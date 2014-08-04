@@ -44,8 +44,8 @@ public:
         InvalidHardwareID,
         InvalidBrand,
         Expired,
-        InvalidType
-
+        InvalidType,
+        TooManyLicensesPerDevice
     };
 
     QnLicense();
@@ -67,6 +67,7 @@ public:
 
     const QString &name() const;
     const QByteArray &key() const;
+    void setKey(const QByteArray& value);
     qint32 cameraCount() const;
     const QByteArray &hardwareId() const;
     const QByteArray &signature() const;
@@ -161,7 +162,7 @@ Q_DECLARE_METATYPE(QnLicenseList)
 
 
 /**
- * License storage which is associated with instance of Enterprise Controller (i.e. should be reloaded when switching appserver).
+ * License storage which is associated with instance of Server (i.e. should be reloaded when switching appserver).
  */
 class QnLicensePool : public QObject
 {
@@ -175,6 +176,7 @@ public:
     void addLicense(const QnLicensePtr &license);
     void addLicenses(const QnLicenseList &licenses);
     void replaceLicenses(const QnLicenseList &licenses);
+    void removeLicense(const QnLicensePtr &license);
 
     void reset();
     bool isEmpty() const;

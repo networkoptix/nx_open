@@ -13,6 +13,7 @@
 #include <ui/style/warning_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace {
     enum Column {
@@ -103,7 +104,6 @@ void QnCheckBoxedHeaderView::at_sectionClicked(int logicalIndex) {
         setCheckState(Qt::Unchecked);
 }
 
-
 // -------------------------------------------------------------------------- //
 // QnCameraAdditionDialog
 // -------------------------------------------------------------------------- //
@@ -155,7 +155,8 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     resize(width(), 1); // set widget height to minimal possible
 }
 
-QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
+QnCameraAdditionDialog::~QnCameraAdditionDialog(){
+}
 
 QnMediaServerResourcePtr QnCameraAdditionDialog::server() const {
     return m_server;
@@ -793,4 +794,13 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
 void QnCameraAdditionDialog::updateStatus() {
     if (m_state == Searching)
         m_server->apiConnection()->searchCameraAsyncStatus(m_processUuid, this, SLOT(at_searchRequestReply(int, const QVariant &, int)));
+}
+
+bool QnCameraAdditionDialog::tryClose(bool force) {
+    if (m_server && !m_processUuid.isNull())
+        m_server->apiConnection()->searchCameraAsyncStop(m_processUuid, NULL, NULL);
+    setState(Initial);
+    if (force)
+        hide();
+    return true;
 }

@@ -76,7 +76,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiVideowallData> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnVideoWallResourcePtr &resource)
     {
-        QnTransaction<ApiVideowallData> tran(command, true);
+        QnTransaction<ApiVideowallData> tran(command);
         fromResourceToApi( resource, tran.params );
         return tran;
     }
@@ -84,7 +84,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiIdData> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnId &id)
     {
-        QnTransaction<ApiIdData> tran(command, false);
+        QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;
         return tran;
     }
@@ -92,7 +92,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiVideowallControlMessageData> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnVideoWallControlMessage &message)
     {
-        QnTransaction<ApiVideowallControlMessageData> tran(command, false);
+        QnTransaction<ApiVideowallControlMessageData> tran(command);
         fromResourceToApi(message, tran.params);
         return tran;
     }

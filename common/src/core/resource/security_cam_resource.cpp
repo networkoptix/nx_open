@@ -373,21 +373,17 @@ Qn::MotionType QnSecurityCamResource::getCameraBasedMotionType() const {
         return Qn::MT_NoMotion;
 }
 
-Qn::MotionType QnSecurityCamResource::getDefaultMotionType() const {
-    QVariant val;
-    if (!getParam(Qn::SUPPORTED_MOTION_PARAM_NAME, val, QnDomainMemory))
-        return defaultMotionType;
-
-    foreach(const QString &s, val.toString().split(L',')) {
-        QString s1 = s.toLower();
-        if (s1 == lit("hardwaregrid"))
-            return Qn::MT_HardwareGrid;
-        else if (s1 == lit("softwaregrid") && hasDualStreaming2())
-            return Qn::MT_SoftwareGrid;
-        else if (s1 == lit("motionwindow"))
-            return Qn::MT_MotionWindow;
-    }
-    return Qn::MT_NoMotion;
+Qn::MotionType QnSecurityCamResource::getDefaultMotionType() const 
+{
+    Qn::MotionTypes value = supportedMotionType();
+    if (value & Qn::MT_HardwareGrid)
+        return Qn::MT_HardwareGrid;
+    else if (value & Qn::MT_SoftwareGrid)
+        return Qn::MT_SoftwareGrid;
+    else if (value & Qn::MT_MotionWindow)
+        return Qn::MT_MotionWindow;
+    else
+        return Qn::MT_NoMotion;
 }
 
 Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const {
@@ -405,10 +401,18 @@ Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const {
         else if (s1 == lit("motionwindow"))
             result |= Qn::MT_MotionWindow;
     }
-    if ((!hasDualStreaming() || secondaryStreamQuality() == Qn::SSQualityDontUse) && !(getCameraCapabilities() &  Qn::PrimaryStreamSoftMotionCapability))
-        result &= ~Qn::MT_SoftwareGrid;
+    //if ((!hasDualStreaming() || secondaryStreamQuality() == Qn::SSQualityDontUse) && !(getCameraCapabilities() &  Qn::PrimaryStreamSoftMotionCapability))
+    //    result &= ~Qn::MT_SoftwareGrid;
 
     return result;
+}
+
+bool QnSecurityCamResource::hasMotion() {
+    Qn::MotionType motionType = getMotionType();
+    if (motionType == Qn::MT_SoftwareGrid)
+        return hasDualStreaming2() || (getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability);
+    else
+        return motionType != Qn::MT_NoMotion;
 }
 
 Qn::MotionType QnSecurityCamResource::getMotionType() {
@@ -669,6 +673,20 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         setGroupName(camera->getGroupName());
         result = true;
     }
+
+    if (getModel() != camera->getModel()) {
+        setModel(camera->getModel());
+        result = true;
+    }
+    if (getVendor() != camera->getVendor()) {
+        setVendor(camera->getVendor());
+        result = true;
+    }
+    if (getMAC() != camera->getMAC()) {
+        setMAC(camera->getMAC());
+        result = true;
+    }
+
 
     return result;
 }

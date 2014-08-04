@@ -59,6 +59,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     setHelpTopic(this, Qn::SystemSettings_Licenses_Help);
 
     connect(ui->detailsButton,                  SIGNAL(clicked()),                                                  this,   SLOT(at_licenseDetailsButton_clicked()));
+    connect(ui->removeButton,                   SIGNAL(clicked()),                                                  this,   SLOT(at_removeButton_clicked()));
     connect(qnLicensePool,                      SIGNAL(licensesChanged()),                                          this,   SLOT(updateLicenses()));
     connect(ui->gridLicenses->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),   this,   SLOT(updateDetailsButtonEnabled()));
     connect(ui->gridLicenses,                   SIGNAL(doubleClicked(const QModelIndex &)),                         this,   SLOT(at_gridLicenses_doubleClicked(const QModelIndex &)));
@@ -142,7 +143,7 @@ void QnLicenseManagerWidget::updateLicenses() {
         }
     } else {
         if (qnLicensePool->currentHardwareId().isEmpty()) {
-            ui->infoLabel->setText(tr("Obtaining licenses from Enterprise Controller..."));
+            ui->infoLabel->setText(tr("Obtaining licenses from Server..."));
             useRedLabel = false;
         } else {
             QString text = (qnProductFeatures().freeLicenseCount > 0) ?
@@ -284,8 +285,12 @@ void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
     QMessageBox::information(this, tr("License Details"), details);
 }
 
-void QnLicenseManagerWidget::updateDetailsButtonEnabled() {
-    ui->detailsButton->setEnabled(ui->gridLicenses->selectionModel()->currentIndex().isValid());
+void QnLicenseManagerWidget::updateDetailsButtonEnabled() 
+{
+    QModelIndex idx = ui->gridLicenses->selectionModel()->currentIndex();
+    ui->detailsButton->setEnabled(idx.isValid());
+    QnLicensePtr license = m_model->license(idx);
+    ui->removeButton->setEnabled(license && !license->isValid());
 }
 
 
@@ -410,6 +415,31 @@ void QnLicenseManagerWidget::at_gridLicenses_doubleClicked(const QModelIndex &in
 void QnLicenseManagerWidget::at_licenseDetailsButton_clicked() {
     QModelIndex index = ui->gridLicenses->selectionModel()->currentIndex();
     showLicenseDetails(m_model->license(index));
+}
+
+void QnLicenseManagerWidget::at_removeButton_clicked() 
+{
+    QModelIndex index = ui->gridLicenses->selectionModel()->currentIndex();
+    QnLicensePtr license = m_model->license(index);
+    if (!license)
+        return;
+
+    auto removeLisencesHandler = [this, license]( int reqID, ec2::ErrorCode errorCode ) {
+        at_licenseRemoved( reqID, errorCode, license );
+    };
+
+    int handle = QnAppServerConnectionFactory::getConnection2()->getLicenseManager()->removeLicense(license, this,  removeLisencesHandler);
+}
+
+void QnLicenseManagerWidget::at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license)
+{
+    if (errorCode == ec2::ErrorCode::ok) {
+        QModelIndex index = ui->gridLicenses->selectionModel()->currentIndex();
+        ui->gridLicenses->model()->removeRow(index.row());
+    }
+    else {
+        emit showMessageLater(tr("Remove license"), tr("Can't remove license from server:  %1").arg(ec2::toString(errorCode)), true);
+    }
 }
 
 void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {

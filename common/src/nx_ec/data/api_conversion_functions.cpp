@@ -188,6 +188,8 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     dst->setVendor(src.vendor);
     dst->setMinDays(src.minArchiveDays);
     dst->setMaxDays(src.maxArchiveDays);
+    Q_ASSERT(dst->getId() == QnVirtualCameraResource::uniqueIdToId(dst->getUniqueId()));
+
 }
 
 
@@ -442,6 +444,8 @@ void fromResourceToApi(const QnLicensePtr &src, ApiLicenseData &dst) {
 
 void fromApiToResource(const ApiLicenseData &src, QnLicensePtr &dst) {
     dst->loadLicenseBlock(src.licenseBlock);
+    if (dst->key().isEmpty())
+        dst->setKey(src.key);
 }
 
 void fromResourceListToApi(const QnLicenseList &src, ApiLicenseDataList &dst) {
@@ -495,12 +499,11 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &
     dst.apiUrl = src->getApiUrl();
     dst.flags = src->getServerFlags();
     dst.panicMode = src->getPanicMode();
-    dst.streamingUrl = src->getStreamingUrl();
     dst.version = src->getVersion().toString();
     dst.systemInfo = src->getSystemInfo().toString();
     dst.maxCameras = src->getMaxCameras();
+    dst.authKey = src->getAuthKey();
     dst.allowAutoRedundancy = src->isRedundancy();
-    //authKey = resource->getAuthKey();
 
     QnAbstractStorageResourceList storageList = src->getStorages();
     dst.storages.resize(storageList.size());
@@ -519,12 +522,11 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     dst->setNetAddrList(resNetAddrList);
     dst->setServerFlags(src.flags);
     dst->setPanicMode(src.panicMode);
-    dst->setStreamingUrl(src.streamingUrl);
     dst->setVersion(QnSoftwareVersion(src.version));
     dst->setSystemInfo(QnSystemInformation(src.systemInfo));
     dst->setMaxCameras(src.maxCameras);
+    dst->setAuthKey(src.authKey);
     dst->setRedundancy(src.allowAutoRedundancy);
-    //dst->setAuthKey(authKey);
 
     QnResourceTypePtr resType = ctx.resTypePool->getResourceTypeByName(lit("Storage"));
     if (!resType)

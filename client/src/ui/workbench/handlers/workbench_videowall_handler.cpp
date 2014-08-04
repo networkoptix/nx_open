@@ -206,11 +206,11 @@ protected:
         QStringList arguments;
         arguments << lit("--videowall");
         arguments << m_videoWallUuid.toString();
-        QUrl url = qnSettings->lastUsedConnection().url;
+        QUrl url = QnAppServerConnectionFactory::url();
         url.setUserName(QString());
         url.setPassword(QString());
-        arguments << QLatin1String("--auth");
-        arguments << QLatin1String(url.toEncoded());
+        arguments << lit("--auth");
+        arguments << QString::fromUtf8(url.toEncoded());
 
         QFileInfo clientFile = QFileInfo(qApp->applicationFilePath());
         QString result = toRegistryFormat(clientFile.canonicalFilePath()) + L' ' + arguments.join(L' ');
@@ -373,7 +373,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
 }
 
 void QnWorkbenchVideoWallHandler::swapLayouts(const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout) {
-    if (firstIndex.isValid() || !secondIndex.isValid())
+    if (!firstIndex.isValid() || !secondIndex.isValid())
         return;
 
     QnLayoutResourceList unsavedLayouts;
@@ -446,26 +446,6 @@ bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr
     return false;
 }
 
-
-bool QnWorkbenchVideoWallHandler::canClose() {
-    if (!context()->user())
-        return true;
-    //TODO: #GDM #VW implement real check. Think about circular dependencies
-    /*
-    if (businessRulesDialog() && businessRulesDialog()->isVisible()) {
-        businessRulesDialog()->activateWindow();
-        if (!businessRulesDialog()->canClose())
-            return;
-        businessRulesDialog()->hide();
-    }
-
-    menu()->trigger(Qn::ClearCameraSettingsAction);
-    if(!context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true))
-        return;*/
-    return true;
-}
-
-
 void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourcePtr &videoWall) {
     if (!canStartVideowall(videoWall)) {
         QMessageBox::warning(mainWindow(),
@@ -488,8 +468,7 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
         return;
 
     if (button == QMessageBox::Yes) {
-        if (canClose())
-            closeInstanceDelayed();
+        closeInstanceDelayed();
     }
     
     QUuid pcUuid = qnSettings->pcUuid();
@@ -498,9 +477,9 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
             continue;
 
         QStringList arguments;
-        arguments << QLatin1String("--videowall");
+        arguments << lit("--videowall");
         arguments << videoWall->getId().toString();
-        arguments << QLatin1String("--videowall-instance");
+        arguments << lit("--videowall-instance");
         arguments << item.uuid.toString();
         openNewWindow(arguments);
     }
@@ -509,12 +488,12 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
 void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args) {
     QStringList arguments = args;
 
-    QUrl url = qnSettings->lastUsedConnection().url;
+    QUrl url = QnAppServerConnectionFactory::url();
     url.setUserName(QString());
     url.setPassword(QString());
 
-    arguments << QLatin1String("--auth");
-    arguments << QLatin1String(url.toEncoded());
+    arguments << lit("--auth");
+    arguments << QString::fromUtf8(url.toEncoded());
 
 #ifdef SENDER_DEBUG
     qDebug() << "arguments" << arguments;
@@ -541,7 +520,7 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
 }
 
 void QnWorkbenchVideoWallHandler::closeInstanceDelayed() {
-    QTimer::singleShot(10, action(Qn::ExitAction), SLOT(trigger()));
+    menu()->trigger(Qn::ExitActionDelayed);
 }
 
 void QnWorkbenchVideoWallHandler::sendMessage(QnVideoWallControlMessage message, bool cached) {
@@ -1091,30 +1070,43 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 /*------------------------------------ HANDLERS ------------------------------------------*/
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
+
+    QStringList usedNames;
+    foreach(const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::videowall))
+        usedNames << resource->getName().trimmed().toLower();
+
     //TODO: #GDM #VW refactor to corresponding dialog
+    QString proposedName = generateUniqueString(usedNames, tr("Video Wall"), tr("Video Wall %1") );
+
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Video Wall..."));
     dialog->setText(tr("Enter the name of the Video Wall to create:")); //TODO: #VW #TR
-    dialog->setName(
-        generateUniqueString([] () {
-                QStringList used;
-                foreach(const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::videowall))
-                    used << resource->getName();
-                return used;
-            }(), tr("Video Wall"), tr("Video Wall %1") )
-    );
+    dialog->setName(proposedName);
     dialog->setWindowModality(Qt::ApplicationModal);
 
-    if(!dialog->exec())
-        return;
+    while (true) {
+        if(!dialog->exec())
+            return;
 
-    QString name = dialog->name();
-    if (name.isEmpty())
-        return;
+        proposedName = dialog->name().trimmed();
+        if (proposedName.isEmpty())
+            return;
+
+        if (usedNames.contains(proposedName.toLower())) {
+            QMessageBox::warning(
+                mainWindow(),
+                tr("Video Wall already exists"),
+                tr("Video Wall with same name already exists")
+                );
+            continue;
+        }
+
+        break;
+    };
 
     QnVideoWallResourcePtr videoWall(new QnVideoWallResource());
     videoWall->setId(QUuid::createUuid());
-    videoWall->setName(name);
+    videoWall->setName(proposedName);
     videoWall->setTypeByName(lit("Videowall"));
 
     connection2()->getVideowallManager()->save(videoWall,  this, 
@@ -1128,7 +1120,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
                 mainWindow(),
                 QnResourceList() << videoWall,
                 tr("Error"),
-                tr("Could not save the following %n items to Enterprise Controller.", "", 1),
+                tr("Could not save the following %n items to Server.", "", 1),
                 QDialogButtonBox::Ok
                 );
     } );
@@ -1279,7 +1271,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered() {
         }
         break;
     default:
-        break;
+        return;
     }
 
     saveVideowalls(videoWalls);
@@ -2108,15 +2100,15 @@ bool QnWorkbenchVideoWallHandler::createShortcut(const QnVideoWallResourcePtr &v
         return false;
 
     QStringList arguments;
-    arguments << QLatin1String("--videowall");
+    arguments << lit("--videowall");
     arguments << videowall->getId().toString();
 
-    QUrl url = qnSettings->lastUsedConnection().url;
+    QUrl url = QnAppServerConnectionFactory::url();
     url.setUserName(QString());
     url.setPassword(QString());
 
-    arguments << QLatin1String("--auth");
-    arguments << QLatin1String(url.toEncoded());
+    arguments << lit("--auth");
+    arguments << QString::fromUtf8(url.toEncoded());
 
     return qnPlatform->shortcuts()->createShortcut(qApp->applicationFilePath(), destinationPath, videowall->getName(), arguments);
 }

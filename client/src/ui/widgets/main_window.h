@@ -99,7 +99,6 @@ private:
 
 private:
     /* Note that destruction order is important here, so we use scoped pointers. */
-    QScopedPointer<QnGradientBackgroundPainter> m_backgroundPainter;
     QScopedPointer<QnGraphicsView> m_view;
     QScopedPointer<QnGraphicsScene> m_scene;
     QScopedPointer<QnWorkbenchController> m_controller;

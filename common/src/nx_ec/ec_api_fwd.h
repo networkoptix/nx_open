@@ -5,6 +5,8 @@
 
 namespace ec2
 {
+    enum class ErrorCode;
+
     class AbstractResourceManager;
     typedef std::shared_ptr<AbstractResourceManager> AbstractResourceManagerPtr;
 

@@ -25,6 +25,7 @@ public:
 
     virtual void updateResource(const QnResourcePtr &resource) = 0;
 
+    QMap<QnId, QnBusinessEventRulePtr> businessRules() const;
 signals:
     void connectionOpened();
     void connectionClosed();
@@ -66,6 +67,7 @@ protected:
 public slots:
     void on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &rule);
     void on_licenseChanged(const QnLicensePtr &license);
+    void on_licenseRemoved(const QnLicensePtr &license);
 
 private slots:
     void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);

@@ -17,10 +17,10 @@
         <root.dir>${basedir}/..</root.dir>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
+        <DbSync22Dir>${libdir}/${arch}/share/dbsync-2.2</DbSync22Dir>
     </properties>
 
     <build>
-        <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${install.type}-beta</finalName>
         <directory>${arch}</directory>
         <sourceDirectory>${basedir}</sourceDirectory>
         <plugins>
@@ -176,19 +176,5 @@
                 </executions>
             </plugin>                    
         </plugins>
-    </build>
-    <profiles>	      
-        <profile>
-            <id>nobeta</id>
-            <activation>
-                <property>
-                    <name>beta</name>
-                    <value>false</value>
-                </property>
-            </activation>
-            <properties>
-                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${install.type}</finalName>    
-            </properties>
-        </profile>	  
-    </profiles>        
+    </build>       
 </project>

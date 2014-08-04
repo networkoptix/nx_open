@@ -102,11 +102,13 @@ void QnTransactionTransport::setStateNoLock(State state)
         m_connected = false;
     }
     else if (state == ReadyForStreaming) {
-        m_socket->setRecvTimeout(SOCKET_TIMEOUT);
-        m_socket->setSendTimeout(SOCKET_TIMEOUT);
-        m_socket->setNonBlockingMode(true);
-        m_chunkHeaderLen = 0;
-        aio::AIOService::instance()->watchSocket( m_socket, aio::etRead, this );
+        if (m_socket) {
+            m_socket->setRecvTimeout(SOCKET_TIMEOUT);
+            m_socket->setSendTimeout(SOCKET_TIMEOUT);
+            m_socket->setNonBlockingMode(true);
+            m_chunkHeaderLen = 0;
+            aio::AIOService::instance()->watchSocket( m_socket, aio::etRead, this );
+        }
     }
     if (this->m_state != state) {
         this->m_state = state;
@@ -168,7 +170,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                         {
                             QByteArray serializedTran;
                             QnTransactionTransportHeader transportHeader;
-                            QnBinaryTransactionSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+                            QnUbjsonTransactionSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
                             emit gotTransaction(serializedTran, transportHeader);
                             m_readBufferLen = m_chunkHeaderLen = 0;
                         }
@@ -380,7 +382,7 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         {
             QByteArray serializedTran;
             QnTransactionTransportHeader transportHeader;
-            QnBinaryTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+            QnUbjsonTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
             emit gotTransaction(serializedTran, transportHeader);
 
             buffer += fullChunkLen;

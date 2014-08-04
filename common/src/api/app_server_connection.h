@@ -27,14 +27,12 @@ public:
     virtual ~QnAppServerConnectionFactory();
 
     static QString clientGuid();
-    static QUrl defaultUrl();
-    static QUrl publicUrl();
+    static QUrl url();
     static QnSoftwareVersion currentVersion();
     static QnResourceFactory* defaultFactory();
 
-    //static void setAuthKey(const QString &key);
     static void setClientGuid(const QString &guid);
-    static void setDefaultUrl(const QUrl &url);
+    static void setUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory *);
     static void setCurrentVersion(const QnSoftwareVersion &version);
     
@@ -57,8 +55,7 @@ public:
 private:
     QMutex m_mutex;
     QString m_clientGuid;
-    QUrl m_defaultUrl;
-    QUrl m_publicUrl;
+    QUrl m_url;
 
     /** Videowall-related fields */
     QUuid m_videowallGuid;

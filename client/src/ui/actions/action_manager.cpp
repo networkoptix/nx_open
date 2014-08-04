@@ -412,6 +412,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Settings..."));
 
+    factory(Qn::ConnectAction).
+        flags(Qn::NoTarget);
+
     factory(Qn::ReconnectAction).
         flags(Qn::NoTarget).
         text(tr("Reconnect to Server"));
@@ -439,7 +442,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenBusinessLogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Alarm/Event Log..."));
+        text(tr("Event Log..."));
 
     factory(Qn::OpenBusinessRulesAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
@@ -498,9 +501,10 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/main_menu.png"));
 
-    // Text and icon are set in QnWorkbenchActionHandler::at_eventManager_connectionOpened/Closed
-    factory(Qn::ConnectToServerAction).
+    factory(Qn::OpenLoginDialogAction).
         flags(Qn::Main).
+        text(tr("Connect to Server...")).
+        icon(qnSkin->icon("titlebar/disconnected.png")).
         autoRepeat(false);
 
     factory(Qn::DisconnectAction).
@@ -736,7 +740,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::BusinessEventsLogAction).
         flags(Qn::Main | Qn::Tree | Qn::GlobalHotkey).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Alarm/Event Log...")).
+        text(tr("Event Log...")).
         shortcut(tr("Ctrl+L")).
         autoRepeat(false).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
@@ -757,11 +761,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         text(tr("How-to Videos and FAQ...")).
         condition(new QnShowcaseActionCondition(this));
-
-    factory(Qn::CheckForUpdatesAction).
-        flags(Qn::Main).
-        text(tr("Check for Updates...")).
-        condition(new QnCheckForUpdatesActionCondition(this));
 
     factory(Qn::AboutAction).
         flags(Qn::Main | Qn::GlobalHotkey).
@@ -784,6 +783,11 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/exit.png"));
 
+    factory(Qn::ExitActionDelayed).
+        flags(Qn::NoTarget);
+
+    factory(Qn::BeforeExitAction).
+        flags(Qn::NoTarget);
 
     /* Tab bar actions. */
     factory().
@@ -1269,10 +1273,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in Camera Settings Dialog"));
 
-    factory(Qn::ClearCameraSettingsAction).
-        flags(Qn::NoTarget).
-        text(tr("Clear Camera Settings Dialog"));
-
     factory(Qn::ServerAddCameraManuallyAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Add Camera(s)...")).
@@ -1716,6 +1716,18 @@ bool QnActionManager::triggerIfPossible(Qn::ActionId id, const QnActionParameter
     return true;
 }
 
+QMenu* QnActionManager::integrateMenu(QMenu *menu, const QnActionParameters &parameters) {
+    if (!menu)
+        return NULL;
+
+    Q_ASSERT(!m_parametersByMenu.contains(menu));
+    m_parametersByMenu[menu] = parameters;
+    menu->installEventFilter(this);
+    connect(menu, &QObject::destroyed, this, &QnActionManager::at_menu_destroyed);
+    return menu;
+}
+
+
 QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options) {
     return newMenu(Qn::NoAction, scope, parent, parameters, options);
 }
@@ -1729,15 +1741,7 @@ QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWid
     } else {
         result = newMenuRecursive(rootAction, scope, parameters, parent, options);
         if (!result)
-            result = new QnMenu(parent);
-    }
-
-    if(result) {
-        m_parametersByMenu[result] = parameters;
-
-        result->installEventFilter(this);
-
-        connect(result, &QObject::destroyed, this, &QnActionManager::at_menu_destroyed);
+            result = integrateMenu(new QnMenu(parent), parameters);
     }
 
     return result;
@@ -1766,8 +1770,13 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
 QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options) {
     if (parent->childFactory()) {
         QMenu* childMenu = parent->childFactory()->newMenu(parameters, parentWidget);
-        if (childMenu)
-            return childMenu;
+        if (childMenu && childMenu->isEmpty()) {
+            delete childMenu;
+            return NULL;
+        }
+
+        /* Do not need to call integrateMenu, it is already integrated. */
+        return childMenu;
     }
 
     QMenu *result = new QnMenu(parentWidget);
@@ -1843,15 +1852,14 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
         return NULL;
     }
 
-    return result;
+    return integrateMenu(result, parameters);
 }
 
 QnActionParameters QnActionManager::currentParameters(QnAction *action) const {
     if(m_shortcutAction == action)
         return m_parametersByMenu.value(NULL);
     
-    if(m_lastClickedMenu == NULL || !m_parametersByMenu.contains(m_lastClickedMenu)) 
-    {
+    if(!m_parametersByMenu.contains(m_lastClickedMenu)) {
         qnWarning("No active menu, no target exists.");
         return QnActionParameters();
     }

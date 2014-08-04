@@ -60,7 +60,9 @@ namespace ec2
         {
             Q_ASSERT(tran.command != ApiCommand::NotDefined);
             QMutexLocker lock(&m_mutex);
-            sendTransactionInternal(tran, QnTransactionTransportHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers));
+            QnTransactionTransportHeader ttHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers);
+            ttHeader.fillSequence();
+            sendTransactionInternal(tran, ttHeader);
         }
 
         /** Template specialization to fill dstPeers from the transaction params. */
@@ -176,6 +178,7 @@ namespace ec2
 
         void addAlivePeerInfo(ApiPeerData peerData, const QnId& gotFromPeer = QnId());
         void removeAlivePeer(const QnId& id, bool isProxy);
+        bool doHandshake(QnTransactionTransport* transport);
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
@@ -188,6 +191,7 @@ namespace ec2
 
         QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
         QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
+		QScopedPointer<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
 
         struct RemoteUrlConnectInfo {
             RemoteUrlConnectInfo(const QUuid& peer = QUuid()): peer(peer), lastConnectedTime(0) {}

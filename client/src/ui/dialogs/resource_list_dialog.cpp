@@ -10,7 +10,7 @@
 #include "ui_resource_list_dialog.h"
 
 QnResourceListDialog::QnResourceListDialog(QWidget *parent):
-    QnButtonBoxDialog(parent),
+    base_type(parent),
     ui(new Ui::ResourceListDialog())
 {
     ui->setupUi(this);

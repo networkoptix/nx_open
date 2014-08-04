@@ -28,7 +28,7 @@
 class QnRestProcessorPool;
 class QnUniversalTcpListener;
 
-//!Contains API classes for the new enterprise controller
+//!Contains API classes for the new Server
 /*!
     TODO describe all API classes
     \note All methods are thread-safe
@@ -366,12 +366,19 @@ namespace ec2
             return addLicenses( licenses, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        template<class TargetType, class HandlerType> int removeLicense( const QnLicensePtr& license, TargetType* target, HandlerType handler ) {
+            return removeLicense( license, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+
     signals:
         void licenseChanged(QnLicensePtr license);
+        void licenseRemoved(QnLicensePtr license);
 
     protected:
         virtual int getLicenses( impl::GetLicensesHandlerPtr handler ) = 0;
         virtual int addLicenses( const QList<QnLicensePtr>& licenses, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int removeLicense( const QnLicensePtr& license, impl::SimpleHandlerPtr handler ) = 0;
     };
 
 
@@ -793,7 +800,7 @@ namespace ec2
         //virtual void cancelRequest( int requestID ) = 0;
 
     signals:
-        //!Delivers all resources found in EC
+        //!Delivers all resources found in Server
         /*!
             This signal is emitted after starting notifications delivery by call to \a AbstractECConnection::startReceivingNotifications 
                 if full synchronization is requested
@@ -867,7 +874,7 @@ namespace ec2
             return testConnectionAsync( addr, std::static_pointer_cast<impl::TestConnectionHandler>(std::make_shared<impl::CustomTestConnectionHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
-            \param addr Empty url designates local EC ("local" means dll linked to executable, not EC running on local host)
+            \param addr Empty url designates local Server ("local" means dll linked to executable, not Server running on local host)
             \param handler Functor with params: (ErrorCode, AbstractECConnectionPtr)
         */
         template<class TargetType, class HandlerType> int connect( const QUrl& addr, TargetType* target, HandlerType handler ) {

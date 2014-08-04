@@ -44,11 +44,8 @@ static const int ONVIF_SERVICE_DEFAULT_PORTS[] =
     9988 // Dahui default port
 };
 
-OnvifResourceSearcher::OnvifResourceSearcher():
-    wsddSearcher(OnvifResourceSearcherWsdd::instance())
-    //mdnsSearcher(OnvifResourceSearcherMdns::instance()),
+OnvifResourceSearcher::OnvifResourceSearcher()
 {
-
 }
 
 OnvifResourceSearcher::~OnvifResourceSearcher()
@@ -98,7 +95,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     if (!typePtr)
         return resList;
 
-    int onvifPort = url.port(80);
+    const int onvifPort = url.port(nx_http::DEFAULT_HTTP_PORT);
     QString onvifUrl(QLatin1String("onvif/device_service"));
 
     QnPlOnvifResourcePtr resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
@@ -209,7 +206,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 void OnvifResourceSearcher::pleaseStop()
 {
     QnAbstractNetworkResourceSearcher::pleaseStop();
-    wsddSearcher.pleaseStop();
+    m_wsddSearcher.pleaseStop();
 }
 
 QnResourceList OnvifResourceSearcher::findResources()
@@ -219,7 +216,7 @@ QnResourceList OnvifResourceSearcher::findResources()
 
     //Order is important! mdns should be the first to avoid creating ONVIF resource, when special is expected
     //mdnsSearcher.findResources(result, specialResourceCreator);
-    wsddSearcher.findResources(result);
+    m_wsddSearcher.findResources(result);
 
     return result;
 }

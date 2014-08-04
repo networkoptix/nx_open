@@ -60,6 +60,8 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
     connect( connection->getLicenseManager().get(), &ec2::AbstractLicenseManager::licenseChanged,
         this, &QnCommonMessageProcessor::on_licenseChanged );
+    connect( connection->getLicenseManager().get(), &ec2::AbstractLicenseManager::licenseRemoved,
+        this, &QnCommonMessageProcessor::on_licenseRemoved );
 
     connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::addedOrUpdated,
         this, &QnCommonMessageProcessor::on_businessEventAddedOrUpdated );
@@ -165,6 +167,10 @@ void QnCommonMessageProcessor::on_licenseChanged(const QnLicensePtr &license) {
     qnLicensePool->addLicense(license);
 }
 
+void QnCommonMessageProcessor::on_licenseRemoved(const QnLicensePtr &license) {
+    qnLicensePool->removeLicense(license);
+}
+
 void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &businessRule){
     m_rules[businessRule->id()] = businessRule;
     emit businessRuleChanged(businessRule);
@@ -259,4 +265,8 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     processCameraServerItems(fullData.cameraHistory);
     //on_runtimeInfoChanged(fullData.serverInfo);
     qnSyncTime->reset();
+}
+
+QMap<QnId, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() const {
+    return m_rules;
 }

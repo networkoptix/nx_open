@@ -31,7 +31,7 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     addFlags(QnResource::server | QnResource::remote);
     removeFlags(QnResource::media); // TODO: #Elric is this call needed here?
 
-    //TODO: #GDM #EDGE in case of EDGE servers getName should return name of its camera. Possibly name just should be synced on EC.
+    //TODO: #GDM #EDGE in case of EDGE servers getName should return name of its camera. Possibly name just should be synced on Server.
     setName(tr("Server"));
 
     m_primaryIFSelected = false;
@@ -66,18 +66,6 @@ QString QnMediaServerResource::getApiUrl() const
 {
     QMutexLocker lock(&m_mutex);
     return m_apiUrl;
-}
-
-void QnMediaServerResource::setStreamingUrl(const QString& value)
-{
-    QMutexLocker lock(&m_mutex);
-    m_streamingUrl = value;
-}
-
-const QString& QnMediaServerResource::getStreamingUrl() const
-{
-    QMutexLocker lock(&m_mutex);
-    return m_streamingUrl;
 }
 
 void QnMediaServerResource::setNetAddrList(const QList<QHostAddress>& netAddrList)
@@ -282,7 +270,6 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_serverFlags = localOther->m_serverFlags;
         netAddrListChanged = m_netAddrList != localOther->m_netAddrList;
         m_netAddrList = localOther->m_netAddrList;
-        m_streamingUrl = localOther->getStreamingUrl();
         m_version = localOther->getVersion();
         m_systemInfo = localOther->getSystemInfo();
         m_redundancy = localOther->isRedundancy();
@@ -290,7 +277,7 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
 
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         
-        /* Keep indices unchanged (EC does not provide this info). */
+        /* Keep indices unchanged (Server does not provide this info). */
         foreach(const QnAbstractStorageResourcePtr &storage, m_storages)
         {
             foreach(const QnAbstractStorageResourcePtr &otherStorage, otherStorages)
@@ -394,4 +381,14 @@ qint64 QnMediaServerResource::currentStatusTime() const
 {
     QMutexLocker lock(&m_mutex);
     return m_statusTimer.elapsed();
+}
+
+QString QnMediaServerResource::getAuthKey() const
+{
+    return m_authKey;
+}
+
+void QnMediaServerResource::setAuthKey(const QString& authKey)
+{
+    m_authKey = authKey;
 }

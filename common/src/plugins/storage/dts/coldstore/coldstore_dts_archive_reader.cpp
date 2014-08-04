@@ -4,6 +4,7 @@
 
 #include <utils/common/log.h>
 
+#include <core/resource/resource.h>
 #include "core/datapacket/video_data_packet.h"
 #include "core/resource/resource_media_layout.h"
 #include "../../coldstore/coldstore_api/sfs-client.h"

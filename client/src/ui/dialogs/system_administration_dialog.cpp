@@ -11,10 +11,14 @@
 #include <ui/widgets/settings/general_system_administration_widget.h>
 #include <ui/widgets/server_updates_widget.h>
 
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_state_manager.h>
+
 QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::QnSystemAdministrationDialog)
+    ui(new Ui::QnSystemAdministrationDialog),
+    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnSystemAdministrationDialog>(this))
 {
     ui->setupUi(this);
 
