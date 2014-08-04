@@ -95,6 +95,7 @@ private:
 
     QMutex m_motionRoleMtx;
     QnResource::ConnectionRole m_softMotionRole;
+    QString m_forcedMotionStream;
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
 #endif
