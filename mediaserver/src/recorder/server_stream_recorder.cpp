@@ -280,6 +280,11 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
         return false;
     }
 
+    if (metaData && !m_useSecondaryRecorder && !m_usePrimaryRecorder) {
+        keepRecentlyMotion(media);
+        return false;
+    }
+
     if (task.getRecordingType() == Qn::RT_Always)
         return true;
     else if (task.getRecordingType() == Qn::RT_MotionAndLowQuality && (m_catalog == QnServer::LowQualityCatalog || !camera->hasDualStreaming2()))

@@ -189,7 +189,7 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
             && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium
             && ui->checkBoxPrimaryRecorder->checkState() == Qt::Unchecked
             && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked
-            && ui->comboBoxTransport->currentIndex();
+            && ui->comboBoxTransport->currentIndex() == 0;
 
     ui->assureCheckBox->setEnabled(!cameras.isEmpty() && defaultValues);
     ui->assureCheckBox->setChecked(!defaultValues);
