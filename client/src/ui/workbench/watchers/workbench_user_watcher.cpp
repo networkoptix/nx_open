@@ -100,6 +100,9 @@ void QnWorkbenchUserWatcher::at_resource_nameChanged(const QnResourcePtr &resour
 }
 
 bool QnWorkbenchUserWatcher::reconnectRequired(const QnUserResourcePtr &user) {
+    if (m_userName.isEmpty())
+        return false;   //we are not connected
+
     if (user->getName() != m_userName)
         return true;
 
