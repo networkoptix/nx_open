@@ -643,7 +643,7 @@ public:
             *m_recvHandlerTerminatedFlag = true;
     }
 
-    virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) override
+    virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() override
     {
         bool terminated = false;    //set to true just before object destruction
 
@@ -747,7 +747,7 @@ public:
                     else
                     {
                         sendBufPos += bytesWritten;
-                        if( sendBufPos == sendBuffer->size() )
+                        if( sendBufPos == (size_t)sendBuffer->size() )
                         {
                             sendHandler( SystemError::noError, sendBufPos );
                             sendBufPos = 0;
@@ -1332,7 +1332,7 @@ public:
     {
     }
 
-    virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) override
+    virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() override
     {
         assert( acceptHandler );
 
