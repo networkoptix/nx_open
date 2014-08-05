@@ -19,7 +19,7 @@ public:
     void updateUi();
 
 private slots:
-    void at_urlComboBox_currentIndexChanged(int index);
+    void at_urlComboBox_activated(int index);
 
 private:
     QScopedPointer<Ui::QnJoinOtherSystemDialog> ui;
