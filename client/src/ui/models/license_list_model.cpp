@@ -21,9 +21,6 @@ const QList<QnLicensePtr> &QnLicenseListModel::licenses() const {
 }
 
 void QnLicenseListModel::setLicenses(const QList<QnLicensePtr> &licenses) {
-    if(m_licenses == licenses)
-        return;
-
     m_licenses = licenses;
 
     rebuild();

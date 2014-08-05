@@ -11,6 +11,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
+#include <QTimer>
 
 #include "core/resource/resource_fwd.h"
 #include "utils/common/latin1_array.h"
@@ -171,7 +172,8 @@ signals:
 
 protected:
     QnLicensePool();
-
+private slots:
+    void at_timer();
 private:
     bool isLicenseMatchesCurrentSystem(const QnLicensePtr &license);
     bool addLicense_i(const QnLicensePtr &license);
@@ -179,6 +181,7 @@ private:
 private:
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QMutex m_mutex;
+    QTimer m_timer;
 };
 
 #define qnLicensePool QnLicensePool::instance()

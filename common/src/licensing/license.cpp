@@ -470,7 +470,26 @@ Q_GLOBAL_STATIC(QnLicensePoolInstance, qn_licensePool_instance)
 
 QnLicensePool::QnLicensePool(): 
     m_mutex(QMutex::Recursive)
-{}
+{
+    connect(&m_timer, &QTimer::timeout, this, &QnLicensePool::at_timer);
+    m_timer.start(1000 * 60);
+}
+
+void QnLicensePool::at_timer()
+{
+    foreach(const QnLicensePtr license, m_licenseDict)
+    {
+        QnLicense::ErrorCode errCode;
+        license->isValid(&errCode);
+        if (errCode == QnLicense::Expired) {
+            qint64 experationDelta = qnSyncTime->currentMSecsSinceEpoch() - license->expirationTime();
+            if (experationDelta < m_timer.interval()) {
+                emit licensesChanged();
+                break;
+            }
+        }
+    }
+}
 
 QnLicensePool *QnLicensePool::instance()
 {
