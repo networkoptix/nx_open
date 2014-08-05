@@ -159,13 +159,13 @@ QString QnLicense::longDisplayName() const {
 
 QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     switch (licenseType) {
-    case Qn::LC_Trial:          return tr("Trial license(s)");
-    case Qn::LC_Analog:         return tr("Analog license(s)");
-    case Qn::LC_Professional:   return tr("Professional license(s)");
-    case Qn::LC_Edge:           return tr("Edge license(s)");
-    case Qn::LC_VMAX:           return tr("Vmax license(s)");
-    case Qn::LC_AnalogEncoder:  return tr("Analog encoder license(s)");
-    case Qn::LC_VideoWall:      return tr("Video Wall license(s)");
+    case Qn::LC_Trial:          return tr("Trial licenses");
+    case Qn::LC_Analog:         return tr("Analog licenses");
+    case Qn::LC_Professional:   return tr("Professional licenses");
+    case Qn::LC_Edge:           return tr("Edge licenses");
+    case Qn::LC_VMAX:           return tr("Vmax licenses");
+    case Qn::LC_AnalogEncoder:  return tr("Analog encoder licenses");
+    case Qn::LC_VideoWall:      return tr("Video Wall licenses");
     default:
         break;
     }

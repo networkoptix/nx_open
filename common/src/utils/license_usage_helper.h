@@ -15,6 +15,8 @@ public:
 
     bool isValid() const;
 
+    bool isValid(Qn::LicenseType licenseType) const;
+
     /** 
      *  Get text "Activate %n more licenses" or "%n more licenses will be used" if valid for the selected type.
      */
@@ -66,8 +68,6 @@ protected:
     int m_usedLicenses[Qn::LC_Count];
     int m_proposedLicenses[Qn::LC_Count];
     int m_overflowLicenses[Qn::LC_Count];
-
-    bool m_isValid;
 };
 
 class QnCamLicenseUsageHelper: public QnLicenseUsageHelper {

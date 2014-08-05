@@ -41,6 +41,9 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
+    QnCamLicenseUsageHelper helper;
+    ui->licensesUsageWidget->init(&helper);
+
     ui->cameraScheduleWidget->setContext(context());
     connect(context(), &QnWorkbenchContext::userChanged, this, &QnMultipleCameraSettingsWidget::updateLicensesButtonVisible);
 
@@ -129,13 +132,20 @@ void QnMultipleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     case Qn::RecordingSettingsTab:
     case Qn::MotionSettingsTab:
     case Qn::AdvancedCameraSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->tabRecording);
+        if (ui->tabWidget->isTabEnabled(Qn::RecordingSettingsTab))
+            ui->tabWidget->setCurrentWidget(ui->tabRecording);
+        else
+            ui->tabWidget->setCurrentWidget(ui->tabGeneral);
         break;
     case Qn::ExpertCameraSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->expertTab);
+        if (ui->tabWidget->isTabEnabled(Qn::ExpertCameraSettingsTab))
+            ui->tabWidget->setCurrentWidget(ui->expertTab);
+        else
+            ui->tabWidget->setCurrentWidget(ui->tabGeneral);
         break;
     default:
         qnWarning("Invalid camera settings tab '%1'.", static_cast<int>(tab));
+        ui->tabWidget->setCurrentWidget(ui->tabGeneral);
         break;
     }
 }
@@ -463,28 +473,7 @@ void QnMultipleCameraSettingsWidget::updateLicenseText() {
         break;
     }
 
-    QPalette palette = this->palette();
-    if (!helper.isValid())
-        setWarningStyle(&palette);
-    QString licenseText = helper.getUsageText();
-    ui->licensesLabel->setText(licenseText);
-    ui->licensesLabel->setPalette(palette);
-    ui->licensesLabel->setVisible(!licenseText.isEmpty());
-
-    if (ui->analogViewCheckBox->checkState() != Qt::Checked) {
-        ui->requiredLicensesLabel->setVisible(false);
-        return;
-    }
-
-    { // required licenses
-        QPalette palette = this->palette();
-        if (!helper.isValid())
-            setWarningStyle(&palette);
-        ui->requiredLicensesLabel->setPalette(palette);
-        ui->requiredLicensesLabel->setVisible(true);
-    }
-
-    ui->requiredLicensesLabel->setText(helper.getRequiredLicenseMsg());
+    ui->licensesUsageWidget->loadData(&helper);
 }
 
 void QnMultipleCameraSettingsWidget::updateMaxFPS(){

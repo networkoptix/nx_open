@@ -175,6 +175,9 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     ui->noRecordButton->setColor(qnGlobals->noRecordColor());
     ui->noRecordButton->setCheckedColor(qnGlobals->noRecordColor().lighter());
 
+    QnCamLicenseUsageHelper helper;
+    ui->licensesUsageWidget->init(&helper);
+
     connect(ui->recordAlwaysButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
     connect(ui->recordMotionButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
     connect(ui->recordMotionPlusLQButton,SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
@@ -691,30 +694,7 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
     default:
         break;
     }
-
-    QPalette palette = this->palette();
-    if (!helper.isValid())
-        setWarningStyle(&palette);
-    QString licenseText = helper.getUsageText();
-    ui->licensesLabel->setText(licenseText);
-    ui->licensesLabel->setPalette(palette);
-    ui->licensesLabel->setVisible(!licenseText.isEmpty());
-
-    if (ui->enableRecordingCheckBox->checkState() != Qt::Checked) {
-        ui->requiredLicensesLabel->setVisible(false);
-        return;
-    }
-
-    { // required licenses
-        QPalette palette = this->palette();
-        if (!helper.isValid())
-            setWarningStyle(&palette);
-        ui->requiredLicensesLabel->setPalette(palette);
-        ui->requiredLicensesLabel->setVisible(true);
-    }
-
-    ui->requiredLicensesLabel->setText(helper.getRequiredLicenseMsg());
-
+    ui->licensesUsageWidget->loadData(&helper);
 }
 
 void QnCameraScheduleWidget::updateLicensesButtonVisible() {
