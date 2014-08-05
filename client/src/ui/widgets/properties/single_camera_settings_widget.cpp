@@ -85,6 +85,9 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     ui->cameraScheduleWidget->setContext(context());
     connect(context(), &QnWorkbenchContext::userChanged, this, &QnSingleCameraSettingsWidget::updateLicensesButtonVisible);
 
+    QnCamLicenseUsageHelper helper;
+    ui->licensesUsageWidget->init(&helper);
+
     /* Set up context help. */
     setHelpTopic(this,                                                      Qn::CameraSettings_Help);
     setHelpTopic(ui->fisheyeCheckBox,                                       Qn::CameraSettings_Dewarping_Help);
@@ -1011,32 +1014,8 @@ void QnSingleCameraSettingsWidget::updateLicenseText() {
         return;
 
     QnCamLicenseUsageHelper helper;
-
     helper.propose(QnVirtualCameraResourceList() << m_camera, ui->analogViewCheckBox->isChecked());
-
-    QPalette palette = this->palette();
-    if (!helper.isValid())
-        setWarningStyle(&palette);
-
-    QString licenseText = helper.getUsageText();
-    ui->licensesLabel->setText(licenseText);
-    ui->licensesLabel->setPalette(palette);
-    ui->licensesLabel->setVisible(!licenseText.isEmpty());
-
-    if (ui->analogViewCheckBox->checkState() != Qt::Checked) {
-        ui->requiredLicensesLabel->setVisible(false);
-        return;
-    }
-
-    { // required licenses
-        QPalette palette = this->palette();
-        if (!helper.isValid())
-            setWarningStyle(&palette);
-        ui->requiredLicensesLabel->setPalette(palette);
-        ui->requiredLicensesLabel->setVisible(true);
-    }
-
-    ui->requiredLicensesLabel->setText(helper.getRequiredLicenseMsg());
+    ui->licensesUsageWidget->loadData(&helper);
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {

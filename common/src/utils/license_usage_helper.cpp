@@ -46,8 +46,7 @@ static std::array<LicenseCompatibility, 14> compatibleLicenseType =
 
 QnLicenseUsageHelper::QnLicenseUsageHelper(QObject *parent):
     base_type(parent),
-    m_licenses(qnLicensePool->getLicenses()),
-    m_isValid(true)
+    m_licenses(qnLicensePool->getLicenses())
 {
     memset(m_usedLicenses, 0, sizeof(m_usedLicenses));
     memset(m_proposedLicenses, 0, sizeof(m_proposedLicenses));
@@ -68,8 +67,9 @@ void QnLicenseUsageHelper::borrowLicenseFromClass(int& srcUsed, int srcTotal, in
     }
 }
 
-QString QnLicenseUsageHelper::getUsageText(Qn::LicenseType licenseType) const
-{
+QString QnLicenseUsageHelper::getUsageText(Qn::LicenseType licenseType) const {
+    if (m_usedLicenses[licenseType] == 0)
+        return QString();
     return tr("%n %2 are used out of %1.", "", m_usedLicenses[licenseType]).arg( m_licenses.totalLicenseByType(licenseType)).arg(QnLicense::longDisplayName(licenseType));
 }
 
@@ -77,8 +77,8 @@ QString QnLicenseUsageHelper::getUsageText() const
 {
     QString licenseText;
     foreach (Qn::LicenseType lt, licenseTypes()) {
-        if (totalLicense(lt) == 0)
-            continue;
+//         if (totalLicense(lt) == 0)
+//             continue;
         if (!licenseText.isEmpty())
             licenseText += lit("\n");
         licenseText += getUsageText(lt);
@@ -86,8 +86,9 @@ QString QnLicenseUsageHelper::getUsageText() const
     return licenseText;
 }
 
-QString QnLicenseUsageHelper::getProposedUsageText(Qn::LicenseType licenseType) const
-{
+QString QnLicenseUsageHelper::getProposedUsageText(Qn::LicenseType licenseType) const {
+    if (m_usedLicenses[licenseType] == 0)
+        return QString();
     return tr("%n %2 will be used out of %1.", "", m_usedLicenses[licenseType]).arg( m_licenses.totalLicenseByType(licenseType)).arg(QnLicense::longDisplayName(licenseType));
 }
 
@@ -127,12 +128,10 @@ QString QnLicenseUsageHelper::getRequiredLicenseMsg() const
 void QnLicenseUsageHelper::update() {
     m_licenses.update(qnLicensePool->getLicenses());
 
-    int recordingTotal = 0;
     int maxTotal = 0;
     int maxLicenses[Qn::LC_Count];
     foreach (Qn::LicenseType lt, licenseTypes()) {
         m_usedLicenses[lt] = calculateUsedLicenses(lt) + m_proposedLicenses[lt];
-        recordingTotal += m_usedLicenses[lt];
         maxLicenses[lt] = m_licenses.totalLicenseByType(lt);
         maxTotal += maxLicenses[lt];
     }
@@ -144,18 +143,21 @@ void QnLicenseUsageHelper::update() {
         }
     }
 
-    m_isValid = true;
-    foreach (Qn::LicenseType lt, licenseTypes()) {
+    foreach (Qn::LicenseType lt, licenseTypes())
         m_overflowLicenses[lt] = qMax(0, m_usedLicenses[lt] - maxLicenses[lt]);
-        m_isValid &= (m_overflowLicenses[lt] == 0);
-    }
 
     emit licensesChanged();
 }
 
-bool QnLicenseUsageHelper::isValid() const
-{
-    return m_isValid;
+bool QnLicenseUsageHelper::isValid() const {
+    foreach (Qn::LicenseType lt, licenseTypes())
+        if (!isValid(lt))
+            return false;
+    return true;
+}
+
+bool QnLicenseUsageHelper::isValid(Qn::LicenseType licenseType) const {
+    return m_overflowLicenses[licenseType] == 0;
 }
 
 int QnLicenseUsageHelper::totalLicense(Qn::LicenseType licenseType) const {
@@ -227,10 +229,10 @@ bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourceP
 QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const {
     return QList<Qn::LicenseType>()
         << Qn::LC_Trial
-        << Qn::LC_Analog
+        << Qn::LC_Analog    // both places
         << Qn::LC_Professional
         << Qn::LC_Edge
-        << Qn::LC_VMAX
+        << Qn::LC_VMAX  //only main page
         << Qn::LC_AnalogEncoder
         ;
 }

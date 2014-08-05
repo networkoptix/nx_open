@@ -101,7 +101,16 @@
             <property name="fieldGrowthPolicy">
              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
             </property>
-            <property name="margin">
+            <property name="leftMargin">
+             <number>9</number>
+            </property>
+            <property name="topMargin">
+             <number>9</number>
+            </property>
+            <property name="rightMargin">
+             <number>9</number>
+            </property>
+            <property name="bottomMargin">
              <number>9</number>
             </property>
             <item row="0" column="0">
@@ -188,7 +197,16 @@
             <property name="fieldGrowthPolicy">
              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
             </property>
-            <property name="margin">
+            <property name="leftMargin">
+             <number>9</number>
+            </property>
+            <property name="topMargin">
+             <number>9</number>
+            </property>
+            <property name="rightMargin">
+             <number>9</number>
+            </property>
+            <property name="bottomMargin">
              <number>9</number>
             </property>
             <item row="0" column="0">
@@ -288,13 +306,6 @@
              </spacer>
             </item>
             <item>
-             <widget class="QLabel" name="requiredLicensesLabel">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QPushButton" name="moreLicensesButton">
               <property name="text">
                <string>Get More Licenses...</string>
@@ -304,11 +315,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QLabel" name="licensesLabel">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
+           <widget class="QnLicensesUsageWidget" name="licensesUsageWidget" native="true"/>
           </item>
          </layout>
         </widget>
@@ -347,7 +354,16 @@
        <string>Recording</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -494,7 +510,16 @@
        <item>
         <widget class="QWidget" name="widget" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
            <number>0</number>
           </property>
           <item>
@@ -560,7 +585,16 @@
        <string>Dewarping</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_10">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -578,7 +612,16 @@
        <string>Expert</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -612,6 +655,12 @@
    <class>QnFisheyeSettingsWidget</class>
    <extends>QWidget</extends>
    <header>ui/widgets/properties/fisheye_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnLicensesUsageWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/licenses_usage_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
