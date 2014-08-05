@@ -789,7 +789,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
 {
     if (!dbManager)
     {
-        qWarning() << "This peer connected to remote EC. Ignoring incoming connection";
+        qWarning() << "This peer connected to remote Server. Ignoring incoming connection";
         return;
     }
 

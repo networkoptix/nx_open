@@ -45,6 +45,17 @@ namespace {
     static bool smtpInitialized = false;
 }
 
+QnEmail::SmtpServerPreset::SmtpServerPreset():
+    connectionType(QnEmail::Unsecure),
+    port(0)
+{}
+
+QnEmail::SmtpServerPreset::SmtpServerPreset(const QString &server, ConnectionType connectionType /*= Tls*/, int port /*= 0*/):
+    server(server),
+    connectionType(connectionType), 
+    port(port) 
+{}
+
 QnEmail::QnEmail(const QString &email):
     m_email(email.trimmed().toLower())
 {
@@ -128,3 +139,15 @@ int QnEmail::defaultTimeoutSec() {
     return defaultSmtpTimeout;
 }
 
+bool operator==(const QnEmail::Settings &l, const QnEmail::Settings &r) {
+    return 
+        l.server == r.server &&
+        l.user == r.user &&
+        l.password == r.password &&
+        l.signature == r.signature &&
+        l.supportEmail == r.supportEmail &&
+        l.connectionType == r.connectionType &&
+        l.port == r.port &&
+        l.timeout == r.timeout &&
+        l.simple == r.simple;
+}

@@ -30,6 +30,9 @@
 namespace ec2
 {
     Ec2DirectConnectionFactory::Ec2DirectConnectionFactory()
+    :
+        m_terminated( false ),
+        m_runningRequests( 0 )
     {
         srand( ::time(NULL) );
 
@@ -47,8 +50,28 @@ namespace ec2
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
     {
+        pleaseStop();
+        join();
+
         m_directConnection.reset();
         ec2::QnTransactionMessageBus::initStaticInstance(0);
+    }
+
+    void Ec2DirectConnectionFactory::pleaseStop()
+    {
+        QMutexLocker lk( &m_mutex );
+        m_terminated = true;
+    }
+
+    void Ec2DirectConnectionFactory::join()
+    {
+        QMutexLocker lk( &m_mutex );
+        while( m_runningRequests > 0 )
+        {
+            lk.unlock();
+            QThread::msleep( 1000 );
+            lk.relock();
+        }
     }
 
     //!Implementation of AbstractECConnectionFactory::testConnectionAsync
@@ -247,16 +270,22 @@ namespace ec2
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();
         loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
+        {
+            QMutexLocker lk( &m_mutex );
+            if( m_terminated )
+                return INVALID_REQ_ID;
+            ++m_runningRequests;
+        }
 #if 1
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
             addr, ApiCommand::connect, loginInfo, func );
 #else
-        //TODO: #ak investigate, what's wrong with following code
+        //TODO: #ak following does not compile due to msvc2012 restriction: no more than 6 arguments to std::bind
         using namespace std::placeholders;
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
-            ApiCommand::connect, loginInfo, std::bind(&Ec2DirectConnectionFactory::remoteConnectionFinished, this, _1, _2) );
+            addr, ApiCommand::connect, loginInfo, std::bind(&Ec2DirectConnectionFactory::remoteConnectionFinished, this, reqID, _1, _2, addr, handler) );
 #endif
         return reqID;
     }
@@ -286,7 +315,7 @@ namespace ec2
     }
 
     template<class Handler>
-    void connectToOldEC(const QUrl& ecURL, Handler completionFunc)
+    void Ec2DirectConnectionFactory::connectToOldEC( const QUrl& ecURL, Handler completionFunc )
     {
         QAuthenticator auth;
         auth.setUser(ecURL.userName());
@@ -303,15 +332,23 @@ namespace ec2
                 QnConnectionInfo oldECConnectionInfo;
                 oldECConnectionInfo.ecUrl = ecURL;
                 if( parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo) )
-                    return completionFunc(ErrorCode::ok, oldECConnectionInfo);
+                    completionFunc(ErrorCode::ok, oldECConnectionInfo);
                 else
-                    return completionFunc(ErrorCode::badResponse, oldECConnectionInfo);
+                    completionFunc(ErrorCode::badResponse, oldECConnectionInfo);
+                break;
             }
+
             case CL_HTTP_AUTH_REQUIRED:
-                return completionFunc(ErrorCode::unauthorized, QnConnectionInfo());
+                completionFunc(ErrorCode::unauthorized, QnConnectionInfo());
+                break;
+
             default:
-                return completionFunc(ErrorCode::ioError, QnConnectionInfo());
+                completionFunc(ErrorCode::ioError, QnConnectionInfo());
+                break;
         }
+
+        QMutexLocker lk( &m_mutex );
+        --m_runningRequests;
     }
 
     void Ec2DirectConnectionFactory::remoteConnectionFinished(
@@ -327,7 +364,7 @@ namespace ec2
             QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
             QnConcurrent::run(
                 Ec2ThreadPool::instance(),
-                [ecURL, handler, reqID]() {
+                [this, ecURL, handler, reqID]() {
                     using namespace std::placeholders;
                     return connectToOldEC(
                         ecURL,
@@ -346,10 +383,13 @@ namespace ec2
             std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
             m_resCtx,
             connectionInfoCopy));
-        return handler->done(
+        handler->done(
             reqID,
             errorCode,
             connection);
+
+        QMutexLocker lk( &m_mutex );
+        --m_runningRequests;
     }
 
     void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
@@ -360,13 +400,18 @@ namespace ec2
         impl::TestConnectionHandlerPtr handler )
     {
         if( errorCode == ErrorCode::ok )
-            return handler->done(reqID, errorCode, connectionInfo);
+        {
+            handler->done( reqID, errorCode, connectionInfo );
+            QMutexLocker lk( &m_mutex );
+            --m_runningRequests;
+            return;
+        }
 
         //checking for old EC
         QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
         QnConcurrent::run(
             Ec2ThreadPool::instance(),
-            [ecURL, handler, reqID]() {
+            [this, ecURL, handler, reqID]() {
                 using namespace std::placeholders;
                 connectToOldEC(ecURL, std::bind(&impl::TestConnectionHandler::done, handler, reqID, _1, _2));
             }
@@ -381,6 +426,7 @@ namespace ec2
         connectionInfo->brand = isCompatibilityMode() ? QString() : lit(QN_PRODUCT_NAME_SHORT);
         connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
+        connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->box = lit(QN_ARM_BOX);
 
         return ErrorCode::ok;
@@ -399,6 +445,13 @@ namespace ec2
     int Ec2DirectConnectionFactory::testRemoteConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler )
     {
         const int reqID = generateRequestID();
+
+        {
+            QMutexLocker lk( &m_mutex );
+            if( m_terminated )
+                return INVALID_REQ_ID;
+            ++m_runningRequests;
+        }
 
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();

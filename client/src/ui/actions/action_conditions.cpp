@@ -677,10 +677,6 @@ Qn::ActionVisibility QnChangeResolutionActionCondition::check(const QnActionPara
         return Qn::EnabledAction;
 }
 
-Qn::ActionVisibility QnCheckForUpdatesActionCondition::check(const QnActionParameters &) {
-    return qnSettings->isUpdatesEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
-}
-
 Qn::ActionVisibility QnShowcaseActionCondition::check(const QnActionParameters &) {
     return qnSettings->isShowcaseEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
 }

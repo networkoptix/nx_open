@@ -23,14 +23,14 @@ struct QnConnectionInfo {
     QUrl ecUrl;
     SoftwareVersionType version;
     QList<QnCompatibilityItem> compatibilityItems;
+    QString systemName;
     QString ecsGuid;
-    QString publicIp;
     QString brand;
     QString systemName;
     QString box;
 };
 
-#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(publicIp)(brand)(systemName)(box)
+#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)(box)
 
 #ifndef QN_NO_QT
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

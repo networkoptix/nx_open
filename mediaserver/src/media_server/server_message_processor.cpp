@@ -198,7 +198,7 @@ void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, boo
     if (res) {
         res->setStatus(QnResource::Offline);
         if (data.peer.peerType != Qn::PT_Server) {
-            // This media server hasn't own DB
+            // This server hasn't own DB
             foreach(QnResourcePtr camera, qnResPool->getAllCameras(res))
                 camera->setStatus(QnResource::Offline);
         }
@@ -209,7 +209,7 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
 {
     if (resource->getId() == qnCommon->moduleGUID() && resource->getStatus() != QnResource::Online)
     {
-        // it's own media server. change status to online
+        // it's own server. change status to online
         QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(resource->getId(), QnResource::Online);
     }
     else {
@@ -249,9 +249,9 @@ bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
     const int port = request.requestLine.url.port( nx_http::DEFAULT_HTTP_PORT );
     const bool _isLocalAddress = isLocalAddress(urlHost);
     if (_isLocalAddress)
-        return port != m_serverPort; //if false, request addressed to us. If true, proxing to some local service
+        return port != m_serverPort; //if false, request addressed to us. If true, proxying to some local service
 
-    return isKnownAddr(urlHost); // is it camera or other media server address?
+    return isKnownAddr(urlHost); // is it camera or other server address?
 }
 
 void QnServerMessageProcessor::execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) {

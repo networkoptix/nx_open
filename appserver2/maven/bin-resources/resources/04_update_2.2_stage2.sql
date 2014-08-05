@@ -13,6 +13,7 @@ INSERT INTO "vms_businessrule_event_resources" (businessrule_guid,resource_guid)
 drop table vms_resource_tmp;
 drop table vms_businessrule_action_resources_tmp;
 drop table vms_businessrule_event_resources_tmp;
+drop table vms_layoutitem_tmp;
 
 CREATE UNIQUE INDEX idx_businessrule_guid ON vms_businessrule(guid);
 CREATE UNIQUE INDEX idx_resourcetype_guid ON vms_resourcetype(guid);

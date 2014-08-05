@@ -37,6 +37,7 @@
 
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/handlers/workbench_bookmarks_handler.h>
+#include <ui/workbench/handlers/workbench_connect_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
 #include <ui/workbench/handlers/workbench_export_handler.h>
@@ -54,6 +55,7 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/workbench_ui.h>
 #include <ui/workbench/workbench_synchronizer.h>
 #include <ui/workbench/workbench_context.h>
@@ -182,11 +184,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_view.reset(new QnGraphicsView(m_scene.data()));
     m_view->setAutoFillBackground(true);
 
-    if (!(qnSettings->lightMode() & Qn::LightModeNoSceneBackground)) {
-        m_backgroundPainter.reset(new QnGradientBackgroundPainter(qnSettings->radialBackgroundCycle(), this));
-        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
-    }
-
     /* Set up model & control machinery. */
     display()->setScene(m_scene.data());
     display()->setView(m_view.data());
@@ -204,8 +201,12 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     else
         m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
 
+    /* State manager */
+    context->instance<QnWorkbenchStateManager>();
+
     /* Set up handlers. */
     context->instance<QnWorkbenchActionHandler>();
+    context->instance<QnWorkbenchConnectHandler>();
     context->instance<QnWorkbenchNotificationsHandler>();
     context->instance<QnWorkbenchScreenshotHandler>();
     context->instance<QnWorkbenchExportHandler>();
@@ -244,7 +245,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::BusinessEventsAction));
     addAction(action(Qn::WebClientAction));
     addAction(action(Qn::OpenFileAction));
-    addAction(action(Qn::ConnectToServerAction));
     addAction(action(Qn::OpenNewTabAction));
     addAction(action(Qn::OpenNewWindowAction));
     addAction(action(Qn::CloseLayoutAction));
@@ -313,7 +313,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addStretch(0x1000);
     if (QnScreenRecorder::isSupported())
         m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
-    m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction), false, 1.0, Qn::Login_Help));
+    m_titleLayout->addWidget(newActionButton(action(Qn::OpenLoginDialogAction), false, 1.0, Qn::Login_Help));
     m_titleLayout->addLayout(m_windowButtonsLayout);
 
     /* Layouts. */
@@ -612,7 +612,7 @@ bool QnMainWindow::event(QEvent *event) {
 void QnMainWindow::closeEvent(QCloseEvent* event)
 {
     event->ignore();
-    action(Qn::ExitAction)->trigger();
+    menu()->trigger(Qn::ExitAction);
 }
 
 void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {

@@ -63,7 +63,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
 
 
     if (port < 0)
-        port = 80;
+        port = nx_http::DEFAULT_HTTP_PORT;
 
     CLHttpStatus status;
     QString response = QString(QLatin1String(downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=Network"), host, port, timeout, auth)));

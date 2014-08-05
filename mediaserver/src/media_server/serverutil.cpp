@@ -34,12 +34,6 @@ QString authKey()
     return MSSettings::roSettings()->value("authKey").toString();
 }
 
-static bool useAlternativeGuid = false;
-void setUseAlternativeGuid(bool value)
-{
-    useAlternativeGuid = value;
-}
-
 #ifdef EDGE_SERVER
 
 #include <sys/types.h>
@@ -74,30 +68,8 @@ QUuid serverGuid() {
     if (!guid.isNull())
         return guid;
 
-    QString name = useAlternativeGuid ? lit("serverGuid2") : lit("serverGuid");
+    guid = MSSettings::roSettings()->value(lit("serverGuid")).toString();
 
-    guid = MSSettings::roSettings()->value(name).toString();
-    if (guid.isNull())
-    {
-        if (!MSSettings::roSettings()->isWritable())
-        {
-            return guid;
-        }
-
-#ifdef EDGE_SERVER
-	char  mac[13];
-	memset(mac, 0, sizeof(mac));
-	char* host = 0;
-	mac_eth0(mac, &host);
-	QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-	md5Hash.addData(mac, 12);
-	md5Hash.addData("edge");
-	guid = QUuid::fromRfc4122(md5Hash.result()).toString();
-#else
-	guid = QUuid::createUuid();
-#endif
-        MSSettings::roSettings()->setValue(name, guid.toString());
-    }
 #ifdef _TEST_TWO_SERVERS
     return guid + "test";
 #endif

@@ -148,7 +148,7 @@ protected:
     //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
 
     /*
-    * Some actions can be executed on media server only. In this case, function returns media server there action must be executed
+    * Some actions can be executed on server only. In this case, function returns server where action must be executed
     */
     QnMediaServerResourcePtr getDestMServer(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
 

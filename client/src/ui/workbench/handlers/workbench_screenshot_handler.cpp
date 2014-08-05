@@ -23,6 +23,9 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
+
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 
 #include <utils/common/string.h>
@@ -254,11 +257,14 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
             allowedFormatFilter += jpegFileFilter;
         }
 
-        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
-            mainWindow(),
-            tr("Save Screenshot As..."),
-            suggestion,
-            allowedFormatFilter
+        bool wasLoggedIn = !context()->user().isNull();
+
+        QScopedPointer<QnCustomFileDialog> dialog(
+            new QnWorkbenchStateDependentDialog<QnCustomFileDialog> (
+                mainWindow(),
+                tr("Save Screenshot As..."),
+                suggestion,
+                allowedFormatFilter
         ));
 
         dialog->setFileMode(QFileDialog::AnyFile);
@@ -275,6 +281,11 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         dialog->addWidget(tr("Timestamp:"), comboBox);
 
         if (!dialog->exec())
+            return;
+
+        /* Check if we were disconnected (server shut down) while the dialog was open. 
+         * Skip this check if we were not logged in before. */
+        if (wasLoggedIn && !context()->user())
             return;
 
         QString fileName = dialog->selectedFile();
@@ -298,6 +309,11 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
             }
         }
 
+        /* Check if we were disconnected (server shut down) while the dialog was open. 
+         * Skip this check if we were not logged in before. */
+        if (wasLoggedIn && !context()->user())
+            return;
+
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
             QMessageBox::critical(
                 mainWindow(),
@@ -307,6 +323,11 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
             );
             return;
         }
+
+        /* Check if we were disconnected (server shut down) while the dialog was open. 
+         * Skip this check if we were not logged in before. */
+        if (wasLoggedIn && !context()->user())
+            return; //TODO: #GDM triple check...
 
         parameters.filename = fileName;
         parameters.timestampPosition = static_cast<Qn::Corner>(comboBox->itemData(comboBox->currentIndex()).value<int>());
@@ -400,7 +421,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
 void QnWorkbenchScreenshotHandler::showProgressDelayed(const QString &message) {
     if (!m_screenshotProgressDialog) {
-        m_screenshotProgressDialog = new QnProgressDialog(mainWindow());
+        m_screenshotProgressDialog = new QnWorkbenchStateDependentDialog<QnProgressDialog>(mainWindow());
         m_screenshotProgressDialog->setWindowTitle(tr("Saving...")); // TODO: #string_freeze replace with "Saving Screenshot"
         m_screenshotProgressDialog->setInfiniteProgress();
         // TODO: #dklychkov ensure concurrent screenshot saving is ok and disable modality

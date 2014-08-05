@@ -36,8 +36,9 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
         assert(!qnCommon->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;
         data.peer.id = qnCommon->remoteGUID();
-        at_remotePeerLost(data, false);
         qnCommon->setRemoteGUID(QUuid());
+        m_connected = false;
+        emit connectionClosed();
     } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
         qnCommon->setRemoteGUID(QUuid());
     }
@@ -145,12 +146,12 @@ void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
 
 void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr &resource)
 {
-    // set proxy. If some media server IF will be found, proxy address will be cleared
-    const QString& proxyAddr = QnAppServerConnectionFactory::defaultUrl().host();
+    // set proxy. If some servers IF will be found, proxy address will be cleared
+    const QString& proxyAddr = QnAppServerConnectionFactory::url().host();
     resource->apiConnection()->setProxyAddr(
         resource->getApiUrl(),
         proxyAddr,
-        QnAppServerConnectionFactory::defaultUrl().port() );    //starting with 2.3 proxy embedded to EC
+        QnAppServerConnectionFactory::url().port() );    //starting with 2.3 proxy embedded to Server
     disconnect(resource.data(), NULL, this, NULL);
     resource->determineOptimalNetIF();
 }
@@ -223,8 +224,5 @@ void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     }
 
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
-    QnResourceDiscoveryManager::instance()->setReady(true);
-    //emit connectionOpened();
-
     m_incompatibleServerAdder = new QnIncompatibleServerAdder(this);
 }

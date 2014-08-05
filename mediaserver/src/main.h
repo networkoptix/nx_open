@@ -51,8 +51,10 @@ private slots:
 
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
+    void at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
 private:
     void updateDisabledVendorsIfNeeded();
+    void updateAllowCameraCHangesIfNeed();
     bool initTcpListener();
     QHostAddress getPublicAddress();
 private:
@@ -64,6 +66,7 @@ private:
     QnModuleFinder* m_moduleFinder;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
+    QSet<QnId> m_updateUserRequests;
 };
 
 #endif // MAIN_H

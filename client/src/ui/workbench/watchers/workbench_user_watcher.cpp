@@ -127,14 +127,12 @@ void QnWorkbenchUserWatcher::at_user_resourceChanged(const QnResourcePtr &resour
     if (!reconnectRequired(resource.dynamicCast<QnUserResource>()))
         return;
 
-    //TODO: #Elric #TR add message box on next step of translations generating
-    menu()->trigger(Qn::DisconnectAction,
-        QnActionParameters().withArgument(Qn::ForceRole, true));
-    menu()->trigger(Qn::ConnectToServerAction);
-
+    //TODO: #GDM #TR add message box 
+    menu()->trigger(Qn::ReconnectAction);
 }
 
 void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnUserResourcePtr &user) {
     Q_UNUSED(user)
+    //TODO: #GDM #TR add message box 
     menu()->trigger(Qn::ReconnectAction);
 }
