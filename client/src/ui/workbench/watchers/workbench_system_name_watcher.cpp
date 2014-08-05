@@ -9,7 +9,8 @@
 QnWorkbenchSystemNameWatcher::QnWorkbenchSystemNameWatcher(QObject *parent) :
     QObject(parent)
 {
-    connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnWorkbenchSystemNameWatcher::at_resourceChanged);
+    connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnWorkbenchSystemNameWatcher::at_resourceChanged);
+    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnWorkbenchSystemNameWatcher::at_resourceChanged);
 }
 
 QnWorkbenchSystemNameWatcher::~QnWorkbenchSystemNameWatcher() {}

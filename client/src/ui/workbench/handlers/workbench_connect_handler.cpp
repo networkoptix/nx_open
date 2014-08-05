@@ -89,6 +89,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
     hideMessageBox();
 
     connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
+    qnCommon->setLocalSystemName(connection2()->connectionInfo().systemName);
 }
 
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
@@ -139,6 +140,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     }
 
     context()->instance<QnWorkbenchStateManager>()->tryClose(true);
+    qnCommon->setLocalSystemName(QString());
 }
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered() {
@@ -241,7 +243,6 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl) {
     QnAppServerConnectionFactory::setUrl(appServerUrl);
     QnAppServerConnectionFactory::setEc2Connection(result.connection());
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
-    qnCommon->setLocalSystemName(connectionInfo.systemName);
 
     QnClientMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
 
