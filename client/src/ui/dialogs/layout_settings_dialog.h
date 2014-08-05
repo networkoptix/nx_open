@@ -27,12 +27,13 @@ public:
     void readFromResource(const QnLayoutResourcePtr &layout);
     bool submitToResource(const QnLayoutResourcePtr &layout);
 
+    virtual void accept() override;
+
 protected:
     virtual bool eventFilter(QObject *target, QEvent *event) override;
 
 private slots:
     void at_clearButton_clicked();
-    void at_accepted();
     void at_opacitySpinBox_valueChanged(int value);
     void at_widthSpinBox_valueChanged(int value);
     void at_heightSpinBox_valueChanged(int value);
