@@ -23,6 +23,7 @@
 #include "nx_ec/data/api_runtime_data.h"
 #include "utils/db/db_helper.h"
 #include "binary_transaction_serializer.h"
+#include "ubjson_transaction_serializer.h"
 
 namespace ec2
 {
@@ -79,7 +80,7 @@ namespace ec2
         template <class T>
         ErrorCode saveTransaction(const QnTransaction<T>& tran) 
         {
-            QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
+            QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
             return saveToDB(tran, transactionHash(tran.params), serializedTran);
         }
 
