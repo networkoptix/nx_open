@@ -36,6 +36,9 @@ public:
     void setModuleGUID(const QUuid& guid) { m_uuid = guid; }
     QUuid moduleGUID() const{ return m_uuid; }
 
+    void setObsoleteServerGuid(const QUuid& guid) { m_obsoleteUuid = guid; }
+    QUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
+    
     void setRemoteGUID(const QUuid& guid) {
         QMutexLocker lock(&m_mutex);
         m_remoteUuid = guid; 
@@ -67,6 +70,7 @@ private:
     QString m_localSystemName;
     QString m_defaultAdminPassword;
     QUuid m_uuid;
+    QUuid m_obsoleteUuid;
     QUuid m_remoteUuid;
     QUrl m_url;
     bool m_cloudMode;

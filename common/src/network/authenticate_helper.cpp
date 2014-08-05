@@ -389,8 +389,12 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
                 md5Hash.addData(pswdData[1]);
                 md5Hash.addData(password);
                 QByteArray incomeHash = md5Hash.result().toHex();
-                if (incomeHash == pswdData[2])
+                if (incomeHash == pswdData[2]) 
+                {
+                    if (user->getDigest().isEmpty()) 
+                        emit emptyDigestDetected(user, QString::fromUtf8(userName), QString::fromUtf8(password));
                     return true;
+                }
             }
         }
     }

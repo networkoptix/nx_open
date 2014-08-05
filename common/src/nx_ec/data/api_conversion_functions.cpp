@@ -444,6 +444,8 @@ void fromResourceToApi(const QnLicensePtr &src, ApiLicenseData &dst) {
 
 void fromApiToResource(const ApiLicenseData &src, QnLicensePtr &dst) {
     dst->loadLicenseBlock(src.licenseBlock);
+    if (dst->key().isEmpty())
+        dst->setKey(src.key);
 }
 
 void fromResourceListToApi(const QnLicenseList &src, ApiLicenseDataList &dst) {

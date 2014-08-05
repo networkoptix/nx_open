@@ -40,11 +40,11 @@ public:
     void updateRule(QnBusinessEventRulePtr rule);
 
     void deleteRule(QnBusinessRuleViewModel* ruleModel);
-    void deleteRule(const QnId& id);
+    void deleteRule(const QUuid &id);
 
     QnBusinessRuleViewModel* getRuleModel(int row);
 protected:
-    QnBusinessRuleViewModel* ruleModelById(const QnId& id);
+    QnBusinessRuleViewModel* ruleModelById(const QUuid &id);
 
 private slots:
     void at_rule_dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);

@@ -956,7 +956,7 @@ namespace nxcip
         {
             //!Signals that reverse playback by GOP (group of picture) reordering is supported
             /*!
-                Plugin MAY support backward playback by GOP (group of picture) reordering. If this is not supported, reverse playback is emulated by media server.\n
+                Plugin MAY support backward playback by GOP (group of picture) reordering. If this is not supported, reverse playback is emulated by server.\n
                 This capability is not required but can increase performance.\n
 
                 Reverse gop playback is organized in following way:\n
