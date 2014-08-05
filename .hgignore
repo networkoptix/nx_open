@@ -228,6 +228,7 @@ android-client/**/gen/*
 android-client/android-main/libs/*.jar
 
 ios-client/build
+ios-client/stage
 ios-client/dist
 ios-client/target
 ios-client/ihdwitness.xcworkspace/xcuserdata
