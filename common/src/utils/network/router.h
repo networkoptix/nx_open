@@ -47,7 +47,7 @@ private:
     void makeConsistent();
 
 private:
-    ec2::AbstractECConnectionPtr m_connection;
+    std::weak_ptr<ec2::AbstractECConnection> m_connection;
     QnModuleFinder *m_moduleFinder;
     QScopedPointer<QnRouteBuilder> m_routeBuilder;
     QMultiHash<QnId, Endpoint> m_connections;

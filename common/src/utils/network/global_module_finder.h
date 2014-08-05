@@ -48,7 +48,7 @@ private:
     void removeAllModulesDiscoveredBy(const QnId &discoverer);
 
 private:
-    ec2::AbstractECConnectionPtr m_connection;  // just to know from where to disconnect
+    std::weak_ptr<ec2::AbstractECConnection> m_connection;  // just to know from where to disconnect
     QPointer<QnModuleFinder> m_moduleFinder;
     QHash<QnId, QnModuleInformation> m_moduleInformationById;
     QMultiHash<QnId, QnId> m_discovererIdByServerId;

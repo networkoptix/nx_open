@@ -8,15 +8,18 @@
 #include <nx_ec/dummy_handler.h>
 
 QnGlobalModuleFinder::QnGlobalModuleFinder(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    m_connection(std::weak_ptr<ec2::AbstractECConnection>())
 {
     connect(qnResPool,      &QnResourcePool::statusChanged,         this,       &QnGlobalModuleFinder::at_resourcePool_statusChanged);
     connect(qnResPool,      &QnResourcePool::resourceRemoved,       this,       &QnGlobalModuleFinder::at_resourcePool_resourceRemoved);
 }
 
 void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &connection) {
-    if (m_connection)
-        disconnect(m_connection->getMiscManager().get(),   &ec2::AbstractMiscManager::moduleChanged,  this,   &QnGlobalModuleFinder::at_moduleChanged);
+    ec2::AbstractECConnectionPtr oldConnection = m_connection.lock();
+
+    if (oldConnection)
+        oldConnection->getMiscManager()->disconnect(this);
 
     m_connection = connection;
 
@@ -87,14 +90,14 @@ void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInf
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation) {
     addModule(moduleInformation, QnId(qnCommon->moduleGUID()));
-    if (m_connection)
-        m_connection->getMiscManager()->sendModuleInformation(moduleInformation, true, QnId(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
+        connection->getMiscManager()->sendModuleInformation(moduleInformation, true, QnId(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
     removeModule(moduleInformation, QnId(qnCommon->moduleGUID()));
-    if (m_connection)
-        m_connection->getMiscManager()->sendModuleInformation(moduleInformation, false, QnId(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
+        connection->getMiscManager()->sendModuleInformation(moduleInformation, false, QnId(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::at_resourcePool_statusChanged(const QnResourcePtr &resource) {
