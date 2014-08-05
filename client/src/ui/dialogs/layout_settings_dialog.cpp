@@ -150,7 +150,6 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     connect(ui->selectButton,               SIGNAL(clicked()),          this, SLOT(selectFile()));
     connect(ui->clearButton,                SIGNAL(clicked()),          this, SLOT(at_clearButton_clicked()));
     connect(ui->lockedCheckBox,             SIGNAL(clicked()),          this, SLOT(updateControls()));
-    connect(ui->buttonBox,                  SIGNAL(accepted()),         this, SLOT(at_accepted()));
     connect(ui->opacitySpinBox,             SIGNAL(valueChanged(int)),  this, SLOT(at_opacitySpinBox_valueChanged(int)));
     connect(ui->widthSpinBox,               SIGNAL(valueChanged(int)),  this, SLOT(at_widthSpinBox_valueChanged(int)));
     connect(ui->heightSpinBox,              SIGNAL(valueChanged(int)),  this, SLOT(at_heightSpinBox_valueChanged(int)));
@@ -346,7 +345,8 @@ void QnLayoutSettingsDialog::at_clearButton_clicked() {
     updateControls();
 }
 
-void QnLayoutSettingsDialog::at_accepted() {
+
+void QnLayoutSettingsDialog::accept() {
     Q_D(QnLayoutSettingsDialog);
 
     switch (d->state) {
@@ -356,7 +356,7 @@ void QnLayoutSettingsDialog::at_accepted() {
     case Error:
     case NewImageSelected:
     case ImageDownloaded:
-        accept();
+        base_type::accept();
         return;
 
     /* current progress should be cancelled before accepting */
@@ -371,7 +371,7 @@ void QnLayoutSettingsDialog::at_accepted() {
         if (d->canChangeAspectRatio() && ui->cropToMonitorCheckBox->isChecked())
             break;
         qnSettings->setLayoutKeepAspectRatio(ui->keepAspectRatioCheckBox->isChecked());
-        accept();
+        base_type::accept();
         return;
     case NewImageLoaded:
         break;
@@ -448,7 +448,7 @@ void QnLayoutSettingsDialog::at_imageStored(const QString &filename, bool ok) {
     d->state = NewImageLoaded;
     qnSettings->setLayoutKeepAspectRatio(ui->keepAspectRatioCheckBox->isChecked());
     //updateControls() is not needed, we are closing the dialog here
-    accept();
+    base_type::accept();
 }
 
 void QnLayoutSettingsDialog::loadPreview() {
@@ -573,4 +573,3 @@ void QnLayoutSettingsDialog::setProgress(bool value) {
     ui->stackedWidget->setCurrentIndex(value ? 1 : 0);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!value);
 }
-
