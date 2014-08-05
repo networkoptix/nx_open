@@ -45,7 +45,7 @@ signals:
 protected:
     virtual void run();
 private:
-    quint32 drawCircle(QSharedPointer<CLVideoDecoderOutput> frame, const QPoint& center, int radius);
+    void drawCircle(const QImage& frame, const QPoint& center, int radius);
     void findCircleParams();
     qreal findElipse(qreal& newRadius);
     int findPixel(int y, int x, int xDelta);
