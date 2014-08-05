@@ -29,3 +29,5 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
 
     loadData();
 }
+
+QnSystemAdministrationDialog::~QnSystemAdministrationDialog() {}

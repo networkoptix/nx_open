@@ -98,7 +98,7 @@ Qn::PtzCapabilities QnOnvifPtzController::initMove() {
 
 	// TODO: #PTZ #Elric we can init caps by examining spaces in response!
 
-    Qn::PtzCapabilities configCapabilities = Qn::NoCapabilities;
+    Qn::PtzCapabilities configCapabilities = Qn::NoPtzCapabilities;
     if(response.PTZConfiguration[0]->DefaultContinuousPanTiltVelocitySpace)
         configCapabilities |= Qn::ContinuousPanCapability | Qn::ContinuousTiltCapability;
     if(response.PTZConfiguration[0]->DefaultContinuousZoomVelocitySpace)

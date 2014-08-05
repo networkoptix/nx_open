@@ -24,6 +24,8 @@ public:
     };
 
     QnSystemAdministrationDialog(QWidget *parent = 0);
+    ~QnSystemAdministrationDialog();
+
 private:
     Q_DISABLE_COPY(QnSystemAdministrationDialog)
 
