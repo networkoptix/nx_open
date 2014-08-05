@@ -27,7 +27,6 @@ class QTextEdit;
 
 namespace Ui {
     class SettingsDialog;
-    class FindAppServerDialog;
 }
 
 bool MyIsUserAnAdmin();
@@ -92,15 +91,13 @@ class QnSystrayWindow : public QDialog
     typedef QDialog base_type;
 
 public:
-    QnSystrayWindow( FoundEnterpriseControllersModel* const foundEnterpriseControllersModel );
+    QnSystrayWindow();
 
     virtual ~QnSystrayWindow();
     QSystemTrayIcon *trayIcon() const { return m_trayIcon; }
     void executeAction(QString cmd);
-    void setVisible(bool visible);
 
 protected:
-    virtual void accept() override;
     virtual void closeEvent(QCloseEvent *event) override;
 
 private slots:
@@ -115,65 +112,28 @@ private slots:
 
     void at_mediaServerStartAction();
     void at_mediaServerStopAction();
-    void at_appServerStartAction();
-    void at_appServerStopAction();
+    void at_mediaServerWebAction();
+    void onShowMediaServerLogAction();
 
     void findServiceInfo();
     void updateServiceInfo();
-    void appServerInfoUpdated(quint64 status);
     void mediaServerInfoUpdated(quint64 status);
-
-    void buttonClicked(QAbstractButton * button);
-    void onSettingsAction();
-    void onShowMediaServerLogAction();
-    void onShowAppServerLogAction();
-
-    void onTestButtonClicked();
-
-    void onFindAppServerButtonClicked();
-    void onAppServerUrlHistoryComboBoxCurrentChanged( int index );
-    void onRadioButtonPublicIpChanged();
-    void onRadioButtonEcsPublicIpChanged();
-
-    void at_appServerPassword_textChanged(const QString &text);
 
 private:
     QAction* actionByName(const QString& name);
     QString nameByAction(QAction* action);
 
     void connectElevatedAction(QAction* source, const char* signal, QObject* target, const char* slot);
+    void updateServiceInfoInternal(SC_HANDLE handle, DWORD status, QAction* startAction, QAction* stopAction);
 
     void createActions();
     void createTrayIcon();
 
     void initTranslations();
 
-    void updateServiceInfoInternal(SC_HANDLE handle, DWORD status, QAction* startAction, QAction* stopAction, QAction* logAction);
-    bool validateData();
-    void saveData();
-    bool checkPortNum(int port, const QString& message);
-    bool isPortFree(int port);
-    QUrl getAppServerURL() const;
-    void setAppServerURL(const QUrl& url);
-    bool isAppServerParamChanged() const;
-    bool isMediaServerParamChanged() const;
-    Qt::CheckState getDiscoveryState() const;
-
-    bool readAllowCameraChanges() const;
-    void writeAllowCameraChanges(bool allowCameraChanges);
-
 private:
-    QScopedPointer<Ui::SettingsDialog> ui;
-    QScopedPointer<QDialog> m_findAppServerDialog;
-    QScopedPointer<Ui::FindAppServerDialog> m_findAppServerDialogUI;
-
-    QSettings m_settings;
     QSettings m_mediaServerSettings;
-    QSettings m_appServerSettings;
 
-    QAction *m_showMediaServerLogAction;
-    QAction *m_showAppLogAction;
-    QAction *m_settingsAction;
     QAction *m_quitAction;
 
     QSystemTrayIcon *m_trayIcon;
@@ -185,29 +145,24 @@ private:
 
     SC_HANDLE m_scManager;
     SC_HANDLE m_mediaServerHandle;
-    SC_HANDLE m_appServerHandle;
-    
+
+    QAction *m_showMediaServerLogAction;    
     QAction* m_mediaServerStartAction;
     QAction* m_mediaServerStopAction;
-    QAction* m_appServerStartAction;
-    QAction* m_appServerStopAction;
+    QAction* m_mediaServerWebAction;
     bool m_firstTimeToolTipError;
     QTimer m_findServices;
     QTimer m_updateServiceStatus;
 
     bool m_needStartMediaServer;
-    bool m_needStartAppServer;
     int m_skipTicks;
 
     int m_prevMediaServerStatus;
-    int m_prevAppServerStatus;
 
     QList<QAction *> m_actions;
     QTime m_lastMessageTimer;
     QQueue<QString> m_delayedMessages;
     QString m_mediaServerServiceName;
-    QString m_appServerServiceName;
-    FoundEnterpriseControllersModel *const m_foundEnterpriseControllersModel;
 };
 
 #endif

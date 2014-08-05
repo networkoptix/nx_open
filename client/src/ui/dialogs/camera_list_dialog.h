@@ -6,8 +6,9 @@
 #include <QtWidgets/QDialog>
 #include <QtGui/QStandardItem>
 
-#include <ui/workbench/workbench_context_aware.h>
 #include <core/resource/resource_fwd.h>
+
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 class QnCameraListModel;
 class QnWorkbenchContext;
@@ -17,10 +18,10 @@ namespace Ui {
     class CameraListDialog;
 }
 
-class QnCameraListDialog: public QDialog, public QnWorkbenchContextAware {
+class QnCameraListDialog: public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
 
-    typedef QDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
     explicit QnCameraListDialog(QWidget *parent = NULL);
@@ -28,12 +29,11 @@ public:
 
     void setServer(const QnMediaServerResourcePtr &server);
     QnMediaServerResourcePtr server() const;
-
 private:
     Q_SIGNAL void updateWindowTitleQueued();
     void updateWindowTitleLater();
     void updateWindowTitle();
-    void updateCriterion(const QString &text);
+    void updateCriterion();
 
     void at_camerasView_customContextMenuRequested(const QPoint &pos);
     void at_exportAction_triggered();

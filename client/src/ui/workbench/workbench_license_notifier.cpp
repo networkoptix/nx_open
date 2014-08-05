@@ -100,7 +100,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses() {
     }
 
     if(warn) {
-        QScopedPointer<QnLicenseNotificationDialog> dialog(new QnLicenseNotificationDialog());
+        QScopedPointer<QnLicenseNotificationDialog> dialog(new QnLicenseNotificationDialog(mainWindow()));
         dialog->setLicenses(licenses);
         dialog->exec();
 

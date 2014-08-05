@@ -708,19 +708,27 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, 
     Q_UNUSED(channel)
     qreal xStep = rect.width() / MD_WIDTH;
     qreal yStep = rect.height() / MD_HEIGHT;
+    qreal offset = xStep * 0.1;
+    qreal fontIncrement = 1.2;
 
     painter->setPen(Qt::black);
     QFont font;
-    font.setPointSizeF(0.03 * rect.width());
+    font.setPointSizeF(yStep * fontIncrement);
+    font.setBold(true);
     painter->setFont(font);
 
     for (int sensitivity = QnMotionRegion::MIN_SENSITIVITY + 1; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; ++sensitivity) {
-        foreach(const QRect &rect, region.getRectsBySens(sensitivity)) {
+        auto rects = region.getRectsBySens(sensitivity);
+        if (rects.isEmpty())
+            continue;
+
+        m_sensStaticText[sensitivity].prepare(painter->transform(), font);
+        foreach(const QRect &rect, rects) {
             if (rect.width() < 2 || rect.height() < 2)
                 continue;
 
             int x = rect.left(), y = rect.top();
-            painter->drawStaticText(x * xStep + xStep * 0.1, y * yStep + yStep * 0.1, m_sensStaticText[sensitivity]);
+            painter->drawStaticText(x * xStep + offset, y * yStep, m_sensStaticText[sensitivity]);
         }
     }
 }
@@ -925,7 +933,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if (!zoomRect().isNull())
         return result;
 
-    if (resource()->toResource()->hasFlags(QnResource::motion) && !(options() & DisplayDewarped))
+    if (resource()->toResource()->hasFlags(QnResource::motion))
         result |= MotionSearchButton;
 
     bool isExportedLayout = item() 
@@ -1074,7 +1082,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
     setOption(DisplayMotion, checked);
 
     if(checked)
-        buttonBar()->setButtonsChecked(PtzButton | ZoomWindowButton, false);
+        buttonBar()->setButtonsChecked(PtzButton | FishEyeButton | ZoomWindowButton, false);
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
@@ -1111,7 +1119,7 @@ void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
     setOption(ControlZoomWindow, checked);
 
     if(checked)
-        buttonBar()->setButtonsChecked(PtzButton | MotionSearchButton, false);
+        buttonBar()->setButtonsChecked(PtzButton | FishEyeButton | MotionSearchButton, false);
 }
 
 void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) {

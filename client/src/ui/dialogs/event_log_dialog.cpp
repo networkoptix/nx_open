@@ -31,6 +31,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
+
 #include <ui/workbench/workbench_context.h>
 
 namespace {
@@ -40,7 +41,6 @@ namespace {
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::EventLogDialog),
     m_eventTypesModel(new QStandardItemModel()),
     m_actionTypesModel(new QStandardItemModel()),
@@ -147,8 +147,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     updateHeaderWidth();
 }
 
-QnEventLogDialog::~QnEventLogDialog()
-{
+QnEventLogDialog::~QnEventLogDialog() {
 }
 
 QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, QnBusiness::EventType value)

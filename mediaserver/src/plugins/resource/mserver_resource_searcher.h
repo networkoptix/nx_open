@@ -22,7 +22,7 @@ public:
     static void initStaticInstance( QnMServerResourceSearcher* inst );
     static QnMServerResourceSearcher* instance();
     void setAppPServerGuid(const QByteArray& appServerGuid);
-    /** find other media servers in current networks. Actually, this function do not instantiate other mServer as resources. Function just check if they are presents */
+    /** find other servers in current networks. Actually, this function do not instantiate other mServer as resources. Function just check if they are presents */
     virtual void run() override;
 private:
     void updateSocketList();

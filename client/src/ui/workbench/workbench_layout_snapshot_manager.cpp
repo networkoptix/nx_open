@@ -16,7 +16,7 @@
 // QnWorkbenchLayoutReplyProcessor
 // -------------------------------------------------------------------------- //
 void QnWorkbenchLayoutReplyProcessor::processReply( int handle, ec2::ErrorCode errorCode ) {
-    /* Note that we may get reply of size 0 if EC is down.
+    /* Note that we may get reply of size 0 if Server is down.
      * This is why we use stored list of layouts. */
     if(m_manager)
         m_manager.data()->processReply((int)errorCode, m_resources, handle);

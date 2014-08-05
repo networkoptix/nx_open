@@ -25,8 +25,10 @@ public:
     virtual void updateFromSettings() override;
     virtual void submitToSettings() override;
 
+    virtual bool hasChanges() const override;
+
 private:
-    QnEmail::Settings settings();
+    QnEmail::Settings settings() const;
     void stopTesting(QString result);
     void loadSettings(QString server, QnEmail::ConnectionType connectionType, int port = 0);
     void updateFocusedElement();

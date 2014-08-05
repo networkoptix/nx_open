@@ -11,9 +11,6 @@
 
 class OnvifResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
-    OnvifResourceSearcherWsdd& wsddSearcher;
-    //OnvifResourceSearcherMdns& mdnsSearcher;
-
 public:
     OnvifResourceSearcher();
     virtual ~OnvifResourceSearcher();
@@ -30,7 +27,10 @@ public:
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 private:
-    QList<QnResourcePtr> checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck);
+    OnvifResourceSearcherWsdd m_wsddSearcher;
+    //OnvifResourceSearcherMdns m_mdnsSearcher;
+
+    QList<QnResourcePtr> checkHostAddrInternal( const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck );
 };
 
 #endif //ENABLE_ONVIF

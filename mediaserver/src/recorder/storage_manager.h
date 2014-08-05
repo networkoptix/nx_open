@@ -58,7 +58,7 @@ public:
     /*
     * convert UTC time to folder name. Used for server archive catalog.
     * @param dateTimeMs UTC time in ms
-    * timeZone media server time zone offset in munutes. If value==-1 - current(system) time zone is used
+    * timeZone server time zone offset in munutes. If value==-1 - current(system) time zone is used
     */
     static QString dateTimeStr(qint64 dateTimeMs, qint16 timeZone);
 
