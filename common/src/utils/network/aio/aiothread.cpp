@@ -266,8 +266,13 @@ namespace aio
             }
         }
 
-        void processPeriodicTasks( const qint64 curClock )
+        /*!
+            \return \a true, if at least one task has been processed
+        */
+        bool processPeriodicTasks( const qint64 curClock )
         {
+            int tasksProcessedCount = 0;
+
             for( ;; )
             {
                 PeriodicTaskData periodicTaskData;
@@ -313,6 +318,7 @@ namespace aio
 
                 if( periodicTaskData.socket )    //periodic event, associated with socket (e.g., socket operation timeout)
                 {
+                    //TODO #ak socket is allowed to be removed in eventTriggered
                     handlingData->eventHandler->eventTriggered(
                         periodicTaskData.socket,
                         static_cast<aio::EventType>(periodicTaskData.eventType | aio::etTimedOut) );
@@ -322,11 +328,14 @@ namespace aio
                         handlingData,
                         periodicTaskData.socket,
                         periodicTaskData.eventType );
+                    ++tasksProcessedCount;
                 }
                 //else
                 //    periodicTaskData.periodicEventHandler->onTimeout( periodicTaskData.taskID );  //for periodic tasks not bound to socket
                 handlingData->beingProcessed.deref();
             }
+
+            return tasksProcessedCount > 0;
         }
 
         void addPeriodicTask(
@@ -508,8 +517,10 @@ namespace aio
 
             //TODO #ak recheck that PollSet::remove does not brake PollSet traversal
 
-            m_impl->processPeriodicTasks( curClock );
-            m_impl->processSocketEvents( curClock );
+            if( m_impl->processPeriodicTasks( curClock ) )
+                continue;   //periodic task handler is allowed to delete socket what will cause undefined behavour while iterating pollset
+            if( triggeredSocketCount > 0 )
+                m_impl->processSocketEvents( curClock );
         }
 
         NX_LOG( QLatin1String("AIO thread stopped"), cl_logDEBUG1 );

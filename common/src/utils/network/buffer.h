@@ -20,51 +20,16 @@
 
 namespace nx
 {
-    class Buffer
-    :
-        public QByteArray
-    {
-    public:
-        static const size_t npos = (size_t)-1;
+    /*!
+        Some effective buffer is required. Following is desired:\n
+            - substr O(1) complexity
+            - pop_front, pop_back O(1) complexity
+            - concatenation O(1) complexity. This implies readiness for readv and writev system calls
+            - buffer should implicit sharing but still minimize atomic operations where they not required
 
-        Buffer()
-        {
-        }
-
-        Buffer( const QByteArray& _arr )
-        :
-            QByteArray( _arr )
-        {
-        }
-
-        Buffer( const QByteArray&& _arr )
-        :
-            QByteArray( _arr )
-        {
-        }
-
-        bool empty() const
-        {
-            return isEmpty();
-        }
-
-        void pop_front( size_t count )
-        {
-            remove( 0, (int)count );
-        }
-
-        Buffer substr( size_t pos, size_t count = npos ) const
-        {
-            return QByteArray::fromRawData(
-                data() + pos,
-                (int)(count == npos ? size()-pos : count) );
-        }
-
-        size_t size() const
-        {
-            return (size_t)QByteArray::size();
-        }
-    };
+        Currently, using QByteArray, but fully new implementation will be provided in 2.4
+    */
+    typedef QByteArray Buffer;
 }
 
 #endif  //NX_BUFFER_H

@@ -12,6 +12,7 @@
 
 #include <utils/common/byte_array.h>
 
+#include "aio/pollset.h"
 #include "buffer.h"
 #include "nettools.h"
 #include "socket_common.h"
@@ -191,12 +192,21 @@ public:
         \return foreign address
         \note If \a AbstractCommunicatingSocket::connect() has not been called yet, empty address is returned
     */
-    virtual const SocketAddress getForeignAddress() = 0;
+    virtual SocketAddress getForeignAddress() const = 0;
     //!Returns \a true, if connection has been established, \a false otherwise
     /*!
         TODO/IMPL give up this method, since it's unreliable
     */
     virtual bool isConnected() const = 0;
+
+    /*!
+        \note uses sendTimeout
+    */
+    template<class HandlerType>
+        bool connectAsync( const SocketAddress& addr, HandlerType handler )
+        {
+            return connectAsyncImpl( addr, std::function<void( SystemError::ErrorCode )>( std::move( handler ) ) );
+        }
 
     //!Reads bytes from socket asynchronously
     /*!
@@ -231,9 +241,18 @@ public:
             return sendAsyncImpl( src, std::function<void( SystemError::ErrorCode, size_t )>( std::move( handler ) ) );
         }
 
+    //!
+    /*!
+        It is garanteed that after return of this method no async handler will be called
+        \param eventType Possible values: \a aio::etRead, \a aio::etWrite
+        \param waitForRunningHandlerCompletion If \a true, it is garanteed that after return of this method no async handler is running
+    */
+    virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion = true ) = 0;
+
 protected:
-    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void(SystemError::ErrorCode, size_t)> handler ) = 0;
-    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void(SystemError::ErrorCode, size_t)> handler ) = 0;
+    virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) = 0;
+    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
+    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
 };
 
 //!Interface for connection-orientied sockets

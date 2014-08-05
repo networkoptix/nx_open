@@ -37,7 +37,7 @@ public:
     virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override;
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
 
-    virtual const SocketAddress getForeignAddress() override;
+    virtual SocketAddress getForeignAddress() const override;
     virtual bool isConnected() const override;
 
     virtual bool bind( const SocketAddress& localAddress ) override;
@@ -65,6 +65,10 @@ public:
 
     bool doServerHandshake();
     bool doClientHandshake();
+
+    //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
+    virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) override;
+
 protected:
     friend int sock_read(BIO *b, char *out, int outl);
     friend int sock_write(BIO *b, const char *in, int inl);
@@ -73,10 +77,12 @@ protected:
     int recvInternal(void* buffer, unsigned int bufferLen, int flags);
     int sendInternal( const void* buffer, unsigned int bufferLen );
 
+    //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
+    virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
     //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
     //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
 
 private:
     void init();
@@ -85,6 +91,11 @@ protected:
     QnSSLSocketPrivate *d_ptr;
 };
 
+//!Can be used to accept both SSL and non-SSL connections on single port
+/*!
+    Auto detects whether remote side uses SSL and delegates calls to \a QnSSLSocket or to system socket
+    \note Can only be used on server side for accepting connections
+*/
 class QnMixedSSLSocket: public QnSSLSocket
 {
 public:
@@ -92,11 +103,16 @@ public:
     virtual int recv( void* buffer, unsigned int bufferLen, int flags) override;
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
 
+    //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
+    virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) override;
+
 protected:
+    //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
+    virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
     //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
     //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
 
 private:
     Q_DECLARE_PRIVATE(QnMixedSSLSocket);
