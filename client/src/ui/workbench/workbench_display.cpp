@@ -1386,12 +1386,15 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
     MarginsF marginsExtension(0.0, 0.0, 0.0, 0.0);
-    if(currentMarginFlags() != 0)
+
+    /* If an item is zoomed then the margins should be null because all panels are hidden. */
+    if(currentMarginFlags() != 0 && !m_widgetByRole[Qn::ZoomedRole])
         marginsExtension = cwiseDiv(m_viewportAnimator->viewportMargins(), m_view->viewport()->size());
 
     /* Sync position extension. */
     {
         MarginsF positionExtension(0.0, 0.0, 0.0, 0.0);
+
         if(currentMarginFlags() & Qn::MarginsAffectPosition)
             positionExtension = marginsExtension;
 
