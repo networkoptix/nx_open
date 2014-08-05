@@ -15,6 +15,7 @@
 
 #include <QtCore/QElapsedTimer>
 
+#include "utils/common/log.h"
 #include "aio/aioservice.h"
 #include "system_socket_impl.h"
 
@@ -603,50 +604,94 @@ class CommunicatingSocketPrivate
     public aio::AIOEventHandler
 {
 public:
+    std::function<void( SystemError::ErrorCode )> connectHandler;
+    size_t connectSendAsyncCallCounter;
+
     std::function<void( SystemError::ErrorCode, size_t )> recvHandler;
     nx::Buffer* recvBuffer;
-    std::atomic<size_t> recvAsyncCallCounter;
+    size_t recvAsyncCallCounter;
+
     std::function<void( SystemError::ErrorCode, size_t )> sendHandler;
     const nx::Buffer* sendBuffer;
     size_t sendBufPos;
-    std::atomic<size_t> sendAsyncCallCounter;
+
+    bool* m_connectSendHandlerTerminatedFlag;
+    bool* m_recvHandlerTerminatedFlag;
 
     CommunicatingSocketPrivate()
     :
+        connectSendAsyncCallCounter( 0 ),
         recvBuffer( nullptr ),
+        recvAsyncCallCounter(0),
         sendBuffer( nullptr ),
-        sendBufPos( 0 )
+        sendBufPos( 0 ),
+        m_connectSendHandlerTerminatedFlag( nullptr ),
+        m_recvHandlerTerminatedFlag( nullptr )
     {
+    }
+
+    virtual ~CommunicatingSocketPrivate()
+    {
+        //synchronization may be required here in case if recv handler and send/connect handler called simultaneously in different aio threads,
+            //but even ion described case no synchronization required, since before removing socket handler implementation MUST cancel ongoing 
+            //async I/O and wait for completion. That, is wait for eventTriggered to return
+            //So, socket can only be removed from handler called in aio thread. So, eventTriggered is down the stack if m_*TerminatedFlag is not nullptr
+
+        if( m_connectSendHandlerTerminatedFlag )
+            *m_connectSendHandlerTerminatedFlag = true;
+        if( m_recvHandlerTerminatedFlag )
+            *m_recvHandlerTerminatedFlag = true;
     }
 
     virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) override
     {
-        const size_t recvAsyncCallCounterBak = recvAsyncCallCounter;
-        auto __finally_read = [this, recvAsyncCallCounterBak, sock](CommunicatingSocketPrivate* /*pThis*/)
+        bool terminated = false;    //set to true just before object destruction
+
+        const size_t connectSendAsyncCallCounterBak = connectSendAsyncCallCounter;
+        auto __finally_connect = [this, connectSendAsyncCallCounterBak, sock, &terminated]( CommunicatingSocketPrivate* /*pThis*/ )
         {
+            if( terminated )
+                return; //most likely, socket has been removed in handler
+            if( connectSendAsyncCallCounterBak == connectSendAsyncCallCounter )
+            {
+                aio::AIOService::instance()->removeFromWatch( sock, aio::etWrite );
+            }
+            m_connectSendHandlerTerminatedFlag = nullptr;
+        };
+
+        const size_t recvAsyncCallCounterBak = recvAsyncCallCounter;
+        auto __finally_read = [this, recvAsyncCallCounterBak, sock, &terminated]( CommunicatingSocketPrivate* /*pThis*/ )
+        {
+            if( terminated )
+                return; //most likely, socket has been removed in handler
             if( recvAsyncCallCounterBak == recvAsyncCallCounter )
             {
                 recvBuffer = nullptr;
                 recvHandler = std::function<void( SystemError::ErrorCode, size_t )>();
                 aio::AIOService::instance()->removeFromWatch( sock, aio::etRead );
             }
+            m_recvHandlerTerminatedFlag = nullptr;
         };
 
-        const size_t sendAsyncCallCounterBak = sendAsyncCallCounter;
-        auto __finally_write = [this, sendAsyncCallCounterBak, sock](CommunicatingSocketPrivate* /*pThis*/)
+        auto __finally_write = [this, connectSendAsyncCallCounterBak, sock, &terminated]( CommunicatingSocketPrivate* /*pThis*/ )
         {
-            if( sendAsyncCallCounterBak == sendAsyncCallCounter )
+            if( terminated )
+                return; //most likely, socket has been removed in handler
+            if( connectSendAsyncCallCounterBak == connectSendAsyncCallCounter )
             {
                 sendBuffer = nullptr;
                 sendHandler = std::function<void( SystemError::ErrorCode, size_t )>();
                 aio::AIOService::instance()->removeFromWatch( sock, aio::etWrite );
             }
+            m_connectSendHandlerTerminatedFlag = nullptr;
         };
 
         switch( eventType )
         {
             case aio::etRead:
             {
+                m_recvHandlerTerminatedFlag = &terminated;
+
                 std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_read)> cleanupGuard( this, __finally_read );
 
                 assert( recvHandler );
@@ -673,31 +718,49 @@ public:
 
             case aio::etWrite:
             {
-                std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_write)> cleanupGuard( this, __finally_write );
+                m_connectSendHandlerTerminatedFlag = &terminated;
 
-                assert( sendHandler );
-                const int bytesWritten = dynamic_cast<AbstractCommunicatingSocket*>(sock)->send(
-                    sendBuffer->constData() + sendBufPos,
-                    sendBuffer->size() - sendBufPos );
-                if( bytesWritten == -1 || bytesWritten == 0 )
+                if( connectHandler )
                 {
-                    sendHandler(
-                        bytesWritten == 0 ? SystemError::connectionReset : SystemError::getLastOSErrorCode(),
-                        sendBufPos );
-                    break;
+                    auto connectHandlerBak = std::move( connectHandler );
+                    //async connect. If we are here than connect succeeded
+                    std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_connect)> cleanupGuard( this, __finally_connect );
+                    connectHandlerBak( SystemError::noError );
                 }
-
-                sendBufPos += bytesWritten;
-                if( sendBufPos == sendBuffer->size() )
+                else
                 {
-                    sendHandler( SystemError::noError, sendBufPos );
-                    sendBufPos = 0;
+                    //can send some bytes
+                    assert( sendHandler );
+
+                    std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_write)> cleanupGuard( this, __finally_write );
+
+                    assert( sendHandler );
+                    const int bytesWritten = dynamic_cast<AbstractCommunicatingSocket*>(sock)->send(
+                        sendBuffer->constData() + sendBufPos,
+                        sendBuffer->size() - sendBufPos );
+                    if( bytesWritten == -1 || bytesWritten == 0 )
+                    {
+                        sendHandler(
+                            bytesWritten == 0 ? SystemError::connectionReset : SystemError::getLastOSErrorCode(),
+                            sendBufPos );
+                    }
+                    else
+                    {
+                        sendBufPos += bytesWritten;
+                        if( sendBufPos == sendBuffer->size() )
+                        {
+                            sendHandler( SystemError::noError, sendBufPos );
+                            sendBufPos = 0;
+                        }
+                    }
                 }
                 break;
             }
 
             case aio::etReadTimedOut:
             {
+                m_recvHandlerTerminatedFlag = &terminated;
+
                 std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_read)> cleanupGuard( this, __finally_read );
                 recvHandler( SystemError::timedOut, (size_t)-1 );
                 break;
@@ -705,8 +768,20 @@ public:
 
             case aio::etWriteTimedOut:
             {
-                std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_write)> cleanupGuard( this, __finally_write );
-                sendHandler( SystemError::timedOut, (size_t)-1 );
+                m_connectSendHandlerTerminatedFlag = &terminated;
+
+                if( connectHandler )
+                {
+                    auto connectHandlerBak = std::move( connectHandler );
+                    std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_connect)> cleanupGuard( this, __finally_connect );
+                    connectHandlerBak( SystemError::timedOut );
+                }
+                else
+                {
+                    assert( sendHandler  );
+                    std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_write)> cleanupGuard( this, __finally_write );
+                    sendHandler( SystemError::timedOut, (size_t)-1 );
+                }
                 break;
             }
 
@@ -715,13 +790,26 @@ public:
                 //TODO #ak distinguish read and write
                 SystemError::ErrorCode sockErrorCode = SystemError::notConnected;
                 sock->getLastError( &sockErrorCode );
+                if( connectHandler )
+                {
+                    auto connectHandlerBak = std::move( connectHandler );
+                    m_connectSendHandlerTerminatedFlag = &terminated;
+                    std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_connect)> cleanupGuard( this, __finally_connect );
+                    connectHandlerBak( sockErrorCode );
+                }
+                if( terminated )
+                    return;
                 if( recvHandler )
                 {
+                    m_recvHandlerTerminatedFlag = &terminated;
                     std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_read)> cleanupGuard( this, __finally_read );
                     recvHandler( sockErrorCode, (size_t)-1 );
                 }
+                if( terminated )
+                    return;
                 if( sendHandler )
                 {
+                    m_connectSendHandlerTerminatedFlag = &terminated;
                     std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_write)> cleanupGuard( this, __finally_write );
                     sendHandler( sockErrorCode, (size_t)-1 );
                 }
@@ -968,7 +1056,7 @@ int CommunicatingSocket::send( const void* buffer, unsigned int bufferLen )
 }
 
 //!Implementation of AbstractCommunicatingSocket::getForeignAddress
-const SocketAddress CommunicatingSocket::getForeignAddress()
+SocketAddress CommunicatingSocket::getForeignAddress() const
 {
     sockaddr_in addr;
     unsigned int addr_len = sizeof(addr);
@@ -1027,9 +1115,29 @@ unsigned short CommunicatingSocket::getForeignPort()  {
     return ntohs(addr.sin_port);
 }
 
+void CommunicatingSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
+{
+    aio::AIOService::instance()->removeFromWatch( this, eventType, waitForRunningHandlerCompletion );
+}
+
 static const int DEFAULT_RESERVE_SIZE = 4*1024;
 
-bool CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )> handler )
+bool CommunicatingSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
+{
+    CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>(impl());
+
+    unsigned int sendTimeout = 0;
+    if( !getSendTimeout( &sendTimeout ) )
+        return false;
+    if( !connect( addr.address.toString(), addr.port, sendTimeout ) )
+        return false;
+
+    d->connectHandler = std::move(handler);
+    ++d->connectSendAsyncCallCounter;
+    return aio::AIOService::instance()->watchSocket( this, aio::etWrite, d );
+}
+
+bool CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
 {
     CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>( impl() );
 
@@ -1041,14 +1149,14 @@ bool CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<vo
     return aio::AIOService::instance()->watchSocket( this, aio::etRead, d );
 }
 
-bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )> handler )
+bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
 {
     CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>( impl() );
 
     d->sendBuffer = &buf;
     d->sendHandler = std::move(handler);
     d->sendBufPos = 0;
-    ++d->sendAsyncCallCounter;
+    ++d->connectSendAsyncCallCounter;
     return aio::AIOService::instance()->watchSocket( this, aio::etWrite, d );
 }
 
@@ -1060,8 +1168,9 @@ bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<vo
 // TCPSocket Code
 
 TCPSocket::TCPSocket()
-    : CommunicatingSocket(SOCK_STREAM,
-                          IPPROTO_TCP) {
+:
+    CommunicatingSocket(SOCK_STREAM, IPPROTO_TCP)
+{
 }
 
 TCPSocket::TCPSocket( const QString &foreignAddress, unsigned short foreignPort )
@@ -1071,7 +1180,14 @@ TCPSocket::TCPSocket( const QString &foreignAddress, unsigned short foreignPort 
     connect( foreignAddress, foreignPort, AbstractCommunicatingSocket::DEFAULT_TIMEOUT_MILLIS );
 }
 
-TCPSocket::TCPSocket(int newConnSD) : CommunicatingSocket(newConnSD) {
+TCPSocket::TCPSocket(int newConnSD)
+:
+    CommunicatingSocket(newConnSD)
+{
+}
+
+TCPSocket::~TCPSocket()
+{
 }
 
 bool TCPSocket::reopen()

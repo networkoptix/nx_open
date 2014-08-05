@@ -241,7 +241,7 @@ public:
     //!Implementation of AbstractCommunicatingSocket::send
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
     //!Implementation of AbstractCommunicatingSocket::getForeignAddress
-    virtual const SocketAddress getForeignAddress() override;
+    virtual SocketAddress getForeignAddress() const override;
     //!Implementation of AbstractCommunicatingSocket::isConnected
     virtual bool isConnected() const override;
 
@@ -264,16 +264,21 @@ public:
      */
     unsigned short getForeignPort() ;
 
+    //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
+    virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) override;
+
 protected:
     bool mConnected;
 
     CommunicatingSocket(int type, int protocol) ;
     CommunicatingSocket(int newConnSD);
 
+    //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
+    virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
     //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
     //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
 };
 
 /**
@@ -300,7 +305,8 @@ public:
      */
     TCPSocket(const QString &foreignAddress, unsigned short foreignPort);
     //!User by \a TCPServerSocket class
-    TCPSocket(int newConnSD);
+    TCPSocket( int newConnSD );
+    virtual ~TCPSocket();
 
     //!Implementation of AbstractStreamSocket::reopen
     virtual bool reopen() override;

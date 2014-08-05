@@ -14,6 +14,8 @@
 #include <QtCore/QMap>
 #include <QtCore/QUrl>
 
+#include "utils/network/buffer.h"
+
 #include "qnbytearrayref.h"
 
 
@@ -40,9 +42,10 @@ namespace nx_http
 
         Using QByteArray or any STL container results in many memory copy/relocation operations which make implementation not effecient
     */
-    typedef QByteArray BufferType;
+    typedef nx::Buffer BufferType;
     typedef QnByteArrayConstRef ConstBufferRefType;
-    typedef QByteArray StringType;
+    //TODO #ak not sure, if nx::Buffer is suitable for string type
+    typedef nx::Buffer StringType;
 
     /*!
         \return < 0, if \a one < \a two. 0 if \a one == \a two. > 0 if \a one > \a two

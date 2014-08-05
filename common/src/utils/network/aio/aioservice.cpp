@@ -9,9 +9,12 @@
 #include <thread>
 
 #include <QtCore/QMutexLocker>
+#include <QtCore/QThread>
+#include <qglobal.h>
+
+#include <utils/common/log.h>
 
 #include "aiothread.h"
-#include "qglobal.h"
 
 
 using namespace std;
@@ -26,29 +29,24 @@ namespace aio
             threadCount = threadCountArgValue;
 
         if( !threadCount )
-        {
-            //TODO/IMPL calculating optimal thread count
-            threadCount = std::thread::hardware_concurrency();
-        }
+            threadCount = QThread::idealThreadCount();
 
         for( unsigned int i = 0; i < threadCount; ++i )
         {
-            std::auto_ptr<AIOThread> thread( new AIOThread( &m_mutex ) );
+            std::unique_ptr<AIOThread> thread( new AIOThread( &m_mutex ) );
             thread->start();
             if( !thread->isRunning() )
-            {
-                //killing every fucking thing we just created
-                for( std::list<AIOThread*>::iterator
-                    it = m_threadPool.begin();
-                    it != m_threadPool.end();
-                    ++it )
-                {
-                    delete *it;
-                }
-                m_threadPool.clear();
-                return;
-            }
+                continue;
             m_threadPool.push_back( thread.release() );
+        }
+
+        assert( !m_threadPool.empty() );
+        if( m_threadPool.empty() )
+        {
+            //I wish we used exceptions
+            NX_LOG( lit("Could not start a single AIO thread. Terminating..."), cl_logALWAYS );
+            std::cerr << "Could not start a single AIO thread. Terminating..." << std::endl;
+            exit(1);
         }
     }
 

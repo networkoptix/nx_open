@@ -396,9 +396,9 @@ bool QnSSLSocket::connect(
     return d->wrappedSocket->connect(foreignAddress, foreignPort, timeoutMillis);
 }
 
-const SocketAddress QnSSLSocket::getForeignAddress()
+SocketAddress QnSSLSocket::getForeignAddress() const
 {
-    Q_D(QnSSLSocket);
+    Q_D(const QnSSLSocket);
     return d->wrappedSocket->getForeignAddress();
 }
 
@@ -535,13 +535,25 @@ AbstractSocket::SOCKET_HANDLE QnSSLSocket::handle() const
     return d->wrappedSocket->handle();
 }
 
-bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const /*buf*/, std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
+void QnSSLSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
+{
+    Q_D( const QnSSLSocket );
+    return d->wrappedSocket->cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
+}
+
+bool QnSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
+{
+    Q_D( const QnSSLSocket );
+    return d->wrappedSocket->connectAsync( addr, std::move(handler) );
+}
+
+bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const /*buf*/, std::function<void( SystemError::ErrorCode, size_t )>&& /*handler*/ )
 {
     assert( false );
     return false;
 }
 
-bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& /*buf*/, std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
+bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& /*buf*/, std::function<void( SystemError::ErrorCode, size_t )>&& /*handler*/ )
 {
     assert( false );
     return false;
@@ -557,6 +569,13 @@ class QnMixedSSLSocketPrivate: public QnSSLSocketPrivate
 public:
     bool initState;
     bool useSSL;
+
+    QnMixedSSLSocketPrivate()
+    :
+        initState( true ),
+        useSSL( false )
+    {
+    }
 };
 
 QnMixedSSLSocket::QnMixedSSLSocket(AbstractStreamSocket* wrappedSocket):
@@ -614,15 +633,34 @@ int QnMixedSSLSocket::send( const void* buffer, unsigned int bufferLen )
         return d->wrappedSocket->send(buffer, bufferLen);
 }
 
+//!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
+void QnMixedSSLSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
+{
+    Q_D( QnMixedSSLSocket );
+    if( d->useSSL )
+        QnSSLSocket::cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
+    else
+        d->wrappedSocket->cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
+}
+
+bool QnMixedSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
+{
+    Q_D( QnMixedSSLSocket );
+    if( d->useSSL )
+        return QnSSLSocket::connectAsyncImpl( addr, std::move(handler) );
+    else
+        return d->wrappedSocket->connectAsync( addr, std::move( handler) );
+}
+
 //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const /*buf*/, std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
+bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const /*buf*/, std::function<void( SystemError::ErrorCode, size_t )>&& /*handler*/ )
 {
     assert( false );
     return false;
 }
 
 //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& /*buf*/, std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
+bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& /*buf*/, std::function<void( SystemError::ErrorCode, size_t )>&& /*handler*/ )
 {
     assert( false );
     return false;
