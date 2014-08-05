@@ -27,6 +27,7 @@ public:
     };
 
     QnSystemAdministrationDialog(QWidget *parent = 0);
+    ~QnSystemAdministrationDialog();
 
     virtual void accept() override;
     virtual void reject() override;

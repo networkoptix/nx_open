@@ -26,7 +26,6 @@ struct QnConnectionInfo {
     QString systemName;
     QString ecsGuid;
     QString brand;
-    QString systemName;
     QString box;
 };
 

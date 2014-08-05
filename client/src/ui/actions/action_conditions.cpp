@@ -659,6 +659,7 @@ Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnLayoutItemI
 }
 
 Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
     return qnCommon->remoteGUID().isNull()
         ? Qn::InvisibleAction
         : Qn::EnabledAction;
@@ -939,11 +940,13 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
     return Qn::InvisibleAction;
    
 #else
+    Q_UNUSED(parameters)
     return Qn::InvisibleAction;
 #endif
 }
 
 Qn::ActionVisibility QnAutoStartAllowedActionCodition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
     if(!context()->instance<QnWorkbenchAutoStarter>()->isSupported())
         return Qn::InvisibleAction;
     return Qn::EnabledAction;

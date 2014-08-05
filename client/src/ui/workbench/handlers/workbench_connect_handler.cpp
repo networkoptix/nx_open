@@ -250,7 +250,7 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl) {
 
     context()->setUserName(appServerUrl.userName());
 
-    QnGlobalModuleFinder::instance()->setConnection(connection);
+    QnGlobalModuleFinder::instance()->setConnection(result.connection());
 
     return true;
 }
