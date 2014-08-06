@@ -233,11 +233,12 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
 
         m_lastPingById[moduleInformation.id] = QDateTime::currentMSecsSinceEpoch();
 
-        if (!m_urls.contains(url, moduleInformation.id))
+        if (!m_urls.contains(url, moduleInformation.id)) {
             m_urls.insert(url, moduleInformation.id);
 
-        url.setPath(QString());
-        emit moduleFound(moduleInformation, url.host(), url);
+            url.setPath(QString());
+            emit moduleFound(moduleInformation, url.host(), url);
+        }
     } else {
         QnId id = m_moduleByUrl[url];
         if (id.isNull())
