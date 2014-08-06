@@ -47,22 +47,6 @@ void QnDirectModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
 }
 
-void QnDirectModuleFinder::checkAndAddUrl(const QUrl &srcUrl, const QnId &id, QMultiHash<QUrl, QnId> *urls) {
-    QUrl url = makeRequestUrl(srcUrl);
-    if (!urls->contains(url, id)) {
-        urls->insert(url, id);
-        enqueRequest(url);
-    }
-}
-
-void QnDirectModuleFinder::checkAndAddAddress(const QHostAddress &address, quint16 port, const QnId &id, QMultiHash<QUrl, QnId> *urls) {
-    QUrl url = makeRequestUrl(address, port);
-    if (!urls->contains(url, id)) {
-        urls->insert(url, id);
-        enqueRequest(url);
-    }
-}
-
 void QnDirectModuleFinder::dropModule(const QnId &id, bool emitSignal) {
     QnModuleInformation moduleInformation = m_foundModules.take(id);
     if (moduleInformation.id.isNull())

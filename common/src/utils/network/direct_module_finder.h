@@ -59,9 +59,6 @@ signals:
 private:
     void enqueRequest(const QUrl &url);
 
-    void checkAndAddUrl(const QUrl &url, const QnId &id, QMultiHash<QUrl, QnId> *urls);
-    void checkAndAddAddress(const QHostAddress &address, quint16 port, const QnId &id, QMultiHash<QUrl, QnId> *urls);
-
     void dropModule(const QnId &id, bool emitSignal = true);
     void dropModule(const QUrl &url, bool emitSignal = true);
 
