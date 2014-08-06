@@ -171,18 +171,17 @@ void QnCameraAdditionDialog::setServer(const QnMediaServerResourcePtr &server) {
 
     m_server = server;
     if (server) {
-        setWindowTitle(tr("Add cameras to %1").arg(getResourceName(server)));
-        ui->serverNameLabel->setText(getResourceName(server));
         setState(server->getStatus() == QnResource::Offline
                  ? InitialOffline
                  : Initial);
 
         connect(m_server, &QnResource::statusChanged, this, &QnCameraAdditionDialog::at_server_statusChanged);
+        connect(m_server, &QnResource::nameChanged,  this, &QnCameraAdditionDialog::updateTitle);
+        connect(m_server, &QnResource::urlChanged,  this, &QnCameraAdditionDialog::updateTitle);
     } else {
-        setWindowTitle(tr("Add cameras..."));
-        ui->serverNameLabel->setText(tr("select target mediaserver in the tree"));
         setState(NoServer);
     }
+    updateTitle();
 }
 
 QnCameraAdditionDialog::State QnCameraAdditionDialog::state() const {
@@ -803,4 +802,15 @@ bool QnCameraAdditionDialog::tryClose(bool force) {
     if (force)
         hide();
     return true;
+}
+
+void QnCameraAdditionDialog::updateTitle() {
+    if (m_server) {
+        QString name = getResourceName(m_server);
+        setWindowTitle(tr("Add cameras to %1").arg(name));
+        ui->serverNameLabel->setText(name);
+    } else {
+        setWindowTitle(tr("Add cameras..."));
+        ui->serverNameLabel->setText(tr("Select target server..."));
+    }
 }

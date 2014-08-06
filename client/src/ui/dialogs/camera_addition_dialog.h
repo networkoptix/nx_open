@@ -83,6 +83,7 @@ private:
     bool ensureServerOnline();
     bool addingAllowed() const;
 
+    void updateTitle();
 private slots: 
     void at_startIPLineEdit_textChanged(QString value);
     void at_startIPLineEdit_editingFinished();
