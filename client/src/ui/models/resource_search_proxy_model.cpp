@@ -14,8 +14,6 @@ QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject *parent):
     QSortFilterProxyModel(parent),
     m_invalidating(false)
 {
-    // TODO: #Elric use natural string comparison instead.
-    setSortCaseSensitivity(Qt::CaseInsensitive);
 }
 
 QnResourceSearchProxyModel::~QnResourceSearchProxyModel() {
@@ -97,7 +95,7 @@ bool QnResourceSearchProxyModel::lessThan(const QModelIndex &left, const QModelI
     if( leftData.type() == QVariant::String && rightData.type() == QVariant::String ) {
         QString ls = leftData.toString();
         QString rs = rightData.toString();
-        return naturalStringCompare(ls,rs,Qt::CaseSensitive,false) >0;
+        return naturalStringCompare(ls,rs,Qt::CaseInsensitive,false) >0;
     } else {
         // Throw the rest situation to base class to handle 
         return QSortFilterProxyModel::lessThan(left,right);
