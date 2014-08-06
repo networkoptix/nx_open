@@ -9,6 +9,8 @@
 #include <core/resource/videowall_resource.h>
 
 #include <core/resource_management/resource_pool.h>
+#include "qjsonobject.h"
+#include "mustache/mustache.h"
 
 
 /** Allow to use 'master' license type instead of 'child' type if there are not enough child licenses. */
@@ -345,4 +347,26 @@ QnVideoWallLicenseUsageProposer::QnVideoWallLicenseUsageProposer(QnVideoWallLice
 QnVideoWallLicenseUsageProposer::~QnVideoWallLicenseUsageProposer() {
     if (m_helper)
         m_helper->propose(-m_count);
+}
+
+QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
+{
+    QString messageId = errorMessage.value(lit("messageId")).toString();
+    QString message = errorMessage.value(lit("message")).toString();
+    QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
+
+    if(messageId == lit("DatabaseError")) {
+        message = tr("There was a problem activating your license key. Database error has occurred.");  //TODO: Feature #3629 case J
+    } else if(messageId == lit("InvalidData")) {
+        message = tr("There was a problem activating your license key. Invalid data received. Please contact support team to report issue.");
+    } else if(messageId == lit("InvalidKey")) {
+        message = tr("The license key you have entered is invalid. Please check that license key is entered correctly. "
+            "If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.");
+    } else if(messageId == lit("InvalidBrand")) {
+        message = tr("You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.");
+    } else if(messageId == lit("AlreadyActivated")) {
+        message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.");
+    }
+
+    return Mustache::renderTemplate(message, arguments);
 }

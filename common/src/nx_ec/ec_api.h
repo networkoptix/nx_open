@@ -358,6 +358,13 @@ namespace ec2
             return addLicenses( licenses, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        ErrorCode addLicensesSync(const QList<QnLicensePtr>& licenses) {
+            using namespace std::placeholders;
+            int(AbstractLicenseManager::*fn)(const QList<QnLicensePtr>&, impl::SimpleHandlerPtr) = &AbstractLicenseManager::addLicenses;
+            return impl::doSyncCall<impl::SimpleHandler>( std::bind(fn, this, licenses, _1));
+        }
+
+
         template<class TargetType, class HandlerType> int removeLicense( const QnLicensePtr& license, TargetType* target, HandlerType handler ) {
             return removeLicense( license, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }

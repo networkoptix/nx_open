@@ -6,6 +6,8 @@
 
 #include <utils/common/connective.h>
 
+static const QString QN_LICENSE_URL(lit("http://networkoptix.com/nolicensed_vms/activate.php"));
+
 class QnLicenseUsageHelper: public Connective<QObject>
 {
     Q_OBJECT
@@ -53,6 +55,11 @@ public:
 
     virtual QList<Qn::LicenseType> licenseTypes() const;
 
+    /**
+     *  Get full error message from activation server
+     */
+    static QString activationMessage(const QJsonObject& errorMessage);
+
     void update();
 signals:
      void licensesChanged();
@@ -78,7 +85,6 @@ public:
 
     void propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
-
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const override;

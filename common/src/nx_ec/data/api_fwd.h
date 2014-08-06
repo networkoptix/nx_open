@@ -26,6 +26,7 @@ namespace ec2 {
     struct ApiLayoutItemWithRefData;
     struct ApiLayoutData;
     struct ApiLicenseData;
+    struct ApiDetailedLicenseData;
     struct ApiLockData;
     struct ApiMediaServerData;
     struct ApiPanicModeData;
@@ -96,6 +97,7 @@ namespace ec2 {
     (ApiLayoutItemWithRefData)\
     (ApiLayoutData)\
     (ApiLicenseData)\
+    (ApiDetailedLicenseData)\
     (ApiLockData)\
     (ApiMediaServerData)\
     (ApiPanicModeData)\
