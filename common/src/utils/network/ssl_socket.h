@@ -2,10 +2,10 @@
 #define __SSL_SOCKET_H_
 
 #ifdef ENABLE_SSL
-
 #include <openssl/ssl.h>
 
 #include <QObject>
+
 
 #include "abstract_socket.h"
 #include "socket_common.h"
