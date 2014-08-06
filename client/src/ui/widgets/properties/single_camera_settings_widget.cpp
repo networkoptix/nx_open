@@ -99,8 +99,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     setHelpTopic(ui->motionTab,                                             Qn::CameraSettings_Motion_Help);
     setHelpTopic(ui->advancedTab,                                           Qn::CameraSettings_Properties_Help);
     setHelpTopic(ui->fisheyeTab,                                            Qn::CameraSettings_Dewarping_Help);
-    setHelpTopic(ui->arOverrideCheckBox, ui->arComboBox,                    Qn::CameraSettings_AspectRatio_Help);
-    setHelpTopic(ui->arGroupBox,                                            Qn::CameraSettings_AspectRatio_Help);
+    setHelpTopic(ui->forceArCheckBox, ui->forceArComboBox,                  Qn::CameraSettings_AspectRatio_Help);
 
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();
@@ -143,22 +142,24 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->fisheyeSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_fisheyeSettingsChanged()));
     connect(ui->fisheyeCheckBox,        &QCheckBox::toggled,                    this,   &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
 
-    connect(ui->arOverrideCheckBox, &QCheckBox::stateChanged, this, [this](int state){ ui->arComboBox->setEnabled(state == Qt::Checked);} );
-    connect(ui->arOverrideCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dbDataChanged()));
+    connect(ui->forceArCheckBox,        &QCheckBox::stateChanged,               this,   [this](int state){ ui->forceArComboBox->setEnabled(state == Qt::Checked);} );
+    connect(ui->forceArCheckBox,        &QCheckBox::stateChanged,               this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
-    ui->arComboBox->addItem(tr("4:3"),  4.0 / 3);
-    ui->arComboBox->addItem(tr("16:9"), 16.0 / 9);
-    ui->arComboBox->addItem(tr("1:1"),  1.0);
-    ui->arComboBox->setCurrentIndex(0);
-    connect(ui->arComboBox,         SIGNAL(currentIndexChanged(int)),    this,          SLOT(at_dbDataChanged()));
+    ui->forceArComboBox->addItem(tr("4:3"),  4.0 / 3);
+    ui->forceArComboBox->addItem(tr("16:9"), 16.0 / 9);
+    ui->forceArComboBox->addItem(tr("1:1"),  1.0);
+    ui->forceArComboBox->setCurrentIndex(0);
+    connect(ui->forceArComboBox,        SIGNAL(currentIndexChanged(int)),       this,   SLOT(at_dbDataChanged()));
 
-    connect(ui->rotCheckBox,&QCheckBox::stateChanged,this,[this](int state){ ui->rotComboBox->setEnabled(state == Qt::Checked);} );
-    connect(ui->rotCheckBox,SIGNAL(stateChanged(int)),this,SLOT(at_dbDataChanged()));
-    ui->rotComboBox->addItem(tr("0 degree"),0);
-    ui->rotComboBox->addItem(tr("90 degrees"),90);
-    ui->rotComboBox->addItem(tr("180 degrees"),180);
-    ui->rotComboBox->addItem(tr("270 degress"),270);
-    connect(ui->rotComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(at_dbDataChanged()));
+    connect(ui->forceRotationCheckBox,  &QCheckBox::stateChanged,               this,   [this](int state){ ui->forceRotationComboBox->setEnabled(state == Qt::Checked);} );
+    connect(ui->forceRotationCheckBox,  &QCheckBox::stateChanged,               this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
+
+    ui->forceRotationComboBox->addItem(tr("0 degree"),      0);
+    ui->forceRotationComboBox->addItem(tr("90 degrees"),    90);
+    ui->forceRotationComboBox->addItem(tr("180 degrees"),   180);
+    ui->forceRotationComboBox->addItem(tr("270 degrees"),   270);
+    ui->forceRotationComboBox->setCurrentIndex(0);
+    connect(ui->forceRotationComboBox,  SIGNAL(currentIndexChanged(int)),       this,   SLOT(at_dbDataChanged()));
 
     updateFromResource();
     updateLicensesButtonVisible();
@@ -582,13 +583,13 @@ void QnSingleCameraSettingsWidget::submitToResource() {
             submitMotionWidgetToResource();
         }
 
-        if (ui->arOverrideCheckBox->isChecked())
-            m_camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->arComboBox->itemData(ui->arComboBox->currentIndex()).toDouble()));
+        if (ui->forceArCheckBox->isChecked())
+            m_camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->forceArComboBox->currentData().toDouble()));
         else
             m_camera->setProperty(QnMediaResource::customAspectRatioKey(), QString());
 
-        if(ui->rotCheckBox->isChecked()) 
-            m_camera->setProperty(QnMediaResource::rotationKey(), QString::number(ui->rotComboBox->itemData(ui->rotComboBox->currentIndex()).toInt()));
+        if(ui->forceRotationCheckBox->isChecked()) 
+            m_camera->setProperty(QnMediaResource::rotationKey(), QString::number(ui->forceRotationComboBox->currentData().toInt()));
         else
             m_camera->setProperty(QnMediaResource::rotationKey(), QString());
 
@@ -683,28 +684,33 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->analogViewCheckBox->setChecked(!m_camera->isScheduleDisabled());
 
         QString arOverride = m_camera->getProperty(QnMediaResource::customAspectRatioKey());
-        ui->arOverrideCheckBox->setChecked(!arOverride.isEmpty());
+        ui->forceArCheckBox->setChecked(!arOverride.isEmpty());
         if (!arOverride.isEmpty()) 
         {
             // float is important here
             float ar = arOverride.toFloat();
             int idx = -1;
-            for (int i = 0; i < ui->arComboBox->count(); ++i) {
-                if (qFuzzyEquals(ar, ui->arComboBox->itemData(i).toFloat())) {
+            for (int i = 0; i < ui->forceArComboBox->count(); ++i) {
+                if (qFuzzyEquals(ar, ui->forceArComboBox->itemData(i).toFloat())) {
                     idx = i;
                     break;
                 }
             }
-            ui->arComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
+            ui->forceArComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
         }
+
         QString rotation = m_camera->getProperty(QnMediaResource::rotationKey());
+        ui->forceRotationCheckBox->setChecked(!rotation.isEmpty());
         if(!rotation.isEmpty()) {
-            ui->rotCheckBox->setChecked(true);
-            bool ok;
-            int degree = rotation.toInt(&ok);
-            Q_ASSERT(ok);
-            Q_ASSERT(degree>=0 && degree<=270);
-            ui->rotComboBox->setCurrentIndex(degree/90);
+            int degree = rotation.toInt();
+            int idx = -1;
+            for (int i = 0; i < ui->forceRotationComboBox->count(); ++i) {
+                if (degree == ui->forceRotationComboBox->itemData(i).toInt()) {
+                    idx = i;
+                    break;
+                }
+            }
+            ui->forceRotationComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
         }
 
         if (!dtsBased) {
