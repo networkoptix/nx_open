@@ -135,7 +135,6 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     connect(ui->camerasTable,       SIGNAL(cellChanged(int,int)),                   this,   SLOT(at_camerasTable_cellChanged(int, int)));
     connect(ui->camerasTable,       SIGNAL(cellClicked(int,int)),                   this,   SLOT(at_camerasTable_cellClicked(int, int)));
     connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),                          this,   SLOT(at_subnetCheckbox_toggled(bool)));
-    connect(ui->closeButton,        SIGNAL(clicked()),                              this,   SLOT(at_closeButton_clicked()));
     connect(ui->scanButton,         SIGNAL(clicked()),                              this,   SLOT(at_scanButton_clicked()));
     connect(ui->stopScanButton,     SIGNAL(clicked()),                              this,   SLOT(at_stopScanButton_clicked()));
     connect(ui->addButton,          SIGNAL(clicked()),                              this,   SLOT(at_addButton_clicked()));
@@ -184,6 +183,12 @@ void QnCameraAdditionDialog::setServer(const QnMediaServerResourcePtr &server) {
     updateTitle();
 }
 
+void QnCameraAdditionDialog::reject() {
+    if (!tryClose(false))
+        return;
+    base_type::reject();
+}
+
 QnCameraAdditionDialog::State QnCameraAdditionDialog::state() const {
     return m_state;
 }
@@ -202,7 +207,7 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         ui->stageStackedWidget->setEnabled(false);
         ui->actionButtonsStackedWidget->setCurrentWidget(ui->scanButtonPage);
         ui->actionButtonsStackedWidget->setEnabled(false);
-        ui->closeButton->setFocus();
+        ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
         clearTable();
         break;
     case Initial:
@@ -219,7 +224,7 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         ui->stageStackedWidget->setEnabled(false);
         ui->actionButtonsStackedWidget->setCurrentWidget(ui->scanButtonPage);
         ui->actionButtonsStackedWidget->setEnabled(false);
-        ui->closeButton->setFocus();
+        ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
         clearTable();
         break;
     case Searching:
@@ -232,12 +237,12 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         ui->actionButtonsStackedWidget->setEnabled(false);
         ui->stopScanButton->setEnabled(false);
         ui->camerasTable->setEnabled(false);
-        ui->closeButton->setFocus();
+        ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
         clearTable();
         break;
     case Stopping:
         ui->stopScanButton->setEnabled(false);
-        ui->closeButton->setFocus();
+        ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
         break;
     case CamerasFound:
     {
@@ -261,14 +266,14 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         ui->stageStackedWidget->setEnabled(true);
         ui->actionButtonsStackedWidget->setCurrentWidget(ui->addButtonPage);
         ui->actionButtonsStackedWidget->setEnabled(false);
-        ui->closeButton->setFocus();
+        ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
         break;
     case Adding:
         ui->stageStackedWidget->setCurrentWidget(ui->discoveredCamerasPage);
         ui->stageStackedWidget->setEnabled(false);
         ui->actionButtonsStackedWidget->setCurrentWidget(ui->addButtonPage);
         ui->actionButtonsStackedWidget->setEnabled(false);
-        ui->closeButton->setFocus();
+        ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
         break;
     default:
         break;
@@ -513,17 +518,6 @@ void QnCameraAdditionDialog::at_header_checkStateChanged(Qt::CheckState state) {
     m_inCheckStateChange = false;
 }
 
-void QnCameraAdditionDialog::at_closeButton_clicked() {
-    if (m_state == Searching && m_processUuid.isNull()) {
-        return; //TODO: #GDM #CameraAddition do something
-    }
-
-    if (m_state == Searching )
-        m_server->apiConnection()->searchCameraAsyncStop(m_processUuid);    //aborting
-    setState(Initial);
-    accept();
-}
-
 void QnCameraAdditionDialog::at_scanButton_clicked() {
     if (!ensureServerOnline())
         return;
@@ -615,8 +609,8 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     setState(Adding);
 
     QEventLoop loop;
-    connect(&result,            SIGNAL(replyProcessed()),   &loop, SLOT(quit()));
-    connect(ui->closeButton,    SIGNAL(clicked()),          &loop, SLOT(quit()));
+    connect(&result,            &QnConnectionRequestResult::replyProcessed, &loop, &QEventLoop::quit);
+    connect(ui->buttonBox,      &QDialogButtonBox::rejected,                &loop, &QEventLoop::quit);
     loop.exec();
 
     ui->addButton->setEnabled(addingAllowed());
