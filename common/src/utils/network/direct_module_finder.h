@@ -24,11 +24,6 @@ public:
     void addAddress(const QHostAddress &address, quint16 port, const QnId &id);
     void removeAddress(const QHostAddress &address, quint16 port, const QnId &id);
 
-    void addManualUrl(const QUrl &url, const QnId &id);
-    void removeManualUrl(const QUrl &url, const QnId &id);
-    void addManualAddress(const QHostAddress &address, quint16 port, const QnId &id);
-    void removeManualAddress(const QHostAddress &address, quint16 port, const QnId &id);
-
     void addIgnoredModule(const QUrl &url, const QnId &id);
     void removeIgnoredModule(const QUrl &url, const QnId &id);
     void addIgnoredModule(const QHostAddress &address, quint16 port, const QnId &id);
@@ -47,9 +42,11 @@ public:
     QList<QnModuleInformation> foundModules() const;
     QnModuleInformation moduleInformation(const QnId &id) const;
 
-    QMultiHash<QUrl, QnId> autoUrls() const;
-    QMultiHash<QUrl, QnId> manualUrls() const;
+    //! Urls for periodical check
+    QMultiHash<QUrl, QnId> urls() const;
+    //! Modules to be ignored when found
     QMultiHash<QUrl, QnId> ignoredModules() const;
+    //! Urls which may appear in url check list but must be ignored
     QSet<QUrl> ignoredUrls() const;
 
 signals:
@@ -65,17 +62,17 @@ private:
     void checkAndAddUrl(const QUrl &url, const QnId &id, QMultiHash<QUrl, QnId> *urls);
     void checkAndAddAddress(const QHostAddress &address, quint16 port, const QnId &id, QMultiHash<QUrl, QnId> *urls);
 
-    QnIdSet expectedModuleIds(const QUrl &url) const;
+    void dropModule(const QnId &id, bool emitSignal = true);
+    void dropModule(const QUrl &url, bool emitSignal = true);
 
 private slots:
     void activateRequests();
 
     void at_reply_finished(QNetworkReply *reply);
-    void at_manualCheckTimer_timeout();
+    void at_periodicalCheckTimer_timeout();
 
 private:
-    QMultiHash<QUrl, QnId> m_autoUrls;
-    QMultiHash<QUrl, QnId> m_manualUrls;
+    QMultiHash<QUrl, QnId> m_urls;
     QMultiHash<QUrl, QnId> m_ignoredModules;
     QSet<QUrl> m_ignoredUrls;
 
@@ -90,7 +87,7 @@ private:
     bool m_compatibilityMode;
 
     QNetworkAccessManager *m_networkAccessManager;
-    QTimer *m_manualCheckTimer;
+    QTimer *m_periodicalCheckTimer;
 };
 
 #endif // DIRECT_MODULE_FINDER_H

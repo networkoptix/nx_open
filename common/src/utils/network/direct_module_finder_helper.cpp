@@ -79,7 +79,7 @@ void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource)
             m_directModuleFinder->addAddress(address, port, serverId);
 
         foreach (const QUrl &url, server->getAdditionalUrls())
-            m_directModuleFinder->addManualUrl(url, serverId);
+            m_directModuleFinder->addUrl(url, serverId);
 
         foreach (const QUrl &url, server->getIgnoredUrls())
             m_directModuleFinder->addIgnoredModule(url, serverId);
@@ -167,10 +167,10 @@ void QnDirectModuleFinderHelper::at_resourceAuxUrlsChanged(const QnResourcePtr &
         QnUrlSet commonAdditionalUrls = oldAdditionalUrls & newAdditionalUrls;
 
         foreach (const QUrl &url, oldAdditionalUrls - commonAdditionalUrls)
-            m_directModuleFinder->removeManualUrl(url, serverId);
+            m_directModuleFinder->removeUrl(url, serverId);
 
         foreach (const QUrl &url, newAdditionalUrls - commonAdditionalUrls)
-            m_directModuleFinder->addManualUrl(url, serverId);
+            m_directModuleFinder->addUrl(url, serverId);
     }
 }
 
@@ -191,7 +191,7 @@ void QnDirectModuleFinderHelper::at_resourceRemoved(const QnResourcePtr &resourc
             m_directModuleFinder->removeAddress(address, port, serverId);
 
         foreach (const QUrl &url, server->getAdditionalUrls())
-            m_directModuleFinder->removeManualUrl(url, serverId);
+            m_directModuleFinder->removeUrl(url, serverId);
 
         foreach (const QUrl &url, server->getIgnoredUrls())
             m_directModuleFinder->removeIgnoredModule(url, serverId);
