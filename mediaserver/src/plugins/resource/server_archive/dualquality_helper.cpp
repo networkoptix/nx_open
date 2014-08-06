@@ -72,7 +72,7 @@ void QnDualQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
             }
 
             // alternate quality matched better
-            if (timeDistance != INT_MAX && altChunk.containsTime(chunk.startTimeMs))
+            if (timeDistance != INT64_MAX && altChunk.containsTime(chunk.startTimeMs))
                 altChunk.truncate(chunk.startTimeMs); // truncate to start of the next chunk of the required quality (if next chunk of requested quality is exists)
 
             catalog = catalogAlt;
