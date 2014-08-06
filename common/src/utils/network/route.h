@@ -19,6 +19,8 @@ struct QnRoute {
     QList<QnRoutePoint> points;
     int weight;
 
+    QnRoute() : weight(0) {}
+
     bool isValid() const;
 
     bool addPoint(const QnRoutePoint &point, int weight);
