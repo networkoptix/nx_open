@@ -42,6 +42,8 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 
+#include <ui/workaround/qt5_combobox_workaround.h>
+
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/license_usage_helper.h>
 #include <common/common_module.h>
@@ -149,7 +151,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     ui->forceArComboBox->addItem(tr("16:9"), 16.0 / 9);
     ui->forceArComboBox->addItem(tr("1:1"),  1.0);
     ui->forceArComboBox->setCurrentIndex(0);
-    connect(ui->forceArComboBox,        SIGNAL(currentIndexChanged(int)),       this,   SLOT(at_dbDataChanged()));
+    connect(ui->forceArComboBox,        QnComboboxCurrentIndexChanged,          this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
     connect(ui->forceRotationCheckBox,  &QCheckBox::stateChanged,               this,   [this](int state){ ui->forceRotationComboBox->setEnabled(state == Qt::Checked);} );
     connect(ui->forceRotationCheckBox,  &QCheckBox::stateChanged,               this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
@@ -159,7 +161,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     ui->forceRotationComboBox->addItem(tr("180 degrees"),   180);
     ui->forceRotationComboBox->addItem(tr("270 degrees"),   270);
     ui->forceRotationComboBox->setCurrentIndex(0);
-    connect(ui->forceRotationComboBox,  SIGNAL(currentIndexChanged(int)),       this,   SLOT(at_dbDataChanged()));
+    connect(ui->forceRotationComboBox,  QnComboboxCurrentIndexChanged,          this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
     updateFromResource();
     updateLicensesButtonVisible();
