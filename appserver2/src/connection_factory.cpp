@@ -43,6 +43,7 @@ namespace ec2
         qRegisterMetaType<QnTransactionTransportHeader>( "QnTransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiPeerAliveData>( "ApiPeerAliveData" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiRuntimeData>( "ApiRuntimeData" ); // TODO: #Elric #EC2 register in a proper place!
+        qRegisterMetaType<ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); // TODO: #Elric #EC2 register in a proper place!
 
         ec2::QnTransactionMessageBus::initStaticInstance(new ec2::QnTransactionMessageBus());
     }
@@ -177,7 +178,6 @@ namespace ec2
         //AbstractLayoutManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeLayout );
 
-
         //AbstractStoredFileManager::listDirectory
         registerGetFuncHandler<ApiStoredFilePath, ApiStoredDirContents>( restProcessorPool, ApiCommand::listDirectory );
         //AbstractStoredFileManager::getStoredFile
@@ -196,12 +196,16 @@ namespace ec2
         //AbstractUpdatesManager::installUpdate
         registerUpdateFuncHandler<ApiUpdateInstallData>( restProcessorPool, ApiCommand::installUpdate );
 
+        registerUpdateFuncHandler<ApiDatabaseDumpData>( restProcessorPool, ApiCommand::resotreDatabase );
+
         //AbstractECConnection
         registerGetFuncHandler<std::nullptr_t, ApiTimeData>( restProcessorPool, ApiCommand::getCurrentTime );
 
 
         registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>( restProcessorPool, ApiCommand::getFullInfo );
         registerGetFuncHandler<std::nullptr_t, ApiLicenseDataList>( restProcessorPool, ApiCommand::getLicenses );
+
+        registerGetFuncHandler<std::nullptr_t, ApiDatabaseDumpData>( restProcessorPool, ApiCommand::dumpDatabase );
 
         //AbstractECConnectionFactory
         registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::connect,
@@ -225,8 +229,9 @@ namespace ec2
         connectionInfo.ecUrl = url;
         {
             QMutexLocker lk( &m_mutex );
-            if( !m_directConnection )
+            if( !m_directConnection ) {
                 m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
+            }
         }
         QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
         QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::ConnectHandler::done, handler, reqID, ec2::ErrorCode::ok, m_directConnection ) );
@@ -403,6 +408,7 @@ namespace ec2
         connectionInfo->version = QnSoftwareVersion(lit(QN_APPLICATION_VERSION));
         connectionInfo->brand = isCompatibilityMode() ? QString() : lit(QN_PRODUCT_NAME_SHORT);
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
+        connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->box = lit(QN_ARM_BOX);
 
         return ErrorCode::ok;

@@ -6,6 +6,9 @@ from pbs import Command, which
 
 import _winreg 
 
+COMPANY = 'Digital Watchdog'
+PRODUCT = 'DW Spectrum'
+
 def enum_key(hKey):
     i = 0
     try:
@@ -52,7 +55,7 @@ def hdwitness_product_code():
 
             try:
                 h_subkey = _winreg.OpenKey(h_key, subkey)
-                if _winreg.QueryValueEx(h_subkey, 'DisplayName')[0] == 'HD Witness':
+                if _winreg.QueryValueEx(h_subkey, 'DisplayName')[0] == PRODUCT:
                     return subkey
             except WindowsError:
                 pass
@@ -67,18 +70,19 @@ def hdwitness_product_code():
 
 product_code = hdwitness_product_code()
 if product_code:
-    print "Uninstalling HD Witness"
+    print "Uninstalling %s" % PRODUCT
     msiexec = Command(which('msiexec.exe'))
     msiexec('/q', '/x', product_code)
 
-optix_data_path = r"C:\Windows\System32\config\systemprofile\AppData\Local\Network Optix"
+optix_data_path = r"C:\Windows\System32\config\systemprofile\AppData\Local\%s" % COMPANY
 if os.path.exists(optix_data_path):
     print 'Wiping files'
     shutil.rmtree(optix_data_path)
 
-optix_reg_path = r"Software\Network Optix"
+optix_reg_path = r"Software\%s" % COMPANY
 if reg_key_exists(_winreg.HKEY_LOCAL_MACHINE, optix_reg_path):
     print 'Wiping registry'
     reg_delete_key(_winreg.HKEY_LOCAL_MACHINE, optix_reg_path);
 
-Command('inst.bat')()
+#print "Installing %s" % PRODUCT
+#Command('inst.bat')()

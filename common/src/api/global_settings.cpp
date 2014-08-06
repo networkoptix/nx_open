@@ -175,6 +175,10 @@ void QnGlobalSettings::setEmailSettings(const QnEmail::Settings &settings) {
     m_signatureAdaptor->setValue(settings.signature);
     m_supportEmailAdaptor->setValue(settings.supportEmail);
     m_simpleAdaptor->setValue(settings.simple);
-    m_timeoutAdaptor->setValue(settings.timeout);
-    
+    m_timeoutAdaptor->setValue(settings.timeout);   
+}
+
+void QnGlobalSettings::synchronizeNow() {
+    foreach (QnAbstractResourcePropertyAdaptor* adaptor, m_allAdaptors)
+        adaptor->synchronizeNow();
 }

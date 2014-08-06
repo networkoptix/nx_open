@@ -13,7 +13,7 @@ class QnDesktopCameraConnectionProcessorPrivate;
 class QnDesktopCameraConnectionProcessor;
 
 /*
-*   This class used for connection from desktop camera to media server
+*   This class used for connection from desktop camera to server
 */
 
 class QnDesktopCameraConnection: public QnLongRunnable

@@ -4,9 +4,6 @@ import argparse
 import contextlib
 from os.path import dirname, join
     
-#class Config:
-#    pass
-
 @contextlib.contextmanager
 def cd(xdir):
     olddir = os.getcwd()

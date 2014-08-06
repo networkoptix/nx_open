@@ -23,7 +23,11 @@ static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
 static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
 {
     Q_UNUSED(opaque)
+
     QnFfmpegTranscoder* transcoder = reinterpret_cast<QnFfmpegTranscoder*> (opaque);
+    if (transcoder->inMiddleOfStream())
+        return size; // ignore write
+
     return transcoder->writeBuffer((char*) buf, size);
 }
 
@@ -32,7 +36,9 @@ static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
     Q_UNUSED(opaque)
     Q_UNUSED(pos)
     Q_UNUSED(whence)
-    Q_ASSERT_X(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
+    //Q_ASSERT_X(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
+    QnFfmpegTranscoder* transcoder = reinterpret_cast<QnFfmpegTranscoder*> (opaque);
+    transcoder->setInMiddleOfStream(!(pos == 0 && whence == SEEK_END));
     return 0;
 }
 
@@ -64,7 +70,8 @@ QnFfmpegTranscoder::QnFfmpegTranscoder()
     m_videoBitrate(0),
     m_formatCtx(0),
     m_ioContext(0),
-    m_baseTime(AV_NOPTS_VALUE)
+    m_baseTime(AV_NOPTS_VALUE),
+    m_inMiddleOfStream(false)
 {
     NX_LOG( lit("Created new ffmpeg transcoder. Total transcoder count %1").
         arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );

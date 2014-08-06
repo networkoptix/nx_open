@@ -665,6 +665,9 @@ void QnWorkbenchUi::at_freespaceAction_triggered() {
         setSliderOpened(qnSettings->isSliderOpened(), isFullscreen);
         setNotificationsOpened(qnSettings->isNotificationsOpened(), isFullscreen);
 
+        updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: #Elric change code so that this call is not needed.
+        action(Qn::FitInViewAction)->trigger();
+
         m_inFreespace = false;
     }
 }
@@ -1318,7 +1321,7 @@ void QnWorkbenchUi::createTitleWidget() {
     m_titleRightButtonsLayout->addStretch(0x1000);
     if (QnScreenRecorder::isSupported())
         m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction), 1.0, Qn::MainWindow_ScreenRecording_Help));
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ConnectToServerAction)));
+    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenLoginDialogAction)));
     m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
     titleLayout->addItem(m_titleRightButtonsLayout);
     m_titleItem->setLayout(titleLayout);

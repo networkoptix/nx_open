@@ -57,7 +57,7 @@ void QnPhysicalCameraResource::setUrl(const QString &urlStr)
     QMutexLocker lock(&m_mutex);
     QUrl url( urlStr );
     m_channelNumber = QUrlQuery( url.query() ).queryItemValue( QLatin1String( "channel" ) ).toInt();
-    setHttpPort( url.port() );
+    setHttpPort( url.port( httpPort() ) );
     if (m_channelNumber > 0)
         m_channelNumber--; // convert human readable channel in range [1..x] to range [0..x-1]
 }
@@ -235,7 +235,7 @@ void QnVirtualCameraResource::saveParams()
     ec2::ErrorCode rez = conn->getResourceManager()->saveSync(getId(), params, true, &outData);
 
     if (rez != ec2::ErrorCode::ok) {
-        qCritical() << Q_FUNC_INFO << ": can't save resource params to Enterprise Controller. Resource physicalId: "
+        qCritical() << Q_FUNC_INFO << ": can't save resource params to Server. Resource physicalId: "
             << getPhysicalId() << ". Description: " << ec2::toString(rez);
     }
 }

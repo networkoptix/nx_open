@@ -94,7 +94,7 @@ QVariant QnFoundEnterpriseControllersModel::headerData( int section, Qt::Orienta
         return QVariant();
     }
 
-    return tr("Enterprise Controller addresses");
+    return tr("Server addresses");
 }
 
 //!Implementation of QAbstractItemModel::index
@@ -137,7 +137,7 @@ int	QnFoundEnterpriseControllersModel::rowCount( const QModelIndex& parent ) con
         return 0;
     }
 
-    //returning number of IPs of enterprise controller
+    //returning number of IPs of Server
     return (int) m_foundModules[parent.row()].ipAddresses.size();
 }
 

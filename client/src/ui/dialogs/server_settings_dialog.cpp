@@ -103,7 +103,6 @@ namespace {
 
 QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server, QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::ServerSettingsDialog),
     m_server(server),
     m_hasStorageChanges(false),
@@ -384,7 +383,7 @@ int QnServerSettingsDialog::dataRowCount() const {
 void QnServerSettingsDialog::at_tableBottomLabel_linkActivated() {
     QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, this));
     dialog->setProtocols(m_storageProtocols);
-    if(dialog->exec() != QDialog::Accepted)
+    if(!dialog->exec())
         return;
 
     QnStorageSpaceData item = dialog->storage();

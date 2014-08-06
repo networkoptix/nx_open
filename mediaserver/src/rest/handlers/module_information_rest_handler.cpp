@@ -16,7 +16,7 @@ int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequ
 
     QJsonObject json;
 
-    json.insert(lit("type"), lit("Media Server"));
+    json.insert(lit("type"), lit("Server"));
     json.insert(lit("customization"), lit(QN_CUSTOMIZATION_NAME));
     json.insert(lit("version"), QnSoftwareVersion(lit(QN_ENGINE_VERSION)).toString());
     json.insert(lit("systemInformation"), QnSystemInformation(QN_APPLICATION_PLATFORM, QN_APPLICATION_ARCH, QN_ARM_BOX).toString());

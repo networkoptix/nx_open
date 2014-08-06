@@ -144,13 +144,6 @@
              </spacer>
             </item>
             <item>
-             <widget class="QLabel" name="requiredLicensesLabel">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QPushButton" name="moreLicensesButton">
               <property name="text">
                <string>Get More Licenses...</string>
@@ -160,18 +153,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QLabel" name="digitalLicensesLabel">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="analogLicensesLabel">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
+           <widget class="QnLicensesUsageWidget" name="licensesUsageWidget" native="true"/>
           </item>
          </layout>
         </widget>
@@ -260,6 +242,12 @@
    <class>QnAdvancedSettingsWidget</class>
    <extends>QWidget</extends>
    <header>ui/widgets/properties/expert_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnLicensesUsageWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/licenses_usage_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

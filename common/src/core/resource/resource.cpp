@@ -108,7 +108,7 @@ QnResource::QnResource():
     m_initMutex(QMutex::Recursive),
     m_resourcePool(NULL),
     m_flags(0),
-    m_status(Offline),
+    m_status(NotDefined),
     m_initialized(false),
     m_lastInitTime(0),
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
@@ -562,6 +562,11 @@ QnResource::Status QnResource::getStatus() const
 
 void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
 {
+    if (newStatus == QnResource::NotDefined)
+    {
+        return;
+    }
+
     Status oldStatus;
     {
         QMutexLocker mutexLocker(&m_mutex);

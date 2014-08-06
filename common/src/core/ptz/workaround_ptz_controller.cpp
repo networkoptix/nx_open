@@ -22,7 +22,7 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
     if(!camera)
         return;
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(camera, true);
+    QnResourceData resourceData = qnCommon->dataPool()->data(camera);
 
     resourceData.value(lit("ptzTraits"), &m_traits);
 

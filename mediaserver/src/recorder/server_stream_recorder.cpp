@@ -59,8 +59,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(const QnResourcePtr &dev, QnServe
 
     connect(this, SIGNAL(motionDetected(QnResourcePtr, bool, qint64, QnConstAbstractDataPacketPtr)), qnBusinessRuleConnector, SLOT(at_motionDetected(const QnResourcePtr&, bool, qint64, QnConstAbstractDataPacketPtr)));
     connect(this, SIGNAL(storageFailure(QnResourcePtr, qint64, QnBusiness::EventReason, QnResourcePtr)), qnBusinessRuleConnector, SLOT(at_storageFailure(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QnResourcePtr&)));
-    connect(dev.data(), SIGNAL(propertyChanged(const QnResourcePtr &, const QString &)),          this, SLOT(at_camera_propertyChanged()));
-    at_camera_propertyChanged();
+    connect(dev.data(), SIGNAL(propertyChanged(const QnResourcePtr &, const QString &)),          this, SLOT(at_camera_propertyChanged(const QnResourcePtr &, const QString &)));
+    at_camera_propertyChanged(m_device, QString());
 }
 
 QnServerStreamRecorder::~QnServerStreamRecorder()
@@ -69,10 +69,17 @@ QnServerStreamRecorder::~QnServerStreamRecorder()
 }
 
 
-void QnServerStreamRecorder::at_camera_propertyChanged()
+void QnServerStreamRecorder::at_camera_propertyChanged(const QnResourcePtr &, const QString & key)
 {
     const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(m_device.data());
+    m_usePrimaryRecorder = (camera->getProperty(QnMediaResource::dontRecordPrimaryStreamKey()).toInt() == 0);
     m_useSecondaryRecorder = (camera->getProperty(QnMediaResource::dontRecordSecondaryStreamKey()).toInt() == 0);
+    
+    if (key == QnMediaResource::motionStreamKey()) {
+        QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
+        if (liveProvider)
+            liveProvider->updateSoftwareMotionStreamNum();
+    }
 }
 
 void QnServerStreamRecorder::at_recordingFinished(int status, const QString &filename) {
@@ -266,6 +273,18 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
         close();
         return false;
     }
+    
+    if (m_catalog == QnServer::HiQualityCatalog && !metaData && !m_usePrimaryRecorder)
+    {
+        close();
+        return false;
+    }
+
+    if (metaData && !m_useSecondaryRecorder && !m_usePrimaryRecorder) {
+        keepRecentlyMotion(media);
+        return false;
+    }
+
     if (task.getRecordingType() == Qn::RT_Always)
         return true;
     else if (task.getRecordingType() == Qn::RT_MotionAndLowQuality && (m_catalog == QnServer::LowQualityCatalog || !camera->hasDualStreaming2()))

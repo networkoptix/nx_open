@@ -13,6 +13,8 @@ class QnPtzRestHandler: public QnJsonRestHandler {
 public:
     virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) override;
 private:
+    typedef std::function<int ()> AsyncFunc;
+
     int executeContinuousMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
     int executeContinuousFocus(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
     int executeAbsoluteMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
@@ -43,6 +45,8 @@ private:
     bool checkSequence(const QString& id, int sequence);
     void cleanupOldSequence();
 
+    static int execCommandAsync(const QString& sequence, AsyncFunc function);
+    static void asyncExecutor(const QString& sequence, AsyncFunc function);
 private:
     struct SequenceInfo {
         SequenceInfo(int seq = 0): sequence(seq) { m_timer.restart(); }
@@ -55,6 +59,18 @@ private:
     
     QMap<QString, SequenceInfo> m_sequencedRequests;
     QMutex m_sequenceMutex;
+
+    
+    struct AsyncExecInfo 
+    {
+        AsyncExecInfo(): inProgress() {}
+
+        bool inProgress;
+        AsyncFunc nextCommand;
+    };
+    static QMap<QString, AsyncExecInfo> m_workers;
+    static QMutex m_asyncExecMutex;
+    
 };
 
 #endif // QN_PTZ_REST_HANDLER_H

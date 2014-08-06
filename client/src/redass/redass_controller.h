@@ -56,12 +56,13 @@ private:
     enum LQReason {Reason_None, Reason_Small, Reason_Network, Reason_CPU, Reson_FF};
     struct RedAssInfo
     {
-        RedAssInfo(): lqTime(0), toLQSpeed(0.0), lqReason(Reason_None), initialTime(qnSyncTime->currentMSecsSinceEpoch()), awaitingLQTime(0) {}
+        RedAssInfo(): lqTime(0), toLQSpeed(0.0), lqReason(Reason_None), initialTime(qnSyncTime->currentMSecsSinceEpoch()), awaitingLQTime(0), smallSizeCnt(0) {}
         qint64 lqTime;
         float toLQSpeed;
         LQReason lqReason;
         qint64 initialTime;
         qint64 awaitingLQTime;
+        int smallSizeCnt;
     };
 
     typedef bool (QnRedAssController::*SearchCondition)(QnCamDisplay*);

@@ -93,6 +93,8 @@ public:
     void setSessionKey(const QByteArray& value);
 
     static QByteArray symmetricalEncode(const QByteArray& data);
+signals:
+    void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &);

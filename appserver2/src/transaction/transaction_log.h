@@ -23,6 +23,7 @@
 #include "nx_ec/data/api_runtime_data.h"
 #include "utils/db/db_helper.h"
 #include "binary_transaction_serializer.h"
+#include "ubjson_transaction_serializer.h"
 
 namespace ec2
 {
@@ -79,7 +80,7 @@ namespace ec2
         template <class T>
         ErrorCode saveTransaction(const QnTransaction<T>& tran) 
         {
-            QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
+            QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
             return saveToDB(tran, transactionHash(tran.params), serializedTran);
         }
 
@@ -146,7 +147,6 @@ namespace ec2
         QUuid transactionHash(const ApiResourceParamDataList& /*tran*/) const    { return makeHash("settings", ADD_HASH_DATA) ; }
         QUuid transactionHash(const ApiStoredFileData& params) const             { return makeHash(params.path.toUtf8()); }
         QUuid transactionHash(const ApiStoredFilePath& params) const             { return makeHash(params.path.toUtf8()); }
-        QUuid transactionHash(const ApiResourceData& params) const               { return makeHash(params.id.toRfc4122(), "resource"); }
         QUuid transactionHash(const ApiLicenseData& params) const                { return makeHash(params.key, "ApiLicense"); }    //TODO
         QUuid transactionHash(const ApiResetBusinessRuleData& /*tran*/) const    { return makeHash("reset_brule", ADD_HASH_DATA); }
         QUuid transactionHash(const ApiCameraBookmarkTagDataList& params)        { return makeHash("add_bookmark_tags", params); }
@@ -170,6 +170,9 @@ namespace ec2
         QUuid transactionHash(const QnTranState& ) const                       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTranStateResponse& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiRuntimeData& ) const                    { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const ApiDatabaseDumpData& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const ApiResourceData& ) const                   { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+
 
     private:
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QUuid& hash, const QByteArray& data);
