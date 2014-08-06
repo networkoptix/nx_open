@@ -1657,7 +1657,7 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
         m_updateUserRequests << user->getId();
         appServerConnection->getUserManager()->save(
             user, this, 
-            [this, user]( int reqID, ec2::ErrorCode errorCode ) 
+            [this, user]( int /*reqID*/, ec2::ErrorCode errorCode ) 
             {
                 if (errorCode == ec2::ErrorCode::ok) {
                     ec2::ApiUserData userData;
@@ -1668,6 +1668,33 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
             } );
     }
 }
+
+#ifdef EDGE_SERVER
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <arpa/inet.h>
+#include <net/if.h>
+
+static void mac_eth0(char  MAC_str[13], char** host)
+{
+    #define HWADDR_len 6
+    int s,i;
+    struct ifreq ifr;
+    s = socket(AF_INET, SOCK_DGRAM, 0);
+    strcpy(ifr.ifr_name, "eth0");
+    if (ioctl(s, SIOCGIFHWADDR, &ifr) != -1) {
+        for (i=0; i<HWADDR_len; i++)
+            sprintf(&MAC_str[i*2],"%02X",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
+    }
+    if((ioctl(s, SIOCGIFADDR, &ifr)) != -1) {
+        const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
+        *host = inet_ntoa(ip->sin_addr);
+    }
+    close(s);
+}
+#endif
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
 {
@@ -1741,16 +1768,16 @@ private:
 
     QString hardwareIdAsGuid() {
 #ifdef EDGE_SERVER
-    char  mac[13];
-    memset(mac, 0, sizeof(mac));
-    char* host = 0;
-    mac_eth0(mac, &host);
-    QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-    md5Hash.addData(mac, 12);
-    md5Hash.addData("edge");
-    return QUuid::fromRfc4122(md5Hash.result()).toString();
+        char  mac[13];
+        memset(mac, 0, sizeof(mac));
+        char* host = 0;
+        mac_eth0(mac, &host);
+        QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+        md5Hash.addData(mac, 12);
+        md5Hash.addData("edge");
+        return QUuid::fromRfc4122(md5Hash.result()).toString();
 #else
-    return hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
+        return hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
 #endif
     }
 
