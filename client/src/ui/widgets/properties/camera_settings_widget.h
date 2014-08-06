@@ -81,7 +81,6 @@ signals:
     void resourcesChanged();
 
 protected slots:
-    void at_moreLicensesRequested();
     void at_advancedSettingChanged();
 
 private:

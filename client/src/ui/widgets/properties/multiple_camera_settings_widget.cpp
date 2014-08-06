@@ -11,6 +11,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
+#include <ui/actions/action_manager.h>
 #include <ui/common/read_only.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/style/warning_style.h>
@@ -58,55 +59,24 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    ui->cameraScheduleWidget->setContext(context());
-    connect(context(), &QnWorkbenchContext::userChanged, this, &QnMultipleCameraSettingsWidget::updateLicensesButtonVisible);
+    connect(ui->generalCameraSettingsWidget,   &QnGeneralCameraSettingsWidget::dataChanged,  this,   &QnMultipleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
-    connect(ui->enableAudioCheckBox,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
-    connect(ui->enableAudioCheckBox,    SIGNAL(clicked()),                      this,   SLOT(at_enableAudioCheckBox_clicked()));
-    connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(at_cameraScheduleWidget_gridParamsChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(recordingSettingsChanged()),     this,   SLOT(at_cameraScheduleWidget_recordingSettingsChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(controlsChangesApplied()),       this,   SLOT(at_cameraScheduleWidget_controlsChangesApplied()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
+    connect(ui->cameraScheduleWidget,   &QnCameraScheduleWidget::moreLicensesRequested, this, [this]{ menu()->trigger(Qn::PreferencesLicensesTabAction);});
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged(int)),    this,   SLOT(at_cameraScheduleWidget_scheduleEnabledChanged(int)));
 
-    connect(ui->moreLicensesButton,     &QPushButton::clicked,                  this,   &QnMultipleCameraSettingsWidget::moreLicensesRequested);
-    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
-    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
-    connect(qnLicensePool,              SIGNAL(licensesChanged()),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
-    connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
+    connect(ui->expertSettingsWidget,   SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
 
-    connect(ui->expertSettingsWidget, SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
-
-    connect(ui->arOverrideCheckBox, &QCheckBox::stateChanged, this, [this](int state){ ui->arComboBox->setEnabled(state == Qt::Checked);} );
-    connect(ui->arOverrideCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(archiveRangeChanged()),          this,   SLOT(at_dbDataChanged()));
-
-    ui->arComboBox->addItem(tr("4:3"),  4.0 / 3);
-    ui->arComboBox->addItem(tr("16:9"), 16.0 / 9);
-    ui->arComboBox->addItem(tr("1:1"),  1.0);
-    ui->arComboBox->setCurrentIndex(0);
-    connect(ui->arComboBox,         SIGNAL(currentIndexChanged(int)),    this,          SLOT(at_dbDataChanged()));
-
-    connect(ui->rotCheckBox,&QCheckBox::stateChanged,this,[this](int state){ ui->rotComboBox->setEnabled(state == Qt::Checked);} );
-    connect(ui->rotCheckBox,SIGNAL(stateChanged(int)),this,SLOT(at_dbDataChanged()));
-    ui->rotComboBox->addItem(tr("0 degree"),0);
-    ui->rotComboBox->addItem(tr("90 degrees"),90);
-    ui->rotComboBox->addItem(tr("180 degrees"),180);
-    ui->rotComboBox->addItem(tr("270 degress"),270);
-    connect(ui->rotComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(at_dbDataChanged()));
 
     /* Set up context help. */
     setHelpTopic(this,                  Qn::CameraSettings_Multi_Help);
     setHelpTopic(ui->tabRecording,      Qn::CameraSettings_Recording_Help);
-
-
-    updateFromResources();
-    updateLicensesButtonVisible();
 }
 
 QnMultipleCameraSettingsWidget::~QnMultipleCameraSettingsWidget() {
@@ -124,6 +94,7 @@ void QnMultipleCameraSettingsWidget::setCameras(const QnVirtualCameraResourceLis
     m_cameras = cameras;
     Q_D(QnCameraSettingsWidget);
     d->setCameras(cameras);
+    ui->generalCameraSettingsWidget->setCameras(cameras);
 
     updateFromResources();
 }
@@ -173,29 +144,17 @@ bool QnMultipleCameraSettingsWidget::isScheduleEnabled() const {
 }
 
 void QnMultipleCameraSettingsWidget::submitToResources() {
-    QString login = ui->loginEdit->text().trimmed();
-    QString password = ui->passwordEdit->text().trimmed();
+    if (!hasDbChanges())
+        return;
+
+    ui->generalCameraSettingsWidget->submitToResources();
 
     QnScheduleTaskList scheduleTasks;
     if(m_hasScheduleChanges)
         foreach(const QnScheduleTask::Data &data, ui->cameraScheduleWidget->scheduleTasks())
             scheduleTasks.append(QnScheduleTask(data));
 
-    bool overrideAr = ui->arOverrideCheckBox->checkState() == Qt::Checked;
-    bool clearAr = ui->arOverrideCheckBox->checkState() == Qt::Unchecked;
-
-    foreach(QnVirtualCameraResourcePtr camera, m_cameras) 
-    {
-        QString cameraLogin = camera->getAuth().user();
-        if (!login.isEmpty() || !m_loginWasEmpty)
-            cameraLogin = login;
-
-        QString cameraPassword = camera->getAuth().password();
-        if (!password.isEmpty() || !m_passwordWasEmpty)
-            cameraPassword = password;
-
-        camera->setAuth(cameraLogin, cameraPassword);
-
+    foreach(QnVirtualCameraResourcePtr camera, m_cameras) {
         int maxDays = ui->cameraScheduleWidget->maxRecordedDays();
         if (maxDays != QnCameraScheduleWidget::RecordedDaysDontChange)
             camera->setMaxDays(maxDays);
@@ -203,25 +162,11 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
         if (minDays != QnCameraScheduleWidget::RecordedDaysDontChange)
             camera->setMinDays(minDays);
         
-        if (ui->enableAudioCheckBox->checkState() != Qt::PartiallyChecked && ui->enableAudioCheckBox->isEnabled()) 
-            camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
-
         if (m_hasScheduleEnabledChanges)
             camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
 
         if (m_hasScheduleChanges)
             camera->setScheduleTasks(scheduleTasks);
-
-        if (overrideAr)
-            camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->arComboBox->itemData(ui->arComboBox->currentIndex()).toDouble()));
-        else if (clearAr)
-            camera->setProperty(QnMediaResource::customAspectRatioKey(), QString());
-
-        if(ui->rotCheckBox->isChecked()) 
-            camera->setProperty(QnMediaResource::rotationKey(), QString::number(ui->rotComboBox->itemData(ui->rotComboBox->currentIndex()).toInt()));
-        else
-            camera->setProperty(QnMediaResource::rotationKey(), QString());
-
     }
     ui->expertSettingsWidget->submitToResources(m_cameras);
 
@@ -239,115 +184,24 @@ bool QnMultipleCameraSettingsWidget::licensedParametersModified() const
 }
 
 void QnMultipleCameraSettingsWidget::updateFromResources() {
+
+    ui->generalCameraSettingsWidget->updateFromResources();
     // This scope will trigger QnScopedUpdateRollback
     {
         QnScopedUpdateRollback rollback(ui->cameraScheduleWidget);
-        if(m_cameras.empty()) {
-            ui->loginEdit->setText(QString());
-            ui->enableAudioCheckBox->setCheckState(Qt::Unchecked);
-            ui->loginEdit->setPlaceholderText(QString());
-            ui->passwordEdit->setText(QString());
-            ui->passwordEdit->setPlaceholderText(QString());
-            ui->cameraScheduleWidget->setScheduleEnabled(Qt::PartiallyChecked);
-            ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
-            ui->cameraScheduleWidget->setChangesDisabled(true);
-            ui->cameraScheduleWidget->setMotionAvailable(false);
-            ui->analogGroupBox->setVisible(false);
-        } else {
+         {
             /* Aggregate camera parameters first. */
             ui->cameraScheduleWidget->setCameras(QnVirtualCameraResourceList());
 
-            QSet<QString> logins, passwords;
-        
-            ui->enableAudioCheckBox->setEnabled(true);
-    
             ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, true);
             ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, true);
-            ui->analogGroupBox->setVisible(false);
-
-            bool firstCamera = true;
-
-            bool sameArOverride = true;
-            QString arOverride;
-            QString rotFirst;
-            bool sameRotation = true;
-            foreach (const QnVirtualCameraResourcePtr &camera, m_cameras) 
-            {
-                logins.insert(camera->getAuth().user());
-                passwords.insert(camera->getAuth().password());
-
-                if (!camera->isAudioSupported())
-                    ui->enableAudioCheckBox->setEnabled(false);
-
-                if (camera->isDtsBased()) {
-                    ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, false);
-                    ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, false);
-                    ui->analogGroupBox->setVisible(true);
-                }
-
-                Qt::CheckState recordingState = camera->isScheduleDisabled() ? Qt::Unchecked : Qt::Checked;
-                if (firstCamera)
-                    ui->analogViewCheckBox->setCheckState(recordingState);
-                else if (recordingState != ui->analogViewCheckBox->checkState())
-                    ui->analogViewCheckBox->setCheckState(Qt::PartiallyChecked);
-
-                Qt::CheckState audioState = camera->isAudioEnabled() ? Qt::Checked : Qt::Unchecked;
-                if (firstCamera) {
-                    ui->enableAudioCheckBox->setCheckState(audioState);
-                } else if (audioState != ui->enableAudioCheckBox->checkState()) {
-                    ui->enableAudioCheckBox->setCheckState(Qt::PartiallyChecked);
-                }
-
-                QString changedAr = camera->getProperty(QnMediaResource::customAspectRatioKey());
-                if (firstCamera) {
-                    arOverride = changedAr;
-                } else {
-                    sameArOverride &= changedAr == arOverride;
-                }
-
-                QString rotation = camera->getProperty(QnMediaResource::rotationKey());
-                if(firstCamera) {
-                    rotFirst = rotation;
-                } else {
-                    sameRotation &= rotFirst == rotation;
-                }
-
-                firstCamera = false;
-            }
-
-            ui->arOverrideCheckBox->setTristate(!sameArOverride);
-            if (sameArOverride) {
-                ui->arOverrideCheckBox->setChecked(!arOverride.isEmpty());
-
-                // float is important here
-                float ar = arOverride.toFloat();
-                int idx = -1;
-                for (int i = 0; i < ui->arComboBox->count(); ++i) {
-                    if (qFuzzyEquals(ar, ui->arComboBox->itemData(i).toFloat())) {
-                        idx = i;
-                        break;
-                    }
-                }
-                ui->arComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
-            }
-            else
-                ui->arOverrideCheckBox->setCheckState(Qt::PartiallyChecked);
-
-            if(!sameRotation) {
-                ui->rotCheckBox->setTristate(true);
-                ui->rotCheckBox->setCheckState(Qt::PartiallyChecked);
-            } else {
-                if( rotFirst.isEmpty() ) {
-                    // Nobody sets the force rotation option
-                    ui->rotCheckBox->setChecked(false);
-                } else {
-                    ui->rotCheckBox->setChecked(true);
-                    bool ok;
-                    int degree = rotFirst.toInt(&ok);
-                    Q_ASSERT(ok);
-                    Q_ASSERT(degree>=0 && degree<=270);
-                    ui->rotComboBox->setCurrentIndex(degree/90);
-                }
+            foreach (const QnVirtualCameraResourcePtr &camera, m_cameras) {
+                if (!camera->isDtsBased())
+                    continue;
+                
+                ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, false);
+                ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, false);
+                break;
             }
 
             ui->expertSettingsWidget->updateFromResources(m_cameras);
@@ -375,35 +229,17 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
             updateMaxFPS();
 
-        bool isMotionAvailable = true;
-        foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
-            isMotionAvailable &= camera->hasMotion();
-        ui->cameraScheduleWidget->setMotionAvailable(isMotionAvailable);
+            bool isMotionAvailable = true;
+            foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
+                isMotionAvailable &= camera->hasMotion();
+            ui->cameraScheduleWidget->setMotionAvailable(isMotionAvailable);
 
-            /* Write camera parameters out. */
-
-            if (logins.size() == 1) {
-                ui->loginEdit->setText(*logins.begin());
-                ui->loginEdit->setPlaceholderText(QString());
-            } else {
-                ui->loginEdit->setText(QString());
-                ui->loginEdit->setPlaceholderText(tr("<multiple values>", "LoginEdit"));
-            }
-            m_loginWasEmpty = ui->loginEdit->text().isEmpty();
-
-            if (passwords.size() == 1) {
-                ui->passwordEdit->setText(*passwords.begin());
-                ui->passwordEdit->setPlaceholderText(QString());
-            } else {
-                ui->passwordEdit->setText(QString());
-                ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
-            }
-            m_passwordWasEmpty = ui->passwordEdit->text().isEmpty();
         }
 
         ui->cameraScheduleWidget->setCameras(m_cameras);
         updateLicenseText();
     }
+    
 
     setHasDbChanges(false);
     m_hasScheduleControlsChanges = false;
@@ -418,9 +254,7 @@ void QnMultipleCameraSettingsWidget::setReadOnly(bool readOnly) {
         return;
 
     using ::setReadOnly;
-    setReadOnly(ui->loginEdit, readOnly);
-    setReadOnly(ui->enableAudioCheckBox, readOnly);
-    setReadOnly(ui->passwordEdit, readOnly);
+    setReadOnly(ui->generalCameraSettingsWidget, readOnly);
     setReadOnly(ui->cameraScheduleWidget, readOnly);
     m_readOnly = readOnly;
 }
@@ -484,94 +318,8 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesAppl
     m_hasScheduleControlsChanges = false;
 }
 
-void QnMultipleCameraSettingsWidget::at_enableAudioCheckBox_clicked() {
-    Qt::CheckState state = ui->enableAudioCheckBox->checkState();
-
-    ui->enableAudioCheckBox->setTristate(false);
-    if (state == Qt::PartiallyChecked)
-        ui->enableAudioCheckBox->setCheckState(Qt::Checked);
-}
-
-void QnMultipleCameraSettingsWidget::at_analogViewCheckBox_clicked() {
-    Qt::CheckState state = ui->analogViewCheckBox->checkState();
-
-    ui->analogViewCheckBox->setTristate(false);
-    if (state == Qt::PartiallyChecked)
-        ui->analogViewCheckBox->setCheckState(Qt::Checked);
-    ui->cameraScheduleWidget->setScheduleEnabled(ui->analogViewCheckBox->isChecked());
-}
-
-void QnMultipleCameraSettingsWidget::updateLicensesButtonVisible() {
-    ui->moreLicensesButton->setVisible(context()->accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
-}
-
 void QnMultipleCameraSettingsWidget::updateLicenseText() {
-    QnLicenseUsageHelper helper;
 
-    int usedDigitalChange = helper.usedDigital();
-    int usedAnalogChange = helper.usedAnalog();
-
-    switch(ui->analogViewCheckBox->checkState()) {
-    case Qt::Checked:
-        helper.propose(m_cameras, true);
-        break;
-    case Qt::Unchecked:
-        helper.propose(m_cameras, false);
-        break;
-    default:
-        break;
-    }
-
-    usedDigitalChange = helper.usedDigital() - usedDigitalChange;
-    usedAnalogChange = helper.usedAnalog() - usedAnalogChange;
-
-    { // digital licenses
-        QString usageText = tr("%n license(s) are used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital());
-        ui->digitalLicensesLabel->setText(usageText);
-        QPalette palette = this->palette();
-        if (!helper.isValid() && helper.required() > 0)
-            setWarningStyle(&palette);
-        ui->digitalLicensesLabel->setPalette(palette);
-    }
-
-    { // analog licenses
-        QString usageText = tr("%n analog license(s) are used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
-        ui->analogLicensesLabel->setText(usageText);
-        QPalette palette = this->palette();
-        if (!helper.isValid() && helper.required() > 0)
-            setWarningStyle(&palette);
-        ui->analogLicensesLabel->setPalette(palette);
-        ui->analogLicensesLabel->setVisible(helper.totalAnalog() > 0);
-    }
-
-    if (ui->analogViewCheckBox->checkState() != Qt::Checked) {
-        ui->requiredLicensesLabel->setVisible(false);
-        return;
-    }
-
-    { // required licenses
-        QPalette palette = this->palette();
-        if (!helper.isValid())
-            setWarningStyle(&palette);
-        ui->requiredLicensesLabel->setPalette(palette);
-        ui->requiredLicensesLabel->setVisible(true);
-    }
-
-    if (helper.required() > 0) {
-        ui->requiredLicensesLabel->setText(tr("Activate %n more license(s).", "", helper.required()));
-    } else if (usedDigitalChange > 0 && usedAnalogChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%1 more licenses and %2 more analog licenses will be used.")
-            .arg(usedDigitalChange)
-            .arg(usedAnalogChange)
-            );
-    } else if (usedDigitalChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%n more license(s) will be used.", "", usedDigitalChange));
-    } else if (usedAnalogChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%n more analog license(s) will be used.", "", usedAnalogChange));
-    }
-    else {
-        ui->requiredLicensesLabel->setText(QString());
-    }
 }
 
 void QnMultipleCameraSettingsWidget::updateMaxFPS(){

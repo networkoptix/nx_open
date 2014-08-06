@@ -68,7 +68,6 @@ public:
     void setExportScheduleButtonEnabled(bool enabled);
 signals:
     void hasChangesChanged();
-    void moreLicensesRequested();
     void scheduleExported(const QnVirtualCameraResourceList &);
 
 private slots:

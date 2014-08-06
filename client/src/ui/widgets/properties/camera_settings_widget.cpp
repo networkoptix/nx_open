@@ -31,8 +31,6 @@ QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent, QnWorkbenchConte
 
     m_singleWidget = new QnSingleCameraSettingsWidget(this);
 
-    connect(m_multiWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
-    connect(m_singleWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
     connect(m_singleWidget, SIGNAL(advancedSettingChanged()), this, SLOT(at_advancedSettingChanged()));
     connect(m_singleWidget, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
     connect(m_multiWidget,  SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
@@ -314,10 +312,6 @@ void QnCameraSettingsWidget::setMode(Mode mode) {
         emit hasChangesChanged();
 
     emit modeChanged();
-}
-
-void QnCameraSettingsWidget::at_moreLicensesRequested() {
-    menu()->trigger(Qn::PreferencesLicensesTabAction);
 }
 
 void QnCameraSettingsWidget::at_advancedSettingChanged() {

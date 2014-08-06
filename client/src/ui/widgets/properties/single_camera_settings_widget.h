@@ -105,7 +105,6 @@ public slots:
 
 signals:
     void hasChangesChanged();
-    void moreLicensesRequested();
     void advancedSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);
 
@@ -135,10 +134,8 @@ private slots:
 
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();
-    void updateLicensesButtonVisible();
     void updateLicenseText();
-    void updateIpAddressText();
-    void updateWebPageText();
+
 
     void setGridScheduleToAlwaysRecord();
 
