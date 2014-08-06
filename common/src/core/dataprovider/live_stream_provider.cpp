@@ -155,7 +155,6 @@ QnResource::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
             else
                 m_softMotionRole = QnResource::Role_SecondaryLiveVideo;
 		}
-		updateSoftwareMotion();
     }
     return m_softMotionRole;
 }

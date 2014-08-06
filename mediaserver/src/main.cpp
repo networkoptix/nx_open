@@ -1040,7 +1040,7 @@ bool QnMain::initTcpListener()
     //m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("HTTP", "*");
 
     m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy");
-    m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
+    //m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
 
     if( !MSSettings::roSettings()->value("authenticationEnabled", "true").toBool() )
         m_universalTcpListener->disableAuth();
@@ -1305,7 +1305,7 @@ void QnMain::run()
     QUrl proxyServerUrl = ec2Connection->connectionInfo().ecUrl;
     //proxyServerUrl.setPort(connectInfo->proxyPort);
     m_universalTcpListener->setProxyParams(proxyServerUrl, serverGuid().toString());
-    m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
+    //m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
 
 
     QHostAddress publicAddress = getPublicAddress();
