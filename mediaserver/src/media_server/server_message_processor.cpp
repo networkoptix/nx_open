@@ -274,5 +274,6 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnId& resourceId)
     if (isOwnServer) {
         QnMediaServerResourcePtr savedServer;
         QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(mServer, &savedServer);
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(mServer->getId(), QnResource::Online);
     }
 }

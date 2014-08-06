@@ -51,7 +51,7 @@ namespace ec2
             void emitGetStoredFileDone( const ErrorCode p1, const QByteArray& p2 ) { emit onGetStoredFileDone( p1, p2 ); }
             void emitListDirectoryDone( const ErrorCode p1, const QStringList& p2 ) { emit onListDirectoryDone( p1, p2 ); }
             void emitCurrentTimeDone( const ErrorCode p1, const qint64& p2 ) { emit onCurrentTimeDone( p1, p2 ); }
-            void emitDumpDatabaseDone( const ErrorCode p1, const QByteArray& p2 ) { emit onDumpDatabaseDone( p1, p2 ); }
+            void emitDumpDatabaseDone( const ErrorCode p1, const ec2::ApiDatabaseDumpData& p2 ) { emit onDumpDatabaseDone( p1, p2 ); }
             void emitConnectDone( const ErrorCode p1, const AbstractECConnection* p2 ) { emit onConnectDone( p1, p2 ); }
         
         signals:
@@ -73,7 +73,7 @@ namespace ec2
             void onGetStoredFileDone( const ErrorCode, const QByteArray& );
             void onListDirectoryDone( const ErrorCode, const QStringList& );
             void onCurrentTimeDone( const ErrorCode, const qint64& );
-            void onDumpDatabaseDone( const ErrorCode, const QByteArray& );
+            void onDumpDatabaseDone( const ErrorCode, const ec2::ApiDatabaseDumpData& );
             void onConnectDone( const ErrorCode, const AbstractECConnection* );
         };
 

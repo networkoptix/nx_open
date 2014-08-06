@@ -85,6 +85,7 @@ void QnAppServerConnectionFactory::setClientGuid(const QString &guid)
     }
 }
 
+
 void QnAppServerConnectionFactory::setUrl(const QUrl &url) {
     if (url.isValid())
         Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");

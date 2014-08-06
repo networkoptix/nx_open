@@ -85,6 +85,9 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     ui->cameraScheduleWidget->setContext(context());
     connect(context(), &QnWorkbenchContext::userChanged, this, &QnSingleCameraSettingsWidget::updateLicensesButtonVisible);
 
+    QnCamLicenseUsageHelper helper;
+    ui->licensesUsageWidget->init(&helper);
+
     /* Set up context help. */
     setHelpTopic(this,                                                      Qn::CameraSettings_Help);
     setHelpTopic(ui->fisheyeCheckBox,                                       Qn::CameraSettings_Dewarping_Help);
@@ -1017,62 +1020,9 @@ void QnSingleCameraSettingsWidget::updateLicenseText() {
     if (!m_camera || !m_camera->isDtsBased())
         return;
 
-    QnLicenseUsageHelper helper;
-
-    int usedDigitalChange = helper.usedDigital();
-    int usedAnalogChange = helper.usedAnalog();
+    QnCamLicenseUsageHelper helper;
     helper.propose(QnVirtualCameraResourceList() << m_camera, ui->analogViewCheckBox->isChecked());
-
-    usedDigitalChange = helper.usedDigital() - usedDigitalChange;
-    usedAnalogChange = helper.usedAnalog() - usedAnalogChange;
-
-    { // digital licenses
-        QString usageText = tr("%n license(s) are used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital());
-        ui->digitalLicensesLabel->setText(usageText);
-        QPalette palette = this->palette();
-        if (!helper.isValid() && helper.required() > 0)
-            setWarningStyle(&palette);
-        ui->digitalLicensesLabel->setPalette(palette);
-    }
-
-    { // analog licenses
-        QString usageText = tr("%n analog license(s) are used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
-        ui->analogLicensesLabel->setText(usageText);
-        QPalette palette = this->palette();
-        if (!helper.isValid() && helper.required() > 0)
-            setWarningStyle(&palette);
-        ui->analogLicensesLabel->setPalette(palette);
-        ui->analogLicensesLabel->setVisible(helper.totalAnalog() > 0);
-    }
-
-    if (ui->analogViewCheckBox->checkState() != Qt::Checked) {
-        ui->requiredLicensesLabel->setVisible(false);
-        return;
-    }
-
-    { // required licenses
-        QPalette palette = this->palette();
-        if (!helper.isValid())
-            setWarningStyle(&palette);
-        ui->requiredLicensesLabel->setPalette(palette);
-        ui->requiredLicensesLabel->setVisible(true);
-    }
-
-    if (helper.required() > 0) {
-        ui->requiredLicensesLabel->setText(tr("Activate %n more license(s).", "", helper.required()));
-    } else if (usedDigitalChange > 0 && usedAnalogChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%1 more licenses and %2 more analog licenses will be used.")
-            .arg(usedDigitalChange)
-            .arg(usedAnalogChange)
-            );
-    } else if (usedDigitalChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%n more license(s) will be used.", "", usedDigitalChange));
-    } else if (usedAnalogChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%n more analog license(s) will be used.", "", usedAnalogChange));
-    }
-    else {
-        ui->requiredLicensesLabel->setText(QString());
-    }
+    ui->licensesUsageWidget->loadData(&helper);
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {

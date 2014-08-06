@@ -68,6 +68,7 @@ namespace CameraDiagnostics
         QString errorMessage() const;
 
     public slots:
+        void onGetServerSystemNameResponse( int status, QString serverSystemName, int handle );
         //!Receives response from server
         /*!
             \param status \a QNetworkReply::NetworkError

@@ -284,6 +284,7 @@ void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTranspor
 
 template <class T>
 void QnTransactionMessageBus::sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader) {
+    Q_ASSERT(!tran.isLocal);
     transport->sendTransaction(tran, transportHeader);
 }
         
@@ -728,7 +729,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     QMutexLocker lock(&m_mutex);
     m_connectingConnections << transport;
     transport->setState(QnTransactionTransport::Connected);
-    if (m_connections.contains(remotePeer.id))
+        if (m_connections.contains(remotePeer.id))
         m_connectionsToRemove << m_connections[remotePeer.id];
 }
 

@@ -21,6 +21,7 @@
 class QnWorkbenchItem;
 class QnResourceWidget;
 class QTimer;
+class QnVideoWallLicenseUsageHelper;
 
 class QnWorkbenchVideoWallHandler : public Connective<QObject>, public QnWorkbenchContextAware
 {
@@ -80,6 +81,8 @@ private:
 
     void updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action);
     void updateReviewLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action);
+
+    bool validateLicenses(const QString &detail) const;
 private slots:
 
     void at_newVideoWallAction_triggered();
@@ -170,6 +173,8 @@ private:
         QList<QnVideoWallControlMessage> cachedMessages;
         QTimer* cacheTimer;
     } m_controlMode;
+
+    QScopedPointer<QnVideoWallLicenseUsageHelper> m_licensesHelper;
 };
 
 #endif // WORKBENCH_VIDEOWALL_HANDLER_H

@@ -494,6 +494,19 @@ public:
     const char* serializationFormatToHttpContentType(SerializationFormat format);
     SerializationFormat serializationFormatFromHttpContentType(const QByteArray& httpContentType);
 
+    enum LicenseType 
+    {
+        LC_Trial,          
+        LC_Analog,
+        LC_Professional,
+        LC_Edge,
+        LC_VMAX,
+        LC_AnalogEncoder,
+        LC_VideoWall,
+
+        LC_Count
+    };
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -519,7 +532,6 @@ enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 
 /** Time value for 'unknown' / 'invalid'. Same as AV_NOPTS_VALUE. Checked in ffmpeg.cpp. */
 #define DATETIME_INVALID    INT64_MIN
-
 
 
 /** 

@@ -52,6 +52,7 @@ private slots:
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
     void at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
+    void at_restartServerRequired();
 private:
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
