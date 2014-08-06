@@ -3,6 +3,8 @@
 
 #include <QtCore/QSettings>
 
+#include <core/resource/resource.h>
+
 
 //!Contains constants with names of configuration parameters
 namespace nx_ms_conf
@@ -59,6 +61,9 @@ namespace nx_ms_conf
     //!If no one uses HLS for thid time period (in seconds), than live media cache is stopped and cleaned. It will be restarted with next HLS request
     static const QLatin1String HLS_INACTIVITY_PERIOD( "hlsInactivityPeriod" );
     static const int DEFAULT_HLS_INACTIVITY_PERIOD = 150;
+
+    static const QLatin1String RESOURCE_INIT_THREADS_COUNT( "resourceInitThreadsCount" );
+    static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = QnInitResPool::DEFAULT_RESOURCE_INIT_THREADS_COUNT;
 }
 
 /*!

@@ -7,6 +7,8 @@
 
 #include <utils/common/warnings.h>
 
+#include "lexical_functions.h"
+
 
 // -------------------------------------------------------------------------- //
 // QnLexicalEnumSerializerData
@@ -61,6 +63,14 @@ void QnEnumLexicalSerializerData::setFlagged(bool flagged) {
     m_flagged = flagged;
 }
 
+bool QnEnumLexicalSerializerData::isNumeric() const {
+    return m_numeric;
+}
+
+void QnEnumLexicalSerializerData::setNumeric(bool numeric) {
+    m_numeric = numeric;
+}
+
 Qt::CaseSensitivity QnEnumLexicalSerializerData::caseSensitivity() const {
     return m_caseSensitivity;
 }
@@ -70,11 +80,21 @@ void QnEnumLexicalSerializerData::setCaseSensitivity(Qt::CaseSensitivity caseSen
 }
 
 void QnEnumLexicalSerializerData::serializeEnum(int value, QString *target) const {
+    if(m_numeric) {
+        QnLexical::serialize(value, target);
+        return;
+    }
+
     /* Return empty string in case of failure. */
     *target = m_nameByValue.value(value); 
 }
 
 bool QnEnumLexicalSerializerData::deserializeEnum(const QString &value, int *target) const {
+    /* Try numeric first. */
+    if(m_numeric)
+        if(QnLexical::deserialize(value, target))
+            return true;
+
     if(m_caseSensitivity == Qt::CaseSensitive) {
         return deserializeEnumInternal(m_valueByName, value, target);
     } else {
@@ -92,6 +112,11 @@ bool QnEnumLexicalSerializerData::deserializeEnumInternal(const QHash<QString, i
 }
 
 void QnEnumLexicalSerializerData::serializeFlags(int value, QString *target) const {
+    if(m_numeric) {
+        QnLexical::serialize(value, target);
+        return;
+    }
+
     target->clear();
 
     int v = value;
@@ -120,6 +145,11 @@ void QnEnumLexicalSerializerData::serializeFlags(int value, QString *target) con
 }
 
 bool QnEnumLexicalSerializerData::deserializeFlags(const QString &value, int *target) const {
+    /* Try numeric first. */
+    if(m_numeric)
+        if(QnLexical::deserialize(value, target))
+            return true;
+
     QStringList names = value.split(L'|');
 
     *target = 0;

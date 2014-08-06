@@ -14,19 +14,17 @@
     <Fragment>
         <UI>
       <Dialog Id="PortIsBusyDlg" Width="370" Height="270" Title="!(loc.StdString_SetupTitle)">
-							<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
-								<Publish Event="EndDialog" Value="Exit">1</Publish>
-							</Control>
-							<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
-							<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
-								<Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
-							</Control>
-							<Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.PortIsBusyDlg_PortOccupied)" />
-							<!--<Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="WARNING" />-->
-							<Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="2" />
-							<Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
-							<Control Id="label1" Type="Text" Height="57" Width="246" X="25" Y="56" Text="!(loc.PortIsBusyDlg_PortOccupiedMessage)" />
-						</Dialog>
+                            <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)"/>
+                            <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+                            <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+                                <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+                            </Control>
+                            <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.PortIsBusyDlg_PortOccupied)" />
+                            <!--<Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="WARNING" />-->
+                            <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="2" />
+                            <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
+                            <Control Id="label1" Type="Text" Height="57" Width="246" X="25" Y="56" Text="!(loc.PortIsBusyDlg_PortOccupiedMessage)" />
+                        </Dialog>
         </UI>
     </Fragment>
 </Wix>

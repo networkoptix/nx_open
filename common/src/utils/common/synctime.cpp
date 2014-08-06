@@ -90,8 +90,14 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
     QMutexLocker lock(&m_mutex);
 
     const qint64 localTime = QDateTime::currentMSecsSinceEpoch();
-    if ((m_lastReceivedTime == 0 || m_timer.elapsed() > EcTimeUpdatePeriod || qAbs(localTime-m_lastLocalTime) > EcTimeUpdatePeriod) && 
-        !m_syncTimeRequestIssued && QnSessionManager::instance()->isReady() && !QnAppServerConnectionFactory::defaultUrl().isEmpty())
+    if (
+        (
+            m_lastReceivedTime == 0 
+        ||  m_timer.elapsed() > EcTimeUpdatePeriod 
+        || qAbs(localTime-m_lastLocalTime) > EcTimeUpdatePeriod
+        ) 
+        && !m_syncTimeRequestIssued 
+        && QnAppServerConnectionFactory::getConnection2())
     {
         ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
         if( appServerConnection ) 
@@ -109,7 +115,7 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
             m_lastWarnTime = localTime;
             if (m_lastWarnTime == 0)
             {
-                NX_LOG( lit("Local time differs from enterprise controller! local time %1, EC time %2").
+                NX_LOG( lit("Local time differs from server's! local time %1, server time %2").
                     arg(QDateTime::fromMSecsSinceEpoch(localTime).toString()).arg(QDateTime::fromMSecsSinceEpoch(time).toString()), cl_logWARNING );
             }
         }

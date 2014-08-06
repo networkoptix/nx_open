@@ -2,6 +2,8 @@
 
 #include <api/global_settings.h>
 
+#include <common/common_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
 
@@ -207,7 +209,8 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened() {
 
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed() {
     clear();
-    setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, QnResourcePtr(), true);
+    if (!qnCommon->remoteGUID().isNull())
+        setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, QnResourcePtr(), true);
 }
 
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {

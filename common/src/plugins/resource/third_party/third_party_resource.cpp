@@ -357,8 +357,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setCameraCapability( Qn::RelayOutputCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability )
         setCameraCapability( Qn::ShareIpCapability, true );
-    if( cameraCapabilities & nxcip::BaseCameraManager::primaryStreamSoftMotionCapability )
-        setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
+    //if( cameraCapabilities & nxcip::BaseCameraManager::primaryStreamSoftMotionCapability )
+    //    setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
         nxcip::CameraPtzManager* ptzManager = m_camManager.getPtzManager();

@@ -19,6 +19,14 @@
     "data": [
         {
             "keys": [
+                "VISTA|VK2-ENCODER",
+		        "*|DW-CP04"
+            ],
+            "analogEncoder": true
+        },
+
+        {
+            "keys": [
                 "ISD|*"
             ],
             "showUrl": true,
@@ -79,16 +87,11 @@
         },
         {
             "keys": [
+                "VISTA|VK2-ENCODER",
                 "VISTA|VK2-1080PTZ",
                 "*|DW-CP04"
             ],
-            "ptzCapabilities": "ContinuousPtzCapabilities|nativePresetsPtzCapability"
-        },
-        {
-            "keys": [
-                "VISTA|VK2-ENCODER"
-            ],
-            "ptzCapabilities": "ContinuousPtzCapabilities|nativePresetsPtzCapability|ContinuousFocusCapability"
+            "onvifPtzPresetsEnabled": true
         },
         {
             "keys": [
@@ -99,10 +102,18 @@
         {
             "keys": [
                 "VISTA|VK2-600PTZ",
-				"VISTA|VK2-720VZMI",
-                "VISTA|VK2-720VZMX"
+                "VISTA|VK2-720VZMI",
+                "VISTA|VK2-1080PTZ",
+                "VISTA|VK2-720VZMX",
+                "VISTA|VK2-ENCODER"
             ],
-            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability"
+            "onvifPtzAbsoluteMoveBroken": true
+        },
+        {
+            "keys": [
+                "VISTA|VK2-ENCODER"
+            ],
+            "vistaFocusDevices": ["EncoderVistaPTZ"]
         },
         {
             "keys": [

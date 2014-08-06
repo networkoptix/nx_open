@@ -11,6 +11,7 @@
 
 namespace ec2
 {
+    //!Connection to old (python-based) EC. Does not provide any functionality, every method returns \a notImplemented error
     class OldEcConnection
     :
         public AbstractECConnection
@@ -34,7 +35,7 @@ namespace ec2
         virtual int setPanicMode(Qn::PanicMode value, impl::SimpleHandlerPtr handler) override;
         virtual int getCurrentTime(impl::CurrentTimeHandlerPtr handler) override;
         virtual int dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler) override;
-        virtual int restoreDatabaseAsync(const QByteArray& dbFile, impl::SimpleHandlerPtr handler) override;
+        virtual int restoreDatabaseAsync(const ApiDatabaseDumpData& dbFile, impl::SimpleHandlerPtr handler) override;
 
         virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) override;
         virtual void deleteRemotePeer(const QUrl& url) override;

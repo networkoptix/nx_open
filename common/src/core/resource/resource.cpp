@@ -108,7 +108,7 @@ QnResource::QnResource():
     m_initMutex(QMutex::Recursive),
     m_resourcePool(NULL),
     m_flags(0),
-    m_status(Offline),
+    m_status(NotDefined),
     m_initialized(false),
     m_lastInitTime(0),
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
@@ -562,6 +562,11 @@ QnResource::Status QnResource::getStatus() const
 
 void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
 {
+    if (newStatus == QnResource::NotDefined)
+    {
+        return;
+    }
+
     Status oldStatus;
     {
         QMutexLocker mutexLocker(&m_mutex);
@@ -808,6 +813,11 @@ QnKvPairList QnResource::getProperties() const {
     for(auto pos = m_propertyByKey.begin(); pos != m_propertyByKey.end(); pos++)
         result.push_back(QnKvPair(pos.key(), pos.value()));
     return result;
+}
+
+QnInitResPool* QnResource::initAsyncPoolInstance()
+{
+    return &m_initAsyncPool;
 }
 
 // -----------------------------------------------------------------------------

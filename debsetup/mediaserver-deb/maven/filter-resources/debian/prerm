@@ -5,9 +5,43 @@
 if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 
+COMPANY_NAME="${deb.customization.company.name}"
+
 # Automatically added by dh_installinit
 if [ -e "/etc/init/${deb.customization.company.name}-mediaserver.conf" ]; then
 	invoke-rc.d ${deb.customization.company.name}-mediaserver stop || exit $?
 fi
 # End automatically added section
 
+if [ $1 = "remove" ]
+then
+    REMOVE="Remove the Database"
+    KEEP="Keep current version"
+    RESTORE="Restore version "
+
+    CHOICES="$REMOVE, $KEEP"
+    for f in $(ls /opt/$COMPANY_NAME/mediaserver/var/ecs.sqlite.* 2> /dev/null)
+    do
+        filename=$(basename $f)
+        version=${filename/ecs.sqlite./}
+        mtime=$(stat -c " %z" $f | cut -f1 -d.)
+        CHOICES="$CHOICES, $RESTORE$version (Last used: $mtime)"
+    done
+
+    db_subst ${deb.customization.company.name}-mediaserver/removeDatabase choices $CHOICES
+    db_set ${deb.customization.company.name}-mediaserver/removeDatabase "$KEEP"
+    db_fset ${deb.customization.company.name}-mediaserver/removeDatabase seen false
+
+    db_input high ${deb.customization.company.name}-mediaserver/removeDatabase || true
+    db_go || true
+    db_get ${deb.customization.company.name}-mediaserver/removeDatabase
+
+    if [ "$RET" = "$REMOVE" ]; then
+        rm -f /opt/$COMPANY_NAME/mediaserver/var/ecs.sqlite
+    elif [ "$RET" = "$KEEP" ]; then
+        true
+    else
+         dbversion=$(echo $RET | sed "s/$RESTORE\([^ ]*\).*/\1/")
+         cp -p /opt/$COMPANY_NAME/mediaserver/var/ecs.sqlite{.$dbversion,} || true
+    fi
+fi

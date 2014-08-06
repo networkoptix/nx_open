@@ -188,6 +188,8 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     dst->setVendor(src.vendor);
     dst->setMinDays(src.minArchiveDays);
     dst->setMaxDays(src.maxArchiveDays);
+    Q_ASSERT(dst->getId() == QnVirtualCameraResource::uniqueIdToId(dst->getUniqueId()));
+
 }
 
 
@@ -442,7 +444,23 @@ void fromResourceToApi(const QnLicensePtr &src, ApiLicenseData &dst) {
 
 void fromApiToResource(const ApiLicenseData &src, QnLicensePtr &dst) {
     dst->loadLicenseBlock(src.licenseBlock);
+    if (dst->key().isEmpty())
+        dst->setKey(src.key);
 }
+
+void fromResourceToApi(const QnLicensePtr &src, ApiDetailedLicenseData &dst) {
+    dst.key = src->key();
+    dst.licenseBlock = src->rawLicense();
+    dst.name = src->name();
+    dst.cameraCount = src->cameraCount();
+    dst.hardwareId = src->hardwareId();
+    dst.licenseType = src->displayName();
+    dst.version = src->version();
+    dst.brand = src->brand();
+    dst.expiration = src->expiration();
+
+}
+
 
 void fromResourceListToApi(const QnLicenseList &src, ApiLicenseDataList &dst) {
     dst.reserve(dst.size() + src.size());
@@ -495,12 +513,11 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &
     dst.apiUrl = src->getApiUrl();
     dst.flags = src->getServerFlags();
     dst.panicMode = src->getPanicMode();
-    dst.streamingUrl = src->getStreamingUrl();
     dst.version = src->getVersion().toString();
     dst.systemInfo = src->getSystemInfo().toString();
     dst.maxCameras = src->getMaxCameras();
+    dst.authKey = src->getAuthKey();
     dst.allowAutoRedundancy = src->isRedundancy();
-    //authKey = resource->getAuthKey();
 
     QnAbstractStorageResourceList storageList = src->getStorages();
     dst.storages.resize(storageList.size());
@@ -519,12 +536,11 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     dst->setNetAddrList(resNetAddrList);
     dst->setServerFlags(src.flags);
     dst->setPanicMode(src.panicMode);
-    dst->setStreamingUrl(src.streamingUrl);
     dst->setVersion(QnSoftwareVersion(src.version));
     dst->setSystemInfo(QnSystemInformation(src.systemInfo));
     dst->setMaxCameras(src.maxCameras);
+    dst->setAuthKey(src.authKey);
     dst->setRedundancy(src.allowAutoRedundancy);
-    //dst->setAuthKey(authKey);
 
     QnResourceTypePtr resType = ctx.resTypePool->getResourceTypeByName(lit("Storage"));
     if (!resType)
@@ -569,7 +585,8 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
     dst.parentId = src->getParentId();
     dst.name = src->getName();
     dst.url = src->getUrl();
-    dst.status = src->getStatus();
+    //dst.status = src->getStatus();
+    dst.status = QnResource::NotDefined; // status field MUST be modified via setStatus call only
 
     QnParamList params = src->getResourceParamList();
     for(const QnParam &srcParam: src->getResourceParamList().list())

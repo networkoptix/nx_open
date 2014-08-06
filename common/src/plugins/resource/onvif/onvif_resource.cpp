@@ -1269,59 +1269,6 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
 
     bool result = QnPhysicalCameraResource::mergeResourcesIfNeeded(source);
 
-    if (getModel() != onvifR->getModel()) {
-        setModel(onvifR->getModel());
-        result = true;
-    }
-    if (getVendor() != onvifR->getVendor()) {
-        setVendor(onvifR->getVendor());
-        result = true;
-    }
-    if (getMAC() != onvifR->getMAC()) {
-        setMAC(onvifR->getMAC());
-        result = true;
-    }
-
-    /*
-    QString onvifUrlSource = onvifR->getDeviceOnvifUrl();
-    QString mediaUrlSource = onvifR->getMediaUrl();
-
-
-    if (onvifUrlSource.size() != 0 && QUrl(onvifUrlSource).host().size() != 0 && getDeviceOnvifUrl() != onvifUrlSource)
-    {
-        setDeviceOnvifUrl(onvifUrlSource);
-        result = true;
-    }
-
-    if (mediaUrlSource.size() != 0 && QUrl(mediaUrlSource).host().size() != 0 && getMediaUrl() != mediaUrlSource)
-    {
-        setMediaUrl(mediaUrlSource);
-        result = true;
-    }
-
-    if (getDeviceOnvifUrl().size()!=0 && QUrl(getDeviceOnvifUrl()).host().size()==0)
-    {
-        // trying to introduce fix for dw cam 
-        QString temp = getDeviceOnvifUrl();
-
-        QUrl newUrl(getDeviceOnvifUrl());
-        newUrl.setHost(getHostAddress());
-        setDeviceOnvifUrl(newUrl.toString());
-        qCritical() << "pure URL(error) " << temp<< " Trying to fix: " << getDeviceOnvifUrl();
-        result = true;
-    }
-
-    if (getMediaUrl().size() != 0 && QUrl(getMediaUrl()).host().size()==0)
-    {
-        // trying to introduce fix for dw cam 
-        QString temp = getMediaUrl();
-        QUrl newUrl(getMediaUrl());
-        newUrl.setHost(getHostAddress());
-        setMediaUrl(newUrl.toString());
-        qCritical() << "pure URL(error) " << temp<< " Trying to fix: " << getMediaUrl();
-        result = true;
-    }
-    */
 
     return result;
 }
@@ -1564,7 +1511,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     /* Note that we don't pass shared pointer here as this would create a 
      * cyclic reference and onvif resource will never be deleted. */
     QnSoapServer::instance()->getService()->registerResource(
-        this,
+        toSharedPointer().staticCast<QnPlOnvifResource>(),
         QUrl(QString::fromStdString(m_eventCapabilities->XAddr)).host(),
         m_onvifNotificationSubscriptionReference );
 
@@ -2461,7 +2408,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 /*timerID*/)
         NX_LOG( lit("Failed to renew subscription (endpoint %1). %2").
             arg(QString::fromLatin1(soapWrapper.endpoint())).arg(m_prevSoapCallResult), cl_logDEBUG1 );
         lk.unlock();
-        QnSoapServer::instance()->getService()->removeResourceRegistration( this );
+        QnSoapServer::instance()->getService()->removeResourceRegistration( toSharedPointer().staticCast<QnPlOnvifResource>() );
         registerNotificationConsumer();
         return;
     }
@@ -2593,7 +2540,7 @@ void QnPlOnvifResource::stopInputPortMonitoring()
         TimerManager::instance()->joinAndDeleteTimer(localRenewSubscriptionTaskID);
         m_renewSubscriptionTaskID = 0;
     }
-    //TODO/IMPL removing device event registration
+    //TODO #ak removing device event registration
         //if we do not remove event registration, camera will do it for us in some timeout
 
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper;
@@ -2608,7 +2555,7 @@ void QnPlOnvifResource::stopInputPortMonitoring()
         asyncPullMessagesCallWrapper->join();
     }
 
-    QnSoapServer::instance()->getService()->removeResourceRegistration( this );
+    QnSoapServer::instance()->getService()->removeResourceRegistration( toSharedPointer().staticCast<QnPlOnvifResource>() );
 }
 
 

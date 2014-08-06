@@ -19,7 +19,7 @@ namespace ec2
     class QnUbjsonTransactionSerializer: public Singleton<QnUbjsonTransactionSerializer>
     {
     public:
-        static const int MAX_CACHE_SIZE_BYTES = 1*1024*1024;
+        static const int MAX_CACHE_SIZE_BYTES = 512*1024;
 
         QnUbjsonTransactionSerializer()
         :
@@ -40,9 +40,11 @@ namespace ec2
             QnUbjsonWriter<QByteArray> stream(serializedTran.get());
             QnUbjson::serialize( tran, &stream );
             QByteArray result = *serializedTran;
-            if (!tran.persistentInfo.isNull())
-                if( m_cache.insert(tran.persistentInfo, serializedTran.get(), serializedTran->size()) )
-                    serializedTran.release();
+            if( !tran.persistentInfo.isNull() )
+            {
+                m_cache.insert( tran.persistentInfo, serializedTran.get(), serializedTran->size() );
+                serializedTran.release();
+            }
 
             return result;
         }
@@ -65,6 +67,5 @@ namespace ec2
     };
 
 }
-
 
 #endif // __UBJSON_TRANSACTION_SERIALIZER_H_

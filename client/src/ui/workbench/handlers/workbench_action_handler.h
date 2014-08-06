@@ -38,7 +38,6 @@ class QnAction;
 class QnCameraSettingsDialog;
 class QnBusinessRulesDialog;
 class QnCameraAdditionDialog;
-class QnLoginDialog;
 class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
@@ -145,14 +144,6 @@ protected:
 
     void openNewWindow(const QStringList &args);
 
-    /**
-     * Save modified camera settings to resources.
-     * \param checkControls - if set then additional check will occur.
-     * If user modified some of control elements but did not apply changes he will be asked to fix it.
-     * \see Feature #1195
-     */
-    void saveCameraSettingsFromDialog(bool checkControls = false);
-
     void rotateItems(int degrees);
 
     void setResolutionMode(Qn::ResolutionMode resolutionMode);
@@ -167,15 +158,12 @@ protected:
 
     QnCameraAdditionDialog *cameraAdditionDialog() const;
 
-    QnLoginDialog *loginDialog() const;
-
     QnSystemAdministrationDialog *systemAdministrationDialog() const;
 
     QnWorkbenchNotificationsHandler* notificationsHandler() const;
 
 protected slots:
-    void updateCameraSettingsFromSelection();
-    void updateCameraSettingsEditibility();
+   
     void submitDelayedDrops();
     void submitInstantDrop();
 
@@ -185,9 +173,6 @@ protected slots:
     void at_workbench_cellAspectRatioChanged();
     void at_workbench_cellSpacingChanged();
     void at_workbench_currentLayoutChanged();
-
-    void at_messageProcessor_connectionClosed();
-    void at_messageProcessor_connectionOpened();
 
     void at_mainMenuAction_triggered();
     void at_openCurrentUserLayoutMenuAction_triggered();
@@ -215,7 +200,6 @@ protected slots:
     void at_openFileAction_triggered();
     void at_openLayoutAction_triggered();
     void at_openFolderAction_triggered();
-    void at_checkForUpdatesAction_triggered();
     void at_showcaseAction_triggered();
     void at_aboutAction_triggered();
     void at_businessEventsAction_triggered();
@@ -229,9 +213,6 @@ protected slots:
     void at_preferencesLicensesTabAction_triggered();
     void at_preferencesSmtpTabAction_triggered();
     void at_preferencesNotificationTabAction_triggered();
-    void at_connectToServerAction_triggered();
-    void at_reconnectAction_triggered();
-    void at_disconnectAction_triggered();
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_pictureSettingsAction_triggered();
@@ -240,13 +221,6 @@ protected slots:
     void at_cameraDiagnosticsAction_triggered();
     void at_layoutSettingsAction_triggered();
     void at_currentLayoutSettingsAction_triggered();
-    void at_clearCameraSettingsAction_triggered();
-    void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
-    void at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras);
-    void at_cameraSettingsDialog_rejected();
-    void at_cameraSettingsDialog_advancedSettingChanged();
-    void at_cameraSettingsDialog_cameraOpenRequested();
-    void at_selectionChangeAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();
     void at_serverLogsAction_triggered();
@@ -264,6 +238,7 @@ protected slots:
 
     void at_adjustVideoAction_triggered();
     void at_exitAction_triggered();
+    void at_beforeExitAction_triggered();
 
     void at_setCurrentLayoutAspectRatio4x3Action_triggered();
     void at_setCurrentLayoutAspectRatio16x9Action_triggered();
@@ -301,8 +276,6 @@ protected slots:
     void at_tourTimer_timeout();
     void at_workbench_itemChanged(Qn::ItemRole role);
 
-    void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
-
     void at_whatsThisAction_triggered();
 
     void at_escapeHotkeyAction_triggered();
@@ -322,9 +295,7 @@ protected slots:
     void at_selectTimeServerAction_triggered();
 
 private:
-    void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
-
-    void notifyAboutUpdate(bool alwaysNotify);
+    void notifyAboutUpdate();
 
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
 
@@ -333,6 +304,7 @@ private:
     /** Check if resource can be safely renamed to the new name. */
     bool validateResourceName(const QnResourcePtr &resource, const QString &newName) const;
 
+    void deleteDialogs();
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 
@@ -345,18 +317,9 @@ private:
     QPointer<QnEventLogDialog> m_businessEventsLogDialog;
     QPointer<QnCameraListDialog> m_cameraListDialog;
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
-    QPointer<QnLoginDialog> m_loginDialog;
     QPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
     QPointer<QnSystemAdministrationDialog> m_systemAdministrationDialog;
     QPointer<QnTimeServerSelectionDialog> m_timeServerSelectionDialog;
-
-
-    /** Whether the set of selected resources was changed and settings
-     * dialog is waiting to be updated. */
-    bool m_selectionUpdatePending;
-
-    /** Scope of the last selection change. */
-    Qn::ActionScope m_selectionScope;
 
     bool m_delayedDropGuard;
     /** List of serialized resources that are to be dropped on the scene once
@@ -369,8 +332,6 @@ private:
     QnTimePeriod m_exportPeriod;
     QnLayoutResourcePtr m_exportLayout;
     QnStorageResourcePtr m_exportStorage;
-
-    QnGraphicsMessageBox* m_connectingMessageBox;
 
     QTimer *m_tourTimer;
 };

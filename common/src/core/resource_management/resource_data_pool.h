@@ -19,18 +19,11 @@ public:
      */
     QnResourceData data(const QString &key) const;
 
-
-    // TODO: #VASILENKO #Elric
-    // useWildcard parameter is evil. It implies that we need to know in the code if the corresponding
-    // record in the file contains wildcards. This defies the purpose of
-    // the json file --- that of separating camera data from the code.
-
     /**
      * \param camera                    resource to get data for.
-     * \param useWildcard               do general wildcard search. It more slow method but allow to find values with '*' in the middle of a key value
      * \returns                         Resource data for the given camera.
      */
-    QnResourceData data(const QnVirtualCameraResourcePtr &camera, bool useWildcard = false) const;
+    QnResourceData data(const QnSecurityCamResourcePtr &camera) const;
     
     bool load(const QString &fileName);
 
@@ -40,6 +33,9 @@ private:
 private:
     QHash<QString, QnResourceData> m_dataByKey;
     QHash<QString, QString> m_shortVendorByName;
+
+    /** Cache of the search results to avoid using too much regexps. */
+    mutable QHash<QString, QnResourceData> m_cachedResultByKey;
 };
 
 

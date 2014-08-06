@@ -13,6 +13,10 @@
 #include <utils/common/string.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+namespace {
+    const QSize minimumWidgetSizeHint(400, 300);
+}
+
 QnVideowallManageWidget::QnVideowallManageWidget(QWidget *parent /*= 0*/):
     base_type(parent),
     d_ptr(new QnVideowallManageWidgetPrivate(this)),
@@ -29,6 +33,7 @@ QnVideowallManageWidget::QnVideowallManageWidget(QWidget *parent /*= 0*/):
     setTimer(animationTimer);
     startListening();
     
+    connect(d_ptr.data(), &QnVideowallManageWidgetPrivate::itemsChanged, this, &QnVideowallManageWidget::itemsChanged);
 }
 
 QnVideowallManageWidget::~QnVideowallManageWidget() { }
@@ -143,3 +148,13 @@ void QnVideowallManageWidget::setColors(const QnVideowallManageWidgetColors &col
     update();
 }
 
+int QnVideowallManageWidget::proposedItemsCount() const {
+    Q_D(const QnVideowallManageWidget);
+    return d->proposedItemsCount();
+}
+
+QSize QnVideowallManageWidget::minimumSizeHint() const {
+    Q_D(const QnVideowallManageWidget);
+    QRect source(QPoint(0, 0), minimumWidgetSizeHint);
+    return d->targetRect(source).size();  
+}

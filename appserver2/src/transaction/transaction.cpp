@@ -159,6 +159,14 @@ namespace ec2
                 case broadcastPeerSystemTime:
                     return "broadcastPeerSystemTime";
 
+                case testEmailSettings:
+                    return "testEmailSettings";
+                case sendEmail:
+                    return "sendEmail";
+                case dumpDatabase:
+                    return "dumpDatabase";
+                case resotreDatabase:
+                    return "resotreDatabase";
                 default:
                     return "unknown " + QString::number((int)val);
             }
@@ -205,7 +213,8 @@ namespace ec2
                 val == removeStoredFile ||
                 val == addLicense ||
                 val == addLicenses ||
-                val == removeLicense;
+                val == removeLicense || 
+                val == resotreDatabase;
         }
 
     }
@@ -233,5 +242,6 @@ namespace ec2
 
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::PersistentInfo,    (binary)(json)(ubjson),   QnAbstractTransaction_PERSISTENT_Fields)
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,                    (binary)(json)(ubjson),   QnAbstractTransaction_Fields)
+	
 } // namespace ec2
 
