@@ -13,6 +13,8 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include "utils/common/id.h"
 
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
+
 namespace Ui {
     class ResourceSelectionDialog;
 }
@@ -20,9 +22,9 @@ namespace Ui {
 class QnResourcePoolModel;
 class QnCameraThumbnailManager;
 
-class QnResourceSelectionDialog : public QDialog, public QnWorkbenchContextAware {
+class QnResourceSelectionDialog : public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
-    typedef QDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
     enum SelectionTarget {

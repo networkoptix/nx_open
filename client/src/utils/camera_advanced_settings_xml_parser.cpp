@@ -73,7 +73,7 @@ void CameraSettingsLister::parentOfRootElemFound(const QString& parentId)
 //
 
 CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj, QTreeWidget& rootWidget, QStackedLayout& rootLayout,
-        TreeWidgetItemsById& widgetsById, LayoutIndById& layoutIndById, SettingsWidgetsById& settingsWidgetsById, EmptyGroupsById& emptyGroupsById, QObject* handler):
+        TreeWidgetItemsById& widgetsById, LayoutIndById& layoutIndById, SettingsWidgetsById& settingsWidgetsById, EmptyGroupsById& emptyGroupsById):
     CameraSettingReader(id),
     m_obj(obj),
     m_settings(0),
@@ -83,13 +83,10 @@ CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, Pa
     m_layoutIndById(layoutIndById),
     m_settingsWidgetsById(settingsWidgetsById),
     m_emptyGroupsById(emptyGroupsById),
-    m_handler(handler),
     m_owner(0)
 {
     connect(&m_rootWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this,   SLOT(treeWidgetItemPressed(QTreeWidgetItem*, int)));
     connect(&m_rootWidget, SIGNAL(itemSelectionChanged()), this,   SLOT(treeWidgetItemSelectionChanged()));
-
-    connect(this, SIGNAL( refreshAdvancedSettings() ), handler, SLOT( refreshAdvancedSettings() ), Qt::QueuedConnection);
 }
 
 CameraSettingsWidgetsCreator::~CameraSettingsWidgetsCreator()
@@ -245,27 +242,27 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
     switch(value.getType())
     {
         case CameraSetting::OnOff:
-            tabWidget = new QnSettingsOnOffWidget(m_handler, *(currIt.value()), *rootWidget);
+            tabWidget = new QnSettingsOnOffWidget(*(currIt.value()), rootWidget);
             break;
 
         case CameraSetting::MinMaxStep:
-            tabWidget = new QnSettingsMinMaxStepWidget(m_handler, *(currIt.value()), *rootWidget);
+            tabWidget = new QnSettingsMinMaxStepWidget(*(currIt.value()), rootWidget);
             break;
 
         case CameraSetting::Enumeration:
-            tabWidget = new QnSettingsEnumerationWidget(m_handler, *(currIt.value()), *rootWidget);
+            tabWidget = new QnSettingsEnumerationWidget(*(currIt.value()), rootWidget);
             break;
 
         case CameraSetting::Button:
-            tabWidget = new QnSettingsButtonWidget(m_handler, value, *rootWidget);
+            tabWidget = new QnSettingsButtonWidget(value, rootWidget);
             break;
 
         case CameraSetting::TextField:
-            tabWidget = new QnSettingsTextFieldWidget(m_handler, *(currIt.value()), *rootWidget);
+            tabWidget = new QnSettingsTextFieldWidget(*(currIt.value()), rootWidget);
             break;
 
         case CameraSetting::ControlButtonsPair:
-            tabWidget = new QnSettingsControlButtonsPairWidget(m_handler, *(currIt.value()), *rootWidget);
+            tabWidget = new QnSettingsControlButtonsPairWidget(*(currIt.value()), rootWidget);
             break;
 
         default:
@@ -273,6 +270,7 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
             Q_ASSERT(false);
     }
 
+    connect(tabWidget, &QnAbstractSettingsWidget::advancedParamChanged, this, &CameraSettingsWidgetsCreator::advancedParamChanged);
     m_settingsWidgetsById.insert(value.getId(), tabWidget);
 }
 
@@ -473,12 +471,12 @@ QStringList CameraSettingsTreeLister::proceed()
 CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(
     const QString& cameraId,
     const QString& id,
-    QTreeWidget& rootWidget,
-    QStackedLayout& rootLayout,
 #ifdef QT_WEBKITWIDGETS_LIB
     QWebView* webView,
 #endif
-    QObject* handler)
+    QTreeWidget& rootWidget,
+    QStackedLayout& rootLayout
+    )
 :
     CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>(id),
     m_rootWidget(rootWidget),
@@ -486,7 +484,6 @@ CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(
     m_treeWidgetsById(),
     m_layoutIndById(),
     m_settingsWidgetsById(),
-    m_handler(handler),
     m_settings(0),
     m_id(id),
     m_cameraId(cameraId)
@@ -509,8 +506,11 @@ CameraSettingsWidgetsTreeCreator::~CameraSettingsWidgetsTreeCreator()
 
 CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(const QString& id)
 {
-    return new CameraSettingsWidgetsCreator(id, *this, m_rootWidget, m_rootLayout, m_treeWidgetsById,
-        m_layoutIndById, m_settingsWidgetsById, m_emptyGroupsById, m_handler);
+    CameraSettingsWidgetsCreator* result = new CameraSettingsWidgetsCreator(id, *this, m_rootWidget, m_rootLayout, m_treeWidgetsById,
+        m_layoutIndById, m_settingsWidgetsById, m_emptyGroupsById);
+    connect (result, &CameraSettingsWidgetsCreator::advancedParamChanged, this, &CameraSettingsWidgetsTreeCreator::advancedParamChanged);
+    connect (result, &CameraSettingsWidgetsCreator::refreshAdvancedSettings, this, &CameraSettingsWidgetsTreeCreator::refreshAdvancedSettings);
+    return result;
 }
 
 CameraSettings& CameraSettingsWidgetsTreeCreator::getAdditionalInfo()

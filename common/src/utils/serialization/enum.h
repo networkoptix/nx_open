@@ -38,13 +38,28 @@ namespace QnSerialization {
     }
 
     template<class T>
-    struct is_enum_or_flags:
-        std::is_enum<T>
+    struct is_flags:
+        std::false_type
     {};
 
     template<class T>
-    struct is_enum_or_flags<QFlags<T> >:
+    struct is_flags<QFlags<T> >:
         std::true_type
+    {};
+
+
+    template<class T>
+    struct is_enum:
+        std::is_enum<T>
+    {};
+
+
+    template<class T>
+    struct is_enum_or_flags:
+        std::integral_constant<
+            bool, 
+            is_flags<T>::value || is_enum<T>::value
+        >
     {};
 
 } // namespace QnSerialization

@@ -24,11 +24,13 @@ public:
         registerSerializer<QColor>();
         registerSerializer<QUuid>();
         registerSerializer<QUrl>();
+
+        registerSerializer<QnLatin1Array>();
     }
 };
 
 Q_GLOBAL_STATIC(QnLexicalSerializerStorage, qn_lexicalSerializerStorage_instance)
 
 QnSerializerStorage<QnLexicalSerializer> *QnLexicalDetail::StorageInstance::operator()() const {
-        return qn_lexicalSerializerStorage_instance();
+    return qn_lexicalSerializerStorage_instance();
 }

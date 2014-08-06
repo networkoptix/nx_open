@@ -229,8 +229,8 @@ void QnDesktopCameraConnection::run()
             connection = 0;
 
             QAuthenticator auth;
-            auth.setUser(QnAppServerConnectionFactory::defaultUrl().userName());
-            auth.setPassword(QnAppServerConnectionFactory::defaultUrl().password());
+            auth.setUser(QnAppServerConnectionFactory::url().userName());
+            auth.setPassword(QnAppServerConnectionFactory::url().password());
             connection = new CLSimpleHTTPClient(m_mServer->getApiUrl(), CONNECT_TIMEOUT, auth);
             connection->addHeader("user-name", auth.user().toUtf8());
             connection->addHeader("user-id", QnAppServerConnectionFactory::clientGuid().toUtf8());

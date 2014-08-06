@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <iostream>
 
-#include <QtSingleApplication>
+#include <qtsinglecoreapplication.h>
 #include <QDir>
 #include <QThread>
 
@@ -113,7 +113,7 @@ int main( int argc, char* argv[] )
     commandLineParser.addParameter( &devModeKey, "--dev-mode-key", NULL, QString(), QString() );
     commandLineParser.parse( argc, argv, stderr );
 
-    QtSingleApplication app( SERVICE_NAME, argc, argv );
+    QtSingleCoreApplication app( SERVICE_NAME, argc, argv );
     QDir::setCurrent( QCoreApplication::applicationDirPath() );
 
     QSettings globalSettings( QSettings::SystemScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );

@@ -6,7 +6,7 @@
 #include <QtWidgets/QRadioButton>
 
 QnAttachToVideowallDialog::QnAttachToVideowallDialog(QWidget *parent) :
-    QnButtonBoxDialog(parent),
+    base_type(parent),
     ui(new Ui::QnAttachToVideowallDialog)
 {
     ui->setupUi(this);

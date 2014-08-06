@@ -114,6 +114,7 @@ public:
     void setValue(const QVariant &value);
     bool testAndSetValue(const QVariant &expectedValue, const QVariant &newValue);
 
+    void synchronizeNow();
 signals:
     void valueChanged();
 

@@ -9,7 +9,7 @@
 
 
 /** 
- * Time provider that is synchronized with Enterprise Controller.
+ * Time provider that is synchronized with Server.
  */
 class QnSyncTime: public QObject {
     Q_OBJECT;
@@ -27,7 +27,7 @@ public:
 
 signals:
     /**
-     * This signal is emitted whenever time on EC changes. 
+     * This signal is emitted whenever time on Server changes. 
      */
     void timeChanged();
 

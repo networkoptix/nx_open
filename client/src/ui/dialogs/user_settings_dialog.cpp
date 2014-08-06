@@ -27,8 +27,7 @@ namespace Qn {
 }
 
 QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent): 
-    QDialog(parent),
-    QnWorkbenchContextAware(context),
+    base_type(parent),
     ui(new Ui::UserSettingsDialog()),
     m_user(0),
     m_hasChanges(false),

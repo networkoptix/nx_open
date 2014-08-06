@@ -63,6 +63,8 @@
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
+#include <ui/graphics/view/gradient_background_painter.h>
+
 #include <ui/workaround/gl_widget_factory.h>
 #include <ui/workaround/gl_widget_workaround.h>
 
@@ -282,7 +284,7 @@ void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
         initSceneView();
 }
 
-void QnWorkbenchDisplay::setView(QGraphicsView *view) {
+void QnWorkbenchDisplay::setView(QnGraphicsView *view) {
     if(m_view == view)
         return;
 
@@ -320,6 +322,13 @@ void QnWorkbenchDisplay::deinitSceneView() {
     /* Clear grid. */
     if(!m_gridItem.isNull())
         delete m_gridItem.data();
+
+    /* Clear background painter. */
+    if (!m_backgroundPainter.isNull()) {
+        m_view->uninstallLayerPainter(m_backgroundPainter.data());
+        delete m_backgroundPainter.data();
+    }
+
 
     /* Deinit workbench. */
     disconnect(workbench(), NULL, this, NULL);
@@ -426,6 +435,13 @@ void QnWorkbenchDisplay::initSceneView() {
     setLayer(gridBackgroundItem(), Qn::EMappingLayer);
     gridBackgroundItem()->setOpacity(0.0);
     gridBackgroundItem()->setMapper(workbench()->mapper());
+
+    /* Set up background */ 
+    if (!(qnSettings->lightMode() & Qn::LightModeNoSceneBackground)) {
+        /* Never set QObject* parent in the QScopedPointer-stored objects if not sure in the descruction order. */
+        m_backgroundPainter = new QnGradientBackgroundPainter(qnSettings->radialBackgroundCycle(), NULL, context());
+        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+    }
 
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
@@ -1370,12 +1386,15 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
     MarginsF marginsExtension(0.0, 0.0, 0.0, 0.0);
-    if(currentMarginFlags() != 0)
+
+    /* If an item is zoomed then the margins should be null because all panels are hidden. */
+    if(currentMarginFlags() != 0 && !m_widgetByRole[Qn::ZoomedRole])
         marginsExtension = cwiseDiv(m_viewportAnimator->viewportMargins(), m_view->viewport()->size());
 
     /* Sync position extension. */
     {
         MarginsF positionExtension(0.0, 0.0, 0.0, 0.0);
+
         if(currentMarginFlags() & Qn::MarginsAffectPosition)
             positionExtension = marginsExtension;
 

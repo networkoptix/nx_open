@@ -100,7 +100,7 @@ public:
     void setExportScheduleButtonEnabled(bool enabled);
 
 public slots:
-    void setAdvancedParam(const CameraSetting& val);
+    void at_advancedParamChanged(const CameraSetting& val);
     void refreshAdvancedSettings();
 
 signals:
