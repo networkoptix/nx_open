@@ -14,7 +14,7 @@ namespace {
 
     const int defaultMaxConnections = 30;
     const int periodicalCheckIntervalMs = 15 * 1000;
-    const int maxPingTimeoutMs = 3 * 60 * 1000;
+    const int maxPingTimeoutMs = 60 * 1000;
 
     QUrl makeRequestUrl(const QHostAddress &address, quint16 port) {
         return QUrl(QString(lit("http://%1:%2/api/moduleInformation")).arg(address.toString()).arg(port));
