@@ -33,7 +33,7 @@ void QnUpdateUploader::cancel() {
 }
 
 bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &fileName, const QSet<QnId> &peers) {
-    if (m_updateFile || !m_updateId.isEmpty())
+    if (m_updateFile)
         return false;
 
     m_updateFile.reset(new QFile(fileName));
