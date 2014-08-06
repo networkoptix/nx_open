@@ -219,8 +219,7 @@ public:
     }
 
     int bio_read ( void* buffer , std::size_t len ) {
-        int digest_size = 
-            static_cast<int>( (std::min)(len,bio_in_buffer_.size()) );
+        int digest_size = (std::min)(static_cast<int>(len),bio_in_buffer_.size()) ;
         if( digest_size == 0 )
             return 0;
         memcpy( buffer , bio_in_buffer_.constData(), digest_size );
@@ -301,7 +300,7 @@ private:
 
     void ssl_read( ssl_async_op *op, buffer_t buffer ) {
             // We issue the read and write at same time if we needed
-            if( bio_out_buffer_.empty() ) {
+            if( bio_out_buffer_.isEmpty() ) {
                 // Here we just issue a recv operation since the bio_out_buffer is empty
                 // right now. So SSL doesn't produce renegotiation during the transaction
                 do_recv( buffer, [this,buffer,op](SystemError::ErrorCode ec,std::size_t bytes_transferred){
@@ -357,7 +356,7 @@ private:
     }
 
     void ssl_finalize( ssl_async_op* op, buffer_t buffer ) {
-        if( !bio_out_buffer_.empty() ) {
+        if( !bio_out_buffer_.isEmpty() ) {
             do_send( 
             buffer,
             [this,op](SystemError::ErrorCode ec,std::size_t) {
@@ -661,7 +660,7 @@ private:
                  is_initialized_ = true;
              }
              // If we are SSL , we need to push the data into the buffer
-             Q_ASSERT( mutable_bio_input_buffer()->empty() );
+             Q_ASSERT( mutable_bio_input_buffer()->isEmpty() );
              mutable_bio_input_buffer()->append( sniffer_buffer_ );
              // If it is an SSL we still need to continue our async operation
              // otherwise we call the failed callback for the upper usage class
@@ -1124,7 +1123,7 @@ bool QnSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::function<voi
     return d->wrappedSocket->connectAsync( addr, std::move(handler) );
 }
 
-bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const buffer , std::function<void( SystemError::ErrorCode, size_t )> handler )
+bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const buffer , std::function<void( SystemError::ErrorCode, std::size_t )>&& handler )
 {
     Q_D(QnSSLSocket);
     d->model_ = QnSSLSocketPrivate::ASYNC;
@@ -1134,7 +1133,7 @@ bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const buffer , std::function<void( 
     return true;
 }
 
-bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& buffer , std::function<void( SystemError::ErrorCode, size_t )> handler )
+bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& buffer , std::function<void( SystemError::ErrorCode, std::size_t )>&& handler )
 {
     Q_D(QnSSLSocket);
     d->model_ = QnSSLSocketPrivate::ASYNC;
@@ -1235,7 +1234,7 @@ bool QnMixedSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::functio
 }
 
 //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const buffer, std::function<void( SystemError::ErrorCode, size_t )> handler )
+bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const buffer, std::function<void( SystemError::ErrorCode , std::size_t )>&&  handler )
 {
     Q_D(QnMixedSSLSocket);
     d->model_ = QnMixedSSLSocketPrivate::ASYNC;
@@ -1253,7 +1252,7 @@ bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const buffer, std::function<vo
 }
 
 //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& buffer, std::function<void( SystemError::ErrorCode, size_t )> handler )
+bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& buffer, std::function<void( SystemError::ErrorCode , std::size_t )>&&  handler )
 {
     Q_D(QnMixedSSLSocket);
     d->model_ = QnMixedSSLSocketPrivate::ASYNC;
