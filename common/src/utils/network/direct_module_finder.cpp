@@ -243,14 +243,8 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         if (id.isNull())
             return;
 
-        if (m_lastPingById[id] + maxPingTimeoutMs < QDateTime::currentMSecsSinceEpoch()) {
-            m_lastPingById.remove(id);
-            QnModuleInformation moduleInformation = m_foundModules.take(id);
-            foreach (const QString &address, moduleInformation.remoteAddresses)
-                m_moduleByUrl.remove(makeRequestUrl(QHostAddress(address), moduleInformation.port));
-
-            emit moduleLost(moduleInformation);
-        }
+        if (m_lastPingById[id] + maxPingTimeoutMs < QDateTime::currentMSecsSinceEpoch())
+            dropModule(id, true);
     }
 }
 
