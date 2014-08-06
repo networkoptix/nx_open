@@ -250,6 +250,13 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
+          <widget class="QCheckBox" name="checkBoxPrimaryRecorder">
+           <property name="text">
+            <string>Do not archive primary stream</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QCheckBox" name="checkBoxSecondaryRecorder">
            <property name="text">
             <string>Do not archive secondary stream</string>
@@ -379,6 +386,9 @@
   </layout>
  </widget>
  <resources>
+  <include location="../../../../x64/build/client.qrc"/>
+  <include location="../../../../x64/build/client.qrc"/>
+  <include location="../../../../x64/build/client.qrc"/>
   <include location="../../../../x64/build/client.qrc"/>
   <include location="../../../../x64/build/client.qrc"/>
   <include location="../../../../x64/build/client.qrc"/>

@@ -104,6 +104,10 @@ namespace ec2
             addLicenses                 = 1002, /*< ApiLicenseDataList */
             removeLicense               = 1003, /*< ApiLicenseData */
 
+            /* Email */
+            testEmailSettings           = 1100, /*< ApiEmailSettingsData */
+            sendEmail                   = 1101, /*< ApiEmailData */
+
             /* Auto-updates */
             uploadUpdate                = 1200, /*< ApiUpdateUploadData */
             uploadUpdateResponce        = 1201, /*< ApiUpdateUploadResponceData */
@@ -113,6 +117,8 @@ namespace ec2
             getCurrentTime              = 9002,  /*< ApiTimeData */         
             //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
+            dumpDatabase                = 9005,  /*< ApiDatabaseDumpData */
+            resotreDatabase             = 9006,  /*< ApiDatabaseDumpData */
 
 			maxTransactionValue         = 65535
         };
@@ -165,7 +171,7 @@ namespace ec2
 
     typedef QnAbstractTransaction::PersistentInfo QnAbstractTransaction_PERSISTENT;
 #define QnAbstractTransaction_PERSISTENT_Fields (dbID)(sequence)(timestamp)
-#define QnAbstractTransaction_Fields (command)(peerID)(persistentInfo)
+#define QnAbstractTransaction_Fields (command)(peerID)(persistentInfo)(isLocal)
 
     template <class T>
     class QnTransaction: public QnAbstractTransaction

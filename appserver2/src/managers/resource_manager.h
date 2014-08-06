@@ -72,7 +72,7 @@ namespace ec2
         //!Implementation of AbstractResourceManager::getKvPairs
         virtual int getKvPairs( const QnId &resourceId, impl::GetKvPairsHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::save
-        virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) override;
+        //virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::save
         virtual int save( const QnId& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, impl::SaveKvPairsHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::remove

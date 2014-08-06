@@ -617,6 +617,7 @@ void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
     action(Qn::RadassAutoAction)->setChecked(true);
     qnRedAssController->setMode(Qn::AutoResolution);
     submitDelayedDrops();
+
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -1729,12 +1730,45 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
             return;
 
         resource->setName(name);
-        connection2()->getResourceManager()->save( resource, this,
-            [this, resource, oldName]( int reqID, ec2::ErrorCode errorCode ) {
-                at_resources_saved( reqID, errorCode, QnResourceList() << resource );
-                if (errorCode != ec2::ErrorCode::ok)
-                    resource->setName(oldName);
+
+        // I've removed command "saveResource" because it cause sync issue in p2p mode. The problem because of we have transactions with different hash:
+        // for instance saveServer and saveResource. But result data will depend of transactions order.
+
+        QnMediaServerResourcePtr mServer = resource.dynamicCast<QnMediaServerResource>();
+        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+        QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
+        if (mServer) {
+            connection2()->getMediaServerManager()->save( mServer, this,
+                [this, mServer, oldName]( int reqID, ec2::ErrorCode errorCode ) {
+                    at_resources_saved( reqID, errorCode, QnResourceList() << mServer );
+					if (errorCode != ec2::ErrorCode::ok)
+                    	mServer->setName(oldName);
+
             });
+        }
+        else if (camera) {
+            connection2()->getCameraManager()->save( QnVirtualCameraResourceList() << camera, this,
+                [this, camera, oldName]( int reqID, ec2::ErrorCode errorCode ) {
+                    at_resources_saved( reqID, errorCode, QnResourceList() << camera );
+                if (errorCode != ec2::ErrorCode::ok)
+                    camera->setName(oldName);
+            });
+        }
+        else if (user) {
+            connection2()->getUserManager()->save( user, this,
+            [this, user, oldName]( int reqID, ec2::ErrorCode errorCode ) {
+                    at_resources_saved( reqID, errorCode, QnResourceList() << user );
+                if (errorCode != ec2::ErrorCode::ok)
+                    user->setName(oldName);
+            });
+        }
+        else if (layout) {
+            connection2()->getLayoutManager()->save( QnLayoutResourceList() << layout, this,
+                [this, layout]( int reqID, ec2::ErrorCode errorCode ) {
+                    at_resources_saved( reqID, errorCode, QnResourceList() << layout );
+            });
+        }
     }
 }
 

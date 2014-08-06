@@ -195,11 +195,20 @@ QnDbManager::QnDbManager(
     m_licenseManagerImpl( licenseManagerImpl ),
     m_licenseOverflowMarked(false),
     m_licenseOverflowTime(0),
-    m_tranStatic(m_sdbStatic, m_mutexStatic)
+    m_tranStatic(m_sdbStatic, m_mutexStatic),
+    m_needResyncLog(false)
 {
     m_resourceFactory = factory;
     m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
-    m_sdb.setDatabaseName( closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite"));
+    QString dbFileName = closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite");
+    m_sdb.setDatabaseName( dbFileName);
+
+    QString backupDbFileName = dbFileName + QString::fromLatin1(".backup");
+    if (QFile::exists(backupDbFileName)) {
+        QFile::remove(dbFileName);
+        QFile::rename(backupDbFileName, dbFileName);
+        m_needResyncLog = true;
+    }
 
     m_sdbStatic = QSqlDatabase::addDatabase("QSQLITE", "QnDbManagerStatic");
     QString path2 = dbFilePathStatic.isEmpty() ? dbFilePath : dbFilePathStatic;
@@ -385,7 +394,7 @@ bool QnDbManager::init()
     if (QnTransactionLog::instance())
         QnTransactionLog::instance()->init();
 
-    if (isMigrationFrom2_2)
+    if (m_needResyncLog)
         resyncTransactionLog();
 
     // Set admin user's password
@@ -404,10 +413,10 @@ bool QnDbManager::init()
         fromApiToResource(users[0], userResource);
         userResource->setPassword(qnCommon->defaultAdminPassword());
 
-        QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser);
-        userTransaction.fillPersistentInfo();
+    	QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser);
+    	userTransaction.fillPersistentInfo();
         fromResourceToApi(userResource, userTransaction.params);
-        executeTransactionNoLock(userTransaction, QnUbjson::serialized(userTransaction));
+    	executeTransactionNoLock(userTransaction, QnUbjson::serialized(userTransaction));
     }
         
     QSqlQuery queryCameras(m_sdb);
@@ -692,17 +701,17 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         //#endif
 
 
+
+
     }
 
     if (!isObjectExists(lit("table"), lit("transaction_log"), m_sdb))
     {
-        NX_LOG(QString("Update database to v 2.3"), cl_logINFO);
-
+		NX_LOG(QString("Update database to v 2.3"), cl_logINFO);
         if (!migrateBusinessEvents())
             return false;
-
         if (!(*dbJustCreated)) {
-            *isMigrationFrom2_2 = true;
+            m_needResyncLog = true;
             if (!execSQLFile(lit(":/02_migration_from_2_2.sql"), m_sdb))
                 return false;
         }
@@ -863,9 +872,11 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
 {
     *internalId = getResourceInternalId(data.id);
 
+    Q_ASSERT_X(data.status == QnResource::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
+
     QSqlQuery query(m_sdb);
     if (*internalId) {
-        query.prepare("UPDATE vms_resource SET guid = :id, xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url, status = :status WHERE id = :internalID");
+        query.prepare("UPDATE vms_resource SET guid = :id, xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url WHERE id = :internalID");
         query.bindValue(":internalID", *internalId);
     }
     else {
@@ -1121,6 +1132,27 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data, qint32 in
             return ErrorCode::dbError;
         }
     }
+    return ErrorCode::ok;
+}
+
+void restartServer();
+
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran)
+{
+    m_sdb.close();
+    QFile f(m_sdb.databaseName() + QString(lit(".backup")));
+    if (!f.open(QFile::WriteOnly))
+        return ErrorCode::failure;
+    f.write(tran.params.data);
+    f.close();
+
+    QSqlDatabase testDB = QSqlDatabase::addDatabase("QSQLITE", "QnDbManagerTmp");
+    testDB.setDatabaseName( f.fileName());
+    if (!testDB.open() || !isObjectExists(lit("table"), lit("transaction_log"), testDB)) {
+        QFile::remove(f.fileName());
+        return ErrorCode::dbError; // invalid back file
+    }
+
     return ErrorCode::ok;
 }
 
@@ -2280,6 +2312,18 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentT
     currentTime.value = QDateTime::currentMSecsSinceEpoch();
     return ErrorCode::ok;
 }
+
+// dumpDatabase
+ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& data)
+{
+    QWriteLocker lock(&m_mutex);
+    QFile f(m_sdb.databaseName());
+    if (!f.open(QFile::ReadOnly))
+        return ErrorCode::failure;
+    data.data = f.readAll();
+    return ErrorCode::ok;
+}
+
 
 // ApiFullInfo
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& data)

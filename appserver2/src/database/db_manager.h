@@ -88,6 +88,10 @@ namespace ec2
             return transactionLog->saveTransaction( tran, serializedTran);
         }
 
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiDatabaseDumpData>& tran, const QByteArray& /*serializedTran*/)
+        {
+            return executeTransactionInternal(tran);
+        }
 
         template <class T>
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
@@ -116,6 +120,9 @@ namespace ec2
 
         //getCurrentTime
         ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiTimeData& currentTime);
+
+        //dumpDatabase
+        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
 
         //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
@@ -193,6 +200,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionInternal(const QnTransaction<ApiIdData>& tran);
@@ -339,6 +347,7 @@ namespace ec2
         bool updateGuids();
         QnId getType(const QString& typeName);
         bool resyncTransactionLog();
+
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
         bool addTransactionForGeneralSettings();
@@ -362,6 +371,7 @@ namespace ec2
         QSqlDatabase m_sdbStatic;
         QnDbTransaction m_tranStatic;
         mutable QReadWriteLock m_mutexStatic;
+        bool m_needResyncLog;
     };
 };
 

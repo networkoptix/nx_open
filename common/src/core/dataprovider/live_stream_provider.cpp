@@ -140,11 +140,21 @@ Qn::StreamQuality QnLiveStreamProvider::getQuality() const
 
 QnResource::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
 {
-    if (m_softMotionRole == QnResource::Role_Default) {
-        if (m_cameraRes && !m_cameraRes->hasDualStreaming2() && (m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
+    QMutexLocker lock(&m_motionRoleMtx);
+
+    if (m_softMotionRole == QnResource::Role_Default) 
+    {
+        m_forcedMotionStream = m_cameraRes->getProperty(QnMediaResource::motionStreamKey()).toLower();
+        if (m_forcedMotionStream == lit("primary"))
             m_softMotionRole = QnResource::Role_LiveVideo;
-        else
+        else if (m_forcedMotionStream == lit("secondary"))
             m_softMotionRole = QnResource::Role_SecondaryLiveVideo;
+        else {
+            if (m_cameraRes && !m_cameraRes->hasDualStreaming2() && (m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
+                m_softMotionRole = QnResource::Role_LiveVideo;
+            else
+                m_softMotionRole = QnResource::Role_SecondaryLiveVideo;
+		}
 		updateSoftwareMotion();
     }
     return m_softMotionRole;
@@ -268,7 +278,11 @@ void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& video
     m_framesSinceLastMetaData++;
 
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
-    if (m_role == roleForMotionEstimation() && m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
+
+    int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
+    bool resoulutionOK =  videoData->width * videoData->height <= maxSquare || !m_forcedMotionStream.isEmpty();
+
+    if (m_role == roleForMotionEstimation() && m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid && resoulutionOK)
     {
         if( m_motionEstimation[videoData->channelNumber].analizeFrame(videoData) )
             updateStreamResolution( videoData->channelNumber, m_motionEstimation[videoData->channelNumber].videoResolution() );
@@ -407,6 +421,12 @@ void QnLiveStreamProvider::updateStreamResolution( int channelNumber, const QSiz
         m_cameraRes->saveParams();
     }
 
+    m_softMotionRole = QnResource::Role_Default;    //it will be auto-detected on the next frame
+}
+
+void QnLiveStreamProvider::updateSoftwareMotionStreamNum()
+{
+    QMutexLocker lock(&m_motionRoleMtx);
     m_softMotionRole = QnResource::Role_Default;    //it will be auto-detected on the next frame
 }
 

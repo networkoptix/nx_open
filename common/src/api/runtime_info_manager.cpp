@@ -13,13 +13,11 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
     m_items(new QnThreadsafeItemStorage<QnPeerRuntimeInfo>(&m_mutex, this))
 {
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::runtimeInfoChanged, this, [this](const ec2::ApiRuntimeData &runtimeData) {
-        // check info version
-        if (m_items->hasItem(runtimeData.peer.id)) {
-            QnPeerRuntimeInfo existingInfo = m_items->getItem(runtimeData.peer.id);
-        }
-
         QnPeerRuntimeInfo info(runtimeData);
-        m_items->addItem(info);
+        if (m_items->hasItem(info.uuid))
+            m_items->updateItem(info.uuid, info);
+        else
+            m_items->addItem(info);
     });
 
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerLost,     this, [this](const ec2::ApiPeerAliveData &data, bool){

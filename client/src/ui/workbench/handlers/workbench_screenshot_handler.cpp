@@ -31,6 +31,7 @@
 #include <utils/common/string.h>
 #include <utils/common/environment.h>
 #include <utils/common/warnings.h>
+#include "transcoding/filters/fisheye_image_filter.h"
 
 //#define QN_SCREENSHOT_DEBUG
 #ifdef QN_SCREENSHOT_DEBUG
@@ -386,8 +387,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     
     int panoFactor = (parameters.mediaDewarpingParams.enabled && parameters.itemDewarpingParams.enabled) ? parameters.itemDewarpingParams.panoFactor : 1;
     if (panoFactor > 1)
-        resized = resized.scaled(resized.width() * panoFactor, resized.height());
-    
+        resized = resized.scaled(QnFisheyeImageFilter::getOptimalSize(resized.size(), parameters.itemDewarpingParams));
 
     QScopedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(resized));
     if (parameters.imageCorrectionParams.enabled) {
