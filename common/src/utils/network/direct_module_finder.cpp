@@ -232,6 +232,7 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         }
 
         m_lastPingById[moduleInformation.id] = QDateTime::currentMSecsSinceEpoch();
+        m_moduleByUrl[url] = moduleInformation.id;
 
         if (!m_urls.contains(url, moduleInformation.id))
             m_urls.insert(url, moduleInformation.id);
