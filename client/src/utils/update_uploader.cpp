@@ -106,8 +106,8 @@ void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &upda
         m_progressById.erase(it);
 
         if (chunks == ec2::AbstractUpdatesManager::Failed) {
-            emit failed();
             cleanUp();
+            emit failed();
             return;
         } else {
             progress = 100;
@@ -124,8 +124,8 @@ void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &upda
     emit progressChanged(wholeProgress / m_peers.size());
 
     if (m_progressById.isEmpty()) {
-        emit finished();
         cleanUp();
+        emit finished();
     }
 }
 
