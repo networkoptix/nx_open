@@ -20,11 +20,12 @@ namespace {
     };
 }
 
-QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QObject *parent) :
+QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *context, QObject *parent) :
     QObject(parent),
+    QnWorkbenchContextAware(context),
     m_running(false),
     m_configureTask(new QnConfigurePeerTask(this)),
-    m_updateDialog(new QnUpdateDialog())
+    m_updateDialog(new QnUpdateDialog(context))
 {
     m_updateTool = m_updateDialog->updateTool();
 

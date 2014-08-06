@@ -84,7 +84,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_joinOtherSystemAction_trigg
 
 QnConnectToCurrentSystemTool *QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystemTool() {
     if (!m_connectToCurrentSystemTool) {
-        m_connectToCurrentSystemTool = new QnConnectToCurrentSystemTool(this);
+        m_connectToCurrentSystemTool = new QnConnectToCurrentSystemTool(context(), this);
         connect(m_connectToCurrentSystemTool, &QnConnectToCurrentSystemTool::finished, this, &QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_finished);
     }
     return m_connectToCurrentSystemTool;

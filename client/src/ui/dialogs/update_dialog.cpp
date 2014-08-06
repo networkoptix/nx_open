@@ -3,8 +3,9 @@
 
 #include <ui/widgets/server_updates_widget.h>
 
-QnUpdateDialog::QnUpdateDialog(QWidget *parent) :
+QnUpdateDialog::QnUpdateDialog(QnWorkbenchContext *context, QWidget *parent) :
     QDialog(parent),
+    QnWorkbenchContextAware(context),
     ui(new Ui::QnUpdateDialog)
 {
     ui->setupUi(this);

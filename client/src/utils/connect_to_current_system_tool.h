@@ -4,12 +4,13 @@
 #include <QtCore/QObject>
 
 #include <utils/common/id.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnConfigurePeerTask;
 class QnUpdateDialog;
 class QnMediaServerUpdateTool;
 
-class QnConnectToCurrentSystemTool : public QObject {
+class QnConnectToCurrentSystemTool : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
     enum ErrorCode {
@@ -19,7 +20,7 @@ public:
         UpdateFailed
     };
 
-    explicit QnConnectToCurrentSystemTool(QObject *parent = 0);
+    explicit QnConnectToCurrentSystemTool(QnWorkbenchContext *context, QObject *parent = 0);
     ~QnConnectToCurrentSystemTool();
 
     void connectToCurrentSystem(const QSet<QnId> &targets, const QString &password);
