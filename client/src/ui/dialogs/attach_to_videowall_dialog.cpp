@@ -5,6 +5,8 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QRadioButton>
 
+#include <ui/workaround/qt5_combobox_workaround.h>
+
 QnAttachToVideowallDialog::QnAttachToVideowallDialog(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnAttachToVideowallDialog)
