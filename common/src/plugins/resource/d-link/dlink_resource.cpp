@@ -360,7 +360,7 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
 
     static int sensToLevelThreshold[10] = 
     {
-        0, // 0 - aka mask really filtered by media server always
+        0, // 0 - aka mask really filtered by server always
         10, // 1
         25, // 2
         40, // 3

@@ -150,13 +150,14 @@
 #include "llutil/hardware_id.h"
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
 static const char COMPONENT_NAME[] = "MediaServer";
 
-static QString SERVICE_NAME = QString(QLatin1String(VER_COMPANYNAME_STR)) + QString(QLatin1String(" Media Server"));
+static QString SERVICE_NAME = lit("%1 Server").arg(lit(QN_ORGANIZATION_NAME));
 static const quint64 DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
 static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
 static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
@@ -659,7 +660,7 @@ void initAppServerConnection(QSettings &settings)
         QString staticDBPath = settings.value("staticDataDir").toString();
         if (!staticDBPath.isEmpty()) {
             params.addQueryItem("staticdb_path", staticDBPath);
-	    }
+		}
     }
 
     // TODO: Actually appserverPassword is always empty. Remove?
@@ -692,9 +693,9 @@ void initAppServerConnection(QSettings &settings)
 
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");
-    NX_LOG(lit("Connect to enterprise controller server %1").arg(urlNoPassword.toString()), cl_logINFO);
+    NX_LOG(lit("Connect to server %1").arg(urlNoPassword.toString()), cl_logINFO);
     QnAppServerConnectionFactory::setClientGuid(serverGuid().toString());
-    QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
+    QnAppServerConnectionFactory::setUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
 }
 
@@ -776,6 +777,19 @@ void QnMain::updateDisabledVendorsIfNeeded()
     }
 }
 
+void QnMain::updateAllowCameraCHangesIfNeed()
+{
+    static const QString DV_PROPERTY = QLatin1String("allowCameraChanges");
+
+    QString allowCameraChanges = MSSettings::roSettings()->value(DV_PROPERTY).toString();
+    if (!allowCameraChanges.isEmpty())
+    {
+        QnGlobalSettings *settings = QnGlobalSettings::instance();
+        settings->setCameraSettingsOptimizationEnabled(allowCameraChanges.toLower() == lit("true") || allowCameraChanges == lit("1"));
+        MSSettings::roSettings()->remove(DV_PROPERTY);
+    }
+}
+
 void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
 {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
@@ -783,11 +797,11 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
     ec2::ErrorCode rez;
 
     {
-        //reading media servers list
+        //reading servers list
         QnMediaServerResourceList mediaServerList;
         while( ec2Connection->getMediaServerManager()->getServersSync( &mediaServerList) != ec2::ErrorCode::ok )
         {
-            NX_LOG( lit("QnMain::run(). Can't get media servers."), cl_logERROR );
+            NX_LOG( lit("QnMain::run(). Can't get servers."), cl_logERROR );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
@@ -1087,7 +1101,7 @@ QHostAddress QnMain::getPublicAddress()
 
 void QnMain::run()
 {
-    QFile f(QLatin1String(":/cert.pem"));
+    QFile f(getDataDirectory() + lit("/ssl/cert.pem"));
     if (!f.open(QIODevice::ReadOnly)) {
         qWarning() << "No SSL sertificate for mediaServer!";
     } else {
@@ -1112,6 +1126,7 @@ void QnMain::run()
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
+    connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &QnMain::at_emptyDigestDetected);
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/ping*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation*"), AuthMethod::noAuth );
@@ -1187,7 +1202,7 @@ void QnMain::run()
     QnConnectionInfo connectInfo;
     while (!needToStop())
     {
-        const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QnAppServerConnectionFactory::defaultUrl(), &ec2Connection );
+        const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QnAppServerConnectionFactory::url(), &ec2Connection );
         if( errorCode == ec2::ErrorCode::ok )
         {
             connectInfo = ec2Connection->connectionInfo();
@@ -1249,7 +1264,7 @@ void QnMain::run()
 
     if (!compatibilityChecker->isCompatible(COMPONENT_NAME, QnSoftwareVersion(QN_ENGINE_VERSION), "ECS", connectInfo.version))
     {
-        NX_LOG(lit("Incompatible Enterprise Controller version detected! Giving up."), cl_logERROR);
+        NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
         return;
     }
 
@@ -1269,7 +1284,7 @@ void QnMain::run()
     QnRestProcessorPool restProcessorPool;
     QnRestProcessorPool::initStaticInstance( &restProcessorPool );
 
-    if( QnAppServerConnectionFactory::defaultUrl().scheme().toLower() == lit("file") )
+    if( QnAppServerConnectionFactory::url().scheme().toLower() == lit("file") )
         ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
 
     nx_hls::HLSSessionPool hlsSessionPool;
@@ -1425,7 +1440,9 @@ void QnMain::run()
 
 
     //===========================================================================
-    //IPPH264Decoder::dll.init();
+    QnResource::initAsyncPoolInstance()->setMaxThreadCount( MSSettings::roSettings()->value(
+        nx_ms_conf::RESOURCE_INIT_THREADS_COUNT,
+        nx_ms_conf::DEFAULT_RESOURCE_INIT_THREADS_COUNT ).toInt() );
 
     //============================
     std::unique_ptr<UPNPDeviceSearcher> upnpDeviceSearcher(new UPNPDeviceSearcher());
@@ -1518,6 +1535,7 @@ void QnMain::run()
     loadResourcesFromECS(messageProcessor.data());
 #ifndef EDGE_SERVER
     updateDisabledVendorsIfNeeded();
+    updateAllowCameraCHangesIfNeed();
     //QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
 #endif
 
@@ -1644,6 +1662,56 @@ void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
     tran.params = runtimeInfo.data;
     ec2::qnTransactionBus->sendTransaction(tran);
 }
+
+void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password)
+{
+    // fill authenticate digest here for compatibility with version 2.1 and below.
+    const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
+    if (user->getDigest().isEmpty() && !m_updateUserRequests.contains(user->getId()))
+    {
+        user->setPassword(password);
+        user->setName(login);
+        m_updateUserRequests << user->getId();
+        appServerConnection->getUserManager()->save(
+            user, this, 
+            [this, user]( int /*reqID*/, ec2::ErrorCode errorCode ) 
+            {
+                if (errorCode == ec2::ErrorCode::ok) {
+                    ec2::ApiUserData userData;
+                    fromResourceToApi(user, userData);
+                    user->setDigest(userData.digest);
+                }
+                m_updateUserRequests.remove(user->getId());
+            } );
+    }
+}
+
+#ifdef EDGE_SERVER
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <arpa/inet.h>
+#include <net/if.h>
+
+static void mac_eth0(char  MAC_str[13], char** host)
+{
+    #define HWADDR_len 6
+    int s,i;
+    struct ifreq ifr;
+    s = socket(AF_INET, SOCK_DGRAM, 0);
+    strcpy(ifr.ifr_name, "eth0");
+    if (ioctl(s, SIOCGIFHWADDR, &ifr) != -1) {
+        for (i=0; i<HWADDR_len; i++)
+            sprintf(&MAC_str[i*2],"%02X",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
+    }
+    if((ioctl(s, SIOCGIFADDR, &ifr)) != -1) {
+        const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
+        *host = inet_ntoa(ip->sin_addr);
+    }
+    close(s);
+}
+#endif
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
 {

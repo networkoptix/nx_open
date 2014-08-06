@@ -7,8 +7,13 @@
 
         <DirectoryRef Id="INSTALLDIR">
             <Directory Id="${customization}MediaServerDir" Name="MediaServer">
-                <Directory Id="ServerImageFormats" Name="imageformats">
+                <Directory Id="${customization}DbSync22Dir" Name="dbsync-2.2">
+                    <Component Id="dbsync221versionpy">
+                        <File Id="version221.py" Name="version.py" Source="${libdir}/version.py" KeyPath="yes"/>
+                    </Component>
                 </Directory>
+
+                <Directory Id="ServerImageFormats" Name="imageformats"></Directory>
 
                 <Component Id="ServerExecutable">
                     <File Id="ServerExe" Name="mediaserver.exe" Source="$(var.SourceDir)/mediaserver.exe" KeyPath="yes">
@@ -190,6 +195,9 @@
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
             <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
 
+            <ComponentGroupRef Id="DbSync22FilesComponent" />
+
+            <ComponentRef Id="dbsync221versionpy"/>
             <ComponentRef Id='ServerConfiguration'/>
             <ComponentRef Id='ServerConfigurationPassword'/>
 
@@ -208,6 +216,11 @@
             <ComponentRef Id="VmaxProxyQTLibraries"/>
             <ComponentGroupRef Id="VmaxProxySDK"/>
             <?endif?>       
+
+            <ComponentRef Id="traytool.exe"/>
+            <ComponentGroupRef Id="TrayToolQTLibraries"/>
+            <ComponentGroupRef Id="TraytoolPlatforms" />            
+
         </Feature>
 
     </Fragment>

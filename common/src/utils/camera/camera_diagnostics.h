@@ -19,7 +19,7 @@ namespace CameraDiagnostics
         enum Value
         {
             none = 0,
-            //!checking media server availability
+            //!checking server availability
             mediaServerAvailability,
             //!checking that camera responses on base API requests
             cameraAvailability,

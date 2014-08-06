@@ -1,10 +1,10 @@
 #ifndef QN_SERIALIZATION_SQL_FUNCTIONS_H
 #define QN_SERIALIZATION_SQL_FUNCTIONS_H
 
-#include "sql.h"
-
 #include <QtCore/QUuid>
 
+#include "sql.h"
+#include "sql_macros.h"
 #include "enum.h"
 
 // TODO: #Elric enumz!

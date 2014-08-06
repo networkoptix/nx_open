@@ -37,16 +37,6 @@ public:
     explicit QnLoginDialog(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
     virtual ~QnLoginDialog();
 
-    QUrl currentUrl() const;
-    QString currentName() const;
-    QnConnectionInfo currentInfo() const;
-
-    bool restartPending() const;
-
-    bool rememberPassword() const;
-
-    void setAutoConnect(bool value = true);
-
 public slots:
     virtual void accept() override;
     virtual void reject() override;
@@ -80,11 +70,16 @@ private slots:
     void at_saveButton_clicked();
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
-    void at_ec2ConnectFinished( int handle, ec2::ErrorCode errorCode, const ec2::AbstractECConnectionPtr &connection);
 
     void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress);
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
+private:
+    QUrl currentUrl() const;
+    QString currentName() const;
+
+    /** Save current connection credentials. */
+    void updateStoredConnections(const QUrl &url, const QString &name);
 private:
     QScopedPointer<Ui::LoginDialog> ui;
     QStandardItemModel *m_connectionsModel;
@@ -93,7 +88,6 @@ private:
     QStandardItem* m_autoFoundItem;
 
     int m_requestHandle;
-    QnConnectionInfo m_connectInfo;
 
     QnRenderingWidget *m_renderingWidget;
     QnModuleFinder *m_moduleFinder;
@@ -109,12 +103,8 @@ private:
         }
     };
 
-    /** Hash list of automatically found Enterprise Controllers based on seed as key. */
+    /** Hash list of automatically found Servers based on seed as key. */
     QMap<QString, QnEcData> m_foundEcs;
-    std::unique_ptr<CompatibilityVersionInstallationDialog> m_installationDialog;
-
-    bool m_restartPending;
-    bool m_autoConnectPending;
 };
 
 #endif // LOGINDIALOG_H

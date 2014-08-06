@@ -67,7 +67,7 @@ public:
      * \param cycleIntervalSecs         Background animation cycle, in seconds.
      * \param parent                    Context-aware parent.
      */
-    QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent = NULL);
+    QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent = NULL, QnWorkbenchContext *context = NULL);
 
     virtual ~QnGradientBackgroundPainter();
 

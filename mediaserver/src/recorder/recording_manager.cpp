@@ -561,7 +561,7 @@ void QnRecordingManager::onTimer()
 
 QnResourceList QnRecordingManager::getLocalControlledCameras()
 {
-    // return own cameras + cameras from media servers without DB (remote connected servers)
+    // return own cameras + cameras from servers without DB (remote connected servers)
     const QnResourceList& cameras = qnResPool->getAllCameras(QnResourcePtr());
     QnResourceList result;
     foreach(QnResourcePtr camRes, cameras)
@@ -586,7 +586,7 @@ void QnRecordingManager::at_checkLicenses()
     if (!helper.isValid())
     {
         if (++m_tooManyRecordingCnt < 5)
-            return; // do not report license problem immediately. Server should wait several minutes, probably other media servers will be available soon
+            return; // do not report license problem immediately. Server should wait several minutes, probably other servers will be available soon
 
 
         ec2::QnDbManager::instance()->markLicenseOverflow(true, qnSyncTime->currentMSecsSinceEpoch());

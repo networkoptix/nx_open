@@ -461,7 +461,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         item->addActionButton(
             qnSkin->icon("events/connection.png"),
             tr("Connect to server"),
-            Qn::ConnectToServerAction
+            Qn::OpenLoginDialogAction
         );
         break;
     case QnSystemHealth::EmailSendError:

@@ -184,6 +184,10 @@ public:
         registerSerializer<QString>();
         registerSerializer<QByteArray>();
         
+        registerSerializer<QStringList>();
+        registerSerializer<QList<QString>>();
+        registerSerializer<QList<QByteArray>>();
+
         registerSerializer<QColor>();
         registerSerializer<QBrush>();
         registerSerializer<QSize>();
@@ -199,6 +203,8 @@ public:
         registerSerializer<QUuid>();
         registerSerializer<QUrl>();
         registerSerializer<QFont>();
+
+        registerSerializer<QnLatin1Array>();
     }
 };
 

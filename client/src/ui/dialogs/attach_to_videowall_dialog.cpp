@@ -12,7 +12,7 @@
 #include <utils/license_usage_helper.h>
 
 QnAttachToVideowallDialog::QnAttachToVideowallDialog(QWidget *parent) :
-    QnButtonBoxDialog(parent),
+    base_type(parent),
     ui(new Ui::QnAttachToVideowallDialog),
     m_licenseHelper(new QnVideoWallLicenseUsageHelper())
 {

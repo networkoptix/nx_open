@@ -489,8 +489,8 @@ bool QnTransactionMessageBus::doHandshake(QnTransactionTransport* transport)
 
         QnTransaction<ApiCameraServerItemDataList> tranCameraHistory;
         tranCameraHistory.command = ApiCommand::getCameraHistoryItems;
-        tranLayouts.peerID = m_localPeer.id;
-        if (dbManager->doQuery(nullptr, tranLayouts.params) != ErrorCode::ok) {
+        tranCameraHistory.peerID = m_localPeer.id;
+        if (dbManager->doQuery(nullptr, tranCameraHistory.params) != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
         }
@@ -718,7 +718,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
 {
     if (!dbManager)
     {
-        qWarning() << "This peer connected to remote EC. Ignoring incoming connection";
+        qWarning() << "This peer connected to remote Server. Ignoring incoming connection";
         return;
     }
 

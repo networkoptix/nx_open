@@ -183,13 +183,10 @@ public:
 
         AuxilaryPtzCapability               = 0x01000000,
 
-        builtinPresetControl                = 0x02000000,
-
         /* Shortcuts */
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
-        nativePresetsPtzCapability          = PresetsPtzCapability | builtinPresetControl,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PtzCapability)
 
@@ -378,11 +375,10 @@ public:
         TimePeriodRole,
         TimePeriodsRole,
         MergedTimePeriodsRole,
-        AutoConnectRole,
         FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
         TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
-        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
+        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and ConnectAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
         UuidRole,                                   /**< Role for target uuid. Used in LoadVideowallMatrixAction. */
@@ -556,14 +552,19 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzCoordinateSpace)(Qn::MotionType)
+    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType), 
     (metatype)(lexical)
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ServerFlags)(Qn::PtzDataFields)(Qn::PtzCapabilities)(Qn::CameraStatusFlags),
+    (Qn::PtzCapabilities),
+    (metatype)(numeric)(lexical)
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::ServerFlags)(Qn::PtzDataFields)(Qn::CameraStatusFlags),
     (metatype)(numeric)
 )
 

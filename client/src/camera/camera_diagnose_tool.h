@@ -69,7 +69,7 @@ namespace CameraDiagnostics
 
     public slots:
         void onGetServerSystemNameResponse( int status, QString serverSystemName, int handle );
-        //!Receives response from media server
+        //!Receives response from server
         /*!
             \param status \a QNetworkReply::NetworkError
             \param performedStep Constant from \a Step::Value enumeration

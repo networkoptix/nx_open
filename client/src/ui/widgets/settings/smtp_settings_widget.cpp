@@ -137,7 +137,7 @@ void QnSmtpSettingsWidget::updateFocusedElement() {
     }
 }
 
-QnEmail::Settings QnSmtpSettingsWidget::settings() {
+QnEmail::Settings QnSmtpSettingsWidget::settings() const {
 
     QnEmail::Settings result;
 
@@ -370,4 +370,8 @@ void QnSmtpSettingsWidget::validateEmailAdvanced() {
     }
 
     ui->supportEmailWarningLabel->setText(errorText);
+}
+
+bool QnSmtpSettingsWidget::hasChanges() const  {
+    return settings() != QnGlobalSettings::instance()->emailSettings();
 }

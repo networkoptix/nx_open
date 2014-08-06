@@ -182,6 +182,11 @@ const QByteArray &QnLicense::key() const
     return m_key;
 }
 
+void QnLicense::setKey(const QByteArray& value)
+{
+    m_key = value;
+}
+
 qint32 QnLicense::cameraCount() const
 {
     return m_cameraCount;

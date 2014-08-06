@@ -35,13 +35,13 @@ public:
     enum Flag 
     { 
         Flag_SlowSource = 1, 
-        Flag_CanProcessNegativeSpeed = 2,   // flag inform that delegate is going to process negative speed. If flag is not setted, ArchiveReader is going to process negative speed
+        Flag_CanProcessNegativeSpeed = 2,   // flag inform that delegate is going to process negative speed. If flag is not set, ArchiveReader is going to process negative speed
         Flag_CanProcessMediaStep = 4,       // flag inform that delegate is going to process media step itself.
         Flag_CanSendMotion       = 8,       // motion supported
-        Flag_CanOfflineRange     = 16,      // delegate can return range immediately withouht opening archive
-        Flag_CanSeekImmediatly   = 32,      // delegate can perform seek operation immediatly, without 'open' function call
-        Flag_CanOfflineLayout    = 64,      // delegate can return audio/video layout immediatly withouht opening archive
-        Flag_UnsyncTime          = 128      // delegate may provide media data with unsync time (non equal to EC time)
+        Flag_CanOfflineRange     = 16,      // delegate can return range immediately without opening archive
+        Flag_CanSeekImmediatly   = 32,      // delegate can perform seek operation immediately, without 'open' function call
+        Flag_CanOfflineLayout    = 64,      // delegate can return audio/video layout immediately without opening archive
+        Flag_UnsyncTime          = 128      // delegate may provide media data with not synced time (non equal to Server time)
     
     };
     Q_DECLARE_FLAGS(Flags, Flag);
@@ -56,7 +56,7 @@ public:
     virtual QnAbstractMediaDataPtr getNextData() = 0;
     // If findIFrame=true, jump to position before time to a nearest IFrame.
     /*!
-       \ mpagaram time UTC, usec
+       \ param time UTC, usec
         \param chunkInfo If not NULL, implementation fills this structure with info of chunk, containing found position
     */
     virtual qint64 seek (qint64 time, bool findIFrame) = 0;

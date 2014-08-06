@@ -52,9 +52,6 @@ private:
 
     bool canStartVideowall(const QnVideoWallResourcePtr &videowall);
 
-    /** Sync check that we can close client silently. Ask about unsaved layouts etc. */
-    bool canClose();
-
     void startVideowallAndExit(const QnVideoWallResourcePtr &videoWall);
 
     void openNewWindow(const QStringList &args);

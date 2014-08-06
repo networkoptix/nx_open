@@ -48,7 +48,6 @@ namespace {
 // -------------------------------------------------------------------------- //
 QnResourceSelectionDialog::QnResourceSelectionDialog(SelectionTarget target, QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     m_resourceModel(NULL),
     m_delegate(NULL),
     m_thumbnailManager(NULL),
@@ -61,7 +60,6 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(SelectionTarget target, QWi
 
 QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     m_resourceModel(NULL),
     m_delegate(NULL),
     m_thumbnailManager(NULL),

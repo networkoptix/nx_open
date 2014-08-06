@@ -55,6 +55,7 @@ bool MyIsUserAnAdmin()
 }
 
 QnSystrayWindow::QnSystrayWindow()
+    : m_mediaServerSettings(QSettings::SystemScope, qApp->organizationName(), MEDIA_SERVER_NAME)
 {
     m_iconOK = QIcon(lit(":/traytool.png"));
     m_iconBad = QIcon(lit(":/traytool.png"));
@@ -464,6 +465,11 @@ void QnSystrayWindow::createActions()
     m_quitAction = new QAction(tr("&Quit"), this);
     connect(m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
+    m_showMediaServerLogAction = new QAction(tr("Show &Media Server Log"), this);
+    m_showMediaServerLogAction->setObjectName(lit("showMediaServerLog"));
+    m_actions.push_back(m_showMediaServerLogAction);
+    connectElevatedAction(m_showMediaServerLogAction, SIGNAL(triggered()), this, SLOT(onShowMediaServerLogAction()));
+
     m_mediaServerStartAction = new QAction(QString(tr("Start Media Server")), this);
     m_mediaServerStartAction->setObjectName(lit("startMediaServer"));
     m_actions.push_back(m_mediaServerStartAction);
@@ -482,32 +488,37 @@ void QnSystrayWindow::createActions()
     updateServiceInfo();
 }
 
- QAction* QnSystrayWindow::actionByName(const QString &name)
- {
-     foreach(QAction *action, m_actions)
-        if (action->objectName() == name)
-            return action;
-     return NULL;
- }
+void QnSystrayWindow::onShowMediaServerLogAction()
+{
+    QString logFileName = m_mediaServerSettings.value(lit("logFile")).toString() + lit(".log");
+    QProcess::startDetached(lit("notepad ") + logFileName);
+};
 
- QString QnSystrayWindow::nameByAction(QAction* action)
- {
-     return action->objectName();
- }
+QAction* QnSystrayWindow::actionByName(const QString &name)
+{
+    foreach(QAction *action, m_actions)
+       if (action->objectName() == name)
+           return action;
+    return NULL;
+}
+
+QString QnSystrayWindow::nameByAction(QAction* action)
+{
+    return action->objectName();
+}
 
 void QnSystrayWindow::createTrayIcon()
 {
     m_trayIconMenu = new QMenu();
 
     m_trayIconMenu->addAction(m_mediaServerWebAction);
+
+    m_trayIconMenu->addSeparator();
     m_trayIconMenu->addAction(m_mediaServerStartAction);
     m_trayIconMenu->addAction(m_mediaServerStopAction);
-    m_trayIconMenu->addSeparator();
+    m_trayIconMenu->addAction(m_showMediaServerLogAction);
 
     m_trayIconMenu->addSeparator();
-
-    m_trayIconMenu->addSeparator();
-
     m_trayIconMenu->addAction(m_quitAction);
 
     m_trayIcon = new QSystemTrayIcon(this);

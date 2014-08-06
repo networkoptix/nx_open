@@ -11,6 +11,7 @@
 
 namespace ec2
 {
+    //!Connection to old (python-based) EC. Does not provide any functionality, every method returns \a notImplemented error
     class OldEcConnection
     :
         public AbstractECConnection

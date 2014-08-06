@@ -1,6 +1,7 @@
 #ifndef QN_ID_H
 #define QN_ID_H
 
+#include <QCryptographicHash>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
 #include <QtCore/QUuid>

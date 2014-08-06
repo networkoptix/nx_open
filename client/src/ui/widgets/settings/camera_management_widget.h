@@ -21,6 +21,8 @@ public:
     virtual void updateFromSettings() override;
     virtual void submitToSettings() override;
 
+    virtual bool hasChanges() const override;
+
 private slots:
     void at_autoDiscoveryCheckBox_clicked();
 

@@ -567,8 +567,9 @@ void QnVideowallItemWidget::setInfoVisible(bool visible, bool animate) {
         m_footerWidget->setOpacity(opacity);
     }
 
-    m_infoButton->setChecked(visible);
+    setOverlayVisible(visible || m_hoverProcessor->isHovered(), animate);
 
+    m_infoButton->setChecked(visible);
     emit infoVisibleChanged(visible);
 }
 

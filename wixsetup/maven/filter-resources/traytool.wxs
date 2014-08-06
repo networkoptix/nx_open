@@ -50,21 +50,15 @@
 
         <ComponentGroup Id="TraytoolPlatforms" Directory="TraytoolPlatforms">
             <Component>
-                <File Id="Traytoolqminimal$(var.suffix).dll" Name="Traytoolqminimal4.dll" Source="$(var.SourceDir)\platforms\qminimal$(var.suffix).dll" />
+                <File Id="Traytoolqminimal$(var.suffix).dll" Name="qminimal.dll" Source="$(var.SourceDir)\platforms\qminimal$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="Traytoolqoffscreen$(var.suffix).dll" Name="Traytoolqoffscreen4.dll" Source="$(var.SourceDir)\platforms\qoffscreen$(var.suffix).dll" />
+                <File Id="Traytoolqoffscreen$(var.suffix).dll" Name="qoffscreen.dll" Source="$(var.SourceDir)\platforms\qoffscreen$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="Traytoolqwindows$(var.suffix).dll" Name="Traytoolqwindows4.dll" Source="$(var.SourceDir)\platforms\qwindows$(var.suffix).dll" />
+                <File Id="Traytoolqwindows$(var.suffix).dll" Name="qwindows.dll" Source="$(var.SourceDir)\platforms\qwindows$(var.suffix).dll" />
             </Component>      
         </ComponentGroup>         
-
-        <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
-            <ComponentRef Id="traytool.exe"/>
-            <ComponentGroupRef Id="TrayToolQTLibraries"/>
-            <ComponentGroupRef Id="TraytoolPlatforms" />            
-        </Feature>
 
     </Fragment>
 </Wix>

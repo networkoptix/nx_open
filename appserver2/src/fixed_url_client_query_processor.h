@@ -16,7 +16,7 @@
 
 namespace ec2
 {
-    //!Calls \a ClientQueryProcessor::processQueryAsync with pre-specified EC url
+    //!Calls \a ClientQueryProcessor::processQueryAsync with pre-specified Server url
     /*!
         \warning \a ClientQueryProcessor instance MUST be alive for the whole \a FixedUrlClientQueryProcessor live time
     */

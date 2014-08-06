@@ -188,12 +188,6 @@ OnvifResourceSearcherWsdd::~OnvifResourceSearcherWsdd()
     m_ifaceToSock.clear();
 }
 
-OnvifResourceSearcherWsdd& OnvifResourceSearcherWsdd::instance()
-{
-    static OnvifResourceSearcherWsdd inst;
-    return inst;
-}
-
 void OnvifResourceSearcherWsdd::pleaseStop()
 {
     m_shouldStop = true;

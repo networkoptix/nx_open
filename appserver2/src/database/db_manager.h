@@ -303,6 +303,7 @@ namespace ec2
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnId& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
+        ErrorCode checkExistingUser(const QString &name, qint32 internalId);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);
         ErrorCode removeVideowall(const QnId& id);
@@ -326,7 +327,7 @@ namespace ec2
         ErrorCode addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
         ErrorCode removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
 
-        bool createDatabase(bool *dbJustCreated);
+        bool createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2);
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
         
@@ -341,6 +342,7 @@ namespace ec2
         enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_INT};
 
         QMap<int, QnId> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
+
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
         bool updateGuids();
         QnId getType(const QString& typeName);

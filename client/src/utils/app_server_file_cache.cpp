@@ -27,7 +27,7 @@ QnAppServerFileCache::~QnAppServerFileCache(){}
 
 QString QnAppServerFileCache::getFullPath(const QString &filename) const {
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    QUrl url = QnAppServerConnectionFactory::defaultUrl();
+    QUrl url = QnAppServerConnectionFactory::url();
     return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/%2_%3/%4/%5"))
                                     .arg(path)
                                     .arg(url.host(QUrl::FullyEncoded))

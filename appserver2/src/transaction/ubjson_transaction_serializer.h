@@ -1,6 +1,8 @@
 #ifndef __UBJSON_TRANSACTION_SERIALIZER_H_
 #define __UBJSON_TRANSACTION_SERIALIZER_H_
 
+#include <memory>
+
 #include <QtCore/QCache>
 
 #include <transaction/transaction.h>
@@ -17,7 +19,13 @@ namespace ec2
     class QnUbjsonTransactionSerializer: public Singleton<QnUbjsonTransactionSerializer>
     {
     public:
-        QnUbjsonTransactionSerializer() {}
+        static const int MAX_CACHE_SIZE_BYTES = 512*1024;
+
+        QnUbjsonTransactionSerializer()
+        :
+            m_cache(MAX_CACHE_SIZE_BYTES)
+        {
+        }
 
         template<class T>
         QByteArray serializedTransaction(const QnTransaction<T>& tran) {
@@ -28,13 +36,17 @@ namespace ec2
             if (!tran.persistentInfo.isNull() && m_cache.contains(tran.persistentInfo))
                 return *m_cache[tran.persistentInfo];
 
-            QByteArray* result = new QByteArray();
-            QnUbjsonWriter<QByteArray> stream(result);
+            std::unique_ptr<QByteArray> serializedTran( new QByteArray() );
+            QnUbjsonWriter<QByteArray> stream(serializedTran.get());
             QnUbjson::serialize( tran, &stream );
-            if (!tran.persistentInfo.isNull())
-                m_cache.insert(tran.persistentInfo, result);
+            QByteArray result = *serializedTran;
+            if( !tran.persistentInfo.isNull() )
+            {
+                m_cache.insert( tran.persistentInfo, serializedTran.get(), serializedTran->size() );
+                serializedTran.release();
+            }
 
-            return *result;
+            return result;
         }
 
         template<class T>
@@ -55,6 +67,5 @@ namespace ec2
     };
 
 }
-
 
 #endif // __UBJSON_TRANSACTION_SERIALIZER_H_

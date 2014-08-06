@@ -19,13 +19,13 @@ QnSettingsScrollArea::QnSettingsScrollArea(QWidget* parent):
     setWidgetResizable(true);
 }
 
-void QnSettingsScrollArea::addWidget(QWidget& widgetToAdd)
+void QnSettingsScrollArea::addWidget(QWidget *widgetToAdd)
 {
     if (widget()->layout()->count() != 0)
         widget()->layout()->removeItem(widget()->layout()->itemAt(widget()->layout()->count() - 1));
 
-    widgetToAdd.setParent(widget());
-    dynamic_cast<QVBoxLayout*>(widget()->layout())->addWidget(&widgetToAdd);
+    widgetToAdd->setParent(widget());
+    dynamic_cast<QVBoxLayout*>(widget()->layout())->addWidget(widgetToAdd);
     static_cast<QVBoxLayout*>(widget()->layout())->addStretch(1);
 }
 
@@ -45,19 +45,16 @@ void QnSettingsSlider::keyReleaseEvent(QKeyEvent *event)
 }
 //==============================================
 
-QnAbstractSettingsWidget::QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea &parent, const QString& hint)
+QnAbstractSettingsWidget::QnAbstractSettingsWidget(const CameraSetting &obj, QnSettingsScrollArea *parent, const QString& hint)
     : QWidget(0),
       m_param(obj),
-      m_handler(handler),
       m_layout(new QHBoxLayout()),
       m_hint(hint)
 {
-    parent.addWidget(*this);
+    if (parent)
+        parent->addWidget(this);
     setLayout(m_layout);
     setToolTip(m_hint);
-
-    QObject::connect(this, SIGNAL( setAdvancedParam(const CameraSetting&) ),
-        handler, SLOT( setAdvancedParam(const CameraSetting&) )  );
 }
 
 QnAbstractSettingsWidget::~QnAbstractSettingsWidget()
@@ -65,7 +62,7 @@ QnAbstractSettingsWidget::~QnAbstractSettingsWidget()
 
 }
 
-const CameraSetting& QnAbstractSettingsWidget::param() const
+CameraSetting QnAbstractSettingsWidget::param() const
 {
     return m_param;
 }
@@ -73,12 +70,12 @@ const CameraSetting& QnAbstractSettingsWidget::param() const
 void QnAbstractSettingsWidget::setParam(const CameraSettingValue& val)
 {
     m_param.setCurrent(val);
-    emit setAdvancedParam(m_param);
+    emit advancedParamChanged(m_param);
 }
 
 //==============================================
-QnSettingsOnOffWidget::QnSettingsOnOffWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent):
-    QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
+QnSettingsOnOffWidget::QnSettingsOnOffWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
+    QnAbstractSettingsWidget(obj, parent, obj.getDescription())
 {
     m_checkBox = new QCheckBox(m_param.getName());
     m_layout->addWidget(m_checkBox);
@@ -115,8 +112,8 @@ void QnSettingsOnOffWidget::updateParam(QString val)
 }
 
 //==============================================
-QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent):
-    QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
+QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
+    QnAbstractSettingsWidget(obj, parent, obj.getDescription())
 {
     QVBoxLayout *vlayout = new QVBoxLayout();
     m_layout->addLayout(vlayout);
@@ -170,8 +167,8 @@ void QnSettingsMinMaxStepWidget::updateParam(QString val)
 }
 
 //==============================================
-QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent):
-    QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
+QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
+    QnAbstractSettingsWidget(obj, parent, obj.getDescription())
 {
     QVBoxLayout *vlayout = new QVBoxLayout();
     m_layout->addLayout(vlayout);
@@ -248,9 +245,8 @@ QRadioButton* QnSettingsEnumerationWidget::getBtnByname(const QString& name)
 }
 
 //==================================================
-QnSettingsButtonWidget::QnSettingsButtonWidget(QObject* handler, const CameraSetting& obj, QnSettingsScrollArea& parent):
-    QnAbstractSettingsWidget(handler, m_dummyVal, parent, obj.getDescription()), //ToDo: remove ugly hack: dummyVal potentially can be used before instantiation
-    m_dummyVal(obj)
+QnSettingsButtonWidget::QnSettingsButtonWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
+    QnAbstractSettingsWidget(obj, parent, obj.getDescription())
 {
     QPushButton* btn = new QPushButton(m_param.getName());
     m_layout->addWidget(new QWidget());
@@ -279,8 +275,8 @@ void QnSettingsButtonWidget::updateParam(QString /*val*/)
 }
 
 //==============================================
-QnSettingsTextFieldWidget::QnSettingsTextFieldWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent):
-    QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
+QnSettingsTextFieldWidget::QnSettingsTextFieldWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
+    QnAbstractSettingsWidget(obj, parent, obj.getDescription())
 {
     m_lineEdit = new QLineEdit();
     m_lineEdit->setText(obj.getCurrent());
@@ -310,8 +306,8 @@ void QnSettingsTextFieldWidget::updateParam(QString val)
 }
 
 //==============================================
-QnSettingsControlButtonsPairWidget::QnSettingsControlButtonsPairWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent):
-    QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
+QnSettingsControlButtonsPairWidget::QnSettingsControlButtonsPairWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
+    QnAbstractSettingsWidget(obj, parent, obj.getDescription())
 {
     QHBoxLayout *hlayout = new QHBoxLayout();
     m_layout->addLayout(hlayout);
