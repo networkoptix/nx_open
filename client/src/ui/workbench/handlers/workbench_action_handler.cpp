@@ -440,7 +440,6 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
 #else
     QProcess::startDetached(qApp->applicationFilePath(), arguments);
 #endif
-        QnLicenseUsageHelper helper(cameras, cameraSettingsDialog()->widget()->isScheduleEnabled());
 }
 
 void QnWorkbenchActionHandler::rotateItems(int degrees){

@@ -270,58 +270,6 @@ bool QnDbManager::resyncTransactionLog()
     return true;
 }
 
-template <class ObjectType, class ObjectListType>
-bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
-{
-    ObjectListType objects;
-    ErrorCode errCode = doQueryNoLock(nullptr, objects);
-    if (errCode != ErrorCode::ok)
-        return false;
-
-    foreach(const ObjectType& object, objects)
-    {
-        QnTransaction<ObjectType> transaction(command);
-        transaction.fillPersistentInfo();
-        transaction.params = object;
-        if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
-            return false;
-    }
-    return true;
-}
-
-bool QnDbManager::addTransactionForGeneralSettings()
-{
-    ApiResourceParamsData object;
-    ErrorCode errCode = doQueryNoLock(m_adminUserID, object);
-    if (errCode != ErrorCode::ok)
-        return false;
-
-    QnTransaction<ApiResourceParamsData> transaction(ApiCommand::setResourceParams);
-    transaction.fillPersistentInfo();
-    transaction.params = object;
-    if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
-        return false;
-    return true;
-}
-
-bool QnDbManager::resyncTransactionLog()
-{
-    if (!fillTransactionLogInternal<ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
-        return false;
-    if (!fillTransactionLogInternal<ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
-        return false;
-    if (!fillTransactionLogInternal<ApiCameraData, ApiCameraDataList>(ApiCommand::saveCamera))
-        return false;
-    if (!fillTransactionLogInternal<ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
-        return false;
-    if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
-        return false;
-    if (!addTransactionForGeneralSettings())
-        return false;
-
-    return true;
-}
-
 bool QnDbManager::init()
 {
     if (!m_sdb.open())
