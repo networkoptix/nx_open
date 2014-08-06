@@ -542,6 +542,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
 
         QnMediaDewarpingParams dewarpingParams = m_camera->getDewarpingParams();
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
+        dewarpingParams.enabled = ui->generalCameraSettingsWidget->isFisheyeEnabled();
         m_camera->setDewarpingParams(dewarpingParams);
 
         setHasDbChanges(false);
@@ -629,7 +630,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         }
     }
 
-    ui->tabWidget->setTabEnabled(Qn::FisheyeCameraSettingsTab, ui->fisheyeCheckBox->isChecked());
+    ui->tabWidget->setTabEnabled(Qn::FisheyeCameraSettingsTab, ui->generalCameraSettingsWidget->isFisheyeEnabled());
 
     updateMotionWidgetFromResource();
     updateMotionAvailability();
@@ -991,7 +992,6 @@ void QnSingleCameraSettingsWidget::at_dbDataChanged() {
     if (m_updating)
         return;
 
-    ui->tabWidget->setTabEnabled(Qn::FisheyeCameraSettingsTab, ui->fisheyeCheckBox->isChecked());
     setHasDbChanges(true);
 }
 
@@ -1059,6 +1059,10 @@ void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged() {
     at_dbDataChanged();
     at_cameraDataChanged();
 
+
+    // Update tab enabled state
+    ui->tabWidget->setTabEnabled(Qn::FisheyeCameraSettingsTab, ui->generalCameraSettingsWidget->isFisheyeEnabled());
+
     // Preview the changes on the central widget
 
     QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
@@ -1068,7 +1072,7 @@ void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged() {
     if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget)) {
         QnMediaDewarpingParams dewarpingParams = mediaWidget->dewarpingParams();
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
-        dewarpingParams.enabled = ui->fisheyeCheckBox->isChecked();
+        dewarpingParams.enabled = ui->generalCameraSettingsWidget->isFisheyeEnabled();
         mediaWidget->setDewarpingParams(dewarpingParams);
 
         QnWorkbenchItem *item = mediaWidget->item();
