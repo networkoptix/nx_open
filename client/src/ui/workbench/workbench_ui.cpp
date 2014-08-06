@@ -355,8 +355,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(display(),                  &QnWorkbenchDisplay::viewportUngrabbed,     this,           &QnWorkbenchUi::enableProxyUpdates);
     connect(display(),                  &QnWorkbenchDisplay::widgetChanged,         this,           &QnWorkbenchUi::at_display_widgetChanged);
 
-    display()->view()->addAction(action(Qn::DisableBackgroundAnimationAction));
-    connect(action(Qn::DisableBackgroundAnimationAction),&QAction::triggered,       this,           &QnWorkbenchUi::at_disableBackgroundAnimationAction_triggered);
     /* Init fields. */
     m_pinOffset = (24 - QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL)) / 2.0;
 
@@ -2474,12 +2472,3 @@ void QnWorkbenchUi::createFpsWidget() {
 }
 
 #pragma endregion Fps widget methods
-
-void QnWorkbenchUi::at_disableBackgroundAnimationAction_triggered() {
-    QnMainWindow* mainWindow = checked_cast<QnMainWindow*>( context()->mainWindow() );
-    // Ivanov advice me that mainWindow may be NULL pointer for context()->mainWindow() may
-    // return NULL pointer. It is possible , so I add a NULL pointer check branch here
-    if( mainWindow == NULL ) 
-        return;
-    mainWindow->flipBackgroundAnimation();
-}

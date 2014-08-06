@@ -161,8 +161,6 @@ public slots:
     void setCalendarOpened(bool opened = true, bool animate = true);
     void setDayTimeWidgetOpened(bool opened = true, bool animate = true);
     void setSearchOpened(bool opened = true, bool animate = true);
-
-    void at_disableBackgroundAnimationAction_triggered();
 protected:
     virtual bool event(QEvent *event) override;
 

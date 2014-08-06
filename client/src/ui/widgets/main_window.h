@@ -51,7 +51,6 @@ public:
     Options options() const;
     void setOptions(Options options);
 
-    void flipBackgroundAnimation();
     void setAnimationsEnabled(bool enabled = true);
 
     QWidget *viewport() const;

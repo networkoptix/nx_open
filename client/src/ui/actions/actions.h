@@ -960,9 +960,9 @@ namespace Qn {
         ToggleSyncAction,
 
         /**
-         * Disable the background animation
+         * Toggle the background animation.
          */
-        DisableBackgroundAnimationAction,
+        ToggleBackgroundAnimationAction,
 
         /* Debug actions. */
 
