@@ -335,7 +335,7 @@ void QnCameraSettingsDialog::at_selectionChangeAction_triggered() {
 void QnCameraSettingsDialog::at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult) {
     QString error = httpStatusCode == 0 
         ? lit("Possibly, appropriate camera's service is unavailable now")
-        : lit("Mediaserver returned the following error code : ") + httpStatusCode; // #TR #Elric
+        : lit("Server returned the following error code : ") + httpStatusCode; // #TR #Elric
 
     QString failedParams;
     for (auto it = operationResult.constBegin(); it != operationResult.constEnd(); ++it)
