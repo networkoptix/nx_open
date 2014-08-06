@@ -110,18 +110,19 @@ namespace aio
                 m_sockets.insert( it, make_pair( sockCtx, it->second ) );
                 return true;
             }
+            assert( false );    //we MUST use same thread for monitoring all events on single socket
         }
 
-        //searching for to least-used thread, which is ready to accept
+        //searching for a least-used thread, which is ready to accept
         AIOThread* threadToUse = NULL;
         for( std::list<AIOThread*>::const_iterator
             threadIter = m_threadPool.begin();
             threadIter != m_threadPool.end();
             ++threadIter )
         {
-            if( !(*threadIter)->canAcceptSocket( eventToWatch ) )
+            if( !(*threadIter)->canAcceptSocket(sock) )
                 continue;
-            if( threadToUse && threadToUse->size(eventToWatch) < (*threadIter)->size(eventToWatch) )
+            if( threadToUse && threadToUse->socketsHandled() < (*threadIter)->socketsHandled() )
                 continue;
             threadToUse = *threadIter;
         }

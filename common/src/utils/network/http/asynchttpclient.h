@@ -43,7 +43,6 @@ namespace nx_http
     class AsyncHttpClient
     :
         public QObject,
-        //public aio::AIOEventHandler,
         public std::enable_shared_from_this<AsyncHttpClient>
     {
         Q_OBJECT

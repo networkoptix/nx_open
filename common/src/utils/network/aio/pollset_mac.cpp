@@ -19,6 +19,8 @@
 #include "../system_socket_impl.h"
 
 
+//TODO #ak get rid of PollSetImpl::monitoredEvents due to performance cosiderations
+
 using namespace std;
 
 namespace aio
@@ -257,7 +259,7 @@ namespace aio
         return userData;
     }
 
-    size_t PollSet::size( EventType /*eventType*/ ) const
+    size_t PollSet::size() const
     {
         return m_impl->monitoredEvents.size();
     }
@@ -295,6 +297,11 @@ namespace aio
 
         m_impl->receivedEventCount = result;
         return result;
+    }
+
+    bool PollSet::canAcceptSocket( AbstractSocket* const /*sock*/ ) const
+    {
+        return true;
     }
 
     //!Returns iterator pointing to first socket, which state has been changed in previous \a poll call

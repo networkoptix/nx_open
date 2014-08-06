@@ -416,9 +416,8 @@ namespace aio
         }
     }
 
-    size_t PollSet::size( EventType /*eventType*/ ) const
+    size_t PollSet::size() const
     {
-        //TODO #ak: return only for events eventType
         return m_impl->monitoredEvents.size();
     }
 
@@ -448,6 +447,11 @@ namespace aio
             millisToWait < 0 ? -1 : millisToWait );
         m_impl->signalledSockCount = result < 0 ? 0 : result;
         return result;
+    }
+
+    bool PollSet::canAcceptSocket( AbstractSocket* const /*sock*/ ) const
+    {
+        return true;
     }
 
     //!Returns iterator pointing to first socket, which state has been changed in previous \a poll call
