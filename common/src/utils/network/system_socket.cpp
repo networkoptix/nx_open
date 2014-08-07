@@ -1009,7 +1009,7 @@ int CommunicatingSocket::send( const void* buffer, unsigned int bufferLen )
 }
 
 //!Implementation of AbstractCommunicatingSocket::getForeignAddress
-SocketAddress CommunicatingSocket::_getForeignAddress() const
+SocketAddress CommunicatingSocket::getForeignAddress() const
 {
     sockaddr_in addr;
     unsigned int addr_len = sizeof(addr);
@@ -1094,9 +1094,9 @@ bool CommunicatingSocket::connectAsyncImpl( const SocketAddress& addr, std::func
     CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>(impl());
 
     unsigned int sendTimeout = 0;
-    if( !_getSendTimeout( &sendTimeout ) )
+    if( !getSendTimeout( &sendTimeout ) )
         return false;
-    if( !_connect( addr.address.toString(), addr.port, sendTimeout ) )
+    if( !connect( addr.address.toString(), addr.port, sendTimeout ) )
         return false;
 
     d->connectHandler = std::move(handler);
@@ -1365,7 +1365,7 @@ TCPServerSocket::TCPServerSocket()
 :
     base_type( SOCK_STREAM, IPPROTO_TCP, new TCPServerSocketPrivate() )
 {
-    static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl())->socketHandle = m_implDelegate._handle();
+    static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl())->socketHandle = m_implDelegate.handle();
     setRecvTimeout( DEFAULT_ACCEPT_TIMEOUT_MSEC );
 }
 
@@ -1381,7 +1381,7 @@ bool TCPServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCod
     ++d->acceptAsyncCallCount;
 
     d->acceptHandler = std::move(handler);
-    //TODO: #ak usually acceptAsyncImpl will be called constantly. SHOULD avoid unneccessary watchSocket and removeFromWatch calls
+    //TODO: #ak usually acceptAsyncImpl is called repeatedly. SHOULD avoid unneccessary watchSocket and removeFromWatch calls
     return aio::AIOService::instance()->watchSocket( this, aio::etRead, d );
 }
 
