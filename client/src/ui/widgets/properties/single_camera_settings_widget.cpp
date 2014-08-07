@@ -701,6 +701,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
                 }
             }
             ui->forceArComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
+        } else {
+            ui->forceArComboBox->setCurrentIndex(0);
         }
 
         QString rotation = m_camera->getProperty(QnMediaResource::rotationKey());
@@ -715,6 +717,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
                 }
             }
             ui->forceRotationComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
+        } else {
+            ui->forceRotationComboBox->setCurrentIndex(0);
         }
 
         if (!dtsBased) {

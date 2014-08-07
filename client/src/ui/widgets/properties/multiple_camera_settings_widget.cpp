@@ -385,9 +385,10 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
                     }
                 }
                 ui->arComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
-            }
-            else
+            } else {
+                ui->arComboBox->setCurrentIndex(0);
                 ui->arOverrideCheckBox->setCheckState(Qt::PartiallyChecked);
+            }
 
             ui->rotCheckBox->setTristate(!sameRotation);
             if(sameRotation) {
@@ -402,9 +403,9 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
                          break;
                      }
                  }
-                 ui->arComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
-
+                 ui->rotComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
             } else {
+                ui->rotComboBox->setCurrentIndex(0);
                 ui->rotCheckBox->setCheckState(Qt::PartiallyChecked);
             }
 
