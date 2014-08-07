@@ -618,6 +618,8 @@ public:
     bool* m_connectSendHandlerTerminatedFlag;
     bool* m_recvHandlerTerminatedFlag;
 
+    Qt::HANDLE threadHandlerIsRunningIn;
+
     CommunicatingSocketPrivate()
     :
         connectSendAsyncCallCounter( 0 ),
@@ -626,15 +628,16 @@ public:
         sendBuffer( nullptr ),
         sendBufPos( 0 ),
         m_connectSendHandlerTerminatedFlag( nullptr ),
-        m_recvHandlerTerminatedFlag( nullptr )
+        m_recvHandlerTerminatedFlag( nullptr ),
+        threadHandlerIsRunningIn( nullptr )
     {
     }
 
     virtual ~CommunicatingSocketPrivate()
     {
         //synchronization may be required here in case if recv handler and send/connect handler called simultaneously in different aio threads,
-            //but even ion described case no synchronization required, since before removing socket handler implementation MUST cancel ongoing 
-            //async I/O and wait for completion. That, is wait for eventTriggered to return
+            //but even in described case no synchronization required, since before removing socket handler implementation MUST cancel ongoing 
+            //async I/O and wait for completion. That is, wait for eventTriggered to return.
             //So, socket can only be removed from handler called in aio thread. So, eventTriggered is down the stack if m_*TerminatedFlag is not nullptr
 
         if( m_connectSendHandlerTerminatedFlag )
@@ -645,13 +648,25 @@ public:
 
     virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() override
     {
+        //NOTE aio garantees that all events on socket are handled in same aio thread, so no synchronization is required
         bool terminated = false;    //set to true just before object destruction
+
+        threadHandlerIsRunningIn = QThread::currentThreadId();
+        std::atomic_thread_fence( std::memory_order_release );
+        auto __threadHandlerIsRunningInResetFunc = [this, &terminated]( CommunicatingSocketPrivate* ){
+            if( terminated )
+                return;     //most likely, socket has been removed in handler
+            threadHandlerIsRunningIn = nullptr;
+            std::atomic_thread_fence( std::memory_order_release );
+        };
+        std::unique_ptr<CommunicatingSocketPrivate, decltype(__threadHandlerIsRunningInResetFunc)>
+            __threadHandlerIsRunningInReset( this, __threadHandlerIsRunningInResetFunc );
 
         const size_t connectSendAsyncCallCounterBak = connectSendAsyncCallCounter;
         auto __finally_connect = [this, connectSendAsyncCallCounterBak, sock, &terminated]( CommunicatingSocketPrivate* /*pThis*/ )
         {
             if( terminated )
-                return; //most likely, socket has been removed in handler
+                return;     //most likely, socket has been removed in handler
             if( connectSendAsyncCallCounterBak == connectSendAsyncCallCounter )
                 aio::AIOService::instance()->removeFromWatch( sock, aio::etWrite );
             m_connectSendHandlerTerminatedFlag = nullptr;
@@ -661,7 +676,7 @@ public:
         auto __finally_read = [this, recvAsyncCallCounterBak, sock, &terminated]( CommunicatingSocketPrivate* /*pThis*/ )
         {
             if( terminated )
-                return; //most likely, socket has been removed in handler
+                return;     //most likely, socket has been removed in handler
             if( recvAsyncCallCounterBak == recvAsyncCallCounter )
             {
                 recvBuffer = nullptr;
@@ -674,7 +689,7 @@ public:
         auto __finally_write = [this, connectSendAsyncCallCounterBak, sock, &terminated]( CommunicatingSocketPrivate* /*pThis*/ )
         {
             if( terminated )
-                return; //most likely, socket has been removed in handler
+                return;     //most likely, socket has been removed in handler
             if( connectSendAsyncCallCounterBak == connectSendAsyncCallCounter )
             {
                 sendBuffer = nullptr;
@@ -1118,10 +1133,19 @@ void CommunicatingSocket::cancelAsyncIO( aio::EventType eventType, bool waitForR
     CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>(impl());
 
     aio::AIOService::instance()->removeFromWatch( this, eventType, waitForRunningHandlerCompletion );
-    if( eventType == aio::etRead )
-        ++d->recvAsyncCallCounter;
-    else if( eventType == aio::etWrite )
-        ++d->connectSendAsyncCallCounter;
+    std::atomic_thread_fence( std::memory_order_acquire );
+    if( d->threadHandlerIsRunningIn == QThread::currentThreadId() )
+    {
+        //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
+        if( eventType == aio::etRead )
+            ++d->recvAsyncCallCounter;
+        else if( eventType == aio::etWrite )
+            ++d->connectSendAsyncCallCounter;
+    }
+    else
+    {
+        //TODO #ak
+    }
 }
 
 static const int DEFAULT_RESERVE_SIZE = 4*1024;
