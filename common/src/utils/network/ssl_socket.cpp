@@ -2,9 +2,12 @@
 
 #ifdef ENABLE_SSL
 #include <mutex>
+#include <errno.h>
+
 #include <openssl/ssl.h>
 #include <openssl/err.h>
-#include <iterator>
+
+#include <utils/common/log.h>
 
 #ifdef max
 #undef max
@@ -22,9 +25,10 @@ int sock_read(BIO *b, char *out, int outl)
 {
     QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(b);
     if( sslSock->mode() == QnSSLSocket::ASYNC ) {
+        // This flag is useful for SSL to force it return 
+        // SSL_ERROR_WANT_READ/WRITE instead of SYSCALL
         BIO_set_retry_read(b);
-        int r = sslSock->asyncRecvInternal(out,outl);
-        return r;
+        return sslSock->asyncRecvInternal(out,outl);
     }
     
     int ret=0;
@@ -53,9 +57,10 @@ int sock_write(BIO *b, const char *in, int inl)
 {
     QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(b);
     if( sslSock->mode() == QnSSLSocket::ASYNC ) {
+        // This flag is useful for SSL to force it return 
+        // SSL_ERROR_WANT_READ/WRITE instead of SYSCALL
         BIO_set_retry_write(b);
-        int r = sslSock->asyncSendInternal(in,inl);
-        return r;
+        return sslSock->asyncSendInternal(in,inl);
     }
     //clear_socket_error();
     int ret = sslSock->sendInternal(in, inl);
@@ -214,8 +219,6 @@ private:
 // request from SSL itself. 
 // 4) Concurrent issue async operation leads to undefined behavior. So
 // lucky, no lock is here :)
-// Notes:
-// Communication pattern VS communicated data.
 
 class async_ssl {
 public:
@@ -297,18 +300,35 @@ private:
         case SSL_ERROR_WANT_READ:
             // Feed the ssl with async operation and push the op to the completion
             // handler once finish the feed operation in remote thread 
-            ssl_read(op,buffer);
+            ssl_recv(op,buffer);
             return;
         case SSL_ERROR_WANT_WRITE:
             // This is simple since it means that SSL just overflow the underlying
             ssl_send(op,buffer);
             return;
-        case SSL_ERROR_SSL:
-            std::cout<<ERR_reason_error_string(ERR_get_error())<<std::endl;
-            return;
         default: 
-            // This is a fatal error, how can I handle this with users SystemError::ErrorCode ?
-            // No way. This needs to be changed here 
+            // Since I am not 100% sure the underlying behavior of SSL. Here we
+            // will meet some unexceptional error and I want to log them and also
+            // even with a valid error. We have no way to notify the user that  
+            // there is a SSL error happened. Because the SystemError::ErrorCode 
+            // doesn't comes with SSL error code. We may need to fix them or add
+            // some there. Anyway, at least some verbose logging is needed here .
+            if( ssl_error == SSL_ERROR_SSL ) {
+                // We may need to resolve the ssl error
+                NX_LOG(lit("SSL Error:%1").arg(
+                    QLatin1String(ERR_reason_error_string(ERR_get_error()))),cl_logDEBUG1);
+
+            } else if( ssl_error == SSL_ERROR_SYSCALL ) {
+                // If there are no errno() related to SSL_ERROR_SYSCALL
+                // this means that we have error/bug related to BIO object
+                Q_ASSERT((errno !=0) || !"SSL unexpected error!");
+                if( errno != 0 ) {
+                    NX_LOG(lit("SSL SYSCALL Error:%1").arg(
+                        QLatin1String(std::strerror(errno))),cl_logDEBUG1 );
+                }
+            }
+            // Call user's callback function and passing a fake ssl_internal_error
+            // number to let user get notification that we are in trouble here !
             op->error( static_cast<SystemError::ErrorCode>(ssl_internal_error) );
             return;
         }
@@ -325,7 +345,7 @@ private:
     // order to avoid undefined behavior for multiple send/recv , we need to chain the
     // operation here . 
 
-    void ssl_read( ssl_async_op *op, buffer_t buffer ) {
+    void ssl_recv( ssl_async_op *op, buffer_t buffer ) {
             // We issue the read and write at same time if we needed
             if( bio_out_buffer_.isEmpty() ) {
                 // Here we just issue a recv operation since the bio_out_buffer is empty
@@ -539,7 +559,7 @@ void async_ssl::async_recv(
             recv_op_->set_user_buffer(buffer);
             recv_op_->set_callback(op);
             // We issue a read operation asynchronously here
-            ssl_read(recv_op_.get(),
+            ssl_recv(recv_op_.get(),
                 make_read_write_buffer(buffer->capacity(),
                 async_buffer_default_size));
         }
