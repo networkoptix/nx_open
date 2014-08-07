@@ -21,6 +21,12 @@ const unsigned char sid[] = "Network Optix SSL socket";
 int sock_read(BIO *b, char *out, int outl)
 {
     QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(b);
+    if( sslSock->mode() == QnSSLSocket::ASYNC ) {
+        BIO_set_retry_read(b);
+        int r = sslSock->asyncRecvInternal(out,outl);
+        return r;
+    }
+    
     int ret=0;
 
     if (out != NULL)
@@ -37,6 +43,7 @@ int sock_read(BIO *b, char *out, int outl)
             {
                 BIO_set_retry_read(b);
             }
+
         }
     }
     return ret;
@@ -45,6 +52,11 @@ int sock_read(BIO *b, char *out, int outl)
 int sock_write(BIO *b, const char *in, int inl)
 {
     QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(b);
+    if( sslSock->mode() == QnSSLSocket::ASYNC ) {
+        BIO_set_retry_write(b);
+        int r = sslSock->asyncSendInternal(in,inl);
+        return r;
+    }
     //clear_socket_error();
     int ret = sslSock->sendInternal(in, inl);
     BIO_clear_retry_flags(b);
@@ -143,12 +155,15 @@ namespace {
 
 // This function make the buffer contains data after from index
 void BufferShinrkTo( nx::Buffer* buffer , int from ) {
-    if( from >= buffer->size() || from == 0 )
+    if( from == 0 )
         return;
-    // What's the point of nx::Buffer , for that move constructor ?
-    // And nothing there in that move constructor. -------- DPENG
-    QByteArray temp(buffer->constData() + from , static_cast<int>(buffer->size())-from+1);
-    buffer->swap(temp);
+    Q_ASSERT(from <= buffer->size());
+    if( from == buffer->size() ) {
+        buffer->clear();
+    } else {
+        QByteArray temp(buffer->constData() + from , static_cast<int>(buffer->size())-from);
+        buffer->swap(temp);
+    }
 }
 
 struct buffer_t {
@@ -231,6 +246,15 @@ public:
     void async_recv( nx::Buffer* buffer, const std::function<void(SystemError::ErrorCode,std::size_t)>& op ) ;
     void async_send( const nx::Buffer& buffer, const std::function<void(SystemError::ErrorCode,std::size_t)>& op );
 
+    // Checking if the async_ssl socket is EOF status
+    bool eof() const {
+        if( eof_ ) {
+            // Checking whether the buffered data has been consumed or not
+            return bio_in_buffer_.isEmpty();
+        }
+        return false;
+    }
+
 protected:
 
     nx::Buffer* mutable_bio_input_buffer() const {
@@ -279,6 +303,9 @@ private:
             // This is simple since it means that SSL just overflow the underlying
             ssl_send(op,buffer);
             return;
+        case SSL_ERROR_SSL:
+            std::cout<<ERR_reason_error_string(ERR_get_error())<<std::endl;
+            return;
         default: 
             // This is a fatal error, how can I handle this with users SystemError::ErrorCode ?
             // No way. This needs to be changed here 
@@ -308,14 +335,23 @@ private:
                         op->error(ec);
                         return;
                     }
-                    // append the buffer that has been written into 
-                    // to the bio_in_buffer_ and later on SSL will use
-                    bio_in_buffer_.append(*buffer.write_buffer);
-                    buffer.write_buffer->clear();
+                    // Checking for EOF 
+                    if( bytes_transferred == 0 ) {
+                        // EOF stream here, this marking is at once
+                        // however, the SSL will find out only when 
+                        // the buffered data has been consumed 
+                        eof_ = true;
+                    } else {
+                        // append the buffer that has been written into 
+                        // to the bio_in_buffer_ and later on SSL will use
+                        bio_in_buffer_.append(*buffer.write_buffer);
+                        buffer.write_buffer->clear();
+                    }
                     // Then we need to call our self here 
                     ssl_perform(ec,bytes_transferred,op,buffer);
                 });
             } else {
+
                 // We need to output the BIO buffer and ONLY after that send operation finished
                 // we can issue a recv operation. That's what I called chaining the operation
                 // And another thing is, SSL is a state machine, so if I doesn't feed the SSL
@@ -386,6 +422,7 @@ private:
     }
 
 private:
+    bool eof_;
     bool server_; 
     SSL* ssl_;
     AbstractStreamSocket* socket_;
@@ -493,7 +530,8 @@ void async_ssl::async_recv(
             }
             // perform async handshake here
             async_handshake(
-                [this,buffer,op]( SystemError::ErrorCode ) {
+                [this,buffer,op]( SystemError::ErrorCode ec ) {
+                    if( ec != SystemError::noError ) return;
                     // We delay the async_recv operation until the async handshake finished
                     async_recv(buffer,op);
                 });
@@ -517,8 +555,11 @@ void async_ssl::async_send(
             }
             // perform async handshake here
             async_handshake(
-                [this,buffer,op]( SystemError::ErrorCode ) {
+                [this,buffer,op]( SystemError::ErrorCode ec ) {
+                    if( ec != SystemError::noError ) return;
                     // We delay the async_recv operation until the async handshake finished
+                    // We will have potential stack overflow here. Suppose a async_handshake
+                    // failed. It will 
                     async_send(buffer,op);
             });
         }  else {
@@ -544,6 +585,7 @@ void async_ssl::async_handshake( const std::function<void(SystemError::ErrorCode
 }
 
 async_ssl::async_ssl( SSL* ssl , bool server , AbstractStreamSocket* socket ) :
+    eof_(false),
     server_(server),
     ssl_(ssl),
     socket_(socket),
@@ -783,17 +825,12 @@ public:
     quint8 extraBuffer[32];
     int extraBufferLen;
 
-    // Flag for the async operation 
-    enum {
-        ASYNC,
-        SYNC
-    };
     // This model flag will be set up by the interface internally. It just tells
     // the user what our socket will be. An async version or a sync version. We
     // keep the sync mode for historic reason , but during the support for async,
     // the call for sync is undefined. This is for purpose since it heavily reduce
     // the pain of 
-    int model_;
+    int mode;
     std::unique_ptr<async_ssl> async_ssl_ptr;
 
     QnSSLSocketPrivate()
@@ -804,7 +841,7 @@ public:
         write(nullptr),
         isServerSide( false ),
         extraBufferLen( 0 ),
-        model_(SYNC)
+        mode(QnSSLSocket::SYNC)
     {
     }
 };
@@ -884,11 +921,6 @@ bool QnSSLSocket::doClientHandshake()
 int QnSSLSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*/)
 {
     Q_D(QnSSLSocket);
-    // For async operation here
-    if( d->model_ == QnSSLSocketPrivate::ASYNC ) {
-        Q_ASSERT(d->async_ssl_ptr != NULL);
-        return d->async_ssl_ptr->bio_read( buffer , bufferLen );
-    }
     if (d->extraBufferLen > 0)
     {
         int toReadLen = qMin((int)bufferLen, d->extraBufferLen);
@@ -924,10 +956,6 @@ int QnSSLSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/)
 int QnSSLSocket::sendInternal( const void* buffer, unsigned int bufferLen )
 {
     Q_D(QnSSLSocket);
-    if( d->model_ == QnSSLSocketPrivate::ASYNC ) {
-        Q_ASSERT(d->async_ssl_ptr != NULL);
-        d->async_ssl_ptr->bio_write(buffer,bufferLen);
-    }
     return d->wrappedSocket->send(buffer,bufferLen);
 }
 
@@ -1126,7 +1154,7 @@ bool QnSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::function<voi
 bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const buffer , std::function<void( SystemError::ErrorCode, std::size_t )>&& handler )
 {
     Q_D(QnSSLSocket);
-    d->model_ = QnSSLSocketPrivate::ASYNC;
+    d->mode = QnSSLSocket::ASYNC;
     if(d->async_ssl_ptr == NULL)
         d->async_ssl_ptr.reset( new async_ssl(d->ssl,d->isServerSide,d->wrappedSocket) );
     d->async_ssl_ptr->async_recv(buffer,handler);
@@ -1136,11 +1164,42 @@ bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const buffer , std::function<void( 
 bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& buffer , std::function<void( SystemError::ErrorCode, std::size_t )>&& handler )
 {
     Q_D(QnSSLSocket);
-    d->model_ = QnSSLSocketPrivate::ASYNC;
+    d->mode = QnSSLSocket::ASYNC;
     if(d->async_ssl_ptr == NULL)
         d->async_ssl_ptr.reset( new async_ssl(d->ssl,d->isServerSide,d->wrappedSocket) );
     d->async_ssl_ptr->async_send(buffer,handler);
     return true;
+}
+
+// If bio return 0 and also sets the BIO_set_retry_read to true
+// then the SSL just may retry at once (without SSL_MODE_AUTO_RETRY)
+// and if SSL continues getting zero from BIO read. SSL will output
+// SSL_ERROR_SYSCALL which is not something that we wish to handle.
+// In the async version, we want SSL to output SSL_ERROR_WANT_READ/WRITE
+// The interesting is if BIO_xxxx return -1 , then SSL will understand
+// this is not an EOF but a partial read/write. 
+
+int QnSSLSocket::asyncRecvInternal( void* buffer , unsigned int bufferLen ) {
+    // For async operation here
+    Q_D(QnSSLSocket);
+    Q_ASSERT(d->mode == ASYNC);
+    Q_ASSERT(d->async_ssl_ptr != NULL);
+    if(d->async_ssl_ptr->eof())
+        return 0;
+    int ret = d->async_ssl_ptr->bio_read( buffer , bufferLen );
+    return ret == 0 ? -1 : ret;
+}
+
+int QnSSLSocket::asyncSendInternal( const void* buffer , unsigned int bufferLen ) {
+    Q_D(QnSSLSocket);
+    Q_ASSERT(d->mode == ASYNC);
+    Q_ASSERT(d->async_ssl_ptr != NULL);
+    return d->async_ssl_ptr->bio_write(buffer,bufferLen);
+}
+
+int QnSSLSocket::mode() const {
+    Q_D(const QnSSLSocket);
+    return d->mode;
 }
 
 // ------------------------------ QnMixedSSLSocket -------------------------------------------------------
@@ -1237,7 +1296,7 @@ bool QnMixedSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::functio
 bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const buffer, std::function<void( SystemError::ErrorCode , std::size_t )>&&  handler )
 {
     Q_D(QnMixedSSLSocket);
-    d->model_ = QnMixedSSLSocketPrivate::ASYNC;
+    d->mode = QnSSLSocket::ASYNC;
     if( d->async_ssl_ptr == NULL ) {
         d->async_ssl_ptr.reset( new mixed_async_ssl(d->ssl,d->wrappedSocket) );
     }
@@ -1255,7 +1314,7 @@ bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const buffer, std::function<vo
 bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& buffer, std::function<void( SystemError::ErrorCode , std::size_t )>&&  handler )
 {
     Q_D(QnMixedSSLSocket);
-    d->model_ = QnMixedSSLSocketPrivate::ASYNC;
+    d->mode = QnSSLSocket::ASYNC;
     if( d->async_ssl_ptr == NULL ) {
         d->async_ssl_ptr.reset( new mixed_async_ssl(d->ssl,d->wrappedSocket) );
     }

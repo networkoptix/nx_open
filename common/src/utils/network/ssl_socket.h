@@ -69,6 +69,11 @@ public:
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) override;
 
+    enum {
+        ASYNC,
+        SYNC
+    };
+
 protected:
     friend int sock_read(BIO *b, char *out, int outl);
     friend int sock_write(BIO *b, const char *in, int inl);
@@ -85,6 +90,10 @@ protected:
     virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
 
 private:
+    // Async version
+    int asyncRecvInternal( void* buffer , unsigned int bufferLen );
+    int asyncSendInternal( const void* buffer , unsigned int bufferLen );
+    int mode() const;
     void init();
 protected:
     Q_DECLARE_PRIVATE(QnSSLSocket);
