@@ -195,14 +195,14 @@
                                                 <![CDATA[<RootNamespace>${project.artifactId}</RootNamespace><LocalDebuggerWorkingDirectory>$(OutputDirectory)</LocalDebuggerWorkingDirectory>]]></value>
                                         </replacement> -->
  
-                                        <replacement>
+                                        <!-- <replacement>
                                             <token>
                                                 <![CDATA[</RootNamespace>]]></token>
                                             <value>
                                                 <![CDATA[</RootNamespace>
     <PlatformToolSet>v110</PlatformToolSet>
     <TargetName>${project.artifactId}</TargetName>]]></value>
-                                        </replacement>                                        
+                                        </replacement>    -->                                    
                                         <replacement>
                                             <token>
                                                 <![CDATA[release</ProgramDataBaseFileName>]]></token>
