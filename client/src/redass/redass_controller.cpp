@@ -214,9 +214,10 @@ bool QnRedAssController::isSmallItem2(QnCamDisplay* display)
     return sz.height() <= TO_LOWQ_SCREEN_SIZE.height() * LQ_HQ_THRESHOLD;
 }
 
-bool QnRedAssController::isNotSmallItem(QnCamDisplay* display)
+bool QnRedAssController::itemCanBeOptimized(QnCamDisplay* display)
 {
-    return !isSmallItem(display);
+    QnArchiveStreamReader* reader = display->getArchiveReader();
+    return !isSmallItem(display) && !isForcedHQDisplay(display, reader);
 }
 
 bool QnRedAssController::isNotSmallItem2(QnCamDisplay* display)
@@ -327,8 +328,8 @@ void QnRedAssController::optimizeItemsQualityBySize()
 
     int largeSize = 0;
     int smallSize = 0;
-    QnCamDisplay* largeDisplay = findDisplay(Find_Biggest, MEDIA_Quality_Low, &QnRedAssController::isNotSmallItem, &largeSize);
-    QnCamDisplay* smallDisplay = findDisplay(Find_Least, MEDIA_Quality_High, &QnRedAssController::isNotSmallItem, &smallSize);
+    QnCamDisplay* largeDisplay = findDisplay(Find_Biggest, MEDIA_Quality_Low, &QnRedAssController::itemCanBeOptimized, &largeSize);
+    QnCamDisplay* smallDisplay = findDisplay(Find_Least, MEDIA_Quality_High, &QnRedAssController::itemCanBeOptimized, &smallSize);
     if (largeDisplay && smallDisplay && largeSize >= smallSize*2)
     {
         // swap items quality
