@@ -479,7 +479,7 @@ namespace aio
             }
 
             //waiting for socket to be removed from pollset
-            while( taskCompletedCondition.load( std::memory_order_relaxed ) > 0 )
+            while( taskCompletedCondition.load( std::memory_order_relaxed ) == 0 )
                 msleep( 0 );    //yield. TODO #ak Better replace it with conditional_variable
 
             m_impl->mutex->lock();
