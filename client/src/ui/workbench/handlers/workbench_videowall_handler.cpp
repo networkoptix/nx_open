@@ -1124,7 +1124,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
             QMessageBox::warning(
                 mainWindow(),
                 tr("Video Wall already exists"),
-                tr("Video Wall with same name already exists")
+                tr("Video Wall with the same name already exists")
                 );
             continue;
         }
