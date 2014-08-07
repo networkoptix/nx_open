@@ -1,6 +1,8 @@
 #ifndef __MSERVER_RESOURCE_SEARCHER_H__
 #define __MSERVER_RESOURCE_SEARCHER_H__
 
+#include <memory>
+
 #include <QtCore/QString>
 #include <QtCore/QSet>
 #include <QtCore/QByteArray>
@@ -33,7 +35,7 @@ private:
     QStringList m_localAddressList;
     QList<AbstractDatagramSocket*> m_socketList;
     QTime m_socketLifeTime;
-    UDPSocket* m_receiveSocket;
+    std::unique_ptr<AbstractDatagramSocket> m_receiveSocket;
     QByteArray m_appServerGuid;
 };
 
