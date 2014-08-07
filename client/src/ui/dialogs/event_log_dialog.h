@@ -11,8 +11,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/button_box_dialog.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 class QnEventLogModel;
 class QnBusinessRuleViewModel;
@@ -21,11 +20,11 @@ namespace Ui {
     class EventLogDialog;
 }
 
-class QnEventLogDialog: public QnButtonBoxDialog, public QnWorkbenchContextAware
+class QnEventLogDialog: public QnWorkbenchStateDependentButtonBoxDialog
 {
     Q_OBJECT
 
-    typedef QnButtonBoxDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
     explicit QnEventLogDialog(QWidget *parent);
@@ -65,7 +64,7 @@ private:
     void updateActionList(bool instantOnly);
 
     /**
-     * Get data from media server
+     * Get data from server
      * 
      * \param fromMsec start date. UTC msecs
      * \param toMsec end date. UTC msecs. Can be DATETIME_NOW

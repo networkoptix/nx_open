@@ -60,8 +60,8 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     SpeedLimits defaultLimits(-1.0, 1.0);
     m_panSpeedLimits = m_tiltSpeedLimits = m_zoomSpeedLimits = m_focusSpeedLimits = defaultLimits;
 
-    QnResourceData data = qnCommon->dataPool()->data(resource, true);
-    m_stopBroken            = data.value<bool>(lit("onvifPtzStopBroken"),           false);
+    QnResourceData data = qnCommon->dataPool()->data(resource);
+    m_stopBroken = qnCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
     bool absoluteMoveBroken = data.value<bool>(lit("onvifPtzAbsoluteMoveBroken"),   false);
     bool focusEnabled       = data.value<bool>(lit("onvifPtzFocusEnabled"),         false);
     bool presetsEnabled     = data.value<bool>(lit("onvifPtzPresetsEnabled"),       false);
@@ -98,7 +98,7 @@ Qn::PtzCapabilities QnOnvifPtzController::initMove() {
 
 	// TODO: #PTZ #Elric we can init caps by examining spaces in response!
 
-    Qn::PtzCapabilities configCapabilities = Qn::NoCapabilities;
+    Qn::PtzCapabilities configCapabilities;
     if(response.PTZConfiguration[0]->DefaultContinuousPanTiltVelocitySpace)
         configCapabilities |= Qn::ContinuousPanCapability | Qn::ContinuousTiltCapability;
     if(response.PTZConfiguration[0]->DefaultContinuousZoomVelocitySpace)

@@ -24,7 +24,16 @@
    <item>
     <widget class="QWidget" name="assureWidget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -43,7 +52,16 @@
          <item>
           <widget class="QWidget" name="horizontalWidget" native="true">
            <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <property name="margin">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
              <number>0</number>
             </property>
             <item>
@@ -186,7 +204,16 @@
          <item>
           <widget class="QWidget" name="widget" native="true">
            <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <property name="margin">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
              <number>0</number>
             </property>
             <item>
@@ -199,7 +226,7 @@
             <item>
              <widget class="QLabel" name="highQualityWarningLabel">
               <property name="text">
-               <string>Warning! High quality may result in Media Server’s CPU overload, network connection errors and other issues.</string>
+               <string>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</string>
               </property>
              </widget>
             </item>
@@ -222,6 +249,13 @@
          <string>Archive control</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QCheckBox" name="checkBoxPrimaryRecorder">
+           <property name="text">
+            <string>Do not archive primary stream</string>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="QCheckBox" name="checkBoxSecondaryRecorder">
            <property name="text">
@@ -352,6 +386,9 @@
   </layout>
  </widget>
  <resources>
+  <include location="../../../../x64/build/client.qrc"/>
+  <include location="../../../../x64/build/client.qrc"/>
+  <include location="../../../../x64/build/client.qrc"/>
   <include location="../../../../x64/build/client.qrc"/>
   <include location="../../../../x64/build/client.qrc"/>
   <include location="../../../../x64/build/client.qrc"/>

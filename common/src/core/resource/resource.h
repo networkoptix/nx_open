@@ -101,7 +101,7 @@ public:
 
         foreigner = 0x40000,    /**< Resource belongs to other entity. E.g., camera on another server */
         no_last_gop = 0x80000,  /**< Do not use last GOP for this when stream is opened */
-        deprecated = 0x100000,  /**< Resource absent in EC but still used in memory for some reason */
+        deprecated = 0x100000,  /**< Resource absent in Server but still used in memory for some reason */
 
         videowall = 0x200000,           /**< Videowall resource */
         desktop_camera = 0x400000,      /**< Desktop Camera resource */

@@ -108,13 +108,13 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
 
         UDPSocket sendSocket, recvSocket;
 
-        bool bindSucceeded = sendSocket.setLocalAddressAndPort(localAddress.toString(), 0);
+        bool bindSucceeded = sendSocket.bind(SocketAddress(localAddress.toString(), 0));
 
         if (!bindSucceeded)
             continue;
 
         recvSocket.setReuseAddrFlag(true);
-        bindSucceeded = recvSocket.setLocalPort(coldStoreRecvPort);
+        bindSucceeded = recvSocket.bind( SocketAddress(HostAddress::anyHost, coldStoreRecvPort) );
         if (!bindSucceeded)
             continue;
 

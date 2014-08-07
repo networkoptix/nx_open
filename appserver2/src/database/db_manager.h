@@ -88,6 +88,10 @@ namespace ec2
             return transactionLog->saveTransaction( tran, serializedTran);
         }
 
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiDatabaseDumpData>& tran, const QByteArray& /*serializedTran*/)
+        {
+            return executeTransactionInternal(tran);
+        }
 
         template <class T>
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
@@ -116,6 +120,9 @@ namespace ec2
 
         //getCurrentTime
         ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiTimeData& currentTime);
+
+        //dumpDatabase
+        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
 
         //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
@@ -193,6 +200,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionInternal(const QnTransaction<ApiIdData>& tran);
@@ -331,18 +339,18 @@ namespace ec2
         void commit();
         void rollback();
     private:
-        enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash};
+        enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_INT};
 
-        QMap<int, QnId> getGuidList(const QString& request, const QByteArray& tableName, GuidConversionMethod method = CM_Default);
+        QMap<int, QnId> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
+
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
         bool updateGuids();
         QnId getType(const QString& typeName);
         bool resyncTransactionLog();
-        
+
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
-        template <class ObjectType>
-        bool fillTransactionLogInternal(ApiCommand::Value command);
+        bool addTransactionForGeneralSettings();
     private:
         QnResourceFactory* m_resourceFactory;
         LicenseManagerImpl* const m_licenseManagerImpl;
@@ -363,6 +371,7 @@ namespace ec2
         QSqlDatabase m_sdbStatic;
         QnDbTransaction m_tranStatic;
         mutable QReadWriteLock m_mutexStatic;
+        bool m_needResyncLog;
     };
 };
 

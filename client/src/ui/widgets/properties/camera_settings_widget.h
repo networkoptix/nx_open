@@ -27,9 +27,8 @@ public:
     QnCameraSettingsWidget(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
     virtual ~QnCameraSettingsWidget();
 
-    const QnResourceList &resources() const;
-    const QnVirtualCameraResourceList &cameras() const;
-    void setResources(const QnResourceList &resources);
+    QnVirtualCameraResourceList cameras() const;
+    void setCameras(const QnVirtualCameraResourceList &cameras);
 
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
@@ -90,7 +89,6 @@ private:
     void setCurrentTab(Mode mode, Qn::CameraSettingsTab tab);
 
 private:
-    QnResourceList m_resources;
     QnVirtualCameraResourceList m_cameras;
     Qn::CameraSettingsTab m_emptyTab;
 

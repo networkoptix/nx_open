@@ -76,7 +76,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr &ca
 
     m_camera = camera;
     m_server = qnResPool->getResourceById(m_camera->getParentId()).dynamicCast<QnMediaServerResource>();
-    setupRtspSession(camera, m_server, &m_rtspSession);
+    setupRtspSession(camera, m_server, &m_rtspSession, m_playNowModeAllowed);
 }
 
 void QnRtspClientArchiveDelegate::setServer(const QnMediaServerResourcePtr &server){
@@ -114,52 +114,37 @@ QString QnRtspClientArchiveDelegate::getUrl(const QnVirtualCameraResourcePtr &ca
 }
 
 qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera) const {
-    /*
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    if (currentTime - m_lastMinTimeTime < 5*60*1000ll)
-        return AV_NOPTS_VALUE;
-    m_lastMinTimeTime = currentTime;
-    */
     if (!camera)
         return 0;
 
     QnMediaServerResourcePtr currentMediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(camera->getParentId()));
-    if (!currentMediaServer) 
-        return 0;
 
     QString physicalId = camera->getPhysicalId();
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
     if (!history)
         return 0;
     QnCameraTimePeriodList mediaServerList = history->getOnlineTimePeriods();
-    QList<QnMediaServerResourcePtr> checkServers;
-    for (int i = 0; i < mediaServerList.size(); ++i)
-    {
-        QnMediaServerResourcePtr otherMediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(mediaServerList[i].getServerId()));
-        if (!otherMediaServer)
+    QSet<QnMediaServerResourcePtr> checkServers;
+    foreach (const QnCameraTimePeriod &period, mediaServerList) {
+        QnMediaServerResourcePtr otherMediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(period.getServerId()));
+        if (!otherMediaServer || otherMediaServer == currentMediaServer)
             continue;
-        if (otherMediaServer != currentMediaServer /*&& m_rtspSession.startTime() != AV_NOPTS_VALUE*/)
-        {
-            if (!checkServers.contains(otherMediaServer))
-                checkServers << otherMediaServer;
-        }
+        checkServers << otherMediaServer;
     }
 
     qint64 minTime = DATETIME_NOW;
-    foreach(const QnMediaServerResourcePtr &server, checkServers)
-    {
+    foreach(const QnMediaServerResourcePtr &server, checkServers) {
         RTPSession otherRtspSession;
+        if (server->getStatus() == QnResource::Offline)
+            continue;
 
-        if (server && server->getStatus() != QnResource::Offline)
-        {
-            setupRtspSession(camera, server,  &otherRtspSession);
-            if (otherRtspSession.open(getUrl(camera, server)).errorCode == CameraDiagnostics::ErrorCode::noError) {
-                if ((quint64)otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
-                {
-                    minTime = qMin(minTime, otherRtspSession.startTime());
-                }
-            }
-        }
+        setupRtspSession(camera, server,  &otherRtspSession, false);
+        if (otherRtspSession.open(getUrl(camera, server)).errorCode != CameraDiagnostics::ErrorCode::noError) 
+            continue;
+
+        qint64 startTime = otherRtspSession.startTime();
+        if ((quint64)startTime != AV_NOPTS_VALUE && startTime != DATETIME_NOW)
+            minTime = qMin(minTime, startTime);
     }
     if (minTime != DATETIME_NOW && minTime < m_rtspSession.startTime())
         return minTime;
@@ -185,7 +170,7 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 tim
         return currentServer;
     
     if (mediaServer != m_server)
-        qDebug() << "switch to media server " << mediaServer->getUrl();
+        qDebug() << "switch to server " << mediaServer->getUrl();
     return mediaServer;
 
 }
@@ -216,7 +201,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     if (m_server == 0 || m_server->getStatus() == QnResource::Offline)
         return false;
 
-    setupRtspSession(m_camera, m_server, &m_rtspSession);
+    setupRtspSession(m_camera, m_server, &m_rtspSession, m_playNowModeAllowed);
     m_rtpData = 0;
 
     bool globalTimeBlocked = false;
@@ -497,7 +482,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
     /*
     if (result && result->flags & QnAbstractMediaData::MediaFlags_LIVE)
     {
-        // Media server can change quality for LIVE stream (for archive quality controlled by client only)
+        // Server can change quality for LIVE stream (for archive quality controlled by client only)
         // So, if server is changed quality, update current quality variables
         if (qSharedPointerDynamicCast<QnCompressedVideoData>(result))
         {
@@ -773,8 +758,8 @@ void QnRtspClientArchiveDelegate::setMultiserverAllowed(bool value)
     m_isMultiserverAllowed = value;
 }
 
-void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session) const {
-    if (m_playNowModeAllowed) {
+void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session, bool usePredefinedTracks) const {
+    if (usePredefinedTracks) {
         int numOfVideoChannels = 1;
         QnConstResourceVideoLayoutPtr videoLayout = camera->getVideoLayout(0);
          if (videoLayout)
@@ -784,8 +769,8 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
         session->setUsePredefinedTracks(0);
     }
     
-    QString user = QnAppServerConnectionFactory::defaultUrl().userName();
-    QString password = QnAppServerConnectionFactory::defaultUrl().password();
+    QString user = QnAppServerConnectionFactory::url().userName();
+    QString password = QnAppServerConnectionFactory::url().password();
     QAuthenticator auth;
     auth.setUser(user);
     auth.setPassword(password);

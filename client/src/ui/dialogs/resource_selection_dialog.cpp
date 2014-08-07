@@ -48,7 +48,6 @@ namespace {
 // -------------------------------------------------------------------------- //
 QnResourceSelectionDialog::QnResourceSelectionDialog(SelectionTarget target, QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     m_resourceModel(NULL),
     m_delegate(NULL),
     m_thumbnailManager(NULL),
@@ -61,7 +60,6 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(SelectionTarget target, QWi
 
 QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     m_resourceModel(NULL),
     m_delegate(NULL),
     m_thumbnailManager(NULL),
@@ -106,6 +104,12 @@ void QnResourceSelectionDialog::init() {
     ui->resourcesWidget->setEditingEnabled(false);
     ui->resourcesWidget->setSimpleSelectionEnabled(true);
     ui->resourcesWidget->treeView()->setMouseTracking(true);
+
+    connect(ui->resourcesWidget, &QnResourceTreeWidget::beforeRecursiveOperation,   this, [this]{ m_updating = true;});
+    connect(ui->resourcesWidget, &QnResourceTreeWidget::afterRecursiveOperation,   this, [this]{
+        m_updating = false;
+        at_resourceModel_dataChanged();
+    });
 
     ui->delegateFrame->setVisible(false);
 

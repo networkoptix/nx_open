@@ -65,6 +65,7 @@ public:
 
     bool isCameraControlDisabled() const;
     void filterMotionByMask(const QnMetaDataV1Ptr& motion);
+    void updateSoftwareMotionStreamNum();
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
@@ -92,7 +93,9 @@ private:
     unsigned int m_framesSinceLastMetaData; // used only for live providers
     QTime m_timeSinceLastMetaData; //used only for live providers
 
+    QMutex m_motionRoleMtx;
     QnResource::ConnectionRole m_softMotionRole;
+    QString m_forcedMotionStream;
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
 #endif

@@ -14,7 +14,15 @@ namespace ec2 {
     };
 #define ApiIdData_Fields (id)
 
+struct ApiDatabaseDumpData: public ApiData {
+    QByteArray data;
+
+};
+
+#define ApiDatabaseDumpData_Fields (data)
+
 } // namespace ec2
 
+Q_DECLARE_METATYPE(ec2::ApiDatabaseDumpData);
 
 #endif // QN_API_DATA_H

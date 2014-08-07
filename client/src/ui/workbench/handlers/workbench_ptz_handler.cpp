@@ -224,7 +224,7 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
     QnPtzManageDialog* dialog = QnPtzManageDialog::instance();
     assert(dialog);
 
-    if (dialog->isVisible() && !dialog->checkForUnsavedChanges())
+    if (dialog->isVisible() && !dialog->tryClose(false))
         return;
 
     dialog->setController(widget->ptzController());

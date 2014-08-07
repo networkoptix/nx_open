@@ -16,13 +16,12 @@ namespace aio
     class PollSetImpl;
     class ConstIteratorImpl;
 
-    // TODO: #Elric #enum
     enum EventType
     {
         etNone = 0,
         etRead = 1,
         etWrite = 2,
-        //!Error occured on socket. Output only event. TODO: #ak report socket error code
+        //!Error occured on socket. Output only event. To get socket error code use \a AbstractSocket::getLastError
         etError = 4,
         //!Used for periodic operations and for socket timers
         etTimedOut = 8,
@@ -104,19 +103,18 @@ namespace aio
         //!Do not monitor event \a eventType on socket \a sock anymore
         /*!
             \return User data, associated with \a sock and \a eventType. NULL, if \a sock was not found
-            \note Ivalidates all iterators
+            \note Ivalidates all iterators to the left of removed element. So, it is ok to iterate signalled sockets and remove current element
         */
         void* remove( AbstractSocket* const sock, EventType eventType );
-        //!Returns number of sockets, monitored for \a eventType
+        //!Returns number of sockets in pollset
         /*!
-            Returned value should only be used for compare with \a maxPollSetSize(). Returned absolute value may be unexpected sometimes
+            Returned value should only be used for compare with \a maxPollSetSize()
         */
-        size_t size( EventType eventType ) const;
+        size_t size() const;
         /*!
             \return NULL if \a sock is not listnened for \a eventType
         */
         void* getUserData( AbstractSocket* const sock, EventType eventType ) const;
-
         /*!
             \param millisToWait if 0, method returns immediatly. If > 0, returns on event or after \a millisToWait milliseconds.
                 If < 0, method blocks till event
@@ -124,6 +122,13 @@ namespace aio
             \note If multiple event occured on same socket each event will be present as a single element
         */
         int poll( int millisToWait = INFINITE_TIMEOUT );
+        //!Returns true, if can accept socket \a sock for monitoring
+        /*!
+            It is garanteed that, if socket is already present in pollset it will always be accepted for monitoring other events
+            \note This method is required only because \a select is used on win32. On linux and mac this method always returns \a true
+            \todo remove this method after moving windows implementation to IO Completion Ports
+        */
+        bool canAcceptSocket( AbstractSocket* const sock ) const;
 
         //!Returns iterator pointing to first socket, which state has been changed in previous \a poll call
         const_iterator begin() const;

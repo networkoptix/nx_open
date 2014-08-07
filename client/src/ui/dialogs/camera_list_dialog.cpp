@@ -10,7 +10,6 @@
 #include <core/resource/media_server_resource.h>
 
 #include <ui/models/camera_list_model.h>
-#include <ui/workbench/workbench_context.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/grid_widget_helper.h>
@@ -18,9 +17,10 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <ui/workbench/workbench_context.h>
+
 QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::CameraListDialog),
     m_model(new QnCameraListModel(this)),
     m_resourceSearch(new QnResourceSearchProxyModel(this)),

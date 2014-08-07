@@ -23,7 +23,8 @@ namespace aio
         Holds multiple threads inside, handler triggered from random thread
         \note Internal thread count can be increased dynamically, since this class uses PollSet class which can monitor only limited number of sockets
         \note Suggested use of this class: little add/remove, many notifications
-        \note There is no garantee that one socket is listened for read and write by same thread (this is garanteed with linux/epoll, but not with winxp/select)
+        \note Single socket is always listened for all requested events by the same thread
+        \note Currently, win32 implementation uses select, so it is far from being efficient. Linux implementation uses epoll, BSD - kqueue
         \note All methods are thread-safe
         \note All methods are not blocking except \a AIOService::removeFromWatch called with \a waitForRunningHandlerCompletion set to \a true
         \todo Socket termination???

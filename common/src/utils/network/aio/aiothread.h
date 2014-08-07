@@ -61,10 +61,14 @@ namespace aio
             AbstractSocket* const sock,
             aio::EventType eventType,
             bool waitForRunningHandlerCompletion );
-        //!Returns number of sockets monitored for \a eventToWatch event
-        size_t size( aio::EventType eventToWatch ) const;
-        //!Returns true, if can monitor one more socket for \a eventToWatch
-        bool canAcceptSocket( aio::EventType eventToWatch ) const;
+        //!Returns number of sockets handled by this object
+        size_t socketsHandled() const;
+        //!Returns true, if can accept socket \a sock for monitoring
+        /*!
+            \note This method is required only because \a select is used on win32. On linux and mac this method always returns \a true
+            \todo remove this method after moving windows implementation to IO Completion Ports
+        */
+        bool canAcceptSocket( AbstractSocket* const sock ) const;
 
     protected:
         //!Implementation of QThread::run
