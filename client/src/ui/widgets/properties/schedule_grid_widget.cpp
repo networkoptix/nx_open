@@ -633,21 +633,3 @@ void QnScheduleGridWidget::setColors(const QnScheduleGridColors &colors) {
 QColor QnScheduleGridWidget::disabledCellColor(const QColor &baseColor) const {
     return toGrayscale(linearCombine(0.5, baseColor, 0.5, palette().color(QPalette::Disabled, QPalette::Background)));
 }
-
-void QnScheduleGridWidget::getCurrentStates( GridParams& output_ref ) const {
-    for( int i = 0 ; i < columnCount() ; ++i ) {
-        for( int j = 0 ; j < rowCount() ; ++j ) {
-            qCopy(m_gridParams[i][j],m_gridParams[i][j]+ParamCount,output_ref[i][j]);
-        }
-    }
-}
-
-void QnScheduleGridWidget::setCurrentStates( const GridParams& params ) {
-    // Bit wise copy cannot be used here, no swap semantic also .
-    // POD array just not work well with objects like QVariant..
-    for( int i = 0 ; i < columnCount() ; ++i ) {
-        for( int j = 0 ; j < rowCount() ; ++j ) {
-            qCopy(params[i][j],params[i][j]+ParamCount,m_gridParams[i][j]);
-        }
-    }
-}

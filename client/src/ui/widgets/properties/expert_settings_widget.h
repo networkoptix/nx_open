@@ -21,8 +21,7 @@ public:
 
 signals:
     void dataChanged();
-    void secondStreamDisabled(bool);
-    void secondStreamInitialState(bool);
+
 private slots:
     void at_dataChanged();
 
@@ -36,7 +35,6 @@ private:
 
     QScopedPointer<Ui::AdvancedSettingsWidget> ui;
     bool m_updating;
-    Qn::SecondStreamQuality m_prevStreamState;
 };
 
 #endif // QN_ADVANCED_SETTINGS_WIDGET_H
