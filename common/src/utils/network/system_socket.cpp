@@ -653,9 +653,7 @@ public:
             if( terminated )
                 return; //most likely, socket has been removed in handler
             if( connectSendAsyncCallCounterBak == connectSendAsyncCallCounter )
-            {
                 aio::AIOService::instance()->removeFromWatch( sock, aio::etWrite );
-            }
             m_connectSendHandlerTerminatedFlag = nullptr;
         };
 
@@ -1117,7 +1115,13 @@ unsigned short CommunicatingSocket::getForeignPort()  {
 
 void CommunicatingSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
 {
+    CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>(impl());
+
     aio::AIOService::instance()->removeFromWatch( this, eventType, waitForRunningHandlerCompletion );
+    if( eventType == aio::etRead )
+        ++d->recvAsyncCallCounter;
+    else if( eventType == aio::etWrite )
+        ++d->connectSendAsyncCallCounter;
 }
 
 static const int DEFAULT_RESERVE_SIZE = 4*1024;
