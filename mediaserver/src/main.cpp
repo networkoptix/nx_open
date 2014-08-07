@@ -1785,19 +1785,7 @@ private:
     }
 
     QString hardwareIdAsGuid() {
-#ifdef EDGE_SERVER
-    char  mac[MAC_ADDR_LEN];
-    memset(mac, 0, sizeof(mac));
-    char* host = 0;
-    getMacFromPrimaryIF(mac, &host);
-
-    QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-    md5Hash.addData(mac, 12);
-    md5Hash.addData("edge");
-    return QUuid::fromRfc4122(md5Hash.result()).toString();
-#else
-    return hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
-#endif
+        return hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
     }
 
     void updateGuidIfNeeded() {
