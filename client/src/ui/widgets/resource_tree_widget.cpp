@@ -51,8 +51,10 @@ public:
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override {
         if (index.column() == Qn::CheckColumn && role == Qt::CheckStateRole) {
             Qt::CheckState checkState = (Qt::CheckState) value.toInt();
+            emit beforeRecursiveOperation();
             setCheckStateRecursive(index, checkState);
             setCheckStateRecursiveUp(index, checkState);
+            emit afterRecursiveOperation();
             return true;
         } else
             return base_type::setData(index, value, role);
@@ -184,7 +186,7 @@ QAbstractItemModel *QnResourceTreeWidget::model() const {
 
 void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
     if (m_resourceProxyModel) {
-        disconnect(m_resourceProxyModel, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
+        disconnect(m_resourceProxyModel, NULL, this, NULL);
         delete m_resourceProxyModel;
         m_resourceProxyModel = NULL;
     }
@@ -203,7 +205,9 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
 
         ui->resourcesTreeView->setModel(m_resourceProxyModel);
 
-        connect(m_resourceProxyModel, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
+        connect(m_resourceProxyModel, SIGNAL(rowsInserted(const QModelIndex &, int, int)),   this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
+        connect(m_resourceProxyModel, &QnResourceSearchProxyModel::beforeRecursiveOperation, this, &QnResourceTreeWidget::beforeRecursiveOperation);
+        connect(m_resourceProxyModel, &QnResourceSearchProxyModel::afterRecursiveOperation, this, &QnResourceTreeWidget::afterRecursiveOperation);
         at_resourceProxyModel_rowsInserted(QModelIndex());
 
         updateCheckboxesVisibility();

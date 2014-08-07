@@ -682,6 +682,23 @@
                     </result>
                 </function>
                 <function>
+                    <name>activateLicense</name>
+                    <description>Activate new license and return license json data if success</description>
+                    <params>
+                        <param>
+                            <name>key</name>
+                            <description>License serial number</description>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>JSON data.</caption>
+                    </result>
+                </function>
+                <function>
                     <name>installUpdate</name>
                     <description>Updates server by the package contained in POST body</description>
                     <method>POST</method>
@@ -1460,7 +1477,7 @@
         </group>
         <group>
             <groupName>Progressive downloading</groupName>
-            <urlPrefix/>
+            <urlPrefix>media</urlPrefix>
             <groupDescription>
                 Progressive downloading is method of receiving media stream using HTTP protocol. Codec and stream format can be specified in url parameters.
                 Live stream and archive can be downloaded. If required, media stream transcoding is performed on-the-fly

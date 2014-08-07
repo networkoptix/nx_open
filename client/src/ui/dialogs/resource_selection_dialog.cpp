@@ -106,6 +106,12 @@ void QnResourceSelectionDialog::init() {
     ui->resourcesWidget->setSimpleSelectionEnabled(true);
     ui->resourcesWidget->treeView()->setMouseTracking(true);
 
+    connect(ui->resourcesWidget, &QnResourceTreeWidget::beforeRecursiveOperation,   this, [this]{ m_updating = true;});
+    connect(ui->resourcesWidget, &QnResourceTreeWidget::afterRecursiveOperation,   this, [this]{
+        m_updating = false;
+        at_resourceModel_dataChanged();
+    });
+
     ui->delegateFrame->setVisible(false);
 
     if (m_target == CameraResourceTarget) {

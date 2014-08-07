@@ -122,7 +122,6 @@ private:
 
     void connectToGridWidget();
     void disconnectFromGridWidget();
-
     // No way, no states object existed for recording the logic instead of UI.
     // In the code base, all the UI elements serves as an object to store logic, 
     // no MVC indeed. Kind of like MFC ...                     DPENG

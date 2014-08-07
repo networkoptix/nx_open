@@ -448,6 +448,20 @@ void fromApiToResource(const ApiLicenseData &src, QnLicensePtr &dst) {
         dst->setKey(src.key);
 }
 
+void fromResourceToApi(const QnLicensePtr &src, ApiDetailedLicenseData &dst) {
+    dst.key = src->key();
+    dst.licenseBlock = src->rawLicense();
+    dst.name = src->name();
+    dst.cameraCount = src->cameraCount();
+    dst.hardwareId = src->hardwareId();
+    dst.licenseType = src->displayName();
+    dst.version = src->version();
+    dst.brand = src->brand();
+    dst.expiration = src->expiration();
+
+}
+
+
 void fromResourceListToApi(const QnLicenseList &src, ApiLicenseDataList &dst) {
     dst.reserve(dst.size() + src.size());
     
@@ -571,7 +585,8 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
     dst.parentId = src->getParentId();
     dst.name = src->getName();
     dst.url = src->getUrl();
-    dst.status = src->getStatus();
+    //dst.status = src->getStatus();
+    dst.status = QnResource::NotDefined; // status field MUST be modified via setStatus call only
 
     QnParamList params = src->getResourceParamList();
     for(const QnParam &srcParam: src->getResourceParamList().list())

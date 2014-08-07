@@ -19,6 +19,14 @@
     "data": [
         {
             "keys": [
+                "VISTA|VK2-ENCODER",
+		        "*|DW-CP04"
+            ],
+            "analogEncoder": true
+        },
+
+        {
+            "keys": [
                 "ISD|*"
             ],
             "showUrl": true,

@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>Camera Schedule Editor</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,0,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,1,0">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
@@ -46,13 +46,6 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="requiredLicensesLabel">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="licensesButton">
        <property name="text">
         <string>Get More Licenses...</string>
@@ -62,18 +55,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="digitalLicensesLabel">
-     <property name="text">
-      <string notr="true">&lt;X license(s) are used out of Y&gt;</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="analogLicensesLabel">
-     <property name="text">
-      <string notr="true">&lt;X analog license(s) are used out of Y&gt;</string>
-     </property>
-    </widget>
+    <widget class="QnLicensesUsageWidget" name="licensesUsageWidget" native="true"/>
    </item>
    <item>
     <widget class="QGroupBox" name="scheduleGridGroupBox">
@@ -663,6 +645,12 @@
    <class>QnCheckedButton</class>
    <extends>QToolButton</extends>
    <header>ui/widgets/checked_button.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QnLicensesUsageWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/licenses_usage_widget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>
