@@ -42,9 +42,9 @@ private:
     bool isSmallItem2(QnCamDisplay* display);
     bool isNotSmallItem(QnCamDisplay* display);
     bool isNotSmallItem2(QnCamDisplay* display);
-    bool isNotSmallAndForcedHQ(QnCamDisplay* display);
 
     bool isSupportedDisplay(QnCamDisplay* display) const;
+    bool isForcedHQDisplay(QnCamDisplay* display, QnArchiveStreamReader* reader) const;
 
     /** try LQ->HQ once more */
     void addHQTry(); 
@@ -54,17 +54,16 @@ private:
 private:
     // TODO: #Elric #enum
     enum FindMethod {Find_Biggest, Find_Least};
-    enum LQReason {Reason_None, Reason_Small, Reason_Network, Reason_CPU, Reason_ForcedByUser, Reson_FF};
+    enum LQReason {Reason_None, Reason_Small, Reason_Network, Reason_CPU, Reson_FF};
     struct RedAssInfo
     {
-        RedAssInfo(): lqTime(0), toLQSpeed(0.0), lqReason(Reason_None), initialTime(qnSyncTime->currentMSecsSinceEpoch()), awaitingLQTime(0), smallSizeCnt(0), previousQuality(MEDIA_Quality_High) {}
+        RedAssInfo(): lqTime(0), toLQSpeed(0.0), lqReason(Reason_None), initialTime(qnSyncTime->currentMSecsSinceEpoch()), awaitingLQTime(0), smallSizeCnt(0) {}
         qint64 lqTime;
         float toLQSpeed;
         LQReason lqReason;
         qint64 initialTime;
         qint64 awaitingLQTime;
         int smallSizeCnt;
-        MediaQuality previousQuality;
     };
 
     typedef bool (QnRedAssController::*SearchCondition)(QnCamDisplay*);
@@ -80,9 +79,8 @@ private:
     Qn::ResolutionMode m_mode;
 private:
     QnCamDisplay* findDisplay(FindMethod method, MediaQuality findQuality, SearchCondition cond = 0, int* displaySize = 0);
-    void gotoLowQuality(QnCamDisplay* display, LQReason reason, MediaQuality previousQuality, double speed = INT_MAX);
+    void gotoLowQuality(QnCamDisplay* display, LQReason reason, double speed = INT_MAX);
     void optimizeItemsQualityBySize();
-    bool isForcedHQDisplay(QnCamDisplay* display, QnArchiveStreamReader* reader) const;
 };
 
 #define qnRedAssController QnRedAssController::instance()
