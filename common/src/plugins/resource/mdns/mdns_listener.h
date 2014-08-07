@@ -51,7 +51,7 @@ private:
 
 private:
     QList<AbstractDatagramSocket*> m_socketList;
-    UDPSocket* m_receiveSocket;
+    AbstractDatagramSocket* m_receiveSocket;
     QElapsedTimer m_socketLifeTime;
     //!list<pair<consumer id, consumer data> >. List is required to garantee, that consumers receive data in order they were registered
     std::list<std::pair<long, ConsumerDataList> > m_data;
