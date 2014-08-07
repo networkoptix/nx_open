@@ -154,7 +154,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        QnTransaction<ApiIdData> tran( ApiCommand::forcePrimaryTimeServer, false );
+        QnTransaction<ApiIdData> tran( ApiCommand::forcePrimaryTimeServer );
         tran.params.id = serverGuid;
 
         using namespace std::placeholders;

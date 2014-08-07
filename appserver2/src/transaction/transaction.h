@@ -162,8 +162,6 @@ namespace ec2
             }
         };
 
-        bool isPersistentType() const;
-
         ApiCommand::Value command;
         QUuid peerID;
         PersistentInfo persistentInfo;

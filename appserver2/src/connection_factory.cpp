@@ -31,7 +31,7 @@ namespace ec2
 {
     Ec2DirectConnectionFactory::Ec2DirectConnectionFactory( Qn::PeerType peerType )
     :
-        m_dbManager( new QnDbManager() ),   //dbmanager is initialized by direct connection Instanciating it here
+        m_dbManager( peerType == Qn::PT_Server ? new QnDbManager() : nullptr ),   //dbmanager is initialized by direct connection
         m_transactionMessageBus( new ec2::QnTransactionMessageBus() ),
         m_timeSynchronizationManager( new TimeSynchronizationManager(peerType) ),
         m_terminated( false ),
@@ -48,8 +48,6 @@ namespace ec2
         qRegisterMetaType<ApiPeerAliveData>( "ApiPeerAliveData" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiRuntimeData>( "ApiRuntimeData" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); // TODO: #Elric #EC2 register in a proper place!
-
-        ec2::QnTransactionMessageBus::initStaticInstance(new ec2::QnTransactionMessageBus());
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()

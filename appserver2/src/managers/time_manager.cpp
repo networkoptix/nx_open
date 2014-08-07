@@ -438,7 +438,7 @@ namespace ec2
             arg(QLatin1String(qnCommon->moduleGUID().toRfc4122())).arg(QDateTime::fromMSecsSinceEpoch(currentMSecsSinceEpoch()).toString(Qt::ISODate)).
             arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logDEBUG2 );
 
-        QnTransaction<ApiPeerSystemTimeData> tran( ApiCommand::broadcastPeerSystemTime, false );
+        QnTransaction<ApiPeerSystemTimeData> tran( ApiCommand::broadcastPeerSystemTime );
         tran.params.peerID = qnCommon->moduleGUID();
         tran.params.timePriorityKey = m_localTimePriorityKey.toUInt64();
         {

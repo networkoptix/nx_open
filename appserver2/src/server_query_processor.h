@@ -64,20 +64,22 @@ namespace ec2
                 SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
             errorCode = auxManager->executeTransaction(tran);
-            if( errorCode != ErrorCode::ok ) {
+            if( errorCode != ErrorCode::ok )
                 return;
-            }
 
-            if (!tran.persistentInfo.isNull()) {
-                const QByteArray& serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-                errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
-                if( errorCode != ErrorCode::ok ) {
-                    if (errorCode == ErrorCode::skipped)
+            if( !tran.persistentInfo.isNull() )
+            {
+                const QByteArray& serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction( tran );
+                errorCode = dbManager->executeTransactionNoLock( tran, serializedTran );
+                if( errorCode != ErrorCode::ok )
+                {
+                    if( errorCode == ErrorCode::skipped )
                         errorCode = ErrorCode::ok;
                     return;
                 }
 
                 locker.commit();
+            }
 
             // delivering transaction to remote peers
             if (!tran.isLocal)

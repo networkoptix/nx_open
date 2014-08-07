@@ -38,6 +38,7 @@
 
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
+#include <utils/common/synctime.h>
 
 namespace {
     const int videowallReconnectTimeoutMSec = 5000;
@@ -101,7 +102,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
                 withArgument(Qn::LocalSystemTimeRole, localSystemTime).withArgument(Qn::PeersToChooseTimeServerFromRole, peersAndTimes));
         });
     connect( QnAppServerConnectionFactory::getConnection2().get(), &ec2::AbstractECConnection::timeChanged,
-             QnSyncTime::instance(), &QnSyncTime::updateTime );
+        QnSyncTime::instance(), static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime) );
 
     //connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
 }
