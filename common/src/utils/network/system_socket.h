@@ -63,12 +63,6 @@ class SocketImpl;
 class Socket
 {
 public:
-    //TODO/IMPL draft refactoring of socket operation result receiving. Enum introduced like in std stream bits
-    enum StatusBit
-    {
-        sbFailed = 1
-    };
-
     Socket( int type, int protocol, SocketImpl* impl = nullptr );
     Socket( int sockDesc, SocketImpl* impl = nullptr );
 
@@ -79,50 +73,48 @@ public:
 
 
     //!Implementation of AbstractSocket::bind
-    bool _bind( const SocketAddress& localAddress );
+    bool bind( const SocketAddress& localAddress );
     //!Implementation of AbstractSocket::bindToInterface
     //bool bindToInterface( const QnInterfaceAndAddr& iface );
     //!Implementation of AbstractSocket::getLocalAddress
-    SocketAddress _getLocalAddress() const;
+    SocketAddress getLocalAddress() const;
     //!Implementation of AbstractSocket::getPeerAddress
-    SocketAddress _getPeerAddress() const;
+    SocketAddress getPeerAddress() const;
     //!Implementation of AbstractSocket::close
-    void _close();
+    void close();
     //!Implementation of AbstractSocket::isClosed
-    bool _isClosed() const;
+    bool isClosed() const;
     //!Implementation of AbstractSocket::setReuseAddrFlag
-    bool _setReuseAddrFlag( bool reuseAddr );
+    bool setReuseAddrFlag( bool reuseAddr );
     //!Implementation of AbstractSocket::reuseAddrFlag
-    bool _getReuseAddrFlag( bool* val );
+    bool getReuseAddrFlag( bool* val );
     //!Implementation of AbstractSocket::setNonBlockingMode
-    bool _setNonBlockingMode( bool val );
+    bool setNonBlockingMode( bool val );
     //!Implementation of AbstractSocket::getNonBlockingMode
-    bool _getNonBlockingMode( bool* val ) const;
+    bool getNonBlockingMode( bool* val ) const;
     //!Implementation of AbstractSocket::getMtu
-    bool _getMtu( unsigned int* mtuValue );
+    bool getMtu( unsigned int* mtuValue );
     //!Implementation of AbstractSocket::setSendBufferSize
-    bool _setSendBufferSize( unsigned int buffSize );
+    bool setSendBufferSize( unsigned int buffSize );
     //!Implementation of AbstractSocket::getSendBufferSize
-    bool _getSendBufferSize( unsigned int* buffSize );
+    bool getSendBufferSize( unsigned int* buffSize );
     //!Implementation of AbstractSocket::setRecvBufferSize
-    bool _setRecvBufferSize( unsigned int buffSize );
+    bool setRecvBufferSize( unsigned int buffSize );
     //!Implementation of AbstractSocket::getRecvBufferSize
-    bool _getRecvBufferSize( unsigned int* buffSize );
+    bool getRecvBufferSize( unsigned int* buffSize );
     //!Implementation of AbstractSocket::setRecvTimeout
-    bool _setRecvTimeout( unsigned int ms );
+    bool setRecvTimeout( unsigned int ms );
     //!Implementation of AbstractSocket::getRecvTimeout
-    bool _getRecvTimeout( unsigned int* millis );
+    bool getRecvTimeout( unsigned int* millis );
     //!Implementation of AbstractSocket::setSendTimeout
-    bool _setSendTimeout( unsigned int ms );
+    bool setSendTimeout( unsigned int ms );
     //!Implementation of AbstractSocket::getSendTimeout
-    bool _getSendTimeout( unsigned int* millis );
+    bool getSendTimeout( unsigned int* millis );
     //!Implementation of AbstractSocket::getLastError
-    bool _getLastError( SystemError::ErrorCode* errorCode );
+    bool getLastError( SystemError::ErrorCode* errorCode );
     //!Implementation of AbstractSocket::handle
-    AbstractSocket::SOCKET_HANDLE _handle() const;
+    AbstractSocket::SOCKET_HANDLE handle() const;
 
-
-    QString lastError() const;
 
     /**
      *   Get the local address
@@ -193,26 +185,19 @@ public:
                                          const QString &protocol = QLatin1String("tcp"));
 
     bool failed() const;
-    SystemError::ErrorCode prevErrorCode() const;
 
     SocketImpl* impl();
     const SocketImpl* impl() const;
 
     bool fillAddr( const QString &address, unsigned short port, sockaddr_in &addr );
     bool createSocket( int type, int protocol );
-    void setStatusBit( StatusBit _status );
-    void clearStatusBit( StatusBit _status );
-    void saveErrorInfo();
 
 protected:
-    int sockDesc;              // Socket descriptor
-    QString m_lastError;
+    int m_socketHandle;              // Socket descriptor
 
 private:
     SocketImpl* m_impl;
     bool m_nonBlockingMode;
-    unsigned int m_status;
-    SystemError::ErrorCode m_prevErrorCode;
     unsigned int m_readTimeoutMS;
     unsigned int m_writeTimeoutMS;
 
@@ -233,18 +218,18 @@ public:
     CommunicatingSocket( AbstractSocket* abstractSocketPtr, int newConnSD );
 
     //!Implementation of AbstractCommunicatingSocket::connect
-    bool _connect(
+    bool connect(
         const QString &foreignAddress,
         unsigned short foreignPort,
         unsigned int timeoutMillis );
     //!Implementation of AbstractCommunicatingSocket::recv
-    int _recv( void* buffer, unsigned int bufferLen, int flags );
+    int recv( void* buffer, unsigned int bufferLen, int flags );
     //!Implementation of AbstractCommunicatingSocket::send
-    int _send( const void* buffer, unsigned int bufferLen );
+    int send( const void* buffer, unsigned int bufferLen );
     //!Implementation of AbstractCommunicatingSocket::getForeignAddress
-    virtual SocketAddress _getForeignAddress() const;
+    virtual SocketAddress getForeignAddress() const;
     //!Implementation of AbstractCommunicatingSocket::isConnected
-    bool _isConnected() const;
+    bool isConnected() const;
     //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
     bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler );
     //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
@@ -256,7 +241,7 @@ public:
 
 
     void shutdown();
-    void _close();
+    void close();
 
 
     /**
@@ -264,18 +249,18 @@ public:
      *   @return foreign address
      *   @exception SocketException thrown if unable to fetch foreign address
      */
-    QString getForeignHostAddress() ;
+    QString getForeignHostAddress() const;
 
     /**
      *   Get the foreign port.  Call connect() before calling recv()
      *   @return foreign port
      *   @exception SocketException thrown if unable to fetch foreign port
      */
-    unsigned short getForeignPort() ;
+    unsigned short getForeignPort() const;
 
 private:
     AbstractSocket* m_abstractSocketPtr;
-    bool mConnected;
+    bool m_connected;
 };
 
 
@@ -320,45 +305,45 @@ public:
     //////////////////////////////////////////////////////////////////////
 
     //!Implementation of AbstractSocket::bind
-    virtual bool bind( const SocketAddress& localAddress ) override { return m_implDelegate._bind( localAddress ); }
+    virtual bool bind( const SocketAddress& localAddress ) override { return m_implDelegate.bind( localAddress ); }
     //!Implementation of AbstractSocket::getLocalAddress
-    virtual SocketAddress getLocalAddress() const override { return m_implDelegate._getLocalAddress(); }
+    virtual SocketAddress getLocalAddress() const override { return m_implDelegate.getLocalAddress(); }
     //!Implementation of AbstractSocket::getPeerAddress
-    virtual SocketAddress getPeerAddress() const override { return m_implDelegate._getPeerAddress(); }
+    virtual SocketAddress getPeerAddress() const override { return m_implDelegate.getPeerAddress(); }
     //!Implementation of AbstractSocket::close
-    virtual void close() override { return m_implDelegate._close(); }
+    virtual void close() override { return m_implDelegate.close(); }
     //!Implementation of AbstractSocket::isClosed
-    virtual bool isClosed() const override { return m_implDelegate._isClosed(); }
+    virtual bool isClosed() const override { return m_implDelegate.isClosed(); }
     //!Implementation of AbstractSocket::setReuseAddrFlag
-    virtual bool setReuseAddrFlag( bool reuseAddr ) override { return m_implDelegate._setReuseAddrFlag( reuseAddr ); }
+    virtual bool setReuseAddrFlag( bool reuseAddr ) override { return m_implDelegate.setReuseAddrFlag( reuseAddr ); }
     //!Implementation of AbstractSocket::reuseAddrFlag
-    virtual bool getReuseAddrFlag( bool* val ) override { return m_implDelegate._getReuseAddrFlag( val ); }
+    virtual bool getReuseAddrFlag( bool* val ) override { return m_implDelegate.getReuseAddrFlag( val ); }
     //!Implementation of AbstractSocket::setNonBlockingMode
-    virtual bool setNonBlockingMode( bool val ) override { return m_implDelegate._setNonBlockingMode( val ); }
+    virtual bool setNonBlockingMode( bool val ) override { return m_implDelegate.setNonBlockingMode( val ); }
     //!Implementation of AbstractSocket::getNonBlockingMode
-    virtual bool getNonBlockingMode( bool* val ) const override { return m_implDelegate._getNonBlockingMode( val ); }
+    virtual bool getNonBlockingMode( bool* val ) const override { return m_implDelegate.getNonBlockingMode( val ); }
     //!Implementation of AbstractSocket::getMtu
-    virtual bool getMtu( unsigned int* mtuValue ) override { return m_implDelegate._getMtu( mtuValue ); }
+    virtual bool getMtu( unsigned int* mtuValue ) override { return m_implDelegate.getMtu( mtuValue ); }
     //!Implementation of AbstractSocket::setSendBufferSize
-    virtual bool setSendBufferSize( unsigned int buffSize ) override { return m_implDelegate._setSendBufferSize( buffSize ); }
+    virtual bool setSendBufferSize( unsigned int buffSize ) override { return m_implDelegate.setSendBufferSize( buffSize ); }
     //!Implementation of AbstractSocket::getSendBufferSize
-    virtual bool getSendBufferSize( unsigned int* buffSize ) override { return m_implDelegate._getSendBufferSize( buffSize ); }
+    virtual bool getSendBufferSize( unsigned int* buffSize ) override { return m_implDelegate.getSendBufferSize( buffSize ); }
     //!Implementation of AbstractSocket::setRecvBufferSize
-    virtual bool setRecvBufferSize( unsigned int buffSize ) override { return m_implDelegate._setRecvBufferSize( buffSize ); }
+    virtual bool setRecvBufferSize( unsigned int buffSize ) override { return m_implDelegate.setRecvBufferSize( buffSize ); }
     //!Implementation of AbstractSocket::getRecvBufferSize
-    virtual bool getRecvBufferSize( unsigned int* buffSize ) override { return m_implDelegate._getRecvBufferSize( buffSize ); }
+    virtual bool getRecvBufferSize( unsigned int* buffSize ) override { return m_implDelegate.getRecvBufferSize( buffSize ); }
     //!Implementation of AbstractSocket::setRecvTimeout
-    virtual bool setRecvTimeout( unsigned int ms ) override { return m_implDelegate._setRecvTimeout( ms ); }
+    virtual bool setRecvTimeout( unsigned int ms ) override { return m_implDelegate.setRecvTimeout( ms ); }
     //!Implementation of AbstractSocket::getRecvTimeout
-    virtual bool getRecvTimeout( unsigned int* millis ) override { return m_implDelegate._getRecvTimeout( millis ); }
+    virtual bool getRecvTimeout( unsigned int* millis ) override { return m_implDelegate.getRecvTimeout( millis ); }
     //!Implementation of AbstractSocket::setSendTimeout
-    virtual bool setSendTimeout( unsigned int ms ) override { return m_implDelegate._setSendTimeout( ms ); }
+    virtual bool setSendTimeout( unsigned int ms ) override { return m_implDelegate.setSendTimeout( ms ); }
     //!Implementation of AbstractSocket::getSendTimeout
-    virtual bool getSendTimeout( unsigned int* millis ) override { return m_implDelegate._getSendTimeout( millis ); }
+    virtual bool getSendTimeout( unsigned int* millis ) override { return m_implDelegate.getSendTimeout( millis ); }
     //!Implementation of AbstractSocket::getLastError
-    virtual bool getLastError( SystemError::ErrorCode* errorCode ) override { return m_implDelegate._getLastError( errorCode ); }
+    virtual bool getLastError( SystemError::ErrorCode* errorCode ) override { return m_implDelegate.getLastError( errorCode ); }
     //!Implementation of AbstractSocket::handle
-    virtual AbstractSocket::SOCKET_HANDLE handle() const override { return m_implDelegate._handle(); }
+    virtual AbstractSocket::SOCKET_HANDLE handle() const override { return m_implDelegate.handle(); }
 
 protected:
     bool mConnected;
@@ -411,16 +396,16 @@ public:
         unsigned short foreignPort,
         unsigned int timeoutMillis )
     {
-        return m_implDelegate._connect( foreignAddress, foreignPort, timeoutMillis );
+        return m_implDelegate.connect( foreignAddress, foreignPort, timeoutMillis );
     }
     //!Implementation of AbstractCommunicatingSocket::recv
-    virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override { return m_implDelegate._recv( buffer, bufferLen, flags ); }
+    virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override { return m_implDelegate.recv( buffer, bufferLen, flags ); }
     //!Implementation of AbstractCommunicatingSocket::send
-    virtual int send( const void* buffer, unsigned int bufferLen ) override { return m_implDelegate._send( buffer, bufferLen ); }
+    virtual int send( const void* buffer, unsigned int bufferLen ) override { return m_implDelegate.send( buffer, bufferLen ); }
     //!Implementation of AbstractCommunicatingSocket::getForeignAddress
-    virtual SocketAddress getForeignAddress() const override { return m_implDelegate._getForeignAddress(); }
+    virtual SocketAddress getForeignAddress() const override { return m_implDelegate.getForeignAddress(); }
     //!Implementation of AbstractCommunicatingSocket::isConnected
-    virtual bool isConnected() const override { return m_implDelegate._isConnected(); }
+    virtual bool isConnected() const override { return m_implDelegate.isConnected(); }
     //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
     virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) {
         return m_implDelegate.connectAsyncImpl( addr, std::move(handler) );
