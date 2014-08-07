@@ -140,8 +140,6 @@ private slots:
     void updateIpAddressText();
     void updateWebPageText();
 
-    void setGridScheduleToAlwaysRecord();
-
 private:
     void setHasCameraChanges(bool hasChanges);
     void setAnyCameraChanges(bool hasChanges);

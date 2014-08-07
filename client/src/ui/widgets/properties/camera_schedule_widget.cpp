@@ -965,7 +965,3 @@ void QnCameraScheduleWidget::validateArchiveLength() {
 }
 
 }
-
-void QnCameraScheduleWidget::resetGridWidget() {
-    ui->recordAlwaysButton->toggle();
-    ui->gridWidget->resetCellValues();

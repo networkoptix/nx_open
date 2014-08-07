@@ -1270,8 +1270,3 @@ void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged() {
         item->setDewarpingParams(itemParams);
     }
 }
-
-void QnSingleCameraSettingsWidget::setGridScheduleToAlwaysRecord() {
-    ui->cameraScheduleWidget->resetGridWidget();
-    at_cameraScheduleWidget_scheduleTasksChanged();
-}
