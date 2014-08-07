@@ -208,10 +208,7 @@
          <property name="title">
           <string>Image Control</string>
          </property>
-         <layout class="QFormLayout" name="formLayout_2">
-          <property name="fieldGrowthPolicy">
-           <enum>QFormLayout::FieldsStayAtSizeHint</enum>
-          </property>
+         <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="0">
            <widget class="QCheckBox" name="forceArCheckBox">
             <property name="text">
@@ -220,11 +217,28 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QComboBox" name="forceArComboBox">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QComboBox" name="forceArComboBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </item>
           <item row="1" column="0">
            <widget class="QCheckBox" name="forceRotationCheckBox">
@@ -234,11 +248,28 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QComboBox" name="forceRotationComboBox">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <item>
+             <widget class="QComboBox" name="forceRotationComboBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -613,6 +644,12 @@
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>QnLicensesUsageWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/licenses_usage_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>QnTextTickSlider</class>
    <extends>QSlider</extends>
    <header>ui/widgets/properties/text_tick_slider.h</header>
@@ -621,12 +658,6 @@
    <class>QnFisheyeSettingsWidget</class>
    <extends>QWidget</extends>
    <header>ui/widgets/properties/fisheye_settings_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QnLicensesUsageWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/licenses_usage_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

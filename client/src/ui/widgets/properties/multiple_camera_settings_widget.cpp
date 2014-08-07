@@ -97,10 +97,10 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->rotCheckBox,&QCheckBox::stateChanged,this,[this](int state){ ui->rotComboBox->setEnabled(state == Qt::Checked);} );
     connect(ui->rotCheckBox,SIGNAL(stateChanged(int)),this,SLOT(at_dbDataChanged()));
-    ui->rotComboBox->addItem(tr("0 degree"),0);
+    ui->rotComboBox->addItem(tr("0 degrees"),0);
     ui->rotComboBox->addItem(tr("90 degrees"),90);
     ui->rotComboBox->addItem(tr("180 degrees"),180);
-    ui->rotComboBox->addItem(tr("270 degress"),270);
+    ui->rotComboBox->addItem(tr("270 degrees"),270);
     connect(ui->rotComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(at_dbDataChanged()));
 
     /* Set up context help. */
@@ -193,6 +193,8 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
 
     bool overrideAr = ui->arOverrideCheckBox->checkState() == Qt::Checked;
     bool clearAr = ui->arOverrideCheckBox->checkState() == Qt::Unchecked;
+    bool overrideRotation = ui->rotCheckBox->checkState() == Qt::Checked;
+    bool clearRotation = ui->rotCheckBox->checkState() == Qt::Unchecked;
 
     foreach(QnVirtualCameraResourcePtr camera, m_cameras) 
     {
@@ -223,13 +225,13 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
             camera->setScheduleTasks(scheduleTasks);
 
         if (overrideAr)
-            camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->arComboBox->itemData(ui->arComboBox->currentIndex()).toDouble()));
+            camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->arComboBox->currentData().toDouble()));
         else if (clearAr)
             camera->setProperty(QnMediaResource::customAspectRatioKey(), QString());
 
-        if(ui->rotCheckBox->isChecked()) 
-            camera->setProperty(QnMediaResource::rotationKey(), QString::number(ui->rotComboBox->itemData(ui->rotComboBox->currentIndex()).toInt()));
-        else
+        if(overrideRotation) 
+            camera->setProperty(QnMediaResource::rotationKey(), QString::number(ui->rotComboBox->currentData().toInt()));
+        else if (clearRotation)
             camera->setProperty(QnMediaResource::rotationKey(), QString());
 
     }
@@ -343,21 +345,23 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             else
                 ui->arOverrideCheckBox->setCheckState(Qt::PartiallyChecked);
 
-            if(!sameRotation) {
-                ui->rotCheckBox->setTristate(true);
-                ui->rotCheckBox->setCheckState(Qt::PartiallyChecked);
+            ui->rotCheckBox->setTristate(!sameRotation);
+            if(sameRotation) {
+                 ui->rotCheckBox->setChecked(!rotFirst.isEmpty());
+
+                 int degree = rotFirst.toInt();
+                 ui->rotComboBox->setCurrentIndex(degree/90);
+                 int idx = -1;
+                 for (int i = 0; i < ui->rotComboBox->count(); ++i) {
+                     if (ui->rotComboBox->itemData(i).toInt() == degree) {
+                         idx = i;
+                         break;
+                     }
+                 }
+                 ui->arComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
+
             } else {
-                if( rotFirst.isEmpty() ) {
-                    // Nobody sets the force rotation option
-                    ui->rotCheckBox->setChecked(false);
-                } else {
-                    ui->rotCheckBox->setChecked(true);
-                    bool ok;
-                    int degree = rotFirst.toInt(&ok);
-                    Q_ASSERT(ok);
-                    Q_ASSERT(degree>=0 && degree<=270);
-                    ui->rotComboBox->setCurrentIndex(degree/90);
-                }
+                ui->rotCheckBox->setCheckState(Qt::PartiallyChecked);
             }
 
             ui->expertSettingsWidget->updateFromResources(m_cameras);

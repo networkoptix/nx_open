@@ -159,7 +159,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->forceRotationCheckBox,  &QCheckBox::stateChanged,               this,   [this](int state){ ui->forceRotationComboBox->setEnabled(state == Qt::Checked);} );
     connect(ui->forceRotationCheckBox,  &QCheckBox::stateChanged,               this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
-    ui->forceRotationComboBox->addItem(tr("0 degree"),      0);
+    ui->forceRotationComboBox->addItem(tr("0 degrees"),      0);
     ui->forceRotationComboBox->addItem(tr("90 degrees"),    90);
     ui->forceRotationComboBox->addItem(tr("180 degrees"),   180);
     ui->forceRotationComboBox->addItem(tr("270 degrees"),   270);
