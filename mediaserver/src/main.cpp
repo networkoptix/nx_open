@@ -1785,7 +1785,9 @@ private:
     }
 
     QString hardwareIdAsGuid() {
-        return hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
+        const QString& hwID = hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
+        std::cout << "Got hwID \"" << hwID.toStdString() << "\"" << std::endl;
+        return hwID;
     }
 
     void updateGuidIfNeeded() {
