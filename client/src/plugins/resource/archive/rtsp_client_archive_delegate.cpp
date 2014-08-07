@@ -76,7 +76,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr &ca
 
     m_camera = camera;
     m_server = qnResPool->getResourceById(m_camera->getParentId()).dynamicCast<QnMediaServerResource>();
-    setupRtspSession(camera, m_server, &m_rtspSession);
+    setupRtspSession(camera, m_server, &m_rtspSession, m_playNowModeAllowed);
 }
 
 void QnRtspClientArchiveDelegate::setServer(const QnMediaServerResourcePtr &server){
@@ -138,7 +138,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualC
         if (server->getStatus() == QnResource::Offline)
             continue;
 
-        setupRtspSession(camera, server,  &otherRtspSession);
+        setupRtspSession(camera, server,  &otherRtspSession, false);
         if (otherRtspSession.open(getUrl(camera, server)).errorCode != CameraDiagnostics::ErrorCode::noError) 
             continue;
 
@@ -201,7 +201,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     if (m_server == 0 || m_server->getStatus() == QnResource::Offline)
         return false;
 
-    setupRtspSession(m_camera, m_server, &m_rtspSession);
+    setupRtspSession(m_camera, m_server, &m_rtspSession, m_playNowModeAllowed);
     m_rtpData = 0;
 
     bool globalTimeBlocked = false;
@@ -758,8 +758,8 @@ void QnRtspClientArchiveDelegate::setMultiserverAllowed(bool value)
     m_isMultiserverAllowed = value;
 }
 
-void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session) const {
-    if (m_playNowModeAllowed) {
+void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session, bool usePredefinedTracks) const {
+    if (usePredefinedTracks) {
         int numOfVideoChannels = 1;
         QnConstResourceVideoLayoutPtr videoLayout = camera->getVideoLayout(0);
          if (videoLayout)
