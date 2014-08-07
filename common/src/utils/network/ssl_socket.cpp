@@ -25,14 +25,16 @@ int sock_read(BIO *b, char *out, int outl)
 {
     QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(b);
     if( sslSock->mode() == QnSSLSocket::ASYNC ) {
-        // This flag is useful for SSL to force it return 
-        // SSL_ERROR_WANT_READ/WRITE instead of SYSCALL
-        BIO_set_retry_read(b);
-        return sslSock->asyncRecvInternal(out,outl);
+        int ret = sslSock->asyncRecvInternal(out,outl);
+        if( ret == -1 ) {
+            // This flag is useful for SSL to force it return 
+            // SSL_ERROR_WANT_READ/WRITE instead of SYSCALL
+            BIO_set_retry_read(b);
+        }
+        return ret;
     }
     
     int ret=0;
-
     if (out != NULL)
     {
         //clear_socket_error();
@@ -57,11 +59,15 @@ int sock_write(BIO *b, const char *in, int inl)
 {
     QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(b);
     if( sslSock->mode() == QnSSLSocket::ASYNC ) {
-        // This flag is useful for SSL to force it return 
-        // SSL_ERROR_WANT_READ/WRITE instead of SYSCALL
-        BIO_set_retry_write(b);
-        return sslSock->asyncSendInternal(in,inl);
+        int ret = sslSock->asyncSendInternal(in,inl);
+        if( ret == -1 ) {
+            // This flag is useful for SSL to force it return 
+            // SSL_ERROR_WANT_READ/WRITE instead of SYSCALL
+            BIO_set_retry_write(b);
+        }
+        return ret;
     }
+
     //clear_socket_error();
     int ret = sslSock->sendInternal(in, inl);
     BIO_clear_retry_flags(b);
