@@ -161,9 +161,7 @@ QnMServerResourceSearcher::~QnMServerResourceSearcher()
     deleteSocketList();
 }
 
-QnMServerResourceSearcher::QnMServerResourceSearcher(): 
-    QnLongRunnable(),
-    m_receiveSocket(0)
+QnMServerResourceSearcher::QnMServerResourceSearcher()
 {
 }
 
@@ -187,7 +185,7 @@ void QnMServerResourceSearcher::updateSocketList()
         UDPSocket* socket = new UDPSocket();
         QString localAddress = iface.address.toString();
         //if (socket->bindToInterface(iface))
-        if (socket->setLocalAddressAndPort(iface.address.toString()))
+        if (socket->bind(SocketAddress(iface.address.toString())))
         {
             socket->setMulticastIF(localAddress);
             m_socketList << socket;
@@ -198,9 +196,9 @@ void QnMServerResourceSearcher::updateSocketList()
         }
     }
 
-    m_receiveSocket = new UDPSocket();
+    m_receiveSocket.reset( new UDPSocket() );
     m_receiveSocket->setReuseAddrFlag(true);
-    m_receiveSocket->setLocalPort(DISCOVERY_PORT);
+    m_receiveSocket->bind(SocketAddress(HostAddress::anyHost, DISCOVERY_PORT));
 
     for (int i = 0; i < m_localAddressList.size(); ++i)
         m_receiveSocket->joinGroup(groupAddress, m_localAddressList[i]);
@@ -219,8 +217,7 @@ void QnMServerResourceSearcher::deleteSocketList()
     m_socketList.clear();
     m_localAddressList.clear();
 
-    delete m_receiveSocket;
-    m_receiveSocket = 0;
+    m_receiveSocket.reset();
 }
 
 void QnMServerResourceSearcher::readDataFromSocket()
@@ -241,7 +238,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
         QnSleep::msleep(100);
 
     QSet<QByteArray> conflictList;
-    readSocketInternal(m_receiveSocket, conflictList);
+    readSocketInternal(m_receiveSocket.get(), conflictList);
     if (!conflictList.isEmpty()) {
         QList<QByteArray> cList = conflictList.toList();
         cList.insert(0, localAppServerHost());

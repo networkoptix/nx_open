@@ -108,17 +108,18 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
     QMap<QString, AbstractDatagramSocket*>::iterator it = m_socketList.find(iface.address.toString());
     if (it == m_socketList.end())
     {
-        UDPSocket* sock = new UDPSocket();
+        std::unique_ptr<AbstractDatagramSocket> sock( SocketFactory::createDatagramSocket() );
         QString localAddress = iface.address.toString();
 
         //if (!sock->bindToInterface(iface))
-        if (!sock->setLocalAddressAndPort(iface.address.toString()))
+        if( !sock->bind( SocketAddress( iface.address.toString() ) ) ||
+            !sock->setMulticastIF( localAddress ) ||
+            !sock->setRecvBufferSize( 1024 * 512 ) )
         {
-            delete sock;
             return 0;
         }
 
-        sock->setMulticastIF(localAddress);
+        
 
         /*
         if (!sock->joinGroup(groupAddress.toString(), iface.address.toString()))
@@ -128,11 +129,9 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
         }
         */
 
-        sock->setRecvBufferSize(1024*512);
+        m_socketList.insert(iface.address.toString(), sock.get());
 
-        m_socketList.insert(iface.address.toString(), sock);
-
-        return sock;
+        return sock.release();
     }
     return it.value();
 }
