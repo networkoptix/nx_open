@@ -932,6 +932,52 @@ bool QnSingleCameraSettingsWidget::isValidMotionRegion(){
     return m_motionWidget->isValidMotionRegion();
 }
 
+bool QnSingleCameraSettingsWidget::isValidSecondStream() {
+    /* Do not check validness if there is no recording anyway. */
+    if (!isScheduleEnabled())
+        return true;
+
+    if (!m_camera->hasDualStreaming())
+        return true;
+
+    QList<QnScheduleTask::Data> filteredTasks;
+    bool usesSecondStream = false;
+    foreach (const QnScheduleTask::Data& scheduleTaskData, ui->cameraScheduleWidget->scheduleTasks()) {
+        QnScheduleTask::Data data(scheduleTaskData);
+        if (data.m_recordType == Qn::RT_MotionAndLowQuality) {
+            usesSecondStream = true;
+            data.m_recordType = Qn::RT_Always;
+        }
+        filteredTasks.append(data);
+    }
+
+    /* There are no Motion+LQ tasks. */
+    if (!usesSecondStream)
+        return true;
+
+    if (ui->expertSettingsWidget->isSecondStreamEnabled())
+        return true;
+
+    auto button = QMessageBox::warning(this,
+        tr("Invalid schedule"),
+        tr("Second stream is disabled on this camera. Motion + LQ option has no effect."\
+        "Press \"Yes\" to change recording type to \"Always\" or \"No\" to re-enable second stream."),
+        QMessageBox::StandardButtons(QMessageBox::Yes|QMessageBox::No | QMessageBox::Cancel),
+        QMessageBox::Yes);
+    switch (button) {
+    case QMessageBox::Yes:
+        ui->cameraScheduleWidget->setScheduleTasks(filteredTasks);
+        return true;
+    case QMessageBox::No:
+        ui->expertSettingsWidget->setSecondStreamEnabled();
+        return true;
+    default:
+        return false;
+    }
+    
+}
+
+
 void QnSingleCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled) {
     ui->cameraScheduleWidget->setExportScheduleButtonEnabled(enabled);
 }

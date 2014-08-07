@@ -963,5 +963,3 @@ void QnCameraScheduleWidget::validateArchiveLength() {
     }
     ui->minArchiveDaysWarningLabel->setVisible(ui->spinBoxMinDays->isEnabled() && ui->spinBoxMinDays->value() > dangerousMinArchiveDays);
 }
-
-}
