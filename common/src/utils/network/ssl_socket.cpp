@@ -551,7 +551,8 @@ void async_ssl::async_recv(
             // perform async handshake here
             async_handshake(
                 [this,buffer,op]( SystemError::ErrorCode ec ) {
-                    if( ec != SystemError::noError ) return;
+                    if( ec != SystemError::noError )
+                        return op( ec, (size_t)-1 );
                     // We delay the async_recv operation until the async handshake finished
                     async_recv(buffer,op);
                 });
@@ -576,7 +577,8 @@ void async_ssl::async_send(
             // perform async handshake here
             async_handshake(
                 [this,buffer,op]( SystemError::ErrorCode ec ) {
-                    if( ec != SystemError::noError ) return;
+                    if( ec != SystemError::noError )
+                        return op( ec, (size_t)-1 );
                     // We delay the async_recv operation until the async handshake finished
                     // We will have potential stack overflow here. Suppose a async_handshake
                     // failed. It will 
@@ -1177,7 +1179,7 @@ bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const buffer , std::function<void( 
     d->mode = QnSSLSocket::ASYNC;
     if(d->async_ssl_ptr == NULL)
         d->async_ssl_ptr.reset( new async_ssl(d->ssl,d->isServerSide,d->wrappedSocket) );
-    d->async_ssl_ptr->async_recv(buffer,handler);
+    d->async_ssl_ptr->async_recv( buffer, std::move( handler ));
     return true;
 }
 
@@ -1187,7 +1189,7 @@ bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& buffer , std::function<void( 
     d->mode = QnSSLSocket::ASYNC;
     if(d->async_ssl_ptr == NULL)
         d->async_ssl_ptr.reset( new async_ssl(d->ssl,d->isServerSide,d->wrappedSocket) );
-    d->async_ssl_ptr->async_send(buffer,handler);
+    d->async_ssl_ptr->async_send( buffer, std::move( handler));
     return true;
 }
 
@@ -1343,7 +1345,7 @@ bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& buffer, std::function<vo
     if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() ) 
         d->wrappedSocket->sendAsync(buffer,std::move(handler));
     else {
-        ssl_ptr->async_send(buffer,handler);
+        ssl_ptr->async_send( buffer, std::move( handler ));
     }
     return true;
 }
