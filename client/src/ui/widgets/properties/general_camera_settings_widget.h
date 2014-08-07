@@ -7,6 +7,8 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+#include <ui/models/camera_settings_model.h>
+
 #include <utils/common/connective.h>
 
 namespace Ui {
@@ -22,21 +24,19 @@ public:
     QnGeneralCameraSettingsWidget(QWidget* parent = 0);
     virtual ~QnGeneralCameraSettingsWidget();
 
-    QnVirtualCameraResourceList cameras() const;
-    void setCameras(const QnVirtualCameraResourceList &cameras);
+    QnCameraSettingsModel* model() const;
+    void setModel(QnCameraSettingsModel* model);
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
-
-    QAuthenticator authenticator() const;
-
-    bool isFisheyeEnabled() const;
 
     void updateFromResources();
     void submitToResources();
 signals:
     void dataChanged();
     void fisheyeSettingsChanged();
+    void webPageChanged(const QString &webPageUrl);
+    void recordingStateChanged();
 
 private:
     void updateLicensesButtonVisible();

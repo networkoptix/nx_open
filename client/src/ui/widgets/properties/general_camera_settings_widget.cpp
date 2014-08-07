@@ -161,6 +161,14 @@ void QnGeneralCameraSettingsWidget::setReadOnly(bool readOnly) {
     m_readOnly = readOnly;
 }
 
+Qt::CheckState QnGeneralCameraSettingsWidget::recordingState() const {
+    return ui->analogViewCheckBox->checkState();
+}
+
+void QnGeneralCameraSettingsWidget::setRecordingState(Qt::CheckState state) {
+    ui->analogViewCheckBox->setCheckState(state);
+}
+
 
 bool QnGeneralCameraSettingsWidget::isFisheyeEnabled() const {
     return ui->fisheyeCheckBox->isChecked();
@@ -351,7 +359,7 @@ void QnGeneralCameraSettingsWidget::updateIpAddressText() {
 }
 
 void QnGeneralCameraSettingsWidget::updateWebPageText() {
-    if (m_cameras.size() < 1)
+    if (m_cameras.size() != 1)
         return;
 
     QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_cameras.first()->getHostAddress());
@@ -367,15 +375,10 @@ void QnGeneralCameraSettingsWidget::updateWebPageText() {
             webPageAddress += QLatin1Char(':') + QString::number(url.port());
     }
 
-    ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
+    QString result = lit("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress);
 
-    if (!m_cameras.first()->isDtsBased()) {
-        // TODO #Elric: wrong, need to get camera-specific web page
-        ui->motionWebPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
-    } else {
-        ui->motionWebPageLabel->clear();
-    }
-
+    ui->webPageLabel->setText(result);
+    emit webPageChanged(result);
 }
 
 void QnGeneralCameraSettingsWidget::at_dataChanged() {

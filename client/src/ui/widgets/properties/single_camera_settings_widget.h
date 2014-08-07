@@ -27,6 +27,7 @@ class QVBoxLayout;
 class QnCameraMotionMaskWidget;
 class QnCameraSettingsWidgetPrivate;
 class QnImageProvider;
+class QnMultipleCamerasSettingsModel;
 
 class QnSingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -37,6 +38,8 @@ class QnSingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbe
 public:
     explicit QnSingleCameraSettingsWidget(QWidget *parent = NULL);
     virtual ~QnSingleCameraSettingsWidget();
+
+    void setModel(QnMultipleCamerasSettingsModel* model);
 
     const QnVirtualCameraResourcePtr &camera() const;
     void setCamera(const QnVirtualCameraResourcePtr &camera);
@@ -169,6 +172,7 @@ private:
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
+    QnMultipleCamerasSettingsModel* m_model;
     QMutex m_cameraMutex;
     QnVirtualCameraResourcePtr m_camera;
     bool m_cameraSupportsMotion;

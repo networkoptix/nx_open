@@ -30,6 +30,7 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/models/multiple_cameras_settings_model.h>
 #include <ui/style/warning_style.h>
 
 #include <ui/widgets/properties/camera_schedule_widget.h>
@@ -62,6 +63,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QnWorkbenchContextAware(parent),
     d_ptr(new QnCameraSettingsWidgetPrivate()),
     ui(new Ui::SingleCameraSettingsWidget),
+    m_model(NULL),
     m_cameraSupportsMotion(false),
     m_hasCameraChanges(false),
     m_anyCameraChanges(false),
@@ -125,9 +127,13 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->generalCameraSettingsWidget,    &QnGeneralCameraSettingsWidget::fisheyeSettingsChanged, this, &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
     connect(ui->fisheyeSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_fisheyeSettingsChanged()));
   
-
-    updateFromResource();
-    
+    connect(ui->generalCameraSettingsWidget,    &QnGeneralCameraSettingsWidget::webPageChanged, this, [this](const QString &webPageUrl) {
+        if (m_camera.isNull() || m_camera->isDtsBased())
+            // TODO #Elric: wrong, need to get camera-specific web page
+            ui->motionWebPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageUrl).arg(webPageUrl));
+        else 
+            ui->motionWebPageLabel->clear();
+    });    
 }
 
 QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
@@ -1023,6 +1029,7 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplie
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged() {
+    ui->generalCameraSettingsWidget->setRecordingState()
     ui->analogViewCheckBox->setChecked(ui->cameraScheduleWidget->isScheduleEnabled());
     m_scheduleEnabledChanged = true;
 }
@@ -1085,4 +1092,13 @@ void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged() {
 void QnSingleCameraSettingsWidget::setGridScheduleToAlwaysRecord() {
     ui->cameraScheduleWidget->resetGridWidget();
     at_cameraScheduleWidget_scheduleTasksChanged();
+}
+
+void QnSingleCameraSettingsWidget::setModel(QnMultipleCamerasSettingsModel* model) {
+    if (m_model)
+        disconnect(m_model, NULL, this, NULL);
+    m_model = model;
+    if (m_model) {
+        //connect
+    }
 }
