@@ -70,7 +70,7 @@ public:
     };
 
     Socket( int type, int protocol, SocketImpl* impl = nullptr );
-    Socket( int sockDesc );
+    Socket( int sockDesc, SocketImpl* impl = nullptr );
 
     /**
      *   Close and deallocate this socket
@@ -229,8 +229,8 @@ class CommunicatingSocket
     public Socket
 {
 public:
-    CommunicatingSocket( int type, int protocol );
-    CommunicatingSocket( int newConnSD );
+    CommunicatingSocket( AbstractSocket* abstractSocketPtr, int type, int protocol );
+    CommunicatingSocket( AbstractSocket* abstractSocketPtr, int newConnSD );
 
     //!Implementation of AbstractCommunicatingSocket::connect
     bool _connect(
@@ -242,9 +242,17 @@ public:
     //!Implementation of AbstractCommunicatingSocket::send
     int _send( const void* buffer, unsigned int bufferLen );
     //!Implementation of AbstractCommunicatingSocket::getForeignAddress
-    virtual SocketAddress getForeignAddress() const override;
+    virtual SocketAddress _getForeignAddress() const;
     //!Implementation of AbstractCommunicatingSocket::isConnected
     bool _isConnected() const;
+    //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
+    bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler );
+    //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
+    bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
+    //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
+    bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
+    //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
+    void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion );
 
 
     void shutdown();
@@ -265,9 +273,8 @@ public:
      */
     unsigned short getForeignPort() ;
 
-    //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
-    virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) override;
-protected:
+private:
+    AbstractSocket* m_abstractSocketPtr;
     bool mConnected;
 };
 
@@ -291,6 +298,20 @@ public:
     SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2 )
     :
         m_implDelegate( param1, param2 )
+    {
+    }
+
+    template<class Param1Type, class Param2Type, class Param3Type>
+    SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2, const Param3Type& param3 )
+    :
+        m_implDelegate( param1, param2, param3 )
+    {
+    }
+
+    template<class Param1Type, class Param2Type, class Param3Type>
+    SocketImplementationDelegate( AbstractSocket* abstractSocketPtr, const Param1Type& param1, const Param2Type& param2, const Param3Type& param3 )
+    :
+        m_implDelegate( abstractSocketPtr, param1, param2, param3 )
     {
     }
 
@@ -362,14 +383,21 @@ public:
     template<class Param1Type>
     SocketImplementationDelegate( const Param1Type& param1 )
     :
-        base_type( param1 )
+        base_type( this, param1 )
     {
     }
 
     template<class Param1Type, class Param2Type>
     SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2 )
     :
-        base_type( param1, param2 )
+        base_type( this, param1, param2 )
+    {
+    }
+
+    template<class Param1Type, class Param2Type, class Param3Type>
+    SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2, const Param3Type& param3 )
+    :
+        base_type( this, param1, param2, param3 )
     {
     }
 
@@ -390,9 +418,25 @@ public:
     //!Implementation of AbstractCommunicatingSocket::send
     virtual int send( const void* buffer, unsigned int bufferLen ) override { return m_implDelegate._send( buffer, bufferLen ); }
     //!Implementation of AbstractCommunicatingSocket::getForeignAddress
-    virtual const SocketAddress getForeignAddress() override { return m_implDelegate._getForeignAddress(); }
+    virtual SocketAddress getForeignAddress() const override { return m_implDelegate._getForeignAddress(); }
     //!Implementation of AbstractCommunicatingSocket::isConnected
     virtual bool isConnected() const override { return m_implDelegate._isConnected(); }
+    //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
+    virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) {
+        return m_implDelegate.connectAsyncImpl( addr, std::move(handler) );
+    }
+    //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
+    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
+        return m_implDelegate.recvAsyncImpl( buf, std::move( handler ) );
+    }
+    //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
+    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
+        return m_implDelegate.sendAsyncImpl( buf, std::move( handler ) );
+    }
+    //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
+    virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) {
+        return m_implDelegate.cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
+    }
 };
 
 
@@ -405,8 +449,6 @@ class TCPSocket
     public SocketImplementationDelegate<AbstractStreamSocket, CommunicatingSocket>
 {
     typedef SocketImplementationDelegate<AbstractStreamSocket, CommunicatingSocket> base_type;
-
-    Q_DECLARE_TR_FUNCTIONS(TCPSocket)
 
 public:
     /**
@@ -438,12 +480,6 @@ public:
     virtual bool setNoDelay( bool value ) override;
     //!Implementation of AbstractStreamSocket::getNoDelay
     virtual bool getNoDelay( bool* value ) override;
-    //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
-    virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
-    //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
-    //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
 
 private:
     // Access for TCPServerSocket::accept() connection creation
@@ -458,8 +494,6 @@ class TCPServerSocket
     public SocketImplementationDelegate<AbstractStreamServerSocket, Socket>
 {
     typedef SocketImplementationDelegate<AbstractStreamServerSocket, Socket> base_type;
-
-    Q_DECLARE_TR_FUNCTIONS(TCPServerSocket)
 
 public:
     TCPServerSocket();
@@ -493,8 +527,6 @@ class UDPSocket
     public SocketImplementationDelegate<AbstractDatagramSocket, CommunicatingSocket>
 {
     typedef SocketImplementationDelegate<AbstractDatagramSocket, CommunicatingSocket> base_type;
-
-    Q_DECLARE_TR_FUNCTIONS(UDPSocket)
 
 public:
     static const unsigned int MAX_PACKET_SIZE = 64*1024 - 24 - 8;   //maximum ip datagram size - ip header length - udp header length
