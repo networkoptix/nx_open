@@ -1323,7 +1323,7 @@ bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const buffer, std::function<vo
     mixed_async_ssl* ssl_ptr = 
         static_cast< mixed_async_ssl* >( d->async_ssl_ptr.get() );
     if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() ) {
-        d->wrappedSocket->readSomeAsync(buffer,handler);
+        d->wrappedSocket->readSomeAsync( buffer, std::move( handler ));
     } else {
         ssl_ptr->async_recv(buffer,handler,handler);
     }
@@ -1341,7 +1341,7 @@ bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& buffer, std::function<vo
     mixed_async_ssl* ssl_ptr = 
         static_cast< mixed_async_ssl* >( d->async_ssl_ptr.get() );
     if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() ) 
-        d->wrappedSocket->sendAsync(buffer,handler);
+        d->wrappedSocket->sendAsync(buffer,std::move(handler));
     else {
         ssl_ptr->async_send(buffer,handler);
     }
