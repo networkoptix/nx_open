@@ -1778,7 +1778,9 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
         }
 
         /* Do not need to call integrateMenu, it is already integrated. */
-        return childMenu;
+        if (childMenu)
+            return childMenu;
+        /* Otherwise we should continue to main factory actions. */
     }
 
     QMenu *result = new QnMenu(parentWidget);
