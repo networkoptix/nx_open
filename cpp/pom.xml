@@ -203,14 +203,13 @@
                                             <value><![CDATA[<WarningLevel>Level3</WarningLevel><Optimization>Disabled</Optimization>]]></value>
                                         </replacement>
  
-                                        <replacement>
                                             <token>
                                                 <![CDATA[</RootNamespace>]]></token>
                                             <value>
                                                 <![CDATA[</RootNamespace>
     <PlatformToolSet>v110</PlatformToolSet>
     <TargetName>${project.artifactId}</TargetName>]]></value>
-                                        </replacement>                                        
+                                        </replacement>    -->                                    
                                         <replacement>
                                             <token>
                                                 <![CDATA[release</ProgramDataBaseFileName>]]></token>
