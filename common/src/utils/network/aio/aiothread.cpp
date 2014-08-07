@@ -27,7 +27,6 @@ namespace aio
     class SocketAddRemoveTask
     {
     public:
-        // TODO: #Elric #enum
         enum TaskType
         {
             tAdding,
@@ -132,7 +131,7 @@ namespace aio
         unsigned int newWriteMonitorTaskCount;
         mutable QMutex processEventsMutex;
 
-        //!map<event clock (millis), periodic task data>. todo: #use some thread-safe container on atomic operations instead of map and mutex
+        //!map<event clock (millis), periodic task data>. TODO #ak use some thread-safe container on atomic operations instead of map and mutex
         std::multimap<qint64, PeriodicTaskData> periodicTasksByClock;
         QMutex periodicTasksMutex;
 
@@ -406,7 +405,7 @@ namespace aio
         if( !canAcceptSocket( sock ) )
             return false;
 
-        //if( QThread::currentThread() == this )
+        //if( currentThreadSystemId() == systemThreadId() )
         //{
         //    //adding socket to pollset right away
         //    return m_impl->addSockToPollset( sock, eventToWatch, timeoutMs, eventHandler );
@@ -419,7 +418,7 @@ namespace aio
             ++m_impl->newWriteMonitorTaskCount;
         else
             Q_ASSERT( false );
-        if( QThread::currentThread() != this )  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
+        if( currentThreadSystemId() != systemThreadId() )  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
             m_impl->pollSet.interrupt();
 
         return true;
@@ -444,7 +443,7 @@ namespace aio
             return false; //socket already marked for removal
         handlingData->markedForRemoval.ref();
 
-        const bool inAIOThread = QThread::currentThread() == this;  //TODO #ak get rid of QThread::currentThread() call
+        const bool inAIOThread = currentThreadSystemId() == systemThreadId();
 
         //m_impl->pollSetModificationQueue.push_back( SocketAddRemoveTask(sock, eventType, NULL, SocketAddRemoveTask::tRemoving, 0) );
 
