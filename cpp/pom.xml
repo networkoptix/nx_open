@@ -203,6 +203,7 @@
                                             <value><![CDATA[<WarningLevel>Level3</WarningLevel><Optimization>Disabled</Optimization>]]></value>
                                         </replacement>
  
+                                        <!-- <replacement>
                                             <token>
                                                 <![CDATA[</RootNamespace>]]></token>
                                             <value>
