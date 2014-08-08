@@ -48,7 +48,7 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
     QnPtzControllerPtr controller(camera->createPtzController());
     if(controller) {
         if(QnMappedPtzController::extends(controller->getCapabilities()))
-            if(QnPtzMapperPtr mapper = qnCommon->dataPool()->data(camera).ptzMapper())
+            if(QnPtzMapperPtr mapper = qnCommon->dataPool()->data(camera).value<QnPtzMapperPtr>(lit("ptzMapper")))
                 controller.reset(new QnMappedPtzController(mapper, controller));
 
         if(QnViewportPtzController::extends(controller->getCapabilities()))
