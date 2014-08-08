@@ -8,7 +8,8 @@
 
 #include <client/client_globals.h>
 
-#include "workbench_context_aware.h"
+#include <ui/workbench/workbench_context_aware.h>
+#include <utils/common/connective.h>
 
 class QnWorkbenchContext;
 class QnResourcePool;
@@ -29,8 +30,10 @@ private:
 /**
  * This class implements access control.
  */
-class QnWorkbenchAccessController: public QObject, public QnWorkbenchContextAware {
-    Q_OBJECT;
+class QnWorkbenchAccessController: public Connective<QObject>, public QnWorkbenchContextAware {
+    Q_OBJECT
+    
+    typedef Connective<QObject> base_type;
 public:
     QnWorkbenchAccessController(QObject *parent = NULL);
     virtual ~QnWorkbenchAccessController();
