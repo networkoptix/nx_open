@@ -95,11 +95,59 @@ void av_free_stream( AVStream* st )
     av_free( st );
 }
 
+extern "C" {
+    void av_opt_free(void *obj);
+};
+
+int workaround_av_write_trailer(AVFormatContext *s)
+{
+    // todo: #akolesnikov: please check for memory leaks here
+    int ret, i;
+    /*
+    for(;;){
+        AVPacket pkt;
+        ret= interleave_packet(s, &pkt, NULL, 1);
+        if(ret<0) //FIXME cleanup needed for ret<0 ?
+            goto fail;
+        if(!ret)
+            break;
+
+        ret= s->oformat->write_packet(s, &pkt);
+        if (ret >= 0)
+            s->streams[pkt.stream_index]->nb_frames++;
+
+        av_free_packet(&pkt);
+
+        if(ret<0)
+            goto fail;
+        if(s->pb && s->pb->error)
+            goto fail;
+    }
+
+    if(s->oformat->write_trailer)
+        ret = s->oformat->write_trailer(s);
+    */
+fail:
+    if (s->pb)
+        avio_flush(s->pb);
+    if(ret == 0)
+        ret = s->pb ? s->pb->error : 0;
+    for(i=0;i<s->nb_streams;i++) {
+        av_freep(&s->streams[i]->priv_data);
+        av_freep(&s->streams[i]->index_entries);
+    }
+    if (s->oformat->priv_class)
+        av_opt_free(s->priv_data);
+    av_freep(&s->priv_data);
+    return ret;
+}
+
+
 void QnFfmpegTranscoder::closeFfmpegContext()
 {
     if (m_formatCtx)
     {
-        av_write_trailer(m_formatCtx);
+        workaround_av_write_trailer(m_formatCtx);
         for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
             av_free_stream( m_formatCtx->streams[i] );
         m_formatCtx->nb_streams = 0;
