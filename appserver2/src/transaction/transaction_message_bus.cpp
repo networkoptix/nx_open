@@ -418,7 +418,10 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
     transport->setReadSync(false);
     QnTransaction<QnTranState> requestTran(ApiCommand::tranSyncRequest);
     requestTran.params = transactionLog->getTransactionsState();
-    transport->sendTransaction(requestTran, QnPeerSet() << transport->remotePeer().id << m_localPeer.id);
+    QnTransactionTransportHeader ttHeader;
+    ttHeader.processedPeers << transport->remotePeer().id << m_localPeer.id;
+    ttHeader.dstPeers << transport->remotePeer().id;
+    transport->sendTransaction(requestTran, ttHeader);
 }
 
 bool QnTransactionMessageBus::doHandshake(QnTransactionTransport* transport)
