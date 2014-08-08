@@ -13,7 +13,8 @@ namespace nx_http
     HttpClient::HttpClient()
     :
         m_asyncHttpClient( std::make_shared<AsyncHttpClient>() ),
-        m_done( false )
+        m_done( false ),
+        m_terminated( false )
     {
         connect( m_asyncHttpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClientPtr)), this, SLOT(onResponseReceived()), Qt::DirectConnection );
         connect( m_asyncHttpClient.get(), SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClientPtr)), this, SLOT(onSomeMessageBodyAvailable()), Qt::DirectConnection );
@@ -22,7 +23,15 @@ namespace nx_http
 
     HttpClient::~HttpClient()
     {
+        pleaseStop();
         m_asyncHttpClient->terminate();
+    }
+
+    void HttpClient::pleaseStop()
+    {
+        QMutexLocker lk( &m_mutex );
+        m_terminated = true;
+        m_cond.wakeAll();
     }
 
     bool HttpClient::doGet( const QUrl& url )
@@ -31,7 +40,7 @@ namespace nx_http
             return false;
 
         QMutexLocker lk( &m_mutex );
-        while( m_asyncHttpClient->state() < AsyncHttpClient::sResponseReceived )
+        while( !m_terminated && (m_asyncHttpClient->state() < AsyncHttpClient::sResponseReceived) )
             m_cond.wait( lk.mutex() );
 
         return m_asyncHttpClient->state() != AsyncHttpClient::sFailed;
@@ -56,7 +65,7 @@ namespace nx_http
     BufferType HttpClient::fetchMessageBodyBuffer()
     {
         QMutexLocker lk( &m_mutex );
-        while( m_msgBodyBuffer.isEmpty() && !m_done )
+        while( !m_terminated && (m_msgBodyBuffer.isEmpty() && !m_done) )
             m_cond.wait( lk.mutex() );
         nx_http::BufferType result = m_msgBodyBuffer;
         m_msgBodyBuffer.clear();
