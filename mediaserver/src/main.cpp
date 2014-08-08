@@ -1334,7 +1334,7 @@ void QnMain::run()
         server->setSystemInfo(QnSystemInformation(QN_APPLICATION_PLATFORM, QN_APPLICATION_ARCH));
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
-        bool isLocal = appserverHostString.isEmpty() || QUrl(appserverHostString).scheme() == "file";
+        bool isLocal = appserverHostString.isEmpty() || appserverHostString == "localhost" || QUrl(appserverHostString).scheme() == "file";
 
         int serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 #ifdef EDGE_SERVER
