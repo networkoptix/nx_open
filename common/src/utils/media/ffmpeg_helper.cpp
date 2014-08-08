@@ -1,5 +1,7 @@
 #include "ffmpeg_helper.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
 
@@ -849,3 +851,5 @@ void QnFfmpegHelper::deleteCodecContext(AVCodecContext* ctx)
     av_freep(&ctx->rc_eq);
     av_freep(&ctx);
 }
+
+#endif // ENABLE_DATA_PROVIDERS

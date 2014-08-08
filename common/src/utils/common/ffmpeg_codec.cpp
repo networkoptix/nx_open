@@ -1,5 +1,7 @@
 #include "ffmpeg_codec.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 CLCodecType ffmpegCodecIdToInternal(CodecID ffmpeg_video_codec_id)
 {
     CLCodecType m_videoCodecId = CL_UNKNOWN;
@@ -212,3 +214,5 @@ CodecID internalCodecIdToFfmpeg(CLCodecType internalCodecId)
     return codec;
 
 }
+
+#endif // ENABLE_DATA_PROVIDERS
