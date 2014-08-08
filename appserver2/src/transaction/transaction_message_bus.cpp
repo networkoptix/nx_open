@@ -300,7 +300,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "transport sequence=" << transportHeader.sequence 
+        qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "from" << tran.peerID << "transport seq=" << transportHeader.sequence 
                  << "time=" << tran.persistentInfo.timestamp << "db seq=" << tran.persistentInfo.sequence;
 #endif
         // process system transactions
@@ -384,6 +384,12 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     emit transactionProcessed(tran);
 }
 
+void QnTransactionMessageBus::printTranState(const QnTranState& tranState)
+{
+    for(auto itr = tranState.values.constBegin(); itr != tranState.values.constEnd(); ++itr)
+        qDebug() << "key=" << itr.key().peerID << "(dbID=" << itr.key().dbID << ") need after=" << itr.value();
+}
+
 void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<QnTranState> &tran)
 {
     sender->setWriteSync(true);
@@ -396,8 +402,7 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
         qDebug() << "got sync request from peer" << sender->remotePeer().id << ". Need transactions after:";
-        for(auto itr = tran.params.values.begin(); itr != tran.params.values.end(); ++itr)
-            qDebug() << "key=" << itr.key().peerID << "(dbID=" << itr.key().dbID << ") need after=" << itr.value();
+        printTranState(tran.params);
         qDebug() << "exist " << serializedTransactions.size() << "new transactions";
 #endif
         QnTransaction<QnTranStateResponse> tran(ApiCommand::tranSyncResponse);
@@ -425,10 +430,7 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
     transport->setReadSync(false);
     QnTransaction<QnTranState> requestTran(ApiCommand::tranSyncRequest);
     requestTran.params = transactionLog->getTransactionsState();
-    QnTransactionTransportHeader ttHeader;
-    ttHeader.processedPeers << transport->remotePeer().id << m_localPeer.id;
-    ttHeader.dstPeers << transport->remotePeer().id;
-    transport->sendTransaction(requestTran, ttHeader);
+    transport->sendTransaction(requestTran, QnPeerSet() << transport->remotePeer().id << m_localPeer.id);
 }
 
 bool QnTransactionMessageBus::doHandshake(QnTransactionTransport* transport)
@@ -678,6 +680,9 @@ void QnTransactionMessageBus::doPeriodicTasks()
     if (m_aliveSendTimer.elapsed() > ALIVE_UPDATE_INTERVAL) {
         m_aliveSendTimer.restart();
         handlePeerAliveChanged(m_localPeer, true, false);
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+    printTranState(transactionLog->getTransactionsState());
+#endif
     }
 
     // check if some server not accessible any more
