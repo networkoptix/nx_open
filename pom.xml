@@ -556,6 +556,21 @@
             </modules>
         </profile>  
         <profile>
+            <id>android-qt</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <toolchain.version>android</toolchain.version>
+                <compiler>${toolchain.version}</compiler>
+                <openssl.version>1.0.0-SNAPSHOT</openssl.version>
+                <qt.spec>android-g++</qt.spec>
+            </properties>
+            <modules>
+                <module>mobile_client</module>
+            </modules>
+        </profile>
+        <profile>
             <id>ios</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
