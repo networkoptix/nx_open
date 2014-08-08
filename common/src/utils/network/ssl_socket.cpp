@@ -329,7 +329,7 @@ private:
                 }
             }
         }
-        return false;
+        return eof_;
     }
 
     // asynchronous handshake for SSL socket
