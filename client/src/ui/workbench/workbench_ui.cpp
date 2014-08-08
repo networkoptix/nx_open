@@ -63,6 +63,7 @@
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/search_line_edit.h>
+#include <ui/widgets/main_window.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/workaround/qtbug_workaround.h>

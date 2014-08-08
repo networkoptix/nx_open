@@ -160,7 +160,7 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
 
     connect(exportProgressDialog,   SIGNAL(canceled()),             tool,                   SLOT(stop()));
     if (target && slot)
-        connect(tool,               SIGNAL(finished(bool)),         target,                 slot);
+        connect(tool,               SIGNAL(finished(bool,QString)),         target,                 slot);
 
     return tool->start();
 }
@@ -461,9 +461,10 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         QnResourcePtr resource = qnResPool->getResourceByUniqId(item.resource.path);
         if (!resource)
             continue;
+        if( resource->getParentResource() == layout )
+            continue;
         hasImage |= resource->hasFlags(QnResource::still_image);
-        hasLocal |= resource->hasFlags(QnResource::local)
-                    || resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); // layout item remove 'local' flag.
+        hasLocal |= resource->hasFlags(QnResource::local) || resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); // layout item remove 'local' flag.
         if (hasImage || hasLocal)
             break;
     }

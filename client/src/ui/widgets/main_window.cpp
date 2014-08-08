@@ -141,7 +141,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_controller(0),
     m_titleVisible(true),
     m_dwm(NULL),
-    m_drawCustomFrame(false)
+    m_drawCustomFrame(false),
+    m_enableBackgroundAnimation(true)
 {
 #ifdef Q_OS_MACX
     // TODO: #ivigasin check the neccesarity of this line. In Maveric fullscreen animation works fine without it.
@@ -254,7 +255,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::DebugDecrementCounterAction));
     addAction(action(Qn::DebugShowResourcePoolAction));
     addAction(action(Qn::DebugControlPanelAction));
-
+    addAction(action(Qn::ToggleBackgroundAnimationAction));
     connect(action(Qn::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
@@ -740,4 +741,3 @@ void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     layouts.push_back(layout);
     menu()->trigger(Qn::CloseLayoutAction, layouts);
 }
-

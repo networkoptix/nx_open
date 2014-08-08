@@ -163,3 +163,7 @@ QString QnMediaResource::rtpTransportKey() {
 QString QnMediaResource::motionStreamKey() {
     return lit("motionStream");
 }
+
+QString QnMediaResource::rotationKey() {
+    return lit("rotation");
+}
