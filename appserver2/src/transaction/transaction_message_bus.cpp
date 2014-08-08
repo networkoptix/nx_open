@@ -681,6 +681,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
         m_aliveSendTimer.restart();
         handlePeerAliveChanged(m_localPeer, true, false);
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+    qDebug() << "Current transaction state:";
     printTranState(transactionLog->getTransactionsState());
 #endif
     }
