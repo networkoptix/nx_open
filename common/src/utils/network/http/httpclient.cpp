@@ -29,10 +29,6 @@ namespace nx_http
 
     void HttpClient::pleaseStop()
     {
-    }
-
-    void HttpClient::pleaseStop()
-    {
         QMutexLocker lk( &m_mutex );
         m_terminated = true;
         m_cond.wakeAll();
