@@ -367,16 +367,16 @@ public:
         unsigned short foreignPort,
         unsigned int timeoutMillis )
     {
-        return m_implDelegate.connect( foreignAddress, foreignPort, timeoutMillis );
+        return this->m_implDelegate.connect( foreignAddress, foreignPort, timeoutMillis );
     }
     //!Implementation of AbstractCommunicatingSocket::recv
-    virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override { return m_implDelegate.recv( buffer, bufferLen, flags ); }
+    virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override { return this->m_implDelegate.recv( buffer, bufferLen, flags ); }
     //!Implementation of AbstractCommunicatingSocket::send
-    virtual int send( const void* buffer, unsigned int bufferLen ) override { return m_implDelegate.send( buffer, bufferLen ); }
+    virtual int send( const void* buffer, unsigned int bufferLen ) override { return this->m_implDelegate.send( buffer, bufferLen ); }
     //!Implementation of AbstractCommunicatingSocket::getForeignAddress
-    virtual const SocketAddress getForeignAddress() override { return m_implDelegate.getForeignAddress(); }
+    virtual const SocketAddress getForeignAddress() override { return this->m_implDelegate.getForeignAddress(); }
     //!Implementation of AbstractCommunicatingSocket::isConnected
-    virtual bool isConnected() const override { return m_implDelegate.isConnected(); }
+    virtual bool isConnected() const override { return this->m_implDelegate.isConnected(); }
 };
 
 
