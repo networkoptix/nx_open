@@ -32,6 +32,13 @@ public:
 
     QnResourcePtr resource(const QModelIndex &index) const;
 
+protected:
+
+    // --------------------------------------------------------------
+    // Add a override function for lessThan to achieve customization
+    // --------------------------------------------------------------
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+
 signals:
     void criteriaChanged();
 

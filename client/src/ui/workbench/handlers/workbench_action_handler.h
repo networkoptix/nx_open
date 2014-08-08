@@ -291,7 +291,6 @@ protected slots:
     void at_betaVersionMessageAction_triggered();
 
     void at_queueAppRestartAction_triggered();
-
 private:
     void notifyAboutUpdate();
 

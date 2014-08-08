@@ -330,6 +330,17 @@ bool QnCameraSettingsWidget::isValidMotionRegion(){
     return true;
 }
 
+bool QnCameraSettingsWidget::isValidSecondStream() {
+    switch(mode()) {
+    case SingleMode:
+        return m_singleWidget->isValidSecondStream();
+    case MultiMode:
+        return m_multiWidget->isValidSecondStream();
+    default:
+        return true;
+    }
+}
+
 void QnCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled) {
     switch(mode()) {
     case SingleMode:

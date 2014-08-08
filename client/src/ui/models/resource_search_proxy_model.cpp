@@ -2,6 +2,9 @@
 #include "resource_pool_model.h"
 
 #include <utils/common/delete_later.h>
+#include <utils/network/nettools.h>
+#include <utils/common/string.h>
+
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource/resource.h>
 
@@ -11,8 +14,6 @@ QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject *parent):
     QSortFilterProxyModel(parent),
     m_invalidating(false)
 {
-    // TODO: #Elric use natural string comparison instead.
-    setSortCaseSensitivity(Qt::CaseInsensitive);
 }
 
 QnResourceSearchProxyModel::~QnResourceSearchProxyModel() {
@@ -85,4 +86,18 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIn
         return false;
 
     return true;
+}
+
+
+bool QnResourceSearchProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
+    QVariant leftData = sourceModel()->data(left);
+    QVariant rightData = sourceModel()->data(right);
+    if( leftData.type() == QVariant::String && rightData.type() == QVariant::String ) {
+        QString ls = leftData.toString();
+        QString rs = rightData.toString();
+        return naturalStringCompare(ls,rs,Qt::CaseInsensitive,false) >0;
+    } else {
+        // Throw the rest situation to base class to handle 
+        return QSortFilterProxyModel::lessThan(left,right);
+    }
 }

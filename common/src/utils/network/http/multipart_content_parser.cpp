@@ -143,7 +143,12 @@ namespace nx_http
     {
         //boundary can contain starting -- (depends on implementation. e.g. axis P1344 does so)
         m_boundary = boundary.startsWith( "--" ) ? boundary.mid(2, boundary.size()-2) : boundary;
-        m_startBoundaryLine = "--"+m_boundary/*+"\r\n"*/; //--boundary\r\n
+        //dropping starting and trailing quotes
+        while( !m_boundary.isEmpty() && m_boundary[0] == '"' )
+            m_boundary.remove( 0, 1 );
+        while( !m_boundary.isEmpty() && m_boundary[m_boundary.size() - 1] == '"' )
+            m_boundary.remove( m_boundary.size() - 1, 1 );
+        m_startBoundaryLine = "--" + m_boundary/*+"\r\n"*/; //--boundary\r\n
         m_endBoundaryLine = "--"+m_boundary+"--" /*"\r\n"*/;
     }
 }

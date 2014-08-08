@@ -26,6 +26,7 @@ public:
 
     Qt::CheckState checkState() const;
     void setCheckState(Qt::CheckState state);
+
 signals:
     void checkStateChanged(Qt::CheckState state);
 protected:
@@ -65,6 +66,7 @@ public:
     State state() const;
 
     virtual bool tryClose(bool force) override;
+    virtual void reject() override;
 private:
     Q_SLOT void clearTable();
 
@@ -83,6 +85,7 @@ private:
     bool ensureServerOnline();
     bool addingAllowed() const;
 
+    void updateTitle();
 private slots: 
     void at_startIPLineEdit_textChanged(QString value);
     void at_startIPLineEdit_editingFinished();
@@ -90,7 +93,6 @@ private slots:
     void at_camerasTable_cellChanged(int row, int column);
     void at_camerasTable_cellClicked(int row, int column);
     void at_header_checkStateChanged(Qt::CheckState state);
-    void at_closeButton_clicked();
     void at_scanButton_clicked();
     void at_stopScanButton_clicked();
     void at_addButton_clicked();

@@ -24,6 +24,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
+#include <ui/style/globals.h>
 
 #include "openal/qtvaudiodevice.h"
 #include "version.h"
@@ -39,7 +41,6 @@ namespace {
 
 QnAboutDialog::QnAboutDialog(QWidget *parent): 
     base_type(parent, Qt::MSWindowsFixedSizeDialogHint),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::AboutDialog())
 {
     ui->setupUi(this);
@@ -75,6 +76,42 @@ void QnAboutDialog::changeEvent(QEvent *event)
         retranslateUi();
 }
 
+
+QString QnAboutDialog::connectedServers() const {
+    QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
+
+    QnSoftwareVersion latestVersion = watcher->latestVersion();
+    QnSoftwareVersion latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
+
+    // if some component is newer than the newest mediaserver, focus on its version
+    if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
+        latestMsVersion = latestVersion;
+
+    QString servers;
+    foreach(const QnVersionMismatchData &data, watcher->mismatchData()) {
+        if (data.component != Qn::ServerComponent)
+            continue;
+
+        QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
+        if(!resource) 
+            continue;
+                      
+        QString server = tr("Server v%1 at %2<br/>").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
+
+        bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
+
+        if (updateRequested)
+            server = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(server);
+
+        servers += server;
+    }
+
+    return servers;
+}
+
+
+
+
 void QnAboutDialog::retranslateUi()
 {
     ui->retranslateUi(this);
@@ -93,30 +130,11 @@ void QnAboutDialog::retranslateUi()
         arg(QLatin1String(QN_APPLICATION_ARCH)).
         arg(QLatin1String(QN_APPLICATION_COMPILER));
 
-    QnSoftwareVersion ecsVersion = QnAppServerConnectionFactory::currentVersion();
-    QUrl ecsUrl = QnAppServerConnectionFactory::url();
-    QString servers;
-
-    if (ecsVersion.isNull()) {
-        servers = tr("<b>Server</b> is not connected.<br>\n");
-    } else {
-        servers = tr("<b>Server</b> version %1 at %2:%3.<br>\n").
-            arg(ecsVersion.toString()).
-            arg(ecsUrl.host()).
-            arg(ecsUrl.port());
-    }
-
-    QStringList serverVersions;
-    foreach (QnMediaServerResourcePtr server, qnResPool->getResources().filtered<QnMediaServerResource>()) {
-        if (server->getStatus() != QnResource::Online)
-            continue;
-
-        serverVersions.append(tr("<b>Server</b> version %2 at %3.").arg(server->getVersion().toString()).arg(QUrl(server->getUrl()).host()));
-    }
+//    QnSoftwareVersion ecsVersion = QnAppServerConnectionFactory::currentVersion();
+    QString servers = connectedServers();
+    if (servers.isEmpty())
+        servers = tr("<b>Client</b> does not connected to <b>Server</b>.<br>");
     
-    if (!ecsVersion.isNull() && !serverVersions.isEmpty())
-        servers += serverVersions.join(QLatin1String("<br>\n"));
-
     QString credits = 
         tr(
             "<b>%1 %2</b> uses the following external libraries:<br/>\n"
@@ -179,8 +197,6 @@ void QnAboutDialog::at_copyButton_clicked() {
          QTextDocumentFragment::fromHtml(ui->serversLabel->text()).toPlainText()
     );
 }
-
-
 
 
 
