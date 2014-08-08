@@ -68,8 +68,8 @@ public:
 #endif
 
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "send transaction to peer " << remotePeer() << "command=" << transaction.command << "transport sequence=" << header.sequence;
-#endif
+        qDebug() << "send transaction to peer " << remotePeer().id << "command=" << ApiCommand::toString(transaction.command) << "transport sequence=" << header.sequence;
+#endif#endif
 
         switch (m_remotePeer.dataFormat) {
         case Qn::JsonFormat:
