@@ -1648,7 +1648,7 @@ int UDPSocket::recvFrom(
         return -1;
 
     int rtn = doInterruptableSystemCallWithTimeout<>(
-        std::bind(&::recvfrom, m_socketHandle, (void*)buffer, (size_t)bufferLen, 0, (sockaddr*)&clntAddr, (socklen_t*)&addrLen),
+        std::bind(&::recvfrom, m_implDelegate.handle(), (void*)buffer, (size_t)bufferLen, 0, (sockaddr*)&clntAddr, (socklen_t*)&addrLen),
         recvTimeout );
 #endif
 
@@ -1679,7 +1679,7 @@ bool UDPSocket::hasData() const
 #else
     struct pollfd sockPollfd;
     memset( &sockPollfd, 0, sizeof(sockPollfd) );
-    sockPollfd.fd = m_socketHandle;
+    sockPollfd.fd = m_implDelegate.handle();
     sockPollfd.events = POLLIN;
 #ifdef _GNU_SOURCE
     sockPollfd.events |= POLLRDHUP;

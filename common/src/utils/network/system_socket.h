@@ -396,31 +396,31 @@ public:
         unsigned short foreignPort,
         unsigned int timeoutMillis )
     {
-        return m_implDelegate.connect( foreignAddress, foreignPort, timeoutMillis );
+        return this->m_implDelegate.connect( foreignAddress, foreignPort, timeoutMillis );
     }
     //!Implementation of AbstractCommunicatingSocket::recv
-    virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override { return m_implDelegate.recv( buffer, bufferLen, flags ); }
+    virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override { return this->m_implDelegate.recv( buffer, bufferLen, flags ); }
     //!Implementation of AbstractCommunicatingSocket::send
-    virtual int send( const void* buffer, unsigned int bufferLen ) override { return m_implDelegate.send( buffer, bufferLen ); }
+    virtual int send( const void* buffer, unsigned int bufferLen ) override { return this->m_implDelegate.send( buffer, bufferLen ); }
     //!Implementation of AbstractCommunicatingSocket::getForeignAddress
-    virtual SocketAddress getForeignAddress() const override { return m_implDelegate.getForeignAddress(); }
+    virtual SocketAddress getForeignAddress() const override { return this->m_implDelegate.getForeignAddress(); }
     //!Implementation of AbstractCommunicatingSocket::isConnected
-    virtual bool isConnected() const override { return m_implDelegate.isConnected(); }
+    virtual bool isConnected() const override { return this->m_implDelegate.isConnected(); }
     //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
     virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) {
-        return m_implDelegate.connectAsyncImpl( addr, std::move(handler) );
+        return this->m_implDelegate.connectAsyncImpl( addr, std::move(handler) );
     }
     //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
     virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
-        return m_implDelegate.recvAsyncImpl( buf, std::move( handler ) );
+        return this->m_implDelegate.recvAsyncImpl( buf, std::move( handler ) );
     }
     //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
     virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
-        return m_implDelegate.sendAsyncImpl( buf, std::move( handler ) );
+        return this->m_implDelegate.sendAsyncImpl( buf, std::move( handler ) );
     }
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) {
-        return m_implDelegate.cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
+        return this->m_implDelegate.cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
     }
 };
 

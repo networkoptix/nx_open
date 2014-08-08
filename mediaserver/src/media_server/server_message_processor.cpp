@@ -131,9 +131,10 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     }
 
     // We are always online
-    if (isServer && resource->getId() == serverGuid()) {
-        if (resource->getStatus() != QnResource::Online) {
-            qWarning() << "XYZ1: Received message that our status is " << resource->getStatus();
+    if (isServer && resource->getId() == serverGuid()) 
+    {
+        if (resource->getStatus() != QnResource::Online && resource->getStatus() != QnResource::NotDefined) {
+            qWarning() << "ServerMessageProcessor: Received message that our status is " << resource->getStatus() << ". change to online";
             resource->setStatus(QnResource::Online);
         }
     }
