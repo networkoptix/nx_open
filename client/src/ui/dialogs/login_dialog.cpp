@@ -151,7 +151,7 @@ QUrl QnLoginDialog::currentUrl() const {
     url.setScheme(QLatin1String("https"));
     url.setHost(ui->hostnameLineEdit->text().trimmed());
     url.setPort(ui->portSpinBox->value());
-    url.setUserName(ui->loginLineEdit->text().trimmed());
+    url.setUserName(ui->loginLineEdit->text().trimmed().toLower());
     url.setPassword(ui->passwordLineEdit->text());
     return url;
 }
@@ -603,7 +603,7 @@ void QnLoginDialog::at_saveButton_clicked() {
 
     bool ok = false;
 
-    QString name = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
+    QString name = tr("%1 at %2").arg(ui->loginLineEdit->text().toLower()).arg(ui->hostnameLineEdit->text());
     name = QInputDialog::getText(this, tr("Save connection as..."), tr("Enter name:"), QLineEdit::Normal, name, &ok);
     if (!ok)
         return;
