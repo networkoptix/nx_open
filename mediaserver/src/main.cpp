@@ -516,12 +516,15 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
         qDebug() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
         return QnMediaServerResourcePtr();
     }
+
+    /*
     rez = ec2Connection->getResourceManager()->setResourceStatusSync(serverPtr->getId(), QnResource::Online);
     if (rez != ec2::ErrorCode::ok)
     {
         qDebug() << "registerServer(): Call to change server status failed. Reason: " << ec2::toString(rez);
         return QnMediaServerResourcePtr();
     }
+    */
     
     return savedServer;
 }
