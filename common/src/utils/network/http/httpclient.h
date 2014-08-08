@@ -66,6 +66,7 @@ namespace nx_http
         QWaitCondition m_cond;
         mutable QMutex m_mutex;
         bool m_done;
+        bool m_terminated;
         nx_http::BufferType m_msgBodyBuffer;
 
     private slots:
