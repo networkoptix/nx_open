@@ -22,19 +22,24 @@ namespace {
             return false;
 
         LPCWSTR pos = wcschr(description, L' ');
-        if(!pos)
-            return false;
-        while(*pos == L' ')
-            pos++;
-        if(*pos == L'\0')
-            return false;
+        bool hasName = (pos != NULL);
+        if (hasName) {
+            while(*pos == L' ')
+                pos++;
+            if(*pos == L'\0')
+                return false;
+        }
 
         int localId = _wtoi(description);
         if(localId == 0 && description[0] != L'0')
             return false;
         
-        if(partitions)
-            *partitions = pos;
+        if(partitions) {
+            if (hasName)
+                *partitions = pos;
+            else
+                *partitions = description;
+        }
         if(id)
             *id = localId;
         return true;
@@ -201,9 +206,15 @@ public:
             int id;
             LPCWSTR partitions;
             if(!parseDiskDescription(item[i].szName, &id, &partitions))
-                continue; /* A '_Total' entry, disk without partitions, or simply something unexpected. */
+                continue; /* A '_Total' entry or something unexpected. */
 
-            (*items)[id] = HddItem(Hdd(id, QLatin1String("HDD") + QString::number(id), QString::fromWCharArray(partitions)), item[i].RawValue);
+            Hdd hdd(id, QLatin1String("HDD") + QString::number(id), QString::fromWCharArray(partitions));
+
+            /* Fix partitions name for the mounted-into-folder drives. */
+            if (!hdd.partitions.contains(L':'))
+                hdd.partitions = hdd.name;
+
+            (*items)[id] = HddItem(hdd,  item[i].RawValue);
         }
     }
 
