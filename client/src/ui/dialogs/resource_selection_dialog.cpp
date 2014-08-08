@@ -99,6 +99,7 @@ void QnResourceSelectionDialog::init() {
 
     connect(m_resourceModel, &QnResourcePoolModel::dataChanged, this, &QnResourceSelectionDialog::at_resourceModel_dataChanged);
 
+
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
     ui->resourcesWidget->setEditingEnabled(false);

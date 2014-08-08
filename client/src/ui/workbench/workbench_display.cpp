@@ -265,6 +265,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     /* Set up defaults. */
     connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);
+
+    connect(action(Qn::ToggleBackgroundAnimationAction),   &QAction::toggled,  this,   &QnWorkbenchDisplay::toggleBackgroundAnimation);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay() {
@@ -437,10 +439,13 @@ void QnWorkbenchDisplay::initSceneView() {
     gridBackgroundItem()->setMapper(workbench()->mapper());
 
     /* Set up background */ 
-    if (!(qnSettings->lightMode() & Qn::LightModeNoSceneBackground)) {
+    if (qnSettings->lightMode() & Qn::LightModeNoSceneBackground) {
+        action(Qn::ToggleBackgroundAnimationAction)->setDisabled(true);
+    } else {
         /* Never set QObject* parent in the QScopedPointer-stored objects if not sure in the descruction order. */
         m_backgroundPainter = new QnGradientBackgroundPainter(qnSettings->radialBackgroundCycle(), NULL, context());
-        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+        if (action(Qn::ToggleBackgroundAnimationAction)->isChecked())
+            m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
     }
 
     /* Connect to context. */
@@ -474,6 +479,18 @@ QnGridItem *QnWorkbenchDisplay::gridItem() const {
 QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
     return m_gridBackgroundItem.data();
 }
+
+
+void QnWorkbenchDisplay::toggleBackgroundAnimation(bool enabled) {
+    if (!m_scene || !m_view || !m_backgroundPainter)
+        return;
+
+    if(enabled) 
+        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+    else 
+        m_view->uninstallLayerPainter(m_backgroundPainter.data());
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: item properties
@@ -1951,5 +1968,4 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         setLayer(splashItem, Qn::EffectsLayer);
     }
 }
-
 

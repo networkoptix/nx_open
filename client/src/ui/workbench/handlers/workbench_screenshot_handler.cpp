@@ -27,6 +27,8 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <ui/workbench/workbench_context.h>
 
 #include <utils/common/string.h>
 #include <utils/common/environment.h>
@@ -231,6 +233,14 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
     parameters.customAspectRatio = display->camDisplay()->overridenAspectRatio();
 
+		// ----------------------------------------------------- 
+		// This localOffset is used to fix the issue : Bug #2988 
+		// ----------------------------------------------------- 
+		qint64 localOffset = 0;
+		if(qnSettings->timeMode() == Qn::ServerTimeMode && parameters.isUtc)
+			localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0);
+		parameters.time += localOffset*1000;
+
     QnImageProvider* imageProvider = getLocalScreenshotProvider(parameters, display.data());
     if (!imageProvider)
         imageProvider = QnSingleThumbnailLoader::newInstance(widget->resource()->toResourcePtr(), parameters.time);
@@ -242,7 +252,6 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         QString previousDir = qnSettings->lastScreenshotDir();
         if (previousDir.isEmpty())
             previousDir = qnSettings->mediaFolder();
-
         QString suggestion = replaceNonFileNameCharacters(widget->resource()->toResource()->getName(), QLatin1Char('_'))
                 + QLatin1Char('_') + parameters.timeString();
         suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);

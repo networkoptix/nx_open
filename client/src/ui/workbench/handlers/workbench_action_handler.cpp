@@ -106,6 +106,7 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
+
 #include <utils/app_server_image_cache.h>
 
 #include <utils/applauncher_utils.h>
@@ -120,6 +121,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/math/math.h>
+
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -2365,7 +2367,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         return;
 
     QnSoftwareVersion latestVersion = watcher->latestVersion();
-    QnSoftwareVersion latestMsVersion = watcher->latestVersion(Qn::MediaServerComponent);
+    QnSoftwareVersion latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
 
     // if some component is newer than the newest mediaserver, focus on its version
     if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
@@ -2378,10 +2380,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         case Qn::ClientComponent:
             component = tr("Client v%1<br/>").arg(data.version.toString());
             break;
-        case Qn::EnterpriseControllerComponent:
-            component = tr("Server v%1<br/>").arg(data.version.toString());
-            break;
-        case Qn::MediaServerComponent: {
+        case Qn::ServerComponent: {
             QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
             if(resource) {
                 component = tr("Server v%1 at %2<br/>").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
@@ -2395,11 +2394,8 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
 
         bool updateRequested = false;
         switch (data.component) {
-        case Qn::MediaServerComponent:
+        case Qn::ServerComponent:
             updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
-            break;
-        case Qn::EnterpriseControllerComponent:
-            updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestVersion);
             break;
         case Qn::ClientComponent:
             updateRequested = false;
