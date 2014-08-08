@@ -20,6 +20,7 @@
 static const int BUFFER_SIZE = 1024;
 const unsigned char sid[] = "Network Optix SSL socket";
 
+
     // TODO: public methods are visible to all, quite bad
 int sock_read(BIO *b, char *out, int outl)
 {
@@ -27,8 +28,7 @@ int sock_read(BIO *b, char *out, int outl)
     if( sslSock->mode() == QnSSLSocket::ASYNC ) {
         int ret = sslSock->asyncRecvInternal(out,outl);
         if( ret == -1 ) {
-            // This flag is useful for SSL to force it return 
-            // SSL_ERROR_WANT_READ/WRITE instead of SYSCALL
+            BIO_clear_retry_flags(b);
             BIO_set_retry_read(b);
         }
         return ret;
@@ -61,8 +61,7 @@ int sock_write(BIO *b, const char *in, int inl)
     if( sslSock->mode() == QnSSLSocket::ASYNC ) {
         int ret = sslSock->asyncSendInternal(in,inl);
         if( ret == -1 ) {
-            // This flag is useful for SSL to force it return 
-            // SSL_ERROR_WANT_READ/WRITE instead of SYSCALL
+            BIO_clear_retry_flags(b);
             BIO_set_retry_write(b);
         }
         return ret;
@@ -241,7 +240,6 @@ public:
             static_cast<const char*>(buffer),static_cast<int>(len));
         return static_cast<int>(len);
     }
-
     int bio_read ( void* buffer , std::size_t len ) {
         int digest_size = (std::min)(static_cast<int>(len),bio_in_buffer_.size()) ;
         if( digest_size == 0 )
@@ -255,15 +253,13 @@ public:
     void async_recv( nx::Buffer* buffer, const std::function<void(SystemError::ErrorCode,std::size_t)>& op ) ;
     void async_send( const nx::Buffer& buffer, const std::function<void(SystemError::ErrorCode,std::size_t)>& op );
 
-    // Checking if the async_ssl socket is EOF status
-    bool eof() const {
-        if( eof_ ) {
-            // Checking whether the buffered data has been consumed or not
-            return bio_in_buffer_.isEmpty();
-        }
-        return false;
+    bool shutdown() const {
+        return ssl_shutdown_ ;
     }
 
+    bool eof() const {
+        return eof_;
+    }
 protected:
 
     nx::Buffer* mutable_bio_input_buffer() const {
@@ -275,6 +271,67 @@ protected:
     }
 
 private:
+    static const char* ssl_error_str( int ssl_error ) {
+        switch(ssl_error) {
+        case SSL_ERROR_SSL: 
+            return "SSL_ERROR_SSL";
+        case SSL_ERROR_SYSCALL:
+            return "SSL_ERROR_SYSCALL";
+        default:
+            return "<ssl not a real error>";
+        }
+    }
+    // SSL typically spew wired error definition. It is very hard to
+    // handle the error throw by the SSL itself. For those error that
+    // we cannot understand, we just record them and hopefully later 
+    // we will take advantage of these errors.
+
+    void handle_error( int ssl_error ) {
+        // Record the SSL error here
+        NX_LOG(
+            lit("SSL error code:%1").arg(QLatin1String(ssl_error_str(ssl_error))),
+            cl_logDEBUG1 );
+        // Dump the error stack here
+        int err;
+        while( (err = ERR_get_error()) != 0 ) {
+            char err_str[1024];
+            ERR_error_string_n(err,err_str,1024);
+            NX_LOG(
+                lit("SSL error stack:%1").arg(QLatin1String(err_str)),cl_logDEBUG1);
+        }
+        // System error string
+        NX_LOG(
+            lit("System error code:%1").arg(SystemError::getLastOSErrorCode()),cl_logDEBUG1);
+    }
+
+    // The SSL can be terminated without notifying the peer. This can be detected by:
+    // 1. SSL_read return 0
+    // 2. SSL_get_error return SSL_ERROR_SYSCALL
+    // 3. ERR_get_error return 0
+    // This situation do happens in our code base based on my debugging. The thing is
+    // the original blocking version does not call SSL_shutdown before calling the 
+    // socket->close. But I will detect it as an error . Anyway, I will handle the eof
+
+    bool check_shutdown( int bytes , int ssl_error ) {
+        if( bytes == 0 ) {
+            // For normal clean shutdown comes from SSL_shutdown
+            if( SSL_get_shutdown(ssl_) == SSL_RECEIVED_SHUTDOWN || 
+                ssl_error == SSL_ERROR_ZERO_RETURN ) {
+                    // This should be the normal shutdown which means the
+                    // peer at least call SSL_shutdown once
+                    ssl_shutdown_ = true;
+                    return true;
+            } else if( ssl_error == SSL_ERROR_SYSCALL ) {
+                // Brute shutdown for SSL connection
+                if( ERR_get_error() == 0 ) {
+                    ssl_shutdown_ = true;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     // asynchronous handshake for SSL socket
     void async_handshake( const std::function<void(SystemError::ErrorCode)>& op );
 
@@ -296,7 +353,12 @@ private:
         
         int ssl_error;
         // perform SSL operation and get the result
-        op->perform( &ssl_error );
+        int bytes = op->perform( &ssl_error );
+        // checking the SSL stream is shutdown or not 
+        if( check_shutdown(bytes,ssl_error) ) {
+            ssl_finalize(op,buffer);
+            return;
+        }
         // check SSL_error and then perform the task
         switch( ssl_error ) {
         case SSL_ERROR_NONE: 
@@ -319,20 +381,7 @@ private:
             // there is a SSL error happened. Because the SystemError::ErrorCode 
             // doesn't comes with SSL error code. We may need to fix them or add
             // some there. Anyway, at least some verbose logging is needed here .
-            if( ssl_error == SSL_ERROR_SSL ) {
-                // We may need to resolve the ssl error
-                NX_LOG(lit("SSL Error:%1").arg(
-                    QLatin1String(ERR_reason_error_string(ERR_get_error()))),cl_logDEBUG1);
-
-            } else if( ssl_error == SSL_ERROR_SYSCALL ) {
-                // If there are no errno() related to SSL_ERROR_SYSCALL
-                // this means that we have error/bug related to BIO object
-                Q_ASSERT((errno !=0) || !"SSL unexpected error!");
-                if( errno != 0 ) {
-                    NX_LOG(lit("SSL SYSCALL Error:%1").arg(
-                        QLatin1String(std::strerror(errno))),cl_logDEBUG1 );
-                }
-            }
+            handle_error( ssl_error );
             // Call user's callback function and passing a fake ssl_internal_error
             // number to let user get notification that we are in trouble here !
             op->error( static_cast<SystemError::ErrorCode>(ssl_internal_error) );
@@ -368,6 +417,7 @@ private:
                         // the buffered data has been consumed 
                         eof_ = true;
                     } else {
+                        Q_ASSERT(bytes_transferred == buffer.write_buffer->size());
                         // append the buffer that has been written into 
                         // to the bio_in_buffer_ and later on SSL will use
                         bio_in_buffer_.append(*buffer.write_buffer);
@@ -383,6 +433,7 @@ private:
                 // And another thing is, SSL is a state machine, so if I doesn't feed the SSL
                 // buffer , it will continue returning SSL_ERROR_WANT_READ . So after a send we
                 // issue another ssl_perform will work out .
+                std::cout<<buffer.read_buffer->size()<<std::endl;
                 do_send( buffer, [this,buffer,op](SystemError::ErrorCode ec,std::size_t bytes_transferred){
                     if( ec ) {
                         op->error(ec);
@@ -421,13 +472,15 @@ private:
         if( !bio_out_buffer_.isEmpty() ) {
             do_send( 
             buffer,
-            [this,op](SystemError::ErrorCode ec,std::size_t) {
+            [this,op](SystemError::ErrorCode ec,std::size_t ) {
                 // Until now , we should have been sent the data out and
                 // what we need to do is just calling the callback function
-                if( !ec ) {
+                if( ec ) {
                     op->error(ec);
                     return;
                 }
+                // Clear the buffer here
+                bio_out_buffer_.clear();
                 // Invoke the callback, the final output has been stored inside
                 // of user data instead of buffer_t object. This is transient data
                 // object and we should not own this buffer object in any sense
@@ -449,6 +502,7 @@ private:
 
 private:
     bool eof_;
+    bool ssl_shutdown_;
     bool server_; 
     SSL* ssl_;
     AbstractStreamSocket* socket_;
@@ -467,9 +521,22 @@ class ssl_async_recv_op : public ssl_async_op {
 public:
     ssl_async_recv_op( SSL* ssl ) : ssl_async_op(ssl){}
     virtual int perform( int* ssl_err ) {
+        // Checking the user buffer capacity. If it is zero,
+        // we modify it. SSL cannot handle buffer size is zero
+        // it will output wired error code and make the code 
+        // hard to debug.
+        if( user_buffer_->capacity() == 0 ) {
+            user_buffer_->resize( async_ssl::async_buffer_default_size );
+        }
         user_buffer_->resize( user_buffer_->capacity() );
         int bytes = SSL_read(ssl(),user_buffer_->data(),
             static_cast<int>(user_buffer_->size()) );
+        // Modify the user_buffer_ size 
+        if( bytes >0 )
+            user_buffer_->resize(bytes);
+        else
+            user_buffer_->clear();
+
         *ssl_err = SSL_get_error(ssl(),bytes);
         return bytes;
     }
@@ -613,6 +680,7 @@ void async_ssl::async_handshake( const std::function<void(SystemError::ErrorCode
 }
 
 async_ssl::async_ssl( SSL* ssl , bool server , AbstractStreamSocket* socket ) :
+    ssl_shutdown_(false),
     eof_(false),
     server_(server),
     ssl_(ssl),
@@ -622,6 +690,7 @@ async_ssl::async_ssl( SSL* ssl , bool server , AbstractStreamSocket* socket ) :
     handshake_op_( new ssl_async_handshake_op(ssl) ) {
         bio_in_buffer_.reserve( bio_input_buffer_reserve );
         bio_out_buffer_.reserve( bio_output_buffer_reserve );
+        SSL_set_mode(ssl_,SSL_MODE_ENABLE_PARTIAL_WRITE);
 }
 
 
@@ -970,14 +1039,13 @@ int QnSSLSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*
 int QnSSLSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/)
 {
     Q_D(QnSSLSocket);
-
+    d->mode = QnSSLSocket::SYNC;
     if (!SSL_is_init_finished(d->ssl)) {
         if (d->isServerSide)
             doServerHandshake();
         else
             doClientHandshake();
     }
-
     return SSL_read(d->ssl, (char*) buffer, bufferLen);
 }
 
@@ -990,7 +1058,7 @@ int QnSSLSocket::sendInternal( const void* buffer, unsigned int bufferLen )
 int QnSSLSocket::send( const void* buffer, unsigned int bufferLen )
 {
     Q_D(QnSSLSocket);
-
+    d->mode = QnSSLSocket::SYNC;
     if (!SSL_is_init_finished(d->ssl)) {
         if (d->isServerSide)
             doServerHandshake();
@@ -1198,14 +1266,6 @@ bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& buffer , std::function<void( 
     d->async_ssl_ptr->async_send( buffer, std::move( handler));
     return true;
 }
-
-// If bio return 0 and also sets the BIO_set_retry_read to true
-// then the SSL just may retry at once (without SSL_MODE_AUTO_RETRY)
-// and if SSL continues getting zero from BIO read. SSL will output
-// SSL_ERROR_SYSCALL which is not something that we wish to handle.
-// In the async version, we want SSL to output SSL_ERROR_WANT_READ/WRITE
-// The interesting is if BIO_xxxx return -1 , then SSL will understand
-// this is not an EOF but a partial read/write. 
 
 int QnSSLSocket::asyncRecvInternal( void* buffer , unsigned int bufferLen ) {
     // For async operation here
