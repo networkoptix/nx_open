@@ -300,7 +300,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "with time=" << tran.timestamp;
+        qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "with time=" << tran.persistentInfo.timestamp;
 #endif
         // process system transactions
         switch(tran.command) {

@@ -49,6 +49,7 @@ QnLicensesUsageWidget::~QnLicensesUsageWidget() {
 void QnLicensesUsageWidget::init(QnLicenseUsageHelper* helper) {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
     foreach (Qn::LicenseType lt, helper->licenseTypes()) {
         QnLicenseUsageWidgetRow* row  = new QnLicenseUsageWidgetRow(this);
         layout->addWidget(row);
