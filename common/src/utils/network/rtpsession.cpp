@@ -1839,8 +1839,8 @@ RTPSession::TrackType RTPSession::getTrackTypeByRtpChannelNum(int channelNum)
         //So, let's try to be closer to RTSP rfc
     //if (rez == TT_UNKNOWN)
     //    rez = getTrackType(channelNum / SDP_TRACK_STEP);
-    //if (channelNum % SDP_TRACK_STEP)
-    //    rez = RTPSession::TrackType(int(rez)+1);
+    if (channelNum % SDP_TRACK_STEP)
+        rez = RTPSession::TrackType(int(rez)+1);
     return rez;
 }
 
