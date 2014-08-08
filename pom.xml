@@ -294,11 +294,30 @@
                 <arch>x64</arch>
                 <force_x86>false</force_x86>
                 <qt.spec>win32-msvc2012</qt.spec>
+				<PlatformToolSet>v110</PlatformToolSet>
                 <profile.classifier>${platform}</profile.classifier>                
                 <windows>true</windows>
                 <unix>false</unix>
             </properties>
         </profile>
+        <profile>
+            <id>windows-xp</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>winxp</value>
+                </property>				
+            </activation>
+
+            <properties>
+                <qt.spec>win32-msvc2012xp</qt.spec>
+				<PlatformToolSet>v110_xp</PlatformToolSet>
+            </properties>
+        </profile>
+		
         <profile>
             <!-- Common Profile for Linux, Mac, Arm -->
             <id>unix</id>
