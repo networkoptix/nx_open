@@ -101,8 +101,7 @@ extern "C" {
 
 int workaround_av_write_trailer(AVFormatContext *s)
 {
-    // todo: #akolesnikov: please check for memory leaks here
-    int ret, i;
+    int ret = 0, i = 0;
     /*
     for(;;){
         AVPacket pkt;
@@ -126,9 +125,9 @@ int workaround_av_write_trailer(AVFormatContext *s)
 
     if(s->oformat->write_trailer)
         ret = s->oformat->write_trailer(s);
-    */
 fail:
-    if (s->pb)
+*/
+    if( s->pb )
         avio_flush(s->pb);
     if(ret == 0)
         ret = s->pb ? s->pb->error : 0;
