@@ -25,11 +25,17 @@ public:
     virtual bool tryClose(bool force) override;
 
     void setCameras(const QnVirtualCameraResourceList &cameras, bool force = false);
+
+    virtual void accept() override;
+    virtual void reject() override;
+
+protected:
+    virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
+
 signals:
     void cameraOpenRequested();
 
 private slots:
-    void at_buttonBox_clicked(QAbstractButton *button);
     void at_settingsWidget_hasChangesChanged();
     void at_settingsWidget_modeChanged();
     void at_advancedSettingChanged();
@@ -42,7 +48,6 @@ private slots:
     void at_cameras_saved(ec2::ErrorCode errorCode, const QnVirtualCameraResourceList &cameras);
     void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
 
-    void acceptIfSafe();
     void updateCamerasFromSelection();
 private:
     void updateReadOnly();

@@ -53,10 +53,6 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     layout->addWidget(m_buttonBox);
 
     connect(m_buttonBox,        SIGNAL(accepted()),                 this,   SLOT(acceptIfSafe()));
-    connect(m_buttonBox,        SIGNAL(rejected()),                 this,   SLOT(reject()));
-    connect(m_buttonBox,        SIGNAL(clicked(QAbstractButton *)), this,   SLOT(at_buttonBox_clicked(QAbstractButton *)));
-
-    connect(this,  &QDialog::rejected,   m_settingsWidget, &QnCameraSettingsWidget::updateFromResources);
 
     connect(m_settingsWidget,   SIGNAL(hasChangesChanged()),        this,   SLOT(at_settingsWidget_hasChangesChanged()));
     connect(m_settingsWidget,   SIGNAL(modeChanged()),              this,   SLOT(at_settingsWidget_modeChanged()));
@@ -84,6 +80,20 @@ bool QnCameraSettingsDialog::tryClose(bool force) {
     if (force)
         hide();
     return true;
+}
+
+
+void QnCameraSettingsDialog::accept() {
+    if (m_ignoreAccept) {
+        m_ignoreAccept = false;
+        return;
+    }
+    base_type::accept();
+}
+
+void QnCameraSettingsDialog::reject() {
+    m_settingsWidget->updateFromResources();
+    base_type::reject();
 }
 
 
@@ -116,8 +126,8 @@ void QnCameraSettingsDialog::at_advancedSettingChanged() {
     saveAdvancedCameraSettingsAsync(cameras);
 }
 
-void QnCameraSettingsDialog::at_buttonBox_clicked(QAbstractButton *button) {
-    switch(m_buttonBox->standardButton(button)) {
+void QnCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button) {
+    switch(button) {
     case QDialogButtonBox::Ok:
     case QDialogButtonBox::Apply:
         submitToResources(true);
@@ -128,13 +138,6 @@ void QnCameraSettingsDialog::at_buttonBox_clicked(QAbstractButton *button) {
     default:
         break;
     }
-}
-
-void QnCameraSettingsDialog::acceptIfSafe() {
-    if (m_ignoreAccept)
-        m_ignoreAccept = false;
-    else
-        accept();
 }
 
 void QnCameraSettingsDialog::at_diagnoseButton_clicked() {
@@ -361,3 +364,4 @@ void QnCameraSettingsDialog::at_camera_settings_saved(int httpStatusCode, const 
         m_settingsWidget->updateFromResources();
     }
 }
+
