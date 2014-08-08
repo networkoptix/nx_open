@@ -49,7 +49,7 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
             continue;
         }
 
-        QnPlOnvifResourcePtr resToNotify;
+        QWeakPointer<QnPlOnvifResource> resToNotify;
 
         //searching for resource by address
         if( notification.oasisWsnB2__ProducerReference && notification.oasisWsnB2__ProducerReference->Address )
@@ -88,7 +88,11 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
         if( resToNotify )
         {
             lk.unlock();
-            resToNotify->notificationReceived( notification );
+            {
+                auto resStrongRef = resToNotify.toStrongRef();
+                if( resStrongRef )
+                    resStrongRef->notificationReceived( notification );
+            }
             lk.relock();
         }
 
@@ -106,9 +110,10 @@ void OnvifNotificationConsumer::registerResource(
     const QString& subscriptionReference )
 {
     QMutexLocker lk( &m_mutex );
-    m_notificationProducerAddressToResource[notificationProducerAddress] = resource;
+    auto resWeakRef = resource.toWeakRef();
+    m_notificationProducerAddressToResource[notificationProducerAddress] = resWeakRef;
     if( !subscriptionReference.isEmpty() )
-        m_subscriptionReferenceToResource[subscriptionReference] = resource;
+        m_subscriptionReferenceToResource[subscriptionReference] = resWeakRef;
 }
 
 //!Cancel registration of \a resource
