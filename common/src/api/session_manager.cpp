@@ -311,7 +311,7 @@ void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenti
     if ((authenticator->user() == user && authenticator->password() == password))
         return;
 
-    authenticator->setUser(user);
+    authenticator->setUser(user.toLower());
     authenticator->setPassword(password);
 }
 
