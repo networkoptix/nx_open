@@ -562,6 +562,10 @@ class ssl_async_send_op : public ssl_async_op {
 public:
     ssl_async_send_op( SSL* ssl ) : ssl_async_op(ssl){}
     virtual int perform( int* ssl_err ) {
+        if( user_buffer_->isEmpty() ) {
+            *ssl_err = SSL_ERROR_NONE;
+            return 0;
+        }
         int bytes = SSL_write( ssl() , 
             user_buffer_->constData() , static_cast<int>(user_buffer_->size()) );
         *ssl_err = SSL_get_error(ssl(),bytes);
