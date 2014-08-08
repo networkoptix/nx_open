@@ -13,9 +13,11 @@
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
 
-#include "utils/common/sleep.h"
+#include <utils/common/log.h>
+#include <utils/common/sleep.h>
 #include <utils/common/model_functions.h>
-#include "utils/common/synctime.h"
+#include <utils/common/synctime.h>
+
 #include "session_manager.h"
 #include "common_message_processor.h"
 
@@ -66,19 +68,11 @@ QString QnAppServerConnectionFactory::clientGuid()
     return QString();
 }
 
-QUrl QnAppServerConnectionFactory::defaultUrl()
-{
+QUrl QnAppServerConnectionFactory::url() {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        return factory->m_defaultUrl;
-    }
+        Q_ASSERT_X(factory->m_url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was passed");
 
-    return QUrl();
-}
-
-QUrl QnAppServerConnectionFactory::publicUrl()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        return factory->m_publicUrl;
+        return factory->m_url;
     }
 
     return QUrl();
@@ -91,14 +85,13 @@ void QnAppServerConnectionFactory::setClientGuid(const QString &guid)
     }
 }
 
-void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
-{
-    Q_ASSERT_X(url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was passed");
-    Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
+
+void QnAppServerConnectionFactory::setUrl(const QUrl &url) {
+    if (url.isValid())
+        Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
 
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_defaultUrl = url;
-        factory->m_publicUrl = url;
+        factory->m_url = url;
     }
 }
 
@@ -134,27 +127,6 @@ void QnAppServerConnectionFactory::setInstanceGuid(const QUuid &uuid)
         factory->m_instanceGuid = uuid;
     }
 }
-
-//QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(const QUrl& url)
-//{
-//    QUrl urlNoPassword (url);
-//    urlNoPassword.setPassword(QString());
-//
-//    NX_LOG(QLatin1String("Creating connection to the Enterprise Controller ") + urlNoPassword.toString(), cl_logDEBUG2);
-//
-//    return QnAppServerConnectionPtr(new QnAppServerConnection(
-//        url,
-//        *(qn_appServerConnectionFactory_instance()->m_resourceFactory),
-//        qn_appServerConnectionFactory_instance()->m_serializer,
-//        qn_appServerConnectionFactory_instance()->m_clientGuid,
-//        qn_appServerConnectionFactory_instance()->m_authKey)
-//    );
-//}
-//
-//QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection()
-//{
-//    return createConnection(defaultUrl());
-//}
 
 static ec2::AbstractECConnectionFactory* ec2ConnectionFactoryInstance = nullptr;
 

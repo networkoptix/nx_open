@@ -11,7 +11,7 @@ class QnOldClientConnectRestHandler
     Q_OBJECT
 public:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType) override;
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& requestBody, QByteArray& responseMessageBody, QByteArray& contentType) override;
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& requestBody, const QByteArray& srcBodyContentType, QByteArray& responseMessageBody, QByteArray& contentType) override;
 };
 
 #endif // OLD_CLIENT_CONNECT_HANDLER_H

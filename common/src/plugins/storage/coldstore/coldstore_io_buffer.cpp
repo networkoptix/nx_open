@@ -1,4 +1,7 @@
 #include "coldstore_io_buffer.h"
+
+#ifdef ENABLE_COLDSTORE
+
 #include "coldstore_storage.h"
 
 
@@ -42,3 +45,5 @@ QnPlColdStoreStoragePtr QnColdStoreIOBuffer::getColdStoreStorage() const
 {
     return getResource().dynamicCast<QnPlColdStoreStorage>();
 }
+
+#endif // ENABLE_COLDSTORE

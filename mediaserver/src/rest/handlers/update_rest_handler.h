@@ -7,7 +7,7 @@ class QnUpdateRestHandler : public QnRestRequestHandler {
     Q_OBJECT
 public:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType) override;
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType) override;
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, QByteArray& contentType) override;
 };
 
 #endif // UPDATE_REST_HANDLER_H

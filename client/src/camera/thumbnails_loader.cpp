@@ -22,15 +22,15 @@ extern "C"
 
 #include "ui/common/geometry.h"
 
-#include "plugins/resources/archive/avi_files/thumbnails_archive_delegate.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resource/avi/thumbnails_archive_delegate.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 
-#include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
+#include "plugins/resource/archive/rtsp_client_archive_delegate.h"
 
 #include "utils/media/frame_info.h"
 
 #include "thumbnails_loader_helper.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
+#include "plugins/resource/avi/avi_resource.h"
 
 #include <recording/time_period.h>
 
@@ -377,7 +377,7 @@ void QnThumbnailsLoader::process() {
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
     if (camera) {
-        QnResourceList servers = QnCameraHistoryPool::instance()->getOnlineCameraServers(camera, period);
+        QnMediaServerResourceList servers = QnCameraHistoryPool::instance()->getOnlineCameraServers(camera, period);
         for (int i = 0; i < servers.size(); ++i) 
         {
             QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(0));
@@ -387,7 +387,7 @@ void QnThumbnailsLoader::process() {
             else
                 rtspDelegate->setQuality(MEDIA_Quality_High, true);
             QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(rtspDelegate));
-            rtspDelegate->setResource(camera);
+            rtspDelegate->setCamera(camera);
             rtspDelegate->setServer(servers[i]);
             delegates << thumbnailDelegate;
         }
@@ -577,12 +577,10 @@ QnThumbnail QnThumbnailsLoader::generateThumbnail(const CLVideoDecoderOutput &ou
 qint64 QnThumbnailsLoader::processThumbnail(const QnThumbnail &thumbnail, qint64 startTime, qint64 endTime, bool ignorePeriod) {
     if(ignorePeriod) {
         emit m_helper->thumbnailLoaded(thumbnail);
-
-        return thumbnail.time() + thumbnail.timeStep();
-    } else {
+        return qCeil(thumbnail.actualTime(), thumbnail.timeStep());
+    } else {      
         for(qint64 time = startTime; time <= endTime; time += thumbnail.timeStep())
             emit m_helper->thumbnailLoaded(QnThumbnail(thumbnail, time));
-
         return qMax(startTime, endTime + thumbnail.timeStep());
     }
 }

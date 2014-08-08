@@ -1,4 +1,7 @@
 #include "coldstore_connection_pool.h"
+
+#ifdef ENABLE_COLDSTORE
+
 #include "coldstore_storage.h"
 #include "utils/common/sleep.h"
 
@@ -387,3 +390,6 @@ void QnColdStoreConnectionPool::checkIfSomeConnectionsNeedToBeClosed()
     }
     
 }
+
+#endif // ENABLE_COLDSTORE
+

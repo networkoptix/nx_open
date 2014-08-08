@@ -15,7 +15,6 @@
 
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/videowall_control_message.h>
-#include <core/resource/videowall_instance_status.h>
 
 #include <nx_ec/impl/ec_api_impl.h>
 #include <nx_ec/impl/sync_handler.h>
@@ -29,7 +28,7 @@
 class QnRestProcessorPool;
 class QnUniversalTcpListener;
 
-//!Contains API classes for the new enterprise controller
+//!Contains API classes for the new Server
 /*!
     TODO describe all API classes
     \note All methods are thread-safe
@@ -103,15 +102,7 @@ namespace ec2
         }
         */
 
-        //!Saves changes to common resource's properties (e.g., name). Accepts any resource
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> 
-        int save( const QnResourcePtr& resource, TargetType* target, HandlerType handler ) {
-            return save( resource, std::static_pointer_cast<impl::SaveResourceHandler>(std::make_shared<impl::CustomSaveResourceHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-        
+       
         /*!
             \param handler Functor with params: (ErrorCode, const QnKvPairListsById&)
         */
@@ -151,7 +142,7 @@ namespace ec2
         virtual int setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler ) = 0;
         //virtual int setResourceDisabled( const QnId& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) = 0;
         virtual int getKvPairs( const QnId &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
-        virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) = 0;
+        //virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) = 0;
         virtual int save( const QnId& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, impl::SaveKvPairsHandlerPtr handler ) = 0;
         virtual int remove( const QnId& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
@@ -367,12 +358,26 @@ namespace ec2
             return addLicenses( licenses, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        ErrorCode addLicensesSync(const QList<QnLicensePtr>& licenses) {
+            using namespace std::placeholders;
+            int(AbstractLicenseManager::*fn)(const QList<QnLicensePtr>&, impl::SimpleHandlerPtr) = &AbstractLicenseManager::addLicenses;
+            return impl::doSyncCall<impl::SimpleHandler>( std::bind(fn, this, licenses, _1));
+        }
+
+
+        template<class TargetType, class HandlerType> int removeLicense( const QnLicensePtr& license, TargetType* target, HandlerType handler ) {
+            return removeLicense( license, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+
     signals:
         void licenseChanged(QnLicensePtr license);
+        void licenseRemoved(QnLicensePtr license);
 
     protected:
         virtual int getLicenses( impl::GetLicensesHandlerPtr handler ) = 0;
         virtual int addLicenses( const QList<QnLicensePtr>& licenses, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int removeLicense( const QnLicensePtr& license, impl::SimpleHandlerPtr handler ) = 0;
     };
 
 
@@ -402,28 +407,6 @@ namespace ec2
             return impl::doSyncCall<impl::GetBusinessRulesHandler>( std::bind(fn, this, _1), businessEventList );
         }
 
-        //!Test if email settings are valid
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int testEmailSettings( const QnEmail::Settings& settings, TargetType* target, HandlerType handler ) {
-            return testEmailSettings( settings, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-        /*!
-            \param to Destination address list
-            \param timeout TODO
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int sendEmail(
-            const ApiEmailData& data,
-            TargetType* target, HandlerType handler )
-        {
-            return sendEmail( data, 
-                std::static_pointer_cast<impl::SimpleHandler>(
-                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
         /*!
             \param handler Functor with params: (ErrorCode)
         */
@@ -469,8 +452,6 @@ namespace ec2
 
     private:
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) = 0;
-        virtual int testEmailSettings( const QnEmail::Settings& settings, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int sendEmail(const ApiEmailData& data, impl::SimpleHandlerPtr handler ) = 0;
         virtual int save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) = 0;
         virtual int deleteRule( QnId ruleId, impl::SimpleHandlerPtr handler ) = 0;
         virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) = 0;
@@ -631,7 +612,6 @@ namespace ec2
         void addedOrUpdated(const QnVideoWallResourcePtr &videowall);
         void removed(const QUuid &id);
         void controlMessage(const QnVideoWallControlMessage &message);
-        void instanceStatusChanged(const QnVideowallInstanceStatus &status);
 
     protected:
         virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) = 0;
@@ -755,6 +735,7 @@ namespace ec2
         virtual void startReceivingNotifications() = 0;
         virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) = 0;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
+        virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) = 0;
 
         virtual AbstractResourceManagerPtr getResourceManager() = 0;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() = 0;
@@ -805,24 +786,8 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int restoreDatabaseAsync( const QByteArray& dbFile, TargetType* target, HandlerType handler ) {
-            return restoreDatabaseAsync( dbFile,
-                std::static_pointer_cast<impl::SimpleHandler>(
-                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-        /*!
-            \param handler Functor with params: (ErrorCode, const QnKvPairList&)
-            \return Request id
-        */
-        template<class TargetType, class HandlerType> int getSettingsAsync( TargetType* target, HandlerType handler ) {
-            return getSettingsAsync( std::static_pointer_cast<impl::GetSettingsHandler>(
-                std::make_shared<impl::CustomGetSettingsHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int saveSettingsAsync( const QnKvPairList& kvPairs, TargetType* target, HandlerType handler ) {
-            return saveSettingsAsync( kvPairs, 
+        template<class TargetType, class HandlerType> int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, TargetType* target, HandlerType handler ) {
+            return restoreDatabaseAsync( data,
                 std::static_pointer_cast<impl::SimpleHandler>(
                     std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -834,7 +799,7 @@ namespace ec2
         //virtual void cancelRequest( int requestID ) = 0;
 
     signals:
-        //!Delivers all resources found in EC
+        //!Delivers all resources found in Server
         /*!
             This signal is emitted after starting notifications delivery by call to \a AbstractECConnection::startReceivingNotifications 
                 if full synchronization is requested
@@ -853,13 +818,13 @@ namespace ec2
         void settingsChanged(QnKvPairList settings);
         void panicModeChanged(Qn::PanicMode mode);
 
+        void databaseDumped();
+
     protected:
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) = 0;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
-        virtual int restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int getSettingsAsync( impl::GetSettingsHandlerPtr handler ) = 0;
-        virtual int saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) = 0;
     };  
 
 
@@ -898,6 +863,9 @@ namespace ec2
         Q_OBJECT
 
     public:
+        AbstractECConnectionFactory():
+            m_compatibilityMode(false)
+        {}
         virtual ~AbstractECConnectionFactory() {}
 
         /*!
@@ -907,7 +875,7 @@ namespace ec2
             return testConnectionAsync( addr, std::static_pointer_cast<impl::TestConnectionHandler>(std::make_shared<impl::CustomTestConnectionHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
-            \param addr Empty url designates local EC ("local" means dll linked to executable, not EC running on local host)
+            \param addr Empty url designates local Server ("local" means dll linked to executable, not Server running on local host)
             \param handler Functor with params: (ErrorCode, AbstractECConnectionPtr)
         */
         template<class TargetType, class HandlerType> int connect( const QUrl& addr, TargetType* target, HandlerType handler ) {
@@ -922,9 +890,24 @@ namespace ec2
         virtual void registerTransactionListener( QnUniversalTcpListener* universalTcpListener ) = 0;
         virtual void setContext( const ResourceContext& resCtx ) = 0;
 
+        /**
+        * \returns                         Whether this connection factory is working in compatibility mode.
+        *                                  In this mode all clients are supported regardless of customization.
+        */
+        bool isCompatibilityMode() const {
+            return m_compatibilityMode;
+        }
+
+        //! \param compatibilityMode         New compatibility mode state.
+        void setCompatibilityMode(bool compatibilityMode) {
+            m_compatibilityMode = compatibilityMode;
+        }
     protected:
         virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) = 0;
         virtual int connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler ) = 0;
+
+    private:
+        bool m_compatibilityMode;
     };
 }
 

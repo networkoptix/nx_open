@@ -12,7 +12,9 @@
 #include <QtGui/QClipboard>
 #include <QtGui/QTextDocumentFragment>
 
-#include "api/app_server_connection.h"
+#include <api/app_server_connection.h>
+#include <api/global_settings.h>
+
 #include "core/resource/resource_type.h"
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/media_server_resource.h>
@@ -47,15 +49,16 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
     if(menu()->canTrigger(Qn::ShowcaseAction)) {
         QPushButton* showcaseButton = new QPushButton(this);
         showcaseButton->setText(action(Qn::ShowcaseAction)->text());
-        connect(showcaseButton, SIGNAL(clicked()), action(Qn::ShowcaseAction), SLOT(trigger()));
+        connect(showcaseButton, &QPushButton::clicked, action(Qn::ShowcaseAction), &QAction::trigger);
         ui->buttonBox->addButton(showcaseButton, QDialogButtonBox::HelpRole);
     }
 
     m_copyButton = new QPushButton(this);
     ui->buttonBox->addButton(m_copyButton, QDialogButtonBox::HelpRole);
 
-    connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    connect(m_copyButton, SIGNAL(clicked()), this, SLOT(at_copyButton_clicked()));
+    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QnAboutDialog::reject);
+    connect(m_copyButton, &QPushButton::clicked, this, &QnAboutDialog::at_copyButton_clicked);
+    connect(QnGlobalSettings::instance(), &QnGlobalSettings::emailSettingsChanged, this, &QnAboutDialog::retranslateUi);
 
     retranslateUi();
 }
@@ -91,13 +94,13 @@ void QnAboutDialog::retranslateUi()
         arg(QLatin1String(QN_APPLICATION_COMPILER));
 
     QnSoftwareVersion ecsVersion = QnAppServerConnectionFactory::currentVersion();
-    QUrl ecsUrl = QnAppServerConnectionFactory::defaultUrl();
+    QUrl ecsUrl = QnAppServerConnectionFactory::url();
     QString servers;
 
     if (ecsVersion.isNull()) {
-        servers = tr("<b>Enterprise controller</b> is not connected.<br>\n");
+        servers = tr("<b>Server</b> is not connected.<br>\n");
     } else {
-        servers = tr("<b>Enterprise controller</b> version %1 at %2:%3.<br>\n").
+        servers = tr("<b>Server</b> version %1 at %2:%3.<br>\n").
             arg(ecsVersion.toString()).
             arg(ecsUrl.host()).
             arg(ecsUrl.port());
@@ -108,7 +111,7 @@ void QnAboutDialog::retranslateUi()
         if (server->getStatus() != QnResource::Online)
             continue;
 
-        serverVersions.append(tr("<b>Media Server</b> version %2 at %3.").arg(server->getVersion().toString()).arg(QUrl(server->getUrl()).host()));
+        serverVersions.append(tr("<b>Server</b> version %2 at %3.").arg(server->getVersion().toString()).arg(QUrl(server->getUrl()).host()));
     }
     
     if (!ecsVersion.isNull() && !serverVersions.isEmpty())
@@ -120,7 +123,6 @@ void QnAboutDialog::retranslateUi()
             "<br />\n"
             "<b>Qt v.%3</b> - Copyright (c) 2012 Nokia Corporation.<br/>\n"
             "<b>FFMpeg %4</b> - Copyright (c) 2000-2012 FFmpeg developers.<br/>\n"
-            "<b>Color Picker v2.6 Qt Solution</b> - Copyright (c) 2009 Nokia Corporation.<br/>\n"
             "<b>LAME 3.99.0</b> - Copyright (c) 1998-2012 LAME developers.<br/>\n"
             "<b>OpenAL %5</b> - Copyright (c) 2000-2006 %6.<br/>\n"
             "<b>SIGAR %7</b> - Copyright (c) 2004-2011 VMware Inc.<br/>\n"
@@ -158,6 +160,9 @@ void QnAboutDialog::retranslateUi()
     ui->creditsLabel->setText(credits);
     ui->gpuLabel->setText(gpu);
     ui->serversLabel->setText(servers);
+
+    QString emailLink = lit("<a href=mailto:%1>%1</a>").arg(QnGlobalSettings::instance()->emailSettings().supportEmail);
+    ui->supportEmailLabel->setText(tr("<b>Email</b>: %1").arg(emailLink));
 }
 
 // -------------------------------------------------------------------------- //

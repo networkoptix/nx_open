@@ -1,6 +1,8 @@
 #ifndef cold_store_io_buffer_h_19_05
 #define cold_store_io_buffer_h_19_05
 
+#ifdef ENABLE_COLDSTORE
+
 #include "core/resource/resource_consumer.h"
 
 #include <QtCore/QBuffer>
@@ -25,5 +27,7 @@ private:
     QString m_fileName;
     
 };
+
+#endif // ENABLE_COLDSTORE
 
 #endif // cold_store_io_buffer_h_19_05

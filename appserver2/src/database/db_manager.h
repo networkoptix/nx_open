@@ -57,7 +57,8 @@ namespace ec2
         QnDbManager(
             QnResourceFactory* factory,
             LicenseManagerImpl* const licenseManagerImpl,
-            const QString& dbFileName );
+            const QString& dbFilePath,
+            const QString& dbFilePathStatic);
         virtual ~QnDbManager();
 
 
@@ -80,16 +81,22 @@ namespace ec2
         template <class T>
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
+            Q_ASSERT_X(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
                 return result;
             return transactionLog->saveTransaction( tran, serializedTran);
         }
 
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiDatabaseDumpData>& tran, const QByteArray& /*serializedTran*/)
+        {
+            return executeTransactionInternal(tran);
+        }
 
         template <class T>
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
+            Q_ASSERT_X(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             QnDbTransactionLocker lock(&m_tran);
             ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
@@ -113,6 +120,9 @@ namespace ec2
 
         //getCurrentTime
         ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiTimeData& currentTime);
+
+        //dumpDatabase
+        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
 
         //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
@@ -190,6 +200,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionInternal(const QnTransaction<ApiIdData>& tran);
@@ -218,11 +229,6 @@ namespace ec2
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallControlMessageData> &) {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
-            return ErrorCode::notImplemented;
-        }
-
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallInstanceStatusData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -297,6 +303,7 @@ namespace ec2
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnId& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
+        ErrorCode checkExistingUser(const QString &name, qint32 internalId);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);
         ErrorCode removeVideowall(const QnId& id);
@@ -315,11 +322,12 @@ namespace ec2
         ErrorCode updateBusinessRule(const ApiBusinessRuleData& rule);
 
         ErrorCode saveLicense(const ApiLicenseData& license);
+        ErrorCode removeLicense(const ApiLicenseData& license);
 
         ErrorCode addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
         ErrorCode removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
 
-        bool createDatabase(bool *dbJustCreated);
+        bool createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2);
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
         
@@ -331,10 +339,18 @@ namespace ec2
         void commit();
         void rollback();
     private:
-        QMap<int, QnId> getGuidList(const QString& request);
+        enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_INT};
+
+        QMap<int, QnId> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
+
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
         bool updateGuids();
         QnId getType(const QString& typeName);
+        bool resyncTransactionLog();
+
+        template <class ObjectType, class ObjectListType> 
+        bool fillTransactionLogInternal(ApiCommand::Value command);
+        bool addTransactionForGeneralSettings();
     private:
         QnResourceFactory* m_resourceFactory;
         LicenseManagerImpl* const m_licenseManagerImpl;
@@ -347,6 +363,15 @@ namespace ec2
         bool m_licenseOverflowMarked;
         qint64 m_licenseOverflowTime;
         QUuid m_dbInstanceId;
+        
+        /*
+        * Database for static or very rare modified data. Be carefull! It's not supported DB transactions for static DB
+        * So, only atomic SQL updates are allowed. m_mutexStatic is used for createDB only. Common mutex/transaction is sharing for both DB
+        */
+        QSqlDatabase m_sdbStatic;
+        QnDbTransaction m_tranStatic;
+        mutable QReadWriteLock m_mutexStatic;
+        bool m_needResyncLog;
     };
 };
 

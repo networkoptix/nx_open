@@ -3,6 +3,8 @@
 
 #include <QtWidgets/QWidget>
 
+#include <ui/widgets/settings/abstract_preferences_widget.h>
+
 namespace Ui {
     class CameraManagementWidget;
 }
@@ -10,14 +12,16 @@ namespace Ui {
 template<class T>
 class QnResourcePropertyAdaptor;
 
-class QnCameraManagementWidget: public QWidget {
+class QnCameraManagementWidget: public QnAbstractPreferencesWidget {
     Q_OBJECT
 public:
     QnCameraManagementWidget(QWidget *parent = NULL);
     virtual ~QnCameraManagementWidget();
 
-    void updateFromSettings();
-    void submitToSettings();
+    virtual void updateFromSettings() override;
+    virtual void submitToSettings() override;
+
+    virtual bool hasChanges() const override;
 
 private slots:
     void at_autoDiscoveryCheckBox_clicked();

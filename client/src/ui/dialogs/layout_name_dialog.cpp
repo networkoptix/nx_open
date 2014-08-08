@@ -4,7 +4,7 @@
 #include <QtWidgets/QPushButton>
 
 QnLayoutNameDialog::QnLayoutNameDialog(const QString &caption, const QString &text, const QString &name, QDialogButtonBox::StandardButtons buttons, QWidget *parent):
-    QnButtonBoxDialog(parent)
+    base_type(parent)
 {
     init(buttons);
 
@@ -14,7 +14,7 @@ QnLayoutNameDialog::QnLayoutNameDialog(const QString &caption, const QString &te
 }
 
 QnLayoutNameDialog::QnLayoutNameDialog(QDialogButtonBox::StandardButtons buttons, QWidget *parent):
-    QnButtonBoxDialog(parent)
+    base_type(parent)
 {
     init(buttons);
 }

@@ -1,6 +1,8 @@
 #ifndef live_strem_provider_h_1508
 #define live_strem_provider_h_1508
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 
@@ -63,6 +65,7 @@ public:
 
     bool isCameraControlDisabled() const;
     void filterMotionByMask(const QnMetaDataV1Ptr& motion);
+    void updateSoftwareMotionStreamNum();
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
@@ -90,7 +93,9 @@ private:
     unsigned int m_framesSinceLastMetaData; // used only for live providers
     QTime m_timeSinceLastMetaData; //used only for live providers
 
+    QMutex m_motionRoleMtx;
     QnResource::ConnectionRole m_softMotionRole;
+    QString m_forcedMotionStream;
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
 #endif
@@ -108,5 +113,7 @@ private:
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //live_strem_provider_h_1508

@@ -21,9 +21,6 @@ const QList<QnLicensePtr> &QnLicenseListModel::licenses() const {
 }
 
 void QnLicenseListModel::setLicenses(const QList<QnLicensePtr> &licenses) {
-    if(m_licenses == licenses)
-        return;
-
     m_licenses = licenses;
 
     rebuild();
@@ -62,7 +59,7 @@ void QnLicenseListModel::setColors(const QnLicensesListModelColors &colors) {
 QString QnLicenseListModel::columnTitle(Column column) {
     switch(column) {
     case TypeColumn:            return tr("Type");
-    case CameraCountColumn:     return tr("Cameras");
+    case CameraCountColumn:     return tr("Amount");
     case LicenseKeyColumn:      return tr("License Key");
     case ExpirationDateColumn:  return tr("Expiration Date");
     case LicenseStatusColumn:   return tr("Status");
@@ -78,7 +75,7 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
 
     switch(column) {
     case TypeColumn:
-        item->setText(license->typeName());
+        item->setText(license->displayName());
         break;
     case CameraCountColumn:
         item->setText(QString::number(license->cameraCount()));
@@ -87,7 +84,7 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
         item->setText(QLatin1String(license->key()));
         break;
     case ExpirationDateColumn:
-        item->setText(license->expirationTime() < 0 ? tr("Never") : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString());
+        item->setText(license->expirationTime() < 0 ? tr("Never") : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString(Qt::SystemLocaleShortDate));
         break;
     case LicenseStatusColumn: 
         {
@@ -132,6 +129,7 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
     if (!qnLicensePool->isLicenseValid(license))
         item->setData(QBrush(colors.expired), Qt::ForegroundRole);
 
+    item->setData(Qt::AlignCenter, Qt::TextAlignmentRole);
     return item;
 }
 

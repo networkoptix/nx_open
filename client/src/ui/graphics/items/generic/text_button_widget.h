@@ -63,7 +63,7 @@ private:
     Qt::Alignment m_alignment;
     bool m_pixmapValid;
     qreal m_relativeFrameWidth;
-    boost::array<qreal, FLAGS_MAX + 1> m_opacities;
+    boost::array<qreal, MaxState + 1> m_opacities;
 };
 
 #endif // QN_TEXT_BUTTON_WIDGET_H

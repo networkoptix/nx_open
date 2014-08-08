@@ -3,6 +3,9 @@
 
 #include <api/app_server_connection.h>
 
+#include "utils/common/id.h"
+#include "utils/network/nettools.h" /* For resolveAddress. */
+
 #include <business/business_aggregation_info.h>
 #include <business/events/reasoned_business_event.h>
 #include <business/events/network_issue_business_event.h>
@@ -15,7 +18,7 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include "utils/common/id.h"
+
 
 namespace {
     static const QString plainTextDelimiter(lit("\n"));
@@ -44,7 +47,7 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
     case BookmarkAction:            return tr("Bookmark");
     case CameraRecordingAction:     return tr("Camera recording");
     case PanicRecordingAction:      return tr("Panic recording");
-    case SendMailAction:            return tr("Send mail");
+    case SendMailAction:            return tr("Send email");
     case DiagnosticsAction:         return tr("Write to log");
     case ShowPopupAction:           return tr("Show notification");
     case PlaySoundAction:           return tr("Repeat sound");
@@ -68,9 +71,9 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
     case StorageFailureEvent:   return tr("Storage Failure");
     case NetworkIssueEvent:     return tr("Network Issue");
     case CameraIpConflictEvent: return tr("Camera IP Conflict");
-    case ServerFailureEvent:    return tr("Media Server Failure");
-    case ServerConflictEvent:   return tr("Media Server Conflict");
-    case ServerStartEvent:      return tr("Media Server Started");
+    case ServerFailureEvent:    return tr("Server Failure");
+    case ServerConflictEvent:   return tr("Server Conflict");
+    case ServerStartEvent:      return tr("Server Started");
     case LicenseIssueEvent:     return tr("License Issue");
     case AnyCameraEvent:        return tr("Any Camera Issue");
     case AnyServerEvent:        return tr("Any Server Issue");
@@ -104,18 +107,18 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
         return tr("Network Issue at %1").arg(resourceName);
 
     case ServerFailureEvent:
-        return tr("Media Server \"%1\" Failure").arg(resourceName);
+        return tr("Server \"%1\" Failure").arg(resourceName);
 
     case CameraIpConflictEvent:
         return tr("Camera IP Conflict at %1").arg(resourceName);
 
     case ServerConflictEvent:
-        return tr("Media Server \"%1\" Conflict").arg(resourceName);
+        return tr("Server \"%1\" Conflict").arg(resourceName);
 
     case ServerStartEvent:
-        return tr("Media Server \"%1\" Started").arg(resourceName);
+        return tr("Server \"%1\" Started").arg(resourceName);
     case LicenseIssueEvent:
-        return tr("Media Server \"%1\" had license issue").arg(resourceName);
+        return tr("Server \"%1\" had license issue").arg(resourceName);
 
     default:
         break;
@@ -207,7 +210,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         int n = 0;
         foreach (const QString &server, conflicts.camerasByServer.keys()) {
             result += delimiter;
-            result += tr("Conflicting EC #%1: %2").arg(++n).arg(server);
+            result += tr("Conflicting Server #%1: %2").arg(++n).arg(server);
             int m = 0;
             foreach (const QString &camera, conflicts.camerasByServer[server]) {
                 result += delimiter;
@@ -365,7 +368,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         result = tr("Not enough HDD/SSD speed for recording to %1.").arg(storageUrl);
         break;
     }
-    case StorageNotEnoughSpaceReason: {
+    case StorageFullReason: {
         QString storageUrl = reasonParamsEncoded;
         result = tr("HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
         break;
@@ -423,25 +426,19 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     if (!mserverRes)
         return QString();
 
-    QUrl appServerUrl = QnAppServerConnectionFactory::publicUrl();
-    QUrl appServerDefaultUrl = QnAppServerConnectionFactory::defaultUrl();
+    QUrl appServerUrl = QnAppServerConnectionFactory::url();
     quint64 ts = params.getEventTimestamp();
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res->getPhysicalId());
     if (history) {
-        QnTimePeriod period;
-        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, true, period, false);
+        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, true, false);
         if (newServer)
             mserverRes = newServer;
     }
 
-    if (!isPublic || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
-        if (resolveAddress(appServerDefaultUrl.host()) != QHostAddress::LocalHost) {
-            appServerUrl = appServerDefaultUrl;
-        } else {
-            QUrl mserverUrl = mserverRes->getUrl();
-            appServerUrl.setHost(mserverUrl.host());
-        }
+    if (resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
+        QUrl mserverUrl = mserverRes->getUrl();
+        appServerUrl.setHost(mserverUrl.host());
     }
 
     QString result(lit("https://%1:%2/web/camera?physical_id=%3&pos=%4"));

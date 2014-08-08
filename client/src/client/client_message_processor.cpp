@@ -6,7 +6,7 @@
 #include "core/resource_management/resource_discovery_manager.h"
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
-#include "device_plugins/server_camera/server_camera.h"
+#include <plugins/resource/server_camera/server_camera.h>
 
 QnClientMessageProcessor::QnClientMessageProcessor():
     base_type(),
@@ -27,8 +27,9 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
         assert(!qnCommon->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;
         data.peer.id = qnCommon->remoteGUID();
-        at_remotePeerLost(data, false);
         qnCommon->setRemoteGUID(QUuid());
+        m_connected = false;
+        emit connectionClosed();
     } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
         qnCommon->setRemoteGUID(QUuid());
     }
@@ -101,12 +102,12 @@ void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
 
 void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr &resource)
 {
-    // set proxy. If some media server IF will be found, proxy address will be cleared
-    const QString& proxyAddr = QnAppServerConnectionFactory::defaultUrl().host();
+    // set proxy. If some servers IF will be found, proxy address will be cleared
+    const QString& proxyAddr = QnAppServerConnectionFactory::url().host();
     resource->apiConnection()->setProxyAddr(
         resource->getApiUrl(),
         proxyAddr,
-        QnAppServerConnectionFactory::defaultUrl().port() );    //starting with 2.3 proxy embedded to EC
+        QnAppServerConnectionFactory::url().port() );    //starting with 2.3 proxy embedded to Server
     disconnect(resource.data(), NULL, this, NULL);
     resource->determineOptimalNetIF();
 }
@@ -150,8 +151,9 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, boo
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-    assert(!isProxy);
-    assert(m_connected);
+
+    Q_ASSERT_X(!isProxy, Q_FUNC_INFO, "!isProxy");
+    Q_ASSERT_X(m_connected, Q_FUNC_INFO, "m_connected");
 
     m_connected = false;
     emit connectionClosed();
@@ -160,5 +162,4 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, boo
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
-    QnResourceDiscoveryManager::instance()->setReady(true);
 }

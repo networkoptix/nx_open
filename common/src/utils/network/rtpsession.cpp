@@ -9,6 +9,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QUuid>
 
+#include "utils/common/log.h"
 #include "utils/common/util.h"
 #include "utils/common/systemerror.h"
 #include "utils/network/http/httptypes.h"
@@ -28,7 +29,7 @@ static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
 
-static const int TCP_CONNECT_TIMEOUT = 1000*2;
+static const int TCP_CONNECT_TIMEOUT = 1000 * 5;
 static const int SDP_TRACK_STEP = 2;
 static const int METADATA_TRACK_NUM = 7;
 static const char USER_AGENT_STR[] = "User-Agent: Network Optix\r\n";
@@ -311,7 +312,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         double resultInSecs = cameraTimeToLocalTime(statistics.nptTime + rtpTimeDiff / double(frequency));
         double localTimeInSecs = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
         // If data is delayed for some reason > than jitter, but not lost, some next data can have timing less then previous data (after reinit).
-        // Such data can not be recorded to archive. I ofter got that situation if media server under debug
+        // Such data can not be recorded to archive. I ofter got that situation if server under debug
         // So, I've increased jitter threshold just in case (very slow mediaServer work e.t.c)
         // In any way, valid threshold behaviour if camera time is changed.
         //if (qAbs(localTimeInSecs - resultInSecs) < 15 || !recursiveAllowed) 

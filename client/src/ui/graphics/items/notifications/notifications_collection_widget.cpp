@@ -5,6 +5,7 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <utils/common/delete_later.h>
+#include <utils/common/util.h> /* For random. */
 
 #include <business/business_strings_helper.h>
 
@@ -69,10 +70,10 @@ QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(QGraphicsItem *parent):
     m_balloon->setText(tr("You have new notifications"));
     m_balloon->setOpacity(0.0);
 
-    connect(m_balloon,  SIGNAL(geometryChanged()),  this, SLOT(updateBalloonTailPos()));
-    connect(this,       SIGNAL(geometryChanged()),  this, SLOT(updateParticleGeometry()));
-    connect(this,       SIGNAL(toggled(bool)),      this, SLOT(updateParticleVisibility()));
-    connect(m_particle, SIGNAL(visibleChanged()),   this, SLOT(at_particle_visibleChanged()));
+    connect(m_balloon,  &QGraphicsWidget::geometryChanged,  this, &QnBlinkingImageButtonWidget::updateBalloonTailPos);
+    connect(this,       &QGraphicsWidget::geometryChanged,  this, &QnBlinkingImageButtonWidget::updateParticleGeometry);
+    connect(this,       &QnImageButtonWidget::toggled,      this, &QnBlinkingImageButtonWidget::updateParticleVisibility);
+    connect(m_particle, &QGraphicsObject::visibleChanged,   this, &QnBlinkingImageButtonWidget::at_particle_visibleChanged);
 
     updateParticleGeometry();
     updateParticleVisibility();
@@ -158,18 +159,14 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     settingsButton->setToolTip(tr("Settings..."));
     settingsButton->setFixedSize(buttonSize);
     settingsButton->setCached(true);
-    connect(settingsButton,   SIGNAL(clicked()),
-            this->context()->action(Qn::BusinessEventsAction), SIGNAL(triggered()));
-//    connect(settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
+    connect(settingsButton, &QnImageButtonWidget::clicked, this->context()->action(Qn::BusinessEventsAction), &QAction::triggered); // TODO: #Elric #GDM I think we should call QAction::trigger, not triggered.
 
     QnImageButtonWidget *filterButton = new QnImageButtonWidget(m_headerWidget);
     filterButton->setIcon(qnSkin->icon("events/filter.png"));
     filterButton->setToolTip(tr("Filter..."));
     filterButton->setFixedSize(buttonSize);
     filterButton->setCached(true);
-    connect(filterButton,   SIGNAL(clicked()),
-            this->context()->action(Qn::PreferencesNotificationTabAction), SIGNAL(triggered()));
-    //connect(filterButton, SIGNAL(clicked()), this, SLOT(at_filterButton_clicked()));
+    connect(filterButton,   &QnImageButtonWidget::clicked, this->context()->action(Qn::PreferencesNotificationTabAction), &QAction::triggered); // TODO: #Elric #GDM same here ^
 
     QnImageButtonWidget *eventLogButton = new QnImageButtonWidget(m_headerWidget);
     eventLogButton->setIcon(qnSkin->icon("events/log.png"));
@@ -177,9 +174,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     eventLogButton->setFixedSize(buttonSize);
     eventLogButton->setCached(true);
     setHelpTopic(eventLogButton, Qn::MainWindow_Notifications_EventLog_Help);
-    connect(eventLogButton,   SIGNAL(clicked()),
-            this->context()->action(Qn::BusinessEventsLogAction), SIGNAL(triggered()));
-    //connect(eventLogButton, SIGNAL(clicked()), this, SLOT(at_eventLogButton_clicked()));
+    connect(eventLogButton,   &QnImageButtonWidget::clicked, this->context()->action(Qn::BusinessEventsLogAction), &QAction::triggered); // TODO: #Elric #GDM same here ^
 
     QnImageButtonWidget *debugButton = NULL;
     if(qnSettings->isDevMode()) {
@@ -188,7 +183,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
         debugButton->setToolTip(tr("DEBUG"));
         debugButton->setFixedSize(buttonSize);
         debugButton->setCached(true);
-        connect(debugButton, SIGNAL(clicked()), this, SLOT(at_debugButton_clicked()));
+        connect(debugButton, &QnImageButtonWidget::clicked, this, &QnNotificationsCollectionWidget::at_debugButton_clicked);
     }
 
     qreal margin = (widgetHeight - buttonSize) / 2.0;
@@ -211,30 +206,19 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     m_list = new QnNotificationListWidget(this);
     layout->addItem(m_list);
 
-    connect(m_list, SIGNAL(itemRemoved(QnNotificationWidget*)), this, SLOT(at_list_itemRemoved(QnNotificationWidget*)));
-    connect(m_list, SIGNAL(visibleSizeChanged()), this, SIGNAL(visibleSizeChanged()));
-    connect(m_list, SIGNAL(sizeHintChanged()), this, SIGNAL(sizeHintChanged()));
-
+    connect(m_list, &QnNotificationListWidget::itemRemoved,         this, &QnNotificationsCollectionWidget::at_list_itemRemoved);
+    connect(m_list, &QnNotificationListWidget::visibleSizeChanged,  this, &QnNotificationsCollectionWidget::visibleSizeChanged);
+    connect(m_list, &QnNotificationListWidget::sizeHintChanged,     this, &QnNotificationsCollectionWidget::sizeHintChanged);
 
     setLayout(layout);
 
     QnWorkbenchNotificationsHandler *handler = this->context()->instance<QnWorkbenchNotificationsHandler>();
-    connect(handler,    SIGNAL(businessActionAdded(QnAbstractBusinessActionPtr)),
-            this,       SLOT(showBusinessAction(QnAbstractBusinessActionPtr)));
-    connect(handler,    SIGNAL(businessActionRemoved(QnAbstractBusinessActionPtr)),
-            this,       SLOT(hideBusinessAction(QnAbstractBusinessActionPtr)));
-
-    connect(handler,    SIGNAL(systemHealthEventAdded   (QnSystemHealth::MessageType, const QnResourcePtr&)),
-            this,       SLOT(showSystemHealthMessage    (QnSystemHealth::MessageType, const QnResourcePtr&)));
-    connect(handler,    SIGNAL(systemHealthEventRemoved (QnSystemHealth::MessageType, const QnResourcePtr&)),
-            this,       SLOT(hideSystemHealthMessage    (QnSystemHealth::MessageType, const QnResourcePtr&)));
-
-    connect(handler,    SIGNAL(cleared()),
-            this,       SLOT(hideAll()));
-
-    connect(this->context()->instance<QnAppServerNotificationCache>(), SIGNAL(fileDownloaded(const QString&, bool)),
-            this, SLOT(at_notificationCache_fileDownloaded(const QString&, bool)));
-
+    connect(handler,    &QnWorkbenchNotificationsHandler::businessActionAdded,      this,   &QnNotificationsCollectionWidget::showBusinessAction);
+    connect(handler,    &QnWorkbenchNotificationsHandler::businessActionRemoved,    this,   &QnNotificationsCollectionWidget::hideBusinessAction);
+    connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventAdded,   this,   &QnNotificationsCollectionWidget::showSystemHealthMessage);
+    connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventRemoved, this,   &QnNotificationsCollectionWidget::hideSystemHealthMessage);
+    connect(handler,    &QnWorkbenchNotificationsHandler::cleared,                  this,   &QnNotificationsCollectionWidget::hideAll);
+    connect(this->context()->instance<QnAppServerNotificationCache>(), &QnAppServerNotificationCache::fileDownloaded, this, &QnNotificationsCollectionWidget::at_notificationCache_fileDownloaded);
 }
 
 QnNotificationsCollectionWidget::~QnNotificationsCollectionWidget() {
@@ -262,8 +246,8 @@ void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *bl
     m_blinker = blinker;
     
     if (m_blinker) {
-        connect(m_list, SIGNAL(itemCountChanged()),         this, SLOT(updateBlinker()));
-        connect(m_list, SIGNAL(notificationLevelChanged()), this, SLOT(updateBlinker()));
+        connect(m_list, &QnNotificationListWidget::itemCountChanged,         this, &QnNotificationsCollectionWidget::updateBlinker);
+        connect(m_list, &QnNotificationListWidget::notificationLevelChanged, this, &QnNotificationsCollectionWidget::updateBlinker);
         updateBlinker();
     }
 }
@@ -401,7 +385,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     m_itemsByBusinessRuleId.insert(businessAction->getBusinessRuleId(), item);
 
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
-    connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters &)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters &)), Qt::QueuedConnection);
+    connect(item, &QnNotificationWidget::actionTriggered, this, &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
 
     m_list->addItem(item, businessAction->actionType() == QnBusiness::PlaySoundAction);
 }
@@ -462,7 +446,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         item->addActionButton(
             qnSkin->icon("events/smtp.png"),
             tr("SMTP Settings"),
-            Qn::PreferencesServerTabAction
+            Qn::PreferencesSmtpTabAction
         );
         break;
     case QnSystemHealth::UsersEmailIsEmpty:
@@ -477,14 +461,14 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         item->addActionButton(
             qnSkin->icon("events/connection.png"),
             tr("Connect to server"),
-            Qn::ConnectToServerAction
+            Qn::OpenLoginDialogAction
         );
         break;
     case QnSystemHealth::EmailSendError:
         item->addActionButton(
             qnSkin->icon("events/email.png"),
             tr("SMTP Settings"),
-            Qn::PreferencesServerTabAction
+            Qn::PreferencesSmtpTabAction
         );
         break;
     case QnSystemHealth::StoragesNotConfigured:
@@ -509,7 +493,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     setHelpTopic(item, QnBusiness::healthHelpId(message));
 
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
-    connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)), Qt::QueuedConnection);
+    connect(item, &QnNotificationWidget::actionTriggered, this, &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
 
     m_list->addItem(item, message != QnSystemHealth::ConnectionLost);
     m_itemsByMessageType.insert(message, item);
@@ -716,5 +700,4 @@ void QnNotificationsCollectionWidget::at_notificationCache_fileDownloaded(const 
         item->setSound(filePath, true);
     }
     m_itemsByLoadingSound.remove(filename);
-
 }

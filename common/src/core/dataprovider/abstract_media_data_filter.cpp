@@ -4,6 +4,7 @@
 
 #include "abstract_media_data_filter.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
 
 AbstractMediaDataFilter::AbstractMediaDataFilter( const AbstractOnDemandDataProviderPtr& dataSource )
 :
@@ -30,3 +31,5 @@ quint64 AbstractMediaDataFilter::currentPos() const
 {
     return m_dataSource->currentPos();
 }
+
+#endif // ENABLE_DATA_PROVIDERS

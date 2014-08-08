@@ -73,8 +73,7 @@ int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequest
     return CODE_OK;
 }
 
-int QnRebuildArchiveRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnRebuildArchiveRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
 {
-    Q_UNUSED(body)
-        return executeGet(path, params, result, contentType);
+    return executeGet(path, params, result, contentType);
 }

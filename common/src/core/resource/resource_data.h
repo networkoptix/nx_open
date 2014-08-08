@@ -3,60 +3,56 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QMetaType>
+#include <QtCore/QJsonValue>
 
-#include <core/ptz/ptz_fwd.h>
+#include <utils/common/warnings.h>
 
-// TODO: #Elric use json for storage. Like in customizations.
 class QnResourceData {
 public:
     QnResourceData() {}
 
-    QVariant value(const QString &key, const QVariant &defaultValue = QVariant()) const {
-        return m_valueByKey.value(key, defaultValue);
+    template<class T>
+    bool value(const QString &key, T *value) const {
+        return this->value(
+            key, 
+            qMetaTypeId<T>(), 
+            value, 
+            [](const void *src, void *dst) { *static_cast<T *>(dst) = *static_cast<const T *>(src); }
+        );
     }
 
     template<class T>
     T value(const QString &key, const T &defaultValue = T()) const {
-        auto pos = m_valueByKey.find(key);
-        if(pos == m_valueByKey.end())
-            return defaultValue;
-
-        QVariant result = *pos;
-        if(!result.convert(static_cast<QVariant::Type>(qMetaTypeId<T>())))
-            return defaultValue;
-
-        return result.value<T>();
+        T result;
+        return this->value(key, &result) ? result : defaultValue;
     }
 
-    void setValue(const QString &key, const QVariant &value) {
-        m_valueByKey.insert(key, value);
-    }
-
-    template<class T>
-    void setValue(const QString &key, const T &value) {
-        m_valueByKey.insert(key, QVariant::fromValue<T>(value));
-    }
-
-    void add(const QnResourceData &other) {
-        if(m_valueByKey.isEmpty()) {
-            m_valueByKey = other.m_valueByKey;
-        } else {
-            for(auto pos = other.m_valueByKey.begin(); pos != other.m_valueByKey.end(); pos++)
-                m_valueByKey.insert(pos.key(), pos.value());
-        }
-    }
-
-    /* Built-in data follows. */
-
-    QnPtzMapperPtr ptzMapper();
+    void add(const QnResourceData &other);
 
 private:
+    typedef void (*CopyFunction)(const void *src, void *dst);
+
+    bool value(const QString &key, int type, void *value, const CopyFunction &copyFunction) const;
+
+private:
+    friend class QnResourceDataJsonSerializer;
+
+    struct Data {
+        Data(): type(QMetaType::UnknownType) {}
+
+        int type;
+        QJsonValue json;
+        QVariant value;
+    };
+
 #ifdef _DEBUG
-    QMap<QString, QVariant> m_valueByKey; /* Map is easier to look through in debug. */
+    QMap<QString, Data> m_dataByKey; /* Map is easier to look through in debug. */
 #else
-    QHash<QString, QVariant> m_valueByKey;
+    QHash<QString, Data> m_dataByKey;
 #endif
 };
+
+Q_DECLARE_METATYPE(QnResourceData)
 
 bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceData *target);
 

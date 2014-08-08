@@ -25,6 +25,7 @@
 #include "resource_fwd.h"
 #include "resource_type.h"
 #include "param.h"
+#include "resource_command_processor.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
@@ -33,9 +34,11 @@ class QnResourcePool;
 class QnInitResPool: public QThreadPool
 {
 public:
+    static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
+
     QnInitResPool() : QThreadPool() 
     {
-        setMaxThreadCount(64);
+        setMaxThreadCount( DEFAULT_RESOURCE_INIT_THREADS_COUNT );
     }
 };
 
@@ -98,7 +101,7 @@ public:
 
         foreigner = 0x40000,    /**< Resource belongs to other entity. E.g., camera on another server */
         no_last_gop = 0x80000,  /**< Do not use last GOP for this when stream is opened */
-        deprecated = 0x100000,  /**< Resource absent in EC but still used in memory for some reason */
+        deprecated = 0x100000,  /**< Resource absent in Server but still used in memory for some reason */
 
         videowall = 0x200000,           /**< Videowall resource */
         desktop_camera = 0x400000,      /**< Desktop Camera resource */
@@ -198,19 +201,21 @@ public:
     // return true if no error
     bool getParam(const QString &name, QVariant &val, QnDomain domain) const;
 
+#ifdef ENABLE_DATA_PROVIDERS
     // same as getParam is invoked in separate thread.
     // as soon as param changed parameterValueChanged() signal is emitted
     void getParamAsync(const QString &name, QnDomain domain);
+#endif 
 
 
     // return true if no error
     virtual bool setParam(const QString &name, const QVariant &val, QnDomain domain);
 
+#ifdef ENABLE_DATA_PROVIDERS
     // same as setParam but but returns immediately;
     // this function leads setParam invoke in separate thread. so no need to make it virtual
     void setParamAsync(const QString &name, const QVariant &val, QnDomain domain);
-
-    // ==============================================================================
+#endif 
 
     // some time we can find resource, but cannot request additional information from it ( resource has bad ip for example )
     // in this case we need to request additional information later.
@@ -219,9 +224,10 @@ public:
 
     // updateResource requests the additional  information and returns resource with same params but additional info; unknownResource() for returned resource must return false
     virtual QnResourcePtr updateResource() { return QnResourcePtr(0); }
-    //=============
 
+#ifdef ENABLE_DATA_PROVIDERS
     QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
+#endif
 
     QString getUrl() const;
     virtual void setUrl(const QString &url);
@@ -233,7 +239,10 @@ public:
     QStringList getTags() const;
 
     bool hasConsumer(QnResourceConsumer *consumer) const;
+#ifdef ENABLE_DATA_PROVIDERS
     bool hasUnprocessedCommands() const;
+#endif
+
     bool isInitialized() const;
 
     static void stopAsyncTasks();
@@ -255,6 +264,8 @@ public:
     QString getProperty(const QString &key, const QString &defaultValue = QString()) const;
     void setProperty(const QString &key, const QString &value);
     QnKvPairList getProperties() const;
+
+    static QnInitResPool* initAsyncPoolInstance();
 
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param) const;
@@ -288,11 +299,13 @@ signals:
 
 
 public:
+#ifdef ENABLE_DATA_PROVIDERS
     // this is thread to process commands like setparam
     static void startCommandProc();
     static void stopCommandProc();
-    static void addCommandToProc(const QnAbstractDataPacketPtr& data);
+    static void addCommandToProc(const QnResourceCommandPtr &command);
     static int commandProcQueueSize();
+#endif
 
     void update(const QnResourcePtr& other, bool silenceMode = false);
 
@@ -312,7 +325,10 @@ protected:
 
     virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain);
 
+#ifdef ENABLE_DATA_PROVIDERS
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+#endif
+
     virtual QnAbstractPtzController *createPtzControllerInternal(); // TODO: #Elric does not belong here
 
     virtual CameraDiagnostics::Result initInternal() {return CameraDiagnostics::NoErrorResult();};

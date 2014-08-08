@@ -100,6 +100,9 @@ void QnWorkbenchUserWatcher::at_resource_nameChanged(const QnResourcePtr &resour
 }
 
 bool QnWorkbenchUserWatcher::reconnectRequired(const QnUserResourcePtr &user) {
+    if (m_userName.isEmpty())
+        return false;   //we are not connected
+
     if (user->getName() != m_userName)
         return true;
 
@@ -127,14 +130,12 @@ void QnWorkbenchUserWatcher::at_user_resourceChanged(const QnResourcePtr &resour
     if (!reconnectRequired(resource.dynamicCast<QnUserResource>()))
         return;
 
-    //TODO: #Elric #TR add message box on next step of translations generating
-    menu()->trigger(Qn::DisconnectAction,
-        QnActionParameters().withArgument(Qn::ForceRole, true));
-    menu()->trigger(Qn::ConnectToServerAction);
-
+    //TODO: #GDM #TR add message box 
+    menu()->trigger(Qn::ReconnectAction);
 }
 
 void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnUserResourcePtr &user) {
     Q_UNUSED(user)
+    //TODO: #GDM #TR add message box 
     menu()->trigger(Qn::ReconnectAction);
 }

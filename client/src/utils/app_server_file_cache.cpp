@@ -6,6 +6,8 @@
 #include <QtCore/QTimer>
 #include <QtCore/QStandardPaths>
 
+#include <utils/common/util.h> /* For removeDir. */
+
 #include <api/app_server_connection.h>
 
 
@@ -25,7 +27,7 @@ QnAppServerFileCache::~QnAppServerFileCache(){}
 
 QString QnAppServerFileCache::getFullPath(const QString &filename) const {
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    QUrl url = QnAppServerConnectionFactory::defaultUrl();
+    QUrl url = QnAppServerConnectionFactory::url();
     return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/%2_%3/%4/%5"))
                                     .arg(path)
                                     .arg(url.host(QUrl::FullyEncoded))
@@ -54,7 +56,13 @@ void QnAppServerFileCache::clearLocalCache() {
 // -------------- File List loading methods -----
 
 void QnAppServerFileCache::getFileList() {
-    m_fileListHandle = QnAppServerConnectionFactory::getConnection2()->getStoredFileManager()->listDirectory(
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection) {
+        m_fileListHandle = -1;
+        return;
+    }
+
+    m_fileListHandle = connection->getStoredFileManager()->listDirectory(
                 m_folderName,
                 this,
                 &QnAppServerFileCache::at_fileListReceived );

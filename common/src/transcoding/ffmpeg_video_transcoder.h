@@ -1,6 +1,8 @@
 #ifndef __FFMPEG_VIDEO_TRANSCODER_H__
 #define __FFMPEG_VIDEO_TRANSCODER_H__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QCoreApplication>
 
 #include "transcoder.h"
@@ -50,5 +52,7 @@ private:
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // __FFMPEG_VIDEO_TRANSCODER_H__

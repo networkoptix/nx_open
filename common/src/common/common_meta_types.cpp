@@ -19,6 +19,7 @@
 #include <api/model/connection_info.h>
 #include <api/model/time_reply.h>
 #include <api/model/rebuild_archive_reply.h>
+#include <api/runtime_info_manager.h>
 
 #include <recording/time_period_list.h>
 
@@ -41,11 +42,11 @@
 #include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_control_message.h>
 #include <core/resource/videowall_matrix.h>
-#include <core/resource/videowall_instance_status.h>
 
 #include <recording/time_period.h>
 
 #include <core/misc/schedule_task.h>
+#include <core/ptz/ptz_mapper.h>
 #include <core/ptz/ptz_data.h>
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
@@ -56,6 +57,7 @@
 #include <business/business_fwd.h>
 
 #include <licensing/license.h>
+#include "api/model/test_email_settings_reply.h"
 
 
 namespace {
@@ -78,9 +80,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qt::Orientations>();
 
     qRegisterMetaType<QnMacAddress>();
+    qRegisterMetaType<QnPeerRuntimeInfo>();
 
     qRegisterMetaType<QnParam>();
-    qRegisterMetaType<QnId>();
     
     qRegisterMetaType<QnKvPair>();
     qRegisterMetaType<QnKvPairList>();
@@ -119,7 +121,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnVideoWallPcData>();
     qRegisterMetaType<QnVideoWallControlMessage>();
     qRegisterMetaType<QnVideoWallMatrix>();
-    qRegisterMetaType<QnVideowallInstanceStatus>();
 
     qRegisterMetaType<QnMotionRegion>();
     qRegisterMetaType<QnScheduleTask>();
@@ -147,11 +148,14 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnStringVariantPairList>("QList<QPair<QString,QVariant> >");
     qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
 
+#ifdef ENABLE_DATA_PROVIDERS
+    qRegisterMetaType<QnMetaDataV1Ptr>();
+#endif
+
     qRegisterMetaType<QnAbstractBusinessActionPtr>();
     qRegisterMetaType<QnAbstractBusinessActionList>();
     qRegisterMetaType<QnBusinessActionDataListPtr>();
     qRegisterMetaType<QnAbstractBusinessEventPtr>();
-    qRegisterMetaType<QnMetaDataV1Ptr>();
     qRegisterMetaType<QnBusinessEventRulePtr>();
     qRegisterMetaType<QnBusinessEventRuleList>();
     qRegisterMetaType<QnAbstractDataPacketPtr>();
@@ -161,6 +165,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnStorageStatusReply>();
     qRegisterMetaType<QnStatisticsReply>();
     qRegisterMetaType<QnTimeReply>();
+    qRegisterMetaType<QnTestEmailSettingsReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
     qRegisterMetaType<QnRebuildArchiveReply>();
     qRegisterMetaType<QnManualCameraSearchReply>();
@@ -169,14 +174,16 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnManualCameraSearchSingleCamera>();
 
     qRegisterMetaType<QnPtzPreset>();
-
     qRegisterMetaType<QnPtzPresetList>();
     qRegisterMetaType<QnPtzTour>();
     qRegisterMetaType<QnPtzTourList>();
     qRegisterMetaType<QnPtzData>();
     qRegisterMetaType<QnPtzLimits>();
+    qRegisterMetaType<QnPtzMapperPtr>();
     qRegisterMetaType<Qn::PtzDataFields>();
     qRegisterMetaType<Qn::PtzCommand>();
+    qRegisterMetaType<Qn::PtzTraits>();
+    qRegisterMetaType<Qn::PtzCapabilities>();
 
     qRegisterMetaType<QnMediaDewarpingParams>();
     qRegisterMetaType<QnItemDewarpingParams>();
@@ -190,6 +197,11 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnModuleInformation>();
 
     qRegisterMetaType<Qn::CameraDataType>();
+
+
+    QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
+    QnJsonSerializer::registerSerializer<Qn::PtzTraits>();
+    QnJsonSerializer::registerSerializer<Qn::PtzCapabilities>();
 
     qn_commonMetaTypes_initialized = true;
 }

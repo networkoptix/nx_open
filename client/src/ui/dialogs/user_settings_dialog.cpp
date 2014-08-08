@@ -27,8 +27,7 @@ namespace Qn {
 }
 
 QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent): 
-    QDialog(parent),
-    QnWorkbenchContextAware(context),
+    base_type(parent),
     ui(new Ui::UserSettingsDialog()),
     m_user(0),
     m_hasChanges(false),
@@ -228,7 +227,7 @@ void QnUserSettingsDialog::submitToResource() {
     if(!m_user)
         return;
 
-    m_user->setName(ui->loginEdit->text());
+    m_user->setName(ui->loginEdit->text().trimmed());
 //    if(!ui->passwordEdit->text().isEmpty())
     m_user->setPassword(ui->passwordEdit->text()); //empty text means 'no change'
 
@@ -298,11 +297,11 @@ void QnUserSettingsDialog::updateElement(Element element) {
 
     switch(element) {
     case Login:
-        if(ui->loginEdit->text().isEmpty()) {
+        if(ui->loginEdit->text().trimmed().isEmpty()) {
             hint = tr("Login cannot be empty.");
             valid = false;
         }
-        if(m_userByLogin.contains(ui->loginEdit->text().toLower()) && m_userByLogin.value(ui->loginEdit->text().toLower()) != m_user) {
+        if(m_userByLogin.contains(ui->loginEdit->text().trimmed().toLower()) && m_userByLogin.value(ui->loginEdit->text().trimmed().toLower()) != m_user) {
             hint = tr("User with specified login already exists.");
             valid = false;
         }
@@ -312,7 +311,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
             !ui->confirmPasswordEdit->text().isEmpty())
                 && !m_currentPassword.isEmpty() && ui->currentPasswordEdit->text() != m_currentPassword) {
             if(ui->currentPasswordEdit->text().isEmpty()) {
-                hint = tr("To change your password, please\n enter your current password.");
+                hint = tr("To change your password, please enter your current password.");
                 valid = false;
             } else {
                 hint = tr("Invalid current password.");

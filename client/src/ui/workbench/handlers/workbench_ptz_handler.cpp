@@ -224,7 +224,7 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
     QnPtzManageDialog* dialog = QnPtzManageDialog::instance();
     assert(dialog);
 
-    if (dialog->isVisible() && !dialog->checkForUnsavedChanges())
+    if (dialog->isVisible() && !dialog->tryClose(false))
         return;
 
     dialog->setController(widget->ptzController());
@@ -244,7 +244,7 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered() {
         return;
 
     qreal startZ = 0.0;
-    qreal endZ = 0.521385;
+    qreal endZ = 0.8;
 
     for(int i = 0; i <= 20; i++) {
         position.setZ(startZ + (endZ - startZ) * i / 20.0);

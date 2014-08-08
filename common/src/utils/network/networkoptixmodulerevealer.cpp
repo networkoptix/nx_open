@@ -47,7 +47,7 @@ NetworkOptixModuleRevealer::NetworkOptixModuleRevealer(
             std::auto_ptr<UDPSocket> sock( new UDPSocket() );
             if( !sock->bind( SocketAddress(localAddressToUse.toString(), 0) ) ||
                 !sock->setReuseAddrFlag(true) ||
-                !sock->setLocalAddressAndPort( localAddressToUse.toString(), multicastGroupPort ) ||
+                !sock->bind( SocketAddress(localAddressToUse.toString(), multicastGroupPort) ) ||
                 !sock->joinGroup( multicastGroupAddress.toString(), localAddressToUse.toString() ) )
             {
                 SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();

@@ -87,6 +87,19 @@ Qn::ActionVisibility QnVideoWallReviewModeCondition::check(const QnActionParamet
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
+
+
+bool QnPreviewSearchModeCondition::isPreviewSearchMode() const {
+    return context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
+}
+
+Qn::ActionVisibility QnPreviewSearchModeCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
+        if (m_hide == isPreviewSearchMode())
+            return Qn::InvisibleAction;
+    return Qn::EnabledAction;
+}
+
 QnConjunctionActionCondition::QnConjunctionActionCondition(const QList<QnActionCondition *> conditions, QObject *parent) :
     QnActionCondition(parent),
     m_conditions(conditions)
@@ -111,38 +124,6 @@ Qn::ActionVisibility QnConjunctionActionCondition::check(const QnActionParameter
     Qn::ActionVisibility result = Qn::EnabledAction;
     foreach (QnActionCondition *condition, m_conditions)
         result = qMin(result, condition->check(parameters));
-
-    return result;
-}
-
-Qn::ActionVisibility QnConjunctionActionCondition::check(const QnResourceList &resources) {
-    Qn::ActionVisibility result = Qn::EnabledAction;
-    foreach (QnActionCondition *condition, m_conditions)
-        result = qMin(result, condition->check(resources));
-
-    return result;
-}
-
-Qn::ActionVisibility QnConjunctionActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
-    Qn::ActionVisibility result = Qn::EnabledAction;
-    foreach (QnActionCondition *condition, m_conditions)
-        result = qMin(result, condition->check(layoutItems));
-
-    return result;
-}
-
-Qn::ActionVisibility QnConjunctionActionCondition::check(const QnResourceWidgetList &widgets) {
-    Qn::ActionVisibility result = Qn::EnabledAction;
-    foreach (QnActionCondition *condition, m_conditions)
-        result = qMin(result, condition->check(widgets));
-
-    return result;
-}
-
-Qn::ActionVisibility QnConjunctionActionCondition::check(const QnWorkbenchLayoutList &layouts) {
-    Qn::ActionVisibility result = Qn::EnabledAction;
-    foreach (QnActionCondition *condition, m_conditions)
-        result = qMin(result, condition->check(layouts));
 
     return result;
 }
@@ -499,6 +480,9 @@ Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &p
     if (isImage)
         return Qn::InvisibleAction;
 
+    if (context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole))
+        return Qn::EnabledAction;
+
 #if 0
     if(camera->isGroupPlayOnly())
         return Qn::InvisibleAction;
@@ -682,10 +666,6 @@ Qn::ActionVisibility QnChangeResolutionActionCondition::check(const QnActionPara
         return Qn::EnabledAction;
 }
 
-Qn::ActionVisibility QnCheckForUpdatesActionCondition::check(const QnActionParameters &) {
-    return qnSettings->isUpdatesEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
-}
-
 Qn::ActionVisibility QnShowcaseActionCondition::check(const QnActionParameters &) {
     return qnSettings->isShowcaseEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
 }
@@ -741,25 +721,36 @@ Qn::ActionVisibility QnNonEmptyVideowallActionCondition::check(const QnResourceL
     return Qn::InvisibleAction;
 }
 
-
 Qn::ActionVisibility QnSaveVideowallReviewActionCondition::check(const QnResourceList &resources) {
-    foreach(const QnResourcePtr &resource, resources) {
-        if(!resource->hasFlags(QnResource::videowall)) 
-            continue;
+    QnLayoutResourceList layouts;
 
-        QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
-        if (!videowall)
-            continue;
+    if(m_current) {
+        if (workbench()->currentLayout()->data().contains(Qn::VideoWallResourceRole))
+            layouts << workbench()->currentLayout()->resource();
+    } else {
+        foreach(const QnResourcePtr &resource, resources) {
+            if(!resource->hasFlags(QnResource::videowall)) 
+                continue;
 
-       // if (videowall->items()->getItems().isEmpty())
-       //     continue; //disable check to avoid unsaved empty layout
+            QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
+            if (!videowall)
+                continue;
 
-        if (!QnWorkbenchLayout::instance(videowall))
-            continue;
-
-        return Qn::EnabledAction;
+            QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(videowall);
+            if (!layout)
+                continue;
+            layouts << layout->resource();
+        }
     }
-    return Qn::InvisibleAction;
+
+    if (layouts.isEmpty())
+       return Qn::InvisibleAction;
+
+    foreach (const QnLayoutResourcePtr &layout, layouts)
+        if(snapshotManager()->isModified(layout))
+            return Qn::EnabledAction;
+
+    return Qn::DisabledAction;
 }
 
 Qn::ActionVisibility QnRunningVideowallActionCondition::check(const QnResourceList &resources) {
@@ -826,9 +817,9 @@ Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionPar
     if (parameters.videoWallItems().size() > 0) {
         // allow action if there is at least one online item
         foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
-            if (index.isNull() || !index.videowall()->items()->hasItem(index.uuid()))
+            if (!index.isValid())
                 continue;
-            if (index.videowall()->items()->getItem(index.uuid()).online)
+            if (index.item().online)
                 return Qn::EnabledAction;
         }
         return Qn::DisabledAction;
@@ -875,11 +866,10 @@ Qn::ActionVisibility QnStartVideoWallControlActionCondition::check(const QnActio
         return Qn::InvisibleAction;
 
     foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
-        if (index.isNull() || !index.videowall()->items()->hasItem(index.uuid()))
+        if (!index.isValid())
             continue;
 
-        auto item = index.videowall()->items()->getItem(index.uuid());
-        if (item.layout.isNull())
+        if (index.item().layout.isNull())
             continue;
 
         return Qn::EnabledAction;

@@ -45,6 +45,7 @@ private:
         UnauthorizedSubText,
         LoadingText,
         AnalogLicenseText,
+        VideowallLicenseText,
         TextCount
     };
 

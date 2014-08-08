@@ -1,6 +1,8 @@
 #ifndef __FFMPEG_TRANSCODER_H
 #define __FFMPEG_TRANSCODER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 extern "C"
 {
     #include <libavcodec/avcodec.h>
@@ -31,7 +33,8 @@ public:
 
     //!Implementation of QnTranscoder::addTag
     virtual bool addTag( const QString& name, const QString& value ) override;
-
+    void setInMiddleOfStream(bool value) { m_inMiddleOfStream = value; }
+    bool inMiddleOfStream() const { return m_inMiddleOfStream; }
 protected:
     virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result) override;
 
@@ -50,6 +53,10 @@ private:
     AVIOContext* m_ioContext;
     QString m_container;
     qint64 m_baseTime;
+    bool m_inMiddleOfStream;
 };
 
+#endif // ENABLE_DATA_PROVIDERS
+
 #endif  // __FFMPEG_TRANSCODER_H
+

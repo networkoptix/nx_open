@@ -17,7 +17,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
-#include <device_plugins/server_camera/server_camera.h>
+#include <plugins/resource/server_camera/server_camera.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/actions.h>
@@ -31,6 +31,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
+
 #include <ui/workbench/workbench_context.h>
 
 namespace {
@@ -38,9 +39,8 @@ namespace {
 }
 
 
-QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
+QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
     ui(new Ui::EventLogDialog),
     m_eventTypesModel(new QStandardItemModel()),
     m_actionTypesModel(new QStandardItemModel()),
@@ -147,8 +147,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     updateHeaderWidth();
 }
 
-QnEventLogDialog::~QnEventLogDialog()
-{
+QnEventLogDialog::~QnEventLogDialog() {
 }
 
 QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, QnBusiness::EventType value)

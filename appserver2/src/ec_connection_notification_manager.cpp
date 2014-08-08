@@ -104,6 +104,11 @@ namespace ec2
         emit m_ecConnection->runtimeInfoChanged(tran.params);
     }
 
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDatabaseDumpData> & /*tran*/)
+    {
+        emit m_ecConnection->databaseDumped();
+    }
+
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiMediaServerData>& tran ) {
         m_mediaServerManager->triggerNotification( tran );
     }
@@ -165,19 +170,7 @@ namespace ec2
         emit m_ecConnection->panicModeChanged(tran.params.mode);
     }
 
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceParamDataList>& tran ) {
-        if( tran.command == ApiCommand::saveSettings ) {
-            QnKvPairList newSettings;
-            fromApiToResourceList(tran.params, newSettings);
-            emit m_ecConnection->settingsChanged(newSettings);
-        }
-    }
-
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran ) {
-        return m_videowallManager->triggerNotification(tran);
-    }
-
-    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiVideowallInstanceStatusData> &tran) {
         return m_videowallManager->triggerNotification(tran);
     }
 

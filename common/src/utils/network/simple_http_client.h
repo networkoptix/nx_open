@@ -96,7 +96,7 @@ public:
     QAuthenticator auth() const { return m_auth; }
 
 private:
-    void initSocket();
+    void initSocket( bool ssl = false );
 
     void getAuthInfo();
 

@@ -29,6 +29,8 @@ public:
 
     void init();
 
+    void updatePage();
+    void updateImage();
 signals:
     void dataChanged();
 
@@ -43,10 +45,6 @@ private slots:
     void at_calibrator_finished(int errorCode);
     void at_autoButton_clicked();
     void at_image_animationFinished();
-
-    void at_imageProvider_imageChanged();
-
-    void at_updateTimer_timeout();
 
     void at_xCenterSlider_valueChanged(int value);
     void at_yCenterSlider_valueChanged(int value);

@@ -4,8 +4,8 @@
 #include <QFile>
 #include <QSqlError>
 
-QnDbHelper::QnDbTransaction::QnDbTransaction(QSqlDatabase& sdb, QReadWriteLock& mutex): 
-    m_sdb(sdb),
+QnDbHelper::QnDbTransaction::QnDbTransaction(QSqlDatabase& database, QReadWriteLock& mutex): 
+    m_database(database),
     m_mutex(mutex)
 {
 
@@ -14,20 +14,20 @@ QnDbHelper::QnDbTransaction::QnDbTransaction(QSqlDatabase& sdb, QReadWriteLock& 
 void QnDbHelper::QnDbTransaction::beginTran()
 {
     m_mutex.lockForWrite();
-    QSqlQuery query(m_sdb);
+    QSqlQuery query(m_database);
     query.exec(lit("BEGIN TRANSACTION"));
 }
 
 void QnDbHelper::QnDbTransaction::rollback()
 {
-    QSqlQuery query(m_sdb);
+    QSqlQuery query(m_database);
     query.exec(lit("ROLLBACK"));
     m_mutex.unlock();
 }
 
 void QnDbHelper::QnDbTransaction::commit()
 {
-    QSqlQuery query(m_sdb);
+    QSqlQuery query(m_database);
     query.exec(lit("COMMIT"));
     m_mutex.unlock();
 }
@@ -83,9 +83,9 @@ QList<QByteArray> quotedSplit(const QByteArray& data)
     return result;
 }
 
-bool QnDbHelper::execSQLQuery(const QString& queryStr)
+bool QnDbHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database)
 {
-    QSqlQuery query(m_sdb);
+    QSqlQuery query(database);
     query.prepare(queryStr);
     bool rez = query.exec(queryStr);
     if (!rez)
@@ -93,7 +93,7 @@ bool QnDbHelper::execSQLQuery(const QString& queryStr)
     return rez;
 }
 
-bool QnDbHelper::execSQLFile(const QString& fileName)
+bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
 {
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly))
@@ -112,10 +112,10 @@ bool QnDbHelper::execSQLFile(const QString& fileName)
 #endif // DB_DEBUG
         if (singleCommand.trimmed().isEmpty())
             continue;
-        QSqlQuery ddlQuery(m_sdb);
+        QSqlQuery ddlQuery(database);
         ddlQuery.prepare(QString::fromUtf8(singleCommand));
         if (!ddlQuery.exec()) {
-            qWarning() << "can't create tables for sqlLite database:" << ddlQuery.lastError().text();
+            qWarning() << "can't create tables for sqlLite database:" << ddlQuery.lastError().text() << ". Query was: " << singleCommand;
             return false;
         }
     }
@@ -123,9 +123,9 @@ bool QnDbHelper::execSQLFile(const QString& fileName)
 }
 
 
-bool QnDbHelper::isObjectExists(const QString& objectType, const QString& objectName)
+bool QnDbHelper::isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database)
 {
-    QSqlQuery tableList(m_sdb);
+    QSqlQuery tableList(database);
     QString request;
     request = QString(lit("SELECT * FROM sqlite_master WHERE type='%1' and name='%2'")).arg(objectType).arg(objectName);
     tableList.prepare(request);

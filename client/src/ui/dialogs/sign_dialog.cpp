@@ -1,8 +1,8 @@
 #include "sign_dialog.h"
 #include "ui_sign_dialog.h"
 
-#include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "plugins/resources/archive/abstract_archive_stream_reader.h"
+#include "plugins/resource/avi/avi_resource.h"
+#include "plugins/resource/archive/abstract_archive_stream_reader.h"
 
 #include "camera/gl_renderer.h"
 #include "camera/cam_display.h"
@@ -74,7 +74,7 @@ private:
 // ------------------------------------
 
 SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
-    QDialog(parent),
+    base_type(parent),
     ui(new Ui::SignDialog),
     m_camDispay(NULL),
     m_reader(NULL),

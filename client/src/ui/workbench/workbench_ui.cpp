@@ -73,10 +73,6 @@
 #include <utils/common/checked_cast.h>
 #include <client/client_settings.h>
 
-#include "openal/qtvaudiodevice.h"
-#include "core/resource_management/resource_pool.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
-
 #include "watchers/workbench_render_watcher.h"
 #include "workbench.h"
 #include "workbench_display.h"
@@ -154,37 +150,32 @@ namespace {
         return result;
     }
 
-    class QnTopResizerWidget: public GraphicsWidget {
+    class QnResizerWidget: public GraphicsWidget {
         typedef GraphicsWidget base_type;
 
     public:
-        QnTopResizerWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0):
-            base_type(parent, wFlags)
+        QnResizerWidget(Qt::Orientation orientation, QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0):
+            base_type(parent, wFlags),
+            m_orientation(orientation)
         {
             setAcceptedMouseButtons(Qt::LeftButton);
-            setCursor(Qt::SizeVerCursor);
             setAcceptHoverEvents(false);
             setFlag(ItemHasNoContents, true);
-            setFlag(ItemIsMovable, true);
             setHandlingFlag(ItemHandlesMovement, true);
+            setEnabled(true);
         }
-    };
 
-
-    class QnRightResizerWidget: public GraphicsWidget {
-        typedef GraphicsWidget base_type;
-
-    public:
-        QnRightResizerWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0):
-            base_type(parent, wFlags)
+        void setEnabled(bool enabled)
         {
-            setAcceptedMouseButtons(Qt::LeftButton);
-            setCursor(Qt::SizeHorCursor);
-            setAcceptHoverEvents(false);
-            setFlag(ItemHasNoContents, true);
-            setFlag(ItemIsMovable, true);
-            setHandlingFlag(ItemHandlesMovement, true);
+            setFlag(ItemIsMovable, enabled);
+            if (enabled)
+                setCursor(m_orientation == Qt::Vertical ? Qt::SizeVerCursor : Qt::SizeHorCursor);
+            else
+                setCursor(QCursor());
         }
+
+    private:
+        Qt::Orientation m_orientation;
     };
 
     class QnTabBarGraphicsProxyWidget: public QGraphicsProxyWidget {
@@ -674,6 +665,9 @@ void QnWorkbenchUi::at_freespaceAction_triggered() {
         setSliderOpened(qnSettings->isSliderOpened(), isFullscreen);
         setNotificationsOpened(qnSettings->isNotificationsOpened(), isFullscreen);
 
+        updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: #Elric change code so that this call is not needed.
+        action(Qn::FitInViewAction)->trigger();
+
         m_inFreespace = false;
     }
 }
@@ -890,6 +884,8 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
 
     if (save)
         qnSettings->setTreeOpened(opened);
+
+    static_cast<QnResizerWidget*>(m_treeResizerWidget)->setEnabled(opened);
 }
 
 QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
@@ -1081,7 +1077,7 @@ void QnWorkbenchUi::createTreeWidget() {
     m_treeShowButton = newShowHideButton(m_controlsWidget, action(Qn::ToggleTreeAction));
     m_treeShowButton->setFocusProxy(m_treeItem);
 
-    m_treeResizerWidget = new QnRightResizerWidget(m_controlsWidget);
+    m_treeResizerWidget = new QnResizerWidget(Qt::Horizontal, m_controlsWidget);
     m_treeResizerWidget->setProperty(Qn::NoHandScrollOver, true);
     m_treeResizerWidget->stackBefore(m_treeShowButton);
     m_treeItem->stackBefore(m_treeResizerWidget);
@@ -1325,7 +1321,7 @@ void QnWorkbenchUi::createTitleWidget() {
     m_titleRightButtonsLayout->addStretch(0x1000);
     if (QnScreenRecorder::isSupported())
         m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction), 1.0, Qn::MainWindow_ScreenRecording_Help));
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ConnectToServerAction)));
+    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenLoginDialogAction)));
     m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
     titleLayout->addItem(m_titleRightButtonsLayout);
     m_titleItem->setLayout(titleLayout);
@@ -1966,6 +1962,8 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
 
     if (save)
         qnSettings->setSliderOpened(opened);
+
+    static_cast<QnResizerWidget*>(m_sliderResizerWidget)->setEnabled(opened);
 }
 
 void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
@@ -2145,7 +2143,7 @@ void QnWorkbenchUi::at_sliderResizerWidget_geometryChanged() {
 
 void QnWorkbenchUi::createSliderWidget() 
 {
-    m_sliderResizerWidget = new QnTopResizerWidget(m_controlsWidget);
+    m_sliderResizerWidget = new QnResizerWidget(Qt::Vertical, m_controlsWidget);
     m_sliderResizerWidget->setProperty(Qn::NoHandScrollOver, true);
 
     m_sliderItem = new QnNavigationItem(m_controlsWidget);

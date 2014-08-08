@@ -2,7 +2,6 @@
 
 #include "recorder/storage_manager.h"
 #include "utils/network/tcp_connection_priv.h"
-#include "rest/server/rest_server.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
 #include <utils/fs/file.h>
@@ -166,9 +165,8 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     return CODE_OK;
 }
 
-int QnRecordedChunksRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnRecordedChunksRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
 {
-    Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 

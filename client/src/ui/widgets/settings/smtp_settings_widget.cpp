@@ -4,6 +4,9 @@
 #include <QtWidgets/QMessageBox>
 
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
+
+#include <nx_ec/ec_api.h>
 
 #include <ui/style/warning_style.h>
 
@@ -13,8 +16,9 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/handlers/workbench_notifications_handler.h>
+#include "version.h"
+#include "core/resource_management/resource_pool.h"
+#include "core/resource/media_server_resource.h"
 
 namespace {
     enum WidgetPages {
@@ -22,6 +26,8 @@ namespace {
         AdvancedPage,
         TestingPage
     };
+
+    const int testSmtpTimeoutMSec = 20 * 1000;
 }
 
 class QnPortNumberValidator: public QIntValidator {
@@ -54,13 +60,11 @@ private:
 };
 
 QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
-    QWidget(parent),
+    QnAbstractPreferencesWidget(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::SmtpSettingsWidget),
-    m_requestHandle(-1),
     m_testHandle(-1),
-    m_timeoutTimer(new QTimer(this)),
-    m_settingsReceived(false)
+    m_timeoutTimer(new QTimer(this))
 {
     ui->setupUi(this);
 
@@ -68,15 +72,18 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
 
     connect(ui->portComboBox,           SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_portComboBox_currentIndexChanged(int)));
     connect(ui->advancedCheckBox,       SIGNAL(toggled(bool)),              this,   SLOT(at_advancedCheckBox_toggled(bool)));
-    connect(ui->simpleEmailLineEdit,    SIGNAL(textChanged(QString)),       this,   SLOT(at_simpleEmail_textChanged(QString)));
     connect(ui->testButton,             SIGNAL(clicked()),                  this,   SLOT(at_testButton_clicked()));
     connect(ui->cancelTestButton,       SIGNAL(clicked()),                  this,   SLOT(at_cancelTestButton_clicked()));
     connect(ui->okTestButton,           SIGNAL(clicked()),                  this,   SLOT(at_okTestButton_clicked()));
     connect(m_timeoutTimer,             SIGNAL(timeout()),                  this,   SLOT(at_timer_timeout()));
+    connect(ui->simpleEmailLineEdit,    &QLineEdit::textChanged,            this,   &QnSmtpSettingsWidget::validateEmailSimple);
+    connect(ui->simpleSupportEmailLineEdit, &QLineEdit::textChanged,        this,   &QnSmtpSettingsWidget::validateEmailSimple);
+    connect(ui->supportEmailLineEdit,   &QLineEdit::textChanged,            this,   &QnSmtpSettingsWidget::validateEmailAdvanced);
 
     m_timeoutTimer->setSingleShot(false);
 
     setWarningStyle(ui->detectErrorLabel);
+    setWarningStyle(ui->supportEmailWarningLabel);
 
     const QString autoPort = tr("Auto");
     ui->portComboBox->addItem(autoPort, 0);
@@ -85,6 +92,9 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
         ui->portComboBox->addItem(QString::number(port), port);
     }
     ui->portComboBox->setValidator(new QnPortNumberValidator(autoPort, this));
+
+    ui->supportEmailLineEdit->setPlaceholderText(lit(QN_SUPPORT_MAIL_ADDRESS));
+    ui->simpleSupportEmailLineEdit->setPlaceholderText(lit(QN_SUPPORT_MAIL_ADDRESS));
 }
 
 QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
@@ -92,23 +102,26 @@ QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
 }
 
 void QnSmtpSettingsWidget::updateFromSettings() {
-    m_settingsReceived = false;
+    QnEmail::Settings settings = QnGlobalSettings::instance()->emailSettings();
 
-    m_requestHandle = QnAppServerConnectionFactory::getConnection2()->getSettingsAsync(
-        this, &QnSmtpSettingsWidget::at_settings_received );
+    loadSettings(settings.server, settings.connectionType, settings.port);
+    ui->userLineEdit->setText(settings.user);
+    ui->simpleEmailLineEdit->setText(settings.user);
+    ui->passwordLineEdit->setText(settings.password);
+    ui->simplePasswordLineEdit->setText(settings.password);
+    ui->signatureLineEdit->setText(settings.signature);
+    ui->simpleSignatureLineEdit->setText(settings.signature);
+    ui->supportEmailLineEdit->setText(settings.supportEmail);
+    ui->simpleSupportEmailLineEdit->setText(settings.supportEmail);
+    ui->advancedCheckBox->setChecked(!settings.simple);
+    ui->stackedWidget->setCurrentIndex(ui->advancedCheckBox->isChecked()
+        ? AdvancedPage
+        : SimplePage);
+    updateFocusedElement();
 }
 
 void QnSmtpSettingsWidget::submitToSettings() {
-    QnEmail::Settings result = settings();
-    QnWorkbenchNotificationsHandler* notificationsHandler = context()->instance<QnWorkbenchNotificationsHandler>();
-    QnKvPairList serializedSettings = result.serialized();
-    auto saveSettingsHandler = [notificationsHandler, serializedSettings]( int reqID, ec2::ErrorCode errorCode ){
-        notificationsHandler->updateSmtpSettings( reqID, errorCode, serializedSettings );
-    };
-    QnAppServerConnectionFactory::getConnection2()->saveSettingsAsync(
-        serializedSettings,
-        notificationsHandler,
-        saveSettingsHandler );
+    QnGlobalSettings::instance()->setEmailSettings(settings());
 }
 
 void QnSmtpSettingsWidget::updateFocusedElement() {
@@ -124,7 +137,7 @@ void QnSmtpSettingsWidget::updateFocusedElement() {
     }
 }
 
-QnEmail::Settings QnSmtpSettingsWidget::settings() {
+QnEmail::Settings QnSmtpSettingsWidget::settings() const {
 
     QnEmail::Settings result;
 
@@ -135,6 +148,7 @@ QnEmail::Settings QnSmtpSettingsWidget::settings() {
         result.password = ui->simplePasswordLineEdit->text();
         result.simple = true;
         result.signature = ui->simpleSignatureLineEdit->text();
+        result.supportEmail = ui->simpleSupportEmailLineEdit->text();
         return result;
     }
 
@@ -151,6 +165,7 @@ QnEmail::Settings QnSmtpSettingsWidget::settings() {
         result.port = QnEmail::defaultPort(result.connectionType);
     result.simple = false;
     result.signature = ui->signatureLineEdit->text();
+    result.supportEmail = ui->supportEmailLineEdit->text();
     return result;
 }
 
@@ -204,28 +219,7 @@ void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
     }
 }
 
-void QnSmtpSettingsWidget::at_simpleEmail_textChanged(const QString &value) {
-    if (!m_settingsReceived)
-        return;
-
-    ui->detectErrorLabel->setText(QString());
-
-    if (value.isEmpty())
-        return;
-
-    QnEmail email(value);
-    if (!email.isValid()) {
-        ui->detectErrorLabel->setText(tr("Email is not valid"));
-    } else
-    if (email.smtpServer().isNull()) {
-        ui->detectErrorLabel->setText(tr("No preset found. Use 'Advanced' option."));
-    }
-}
-
 void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
-    if (!m_settingsReceived)
-        return;
-
     if (toggled) {
         QString value = ui->simpleEmailLineEdit->text();
         QnEmail email(value);
@@ -242,20 +236,22 @@ void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
         ui->userLineEdit->setText(value);
         ui->passwordLineEdit->setText(ui->simplePasswordLineEdit->text());
         ui->signatureLineEdit->setText(ui->simpleSignatureLineEdit->text());
+        ui->supportEmailLineEdit->setText(ui->simpleSupportEmailLineEdit->text());
+        validateEmailAdvanced();
     } else {
         ui->simpleEmailLineEdit->setText(ui->userLineEdit->text());
         ui->simplePasswordLineEdit->setText(ui->passwordLineEdit->text());
         ui->simpleSignatureLineEdit->setText(ui->signatureLineEdit->text());
-        at_simpleEmail_textChanged(ui->userLineEdit->text()); //force error checking
+        ui->simpleSupportEmailLineEdit->setText(ui->supportEmailLineEdit->text());
+        validateEmailSimple();
     }
     ui->stackedWidget->setCurrentIndex(toggled ? AdvancedPage : SimplePage);
 }
 
 void QnSmtpSettingsWidget::at_testButton_clicked() {
-    if (!m_settingsReceived)
-        return;
-
     QnEmail::Settings result = settings();
+    result.timeout = testSmtpTimeoutMSec / 1000;
+
     if (result.isNull()) {
         QMessageBox::warning(this, tr("Invalid data"), tr("Provided parameters are not valid. Could not perform a test."));
         return;
@@ -281,14 +277,40 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
 
     ui->testResultLabel->setText(tr("In Progress..."));
 
-    m_timeoutTimer->setInterval(result.timeout * 1000 / ui->testProgressBar->maximum());
+    m_timeoutTimer->setInterval(testSmtpTimeoutMSec / ui->testProgressBar->maximum());
     m_timeoutTimer->start();
 
-    m_testHandle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->testEmailSettings(
-        result.serialized(),
-        this,
-        &QnSmtpSettingsWidget::at_finishedTestEmailSettings );
+    QnMediaServerResourcePtr serverResource;
+    QnMediaServerResourceList servers = qnResPool->getAllServers();
+    if (!servers.isEmpty()) {
+        serverResource = servers.first();
+        foreach(QnMediaServerResourcePtr mserver, servers)
+        {
+            if (mserver->getServerFlags() & Qn::SF_HasPublicIP) {
+                serverResource = mserver;
+                break;
+            }
+        }
+    }
+    if (!serverResource)
+        return;
+
+    QnMediaServerConnectionPtr serverConnection = serverResource->apiConnection();
+    if (!serverConnection)
+        return;
+
+    m_testHandle = serverConnection->testEmailSettingsAsync( result, this, SLOT(at_testEmailSettingsFinished(int, const QnTestEmailSettingsReply& , int)));
     ui->stackedWidget->setCurrentIndex(TestingPage);
+}
+
+void QnSmtpSettingsWidget::at_testEmailSettingsFinished(int status, const QnTestEmailSettingsReply& reply, int handle)
+{
+    if (handle != m_testHandle)
+        return;
+
+    stopTesting(reply.errorCode != 0
+        ? tr("Error while testing settings")
+        : tr("Success") );
 }
 
 void QnSmtpSettingsWidget::at_cancelTestButton_clicked() {
@@ -305,15 +327,6 @@ void QnSmtpSettingsWidget::at_timer_timeout() {
     stopTesting(tr("Timed out"));
 }
 
-void QnSmtpSettingsWidget::at_finishedTestEmailSettings( int handle, ec2::ErrorCode errorCode ) {
-    if (handle != m_testHandle)
-        return;
-
-    stopTesting(errorCode != ec2::ErrorCode::ok
-            ? tr("Error while testing settings")
-            : tr("Success") );
-}
-
 void QnSmtpSettingsWidget::at_okTestButton_clicked() {
     ui->controlsWidget->setEnabled(true);
     ui->stackedWidget->setCurrentIndex(ui->advancedCheckBox->isChecked()
@@ -321,30 +334,44 @@ void QnSmtpSettingsWidget::at_okTestButton_clicked() {
                                        : SimplePage);
 }
 
-void QnSmtpSettingsWidget::at_settings_received( int handle, ec2::ErrorCode errorCode, const QnEmail::Settings& settings) {
-    if (handle != m_requestHandle)
-        return;
+void QnSmtpSettingsWidget::validateEmailSimple() {
 
-    if(errorCode != ec2::ErrorCode::ok) {
-        QMessageBox::critical(this, tr("Error"), tr("Could not read settings from Enterprise Controller."));
-        m_settingsReceived = true;
-        return;
+    QString errorText;
+
+    const QString targetEmail = ui->simpleEmailLineEdit->text();
+    const QString supportEmail = ui->simpleSupportEmailLineEdit->text();
+
+    if (!targetEmail.isEmpty()) {
+        QnEmail email(targetEmail); 
+        if (!email.isValid())
+            errorText = tr("Email is not valid");
+        else if (email.smtpServer().isNull())
+            errorText = tr("No preset found. Use 'Advanced' option");
     }
 
-    m_requestHandle = -1;
-    context()->instance<QnWorkbenchNotificationsHandler>()->updateSmtpSettings(handle, errorCode, settings);
+    if (errorText.isEmpty() && !supportEmail.isEmpty()) {
+        QnEmail support(supportEmail);
+        if (!support.isValid())
+            errorText = tr("Support email is not valid");
+    } 
 
-    loadSettings(settings.server, settings.connectionType, settings.port);
-    ui->userLineEdit->setText(settings.user);
-    ui->simpleEmailLineEdit->setText(settings.user);
-    ui->passwordLineEdit->setText(settings.password);
-    ui->simplePasswordLineEdit->setText(settings.password);
-    ui->signatureLineEdit->setText(settings.signature);
-    ui->simpleSignatureLineEdit->setText(settings.signature);
-    ui->advancedCheckBox->setChecked(!settings.simple);
-    ui->stackedWidget->setCurrentIndex(ui->advancedCheckBox->isChecked()
-                                       ? AdvancedPage
-                                       : SimplePage);
-    m_settingsReceived = true;
-    updateFocusedElement();
+    ui->detectErrorLabel->setText(errorText);
+}
+
+void QnSmtpSettingsWidget::validateEmailAdvanced() {
+    QString errorText;
+
+    const QString supportEmail = ui->supportEmailLineEdit->text();
+
+    if (!supportEmail.isEmpty()) {
+        QnEmail support(supportEmail);
+        if (!support.isValid())
+            errorText = tr("Support email is not valid");
+    }
+
+    ui->supportEmailWarningLabel->setText(errorText);
+}
+
+bool QnSmtpSettingsWidget::hasChanges() const  {
+    return settings() != QnGlobalSettings::instance()->emailSettings();
 }

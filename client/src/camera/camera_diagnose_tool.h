@@ -68,7 +68,8 @@ namespace CameraDiagnostics
         QString errorMessage() const;
 
     public slots:
-        //!Receives response from media server
+        void onGetServerSystemNameResponse( int status, QString serverSystemName, int handle );
+        //!Receives response from server
         /*!
             \param status \a QNetworkReply::NetworkError
             \param performedStep Constant from \a Step::Value enumeration

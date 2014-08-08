@@ -1,6 +1,8 @@
 #include "workbench_notifications_handler.h"
 
-#include <api/app_server_connection.h>
+#include <api/global_settings.h>
+
+#include <common/common_module.h>
 
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
@@ -37,6 +39,8 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     connect(messageProcessor,   &QnCommonMessageProcessor::businessActionReceived,          this,   &QnWorkbenchNotificationsHandler::at_eventManager_actionReceived);
 
     connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH), &QnPropertyNotifier::valueChanged, this, &QnWorkbenchNotificationsHandler::at_settings_valueChanged);
+
+    connect(QnGlobalSettings::instance(), &QnGlobalSettings::emailSettingsChanged,          this,   &QnWorkbenchNotificationsHandler::at_emailSettingsChanged);
 }
 
 QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler() {
@@ -45,12 +49,6 @@ QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler() {
 
 void QnWorkbenchNotificationsHandler::clear() {
     emit cleared();
-}
-
-void QnWorkbenchNotificationsHandler::requestSmtpSettings() {
-    if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)
-        QnAppServerConnectionFactory::getConnection2()->getSettingsAsync(
-            this, &QnWorkbenchNotificationsHandler::updateSmtpSettings );
 }
 
 void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
@@ -126,15 +124,6 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     return false;
 }
 
-void QnWorkbenchNotificationsHandler::updateSmtpSettings( int handle, ec2::ErrorCode errorCode, const QnEmail::Settings &settings ) {
-    Q_UNUSED(handle)
-    if (errorCode != ec2::ErrorCode::ok)
-        return;
-
-    bool isInvalid = settings.server.isEmpty() || settings.user.isEmpty() || settings.password.isEmpty();
-    setSystemHealthEventVisible(QnSystemHealth::SmtpIsNotSet, isInvalid);
-}
-
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible) {
     setSystemHealthEventVisible(message, QnResourcePtr(), visible);
 }
@@ -166,7 +155,6 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
 }
 
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {
-    requestSmtpSettings();
     at_licensePool_licensesChanged();
 
     m_adaptor->setResource(context()->user());
@@ -194,7 +182,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
         return;
 
     case QnSystemHealth::SmtpIsNotSet:
-        requestSmtpSettings();
+        at_emailSettingsChanged();
         return;
 
     case QnSystemHealth::StoragesNotConfigured:
@@ -221,7 +209,8 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened() {
 
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed() {
     clear();
-    setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, QnResourcePtr(), true);
+    if (!qnCommon->remoteGUID().isNull())
+        setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, QnResourcePtr(), true);
 }
 
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
@@ -285,4 +274,10 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id) {
             setSystemHealthEventVisible(message, false);
     }
     m_popupSystemHealthFilter = filter;
+}
+
+void QnWorkbenchNotificationsHandler::at_emailSettingsChanged() {
+    QnEmail::Settings settings = QnGlobalSettings::instance()->emailSettings();
+    bool isInvalid = settings.server.isEmpty() || settings.user.isEmpty() || settings.password.isEmpty();
+    setSystemHealthEventVisible(QnSystemHealth::SmtpIsNotSet, isInvalid);
 }

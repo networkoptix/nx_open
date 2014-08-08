@@ -1,6 +1,8 @@
 #ifndef _LAYOUT_STORAGE_PROTOCOL_H__
 #define _LAYOUT_STORAGE_PROTOCOL_H__
 
+#ifdef ENABLE_ARCHIVE
+
 #include <QtCore/QFile>
 
 extern "C"
@@ -21,8 +23,6 @@ public:
     enum StorageFlags {
         ReadOnly        = 0x1,
         ContainsCameras = 0x2,
-
-        Count
     };
 
     QnLayoutFileStorageResource();
@@ -55,6 +55,7 @@ public:
     static QString updateNovParent(const QString& novName, const QString& itemName);
 
     static QString layoutPrefix();
+
 public:
     static const int MAX_FILES_AT_LAYOUT = 256;
 
@@ -81,6 +82,7 @@ public:
 #pragma pack(pop)
 
     static QString removeProtocolPrefix(const QString& url);
+
 private:
     bool addFileEntry(const QString& fileName);
     qint64 getFileOffset(const QString& fileName, qint64* fileSize);
@@ -107,5 +109,7 @@ private:
 };
 
 typedef QSharedPointer<QnLayoutFileStorageResource> QnLayoutFileStorageResourcePtr;
+
+#endif // ENABLE_ARCHIVE
 
 #endif // _LAYOUT_STORAGE_PROTOCOL_H__
