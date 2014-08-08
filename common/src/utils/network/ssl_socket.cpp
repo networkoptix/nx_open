@@ -544,7 +544,7 @@ public:
             callback_(ec,user_buffer_->size());
     }
     virtual void error( SystemError::ErrorCode ec ) {
-        callback_(ec,0);
+        callback_(ec,static_cast<std::size_t>(-1));
     }
     void set_callback( const std::function<void(SystemError::ErrorCode,std::size_t)>& cb ) {
         callback_ = cb;
@@ -571,7 +571,7 @@ public:
         callback_(ec,user_buffer_->size());
     }
     virtual void error( SystemError::ErrorCode ec ) {
-        callback_(ec,0);
+        callback_(ec,static_cast<std::size_t>(-1));
     }
     void set_callback( const std::function<void(SystemError::ErrorCode,std::size_t)>& cb ) {
         callback_ = cb;
@@ -624,8 +624,7 @@ void async_ssl::async_recv(
             // perform async handshake here
             async_handshake(
                 [this,buffer,op]( SystemError::ErrorCode ec ) {
-                    if( ec != SystemError::noError )
-                        return op( ec, (size_t)-1 );
+                    if(ec) return;
                     // We delay the async_recv operation until the async handshake finished
                     async_recv(buffer,op);
                 });
@@ -650,8 +649,7 @@ void async_ssl::async_send(
             // perform async handshake here
             async_handshake(
                 [this,buffer,op]( SystemError::ErrorCode ec ) {
-                    if( ec != SystemError::noError )
-                        return op( ec, (size_t)-1 );
+                    if(ec) return;
                     // We delay the async_recv operation until the async handshake finished
                     // We will have potential stack overflow here. Suppose a async_handshake
                     // failed. It will 
