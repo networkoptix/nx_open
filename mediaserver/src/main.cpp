@@ -1103,12 +1103,17 @@ QHostAddress QnMain::getPublicAddress()
 
 void QnMain::run()
 {
-    QFile f(getDataDirectory() + lit("/ssl/cert.pem"));
+    QFile f( MSSettings::roSettings()->value( nx_ms_conf::SSL_CERTIFICATE_PATH, getDataDirectory() + lit( "/ssl/cert.pem" ) ).toString() );
     if (!f.open(QIODevice::ReadOnly)) {
-        qWarning() << "No SSL sertificate for mediaServer!";
-    } else {
-        QByteArray certData = f.readAll();
-        QnSSLSocket::initSSLEngine(certData);
+        qWarning() << "Could not find SSL certificate at "<<f.fileName()<<". Using built-in certificate";
+        f.setFileName( ":cert.pem" );
+        if( !f.open( QIODevice::ReadOnly ) )
+            qWarning() << "Could not load built-in SSL certificate "<<f.fileName();
+    }
+    if( f.isOpen() )
+    {
+        const QByteArray& certData = f.readAll();
+        QnSSLSocket::initSSLEngine( certData );
     }
 
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
