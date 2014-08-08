@@ -21,7 +21,7 @@
 #include <common/common_module.h>
 #endif
 
-//#define TRANSACTION_MESSAGE_BUS_DEBUG
+#define TRANSACTION_MESSAGE_BUS_DEBUG
 
 namespace ec2
 {
@@ -68,8 +68,9 @@ public:
 #endif
 
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "send transaction to peer " << remotePeer().id << "command=" << ApiCommand::toString(transaction.command) << "transport sequence=" << header.sequence;
-#endif#endif
+        qDebug() << "send transaction to peer " << remotePeer().id << "command=" << ApiCommand::toString(transaction.command) 
+                 << "transport seq=" << header.sequence << "db seq=" << transaction.persistentInfo.sequence;
+#endif
 
         switch (m_remotePeer.dataFormat) {
         case Qn::JsonFormat:

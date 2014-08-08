@@ -23,7 +23,7 @@
 #include "api/runtime_info_manager.h"
 
 
-//#define TRANSACTION_MESSAGE_BUS_DEBUG
+#define TRANSACTION_MESSAGE_BUS_DEBUG
 
 namespace ec2
 {
@@ -300,7 +300,8 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "transport sequence=" << transportHeader.sequence << "time=" << tran.persistentInfo.timestamp;
+        qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "transport sequence=" << transportHeader.sequence 
+                 << "time=" << tran.persistentInfo.timestamp << "db seq=" << tran.persistentInfo.sequence;
 #endif
         // process system transactions
         switch(tran.command) {
@@ -393,6 +394,12 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     const ErrorCode errorCode = transactionLog->getTransactionsAfter(tran.params, serializedTransactions);
     if (errorCode == ErrorCode::ok) 
     {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+        qDebug() << "got sync request from peer" << sender->remotePeer().id << ". Need transactions after:";
+        for(auto itr = tran.params.values.begin(); itr != tran.params.values.end(); ++itr)
+            qDebug() << "key=" << itr.key().peerID << "(dbID=" << itr.key().dbID << ") need after=" << itr.value();
+        qDebug() << "exist " << serializedTransactions.size() << "new transactions";
+#endif
         QnTransaction<QnTranStateResponse> tran(ApiCommand::tranSyncResponse);
         tran.params.result = 0;
         QByteArray chunkData;
