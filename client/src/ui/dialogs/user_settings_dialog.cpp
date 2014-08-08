@@ -217,7 +217,7 @@ void QnUserSettingsDialog::updateFromResource() {
         ui->confirmPasswordEdit->clear();
         ui->emailEdit->setText(m_user->getEmail());
 
-        loadAccessRightsToUi(context()->accessController()->globalPermissions(m_user));
+        loadAccessRightsToUi(accessController()->globalPermissions(m_user));
         updatePassword();
     }
     setHasChanges(false);
@@ -227,15 +227,21 @@ void QnUserSettingsDialog::submitToResource() {
     if(!m_user)
         return;
 
-    m_user->setName(ui->loginEdit->text().trimmed());
-//    if(!ui->passwordEdit->text().isEmpty())
-    m_user->setPassword(ui->passwordEdit->text()); //empty text means 'no change'
+    Qn::Permissions permissions = accessController()->permissions(m_user);
 
-    quint64 rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toULongLong();
-    if (rights == CUSTOM_RIGHTS)
-        rights = readAccessRightsAdvanced();
+    if (permissions & Qn::WriteNamePermission)
+        m_user->setName(ui->loginEdit->text().trimmed());
 
-    m_user->setPermissions(rights);
+    if (permissions & Qn::WritePasswordPermission)
+        m_user->setPassword(ui->passwordEdit->text()); //empty text means 'no change'
+
+    /* User cannot change it's own rights */
+    if (permissions & Qn::WriteAccessRightsPermission) {
+        quint64 rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toULongLong();
+        if (rights == CUSTOM_RIGHTS)
+            rights = readAccessRightsAdvanced();
+        m_user->setPermissions(rights);
+    }
     m_user->setEmail(ui->emailEdit->text());
 
     setHasChanges(false);
@@ -435,7 +441,7 @@ void QnUserSettingsDialog::createAccessRightsPresets() {
     if (!m_user)
         return;
 
-    Qn::Permissions permissions = context()->accessController()->globalPermissions(m_user);
+    Qn::Permissions permissions = accessController()->globalPermissions(m_user);
 
     // show only for view of owner
     if (permissions & Qn::GlobalEditProtectedUserPermission)
@@ -456,7 +462,7 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
     if (!m_user)
         return;
 
-    Qn::Permissions permissions = context()->accessController()->globalPermissions(m_user);
+    Qn::Permissions permissions = accessController()->globalPermissions(m_user);
     QWidget* previous = ui->advancedButton;
 
     if (permissions & Qn::GlobalEditProtectedUserPermission)

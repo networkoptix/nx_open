@@ -26,7 +26,12 @@
 #endif
 
 QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):
-    QObject(parent)
+    QObject(parent),
+    m_userWatcher(NULL),
+    m_layoutWatcher(NULL)
+#ifdef Q_OS_WIN
+    ,m_desktopCameraWatcher(NULL)
+#endif
 {
     if(resourcePool == NULL) {
         qnNullWarning(resourcePool);
@@ -35,9 +40,16 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     }
 
     m_resourcePool = resourcePool;
-    m_workbench.reset(new QnWorkbench(this));
 
     m_snapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(this));
+
+    /* 
+     * Access controller should be initialized early because a lot of other modules use it.
+     * It depends on snapshotManager only,
+     */
+    m_accessController.reset(new QnWorkbenchAccessController(this));
+
+    m_workbench.reset(new QnWorkbench(this));
 
     m_layoutWatcher = instance<QnWorkbenchLayoutWatcher>();
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
@@ -51,7 +63,6 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     /* Create dependent objects. */
     m_synchronizer.reset(new QnWorkbenchSynchronizer(this));
 
-    m_accessController.reset(new QnWorkbenchAccessController(this));
     m_menu.reset(new QnActionManager(this));
     m_display.reset(new QnWorkbenchDisplay(this));
     m_navigator.reset(new QnWorkbenchNavigator(this));
