@@ -561,10 +561,11 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <toolchain.version>android</toolchain.version>
-                <compiler>${toolchain.version}</compiler>
-                <openssl.version>1.0.0-SNAPSHOT</openssl.version>
+                <platform>android</platform>
+                <compiler>gcc</compiler>
+                <profile.classifier>${platform}-${arch}</profile.classifier>
                 <qt.spec>android-g++</qt.spec>
+                <qt.classifier>${platform}-${arch}</qt.classifier>
             </properties>
             <modules>
                 <module>mobile_client</module>

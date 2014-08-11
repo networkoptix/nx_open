@@ -407,7 +407,7 @@
 		<profile>
 			<id>linux-arm-rpi</id>
 			<activation>
-				<activeByDefault>false</activeByDefault>
+                <activeByDefault>false</activeByDefault>
 				<os>
 					<family>unix</family>
 					<name>linux</name>
@@ -428,6 +428,32 @@
 				</dependency>
 			</dependencies>
 		</profile>
+        <profile>
+            <id>android-qt</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>platform</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.digia</groupId>
+                    <version>5.3.1-SNAPSHOT</version>
+                    <artifactId>qt</artifactId>
+                    <type>tar.gz</type>
+                    <classifier>${qt.classifier}${compile.options}</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openssl</groupId>
+                    <artifactId>openssl</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
 
 	</profiles> 
 </project>
