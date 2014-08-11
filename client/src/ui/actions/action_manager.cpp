@@ -465,6 +465,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Restart application"));
 
+    factory(Qn::SelectTimeServerAction).
+        flags(Qn::NoTarget).
+        text(tr("Select time server"));
+
     factory(Qn::PtzActivatePresetAction).
         flags(Qn::SingleTarget | Qn::WidgetTarget).
         text(tr("Go To Saved Position")).

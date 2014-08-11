@@ -154,6 +154,10 @@ namespace ec2
 
                 case runtimeInfoChanged:
                     return "runtimeInfoChanged";
+                case forcePrimaryTimeServer:
+                    return "forcePrimaryTimeServer";
+                case broadcastPeerSystemTime:
+                    return "broadcastPeerSystemTime";
 
                 case testEmailSettings:
                     return "testEmailSettings";

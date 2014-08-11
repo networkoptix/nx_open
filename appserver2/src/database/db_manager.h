@@ -48,17 +48,15 @@ namespace ec2
         }
     };
 
-    class QnDbManager;
-
-    class QnDbManager: public QnDbHelper
+    class QnDbManager
+    :
+        public QObject,
+        public QnDbHelper
     {
-    public:
+        Q_OBJECT
 
-        QnDbManager(
-            QnResourceFactory* factory,
-            LicenseManagerImpl* const licenseManagerImpl,
-            const QString& dbFilePath,
-            const QString& dbFilePathStatic);
+    public:
+        QnDbManager();
         virtual ~QnDbManager();
 
 
@@ -74,7 +72,11 @@ namespace ec2
             QnDbManager* m_db;
         };
 
-        bool init();
+        bool init(
+            QnResourceFactory* factory,
+            const QString& dbFilePath,
+            const QString& dbFilePathStatic );
+        bool isInitialized() const;
 
         static QnDbManager* instance();
         
@@ -174,6 +176,14 @@ namespace ec2
 
         ApiOjectType getObjectType(const QnId& objectId);
         ApiObjectInfoList getNestedObjects(const ApiObjectInfo& parentObject);
+
+        bool saveMiscParam( const QByteArray& name, const QByteArray& value );
+        bool readMiscParam( const QByteArray& name, QByteArray* value );
+
+    signals:
+        //!Emitted after \a QnDbManager::init was successfully executed
+        void initialized();
+
     private:
         friend class QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
@@ -268,6 +278,11 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerSystemTimeData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
         ErrorCode deleteTableRecord(const QnId& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
@@ -353,7 +368,6 @@ namespace ec2
         bool addTransactionForGeneralSettings();
     private:
         QnResourceFactory* m_resourceFactory;
-        LicenseManagerImpl* const m_licenseManagerImpl;
         QnId m_storageTypeId;
         QnId m_serverTypeId;
         QnId m_cameraTypeId;
@@ -363,6 +377,7 @@ namespace ec2
         bool m_licenseOverflowMarked;
         qint64 m_licenseOverflowTime;
         QUuid m_dbInstanceId;
+        bool m_initialized;
         
         /*
         * Database for static or very rare modified data. Be carefull! It's not supported DB transactions for static DB

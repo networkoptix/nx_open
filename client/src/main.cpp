@@ -102,6 +102,7 @@ extern "C"
 #include <client/client_resource_processor.h>
 #include "platform/platform_abstraction.h"
 #include "utils/common/long_runnable.h"
+#include <utils/common/synctime.h>
 
 #include "text_to_wav.h"
 #include "common/common_module.h"
@@ -302,6 +303,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Parse command line. */
     QnAutoTester autoTester(argc, argv);
 
+    QnSyncTime syncTime;
+
     qnSettings->updateFromCommandLine(argc, argv, stderr);
 
     QString devModeKey;
@@ -449,7 +452,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Initialize connections. */
     initAppServerConnection(videowallGuid, videowallInstanceGuid);
 
-    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
+    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
+        getConnectionFactory( videowallGuid.isNull() ? Qn::PT_DesktopClient : Qn::PT_VideowallClient ) );
     ec2::ResourceContext resCtx(
         QnServerCameraFactory::instance(),
         qnResPool,
@@ -671,6 +675,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Write out settings. */
     qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
     av_lockmgr_register(NULL);
+
+    //restoring default message handler
+    qInstallMessageHandler( defaultMsgHandler );
 
     return result;
 }

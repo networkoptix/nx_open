@@ -1,9 +1,11 @@
 #include "system_socket.h"
 
+#include <memory>
 #include <boost/type_traits/is_same.hpp>
 
 #include <atomic>
 
+#include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 #include <utils/common/systemerror.h>
 #include <utils/network/ssl_socket.h>
@@ -11,6 +13,9 @@
 #ifdef Q_OS_WIN
 #  include <ws2tcpip.h>
 #  include <iphlpapi.h>
+#  include "win32_socket_tools.h"
+#else
+#  include <netinet/tcp.h>
 #endif
 
 #include <QtCore/QElapsedTimer>
@@ -828,19 +833,19 @@ namespace
 }
 #endif
 
-CommunicatingSocket::CommunicatingSocket( AbstractSocket* abstractSocketPtr, int type, int protocol )
+CommunicatingSocket::CommunicatingSocket( AbstractSocket* abstractSocketPtr, int type, int protocol, SocketImpl* sockImpl )
 :
-    Socket(type, protocol, new CommunicatingSocketPrivate()),
+    Socket(type, protocol, sockImpl ? sockImpl : new CommunicatingSocketPrivate()),
     m_abstractSocketPtr( abstractSocketPtr ),
     m_connected(false)
 {
 }
 
-CommunicatingSocket::CommunicatingSocket( AbstractSocket* abstractSocketPtr, int newConnSD )
+CommunicatingSocket::CommunicatingSocket( AbstractSocket* abstractSocketPtr, int newConnSD, SocketImpl* sockImpl )
 :
-    Socket(newConnSD, new CommunicatingSocketPrivate()),
+    Socket(newConnSD, sockImpl ? sockImpl : new CommunicatingSocketPrivate()),
     m_abstractSocketPtr( abstractSocketPtr ),
-    m_connected( true )
+    m_connected(true)   //this constructor is used
 {
 }
 
@@ -1134,22 +1139,54 @@ bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<vo
 
 // TCPSocket Code
 
+#ifdef _WIN32
+class Win32TcpSocketImpl
+:
+    public SocketImpl
+{
+public:
+    MIB_TCPROW win32TcpTableRow;
+
+    Win32TcpSocketImpl()
+    {
+        memset( &win32TcpTableRow, 0, sizeof(win32TcpTableRow) );
+    }
+};
+#endif
+
 TCPSocket::TCPSocket()
 :
-    base_type( SOCK_STREAM, IPPROTO_TCP )
+    base_type(
+        SOCK_STREAM,
+        IPPROTO_TCP
+#ifdef _WIN32
+        , new Win32TcpSocketImpl()
+#endif
+        )
 {
 }
 
 TCPSocket::TCPSocket( const QString &foreignAddress, unsigned short foreignPort )
 :
-    base_type( SOCK_STREAM, IPPROTO_TCP )
+    base_type(
+        SOCK_STREAM,
+        IPPROTO_TCP
+#ifdef _WIN32
+        , new Win32TcpSocketImpl()
+#endif
+        )
 {
     connect( foreignAddress, foreignPort, AbstractCommunicatingSocket::DEFAULT_TIMEOUT_MILLIS );
 }
 
 TCPSocket::TCPSocket(int newConnSD)
 :
-    base_type(newConnSD)
+    base_type(
+        newConnSD
+#ifdef _WIN32
+        , new Win32TcpSocketImpl()
+#endif
+        )
 {
 }
 
@@ -1189,6 +1226,54 @@ bool TCPSocket::getNoDelay( bool* value )
 
     *value = flag > 0;
     return true;
+}
+
+bool TCPSocket::toggleStatisticsCollection( bool val )
+{
+#ifdef _WIN32
+    if( GetTcpRow(
+            getLocalAddress().port,
+            getForeignAddress().port,
+            MIB_TCP_STATE_ESTAB,
+            &static_cast<Win32TcpSocketImpl*>(m_implDelegate.impl())->win32TcpTableRow ) != ERROR_SUCCESS )
+    {
+        return false;
+    }
+
+    auto freeLambda = [](void* ptr){ ::free(ptr); };
+    std::unique_ptr<TCP_ESTATS_PATH_RW_v0, decltype(freeLambda)> pathRW( (TCP_ESTATS_PATH_RW_v0*)malloc( sizeof(TCP_ESTATS_PATH_RW_v0) ), freeLambda );
+    if( !pathRW.get() )
+        return false;
+
+    memset( pathRW.get(), 0, sizeof(*pathRW) ); // zero the buffer
+    pathRW->EnableCollection = val ? TRUE : FALSE;
+    //enabling statistics collection
+    return SetPerTcpConnectionEStats(
+            &static_cast<Win32TcpSocketImpl*>(m_implDelegate.impl())->win32TcpTableRow,
+            TcpConnectionEstatsPath,
+            (UCHAR*)pathRW.get(), 0, sizeof(*pathRW),
+            0 ) == NO_ERROR;
+#else
+    Q_UNUSED(val);
+    return true;
+#endif
+}
+
+static const size_t USEC_PER_MSEC = 1000;
+
+bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
+{
+#ifdef _WIN32
+    return readTcpStat( &static_cast<Win32TcpSocketImpl*>(m_implDelegate.impl())->win32TcpTableRow, info ) == ERROR_SUCCESS;
+#else
+    struct tcp_info tcpinfo;
+    memset( &tcpinfo, 0, sizeof(tcpinfo) );
+    socklen_t tcp_info_length = sizeof(tcpinfo);
+    if( getsockopt( sockDesc, SOL_TCP, TCP_INFO, (void *)&tcpinfo, &tcp_info_length ) != 0 )
+        return false;
+    info->rttVar = tcpinfo.tcpi_rttvar / USEC_PER_MSEC;
+    return true;
+#endif
 }
 
 

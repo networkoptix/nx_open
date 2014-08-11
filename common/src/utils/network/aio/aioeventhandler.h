@@ -19,6 +19,10 @@ namespace aio
     public:
         virtual ~AIOEventHandler() {}
 
+        //!Receives socket state change event
+        /*!
+            Implementation MUST NOT block otherwise it will result poor performance
+        */
         virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() = 0;
     };
 }

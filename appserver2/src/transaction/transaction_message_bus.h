@@ -30,11 +30,10 @@ namespace ec2
         virtual ~QnTransactionMessageBus();
 
         static QnTransactionMessageBus* instance();
-        static void initStaticInstance(QnTransactionMessageBus* instance);
 
         void addConnectionToPeer(const QUrl& url, const QUuid& peer = QUuid());
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const ApiPeerData &remotePeer);
+        void gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer);
         
         void setLocalPeer(const ApiPeerData localPeer);
         ApiPeerData localPeer() const;
@@ -99,8 +98,17 @@ namespace ec2
         AlivePeersMap aliveServerPeers() const;
 
     signals:
+        /*!
+            \param isProxy \a true if we connected to peer indirectly (via any other peer(s)). \a false if there is direct connection to peer
+        */
         void peerLost(ApiPeerAliveData data, bool isProxy);
+        //!Emitted when a new peer has joined cluster or became online
+        /*!
+            \param isProxy \a true if we connected to peer indirectly (via any other peer(s)). \a false if there is direct connection to peer
+        */
         void peerFound(ApiPeerAliveData data, bool isProxy);
+        //!Emitted on a new direct connection to a remote peer has been established
+        void newDirectConnectionEstablished(const QnTransactionTransportPtr& transport);
 
         void gotLockRequest(ApiLockData);
         //void gotUnlockRequest(ApiLockData);
@@ -116,7 +124,7 @@ namespace ec2
         bool isExists(const QnId& removeGuid) const;
         bool isConnecting(const QnId& removeGuid) const;
 
-        typedef QMap<QUuid, QSharedPointer<QnTransactionTransport>> QnConnectionMap;
+        typedef QMap<QUuid, QnTransactionTransportPtr> QnConnectionMap;
 
     private:
         template<class T>
@@ -174,11 +182,12 @@ namespace ec2
         void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QnId& gotFromID);
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
 
-        void sendRuntimeInfo(QnTransactionTransport* transport, const QnPeerSet& processedPeers);
+        void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader);
 
         void addAlivePeerInfo(ApiPeerData peerData, const QnId& gotFromPeer = QnId());
         void removeAlivePeer(const QnId& id, bool isProxy);
         bool doHandshake(QnTransactionTransport* transport);
+        void printTranState(const QnTranState& tranState);
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();

@@ -255,6 +255,18 @@ protected:
     virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
 };
 
+struct StreamSocketInfo
+{
+    //!round-trip time smoothed variation, millis
+    unsigned int rttVar;
+
+    StreamSocketInfo()
+    :
+        rttVar( 0 )
+    {
+    }
+};
+
 //!Interface for connection-orientied sockets
 class AbstractStreamSocket
 :
@@ -278,6 +290,19 @@ public:
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getNoDelay( bool* value ) = 0;
+    //!Enable collection of socket statistics
+    /*!
+        \param val \a true - enable, \a false - diable
+        \note This method MUST be called only after establishing connection. After reconnecting socket, it MUST be called again!
+        \note On win32 only process with admin rights can enable statistics collection, on linux it is enabled by default for every socket
+    */
+    virtual bool toggleStatisticsCollection( bool val ) = 0;
+    //!Reads extended stream socket information
+    /*!
+        \note \a AbstractStreamSocket::toggleStatisticsCollection MUST be called prior to this method
+        \note on win32 for tcp protocol this function is pretty slow, so it is not recommended to call it too often
+    */
+    virtual bool getConnectionStatistics( StreamSocketInfo* info ) = 0;
 };
 
 //!Interface for server socket, accepting stream connections
