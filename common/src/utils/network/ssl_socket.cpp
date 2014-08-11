@@ -719,8 +719,8 @@ class mixed_async_ssl : public async_ssl {
     // default MSVC 2012 work .
 
     struct sniffer_data_t {
-        const std::function<void(SystemError::ErrorCode,std::size_t)> ssl_cb;
-        const std::function<void(SystemError::ErrorCode,std::size_t)> other_cb;
+        std::function<void(SystemError::ErrorCode,std::size_t)> ssl_cb;
+        std::function<void(SystemError::ErrorCode,std::size_t)> other_cb;
         nx::Buffer* buffer;
         sniffer_data_t( const std::function<void(SystemError::ErrorCode,std::size_t)>& ssl , 
                         const std::function<void(SystemError::ErrorCode,std::size_t)>& other,
