@@ -257,7 +257,10 @@
                 <activeByDefault>false</activeByDefault>
                 <os>
                     <family>!mac</family>
-                </os> 
+                </os>
+                <property>
+                    <name>!mobile</name>
+                </property>
             </activation>
             <modules>
                 <!--<module>plugins/axiscamplugin</module>-->
@@ -562,11 +565,17 @@
             </activation>
             <properties>
                 <platform>android</platform>
+                <toolchain.version>android</toolchain.version>
                 <compiler>gcc</compiler>
+                <additional.compiler>gcc</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <qt.spec>android-g++</qt.spec>
                 <qt.classifier>${platform}-${arch}</qt.classifier>
+                <libdir>${root.dir}/build_environment/target</libdir>
             </properties>
+            <build>
+                <directory>target</directory>
+            </build>
             <modules>
                 <module>mobile_client</module>
             </modules>

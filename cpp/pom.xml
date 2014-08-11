@@ -363,6 +363,15 @@
             <build>
                 <directory>${arch}-${box}</directory>
             </build>
-        </profile> 		
+        </profile>
+        <profile>
+            <id>android-qt</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <directory>${arch}</directory>
+            </build>
+        </profile>
     </profiles>	
 </project>

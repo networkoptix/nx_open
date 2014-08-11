@@ -99,7 +99,6 @@
                 <qt.libs>core network xml sql</qt.libs>
             </properties>
         </profile>
-
     </profiles>	
 
 </project>
