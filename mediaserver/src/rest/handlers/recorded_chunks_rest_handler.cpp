@@ -119,7 +119,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
                 }
             } else {
             //TODO: #GDM #Bookmarks use tags to filter periods?
-                periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog);
+                periods = qnStorageMan->getRecordedPeriods(resList.filtered<QnVirtualCameraResource>(), startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog);
             }
             break;
         }
