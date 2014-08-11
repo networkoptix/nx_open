@@ -27,7 +27,10 @@
 namespace ec2
 {
 
-class QnTransactionTransport: public QObject, public aio::AIOEventHandler
+class QnTransactionTransport
+:
+    public QObject
+    //, public aio::AIOEventHandler
 {
     Q_OBJECT
 public:
@@ -154,7 +157,7 @@ private:
     QSharedPointer<AbstractStreamSocket> m_socket;
     nx_http::AsyncHttpClientPtr m_httpClient;
     State m_state;
-    std::vector<quint8> m_readBuffer;
+    /*std::vector<quint8>*/ nx::Buffer m_readBuffer;
     size_t m_readBufferLen;
     int m_chunkHeaderLen;
     size_t m_chunkLen;
@@ -172,8 +175,9 @@ private:
     typedef QMap<QUuid, QPair<bool, bool>> ConnectingInfoMap;
     static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
     static QMutex m_staticMutex;
+
 private:
-    void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
+    //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
     void addData(QByteArray &&data);
     /*!
@@ -187,6 +191,10 @@ private:
     static void connectingCanceledNoLock(const QnId& remoteGuid, bool isOriginator);
     void addHttpChunkExtensions( std::vector<nx_http::ChunkExtension>* const chunkExtensions );
     void processChunkExtensions( const nx_http::ChunkHeader& httpChunkHeader );
+    void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead );
+    void serializeAndSendNextDataBuffer();
+    void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
+
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
     void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );

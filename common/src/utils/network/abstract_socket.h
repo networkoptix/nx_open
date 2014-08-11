@@ -210,7 +210,8 @@ public:
 
     //!Reads bytes from socket asynchronously
     /*!
-        \param dst Buffer to read to. Maximum \a dst->capacity() bytes read to this buffer
+        \param dst Buffer to read to. Maximum \a dst->capacity() bytes read to this buffer. If buffer already contains some data, 
+            newly-read data will be appended to it. Buffer is resized after reading to its actual size
         \param handler functor with following signature:
             \code{.cpp}
                 ( SystemError::ErrorCode errorCode, size_t bytesRead )

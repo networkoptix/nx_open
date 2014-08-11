@@ -18,6 +18,7 @@
 #include <utils/common/timermanager.h>
 
 #include "database/db_manager.h"
+#include "ec2_thread_pool.h"
 
 
 namespace ec2
@@ -296,7 +297,7 @@ namespace ec2
                 m_timeSynchronized = true;
                 //saving synchronized time to DB
                 if( QnDbManager::instance() && QnDbManager::instance()->isInitialized() )
-                    QThreadPool::globalInstance()->start( new SaveTimeDeltaTask( 0 ) );
+                    Ec2ThreadPool::instance()->start( new SaveTimeDeltaTask( 0 ) );
 
                 if( !synchronizingByCurrentServer )
                 {
@@ -380,7 +381,7 @@ namespace ec2
             //saving synchronized time to DB
             m_timeSynchronized = true;
             if( QnDbManager::instance() && QnDbManager::instance()->isInitialized() )
-                QThreadPool::globalInstance()->start( new SaveTimeDeltaTask( QDateTime::currentMSecsSinceEpoch() - curSyncTime ) );
+                Ec2ThreadPool::instance()->start( new SaveTimeDeltaTask( QDateTime::currentMSecsSinceEpoch() - curSyncTime ) );
             if( m_peerType == Qn::PT_Server )
             {
                 using namespace std::placeholders;

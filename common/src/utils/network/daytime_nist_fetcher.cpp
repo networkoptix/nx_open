@@ -34,9 +34,9 @@ void DaytimeNISTFetcher::pleaseStop()
     if( !m_tcpSock )
         return;
 
-    aio::AIOService::instance()->removeFromWatch( m_tcpSock, aio::etRead );
-    aio::AIOService::instance()->removeFromWatch( m_tcpSock, aio::etWrite );
-    m_tcpSock.clear();
+    aio::AIOService::instance()->removeFromWatch( m_tcpSock.get(), aio::etRead );
+    aio::AIOService::instance()->removeFromWatch( m_tcpSock.get(), aio::etWrite );
+    m_tcpSock.reset();
 }
 
 void DaytimeNISTFetcher::join()
@@ -47,14 +47,14 @@ bool DaytimeNISTFetcher::getTimeAsync( std::function<void(qint64, SystemError::E
 {
     m_readBufferSize = 0;
 
-    m_tcpSock = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket( false, SocketFactory::nttDisabled ) );
+    m_tcpSock.reset( SocketFactory::createStreamSocket( false, SocketFactory::nttDisabled ) );
     if( !m_tcpSock )
         return false;
 
     if( !m_tcpSock->setNonBlockingMode( true ) ||
         !m_tcpSock->setRecvTimeout(SOCKET_READ_TIMEOUT) )
     {
-        m_tcpSock.clear();
+        m_tcpSock.reset();
         return false;
     }
     m_handlerFunc = handlerFunc;
@@ -62,9 +62,9 @@ bool DaytimeNISTFetcher::getTimeAsync( std::function<void(qint64, SystemError::E
     m_tcpSock->connect( QString::fromLatin1(DEFAULT_NIST_SERVER), DAYTIME_PROTOCOL_DEFAULT_PORT, SOCKET_READ_TIMEOUT );
 
     //we MUST do watchSocket after connect
-    if( !aio::AIOService::instance()->watchSocket( m_tcpSock, aio::etWrite, this ) )
+    if( !aio::AIOService::instance()->watchSocket( m_tcpSock.get(), aio::etWrite, this ) )
     {
-        m_tcpSock.clear();
+        m_tcpSock.reset();
         return false;
     }
 
@@ -107,14 +107,14 @@ static qint64 actsTimeToUTCMillis( const char* actsStr )
 
 void DaytimeNISTFetcher::eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw()
 {
-    assert( sock == m_tcpSock.data() );
+    assert( sock == m_tcpSock.get() );
 
     switch( eventType )
     {
         case aio::etWrite:
             //connection established, waiting for data
-            aio::AIOService::instance()->removeFromWatch( m_tcpSock, aio::etWrite );
-            if( !aio::AIOService::instance()->watchSocket( m_tcpSock, aio::etRead, this ) )
+            aio::AIOService::instance()->removeFromWatch( m_tcpSock.get(), aio::etWrite );
+            if( !aio::AIOService::instance()->watchSocket( m_tcpSock.get(), aio::etRead, this ) )
             {
                 m_handlerFunc( -1, SystemError::getLastOSErrorCode() );
                 break;
@@ -174,7 +174,7 @@ void DaytimeNISTFetcher::eventTriggered( AbstractSocket* sock, aio::EventType ev
             break;
     }
 
-    aio::AIOService::instance()->removeFromWatch( m_tcpSock, aio::etRead );
-    aio::AIOService::instance()->removeFromWatch( m_tcpSock, aio::etWrite );
-    m_tcpSock.clear();
+    aio::AIOService::instance()->removeFromWatch( m_tcpSock.get(), aio::etRead );
+    aio::AIOService::instance()->removeFromWatch( m_tcpSock.get(), aio::etWrite );
+    m_tcpSock.reset();
 }

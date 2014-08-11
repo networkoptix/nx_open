@@ -35,7 +35,8 @@ QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, con
     m_connected(false),
     m_prevGivenHandlerID(0)
 {
-    m_readBuffer.resize( 4*1024 );
+    m_readBuffer.reserve( 4 * 1024 );
+    //m_readBuffer.resize( 4*1024 );
 }
 
 
@@ -49,10 +50,12 @@ QnTransactionTransport::~QnTransactionTransport()
 
 void QnTransactionTransport::addData(QByteArray&& data)
 {
+    using namespace std::placeholders;
+
     QMutexLocker lock(&m_mutex);
-    if (m_dataToSend.empty() && m_socket)
-        aio::AIOService::instance()->watchSocket( m_socket.data(), aio::etWrite, this );
-    m_dataToSend.push_back(std::move(data));
+    m_dataToSend.push_back( std::move( data ) );
+    if( (m_dataToSend.size() == 1) && m_socket )
+        serializeAndSendNextDataBuffer();
 }
 
 int QnTransactionTransport::readChunkHeader(const quint8* data, int dataLen, nx_http::ChunkHeader* const chunkHeader)
@@ -66,8 +69,8 @@ int QnTransactionTransport::readChunkHeader(const quint8* data, int dataLen, nx_
 void QnTransactionTransport::closeSocket()
 {
     if (m_socket) {
-        aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etRead, this );
-        aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etWrite, this );
+        m_socket->cancelAsyncIO( aio::etRead );
+        m_socket->cancelAsyncIO( aio::etWrite );
         m_socket->close();
         m_socket.reset();
     }
@@ -95,7 +98,8 @@ void QnTransactionTransport::setStateNoLock(State state)
             m_socket->setSendTimeout(SOCKET_TIMEOUT);
             m_socket->setNonBlockingMode(true);
             m_chunkHeaderLen = 0;
-            aio::AIOService::instance()->watchSocket( m_socket.data(), aio::etRead, this );
+            using namespace std::placeholders;
+            m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) );
         }
     }
     if (this->m_state != state) {
@@ -148,6 +152,7 @@ void QnTransactionTransport::close()
     setState(State::Closed);
 }
 
+#if 0
 void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType eventType ) throw()
 {
     switch( eventType )
@@ -159,7 +164,6 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                 if (m_state == ReadyForStreaming) {
                     //TODO #ak it makes sense to use here some chunk parser class. At this moment http chunk parsing logic is implemented 
                         //3 times in different parts of our code (async http client, sync http server and here)
-                        //Also, it is better to read all data from socket by as few system calls as possible (use some fixed size buffer and parse data from that buffer)
                     assert( m_readBufferLen < m_readBuffer.size() );
                     const int readed = m_socket->recv(&m_readBuffer[0] + m_readBufferLen, m_readBuffer.size() - m_readBufferLen);
                     if (readed < 1) {
@@ -268,6 +272,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
         break;
     }
 }
+#endif
 
 void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
 {
@@ -375,11 +380,109 @@ void QnTransactionTransport::cancelConnecting()
     setState(Error);
 }
 
-void QnTransactionTransport::at_httpClientDone(const nx_http::AsyncHttpClientPtr& client)
+void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
 {
-    nx_http::AsyncHttpClient::State state = client->state();
-    if (state == nx_http::AsyncHttpClient::sFailed)
-        cancelConnecting();
+    if( errorCode )
+        return setState( State::Error );
+
+    assert( m_state == ReadyForStreaming );
+
+    //TODO #ak it makes sense to use here some chunk parser class. At this moment http chunk parsing logic is implemented 
+    //3 times in different parts of our code (async http client, sync http server and here)
+    assert( m_readBufferLen < m_readBuffer.capacity() );
+    m_readBufferLen += bytesRead;
+
+    for( size_t readBufPos = 0;; )
+    {
+        //processing available data: we can have zero or more chunks in m_readBuffer
+        if( m_chunkHeaderLen == 0 )  //chunk header has not been read yet
+        {
+            nx_http::ChunkHeader httpChunkHeader;
+            //reading chunk header
+            m_chunkHeaderLen = readChunkHeader( reinterpret_cast<const quint8*>(m_readBuffer.constData()) + readBufPos, m_readBufferLen, &httpChunkHeader );
+            if( m_chunkHeaderLen == 0 )
+            {
+                if( readBufPos > 0 )
+                    m_readBuffer.remove( 0, readBufPos );  //pop_front(readBufPos)
+                break;  //not enough data in m_readBuffer to read http chunk header
+            }
+            m_chunkLen = httpChunkHeader.chunkSize;
+            processChunkExtensions( httpChunkHeader );  //processing chunk extensions even before receiving whole transaction
+        }
+
+        assert( m_chunkHeaderLen > 0 );
+
+        //have just read http chunk
+        const size_t fullChunkSize = m_chunkHeaderLen + m_chunkLen + sizeof( "\r\n" ) - 1;
+        if( m_readBuffer.capacity() < fullChunkSize )
+            m_readBuffer.reserve( fullChunkSize );
+
+        if( m_readBufferLen < fullChunkSize )
+        {
+            //not enough data in m_readBuffer
+            if( readBufPos > 0 )
+                m_readBuffer.remove( 0, readBufPos );  //pop_front(readBufPos)
+            break;
+        }
+
+        QByteArray serializedTran;
+        QnTransactionTransportHeader transportHeader;
+        QnUbjsonTransactionSerializer::deserializeTran(
+            reinterpret_cast<const quint8*>(m_readBuffer.constData()) + readBufPos + m_chunkHeaderLen + 4,
+            m_chunkLen - 4,
+            transportHeader,
+            serializedTran );
+        assert( !transportHeader.processedPeers.empty() );
+        emit gotTransaction( serializedTran, transportHeader );
+        readBufPos += fullChunkSize;
+        m_readBufferLen -= fullChunkSize;
+        m_chunkHeaderLen = 0;
+
+        if( !m_readBufferLen )
+        {
+            m_readBuffer.clear();
+            break;  //processed all data
+        }
+    }
+
+    using namespace std::placeholders;
+    m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) );
+}
+
+void QnTransactionTransport::serializeAndSendNextDataBuffer()
+{
+    assert( !m_dataToSend.empty() );
+
+    DataToSend& dataCtx = m_dataToSend.front();
+    if( dataCtx.encodedSourceData.isEmpty() )
+    {
+        std::vector<nx_http::ChunkExtension> chunkExtensions;
+        addHttpChunkExtensions( &chunkExtensions );
+        dataCtx.encodedSourceData = QnChunkedTransferEncoder::serializedTransaction(
+            dataCtx.sourceData,
+            chunkExtensions );
+    }
+
+    //TODO #ak BUG currently, there is a bug in aio: when we calling this method not from completion handler, socket may not be set to watch
+
+    using namespace std::placeholders;
+    m_socket->sendAsync( dataCtx.encodedSourceData, std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) );
+}
+
+void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent )
+{
+    QMutexLocker lk( &m_mutex );
+
+    if( errorCode )
+        return setStateNoLock( State::Error );
+
+    assert( bytesSent == m_dataToSend.front().encodedSourceData.size() );
+
+    m_dataToSend.pop_front();
+    if( m_dataToSend.empty() )
+        return;
+
+    serializeAndSendNextDataBuffer();
 }
 
 void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientPtr& client)
@@ -420,6 +523,13 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             cancelConnecting();
         }
     }
+}
+
+void QnTransactionTransport::at_httpClientDone( const nx_http::AsyncHttpClientPtr& client )
+{
+    nx_http::AsyncHttpClient::State state = client->state();
+    if( state == nx_http::AsyncHttpClient::sFailed )
+        cancelConnecting();
 }
 
 void QnTransactionTransport::processTransactionData(const QByteArray& data)
