@@ -192,9 +192,10 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
 }    
 
 void QnWorkbenchConnectHandler::at_reconnectAction_triggered() {
+    QUrl currentUrl = QnAppServerConnectionFactory::url(); 
     if (connected())
         disconnectFromServer(true);
-    if (!connectToServer(QnAppServerConnectionFactory::url()))
+    if (!connectToServer(currentUrl))
         showLoginDialog();
 }
  
