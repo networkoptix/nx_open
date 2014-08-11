@@ -8,15 +8,13 @@
 
 #include <memory>
 
-#include <QtCore/QMutex>
-
 #include "aioeventhandler.h"
 #include "pollset.h"
 
 
 namespace aio
 {
-    class AIOThread;
+    class AIOServiceImpl;
 
     //!Monitors multiple sockets for asynchronous events and triggers handler (\a AIOEventHandler) on event
     /*!
@@ -75,16 +73,7 @@ namespace aio
         static AIOService* instance( unsigned int threadCount = 0 );
 
     private:
-        class SocketMonitorContext
-        {
-        public:
-            AIOThread* thread;
-            unsigned int monitoredEvents;
-        };
-
-        std::list<AIOThread*> m_threadPool;
-        std::map<std::pair<AbstractSocket*, aio::EventType>, AIOThread*> m_sockets;
-        mutable QMutex m_mutex;
+        AIOServiceImpl* m_impl;
     };
 }
 

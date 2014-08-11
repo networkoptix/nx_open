@@ -17,13 +17,14 @@
 
 namespace aio
 {
-    class AIOThreadImpl;
+    template<class PollSetType> class AIOThreadImpl;
 
     /*!
         This class is intended for use only with aio::AIOService
         \todo make it nested in aio::AIOService?
         \note All methods, except for \a pleaseStop(), must be called with \a mutex locked
     */
+    template<class PollSetType>
     class AIOThread
     :
         public QnLongRunnable
@@ -75,7 +76,7 @@ namespace aio
         virtual void run() override;
 
     private:
-        AIOThreadImpl* m_impl;
+        AIOThreadImpl<PollSetType>* m_impl;
     };
 }
 

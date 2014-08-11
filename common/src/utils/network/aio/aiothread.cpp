@@ -119,6 +119,7 @@ namespace aio
         }
     };
 
+    template<class PollSetType>
     class AIOThreadImpl
     {
     public:
@@ -362,16 +363,18 @@ namespace aio
     };
 
 
-    AIOThread::AIOThread( QMutex* const mutex ) //TODO: #ak give up using single mutex for all aio threads
+    template<class PollSetType>
+    AIOThread<PollSetType>::AIOThread( QMutex* const mutex ) //TODO: #ak give up using single mutex for all aio threads
     :
-        m_impl( new AIOThreadImpl() )
+        m_impl( new AIOThreadImpl<PollSetType>() )
     {
         m_impl->mutex = mutex;
 
         setObjectName( lit("AIOThread") );
     }
 
-    AIOThread::~AIOThread()
+    template<class PollSetType>
+    AIOThread<PollSetType>::~AIOThread()
     {
         pleaseStop();
         wait();
@@ -380,7 +383,8 @@ namespace aio
         m_impl = NULL;
     }
 
-    void AIOThread::pleaseStop()
+    template<class PollSetType>
+    void AIOThread<PollSetType>::pleaseStop()
     {
         QnLongRunnable::pleaseStop();
         m_impl->pollSet.interrupt();
@@ -390,7 +394,8 @@ namespace aio
     /*!
         \return true, if added successfully. If \a false, error can be read by \a SystemError::getLastOSErrorCode() function
     */
-    bool AIOThread::watchSocket(
+    template<class PollSetType>
+    bool AIOThread<PollSetType>::watchSocket(
         AbstractSocket* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
@@ -424,7 +429,8 @@ namespace aio
         return true;
     }
 
-    bool AIOThread::removeFromWatch(
+    template<class PollSetType>
+    bool AIOThread<PollSetType>::removeFromWatch(
         AbstractSocket* const sock,
         aio::EventType eventType,
         bool waitForRunningHandlerCompletion )
@@ -488,20 +494,23 @@ namespace aio
     }
 
     //!Returns number of sockets monitored for \a eventToWatch event
-    size_t AIOThread::socketsHandled() const
+    template<class PollSetType>
+    size_t AIOThread<PollSetType>::socketsHandled() const
     {
         return m_impl->pollSet.size() + m_impl->newReadMonitorTaskCount + m_impl->newWriteMonitorTaskCount;
     }
 
     //!Returns true, if can monitor one more socket for \a eventToWatch
-    bool AIOThread::canAcceptSocket( AbstractSocket* const sock ) const
+    template<class PollSetType>
+    bool AIOThread<PollSetType>::canAcceptSocket( AbstractSocket* const sock ) const
     {
         return m_impl->pollSet.canAcceptSocket( sock );
     }
 
     static const int ERROR_RESET_TIMEOUT = 1000;
 
-    void AIOThread::run()
+    template<class PollSetType>
+    void AIOThread<PollSetType>::run()
     {
         initSystemThreadId();
         NX_LOG( QLatin1String("AIO thread started"), cl_logDEBUG1 );
@@ -556,4 +565,6 @@ namespace aio
 
         NX_LOG( QLatin1String("AIO thread stopped"), cl_logDEBUG1 );
     }
+
+    template class AIOThread<PollSet>;
 }

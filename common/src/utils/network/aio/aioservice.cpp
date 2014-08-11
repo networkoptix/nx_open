@@ -8,6 +8,7 @@
 #include <memory>
 #include <thread>
 
+#include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 #include <QtCore/QThread>
 #include <qglobal.h>
@@ -21,9 +22,30 @@ using namespace std;
 
 namespace aio
 {
+    typedef AIOThread<PollSet> SystemAIOThread;
+
+
+    class SocketMonitorContext
+    {
+    public:
+        SystemAIOThread* thread;
+        unsigned int monitoredEvents;
+    };
+
+    class AIOServiceImpl
+    {
+    public:
+        std::list<SystemAIOThread*> m_systemAioThreadPool;
+        std::map<std::pair<AbstractSocket*, aio::EventType>, SystemAIOThread*> m_sockets;
+        mutable QMutex m_mutex;
+    };
+
+
     static unsigned int threadCountArgValue = 0;
 
     AIOService::AIOService( unsigned int threadCount )
+    :
+        m_impl( new AIOServiceImpl() )
     {
         if( !threadCount )
             threadCount = threadCountArgValue;
@@ -33,15 +55,15 @@ namespace aio
 
         for( unsigned int i = 0; i < threadCount; ++i )
         {
-            std::unique_ptr<AIOThread> thread( new AIOThread( &m_mutex ) );
+            std::unique_ptr<SystemAIOThread> thread( new SystemAIOThread( &m_impl->m_mutex ) );
             thread->start();
             if( !thread->isRunning() )
                 continue;
-            m_threadPool.push_back( thread.release() );
+            m_impl->m_systemAioThreadPool.push_back( thread.release() );
         }
 
-        assert( !m_threadPool.empty() );
-        if( m_threadPool.empty() )
+        assert( !m_impl->m_systemAioThreadPool.empty() );
+        if( m_impl->m_systemAioThreadPool.empty() )
         {
             //I wish we used exceptions
             NX_LOG( lit("Could not start a single AIO thread. Terminating..."), cl_logALWAYS );
@@ -52,21 +74,24 @@ namespace aio
 
     AIOService::~AIOService()
     {
-        m_sockets.clear();
-        for( std::list<AIOThread*>::iterator
-            it = m_threadPool.begin();
-            it != m_threadPool.end();
+        m_impl->m_sockets.clear();
+        for( std::list<SystemAIOThread*>::iterator
+            it = m_impl->m_systemAioThreadPool.begin();
+            it != m_impl->m_systemAioThreadPool.end();
             ++it )
         {
             delete *it;
         }
-        m_threadPool.clear();
+        m_impl->m_systemAioThreadPool.clear();
+
+        delete m_impl;
+        m_impl = nullptr;
     }
 
     //!Returns true, if object has been successfully initialized
     bool AIOService::isInitialized() const
     {
-        return !m_threadPool.empty();
+        return !m_impl->m_systemAioThreadPool.empty();
     }
 
     //!Monitor socket \a sock for event \a eventToWatch occurrence and trigger \a eventHandler on event
@@ -78,7 +103,7 @@ namespace aio
         aio::EventType eventToWatch,
         AIOEventHandler* const eventHandler )
     {
-        QMutexLocker lk( &m_mutex );
+        QMutexLocker lk( &m_impl->m_mutex );
 
         unsigned int sockTimeoutMS = 0;
         if( eventToWatch == aio::etRead )
@@ -98,26 +123,26 @@ namespace aio
 
         //checking, if that socket is already monitored
         const pair<AbstractSocket*, aio::EventType>& sockCtx = make_pair( sock, eventToWatch );
-        map<pair<AbstractSocket*, aio::EventType>, AIOThread*>::iterator it = m_sockets.lower_bound( sockCtx );
-        if( it != m_sockets.end() && it->first == sockCtx )
+        map<pair<AbstractSocket*, aio::EventType>, SystemAIOThread*>::iterator it = m_impl->m_sockets.lower_bound( sockCtx );
+        if( it != m_impl->m_sockets.end() && it->first == sockCtx )
             return true;    //socket already monitored for eventToWatch
 
-        if( (it != m_sockets.end()) && (it->first.first == sockCtx.first) )
+        if( (it != m_impl->m_sockets.end()) && (it->first.first == sockCtx.first) )
         {
             //socket is already monitored for other event. Trying to use same thread
             if( it->second->watchSocket( sock, eventToWatch, eventHandler, sockTimeoutMS ) )
             {
-                m_sockets.insert( it, make_pair( sockCtx, it->second ) );
+                m_impl->m_sockets.insert( it, make_pair( sockCtx, it->second ) );
                 return true;
             }
             assert( false );    //we MUST use same thread for monitoring all events on single socket
         }
 
         //searching for a least-used thread, which is ready to accept
-        AIOThread* threadToUse = NULL;
-        for( std::list<AIOThread*>::const_iterator
-            threadIter = m_threadPool.begin();
-            threadIter != m_threadPool.end();
+        SystemAIOThread* threadToUse = NULL;
+        for( std::list<SystemAIOThread*>::const_iterator
+            threadIter = m_impl->m_systemAioThreadPool.begin();
+            threadIter != m_impl->m_systemAioThreadPool.end();
             ++threadIter )
         {
             if( !(*threadIter)->canAcceptSocket(sock) )
@@ -130,17 +155,17 @@ namespace aio
         if( !threadToUse )
         {
             //creating new thread
-            std::unique_ptr<AIOThread> newThread( new AIOThread(&m_mutex) );
+            std::unique_ptr<SystemAIOThread> newThread( new SystemAIOThread(&m_impl->m_mutex) );
             newThread->start();
             if( !newThread->isRunning() )
                 return false;
             threadToUse = newThread.get();
-            m_threadPool.push_back( newThread.release() );
+            m_impl->m_systemAioThreadPool.push_back( newThread.release() );
         }
 
         if( threadToUse->watchSocket( sock, eventToWatch, eventHandler, sockTimeoutMS ) )
         {
-            m_sockets.insert( make_pair( sockCtx, threadToUse ) );
+            m_impl->m_sockets.insert( make_pair( sockCtx, threadToUse ) );
             return true;
         }
 
@@ -156,22 +181,22 @@ namespace aio
         aio::EventType eventType,
         bool waitForRunningHandlerCompletion )
     {
-        QMutexLocker lk( &m_mutex );
+        QMutexLocker lk( &m_impl->m_mutex );
 
         const pair<AbstractSocket*, aio::EventType>& sockCtx = make_pair( sock, eventType );
-        map<pair<AbstractSocket*, aio::EventType>, AIOThread*>::iterator it = m_sockets.find( sockCtx );
-        if( it != m_sockets.end() )
+        map<pair<AbstractSocket*, aio::EventType>, SystemAIOThread*>::iterator it = m_impl->m_sockets.find( sockCtx );
+        if( it != m_impl->m_sockets.end() )
         {
             if( it->second->removeFromWatch( sock, eventType, waitForRunningHandlerCompletion ) )
-                m_sockets.erase( it );
+                m_impl->m_sockets.erase( it );
         }
     }
 
     bool AIOService::isSocketBeingWatched(AbstractSocket* sock) const
     {
-        QMutexLocker lk(&m_mutex);
-        const auto& it = m_sockets.lower_bound(std::make_pair(sock, aio::etNone));
-        return it != m_sockets.end() && it->first.first == sock;
+        QMutexLocker lk(&m_impl->m_mutex);
+        const auto& it = m_impl->m_sockets.lower_bound(std::make_pair(sock, aio::etNone));
+        return it != m_impl->m_sockets.end() && it->first.first == sock;
     }
 
     Q_GLOBAL_STATIC( AIOService, aioServiceInstance )
