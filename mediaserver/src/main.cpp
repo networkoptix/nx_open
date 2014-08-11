@@ -152,6 +152,7 @@
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
 #include "nx_ec/data/api_conversion_functions.h"
+#include "media_server/resource_status_watcher.h"
 
 
 // This constant is used while checking for compatibility.
@@ -1467,6 +1468,8 @@ void QnMain::run()
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
     serverResourceProcessor->moveToThread( mserverResourceDiscoveryManager.get() );
     QnResourceDiscoveryManager::instance()->setResourceProcessor(serverResourceProcessor.get());
+
+    std::unique_ptr<QnResourceStatusWatcher> statusWatcher( new QnResourceStatusWatcher());
 
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher thirdPartyResourceSearcher;
