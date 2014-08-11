@@ -31,7 +31,6 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     ui(new Ui::UserSettingsDialog()),
     m_user(0),
     m_hasChanges(false),
-    m_editorRights(0),
     m_inUpdateDependensies(false)
 {
     if(context == NULL) 
@@ -143,14 +142,6 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
     updateElement(element);
 }
 
-void QnUserSettingsDialog::setEditorPermissions(quint64 rights) {
-    m_editorRights = rights;
-    if (m_user) {
-        createAccessRightsPresets();
-        createAccessRightsAdvanced();
-    }
-}
-
 void QnUserSettingsDialog::setFocusedElement(QString element) {
     if (element == QLatin1String("email"))
         ui->emailEdit->setFocus();
@@ -174,7 +165,7 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user) {
         return;
 
     m_user = user;
-    if (m_editorRights) {
+    if (accessController()->globalPermissions()) {
         createAccessRightsPresets();
         createAccessRightsAdvanced();
     }
@@ -448,7 +439,7 @@ void QnUserSettingsDialog::createAccessRightsPresets() {
         ui->accessRightsComboBox->addItem(tr("Owner"), Qn::GlobalOwnerPermissions);
 
     // show for an admin or for anyone opened by owner
-    if ((permissions & Qn::GlobalProtectedPermission) || (m_editorRights & Qn::GlobalEditProtectedUserPermission))
+    if ((permissions & Qn::GlobalProtectedPermission) || (accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission))
         ui->accessRightsComboBox->addItem(tr("Administrator"), Qn::GlobalAdminPermissions);
 
     ui->accessRightsComboBox->addItem(tr("Advanced Viewer"), Qn::GlobalAdvancedViewerPermissions);
@@ -467,7 +458,7 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
 
     if (permissions & Qn::GlobalEditProtectedUserPermission)
         previous = createAccessRightCheckBox(tr("Owner"), Qn::ExcludingOwnerPermission, previous);
-    if ((permissions & Qn::GlobalProtectedPermission) || (m_editorRights & Qn::GlobalEditProtectedUserPermission))
+    if ((permissions & Qn::GlobalProtectedPermission) || (accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission))
         previous = createAccessRightCheckBox(tr("Administrator"),
                      Qn::ExcludingAdminPermission,
                      previous);

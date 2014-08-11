@@ -53,8 +53,6 @@ public:
 
     void setFocusedElement(QString element);
 
-    void setEditorPermissions(quint64 rights);
-
     bool hasChanges() const {
         return m_hasChanges;
     }
@@ -112,7 +110,6 @@ private:
     ElementFlags m_flags[ElementCount];
     bool m_hasChanges;
     QHash<quint64, QCheckBox*> m_advancedRights;
-    quint64 m_editorRights;
 
     /** Status variable to avoid unneeded checks. */
     bool m_inUpdateDependensies;
