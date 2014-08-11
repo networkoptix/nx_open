@@ -76,6 +76,10 @@ public:
 
     QList<QnModuleInformation> revealedModules() const;
 
+    //! \param peerList Discovery peer if and only if peer exist in peerList
+    void setAllowedPeers(const QList<QString> peerList) {
+        m_allowedPeers = peerList;
+    }
 public slots:
     virtual void pleaseStop() override;
 
@@ -115,6 +119,7 @@ private:
     QHash<QString, ModuleContext> m_knownEnterpriseControllers;
     QSet<QString> m_localNetworkAdresses;
     bool m_compatibilityMode;
+    QList<QString> m_allowedPeers;
 };
 
 Q_DECLARE_METATYPE(QnModuleInformation)
