@@ -66,8 +66,8 @@ class Socket
     Q_DECLARE_TR_FUNCTIONS(Socket)
 
 public:
-    Socket( int type, int protocol );
-    Socket( int sockDesc );
+    Socket( int type, int protocol, SocketImpl* sockImpl = nullptr );
+    Socket( int sockDesc, SocketImpl* sockImpl = nullptr );
 
     /**
      *   Close and deallocate this socket
@@ -282,6 +282,13 @@ public:
     {
     }
 
+    template<class Param1Type, class Param2Type, class Param3Type>
+    SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2, const Param3Type& param3 )
+    :
+        m_implDelegate( param1, param2, param3 )
+    {
+    }
+
     //////////////////////////////////////////////////////////////////////
     ///////// Implementation of AbstractSocket methods
     //////////////////////////////////////////////////////////////////////
@@ -354,6 +361,13 @@ public:
     SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2 )
     :
         base_type( param1, param2 )
+    {
+    }
+
+    template<class Param1Type, class Param2Type, class Param3Type>
+    SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2, const Param3Type& param3 )
+    :
+        base_type( param1, param2, param3 )
     {
     }
 

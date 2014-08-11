@@ -592,14 +592,16 @@ namespace
 #endif
 
 CommunicatingSocket::CommunicatingSocket(int type, int protocol, SocketImpl* sockImpl)
-    : Socket(type, protocol, sockImpl),
-      m_connected(false)
+:
+    Socket(type, protocol, sockImpl),
+    m_connected(false)
 {
 }
 
 CommunicatingSocket::CommunicatingSocket(int newConnSD, SocketImpl* sockImpl) 
-    : Socket(newConnSD, sockImpl),
-      m_connected(true)
+:
+    Socket(newConnSD, sockImpl),
+    m_connected(true)   //this constructor is used
 {
 }
 
@@ -851,6 +853,7 @@ public:
 #endif
 
 TCPSocket::TCPSocket()
+:
     base_type(
         SOCK_STREAM,
         IPPROTO_TCP
@@ -915,7 +918,7 @@ bool TCPSocket::toggleStatisticsCollection( bool val )
             getLocalAddress().port,
             getForeignAddress().port,
             MIB_TCP_STATE_ESTAB,
-            &static_cast<Win32TcpSocketImpl*>(m_impl)->win32TcpTableRow ) != ERROR_SUCCESS )
+            &static_cast<Win32TcpSocketImpl*>(m_implDelegate.impl())->win32TcpTableRow ) != ERROR_SUCCESS )
     {
         return false;
     }
@@ -929,7 +932,7 @@ bool TCPSocket::toggleStatisticsCollection( bool val )
     pathRW->EnableCollection = val ? TRUE : FALSE;
     //enabling statistics collection
     return SetPerTcpConnectionEStats(
-            &static_cast<Win32TcpSocketImpl*>(m_impl)->win32TcpTableRow,
+            &static_cast<Win32TcpSocketImpl*>(m_implDelegate.impl())->win32TcpTableRow,
             TcpConnectionEstatsPath,
             (UCHAR*)pathRW.get(), 0, sizeof(*pathRW),
             0 ) == NO_ERROR;
@@ -944,7 +947,7 @@ static const size_t USEC_PER_MSEC = 1000;
 bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
 {
 #ifdef _WIN32
-    return readTcpStat( &static_cast<Win32TcpSocketImpl*>(m_impl)->win32TcpTableRow, info ) == ERROR_SUCCESS;
+    return readTcpStat( &static_cast<Win32TcpSocketImpl*>(m_implDelegate.impl())->win32TcpTableRow, info ) == ERROR_SUCCESS;
 #else
     struct tcp_info tcpinfo;
     memset( &tcpinfo, 0, sizeof(tcpinfo) );
