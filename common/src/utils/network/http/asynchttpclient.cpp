@@ -489,8 +489,6 @@ namespace nx_http
 
         if( m_socket )
         {
-            //aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etRead );
-            //aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etWrite );
             m_socket->cancelAsyncIO( aio::etWrite );
             m_socket->cancelAsyncIO( aio::etRead );
 
@@ -503,7 +501,7 @@ namespace nx_http
         else {
             m_state = sInit;
 
-            m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/) ); //TODO #ak uncomment when async ssl connection supported
+            m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(url.scheme() == lit("https")) ); //TODO #ak uncomment when async ssl connection supported
             if( !m_socket->setNonBlockingMode( true ) ||
                 !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) )
             {
