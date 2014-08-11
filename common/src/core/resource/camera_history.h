@@ -2,6 +2,7 @@
 #define QN_CAMERA_HISTORY_H
 
 #include <QtCore/QObject>
+#include <QtCore/QMutex>
 #include <QtCore/QUuid>
 
 #include "recording/time_period.h"
