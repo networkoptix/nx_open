@@ -521,13 +521,6 @@ class ssl_async_recv_op : public ssl_async_op {
 public:
     ssl_async_recv_op( SSL* ssl ) : ssl_async_op(ssl){}
     virtual int perform( int* ssl_err ) {
-        // Checking the user buffer capacity. If it is zero,
-        // we modify it. SSL cannot handle buffer size is zero
-        // it will output wired error code and make the code 
-        // hard to debug.
-        if( user_buffer_->capacity() == 0 ) {
-            user_buffer_->resize( async_ssl::async_buffer_default_size );
-        }
         user_buffer_->resize( user_buffer_->capacity() );
         int bytes = SSL_read(ssl(),user_buffer_->data(),
             static_cast<int>(user_buffer_->size()) );
@@ -550,6 +543,7 @@ public:
         callback_ = cb;
     }
     void set_user_buffer( nx::Buffer* ubuf ) {
+        Q_ASSERT(ubuf->capacity() >0);
         user_buffer_ = ubuf;
     }
 private:
