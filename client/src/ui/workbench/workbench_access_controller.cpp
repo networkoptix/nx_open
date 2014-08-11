@@ -42,6 +42,13 @@ QnWorkbenchAccessController::~QnWorkbenchAccessController() {
 }
 
 Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr &resource) const {
+    if (!m_dataByResource.contains(resource)) {
+        Q_ASSERT(resource);
+        if (resource && !resource->resourcePool())         /* Calculated permissions should always exist for all resources in the pool. */
+            qDebug() << "Requesting permissions for the non-pool resource" << resource->getName();
+        return calculatePermissions(resource);
+    }
+
     return m_dataByResource.value(resource).permissions;
 }
 
@@ -53,10 +60,10 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions() const {
     if (qnSettings->isVideoWallMode())
         return Qn::GlobalViewerPermissions;
 
-    return permissions(m_user);
+    return globalPermissions(m_user);
 }
 
-Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResourcePtr &user) {
+Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResourcePtr &user) const {
     Qn::Permissions result(0);
 
     if(!user)
@@ -71,6 +78,8 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResou
 }
 
 bool QnWorkbenchAccessController::hasGlobalPermissions(Qn::Permissions requiredPermissions) const {
+    if (!m_user)
+        return false;
     return hasPermissions(m_user, requiredPermissions);
 }
 
@@ -86,7 +95,7 @@ QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnRe
     return data.notifier;
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResourcePtr &resource) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResourcePtr &resource) const {
     Q_ASSERT(resource);
 
     if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
@@ -114,7 +123,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     return 0;
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserResourcePtr &user) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserResourcePtr &user) const {
     Q_ASSERT(user);
 
     Qn::Permissions result = 0;
@@ -137,7 +146,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserRe
     return result;
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayoutResourcePtr &layout) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayoutResourcePtr &layout) const {
     Q_ASSERT(layout);
 
     QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
@@ -169,7 +178,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
     }
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtualCameraResourcePtr &camera) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtualCameraResourcePtr &camera) const {
     Q_ASSERT(camera);
 
     Qn::Permissions result = Qn::ReadPermission;
@@ -182,13 +191,13 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtua
     return result;
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnAbstractArchiveResourcePtr &media) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnAbstractArchiveResourcePtr &media) const {
     Q_ASSERT(media);
 
     return Qn::ReadPermission | Qn::ExportPermission;
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnMediaServerResourcePtr &server) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnMediaServerResourcePtr &server) const {
     Q_ASSERT(server);
 
     if(m_userPermissions & Qn::GlobalEditServersPermissions) 
@@ -196,7 +205,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnMediaS
     return 0;
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoWallResourcePtr &videoWall) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoWallResourcePtr &videoWall) const {
     Q_ASSERT(videoWall);
 
     if(m_userPermissions & Qn::GlobalEditVideoWallPermission) 

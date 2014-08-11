@@ -1740,37 +1740,19 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
         QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
         QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
-        if (mServer) {
-            connection2()->getMediaServerManager()->save( mServer, this,
-                [this, mServer, oldName]( int reqID, ec2::ErrorCode errorCode ) {
-                    at_resources_saved( reqID, errorCode, QnResourceList() << mServer );
-					if (errorCode != ec2::ErrorCode::ok)
-                    	mServer->setName(oldName);
-
-            });
-        }
-        else if (camera) {
-            connection2()->getCameraManager()->save( QnVirtualCameraResourceList() << camera, this,
-                [this, camera, oldName]( int reqID, ec2::ErrorCode errorCode ) {
-                    at_resources_saved( reqID, errorCode, QnResourceList() << camera );
-                if (errorCode != ec2::ErrorCode::ok)
-                    camera->setName(oldName);
-            });
-        }
-        else if (user) {
-            connection2()->getUserManager()->save( user, this,
-            [this, user, oldName]( int reqID, ec2::ErrorCode errorCode ) {
-                    at_resources_saved( reqID, errorCode, QnResourceList() << user );
-                if (errorCode != ec2::ErrorCode::ok)
-                    user->setName(oldName);
-            });
-        }
-        else if (layout) {
-            connection2()->getLayoutManager()->save( QnLayoutResourceList() << layout, this,
-                [this, layout]( int reqID, ec2::ErrorCode errorCode ) {
-                    at_resources_saved( reqID, errorCode, QnResourceList() << layout );
-            });
-        }
+        auto callback = [this, resource, oldName]( int reqID, ec2::ErrorCode errorCode ) {
+            at_resources_saved( reqID, errorCode, QnResourceList() << resource );
+            if (errorCode != ec2::ErrorCode::ok)
+                resource->setName(oldName);
+        };
+        if (mServer)
+            connection2()->getMediaServerManager()->save(mServer, this, callback);
+        else if (camera)
+            connection2()->getCameraManager()->save( QnVirtualCameraResourceList() << camera, this, callback);
+        else if (user) 
+            connection2()->getUserManager()->save( user, this, callback );
+        else if (layout)
+            connection2()->getLayoutManager()->save( QnLayoutResourceList() << layout, this, callback);
     }
 }
 
@@ -1874,7 +1856,6 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
 
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->setEditorPermissions(accessController()->globalPermissions());
     dialog->setUser(user);
     dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
     setHelpTopic(dialog.data(), Qn::NewUser_Help);
@@ -1969,7 +1950,6 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     dialog->setElementFlags(QnUserSettingsDialog::Password, passwordFlags);
     dialog->setElementFlags(QnUserSettingsDialog::AccessRights, accessRightsFlags);
     dialog->setElementFlags(QnUserSettingsDialog::Email, emailFlags);
-    dialog->setEditorPermissions(accessController()->globalPermissions());
 
 
     // TODO #Elric: This is a totally evil hack. Store password hash/salt in user.
