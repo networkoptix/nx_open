@@ -280,7 +280,6 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
         resource->setPhysicalId(uniqId);
 
     resource->setDeviceOnvifUrl(deviceUrl);
-    resource->setDeviceOnvifID(uniqId);
 
     if (!login.isEmpty())
         resource->setAuth(login, passwd);

@@ -507,6 +507,7 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
         m_display->addRenderer(m_renderer);
         m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
         updateCustomAspectRatio();
+        updateRotation();
     } else {
         setChannelLayout(QnConstResourceVideoLayoutPtr(new QnDefaultResourceVideoLayout()));
         m_renderer->setChannelCount(0);
@@ -858,9 +859,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         mbps += statistics->getBitrate();
     }
 
-    QSize size = m_display->camDisplay()->getFrameSize(0);
-    if(size.isEmpty())
-        size = QSize(0, 0);
+    QSize size = m_display->camDisplay()->getRawDataSize();
 
     QString codecString;
     if(QnMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext()) {
@@ -1022,9 +1021,10 @@ void QnMediaResourceWidget::at_resource_resourceChanged() {
 
 void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key) {
     Q_UNUSED(resource);
-    if (key != QnMediaResource::customAspectRatioKey())
-        return;
-    updateCustomAspectRatio();
+    if (key == QnMediaResource::customAspectRatioKey())
+        updateCustomAspectRatio();
+    else if(key == QnMediaResource::rotationKey())
+        updateRotation();
 }
 
 void QnMediaResourceWidget::updateAspectRatio() {
@@ -1206,4 +1206,19 @@ void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
 
 void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
     setImageEnhancement(item()->imageEnhancement());
+}
+
+void QnMediaResourceWidget::updateRotation() {
+    if(!m_display)
+        return;
+    QString par = m_resource->toResource()->getProperty(QnMediaResource::rotationKey());
+    if( par.isEmpty() ) {
+        item()->setRotation(0);
+        return;
+    }
+    bool ok;
+    int degree = par.toInt(&ok);
+    Q_ASSERT(ok);
+    if( item()->rotation() != degree )
+        item()->setRotation(degree);
 }

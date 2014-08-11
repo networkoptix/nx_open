@@ -272,6 +272,7 @@ void QnPtzManageDialog::clear() {
     m_model->setTours(QnPtzTourList());
     ui->tourEditWidget->setSpots(QnPtzTourSpotList());
     ui->tourEditWidget->setPresets(QnPtzPresetList());
+    ui->tourStackedWidget->setCurrentIndex(ui->tourStackedWidget->indexOf(ui->noTourPage));
 }
 
 void QnPtzManageDialog::saveData() {

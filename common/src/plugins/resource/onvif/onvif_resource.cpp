@@ -769,20 +769,6 @@ void QnPlOnvifResource::setDeviceOnvifUrl(const QString& src)
 { 
     setParam(ONVIF_URL_PARAM_NAME, src, QnDomainDatabase);
 }
-
-QString QnPlOnvifResource::getDeviceOnvifID() const 
-{ 
-    QVariant mediaVariant;
-    QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
-    this_casted->getParam(ONVIF_ID_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toString();
-}
-
-void QnPlOnvifResource::setDeviceOnvifID(const QString& src) 
-{ 
-    setParam(ONVIF_ID_PARAM_NAME, src, QnDomainDatabase);
-}
-
 QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort)
 {
     QUrl url(QString::fromStdString(onvifUrl));

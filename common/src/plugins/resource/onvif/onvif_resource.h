@@ -189,9 +189,6 @@ public:
     QString getDeviceOnvifUrl() const;
     void setDeviceOnvifUrl(const QString& src);
 
-    QString getDeviceOnvifID() const;
-    void setDeviceOnvifID(const QString& src);
-
     CODECS getCodec(bool isPrimary) const;
     AUDIO_CODECS getAudioCodec() const;
 

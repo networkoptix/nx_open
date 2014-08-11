@@ -186,6 +186,7 @@ private:
     Q_SLOT void updateFisheye();
     Q_SLOT void updateDewarpingParams();
     Q_SLOT void updateCustomAspectRatio();
+    Q_SLOT void updateRotation();
 
 private:
     /** Media resource. */

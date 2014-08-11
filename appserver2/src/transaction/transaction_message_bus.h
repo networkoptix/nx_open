@@ -182,11 +182,12 @@ namespace ec2
         void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QnId& gotFromID);
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
 
-        void sendRuntimeInfo(QnTransactionTransport* transport, const QnPeerSet& processedPeers);
+        void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader);
 
         void addAlivePeerInfo(ApiPeerData peerData, const QnId& gotFromPeer = QnId());
         void removeAlivePeer(const QnId& id, bool isProxy);
         bool doHandshake(QnTransactionTransport* transport);
+        void printTranState(const QnTranState& tranState);
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();

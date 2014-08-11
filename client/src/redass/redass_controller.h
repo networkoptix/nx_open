@@ -40,10 +40,11 @@ private:
     QnCamDisplay* getDisplayByReader(QnArchiveStreamReader* reader);
     bool isSmallItem(QnCamDisplay* display);
     bool isSmallItem2(QnCamDisplay* display);
-    bool isNotSmallItem(QnCamDisplay* display);
+    bool itemCanBeOptimized(QnCamDisplay* display);
     bool isNotSmallItem2(QnCamDisplay* display);
 
     bool isSupportedDisplay(QnCamDisplay* display) const;
+    bool isForcedHQDisplay(QnCamDisplay* display, QnArchiveStreamReader* reader) const;
 
     /** try LQ->HQ once more */
     void addHQTry(); 

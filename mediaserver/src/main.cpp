@@ -516,12 +516,15 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
         qDebug() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
         return QnMediaServerResourcePtr();
     }
+
+    /*
     rez = ec2Connection->getResourceManager()->setResourceStatusSync(serverPtr->getId(), QnResource::Online);
     if (rez != ec2::ErrorCode::ok)
     {
         qDebug() << "registerServer(): Call to change server status failed. Reason: " << ec2::toString(rez);
         return QnMediaServerResourcePtr();
     }
+    */
     
     return savedServer;
 }
@@ -1103,12 +1106,17 @@ QHostAddress QnMain::getPublicAddress()
 
 void QnMain::run()
 {
-    QFile f(getDataDirectory() + lit("/ssl/cert.pem"));
+    QFile f( MSSettings::roSettings()->value( nx_ms_conf::SSL_CERTIFICATE_PATH, getDataDirectory() + lit( "/ssl/cert.pem" ) ).toString() );
     if (!f.open(QIODevice::ReadOnly)) {
-        qWarning() << "No SSL sertificate for mediaServer!";
-    } else {
-        QByteArray certData = f.readAll();
-        QnSSLSocket::initSSLEngine(certData);
+        qWarning() << "Could not find SSL certificate at "<<f.fileName()<<". Using built-in certificate";
+        f.setFileName( ":cert.pem" );
+        if( !f.open( QIODevice::ReadOnly ) )
+            qWarning() << "Could not load built-in SSL certificate "<<f.fileName();
+    }
+    if( f.isOpen() )
+    {
+        const QByteArray& certData = f.readAll();
+        QnSSLSocket::initSSLEngine( certData );
     }
 
     QnSyncTime syncTime;
@@ -1330,7 +1338,7 @@ void QnMain::run()
         server->setSystemInfo(QnSystemInformation(QN_APPLICATION_PLATFORM, QN_APPLICATION_ARCH));
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
-        bool isLocal = appserverHostString.isEmpty() || QUrl(appserverHostString).scheme() == "file";
+        bool isLocal = appserverHostString.isEmpty() || appserverHostString == "localhost" || QUrl(appserverHostString).scheme() == "file";
 
         int serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 #ifdef EDGE_SERVER
@@ -1789,19 +1797,9 @@ private:
     }
 
     QString hardwareIdAsGuid() {
-#ifdef EDGE_SERVER
-    char  mac[MAC_ADDR_LEN];
-    memset(mac, 0, sizeof(mac));
-    char* host = 0;
-    getMacFromPrimaryIF(mac, &host);
-
-    QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-    md5Hash.addData(mac, 12);
-    md5Hash.addData("edge");
-    return QUuid::fromRfc4122(md5Hash.result()).toString();
-#else
-    return hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
-#endif
+        const QString& hwID = hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
+        std::cout << "Got hwID \"" << hwID.toStdString() << "\"" << std::endl;
+        return hwID;
     }
 
     void updateGuidIfNeeded() {

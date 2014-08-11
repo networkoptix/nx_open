@@ -166,7 +166,7 @@ bool isNumberStart(const QChar &c) {
         c.isDigit();
 }
 
-void ExtractToken( QString & buffer, const QString & string, int & pos, bool & isNumber )
+void ExtractToken( QString & buffer, const QString & string, int & pos, bool & isNumber , bool enableFloat )
 {
     buffer.clear();
     if ( string.isNull() || pos >= string.length() )
@@ -174,6 +174,8 @@ void ExtractToken( QString & buffer, const QString & string, int & pos, bool & i
 
     isNumber = false;
     QChar curr = string[ pos ];
+    // TODO:: Fix it
+    // If you don't want to handle sign of the number, this isNumberStart is not needed indeed 
     if ( isNumberStart(curr) )
     {
 #if 0
@@ -189,9 +191,14 @@ void ExtractToken( QString & buffer, const QString & string, int & pos, bool & i
 
             if ( curr == L'.' )
             {
-                INCBUF();
-                while ( curr.isDigit() )
+                if(enableFloat) {
                     INCBUF();
+                    while ( curr.isDigit() )
+                        INCBUF();
+                } else {
+                    // We are done since we meet first character that is not expected
+                    return;
+                }
             }
 
             /* We don't want to handle exponential notation.
@@ -221,7 +228,7 @@ void ExtractToken( QString & buffer, const QString & string, int & pos, bool & i
     }
 }
 
-int naturalStringCompare( const QString & lhs, const QString & rhs, Qt::CaseSensitivity caseSensitive )
+int naturalStringCompare( const QString & lhs, const QString & rhs, Qt::CaseSensitivity caseSensitive , bool enableFloat )
 {
     int ii = 0;
     int jj = 0;
@@ -242,8 +249,8 @@ int naturalStringCompare( const QString & lhs, const QString & rhs, Qt::CaseSens
 
     while ( retVal == 0 && ii < lhs.length() && jj < rhs.length() )
     {
-        ExtractToken( lhsBufferQStr, lhs, ii, lhsNumber );
-        ExtractToken( rhsBufferQStr, rhs, jj, rhsNumber );
+        ExtractToken( lhsBufferQStr, lhs, ii, lhsNumber , enableFloat );
+        ExtractToken( rhsBufferQStr, rhs, jj, rhsNumber , enableFloat );
 
         if ( !lhsNumber && !rhsNumber )
         {

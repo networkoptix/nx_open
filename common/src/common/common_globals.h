@@ -283,11 +283,8 @@ public:
     };
 
     enum SystemComponent {
-        EnterpriseControllerComponent,
-        MediaServerComponent,
+        ServerComponent,
         ClientComponent,
-        MediaProxyComponent,
-
         AnyComponent
     };
 

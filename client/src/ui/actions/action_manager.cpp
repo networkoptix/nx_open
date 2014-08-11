@@ -1604,6 +1604,14 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Pin Notifications")).
         toggledText(tr("Unpin Notifications"));
 
+    factory(Qn::ToggleBackgroundAnimationAction).
+        flags(Qn::GlobalHotkey).
+        shortcut(tr("Ctrl+Alt+T")).
+        text(tr("Disable Background Animation")).
+        toggledText(tr("Enable Background Animation")).
+        checked(true).
+        autoRepeat(false);
+
 #ifdef QN_ENABLE_BOOKMARKS
     factory(Qn::ToggleBookmarksSearchAction).
         flags(Qn::GlobalHotkey).
@@ -1774,7 +1782,9 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
         }
 
         /* Do not need to call integrateMenu, it is already integrated. */
-        return childMenu;
+        if (childMenu)
+            return childMenu;
+        /* Otherwise we should continue to main factory actions. */
     }
 
     QMenu *result = new QnMenu(parentWidget);
