@@ -147,7 +147,7 @@ public:
 //!Interface for writing to/reading from socket
 class AbstractCommunicatingSocket
 :
-    virtual public AbstractSocket
+    public AbstractSocket
 {
 public:
     virtual ~AbstractCommunicatingSocket() {}
@@ -271,7 +271,7 @@ struct StreamSocketInfo
 //!Interface for connection-orientied sockets
 class AbstractStreamSocket
 :
-    virtual public AbstractCommunicatingSocket
+    public AbstractCommunicatingSocket
 {
 public:
     virtual ~AbstractStreamSocket() {}
@@ -312,7 +312,7 @@ public:
 */
 class AbstractStreamServerSocket
 :
-    virtual public AbstractSocket
+    public AbstractSocket
 {
 public:
     //!This class for internal use only. MAY be removed or changed in future
@@ -370,7 +370,7 @@ static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));
 */
 class AbstractDatagramSocket
 :
-    virtual public AbstractCommunicatingSocket
+    public AbstractCommunicatingSocket
 {
 public:
     static const int UDP_HEADER_SIZE = 8;
