@@ -3,7 +3,7 @@
 
 #include <QtQml/QtQml>
 
-#include <src/context/context.h>
+#include <context/context.h>
 
 #include <api/app_server_connection.h>
 
