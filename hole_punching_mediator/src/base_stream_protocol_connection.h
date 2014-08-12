@@ -7,6 +7,7 @@
 #define BASE_STREAM_PROTOCOL_CONNECTION_H
 
 #include <atomic>
+#include <functional>
 
 #include <boost/optional.hpp>
 
@@ -77,7 +78,7 @@ namespace nx_api
             {
                 //parsing message
                 size_t bytesProcessed = 0;
-                switch( m_parser.parse( pos > 0 ? buf.substr(pos) : buf, &bytesProcessed ) )
+                switch( m_parser.parse( pos > 0 ? buf.mid(pos) : buf, &bytesProcessed ) )
                 {
                     case ParserState::init:
                     case ParserState::inProgress:
@@ -97,7 +98,7 @@ namespace nx_api
                     }
 
                     case ParserState::failed:
-                        //TODO/IMPL: #ak ignore all following data and close connection?
+                        //TODO : #ak ignore all following data and close connection?
                         return;
                 }
             }
@@ -111,13 +112,19 @@ namespace nx_api
             {
                 //can accept another outgoing message
                 m_isSendingMessage = 0;
+                if( m_sendCompletionHandler )
+                {
+                    //completion handler is allowed to remove this connection
+                    auto sendCompletionHandlerBak = std::move( m_sendCompletionHandler );
+                    sendCompletionHandlerBak();
+                }
                 return;
             }
             size_t bytesWritten = 0;
             m_serializerState = m_serializer.serialize( &m_writeBuffer, &bytesWritten );
             if( (m_serializerState == SerializerState::needMoreBufferSpace) && (bytesWritten == 0) )
             {
-                //TODO/IMPL #ak increase buffer
+                //TODO #ak increase buffer
                 assert( false );
             }
             //assuming that all bytes will be written or none
@@ -127,13 +134,31 @@ namespace nx_api
         /*!
             Initiates asynchoronous message send
         */
-        bool sendMessage( const MessageType& msg )
+        template<class Handler>
+        bool sendMessage( const MessageType& msg, Handler handler = std::function<void()>() )
         {
             if( m_isSendingMessage > 0 )
                 return false;   //TODO: #ak interleaving is not supported yet
 
-            //TODO/IMPL avoid message copying
+            //TODO #ak avoid message copying
             m_response = msg;
+            m_sendCompletionHandler = std::move(handler);
+            sendResponseMessage();
+            return true;
+        }
+
+        /*!
+            Initiates asynchoronous message send
+        */
+        template<class Handler>
+        bool sendMessage( MessageType&& msg, Handler handler = std::function<void()>() )
+        {
+            if( m_isSendingMessage > 0 )
+                return false;   //TODO: #ak interleaving is not supported yet
+
+            //TODO #ak avoid message copying
+            m_response = std::move(msg);
+            m_sendCompletionHandler = std::move(handler);
             sendResponseMessage();
             return true;
         }
@@ -146,6 +171,7 @@ namespace nx_api
         SerializerState::Type m_serializerState;
         nx::Buffer m_writeBuffer;
         std::atomic<int> m_isSendingMessage;
+        std::function<void()> m_sendCompletionHandler;
 
         void sendResponseMessage()
         {

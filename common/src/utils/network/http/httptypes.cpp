@@ -545,6 +545,15 @@ namespace nx_http
             request = NULL;
     }
 
+    Message::Message( Message&& right )
+    :
+        type( right.type ),
+        request( right.request )
+    {
+        right.type = MessageType::none;
+        right.request = nullptr;
+    }
+
     Message::~Message()
     {
         clear();
@@ -558,6 +567,17 @@ namespace nx_http
             request = new Request( *right.request );
         else if( type == MessageType::response )
             response = new Response( *right.response );
+        return *this;
+    }
+
+    Message& Message::operator=(Message&& right)
+    {
+        clear();
+
+        type = right.type;
+        right.type = MessageType::none;
+        request = right.request;
+        right.request = nullptr;
         return *this;
     }
 

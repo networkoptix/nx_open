@@ -324,9 +324,11 @@ namespace nx_http
 
         Message( MessageType::Value _type = MessageType::none );
         Message( const Message& right );
+        Message( Message&& right );
         ~Message();
 
-        Message& operator=( const Message& right );
+        Message& operator=(const Message& right);
+        Message& operator=(Message&& right);
 
         void serialize( BufferType* const dstBuffer ) const;
 

@@ -35,8 +35,12 @@ void HolePuncherProcess::pleaseStop()
 }
 
 int HolePuncherProcess::executeApplication()
-{ 
-    int result = application()->exec();
+{
+    if( !initialize() )
+        return 1;
+
+    const int result = application()->exec();
+
     deinitialize();
     return result;
 }
@@ -51,9 +55,6 @@ void HolePuncherProcess::start()
         application->quit();
         return;
     }
-
-    if( !initialize() )
-        application->quit();
 }
 
 void HolePuncherProcess::stop()
@@ -102,10 +103,14 @@ bool HolePuncherProcess::initialize()
         const QString& logDir = m_settings->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
         QDir().mkpath( logDir );
         const QString& logFileName = logDir + QLatin1String("/log_file");
-        if( cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1) )
-            QnLog::initLog(logLevel);
+        if( cl_log.create( logFileName, 1024 * 1024 * 10, 5, cl_logDEBUG1 ) )
+            QnLog::initLog( logLevel );
         else
             std::wcerr<<L"Failed to create log file "<<logFileName.toStdWString()<<std::endl;
+        NX_LOG( lit( "=================================================================================" ), cl_logALWAYS );
+        NX_LOG( lit( "%1 started" ).arg( QN_APPLICATION_NAME ), cl_logALWAYS );
+        NX_LOG( lit( "Software version: %1" ).arg( QN_APPLICATION_VERSION ), cl_logALWAYS );
+        NX_LOG( lit( "Software revision: %1" ).arg( QN_APPLICATION_REVISION ), cl_logALWAYS );
     }
 
     const QStringList& addrToListenStrList = m_settings->value("addressToListen", DEFAULT_ADDRESS_TO_LISTEN).toString().split(',');

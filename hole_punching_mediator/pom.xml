@@ -19,10 +19,10 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hole_punching_mediator</artifactId>
     <packaging>pom</packaging>
-    <name>${company.name} UDP Hole Puncher</name>    
+    <name>${company.name} Mediator</name>    
 
     <properties>
-        <product.title>${company.name} UDP Hole Punching Mediator</product.title>  
+        <product.title>${company.name} Mediator</product.title>  
         <!--Global libs-->        
         <qt.libs>core network concurrent</qt.libs>
         <global.libs>-lcommon</global.libs>
