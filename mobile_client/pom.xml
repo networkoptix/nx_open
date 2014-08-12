@@ -24,5 +24,6 @@
         <!--<global.defines>CL_FORCE_LOGO</global.defines>-->
         <!--Specific os defines-->
         <android.defines/>
+        <buildLib>sharedlib</buildLib>
     </properties>
 </project>
