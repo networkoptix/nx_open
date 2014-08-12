@@ -179,8 +179,15 @@ namespace ec2
     private:
         QnDbManager* m_dbManager;
         QnTranState m_state;
-        //QMap<QUuid, QnAbstractTransaction> m_updateHistory;
-        QMap<QUuid, qint64> m_updateHistory;
+        struct UpdateHistoryData
+        {
+            UpdateHistoryData(): timestamp(0) {}
+            UpdateHistoryData(const QnTranStateKey& updatedBy, const qint64& timestamp): updatedBy(updatedBy), timestamp(timestamp) {}
+            QnTranStateKey updatedBy;
+            qint64 timestamp;
+        };
+
+        QMap<QUuid, UpdateHistoryData> m_updateHistory;
         
         mutable QMutex m_timeMutex;
         QElapsedTimer m_relativeTimer;
