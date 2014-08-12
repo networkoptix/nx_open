@@ -17,9 +17,9 @@
         <product.title>${mobile_client.name}</product.title>
         <!--Global libs-->
         <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
-        <global.libs/>
+        <global.libs>-lcommon -lappserver2 -lquazip -lssl -lcrypto</global.libs>
         <!--Specific os libs used-->
-        <android.oslibs>-lcommon -lappserver2 -lquazip -lssl -lcrypto</android.oslibs>
+        <android.oslibs></android.oslibs>
         <!--Global defines-->
         <!--<global.defines>CL_FORCE_LOGO</global.defines>-->
         <!--Specific os defines-->

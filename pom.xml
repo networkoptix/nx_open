@@ -581,35 +581,6 @@
                 <module>android-client/protobuf-classes</module>
                 <module>android-client/android-main</module>
             </modules>
-        </profile>  
-        <profile>
-            <id>android-qt</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                </os>
-                <property>
-                    <name>mobile</name>
-                    <value>android</value>
-                </property>
-            </activation>
-            <properties>
-                <platform>android</platform>
-                <toolchain.version>android</toolchain.version>
-                <compiler>gcc</compiler>
-                <additional.compiler>gcc</additional.compiler>
-                <profile.classifier>${platform}-${arch}</profile.classifier>
-                <qt.spec>android-g++</qt.spec>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
-                <libdir>${root.dir}/build_environment/target</libdir>
-            </properties>
-            <build>
-                <directory>target</directory>
-            </build>
-            <modules>
-                <module>mobile_client</module>
-            </modules>
         </profile>
         <profile>
             <id>ios</id>
@@ -659,6 +630,68 @@
             <properties>
                 <compile.option2>-angle</compile.option2>
             </properties>
-        </profile>          
+        </profile>
+
+        <!-- Mobile client profiles -->
+        <profile>
+            <id>mobile-common</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>mobile</name>
+                </property>
+            </activation>
+            <properties>
+                <compiler>gcc</compiler>
+                <additional.compiler>gcc</additional.compiler>
+                <profile.classifier>${platform}-${arch}</profile.classifier>
+                <libdir>${root.dir}/build_environment/target</libdir>
+                <qt.classifier>${platform}-${arch}</qt.classifier>
+            </properties>
+            <build>
+                <directory>target</directory>
+            </build>
+            <modules>
+                <module>mobile_client</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>mobile</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <platform>android</platform>
+                <toolchain.version>android</toolchain.version>
+                <qt.spec>android-g++</qt.spec>
+            </properties>
+        </profile>
+        <profile>
+            <id>mobile-android-on-desktop</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>mobile</name>
+                    <value>android-on-desktop</value>
+                </property>
+            </activation>
+            <properties>
+                <platform>linux</platform>
+                <qt.spec>linux-g++</qt.spec>
+            </properties>
+        </profile>
     </profiles> 
 </project>
