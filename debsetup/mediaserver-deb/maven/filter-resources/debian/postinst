@@ -37,7 +37,7 @@ fi
 PORT_DEFAULT="7001"
 TRANSPORT_DEAULT="auto"
 PUBLIC_IP_ENABLED_DEFAULT="auto"
-SYSTEM_NAME=$COMPANY_NAME
+SYSTEM_NAME_DEFAULT=$COMPANY_NAME
 ALLOW_CAMERA_CHANGES_DEFAULT=true
 
 function is_local_addr {
@@ -154,7 +154,7 @@ case "$1" in
 
         SYSTEM_NAME="$($CFG_HELPER systemName)"
         [ -z "$SYSTEM_NAME" ] && SYSTEM_NAME=$SYSTEM_NAME_DEFAULT
-        SYSTEM_NAME=$(ask_for_value systemName "$systemName")
+        SYSTEM_NAME=$(ask_for_value systemName "$SYSTEM_NAME")
         $CFG_HELPER systemName "$SYSTEM_NAME"
 
         ALLOW_CAMERA_CHANGES="$($CFG_HELPER allowCameraChanges)"
