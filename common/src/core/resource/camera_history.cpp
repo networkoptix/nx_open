@@ -1,10 +1,5 @@
 #include "camera_history.h"
 
-extern "C"
-{
-    #include <libavutil/avutil.h>
-}
-
 #include <utils/common/util.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -134,7 +129,7 @@ qint64 QnCameraHistory::getMinTime() const
 {
     QMutexLocker lock(&m_mutex);
     if (m_fullTimePeriods.isEmpty())
-        return AV_NOPTS_VALUE;
+        return DATETIME_INVALID;
     return m_fullTimePeriods.first().startTimeMs;
 }
 
@@ -228,10 +223,10 @@ QnResourceList QnCameraHistoryPool::getOnlineCameraServers(const QnNetworkResour
 qint64 QnCameraHistoryPool::getMinTime(const QnNetworkResource* camera)
 {
     if (!camera)
-        return AV_NOPTS_VALUE;
+        return DATETIME_INVALID;
     QnCameraHistoryPtr history = getCameraHistory(camera->getPhysicalId());
     if (!history)
-        return AV_NOPTS_VALUE;
+        return DATETIME_INVALID;
 
     return history->getMinTime();
 }

@@ -1,5 +1,7 @@
 #include "playbackmask_helper.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 extern "C"
 {
     #include <libavutil/avutil.h> /* For AV_NOPTS_VALUE. */
@@ -78,3 +80,5 @@ qint64 QnPlaybackMaskHelper::endTimeMs() const
     else
         return m_playbackMask.last().endTimeMs();
 }
+
+#endif //ENABLE_DATA_PROVIDERS

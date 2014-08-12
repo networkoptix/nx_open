@@ -1,6 +1,8 @@
 #ifndef __BLURAY_HELPER_H
 #define __BLURAY_HELPER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QMap>
 #include <QtCore/QString>
 #include <QtCore/QVector>
@@ -321,5 +323,7 @@ private:
     void parseMovieObjects(BitStreamReader& reader);
     void parseNavigationCommand(BitStreamReader& reader);
 };
+
+#endif //ENABLE_DATA_PROVIDERS
 
 #endif

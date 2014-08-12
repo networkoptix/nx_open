@@ -1,5 +1,6 @@
-
 #include "bluray_helper.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
 
 extern "C"
 {
@@ -1917,3 +1918,5 @@ void MovieObject::parseNavigationCommand(BitStreamReader& reader)
         immediateValue = immediateValue;
     }
 }
+
+#endif //ENABLE_DATA_PROVIDERS
