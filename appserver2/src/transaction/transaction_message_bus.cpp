@@ -401,9 +401,13 @@ void QnTransactionMessageBus::printTranState(const QnTranState& tranState)
 void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<QnTranState> &tran)
 {
     sender->setWriteSync(true);
-    QnTransactionTransportHeader transportHeader;
-    transportHeader.processedPeers << sender->remotePeer().id << m_localPeer.id;
-    transportHeader.dstPeers << sender->remotePeer().id;
+
+    QnTransactionTransportHeader ttUnicast;
+    ttUnicast.processedPeers << sender->remotePeer().id << m_localPeer.id;
+    ttUnicast.dstPeers << sender->remotePeer().id;
+
+    QnTransactionTransportHeader ttBroadcast(ttUnicast.processedPeers);
+
     QList<QByteArray> serializedTransactions;
     const ErrorCode errorCode = transactionLog->getTransactionsAfter(tran.params, serializedTransactions);
     if (errorCode == ErrorCode::ok) 
@@ -417,13 +421,13 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
         tran.params.result = 0;
         QByteArray chunkData;
         
-        sender->sendTransaction(tran, transportHeader);
+        sender->sendTransaction(tran, ttUnicast);
 
-        sendRuntimeInfo(sender, transportHeader);
+        sendRuntimeInfo(sender, ttBroadcast); // send as broadcast
 
         using namespace std::placeholders;
         foreach(const QByteArray& serializedTran, serializedTransactions)
-            if(!handleTransaction(serializedTran, std::bind(SendTransactionToTransportFuction(), this, _1, sender, transportHeader)))
+            if(!handleTransaction(serializedTran, std::bind(SendTransactionToTransportFuction(), this, _1, sender, ttBroadcast)))
                 sender->setState(QnTransactionTransport::Error);
         return;
     }

@@ -216,7 +216,9 @@ void QnResourcePoolModelNode::update() {
         bastard = false;
         break;
     case Qn::ResourceNode:
-        bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
+        bastard = !m_resource;  /* Hide resource nodes without resource. */
+        if (!bastard)
+            bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
         if(!bastard)
             if(QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>()) {
                 /* Hide local layouts that are not file-based. */ 

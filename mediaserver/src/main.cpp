@@ -152,6 +152,7 @@
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
 #include "nx_ec/data/api_conversion_functions.h"
+#include "media_server/resource_status_watcher.h"
 
 
 // This constant is used while checking for compatibility.
@@ -200,6 +201,7 @@ public:
     QString msgLogLevel;
     QString rebuildArchive;
     QString devModeKey;
+    QString allowedDiscoveryPeers;
 
     CmdLineArguments()
     :
@@ -1439,6 +1441,11 @@ void QnMain::run()
         m_moduleFinder->setCompatibilityMode(true);
         ec2ConnectionFactory->setCompatibilityMode(true);
     }
+    if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
+        m_moduleFinder->setAllowedPeers(cmdLineArguments.allowedDiscoveryPeers.split(";"));
+    }
+
+
     QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleFound,     this,   &QnMain::at_peerFound,  Qt::DirectConnection);
     QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleLost,      this,   &QnMain::at_peerLost,   Qt::DirectConnection);
 
@@ -1465,6 +1472,8 @@ void QnMain::run()
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
     serverResourceProcessor->moveToThread( mserverResourceDiscoveryManager.get() );
     QnResourceDiscoveryManager::instance()->setResourceProcessor(serverResourceProcessor.get());
+
+    std::unique_ptr<QnResourceStatusWatcher> statusWatcher( new QnResourceStatusWatcher());
 
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher thirdPartyResourceSearcher;
@@ -1912,6 +1921,7 @@ int main(int argc, char* argv[])
     commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL, 
         lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
     commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
+    commandLineParser.addParameter(&cmdLineArguments.allowedDiscoveryPeers, "--allowed-peers", NULL, QString());
     commandLineParser.addParameter(&configFilePath, "--conf-file", NULL, 
         "Path to config file. By default "+MSSettings::defaultROSettingsFilePath());
     commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL, 

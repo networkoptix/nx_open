@@ -14,9 +14,6 @@
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
     : m_serverId(serverId)
 {
-    connect(qnResPool, &QnResourcePool::statusChanged, this, &QnAppserverResourceProcessor::at_resource_statusChanged);
-
-
     m_cameraDataHandler = new ec2::QnMutexCameraDataHandler();
     ec2::QnDistributedMutexManager::instance()->setUserDataHandler(m_cameraDataHandler);
 }
@@ -143,42 +140,6 @@ void QnAppserverResourceProcessor::at_mutexTimeout()
     mutex->deleteLater();
 }
 
-
-void QnAppserverResourceProcessor::updateResourceStatusAsync(const QnResourcePtr &resource)
-{
-    if (!resource)
-        return;
-
-    m_setStatusInProgress.insert(resource->getId());
-    QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatus(resource->getId(), resource->getStatus(), this, &QnAppserverResourceProcessor::requestFinished2);
-}
-
-void QnAppserverResourceProcessor::requestFinished2(int /*reqID*/, ec2::ErrorCode errCode, const QnId& id)
-{
-    if (errCode != ec2::ErrorCode::ok)
-        qCritical() << "Failed to update resource status" << id.toString();
-
-    m_setStatusInProgress.remove(id);
-    if (m_awaitingSetStatus.contains(id)) {
-        m_awaitingSetStatus.remove(id);
-        updateResourceStatusAsync(qnResPool->getResourceById(id));
-    }
-}
-
-bool QnAppserverResourceProcessor::isSetStatusInProgress(const QnResourcePtr &resource)
-{
-    return m_setStatusInProgress.contains(resource->getId());
-}
-
-void QnAppserverResourceProcessor::at_resource_statusChanged(const QnResourcePtr &resource)
-{
-    //Q_ASSERT_X(!resource->hasFlags(QnResource::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
-
-    if (!isSetStatusInProgress(resource))
-        updateResourceStatusAsync(resource);
-    else
-        m_awaitingSetStatus << resource->getId();
-}
 
 bool QnAppserverResourceProcessor::isBusy() const
 {
