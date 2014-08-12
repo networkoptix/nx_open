@@ -12,7 +12,7 @@
 #include <utils/match/wildcard.h>
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
-
+#include "core/resource/media_server_resource.h"
 
 
 ////////////////////////////////////////////////////////////
@@ -341,6 +341,25 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
                     return true;
             }
         }
+
+        // authenticate by media server auth_key
+        foreach(QnMediaServerResourcePtr server, m_servers)
+        {
+            if (server->getId().toString().toUtf8().toLower() == userName)
+            {
+                QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+                md5Hash.addData(server->getAuthKey().toUtf8());
+                md5Hash.addData(":");
+                md5Hash.addData(nonce);
+                md5Hash.addData(":");
+                md5Hash.addData(ha2);
+                QByteArray calcResponse = md5Hash.result().toHex();
+
+                if (calcResponse == response)
+                    return true;
+            }
+        }
+
     }
 
     addAuthHeader(responseHeaders, isProxy);
@@ -370,11 +389,26 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
                 md5Hash.addData(pswdData[1]);
                 md5Hash.addData(password);
                 QByteArray incomeHash = md5Hash.result().toHex();
-                if (incomeHash == pswdData[2])
+                if (incomeHash == pswdData[2]) 
+                {
+                    if (user->getDigest().isEmpty()) 
+                        emit emptyDigestDetected(user, QString::fromUtf8(userName), QString::fromUtf8(password));
                     return true;
+                }
             }
         }
     }
+
+    // authenticate by media server auth_key
+    foreach(QnMediaServerResourcePtr server, m_servers)
+    {
+        if (server->getId().toString().toUtf8().toLower() == userName)
+        {
+            if (server->getAuthKey().toUtf8() == password)
+                return true;
+        }
+    }
+
     return false;
 }
 
@@ -421,8 +455,11 @@ void QnAuthHelper::at_resourcePool_resourceAdded(const QnResourcePtr & res)
     QMutexLocker lock(&m_mutex);
 
     QnUserResourcePtr user = res.dynamicCast<QnUserResource>();
+    QnMediaServerResourcePtr server = res.dynamicCast<QnMediaServerResource>();
     if (user)
         m_users.insert(user->getId(), user);
+    else if (server)
+        m_servers.insert(server->getId(), server);
 }
 
 void QnAuthHelper::at_resourcePool_resourceRemoved(const QnResourcePtr &res)
@@ -430,6 +467,7 @@ void QnAuthHelper::at_resourcePool_resourceRemoved(const QnResourcePtr &res)
     QMutexLocker lock(&m_mutex);
 
     m_users.remove(res->getId());
+    m_servers.remove(res->getId());
 }
 
 void QnAuthHelper::setSessionKey(const QByteArray& value)
@@ -437,4 +475,14 @@ void QnAuthHelper::setSessionKey(const QByteArray& value)
     QMutexLocker lock(&m_sessionKeyMutex);
     m_prevSessionKey = m_sessionKey;
     m_sessionKey = value;
+}
+
+QByteArray QnAuthHelper::symmetricalEncode(const QByteArray& data)
+{
+    static const QByteArray mask = QByteArray::fromHex("4453D6654C634636990B2E5AA69A1312"); // generated from guid
+    static const int maskSize = mask.size();
+    QByteArray result = data;
+    for (int i = 0; i < result.size(); ++i)
+        result.data()[i] ^= mask.data()[i % maskSize];
+    return result;
 }

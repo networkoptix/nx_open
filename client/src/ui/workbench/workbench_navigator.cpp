@@ -864,8 +864,12 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         endTimeUSec = reader->endTime();
         endTimeMSec = endTimeUSec == DATETIME_NOW ? qnSyncTime->currentMSecsSinceEpoch() : ((quint64)endTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->maximum() : endTimeUSec / 1000);
 
-        startTimeUSec = reader->startTime();                       /* vvvvv  If nothing is recorded, set minimum to end - 10s. */
-        startTimeMSec = startTimeUSec == DATETIME_NOW ? endTimeMSec - 10000 : ((quint64)startTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->minimum() : startTimeUSec / 1000);
+        startTimeUSec = reader->startTime();                       
+        startTimeMSec = startTimeUSec == DATETIME_NOW 
+            ? endTimeMSec - 10000                               /* If nothing is recorded, set minimum to end - 10s. */        
+            : (quint64)startTimeUSec == AV_NOPTS_VALUE 
+            ? m_timeSlider->minimum() 
+            : startTimeUSec / 1000;
     }
 
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
@@ -1062,9 +1066,8 @@ void QnWorkbenchNavigator::updateLines() {
         m_timeSlider->setLineVisible(SyncedLine, false);
     }
 
-    QnResourcePtr currentLayout = workbench()->currentLayout()->resource();
-    bool localLayout = currentLayout && currentLayout->flags().testFlag(QnResource::local);
-    if (localLayout) {
+    QnLayoutResourcePtr currentLayoutResource = workbench()->currentLayout()->resource().staticCast<QnLayoutResource>();
+    if (context()->snapshotManager()->isFile(currentLayoutResource)) {
         m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, false);
         m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, false);
     } else {

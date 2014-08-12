@@ -5,7 +5,7 @@
 #include <QtCore/QMetaType>
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QAuthenticator>
-#include "nx_ec/ec_api.h"
+
 
 // TODO: #Elric move to model functions?
 /**
@@ -31,7 +31,6 @@ public:
     static void initialize();
 };
 
-Q_DECLARE_METATYPE(QUuid);
 Q_DECLARE_METATYPE(QHostAddress);
 Q_DECLARE_METATYPE(QAuthenticator);
 Q_DECLARE_METATYPE(Qt::ConnectionType);

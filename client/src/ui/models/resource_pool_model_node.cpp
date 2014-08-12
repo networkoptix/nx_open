@@ -174,7 +174,7 @@ void QnResourcePoolModelNode::update() {
 
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
         if (!index.isNull()) {
-            QnVideoWallItem item = index.videowall()->items()->getItem(m_uuid);
+            QnVideoWallItem item = index.item();
 
             if (item.online) {
                 m_status = QnResource::Online;
@@ -205,7 +205,6 @@ void QnResourcePoolModelNode::update() {
             break;
         }
     }
-
     /* Update bastard state. */
     bool bastard = false;
     switch(m_type) {
@@ -217,7 +216,9 @@ void QnResourcePoolModelNode::update() {
         bastard = false;
         break;
     case Qn::ResourceNode:
-        bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
+        bastard = !m_resource;  /* Hide resource nodes without resource. */
+        if (!bastard)
+            bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
         if(!bastard)
             if(QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>()) {
                 /* Hide local layouts that are not file-based. */ 
@@ -253,6 +254,7 @@ void QnResourcePoolModelNode::update() {
     default:
         break;
     }
+
     setBastard(bastard);
 
     /* Notify views. */

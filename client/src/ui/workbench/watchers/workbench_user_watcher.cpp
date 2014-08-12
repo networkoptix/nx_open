@@ -5,10 +5,12 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 
+#include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/actions/action_manager.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     base_type(parent),
@@ -29,16 +31,22 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
     if(m_user == user)
         return;
 
-    if (m_user)
+    if (m_user) {
         disconnect(m_user, NULL, this, NULL);
+        if (m_permissionsNotifier)
+            disconnect(m_permissionsNotifier, NULL, this, NULL); 
+    }
 
     m_user = user;
     m_userPassword = QString();
     m_userPasswordHash = user ? user->getHash() : QByteArray();
+    m_userPermissions = accessController()->globalPermissions(user);
+    m_permissionsNotifier = user ? accessController()->notifier(user) : NULL;
 
     if (m_user) {
         connect(m_user, &QnResource::resourceChanged, this, &QnWorkbenchUserWatcher::at_user_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
-        connect(m_user, &QnUserResource::permissionsChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
+        
+        connect(m_permissionsNotifier, &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
     }
 
 
@@ -100,6 +108,9 @@ void QnWorkbenchUserWatcher::at_resource_nameChanged(const QnResourcePtr &resour
 }
 
 bool QnWorkbenchUserWatcher::reconnectRequired(const QnUserResourcePtr &user) {
+    if (m_userName.isEmpty())
+        return false;   //we are not connected
+
     if (user->getName() != m_userName)
         return true;
 
@@ -127,14 +138,18 @@ void QnWorkbenchUserWatcher::at_user_resourceChanged(const QnResourcePtr &resour
     if (!reconnectRequired(resource.dynamicCast<QnUserResource>()))
         return;
 
-    //TODO: #Elric #TR add message box on next step of translations generating
-    menu()->trigger(Qn::DisconnectAction,
-        QnActionParameters().withArgument(Qn::ForceRole, true));
-    menu()->trigger(Qn::ConnectToServerAction);
-
+    //TODO: #GDM #TR add message box 
+    menu()->trigger(Qn::ReconnectAction);
 }
 
-void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnUserResourcePtr &user) {
-    Q_UNUSED(user)
-    menu()->trigger(Qn::ReconnectAction);
+void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnResourcePtr &user) {
+    if (!m_user || user.dynamicCast<QnUserResource>() != m_user)
+        return;
+
+    Qn::Permissions newPermissions = accessController()->globalPermissions(m_user);
+    bool reconnect = (newPermissions & m_userPermissions) != m_userPermissions;    // some permissions were removed
+
+    m_userPermissions = newPermissions;
+    if (reconnect) //TODO: #GDM #TR add message box 
+        menu()->trigger(Qn::ReconnectAction);
 }

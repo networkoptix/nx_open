@@ -182,8 +182,11 @@ bool QnModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket)
             arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
         return false;
     }
+    
+    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(response.seed))
+        return false;
 
-    //received valid response, checking if already know this enterprise controller
+    //received valid response, checking if already know this Server
     auto it = m_knownEnterpriseControllers.find(response.seed);
     bool newModule = (it == m_knownEnterpriseControllers.end());
 
@@ -191,7 +194,7 @@ bool QnModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket)
         it = m_knownEnterpriseControllers.insert(response.seed, ModuleContext(response));
 
     if (!it->signalledAddresses.contains(remoteAddressStr)) {
-        //new enterprise controller found
+        //new Server found
 
         it->signalledAddresses.insert(remoteAddressStr);
         const QHostAddress &localAddress = QHostAddress(udpSocket->getLocalAddress().address.toString());

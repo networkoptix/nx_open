@@ -7,6 +7,8 @@
 
 #include <api/model/kvpair.h>
 
+#include <boost/operators.hpp>
+
 #include <utils/common/model_functions_fwd.h>
 
 class QnEmail {
@@ -23,9 +25,8 @@ public:
     };
 
     struct SmtpServerPreset {
-        SmtpServerPreset() {}
-        SmtpServerPreset(const QString &server, ConnectionType connectionType = Tls, int port = 0):
-            server(server), connectionType(connectionType), port(port) {}
+        SmtpServerPreset();
+        SmtpServerPreset(const QString &server, ConnectionType connectionType = Tls, int port = 0);
 
         bool isNull() const {
             return server.isEmpty();
@@ -36,20 +37,17 @@ public:
         int port;
     };
 
-    struct Settings {
+    struct Settings: public boost::equality_comparable1<Settings> {
         Settings();
-        Settings(const QnKvPairList &values);
-        ~Settings();
 
         bool isNull() const;
         bool isValid() const;
-
-        QnKvPairList serialized() const;
 
         QString server;
         QString user;
         QString password;
         QString signature;
+        QString supportEmail;
         ConnectionType connectionType;
         int port;
         int timeout;
@@ -57,6 +55,8 @@ public:
         //TODO: #GDM #Common think where else we can store it
         /** Flag that we are using simple view */
         bool simple;
+
+        friend bool operator==(const Settings &l, const Settings &r);
     };
 
 
@@ -64,6 +64,7 @@ public:
 
     static bool isValid(const QString &email);
     static int defaultPort(ConnectionType connectionType);
+    static int defaultTimeoutSec();
 
     bool isValid() const;
 
@@ -88,7 +89,7 @@ private:
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnEmail::ConnectionType)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::SmtpServerPreset)(QnEmail::ConnectionType), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::SmtpServerPreset)(QnEmail::ConnectionType), (metatype)(lexical))
 
 #endif // QN_EMAIL_H
 

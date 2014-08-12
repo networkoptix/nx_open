@@ -11,6 +11,8 @@
 #include <utils/network/aio/aioservice.h>
 #include <utils/network/system_socket.h>
 
+#include "version.h"
+
 using namespace std;
 
 static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
@@ -78,6 +80,8 @@ public:
 ////////////////////////////////////////////////////////////
 static const unsigned int READ_BUF_CAPACITY = 64*1024+1;    //max UDP packet size
 
+static UPNPDeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
+
 UPNPDeviceSearcher::UPNPDeviceSearcher( unsigned int discoverTryTimeoutMS )
 :
     m_discoverTryTimeoutMS( discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS ),
@@ -87,6 +91,9 @@ UPNPDeviceSearcher::UPNPDeviceSearcher( unsigned int discoverTryTimeoutMS )
 {
     m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
     m_cacheTimer.start();
+
+    assert(UPNPDeviceSearcherInstance == nullptr);
+    UPNPDeviceSearcherInstance = this;
 }
 
 UPNPDeviceSearcher::~UPNPDeviceSearcher()
@@ -95,6 +102,8 @@ UPNPDeviceSearcher::~UPNPDeviceSearcher()
 
     delete[] m_readBuf;
     m_readBuf = NULL;
+
+    UPNPDeviceSearcherInstance = nullptr;
 }
 
 void UPNPDeviceSearcher::pleaseStop()
@@ -175,13 +184,6 @@ void UPNPDeviceSearcher::processDiscoveredDevices( UPNPSearchHandler* handlerToU
 
         ++it;
     }
-}
-
-static UPNPDeviceSearcher* UPNPDeviceSearcherInstance = NULL;
-
-void UPNPDeviceSearcher::initGlobalInstance( UPNPDeviceSearcher* _inst )
-{
-    UPNPDeviceSearcherInstance = _inst;
 }
 
 UPNPDeviceSearcher* UPNPDeviceSearcher::instance()
@@ -275,7 +277,7 @@ void UPNPDeviceSearcher::dispatchDiscoverPackets()
         data.append("M-SEARCH * HTTP/1.1\r\n");
         //data.append("Host: 192.168.0.150:1900\r\n");
         data.append("Host: ").append(sock->getLocalAddress().toString()).append("\r\n");
-        data.append("ST:urn:schemas-upnp-org:device:Network Optix Media Server:1\r\n");
+        data.append(lit("ST:urn:schemas-upnp-org:device:%1 Server:1\r\n").arg(lit(QN_ORGANIZATION_NAME)));
         data.append("Man:\"ssdp:discover\"\r\n");
         data.append("MX:3\r\n\r\n");
         sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);

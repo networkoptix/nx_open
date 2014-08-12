@@ -377,7 +377,7 @@ void QnThumbnailsLoader::process() {
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
     if (camera) {
-        QnResourceList servers = QnCameraHistoryPool::instance()->getOnlineCameraServers(camera, period);
+        QnMediaServerResourceList servers = QnCameraHistoryPool::instance()->getOnlineCameraServers(camera, period);
         for (int i = 0; i < servers.size(); ++i) 
         {
             QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(0));
@@ -387,7 +387,7 @@ void QnThumbnailsLoader::process() {
             else
                 rtspDelegate->setQuality(MEDIA_Quality_High, true);
             QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(rtspDelegate));
-            rtspDelegate->setResource(camera);
+            rtspDelegate->setCamera(camera);
             rtspDelegate->setServer(servers[i]);
             delegates << thumbnailDelegate;
         }
@@ -577,12 +577,10 @@ QnThumbnail QnThumbnailsLoader::generateThumbnail(const CLVideoDecoderOutput &ou
 qint64 QnThumbnailsLoader::processThumbnail(const QnThumbnail &thumbnail, qint64 startTime, qint64 endTime, bool ignorePeriod) {
     if(ignorePeriod) {
         emit m_helper->thumbnailLoaded(thumbnail);
-
-        return thumbnail.time() + thumbnail.timeStep();
-    } else {
+        return qCeil(thumbnail.actualTime(), thumbnail.timeStep());
+    } else {      
         for(qint64 time = startTime; time <= endTime; time += thumbnail.timeStep())
             emit m_helper->thumbnailLoaded(QnThumbnail(thumbnail, time));
-
         return qMax(startTime, endTime + thumbnail.timeStep());
     }
 }

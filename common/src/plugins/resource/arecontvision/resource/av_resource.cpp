@@ -32,7 +32,7 @@ QnPlAreconVisionResource::QnPlAreconVisionResource()
 
 bool QnPlAreconVisionResource::isPanoramic() const
 {
-    return QnPlAreconVisionResource::isPanoramic(getModel());
+    return const_cast<QnPlAreconVisionResource*>(this)->getVideoLayout(0)->channelCount() > 1;
 }
 
 bool QnPlAreconVisionResource::isDualSensor() const
@@ -272,7 +272,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     const CodecID streamCodec = isH264() ? CODEC_ID_H264 : CODEC_ID_MJPEG;
     mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(maxSensorWidth.toInt(), maxSensorHeight.toInt()), streamCodec ) );
     QVariant hasDualStreaming;
-    getParam(lit("hasDualStreaming"), hasDualStreaming, QnDomainMemory);
+    getParam(Qn::HAS_DUAL_STREAMING_PARAM_NAME, hasDualStreaming, QnDomainMemory);
     if( hasDualStreaming.toInt() > 0 )
         mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(maxSensorWidth.toInt()/2, maxSensorHeight.toInt()/2), streamCodec ) );
     saveResolutionList( mediaStreams );
@@ -435,7 +435,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId 
 
     QnPlAreconVisionResource* res = 0;
 
-    if (isPanoramic(resourceType->getName()))
+    if (isPanoramic(resourceType))
         res = new QnArecontPanoramicResource(resourceType->getName());
     else
         res = new CLArecontSingleSensorResource(resourceType->getName());
@@ -445,11 +445,15 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId 
     return res;
 }
 
-bool QnPlAreconVisionResource::isPanoramic(const QString &name)
+bool QnPlAreconVisionResource::isPanoramic(QnResourceTypePtr resType)
 {
-    return name.contains(lit("8180")) || name.contains(lit("8185")) || name.contains(lit("20185")) || name.contains(lit("20365")) ||
-           name.contains(lit("8360")) || name.contains(lit("8365")) || name.contains(lit("12186")) || name.contains(lit("40185")); // TODO: #Elric #vasilenko move to json?
-}
+	foreach(const QnParamTypePtr& param, resType->paramTypeList())
+	{
+		if (param->name == QLatin1String("VideoLayout"))
+			return QnCustomResourceVideoLayout::fromString(param->default_value.toString())->channelCount() > 1;
+	}
+	return false;
+};
 
 QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider()
 {
@@ -464,7 +468,7 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
 
     static int sensToLevelThreshold[10] = 
     {
-        31, // 0 - aka mask really filtered by media server always
+        31, // 0 - aka mask really filtered by server always
         31, // 1
         25, // 2
         19, // 3

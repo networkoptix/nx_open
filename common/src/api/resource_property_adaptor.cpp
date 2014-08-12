@@ -6,7 +6,7 @@
 
 // TODO: #Elric
 // Right now we have a problem in case resource property is changed very often.
-// Changes are pushed to EC and then we get them back as notifications, not
+// Changes are pushed to Server and then we get them back as notifications, not
 // necessarily in the original order. This way property value gets changed
 // in totally unexpected ways.
 #if 0
@@ -54,7 +54,7 @@ void QnAbstractResourcePropertyAdaptor::setResource(const QnResourcePtr &resourc
 }
 
 void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr &resource, bool notify) {
-    QString newSerializedValue = resource ? resource->getProperty(m_key) : QString();
+    QString newSerializedValue = resource ? resource->getProperty(m_key) : defaultSerializedValue();
 
     bool changed;
     QnResourcePtr oldResource;
@@ -94,6 +94,10 @@ QVariant QnAbstractResourcePropertyAdaptor::value() const {
 QString QnAbstractResourcePropertyAdaptor::serializedValue() const {
     QMutexLocker locker(&m_mutex);
     return m_serializedValue;
+}
+
+QString QnAbstractResourcePropertyAdaptor::defaultSerializedValue() const {
+    return QString();
 }
 
 void QnAbstractResourcePropertyAdaptor::setValue(const QVariant &value) {
@@ -159,11 +163,16 @@ bool QnAbstractResourcePropertyAdaptor::loadValueLocked(const QString &serialize
         return false;
 
     m_serializedValue = serializedValue;
-    if(!m_handler->deserialize(m_serializedValue, &m_value))
+    if(m_serializedValue.isEmpty() || !m_handler->deserialize(m_serializedValue, &m_value))
         m_value = QVariant();
 
     return true;
 }
+
+void QnAbstractResourcePropertyAdaptor::synchronizeNow() {
+    processSaveRequests();
+}
+
 
 void QnAbstractResourcePropertyAdaptor::processSaveRequests() {
     if(!m_pendingSave.loadAcquire())
@@ -192,6 +201,8 @@ void QnAbstractResourcePropertyAdaptor::processSaveRequestsNoLock(const QnResour
     resource->setProperty(m_key, serializedValue);
 
     ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
     connection->getResourceManager()->save(resource->getId(), QnKvPairList() << QnKvPair(m_key, serializedValue), false, this, &QnAbstractResourcePropertyAdaptor::at_connection_propertiesSaved);
 }
 

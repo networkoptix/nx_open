@@ -92,3 +92,7 @@ void QnFisheyeSettingsWidget::at_dataChanged() {
         return;
     emit dataChanged();
 }
+
+void QnFisheyeSettingsWidget::loadPreview() {
+    ui->calibrateWidget->updateImage();
+}

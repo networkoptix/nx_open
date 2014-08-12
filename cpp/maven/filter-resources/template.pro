@@ -95,6 +95,9 @@ MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib
+!win*:!mac {
+    LIBS += -Wl,-rpath-link,${qt.dir}/lib
+}
 !android {
     LIBS += ${global.libs}
 }
@@ -187,7 +190,7 @@ win* {
 ## LINUX, MAC AND ANDROID
 unix {
   DEFINES += QN_EXPORT=  
-  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=maybe-uninitialized
+  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Wuninitialized
   arm {
     QMAKE_CXXFLAGS += -std=c++0x 
   } else {

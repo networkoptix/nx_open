@@ -133,11 +133,13 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
     return result;
 }
 
-QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress)
+QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
+    QnResourceList& result,
+    const QByteArray& responseData,
+    const QHostAddress& discoveryAddress,
+    const QHostAddress& /*foundHostAddress*/ )
 {
     QList<QnNetworkResourcePtr> local_result;
-
-    return local_result; // block ISD driver auto discovery
 
 
     QString smac;

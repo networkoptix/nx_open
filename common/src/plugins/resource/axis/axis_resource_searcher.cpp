@@ -63,7 +63,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
 
 
     if (port < 0)
-        port = 80;
+        port = nx_http::DEFAULT_HTTP_PORT;
 
     CLHttpStatus status;
     QString response = QString(QLatin1String(downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=Network"), host, port, timeout, auth)));
@@ -126,7 +126,11 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     return result;
 }
 
-QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress)
+QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
+    QnResourceList& result,
+    const QByteArray& responseData,
+    const QHostAddress& discoveryAddress,
+    const QHostAddress& /*foundHostAddress*/ )
 {
 
     QString smac;
@@ -140,9 +144,14 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
     if (iqpos<0)
         return local_results;
 
+    QByteArray prefix2("axis-00");
     int macpos = responseData.indexOf("- 00", iqpos);
-    if (macpos < 0)
-        return local_results;
+    if (macpos < 0) {
+        macpos = responseData.indexOf("- AC", iqpos);
+        if (macpos < 0)
+            return local_results;
+        prefix2 = QByteArray("axis-ac");
+    }
     macpos += 2;
 
     for (int i = iqpos; i < macpos; i++)
@@ -150,7 +159,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
         name += QLatin1Char(responseData[i]);
     }
 
-    int macpos2 = responseData.indexOf("axis-00", macpos);
+    int macpos2 = responseData.indexOf(prefix2, macpos);
     if (macpos2 > 0)
         macpos = macpos2 + 5; // replace real MAC to virtual MAC if exists
 

@@ -27,6 +27,8 @@
 #include <camera/resource_display.h>
 #include <camera/client_video_camera.h>
 
+#include <redass/redass_controller.h>
+
 #include <ui/common/notification_levels.h>
 
 #include <ui/animation/viewport_animator.h>
@@ -60,6 +62,8 @@
 #include <ui/graphics/items/grid/grid_raised_cone_item.h>
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
+
+#include <ui/graphics/view/gradient_background_painter.h>
 
 #include <ui/workaround/gl_widget_factory.h>
 #include <ui/workaround/gl_widget_workaround.h>
@@ -261,6 +265,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     /* Set up defaults. */
     connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);
+
+    connect(action(Qn::ToggleBackgroundAnimationAction),   &QAction::toggled,  this,   &QnWorkbenchDisplay::toggleBackgroundAnimation);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay() {
@@ -280,7 +286,7 @@ void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
         initSceneView();
 }
 
-void QnWorkbenchDisplay::setView(QGraphicsView *view) {
+void QnWorkbenchDisplay::setView(QnGraphicsView *view) {
     if(m_view == view)
         return;
 
@@ -318,6 +324,13 @@ void QnWorkbenchDisplay::deinitSceneView() {
     /* Clear grid. */
     if(!m_gridItem.isNull())
         delete m_gridItem.data();
+
+    /* Clear background painter. */
+    if (!m_backgroundPainter.isNull()) {
+        m_view->uninstallLayerPainter(m_backgroundPainter.data());
+        delete m_backgroundPainter.data();
+    }
+
 
     /* Deinit workbench. */
     disconnect(workbench(), NULL, this, NULL);
@@ -425,6 +438,16 @@ void QnWorkbenchDisplay::initSceneView() {
     gridBackgroundItem()->setOpacity(0.0);
     gridBackgroundItem()->setMapper(workbench()->mapper());
 
+    /* Set up background */ 
+    if (qnSettings->lightMode() & Qn::LightModeNoSceneBackground) {
+        action(Qn::ToggleBackgroundAnimationAction)->setDisabled(true);
+    } else {
+        /* Never set QObject* parent in the QScopedPointer-stored objects if not sure in the descruction order. */
+        m_backgroundPainter = new QnGradientBackgroundPainter(qnSettings->radialBackgroundCycle(), NULL, context());
+        if (action(Qn::ToggleBackgroundAnimationAction)->isChecked())
+            m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+    }
+
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),            SIGNAL(currentLayoutAboutToBeChanged()),        this,                   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
@@ -456,6 +479,18 @@ QnGridItem *QnWorkbenchDisplay::gridItem() const {
 QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
     return m_gridBackgroundItem.data();
 }
+
+
+void QnWorkbenchDisplay::toggleBackgroundAnimation(bool enabled) {
+    if (!m_scene || !m_view || !m_backgroundPainter)
+        return;
+
+    if(enabled) 
+        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+    else 
+        m_view->uninstallLayerPainter(m_backgroundPainter.data());
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: item properties
@@ -887,6 +922,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 }
             }
         }
+        qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
     }
 
     return true;
@@ -922,8 +958,10 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     m_widgets.removeOne(widget);
     m_widgetByItem.remove(item);
-    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
         m_widgetByRenderer.remove(mediaWidget->renderer());
+        qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
+    }
 
     if(destroyWidget) {
         widget->hide();
@@ -1365,12 +1403,15 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
     MarginsF marginsExtension(0.0, 0.0, 0.0, 0.0);
-    if(currentMarginFlags() != 0)
+
+    /* If an item is zoomed then the margins should be null because all panels are hidden. */
+    if(currentMarginFlags() != 0 && !m_widgetByRole[Qn::ZoomedRole])
         marginsExtension = cwiseDiv(m_viewportAnimator->viewportMargins(), m_view->viewport()->size());
 
     /* Sync position extension. */
     {
         MarginsF positionExtension(0.0, 0.0, 0.0, 0.0);
+
         if(currentMarginFlags() & Qn::MarginsAffectPosition)
             positionExtension = marginsExtension;
 
@@ -1564,8 +1605,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
         }
-
-//        widget->item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(widget->checkedButtons()));
     }
 
     foreach(QnWorkbenchItem *item, layout->items())
@@ -1626,13 +1665,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         if(!widget)
             continue;
 
-        qint64 time;
-        if(thumbnailed) {
-            time = searchState.period.startTimeMs + searchState.step * i;
-            widget->item()->setData(Qn::ItemTimeRole, time);
-        } else {
-            time = widget->item()->data<qint64>(Qn::ItemTimeRole, -1);
-        }
+        qint64 time = widget->item()->data<qint64>(Qn::ItemTimeRole, -1);
 
         if(!thumbnailed) {
             QnResourcePtr resource = widget->resource()->toResourcePtr();
@@ -1696,7 +1729,7 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
     if(searchState.step <= 0)
         return;
-
+  
     int index = (thumbnail.time() - searchState.period.startTimeMs) / searchState.step;
     QList<QnResourceWidget *> widgets = this->widgets();
     if(index < 0)
@@ -1705,12 +1738,27 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     qSort(widgets.begin(), widgets.end(), WidgetPositionLess());
 
     if(index < widgets.size()) {
-        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widgets[index])) {
-            mediaWidget->display()->archiveReader()->jumpTo(thumbnail.actualTime() * 1000, 0);
-            mediaWidget->display()->camDisplay()->setMTDecoding(false);
-            mediaWidget->display()->camDisplay()->putData(thumbnail.data());
-            mediaWidget->display()->camDisplay()->start();
-            mediaWidget->display()->archiveReader()->startPaused();
+
+        // when we have received thumbnail for an item, check if it can be used for the previous item
+        for (int checkedIdx = qMax(index - 1, 0); checkedIdx <= index; checkedIdx++) {
+            if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widgets[checkedIdx])) {
+                qint64 time = mediaWidget->item()->data<qint64>(Qn::ItemTimeRole, -1);
+
+                if (time > 0 && qAbs(time - thumbnail.actualTime()) > searchState.step / 2)
+                    continue;
+
+                qint64 existingThumbnailTime = mediaWidget->item()->data<qint64>(Qn::ItemThumbnailTimestampRole, 0);
+                if (qAbs(time - existingThumbnailTime) < qAbs(time - thumbnail.actualTime()))   // if value not present automatically advance =)
+                    continue;
+
+                mediaWidget->item()->setData(Qn::ItemThumbnailTimestampRole, thumbnail.actualTime());
+
+                mediaWidget->display()->archiveReader()->jumpTo(thumbnail.actualTime() * 1000, 0);
+                mediaWidget->display()->camDisplay()->setMTDecoding(false);
+                mediaWidget->display()->camDisplay()->putData(thumbnail.data());
+                mediaWidget->display()->camDisplay()->start();
+                mediaWidget->display()->archiveReader()->startPaused();
+            }
         }
     }
 
@@ -1920,5 +1968,4 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         setLayer(splashItem, Qn::EffectsLayer);
     }
 }
-
 

@@ -20,8 +20,7 @@ static const char* ANALOG_CAMERAS[][2] =
 {
     {"AXIS", "Q7404"},
     {"vivo_ironman", "VS8801"},
-    {"VIVOTEK", "VS8801"},
-    {"*", "DW-CP04"}
+    {"VIVOTEK", "VS8801"}
 };
 
 // Add vendor and camera model to ommit ONVIF search (case insensitive)
@@ -281,7 +280,6 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
         resource->setPhysicalId(uniqId);
 
     resource->setDeviceOnvifUrl(deviceUrl);
-    resource->setDeviceOnvifID(uniqId);
 
     if (!login.isEmpty())
         resource->setAuth(login, passwd);

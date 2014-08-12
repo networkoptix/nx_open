@@ -80,7 +80,11 @@ public:
     void setContext(QnWorkbenchContext *context);
 
     void setExportScheduleButtonEnabled(bool enabled);
+    int maxRecordedDays() const;
+    int minRecordedDays() const;
+    static const int RecordedDaysDontChange = INT_MAX;
 signals:
+    void archiveRangeChanged();
     void scheduleTasksChanged();
     void recordingSettingsChanged();
     void scheduleEnabledChanged(int);
@@ -92,6 +96,8 @@ signals:
 private slots:
     void updateGridParams(bool fromUserInput = false);
     void updateGridEnabledState();
+    void updateArchiveRangeEnabledState();
+    void validateArchiveLength();
     void updateLicensesLabelText();
     void updateMotionButtons();
     void updatePanicLabelText();
@@ -101,18 +107,17 @@ private slots:
 
     void at_gridWidget_cellActivated(const QPoint &cell);
     void at_enableRecordingCheckBox_clicked();
+    void at_checkBoxArchive_clicked();
     void at_displayQualiteCheckBox_stateChanged(int state);
     void at_displayFpsCheckBox_stateChanged(int state);
     void at_licensesButton_clicked();
     void at_releaseSignalizer_activated(QObject *target);
     void at_exportScheduleButton_clicked();
-
 private:
     int qualityToComboIndex(const Qn::StreamQuality& q);
 
     void connectToGridWidget();
     void disconnectFromGridWidget();
-
 private:
     Q_DISABLE_COPY(QnCameraScheduleWidget)
 

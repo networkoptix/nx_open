@@ -157,8 +157,6 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     int expectedPrebuferSize = m_isRealTimeSource ? REALTIME_AUDIO_PREBUFFER : DEFAULT_AUDIO_BUFF_SIZE/2;
     setAudioBufferSize(expectedBufferSize, expectedPrebuferSize);
 
-    qnRedAssController->registerConsumer(this);
-
 #ifdef Q_OS_WIN
     QnDesktopResourcePtr desktopResource = resource.dynamicCast<QnDesktopResource>();
     if (desktopResource && desktopResource->isRendererSlow())

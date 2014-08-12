@@ -59,34 +59,28 @@ QnCameraSettingsWidget::Mode QnCameraSettingsWidget::mode() const {
     return static_cast<Mode>(m_stackedWidget->currentIndex());
 }
 
-const QnResourceList &QnCameraSettingsWidget::resources() const {
-    return m_resources;
-}
-
-const QnVirtualCameraResourceList &QnCameraSettingsWidget::cameras() const {
+QnVirtualCameraResourceList QnCameraSettingsWidget::cameras() const {
     return m_cameras;
 }
 
-void QnCameraSettingsWidget::setResources(const QnResourceList &resources) {
-    m_resources = resources.toSet().toList();
-    m_cameras = m_resources.filtered<QnVirtualCameraResource>();
+void QnCameraSettingsWidget::setCameras(const QnVirtualCameraResourceList &cameras) {
+    if (m_cameras == cameras)
+        return;
 
-    if(m_cameras.size() != m_resources.size() && m_cameras.size() != 0) {
-        setMode(InvalidMode);
-    } else {
-        switch(m_cameras.size()) {
-        case 0: 
-            setMode(EmptyMode);
-            break;
-        case 1: 
-            m_singleWidget->setCamera(m_cameras.front());
-            setMode(SingleMode);
-            break;
-        default: 
-            m_multiWidget->setCameras(m_cameras);
-            setMode(MultiMode);
-            break;
-        }
+    m_cameras = cameras;
+
+    switch(m_cameras.size()) {
+    case 0: 
+        setMode(EmptyMode);
+        break;
+    case 1: 
+        m_singleWidget->setCamera(m_cameras.front());
+        setMode(SingleMode);
+        break;
+    default: 
+        m_multiWidget->setCameras(m_cameras);
+        setMode(MultiMode);
+        break;
     }
 
     emit resourcesChanged();
@@ -334,6 +328,17 @@ bool QnCameraSettingsWidget::isValidMotionRegion(){
     if (mode() == SingleMode)
         return m_singleWidget->isValidMotionRegion();
     return true;
+}
+
+bool QnCameraSettingsWidget::isValidSecondStream() {
+    switch(mode()) {
+    case SingleMode:
+        return m_singleWidget->isValidSecondStream();
+    case MultiMode:
+        return m_multiWidget->isValidSecondStream();
+    default:
+        return true;
+    }
 }
 
 void QnCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled) {

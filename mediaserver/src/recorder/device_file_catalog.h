@@ -74,11 +74,13 @@ public:
     Chunk updateDuration(int durationMs, qint64 fileSize);
     Chunk takeChunk(qint64 startTimeMs, qint64 durationMs);
 
-    /** return deleted file size if calcFileSize is true and srcStorage matched with deleted file */
-    qint64 deleteFirstRecord(); 
+    Chunk deleteFirstRecord(); 
+
+    /** Delete first N records. Return deleted file timestamps */
+    QVector<Chunk> deleteRecordsBefore(int idx);
+
     bool isEmpty() const;
     void clear();
-    QVector<qint64> deleteRecordsBefore(int idx);
     void deleteRecordsByStorage(int storageIndex, qint64 timeMs);
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
     void updateChunkDuration(Chunk& chunk);
@@ -134,17 +136,19 @@ public:
     static std::deque<Chunk> mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2);
     void addChunks(const std::deque<Chunk>& chunk);
     bool fromCSVFile(const QString& fileName);
+    QnServer::ChunksCatalog getRole() const;
 private:
 
     bool fileExists(const Chunk& chunk, bool checkDirOnly);
     bool addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage);
-    //QList<QDate> recordedMonthList();
+    QSet<QDate> recordedMonthList();
 
     void readStorageData(QnStorageResourcePtr storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList);
     Chunk chunkFromFile(QnStorageResourcePtr storage, const QString& fileName);
     QnTimePeriod timePeriodFromDir(QnStorageResourcePtr storage, const QString& dirName);
     void replaceChunks(int storageIndex, const std::deque<Chunk>& newCatalog);
+    void removeRecord(int idx);
 private:
     friend class QnStorageManager;
 
@@ -167,7 +171,7 @@ private:
 
     //bool m_duplicateName;
     //QMap<int,QString> m_prevFileNames;
-    QnServer::ChunksCatalog m_catalog;
+    const QnServer::ChunksCatalog m_catalog;
     int m_lastAddIndex; // last added record index. In most cases it is last record
     QMutex m_IOMutex;
     static RebuildMethod m_rebuildArchive;

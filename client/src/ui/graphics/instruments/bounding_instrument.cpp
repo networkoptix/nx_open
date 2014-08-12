@@ -161,6 +161,9 @@ public:
         m_lastTickTime = 0;
         m_stickyLogScaleHi = 1.0;
         m_stickyLogScaleLo = -1.0;
+        m_defaultStickyLogScaleResettingThreshold = 0.91;
+        m_stickyLogScaleResettingThreshold = m_defaultStickyLogScaleResettingThreshold;
+        m_logScaleResettingSpeedMultiplier = 0.2;
     }
 
     void update() {
@@ -186,7 +189,7 @@ public:
     void setPositionBoundsExtension(const MarginsF &extension) {
         m_positionBoundsExtension = extension;
 
-        if(m_view != NULL)
+        if (m_view)
             updateSceneRect();
     }
 
@@ -213,9 +216,17 @@ public:
         m_sizeLowerExtension = sizeLowerExtension;
         m_sizeUpperExtension = sizeUpperExtension;
 
-        if(m_view != NULL) {
+        if (m_view) {
+            qreal logScale;
+            calculateRelativeScale(&logScale);
+
             updateExtendedSizeBounds();
             updateSceneRect();
+
+            if (logScale > m_defaultStickyLogScaleResettingThreshold && logScale <= 1.0) {
+                calculateRelativeScale(&logScale);
+                m_stickyLogScaleResettingThreshold = logScale;
+            }
         }
     }
 
@@ -317,8 +328,15 @@ public:
                 qreal logScale, powFactor;
                 calculateRelativeScale(&logScale, &powFactor);
                 qreal logDirection = calculateDistance(logScale, m_stickyLogScaleLo, m_stickyLogScaleHi);
+                qreal scaleSpeed = m_logScaleSpeed;
+                if (qFuzzyIsNull(logDirection)) {
+                    if (logScale >= m_stickyLogScaleResettingThreshold) {
+                        logDirection = 1 - logScale;
+                        scaleSpeed *= m_logScaleResettingSpeedMultiplier;
+                    }
+                }
                 if(!qFuzzyIsNull(logDirection)) {
-                    qreal logDelta = dt * (m_logScaleSpeed / powFactor) * speedMultiplier(logDirection, std::log(2.0) / powFactor);
+                    qreal logDelta = dt * (scaleSpeed / powFactor) * speedMultiplier(logDirection, std::log(2.0) / powFactor);
                     if(std::abs(logDelta) > std::abs(logDirection))
                         logDelta = logDirection;
 
@@ -352,12 +370,14 @@ public:
         }
 
         /* Adjust sticky scale if needed. */
-        if(stickyScaleDirty && (!qFuzzyCompare(m_stickyLogScaleHi, 1.0) || !qFuzzyCompare(m_stickyLogScaleLo, 1.0))) {
+        if(stickyScaleDirty && (!qFuzzyCompare(m_stickyLogScaleHi, 1.0) || !qFuzzyCompare(m_stickyLogScaleLo, 1.0) ||
+                                !qFuzzyCompare(m_stickyLogScaleResettingThreshold, m_defaultStickyLogScaleResettingThreshold))) {
             qreal logScale, powFactor;
             calculateRelativeScale(&logScale, &powFactor);
 
             m_stickyLogScaleLo = qMin(-1.0, qMax(logScale, m_stickyLogScaleLo));
             m_stickyLogScaleHi = qMax( 1.0, qMin(logScale, m_stickyLogScaleHi));
+            m_stickyLogScaleResettingThreshold = qMin(m_defaultStickyLogScaleResettingThreshold, qMax(logScale, m_stickyLogScaleResettingThreshold));
         }
 
         m_lastTickTime = time;
@@ -383,7 +403,18 @@ protected:
     }
 
     QRectF calculateCenterPositionBounds() const {
-        return truncated(dilated(m_positionBounds, cwiseMul(m_positionBoundsExtension - MarginsF(0.5, 0.5, 0.5, 0.5), m_sceneViewportRect.size())));
+        MarginsF margins = cwiseMul(m_positionBoundsExtension - MarginsF(0.5, 0.5, 0.5, 0.5), m_sceneViewportRect.size());
+        QRectF fullRect = truncated(dilated(m_positionBounds, margins));
+
+        QSizeF preferredRectSize = eroded(m_sceneViewportRect.size(), margins);
+        QSizeF sizeDiff = m_positionBounds.size() - preferredRectSize;
+        if (sizeDiff.height() < 0)
+            sizeDiff.setHeight(0);
+        if (sizeDiff.width() < 0)
+            sizeDiff.setWidth(0);
+
+        QPointF center = fullRect.center();
+        return QRectF(QPointF(center.x() - sizeDiff.width() / 2, center.y() - sizeDiff.height() / 2), sizeDiff);
     }
 
     /**
@@ -518,6 +549,15 @@ public:
 
     /** Sticky log scale lower bound. */
     qreal m_stickyLogScaleLo;
+
+    /** Threshold multiplier to specify the scale when the bounds should be reset to default value (m_stickyLogScaleHi). */
+    qreal m_stickyLogScaleResettingThreshold;
+
+    /** Default value of m_stickyLogScaleResettingThreshold. */
+    qreal m_defaultStickyLogScaleResettingThreshold;
+
+    /** Scale speed multiplier when scale is resetting to default value (m_stickyLogScaleHi). */
+    qreal m_logScaleResettingSpeedMultiplier;
 };
 
 

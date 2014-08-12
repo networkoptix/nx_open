@@ -660,7 +660,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
             if (!QFile::rename(recordedFileName, filePath)) {
                 QString message = tr("Could not overwrite file '%1'. Please try another name.").arg(filePath);
                 CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
-                QMessageBox::warning(display()->view(), QObject::tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
+                QMessageBox::warning(display()->view(), tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
                 continue;
             }
 
@@ -1060,6 +1060,7 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.zoomRect = zoomRect;
     data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
     data.dewarpingParams.panoFactor = 1; // zoom target must always be dewarped by 90 degrees
+    data.dewarpingParams.enabled = zoomTargetWidget->resource()->getDewarpingParams().enabled;  // zoom items on fisheye cameras must always be dewarped
 
     int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
             ? 1

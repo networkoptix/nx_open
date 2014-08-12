@@ -66,7 +66,6 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiPanicModeData>& tran );
         void triggerNotification( const QnTransaction<ApiResourceParamDataList>& tran );
         void triggerNotification( const QnTransaction<ApiVideowallControlMessageData>& tran );
-        void triggerNotification( const QnTransaction<ApiVideowallInstanceStatusData>& tran );
         void triggerNotification( const QnTransaction<ApiEmailSettingsData>& /*tran*/ );
         void triggerNotification( const QnTransaction<ApiEmailData>& /*tran*/ );
         void triggerNotification( const QnTransaction<ApiUpdateInstallData>& tran );
@@ -74,6 +73,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiUpdateUploadResponceData>& tran );
         void triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList>& tran );
         void triggerNotification( const QnTransaction<ApiRuntimeData>& tran );
+        void triggerNotification(const QnTransaction<ApiDatabaseDumpData> & /*tran*/);
 
         void triggerNotification(const QnTransaction<ApiLockData> &/*tran*/) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here

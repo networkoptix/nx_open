@@ -42,6 +42,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
+#include <utils/license_usage_helper.h>
 
 namespace {
 
@@ -141,9 +142,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     closeButton->setProperty(Qn::NoBlockMotionSelection, true);
     closeButton->setToolTip(tr("Close"));
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close);
-    //TODO: #GDM #VW Why?? o_O
-    if (accessController()->notifier(item->layout()->resource()) != NULL)
-        connect(accessController()->notifier(item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
+    connect(accessController()->notifier(item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
 
     QnImageButtonWidget *infoButton = new QnImageButtonWidget();
     infoButton->setIcon(qnSkin->icon("item/info.png"));
@@ -246,6 +245,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_aspectRatio = defaultAspectRatio();
 
     connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
+
+    /* Videowall license changes helper */
+    QnLicenseUsageHelper* videowallLicenseHelper = new QnVideoWallLicenseUsageHelper(this);
+    connect(videowallLicenseHelper, &QnLicenseUsageHelper::licensesChanged, this, &QnResourceWidget::updateStatusOverlay);
 
     /* Run handlers. */
     updateTitleText();

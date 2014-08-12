@@ -36,6 +36,7 @@
 
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/handlers/workbench_bookmarks_handler.h>
+#include <ui/workbench/handlers/workbench_connect_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
 #include <ui/workbench/handlers/workbench_export_handler.h>
@@ -50,6 +51,7 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/workbench_ui.h>
 #include <ui/workbench/workbench_synchronizer.h>
 #include <ui/workbench/workbench_context.h>
@@ -139,7 +141,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_controller(0),
     m_titleVisible(true),
     m_dwm(NULL),
-    m_drawCustomFrame(false)
+    m_drawCustomFrame(false),
+    m_enableBackgroundAnimation(true)
 {
 #ifdef Q_OS_MACX
     // TODO: #ivigasin check the neccesarity of this line. In Maveric fullscreen animation works fine without it.
@@ -178,11 +181,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_view.reset(new QnGraphicsView(m_scene.data()));
     m_view->setAutoFillBackground(true);
 
-    if (!(qnSettings->lightMode() & Qn::LightModeNoSceneBackground)) {
-        m_backgroundPainter.reset(new QnGradientBackgroundPainter(qnSettings->radialBackgroundCycle(), this));
-        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
-    }
-
     /* Set up model & control machinery. */
     display()->setScene(m_scene.data());
     display()->setView(m_view.data());
@@ -200,8 +198,12 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     else
         m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
 
+    /* State manager */
+    context->instance<QnWorkbenchStateManager>();
+
     /* Set up handlers. */
     context->instance<QnWorkbenchActionHandler>();
+    context->instance<QnWorkbenchConnectHandler>();
     context->instance<QnWorkbenchNotificationsHandler>();
     context->instance<QnWorkbenchScreenshotHandler>();
     context->instance<QnWorkbenchExportHandler>();
@@ -234,7 +236,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::BusinessEventsAction));
     addAction(action(Qn::WebClientAction));
     addAction(action(Qn::OpenFileAction));
-    addAction(action(Qn::ConnectToServerAction));
     addAction(action(Qn::OpenNewTabAction));
     addAction(action(Qn::OpenNewWindowAction));
     addAction(action(Qn::CloseLayoutAction));
@@ -254,7 +255,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::DebugDecrementCounterAction));
     addAction(action(Qn::DebugShowResourcePoolAction));
     addAction(action(Qn::DebugControlPanelAction));
-
+    addAction(action(Qn::ToggleBackgroundAnimationAction));
     connect(action(Qn::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
@@ -303,7 +304,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addStretch(0x1000);
     if (QnScreenRecorder::isSupported())
         m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
-    m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction), false, 1.0, Qn::Login_Help));
+    m_titleLayout->addWidget(newActionButton(action(Qn::OpenLoginDialogAction), false, 1.0, Qn::Login_Help));
     m_titleLayout->addLayout(m_windowButtonsLayout);
 
     /* Layouts. */
@@ -337,10 +338,13 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     menu()->newMenu(Qn::MainScope);
 #endif
 
-    if (!qnSettings->isVSyncEnabled()) {
-        QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
-        Q_UNUSED(vsyncWorkaround);
-    }
+    /* VSync workaround must always be enabled to limit fps usage in following cases:
+     * * VSync is not supported by drivers 
+     * * VSync is disabled in drivers
+     * * double buffering is disabled in drivers or in our program
+     */
+    QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
+    Q_UNUSED(vsyncWorkaround);
 
     QnPtzManageDialog *manageDialog = new QnPtzManageDialog(this); //initializing instance of a singleton
     Q_UNUSED(manageDialog)
@@ -602,7 +606,7 @@ bool QnMainWindow::event(QEvent *event) {
 void QnMainWindow::closeEvent(QCloseEvent* event)
 {
     event->ignore();
-    action(Qn::ExitAction)->trigger();
+    menu()->trigger(Qn::ExitAction);
 }
 
 void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
@@ -740,4 +744,3 @@ void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     layouts.push_back(layout);
     menu()->trigger(Qn::CloseLayoutAction, layouts);
 }
-

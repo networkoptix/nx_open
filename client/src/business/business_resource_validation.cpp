@@ -72,9 +72,7 @@ QString QnCameraOutputPolicy::getText(const QnResourceList &resources, const boo
 }
 
 bool QnCameraMotionPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
-    return !camera->isScheduleDisabled()
-            && camera->getMotionType() != Qn::MT_NoMotion
-            && camera->supportedMotionType() != Qn::MT_NoMotion;
+    return !camera->isScheduleDisabled() && camera->hasMotion();
 }
 
 QString QnCameraMotionPolicy::getText(const QnResourceList &resources, const bool detailed) {
@@ -116,7 +114,7 @@ QString QnUserEmailPolicy::getText(const QnResourceList &resources, const bool d
     if (detailed && invalid > 0) {
         if (users.size() == 1)
             return tr("User %1 has invalid email address").arg(users.first()->getName());
-        return tr("%n of %1 users have invalid E-Mail address", "", invalid).arg(users.size()); // TODO: #Elric #TR invalid %n placement!
+        return tr("%n of %1 users have invalid email address", "", invalid).arg(users.size()); // TODO: #Elric #TR invalid %n placement!
     }
 
     invalid = 0;
@@ -130,11 +128,11 @@ QString QnUserEmailPolicy::getText(const QnResourceList &resources, const bool d
     //
     if (detailed && invalid > 0)
         return (additional.size() == 1)
-                ? tr("Invalid E-Mail address %1").arg(additional.first())
-                : tr("%n of %1 additional E-Mail addresses are invalid", "", invalid).arg(additional.size());
+                ? tr("Invalid email address %1").arg(additional.first())
+                : tr("%n of %1 additional email addresses are invalid", "", invalid).arg(additional.size());
 
     if (detailed)
-        return tr("Send mail to %1").arg(receivers.join(QLatin1String("; ")));
+        return tr("Send email to %1").arg(receivers.join(QLatin1String("; ")));
 
     QString result = tr("%n User(s)", "", users.size());
     if (additional.size() > 0)

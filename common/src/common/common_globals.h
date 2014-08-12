@@ -1,6 +1,8 @@
 #ifndef QN_COMMON_GLOBALS_H
 #define QN_COMMON_GLOBALS_H
 
+#include <cassert>
+
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
@@ -181,19 +183,21 @@ public:
 
         AuxilaryPtzCapability               = 0x01000000,
 
-        builtinPresetControl                = 0x02000000,
-
         /* Shortcuts */
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
-        nativePresetsPtzCapability          = PresetsPtzCapability | builtinPresetControl,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PtzCapability)
 
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities)
 
+
+    enum Projection {
+        RectilinearProjection,
+        EquirectangularProjection
+    };
 
 
     enum PtzTrait {
@@ -279,11 +283,8 @@ public:
     };
 
     enum SystemComponent {
-        EnterpriseControllerComponent,
-        MediaServerComponent,
+        ServerComponent,
         ClientComponent,
-        MediaProxyComponent,
-
         AnyComponent
     };
 
@@ -312,8 +313,7 @@ public:
 
         VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QUuid. */
         VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QUuid. */
-        VideoWallPcGuidRole,                        /**< Role for videowall pc unique id. Value of type QUuid. */
-        VideoWallPcScreenIndicesRole,               /**< Role for videowall pc screen indices. Value of type QList<int>. */
+        VideoWallItemIndicesRole,                   /**< Role for videowall item indices list. Value of type QnVideoWallItemIndexList. */
 
         /* Layout-based. */
         LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type QSizeF. */
@@ -341,6 +341,7 @@ public:
         ItemAspectRatioRole,                        /**< Role for item's aspect ratio. Value of type qreal. */
 
         ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
+        ItemThumbnailTimestampRole,                 /**< Role for item's loaded thumbnail timestamp, in milliseconds. Used in thumbnails search. Value of type qint64. */
         ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
         ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
         ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
@@ -371,11 +372,10 @@ public:
         TimePeriodRole,
         TimePeriodsRole,
         MergedTimePeriodsRole,
-        AutoConnectRole,
         FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
         TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
-        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
+        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and ConnectAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
         UuidRole,                                   /**< Role for target uuid. Used in LoadVideowallMatrixAction. */
@@ -478,14 +478,31 @@ public:
 
 
     enum SerializationFormat {
-        JsonFormat      = 0,
-        UbjsonFormat    = 1,
-        BnsFormat       = 2,
-        CsvFormat       = 3,
-        XmlFormat       = 4
+        JsonFormat          = 0,
+        UbjsonFormat        = 1,
+        BnsFormat           = 2,
+        CsvFormat           = 3,
+        XmlFormat           = 4,
+
+        UnsupportedFormat   = -1
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SerializationFormat)
 
+    const char* serializationFormatToHttpContentType(SerializationFormat format);
+    SerializationFormat serializationFormatFromHttpContentType(const QByteArray& httpContentType);
+
+    enum LicenseType 
+    {
+        LC_Trial,          
+        LC_Analog,
+        LC_Professional,
+        LC_Edge,
+        LC_VMAX,
+        LC_AnalogEncoder,
+        LC_VideoWall,
+
+        LC_Count
+    };
 
     /**
      * Invalid value for a timezone UTC offset.
@@ -514,7 +531,6 @@ enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 #define DATETIME_INVALID    INT64_MIN
 
 
-
 /** 
  * \def lit
  * Helper macro to mark strings that are not to be translated. 
@@ -533,14 +549,19 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzCoordinateSpace)(Qn::MotionType)
+    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType), 
     (metatype)(lexical)
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ServerFlags)(Qn::PtzDataFields)(Qn::PtzCapabilities)(Qn::CameraStatusFlags),
+    (Qn::PtzCapabilities),
+    (metatype)(numeric)(lexical)
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::ServerFlags)(Qn::PtzDataFields)(Qn::CameraStatusFlags),
     (metatype)(numeric)
 )
 

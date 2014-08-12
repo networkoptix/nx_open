@@ -28,9 +28,6 @@ private:
     ec2::AbstractECConnectionPtr m_ec2Connection;
     QnId m_serverId;
     
-    QSet<QnId> m_awaitingSetStatus;
-    QSet<QnId> m_setStatusInProgress;
-
     struct LockData 
     {
         LockData(): mutex(0) {}
@@ -44,15 +41,10 @@ private:
     QMutex m_mutex;
 
 private:
-    void updateResourceStatusAsync(const QnResourcePtr &resource);
-    bool isSetStatusInProgress(const QnResourcePtr &resource);
     void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
     void addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource);
 
-private slots:
-    void at_resource_statusChanged(const QnResourcePtr& resource);
     //void requestFinished(const QnHTTPRawResponse& response, int handle);
-    void requestFinished2( int reqID, ec2::ErrorCode errCode, const QnId& id );
 
     void at_mutexLocked();
     void at_mutexTimeout();

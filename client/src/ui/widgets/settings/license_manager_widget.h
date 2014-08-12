@@ -9,19 +9,22 @@
 
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 
+#include <utils/common/connective.h>
+
 class QModelIndex;
 class QNetworkAccessManager;
 class QNetworkReply;
 
 class QnLicenseListModel;
+class QnLicenseUsageHelper;
 
 namespace Ui {
     class LicenseManagerWidget;
 }
 
-class QnLicenseManagerWidget : public QnAbstractPreferencesWidget {
+class QnLicenseManagerWidget : public Connective<QnAbstractPreferencesWidget> {
     Q_OBJECT
-    typedef QnAbstractPreferencesWidget base_type;
+    typedef Connective<QnAbstractPreferencesWidget> base_type;
 
 public:
     explicit QnLicenseManagerWidget(QWidget *parent = 0);
@@ -35,16 +38,18 @@ private slots:
     void at_downloadFinished();
     void at_licensesReceived(int handle, ec2::ErrorCode errorCode, QnLicenseList licenses);
     void at_licenseDetailsButton_clicked();
+    void at_removeButton_clicked();
     void at_gridLicenses_doubleClicked(const QModelIndex &index);
     void at_licenseWidget_stateChanged();
 
     void showMessage(const QString &title, const QString &message, bool warning);
+    void at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license);
 
 signals:
     void showMessageLater(const QString &title, const QString &message, bool warning);
 
 private:
-    void updateFromServer(const QByteArray &licenseKey, const QList<QByteArray> &mainHardwareIds, const QList<QByteArray> &compatibleHardwareIds);
+    void updateFromServer(const QByteArray &licenseKey, bool infoMode);
     void validateLicenses(const QByteArray& licenseKey, const QList<QnLicensePtr> &licenses);
     void showLicenseDetails(const QnLicensePtr &license);
 
@@ -53,6 +58,8 @@ private:
 
     QScopedPointer<Ui::LicenseManagerWidget> ui;
     QnLicenseListModel *m_model;
+    QScopedPointer<QnLicenseUsageHelper> m_camerasUsageHelper;
+    QScopedPointer<QnLicenseUsageHelper> m_videowallUsageHelper;
     QNetworkAccessManager *m_httpClient;
     QnLicenseList m_licenses;
     QMap<QNetworkReply*, QByteArray> m_replyKeyMap;

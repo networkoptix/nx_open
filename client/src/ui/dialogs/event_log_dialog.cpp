@@ -31,16 +31,17 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
+
 #include <ui/workbench/workbench_context.h>
+#include <ui/workaround/qt5_combobox_workaround.h>
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
 }
 
 
-QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
+QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
     ui(new Ui::EventLogDialog),
     m_eventTypesModel(new QStandardItemModel()),
     m_actionTypesModel(new QStandardItemModel()),
@@ -133,8 +134,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
 
     connect(ui->dateEditFrom,       &QDateEdit::dateChanged,            this,   &QnEventLogDialog::updateData);
     connect(ui->dateEditTo,         &QDateEdit::dateChanged,            this,   &QnEventLogDialog::updateData);
-    connect(ui->eventComboBox,      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),    this,   &QnEventLogDialog::updateData); // TODO: #Elric try to introduce better syntax for this
-    connect(ui->actionComboBox,     static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),    this,   &QnEventLogDialog::updateData);
+    connect(ui->eventComboBox,      QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
+    connect(ui->actionComboBox,     QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
     connect(ui->refreshButton,      &QAbstractButton::clicked,          this,   &QnEventLogDialog::updateData);
     connect(ui->eventRulesButton,   &QAbstractButton::clicked,          this->context()->action(Qn::BusinessEventsAction), &QAction::trigger);
 
@@ -147,8 +148,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     updateHeaderWidth();
 }
 
-QnEventLogDialog::~QnEventLogDialog()
-{
+QnEventLogDialog::~QnEventLogDialog() {
 }
 
 QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, QnBusiness::EventType value)

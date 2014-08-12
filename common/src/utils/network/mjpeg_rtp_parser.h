@@ -33,8 +33,6 @@ private:
     int m_sdpWidth;
     int m_sdpHeight;
 
-    quint8* m_lumaQTPtr;
-    quint8* m_chromaQTPtr;
     int m_lastJpegQ;
 
     int m_hdrQ;

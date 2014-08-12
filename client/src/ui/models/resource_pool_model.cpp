@@ -83,6 +83,7 @@ QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, QObject *par
     /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
     foreach(const QnResourcePtr &resource, resources)
         at_resPool_resourceAdded(resource);
+
 }
 
 QnResourcePoolModel::~QnResourcePoolModel() {
@@ -147,13 +148,12 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QModelIndex &index) con
 }
 
 QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource, const QString &groupId, const QString &groupName) {
-    RecorderHash recorderHash = m_recorderHashByResource[resource];
-    if (recorderHash.contains(groupId))
-        return recorderHash[groupId];
+    if (m_recorderHashByResource[resource].contains(groupId))
+        return m_recorderHashByResource[resource][groupId];
 
     QnResourcePoolModelNode* recorder = new QnResourcePoolModelNode(this, Qn::RecorderNode, groupName);
     recorder->setParent(m_resourceNodeByResource[resource]);
-    recorderHash[groupId] = recorder;
+    m_recorderHashByResource[resource][groupId] = recorder;
     return recorder;
 }
 
@@ -211,6 +211,14 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
 
     if (node->resourceFlags() & QnResource::videowall)
         return m_rootNodes[Qn::RootNode];
+
+    // We are requesting for the list of users so we don't want to see their layouts
+    if (m_rootNodeType == Qn::UsersNode && !(node->resourceFlags() &  QnResource::user)) 
+        return m_rootNodes[Qn::BastardNode];
+
+    // We are requesting for the list of users so we don't want to see their layouts
+    if (m_rootNodeType == Qn::UsersNode && !(node->resourceFlags() &  QnResource::user)) 
+        return m_rootNodes[Qn::BastardNode];
 
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
     if(!parentResource || (parentResource->flags() & QnResource::local_server) == QnResource::local_server) {
@@ -386,8 +394,6 @@ QMimeData *QnResourcePoolModel::mimeData(const QModelIndexList &indexes) const {
 }
 
 bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction action, int row, int column, const QModelIndex &parent) {
-    qDebug() << "Qt::DropAction" << action;
-
     if (!mimeData)
         return false;
 
@@ -474,7 +480,7 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     connect(resource,       &QnResource::nameChanged,                    this,  &QnResourcePoolModel::at_resource_resourceChanged);
     connect(resource,       &QnResource::statusChanged,                  this,  &QnResourcePoolModel::at_resource_resourceChanged);
     connect(resource,       &QnResource::urlChanged,                     this,  &QnResourcePoolModel::at_resource_resourceChanged);
-    connect(resource,       &QnResource::resourceChanged,                this,  &QnResourcePoolModel::at_resource_resourceChanged);
+    connect(resource,       &QnResource::flagsChanged,                   this,  &QnResourcePoolModel::at_resource_resourceChanged);
 
     QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
     if(layout) {

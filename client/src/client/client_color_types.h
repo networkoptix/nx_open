@@ -155,11 +155,22 @@ struct QnLicensesListModelColors {
 };
 #define QnLicensesListModelColors_Fields (normal)(warning)(expired)
 
+struct QnVideowallManageWidgetColors {
+    QnVideowallManageWidgetColors();
+
+    QColor desktop;
+    QColor freeSpace;
+    QColor item;
+    QColor text;
+    QColor error;
+};
+#define QnVideowallManageWidgetColors_Fields (desktop)(freeSpace)(item)(text)(error)
 
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
-    (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors)
+    (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
+    (QnVideowallManageWidgetColors) \
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

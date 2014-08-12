@@ -24,6 +24,18 @@ public:
      * @return                                  False if saving should be aborted, true otherwise.
      */
     virtual bool confirm() {return true;}
+
+    /**
+     * @brief discard                           Check that all values can be discarded safely.
+     * @return                                  False if discarding should be aborted, true otherwise.
+     */
+    virtual bool discard() { return true; }
+
+    /**
+     * @brief hasChanges                        Check if there are modified values.
+     * @return                                  True if something is changed, false otherwise.
+     */
+    virtual bool hasChanges() const {return false; }
 };
 
 #endif // ABSTRACT_PREFERENCES_WIDGET_H

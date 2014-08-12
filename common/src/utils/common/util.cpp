@@ -124,7 +124,22 @@ QString closeDirPath(const QString& value)
     else
         return tmp + QLatin1Char('/');
 }
-#if defined(Q_OS_WIN32)
+
+#ifdef Q_OS_WIN32
+
+bool isLocalPath(const QString& folder)
+{
+    return folder.length() >= 2 && folder[1] == L':';
+}
+
+QString getParentFolder(const QString& root)
+{
+    QString newRoot = QDir::toNativeSeparators(root);
+    if (newRoot.endsWith(QDir::separator()))
+        newRoot.chop(1);
+    return newRoot.left(newRoot.lastIndexOf(QDir::separator())+1);
+}
+
 qint64 getDiskFreeSpace(const QString& root)
 {
     quint64 freeBytesAvailableToCaller = -1;
@@ -136,7 +151,11 @@ qint64 getDiskFreeSpace(const QString& root)
         (PULARGE_INTEGER) &totalNumberOfBytes, // receives the number of bytes on disk
         (PULARGE_INTEGER) &totalNumberOfFreeBytes // receives the free bytes on disk
     );
-    Q_UNUSED(status);
+    if (!status && isLocalPath(root)) {
+        QString newRoot = getParentFolder(root);
+        if (!newRoot.isEmpty())
+            return getDiskFreeSpace(newRoot); // try parent folder
+    }
     return totalNumberOfFreeBytes;
 };
 
@@ -151,7 +170,11 @@ qint64 getDiskTotalSpace(const QString& root)
         (PULARGE_INTEGER) &totalNumberOfBytes, // receives the number of bytes on disk
         (PULARGE_INTEGER) &totalNumberOfFreeBytes // receives the free bytes on disk
         );
-    Q_UNUSED(status);
+    if (!status && isLocalPath(root)) {
+        QString newRoot = getParentFolder(root);
+        if (!newRoot.isEmpty())
+            return getDiskTotalSpace(newRoot); // try parent folder
+    }
     return totalNumberOfBytes;
 };
 
@@ -270,3 +293,10 @@ uint qt4Hash(const QString &key)
 {
     return hash(key.unicode(), key.size());
 }
+
+#ifdef _DEBUG
+QString debugTime(qint64 timeMSec, const QString &fmt) {
+    QString format = fmt.isEmpty() ? lit("hh:mm:ss") : fmt;
+    return QDateTime::fromMSecsSinceEpoch(timeMSec).toString(format);
+}
+#endif

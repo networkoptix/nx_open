@@ -31,6 +31,7 @@ protected:
         const QString& host,
         const UpnpDeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
+        const QAuthenticator &auth,
         QnResourceList& result) override;
 
 private:

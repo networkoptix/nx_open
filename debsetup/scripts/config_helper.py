@@ -28,6 +28,14 @@ elif len(sys.argv) == 3:
 else:
     if not cfgparser.has_section('General'):
         cfgparser.add_section('General')
-    cfgparser.set('General', sys.argv[2], sys.argv[3])
+
+    if sys.argv[2] == '-d':
+        name = sys.argv[3]
+        if cfgparser.has_option('General', name):
+            cfgparser.remove_option('General', name)
+    else:
+        name, value = sys.argv[2:4]
+        cfgparser.set('General', name, value)
+
     with open(config_file, 'w') as f:
         cfgparser.write(f)

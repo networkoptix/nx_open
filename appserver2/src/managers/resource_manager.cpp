@@ -83,24 +83,6 @@ namespace ec2
     }
     */
 
-    template<class T>
-    int QnResourceManager<T>::save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler )
-    {
-        const int reqID = generateRequestID();
-
-        if (resource->getId().isNull()) {
-            Q_ASSERT_X(0, "Only UPDATE operation is supported for saving resource!", Q_FUNC_INFO);
-            return INVALID_REQ_ID;
-        }
-
-        //performing request
-        auto tran = prepareTransaction( ApiCommand::saveResource, resource );
-
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveResourceHandler::done ), handler, reqID, _1, resource ) );
-
-        return reqID;
-    }
 
     template<class T>
     int QnResourceManager<T>::save( const QnId& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, impl::SaveKvPairsHandlerPtr handler )
@@ -131,7 +113,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnId& id, QnResource::Status status)
     {
-        QnTransaction<ApiSetResourceStatusData> tran(command, true);
+        QnTransaction<ApiSetResourceStatusData> tran(command);
         tran.params.id = id;
         tran.params.status = status;
         return tran;
@@ -142,7 +124,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnId& id, const QnKvPairList& kvPairs, bool isPredefinedParams)
     {
-        QnTransaction<ApiResourceParamsData> tran(command, true);
+        QnTransaction<ApiResourceParamsData> tran(command);
         tran.params.params.reserve(kvPairs.size());
         foreach(const QnKvPair& pair, kvPairs)
             tran.params.params.push_back(ApiResourceParamData(pair.name(), pair.value(), isPredefinedParams));
@@ -153,7 +135,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiIdData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
     {
-        QnTransaction<ApiIdData> tran(command, true);
+        QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;
         
         if (command == ApiCommand::setResourceStatus) 
@@ -182,7 +164,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiResourceData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource )
     {
-        QnTransaction<ApiResourceData> tran(command, true);
+        QnTransaction<ApiResourceData> tran(command);
         fromResourceToApi(resource, tran.params);
         return tran;
     }

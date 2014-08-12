@@ -148,10 +148,22 @@ QString QnMediaResource::customAspectRatioKey() {
     return lit("overrideAr");
 }
 
+QString QnMediaResource::dontRecordPrimaryStreamKey() {
+    return lit("dontRecordPrimaryStream");
+}
+
 QString QnMediaResource::dontRecordSecondaryStreamKey() {
     return lit("dontRecordSecondaryStream");
 }
 
 QString QnMediaResource::rtpTransportKey() {
     return lit("rtpTransport");
+}
+
+QString QnMediaResource::motionStreamKey() {
+    return lit("motionStream");
+}
+
+QString QnMediaResource::rotationKey() {
+    return lit("rotation");
 }

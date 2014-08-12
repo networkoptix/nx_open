@@ -12,10 +12,9 @@
 
 #include <QtCore/QMutex>
 
+#include <core/resource/resource_fwd.h>
 #include <soapNotificationConsumerBindingService.h>
 
-
-class QnPlOnvifResource;
 
 //!Processes notifications from onvif resources
 class OnvifNotificationConsumer
@@ -30,16 +29,16 @@ public:
 
     //!Pass notifications from address \a notificationProducerAddress to \a resource
     void registerResource(
-        QnPlOnvifResource* const resource,
+        const QnPlOnvifResourcePtr& resource,
         const QString& notificationProducerAddress,
         const QString& subscriptionReference = QString() );
     //!Cancel registration of \a resource
-    void removeResourceRegistration( QnPlOnvifResource* const resource );
+    void removeResourceRegistration( const QnPlOnvifResourcePtr& resource );
     virtual SOAP_SOCKET accept() override;
 
 private:
-    std::map<QString, QnPlOnvifResource*> m_notificationProducerAddressToResource;
-    std::map<QString, QnPlOnvifResource*> m_subscriptionReferenceToResource;
+    std::map<QString, QWeakPointer<QnPlOnvifResource>> m_notificationProducerAddressToResource;
+    std::map<QString, QWeakPointer<QnPlOnvifResource>> m_subscriptionReferenceToResource;
     mutable QMutex m_mutex;
 };
 

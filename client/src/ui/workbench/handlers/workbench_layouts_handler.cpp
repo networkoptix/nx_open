@@ -26,16 +26,17 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/handlers/workbench_export_handler.h>
-#include <ui/workbench/handlers/workbench_videowall_handler.h>
+#include <ui/workbench/handlers/workbench_export_handler.h>     //TODO: #GDM dependencies
+#include <ui/workbench/handlers/workbench_videowall_handler.h>  //TODO: #GDM dependencies
+#include <ui/workbench/workbench_state_manager.h>
 
 #include <utils/common/counter.h>
 #include <utils/common/event_processors.h>
 
-
 QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     QObject(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnWorkbenchLayoutsHandler>(this))
 {
     connect(action(Qn::NewUserLayoutAction),                &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered);
     connect(action(Qn::SaveLayoutAction),                   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutAction_triggered);
@@ -45,6 +46,9 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     connect(action(Qn::SaveCurrentLayoutAsAction),          &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
     connect(action(Qn::CloseLayoutAction),                  &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeLayoutAction_triggered);
     connect(action(Qn::CloseAllButThisLayoutAction),        &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered);
+}
+
+QnWorkbenchLayoutsHandler::~QnWorkbenchLayoutsHandler() {
 }
 
 ec2::AbstractECConnectionPtr QnWorkbenchLayoutsHandler::connection2() const {
@@ -124,24 +128,42 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     }
 
     const QnResourcePtr layoutOwnerUser = layout->getParentResource();
+    bool hasSavePermission = accessController()->hasPermissions(layout, Qn::SavePermission);
 
     QString name = menu()->currentParameters(sender()).argument<QString>(Qn::ResourceNameRole).trimmed();
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, mainWindow()));
         dialog->setWindowTitle(tr("Save Layout As"));
         dialog->setText(tr("Enter layout name:"));
-        dialog->setName(layout->getName());
+
+        QString proposedName = hasSavePermission
+            ? layout->getName()
+            : generateUniqueLayoutName(context()->user(), layout->getName(), layout->getName() + lit(" %1"));
+
+        dialog->setName(proposedName);
         setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
 
         QMessageBox::Button button = QMessageBox::Cancel;
         do {
-            dialog->exec();
+            if (!dialog->exec())
+                return;
+
+            /* Check if we were disconnected (server shut down) while the dialog was open. */
+            if (!context()->user())
+                return;
+
             if(dialog->clickedButton() != QDialogButtonBox::Save)
                 return;
+
             name = dialog->name();
 
             // that's the case when user press "Save As" and enters the same name as this layout already has
-            if (name == layout->getName() && user == layoutOwnerUser) {
+            if (name == layout->getName() && user == layoutOwnerUser && hasSavePermission) {
+                if(snapshotManager()->isLocal(layout)) {
+                    saveLayout(layout);
+                    return;
+                }
+
                 switch (askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes)) {
                 case QMessageBox::Cancel:
                     return;
@@ -153,14 +175,17 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
                 }
             }
 
-            QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
+            /* Check if we have rights to overwrite the layout */
+            QnLayoutResourcePtr excludingSelfLayout = hasSavePermission ? layout : QnLayoutResourcePtr();
+            QnLayoutResourceList existing = alreadyExistingLayouts(name, user, excludingSelfLayout);
             if (!canRemoveLayouts(existing)) {
                 QMessageBox::warning(
                     mainWindow(),
                     tr("Layout already exists"),
                     tr("Layout with the same name already exists and you do not have the rights to overwrite it.")
                 );
-                return;
+                dialog->setName(proposedName);
+                continue;
             }
 
             button = QMessageBox::Yes;
@@ -332,15 +357,20 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
             false
         );
 
-        if(button == QDialogButtonBox::Cancel) {
+        switch (button) {
+        case QDialogButtonBox::NoButton:
+        case QDialogButtonBox::Cancel:
             closeAll = false;
             saveAll = false;
-        } else if(button == QDialogButtonBox::No) {
+            break;
+        case QDialogButtonBox::No:
             closeAll = true;
             saveAll = false;
-        } else {
+            break;
+        default:
             closeAll = true;
             saveAll = true;
+            break;
         }
     }
 
@@ -576,7 +606,7 @@ void QnWorkbenchLayoutsHandler::at_layouts_saved(int status, const QnResourceLis
             mainWindow(),
             resources,
             tr("Error"),
-            tr("Could not save the following %n layout(s) to Enterprise Controller.", "", reopeningLayoutResources.size()),
+            tr("Could not save the following %n layout(s) to Server.", "", reopeningLayoutResources.size()),
             tr("Do you want to restore these %n layout(s)?", "", reopeningLayoutResources.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
         );
@@ -589,4 +619,8 @@ void QnWorkbenchLayoutsHandler::at_layouts_saved(int status, const QnResourceLis
                 resourcePool()->removeResource(layoutResource);
         }
     }
+}
+
+bool QnWorkbenchLayoutsHandler::tryClose(bool force) {
+    return closeAllLayouts(true, force);
 }
