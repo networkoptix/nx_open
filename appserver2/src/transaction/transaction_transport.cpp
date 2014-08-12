@@ -145,6 +145,7 @@ void QnTransactionTransport::close()
     closeSocket();
     {
         QMutexLocker lock(&m_mutex);
+        assert( !m_socket );
         m_readSync = false;
         m_writeSync = false;
         m_dataToSend.clear();
@@ -462,8 +463,6 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             dataCtx.sourceData,
             chunkExtensions );
     }
-
-    //TODO #ak BUG currently, there is a bug in aio: when we calling this method not from completion handler, socket may not be set to watch
 
     using namespace std::placeholders;
     m_socket->sendAsync( dataCtx.encodedSourceData, std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) );

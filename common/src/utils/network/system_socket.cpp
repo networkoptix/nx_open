@@ -563,6 +563,8 @@ public:
 
     Qt::HANDLE threadHandlerIsRunningIn;
 
+    bool asyncSendIssued;
+
     CommunicatingSocketPrivate()
     :
         connectSendAsyncCallCounter( 0 ),
@@ -572,7 +574,8 @@ public:
         sendBufPos( 0 ),
         m_connectSendHandlerTerminatedFlag( nullptr ),
         m_recvHandlerTerminatedFlag( nullptr ),
-        threadHandlerIsRunningIn( nullptr )
+        threadHandlerIsRunningIn( nullptr ),
+        asyncSendIssued( false )
     {
     }
 
@@ -608,6 +611,7 @@ public:
         auto connectHandlerLocal = [this]( SystemError::ErrorCode errorCode )
         {
             auto connectHandlerBak = std::move( connectHandler );
+            asyncSendIssued = false;
             connectHandlerBak( errorCode );
         };
 
@@ -645,6 +649,7 @@ public:
             sendBuffer = nullptr;
             sendBufPos = 0;
             auto sendHandlerBak = std::move( sendHandler );
+            asyncSendIssued = false;
             sendHandlerBak( errorCode, bytesSent );
         };
 
@@ -1114,6 +1119,9 @@ bool CommunicatingSocket::connectAsyncImpl( const SocketAddress& addr, std::func
     if( !connect( addr.address.toString(), addr.port, sendTimeout ) )
         return false;
 
+    assert( !d->asyncSendIssued );
+    d->asyncSendIssued = true;
+
     d->connectHandler = std::move(handler);
 
     QMutexLocker lk( aio::AIOService::instance()->mutex() );
@@ -1142,6 +1150,9 @@ bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<vo
     assert( buf.size() > 0 );
 
     CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>(impl());
+
+    assert( !d->asyncSendIssued );
+    d->asyncSendIssued = true;
 
     d->sendBuffer = &buf;
     d->sendHandler = std::move(handler);
