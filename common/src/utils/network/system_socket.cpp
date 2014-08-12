@@ -686,8 +686,7 @@ public:
                 }
                 else
                 {
-                    if( bytesRead > 0 )
-                        recvBuffer->resize( bufSizeBak + bytesRead );   //shrinking buffer
+                    recvBuffer->resize( bufSizeBak + bytesRead );   //shrinking buffer
                     recvHandlerLocal( SystemError::noError, bytesRead );
                 }
                 break;
@@ -861,7 +860,10 @@ CommunicatingSocket::CommunicatingSocket( AbstractSocket* abstractSocketPtr, int
 {
 }
 
-
+CommunicatingSocket::~CommunicatingSocket()
+{
+    //TODO #ak cancel ongoing async I/O
+}
 
 //!Implementation of AbstractCommunicatingSocket::connect
 bool CommunicatingSocket::connect( const QString& foreignAddress, unsigned short foreignPort, unsigned int timeoutMs )

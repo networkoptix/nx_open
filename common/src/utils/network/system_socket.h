@@ -217,6 +217,8 @@ public:
     CommunicatingSocket( AbstractSocket* abstractSocketPtr, int type, int protocol, SocketImpl* sockImpl = nullptr );
     CommunicatingSocket( AbstractSocket* abstractSocketPtr, int newConnSD, SocketImpl* sockImpl = nullptr );
 
+    virtual ~CommunicatingSocket();
+
     //!Implementation of AbstractCommunicatingSocket::connect
     bool connect(
         const QString &foreignAddress,
