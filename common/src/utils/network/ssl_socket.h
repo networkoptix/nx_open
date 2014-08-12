@@ -29,6 +29,10 @@ public:
     virtual bool reopen() override;
     virtual bool setNoDelay( bool value ) override;
     virtual bool getNoDelay( bool* value ) override;
+    //!Implementation of AbstractStreamSocket::toggleStatisticsCollection
+    virtual bool toggleStatisticsCollection( bool val ) override;
+    //!Implementation of AbstractStreamSocket::getConnectionStatistics
+    virtual bool getConnectionStatistics( StreamSocketInfo* info ) override;
 
     virtual bool connect(
         const QString& foreignAddress,

@@ -77,7 +77,7 @@ public:
      * \returns                         Global permissions of the given user,
      *                                  adjusted to take deprecation and superuser status into account.
      */
-    Qn::Permissions globalPermissions(const QnUserResourcePtr &user);
+    Qn::Permissions globalPermissions(const QnUserResourcePtr &user) const;
 
     /**
      * \param requiredPermissions       Global permissions to check.
@@ -112,13 +112,13 @@ protected slots:
 private:
     void setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions);
 
-    Qn::Permissions calculatePermissions(const QnResourcePtr &resource);
-    Qn::Permissions calculatePermissions(const QnUserResourcePtr &user);
-    Qn::Permissions calculatePermissions(const QnLayoutResourcePtr &layout);
-    Qn::Permissions calculatePermissions(const QnVirtualCameraResourcePtr &camera);
-    Qn::Permissions calculatePermissions(const QnAbstractArchiveResourcePtr &archive);
-    Qn::Permissions calculatePermissions(const QnMediaServerResourcePtr &server);
-    Qn::Permissions calculatePermissions(const QnVideoWallResourcePtr &videoWall);
+    Qn::Permissions calculatePermissions(const QnResourcePtr &resource) const;
+    Qn::Permissions calculatePermissions(const QnUserResourcePtr &user) const;
+    Qn::Permissions calculatePermissions(const QnLayoutResourcePtr &layout) const;
+    Qn::Permissions calculatePermissions(const QnVirtualCameraResourcePtr &camera) const;
+    Qn::Permissions calculatePermissions(const QnAbstractArchiveResourcePtr &archive) const;
+    Qn::Permissions calculatePermissions(const QnMediaServerResourcePtr &server) const;
+    Qn::Permissions calculatePermissions(const QnVideoWallResourcePtr &videoWall) const;
 
 private:
     struct PermissionsData {

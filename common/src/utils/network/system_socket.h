@@ -194,9 +194,9 @@ public:
 
 protected:
     int m_socketHandle;              // Socket descriptor
+    SocketImpl* m_impl;
 
 private:
-    SocketImpl* m_impl;
     bool m_nonBlockingMode;
     unsigned int m_readTimeoutMS;
     unsigned int m_writeTimeoutMS;
@@ -214,8 +214,8 @@ class CommunicatingSocket
     public Socket
 {
 public:
-    CommunicatingSocket( AbstractSocket* abstractSocketPtr, int type, int protocol );
-    CommunicatingSocket( AbstractSocket* abstractSocketPtr, int newConnSD );
+    CommunicatingSocket( AbstractSocket* abstractSocketPtr, int type, int protocol, SocketImpl* sockImpl = nullptr );
+    CommunicatingSocket( AbstractSocket* abstractSocketPtr, int newConnSD, SocketImpl* sockImpl = nullptr );
 
     //!Implementation of AbstractCommunicatingSocket::connect
     bool connect(
@@ -465,6 +465,10 @@ public:
     virtual bool setNoDelay( bool value ) override;
     //!Implementation of AbstractStreamSocket::getNoDelay
     virtual bool getNoDelay( bool* value ) override;
+    //!Implementation of AbstractStreamSocket::toggleStatisticsCollection
+    virtual bool toggleStatisticsCollection( bool val ) override;
+    //!Implementation of AbstractStreamSocket::getConnectionStatistics
+    virtual bool getConnectionStatistics( StreamSocketInfo* info ) override;
 
 private:
     // Access for TCPServerSocket::accept() connection creation

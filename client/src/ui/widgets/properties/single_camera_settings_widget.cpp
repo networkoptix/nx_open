@@ -211,6 +211,8 @@ void QnSingleCameraSettingsWidget::at_proxyAuthenticationRequired ( const QNetwo
 #ifdef QT_WEBKITWIDGETS_LIB
 void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout , QWebView* advancedWebView)
 {
+    if (!m_camera)
+        return;
     if ( qnCommon )
     {
         QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);

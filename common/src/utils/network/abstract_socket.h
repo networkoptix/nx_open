@@ -147,7 +147,7 @@ public:
 //!Interface for writing to/reading from socket
 class AbstractCommunicatingSocket
 :
-    virtual public AbstractSocket
+    public AbstractSocket
 {
 public:
     virtual ~AbstractCommunicatingSocket() {}
@@ -210,7 +210,8 @@ public:
 
     //!Reads bytes from socket asynchronously
     /*!
-        \param dst Buffer to read to. Maximum \a dst->capacity() bytes read to this buffer
+        \param dst Buffer to read to. Maximum \a dst->capacity() bytes read to this buffer. If buffer already contains some data, 
+            newly-read data will be appended to it. Buffer is resized after reading to its actual size
         \param handler functor with following signature:
             \code{.cpp}
                 ( SystemError::ErrorCode errorCode, size_t bytesRead )
@@ -255,10 +256,22 @@ protected:
     virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
 };
 
+struct StreamSocketInfo
+{
+    //!round-trip time smoothed variation, millis
+    unsigned int rttVar;
+
+    StreamSocketInfo()
+    :
+        rttVar( 0 )
+    {
+    }
+};
+
 //!Interface for connection-orientied sockets
 class AbstractStreamSocket
 :
-    virtual public AbstractCommunicatingSocket
+    public AbstractCommunicatingSocket
 {
 public:
     virtual ~AbstractStreamSocket() {}
@@ -278,6 +291,19 @@ public:
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getNoDelay( bool* value ) = 0;
+    //!Enable collection of socket statistics
+    /*!
+        \param val \a true - enable, \a false - diable
+        \note This method MUST be called only after establishing connection. After reconnecting socket, it MUST be called again!
+        \note On win32 only process with admin rights can enable statistics collection, on linux it is enabled by default for every socket
+    */
+    virtual bool toggleStatisticsCollection( bool val ) = 0;
+    //!Reads extended stream socket information
+    /*!
+        \note \a AbstractStreamSocket::toggleStatisticsCollection MUST be called prior to this method
+        \note on win32 for tcp protocol this function is pretty slow, so it is not recommended to call it too often
+    */
+    virtual bool getConnectionStatistics( StreamSocketInfo* info ) = 0;
 };
 
 //!Interface for server socket, accepting stream connections
@@ -286,7 +312,7 @@ public:
 */
 class AbstractStreamServerSocket
 :
-    virtual public AbstractSocket
+    public AbstractSocket
 {
 public:
     //!This class for internal use only. MAY be removed or changed in future
@@ -344,7 +370,7 @@ static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));
 */
 class AbstractDatagramSocket
 :
-    virtual public AbstractCommunicatingSocket
+    public AbstractCommunicatingSocket
 {
 public:
     static const int UDP_HEADER_SIZE = 8;

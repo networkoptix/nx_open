@@ -704,15 +704,15 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         result = true;
     }
 
-    if (getModel() != camera->getModel()) {
+    if (getModel() != camera->getModel() && !camera->getModel().isEmpty()) {
         setModel(camera->getModel());
         result = true;
     }
-    if (getVendor() != camera->getVendor()) {
+    if (getVendor() != camera->getVendor() && !camera->getVendor().isEmpty()) {
         setVendor(camera->getVendor());
         result = true;
     }
-    if (getMAC() != camera->getMAC()) {
+    if (getMAC() != camera->getMAC() && !camera->getMAC().isNull()) {
         setMAC(camera->getMAC());
         result = true;
     }

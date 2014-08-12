@@ -19,6 +19,8 @@
 /*!
     Internally, it is list of buffers, called arena.
     Overhead per one allocation is 2*sizeof(size_t)
+    
+    \note Maximum possible memory fragmentation is one arena size
 */
 class CyclicAllocator
 :

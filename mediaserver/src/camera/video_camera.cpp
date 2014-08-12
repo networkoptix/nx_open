@@ -440,7 +440,7 @@ void QnVideoCamera::stopIfNoActivity()
     if( (m_liveCache[MEDIA_Quality_High] || m_liveCache[MEDIA_Quality_Low])     //has live cache ever been started?
         &&
         (!m_liveCache[MEDIA_Quality_High] ||                                    //has hi quality live cache been started?
-            (m_hlsLivePlaylistManager[MEDIA_Quality_High].unique() &&
+            (m_hlsLivePlaylistManager[MEDIA_Quality_High].unique() &&           //no one uses playlist
              m_hlsLivePlaylistManager[MEDIA_Quality_High]->inactivityPeriod() > m_hlsInactivityPeriodMS &&  //checking inactivity timer
              m_liveCache[MEDIA_Quality_High]->inactivityPeriod() > m_hlsInactivityPeriodMS))
         &&

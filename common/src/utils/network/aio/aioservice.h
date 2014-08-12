@@ -66,6 +66,20 @@ namespace aio
             bool waitForRunningHandlerCompletion = true );
         //!Returns \a true, if socket is still listened for state changes
         bool isSocketBeingWatched(AbstractSocket* sock) const;
+
+        QMutex* mutex() const { return &m_mutex; }
+
+        //!Same as \a AIOService::watchSocket, but does not lock mutex. Calling entity MUST lock \a AIOService::mutex() before calling this method
+        bool watchSocketNonSafe(
+            AbstractSocket* const sock,
+            aio::EventType eventToWatch,
+            AIOEventHandler* const eventHandler );
+        //!Same as \a AIOService::removeFromWatch, but does not lock mutex. Calling entity MUST lock \a AIOService::mutex() before calling this method
+        void removeFromWatchNonSafe(
+            AbstractSocket* const sock,
+            aio::EventType eventType,
+            bool waitForRunningHandlerCompletion = true );
+
         /*!
             \param threadCount minimal thread count. Actual thread poll may exceed this value because PollSet can monitor limited number of sockets.
                 If zero, thread count is choosed automatically. This value is used only in first call 

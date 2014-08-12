@@ -5,6 +5,9 @@
 #include <client/client_settings.h>
 
 #include <ui/common/palette.h>
+#include <utils/common/synctime.h>
+
+
 
 QnClockDataProvider::QnClockDataProvider(const QString fixedFormat, QObject *parent) :
     QObject(parent),
@@ -25,7 +28,11 @@ QnClockDataProvider::QnClockDataProvider(const QString fixedFormat, QObject *par
     }
 
     connect(m_timer, &QTimer::timeout, this, [this](){
+#ifdef _DEBUG
+        emit timeChanged(QDateTime::fromMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch()).toString(m_formatString));
+#else
         emit timeChanged(QDateTime::currentDateTime().toString(m_formatString));
+#endif
     });
     m_timer->start(100);
 }

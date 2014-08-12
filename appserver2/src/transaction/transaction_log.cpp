@@ -11,7 +11,7 @@
 #include "utils/common/model_functions.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
 
-//#define TRANSACTION_LOG_DEBUG
+#define TRANSACTION_MESSAGE_BUS_DEBUG
 
 namespace ec2
 {
@@ -113,6 +113,11 @@ QUuid QnTransactionLog::makeHash(const QString& extraData, const ApiCameraBookma
 
 ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QUuid& hash, const QByteArray& data)
 {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+    qDebug() << "add transaction to log " << tran.peerID << "command=" << ApiCommand::toString(tran.command) 
+        << "db seq=" << tran.persistentInfo.sequence << "timestamp=" << tran.persistentInfo.timestamp;
+#endif
+
     Q_ASSERT_X(!tran.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     Q_ASSERT_X(!tran.persistentInfo.dbID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     Q_ASSERT_X(tran.persistentInfo.sequence, Q_FUNC_INFO, "Transaction sequence MUST be filled!");

@@ -59,7 +59,9 @@
 #include "ioctl.h"
 #include "dvd_device.h"
 
+#ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wwrite-strings"
+#endif
 
 /*****************************************************************************
  * Local prototypes

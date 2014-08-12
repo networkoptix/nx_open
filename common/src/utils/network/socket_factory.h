@@ -21,6 +21,7 @@ public:
     {
         nttAuto,
         nttEnabled,
+        //!Using this value causes TCP protocol to be used for stream-orientied sockets
         nttDisabled
     };
 

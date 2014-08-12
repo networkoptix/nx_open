@@ -183,6 +183,9 @@ bool QnModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket)
             arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
         return false;
     }
+    
+    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(response.seed))
+        return false;
 
     //received valid response, checking if already know this Server
     auto it = m_knownEnterpriseControllers.find(response.seed);

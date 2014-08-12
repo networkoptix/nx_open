@@ -250,7 +250,7 @@ void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
     }
 }
 
-static QnResourceList ChecHostAddrAsync(const QnManualCameraInfo& input) { return input.checkHostAddr(); }
+static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input) { return input.checkHostAddr(); }
 
 void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList& resources)
 {
@@ -258,7 +258,7 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
     QnManualCameraInfoMap cameras = m_manualCameraMap;
     m_searchersListMutex.unlock();
 
-    QFuture<QnResourceList> results = QtConcurrent::mapped(cameras, &ChecHostAddrAsync);
+    QFuture<QnResourceList> results = QtConcurrent::mapped(cameras, &CheckHostAddrAsync);
     results.waitForFinished();
     for (QFuture<QnResourceList>::const_iterator itr = results.constBegin(); itr != results.constEnd(); ++itr)
     {

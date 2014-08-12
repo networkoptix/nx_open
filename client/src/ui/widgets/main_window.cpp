@@ -338,10 +338,13 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     menu()->newMenu(Qn::MainScope);
 #endif
 
-    if (!qnSettings->isVSyncEnabled()) {
-        QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
-        Q_UNUSED(vsyncWorkaround);
-    }
+    /* VSync workaround must always be enabled to limit fps usage in following cases:
+     * * VSync is not supported by drivers 
+     * * VSync is disabled in drivers
+     * * double buffering is disabled in drivers or in our program
+     */
+    QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
+    Q_UNUSED(vsyncWorkaround);
 
     QnPtzManageDialog *manageDialog = new QnPtzManageDialog(this); //initializing instance of a singleton
     Q_UNUSED(manageDialog)

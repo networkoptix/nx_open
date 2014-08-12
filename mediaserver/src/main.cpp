@@ -152,6 +152,7 @@
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
 #include "nx_ec/data/api_conversion_functions.h"
+#include "media_server/resource_status_watcher.h"
 
 
 // This constant is used while checking for compatibility.
@@ -200,6 +201,7 @@ public:
     QString msgLogLevel;
     QString rebuildArchive;
     QString devModeKey;
+    QString allowedDiscoveryPeers;
 
     CmdLineArguments()
     :
@@ -516,12 +518,15 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
         qDebug() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
         return QnMediaServerResourcePtr();
     }
+
+    /*
     rez = ec2Connection->getResourceManager()->setResourceStatusSync(serverPtr->getId(), QnResource::Online);
     if (rez != ec2::ErrorCode::ok)
     {
         qDebug() << "registerServer(): Call to change server status failed. Reason: " << ec2::toString(rez);
         return QnMediaServerResourcePtr();
     }
+    */
     
     return savedServer;
 }
@@ -1116,6 +1121,8 @@ void QnMain::run()
         QnSSLSocket::initSSLEngine( certData );
     }
 
+    QnSyncTime syncTime;
+
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
@@ -1188,7 +1195,7 @@ void QnMain::run()
     qnCommon->setModuleGUID(serverGuid());
     qnCommon->setLocalSystemName(settings->value("systemName").toString());
 
-    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
+    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
@@ -1249,6 +1256,8 @@ void QnMain::run()
         localInfo.data.publicIP = publicIP;
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
+    connect( ec2Connection.get(), &ec2::AbstractECConnection::timeChanged,
+             QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo.ecsGuid.toUtf8());
@@ -1331,7 +1340,7 @@ void QnMain::run()
         server->setSystemInfo(QnSystemInformation(QN_APPLICATION_PLATFORM, QN_APPLICATION_ARCH));
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
-        bool isLocal = appserverHostString.isEmpty() || QUrl(appserverHostString).scheme() == "file";
+        bool isLocal = appserverHostString.isEmpty() || appserverHostString == "localhost" || QUrl(appserverHostString).scheme() == "file";
 
         int serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 #ifdef EDGE_SERVER
@@ -1432,6 +1441,11 @@ void QnMain::run()
         m_moduleFinder->setCompatibilityMode(true);
         ec2ConnectionFactory->setCompatibilityMode(true);
     }
+    if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
+        m_moduleFinder->setAllowedPeers(cmdLineArguments.allowedDiscoveryPeers.split(";"));
+    }
+
+
     QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleFound,     this,   &QnMain::at_peerFound,  Qt::DirectConnection);
     QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleLost,      this,   &QnMain::at_peerLost,   Qt::DirectConnection);
 
@@ -1458,6 +1472,8 @@ void QnMain::run()
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
     serverResourceProcessor->moveToThread( mserverResourceDiscoveryManager.get() );
     QnResourceDiscoveryManager::instance()->setResourceProcessor(serverResourceProcessor.get());
+
+    std::unique_ptr<QnResourceStatusWatcher> statusWatcher( new QnResourceStatusWatcher());
 
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher thirdPartyResourceSearcher;
@@ -1869,7 +1885,6 @@ static void printVersion();
 
 int main(int argc, char* argv[])
 {
-
 #if 0
 #if defined(__GNUC__)
 # if defined(__i386__)
@@ -1906,6 +1921,7 @@ int main(int argc, char* argv[])
     commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL, 
         lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
     commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
+    commandLineParser.addParameter(&cmdLineArguments.allowedDiscoveryPeers, "--allowed-peers", NULL, QString());
     commandLineParser.addParameter(&configFilePath, "--conf-file", NULL, 
         "Path to config file. By default "+MSSettings::defaultROSettingsFilePath());
     commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL, 
