@@ -24,7 +24,7 @@ int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnReque
     QString errStr;
     QnBusiness::EventType eventType = QnBusiness::UndefinedEvent;
     QnBusiness::ActionType actionType = QnBusiness::UndefinedAction;
-    QnId businessRuleId;
+    QUuid businessRuleId;
 
     for (int i = 0; i < params.size(); ++i)
     {

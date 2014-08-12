@@ -6,6 +6,7 @@
 #include "api/app_server_connection.h"
 
 #include "core/resource_management/resource_pool.h"
+#include <core/resource/resource.h>
 #include "core/resource/media_server_resource.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/security_cam_resource.h"
@@ -167,7 +168,7 @@ QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventP
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
 
     QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
-    bool gotFrame = (res->getStatus() == QnResource::Online || res->getStatus() == QnResource::Recording) && decoder.decode(video, &outFrame);
+    bool gotFrame = (res->getStatus() == Qn::Online || res->getStatus() == Qn::Recording) && decoder.decode(video, &outFrame);
     if (!gotFrame)
         return result;
 

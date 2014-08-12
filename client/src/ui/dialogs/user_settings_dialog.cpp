@@ -36,7 +36,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     if(context == NULL) 
         qnNullWarning(context);
 
-    foreach(const QnResourcePtr &user, context->resourcePool()->getResourcesWithFlag(QnResource::user))
+    foreach(const QnResourcePtr &user, context->resourcePool()->getResourcesWithFlag(Qn::user))
         m_userByLogin[user->getName().toLower()] = user;
 
     for(int i = 0; i < ElementCount; i++) {

@@ -692,7 +692,7 @@ int QnMediaServerConnection::testEmailSettingsAsync(const QnEmail::Settings &set
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
-    const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
+    const QUuid& cameraID, CameraDiagnostics::Step::Value previousStep,
     QObject* target, const char* slot )
 {
     QnRequestParamList params;
@@ -731,7 +731,7 @@ int QnMediaServerConnection::getEventLogAsync(
                   QnResourceList camList,
                   QnBusiness::EventType eventType,
                   QnBusiness::ActionType actionType,
-                  QnId businessRuleId,
+                  QUuid businessRuleId,
                   QObject *target, const char *slot)
 {
     QnRequestParamList params;

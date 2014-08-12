@@ -21,7 +21,7 @@ public:
 
     virtual QnResourceList findResources();
 
-    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams& params) override;
 
     virtual QString manufacture() const override;
 

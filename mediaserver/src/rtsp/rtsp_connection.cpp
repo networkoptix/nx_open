@@ -892,7 +892,7 @@ void QnRtspConnectionProcessor::at_camera_parentIdChanged()
     Q_D(QnRtspConnectionProcessor);
 
     QMutexLocker lock(&d->mutex);
-    if (d->mediaRes->toResource()->hasFlags(QnResource::foreigner)) {
+    if (d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
         m_needStop = true;
         d->socket->close();
     }
@@ -906,12 +906,12 @@ void QnRtspConnectionProcessor::createDataProvider()
     if (d->mediaRes) {
         camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
         QnNetworkResourcePtr cameraRes = d->mediaRes.dynamicCast<QnNetworkResource>();
-        if (cameraRes && !cameraRes->isInitialized() && !cameraRes->hasFlags(QnResource::foreigner))
+        if (cameraRes && !cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner))
             cameraRes->initAsync(true);
     }
     if (camera && d->liveMode == Mode_Live)
     {
-        if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(QnResource::foreigner)) {
+        if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
             d->liveDpHi = camera->getLiveReader(QnServer::HiQualityCatalog);
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(at_camera_parentIdChanged()), Qt::DirectConnection);
@@ -935,7 +935,7 @@ void QnRtspConnectionProcessor::createDataProvider()
         }
     }
     if (!d->archiveDP) {
-        d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->toResource()->createDataProvider(QnResource::Role_Archive)));
+        d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->toResource()->createDataProvider(Qn::CR_Archive)));
         if (d->archiveDP)
             d->archiveDP->setGroupId(d->clientGuid);
     }
@@ -1086,7 +1086,7 @@ int QnRtspConnectionProcessor::composePlay()
         return CODE_NOT_FOUND;
 
 
-    QnResource::Status status = getResource()->toResource()->getStatus();
+    Qn::ResourceStatus status = getResource()->toResource()->getStatus();
 
     d->dataProcessor->setLiveMode(d->liveMode == Mode_Live);
 
@@ -1099,7 +1099,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->dataProcessor->lockDataQueue();
 
         int copySize = 0;
-        if (!getResource()->toResource()->hasFlags(QnResource::foreigner) && (status == QnResource::Online || status == QnResource::Recording)) {
+        if (!getResource()->toResource()->hasFlags(Qn::foreigner) && (status == Qn::Online || status == Qn::Recording)) {
             copySize = d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, 0, d->lastPlayCSeq);
         }
 

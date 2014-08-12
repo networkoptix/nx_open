@@ -15,6 +15,8 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
+#include <core/resource/resource_fwd.h>
+
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/dialogs/event_log_dialog.h>

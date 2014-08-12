@@ -5,6 +5,8 @@
 #include <business/actions/recording_business_action.h>
 #include "events_db.h"
 
+#include <core/resource/resource_fwd.h>
+
 /*
 * QnMServerBusinessRuleProcessor can execute business actions
 */

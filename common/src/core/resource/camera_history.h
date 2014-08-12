@@ -4,7 +4,6 @@
 #include <QtCore/QObject>
 
 #include "recording/time_period.h"
-#include "resource.h"
 #include "resource_fwd.h"
 
 struct QnCameraHistoryItem
@@ -26,7 +25,7 @@ struct QnCameraTimePeriod: QnTimePeriod
 {
     QnCameraTimePeriod(qint64 startTimeMs, qint64 durationMs, QByteArray serverGuid): QnTimePeriod(startTimeMs, durationMs), mediaServerGuid(serverGuid) {}
 
-    QnId getServerId() const;
+    QUuid getServerId() const;
 
     QByteArray mediaServerGuid;
 };

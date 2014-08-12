@@ -134,7 +134,7 @@ private slots:
     void at_actionDeliveryFailed(const QnAbstractBusinessActionPtr& action);
 
     void at_businessRuleChanged(const QnBusinessEventRulePtr& bRule);
-    void at_businessRuleDeleted(QnId id);
+    void at_businessRuleDeleted(QUuid id);
     void at_businessRuleReset(const QnBusinessEventRuleList& rules);
 
     void at_timer();
@@ -143,7 +143,7 @@ private slots:
 protected:
     virtual QImage getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const;
     
-    bool containResource(const QnResourceList& resList, const QnId& resId) const;
+    bool containResource(const QnResourceList& resList, const QUuid& resId) const;
     QnAbstractBusinessActionList matchActions(const QnAbstractBusinessEventPtr& bEvent);
     //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
 
@@ -174,8 +174,8 @@ private:
     struct RunningRuleInfo
     {
         RunningRuleInfo() {}
-        QMap<QnId, QnAbstractBusinessEventPtr> resources; 
-        QSet<QnId> isActionRunning; // actions that has been started by resource. Continues action starts only onces for all event resources.
+        QMap<QUuid, QnAbstractBusinessEventPtr> resources; 
+        QSet<QUuid> isActionRunning; // actions that has been started by resource. Continues action starts only onces for all event resources.
     };
     typedef QMap<QString, RunningRuleInfo> RunningRuleMap;
 

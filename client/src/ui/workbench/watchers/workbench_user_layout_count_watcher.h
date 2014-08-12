@@ -31,7 +31,7 @@ private slots:
     void updateLayoutCount();
 
 private:
-    QnId m_currentUserId;
+    QUuid m_currentUserId;
     QSet<QnResourcePtr> m_layouts;
     int m_layoutCount;
 };

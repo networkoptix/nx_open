@@ -301,7 +301,7 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
 }
 
 QString QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params, bool useIp) {
-    QnId id = params.getEventResourceId();
+    QUuid id = params.getEventResourceId();
     QnResourcePtr res = !id.isNull() ? qnResPool->getResourceById(id) : QnResourcePtr();
     return getFullResourceName(res, useIp);
 }
@@ -399,7 +399,7 @@ QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(const QnAbstract
 }
 
 QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool isPublic) {
-    QnId id = params.getEventResourceId();
+    QUuid id = params.getEventResourceId();
     QnNetworkResourcePtr res = !id.isNull() ? 
                             qnResPool->getResourceById(id).dynamicCast<QnNetworkResource>() : 
                             QnNetworkResourcePtr();

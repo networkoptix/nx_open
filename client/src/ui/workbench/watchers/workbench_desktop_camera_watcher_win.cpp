@@ -51,7 +51,7 @@ void QnWorkbenchDesktopCameraWatcher::at_resourcePool_resourceAdded(const QnReso
             m_serverList << server;
             processServer(server);
         }
-        else if (server->getStatus() == QnResource::Online) {
+        else if (server->getStatus() == Qn::Online) {
             m_serverList << server;
             processServer(server);
         }
@@ -101,7 +101,7 @@ void QnWorkbenchDesktopCameraWatcher::processServer(QnMediaServerResourcePtr ser
     QnDesktopResourcePtr desktop = qnResPool->getResourceById(QnDesktopResource::getDesktopResourceUuid().toString()).dynamicCast<QnDesktopResource>();
     if (desktop && m_serverList.contains(server)) 
     {
-        if (server->getStatus() == QnResource::Online)
+        if (server->getStatus() == Qn::Online)
             desktop->addConnection(server);
         else
             desktop->removeConnection(server);

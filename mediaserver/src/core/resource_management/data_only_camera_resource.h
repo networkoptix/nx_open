@@ -19,7 +19,7 @@ class DataOnlyCameraResource
     public QnVirtualCameraResource
 {
 public:
-    DataOnlyCameraResource( const QnId& resourceTypeId );
+    DataOnlyCameraResource( const QUuid& resourceTypeId );
 
     //!Implementation of QnNetworkResource::isResourceAccessible
     virtual bool isResourceAccessible() override;

@@ -21,7 +21,7 @@ public:
     {}
 
     struct {
-        QnId id;
+        QUuid id;
         QString path;
     } resource;
 

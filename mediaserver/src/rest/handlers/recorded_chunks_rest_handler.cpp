@@ -2,7 +2,10 @@
 
 #include "recorder/storage_manager.h"
 #include "utils/network/tcp_connection_priv.h"
+
 #include "core/resource_management/resource_pool.h"
+#include <core/resource/camera_bookmark.h>
+
 #include "utils/common/util.h"
 #include <utils/fs/file.h>
 #include "motion/motion_helper.h"
@@ -12,10 +15,11 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
 {
     Q_UNUSED(path)
     qint64 startTime = -1, endTime = 1, detailLevel = -1;
-    QList<QnResourcePtr> resList;
+    QnResourceList resList;
     QByteArray errStr;
     QByteArray errStrPhysicalId;
     bool urlFound = false;
+    QString physicalId;
     
     ChunkFormat format = ChunkFormat_Unknown;
     QString callback;
@@ -27,7 +31,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
         if (params[i].first == "physicalId" || params[i].first == "mac") // use 'mac' name for compatibility with previous client version
         {
             urlFound = true;
-            QString physicalId = params[i].second.trimmed();
+            physicalId = params[i].second.trimmed();
             QnResourcePtr res = qnResPool->getNetResourceByPhysicalId(physicalId);
             if (res == 0)
                 errStrPhysicalId += QByteArray("Resource with physicalId '") + physicalId.toUtf8() + QByteArray("' not found. \n");
@@ -101,10 +105,21 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     case Qn::BookmarksContent:
         {
             QnCameraBookmarkTags tags;
-            if (!filter.isEmpty())
-                tags = filter.split(L',');
+            if (!filter.isEmpty()) {
+                QnCameraBookmarkSearchFilter bookmarksFilter;
+                bookmarksFilter.minStartTimeMs = startTime;
+                bookmarksFilter.maxStartTimeMs = endTime;
+                bookmarksFilter.minDurationMs = detailLevel;
+                bookmarksFilter.text = filter;
+                QnCameraBookmarkList bookmarks;
+                if (qnStorageMan->getBookmarks(physicalId.toUtf8(), bookmarksFilter, bookmarks)) {
+                    foreach (const QnCameraBookmark &bookmark, bookmarks)
+                        periods << QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs);                    
+                }
+            } else {
             //TODO: #GDM #Bookmarks use tags to filter periods?
-            periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog);
+                periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog);
+            }
             break;
         }
 #endif

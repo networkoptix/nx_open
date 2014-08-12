@@ -5,6 +5,9 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include "recorder/file_deletor.h"
+
+#include <core/resource/security_cam_resource.h>
+
 #include <media_server/serverutil.h>
 
 #include <recording/time_period_list.h>
@@ -107,24 +110,24 @@ QnMotionHelper* QnMotionHelper::instance()
     //return inst();
 }
 
-QString QnMotionHelper::getBaseDir(const QString& macAddress)
+QString QnMotionHelper::getBaseDir(const QUuid& cameraId)
 {
 #ifdef _TEST_TWO_SERVERS
-    return closeDirPath(getDataDirectory()) + QString("test/record_catalog/metadata/") + macAddress + QString("/");
+    return closeDirPath(getDataDirectory()) + QString("test/record_catalog/metadata/") + cameraId.toString() + L'/';
 #else
-    return closeDirPath(getDataDirectory()) + QString("record_catalog/metadata/") + macAddress + QString("/");
+    return closeDirPath(getDataDirectory()) + QString("record_catalog/metadata/") + cameraId.toString() + L'/';
 #endif
 }
 
-QString QnMotionHelper::getMotionDir(const QDate& date, const QString& macAddress)
+QString QnMotionHelper::getMotionDir(const QDate& date, const QUuid& cameraId)
 {
-    return getBaseDir(macAddress) + date.toString("yyyy/MM/");
+    return getBaseDir(cameraId) + date.toString("yyyy/MM/");
 }
 
-QList<QDate> QnMotionHelper::recordedMonth(const QString& macAddress)
+QList<QDate> QnMotionHelper::recordedMonth(const QUuid& cameraId)
 {
     QList<QDate> rez;
-    QDir baseDir(getBaseDir(macAddress));
+    QDir baseDir(getBaseDir(cameraId));
     QList<QFileInfo> yearList = baseDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs);
     foreach(const QFileInfo& fiYear, yearList)
     {
@@ -142,11 +145,11 @@ QList<QDate> QnMotionHelper::recordedMonth(const QString& macAddress)
     return rez;
 }
 
-void QnMotionHelper::deleteUnusedFiles(const QList<QDate>& monthList, const QString& macAddress)
+void QnMotionHelper::deleteUnusedFiles(const QList<QDate>& monthList, const QUuid& cameraId)
 {
-    QList<QDate> existsData = recordedMonth(macAddress);
+    QList<QDate> existsData = recordedMonth(cameraId);
     foreach(const QDate& date, existsData) {
         if (!monthList.contains(date))
-            qnFileDeletor->deleteDir(getMotionDir(date, macAddress));
+            qnFileDeletor->deleteDir(getMotionDir(date, cameraId));
     }
 }

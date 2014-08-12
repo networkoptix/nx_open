@@ -41,7 +41,7 @@ namespace {
     QList<QUrl> serializeResourcesToUriList(const QnResourceList &resources) {
         QList<QUrl> result;
         foreach (const QnResourcePtr &resource, resources) {
-            if (resource->hasFlags(QnResource::url))
+            if (resource->hasFlags(Qn::url))
                 result.append(QUrl::fromLocalFile(resource->getUrl()));
         }
         return result;

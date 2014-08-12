@@ -151,7 +151,7 @@ bool QnLayoutExportTool::start() {
     QScopedPointer<QIODevice> miscFile(m_storage->open(lit("misc.bin"), QIODevice::WriteOnly));
     quint32 flags = m_readOnly ? QnLayoutFileStorageResource::ReadOnly : 0;
     foreach (const QnMediaResourcePtr resource, m_resources) {
-        if (resource->toResource()->hasFlags(QnResource::utc)) {
+        if (resource->toResource()->hasFlags(Qn::utc)) {
             flags |= QnLayoutFileStorageResource::ContainsCameras;
             break;
         }
@@ -271,7 +271,7 @@ void QnLayoutExportTool::finishExport(bool success) {
         else {
             QnLayoutResourcePtr layout =  QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl());
             if (!resourcePool()->getResourceById(layout->getUniqueId())) {
-                layout->setStatus(QnResource::Online);
+                layout->setStatus(Qn::Online);
                 resourcePool()->addResource(layout);
             }
         }
@@ -296,7 +296,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
     QString uniqId = resource->toResource()->getUniqueId();
     uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
     QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
-    if (resource->toResource()->hasFlags(QnResource::utc))
+    if (resource->toResource()->hasFlags(Qn::utc))
         role = QnStreamRecorder::Role_FileExportWithEmptyContext;
     QnLayoutItemData itemData = m_layout->getItem(uniqId);
 

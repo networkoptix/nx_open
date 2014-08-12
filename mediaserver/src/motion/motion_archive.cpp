@@ -4,6 +4,8 @@
 #include "utils/common/util.h"
 #include "motion_helper.h"
 
+#include <core/resource/security_cam_resource.h>
+
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 

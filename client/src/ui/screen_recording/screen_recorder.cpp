@@ -68,7 +68,7 @@ void QnScreenRecorder::startRecording() {
         return;
     }
 
-    m_dataProvider = dynamic_cast<QnDesktopDataProviderWrapper*> (res->createDataProvider(QnResource::Role_Default));
+    m_dataProvider = dynamic_cast<QnDesktopDataProviderWrapper*> (res->createDataProvider(Qn::CR_Default));
     m_recorder = new QnStreamRecorder(res->toResourcePtr());
     m_dataProvider->addDataProcessor(m_recorder);
     m_recorder->setFileName(filePath);

@@ -47,14 +47,14 @@ void fromApiToResource(const ApiBusinessRuleData &src, QnBusinessEventRulePtr &d
     dst->setId(src.id);
     dst->setEventType(src.eventType);
 
-    dst->setEventResources(QVector<QnId>::fromStdVector(src.eventResourceIds));
+    dst->setEventResources(QVector<QUuid>::fromStdVector(src.eventResourceIds));
 
     dst->setEventParams(QnBusinessEventParameters::fromBusinessParams(deserializeBusinessParams(src.eventCondition)));
 
     dst->setEventState(src.eventState);
     dst->setActionType(src.actionType);
 
-    dst->setActionResources(QVector<QnId>::fromStdVector(src.actionResourceIds));
+    dst->setActionResources(QVector<QUuid>::fromStdVector(src.actionResourceIds));
 
     dst->setActionParams(QnBusinessActionParameters::fromBusinessParams(deserializeBusinessParams(src.actionParams)));
 
@@ -119,7 +119,7 @@ void fromApiToResource(const ApiBusinessActionData &src, QnAbstractBusinessActio
     dst->setToggleState(src.toggleState);
     dst->setReceivedFromRemoteHost(src.receivedFromRemoteHost);
 
-    dst->setResources(QVector<QnId>::fromStdVector(src.resourceIds));
+    dst->setResources(QVector<QUuid>::fromStdVector(src.resourceIds));
 
     dst->setParams(QnBusinessActionParameters::fromBusinessParams(deserializeBusinessParams(src.params)));
 
@@ -139,7 +139,7 @@ void fromResourceToApi(const QnScheduleTask &src, ApiScheduleTaskData &dst) {
     dst.fps = src.getFps();
 }
 
-void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QnId &resourceId) {
+void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QUuid &resourceId) {
     dst = QnScheduleTask(resourceId, src.dayOfWeek, src.startTime, src.endTime, src.recordingType, src.beforeThreshold, src.afterThreshold, src.streamQuality, src.fps, src.recordAudio);
 }
 
@@ -150,7 +150,7 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     { // test if the camera is desktop camera
         auto resType = qnResTypePool->desktopCameraResourceType();
         if (resType && resType->getId() == src.typeId)
-            dst->addFlags(QnResource::desktop_camera);
+            dst->addFlags(Qn::desktop_camera);
     }
 
     dst->setScheduleDisabled(!src.scheduleEnabled);
@@ -586,7 +586,7 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
     dst.name = src->getName();
     dst.url = src->getUrl();
     //dst.status = src->getStatus();
-    dst.status = QnResource::NotDefined; // status field MUST be modified via setStatus call only
+    dst.status = Qn::NotDefined; // status field MUST be modified via setStatus call only
 
     QnParamList params = src->getResourceParamList();
     for(const QnParam &srcParam: src->getResourceParamList().list())

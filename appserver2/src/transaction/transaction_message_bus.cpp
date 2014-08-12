@@ -142,7 +142,7 @@ void QnTransactionMessageBus::initStaticInstance(QnTransactionMessageBus* instan
 }
 
 QnTransactionMessageBus::QnTransactionMessageBus(): 
-    m_localPeer(QnId(), Qn::PT_Server),
+    m_localPeer(QUuid(), Qn::PT_Server),
     m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
@@ -181,7 +181,7 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
     delete m_timer;
 }
 
-void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QnId& gotFromPeer)
+void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QUuid& gotFromPeer)
 {
     AlivePeersMap::iterator itr = m_alivePeers.find(peerData.id);
     if (itr == m_alivePeers.end()) 
@@ -198,7 +198,7 @@ void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QnId&
     }
 }
 
-void QnTransactionMessageBus::removeAlivePeer(const QnId& id, bool isProxy)
+void QnTransactionMessageBus::removeAlivePeer(const QUuid& id, bool isProxy)
 {
     // 1. remove peer from alivePeers map
 
@@ -214,7 +214,7 @@ void QnTransactionMessageBus::removeAlivePeer(const QnId& id, bool isProxy)
     // 2. remove peers proxy via current peer
     if (isProxy)
         return;
-    QSet<QnId> morePeersToRemove;
+    QSet<QUuid> morePeersToRemove;
     for (auto itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
         AlivePeerInfo& otherPeer = itr.value();
@@ -225,11 +225,11 @@ void QnTransactionMessageBus::removeAlivePeer(const QnId& id, bool isProxy)
             }
         }
     }
-    foreach(const QnId& p, morePeersToRemove)
+    foreach(const QUuid& p, morePeersToRemove)
         removeAlivePeer(p, true);
 }
 
-void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QnId& gotFromPeer)
+void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QUuid& gotFromPeer)
 {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
     qDebug() << "received peerAlive transaction" << tran.params.peer.id << tran.params.peer.peerType;
@@ -468,7 +468,7 @@ bool QnTransactionMessageBus::doHandshake(QnTransactionTransport* transport)
         }
 
         ec2::ApiCameraDataList cameras;
-        if (dbManager->doQuery(QnId(), cameras) != ErrorCode::ok) {
+        if (dbManager->doQuery(QUuid(), cameras) != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
         }
@@ -530,7 +530,7 @@ bool QnTransactionMessageBus::doHandshake(QnTransactionTransport* transport)
     return true;
 }
 
-void QnTransactionMessageBus::connectToPeerLost(const QnId& id)
+void QnTransactionMessageBus::connectToPeerLost(const QUuid& id)
 {
     if (!m_alivePeers.contains(id)) 
         return;    

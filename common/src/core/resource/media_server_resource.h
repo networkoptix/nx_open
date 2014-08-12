@@ -53,7 +53,7 @@ public:
     Qn::ServerFlags getServerFlags() const;
     void setServerFlags(Qn::ServerFlags flags);
 
-    //virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+    //virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
 
     QString getProxyHost();
     int getProxyPort();
@@ -74,7 +74,7 @@ public:
     void setAuthKey(const QString& value);
 
     static bool isEdgeServer(const QnResourcePtr &resource);
-    virtual void setStatus(Status newStatus, bool silenceMode = false) override;
+    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
@@ -107,7 +107,7 @@ private:
 class QnMediaServerResourceFactory : public QnResourceFactory
 {
 public:
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
+    QnResourcePtr createResource(QUuid resourceTypeId, const QnResourceParams& params);
 };
 
 Q_DECLARE_METATYPE(QnMediaServerResourcePtr);

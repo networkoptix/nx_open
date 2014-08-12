@@ -265,7 +265,7 @@ void QnServerSettingsDialog::updateFromResources()
     m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
     updateRebuildUi(RebuildState::Invalid);
 
-    if (m_server->getStatus() == QnResource::Online)
+    if (m_server->getStatus() == Qn::Online)
         sendNextArchiveRequest();
 
     setTableItems(QList<QnStorageSpaceData>());
@@ -452,7 +452,7 @@ void QnServerSettingsDialog::at_rebuildButton_clicked()
 
 void QnServerSettingsDialog::at_updateRebuildInfo()
 {
-    if (m_server->getStatus() == QnResource::Online)
+    if (m_server->getStatus() == Qn::Online)
         sendNextArchiveRequest();
     else
         updateRebuildUi(RebuildState::Invalid);

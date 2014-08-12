@@ -16,7 +16,7 @@ namespace ec2
         float right;
         float bottom;
         float rotation;
-        QnId resourceId;
+        QUuid resourceId;
         QString resourcePath;
         float zoomLeft;
         float zoomTop;
@@ -31,7 +31,7 @@ namespace ec2
 
 
     struct ApiLayoutItemWithRefData: ApiLayoutItemData {
-        QnId layoutId;
+        QUuid layoutId;
     };
 #define ApiLayoutItemWithRefData_Fields ApiLayoutItemData_Fields (layoutId)
 

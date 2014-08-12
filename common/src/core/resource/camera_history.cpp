@@ -12,9 +12,9 @@ extern "C"
 #include <core/resource/media_server_resource.h>
 
 
-QnId QnCameraTimePeriod::getServerId() const
+QUuid QnCameraTimePeriod::getServerId() const
 {
-    QnId id;
+    QUuid id;
 
     QnResourcePtr resource = qnResPool->getResourceById(mediaServerGuid);
     if (resource)
@@ -46,7 +46,7 @@ QnCameraTimePeriodList QnCameraHistory::getOnlineTimePeriods() const
     for (QnCameraTimePeriodList::const_iterator itr = m_fullTimePeriods.constBegin(); itr != m_fullTimePeriods.constEnd(); ++itr)
     {
         QnResourcePtr resource = qnResPool->getResourceById(itr->mediaServerGuid);
-        if (resource && resource->getStatus() == QnResource::Online)
+        if (resource && resource->getStatus() == Qn::Online)
             result << *itr;        
     }
     return result;

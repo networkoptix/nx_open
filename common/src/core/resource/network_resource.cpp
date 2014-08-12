@@ -29,7 +29,7 @@ QnNetworkResource::QnNetworkResource():
     m_probablyNeedToUpdateStatus(false)
 {
     //TODO: #GDM #Common motion flag should be set in QnVirtualCameraResource depending on motion support
-    addFlags(network);
+    addFlags(Qn::network);
 }
 
 QnNetworkResource::~QnNetworkResource()
@@ -278,11 +278,11 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 }
 */
 
-QnId QnNetworkResource::uniqueIdToId(const QString& uniqId)
+QUuid QnNetworkResource::uniqueIdToId(const QString& uniqId)
 {
     Q_ASSERT(!uniqId.isEmpty());
     QCryptographicHash md5(QCryptographicHash::Md5);
     md5.addData(uniqId.toUtf8());
-    QnId id = QnId::fromRfc4122(md5.result());
+    QUuid id = QUuid::fromRfc4122(md5.result());
     return id;
 }

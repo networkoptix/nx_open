@@ -135,7 +135,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualC
     qint64 minTime = DATETIME_NOW;
     foreach(const QnMediaServerResourcePtr &server, checkServers) {
         RTPSession otherRtspSession;
-        if (server->getStatus() == QnResource::Offline)
+        if (server->getStatus() == Qn::Offline)
             continue;
 
         setupRtspSession(camera, server,  &otherRtspSession, false);
@@ -198,7 +198,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
 
     m_customVideoLayout.reset();
    
-    if (m_server == 0 || m_server->getStatus() == QnResource::Offline)
+    if (m_server == 0 || m_server->getStatus() == Qn::Offline)
         return false;
 
     setupRtspSession(m_camera, m_server, &m_rtspSession, m_playNowModeAllowed);
