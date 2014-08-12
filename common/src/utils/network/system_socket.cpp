@@ -616,8 +616,9 @@ public:
         {
             if( terminated )
                 return;     //most likely, socket has been removed in handler
+            QMutexLocker lk( aio::AIOService::instance()->mutex() );
             if( connectSendAsyncCallCounterBak == connectSendAsyncCallCounter )
-                aio::AIOService::instance()->removeFromWatch( sock, aio::etWrite );
+                aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etWrite );
             m_connectSendHandlerTerminatedFlag = nullptr;
         };
 
@@ -625,7 +626,6 @@ public:
         {
             recvBuffer = nullptr;
             auto recvHandlerBak = std::move( recvHandler );
-            //recvHandler = std::function<void( SystemError::ErrorCode, size_t )>();  //TODO #ak is it required?
             recvHandlerBak( errorCode, bytesRead );
         };
 
@@ -634,8 +634,9 @@ public:
         {
             if( terminated )
                 return;     //most likely, socket has been removed in handler
+            QMutexLocker lk( aio::AIOService::instance()->mutex() );
             if( recvAsyncCallCounterBak == recvAsyncCallCounter )
-                aio::AIOService::instance()->removeFromWatch( sock, aio::etRead );
+                aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etRead );
             m_recvHandlerTerminatedFlag = nullptr;
         };
 
@@ -644,7 +645,6 @@ public:
             sendBuffer = nullptr;
             sendBufPos = 0;
             auto sendHandlerBak = std::move( sendHandler );
-            //sendHandler = std::function<void( SystemError::ErrorCode, size_t )>();  //TODO #ak is it required?
             sendHandlerBak( errorCode, bytesSent );
         };
 
@@ -652,8 +652,9 @@ public:
         {
             if( terminated )
                 return;     //most likely, socket has been removed in handler
+            QMutexLocker lk( aio::AIOService::instance()->mutex() );
             if( connectSendAsyncCallCounterBak == connectSendAsyncCallCounter )
-                aio::AIOService::instance()->removeFromWatch( sock, aio::etWrite );
+                aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etWrite );
             m_connectSendHandlerTerminatedFlag = nullptr;
         };
 
@@ -1114,31 +1115,41 @@ bool CommunicatingSocket::connectAsyncImpl( const SocketAddress& addr, std::func
         return false;
 
     d->connectHandler = std::move(handler);
+
+    QMutexLocker lk( aio::AIOService::instance()->mutex() );
     ++d->connectSendAsyncCallCounter;
-    return aio::AIOService::instance()->watchSocket( m_abstractSocketPtr, aio::etWrite, d );
+    return aio::AIOService::instance()->watchSocketNonSafe( m_abstractSocketPtr, aio::etWrite, d );
 }
 
 bool CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
 {
+    assert( buf->capacity() > buf->size() );
+
     CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>( impl() );
 
     if( buf->capacity() == buf->size() )
         buf->reserve( DEFAULT_RESERVE_SIZE );
     d->recvBuffer = buf;
     d->recvHandler = std::move(handler);
+    
+    QMutexLocker lk( aio::AIOService::instance()->mutex() );
     ++d->recvAsyncCallCounter;
-    return aio::AIOService::instance()->watchSocket( m_abstractSocketPtr, aio::etRead, d );
+    return aio::AIOService::instance()->watchSocketNonSafe( m_abstractSocketPtr, aio::etRead, d );
 }
 
 bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
 {
-    CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>( impl() );
+    assert( buf.size() > 0 );
+
+    CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>(impl());
 
     d->sendBuffer = &buf;
     d->sendHandler = std::move(handler);
     d->sendBufPos = 0;
+
+    QMutexLocker lk( aio::AIOService::instance()->mutex() );
     ++d->connectSendAsyncCallCounter;
-    return aio::AIOService::instance()->watchSocket( m_abstractSocketPtr, aio::etWrite, d );
+    return aio::AIOService::instance()->watchSocketNonSafe( m_abstractSocketPtr, aio::etWrite, d );
 }
 
 
@@ -1410,9 +1421,12 @@ public:
                 break;
 
             case aio::etError:
-                //TODO/IMPL get correct socket error
-                acceptHandler( SystemError::connectionReset, nullptr );
+            {
+                SystemError::ErrorCode errorCode = SystemError::noError;
+                sock->getLastError( &errorCode );
+                acceptHandler( errorCode, nullptr );
                 break;
+            }
 
             default:
                 assert( false );

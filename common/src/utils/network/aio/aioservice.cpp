@@ -79,7 +79,34 @@ namespace aio
         AIOEventHandler* const eventHandler )
     {
         QMutexLocker lk( &m_mutex );
+        return watchSocketNonSafe( sock, eventToWatch, eventHandler );
+    }
 
+    //!Do not monitor \a sock for event \a eventType
+    /*!
+        Garantees that no \a eventTriggered will be called after return of this method
+    */
+    void AIOService::removeFromWatch(
+        AbstractSocket* const sock,
+        aio::EventType eventType,
+        bool waitForRunningHandlerCompletion )
+    {
+        QMutexLocker lk( &m_mutex );
+        return removeFromWatchNonSafe( sock, eventType, waitForRunningHandlerCompletion );
+    }
+
+    bool AIOService::isSocketBeingWatched(AbstractSocket* sock) const
+    {
+        QMutexLocker lk(&m_mutex);
+        const auto& it = m_sockets.lower_bound(std::make_pair(sock, aio::etNone));
+        return it != m_sockets.end() && it->first.first == sock;
+    }
+
+    bool AIOService::watchSocketNonSafe(
+        AbstractSocket* const sock,
+        aio::EventType eventToWatch,
+        AIOEventHandler* const eventHandler )
+    {
         unsigned int sockTimeoutMS = 0;
         if( eventToWatch == aio::etRead )
         {
@@ -118,9 +145,9 @@ namespace aio
         for( std::list<AIOThread*>::const_iterator
             threadIter = m_threadPool.begin();
             threadIter != m_threadPool.end();
-            ++threadIter )
+        ++threadIter )
         {
-            if( !(*threadIter)->canAcceptSocket(sock) )
+            if( !(*threadIter)->canAcceptSocket( sock ) )
                 continue;
             if( threadToUse && threadToUse->socketsHandled() < (*threadIter)->socketsHandled() )
                 continue;
@@ -130,7 +157,7 @@ namespace aio
         if( !threadToUse )
         {
             //creating new thread
-            std::unique_ptr<AIOThread> newThread( new AIOThread(&m_mutex) );
+            std::unique_ptr<AIOThread> newThread( new AIOThread( &m_mutex ) );
             newThread->start();
             if( !newThread->isRunning() )
                 return false;
@@ -147,17 +174,11 @@ namespace aio
         return false;
     }
 
-    //!Do not monitor \a sock for event \a eventType
-    /*!
-        Garantees that no \a eventTriggered will be called after return of this method
-    */
-    void AIOService::removeFromWatch(
+    void AIOService::removeFromWatchNonSafe(
         AbstractSocket* const sock,
         aio::EventType eventType,
         bool waitForRunningHandlerCompletion )
     {
-        QMutexLocker lk( &m_mutex );
-
         const pair<AbstractSocket*, aio::EventType>& sockCtx = make_pair( sock, eventType );
         map<pair<AbstractSocket*, aio::EventType>, AIOThread*>::iterator it = m_sockets.find( sockCtx );
         if( it != m_sockets.end() )
@@ -165,13 +186,6 @@ namespace aio
             if( it->second->removeFromWatch( sock, eventType, waitForRunningHandlerCompletion ) )
                 m_sockets.erase( it );
         }
-    }
-
-    bool AIOService::isSocketBeingWatched(AbstractSocket* sock) const
-    {
-        QMutexLocker lk(&m_mutex);
-        const auto& it = m_sockets.lower_bound(std::make_pair(sock, aio::etNone));
-        return it != m_sockets.end() && it->first.first == sock;
     }
 
     Q_GLOBAL_STATIC( AIOService, aioServiceInstance )
