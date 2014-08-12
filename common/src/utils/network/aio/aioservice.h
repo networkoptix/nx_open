@@ -67,7 +67,7 @@ namespace aio
         //!Returns \a true, if socket is still listened for state changes
         bool isSocketBeingWatched(AbstractSocket* sock) const;
 
-        QMutex* mutex() const { return &m_mutex; }
+        QMutex* mutex() const;
 
         //!Same as \a AIOService::watchSocket, but does not lock mutex. Calling entity MUST lock \a AIOService::mutex() before calling this method
         bool watchSocketNonSafe(

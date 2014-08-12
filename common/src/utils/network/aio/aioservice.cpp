@@ -116,15 +116,20 @@ namespace aio
         aio::EventType eventType,
         bool waitForRunningHandlerCompletion )
     {
-        QMutexLocker lk( &m_mutex );
+        QMutexLocker lk( &m_impl->m_mutex );
         return removeFromWatchNonSafe( sock, eventType, waitForRunningHandlerCompletion );
     }
 
-    bool AIOService::isSocketBeingWatched(AbstractSocket* sock) const
+    bool AIOService::isSocketBeingWatched( AbstractSocket* sock ) const
     {
-        QMutexLocker lk(&m_impl->m_mutex);
-        const auto& it = m_sockets.lower_bound(std::make_pair(sock, aio::etNone));
-        return it != m_sockets.end() && it->first.first == sock;
+        QMutexLocker lk( &m_impl->m_mutex );
+        const auto& it = m_impl->m_sockets.lower_bound( std::make_pair( sock, aio::etNone ) );
+        return it != m_impl->m_sockets.end() && it->first.first == sock;
+    }
+
+    QMutex* AIOService::mutex() const
+    {
+        return &m_impl->m_mutex;
     }
 
     bool AIOService::watchSocketNonSafe(
@@ -211,13 +216,6 @@ namespace aio
             if( it->second->removeFromWatch( sock, eventType, waitForRunningHandlerCompletion ) )
                 m_impl->m_sockets.erase( it );
         }
-    }
-
-    bool AIOService::isSocketBeingWatched(AbstractSocket* sock) const
-    {
-        QMutexLocker lk(&m_impl->m_mutex);
-        const auto& it = m_impl->m_sockets.lower_bound(std::make_pair(sock, aio::etNone));
-        return it != m_impl->m_sockets.end() && it->first.first == sock;
     }
 
     Q_GLOBAL_STATIC( AIOService, aioServiceInstance )
