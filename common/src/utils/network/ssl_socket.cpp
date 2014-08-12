@@ -169,7 +169,7 @@ void BufferShinrkTo( nx::Buffer* buffer , int from ) {
         return;
     Q_ASSERT(from <= buffer->size());
     if( from == buffer->size() ) {
-        buffer->clear();
+        buffer->resize(0);
     } else {
         QByteArray temp(buffer->constData() + from , static_cast<int>(buffer->size())-from);
         buffer->swap(temp);
@@ -427,7 +427,7 @@ private:
                         // append the buffer that has been written into 
                         // to the bio_in_buffer_ and later on SSL will use
                         bio_in_buffer_.append(*buffer.write_buffer);
-                        buffer.write_buffer->clear();
+                        buffer.write_buffer->resize(0);
                     }
                     // Then we need to call our self here 
                     ssl_perform(ec,bytes_transferred,op,buffer);
@@ -447,7 +447,7 @@ private:
                     Q_ASSERT( bytes_transferred == buffer.read_buffer->size() && 
                               buffer.read_buffer == &bio_out_buffer_  );
                     // since we have already sent the buffer there
-                    bio_out_buffer_.clear(); 
+                    bio_out_buffer_.resize(0); 
                     // This ssl_perform will cause SSL_ERROR_WANT_READ again
                     // and then it goes into the ssl_perform_read_and_write with
                     // an empty bio_out_buffer_, so it will go to another branch
@@ -465,7 +465,7 @@ private:
             Q_ASSERT( bytes_transferred == buffer.read_buffer->size() && 
                       buffer.read_buffer == &bio_out_buffer_ );
             // since we have already sent the buffer there
-            bio_out_buffer_.clear(); 
+            bio_out_buffer_.resize(0); 
             // we may want to extend more buffer for SSL
             bio_out_buffer_.reserve( 2*bio_out_buffer_.capacity() );
             // Then we need to call our self here 
@@ -485,7 +485,7 @@ private:
                     return;
                 }
                 // Clear the buffer here
-                bio_out_buffer_.clear();
+                bio_out_buffer_.resize(0);
                 // Invoke the callback, the final output has been stored inside
                 // of user data instead of buffer_t object. This is transient data
                 // object and we should not own this buffer object in any sense
@@ -496,7 +496,7 @@ private:
     }
 
     buffer_t make_read_write_buffer( std::size_t rcap, std::size_t wcap ) const {
-        recv_buffer_.clear();
+        recv_buffer_.resize(0);
         recv_buffer_.reserve( static_cast<int>(
             std::max(wcap,async_buffer_default_size)) );
         bio_out_buffer_.reserve(static_cast<int>(rcap));
@@ -533,7 +533,7 @@ public:
         if( bytes >0 )
             user_buffer_->resize(bytes);
         else
-            user_buffer_->clear();
+            user_buffer_->resize(0);
 
         *ssl_err = SSL_get_error(ssl(),bytes);
         return bytes;

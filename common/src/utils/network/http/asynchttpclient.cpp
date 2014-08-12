@@ -162,7 +162,7 @@ namespace nx_http
 
         NX_LOG( lit( "Http request has been successfully sent to %1" ).arg( m_url.toString() ), cl_logDEBUG2 );
         m_state = sReceivingResponse;
-        m_responseBuffer.clear();
+        m_responseBuffer.resize( 0 );
         if( !m_socket->setRecvTimeout( DEFAULT_RESPONSE_READ_TIMEOUT ) ||
             !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
         {
@@ -215,7 +215,7 @@ namespace nx_http
 
                 if( m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders )
                 {
-                    m_responseBuffer.clear();
+                    m_responseBuffer.resize( 0 );
                     if( !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
                     {
                         NX_LOG( lit( "Failed to read (1) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
@@ -290,7 +290,7 @@ namespace nx_http
                 if( m_httpStreamReader.state() == HttpStreamReader::readingMessageBody )
                 {
                     //reading more data
-                    m_responseBuffer.clear();
+                    m_responseBuffer.resize( 0 );
                     if( !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
                     {
                         NX_LOG( lit( "Failed to read (1) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
@@ -327,7 +327,7 @@ namespace nx_http
 
                 if( m_state != sFailed && m_state != sDone )
                 {
-                    m_responseBuffer.clear();
+                    m_responseBuffer.resize( 0 );
                     if( m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
                     {
                         return;
@@ -501,7 +501,7 @@ namespace nx_http
         else {
             m_state = sInit;
 
-            m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(url.scheme() == lit("https")) ); //TODO #ak uncomment when async ssl connection supported
+            m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/) ); //TODO #ak uncomment when async ssl connection supported
             if( !m_socket->setNonBlockingMode( true ) ||
                 !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) )
             {

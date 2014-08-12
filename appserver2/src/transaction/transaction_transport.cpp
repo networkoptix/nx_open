@@ -382,7 +382,7 @@ void QnTransactionTransport::cancelConnecting()
 
 void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
 {
-    if( errorCode )
+    if( errorCode || bytesRead == 0 )   //error or connection closed
         return setState( State::Error );
 
     assert( m_state == ReadyForStreaming );
@@ -440,7 +440,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 
         if( !m_readBufferLen )
         {
-            m_readBuffer.clear();
+            m_readBuffer.resize(0);
             break;  //processed all data
         }
     }
