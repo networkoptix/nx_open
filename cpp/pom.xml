@@ -368,6 +368,13 @@
             <id>android-qt</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>mobile</name>
+                    <value>android</value>
+                </property>
             </activation>
             <build>
                 <directory>${arch}</directory>
