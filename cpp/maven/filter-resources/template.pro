@@ -94,8 +94,10 @@ OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION
 MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
-LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib 
-LIBS += ${global.libs}
+LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib
+!android {
+    LIBS += ${global.libs}
+}
 
 INCLUDEPATH +=  ${qt.dir}/include \
                 ${qt.dir}/include/QtCore \
@@ -114,35 +116,43 @@ DEPENDPATH *= $${INCLUDEPATH}
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
 PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 
+android: {
+  QMAKE_PCH_OUTPUT_EXT    = .gch
 
-android:contains(QMAKE_HOST.os,Windows) {
-  # Support precompiled headers on android-mingw
-  QMAKE_CFLAGS_PRECOMPILE       = -x c-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}.gch
-  QMAKE_CFLAGS_USE_PRECOMPILE   = -include ${QMAKE_PCH_OUTPUT}
-  QMAKE_CXXFLAGS_PRECOMPILE     = -x c++-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}.gch
+  QMAKE_CFLAGS_PRECOMPILE       = -x c-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}
+  QMAKE_CFLAGS_USE_PRECOMPILE   = -include ${QMAKE_PCH_OUTPUT_BASE}
+  QMAKE_CXXFLAGS_PRECOMPILE     = -x c++-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}
   QMAKE_CXXFLAGS_USE_PRECOMPILE = $$QMAKE_CFLAGS_USE_PRECOMPILE
-
-  # Make sure moc files compile
-  QMAKE_CXXFLAGS += -fpermissive
-
-  # Replace slashes in paths with backslashes
-  OBJECTS_DIR ~= s,/,\\,g
-
-  # Work around CreateProcess limit on arg size
-  QMAKE_AR_CMD = \
-    del /F $$OBJECTS_DIR\\_list.bat                                                 $$escape_expand(\n\t)\
-                                                                                    $$escape_expand(\n\t)\
-    echo @echo off                          >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
-    echo setlocal EnableDelayedExpansion    >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
-    echo for %%%%i in (%%1) do (            >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
-    echo   set OBJECT=%%%%~fi               >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
-    echo   set OBJECT=!OBJECT:\\=/!         >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
-    echo   echo !OBJECT!                    >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
-    echo )                                  >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
-                                                                                    $$escape_expand(\n\t)\
-    $$OBJECTS_DIR\\_list.bat $$OBJECTS_DIR\\*.obj >$$OBJECTS_DIR\\_objects.lst      $$escape_expand(\n\t)\
-    $(AR) $(TARGET) @$$OBJECTS_DIR\\_objects.lst
 }
+
+# android:contains(QMAKE_HOST.os,Windows) {
+#   # Support precompiled headers on android-mingw
+#   QMAKE_CFLAGS_PRECOMPILE       = -x c-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}.gch
+#   QMAKE_CFLAGS_USE_PRECOMPILE   = -include ${QMAKE_PCH_OUTPUT}
+#   QMAKE_CXXFLAGS_PRECOMPILE     = -x c++-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}.gch
+#   QMAKE_CXXFLAGS_USE_PRECOMPILE = $$QMAKE_CFLAGS_USE_PRECOMPILE
+# 
+#   # Make sure moc files compile
+#   QMAKE_CXXFLAGS += -fpermissive
+# 
+#   # Replace slashes in paths with backslashes
+#   OBJECTS_DIR ~= s,/,\\,g
+# 
+#   # Work around CreateProcess limit on arg size
+#   QMAKE_AR_CMD = \
+#     del /F $$OBJECTS_DIR\\_list.bat                                                 $$escape_expand(\n\t)\
+#                                                                                     $$escape_expand(\n\t)\
+#     echo @echo off                          >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+#     echo setlocal EnableDelayedExpansion    >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+#     echo for %%%%i in (%%1) do (            >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+#     echo   set OBJECT=%%%%~fi               >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+#     echo   set OBJECT=!OBJECT:\\=/!         >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+#     echo   echo !OBJECT!                    >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+#     echo )                                  >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+#                                                                                     $$escape_expand(\n\t)\
+#     $$OBJECTS_DIR\\_list.bat $$OBJECTS_DIR\\*.obj >$$OBJECTS_DIR\\_objects.lst      $$escape_expand(\n\t)\
+#     $(AR) $(TARGET) @$$OBJECTS_DIR\\_objects.lst
+# }
 
 
 # Workaround for https://bugreports.qt-project.org/browse/QTBUG-29331
@@ -214,7 +224,7 @@ mac {
 ## ANDROID
 android {
   LIBS -= -lssl
-  LIBS += ${linux.arm.oslibs}
+  LIBS += ${android.oslibs}
 
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}

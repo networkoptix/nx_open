@@ -29,6 +29,7 @@
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar</windows.oslibs>
         <linux.oslibs>-lssl -lsigar</linux.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
+        <android.oslibs>-lquazip -lssl -lcrypto</android.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->

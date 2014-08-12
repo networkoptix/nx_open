@@ -31,6 +31,7 @@
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>                
         <mac.oslibs>-lssl -lcrypto -lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+        <android.oslibs>-lcommon -lssl -lcrypto</android.oslibs>
         <!--Global defines-->
         <global.defines></global.defines>
         <!--Specific os defines-->
