@@ -3,6 +3,7 @@
 
 #include <memory> // for auto_ptr
 
+#include <QtCore/QMutex>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
 #include <QtNetwork/QAuthenticator>

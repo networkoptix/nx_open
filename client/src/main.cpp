@@ -683,10 +683,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 }
 
 #include <QtCore/QStandardPaths>
-#include <QtCore/Qstring>
+#include <QtCore/QString>
 
 #include <QtCore/QStandardPaths>
-#include <QtCore/Qstring>
+#include <QtCore/QString>
 
 int main(int argc, char **argv)
 {
