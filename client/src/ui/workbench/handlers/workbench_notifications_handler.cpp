@@ -223,7 +223,7 @@ void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserRe
         setSystemHealthEventVisible( QnSystemHealth::UsersEmailIsEmpty, user.staticCast<QnResource>(), !isValid );
 }
 
-void QnWorkbenchNotificationsHandler::at_primaryTimeServerSelectionRequired( qint64 localSystemTime, const QList<QPair<QnId, qint64> >& peersAndTimes )
+void QnWorkbenchNotificationsHandler::at_primaryTimeServerSelectionRequired( qint64 localSystemTime, const QList<QPair<QUuid, qint64> >& peersAndTimes )
 {
     setSystemHealthEventVisible(
         QnSystemHealth::NoPrimaryTimeServer,

@@ -128,10 +128,10 @@ public:
 
     AbstractStreamSocket* getSocket() const;
 
-    static bool tryAcquireConnecting(const QUuid>& remoteGuid, bool isOriginator);
-    static bool tryAcquireConnected(const QUuid>& remoteGuid, bool isOriginator);
-    static void connectingCanceled(const QUuid>& id, bool isOriginator);
-    static void connectDone(const QUuid>& id);
+    static bool tryAcquireConnecting(const QUuid& remoteGuid, bool isOriginator);
+    static bool tryAcquireConnected(const QUuid& remoteGuid, bool isOriginator);
+    static void connectingCanceled(const QUuid& id, bool isOriginator);
+    static void connectDone(const QUuid& id);
 
 private:
     struct DataToSend
@@ -186,7 +186,7 @@ private:
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();
-    static void connectingCanceledNoLock(const QUuid>& remoteGuid, bool isOriginator);
+    static void connectingCanceledNoLock(const QUuid& remoteGuid, bool isOriginator);
     void addHttpChunkExtensions( std::vector<nx_http::ChunkExtension>* const chunkExtensions );
     void processChunkExtensions( const nx_http::ChunkHeader& httpChunkHeader );
     void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead );

@@ -283,7 +283,7 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode deleteTableRecord(const QUuid>& id, const QString& tableName, const QString& fieldName);
+        ErrorCode deleteTableRecord(const QUuid& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
         ErrorCode updateResource(const ApiResourceData& data, qint32 internalId);

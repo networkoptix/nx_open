@@ -43,7 +43,7 @@ namespace ec2
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) override;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
         virtual int restoreDatabaseAsync( const ApiDatabaseDumpData& dbFile, impl::SimpleHandlerPtr handler ) override;
-        virtual int forcePrimaryTimeServer( const QnId& serverGuid, impl::SimpleHandlerPtr handler ) override;
+        virtual int forcePrimaryTimeServer( const QUuid& serverGuid, impl::SimpleHandlerPtr handler ) override;
 
     private:
         QnConnectionInfo m_connectionInfo;

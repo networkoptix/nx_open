@@ -41,7 +41,7 @@ public slots:
 private slots:
     void at_context_userChanged();
     void at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid);
-    void at_primaryTimeServerSelectionRequired( qint64 localSystemTime, const QList<QPair<QnId, qint64> >& peersAndTimes );
+    void at_primaryTimeServerSelectionRequired( qint64 localSystemTime, const QList<QPair<QUuid, qint64> >& peersAndTimes );
 
     void at_eventManager_connectionOpened();
     void at_eventManager_connectionClosed();

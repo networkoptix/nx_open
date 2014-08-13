@@ -47,7 +47,7 @@ namespace ec2
     };
 
     //list<pair<peerid, peer system time (UTC, millis from epoch)> >
-    typedef QList<QPair<QnId, qint64>> QnPeerTimeInfoList;
+    typedef QList<QPair<QUuid, qint64>> QnPeerTimeInfoList;
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -781,7 +781,8 @@ namespace ec2
         }
 
         //!Set peer identified by \a serverGuid to be primary time server (every other peer synchronizes time with server \a serverGuid)
-        template<class TargetType, class HandlerType> int forcePrimaryTimeServer( const QnId& serverGuid, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int forcePrimaryTimeServer( const QUuid& serverGuid, TargetType* target, HandlerType handler )
+        {
             return forcePrimaryTimeServer(
                 serverGuid,
                 std::static_pointer_cast<impl::SimpleHandler>(
@@ -845,7 +846,7 @@ namespace ec2
     protected:
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) = 0;
-        virtual int forcePrimaryTimeServer( const QnId& serverGuid, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int forcePrimaryTimeServer( const QUuid& serverGuid, impl::SimpleHandlerPtr handler ) = 0;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) = 0;
     };  
