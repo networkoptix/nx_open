@@ -174,13 +174,16 @@ bool QnStorageDb::createDatabase()
 }
 
 bool QnStorageDb::initializeBookmarksFtsTable() {
-
+#ifdef QN_ENABLE_BOOKMARKS
     return 
         execSQLQuery("CREATE VIRTUAL TABLE fts_bookmarks USING fts3(name, description)", m_sdb) &&
         execSQLQuery("CREATE VIRTUAL TABLE fts_bookmark_tags USING fts3(name)", m_sdb) &&
         execSQLQuery("INSERT INTO fts_bookmarks(docid, name, description) SELECT rowid, name, description FROM storage_bookmark", m_sdb) &&
         execSQLQuery("INSERT INTO fts_bookmark_tags(docid, name) SELECT rowid, name FROM storage_bookmark_tag", m_sdb)
         ;
+#else
+    return true;
+#endif
 }
 
 
