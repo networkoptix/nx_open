@@ -61,8 +61,6 @@ bool DaytimeNISTFetcher::getTimeAsync( std::function<void(qint64, SystemError::E
 
     m_handlerFunc = [this, handlerFunc]( qint64 timestamp, SystemError::ErrorCode error )
     {
-        m_tcpSock->cancelAsyncIO( aio::etRead );
-        m_tcpSock->cancelAsyncIO( aio::etWrite );
         m_tcpSock.reset();
         handlerFunc( timestamp, error );
     };

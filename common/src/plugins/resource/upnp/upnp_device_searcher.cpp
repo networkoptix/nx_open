@@ -123,7 +123,6 @@ void UPNPDeviceSearcher::pleaseStop()
         it != m_socketList.end();
         ++it )
     {
-        //aio::AIOService::instance()->removeFromWatch( it->second.get(), aio::etRead );
         it->second.sock->cancelAsyncIO( aio::etRead );
     }
     m_socketList.clear();
@@ -270,68 +269,6 @@ void UPNPDeviceSearcher::onSomeBytesRead(
     startFetchDeviceXml( uuidStr, descriptionUrl, remoteHost );
 }
 
-//void UPNPDeviceSearcher::eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw()
-//{
-//    if( eventType == aio::etError )
-//    {
-//        std::shared_ptr<AbstractDatagramSocket> udpSock;
-//        {
-//            QMutexLocker lk( &m_mutex );
-//            //removing socket from m_socketList
-//            for( map<QString, SocketReadCtx>::iterator
-//                it = m_socketList.begin();
-//                it != m_socketList.end();
-//                ++it )
-//            {
-//                if( it->second.get() == sock ) {
-//                    udpSock = it->second;
-//                    m_socketList.erase( it );
-//                    break;
-//                }
-//            }
-//        }
-//        if( udpSock )
-//            aio::AIOService::instance()->removeFromWatch( udpSock.get(), aio::etRead );
-//        return;
-//    }
-//
-//    nx_http::Request foundDeviceReply;
-//    QString remoteHost;
-//
-//    AbstractDatagramSocket* udpSock = dynamic_cast<AbstractDatagramSocket*>( sock );
-//    Q_ASSERT( udpSock );
-//
-//    {
-//        QMutexLocker lk( &m_mutex );    //locking m_readBuf
-//
-//        //reading socket and parsing UPnP response packet
-//        quint16 senderPort;
-//        int readed = udpSock->recvFrom( m_readBuf, READ_BUF_CAPACITY, remoteHost, senderPort );
-//        if( readed > 0 )
-//            m_readBuf[readed] = 0;
-//        if( !foundDeviceReply.parse( QByteArray::fromRawData(m_readBuf, readed) ) )
-//            return;
-//    }
-//
-//    nx_http::HttpHeaders::const_iterator locationHeader = foundDeviceReply.headers.find( "LOCATION" );
-//    if( locationHeader == foundDeviceReply.headers.end() )
-//        return;
-//
-//    nx_http::HttpHeaders::const_iterator uuidHeader = foundDeviceReply.headers.find( "USN" );
-//    if( uuidHeader == foundDeviceReply.headers.end() )
-//        return;
-//
-//    QByteArray uuidStr = uuidHeader->second;
-//    if (!uuidStr.startsWith("uuid:"))
-//        return;
-//    uuidStr = uuidStr.split(':')[1];
-//
-//    const QUrl descriptionUrl( QLatin1String(locationHeader->second) );
-//    uuidStr += descriptionUrl.toString();
-//
-//    startFetchDeviceXml( uuidStr, descriptionUrl, remoteHost );
-//}
-
 void UPNPDeviceSearcher::dispatchDiscoverPackets()
 {
     foreach( QnInterfaceAndAddr iface, getAllIPv4Interfaces() )
@@ -376,7 +313,6 @@ std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const
         !sock->joinGroup( groupAddress.toString(), iface.address.toString() ) ||
         !sock->setMulticastIF( localAddress ) ||
         !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ) ||
-        //!aio::AIOService::instance()->watchSocket( sock.get(), aio::etRead, this ) )
         !sock->readSomeAsync( &p.first->second.buf, std::bind( &UPNPDeviceSearcher::onSomeBytesRead, this, sock.get(), _1, &p.first->second.buf, _2 ) ) )
     {
         QMutexLocker lk( &m_mutex );
