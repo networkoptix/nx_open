@@ -47,7 +47,7 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
     QMutexLocker mtx(&m_mutex);
 
     QString resolution;
-    if (getRole() == QnResource::Role_LiveVideo)
+    if (getRole() == Qn::CR_LiveVideo)
         resolution = QLatin1String("full");
     else
         resolution = QLatin1String("half");

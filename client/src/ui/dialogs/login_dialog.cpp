@@ -91,7 +91,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 
     QnAviResourcePtr resource = QnAviResourcePtr(new QnAviResource(lit("qtfile://") + introPath));
     if (FileTypeSupport::isImageFileExt(introPath))
-        resource->addFlags(QnResource::still_image);
+        resource->addFlags(Qn::still_image);
 
     m_renderingWidget = QnGlWidgetFactory::create<QnRenderingWidget>();
     m_renderingWidget->setResource(resource);

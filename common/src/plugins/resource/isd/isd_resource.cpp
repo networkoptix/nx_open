@@ -59,7 +59,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        setStatus(Unauthorized);
+        setStatus(Qn::Unauthorized);
         return CameraDiagnostics::UnknownErrorResult();
     }
 
@@ -154,7 +154,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        setStatus(Unauthorized);
+        setStatus(Qn::Unauthorized);
         QUrl requestedUrl;
         requestedUrl.setHost( getHostAddress() );
         requestedUrl.setPort( 80 );

@@ -99,7 +99,7 @@ int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params
         return CODE_INVALID_PARAMETER;
     }
 
-    if (camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
+    if (camera->getStatus() == Qn::Offline || camera->getStatus() == Qn::Unauthorized) {
         result.setError(QnJsonRestResult::InvalidParameter, lit("Camera resource '%1' is not ready yet.").arg(resourceId));
         return CODE_INVALID_PARAMETER;
     }

@@ -28,7 +28,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
             assert( tran.command == ApiCommand::removeMediaServer );
-            emit removed( QnId(tran.params.id) );
+            emit removed( QUuid(tran.params.id) );
         }
 
     protected:
@@ -50,13 +50,13 @@ namespace ec2
         //!Implementation of QnMediaServerManager::saveServer
         virtual int save( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::remove
-        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
+        virtual int remove( const QUuid& id, impl::SimpleHandlerPtr handler ) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
 
         QnTransaction<ApiMediaServerData> prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource );
-        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
+        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QUuid& id );
     };
 }
 

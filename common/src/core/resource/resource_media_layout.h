@@ -1,8 +1,6 @@
 #ifndef QN_RESOURCE_LAYOUT_H
 #define QN_RESOURCE_LAYOUT_H
 
-#define CL_MAX_CHANNELS 4 // TODO: #Elric get rid of this definition
-
 #include <memory>
 
 #include <QtCore/QVector>

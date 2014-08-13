@@ -50,19 +50,19 @@ void QnBusinessEventParameters::setEventTimestamp(qint64 value) {
     m_timestamp = value;
 }
 
-QnId QnBusinessEventParameters::getEventResourceId() const {
+QUuid QnBusinessEventParameters::getEventResourceId() const {
     return m_resourceId;
 }
 
-void QnBusinessEventParameters::setEventResourceId(const QnId& value) {
+void QnBusinessEventParameters::setEventResourceId(const QUuid& value) {
     m_resourceId = value;
 }
 
-QnId QnBusinessEventParameters::getActionResourceId() const {
+QUuid QnBusinessEventParameters::getActionResourceId() const {
     return m_actionResourceId;
 }
 
-void QnBusinessEventParameters::setActionResourceId(const QnId& value) {
+void QnBusinessEventParameters::setActionResourceId(const QUuid& value) {
     m_actionResourceId = value;
 }
 
@@ -163,10 +163,10 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
                     result.m_timestamp = toInt64(field);
                     break;
                 case EventResourceParam:
-                    result.m_resourceId = QnId(field);
+                    result.m_resourceId = QUuid(field);
                     break;
                 case ActionResourceParam:
-                    result.m_actionResourceId = QnId(field);
+                    result.m_actionResourceId = QUuid(field);
                     break;
 
                 // event specific params.
@@ -214,9 +214,9 @@ static void serializeStringParam(QByteArray& result, const QString& value, const
     result += DELIMITER;
 }
 
-static void serializeQnIdParam(QByteArray& result, const QnId& value)
+static void serializeQnIdParam(QByteArray& result, const QUuid& value)
 {
-    if (value != QnId()) {
+    if (value != QUuid()) {
         QByteArray data = value.toByteArray();
         result += data;
     }
@@ -338,10 +338,10 @@ QnBusinessEventParameters QnBusinessEventParameters::fromBusinessParams(const Qn
                 result.m_timestamp = itr.value().toLongLong();
                 break;
             case EventResourceParam:
-                result.m_resourceId = itr.value().toString();
+                result.m_resourceId = QUuid(itr.value().toString());
                 break;
             case ActionResourceParam:
-                result.m_actionResourceId = itr.value().toString();
+                result.m_actionResourceId = QUuid(itr.value().toString());
                 break;
 
                 // event specific params.

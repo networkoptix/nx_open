@@ -484,7 +484,7 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
             ? qnResPool->getResourceById(data.resource.id)
             : qnResPool->getResourceByUniqId(data.resource.path); //TODO: #EC2
 
-    bool isServer = resource && (resource->flags() & QnResource::server);
+    bool isServer = resource && (resource->flags() & Qn::server);
 
     if (isServer && !m_widget->m_thumbs.contains(resource->getId())) {
         m_widget->m_thumbs[resource->getId()] = qnSkin->pixmap("events/thumb_server.png");
@@ -537,7 +537,7 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
         return true;
     }
 
-    if (resource && (resource->flags() & QnResource::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
+    if (resource && (resource->flags() & Qn::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
         m_widget->m_thumbnailManager->selectResource(resource);
         return false;
     }

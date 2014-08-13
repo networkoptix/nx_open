@@ -15,6 +15,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/environment.h>
 
+#include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/file_processor.h>
 #include <core/resource_management/resource_discovery_manager.h>

@@ -3,6 +3,8 @@
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
 
+#include <core/resource/media_resource.h>
+
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/common/geometry.h>
 

@@ -50,7 +50,7 @@ public:
     }
 
 private:
-    QnId m_resourceId;
+    QUuid m_resourceId;
     QScopedPointer<QnPtzHotkeysResourcePropertyAdaptor> m_adaptor;
 };
 
@@ -102,7 +102,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
     QnResourcePtr resource = widget->resource()->toResourcePtr();
 
     //TODO: #GDM #PTZ fix the text
-    if(resource->getStatus() == QnResource::Offline || resource->getStatus() == QnResource::Unauthorized) {
+    if(resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not get position from camera"),
@@ -144,7 +144,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
         if (!widget->dewarpingParams().enabled) // do not jump to live if this is a fisheye camera
             action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
     } else {
-        if(resource->getStatus() == QnResource::Offline || resource->getStatus() == QnResource::Unauthorized) {
+        if(resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized) {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Could not set position for camera"),
@@ -178,7 +178,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered() {
         if (!widget->dewarpingParams().enabled) // do not jump to live if this is a fisheye camera
             action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
     } else {
-        if(resource->getStatus() == QnResource::Offline || resource->getStatus() == QnResource::Unauthorized) {
+        if(resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized) {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Could not set position to camera"),

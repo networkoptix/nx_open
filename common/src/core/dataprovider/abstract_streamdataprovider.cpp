@@ -7,7 +7,7 @@
 QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(const QnResourcePtr& resource):
     QnResourceConsumer(resource),
     m_mutex(QMutex::Recursive),
-    m_role(QnResource::Role_Default)
+    m_role(Qn::CR_Default)
 {
 }
 
@@ -83,7 +83,7 @@ void QnAbstractStreamDataProvider::beforeDisconnectFromResource()
     pleaseStop();
 }
 
-void QnAbstractStreamDataProvider::setRole(QnResource::ConnectionRole role)
+void QnAbstractStreamDataProvider::setRole(Qn::ConnectionRole role)
 {
     m_role = role;
 }

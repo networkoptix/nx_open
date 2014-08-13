@@ -152,7 +152,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
     QMutexLocker lock(&m_exportMutex);
     if (m_exportRecorder == 0)
     {
-        QnAbstractStreamDataProvider* tmpReader = m_resource->toResource()->createDataProvider(QnResource::Role_Default);
+        QnAbstractStreamDataProvider* tmpReader = m_resource->toResource()->createDataProvider(Qn::CR_Default);
         m_exportReader = dynamic_cast<QnAbstractArchiveReader*> (tmpReader);
         if (!m_exportReader)
         {

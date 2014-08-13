@@ -56,7 +56,7 @@ public:
     QModelIndex index(const QnMediaServerResourcePtr &server) const;
 
     QnMediaServerResourceList servers() const;
-    void setUpdatesInformation(const QHash<QnId, QnMediaServerUpdateTool::PeerUpdateInformation> &updates);
+    void setUpdatesInformation(const QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> &updates);
     void setUpdateInformation(const QnMediaServerUpdateTool::PeerUpdateInformation &update);
 
 private:
@@ -69,7 +69,7 @@ private slots:
 
 private:
     QList<Item*> m_items;
-    QHash<QnId, QnMediaServerUpdateTool::PeerUpdateInformation> m_updates;
+    QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> m_updates;
 };
 
 #endif // SERVER_UPDATES_MODEL_H

@@ -25,7 +25,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
     m_state(Normal),
     m_bastard(false),
     m_parent(NULL),
-    m_status(QnResource::Online),
+    m_status(Qn::Online),
     m_modified(false),
     m_checked(Qt::Unchecked)
 {
@@ -77,7 +77,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
     m_state(Invalid),
     m_bastard(false),
     m_parent(NULL),
-    m_status(QnResource::Offline),
+    m_status(Qn::Offline),
     m_modified(false),
     m_checked(Qt::Unchecked)
 {
@@ -100,7 +100,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
     m_state(Invalid),
     m_bastard(false),
     m_parent(NULL),
-    m_status(QnResource::Offline),
+    m_status(Qn::Offline),
     m_modified(false),
     m_checked(Qt::Unchecked)
 {
@@ -155,7 +155,7 @@ void QnResourcePoolModelNode::update() {
         if(m_resource.isNull()) {
             m_displayName = m_name = QString();
             m_flags = 0;
-            m_status = QnResource::Online;
+            m_status = Qn::Online;
             m_searchString = QString();
             m_icon = QIcon();
         } else {
@@ -169,7 +169,7 @@ void QnResourcePoolModelNode::update() {
     } else if (m_type == Qn::VideoWallItemNode) {
         m_searchString = QString();
         m_flags = 0;
-        m_status = QnResource::Offline;
+        m_status = Qn::Offline;
         m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Offline);
 
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
@@ -177,7 +177,7 @@ void QnResourcePoolModelNode::update() {
             QnVideoWallItem item = index.item();
 
             if (item.online) {
-                m_status = QnResource::Online;
+                m_status = Qn::Online;
                 m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem);              
             }
 
@@ -186,7 +186,7 @@ void QnResourcePoolModelNode::update() {
             } else {
                 m_name = item.name;
                 QString resourceName = m_resource->getName();
-                if (m_flags & QnResource::desktop_camera)
+                if (m_flags & Qn::desktop_camera)
                     resourceName = tr("%1's Screen", "%1 means user's name").arg(resourceName);
                 m_displayName = QString(QLatin1String("%1 <%2>")).arg(item.name).arg(resourceName);
             }
@@ -194,7 +194,7 @@ void QnResourcePoolModelNode::update() {
             m_displayName = m_name = QString();
         }
     } else if (m_type == Qn::VideoWallMatrixNode) {
-        m_status = QnResource::Online;
+        m_status = Qn::Online;
         m_searchString = QString();
         m_flags = 0; 
         m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallMatrix);
@@ -228,11 +228,11 @@ void QnResourcePoolModelNode::update() {
                 bastard |= layout->data().contains(Qn::LayoutSearchStateRole);
             }
         if(!bastard)
-            bastard = (m_flags & QnResource::desktop_camera) == QnResource::desktop_camera; /* Hide desktop camera resources from the tree. */
+            bastard = (m_flags & Qn::desktop_camera) == Qn::desktop_camera; /* Hide desktop camera resources from the tree. */
         if(!bastard)
-            bastard = (m_flags & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
+            bastard = (m_flags & Qn::local_server) == Qn::local_server; /* Hide local server resource. */
         if(!bastard)
-            bastard = (m_flags & QnResource::local_media) == QnResource::local_media && m_resource->getUrl().startsWith(QLatin1String("layout://")); //TODO: #Elric hack hack hack
+            bastard = (m_flags & Qn::local_media) == Qn::local_media && m_resource->getUrl().startsWith(QLatin1String("layout://")); //TODO: #Elric hack hack hack
         if (!bastard)
             bastard = QnMediaServerResource::isEdgeServer(m_resource);
         break;
@@ -276,11 +276,11 @@ const QnResourcePtr& QnResourcePoolModelNode::resource() const {
     return m_resource;
 }
 
-QnResource::Flags QnResourcePoolModelNode::resourceFlags() const {
+Qn::ResourceFlags QnResourcePoolModelNode::resourceFlags() const {
     return m_flags;
 }
 
-QnResource::Status QnResourcePoolModelNode::resourceStatus() const {
+Qn::ResourceStatus QnResourcePoolModelNode::resourceStatus() const {
     return m_status;
 }
 
@@ -409,7 +409,7 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
     case Qn::ResourceNode:
     case Qn::EdgeNode:
     case Qn::ItemNode:
-        if(m_flags & (QnResource::media | QnResource::layout | QnResource::server | QnResource::user | QnResource::videowall))
+        if(m_flags & (Qn::media | Qn::layout | Qn::server | Qn::user | Qn::videowall))
             result |= Qt::ItemIsDragEnabled;
         break;
     case Qn::VideoWallItemNode: //TODO: #GDM #VW drag of empty item on scene should create new layout
@@ -475,17 +475,17 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
             return Qn::MainWindow_Tree_Local_Help;
         } else if(m_type == Qn::RecorderNode) {
             return Qn::MainWindow_Tree_Recorder_Help;
-        } else if(m_flags & QnResource::layout) {
+        } else if(m_flags & Qn::layout) {
             if(m_model->context()->snapshotManager()->isFile(m_resource.dynamicCast<QnLayoutResource>())) {
                 return Qn::MainWindow_Tree_MultiVideo_Help;
             } else {
                 return Qn::MainWindow_Tree_Layouts_Help;
             }
-        } else if(m_flags & QnResource::user) {
+        } else if(m_flags & Qn::user) {
             return Qn::MainWindow_Tree_Users_Help;
-        } else if(m_flags & QnResource::local) {
+        } else if(m_flags & Qn::local) {
             return Qn::MainWindow_Tree_Local_Help;
-        } else if(m_flags & QnResource::server) {
+        } else if(m_flags & Qn::server) {
             return Qn::MainWindow_Tree_Servers_Help;
         } else {
             return -1;
