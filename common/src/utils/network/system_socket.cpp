@@ -54,8 +54,6 @@ static const int ERR_TIMEOUT = ETIMEDOUT;
 static const int ERR_WOULDBLOCK = EWOULDBLOCK;
 #endif
 
-//TODO/IMPL set prevErrorCode to noError in case of success
-
 int getSystemErrCode()
 {
 #ifdef WIN32
@@ -864,7 +862,16 @@ CommunicatingSocket::CommunicatingSocket( AbstractSocket* abstractSocketPtr, int
 
 CommunicatingSocket::~CommunicatingSocket()
 {
-    //TODO #ak cancel ongoing async I/O
+    CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>(impl());
+
+    //cancel ongoing async I/O. Doing this only if CommunicatingSocketPrivate::eventTriggered is down the stack
+    if( d->threadHandlerIsRunningIn == QThread::currentThreadId() )
+    {
+        if( d->m_connectSendHandlerTerminatedFlag )
+            aio::AIOService::instance()->removeFromWatch( m_abstractSocketPtr, aio::etWrite );
+        if( d->m_recvHandlerTerminatedFlag )
+            aio::AIOService::instance()->removeFromWatch( m_abstractSocketPtr, aio::etRead );
+    }
 }
 
 //!Implementation of AbstractCommunicatingSocket::connect
