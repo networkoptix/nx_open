@@ -96,11 +96,6 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
     });
 
 
-    connect( QnAppServerConnectionFactory::getConnection2().get(), &ec2::AbstractECConnection::primaryTimeServerSelectionRequired,
-        this, [this]( qint64 localSystemTime, const QList<QPair<QnId, qint64> >& peersAndTimes ) {
-            menu()->trigger(Qn::SelectTimeServerAction, QnActionParameters().
-                withArgument(Qn::LocalSystemTimeRole, localSystemTime).withArgument(Qn::PeersToChooseTimeServerFromRole, peersAndTimes));
-        });
     connect( QnAppServerConnectionFactory::getConnection2().get(), &ec2::AbstractECConnection::timeChanged,
         QnSyncTime::instance(), static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime) );
 
@@ -138,7 +133,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     action(Qn::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
     /* Remove all remote resources. */
-    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
     resourcePool()->removeResources(remoteResources);
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */

@@ -26,7 +26,7 @@
         <qt.libs>core gui network xml widgets</qt.libs>
         <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib ssleay32.lib libeay32.lib Ws2_32.lib</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib ssleay32.lib libeay32.lib Ws2_32.lib Iphlpapi.lib</windows.oslibs>
         <windows.oslibs.release></windows.oslibs.release> 
         <windows.oslibs.debug></windows.oslibs.debug>        
         <linux.oslibs></linux.oslibs>

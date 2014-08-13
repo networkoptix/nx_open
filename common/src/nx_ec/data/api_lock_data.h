@@ -11,7 +11,7 @@ namespace ec2
         ApiLockData(): timestamp(0) {}
 
         QString name;
-        QnId peer;
+        QUuid peer;
         qint64 timestamp;
         QByteArray userData;
     };

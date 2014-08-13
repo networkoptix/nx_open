@@ -10,6 +10,7 @@
 #include <utils/common/string.h>
 
 #include <core/resource/camera_history.h>
+#include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -372,7 +373,7 @@ void QnResourceTreeWidget::updateFilter() {
     m_resourceProxyModel->clearCriteria();
     m_resourceProxyModel->addCriterion(QnResourceCriterionGroup(filter));
     m_resourceProxyModel->addCriterion(m_criterion);
-    m_resourceProxyModel->addCriterion(QnResourceCriterion(QnResource::server));
+    m_resourceProxyModel->addCriterion(QnResourceCriterion(Qn::server));
 
     m_resourceProxyModel->setFilterEnabled(!filter.isEmpty() || !m_criterion.isNull());
     if (!filter.isEmpty())
@@ -427,8 +428,8 @@ void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
 
     // TODO: #Elric. This is totally evil. This check belongs to the slot that handles activation.
     if (resource &&
-        !(resource->flags() & QnResource::layout) &&    /* Layouts cannot be activated by double clicking. */
-        !(resource->flags() & QnResource::server))      /* Bug #1009: Servers should not be activated by double clicking. */
+        !(resource->flags() & Qn::layout) &&    /* Layouts cannot be activated by double clicking. */
+        !(resource->flags() & Qn::server))      /* Bug #1009: Servers should not be activated by double clicking. */
         emit activated(resource);
 }
 
@@ -459,7 +460,7 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
 void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if((resource && resource->hasFlags(QnResource::server)) || nodeType == Qn::ServersNode)
+    if((resource && resource->hasFlags(Qn::server)) || nodeType == Qn::ServersNode)
         ui->resourcesTreeView->expand(index);
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }

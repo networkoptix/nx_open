@@ -49,7 +49,7 @@ public:
     static QString toString( State state );
 
     QnTransactionTransport(const ApiPeerData &localPeer,
-        const ApiPeerData &remotePeer = ApiPeerData(QnId(), Qn::PT_Server),
+        const ApiPeerData &remotePeer = ApiPeerData(QUuid(), Qn::PT_Server),
         const QSharedPointer<AbstractStreamSocket>& socket = QSharedPointer<AbstractStreamSocket>());
     ~QnTransactionTransport();
 
@@ -67,7 +67,7 @@ public:
             header.fillSequence();
 #ifdef _DEBUG
 
-        foreach (const QnId& peer, header.dstPeers) {
+        foreach (const QUuid& peer, header.dstPeers) {
             Q_ASSERT(!peer.isNull());
             Q_ASSERT(peer != qnCommon->moduleGUID());
         }
@@ -128,10 +128,10 @@ public:
 
     AbstractStreamSocket* getSocket() const;
 
-    static bool tryAcquireConnecting(const QnId& remoteGuid, bool isOriginator);
-    static bool tryAcquireConnected(const QnId& remoteGuid, bool isOriginator);
-    static void connectingCanceled(const QnId& id, bool isOriginator);
-    static void connectDone(const QnId& id);
+    static bool tryAcquireConnecting(const QUuid& remoteGuid, bool isOriginator);
+    static bool tryAcquireConnected(const QUuid& remoteGuid, bool isOriginator);
+    static void connectingCanceled(const QUuid& id, bool isOriginator);
+    static void connectDone(const QUuid& id);
 
 private:
     struct DataToSend
@@ -186,7 +186,7 @@ private:
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();
-    static void connectingCanceledNoLock(const QnId& remoteGuid, bool isOriginator);
+    static void connectingCanceledNoLock(const QUuid& remoteGuid, bool isOriginator);
     void addHttpChunkExtensions( std::vector<nx_http::ChunkExtension>* const chunkExtensions );
     void processChunkExtensions( const nx_http::ChunkHeader& httpChunkHeader );
     void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead );

@@ -216,14 +216,14 @@ void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
 
     const QnScheduleTask task = currentScheduleTask();
     bool isRecording = task.getRecordingType() != Qn::RT_Never && qnStorageMan->isWritableStoragesAvailable();
-    if (!m_device->hasFlags(QnResource::foreigner)) {
+    if (!m_device->hasFlags(Qn::foreigner)) {
         if (isRecording) {
-            if(m_device->getStatus() == QnResource::Online)
-                m_device->setStatus(QnResource::Recording);
+            if(m_device->getStatus() == Qn::Online)
+                m_device->setStatus(Qn::Recording);
         }
         else {
-            if(m_device->getStatus() == QnResource::Recording)
-                m_device->setStatus(QnResource::Online);
+            if(m_device->getStatus() == Qn::Recording)
+                m_device->setStatus(Qn::Online);
         }
     }
 
@@ -427,7 +427,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 
     m_usedSpecialRecordingMode = m_usedPanicMode = false;
-    QnScheduleTask noRecordTask(QnId(), 1, 0, 0, Qn::RT_Never, 0, 0);
+    QnScheduleTask noRecordTask(QUuid(), 1, 0, 0, Qn::RT_Never, 0, 0);
 
     if (!m_schedule.isEmpty())
     {
@@ -525,8 +525,8 @@ void QnServerStreamRecorder::endOfRun()
     updateMotionStateInternal(false, m_lastMediaTime, QnMetaDataV1Ptr());
 
     QnStreamRecorder::endOfRun();
-    if(m_device->getStatus() == QnResource::Recording)
-        m_device->setStatus(QnResource::Online);
+    if(m_device->getStatus() == Qn::Recording)
+        m_device->setStatus(Qn::Online);
 
     if (m_rebuildBlocked) {
         m_rebuildBlocked = false;

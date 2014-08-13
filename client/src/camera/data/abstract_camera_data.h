@@ -12,7 +12,7 @@ class QnTimePeriodList;
  */
 class QnAbstractCameraData {
 public:
-    QnAbstractCameraData(){}
+    virtual ~QnAbstractCameraData() {}
 
     /**
      * @brief isEmpty                               Check that there is some data in the struct.

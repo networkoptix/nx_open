@@ -13,7 +13,7 @@ QnPlIpWebCamResourceSearcher::QnPlIpWebCamResourceSearcher()
 {
 }
 
-QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -161,7 +161,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 
                 QnNetworkResourcePtr resource ( new QnPlDriodIpWebCamResource() );
 
-                QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+                QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
                 if (rt.isNull())
                     continue;
 

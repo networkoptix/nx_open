@@ -150,7 +150,7 @@ namespace ec2
     }
     
     template <class T>
-    int BaseEc2Connection<T>::forcePrimaryTimeServer( const QnId& serverGuid, impl::SimpleHandlerPtr handler )
+    int BaseEc2Connection<T>::forcePrimaryTimeServer( const QUuid& serverGuid, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 

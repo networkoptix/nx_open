@@ -33,8 +33,8 @@ public:
 
     void setData(
         qint64 localSystemTime,
-        const QList<QPair<QnId, qint64> >& peersAndTimes );
-    QnId selectedPeer() const;
+        const QList<QPair<QUuid, qint64> >& peersAndTimes );
+    QUuid selectedPeer() const;
 
 public slots:
     virtual void accept() override;
@@ -48,7 +48,7 @@ private:
     qint64 m_timeBase;
     QTimer m_timer;
     //list<pair<peerid, local time on peer at \a m_timeBase time point>>. All times are UTC, millis from epoch
-    QList<QPair<QnId, qint64> > m_peersAndTimes;
+    QList<QPair<QUuid, qint64> > m_peersAndTimes;
 
 private slots:
     void onTimer();

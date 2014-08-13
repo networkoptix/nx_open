@@ -50,7 +50,7 @@ QnTimeServerSelectionDialog::~QnTimeServerSelectionDialog()
 */
 void QnTimeServerSelectionDialog::setData(
     qint64 localSystemTime,
-    const QList<QPair<QnId, qint64> >& peersAndTimes )
+    const QList<QPair<QUuid, qint64> >& peersAndTimes )
 {
     const qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
     m_timeBase = localSystemTime;
@@ -90,7 +90,7 @@ void QnTimeServerSelectionDialog::setData(
     }
 }
 
-QnId QnTimeServerSelectionDialog::selectedPeer() const
+QUuid QnTimeServerSelectionDialog::selectedPeer() const
 {
     for( int row = 0; row < m_ui->serversWidget->rowCount(); ++row )
     {
@@ -98,14 +98,14 @@ QnId QnTimeServerSelectionDialog::selectedPeer() const
             return m_peersAndTimes[m_ui->serversWidget->item(row, checkBoxColumn)->data(Qt::UserRole).toInt()].first;
     }
 
-    return QnId();
+    return QUuid();
 }
 
 void QnTimeServerSelectionDialog::accept()
 {
     QDialog::accept();
 
-    const QnId& selectedPeerID = selectedPeer();
+    const QUuid& selectedPeerID = selectedPeer();
     if( selectedPeerID.isNull() )
         return;
     const ec2::AbstractECConnectionPtr& connection = QnAppServerConnectionFactory::getConnection2();

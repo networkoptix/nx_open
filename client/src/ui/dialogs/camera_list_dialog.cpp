@@ -109,7 +109,7 @@ void QnCameraListDialog::updateCriterion() {
         : lit("*%1*").arg(text);
     m_resourceSearch->clearCriteria();
     m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(searchString, Qt::CaseInsensitive, QRegExp::Wildcard)));
-    m_resourceSearch->addCriterion(QnResourceCriterion(QnResource::desktop_camera, QnResourceProperty::flags, QnResourceCriterion::Reject, QnResourceCriterion::Next));
+    m_resourceSearch->addCriterion(QnResourceCriterion(Qn::desktop_camera, QnResourceProperty::flags, QnResourceCriterion::Reject, QnResourceCriterion::Next));
 }
 
 void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex &index) {

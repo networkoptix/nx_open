@@ -119,14 +119,14 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResour
 }
 
 
-void QnCommonMessageProcessor::on_resourceStatusChanged( const QnId& resourceId, QnResource::Status status )
+void QnCommonMessageProcessor::on_resourceStatusChanged( const QUuid& resourceId, Qn::ResourceStatus status )
 {
     QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (resource)
         onResourceStatusChanged(resource, status);
 }
 
-void QnCommonMessageProcessor::on_resourceParamsChanged( const QnId& resourceId, const QnKvPairList& kvPairs )
+void QnCommonMessageProcessor::on_resourceParamsChanged( const QUuid& resourceId, const QnKvPairList& kvPairs )
 {
     QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (!resource)
@@ -139,7 +139,7 @@ void QnCommonMessageProcessor::on_resourceParamsChanged( const QnId& resourceId,
             resource->setProperty(pair.name(), pair.value());
 }
 
-void QnCommonMessageProcessor::on_resourceRemoved( const QnId& resourceId )
+void QnCommonMessageProcessor::on_resourceRemoved( const QUuid& resourceId )
 {
     if (canRemoveResource(resourceId))
     {
@@ -176,7 +176,7 @@ void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const QnBusinessEv
     emit businessRuleChanged(businessRule);
 }
 
-void QnCommonMessageProcessor::on_businessEventRemoved(const QnId &id) {
+void QnCommonMessageProcessor::on_businessEventRemoved(const QUuid &id) {
     m_rules.remove(id);
     emit businessRuleDeleted(id);
 }
@@ -215,7 +215,7 @@ void QnCommonMessageProcessor::on_panicModeChanged(Qn::PanicMode mode) {
 }
 
 // todo: ec2 relate logic. remove from this class
-void QnCommonMessageProcessor::afterRemovingResource(const QnId& id) {
+void QnCommonMessageProcessor::afterRemovingResource(const QUuid& id) {
     foreach(QnBusinessEventRulePtr bRule, m_rules.values())
     {
         if (bRule->eventResources().contains(id) || bRule->actionResources().contains(id))
@@ -247,12 +247,12 @@ void QnCommonMessageProcessor::processCameraServerItems(const QnCameraHistoryLis
         QnCameraHistoryPool::instance()->addCameraHistory(history);
 }
 
-bool QnCommonMessageProcessor::canRemoveResource(const QnId &) 
+bool QnCommonMessageProcessor::canRemoveResource(const QUuid &) 
 { 
     return true; 
 }
 
-void QnCommonMessageProcessor::removeResourceIgnored(const QnId &) 
+void QnCommonMessageProcessor::removeResourceIgnored(const QUuid &) 
 {
 }
 
@@ -267,6 +267,6 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     qnSyncTime->reset();
 }
 
-QMap<QnId, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() const {
+QMap<QUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() const {
     return m_rules;
 }

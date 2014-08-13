@@ -141,13 +141,21 @@ namespace ec2
     }
 
 
+//#define TEST_PTS_SELECTION
+
+
     //////////////////////////////////////////////
     //   TimeSynchronizationManager
     //////////////////////////////////////////////
     static TimeSynchronizationManager* TimeManager_instance = nullptr;
+#ifdef TEST_PTS_SELECTION
+    static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10 * 1000;
+    static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10 * 1000;
+#else
     static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*60*1000;
     //!Once per 10 minutes checking if manual time server selection is required
     static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10 * 60 * 1000;
+#endif
 
     //!Accurate time is fetched from internet with this period
     static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 600;
@@ -350,7 +358,7 @@ namespace ec2
 
     void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
         QMutexLocker* const lock,
-        const QnId& remotePeerID,
+        const QUuid& remotePeerID,
         qint64 localMonotonicClock,
         qint64 remotePeerSyncTime,
         const TimePriorityKey& remotePeerTimePriorityKey )
@@ -465,21 +473,23 @@ namespace ec2
 
         const qint64 currentClock = m_monotonicClock.elapsed();
         //map<priority flags, m_systemTimeByPeer iterator>
-        std::multimap<unsigned int, std::map<QnId, TimeSyncInfo>::const_iterator, std::greater<unsigned int>> peersByTimePriorityFlags;
+        std::multimap<unsigned int, std::map<QUuid, TimeSyncInfo>::const_iterator, std::greater<unsigned int>> peersByTimePriorityFlags;
         for( auto it = m_systemTimeByPeer.cbegin(); it != m_systemTimeByPeer.cend(); ++it )
             peersByTimePriorityFlags.emplace( it->second.timePriorityKey.flags, it );
 
+#ifndef TEST_PTS_SELECTION
         if( peersByTimePriorityFlags.count(peersByTimePriorityFlags.cbegin()->first) > 1 )
+#endif
         {
             const qint64 currentLocalTime = currentMSecsSinceEpoch();
 
             //list<pair<peerid, time> >
-            QList<QPair<QnId, qint64> > peers;
+            QList<QPair<QUuid, qint64> > peers;
             for( auto val: peersByTimePriorityFlags )
             {
                 if( val.first != peersByTimePriorityFlags.cbegin()->first )
                     break;
-                peers.push_back( QPair<QnId, qint64>( val.second->first, val.second->second.syncTime + (currentClock - val.second->second.monotonicClockValue) ) );
+                peers.push_back( QPair<QUuid, qint64>( val.second->first, val.second->second.syncTime + (currentClock - val.second->second.monotonicClockValue) ) );
             }
             //multiple peers have same priority, user selection is required
             emit primaryTimeServerSelectionRequired( currentLocalTime, peers );

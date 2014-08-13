@@ -23,7 +23,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
             assert( tran.command == ApiCommand::removeLayout );
-            emit removed( QnId(tran.params.id) );
+            emit removed( QUuid(tran.params.id) );
         }
 
         void triggerNotification( const QnTransaction<ApiLayoutData>& tran )
@@ -61,10 +61,10 @@ namespace ec2
 
         virtual int getLayouts( impl::GetLayoutsHandlerPtr handler ) override;
         virtual int save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler ) override;
-        virtual int remove( const QnId& resource, impl::SimpleHandlerPtr handler ) override;
+        virtual int remove( const QUuid& resource, impl::SimpleHandlerPtr handler ) override;
 
     private:
-        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
+        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QUuid& id );
         QnTransaction<ApiLayoutDataList> prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts );
 
     private:

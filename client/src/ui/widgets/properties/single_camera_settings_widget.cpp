@@ -217,7 +217,7 @@ void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout ,
     {
         QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
         bool showUrl = resourceData.value<bool>(lit("showUrl"), false);
-        if ( showUrl && m_camera->getStatus() != QnResource::Offline )
+        if ( showUrl && m_camera->getStatus() != Qn::Offline )
         {
             QnNetworkProxyFactory::instance()->removeFromProxyList(m_lastCameraPageUrl.host());
             

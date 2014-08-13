@@ -29,7 +29,7 @@ NetworkOptixModuleRevealer::NetworkOptixModuleRevealer(
     m_revealResponse.version = moduleVersion;
     m_revealResponse.typeSpecificParameters = moduleSpecificParameters;
     //generating random seed
-    m_revealResponse.seed = lit("%1_%2_%3").arg(QCoreApplication::applicationPid()).arg(qrand()).arg(QDateTime::currentMSecsSinceEpoch());
+    m_revealResponse.seed = QUuid::createUuid();
 
     const QList<QHostAddress>& interfaceAddresses = QNetworkInterface::allAddresses();
     for( QList<QHostAddress>::const_iterator
@@ -40,7 +40,7 @@ NetworkOptixModuleRevealer::NetworkOptixModuleRevealer(
         if( addrIter->protocol() != QAbstractSocket::IPv4Protocol )
             continue;
 
-        const QHostAddress& localAddressToUse = *addrIter; //using any address of inteface
+        const QHostAddress& localAddressToUse = *addrIter; //using any address of interface
         try
         {
             //if( localAddressToUse == QHostAddress(lit("127.0.0.1")) )

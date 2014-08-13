@@ -8,9 +8,9 @@
 namespace ec2
 {
     struct ApiVideowallItemData: ApiData {
-        QnId guid;
-        QnId pcGuid;
-        QnId layoutGuid;
+        QUuid guid;
+        QUuid pcGuid;
+        QUuid layoutGuid;
         QString name;
         int snapLeft;
         int snapTop;
@@ -21,7 +21,7 @@ namespace ec2
 
 
     struct ApiVideowallScreenData: ApiData {
-        QnId pcGuid;
+        QUuid pcGuid;
         int pcIndex;
         int desktopLeft;
         int desktopTop;
@@ -36,8 +36,8 @@ namespace ec2
 
 
     struct ApiVideowallMatrixItemData: ApiData {
-        QnId itemGuid;
-        QnId layoutGuid;
+        QUuid itemGuid;
+        QUuid layoutGuid;
     };
 #define ApiVideowallMatrixItemData_Fields (itemGuid)(layoutGuid)
 
@@ -64,32 +64,32 @@ namespace ec2
 
     struct ApiVideowallControlMessageData: ApiData {
         int operation;
-        QnId videowallGuid;
-        QnId instanceGuid;
+        QUuid videowallGuid;
+        QUuid instanceGuid;
         std::map<QString, QString> params;
     };
 #define ApiVideowallControlMessageData_Fields (operation)(videowallGuid)(instanceGuid)(params)
 
     struct ApiVideowallItemWithRefData: public ApiVideowallItemData {
-        QnId videowallGuid;
+        QUuid videowallGuid;
     };
 #define ApiVideowallItemWithRefData_Fields ApiVideowallItemData_Fields (videowallGuid)
 
 
     struct ApiVideowallScreenWithRefData: public ApiVideowallScreenData {
-        QnId videowallGuid;
+        QUuid videowallGuid;
     };
 #define ApiVideowallScreenWithRefData_Fields ApiVideowallScreenData_Fields (videowallGuid)
 
 
     struct ApiVideowallMatrixItemWithRefData: public ApiVideowallMatrixItemData {
-        QnId matrixGuid;
+        QUuid matrixGuid;
     };
 #define ApiVideowallMatrixItemWithRefData_Fields ApiVideowallMatrixItemData_Fields (matrixGuid)
 
 
     struct ApiVideowallMatrixWithRefData: public ApiVideowallMatrixData {
-        QnId videowallGuid;
+        QUuid videowallGuid;
     };
 #define ApiVideowallMatrixWithRefData_Fields ApiVideowallMatrixData_Fields (videowallGuid)
 

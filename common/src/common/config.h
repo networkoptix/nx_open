@@ -11,7 +11,10 @@
 /** Additional free space at a end of memory block. Some ffmpeg calls requires it */
 #define CL_MEDIA_EXTRA 8
 
+#define CL_MAX_CHANNELS 4 // TODO: #Elric get rid of this definition
 
+//TODO: #GDM think about correct place
+static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
 
 // -------------------------------------------------------------------------- //
 // Library & Compiler globals. Do not change.

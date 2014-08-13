@@ -107,7 +107,7 @@ namespace ec2
         return reqID;
     }
 
-    int OldEcConnection::forcePrimaryTimeServer( const QnId& /*serverGuid*/, impl::SimpleHandlerPtr handler )
+    int OldEcConnection::forcePrimaryTimeServer( const QUuid& /*serverGuid*/, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
