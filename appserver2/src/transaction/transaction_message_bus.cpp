@@ -754,12 +754,11 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<A
     QnTransactionTransportPtr transport(new QnTransactionTransport(m_localPeer, remotePeer, socket));
     connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
     connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
-    emit newDirectConnectionEstablished( transport );
 
     QMutexLocker lock(&m_mutex);
     m_connectingConnections << transport;
     transport->setState(QnTransactionTransport::Connected);
-        if (m_connections.contains(remotePeer.id))
+    if (m_connections.contains(remotePeer.id))
         m_connectionsToRemove << m_connections[remotePeer.id];
 }
 
