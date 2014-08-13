@@ -133,7 +133,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     action(Qn::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
     /* Remove all remote resources. */
-    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
     resourcePool()->removeResources(remoteResources);
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */

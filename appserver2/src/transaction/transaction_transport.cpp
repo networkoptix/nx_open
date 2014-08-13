@@ -186,7 +186,7 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     }
 }
 
-bool QnTransactionTransport::tryAcquireConnecting(const QnId& remoteGuid, bool isOriginator)
+bool QnTransactionTransport::tryAcquireConnecting(const QUuid& remoteGuid, bool isOriginator)
 {
     QMutexLocker lock(&m_staticMutex);
 
@@ -206,13 +206,13 @@ bool QnTransactionTransport::tryAcquireConnecting(const QnId& remoteGuid, bool i
 }
 
 
-void QnTransactionTransport::connectingCanceled(const QnId& remoteGuid, bool isOriginator)
+void QnTransactionTransport::connectingCanceled(const QUuid& remoteGuid, bool isOriginator)
 {
     QMutexLocker lock(&m_staticMutex);
     connectingCanceledNoLock(remoteGuid, isOriginator);
 }
 
-void QnTransactionTransport::connectingCanceledNoLock(const QnId& remoteGuid, bool isOriginator)
+void QnTransactionTransport::connectingCanceledNoLock(const QUuid& remoteGuid, bool isOriginator)
 {
     ConnectingInfoMap::iterator itr = m_connectingConn.find(remoteGuid);
     if (itr != m_connectingConn.end()) {
@@ -225,7 +225,7 @@ void QnTransactionTransport::connectingCanceledNoLock(const QnId& remoteGuid, bo
     }
 }
 
-bool QnTransactionTransport::tryAcquireConnected(const QnId& remoteGuid, bool isOriginator)
+bool QnTransactionTransport::tryAcquireConnected(const QUuid& remoteGuid, bool isOriginator)
 {
     QMutexLocker lock(&m_staticMutex);
     bool isExist = m_existConn.contains(remoteGuid);
@@ -238,7 +238,7 @@ bool QnTransactionTransport::tryAcquireConnected(const QnId& remoteGuid, bool is
     return !fail;    
 }
 
-void QnTransactionTransport::connectDone(const QnId& id)
+void QnTransactionTransport::connectDone(const QUuid& id)
 {
     QMutexLocker lock(&m_staticMutex);
     m_existConn.remove(id);
@@ -372,7 +372,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
     }
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
-    m_remotePeer.id = itrGuid->second;
+    m_remotePeer.id = QUuid(itrGuid->second);
 
     if (getState() == ConnectingStage1) {
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);

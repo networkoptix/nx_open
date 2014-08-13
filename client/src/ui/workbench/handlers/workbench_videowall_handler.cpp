@@ -232,7 +232,7 @@ public:
         QnLayoutResource()
     {
         setId(QUuid::createUuid());
-        addFlags(QnResource::local);
+        addFlags(Qn::local);
         setTypeByName(lit("Layout"));
         setName(videowall->getName());
         setCellSpacing(0.1, 0.1);
@@ -417,7 +417,7 @@ void QnWorkbenchVideoWallHandler::swapLayouts(const QnVideoWallItemIndex firstIn
     }
 }
 
-void QnWorkbenchVideoWallHandler::updateItemsLayout(const QnVideoWallItemIndexList &items, const QnId &layoutId) {
+void QnWorkbenchVideoWallHandler::updateItemsLayout(const QnVideoWallItemIndexList &items, const QUuid &layoutId) {
     QSet<QnVideoWallResourcePtr> videoWalls;
 
     foreach (const QnVideoWallItemIndex &index, items) {
@@ -958,7 +958,7 @@ QnVideoWallItemIndexList QnWorkbenchVideoWallHandler::targetList() const {
     if (!workbench()->currentLayout()->resource())
         return QnVideoWallItemIndexList();
 
-    QnId currentId = workbench()->currentLayout()->resource()->getId();
+    QUuid currentId = workbench()->currentLayout()->resource()->getId();
 
     QnVideoWallItemIndexList indices;
 
@@ -980,7 +980,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::findExistingResourceLayout(cons
     if (!resource.dynamicCast<QnMediaResource>() && !resource.dynamicCast<QnMediaServerResource>())
         return QnLayoutResourcePtr();
 
-    QnId parentId = context()->user() ? context()->user()->getId() : QnId();
+    QUuid parentId = context()->user() ? context()->user()->getId() : QUuid();
     foreach(const QnLayoutResourcePtr &layout, qnResPool->getResourcesWithParentId(parentId).filtered<QnLayoutResource>()) {
         //TODO: #GDM #VW should we check name of this layout?
         if (layout->getItems().size() != 1)
@@ -1066,7 +1066,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 
     layout->setCellSpacing(0, 0);
     layout->setCellAspectRatio(desiredAspectRatio);
-    layout->addFlags(QnResource::local); // TODO: #Elric #EC2
+    layout->addFlags(Qn::local); // TODO: #Elric #EC2
 
     /* Calculate size of the resulting matrix. */
     const int matrixWidth = qMax(1, qRound(std::sqrt(desiredAspectRatio * filtered.size())));
@@ -1100,7 +1100,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
     }
 	
 	QStringList usedNames;
-    foreach(const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::videowall))
+    foreach(const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::videowall))
         usedNames << resource->getName().trimmed().toLower();
 	
     //TODO: #GDM #VW refactor to corresponding dialog
@@ -1183,7 +1183,7 @@ void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered() {
             continue;
 
         QnVideoWallItem existingItem = index.item();
-        existingItem.layout = QnId();
+        existingItem.layout = QUuid();
         index.videowall()->items()->updateItem(index.uuid(), existingItem);
         videoWalls << index.videowall();
     }
@@ -1470,7 +1470,7 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
 
     QnVirtualCameraResourcePtr desktopCamera;
 
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::desktop_camera)) {
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::desktop_camera)) {
         if (resource->getUniqueId() == QnAppServerConnectionFactory::clientGuid())
             desktopCamera = resource.dynamicCast<QnVirtualCameraResource>();    
     }
@@ -1806,7 +1806,7 @@ void QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived(const Q
 }
 
 void QnWorkbenchVideoWallHandler::at_display_widgetAdded(QnResourceWidget* widget) {
-    if (widget->resource()->flags() & QnResource::sync) {
+    if (widget->resource()->flags() & Qn::sync) {
         if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
             connect(mediaWidget, &QnMediaResourceWidget::motionSelectionChanged, this, &QnWorkbenchVideoWallHandler::at_widget_motionSelectionChanged);
             connect(mediaWidget, &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnWorkbenchVideoWallHandler::at_widget_dewarpingParamsChanged);

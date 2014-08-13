@@ -1,6 +1,8 @@
 #ifndef QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H
 #define QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H
 
+#include <QtCore/QTime>
+
 #include "core/resource_management/resource_discovery_manager.h"
 
 class QnMServerResourceDiscoveryManager: public QnResourceDiscoveryManager
@@ -14,7 +16,7 @@ public:
     /*!
         Calls \a QnResourceDiscoveryManager::createResource first. If resource was not created and resource type is present in system, returns data-only resource
     */
-    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams &params) override;
+    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams &params) override;
 
 signals:
     void cameraDisconnected(const QnResourcePtr& camera, qint64 timestamp);

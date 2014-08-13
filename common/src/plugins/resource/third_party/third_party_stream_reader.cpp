@@ -116,9 +116,9 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
     if( isStreamOpened() )
         return CameraDiagnostics::NoErrorResult();
 
-    const QnResource::ConnectionRole role = getRole();
+    const Qn::ConnectionRole role = getRole();
 
-    const int encoderIndex = role == QnResource::Role_LiveVideo
+    const int encoderIndex = role == Qn::CR_LiveVideo
         ? QnThirdPartyResource::PRIMARY_ENCODER_INDEX
         : QnThirdPartyResource::SECONDARY_ENCODER_INDEX;
 
@@ -269,15 +269,15 @@ void ThirdPartyStreamReader::afterRun()
     closeStream();
 }
 
-QnResource::ConnectionRole ThirdPartyStreamReader::roleForMotionEstimation()
+Qn::ConnectionRole ThirdPartyStreamReader::roleForMotionEstimation()
 {
-    const QnResource::ConnectionRole softMotionRole = CLServerPushStreamReader::roleForMotionEstimation();
-    if( softMotionRole != QnResource::Role_LiveVideo)  //primary stream
+    const Qn::ConnectionRole softMotionRole = CLServerPushStreamReader::roleForMotionEstimation();
+    if( softMotionRole != Qn::CR_LiveVideo)  //primary stream
         return softMotionRole;
 
     //checking stream resolution
     if( m_videoResolution.width()*m_videoResolution.height() > MAX_PRIMARY_RES_FOR_SOFT_MOTION )
-        return QnResource::Role_SecondaryLiveVideo;
+        return Qn::CR_SecondaryLiveVideo;
 
     return softMotionRole;
 }

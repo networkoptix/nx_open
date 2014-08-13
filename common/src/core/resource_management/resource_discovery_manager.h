@@ -13,7 +13,7 @@
 
 #include <api/model/manual_camera_seach_reply.h>
 
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
 #include <core/resource/resource_factory.h>
 #include <core/resource/resource_processor.h>
 
@@ -85,7 +85,7 @@ public:
     void addDTSServer(QnAbstractDTSSearcher* serv);
     void setResourceProcessor(QnResourceProcessor* processor);
 
-    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams& params) override;
 
     virtual void pleaseStop();
 

@@ -28,10 +28,10 @@ namespace ec2
     struct ApiObjectInfo
     {
         ApiObjectInfo() {}
-        ApiObjectInfo(const ApiOjectType& type, const QnId& id): type(type), id(id) {}
+        ApiObjectInfo(const ApiOjectType& type, const QUuid& id): type(type), id(id) {}
 
         ApiOjectType type;
-        QnId id;
+        QUuid id;
     };
     class ApiObjectInfoList: public std::vector<ApiObjectInfo>
     {
@@ -135,7 +135,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
         //getCameras
-        ErrorCode doQueryNoLock(const QnId& mServerId, ApiCameraDataList& cameraList);
+        ErrorCode doQueryNoLock(const QUuid& mServerId, ApiCameraDataList& cameraList);
 
         //getServers
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
@@ -159,7 +159,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
 
         //getResourceParams
-        ErrorCode doQueryNoLock(const QnId& resourceId, ApiResourceParamsData& params);
+        ErrorCode doQueryNoLock(const QUuid& resourceId, ApiResourceParamsData& params);
 
         // ApiFullInfo
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiFullInfoData& data);
@@ -174,7 +174,7 @@ namespace ec2
         bool markLicenseOverflow(bool value, qint64 time);
         QUuid getID() const;
 
-        ApiOjectType getObjectType(const QnId& objectId);
+        ApiOjectType getObjectType(const QUuid& objectId);
         ApiObjectInfoList getNestedObjects(const ApiObjectInfo& parentObject);
 
         bool saveMiscParam( const QByteArray& name, const QByteArray& value );
@@ -283,7 +283,7 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode deleteTableRecord(const QnId& id, const QString& tableName, const QString& fieldName);
+        ErrorCode deleteTableRecord(const QUuid>& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
         ErrorCode updateResource(const ApiResourceData& data, qint32 internalId);
@@ -300,40 +300,40 @@ namespace ec2
         ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
         ErrorCode updateCameraSchedule(const ApiCameraData& data, qint32 internalId);
         ErrorCode removeCameraSchedule(qint32 internalId);
-        ErrorCode removeCamera(const QnId& guid);
+        ErrorCode removeCamera(const QUuid& guid);
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
         ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
         ErrorCode updateStorages(const ApiMediaServerData&);
-        ErrorCode removeServer(const QnId& guid);
-        ErrorCode removeStoragesByServer(const QnId& serverGUID);
+        ErrorCode removeServer(const QUuid& guid);
+        ErrorCode removeStoragesByServer(const QUuid& serverGUID);
 
-        ErrorCode removeLayout(const QnId& id);
-        ErrorCode removeLayoutInternal(const QnId& id, const qint32 &internalId);
+        ErrorCode removeLayout(const QUuid& id);
+        ErrorCode removeLayoutInternal(const QUuid& id, const qint32 &internalId);
         ErrorCode saveLayout(const ApiLayoutData& params);
         ErrorCode insertOrReplaceLayout(const ApiLayoutData& data, qint32 internalId);
         ErrorCode updateLayoutItems(const ApiLayoutData& data, qint32 internalLayoutId);
         ErrorCode removeLayoutItems(qint32 id);
 
         ErrorCode deleteUserProfileTable(const qint32 id);
-        ErrorCode removeUser( const QnId& guid );
+        ErrorCode removeUser( const QUuid& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
         ErrorCode checkExistingUser(const QString &name, qint32 internalId);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);
-        ErrorCode removeVideowall(const QnId& id);
+        ErrorCode removeVideowall(const QUuid& id);
         ErrorCode insertOrReplaceVideowall(const ApiVideowallData& data, qint32 internalId);
-        ErrorCode deleteVideowallPcs(const QnId &videowall_guid);
-        ErrorCode deleteVideowallItems(const QnId &videowall_guid);
+        ErrorCode deleteVideowallPcs(const QUuid &videowall_guid);
+        ErrorCode deleteVideowallItems(const QUuid &videowall_guid);
         ErrorCode updateVideowallItems(const ApiVideowallData& data);
         ErrorCode updateVideowallScreens(const ApiVideowallData& data);
-        ErrorCode removeLayoutFromVideowallItems(const QnId &layout_id);
-        ErrorCode deleteVideowallMatrices(const QnId &videowall_guid);
+        ErrorCode removeLayoutFromVideowallItems(const QUuid &layout_id);
+        ErrorCode deleteVideowallMatrices(const QUuid &videowall_guid);
         ErrorCode updateVideowallMatrices(const ApiVideowallData &data);
 
         ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule);
-        ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);
-        ErrorCode removeBusinessRule( const QnId& id );
+        ErrorCode insertBRuleResource(const QString& tableName, const QUuid& ruleGuid, const QUuid& resourceGuid);
+        ErrorCode removeBusinessRule( const QUuid& id );
         ErrorCode updateBusinessRule(const ApiBusinessRuleData& rule);
 
         ErrorCode saveLicense(const ApiLicenseData& license);
@@ -346,9 +346,9 @@ namespace ec2
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
         
-        qint32 getResourceInternalId( const QnId& guid );
-        QnId getResourceGuid(const qint32 &internalId);
-        qint32 getBusinessRuleInternalId( const QnId& guid );
+        qint32 getResourceInternalId( const QUuid& guid );
+        QUuid getResourceGuid(const qint32 &internalId);
+        qint32 getBusinessRuleInternalId( const QUuid& guid );
 
         void beginTran();
         void commit();
@@ -356,11 +356,11 @@ namespace ec2
     private:
         enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_INT};
 
-        QMap<int, QnId> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
+        QMap<int, QUuid> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
 
-        bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
+        bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QUuid>& guids);
         bool updateGuids();
-        QnId getType(const QString& typeName);
+        QUuid getType(const QString& typeName);
         bool resyncTransactionLog();
 
         template <class ObjectType, class ObjectListType> 
@@ -368,10 +368,10 @@ namespace ec2
         bool addTransactionForGeneralSettings();
     private:
         QnResourceFactory* m_resourceFactory;
-        QnId m_storageTypeId;
-        QnId m_serverTypeId;
-        QnId m_cameraTypeId;
-        QnId m_adminUserID;
+        QUuid m_storageTypeId;
+        QUuid m_serverTypeId;
+        QUuid m_cameraTypeId;
+        QUuid m_adminUserID;
         int m_adminUserInternalID;
         ApiResourceTypeDataList m_cachedResTypes;
         bool m_licenseOverflowMarked;

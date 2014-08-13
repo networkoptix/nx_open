@@ -29,7 +29,7 @@ public:
 
     static QUuid getDesktopResourceUuid();
 protected:
-    virtual QnAbstractStreamDataProvider *createDataProviderInternal(ConnectionRole role) override;
+    virtual QnAbstractStreamDataProvider *createDataProviderInternal(Qn::ConnectionRole role) override;
 private:
     void createSharedDataProvider();
 

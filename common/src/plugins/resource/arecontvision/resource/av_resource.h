@@ -68,7 +68,7 @@ protected:
     virtual void setMotionMaskPhysical(int channel) override;
 public:
     static QnPlAreconVisionResource* createResourceByName(const QString &name);
-    static QnPlAreconVisionResource* createResourceByTypeId(QnId rt);
+    static QnPlAreconVisionResource* createResourceByTypeId(QUuid rt);
 
     static bool isPanoramic(QnResourceTypePtr resType);
 

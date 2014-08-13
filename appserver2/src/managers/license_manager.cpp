@@ -64,7 +64,7 @@ namespace ec2
         const int reqID = generateRequestID();
 
         //for( QnLicensePtr lic: licenses )
-        //    lic->setId(QnId::createUuid());
+        //    lic->setId(QUuid::createUuid());
 
         auto tran = prepareTransaction( ApiCommand::addLicenses, licenses );
 
@@ -80,7 +80,7 @@ namespace ec2
         const int reqID = generateRequestID();
 
         //for( QnLicensePtr lic: licenses )
-        //    lic->setId(QnId::createUuid());
+        //    lic->setId(QUuid::createUuid());
 
         auto tran = prepareTransaction( ApiCommand::removeLicense, license );
 

@@ -45,7 +45,7 @@ ThirdPartyResourceSearcher::~ThirdPartyResourceSearcher()
 {
 }
 
-QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnId &resourceTypeId, const QnResourceParams& params )
+QnResourcePtr ThirdPartyResourceSearcher::createResource( const QUuid &resourceTypeId, const QnResourceParams& params )
 {
     QnThirdPartyResourcePtr result;
 
@@ -289,7 +289,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     nxcip_qt::CameraDiscoveryManager* const discoveryManager,
     const nxcip::CameraInfo& cameraInfo )
 {
-    QnId typeId = qnResTypePool->getResourceTypeId(manufacture(), THIRD_PARTY_MODEL_NAME);
+    QUuid typeId = qnResTypePool->getResourceTypeId(manufacture(), THIRD_PARTY_MODEL_NAME);
     if( typeId.isNull() )
         return QnThirdPartyResourcePtr();
 

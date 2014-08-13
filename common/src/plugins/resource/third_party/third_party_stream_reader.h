@@ -52,7 +52,7 @@ protected:
     virtual void afterRun() override;
 
     //!Overrides QnLiveStreamProvider::roleForMotionEstimation()
-    virtual QnResource::ConnectionRole roleForMotionEstimation() override;
+    virtual Qn::ConnectionRole roleForMotionEstimation() override;
     //!Overrides QnLiveStreamProvider::onStreamResolutionChanged()
     virtual void onStreamResolutionChanged( int channelNumber, const QSize& picSize );
 

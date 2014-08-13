@@ -93,7 +93,7 @@ private:
     QnModuleFinder *m_moduleFinder;
 
     struct QnEcData {
-        QnId id;
+        QUuid id;
         QUrl url;
         QString version;
         QString systemName;

@@ -40,7 +40,7 @@ private:
     void updateItems();
     void updateLayout(bool force = false);
 private slots:
-    void at_thumbnailReady(const QnId &resourceId, const QPixmap &thumbnail);
+    void at_thumbnailReady(const QUuid &resourceId, const QPixmap &thumbnail);
 
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 private:
@@ -55,7 +55,7 @@ private:
     bool m_layoutUpdateRequired;
 
     QnCameraThumbnailManager *m_thumbnailManager;
-    QHash<QnId, QPixmap> m_thumbs;
+    QHash<QUuid, QPixmap> m_thumbs;
 };
 
 #endif // VIDEOWALL_RESOURCE_SCREEN_WIDGET_H
