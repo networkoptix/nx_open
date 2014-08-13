@@ -207,8 +207,13 @@
                                                 <![CDATA[</RootNamespace>]]></token>
                                             <value>
                                                 <![CDATA[</RootNamespace>
-    <PlatformToolSet>${PlatformToolSet}</PlatformToolSet>
     <TargetName>${project.artifactId}</TargetName>]]></value>
+                                        </replacement> 
+										<replacement>
+                                            <token>
+                                                <![CDATA[<PlatformToolSet>v110</PlatformToolSet>]]></token>
+                                            <value>
+                                                <![CDATA[<PlatformToolSet>${PlatformToolSet}</PlatformToolSet>]]></value>
                                         </replacement>         
                                         <replacement>
                                             <token>
