@@ -1,6 +1,8 @@
 #ifndef LICENSE_USAGE_HELPER_H
 #define LICENSE_USAGE_HELPER_H
 
+#ifdef ENABLE_SENDMAIL
+
 #include <core/resource/resource_fwd.h>
 #include <licensing/license.h>
 
@@ -117,5 +119,7 @@ private:
     QPointer<QnVideoWallLicenseUsageHelper> m_helper;
     int m_count;
 };
+
+#endif //ENABLE_SENDMAIL
 
 #endif // LICENSE_USAGE_HELPER_H

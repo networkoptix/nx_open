@@ -38,6 +38,7 @@
         <windows.defines>EC2_LIB_API=__declspec(dllexport)</windows.defines>
         <linux.defines/>
         <mac.defines/>      
+        <android.defines/>
 
 	<buildLib>sharedlib</buildLib>
 

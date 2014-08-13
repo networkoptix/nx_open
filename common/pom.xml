@@ -36,6 +36,7 @@
         <windows.defines>_USING_V110_SDK71_</windows.defines>
         <linux.defines/>
         <mac.defines/>      
+        <android.defines/>
         <qt.libs>core gui network xml multimedia sql</qt.libs>
     </properties>   
 

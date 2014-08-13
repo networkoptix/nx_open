@@ -1,5 +1,7 @@
 #include "license_usage_helper.h"
 
+#ifdef ENABLE_SENDMAIL
+
 #include <api/runtime_info_manager.h>
 
 #include <core/resource/resource.h>
@@ -370,3 +372,5 @@ QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
 
     return Mustache::renderTemplate(message, arguments);
 }
+
+#endif //ENABLE_SENDMAIL

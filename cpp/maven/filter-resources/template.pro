@@ -230,7 +230,7 @@ android {
   LIBS += ${android.oslibs}
 
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
-  DEFINES += ${linux.defines}
+  DEFINES += ${android.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
 }
 
