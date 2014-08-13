@@ -651,7 +651,15 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
 
                 QStringList conflicts;
                 conflicts << lit("10.0.2.108");
+                conflicts << lit("2");
+                conflicts << lit("50:e5:49:43:b2:63");
+                conflicts << lit("50:e5:49:43:b2:64");
                 conflicts << lit("192.168.0.15");
+                conflicts << lit("4");
+                conflicts << lit("50:e5:49:43:b2:61");
+                conflicts << lit("50:e5:49:43:b2:62");
+                conflicts << lit("50:e5:49:43:b2:63");
+                conflicts << lit("50:e5:49:43:b2:64");
                 params.setConflicts(conflicts);
                 break;
             }

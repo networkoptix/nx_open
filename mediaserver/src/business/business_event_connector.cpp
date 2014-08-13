@@ -115,9 +115,9 @@ void QnBusinessEventConnector::at_cameraInput(const QnResourcePtr &resource, con
 }
 
 
-void QnBusinessEventConnector::at_mediaServerConflict(const QnResourcePtr& resource, qint64 timeStamp, const QList<QByteArray>& otherServers)
+void QnBusinessEventConnector::at_mediaServerConflict(const QnResourcePtr& resource, qint64 timeStamp, const QnCameraConflictList& conflicts)
 {
-    QnMServerConflictBusinessEventPtr conflictEvent(new QnMServerConflictBusinessEvent(resource, timeStamp, otherServers));
+    QnMServerConflictBusinessEventPtr conflictEvent(new QnMServerConflictBusinessEvent(resource, timeStamp, conflicts));
     qnBusinessRuleProcessor->processBusinessEvent(conflictEvent);
 }
 
