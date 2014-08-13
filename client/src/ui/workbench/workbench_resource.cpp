@@ -75,7 +75,7 @@ namespace {
             QString id, uniqueId;
             stream >> id >> uniqueId;
 
-            QnResourcePtr resource = qnResPool->getResourceById(id);
+            QnResourcePtr resource = qnResPool->getResourceById(QUuid(id));
             if(resource && resource->getUniqueId() == uniqueId) {
                 result.push_back(resource);
                 continue;

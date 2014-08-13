@@ -1487,17 +1487,17 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraS
 {
     QSqlQuery lastHistory(m_sdb);
     lastHistory.prepare("SELECT server_guid, max(timestamp) FROM vms_cameraserveritem WHERE physical_id = ? AND timestamp < ?");
-    lastHistory.addBindValue(tran.params.physicalId);
+    lastHistory.addBindValue(tran.params.cameraId.toRfc4122());
     lastHistory.addBindValue(tran.params.timestamp);
     if (!lastHistory.exec()) {
         qWarning() << Q_FUNC_INFO << lastHistory.lastError().text();
         return ErrorCode::dbError;
     }
-    if (lastHistory.next() && lastHistory.value(0).toString() == tran.params.serverId)
+    if (lastHistory.next() && QUuid::fromRfc4122(lastHistory.value(0).toByteArray()) == tran.params.serverId)
         return ErrorCode::skipped;
 
     QSqlQuery query(m_sdb);
-    query.prepare("INSERT INTO vms_cameraserveritem (server_guid, timestamp, physical_id) VALUES(:serverId, :timestamp, :physicalId)");
+    query.prepare("INSERT INTO vms_cameraserveritem (server_guid, timestamp, physical_id) VALUES(:serverId, :timestamp, :cameraId)");
     QnSql::bind(tran.params, &query);
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -2095,7 +2095,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServer
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(QString("select server_guid as serverId, timestamp, physical_id as physicalId from vms_cameraserveritem"));
+    query.prepare(QString("select server_guid as serverId, timestamp, physical_id as cameraId from vms_cameraserveritem"));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;

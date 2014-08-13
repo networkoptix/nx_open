@@ -153,12 +153,11 @@ bool QnRecordingManager::isResourceDisabled(const QnResourcePtr& res) const
 bool QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
 {
     const QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
-    QString physicalId = netRes->getPhysicalId();
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     if (QnCameraHistoryPool::instance()->getMinTime(netRes) == (qint64)AV_NOPTS_VALUE)
     {
         // it is first record for camera
-        DeviceFileCatalogPtr catalogHi = qnStorageMan->getFileCatalog(physicalId.toUtf8(), QnServer::HiQualityCatalog);
+        DeviceFileCatalogPtr catalogHi = qnStorageMan->getFileCatalog(res->getUniqueId(), QnServer::HiQualityCatalog);
         if (!catalogHi)
             return false;
         qint64 archiveMinTime = catalogHi->minTime();
@@ -169,7 +168,7 @@ bool QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
     const QnResourcePtr& serverRes = qnResPool->getResourceById(res->getParentId());
     const QnMediaServerResource* server = dynamic_cast<const QnMediaServerResource*>(serverRes.data());
     assert( server != nullptr );
-    QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getId().toByteArray());
+    QnCameraHistoryItem cameraHistoryItem(netRes->getId(), currentTime, server->getId());
 
     const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
     ec2::ErrorCode errCode = appServerConnection->getCameraManager()->addCameraHistoryItemSync(cameraHistoryItem);

@@ -74,55 +74,15 @@ void DeviceFileCatalog::Chunk::truncate(qint64 timeMs)
     durationMs = qMax(0ll, timeMs - startTimeMs);
 }
 
-DeviceFileCatalog::DeviceFileCatalog(const QUuid &cameraId, QnServer::ChunksCatalog catalog):
+DeviceFileCatalog::DeviceFileCatalog(const QString &cameraUniqueId, QnServer::ChunksCatalog catalog):
     m_rebuildStartTime(0),
     m_mutex(QMutex::Recursive),
-    m_cameraId(cameraId),
-    //m_duplicateName(false),
+    m_cameraUniqueId(cameraUniqueId),
     m_catalog(catalog),
     m_lastAddIndex(-1),
     m_lastRecordRecording(false)
 {
-    /*
-    QString devTitleFile = closeDirPath(getDataDirectory()) + QString("record_catalog/media/");
-    devTitleFile += prefixByCatalog(catalog) + "/";
-    devTitleFile += m_macAddress + "/";
-    devTitleFile += QString("title.csv");
-    m_file.setFileName(devTitleFile);
-    QDir dir;
-    dir.mkpath(QnFile::absolutePath(devTitleFile));
-    */
 }
-
-/*
-bool DeviceFileCatalog::readCatalog()
-{
-    if (!m_file.open(QFile::ReadWrite))
-    {
-        NX_LOG("Can't create title file ", m_file.fileName(), cl_logERROR);
-        return false;
-    }
-
-    if (m_file.size() == 0) 
-    {
-        QTextStream str(&m_file);
-        str << "timezone; start; storage; index; duration\n"; // write CSV header
-        str.flush();
-
-    }
-    else {
-        deserializeTitleFile();
-    }
-    return true;
-}
-*/
-
-/*
-bool DeviceFileCatalog::lastFileDuplicateName() const
-{
-    return m_duplicateName;
-}
-*/
 
 QString getDirName(const QString& prefix, int currentParts[4], int i)
 {
@@ -460,18 +420,18 @@ void DeviceFileCatalog::readStorageData(const QnStorageResourcePtr &storage, QnS
 }
 
 QString DeviceFileCatalog::rootFolder(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog) const {
-    return closeDirPath(storage->getUrl()) + prefixByCatalog(catalog) + L'/' + m_cameraId.toString() + L'/';
+    return closeDirPath(storage->getUrl()) + prefixByCatalog(catalog) + L'/' + m_cameraUniqueId + L'/';
 }
 
-QUuid DeviceFileCatalog::cameraId() const {
-    return m_cameraId;
+QString DeviceFileCatalog::cameraUniqueId() const {
+    return m_cameraUniqueId;
 }
 
 bool DeviceFileCatalog::doRebuildArchive(const QnStorageResourcePtr &storage, const QnTimePeriod& period)
 {
     QElapsedTimer t;
     t.restart();
-    qWarning() << "start rebuilding archive for camera " << m_cameraId << prefixByCatalog(m_catalog);
+    qWarning() << "start rebuilding archive for camera " << m_cameraUniqueId << prefixByCatalog(m_catalog);
     m_rebuildStartTime = qnSyncTime->currentMSecsSinceEpoch();
 
     QMap<qint64, Chunk> allChunks;
@@ -491,7 +451,7 @@ bool DeviceFileCatalog::doRebuildArchive(const QnStorageResourcePtr &storage, co
     foreach(const Chunk& chunk, allChunks)
         m_chunks.push_back(chunk);
 
-    qWarning() << "rebuild archive for camera " << m_cameraId << prefixByCatalog(m_catalog) << "finished. time=" << t.elapsed() << "ms. processd files=" << m_chunks.size();
+    qWarning() << "rebuild archive for camera " << m_cameraUniqueId << prefixByCatalog(m_catalog) << "finished. time=" << t.elapsed() << "ms. processd files=" << m_chunks.size();
 
     return true;
 }

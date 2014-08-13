@@ -495,7 +495,7 @@ bool QnResourceBrowserWidget::showOwnTooltip(const QPointF &pos) {
             m_tooltipWidget->setResourceId(resource->getId());
             m_thumbnailManager->selectResource(resource);
         } else {
-            m_tooltipWidget->setResourceId(0);
+            m_tooltipWidget->setResourceId(QUuid());
             m_tooltipWidget->setPixmap(QPixmap());
         }
 

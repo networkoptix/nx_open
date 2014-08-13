@@ -338,10 +338,10 @@ QnBusinessEventParameters QnBusinessEventParameters::fromBusinessParams(const Qn
                 result.m_timestamp = itr.value().toLongLong();
                 break;
             case EventResourceParam:
-                result.m_resourceId = itr.value().toString();
+                result.m_resourceId = QUuid(itr.value().toString());
                 break;
             case ActionResourceParam:
-                result.m_actionResourceId = itr.value().toString();
+                result.m_actionResourceId = QUuid(itr.value().toString());
                 break;
 
                 // event specific params.

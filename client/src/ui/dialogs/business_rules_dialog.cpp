@@ -331,7 +331,7 @@ bool QnBusinessRulesDialog::saveAll() {
 }
 
 void QnBusinessRulesDialog::deleteRule(QnBusinessRuleViewModel* ruleModel) {
-    if (ruleModel->id() > 0)
+    if (!ruleModel->id().isNull())
         m_pendingDeleteRules.append(ruleModel->id());
     m_rulesViewModel->deleteRule(ruleModel);
     updateControlButtons();

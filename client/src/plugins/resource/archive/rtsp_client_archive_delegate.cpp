@@ -91,8 +91,7 @@ QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate() {
 QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime(const QnVirtualCameraResourcePtr &camera, qint64 time) {
     if (!camera)
         return QnMediaServerResourcePtr();
-    QString physicalId = camera->getPhysicalId();
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera->getId());
     if (!history)
         return QnMediaServerResourcePtr();
     return history->getNextMediaServerAndPeriodOnTime(time, m_rtspSession.getScale() >= 0, m_serverTimePeriod);
@@ -119,14 +118,13 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualC
 
     QnMediaServerResourcePtr currentMediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(camera->getParentId()));
 
-    QString physicalId = camera->getPhysicalId();
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera->getId());
     if (!history)
         return 0;
     QnCameraTimePeriodList mediaServerList = history->getOnlineTimePeriods();
     QSet<QnMediaServerResourcePtr> checkServers;
     foreach (const QnCameraTimePeriod &period, mediaServerList) {
-        QnMediaServerResourcePtr otherMediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(period.getServerId()));
+        QnMediaServerResourcePtr otherMediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(period.mediaServerGuid));
         if (!otherMediaServer || otherMediaServer == currentMediaServer)
             continue;
         checkServers << otherMediaServer;
@@ -155,13 +153,12 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualC
 QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 time) {
     if (!m_camera)
         return QnMediaServerResourcePtr();
-    QString physicalId = m_camera->getPhysicalId();
     QnMediaServerResourcePtr currentServer = qnResPool->getResourceById(m_camera->getParentId()).dynamicCast<QnMediaServerResource>();
 
     if (time == DATETIME_NOW)
         return currentServer;
 
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(m_camera->getId());
     if (!history)
         return currentServer;
 

@@ -4,6 +4,7 @@
 #include "utils/network/tcp_connection_priv.h"
 
 #include "core/resource_management/resource_pool.h"
+#include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
 
 #include "utils/common/util.h"
@@ -92,7 +93,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     QnTimePeriodList periods;
     switch (periodsType) {
     case Qn::RecordingContent:
-        periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog);
+        periods = qnStorageMan->getRecordedPeriods(resList.filtered<QnVirtualCameraResource>(), startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog);
         break;
     case Qn::MotionContent:
         {

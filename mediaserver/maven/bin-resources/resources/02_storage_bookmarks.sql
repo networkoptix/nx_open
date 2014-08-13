@@ -1,6 +1,5 @@
 -- Bookmark tags table
 CREATE TABLE "storage_bookmark_tag" (
-    id              INTEGER NOT NULL autoincrement,         -- ID to make use of full-text-search tables
     bookmark_guid   BLOB NOT NULL,
     name            TEXT NOT NULL,
     PRIMARY KEY(bookmark_guid, name)
@@ -8,9 +7,8 @@ CREATE TABLE "storage_bookmark_tag" (
 
 -- Bookmarks table
 CREATE TABLE "storage_bookmark" (
-    id              INTEGER NOT NULL autoincrement,         -- ID to make use of full-text-search tables
     guid            BLOB NOT NULL UNIQUE PRIMARY KEY,
-    camera_guid     BLOB NOT NULL,                          -- GUID of the related camera resource
+    unique_id       TEXT NOT NULL,                          -- unique id of the related camera resource
     start_time      INTEGER NOT NULL,
     duration        INTEGER NOT NULL,
     name            TEXT NULL,

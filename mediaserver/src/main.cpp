@@ -1226,7 +1226,7 @@ void QnMain::run()
         QnSleep::msleep(3000);
     }
     connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &QnMain::at_restartServerRequired);
-    qnCommon->setRemoteGUID(connectInfo.ecsGuid);
+    qnCommon->setRemoteGUID(QUuid(connectInfo.ecsGuid));
     MSSettings::roSettings()->sync();
     if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
@@ -1438,7 +1438,14 @@ void QnMain::run()
         ec2ConnectionFactory->setCompatibilityMode(true);
     }
     if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
-        m_moduleFinder->setAllowedPeers(cmdLineArguments.allowedDiscoveryPeers.split(";"));
+        QList<QUuid> allowedPeers;
+        foreach (const QString &peer, cmdLineArguments.allowedDiscoveryPeers.split(";")) {
+            QUuid peerId(peer);
+            if (!peerId.isNull())
+                allowedPeers << peerId;
+        }
+        if (!allowedPeers.isEmpty())
+            m_moduleFinder->setAllowedPeers(allowedPeers);
     }
 
 
@@ -1846,8 +1853,8 @@ private:
             }
         }
 
-        QString obsoleteGuid = MSSettings::roSettings()->value(OBSOLETE_SERVER_GUID).toString();
-        if (!obsoleteGuid.isEmpty()) {
+        QUuid obsoleteGuid = QUuid(MSSettings::roSettings()->value(OBSOLETE_SERVER_GUID).toString());
+        if (!obsoleteGuid.isNull()) {
             qnCommon->setObsoleteServerGuid(obsoleteGuid);
         }
     }

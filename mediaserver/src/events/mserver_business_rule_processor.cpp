@@ -101,9 +101,8 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
     return rez;
 }
 
-QString QnMServerBusinessRuleProcessor::getGuid() const
-{
-    return serverGuid().toString();
+QUuid QnMServerBusinessRuleProcessor::getGuid() const {
+    return serverGuid();
 }
 
 bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, const QnResourcePtr& resource )

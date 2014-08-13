@@ -9,11 +9,11 @@ namespace ec2
     struct ApiCameraServerItemData: ApiData {
         ApiCameraServerItemData(): timestamp(0) {}
 
-        QString  physicalId;
-        QnLatin1Array  serverId;
+        QUuid  cameraId;
+        QUuid  serverId;
         qint64   timestamp;
     };
-#define ApiCameraServerItemData_Fields (physicalId)(serverId)(timestamp)
+#define ApiCameraServerItemData_Fields (cameraId)(serverId)(timestamp)
 
 }
 

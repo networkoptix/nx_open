@@ -241,7 +241,7 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
 
     result.isWritable = checkBoxItem->flags() & Qt::ItemIsEnabled;
     result.isUsedForWriting = checkBoxItem->checkState() == Qt::Checked;
-    result.storageId = qvariant_cast<QString>(checkBoxItem->data(StorageIdRole), QString());
+    result.storageId = checkBoxItem->data(StorageIdRole).value<QUuid>();
     result.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
 
     result.path = pathItem->text();

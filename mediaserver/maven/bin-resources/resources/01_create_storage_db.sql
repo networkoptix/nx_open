@@ -1,5 +1,5 @@
 CREATE TABLE "storage_data" (
-    camera_guid BLOB NOT NULL,                          -- GUID of the related camera resource
+    unique_id   TEXT NOT NULL,                          -- unique id of the related camera resource
     role        INTEGER  NOT NULL,
     start_time  INTEGER  NOT NULL,
     timezone    INTEGER  NOT NULL,

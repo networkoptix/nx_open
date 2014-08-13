@@ -68,7 +68,7 @@ public:
     // TODO: #Elric #enum
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
 
-    DeviceFileCatalog(const QUuid &cameraId, QnServer::ChunksCatalog catalog);
+    DeviceFileCatalog(const QString &cameraUniqueId, QnServer::ChunksCatalog catalog);
     //void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
     Chunk updateDuration(int durationMs, qint64 fileSize);
@@ -104,7 +104,7 @@ public:
     void close();
 
     QString rootFolder(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog) const;
-    QUuid cameraId() const;
+    QString cameraUniqueId() const;
 
     static QString prefixByCatalog(QnServer::ChunksCatalog catalog);
     static QnServer::ChunksCatalog catalogByPrefix(const QString &prefix);
@@ -156,7 +156,7 @@ private:
     mutable QMutex m_mutex;
     //QFile m_file;
     std::deque<Chunk> m_chunks; 
-    QUuid m_cameraId;
+    QString m_cameraUniqueId;
 
     typedef QVector<QPair<int, bool> > CachedDirInfo;
     struct IOCacheEntry

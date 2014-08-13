@@ -340,7 +340,7 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     }
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
-    m_remotePeer.id = itrGuid->second;
+    m_remotePeer.id = QUuid(itrGuid->second);
 
     if (getState() == ConnectingStage1) {
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);

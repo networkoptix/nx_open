@@ -244,7 +244,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
         QnBusinessEventParameters runtimeParams = QnBusinessEventParameters::deserialize(query.value(runtimeParamIdx).toByteArray());
         QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
         action->setParams(actionParams);
-        action->setBusinessRuleId(query.value(businessRuleIdx).toByteArray());
+        action->setBusinessRuleId(QUuid(query.value(businessRuleIdx).toByteArray()));
         action->setToggleState( (QnBusiness::EventState) query.value(toggleStateIdx).toInt());
         action->setAggregationCount(query.value(aggregationCntIdx).toInt());
 
@@ -312,7 +312,7 @@ void QnEventsDB::getAndSerializeActions(
             QUuid eventResId = QUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes = qnResPool->getResourceById(eventResId).dynamicCast<QnNetworkResource>();
             if (camRes) {
-                if (qnStorageMan->isArchiveTimeExists(camRes->getPhysicalId(), actionsQuery.value(timestampIdx).toInt()*1000ll))
+                if (qnStorageMan->isArchiveTimeExists(camRes->getUniqueId(), actionsQuery.value(timestampIdx).toInt()*1000ll))
                     flags |= QnBusinessActionData::MotionExists;
 
             }
@@ -378,7 +378,7 @@ void QnEventsDB::migrate()
 
         QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
         action->setParams(actionParams);
-        action->setBusinessRuleId(query.value(businessRuleIdx).toString());
+        action->setBusinessRuleId(QUuid(query.value(businessRuleIdx).toString()));
         action->setToggleState( (QnBusiness::EventState) query.value(toggleStateIdx).toInt());
         action->setAggregationCount(query.value(aggregationCntIdx).toInt());
 

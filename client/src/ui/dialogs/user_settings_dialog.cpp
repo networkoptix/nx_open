@@ -187,7 +187,7 @@ void QnUserSettingsDialog::updateFromResource() {
     if(!m_user)
         return;
 
-    if(m_user->getId() == 0) {
+    if(m_user->getId().isNull()) {
         ui->loginEdit->clear();
         ui->currentPasswordEdit->clear();
         ui->passwordEdit->clear();

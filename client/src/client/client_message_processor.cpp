@@ -20,7 +20,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     if (connection) {
         assert(!m_connected);
         assert(qnCommon->remoteGUID().isNull());
-        qnCommon->setRemoteGUID(connection->connectionInfo().ecsGuid);
+        qnCommon->setRemoteGUID(QUuid(connection->connectionInfo().ecsGuid));
         connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
         connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
     } else if (m_connected) { // double init by null is allowed

@@ -28,14 +28,14 @@ public:
 
     QnMotionArchive* getArchive(const QnResourcePtr& res, int channel);
 
-    static QString getMotionDir(const QDate& date, const QUuid& cameraId);
-    static void deleteUnusedFiles(const QList<QDate>& chunks, const QUuid& cameraId);
-    static QList<QDate> recordedMonth(const QUuid& cameraId);
+    static QString getMotionDir(const QDate& date, const QString& cameraUniqueId);
+    static void deleteUnusedFiles(const QList<QDate>& chunks, const QString& cameraUniqueId);
+    static QList<QDate> recordedMonth(const QString& cameraUniqueId);
 
     QnMotionHelper();
 
 private:
-    static QString getBaseDir(const QUuid& cameraId);
+    static QString getBaseDir(const QString& cameraUniqueId);
 
     // create Find mask by region
     void createMask(const QRegion& region);

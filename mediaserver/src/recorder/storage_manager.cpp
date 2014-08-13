@@ -118,9 +118,9 @@ std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaDat
 
     // add to DB
     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
-    QUuid cameraId = fileCatalog->cameraId();
+    QString cameraUniqueId = fileCatalog->cameraUniqueId();
     foreach(const DeviceFileCatalog::Chunk& chunk, newChunks)
-        sdb->addRecord(cameraId, catalog, chunk);
+        sdb->addRecord(cameraUniqueId, catalog, chunk);
     sdb->flushRecords();
     // merge chunks
     return DeviceFileCatalog::mergeChunks(chunks, newChunks);
@@ -177,7 +177,7 @@ bool QnStorageManager::loadFullFileCatalog(const QnStorageResourcePtr &storage, 
         // load from database
         foreach(DeviceFileCatalogPtr c, sdb->loadFullFileCatalog())
         {
-            DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->cameraId(), c->getCatalog());
+            DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->cameraUniqueId(), c->getCatalog());
             if (fileCatalog->m_chunks.empty())
                 fileCatalog->addChunks(correctChunksFromMediaData(fileCatalog, storage, c->m_chunks));
         }
@@ -280,14 +280,15 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
         if (m_rebuildState != RebuildState_Started)
             return; // cancel rebuild
 
+        QString cameraUniqueId = fi.fileName();
+
         qint64 rebuildEndTime = qnSyncTime->currentMSecsSinceEpoch() - 100 * 1000;
-        DeviceFileCatalogPtr newCatalog(new DeviceFileCatalog(fi.fileName(), catalog));
+        DeviceFileCatalogPtr newCatalog(new DeviceFileCatalog(cameraUniqueId, catalog));
         QnTimePeriod rebuildPeriod = QnTimePeriod(0, rebuildEndTime);
         newCatalog->doRebuildArchive(storage, rebuildPeriod);
-
-        QByteArray mac = fi.fileName().toUtf8();
-        DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(mac, catalog);
-        replaceChunks(rebuildPeriod, storage, newCatalog, mac, catalog);
+        
+        DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(cameraUniqueId, catalog);
+        replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
 
         m_rebuildProgress += progressCoeff / (double) list.size();
     }
@@ -453,25 +454,21 @@ void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList> &cameras,
     }
 }
 
-bool QnStorageManager::isArchiveTimeExists(const QString& physicalId, qint64 timeMs)
+bool QnStorageManager::isArchiveTimeExists(const QString& cameraUniqueId, qint64 timeMs)
 {
-    DeviceFileCatalogPtr catalog = getFileCatalog(physicalId.toUtf8(), QnServer::HiQualityCatalog);
+    DeviceFileCatalogPtr catalog = getFileCatalog(cameraUniqueId, QnServer::HiQualityCatalog);
     if (catalog && catalog->containTime(timeMs))
         return true;
 
-    catalog = getFileCatalog(physicalId.toUtf8(), QnServer::LowQualityCatalog);
+    catalog = getFileCatalog(cameraUniqueId, QnServer::LowQualityCatalog);
     return catalog && catalog->containTime(timeMs);
 }
 
 
-QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnResourceList &resList, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs) {
+QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs) {
     QVector<QnTimePeriodList> periods;
-    foreach (const QnResourcePtr &resource, resList) {
-        QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (resource);
-        if (!camera)
-            continue;
-
-        QString physicalId = camera->getPhysicalId();
+    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
+        QString cameraUniqueId = camera->getUniqueId();
         for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
             QnServer::ChunksCatalog catalog = static_cast<QnServer::ChunksCatalog> (i);
             if (!catalogs.contains(catalog))
@@ -482,7 +479,7 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnResourceList &resL
                 if (catalog == QnServer::HiQualityCatalog) // both hi- and low-quality chunks are loaded with this method
                     periods << camera->getDtsTimePeriods(startTime, endTime, detailLevel);
             } else {
-                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId.toUtf8(), catalog));
+                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(cameraUniqueId, catalog));
             }
         }
 
@@ -543,7 +540,7 @@ void QnStorageManager::clearDbByChunk(DeviceFileCatalogPtr catalog, const Device
         QnStorageResourcePtr storage = storageRoot(chunk.storageIndex);
         if (storage) {
             QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
-            sdb->deleteRecords(catalog->cameraId(), catalog->getRole(), chunk.startTimeMs);
+            sdb->deleteRecords(catalog->cameraUniqueId(), catalog->getRole(), chunk.startTimeMs);
         }
     }
 }
@@ -554,11 +551,11 @@ void QnStorageManager::clearMaxDaysData()
     clearMaxDaysData(m_devFileCatalog[QnServer::LowQualityCatalog]);
 }
 
-void QnStorageManager::clearMaxDaysData(FileCatalogMap catalogMap)
+void QnStorageManager::clearMaxDaysData(const FileCatalogMap &catalogMap)
 {
     QMutexLocker lock(&m_mutexCatalog);
     foreach(const DeviceFileCatalogPtr catalog, catalogMap.values()) {
-        QnSecurityCamResourcePtr camera = qnResPool->getResourceById(catalog->cameraId()).dynamicCast<QnSecurityCamResource>();
+        QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqId(catalog->cameraUniqueId()).dynamicCast<QnSecurityCamResource>();
         if (camera && camera->maxDays() > 0) {
             qint64 timeToDelete = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * camera->maxDays();
             deleteRecordsToTime(catalog, timeToDelete);
@@ -570,19 +567,19 @@ void QnStorageManager::clearUnusedMotion()
 {
     QMutexLocker lock(&m_mutexCatalog);
 
-    QMap<QUuid, QSet<QDate>> usedMonths;
+    UsedMonthsMap usedMonths;
 
     updateRecordedMonths(m_devFileCatalog[QnServer::HiQualityCatalog], usedMonths);
     updateRecordedMonths(m_devFileCatalog[QnServer::LowQualityCatalog], usedMonths);
 
     foreach(const DeviceFileCatalogPtr catalog, m_devFileCatalog[QnServer::HiQualityCatalog].values())
-        QnMotionHelper::instance()->deleteUnusedFiles(usedMonths[catalog->cameraId()].toList(), catalog->cameraId());
+        QnMotionHelper::instance()->deleteUnusedFiles(usedMonths[catalog->cameraUniqueId()].toList(), catalog->cameraUniqueId());
 }
 
-void QnStorageManager::updateRecordedMonths(FileCatalogMap catalogMap, QMap<QUuid, QSet<QDate>>& usedMonths)
+void QnStorageManager::updateRecordedMonths(const FileCatalogMap &catalogMap, UsedMonthsMap& usedMonths)
 {
     foreach(const DeviceFileCatalogPtr catalog, catalogMap.values())
-        usedMonths[catalog->cameraId()] += catalog->recordedMonthList();
+        usedMonths[catalog->cameraUniqueId()] += catalog->recordedMonthList();
 }
 
 void QnStorageManager::findTotalMinTime(const bool useMinArchiveDays, const FileCatalogMap& catalogMap, qint64& minTime, DeviceFileCatalogPtr& catalog)
@@ -594,7 +591,7 @@ void QnStorageManager::findTotalMinTime(const bool useMinArchiveDays, const File
         if (curMinTime != (qint64)AV_NOPTS_VALUE && curMinTime < minTime)
         {
             if (useMinArchiveDays) {
-                QnSecurityCamResourcePtr camera = qnResPool->getResourceById(itr.key()).dynamicCast<QnSecurityCamResource>();
+                QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqId(itr.key()).dynamicCast<QnSecurityCamResource>();
                 if (camera && camera->minDays() > 0) {
                     qint64 threshold = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * camera->minDays();
                     if (threshold < curMinTime)
@@ -637,7 +634,7 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
             DeviceFileCatalog::Chunk deletedChunk = catalog->deleteFirstRecord();
             clearDbByChunk(catalog, deletedChunk);
             QnServer::ChunksCatalog altQuality = catalog->getRole() == QnServer::HiQualityCatalog ? QnServer::LowQualityCatalog : QnServer::HiQualityCatalog;
-            DeviceFileCatalogPtr altCatalog = getFileCatalog(catalog->cameraId(), altQuality);
+            DeviceFileCatalogPtr altCatalog = getFileCatalog(catalog->cameraUniqueId(), altQuality);
             if (altCatalog != 0) 
             {
                 qint64 minTime = catalog->minTime();
@@ -891,21 +888,21 @@ QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, c
     return text + strPadLeft(QString::number(fileNum), 3, '0');
 }
 
-DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QUuid& cameraId, const QString &catalogPrefix)
+DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix)
 {
     if (!m_catalogLoaded)
         return DeviceFileCatalogPtr();
-    return getFileCatalogInternal(cameraId, DeviceFileCatalog::catalogByPrefix(catalogPrefix));
+    return getFileCatalogInternal(cameraUniqueId, DeviceFileCatalog::catalogByPrefix(catalogPrefix));
 }
 
-DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QUuid& cameraId, QnServer::ChunksCatalog catalog)
+DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog)
 {
     if (!m_catalogLoaded)
         return DeviceFileCatalogPtr();
-    return getFileCatalogInternal(cameraId, catalog);
+    return getFileCatalogInternal(cameraUniqueId, catalog);
 }
 
-void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QByteArray& mac, QnServer::ChunksCatalog catalog)
+void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QString& cameraUniqueId, QnServer::ChunksCatalog catalog)
 {
     QMutexLocker lock(&m_mutexCatalog);
     int storageIndex = storage->getIndex();
@@ -914,7 +911,7 @@ void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const Qn
     qint64 scannedDataLastTime = newCatalog->m_chunks.empty() ? 0 : newCatalog->m_chunks[newCatalog->m_chunks.size()-1].startTimeMs;
     qint64 rebuildLastTime = qMax(rebuildPeriod.endTimeMs(), scannedDataLastTime);
     
-    DeviceFileCatalogPtr ownCatalog = getFileCatalogInternal(mac, catalog);
+    DeviceFileCatalogPtr ownCatalog = getFileCatalogInternal(cameraUniqueId, catalog);
     auto itr = qLowerBound(ownCatalog->m_chunks.begin(), ownCatalog->m_chunks.end(), rebuildLastTime);
     for (; itr != ownCatalog->m_chunks.end(); ++itr)
     {
@@ -939,23 +936,23 @@ void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const Qn
         ownCatalog->setLatRecordingTime(recordingTime);
 
     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
-    sdb->replaceChunks(mac, catalog, newCatalog->m_chunks);
+    sdb->replaceChunks(cameraUniqueId, catalog, newCatalog->m_chunks);
 }
 
-DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(const QUuid& cameraId, QnServer::ChunksCatalog catalog)
+DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog)
 {
     QMutexLocker lock(&m_mutexCatalog);
     FileCatalogMap& catalogMap = m_devFileCatalog[catalog];
-    DeviceFileCatalogPtr fileCatalog = catalogMap[cameraId];
+    DeviceFileCatalogPtr fileCatalog = catalogMap[cameraUniqueId];
     if (fileCatalog == 0)
     {
-        fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(cameraId, catalog));
-        catalogMap[cameraId] = fileCatalog;
+        fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(cameraUniqueId, catalog));
+        catalogMap[cameraUniqueId] = fileCatalog;
     }
     return fileCatalog;
 }
 
-QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality)
+QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& uniqueId, QString& quality)
 {
     // 1.4 to 1.5 compatibility notes:
     // 1.5 prevent duplicates path to same physical storage (aka c:/test and c:/test/)
@@ -972,8 +969,8 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
         {
             int qualityLen = fileName.indexOf('/', root.length()+1) - root.length();
             quality = fileName.mid(root.length(), qualityLen);
-            int macPos = root.length() + qualityLen;
-            mac = fileName.mid(macPos+1, fileName.indexOf('/', macPos+1) - macPos-1);
+            int idPos = root.length() + qualityLen;
+            uniqueId = fileName.mid(idPos+1, fileName.indexOf('/', idPos+1) - idPos-1);
             storageIndex = itr.value()->getIndex();
             return *itr;
         }
@@ -996,17 +993,18 @@ QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
 bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)
 {
     int storageIndex;
-    QString quality, mac;
-    QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, mac, quality);
+    QString quality;
+    QString cameraUniqueId;
+    QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, cameraUniqueId, quality);
     if (storageIndex >= 0)
         storage->releaseBitrate(provider);
         //storage->addWritedSpace(fileSize);
 
-    DeviceFileCatalogPtr catalog = getFileCatalog(mac.toUtf8(), quality);
+    DeviceFileCatalogPtr catalog = getFileCatalog(cameraUniqueId, quality);
     if (catalog == 0)
         return false;
     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
-    sdb->addRecord(mac.toUtf8(), DeviceFileCatalog::catalogByPrefix(quality), catalog->updateDuration(durationMs, fileSize));
+    sdb->addRecord(cameraUniqueId, DeviceFileCatalog::catalogByPrefix(quality), catalog->updateDuration(durationMs, fileSize));
     return true;
 }
 

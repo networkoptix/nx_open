@@ -103,13 +103,13 @@ public:
     * Return module GUID. if destination action intended for current module, no route through message bus is required
     */
 
-    virtual QString getGuid() const { return QString(); }
+    virtual QUuid getGuid() const { return QUuid(); }
 
     bool broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
 public slots:
     /*
     * This function matches all business actions for specified business event and execute it
-    * So, call this function if business event occured
+    * So, call this function if business event occurred
     */
     void processBusinessEvent(const QnAbstractBusinessEventPtr& bEvent);
 

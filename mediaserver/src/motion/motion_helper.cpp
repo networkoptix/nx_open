@@ -110,24 +110,24 @@ QnMotionHelper* QnMotionHelper::instance()
     //return inst();
 }
 
-QString QnMotionHelper::getBaseDir(const QUuid& cameraId)
+QString QnMotionHelper::getBaseDir(const QString& cameraUniqueId)
 {
 #ifdef _TEST_TWO_SERVERS
-    return closeDirPath(getDataDirectory()) + QString("test/record_catalog/metadata/") + cameraId.toString() + L'/';
+    return closeDirPath(getDataDirectory()) + QString("test/record_catalog/metadata/") + cameraUniqueId + L'/';
 #else
-    return closeDirPath(getDataDirectory()) + QString("record_catalog/metadata/") + cameraId.toString() + L'/';
+    return closeDirPath(getDataDirectory()) + QString("record_catalog/metadata/") + cameraUniqueId + L'/';
 #endif
 }
 
-QString QnMotionHelper::getMotionDir(const QDate& date, const QUuid& cameraId)
+QString QnMotionHelper::getMotionDir(const QDate& date, const QString& cameraUniqueId)
 {
-    return getBaseDir(cameraId) + date.toString("yyyy/MM/");
+    return getBaseDir(cameraUniqueId) + date.toString("yyyy/MM/");
 }
 
-QList<QDate> QnMotionHelper::recordedMonth(const QUuid& cameraId)
+QList<QDate> QnMotionHelper::recordedMonth(const QString& cameraUniqueId)
 {
     QList<QDate> rez;
-    QDir baseDir(getBaseDir(cameraId));
+    QDir baseDir(getBaseDir(cameraUniqueId));
     QList<QFileInfo> yearList = baseDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs);
     foreach(const QFileInfo& fiYear, yearList)
     {
@@ -145,11 +145,11 @@ QList<QDate> QnMotionHelper::recordedMonth(const QUuid& cameraId)
     return rez;
 }
 
-void QnMotionHelper::deleteUnusedFiles(const QList<QDate>& monthList, const QUuid& cameraId)
+void QnMotionHelper::deleteUnusedFiles(const QList<QDate>& monthList, const QString& cameraUniqueId)
 {
-    QList<QDate> existsData = recordedMonth(cameraId);
+    QList<QDate> existsData = recordedMonth(cameraUniqueId);
     foreach(const QDate& date, existsData) {
         if (!monthList.contains(date))
-            qnFileDeletor->deleteDir(getMotionDir(date, cameraId));
+            qnFileDeletor->deleteDir(getMotionDir(date, cameraUniqueId));
     }
 }

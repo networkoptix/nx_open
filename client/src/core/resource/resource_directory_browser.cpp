@@ -213,7 +213,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     }
 
 
-    layout->setParentId(0);
+    layout->setParentId(QUuid());
     layout->setId(QUuid::createUuid());
     layout->setName(QFileInfo(xfile).fileName());
     // No need to do so, at end of this function the author do it again. ---- DPENG
