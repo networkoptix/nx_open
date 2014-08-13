@@ -65,7 +65,6 @@ class UPNPDeviceSearcher
     public QObject,
     public TimerEventHandler,
     public QnStoppable
-    //, public aio::AIOEventHandler
 {
     Q_OBJECT
 
@@ -153,8 +152,6 @@ private:
 
     //!Implementation of \a TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID ) override;
-    //!Implementation of \a aio::AIOEventHandler::eventTriggered
-    //virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() override;
     void onSomeBytesRead(
         AbstractCommunicatingSocket* sock,
         SystemError::ErrorCode errorCode,
