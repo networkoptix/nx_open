@@ -11,7 +11,7 @@
 #include <QtCore/QByteArray>
 
 #include "abstract_accurate_time_fetcher.h"
-#include "utils/network/aio/aioservice.h"
+#include "utils/network/abstract_socket.h"
 
 
 //!Fetches time from NIST servers using Daytime (rfc867) protocol
@@ -20,8 +20,7 @@
 */
 class DaytimeNISTFetcher
 :
-    public AbstractAccurateTimeFetcher,
-    public aio::AIOEventHandler
+    public AbstractAccurateTimeFetcher
 {
 public:
     DaytimeNISTFetcher();
@@ -41,7 +40,8 @@ private:
     std::function<void(qint64, SystemError::ErrorCode)> m_handlerFunc;
     int m_readBufferSize;
 
-    virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() override;
+    void onConnectionEstablished( SystemError::ErrorCode errorCode ) noexcept;
+    void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead ) noexcept;
 };
 
 #endif  //DAYTIME_NIST_FETCHER_H

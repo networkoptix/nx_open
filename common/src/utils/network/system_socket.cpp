@@ -54,8 +54,6 @@ static const int ERR_TIMEOUT = ETIMEDOUT;
 static const int ERR_WOULDBLOCK = EWOULDBLOCK;
 #endif
 
-//TODO/IMPL set prevErrorCode to noError in case of success
-
 int getSystemErrCode()
 {
 #ifdef WIN32
@@ -594,6 +592,8 @@ public:
 
     virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() override
     {
+        //TODO #ak break this method to multiple methods
+
         //NOTE aio garantees that all events on socket are handled in same aio thread, so no synchronization is required
         bool terminated = false;    //set to true just before object destruction
 
@@ -676,7 +676,7 @@ public:
                 //reading to buffer
                 const size_t bufSizeBak = recvBuffer->size();
                 recvBuffer->resize( recvBuffer->capacity() );
-                const int bytesRead = dynamic_cast<AbstractCommunicatingSocket*>(sock)->recv(
+                const int bytesRead = static_cast<AbstractCommunicatingSocket*>(sock)->recv(
                     recvBuffer->data() + bufSizeBak,
                     recvBuffer->capacity() - bufSizeBak );
                 if( bytesRead == -1 )
@@ -686,8 +686,7 @@ public:
                 }
                 else
                 {
-                    if( bytesRead > 0 )
-                        recvBuffer->resize( bufSizeBak + bytesRead );   //shrinking buffer
+                    recvBuffer->resize( bufSizeBak + bytesRead );   //shrinking buffer
                     recvHandlerLocal( SystemError::noError, bytesRead );
                 }
                 break;
@@ -710,7 +709,7 @@ public:
 
                     std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_write)> cleanupGuard( this, __finally_write );
 
-                    const int bytesWritten = dynamic_cast<AbstractCommunicatingSocket*>(sock)->send(
+                    const int bytesWritten = static_cast<AbstractCommunicatingSocket*>(sock)->send(
                         sendBuffer->constData() + sendBufPos,
                         sendBuffer->size() - sendBufPos );
                     if( bytesWritten == -1 || bytesWritten == 0 )
@@ -861,7 +860,19 @@ CommunicatingSocket::CommunicatingSocket( AbstractSocket* abstractSocketPtr, int
 {
 }
 
+CommunicatingSocket::~CommunicatingSocket()
+{
+    CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>(impl());
 
+    //cancel ongoing async I/O. Doing this only if CommunicatingSocketPrivate::eventTriggered is down the stack
+    if( d->threadHandlerIsRunningIn == QThread::currentThreadId() )
+    {
+        if( d->m_connectSendHandlerTerminatedFlag )
+            aio::AIOService::instance()->removeFromWatch( m_abstractSocketPtr, aio::etWrite );
+        if( d->m_recvHandlerTerminatedFlag )
+            aio::AIOService::instance()->removeFromWatch( m_abstractSocketPtr, aio::etRead );
+    }
+}
 
 //!Implementation of AbstractCommunicatingSocket::connect
 bool CommunicatingSocket::connect( const QString& foreignAddress, unsigned short foreignPort, unsigned int timeoutMs )
@@ -1744,32 +1755,34 @@ bool UDPSocket::sendTo(
     return sendTo( buffer, bufferLen );
 }
 
+int UDPSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/ )
+{
+    //TODO #ak use flags
+    return recvFrom( buffer, bufferLen, &m_prevDatagramAddress.address, &m_prevDatagramAddress.port );
+}
+
 int UDPSocket::recvFrom(
     void *buffer,
-    int bufferLen,
+    unsigned int bufferLen,
     QString& sourceAddress,
     unsigned short &sourcePort )
 {
-    sockaddr_in clntAddr;
-    socklen_t addrLen = sizeof(clntAddr);
-
-#ifdef _WIN32
-    int rtn = recvfrom( m_implDelegate.handle(), (raw_type *)buffer, bufferLen, 0, (sockaddr *)&clntAddr, (socklen_t *)&addrLen );
-#else
-    unsigned int recvTimeout = 0;
-    if( !getRecvTimeout( &recvTimeout ) )
-        return -1;
-
-    int rtn = doInterruptableSystemCallWithTimeout<>(
-        std::bind(&::recvfrom, m_implDelegate.handle(), (void*)buffer, (size_t)bufferLen, 0, (sockaddr*)&clntAddr, (socklen_t*)&addrLen),
-        recvTimeout );
-#endif
+    int rtn = recvFrom(
+        buffer,
+        bufferLen,
+        &m_prevDatagramAddress.address,
+        &m_prevDatagramAddress.port );
 
     if (rtn >= 0) {
-        sourceAddress = QLatin1String(inet_ntoa(clntAddr.sin_addr));
-        sourcePort = ntohs(clntAddr.sin_port);
+        sourceAddress = QLatin1String(inet_ntoa(m_prevDatagramAddress.address.inAddr()));
+        sourcePort = m_prevDatagramAddress.port;
     }
     return rtn;
+}
+
+SocketAddress UDPSocket::lastDatagramSourceAddress() const
+{
+    return m_prevDatagramAddress;
 }
 
 bool UDPSocket::hasData() const
@@ -1799,4 +1812,33 @@ bool UDPSocket::hasData() const
 #endif
     return (::poll( &sockPollfd, 1, 0 ) == 1) && ((sockPollfd.revents & POLLIN) != 0);
 #endif
+}
+
+int UDPSocket::recvFrom(
+    void* buffer,
+    unsigned int bufferLen,
+    HostAddress* const sourceAddress,
+    int* const sourcePort )
+{
+    sockaddr_in clntAddr;
+    socklen_t addrLen = sizeof( clntAddr );
+
+#ifdef _WIN32
+    int rtn = recvfrom( m_implDelegate.handle(), (raw_type *)buffer, bufferLen, 0, (sockaddr *)&clntAddr, (socklen_t *)&addrLen );
+#else
+    unsigned int recvTimeout = 0;
+    if( !getRecvTimeout( &recvTimeout ) )
+        return -1;
+
+    int rtn = doInterruptableSystemCallWithTimeout<>(
+        std::bind( &::recvfrom, m_implDelegate.handle(), (void*)buffer, (size_t)bufferLen, 0, (sockaddr*)&clntAddr, (socklen_t*)&addrLen ),
+        recvTimeout );
+#endif
+
+    if( rtn >= 0 )
+    {
+        *sourceAddress = HostAddress( clntAddr.sin_addr );
+        *sourcePort = ntohs(clntAddr.sin_port);
+    }
+    return rtn;
 }

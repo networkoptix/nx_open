@@ -38,6 +38,8 @@ public:
     uint32_t ipv4() const;
     QString toString() const;
 
+    struct in_addr inAddr() const;
+
     static const HostAddress localhost;
     static const HostAddress anyHost;
 

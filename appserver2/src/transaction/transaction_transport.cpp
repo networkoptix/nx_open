@@ -36,7 +36,6 @@ QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, con
     m_prevGivenHandlerID(0)
 {
     m_readBuffer.reserve( 4 * 1024 );
-    //m_readBuffer.resize( 4*1024 );
 }
 
 

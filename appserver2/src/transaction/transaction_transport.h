@@ -14,7 +14,6 @@
 #include <transaction/transaction_transport_header.h>
 
 #include <utils/network/abstract_socket.h>
-#include "utils/network/aio/aioeventhandler.h"
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/common/id.h"
 
@@ -30,7 +29,6 @@ namespace ec2
 class QnTransactionTransport
 :
     public QObject
-    //, public aio::AIOEventHandler
 {
     Q_OBJECT
 public:

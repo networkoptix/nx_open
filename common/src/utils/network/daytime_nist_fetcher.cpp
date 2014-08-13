@@ -22,7 +22,7 @@ DaytimeNISTFetcher::DaytimeNISTFetcher()
 :
     m_readBufferSize( 0 )
 {
-    m_timeStr.resize( MAX_TIME_STR_LENGTH );
+    m_timeStr.reserve( MAX_TIME_STR_LENGTH );
 }
 
 DaytimeNISTFetcher::~DaytimeNISTFetcher()
@@ -34,8 +34,8 @@ void DaytimeNISTFetcher::pleaseStop()
     if( !m_tcpSock )
         return;
 
-    aio::AIOService::instance()->removeFromWatch( m_tcpSock.get(), aio::etRead );
-    aio::AIOService::instance()->removeFromWatch( m_tcpSock.get(), aio::etWrite );
+    m_tcpSock->cancelAsyncIO( aio::etRead );
+    m_tcpSock->cancelAsyncIO( aio::etWrite );
     m_tcpSock.reset();
 }
 
@@ -52,18 +52,25 @@ bool DaytimeNISTFetcher::getTimeAsync( std::function<void(qint64, SystemError::E
         return false;
 
     if( !m_tcpSock->setNonBlockingMode( true ) ||
-        !m_tcpSock->setRecvTimeout(SOCKET_READ_TIMEOUT) )
+        !m_tcpSock->setRecvTimeout(SOCKET_READ_TIMEOUT) ||
+        !m_tcpSock->setSendTimeout(SOCKET_READ_TIMEOUT) )
     {
         m_tcpSock.reset();
         return false;
     }
-    m_handlerFunc = handlerFunc;
 
-    m_tcpSock->connect( QString::fromLatin1(DEFAULT_NIST_SERVER), DAYTIME_PROTOCOL_DEFAULT_PORT, SOCKET_READ_TIMEOUT );
-
-    //we MUST do watchSocket after connect
-    if( !aio::AIOService::instance()->watchSocket( m_tcpSock.get(), aio::etWrite, this ) )
+    m_handlerFunc = [this, handlerFunc]( qint64 timestamp, SystemError::ErrorCode error )
     {
+        m_tcpSock.reset();
+        handlerFunc( timestamp, error );
+    };
+
+    using namespace std::placeholders;
+    if( !m_tcpSock->connectAsync(
+            SocketAddress( HostAddress( QLatin1String( DEFAULT_NIST_SERVER ) ), DAYTIME_PROTOCOL_DEFAULT_PORT ),
+            std::bind( &DaytimeNISTFetcher::onConnectionEstablished, this, _1 ) ) )
+    {
+        m_handlerFunc = std::function<void( qint64, SystemError::ErrorCode )>();
         m_tcpSock.reset();
         return false;
     }
@@ -105,76 +112,60 @@ static qint64 actsTimeToUTCMillis( const char* actsStr )
     return ((qint64)utcTime - tp.timezone * SEC_PER_MIN) * MILLIS_PER_SEC;
 }
 
-void DaytimeNISTFetcher::eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw()
+void DaytimeNISTFetcher::onConnectionEstablished( SystemError::ErrorCode errorCode )
 {
-    assert( sock == m_tcpSock.get() );
-
-    switch( eventType )
+    if( errorCode )
     {
-        case aio::etWrite:
-            //connection established, waiting for data
-            aio::AIOService::instance()->removeFromWatch( m_tcpSock.get(), aio::etWrite );
-            if( !aio::AIOService::instance()->watchSocket( m_tcpSock.get(), aio::etRead, this ) )
-            {
-                m_handlerFunc( -1, SystemError::getLastOSErrorCode() );
-                break;
-            }
-            return;
-
-        case aio::etRead:
-        {
-            //reading time data
-            int readed = m_tcpSock->recv( m_timeStr.data() + m_readBufferSize, m_timeStr.size()-m_readBufferSize );
-            if( readed == 0 )
-            {
-                //connection closed
-                assert( m_readBufferSize < m_timeStr.size() );
-                m_timeStr[m_readBufferSize] = 0;
-                m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
-                break;
-            }
-            if( readed < 0 )
-            {
-                const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-                if( errorCode == SystemError::wouldBlock || errorCode == SystemError::again )
-                    return; //waiting for more data
-                m_handlerFunc( -1, errorCode );
-                break;
-            }
-
-            m_readBufferSize += readed;
-            if( m_readBufferSize == m_timeStr.size() )
-            {
-                //max data size has been read, ignoring futher data
-                m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
-                break;
-            }
-            return; //waiting futher data
-        }
-
-        case aio::etTimedOut:
-        {
-            //no response during the allotted time period
-            if( m_readBufferSize > 0 )
-            {
-                //processing that we have
-                assert( m_readBufferSize < m_timeStr.size() );
-                m_timeStr[m_readBufferSize] = 0;
-                m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
-            }
-            else
-            {
-                m_handlerFunc( -1, SystemError::timedOut );
-            }
-            break;
-        }
-
-        default:
-            m_handlerFunc( -1, SystemError::timedOut ); //TODO get error code
-            break;
+        m_handlerFunc( -1, errorCode );
+        return;
     }
 
-    aio::AIOService::instance()->removeFromWatch( m_tcpSock.get(), aio::etRead );
-    aio::AIOService::instance()->removeFromWatch( m_tcpSock.get(), aio::etWrite );
-    m_tcpSock.reset();
+    m_timeStr.reserve( MAX_TIME_STR_LENGTH );
+    m_timeStr.resize( 0 );
+
+    using namespace std::placeholders;
+    if( !m_tcpSock->readSomeAsync( &m_timeStr, std::bind( &DaytimeNISTFetcher::onSomeBytesRead, this, _1, _2 ) ) )
+        m_handlerFunc( -1, SystemError::getLastOSErrorCode() );
+}
+
+void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
+{
+    if( errorCode )
+    {
+        if( errorCode == SystemError::timedOut && m_timeStr.size() > 0 )
+        {
+            //no response during the allotted time period
+            //processing what we have
+            assert( m_timeStr.size() < m_timeStr.capacity() );
+            m_timeStr.append( '\0' );
+            m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
+        }
+        else
+        {
+            m_handlerFunc( -1, errorCode );
+        }
+        return;
+    }
+
+    if( bytesRead == 0 )
+    {
+        //connection closed, analyzing what we have
+        assert( m_timeStr.size() < m_timeStr.capacity() );
+        m_timeStr.append( '\0' );
+        m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
+        return;
+    }
+
+    if( m_timeStr.size() == m_timeStr.capacity() )
+    {
+        //max data size has been read, ignoring futher data
+        m_tcpSock->close();
+        m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
+        return;
+    }
+
+    //reading futher data
+    using namespace std::placeholders;
+    if( !m_tcpSock->readSomeAsync( &m_timeStr, std::bind( &DaytimeNISTFetcher::onSomeBytesRead, this, _1, _2 ) ) )
+        m_handlerFunc( -1, SystemError::getLastOSErrorCode() );
 }

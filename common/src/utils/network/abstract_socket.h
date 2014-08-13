@@ -417,9 +417,11 @@ public:
     */
     virtual int recvFrom(
         void* buffer,
-        int bufferLen,
+        unsigned int bufferLen,
         QString& sourceAddress,
         unsigned short& sourcePort ) = 0;
+    //!Returns address of previous datagram read with \a AbstractCommunicatingSocket::recv or \a AbstractDatagramSocket::recvFrom
+    virtual SocketAddress lastDatagramSourceAddress() const = 0;
     //!Checks, whether data is available for reading in non-blocking mode. Does not block for timeout, returns immediately
     /*!
         TODO: #ak remove this method, since it requires use of \a select(), which is heavy, use \a MSG_DONTWAIT instead
