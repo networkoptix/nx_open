@@ -118,12 +118,13 @@ void UPNPDeviceSearcher::pleaseStop()
         TimerManager::instance()->joinAndDeleteTimer( m_timerID );
 
     //since dispatching is stopped, no need to synchronize access to m_socketList
-    for( std::map<QString, std::shared_ptr<AbstractDatagramSocket> >::const_iterator
+    for( std::map<QString, SocketReadCtx>::const_iterator
         it = m_socketList.begin();
         it != m_socketList.end();
         ++it )
     {
-        aio::AIOService::instance()->removeFromWatch( it->second.get(), aio::etRead );
+        //aio::AIOService::instance()->removeFromWatch( it->second.get(), aio::etRead );
+        it->second.sock->cancelAsyncIO( aio::etRead );
     }
     m_socketList.clear();
 
@@ -202,46 +203,51 @@ void UPNPDeviceSearcher::onTimer( const quint64& /*timerID*/ )
         m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
 }
 
-void UPNPDeviceSearcher::eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw()
+void UPNPDeviceSearcher::onSomeBytesRead(
+    AbstractCommunicatingSocket* sock,
+    SystemError::ErrorCode errorCode,
+    nx::Buffer* readBuffer,
+    size_t /*bytesRead*/ ) noexcept
 {
-    if( eventType == aio::etError )
+    if( errorCode )
     {
         std::shared_ptr<AbstractDatagramSocket> udpSock;
         {
             QMutexLocker lk( &m_mutex );
             //removing socket from m_socketList
-            for( map<QString, std::shared_ptr<AbstractDatagramSocket> >::iterator
+            for( map<QString, SocketReadCtx>::iterator
                 it = m_socketList.begin();
                 it != m_socketList.end();
                 ++it )
             {
-                if( it->second.get() == sock ) {
-                    udpSock = it->second;
+                if( it->second.sock.get() == sock )
+                {
+                    udpSock = it->second.sock;
                     m_socketList.erase( it );
                     break;
                 }
             }
         }
-        if( udpSock )
-            aio::AIOService::instance()->removeFromWatch( udpSock.get(), aio::etRead );
+        udpSock->cancelAsyncIO( aio::etRead );
         return;
     }
 
     nx_http::Request foundDeviceReply;
     QString remoteHost;
 
-    AbstractDatagramSocket* udpSock = dynamic_cast<AbstractDatagramSocket*>( sock );
-    Q_ASSERT( udpSock );
+    auto SCOPED_GUARD_FUNC = [this, readBuffer, sock]( UPNPDeviceSearcher* ){
+        readBuffer->resize( 0 );
+        using namespace std::placeholders;
+        sock->readSomeAsync( readBuffer, std::bind( &UPNPDeviceSearcher::onSomeBytesRead, this, sock, _1, readBuffer, _2 ) );
+    };
+
+    std::unique_ptr<UPNPDeviceSearcher, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
     {
-        QMutexLocker lk( &m_mutex );    //locking m_readBuf
-
+        AbstractDatagramSocket* udpSock = static_cast<AbstractDatagramSocket*>(sock);
         //reading socket and parsing UPnP response packet
-        quint16 senderPort;
-        int readed = udpSock->recvFrom( m_readBuf, READ_BUF_CAPACITY, remoteHost, senderPort );
-        if( readed > 0 )
-            m_readBuf[readed] = 0;
-        if( !foundDeviceReply.parse( QByteArray::fromRawData(m_readBuf, readed) ) )
+        remoteHost = udpSock->lastDatagramSourceAddress().address.toString();
+        if( !foundDeviceReply.parse( *readBuffer ) )
             return;
     }
 
@@ -254,15 +260,77 @@ void UPNPDeviceSearcher::eventTriggered( AbstractSocket* sock, aio::EventType ev
         return;
 
     QByteArray uuidStr = uuidHeader->second;
-    if (!uuidStr.startsWith("uuid:"))
+    if( !uuidStr.startsWith( "uuid:" ) )
         return;
-    uuidStr = uuidStr.split(':')[1];
+    uuidStr = uuidStr.split( ':' )[1];
 
-    const QUrl descriptionUrl( QLatin1String(locationHeader->second) );
+    const QUrl descriptionUrl( QLatin1String( locationHeader->second ) );
     uuidStr += descriptionUrl.toString();
 
     startFetchDeviceXml( uuidStr, descriptionUrl, remoteHost );
 }
+
+//void UPNPDeviceSearcher::eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw()
+//{
+//    if( eventType == aio::etError )
+//    {
+//        std::shared_ptr<AbstractDatagramSocket> udpSock;
+//        {
+//            QMutexLocker lk( &m_mutex );
+//            //removing socket from m_socketList
+//            for( map<QString, SocketReadCtx>::iterator
+//                it = m_socketList.begin();
+//                it != m_socketList.end();
+//                ++it )
+//            {
+//                if( it->second.get() == sock ) {
+//                    udpSock = it->second;
+//                    m_socketList.erase( it );
+//                    break;
+//                }
+//            }
+//        }
+//        if( udpSock )
+//            aio::AIOService::instance()->removeFromWatch( udpSock.get(), aio::etRead );
+//        return;
+//    }
+//
+//    nx_http::Request foundDeviceReply;
+//    QString remoteHost;
+//
+//    AbstractDatagramSocket* udpSock = dynamic_cast<AbstractDatagramSocket*>( sock );
+//    Q_ASSERT( udpSock );
+//
+//    {
+//        QMutexLocker lk( &m_mutex );    //locking m_readBuf
+//
+//        //reading socket and parsing UPnP response packet
+//        quint16 senderPort;
+//        int readed = udpSock->recvFrom( m_readBuf, READ_BUF_CAPACITY, remoteHost, senderPort );
+//        if( readed > 0 )
+//            m_readBuf[readed] = 0;
+//        if( !foundDeviceReply.parse( QByteArray::fromRawData(m_readBuf, readed) ) )
+//            return;
+//    }
+//
+//    nx_http::HttpHeaders::const_iterator locationHeader = foundDeviceReply.headers.find( "LOCATION" );
+//    if( locationHeader == foundDeviceReply.headers.end() )
+//        return;
+//
+//    nx_http::HttpHeaders::const_iterator uuidHeader = foundDeviceReply.headers.find( "USN" );
+//    if( uuidHeader == foundDeviceReply.headers.end() )
+//        return;
+//
+//    QByteArray uuidStr = uuidHeader->second;
+//    if (!uuidStr.startsWith("uuid:"))
+//        return;
+//    uuidStr = uuidStr.split(':')[1];
+//
+//    const QUrl descriptionUrl( QLatin1String(locationHeader->second) );
+//    uuidStr += descriptionUrl.toString();
+//
+//    startFetchDeviceXml( uuidStr, descriptionUrl, remoteHost );
+//}
 
 void UPNPDeviceSearcher::dispatchDiscoverPackets()
 {
@@ -288,24 +356,28 @@ std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const
 {
     const QString& localAddress = iface.address.toString();
 
-    pair<map<QString, std::shared_ptr<AbstractDatagramSocket> >::iterator, bool> p;
+    pair<map<QString, SocketReadCtx>::iterator, bool> p;
     {
         QMutexLocker lk( &m_mutex );
-        p = m_socketList.insert( make_pair( localAddress, std::shared_ptr<AbstractDatagramSocket>() ) );
+        p = m_socketList.insert( make_pair( localAddress, SocketReadCtx() ) );
     }
     if( !p.second )
-        return p.first->second;
+        return p.first->second.sock;
 
     //creating new socket
     std::shared_ptr<UDPSocket> sock( new UDPSocket() );
 
-    p.first->second = sock;
+    using namespace std::placeholders;
+
+    p.first->second.sock = sock;
+    p.first->second.buf.reserve( READ_BUF_CAPACITY );
     if( !sock->setReuseAddrFlag( true ) ||
         !sock->bind( SocketAddress(localAddress, GROUP_PORT) ) ||
         !sock->joinGroup( groupAddress.toString(), iface.address.toString() ) ||
         !sock->setMulticastIF( localAddress ) ||
         !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ) ||
-        !aio::AIOService::instance()->watchSocket( sock.get(), aio::etRead, this ) )
+        //!aio::AIOService::instance()->watchSocket( sock.get(), aio::etRead, this ) )
+        !sock->readSomeAsync( &p.first->second.buf, std::bind( &UPNPDeviceSearcher::onSomeBytesRead, this, sock.get(), _1, &p.first->second.buf, _2 ) ) )
     {
         QMutexLocker lk( &m_mutex );
         m_socketList.erase( p.first );

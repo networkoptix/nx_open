@@ -44,3 +44,8 @@ QString HostAddress::toString() const
         m_addrStr = QLatin1String(inet_ntoa(m_sinAddr));
     return m_addrStr.get();
 }
+
+struct in_addr HostAddress::inAddr() const
+{
+    return m_sinAddr;
+}

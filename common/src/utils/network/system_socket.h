@@ -589,12 +589,19 @@ public:
         unsigned int bufferLen,
         const QString& foreignAddress,
         unsigned short foreignPort ) override;
+    //!Implementation of AbstractCommunicatingSocket::recv
+    /*!
+        Actually calls \a UDPSocket::recvFrom and saves datagram source address/port
+    */
+    virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
     //!Implementation of AbstractDatagramSocket::recvFrom
     virtual int recvFrom(
         void* buffer,
-        int bufferLen,
+        unsigned int bufferLen,
         QString& sourceAddress,
         unsigned short& sourcePort ) override;
+    //!Implementation of AbstractDatagramSocket::lastDatagramSourceAddress
+    virtual SocketAddress lastDatagramSourceAddress() const override;
     //!Implementation of AbstractDatagramSocket::hasData
     virtual bool hasData() const override;
     //!Implementation of AbstractDatagramSocket::setMulticastIF
@@ -605,10 +612,18 @@ public:
     virtual bool setMulticastIF( const QString& multicastIF ) override;
 
 private:
-    void setBroadcast();
-
-private:
     sockaddr_in m_destAddr;
+    SocketAddress m_prevDatagramAddress;
+
+    void setBroadcast();
+    /*!
+        \param sourcePort Port is returned in host byte order
+    */
+    int recvFrom(
+        void* buffer,
+        unsigned int bufferLen,
+        HostAddress* const sourceAddress,
+        int* const sourcePort );
 };
 
 #endif
