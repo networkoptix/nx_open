@@ -24,9 +24,9 @@ namespace ec2
         m_dbManager( new QnDbManager(
             resCtx.resFactory,
             &m_licenseManagerImpl,
-            dbUrl.path(),
+            dbUrl.path().mid(1),
             QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path"))),
-        m_auxManager(new QnAuxManager(&m_emailManagerImpl)),
+        m_auxManager(new QnAuxManager()),
         m_transactionLog( new QnTransactionLog(m_dbManager.get() )),
         m_connectionInfo( connectionInfo )
     {

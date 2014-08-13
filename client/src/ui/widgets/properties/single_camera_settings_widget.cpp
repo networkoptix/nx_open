@@ -42,6 +42,8 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 
+#include <ui/workaround/qt5_combobox_workaround.h>
+
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/license_usage_helper.h>
 #include <common/common_module.h>
@@ -85,6 +87,9 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     ui->cameraScheduleWidget->setContext(context());
     connect(context(), &QnWorkbenchContext::userChanged, this, &QnSingleCameraSettingsWidget::updateLicensesButtonVisible);
 
+    QnCamLicenseUsageHelper helper;
+    ui->licensesUsageWidget->init(&helper);
+
     /* Set up context help. */
     setHelpTopic(this,                                                      Qn::CameraSettings_Help);
     setHelpTopic(ui->fisheyeCheckBox,                                       Qn::CameraSettings_Dewarping_Help);
@@ -99,8 +104,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     setHelpTopic(ui->motionTab,                                             Qn::CameraSettings_Motion_Help);
     setHelpTopic(ui->advancedTab,                                           Qn::CameraSettings_Properties_Help);
     setHelpTopic(ui->fisheyeTab,                                            Qn::CameraSettings_Dewarping_Help);
-    setHelpTopic(ui->arOverrideCheckBox, ui->arComboBox,                    Qn::CameraSettings_AspectRatio_Help);
-    setHelpTopic(ui->arGroupBox,                                            Qn::CameraSettings_AspectRatio_Help);
+    setHelpTopic(ui->forceArCheckBox, ui->forceArComboBox,                  Qn::CameraSettings_AspectRatio_Help);
 
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();
@@ -142,15 +146,24 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->fisheyeSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_fisheyeSettingsChanged()));
     connect(ui->fisheyeCheckBox,        &QCheckBox::toggled,                    this,   &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
 
-    connect(ui->arOverrideCheckBox, &QCheckBox::stateChanged, this, [this](int state){ ui->arComboBox->setEnabled(state == Qt::Checked);} );
-    connect(ui->arOverrideCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dbDataChanged()));
+    connect(ui->forceArCheckBox,        &QCheckBox::stateChanged,               this,   [this](int state){ ui->forceArComboBox->setEnabled(state == Qt::Checked);} );
+    connect(ui->forceArCheckBox,        &QCheckBox::stateChanged,               this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
-    ui->arComboBox->addItem(tr("4:3"),  4.0 / 3);
-    ui->arComboBox->addItem(tr("16:9"), 16.0 / 9);
-    ui->arComboBox->addItem(tr("1:1"),  1.0);
-    ui->arComboBox->setCurrentIndex(0);
-    connect(ui->arComboBox,         SIGNAL(currentIndexChanged(int)),    this,          SLOT(at_dbDataChanged()));
+    ui->forceArComboBox->addItem(tr("4:3"),  4.0 / 3);
+    ui->forceArComboBox->addItem(tr("16:9"), 16.0 / 9);
+    ui->forceArComboBox->addItem(tr("1:1"),  1.0);
+    ui->forceArComboBox->setCurrentIndex(0);
+    connect(ui->forceArComboBox,        QnComboboxCurrentIndexChanged,          this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
+    connect(ui->forceRotationCheckBox,  &QCheckBox::stateChanged,               this,   [this](int state){ ui->forceRotationComboBox->setEnabled(state == Qt::Checked);} );
+    connect(ui->forceRotationCheckBox,  &QCheckBox::stateChanged,               this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
+
+    ui->forceRotationComboBox->addItem(tr("0 degrees"),      0);
+    ui->forceRotationComboBox->addItem(tr("90 degrees"),    90);
+    ui->forceRotationComboBox->addItem(tr("180 degrees"),   180);
+    ui->forceRotationComboBox->addItem(tr("270 degrees"),   270);
+    ui->forceRotationComboBox->setCurrentIndex(0);
+    connect(ui->forceRotationComboBox,  QnComboboxCurrentIndexChanged,          this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
     updateFromResource();
     updateLicensesButtonVisible();
@@ -188,19 +201,23 @@ void QnSingleCameraSettingsWidget::at_proxyAuthenticationRequired ( const QNetwo
     QMutexLocker locker(&m_cameraMutex);
     if (!m_camera)
         return;
-    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
-    authenticator->setUser(lastUsedConnection.url.userName());
-    authenticator->setPassword(lastUsedConnection.url.password());
+
+    QString user = QnAppServerConnectionFactory::url().userName();
+    QString password = QnAppServerConnectionFactory::url().password();
+    authenticator->setUser(user);
+    authenticator->setPassword(password);
 }
 
 #ifdef QT_WEBKITWIDGETS_LIB
 void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout , QWebView* advancedWebView)
 {
+    if (!m_camera)
+        return;
     if ( qnCommon )
     {
         QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
         bool showUrl = resourceData.value<bool>(lit("showUrl"), false);
-        if ( showUrl && m_camera->getStatus() != QnResource::Offline )
+        if ( showUrl && m_camera->getStatus() != Qn::Offline )
         {
             QnNetworkProxyFactory::instance()->removeFromProxyList(m_lastCameraPageUrl.host());
             
@@ -367,11 +384,14 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
             cleanAdvancedSettings();
         }
 
-        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id.toString(), *advancedTreeWidget, *advancedLayout,
+        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id.toString(), 
 #ifdef QT_WEBKITWIDGETS_LIB
             advancedWebView,
 #endif
-            this);
+            *advancedTreeWidget, *advancedLayout);
+        connect(m_widgetsRecreator, &CameraSettingsWidgetsTreeCreator::advancedParamChanged, this, &QnSingleCameraSettingsWidget::at_advancedParamChanged);
+        connect(m_widgetsRecreator, &CameraSettingsWidgetsTreeCreator::refreshAdvancedSettings, this, &QnSingleCameraSettingsWidget::refreshAdvancedSettings, Qt::QueuedConnection);
+
     }
     else if (m_widgetsRecreator)
     {
@@ -383,12 +403,11 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
         cleanAdvancedSettings();
 
         //Dummy creator: required for cameras, that doesn't support advanced settings
-        //m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(), *advancedTreeWidget, *advancedLayout, this);
-		m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(), *advancedTreeWidget, *advancedLayout,
+		m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(),
 #ifdef QT_WEBKITWIDGETS_LIB
             advancedWebView,
 #endif
-            this);
+            *advancedTreeWidget, *advancedLayout);
     }
 
     return showOldSettings;
@@ -396,8 +415,11 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
 
 void QnSingleCameraSettingsWidget::cleanAdvancedSettings()
 {
-    delete m_widgetsRecreator;
-    m_widgetsRecreator = 0;
+    if (m_widgetsRecreator) {
+        disconnect(m_widgetsRecreator, NULL, this, NULL);
+        delete m_widgetsRecreator;
+        m_widgetsRecreator = NULL;
+    }
     m_cameraSettings.clear();
 }
 
@@ -567,10 +589,15 @@ void QnSingleCameraSettingsWidget::submitToResource() {
             submitMotionWidgetToResource();
         }
 
-        if (ui->arOverrideCheckBox->isChecked())
-            m_camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->arComboBox->itemData(ui->arComboBox->currentIndex()).toDouble()));
+        if (ui->forceArCheckBox->isChecked())
+            m_camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->forceArComboBox->currentData().toDouble()));
         else
             m_camera->setProperty(QnMediaResource::customAspectRatioKey(), QString());
+
+        if(ui->forceRotationCheckBox->isChecked()) 
+            m_camera->setProperty(QnMediaResource::rotationKey(), QString::number(ui->forceRotationComboBox->currentData().toInt()));
+        else
+            m_camera->setProperty(QnMediaResource::rotationKey(), QString());
 
         ui->expertSettingsWidget->submitToResources(QnVirtualCameraResourceList() << m_camera);
 
@@ -663,19 +690,37 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->analogViewCheckBox->setChecked(!m_camera->isScheduleDisabled());
 
         QString arOverride = m_camera->getProperty(QnMediaResource::customAspectRatioKey());
-        ui->arOverrideCheckBox->setChecked(!arOverride.isEmpty());
+        ui->forceArCheckBox->setChecked(!arOverride.isEmpty());
         if (!arOverride.isEmpty()) 
         {
             // float is important here
             float ar = arOverride.toFloat();
             int idx = -1;
-            for (int i = 0; i < ui->arComboBox->count(); ++i) {
-                if (qFuzzyEquals(ar, ui->arComboBox->itemData(i).toFloat())) {
+            for (int i = 0; i < ui->forceArComboBox->count(); ++i) {
+                if (qFuzzyEquals(ar, ui->forceArComboBox->itemData(i).toFloat())) {
                     idx = i;
                     break;
                 }
             }
-            ui->arComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
+            ui->forceArComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
+        } else {
+            ui->forceArComboBox->setCurrentIndex(0);
+        }
+
+        QString rotation = m_camera->getProperty(QnMediaResource::rotationKey());
+        ui->forceRotationCheckBox->setChecked(!rotation.isEmpty());
+        if(!rotation.isEmpty()) {
+            int degree = rotation.toInt();
+            int idx = -1;
+            for (int i = 0; i < ui->forceRotationComboBox->count(); ++i) {
+                if (degree == ui->forceRotationComboBox->itemData(i).toInt()) {
+                    idx = i;
+                    break;
+                }
+            }
+            ui->forceRotationComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
+        } else {
+            ui->forceRotationComboBox->setCurrentIndex(0);
         }
 
         if (!dtsBased) {
@@ -709,7 +754,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->cameraMotionButton->setChecked(m_camera->getMotionType() != Qn::MT_SoftwareGrid);
             ui->softwareMotionButton->setChecked(m_camera->getMotionType() == Qn::MT_SoftwareGrid);
 
-            m_cameraSupportsMotion = m_camera->supportedMotionType() != Qn::MT_NoMotion;
+            m_cameraSupportsMotion = m_camera->hasMotion();
             ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
             ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
 
@@ -893,6 +938,52 @@ bool QnSingleCameraSettingsWidget::isValidMotionRegion(){
     return m_motionWidget->isValidMotionRegion();
 }
 
+bool QnSingleCameraSettingsWidget::isValidSecondStream() {
+    /* Do not check validness if there is no recording anyway. */
+    if (!isScheduleEnabled())
+        return true;
+
+    if (!m_camera->hasDualStreaming())
+        return true;
+
+    QList<QnScheduleTask::Data> filteredTasks;
+    bool usesSecondStream = false;
+    foreach (const QnScheduleTask::Data& scheduleTaskData, ui->cameraScheduleWidget->scheduleTasks()) {
+        QnScheduleTask::Data data(scheduleTaskData);
+        if (data.m_recordType == Qn::RT_MotionAndLowQuality) {
+            usesSecondStream = true;
+            data.m_recordType = Qn::RT_Always;
+        }
+        filteredTasks.append(data);
+    }
+
+    /* There are no Motion+LQ tasks. */
+    if (!usesSecondStream)
+        return true;
+
+    if (ui->expertSettingsWidget->isSecondStreamEnabled())
+        return true;
+
+    auto button = QMessageBox::warning(this,
+        tr("Invalid schedule"),
+        tr("Second stream is disabled on this camera. Motion + LQ option has no effect."\
+        "Press \"Yes\" to change recording type to \"Always\" or \"No\" to re-enable second stream."),
+        QMessageBox::StandardButtons(QMessageBox::Yes|QMessageBox::No | QMessageBox::Cancel),
+        QMessageBox::Yes);
+    switch (button) {
+    case QMessageBox::Yes:
+        ui->cameraScheduleWidget->setScheduleTasks(filteredTasks);
+        return true;
+    case QMessageBox::No:
+        ui->expertSettingsWidget->setSecondStreamEnabled();
+        return true;
+    default:
+        return false;
+    }
+    
+}
+
+
 void QnSingleCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled) {
     ui->cameraScheduleWidget->setExportScheduleButtonEnabled(enabled);
 }
@@ -1010,62 +1101,9 @@ void QnSingleCameraSettingsWidget::updateLicenseText() {
     if (!m_camera || !m_camera->isDtsBased())
         return;
 
-    QnLicenseUsageHelper helper;
-
-    int usedDigitalChange = helper.usedDigital();
-    int usedAnalogChange = helper.usedAnalog();
+    QnCamLicenseUsageHelper helper;
     helper.propose(QnVirtualCameraResourceList() << m_camera, ui->analogViewCheckBox->isChecked());
-
-    usedDigitalChange = helper.usedDigital() - usedDigitalChange;
-    usedAnalogChange = helper.usedAnalog() - usedAnalogChange;
-
-    { // digital licenses
-        QString usageText = tr("%n license(s) are used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital());
-        ui->digitalLicensesLabel->setText(usageText);
-        QPalette palette = this->palette();
-        if (!helper.isValid() && helper.required() > 0)
-            setWarningStyle(&palette);
-        ui->digitalLicensesLabel->setPalette(palette);
-    }
-
-    { // analog licenses
-        QString usageText = tr("%n analog license(s) are used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
-        ui->analogLicensesLabel->setText(usageText);
-        QPalette palette = this->palette();
-        if (!helper.isValid() && helper.required() > 0)
-            setWarningStyle(&palette);
-        ui->analogLicensesLabel->setPalette(palette);
-        ui->analogLicensesLabel->setVisible(helper.totalAnalog() > 0);
-    }
-
-    if (ui->analogViewCheckBox->checkState() != Qt::Checked) {
-        ui->requiredLicensesLabel->setVisible(false);
-        return;
-    }
-
-    { // required licenses
-        QPalette palette = this->palette();
-        if (!helper.isValid())
-            setWarningStyle(&palette);
-        ui->requiredLicensesLabel->setPalette(palette);
-        ui->requiredLicensesLabel->setVisible(true);
-    }
-
-    if (helper.required() > 0) {
-        ui->requiredLicensesLabel->setText(tr("Activate %n more license(s).", "", helper.required()));
-    } else if (usedDigitalChange > 0 && usedAnalogChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%1 more licenses and %2 more analog licenses will be used.")
-            .arg(usedDigitalChange)
-            .arg(usedAnalogChange)
-            );
-    } else if (usedDigitalChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%n more license(s) will be used.", "", usedDigitalChange));
-    } else if (usedAnalogChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%n more analog license(s) will be used.", "", usedAnalogChange));
-    }
-    else {
-        ui->requiredLicensesLabel->setText(QString());
-    }
+    ui->licensesUsageWidget->loadData(&helper);
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {
@@ -1183,6 +1221,12 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
         }
 #endif
 
+        case Qn::FisheyeCameraSettingsTab:
+        {
+            ui->fisheyeSettingsWidget->loadPreview();
+            break;
+        }
+
         default:
             break;
     }
@@ -1228,8 +1272,7 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChange
     m_scheduleEnabledChanged = true;
 }
 
-void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)
-{
+void QnSingleCameraSettingsWidget::at_advancedParamChanged(const CameraSetting& val) {
     m_modifiedAdvancedParams.push_back(QPair<QString, QVariant>(val.getId(), QVariant(val.serializeToStr())));
     setAnyCameraChanges(true);
     at_cameraDataChanged();

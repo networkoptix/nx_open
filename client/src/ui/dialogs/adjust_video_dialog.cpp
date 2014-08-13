@@ -189,3 +189,12 @@ void QnAdjustVideoDialog::closeEvent(QCloseEvent *e)
     setWidget(0);
     base_type::closeEvent(e);
 }
+
+bool QnAdjustVideoDialog::tryClose(bool force) {
+    if (m_widget)
+        m_widget->setImageEnhancement(m_backupParams);
+    setWidget(0);
+    if (force)
+        hide();
+    return true;
+}

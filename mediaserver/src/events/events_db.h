@@ -17,14 +17,14 @@ class QnEventsDB: public QnDbHelper
 public:
     void setEventLogPeriod(qint64 periodUsec);
     bool saveActionToDB(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& actionRes);
-    bool removeLogForRes(QnId resId);
+    bool removeLogForRes(QUuid resId);
 
     QList<QnAbstractBusinessActionPtr> getActions(
         const QnTimePeriod& period,
         const QnResourceList& resList,
         const QnBusiness::EventType& eventType = QnBusiness::UndefinedEvent, 
         const QnBusiness::ActionType& actionType = QnBusiness::UndefinedAction,
-        const QnId& businessRuleId = QnId()) const;
+        const QUuid& businessRuleId = QUuid()) const;
 
     void getAndSerializeActions(
         QByteArray& result,
@@ -32,7 +32,7 @@ public:
         const QnResourceList& resList,
         const QnBusiness::EventType& eventType, 
         const QnBusiness::ActionType& actionType,
-        const QnId& businessRuleId) const;
+        const QUuid& businessRuleId) const;
 
 
     static QnEventsDB* instance();
@@ -50,7 +50,7 @@ private:
         const QnResourceList& resList,
         const QnBusiness::EventType& eventType, 
         const QnBusiness::ActionType& actionType,
-        const QnId& businessRuleId) const;
+        const QUuid& businessRuleId) const;
 private:
     qint64 m_lastCleanuptime;
     qint64 m_eventKeepPeriod;

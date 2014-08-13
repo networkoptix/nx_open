@@ -14,6 +14,8 @@
 
 #include "nettools.h"
 #include "socket_common.h"
+#include "utils/common/systemerror.h"
+
 
 //!Base interface for sockets. Provides methods to set different socket configuration parameters
 class AbstractSocket
@@ -126,6 +128,11 @@ public:
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getSendTimeout( unsigned int* millis ) = 0;
+    //!Get socket's last error code. Needed in case of \a aio::etError
+    /*!
+        \return \a true if read error code successfully, \a false otherwise
+    */
+    virtual bool getLastError( SystemError::ErrorCode* errorCode ) = 0;
     //!Returns system-specific socket handle
     /*!
         TODO: #ak remove this method after complete move to the new socket
@@ -309,6 +316,20 @@ public:
         \param multicastIF multicast interface for sending packets
     */
     virtual bool setMulticastIF( const QString& multicastIF ) = 0;
+
+    /**
+    *   Join the specified multicast group
+    *   @param multicastGroup multicast group address to join
+    */
+    virtual bool joinGroup( const QString &multicastGroup ) = 0;
+    virtual bool joinGroup( const QString &multicastGroup, const QString& multicastIF ) = 0;
+
+    /**
+    *   Leave the specified multicast group
+    *   @param multicastGroup multicast group address to leave
+    */
+    virtual bool leaveGroup( const QString &multicastGroup ) = 0;
+    virtual bool leaveGroup( const QString &multicastGroup, const QString& multicastIF ) = 0;
 };
 
 #endif  //ABSTRACT_SOCKET_H

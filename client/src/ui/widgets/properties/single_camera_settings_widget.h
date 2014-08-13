@@ -97,10 +97,13 @@ public:
     /** Check if motion region is valid */
     bool isValidMotionRegion();
 
+    /** Check if second stream is enabled if there are Motion+LQ tasks in schedule. */
+    bool isValidSecondStream();
+
     void setExportScheduleButtonEnabled(bool enabled);
 
 public slots:
-    void setAdvancedParam(const CameraSetting& val);
+    void at_advancedParamChanged(const CameraSetting& val);
     void refreshAdvancedSettings();
 
 signals:
@@ -202,7 +205,7 @@ private:
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
     mutable QnMediaServerConnectionPtr m_serverConnection;
 
-    QHash<QnId, QnImageProvider*> m_imageProvidersByResourceId;
+    QHash<QUuid, QnImageProvider*> m_imageProvidersByResourceId;
 	QUrl m_lastCameraPageUrl;
 };
 

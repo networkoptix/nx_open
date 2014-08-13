@@ -60,14 +60,16 @@ namespace ec2
         {
             Q_ASSERT(tran.command != ApiCommand::NotDefined);
             QMutexLocker lock(&m_mutex);
-            sendTransactionInternal(tran, QnTransactionTransportHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers));
+            QnTransactionTransportHeader ttHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers);
+            ttHeader.fillSequence();
+            sendTransactionInternal(tran, ttHeader);
         }
 
         /** Template specialization to fill dstPeers from the transaction params. */
         void sendTransaction(const QnTransaction<ec2::ApiVideowallControlMessageData>& tran, const QnPeerSet& dstPeers = QnPeerSet());
 
         template <class T>
-        void sendTransaction(const QnTransaction<T>& tran, const QnId& dstPeerId)
+        void sendTransaction(const QnTransaction<T>& tran, const QUuid& dstPeerId)
         {
             Q_ASSERT(tran.command != ApiCommand::NotDefined);
             QnPeerSet pSet;
@@ -78,13 +80,13 @@ namespace ec2
 
         struct AlivePeerInfo
         {
-            AlivePeerInfo(): peer(QnId(), Qn::PT_Server) { lastActivity.restart(); }
+            AlivePeerInfo(): peer(QUuid(), Qn::PT_Server) { lastActivity.restart(); }
             AlivePeerInfo(const ApiPeerData &peer): peer(peer) { lastActivity.restart(); }
             ApiPeerData peer;
-            QSet<QnId> proxyVia;
+            QSet<QUuid> proxyVia;
             QElapsedTimer lastActivity;
         };
-        typedef QMap<QnId, AlivePeerInfo> AlivePeersMap;
+        typedef QMap<QUuid, AlivePeerInfo> AlivePeersMap;
 
         /*
         * Return all alive peers
@@ -111,8 +113,8 @@ namespace ec2
         friend struct GotTransactionFuction;
         friend struct SendTransactionToTransportFuction;
 
-        bool isExists(const QnId& removeGuid) const;
-        bool isConnecting(const QnId& removeGuid) const;
+        bool isExists(const QUuid& removeGuid) const;
+        bool isConnecting(const QUuid& removeGuid) const;
 
         typedef QMap<QUuid, QSharedPointer<QnTransactionTransport>> QnConnectionMap;
 
@@ -166,17 +168,18 @@ namespace ec2
         void queueSyncRequest(QnTransactionTransport* transport);
 
         void connectToPeerEstablished(const ApiPeerData &peerInfo);
-        void connectToPeerLost(const QnId& id);
+        void connectToPeerLost(const QUuid& id);
         void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool isProxy);
-        void sendVideowallInstanceStatus(const ApiPeerData &peer, bool isAlive);
         bool isPeerUsing(const QUrl& url);
-        void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QnId& gotFromID);
+        void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QUuid& gotFromID);
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
 
-        void sendRuntimeInfo(QnTransactionTransport* transport, const QnPeerSet& processedPeers);
+        void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader);
 
-        void addAlivePeerInfo(ApiPeerData peerData, const QnId& gotFromPeer = QnId());
-        void removeAlivePeer(const QnId& id, bool isProxy);
+        void addAlivePeerInfo(ApiPeerData peerData, const QUuid& gotFromPeer = QUuid());
+        void removeAlivePeer(const QUuid& id, bool isProxy);
+        bool doHandshake(QnTransactionTransport* transport);
+        void printTranState(const QnTranState& tranState);
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
@@ -189,6 +192,7 @@ namespace ec2
 
         QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
         QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
+		QScopedPointer<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
 
         struct RemoteUrlConnectInfo {
             RemoteUrlConnectInfo(const QUuid& peer = QUuid()): peer(peer), lastConnectedTime(0) {}
@@ -206,7 +210,7 @@ namespace ec2
         AlivePeersMap m_alivePeers;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectionsToRemove;
-        QMap<QnId, int> m_lastTranSeq;
+        QMap<QUuid, int> m_lastTranSeq;
 
         // alive control
         QElapsedTimer m_aliveSendTimer;

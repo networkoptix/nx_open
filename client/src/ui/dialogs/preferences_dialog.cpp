@@ -43,6 +43,8 @@ QnPreferencesDialog::QnPreferencesDialog(QWidget *parent):
     loadData();
 }
 
+QnPreferencesDialog::~QnPreferencesDialog() {}
+
 void QnPreferencesDialog::submitData() {
     base_type::submitData();
     if (qnSettings->isWritable())

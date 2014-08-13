@@ -7,7 +7,8 @@
 
 #include "core/resource_management/resource_searcher.h"
 #include "utils/network/nettools.h"
-#include "droid_controlport_listener.h"
+#include "utils/network/socket.h"
+
 
 class QnPlDroidResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
@@ -17,7 +18,7 @@ public:
 
     QnResourceList findResources(void);
 
-    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams& params) override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 

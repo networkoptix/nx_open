@@ -194,33 +194,33 @@ public:
      * Expands the given size to given minSize.
      * 
      * \param size                      Size to expand.
-     * \param maxSize                   Minimal size. 
+     * \param maxSize                   Maximal size. 
      * \param mode                      Aspect ratio mode.
      */
-    static QSizeF expanded(const QSizeF &size, const QSizeF &minSize, Qt::AspectRatioMode mode);
+    static QSizeF expanded(const QSizeF &size, const QSizeF &maxSize, Qt::AspectRatioMode mode);
 
     /**
      * Expands an infinitely small size with the given aspect ratio (width to
-     * height ratio) to given minimal size.
+     * height ratio) to given maximal size.
      * 
      * \param aspectRatio               Aspect ratio.
-     * \param minSize                   Minimal size.
+     * \param maxSize                   Maximal size.
      * \param mode                      Aspect ratio mode.
      */
-    static QSizeF expanded(qreal aspectRatio, const QSizeF &minSize, Qt::AspectRatioMode mode);
+    static QSizeF expanded(qreal aspectRatio, const QSizeF &maxSize, Qt::AspectRatioMode mode);
 
     /**
      * Expands an infinitely small rectangle with the given aspect ratio (width to
-     * height ratio) to given minimal rectangle.
+     * height ratio) to given maximal rectangle.
      * 
      * \param aspectRatio               Aspect ratio.
-     * \param minRect                   Minimal rectangle.
+     * \param maxRect                   Maximal rectangle.
      * \param mode                      Aspect ratio mode.
      * \param alignment                 Alignment of the result relative to minimal rectangle.
      */
-    static QRectF expanded(qreal aspectRatio, const QRectF &minRect, Qt::AspectRatioMode mode, Qt::Alignment alignment = Qt::AlignCenter);
+    static QRectF expanded(qreal aspectRatio, const QRectF &maxRect, Qt::AspectRatioMode mode, Qt::Alignment alignment = Qt::AlignCenter);
 
-    static QRectF expanded(qreal aspectRatio, const QSizeF &minSize, const QPointF &center, Qt::AspectRatioMode mode);
+    static QRectF expanded(qreal aspectRatio, const QSizeF &maxSize, const QPointF &center, Qt::AspectRatioMode mode);
 
     static QRectF scaled(const QRectF &rect, const QSizeF &size, const QPointF &fixedPoint, Qt::AspectRatioMode mode);
 
@@ -256,6 +256,15 @@ public:
     static QRectF dilated(const QRectF &rect, qreal amount);
 
     /**
+     * Dilates the given rectangle by the given amount.
+     * 
+     * \param rect                      Rectangle to dilate.
+     * \param amount                    Dilation amount.
+     * \returns                         Dilated rectangle.
+     */
+    static QRect dilated(const QRect rect, int amount);
+
+    /**
      * Dilates the given size by the given amount.
      * 
      * \param size                      Size to dilate.
@@ -281,6 +290,15 @@ public:
      * \returns                         Eroded rectangle.
      */
     static QRectF eroded(const QRectF &rect, qreal amount);
+
+    /**
+     * Erodes the given rectangle by the given amount.
+     * 
+     * \param rect                      Rectangle to erode.
+     * \param amount                    Erosion amount.
+     * \returns                         Eroded rectangle.
+     */
+    static QRect eroded(const QRect &rect, int amount);
 
     /**
      * Erodes the given rectangle by the given amount.
@@ -322,6 +340,14 @@ public:
      * \returns                         Whether the reference size contains the given size.
      */
     static bool contains(const QSize &size, const QSize &otherSize);
+
+    /**
+     * Calculates the area of the given rectangle.
+     * 
+     * \param rect                      Target rectangle.
+     * \returns                         Area of the provided rectangle or 0 if it is not valid.
+     */
+    static qint64 area(const QRect &rect);
 
     static QRectF movedInto(const QRectF &rect, const QRectF &target);
 

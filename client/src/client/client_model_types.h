@@ -53,7 +53,7 @@ public:
     QnWorkbenchState(): currentLayoutIndex(-1) {}
 
     int currentLayoutIndex;
-    QList<QString> layoutUuids;
+    QList<QUuid> layoutUuids;
 };
 
 /**
@@ -125,34 +125,5 @@ struct QnPtzHotkey {
 typedef QHash<int, QString> QnPtzHotkeyHash;
 
 QN_FUSION_DECLARE_FUNCTIONS(QnPtzHotkey, (json)(metatype));
-
-
-// -------------------------------------------------------------------------- //
-// QnVideowallAttachSettings
-// -------------------------------------------------------------------------- //
-struct QnVideowallAttachSettings {
-    enum AttachMode {
-        AttachWindow,
-        AttachScreen,
-        AttachAll
-    };
-
-    enum LayoutMode {
-        LayoutNone,
-        LayoutClone,
-        LayoutCustom
-    };
-
-    AttachMode attachMode;
-    LayoutMode layoutMode;
-    QnId layoutId;               /**< for custom layout */
-    bool autoFill;
-
-    QnVideowallAttachSettings():
-        attachMode(AttachScreen),
-        layoutMode(LayoutClone),
-        autoFill(true)
-        {}
-};
 
 #endif // QN_CLIENT_MODEL_TYPES_H

@@ -113,7 +113,7 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStream()
     QString urlStr = m_resource->getUrl();
     QnNetworkResourcePtr res = qSharedPointerDynamicCast<QnNetworkResource>(m_resource);
 
-    urlStr += QString(QLatin1String("?primary=%1&fps=%2")).arg(getRole() == QnResource::Role_LiveVideo).arg(getFps());
+    urlStr += QString(QLatin1String("?primary=%1&fps=%2")).arg(getRole() == Qn::CR_LiveVideo).arg(getFps());
     QUrl url(urlStr);
 
 

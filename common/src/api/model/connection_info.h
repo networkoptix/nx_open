@@ -23,18 +23,18 @@ struct QnConnectionInfo {
     QUrl ecUrl;
     SoftwareVersionType version;
     QList<QnCompatibilityItem> compatibilityItems;
-    QString ecsGuid;
-    QString publicIp;
+    QString systemName;
+    QString ecsGuid;    //TODO: #GDM make QUuid
     QString brand;
     QString box;
 };
 
-#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(publicIp)(brand)(box)
+#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)(box)
 
 #ifndef QN_NO_QT
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (QnCompatibilityItem)(QnConnectionInfo), 
-    (ubj)(metatype)(xml)(json)(binary)(csv_record)
+    (ubjson)(metatype)(xml)(json)(binary)(csv_record)
 )
 #endif
 

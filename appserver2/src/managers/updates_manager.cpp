@@ -32,16 +32,18 @@ namespace ec2 {
 
     void QnUpdatesNotificationManager::triggerNotification(const QnTransaction<ApiUpdateInstallData> &transaction) {
         assert(transaction.command == ApiCommand::installUpdate);
-        m_requestedUpdateIds.insert(transaction.id, transaction.params.updateId);
+        m_requestedUpdateIds.insert(transaction.params.updateId);
     }
 
     void QnUpdatesNotificationManager::at_transactionProcessed(const QnAbstractTransaction &transaction) {
         if (transaction.command != ApiCommand::installUpdate)
             return;
-
-        QString requestedUpdateId = m_requestedUpdateIds.take(transaction.id);
-        if (requestedUpdateId.isEmpty())
+        QnTransaction<ApiUpdateInstallData> t = (QnTransaction<ApiUpdateInstallData>) transaction;
+        auto requestedUpdateItr = m_requestedUpdateIds.find(t.params.updateId);
+        if (requestedUpdateItr == m_requestedUpdateIds.end())
             return;
+        QString requestedUpdateId = *requestedUpdateItr;
+        m_requestedUpdateIds.erase(requestedUpdateItr);
 
         emit updateInstallationRequested(requestedUpdateId);
     }
@@ -75,7 +77,7 @@ namespace ec2 {
     }
 
     template<class QueryProcessorType>
-    int QnUpdatesManager<QueryProcessorType>::sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, impl::SimpleHandlerPtr handler) {
+    int QnUpdatesManager<QueryProcessorType>::sendUpdateUploadResponce(const QString &updateId, const QUuid &peerId, int chunks, impl::SimpleHandlerPtr handler) {
         const int reqId = generateRequestID();
         auto transaction = prepareTransaction(updateId, peerId, chunks);
 
@@ -99,7 +101,7 @@ namespace ec2 {
 
     template<class QueryProcessorType>
     QnTransaction<ApiUpdateUploadData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId, const QByteArray &data, qint64 offset) const {
-        QnTransaction<ApiUpdateUploadData> transaction(ApiCommand::uploadUpdate, false);
+        QnTransaction<ApiUpdateUploadData> transaction(ApiCommand::uploadUpdate);
         transaction.params.updateId = updateId;
         transaction.params.data = data;
         transaction.params.offset = offset;
@@ -107,8 +109,8 @@ namespace ec2 {
     }
 
     template<class QueryProcessorType>
-    QnTransaction<ApiUpdateUploadResponceData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId, const QnId &peerId, int chunks) const {
-        QnTransaction<ApiUpdateUploadResponceData> transaction(ApiCommand::uploadUpdateResponce, false);
+    QnTransaction<ApiUpdateUploadResponceData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId, const QUuid &peerId, int chunks) const {
+        QnTransaction<ApiUpdateUploadResponceData> transaction(ApiCommand::uploadUpdateResponce);
         transaction.params.id = peerId;
         transaction.params.updateId = updateId;
         transaction.params.chunks = chunks;
@@ -117,7 +119,7 @@ namespace ec2 {
 
     template<class QueryProcessorType>
     QnTransaction<ApiUpdateInstallData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId) const {
-        QnTransaction<ApiUpdateInstallData> transaction(ApiCommand::installUpdate, false);
+        QnTransaction<ApiUpdateInstallData> transaction(ApiCommand::installUpdate);
         transaction.params = updateId;
         return transaction;
     }

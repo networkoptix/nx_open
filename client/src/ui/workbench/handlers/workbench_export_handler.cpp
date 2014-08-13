@@ -27,6 +27,7 @@
 #include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
@@ -159,7 +160,7 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
 
     connect(exportProgressDialog,   SIGNAL(canceled()),             tool,                   SLOT(stop()));
     if (target && slot)
-        connect(tool,               SIGNAL(finished(bool)),         target,                 slot);
+        connect(tool,               SIGNAL(finished(bool,QString)),         target,                 slot);
 
     return tool->start();
 }
@@ -195,6 +196,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     if(!widget)
         return;
 
+    bool wasLoggedIn = !context()->user().isNull();
+
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
     // TODO: #Elric implement more precise estimation
@@ -210,6 +213,10 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                 ) == QMessageBox::No)
         return;
 
+    /* Check if we were disconnected (server shut down) while the dialog was open. 
+     * Skip this check if we were not logged in before. */
+    if (wasLoggedIn && !context()->user())
+        return;
 
     QString previousDir = qnSettings->lastExportDir();
     if (previousDir.isEmpty())
@@ -238,13 +245,18 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
 
     QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), L'_');
-    QString timePart = (widget->resource()->toResource()->flags() & QnResource::utc)
+    QString timePart = (widget->resource()->toResource()->flags() & Qn::utc)
             ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
             : QTime().addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
     QString suggestion = QnEnvironment::getUniqueFileName(previousDir, namePart + lit("_") + timePart);
 
     while (true) {
-        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
+        /* Check if we were disconnected (server shut down) while the dialog was open. 
+         * Skip this check if we were not logged in before. */
+        if (wasLoggedIn && !context()->user())
+            return;
+
+        QScopedPointer<QnCustomFileDialog> dialog(new QnWorkbenchStateDependentDialog<QnCustomFileDialog>(
             mainWindow(),
             tr("Export Video As..."),
             suggestion,
@@ -279,6 +291,11 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         }
 
         if (!dialog->exec())
+            return;
+
+        /* Check if we were disconnected (server shut down) while the dialog was open. 
+         * Skip this check if we were not logged in before. */
+        if (wasLoggedIn && !context()->user())
             return;
 
         fileName = dialog->selectedFile();
@@ -322,6 +339,11 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                 return;
         }
 
+        /* Check if we were disconnected (server shut down) while the dialog was open. 
+         * Skip this check if we were not logged in before. */
+        if (wasLoggedIn && !context()->user())
+            return;
+
         selectedExtension = dialog->selectedExtension();
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
@@ -336,16 +358,24 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                             );
                 if (button == QMessageBox::Cancel)
                     return;
-                if (button == QMessageBox::No)
+                if (button == QMessageBox::No) {
                     continue;
+                }
             }
         }
 
-        if (!lockFile(fileName))
+        if (!lockFile(fileName)) {
             continue;
+        }
 
         break;
     }
+
+    /* Check if we were disconnected (server shut down) while the dialog was open. 
+     * Skip this check if we were not logged in before. */
+     if (wasLoggedIn && !context()->user())
+        return;
+
     qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
 
 #ifdef Q_OS_WIN
@@ -367,7 +397,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     }
 #endif
 
-    QnProgressDialog *exportProgressDialog = new QnProgressDialog(mainWindow());
+    QnProgressDialog *exportProgressDialog = new QnWorkbenchStateDependentDialog<QnProgressDialog>(mainWindow());
     exportProgressDialog->setWindowTitle(tr("Exporting Video"));
     exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
     exportProgressDialog->setMinimumDuration(1000);
@@ -431,9 +461,10 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         QnResourcePtr resource = qnResPool->getResourceByUniqId(item.resource.path);
         if (!resource)
             continue;
-        hasImage |= resource->hasFlags(QnResource::still_image);
-        hasLocal |= resource->hasFlags(QnResource::local)
-                    || resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); // layout item remove 'local' flag.
+        if( resource->getParentResource() == layout )
+            continue;
+        hasImage |= resource->hasFlags(Qn::still_image);
+        hasLocal |= resource->hasFlags(Qn::local) || resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); // layout item remove 'local' flag.
         if (hasImage || hasLocal)
             break;
     }
@@ -479,6 +510,8 @@ bool QnWorkbenchExportHandler::saveLocalLayout(const QnLayoutResourcePtr &layout
 bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, const QnLayoutResourcePtr &layout, Qn::LayoutExportMode mode) {
     // TODO: #Elric we have a lot of copypasta with at_exportTimeSelectionAction_triggered
 
+    bool wasLoggedIn = !context()->user().isNull();
+
     if (!validateItemTypes(layout))
         return false;
 
@@ -511,7 +544,12 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
             ;
 
     while (true) {
-        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
+        /* Check if we were disconnected (server shut down) while the dialog was open. 
+         * Skip this check if we were not logged in before. */
+        if (wasLoggedIn && !context()->user())
+            return false;
+
+        QScopedPointer<QnCustomFileDialog> dialog(new QnWorkbenchStateDependentDialog<QnCustomFileDialog>(
             mainWindow(),
             dialogName,
             suggestion,
@@ -522,6 +560,11 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         dialog->addCheckBox(tr("Make file read-only"), &readOnly);
 
         if (!dialog->exec())
+            return false;
+
+        /* Check if we were disconnected (server shut down) while the dialog was open. 
+         * Skip this check if we were not logged in before. */
+        if (wasLoggedIn && !context()->user())
             return false;
 
         fileName = dialog->selectedFile();
@@ -547,11 +590,22 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
             }
         }
 
+        /* Check if we were disconnected (server shut down) while the dialog was open. 
+         * Skip this check if we were not logged in before. */
+        if (wasLoggedIn && !context()->user())
+            return false;
+
         if (!lockFile(fileName))
             continue;
 
         break;
     }
+
+    /* Check if we were disconnected (server shut down) while the dialog was open. 
+     * Skip this check if we were not logged in before. */
+    if (wasLoggedIn && !context()->user())
+        return false;
+
     qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
 
     QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QnLayoutFileStorageResource::layoutPrefix() + fileName).dynamicCast<QnLayoutResource>();
@@ -568,6 +622,8 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
 {
     QnActionParameters parameters = menu()->currentParameters(sender());
+
+    bool wasLoggedIn = !context()->user().isNull();
 
     QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
     if (!layout)
@@ -588,6 +644,11 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
             return;
     }
 
+    /* Check if we were disconnected (server shut down) while the dialog was open. 
+     * Skip this check if we were not logged in before. */
+    if (wasLoggedIn && !context()->user())
+        return;
+
     doAskNameAndExportLocalLayout(exportPeriod, layout, Qn::LayoutExport);
 }
 
@@ -603,7 +664,7 @@ void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QStr
 
     if (success) {
         QnAviResourcePtr file(new QnAviResource(fileName));
-        file->setStatus(QnResource::Online);
+        file->setStatus(Qn::Online);
         resourcePool()->addResource(file);
 
         QMessageBox::information(mainWindow(), tr("Export finished"), tr("Export successfully finished."), QMessageBox::Ok);

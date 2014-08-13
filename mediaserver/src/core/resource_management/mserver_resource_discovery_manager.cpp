@@ -39,7 +39,7 @@ QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
     stop();
 }
 
-QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QnId &resourceTypeId, const QnResourceParams &params)
+QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QUuid &resourceTypeId, const QnResourceParams &params)
 {
     QnResourcePtr res = QnResourceDiscoveryManager::createResource( resourceTypeId, params );
     if( res )
@@ -66,7 +66,6 @@ static void printInLogNetResources(const QnResourceList& resources)
 
 bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnResourcePtr& camera)
 {
-#if 0
 #ifdef EDGE_SERVER
     // return own camera back for edge server
     char  mac[MAC_ADDR_LEN];
@@ -75,14 +74,16 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnResourcePtr
     if (camera->getUniqueId().toLocal8Bit() == QByteArray(mac))
         return true;
 #endif
-#endif
 
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
-    if (!mServer || mServer->getStatus() == QnResource::Online)
+    if (!mServer || mServer->getStatus() == Qn::Online)
         return false;
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
     if (!ownServer || !ownServer->isRedundancy())
         return false; // redundancy is disabled
+
+    if (qnResPool->getAllCameras(ownServer).count() >= ownServer->getMaxCameras())
+        return false;
     
     return mServer->currentStatusTime() > MSERVER_OFFLINE_TIMEOUT;
 }
@@ -126,7 +127,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         // if such res in ResourcePool
 
-        if (rpResource->hasFlags(QnResource::foreigner))
+        if (rpResource->hasFlags(Qn::foreigner))
         {
             if (!canTakeForeignCamera(rpResource)) 
             {
@@ -135,8 +136,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             }
         }
 
-        QnSecurityCamResourcePtr camRes = newNetRes.dynamicCast<QnSecurityCamResource>();
-        if (camRes && camRes->needCheckIpConflicts())
+        QnVirtualCameraResourcePtr newCamRes = newNetRes.dynamicCast<QnVirtualCameraResource>();
+        if (newCamRes && newCamRes->needCheckIpConflicts())
         {
             // do not count 2--N channels of multichannel cameras as conflict
             quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
@@ -144,18 +145,35 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 ipsList[ips].insert(newNetRes);
         }
 
-        if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || rpResource->hasFlags(QnResource::foreigner))
+        if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || rpResource->hasFlags(Qn::foreigner))
         {
-            QnVirtualCameraResourcePtr cameraResource = rpNetRes.dynamicCast<QnVirtualCameraResource>();
-            if (cameraResource)
+            QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
+            if (existCamRes)
             {
-                cameraResource->setParentId(qnCommon->moduleGUID());
+                if (existCamRes->getTypeId() != newNetRes->getTypeId() && !newNetRes->isAbstractResource()) {
+                    QUuid newTypeId = newNetRes->getTypeId();
+                    newNetRes->update(existCamRes);
+                    newNetRes->setParentId(qnCommon->moduleGUID());
+                    newNetRes->setFlags(existCamRes->flags() & ~Qn::foreigner);
+                    newNetRes->setId(existCamRes->getId());
+                    newNetRes->setTypeId(newTypeId);
+                    qnResPool->removeResource(existCamRes);
+                    qnResPool->addResource(newCamRes);
+                    rpNetRes = existCamRes = newCamRes;
+                }
+                else {
+                    existCamRes->setParentId(qnCommon->moduleGUID());
+                    existCamRes->setFlags(existCamRes->flags() & ~Qn::foreigner);
+
+                }
+                
                 QByteArray errorString;
                 QnVirtualCameraResourceList cameras;
                 ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
-                const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
+                const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( existCamRes, &cameras );
                 if( errorCode != ec2::ErrorCode::ok )
                     NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+                    
             }
 
         }
@@ -234,10 +252,10 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
         if (!netRes)
             continue;
 
-        if (res->hasFlags(QnResource::server_live_cam)) // if this is camera from mediaserver on the client
+        if (res->hasFlags(Qn::server_live_cam)) // if this is camera from mediaserver on the client
             continue;
 
-        if( res->hasFlags(QnResource::foreigner) )      //this camera belongs to some other mediaserver
+        if( res->hasFlags(Qn::foreigner) )      //this camera belongs to some other mediaserver
         {
             continue;
         }
@@ -257,7 +275,7 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
             {
                 QnVirtualCameraResource* camRes = dynamic_cast<QnVirtualCameraResource*>(netRes);
                 if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)  || (camRes && !camRes->isScheduleDisabled())) {
-                    if (res->getStatus() == QnResource::Offline && !m_disconnectSended[uniqId]) {
+                    if (res->getStatus() == Qn::Offline && !m_disconnectSended[uniqId]) {
                         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
                         if (cam)
                             cam->issueOccured();
@@ -265,7 +283,7 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
                         m_disconnectSended[uniqId] = true;
                     }
                 } else {
-                    res->setStatus(QnResource::Offline);
+                    res->setStatus(Qn::Offline);
                     m_resourceDiscoveryCounter[uniqId] = 0;
                 }
             }
@@ -287,9 +305,9 @@ void QnMServerResourceDiscoveryManager::updateResourceStatus(const QnResourcePtr
         disconnect(rpNetRes, &QnResource::initAsyncFinished, this, &QnMServerResourceDiscoveryManager::onInitAsyncFinished);
         connect(rpNetRes, &QnResource::initAsyncFinished, this, &QnMServerResourceDiscoveryManager::onInitAsyncFinished);
 
-        if (!rpNetRes->hasFlags(QnResource::foreigner))
+        if (!rpNetRes->hasFlags(Qn::foreigner))
         {
-            if (rpNetRes->getStatus() == QnResource::Offline) 
+            if (rpNetRes->getStatus() == Qn::Offline) 
             {
                 // if resource with OK ip seems to be found; I do it coz if there is no readers and camera was offline and now online => status needs to be changed
                 if (rpNetRes->getLastStatusUpdateTime().msecsTo(qnSyncTime->currentDateTime()) > 30)

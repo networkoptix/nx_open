@@ -61,4 +61,9 @@ void QnButtonBoxDialog::initializeButtonBox() {
 void QnButtonBoxDialog::at_buttonBox_clicked(QAbstractButton *button) {
     if(m_buttonBox)
         m_clickedButton = m_buttonBox.data()->standardButton(button);
+    buttonBoxClicked(m_clickedButton);
+}
+
+void QnButtonBoxDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button) {
+    //do nothing
 }

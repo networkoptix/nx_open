@@ -45,7 +45,7 @@ ThirdPartyResourceSearcher::~ThirdPartyResourceSearcher()
 {
 }
 
-QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnId &resourceTypeId, const QnResourceParams& params )
+QnResourcePtr ThirdPartyResourceSearcher::createResource( const QUuid &resourceTypeId, const QnResourceParams& params )
 {
     QnThirdPartyResourcePtr result;
 
@@ -194,7 +194,8 @@ ThirdPartyResourceSearcher* ThirdPartyResourceSearcher::instance()
 QList<QnNetworkResourcePtr> ThirdPartyResourceSearcher::processPacket(
     QnResourceList& /*result*/,
     const QByteArray& responseData,
-    const QHostAddress& discoveryAddress )
+    const QHostAddress& /*discoveryAddress*/,
+    const QHostAddress& foundHostAddress )
 {
     QList<QnNetworkResourcePtr> localResults;
 
@@ -204,7 +205,7 @@ QList<QnNetworkResourcePtr> ThirdPartyResourceSearcher::processPacket(
         ++it )
     {
         nxcip::CameraInfo cameraInfo;
-        if( !it->fromMDNSData( responseData, discoveryAddress, &cameraInfo ) )
+        if( !it->fromMDNSData( responseData, foundHostAddress, &cameraInfo ) )
             continue;
 
         QnNetworkResourcePtr res = createResourceFromCameraInfo( &*it, cameraInfo );
@@ -288,7 +289,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     nxcip_qt::CameraDiscoveryManager* const discoveryManager,
     const nxcip::CameraInfo& cameraInfo )
 {
-    QnId typeId = qnResTypePool->getResourceTypeId(manufacture(), THIRD_PARTY_MODEL_NAME);
+    QUuid typeId = qnResTypePool->getResourceTypeId(manufacture(), THIRD_PARTY_MODEL_NAME);
     if( typeId.isNull() )
         return QnThirdPartyResourcePtr();
 

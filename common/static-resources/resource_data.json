@@ -19,6 +19,14 @@
     "data": [
         {
             "keys": [
+                "VISTA|VK2-ENCODER",
+		        "*|DW-CP04"
+            ],
+            "analogEncoder": true
+        },
+
+        {
+            "keys": [
                 "ISD|*"
             ],
             "showUrl": true,
@@ -46,9 +54,11 @@
                 "ACTI|KCM5211", "ACTI|TCM3511", 
                 "AXIS|AXISP3344", "AXIS|AXISP1344",
                 "*|IPC-HDB3200C", "*|N53F-F",
-                "IPC|LR01", "hs0130|LR01", "H18A2|IPCAM_M1", "H18A3|IPCAM_M1", "H18A4|RL01", "H18A5|IPCAM_M1", "HI9712_51ÊÒÍâ|LR01",
+                "*|LR01", "*|IPCAM_M1", "*|RL01",
                 "VISTA|*VRD", "VISTA|VK2-2MPBX(DN)",
-                "DW|DWC-MV950TIR", "DW|DWC-MB950TIR", "DW|DWC-MB721M4TIR"
+                "ZXDZHZ|vimicro","DW|DWC-MF21M4TIR","ACTI|TCM4201","Sony|SNC-CH120","Sony|SNC-CH280",
+                "Sony|SNC-DH210","Sony|SNC-DH120T","VITEK|VT-20VN-M","Etrovision Technology|EV8180U-XL","VIVOTEK|FE8174V",
+                "AVTECH|AVM542B"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
@@ -64,8 +74,14 @@
         },
         {
             "keys": [
-                "ACTI|KCM3311",
-                "DW|DWC-MB421TIR"
+                "ACTI|KCM3311","ACTI|KCM7211","ACTI|KCM5611","ACTI|KCM5311","Sony|SNC-EM600","Sony|SNC-CX600","Sony|SNC-DH120T",
+                "Sony|SNC-XM636",
+                "DW|DWC-MB421TIR",
+		        "VISTA|VK2-1080VRDIR3V9F",
+		        "VISTA|VK2-1080VFD3V9F",
+		        "VISTA|VK2-1080BIR3V9F",
+		        "VISTA|VK2-720VZMI",
+		        "VISTA|VK2-720VZMX"
             ],
             "ptzCapabilities": "ContinuousZoomCapability"
         },
@@ -74,21 +90,15 @@
                 "VISTA|*PTW"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability",
-            "ptzTraits": "FourWayPtz",
-            "panFlipped": true
+            "ptzTraits": "FourWayPtz"
         },
         {
             "keys": [
+                "VISTA|VK2-ENCODER",
                 "VISTA|VK2-1080PTZ",
                 "*|DW-CP04"
             ],
-            "ptzCapabilities": "ContinuousPtzCapabilities|nativePresetsPtzCapability"
-        },
-        {
-            "keys": [
-                "VISTA|VK2-ENCODER"
-            ],
-            "ptzCapabilities": "ContinuousPtzCapabilities|nativePresetsPtzCapability|ContinuousFocusCapability"
+            "onvifPtzPresetsEnabled": true
         },
         {
             "keys": [
@@ -99,10 +109,18 @@
         {
             "keys": [
                 "VISTA|VK2-600PTZ",
-				"VISTA|VK2-720VZMI",
-                "VISTA|VK2-720VZMX"
+                "VISTA|VK2-720VZMI",
+                "VISTA|VK2-1080PTZ",
+                "VISTA|VK2-720VZMX",
+                "VISTA|VK2-ENCODER"
             ],
-            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability"
+            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
+        },
+        {
+            "keys": [
+                "VISTA|VK2-1080VRDIR3V9F"
+            ],
+            "vistaFocusDevices": ["EncoderVistaPTZ"]
         },
         {
             "keys": [
@@ -454,6 +472,179 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+                "Canon|VB-S30D", "Canon|VB-S30D|Ver. 1.0.0"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [   -1,  1],
+                        "logical": [-175, 175]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1,   1],
+                        "logical": [-90,   0]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.04,  0.08,  0.12, 0.2,  0.28, 0.36, 0.44, 0.52, 0.6,  0.68, 0.76,0.8],
+                        "logical": [1, 1.025, 1.063, 1.09 ,1.18 ,1.27, 1.40, 1.55, 1.76, 2.02, 2.41, 3.0, 3.4],
+                        "logicalMultiplier": 27.5,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "Brand|NH720-18N1", "Brand|NH720-18N1|z120120713NSA"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   -1,  1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1,   1],
+                        "logical": [10, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 1],
+                        "logical": [1, 18],
+                        "logicalMultiplier": 40,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "Samsung Techwin|SNP-6200", "Samsung Techwin|SNP-6200|1.20_130930"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   -1,  1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO" : "Actual tilt range is [0,-180]",
+                        "device":  [0, 1],
+                        "logical": [-90,0]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.10, 0.20 , 0.30 , 0.40 , 0.50 , 0.60 , 0.70, 0.80, 0.90, 1],
+                        "logical": [1, 1.31, 1.60 , 1.91 , 2.64 , 3.32 , 4.36 , 5.82, 8.55, 13.5 , 20],
+                        "logicalMultiplier": 32,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "VIVOTEK|SD8363E", "VIVOTEK|SD8363E|SD8363-VVTK-0200f"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   -1,  1],
+                        "logical": [180, -180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO" : "Actual tilt range is [0,-180]",
+                        "device":  [-1, 1],
+                        "logical": [20,-90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.10, 0.20 , 0.30 , 0.40 , 0.50 , 0.60 , 0.70, 0.80, 0.90, 1],
+                        "logical": [1, 1.19, 1.41 , 1.69 , 2.10 , 2.74 , 3.65, 5.05, 7.15, 10.79 ,19],
+                        "logicalMultiplier": 35,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "Sony|SNC-WR630", "Sony|SNC-WR630|2.1.2"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   -1,  1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO" : "Actual tilt range is [0,-180]",
+                        "device":  [-1, 1],
+                        "logical": [-90,20]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0,0.052,0.104,0.130,0.208,0.260,0.312,0.364,0.416,0.468,0.52],
+                        "logical": [1,1.2,1.49,1.86,2.39,3.10,4.22,6.04,9.18,14.43,26.69],
+                        "logicalMultiplier": 30,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "Samsung Techwin|SNP-6200RH", "Samsung Techwin|SNP-6200RH|3.00_140302"
+            ],
+            "_comment": "This one cannot be calliberated since it pass to -20 which we haven't implemented.",
+            "_ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO" : "Actual tilt range is [-5,185]",
+                        "device":  [1, 0],
+                        "logical": [5, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0,1],
+                        "logical": [1,20],
+                        "logicalMultiplier": 35,
+                        "space": "35MmEquiv"
+                    }
+                },
+                "toCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1, 1],
+                        "logical": [180,-20]
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "MOOG|MOOG-EXO-HD", "MOOG|MOOG-EXO-HD|3.8.0.7"
+            ]
         }
     ]
 }

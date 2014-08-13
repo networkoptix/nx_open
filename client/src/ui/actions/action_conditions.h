@@ -8,6 +8,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_criterion.h>
+#include <core/ptz/ptz_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -487,12 +488,6 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
-class QnCheckForUpdatesActionCondition: public QnActionCondition {
-public:
-    QnCheckForUpdatesActionCondition(QObject* parent): QnActionCondition(parent) {}
-    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
-};
-
 class QnShowcaseActionCondition: public QnActionCondition {
 public:
     QnShowcaseActionCondition(QObject* parent): QnActionCondition(parent) {}
@@ -532,8 +527,10 @@ public:
 
 class QnSaveVideowallReviewActionCondition: public QnActionCondition {
 public:
-    QnSaveVideowallReviewActionCondition(QObject* parent): QnActionCondition(parent) {}
+    QnSaveVideowallReviewActionCondition(bool isCurrent, QObject* parent): QnActionCondition(parent), m_current(isCurrent) {}
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+private:
+    bool m_current;
 };
 
 class QnStartVideowallActionCondition: public QnActionCondition {

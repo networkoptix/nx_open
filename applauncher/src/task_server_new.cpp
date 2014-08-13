@@ -8,7 +8,7 @@
 #include <unistd.h>
 #endif
 
-#include <QtSingleApplication>
+#include <qtsinglecoreapplication.h>
 
 #include <utils/common/log.h>
 #include <utils/ipc/named_pipe_socket.h>
@@ -43,7 +43,7 @@ bool TaskServerNew::listen( const QString& pipeName )
 
     //on windows multiple m_taskServer can listen single pipe, 
         //on linux unix socket can hang after server crash (because of socket file not removed)
-    QtSingleApplication* singleApp = qobject_cast<QtSingleApplication*>(QCoreApplication::instance());
+    QtSingleCoreApplication* singleApp = qobject_cast<QtSingleCoreApplication*>(QCoreApplication::instance());
     Q_ASSERT( singleApp );
     if( singleApp->isRunning() )
     {

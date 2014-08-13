@@ -13,6 +13,7 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
+#include <core/resource/videowall_item_index.h>
 #include <core/resource/layout_item_data.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -39,33 +40,12 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(QnWorkbenchContext *context, Qn
         return;
     }
 
-    connect(m_videowall, &QnVideoWallResource::itemAdded,     this, &QnVideowallScreenWidget::at_videoWall_itemAdded);
     connect(m_videowall, &QnVideoWallResource::itemChanged,   this, &QnVideowallScreenWidget::at_videoWall_itemChanged);
-    connect(m_videowall, &QnVideoWallResource::itemRemoved,   this, &QnVideowallScreenWidget::at_videoWall_itemRemoved);
-
-    m_pcUuid = item->data(Qn::VideoWallPcGuidRole).value<QUuid>();
-    if (!m_videowall->pcs()->hasItem(m_pcUuid))
-        return;
-
-    QnVideoWallPcData pc = m_videowall->pcs()->getItem(m_pcUuid);
-    QList<int> screenIndices = item->data(Qn::VideoWallPcScreenIndicesRole).value<QList<int> >();
-
-    foreach(const QnVideoWallPcData::PcScreen &screen, pc.screens) {
-        if (!screenIndices.contains(screen.index))
-            continue;
-        m_screens << screen;
-        m_desktopGeometry = m_desktopGeometry.united(screen.desktopGeometry);
-    }
-
-    if (m_desktopGeometry.isValid())
-        setAspectRatio((qreal)m_desktopGeometry.width() / m_desktopGeometry.height());
-
-    foreach (const QnVideoWallItem &item, m_videowall->items()->getItems())
-        at_videoWall_itemAdded(m_videowall, item);
 
     m_thumbnailManager = context->instance<QnCameraThumbnailManager>();
     connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this, &QnVideowallScreenWidget::at_thumbnailReady);
 
+    updateItems();
     updateButtonsVisibility();
     updateTitleText();
     updateInfoText();
@@ -98,27 +78,34 @@ QnResourceWidget::Buttons QnVideowallScreenWidget::calculateButtonsVisibility() 
 }
 
 QString QnVideowallScreenWidget::calculateTitleText() const {
+    if (m_items.isEmpty())
+        return QString();
+
+    auto pcUuid = m_videowall->pcs()->getItem(m_items.first().pcUuid).uuid;
+
     QStringList pcUuids;
     foreach (const QUuid &uuid, m_videowall->pcs()->getItems().keys())
         pcUuids.append(uuid.toString());
     pcUuids.sort(Qt::CaseInsensitive);
-    int idx = pcUuids.indexOf(m_pcUuid.toString());
+    int idx = pcUuids.indexOf(pcUuid.toString());
     if (idx < 0)
         idx = 0;
 
-    QString base = tr("Pc %1").arg(idx);
-    if (m_screens.isEmpty())
+    QString base = tr("Pc %1").arg(idx + 1);
+
+    QSet<int> screens = m_items.first().screenSnaps.screens();
+    if (screens.isEmpty())
         return base;
 
     QStringList screenIndices;
-    foreach (QnVideoWallPcData::PcScreen screen, m_screens)
-        screenIndices.append(QString::number(screen.index));
+    foreach (int screen, screens)
+        screenIndices.append(QString::number(screen + 1));
 
-    return tr("Pc %1 - Screens %2", "", m_screens.size()).arg(idx).arg(screenIndices.join(lit(" ,")));
+    return tr("Pc %1 - Screens %2", "", screens.size()).arg(idx + 1).arg(screenIndices.join(lit(" ,")));
 }
 
-void QnVideowallScreenWidget::updateLayout() {
-    if (!m_layoutUpdateRequired)
+void QnVideowallScreenWidget::updateLayout(bool force) {
+    if (!m_layoutUpdateRequired && !force)
         return;
 
     if (!m_mainLayout) {
@@ -147,7 +134,7 @@ void QnVideowallScreenWidget::updateLayout() {
         QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, id, this, m_mainOverlayWidget);
         itemWidget->setFrameColors(frameColors());
         if (state.contains(id))
-            itemWidget->setInfoVisible(state[id] > 0);
+            itemWidget->setInfoVisible(state[id] > 0, false);
 
         connect(itemWidget, &QnVideowallItemWidget::infoVisibleChanged, this, [this, id](bool visible){
             if (!this->item())
@@ -160,33 +147,39 @@ void QnVideowallScreenWidget::updateLayout() {
         return itemWidget;
     };
 
-    // can have several items on a single screen
-    if (m_screens.size() == 1) {
+    
+    auto partOfScreen = [](const QnScreenSnaps &snaps) {
+        return std::any_of(snaps.values.cbegin(), snaps.values.cend(), [](const QnScreenSnap &snap) {return snap.snapIndex > 0;});
+    };
+
+    // can have several items on a single screen - or one item can take just part of the screen
+    if (m_items.size() > 1 || (m_items.size() == 1 && partOfScreen(m_items.first().screenSnaps))) {
         foreach (const QnVideoWallItem &item, m_items) {
             QnVideowallItemWidget *itemWidget = createItem(item.uuid);
+            assert(QnScreenSnap::snapsPerScreen() == 2);    //in other case layout should be reimplemented
 
-            if (item.geometry.left() == m_desktopGeometry.left())
+            if (item.screenSnaps.left().snapIndex == 0)
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorLeft, m_mainLayout, Qt::AnchorLeft);
             else
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorLeft, m_mainLayout, Qt::AnchorHorizontalCenter);
 
-            if (item.geometry.top() == m_desktopGeometry.top())
+            if (item.screenSnaps.top().snapIndex == 0)
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorTop, m_mainLayout, Qt::AnchorTop);
             else
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorTop, m_mainLayout, Qt::AnchorVerticalCenter);
 
-            if (item.geometry.right() == m_desktopGeometry.right())
+            if (item.screenSnaps.right().snapIndex == 0)
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorRight, m_mainLayout, Qt::AnchorRight);
             else
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorRight, m_mainLayout, Qt::AnchorHorizontalCenter);
 
-            if (item.geometry.bottom() == m_desktopGeometry.bottom())
+            if (item.screenSnaps.bottom().snapIndex == 0)
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorBottom, m_mainLayout, Qt::AnchorBottom);
             else
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorBottom, m_mainLayout, Qt::AnchorVerticalCenter);
 
         }
-    } else if (m_items.size() == 1 ) {    // can have only on item on several screens
+    } else if (m_items.size() == 1 ) {    // can have only one item on several screens
         QnVideowallItemWidget *itemWidget = createItem(m_items.first().uuid);
         m_mainLayout->addAnchors(itemWidget, m_mainLayout, Qt::Horizontal | Qt::Vertical);
     }
@@ -195,52 +188,64 @@ void QnVideowallScreenWidget::updateLayout() {
 }
 
 
-void QnVideowallScreenWidget::at_thumbnailReady(const QnId &resourceId, const QPixmap &thumbnail) {
+void QnVideowallScreenWidget::at_thumbnailReady(const QUuid &resourceId, const QPixmap &thumbnail) {
     m_thumbs[resourceId] = thumbnail;
-    update();
-}
-
-void QnVideowallScreenWidget::at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
-    Q_UNUSED(videoWall)
-    if (item.pcUuid != m_pcUuid)
-        return;
-
-    if (!m_desktopGeometry.contains(item.geometry))
-        return;
-
-    m_items << item;
-    m_layoutUpdateRequired = true;
     update();
 }
 
 void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     Q_UNUSED(videoWall)
-    if (item.pcUuid != m_pcUuid)
-        return;
 
-    int idx = qnIndexOf(m_items, [&](const QnVideoWallItem &i) {return item.uuid == i.uuid; });
+    int idx = qnIndexOf(m_items, [&item](const QnVideoWallItem &i) {return item.uuid == i.uuid; });
     if (idx < 0)
-        return; // item on another screen
+        return; // item on another widget
 
     QnVideoWallItem oldItem = m_items[idx];
+    if (oldItem.screenSnaps.screens() != item.screenSnaps.screens()) {
+         // if there are more than one item on the widget, this one will be updated from outside
+        if (m_items.size() == 1)
+            updateItems(); 
+        return; 
+    }
+    
     m_items[idx] = item;
-    if (item.geometry == oldItem.geometry)
-       return;
-
-    m_layoutUpdateRequired = true;
+    m_layoutUpdateRequired = (item.screenSnaps != oldItem.screenSnaps);
     update();
 }
 
-void QnVideowallScreenWidget::at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
-    Q_UNUSED(videoWall)
-    if (item.pcUuid != m_pcUuid)
+void QnVideowallScreenWidget::at_itemDataChanged(int role) {
+    base_type::at_itemDataChanged(role);
+    if (role != Qn::VideoWallItemIndicesRole)
         return;
 
-    int idx = qnIndexOf(m_items, [&](const QnVideoWallItem &i) {return item.uuid == i.uuid; });
-    if (idx < 0)
-        return; // item on another screen
+    updateItems();
+}
 
-    m_items.removeAt(idx);
-    m_layoutUpdateRequired = true;
+void QnVideowallScreenWidget::updateItems() {
+    m_items.clear();
+
+    QnVideoWallItemIndexList indices = item()->data(Qn::VideoWallItemIndicesRole).value<QnVideoWallItemIndexList>();
+    foreach (const QnVideoWallItemIndex &index, indices) {
+        if (!index.isValid())
+            continue;
+        m_items << index.item();
+    }
+
+    if (!m_items.isEmpty()) {
+        QnVideoWallPcData pc = m_videowall->pcs()->getItem(m_items.first().pcUuid);
+        
+        QRect totalDesktopGeometry;
+        QSet<int> screens = m_items.first().screenSnaps.screens();
+        foreach (const QnVideoWallPcData::PcScreen &screen, pc.screens) {
+            if (!screens.contains(screen.index))
+                continue;
+            totalDesktopGeometry = totalDesktopGeometry.united(screen.desktopGeometry);
+        }
+        if (totalDesktopGeometry.isValid())
+            setAspectRatio((qreal)totalDesktopGeometry.width() / totalDesktopGeometry.height());
+    }
+
+    updateLayout(true);
+    updateTitleText();
     update();
 }

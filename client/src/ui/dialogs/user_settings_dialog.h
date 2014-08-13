@@ -9,6 +9,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 class QnWorkbenchContext;
 class QCheckBox;
@@ -17,8 +18,11 @@ namespace Ui {
     class UserSettingsDialog;
 }
 
-class QnUserSettingsDialog: public QDialog, public QnWorkbenchContextAware {
+class QnUserSettingsDialog: public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
+
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+
 public:
     enum Element {
         Login,
@@ -48,8 +52,6 @@ public:
     ElementFlags elementFlags(Element element) const;
 
     void setFocusedElement(QString element);
-
-    void setEditorPermissions(quint64 rights);
 
     bool hasChanges() const {
         return m_hasChanges;
@@ -108,7 +110,6 @@ private:
     ElementFlags m_flags[ElementCount];
     bool m_hasChanges;
     QHash<quint64, QCheckBox*> m_advancedRights;
-    quint64 m_editorRights;
 
     /** Status variable to avoid unneeded checks. */
     bool m_inUpdateDependensies;

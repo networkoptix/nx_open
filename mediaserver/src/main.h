@@ -16,12 +16,11 @@
 
 
 class QnAppserverResourceProcessor;
-class QnRtspListener;
-class QnRestServer;
 class QNetworkReply;
 class QnServerMessageProcessor;
 struct QnModuleInformation;
 class QnModuleFinder;
+struct QnPeerRuntimeInfo;
 
 class QnMain : public QnLongRunnable
 {
@@ -51,10 +50,13 @@ private slots:
     void at_peerLost(const QnModuleInformation &moduleInformation);
 
     void at_appStarted();
-    void at_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
+    void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
+    void at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
+    void at_restartServerRequired();
 private:
     void updateDisabledVendorsIfNeeded();
-    void initTcpListener();
+    void updateAllowCameraCHangesIfNeed();
+    bool initTcpListener();
     QHostAddress getPublicAddress();
 private:
     int m_argc;
@@ -63,11 +65,9 @@ private:
     qint64 m_firstRunningTime;
 
     QnModuleFinder* m_moduleFinder;
-    QnRtspListener* m_rtspListener;
-    QnRestServer* m_restServer;
-    QnProgressiveDownloadingServer* m_progressiveDownloadingServer;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
+    QSet<QUuid> m_updateUserRequests;
 };
 
 #endif // MAIN_H

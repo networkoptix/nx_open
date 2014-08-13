@@ -13,7 +13,7 @@ class QnPlIqResourceSearcher : public QnMdnsResourceSearcher
 public:
     QnPlIqResourceSearcher();
 
-    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams& params) override;
 
     // return the manufacture of the server
     virtual QString manufacture() const;
@@ -21,7 +21,11 @@ public:
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
 protected:
-    virtual QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress) override;
+    virtual QList<QnNetworkResourcePtr> processPacket(
+        QnResourceList& result,
+        const QByteArray& responseData,
+        const QHostAddress& discoveryAddress,
+        const QHostAddress& foundHostAddress ) override;
     virtual QnResourceList findResources() override;
 private:
     void  processNativePacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress);

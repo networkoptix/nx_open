@@ -67,7 +67,7 @@ public:
     QSize backgroundSize() const;
     void setBackgroundSize(QSize size);
 
-    /** Filename of background image on EC */
+    /** Filename of background image on Server */
     QString backgroundImageFilename() const;
     void setBackgroundImageFilename(const QString &filename);
 

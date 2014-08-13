@@ -98,7 +98,7 @@ bool QnEventsDB::cleanupEvents()
     return rez;
 }
 
-bool QnEventsDB::removeLogForRes(QnId resId)
+bool QnEventsDB::removeLogForRes(QUuid resId)
 {
     QWriteLocker lock(&m_mutex);
 
@@ -128,7 +128,7 @@ bool QnEventsDB::saveActionToDB(const QnAbstractBusinessActionPtr& action, const
         "VALUES (:timestamp, :action_type, :action_params, :runtime_params, :business_rule_guid, :toggle_state, :aggregation_count, :event_type, :event_resource_guid, :action_resource_guid);");
 
     qint64 timestampUsec = action->getRuntimeParams().getEventTimestamp();
-    QnId eventResId = action->getRuntimeParams().getEventResourceId();
+    QUuid eventResId = action->getRuntimeParams().getEventResourceId();
     
     QnBusinessEventParameters actionRuntime = action->getRuntimeParams();
     if (actionRes)
@@ -162,7 +162,7 @@ QString QnEventsDB::getRequestStr(const QnTimePeriod& period,
                                   const QnResourceList& resList,
                                   const QnBusiness::EventType& eventType, 
                                   const QnBusiness::ActionType& actionType,
-                                  const QnId& businessRuleId) const
+                                  const QUuid& businessRuleId) const
 
 {
     QString request(lit("SELECT * FROM runtime_actions where"));
@@ -214,7 +214,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     const QnResourceList& resList, 
     const QnBusiness::EventType& eventType, 
     const QnBusiness::ActionType& actionType,
-    const QnId& businessRuleId) const
+    const QUuid& businessRuleId) const
 
 {
     QElapsedTimer t;
@@ -244,7 +244,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
         QnBusinessEventParameters runtimeParams = QnBusinessEventParameters::deserialize(query.value(runtimeParamIdx).toByteArray());
         QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
         action->setParams(actionParams);
-        action->setBusinessRuleId(query.value(businessRuleIdx).toByteArray());
+        action->setBusinessRuleId(QUuid(query.value(businessRuleIdx).toByteArray()));
         action->setToggleState( (QnBusiness::EventState) query.value(toggleStateIdx).toInt());
         action->setAggregationCount(query.value(aggregationCntIdx).toInt());
 
@@ -262,7 +262,7 @@ inline void appendIntToBA(QByteArray& ba, int value)
     ba.append((const char*) &value, sizeof(int));
 }
 
-inline void appendQnIdToBA(QByteArray& ba, const QnId& value)
+inline void appendQnIdToBA(QByteArray& ba, const QUuid& value)
 {
     ba.append(value.toRfc4122());
 }
@@ -273,7 +273,7 @@ void QnEventsDB::getAndSerializeActions(
                                         const QnResourceList& resList,
                                         const QnBusiness::EventType& eventType, 
                                         const QnBusiness::ActionType& actionType,
-                                        const QnId& businessRuleId) const
+                                        const QUuid& businessRuleId) const
 
 {
     QElapsedTimer t;
@@ -309,10 +309,10 @@ void QnEventsDB::getAndSerializeActions(
         QnBusiness::EventType eventType = (QnBusiness::EventType) actionsQuery.value(eventTypeIdx).toInt();
         if (eventType == QnBusiness::CameraMotionEvent) 
         {
-            QnId eventResId = QnId::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
+            QUuid eventResId = QUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes = qnResPool->getResourceById(eventResId).dynamicCast<QnNetworkResource>();
             if (camRes) {
-                if (qnStorageMan->isArchiveTimeExists(camRes->getPhysicalId(), actionsQuery.value(timestampIdx).toInt()*1000ll))
+                if (qnStorageMan->isArchiveTimeExists(camRes->getUniqueId(), actionsQuery.value(timestampIdx).toInt()*1000ll))
                     flags |= QnBusinessActionData::MotionExists;
 
             }
@@ -378,7 +378,7 @@ void QnEventsDB::migrate()
 
         QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
         action->setParams(actionParams);
-        action->setBusinessRuleId(query.value(businessRuleIdx).toString());
+        action->setBusinessRuleId(QUuid(query.value(businessRuleIdx).toString()));
         action->setToggleState( (QnBusiness::EventState) query.value(toggleStateIdx).toInt());
         action->setAggregationCount(query.value(aggregationCntIdx).toInt());
 

@@ -8,13 +8,10 @@
 #include "api/app_server_connection.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "acti_stream_reader.h"
-#include <business/business_event_connector.h>
 #include <business/business_event_rule.h>
-#include <business/business_rule_processor.h>
 #include "utils/common/synctime.h"
 #include "acti_ptz_controller.h"
 #include "rest/server/rest_connection_processor.h"
-#include "business/business_event_connector.h"
 
 
 const QString QnActiResource::MANUFACTURE(lit("ACTI"));
@@ -23,9 +20,6 @@ static const int DEFAULT_RTSP_PORT = 7070;
 
 static int actiEventPort = 0;
 
-QString AUDIO_SUPPORTED_PARAM_NAME = QLatin1String("isAudioSupported");
-QString DUAL_STREAMING_PARAM_NAME = QLatin1String("hasDualStreaming");
-QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 static int DEFAULT_AVAIL_BITRATE_KBPS[] = { 28, 56, 128, 256, 384, 500, 750, 1000, 1200, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000 };
 
 QnActiResource::QnActiResource()
@@ -248,7 +242,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     QByteArray resolutions= makeActiRequest(QLatin1String("system"), QLatin1String("VIDEO_RESOLUTION_CAP"), status);
 
     if (status == CL_HTTP_AUTH_REQUIRED) 
-        setStatus(QnResource::Unauthorized);
+        setStatus(Qn::Unauthorized);
     if (status != CL_HTTP_SUCCESS)
         return CameraDiagnostics::UnknownErrorResult();
 
@@ -317,9 +311,9 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     QScopedPointer<QnAbstractPtzController> ptzController(createPtzControllerInternal());
     setPtzCapabilities(ptzController->getCapabilities());
 
-    setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
-    setParam(MAX_FPS_PARAM_NAME, getMaxFps(), QnDomainDatabase);
-    setParam(DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0, QnDomainDatabase);
+    setParam(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
+    setParam(Qn::MAX_FPS_PARAM_NAME, getMaxFps(), QnDomainDatabase);
+    setParam(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0, QnDomainDatabase);
 
     //detecting and saving selected resolutions
     CameraMediaStreams mediaStreams;
@@ -494,14 +488,14 @@ int QnActiResource::getMaxFps() const
     return m_availFps[0].last();
 }
 
-QSize QnActiResource::getResolution(QnResource::ConnectionRole role) const
+QSize QnActiResource::getResolution(Qn::ConnectionRole role) const
 {
-    return (role == QnResource::Role_LiveVideo ? m_resolution[0] : m_resolution[1]);
+    return (role == Qn::CR_LiveVideo ? m_resolution[0] : m_resolution[1]);
 }
 
-int QnActiResource::roundFps(int srcFps, QnResource::ConnectionRole role) const
+int QnActiResource::roundFps(int srcFps, Qn::ConnectionRole role) const
 {
-    QList<int> availFps = (role == QnResource::Role_LiveVideo ? m_availFps[0] : m_availFps[1]);
+    QList<int> availFps = (role == Qn::CR_LiveVideo ? m_availFps[0] : m_availFps[1]);
     int minDistance = INT_MAX;
     int result = srcFps;
     for (int i = 0; i < availFps.size(); ++i)
@@ -541,7 +535,7 @@ bool QnActiResource::hasDualStreaming() const
 {
     QVariant mediaVariant;
     QnActiResource* this_casted = const_cast<QnActiResource*>(this);
-    this_casted->getParam(DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
+    this_casted->getParam(Qn::HAS_DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
     return mediaVariant.toBool();
 }
 

@@ -9,6 +9,7 @@
 #include <transaction/transaction.h>
 #include <transaction/binary_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
+#include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/transaction_transport_header.h>
 
 #include <utils/network/abstract_socket.h>
@@ -20,6 +21,7 @@
 #include <common/common_module.h>
 #endif
 
+#define TRANSACTION_MESSAGE_BUS_DEBUG
 
 namespace ec2
 {
@@ -41,7 +43,7 @@ public:
     static QString toString( State state );
 
     QnTransactionTransport(const ApiPeerData &localPeer,
-        const ApiPeerData &remotePeer = ApiPeerData(QnId(), Qn::PT_Server),
+        const ApiPeerData &remotePeer = ApiPeerData(QUuid(), Qn::PT_Server),
         QSharedPointer<AbstractStreamSocket> socket = QSharedPointer<AbstractStreamSocket>());
     ~QnTransactionTransport();
 
@@ -51,13 +53,23 @@ signals:
 public:
 
     template<class T> 
-    void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader &header) {
+    void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header) 
+    {
+        QnTransactionTransportHeader header(_header);
         assert(header.processedPeers.contains(m_localPeer.id));
+        if(header.sequence == 0) 
+            header.fillSequence();
 #ifdef _DEBUG
-        foreach (const QnId& peer, header.dstPeers) {
+
+        foreach (const QUuid& peer, header.dstPeers) {
             Q_ASSERT(!peer.isNull());
             Q_ASSERT(peer != qnCommon->moduleGUID());
         }
+#endif
+
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+        qDebug() << "send transaction to peer " << remotePeer().id << "command=" << ApiCommand::toString(transaction.command) 
+                 << "transport seq=" << header.sequence << "db seq=" << transaction.persistentInfo.sequence << "timestamp=" << transaction.persistentInfo.timestamp;
 #endif
 
         switch (m_remotePeer.dataFormat) {
@@ -67,9 +79,12 @@ public:
         case Qn::BnsFormat:
             addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
+        case Qn::UbjsonFormat:
+            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+            break;
         default:
             qWarning() << "Client has requested data in the unsupported format" << m_remotePeer.dataFormat;
-            addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
         }
     }
@@ -80,7 +95,7 @@ public:
     // these getters/setters are using from a single thread
     qint64 lastConnectTime() { return m_lastConnectTime; }
     void setLastConnectTime(qint64 value) { m_lastConnectTime = value; }
-    bool isReadSync() const       { return m_readSync; }
+    bool isReadSync(ApiCommand::Value command) const;
     void setReadSync(bool value)  {m_readSync = value;}
     bool isReadyToSend(ApiCommand::Value command) const;
     void setWriteSync(bool value) { m_writeSync = value; }
@@ -92,10 +107,10 @@ public:
     void setState(State state);
     State getState() const;
 
-    static bool tryAcquireConnecting(const QnId& remoteGuid, bool isOriginator);
-    static bool tryAcquireConnected(const QnId& remoteGuid, bool isOriginator);
-    static void connectingCanceled(const QnId& id, bool isOriginator);
-    static void connectDone(const QnId& id);
+    static bool tryAcquireConnecting(const QUuid& remoteGuid, bool isOriginator);
+    static bool tryAcquireConnected(const QUuid& remoteGuid, bool isOriginator);
+    static void connectingCanceled(const QUuid& id, bool isOriginator);
+    static void connectDone(const QUuid& id);
 private:
     ApiPeerData m_localPeer;
     ApiPeerData m_remotePeer;
@@ -131,7 +146,7 @@ private:
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();
-    static void connectingCanceledNoLock(const QnId& remoteGuid, bool isOriginator);
+    static void connectingCanceledNoLock(const QUuid& remoteGuid, bool isOriginator);
 private slots:
     void at_responseReceived( nx_http::AsyncHttpClientPtr );
     void at_httpClientDone(nx_http::AsyncHttpClientPtr);

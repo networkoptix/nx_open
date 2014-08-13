@@ -23,7 +23,11 @@ static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
 static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
 {
     Q_UNUSED(opaque)
+
     QnFfmpegTranscoder* transcoder = reinterpret_cast<QnFfmpegTranscoder*> (opaque);
+    if (transcoder->inMiddleOfStream())
+        return size; // ignore write
+
     return transcoder->writeBuffer((char*) buf, size);
 }
 
@@ -32,7 +36,9 @@ static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
     Q_UNUSED(opaque)
     Q_UNUSED(pos)
     Q_UNUSED(whence)
-    Q_ASSERT_X(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
+    //Q_ASSERT_X(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
+    QnFfmpegTranscoder* transcoder = reinterpret_cast<QnFfmpegTranscoder*> (opaque);
+    transcoder->setInMiddleOfStream(!(pos == 0 && whence == SEEK_END));
     return 0;
 }
 
@@ -64,7 +70,8 @@ QnFfmpegTranscoder::QnFfmpegTranscoder()
     m_videoBitrate(0),
     m_formatCtx(0),
     m_ioContext(0),
-    m_baseTime(AV_NOPTS_VALUE)
+    m_baseTime(AV_NOPTS_VALUE),
+    m_inMiddleOfStream(false)
 {
     NX_LOG( lit("Created new ffmpeg transcoder. Total transcoder count %1").
         arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
@@ -88,11 +95,58 @@ void av_free_stream( AVStream* st )
     av_free( st );
 }
 
+extern "C" {
+    void av_opt_free(void *obj);
+};
+
+int workaround_av_write_trailer(AVFormatContext *s)
+{
+    int ret = 0, i = 0;
+    /*
+    for(;;){
+        AVPacket pkt;
+        ret= interleave_packet(s, &pkt, NULL, 1);
+        if(ret<0) //FIXME cleanup needed for ret<0 ?
+            goto fail;
+        if(!ret)
+            break;
+
+        ret= s->oformat->write_packet(s, &pkt);
+        if (ret >= 0)
+            s->streams[pkt.stream_index]->nb_frames++;
+
+        av_free_packet(&pkt);
+
+        if(ret<0)
+            goto fail;
+        if(s->pb && s->pb->error)
+            goto fail;
+    }
+
+    if(s->oformat->write_trailer)
+        ret = s->oformat->write_trailer(s);
+fail:
+*/
+    if( s->pb )
+        avio_flush(s->pb);
+    if(ret == 0)
+        ret = s->pb ? s->pb->error : 0;
+    for(i=0;i<s->nb_streams;i++) {
+        av_freep(&s->streams[i]->priv_data);
+        av_freep(&s->streams[i]->index_entries);
+    }
+    if (s->oformat->priv_class)
+        av_opt_free(s->priv_data);
+    av_freep(&s->priv_data);
+    return ret;
+}
+
+
 void QnFfmpegTranscoder::closeFfmpegContext()
 {
     if (m_formatCtx)
     {
-        av_write_trailer(m_formatCtx);
+        workaround_av_write_trailer(m_formatCtx);
         for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
             av_free_stream( m_formatCtx->streams[i] );
         m_formatCtx->nb_streams = 0;
@@ -167,6 +221,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             QnFfmpegVideoTranscoderPtr ffmpegVideoTranscoder = m_vTranscoder.dynamicCast<QnFfmpegVideoTranscoder>();
             if (ffmpegVideoTranscoder->getCodecContext()) {
                 avcodec_copy_context(m_videoEncoderCodecCtx, ffmpegVideoTranscoder->getCodecContext());
+                m_videoEncoderCodecCtx->stats_out = NULL;   //to avoid double free since avcodec_copy_context does not copy this field
             }
             else {
                 m_videoEncoderCodecCtx->width = m_vTranscoder->getResolution().width();
@@ -195,6 +250,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
 
             if (video->context && video->context->ctx()) {
                 avcodec_copy_context(m_videoEncoderCodecCtx, video->context->ctx());
+                m_videoEncoderCodecCtx->stats_out = NULL;   //to avoid double free since avcodec_copy_context does not copy this field
             }
 
             m_videoEncoderCodecCtx->width = videoWidth;
@@ -246,6 +302,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             QnFfmpegAudioTranscoderPtr ffmpegAudioTranscoder = m_aTranscoder.dynamicCast<QnFfmpegAudioTranscoder>();
             if (ffmpegAudioTranscoder->getCodecContext()) {
                 avcodec_copy_context(m_audioEncoderCodecCtx, ffmpegAudioTranscoder->getCodecContext());
+                m_audioEncoderCodecCtx->stats_out = NULL;   //to avoid double free since avcodec_copy_context does not copy this field
             }
             m_audioEncoderCodecCtx->bit_rate = m_aTranscoder->getBitrate();
         }
@@ -253,6 +310,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         {
             if (audio->context && audio->context->ctx()) {
                 avcodec_copy_context(m_audioEncoderCodecCtx, audio->context->ctx());
+                m_audioEncoderCodecCtx->stats_out = NULL;   //to avoid double free since avcodec_copy_context does not copy this field
             }
             //m_audioEncoderCodecCtx->bit_rate = 1024 * 96;
         }

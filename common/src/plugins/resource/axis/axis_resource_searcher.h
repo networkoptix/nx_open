@@ -13,7 +13,7 @@ class QnPlAxisResourceSearcher : public QnMdnsResourceSearcher
 public:
     QnPlAxisResourceSearcher();
 
-    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams& params) override;
 
     // return the manufacture of the server
     virtual QString manufacture() const override;
@@ -22,7 +22,11 @@ public:
 private:
     template <class T> void addMultichannelResources(QList<T>& result);
 protected:
-    QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress) override;
+    QList<QnNetworkResourcePtr> processPacket(
+        QnResourceList& result,
+        const QByteArray& responseData,
+        const QHostAddress& discoveryAddress,
+        const QHostAddress& foundHostAddress ) override;
 };
 
 #endif // #ifdef ENABLE_AXIS

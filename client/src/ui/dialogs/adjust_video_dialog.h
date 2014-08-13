@@ -4,7 +4,11 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QAbstractButton>
 
+#include <ui/workbench/workbench_context_aware.h>
+
 #include <utils/color_space/image_correction.h>
+
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 class QnMediaResourceWidget;
 
@@ -13,9 +17,9 @@ namespace Ui {
 }
 
 // TODO: #Elric rename image enhancement dialog
-class QnAdjustVideoDialog : public QDialog {
+class QnAdjustVideoDialog : public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
-    typedef QDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
     explicit QnAdjustVideoDialog(QWidget *parent = NULL);
@@ -27,6 +31,7 @@ public:
     
     void setWidget(QnMediaResourceWidget *widget);
 
+    virtual bool tryClose(bool force) override;
 protected:
     virtual void closeEvent(QCloseEvent *e) override;
 
@@ -42,6 +47,7 @@ private slots:
 
 private:
     QScopedPointer<Ui::AdjustVideoDialog> ui;
+
     bool m_updateDisabled;
     ImageCorrectionParams m_params;
     QnMediaResourceWidget* m_widget;

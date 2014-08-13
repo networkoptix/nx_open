@@ -4,6 +4,7 @@
 
 #include <core/dataprovider/media_streamdataprovider.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/security_cam_resource.h>
 
 #include <plugins/resource/archive/rtsp_client_archive_delegate.h>
@@ -151,7 +152,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
     QMutexLocker lock(&m_exportMutex);
     if (m_exportRecorder == 0)
     {
-        QnAbstractStreamDataProvider* tmpReader = m_resource->toResource()->createDataProvider(QnResource::Role_Default);
+        QnAbstractStreamDataProvider* tmpReader = m_resource->toResource()->createDataProvider(Qn::CR_Default);
         m_exportReader = dynamic_cast<QnAbstractArchiveReader*> (tmpReader);
         if (!m_exportReader)
         {
@@ -164,7 +165,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
         if (rtspClient) {
             // 'slow' open mode. send DESCRIBE and SETUP to server.
             // it is required for av_streams in output file - we should know all codec context immediately
-            rtspClient->setResource(m_resource->toResourcePtr());
+            QnVirtualCameraResourcePtr camera = m_resource->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+            rtspClient->setCamera(camera);
             rtspClient->setPlayNowModeAllowed(false); 
         }
         if (role == QnStreamRecorder::Role_FileExport)

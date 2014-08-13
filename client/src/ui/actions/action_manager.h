@@ -155,6 +155,9 @@ protected:
     QMenu *newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options);
 
     bool redirectActionRecursive(QMenu *menu, Qn::ActionId targetId, QAction *targetAction);
+
+    /** Setup proper connections between menu and the manager. */
+    QMenu* integrateMenu(QMenu *menu, const QnActionParameters &parameters);
 private slots:
     void at_menu_destroyed(QObject *menu);
 

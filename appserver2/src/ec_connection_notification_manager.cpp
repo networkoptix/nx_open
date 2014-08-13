@@ -104,6 +104,11 @@ namespace ec2
         emit m_ecConnection->runtimeInfoChanged(tran.params);
     }
 
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDatabaseDumpData> & /*tran*/)
+    {
+        emit m_ecConnection->databaseDumped();
+    }
+
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiMediaServerData>& tran ) {
         m_mediaServerManager->triggerNotification( tran );
     }
@@ -166,10 +171,6 @@ namespace ec2
     }
 
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran ) {
-        return m_videowallManager->triggerNotification(tran);
-    }
-
-    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiVideowallInstanceStatusData> &tran) {
         return m_videowallManager->triggerNotification(tran);
     }
 

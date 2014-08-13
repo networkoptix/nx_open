@@ -37,11 +37,11 @@ public:
     qint64 getEventTimestamp() const;
     void setEventTimestamp(qint64 value);
 
-    QnId getEventResourceId() const;
-    void setEventResourceId(const QnId& value);
+    QUuid getEventResourceId() const;
+    void setEventResourceId(const QUuid& value);
 
-    QnId getActionResourceId() const;
-    void setActionResourceId(const QnId& value);
+    QUuid getActionResourceId() const;
+    void setActionResourceId(const QUuid& value);
 
     QnBusiness::EventReason getReasonCode() const;
     void setReasonCode(QnBusiness::EventReason value);
@@ -79,8 +79,8 @@ private:
 private:
     QnBusiness::EventType m_eventType;
     qint64 m_timestamp;
-    QnId m_resourceId;
-    QnId m_actionResourceId;
+    QUuid m_resourceId;
+    QUuid m_actionResourceId;
 
     QString m_inputPort;
     QnBusiness::EventReason m_reasonCode;

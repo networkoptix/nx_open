@@ -25,7 +25,10 @@ namespace ec2
     {
         QnLicensePtr license(new QnLicense());
         fromApiToResource(tran.params, license);
-        emit licenseChanged(license);
+        if (tran.command == ApiCommand::addLicense)
+            emit licenseChanged(license);
+        else if (tran.command == ApiCommand::removeLicense)
+            emit licenseRemoved(license);
     }
 
 
@@ -61,7 +64,7 @@ namespace ec2
         const int reqID = generateRequestID();
 
         //for( QnLicensePtr lic: licenses )
-        //    lic->setId(QnId::createUuid());
+        //    lic->setId(QUuid::createUuid());
 
         auto tran = prepareTransaction( ApiCommand::addLicenses, licenses );
 
@@ -72,10 +75,34 @@ namespace ec2
     }
 
     template<class T>
+    int QnLicenseManager<T>::removeLicense( const QnLicensePtr& license, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+
+        //for( QnLicensePtr lic: licenses )
+        //    lic->setId(QUuid::createUuid());
+
+        auto tran = prepareTransaction( ApiCommand::removeLicense, license );
+
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+
+        return reqID;
+    }
+
+    template<class T>
     QnTransaction<ApiLicenseDataList> QnLicenseManager<T>::prepareTransaction( ApiCommand::Value cmd, const QnLicenseList& licenses )
     {
-        QnTransaction<ApiLicenseDataList> tran( cmd, true );
+        QnTransaction<ApiLicenseDataList> tran( cmd);
         fromResourceListToApi(licenses, tran.params);
+        return tran;
+    }
+
+    template<class T>
+    QnTransaction<ApiLicenseData> QnLicenseManager<T>::prepareTransaction( ApiCommand::Value cmd, const QnLicensePtr& license )
+    {
+        QnTransaction<ApiLicenseData> tran( cmd);
+        fromResourceToApi(license, tran.params);
         return tran;
     }
 

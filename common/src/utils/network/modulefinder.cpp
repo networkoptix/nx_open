@@ -133,7 +133,7 @@ bool QnModuleFinder::processDiscoveryRequest(AbstractDatagramSocket *udpSocket) 
     
     response.type = moduleName;
     response.customization = QString::fromLatin1(QN_CUSTOMIZATION_NAME);
-    response.seed = qnCommon->moduleGUID().toString();
+    response.seed = qnCommon->moduleGUID();
     response.name = qnCommon->localSystemName();
     response.typeSpecificParameters.insert(lit("port"), QString::number(qnCommon->moduleUrl().port()));
     quint8 *responseBufStart = readBuffer;
@@ -174,7 +174,7 @@ bool QnModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket)
         return false;
     }
 
-    if (response.seed == qnCommon->moduleGUID().toString())
+    if (response.seed == qnCommon->moduleGUID())
         return true; // ignore requests to himself
 
     if (!m_compatibilityMode && response.customization.toLower() != qnProductFeatures().customizationName.toLower()) { // TODO: #2.1 #Elric #AK check for "default" VS "Vms"
@@ -182,8 +182,11 @@ bool QnModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket)
             arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
         return false;
     }
+    
+    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(response.seed))
+        return false;
 
-    //received valid response, checking if already know this enterprise controller
+    //received valid response, checking if already know this Server
     auto it = m_knownEnterpriseControllers.find(response.seed);
     bool newModule = (it == m_knownEnterpriseControllers.end());
 
@@ -191,7 +194,7 @@ bool QnModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket)
         it = m_knownEnterpriseControllers.insert(response.seed, ModuleContext(response));
 
     if (!it->signalledAddresses.contains(remoteAddressStr)) {
-        //new enterprise controller found
+        //new Server found
 
         it->signalledAddresses.insert(remoteAddressStr);
         const QHostAddress &localAddress = QHostAddress(udpSocket->getLocalAddress().address.toString());

@@ -102,11 +102,13 @@ void QnTransactionTransport::setStateNoLock(State state)
         m_connected = false;
     }
     else if (state == ReadyForStreaming) {
-        m_socket->setRecvTimeout(SOCKET_TIMEOUT);
-        m_socket->setSendTimeout(SOCKET_TIMEOUT);
-        m_socket->setNonBlockingMode(true);
-        m_chunkHeaderLen = 0;
-        aio::AIOService::instance()->watchSocket( m_socket, aio::etRead, this );
+        if (m_socket) {
+            m_socket->setRecvTimeout(SOCKET_TIMEOUT);
+            m_socket->setSendTimeout(SOCKET_TIMEOUT);
+            m_socket->setNonBlockingMode(true);
+            m_chunkHeaderLen = 0;
+            aio::AIOService::instance()->watchSocket( m_socket, aio::etRead, this );
+        }
     }
     if (this->m_state != state) {
         this->m_state = state;
@@ -168,7 +170,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                         {
                             QByteArray serializedTran;
                             QnTransactionTransportHeader transportHeader;
-                            QnBinaryTransactionSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+                            QnUbjsonTransactionSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
                             emit gotTransaction(serializedTran, transportHeader);
                             m_readBufferLen = m_chunkHeaderLen = 0;
                         }
@@ -233,21 +235,9 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     QUrlQuery q = QUrlQuery(remoteAddr.query());
 
     // Client reconnects to the server
-    if( m_localPeer.peerType == Qn::PT_DesktopClient ) {
+    if( m_localPeer.isClient() ) {
         q.removeQueryItem("isClient");
         q.addQueryItem("isClient", QString());
-        setState(ConnectingStage2); // one GET method for client peer is enough
-        setReadSync(true);
-    } else if (m_localPeer.peerType == Qn::PT_VideowallClient) {
-        q.removeQueryItem("isClient");  //videowall client is still client
-        q.addQueryItem("isClient", QString());
-
-        q.removeQueryItem("videowallGuid");
-        q.addQueryItem("videowallGuid", m_localPeer.params["videowallGuid"]);
-
-        q.removeQueryItem("instanceGuid");
-        q.addQueryItem("instanceGuid", m_localPeer.params["instanceGuid"]);
-
         setState(ConnectingStage2); // one GET method for client peer is enough
         setReadSync(true);
     }
@@ -260,7 +250,7 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     }
 }
 
-bool QnTransactionTransport::tryAcquireConnecting(const QnId& remoteGuid, bool isOriginator)
+bool QnTransactionTransport::tryAcquireConnecting(const QUuid& remoteGuid, bool isOriginator)
 {
     QMutexLocker lock(&m_staticMutex);
 
@@ -280,13 +270,13 @@ bool QnTransactionTransport::tryAcquireConnecting(const QnId& remoteGuid, bool i
 }
 
 
-void QnTransactionTransport::connectingCanceled(const QnId& remoteGuid, bool isOriginator)
+void QnTransactionTransport::connectingCanceled(const QUuid& remoteGuid, bool isOriginator)
 {
     QMutexLocker lock(&m_staticMutex);
     connectingCanceledNoLock(remoteGuid, isOriginator);
 }
 
-void QnTransactionTransport::connectingCanceledNoLock(const QnId& remoteGuid, bool isOriginator)
+void QnTransactionTransport::connectingCanceledNoLock(const QUuid& remoteGuid, bool isOriginator)
 {
     ConnectingInfoMap::iterator itr = m_connectingConn.find(remoteGuid);
     if (itr != m_connectingConn.end()) {
@@ -299,7 +289,7 @@ void QnTransactionTransport::connectingCanceledNoLock(const QnId& remoteGuid, bo
     }
 }
 
-bool QnTransactionTransport::tryAcquireConnected(const QnId& remoteGuid, bool isOriginator)
+bool QnTransactionTransport::tryAcquireConnected(const QUuid& remoteGuid, bool isOriginator)
 {
     QMutexLocker lock(&m_staticMutex);
     bool isExist = m_existConn.contains(remoteGuid);
@@ -312,7 +302,7 @@ bool QnTransactionTransport::tryAcquireConnected(const QnId& remoteGuid, bool is
     return !fail;    
 }
 
-void QnTransactionTransport::connectDone(const QnId& id)
+void QnTransactionTransport::connectDone(const QUuid& id)
 {
     QMutexLocker lock(&m_staticMutex);
     m_existConn.remove(id);
@@ -350,7 +340,7 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     }
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
-    m_remotePeer.id = itrGuid->second;
+    m_remotePeer.id = QUuid(itrGuid->second);
 
     if (getState() == ConnectingStage1) {
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);
@@ -392,7 +382,7 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         {
             QByteArray serializedTran;
             QnTransactionTransportHeader transportHeader;
-            QnBinaryTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+            QnUbjsonTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
             emit gotTransaction(serializedTran, transportHeader);
 
             buffer += fullChunkLen;
@@ -415,6 +405,11 @@ bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
 {
      // allow to send system command immediately, without tranSyncRequest
     return ApiCommand::isSystem(command) ? true : m_writeSync;
+}
+
+bool QnTransactionTransport::isReadSync(ApiCommand::Value command) const {
+    // allow to read system command immediately, without tranSyncRequest
+    return ApiCommand::isSystem(command) ? true : m_readSync;
 }
 
 QString QnTransactionTransport::toString( State state )

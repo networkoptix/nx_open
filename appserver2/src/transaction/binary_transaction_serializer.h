@@ -25,14 +25,15 @@ namespace ec2
             Q_UNUSED(lock);
 
             // do not cache read-only transactions (they have sequence == 0)
-            if (tran.id.sequence > 0 && m_cache.contains(tran.id))
-                return *m_cache[tran.id];
+            if (!tran.persistentInfo.isNull() && m_cache.contains(tran.persistentInfo))
+                return *m_cache[tran.persistentInfo];
 
             QByteArray* result = new QByteArray();
             QnOutputBinaryStream<QByteArray> stream(result);
             QnBinary::serialize( tran, &stream );
 
-            m_cache.insert(tran.id, result);
+            if (!tran.persistentInfo.isNull())
+                m_cache.insert(tran.persistentInfo, result);
 
             return *result;
         }
@@ -51,7 +52,7 @@ namespace ec2
         static bool deserializeTran(const quint8* chunkPayload, int len,  QnTransactionTransportHeader& transportHeader, QByteArray& tranData);
     private:
         mutable QMutex m_mutex;
-        QCache<QnAbstractTransaction::ID, QByteArray> m_cache;
+        QCache<QnAbstractTransaction::PersistentInfo, QByteArray> m_cache;
     };
 
 }

@@ -14,6 +14,7 @@
 #include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>
 #include <ui/animation/animation_timer_listener.h>
+#include <ui/graphics/view/graphics_view.h>
 
 #include <client/client_globals.h>
 
@@ -50,6 +51,7 @@ class QnWorkbenchStreamSynchronizer;
 class QnToggle;
 class QnThumbnailsLoader;
 class QnThumbnail;
+class QnGradientBackgroundPainter;
 
 class QnClientVideoCamera;
 class QnCamDisplay;
@@ -153,14 +155,14 @@ public:
      * \returns                         Current graphics view of this workbench display. 
      *                                  May be NULL.
      */
-    QGraphicsView *view() const {
+    QnGraphicsView *view() const {
         return m_view;
     }
 
     /**
      * \param view                      New view for this workbench display.
      */
-    void setView(QGraphicsView *view);
+    void setView(QnGraphicsView *view);
 
     /**
      * \returns                         Grid item. 
@@ -345,6 +347,8 @@ protected:
     void initContext(QnWorkbenchContext *context);
     void initBoundingInstrument();
 
+    void toggleBackgroundAnimation(bool enabled);
+
     qreal widgetsFrameOpacity() const;
     void setWidgetsFrameOpacity(qreal opacity);
 
@@ -409,7 +413,7 @@ private:
     QGraphicsScene *m_scene;
 
     /** Current view. */
-    QGraphicsView *m_view;
+    QnGraphicsView *m_view;
 
     /** Zoomed state toggle. */
     QnToggle *m_zoomedToggle;
@@ -442,6 +446,9 @@ private:
 
     /** Grid background item. */
     QPointer<QnGridBackgroundItem> m_gridBackgroundItem;
+
+    /* Background painter. */
+    QPointer<QnGradientBackgroundPainter> m_backgroundPainter;
 
     /** Current frame opacity for widgets. */
     qreal m_frameOpacity;

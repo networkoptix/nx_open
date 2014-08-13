@@ -65,6 +65,19 @@ namespace detail {
         }
     };
 
+    struct PainterClipRegionAccessor {
+        void operator()(QPainter *painter, const QRegion &clipRegion) const {
+            if (clipRegion.isEmpty())
+                painter->setClipping(false);
+            else
+                painter->setClipRegion(clipRegion);
+        }
+
+        QRegion operator()(QPainter *painter) const {
+            return painter->clipRegion();
+        }
+    };
+
     template<QPainter::RenderHint renderHint>
     struct PainterRenderHintAccessor {
         void operator()(QPainter *painter, bool antialiasing) const {
@@ -83,6 +96,7 @@ typedef QnGenericScopedPainterRollback<QBrush,      detail::PainterBrushAccessor
 typedef QnGenericScopedPainterRollback<QTransform,  detail::PainterTransformAccessor>                                       QnScopedPainterTransformRollback;
 typedef QnGenericScopedPainterRollback<QFont,       detail::PainterFontAccessor>                                            QnScopedPainterFontRollback;
 typedef QnGenericScopedPainterRollback<qreal,       detail::PainterOpacityAccessor>                                         QnScopedPainterOpacityRollback;
+typedef QnGenericScopedPainterRollback<QRegion,     detail::PainterClipRegionAccessor>                                      QnScopedPainterClipRegionRollback;
 typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::Antialiasing> >             QnScopedPainterAntialiasingRollback;
 typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::NonCosmeticDefaultPen> >    QnScopedPainterNonCosmeticDefaultPenRollback;
 typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::SmoothPixmapTransform> >    QnScopedPainterSmoothPixmapTransformRollback;

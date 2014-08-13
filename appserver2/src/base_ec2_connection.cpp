@@ -145,23 +145,40 @@ namespace ec2
 
 
     template<class T>
-    int BaseEc2Connection<T>::dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr /*handler*/ )
+    int BaseEc2Connection<T>::dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+        const int reqID = generateRequestID();
+
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiDatabaseDumpData& data) {
+            ApiDatabaseDumpData outData;
+            if( errorCode == ErrorCode::ok )
+                outData = data;
+            handler->done( reqID, errorCode, outData );
+        };
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiDatabaseDumpData, decltype(queryDoneHandler)> ( 
+            ApiCommand::dumpDatabase, nullptr, queryDoneHandler);
+        return reqID;
     }
 
     template<class T>
-    int BaseEc2Connection<T>::restoreDatabaseAsync( const QByteArray& /*dbFile*/, impl::SimpleHandlerPtr /*handler*/ )
+    int BaseEc2Connection<T>::restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+        const int reqID = generateRequestID();
+
+        QnTransaction<ApiDatabaseDumpData> tran(ApiCommand::resotreDatabase);
+        tran.isLocal = true;
+        tran.params = data;
+
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1) );
+
+        return reqID;
     }
 
     template<class T>
     QnTransaction<ApiPanicModeData> BaseEc2Connection<T>::prepareTransaction( ApiCommand::Value command, const Qn::PanicMode& mode)
     {
-        QnTransaction<ApiPanicModeData> tran(command, true);
+        QnTransaction<ApiPanicModeData> tran(command);
         tran.params.mode = mode;
         return tran;
     }
@@ -187,6 +204,16 @@ namespace ec2
         url.setQuery(q);
         QnTransactionMessageBus::instance()->removeConnectionFromPeer(url);
     }
+
+
+    template<class T>
+    void ec2::BaseEc2Connection<T>::sendRuntimeData(const ec2::ApiRuntimeData &data)
+    {
+        ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged);
+        tran.params = data;
+        ec2::qnTransactionBus->sendTransaction(tran);
+    }
+
 
 
     template class BaseEc2Connection<FixedUrlClientQueryProcessor>;

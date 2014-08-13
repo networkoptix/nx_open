@@ -21,11 +21,11 @@ QnBusinessEventRule::~QnBusinessEventRule() {
 
 }
 
-QnId QnBusinessEventRule::id() const {
+QUuid QnBusinessEventRule::id() const {
     return m_id;
 }
 
-void QnBusinessEventRule::setId(const QnId& value) {
+void QnBusinessEventRule::setId(const QUuid& value) {
     m_id = value;
 }
 
@@ -38,14 +38,14 @@ void QnBusinessEventRule::setEventType(QnBusiness::EventType eventType) {
 }
 
 
-QVector<QnId> QnBusinessEventRule::eventResources() const {
+QVector<QUuid> QnBusinessEventRule::eventResources() const {
     return m_eventResources;
 }
 
 QnResourceList QnBusinessEventRule::eventResourceObjects() const 
 {
     QnResourceList result;
-    foreach(const QnId& id, m_eventResources) {
+    foreach(const QUuid& id, m_eventResources) {
         QnResourcePtr res = qnResPool->getResourceById(id);
         if (res)
             result << res;
@@ -53,7 +53,7 @@ QnResourceList QnBusinessEventRule::eventResourceObjects() const
     return result;
 }
 
-void QnBusinessEventRule::setEventResources(const QVector<QnId> &value) {
+void QnBusinessEventRule::setEventResources(const QVector<QUuid> &value) {
     m_eventResources = value;
 }
 
@@ -83,14 +83,14 @@ void QnBusinessEventRule::setActionType(QnBusiness::ActionType actionType) {
     //TODO: #GDM #Business fill action params with default values? filter action resources?
 }
 
-QVector<QnId> QnBusinessEventRule::actionResources() const {
+QVector<QUuid> QnBusinessEventRule::actionResources() const {
     return m_actionResources;
 }
 
 QnResourceList QnBusinessEventRule::actionResourceObjects() const 
 {
     QnResourceList result;
-    foreach(const QnId& id, m_actionResources) {
+    foreach(const QUuid& id, m_actionResources) {
         QnResourcePtr res = qnResPool->getResourceById(id);
         if (res)
             result << res;
@@ -98,7 +98,7 @@ QnResourceList QnBusinessEventRule::actionResourceObjects() const
     return result;
 }
 
-void QnBusinessEventRule::setActionResources(const QVector<QnId> &value) {
+void QnBusinessEventRule::setActionResources(const QVector<QUuid> &value) {
     m_actionResources = value;
 }
 
@@ -182,7 +182,7 @@ QnBusinessEventRule::QnBusinessEventRule(
     m_disabled = false;
     m_eventState = QnBusiness::UndefinedState;
     
-    m_id = intToGuid(internalId);
+    m_id = intToGuid(internalId, "vms_businessrule");
     m_aggregationPeriod = aggregationPeriod;
     m_system = isSystem;
     m_actionType = bActionType;
@@ -215,7 +215,7 @@ QnBusinessEventRule* QnBusinessEventRule::clone()
     return newRule;
 }
 
-void QnBusinessEventRule::removeResource(const QnId& resId)
+void QnBusinessEventRule::removeResource(const QUuid& resId)
 {
     for (int i = m_actionResources.size() - 1; i >= 0; --i)
     {
@@ -233,8 +233,8 @@ void QnBusinessEventRule::removeResource(const QnId& resId)
 
 QnBusinessEventRuleList QnBusinessEventRule::getDefaultRules()
 {
-    QnResourcePtr admin = qnResPool->getResourceById(QUuid("e3219e00-cb8f-496c-81a0-28abc1b3a830"));
-
+    QnResourcePtr admin = qnResPool->getResourceById(QUuid("99cbc715-539b-4bfe-856f-799b45b69b1e"));
+    Q_ASSERT(admin);
     QnBusinessEventRuleList result;
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(1,  30,    "{ \"userGroup\" : 0 }",  0, QnBusiness::ShowPopupAction,   QnBusiness::CameraDisconnectEvent));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(2,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::StorageFailureEvent));
@@ -254,6 +254,8 @@ QnBusinessEventRuleList QnBusinessEventRule::getDefaultRules()
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(16, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::CameraIpConflictEvent));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(17, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::ServerFailureEvent));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(18, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::ServerConflictEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(19, 0,     QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::ServerStartEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(20, 21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::ServerStartEvent, admin));
 
     return result;
 }

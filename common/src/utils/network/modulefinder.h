@@ -28,12 +28,12 @@ struct QnModuleInformation {
     TypeSpecificParamMap parameters;
     QSet<QString> remoteAddresses;
     bool isLocal; //!< true if at least one address from \a remoteHostAddress is a local address
-    QString id;
+    QUuid id;
 
     QnModuleInformation() : isLocal(false) {}
 };
 
-//!Searches for all Network Optix enterprise controllers in local network environment using multicast
+//!Searches for all Network Optix Servers in local network environment using multicast
 /*!
     Search is done by sending multicast packet to predefined multicast group and waiting for an answer.
     Requests are sent periodically every \a pingTimeoutMillis milliseconds.
@@ -67,7 +67,7 @@ public:
 
     /**
      * \returns                         Whether this module finder is working in compatibility mode.
-     *                                  In this mode all EC are supported regardless of customization.
+     *                                  In this mode all Servers are supported regardless of customization.
      */
     bool isCompatibilityMode() const;
 
@@ -76,16 +76,20 @@ public:
 
     QList<QnModuleInformation> revealedModules() const;
 
+    //! \param peerList Discovery peer if and only if peer exist in peerList
+    void setAllowedPeers(const QList<QUuid> &peerList) {
+        m_allowedPeers = peerList;
+    }
 public slots:
     virtual void pleaseStop() override;
 
 signals:
-    //!Emitted when new enterprise controller has been found
+    //!Emitted when new Server has been found
     void moduleFound(const QnModuleInformation &moduleInformation,
                      const QString &remoteAddress,
                      const QString &localInterfaceAddress);
 
-    //!Emmited when previously found module did not respond to request in predefined timeout
+    //!Emitted when previously found module did not respond to request in predefined timeout
     void moduleLost(const QnModuleInformation &moduleInformation);
 
 protected:
@@ -112,9 +116,10 @@ private:
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;
-    QHash<QString, ModuleContext> m_knownEnterpriseControllers;
+    QHash<QUuid, ModuleContext> m_knownEnterpriseControllers;
     QSet<QString> m_localNetworkAdresses;
     bool m_compatibilityMode;
+    QList<QUuid> m_allowedPeers;
 };
 
 Q_DECLARE_METATYPE(QnModuleInformation)

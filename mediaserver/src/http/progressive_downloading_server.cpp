@@ -32,24 +32,9 @@
 
 #include "cached_output_stream.h"
 
+
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
-
-QnProgressiveDownloadingServer::QnProgressiveDownloadingServer(const QHostAddress& address, int port):
-    QnTcpListener(address, port)
-{
-
-}
-
-QnProgressiveDownloadingServer::~QnProgressiveDownloadingServer()
-{
-
-}
-
-QnTCPConnectionProcessor* QnProgressiveDownloadingServer::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner)
-{
-    return new QnProgressiveDownloadingConsumer(clientSocket, owner);
-}
 
 // -------------------------- QnProgressiveDownloadingDataConsumer ---------------------
 
@@ -538,7 +523,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         if (isLive)
         {
-            if (resource->getStatus() != QnResource::Online && resource->getStatus() != QnResource::Recording)
+            if (resource->getStatus() != Qn::Online && resource->getStatus() != Qn::Recording)
             {
                 d->responseBody = "Video camera is not ready yet";
                 sendResponse(CODE_NOT_FOUND, "text/plain");
@@ -626,7 +611,7 @@ void QnProgressiveDownloadingConsumer::run()
                 return;
             }
 
-            d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (resource->createDataProvider(QnResource::Role_Archive)));
+            d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (resource->createDataProvider(Qn::CR_Archive)));
             d->archiveDP->open();
             d->archiveDP->jumpTo(timeMs, timeMs);
             d->archiveDP->start();

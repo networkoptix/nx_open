@@ -8,49 +8,73 @@
 
 #include <ui/widgets/properties/camera_settings_widget.h>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 class QAbstractButton;
 
 class QnCameraSettingsWidget;
-class QnWorkbenchContext;
 
-class QnCameraSettingsDialog: public QDialog, public QnWorkbenchContextAware {
+class QnCameraSettingsDialog: public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
+
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 public:
     QnCameraSettingsDialog(QWidget *parent = NULL);
     virtual ~QnCameraSettingsDialog();
 
-    QnCameraSettingsWidget *widget() const {
-        return m_settingsWidget;
-    }
+    virtual bool tryClose(bool force) override;
 
-    void ignoreAcceptOnce() {
-        m_ignoreAccept = true;
-    }
+    void setCameras(const QnVirtualCameraResourceList &cameras, bool force = false);
+
+    virtual void accept() override;
+    virtual void reject() override;
+
+protected:
+    virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
 
 signals:
-    void buttonClicked(QDialogButtonBox::StandardButton button);
-    void advancedSettingChanged();
-    void scheduleExported(const QnVirtualCameraResourceList &cameras);
     void cameraOpenRequested();
 
 private slots:
-    void at_buttonBox_clicked(QAbstractButton *button);
     void at_settingsWidget_hasChangesChanged();
     void at_settingsWidget_modeChanged();
     void at_advancedSettingChanged();
+    void at_selectionChangeAction_triggered();
 
     void at_diagnoseButton_clicked();
     void at_rulesButton_clicked();
+    void at_openButton_clicked();
 
-    void acceptIfSafe();
+    void at_cameras_saved(ec2::ErrorCode errorCode, const QnVirtualCameraResourceList &cameras);
+    void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
 
+    void updateCamerasFromSelection();
 private:
-    QPointer<QnWorkbenchContext> m_context;
+    void updateReadOnly();
+
+    /**
+     * Save modified camera settings to server.
+     * \param checkControls - if set then additional check will occur.
+     * If user modified some of control elements but did not apply changes he will be asked to fix it.
+     * \see Feature #1195
+     */
+    void submitToResources(bool checkControls = false);
+    
+    void saveCameras(const QnVirtualCameraResourceList &cameras);
+
+    void saveAdvancedCameraSettingsAsync(const QnVirtualCameraResourceList &cameras);
+private:
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;
     QPushButton *m_applyButton, *m_okButton, *m_openButton, *m_diagnoseButton, *m_rulesButton;
+
+    /** Whether the set of selected resources was changed and settings
+     * dialog is waiting to be updated. */
+    bool m_selectionUpdatePending;
+
+    /** Scope of the last selection change. */
+    Qn::ActionScope m_selectionScope;
+
     bool m_ignoreAccept;
 };
 

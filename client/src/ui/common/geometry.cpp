@@ -282,25 +282,25 @@ QSizeF QnGeometry::bounded(const QSizeF &size, const QSizeF &maxSize, Qt::Aspect
     return size * factor;
 }
 
-QSizeF QnGeometry::expanded(const QSizeF &size, const QSizeF &minSize, Qt::AspectRatioMode mode) {
+QSizeF QnGeometry::expanded(const QSizeF &size, const QSizeF &maxSize, Qt::AspectRatioMode mode) {
     if(mode == Qt::IgnoreAspectRatio)
-        return size.expandedTo(minSize);
+        return size.expandedTo(maxSize);
 
-    qreal factor = scaleFactor(size, minSize, mode);
+    qreal factor = scaleFactor(size, maxSize, mode);
     if(factor <= 1.0)
         return size;
 
     return size * factor;
 }
 
-QSizeF QnGeometry::expanded(qreal aspectRatio, const QSizeF &minSize, Qt::AspectRatioMode mode) {
+QSizeF QnGeometry::expanded(qreal aspectRatio, const QSizeF &maxSize, Qt::AspectRatioMode mode) {
     if(mode == Qt::IgnoreAspectRatio)
-        return minSize;
+        return maxSize;
 
     bool expanding = mode == Qt::KeepAspectRatioByExpanding;
-    bool toGreaterAspectRatio = minSize.width() / minSize.height() > aspectRatio;
+    bool toGreaterAspectRatio = maxSize.width() / maxSize.height() > aspectRatio;
 
-    QSizeF result = minSize;
+    QSizeF result = maxSize;
     if(expanding ^ toGreaterAspectRatio) {
         result.setWidth(result.height() * aspectRatio);
     } else {
@@ -309,15 +309,15 @@ QSizeF QnGeometry::expanded(qreal aspectRatio, const QSizeF &minSize, Qt::Aspect
     return result;
 }
 
-QRectF QnGeometry::expanded(qreal aspectRatio, const QRectF &minRect, Qt::AspectRatioMode mode, Qt::Alignment alignment) {
+QRectF QnGeometry::expanded(qreal aspectRatio, const QRectF &maxRect, Qt::AspectRatioMode mode, Qt::Alignment alignment) {
     if(mode == Qt::IgnoreAspectRatio)
-        return minRect;
+        return maxRect;
 
-    return aligned(expanded(aspectRatio, minRect.size(), mode), minRect, alignment);
+    return aligned(expanded(aspectRatio, maxRect.size(), mode), maxRect, alignment);
 }
 
-QRectF QnGeometry::expanded(qreal aspectRatio, const QSizeF &minSize, const QPointF &center, Qt::AspectRatioMode mode) {
-    return expanded(aspectRatio, QRectF(center - toPoint(minSize) / 2, minSize), mode, Qt::AlignCenter);
+QRectF QnGeometry::expanded(qreal aspectRatio, const QSizeF &maxSize, const QPointF &center, Qt::AspectRatioMode mode) {
+    return expanded(aspectRatio, QRectF(center - toPoint(maxSize) / 2, maxSize), mode, Qt::AlignCenter);
 }
 
 QRectF QnGeometry::scaled(const QRectF &rect, const QSizeF &size, const QPointF &fixedPoint, Qt::AspectRatioMode mode) {
@@ -375,6 +375,10 @@ QRectF QnGeometry::dilated(const QRectF &rect, qreal amount) {
     return rect.adjusted(-amount, -amount, amount, amount);
 }
 
+QRect QnGeometry::dilated(const QRect rect, int amount) {
+    return rect.adjusted(-amount, -amount, amount, amount);
+}
+
 QSizeF QnGeometry::dilated(const QSizeF &size, const MarginsF &amount) {
     return size + sizeDelta(amount);
 }
@@ -384,6 +388,10 @@ QRectF QnGeometry::eroded(const QRectF &rect, const MarginsF &amount) {
 }
 
 QRectF QnGeometry::eroded(const QRectF &rect, qreal amount) {
+    return rect.adjusted(amount, amount, -amount, -amount);
+}
+
+QRect QnGeometry::eroded(const QRect &rect, int amount) {
     return rect.adjusted(amount, amount, -amount, -amount);
 }
 
@@ -500,6 +508,12 @@ QPointF QnGeometry::closestPoint(const QPointF &a, const QPointF &b, const QPoin
     if(t)
         *t = k;
     return a + k * b;
+}
+
+qint64 QnGeometry::area(const QRect &rect) {
+    if (!rect.isValid())
+        return 0;
+    return rect.width() * rect.height();
 }
 
 

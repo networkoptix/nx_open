@@ -29,7 +29,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
             assert( tran.command == ApiCommand::removeVideowall );
-            emit removed( QnId(tran.params.id) );
+            emit removed( QUuid(tran.params.id) );
         }
 
         void triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran) {
@@ -37,13 +37,6 @@ namespace ec2
             QnVideoWallControlMessage message;
             fromApiToResource(tran.params, message);
             emit controlMessage(message);
-        }
-
-        void triggerNotification(const QnTransaction<ApiVideowallInstanceStatusData>& tran) {
-            assert(tran.command == ApiCommand::videowallInstanceStatus);
-            QnVideowallInstanceStatus status;
-            fromApiToResource(tran.params, status);
-            emit instanceStatusChanged(status);
         }
 
     protected:
@@ -61,7 +54,7 @@ namespace ec2
     protected:
         virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) override;
         virtual int save( const QnVideoWallResourcePtr& resource, impl::AddVideowallHandlerPtr handler ) override;
-        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
+        virtual int remove( const QUuid& id, impl::SimpleHandlerPtr handler ) override;
 
         virtual int sendControlMessage(const QnVideoWallControlMessage& message, impl::SimpleHandlerPtr handler) override;
 
@@ -69,7 +62,7 @@ namespace ec2
         QueryProcessorType* const m_queryProcessor;
 
         QnTransaction<ApiVideowallData> prepareTransaction(ApiCommand::Value command, const QnVideoWallResourcePtr &resource);
-        QnTransaction<ApiIdData> prepareTransaction(ApiCommand::Value command, const QnId& id);
+        QnTransaction<ApiIdData> prepareTransaction(ApiCommand::Value command, const QUuid& id);
         QnTransaction<ApiVideowallControlMessageData> prepareTransaction(ApiCommand::Value command, const QnVideoWallControlMessage &message);
     };
 }

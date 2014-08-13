@@ -28,6 +28,7 @@ public:
 
     bool isPanoramic() const;
     bool isDualSensor() const;
+    virtual bool isAbstractResource() const override { return true; }
 
     virtual bool setHostAddress(const QString& ip, QnDomain domain);
 
@@ -67,7 +68,7 @@ protected:
     virtual void setMotionMaskPhysical(int channel) override;
 public:
     static QnPlAreconVisionResource* createResourceByName(const QString &name);
-    static QnPlAreconVisionResource* createResourceByTypeId(QnId rt);
+    static QnPlAreconVisionResource* createResourceByTypeId(QUuid rt);
 
     static bool isPanoramic(QnResourceTypePtr resType);
 

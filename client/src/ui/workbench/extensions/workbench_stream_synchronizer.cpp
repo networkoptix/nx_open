@@ -122,7 +122,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
 
     connect(mediaWidget->resource()->toResource(), SIGNAL(flagsChanged(const QnResourcePtr &)), this, SLOT(at_resource_flagsChanged(const QnResourcePtr &)));
 
-    if(!mediaWidget->resource()->toResource()->hasFlags(QnResource::sync)) {
+    if(!mediaWidget->resource()->toResource()->hasFlags(Qn::sync)) {
         m_queuedWidgets.insert(mediaWidget);
         return;
     }
@@ -152,7 +152,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
 
     m_queuedWidgets.remove(mediaWidget);
 
-    if(!mediaWidget->resource()->toResource()->hasFlags(QnResource::sync))
+    if(!mediaWidget->resource()->toResource()->hasFlags(Qn::sync))
         return;
 
     if(mediaWidget->display()->archiveReader() == NULL) 
@@ -175,7 +175,7 @@ void QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged() {
 }
 
 void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged(const QnResourcePtr &resource) {
-    if(!(resource->flags() & QnResource::sync))
+    if(!(resource->flags() & Qn::sync))
         return; // TODO: #Elric implement reverse handling?
 
     foreach(QnMediaResourceWidget *widget, m_queuedWidgets) {

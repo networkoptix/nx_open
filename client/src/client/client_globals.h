@@ -103,13 +103,13 @@ namespace Qn {
 
     /**
      * Flags describing the differences between instances of the same resource
-     * on the client and on the enterprise controller.
+     * on the client and on the Server.
      */
     enum ResourceSavingFlag {
-        /** Resource is local and has never been saved to EC. */
+        /** Resource is local and has never been saved to Server. */
         ResourceIsLocal = 0x1,
 
-        /** Resource is currently being saved to EC. */
+        /** Resource is currently being saved to Server. */
         ResourceIsBeingSaved = 0x2,
 
         /** Unsaved changes are present in the resource. */
@@ -174,6 +174,7 @@ namespace Qn {
         UnauthorizedOverlay,
         OfflineOverlay,
         AnalogWithoutLicenseOverlay,
+        VideowallWithoutLicenseOverlay,
         ServerOfflineOverlay,
 
         OverlayCount

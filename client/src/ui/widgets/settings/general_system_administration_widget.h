@@ -6,12 +6,9 @@
 
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui_general_system_administration_widget.h>
 
 struct QnHTTPRawResponse;
-
-namespace Ui {
-    class GeneralSystemAdministrationWidget;
-}
 
 class QnGeneralSystemAdministrationWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -21,6 +18,8 @@ public:
 
     virtual void updateFromSettings() override;
     virtual void submitToSettings() override;
+
+    virtual bool hasChanges() const override;
 private:
     QScopedPointer<Ui::GeneralSystemAdministrationWidget> ui;
 };

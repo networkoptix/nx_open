@@ -56,6 +56,8 @@ public:
     virtual bool getRecvTimeout( unsigned int* millis ) override;
     virtual bool setSendTimeout( unsigned int ms ) override;
     virtual bool getSendTimeout( unsigned int* millis ) override;
+    //!Implementation of AbstractSocket::getLastError
+    virtual bool getLastError(SystemError::ErrorCode* errorCode) override;
     virtual SOCKET_HANDLE handle() const override;
 
     bool doServerHandshake();

@@ -312,7 +312,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         double resultInSecs = cameraTimeToLocalTime(statistics.nptTime + rtpTimeDiff / double(frequency));
         double localTimeInSecs = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
         // If data is delayed for some reason > than jitter, but not lost, some next data can have timing less then previous data (after reinit).
-        // Such data can not be recorded to archive. I ofter got that situation if media server under debug
+        // Such data can not be recorded to archive. I ofter got that situation if server under debug
         // So, I've increased jitter threshold just in case (very slow mediaServer work e.t.c)
         // In any way, valid threshold behaviour if camera time is changed.
         //if (qAbs(localTimeInSecs - resultInSecs) < 15 || !recursiveAllowed) 
@@ -1822,8 +1822,8 @@ RTPSession::TrackType RTPSession::getTrackTypeByRtpChannelNum(int channelNum)
         //So, let's try to be closer to RTSP rfc
     //if (rez == TT_UNKNOWN)
     //    rez = getTrackType(channelNum / SDP_TRACK_STEP);
-    //if (channelNum % SDP_TRACK_STEP)
-    //    rez = RTPSession::TrackType(int(rez)+1);
+    if (channelNum % SDP_TRACK_STEP)
+        rez = RTPSession::TrackType(int(rez)+1);
     return rez;
 }
 

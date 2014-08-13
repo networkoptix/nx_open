@@ -13,6 +13,7 @@
 
 #include <rest/server/request_handler.h>
 #include <utils/common/concurrent.h>
+#include <utils/common/model_functions.h>
 #include <utils/network/http/httptypes.h>
 
 #include "ec2_thread_pool.h"
@@ -56,7 +57,7 @@ namespace ec2
             QString command = path.split(L'/').last();
             parseHttpRequestParams( command, params, &inputData);
 
-            Qn::SerializationFormat format = Qn::BnsFormat;
+            Qn::SerializationFormat format = Qn::UbjsonFormat;
             parseHttpRequestParams( command, params, &format);
 
             ErrorCode errorCode = ErrorCode::ok;
@@ -68,24 +69,20 @@ namespace ec2
                 {
                     if(format == Qn::BnsFormat) {
                         result = QnBinary::serialized(outputData);
-                        contentType = "application/octet-stream";
                     } else if(format == Qn::JsonFormat) {
                         result = QJson::serialized(outputData);
-                        contentType = "application/json";
                     } else if(format == Qn::UbjsonFormat) {
                         result = QnUbjson::serialized(outputData);
-                        contentType = "application/ubjson";
                     } else if(format == Qn::CsvFormat) {
                         result = QnCsv::serialized(outputData);
-                        contentType = "text/csv";
                     } else if(format == Qn::XmlFormat) {
                         result = QnXml::serialized(outputData, lit("reply"));
-                        contentType = "application/xml";
                     } else {
                         assert(false);
                     }
                 }
                 errorCode = _errorCode;
+                contentType = Qn::serializationFormatToHttpContentType(format);
 
                 QMutexLocker lk( &m_mutex );
                 finished = true;
@@ -112,6 +109,7 @@ namespace ec2
             const QString& /*path*/,
             const QnRequestParamList& /*params*/,
             const QByteArray& /*body*/,
+            const QByteArray& /*srcBodyContentType*/,
             QByteArray& /*result*/,
             QByteArray& /*contentType*/ )
         {

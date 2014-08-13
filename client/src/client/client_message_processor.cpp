@@ -20,21 +20,22 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     if (connection) {
         assert(!m_connected);
         assert(qnCommon->remoteGUID().isNull());
-        qnCommon->setRemoteGUID(connection->connectionInfo().ecsGuid);
+        qnCommon->setRemoteGUID(QUuid(connection->connectionInfo().ecsGuid));
         connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
         connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
     } else if (m_connected) { // double init by null is allowed
         assert(!qnCommon->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;
         data.peer.id = qnCommon->remoteGUID();
-        at_remotePeerLost(data, false);
         qnCommon->setRemoteGUID(QUuid());
+        m_connected = false;
+        emit connectionClosed();
     } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
         qnCommon->setRemoteGUID(QUuid());
     }
 }
 
-void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
+void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) {
     resource->setStatus(status);
     checkForTmpStatus(resource);
 }
@@ -82,36 +83,36 @@ void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
     // process tmp status
     if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) 
     {
-        if (mediaServer->getStatus() == QnResource::Offline)
-            updateServerTmpStatus(mediaServer->getId(), QnResource::Offline);
+        if (mediaServer->getStatus() == Qn::Offline)
+            updateServerTmpStatus(mediaServer->getId(), Qn::Offline);
         else
-            updateServerTmpStatus(mediaServer->getId(), QnResource::NotDefined);
+            updateServerTmpStatus(mediaServer->getId(), Qn::NotDefined);
     }
     else if (QnServerCameraPtr serverCamera = resource.dynamicCast<QnServerCamera>()) 
     {
         QnMediaServerResourcePtr mediaServer = qnResPool->getResourceById(serverCamera->getParentId()).dynamicCast<QnMediaServerResource>();
         if (mediaServer) {
-            if (mediaServer->getStatus() ==QnResource::Offline)
-                serverCamera->setTmpStatus(QnResource::Offline);
+            if (mediaServer->getStatus() ==Qn::Offline)
+                serverCamera->setTmpStatus(Qn::Offline);
             else
-                serverCamera->setTmpStatus(QnResource::NotDefined);
+                serverCamera->setTmpStatus(Qn::NotDefined);
         }
     }
 }
 
 void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr &resource)
 {
-    // set proxy. If some media server IF will be found, proxy address will be cleared
-    const QString& proxyAddr = QnAppServerConnectionFactory::defaultUrl().host();
+    // set proxy. If some servers IF will be found, proxy address will be cleared
+    const QString& proxyAddr = QnAppServerConnectionFactory::url().host();
     resource->apiConnection()->setProxyAddr(
         resource->getApiUrl(),
         proxyAddr,
-        QnAppServerConnectionFactory::defaultUrl().port() );    //starting with 2.3 proxy embedded to EC
+        QnAppServerConnectionFactory::url().port() );    //starting with 2.3 proxy embedded to Server
     disconnect(resource.data(), NULL, this, NULL);
     resource->determineOptimalNetIF();
 }
 
-void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource::Status status)
+void QnClientMessageProcessor::updateServerTmpStatus(const QUuid& id, Qn::ResourceStatus status)
 {
     QnResourcePtr server = qnResPool->getResourceById(id);
     if (!server)
@@ -161,5 +162,4 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, boo
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
-    QnResourceDiscoveryManager::instance()->setReady(true);
 }

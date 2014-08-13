@@ -8,6 +8,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/email.h>
 #include <ui/widgets/settings/abstract_preferences_widget.h>
+#include "api/model/test_email_settings_reply.h"
 
 namespace Ui {
     class SmtpSettingsWidget;
@@ -24,8 +25,10 @@ public:
     virtual void updateFromSettings() override;
     virtual void submitToSettings() override;
 
+    virtual bool hasChanges() const override;
+
 private:
-    QnEmail::Settings settings();
+    QnEmail::Settings settings() const;
     void stopTesting(QString result);
     void loadSettings(QString server, QnEmail::ConnectionType connectionType, int port = 0);
     void updateFocusedElement();
@@ -42,6 +45,7 @@ private slots:
     void at_timer_timeout();
 
     void at_advancedCheckBox_toggled(bool toggled);
+    void at_testEmailSettingsFinished(int status, const QnTestEmailSettingsReply& reply, int handle);
 private:
     QScopedPointer<Ui::SmtpSettingsWidget> ui;
 
