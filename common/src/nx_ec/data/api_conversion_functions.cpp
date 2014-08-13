@@ -256,24 +256,24 @@ void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraData
 
 
 void fromResourceToApi(const QnCameraHistoryItem &src, ApiCameraServerItemData &dst) {
-    dst.cameraId = src.cameraId;
-    dst.serverId = src.mediaServerGuid;
+    dst.cameraUniqueId = src.cameraUniqueId;
+    dst.serverId = src.mediaServerGuid.toString().toLatin1();
     dst.timestamp = src.timestamp;
 }
 
 void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &dst) {
-    dst.cameraId = src.cameraId;
-    dst.mediaServerGuid = src.serverId;
+    dst.cameraUniqueId = src.cameraUniqueId;
+    dst.mediaServerGuid = QUuid(src.serverId);
     dst.timestamp = src.timestamp;
 }
 
 void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) {
-    /* CameraId -> (Timestamp -> ServerId). */
-    QMap<QUuid, QMap<qint64, QUuid> > history;
+    /* CameraUniqueId -> (Timestamp -> ServerGuid). */
+    QMap<QString, QMap<qint64, QByteArray> > history;
 
     /* Fill temporary history map. */
     for (auto pos = src.begin(); pos != src.end(); ++pos)
-        history[pos->cameraId][pos->timestamp] = pos->serverId;
+        history[pos->cameraUniqueId][pos->timestamp] = pos->serverId;
 
     for(auto pos = history.begin(); pos != history.end(); ++pos) {
         QnCameraHistoryPtr cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
@@ -281,11 +281,11 @@ void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHisto
         if (pos.value().isEmpty())
             continue;
 
-        QMapIterator<qint64, QUuid> camit(pos.value());
+        QMapIterator<qint64, QByteArray> camit(pos.value());
         camit.toFront();
 
         qint64 duration;
-        cameraHistory->setCameraId(pos.key());
+        cameraHistory->setCameraUniqueId(pos.key());
         while (camit.hasNext())
         {
             camit.next();
@@ -350,7 +350,7 @@ void fromApiToResource(const ApiLayoutItemData &src, QnLayoutItemData &dst) {
 }
 
 void fromResourceToApi(const QnLayoutItemData &src, ApiLayoutItemData &dst) {
-    dst.id = src.uuid;
+    dst.id = src.uuid.toByteArray();
     dst.flags = src.flags;
     dst.left = src.combinedGeometry.topLeft().x();
     dst.top = src.combinedGeometry.topLeft().y();
@@ -363,7 +363,7 @@ void fromResourceToApi(const QnLayoutItemData &src, ApiLayoutItemData &dst) {
     dst.zoomTop = src.zoomRect.topLeft().y();
     dst.zoomRight = src.zoomRect.bottomRight().x();
     dst.zoomBottom = src.zoomRect.bottomRight().y();
-    dst.zoomTargetId = src.zoomTargetUuid;
+    dst.zoomTargetId = src.zoomTargetUuid.toByteArray();
     dst.contrastParams = src.contrastParams.serialize();
     dst.dewarpingParams = QJson::serialized(src.dewarpingParams);
 }

@@ -9,14 +9,14 @@
 
 struct QnCameraHistoryItem
 {
-    QnCameraHistoryItem(const QUuid& cameraId, qint64 timestamp, const QUuid& mediaServerGuid)
-        : cameraId(cameraId),
+    QnCameraHistoryItem(const QString& cameraUniqueId, qint64 timestamp, const QUuid& mediaServerGuid)
+        : cameraUniqueId(cameraUniqueId),
           timestamp(timestamp),
           mediaServerGuid(mediaServerGuid)
     {
     }
 
-    QUuid cameraId;
+    QString cameraUniqueId;
     qint64 timestamp;
     QUuid mediaServerGuid;
 };
@@ -39,6 +39,9 @@ public:
 
     QUuid getCameraId() const;
     void setCameraId(const QUuid& cameraId);
+
+    QString getCameraUniqueId() const;
+    void setCameraUniqueId(const QString &cameraUniqueId);
 
     QnMediaServerResourcePtr getMediaServerOnTime(qint64 timestamp, bool searchForward, bool allowOfflineServers) const;
     QnMediaServerResourcePtr getNextMediaServerOnTime(qint64 timestamp, bool searchForward) const;
@@ -85,7 +88,7 @@ public:
     virtual ~QnCameraHistoryPool();
 
     static QnCameraHistoryPool* instance();
-    QnCameraHistoryPtr getCameraHistory(const QUuid& cameraId) const;
+    QnCameraHistoryPtr getCameraHistory(const QnResourcePtr &camera) const;
     void addCameraHistory(const QnCameraHistoryPtr &history);
     void addCameraHistoryItem(const QnCameraHistoryItem& historyItem);
 
@@ -102,7 +105,7 @@ signals:
 private:
     QnMediaServerResourceList getCurrentServer(const QnNetworkResourcePtr &camera) const;
 private:
-    typedef QMap<QUuid, QnCameraHistoryPtr> CameraHistoryMap;
+    typedef QMap<QString, QnCameraHistoryPtr> CameraHistoryMap; /* Map by camera unique id */
     CameraHistoryMap m_cameraHistory;
     mutable QMutex m_mutex;
 };

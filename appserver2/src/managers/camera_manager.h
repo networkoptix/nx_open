@@ -55,7 +55,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran )
         {
             QnCameraHistoryItemPtr cameraHistoryItem( new QnCameraHistoryItem(
-                tran.params.cameraId,
+                tran.params.cameraUniqueId,
                 tran.params.timestamp,
                 tran.params.serverId ) );
             emit cameraHistoryChanged( cameraHistoryItem );
