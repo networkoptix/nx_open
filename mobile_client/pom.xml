@@ -19,9 +19,10 @@
         <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
         <global.libs>-lcommon -lappserver2 -lquazip -lssl -lcrypto</global.libs>
         <!--Specific os libs used-->
+        <linux.oslibs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lFestival -lestools -leststring -lestbase -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac</linux.oslibs>
         <android.oslibs></android.oslibs>
         <!--Global defines-->
-        <!--<global.defines>CL_FORCE_LOGO</global.defines>-->
+        <global.defines>CL_FORCE_LOGO</global.defines>
         <!--Specific os defines-->
         <android.defines/>
         <buildLib>sharedlib</buildLib>

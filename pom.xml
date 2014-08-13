@@ -691,6 +691,7 @@
             <properties>
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
+                <qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
             </properties>
         </profile>
     </profiles> 
