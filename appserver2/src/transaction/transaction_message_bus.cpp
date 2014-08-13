@@ -289,7 +289,10 @@ void QnTransactionMessageBus::sendTransactionToTransport(const QnTransaction<T> 
 }
         
 template <class T>
-void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) {
+void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) 
+{
+    QMutexLocker lock(&m_mutex);
+
     AlivePeersMap:: iterator itr = m_alivePeers.find(tran.peerID);
     if (itr != m_alivePeers.end())
         itr.value().lastActivity.restart();
@@ -326,27 +329,22 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             if (!sender->isReadSync(tran.command))
                 return;
 
-            if( !tran.persistentInfo.isNull() && transactionLog && transactionLog->contains(tran) )
+            if (!tran.persistentInfo.isNull() && transactionLog && transactionLog->contains(tran))
+                return; // already processed
+            if (!tran.persistentInfo.isNull() && dbManager)
             {
-                // transaction is already processed
-            }
-            else 
-            {
-                if (!tran.persistentInfo.isNull() && dbManager)
+                QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+                ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
+                if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
                 {
-                    QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-                    ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
-                    if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
-                    {
-                        qWarning() << "Can't handle transaction" << ApiCommand::toString(tran.command) << "reopen connection";
-                        sender->setState(QnTransactionTransport::Error);
-                        return;
-                    }
+                    qWarning() << "Can't handle transaction" << ApiCommand::toString(tran.command) << "reopen connection";
+                    sender->setState(QnTransactionTransport::Error);
+                    return;
                 }
-
-                if( m_handler )
-                    m_handler->triggerNotification(tran);
             }
+
+            if( m_handler )
+                m_handler->triggerNotification(tran);
 
             // this is required to allow client place transactions directly into transaction message bus
             if (tran.command == ApiCommand::getFullInfo)
@@ -360,8 +358,6 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 #endif
     }
 
-    QMutexLocker lock(&m_mutex);
-
     // proxy incoming transaction to other peers.
     if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty()) {
         emit transactionProcessed(tran);
@@ -371,7 +367,8 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     QnPeerSet processedPeers = transportHeader.processedPeers + connectedPeers(tran.command);
     processedPeers << m_localPeer.id;
 
-    for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) {
+    for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) 
+    {
         QnTransactionTransportPtr transport = *itr;
         if (transportHeader.processedPeers.contains(transport->remotePeer().id) || !transport->isReadyToSend(tran.command)) 
             continue;

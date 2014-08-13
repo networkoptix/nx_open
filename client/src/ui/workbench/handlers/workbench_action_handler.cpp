@@ -754,49 +754,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
-
-    QnWorkbenchStreamSynchronizer *synchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
-
-    /* if synchronizer is running now and we want to add an item to the scene with the specified time, synchronization should be disabled. */
-    if (parameters.hasArgument(Qn::ItemTimeRole) && synchronizer->isRunning())
-        synchronizer->stop();
-
-    bool hasNonLocalItems = false;
-    foreach (QnWorkbenchItem *item, workbench()->currentLayout()->items()) {
-        QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
-        if (!resource->hasFlags(Qn::local)) {
-            hasNonLocalItems = true;
-            break;
-        }
-    }
-
-    if (hasNonLocalItems && synchronizer->isRunning() && !navigator()->isLive() && parameters.widgets().isEmpty()) {
-        // split resources in two groups: local and non-local and specify different initial time for them
-        // TODO: #dklychkov add ability to specify different time for resources and then simplify the code below
-        QnResourceList resources = parameters.resources();
-        QnResourceList localResources;
-        foreach (const QnResourcePtr &resource, resources) {
-            if (resource->flags().testFlag(Qn::local)) {
-                localResources.append(resource);
-                resources.removeOne(resource);
-            }
-        }
-        if (!localResources.isEmpty()) {
-            parameters.setResources(localResources);
-            menu()->trigger(Qn::OpenInLayoutAction, parameters);
-        }
-        if (!resources.isEmpty()) {
-            parameters.setResources(resources);
-            parameters.setArgument(Qn::ItemTimeRole, navigator()->timeSlider()->sliderPosition());
-
-            QnStreamSynchronizationState synchronizerState = synchronizer->state();
-            synchronizer->stop();
-            menu()->trigger(Qn::OpenInLayoutAction, parameters);
-            synchronizer->setState(synchronizerState);
-        }
-    } else {
-        menu()->trigger(Qn::OpenInLayoutAction, parameters);
-    }
+    menu()->trigger(Qn::OpenInLayoutAction, parameters);
 }
 
 void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
