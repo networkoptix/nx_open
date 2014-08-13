@@ -132,18 +132,16 @@ public:
         return listToByteArray(result);
     }
 
-    QStringList cameraConflictList() const {
+    void fillCameraConflictList(QStringList &result) const {
         QStringList localCameras = getLocalUsingCameras();
-        QStringList result;
         if (localCameras.isEmpty())
-            return result;
+            return;
 
         foreach (const QByteArray &camera, m_cameras) {
             QString cam = QString::fromUtf8(camera);
-            if (localCameras.contains(cam))
+            if (localCameras.contains(cam) && !result.contains(cam))
                 result << cam;
         }
-        return result;
     }
 };
 
@@ -265,10 +263,12 @@ void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socke
             QByteArray responseData((const char*) tmpBuffer, datagramSize);
             DiscoveryPacket packet(responseData);
             if (packet.isValidPacket() && packet.appServerGuid() != m_appServerGuid) {
-                QStringList conflicts = packet.cameraConflictList();
-                if (conflicts.isEmpty())
-                    continue;
-                conflictList.camerasByServer[packet.appServerHost()].append(conflicts);
+                QStringList cameras = conflictList.camerasByServer.contains(packet.appServerHost())
+                    ? conflictList.camerasByServer[packet.appServerHost()]
+                    : QStringList();
+                packet.fillCameraConflictList(cameras);
+                if (!cameras.isEmpty())
+                    conflictList.camerasByServer[packet.appServerHost()] = cameras;
             }
         }
     }
