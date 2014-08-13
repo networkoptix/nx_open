@@ -25,7 +25,7 @@ namespace nx_http
     class AsyncHttpClient;
     typedef std::shared_ptr<AsyncHttpClient> AsyncHttpClientPtr;
 
-    //!Http client. All operations are done asynchronously using aio::AIOService
+    //!Http client. All operations are done asynchronously
     /*!
         It is strongly recommended to connect to signals using Qt::DirectConnection and slot should not use blocking calls.
         
