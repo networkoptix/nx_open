@@ -20,7 +20,6 @@
 static const int BUFFER_SIZE = 1024;
 const unsigned char sid[] = "Network Optix SSL socket";
 
-
     // TODO: public methods are visible to all, quite bad
 int sock_read(BIO *b, char *out, int outl)
 {
@@ -172,6 +171,7 @@ void BufferShinrkTo( nx::Buffer* buffer , int from ) {
         buffer->resize(0);
     } else {
         QByteArray temp(buffer->constData() + from , static_cast<int>(buffer->size())-from);
+        temp.reserve( buffer->capacity() );
         buffer->swap(temp);
     }
 }
@@ -477,7 +477,7 @@ private:
         if( !bio_out_buffer_.isEmpty() ) {
             do_send( 
             buffer,
-            [this,op](SystemError::ErrorCode ec,std::size_t ) {
+            [this,op](SystemError::ErrorCode ec,std::size_t bytes_transferred ) {
                 // Until now , we should have been sent the data out and
                 // what we need to do is just calling the callback function
                 if( ec ) {
@@ -634,10 +634,9 @@ void async_ssl::async_recv(
         } else {
             recv_op_->set_user_buffer(buffer);
             recv_op_->set_callback(op);
-            // We issue a read operation asynchronously here
-            ssl_recv(recv_op_.get(),
-                make_read_write_buffer(buffer->capacity(),
-                async_buffer_default_size));
+            ssl_perform(SystemError::noError,0,recv_op_.get(),
+                make_read_write_buffer(async_buffer_default_size,
+                buffer->capacity()));
         }
 }
 
@@ -691,7 +690,6 @@ async_ssl::async_ssl( SSL* ssl , bool server , AbstractStreamSocket* socket ) :
     handshake_op_( new ssl_async_handshake_op(ssl) ) {
         bio_in_buffer_.reserve( bio_input_buffer_reserve );
         bio_out_buffer_.reserve( bio_output_buffer_reserve );
-        SSL_set_mode(ssl_,SSL_MODE_ENABLE_PARTIAL_WRITE);
 }
 
 
@@ -754,7 +752,6 @@ public:
         if( !is_initialized_ ) {
             // We need to sniffer the buffer here
             sniffer_buffer_.reserve(sniffer_header_length);
-
             socket()->
                 readSomeAsync(
                 &sniffer_buffer_,
