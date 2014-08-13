@@ -142,9 +142,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     closeButton->setProperty(Qn::NoBlockMotionSelection, true);
     closeButton->setToolTip(tr("Close"));
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close);
-    //TODO: #GDM #VW Why?? o_O
-    if (accessController()->notifier(item->layout()->resource()) != NULL)
-        connect(accessController()->notifier(item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
+    connect(accessController()->notifier(item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
 
     QnImageButtonWidget *infoButton = new QnImageButtonWidget();
     infoButton->setIcon(qnSkin->icon("item/info.png"));
@@ -642,9 +640,9 @@ void QnResourceWidget::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay)
 }
 
 Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(int resourceStatus) const {
-    if (resourceStatus == QnResource::Offline) {
+    if (resourceStatus == Qn::Offline) {
         return Qn::OfflineOverlay;
-    } else if (resourceStatus == QnResource::Unauthorized) {
+    } else if (resourceStatus == Qn::Unauthorized) {
         return Qn::UnauthorizedOverlay;
     } else if(m_renderStatus == Qn::NewFrameRendered) {
         return Qn::EmptyOverlay;

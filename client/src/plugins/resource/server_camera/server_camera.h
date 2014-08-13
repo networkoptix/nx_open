@@ -12,7 +12,7 @@ class QnServerCamera: public QnVirtualCameraResource {
     Q_OBJECT
 
 public:
-    QnServerCamera(const QnId& resourceTypeId);
+    QnServerCamera(const QUuid& resourceTypeId);
 
     virtual bool isResourceAccessible() override;
     virtual bool updateMACAddress() override;
@@ -22,15 +22,15 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
 
-    virtual Status getStatus() const override;
+    virtual Qn::ResourceStatus getStatus() const override;
 
-    void setTmpStatus(Status value);
+    void setTmpStatus(Qn::ResourceStatus status);
 
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
 
 private:
-    Status m_tmpStatus;
+    Qn::ResourceStatus m_tmpStatus;
     QnServerCameraPtr m_activeCamera;
 };
 

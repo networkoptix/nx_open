@@ -37,8 +37,8 @@ public:
     virtual SOAP_SOCKET accept() override;
 
 private:
-    std::map<QString, QnPlOnvifResourcePtr> m_notificationProducerAddressToResource;
-    std::map<QString, QnPlOnvifResourcePtr> m_subscriptionReferenceToResource;
+    std::map<QString, QWeakPointer<QnPlOnvifResource>> m_notificationProducerAddressToResource;
+    std::map<QString, QWeakPointer<QnPlOnvifResource>> m_subscriptionReferenceToResource;
     mutable QMutex m_mutex;
 };
 

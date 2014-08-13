@@ -69,6 +69,7 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
                 processIntParam("streamtype", m_streamtype, param);
                 processHexParam("config", m_config, param);
                 processStringParam("mode", m_mode, param);
+                processIntParam("constantSize", m_constantSize, param);
             }
         }   
     }
@@ -106,6 +107,22 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
     const quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
     const quint8* end = rtpBuffer + bufferSize;
 
+    if (rtpHeader->extension)
+    {
+        if (bufferSize < RtpHeader::RTP_HEADER_SIZE + 4)
+            return false;
+
+        int extWords = ((int(curPtr[2]) << 8) + curPtr[3]);
+        curPtr += extWords*4 + 4;
+    }
+
+    if (curPtr >= end)
+        return false;
+    if (rtpHeader->padding)
+        end -= end[-1];
+    if (curPtr >= end)
+        return false;
+
     //bool isLastPacket = rtpHeader->marker;
     try 
     {
@@ -115,6 +132,8 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
                 return false;
             unsigned auHeaderLen = (curPtr[0] << 8) + curPtr[1];
             curPtr += 2;
+            if (curPtr + auHeaderLen > end)
+                return false;
             BitStreamReader reader(curPtr, curPtr + auHeaderLen);
             while(reader.getBitsCount() < auHeaderLen) 
             {

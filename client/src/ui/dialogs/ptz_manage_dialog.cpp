@@ -272,6 +272,7 @@ void QnPtzManageDialog::clear() {
     m_model->setTours(QnPtzTourList());
     ui->tourEditWidget->setSpots(QnPtzTourSpotList());
     ui->tourEditWidget->setPresets(QnPtzPresetList());
+    ui->tourStackedWidget->setCurrentIndex(ui->tourStackedWidget->indexOf(ui->noTourPage));
 }
 
 void QnPtzManageDialog::saveData() {
@@ -367,7 +368,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked() {
     if (!m_resource || !controller())
         return;
 
-    if(m_resource->getStatus() == QnResource::Offline || m_resource->getStatus() == QnResource::Unauthorized) {
+    if(m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized) {
         QMessageBox::critical(
             this,
             tr("Could not get position from camera"),
@@ -389,7 +390,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked() {
     if (!m_resource || !controller())
         return;
 
-    if(m_resource->getStatus() == QnResource::Offline || m_resource->getStatus() == QnResource::Unauthorized) {
+    if(m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized) {
         QMessageBox::critical(
             this,
             tr("Could not set position for camera"),
@@ -430,7 +431,7 @@ void QnPtzManageDialog::at_startTourButton_clicked() {
     if (!m_resource || !controller())
         return;
 
-    if(m_resource->getStatus() == QnResource::Offline || m_resource->getStatus() == QnResource::Unauthorized) {
+    if(m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized) {
         QMessageBox::critical(
             this,
             tr("Could not set position for camera"),

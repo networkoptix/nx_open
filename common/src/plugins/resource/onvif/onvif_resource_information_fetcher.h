@@ -58,7 +58,7 @@ public:
     void findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result) const;
     void findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result) const;
     static QnPlOnvifResourcePtr createOnvifResourceByManufacture (const QString& manufacture);
-    QnId getOnvifResourceType(const QString& manufacturer, const QString&  model) const;
+    QUuid getOnvifResourceType(const QString& manufacturer, const QString&  model) const;
 
     void pleaseStop();
     static bool ignoreCamera(const QString& manufacturer, const QString& name);
@@ -77,8 +77,8 @@ private:
     static bool isModelContainVendor(const QString& vendor, const QString& model);
 private:
     static const char *ONVIF_RT;
-    QnId onvifTypeId;
-    QnId onvifAnalogTypeId;
+    QUuid onvifTypeId;
+    QUuid onvifAnalogTypeId;
     //PasswordHelper& passwordsData;
     NameHelper &camersNamesData;
     bool m_shouldStop;

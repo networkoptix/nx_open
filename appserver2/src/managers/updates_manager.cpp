@@ -77,7 +77,7 @@ namespace ec2 {
     }
 
     template<class QueryProcessorType>
-    int QnUpdatesManager<QueryProcessorType>::sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, impl::SimpleHandlerPtr handler) {
+    int QnUpdatesManager<QueryProcessorType>::sendUpdateUploadResponce(const QString &updateId, const QUuid &peerId, int chunks, impl::SimpleHandlerPtr handler) {
         const int reqId = generateRequestID();
         auto transaction = prepareTransaction(updateId, peerId, chunks);
 
@@ -109,7 +109,7 @@ namespace ec2 {
     }
 
     template<class QueryProcessorType>
-    QnTransaction<ApiUpdateUploadResponceData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId, const QnId &peerId, int chunks) const {
+    QnTransaction<ApiUpdateUploadResponceData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId, const QUuid &peerId, int chunks) const {
         QnTransaction<ApiUpdateUploadResponceData> transaction(ApiCommand::uploadUpdateResponce);
         transaction.params.id = peerId;
         transaction.params.updateId = updateId;

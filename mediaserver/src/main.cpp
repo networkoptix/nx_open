@@ -152,6 +152,7 @@
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
 #include "nx_ec/data/api_conversion_functions.h"
+#include "media_server/resource_status_watcher.h"
 
 
 // This constant is used while checking for compatibility.
@@ -200,6 +201,7 @@ public:
     QString msgLogLevel;
     QString rebuildArchive;
     QString devModeKey;
+    QString allowedDiscoveryPeers;
 
     CmdLineArguments()
     :
@@ -508,7 +510,7 @@ QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection, 
 QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, QnMediaServerResourcePtr serverPtr)
 {
     QnMediaServerResourcePtr savedServer;
-    serverPtr->setStatus(QnResource::Online, true);
+    serverPtr->setStatus(Qn::Online, true);
 
     ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->saveSync(serverPtr, &savedServer);
     if (rez != ec2::ErrorCode::ok)
@@ -516,12 +518,15 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
         qDebug() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
         return QnMediaServerResourcePtr();
     }
-    rez = ec2Connection->getResourceManager()->setResourceStatusSync(serverPtr->getId(), QnResource::Online);
+
+    /*
+    rez = ec2Connection->getResourceManager()->setResourceStatusSync(serverPtr->getId(), Qn::Online);
     if (rez != ec2::ErrorCode::ok)
     {
         qDebug() << "registerServer(): Call to change server status failed. Reason: " << ec2::toString(rez);
         return QnMediaServerResourcePtr();
     }
+    */
     
     return savedServer;
 }
@@ -815,7 +820,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
     {
         // read camera list
         QnVirtualCameraResourceList cameras;
-        while ((rez = ec2Connection->getCameraManager()->getCamerasSync(QnId(), &cameras)) != ec2::ErrorCode::ok)
+        while ((rez = ec2Connection->getCameraManager()->getCamerasSync(QUuid(), &cameras)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get cameras. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1103,12 +1108,17 @@ QHostAddress QnMain::getPublicAddress()
 
 void QnMain::run()
 {
-    QFile f(getDataDirectory() + lit("/ssl/cert.pem"));
+    QFile f( MSSettings::roSettings()->value( nx_ms_conf::SSL_CERTIFICATE_PATH, getDataDirectory() + lit( "/ssl/cert.pem" ) ).toString() );
     if (!f.open(QIODevice::ReadOnly)) {
-        qWarning() << "No SSL sertificate for mediaServer!";
-    } else {
-        QByteArray certData = f.readAll();
-        QnSSLSocket::initSSLEngine(certData);
+        qWarning() << "Could not find SSL certificate at "<<f.fileName()<<". Using built-in certificate";
+        f.setFileName( ":cert.pem" );
+        if( !f.open( QIODevice::ReadOnly ) )
+            qWarning() << "Could not load built-in SSL certificate "<<f.fileName();
+    }
+    if( f.isOpen() )
+    {
+        const QByteArray& certData = f.readAll();
+        QnSSLSocket::initSSLEngine( certData );
     }
 
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
@@ -1216,7 +1226,7 @@ void QnMain::run()
         QnSleep::msleep(3000);
     }
     connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &QnMain::at_restartServerRequired);
-    qnCommon->setRemoteGUID(connectInfo.ecsGuid);
+    qnCommon->setRemoteGUID(QUuid(connectInfo.ecsGuid));
     MSSettings::roSettings()->sync();
     if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
@@ -1326,7 +1336,7 @@ void QnMain::run()
         server->setSystemInfo(QnSystemInformation(QN_APPLICATION_PLATFORM, QN_APPLICATION_ARCH));
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
-        bool isLocal = appserverHostString.isEmpty() || QUrl(appserverHostString).scheme() == "file";
+        bool isLocal = appserverHostString.isEmpty() || appserverHostString == "localhost" || QUrl(appserverHostString).scheme() == "file";
 
         int serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 #ifdef EDGE_SERVER
@@ -1384,7 +1394,7 @@ void QnMain::run()
     do {
         if (needToStop())
             return;
-    } while (ec2Connection->getResourceManager()->setResourceStatusSync(m_mediaServer->getId(), QnResource::Online) != ec2::ErrorCode::ok);
+    } while (ec2Connection->getResourceManager()->setResourceStatusSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
 
 
     QStringList usedPathList;
@@ -1405,11 +1415,11 @@ void QnMain::run()
         if (usedPathList.contains(path))
             continue;
         QnStorageResourcePtr newStorage = QnStorageResourcePtr(new QnFileStorageResource());
-        newStorage->setId(QnId::createUuid());
+        newStorage->setId(QUuid::createUuid());
         newStorage->setUrl(path);
         newStorage->setSpaceLimit( settings->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
         newStorage->setUsedForWriting(false);
-        newStorage->addFlags(QnResource::deprecated);
+        newStorage->addFlags(Qn::deprecated);
 
         qnStorageMan->addStorage(newStorage);
     }
@@ -1427,6 +1437,18 @@ void QnMain::run()
         m_moduleFinder->setCompatibilityMode(true);
         ec2ConnectionFactory->setCompatibilityMode(true);
     }
+    if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
+        QList<QUuid> allowedPeers;
+        foreach (const QString &peer, cmdLineArguments.allowedDiscoveryPeers.split(";")) {
+            QUuid peerId(peer);
+            if (!peerId.isNull())
+                allowedPeers << peerId;
+        }
+        if (!allowedPeers.isEmpty())
+            m_moduleFinder->setAllowedPeers(allowedPeers);
+    }
+
+
     QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleFound,     this,   &QnMain::at_peerFound,  Qt::DirectConnection);
     QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleLost,      this,   &QnMain::at_peerLost,   Qt::DirectConnection);
 
@@ -1453,6 +1475,8 @@ void QnMain::run()
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
     serverResourceProcessor->moveToThread( mserverResourceDiscoveryManager.get() );
     QnResourceDiscoveryManager::instance()->setResourceProcessor(serverResourceProcessor.get());
+
+    std::unique_ptr<QnResourceStatusWatcher> statusWatcher( new QnResourceStatusWatcher());
 
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher thirdPartyResourceSearcher;
@@ -1829,8 +1853,8 @@ private:
             }
         }
 
-        QString obsoleteGuid = MSSettings::roSettings()->value(OBSOLETE_SERVER_GUID).toString();
-        if (!obsoleteGuid.isEmpty()) {
+        QUuid obsoleteGuid = QUuid(MSSettings::roSettings()->value(OBSOLETE_SERVER_GUID).toString());
+        if (!obsoleteGuid.isNull()) {
             qnCommon->setObsoleteServerGuid(obsoleteGuid);
         }
     }
@@ -1901,6 +1925,7 @@ int main(int argc, char* argv[])
     commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL, 
         lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
     commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
+    commandLineParser.addParameter(&cmdLineArguments.allowedDiscoveryPeers, "--allowed-peers", NULL, QString());
     commandLineParser.addParameter(&configFilePath, "--conf-file", NULL, 
         "Path to config file. By default "+MSSettings::defaultROSettingsFilePath());
     commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL, 

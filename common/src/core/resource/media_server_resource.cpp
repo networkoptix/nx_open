@@ -28,8 +28,8 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     m_redundancy(false)
 {
     setTypeId(resTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
-    addFlags(QnResource::server | QnResource::remote);
-    removeFlags(QnResource::media); // TODO: #Elric is this call needed here?
+    addFlags(Qn::server | Qn::remote);
+    removeFlags(Qn::media); // TODO: #Elric is this call needed here?
 
     //TODO: #GDM #EDGE in case of EDGE servers getName should return name of its camera. Possibly name just should be synced on Server.
     setName(tr("Server"));
@@ -48,7 +48,7 @@ QString QnMediaServerResource::getUniqueId() const
     QMutexLocker mutexLocker(&m_mutex); // needed here !!!
     QnMediaServerResource* nonConstThis = const_cast<QnMediaServerResource*> (this);
     if (getId().isNull())
-        nonConstThis->setId(QnId::createUuid());
+        nonConstThis->setId(QUuid::createUuid());
     return QLatin1String("Server ") + getId().toString();
 }
 
@@ -92,7 +92,7 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     return m_restConnection;
 }
 
-QnResourcePtr QnMediaServerResourceFactory::createResource(QnId resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnMediaServerResourceFactory::createResource(QUuid resourceTypeId, const QnResourceParams& /*params*/)
 {
     Q_UNUSED(resourceTypeId)
 
@@ -368,7 +368,7 @@ bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
     return false;
 }
 
-void QnMediaServerResource::setStatus(Status newStatus, bool silenceMode)
+void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
 {
     if (getStatus() != newStatus) {
         QMutexLocker lock(&m_mutex);

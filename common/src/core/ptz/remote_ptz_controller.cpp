@@ -44,8 +44,8 @@ bool QnRemotePtzController::isPointless(Qn::PtzCommand command) {
     if(!m_server)
         return true;
 
-    QnResource::Status status = m_resource->getStatus();
-    if(status == QnResource::Unauthorized || status == QnResource::Offline)
+    Qn::ResourceStatus status = m_resource->getStatus();
+    if(status == Qn::Unauthorized || status == Qn::Offline)
         return true;
 
     return !base_type::supports(command);

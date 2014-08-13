@@ -16,7 +16,7 @@ namespace {
 QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveResource() 
 {
     m_mainWidget = mainWindow;
-    addFlags(local_live_cam);
+    addFlags(Qn::local_live_cam);
 
     const QString name = lit("Desktop");
     setName(name);
@@ -38,7 +38,7 @@ QString QnDesktopResource::toString() const {
     return getUniqueId();
 }
 
-QnAbstractStreamDataProvider* QnDesktopResource::createDataProviderInternal(ConnectionRole /*role*/) 
+QnAbstractStreamDataProvider* QnDesktopResource::createDataProviderInternal(Qn::ConnectionRole /*role*/) 
 {
     QMutexLocker lock(&m_dpMutex);
 

@@ -38,7 +38,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
     else {
         resource= qnResPool->getResourceByUniqId(resourceId);
         if (!resource) {
-            resource= qnResPool->getResourceById(resourceId);
+            resource= qnResPool->getResourceById(QUuid(resourceId));
             if (!resource)
                 errStr = tr("Resource with id '%1' not found \n").arg(resourceId);
         }

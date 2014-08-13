@@ -94,7 +94,7 @@ void QnFileProcessor::deleteLocalResources(const QnResourceList &resources_)
 {
     QnResourceList resources;
     foreach (const QnResourcePtr &resource, resources_)
-        if (resource->hasFlags(QnResource::url | QnResource::local))
+        if (resource->hasFlags(Qn::url | Qn::local))
             resources.append(resource);
     if (resources.isEmpty())
         return;

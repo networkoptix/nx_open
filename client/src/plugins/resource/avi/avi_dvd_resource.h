@@ -14,7 +14,7 @@ public:
     static bool isAcceptedUrl(const QString& url);
     static QString urlToFirstVTS(const QString& url);
 protected:
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
 };
 
 typedef QnSharedResourcePointer<QnAviDvdResource> QnAviDvdResourcePtr;

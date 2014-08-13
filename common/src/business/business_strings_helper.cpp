@@ -317,7 +317,7 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
 }
 
 QString QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params, bool useIp) {
-    QnId id = params.getEventResourceId();
+    QUuid id = params.getEventResourceId();
     QnResourcePtr res = !id.isNull() ? qnResPool->getResourceById(id) : QnResourcePtr();
     return getFullResourceName(res, useIp);
 }
@@ -415,7 +415,7 @@ QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(const QnAbstract
 }
 
 QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool isPublic) {
-    QnId id = params.getEventResourceId();
+    QUuid id = params.getEventResourceId();
     QnNetworkResourcePtr res = !id.isNull() ? 
                             qnResPool->getResourceById(id).dynamicCast<QnNetworkResource>() : 
                             QnNetworkResourcePtr();
@@ -429,7 +429,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     QUrl appServerUrl = QnAppServerConnectionFactory::url();
     quint64 ts = params.getEventTimestamp();
 
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res->getPhysicalId());
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res);
     if (history) {
         QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, true, false);
         if (newServer)

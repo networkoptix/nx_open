@@ -17,7 +17,8 @@
 QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     QWidget(parent),
     ui(new Ui::AdvancedSettingsWidget),
-    m_updating(false)
+    m_updating(false),
+    m_qualityEditable(false)
 {
     ui->setupUi(this);
 
@@ -143,6 +144,7 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
         camCnt++;
     }
 
+    m_qualityEditable = anyHasDualStreaming;
     ui->qualityGroupBox->setVisible(anyHasDualStreaming);
     if (sameQuality && quality != Qn::SSQualityNotDefined) {
         ui->qualityOverrideCheckBox->setChecked(true);
@@ -259,8 +261,7 @@ void QnAdvancedSettingsWidget::at_qualitySlider_valueChanged(int value) {
     ui->highQualityWarningLabel->setVisible(quality == Qn::SSQualityHigh);
 }
 
-Qn::SecondStreamQuality QnAdvancedSettingsWidget::sliderPosToQuality(int pos)
-{
+Qn::SecondStreamQuality QnAdvancedSettingsWidget::sliderPosToQuality(int pos) const {
     if (pos == 0)
         return Qn::SSQualityDontUse;
     else
@@ -273,4 +274,38 @@ int QnAdvancedSettingsWidget::qualityToSliderPos(Qn::SecondStreamQuality quality
         return 0;
     else
         return int(quality) + 1;
+}
+
+bool QnAdvancedSettingsWidget::isSecondStreamEnabled() const {
+    if (!m_qualityEditable)
+        return true;
+
+    if (ui->settingsDisableControlCheckBox->checkState() != Qt::Unchecked)
+        return true;
+
+    if (!ui->qualityGroupBox->isEnabled())
+        return true;
+
+    if (!ui->qualityOverrideCheckBox->isChecked())
+        return true;
+
+    Qn::SecondStreamQuality quality = (Qn::SecondStreamQuality) sliderPosToQuality(ui->qualitySlider->value());
+    return quality != Qn::SSQualityDontUse;
+}
+
+void QnAdvancedSettingsWidget::setSecondStreamEnabled(bool value /*= true*/) {
+    if (!m_qualityEditable)
+        return;
+
+    if (ui->settingsDisableControlCheckBox->checkState() != Qt::Unchecked)
+        return;
+
+    if (!ui->qualityGroupBox->isEnabled())
+        return;
+
+    if (value) {
+        ui->qualitySlider->setValue(qualityToSliderPos(Qn::SSQualityMedium));
+    } else {
+        ui->qualitySlider->setValue(qualityToSliderPos(Qn::SSQualityDontUse));
+    }
 }

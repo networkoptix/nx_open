@@ -116,7 +116,7 @@ QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractSt
 
 void QnMediaResource::initMediaResource()
 {
-    toResource()->addFlags(QnResource::media);
+    toResource()->addFlags(Qn::media);
 }
 
 QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const {
@@ -162,4 +162,8 @@ QString QnMediaResource::rtpTransportKey() {
 
 QString QnMediaResource::motionStreamKey() {
     return lit("motionStream");
+}
+
+QString QnMediaResource::rotationKey() {
+    return lit("rotation");
 }
