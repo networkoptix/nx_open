@@ -21,7 +21,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     connect(ui->businessRulesButton,    &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenBusinessRulesAction); } );
     connect(ui->cameraListButton,       &QPushButton::clicked, this, [this] { menu()->trigger(Qn::CameraListAction); } );
     connect(ui->eventLogButton,         &QPushButton::clicked, this, [this] { menu()->trigger(Qn::BusinessEventsLogAction); } );
-    connect(ui->healthMonitorButton,    &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenInNewLayoutAction, qnResPool->getResourcesWithFlag(QnResource::server)); } );
+    connect(ui->healthMonitorButton,    &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenInNewLayoutAction, qnResPool->getResourcesWithFlag(Qn::server)); } );
 }
 
 void QnGeneralSystemAdministrationWidget::updateFromSettings() {

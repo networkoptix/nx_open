@@ -20,7 +20,6 @@
 static const int BUFFER_SIZE = 1024;
 const unsigned char sid[] = "Network Optix SSL socket";
 
-
     // TODO: public methods are visible to all, quite bad
 int sock_read(BIO *b, char *out, int outl)
 {
@@ -172,6 +171,7 @@ void BufferShinrkTo( nx::Buffer* buffer , int from ) {
         buffer->resize(0);
     } else {
         QByteArray temp(buffer->constData() + from , static_cast<int>(buffer->size())-from);
+        temp.reserve( buffer->capacity() );
         buffer->swap(temp);
     }
 }
@@ -289,7 +289,7 @@ private:
     void handle_error( int ssl_error ) {
         // Record the SSL error here
         NX_LOG(
-            lit("SSL error code:%1").arg(QLatin1String(ssl_error_str(ssl_error))),
+            lit("SSL error code:%1\n").arg(QLatin1String(ssl_error_str(ssl_error))),
             cl_logDEBUG1 );
         // Dump the error stack here
         int err;
@@ -297,11 +297,11 @@ private:
             char err_str[1024];
             ERR_error_string_n(err,err_str,1024);
             NX_LOG(
-                lit("SSL error stack:%1").arg(QLatin1String(err_str)),cl_logDEBUG1);
+                lit("SSL error stack:%1\n").arg(QLatin1String(err_str)),cl_logDEBUG1);
         }
         // System error string
         NX_LOG(
-            lit("System error code:%1").arg(SystemError::getLastOSErrorCode()),cl_logDEBUG1);
+            lit("System error code:%1\n").arg(SystemError::getLastOSErrorCode()),cl_logDEBUG1);
     }
 
     // The SSL can be terminated without notifying the peer. This can be detected by:
@@ -477,7 +477,7 @@ private:
         if( !bio_out_buffer_.isEmpty() ) {
             do_send( 
             buffer,
-            [this,op](SystemError::ErrorCode ec,std::size_t ) {
+            [this,op](SystemError::ErrorCode ec,std::size_t bytes_transferred ) {
                 // Until now , we should have been sent the data out and
                 // what we need to do is just calling the callback function
                 if( ec ) {
@@ -524,22 +524,28 @@ private:
 // read operation 
 class ssl_async_recv_op : public ssl_async_op {
 public:
-    ssl_async_recv_op( SSL* ssl ) : ssl_async_op(ssl){}
+    ssl_async_recv_op( SSL* ssl ) : ssl_async_op(ssl),read_bytes_(0){}
     virtual int perform( int* ssl_err ) {
+        // A bug here is just that I misunderstand the buffer usage.
+        // The user suppose I will not touch the data that originally
+        // reside inside of the buffer. I suppose this is not true !
+        std::size_t old_size = user_buffer_->size();
+        std::size_t target_num = user_buffer_->capacity()-old_size;
         user_buffer_->resize( user_buffer_->capacity() );
-        int bytes = SSL_read(ssl(),user_buffer_->data(),
-            static_cast<int>(user_buffer_->size()) );
-        // Modify the user_buffer_ size 
-        if( bytes >0 )
-            user_buffer_->resize(bytes);
-        else
-            user_buffer_->resize(0);
+        read_bytes_ = SSL_read(ssl(),
+            user_buffer_->data() + old_size ,
+            static_cast<int>(target_num) );
+        // Modify the buffer size if we really need to do so
+        if( read_bytes_ >0 )
+            user_buffer_->resize(read_bytes_+old_size);
+        else 
+            user_buffer_->resize(old_size);
 
-        *ssl_err = SSL_get_error(ssl(),bytes);
-        return bytes;
+        *ssl_err = SSL_get_error(ssl(),read_bytes_);
+        return read_bytes_;
     }
     virtual void notify( SystemError::ErrorCode ec ) {
-            callback_(ec,user_buffer_->size());
+            callback_(ec,read_bytes_);
     }
     virtual void error( SystemError::ErrorCode ec ) {
         callback_(ec,static_cast<std::size_t>(-1));
@@ -554,6 +560,7 @@ public:
 private:
     std::function<void(SystemError::ErrorCode,std::size_t)> callback_;
     nx::Buffer* user_buffer_;
+    int read_bytes_;
 };
 
 // write operation
@@ -634,10 +641,9 @@ void async_ssl::async_recv(
         } else {
             recv_op_->set_user_buffer(buffer);
             recv_op_->set_callback(op);
-            // We issue a read operation asynchronously here
-            ssl_recv(recv_op_.get(),
-                make_read_write_buffer(buffer->capacity(),
-                async_buffer_default_size));
+            ssl_perform(SystemError::noError,0,recv_op_.get(),
+                make_read_write_buffer(async_buffer_default_size,
+                buffer->capacity()));
         }
 }
 
@@ -691,7 +697,6 @@ async_ssl::async_ssl( SSL* ssl , bool server , AbstractStreamSocket* socket ) :
     handshake_op_( new ssl_async_handshake_op(ssl) ) {
         bio_in_buffer_.reserve( bio_input_buffer_reserve );
         bio_out_buffer_.reserve( bio_output_buffer_reserve );
-        SSL_set_mode(ssl_,SSL_MODE_ENABLE_PARTIAL_WRITE);
 }
 
 
@@ -754,7 +759,6 @@ public:
         if( !is_initialized_ ) {
             // We need to sniffer the buffer here
             sniffer_buffer_.reserve(sniffer_header_length);
-
             socket()->
                 readSomeAsync(
                 &sniffer_buffer_,

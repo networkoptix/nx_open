@@ -11,6 +11,7 @@
 #include <business/events/network_issue_business_event.h>
 #include <business/events/camera_input_business_event.h>
 #include <business/events/conflict_business_event.h>
+#include <business/events/mserver_conflict_business_event.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
@@ -203,11 +204,19 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         break;
     }
     case ServerConflictEvent: {
-        QVariantList conflicts;
+        QnCameraConflictList conflicts;
+        conflicts.sourceServer = params.getSource();
+        conflicts.decode(params.getConflicts());
         int n = 0;
-        foreach (QString ip, params.getConflicts()) {
+        foreach (const QString &server, conflicts.camerasByServer.keys()) {
             result += delimiter;
-            result += tr("Conflicting Server #%1: %2").arg(n).arg(ip);
+            result += tr("Conflicting Server #%1: %2").arg(++n).arg(server);
+            int m = 0;
+            foreach (const QString &camera, conflicts.camerasByServer[server]) {
+                result += delimiter;
+                result += tr("Camera #%1 MAC: %2").arg(++m).arg(camera);
+            }
+
         }
         break;
     }
@@ -252,15 +261,22 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(const QnBusinessEventParam
         break;
     }
     case ServerConflictEvent: {
-        QVariantList conflicts;
+        QnCameraConflictList conflicts;
+        conflicts.sourceServer = params.getSource();
+        conflicts.decode(params.getConflicts());
+
+        QVariantList conflictsList;
         int n = 0;
-        foreach (QString ip, params.getConflicts()) {
-            QVariantHash conflict;
-            conflict[lit("number")] = ++n;
-            conflict[lit("ip")] = ip;
-            conflicts << conflict;
+        foreach (const QString &server, conflicts.camerasByServer.keys()) {
+            foreach (const QString &camera, conflicts.camerasByServer[server]) {
+                QVariantHash conflict;
+                conflict[lit("number")] = ++n;
+                conflict[lit("ip")] = server;
+                conflict[lit("mac")] = camera;
+                conflictsList << conflict;
+            }
         }
-        detailsMap[lit("msConflicts")] = conflicts;
+        detailsMap[lit("msConflicts")] = conflictsList;
         break;
     }
     default:
@@ -301,7 +317,7 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
 }
 
 QString QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params, bool useIp) {
-    QnId id = params.getEventResourceId();
+    QUuid id = params.getEventResourceId();
     QnResourcePtr res = !id.isNull() ? qnResPool->getResourceById(id) : QnResourcePtr();
     return getFullResourceName(res, useIp);
 }
@@ -399,7 +415,7 @@ QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(const QnAbstract
 }
 
 QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool isPublic) {
-    QnId id = params.getEventResourceId();
+    QUuid id = params.getEventResourceId();
     QnNetworkResourcePtr res = !id.isNull() ? 
                             qnResPool->getResourceById(id).dynamicCast<QnNetworkResource>() : 
                             QnNetworkResourcePtr();
@@ -413,7 +429,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     QUrl appServerUrl = QnAppServerConnectionFactory::url();
     quint64 ts = params.getEventTimestamp();
 
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res->getPhysicalId());
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res);
     if (history) {
         QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, true, false);
         if (newServer)

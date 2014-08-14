@@ -139,7 +139,7 @@ QnTransactionMessageBus* QnTransactionMessageBus::instance()
 
 QnTransactionMessageBus::QnTransactionMessageBus()
 : 
-    m_localPeer(QnId(), Qn::PT_Server),
+    m_localPeer(QUuid(), Qn::PT_Server),
     m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
@@ -183,7 +183,7 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
     delete m_timer;
 }
 
-void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QnId& gotFromPeer)
+void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QUuid& gotFromPeer)
 {
     AlivePeersMap::iterator itr = m_alivePeers.find(peerData.id);
     if (itr == m_alivePeers.end()) 
@@ -200,7 +200,7 @@ void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QnId&
     }
 }
 
-void QnTransactionMessageBus::removeAlivePeer(const QnId& id, bool isProxy)
+void QnTransactionMessageBus::removeAlivePeer(const QUuid& id, bool isProxy)
 {
     // 1. remove peer from alivePeers map
 
@@ -216,7 +216,7 @@ void QnTransactionMessageBus::removeAlivePeer(const QnId& id, bool isProxy)
     // 2. remove peers proxy via current peer
     if (isProxy)
         return;
-    QSet<QnId> morePeersToRemove;
+    QSet<QUuid> morePeersToRemove;
     for (auto itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
         AlivePeerInfo& otherPeer = itr.value();
@@ -227,11 +227,11 @@ void QnTransactionMessageBus::removeAlivePeer(const QnId& id, bool isProxy)
             }
         }
     }
-    foreach(const QnId& p, morePeersToRemove)
+    foreach(const QUuid& p, morePeersToRemove)
         removeAlivePeer(p, true);
 }
 
-void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QnId& gotFromPeer)
+void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QUuid& gotFromPeer)
 {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
     qDebug() << "received peerAlive transaction" << tran.params.peer.id << tran.params.peer.peerType;
@@ -293,6 +293,8 @@ void QnTransactionMessageBus::sendTransactionToTransport(const QnTransaction<T> 
 template <class T>
 void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) 
 {
+    QMutexLocker lock(&m_mutex);
+
     AlivePeersMap:: iterator itr = m_alivePeers.find(tran.peerID);
     if (itr != m_alivePeers.end())
         itr.value().lastActivity.restart();
@@ -363,8 +365,6 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         qDebug() << "skip transaction " << ApiCommand::toString(tran.command) << "for peers" << transportHeader.dstPeers;
 #endif
     }
-
-    QMutexLocker lock(&m_mutex);
 
     // proxy incoming transaction to other peers.
     if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty()) {
@@ -473,7 +473,7 @@ bool QnTransactionMessageBus::doHandshake(QnTransactionTransport* transport)
         }
 
         ec2::ApiCameraDataList cameras;
-        if (dbManager->doQuery(QnId(), cameras) != ErrorCode::ok) {
+        if (dbManager->doQuery(QUuid(), cameras) != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
         }
@@ -535,7 +535,7 @@ bool QnTransactionMessageBus::doHandshake(QnTransactionTransport* transport)
     return true;
 }
 
-void QnTransactionMessageBus::connectToPeerLost(const QnId& id)
+void QnTransactionMessageBus::connectToPeerLost(const QUuid& id)
 {
     if (!m_alivePeers.contains(id)) 
         return;    
@@ -754,12 +754,11 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<A
     QnTransactionTransportPtr transport(new QnTransactionTransport(m_localPeer, remotePeer, socket));
     connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
     connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
-    emit newDirectConnectionEstablished( transport );
 
     QMutexLocker lock(&m_mutex);
     m_connectingConnections << transport;
     transport->setState(QnTransactionTransport::Connected);
-        if (m_connections.contains(remotePeer.id))
+    if (m_connections.contains(remotePeer.id))
         m_connectionsToRemove << m_connections[remotePeer.id];
 }
 

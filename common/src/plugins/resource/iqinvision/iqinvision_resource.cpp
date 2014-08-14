@@ -98,7 +98,7 @@ CLHttpStatus QnPlIqResource::readOID(const QString& oid, QString& result)
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        setStatus(Unauthorized);
+        setStatus(Qn::Unauthorized);
     }
     
     return status;
@@ -125,7 +125,7 @@ CLHttpStatus QnPlIqResource::setOID(const QString& oid, const QString& val)
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        setStatus(Unauthorized);
+        setStatus(Qn::Unauthorized);
     }
 
     return status;

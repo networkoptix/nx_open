@@ -460,7 +460,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
     if (qnSettings->isVideoWallMode()) {
         bool sliderVisible =
             navigator()->currentWidget() != NULL &&
-            !(navigator()->currentWidget()->resource()->flags() & (QnResource::still_image | QnResource::server));
+            !(navigator()->currentWidget()->resource()->flags() & (Qn::still_image | Qn::server));
 
         setSliderVisible(sliderVisible, animate);
         setTreeVisible(false, false);
@@ -474,8 +474,8 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
 
     bool sliderVisible =
         navigator()->currentWidget() != NULL &&
-        !(navigator()->currentWidget()->resource()->flags() & (QnResource::still_image | QnResource::server | QnResource::videowall)) &&
-        ((accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) || !(navigator()->currentWidget()->resource()->flags() & QnResource::live)) &&
+        !(navigator()->currentWidget()->resource()->flags() & (Qn::still_image | Qn::server | Qn::videowall)) &&
+        ((accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) || !(navigator()->currentWidget()->resource()->flags() & Qn::live)) &&
         !action(Qn::ToggleTourModeAction)->isChecked();
 
     if(m_inactive) {
@@ -1772,7 +1772,7 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
     if (QnCalendarWidget* c = dynamic_cast<QnCalendarWidget *>(m_calendarItem->widget()))
         calendarEmpty = c->isEmpty(); /* Small hack. We have a signal that updates visibility if a calendar receive new data */
 
-    bool calendarEnabled = !calendarEmpty && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
+    bool calendarEnabled = !calendarEmpty && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & Qn::utc);
     action(Qn::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: #GDM #Common does this belong here?
 
     bool calendarVisible = calendarEnabled && m_sliderVisible && isSliderOpened();

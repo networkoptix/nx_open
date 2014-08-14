@@ -99,7 +99,7 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
     m_srcVideoInfo = new QnSignInfo();
 
     m_resource = QnAviResourcePtr(new QnAviResource(checkResource->getUrl()));
-    m_reader = static_cast<QnAbstractArchiveReader*> (m_resource->createDataProvider(QnResource::Role_Default));
+    m_reader = static_cast<QnAbstractArchiveReader*> (m_resource->createDataProvider(Qn::CR_Default));
     m_reader->setCycleMode(false);
     m_camDispay = new QnSignDialogDisplay(m_resource);
 

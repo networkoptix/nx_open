@@ -135,20 +135,20 @@ namespace ec2
             \param localSystemTime Local system time (UTC, millis from epoch)
             \param peersAndTimes pair<peer id, peer local time (UTC, millis from epoch) corresponding to \a localSystemTime>
         */
-        void primaryTimeServerSelectionRequired( qint64 localSystemTime, QList<QPair<QnId, qint64> > peersAndTimes );
+        void primaryTimeServerSelectionRequired( qint64 localSystemTime, QList<QPair<QUuid, qint64> > peersAndTimes );
         //!Emitted when synchronized time has been changed
         void timeChanged( qint64 syncTime );
 
     private:
         struct RemotePeerTimeInfo
         {
-            QnId peerID;
+            QUuid peerID;
             qint64 localMonotonicClock;
             //!synchorionized millis from epoch, corresponding to \a monotonicClockValue
             qint64 remotePeerSyncTime;
 
             RemotePeerTimeInfo(
-                const QnId& _peerID = QnId(),
+                const QUuid& _peerID = QUuid(),
                 qint64 _localMonotonicClock = 0,
                 qint64 _remotePeerSyncTime = 0 )
             :
@@ -175,7 +175,7 @@ namespace ec2
         quint64 m_internetSynchronizationTaskID;
         quint64 m_manualTimerServerSelectionCheckTaskID;
         bool m_terminated;
-        std::map<QnId, TimeSyncInfo> m_systemTimeByPeer;
+        std::map<QUuid, TimeSyncInfo> m_systemTimeByPeer;
         const Qn::PeerType m_peerType;
         DaytimeNISTFetcher m_timeSynchronizer;
         size_t m_internetTimeSynchronizationPeriod;
@@ -192,7 +192,7 @@ namespace ec2
         */
         void remotePeerTimeSyncUpdate(
             QMutexLocker* const lock,
-            const QnId& remotePeerID,
+            const QUuid& remotePeerID,
             qint64 localMonotonicClock,
             qint64 remotePeerSyncTime,
             const TimePriorityKey& remotePeerTimePriorityKey );

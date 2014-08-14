@@ -24,7 +24,7 @@ public:
     /**
      * @brief layout                        Id of this item's layout resource (if any).
      */
-    QnId layout;
+    QUuid layout;
 
     /**
      * @brief uuid                          Id of this item instance.

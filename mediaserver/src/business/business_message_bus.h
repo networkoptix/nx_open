@@ -33,7 +33,7 @@ public:
     //int deliveryBusinessEvent(QnAbstractBusinessEventPtr bEvent, const QUrl& url);
 
     /** Delivery action to other module */
-    int deliveryBusinessAction(const QnAbstractBusinessActionPtr &bAction, const QnId& dstPeer);
+    int deliveryBusinessAction(const QnAbstractBusinessActionPtr &bAction, const QUuid& dstPeer);
 
 signals:
     /** Action successfully delivered to other module*/

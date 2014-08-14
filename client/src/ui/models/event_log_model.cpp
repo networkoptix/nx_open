@@ -20,7 +20,7 @@
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
-QHash<QnId, QnResourcePtr> QnEventLogModel::m_resourcesHash;
+QHash<QUuid, QnResourcePtr> QnEventLogModel::m_resourcesHash;
 
 // -------------------------------------------------------------------------- //
 // QnEventLogModel::DataIndex
@@ -313,7 +313,7 @@ QnResourcePtr QnEventLogModel::getResource(const Column &column, const QnBusines
     return QnResourcePtr();
 }
 
-QnResourcePtr QnEventLogModel::getResourceById(const QnId &id) {
+QnResourcePtr QnEventLogModel::getResourceById(const QUuid &id) {
     if (id.isNull())
         return QnResourcePtr();
 
@@ -329,7 +329,7 @@ QnResourcePtr QnEventLogModel::getResourceById(const QnId &id) {
 }
 
 QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionData &action) {
-    QnId resId;
+    QUuid resId;
     switch(column) {
     case EventCameraColumn: 
         resId = action.getRuntimeParams().getEventResourceId();
@@ -363,7 +363,7 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
     return qnResIconCache->icon(getResourceById(resId));
 }
 
-QString QnEventLogModel::getResourceNameString(QnId id) {
+QString QnEventLogModel::getResourceNameString(QUuid id) {
     return getResourceName(getResourceById(id));
 }
 

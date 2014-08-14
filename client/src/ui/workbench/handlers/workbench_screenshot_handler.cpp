@@ -224,7 +224,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
 
     QnScreenshotParameters parameters;
     parameters.time = display->camDisplay()->getCurrentTime();
-    parameters.isUtc = widget->resource()->toResource()->flags() & QnResource::utc;
+    parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
     parameters.filename = actionParameters.argument<QString>(Qn::FileNameRole);
     parameters.timestampPosition = qnSettings->timestampCorner();
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();

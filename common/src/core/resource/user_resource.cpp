@@ -4,8 +4,8 @@ QnUserResource::QnUserResource():
     m_permissions(0),
     m_isAdmin(false)
 {
-    setStatus(Online, true);
-    addFlags(QnResource::user | QnResource::remote);
+    setStatus(Qn::Online, true);
+    addFlags(Qn::user | Qn::remote);
 }
 
 QByteArray QnUserResource::getHash() const

@@ -91,12 +91,12 @@ private:
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
     QnBusinessRulesActualModel* m_rulesViewModel;
-    QList<QnId> m_pendingDeleteRules;
+    QList<QUuid> m_pendingDeleteRules;
 
     QnBusinessRuleWidget* m_currentDetailsWidget;
 
 
-    QMap<int, QnId> m_deleting;
+    QMap<int, QUuid> m_deleting;
 
     QMenu* m_popupMenu;
 

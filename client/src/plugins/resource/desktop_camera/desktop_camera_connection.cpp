@@ -108,7 +108,7 @@ void QnDesktopCameraConnectionProcessor::processRequest()
     if (method == "PLAY")
     {
         if (d->dataProvider == 0) {
-            d->dataProvider = d->desktop->createDataProvider(QnResource::Role_Default);
+            d->dataProvider = d->desktop->createDataProvider(Qn::CR_Default);
             d->dataConsumer = new QnDesktopCameraDataConsumer(this);
             d->dataProvider->addDataProcessor(d->dataConsumer);
             d->dataConsumer->start();

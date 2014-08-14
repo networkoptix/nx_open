@@ -21,14 +21,14 @@ public:
 
     QString getUniqueId() const;
 
-    QnId id() const;
-    void setId(const QnId& value);
+    QUuid id() const;
+    void setId(const QUuid& value);
 
     QnBusiness::EventType eventType() const;
     void setEventType(QnBusiness::EventType eventType);
 
-    QVector<QnId> eventResources() const;
-    void setEventResources(const QVector<QnId> &value);
+    QVector<QUuid> eventResources() const;
+    void setEventResources(const QVector<QUuid> &value);
     QnResourceList eventResourceObjects() const;
 
     QnBusinessEventParameters eventParams() const;
@@ -40,9 +40,9 @@ public:
     QnBusiness::ActionType actionType() const;
     void setActionType(QnBusiness::ActionType actionType);
 
-    QVector<QnId> actionResources() const;
+    QVector<QUuid> actionResources() const;
     QnResourceList actionResourceObjects() const;
-    void setActionResources(const QVector<QnId> &value);
+    void setActionResources(const QVector<QUuid> &value);
 
     QnBusinessActionParameters actionParams() const;
     void setActionParams(const QnBusinessActionParameters& params);
@@ -69,21 +69,21 @@ public:
     static QnBusinessEventRuleList getDefaultRules();
 
     QnBusinessEventRule* clone();
-    void removeResource(const QnId& resId);
+    void removeResource(const QUuid& resId);
 
 private:
     QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem,
         QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType, const QnResourcePtr& actionRes= QnResourcePtr());
 
-    QnId m_id;
+    QUuid m_id;
 
     QnBusiness::EventType m_eventType;
-    QVector<QnId> m_eventResources;
+    QVector<QUuid> m_eventResources;
     QnBusinessEventParameters m_eventParams;
     QnBusiness::EventState m_eventState;
 
     QnBusiness::ActionType m_actionType;
-    QVector<QnId> m_actionResources;
+    QVector<QUuid> m_actionResources;
     QnBusinessActionParameters m_actionParams;
 
     int m_aggregationPeriod;

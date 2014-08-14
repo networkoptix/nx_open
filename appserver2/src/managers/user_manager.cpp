@@ -72,7 +72,7 @@ namespace ec2
         //preparing output data
         QnUserResourceList users;
         if (resource->getId().isNull()) {
-            resource->setId(QnId::createUuid());
+            resource->setId(QUuid::createUuid());
         }
         users.push_back( resource );
 
@@ -83,7 +83,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnUserManager<T>::remove( const QnId& id, impl::SimpleHandlerPtr handler )
+    int QnUserManager<T>::remove( const QUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::removeUser, id );
@@ -101,7 +101,7 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiIdData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
+    QnTransaction<ApiIdData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QUuid& id )
     {
         QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;

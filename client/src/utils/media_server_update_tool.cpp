@@ -94,7 +94,7 @@ void QnMediaServerUpdateTool::finishUpdate(QnMediaServerUpdateTool::UpdateResult
     setUpdateResult(result);
 }
 
-void QnMediaServerUpdateTool::setPeerState(const QnId &peerId, QnMediaServerUpdateTool::PeerUpdateInformation::State state) {
+void QnMediaServerUpdateTool::setPeerState(const QUuid &peerId, QnMediaServerUpdateTool::PeerUpdateInformation::State state) {
     auto it = m_updateInformationById.find(peerId);
     if (it == m_updateInformationById.end())
         return;
@@ -117,7 +117,7 @@ QnSoftwareVersion QnMediaServerUpdateTool::targetVersion() const {
     return m_targetVersion;
 }
 
-QnMediaServerUpdateTool::PeerUpdateInformation QnMediaServerUpdateTool::updateInformation(const QnId &peerId) const {
+QnMediaServerUpdateTool::PeerUpdateInformation QnMediaServerUpdateTool::updateInformation(const QUuid &peerId) const {
     auto it = m_updateInformationById.find(peerId);
     if (it != m_updateInformationById.end())
         return it.value();
@@ -205,7 +205,7 @@ void QnMediaServerUpdateTool::checkBuildOnline() {
 
 void QnMediaServerUpdateTool::checkUpdateCoverage() {
     bool needUpdate = false;
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::server)) {
         QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
         UpdateFileInformationPtr updateFileInformation = m_updateFiles[server->getSystemInfo()];
         if (!updateFileInformation) {
@@ -312,9 +312,9 @@ void QnMediaServerUpdateTool::updateServers() {
 
     m_updateId = QUuid::createUuid().toString();
 
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::server)) {
         QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-        if (server->getStatus() != QnResource::Online)
+        if (server->getStatus() != Qn::Online)
             continue;
 
         PeerUpdateInformation info(server);
@@ -372,7 +372,7 @@ void QnMediaServerUpdateTool::downloadNextUpdate() {
         return;
     }
 
-    foreach (const QnId &peerId, m_idBySystemInformation.values(*it))
+    foreach (const QUuid &peerId, m_idBySystemInformation.values(*it))
         setPeerState(peerId, PeerUpdateInformation::UpdateDownloading);
 
     m_downloadFile.reset(new QFile(updateFilePath(m_updateFiles[*it]->baseFileName)));
@@ -442,7 +442,7 @@ void QnMediaServerUpdateTool::at_downloadReply_finished() {
 
     m_downloadFile.reset();
 
-    foreach (const QnId &peerId, m_idBySystemInformation.values(systemInformation))
+    foreach (const QUuid &peerId, m_idBySystemInformation.values(systemInformation))
         setPeerState(peerId, PeerUpdateInformation::PendingUpload);
 
     downloadNextUpdate();
@@ -452,7 +452,7 @@ void QnMediaServerUpdateTool::uploadUpdatesToServers() {
     emit progressChanged(0);
     setState(UploadingUpdate);
 
-    m_pendingUploadPeers = QSet<QnId>::fromList(m_updateInformationById.keys());
+    m_pendingUploadPeers = QSet<QUuid>::fromList(m_updateInformationById.keys());
     m_pendingUploads = m_idBySystemInformation.uniqueKeys();
 
     m_distributedMutex = ec2::QnDistributedMutexManager::instance()->createMutex(mutexName);
@@ -472,10 +472,10 @@ void QnMediaServerUpdateTool::uploadNextUpdate() {
 
     QnSystemInformation sysInfo = m_pendingUploads.takeFirst();
 
-    foreach (const QnId &peerId, m_idBySystemInformation.values(sysInfo))
+    foreach (const QUuid &peerId, m_idBySystemInformation.values(sysInfo))
         setPeerState(peerId, PeerUpdateInformation::UpdateUploading);
 
-    if (!m_uploader->uploadUpdate(m_updateId, m_updateFiles[sysInfo]->fileName, QSet<QnId>::fromList(m_idBySystemInformation.values(sysInfo))))
+    if (!m_uploader->uploadUpdate(m_updateId, m_updateFiles[sysInfo]->fileName, QSet<QUuid>::fromList(m_idBySystemInformation.values(sysInfo))))
         finishUpdate(UploadingFailed);
 }
 
@@ -483,7 +483,7 @@ void QnMediaServerUpdateTool::at_uploader_finished() {
     if (m_state != UploadingUpdate)
         return;
 
-    foreach (const QnId &peerId, m_uploader->peers()) {
+    foreach (const QUuid &peerId, m_uploader->peers()) {
         m_pendingUploadPeers.remove(peerId);
         m_pendingInstallations.insert(peerId);
         setPeerState(peerId, PeerUpdateInformation::PendingInstallation);
@@ -493,7 +493,7 @@ void QnMediaServerUpdateTool::at_uploader_finished() {
 }
 
 void QnMediaServerUpdateTool::at_uploader_failed() {
-    foreach (const QnId &peerId, m_uploader->peers()) {
+    foreach (const QUuid &peerId, m_uploader->peers()) {
         setPeerState(peerId, PeerUpdateInformation::UpdateFailed);
         finishUpdate(UploadingFailed);
     }
@@ -507,7 +507,7 @@ void QnMediaServerUpdateTool::at_uploader_progressChanged(int progress) {
     emit progressChanged((finished * 100 + current * progress) / peers);
 }
 
-void QnMediaServerUpdateTool::at_uploader_peerProgressChanged(const QnId &peerId, int progress) {
+void QnMediaServerUpdateTool::at_uploader_peerProgressChanged(const QUuid &peerId, int progress) {
     m_updateInformationById[peerId].progress = progress;
     emit peerChanged(peerId);
 }
@@ -552,7 +552,7 @@ void QnMediaServerUpdateTool::at_resourceChanged(const QnResourcePtr &resource) 
        return;
     }
 
-    if (resource->getStatus() == QnResource::Offline)
+    if (resource->getStatus() == Qn::Offline)
         m_restartingServers.remove(resource->getId());
 
     auto it = m_pendingInstallations.find(resource->getId());
@@ -573,8 +573,8 @@ void QnMediaServerUpdateTool::at_resourceChanged(const QnResourcePtr &resource) 
 
     if (m_restartingServers.isEmpty()) {
         bool pending = false;
-        foreach (const QnId &id, m_pendingInstallations) {
-            if (m_updateInformationById[id].server->getStatus() == QnResource::Offline) {
+        foreach (const QUuid &id, m_pendingInstallations) {
+            if (m_updateInformationById[id].server->getStatus() == Qn::Offline) {
                 pending = true;
                 break;
             }
@@ -589,7 +589,7 @@ void QnMediaServerUpdateTool::at_installationTimeout() {
     // disconnect from resource pool and make final check
     disconnect(qnResPool, &QnResourcePool::resourceChanged, this, &QnMediaServerUpdateTool::at_resourceChanged);
 
-    foreach (const QnId &id, m_pendingInstallations) {
+    foreach (const QUuid &id, m_pendingInstallations) {
         if (m_updateInformationById[id].server->getVersion() == m_targetVersion) {
             m_pendingInstallations.remove(id);
             setPeerState(id, PeerUpdateInformation::UpdateFinished);
