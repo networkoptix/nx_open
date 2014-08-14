@@ -80,9 +80,11 @@ namespace aio
         template<class SocketType>
         bool isSocketBeingWatched( SocketType* sock ) const
         {
+            const SocketAIOContext<SocketType>& aioHandlingContext = getAIOHandlingContext<SocketType>();
+
             QMutexLocker lk( &m_mutex );
-            const auto& it = m_impl->sockets.lower_bound( std::make_pair( sock, aio::etNone ) );
-            return it != m_impl->sockets.end() && it->first.first == sock;
+            const auto& it = aioHandlingContext.sockets.lower_bound( std::make_pair( sock, aio::etNone ) );
+            return it != aioHandlingContext.sockets.end() && it->first.first == sock;
         }
 
         QMutex* mutex() const { return &m_mutex; }

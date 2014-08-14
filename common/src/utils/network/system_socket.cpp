@@ -1067,7 +1067,7 @@ bool CommunicatingSocket::isConnected() const
 void CommunicatingSocket::close()
 {
     //checking that socket is not registered in aio
-    assert( !aio::AIOService::instance()->isSocketBeingWatched( m_impl->abstractSocketPtr ) );
+    assert( !aio::AIOService::instance()->isSocketBeingWatched( static_cast<Socket*>(this) ) );
 
     Socket::close();
     m_connected = false;
