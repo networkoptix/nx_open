@@ -6,6 +6,9 @@
 class QnMobileClientMetaTypes {
 public:
     static void initialize();
+
+private:
+    static void registerQmlTypes();
 };
 
 #endif // MOBILE_CLIENT_META_TYPES_H

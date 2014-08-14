@@ -6,20 +6,25 @@
 
 #include <utils/common/instance_storage.h>
 
-#include <nx_ec/ec_api_fwd.h>
+class QnConnectionManager;
 
-class Context: public QObject, public QnInstanceStorage {
+class QnContext: public QObject, public QnInstanceStorage {
     Q_OBJECT
     typedef QObject base_type;
 
+    Q_PROPERTY(QnConnectionManager connectionManager READ connectionManager)
 public:
-    Context(QObject *parent = NULL);
-    virtual ~Context();
+    QnContext(QObject *parent = NULL);
+    virtual ~QnContext();
+
+    QnConnectionManager *connectionManager() const {
+        return m_connectionManager;
+    }
 
 private:
-    QScopedPointer<ec2::AbstractECConnectionFactory> m_connectionFactory;
+    QnConnectionManager *m_connectionManager;
 };
 
-Q_DECLARE_METATYPE(Context *)
+Q_DECLARE_METATYPE(QnContext*)
 
 #endif // CONTEXT_H

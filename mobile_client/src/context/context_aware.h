@@ -5,17 +5,17 @@
 
 #include <QtCore/QObject>
 
-class Context;
+class QnContext;
 
-class ContextAware {
+class QnContextAware {
 public:
-    ContextAware(QObject *parent = NULL);
-    virtual ~ContextAware() {}
+    QnContextAware(QObject *parent = NULL);
+    virtual ~QnContextAware() {}
 
-    Context *context() const;
+    QnContext *context() const;
 
 private:
-    mutable Context *m_context;
+    mutable QnContext *m_context;
 };
 
 #endif // CONTEXT_AWARE_H

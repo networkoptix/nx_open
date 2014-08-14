@@ -6,16 +6,16 @@
 
 #include "context.h"
 
-ContextAware::ContextAware(QObject *parent):
+QnContextAware::QnContextAware(QObject *parent):
     m_context(NULL)
 {
     while(parent) {
-        if(ContextAware *contextAware = dynamic_cast<ContextAware *>(parent)) {
+        if(QnContextAware *contextAware = dynamic_cast<QnContextAware *>(parent)) {
             m_context = contextAware->context();
             return;
         }
 
-        if(Context *context = dynamic_cast<Context *>(parent)) {
+        if(QnContext *context = dynamic_cast<QnContext *>(parent)) {
             m_context = context;
             return;
         }
@@ -24,7 +24,7 @@ ContextAware::ContextAware(QObject *parent):
     }
 }
 
-Context *ContextAware::context() const {
+QnContext *QnContextAware::context() const {
     if(m_context)
         return m_context;
 
@@ -35,7 +35,7 @@ Context *ContextAware::context() const {
     QQmlContext *qmlContext = QtQml::qmlContext(object);
     assert(qmlContext);
 
-    Context *result = qmlContext->contextProperty(lit("context")).value<Context *>();
+    QnContext *result = qmlContext->contextProperty(lit("context")).value<QnContext *>();
     assert(result);
 
     m_context = result;

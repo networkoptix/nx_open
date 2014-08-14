@@ -5,7 +5,7 @@
 
 #include <context/context_aware.h>
 
-class EcConnection : public QObject, public ContextAware {
+class EcConnection : public QObject, public QnContextAware {
     Q_OBJECT
 
 public:

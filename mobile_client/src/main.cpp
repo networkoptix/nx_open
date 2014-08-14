@@ -56,10 +56,11 @@ int runApplication(QGuiApplication *application) {
     QnRuntimeInfoManager::instance()->items()->addItem(runtimeData);
 
 
-    Context context;
+    QnContext context;
 
     QQmlApplicationEngine engine(&context);
-    engine.load(QUrl(QStringLiteral("qrc:///qml/main.qml")));
+    engine.rootContext()->setProperty("context", QVariant::fromValue(&context));
+    engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
 
     int result = application->exec();
 
