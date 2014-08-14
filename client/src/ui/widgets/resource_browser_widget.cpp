@@ -735,6 +735,8 @@ void QnResourceBrowserWidget::at_layout_itemRemoved(QnWorkbenchItem *) {
 void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index) {
     if(index == SearchTab) {
         QnWorkbenchLayout *layout = workbench()->currentLayout();
+        if (!layout || !layout->resource())
+            return;
 
         layoutSynchronizer(layout, true); /* Just initialize the synchronizer. */
         QnResourceSearchProxyModel *model = layoutModel(layout, true);
