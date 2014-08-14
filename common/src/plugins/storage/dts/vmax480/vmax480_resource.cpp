@@ -125,7 +125,7 @@ QnAbstractStreamDataProvider* QnPlVmax480Resource::createArchiveDataProvider()
     QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
     QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
     archiveReader->setArchiveDelegate(archiveDelegate);
-    if (hasFlags(still_image) || hasFlags(utc))
+    if (hasFlags(Qn::still_image) || hasFlags(Qn::utc))
         archiveReader->setCycleMode(false);
     return archiveReader;
 }
