@@ -60,7 +60,10 @@ namespace ec2
         QString newPassword = users.front()->getPassword();
         queryProcessor->processUpdateAsync( tran, 
             [queryProcessor, handler, reqID, users, newPassword]( ec2::ErrorCode errorCode ){
-                if( errorCode == ec2::ErrorCode::ok && queryProcessor->userName() == users.front()->getName() )
+                if( errorCode == ec2::ErrorCode::ok 
+                    && queryProcessor->userName() == users.front()->getName()
+                    && !newPassword.isEmpty()
+                    )
                     queryProcessor->setPassword( newPassword );
                 handler->done( reqID, errorCode, users );
             });

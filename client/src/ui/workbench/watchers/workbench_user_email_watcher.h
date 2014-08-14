@@ -8,9 +8,13 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchUserEmailWatcher : public QObject, public QnWorkbenchContextAware
+#include <utils/common/connective.h>
+
+class QnWorkbenchUserEmailWatcher : public Connective<QObject>, public QnWorkbenchContextAware
 {
     Q_OBJECT
+
+    typedef Connective<QObject> base_type;
 public:
     explicit QnWorkbenchUserEmailWatcher(QObject *parent = 0);
     virtual ~QnWorkbenchUserEmailWatcher();
@@ -25,7 +29,7 @@ private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
-    void at_user_emailChanged(const QnUserResourcePtr &user);
+    void at_user_emailChanged(const QnResourcePtr &resource);
 
 private:
     QHash<QnUserResourcePtr, bool> m_emailValidByUser;
