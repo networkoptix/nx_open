@@ -24,11 +24,11 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     const QnRequestParams &params,
     QnJsonRestResult& result )
 {
-    QString resID = params.value("res_id");
+    QUuid resID = QUuid(params.value("res_id"));
     CameraDiagnostics::Step::Value diagnosticsType = CameraDiagnostics::Step::fromString(params.value("type"));
-    if( resID.isEmpty() || diagnosticsType == CameraDiagnostics::Step::none )
+    if( resID.isNull() || diagnosticsType == CameraDiagnostics::Step::none )
         return nx_http::StatusCode::badRequest;
-
+    
     //retrieving resource
     QnResourcePtr resource = QnResourcePool::instance()->getResourceById( resID );
     if( !resource )

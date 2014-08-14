@@ -6,6 +6,7 @@ static const int MOTION_AGGREGATION_PERIOD = 300 * 1000;
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 
 #include <QtCore/QByteArray>
+#include <QtCore/QMutex>
 #include "core/datapacket/media_data_packet.h"
 #include "core/datapacket/video_data_packet.h"
 #include "decoders/video/ffmpeg.h"

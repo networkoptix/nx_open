@@ -47,7 +47,7 @@ CameraDiagnostics::Result QnStardotStreamReader::openStream()
         {
             if (status == CL_HTTP_AUTH_REQUIRED) 
             {
-                m_resource->setStatus(QnResource::Unauthorized);
+                m_resource->setStatus(Qn::Unauthorized);
                 QUrl requestedUrl;
                 requestedUrl.setHost( m_stardotRes->getHostAddress() );
                 requestedUrl.setPort( m_stardotRes->httpPort() );
@@ -65,7 +65,7 @@ CameraDiagnostics::Result QnStardotStreamReader::openStream()
     m_multiCodec.setRequest(streamUrl);
     const CameraDiagnostics::Result result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
-        m_resource->setStatus(QnResource::Unauthorized);
+        m_resource->setStatus(Qn::Unauthorized);
     return result;
 }
 

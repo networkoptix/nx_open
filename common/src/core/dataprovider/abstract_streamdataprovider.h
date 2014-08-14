@@ -42,7 +42,7 @@ public:
     void disconnectFromResource();
 
     /* One resource may have several providers used with different roles*/
-    virtual void setRole(QnResource::ConnectionRole role);
+    virtual void setRole(Qn::ConnectionRole role);
 signals:
     void videoParamsChanged(AVCodecContext * codec);
     void slowSourceHint();
@@ -55,7 +55,7 @@ protected:
     QList<QnAbstractDataReceptor*> m_dataprocessors;
     mutable QMutex m_mutex;
     QHash<QByteArray, QVariant> m_streamParam;
-    QnResource::ConnectionRole m_role;
+    Qn::ConnectionRole m_role;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

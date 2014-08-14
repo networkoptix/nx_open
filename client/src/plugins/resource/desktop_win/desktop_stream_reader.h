@@ -14,7 +14,7 @@ class QnDesktopStreamreader: public CLServerPushStreamReader {
     Q_OBJECT
 
 public:
-    QnDesktopStreamreader(QnResourcePtr dev);
+    QnDesktopStreamreader(const QnResourcePtr &dev);
     virtual ~QnDesktopStreamreader();
 
 protected:

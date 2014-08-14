@@ -53,7 +53,7 @@ public:
     QnWorkbenchState(): currentLayoutIndex(-1) {}
 
     int currentLayoutIndex;
-    QList<QString> layoutUuids;
+    QList<QUuid> layoutUuids;
 };
 
 /**

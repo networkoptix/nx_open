@@ -28,7 +28,7 @@ struct QnModuleInformation {
     TypeSpecificParamMap parameters;
     QSet<QString> remoteAddresses;
     bool isLocal; //!< true if at least one address from \a remoteHostAddress is a local address
-    QString id;
+    QUuid id;
 
     QnModuleInformation() : isLocal(false) {}
 };
@@ -77,7 +77,7 @@ public:
     QList<QnModuleInformation> revealedModules() const;
 
     //! \param peerList Discovery peer if and only if peer exist in peerList
-    void setAllowedPeers(const QList<QString> peerList) {
+    void setAllowedPeers(const QList<QUuid> &peerList) {
         m_allowedPeers = peerList;
     }
 public slots:
@@ -89,7 +89,7 @@ signals:
                      const QString &remoteAddress,
                      const QString &localInterfaceAddress);
 
-    //!Emmitted when previously found module did not respond to request in predefined timeout
+    //!Emitted when previously found module did not respond to request in predefined timeout
     void moduleLost(const QnModuleInformation &moduleInformation);
 
 protected:
@@ -116,10 +116,10 @@ private:
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;
-    QHash<QString, ModuleContext> m_knownEnterpriseControllers;
+    QHash<QUuid, ModuleContext> m_knownEnterpriseControllers;
     QSet<QString> m_localNetworkAdresses;
     bool m_compatibilityMode;
-    QList<QString> m_allowedPeers;
+    QList<QUuid> m_allowedPeers;
 };
 
 Q_DECLARE_METATYPE(QnModuleInformation)

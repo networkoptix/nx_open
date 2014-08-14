@@ -321,7 +321,7 @@ bool QnBusinessRulesDialog::saveAll() {
     }
 
     //TODO: #GDM #Business replace with QnAppServerReplyProcessor
-    foreach (const QnId& id, m_pendingDeleteRules) {
+    foreach (const QUuid& id, m_pendingDeleteRules) {
         int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->deleteRule(
             id, this, &QnBusinessRulesDialog::at_resources_deleted );
         m_deleting[handle] = id;
@@ -331,7 +331,7 @@ bool QnBusinessRulesDialog::saveAll() {
 }
 
 void QnBusinessRulesDialog::deleteRule(QnBusinessRuleViewModel* ruleModel) {
-    if (ruleModel->id() > 0)
+    if (!ruleModel->id().isNull())
         m_pendingDeleteRules.append(ruleModel->id());
     m_rulesViewModel->deleteRule(ruleModel);
     updateControlButtons();

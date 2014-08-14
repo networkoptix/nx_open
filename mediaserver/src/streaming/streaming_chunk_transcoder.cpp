@@ -152,7 +152,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
                 arg(transcodeParams.srcResourceUniqueID()).arg(transcodeParams.startTimestamp()).arg(transcodeParams.duration()), cl_logDEBUG2 );
 
             //creating archive reader
-            QSharedPointer<QnAbstractStreamDataProvider> dp( cameraResource->createDataProvider( QnResource::Role_Archive ) );
+            QSharedPointer<QnAbstractStreamDataProvider> dp( cameraResource->createDataProvider( Qn::CR_Archive ) );
             if( !dp )
             {
                 NX_LOG( lit("StreamingChunkTranscoder::transcodeAsync. Failed (1) to create archive data provider (resource %1)").
