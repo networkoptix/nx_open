@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     //QnAppServerConnectionFactory::setEC2ConnectionFactory(new ec2::)
 
     QQmlApplicationEngine engine(&context);
-    engine.load(QUrl(QStringLiteral("qrc:///src/main.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:///qml/main.qml")));
 
     return app.exec();
 }
