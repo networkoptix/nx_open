@@ -542,9 +542,11 @@ bool Socket::createSocket(int type, int protocol)
 class CommunicatingSocketPrivate
 :
     public SocketImpl,
-    public aio::AIOEventHandler
+    public aio::AIOEventHandler<Socket>
 {
 public:
+    AbstractCommunicatingSocket* abstractSocketPtr;
+
     std::function<void( SystemError::ErrorCode )> connectHandler;
     size_t connectSendAsyncCallCounter;
 
@@ -565,6 +567,7 @@ public:
 
     CommunicatingSocketPrivate()
     :
+        abstractSocketPtr( nullptr ),
         connectSendAsyncCallCounter( 0 ),
         recvBuffer( nullptr ),
         recvAsyncCallCounter(0),
@@ -590,7 +593,7 @@ public:
             *m_recvHandlerTerminatedFlag = true;
     }
 
-    virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() override
+    virtual void eventTriggered( Socket* sock, aio::EventType eventType ) throw() override
     {
         //TODO #ak break this method to multiple methods
 
@@ -676,7 +679,7 @@ public:
                 //reading to buffer
                 const size_t bufSizeBak = recvBuffer->size();
                 recvBuffer->resize( recvBuffer->capacity() );
-                const int bytesRead = static_cast<AbstractCommunicatingSocket*>(sock)->recv(
+                const int bytesRead = abstractSocketPtr->recv(
                     recvBuffer->data() + bufSizeBak,
                     recvBuffer->capacity() - bufSizeBak );
                 if( bytesRead == -1 )
@@ -709,7 +712,7 @@ public:
 
                     std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_write)> cleanupGuard( this, __finally_write );
 
-                    const int bytesWritten = static_cast<AbstractCommunicatingSocket*>(sock)->send(
+                    const int bytesWritten = abstractSocketPtr->send(
                         sendBuffer->constData() + sendBufPos,
                         sendBuffer->size() - sendBufPos );
                     if( bytesWritten == -1 || bytesWritten == 0 )
@@ -844,20 +847,26 @@ namespace
 }
 #endif
 
-CommunicatingSocket::CommunicatingSocket( AbstractSocket* abstractSocketPtr, int type, int protocol, SocketImpl* sockImpl )
+CommunicatingSocket::CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int type, int protocol, SocketImpl* sockImpl )
 :
-    Socket(type, protocol, sockImpl ? sockImpl : new CommunicatingSocketPrivate()),
-    m_abstractSocketPtr( abstractSocketPtr ),
+    Socket( type, protocol, sockImpl ? sockImpl : new CommunicatingSocketPrivate() ),
     m_connected(false)
 {
+    if( sockImpl )
+        assert( dynamic_cast<CommunicatingSocketPrivate*>(sockImpl) );
+
+    static_cast<CommunicatingSocketPrivate*>(m_impl)->abstractSocketPtr = abstractSocketPtr;
 }
 
-CommunicatingSocket::CommunicatingSocket( AbstractSocket* abstractSocketPtr, int newConnSD, SocketImpl* sockImpl )
+CommunicatingSocket::CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int newConnSD, SocketImpl* sockImpl )
 :
-    Socket(newConnSD, sockImpl ? sockImpl : new CommunicatingSocketPrivate()),
-    m_abstractSocketPtr( abstractSocketPtr ),
+    Socket( newConnSD, sockImpl ? sockImpl : new CommunicatingSocketPrivate() ),
     m_connected(true)   //this constructor is used
 {
+    if( sockImpl )
+        assert( dynamic_cast<CommunicatingSocketPrivate*>(sockImpl) );
+
+    static_cast<CommunicatingSocketPrivate*>(m_impl)->abstractSocketPtr = abstractSocketPtr;
 }
 
 CommunicatingSocket::~CommunicatingSocket()
@@ -868,9 +877,9 @@ CommunicatingSocket::~CommunicatingSocket()
     if( d->threadHandlerIsRunningIn == QThread::currentThreadId() )
     {
         if( d->m_connectSendHandlerTerminatedFlag )
-            aio::AIOService::instance()->removeFromWatch( m_abstractSocketPtr, aio::etWrite );
+            aio::AIOService::instance()->removeFromWatch( static_cast<Socket*>(this), aio::etWrite );
         if( d->m_recvHandlerTerminatedFlag )
-            aio::AIOService::instance()->removeFromWatch( m_abstractSocketPtr, aio::etRead );
+            aio::AIOService::instance()->removeFromWatch( static_cast<Socket*>(this), aio::etRead );
     }
 }
 
@@ -1058,7 +1067,7 @@ bool CommunicatingSocket::isConnected() const
 void CommunicatingSocket::close()
 {
     //checking that socket is not registered in aio
-    assert( !aio::AIOService::instance()->isSocketBeingWatched( m_abstractSocketPtr ) );
+    assert( !aio::AIOService::instance()->isSocketBeingWatched( m_impl->abstractSocketPtr ) );
 
     Socket::close();
     m_connected = false;
@@ -1102,7 +1111,7 @@ void CommunicatingSocket::cancelAsyncIO( aio::EventType eventType, bool waitForR
 {
     CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>(impl());
 
-    aio::AIOService::instance()->removeFromWatch( m_abstractSocketPtr, eventType, waitForRunningHandlerCompletion );
+    aio::AIOService::instance()->removeFromWatch( static_cast<Socket*>(this), eventType, waitForRunningHandlerCompletion );
     std::atomic_thread_fence( std::memory_order_acquire );
     if( d->threadHandlerIsRunningIn == QThread::currentThreadId() )
     {
@@ -1137,7 +1146,7 @@ bool CommunicatingSocket::connectAsyncImpl( const SocketAddress& addr, std::func
 
     QMutexLocker lk( aio::AIOService::instance()->mutex() );
     ++d->connectSendAsyncCallCounter;
-    return aio::AIOService::instance()->watchSocketNonSafe( m_abstractSocketPtr, aio::etWrite, d );
+    return aio::AIOService::instance()->watchSocketNonSafe( static_cast<Socket*>(this), aio::etWrite, d );
 }
 
 bool CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
@@ -1153,7 +1162,7 @@ bool CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<vo
     
     QMutexLocker lk( aio::AIOService::instance()->mutex() );
     ++d->recvAsyncCallCounter;
-    return aio::AIOService::instance()->watchSocketNonSafe( m_abstractSocketPtr, aio::etRead, d );
+    return aio::AIOService::instance()->watchSocketNonSafe( static_cast<Socket*>(this), aio::etRead, d );
 }
 
 bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
@@ -1171,7 +1180,7 @@ bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<vo
 
     QMutexLocker lk( aio::AIOService::instance()->mutex() );
     ++d->connectSendAsyncCallCounter;
-    return aio::AIOService::instance()->watchSocketNonSafe( m_abstractSocketPtr, aio::etWrite, d );
+    return aio::AIOService::instance()->watchSocketNonSafe( static_cast<Socket*>(this), aio::etWrite, d );
 }
 
 
@@ -1407,20 +1416,21 @@ static int acceptWithTimeout( int m_socketHandle, int timeoutMillis = DEFAULT_AC
 class TCPServerSocketPrivate
 :
     public SocketImpl,
-    public aio::AIOEventHandler
+    public aio::AIOEventHandler<Socket>
 {
 public:
     std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> acceptHandler;
     int socketHandle;
     std::atomic<int> acceptAsyncCallCount;
 
-    TCPServerSocketPrivate()
+    TCPServerSocketPrivate( TCPServerSocket* _sock )
     :
-        socketHandle( -1 )
+        socketHandle( -1 ),
+        m_sock( _sock )
     {
     }
 
-    virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() override
+    virtual void eventTriggered( Socket* sock, aio::EventType eventType ) throw() override
     {
         assert( acceptHandler );
 
@@ -1431,7 +1441,7 @@ public:
             case aio::etRead:
             {
                 //accepting socket
-                AbstractStreamSocket* newSocket = dynamic_cast<TCPServerSocket*>(sock)->accept();
+                AbstractStreamSocket* newSocket = m_sock->accept();
                 acceptHandler(
                     newSocket != nullptr ? SystemError::noError : SystemError::getLastOSErrorCode(),
                     newSocket );
@@ -1483,13 +1493,17 @@ public:
         else
         {
             return nullptr;
+        
         }
     }
+
+private:
+    TCPServerSocket* m_sock;
 };
 
 TCPServerSocket::TCPServerSocket()
 :
-    base_type( SOCK_STREAM, IPPROTO_TCP, new TCPServerSocketPrivate() )
+    base_type( SOCK_STREAM, IPPROTO_TCP, new TCPServerSocketPrivate( this ) )
 {
     static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl())->socketHandle = m_implDelegate.handle();
     setRecvTimeout( DEFAULT_ACCEPT_TIMEOUT_MSEC );
@@ -1508,7 +1522,7 @@ bool TCPServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCod
 
     d->acceptHandler = std::move(handler);
     //TODO: #ak usually acceptAsyncImpl is called repeatedly. SHOULD avoid unneccessary watchSocket and removeFromWatch calls
-    return aio::AIOService::instance()->watchSocket( this, aio::etRead, d );
+    return aio::AIOService::instance()->watchSocket( &m_implDelegate, aio::etRead, d );
 }
 
 //!Implementation of AbstractStreamServerSocket::listen
@@ -1748,10 +1762,9 @@ bool UDPSocket::setDestAddr( const QString& foreignAddress, unsigned short forei
 bool UDPSocket::sendTo(
     const void* buffer,
     unsigned int bufferLen,
-    const QString& foreignAddress,
-    unsigned short foreignPort )
+    const SocketAddress& foreignAddress )
 {
-    setDestAddr( foreignAddress, foreignPort );
+    setDestAddr( foreignAddress.address.toString(), foreignAddress.port );  //TODO #ak optimize, remove (to QString); (from QString) operations
     return sendTo( buffer, bufferLen );
 }
 

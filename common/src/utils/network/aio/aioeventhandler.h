@@ -14,6 +14,7 @@
 
 namespace aio
 {
+    template<class SocketType>
     class AIOEventHandler
     {
     public:
@@ -23,7 +24,7 @@ namespace aio
         /*!
             Implementation MUST NOT block otherwise it will result poor performance
         */
-        virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() = 0;
+        virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() = 0;
     };
 }
 

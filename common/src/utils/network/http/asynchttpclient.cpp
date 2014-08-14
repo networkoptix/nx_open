@@ -8,7 +8,6 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QMutexLocker>
 
-//#include "../aio/aioservice.h"
 #include "utils/network/socket_factory.h"
 #include "../../common/log.h"
 #include "../../common/systemerror.h"

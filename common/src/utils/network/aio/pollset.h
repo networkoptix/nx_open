@@ -9,7 +9,7 @@
 #include <cstddef>
 
 
-class AbstractSocket;
+class Socket;
 
 namespace aio
 {
@@ -21,7 +21,7 @@ namespace aio
         etNone = 0,
         etRead = 1,
         etWrite = 2,
-        //!Error occured on socket. Output only event. To get socket error code use \a AbstractSocket::getLastError
+        //!Error occured on socket. Output only event. To get socket error code use \a Socket::getLastError
         etError = 4,
         //!Used for periodic operations and for socket timers
         etTimedOut = 8,
@@ -31,6 +31,8 @@ namespace aio
     };
 
     const char* toString( EventType eventType );
+
+    static const int INFINITE_TIMEOUT = -1;
 
     //!Allows to wait for state change on mutiple sockets
     /*!
@@ -42,8 +44,6 @@ namespace aio
     class PollSet
     {
     public:
-        static const int INFINITE_TIMEOUT = -1;
-
         /*!
             Using iterator in other thread than \a poll() results in undefined behavour
         */
@@ -62,8 +62,8 @@ namespace aio
             //!Selects next socket which state has been changed with previous \a poll call
             const_iterator& operator++();       //++it
 
-            AbstractSocket* socket();
-            const AbstractSocket* socket() const;
+            Socket* socket();
+            const Socket* socket() const;
             /*!
                 \return Triggered event
             */
@@ -99,13 +99,13 @@ namespace aio
             \note Ivalidates all iterators
             \note \a userData is associated with pair (\a sock, \a eventType)
         */
-        bool add( AbstractSocket* const sock, EventType eventType, void* userData = NULL );
+        bool add( Socket* const sock, EventType eventType, void* userData = NULL );
         //!Do not monitor event \a eventType on socket \a sock anymore
         /*!
             \return User data, associated with \a sock and \a eventType. NULL, if \a sock was not found
             \note Ivalidates all iterators to the left of removed element. So, it is ok to iterate signalled sockets and remove current element
         */
-        void* remove( AbstractSocket* const sock, EventType eventType );
+        void* remove( Socket* const sock, EventType eventType );
         //!Returns number of sockets in pollset
         /*!
             Returned value should only be used for compare with \a maxPollSetSize()
@@ -114,7 +114,7 @@ namespace aio
         /*!
             \return NULL if \a sock is not listnened for \a eventType
         */
-        void* getUserData( AbstractSocket* const sock, EventType eventType ) const;
+        void* getUserData( Socket* const sock, EventType eventType ) const;
         /*!
             \param millisToWait if 0, method returns immediatly. If > 0, returns on event or after \a millisToWait milliseconds.
                 If < 0, method blocks till event
@@ -128,7 +128,7 @@ namespace aio
             \note This method is required only because \a select is used on win32. On linux and mac this method always returns \a true
             \todo remove this method after moving windows implementation to IO Completion Ports
         */
-        bool canAcceptSocket( AbstractSocket* const sock ) const;
+        bool canAcceptSocket( Socket* const sock ) const;
 
         //!Returns iterator pointing to first socket, which state has been changed in previous \a poll call
         const_iterator begin() const;

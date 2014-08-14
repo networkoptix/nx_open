@@ -4,7 +4,6 @@
 #include <QtCore/QTimer>
 
 #include "transaction_message_bus.h"
-#include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
 #include "transaction_log.h"
 #include <transaction/chunked_transfer_encoder.h>

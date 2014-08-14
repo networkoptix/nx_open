@@ -15,7 +15,7 @@
 #include "../common/long_runnable.h"
 
 
-class AbstractDatagramSocket;
+class UDPSocket;
 
 //!Makes module to be located in network by \a NetworkOptixModuleFinder instances
 /*!
@@ -46,7 +46,7 @@ protected:
 
 private:
     aio::PollSet m_pollSet;
-    std::vector<AbstractDatagramSocket*> m_sockets;
+    std::vector<UDPSocket*> m_sockets;
     RevealResponse m_revealResponse;
 };
 

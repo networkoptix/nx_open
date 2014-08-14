@@ -214,8 +214,8 @@ class CommunicatingSocket
     public Socket
 {
 public:
-    CommunicatingSocket( AbstractSocket* abstractSocketPtr, int type, int protocol, SocketImpl* sockImpl = nullptr );
-    CommunicatingSocket( AbstractSocket* abstractSocketPtr, int newConnSD, SocketImpl* sockImpl = nullptr );
+    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int type, int protocol, SocketImpl* sockImpl = nullptr );
+    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int newConnSD, SocketImpl* sockImpl = nullptr );
 
     virtual ~CommunicatingSocket();
 
@@ -261,7 +261,6 @@ public:
     unsigned short getForeignPort() const;
 
 private:
-    AbstractSocket* m_abstractSocketPtr;
     bool m_connected;
 };
 
@@ -296,7 +295,7 @@ public:
     }
 
     template<class Param1Type, class Param2Type, class Param3Type>
-    SocketImplementationDelegate( AbstractSocket* abstractSocketPtr, const Param1Type& param1, const Param2Type& param2, const Param3Type& param3 )
+    SocketImplementationDelegate( AbstractCommunicatingSocket* abstractSocketPtr, const Param1Type& param1, const Param2Type& param2, const Param3Type& param3 )
     :
         m_implDelegate( abstractSocketPtr, param1, param2, param3 )
     {
@@ -347,9 +346,8 @@ public:
     //!Implementation of AbstractSocket::handle
     virtual AbstractSocket::SOCKET_HANDLE handle() const override { return m_implDelegate.handle(); }
 
-protected:
-    bool mConnected;
-
+    AbstractSocketMethodsImplementorType* implementationDelegate() { return &m_implDelegate; }
+    const AbstractSocketMethodsImplementorType* implementationDelegate() const { return &m_implDelegate; }
 
 protected:
     AbstractSocketMethodsImplementorType m_implDelegate;
@@ -587,8 +585,7 @@ public:
     virtual bool sendTo(
         const void* buffer,
         unsigned int bufferLen,
-        const QString& foreignAddress,
-        unsigned short foreignPort ) override;
+        const SocketAddress& foreignAddress ) override;
     //!Implementation of AbstractCommunicatingSocket::recv
     /*!
         Actually calls \a UDPSocket::recvFrom and saves datagram source address/port

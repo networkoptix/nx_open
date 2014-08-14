@@ -15,7 +15,6 @@
 #include <utils/common/long_runnable.h>
 #include <utils/common/stoppable.h>
 #include <utils/common/timermanager.h>
-#include <utils/network/aio/aioeventhandler.h>
 #include <utils/network/http/httptypes.h>
 #include <utils/network/http/asynchttpclient.h>
 #include <utils/network/nettools.h>
