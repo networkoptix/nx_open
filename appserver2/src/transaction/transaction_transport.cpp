@@ -107,6 +107,9 @@ void QnTransactionTransport::setStateNoLock(State state)
         */
     }
     else if (state == ReadyForStreaming) {
+        processTransactionData(m_extraData);
+        m_extraData.clear();
+
         if (m_socket) {
             m_socket->setRecvTimeout(SOCKET_TIMEOUT);
             m_socket->setSendTimeout(SOCKET_TIMEOUT);
@@ -363,8 +366,7 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
         m_socket = m_httpClient->takeSocket();
         m_httpClient.reset();
         if (QnTransactionTransport::tryAcquireConnected(m_remotePeer.id, true)) {
-            if (!data.isEmpty())
-                processTransactionData(data);
+            setExtraDataBuffer(data);
             setState(QnTransactionTransport::Connected);
         }
         else {
@@ -440,6 +442,11 @@ QString QnTransactionTransport::toString( State state )
         default:
             return lit("unknown");
     }
+}
+
+void QnTransactionTransport::setExtraDataBuffer(const QByteArray& data) 
+{ 
+    m_extraData = data; 
 }
 
 }

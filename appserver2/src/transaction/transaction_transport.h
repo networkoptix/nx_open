@@ -137,6 +137,7 @@ private:
     typedef QMap<QUuid, QPair<bool, bool>> ConnectingInfoMap;
     static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
     static QMutex m_staticMutex;
+    QByteArray m_extraData;
 private:
     void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
@@ -147,6 +148,7 @@ private:
     void setStateNoLock(State state);
     void cancelConnecting();
     static void connectingCanceledNoLock(const QnId& remoteGuid, bool isOriginator);
+    void setExtraDataBuffer(const QByteArray& data);
 private slots:
     void at_responseReceived( nx_http::AsyncHttpClientPtr );
     void at_httpClientDone(nx_http::AsyncHttpClientPtr);
