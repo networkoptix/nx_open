@@ -203,11 +203,6 @@ void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUs
     }
 }
 
-void QnPlVmax480Resource::setStatus(Status newStatus, bool silenceMode)
-{
-    QnPhysicalCameraResource::setStatus(newStatus, silenceMode);
-}
-
 QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
 {
     QUrl url(getUrl());
