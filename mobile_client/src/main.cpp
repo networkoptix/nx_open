@@ -1,24 +1,88 @@
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
-
 #include <QtQml/QtQml>
 
-#include <context/context.h>
+#include <time.h>
 
-#include <api/app_server_connection.h>
+#include "api/app_server_connection.h"
+#include "api/session_manager.h"
+#include "api/global_settings.h"
+#include "api/runtime_info_manager.h"
+#include "api/network_proxy_factory.h"
+#include "nx_ec/ec2_lib.h"
+#include "common/common_module.h"
+#include "core/resource_management/resource_pool.h"
+#include "utils/common/long_runnable.h"
+#include "plugins/resource/server_camera/server_camera_factory.h"
 
-int main(int argc, char *argv[])
-{
-    QGuiApplication app(argc, argv);
+#include "context/context.h"
+#include "mobile_client/mobile_client_module.h"
+#include "mobile_client/mobile_client_message_processor.h"
 
-    //qmlRegisterType();
+#include "version.h"
+
+int runApplication(QGuiApplication *application) {
+    // these functions should be called in every thread that wants to use rand() and qrand()
+    srand(time(NULL));
+    qsrand(time(NULL));
+
+    QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
+    QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
+
+    QScopedPointer<QnServerCameraFactory> serverCameraFactory(new QnServerCameraFactory());
+
+    //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
+    QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
+
+    /* Initialize connections. */
+    QnAppServerConnectionFactory::setClientGuid(qnCommon->moduleGUID().toString());
+    QnAppServerConnectionFactory::setDefaultFactory(serverCameraFactory.data());
+
+    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
+    ec2::ResourceContext resourceContext(
+        QnServerCameraFactory::instance(),
+        qnResPool,
+        qnResTypePool);
+    ec2ConnectionFactory->setContext(resourceContext);
+    QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.get());
+
+    QScopedPointer<QnMobileClientMessageProcessor> mobileClientMessageProcessor(new QnMobileClientMessageProcessor());
+    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
+
+    ec2::ApiRuntimeData runtimeData;
+    runtimeData.peer.id = qnCommon->moduleGUID();
+    runtimeData.peer.peerType = Qn::PT_MobileClient;
+    runtimeData.brand = lit(QN_PRODUCT_NAME_SHORT);
+    QnRuntimeInfoManager::instance()->items()->addItem(runtimeData);
+
 
     Context context;
-
-    //QnAppServerConnectionFactory::setEC2ConnectionFactory(new ec2::)
 
     QQmlApplicationEngine engine(&context);
     engine.load(QUrl(QStringLiteral("qrc:///qml/main.qml")));
 
-    return app.exec();
+    int result = application->exec();
+
+    QnSessionManager::instance()->stop();
+//    QnResource::stopCommandProc();
+    QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr());
+
+    return result;
+}
+
+int main(int argc, char *argv[]) {
+    QGuiApplication application(argc, argv);
+
+    QnMobileClientModule mobile_client(argc, argv);
+    Q_UNUSED(mobile_client)
+
+    QnSessionManager::instance();
+    QnResourcePool::initStaticInstance(new QnResourcePool());
+
+    int result = runApplication(&application);
+
+    delete QnResourcePool::instance();
+    QnResourcePool::initStaticInstance(0);
+
+    return result;
 }
