@@ -145,7 +145,11 @@ void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int resp
 
     QString urlStr = m_runningIfRequests.value(responseNum);
     QByteArray guid = getGuid().toUtf8();
-    if (response.data.contains("Requested method is absent") || response.data.contains(guid) || response.data.contains("<time><clock>"))
+    if (response.data.contains("Requested method is absent") 
+        || response.data.contains(guid) 
+        || response.data.contains("<time><clock>")
+        || response.data.contains("timeZoneOffset")
+        )
     {
         // server OK
         if (urlStr == QLatin1String("proxy"))
