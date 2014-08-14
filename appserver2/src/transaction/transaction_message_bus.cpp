@@ -602,14 +602,19 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         transport->close();
         break;
     case QnTransactionTransport::Connected:
+    {
+        bool found = false;
         for (int i = 0; i < m_connectingConnections.size(); ++i) 
         {
             if (m_connectingConnections[i] == transport) {
+                Q_ASSERT(!m_connections.contains(transport->remotePeer().id));
                 m_connections[transport->remotePeer().id] = m_connectingConnections[i];
                 m_connectingConnections.removeAt(i);
+                found = true;
                 break;
             }
         }
+        Q_ASSERT(found);
         m_lastTranSeq[transport->remotePeer().id] = 0;
         transport->setState(QnTransactionTransport::ReadyForStreaming);
         // if sync already done or in progress do not send new request
@@ -618,6 +623,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         else
             transport->close();
         break;
+    }
     case QnTransactionTransport::Closed:
         for (int i = m_connectingConnections.size() -1; i >= 0; --i) 
         {
@@ -653,8 +659,6 @@ void QnTransactionMessageBus::at_timer()
 void QnTransactionMessageBus::doPeriodicTasks()
 {
     QMutexLocker lock(&m_mutex);
-
-    m_connectionsToRemove.clear();
 
     // add new outgoing connections
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
@@ -748,8 +752,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     QMutexLocker lock(&m_mutex);
     m_connectingConnections << transport;
     transport->setState(QnTransactionTransport::Connected);
-        if (m_connections.contains(remotePeer.id))
-        m_connectionsToRemove << m_connections[remotePeer.id];
+    Q_ASSERT(!m_connections.contains(remotePeer.id));
 }
 
 void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, const QUuid& peer)

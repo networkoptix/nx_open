@@ -42,6 +42,9 @@ QnTransactionTransport::~QnTransactionTransport()
         m_httpClient->terminate();
 
     closeSocket();
+
+    if (m_connected)
+        connectDone(m_remotePeer.id);
 }
 
 void QnTransactionTransport::ensureSize(std::vector<quint8>& buffer, std::size_t size)
@@ -97,9 +100,11 @@ void QnTransactionTransport::setStateNoLock(State state)
         m_connected = true;
     }
     else if (state == Error) {
+        /*
         if (m_connected)
             connectDone(m_remotePeer.id);
         m_connected = false;
+        */
     }
     else if (state == ReadyForStreaming) {
         if (m_socket) {
