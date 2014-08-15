@@ -541,7 +541,7 @@ void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
         return;
 
     addAlivePeerInfo(peer);
-    handlePeerAliveChanged(peer, true, false);
+    handlePeerAliveChanged(peer, true, true);
 }
 
 void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bool isAlive, bool sendTran) 
@@ -684,7 +684,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
         m_aliveSendTimer.restart();
     if (m_aliveSendTimer.elapsed() > ALIVE_UPDATE_INTERVAL) {
         m_aliveSendTimer.restart();
-        handlePeerAliveChanged(m_localPeer, true, false);
+        handlePeerAliveChanged(m_localPeer, true, true);
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
     qDebug() << "Current transaction state:";
     if (transactionLog)
