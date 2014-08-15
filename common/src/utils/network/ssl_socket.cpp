@@ -932,6 +932,8 @@ public:
     bool isServerSide;
     quint8 extraBuffer[32];
     int extraBufferLen;
+    //!Socket works as regular socket (without encryption until this flag is set to \a true)
+    bool ecnryptionEnabled;
 
     // This model flag will be set up by the interface internally. It just tells
     // the user what our socket will be. An async version or a sync version. We
@@ -949,6 +951,7 @@ public:
         write(nullptr),
         isServerSide( false ),
         extraBufferLen( 0 ),
+        ecnryptionEnabled(false),
         mode(QnSSLSocket::SYNC)
     {
     }
@@ -1047,9 +1050,12 @@ int QnSSLSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*
     return d->wrappedSocket->recv(buffer, bufferLen);
 }
 
-int QnSSLSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/)
+int QnSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(QnSSLSocket);
+    if( !d->ecnryptionEnabled )
+        return d->wrappedSocket->recv( buffer, bufferLen, flags );
+
     d->mode = QnSSLSocket::SYNC;
     if (!SSL_is_init_finished(d->ssl)) {
         if (d->isServerSide)
@@ -1069,6 +1075,10 @@ int QnSSLSocket::sendInternal( const void* buffer, unsigned int bufferLen )
 int QnSSLSocket::send( const void* buffer, unsigned int bufferLen )
 {
     Q_D(QnSSLSocket);
+
+    if( !d->ecnryptionEnabled )
+        return d->wrappedSocket->send( buffer, bufferLen );
+
     d->mode = QnSSLSocket::SYNC;
     if (!SSL_is_init_finished(d->ssl)) {
         if (d->isServerSide)
@@ -1083,6 +1093,7 @@ int QnSSLSocket::send( const void* buffer, unsigned int bufferLen )
 bool QnSSLSocket::reopen()
 {
     Q_D(QnSSLSocket);
+    d->ecnryptionEnabled = false;
     return d->wrappedSocket->reopen();
 }
 
@@ -1116,6 +1127,7 @@ bool QnSSLSocket::connect(
                      unsigned int timeoutMillis)
 {
     Q_D(QnSSLSocket);
+    d->ecnryptionEnabled = true;
     return d->wrappedSocket->connect(foreignAddress, foreignPort, timeoutMillis);
 }
 
@@ -1256,6 +1268,22 @@ AbstractSocket::SOCKET_HANDLE QnSSLSocket::handle() const
 {
     Q_D(const QnSSLSocket);
     return d->wrappedSocket->handle();
+}
+
+bool QnSSLSocket::connectWithoutEncryption(
+    const QString& foreignAddress,
+    unsigned short foreignPort,
+    unsigned int timeoutMillis )
+{
+    Q_D( const QnSSLSocket );
+    return d->wrappedSocket->connect( foreignAddress, foreignPort, timeoutMillis );
+}
+
+bool QnSSLSocket::enableClientEncryption()
+{
+    Q_D( QnSSLSocket );
+    d->ecnryptionEnabled = true;
+    return doClientHandshake();
 }
 
 void QnSSLSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )

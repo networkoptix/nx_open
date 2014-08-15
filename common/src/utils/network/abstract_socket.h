@@ -306,6 +306,27 @@ public:
     virtual bool getConnectionStatistics( StreamSocketInfo* info ) = 0;
 };
 
+//!Stream socket with encryption
+/*!
+    In most cases, \a AbstractStreamSocket interface is enough. This one is needed for SMTP/TLS, for example
+*/
+class AbstractEncryptedStreamSocket
+:
+    public AbstractStreamSocket
+{
+public:
+    //!Connect to remote host without performing SSL handshake
+    /*!
+        \a AbstractCommunicatingSocket::connect connects and performs handshake. This method is required for SMTP/TLS, for example
+    */
+    virtual bool connectWithoutEncryption(
+        const QString& foreignAddress,
+        unsigned short foreignPort,
+        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) = 0;
+    //!Do SSL handshake and use encryption on succeeding data exchange
+    virtual bool enableClientEncryption() = 0;
+};
+
 //!Interface for server socket, accepting stream connections
 /*!
     \note This socket has default recv timeout of 250ms for backward compatibility
@@ -315,15 +336,6 @@ class AbstractStreamServerSocket
     public AbstractSocket
 {
 public:
-    //!This class for internal use only. MAY be removed or changed in future
-    class AbstractAsyncAcceptHandler
-    {
-    public:
-        virtual ~AbstractAsyncAcceptHandler() {}
-        virtual void onNewConnection( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection ) = 0;
-    };
-
-
     virtual ~AbstractStreamServerSocket() {}
 
     //!Start listening for incoming connections
@@ -356,9 +368,6 @@ public:
         }
 
 protected:
-    /*!
-        \param handler This SHOULD be freed by implementation
-    */
     virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) = 0;
 };
 

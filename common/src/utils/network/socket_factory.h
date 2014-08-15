@@ -26,6 +26,9 @@ public:
     };
 
     static AbstractDatagramSocket* createDatagramSocket();
+    /*!
+        \param sslRequired If \a true than it is guaranteed that returned object can be safely cast to \a AbstractEncryptedStreamSocket
+    */
     static AbstractStreamSocket* createStreamSocket( bool sslRequired = false, NatTraversalType natTraversalRequired = nttAuto );
     static AbstractStreamServerSocket* createStreamServerSocket( bool sslRequired = false, NatTraversalType natTraversalRequired = nttAuto );
 

@@ -17,7 +17,7 @@ typedef struct bio_st BIO; /* This one is from OpenSSL, which we don't want to i
 class QnSSLSocketPrivate;
 class QnMixedSSLSocketPrivate;
 
-class QnSSLSocket: public AbstractStreamSocket
+class QnSSLSocket : public AbstractEncryptedStreamSocket
 {
 public:
     QnSSLSocket(AbstractStreamSocket* wrappedSocket, bool isServerSide);
@@ -66,6 +66,14 @@ public:
     //!Implementation of AbstractSocket::getLastError
     virtual bool getLastError(SystemError::ErrorCode* errorCode) override;
     virtual SOCKET_HANDLE handle() const override;
+
+    //!Implementation of AbstractEncryptedStreamSocket::connectWithoutEncryption
+    virtual bool connectWithoutEncryption(
+        const QString& foreignAddress,
+        unsigned short foreignPort,
+        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
+    //!Implementation of AbstractEncryptedStreamSocket::enableClientEncryption
+    virtual bool enableClientEncryption() override;
 
     bool doServerHandshake();
     bool doClientHandshake();
