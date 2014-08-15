@@ -599,7 +599,7 @@ namespace ec2
         }
     }
 
-    void TimeSynchronizationManager::onPeerLost( ApiPeerAliveData data, bool /*isProxy*/ )
+    void TimeSynchronizationManager::onPeerLost( ApiPeerAliveData data )
     {
         QMutexLocker lk( &m_mutex );
         m_systemTimeByPeer.erase( data.peer.id );

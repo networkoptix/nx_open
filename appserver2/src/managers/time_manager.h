@@ -208,7 +208,7 @@ namespace ec2
 
     private slots:
         void onNewConnectionEstablished( const QnTransactionTransportPtr& transport );
-        void onPeerLost( ApiPeerAliveData data, bool isProxy );
+        void onPeerLost( ApiPeerAliveData data );
         void onDbManagerInitialized();
     };
 }
