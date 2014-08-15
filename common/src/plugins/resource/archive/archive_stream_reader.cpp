@@ -3,6 +3,9 @@
 #ifdef ENABLE_ARCHIVE
 
 #include "stdint.h"
+
+#include <core/resource/resource.h>
+
 #include "utils/common/util.h"
 #include "utils/media/externaltimesource.h"
 #include "utils/common/synctime.h"
@@ -67,16 +70,24 @@ QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
 
-    m_isStillImage = dev->hasFlags(QnResource::still_image);
+    m_isStillImage = dev->hasFlags(Qn::still_image);
+
+    if (dev->hasFlags(Qn::still_image) ||                           // disable cycle mode for images
+       (
+        (dev->hasFlags(Qn::utc) || dev->hasFlags(Qn::live))         // and for live non-local cameras
+            && !dev->hasFlags(Qn::local))
+       )      
+        m_cycleMode = false;
+
     // Should init packets here as some times destroy (av_free_packet) could be called before init
-    //connect(dev.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onStatusChanged(QnResource::Status, QnResource::Status)));
+    //connect(dev.data(), SIGNAL(statusChanged(Qn::ResourceStatus, Qn::ResourceStatus)), this, SLOT(onStatusChanged(Qn::ResourceStatus, Qn::ResourceStatus)));
 
 }
 
 /*
-QnArchiveStreamReader::onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
+QnArchiveStreamReader::onStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus)
 {
-    if (newStatus == QnResource::Offline)
+    if (newStatus == Qn::Offline)
         m_delegate->close();
 }
 */

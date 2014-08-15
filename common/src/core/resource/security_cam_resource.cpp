@@ -46,7 +46,7 @@ QnSecurityCamResource::QnSecurityCamResource():
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_motionMaskList << QnMotionRegion();
 
-    addFlags(live_cam);
+    addFlags(Qn::live_cam);
 
     m_cameraControlDisabled = !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
 
@@ -141,11 +141,11 @@ QSize QnSecurityCamResource::getMaxSensorSize() const {
 }
 
 #ifdef ENABLE_DATA_PROVIDERS
-QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(QnResource::ConnectionRole role) {
-    if (role == QnResource::Role_LiveVideo || role == QnResource::Role_Default || role == QnResource::Role_SecondaryLiveVideo)
+QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(Qn::ConnectionRole role) {
+    if (role == Qn::CR_LiveVideo || role == Qn::CR_Default || role == Qn::CR_SecondaryLiveVideo)
     {
 
-        if (role == QnResource::Role_SecondaryLiveVideo && !hasDualStreaming2())
+        if (role == Qn::CR_SecondaryLiveVideo && !hasDualStreaming2())
             return 0;
 
         QnAbstractStreamDataProvider* result = createLiveDataProvider();
@@ -153,7 +153,7 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
         return result;
 
     }
-    else if (role == QnResource::Role_Archive) {
+    else if (role == Qn::CR_Archive) {
         QnAbstractStreamDataProvider* result = createArchiveDataProvider();
         if (result)
             return result;

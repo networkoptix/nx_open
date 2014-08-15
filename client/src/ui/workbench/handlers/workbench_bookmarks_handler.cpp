@@ -74,7 +74,7 @@ QnMediaServerResourcePtr QnWorkbenchBookmarksHandler::getMediaServerOnTime(const
     if (time == DATETIME_NOW)
         return currentServer;
 
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera->getPhysicalId());
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera);
     if (!history)
         return currentServer;
 
@@ -98,7 +98,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
     QnMediaServerResourcePtr server = getMediaServerOnTime(camera, period.startTimeMs);
-    if (!server || server->getStatus() != QnResource::Online) {
+    if (!server || server->getStatus() != Qn::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
             tr("Bookmark can only be added to an online server.")); //TODO: #Elric ec2 update text if needed
@@ -131,7 +131,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
     QnMediaServerResourcePtr server = getMediaServerOnTime(camera, bookmark.startTimeMs);
-    if (!server || server->getStatus() != QnResource::Online) {
+    if (!server || server->getStatus() != Qn::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
             tr("Bookmark can only be edited on an online server.")); //TODO: #Elric ec2 update text if needed
@@ -158,7 +158,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
     QnMediaServerResourcePtr server = getMediaServerOnTime(camera, bookmark.startTimeMs);
-    if (!server || server->getStatus() != QnResource::Online) {
+    if (!server || server->getStatus() != Qn::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
             tr("Bookmark can only be deleted from an online server.")); //TODO: #Elric ec2 update text if needed

@@ -116,7 +116,7 @@ QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractSt
 
 void QnMediaResource::initMediaResource()
 {
-    toResource()->addFlags(QnResource::media);
+    toResource()->addFlags(Qn::media);
 }
 
 QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const {

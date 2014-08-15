@@ -18,6 +18,7 @@ class QnSmtpSettingsWidget : public QnAbstractPreferencesWidget, public QnWorkbe
 {
     Q_OBJECT
 
+    typedef QnAbstractPreferencesWidget base_type;
 public:
     explicit QnSmtpSettingsWidget(QWidget *parent = 0);
     ~QnSmtpSettingsWidget();
@@ -27,10 +28,13 @@ public:
 
     virtual bool hasChanges() const override;
 
+    virtual bool confirm() override;
+    virtual bool discard() override;
 private:
     QnEmail::Settings settings() const;
-    void stopTesting(QString result);
-    void loadSettings(QString server, QnEmail::ConnectionType connectionType, int port = 0);
+    void stopTesting(const QString &result = QString());
+    void finishTesting();
+    void loadSettings(const QString &server, QnEmail::ConnectionType connectionType, int port = 0);
     void updateFocusedElement();
 
     void validateEmailSimple();
@@ -40,7 +44,6 @@ private slots:
     void at_testButton_clicked();
 
     void at_cancelTestButton_clicked();
-    void at_okTestButton_clicked();
 
     void at_timer_timeout();
 

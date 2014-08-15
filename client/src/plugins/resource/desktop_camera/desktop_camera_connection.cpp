@@ -108,7 +108,7 @@ void QnDesktopCameraConnectionProcessor::processRequest()
     if (method == "PLAY")
     {
         if (d->dataProvider == 0) {
-            d->dataProvider = d->desktop->createDataProvider(QnResource::Role_Default);
+            d->dataProvider = d->desktop->createDataProvider(Qn::CR_Default);
             d->dataConsumer = new QnDesktopCameraDataConsumer(this);
             d->dataProvider->addDataProcessor(d->dataConsumer);
             d->dataConsumer->start();
@@ -182,14 +182,16 @@ void QnDesktopCameraConnectionProcessor::sendData(const char* data, int len)
 
 // --------------- QnDesktopCameraconnection ------------------
 
-QnDesktopCameraConnection::QnDesktopCameraConnection(QnDesktopResource* owner, QnMediaServerResourcePtr mServer):
+QnDesktopCameraConnection::QnDesktopCameraConnection(QnDesktopResource* owner, const QnMediaServerResourcePtr &mServer):
     QnLongRunnable(),
     m_owner(owner),
     m_mServer(mServer),
     connection(0),
     processor(0)
 {
-
+    m_auth.username = QnAppServerConnectionFactory::url().userName();
+    m_auth.password = QnAppServerConnectionFactory::url().password();
+    m_auth.clientGuid = QnAppServerConnectionFactory::clientGuid();
 }
 
 QnDesktopCameraConnection::~QnDesktopCameraConnection()
@@ -229,11 +231,11 @@ void QnDesktopCameraConnection::run()
             connection = 0;
 
             QAuthenticator auth;
-            auth.setUser(QnAppServerConnectionFactory::url().userName());
-            auth.setPassword(QnAppServerConnectionFactory::url().password());
+            auth.setUser(m_auth.username);
+            auth.setPassword(m_auth.password);
             connection = new CLSimpleHTTPClient(m_mServer->getApiUrl(), CONNECT_TIMEOUT, auth);
             connection->addHeader("user-name", auth.user().toUtf8());
-            connection->addHeader("user-id", QnAppServerConnectionFactory::clientGuid().toUtf8());
+            connection->addHeader("user-id", m_auth.clientGuid.toUtf8());
         }
 
         CLHttpStatus status = connection->doGET(QByteArray("desktop_camera"));

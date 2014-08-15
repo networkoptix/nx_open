@@ -344,7 +344,7 @@ NameHelper::NameHelper()
 
     foreach(QnResourceTypePtr rt, typeMap) {
 
-        if (rt->getParentId() == 0)
+        if (rt->getParentId().isNull())
             continue;
 
         QString normalizedManufacturer = rt->getManufacture().toLower().replace(UNNEEDED_CHARACTERS, QString());

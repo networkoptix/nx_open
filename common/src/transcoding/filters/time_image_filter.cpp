@@ -77,7 +77,7 @@ void QnTimeImageFilter::initTimeDrawing(CLVideoDecoderOutput* frame, const QStri
     m_timeImg = new QImage(m_imageBuffer, drawWidth, drawHeight, drawWidth*4, QImage::Format_ARGB32_Premultiplied);
 }
 
-void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect)
+void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar)
 {
     switch(m_dateTextPos)
     {

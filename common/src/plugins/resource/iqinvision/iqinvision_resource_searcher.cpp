@@ -26,7 +26,7 @@ QnPlIqResourceSearcher::QnPlIqResourceSearcher()
 {
 }
 
-QnResourcePtr QnPlIqResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlIqResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -146,7 +146,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
 
     QnPlIqResourcePtr resource ( new QnPlIqResource() );
 
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (rt.isNull())
     {
         // try with default camera name
@@ -206,7 +206,7 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const Q
     }
 
     QString nameStr = QString::fromLatin1(name);
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), nameStr);
+    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), nameStr);
     if (rt.isNull()) {
         qWarning() << "Unregistered IQvision camera type:" << name;
         return;

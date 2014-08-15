@@ -428,7 +428,7 @@ void QnThumbnailsLoader::process() {
             outFrame->setUseExternalData(false);
 
             while (frame) {
-                if (!m_resource->hasFlags(QnResource::utc))
+                if (!m_resource->hasFlags(Qn::utc))
                     frame->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
 
                 timingsQueue << frame->timestamp;

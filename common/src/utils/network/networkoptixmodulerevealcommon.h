@@ -42,7 +42,7 @@ public:
     QString customization;
     QString name;
     //!random string, unique for particular module instance
-    QString seed;
+    QUuid seed;
     TypeSpecificParamMap typeSpecificParameters;
 
     bool serialize(quint8 ** const bufStart, const quint8 *bufEnd);

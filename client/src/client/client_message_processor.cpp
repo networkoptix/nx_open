@@ -20,7 +20,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     if (connection) {
         assert(!m_connected);
         assert(qnCommon->remoteGUID().isNull());
-        qnCommon->setRemoteGUID(connection->connectionInfo().ecsGuid);
+        qnCommon->setRemoteGUID(QUuid(connection->connectionInfo().ecsGuid));
         connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
         connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
     } else if (m_connected) { // double init by null is allowed
@@ -35,12 +35,15 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     }
 }
 
-void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
+void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) {
     resource->setStatus(status);
     checkForTmpStatus(resource);
 }
 
-void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
+void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) 
+{
+    QnCommonMessageProcessor::updateResource(resource);
+
     QnResourcePtr ownResource;
 
     ownResource = qnResPool->getResourceById(resource->getId());
@@ -83,19 +86,19 @@ void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
     // process tmp status
     if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) 
     {
-        if (mediaServer->getStatus() == QnResource::Offline)
-            updateServerTmpStatus(mediaServer->getId(), QnResource::Offline);
+        if (mediaServer->getStatus() == Qn::Offline)
+            updateServerTmpStatus(mediaServer->getId(), Qn::Offline);
         else
-            updateServerTmpStatus(mediaServer->getId(), QnResource::NotDefined);
+            updateServerTmpStatus(mediaServer->getId(), Qn::NotDefined);
     }
     else if (QnServerCameraPtr serverCamera = resource.dynamicCast<QnServerCamera>()) 
     {
         QnMediaServerResourcePtr mediaServer = qnResPool->getResourceById(serverCamera->getParentId()).dynamicCast<QnMediaServerResource>();
         if (mediaServer) {
-            if (mediaServer->getStatus() ==QnResource::Offline)
-                serverCamera->setTmpStatus(QnResource::Offline);
+            if (mediaServer->getStatus() ==Qn::Offline)
+                serverCamera->setTmpStatus(Qn::Offline);
             else
-                serverCamera->setTmpStatus(QnResource::NotDefined);
+                serverCamera->setTmpStatus(Qn::NotDefined);
         }
     }
 }
@@ -112,7 +115,7 @@ void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr
     resource->determineOptimalNetIF();
 }
 
-void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource::Status status)
+void QnClientMessageProcessor::updateServerTmpStatus(const QUuid& id, Qn::ResourceStatus status)
 {
     QnResourcePtr server = qnResPool->getResourceById(id);
     if (!server)
@@ -124,7 +127,7 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource:
     }
 }
 
-void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy)
+void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
 {
     if (qnCommon->remoteGUID().isNull()) {
         qWarning() << "at_remotePeerFound received while disconnected";
@@ -134,14 +137,13 @@ void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bo
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-    assert(!isProxy);
     assert(!m_connected);
     
     m_connected = true;
     emit connectionOpened();
 }
 
-void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy)
+void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
 {
     if (qnCommon->remoteGUID().isNull()) {
         qWarning() << "at_remotePeerLost received while disconnected";
@@ -152,7 +154,6 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, boo
         return;
 
 
-    Q_ASSERT_X(!isProxy, Q_FUNC_INFO, "!isProxy");
     Q_ASSERT_X(m_connected, Q_FUNC_INFO, "m_connected");
 
     m_connected = false;

@@ -6,7 +6,7 @@
 #include <utils/common/email.h>
 
 QnWorkbenchUserEmailWatcher::QnWorkbenchUserEmailWatcher(QObject *parent) :
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent)
 {
     connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
@@ -37,7 +37,7 @@ void QnWorkbenchUserEmailWatcher::at_resourcePool_resourceAdded(const QnResource
     if(!user)
         return;
 
-    connect(user.data(), SIGNAL(emailChanged(const QnUserResourcePtr &)), this, SLOT(at_user_emailChanged(const QnUserResourcePtr &)));
+    connect(user, &QnUserResource::emailChanged, this, &QnWorkbenchUserEmailWatcher::at_user_emailChanged);
 
     at_user_emailChanged(user);
 }
@@ -55,7 +55,11 @@ void QnWorkbenchUserEmailWatcher::at_resourcePool_resourceRemoved(const QnResour
     m_emailValidByUser.remove(user);
 }
 
-void QnWorkbenchUserEmailWatcher::at_user_emailChanged(const QnUserResourcePtr &user) {
+void QnWorkbenchUserEmailWatcher::at_user_emailChanged(const QnResourcePtr &resource) {
+    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+    if (!user)
+        return;
+
     bool valid = QnEmail::isValid(user->getEmail());
     if (m_emailValidByUser.contains(user) && m_emailValidByUser[user] == valid)
         return;

@@ -760,7 +760,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     }
 
 #ifdef QN_ENABLE_BOOKMARKS
-    action(Qn::ToggleBookmarksSearchAction)->setEnabled(m_currentMediaWidget && m_currentWidget->resource()->flags() & QnResource::utc);
+    action(Qn::ToggleBookmarksSearchAction)->setEnabled(m_currentMediaWidget && m_currentWidget->resource()->flags() & Qn::utc);
 #endif
 
     updateLocalOffset();
@@ -794,13 +794,13 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
         if(m_currentWidget->resource().dynamicCast<QnSecurityCamResource>())
             flags |= WidgetSupportsLive | WidgetSupportsPeriods;
 
-        if(m_currentWidget->resource()->flags() & QnResource::periods)
+        if(m_currentWidget->resource()->flags() & Qn::periods)
             flags |= WidgetSupportsPeriods;
 
-        if(m_currentWidget->resource()->flags() & QnResource::utc)
+        if(m_currentWidget->resource()->flags() & Qn::utc)
             flags |= WidgetUsesUTC;
 
-        if(m_currentWidget->resource()->flags() & QnResource::sync)
+        if(m_currentWidget->resource()->flags() & Qn::sync)
             flags |= WidgetSupportsSync;
 
         QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
@@ -825,7 +825,7 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
 void QnWorkbenchNavigator::updateSliderOptions() {
     m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetFlags & WidgetUsesUTC);
 
-    bool selectionEditable = workbench()->currentLayout()->resource(); //&& (workbench()->currentLayout()->resource()->flags() & QnResource::local_media) != QnResource::local_media;
+    bool selectionEditable = workbench()->currentLayout()->resource(); //&& (workbench()->currentLayout()->resource()->flags() & Qn::local_media) != Qn::local_media;
     m_timeSlider->setOption(QnTimeSlider::SelectionEditable, selectionEditable);
     if(!selectionEditable)
         m_timeSlider->setSelectionValid(false);
@@ -913,7 +913,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
             QVector<qint64> indicators;
             foreach(QnResourceWidget *widget, display()->widgets())
                 if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-                    if (mediaWidget != m_currentMediaWidget && mediaWidget->resource()->toResource()->hasFlags(QnResource::sync))
+                    if (mediaWidget != m_currentMediaWidget && mediaWidget->resource()->toResource()->hasFlags(Qn::sync))
                         indicators.push_back(mediaWidget->display()->camera()->getCurrentTime() / 1000);
             m_timeSlider->setIndicators(indicators);
         } else {
@@ -1072,12 +1072,12 @@ void QnWorkbenchNavigator::updateLines() {
         m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, false);
     } else {
         bool isSearch = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>().step > 0;
-        bool isLocal = m_currentWidget && m_currentWidget->resource()->flags().testFlag(QnResource::local);
+        bool isLocal = m_currentWidget && m_currentWidget->resource()->flags().testFlag(Qn::local);
 
         bool hasNonLocalResource = !isLocal;
         if (!hasNonLocalResource) {
             foreach(const QnResourceWidget *widget, m_syncedWidgets) {
-                if (widget->resource() && !widget->resource()->flags().testFlag(QnResource::local)) {
+                if (widget->resource() && !widget->resource()->flags().testFlag(Qn::local)) {
                     hasNonLocalResource = true;
                     break;
                 }
@@ -1486,7 +1486,7 @@ void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
-    if(widget->resource()->flags() & QnResource::sync) {
+    if(widget->resource()->flags() & Qn::sync) {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)){
             addSyncedWidget(mediaWidget);
             connect(mediaWidget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
@@ -1502,7 +1502,7 @@ void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *w
     disconnect(widget, NULL, this, NULL);
     disconnect(widget->resource(), NULL, this, NULL);
 
-    if(widget->resource()->flags() & QnResource::sync)
+    if(widget->resource()->flags() & Qn::sync)
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
             removeSyncedWidget(mediaWidget);
 }

@@ -24,7 +24,7 @@ QnAviResource::QnAviResource(const QString& file)
     QString shortName = QFileInfo(file).fileName();
     setName(shortName.mid(shortName.indexOf(QLatin1Char('?'))+1));
     if (FileTypeSupport::isImageFileExt(file)) 
-        addFlags(QnResource::still_image);
+        addFlags(Qn::still_image);
     m_timeZoneOffset = Qn::InvalidUtcOffset;
 }
 
@@ -46,7 +46,7 @@ QnAviArchiveDelegate* QnAviResource::createArchiveDelegate() const
     return aviDelegate;
 }
 
-QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(ConnectionRole /*role*/)
+QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Qn::ConnectionRole /*role*/)
 {
     if (FileTypeSupport::isImageFileExt(getUrl())) {
         return new QnSingleShotFileStreamreader(toSharedPointer());
@@ -55,9 +55,6 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Connecti
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
 
     result->setArchiveDelegate(createArchiveDelegate());
-    if (hasFlags(still_image) || hasFlags(utc))
-        result->setCycleMode(false);
-
     return result;
 }
 

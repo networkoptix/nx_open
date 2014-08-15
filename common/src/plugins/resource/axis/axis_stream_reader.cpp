@@ -57,10 +57,10 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 
-    //setRole(QnResource::Role_SecondaryLiveVideo);
+    //setRole(Qn::CR_SecondaryLiveVideo);
 
     //==== init if needed
-    QnResource::ConnectionRole role = getRole();
+    Qn::ConnectionRole role = getRole();
     m_rtpStreamParser.setRole(role);
     QnPlAxisResourcePtr res = getResource().dynamicCast<QnPlAxisResource>();
 
@@ -85,7 +85,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
         profileSufix = QString::number(res->getChannelNumAxis());
     }
 
-    if (role == QnResource::Role_LiveVideo)
+    if (role == Qn::CR_LiveVideo)
     {
         profileName = QString(lit("%1Primary%2")).arg(lit(QN_PRODUCT_NAME_SHORT)).arg(profileSufix).toUtf8();
         profileDescription = QString(lit("%1 Primary Stream")).arg(lit(QN_PRODUCT_NAME_SHORT)).toUtf8();
@@ -109,7 +109,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
         {
             if (status == CL_HTTP_AUTH_REQUIRED)
             {
-                getResource()->setStatus(QnResource::Unauthorized);
+                getResource()->setStatus(Qn::Unauthorized);
                 return CameraDiagnostics::NotAuthorisedResult( res->getUrl() );
             }
             else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned) 
@@ -144,7 +144,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
     // ------------------- determine stream parameters ----------------------------
     float fps = getFps();
     const QnPlAxisResource::AxisResolution& resolution = res->getResolution(
-        role == QnResource::Role_LiveVideo
+        role == Qn::CR_LiveVideo
             ? QnPlAxisResource::PRIMARY_ENCODER_INDEX
             : QnPlAxisResource::SECONDARY_ENCODER_INDEX );
 
@@ -182,13 +182,13 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
 
         if (status == CL_HTTP_AUTH_REQUIRED)
         {
-            getResource()->setStatus(QnResource::Unauthorized);
+            getResource()->setStatus(Qn::Unauthorized);
             return CameraDiagnostics::NotAuthorisedResult( res->getUrl() );
         }
         else if (status != CL_HTTP_SUCCESS)
             return CameraDiagnostics::RequestFailedResult(CameraDiagnostics::RequestFailedResult(streamProfile, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status))));
 
-        if (role != QnResource::Role_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
+        if (role != Qn::CR_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
         {
             res->setMotionMaskPhysical(0);
         }
@@ -343,7 +343,7 @@ void QnAxisStreamReader::pleaseStop()
 
 QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
 {
-    if (getRole() == QnResource::Role_LiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid) 
+    if (getRole() == Qn::CR_LiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid) 
         m_axisRes->readMotionInfo();
 
     if (!isStreamOpened()) {

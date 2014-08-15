@@ -1,5 +1,7 @@
 #include "email_manager_impl.h"
 
+#include <memory>
+
 #include <api/global_settings.h>
 #include <api/model/email_attachment.h>
 

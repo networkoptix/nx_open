@@ -74,7 +74,7 @@
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>        
         <toolchain.version>none</toolchain.version>            
 
-        <additional.defines/>
+        <additional.defines>DISABLE_BOOKMARKS</additional.defines>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) --> 
         <qtlib1>Core</qtlib1>
@@ -318,6 +318,7 @@
                 <platform>windows</platform>
                 <compiler>msvc2012u3</compiler>
                 <arch>x64</arch>
+				<box>win78</box>
                 <force_x86>false</force_x86>
                 <qt.spec>win32-msvc2012</qt.spec>
 				<PlatformToolSet>v110</PlatformToolSet>

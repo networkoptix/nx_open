@@ -121,14 +121,17 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     action(Qn::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
     /* Remove all remote resources. */
-    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
     resourcePool()->removeResources(remoteResources);
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
-    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>())
-        if(snapshotManager()->isLocal(layout) 
-            && !snapshotManager()->isFile(layout))  //do not remove exported layouts
-            resourcePool()->removeResource(layout);
+    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>()) {
+        bool isLocal = snapshotManager()->isLocal(layout);
+        bool isFile = snapshotManager()->isFile(layout);
+        if(isLocal && isFile)  //do not remove exported layouts
+            continue;
+        resourcePool()->removeResource(layout);
+    }
 
     qnLicensePool->reset();
     context()->instance<QnAppServerNotificationCache>()->clear();

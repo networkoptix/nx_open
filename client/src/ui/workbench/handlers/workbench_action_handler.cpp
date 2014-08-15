@@ -26,6 +26,7 @@
 
 #include <common/common_module.h>
 
+#include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
@@ -340,9 +341,9 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
 
     {
         //TODO: #GDM #Common refactor duplicated code
-        bool isServer = resource->hasFlags(QnResource::server);
-        bool isMediaResource = resource->hasFlags(QnResource::media);
-        bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
+        bool isServer = resource->hasFlags(Qn::server);
+        bool isMediaResource = resource->hasFlags(Qn::media);
+        bool isLocalResource = resource->hasFlags(Qn::url | Qn::local | Qn::media)
                 && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
         bool isExportedLayout = snapshotManager()->isFile(layout);
 
@@ -557,7 +558,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         workbench()->update(state);
 
         /* Delete orphaned layouts. */
-        foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(QnId()).filtered<QnLayoutResource>())
+        foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(QUuid()).filtered<QnLayoutResource>())
             if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
                 resourcePool()->removeResource(layout);
     }
@@ -753,49 +754,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
-
-    QnWorkbenchStreamSynchronizer *synchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
-
-    /* if synchronizer is running now and we want to add an item to the scene with the specified time, synchronization should be disabled. */
-    if (parameters.hasArgument(Qn::ItemTimeRole) && synchronizer->isRunning())
-        synchronizer->stop();
-
-    bool hasNonLocalItems = false;
-    foreach (QnWorkbenchItem *item, workbench()->currentLayout()->items()) {
-        QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
-        if (!resource->hasFlags(QnResource::local)) {
-            hasNonLocalItems = true;
-            break;
-        }
-    }
-
-    if (hasNonLocalItems && synchronizer->isRunning() && !navigator()->isLive() && parameters.widgets().isEmpty()) {
-        // split resources in two groups: local and non-local and specify different initial time for them
-        // TODO: #dklychkov add ability to specify different time for resources and then simplify the code below
-        QnResourceList resources = parameters.resources();
-        QnResourceList localResources;
-        foreach (const QnResourcePtr &resource, resources) {
-            if (resource->flags().testFlag(QnResource::local)) {
-                localResources.append(resource);
-                resources.removeOne(resource);
-            }
-        }
-        if (!localResources.isEmpty()) {
-            parameters.setResources(localResources);
-            menu()->trigger(Qn::OpenInLayoutAction, parameters);
-        }
-        if (!resources.isEmpty()) {
-            parameters.setResources(resources);
-            parameters.setArgument(Qn::ItemTimeRole, navigator()->timeSlider()->sliderPosition());
-
-            QnStreamSynchronizationState synchronizerState = synchronizer->state();
-            synchronizer->stop();
-            menu()->trigger(Qn::OpenInLayoutAction, parameters);
-            synchronizer->setState(synchronizerState);
-        }
-    } else {
-        menu()->trigger(Qn::OpenInLayoutAction, parameters);
-    }
+    menu()->trigger(Qn::OpenInLayoutAction, parameters);
 }
 
 void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
@@ -809,7 +768,7 @@ void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
 
     QnResourceList filtered;
     foreach (const QnResourcePtr &resource, parameters.resources()) {
-        if (resource->hasFlags(QnResource::media) || resource->hasFlags(QnResource::server))
+        if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::server))
             filtered << resource;
     }
     if (filtered.isEmpty())
@@ -884,11 +843,11 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
             continue;
 
         camera->setParentId(server->getId());
-        camera->setStatus(QnResource::Offline);
+        camera->setStatus(Qn::Offline);
         modifiedResources.push_back(camera);
 
-        if (server->getStatus() == QnResource::Offline)
-            camera->setStatus(QnResource::Offline);
+        if (server->getStatus() == Qn::Offline)
+            camera->setStatus(Qn::Offline);
     }
 
     if(!errorResources.empty()) {
@@ -940,11 +899,11 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
             menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
         } else {
             QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
-            if (layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout)) {
+            if (layout->hasFlags(Qn::url | Qn::local | Qn::layout)) {
                 bool hasLocal = false;
                 foreach (const QnResourcePtr &resource, resources) {
                     //TODO: #GDM #Common refactor duplicated code
-                    hasLocal |= resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
+                    hasLocal |= resource->hasFlags(Qn::url | Qn::local | Qn::media)
                             && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
                     if (hasLocal)
                         break;
@@ -1301,7 +1260,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     } else {
         /* In this case we want to adjust the period. */
 
-        if(resource->flags() & QnResource::utc) {
+        if(resource->flags() & Qn::utc) {
             QDateTime startDateTime = QDateTime::fromMSecsSinceEpoch(period.startTimeMs);
             QDateTime endDateTime = QDateTime::fromMSecsSinceEpoch(period.endTimeMs());
             const qint64 dayMSecs = 1000ll * 60 * 60 * 24;
@@ -1408,7 +1367,7 @@ void QnWorkbenchActionHandler::at_pictureSettingsAction_triggered() {
         return;
 
     QScopedPointer<QnPictureSettingsDialog> dialog;
-    if (resource->hasFlags(QnResource::remote))
+    if (resource->hasFlags(Qn::remote))
         dialog.reset(new QnWorkbenchStateDependentDialog<QnPictureSettingsDialog>(mainWindow()));
     else
         dialog.reset(new QnPictureSettingsDialog(mainWindow()));
@@ -1621,12 +1580,12 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
 
 bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resource, const QString &newName) const {
     /* Only users and videowall should be checked. Layouts are checked separately, servers and cameras can have the same name. */
-    QnResource::Flags checkedFlags = resource->flags() & (QnResource::user | QnResource::videowall);
+    Qn::ResourceFlags checkedFlags = resource->flags() & (Qn::user | Qn::videowall);
     if (!checkedFlags)
         return true;
 
     /* Resource cannot have both of these flags at once. */
-    Q_ASSERT(checkedFlags == QnResource::user || checkedFlags == QnResource::videowall);
+    Q_ASSERT(checkedFlags == Qn::user || checkedFlags == Qn::videowall);
 
     foreach (const QnResourcePtr &resource, qnResPool->getResources()) {
         if (!resource->hasFlags(checkedFlags))
@@ -1634,11 +1593,11 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
         if (resource->getName() != newName)
             continue;
 
-        QString title = checkedFlags == QnResource::user
+        QString title = checkedFlags == Qn::user
             ? tr("User already exists.")
             : tr("Video Wall already exists");
 
-        QString message = checkedFlags == QnResource::user 
+        QString message = checkedFlags == Qn::user 
             ? tr("User with the same name already exists")
             : tr("Video Wall with the same name already exists");
 
@@ -1810,7 +1769,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     foreach(const QnResourcePtr &resource, resources) {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
         if (!camera ||
-            camera->getStatus() == QnResource::Offline || 
+            camera->getStatus() == Qn::Offline || 
             camera->isManuallyAdded()) 
                 continue;
         onlineAutoDiscoveredCameras << camera;
@@ -2316,8 +2275,6 @@ void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
 void QnWorkbenchActionHandler::at_escapeHotkeyAction_triggered() {
     if (action(Qn::ToggleTourModeAction)->isChecked())
         menu()->trigger(Qn::ToggleTourModeAction);
-    else
-        menu()->trigger(Qn::EffectiveMaximizeAction);
 }
 
 void QnWorkbenchActionHandler::at_clearCacheAction_triggered() {

@@ -23,7 +23,7 @@ QnPhysicalCameraResource::QnPhysicalCameraResource():
     QnVirtualCameraResource(),
     m_channelNumber(0)
 {
-    setFlags(local_live_cam);
+    setFlags(Qn::local_live_cam);
 }
 
 int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const

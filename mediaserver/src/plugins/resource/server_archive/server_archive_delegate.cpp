@@ -93,8 +93,8 @@ bool QnServerArchiveDelegate::open(const QnResourcePtr &resource)
     Q_ASSERT(netResource != 0);
     m_dialQualityHelper.setResource(netResource);
 
-    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getPhysicalId().toUtf8(), QnServer::HiQualityCatalog);
-    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getPhysicalId().toUtf8(), QnServer::LowQualityCatalog);
+    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getUniqueId(), QnServer::HiQualityCatalog);
+    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getUniqueId(), QnServer::LowQualityCatalog);
 
     m_currentChunkCatalog = m_quality == MEDIA_Quality_Low ? m_catalogLow : m_catalogHi;
     m_opened = true;
