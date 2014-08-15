@@ -240,7 +240,7 @@ void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent *event) {
     QScopedPointer<QPainter> painter(new QPainter(this));
 
     int halfLineWidth = m_lineWidth / 2;
-    QRect targetRect = event->rect().adjusted(halfLineWidth, halfLineWidth, -halfLineWidth, -halfLineWidth);
+    QRect targetRect = rect().adjusted(halfLineWidth, halfLineWidth, -halfLineWidth, -halfLineWidth);
 
     if (targetRect != m_cachedRect || m_cachedImage.isNull()) {
         m_cachedRect = targetRect;
@@ -249,8 +249,8 @@ void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent *event) {
 
     /* Update target rect to be in the center of the source rect and match the image size */
     targetRect.setSize(m_cachedImage.size());
-    targetRect.moveLeft( (event->rect().width() - targetRect.width()) / 2 );
-    targetRect.moveTop( (event->rect().height() - targetRect.height()) / 2 );
+    targetRect.moveLeft( (rect().width() - targetRect.width()) / 2 );
+    targetRect.moveTop( (rect().height() - targetRect.height()) / 2 );
 
     painter->drawImage(targetRect, m_cachedImage);
 
