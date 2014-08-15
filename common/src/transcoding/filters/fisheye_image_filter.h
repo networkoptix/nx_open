@@ -15,14 +15,14 @@ class QnFisheyeImageFilter: public QnAbstractImageFilter
 public:
     QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDewarping, const QnItemDewarpingParams& itemDewarping);
 
-    virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect) override;
+    virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar) override;
 
     static QSize getOptimalSize(const QSize& srcResolution, const QnItemDewarpingParams& itemDewarpingParams);
 
 private:
-    void updateFisheyeTransform(const QSize& imageSize, int plane);
-    void updateFisheyeTransformRectilinear(const QSize& imageSize, int plane);
-    void updateFisheyeTransformEquirectangular(const QSize& imageSize, int plane);
+    void updateFisheyeTransform(const QSize& imageSize, int plane, qreal ar);
+    void updateFisheyeTransformRectilinear(const QSize& imageSize, int plane, qreal ar);
+    void updateFisheyeTransformEquirectangular(const QSize& imageSize, int plane, qreal ar);
 
 private:
     static const int MAX_COLOR_PLANES = 4;

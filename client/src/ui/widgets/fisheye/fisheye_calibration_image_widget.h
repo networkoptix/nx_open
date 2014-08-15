@@ -12,12 +12,14 @@ class QnFisheyeAnimatedCircle: public QObject {
     Q_OBJECT
     Q_PROPERTY(QPointF  center      READ center     WRITE setCenter)
     Q_PROPERTY(qreal    radius      READ radius     WRITE setRadius)
+    Q_PROPERTY(qreal    stretch     READ stretch    WRITE setStretch)
 
 public:
     explicit QnFisheyeAnimatedCircle(QObject *parent = 0):
         QObject(parent),
         m_center(0.5, 0.5),
-        m_radius(0.5)
+        m_radius(0.5),
+        m_stretch(1.0)
         {}
 
     QPointF center() const { return m_center; }
@@ -26,11 +28,15 @@ public:
     qreal   radius() const {return m_radius;}
     Q_SLOT  void setRadius(qreal radius) {m_radius = radius; emit changed();}
 
+    qreal   stretch() const {return m_stretch;}
+    Q_SLOT  void setStretch(qreal stretch) {m_stretch = stretch; emit changed();}
+
 signals:
     void changed();
 private:
     QPointF m_center;
     qreal   m_radius;
+    qreal   m_stretch;
 };
 
 class QnFisheyeCalibrationImageWidget : public QWidget, public DragProcessHandler
@@ -41,6 +47,7 @@ class QnFisheyeCalibrationImageWidget : public QWidget, public DragProcessHandle
     Q_PROPERTY(QColor   lineColor   READ lineColor  WRITE setLineColor)
     Q_PROPERTY(QPointF  center      READ center     WRITE setCenter)
     Q_PROPERTY(qreal    radius      READ radius     WRITE setRadius)
+    Q_PROPERTY(qreal    stretch     READ stretch    WRITE setStretch)
     Q_PROPERTY(int      lineWidth   READ lineWidth  WRITE setLineWidth)
 
     typedef QWidget base_type;
@@ -62,6 +69,9 @@ public:
 
     qreal   radius() const;
     Q_SLOT  void setRadius(qreal radius);
+
+    qreal   stretch() const;
+    Q_SLOT  void setStretch(qreal stretch);
 
     int     lineWidth() const;
     Q_SLOT  void setLineWidth(int width);
@@ -85,7 +95,7 @@ protected:
     virtual void wheelEvent(QWheelEvent *event) override;
 
 private:
-    void paintCircle(QPainter* painter, const QRect &targetRect, const QPointF &relativeCenter, const qreal relativeRadius);
+    void paintCircle(QPainter* painter, const QRect &targetRect, const QPointF &relativeCenter, const qreal relativeRadius, const qreal xStretch);
 
     void finishAnimationStep();
     Q_SLOT void endAnimation();
@@ -111,6 +121,7 @@ private:
     QColor  m_lineColor;
     QPointF m_center;
     qreal   m_radius;
+    qreal   m_stretch;
     int     m_lineWidth;
 };
 
