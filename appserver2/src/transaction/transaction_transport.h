@@ -156,7 +156,6 @@ private:
     nx_http::AsyncHttpClientPtr m_httpClient;
     State m_state;
     /*std::vector<quint8>*/ nx::Buffer m_readBuffer;
-    size_t m_readBufferLen;
     int m_chunkHeaderLen;
     size_t m_chunkLen;
     int m_sendOffset;
