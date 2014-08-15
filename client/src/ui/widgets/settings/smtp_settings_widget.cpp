@@ -281,6 +281,26 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
         return;
     }
 
+    QnMediaServerResourcePtr serverResource;
+    QnMediaServerResourceList servers = qnResPool->getAllServers();
+    if (!servers.isEmpty()) {
+        serverResource = servers.first();
+        foreach(QnMediaServerResourcePtr mserver, servers)
+        {
+            if (mserver->getServerFlags() & Qn::SF_HasPublicIP) {
+                serverResource = mserver;
+                break;
+            }
+        }
+    }
+    QnMediaServerConnectionPtr serverConnection = serverResource
+        ? serverResource->apiConnection()
+        : NULL;
+    if (!serverConnection) {
+        QMessageBox::warning(this, tr("Network Error"), tr("Could not perform a test. None of your servers has a public IP."));
+        return;
+    }
+
     ui->controlsWidget->setEnabled(false);
 
     ui->testServerLabel->setText(result.server);
@@ -304,27 +324,8 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     m_timeoutTimer->setInterval(testSmtpTimeoutMSec / ui->testProgressBar->maximum());
     m_timeoutTimer->start();
 
-    QnMediaServerResourcePtr serverResource;
-    QnMediaServerResourceList servers = qnResPool->getAllServers();
-    if (!servers.isEmpty()) {
-        serverResource = servers.first();
-        foreach(QnMediaServerResourcePtr mserver, servers)
-        {
-            if (mserver->getServerFlags() & Qn::SF_HasPublicIP) {
-                serverResource = mserver;
-                break;
-            }
-        }
-    }
-    if (!serverResource)
-        return;
-
-    QnMediaServerConnectionPtr serverConnection = serverResource->apiConnection();
-    if (!serverConnection)
-        return;
-
-    m_testHandle = serverConnection->testEmailSettingsAsync( result, this, SLOT(at_testEmailSettingsFinished(int, const QnTestEmailSettingsReply& , int)));
     ui->stackedWidget->setCurrentIndex(TestingPage);
+    m_testHandle = serverConnection->testEmailSettingsAsync( result, this, SLOT(at_testEmailSettingsFinished(int, const QnTestEmailSettingsReply& , int)));       
 }
 
 void QnSmtpSettingsWidget::at_testEmailSettingsFinished(int status, const QnTestEmailSettingsReply& reply, int handle)
