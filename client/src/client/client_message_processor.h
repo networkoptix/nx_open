@@ -20,8 +20,8 @@ protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) override;
     virtual void processResources(const QnResourceList& resources) override;
 private slots:
-    void at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);
-    void at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy);
+    void at_remotePeerFound(ec2::ApiPeerAliveData data);
+    void at_remotePeerLost(ec2::ApiPeerAliveData data);
 private:
     void determineOptimalIF(const QnMediaServerResourcePtr &resource);
     void updateServerTmpStatus(const QUuid& id, Qn::ResourceStatus status);

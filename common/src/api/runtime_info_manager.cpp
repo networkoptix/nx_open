@@ -20,7 +20,7 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
             m_items->addItem(info);
     });
 
-    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerLost,     this, [this](const ec2::ApiPeerAliveData &data, bool){
+    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerLost,     this, [this](const ec2::ApiPeerAliveData &data){
         m_items->removeItem(data.peer.id);
     });
 

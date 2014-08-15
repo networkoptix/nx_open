@@ -127,7 +127,7 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QUuid& id, Qn::Resour
     }
 }
 
-void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy)
+void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
 {
     if (qnCommon->remoteGUID().isNull()) {
         qWarning() << "at_remotePeerFound received while disconnected";
@@ -137,14 +137,13 @@ void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bo
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-    assert(!isProxy);
     assert(!m_connected);
     
     m_connected = true;
     emit connectionOpened();
 }
 
-void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy)
+void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
 {
     if (qnCommon->remoteGUID().isNull()) {
         qWarning() << "at_remotePeerLost received while disconnected";
@@ -155,7 +154,6 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, boo
         return;
 
 
-    Q_ASSERT_X(!isProxy, Q_FUNC_INFO, "!isProxy");
     Q_ASSERT_X(m_connected, Q_FUNC_INFO, "m_connected");
 
     m_connected = false;

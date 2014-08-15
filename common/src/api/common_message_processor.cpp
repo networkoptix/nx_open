@@ -117,7 +117,7 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 * EC2 related processing. Need move to other class
 */
 
-void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool /*isProxy*/)
+void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
 {
     QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
     if (res)
@@ -125,7 +125,7 @@ void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bo
 
 }
 
-void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool /*isProxy*/)
+void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
 {
     QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
     if (res) {

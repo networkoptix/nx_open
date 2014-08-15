@@ -99,8 +99,8 @@ namespace ec2
         AlivePeersMap aliveServerPeers() const;
 
     signals:
-        void peerLost(ApiPeerAliveData data, bool isProxy);
-        void peerFound(ApiPeerAliveData data, bool isProxy);
+        void peerLost(ApiPeerAliveData data);
+        void peerFound(ApiPeerAliveData data);
 
         void gotLockRequest(ApiLockData);
         //void gotUnlockRequest(ApiLockData);
@@ -169,7 +169,7 @@ namespace ec2
 
         void connectToPeerEstablished(const ApiPeerData &peerInfo);
         void connectToPeerLost(const QUuid& id);
-        void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool isProxy);
+        void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool sendTran);
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QUuid& gotFromID);
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
@@ -177,7 +177,7 @@ namespace ec2
         void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader);
 
         void addAlivePeerInfo(ApiPeerData peerData, const QUuid& gotFromPeer = QUuid());
-        void removeAlivePeer(const QUuid& id, bool isProxy);
+        void removeAlivePeer(const QUuid& id, bool sendTran, bool isRecursive = false);
         bool doHandshake(QnTransactionTransport* transport);
         void printTranState(const QnTranState& tranState);
     private slots:
