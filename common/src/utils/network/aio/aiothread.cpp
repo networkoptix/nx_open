@@ -168,7 +168,7 @@ namespace aio
 
             QMutexLocker lk( mutex );
 
-            for( std::deque<SocketAddRemoveTaskType>::iterator
+            for( typename std::deque<SocketAddRemoveTaskType>::iterator
                 it = pollSetModificationQueue.begin();
                 it != pollSetModificationQueue.end();
                  )
@@ -245,10 +245,10 @@ namespace aio
         {
             Q_UNUSED(eventHandler)
 
-                for( std::deque<SocketAddRemoveTaskType>::iterator
-                it = pollSetModificationQueue.begin();
-                it != pollSetModificationQueue.end();
-                ++it )
+                for( typename std::deque<SocketAddRemoveTaskType>::iterator
+                    it = pollSetModificationQueue.begin();
+                    it != pollSetModificationQueue.end();
+                    ++it )
             {
                 if( it->socket == sock && it->eventType == eventType && it->type != taskType )
                 {
@@ -273,7 +273,7 @@ namespace aio
         //!Processes events from \a pollSet
         void processSocketEvents( const qint64 curClock )
         {
-            for( PollSetType::const_iterator
+            for( typename PollSetType::const_iterator
                 it = pollSet.begin();
                 it != pollSet.end();
                 ++it )
@@ -307,7 +307,7 @@ namespace aio
                 {
                     //taking task from queue
                     QMutexLocker lk( &periodicTasksMutex );
-                    std::multimap<qint64, PeriodicTaskDataType>::iterator it = periodicTasksByClock.begin();
+                    typename std::multimap<qint64, PeriodicTaskDataType>::iterator it = periodicTasksByClock.begin();
                     if( it == periodicTasksByClock.end() || it->first > curClock )
                         break;
                     periodicTaskData = it->second;
@@ -433,7 +433,7 @@ namespace aio
         //    return m_impl->addSockToPollset( sock, eventToWatch, timeoutMs, eventHandler );
         //}
 
-        m_impl->pollSetModificationQueue.push_back( AIOThreadImplType::SocketAddRemoveTaskType(
+        m_impl->pollSetModificationQueue.push_back( typename AIOThreadImplType::SocketAddRemoveTaskType(
             sock,
             eventToWatch,
             eventHandler,
@@ -487,7 +487,7 @@ namespace aio
         {
             std::atomic<int> taskCompletedCondition( 0 );
             //we MUST remove socket from pollset before returning from here
-            m_impl->pollSetModificationQueue.push_back( AIOThreadImplType::SocketAddRemoveTaskType( sock, eventType, NULL, TaskType::tRemoving, 0, &taskCompletedCondition ) );
+            m_impl->pollSetModificationQueue.push_back( typename AIOThreadImplType::SocketAddRemoveTaskType( sock, eventType, NULL, TaskType::tRemoving, 0, &taskCompletedCondition ) );
 
             m_impl->pollSet.interrupt();
 

@@ -112,7 +112,7 @@ static qint64 actsTimeToUTCMillis( const char* actsStr )
     return ((qint64)utcTime - tp.timezone * SEC_PER_MIN) * MILLIS_PER_SEC;
 }
 
-void DaytimeNISTFetcher::onConnectionEstablished( SystemError::ErrorCode errorCode )
+void DaytimeNISTFetcher::onConnectionEstablished( SystemError::ErrorCode errorCode ) noexcept
 {
     if( errorCode )
     {
@@ -128,7 +128,7 @@ void DaytimeNISTFetcher::onConnectionEstablished( SystemError::ErrorCode errorCo
         m_handlerFunc( -1, SystemError::getLastOSErrorCode() );
 }
 
-void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
+void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead ) noexcept
 {
     if( errorCode )
     {

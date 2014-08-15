@@ -11,7 +11,7 @@
 
 #include <QtCore/QThread>
 
-#include "aio/aioservice.h"
+#include "aioservice.h"
 #include "../abstract_socket.h"
 
 

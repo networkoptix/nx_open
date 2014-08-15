@@ -78,4 +78,15 @@ namespace aio
         threadCountArgValue = threadCount;
         return aioServiceInstance();
     }
+
+    template<> AIOService::SocketAIOContext<Socket>& AIOService::getAIOHandlingContext()
+    {
+        return m_systemSocketAIO;
+    }
+
+    template<> const AIOService::SocketAIOContext<Socket>& AIOService::getAIOHandlingContext() const
+    {
+        return m_systemSocketAIO;
+    }
+
 }

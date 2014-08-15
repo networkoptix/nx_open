@@ -112,7 +112,7 @@ namespace aio
 
             //checking, if that socket is already monitored
             const std::pair<SocketType*, aio::EventType>& sockCtx = std::make_pair( sock, eventToWatch );
-            std::map<typename std::pair<SocketType*, aio::EventType>, typename SocketAIOContext<SocketType>::AIOThreadType*>::iterator
+            typename std::map<typename std::pair<SocketType*, aio::EventType>, typename SocketAIOContext<SocketType>::AIOThreadType*>::iterator
                 it = aioHandlingContext.sockets.lower_bound( sockCtx );
             if( it != aioHandlingContext.sockets.end() && it->first == sockCtx )
                 return true;    //socket already monitored for eventToWatch
@@ -145,7 +145,7 @@ namespace aio
             if( !threadToUse )
             {
                 //creating new thread
-                std::unique_ptr<typename SocketAIOContext<SocketType>::AIOThreadType> newThread( new SocketAIOContext<SocketType>::AIOThreadType( &m_mutex ) );
+                std::unique_ptr<typename SocketAIOContext<SocketType>::AIOThreadType> newThread( new typename SocketAIOContext<SocketType>::AIOThreadType( &m_mutex ) );
                 newThread->start();
                 if( !newThread->isRunning() )
                     return false;
@@ -172,7 +172,7 @@ namespace aio
             SocketAIOContext<SocketType>& aioHandlingContext = getAIOHandlingContext<SocketType>();
 
             const std::pair<SocketType*, aio::EventType>& sockCtx = std::make_pair( sock, eventType );
-            std::map<typename std::pair<SocketType*, aio::EventType>, typename SocketAIOContext<SocketType>::AIOThreadType*>::iterator
+            typename std::map<typename std::pair<SocketType*, aio::EventType>, typename SocketAIOContext<SocketType>::AIOThreadType*>::iterator
                 it = aioHandlingContext.sockets.find( sockCtx );
             if( it != aioHandlingContext.sockets.end() )
             {
@@ -200,11 +200,9 @@ namespace aio
         SocketAIOContext<Socket> m_systemSocketAIO;
         mutable QMutex m_mutex;
 
-        template<class SocketType> SocketAIOContext<SocketType>& getAIOHandlingContext() { static_assert( false, "Bad socket type" ); }
-        template<class SocketType> const SocketAIOContext<SocketType>& getAIOHandlingContext() const { static_assert( false, "Bad socket type" ); }
+        template<class SocketType> SocketAIOContext<SocketType>& getAIOHandlingContext();
+        template<class SocketType> const SocketAIOContext<SocketType>& getAIOHandlingContext() const;// { static_assert( false, "Bad socket type" ); }
 
-        template<> SocketAIOContext<Socket>& getAIOHandlingContext<Socket>() { return m_systemSocketAIO; }
-        template<> const SocketAIOContext<Socket>& getAIOHandlingContext<Socket>() const { return m_systemSocketAIO; }
     };
 }
 

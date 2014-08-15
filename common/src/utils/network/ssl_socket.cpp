@@ -225,13 +225,13 @@ private:
 // 4) Concurrent issue async operation leads to undefined behavior. So
 // lucky, no lock is here :)
 
+static const std::size_t bio_input_buffer_reserve = 1024;
+static const std::size_t bio_output_buffer_reserve= 2048;
+static const std::size_t async_buffer_default_size= 1024;
+static const int ssl_internal_error = 100;
+
 class async_ssl {
 public:
-    static const std::size_t bio_input_buffer_reserve = 1024;
-    static const std::size_t bio_output_buffer_reserve= 2048;
-    static const std::size_t async_buffer_default_size= 1024;
-    static const int ssl_internal_error = 100;
-
     async_ssl( SSL* ssl , bool server , AbstractStreamSocket* socket ) ;
 
     // This function is invoked by the BIO function
@@ -423,7 +423,7 @@ private:
                         // the buffered data has been consumed 
                         eof_ = true;
                     } else {
-                        Q_ASSERT(bytes_transferred == buffer.write_buffer->size());
+                        Q_ASSERT(bytes_transferred == (std::size_t)buffer.write_buffer->size());
                         // append the buffer that has been written into 
                         // to the bio_in_buffer_ and later on SSL will use
                         bio_in_buffer_.append(*buffer.write_buffer);
@@ -444,7 +444,7 @@ private:
                         op->error(ec);
                         return;
                     }
-                    Q_ASSERT( bytes_transferred == buffer.read_buffer->size() && 
+                    Q_ASSERT( bytes_transferred == (std::size_t)buffer.read_buffer->size() && 
                               buffer.read_buffer == &bio_out_buffer_  );
                     // since we have already sent the buffer there
                     bio_out_buffer_.resize(0); 
@@ -462,7 +462,7 @@ private:
                 op->error(ec);
                 return;
             }
-            Q_ASSERT( bytes_transferred == buffer.read_buffer->size() && 
+            Q_ASSERT( bytes_transferred == (std::size_t)buffer.read_buffer->size() && 
                       buffer.read_buffer == &bio_out_buffer_ );
             // since we have already sent the buffer there
             bio_out_buffer_.resize(0); 
@@ -687,8 +687,8 @@ void async_ssl::async_handshake( const std::function<void(SystemError::ErrorCode
 }
 
 async_ssl::async_ssl( SSL* ssl , bool server , AbstractStreamSocket* socket ) :
-    ssl_shutdown_(false),
     eof_(false),
+    ssl_shutdown_(false),
     server_(server),
     ssl_(ssl),
     socket_(socket),

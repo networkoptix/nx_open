@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hole_punching_mediator</artifactId>
     <packaging>pom</packaging>
-    <name>${company.name} Mediator</name>    
+    <name>HD Witness Mediator</name>    
 
     <properties>
         <product.title>${company.name} Mediator</product.title>  

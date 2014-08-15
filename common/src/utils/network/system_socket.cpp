@@ -989,7 +989,7 @@ bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
     struct tcp_info tcpinfo;
     memset( &tcpinfo, 0, sizeof(tcpinfo) );
     socklen_t tcp_info_length = sizeof(tcpinfo);
-    if( getsockopt( sockDesc, SOL_TCP, TCP_INFO, (void *)&tcpinfo, &tcp_info_length ) != 0 )
+    if( getsockopt( m_implDelegate.handle(), SOL_TCP, TCP_INFO, (void *)&tcpinfo, &tcp_info_length ) != 0 )
         return false;
     info->rttVar = tcpinfo.tcpi_rttvar / USEC_PER_MSEC;
     return true;

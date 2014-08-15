@@ -274,7 +274,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 
     //TODO #ak it makes sense to use here some chunk parser class. At this moment http chunk parsing logic is implemented 
     //3 times in different parts of our code (async http client, sync http server and here)
-    assert( m_readBufferLen < m_readBuffer.capacity() );
+    assert( m_readBufferLen < (size_t)m_readBuffer.capacity() );
     m_readBufferLen += bytesRead;
 
     for( size_t readBufPos = 0;; )
@@ -299,7 +299,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 
         //have just read http chunk
         const size_t fullChunkSize = m_chunkHeaderLen + m_chunkLen + sizeof( "\r\n" ) - 1;
-        if( m_readBuffer.capacity() < fullChunkSize )
+        if( (size_t)m_readBuffer.capacity() < fullChunkSize )
             m_readBuffer.reserve( fullChunkSize );
 
         if( m_readBufferLen < fullChunkSize )
@@ -359,7 +359,7 @@ void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_
     if( errorCode )
         return setStateNoLock( State::Error );
 
-    assert( bytesSent == m_dataToSend.front().encodedSourceData.size() );
+    assert( bytesSent == (size_t)m_dataToSend.front().encodedSourceData.size() );
 
     m_dataToSend.pop_front();
     if( m_dataToSend.empty() )
@@ -448,9 +448,9 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
     }
 
     if (bufferLen > 0) {
-        if( m_readBuffer.size() < bufferLen )
+        if( (size_t)m_readBuffer.size() < bufferLen )
             m_readBuffer.resize(bufferLen);
-        memcpy(&m_readBuffer[0], buffer, bufferLen);
+        memcpy(m_readBuffer.data(), buffer, bufferLen);
     }
     m_readBufferLen = bufferLen;
 }
