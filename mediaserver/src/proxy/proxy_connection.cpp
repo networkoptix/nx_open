@@ -297,10 +297,10 @@ void QnProxyConnectionProcessor::doRawProxy()
         if (rez < 1)
             return; // error or timeout
 
-        if( fds[0].revents & POLLIN )
+        if( fds[0].revents )
             if( !doProxyData( d->socket.data(), d->dstSocket.data(), buffer, sizeof( buffer ) ) )
                 return;
-        if( fds[1].revents & POLLIN )
+        if( fds[1].revents )
             if( !doProxyData( d->dstSocket.data(), d->socket.data(), buffer, sizeof( buffer ) ) )
                 return;
 
@@ -352,7 +352,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
         //    if( it.eventType() != aio::etRead )
         //        return;
             //if( it.socket() == d->socket )
-            if( fds[0].revents & POLLIN )
+            if( fds[0].revents )    //if polled returned connection closed or error state, recv will fail and we will process error
             {
                 int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
                 if (readed < 1) 
@@ -402,7 +402,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
             }
 
             //else if( it.socket() == d->dstSocket )
-            if( fds[1].revents & POLLIN )
+            if( fds[1].revents )
             {
                 if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer, sizeof(buffer)))
                     return;
