@@ -267,8 +267,10 @@ void QnTransactionTransport::cancelConnecting()
 
 void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
 {
+    QMutexLocker lock(&m_mutex);
+
     if( errorCode || bytesRead == 0 )   //error or connection closed
-        return setState( State::Error );
+        return setStateNoLock( State::Error );
 
     assert( m_state == ReadyForStreaming );
 
@@ -322,7 +324,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
         readBufPos += fullChunkSize;
         m_chunkHeaderLen = 0;
 
-        if( readBufPos == m_readBuffer.size() )
+        if( readBufPos == (size_t)m_readBuffer.size() )
         {
             m_readBuffer.resize(0);
             break;  //processed all data
