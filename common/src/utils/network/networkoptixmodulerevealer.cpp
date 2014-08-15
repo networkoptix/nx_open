@@ -68,7 +68,7 @@ NetworkOptixModuleRevealer::NetworkOptixModuleRevealer(
 NetworkOptixModuleRevealer::~NetworkOptixModuleRevealer()
 {
     stop();
-    for( std::vector<AbstractDatagramSocket*>::size_type
+    for( std::vector<UDPSocket*>::size_type
         i = 0;
         i < m_sockets.size();
         ++i )
@@ -101,12 +101,12 @@ void NetworkOptixModuleRevealer::run()
         Q_ASSERT( false );
     }
 
-    for( std::vector<AbstractDatagramSocket*>::const_iterator
+    for( std::vector<UDPSocket*>::const_iterator
         it = m_sockets.begin();
         it != m_sockets.end();
         ++it )
     {
-        if( !m_pollSet.add( *it, aio::etRead ) )
+        if( !m_pollSet.add( (*it)->implementationDelegate(), aio::etRead, *it ) )
         {
             Q_ASSERT( false );
         }
@@ -119,7 +119,7 @@ void NetworkOptixModuleRevealer::run()
     {
         //TODO/IMPL do join periodically
 
-        int socketCount = m_pollSet.poll( aio::PollSet::INFINITE_TIMEOUT );
+        int socketCount = m_pollSet.poll( aio::INFINITE_TIMEOUT );
         if( socketCount == 0 )
             continue;    //timeout
         if( socketCount < 0 )
@@ -139,8 +139,7 @@ void NetworkOptixModuleRevealer::run()
             if( !(it.eventType() & aio::etRead) )
                 continue;
 
-            AbstractDatagramSocket* udpSocket = dynamic_cast<AbstractDatagramSocket*>(it.socket());
-            Q_ASSERT( udpSocket );
+            UDPSocket* udpSocket = static_cast<UDPSocket*>(it.userData());
 
             //reading socket response
             QString remoteAddressStr;
@@ -169,7 +168,7 @@ void NetworkOptixModuleRevealer::run()
                 arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1 );
 
             //received valid request, sending response
-            if( !udpSocket->sendTo( revealPacketResponse, revealResponseBufStart-revealPacketResponse, remoteAddressStr, remotePort ) )
+            if( !udpSocket->sendTo( revealPacketResponse, revealResponseBufStart-revealPacketResponse, SocketAddress(remoteAddressStr, remotePort) ) )
             {
                 const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
                 NX_LOG( lit("NetworkOptixModuleRevealer. Failed to send reveal response to (%1:%2). %3").

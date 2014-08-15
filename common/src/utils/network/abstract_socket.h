@@ -394,19 +394,22 @@ public:
         \return true if whole data has been sent
         \note Remebers new destination address (as if \a AbstractDatagramSocket::setDestAddr( \a foreignAddress, \a foreignPort ) has been called)
     */
-    virtual bool sendTo(
+    bool sendTo(
         const void* buffer,
         unsigned int bufferLen,
         const QString& foreignAddress,
-        unsigned short foreignPort ) = 0;
+        unsigned short foreignPort )
+    {
+        return sendTo( buffer, bufferLen, SocketAddress( foreignAddress, foreignPort ) );
+    }
     //!Send the given \a buffer as a datagram to the specified address/port
     /*!
         Same as previous method
     */
-    bool sendTo(
+    virtual bool sendTo(
         const void* buffer,
         unsigned int bufferLen,
-        const SocketAddress& foreignAddress ) { return sendTo( buffer, bufferLen, foreignAddress.address.toString(), foreignAddress.port ); }
+        const SocketAddress& foreignAddress ) = 0;
     //!Read read up to \a bufferLen bytes data from this socket. The given \a buffer is where the data will be placed
     /*!
         \param buffer buffer to receive data

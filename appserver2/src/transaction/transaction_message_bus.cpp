@@ -4,7 +4,6 @@
 #include <QtCore/QTimer>
 
 #include "remote_ec_connection.h"
-#include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
 #include "ec2_connection.h"
 #include "common/common_module.h"

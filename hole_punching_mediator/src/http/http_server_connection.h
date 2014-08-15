@@ -39,8 +39,12 @@ public:
     HttpServerConnection(
         nx_http::HttpStreamSocketServer* socketServer,
         AbstractCommunicatingSocket* sock );
+    ~HttpServerConnection();
 
     void processMessage( const nx_http::Message& request );
+
+private:
+    void responseSent();
 };
 
 #endif  //HTTP_SERVER_CONNECTION_H

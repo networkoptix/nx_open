@@ -12,13 +12,13 @@
 #include <map>
 #include <memory>
 
-#include "../socket.h"
+#include "../system_socket.h"
 
 
 namespace aio
 {
-    typedef std::map<AbstractSocket*, void*> PolledSockets;
-    typedef std::pair<AbstractSocket*, void*> SocketContext;
+    typedef std::map<Socket*, void*> PolledSockets;
+    typedef std::pair<Socket*, void*> SocketContext;
 
     class PollSetImpl
     {
@@ -28,7 +28,7 @@ namespace aio
         fd_set readfds;
         fd_set writefds;
         fd_set exceptfds;
-        std::unique_ptr<AbstractDatagramSocket> dummySocket;
+        std::unique_ptr<UDPSocket> dummySocket;
 
         PollSetImpl()
         {
@@ -36,7 +36,7 @@ namespace aio
             FD_ZERO( &writefds );
             FD_ZERO( &exceptfds );
 
-            dummySocket.reset( SocketFactory::createDatagramSocket() );
+            dummySocket.reset( new UDPSocket() );
         }
 
         void fillFDSet( fd_set* const dest, const PolledSockets& src )
@@ -50,7 +50,7 @@ namespace aio
         }
 
         PolledSockets::iterator findSocketContextIter(
-            AbstractSocket* const sock,
+            Socket* const sock,
             aio::EventType eventType,
             PolledSockets** setToUse )
         {
@@ -153,7 +153,7 @@ namespace aio
                     break;  //reached end()
                 }
 
-                if( currentSocket.first == pollSetImpl->dummySocket.get() )
+                if( currentSocket.first == pollSetImpl->dummySocket->implementationDelegate() )
                     continue;   //skipping dummy socket
 
                 if( currentSocketREvent )
@@ -211,12 +211,12 @@ namespace aio
         return *this;
     }
 
-    AbstractSocket* PollSet::const_iterator::socket()
+    Socket* PollSet::const_iterator::socket()
     {
         return m_impl->currentSocket.first;
     }
 
-    const AbstractSocket* PollSet::const_iterator::socket() const
+    const Socket* PollSet::const_iterator::socket() const
     {
         return m_impl->currentSocket.first;
     }
@@ -252,7 +252,7 @@ namespace aio
     :
         m_impl( new PollSetImpl() )
     {
-        m_impl->readSockets.emplace( m_impl->dummySocket.get(), (void*)nullptr );
+        m_impl->readSockets.emplace( m_impl->dummySocket->implementationDelegate(), (void*)nullptr );
         m_impl->dummySocket->setNonBlockingMode( true );
         m_impl->dummySocket->bind( SocketAddress( HostAddress::localhost, 0 ) );
     }
@@ -281,7 +281,7 @@ namespace aio
 
     //!Add socket to set. Does not take socket ownership
     bool PollSet::add(
-        AbstractSocket* const sock,
+        Socket* const sock,
         aio::EventType eventType,
         void* userData )
     {
@@ -304,7 +304,7 @@ namespace aio
     }
 
     //!Remove socket from set
-    void* PollSet::remove( AbstractSocket* const sock, aio::EventType eventType )
+    void* PollSet::remove( Socket* const sock, aio::EventType eventType )
     {
 #ifdef _DEBUG
         sock->handle(); //checking that socket object is still alive, since linux and mac implementation use socket in PollSet::remove
@@ -327,7 +327,7 @@ namespace aio
         return std::max<size_t>( m_impl->readSockets.size(), m_impl->writeSockets.size() );
     }
 
-    void* PollSet::getUserData( AbstractSocket* const sock, EventType eventType ) const
+    void* PollSet::getUserData( Socket* const sock, EventType eventType ) const
     {
         PolledSockets* setToUse = NULL;
         PolledSockets::iterator it = m_impl->findSocketContextIter( sock, eventType, &setToUse );
@@ -364,7 +364,7 @@ namespace aio
         return result;
     }
 
-    bool PollSet::canAcceptSocket( AbstractSocket* const sock ) const
+    bool PollSet::canAcceptSocket( Socket* const sock ) const
     {
         return
             m_impl->readSockets.find( sock ) != m_impl->readSockets.end() ||

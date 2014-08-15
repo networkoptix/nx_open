@@ -31,7 +31,7 @@ namespace aio
     {
     public:
         //!map<pair<socket, event type> >
-        typedef std::set<std::pair<AbstractSocket*, aio::EventType> > MonitoredEventSet;
+        typedef std::set<std::pair<Socket*, aio::EventType> > MonitoredEventSet;
 
         int kqueueFD;
         MonitoredEventSet monitoredEvents;
@@ -134,14 +134,14 @@ namespace aio
         return *this;
     }
 
-    AbstractSocket* PollSet::const_iterator::socket()
+    Socket* PollSet::const_iterator::socket()
     {
-        return static_cast<AbstractSocket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
+        return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
     }
 
-    const AbstractSocket* PollSet::const_iterator::socket() const
+    const Socket* PollSet::const_iterator::socket() const
     {
-        return static_cast<AbstractSocket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
+        return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
     }
 
     /*!
@@ -160,7 +160,7 @@ namespace aio
 
     void* PollSet::const_iterator::userData()
     {
-        return dynamic_cast<Socket*>(static_cast<AbstractSocket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata))->impl()->getUserData(eventType());
+        return dynamic_cast<Socket*>(static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata))->impl()->getUserData(eventType());
     }
 
     bool PollSet::const_iterator::operator==( const const_iterator& right ) const
@@ -219,7 +219,7 @@ namespace aio
     }
 
     //!Add socket to set. Does not take socket ownership
-    bool PollSet::add( AbstractSocket* const sock, EventType eventType, void* userData )
+    bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
     {
         pair<PollSetImpl::MonitoredEventSet::iterator, bool> p = m_impl->monitoredEvents.insert( make_pair( sock, eventType ) );
         if( !p.second )
@@ -241,7 +241,7 @@ namespace aio
     }
 
     //!Remove socket from set
-    void* PollSet::remove( AbstractSocket* const sock, EventType eventType )
+    void* PollSet::remove( Socket* const sock, EventType eventType )
     {
         PollSetImpl::MonitoredEventSet::iterator it = m_impl->monitoredEvents.find( make_pair( sock, eventType ) );
         if( it == m_impl->monitoredEvents.end() )
@@ -264,7 +264,7 @@ namespace aio
         return m_impl->monitoredEvents.size();
     }
 
-    void* PollSet::getUserData( AbstractSocket* const sock, EventType eventType ) const
+    void* PollSet::getUserData( Socket* const sock, EventType eventType ) const
     {
         return dynamic_cast<Socket*>(sock)->impl()->getUserData(eventType);
     }
@@ -299,7 +299,7 @@ namespace aio
         return result;
     }
 
-    bool PollSet::canAcceptSocket( AbstractSocket* const /*sock*/ ) const
+    bool PollSet::canAcceptSocket( Socket* const /*sock*/ ) const
     {
         return true;
     }

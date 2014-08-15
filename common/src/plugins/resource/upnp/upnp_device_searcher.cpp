@@ -8,7 +8,6 @@
 #include <QtXml/QXmlDefaultHandler>
 
 #include <common/common_globals.h>
-#include <utils/network/aio/aioservice.h>
 #include <utils/network/system_socket.h>
 
 #include "version.h"

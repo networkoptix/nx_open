@@ -14,6 +14,8 @@
 #include "stream_socket_server.h"
 
 
+static const size_t READ_BUFFER_CAPACITY = 16*1024;
+
 //!Contains common logic for server-side connection created by \a StreamSocketServer
 /*!
     \a CustomConnectionType MUST define following methods:
@@ -44,15 +46,29 @@ public:
         m_streamSocket( streamSocket ),
         m_bytesToSend( 0 )
     {
+        m_readBuffer.reserve( READ_BUFFER_CAPACITY );
+
         using namespace std::placeholders;
-        m_streamSocket->readSomeAsync( &m_readBuffer, std::bind( std::mem_fn( &SelfType::onBytesRead ), this, _1, _2 ) );
+        m_streamSocket->readSomeAsync( &m_readBuffer, std::bind( &SelfType::onBytesRead, this, _1, _2 ) );
+    }
+
+    ~BaseServerConnection()
+    {
+        m_streamSocket->cancelAsyncIO( aio::etRead );
+        m_streamSocket->cancelAsyncIO( aio::etWrite );
+        m_streamSocket->close();
     }
 
     void sendBufAsync( const nx::Buffer& buf )
     {
         using namespace std::placeholders;
-        m_streamSocket->sendAsync( buf, std::bind( std::mem_fn( &SelfType::onBytesSent ), this, _1, _2 ) );
+        m_streamSocket->sendAsync( buf, std::bind( &SelfType::onBytesSent, this, _1, _2 ) );
         m_bytesToSend = buf.size();
+    }
+
+    void closeConnection()
+    {
+        m_streamServer->connectionTerminated( std::static_pointer_cast<CustomSocketServerType::ConnectionType>(shared_from_this()) );
     }
 
 private:
@@ -61,15 +77,19 @@ private:
     nx::Buffer m_readBuffer;
     size_t m_bytesToSend;
 
-    void onBytesRead( SystemError::ErrorCode errorCode, size_t count )
+    void onBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
     {
         using namespace std::placeholders;
 
         if( errorCode != SystemError::noError )
             return handleSocketError( errorCode );
+        if( bytesRead == 0 )    //connection closed by remote peer
+            return m_streamServer->connectionTerminated( std::static_pointer_cast<CustomSocketServerType::ConnectionType>(shared_from_this()) );
 
-        static_cast<CustomConnectionType*>(this)->bytesReceived( m_readBuffer.substr(0, count) );
-        m_streamSocket->readSomeAsync( &m_readBuffer, std::bind( std::mem_fn( &SelfType::onBytesRead ), this, _1, _2 ) );
+        assert( m_readBuffer.size() == bytesRead );
+        static_cast<CustomConnectionType*>(this)->bytesReceived( m_readBuffer ); 
+        m_readBuffer.resize( 0 );
+        m_streamSocket->readSomeAsync( &m_readBuffer, std::bind( &SelfType::onBytesRead, this, _1, _2 ) );
     }
 
     void onBytesSent( SystemError::ErrorCode errorCode, size_t count )
@@ -98,7 +118,7 @@ private:
                 return m_streamServer->connectionTerminated( std::static_pointer_cast<CustomSocketServerType::ConnectionType>(shared_from_this()) );
 
             default:
-                //TODO/IMPL #ak process error code
+                //TODO #ak process error code
                 return m_streamServer->connectionTerminated( std::static_pointer_cast<CustomSocketServerType::ConnectionType>(shared_from_this()) );
         }
     }
