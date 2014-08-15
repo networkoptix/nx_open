@@ -42,7 +42,8 @@ QnDesktopResourceSearcher::QnDesktopResourceSearcher(QGLWidget* mainWidget)
 QnDesktopResourceSearcher::~QnDesktopResourceSearcher()
 {
 #ifdef Q_OS_WIN
-    m_pD3D->Release();
+    if (m_pD3D)
+        m_pD3D->Release();
 #endif
 }
 
