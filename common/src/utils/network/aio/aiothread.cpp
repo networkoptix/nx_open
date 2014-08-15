@@ -45,7 +45,7 @@ namespace aio
 
         /*!
             \param taskCompletionEvent if not NULL, set to 1 after processing task
-        */
+            */
         SocketAddRemoveTask(
             SocketType* const _socket,
             aio::EventType _eventType,
@@ -53,7 +53,7 @@ namespace aio
             TaskType _type,
             int _timeout = 0,
             std::atomic<int>* const _taskCompletionEvent = nullptr )
-        :
+            :
             socket( _socket ),
             eventType( _eventType ),
             eventHandler( _eventHandler ),
@@ -124,13 +124,21 @@ namespace aio
         }
     };
 
+
+    namespace socket_to_pollset_static_map
+    {
+        template<class SocketType> struct get {};
+        template<> struct get<Socket> { typedef PollSet value; };
+    }
+
+
     template<class SocketType>
     class AIOThreadImpl
     {
     public:
         typedef SocketAddRemoveTask<SocketType> SocketAddRemoveTaskType;
         typedef PeriodicTaskData<SocketType> PeriodicTaskDataType;
-        typedef PollSet PollSetType;
+        typedef typename socket_to_pollset_static_map::get<SocketType>::value PollSetType;
 
         //TODO #ak too many mutexes here. Refactoring required
 
