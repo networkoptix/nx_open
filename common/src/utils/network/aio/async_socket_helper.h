@@ -189,45 +189,51 @@ private:
         std::unique_ptr<AsyncSocketImplHelper, decltype(__threadHandlerIsRunningInResetFunc)>
             __threadHandlerIsRunningInReset( this, __threadHandlerIsRunningInResetFunc );
 
-        auto connectHandlerLocal = [this]( SystemError::ErrorCode errorCode )
+        const size_t connectSendAsyncCallCounterBak = m_connectSendAsyncCallCounter;
+        auto connectHandlerLocal = [this, connectSendAsyncCallCounterBak, sock, &terminated]( SystemError::ErrorCode errorCode )
         {
             auto connectHandlerBak = std::move( m_connectHandler );
 #ifdef _DEBUG
             m_asyncSendIssued = false;
 #endif
             connectHandlerBak( errorCode );
-        };
 
-        const size_t connectSendAsyncCallCounterBak = m_connectSendAsyncCallCounter;
-        auto __finally_connect = [this, connectSendAsyncCallCounterBak, sock, &terminated]( AsyncSocketImplHelper* /*pThis*/ )
-        {
             if( terminated )
                 return;     //most likely, socket has been removed in handler
             QMutexLocker lk( aio::AIOService::instance()->mutex() );
             if( connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter )
                 aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etWrite );
+        };
+
+        auto __finally_connect = [this, &terminated]( AsyncSocketImplHelper* /*pThis*/ )
+        {
+            if( terminated )
+                return;     //most likely, socket has been removed in handler
             m_connectSendHandlerTerminatedFlag = nullptr;
         };
 
-        auto recvHandlerLocal = [this]( SystemError::ErrorCode errorCode, size_t bytesRead )
+        const size_t recvAsyncCallCounterBak = m_recvAsyncCallCounter;
+        auto recvHandlerLocal = [this, recvAsyncCallCounterBak, sock, &terminated]( SystemError::ErrorCode errorCode, size_t bytesRead )
         {
             m_recvBuffer = nullptr;
             auto recvHandlerBak = std::move( m_recvHandler );
             recvHandlerBak( errorCode, bytesRead );
-        };
 
-        const size_t recvAsyncCallCounterBak = m_recvAsyncCallCounter;
-        auto __finally_read = [this, recvAsyncCallCounterBak, sock, &terminated]( AsyncSocketImplHelper* /*pThis*/ )
-        {
             if( terminated )
                 return;     //most likely, socket has been removed in handler
             QMutexLocker lk( aio::AIOService::instance()->mutex() );
             if( recvAsyncCallCounterBak == m_recvAsyncCallCounter )
                 aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etRead );
+        };
+
+        auto __finally_read = [this, &terminated]( AsyncSocketImplHelper* /*pThis*/ )
+        {
+            if( terminated )
+                return;     //most likely, socket has been removed in handler
             m_recvHandlerTerminatedFlag = nullptr;
         };
 
-        auto sendHandlerLocal = [this]( SystemError::ErrorCode errorCode, size_t bytesSent )
+        auto sendHandlerLocal = [this, connectSendAsyncCallCounterBak, sock, &terminated]( SystemError::ErrorCode errorCode, size_t bytesSent )
         {
             m_sendBuffer = nullptr;
             m_sendBufPos = 0;
@@ -236,15 +242,18 @@ private:
             m_asyncSendIssued = false;
 #endif
             sendHandlerBak( errorCode, bytesSent );
-        };
 
-        auto __finally_write = [this, connectSendAsyncCallCounterBak, sock, &terminated]( AsyncSocketImplHelper* /*pThis*/ )
-        {
             if( terminated )
                 return;     //most likely, socket has been removed in handler
             QMutexLocker lk( aio::AIOService::instance()->mutex() );
             if( connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter )
                 aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etWrite );
+        };
+
+        auto __finally_write = [this, &terminated]( AsyncSocketImplHelper* /*pThis*/ )
+        {
+            if( terminated )
+                return;     //most likely, socket has been removed in handler
             m_connectSendHandlerTerminatedFlag = nullptr;
         };
 
