@@ -23,7 +23,7 @@ public:
 
     virtual void init(const ec2::AbstractECConnectionPtr& connection);
 
-    virtual void updateResource(const QnResourcePtr &resource) = 0;
+    virtual void updateResource(const QnResourcePtr &resource);
 
     QMap<QUuid, QnBusinessEventRulePtr> businessRules() const;
 signals:
@@ -47,8 +47,8 @@ signals:
     void cameraBookmarkTagsRemoved(const QnCameraBookmarkTags &tags);
 
     void runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
-    void remotePeerFound(const ec2::ApiPeerAliveData &data, bool isProxy);
-    void remotePeerLost(const ec2::ApiPeerAliveData &data, bool isProxy);
+    void remotePeerFound(const ec2::ApiPeerAliveData &data);
+    void remotePeerLost(const ec2::ApiPeerAliveData &data);
 
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
@@ -70,6 +70,9 @@ public slots:
     void on_licenseRemoved(const QnLicensePtr &license);
 
 private slots:
+    void at_remotePeerFound(ec2::ApiPeerAliveData data);
+    void at_remotePeerLost(ec2::ApiPeerAliveData data);
+
     void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
 
 

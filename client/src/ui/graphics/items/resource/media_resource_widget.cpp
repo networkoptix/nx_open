@@ -1045,14 +1045,20 @@ void QnMediaResourceWidget::updateAspectRatio() {
         qreal aspectRatio = resourceId.isEmpty()
                             ? defaultAspectRatio()
                             : qnSettings->resourceAspectRatios().value(resourceId, defaultAspectRatio());
-
-        setAspectRatio(dewarpingRatio * aspectRatio);
+        if (dewarpingRatio > 1)
+            setAspectRatio(dewarpingRatio);
+        else
+            setAspectRatio(aspectRatio);
     } else {
         qreal aspectRatio = QnGeometry::aspectRatio(sourceSize) *
                             QnGeometry::aspectRatio(channelLayout()->size()) *
                             (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()));
 
-        setAspectRatio(dewarpingRatio * aspectRatio);
+
+        if (dewarpingRatio > 1)
+            setAspectRatio(dewarpingRatio);
+        else
+            setAspectRatio(aspectRatio);
 
         if (!resourceId.isEmpty()) {
             QnAspectRatioHash aspectRatios = qnSettings->resourceAspectRatios();

@@ -10,6 +10,7 @@ enum Corner {
 struct Distance
 {
     Distance(): distance(INT64_MAX), corner(LeftTop) {}
+    Distance(qint64 distance, const QPointF& pos, Corner corner): distance(distance), pos(pos), corner(corner) {}
 
     qint64 distance;
     QPointF pos;
@@ -30,6 +31,7 @@ QnFisheyeCalibrator::QnFisheyeCalibrator()
     m_height = 0;
     m_center = QPointF(0.0, 0.0);
     m_radius = 0.0;
+    m_horizontalStretch = 1.0;
 }
 
 QnFisheyeCalibrator::~QnFisheyeCalibrator()
@@ -50,6 +52,21 @@ void QnFisheyeCalibrator::setCenter(const QPointF &center) {
 QPointF QnFisheyeCalibrator::center() const {
     return m_center;
 }
+
+void QnFisheyeCalibrator::setHorizontalStretch(const qreal& value)
+{
+    if (qFuzzyEquals(m_horizontalStretch, value))
+        return;
+    m_horizontalStretch = value;
+    emit stretchChanged(m_horizontalStretch);
+
+}
+
+qreal QnFisheyeCalibrator::horizontalStretch() const
+{
+    return m_horizontalStretch;
+}
+
 
 void QnFisheyeCalibrator::setRadius(qreal radius) {
     qreal fixed = qBound(0.25, radius, 0.75);
@@ -84,12 +101,29 @@ quint8 opt_med9(quint8 * p)
     PIX_SORT(p[4], p[2]) ; return(p[4]) ;
 }
 
-quint32 QnFisheyeCalibrator::drawCircle(QSharedPointer<CLVideoDecoderOutput> frame, const QPoint& center, int radius)
+void QnFisheyeCalibrator::drawCircle(const QImage& frame, const QPoint& center, int radius)
 {
+    int w = frame.width();
+    int h = frame.height();
+    for (int y = 0; y < frame.height(); ++y)
+    {
+        for (int x = 0; x < frame.width(); ++x)
+        {
+            quint32* data = (quint32*) frame.bits() + y * frame.bytesPerLine()/4 + x;
+            int idx = y/2 * frame.width()/2 + x/2;
+            if (m_filteredFrame[idx])
+                *data = -1;
+            else
+                *data = 0;
+        }
+    }
+
+    /*
     float radius2 = (float) radius * (float) radius;
     quint32 result = 0;
     int yMin = qMax(0, center.y() - radius);
     int yMax = qMin(m_height-1, center.y() + radius);
+    /*
     for (int y = yMin; y <= yMax; ++y)
     {
         float yOffs = center.y() - y;
@@ -97,19 +131,20 @@ quint32 QnFisheyeCalibrator::drawCircle(QSharedPointer<CLVideoDecoderOutput> fra
         int xLeft = qMax(0, center.x() - int(xOffs + 0.5));
         int xRight = qMin(m_width-1, center.x() + int(xOffs + 0.5));
 
-        quint8* data = frame->data[0] + y * frame->linesize[0] + xRight;
-        *data = 0x80;
+        quint32* data = (quint32*) frame.bits() + y * frame.bytesPerLine()/4 + xRight;
+        *data = -1;
 
-        data = frame->data[0] + y * frame->linesize[0] + xLeft;
-        *data = 0x80;
+        data = (quint32*) frame.bits() + y * frame.bytesPerLine()/4 + xLeft;
+        *data = -1;
         
         for (int x = xLeft; x <= xRight; ++x)
         {
-            *data++ = 0x80;
+            *data++ = -1;
         }
         
     }
     return result;
+    */
 }
 
 int QnFisheyeCalibrator::findPixel(int y, int x, int xDelta)
@@ -121,6 +156,43 @@ int QnFisheyeCalibrator::findPixel(int y, int x, int xDelta)
         x += xDelta;
     }
     return -1;
+}
+
+qreal QnFisheyeCalibrator::findElipse(qreal& newRadius)
+{
+    QPointF center(m_center.x() * m_width, m_center.y() * m_height);
+    qreal height = m_radius * m_height;
+
+    // scan lines
+    QPointF p1, p2;
+    for (int i = 0; i < 2; ++i) 
+    {
+        QVector<Distance> distances;
+        qreal offset = (i==0) ? height*0.33 : height*0.66;
+        int x1 = findPixel(center.y() + offset, m_width-1, -1);
+        int x2 = findPixel(center.y() + offset, 0, 1);
+        int x3 = findPixel(center.y() - offset, m_width-1, -1);
+        int x4 = findPixel(center.y() - offset, 0, 1);
+        distances << Distance(qAbs(center.x() - x1), QPointF(x1, center.y() + offset), RightBottom);
+        distances << Distance(qAbs(center.x() - x2), QPointF(x2, center.y() + offset), LeftBottom);
+        distances << Distance(qAbs(center.x() - x3), QPointF(x3, center.y() - offset), RightTop);
+        distances << Distance(qAbs(center.x() - x4), QPointF(x4, center.y() - offset), LeftTop);
+        qSort(distances);
+        if (i == 0)
+            p1 = QPointF(distances[3].pos);
+        else
+            p2 = QPointF(distances[3].pos);
+    }
+
+    p1 -= center;
+    p2 -= center;
+
+    qreal c = p2.x()*p2.x() * p1.y()*p1.y() - p1.x()*p1.x() * p2.y()*p2.y();
+    qreal k = (p2.x()*p2.x() - p1.x()*p1.x());
+    qreal b = sqrt(qAbs(c / k));
+    qreal a = sqrt(qAbs(p1.x()*p1.x() * b*b / (b*b - p1.y()*p1.y())));
+    newRadius = a;
+    return a / b;
 }
 
 void QnFisheyeCalibrator::findCircleParams()
@@ -222,6 +294,17 @@ void QnFisheyeCalibrator::findCircleParams()
 
     setCenter(QPointF(centerX / (qreal) m_width, centerY / (qreal)m_height));
     setRadius(radius / (qreal) m_width);
+
+    // check for horizontal stretch
+    qreal newRadius = 0.0;
+    qreal stretch = findElipse(newRadius);
+    if (qBetween(1.1, stretch, 2.0)) {
+        setRadius(newRadius / (qreal) m_width);
+        setHorizontalStretch(stretch);
+    }
+    else {
+        setHorizontalStretch(1.0);
+    }
 
     emit finished(NoError);
 }
@@ -493,9 +576,9 @@ void QnFisheyeCalibrator::analyseFrame(QImage frame)
     // update source frame for test purpose
     QPoint center = QPoint(m_center.x() * m_width, m_center.y() * m_height);
     int redius = m_radius * m_width;
-    drawCircle(frame, center, redius);
-    memset(frame->data[1], 0x80, frame->height*frame->linesize[1]/2);
-    memset(frame->data[2], 0x80, frame->height*frame->linesize[2]/2);
+    drawCircle(m_analysedFrame, center, redius);
+    //memset(frame->data[1], 0x80, frame->height*frame->linesize[1]/2);
+    //memset(frame->data[2], 0x80, frame->height*frame->linesize[2]/2);
     /*
     for (int y = 0; y < frame->height; ++y)
     {

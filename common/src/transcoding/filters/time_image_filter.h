@@ -12,7 +12,7 @@ class QnTimeImageFilter: public QnAbstractImageFilter
 public:
     QnTimeImageFilter(Qn::Corner datePos, qint64 timeOffsetMs);
     virtual ~QnTimeImageFilter();
-    virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect) override;
+    virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar) override;
 
 private:
     void initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr);

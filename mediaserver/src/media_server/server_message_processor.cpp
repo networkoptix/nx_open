@@ -89,7 +89,9 @@ void QnServerMessageProcessor::removeIPList(const QUuid& id)
     }
 }
 
-void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
+void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) 
+{
+    QnCommonMessageProcessor::updateResource(resource);
     QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>();
 
     const bool isServer = dynamic_cast<const QnMediaServerResource*>(resource.data()) != nullptr;
@@ -157,9 +159,6 @@ void QnServerMessageProcessor::afterRemovingResource(const QUuid& id)
 
 void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
 {
-    connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnServerMessageProcessor::at_remotePeerFound );
-    connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnServerMessageProcessor::at_remotePeerLost );
-
     connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateChunkReceived,
         this, &QnServerMessageProcessor::at_updateChunkReceived );
     connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
@@ -175,33 +174,9 @@ bool QnServerMessageProcessor::isKnownAddr(const QString& addr) const
     return !addr.isEmpty() && m_allIPAddress.contains(addr);
 }
 
-/*
-* EC2 related processing. Need move to other class
-*/
-
-void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool /*isProxy*/)
-{
-    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
-    if (res)
-        res->setStatus(Qn::Online);
-
-}
-
-void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool /*isProxy*/)
-{
-    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
-    if (res) {
-        res->setStatus(Qn::Offline);
-        if (data.peer.peerType != Qn::PT_Server) {
-            // This server hasn't own DB
-            foreach(QnResourcePtr camera, qnResPool->getAllCameras(res))
-                camera->setStatus(Qn::Offline);
-        }
-    }
-}
-
 void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) 
 {
+#if 0
     if (resource->getId() == qnCommon->moduleGUID() && resource->getStatus() != Qn::Online)
     {
         // it's own server. change status to online
@@ -210,6 +185,7 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     else {
         resource->setStatus(status, true);
     }
+#endif
 }
 
 bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
