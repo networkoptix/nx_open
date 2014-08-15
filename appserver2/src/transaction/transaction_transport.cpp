@@ -510,3 +510,5 @@ void QnTransactionTransport::setExtraDataBuffer(const QByteArray& data)
 { 
     m_extraData = data; 
 }
+
+}
