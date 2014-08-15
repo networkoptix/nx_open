@@ -12,6 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
+#include "runtime_info_manager.h"
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     QObject(parent)
@@ -27,6 +28,9 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
     if (!connection)
         return;
+
+    connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::at_remotePeerFound );
+    connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::at_remotePeerLost );
 
     connect( connection.get(), &ec2::AbstractECConnection::initNotification,
         this, &QnCommonMessageProcessor::on_gotInitialNotification );
@@ -108,6 +112,32 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
     connection->startReceivingNotifications();
 }
+
+/*
+* EC2 related processing. Need move to other class
+*/
+
+void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
+{
+    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
+    if (res)
+        res->setStatus(Qn::Online);
+
+}
+
+void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
+{
+    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
+    if (res) {
+        res->setStatus(Qn::Offline);
+        if (data.peer.peerType != Qn::PT_Server) {
+            // This server hasn't own DB
+            foreach(QnResourcePtr camera, qnResPool->getAllCameras(res))
+                camera->setStatus(Qn::Offline);
+        }
+    }
+}
+
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)
 {
@@ -269,4 +299,16 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
 
 QMap<QUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() const {
     return m_rules;
+}
+
+void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource) 
+{
+    if (dynamic_cast<const QnMediaServerResource*>(resource.data()))
+    {
+        if (QnRuntimeInfoManager::instance()->hasItem(resource->getId()))
+            resource->setStatus(Qn::Online);
+        else
+            resource->setStatus(Qn::Offline);
+    }
+
 }

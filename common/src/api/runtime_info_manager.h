@@ -48,6 +48,7 @@ public:
 
     QnPeerRuntimeInfo localInfo() const;
     QnPeerRuntimeInfo remoteInfo() const;
+    bool hasItem(const QUuid& id);
 signals:
     void runtimeInfoAdded(const QnPeerRuntimeInfo &data);
     void runtimeInfoChanged(const QnPeerRuntimeInfo &data);
