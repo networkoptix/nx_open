@@ -295,7 +295,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     }
     QnMediaServerConnectionPtr serverConnection = serverResource
         ? serverResource->apiConnection()
-        : NULL;
+        : QnMediaServerConnectionPtr();
     if (!serverConnection) {
         QMessageBox::warning(this, tr("Network Error"), tr("Could not perform a test. None of your servers has a public IP."));
         return;
