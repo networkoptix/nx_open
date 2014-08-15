@@ -7,14 +7,14 @@ namespace ec2 {
 
     struct ApiModuleData : ApiData {
         QString type;       // e.g. "Media Server"
-        QnId id;
+        QUuid id;
         QString systemName;
         QString version;
         QString systemInformation;
         QStringList addresses;
         int port;
         bool isAlive;
-        QList<QnId> discoverers;
+        QList<QUuid> discoverers;
     };
 
 #define ApiModuleData_Fields (type)(id)(systemName)(version)(systemInformation)(addresses)(port)(isAlive)(discoverers)

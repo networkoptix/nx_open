@@ -18,7 +18,7 @@ struct QnModuleInformation {
     quint16 port;
     QSet<QString> remoteAddresses;
     bool isLocal; //!< true if at least one address from \a remoteHostAddress is a local address
-    QnId id;
+    QUuid id;
 
     QnModuleInformation() : port(0), isLocal(false) {}
 };

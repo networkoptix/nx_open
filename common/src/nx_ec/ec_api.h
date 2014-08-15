@@ -80,13 +80,13 @@ namespace ec2
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> 
-        int setResourceStatus( const QnId& resourceId, QnResource::Status status, TargetType* target, HandlerType handler ) {
+        int setResourceStatus( const QUuid& resourceId, Qn::ResourceStatus status, TargetType* target, HandlerType handler ) {
             return setResourceStatus(resourceId, status, std::static_pointer_cast<impl::SetResourceStatusHandler>(std::make_shared<impl::CustomSetResourceStatusHandler<TargetType, HandlerType>>(target, handler)) );
         }
-        ErrorCode setResourceStatusSync( const QnId& id, QnResource::Status status) {
+        ErrorCode setResourceStatusSync( const QUuid& id, Qn::ResourceStatus status) {
             using namespace std::placeholders;
-            QnId rezId;
-            int(AbstractResourceManager::*fn)(const QnId&, QnResource::Status, impl::SetResourceStatusHandlerPtr) = &AbstractResourceManager::setResourceStatus;
+            QUuid rezId;
+            int(AbstractResourceManager::*fn)(const QUuid&, Qn::ResourceStatus, impl::SetResourceStatusHandlerPtr) = &AbstractResourceManager::setResourceStatus;
             return impl::doSyncCall<impl::SetResourceStatusHandler>( std::bind(fn, this, id, status, _1), &rezId );
         }
 
@@ -94,34 +94,26 @@ namespace ec2
             \param handler Functor with params: (ErrorCode, const QnKvPairListsById&)
         */
         template<class TargetType, class HandlerType> 
-        int getKvPairs( const QnId& resourceId, TargetType* target, HandlerType handler ) {
+        int getKvPairs( const QUuid& resourceId, TargetType* target, HandlerType handler ) {
             return getKvPairs( resourceId, std::static_pointer_cast<impl::GetKvPairsHandler>(std::make_shared<impl::CustomGetKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
         /*!
-        template<class TargetType, class HandlerType> int setResourceDisabled( const QnId& resourceId, bool disabled, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int setResourceDisabled( const QUuid& resourceId, bool disabled, TargetType* target, HandlerType handler ) {
             return setResourceDisabled( resourceId, disabled, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         */
 
-        //!Saves changes to common resource's properties (e.g., name). Accepts any resource
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> 
-        int save( const QnResourcePtr& resource, TargetType* target, HandlerType handler ) {
-            return save( resource, std::static_pointer_cast<impl::SaveResourceHandler>(std::make_shared<impl::CustomSaveResourceHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-        
+       
         /*!
             \param handler Functor with params: (ErrorCode, const QnKvPairListsById&)
         */
         template<class TargetType, class HandlerType> 
-        int save( const QnId& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, TargetType* target, HandlerType handler ) {
+        int save( const QUuid& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, TargetType* target, HandlerType handler ) {
             return save(resourceId, kvPairs,  isPredefinedParams, std::static_pointer_cast<impl::SaveKvPairsHandler>(std::make_shared<impl::CustomSaveKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode saveSync( const QnId& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, QnKvPairListsById* const outData) {
+        ErrorCode saveSync( const QUuid& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, QnKvPairListsById* const outData) {
             return impl::doSyncCall<impl::SaveKvPairsHandler>( 
                 [=](const impl::SaveKvPairsHandlerPtr &handler) {
                     return this->save(resourceId, kvPairs, isPredefinedParams, handler);
@@ -136,25 +128,25 @@ namespace ec2
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> 
-        int remove( const QnId& id, TargetType* target, HandlerType handler ) {
+        int remove( const QUuid& id, TargetType* target, HandlerType handler ) {
             return remove( id, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
     signals:
-        void statusChanged( const QnId& resourceId, QnResource::Status status );
-        //void disabledChanged( const QnId& resourceId, bool disabled );
+        void statusChanged( const QUuid& resourceId, Qn::ResourceStatus status );
+        //void disabledChanged( const QUuid& resourceId, bool disabled );
         void resourceChanged( const QnResourcePtr& resource );
-        void resourceParamsChanged( const QnId& resourceId, const QnKvPairList& kvPairs );
-        void resourceRemoved( const QnId& resourceId );
+        void resourceParamsChanged( const QUuid& resourceId, const QnKvPairList& kvPairs );
+        void resourceRemoved( const QUuid& resourceId );
 
     protected:
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) = 0;
-        virtual int setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler ) = 0;
-        //virtual int setResourceDisabled( const QnId& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) = 0;
-        virtual int getKvPairs( const QnId &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
-        virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) = 0;
-        virtual int save( const QnId& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, impl::SaveKvPairsHandlerPtr handler ) = 0;
-        virtual int remove( const QnId& resource, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int setResourceStatus( const QUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler ) = 0;
+        //virtual int setResourceDisabled( const QUuid& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) = 0;
+        virtual int getKvPairs( const QUuid &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
+        //virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) = 0;
+        virtual int save( const QUuid& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, impl::SaveKvPairsHandlerPtr handler ) = 0;
+        virtual int remove( const QUuid& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
 
 
@@ -202,17 +194,17 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int remove( const QnId& id, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int remove( const QUuid& id, TargetType* target, HandlerType handler ) {
             return remove( id, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
     signals:
         void addedOrUpdated( QnMediaServerResourcePtr camera );
-        void removed( QnId id );
+        void removed( QUuid id );
     protected:
         virtual int getServers( impl::GetServersHandlerPtr handler ) = 0;
         virtual int save( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) = 0;
-        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int remove( const QUuid& id, impl::SimpleHandlerPtr handler ) = 0;
     };
 
 
@@ -254,13 +246,13 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode, const QnVirtualCameraResourceList& cameras)
         */
-        template<class TargetType, class HandlerType> int getCameras( const QnId& mediaServerId, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int getCameras( const QUuid& mediaServerId, TargetType* target, HandlerType handler ) {
             return getCameras( mediaServerId, std::static_pointer_cast<impl::GetCamerasHandler>(std::make_shared<impl::CustomGetCamerasHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode getCamerasSync(const QnId& mServerId, QnVirtualCameraResourceList* const cameraList ) {
+        ErrorCode getCamerasSync(const QUuid& mServerId, QnVirtualCameraResourceList* const cameraList ) {
             using namespace std::placeholders;
-            int(AbstractCameraManager::*fn)(const QnId&, impl::GetCamerasHandlerPtr) = &AbstractCameraManager::getCameras;
+            int(AbstractCameraManager::*fn)(const QUuid&, impl::GetCamerasHandlerPtr) = &AbstractCameraManager::getCameras;
             return impl::doSyncCall<impl::GetCamerasHandler>( std::bind(fn, this, mServerId, _1), cameraList );
         }
 
@@ -287,7 +279,7 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int remove( const QnId& id, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int remove( const QUuid& id, TargetType* target, HandlerType handler ) {
             return remove(id, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
@@ -315,17 +307,17 @@ namespace ec2
     signals:
         void cameraAddedOrUpdated( QnVirtualCameraResourcePtr camera );
         void cameraHistoryChanged( QnCameraHistoryItemPtr cameraHistory );
-        void cameraRemoved( QnId id );
+        void cameraRemoved( QUuid id );
 
         void cameraBookmarkTagsAdded(const QnCameraBookmarkTags &tags);
         void cameraBookmarkTagsRemoved(const QnCameraBookmarkTags &tags);
     protected:
         virtual int addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) = 0;
         virtual int addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int getCameras( const QnId& mediaServerId, impl::GetCamerasHandlerPtr handler ) = 0;
+        virtual int getCameras( const QUuid& mediaServerId, impl::GetCamerasHandlerPtr handler ) = 0;
         virtual int getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler ) = 0;
         virtual int save( const QnVirtualCameraResourceList& cameras, impl::AddCameraHandlerPtr handler ) = 0;
-        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int remove( const QUuid& id, impl::SimpleHandlerPtr handler ) = 0;
         
         virtual int addBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler) = 0;
         virtual int getBookmarkTags(impl::GetCameraBookmarkTagsHandlerPtr handler) = 0;
@@ -367,6 +359,13 @@ namespace ec2
         template<class TargetType, class HandlerType> int addLicenses( const QList<QnLicensePtr>& licenses, TargetType* target, HandlerType handler ) {
             return addLicenses( licenses, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
+
+        ErrorCode addLicensesSync(const QList<QnLicensePtr>& licenses) {
+            using namespace std::placeholders;
+            int(AbstractLicenseManager::*fn)(const QList<QnLicensePtr>&, impl::SimpleHandlerPtr) = &AbstractLicenseManager::addLicenses;
+            return impl::doSyncCall<impl::SimpleHandler>( std::bind(fn, this, licenses, _1));
+        }
+
 
         template<class TargetType, class HandlerType> int removeLicense( const QnLicensePtr& license, TargetType* target, HandlerType handler ) {
             return removeLicense( license, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
@@ -420,7 +419,7 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int deleteRule( QnId ruleId, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int deleteRule( QUuid ruleId, TargetType* target, HandlerType handler ) {
             return deleteRule( ruleId, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -431,7 +430,7 @@ namespace ec2
             return broadcastBusinessAction( businessAction, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
-        template<class TargetType, class HandlerType> int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnId& dstPeer, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QUuid& dstPeer, TargetType* target, HandlerType handler ) {
             return sendBusinessAction( businessAction, dstPeer, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -447,7 +446,7 @@ namespace ec2
 
     signals:
         void addedOrUpdated( QnBusinessEventRulePtr businessRule );
-        void removed( QnId id );
+        void removed( QUuid id );
         void businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
         void businessRuleReset( const QnBusinessEventRuleList& rules );
         void gotBroadcastAction(const QnAbstractBusinessActionPtr& action);
@@ -456,9 +455,9 @@ namespace ec2
     private:
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) = 0;
         virtual int save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) = 0;
-        virtual int deleteRule( QnId ruleId, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int deleteRule( QUuid ruleId, impl::SimpleHandlerPtr handler ) = 0;
         virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QUuid& id, impl::SimpleHandlerPtr handler ) = 0;
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) = 0;
     };
 
@@ -500,19 +499,19 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int remove( const QnId& id, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int remove( const QUuid& id, TargetType* target, HandlerType handler ) {
             return remove( id, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
     signals:
         void addedOrUpdated( QnUserResourcePtr camera );
-        void removed( QnId id );
+        void removed( QUuid id );
 
     private:
         virtual int getUsers( impl::GetUsersHandlerPtr handler ) = 0;
         virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) = 0;
-        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int remove( const QUuid& id, impl::SimpleHandlerPtr handler ) = 0;
     };
 
 
@@ -545,19 +544,19 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int remove( const QnId& resource, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int remove( const QUuid& resource, TargetType* target, HandlerType handler ) {
             return remove( resource, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
     signals:
         void addedOrUpdated( QnLayoutResourcePtr camera );
-        void removed( QnId id );
+        void removed( QUuid id );
 
     protected:
         virtual int getLayouts( impl::GetLayoutsHandlerPtr handler ) = 0;
         virtual int save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int remove( const QnId& resource, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int remove( const QUuid& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
     
 
@@ -598,7 +597,7 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int remove( const QnId& id, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int remove( const QUuid& id, TargetType* target, HandlerType handler ) {
             return remove( id, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -619,7 +618,7 @@ namespace ec2
     protected:
         virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) = 0;
         virtual int save( const QnVideoWallResourcePtr& resource, impl::AddVideowallHandlerPtr handler ) = 0;
-        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int remove( const QUuid& id, impl::SimpleHandlerPtr handler ) = 0;
 
         virtual int sendControlMessage(const QnVideoWallControlMessage& message, impl::SimpleHandlerPtr handler) = 0;
     };
@@ -696,7 +695,7 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, TargetType *target, HandlerType handler) {
+        template<class TargetType, class HandlerType> int sendUpdateUploadResponce(const QString &updateId, const QUuid &peerId, int chunks, TargetType *target, HandlerType handler) {
             return sendUpdateUploadResponce(updateId, peerId, chunks, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
@@ -708,12 +707,12 @@ namespace ec2
 
     signals:
         void updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
-        void updateUploadProgress(const QString &updateId, const QnId &peerId, int chunks);
+        void updateUploadProgress(const QString &updateId, const QUuid &peerId, int chunks);
         void updateInstallationRequested(const QString &updateId);
 
     protected:
         virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) = 0;
-        virtual int sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendUpdateUploadResponce(const QString &updateId, const QUuid &peerId, int chunks, impl::SimpleHandlerPtr handler) = 0;
         virtual int installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) = 0;
     };
 
@@ -726,12 +725,12 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int addDiscoveryInformation(const QnId &id, const QList<QUrl> &urls, bool ignore, TargetType *target, HandlerType handler) {
+        template<class TargetType, class HandlerType> int addDiscoveryInformation(const QUuid &id, const QList<QUrl> &urls, bool ignore, TargetType *target, HandlerType handler) {
             return addDiscoveryInformation(id, urls, ignore, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int removeDiscoveryInformation(const QnId &id, const QList<QUrl> &urls, bool ignore, TargetType *target, HandlerType handler) {
+        template<class TargetType, class HandlerType> int removeDiscoveryInformation(const QUuid &id, const QList<QUrl> &urls, bool ignore, TargetType *target, HandlerType handler) {
             return removeDiscoveryInformation(id, urls, ignore, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
@@ -742,20 +741,20 @@ namespace ec2
 
     protected:
         virtual int discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler) = 0;
-        virtual int addDiscoveryInformation(const QnId &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) = 0;
-        virtual int removeDiscoveryInformation(const QnId &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) = 0;
+        virtual int addDiscoveryInformation(const QUuid &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) = 0;
+        virtual int removeDiscoveryInformation(const QUuid &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractDiscoveryManager> AbstractDiscoveryManagerPtr;
 
     class AbstractMiscManager : public QObject {
         Q_OBJECT
     public:
-        template<class TargetType, class HandlerType> int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer, TargetType *target, HandlerType handler) {
+        template<class TargetType, class HandlerType> int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer, TargetType *target, HandlerType handler) {
             return sendModuleInformation(moduleInformation, isAlive, discoverer, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnId, QnId> &discoverersByPeer, TargetType *target, HandlerType handler) {
+        template<class TargetType, class HandlerType> int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QUuid, QUuid> &discoverersByPeer, TargetType *target, HandlerType handler) {
             return sendModuleInformation(moduleInformationList, discoverersByPeer, std::static_pointer_cast<impl::SimpleHandler>(
                  std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
@@ -765,12 +764,12 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int addConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, TargetType *target, HandlerType handler) {
+        template<class TargetType, class HandlerType> int addConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, TargetType *target, HandlerType handler) {
             return addConnection(discovererId, peerId, host, port, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int removeConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, TargetType *target, HandlerType handler) {
+        template<class TargetType, class HandlerType> int removeConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, TargetType *target, HandlerType handler) {
             return removeConnection(discovererId, peerId, host, port, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
@@ -781,17 +780,17 @@ namespace ec2
         }
 
     signals:
-        void moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer);
+        void moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer);
         void systemNameChangeRequested(const QString &systemName);
-        void connectionAdded(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port);
-        void connectionRemoved(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port);
+        void connectionAdded(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
+        void connectionRemoved(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
 
     protected:
-        virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer, impl::SimpleHandlerPtr handler) = 0;
-        virtual int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnId, QnId> &discoverersByPeer, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QUuid, QUuid> &discoverersByPeer, impl::SimpleHandlerPtr handler) = 0;
         virtual int changeSystemName(const QString &systemName, impl::SimpleHandlerPtr handler) = 0;
-        virtual int addConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
-        virtual int removeConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
+        virtual int addConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
+        virtual int removeConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
         virtual int sendAvailableConnections(impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
@@ -869,8 +868,8 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int restoreDatabaseAsync( const QByteArray& dbFile, TargetType* target, HandlerType handler ) {
-            return restoreDatabaseAsync( dbFile,
+        template<class TargetType, class HandlerType> int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, TargetType* target, HandlerType handler ) {
+            return restoreDatabaseAsync( data,
                 std::static_pointer_cast<impl::SimpleHandler>(
                     std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -895,17 +894,19 @@ namespace ec2
         void initNotification(QnFullResourceData fullData);
         void runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
 
-        void remotePeerFound(ApiPeerAliveData data, bool isProxy);
-        void remotePeerLost(ApiPeerAliveData data, bool isProxy);
+        void remotePeerFound(ApiPeerAliveData data);
+        void remotePeerLost(ApiPeerAliveData data);
 
         void settingsChanged(QnKvPairList settings);
         void panicModeChanged(Qn::PanicMode mode);
+
+        void databaseDumped();
 
     protected:
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) = 0;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
-        virtual int restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) = 0;
     };  
 
 

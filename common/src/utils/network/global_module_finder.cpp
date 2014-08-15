@@ -69,19 +69,19 @@ QList<QnModuleInformation> QnGlobalModuleFinder::foundModules() const {
     return m_moduleInformationById.values();
 }
 
-QList<QnId> QnGlobalModuleFinder::discoverers(const QnId &moduleId) {
+QList<QUuid> QnGlobalModuleFinder::discoverers(const QUuid &moduleId) {
     return m_discovererIdByServerId.values(moduleId);
 }
 
-QMultiHash<QnId, QnId> QnGlobalModuleFinder::discoverers() const {
+QMultiHash<QUuid, QUuid> QnGlobalModuleFinder::discoverers() const {
     return m_discovererIdByServerId;
 }
 
-QnModuleInformation QnGlobalModuleFinder::moduleInformation(const QnId &id) const {
+QnModuleInformation QnGlobalModuleFinder::moduleInformation(const QUuid &id) const {
     return m_moduleInformationById[id];
 }
 
-void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer) {
+void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer) {
     if (isAlive)
         addModule(moduleInformation, discoverer);
     else
@@ -89,33 +89,33 @@ void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInf
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation) {
-    addModule(moduleInformation, QnId(qnCommon->moduleGUID()));
+    addModule(moduleInformation, QUuid(qnCommon->moduleGUID()));
     if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
-        connection->getMiscManager()->sendModuleInformation(moduleInformation, true, QnId(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        connection->getMiscManager()->sendModuleInformation(moduleInformation, true, QUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
-    removeModule(moduleInformation, QnId(qnCommon->moduleGUID()));
+    removeModule(moduleInformation, QUuid(qnCommon->moduleGUID()));
     if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
-        connection->getMiscManager()->sendModuleInformation(moduleInformation, false, QnId(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        connection->getMiscManager()->sendModuleInformation(moduleInformation, false, QUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::at_resourcePool_statusChanged(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(QnResource::server))
+    if (!resource->hasFlags(Qn::server))
         return;
 
-    if (resource->getStatus() != QnResource::Online)
+    if (resource->getStatus() != Qn::Online)
         removeAllModulesDiscoveredBy(resource->getId());
 }
 
 void QnGlobalModuleFinder::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(QnResource::server))
+    if (!resource->hasFlags(Qn::server))
         return;
 
     removeAllModulesDiscoveredBy(resource->getId());
 }
 
-void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformation, const QnId &discoverer) {
+void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformation, const QUuid &discoverer) {
     if (moduleInformation.id == qnCommon->moduleGUID())
         return;
 
@@ -132,7 +132,7 @@ void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformatio
     }
 }
 
-void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInformation, const QnId &discoverer) {
+void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInformation, const QUuid &discoverer) {
     if (moduleInformation.id == qnCommon->moduleGUID())
         return;
 
@@ -148,7 +148,7 @@ void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInforma
     }
 }
 
-void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QnId &discoverer) {
+void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QUuid &discoverer) {
     if (discoverer == qnCommon->moduleGUID()) {
         qWarning() << "Trying to remove our own modules";
         return;

@@ -91,7 +91,7 @@ private:
     QnRenderingWidget *m_renderingWidget;
 
     struct QnEcData {
-        QnId id;
+        QUuid id;
         QUrl url;
         QString version;
         QString systemName;

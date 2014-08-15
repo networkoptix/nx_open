@@ -71,7 +71,7 @@ void QnJoinSystemTool::findResource() {
     QSet<QHostAddress> addresses = QSet<QHostAddress>::fromList(m_possibleAddresses);
     QnMediaServerResourceList servers = qnResPool->getAllServers();
     foreach (const QnResourcePtr &resource, qnResPool->getAllIncompatibleResources()) {
-        if (!resource->hasFlags(QnResource::server))
+        if (!resource->hasFlags(Qn::server))
             continue;
         servers.append(resource.staticCast<QnMediaServerResource>());
     }
@@ -117,7 +117,7 @@ void QnJoinSystemTool::joinResource() {
 
     QByteArray hash;
     QByteArray digest;
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::user)) {
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
         QnUserResourcePtr user = resource.staticCast<QnUserResource>();
         if (user->getName() == lit("admin")) {
             hash = user->getHash();
@@ -144,7 +144,7 @@ void QnJoinSystemTool::joinResource() {
 }
 
 void QnJoinSystemTool::rediscoverPeer() {
-    if (m_targetServer->getStatus() == QnResource::Online) {
+    if (m_targetServer->getStatus() == Qn::Online) {
         updateDiscoveryInformation();
         return;
     }
@@ -178,7 +178,7 @@ void QnJoinSystemTool::at_resource_added(const QnResourcePtr &resource) {
     if (!m_running)
         return;
 
-    if (!resource->hasFlags(QnResource::server))
+    if (!resource->hasFlags(Qn::server))
         return;
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
@@ -205,7 +205,7 @@ void QnJoinSystemTool::at_resource_statusChanged(const QnResourcePtr &resource) 
     if (m_targetServer.isNull() || resource->getId() != m_targetServer->getId())
         return;
 
-    if (resource->getStatus() == QnResource::Online) {
+    if (resource->getStatus() == Qn::Online) {
         disconnect(qnResPool, &QnResourcePool::statusChanged, this, &QnJoinSystemTool::at_resource_statusChanged);
         m_timer->stop();
         updateDiscoveryInformation();

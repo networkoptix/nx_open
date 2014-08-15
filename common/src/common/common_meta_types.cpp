@@ -73,7 +73,7 @@ void QnCommonMetaTypes::initialize() {
         return;
 
     qRegisterMetaType<QUuid>();
-    qRegisterMetaType<QnId>("QnId");
+    qRegisterMetaType<QUuid>("QUuid");
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();
     qRegisterMetaType<Qt::ConnectionType>();
@@ -83,8 +83,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnPeerRuntimeInfo>();
 
     qRegisterMetaType<QnParam>();
-    qRegisterMetaType<QnId>();
-    qRegisterMetaType<QSet<QnId>>("QSet<QnId>");
+    qRegisterMetaType<QUuid>();
+    qRegisterMetaType<QSet<QUuid>>("QSet<QUuid>");
     
     qRegisterMetaType<QnKvPair>();
     qRegisterMetaType<QnKvPairList>();
@@ -93,7 +93,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnResourceTypeList>();
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
-    qRegisterMetaType<QnResource::Status>();
+    qRegisterMetaType<Qn::ResourceStatus>();
     qRegisterMetaType<QnBusiness::EventReason>();
     
     qRegisterMetaType<QnUserResourcePtr>();

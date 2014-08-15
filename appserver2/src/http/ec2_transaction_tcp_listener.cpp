@@ -52,10 +52,10 @@ void QnTransactionTcpProcessor::run()
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
     bool isClient = query.hasQueryItem("isClient");
     bool isMobileClient = query.hasQueryItem("isMobile");
-    QUuid remoteGuid  = query.queryItemValue("guid");
+    QUuid remoteGuid  = QUuid(query.queryItemValue("guid"));
     if (remoteGuid.isNull())
         remoteGuid = QUuid::createUuid();
-    QnId videowallGuid = query.queryItemValue("videowallGuid");
+    QUuid videowallGuid = QUuid(query.queryItemValue("videowallGuid"));
     bool isVideowall = (!videowallGuid.isNull());
 
     Qn::PeerType peerType = isMobileClient  ? Qn::PT_MobileClient

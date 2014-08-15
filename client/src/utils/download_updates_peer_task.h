@@ -23,7 +23,7 @@ public:
     void setHashes(const QHash<QUrl, QString> &hashByUrl);
     void setFileSizes(const QHash<QUrl, qint64> &fileSizeByUrl);
     QHash<QUrl, QString> resultingFiles() const;
-    void setPeerAssociations(const QMultiHash<QUrl, QnId> &peersByUrl);
+    void setPeerAssociations(const QMultiHash<QUrl, QUuid> &peersByUrl);
 
     virtual void cancel() override;
 
@@ -43,12 +43,12 @@ private:
     QString m_targetDirPath;
     QHash<QUrl, QString> m_targets;
     QHash<QUrl, QString> m_hashByUrl;
-    QMultiHash<QUrl, QnId> m_peersByUrl;
+    QMultiHash<QUrl, QUuid> m_peersByUrl;
     QHash<QUrl, QString> m_resultingFiles;
     QHash<QUrl, qint64> m_fileSizeByUrl;
 
     QList<QUrl> m_pendingDownloads;
-    QSet<QnId> m_currentPeers;
+    QSet<QUuid> m_currentPeers;
     int m_triesCount;
 
     QScopedPointer<QFile> m_file;

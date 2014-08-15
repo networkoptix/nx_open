@@ -29,7 +29,8 @@ QnFisheyeCalibrationImageWidget::QnFisheyeCalibrationImageWidget(QWidget *parent
     m_lineColor(QColor(128, 196, 255)),
     m_center(0.5, 0.5),
     m_radius(0.5),
-    m_lineWidth(4)
+    m_lineWidth(4),
+    m_stretch(1.0)
 {
     m_dragProcessor->setHandler(this);
     setMouseTracking(true);
@@ -96,6 +97,17 @@ void QnFisheyeCalibrationImageWidget::setRadius(qreal radius) {
     repaint();
 }
 
+qreal QnFisheyeCalibrationImageWidget::stretch() const {
+    return m_stretch;
+}
+
+void QnFisheyeCalibrationImageWidget::setStretch(qreal stretch) {
+    if (qFuzzyEquals(m_stretch, stretch))
+        return;
+    m_stretch = stretch;
+    repaint();
+}
+
 int QnFisheyeCalibrationImageWidget::lineWidth() const {
     return m_lineWidth;
 }
@@ -114,6 +126,7 @@ void QnFisheyeCalibrationImageWidget::beginSearchAnimation() {
 
     m_animation.circle->setCenter(m_center);
     m_animation.circle->setRadius(m_radius);
+    m_animation.circle->setStretch(m_stretch);
     m_animation.stage = Searching;
 }
 
@@ -129,12 +142,18 @@ void QnFisheyeCalibrationImageWidget::finishAnimationStep() {
     anim2->setStartValue(m_animation.circle->radius());
     anim2->setEndValue(m_radius);
 
+    QPropertyAnimation* anim3 = new QPropertyAnimation(m_animation.circle, "stretch", this);
+    anim3->setDuration(animDuration);
+    anim3->setStartValue(m_animation.circle->stretch());
+    anim3->setEndValue(m_stretch);
+
     if (m_animation.animation)
         m_animation.animation->stop();
 
     QParallelAnimationGroup* anim = new QParallelAnimationGroup(this);
     anim->addAnimation(anim1);
     anim->addAnimation(anim2);
+    anim->addAnimation(anim3);
 
     connect(anim, &QAbstractAnimation::finished, this, &QnFisheyeCalibrationImageWidget::endAnimation);
 
@@ -159,12 +178,13 @@ void QnFisheyeCalibrationImageWidget::abortSearchAnimation() {
     m_animation.stage = Idle;
 }
 
-void QnFisheyeCalibrationImageWidget::paintCircle(QPainter *painter, const QRect &targetRect, const QPointF &relativeCenter, const qreal relativeRadius) {
+void QnFisheyeCalibrationImageWidget::paintCircle(QPainter *painter, const QRect &targetRect, const QPointF &relativeCenter, const qreal relativeRadius, const qreal xStretch) {
     if (qFuzzyIsNull(relativeRadius))
         return;
 
     int halfLineWidth = m_lineWidth / 2;
-    qreal radius = relativeRadius * targetRect.width();
+    qreal radiusX = relativeRadius * targetRect.width();
+    qreal radiusY = radiusX / xStretch;
     QPointF center(relativeCenter.x() * targetRect.width(), relativeCenter.y() * targetRect.height());
     center += targetRect.topLeft();
 
@@ -177,7 +197,7 @@ void QnFisheyeCalibrationImageWidget::paintCircle(QPainter *painter, const QRect
 
         QColor brushColor1(toTransparent(m_lineColor, 0.6));
         QColor brushColor2(toTransparent(m_lineColor, 0.3));
-        QRadialGradient gradient(center * 0.66, radius);
+        QRadialGradient gradient(center * 0.66, radiusX);
         gradient.setColorAt(0, brushColor1);
         gradient.setColorAt(1, brushColor2);
         QBrush brush(gradient);
@@ -186,7 +206,7 @@ void QnFisheyeCalibrationImageWidget::paintCircle(QPainter *painter, const QRect
         Q_UNUSED(brushRollback)
 
         QPainterPath path;
-        path.addEllipse(center, radius, radius);
+        path.addEllipse(center, radiusX, radiusY);
         path.addEllipse(center, m_lineWidth, m_lineWidth);
 
         /* Adjust again to not draw over frame */
@@ -240,7 +260,7 @@ void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent *event) {
     QScopedPointer<QPainter> painter(new QPainter(this));
 
     int halfLineWidth = m_lineWidth / 2;
-    QRect targetRect = event->rect().adjusted(halfLineWidth, halfLineWidth, -halfLineWidth, -halfLineWidth);
+    QRect targetRect = rect().adjusted(halfLineWidth, halfLineWidth, -halfLineWidth, -halfLineWidth);
 
     if (targetRect != m_cachedRect || m_cachedImage.isNull()) {
         m_cachedRect = targetRect;
@@ -249,8 +269,8 @@ void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent *event) {
 
     /* Update target rect to be in the center of the source rect and match the image size */
     targetRect.setSize(m_cachedImage.size());
-    targetRect.moveLeft( (event->rect().width() - targetRect.width()) / 2 );
-    targetRect.moveTop( (event->rect().height() - targetRect.height()) / 2 );
+    targetRect.moveLeft( (rect().width() - targetRect.width()) / 2 );
+    targetRect.moveTop( (rect().height() - targetRect.height()) / 2 );
 
     painter->drawImage(targetRect, m_cachedImage);
 
@@ -270,7 +290,7 @@ void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent *event) {
     }
 
     if (m_animation.stage == Idle)
-        paintCircle(painter.data(), targetRect, m_center, m_radius);
+        paintCircle(painter.data(), targetRect, m_center, m_radius, m_stretch);
     else
-        paintCircle(painter.data(), targetRect, m_animation.circle->center(), m_animation.circle->radius());
+        paintCircle(painter.data(), targetRect, m_animation.circle->center(), m_animation.circle->radius(), m_animation.circle->stretch());
 }

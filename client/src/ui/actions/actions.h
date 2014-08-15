@@ -969,6 +969,10 @@ namespace Qn {
         JumpToLiveAction,
         ToggleSyncAction,
 
+        /**
+         * Toggle the background animation.
+         */
+        ToggleBackgroundAnimationAction,
 
         /* Debug actions. */
 

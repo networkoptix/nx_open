@@ -20,8 +20,7 @@ static const char* ANALOG_CAMERAS[][2] =
 {
     {"AXIS", "Q7404"},
     {"vivo_ironman", "VS8801"},
-    {"VIVOTEK", "VS8801"},
-    {"*", "DW-CP04"}
+    {"VIVOTEK", "VS8801"}
 };
 
 // Add vendor and camera model to ommit ONVIF search (case insensitive)
@@ -244,9 +243,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     }
 }
 
-QnId OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manufacturer, const QString&  model) const
+QUuid OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manufacturer, const QString&  model) const
 {
-    QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false); // try to find child resource type, use real manufacturer name as camera model in onvif XML
+    QUuid rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false); // try to find child resource type, use real manufacturer name as camera model in onvif XML
     if (!rt.isNull())
         return rt;
     else if (isAnalogOnvifResource(manufacturer, model) && !onvifAnalogTypeId.isNull())
@@ -281,7 +280,6 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
         resource->setPhysicalId(uniqId);
 
     resource->setDeviceOnvifUrl(deviceUrl);
-    resource->setDeviceOnvifID(uniqId);
 
     if (!login.isEmpty())
         resource->setAuth(login, passwd);

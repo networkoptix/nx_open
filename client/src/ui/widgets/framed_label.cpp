@@ -45,7 +45,7 @@ void QnFramedLabel::paintEvent(QPaintEvent *event) {
     }
 
     QPainter painter(this);
-    QRect fullRect = event->rect().adjusted(lineWidth() / 2, lineWidth() / 2, -lineWidth() / 2, -lineWidth() / 2);
+    QRect fullRect = rect().adjusted(lineWidth() / 2, lineWidth() / 2, -lineWidth() / 2, -lineWidth() / 2);
 
     if (pixmapExists) {
         QnScopedPainterOpacityRollback opacityRollback(&painter, painter.opacity() * m_opacity);

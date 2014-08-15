@@ -14,7 +14,7 @@ QnPlAxisResourceSearcher::QnPlAxisResourceSearcher()
 {
 }
 
-QnResourcePtr QnPlAxisResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlAxisResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -100,7 +100,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
         return QList<QnResourcePtr>();
 
 
-    QnId typeId = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
+    QUuid typeId = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
     if (typeId.isNull())
         return QList<QnResourcePtr>();
 
@@ -209,7 +209,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
     QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
-    QnId rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
+    QUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
     if (rt.isNull())
         return local_results;
 
@@ -250,7 +250,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
         {
             QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
-            QnId rt = qnResTypePool->getLikeResourceTypeId(manufacture(), firstResource->getName());
+            QUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), firstResource->getName());
             if (rt.isNull())
                 return;
 

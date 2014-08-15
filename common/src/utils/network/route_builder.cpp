@@ -1,11 +1,11 @@
 #include "route_builder.h"
 
-QnRouteBuilder::QnRouteBuilder(const QnId &startId) :
+QnRouteBuilder::QnRouteBuilder(const QUuid &startId) :
     m_startId(startId)
 {
 }
 
-void QnRouteBuilder::addConnection(const QnId &from, const QnId &to, const QString &host, quint16 port, int weight) {
+void QnRouteBuilder::addConnection(const QUuid &from, const QUuid &to, const QString &host, quint16 port, int weight) {
     Q_ASSERT(from != to);
 
     if (to == m_startId)
@@ -35,7 +35,7 @@ void QnRouteBuilder::addConnection(const QnId &from, const QnId &to, const QStri
     }
 }
 
-void QnRouteBuilder::removeConnection(const QnId &from, const QnId &to, const QString &host, quint16 port) {
+void QnRouteBuilder::removeConnection(const QUuid &from, const QUuid &to, const QString &host, quint16 port) {
     Q_ASSERT(from != to);
 
     QnRoutePoint point(to, host, port);
@@ -71,7 +71,7 @@ void QnRouteBuilder::clear() {
     m_routes.clear();
 }
 
-QnRoute QnRouteBuilder::routeTo(const QnId &peerId) const {
+QnRoute QnRouteBuilder::routeTo(const QUuid &peerId) const {
     const QnRouteList &routeList = m_routes[peerId];
     if (routeList.isEmpty())
         return QnRoute();
@@ -79,7 +79,7 @@ QnRoute QnRouteBuilder::routeTo(const QnId &peerId) const {
         return routeList.first();
 }
 
-QHash<QnId, QnRouteList> QnRouteBuilder::routes() const {
+QHash<QUuid, QnRouteList> QnRouteBuilder::routes() const {
     return m_routes;
 }
 
@@ -106,7 +106,7 @@ void QnRouteBuilder::buildRoutes(const QList<QnRoute> &initialRoutes) {
     }
 }
 
-QMultiHash<QnId, QnRouteBuilder::WeightedPoint>::iterator QnRouteBuilder::findConnection(const QnId &from, const QnRoutePoint &point) {
+QMultiHash<QUuid, QnRouteBuilder::WeightedPoint>::iterator QnRouteBuilder::findConnection(const QUuid &from, const QnRoutePoint &point) {
     auto it = m_connections.begin();
     for (; it != m_connections.end(); ++it) {
         if (it.key() == from && it.value().first == point)

@@ -262,7 +262,8 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
             decodedFrame = &m_scaledVideoFrame;
         }
         decodedFrame->pts = m_decodedVideoFrame->pkt_dts;
-        processFilterChain(decodedFrame, dstRectF);
+        qreal ar = decoder->getWidth() * (qreal) decoder->getSampleAspectRatio() / (qreal) decoder->getHeight();
+        processFilterChain(decodedFrame, dstRectF, ar);
 
         static AVRational r = {1, 1000000};
         decodedFrame->pts  = av_rescale_q(m_decodedVideoFrame->pkt_dts, r, m_encoderCtx->time_base);

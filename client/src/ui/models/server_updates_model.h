@@ -47,7 +47,7 @@ public:
 
     explicit QnServerUpdatesModel(QObject *parent = 0);
 
-    void setTargets(const QSet<QnId> &targets);
+    void setTargets(const QSet<QUuid> &targets);
     void setTargets(const QnMediaServerResourceList &targets);
 
     int columnCount(const QModelIndex &parent) const override;
@@ -58,7 +58,7 @@ public:
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     QModelIndex index(const QnMediaServerResourcePtr &server) const;
 
-    void setUpdatesInformation(const QHash<QnId, QnMediaServerUpdateTool::PeerUpdateInformation> &updates);
+    void setUpdatesInformation(const QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> &updates);
     void setUpdateInformation(const QnMediaServerUpdateTool::PeerUpdateInformation &update);
 
 private:
@@ -71,8 +71,8 @@ private slots:
 
 private:
     QList<Item*> m_items;
-    QHash<QnId, QnMediaServerUpdateTool::PeerUpdateInformation> m_updates;
-    QSet<QnId> m_targets;
+    QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> m_updates;
+    QSet<QUuid> m_targets;
 };
 
 #endif // SERVER_UPDATES_MODEL_H

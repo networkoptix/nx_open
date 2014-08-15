@@ -66,7 +66,7 @@ bool QnCheckForUpdatesPeerTask::needUpdate(const QnSoftwareVersion &version, con
 
 void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
     bool needUpdate = false;
-    foreach (const QnId &peerId, peers()) {
+    foreach (const QUuid &peerId, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(peerId, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;

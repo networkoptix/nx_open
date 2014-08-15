@@ -33,6 +33,7 @@ QnVideowallManageWidget::QnVideowallManageWidget(QWidget *parent /*= 0*/):
     setTimer(animationTimer);
     startListening();
     
+    connect(d_ptr.data(), &QnVideowallManageWidgetPrivate::itemsChanged, this, &QnVideowallManageWidget::itemsChanged);
 }
 
 QnVideowallManageWidget::~QnVideowallManageWidget() { }
@@ -42,12 +43,12 @@ void QnVideowallManageWidget::paintEvent(QPaintEvent *event) {
 
     QScopedPointer<QPainter> painter(new QPainter(this));
 
-    QRect eventRect = event->rect();
-    if (eventRect.isNull())
+    QRect paintRect = this->rect();
+    if (paintRect.isNull())
         return;
 
-    painter->fillRect(eventRect, palette().window());
-    d->paint(painter.data(), eventRect);
+    painter->fillRect(paintRect, palette().window());
+    d->paint(painter.data(), paintRect);
 }
 
 void QnVideowallManageWidget::loadFromResource(const QnVideoWallResourcePtr &videowall) {
@@ -147,9 +148,13 @@ void QnVideowallManageWidget::setColors(const QnVideowallManageWidgetColors &col
     update();
 }
 
+int QnVideowallManageWidget::proposedItemsCount() const {
+    Q_D(const QnVideowallManageWidget);
+    return d->proposedItemsCount();
+}
+
 QSize QnVideowallManageWidget::minimumSizeHint() const {
     Q_D(const QnVideowallManageWidget);
     QRect source(QPoint(0, 0), minimumWidgetSizeHint);
     return d->targetRect(source).size();  
 }
-

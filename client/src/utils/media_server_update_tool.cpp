@@ -168,7 +168,7 @@ void QnMediaServerUpdateTool::finishUpdate(QnMediaServerUpdateTool::UpdateResult
     setUpdateResult(result);
 }
 
-void QnMediaServerUpdateTool::setPeerState(const QnId &peerId, QnMediaServerUpdateTool::PeerUpdateInformation::State state) {
+void QnMediaServerUpdateTool::setPeerState(const QUuid &peerId, QnMediaServerUpdateTool::PeerUpdateInformation::State state) {
     auto it = m_updateInformationById.find(peerId);
     if (it == m_updateInformationById.end())
         return;
@@ -199,7 +199,7 @@ void QnMediaServerUpdateTool::setDenyMajorUpdates(bool denyMajorUpdates) {
     m_denyMajorUpdates = denyMajorUpdates;
 }
 
-QnMediaServerUpdateTool::PeerUpdateInformation QnMediaServerUpdateTool::updateInformation(const QnId &peerId) const {
+QnMediaServerUpdateTool::PeerUpdateInformation QnMediaServerUpdateTool::updateInformation(const QUuid &peerId) const {
     auto it = m_updateInformationById.find(peerId);
     if (it != m_updateInformationById.end())
         return it.value();
@@ -219,10 +219,10 @@ QnMediaServerResourceList QnMediaServerUpdateTool::targets() const {
     return m_targets;
 }
 
-void QnMediaServerUpdateTool::setTargets(const QSet<QnId> &targets) {
+void QnMediaServerUpdateTool::setTargets(const QSet<QUuid> &targets) {
     m_targets.clear();
 
-    foreach (const QnId &id, targets) {
+    foreach (const QUuid &id, targets) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
@@ -234,7 +234,7 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
     QnMediaServerResourceList result;
 
     if (m_targets.isEmpty()) {
-        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server))
+        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::server))
             result.append(resource.staticCast<QnMediaServerResource>());
 
         foreach (const QnResourcePtr &resource, qnResPool->getAllIncompatibleResources()) {
@@ -296,7 +296,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QnSoftwareVersion &version) 
 
     setState(CheckingForUpdates);
 
-    QnIdSet peers;
+    QSet<QUuid> peers;
     foreach (const QnMediaServerResourcePtr &server, actualTargets())
         peers.insert(server->getId());
 
@@ -312,7 +312,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QString &fileName) {
 
     setState(CheckingForUpdates);
 
-    QnIdSet peers;
+    QSet<QUuid> peers;
     foreach (const QnMediaServerResourcePtr &server, actualTargets())
         peers.insert(server->getId());
 
@@ -336,9 +336,9 @@ void QnMediaServerUpdateTool::updateServers() {
     m_idBySystemInformation.clear();
 
     foreach (const QnMediaServerResourcePtr &server, actualTargets()) {
-        bool incompatible = (server->getStatus() == QnResource::Incompatible);
+        bool incompatible = (server->getStatus() == Qn::Incompatible);
 
-        if (server->getStatus() != QnResource::Online && !incompatible)
+        if (server->getStatus() != Qn::Online && !incompatible)
             continue;
 
         if (!server->getSystemInfo().isValid())
@@ -347,7 +347,7 @@ void QnMediaServerUpdateTool::updateServers() {
         if (!m_checkForUpdatesPeerTask->needUpdate(server->getVersion(), m_targetVersion))
             continue;
 
-        QnId peerId = server->getId();
+        QUuid peerId = server->getId();
 
         m_targetPeerIds.insert(peerId);
         if (incompatible)
@@ -403,12 +403,12 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
 
 void QnMediaServerUpdateTool::downloadUpdates() {
     QHash<QUrl, QString> downloadTargets;
-    QMultiHash<QUrl, QnId> peerAssociations;
+    QMultiHash<QUrl, QUuid> peerAssociations;
     QHash<QUrl, QString> hashByUrl;
     QHash<QUrl, qint64> fileSizeByUrl;
 
     for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it) {
-        QList<QnId> peers = m_idBySystemInformation.values(it.key());
+        QList<QUuid> peers = m_idBySystemInformation.values(it.key());
         if (peers.isEmpty())
             continue;
 
@@ -429,7 +429,7 @@ void QnMediaServerUpdateTool::downloadUpdates() {
         downloadTargets.insert(it.value()->url, it.value()->baseFileName);
         hashByUrl.insert(it.value()->url, it.value()->md5);
         fileSizeByUrl.insert(it.value()->url, it.value()->fileSize);
-        foreach (const QnId &peerId, peers) {
+        foreach (const QUuid &peerId, peers) {
             peerAssociations.insert(it.value()->url, peerId);
             PeerUpdateInformation &updateInformation = m_updateInformationById[peerId];
             updateInformation.state = PeerUpdateInformation::UpdateDownloading;
@@ -445,7 +445,7 @@ void QnMediaServerUpdateTool::downloadUpdates() {
     m_downloadUpdatesPeerTask->setHashes(hashByUrl);
     m_downloadUpdatesPeerTask->setFileSizes(fileSizeByUrl);
     m_downloadUpdatesPeerTask->setPeerAssociations(peerAssociations);
-    m_downloadUpdatesPeerTask->setPeers(QSet<QnId>::fromList(m_updateInformationById.keys()));
+    m_downloadUpdatesPeerTask->setPeers(QSet<QUuid>::fromList(m_updateInformationById.keys()));
     QMetaObject::invokeMethod(m_downloadUpdatesPeerTask, "start", Qt::QueuedConnection);
 }
 
@@ -485,7 +485,7 @@ void QnMediaServerUpdateTool::installIncompatiblePeers() {
     for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it) {
         updateFiles[it.key()] = it.value()->fileName;
 
-        foreach (const QnId &peerId, m_idBySystemInformation.values(it.key())) {
+        foreach (const QUuid &peerId, m_idBySystemInformation.values(it.key())) {
             if (m_incompatiblePeerIds.contains(peerId))
                 m_updateInformationById[peerId].state = PeerUpdateInformation::UpdateInstalling;
         }
@@ -502,6 +502,9 @@ void QnMediaServerUpdateTool::installIncompatiblePeers() {
 
 void QnMediaServerUpdateTool::lockMutex() {
     setState(UploadingUpdate);
+
+    m_pendingUploadPeers = QSet<QUuid>::fromList(m_updateInformationById.keys());
+    m_pendingUploads = m_idBySystemInformation.uniqueKeys();
 
     m_distributedMutex = ec2::QnDistributedMutexManager::instance()->createMutex(mutexName);
     connect(m_distributedMutex, &ec2::QnDistributedMutex::locked,        this,   &QnMediaServerUpdateTool::at_mutexLocked, Qt::QueuedConnection);
@@ -605,23 +608,23 @@ void QnMediaServerUpdateTool::at_restUpdateTask_finished(int errorCode) {
     lockMutex();
 }
 
-void QnMediaServerUpdateTool::at_networkTask_peerProgressChanged(const QnId &peerId, int progress) {
+void QnMediaServerUpdateTool::at_networkTask_peerProgressChanged(const QUuid &peerId, int progress) {
     m_updateInformationById[peerId].progress = progress;
     emit peerChanged(peerId);
 }
 
-void QnMediaServerUpdateTool::at_downloadTask_peerFinished(const QnId &peerId) {
+void QnMediaServerUpdateTool::at_downloadTask_peerFinished(const QUuid &peerId) {
     setPeerState(peerId, PeerUpdateInformation::PendingUpload);
 }
 
-void QnMediaServerUpdateTool::at_uploadTask_peerFinished(const QnId &peerId) {
+void QnMediaServerUpdateTool::at_uploadTask_peerFinished(const QUuid &peerId) {
     setPeerState(peerId, PeerUpdateInformation::PendingInstallation);
 }
 
-void QnMediaServerUpdateTool::at_installTask_peerFinished(const QnId &peerId) {
+void QnMediaServerUpdateTool::at_installTask_peerFinished(const QUuid &peerId) {
     setPeerState(peerId, PeerUpdateInformation::UpdateFinished);
 }
 
-void QnMediaServerUpdateTool::at_restUpdateTask_peerFinished(const QnId &peerId) {
+void QnMediaServerUpdateTool::at_restUpdateTask_peerFinished(const QUuid &peerId) {
     setPeerState(peerId, PeerUpdateInformation::UpdateFinished);
 }

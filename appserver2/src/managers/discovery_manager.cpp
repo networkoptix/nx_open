@@ -50,7 +50,7 @@ int QnDiscoveryManager<QueryProcessorType>::discoverPeer(const QUrl &url, impl::
 }
 
 template<class QueryProcessorType>
-int QnDiscoveryManager<QueryProcessorType>::addDiscoveryInformation(const QnId &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) {
+int QnDiscoveryManager<QueryProcessorType>::addDiscoveryInformation(const QUuid &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(ApiCommand::addDiscoveryInformation, id, urls, ignore);
 
@@ -61,7 +61,7 @@ int QnDiscoveryManager<QueryProcessorType>::addDiscoveryInformation(const QnId &
 }
 
 template<class QueryProcessorType>
-int QnDiscoveryManager<QueryProcessorType>::removeDiscoveryInformation(const QnId &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) {
+int QnDiscoveryManager<QueryProcessorType>::removeDiscoveryInformation(const QUuid &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(ApiCommand::removeDiscoveryInformation, id, urls, ignore);
 
@@ -72,7 +72,7 @@ int QnDiscoveryManager<QueryProcessorType>::removeDiscoveryInformation(const QnI
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiDiscoveryDataList> QnDiscoveryManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const QnId &id, const QList<QUrl> &urls, bool ignore) const {
+QnTransaction<ApiDiscoveryDataList> QnDiscoveryManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const QUuid &id, const QList<QUrl> &urls, bool ignore) const {
     QnTransaction<ApiDiscoveryDataList> transaction(command);
     foreach (const QUrl &url, urls) {
         Q_ASSERT_X(ignore || url.port() != -1, "Additional server URLs without a port are not allowed", Q_FUNC_INFO);

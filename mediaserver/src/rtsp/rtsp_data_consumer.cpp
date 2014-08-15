@@ -625,7 +625,7 @@ int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skip
         camera = qnCameraPool->getVideoCamera(res);
     }
     int copySize = 0;
-    //if (camera && !res->hasFlags(QnResource::no_last_gop))
+    //if (camera && !res->hasFlags(Qn::no_last_gop))
         copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, cseq);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;

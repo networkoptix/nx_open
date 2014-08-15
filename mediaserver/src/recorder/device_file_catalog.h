@@ -68,7 +68,7 @@ public:
     // TODO: #Elric #enum
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
 
-    DeviceFileCatalog(const QString& macAddress, QnServer::ChunksCatalog catalog);
+    DeviceFileCatalog(const QString &cameraUniqueId, QnServer::ChunksCatalog catalog);
     //void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
     Chunk updateDuration(int durationMs, qint64 fileSize);
@@ -94,7 +94,7 @@ public:
     //bool lastFileDuplicateName() const;
     qint64 firstTime() const;
     QnServer::ChunksCatalog getCatalog() const { return m_catalog; }
-    QByteArray getMac() const { return m_macAddress.toUtf8(); }
+    //QByteArray getMac() const { return m_macAddress.toUtf8(); }
 
     // Detail level determine time duration (in microseconds) visible at 1 screen pixel
     // All information less than detail level is discarded
@@ -102,6 +102,9 @@ public:
 
     QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
     void close();
+
+    QString rootFolder(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog) const;
+    QString cameraUniqueId() const;
 
     static QString prefixByCatalog(QnServer::ChunksCatalog catalog);
     static QnServer::ChunksCatalog catalogByPrefix(const QString &prefix);
@@ -115,9 +118,7 @@ public:
     static QSet<void*> m_pauseList;
     qint64 m_rebuildStartTime;
 
-    //bool readCatalog();
-    bool doRebuildArchive(QnStorageResourcePtr storage, const QnTimePeriod& period);
-    //void rewriteCatalog(bool isCatalogUsing);
+    bool doRebuildArchive(const QnStorageResourcePtr &storage, const QnTimePeriod& period);
     bool isLastRecordRecording() const { return m_lastRecordRecording; }
     qint64 getLatRecordingTime() const;
     void setLatRecordingTime(qint64 value);
@@ -130,7 +131,7 @@ public:
         bool intersects(const QnTimePeriod& period) const;
     };
 
-    void scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList,
+    void scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList,
         const ScanFilter& filter = ScanFilter());
 
     static std::deque<Chunk> mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2);
@@ -141,12 +142,12 @@ private:
 
     bool fileExists(const Chunk& chunk, bool checkDirOnly);
     bool addChunk(const Chunk& chunk);
-    qint64 recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage);
+    qint64 recreateFile(const QString& fileName, qint64 startTimeMs, const QnStorageResourcePtr &storage);
     QSet<QDate> recordedMonthList();
 
-    void readStorageData(QnStorageResourcePtr storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList);
-    Chunk chunkFromFile(QnStorageResourcePtr storage, const QString& fileName);
-    QnTimePeriod timePeriodFromDir(QnStorageResourcePtr storage, const QString& dirName);
+    void readStorageData(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList);
+    Chunk chunkFromFile(const QnStorageResourcePtr &storage, const QString& fileName);
+    QnTimePeriod timePeriodFromDir(const QnStorageResourcePtr &storage, const QString& dirName);
     void replaceChunks(int storageIndex, const std::deque<Chunk>& newCatalog);
     void removeRecord(int idx);
 private:
@@ -155,7 +156,7 @@ private:
     mutable QMutex m_mutex;
     //QFile m_file;
     std::deque<Chunk> m_chunks; 
-    QString m_macAddress;
+    QString m_cameraUniqueId;
 
     typedef QVector<QPair<int, bool> > CachedDirInfo;
     struct IOCacheEntry

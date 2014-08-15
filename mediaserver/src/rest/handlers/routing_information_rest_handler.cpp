@@ -12,7 +12,7 @@ namespace HttpCode {
 }
 
 namespace {
-    QByteArray routeToHtml(const QnId &target, const QnRoute &route) {
+    QByteArray routeToHtml(const QUuid &target, const QnRoute &route) {
         QByteArray result;
 
         result.append("<b>Route to ");
@@ -43,7 +43,7 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
         command = command.mid(1);
 
     if (command == lit("routeTo")) {
-        QnId target = QnId(params.value(lit("target")));
+        QUuid target = QUuid(params.value(lit("target")));
         if (target.isNull()) {
             // suppose it to be host:port
             QStringList targetParams = params.value(lit("target")).split(QLatin1Char(':'));
@@ -95,13 +95,13 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
 
         return HttpCode::Ok;
     } else if (command == lit("routes")) {
-        QnId target = QnId(params.value(lit("target")));
-        QHash<QnId, QnRouteList> routes = QnRouter::instance()->routes();
+        QUuid target = QUuid(params.value(lit("target")));
+        QHash<QUuid, QnRouteList> routes = QnRouter::instance()->routes();
 
         result.append("<html><body>\r\n");
 
-        QList<QnId> targets = target.isNull() ? routes.uniqueKeys() : (QList<QnId>() << target);
-        foreach (const QnId &id, targets) {
+        QList<QUuid> targets = target.isNull() ? routes.uniqueKeys() : (QList<QUuid>() << target);
+        foreach (const QUuid &id, targets) {
             foreach (const QnRoute &route, routes.value(id)) {
                 result.append(routeToHtml(id, route));
                 result.append("<br/>\r\n");

@@ -36,9 +36,9 @@ private slots:
 private:
     QString m_updateId;
     QHash<QnSystemInformation, QString> m_fileBySystemInformation;
-    QMultiHash<QnSystemInformation, QnId> m_peersBySystemInformation;
+    QMultiHash<QnSystemInformation, QUuid> m_peersBySystemInformation;
     QList<QnSystemInformation> m_pendingUploads;
-    QSet<QnId> m_finishedPeers;
+    QSet<QUuid> m_finishedPeers;
 
     QnUpdateUploader *m_uploader;
 };

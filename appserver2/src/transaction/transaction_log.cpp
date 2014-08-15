@@ -12,7 +12,7 @@
 #include "nx_ec/data/api_discovery_data.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
 
-//#define TRANSACTION_LOG_DEBUG
+#define TRANSACTION_MESSAGE_BUS_DEBUG
 
 namespace ec2
 {
@@ -40,10 +40,15 @@ void QnTransactionLog::init()
     }
 
     QSqlQuery query2(m_dbManager->getDB());
-    query2.prepare("SELECT tran_guid, timestamp as timestamp FROM transaction_log");
+    query2.prepare("SELECT tran_guid, timestamp, peer_guid, db_guid FROM transaction_log"); 
     if (query2.exec()) {
-        while (query2.next())
-            m_updateHistory.insert(QUuid::fromRfc4122(query2.value(0).toByteArray()), query2.value(1).toLongLong());
+        while (query2.next()) {
+            QUuid hash = QUuid::fromRfc4122(query2.value("tran_guid").toByteArray());
+            qint64 timestamp = query2.value("timestamp").toLongLong();
+            QUuid peerID = QUuid::fromRfc4122(query2.value("peer_guid").toByteArray());
+            QUuid dbID = QUuid::fromRfc4122(query2.value("db_guid").toByteArray());
+            m_updateHistory.insert(hash, UpdateHistoryData(QnTranStateKey(peerID, dbID), timestamp));
+        }     
     }
 
     m_currentTime = QDateTime::currentMSecsSinceEpoch();
@@ -124,6 +129,11 @@ QUuid QnTransactionLog::makeHash(const QString &extraData, const ApiDiscoveryDat
 
 ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QUuid& hash, const QByteArray& data)
 {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+    qDebug() << "add transaction to log " << tran.peerID << "command=" << ApiCommand::toString(tran.command) 
+        << "db seq=" << tran.persistentInfo.sequence << "timestamp=" << tran.persistentInfo.timestamp;
+#endif
+
     Q_ASSERT_X(!tran.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     Q_ASSERT_X(!tran.persistentInfo.dbID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     Q_ASSERT_X(tran.persistentInfo.sequence, Q_FUNC_INFO, "Transaction sequence MUST be filled!");
@@ -150,7 +160,16 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QU
 
     QnTranStateKey key(tran.peerID, tran.persistentInfo.dbID);
     m_state.values[key] = qMax(m_state.values[key], tran.persistentInfo.sequence);
-    m_updateHistory[hash] = qMax(m_updateHistory[hash], tran.persistentInfo.timestamp);
+
+    auto updateHistoryItr = m_updateHistory.find(hash);
+    if (updateHistoryItr == m_updateHistory.end())
+        updateHistoryItr = m_updateHistory.insert(hash, UpdateHistoryData());
+    if ((tran.persistentInfo.timestamp > updateHistoryItr.value().timestamp) ||
+        (tran.persistentInfo.timestamp == updateHistoryItr.value().timestamp && key > updateHistoryItr.value().updatedBy))
+    {
+        updateHistoryItr.value().timestamp = tran.persistentInfo.timestamp;
+        updateHistoryItr.value().updatedBy = key;
+    }
 
     QMutexLocker lock(&m_timeMutex);
     if (tran.persistentInfo.timestamp > m_currentTime + m_relativeTimer.elapsed()) {
@@ -176,16 +195,14 @@ bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& 
         qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << "because of precessed seq:" << m_state.values.value(key) << ">=" << tran.persistentInfo.sequence;
         return true;
     }
-    QMap<QUuid, qint64>::const_iterator itr = m_updateHistory.find(hash);
+    auto itr = m_updateHistory.find(hash);
     if (itr == m_updateHistory.end())
         return false;
 
-    const qint64 lastTime = itr.value();
+    const qint64 lastTime = itr.value().timestamp;
     bool rez = lastTime > tran.persistentInfo.timestamp;
-    if (lastTime == tran.persistentInfo.timestamp) {
-        QnTranStateKey locakKey(qnCommon->moduleGUID(), m_dbManager->getID());
-        rez = key > locakKey;
-    }
+    if (lastTime == tran.persistentInfo.timestamp)
+        rez = key < itr.value().updatedBy;
     if (rez)
         qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << "because of timestamp:" << lastTime << ">=" << tran.persistentInfo.timestamp;
 

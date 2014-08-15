@@ -16,7 +16,7 @@ QString getResourceName(const QnResourcePtr &resource) {
 
 QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &defaultName, const QString &nameTemplate) {
     QStringList usedNames;
-    QnId parentId = user ? user->getId() : QnId();
+    QUuid parentId = user ? user->getId() : QUuid();
     foreach(const QnLayoutResourcePtr &resource, qnResPool->getResourcesWithParentId(parentId).filtered<QnLayoutResource>())
         usedNames.push_back(resource->getName().toLower());
 

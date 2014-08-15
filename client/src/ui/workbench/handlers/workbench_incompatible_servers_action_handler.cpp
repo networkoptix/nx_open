@@ -32,9 +32,9 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
         return;
     }
 
-    QSet<QnId> targets;
+    QSet<QUuid> targets;
     foreach (const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
-        if (resource->hasFlags(QnResource::remote_server) && resource->getStatus() == QnResource::Incompatible)
+        if (resource->hasFlags(QnResource::remote_server) && resource->getStatus() == Qn::Incompatible)
             targets.insert(resource->getId());
     }
 

@@ -36,7 +36,7 @@ QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *c
 
 QnConnectToCurrentSystemTool::~QnConnectToCurrentSystemTool() {}
 
-void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QnId> &targets, const QString &password) {
+void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QUuid> &targets, const QString &password) {
     if (m_running)
         return;
 
@@ -65,7 +65,7 @@ void QnConnectToCurrentSystemTool::configureServer() {
         return;
     }
 
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::user)) {
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
         QnUserResourcePtr user = resource.staticCast<QnUserResource>();
         if (user->getName() == lit("admin")) {
             m_configureTask->setPasswordHash(user->getHash(), user->getDigest());
@@ -73,7 +73,7 @@ void QnConnectToCurrentSystemTool::configureServer() {
         }
     }
 
-    foreach (const QnId &id, m_targets) {
+    foreach (const QUuid &id, m_targets) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
@@ -114,7 +114,7 @@ void QnConnectToCurrentSystemTool::revertApiUrls() {
     m_oldUrls.clear();
 }
 
-void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, const QSet<QnId> &failedPeers) {
+void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, const QSet<QUuid> &failedPeers) {
     revertApiUrls();
 
     if (errorCode != 0) {
@@ -125,7 +125,7 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
         return;
     }
 
-    foreach (const QnId &id, m_targets - failedPeers) {
+    foreach (const QUuid &id, m_targets - failedPeers) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;

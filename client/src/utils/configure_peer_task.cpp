@@ -60,7 +60,7 @@ void QnConfigurePeerTask::setWholeSystem(bool wholeSystem) {
 
 void QnConfigurePeerTask::doStart() {
     m_error = NoError;
-    foreach (const QnId &id, peers()) {
+    foreach (const QUuid &id, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
         if (!server) {
             m_failedPeers.insert(id);
@@ -76,7 +76,7 @@ void QnConfigurePeerTask::doStart() {
 }
 
 void QnConfigurePeerTask::processReply(int status, int handle) {
-    QnId id = m_pendingPeers.take(handle);
+    QUuid id = m_pendingPeers.take(handle);
     if (id.isNull())
         return;
 

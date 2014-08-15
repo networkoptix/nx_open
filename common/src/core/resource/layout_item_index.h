@@ -5,7 +5,6 @@
 #include <QtCore/QUuid>
 #include <QtCore/QList>
 #include "resource_fwd.h"
-#include "layout_resource.h"
 
 /**
  * This class contains all the necessary information to look up a layout item. 

@@ -310,5 +310,5 @@ QnMulticastModuleFinder::ModuleContext::ModuleContext(const RevealResponse &resp
     moduleInformation.systemInformation = QnSystemInformation(response.systemInformation);
     moduleInformation.systemName = response.name;
     moduleInformation.port = response.typeSpecificParameters.value(lit("port")).toUShort();
-    moduleInformation.id = QnId(response.seed);
+    moduleInformation.id = QUuid(response.seed);
 }

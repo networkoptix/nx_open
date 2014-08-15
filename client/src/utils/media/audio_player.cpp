@@ -304,7 +304,7 @@ bool AudioPlayer::openNonSafe( QIODevice* dataSource )
 
     QnResourcePtr res( new LocalAudioFileResource() );
     res->setUrl( temporaryResUrl );
-    res->setStatus( QnResource::Online );
+    res->setStatus( Qn::Online );
     if( !mediaFileReader->open( res ) )
     {
         m_storage->removeFile( temporaryFilePath );

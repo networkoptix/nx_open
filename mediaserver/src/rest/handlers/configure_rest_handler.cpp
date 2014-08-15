@@ -82,7 +82,7 @@ int QnConfigureRestHandler::changeSystemName(const QString &systemName, bool who
 
 int QnConfigureRestHandler::changeAdminPassword(const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest) {
     if (!password.isEmpty() || (!passwordHash.isEmpty() && !passwordDigest.isEmpty())) {
-        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::user)) {
+        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
             QnUserResourcePtr user = resource.staticCast<QnUserResource>();
             if (user->getName() == lit("admin")) {
                 if (!password.isEmpty()) {

@@ -15,7 +15,7 @@ namespace ec2
             dataFormat( Qn::UbjsonFormat )
         {}
 
-        ApiPeerData(QnId id, Qn::PeerType peerType, Qn::SerializationFormat dataFormat = Qn::UbjsonFormat):
+        ApiPeerData(QUuid id, Qn::PeerType peerType, Qn::SerializationFormat dataFormat = Qn::UbjsonFormat):
             id(id),
             peerType(peerType),
             dataFormat(dataFormat) 
@@ -30,7 +30,7 @@ namespace ec2
         }
 
         /** Unique ID of the peer. */ 
-        QnId id;
+        QUuid id;
 
         /** Type of the peer. */
         Qn::PeerType peerType;
@@ -38,7 +38,7 @@ namespace ec2
         /** Preferred client data serialization format */
         Qn::SerializationFormat dataFormat;
     };
-    typedef QSet<QnId> QnPeerSet;
+    typedef QSet<QUuid> QnPeerSet;
 
 #define ApiPeerData_Fields (id)(peerType)(dataFormat)
 

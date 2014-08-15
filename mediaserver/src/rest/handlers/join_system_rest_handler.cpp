@@ -111,7 +111,7 @@ bool QnJoinSystemRestHandler::changeSystemName(const QString &systemName) {
 }
 
 bool QnJoinSystemRestHandler::changeAdminPassword(const QString &password) {
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::user)) {
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
         QnUserResourcePtr user = resource.staticCast<QnUserResource>();
         if (user->getName() == lit("admin")) {
             user->setPassword(password);

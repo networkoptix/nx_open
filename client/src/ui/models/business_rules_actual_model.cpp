@@ -43,7 +43,7 @@ void QnBusinessRulesActualModel::at_resources_saved( int handle, ec2::ErrorCode 
 
     const bool success = errorCode == ec2::ErrorCode::ok;
     if(success) {
-        if (model->id() == 0)
+        if (model->id().isNull())
             deleteRule(model);
         updateRule(rule);
     }

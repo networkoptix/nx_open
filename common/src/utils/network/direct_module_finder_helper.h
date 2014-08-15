@@ -33,9 +33,9 @@ private slots:
 
 private:
     QPointer<QnDirectModuleFinder> m_directModuleFinder;
-    QHash<QnId, QnHostAddressSet> m_addressesByServer;
-    QHash<QnId, QnUrlSet> m_manualAddressesByServer;
-    QHash<QnId, quint16> m_portByServer;
+    QHash<QUuid, QnHostAddressSet> m_addressesByServer;
+    QHash<QUuid, QnUrlSet> m_manualAddressesByServer;
+    QHash<QUuid, quint16> m_portByServer;
     QnUrlSet m_urlsForPeriodicalCheck;
 };
 

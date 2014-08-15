@@ -59,11 +59,11 @@ void QnDirectModuleFinderHelper::setUrlsForPeriodicalCheck(const QnUrlSet &urls)
 }
 
 void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(QnResource::server) || resource->getId() == qnCommon->moduleGUID())
+    if (!resource->hasFlags(Qn::server) || resource->getId() == qnCommon->moduleGUID())
         return;
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-    QnId serverId = server->getId();
+    QUuid serverId = server->getId();
 
     QnHostAddressSet addresses = QnHostAddressSet::fromList(server->getNetAddrList());
     quint16 port = QUrl(server->getApiUrl()).port();
@@ -89,11 +89,11 @@ void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource)
 }
 
 void QnDirectModuleFinderHelper::at_resourceChanged(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(QnResource::server) || resource->getId() == qnCommon->moduleGUID())
+    if (!resource->hasFlags(Qn::server) || resource->getId() == qnCommon->moduleGUID())
         return;
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-    QnId serverId = server->getId();
+    QUuid serverId = server->getId();
 
     QnHostAddressSet oldAddresses = m_addressesByServer.value(server->getId());
     QnHostAddressSet newAddresses = QnHostAddressSet::fromList(server->getNetAddrList());
@@ -122,7 +122,7 @@ void QnDirectModuleFinderHelper::at_resourceChanged(const QnResourcePtr &resourc
             foreach (const QUrl &url, server->getAdditionalUrls())
                 m_directModuleFinder->addUrl(url, serverId);
 
-            QnId serverId = server->getId();
+            QUuid serverId = server->getId();
 
             QList<QUrl> ignoredUrls = m_directModuleFinder->ignoredModules().keys(serverId);
 
@@ -141,11 +141,11 @@ void QnDirectModuleFinderHelper::at_resourceChanged(const QnResourcePtr &resourc
 }
 
 void QnDirectModuleFinderHelper::at_resourceAuxUrlsChanged(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(QnResource::server) || resource->getId() == qnCommon->moduleGUID())
+    if (!resource->hasFlags(Qn::server) || resource->getId() == qnCommon->moduleGUID())
         return;
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-    QnId serverId = server->getId();
+    QUuid serverId = server->getId();
 
     QnUrlSet oldIgnoredUrls = QnUrlSet::fromList(m_directModuleFinder->ignoredModules().keys(serverId));
     QnUrlSet newIgnoredUrls = QnUrlSet::fromList(server->getIgnoredUrls());
@@ -175,11 +175,11 @@ void QnDirectModuleFinderHelper::at_resourceAuxUrlsChanged(const QnResourcePtr &
 }
 
 void QnDirectModuleFinderHelper::at_resourceRemoved(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(QnResource::server) || resource->getId() == qnCommon->moduleGUID())
+    if (!resource->hasFlags(Qn::server) || resource->getId() == qnCommon->moduleGUID())
         return;
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-    QnId serverId = server->getId();
+    QUuid serverId = server->getId();
 
     disconnect(server.data(), &QnMediaServerResource::auxUrlsChanged, this, &QnDirectModuleFinderHelper::at_resourceAuxUrlsChanged);
 

@@ -218,7 +218,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
             QHostAddress address(dstUrl.host());
             if (!address.isNull()) {
                 bool found = false;
-                foreach (const QnRouter::Endpoint &endpoint, QnRouter::instance()->connections().values(QnId(xServerGUID))) {
+                foreach (const QnRouter::Endpoint &endpoint, QnRouter::instance()->connections().values(QUuid(xServerGUID))) {
                     if (endpoint.host == address.toString() && endpoint.port == dstUrl.port()) {
                         found = true;
                         break;

@@ -1,2 +1,3 @@
 arch=${arch}
 box=${box}
+configuration=${build.configuration}

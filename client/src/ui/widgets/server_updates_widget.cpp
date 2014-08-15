@@ -76,7 +76,7 @@ bool QnServerUpdatesWidget::isUpdating() const {
     return m_updateTool->isUpdating();
 }
 
-void QnServerUpdatesWidget::setTargets(const QSet<QnId> &targets) {
+void QnServerUpdatesWidget::setTargets(const QSet<QUuid> &targets) {
     m_updatesModel->setTargets(targets);
     m_updateTool->setTargets(targets);
 }
@@ -99,7 +99,7 @@ void QnServerUpdatesWidget::updateFromSettings() {
         return;
 
     m_updateTool->reset();
-    m_updatesModel->setTargets(QSet<QnId>());
+    m_updatesModel->setTargets(QSet<QUuid>());
     updateUi();
 }
 
@@ -133,7 +133,7 @@ void QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked() {
 void QnServerUpdatesWidget::at_updateButton_clicked() {
     bool haveOffline = false;
     foreach (const QnMediaServerResourcePtr &resource, m_updateTool->actualTargets()) {
-        if (resource->getStatus() == QnResource::Offline) {
+        if (resource->getStatus() == Qn::Offline) {
             haveOffline = true;
             break;
         }

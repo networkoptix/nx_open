@@ -10,7 +10,7 @@ QnMediaServerResourcePtr makeResource(const QnModuleInformation &moduleInformati
     QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
 
     server->setId(moduleInformation.id);
-    server->setStatus(QnResource::Incompatible, true);
+    server->setStatus(Qn::Incompatible, true);
 
     QList<QHostAddress> addressList;
     foreach (const QString &address, moduleInformation.remoteAddresses)
@@ -61,11 +61,11 @@ void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &module
 
     // don't touch normal servers
     if (server) {
-        if (server->getStatus() == QnResource::Offline || server->getStatus() == QnResource::Incompatible) {
+        if (server->getStatus() == Qn::Offline || server->getStatus() == Qn::Incompatible) {
             server->setVersion(moduleInformation.version);
             server->setSystemInfo(moduleInformation.systemInformation);
             server->setSystemName(moduleInformation.systemName);
-            server->setStatus(QnResource::Incompatible);
+            server->setStatus(Qn::Incompatible);
             // now put server to 'other systems' subtree
             server->parentIdChanged(server);
         }
@@ -79,7 +79,7 @@ void QnIncompatibleServerAdder::at_peerLost(const QnModuleInformation &moduleInf
     QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
 
     // don't touch normal servers
-    if (server && server->getStatus() != QnResource::Incompatible)
+    if (server && server->getStatus() != Qn::Incompatible)
         return;
 
     QnResourcePtr incompatibleResource = qnResPool->getIncompatibleResourceById(moduleInformation.id);
@@ -87,5 +87,5 @@ void QnIncompatibleServerAdder::at_peerLost(const QnModuleInformation &moduleInf
     if (incompatibleResource)
         qnResPool->removeResource(incompatibleResource);
     else if (server)
-        server->setStatus(QnResource::Offline);
+        server->setStatus(Qn::Offline);
 }

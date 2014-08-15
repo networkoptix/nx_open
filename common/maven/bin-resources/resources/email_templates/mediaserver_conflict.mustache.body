@@ -6,11 +6,13 @@
             <tr>
                 <th>Number</th>
                 <th>ECS IP</th>
+                <th>Camera Physical ID</th>
             </tr>
                 {{#msConflicts}}
                     <tr>
                         <td>{{number}}</td>
                         <td>{{ip}}</td>
+                        <td>{{mac}}</td>
                     </tr>
                 {{/msConflicts}}
         </table>

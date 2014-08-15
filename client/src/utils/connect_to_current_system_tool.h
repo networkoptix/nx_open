@@ -23,7 +23,7 @@ public:
     explicit QnConnectToCurrentSystemTool(QnWorkbenchContext *context, QObject *parent = 0);
     ~QnConnectToCurrentSystemTool();
 
-    void connectToCurrentSystem(const QSet<QnId> &targets, const QString &password);
+    void connectToCurrentSystem(const QSet<QUuid> &targets, const QString &password);
 
     bool isRunning() const;
 
@@ -37,17 +37,17 @@ private:
     void revertApiUrls();
 
 private slots:
-    void at_configureTask_finished(int errorCode, const QSet<QnId> &failedPeers);
+    void at_configureTask_finished(int errorCode, const QSet<QUuid> &failedPeers);
     void at_updateTool_stateChanged(int state);
 
 private:
     bool m_running;
-    QSet<QnId> m_targets;
+    QSet<QUuid> m_targets;
     QString m_password;
 
-    QSet<QnId> m_restartTargets;
-    QSet<QnId> m_updateTargets;
-    QHash<QnId, QUrl> m_oldUrls;
+    QSet<QUuid> m_restartTargets;
+    QSet<QUuid> m_updateTargets;
+    QHash<QUuid, QUrl> m_oldUrls;
     QnConfigurePeerTask *m_configureTask;
     QScopedPointer<QnUpdateDialog> m_updateDialog;
     QnMediaServerUpdateTool *m_updateTool;

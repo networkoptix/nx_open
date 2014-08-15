@@ -25,7 +25,7 @@ static const __m128i  sse_0000_intrs  = _mm_setr_epi32(0x00000000, 0x00000000, 0
     //TODO: C fallback routine
 #endif
 
-void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect)
+void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar)
 {
     static const float GAMMA_EPS = 0.01f;
 

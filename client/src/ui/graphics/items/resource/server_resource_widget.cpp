@@ -30,6 +30,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 
+#include <utils/license_usage_helper.h>
+
 namespace {
     /** Convert angle from radians to degrees */
     qreal radiansToDegrees(qreal radian) {
@@ -773,7 +775,10 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
 }
 
 Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const {
-    if (m_resource->getStatus() == QnResource::Offline)
+    if (qnSettings->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
+        return Qn::VideowallWithoutLicenseOverlay;
+
+    if (m_resource->getStatus() == Qn::Offline)
         return Qn::ServerOfflineOverlay;
     return base_type::calculateStatusOverlay();
 }

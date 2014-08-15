@@ -503,7 +503,7 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
 
 void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display) {
     foreach(QnResourceWidget *widget, widgets) {
-        if(!widget->resource()->hasFlags(QnResource::motion))
+        if(!widget->resource()->hasFlags(Qn::motion))
             continue;
         if (!widget->zoomRect().isNull())
             continue;
@@ -660,7 +660,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
             if (!QFile::rename(recordedFileName, filePath)) {
                 QString message = tr("Could not overwrite file '%1'. Please try another name.").arg(filePath);
                 CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
-                QMessageBox::warning(display()->view(), QObject::tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
+                QMessageBox::warning(display()->view(), tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
                 continue;
             }
 
@@ -1298,7 +1298,7 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
     if (widgets.isEmpty())
         return;
     QnResourceWidget *widget = widgets.at(0);
-    if(widget->resource()->flags() & QnResource::network)
+    if(widget->resource()->flags() & Qn::network)
         return;
     QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource(), mainWindow()));
     dialog->setModal(true);
@@ -1309,7 +1309,7 @@ void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
 
     foreach(QnResourceWidget *widget, widgets) {
-        if (!widget->resource()->hasFlags(QnResource::motion))
+        if (!widget->resource()->hasFlags(Qn::motion))
             continue;
 
         if (!widget->zoomRect().isNull())

@@ -47,7 +47,7 @@ void QnDirectModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
 }
 
-void QnDirectModuleFinder::dropModule(const QnId &id, bool emitSignal) {
+void QnDirectModuleFinder::dropModule(const QUuid &id, bool emitSignal) {
     QnModuleInformation moduleInformation = m_foundModules.take(id);
     if (moduleInformation.id.isNull())
         return;
@@ -61,7 +61,7 @@ void QnDirectModuleFinder::dropModule(const QnId &id, bool emitSignal) {
 }
 
 void QnDirectModuleFinder::dropModule(const QUrl &url, bool emitSignal) {
-    QnId id = m_moduleByUrl.take(url);
+    QUuid id = m_moduleByUrl.take(url);
     if (id.isNull())
         return;
 
@@ -69,7 +69,7 @@ void QnDirectModuleFinder::dropModule(const QUrl &url, bool emitSignal) {
         dropModule(id, emitSignal);
 }
 
-void QnDirectModuleFinder::addUrl(const QUrl &url, const QnId &id) {
+void QnDirectModuleFinder::addUrl(const QUrl &url, const QUuid &id) {
     Q_ASSERT(id != qnCommon->moduleGUID());
 
     QUrl requestUrl = makeRequestUrl(url);
@@ -79,20 +79,20 @@ void QnDirectModuleFinder::addUrl(const QUrl &url, const QnId &id) {
     }
 }
 
-void QnDirectModuleFinder::removeUrl(const QUrl &url, const QnId &id) {
+void QnDirectModuleFinder::removeUrl(const QUrl &url, const QUuid &id) {
     if (m_urls.remove(makeRequestUrl(url), id))
         dropModule(id, false);
 }
 
-void QnDirectModuleFinder::addAddress(const QHostAddress &address, quint16 port, const QnId &id) {
+void QnDirectModuleFinder::addAddress(const QHostAddress &address, quint16 port, const QUuid &id) {
     addUrl(makeRequestUrl(address, port), id);
 }
 
-void QnDirectModuleFinder::removeAddress(const QHostAddress &address, quint16 port, const QnId &id) {
+void QnDirectModuleFinder::removeAddress(const QHostAddress &address, quint16 port, const QUuid &id) {
     removeUrl(makeRequestUrl(address, port), id);
 }
 
-void QnDirectModuleFinder::addIgnoredModule(const QUrl &url, const QnId &id) {
+void QnDirectModuleFinder::addIgnoredModule(const QUrl &url, const QUuid &id) {
     QUrl requestUrl = makeRequestUrl(url);
     if (!m_ignoredModules.contains(requestUrl, id)) {
         m_ignoredModules.insert(requestUrl, id);
@@ -102,15 +102,15 @@ void QnDirectModuleFinder::addIgnoredModule(const QUrl &url, const QnId &id) {
     }
 }
 
-void QnDirectModuleFinder::removeIgnoredModule(const QUrl &url, const QnId &id) {
+void QnDirectModuleFinder::removeIgnoredModule(const QUrl &url, const QUuid &id) {
     m_ignoredModules.remove(makeRequestUrl(url), id);
 }
 
-void QnDirectModuleFinder::addIgnoredModule(const QHostAddress &address, quint16 port, const QnId &id) {
+void QnDirectModuleFinder::addIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id) {
     addIgnoredModule(makeRequestUrl(address, port), id);
 }
 
-void QnDirectModuleFinder::removeIgnoredModule(const QHostAddress &address, quint16 port, const QnId &id) {
+void QnDirectModuleFinder::removeIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id) {
     removeIgnoredModule(makeRequestUrl(address, port), id);
 }
 
@@ -152,15 +152,15 @@ QList<QnModuleInformation> QnDirectModuleFinder::foundModules() const {
     return m_foundModules.values();
 }
 
-QnModuleInformation QnDirectModuleFinder::moduleInformation(const QnId &id) const {
+QnModuleInformation QnDirectModuleFinder::moduleInformation(const QUuid &id) const {
     return m_foundModules[id];
 }
 
-QMultiHash<QUrl, QnId> QnDirectModuleFinder::urls() const {
+QMultiHash<QUrl, QUuid> QnDirectModuleFinder::urls() const {
     return m_urls;
 }
 
-QMultiHash<QUrl, QnId> QnDirectModuleFinder::ignoredModules() const {
+QMultiHash<QUrl, QUuid> QnDirectModuleFinder::ignoredModules() const {
     return m_ignoredModules;
 }
 
@@ -214,7 +214,7 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         if (m_ignoredUrls.contains(url))
             return;
 
-        QnIdSet expectedIds = QnIdSet::fromList(m_urls.values(url));
+        QSet<QUuid> expectedIds = QSet<QUuid>::fromList(m_urls.values(url));
         if (!expectedIds.isEmpty() && !expectedIds.contains(moduleInformation.id))
             return;
 
@@ -240,7 +240,7 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         url.setPath(QString());
         emit moduleFound(moduleInformation, url.host(), url);
     } else {
-        QnId id = m_moduleByUrl[url];
+        QUuid id = m_moduleByUrl[url];
         if (id.isNull())
             return;
 
