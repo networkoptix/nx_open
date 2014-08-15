@@ -155,10 +155,10 @@
         <CustomAction Id="CertGenAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
 
-        <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
+<!--        <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
                       Value="&quot;[${customization}TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
-                      Execute="deferred" Return="ignore" Impersonate="no" />
+                      Execute="deferred" Return="ignore" Impersonate="no" /> -->
 
         <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
                       Value="&quot;[${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]$(var.ProductName) Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
@@ -175,7 +175,7 @@
         <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="yes"
                       Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\ecs.sqlite"/>
 
-        <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
+<!--        <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/> -->
         <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="applauncher.exe" ExeCommand=""/>
 
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
@@ -224,12 +224,12 @@
             <Custom Action="DeleteOldMediaserverSettings_Cmd" After="WriteRegistryValues">$(var.VmsUpgrading)</Custom>
             <Custom Action="DeleteOldMediaserverSettings" After="DeleteOldMediaserverSettings_Cmd">$(var.VmsUpgrading)</Custom>
 
-            <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">
+<!--            <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">
                 <![CDATA[ NOT $(var.VmsInstalling) ]]>
-            </Custom>
+            </Custom>                                 
             <Custom Action="CloseTrayToolAction" Before="StopServices">
                 <![CDATA[ NOT $(var.VmsInstalling) ]]>
-            </Custom>
+            </Custom> -->
 
             <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">
                 <![CDATA[ NOT $(var.VmsInstalling) ]]>
@@ -238,8 +238,8 @@
                 <![CDATA[ NOT $(var.VmsInstalling) ]]>
             </Custom>
 
-            <Custom Action="LaunchTrayTool" After="InstallFinalize">
-            <![CDATA[ (!ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom>
+<!--            <Custom Action="LaunchTrayTool" After="InstallFinalize">
+            <![CDATA[ (!ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom> -->
 
             <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
             <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">REMOVE_DATABASE=1</Custom>
