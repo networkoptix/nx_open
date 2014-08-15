@@ -801,7 +801,8 @@ private:
              Q_ASSERT( bytes_transferred == sniffer_header_length );
              // No idea whether that socket implementation set this length
              sniffer_buffer_.resize(sniffer_header_length); 
-             const char* buf = sniffer_buffer_.data();
+             // Fix for the bug that always false in terms of comparison of 0x80
+             const unsigned char* buf = reinterpret_cast<unsigned char*>(sniffer_buffer_.data());
              if( buf[0] == 0x80 || (buf[0] == 0x16 && buf[1] == 0x03) ) {
                  is_ssl_ = true;
                  is_initialized_ = true;
