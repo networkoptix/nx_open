@@ -11,6 +11,7 @@
 QnMobileClientModule::QnMobileClientModule(int &argc, char *argv[], QObject *parent) :
     QObject(parent)
 {
+    Q_INIT_RESOURCE(mobile_client);
     QnMobileClientMetaTypes::initialize();
 
     /* Set up application parameters so that QSettings know where to look for settings. */

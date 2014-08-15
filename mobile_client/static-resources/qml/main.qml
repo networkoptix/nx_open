@@ -24,9 +24,12 @@ Window {
         Button {
             anchors.bottom: parent.bottom
             text: qsTr("Connect")
-            onClicked: context.connectionManager.connect("http://admin:123@127.0.0.1:7001")
+            onClicked: connectionManager.connect("http://admin:123@127.0.0.1:7001")
         }
     }
 
-    context.connectionManager.onConnected: label.text = "Connected!!!"
+    Connections {
+        target: connectionManager
+        onConnected: label.text = "Connected!!!"
+    }
 }

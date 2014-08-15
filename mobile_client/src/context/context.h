@@ -12,7 +12,7 @@ class QnContext: public QObject, public QnInstanceStorage {
     Q_OBJECT
     typedef QObject base_type;
 
-    Q_PROPERTY(QnConnectionManager connectionManager READ connectionManager)
+    Q_PROPERTY(QnConnectionManager* connectionManager READ connectionManager)
 public:
     QnContext(QObject *parent = NULL);
     virtual ~QnContext();

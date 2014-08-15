@@ -1,5 +1,5 @@
 #include <QtGui/QGuiApplication>
-#include <QtQml/QQmlApplicationEngine>
+#include <QtQml/QQmlEngine>
 #include <QtQml/QtQml>
 
 #include <time.h>
@@ -58,11 +58,16 @@ int runApplication(QGuiApplication *application) {
 
     QnContext context;
 
-    QQmlApplicationEngine engine(&context);
-    engine.rootContext()->setProperty("context", QVariant::fromValue(&context));
-    engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
+    QQmlEngine engine;
+    engine.rootContext()->setContextObject(&context);
+    QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
+    QObject *mainWindow = mainComponent.create();
+
+    QObject::connect(&engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
 
     int result = application->exec();
+
+    delete mainWindow;
 
     QnSessionManager::instance()->stop();
 //    QnResource::stopCommandProc();
