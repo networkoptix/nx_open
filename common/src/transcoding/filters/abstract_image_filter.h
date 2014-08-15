@@ -22,8 +22,9 @@ public:
      * 
      * \param frame image to update
      * \param updateRect    image rect to update. Filter MUST not update image outside the rect. Rect in range [0..1]
+     * \param ar    image aspect ratio.
      */
-    virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect) = 0;
+    virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar) = 0;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

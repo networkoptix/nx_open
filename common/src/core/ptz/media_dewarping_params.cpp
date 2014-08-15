@@ -5,7 +5,7 @@
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnMediaDewarpingParams, ViewMode)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnMediaDewarpingParams,      (json)(eq)(debug),    (enabled)(viewMode)(fovRot)(xCenter)(yCenter)(radius))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnMediaDewarpingParams,      (json)(eq)(debug),    (enabled)(viewMode)(fovRot)(xCenter)(yCenter)(radius)(hStretch))
 
 
 
