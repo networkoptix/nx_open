@@ -447,7 +447,7 @@ QnResourceList QnResourceBrowserWidget::selectedIncompatibleServers() const {
     QnResourceList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
-        if (index.data(Qn::ResourceStatusRole).value<QnResource::Status>() != Qn::Incompatible)
+        if (index.data(Qn::ResourceStatusRole).value<Qn::ResourceStatus>() != Qn::Incompatible)
             continue;
 
         result.append(index.data(Qn::ResourceRole).value<QnResourcePtr>());

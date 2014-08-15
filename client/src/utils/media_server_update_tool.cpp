@@ -503,9 +503,6 @@ void QnMediaServerUpdateTool::installIncompatiblePeers() {
 void QnMediaServerUpdateTool::lockMutex() {
     setState(UploadingUpdate);
 
-    m_pendingUploadPeers = QSet<QUuid>::fromList(m_updateInformationById.keys());
-    m_pendingUploads = m_idBySystemInformation.uniqueKeys();
-
     m_distributedMutex = ec2::QnDistributedMutexManager::instance()->createMutex(mutexName);
     connect(m_distributedMutex, &ec2::QnDistributedMutex::locked,        this,   &QnMediaServerUpdateTool::at_mutexLocked, Qt::QueuedConnection);
     connect(m_distributedMutex, &ec2::QnDistributedMutex::lockTimeout,   this,   &QnMediaServerUpdateTool::at_mutexTimeout, Qt::QueuedConnection);

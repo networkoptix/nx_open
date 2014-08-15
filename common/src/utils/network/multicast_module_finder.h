@@ -98,7 +98,7 @@ private:
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;
-    QHash<QString, ModuleContext> m_knownEnterpriseControllers;
+    QHash<QUuid, ModuleContext> m_knownEnterpriseControllers;
     QSet<QString> m_localNetworkAdresses;
     bool m_compatibilityMode;
 };

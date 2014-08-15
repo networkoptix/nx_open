@@ -4,6 +4,7 @@
 #include <QtWidgets/QInputDialog>
 #include <QtCore/QUrl>
 
+#include <core/resource/resource.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/actions/action_parameter_types.h>
@@ -34,7 +35,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 
     QSet<QUuid> targets;
     foreach (const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
-        if (resource->hasFlags(QnResource::remote_server) && resource->getStatus() == Qn::Incompatible)
+        if (resource->hasFlags(Qn::remote_server) && resource->getStatus() == Qn::Incompatible)
             targets.insert(resource->getId());
     }
 

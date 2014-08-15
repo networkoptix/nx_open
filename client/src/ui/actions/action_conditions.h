@@ -462,12 +462,12 @@ private:
 
 class QnResourceStatusActionCondition: public QnActionCondition {
 public:
-    QnResourceStatusActionCondition(QnResource::Status status, bool allResources, QObject *parent): QnActionCondition(parent), m_status(status), m_all(allResources) {}
+    QnResourceStatusActionCondition(Qn::ResourceStatus status, bool allResources, QObject *parent): QnActionCondition(parent), m_status(status), m_all(allResources) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 
 private:
-    QnResource::Status m_status;
+    Qn::ResourceStatus m_status;
     bool m_all;
 };
 

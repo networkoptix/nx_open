@@ -33,10 +33,10 @@ public:
      */
     void makeModulesReappear();
 
-    //! \param peerList Discovery peer if and only if peer exist in peerList
-    void setAllowedPeers(const QList<QUuid> &peerList) {
-        m_allowedPeers = peerList;
-    }
+//    //! \param peerList Discovery peer if and only if peer exist in peerList
+//    void setAllowedPeers(const QList<QUuid> &peerList) {
+//        m_allowedPeers = peerList;
+//    }
 public slots:
     void start();
     void stop();
