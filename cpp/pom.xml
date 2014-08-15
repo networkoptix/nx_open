@@ -19,7 +19,7 @@
         <root.dir>${basedir}/..</root.dir>
         <buildLib/>
         <libtype/>
-        <!--<product.title>${project.name}</product.title>		-->
+        <!--<product.title>${project.name}</product.title>      -->
         <postfix.libs/>
         <linux.arm.oslibs>${linux.oslibs}</linux.arm.oslibs>
     </properties>
@@ -68,7 +68,7 @@
                                 <resource>
                                     <directory>${root.dir}/cpp/maven/filter-resources</directory>
                                     <filtering>true</filtering>
-                                </resource>	                               
+                                </resource>                                
                                 <resource>
                                     <directory>${root.dir}/cpp/maven/bin-resources</directory>
                                     <filtering>false</filtering>
@@ -95,7 +95,7 @@
                             <arguments>
                                 <argument>${project.build.directory}/gen_resources.py</argument>
                             </arguments>
-                            <workingDirectory>${project.build.directory}</workingDirectory>		
+                            <workingDirectory>${project.build.directory}</workingDirectory>     
                         </configuration>
                     </execution>
                     <execution>
@@ -109,7 +109,7 @@
                             <arguments>
                                 <argument>build-prepare.py</argument>
                             </arguments>
-                            <workingDirectory>${project.build.directory}</workingDirectory>		
+                            <workingDirectory>${project.build.directory}</workingDirectory>     
                         </configuration>
                     </execution>
                     <execution>
@@ -123,12 +123,12 @@
                             <arguments>
                                 <argument>${project.build.directory}/build.py</argument>
                             </arguments>                                    
-                            <workingDirectory>${project.build.directory}</workingDirectory>		
+                            <workingDirectory>${project.build.directory}</workingDirectory>     
                         </configuration>
                     </execution>                    
                 </executions>
-            </plugin>					
-        </plugins>		
+            </plugin>                   
+        </plugins>      
     </build>
     <profiles>
         <profile>
@@ -143,7 +143,7 @@
                 <exclude_platform>unix</exclude_platform>
             </properties>
             <build>
-                <plugins>					
+                <plugins>                   
                     <plugin>
                         <groupId>com.google.code.maven-replacer-plugin</groupId>
                         <artifactId>replacer</artifactId>
@@ -158,8 +158,8 @@
                                     <encoding>utf-8</encoding>
                                     <file>${project.build.sourceDirectory}/${project.artifactId}-x64.vcxproj</file>
                                     <!-- <excludes>
-										<exclude>**/vmaxproxy-x64.vcproj</exclude>
-									</excludes> -->	
+                                        <exclude>**/vmaxproxy-x64.vcproj</exclude>
+                                    </excludes> --> 
                                     <ignoreMissingFile>true</ignoreMissingFile>                                    
                                     <replacements>
                                         <replacement>
@@ -168,11 +168,11 @@
                                         </replacement>         
                                         <replacement>
                                             <token>Name="VCLibrarianTool"</token>
-                                            <value>Name="VCLibrarianTool" \n				AdditionalOptions="/MACHINE:${arch}"</value>
+                                            <value>Name="VCLibrarianTool" \n                AdditionalOptions="/MACHINE:${arch}"</value>
                                         </replacement>         
                                     </replacements>
                                     <skip>${force_x86}</skip>
-                                </configuration>								
+                                </configuration>                                
                             </execution>
 
                             <!-- Fixing qmake-generated msvc2012 project files. Sometimes this step will be unneccessary (when qmake is fixed) -->
@@ -195,22 +195,37 @@
                                             <value>
                                                 <![CDATA[<RootNamespace>${project.artifactId}</RootNamespace><LocalDebuggerWorkingDirectory>$(OutputDirectory)</LocalDebuggerWorkingDirectory>]]></value>
                                         </replacement> -->
- 
+
                                         <!-- Disabling optimization for debug builds -->
                                         <replacement>
                                             <xpath>//Project/ItemDefinitionGroup[contains(@Condition,'Debug')]</xpath>
                                             <token><![CDATA[<WarningLevel>Level3</WarningLevel>]]></token>
                                             <value><![CDATA[<WarningLevel>Level3</WarningLevel><Optimization>Disabled</Optimization>]]></value>
                                         </replacement>
- 
                                         <replacement>
                                             <token>
                                                 <![CDATA[</RootNamespace>]]></token>
                                             <value>
                                                 <![CDATA[</RootNamespace>
-    <PlatformToolSet>v110</PlatformToolSet>
     <TargetName>${project.artifactId}</TargetName>]]></value>
-                                        </replacement>                                        
+                                        </replacement> 
+										<replacement>
+                                            <token>
+                                                <![CDATA[<PlatformToolSet>v110</PlatformToolSet>]]></token>
+                                            <value>
+                                                <![CDATA[<PlatformToolSet>${PlatformToolSet}</PlatformToolSet>]]></value>
+                                        </replacement>         
+                                        <replacement>
+                                            <token>
+                                                <![CDATA[<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">]]></token>
+                                            <value>
+                                                <![CDATA[<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemDefinitionGroup>
+    <Link>
+      <SubSystem Condition="'%(Link.SubSystem)'=='' Or '%(Link.SubSystem)'=='NotSet'">Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>]]></value>
+                                        </replacement> 
                                         <replacement>
                                             <token>
                                                 <![CDATA[release</ProgramDataBaseFileName>]]></token>
@@ -266,18 +281,18 @@
 
                                         <!-- Adding "Create precompiled header option" to StdAfx.cpp compile options -->
                                         <!-- <replacement>
-											<xpath>//Project/ItemGroup/ClCompile[contains(@Include,'StdAfx.cpp')]</xpath>
- 											<token>CustomBuild</token>
-											<value>None</value>
-										</replacement>
-										<replacement>
- 											<token><![CDATA[<ClCompile Include="StdAfx.cpp"/>]]></token>
-											<value><![CDATA[<None Include="StdAfx.cpp"/>]]></value>
-										</replacement> -->
+                                            <xpath>//Project/ItemGroup/ClCompile[contains(@Include,'StdAfx.cpp')]</xpath>
+                                            <token>CustomBuild</token>
+                                            <value>None</value>
+                                        </replacement>
+                                        <replacement>
+                                            <token><![CDATA[<ClCompile Include="StdAfx.cpp"/>]]></token>
+                                            <value><![CDATA[<None Include="StdAfx.cpp"/>]]></value>
+                                        </replacement> -->
 
                                     </replacements>
                                     <skip>${replace.skip}</skip>
-                                </configuration>								
+                                </configuration>                                
                             </execution>
                             <execution>
                                 <id>fix-makefile-QMAKE-SUCKS!!!!!!!!!!</id>
@@ -302,11 +317,11 @@
                                         <replacement>
                                             <token>${project.artifactId}${parsedVersion.majorVersion}</token>
                                             <value>${project.artifactId}</value>
-                                        </replacement>										
+                                        </replacement>                                      
                                     </replacements>
                                     <skip>${replace.skip}</skip>
-                                </configuration>								
-                            </execution>							
+                                </configuration>                                
+                            </execution>                            
                         </executions>
                     </plugin>
                 </plugins>
@@ -323,7 +338,7 @@
             <properties>
                 <rename-skip>false</rename-skip>
             </properties>
-            <build>	
+            <build> 
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
@@ -338,15 +353,15 @@
                                 </goals>
                                 <configuration>
                                     <executable>${project.build.directory}/build.sh</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>		
+                                    <workingDirectory>${project.build.directory}</workingDirectory>     
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
-                </plugins>	
-            </build>			
-        </profile>	
-		
+                </plugins>  
+            </build>            
+        </profile>  
+        
         <profile>
             <id>linux-arm</id>
             <activation>
@@ -363,6 +378,6 @@
             <build>
                 <directory>${arch}-${box}</directory>
             </build>
-        </profile> 		
-    </profiles>	
+        </profile>      
+    </profiles> 
 </project>

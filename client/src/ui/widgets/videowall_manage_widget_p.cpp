@@ -453,6 +453,7 @@ QnVideowallManageWidgetPrivate::TransformationProcess::TransformationProcess():
 /************************************************************************/
 
 QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate(QnVideowallManageWidget* q):
+    QObject(),
     q_ptr(q)
 {
     QDesktopWidget* desktop = qApp->desktop();
@@ -726,6 +727,8 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
         added.flags |= StateFlag::Hovered;   //mouse cursor is over it
         added.opacity = 1.0;
         m_items << added;
+        emit itemsChanged();
+
         item.setFree(false);
 
         abort = true;
@@ -745,6 +748,8 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
         
         setFree(item->snaps, true);
         m_items.removeAt(std::distance(m_items.begin(), item));
+        emit itemsChanged();
+
         break;
     }
 }
@@ -1064,4 +1069,8 @@ void QnVideowallManageWidgetPrivate::processItemEnd(BaseModelItem &item, calcula
     //for bes user experience do not hide controls until user moves a mouse
     setFree(item.snaps, false);
     item.flags |= StateFlags(StateFlag::Hovered);
+}
+
+int QnVideowallManageWidgetPrivate::proposedItemsCount() const {
+    return m_items.size();
 }

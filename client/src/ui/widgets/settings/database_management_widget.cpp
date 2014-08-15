@@ -50,11 +50,11 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
                                                       tr("Save Database Backup..."),
                                                       qnSettings->lastDatabaseBackupDir(),
                                                       tr("Database Backup Files (*.db)")));
-    if (!fileDialog->exec())
+    fileDialog->setAcceptMode(QFileDialog::AcceptSave);
+    if(!fileDialog->exec())
         return;
-
     QString fileName = fileDialog->selectedFile();
-    if(fileName.isEmpty())
+    if (fileName.isEmpty())
         return;
 
     /* Check if we were disconnected (server shut down) while the dialog was open. */
@@ -82,9 +82,9 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
     ec2::ErrorCode errorCode;
     QByteArray databaseData;
     auto dumpDatabaseHandler = 
-        [&dialog, &errorCode, &databaseData]( int /*reqID*/, ec2::ErrorCode _errorCode, const QByteArray& dbData ) {
+        [&dialog, &errorCode, &databaseData]( int /*reqID*/, ec2::ErrorCode _errorCode, const ec2::ApiDatabaseDumpData& dbData ) {
             errorCode = _errorCode;
-            databaseData = dbData;
+            databaseData = dbData.data;
             dialog->reset(); 
     };
     QnAppServerConnectionFactory::getConnection2()->dumpDatabaseAsync( dialog.data(), dumpDatabaseHandler );
@@ -128,7 +128,8 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
         return;
     }
 
-    QByteArray data = file.readAll();
+    ec2::ApiDatabaseDumpData data;
+    data.data = file.readAll();
     file.close();
 
     //TODO: #GDM QnWorkbenchStateDependentDialog, QScopedPointer vs QObject-parent problem
@@ -145,7 +146,15 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
             errorCode = _errorCode;
             dialog->reset(); 
     };
-    QnAppServerConnectionFactory::getConnection2()->restoreDatabaseAsync( data, dialog.data(), restoreDatabaseHandler );
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    if (!conn) {
+        QMessageBox::information(this,
+            tr("Information"),
+            tr("You need to connect to a server before doing backup"));
+        return;
+    }
+
+    conn->restoreDatabaseAsync( data, dialog.data(), restoreDatabaseHandler );
     dialog->exec();
     if(dialog->wasCanceled())
         return; // TODO: #Elric make non-cancelable.   TODO: #ak is running request finish OK?
@@ -153,7 +162,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     if( errorCode == ec2::ErrorCode::ok ) {
         QMessageBox::information(this,
                                  tr("Information"),
-                                 tr("Database was successfully restored from file '%1'.").arg(fileName));
+                                 tr("Database was successfully restored from file '%1'. Media server will be restarted.").arg(fileName));
         menu()->trigger(Qn::ReconnectAction);
     } else {
         NX_LOG( lit("Failed to restore Server database from file '$1'. $2").arg(fileName).arg(ec2::toString(errorCode)), cl_logERROR );

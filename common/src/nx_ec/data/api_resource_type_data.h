@@ -7,7 +7,7 @@
 namespace ec2 
 {
     struct ApiPropertyTypeData: ApiData {
-        QnId resourceTypeId;
+        QUuid resourceTypeId;
 
         QString name;
         Qn::PropertyDataType type;
@@ -37,10 +37,10 @@ namespace ec2
 
 
     struct ApiResourceTypeData: ApiData {
-        QnId id;
+        QUuid id;
         QString name;
         QString vendor;
-        std::vector<QnId> parentId;
+        std::vector<QUuid> parentId;
         std::vector<ApiPropertyTypeData> propertyTypes;
     };
 #define ApiResourceTypeData_Fields (id)(name)(vendor)(parentId)(propertyTypes)

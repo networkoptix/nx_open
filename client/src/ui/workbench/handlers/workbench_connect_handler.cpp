@@ -61,7 +61,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
     connect(action(Qn::DisconnectAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_disconnectAction_triggered);
 
     connect(action(Qn::OpenLoginDialogAction),      &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::showLoginDialog);
-    connect(action(Qn::ExitActionDelayed),          &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_beforeExitAction_triggered);
+    connect(action(Qn::BeforeExitAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_beforeExitAction_triggered);
 
     context()->instance<QnAppServerNotificationCache>();
 }
@@ -87,13 +87,22 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
 
     hideMessageBox();
 
-    connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
+    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, [this](const QnPeerRuntimeInfo &info) 
+    {
+        if (info.uuid != qnCommon->moduleGUID())
+            return;
+        connection2()->sendRuntimeData(info.data);
+    });
+
+    //connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
 }
 
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     /* Don't do anything if we are closing client. */
     if (!mainWindow())
         return;
+
+    disconnect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, NULL);
 
     if (qnSettings->isVideoWallMode()) {
         m_connectingMessageBox = QnGraphicsMessageBox::information(
@@ -112,7 +121,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     action(Qn::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
     /* Remove all remote resources. */
-    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
     resourcePool()->removeResources(remoteResources);
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
@@ -183,9 +192,10 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
 }    
 
 void QnWorkbenchConnectHandler::at_reconnectAction_triggered() {
+    QUrl currentUrl = QnAppServerConnectionFactory::url(); 
     if (connected())
         disconnectFromServer(true);
-    if (!connectToServer(QnAppServerConnectionFactory::url()))
+    if (!connectToServer(currentUrl))
         showLoginDialog();
 }
  

@@ -49,7 +49,7 @@ inline QString replaceNonFileNameCharacters(const QString &string, const QChar &
  */
 QString formatFileSize(qint64 size, int precision = 1, int prefixThreshold = 1, Qn::MetricPrefix minPrefix = Qn::NoPrefix, Qn::MetricPrefix maxPrefix = Qn::YottaPrefix, bool useBinaryPrefixes = true, const QString pattern = QLatin1String("%1 %2"));
 
-int naturalStringCompare(const QString &lhs, const QString &rhs, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive);
+int naturalStringCompare(const QString &lhs, const QString &rhs, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive , bool enableFloat = true );
 QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive);
 
 bool naturalStringLessThan(const QString &lhs, const QString &rhs);
@@ -68,6 +68,7 @@ QString extractFileExtension(const QString &string);
 
 /** Returns string formed as "baseValue<spacer>(n)" that is not contained in the usedValues list. */
 QString generateUniqueString(const QStringList &usedStrings, const QString &defaultString, const QString &templateString);
+
 
 #endif // QN_STRING_H
 

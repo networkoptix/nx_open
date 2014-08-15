@@ -125,7 +125,7 @@ QnAbstractStreamDataProvider* QnPlVmax480Resource::createArchiveDataProvider()
     QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
     QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
     archiveReader->setArchiveDelegate(archiveDelegate);
-    if (hasFlags(still_image) || hasFlags(utc))
+    if (hasFlags(Qn::still_image) || hasFlags(Qn::utc))
         archiveReader->setCycleMode(false);
     return archiveReader;
 }
@@ -203,11 +203,6 @@ void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUs
     }
 }
 
-void QnPlVmax480Resource::setStatus(Status newStatus, bool silenceMode)
-{
-    QnPhysicalCameraResource::setStatus(newStatus, silenceMode);
-}
-
 QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
 {
     QUrl url(getUrl());
@@ -263,6 +258,12 @@ QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint
 
     return m_chunks.intersected(period);
 }
+
+Qn::LicenseType QnPlVmax480Resource::licenseType() const
+{
+    return Qn::LC_VMAX;
+}
+
 
 #endif // #ifdef ENABLE_VMAX
 

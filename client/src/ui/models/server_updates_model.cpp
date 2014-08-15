@@ -77,7 +77,7 @@ QnMediaServerResourceList QnServerUpdatesModel::servers() const {
     return servers;
 }
 
-void QnServerUpdatesModel::setUpdatesInformation(const QHash<QnId, QnMediaServerUpdateTool::PeerUpdateInformation> &updates) {
+void QnServerUpdatesModel::setUpdatesInformation(const QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> &updates) {
     foreach (Item *item, m_items)
         item->m_updateInfo = updates[item->server()->getId()];
 
@@ -104,7 +104,7 @@ void QnServerUpdatesModel::resetResourses() {
     qDeleteAll(m_items);
     m_items.clear();
 
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::server)) {
         QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
         m_items.append(new Item(server, m_updates[server->getId()]));
     }

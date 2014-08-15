@@ -259,7 +259,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget 
 
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
-    QnId resourceId = params.getEventResourceId();
+    QUuid resourceId = params.getEventResourceId();
     QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (!resource)
         return;
@@ -391,7 +391,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 }
 
 void QnNotificationsCollectionWidget::hideBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
-    QnId ruleId = businessAction->getBusinessRuleId();
+    QUuid ruleId = businessAction->getBusinessRuleId();
     QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().getEventResourceId());
     if (!resource)
         return;
@@ -412,7 +412,7 @@ QnNotificationWidget* QnNotificationsCollectionWidget::findItem(QnSystemHealth::
     return NULL;
 }
 
-QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QnId& businessRuleId, const QnResourcePtr &resource, bool useResource) {
+QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QUuid& businessRuleId, const QnResourcePtr &resource, bool useResource) {
     foreach (QnNotificationWidget *item, m_itemsByBusinessRuleId.values(businessRuleId))
         if (!useResource || resource == item->property(itemResourcePropertyName).value<QnResourcePtr>())
             return item;
@@ -651,7 +651,15 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
 
                 QStringList conflicts;
                 conflicts << lit("10.0.2.108");
+                conflicts << lit("2");
+                conflicts << lit("50:e5:49:43:b2:63");
+                conflicts << lit("50:e5:49:43:b2:64");
                 conflicts << lit("192.168.0.15");
+                conflicts << lit("4");
+                conflicts << lit("50:e5:49:43:b2:61");
+                conflicts << lit("50:e5:49:43:b2:62");
+                conflicts << lit("50:e5:49:43:b2:63");
+                conflicts << lit("50:e5:49:43:b2:64");
                 params.setConflicts(conflicts);
                 break;
             }
@@ -670,7 +678,7 @@ void QnNotificationsCollectionWidget::at_list_itemRemoved(QnNotificationWidget *
     foreach (QnSystemHealth::MessageType messageType, m_itemsByMessageType.keys(item))
         m_itemsByMessageType.remove(messageType, item);
 
-    foreach (const QnId& ruleId, m_itemsByBusinessRuleId.keys(item))
+    foreach (const QUuid& ruleId, m_itemsByBusinessRuleId.keys(item))
         m_itemsByBusinessRuleId.remove(ruleId, item);
 
     foreach (QString soundPath, m_itemsByLoadingSound.keys(item))

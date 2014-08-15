@@ -160,7 +160,7 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
 
     connect(exportProgressDialog,   SIGNAL(canceled()),             tool,                   SLOT(stop()));
     if (target && slot)
-        connect(tool,               SIGNAL(finished(bool)),         target,                 slot);
+        connect(tool,               SIGNAL(finished(bool,QString)),         target,                 slot);
 
     return tool->start();
 }
@@ -245,7 +245,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
 
     QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), L'_');
-    QString timePart = (widget->resource()->toResource()->flags() & QnResource::utc)
+    QString timePart = (widget->resource()->toResource()->flags() & Qn::utc)
             ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
             : QTime().addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
     QString suggestion = QnEnvironment::getUniqueFileName(previousDir, namePart + lit("_") + timePart);
@@ -461,9 +461,10 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         QnResourcePtr resource = qnResPool->getResourceByUniqId(item.resource.path);
         if (!resource)
             continue;
-        hasImage |= resource->hasFlags(QnResource::still_image);
-        hasLocal |= resource->hasFlags(QnResource::local)
-                    || resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); // layout item remove 'local' flag.
+        if( resource->getParentResource() == layout )
+            continue;
+        hasImage |= resource->hasFlags(Qn::still_image);
+        hasLocal |= resource->hasFlags(Qn::local) || resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); // layout item remove 'local' flag.
         if (hasImage || hasLocal)
             break;
     }
@@ -663,7 +664,7 @@ void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QStr
 
     if (success) {
         QnAviResourcePtr file(new QnAviResource(fileName));
-        file->setStatus(QnResource::Online);
+        file->setStatus(Qn::Online);
         resourcePool()->addResource(file);
 
         QMessageBox::information(mainWindow(), tr("Export finished"), tr("Export successfully finished."), QMessageBox::Ok);

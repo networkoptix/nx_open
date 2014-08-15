@@ -95,11 +95,11 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
-        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::DumpDatabaseHandler::done, handler, reqID, ec2::ErrorCode::notImplemented, QByteArray()));
+        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::DumpDatabaseHandler::done, handler, reqID, ec2::ErrorCode::notImplemented, ec2::ApiDatabaseDumpData()));
         return reqID;
     }
 
-    int OldEcConnection::restoreDatabaseAsync(const QByteArray& /*dbFile*/, impl::SimpleHandlerPtr handler)
+    int OldEcConnection::restoreDatabaseAsync(const ApiDatabaseDumpData& /*dbFile*/, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
         QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());

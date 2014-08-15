@@ -347,6 +347,8 @@ protected:
     void initContext(QnWorkbenchContext *context);
     void initBoundingInstrument();
 
+    void toggleBackgroundAnimation(bool enabled);
+
     qreal widgetsFrameOpacity() const;
     void setWidgetsFrameOpacity(qreal opacity);
 

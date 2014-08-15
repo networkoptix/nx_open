@@ -118,7 +118,6 @@ private:
 
     void connectToGridWidget();
     void disconnectFromGridWidget();
-
 private:
     Q_DISABLE_COPY(QnCameraScheduleWidget)
 

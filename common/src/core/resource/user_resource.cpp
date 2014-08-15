@@ -4,8 +4,8 @@ QnUserResource::QnUserResource():
     m_permissions(0),
     m_isAdmin(false)
 {
-    setStatus(Online, true);
-    addFlags(QnResource::user | QnResource::remote);
+    setStatus(Qn::Online, true);
+    addFlags(Qn::user | Qn::remote);
 }
 
 QByteArray QnUserResource::getHash() const
@@ -16,8 +16,13 @@ QByteArray QnUserResource::getHash() const
 
 void QnUserResource::setHash(const QByteArray& hash)
 {
-    QMutexLocker locker(&m_mutex);
-    m_hash = hash;
+    {
+        QMutexLocker locker(&m_mutex);
+        if (m_hash == hash)
+            return;
+        m_hash = hash;
+    }
+    emit hashChanged(::toSharedPointer(this));
 }
 
 QString QnUserResource::getPassword() const
@@ -28,14 +33,24 @@ QString QnUserResource::getPassword() const
 
 void QnUserResource::setPassword(const QString& password)
 {
-    QMutexLocker locker(&m_mutex);
-    m_password = password;
+    {
+        QMutexLocker locker(&m_mutex);
+        if (m_password == password)
+            return;
+        m_password = password;
+    }
+    emit passwordChanged(::toSharedPointer(this));
 }
 
 void QnUserResource::setDigest(const QByteArray& digest)
 {
-    QMutexLocker locker(&m_mutex);
-    m_digest = digest;
+    {
+        QMutexLocker locker(&m_mutex);
+        if (m_digest == digest)
+            return;
+        m_digest = digest;
+    }
+    emit digestChanged(::toSharedPointer(this));
 }
 
 QByteArray QnUserResource::getDigest() const
@@ -68,8 +83,13 @@ bool QnUserResource::isAdmin() const
 
 void QnUserResource::setAdmin(bool isAdmin)
 {
-    QMutexLocker locker(&m_mutex);
-    m_isAdmin = isAdmin;
+    {
+        QMutexLocker locker(&m_mutex);
+        if (m_isAdmin == isAdmin)
+            return;
+        m_isAdmin = isAdmin;
+    }
+    emit adminChanged(::toSharedPointer(this));
 }
 
 QString QnUserResource::getEmail() const
@@ -93,13 +113,36 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
 {
     base_type::updateInner(other, modifiedFields);
 
-    QnUserResource* localOther = dynamic_cast<QnUserResource*>(other.data());
+    QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
     if(localOther) {
-        setPassword(localOther->getPassword());
-        setHash(localOther->getHash());
-        setDigest(localOther->getDigest());
-        setPermissions(localOther->getPermissions());
-        setAdmin(localOther->isAdmin());
-        setEmail(localOther->getEmail());
+        if (m_password != localOther->m_password) {
+            m_password = localOther->m_password;
+            modifiedFields << "passwordChanged";
+        }
+
+        if (m_hash != localOther->m_hash) {
+            m_hash = localOther->m_hash;
+            modifiedFields << "hashChanged";
+        }
+
+        if (m_digest != localOther->m_digest) {
+            m_digest = localOther->m_digest;
+            modifiedFields << "digestChanged";
+        }
+
+        if (m_permissions != localOther->m_permissions) {
+            m_permissions = localOther->m_permissions;
+            modifiedFields << "permissionsChanged";
+        }
+
+        if (m_isAdmin != localOther->m_isAdmin) {
+            m_isAdmin = localOther->m_isAdmin;
+            modifiedFields << "adminChanged";
+        }
+
+        if (m_email != localOther->m_email) {
+            m_email = localOther->m_email;
+            modifiedFields << "emailChanged";
+        }
     }
 }

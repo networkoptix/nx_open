@@ -70,6 +70,7 @@ namespace {
         (EventLogObject,           "events")
         (ImageObject,              "image")
         (CameraDiagnosticsObject,  "doCameraDiagnosticsStep")
+        (GetSystemNameObject,      "getSystemName")
         (RebuildArchiveObject,     "rebuildArchive")
         (BookmarkAddObject,        "cameraBookmarks/add")
         (BookmarkUpdateObject,     "cameraBookmarks/update")
@@ -294,6 +295,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     }
     case CameraDiagnosticsObject:
         processJsonReply<QnCameraDiagnosticsReply>(this, response, handle);
+        break;
+    case GetSystemNameObject:
+        emitFinished( this, response.status, QString::fromUtf8(response.data), handle );
         break;
     case RebuildArchiveObject: {
         QnRebuildArchiveReply info;
@@ -673,6 +677,11 @@ int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
     return sendAsyncGetRequest(TimeObject, QnRequestParamList(), QN_STRINGIZE_TYPE(QnTimeReply), target, slot);
 }
 
+int QnMediaServerConnection::getSystemNameAsync( QObject* target, const char* slot )
+{
+    return sendAsyncGetRequest(GetSystemNameObject, QnRequestParamList(), QN_STRINGIZE_TYPE(QString), target, slot);
+}
+
 int QnMediaServerConnection::testEmailSettingsAsync(const QnEmail::Settings &settings, QObject *target, const char *slot) 
 {
     QnRequestHeaderList headers;
@@ -683,7 +692,7 @@ int QnMediaServerConnection::testEmailSettingsAsync(const QnEmail::Settings &set
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
-    const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
+    const QUuid& cameraID, CameraDiagnostics::Step::Value previousStep,
     QObject* target, const char* slot )
 {
     QnRequestParamList params;
@@ -722,7 +731,7 @@ int QnMediaServerConnection::getEventLogAsync(
                   QnResourceList camList,
                   QnBusiness::EventType eventType,
                   QnBusiness::ActionType actionType,
-                  QnId businessRuleId,
+                  QUuid businessRuleId,
                   QObject *target, const char *slot)
 {
     QnRequestParamList params;

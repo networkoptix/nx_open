@@ -316,6 +316,20 @@ public:
         \param multicastIF multicast interface for sending packets
     */
     virtual bool setMulticastIF( const QString& multicastIF ) = 0;
+
+    /**
+    *   Join the specified multicast group
+    *   @param multicastGroup multicast group address to join
+    */
+    virtual bool joinGroup( const QString &multicastGroup ) = 0;
+    virtual bool joinGroup( const QString &multicastGroup, const QString& multicastIF ) = 0;
+
+    /**
+    *   Leave the specified multicast group
+    *   @param multicastGroup multicast group address to leave
+    */
+    virtual bool leaveGroup( const QString &multicastGroup ) = 0;
+    virtual bool leaveGroup( const QString &multicastGroup, const QString& multicastIF ) = 0;
 };
 
 #endif  //ABSTRACT_SOCKET_H

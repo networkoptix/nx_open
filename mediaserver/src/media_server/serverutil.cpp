@@ -31,45 +31,14 @@ QString authKey()
     return MSSettings::roSettings()->value("authKey").toString();
 }
 
-#ifdef EDGE_SERVER
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <arpa/inet.h>
-#include <net/if.h>
-
-void mac_eth0(char  MAC_str[13], char** host)
-{
-    #define HWADDR_len 6
-    int s,i;
-    struct ifreq ifr;
-    s = socket(AF_INET, SOCK_DGRAM, 0);
-    strcpy(ifr.ifr_name, "eth0");
-    if (ioctl(s, SIOCGIFHWADDR, &ifr) != -1) {
-        for (i=0; i<HWADDR_len; i++)
-            sprintf(&MAC_str[i*2],"%02X",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
-    }
-    if((ioctl(s, SIOCGIFADDR, &ifr)) != -1) {
-        const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
-        *host = inet_ntoa(ip->sin_addr);
-    }
-    close(s);
-}
-#endif
-
-
 QUuid serverGuid() {
     static QUuid guid;
 
     if (!guid.isNull())
         return guid;
 
-    guid = MSSettings::roSettings()->value(lit("serverGuid")).toString();
+    guid = QUuid(MSSettings::roSettings()->value(lit("serverGuid")).toString());
 
-#ifdef _TEST_TWO_SERVERS
-    return guid + "test";
-#endif
     return guid;
 }
 
