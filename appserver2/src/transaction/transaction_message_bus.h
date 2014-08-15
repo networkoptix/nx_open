@@ -217,7 +217,6 @@ namespace ec2
 
         AlivePeersMap m_alivePeers;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
-        QVector<QSharedPointer<QnTransactionTransport>> m_connectionsToRemove;
         QMap<QUuid, int> m_lastTranSeq;
 
         // alive control
