@@ -1395,10 +1395,12 @@ void QnMain::run()
 
     syncStoragesToSettings(m_mediaServer);
 
+    /*
     do {
         if (needToStop())
             return;
     } while (ec2Connection->getResourceManager()->setResourceStatusSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
+    */
 
 
     QStringList usedPathList;

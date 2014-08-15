@@ -120,7 +120,7 @@ public:
                 setUniformValue(m_fovRotLocation, (float) fovRot);
             }
             else {
-                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - M_PI/2.0 - itemParams.fov/2.0));
+                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - M_PI/2.0 - itemParams.fov/2.0/aspectRatio));
                 setUniformValue(m_yPos, (float) 1.0);
                 setUniformValue(m_xShiftLocation, (float) fovRot);
                 setUniformValue(m_fovRotLocation, (float) -itemParams.xAngle);
@@ -140,7 +140,7 @@ public:
             }
         }
 
-        setUniformValue(m_aspectRatioLocation, (float) (aspectRatio));
+        setUniformValue(m_aspectRatioLocation, (float) (aspectRatio / mediaParams.hStretch));
         setUniformValue(m_panoFactorLocation, (float) (itemParams.panoFactor));
         setUniformValue(m_dstFovLocation, (float) itemParams.fov);
 
@@ -149,6 +149,7 @@ public:
         setUniformValue(m_radiusLocation, (float) mediaParams.radius);
         setUniformValue(m_maxXLocation, maxX);
         setUniformValue(m_maxYLocation, maxY);
+        setUniformValue(m_xStretchLocation, (float) mediaParams.hStretch);
     }
 
     virtual bool link() override {
@@ -172,6 +173,7 @@ public:
 
             m_maxXLocation = uniformLocation("maxX");
             m_maxYLocation = uniformLocation("maxY");
+            m_xStretchLocation = uniformLocation("xStretch");
         }
         return rez;
     }
@@ -194,6 +196,7 @@ protected:
     
     int m_maxXLocation;
     int m_maxYLocation;
+    int m_xStretchLocation;
     bool m_add_shader;
 };
 

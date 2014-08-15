@@ -43,12 +43,12 @@ void QnVideowallManageWidget::paintEvent(QPaintEvent *event) {
 
     QScopedPointer<QPainter> painter(new QPainter(this));
 
-    QRect eventRect = event->rect();
-    if (eventRect.isNull())
+    QRect paintRect = this->rect();
+    if (paintRect.isNull())
         return;
 
-    painter->fillRect(eventRect, palette().window());
-    d->paint(painter.data(), eventRect);
+    painter->fillRect(paintRect, palette().window());
+    d->paint(painter.data(), paintRect);
 }
 
 void QnVideowallManageWidget::loadFromResource(const QnVideoWallResourcePtr &videowall) {

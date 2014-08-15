@@ -375,3 +375,9 @@ void QnSmtpSettingsWidget::validateEmailAdvanced() {
 bool QnSmtpSettingsWidget::hasChanges() const  {
     return settings() != QnGlobalSettings::instance()->emailSettings();
 }
+
+void QnSmtpSettingsWidget::showEvent( QShowEvent* event )
+{
+    QnAbstractPreferencesWidget::showEvent( event );
+    ui->controlsWidget->setEnabled( true );
+}

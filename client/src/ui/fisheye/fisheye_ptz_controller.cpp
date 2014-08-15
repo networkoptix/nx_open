@@ -62,8 +62,10 @@ void QnFisheyePtzController::updateLimits() {
     m_limits.minFov = 20.0;
     m_limits.maxFov = 90.0 * m_itemDewarpingParams.panoFactor;
 
-    qreal imageAR = m_aspectRatio / (qreal) m_itemDewarpingParams.panoFactor;
-    qreal radiusY = m_mediaDewarpingParams.radius * imageAR;
+    qreal imageAR = m_aspectRatio;
+    if (m_itemDewarpingParams.panoFactor > 1)
+        imageAR = 1.0 / (qreal) m_itemDewarpingParams.panoFactor;
+    qreal radiusY = m_mediaDewarpingParams.radius * imageAR / m_mediaDewarpingParams.hStretch;
     
     qreal minY = m_mediaDewarpingParams.yCenter - radiusY;
     qreal maxY = m_mediaDewarpingParams.yCenter + radiusY;
@@ -123,7 +125,7 @@ void QnFisheyePtzController::updateAspectRatio() {
     if (!m_widget)
         return;
 
-    m_aspectRatio = m_widget->hasAspectRatio() ? m_widget->aspectRatio() : 1.0;
+    m_aspectRatio = (m_widget->hasAspectRatio() ? m_widget->aspectRatio() : 1.0);
 }
 
 void QnFisheyePtzController::updateMediaDewarpingParams() {
@@ -164,7 +166,7 @@ QVector3D QnFisheyePtzController::boundedPosition(const QVector3D &position) {
     if(!m_unlimitedPan || !qFuzzyEquals(m_limits.minTilt, -90) || m_itemDewarpingParams.panoFactor > 1)
         result.setY(qMax(m_limits.minTilt + vFov / 2.0, result.y()));
     if(!m_unlimitedPan || !qFuzzyEquals(m_limits.maxTilt, 90) || m_itemDewarpingParams.panoFactor > 1)
-        result.setY(qMin(m_limits.maxTilt - vFov / 2.0, result.y()));
+        result.setY(qMin(m_limits.maxTilt - vFov  / 2.0, result.y()));
 
     return result;
 }
