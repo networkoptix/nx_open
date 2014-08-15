@@ -27,6 +27,9 @@ public:
 
     virtual bool hasChanges() const override;
 
+protected:
+    virtual void showEvent( QShowEvent* event ) override;
+
 private:
     QnEmail::Settings settings() const;
     void stopTesting(QString result);
