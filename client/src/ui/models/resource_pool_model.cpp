@@ -579,6 +579,7 @@ void QnResourcePoolModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout,
     } else {
         resource = resourcePool()->getResourceByUniqId(item.resource.path);
     }
+    Q_ASSERT(resource);
 
     node->setResource(resource);
     node->setParent(parentNode);
