@@ -62,7 +62,7 @@ namespace aio
         {
             delete *it;
         }
-            m_systemSocketAIO.aioThreadPool.clear();
+        m_systemSocketAIO.aioThreadPool.clear();
     }
 
     //!Returns true, if object has been successfully initialized
