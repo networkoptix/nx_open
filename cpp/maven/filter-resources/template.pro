@@ -98,9 +98,7 @@ LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib
 !win*:!mac {
     LIBS += -Wl,-rpath-link,${qt.dir}/lib
 }
-!android {
-    LIBS += ${global.libs}
-}
+LIBS += ${global.libs}
 
 INCLUDEPATH +=  ${qt.dir}/include \
                 ${qt.dir}/include/QtCore \

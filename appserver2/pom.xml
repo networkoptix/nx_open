@@ -24,14 +24,14 @@
         <product.title>${appserver2.name}</product.title>  
         <!--Global libs-->		
         <qt.libs>core network xml sql concurrent</qt.libs>
-        <global.libs>-lcommon -lpostproc</global.libs>
+        <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
-        <linux.oslibs>-lssl -lcrypto</linux.oslibs>
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32 -lpostproc</windows.oslibs>
+        <linux.oslibs>-lssl -lcrypto -lpostproc</linux.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>                
-        <mac.oslibs>-lssl -lcrypto -lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
-        <android.oslibs>-lcommon -lssl -lcrypto</android.oslibs>
+        <mac.oslibs>-lpostproc -lssl -lcrypto -lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+        <android.oslibs>-lssl -lcrypto</android.oslibs>
         <!--Global defines-->
         <global.defines></global.defines>
         <!--Specific os defines-->

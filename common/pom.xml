@@ -24,12 +24,13 @@
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <!--Global libs-->
         <!-- <qt.libs>core gui network opengl xml multimedia sql</qt.libs> -->
-        <global.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lonvif -lquazip</global.libs>
+        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
+        <global.libs>-lonvif -lquazip</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar</windows.oslibs>
-        <linux.oslibs>-lssl -lsigar</linux.oslibs>
-        <mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
-        <android.oslibs>-lquazip -lssl -lcrypto</android.oslibs>
+        <windows.oslibs>${ffmpeg.libs} -lws2_32 -lIphlpapi -lOle32 -lsigar</windows.oslibs>
+        <linux.oslibs>${ffmpeg.libs} -lssl -lsigar</linux.oslibs>
+        <mac.oslibs>${ffmpeg.libs} -framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
+        <android.oslibs>-lssl -lcrypto</android.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->
