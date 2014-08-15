@@ -100,7 +100,7 @@ void RDirSyncher::pleaseStop()
     //TODO/IMPL
 }
 
-void RDirSyncher::setFileProgressNotificationStep( int bytes )
+void RDirSyncher::setFileProgressNotificationStep( int /*bytes*/ )
 {
     //TODO/IMPL
 }
