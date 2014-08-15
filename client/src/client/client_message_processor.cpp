@@ -40,7 +40,10 @@ void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     checkForTmpStatus(resource);
 }
 
-void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
+void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) 
+{
+    QnCommonMessageProcessor::updateResource(resource);
+
     QnResourcePtr ownResource;
 
     ownResource = qnResPool->getResourceById(resource->getId());

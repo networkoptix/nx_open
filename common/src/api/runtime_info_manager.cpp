@@ -33,6 +33,7 @@ QnThreadsafeItemStorage<QnPeerRuntimeInfo> * QnRuntimeInfoManager::items() const
     return m_items.data();
 }
 
+
 void QnRuntimeInfoManager::storedItemAdded(const QnPeerRuntimeInfo &item) {
 #ifdef RUNTIME_INFO_DEBUG
     qDebug() <<"runtime info added" << item.uuid << item.data.peer.peerType;
@@ -65,3 +66,7 @@ QnPeerRuntimeInfo QnRuntimeInfoManager::remoteInfo() const {
     return m_items->getItem(qnCommon->remoteGUID());
 }
 
+bool QnRuntimeInfoManager::hasItem(const QUuid& id)
+{
+    return m_items->hasItem(id);
+}

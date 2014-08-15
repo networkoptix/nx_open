@@ -23,7 +23,7 @@ public:
 
     virtual void init(const ec2::AbstractECConnectionPtr& connection);
 
-    virtual void updateResource(const QnResourcePtr &resource) = 0;
+    virtual void updateResource(const QnResourcePtr &resource);
 
     QMap<QUuid, QnBusinessEventRulePtr> businessRules() const;
 signals:

@@ -89,7 +89,9 @@ void QnServerMessageProcessor::removeIPList(const QUuid& id)
     }
 }
 
-void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
+void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) 
+{
+    QnCommonMessageProcessor::updateResource(resource);
     QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>();
 
     const bool isServer = dynamic_cast<const QnMediaServerResource*>(resource.data()) != nullptr;
@@ -174,6 +176,7 @@ bool QnServerMessageProcessor::isKnownAddr(const QString& addr) const
 
 void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) 
 {
+#if 0
     if (resource->getId() == qnCommon->moduleGUID() && resource->getStatus() != Qn::Online)
     {
         // it's own server. change status to online
@@ -182,6 +185,7 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     else {
         resource->setStatus(status, true);
     }
+#endif
 }
 
 bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const

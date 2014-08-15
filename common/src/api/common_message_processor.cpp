@@ -12,6 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
+#include "runtime_info_manager.h"
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     QObject(parent)
@@ -298,4 +299,16 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
 
 QMap<QUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() const {
     return m_rules;
+}
+
+void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource) 
+{
+    if (dynamic_cast<const QnMediaServerResource*>(resource.data()))
+    {
+        if (QnRuntimeInfoManager::instance()->hasItem(resource->getId()))
+            resource->setStatus(Qn::Online);
+        else
+            resource->setStatus(Qn::Offline);
+    }
+
 }
