@@ -1,9 +1,7 @@
 #include "module_information_rest_handler.h"
 
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonValue>
-
 #include <utils/network/tcp_connection_priv.h>
+#include <utils/network/module_information.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -14,15 +12,24 @@ int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequ
     Q_UNUSED(path)
     Q_UNUSED(params)
 
-    QJsonObject json;
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return CODE_INTERNAL_ERROR;
 
-    json.insert(lit("type"), lit("Server"));
-    json.insert(lit("customization"), lit(QN_CUSTOMIZATION_NAME));
-    json.insert(lit("version"), QnSoftwareVersion(lit(QN_ENGINE_VERSION)).toString());
-    json.insert(lit("systemInformation"), QnSystemInformation(QN_APPLICATION_PLATFORM, QN_APPLICATION_ARCH, QN_ARM_BOX).toString());
-    json.insert(lit("systemName"), qnCommon->localSystemName());
-    json.insert(lit("id"), qnCommon->moduleGUID().toString());
+    QnModuleInformation moduleInformation;
+    moduleInformation.type = lit("Media Server");
+    moduleInformation.customization = lit(QN_CUSTOMIZATION_NAME);
+    moduleInformation.version = qnCommon->engineVersion();
+    moduleInformation.systemInformation = QnSystemInformation::currentSystemInformation();
+    moduleInformation.systemName = qnCommon->localSystemName();
+    moduleInformation.id = qnCommon->moduleGUID();
+    moduleInformation.isLocal = false;
 
-    result.setReply(QJsonValue(json));
+    foreach (const QHostAddress &address, server->getNetAddrList())
+        moduleInformation.remoteAddresses.insert(address.toString());
+
+    moduleInformation.port = qnCommon->moduleUrl().port();
+
+    result.setReply(moduleInformation);
     return CODE_OK;
 }

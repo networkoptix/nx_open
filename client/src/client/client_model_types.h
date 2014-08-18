@@ -23,7 +23,6 @@ typedef QHash<QString, QWeakPointer<QObject> > QnWeakObjectHash;
 
 Q_DECLARE_METATYPE(QnWeakObjectHash)
 
-
 // -------------------------------------------------------------------------- //
 // QnWorkbenchState
 // -------------------------------------------------------------------------- //

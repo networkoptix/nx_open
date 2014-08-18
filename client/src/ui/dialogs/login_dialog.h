@@ -23,7 +23,6 @@ class QnWorkbenchContext;
 class QnAbstractArchiveReader;
 class QnResourceWidgetRenderer;
 class QnRenderingWidget;
-class ModuleInformation;
 
 namespace Ui {
     class LoginDialog;
@@ -71,7 +70,7 @@ private slots:
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
 
-    void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress);
+    void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress);
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
 private:
@@ -90,7 +89,6 @@ private:
     int m_requestHandle;
 
     QnRenderingWidget *m_renderingWidget;
-    QnModuleFinder *m_moduleFinder;
 
     struct QnEcData {
         QUuid id;

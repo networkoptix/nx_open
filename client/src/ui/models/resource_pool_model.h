@@ -59,6 +59,7 @@ private:
     QnResourcePoolModelNode *node(const QModelIndex &index) const;
     QnResourcePoolModelNode *node(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource);
     QnResourcePoolModelNode *node(const QnResourcePtr &resource, const QString &groupId, const QString &groupName);
+    QnResourcePoolModelNode *systemNode(const QString &systemName);
     QnResourcePoolModelNode *expectedParent(QnResourcePoolModelNode *node);
     bool isIgnored(const QnResourcePtr &resource) const;
 
@@ -87,6 +88,9 @@ private slots:
     void at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
 
     void at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera);
+
+    void at_commonModule_systemNameChanged();
+
 private:
     friend class QnResourcePoolModelNode;
 
@@ -114,6 +118,9 @@ private:
 
     /** Mapping for item nodes, by resource id. Is managed by nodes. */
     QHash<QnResourcePtr, QList<QnResourcePoolModelNode *> > m_itemNodesByResource;
+
+    /** Mapping for system nodes, by system name. */
+    QHash<QString, QnResourcePoolModelNode *> m_systemNodeBySystemName;
 
     /** Whether item urls should be shown. */
     bool m_urlsShown;

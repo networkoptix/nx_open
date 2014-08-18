@@ -120,6 +120,10 @@ QnLicensesListModelColors::QnLicensesListModelColors() {
     expired = QColor(Qt::red);
 }
 
+QnRoutingManagementColors::QnRoutingManagementColors() {
+    readOnly = Qt::lightGray;
+}
+
 QnVideowallManageWidgetColors::QnVideowallManageWidgetColors() {
     desktop = Qt::darkGray;
     freeSpace = Qt::lightGray;

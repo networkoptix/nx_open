@@ -17,6 +17,8 @@ public:
     QString arch;
     QString platform;
     QString modification;
+
+    static QnSystemInformation currentSystemInformation();
 };
 #define QnSystemInformation_Fields (arch)(platform)(modification)
 

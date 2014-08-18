@@ -9,6 +9,7 @@
 #include <QtCore/QUrl>
 
 #include <utils/common/email.h>
+#include <utils/network/module_information.h>
 
 #include <api/model/connection_info.h>
 #include <api/model/email_attachment.h>
@@ -27,6 +28,7 @@
 
 class QnRestProcessorPool;
 class QnUniversalTcpListener;
+struct QnModuleInformation;
 
 //!Contains API classes for the new Server
 /*!
@@ -715,6 +717,84 @@ namespace ec2
     };
 
 
+    class AbstractDiscoveryManager : public QObject {
+        Q_OBJECT
+    public:
+        template<class TargetType, class HandlerType> int discoverPeer(const QUrl &url, TargetType *target, HandlerType handler) {
+            return discoverPeer(url, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int addDiscoveryInformation(const QUuid &id, const QList<QUrl> &urls, bool ignore, TargetType *target, HandlerType handler) {
+            return addDiscoveryInformation(id, urls, ignore, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int removeDiscoveryInformation(const QUuid &id, const QList<QUrl> &urls, bool ignore, TargetType *target, HandlerType handler) {
+            return removeDiscoveryInformation(id, urls, ignore, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+    signals:
+        void peerDiscoveryRequested(const QUrl &url);
+        void discoveryInformationChanged(const ApiDiscoveryDataList &data, bool addInformation);
+
+    protected:
+        virtual int discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler) = 0;
+        virtual int addDiscoveryInformation(const QUuid &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) = 0;
+        virtual int removeDiscoveryInformation(const QUuid &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) = 0;
+    };
+    typedef std::shared_ptr<AbstractDiscoveryManager> AbstractDiscoveryManagerPtr;
+
+    class AbstractMiscManager : public QObject {
+        Q_OBJECT
+    public:
+        template<class TargetType, class HandlerType> int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer, TargetType *target, HandlerType handler) {
+            return sendModuleInformation(moduleInformation, isAlive, discoverer, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QUuid, QUuid> &discoverersByPeer, TargetType *target, HandlerType handler) {
+            return sendModuleInformation(moduleInformationList, discoverersByPeer, std::static_pointer_cast<impl::SimpleHandler>(
+                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int changeSystemName(const QString &systemName, TargetType *target, HandlerType handler) {
+            return changeSystemName(systemName, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int addConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, TargetType *target, HandlerType handler) {
+            return addConnection(discovererId, peerId, host, port, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int removeConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, TargetType *target, HandlerType handler) {
+            return removeConnection(discovererId, peerId, host, port, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int sendAvailableConnections(TargetType *target, HandlerType handler) {
+            return sendAvailableConnections(std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+    signals:
+        void moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer);
+        void systemNameChangeRequested(const QString &systemName);
+        void connectionAdded(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
+        void connectionRemoved(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
+
+    protected:
+        virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QUuid, QUuid> &discoverersByPeer, impl::SimpleHandlerPtr handler) = 0;
+        virtual int changeSystemName(const QString &systemName, impl::SimpleHandlerPtr handler) = 0;
+        virtual int addConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
+        virtual int removeConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendAvailableConnections(impl::SimpleHandlerPtr handler) = 0;
+    };
+    typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
+
     /*!
         \note All methods are asynchronous if other not specified
     */
@@ -747,6 +827,8 @@ namespace ec2
         virtual AbstractVideowallManagerPtr getVideowallManager() = 0;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() = 0;
         virtual AbstractUpdatesManagerPtr getUpdatesManager() = 0;
+        virtual AbstractMiscManagerPtr getMiscManager() = 0;
+        virtual AbstractDiscoveryManagerPtr getDiscoveryManager() = 0;
 
         /*!
             \param handler Functor with params: (ErrorCode)

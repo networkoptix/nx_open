@@ -1,6 +1,7 @@
 #include "resource_pool_model_node.h"
 
 #include <common/common_meta_types.h>
+#include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -31,9 +32,11 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
 {
     assert(type == Qn::LocalNode ||
            type == Qn::ServersNode ||
+           type == Qn::OtherSystemsNode ||
            type == Qn::UsersNode ||
            type == Qn::RootNode ||
            type == Qn::BastardNode ||
+           type == Qn::SystemNode ||
            type == Qn::RecorderNode);
 
     switch(type) {
@@ -48,6 +51,10 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
         m_displayName = m_name = tr("System");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
         break;
+    case Qn::OtherSystemsNode:
+        m_displayName = m_name = tr("Other Systems");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
+        break;
     case Qn::UsersNode:
         m_displayName = m_name = tr("Users");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
@@ -60,6 +67,10 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
         m_displayName = m_name = name;
         m_icon = qnResIconCache->icon(QnResourceIconCache::Recorder);
         m_bastard = true; /* Invisible by default until has children. */
+        break;
+    case Qn::SystemNode:
+        m_displayName = m_name = name;
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
         break;
     default:
         break;
@@ -125,7 +136,9 @@ void QnResourcePoolModelNode::clear() {
         m_type == Qn::ResourceNode || 
         m_type == Qn::VideoWallItemNode || 
         m_type == Qn::EdgeNode)
+    {
         setResource(QnResourcePtr());
+    }
 }
 
 void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
@@ -204,6 +217,8 @@ void QnResourcePoolModelNode::update() {
             m_displayName = m_name = videowall->matrices()->getItem(m_uuid).name;
             break;
         }
+    } else if (m_type == Qn::ServersNode) {
+        m_displayName = m_name + lit(" (%1)").arg(qnCommon->localSystemName());
     }
     /* Update bastard state. */
     bool bastard = false;
@@ -247,10 +262,16 @@ void QnResourcePoolModelNode::update() {
     case Qn::ServersNode:
         bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditServersPermissions);
         break;
+    case Qn::OtherSystemsNode:
+        bastard = m_children.size() == 0;
+        break;
     case Qn::BastardNode:
         bastard = true;
         break;
     case Qn::RecorderNode:
+        bastard = m_children.size() == 0;
+        break;
+    case Qn::SystemNode:
         bastard = m_children.size() == 0;
         break;
     default:
