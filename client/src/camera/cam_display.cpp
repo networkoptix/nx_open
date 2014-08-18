@@ -130,7 +130,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_prevLQ(-1),
     m_doNotChangeDisplayTime(false),
     m_firstLivePacket(true),
-    m_multiView(false)
+    m_multiView(false),
+    m_fisheyeEnabled(false)
 {
 
     if (resource && resource->toResource()->hasFlags(Qn::live_cam))
@@ -1669,6 +1670,16 @@ bool QnCamDisplay::isFullScreen() const
 void QnCamDisplay::setFullScreen(bool fullScreen)
 {
     m_fullScreen = fullScreen;
+}
+
+bool QnCamDisplay::isFisheyeEnabled() const
+{
+    return m_fisheyeEnabled;
+}
+
+void QnCamDisplay::setFisheyeEnabled(bool fisheyeEnabled)
+{
+    m_fisheyeEnabled = fisheyeEnabled;
 }
 
 int QnCamDisplay::getAvarageFps() const
