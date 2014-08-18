@@ -16,7 +16,8 @@ QnClockDataProvider::QnClockDataProvider(const QString fixedFormat, QObject *par
     m_showWeekDay(qnSettings->isClockWeekdayOn()),
     m_showDateAndMonth(qnSettings->isClockDateOn()),
     m_showSeconds(qnSettings->isClockSecondsOn()),
-    m_formatString(fixedFormat)
+    m_formatString(fixedFormat),
+    m_clockType(localSystemClock)
 {
     if (m_formatString.isEmpty()) {
         connect(qnSettings->notifier(QnClientSettings::CLOCK_24HOUR),     SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
@@ -28,17 +29,21 @@ QnClockDataProvider::QnClockDataProvider(const QString fixedFormat, QObject *par
     }
 
     connect(m_timer, &QTimer::timeout, this, [this](){
-#ifdef _DEBUG
-        emit timeChanged(QDateTime::fromMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch()).toString(m_formatString));
-#else
-        emit timeChanged(QDateTime::currentDateTime().toString(m_formatString));
-#endif
+        emit timeChanged(
+            m_clockType == serverClock
+            ? QDateTime::fromMSecsSinceEpoch( qnSyncTime->currentMSecsSinceEpoch() ).toString( m_formatString )
+            : QDateTime::currentDateTime().toString(m_formatString) );
     });
     m_timer->start(100);
 }
 
 QnClockDataProvider::~QnClockDataProvider() {
     return;
+}
+
+void QnClockDataProvider::setClockType( ClockType clockType )
+{
+    m_clockType = clockType;
 }
 
 void QnClockDataProvider::updateFormatString() {
@@ -80,6 +85,23 @@ void QnClockLabel::init(const QString &format) {
 
     setPaletteColor(this, QPalette::WindowText, QColor(64, 130, 180, 128));
 
-    QnClockDataProvider *provider = new QnClockDataProvider(format, this);
-    connect(provider, &QnClockDataProvider::timeChanged, this, &GraphicsLabel::setText);
+    m_provider = new QnClockDataProvider(format, this);
+    connect( m_provider, &QnClockDataProvider::timeChanged, this, &GraphicsLabel::setText );
+
+
+    m_serverTimeAction = new QAction( tr( "Server time" ), this );
+    addAction( m_serverTimeAction );
+    m_localTimeAction = new QAction( tr( "Local system time" ), this );
+    addAction( m_localTimeAction );
+}
+
+void QnClockLabel::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
+{
+    QMenu menu;
+    menu.addActions( actions() );
+    QAction* selectedAction = menu.exec( event->screenPos() );
+    if( selectedAction == m_serverTimeAction )
+        m_provider->setClockType( QnClockDataProvider::serverClock );
+    else if( selectedAction == m_localTimeAction )
+        m_provider->setClockType( QnClockDataProvider::localSystemClock );
 }
