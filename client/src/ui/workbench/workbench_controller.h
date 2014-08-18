@@ -298,9 +298,6 @@ private:
     /** Screen recorder object. */
     QnScreenRecorder *m_screenRecorder;
 
-    /** Whether recorder countdown is canceled. */
-    bool m_countdownCanceled;
-
     /** Screen recording countdown label. */
     QnGraphicsMessageBox *m_recordingCountdownLabel;
 
