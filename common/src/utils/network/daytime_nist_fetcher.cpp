@@ -11,6 +11,8 @@
 #include "utils/network/socket_factory.h"
 
 
+//TODO #ak try multiple servers in case of error or empty string (it happens pretty often)
+
 static const size_t MAX_TIME_STR_LENGTH = 256; 
 static const char* DEFAULT_NIST_SERVER = "time.nist.gov";
 static const unsigned short DAYTIME_PROTOCOL_DEFAULT_PORT = 13;
@@ -137,6 +139,8 @@ void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size
             //no response during the allotted time period
             //processing what we have
             assert( m_timeStr.size() < m_timeStr.capacity() );
+            if( m_timeStr.isEmpty() )
+                m_handlerFunc( -1, SystemError::notConnected );
             m_timeStr.append( '\0' );
             m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
         }
@@ -151,6 +155,8 @@ void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size
     {
         //connection closed, analyzing what we have
         assert( m_timeStr.size() < m_timeStr.capacity() );
+        if( m_timeStr.isEmpty() )
+            m_handlerFunc( -1, SystemError::notConnected );
         m_timeStr.append( '\0' );
         m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
         return;
