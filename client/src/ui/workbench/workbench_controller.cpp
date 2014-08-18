@@ -600,6 +600,12 @@ void QnWorkbenchController::stopRecording() {
     if (!m_screenRecorder)
         return;
 
+    if (m_recordingCountdownLabel) {
+        disconnect(m_recordingCountdownLabel, NULL, this, NULL);
+        m_recordingCountdownLabel->hideImmideately();
+        m_recordingCountdownLabel = NULL;
+    }
+
     action(Qn::ToggleScreenRecordingAction)->setChecked(false);
 
     if (!m_screenRecorder->isRecording()) {
