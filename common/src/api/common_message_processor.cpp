@@ -147,11 +147,8 @@ void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)
 {
-    m_rules.clear();
-    foreach(QnBusinessEventRulePtr bRule, fullData.bRules)
-        m_rules[bRule->id()] = bRule;
-
     onGotInitialNotification(fullData);
+    on_businessRuleReset(fullData.bRules);
 }
 
 
@@ -283,7 +280,7 @@ void QnCommonMessageProcessor::on_businessActionBroadcasted( const QnAbstractBus
 void QnCommonMessageProcessor::on_businessRuleReset( const QnBusinessEventRuleList& rules )
 {
     m_rules.clear();
-    foreach(QnBusinessEventRulePtr bRule, rules)
+    foreach(const QnBusinessEventRulePtr &bRule, rules)
         m_rules[bRule->id()] = bRule;
 
     emit businessRuleReset(rules);

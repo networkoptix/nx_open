@@ -61,6 +61,15 @@ void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
 
 void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) 
 {
+    /* 
+     * In rare cases we can receive updateResource call when the client is
+     * in the reconnect process (it starts an event loop inside the main 
+     * thread). Populating the resource pool or changing resources is highly 
+     * inappropriate at that time.
+     * */
+    if (!m_connection)
+        return;
+
     QnCommonMessageProcessor::updateResource(resource);
 
     QnResourcePtr ownResource;

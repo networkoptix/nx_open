@@ -4,7 +4,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include "api/app_server_connection.h"
-#include "core/resource/media_server_resource.h"
+//#include "core/resource/media_server_resource.h"
 
 QnResourceStatusWatcher::QnResourceStatusWatcher()
 {
@@ -19,9 +19,8 @@ bool QnResourceStatusWatcher::isSetStatusInProgress(const QnResourcePtr &resourc
 void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr &resource)
 {
     //Q_ASSERT_X(!resource->hasFlags(Qn::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
-
-    if (resource.dynamicCast<QnMediaServerResource>())
-        return;
+    //if (resource.dynamicCast<QnMediaServerResource>())
+    //    return;
 
     if (!isSetStatusInProgress(resource))
         updateResourceStatusAsync(resource);

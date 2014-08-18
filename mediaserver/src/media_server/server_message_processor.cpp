@@ -182,7 +182,6 @@ bool QnServerMessageProcessor::isKnownAddr(const QString& addr) const
 
 void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) 
 {
-#if 0
     if (resource->getId() == qnCommon->moduleGUID() && resource->getStatus() != Qn::Online)
     {
         // it's own server. change status to online
@@ -191,7 +190,6 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     else {
         resource->setStatus(status, true);
     }
-#endif
 }
 
 bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const

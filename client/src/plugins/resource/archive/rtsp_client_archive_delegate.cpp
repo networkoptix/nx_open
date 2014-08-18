@@ -67,6 +67,10 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
         connect(this, SIGNAL(dataDropped(QnArchiveStreamReader*)), qnRedAssController, SLOT(onSlowStream(QnArchiveStreamReader*)));
 
     m_defaultVideoLayout.reset( new QnDefaultResourceVideoLayout() );
+
+    m_auth.username = QnAppServerConnectionFactory::url().userName();
+    m_auth.password = QnAppServerConnectionFactory::url().password();
+    m_auth.videowall = QnAppServerConnectionFactory::videowallGuid();
 }
 
 void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr &camera)
@@ -766,15 +770,15 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
         session->setUsePredefinedTracks(0);
     }
     
-    QString user = QnAppServerConnectionFactory::url().userName();
-    QString password = QnAppServerConnectionFactory::url().password();
+    QString user = m_auth.username;
+    QString password = m_auth.password;
     QAuthenticator auth;
     auth.setUser(user);
     auth.setPassword(password);
     session->setAuth(auth, RTPSession::authDigest);
 
-    if (!QnAppServerConnectionFactory::videowallGuid().isNull())
-        session->setAdditionAttribute("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
+    if (!m_auth.videowall.isNull())
+        session->setAdditionAttribute("X-NetworkOptix-VideoWall", m_auth.videowall.toString().toUtf8());
 
     if (server) {
         session->setProxyAddr(server->getProxyHost(), server->getProxyPort());

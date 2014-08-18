@@ -38,9 +38,6 @@ class QnCameraHistory
 public:
     QnCameraHistory();
 
-    QUuid getCameraId() const;
-    void setCameraId(const QUuid& cameraId);
-
     QString getCameraUniqueId() const;
     void setCameraUniqueId(const QString &cameraUniqueId);
 
@@ -75,7 +72,7 @@ private:
     Q_DISABLE_COPY(QnCameraHistory);
 
     QnCameraTimePeriodList m_fullTimePeriods;
-    QUuid m_cameraId;
+    QString m_cameraUniqueId;
     mutable QMutex m_mutex;
 };
 

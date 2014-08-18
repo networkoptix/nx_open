@@ -77,8 +77,19 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 {
     ui->setupUi(this);
 
-    setWindowTitle(tr("Connect to Server (%1)").arg(lit(QN_APPLICATION_VERSION)));
+    setWindowTitle(tr("Connect to Server..."));
     setHelpTopic(this, Qn::Login_Help);
+
+    QHBoxLayout* bbLayout = dynamic_cast<QHBoxLayout*>(ui->buttonBox->layout());
+    Q_ASSERT(bbLayout);
+    if (bbLayout) {
+        QLabel* versionLabel = new QLabel(ui->buttonBox);
+        versionLabel->setText(tr("Version %1").arg(lit(QN_APPLICATION_VERSION)));
+        QFont font = versionLabel->font();
+        font.setPointSize(7);
+        versionLabel->setFont(font);
+        bbLayout->insertWidget(0, versionLabel);
+    }
 
     static const char *introNames[] = { "intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg", NULL };
     QString introPath;

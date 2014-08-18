@@ -610,6 +610,7 @@ void QnResourcePoolModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout,
     } else {
         resource = resourcePool()->getResourceByUniqId(item.resource.path);
     }
+    //Q_ASSERT(resource);   //too many strange situations with invalid resources in layout items
 
     node->setResource(resource);
     node->setParent(parentNode);

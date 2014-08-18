@@ -127,10 +127,13 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     resourcePool()->removeResources(remoteResources);
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
-    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>())
-        if(snapshotManager()->isLocal(layout) 
-            && !snapshotManager()->isFile(layout))  //do not remove exported layouts
-            resourcePool()->removeResource(layout);
+    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>()) {
+        bool isLocal = snapshotManager()->isLocal(layout);
+        bool isFile = snapshotManager()->isFile(layout);
+        if(isLocal && isFile)  //do not remove exported layouts
+            continue;
+        resourcePool()->removeResource(layout);
+    }
 
     qnLicensePool->reset();
     context()->instance<QnAppServerNotificationCache>()->clear();
@@ -195,6 +198,10 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
 }    
 
 void QnWorkbenchConnectHandler::at_reconnectAction_triggered() {
+    /* Reconnect call should not be executed while we are disconnected. */
+    if (!context()->user())
+        return;
+
     QUrl currentUrl = QnAppServerConnectionFactory::url(); 
     if (connected())
         disconnectFromServer(true);
@@ -304,6 +311,7 @@ void QnWorkbenchConnectHandler::hideMessageBox() {
 
 void QnWorkbenchConnectHandler::showLoginDialog() {
     QnNonModalDialogConstructor<QnLoginDialog> dialogConstructor(m_loginDialog, mainWindow());
+    dialogConstructor.resetGeometry();
     //just show dialog   
 }
 
