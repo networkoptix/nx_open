@@ -14,6 +14,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/environment.h>
+#include <utils/network/module_finder.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -45,9 +46,12 @@
 #include <ui/workbench/handlers/workbench_ptz_handler.h>
 #include <ui/workbench/handlers/workbench_debug_handler.h>
 #include <ui/workbench/handlers/workbench_videowall_handler.h>
+#include <ui/workbench/handlers/workbench_incompatible_servers_action_handler.h>
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
+#include <ui/workbench/watchers/workbench_system_name_watcher.h>
+#include <ui/workbench/watchers/workbench_server_address_watcher.h>
 #include <ui/workbench/workbench_controller.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
@@ -213,11 +217,17 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();
     context->instance<QnWorkbenchVideoWallHandler>();
+    context->instance<QnWorkbenchIncompatibleServersActionHandler>();
 #ifdef QN_ENABLE_BOOKMARKS
     context->instance<QnWorkbenchBookmarksHandler>();
 #endif
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
+    context->instance<QnWorkbenchSystemNameWatcher>();
+
+    QnWorkbenchServerAddressWatcher *serverAddressWatcher = context->instance<QnWorkbenchServerAddressWatcher>();
+    serverAddressWatcher->setDirectModuleFinder(QnModuleFinder::instance()->directModuleFinder());
+    serverAddressWatcher->setDirectModuleFinderHelper(QnModuleFinder::instance()->directModuleFinderHelper());
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);

@@ -42,6 +42,7 @@ namespace ec2
         qRegisterMetaType<QnFullResourceData>( "QnFullResourceData" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<QnTransactionTransportHeader>( "QnTransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiPeerAliveData>( "ApiPeerAliveData" ); // TODO: #Elric #EC2 register in a proper place!
+        qRegisterMetaType<ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiRuntimeData>( "ApiRuntimeData" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); // TODO: #Elric #EC2 register in a proper place!
 
@@ -196,6 +197,28 @@ namespace ec2
         //AbstractUpdatesManager::installUpdate
         registerUpdateFuncHandler<ApiUpdateInstallData>( restProcessorPool, ApiCommand::installUpdate );
 
+        //AbstractMiscManager::moduleInfo
+        registerUpdateFuncHandler<ApiModuleData>(restProcessorPool, ApiCommand::moduleInfo);
+        //AbstractMiscManager::moduleInfoList
+        registerUpdateFuncHandler<ApiModuleDataList>(restProcessorPool, ApiCommand::moduleInfoList);
+
+        //AbstractMiscManager::discoverPeer
+        registerUpdateFuncHandler<ApiDiscoverPeerData>(restProcessorPool, ApiCommand::discoverPeer);
+        //AbstractMiscManager::addDiscoveryInformation
+        registerUpdateFuncHandler<ApiDiscoveryDataList>(restProcessorPool, ApiCommand::addDiscoveryInformation);
+        //AbstractMiscManager::removeDiscoveryInformation
+        registerUpdateFuncHandler<ApiDiscoveryDataList>(restProcessorPool, ApiCommand::removeDiscoveryInformation);
+        //AbstractMiscManager::changeSystemName
+        registerUpdateFuncHandler<ApiSystemNameData>(restProcessorPool, ApiCommand::changeSystemName);
+
+        //AbstractMiscManager::addConnection
+        registerUpdateFuncHandler<ApiConnectionData>(restProcessorPool, ApiCommand::addConnection);
+        //AbstractMiscManager::removeConnection
+        registerUpdateFuncHandler<ApiConnectionData>(restProcessorPool, ApiCommand::removeConnection);
+        //AbstractMiscManager::availableConnections
+        registerUpdateFuncHandler<ApiConnectionDataList>(restProcessorPool, ApiCommand::availableConnections);
+
+       //AbstractECConnection
         registerUpdateFuncHandler<ApiDatabaseDumpData>( restProcessorPool, ApiCommand::resotreDatabase );
 
         //AbstractECConnection
@@ -405,8 +428,9 @@ namespace ec2
         const ApiLoginData& /*loginInfo*/,
         QnConnectionInfo* const connectionInfo )
     {
-        connectionInfo->version = QnSoftwareVersion(lit(QN_APPLICATION_VERSION));
+        connectionInfo->version = qnCommon->engineVersion();
         connectionInfo->brand = isCompatibilityMode() ? QString() : lit(QN_PRODUCT_NAME_SHORT);
+        connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
         connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->box = lit(QN_ARM_BOX);

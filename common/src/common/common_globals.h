@@ -309,7 +309,8 @@ public:
         Unauthorized,
         Online,
         Recording,
-        NotDefined
+        NotDefined,
+        Incompatible
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)
 

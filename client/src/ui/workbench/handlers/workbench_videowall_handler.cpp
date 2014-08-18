@@ -4,6 +4,7 @@
 #include <QtCore/QRegExp>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
+#include <QtWidgets/QMessageBox>
 
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>

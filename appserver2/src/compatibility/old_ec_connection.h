@@ -31,6 +31,8 @@ namespace ec2
         virtual AbstractVideowallManagerPtr getVideowallManager() override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
         virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
+        virtual AbstractMiscManagerPtr getMiscManager() override;
+        virtual AbstractDiscoveryManagerPtr getDiscoveryManager() override;
 
         virtual int setPanicMode(Qn::PanicMode value, impl::SimpleHandlerPtr handler) override;
         virtual int getCurrentTime(impl::CurrentTimeHandlerPtr handler) override;

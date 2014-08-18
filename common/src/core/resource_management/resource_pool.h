@@ -89,6 +89,11 @@ public:
     QnResourceList getResourcesWithParentId(QUuid id) const;
     QnResourceList getResourcesWithTypeId(QUuid id) const;
 
+    QnResourcePtr getIncompatibleResourceById(const QUuid &id, bool useCompatible = false) const;
+    QnResourcePtr getIncompatibleResourceByUniqueId(const QString &uid) const;
+    QnResourceList getAllIncompatibleResources() const;
+    void makeResourceNormal(const QnResourcePtr &resource);
+
     QnUserResourcePtr getAdministrator() const;
 
     /**
@@ -104,7 +109,6 @@ public:
      * @return                                  List of valid indices containing the videowall and items' uuid.
      */
     QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QUuid> &uuids) const;
-
     
     /**
      * @brief getVideoWallMatrixByUuid          Find videowall matrix by uuid.
@@ -119,8 +123,6 @@ public:
      * @return                                  List of indices containing the videowall and matrices' uuid.
      */
     QnVideoWallMatrixIndexList getVideoWallMatricesByUuid(const QList<QUuid> &uuids) const;
-
-
 
     QStringList allTags() const;
 
@@ -142,6 +144,7 @@ private:
     bool m_tranInProgress;
     QnResourceList m_tmpResources;
     QHash<QString, QnResourcePtr> m_resources;
+    QHash<QString, QnResourcePtr> m_incompatibleResources;
 
     /*!
         \return true, if \a resource has been inserted. false - if updated existing resource

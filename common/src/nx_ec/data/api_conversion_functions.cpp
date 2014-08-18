@@ -518,6 +518,7 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &
     dst.maxCameras = src->getMaxCameras();
     dst.authKey = src->getAuthKey();
     dst.allowAutoRedundancy = src->isRedundancy();
+    dst.systemName = src->getSystemName();
 
     QnAbstractStorageResourceList storageList = src->getStorages();
     dst.storages.resize(storageList.size());
@@ -541,6 +542,7 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     dst->setMaxCameras(src.maxCameras);
     dst->setAuthKey(src.authKey);
     dst->setRedundancy(src.allowAutoRedundancy);
+    dst->setSystemName(src.systemName);
 
     QnResourceTypePtr resType = ctx.resTypePool->getResourceTypeByName(lit("Storage"));
     if (!resType)

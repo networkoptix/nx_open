@@ -74,7 +74,7 @@ private slots:
     void at_remotePeerLost(ec2::ApiPeerAliveData data);
 
     void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
-
+    void on_gotDiscoveryData(const ec2::ApiDiscoveryDataList &discoveryData, bool addInformation);
 
     void on_resourceStatusChanged(const QUuid &resourceId, Qn::ResourceStatus status );
     void on_resourceParamsChanged(const QUuid& resourceId, const QnKvPairList& kvPairs );

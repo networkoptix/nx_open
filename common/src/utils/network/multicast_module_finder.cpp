@@ -1,8 +1,4 @@
-/**********************************************************
-* 30 oct 2012
-* a.kolesnikov
-***********************************************************/
-#include "modulefinder.h"
+#include "multicast_module_finder.h"
 
 #include <memory>
 
@@ -27,7 +23,7 @@ namespace {
 
 } // anonymous namespace
 
-QnModuleFinder::QnModuleFinder(
+QnMulticastModuleFinder::QnMulticastModuleFinder(
     bool clientOnly,
     const QHostAddress &multicastGroupAddress,
     const unsigned int multicastGroupPort,
@@ -67,41 +63,52 @@ QnModuleFinder::QnModuleFinder(
     }
 }
 
-QnModuleFinder::~QnModuleFinder() {
+QnMulticastModuleFinder::~QnMulticastModuleFinder() {
     stop();
-    
+
     qDeleteAll(m_clientSockets);
     m_clientSockets.clear();
     delete m_serverSocket;
 }
 
-bool QnModuleFinder::isValid() const {
+bool QnMulticastModuleFinder::isValid() const {
     return !m_clientSockets.empty();
 }
 
-bool QnModuleFinder::isCompatibilityMode() const {
+bool QnMulticastModuleFinder::isCompatibilityMode() const {
     return m_compatibilityMode;
 }
 
-void QnModuleFinder::setCompatibilityMode(bool compatibilityMode) {
+void QnMulticastModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
 }
 
-QList<QnModuleInformation> QnModuleFinder::revealedModules() const {
-    QList<QnModuleInformation> modules;
+QList<QnModuleInformation> QnMulticastModuleFinder::revealedModules() const {
+    QMutexLocker lk(&m_mutex);
 
+    QList<QnModuleInformation> modules;
     foreach (const ModuleContext &moduleCOntext, m_knownEnterpriseControllers)
         modules.append(moduleCOntext.moduleInformation);
 
     return modules;
 }
 
-void QnModuleFinder::pleaseStop() {
+QnModuleInformation QnMulticastModuleFinder::moduleInformation(const QString &moduleId) const {
+    QMutexLocker lk(&m_mutex);
+
+    auto it = m_knownEnterpriseControllers.find(moduleId);
+    if (it == m_knownEnterpriseControllers.end())
+        return QnModuleInformation();
+
+    return it->moduleInformation;
+}
+
+void QnMulticastModuleFinder::pleaseStop() {
     QnLongRunnable::pleaseStop();
     m_pollSet.interrupt();
 }
 
-bool QnModuleFinder::processDiscoveryRequest(AbstractDatagramSocket *udpSocket) {
+bool QnMulticastModuleFinder::processDiscoveryRequest(AbstractDatagramSocket *udpSocket) {
     static const size_t READ_BUFFER_SIZE = UDPSocket::MAX_PACKET_SIZE;
     quint8 readBuffer[READ_BUFFER_SIZE];
 
@@ -126,15 +133,16 @@ bool QnModuleFinder::processDiscoveryRequest(AbstractDatagramSocket *udpSocket) 
     }
 
     RevealResponse response;
-    response.version = qApp->applicationVersion();
+    response.version = qnCommon->engineVersion().toString();
     QString moduleName = qApp->applicationName();
     if (moduleName.startsWith(qApp->organizationName()))
         moduleName = moduleName.mid(qApp->organizationName().length()).trimmed();
-    
+
     response.type = moduleName;
     response.customization = QString::fromLatin1(QN_CUSTOMIZATION_NAME);
-    response.seed = qnCommon->moduleGUID();
+    response.seed = qnCommon->moduleGUID().toString();
     response.name = qnCommon->localSystemName();
+    response.systemInformation = QnSystemInformation::currentSystemInformation().toString();
     response.typeSpecificParameters.insert(lit("port"), QString::number(qnCommon->moduleUrl().port()));
     quint8 *responseBufStart = readBuffer;
     if (!response.serialize(&responseBufStart, readBuffer + READ_BUFFER_SIZE))
@@ -149,7 +157,7 @@ bool QnModuleFinder::processDiscoveryRequest(AbstractDatagramSocket *udpSocket) 
     return true;
 }
 
-bool QnModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket) {
+bool QnMulticastModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket) {
     static const size_t READ_BUFFER_SIZE = UDPSocket::MAX_PACKET_SIZE;
     quint8 readBuffer[READ_BUFFER_SIZE];
 
@@ -174,7 +182,7 @@ bool QnModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket)
         return false;
     }
 
-    if (response.seed == qnCommon->moduleGUID())
+    if (response.seed == qnCommon->moduleGUID().toString())
         return true; // ignore requests to himself
 
     if (!m_compatibilityMode && response.customization.toLower() != qnProductFeatures().customizationName.toLower()) { // TODO: #2.1 #Elric #AK check for "default" VS "Vms"
@@ -182,11 +190,10 @@ bool QnModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket)
             arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
         return false;
     }
-    
-    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(response.seed))
-        return false;
 
-    //received valid response, checking if already know this Server
+    QMutexLocker lk(&m_mutex);
+
+    //received valid response, checking if already know this enterprise controller
     auto it = m_knownEnterpriseControllers.find(response.seed);
     bool newModule = (it == m_knownEnterpriseControllers.end());
 
@@ -194,7 +201,7 @@ bool QnModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket)
         it = m_knownEnterpriseControllers.insert(response.seed, ModuleContext(response));
 
     if (!it->signalledAddresses.contains(remoteAddressStr)) {
-        //new Server found
+        //new enterprise controller found
 
         it->signalledAddresses.insert(remoteAddressStr);
         const QHostAddress &localAddress = QHostAddress(udpSocket->getLocalAddress().address.toString());
@@ -216,9 +223,9 @@ bool QnModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket)
     return true;
 }
 
-void QnModuleFinder::run() {
+void QnMulticastModuleFinder::run() {
     initSystemThreadId();
-    NX_LOG(lit("QnModuleFinder started"), cl_logDEBUG1);
+    NX_LOG(lit("NetworkOptixModuleFinder started"), cl_logDEBUG1);
 
     static const unsigned int SEARCH_PACKET_LENGTH = 64;
     quint8 searchPacket[SEARCH_PACKET_LENGTH];
@@ -244,8 +251,9 @@ void QnModuleFinder::run() {
             foreach (AbstractDatagramSocket *socket, m_clientSockets) {
                 if (!socket->send(searchPacket, searchPacketBufStart - searchPacket)) {
                     //failed to send packet ???
-                    const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                    NX_LOG(lit("QnModuleFinder. Failed to send search packet to %1. %2").arg(socket->getPeerAddress().toString()).arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1);
+                    SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+                    NX_LOG(lit("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1);
+                    //TODO/IMPL if corresponding interface is down, should remove socket from set
                 }
             }
             m_prevPingClock = currentClock;
@@ -255,10 +263,8 @@ void QnModuleFinder::run() {
         if (socketCount == 0)
             continue;    //timeout
         if (socketCount < 0) {
-            const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-            if( prevErrorCode == SystemError::interrupted )
-                continue;
-            NX_LOG(lit("QnModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR);
+            SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+            NX_LOG(lit("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR);
             msleep(errorWaitTimeoutMs);
             continue;
         }
@@ -279,6 +285,7 @@ void QnModuleFinder::run() {
                 processDiscoveryResponse(udpSocket);
         }
 
+        QMutexLocker lk(&m_mutex);
         //checking for expired known hosts...
         for (auto it = m_knownEnterpriseControllers.begin(); it != m_knownEnterpriseControllers.end(); /* no inc */) {
             if(it->prevResponseReceiveClock + m_pingTimeoutMillis*m_keepAliveMultiply > currentClock) {
@@ -291,10 +298,10 @@ void QnModuleFinder::run() {
         }
     }
 
-    NX_LOG(lit("QnModuleFinder stopped"), cl_logDEBUG1);
+    NX_LOG(lit("NetworkOptixModuleFinder stopped"), cl_logDEBUG1);
 }
 
-QnModuleFinder::ModuleContext::ModuleContext(const RevealResponse &response)
+QnMulticastModuleFinder::ModuleContext::ModuleContext(const RevealResponse &response)
     : response(response),
       prevResponseReceiveClock(0)
 {
@@ -302,6 +309,6 @@ QnModuleFinder::ModuleContext::ModuleContext(const RevealResponse &response)
     moduleInformation.version = QnSoftwareVersion(response.version);
     moduleInformation.systemInformation = QnSystemInformation(response.systemInformation);
     moduleInformation.systemName = response.name;
-    moduleInformation.parameters = response.typeSpecificParameters;
-    moduleInformation.id = response.seed;
+    moduleInformation.port = response.typeSpecificParameters.value(lit("port")).toUShort();
+    moduleInformation.id = QUuid(response.seed);
 }

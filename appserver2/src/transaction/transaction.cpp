@@ -152,6 +152,28 @@ namespace ec2
                 case removeCameraBookmarkTags:
                     return "removeCameraBookmarkTags";
 
+                case moduleInfo:
+                    return "moduleInfo";
+                case moduleInfoList:
+                    return "moduleInfoList";
+
+                case discoverPeer:
+                    return "discoverPeer";
+                case addDiscoveryInformation:
+                    return "addDiscoveryInformation";
+                case removeDiscoveryInformation:
+                    return "removeDiscoveryInformation";
+
+                case addConnection:
+                    return "addConnection";
+                case removeConnection:
+                    return "removeConnection";
+                case availableConnections:
+                    return "availableConnections";
+
+                case changeSystemName:
+                    return "changeSystemName";
+
                 case runtimeInfoChanged:
                     return "runtimeInfoChanged";
 
@@ -207,6 +229,8 @@ namespace ec2
                 val == addStoredFile ||
                 val == updateStoredFile ||
                 val == removeStoredFile ||
+                val == addDiscoveryInformation ||
+                val == removeDiscoveryInformation ||
                 val == addLicense ||
                 val == addLicenses ||
                 val == removeLicense || 

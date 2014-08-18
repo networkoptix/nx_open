@@ -19,7 +19,7 @@ Description: Port is invalid
 
 Template: ${deb.customization.company.name}-mediaserver/systemName
 Type: string
-Default: ${deb.customization.company.name}
+Default:
 Description: System name:
 
 Template: ${deb.customization.company.name}-mediaserver/removeDatabase

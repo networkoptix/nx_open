@@ -31,8 +31,9 @@ namespace ec2
         std::vector<ApiStorageData> storages;
         int             maxCameras;
         bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
+        QString         systemName; //! < Server system name. It can be invalid sometimes, but it matters only when server is in incompatible state.
     };
-#define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(networkAddresses)(flags)(panicMode)(version)(systemInfo)(authKey)(storages)(maxCameras)(allowAutoRedundancy)
+#define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(networkAddresses)(flags)(panicMode)(version)(systemInfo)(authKey)(storages)(maxCameras)(allowAutoRedundancy)(systemName)
 
 
     struct ApiPanicModeData: public ApiData

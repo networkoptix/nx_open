@@ -9,6 +9,7 @@
 #include "transaction.h"
 #include "utils/common/synctime.h"
 #include "utils/common/model_functions.h"
+#include "nx_ec/data/api_discovery_data.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
 
 #define TRANSACTION_MESSAGE_BUS_DEBUG
@@ -108,11 +109,21 @@ QUuid QnTransactionLog::transactionHash(const ApiResourceParamsData& params) con
     return QUuid::fromRfc4122(hash.result());
 }
 
-QUuid QnTransactionLog::makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) {
+QUuid QnTransactionLog::makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) const {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(extraData.toUtf8());
     for(const ApiCameraBookmarkTagData tag: data)
         hash.addData(tag.name.toUtf8());
+    return QUuid::fromRfc4122(hash.result());
+}
+
+QUuid QnTransactionLog::makeHash(const QString &extraData, const ApiDiscoveryDataList &data) const {
+    QCryptographicHash hash(QCryptographicHash::Md5);
+    hash.addData(extraData.toUtf8());
+    foreach (const ApiDiscoveryData &item, data) {
+        hash.addData(item.url.toUtf8());
+        hash.addData(item.id.toString().toUtf8());
+    }
     return QUuid::fromRfc4122(hash.result());
 }
 

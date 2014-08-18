@@ -13,7 +13,8 @@
 #   include <netinet/tcp.h>
 #endif
 
-static const int MAX_REQUEST_SIZE = 1024*1024*15;
+// we need enough size for updates
+static const int MAX_REQUEST_SIZE = 1024*1024*100;
 
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket):

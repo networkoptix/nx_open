@@ -18,7 +18,6 @@ QnUpdateUploader::QnUpdateUploader(QObject *parent) :
     QObject(parent),
     m_chunkSize(chunkSize)
 {
-    connect(connection2()->getUpdatesManager().get(),   &ec2::AbstractUpdatesManager::updateUploadProgress,   this,   &QnUpdateUploader::at_updateManager_updateUploadProgress);
 }
 
 QString QnUpdateUploader::updateId() const {
@@ -34,7 +33,7 @@ void QnUpdateUploader::cancel() {
 }
 
 bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &fileName, const QSet<QUuid> &peers) {
-    if (m_updateFile || !m_updateId.isEmpty())
+    if (m_updateFile)
         return false;
 
     m_updateFile.reset(new QFile(fileName));
@@ -51,11 +50,15 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
     foreach (const QUuid &peerId, peers)
         m_progressById[peerId] = 0;
 
+    connect(connection2()->getUpdatesManager().get(),   &ec2::AbstractUpdatesManager::updateUploadProgress,   this,   &QnUpdateUploader::at_updateManager_updateUploadProgress);
     sendNextChunk();
     return true;
 }
 
 void QnUpdateUploader::sendNextChunk() {
+    if (m_updateFile.isNull())
+        return;
+
     qint64 offset = m_updateFile->pos();
     QByteArray data = m_updateFile->read(m_chunkSize);
 
@@ -73,6 +76,9 @@ void QnUpdateUploader::sendNextChunk() {
 void QnUpdateUploader::chunkUploaded(int reqId, ec2::ErrorCode errorCode) {
     Q_UNUSED(reqId)
 
+    if (m_updateFile.isNull())
+        return;
+
     if (errorCode != ec2::ErrorCode::ok) {
         cleanUp();
         emit failed();
@@ -87,6 +93,9 @@ void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &upda
     if (updateId != m_updateId)
         return;
 
+    if (m_updateFile.isNull())
+        return;
+
     auto it = m_progressById.find(peerId);
     if (it == m_progressById.end()) // it means we have already done upload for this peer
         return;
@@ -97,8 +106,9 @@ void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &upda
         m_progressById.erase(it);
 
         if (chunks == ec2::AbstractUpdatesManager::Failed) {
-            emit failed();
             cleanUp();
+            emit failed();
+            return;
         } else {
             progress = 100;
         }
@@ -114,12 +124,13 @@ void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &upda
     emit progressChanged(wholeProgress / m_peers.size());
 
     if (m_progressById.isEmpty()) {
-        emit finished();
         cleanUp();
+        emit finished();
     }
 }
 
 void QnUpdateUploader::cleanUp() {
     m_updateFile.reset();
     m_updateId.clear();
+    connection2()->getUpdatesManager()->disconnect(this);
 }

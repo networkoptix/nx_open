@@ -52,6 +52,7 @@
 #include <network/default_tcp_connection_processor.h>
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
+#include <transaction/transaction_message_bus.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -98,6 +99,7 @@
 #include <rest/handlers/log_rest_handler.h>
 #include <rest/handlers/manual_camera_addition_rest_handler.h>
 #include <rest/handlers/ping_rest_handler.h>
+#include <rest/handlers/ping_system_rest_handler.h>
 #include <rest/handlers/ptz_rest_handler.h>
 #include <rest/handlers/rebuild_archive_rest_handler.h>
 #include <rest/handlers/recorded_chunks_rest_handler.h>
@@ -108,8 +110,12 @@
 #include <rest/handlers/activate_license_rest_handler.h>
 #include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
-#include <rest/handlers/change_system_name_rest_handler.h>
+#include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
+#include <rest/handlers/routing_information_rest_handler.h>
+#include <rest/handlers/configure_rest_handler.h>
+#include <rest/handlers/join_system_rest_handler.h>
+#include <rest/handlers/backup_db_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 
 #include <streaming/hls/hls_server.h>
@@ -127,7 +133,10 @@
 #include <utils/network/multicodec_rtp_reader.h>
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
-#include <utils/network/modulefinder.h>
+#include <utils/network/module_finder.h>
+#include <utils/network/global_module_finder.h>
+#include <utils/network/router.h>
+#include <media_server/server_update_tool.h>
 
 
 #include <media_server/server_message_processor.h>
@@ -142,7 +151,6 @@
 #include "plugins/resource/acti/acti_resource.h"
 #include "transaction/transaction_message_bus.h"
 #include "common/common_module.h"
-#include "utils/network/modulefinder.h"
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
 #include "compatibility.h"
@@ -586,7 +594,8 @@ int serverMain(int argc, char *argv[])
 
     QCoreApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
     QCoreApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
-    QCoreApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
+    if (QCoreApplication::applicationVersion().isEmpty())
+        QCoreApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
 
     const QString& dataLocation = getDataDirectory();
     QDir::setCurrent(qApp->applicationDirPath());
@@ -623,7 +632,7 @@ int serverMain(int argc, char *argv[])
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_LQ);
     
     NX_LOG(lit("%1 started").arg(QN_APPLICATION_NAME), cl_logALWAYS);
-    NX_LOG(lit("Software version: %1").arg(QN_APPLICATION_VERSION), cl_logALWAYS);
+    NX_LOG(lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
     NX_LOG(lit("Software revision: %1").arg(QN_APPLICATION_REVISION), cl_logALWAYS);
     NX_LOG(lit("binary path: %1").arg(QFile::decodeName(argv[0])), cl_logALWAYS);
 
@@ -973,23 +982,21 @@ void QnMain::at_cameraIPConflict(const QHostAddress& host, const QStringList& ma
         qnSyncTime->currentUSecsSinceEpoch());
 }
 
-void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress) {
-    Q_UNUSED(localInterfaceAddress)
+void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
+    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
-    if (isCompatible(moduleInformation.version, QnSoftwareVersion(QN_APPLICATION_VERSION)) && moduleInformation.systemName == qnCommon->localSystemName()) {
-        int port = moduleInformation.parameters.value("port").toInt();
-        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
-        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    if (isCompatible(moduleInformation.version, qnCommon->engineVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
+        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
         ec2Connection->addRemotePeer(url, moduleInformation.id);
     } else {
         at_peerLost(moduleInformation);
     }
 }
 void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
-    int port = moduleInformation.parameters.value("port").toInt();
+    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+
     foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
-        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
-        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
         ec2Connection->deleteRemotePeer(url);
     }
 }
@@ -1012,15 +1019,21 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testEmailSettings", new QnTestEmailSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/getSystemName", new QnGetSystemNameRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/configure", new QnChangeSystemNameRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/routingInformation", new QnRoutingInformationRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/joinSystem", new QnJoinSystemRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
 #ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #endif
@@ -1139,10 +1152,10 @@ void QnMain::run()
 
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &QnMain::at_emptyDigestDetected);
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/ping*"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/ping"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );
+    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation"), AuthMethod::noAuth );
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
     QnEventsDB::init();
@@ -1274,7 +1287,7 @@ void QnMain::run()
     else
         compatibilityChecker = &localChecker;
 
-    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, QnSoftwareVersion(QN_ENGINE_VERSION), "ECS", connectInfo.version))
+    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, qnCommon->engineVersion(), "ECS", connectInfo.version))
     {
         NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
         return;
@@ -1332,8 +1345,9 @@ void QnMain::run()
             server->setPanicMode(pm);
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
         }
-        server->setVersion(QnSoftwareVersion(QN_ENGINE_VERSION));
-        server->setSystemInfo(QnSystemInformation(QN_APPLICATION_PLATFORM, QN_APPLICATION_ARCH));
+        server->setVersion(qnCommon->engineVersion());
+        server->setSystemInfo(QnSystemInformation::currentSystemInformation());
+        server->setSystemName(qnCommon->localSystemName());
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
         bool isLocal = appserverHostString.isEmpty() || appserverHostString == "localhost" || QUrl(appserverHostString).scheme() == "file";
@@ -1461,6 +1475,15 @@ void QnMain::run()
 #endif
     // ------------------------------------------
 
+    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
+    globalModuleFinder->setConnection(ec2Connection);
+    globalModuleFinder->setModuleFinder(m_moduleFinder);
+
+    QScopedPointer<QnRouter> router(new QnRouter());
+    router->setConnection(ec2Connection);
+    router->setModuleFinder(m_moduleFinder);
+
+    QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
 
     //===========================================================================
     QnResource::initAsyncPoolInstance()->setMaxThreadCount( MSSettings::roSettings()->value(
@@ -1685,7 +1708,7 @@ void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
     
     ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged);
     tran.params = runtimeInfo.data;
-    ec2::qnTransactionBus->sendTransaction(tran);
+    qnTransactionBus->sendTransaction(tran);
 }
 
 void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password)
@@ -1749,12 +1772,19 @@ public:
         setServiceDescription(SERVICE_NAME);
     }
 
+    void setOverrideVersion(const QnSoftwareVersion &version) {
+        m_overrideVersion = version;
+    }
+
 protected:
     virtual int executeApplication() override { 
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
         
+        if (!m_overrideVersion.isNull())
+            qnCommon->setEngineVersion(m_overrideVersion);
+
         m_main.reset(new QnMain(m_argc, m_argv));
 
         int res = application()->exec();
@@ -1862,6 +1892,7 @@ private:
     int m_argc;
     char **m_argv;
     QScopedPointer<QnMain> m_main;
+    QnSoftwareVersion m_overrideVersion;
 };
 
 void stopServer(int signal)
@@ -1909,6 +1940,7 @@ int main(int argc, char* argv[])
     QString rwConfigFilePath;
     bool showVersion = false;
     bool showHelp = false;
+    QString engineVersion;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL, 
@@ -1933,6 +1965,8 @@ int main(int argc, char* argv[])
         lit("Print version info and exit"), true);
     commandLineParser.addParameter(&showHelp, "--help", NULL,
         lit("This help message"), true);
+    commandLineParser.addParameter(&engineVersion, "--override-version", NULL,
+        lit("Force the other engine version"), QString());
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
 
     if( showVersion )
@@ -1955,6 +1989,15 @@ int main(int argc, char* argv[])
 
 
     QnVideoService service( argc, argv );
+
+    if (!engineVersion.isEmpty()) {
+        QnSoftwareVersion version(engineVersion);
+        if (!version.isNull()) {
+            qWarning() << "Starting with overriden version: " << version.toString();
+            service.setOverrideVersion(version);
+        }
+    }
+
     int res = service.exec();
     if (restartFlag && res == 0)
         return 1;
@@ -1963,5 +2006,5 @@ int main(int argc, char* argv[])
 
 static void printVersion()
 {
-    std::cout<<"  "<<QN_APPLICATION_NAME<<" v."<<QN_APPLICATION_VERSION<<std::endl;
+    std::cout << "  " << QN_APPLICATION_NAME << " v." << QCoreApplication::applicationVersion().toUtf8().data() << std::endl;
 }
