@@ -374,13 +374,13 @@ bool NameHelper::isSupported(const QString& cameraName) const
     //qDebug() << "NameHelper::isSupported: camera name: " << cameraName << ", normalized: "
     //         << cameraName.toLower().replace(UNNEEDED_CHARACTERS, QString());
 
-    QSet<QString>::ConstIterator it = camerasNames.constFind(cameraName.toLower().replace(UNNEEDED_CHARACTERS, QString()));
-    if (it == camerasNames.constEnd()) {
-        //qDebug() << "NameHelper::isSupported: can't find " << cameraName;
-        return false;
+    QString normalizedCameraName = cameraName.toLower().replace(UNNEEDED_CHARACTERS, QString());
+    while (normalizedCameraName.length() >= 4) {
+        QSet<QString>::ConstIterator it = camerasNames.constFind(normalizedCameraName);
+        if (it == camerasNames.constEnd())
+            return false;
+        normalizedCameraName.chop(1);
     }
-
-    //qDebug() << "NameHelper::isSupported: " << cameraName << " found";
     return true;
 }
 
