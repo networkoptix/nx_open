@@ -38,6 +38,10 @@ public:
         return QObject::eventFilter(watched, event);
     }
 
+    /** Invalidate stored geometry so dialog will be displayed in the center of the screen. */
+    void resetGeometry() {
+        m_targetGeometry = QRect();
+    }
 
 private:
     QPointer<QWidget> m_targetWidget;
@@ -82,6 +86,12 @@ public:
         /* Or show it immediately if no modal windows are visible. */
         show(m_dialog, m_targetGeometry);
     }
+
+    /** Invalidate stored geometry so dialog will be displayed in the center of the screen. */
+    void resetGeometry() {
+        m_targetGeometry = QRect();
+    }
+
 
 private:
     QRect m_targetGeometry;
