@@ -66,6 +66,14 @@ public:
             if( m_recvHandlerTerminatedFlag )
                 aio::AIOService::instance()->removeFromWatch( m_socket, aio::etRead );
         }
+        else
+        {
+            //checking that socket is not registered in aio
+            Q_ASSERT_X(
+                !aio::AIOService::instance()->isSocketBeingWatched( m_socket ),
+                Q_FUNC_INFO,
+                "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread" );
+        }
     }
 
     bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )

@@ -36,8 +36,9 @@ void DaytimeNISTFetcher::pleaseStop()
     if( !m_tcpSock )
         return;
 
-    m_tcpSock->cancelAsyncIO( aio::etRead );
     m_tcpSock->cancelAsyncIO( aio::etWrite );
+    if( m_tcpSock )
+        m_tcpSock->cancelAsyncIO( aio::etRead );
     m_tcpSock.reset();
 }
 
@@ -127,11 +128,17 @@ void DaytimeNISTFetcher::onConnectionEstablished( SystemError::ErrorCode errorCo
 
     using namespace std::placeholders;
     if( !m_tcpSock->readSomeAsync( &m_timeStr, std::bind( &DaytimeNISTFetcher::onSomeBytesRead, this, _1, _2 ) ) )
+    {
+        m_tcpSock.reset();
         m_handlerFunc( -1, SystemError::getLastOSErrorCode() );
+    }
 }
 
 void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead ) noexcept
 {
+    auto scoped_guard_func = [this]( DaytimeNISTFetcher * ) { m_tcpSock.reset(); };
+    std::unique_ptr<DaytimeNISTFetcher, decltype(scoped_guard_func)> scopedTcpSocketDeleter( this, scoped_guard_func );
+
     if( errorCode )
     {
         if( errorCode == SystemError::timedOut && m_timeStr.size() > 0 )
@@ -174,4 +181,6 @@ void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size
     using namespace std::placeholders;
     if( !m_tcpSock->readSomeAsync( &m_timeStr, std::bind( &DaytimeNISTFetcher::onSomeBytesRead, this, _1, _2 ) ) )
         m_handlerFunc( -1, SystemError::getLastOSErrorCode() );
+    else
+        scopedTcpSocketDeleter.release();
 }
