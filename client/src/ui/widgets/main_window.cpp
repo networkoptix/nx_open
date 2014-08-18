@@ -141,6 +141,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     QnWorkbenchContextAware(context),
     m_controller(0),
     m_titleVisible(true),
+    m_skipDoubleClick(false),
     m_dwm(NULL),
     m_drawCustomFrame(false),
     m_enableBackgroundAnimation(true)
@@ -272,6 +273,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
 #endif
     connect(m_tabBar,                       SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                                   SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
+    connect(m_tabBar,             &QnLayoutTabBar::tabCloseRequested,     this,    &QnMainWindow::skipDoubleClick);
+    connect(m_tabBar,             &QnLayoutTabBar::currentChanged,        this,    &QnMainWindow::skipDoubleClick);
 
 
     /* Tab bar layout. To snap tab bar to graphics view. */
@@ -294,6 +297,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
     m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), true, 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
+    connect(action(Qn::MainMenuAction), &QAction::triggered, this, &QnMainWindow::skipDoubleClick);
 
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
@@ -440,6 +444,10 @@ void QnMainWindow::showNormal() {
 #else
     QnEmulatedFrameWidget::showNormal();
 #endif
+}
+
+void QnMainWindow::skipDoubleClick() {
+    m_skipDoubleClick = true;
 }
 
 void QnMainWindow::minimize() {
@@ -618,6 +626,8 @@ void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
         QApplication::sendEvent(m_tabBar, &e);
         event->accept();
     }
+
+    m_skipDoubleClick = false;
 }
 
 void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
@@ -626,11 +636,16 @@ void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
 #ifndef Q_OS_MACX
     if(event->button() == Qt::LeftButton && windowFrameSectionAt(event->pos()) == Qt::TitleBarArea) {
         QPoint tabBarPos = m_tabBar->mapFrom(this, event->pos());
-        if (m_tabBar->tabAt(tabBarPos) >= 0)
+        if (m_tabBar->tabAt(tabBarPos) >= 0) {
+            m_skipDoubleClick = false;
             return;
-        action(Qn::EffectiveMaximizeAction)->toggle();
+        }
+
+        if (!m_skipDoubleClick)
+            action(Qn::EffectiveMaximizeAction)->toggle();
         event->accept();
     }
+    m_skipDoubleClick = false;
 #endif
 }
 
