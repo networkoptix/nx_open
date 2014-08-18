@@ -1383,6 +1383,7 @@ int QnMixedSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
         if (d->extraBuffer[0] == 0x80)
         {
             d->useSSL = true;
+            d->ecnryptionEnabled = true;
             d->initState = false;
         }
         else if (d->extraBuffer[0] == 0x16)
@@ -1392,8 +1393,11 @@ int QnMixedSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
                 return readed;
             d->extraBufferLen += readed;
 
-            if (d->extraBuffer[1] == 0x03)
+            if( d->extraBuffer[1] == 0x03 )
+            {
                 d->useSSL = true;
+                d->ecnryptionEnabled = true;
+            }
         }
         d->initState = false;
     }
