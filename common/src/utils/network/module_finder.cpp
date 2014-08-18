@@ -52,6 +52,10 @@ void QnModuleFinder::makeModulesReappear() {
     }
 }
 
+void QnModuleFinder::setAllowedPeers(const QList<QUuid> &peerList) {
+    m_allowedPeers = peerList;
+}
+
 void QnModuleFinder::start() {
     m_multicastModuleFinder->start();
     m_directModuleFinder->start();
@@ -65,6 +69,9 @@ void QnModuleFinder::stop() {
 }
 
 void QnModuleFinder::at_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
+    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+        return;
+
     if (sender() == m_multicastModuleFinder)
         m_directModuleFinder->addIgnoredAddress(QHostAddress(remoteAddress), moduleInformation.port);
 

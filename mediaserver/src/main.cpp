@@ -1460,8 +1460,8 @@ void QnMain::run()
             if (!peerId.isNull())
                 allowedPeers << peerId;
         }
-//        if (!allowedPeers.isEmpty())
-//            m_moduleFinder->setAllowedPeers(allowedPeers);
+        if (!allowedPeers.isEmpty())
+            m_moduleFinder->setAllowedPeers(allowedPeers);
     }
 
 
