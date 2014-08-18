@@ -133,7 +133,7 @@ void QnAboutDialog::retranslateUi()
 //    QnSoftwareVersion ecsVersion = QnAppServerConnectionFactory::currentVersion();
     QString servers = connectedServers();
     if (servers.isEmpty())
-        servers = tr("<b>Client</b> does not connected to <b>Server</b>.<br>");
+        servers = tr("<b>Client</b> is not connected to <b>Server</b>.<br>");
     
     QString credits = 
         tr(

@@ -95,6 +95,7 @@ private:
     void showFullScreen();
     void showNormal();
 
+    void skipDoubleClick();
 private:
     /* Note that destruction order is important here, so we use scoped pointers. */
     QScopedPointer<QnGraphicsView> m_view;
@@ -111,6 +112,10 @@ private:
     QBoxLayout *m_globalLayout;
 
     bool m_titleVisible;
+
+    /** Set the flag to skip next double-click. Used to workaround invalid double click when
+     *  the first mouse click was handled and changed the widget state. */
+    bool m_skipDoubleClick;
 
     QnResourceList m_dropResources;
 

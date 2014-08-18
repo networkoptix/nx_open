@@ -60,7 +60,7 @@ namespace nx_ms_conf
     static const int DEFAULT_HLS_INACTIVITY_PERIOD = 150;
 
     static const QLatin1String RESOURCE_INIT_THREADS_COUNT( "resourceInitThreadsCount" );
-    static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = DEFAULT_RESOURCE_INIT_THREADS_COUNT;
+    static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
 
     static const QLatin1String SSL_CERTIFICATE_PATH( "sslCertificatePath" );
 }
