@@ -162,9 +162,9 @@ namespace nx_http
         bool m_contentEncodingUsed;
         int m_responseReadTimeoutMs;
 
-        void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode ) noexcept;
-        void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten ) noexcept;
-        void onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead ) noexcept;
+        void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode );
+        void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten );
+        void onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead );
 
         void resetDataBeforeNewRequest();
         bool initiateHttpMessageDelivery( const QUrl& url );

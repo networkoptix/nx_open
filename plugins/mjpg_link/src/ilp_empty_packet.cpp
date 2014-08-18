@@ -9,8 +9,6 @@
 #include <cstring>
 #include <cstdlib>
 
-#include <plugins/plugin_tools.h>
-
 
 ILPEmptyPacket::ILPEmptyPacket(
     int channelNumber,
