@@ -1194,6 +1194,8 @@ void QnMediaResourceWidget::updateFisheye() {
     item()->setData(Qn::ItemFlipRole, flip);
 
     updateAspectRatio();
+    if (display() && display()->camDisplay())
+        display()->camDisplay()->setFisheyeEnabled(fisheyeEnabled);
 
     emit fisheyeChanged();
 
