@@ -237,7 +237,9 @@ void QnResourcePoolModelNode::update() {
             bastard = QnMediaServerResource::isEdgeServer(m_resource);
         break;
     case Qn::EdgeNode:
-        bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
+        bastard = (!m_resource);
+        if (m_resource)
+            bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
         break;
     case Qn::UsersNode:
         bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
