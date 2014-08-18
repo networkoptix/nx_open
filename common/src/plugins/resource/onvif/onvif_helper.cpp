@@ -375,13 +375,13 @@ bool NameHelper::isSupported(const QString& cameraName) const
     //         << cameraName.toLower().replace(UNNEEDED_CHARACTERS, QString());
 
     QString normalizedCameraName = cameraName.toLower().replace(UNNEEDED_CHARACTERS, QString());
-    while (normalizedCameraName.length() >= 4) {
+    do {
         QSet<QString>::ConstIterator it = camerasNames.constFind(normalizedCameraName);
-        if (it == camerasNames.constEnd())
-            return false;
+        if (it != camerasNames.constEnd())
+            return true;
         normalizedCameraName.chop(1);
-    }
-    return true;
+    } while (normalizedCameraName.length() >= 4);
+    return false;
 }
 
 bool NameHelper::isManufacturerSupported(const QString& manufacturer) const
