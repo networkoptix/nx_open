@@ -1009,7 +1009,10 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
         else
             return Qn::NoDataOverlay;
     } else if (m_display->isPaused()) {
-        return Qn::EmptyOverlay;
+        if (m_display->camDisplay()->isEOFReached())
+            return Qn::NoDataOverlay;
+        else
+            return Qn::EmptyOverlay;
     } else {
         return base_type::calculateStatusOverlay(Qn::Online);
     }
