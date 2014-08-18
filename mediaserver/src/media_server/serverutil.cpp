@@ -84,9 +84,9 @@ bool backupDatabase() {
 
     QEventLoop loop;
     auto dumpDatabaseHandler =
-        [&loop, &errorCode, &data] (int /*reqID*/, ec2::ErrorCode _errorCode, const QByteArray &dbData) {
+        [&loop, &errorCode, &data] (int /*reqID*/, ec2::ErrorCode _errorCode, const ec2::ApiDatabaseDumpData &dumpData) {
             errorCode = _errorCode;
-            data = dbData;
+            data = dumpData.data;
             loop.quit();
     };
 

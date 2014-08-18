@@ -36,7 +36,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     /* set system name */
     int changeSystemNameResult = changeSystemName(systemName, wholeSystem);
     if (changeSystemNameResult == ResultFail)
-        result.setError(QnJsonRestResult::InternalError);
+        result.setError(QnJsonRestResult::CantProcessRequest);
 
     /* reset connections if systemName is changed */
     if (changeSystemNameResult == ResultOk && !wholeSystem)
@@ -45,12 +45,12 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     /* set port */
     int changePortResult = changePort(port);
     if (changePortResult == ResultFail)
-        result.setError(QnJsonRestResult::InternalError);
+        result.setError(QnJsonRestResult::CantProcessRequest);
 
     /* set password */
     int changeAdminPasswordResult = changeAdminPassword(password, passwordHash, passwordDigest);
     if (changeAdminPasswordResult == ResultFail)
-        result.setError(QnJsonRestResult::InternalError);
+        result.setError(QnJsonRestResult::CantProcessRequest);
 
     QJsonObject res;
     res.insert(lit("restartNeeded"), changePortResult == ResultOk);
