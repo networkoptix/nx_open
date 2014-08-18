@@ -4,7 +4,9 @@
 
 #include <utils/common/model_functions.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnSystemInformation, (json)(binary)(datastream)(eq)(hash), QnSystemInformation_Fields)
+#include "version.h"
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnSystemInformation, (json)(binary)(datastream)(eq)(hash), QnSystemInformation_Fields, (optional, true))
 
 QnSystemInformation::QnSystemInformation(const QString &platform, const QString &arch, const QString &modification) :
     arch(arch),
@@ -13,7 +15,7 @@ QnSystemInformation::QnSystemInformation(const QString &platform, const QString 
 {}
 
 QnSystemInformation::QnSystemInformation(const QString &infoString) {
-    QRegExp infoRegExp(lit("(.+) (.+) ?(.*)"));
+    QRegExp infoRegExp(lit("(\\S+)\\s+(\\S+)\\s*(\\S*)"));
     if (infoRegExp.exactMatch(infoString)) {
         platform = infoRegExp.cap(1);
         arch = infoRegExp.cap(2);
@@ -30,4 +32,12 @@ QString QnSystemInformation::toString() const {
 
 bool QnSystemInformation::isValid() const {
     return !platform.isEmpty() && !arch.isEmpty();
+}
+
+QnSystemInformation QnSystemInformation::currentSystemInformation() {
+    QString arch(lit(QN_APPLICATION_ARCH));
+    QString mod;
+    if (arch == lit("arm"))
+        mod = lit(QN_ARM_BOX);
+    return QnSystemInformation(lit(QN_APPLICATION_PLATFORM), arch, mod);
 }

@@ -46,7 +46,7 @@ private slots:
     void at_timer();
     void at_connectionOpened();
 
-    void at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress);
+    void at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress);
     void at_peerLost(const QnModuleInformation &moduleInformation);
 
     void at_appStarted();

@@ -128,6 +128,14 @@ Qn::ActionVisibility QnConjunctionActionCondition::check(const QnActionParameter
     return result;
 }
 
+Qn::ActionVisibility QnNegativeActionCondition::check(const QnActionParameters &parameters) {
+    Qn::ActionVisibility result = m_condition->check(parameters);
+    if (result == Qn::InvisibleAction)
+        return Qn::EnabledAction;
+    else
+        return Qn::InvisibleAction;
+}
+
 Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetList &widgets) {
     if(widgets.size() != 1 || !widgets[0])
         return Qn::InvisibleAction;
@@ -593,6 +601,9 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
     bool isExportedLayout = snapshotManager()->isFile(layout);
 
     foreach (const QnResourcePtr &resource, resources) {
+        if (resource->getStatus() == Qn::Incompatible)
+            continue;
+
         //TODO: #GDM #Common refactor duplicated code
         bool isServer = resource->hasFlags(Qn::server);
         bool isMediaResource = resource->hasFlags(Qn::media);
@@ -648,6 +659,7 @@ Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnLayoutItemI
 }
 
 Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
     return qnCommon->remoteGUID().isNull()
         ? Qn::InvisibleAction
         : Qn::EnabledAction;
@@ -902,6 +914,19 @@ Qn::ActionVisibility QnEdgeServerCondition::check(const QnResourceList &resource
     return Qn::EnabledAction;
 }
 
+Qn::ActionVisibility QnResourceStatusActionCondition::check(const QnResourceList &resources) {
+    bool found = false;
+    foreach (const QnResourcePtr &resource, resources) {
+        if (resource->getStatus() != m_status) {
+            if (m_all)
+                return Qn::InvisibleAction;
+        } else {
+            found = true;
+        }
+    }
+    return found ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
 Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParameters &parameters) {
 #ifdef Q_OS_WIN
     if (!context()->user())
@@ -915,12 +940,13 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
     return Qn::InvisibleAction;
    
 #else
+    Q_UNUSED(parameters)
     return Qn::InvisibleAction;
 #endif
 }
 
-
 Qn::ActionVisibility QnAutoStartAllowedActionCodition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
     if(!context()->instance<QnWorkbenchAutoStarter>()->isSupported())
         return Qn::InvisibleAction;
     return Qn::EnabledAction;

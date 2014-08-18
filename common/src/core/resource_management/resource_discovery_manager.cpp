@@ -288,7 +288,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             QnResourceList lst = searcher->search();
 
             // resources can be searched by client in or server.
-            // if this client in stand alone => lets add QnResource::local 
+            // if this client in stand alone => lets add Qn::local
             // server does not care about flags 
             for( QnResourceList::iterator
                 it = lst.begin();

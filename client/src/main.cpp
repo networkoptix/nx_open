@@ -111,6 +111,8 @@ extern "C"
 #include "ui/dialogs/message_box.h"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
+#include <utils/network/module_finder.h>
+#include <utils/network/global_module_finder.h>
 #include <api/network_proxy_factory.h>
 
 #ifdef Q_OS_MAC
@@ -321,6 +323,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool noVSync = false;
     QString sVideoWallGuid;
     QString sVideoWallItemGuid;
+    QString engineVersion;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -343,6 +346,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
     commandLineParser.addParameter(&sVideoWallGuid,         "--videowall",                  NULL,   QString());
     commandLineParser.addParameter(&sVideoWallItemGuid,     "--videowall-instance",         NULL,   QString());
+    commandLineParser.addParameter(&engineVersion,          "--override-version",           NULL,   QString());
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
@@ -351,6 +355,14 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Dev mode. */
     if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
         qnSettings->setDevMode(true);
+    }
+
+    if (!engineVersion.isEmpty()) {
+        QnSoftwareVersion version(engineVersion);
+        if (!version.isNull()) {
+            qWarning() << "Starting with overriden version: " << version.toString();
+            qnCommon->setEngineVersion(version);
+        }
     }
 
     QUuid videowallGuid(sVideoWallGuid);
@@ -485,7 +497,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     qApp->installEventFilter(&helpHandler);
 
     cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
-    cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
+    cl_log.log("Software version: ", QApplication::applicationVersion(), cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
@@ -494,6 +506,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnSessionManager::instance()->start();
 
     ffmpegInit();
+
+    QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(true));
+    moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
+    moduleFinder->start();
+
+    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
 
     //===========================================================================
 

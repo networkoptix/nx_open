@@ -38,6 +38,7 @@
 
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
+#include <utils/network/global_module_finder.h>
 
 namespace {
     const int videowallReconnectTimeoutMSec = 5000;
@@ -95,6 +96,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
     });
 
     //connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
+    qnCommon->setLocalSystemName(connection2()->connectionInfo().systemName);
 }
 
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
@@ -150,6 +152,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     }
 
     context()->instance<QnWorkbenchStateManager>()->tryClose(true);
+    qnCommon->setLocalSystemName(QString());
 }
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered() {
@@ -264,6 +267,8 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl) {
     QnResource::startCommandProc();
 
     context()->setUserName(appServerUrl.userName());
+
+    QnGlobalModuleFinder::instance()->setConnection(result.connection());
 
     return true;
 }

@@ -12,66 +12,114 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="updateFromLocalSourceButton">
-       <property name="text">
-        <string>Update from local source</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="installSpecificBuildButton">
-       <property name="text">
-        <string>Install specific build</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="checkForUpdatesButton">
-       <property name="text">
-        <string>Check for updates</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QWidget" name="topButtonBar" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QPushButton" name="updateFromLocalSourceButton">
+        <property name="text">
+         <string>Update from local source</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="installSpecificBuildButton">
+        <property name="text">
+         <string>Install specific build</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="checkForUpdatesButton">
+        <property name="text">
+         <string>Check for updates</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <widget class="QTableView" name="tableView"/>
    </item>
    <item>
     <widget class="QWidget" name="updateStateWidget" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
       <item>
-       <widget class="QLabel" name="updateStateLabel">
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="updateStateLabel">
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="progressIndicator" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QnProgressWidget" name="indicator" native="true"/>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QProgressBar" name="updateProgessBar"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="cancelButton">
+          <property name="text">
+           <string>Cancel</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QProgressBar" name="updateProgessBar"/>
-      </item>
-      <item>
-       <widget class="QPushButton" name="cancelButton">
+       <widget class="QLabel" name="extraMessageLabel">
         <property name="text">
-         <string>Cancel</string>
+         <string>It looks like the update process is taking more time than usual. Please keep waiting.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -88,6 +136,12 @@
    <class>QnProgressWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/progress_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnProgressWidget</class>
+   <extends>QWidget</extends>
+   <header>ui/widgets/dialog_button_box.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

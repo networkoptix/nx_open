@@ -663,6 +663,16 @@ namespace Qn {
          */
         ToggleRadassAction,
 
+        /**
+         * Connect incompatible server to current system
+         */
+        ConnectToCurrentSystem,
+
+        /**
+         * Joing the other system to the current system
+         */
+        JoinOtherSystem,
+
         /* PTZ Actions */
 
         /**

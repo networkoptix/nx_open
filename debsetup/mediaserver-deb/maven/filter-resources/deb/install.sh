@@ -1,6 +1,7 @@
 #!/bin/bash
 
-DISTRIB=$COMPANY_NAME-mediaserver-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta
+COMPANY_NAME=${deb.customization.company.name}
+DISTRIB=$COMPANY_NAME-mediaserver-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta.deb
 
 function update () {
     export DEBIAN_FRONTEND=noninteractive

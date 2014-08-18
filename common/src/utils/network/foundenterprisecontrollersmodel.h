@@ -46,7 +46,7 @@ public:
     virtual int	rowCount( const QModelIndex& parent = QModelIndex() ) const;
 
 public slots:
-    void remoteModuleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress);
+    void remoteModuleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress);
     void remoteModuleLost(const QnModuleInformation &moduleInformation);
 
 protected:
@@ -55,7 +55,7 @@ protected:
         QUuid seed;
         QString url;
         QList<QString> ipAddresses;
-        TypeSpecificParamMap params;
+        quint16 port;
 
         bool operator<( const FoundModuleData& right ) const
         {

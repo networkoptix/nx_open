@@ -9,7 +9,7 @@
 
 #include <QtCore/QMutexLocker>
 
-#include <utils/network/modulefinder.h>
+#include <utils/network/module_finder.h>
 
 QnFoundEnterpriseControllersModel::QnFoundEnterpriseControllersModel(QnModuleFinder* const finder) {
     connect(finder,     &QnModuleFinder::moduleFound,   this,   &QnFoundEnterpriseControllersModel::remoteModuleFound,  Qt::DirectConnection);
@@ -51,7 +51,7 @@ QVariant QnFoundEnterpriseControllersModel::data( const QModelIndex& index, int 
     switch( role )
     {
         case UrlRole:
-            return QString::fromLatin1("https://%1:%2").arg(moduleData.ipAddresses[moduleAddressIndex]).arg(moduleData.params[QString::fromLatin1("port")]);
+            return QString::fromLatin1("https://%1:%2").arg(moduleData.ipAddresses[moduleAddressIndex]).arg(moduleData.port);
 
         case SeedRole:
             return moduleData.seed;
@@ -60,7 +60,7 @@ QVariant QnFoundEnterpriseControllersModel::data( const QModelIndex& index, int 
             return moduleData.ipAddresses[moduleAddressIndex];
 
         case PortRole:
-            return moduleData.params[QString::fromLatin1("port")].toInt();
+            return moduleData.port;
 
         default:
             return QVariant();
@@ -141,27 +141,22 @@ int	QnFoundEnterpriseControllersModel::rowCount( const QModelIndex& parent ) con
     return (int) m_foundModules[parent.row()].ipAddresses.size();
 }
 
-void QnFoundEnterpriseControllersModel::remoteModuleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress) {
-    Q_UNUSED(localInterfaceAddress)
-
+void QnFoundEnterpriseControllersModel::remoteModuleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
     QMutexLocker lk(&m_mutex);
 
     if (moduleInformation.type != nxMediaServerId)
         return;
 
-    if (!moduleInformation.parameters.contains(lit("port")))
-        return;
-
     const QString &remoteHostAddress = moduleInformation.isLocal ? QString::fromLatin1("127.0.0.1") : remoteAddress;
-    const QString &url = QString(lit("https://%1:%2")).arg(remoteHostAddress).arg(moduleInformation.parameters[lit("port")]);
+    const QString &url = QString(lit("https://%1:%2")).arg(remoteHostAddress).arg(moduleInformation.port);
     bool isNewElement = false;
 
     auto it = std::find_if(m_foundModules.begin(), m_foundModules.end(),
-                           [&moduleInformation](const FoundModuleData &data) { return data.seed == moduleInformation.id; });
+                           [&moduleInformation](const FoundModuleData &data) { return data.seed == moduleInformation.id.toString(); });
     if (it == m_foundModules.end()) {
         FoundModuleData newModuleData;
         newModuleData.url = url;
-        newModuleData.seed = moduleInformation.id;
+        newModuleData.seed = moduleInformation.id.toString();
 
         //searching place to insert new element in order of increase of url
         it = std::lower_bound(m_foundModules.begin(), m_foundModules.end(), newModuleData);
@@ -174,7 +169,7 @@ void QnFoundEnterpriseControllersModel::remoteModuleFound(const QnModuleInformat
     //if such already exists, updating it's data
     if (!it->ipAddresses.contains(remoteAddress))
         it->ipAddresses.append(remoteAddress);
-    it->params = moduleInformation.parameters;
+    it->port = moduleInformation.port;
 
     const QModelIndex &updatedElemIndex = indexNonSafe(it - m_foundModules.begin(), 0);
 
@@ -195,7 +190,7 @@ void QnFoundEnterpriseControllersModel::remoteModuleLost(const QnModuleInformati
         return;
 
     auto it = std::find_if(m_foundModules.begin(), m_foundModules.end(),
-                           [&moduleInformation](const FoundModuleData &data) { return data.seed == moduleInformation.id; });
+                           [&moduleInformation](const FoundModuleData &data) { return data.seed == moduleInformation.id.toString(); });
     if (it == m_foundModules.end())
         return;
 
@@ -209,13 +204,11 @@ void QnFoundEnterpriseControllersModel::remoteModuleLost(const QnModuleInformati
 
 QString QnFoundEnterpriseControllersModel::getDisplayStringForEnterpriseControllerRootNode( const FoundModuleData& moduleData ) const
 {
-    QString port = moduleData.params[lit("port")];
-
     QString result;
     for(int i = 0; i < moduleData.ipAddresses.size(); ++i) {
         if(i > 0)
             result += lit(", ");
-        result += lit("%1:%2").arg(moduleData.ipAddresses[i]).arg(port);
+        result += lit("%1:%2").arg(moduleData.ipAddresses[i]).arg(moduleData.port);
     }
     return result;
 }

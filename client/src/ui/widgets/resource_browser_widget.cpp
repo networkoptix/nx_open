@@ -434,9 +434,23 @@ QnVideoWallMatrixIndexList QnResourceBrowserWidget::selectedVideoWallMatrices() 
         QUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QUuid>();
         if(uuid.isNull())
             continue;
+
         QnVideoWallMatrixIndex index = qnResPool->getVideoWallMatrixByUuid(uuid);
         if (!index.isNull())
             result.push_back(index);
+    }
+
+    return result;
+}
+
+QnResourceList QnResourceBrowserWidget::selectedIncompatibleServers() const {
+    QnResourceList result;
+
+    foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
+        if (index.data(Qn::ResourceStatusRole).value<Qn::ResourceStatus>() != Qn::Incompatible)
+            continue;
+
+        result.append(index.data(Qn::ResourceRole).value<QnResourcePtr>());
     }
 
     return result;
