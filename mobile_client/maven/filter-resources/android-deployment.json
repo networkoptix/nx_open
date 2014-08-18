@@ -8,6 +8,6 @@
    "toolchain-version": "4.8",
    "ndk-host": "linux-x86_64",
    "target-architecture": "armeabi-v7a",
-   "android-extra-libs": "${libdir}/lib/${build.configuration}/libssl.so,${libdir}/lib/${build.configuration}/libquazip.so,${libdir}/lib/${build.configuration}/libcrypto.so,${libdir}/lib/${build.configuration}/libcommon.so,${libdir}/lib/${build.configuration}/libappserver2.so",
+   "android-extra-libs": "${libdir}/lib/${build.configuration}/libssl.so,${libdir}/lib/${build.configuration}/libquazip.so,${libdir}/lib/${build.configuration}/libcrypto.so",
    "application-binary": "${libdir}/lib/${build.configuration}/libmobile_client.so"
 }

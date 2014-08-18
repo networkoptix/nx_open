@@ -102,6 +102,22 @@
                 <qt.libs>core network xml sql</qt.libs>
             </properties>
         </profile>
+
+        <profile>
+            <id>mobile-client</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>mobile</name>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
     </profiles>	
 
 </project>
