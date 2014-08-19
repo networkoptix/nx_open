@@ -260,7 +260,7 @@ bool checkForEdgeBox(const QString& value)
         "rpi"
     };
     QByteArray box = value.toUtf8().toLower().trimmed();
-    for (int i = 0; i < sizeof(EDGE_BOXES) / sizeof(char*); ++i)
+    for (size_t i = 0; i < sizeof(EDGE_BOXES) / sizeof(char*); ++i)
     {
         if (box == EDGE_BOXES[i])
             return true;
