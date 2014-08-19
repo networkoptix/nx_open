@@ -240,8 +240,9 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened() {
 
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed() {
 
-    disconnect( nullptr, &ec2::AbstractECConnection::primaryTimeServerSelectionRequired,
-                this, &QnWorkbenchNotificationsHandler::at_primaryTimeServerSelectionRequired );
+    if( QnAppServerConnectionFactory::getConnection2().get() )
+        disconnect( QnAppServerConnectionFactory::getConnection2().get(), &ec2::AbstractECConnection::primaryTimeServerSelectionRequired,
+                    this, &QnWorkbenchNotificationsHandler::at_primaryTimeServerSelectionRequired );
 
     clear();
     if (!qnCommon->remoteGUID().isNull())
