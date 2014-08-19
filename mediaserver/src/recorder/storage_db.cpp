@@ -5,6 +5,7 @@
 #include <core/resource/camera_bookmark.h>
 
 #include <utils/serialization/sql.h>
+#include "utils/common/util.h"
 
 static const int COMMIT_INTERVAL = 1000 * 60 * 5;
 
@@ -191,7 +192,35 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog() {
     QVector<DeviceFileCatalogPtr> result;
     result << loadChunksFileCatalog();
     result << loadBookmarksFileCatalog();
+
+    addCatalogFromMediaFolder(lit("hi_quality"), QnServer::HiQualityCatalog, result);
+    addCatalogFromMediaFolder(lit("low_quality"), QnServer::LowQualityCatalog, result);
+
     return result;
+}
+
+bool isCatalogExistInResult(const QVector<DeviceFileCatalogPtr>& result, QnServer::ChunksCatalog catalog, const QString& uniqueId)
+{
+    foreach(const DeviceFileCatalogPtr& c, result) 
+    {
+        if (c->getRole() == catalog && c->cameraUniqueId() == uniqueId)
+            return true;
+    }
+    return false;
+}
+
+void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix, QnServer::ChunksCatalog catalog, QVector<DeviceFileCatalogPtr>& result)
+{
+
+    QString root = closeDirPath(QFileInfo(m_sdb.databaseName()).absoluteDir().path()) + postfix;
+    QDir dir(root);
+    foreach(const QFileInfo& fi, dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name))
+    {
+        QString uniqueId = fi.baseName();
+        if (!isCatalogExistInResult(result, catalog, uniqueId)) {
+            result << DeviceFileCatalogPtr(new DeviceFileCatalog(uniqueId, catalog));
+        }
+    }
 }
 
 bool QnStorageDb::removeCameraBookmarks(const QString& cameraUniqueId) {
