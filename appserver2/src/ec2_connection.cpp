@@ -30,7 +30,7 @@ namespace ec2
 
         QnDbManager::instance()->init(
             resCtx.resFactory,
-            QFileInfo(dbUrl.path()).absoluteFilePath(),
+            dbUrl.toLocalFile(),
             QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path") );
 
         ApiResourceParamDataList paramList;

@@ -658,11 +658,13 @@ void initAppServerConnection(QSettings &settings)
     
     // ### remove
     QString host = settings.value("appserverHost").toString();
-    if (QUrl(host).scheme() == "file")
-        appServerUrl = QUrl(host); // it is a completed URL
+    if( QUrl( host ).scheme() == "file" )
+    {
+        appServerUrl = QUrl( host ); // it is a completed URL
+    }
     else if (host.isEmpty() || host == "localhost") 
     {
-        appServerUrl = QUrl(QString("file:///") + closeDirPath(getDataDirectory()));
+        appServerUrl = QUrl::fromLocalFile( closeDirPath( getDataDirectory() ) );
     }
     else {
         appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
@@ -715,7 +717,8 @@ void initAppServerConnection(QSettings &settings)
 }
 
 QnMain::QnMain(int argc, char* argv[])
-    : m_argc(argc),
+:
+    m_argc(argc),
     m_argv(argv),
     m_startMessageSent(false),
     m_firstRunningTime(0),
