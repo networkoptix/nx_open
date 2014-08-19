@@ -225,13 +225,13 @@ private:
 // 4) Concurrent issue async operation leads to undefined behavior. So
 // lucky, no lock is here :)
 
+static const std::size_t bio_input_buffer_reserve = 1024;
+static const std::size_t bio_output_buffer_reserve= 2048;
+static const std::size_t async_buffer_default_size= 1024;
+static const int ssl_internal_error = 100;
+
 class async_ssl {
 public:
-    static const std::size_t bio_input_buffer_reserve = 1024;
-    static const std::size_t bio_output_buffer_reserve= 2048;
-    static const std::size_t async_buffer_default_size= 1024;
-    static const int ssl_internal_error = 100;
-
     async_ssl( SSL* ssl , bool server , AbstractStreamSocket* socket ) ;
 
     // This function is invoked by the BIO function
@@ -423,7 +423,7 @@ private:
                         // the buffered data has been consumed 
                         eof_ = true;
                     } else {
-                        Q_ASSERT(bytes_transferred == buffer.write_buffer->size());
+                        Q_ASSERT(bytes_transferred == (std::size_t)buffer.write_buffer->size());
                         // append the buffer that has been written into 
                         // to the bio_in_buffer_ and later on SSL will use
                         bio_in_buffer_.append(*buffer.write_buffer);
@@ -444,7 +444,7 @@ private:
                         op->error(ec);
                         return;
                     }
-                    Q_ASSERT( bytes_transferred == buffer.read_buffer->size() && 
+                    Q_ASSERT( bytes_transferred == (std::size_t)buffer.read_buffer->size() && 
                               buffer.read_buffer == &bio_out_buffer_  );
                     // since we have already sent the buffer there
                     bio_out_buffer_.resize(0); 
@@ -462,7 +462,7 @@ private:
                 op->error(ec);
                 return;
             }
-            Q_ASSERT( bytes_transferred == buffer.read_buffer->size() && 
+            Q_ASSERT( bytes_transferred == (std::size_t)buffer.read_buffer->size() && 
                       buffer.read_buffer == &bio_out_buffer_ );
             // since we have already sent the buffer there
             bio_out_buffer_.resize(0); 
@@ -687,8 +687,8 @@ void async_ssl::async_handshake( const std::function<void(SystemError::ErrorCode
 }
 
 async_ssl::async_ssl( SSL* ssl , bool server , AbstractStreamSocket* socket ) :
-    ssl_shutdown_(false),
     eof_(false),
+    ssl_shutdown_(false),
     server_(server),
     ssl_(ssl),
     socket_(socket),
@@ -801,7 +801,8 @@ private:
              Q_ASSERT( bytes_transferred == sniffer_header_length );
              // No idea whether that socket implementation set this length
              sniffer_buffer_.resize(sniffer_header_length); 
-             const char* buf = sniffer_buffer_.data();
+             // Fix for the bug that always false in terms of comparison of 0x80
+             const unsigned char* buf = reinterpret_cast<unsigned char*>(sniffer_buffer_.data());
              if( buf[0] == 0x80 || (buf[0] == 0x16 && buf[1] == 0x03) ) {
                  is_ssl_ = true;
                  is_initialized_ = true;
@@ -932,6 +933,8 @@ public:
     bool isServerSide;
     quint8 extraBuffer[32];
     int extraBufferLen;
+    //!Socket works as regular socket (without encryption until this flag is set to \a true)
+    bool ecnryptionEnabled;
 
     // This model flag will be set up by the interface internally. It just tells
     // the user what our socket will be. An async version or a sync version. We
@@ -949,6 +952,7 @@ public:
         write(nullptr),
         isServerSide( false ),
         extraBufferLen( 0 ),
+        ecnryptionEnabled(false),
         mode(QnSSLSocket::SYNC)
     {
     }
@@ -1047,9 +1051,12 @@ int QnSSLSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*
     return d->wrappedSocket->recv(buffer, bufferLen);
 }
 
-int QnSSLSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/)
+int QnSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(QnSSLSocket);
+    if( !d->ecnryptionEnabled )
+        return d->wrappedSocket->recv( buffer, bufferLen, flags );
+
     d->mode = QnSSLSocket::SYNC;
     if (!SSL_is_init_finished(d->ssl)) {
         if (d->isServerSide)
@@ -1069,6 +1076,10 @@ int QnSSLSocket::sendInternal( const void* buffer, unsigned int bufferLen )
 int QnSSLSocket::send( const void* buffer, unsigned int bufferLen )
 {
     Q_D(QnSSLSocket);
+
+    if( !d->ecnryptionEnabled )
+        return d->wrappedSocket->send( buffer, bufferLen );
+
     d->mode = QnSSLSocket::SYNC;
     if (!SSL_is_init_finished(d->ssl)) {
         if (d->isServerSide)
@@ -1083,6 +1094,7 @@ int QnSSLSocket::send( const void* buffer, unsigned int bufferLen )
 bool QnSSLSocket::reopen()
 {
     Q_D(QnSSLSocket);
+    d->ecnryptionEnabled = false;
     return d->wrappedSocket->reopen();
 }
 
@@ -1116,6 +1128,7 @@ bool QnSSLSocket::connect(
                      unsigned int timeoutMillis)
 {
     Q_D(QnSSLSocket);
+    d->ecnryptionEnabled = true;
     return d->wrappedSocket->connect(foreignAddress, foreignPort, timeoutMillis);
 }
 
@@ -1258,6 +1271,22 @@ AbstractSocket::SOCKET_HANDLE QnSSLSocket::handle() const
     return d->wrappedSocket->handle();
 }
 
+bool QnSSLSocket::connectWithoutEncryption(
+    const QString& foreignAddress,
+    unsigned short foreignPort,
+    unsigned int timeoutMillis )
+{
+    Q_D( const QnSSLSocket );
+    return d->wrappedSocket->connect( foreignAddress, foreignPort, timeoutMillis );
+}
+
+bool QnSSLSocket::enableClientEncryption()
+{
+    Q_D( QnSSLSocket );
+    d->ecnryptionEnabled = true;
+    return doClientHandshake();
+}
+
 void QnSSLSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
 {
     Q_D( const QnSSLSocket );
@@ -1354,6 +1383,7 @@ int QnMixedSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
         if (d->extraBuffer[0] == 0x80)
         {
             d->useSSL = true;
+            d->ecnryptionEnabled = true;
             d->initState = false;
         }
         else if (d->extraBuffer[0] == 0x16)
@@ -1363,8 +1393,11 @@ int QnMixedSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
                 return readed;
             d->extraBufferLen += readed;
 
-            if (d->extraBuffer[1] == 0x03)
+            if( d->extraBuffer[1] == 0x03 )
+            {
                 d->useSSL = true;
+                d->ecnryptionEnabled = true;
+            }
         }
         d->initState = false;
     }

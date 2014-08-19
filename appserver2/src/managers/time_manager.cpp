@@ -279,7 +279,7 @@ namespace ec2
         QMutexLocker lk( &m_mutex );
 
         NX_LOG( lit("Received primary time server change transaction. new peer %1, local peer %2").
-            arg(QLatin1String(tran.params.id.toRfc4122())).arg(QLatin1String(qnCommon->moduleGUID().toRfc4122())), cl_logDEBUG1 );
+            arg( tran.params.id.toString() ).arg( qnCommon->moduleGUID().toString() ), cl_logDEBUG1 );
 
         if( tran.params.id == qnCommon->moduleGUID() )
         {
@@ -328,7 +328,7 @@ namespace ec2
         QMutexLocker lk( &m_mutex );
 
         NX_LOG( lit("Received peer %1 system time (%2), peer time priority key 0x%3").
-            arg(QLatin1String(tran.params.peerID.toRfc4122())).arg(QDateTime::fromMSecsSinceEpoch(tran.params.peerSysTime).toString(Qt::ISODate)).
+            arg( tran.params.peerID.toString() ).arg( QDateTime::fromMSecsSinceEpoch( tran.params.peerSysTime ).toString( Qt::ISODate ) ).
             arg(tran.params.timePriorityKey, 0, 16), cl_logDEBUG2 );
 
         TimePriorityKey peerPriorityKey;
@@ -366,16 +366,16 @@ namespace ec2
         assert( remotePeerTimePriorityKey.seed > 0 );
 
         NX_LOG( lit("Received sync time update from peer %1, peer's sync time (%2), peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5").
-            arg(QLatin1String(remotePeerID.toRfc4122())).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
-            arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(QLatin1String(qnCommon->moduleGUID().toRfc4122())).
+            arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
+            arg( remotePeerTimePriorityKey.toUInt64(), 0, 16 ).arg( qnCommon->moduleGUID().toString() ).
             arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logDEBUG2 );
 
         //if there is new maximum remotePeerTimePriorityKey than updating delta and emitting timeChanged
         if( remotePeerTimePriorityKey > m_usedTimeSyncInfo.timePriorityKey )
         {
             NX_LOG( lit("Received sync time update from peer %1, peer's sync time (%2), peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5. Acceping peer's synchronized time").
-                arg(QLatin1String(remotePeerID.toRfc4122())).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
-                arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(QLatin1String(qnCommon->moduleGUID().toRfc4122())).
+                arg( remotePeerID.toString() ).arg( QDateTime::fromMSecsSinceEpoch( remotePeerSyncTime ).toString( Qt::ISODate ) ).
+                arg( remotePeerTimePriorityKey.toUInt64(), 0, 16 ).arg( qnCommon->moduleGUID().toString() ).
                 arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logWARNING );
             //taking new synchronization data
             m_usedTimeSyncInfo = TimeSyncInfo(
@@ -441,7 +441,7 @@ namespace ec2
         //TODO #ak if local time changes have to broadcast it as soon as possible
 
         NX_LOG( lit("Broadcasting local system time. peer %1, system time time (%2), local time priority key 0x%3").
-            arg(QLatin1String(qnCommon->moduleGUID().toRfc4122())).arg(QDateTime::fromMSecsSinceEpoch(currentMSecsSinceEpoch()).toString(Qt::ISODate)).
+            arg( qnCommon->moduleGUID().toString() ).arg( QDateTime::fromMSecsSinceEpoch( currentMSecsSinceEpoch() ).toString( Qt::ISODate ) ).
             arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logDEBUG2 );
 
         QnTransaction<ApiPeerSystemTimeData> tran( ApiCommand::broadcastPeerSystemTime );
@@ -599,7 +599,7 @@ namespace ec2
         }
     }
 
-    void TimeSynchronizationManager::onPeerLost( ApiPeerAliveData data, bool /*isProxy*/ )
+    void TimeSynchronizationManager::onPeerLost( ApiPeerAliveData data )
     {
         QMutexLocker lk( &m_mutex );
         m_systemTimeByPeer.erase( data.peer.id );

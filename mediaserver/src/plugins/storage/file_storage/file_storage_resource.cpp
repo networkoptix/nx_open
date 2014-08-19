@@ -287,3 +287,4 @@ bool QnFileStorageResource::isStorageDirMounted()
     return true;
 }
 #endif    // _WIN32
+

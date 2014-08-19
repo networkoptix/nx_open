@@ -59,7 +59,12 @@ namespace ec2 {
     struct ApiUpdateUploadResponceData;
     struct ApiUpdateInstallData;
     struct ApiCameraBookmarkTagData;
+    struct ApiModuleData;
     struct ApiLoginData;
+    struct ApiDiscoveryData;
+    struct ApiDiscoverPeerData;
+    struct ApiConnectionData;
+    struct ApiSystemNameData;
 
     struct ApiTimeData;
     struct ApiPeerSystemTimeData;
@@ -83,6 +88,9 @@ namespace ec2 {
     typedef std::vector<ApiUserData> ApiUserDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
     typedef std::vector<ApiCameraBookmarkTagData> ApiCameraBookmarkTagDataList;
+    typedef std::vector<ApiModuleData> ApiModuleDataList;
+    typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
+    typedef std::vector<ApiConnectionData> ApiConnectionDataList;
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
 
 #define QN_EC2_API_DATA_TYPES \
@@ -132,7 +140,12 @@ namespace ec2 {
     (ApiUpdateUploadData)\
     (ApiUpdateUploadResponceData)\
     (ApiCameraBookmarkTagData)\
+    (ApiModuleData)\
     (ApiLoginData)\
+    (ApiDiscoveryData)\
+    (ApiDiscoverPeerData)\
+    (ApiConnectionData)\
+    (ApiSystemNameData)\
     (ApiTimeData)\
     (ApiPeerData)\
     (ApiRuntimeData)\

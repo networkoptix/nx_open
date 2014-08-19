@@ -30,9 +30,10 @@ CREATE TABLE "vms_server_tmp" (
     "flags" number,
     "system_info" varchar(1024),
     "max_cameras" number,
-    "redundancy" bool);
+    "redundancy" bool,
+    "system_name" varchar(1024));
 INSERT INTO vms_server_tmp
- SELECT api_url, auth_key, version, net_addr_list, resource_ptr_id, panic_mode, 0, '', 0,0
+ SELECT api_url, auth_key, version, net_addr_list, resource_ptr_id, panic_mode, 0, '', 0, 0, ''
   FROM  vms_server;
 drop table  vms_server;
 ALTER TABLE vms_server_tmp RENAME TO vms_server;

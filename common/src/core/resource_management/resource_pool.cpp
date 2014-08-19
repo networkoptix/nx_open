@@ -108,12 +108,17 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, resources)
     {
+        bool incompatible = resource->getStatus() == Qn::Incompatible;
+
         if( insertOrUpdateResource(
                 resource,
-                &m_resources ) )
+                incompatible ? &m_incompatibleResources : &m_resources ) )
         {
             newResources.insert(resource->getId(), resource);
         }
+
+        if (!incompatible)
+            m_incompatibleResources.remove(resource->getUniqueId());
     }
 
     m_resourcesMtx.unlock();
@@ -200,6 +205,17 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
             m_resources.erase( resIter );
             removedResources.append(resource);
         }
+        else
+        {
+            resIter = std::find_if(m_incompatibleResources.begin(), m_incompatibleResources.end(), MatchResourceByID(resource->getId()));
+            if (resIter != m_incompatibleResources.end())
+            {
+                m_incompatibleResources.erase(resIter);
+                removedResources.append(resource);
+            }
+        }
+
+
 
         resource->setResourcePool(NULL);
     }
@@ -515,6 +531,39 @@ bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHas
     }
 }
 
+QnResourcePtr QnResourcePool::getIncompatibleResourceById(const QUuid &id, bool useCompatible) const {
+    QMutexLocker locker(&m_resourcesMtx);
+
+    auto it = std::find_if(m_incompatibleResources.begin(), m_incompatibleResources.end(), MatchResourceByID(id));
+    if (it != m_incompatibleResources.end())
+        return it.value();
+
+    if (useCompatible)
+        return getResourceById(id);
+
+    return QnResourcePtr();
+}
+
+QnResourcePtr QnResourcePool::getIncompatibleResourceByUniqueId(const QString &uid) const {
+    QMutexLocker locker(&m_resourcesMtx);
+    return m_incompatibleResources.value(uid);
+}
+
+QnResourceList QnResourcePool::getAllIncompatibleResources() const {
+    QMutexLocker locker(&m_resourcesMtx);
+    return m_incompatibleResources.values();
+}
+
+void QnResourcePool::makeResourceNormal(const QnResourcePtr &resource) {
+    QMutexLocker locker(&m_resourcesMtx);
+    auto it = m_incompatibleResources.find(resource->getUniqueId());
+    if (it == m_incompatibleResources.end() || it.value() != resource)
+        return;
+
+    m_incompatibleResources.erase(it);
+    insertOrUpdateResource(resource, &m_resources);
+}
+
 QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QUuid &uuid) const {
     foreach (const QnResourcePtr &resource, m_resources) {
         QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
@@ -544,6 +593,7 @@ QnVideoWallMatrixIndex QnResourcePool::getVideoWallMatrixByUuid(const QUuid &uui
     }
     return QnVideoWallMatrixIndex();
 }
+
 
 QnVideoWallMatrixIndexList QnResourcePool::getVideoWallMatricesByUuid(const QList<QUuid> &uuids) const {
     QnVideoWallMatrixIndexList result;

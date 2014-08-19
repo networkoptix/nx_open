@@ -39,6 +39,7 @@
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/synctime.h>
+#include <utils/network/global_module_finder.h>
 
 namespace {
     const int videowallReconnectTimeoutMSec = 5000;
@@ -100,6 +101,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
         QnSyncTime::instance(), static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime) );
 
     //connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
+    qnCommon->setLocalSystemName(connection2()->connectionInfo().systemName);
 }
 
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
@@ -137,10 +139,13 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     resourcePool()->removeResources(remoteResources);
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
-    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>())
-        if(snapshotManager()->isLocal(layout) 
-            && !snapshotManager()->isFile(layout))  //do not remove exported layouts
-            resourcePool()->removeResource(layout);
+    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>()) {
+        bool isLocal = snapshotManager()->isLocal(layout);
+        bool isFile = snapshotManager()->isFile(layout);
+        if(isLocal && isFile)  //do not remove exported layouts
+            continue;
+        resourcePool()->removeResource(layout);
+    }
 
     qnLicensePool->reset();
     context()->instance<QnAppServerNotificationCache>()->clear();
@@ -159,6 +164,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     }
 
     context()->instance<QnWorkbenchStateManager>()->tryClose(true);
+    qnCommon->setLocalSystemName(QString());
 }
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered() {
@@ -204,6 +210,10 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
 }    
 
 void QnWorkbenchConnectHandler::at_reconnectAction_triggered() {
+    /* Reconnect call should not be executed while we are disconnected. */
+    if (!context()->user())
+        return;
+
     QUrl currentUrl = QnAppServerConnectionFactory::url(); 
     if (connected())
         disconnectFromServer(true);
@@ -270,6 +280,8 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl) {
 
     context()->setUserName(appServerUrl.userName());
 
+    QnGlobalModuleFinder::instance()->setConnection(result.connection());
+
     return true;
 }
 
@@ -311,6 +323,7 @@ void QnWorkbenchConnectHandler::hideMessageBox() {
 
 void QnWorkbenchConnectHandler::showLoginDialog() {
     QnNonModalDialogConstructor<QnLoginDialog> dialogConstructor(m_loginDialog, mainWindow());
+    dialogConstructor.resetGeometry();
     //just show dialog   
 }
 

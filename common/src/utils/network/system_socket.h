@@ -206,6 +206,8 @@ private:
     void operator=(const Socket &sock);
 };
 
+template<class SocketType> class AsyncSocketImplHelper;
+
 /**
  *   Socket which is able to connect, send, and receive
  */
@@ -261,6 +263,7 @@ public:
     unsigned short getForeignPort() const;
 
 private:
+    std::unique_ptr<AsyncSocketImplHelper<Socket>> m_aioHelper;
     bool m_connected;
 };
 

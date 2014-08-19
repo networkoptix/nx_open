@@ -156,7 +156,6 @@ private:
     nx_http::AsyncHttpClientPtr m_httpClient;
     State m_state;
     /*std::vector<quint8>*/ nx::Buffer m_readBuffer;
-    size_t m_readBufferLen;
     int m_chunkHeaderLen;
     size_t m_chunkLen;
     int m_sendOffset;
@@ -173,6 +172,8 @@ private:
     typedef QMap<QUuid, QPair<bool, bool>> ConnectingInfoMap;
     static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
     static QMutex m_staticMutex;
+
+    QByteArray m_extraData;
 
 private:
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
@@ -192,6 +193,7 @@ private:
     void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead );
     void serializeAndSendNextDataBuffer();
     void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
+    void setExtraDataBuffer(const QByteArray& data);
 
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );

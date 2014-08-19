@@ -34,10 +34,6 @@ class QnResourcePool;
 class QnInitResPool: public QThreadPool
 {
 public:
-    QnInitResPool() : QThreadPool() 
-    {
-        setMaxThreadCount( DEFAULT_RESOURCE_INIT_THREADS_COUNT );
-    }
 };
 
 class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResource>

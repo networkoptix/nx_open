@@ -71,7 +71,7 @@ namespace nx_http
         }
     }
 
-    void AsyncHttpClient::asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode ) noexcept
+    void AsyncHttpClient::asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode )
     {
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
@@ -115,7 +115,7 @@ namespace nx_http
         lk.relock();
     }
 
-    void AsyncHttpClient::asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten ) noexcept
+    void AsyncHttpClient::asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten )
     {
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
@@ -173,7 +173,7 @@ namespace nx_http
         }
     }
 
-    void AsyncHttpClient::onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead ) noexcept
+    void AsyncHttpClient::onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead )
     {
         using namespace std::placeholders;
 

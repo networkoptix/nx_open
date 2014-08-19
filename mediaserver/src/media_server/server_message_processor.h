@@ -31,11 +31,10 @@ protected:
     virtual void removeResourceIgnored(const QUuid& resourceId) override;
 
 private slots:
-    void at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);
-    void at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy);
-
     void at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
     void at_updateInstallationRequested(const QString &updateId);
+
+    void at_systemNameChangeRequested(const QString &systemName);
 
 private:
     void updateAllIPList(const QUuid& id, const QList<QHostAddress>& addrList);

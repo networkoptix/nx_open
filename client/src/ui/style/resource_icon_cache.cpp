@@ -32,6 +32,7 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(VideoWallMatrix,         qnSkin->icon("tree/matrix.png"));
 
     m_cache.insert(Server | Offline,        qnSkin->icon("tree/server_offline.png"));
+    m_cache.insert(Server | Incompatible,   qnSkin->icon("tree/server_incompatible.png"));
     m_cache.insert(Camera | Offline,        qnSkin->icon("tree/camera_offline.png"));
     m_cache.insert(Camera | Unauthorized,   qnSkin->icon("tree/camera_unauthorized.png"));
     m_cache.insert(Layout | Locked,         qnSkin->icon("tree/layout_locked.png"));
@@ -132,6 +133,9 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr &resource)
             break;
         case Qn::Unauthorized:
             status = Unauthorized;
+            break;
+        case Qn::Incompatible:
+            status = Incompatible;
             break;
         default:
             break;

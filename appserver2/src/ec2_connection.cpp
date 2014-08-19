@@ -5,6 +5,7 @@
 
 #include "ec2_connection.h"
 
+#include <QtCore/QFileInfo>
 #include <QtCore/QUrlQuery>
 
 #include "mutex/distributed_mutex.h"
@@ -29,7 +30,7 @@ namespace ec2
 
         QnDbManager::instance()->init(
             resCtx.resFactory,
-            dbUrl.path().mid(1),
+            dbUrl.toLocalFile(),
             QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path") );
 
         ApiResourceParamDataList paramList;

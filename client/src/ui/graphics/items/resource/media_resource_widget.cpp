@@ -1009,7 +1009,10 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
         else
             return Qn::NoDataOverlay;
     } else if (m_display->isPaused()) {
-        return Qn::EmptyOverlay;
+        if (m_display->camDisplay()->isEOFReached())
+            return Qn::NoDataOverlay;
+        else
+            return Qn::EmptyOverlay;
     } else {
         return base_type::calculateStatusOverlay(Qn::Online);
     }
@@ -1045,14 +1048,20 @@ void QnMediaResourceWidget::updateAspectRatio() {
         qreal aspectRatio = resourceId.isEmpty()
                             ? defaultAspectRatio()
                             : qnSettings->resourceAspectRatios().value(resourceId, defaultAspectRatio());
-
-        setAspectRatio(dewarpingRatio * aspectRatio);
+        if (dewarpingRatio > 1)
+            setAspectRatio(dewarpingRatio);
+        else
+            setAspectRatio(aspectRatio);
     } else {
         qreal aspectRatio = QnGeometry::aspectRatio(sourceSize) *
                             QnGeometry::aspectRatio(channelLayout()->size()) *
                             (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()));
 
-        setAspectRatio(dewarpingRatio * aspectRatio);
+
+        if (dewarpingRatio > 1)
+            setAspectRatio(dewarpingRatio);
+        else
+            setAspectRatio(aspectRatio);
 
         if (!resourceId.isEmpty()) {
             QnAspectRatioHash aspectRatios = qnSettings->resourceAspectRatios();
@@ -1185,6 +1194,8 @@ void QnMediaResourceWidget::updateFisheye() {
     item()->setData(Qn::ItemFlipRole, flip);
 
     updateAspectRatio();
+    if (display() && display()->camDisplay())
+        display()->camDisplay()->setFisheyeEnabled(fisheyeEnabled);
 
     emit fisheyeChanged();
 

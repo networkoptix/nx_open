@@ -62,7 +62,7 @@ namespace aio
         {
             delete *it;
         }
-            m_systemSocketAIO.aioThreadPool.clear();
+        m_systemSocketAIO.aioThreadPool.clear();
     }
 
     //!Returns true, if object has been successfully initialized
@@ -78,4 +78,15 @@ namespace aio
         threadCountArgValue = threadCount;
         return aioServiceInstance();
     }
+
+    template<> AIOService::SocketAIOContext<Socket>& AIOService::getAIOHandlingContext()
+    {
+        return m_systemSocketAIO;
+    }
+
+    template<> const AIOService::SocketAIOContext<Socket>& AIOService::getAIOHandlingContext() const
+    {
+        return m_systemSocketAIO;
+    }
+
 }

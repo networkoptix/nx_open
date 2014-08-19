@@ -120,8 +120,8 @@ public:
         m_syncWrapper->getProxy()->soap->user = this;
         m_syncWrapper->getProxy()->soap->fconnect = [](struct soap*, const char*, const char*, int) -> int { return SOAP_OK; };
         m_syncWrapper->getProxy()->soap->fdisconnect = [](struct soap*) -> int { return SOAP_OK; };
-        m_syncWrapper->getProxy()->soap->fsend = &custom_soap_fsend<std::remove_reference<decltype(*this)>::type>;
-        m_syncWrapper->getProxy()->soap->frecv = &custom_soap_frecv<std::remove_reference<decltype(*this)>::type>;
+        m_syncWrapper->getProxy()->soap->fsend = &custom_soap_fsend<typename std::remove_reference<decltype(*this)>::type>;
+        m_syncWrapper->getProxy()->soap->frecv = &custom_soap_frecv<typename std::remove_reference<decltype(*this)>::type>;
         m_syncWrapper->getProxy()->soap->fopen = NULL;
         m_syncWrapper->getProxy()->soap->fdisconnect = [](struct soap*) -> int { return SOAP_OK; };
         m_syncWrapper->getProxy()->soap->fclose = [](struct soap*) -> int { return SOAP_OK; };

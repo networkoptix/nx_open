@@ -223,7 +223,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 
     params.addQueryItem(QLatin1String("box"), runtimeData.box);
     params.addQueryItem(QLatin1String("brand"), runtimeData.brand);
-    params.addQueryItem(QLatin1String("version"), QLatin1String(QN_ENGINE_VERSION));
+    params.addQueryItem(QLatin1String("version"), qnCommon->engineVersion().toString());
     params.addQueryItem(QLatin1String("lang"), qnCommon->instance<QnClientTranslationManager>()->getCurrentLanguage());
 
     QNetworkReply *reply = m_httpClient->post(request, params.query(QUrl::FullyEncoded).toUtf8());

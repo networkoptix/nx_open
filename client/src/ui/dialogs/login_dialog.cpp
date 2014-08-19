@@ -33,7 +33,7 @@
 #include <ui/workaround/gl_widget_factory.h>
 
 #include <utils/applauncher_utils.h>
-#include <utils/network/modulefinder.h>
+#include <utils/network/module_finder.h>
 
 #include "plugins/resource/avi/avi_resource.h"
 #include "plugins/resource/archive/abstract_archive_stream_reader.h"
@@ -73,13 +73,23 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::LoginDialog),
     m_requestHandle(-1),
-    m_renderingWidget(NULL),
-    m_moduleFinder(NULL)
+    m_renderingWidget(NULL)
 {
     ui->setupUi(this);
 
-    setWindowTitle(tr("Connect to Server (%1)").arg(lit(QN_APPLICATION_VERSION)));
+    setWindowTitle(tr("Connect to Server..."));
     setHelpTopic(this, Qn::Login_Help);
+
+    QHBoxLayout* bbLayout = dynamic_cast<QHBoxLayout*>(ui->buttonBox->layout());
+    Q_ASSERT(bbLayout);
+    if (bbLayout) {
+        QLabel* versionLabel = new QLabel(ui->buttonBox);
+        versionLabel->setText(tr("Version %1").arg(lit(QN_APPLICATION_VERSION)));
+        QFont font = versionLabel->font();
+        font.setPointSize(7);
+        versionLabel->setFont(font);
+        bbLayout->insertWidget(0, versionLabel);
+    }
 
     static const char *introNames[] = { "intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg", NULL };
     QString introPath;
@@ -128,13 +138,11 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     resetConnectionsModel();
     updateFocus();
 
-    m_moduleFinder = new QnModuleFinder(true);
-    m_moduleFinder->setParent(this);
-    if (qnSettings->isDevMode())
-        m_moduleFinder->setCompatibilityMode(true);
-    connect(m_moduleFinder,     &QnModuleFinder::moduleFound,     this,   &QnLoginDialog::at_moduleFinder_moduleFound);
-    connect(m_moduleFinder,     &QnModuleFinder::moduleLost,      this,   &QnLoginDialog::at_moduleFinder_moduleLost);
-    m_moduleFinder->start();
+    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleFound,     this,   &QnLoginDialog::at_moduleFinder_moduleFound);
+    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleLost,      this,   &QnLoginDialog::at_moduleFinder_moduleLost);
+
+    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules())
+        at_moduleFinder_moduleFound(moduleInformation, *moduleInformation.remoteAddresses.begin());
 }
 
 QnLoginDialog::~QnLoginDialog() {}
@@ -273,8 +281,6 @@ void QnLoginDialog::resetSavedSessionsModel() {
 
 void QnLoginDialog::resetAutoFoundConnectionsModel() {
     QnCompatibilityChecker checker(localCompatibilityItems());
-    QnSoftwareVersion clientVersion(QN_ENGINE_VERSION);
-
 
     m_autoFoundItem->removeRows(0, m_autoFoundItem->rowCount());
     if (m_foundEcs.size() == 0) {
@@ -286,7 +292,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
             QUrl url = data.url;
 
             QnSoftwareVersion ecVersion(data.version);
-            bool isCompatible = checker.isCompatible(QLatin1String("Client"), clientVersion,
+            bool isCompatible = checker.isCompatible(QLatin1String("Client"), qnCommon->engineVersion(),
                                                      QLatin1String("ECS"),    ecVersion);
 
 
@@ -476,17 +482,14 @@ void QnLoginDialog::at_deleteButton_clicked() {
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress) {
-    Q_UNUSED(localInterfaceAddress)
-
+void QnLoginDialog::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
     //if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
     //    return;
 
     QString host = moduleInformation.isLocal ? QLatin1String("127.0.0.1") : remoteAddress;
     QUrl url;
     url.setHost(host);
-    QString port = moduleInformation.parameters[lit("port")];
-    url.setPort(port.toInt());
+    url.setPort(moduleInformation.port);
 
     QnEcData data;
     data.id = moduleInformation.id;

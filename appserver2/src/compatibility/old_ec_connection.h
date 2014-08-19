@@ -31,6 +31,8 @@ namespace ec2
         virtual AbstractVideowallManagerPtr getVideowallManager() override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
         virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
+        virtual AbstractMiscManagerPtr getMiscManager() override;
+        virtual AbstractDiscoveryManagerPtr getDiscoveryManager() override;
 
         virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) override;
         virtual void deleteRemotePeer(const QUrl& url) override;

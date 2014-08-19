@@ -124,7 +124,7 @@ void QnAboutDialog::retranslateUi()
             "Built for %5-%6 with %7.<br/>\n"
         ).
         arg(QLatin1String(QN_APPLICATION_NAME)).
-        arg(QLatin1String(QN_APPLICATION_VERSION)).
+        arg(QApplication::applicationVersion()).
         arg(QLatin1String(QN_APPLICATION_REVISION)).
         arg(QLatin1String(QN_APPLICATION_PLATFORM)).
         arg(QLatin1String(QN_APPLICATION_ARCH)).
@@ -133,7 +133,7 @@ void QnAboutDialog::retranslateUi()
 //    QnSoftwareVersion ecsVersion = QnAppServerConnectionFactory::currentVersion();
     QString servers = connectedServers();
     if (servers.isEmpty())
-        servers = tr("<b>Client</b> does not connected to <b>Server</b>.<br>");
+        servers = tr("<b>Client</b> is not connected to <b>Server</b>.<br>");
     
     QString credits = 
         tr(

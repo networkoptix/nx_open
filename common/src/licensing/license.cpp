@@ -252,6 +252,22 @@ bool QnLicense::gotError(ErrorCode* errCode, ErrorCode errorCode) const
     return errorCode == NoError;
 }
 
+bool checkForEdgeBox(const QString& value)
+{
+    const char* EDGE_BOXES[] = {
+        "isd",
+        "isd_s2",
+        "rpi"
+    };
+    QByteArray box = value.toUtf8().toLower().trimmed();
+    for (int i = 0; i < sizeof(EDGE_BOXES) / sizeof(char*); ++i)
+    {
+        if (box == EDGE_BOXES[i])
+            return true;
+    }
+    return false;
+}
+
 /* 
    >= v1.5, shoud have hwid1, hwid2 or hwid3, and have brand
    v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
@@ -272,7 +288,7 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     if (expirationTime() > 0 && qnSyncTime->currentMSecsSinceEpoch() > expirationTime()) // TODO: #Elric make NEVER an INT64_MAX
         return gotError(errCode, Expired);
     
-    bool isEdgeBox = !info.data.box.trimmed().isEmpty() && info.data.box.trimmed().toLower() != lit("none");
+    bool isEdgeBox = checkForEdgeBox(info.data.box);
     if (isEdgeBox && !licenseTypeInfo[type()].allowedForEdge)
         return gotError(errCode, InvalidType); // strict allowed license type for EDGE devices
 

@@ -34,6 +34,7 @@ namespace ec2
         void addConnectionToPeer(const QUrl& url, const QUuid& peer = QUuid());
         void removeConnectionFromPeer(const QUrl& url);
         void gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer);
+        void dropConnections();
         
         void setLocalPeer(const ApiPeerData localPeer);
         ApiPeerData localPeer() const;
@@ -98,15 +99,9 @@ namespace ec2
         AlivePeersMap aliveServerPeers() const;
 
     signals:
-        /*!
-            \param isProxy \a true if we connected to peer indirectly (via any other peer(s)). \a false if there is direct connection to peer
-        */
-        void peerLost(ApiPeerAliveData data, bool isProxy);
+        void peerLost(ApiPeerAliveData data);
         //!Emitted when a new peer has joined cluster or became online
-        /*!
-            \param isProxy \a true if we connected to peer indirectly (via any other peer(s)). \a false if there is direct connection to peer
-        */
-        void peerFound(ApiPeerAliveData data, bool isProxy);
+        void peerFound(ApiPeerAliveData data);
         //!Emitted on a new direct connection to a remote peer has been established
         void newDirectConnectionEstablished(const QnTransactionTransportPtr& transport);
 
@@ -177,7 +172,10 @@ namespace ec2
 
         void connectToPeerEstablished(const ApiPeerData &peerInfo);
         void connectToPeerLost(const QUuid& id);
-        void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool isProxy);
+        void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool sendTran);
+        QnTransaction<ApiModuleDataList> prepareModulesDataTransaction() const;
+        void sendConnectionsData();
+        void sendModulesData();
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QUuid& gotFromID);
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
@@ -185,7 +183,7 @@ namespace ec2
         void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader);
 
         void addAlivePeerInfo(ApiPeerData peerData, const QUuid& gotFromPeer = QUuid());
-        void removeAlivePeer(const QUuid& id, bool isProxy);
+        void removeAlivePeer(const QUuid& id, bool sendTran, bool isRecursive = false);
         bool doHandshake(QnTransactionTransport* transport);
         void printTranState(const QnTranState& tranState);
     private slots:
@@ -217,13 +215,12 @@ namespace ec2
 
         AlivePeersMap m_alivePeers;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
-        QVector<QSharedPointer<QnTransactionTransport>> m_connectionsToRemove;
         QMap<QUuid, int> m_lastTranSeq;
 
         // alive control
         QElapsedTimer m_aliveSendTimer;
     };
 }
-#define qnTransactionBus QnTransactionMessageBus::instance()
+#define qnTransactionBus ec2::QnTransactionMessageBus::instance()
 
 #endif // __TRANSACTION_MESSAGE_BUS_H_

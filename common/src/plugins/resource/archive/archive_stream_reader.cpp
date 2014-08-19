@@ -71,6 +71,14 @@ QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
 
     m_isStillImage = dev->hasFlags(Qn::still_image);
+
+    if (dev->hasFlags(Qn::still_image) ||                           // disable cycle mode for images
+       (
+        (dev->hasFlags(Qn::utc) || dev->hasFlags(Qn::live))         // and for live non-local cameras
+            && !dev->hasFlags(Qn::local))
+       )      
+        m_cycleMode = false;
+
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     //connect(dev.data(), SIGNAL(statusChanged(Qn::ResourceStatus, Qn::ResourceStatus)), this, SLOT(onStatusChanged(Qn::ResourceStatus, Qn::ResourceStatus)));
 

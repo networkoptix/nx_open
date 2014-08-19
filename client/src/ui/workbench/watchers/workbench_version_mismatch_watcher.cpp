@@ -5,6 +5,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/media_server_resource.h>
+#include <common/common_module.h>
 
 #include <ui/workbench/workbench_context.h>
 
@@ -84,7 +85,7 @@ void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
 void QnWorkbenchVersionMismatchWatcher::updateMismatchData() {
     m_mismatchData.clear();
 
-    QnVersionMismatchData clientData(Qn::ClientComponent, QnSoftwareVersion(QN_ENGINE_VERSION));
+    QnVersionMismatchData clientData(Qn::ClientComponent, qnCommon->engineVersion());
     m_mismatchData.push_back(clientData);
 
     if(context()->user()) {

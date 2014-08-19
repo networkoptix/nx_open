@@ -125,8 +125,6 @@ QnAbstractStreamDataProvider* QnPlVmax480Resource::createArchiveDataProvider()
     QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
     QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
     archiveReader->setArchiveDelegate(archiveDelegate);
-    if (hasFlags(still_image) || hasFlags(utc))
-        archiveReader->setCycleMode(false);
     return archiveReader;
 }
 
@@ -201,11 +199,6 @@ void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUs
                 otherRes.dynamicCast<QnPlVmax480Resource>()->setArchiveRange(startTimeUsec, endTimeUsec, false);
         }
     }
-}
-
-void QnPlVmax480Resource::setStatus(Status newStatus, bool silenceMode)
-{
-    QnPhysicalCameraResource::setStatus(newStatus, silenceMode);
 }
 
 QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)

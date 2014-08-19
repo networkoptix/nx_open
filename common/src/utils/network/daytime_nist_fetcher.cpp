@@ -11,6 +11,8 @@
 #include "utils/network/socket_factory.h"
 
 
+//TODO #ak try multiple servers in case of error or empty string (it happens pretty often)
+
 static const size_t MAX_TIME_STR_LENGTH = 256; 
 static const char* DEFAULT_NIST_SERVER = "time.nist.gov";
 static const unsigned short DAYTIME_PROTOCOL_DEFAULT_PORT = 13;
@@ -34,8 +36,9 @@ void DaytimeNISTFetcher::pleaseStop()
     if( !m_tcpSock )
         return;
 
-    m_tcpSock->cancelAsyncIO( aio::etRead );
     m_tcpSock->cancelAsyncIO( aio::etWrite );
+    if( m_tcpSock )
+        m_tcpSock->cancelAsyncIO( aio::etRead );
     m_tcpSock.reset();
 }
 
@@ -112,7 +115,7 @@ static qint64 actsTimeToUTCMillis( const char* actsStr )
     return ((qint64)utcTime - tp.timezone * SEC_PER_MIN) * MILLIS_PER_SEC;
 }
 
-void DaytimeNISTFetcher::onConnectionEstablished( SystemError::ErrorCode errorCode )
+void DaytimeNISTFetcher::onConnectionEstablished( SystemError::ErrorCode errorCode ) noexcept
 {
     if( errorCode )
     {
@@ -125,11 +128,17 @@ void DaytimeNISTFetcher::onConnectionEstablished( SystemError::ErrorCode errorCo
 
     using namespace std::placeholders;
     if( !m_tcpSock->readSomeAsync( &m_timeStr, std::bind( &DaytimeNISTFetcher::onSomeBytesRead, this, _1, _2 ) ) )
+    {
+        m_tcpSock.reset();
         m_handlerFunc( -1, SystemError::getLastOSErrorCode() );
+    }
 }
 
-void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
+void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead ) noexcept
 {
+    auto scoped_guard_func = [this]( DaytimeNISTFetcher * ) { m_tcpSock.reset(); };
+    std::unique_ptr<DaytimeNISTFetcher, decltype(scoped_guard_func)> scopedTcpSocketDeleter( this, scoped_guard_func );
+
     if( errorCode )
     {
         if( errorCode == SystemError::timedOut && m_timeStr.size() > 0 )
@@ -137,6 +146,8 @@ void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size
             //no response during the allotted time period
             //processing what we have
             assert( m_timeStr.size() < m_timeStr.capacity() );
+            if( m_timeStr.isEmpty() )
+                m_handlerFunc( -1, SystemError::notConnected );
             m_timeStr.append( '\0' );
             m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
         }
@@ -151,6 +162,8 @@ void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size
     {
         //connection closed, analyzing what we have
         assert( m_timeStr.size() < m_timeStr.capacity() );
+        if( m_timeStr.isEmpty() )
+            m_handlerFunc( -1, SystemError::notConnected );
         m_timeStr.append( '\0' );
         m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
         return;
@@ -168,4 +181,6 @@ void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size
     using namespace std::placeholders;
     if( !m_tcpSock->readSomeAsync( &m_timeStr, std::bind( &DaytimeNISTFetcher::onSomeBytesRead, this, _1, _2 ) ) )
         m_handlerFunc( -1, SystemError::getLastOSErrorCode() );
+    else
+        scopedTcpSocketDeleter.release();
 }

@@ -166,12 +166,19 @@ struct QnVideowallManageWidgetColors {
 };
 #define QnVideowallManageWidgetColors_Fields (desktop)(freeSpace)(item)(text)(error)
 
+struct QnRoutingManagementColors {
+    QnRoutingManagementColors();
+
+    QColor readOnly;
+};
+#define QnRoutingManagementColors_Fields (readOnly)
+
+
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
     (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
-    (QnVideowallManageWidgetColors) \
-
+    (QnRoutingManagementColors)(QnVideowallManageWidgetColors)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,

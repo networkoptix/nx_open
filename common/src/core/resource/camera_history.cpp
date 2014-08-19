@@ -16,26 +16,12 @@ QnCameraHistory::QnCameraHistory():
 {
 }
 
-
-QUuid QnCameraHistory::getCameraId() const
-{
-    return m_cameraId;
-}
-
-void QnCameraHistory::setCameraId(const QUuid& cameraId)
-{
-    m_cameraId = cameraId;
-}
-
 QString QnCameraHistory::getCameraUniqueId() const {
-    QnResourcePtr camera = qnResPool->getResourceById(m_cameraId);
-    return camera ? camera->getUniqueId() : QString();
+    return m_cameraUniqueId;
 }
 
 void QnCameraHistory::setCameraUniqueId(const QString &cameraUniqueId) {
-    QnResourcePtr camera = qnResPool->getResourceByUniqId(cameraUniqueId);
-    if (camera)
-        m_cameraId = camera->getId();
+    m_cameraUniqueId = cameraUniqueId;
 }
 
 QnCameraTimePeriodList QnCameraHistory::getOnlineTimePeriods() const
@@ -290,7 +276,7 @@ void QnCameraHistoryPool::addCameraHistory(const QnCameraHistoryPtr &history)
     }
     
     if(!oldHistory || (oldHistory->getMediaServerOnTime(DATETIME_NOW, true, true) != newHistory->getMediaServerOnTime(DATETIME_NOW, true, true))) {
-        QnNetworkResourcePtr camera = qnResPool->getResourceById(history->getCameraId()).dynamicCast<QnNetworkResource>();
+        QnNetworkResourcePtr camera = qnResPool->getResourceByUniqId(history->getCameraUniqueId()).dynamicCast<QnNetworkResource>();
         if (camera)
             emit currentCameraChanged(camera);
     }

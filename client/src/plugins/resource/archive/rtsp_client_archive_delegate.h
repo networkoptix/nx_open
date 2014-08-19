@@ -111,6 +111,12 @@ private:
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
     
     QMap<int, QnFfmpegRtpParserPtr> m_parsers;
+    
+    struct {
+        QString username;
+        QString password;
+        QUuid videowall;
+    } m_auth;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

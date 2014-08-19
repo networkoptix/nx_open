@@ -2279,8 +2279,6 @@ void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
 void QnWorkbenchActionHandler::at_escapeHotkeyAction_triggered() {
     if (action(Qn::ToggleTourModeAction)->isChecked())
         menu()->trigger(Qn::ToggleTourModeAction);
-    else
-        menu()->trigger(Qn::EffectiveMaximizeAction);
 }
 
 void QnWorkbenchActionHandler::at_clearCacheAction_triggered() {

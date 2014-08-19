@@ -1,39 +1,22 @@
-/**********************************************************
-* 30 oct 2012
-* a.kolesnikov
-***********************************************************/
+#ifndef MULTICAST_MODULE_FINDER_H
+#define MULTICAST_MODULE_FINDER_H
 
-#ifndef NETWORKOPTIXMODULEFINDER_H
-#define NETWORKOPTIXMODULEFINDER_H
-
-#include <QtCore/QSet>
 #include <QtCore/QHash>
+#include <QtCore/QMutex>
 #include <QtNetwork/QHostAddress>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 
+#include "module_information.h"
 #include "networkoptixmodulerevealcommon.h"
 #include "aio/pollset.h"
 #include "system_socket.h"
 
 class UDPSocket;
 
-struct QnModuleInformation {
-    QString type;
-    QnSoftwareVersion version;
-    QnSystemInformation systemInformation;
-    QString systemName;
-    TypeSpecificParamMap parameters;
-    QSet<QString> remoteAddresses;
-    bool isLocal; //!< true if at least one address from \a remoteHostAddress is a local address
-    QUuid id;
-
-    QnModuleInformation() : isLocal(false) {}
-};
-
-//!Searches for all Network Optix Servers in local network environment using multicast
+//!Searches for all Network Optix enterprise controllers in local network environment using multicast
 /*!
     Search is done by sending multicast packet to predefined multicast group and waiting for an answer.
     Requests are sent periodically every \a pingTimeoutMillis milliseconds.
@@ -41,7 +24,7 @@ struct QnModuleInformation {
 
     \note Requests are sent via all available local network interfaces
 */
-class QnModuleFinder : public QnLongRunnable {
+class QnMulticastModuleFinder : public QnLongRunnable {
     Q_OBJECT
 public:
     //!Creates socket and binds it to random unused udp port
@@ -53,21 +36,21 @@ public:
         \param pingTimeoutMillis multicast group ping time. if 0, default value is used
         \param keepAliveMultiply if 0, default value is used
     */
-    QnModuleFinder(
+    QnMulticastModuleFinder(
         bool clientOnly,
         const QHostAddress &multicastGroupAddress = defaultModuleRevealMulticastGroup,
         const unsigned int multicastGroupPort = defaultModuleRevealMulticastGroupPort,
         const unsigned int pingTimeoutMillis = 0,
         const unsigned int keepAliveMultiply = 0);
 
-    virtual ~QnModuleFinder();
+    virtual ~QnMulticastModuleFinder();
 
     //! \returns true, if object has been successfully initialized (socket is created and binded to local address)
     bool isValid() const;
 
     /**
      * \returns                         Whether this module finder is working in compatibility mode.
-     *                                  In this mode all Servers are supported regardless of customization.
+     *                                  In this mode all EC are supported regardless of customization.
      */
     bool isCompatibilityMode() const;
 
@@ -76,28 +59,26 @@ public:
 
     QList<QnModuleInformation> revealedModules() const;
 
-    //! \param peerList Discovery peer if and only if peer exist in peerList
-    void setAllowedPeers(const QList<QUuid> &peerList) {
-        m_allowedPeers = peerList;
-    }
+    QnModuleInformation moduleInformation(const QString &moduleId) const;
+
 public slots:
     virtual void pleaseStop() override;
 
 signals:
-    //!Emitted when new Server has been found
+    //!Emitted when new enterprise controller has been found
     void moduleFound(const QnModuleInformation &moduleInformation,
                      const QString &remoteAddress,
                      const QString &localInterfaceAddress);
 
-    //!Emitted when previously found module did not respond to request in predefined timeout
+    //!Emmited when previously found module did not respond to request in predefined timeout
     void moduleLost(const QnModuleInformation &moduleInformation);
 
 protected:
     virtual void run() override;
 
 private:
-    bool processDiscoveryRequest( UDPSocket *udpSocket );
-    bool processDiscoveryResponse( UDPSocket *udpSocket );
+    bool processDiscoveryRequest(UDPSocket *udpSocket);
+    bool processDiscoveryResponse(UDPSocket *udpSocket);
 
 private:
     struct ModuleContext {
@@ -110,18 +91,16 @@ private:
         ModuleContext(const RevealResponse &response);
     };
 
+    mutable QMutex m_mutex;
     aio::PollSet m_pollSet;
     QList<UDPSocket*> m_clientSockets;
-    UDPSocket* m_serverSocket;
+    UDPSocket *m_serverSocket;
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;
     QHash<QUuid, ModuleContext> m_knownEnterpriseControllers;
     QSet<QString> m_localNetworkAdresses;
     bool m_compatibilityMode;
-    QList<QUuid> m_allowedPeers;
 };
 
-Q_DECLARE_METATYPE(QnModuleInformation)
-
-#endif  //NETWORKOPTIXMODULEFINDER_H
+#endif // MULTICAST_MODULE_FINDER_H

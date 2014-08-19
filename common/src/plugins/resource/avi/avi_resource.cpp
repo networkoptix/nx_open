@@ -55,9 +55,6 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Qn::Conn
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
 
     result->setArchiveDelegate(createArchiveDelegate());
-    if (hasFlags(Qn::still_image) || hasFlags(Qn::utc))
-        result->setCycleMode(false);
-
     return result;
 }
 

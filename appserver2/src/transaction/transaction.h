@@ -113,8 +113,23 @@ namespace ec2
             uploadUpdateResponce        = 1201, /*< ApiUpdateUploadResponceData */
             installUpdate               = 1202, /*< ApiUpdateInstallData  */
 
+            /* Module information */
+            moduleInfo                  = 1301, /*< ApiModuleData */
+            moduleInfoList              = 1302, /*< ApiModuleDataList */
+
+            /* Discovery */
+            discoverPeer                = 1401, /*< ApiDiscoveryData */
+            addDiscoveryInformation     = 1402, /*< ApiDiscoveryDataList*/
+            removeDiscoveryInformation  = 1403, /*< ApiDiscoveryDataList*/
+
+            addConnection               = 1501, /*< ApiConnectionData */
+            removeConnection            = 1502, /*< ApiConnectionData */
+            availableConnections        = 1503, /*< ApiConnectionDataList */
+
             /* Misc */
             getCurrentTime              = 9002,  /*< ApiTimeData */         
+            changeSystemName            = 9003,  /*< ApiSystemNameData */
+
             //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
             dumpDatabase                = 9005,  /*< ApiDatabaseDumpData */

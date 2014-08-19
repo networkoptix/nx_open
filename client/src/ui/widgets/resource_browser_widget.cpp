@@ -434,9 +434,23 @@ QnVideoWallMatrixIndexList QnResourceBrowserWidget::selectedVideoWallMatrices() 
         QUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QUuid>();
         if(uuid.isNull())
             continue;
+
         QnVideoWallMatrixIndex index = qnResPool->getVideoWallMatrixByUuid(uuid);
         if (!index.isNull())
             result.push_back(index);
+    }
+
+    return result;
+}
+
+QnResourceList QnResourceBrowserWidget::selectedIncompatibleServers() const {
+    QnResourceList result;
+
+    foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
+        if (index.data(Qn::ResourceStatusRole).value<Qn::ResourceStatus>() != Qn::Incompatible)
+            continue;
+
+        result.append(index.data(Qn::ResourceRole).value<QnResourcePtr>());
     }
 
     return result;
@@ -735,6 +749,8 @@ void QnResourceBrowserWidget::at_layout_itemRemoved(QnWorkbenchItem *) {
 void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index) {
     if(index == SearchTab) {
         QnWorkbenchLayout *layout = workbench()->currentLayout();
+        if (!layout || !layout->resource())
+            return;
 
         layoutSynchronizer(layout, true); /* Just initialize the synchronizer. */
         QnResourceSearchProxyModel *model = layoutModel(layout, true);

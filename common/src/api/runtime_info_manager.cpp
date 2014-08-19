@@ -20,7 +20,7 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
             m_items->addItem(info);
     });
 
-    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerLost,     this, [this](const ec2::ApiPeerAliveData &data, bool){
+    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerLost,     this, [this](const ec2::ApiPeerAliveData &data){
         m_items->removeItem(data.peer.id);
     });
 
@@ -32,6 +32,7 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
 QnThreadsafeItemStorage<QnPeerRuntimeInfo> * QnRuntimeInfoManager::items() const {
     return m_items.data();
 }
+
 
 void QnRuntimeInfoManager::storedItemAdded(const QnPeerRuntimeInfo &item) {
 #ifdef RUNTIME_INFO_DEBUG
@@ -65,3 +66,7 @@ QnPeerRuntimeInfo QnRuntimeInfoManager::remoteInfo() const {
     return m_items->getItem(qnCommon->remoteGUID());
 }
 
+bool QnRuntimeInfoManager::hasItem(const QUuid& id)
+{
+    return m_items->hasItem(id);
+}
