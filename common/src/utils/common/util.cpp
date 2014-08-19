@@ -112,18 +112,20 @@ QString strPadLeft(const QString &str, int len, char ch)
     return str;
 }
 
+QString getPathSeparator(const QString& path)
+{
+    return path.contains(lit("\\")) ? lit("\\") : lit("/");
+}
+
 QString closeDirPath(const QString& value)
 {
-    QString tmp = value;
-    for (int i = 0; i < tmp.size(); ++i) {
-        if (tmp[i] == QLatin1Char('\\'))
-            tmp[i] = QLatin1Char('/');
-    }
-    if (tmp.endsWith(QLatin1Char('/')))
-        return tmp;
+    QString separator = getPathSeparator(value);
+    if (value.endsWith(separator))
+        return value;
     else
-        return tmp + QLatin1Char('/');
+        return value + separator;
 }
+
 #ifdef Q_OS_WIN32
 
 bool isLocalPath(const QString& folder)
