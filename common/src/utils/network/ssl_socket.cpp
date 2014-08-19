@@ -477,7 +477,7 @@ private:
         if( !bio_out_buffer_.isEmpty() ) {
             do_send( 
             buffer,
-            [this,op](SystemError::ErrorCode ec,std::size_t bytes_transferred ) {
+            [this,op](SystemError::ErrorCode ec,std::size_t ) {
                 // Until now , we should have been sent the data out and
                 // what we need to do is just calling the callback function
                 if( ec ) {
@@ -537,15 +537,16 @@ public:
             static_cast<int>(target_num) );
         // Modify the buffer size if we really need to do so
         if( read_bytes_ >0 )
-            user_buffer_->resize(read_bytes_+old_size);
+            user_buffer_->resize(static_cast<int>(old_size)+read_bytes_);
         else 
-            user_buffer_->resize(old_size);
+            user_buffer_->resize(static_cast<int>(old_size));
 
         *ssl_err = SSL_get_error(ssl(),read_bytes_);
         return read_bytes_;
     }
     virtual void notify( SystemError::ErrorCode ec ) {
-            callback_(ec,read_bytes_);
+        drain_ssl_buffer();
+        callback_(ec,read_bytes_);
     }
     virtual void error( SystemError::ErrorCode ec ) {
         callback_(ec,static_cast<std::size_t>(-1));
@@ -557,6 +558,25 @@ public:
         Q_ASSERT(ubuf->capacity() >0);
         user_buffer_ = ubuf;
     }
+
+    // This function is painfully slow but it will help to ensure the next call of
+    // asyncRead on SSL will always happened inside of the remote thread. Since we
+    // don't know the expected buffer for the next read, so every time a one byte 
+    // buffer will ensure the next call resides in the remote thread .
+    void drain_ssl_buffer() {
+        char bytes_buffer;
+        int ssl_return;
+        do {
+            ssl_return = SSL_read(ssl(),&bytes_buffer,1);
+            if( ssl_return >0 ) {
+                user_buffer_->push_back(bytes_buffer);
+                ++read_bytes_;
+            } else {
+                return;
+            }
+        } while( true );
+    }
+
 private:
     std::function<void(SystemError::ErrorCode,std::size_t)> callback_;
     nx::Buffer* user_buffer_;
