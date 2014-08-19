@@ -285,12 +285,15 @@ int QnTranscoder::setVideoCodec(
             m_vTranscoder = QnVideoTranscoderPtr();
             break;
         case TM_FfmpegTranscode:
+        {
             ffmpegTranscoder = new QnFfmpegVideoTranscoder(codec);
             ffmpegTranscoder->setVideoLayout(m_vLayout);
-            //if (getCPUString().toLower().contains(QLatin1String("atom")))
+            bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
+            if (isAtom || resolution.height() >= 1080)
                 ffmpegTranscoder->setMTMode(true);
             m_vTranscoder = QnVideoTranscoderPtr(ffmpegTranscoder);
             break;
+        }
             /*
         case TM_QuickSyncTranscode:
             m_vTranscoder = QnVideoTranscoderPtr(new QnQuickSyncTranscoder(codec));
