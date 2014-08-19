@@ -267,7 +267,7 @@ bool Socket::setSendBufferSize( unsigned int buff_size )
 //!Implementation of AbstractSocket::getSendBufferSize
 bool Socket::getSendBufferSize( unsigned int* buffSize )
 {
-    socklen_t optLen = 0;
+    socklen_t optLen = sizeof(*buffSize);
     return ::getsockopt(m_socketHandle, SOL_SOCKET, SO_SNDBUF, (char*)buffSize, &optLen) == 0;
 }
 
@@ -280,7 +280,7 @@ bool Socket::setRecvBufferSize( unsigned int buff_size )
 //!Implementation of AbstractSocket::getRecvBufferSize
 bool Socket::getRecvBufferSize( unsigned int* buffSize )
 {
-    socklen_t optLen = 0;
+    socklen_t optLen = sizeof(*buffSize);
     return ::getsockopt(m_socketHandle, SOL_SOCKET, SO_RCVBUF, (char*)buffSize, &optLen) == 0;
 }
 
