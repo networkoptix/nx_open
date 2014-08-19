@@ -22,8 +22,7 @@ public:
 
 private:
     bool m_initialized;
-    GLuint m_buffer;
-    int m_vertexOffset, m_colorOffset, m_vertexCount;
+    int m_vertexCount;
     QOpenGLVertexArrayObject m_vertices;
     QnPerVertexColoredGLShaderProgramm* m_shader;
     QOpenGLBuffer m_positionBuffer;

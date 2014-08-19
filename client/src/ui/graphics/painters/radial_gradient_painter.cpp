@@ -11,7 +11,9 @@
 QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &innerColor, const QColor &outerColor, const QGLContext *context):
     QOpenGLFunctions(context->contextHandle()),
     m_initialized(false),
-    m_positionBuffer(QOpenGLBuffer::VertexBuffer)
+    m_vertexCount(sectorCount + 2),
+    m_positionBuffer(QOpenGLBuffer::VertexBuffer),
+    m_colorBuffer(QOpenGLBuffer::VertexBuffer)
 {
     if(context != QGLContext::currentContext()) {
         qnWarning("Invalid current OpenGL context.");
@@ -24,22 +26,16 @@ QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &
     QByteArray data;
     /* Generate vertex data. */
     QnGlBufferStream<GLfloat> vertexStream(&data);
-    m_vertexOffset = vertexStream.offset();
     vertexStream << QVector2D(0.0f, 0.0f);
     for(int i = 0; i <= sectorCount; i++)
         vertexStream << polarToCartesian<QVector2D>(1.0f, 2 * M_PI * i / sectorCount);
-    m_vertexCount = sectorCount + 2;
-    qDebug() << "storing all vertices, offset" << vertexStream.offset();
 
     /* Generate color data. */
     QByteArray colorData;
     QnGlBufferStream<GLfloat> colorStream(&colorData);
-    m_colorOffset = colorStream.offset();
     colorStream << innerColor;
     for(int i = 0; i <= sectorCount; i++)
         colorStream << outerColor;
-
-    qDebug() << "storing all colors, offset" << colorStream.offset();
 
     // Create VAO for first object to render
     m_vertices.create();
@@ -48,21 +44,6 @@ QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &
     // Setup VBOs and IBO (use QOpenGLBuffer to buffer data,
     // specify format, usage hint etc). These will be
     // remembered by the currently bound VAO
-    m_positionBuffer.create();
-    //m_positionBuffer.setUsagePattern( QOpenGLBuffer::StreamDraw );
-    m_positionBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    m_positionBuffer.bind();
-
-    qDebug() <<"allocate " << data.size() << "bytes to store" << m_vertexCount << "sectors and colors";
-    m_positionBuffer.allocate(data.data(), data.size());
-
-//     glVertexAttribPointer(_positionAttr, 3, GL_FLOAT, GL_FALSE, 0, 0);
-//     glVertexAttribPointer(_colourAttr, 3, GL_FLOAT, GL_FALSE, 0, (void*)(_colourOffset));
-// 
-//     glEnableVertexAttribArray(_positionAttr);  
-//     glEnableVertexAttribArray(_colourAttr);
-//     
-
     m_positionBuffer.create();
     m_positionBuffer.setUsagePattern( QOpenGLBuffer::StreamDraw );
     m_positionBuffer.bind();
@@ -84,8 +65,6 @@ QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &
 }
 
 QnRadialGradientPainter::~QnRadialGradientPainter() {
-    if(m_initialized && QGLContext::currentContext())
-        glDeleteBuffers(1, &m_buffer);
 }
 
 void QnRadialGradientPainter::paint(const QColor &colorMultiplier) {

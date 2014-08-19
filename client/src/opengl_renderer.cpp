@@ -147,7 +147,6 @@ void QnOpenGLRenderer::drawVao(QOpenGLVertexArrayObject* vao, QGLShaderProgram* 
 
     
     glDrawArrays(GL_TRIANGLE_FAN, 0, size);
-    glCheckError("render");
     vao->release();
     glCheckError("render");
 }
