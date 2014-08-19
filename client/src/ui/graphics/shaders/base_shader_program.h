@@ -21,19 +21,20 @@ public:
         }
         return rez;
     }
-    void setWasBind( bool bind ){ m_first_bind = bind; };
-    bool wasBind() const{ return m_first_bind; };
+
+    void markInitialized() { m_initialized = true; };
+    bool initialized() const { return m_initialized; };
 
 protected:
     QnAbstractBaseGLShaderProgramm(const QGLContext *context = NULL, QObject *parent = NULL)
         : QGLShaderProgram(context,parent),
-          m_first_bind(true)
+          m_initialized(false)
     {
     };
 private:
     int m_modelViewProjection;
     int m_vertices;
-    bool m_first_bind;
+    bool m_initialized;
 };
 
 #endif // QN_COLOR_SHADER_PROGRAM_H

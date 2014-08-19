@@ -4,55 +4,42 @@
 
 #include <ui/graphics/opengl/gl_shortcuts.h>
 //#include <ui/graphics/shaders/color_shader_program.h>
+#include <ui/graphics/shaders/per_vertex_colored_shader_program.h>
 #include <ui/graphics/opengl/gl_buffer_stream.h>
 #include "opengl_renderer.h"
 
 QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &innerColor, const QColor &outerColor, const QGLContext *context):
     QOpenGLFunctions(context->contextHandle()),
-    m_initialized(false)
+    m_initialized(false),
+    m_sectorCount(sectorCount),
+    m_innerColor(innerColor),
+    m_outerColor(outerColor),
+    m_positionBuffer(QOpenGLBuffer::VertexBuffer),
+    m_colorBuffer(QOpenGLBuffer::VertexBuffer)
 {
     if(context != QGLContext::currentContext()) {
         qnWarning("Invalid current OpenGL context.");
         return;
     }
 
-    QByteArray data;
-    /* Generate vertex data. */
-    QnGlBufferStream<GLfloat> vertexStream(&data);
-    m_vertexOffset = vertexStream.offset();
-    vertexStream << QVector2D(0.0f, 0.0f);
-    for(int i = 0; i <= sectorCount; i++)
-        vertexStream << polarToCartesian<QVector2D>(1.0f, 2 * M_PI * i / sectorCount);
-    m_vertexCount = sectorCount + 2;
-
-    /* Generate color data. */
-    QnGlBufferStream<GLfloat> colorStream(&data);
-    m_colorOffset = colorStream.offset();
-    colorStream << innerColor;
-    for(int i = 0; i <= sectorCount; i++)
-        colorStream << outerColor;
-
-    /* Push data to GPU. */
-    
-    glGenBuffers(1, &m_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
-    glBufferData(GL_ARRAY_BUFFER, data.size(), data.data(), GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    
-    m_initialized = true;
+  
 }
 
 QnRadialGradientPainter::~QnRadialGradientPainter() {
-    if(m_initialized && QGLContext::currentContext())
-        glDeleteBuffers(1, &m_buffer);
 }
 
 void QnRadialGradientPainter::paint(const QColor &colorMultiplier) {
-    if(!m_initialized || !isAvailable())
+    if (!isAvailable())
+        return;
+
+    if (!m_initialized)
+        initialize();
+
+    if(!m_initialized)
         return;
 
     QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(colorMultiplier);
-    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawPerVertexColoredPolygon(m_buffer,m_vertexCount);
+    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawVao(&m_vertices, m_sectorCount + 2);
 }
 
 void QnRadialGradientPainter::paint() {
@@ -61,4 +48,44 @@ void QnRadialGradientPainter::paint() {
 
 bool QnRadialGradientPainter::isAvailable() const {
     return hasOpenGLFeature(QOpenGLFunctions::Shaders) && hasOpenGLFeature(QOpenGLFunctions::Buffers);
+}
+
+void QnRadialGradientPainter::initialize() {
+
+    /* Generate vertex data. */
+    QByteArray data;
+    QnGlBufferStream<GLfloat> vertexStream(&data);
+    vertexStream << QVector2D(0.0f, 0.0f);
+    for(int i = 0; i <= m_sectorCount; i++)
+        vertexStream << polarToCartesian<QVector2D>(1.0f, 2 * M_PI * i / m_sectorCount);
+
+    /* Generate color data. */
+    QByteArray colorData;
+    QnGlBufferStream<GLfloat> colorStream(&colorData);
+    colorStream << m_innerColor;
+    for(int i = 0; i <= m_sectorCount; i++)
+        colorStream << m_outerColor;
+
+    m_vertices.create();
+    m_vertices.bind();
+
+    auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext()).getColorShader();
+
+    m_positionBuffer.create();
+    m_positionBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_positionBuffer.bind();
+    m_positionBuffer.allocate( data.data(), data.size() );
+    shader->enableAttributeArray( 0 );
+    shader->setAttributeBuffer( 0, GL_FLOAT, 0, 2 );
+
+    m_colorBuffer.create();
+    m_colorBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_colorBuffer.bind();
+    m_colorBuffer.allocate( colorData.data(), colorData.size());
+    shader->enableAttributeArray( 1 );
+    shader->setAttributeBuffer( 1, GL_FLOAT, 0, 4 );
+
+    m_vertices.release();
+
+    m_initialized = true;
 }

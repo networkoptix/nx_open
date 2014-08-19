@@ -583,25 +583,7 @@ void QnGLRenderer::drawNV12VideoTexture(
 
 
 void QnGLRenderer::drawBindedTexture( QnAbstractBaseGLShaderProgramm* program , const float* v_array, const float* tx_array )
-{/*
-    DEBUG_CODE(glCheckError("glBindBuffer"));
-    glVertexPointer(2, GL_FLOAT, 0, v_array);
-    DEBUG_CODE(glCheckError("glVertexPointer"));
-    glTexCoordPointer(2, GL_FLOAT, 0, tx_array);
-    DEBUG_CODE(glCheckError("glTexCoordPointer"));
-    glEnableClientState(GL_VERTEX_ARRAY);
-    DEBUG_CODE(glCheckError("glEnableClientState"));
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    DEBUG_CODE(glCheckError("glEnableClientState"));
-    glDrawArrays(GL_QUADS, 0, 4);
-    DEBUG_CODE(glCheckError("glDrawArrays"));
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    DEBUG_CODE(glCheckError("glDisableClientState"));
-    glDisableClientState(GL_VERTEX_ARRAY);
-    DEBUG_CODE(glCheckError("glDisableClientState"));
-*/
-
-
+{
     QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawBindedTextureOnQuad(v_array,tx_array,program);
 }
 
