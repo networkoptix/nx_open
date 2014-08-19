@@ -72,7 +72,7 @@ void QnRadialGradientPainter::initialize() {
     auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext()).getColorShader();
 
     m_positionBuffer.create();
-    m_positionBuffer.setUsagePattern( QOpenGLBuffer::StreamDraw );
+    m_positionBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
     m_positionBuffer.bind();
     m_positionBuffer.allocate( data.data(), data.size() );
     shader->enableAttributeArray( 0 );

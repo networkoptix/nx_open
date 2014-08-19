@@ -57,34 +57,6 @@ namespace {
     QPixmap bestPixmap(const QIcon &icon, QIcon::Mode mode, QIcon::State state) {
         return icon.pixmap(QSize(1024, 1024), mode, state);
     }
-/*
-    void glDrawTexturedRect(const QRectF &rect) {
-        GLfloat vertices[] = {
-            (GLfloat)rect.left(),   (GLfloat)rect.top(),
-            (GLfloat)rect.right(),  (GLfloat)rect.top(),
-            (GLfloat)rect.right(),  (GLfloat)rect.bottom(),
-            (GLfloat)rect.left(),   (GLfloat)rect.bottom()
-        };
-
-        GLfloat texCoords[] = {
-            0.0, 0.0,
-            1.0, 0.0,
-            1.0, 1.0,
-            0.0, 1.0
-        };
-        
-
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-        glVertexPointer(2, GL_FLOAT, 0, vertices);
-        glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
-
-        glDrawArrays(GL_QUADS, 0, 4);
-
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
-    }*/
 
     typedef QnGlContextData<QnTextureTransitionShaderProgram, QnGlContextDataForwardingFactory<QnTextureTransitionShaderProgram> > QnTextureTransitionShaderProgramStorage;
     Q_GLOBAL_STATIC(QnTextureTransitionShaderProgramStorage, qn_textureTransitionShaderProgramStorage)
