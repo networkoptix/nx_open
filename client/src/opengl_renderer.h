@@ -27,7 +27,8 @@ public:
     void                drawColoredPolygon(const QVector<QVector2D>& a_polygon, QnColorGLShaderProgramm* shader = NULL);
     void                drawColoredQuad(const QRectF &rect , QnColorGLShaderProgramm* shader = NULL);
     void                drawPerVertexColoredPolygon(unsigned int a_buffer , unsigned int a_vertices_size , unsigned int a_polygon_state = GL_TRIANGLE_FAN);
-    void                drawBindedTextureOnQuad(const float* v_array, const float* tx_array, QnAbstractBaseGLShaderProgramm* shader = NULL );
+    void                drawBindedTextureOnQuad(const float* v_array, const float* tx_array, QnGLShaderProgram* shader = NULL );
+    void                drawBindedTextureOnQuadVao(QOpenGLVertexArrayObject* vao, QnGLShaderProgram* shader);
     void                drawColoredQuad(const float* v_array, QnColorGLShaderProgramm* shader = NULL);
     void                drawVao(QOpenGLVertexArrayObject* vao, int count);
 
@@ -38,6 +39,8 @@ public:
     const QMatrix4x4&   getProjectionMatrix() const { return m_projectionMatrix; };
 
     QnPerVertexColoredGLShaderProgramm* getColorShader() const;
+    QnTextureColorGLShaderProgramm* getTextureShader() const;
+
 private:
     QMatrix4x4 m_modelViewMatrix;
     QMatrix4x4 m_projectionMatrix;

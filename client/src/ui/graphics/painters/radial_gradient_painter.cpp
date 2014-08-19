@@ -21,8 +21,6 @@ QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &
         qnWarning("Invalid current OpenGL context.");
         return;
     }
-
-  
 }
 
 QnRadialGradientPainter::~QnRadialGradientPainter() {
@@ -34,9 +32,6 @@ void QnRadialGradientPainter::paint(const QColor &colorMultiplier) {
 
     if (!m_initialized)
         initialize();
-
-    if(!m_initialized)
-        return;
 
     QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(colorMultiplier);
     QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawVao(&m_vertices, m_sectorCount + 2);
@@ -69,21 +64,32 @@ void QnRadialGradientPainter::initialize() {
     m_vertices.create();
     m_vertices.bind();
 
+    const int VERTEX_POS_SIZE = 2; // x, y
+    const int VERTEX_COLOR_SIZE = 4; // s and t
+    const int VERTEX_POS_INDX = 0;
+    const int VERTEX_COLOR_INDX = 1;
+
     auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext()).getColorShader();
 
     m_positionBuffer.create();
     m_positionBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
     m_positionBuffer.bind();
     m_positionBuffer.allocate( data.data(), data.size() );
-    shader->enableAttributeArray( 0 );
-    shader->setAttributeBuffer( 0, GL_FLOAT, 0, 2 );
+    shader->enableAttributeArray( VERTEX_POS_INDX );
+    shader->setAttributeBuffer( VERTEX_POS_INDX, GL_FLOAT, 0, VERTEX_POS_SIZE );
 
     m_colorBuffer.create();
     m_colorBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
     m_colorBuffer.bind();
     m_colorBuffer.allocate( colorData.data(), colorData.size());
-    shader->enableAttributeArray( 1 );
-    shader->setAttributeBuffer( 1, GL_FLOAT, 0, 4 );
+    shader->enableAttributeArray( VERTEX_COLOR_INDX );
+    shader->setAttributeBuffer( VERTEX_COLOR_INDX, GL_FLOAT, 0, VERTEX_COLOR_SIZE );
+
+    if (!shader->initialized()) {
+        shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
+        shader->bindAttributeLocation("aColor", VERTEX_COLOR_INDX);
+        shader->markInitialized();
+    };
 
     m_vertices.release();
 

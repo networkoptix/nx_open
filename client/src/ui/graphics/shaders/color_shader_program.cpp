@@ -37,7 +37,7 @@
 
 
 QnColorGLShaderProgramm::QnColorGLShaderProgramm(const QGLContext *context, QObject *parent)
-    : QnAbstractBaseGLShaderProgramm(context,parent)
+    : QnGLShaderProgram(context,parent)
 {
 }
 

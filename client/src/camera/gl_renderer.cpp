@@ -24,6 +24,7 @@
 
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
+#include <ui/graphics/opengl/gl_buffer_stream.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 #include <ui/common/geometry.h>
 #include "ui/fisheye/fisheye_ptz_controller.h"
@@ -133,7 +134,11 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_paused(false),
     m_screenshotInterface(0),
     m_histogramConsumer(0),
-    m_fisheyeController(0)
+    m_fisheyeController(0),
+
+    m_initialized(false),
+    m_positionBuffer(QOpenGLBuffer::VertexBuffer),
+    m_textureBuffer(QOpenGLBuffer::VertexBuffer)
 
     //m_extraMin(-PI/4.0),
     //m_extraMax(PI/4.0) // rotation range
@@ -191,7 +196,16 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
     } 
     else if( picLock->width() > 0 && picLock->height() > 0 )
     {
-        const float v_array[] = { (float)targetRect.left(), (float)targetRect.top(), (float)targetRect.right(), (float)targetRect.top(), (float)targetRect.right(), (float)targetRect.bottom(), (float)targetRect.left(), (float)targetRect.bottom() };
+        const float v_array[] = { 
+            (float)targetRect.left(), 
+            (float)targetRect.top(),
+            (float)targetRect.right(),
+            (float)targetRect.top(), 
+            (float)targetRect.right(), 
+            (float)targetRect.bottom(), 
+            (float)targetRect.left(), 
+            (float)targetRect.bottom() 
+        };
         switch( picLock->colorFormat() )
         {
             case PIX_FMT_RGBA:
@@ -582,9 +596,59 @@ void QnGLRenderer::drawNV12VideoTexture(
 }
 
 
-void QnGLRenderer::drawBindedTexture( QnAbstractBaseGLShaderProgramm* program , const float* v_array, const float* tx_array )
-{
-    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawBindedTextureOnQuad(v_array,tx_array,program);
+void QnGLRenderer::drawBindedTexture( QnGLShaderProgram* shader , const float* v_array, const float* tx_array ) {
+    QByteArray data, texData;
+    QnGlBufferStream<GLfloat> vertexStream(&data), texStream(&texData);
+
+    for(int i = 0; i < 8; i++) {
+        vertexStream << v_array[i];
+        texStream << tx_array[i];
+    }
+
+    const int VERTEX_POS_INDX = 0;
+    const int VERTEX_TEXCOORD0_INDX = 1;
+    const int VERTEX_POS_SIZE = 2; // x, y
+    const int VERTEX_TEXCOORD0_SIZE = 2; // s and t
+
+    if (!m_initialized) {
+        m_vertices.create();
+        m_vertices.bind();
+
+        m_positionBuffer.create();
+        m_positionBuffer.setUsagePattern( QOpenGLBuffer::DynamicDraw );
+        m_positionBuffer.bind();
+        m_positionBuffer.allocate( data.data(), data.size() );
+        shader->enableAttributeArray( VERTEX_POS_INDX );
+        shader->setAttributeBuffer( VERTEX_POS_INDX, GL_FLOAT, 0, VERTEX_POS_SIZE );
+
+        m_textureBuffer.create();
+        m_textureBuffer.setUsagePattern( QOpenGLBuffer::DynamicDraw );
+        m_textureBuffer.bind();
+        m_textureBuffer.allocate( texData.data(), texData.size());
+        shader->enableAttributeArray( VERTEX_TEXCOORD0_INDX );
+        shader->setAttributeBuffer( VERTEX_TEXCOORD0_INDX, GL_FLOAT, 0, VERTEX_TEXCOORD0_SIZE );
+
+        if (!shader->initialized()) {
+            shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
+            shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
+            shader->markInitialized();
+        };    
+
+        m_vertices.release();
+
+        m_initialized = true;
+    } else {
+        m_positionBuffer.bind();
+        m_positionBuffer.write(0, data.data(), data.size());
+        m_positionBuffer.release();
+
+        m_textureBuffer.bind();
+        m_textureBuffer.write(0, texData.data(), texData.size());
+        m_textureBuffer.release();
+
+    }
+
+    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawBindedTextureOnQuadVao(&m_vertices, shader);
 }
 
 qint64 QnGLRenderer::lastDisplayedTime() const

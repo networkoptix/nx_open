@@ -141,12 +141,7 @@ void QnOpenGLRenderer::drawVao(QOpenGLVertexArrayObject* vao, int count) {
     shader->bind();
     shader->setModelViewProjectionMatrix(m_projectionMatrix*m_modelViewMatrix);
     shader->setColor(m_color);
-    if ( !shader->initialized()  )
-    {
-        shader->bindAttributeLocation("aPosition",0);
-        shader->bindAttributeLocation("aColor",1);
-        shader->markInitialized();
-    };
+
 
     glDrawArrays(GL_TRIANGLE_FAN, 0, count);
     vao->release();
@@ -185,7 +180,7 @@ void QnOpenGLRenderer::drawColoredQuad(const float* v_array, QnColorGLShaderProg
     }
 };
 
-void QnOpenGLRenderer::drawBindedTextureOnQuad( const float* v_array, const float* tx_array , QnAbstractBaseGLShaderProgramm* shader)
+void QnOpenGLRenderer::drawBindedTextureOnQuad( const float* v_array, const float* tx_array , QnGLShaderProgram* shader)
 {
     bool empty_shader = false;
     if ( !shader )
@@ -235,6 +230,14 @@ void QnOpenGLRenderer::drawBindedTextureOnQuad( const float* v_array, const floa
         //glDisableVertexAttribArray(VERTEX_POS_INDX);
     }
     
+}
+
+void QnOpenGLRenderer::drawBindedTextureOnQuadVao(QOpenGLVertexArrayObject* vao, QnGLShaderProgram* shader) {
+    vao->bind();
+    shader->setModelViewProjectionMatrix(m_projectionMatrix*m_modelViewMatrix);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT,m_indices_for_render_quads);
+    vao->release();
+    glCheckError("render");    
 }
 
 void    QnOpenGLRenderer:: drawColoredPolygon( const QPolygonF & a_polygon, QnColorGLShaderProgramm* shader)
@@ -295,6 +298,9 @@ QnPerVertexColoredGLShaderProgramm* QnOpenGLRenderer::getColorShader() const {
     return m_texturePerVertexColoredProgram.data();
 }
 
+QnTextureColorGLShaderProgramm* QnOpenGLRenderer::getTextureShader() const {
+    return m_textureColorProgram.data();
+}
 
 //=================================================================================================
 

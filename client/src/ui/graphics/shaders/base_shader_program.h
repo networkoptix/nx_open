@@ -1,11 +1,9 @@
 #ifndef QN_BASE_SHADER_PROGRAM_H
 #define QN_BASE_SHADER_PROGRAM_H
 
-
-
 #include <QtOpenGL/QGLShaderProgram>
 
-class QnAbstractBaseGLShaderProgramm : public QGLShaderProgram 
+class QnGLShaderProgram : public QGLShaderProgram 
 {
     Q_OBJECT
 public:
@@ -26,7 +24,7 @@ public:
     bool initialized() const { return m_initialized; };
 
 protected:
-    QnAbstractBaseGLShaderProgramm(const QGLContext *context = NULL, QObject *parent = NULL)
+    QnGLShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL)
         : QGLShaderProgram(context,parent),
           m_initialized(false)
     {
