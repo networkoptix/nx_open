@@ -2,8 +2,8 @@
 
 #include <memory>
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QDateTime>
-#include <QtCore/QScopedArrayPointer>
 #include <QtNetwork/QNetworkInterface>
 
 #include <utils/common/log.h>
@@ -49,8 +49,8 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
         try {
             //if( addressToUse == QHostAddress(lit("127.0.0.1")) )
             //    continue;
-            std::auto_ptr<AbstractDatagramSocket> sock(SocketFactory::createDatagramSocket());
-            sock->bind(address.toString(), 0);
+            std::unique_ptr<UDPSocket> sock( new UDPSocket() );
+            sock->bind(SocketAddress(address.toString(), 0));
             sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
             sock->setDestAddr(multicastGroupAddress.toString(), multicastGroupPort);
             m_clientSockets.push_back(sock.release());
@@ -108,7 +108,7 @@ void QnMulticastModuleFinder::pleaseStop() {
     m_pollSet.interrupt();
 }
 
-bool QnMulticastModuleFinder::processDiscoveryRequest(AbstractDatagramSocket *udpSocket) {
+bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
     static const size_t READ_BUFFER_SIZE = UDPSocket::MAX_PACKET_SIZE;
     quint8 readBuffer[READ_BUFFER_SIZE];
 
@@ -147,7 +147,7 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(AbstractDatagramSocket *ud
     quint8 *responseBufStart = readBuffer;
     if (!response.serialize(&responseBufStart, readBuffer + READ_BUFFER_SIZE))
         return false;
-    if (!udpSocket->sendTo(readBuffer, responseBufStart - readBuffer, remoteAddressStr, remotePort)) {
+    if (!udpSocket->sendTo(readBuffer, responseBufStart - readBuffer, SocketAddress(remoteAddressStr, remotePort))) {
         NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. Can't send response to address (%1:%2)").
             arg(remoteAddressStr).arg(remotePort), cl_logDEBUG1);
         return false;
@@ -157,7 +157,7 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(AbstractDatagramSocket *ud
     return true;
 }
 
-bool QnMulticastModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket) {
+bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     static const size_t READ_BUFFER_SIZE = UDPSocket::MAX_PACKET_SIZE;
     quint8 readBuffer[READ_BUFFER_SIZE];
 
@@ -235,12 +235,12 @@ void QnMulticastModuleFinder::run() {
     if (!searchRequest.serialize(&searchPacketBufStart, searchPacket + sizeof(searchPacket)))
         Q_ASSERT(false);
 
-    foreach (AbstractDatagramSocket *socket, m_clientSockets) {
-        if (!m_pollSet.add(socket, aio::etRead))
+    foreach (UDPSocket *socket, m_clientSockets) {
+        if( !m_pollSet.add( socket->implementationDelegate(), aio::etRead, socket ) )
             Q_ASSERT(false);
     }
     if (m_serverSocket) {
-        if (!m_pollSet.add(m_serverSocket, aio::etRead))
+        if( !m_pollSet.add( m_serverSocket->implementationDelegate(), aio::etRead, m_serverSocket ) )
             Q_ASSERT(false);
     }
 
@@ -248,7 +248,7 @@ void QnMulticastModuleFinder::run() {
         quint64 currentClock = QDateTime::currentMSecsSinceEpoch();
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis) {
             //sending request via each socket
-            foreach (AbstractDatagramSocket *socket, m_clientSockets) {
+            foreach (UDPSocket *socket, m_clientSockets) {
                 if (!socket->send(searchPacket, searchPacketBufStart - searchPacket)) {
                     //failed to send packet ???
                     SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
@@ -276,8 +276,7 @@ void QnMulticastModuleFinder::run() {
             if (!(it.eventType() & aio::etRead))
                 continue;
 
-            AbstractDatagramSocket *udpSocket = dynamic_cast<AbstractDatagramSocket*>(it.socket());
-            Q_ASSERT(udpSocket);
+            UDPSocket* udpSocket = static_cast<UDPSocket*>(it.userData());
 
             if (udpSocket == m_serverSocket)
                 processDiscoveryRequest(udpSocket);
