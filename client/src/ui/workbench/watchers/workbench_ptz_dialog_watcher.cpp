@@ -39,5 +39,5 @@ void QnWorkbenchPtzDialogWatcher::closePtzManageDialog(QnWorkbenchItem *item) {
     if (item && item->resourceUid() != dialog->resource()->getUniqueId())
         return;
 
-    dialog->closeWithoutCancel();
+    dialog->tryClose(true);
 }

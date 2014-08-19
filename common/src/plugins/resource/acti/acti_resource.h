@@ -49,8 +49,8 @@ public:
         \param localAddress If not NULL, filled with local ip address, used to connect to camera
     */
     QByteArray makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status, bool keepAllData = false, QString* const localAddress = NULL) const;
-    QSize getResolution(QnResource::ConnectionRole role) const;
-    int roundFps(int srcFps, QnResource::ConnectionRole role) const;
+    QSize getResolution(Qn::ConnectionRole role) const;
+    int roundFps(int srcFps, Qn::ConnectionRole role) const;
     int roundBitrate(int srcBitrateKbps) const;
 
     bool isAudioSupported() const;

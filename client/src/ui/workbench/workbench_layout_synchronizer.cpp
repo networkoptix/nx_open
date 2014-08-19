@@ -7,6 +7,7 @@
 #include <utils/common/delete_later.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 

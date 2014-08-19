@@ -17,7 +17,9 @@
 #include <utils/common/synctime.h>
 #include <utils/common/product_features.h>
 #include "common/common_module.h"
+
 #include "api/runtime_info_manager.h"
+#include <nx_ec/data/api_runtime_data.h>
 
 namespace {
     const char *networkOptixRSAPublicKey = "-----BEGIN PUBLIC KEY-----\n"
@@ -54,6 +56,28 @@ namespace {
 #endif
     }
 
+
+struct LicenseTypeInfo
+{
+    LicenseTypeInfo(): licenseType(Qn::LC_Count), allowedForEdge(0) {}
+    LicenseTypeInfo(Qn::LicenseType licenseType,  const QnLatin1Array& className, bool allowedForEdge):
+        licenseType(licenseType), className(className), allowedForEdge(allowedForEdge) {}
+
+    Qn::LicenseType licenseType;
+    QnLatin1Array className;
+    bool allowedForEdge;
+};
+
+static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
+{
+    LicenseTypeInfo(Qn::LC_Trial,           "trial",         1),
+    LicenseTypeInfo(Qn::LC_Analog,          "analog",        0),
+    LicenseTypeInfo(Qn::LC_Professional,    "digital",       0),
+    LicenseTypeInfo(Qn::LC_Edge,            "edge",          1),
+    LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          0),
+    LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", 0),
+    LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1)
+};
 } // anonymous namespace
 
 
@@ -76,11 +100,17 @@ QnLicense::QnLicense(const QByteArray &licenseBlock)
     loadLicenseBlock( licenseBlock );
 }
 
+bool QnLicense::isInfoMode() const
+{
+    return m_signature.isEmpty() && m_signature2.isEmpty();
+}
+
 void QnLicense::loadLicenseBlock( const QByteArray& licenseBlock )
 {
     QByteArray v1LicenseBlock, v2LicenseBlock;
     parseLicenseBlock( licenseBlock, &v1LicenseBlock, &v2LicenseBlock );
     verify( v1LicenseBlock, v2LicenseBlock );
+    this->m_rawLicense = licenseBlock;
 }
 
 QnLicensePtr QnLicense::readFromStream(QTextStream &stream)
@@ -104,6 +134,44 @@ QnLicensePtr QnLicense::readFromStream(QTextStream &stream)
     return QnLicensePtr(new QnLicense(licenseBlock));
 }
 
+QString QnLicense::displayName() const {
+    return QnLicense::displayName(type());
+}
+
+QString QnLicense::displayName(Qn::LicenseType licenseType) {
+    switch (licenseType) {
+    case Qn::LC_Trial:          return tr("Trial");
+    case Qn::LC_Analog:         return tr("Analog");
+    case Qn::LC_Professional:   return tr("Professional");
+    case Qn::LC_Edge:           return tr("Edge");
+    case Qn::LC_VMAX:           return tr("Vmax");
+    case Qn::LC_AnalogEncoder:  return tr("Analog encoder");
+    case Qn::LC_VideoWall:      return tr("Video Wall");
+    default:
+        break;
+    }
+    return QString();
+}
+
+QString QnLicense::longDisplayName() const {
+    return QnLicense::longDisplayName(type());
+}
+
+QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
+    switch (licenseType) {
+    case Qn::LC_Trial:          return tr("Trial licenses");
+    case Qn::LC_Analog:         return tr("Analog licenses");
+    case Qn::LC_Professional:   return tr("Professional licenses");
+    case Qn::LC_Edge:           return tr("Edge licenses");
+    case Qn::LC_VMAX:           return tr("Vmax licenses");
+    case Qn::LC_AnalogEncoder:  return tr("Analog encoder licenses");
+    case Qn::LC_VideoWall:      return tr("Video Wall licenses");
+    default:
+        break;
+    }
+    return QString();
+}
+
 const QString &QnLicense::name() const
 {
     return m_name;
@@ -112,6 +180,11 @@ const QString &QnLicense::name() const
 const QByteArray &QnLicense::key() const
 {
     return m_key;
+}
+
+void QnLicense::setKey(const QByteArray& value)
+{
+    m_key = value;
 }
 
 qint32 QnLicense::cameraCount() const
@@ -157,96 +230,82 @@ const QByteArray& QnLicense::rawLicense() const
     return m_rawLicense;
 }
 
-ec2::ApiRuntimeData QnLicense::findRuntimeDataByLicense() const
+QUuid QnLicense::findRuntimeDataByLicense() const
 {
-    foreach(const ec2::ApiRuntimeData& data, QnRuntimeInfoManager::instance()->allData().values())
+    foreach(const QnPeerRuntimeInfo& info, QnRuntimeInfoManager::instance()->items()->getItems())
     {
-        bool hwKeyOK = data.mainHardwareIds.contains(m_hardwareId) || data.compatibleHardwareIds.contains(m_hardwareId);
-        bool brandOK = (m_brand == data.brand);
+        if (info.data.peer.peerType != Qn::PT_Server)
+            continue;
+
+        bool hwKeyOK = info.data.mainHardwareIds.contains(m_hardwareId) || info.data.compatibleHardwareIds.contains(m_hardwareId);
+        bool brandOK = (m_brand == info.data.brand);
         if (hwKeyOK && brandOK)
-            return data;
+            return info.uuid;
     }
-    return ec2::ApiRuntimeData();
+    return QUuid();
 }
 
-bool QnLicense::isValid(ErrorCode* errCode, bool isNewLicense) const
+bool QnLicense::gotError(ErrorCode* errCode, ErrorCode errorCode) const
 {
-    // >= v1.5, shoud have hwid1, hwid2 or hwid3, and have brand
-    // v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
-    // We just allow empty brand for all, because we believe license is correct.
+    if (errCode)
+        *errCode = errorCode;
+    return errorCode == NoError;
+}
 
-
-    // 1. edge licenses can be activated only if box is "isd"
-    // 2. if box is "isd" only edge licenses AND any trial can be activated
-
-    if (!m_isValid1 && !m_isValid2) {
-        if (errCode)
-            *errCode = InvalidSignature;
-        return false;
-    }
-
-    ec2::ApiRuntimeData runtimeData = isNewLicense ? QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID()) : findRuntimeDataByLicense();
-
-    if (runtimeData.peer.id.isNull())
+bool checkForEdgeBox(const QString& value)
+{
+    const char* EDGE_BOXES[] = {
+        "isd",
+        "isd_s2",
+        "rpi"
+    };
+    QByteArray box = value.toUtf8().toLower().trimmed();
+    for (size_t i = 0; i < sizeof(EDGE_BOXES) / sizeof(char*); ++i)
     {
-        if (errCode)
-            *errCode = InvalidHardwareID;
-        return false;
+        if (box == EDGE_BOXES[i])
+            return true;
     }
+    return false;
+}
 
-    const QString box = runtimeData.box;
-    const QString brand = runtimeData.brand;
+/* 
+   >= v1.5, shoud have hwid1, hwid2 or hwid3, and have brand
+   v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
+   We just allow empty brand for all, because we believe license is correct. 
+*/
+bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
+{
+    if (!m_isValid1 && !m_isValid2 && mode != VM_CheckInfo)
+        return gotError(errCode, InvalidSignature);
+    
+    QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(mode == VM_Regular ? findRuntimeDataByLicense() : qnCommon->remoteGUID());
+    if (info.uuid.isNull())
+        return gotError(errCode, InvalidHardwareID); // peer where license was activated not found
 
-    if (!m_brand.isEmpty() && m_brand != brand) {
-        if (errCode)
-            *errCode = InvalidBrand;
-        return false;
-    }
+    if (!m_brand.isEmpty() && m_brand != info.data.brand) 
+        return gotError(errCode, InvalidBrand);
 
     if (expirationTime() > 0 && qnSyncTime->currentMSecsSinceEpoch() > expirationTime()) // TODO: #Elric make NEVER an INT64_MAX
-    {
-        if (errCode)
-            *errCode = Expired;
-        return false; // license is out of date
-    }
+        return gotError(errCode, Expired);
     
-    bool isEdgeBox = box == lit("isd") || box == lit("isd_s2");
-    bool classOK;
-    if (isEdgeBox)
-        classOK = (m_class == lit("edge") || !m_expiration.isEmpty());
-    else
-        classOK  = m_class != lit("edge");
-    
-    if (errCode)
-        *errCode = classOK ? NoError : InvalidType;
-    return classOK;
-}
+    bool isEdgeBox = checkForEdgeBox(info.data.box);
+    if (isEdgeBox && !licenseTypeInfo[type()].allowedForEdge)
+        return gotError(errCode, InvalidType); // strict allowed license type for EDGE devices
 
-QString QnLicense::errorMessage(ErrorCode errCode)
-{
-    switch (errCode)
+    if (isEdgeBox && type() == Qn::LC_Edge) 
     {
-        case NoError:
-            return QString();
-        case InvalidSignature:
-            return tr("Invalid signature");
-        case InvalidHardwareID:
-            return tr("Server with necessary hardware ID is not found");
-        case InvalidBrand:
-            return tr("Invalid customization");
-        case Expired:
-            return tr("Expired"); // license is out of date
-        case InvalidType:
-            return tr("Invalid type");
-        default:
-            return tr("Unknown error");
+        foreach(QnLicensePtr license, qnLicensePool->getLicenses()) {
+            if (license->hardwareId() == hardwareId() && license->type() == type()) 
+            {
+                if (mode == VM_CheckInfo && license->key() != key())
+                    return gotError(errCode, TooManyLicensesPerDevice); // Only single EDGE license per ARM device is allowed
+                else if (license->key() < key())
+                    return gotError(errCode, TooManyLicensesPerDevice); // Only single EDGE license per ARM device is allowed
+            }
+        }
     }
 
-    return QString();
-}
-
-bool QnLicense::isAnalog() const {
-    return m_class.toLower() == QLatin1String("analog");
+    return gotError(errCode, NoError);
 }
 
 QByteArray QnLicense::toString() const
@@ -267,32 +326,48 @@ qint64 QnLicense::expirationTime() const {
     return result.toMSecsSinceEpoch();
 }
 
-QnLicense::Type QnLicense::type() const {
-    if (key() == qnProductFeatures().freeLicenseKey.toLatin1())
-        return FreeLicense;
+QString QnLicense::errorMessage(ErrorCode errCode)
+{
+    switch (errCode)
+    {
+    case NoError:
+        return QString();
+    case InvalidSignature:
+        return tr("Invalid signature");
+    case InvalidHardwareID:
+        return tr("Server with necessary hardware ID is not found");
+    case InvalidBrand:
+        return tr("Invalid customization");
+    case Expired:
+        return tr("Expired"); // license is out of date
+    case InvalidType:
+        return tr("Invalid type");
+    case TooManyLicensesPerDevice:
+        return tr("Only single license is allowed for this device");
+    default:
+        return tr("Unknown error");
+    }
 
-    if (!expiration().isEmpty())
-        return TrialLicense;
-
-    if (xclass().toLower() == LICENSE_TYPE_ANALOG)
-        return AnalogLicense;
-    if (xclass().toLower() == LICENSE_TYPE_EDGE)
-        return EdgeLicense;
-
-    return ProfessionalLicense;
+    return QString();
 }
 
-QString QnLicense::typeName() const {
-    switch(type()) {
-    case FreeLicense:       return tr("Free");
-    case TrialLicense:      return tr("Trial");
-    case AnalogLicense:     return tr("Analog");
-    case ProfessionalLicense:   return tr("Professional");
-    case EdgeLicense:       return tr("Edge");
-    default:
-        assert(false);
-        return QString();
+Qn::LicenseType QnLicense::type() const 
+{
+    if (key() == qnProductFeatures().freeLicenseKey.toLatin1())
+        return Qn::LC_Trial;
+
+    if (xclass().toLower().toUtf8() == licenseTypeInfo[Qn::LC_VideoWall].className)
+        return Qn::LC_VideoWall;
+
+    if (!expiration().isEmpty())
+        return Qn::LC_Trial;
+    
+    for (int i = 0; i < Qn::LC_Count; ++i) {
+        if (xclass().toLower().toUtf8() == licenseTypeInfo[i].className)
+            return licenseTypeInfo[i].licenseType;
     }
+
+    return Qn::LC_Professional; // default value
 }
 
 void QnLicense::parseLicenseBlock(
@@ -371,9 +446,7 @@ void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2Li
 // -------------------------------------------------------------------------- //
 
 QnLicenseListHelper::QnLicenseListHelper(const QnLicenseList& licenseList) {
-    foreach (QnLicensePtr license, licenseList) {
-        m_licenseDict[license->key()] = license;
-    }
+    update(licenseList);
 }
 
 bool QnLicenseListHelper::haveLicenseKey(const QByteArray &key) const {
@@ -391,16 +464,23 @@ QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const {
     return m_licenseDict.keys();
 }
 
-int QnLicenseListHelper::totalCamerasByClass(bool analog) const
+int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType) const
 {
     int result = 0;
 
     foreach (QnLicensePtr license, m_licenseDict.values()) 
     {
-        if (license->isAnalog() == analog && license->isValid())
+        if (license->type() == licenseType && license->isValid())
             result += license->cameraCount();
     }
     return result;
+}
+
+void QnLicenseListHelper::update(const QnLicenseList& licenseList) {
+    m_licenseDict.clear();
+    foreach (QnLicensePtr license, licenseList) {
+        m_licenseDict[license->key()] = license;
+    }
 }
 
 // -------------------------------------------------------------------------- //
@@ -411,7 +491,26 @@ Q_GLOBAL_STATIC(QnLicensePoolInstance, qn_licensePool_instance)
 
 QnLicensePool::QnLicensePool(): 
     m_mutex(QMutex::Recursive)
-{}
+{
+    connect(&m_timer, &QTimer::timeout, this, &QnLicensePool::at_timer);
+    m_timer.start(1000 * 60);
+}
+
+void QnLicensePool::at_timer()
+{
+    foreach(const QnLicensePtr license, m_licenseDict)
+    {
+        QnLicense::ErrorCode errCode;
+        license->isValid(&errCode);
+        if (errCode == QnLicense::Expired) {
+            qint64 experationDelta = qnSyncTime->currentMSecsSinceEpoch() - license->expirationTime();
+            if (experationDelta < m_timer.interval()) {
+                emit licensesChanged();
+                break;
+            }
+        }
+    }
+}
 
 QnLicensePool *QnLicensePool::instance()
 {
@@ -450,6 +549,13 @@ void QnLicensePool::addLicense(const QnLicensePtr &license)
 
     if (addLicense_i(license))
         emit licensesChanged();
+}
+
+void QnLicensePool::removeLicense(const QnLicensePtr &license)
+{
+    QMutexLocker locker(&m_mutex);
+    m_licenseDict.remove(license->key());
+    emit licensesChanged();
 }
 
 bool QnLicensePool::addLicenses_i(const QnLicenseList &licenses)
@@ -499,20 +605,17 @@ bool QnLicensePool::isEmpty() const
 }
 
 
-QList<QByteArray> QnLicensePool::mainHardwareIds() const
-{
-    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
-    return data.mainHardwareIds;
+QList<QByteArray> QnLicensePool::mainHardwareIds() const {
+    return QnRuntimeInfoManager::instance()->remoteInfo().data.mainHardwareIds;
 }
 
-QList<QByteArray> QnLicensePool::compatibleHardwareIds() const
-{
-    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
-    return data.compatibleHardwareIds;
+QList<QByteArray> QnLicensePool::compatibleHardwareIds() const {
+    return QnRuntimeInfoManager::instance()->remoteInfo().data.compatibleHardwareIds;
 }
 
-QByteArray QnLicensePool::currentHardwareId() const
-{
-    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
-    return data.mainHardwareIds.isEmpty() ? QByteArray() : data.mainHardwareIds.last();
+QByteArray QnLicensePool::currentHardwareId() const {
+    QList<QByteArray> hwIds = mainHardwareIds();
+    return hwIds.isEmpty() 
+        ? QByteArray() 
+        : hwIds.last();
 }

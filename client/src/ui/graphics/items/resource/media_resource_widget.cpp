@@ -62,6 +62,8 @@
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
 
+#include <utils/license_usage_helper.h>
+
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
 namespace {
@@ -388,7 +390,7 @@ void QnMediaResourceWidget::ensureMotionSensitivity() const {
             qnWarning("Camera '%1' returned a motion sensitivity list of invalid size.", m_camera->getName());
             qnResizeList(m_motionSensitivity, channelCount());
         }
-    } else if(m_resource->toResource()->hasFlags(QnResource::motion)) {
+    } else if(m_resource->toResource()->hasFlags(Qn::motion)) {
         for(int i = 0, count = channelCount(); i < count; i++)
             m_motionSensitivity.push_back(QnMotionRegion());
     } else {
@@ -505,6 +507,7 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
         m_display->addRenderer(m_renderer);
         m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
         updateCustomAspectRatio();
+        updateRotation();
     } else {
         setChannelLayout(QnConstResourceVideoLayoutPtr(new QnDefaultResourceVideoLayout()));
         m_renderer->setChannelCount(0);
@@ -552,7 +555,7 @@ void QnMediaResourceWidget::updateIconButton() {
 }
 
 void QnMediaResourceWidget::updateRendererEnabled() {
-    if(m_resource->toResourcePtr()->flags() & QnResource::still_image)
+    if(m_resource->toResourcePtr()->flags() & Qn::still_image)
         return;
 
     for(int channel = 0; channel < channelCount(); channel++)
@@ -592,7 +595,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
     qreal opacity = effectiveOpacity();
     bool opaque = qFuzzyCompare(opacity, 1.0);
     // always use blending for images --gdm
-    if(!opaque || (resource()->toResource()->flags() & QnResource::still_image)) {
+    if(!opaque || (resource()->toResource()->flags() & Qn::still_image)) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
@@ -708,19 +711,27 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, 
     Q_UNUSED(channel)
     qreal xStep = rect.width() / MD_WIDTH;
     qreal yStep = rect.height() / MD_HEIGHT;
+    qreal offset = xStep * 0.1;
+    qreal fontIncrement = 1.2;
 
     painter->setPen(Qt::black);
     QFont font;
-    font.setPointSizeF(0.03 * rect.width());
+    font.setPointSizeF(yStep * fontIncrement);
+    font.setBold(true);
     painter->setFont(font);
 
     for (int sensitivity = QnMotionRegion::MIN_SENSITIVITY + 1; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; ++sensitivity) {
-        foreach(const QRect &rect, region.getRectsBySens(sensitivity)) {
+        auto rects = region.getRectsBySens(sensitivity);
+        if (rects.isEmpty())
+            continue;
+
+        m_sensStaticText[sensitivity].prepare(painter->transform(), font);
+        foreach(const QRect &rect, rects) {
             if (rect.width() < 2 || rect.height() < 2)
                 continue;
 
             int x = rect.left(), y = rect.top();
-            painter->drawStaticText(x * xStep + xStep * 0.1, y * yStep + yStep * 0.1, m_sensStaticText[sensitivity]);
+            painter->drawStaticText(x * xStep + offset, y * yStep, m_sensStaticText[sensitivity]);
         }
     }
 }
@@ -783,7 +794,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
         return Qn::CameraSettings_Motion_Help;
     } else if(options() & DisplayMotion) {
         return Qn::MainWindow_MediaItem_SmartSearch_Help;
-    } else if(m_resource->toResource()->flags() & QnResource::local) {
+    } else if(m_resource->toResource()->flags() & Qn::local) {
         return Qn::MainWindow_MediaItem_Local_Help;
     } else if (m_camera && m_camera->isDtsBased()) {
         return Qn::MainWindow_MediaItem_AnalogCamera_Help;
@@ -848,9 +859,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         mbps += statistics->getBitrate();
     }
 
-    QSize size = m_display->camDisplay()->getFrameSize(0);
-    if(size.isEmpty())
-        size = QSize(0, 0);
+    QSize size = m_display->camDisplay()->getRawDataSize();
 
     QString codecString;
     if(QnMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext()) {
@@ -861,12 +870,12 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 
     QString hqLqString;
 #ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
-    if (!(m_resource->toResource()->flags() & QnResource::local))
+    if (!(m_resource->toResource()->flags() & Qn::local))
         hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
 #endif
 
     QString timeString;
-    if (m_resource->toResource()->flags() & QnResource::utc) { /* Do not show time for regular media files. */
+    if (m_resource->toResource()->flags() & Qn::utc) { /* Do not show time for regular media files. */
 
         // get timestamp from the first channel that was painted
         int channel = std::distance(m_paintedChannels.cbegin(),
@@ -908,7 +917,7 @@ QString QnMediaResourceWidget::calculateTitleText() const {
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility();
 
-    if(!(resource()->toResource()->flags() & QnResource::still_image))
+    if(!(resource()->toResource()->flags() & Qn::still_image))
         result |= ScreenshotButton;
 
     bool rgbImage = false;
@@ -917,7 +926,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     // TODO: #Elric totally evil. Button availability should be based on actual 
     // colorspace value, better via some function in enhancement implementation,
     // and not on file extension checks!
-    if(((resource()->toResource()->flags() & QnResource::still_image)) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg"))) 
+    if(((resource()->toResource()->flags() & Qn::still_image)) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg"))) 
         rgbImage = true;
     if (!rgbImage)
         result |= EnhancementButton;
@@ -925,7 +934,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if (!zoomRect().isNull())
         return result;
 
-    if (resource()->toResource()->hasFlags(QnResource::motion) && !(options() & DisplayDewarped))
+    if (resource()->toResource()->hasFlags(Qn::motion))
         result |= MotionSearchButton;
 
     bool isExportedLayout = item() 
@@ -966,21 +975,24 @@ QCursor QnMediaResourceWidget::calculateCursor() const {
 }
 
 Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const {
+    if (qnSettings->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
+        return Qn::VideowallWithoutLicenseOverlay;
+
     QnResourcePtr resource = m_display->resource();
 
-    if (resource->hasFlags(QnResource::SINGLE_SHOT)) {
-        if (resource->getStatus() == QnResource::Offline)
+    if (resource->hasFlags(Qn::SINGLE_SHOT)) {
+        if (resource->getStatus() == Qn::Offline)
             return Qn::NoDataOverlay;
         if (m_display->camDisplay()->isStillImage() && m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
         return Qn::EmptyOverlay;
-    } else if (resource->hasFlags(QnResource::ARCHIVE) && resource->getStatus() == QnResource::Offline) {
+    } else if (resource->hasFlags(Qn::ARCHIVE) && resource->getStatus() == Qn::Offline) {
         return Qn::NoDataOverlay;
 
         
-    } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Offline) {
+    } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == Qn::Offline) {
         return Qn::OfflineOverlay;
-    } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Unauthorized) {
+    } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == Qn::Unauthorized) {
         return Qn::UnauthorizedOverlay;
     } else if (m_camera && m_camera->isDtsBased() && m_camera->isScheduleDisabled()) {
         return Qn::AnalogWithoutLicenseOverlay;
@@ -993,13 +1005,16 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
             return Qn::NoDataOverlay;
         QnCachingCameraDataLoader *loader = context()->navigator()->loader(m_resource->toResourcePtr());
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
-            return base_type::calculateStatusOverlay(QnResource::Online);
+            return base_type::calculateStatusOverlay(Qn::Online);
         else
             return Qn::NoDataOverlay;
     } else if (m_display->isPaused()) {
-        return Qn::EmptyOverlay;
+        if (m_display->camDisplay()->isEOFReached())
+            return Qn::NoDataOverlay;
+        else
+            return Qn::EmptyOverlay;
     } else {
-        return base_type::calculateStatusOverlay(QnResource::Online);
+        return base_type::calculateStatusOverlay(Qn::Online);
     }
 }
 
@@ -1009,9 +1024,10 @@ void QnMediaResourceWidget::at_resource_resourceChanged() {
 
 void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key) {
     Q_UNUSED(resource);
-    if (key != QnMediaResource::customAspectRatioKey())
-        return;
-    updateCustomAspectRatio();
+    if (key == QnMediaResource::customAspectRatioKey())
+        updateCustomAspectRatio();
+    else if(key == QnMediaResource::rotationKey())
+        updateRotation();
 }
 
 void QnMediaResourceWidget::updateAspectRatio() {
@@ -1032,14 +1048,20 @@ void QnMediaResourceWidget::updateAspectRatio() {
         qreal aspectRatio = resourceId.isEmpty()
                             ? defaultAspectRatio()
                             : qnSettings->resourceAspectRatios().value(resourceId, defaultAspectRatio());
-
-        setAspectRatio(dewarpingRatio * aspectRatio);
+        if (dewarpingRatio > 1)
+            setAspectRatio(dewarpingRatio);
+        else
+            setAspectRatio(aspectRatio);
     } else {
         qreal aspectRatio = QnGeometry::aspectRatio(sourceSize) *
                             QnGeometry::aspectRatio(channelLayout()->size()) *
                             (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()));
 
-        setAspectRatio(dewarpingRatio * aspectRatio);
+
+        if (dewarpingRatio > 1)
+            setAspectRatio(dewarpingRatio);
+        else
+            setAspectRatio(aspectRatio);
 
         if (!resourceId.isEmpty()) {
             QnAspectRatioHash aspectRatios = qnSettings->resourceAspectRatios();
@@ -1068,7 +1090,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
     setOption(DisplayMotion, checked);
 
     if(checked)
-        buttonBar()->setButtonsChecked(PtzButton | ZoomWindowButton, false);
+        buttonBar()->setButtonsChecked(PtzButton | FishEyeButton | ZoomWindowButton, false);
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
@@ -1105,7 +1127,7 @@ void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
     setOption(ControlZoomWindow, checked);
 
     if(checked)
-        buttonBar()->setButtonsChecked(PtzButton | MotionSearchButton, false);
+        buttonBar()->setButtonsChecked(PtzButton | FishEyeButton | MotionSearchButton, false);
 }
 
 void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) {
@@ -1172,6 +1194,8 @@ void QnMediaResourceWidget::updateFisheye() {
     item()->setData(Qn::ItemFlipRole, flip);
 
     updateAspectRatio();
+    if (display() && display()->camDisplay())
+        display()->camDisplay()->setFisheyeEnabled(fisheyeEnabled);
 
     emit fisheyeChanged();
 
@@ -1193,4 +1217,19 @@ void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
 
 void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
     setImageEnhancement(item()->imageEnhancement());
+}
+
+void QnMediaResourceWidget::updateRotation() {
+    if(!m_display)
+        return;
+    QString par = m_resource->toResource()->getProperty(QnMediaResource::rotationKey());
+    if( par.isEmpty() ) {
+        item()->setRotation(0);
+        return;
+    }
+    bool ok;
+    int degree = par.toInt(&ok);
+    Q_ASSERT(ok);
+    if( item()->rotation() != degree )
+        item()->setRotation(degree);
 }

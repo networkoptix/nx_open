@@ -11,6 +11,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
+#include <QTimer>
 
 #include "core/resource/resource_fwd.h"
 #include "utils/common/latin1_array.h"
@@ -21,31 +22,24 @@
 #undef verify
 #endif
 
-const QString LICENSE_TYPE_PROFESSIONAL = lit("digital");
-const QString LICENSE_TYPE_ANALOG = lit("analog"); // TODO: #Elric #EC2 TOTALLY EVIL!!!!!!!!!
-const QString LICENSE_TYPE_EDGE = lit("edge");
-
 class QnLicense {
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
 public:
-    enum Type {
-        FreeLicense,
-        TrialLicense,
-        AnalogLicense,
-        ProfessionalLicense,
-        EdgeLicense,
-        TypeCount,
-        Invalid
-    };
 
     enum ErrorCode {
         NoError,
-        InvalidSignature,
-        InvalidHardwareID,
-        InvalidBrand,
-        Expired,
-        InvalidType
+        InvalidSignature,           /**< License digital signature is not match */
+        InvalidHardwareID,          /**< Invalid hardware ID */
+        InvalidBrand,               /**< License belong to other customization */
+        Expired,                    /**< Expired */
+        InvalidType,                /**< Such license type isn't allowed for that device. */
+        TooManyLicensesPerDevice    /**< Too many licenses of this type per device */
+    };
 
+    enum ValidationMode {
+        VM_Regular,
+        VM_CheckInfo,
+        VM_JustCreated
     };
 
     QnLicense();
@@ -56,17 +50,13 @@ public:
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(ErrorCode* errCode = 0, bool isNewLicense = false) const;
+    bool isValid(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
 
     static QString errorMessage(ErrorCode errCode);
 
-    /**
-     * @returns                         Whether this license is for analog cameras.
-     */
-    bool isAnalog() const;
-
     const QString &name() const;
     const QByteArray &key() const;
+    void setKey(const QByteArray& value);
     qint32 cameraCount() const;
     const QByteArray &hardwareId() const;
     const QByteArray &signature() const;
@@ -85,11 +75,16 @@ public:
      *                                  or -1 if this license never expires.
      */
     qint64 expirationTime() const;
-    Type type() const;
-    QString typeName() const;
+    Qn::LicenseType type() const; 
+
+    bool isInfoMode() const;
 
     static QnLicensePtr readFromStream(QTextStream &stream);
 
+    QString displayName() const;
+    static QString displayName(Qn::LicenseType licenseType);
+    QString longDisplayName() const;
+    static QString longDisplayName(Qn::LicenseType licenseType);
 private:
     QByteArray m_rawLicense;
 
@@ -120,7 +115,8 @@ private:
         QByteArray* const v2LicenseBlock );
     void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
 
-    ec2::ApiRuntimeData findRuntimeDataByLicense() const;
+    QUuid findRuntimeDataByLicense() const;
+    bool gotError(ErrorCode* errCode, ErrorCode errorCode) const;
 };
 
 Q_DECLARE_METATYPE(QnLicensePtr)
@@ -132,26 +128,14 @@ class QnLicenseListHelper
 public:
     QnLicenseListHelper(const QnLicenseList& licenseList);
 
+    void update(const QnLicenseList& licenseList);
+
     QList<QByteArray> allLicenseKeys() const;
     bool haveLicenseKey(const QByteArray& key) const;
     QnLicensePtr getLicenseByKey(const QByteArray& key) const;
-
-    /**
-     * \returns                         Total number of digital cameras allowed.
-     */
-    int totalDigital() const {
-        return totalCamerasByClass(false);
-    }
-
-    /**
-     * \returns                         Total number of analog cameras allowed.
-     */
-    int totalAnalog() const {
-        return totalCamerasByClass(true);
-    }
+    int totalLicenseByType(Qn::LicenseType licenseType) const;
 
 private:
-    int totalCamerasByClass(bool analog) const;
 
 private:
     QnLicenseDict m_licenseDict;
@@ -161,7 +145,7 @@ Q_DECLARE_METATYPE(QnLicenseList)
 
 
 /**
- * License storage which is associated with instance of Enterprise Controller (i.e. should be reloaded when switching appserver).
+ * License storage which is associated with instance of Server (i.e. should be reloaded when switching appserver).
  */
 class QnLicensePool : public QObject
 {
@@ -175,6 +159,7 @@ public:
     void addLicense(const QnLicensePtr &license);
     void addLicenses(const QnLicenseList &licenses);
     void replaceLicenses(const QnLicenseList &licenses);
+    void removeLicense(const QnLicensePtr &license);
 
     void reset();
     bool isEmpty() const;
@@ -188,7 +173,8 @@ signals:
 
 protected:
     QnLicensePool();
-
+private slots:
+    void at_timer();
 private:
     bool isLicenseMatchesCurrentSystem(const QnLicensePtr &license);
     bool addLicense_i(const QnLicensePtr &license);
@@ -196,6 +182,7 @@ private:
 private:
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QMutex m_mutex;
+    QTimer m_timer;
 };
 
 #define qnLicensePool QnLicensePool::instance()

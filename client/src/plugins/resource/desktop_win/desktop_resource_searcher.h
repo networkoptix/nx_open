@@ -19,14 +19,14 @@ public:
 
     virtual QnResourceList findResources() override;
 
-    virtual bool isResourceTypeSupported(QnId resourceTypeId) const override;
+    virtual bool isResourceTypeSupported(QUuid resourceTypeId) const override;
 
     static void initStaticInstance(QnDesktopResourceSearcher* instance);
 
     virtual bool isVirtualResource() const override { return true; }
 
 protected:
-    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams& params) override;
 
 private:
     IDirect3D9 *m_pD3D;

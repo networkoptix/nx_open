@@ -5,10 +5,10 @@
 
 QnFakeCamera::QnFakeCamera()
 {
-    addFlags(server_live_cam);
+    addFlags(Qn::server_live_cam);
 }
 
-QnAbstractStreamDataProvider* QnFakeCamera::createDataProvider(ConnectionRole /*role*/)
+QnAbstractStreamDataProvider* QnFakeCamera::createDataProvider(Qn::ConnectionRole /*role*/)
 {
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
     result->setArchiveDelegate(new QnAviArchiveDelegate());

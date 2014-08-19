@@ -475,3 +475,95 @@ void QuitExecAndWarn(const LPWSTR commandLine, int status, const LPWSTR warningM
         MessageBox(0, warningMsg, L"Warning!", MB_OK | MB_ICONWARNING | MB_SYSTEMMODAL);
     }
 }
+
+#define MAX_TRIES 3
+#define WORKING_BUFFER_SIZE 15000
+
+#define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
+#define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
+
+typedef std::set<unsigned long> addresses_t;
+
+bool fill_local_addresses(addresses_t& local_addresses) {
+    PIP_ADAPTER_ADDRESSES pAddresses = NULL;
+    PIP_ADAPTER_ADDRESSES pCurrAddresses = NULL;
+
+    ULONG outBufLen = 0;
+    ULONG Iterations = 0;
+
+    DWORD dwSize = 0;
+    DWORD dwRetVal = 0;
+
+    // Allocate a 15 KB buffer to start with.
+    outBufLen = WORKING_BUFFER_SIZE;
+
+    do {
+
+        pAddresses = (IP_ADAPTER_ADDRESSES *) MALLOC(outBufLen);
+        if (pAddresses == NULL) {
+            return false;
+        }
+
+        dwRetVal =
+            GetAdaptersAddresses(AF_INET, GAA_FLAG_SKIP_MULTICAST, NULL, pAddresses, &outBufLen);
+
+        if (dwRetVal == ERROR_BUFFER_OVERFLOW) {
+            FREE(pAddresses);
+            pAddresses = NULL;
+        } else {
+            break;
+        }
+
+        Iterations++;
+
+    } while ((dwRetVal == ERROR_BUFFER_OVERFLOW) && (Iterations < MAX_TRIES));
+
+    if (dwRetVal == NO_ERROR) {
+        pCurrAddresses = pAddresses;
+        for (; pCurrAddresses; pCurrAddresses = pCurrAddresses->Next) {
+            PIP_ADAPTER_UNICAST_ADDRESS pUnicast = NULL;
+
+            if (pCurrAddresses->OperStatus != IfOperStatusUp) {
+                continue;
+            }
+
+            pUnicast = pCurrAddresses->FirstUnicastAddress;
+            if (pUnicast != NULL) {
+                for (int i = 0; pUnicast != NULL; i++) {
+                    local_addresses.insert(((SOCKADDR_IN *)(pUnicast->Address.lpSockaddr))->sin_addr.S_un.S_addr);
+                    // cout << inet_ntoa(((SOCKADDR_IN *)(pUnicast->Address.lpSockaddr))->sin_addr) << endl;
+                    pUnicast = pUnicast->Next;
+                }
+            }
+        }
+    }
+
+    if (pAddresses) {
+        FREE(pAddresses);
+    }
+
+    return true;
+}
+
+bool isStandaloneSystem(const char* host) {
+    struct hostent *phe = gethostbyname(host);
+    if (phe == 0) {
+        // Can not resolve host => system is not standalone
+        return false;
+    }
+
+    addresses_t host_addresses;
+    for (int i = 0; phe->h_addr_list[i] != 0; ++i) {
+        struct in_addr addr;
+        memcpy(&addr, phe->h_addr_list[i], sizeof(struct in_addr));
+        host_addresses.insert(addr.S_un.S_addr);
+    }
+
+    addresses_t local_addresses;
+    fill_local_addresses(local_addresses);
+
+    std::vector<unsigned long> intersection;
+    std::set_intersection(host_addresses.begin(), host_addresses.end(), local_addresses.begin(), local_addresses.end(), std::back_inserter(intersection));
+    return !intersection.empty();
+
+}

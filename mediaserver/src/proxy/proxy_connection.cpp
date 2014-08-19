@@ -6,9 +6,10 @@
 
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
+#include "utils/network/compat_poll.h"
 #include "utils/network/tcp_listener.h"
 #include "utils/network/socket.h"
-
+#include "utils/network/router.h"
 #include "network/universal_tcp_listener.h"
 #include "api/app_server_connection.h"
 #include "media_server/server_message_processor.h"
@@ -64,8 +65,8 @@ bool QnProxyConnectionProcessor::doProxyData(AbstractStreamSocket* srcSocket, Ab
 {
     int readed = srcSocket->recv(buffer, bufferSize);
 #ifndef Q_OS_WIN32
-        if( readed == -1 && errno == EINTR )
-            return true;
+    if( readed == -1 && errno == EINTR )
+        return true;
 #endif
 
     if (readed < 1)
@@ -197,6 +198,41 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
             xServerGUID = itr->second;
     }
 
+    QnRoute route;
+    if (!xServerGUID.isEmpty())
+        route = QnRouter::instance()->routeTo(xServerGUID);
+    else
+        route = QnRouter::instance()->routeTo(dstUrl.host(), dstUrl.port());
+
+    if (route.isValid()) {
+        if (route.points.size() > 1) {
+            QString path = urlPath;
+            if (!path.startsWith(QLatin1Char('/')))
+                path.prepend(QLatin1Char('/'));
+            path.prepend(QString(lit("/proxy/%1/%2:%3")).arg(dstUrl.scheme()).arg(dstUrl.host()).arg(dstUrl.port()));
+            d->request.requestLine.url = path;
+
+            dstUrl.setHost(route.points.first().host);
+            dstUrl.setPort(route.points.first().port);
+        } else if (route.points.size() == 1 && !xServerGUID.isEmpty()) {
+            // check connectivity and fix destination address if needed
+            QHostAddress address(dstUrl.host());
+            if (!address.isNull()) {
+                bool found = false;
+                foreach (const QnRouter::Endpoint &endpoint, QnRouter::instance()->connections().values(QUuid(xServerGUID))) {
+                    if (endpoint.host == address.toString() && endpoint.port == dstUrl.port()) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    dstUrl.setHost(route.points.first().host);
+                    dstUrl.setPort(route.points.first().port);
+                }
+            }
+        }
+    }
+
     d->clientRequest.clear();
     d->request.serialize(&d->clientRequest);
 
@@ -255,8 +291,8 @@ void QnProxyConnectionProcessor::run()
     if (!openProxyDstConnection())
         return;
 
-    d->pollSet.add( d->socket.data(), aio::etRead );
-    d->pollSet.add( d->dstSocket.data(), aio::etRead );
+    //d->pollSet.add( d->socket.data(), aio::etRead );
+    //d->pollSet.add( d->dstSocket.data(), aio::etRead );
 
     bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
     if (!isWebSocket && (d->protocol.toLower() == "http" || d->protocol.toLower() == "https"))
@@ -279,26 +315,44 @@ void QnProxyConnectionProcessor::doRawProxy()
 
     while (!m_needStop)
     {
-        int rez = d->pollSet.poll( IO_TIMEOUT );
+        //TODO #ak replace poll with async socket operations here or it will not work for UDT
+
+        //int rez = d->pollSet.poll( IO_TIMEOUT );
+        struct pollfd fds[2];
+        memset( fds, 0, sizeof( fds ) );
+        fds[0].fd = d->socket->handle();
+        fds[0].events = POLLIN;
+        fds[1].fd = d->dstSocket->handle();
+        fds[1].events = POLLIN;
+
+        int rez = poll( fds, sizeof( fds ) / sizeof( *fds ), IO_TIMEOUT );
         if( rez == -1 && SystemError::getLastOSErrorCode() == SystemError::interrupted )
             continue;
 
         if (rez < 1)
             return; // error or timeout
-        for( aio::PollSet::const_iterator
-            it = d->pollSet.begin();
-            it != d->pollSet.end();
-            ++it )
-        {
-            if( it.eventType() != aio::etRead )
+
+        if( fds[0].revents )
+            if( !doProxyData( d->socket.data(), d->dstSocket.data(), buffer, sizeof( buffer ) ) )
                 return;
-            if( it.socket() == d->socket )
-                if (!doProxyData(d->socket.data(), d->dstSocket.data(), buffer, sizeof(buffer)))
-                    return;
-            if( it.socket() == d->dstSocket )
-                if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer, sizeof(buffer)))
-                    return;
-        }
+        if( fds[1].revents )
+            if( !doProxyData( d->dstSocket.data(), d->socket.data(), buffer, sizeof( buffer ) ) )
+                return;
+
+        //for( aio::PollSet::const_iterator
+        //    it = d->pollSet.begin();
+        //    it != d->pollSet.end();
+        //    ++it )
+        //{
+        //    if( it.eventType() != aio::etRead )
+        //        return;
+        //    if( it.socket() == d->socket )
+        //        if (!doProxyData(d->socket.data(), d->dstSocket.data(), buffer, sizeof(buffer)))
+        //            return;
+        //    if( it.socket() == d->dstSocket )
+        //        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer, sizeof(buffer)))
+        //            return;
+        //}
     }
 }
 
@@ -311,20 +365,29 @@ void QnProxyConnectionProcessor::doSmartProxy()
 
     while (!m_needStop)
     {
-        int rez = d->pollSet.poll( IO_TIMEOUT );
+        struct pollfd fds[2];
+        memset( fds, 0, sizeof( fds ) );
+        fds[0].fd = d->socket->handle();
+        fds[0].events = POLLIN;
+        fds[1].fd = d->dstSocket->handle();
+        fds[1].events = POLLIN;
+
+        //int rez = d->pollSet.poll( IO_TIMEOUT );
+        int rez = poll( fds, sizeof( fds ) / sizeof( *fds ), IO_TIMEOUT );
         if( rez == -1 && SystemError::getLastOSErrorCode() == SystemError::interrupted )
             continue;
         if (rez < 1)
             return; // error or timeout
 
-        for( aio::PollSet::const_iterator
-            it = d->pollSet.begin();
-            it != d->pollSet.end();
-            ++it )
-        {
-            if( it.eventType() != aio::etRead )
-                return;
-            if( it.socket() == d->socket )
+        //for( aio::PollSet::const_iterator
+        //    it = d->pollSet.begin();
+        //    it != d->pollSet.end();
+        //    ++it )
+        //{
+        //    if( it.eventType() != aio::etRead )
+        //        return;
+            //if( it.socket() == d->socket )
+            if( fds[0].revents )    //if polled returned connection closed or error state, recv will fail and we will process error
             {
                 int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
                 if (readed < 1) 
@@ -372,11 +435,13 @@ void QnProxyConnectionProcessor::doSmartProxy()
                     d->clientRequest.clear();
                 }
             }
-            else if( it.socket() == d->dstSocket )
+
+            //else if( it.socket() == d->dstSocket )
+            if( fds[1].revents )
             {
                 if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer, sizeof(buffer)))
                     return;
             }
-        }
+        //}
     }
 }

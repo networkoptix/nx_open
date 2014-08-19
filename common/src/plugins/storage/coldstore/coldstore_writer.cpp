@@ -2,6 +2,7 @@
 
 #ifdef ENABLE_COLDSTORE
 
+#include "coldstore_storage_helper.h"
 #include "coldstore_storage.h"
 #include "utils/common/sleep.h"
 

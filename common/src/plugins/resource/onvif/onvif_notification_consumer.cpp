@@ -30,6 +30,8 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
     NX_LOG( lit("Received soap notification from %1").
         arg(QString::fromLatin1(notificationRequest->soap ? notificationRequest->soap->endpoint : "")), cl_logDEBUG1 );
 
+    QMutexLocker lk( &m_mutex );
+
     //oasisWsnB2__Notify->
     for( size_t i = 0; i < notificationRequest->oasisWsnB2__NotificationMessage.size(); ++i )
     {
@@ -47,40 +49,55 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
             continue;
         }
 
+        QWeakPointer<QnPlOnvifResource> resToNotify;
+
         //searching for resource by address
-        auto it = m_notificationProducerAddressToResource.end();
         if( notification.oasisWsnB2__ProducerReference && notification.oasisWsnB2__ProducerReference->Address )
         {
             const QString& address = QUrl( QString::fromStdString(notification.oasisWsnB2__ProducerReference->Address->__item) ).host();
-            it = m_notificationProducerAddressToResource.find( address );
+            auto it = m_notificationProducerAddressToResource.find( address );
+            if( it != m_notificationProducerAddressToResource.end() )
+            {
+                resToNotify = it->second;
+                continue;
+            }
         }
 
-        if( it == m_notificationProducerAddressToResource.end()
-            && notification.oasisWsnB2__SubscriptionReference
-            && notification.oasisWsnB2__SubscriptionReference->Address )
+        if( !resToNotify && notification.oasisWsnB2__SubscriptionReference && notification.oasisWsnB2__SubscriptionReference->Address )
         {
             //trying to find by subscription reference
-            it = m_subscriptionReferenceToResource.find( QString::fromStdString(notification.oasisWsnB2__SubscriptionReference->Address->__item) );
+            auto it = m_subscriptionReferenceToResource.find( QString::fromStdString(notification.oasisWsnB2__SubscriptionReference->Address->__item) );
+            if( it != m_subscriptionReferenceToResource.end() )
+            {
+                resToNotify = it->second;
+                continue;
+            }
         }
 
-        if( it == m_notificationProducerAddressToResource.end()
-            && notificationRequest->soap
-            && notificationRequest->soap->host )
+        if( !resToNotify && notificationRequest->soap && notificationRequest->soap->host )
         {
             //searching by host
-            it = m_notificationProducerAddressToResource.find( QLatin1String(notificationRequest->soap->host) );
+            auto it = m_notificationProducerAddressToResource.find( QLatin1String(notificationRequest->soap->host) );
+            if( it != m_notificationProducerAddressToResource.end() )
+            {
+                resToNotify = it->second;
+                continue;
+            }
         }
 
-        if( it == m_notificationProducerAddressToResource.end() )
+        if( resToNotify )
         {
-            //this is possible shortly after resource unregistration
-            //NX_LOG( lit("Received notification for unknown resource. Producer address %1. Ignoring...").
-            //    arg(QString::fromStdString(notification.oasisWsnB2__ProducerReference->Address->__item)), cl_logWARNING );
-            NX_LOG( lit("Received notification for unknown resource. Ignoring..."), cl_logWARNING );
-            continue;
+            lk.unlock();
+            {
+                auto resStrongRef = resToNotify.toStrongRef();
+                if( resStrongRef )
+                    resStrongRef->notificationReceived( notification );
+            }
+            lk.relock();
         }
 
-        it->second->notificationReceived( notification );
+        //this is possible shortly after resource unregistration
+        NX_LOG( lit("Received notification for unknown resource. Ignoring..."), cl_logWARNING );
     }
 
     return SOAP_OK;
@@ -88,22 +105,23 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
 
 //!Pass notifications from address \a notificationProducerAddress to \a resource
 void OnvifNotificationConsumer::registerResource(
-    QnPlOnvifResource* const resource,
+    const QnPlOnvifResourcePtr& resource,
     const QString& notificationProducerAddress,
     const QString& subscriptionReference )
 {
     QMutexLocker lk( &m_mutex );
-    m_notificationProducerAddressToResource[notificationProducerAddress] = resource;
+    auto resWeakRef = resource.toWeakRef();
+    m_notificationProducerAddressToResource[notificationProducerAddress] = resWeakRef;
     if( !subscriptionReference.isEmpty() )
-        m_subscriptionReferenceToResource[subscriptionReference] = resource;
+        m_subscriptionReferenceToResource[subscriptionReference] = resWeakRef;
 }
 
 //!Cancel registration of \a resource
-void OnvifNotificationConsumer::removeResourceRegistration( QnPlOnvifResource* const resource )
+void OnvifNotificationConsumer::removeResourceRegistration( const QnPlOnvifResourcePtr& resource )
 {
     QMutexLocker lk( &m_mutex );
 
-    auto compareResourceFunc = [resource]( const std::pair<QString, QnPlOnvifResource*>& val ){ return val.second == resource; };
+    auto compareResourceFunc = [resource]( const std::pair<QString, QnPlOnvifResourcePtr>& val ){ return val.second == resource; };
 
     auto it = std::find_if(
         m_notificationProducerAddressToResource.begin(),
@@ -126,4 +144,3 @@ SOAP_SOCKET OnvifNotificationConsumer::accept()
 }
 
 #endif  //ENABLE_ONVIF
-

@@ -3,7 +3,6 @@
 #include <QtCore/QFileInfo>
 
 #include "utils/network/tcp_connection_priv.h"
-#include "rest/server/rest_server.h"
 
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/storage_resource.h>
@@ -33,7 +32,7 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
     
     QnStorageStatusReply reply;
     reply.pluginExists = storage;
-    reply.storage.storageId = exists ? storage->getId() : QnId();
+    reply.storage.storageId = exists ? storage->getId() : QUuid();
     reply.storage.url = storageUrl;
     reply.storage.freeSpace = storage ? storage->getFreeSpace() : -1;
     reply.storage.reservedSpace = storage ? storage->getSpaceLimit() : -1;

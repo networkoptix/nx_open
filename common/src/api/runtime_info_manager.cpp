@@ -1,99 +1,72 @@
 #include "runtime_info_manager.h"
-#include "api/common_message_processor.h"
-#include "api/app_server_connection.h"
-#include "common/common_module.h"
 
-static QnRuntimeInfoManager* m_inst;
+#include <api/common_message_processor.h>
 
-QnRuntimeInfoManager::QnRuntimeInfoManager():
-    QObject()
+#include <common/common_module.h>
+
+#include <nx_ec/data/api_server_alive_data.h>
+    
+//#define RUNTIME_INFO_DEBUG
+
+QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
+    QObject(parent),
+    m_items(new QnThreadsafeItemStorage<QnPeerRuntimeInfo>(&m_mutex, this))
 {
-    Q_ASSERT(m_inst == 0);
-    m_inst = this;
+    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::runtimeInfoChanged, this, [this](const ec2::ApiRuntimeData &runtimeData) {
+        QnPeerRuntimeInfo info(runtimeData);
+        if (m_items->hasItem(info.uuid))
+            m_items->updateItem(info.uuid, info);
+        else
+            m_items->addItem(info);
+    });
 
-    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::runtimeInfoChanged, this, &QnRuntimeInfoManager::at_runtimeInfoChanged );
-    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerFound,    this, &QnRuntimeInfoManager::at_remotePeerFound );
-    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerLost,     this, &QnRuntimeInfoManager::at_remotePeerLost );
-    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::connectionClosed,   this, &QnRuntimeInfoManager::at_connectionClosed );
+    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerLost,     this, [this](const ec2::ApiPeerAliveData &data){
+        m_items->removeItem(data.peer.id);
+    });
+
+    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::connectionClosed,   this, [this]{
+        m_items->setItems(QnPeerRuntimeInfoList() << localInfo());
+    });
 }
 
-QnRuntimeInfoManager::~QnRuntimeInfoManager()
-{
-    m_inst = 0;
+QnThreadsafeItemStorage<QnPeerRuntimeInfo> * QnRuntimeInfoManager::items() const {
+    return m_items.data();
 }
 
-QnRuntimeInfoManager* instance()
-{
-    return m_inst;
+
+void QnRuntimeInfoManager::storedItemAdded(const QnPeerRuntimeInfo &item) {
+#ifdef RUNTIME_INFO_DEBUG
+    qDebug() <<"runtime info added" << item.uuid << item.data.peer.peerType;
+#endif
+    emit runtimeInfoAdded(item);
 }
 
-void QnRuntimeInfoManager::at_remotePeerFound(const ec2::ApiPeerAliveData &, bool)
-{
+void QnRuntimeInfoManager::storedItemRemoved(const QnPeerRuntimeInfo &item) {
+#ifdef RUNTIME_INFO_DEBUG
+    qDebug() <<"runtime info removed" << item.uuid << item.data.peer.peerType;
+#endif
+    emit runtimeInfoRemoved(item);  
 }
 
-void QnRuntimeInfoManager::at_remotePeerLost(const ec2::ApiPeerAliveData &data, bool)
-{
-    m_runtimeInfo.remove(data.peer.id);
-
-    if (data.peer.id == qnCommon->remoteGUID()) {
-        m_runtimeInfo.clear();
-    }
+void QnRuntimeInfoManager::storedItemChanged(const QnPeerRuntimeInfo &item) {
+#ifdef RUNTIME_INFO_DEBUG
+    qDebug() <<"runtime info changed" << item.uuid << item.data.peer.peerType;
+#endif
+    emit runtimeInfoChanged(item);
 }
 
-void QnRuntimeInfoManager::at_connectionClosed()
-{
-    m_runtimeInfo.clear();
+QnPeerRuntimeInfo QnRuntimeInfoManager::localInfo() const {
+    Q_ASSERT(m_items->hasItem(qnCommon->moduleGUID()));
+    return m_items->getItem(qnCommon->moduleGUID());
 }
 
-void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo)
-{
-    QMutexLocker lock(&m_mutex);
-
-    ec2::ApiRuntimeData existingData = m_runtimeInfo.value(runtimeInfo.peer.id);
-    if (existingData.version >= runtimeInfo.version)
-        return;
-
-    m_runtimeInfo.insert(runtimeInfo.peer.id, runtimeInfo);
-
-    emit runtimeInfoChanged(runtimeInfo);
+QnPeerRuntimeInfo QnRuntimeInfoManager::remoteInfo() const {
+    if (!m_items->hasItem(qnCommon->remoteGUID()))
+        return QnPeerRuntimeInfo();
+    return m_items->getItem(qnCommon->remoteGUID());
 }
 
-void QnRuntimeInfoManager::update(const ec2::ApiRuntimeData& value)
+bool QnRuntimeInfoManager::hasItem(const QUuid& id)
 {
-    Q_ASSERT(!value.peer.id.isNull() && value.peer.peerType == Qn::PT_Server);
-
-    QMutexLocker lock(&m_mutex);
-
-    ec2::ApiRuntimeData existingData = m_runtimeInfo.value(value.peer.id);
-    if (existingData == value)
-        return;
-
-    ec2::ApiRuntimeData newData = value;
-    newData.version = existingData.version + 1;
-    m_runtimeInfo.insert(value.peer.id, newData);
-    emit runtimeInfoChanged(newData);
-}
-
-QMap<QnId, ec2::ApiRuntimeData> QnRuntimeInfoManager::allData() const
-{
-    QMutexLocker lock(&m_mutex);
-    return m_runtimeInfo;
-}
-
-ec2::ApiRuntimeData QnRuntimeInfoManager::data(const QnId& id) const
-{
-    QMutexLocker lock(&m_mutex);
-    if (m_runtimeInfo.contains(id)) {
-        return m_runtimeInfo.value(id);
-    }
-    else {
-        ec2::ApiRuntimeData result;
-        result.peer.id = id;
-        return result;
-    }
-}
-
-QnRuntimeInfoManager* QnRuntimeInfoManager::instance()
-{
-    return m_inst;
+    return m_items->hasItem(id);
 }

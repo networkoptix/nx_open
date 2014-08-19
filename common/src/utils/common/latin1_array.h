@@ -2,6 +2,7 @@
 #define QN_LATIN1_ARRAY_H
 
 #include <QtCore/QByteArray>
+#include <QtCore/QMetaType>
 
 
 /**
@@ -16,5 +17,6 @@ public:
     QnLatin1Array(const char* data): QByteArray(data) {}
 };
 
+Q_DECLARE_METATYPE(QnLatin1Array)
 
 #endif // QN_LATIN1_ARRAY_H

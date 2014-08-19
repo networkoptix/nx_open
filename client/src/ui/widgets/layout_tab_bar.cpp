@@ -10,6 +10,8 @@
 #include <client/client_settings.h>
 
 #include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_item_index.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -23,7 +25,9 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+
 #include <ui/style/skin.h>
+#include <ui/style/resource_icon_cache.h>
 
 
 QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
@@ -117,10 +121,19 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout *layout) const {
         return QIcon();
 
     if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
-        return qnSkin->icon("titlebar/videowall.png");
+        return qnResIconCache->icon(QnResourceIconCache::VideoWall);
 
-    if (!layout->data(Qn::VideoWallItemGuidRole).value<QUuid>().isNull())
-        return qnSkin->icon("titlebar/screen.png");
+    // videowall control mode
+    QUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QUuid>();
+    if (!videoWallInstanceGuid.isNull()) {
+        QnVideoWallItemIndex idx = qnResPool->getVideoWallItemByUuid(videoWallInstanceGuid);
+        bool online = idx.isNull()
+            ? false
+            : idx.item().online;
+        if (online)
+            return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
+        return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Offline);
+    }
 
     QnLayoutResourcePtr resource = layout->resource();
     if (resource && resource->locked())
@@ -259,26 +272,6 @@ void QnLayoutTabBar::at_workbench_currentLayoutChanged() {
     checkInvariants();
 }
 
-void QnLayoutTabBar::at_layout_nameChanged() {
-    QnWorkbenchLayout *layout = checked_cast<QnWorkbenchLayout *>(sender());
-
-    updateTabText(layout);
-}
-
-void QnLayoutTabBar::at_layout_lockedChanged() {
-    QnWorkbenchLayout *layout = checked_cast<QnWorkbenchLayout *>(sender());
-
-    updateTabIcon(layout);
-}
-
-void QnLayoutTabBar::at_layout_dataChanged(int role) {
-    if (role != Qn::VideoWallItemGuidRole)
-        return;
-
-    QnWorkbenchLayout *layout = checked_cast<QnWorkbenchLayout *>(sender());
-    updateTabIcon(layout);
-}
-
 void QnLayoutTabBar::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
     updateTabText(QnWorkbenchLayout::instance(resource));
 }
@@ -295,9 +288,16 @@ void QnLayoutTabBar::tabInserted(int index) {
         }
 
         QnWorkbenchLayout *layout = m_layouts[index];
-        connect(layout, SIGNAL(nameChanged()),          this, SLOT(at_layout_nameChanged()));
-        connect(layout, SIGNAL(lockedChanged()),        this, SLOT(at_layout_lockedChanged()));
-        connect(layout, SIGNAL(dataChanged(int)),       this, SLOT(at_layout_dataChanged(int)));
+        connect(layout, &QnWorkbenchLayout::nameChanged,    this, [this, layout] {
+            updateTabText(layout);
+        });
+        connect(layout, &QnWorkbenchLayout::lockedChanged,  this, [this, layout] {
+            updateTabIcon(layout);
+        });
+        connect(layout, &QnWorkbenchLayout::titleChanged,   this, [this, layout] {
+            updateTabText(layout);
+            updateTabIcon(layout);
+        });
 
         if(!name.isNull())
             layout->setName(name); /* It is important to set the name after connecting so that the name change signal is delivered to us. */

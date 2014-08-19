@@ -4,5 +4,12 @@
 
 namespace ec2
 {
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTransactionTransportHeader, (binary)(json), QnTransactionTransportHeader_Fields);
+    static QAtomicInt qn_transportHeader_sequence(1);
+
+    void QnTransactionTransportHeader::fillSequence()
+    {
+        sequence = qn_transportHeader_sequence.fetchAndAddAcquire(1);
+    }
+
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTransactionTransportHeader, (binary)(json)(ubjson), QnTransactionTransportHeader_Fields);
 }

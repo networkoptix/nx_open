@@ -9,6 +9,10 @@
 #include <utils/common/ini_section.h>
 #include <utils/common/warnings.h>
 
+#include <common/common_module.h>
+#include <core/resource/resource_data.h>
+#include <core/resource_management/resource_data_pool.h>
+
 #include "vista_resource.h"
 
 namespace {
@@ -68,6 +72,14 @@ void QnVistaFocusPtzController::init() {
     if(options.contains(lit("PTZ")) && config.value<QString>(lit("device_name")).compare(lit("EncoderVistaPTZ"), Qt::CaseInsensitive) == 0) { // TODO: #Elric the device_name part should go to json settings.
         m_capabilities |= Qn::ContinuousFocusCapability;
         m_isMotor = false;
+    }
+
+    if(options.contains(lit("PTZ"))) {
+        QnResourceData data = qnCommon->dataPool()->data(m_resource);
+        if(data.value<QStringList>(lit("vistaFocusDevices")).contains(config.value<QString>(lit("device_name")), Qt::CaseInsensitive)) {
+            m_capabilities |= Qn::ContinuousFocusCapability;
+            m_isMotor = false;
+        }
     }
 
     if(options.contains(lit("M_PTZ"))) {

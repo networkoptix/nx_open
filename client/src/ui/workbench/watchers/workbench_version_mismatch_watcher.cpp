@@ -5,6 +5,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/media_server_resource.h>
+#include <common/common_module.h>
 
 #include <ui/workbench/workbench_context.h>
 
@@ -60,7 +61,7 @@ void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
     QnSoftwareVersion latestMs;
     foreach(const QnVersionMismatchData &data, m_mismatchData) {
         latest = qMax(data.version, latest);
-        if (data.component != Qn::MediaServerComponent)
+        if (data.component != Qn::ServerComponent)
             continue;
         latestMs = qMax(data.version, latestMs);
     }
@@ -69,11 +70,8 @@ void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
 
     foreach(const QnVersionMismatchData &data, m_mismatchData) {
         switch (data.component) {
-        case Qn::MediaServerComponent:
+        case Qn::ServerComponent:
             m_hasMismatches |= QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMs, true);
-            break;
-        case Qn::EnterpriseControllerComponent:
-            m_hasMismatches |= QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latest);
             break;
         default:
             break;
@@ -87,15 +85,12 @@ void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
 void QnWorkbenchVersionMismatchWatcher::updateMismatchData() {
     m_mismatchData.clear();
 
-    QnVersionMismatchData clientData(Qn::ClientComponent, QnSoftwareVersion(QN_ENGINE_VERSION));
+    QnVersionMismatchData clientData(Qn::ClientComponent, qnCommon->engineVersion());
     m_mismatchData.push_back(clientData);
 
     if(context()->user()) {
-        QnVersionMismatchData ecData(Qn::EnterpriseControllerComponent, QnAppServerConnectionFactory::currentVersion());
-        m_mismatchData.push_back(ecData);
-
         foreach(const QnMediaServerResourcePtr &mediaServerResource, resourcePool()->getResources().filtered<QnMediaServerResource>()) {
-            QnVersionMismatchData msData(Qn::MediaServerComponent, mediaServerResource->getVersion());
+            QnVersionMismatchData msData(Qn::ServerComponent, mediaServerResource->getVersion());
             msData.resource = mediaServerResource;
             m_mismatchData.push_back(msData);
         }

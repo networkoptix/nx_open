@@ -8,6 +8,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_criterion.h>
+#include <core/ptz/ptz_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -127,6 +128,14 @@ private:
     QList<QnActionCondition*> m_conditions;
 };
 
+class QnNegativeActionCondition: public QnActionCondition {
+public:
+    QnNegativeActionCondition(QnActionCondition *condition, QObject *parent = NULL) : QnActionCondition(parent), m_condition(condition) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+private:
+    QnActionCondition *m_condition;
+};
 
 /**
  * Condition for a single resource widget that checks its zoomed state.
@@ -451,6 +460,17 @@ private:
     Qn::NodeType m_nodeType;
 };
 
+class QnResourceStatusActionCondition: public QnActionCondition {
+public:
+    QnResourceStatusActionCondition(Qn::ResourceStatus status, bool allResources, QObject *parent): QnActionCondition(parent), m_status(status), m_all(allResources) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+
+private:
+    Qn::ResourceStatus m_status;
+    bool m_all;
+};
+
 class QnOpenInCurrentLayoutActionCondition: public QnActionCondition {
 public:
     QnOpenInCurrentLayoutActionCondition(QObject *parent): QnActionCondition(parent) {}
@@ -484,12 +504,6 @@ public:
 class QnLoggedInCondition: public QnActionCondition {
 public:
     QnLoggedInCondition(QObject* parent): QnActionCondition(parent) {}
-    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
-};
-
-class QnCheckForUpdatesActionCondition: public QnActionCondition {
-public:
-    QnCheckForUpdatesActionCondition(QObject* parent): QnActionCondition(parent) {}
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
@@ -532,8 +546,10 @@ public:
 
 class QnSaveVideowallReviewActionCondition: public QnActionCondition {
 public:
-    QnSaveVideowallReviewActionCondition(QObject* parent): QnActionCondition(parent) {}
+    QnSaveVideowallReviewActionCondition(bool isCurrent, QObject* parent): QnActionCondition(parent), m_current(isCurrent) {}
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+private:
+    bool m_current;
 };
 
 class QnStartVideowallActionCondition: public QnActionCondition {

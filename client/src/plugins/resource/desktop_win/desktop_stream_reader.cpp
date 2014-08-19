@@ -2,6 +2,8 @@
 
 #ifdef Q_OS_WIN
 
+#include <core/resource/resource.h>
+
 #include <utils/common/log.h>
 
 struct FffmpegLog
@@ -25,7 +27,7 @@ struct FffmpegLog
 };
 
 
-QnDesktopStreamreader::QnDesktopStreamreader(QnResourcePtr dev):
+QnDesktopStreamreader::QnDesktopStreamreader(const QnResourcePtr &dev):
     CLServerPushStreamReader(dev),
     m_videoBuf(0),
     m_videoBufSize(0),

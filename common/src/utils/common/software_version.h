@@ -79,7 +79,7 @@ public:
     friend bool operator<(const QnSoftwareVersion &l, const QnSoftwareVersion &r);
     friend bool operator==(const QnSoftwareVersion &l, const QnSoftwareVersion &r);
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnSoftwareVersion, (ubj)(xml)(json)(lexical)(binary)(datastream)(csv_field), friend)
+    QN_FUSION_DECLARE_FUNCTIONS(QnSoftwareVersion, (ubjson)(xml)(json)(lexical)(binary)(datastream)(csv_field), friend)
 
 private:
     std::array<int, 4> m_data;

@@ -9,57 +9,26 @@
 #include "pollset.h"
 
 #include <algorithm>
-#include <vector>
+#include <map>
+#include <memory>
 
-#include "../socket.h"
+#include "../system_socket.h"
 
 
 namespace aio
 {
-    class SocketContext
-    {
-    public:
-        AbstractSocket* socket;
-        void* userData;
-
-        SocketContext()
-        :
-            socket( NULL ),
-            userData( NULL )
-        {
-        }
-
-        SocketContext(
-            AbstractSocket* _socket,
-            void* _userData = NULL )
-        :
-            socket( _socket ),
-            userData( _userData )
-        {
-        }
-
-        bool operator<( const SocketContext& right ) const
-        {
-            return socket < right.socket;
-        }
-
-        bool operator<=( const SocketContext& right ) const
-        {
-            return socket <= right.socket;
-        }
-    };
+    typedef std::map<Socket*, void*> PolledSockets;
+    typedef std::pair<Socket*, void*> SocketContext;
 
     class PollSetImpl
     {
     public:
-        //!Elements here are sorted by std::less<>
-        std::vector<SocketContext> readSockets;
-        //!Elements here are sorted by std::less<>
-        std::vector<SocketContext> writeSockets;
+        PolledSockets readSockets;
+        PolledSockets writeSockets;
         fd_set readfds;
         fd_set writefds;
         fd_set exceptfds;
-        std::auto_ptr<AbstractDatagramSocket> dummySocket;
+        std::unique_ptr<UDPSocket> dummySocket;
 
         PollSetImpl()
         {
@@ -67,25 +36,23 @@ namespace aio
             FD_ZERO( &writefds );
             FD_ZERO( &exceptfds );
 
-            dummySocket.reset( SocketFactory::createDatagramSocket() );
+            dummySocket.reset( new UDPSocket() );
         }
 
-        void fillFDSet( fd_set* const dest, const std::vector<SocketContext>& src )
+        void fillFDSet( fd_set* const dest, const PolledSockets& src )
         {
             FD_ZERO( dest );
-            for( std::vector<SocketContext>::size_type
-                i = 0;
-                i < src.size();
-                ++i )
+            const auto endIter = src.cend();
+            for( PolledSockets::const_iterator it = src.cbegin(); it != endIter; ++it )
             {
-                FD_SET( src[i].socket->handle(), dest );
+                FD_SET( it->first->handle(), dest );
             }
         }
 
-        std::vector<SocketContext>::iterator findSocketContextIter(
-            AbstractSocket* const sock,
+        PolledSockets::iterator findSocketContextIter(
+            Socket* const sock,
             aio::EventType eventType,
-            std::vector<SocketContext>** setToUse )
+            PolledSockets** setToUse )
         {
             *setToUse = &readSockets;   //have to return something in any case
             if( eventType == aio::etRead )
@@ -98,14 +65,11 @@ namespace aio
             }
             else
             {
-                Q_ASSERT( false );
+                assert( false );
                 return (*setToUse)->end();
             }
 
-            std::vector<SocketContext>::iterator it = std::lower_bound( (*setToUse)->begin(), (*setToUse)->end(), SocketContext(sock), std::less<SocketContext>() );
-            if( (it != (*setToUse)->end()) && (it->socket == sock) )
-                return it;
-            return (*setToUse)->end();
+            return (*setToUse)->find( sock );
         }
     };
 
@@ -120,31 +84,37 @@ namespace aio
         ConstIteratorImpl()
         :
             currentSocketREvent( aio::etNone ),
-            pollSetImpl( NULL ),
-            m_nextReadSocketIndex( 0 ),
-            m_nextWriteSocketIndex( 0 )
+            pollSetImpl( nullptr ),
+            m_iteratorsAreValid( false )
         {
         }
 
         void findNextSignalledSocket()
         {
+            if( !m_iteratorsAreValid )
+            {
+                m_nextReadSocketIndex = pollSetImpl->readSockets.cbegin();
+                m_nextWriteSocketIndex = pollSetImpl->writeSockets.cbegin();
+                m_iteratorsAreValid = true;
+            }
+
             for( ;; )
             {
                 currentSocket = SocketContext();
                 currentSocketREvent = aio::etNone;
-                std::vector<SocketContext>::size_type nextReadSocketIndexBak = m_nextReadSocketIndex;
+                const auto nextReadSocketIndexBak = m_nextReadSocketIndex;
                 //!current index in PollSetImpl::writeSockets
-                std::vector<SocketContext>::size_type nextWriteSocketIndexBak = m_nextWriteSocketIndex;
-                if( (m_nextReadSocketIndex < pollSetImpl->readSockets.size()) && (m_nextWriteSocketIndex < pollSetImpl->writeSockets.size()) )
+                const auto nextWriteSocketIndexBak = m_nextWriteSocketIndex;
+                if( (m_nextReadSocketIndex != pollSetImpl->readSockets.cend()) && (m_nextWriteSocketIndex != pollSetImpl->writeSockets.cend()) )
                 {
-                    if( pollSetImpl->readSockets[m_nextReadSocketIndex] <= pollSetImpl->writeSockets[m_nextWriteSocketIndex] )
+                    if( m_nextReadSocketIndex->first <= m_nextWriteSocketIndex->first )
                     {
-                        currentSocket = pollSetImpl->readSockets[m_nextReadSocketIndex];
+                        currentSocket = *m_nextReadSocketIndex;
                         ++m_nextReadSocketIndex;
                     }
-                    else if( pollSetImpl->writeSockets[m_nextWriteSocketIndex] < pollSetImpl->readSockets[m_nextReadSocketIndex] )
+                    else if( m_nextWriteSocketIndex->first < m_nextReadSocketIndex->first )
                     {
-                        currentSocket = pollSetImpl->writeSockets[m_nextWriteSocketIndex];
+                        currentSocket = *m_nextWriteSocketIndex;
                         ++m_nextWriteSocketIndex;
                     }
                     //else    //pollSetImpl->readSockets[m_nextReadSocketIndex] == pollSetImpl->writeSockets[m_nextWriteSocketIndex]
@@ -154,26 +124,26 @@ namespace aio
                     //    ++m_nextWriteSocketIndex;
                     //}
                 }
-                else if( m_nextReadSocketIndex < pollSetImpl->readSockets.size() )
+                else if( m_nextReadSocketIndex != pollSetImpl->readSockets.end() )
                 {
-                    currentSocket = pollSetImpl->readSockets[m_nextReadSocketIndex];
+                    currentSocket = *m_nextReadSocketIndex;
                     ++m_nextReadSocketIndex;
                 }
-                else if( m_nextWriteSocketIndex < pollSetImpl->writeSockets.size() )
+                else if( m_nextWriteSocketIndex != pollSetImpl->writeSockets.end() )
                 {
-                    currentSocket = pollSetImpl->writeSockets[m_nextWriteSocketIndex];
+                    currentSocket = *m_nextWriteSocketIndex;
                     ++m_nextWriteSocketIndex;
                 }
 
-                if( currentSocket.socket )
+                if( currentSocket.first )
                 {
                     if( m_nextReadSocketIndex != nextReadSocketIndexBak &&
-                        FD_ISSET( currentSocket.socket->handle(), &pollSetImpl->readfds ) )
+                        FD_ISSET( currentSocket.first->handle(), &pollSetImpl->readfds ) )
                     {
                         currentSocketREvent = aio::etRead;
                     }
                     if( m_nextWriteSocketIndex != nextWriteSocketIndexBak &&
-                        FD_ISSET( currentSocket.socket->handle(), &pollSetImpl->writefds ) )
+                        FD_ISSET( currentSocket.first->handle(), &pollSetImpl->writefds ) )
                     {
                         currentSocketREvent = aio::etWrite;
                     }
@@ -183,7 +153,7 @@ namespace aio
                     break;  //reached end()
                 }
 
-                if( currentSocket.socket == pollSetImpl->dummySocket.get() )
+                if( currentSocket.first == pollSetImpl->dummySocket->implementationDelegate() )
                     continue;   //skipping dummy socket
 
                 if( currentSocketREvent )
@@ -192,10 +162,11 @@ namespace aio
         }
 
     private:
+        bool m_iteratorsAreValid;
         //!current index in PollSetImpl::readSockets
-        std::vector<SocketContext>::size_type m_nextReadSocketIndex;
+        PolledSockets::const_iterator m_nextReadSocketIndex;
         //!current index in PollSetImpl::writeSockets
-        std::vector<SocketContext>::size_type m_nextWriteSocketIndex;
+        PolledSockets::const_iterator m_nextWriteSocketIndex;
     };
 
     //////////////////////////////////////////////////////////
@@ -240,14 +211,14 @@ namespace aio
         return *this;
     }
 
-    AbstractSocket* PollSet::const_iterator::socket()
+    Socket* PollSet::const_iterator::socket()
     {
-        return m_impl->currentSocket.socket;
+        return m_impl->currentSocket.first;
     }
 
-    const AbstractSocket* PollSet::const_iterator::socket() const
+    const Socket* PollSet::const_iterator::socket() const
     {
-        return m_impl->currentSocket.socket;
+        return m_impl->currentSocket.first;
     }
 
     /*!
@@ -260,12 +231,12 @@ namespace aio
 
     void* PollSet::const_iterator::userData()
     {
-        return m_impl->currentSocket.userData;
+        return m_impl->currentSocket.second;
     }
 
     bool PollSet::const_iterator::operator==( const const_iterator& right ) const
     {
-        return (m_impl->pollSetImpl == right.m_impl->pollSetImpl) && (m_impl->currentSocket.socket == right.m_impl->currentSocket.socket);
+        return (m_impl->pollSetImpl == right.m_impl->pollSetImpl) && (m_impl->currentSocket.first == right.m_impl->currentSocket.first);
     }
 
     bool PollSet::const_iterator::operator!=( const const_iterator& right ) const
@@ -281,7 +252,7 @@ namespace aio
     :
         m_impl( new PollSetImpl() )
     {
-        m_impl->readSockets.push_back( m_impl->dummySocket.get() );
+        m_impl->readSockets.emplace( m_impl->dummySocket->implementationDelegate(), (void*)nullptr );
         m_impl->dummySocket->setNonBlockingMode( true );
         m_impl->dummySocket->bind( SocketAddress( HostAddress::localhost, 0 ) );
     }
@@ -303,80 +274,68 @@ namespace aio
     */
     void PollSet::interrupt()
     {
-        //introduce overlapped IO
+        //TODO #ak introduce overlapped IO
         quint8 buf[128];
         m_impl->dummySocket->sendTo( buf, sizeof(buf), m_impl->dummySocket->getLocalAddress() );
     }
 
     //!Add socket to set. Does not take socket ownership
     bool PollSet::add(
-        AbstractSocket* const sock,
+        Socket* const sock,
         aio::EventType eventType,
         void* userData )
     {
-        std::vector<SocketContext>* setToUse = NULL;
+        PolledSockets* setToUse = NULL;
         if( eventType == etRead )
-        {
             setToUse = &m_impl->readSockets;
-        }
         else if( eventType == etWrite )
-        {
             setToUse = &m_impl->writeSockets;
-        }
         else
         {
-            Q_ASSERT( false );
+            assert( false );
             return false;
         }
 
-        std::vector<SocketContext>::iterator it = std::lower_bound( setToUse->begin(), setToUse->end(), SocketContext(sock), std::less<SocketContext>() );
-        if( (it != setToUse->end()) && (it->socket == sock) )
-            return true;    //already in set
-
-        if( setToUse->size() == maxPollSetSize() )
-            return false;   //no more space
-
-        setToUse->insert( it, SocketContext(sock, userData) );   //adding to position in set
+        //assuming that canAcceptSocket has been called prior to this method
+        if( !setToUse->emplace( sock, userData ).second )
+            return true;    //socket is already there
+        assert( setToUse->size() <= FD_SETSIZE );
         return true;
     }
 
     //!Remove socket from set
-    void* PollSet::remove( AbstractSocket* const sock, aio::EventType eventType )
+    void* PollSet::remove( Socket* const sock, aio::EventType eventType )
     {
-        std::vector<SocketContext>* setToUse = NULL;
-        std::vector<SocketContext>::iterator it = m_impl->findSocketContextIter( sock, eventType, &setToUse );
+#ifdef _DEBUG
+        sock->handle(); //checking that socket object is still alive, since linux and mac implementation use socket in PollSet::remove
+#endif
+
+        PolledSockets* setToUse = NULL;
+        PolledSockets::iterator it = m_impl->findSocketContextIter( sock, eventType, &setToUse );
         if( it != setToUse->end() )
         {
-            void* userData = it->userData;
+            void* userData = it->second;
             setToUse->erase( it );
             return userData;
         }
 
-        return NULL;
+        return nullptr;
     }
 
-    size_t PollSet::size( EventType eventType ) const
+    size_t PollSet::size() const
     {
-        if( eventType == etRead )
-            return m_impl->readSockets.size();
-        else if( eventType == etWrite )
-            return m_impl->writeSockets.size();
-        else
-        {
-            Q_ASSERT( false );
-            return maxPollSetSize();
-        }
+        return std::max<size_t>( m_impl->readSockets.size(), m_impl->writeSockets.size() );
     }
 
-    void* PollSet::getUserData( AbstractSocket* const sock, EventType eventType ) const
+    void* PollSet::getUserData( Socket* const sock, EventType eventType ) const
     {
-        std::vector<SocketContext>* setToUse = NULL;
-        std::vector<SocketContext>::iterator it = m_impl->findSocketContextIter( sock, eventType, &setToUse );
-        return it != setToUse->end() ? it->userData : NULL;
+        PolledSockets* setToUse = NULL;
+        PolledSockets::iterator it = m_impl->findSocketContextIter( sock, eventType, &setToUse );
+        return it != setToUse->end() ? it->second : NULL;
     }
 
     /*!
-        \param millisToWait if 0, method returns immediatly. If > 0, returns on event or after \a millisToWait milliseconds.
+        \param millisToWait if 0, method returns immediately. If > 0, returns on event or after \a millisToWait milliseconds.
             If < 0, method blocks till event
         \return -1 on error, 0 if \a millisToWait timeout has expired of call has been interrupted, > 0 - number of socket whose state has been changed
     */
@@ -405,6 +364,14 @@ namespace aio
         return result;
     }
 
+    bool PollSet::canAcceptSocket( Socket* const sock ) const
+    {
+        return
+            m_impl->readSockets.find( sock ) != m_impl->readSockets.end() ||
+            m_impl->writeSockets.find( sock ) != m_impl->writeSockets.end() ||
+            size() < maxPollSetSize();
+    }
+
     //!Returns iterator pointing to first socket, which state has been changed in previous \a poll call
     PollSet::const_iterator PollSet::begin() const
     {
@@ -424,7 +391,7 @@ namespace aio
 
     unsigned int PollSet::maxPollSetSize()
     {
-        return FD_SETSIZE - 1;  //1 - for dummy socket
+        return FD_SETSIZE / 2 - 1;  //1 - for dummy socket, /2 is required to be able to add any socket already present (we MUST always handle every socket in single thread)
     }
 }
 

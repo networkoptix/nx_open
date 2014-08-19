@@ -171,6 +171,10 @@ namespace QnUbjsonDetail {
             return m_stream.skip(size) == size;
         }
 
+        int pos() const {
+            return m_stream.pos();
+        }
+
     private:
         QnInputBinaryStream<Input> m_stream;
     };

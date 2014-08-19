@@ -3,8 +3,8 @@
 
 #include <utils/fusion/fusion_adaptor.h>
 #include <utils/serialization/binary_functions.h>
-#include <utils/serialization/data_stream.h>
-#include <utils/serialization/debug.h>
+#include <utils/serialization/data_stream_macros.h>
+#include <utils/serialization/debug_macros.h>
 #include <utils/serialization/csv_functions.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/serialization/lexical_functions.h>

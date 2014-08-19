@@ -12,6 +12,8 @@
 #include "button_box_dialog.h"
 #include "api/model/rebuild_archive_reply.h"
 
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
+
 class QLabel;
 
 struct QnStorageSpaceReply;
@@ -21,10 +23,10 @@ namespace Ui {
     class ServerSettingsDialog;
 }
 
-class QnServerSettingsDialog: public QnButtonBoxDialog, public QnWorkbenchContextAware {
+class QnServerSettingsDialog: public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT;
 
-    typedef QnButtonBoxDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
     explicit QnServerSettingsDialog(const QnMediaServerResourcePtr &server, QWidget *parent = NULL);
@@ -69,7 +71,6 @@ private slots:
     void at_updateRebuildInfo();
 
     void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
-
 private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;

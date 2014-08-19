@@ -6,6 +6,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QTimer>
+#include <QtCore/QQueue>
 
 #include "nx_ec/data/api_lock_data.h"
 #include "transaction/transaction.h"
@@ -65,14 +66,14 @@ namespace ec2
     private:
         bool isAllPeersReady() const;
         void checkForLocked();
-        void sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QnId& dstPeer);
+        void sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QUuid& dstPeer);
         void unlockInternal();
     private:
         QString m_name;
         LockRuntimeInfo m_selfLock;
         typedef QMap<LockRuntimeInfo, int> LockedMap;
         LockedMap m_peerLockInfo;
-        QSet<QnId> m_proccesedPeers;
+        QSet<QUuid> m_proccesedPeers;
         QTimer* m_timer;
         mutable QMutex m_mutex;
         bool m_locked;
@@ -118,8 +119,8 @@ namespace ec2
         void at_gotLockRequest(ApiLockData lockInfo);
         void at_gotLockResponse(ApiLockData lockInfo);
         //void at_gotUnlockRequest(ApiLockData lockInfo);
-        void at_newPeerFound(QnId peer);
-        void at_peerLost(QnId peer);
+        void at_newPeerFound(QUuid peer);
+        void at_peerLost(QUuid peer);
         void releaseMutex(const QString& name);
     private:
         QMap<QString, QnDistributedMutex*> m_mutexList;

@@ -197,7 +197,8 @@ int QnCameraSettingsRestHandler::executeGet( const QString& path, const QnReques
     return HttpStatusCode::ok;
 }
 
-int QnCameraSettingsRestHandler::executePost( const QString& /*path*/, const QnRequestParamList& /*params*/, const QByteArray& /*body*/, QByteArray& /*responseMessageBody*/, QByteArray& /*contentType*/)
+int QnCameraSettingsRestHandler::executePost(const QString& /*path*/, const QnRequestParamList& /*params*/, 
+    const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& /*responseMessageBody*/, QByteArray& /*contentType*/)
 {
     //TODO/IMPL
     return 0;

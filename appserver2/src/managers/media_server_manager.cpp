@@ -46,13 +46,13 @@ namespace ec2
         const int reqID = generateRequestID();
 
         if (resource->getId().isNull())
-            resource->setId( QnId::createUuid());
+            resource->setId( QUuid::createUuid());
 
         QnAbstractStorageResourceList storages = resource->getStorages();
         for (int i = 0; i < storages.size(); ++i)
         {
             if (storages[i]->getId().isNull())
-                storages[i]->setId(QnId::createUuid());
+                storages[i]->setId(QUuid::createUuid());
         }
         resource->setStorages(storages);
 
@@ -66,7 +66,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnMediaServerManager<T>::remove( const QnId& id, impl::SimpleHandlerPtr handler )
+    int QnMediaServerManager<T>::remove( const QUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::removeMediaServer, id );
@@ -78,15 +78,15 @@ namespace ec2
     template<class T>
     QnTransaction<ApiMediaServerData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource )
     {
-        QnTransaction<ApiMediaServerData> tran(command, true);
+        QnTransaction<ApiMediaServerData> tran(command);
         fromResourceToApi(resource, tran.params);
         return tran;
     }
 
     template<class T>
-    QnTransaction<ApiIdData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
+    QnTransaction<ApiIdData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QUuid& id )
     {
-        QnTransaction<ApiIdData> tran(command, true);
+        QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;
         return tran;
     }

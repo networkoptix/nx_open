@@ -17,6 +17,8 @@ enum {
 // -------------------------------------------------------------------------- //
 // QnSyncTime
 // -------------------------------------------------------------------------- //
+static QnSyncTime* QnSyncTime_instance = nullptr;
+
 QnSyncTime::QnSyncTime()
 :
     m_lastReceivedTime( 0 ),
@@ -25,6 +27,19 @@ QnSyncTime::QnSyncTime()
     m_syncTimeRequestIssued( false )
 {
     reset();
+
+    assert( QnSyncTime_instance == nullptr );
+    QnSyncTime_instance = this;
+}
+
+QnSyncTime::~QnSyncTime()
+{
+    QnSyncTime_instance = nullptr;
+}
+
+QnSyncTime* QnSyncTime::instance()
+{
+    return QnSyncTime_instance;
 }
 
 void QnSyncTime::updateTime(int /*reqID*/, ec2::ErrorCode errorCode, qint64 newTime)
@@ -44,7 +59,7 @@ void QnSyncTime::updateTime(int /*reqID*/, ec2::ErrorCode errorCode, qint64 newT
 
     if(qAbs(oldTime - newTime) > TimeChangeThreshold)
     {
-        lock.unlock();
+        lock.unlock();  //to avoid deadlock: in case if timeChanged signal handler will call thread-safe method of this class
         emit timeChanged();
     }
 }
@@ -65,18 +80,29 @@ void QnSyncTime::reset()
     m_lastLocalTime = 0;
 }
 
+void QnSyncTime::updateTime(qint64 newTime)
+{
+    updateTime( 0, ec2::ErrorCode::ok, newTime );
+}
+
 qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
     QMutexLocker lock(&m_mutex);
 
     const qint64 localTime = QDateTime::currentMSecsSinceEpoch();
-    if ((m_lastReceivedTime == 0 || m_timer.elapsed() > EcTimeUpdatePeriod || qAbs(localTime-m_lastLocalTime) > EcTimeUpdatePeriod) && 
-        !m_syncTimeRequestIssued && QnSessionManager::instance()->isReady() && !QnAppServerConnectionFactory::defaultUrl().isEmpty())
+    if (
+        (
+            m_lastReceivedTime == 0 
+        ||  m_timer.elapsed() > EcTimeUpdatePeriod 
+        || qAbs(localTime-m_lastLocalTime) > EcTimeUpdatePeriod
+        ) 
+        && !m_syncTimeRequestIssued 
+        && QnAppServerConnectionFactory::getConnection2())
     {
         ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
         if( appServerConnection ) 
         {
-            appServerConnection->getCurrentTime( this, &QnSyncTime::updateTime );
+            appServerConnection->getCurrentTime( this, (void(QnSyncTime::*)(int, ec2::ErrorCode, qint64))&QnSyncTime::updateTime );
             m_syncTimeRequestIssued = true;
         }
     }
@@ -89,7 +115,7 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
             m_lastWarnTime = localTime;
             if (m_lastWarnTime == 0)
             {
-                NX_LOG( lit("Local time differs from enterprise controller! local time %1, EC time %2").
+                NX_LOG( lit("Local time differs from server's! local time %1, server time %2").
                     arg(QDateTime::fromMSecsSinceEpoch(localTime).toString()).arg(QDateTime::fromMSecsSinceEpoch(time).toString()), cl_logWARNING );
             }
         }
@@ -98,11 +124,3 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
     else
         return QDateTime::currentMSecsSinceEpoch();
 }
-
-Q_GLOBAL_STATIC(QnSyncTime, qn_syncTime_instance);
-
-QnSyncTime* QnSyncTime::instance()
-{
-    return qn_syncTime_instance();
-}
-

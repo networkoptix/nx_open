@@ -114,8 +114,12 @@ public:
     void setValue(const QVariant &value);
     bool testAndSetValue(const QVariant &expectedValue, const QVariant &newValue);
 
+    void synchronizeNow();
 signals:
     void valueChanged();
+
+protected:
+    virtual QString defaultSerializedValue() const;
 
 private:
     void loadValue(const QString &serializedValue);
@@ -151,7 +155,10 @@ public:
         QnAbstractResourcePropertyAdaptor(key, handler, parent),
         m_type(qMetaTypeId<T>()),
         m_defaultValue(defaultValue)
-    {}
+    {
+        if (handler)
+            handler->serialize(qVariantFromValue(defaultValue), &m_defaultSerializedValue);
+    }
 
     T value() const {
         QVariant baseValue = base_type::value();
@@ -170,9 +177,15 @@ public:
         return base_type::testAndSetValue(QVariant::fromValue(expectedValue), QVariant::fromValue(newValue));
     }
 
+protected:
+    virtual QString defaultSerializedValue() const override {
+        return m_defaultSerializedValue;
+    }
+
 private:
     const int m_type;
     const T m_defaultValue;
+    QString m_defaultSerializedValue;
 };
 
 

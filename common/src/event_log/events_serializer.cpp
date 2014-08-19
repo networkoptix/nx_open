@@ -11,11 +11,11 @@ inline int readInt(quint8* &curPtr)
     return ntohl(val);
 }
 
-inline QnId readQnId(quint8* &curPtr)
+inline QUuid readQnId(quint8* &curPtr)
 {
     const QByteArray uuid = QByteArray::fromRawData((const char*) curPtr, 16);
     curPtr += 16;
-    return QnId::fromRfc4122(uuid);
+    return QUuid::fromRfc4122(uuid);
 }
 
 void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, const QByteArray& data)

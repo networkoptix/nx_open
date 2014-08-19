@@ -61,16 +61,16 @@ QnSignHelper::QnSignHelper():
     m_opacity = 1.0;
     m_signBackground = Qt::white;
 
-    m_versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
+    m_versionStr = qApp->applicationName().append(QLatin1String(" v")).append(QCoreApplication::applicationVersion());
     m_hwIdStr = QLatin1String(qnLicensePool->currentHardwareId());
     if (m_hwIdStr.isEmpty())
         m_hwIdStr = tr("Unknown");
 
     QList<QnLicensePtr> list = qnLicensePool->getLicenses();
-    m_licensedToStr = tr("FREE license");
+    m_licensedToStr = tr("Trial license");
     foreach (QnLicensePtr license, list)
     {
-        if (license->type() != QnLicense::FreeLicense)
+        if (license->type() != Qn::LC_Trial)
             m_licensedToStr = license->name();
     }
 }
@@ -705,7 +705,7 @@ QByteArray QnSignHelper::getSignPattern()
     result.append(INITIAL_SIGNATURE_MAGIC);
     result.append(SIGN_TEXT_DELIMITER);
 
-    result.append(qApp->applicationName().toUtf8()).append(" v").append(qApp->applicationVersion().toUtf8()).append(SIGN_TEXT_DELIMITER);
+    result.append(qApp->applicationName().toUtf8()).append(" v").append(QCoreApplication::applicationVersion().toUtf8()).append(SIGN_TEXT_DELIMITER);
 
     QString hid = QLatin1String(qnLicensePool->currentHardwareId());
     if (hid.isEmpty())

@@ -8,8 +8,9 @@
 #include <QtXml/QXmlDefaultHandler>
 
 #include <common/common_globals.h>
-#include <utils/network/aio/aioservice.h>
 #include <utils/network/system_socket.h>
+
+#include "version.h"
 
 using namespace std;
 
@@ -78,6 +79,8 @@ public:
 ////////////////////////////////////////////////////////////
 static const unsigned int READ_BUF_CAPACITY = 64*1024+1;    //max UDP packet size
 
+static UPNPDeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
+
 UPNPDeviceSearcher::UPNPDeviceSearcher( unsigned int discoverTryTimeoutMS )
 :
     m_discoverTryTimeoutMS( discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS ),
@@ -87,6 +90,9 @@ UPNPDeviceSearcher::UPNPDeviceSearcher( unsigned int discoverTryTimeoutMS )
 {
     m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
     m_cacheTimer.start();
+
+    assert(UPNPDeviceSearcherInstance == nullptr);
+    UPNPDeviceSearcherInstance = this;
 }
 
 UPNPDeviceSearcher::~UPNPDeviceSearcher()
@@ -95,6 +101,8 @@ UPNPDeviceSearcher::~UPNPDeviceSearcher()
 
     delete[] m_readBuf;
     m_readBuf = NULL;
+
+    UPNPDeviceSearcherInstance = nullptr;
 }
 
 void UPNPDeviceSearcher::pleaseStop()
@@ -109,12 +117,12 @@ void UPNPDeviceSearcher::pleaseStop()
         TimerManager::instance()->joinAndDeleteTimer( m_timerID );
 
     //since dispatching is stopped, no need to synchronize access to m_socketList
-    for( std::map<QString, QSharedPointer<AbstractDatagramSocket> >::const_iterator
+    for( std::map<QString, SocketReadCtx>::const_iterator
         it = m_socketList.begin();
         it != m_socketList.end();
         ++it )
     {
-        aio::AIOService::instance()->removeFromWatch( it->second, aio::etRead );
+        it->second.sock->cancelAsyncIO( aio::etRead );
     }
     m_socketList.clear();
 
@@ -177,13 +185,6 @@ void UPNPDeviceSearcher::processDiscoveredDevices( UPNPSearchHandler* handlerToU
     }
 }
 
-static UPNPDeviceSearcher* UPNPDeviceSearcherInstance = NULL;
-
-void UPNPDeviceSearcher::initGlobalInstance( UPNPDeviceSearcher* _inst )
-{
-    UPNPDeviceSearcherInstance = _inst;
-}
-
 UPNPDeviceSearcher* UPNPDeviceSearcher::instance()
 {
     return UPNPDeviceSearcherInstance;
@@ -200,46 +201,51 @@ void UPNPDeviceSearcher::onTimer( const quint64& /*timerID*/ )
         m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
 }
 
-void UPNPDeviceSearcher::eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw()
+void UPNPDeviceSearcher::onSomeBytesRead(
+    AbstractCommunicatingSocket* sock,
+    SystemError::ErrorCode errorCode,
+    nx::Buffer* readBuffer,
+    size_t /*bytesRead*/ ) noexcept
 {
-    if( eventType == aio::etError )
+    if( errorCode )
     {
-        QSharedPointer<AbstractDatagramSocket> udpSock;
+        std::shared_ptr<AbstractDatagramSocket> udpSock;
         {
             QMutexLocker lk( &m_mutex );
             //removing socket from m_socketList
-            for( map<QString, QSharedPointer<AbstractDatagramSocket> >::iterator
+            for( map<QString, SocketReadCtx>::iterator
                 it = m_socketList.begin();
                 it != m_socketList.end();
                 ++it )
             {
-                if( it->second.data() == sock ) {
-                    udpSock = it->second;
+                if( it->second.sock.get() == sock )
+                {
+                    udpSock = it->second.sock;
                     m_socketList.erase( it );
                     break;
                 }
             }
         }
-        if( udpSock )
-            aio::AIOService::instance()->removeFromWatch( udpSock, aio::etRead );
+        udpSock->cancelAsyncIO( aio::etRead );
         return;
     }
 
     nx_http::Request foundDeviceReply;
     QString remoteHost;
 
-    AbstractDatagramSocket* udpSock = dynamic_cast<AbstractDatagramSocket*>( sock );
-    Q_ASSERT( udpSock );
+    auto SCOPED_GUARD_FUNC = [this, readBuffer, sock]( UPNPDeviceSearcher* ){
+        readBuffer->resize( 0 );
+        using namespace std::placeholders;
+        sock->readSomeAsync( readBuffer, std::bind( &UPNPDeviceSearcher::onSomeBytesRead, this, sock, _1, readBuffer, _2 ) );
+    };
+
+    std::unique_ptr<UPNPDeviceSearcher, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
     {
-        QMutexLocker lk( &m_mutex );    //locking m_readBuf
-
+        AbstractDatagramSocket* udpSock = static_cast<AbstractDatagramSocket*>(sock);
         //reading socket and parsing UPnP response packet
-        quint16 senderPort;
-        int readed = udpSock->recvFrom( m_readBuf, READ_BUF_CAPACITY, remoteHost, senderPort );
-        if( readed > 0 )
-            m_readBuf[readed] = 0;
-        if( !foundDeviceReply.parse( QByteArray::fromRawData(m_readBuf, readed) ) )
+        remoteHost = udpSock->lastDatagramSourceAddress().address.toString();
+        if( !foundDeviceReply.parse( *readBuffer ) )
             return;
     }
 
@@ -252,11 +258,11 @@ void UPNPDeviceSearcher::eventTriggered( AbstractSocket* sock, aio::EventType ev
         return;
 
     QByteArray uuidStr = uuidHeader->second;
-    if (!uuidStr.startsWith("uuid:"))
+    if( !uuidStr.startsWith( "uuid:" ) )
         return;
-    uuidStr = uuidStr.split(':')[1];
+    uuidStr = uuidStr.split( ':' )[1];
 
-    const QUrl descriptionUrl( QLatin1String(locationHeader->second) );
+    const QUrl descriptionUrl( QLatin1String( locationHeader->second ) );
     uuidStr += descriptionUrl.toString();
 
     startFetchDeviceXml( uuidStr, descriptionUrl, remoteHost );
@@ -266,7 +272,7 @@ void UPNPDeviceSearcher::dispatchDiscoverPackets()
 {
     foreach( QnInterfaceAndAddr iface, getAllIPv4Interfaces() )
     {
-        const QSharedPointer<AbstractDatagramSocket>& sock = getSockByIntf(iface);
+        const std::shared_ptr<AbstractDatagramSocket>& sock = getSockByIntf(iface);
         if( !sock )
             continue;
 
@@ -275,39 +281,42 @@ void UPNPDeviceSearcher::dispatchDiscoverPackets()
         data.append("M-SEARCH * HTTP/1.1\r\n");
         //data.append("Host: 192.168.0.150:1900\r\n");
         data.append("Host: ").append(sock->getLocalAddress().toString()).append("\r\n");
-        data.append("ST:urn:schemas-upnp-org:device:Network Optix Media Server:1\r\n");
+        data.append(lit("ST:urn:schemas-upnp-org:device:%1 Server:1\r\n").arg(lit(QN_ORGANIZATION_NAME)));
         data.append("Man:\"ssdp:discover\"\r\n");
         data.append("MX:3\r\n\r\n");
         sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
     }
 }
 
-QSharedPointer<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const QnInterfaceAndAddr& iface )
+std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const QnInterfaceAndAddr& iface )
 {
     const QString& localAddress = iface.address.toString();
 
-    pair<map<QString, QSharedPointer<AbstractDatagramSocket> >::iterator, bool> p;
+    pair<map<QString, SocketReadCtx>::iterator, bool> p;
     {
         QMutexLocker lk( &m_mutex );
-        p = m_socketList.insert( make_pair( localAddress, QSharedPointer<AbstractDatagramSocket>() ) );
+        p = m_socketList.insert( make_pair( localAddress, SocketReadCtx() ) );
     }
     if( !p.second )
-        return p.first->second;
+        return p.first->second.sock;
 
     //creating new socket
-    QSharedPointer<UDPSocket> sock( new UDPSocket() );
+    std::shared_ptr<UDPSocket> sock( new UDPSocket() );
 
-    p.first->second = sock;
+    using namespace std::placeholders;
+
+    p.first->second.sock = sock;
+    p.first->second.buf.reserve( READ_BUF_CAPACITY );
     if( !sock->setReuseAddrFlag( true ) ||
         !sock->bind( SocketAddress(localAddress, GROUP_PORT) ) ||
         !sock->joinGroup( groupAddress.toString(), iface.address.toString() ) ||
         !sock->setMulticastIF( localAddress ) ||
         !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ) ||
-        !aio::AIOService::instance()->watchSocket( sock, aio::etRead, this ) )
+        !sock->readSomeAsync( &p.first->second.buf, std::bind( &UPNPDeviceSearcher::onSomeBytesRead, this, sock.get(), _1, &p.first->second.buf, _2 ) ) )
     {
         QMutexLocker lk( &m_mutex );
         m_socketList.erase( p.first );
-        return QSharedPointer<AbstractDatagramSocket>();
+        return std::shared_ptr<AbstractDatagramSocket>();
     }
 
     return sock;

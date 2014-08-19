@@ -22,33 +22,23 @@ class QnBusinessRulesActualModel: public QnBusinessRulesViewModel
 public:
     QnBusinessRulesActualModel(QObject *parent = 0);
 
-    bool isLoaded() const;
-
+    void reset();
 signals:
     void beforeModelChanged();
     void afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);
     
-    void businessRuleChanged(QnId id);
-    void businessRuleDeleted(QnId id);
+    void businessRuleChanged(const QUuid &id);
+    void businessRuleDeleted(const QUuid &id);
 public slots:
-    /*
-    * Load data from DB
-    */
-    void reloadData();
-
     void saveRule(int row);
 private slots:
-    void at_resources_received( int reqID, ec2::ErrorCode errorCode, const QnBusinessEventRuleList& rules );
-    void at_resources_saved( int handle, ec2::ErrorCode errorCode, QnBusinessEventRulePtr rule );
+    void at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnBusinessEventRulePtr &rule );
 
     void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);
-    void at_message_ruleDeleted(QnId id);
-    void at_message_ruleReset(QnBusinessEventRuleList rules);
+    void at_message_ruleDeleted(const QUuid &id);
+    void at_message_ruleReset(const QnBusinessEventRuleList &rules);
 
 private:
-    int m_loadingHandle;
-    bool m_isDataLoaded; // data sync with DB
-
     QMap<int, QnBusinessRuleViewModel*> m_savingRules;
 };
 

@@ -2,14 +2,19 @@
 #include "ui_server_updates_widget.h"
 
 #include <QtWidgets/QMessageBox>
+#include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
+#include <QtCore/QTimer>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <common/common_module.h>
 
 #include <ui/models/sorted_server_updates_model.h>
 #include <ui/dialogs/file_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/build_number_dialog.h>
+#include <ui/dialogs/update_url_dialog.h>
 #include <ui/delegates/update_status_item_delegate.h>
 
 #include <utils/common/software_version.h>
@@ -17,22 +22,27 @@
 
 #include <version.h>
 
+namespace {
+    const int longInstallWarningTimeout = 2 * 60 * 1000; // 2 minutes
+}
+
 QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::QnServerUpdatesWidget),
-    m_specificBuildCheck(false)
+    m_minimalMode(false),
+    m_extraMessageTimer(new QTimer(this))
 {
     ui->setupUi(this);
 
     m_updateTool = new QnMediaServerUpdateTool(this);
     m_updatesModel = new QnServerUpdatesModel(this);
 
-    QnSortedServerUpdatesModel *model = new QnSortedServerUpdatesModel(this);
-    model->setSourceModel(m_updatesModel);
-    model->sort(0); // the column does not matter because the model uses column-independent sorting
+    QnSortedServerUpdatesModel *sortedUpdatesModel = new QnSortedServerUpdatesModel(this);
+    sortedUpdatesModel->setSourceModel(m_updatesModel);
+    sortedUpdatesModel->sort(0); // the column does not matter because the model uses column-independent sorting
 
-    ui->tableView->setModel(model);
+    ui->tableView->setModel(sortedUpdatesModel);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::ResourceNameColumn, QHeaderView::Stretch);
     // TODO: #dklychkov fix progress bar painting and uncomment the line below
@@ -46,6 +56,9 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     connect(m_updateTool,       &QnMediaServerUpdateTool::stateChanged,         this,           &QnServerUpdatesWidget::updateUi);
     connect(m_updateTool,       &QnMediaServerUpdateTool::progressChanged,      ui->updateProgessBar,   &QProgressBar::setValue);
     connect(m_updateTool,       &QnMediaServerUpdateTool::peerChanged,          this,           &QnServerUpdatesWidget::at_updateTool_peerChanged);
+
+    m_extraMessageTimer->setInterval(longInstallWarningTimeout);
+    connect(m_extraMessageTimer, &QTimer::timeout, this, &QnServerUpdatesWidget::at_extraMessageTimer_timeout);
 
     m_previousToolState = m_updateTool->state();
 
@@ -63,8 +76,37 @@ bool QnServerUpdatesWidget::isUpdating() const {
     return m_updateTool->isUpdating();
 }
 
+void QnServerUpdatesWidget::setTargets(const QSet<QUuid> &targets) {
+    m_updatesModel->setTargets(targets);
+    m_updateTool->setTargets(targets);
+}
+
+QnMediaServerUpdateTool *QnServerUpdatesWidget::updateTool() const {
+    return m_updateTool;
+}
+
+bool QnServerUpdatesWidget::isMinimalMode() const {
+    return m_minimalMode;
+}
+
+void QnServerUpdatesWidget::setMinimalMode(bool minimalMode) {
+    m_minimalMode = minimalMode;
+    ui->topButtonBar->setVisible(!m_minimalMode);
+}
+
+void QnServerUpdatesWidget::updateFromSettings() {
+    if (m_updateTool->state() != QnMediaServerUpdateTool::Idle)
+        return;
+
+    m_updateTool->reset();
+    m_updatesModel->setTargets(QSet<QUuid>());
+    updateUi();
+}
+
 void QnServerUpdatesWidget::at_checkForUpdatesButton_clicked() {
+    m_updateTool->setDenyMajorUpdates(false);
     m_updateTool->checkForUpdates();
+    m_updatesModel->setTargets(m_updateTool->actualTargets());
 }
 
 void QnServerUpdatesWidget::at_installSpecificBuildButton_clicked() {
@@ -72,24 +114,26 @@ void QnServerUpdatesWidget::at_installSpecificBuildButton_clicked() {
     if (dialog.exec() == QDialog::Rejected)
         return;
 
-    m_specificBuildCheck = true;
-    QnSoftwareVersion version(lit(QN_APPLICATION_VERSION));
+    m_updateTool->setDenyMajorUpdates(true);
+    QnSoftwareVersion version = qnCommon->engineVersion();
     m_updateTool->checkForUpdates(QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber()));
+    m_updatesModel->setTargets(m_updateTool->actualTargets());
 }
 
 void QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked() {
-    QString sourceDir = QnFileDialog::getExistingDirectory(this, tr("Select updates folder..."), QString(), QnCustomFileDialog::directoryDialogOptions());
-    if (sourceDir.isEmpty())
+    QString fileName = QnFileDialog::getOpenFileName(this, tr("Select Update File..."), QString(), tr("Update Files (*.zip)"), 0, QnCustomFileDialog::fileDialogOptions());
+    if (fileName.isEmpty())
         return;
 
-    m_updateTool->checkForUpdates(sourceDir);
+    m_updateTool->setDenyMajorUpdates(false);
+    m_updateTool->checkForUpdates(fileName);
+    m_updatesModel->setTargets(m_updateTool->actualTargets());
 }
 
 void QnServerUpdatesWidget::at_updateButton_clicked() {
     bool haveOffline = false;
-    QList<QnMediaServerResourcePtr> servers = m_updatesModel->servers();
-    foreach (const QnMediaServerResourcePtr &resource, servers) {
-        if (resource->getStatus() == QnResource::Offline) {
+    foreach (const QnMediaServerResourcePtr &resource, m_updateTool->actualTargets()) {
+        if (resource->getStatus() == Qn::Offline) {
             haveOffline = true;
             break;
         }
@@ -108,89 +152,88 @@ void QnServerUpdatesWidget::at_updateTool_peerChanged(const QUuid &peerId) {
     m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(peerId));
 }
 
+void QnServerUpdatesWidget::at_extraMessageTimer_timeout() {
+    if (m_updateTool->state() == QnMediaServerUpdateTool::InstallingUpdate)
+        ui->extraMessageLabel->show();
+}
+
 void QnServerUpdatesWidget::updateUi() {
     bool checkingForUpdates = false;
     bool applying = false;
     bool cancellable = false;
     bool startUpdate = false;
+    bool infiniteProgress = false;
+    bool installing = false;
+
+    foreach (const QnMediaServerResourcePtr &server, m_updateTool->actualTargets())
+        m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(server->getId()));
 
     switch (m_updateTool->state()) {
     case QnMediaServerUpdateTool::Idle:
-        if (m_previousToolState <= QnMediaServerUpdateTool::CheckingForUpdates) {
+        if (m_previousToolState == QnMediaServerUpdateTool::CheckingForUpdates) {
             switch (m_updateTool->updateCheckResult()) {
             case QnMediaServerUpdateTool::UpdateFound:
-                if (m_specificBuildCheck) {
-                    m_specificBuildCheck = false;
-
-                    QnSoftwareVersion currentVersion(QN_APPLICATION_VERSION);
-                    QnSoftwareVersion foundVersion = m_updateTool->targetVersion();
-
-                    if (currentVersion.major() != foundVersion.major() || currentVersion.minor() != foundVersion.minor()) {
-                        QMessageBox::critical(this, tr("Wrong build number"), tr("There is no such build on the update server"));
+                if (!m_updateTool->targetVersion().isNull() && !m_minimalMode) { // null version means we've got here first time after the dialog has been showed
+                    QString message = tr("Do you want to update your system to version %1?").arg(m_updateTool->targetVersion().toString());
+                    switch (QDateTime::currentDateTime().date().dayOfWeek()) {
+                    case Qt::Thursday:
+                    case Qt::Friday:
+                    case Qt::Saturday:
+                    case Qt::Sunday:
+                        message += lit("\n") + tr("As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week.");
+                        break;
+                    default:
                         break;
                     }
-                }
 
-                if (!m_updateTool->targetVersion().isNull()) { // null version means we've got here first time after the dialog has been showed
-                    int result = QMessageBox::question(this, tr("Update is found"),
-                                                       tr("Do you want to update your system to version %1?").arg(m_updateTool->targetVersion().toString()),
-                                                       QMessageBox::Yes | QMessageBox::No);
+                    int result = QMessageBox::question(this, tr("Update is found"), message, QMessageBox::Yes | QMessageBox::No);
                     startUpdate = (result == QMessageBox::Yes);
                 }
                 break;
             case QnMediaServerUpdateTool::InternetProblem: {
-                int result = QMessageBox::warning(this,
-                                                  tr("Check for updates failed"),
-                                                  tr("Cannot check for updates via the Internet.\n"
-                                                     "Do you want to create a download helper to download updates on the computer which is connected to the internet?"),
-                                                  QMessageBox::Yes, QMessageBox::No);
-                if (result == QMessageBox::Yes)
-                    createUpdatesDownloader();
-
+                QnUpdateUrlDialog dialog;
+                dialog.setUpdatesUrl(m_updateTool->generateUpdatePackageUrl().toString());
+                dialog.exec();
                 break;
             }
             case QnMediaServerUpdateTool::NoNewerVersion:
-                QMessageBox::information(this, tr("Update is not found"), tr("All component in your system are already up to date."));
+                if (!m_minimalMode)
+                    QMessageBox::information(this, tr("Update is not found"), m_updateTool->resultString());
                 break;
             case QnMediaServerUpdateTool::NoSuchBuild:
-                QMessageBox::critical(this, tr("Wrong build number"), tr("There is no such build on the update server"));
+                if (!m_minimalMode)
+                    QMessageBox::critical(this, tr("Wrong build number"), m_updateTool->resultString());
                 break;
             case QnMediaServerUpdateTool::UpdateImpossible:
-                QMessageBox::critical(this, tr("Update is impossible"), tr("Cannot start update.\nUpdate for one or more servers were not found."));
+                if (!m_minimalMode)
+                    QMessageBox::critical(this, tr("Update is impossible"), m_updateTool->resultString());
+                break;
+            case QnMediaServerUpdateTool::BadUpdateFile:
+                if (!m_minimalMode)
+                    QMessageBox::critical(this, tr("Update check failed"), m_updateTool->resultString());
                 break;
             }
-        } else {
+        } else if (m_previousToolState > QnMediaServerUpdateTool::CheckingForUpdates) {
             switch (m_updateTool->updateResult()) {
             case QnMediaServerUpdateTool::UpdateSuccessful:
-                QMessageBox::information(this,
-                                         tr("Update is successful"),
-                                         tr("Update has been successfully finished.\n"
-                                            "Client will be restarted and updated."));
+                if (!m_minimalMode) {
+                    QMessageBox::information(this,
+                                             tr("Update is successfull"),
+                                             tr("Update has been successfully finished.\n"
+                                                "Client will be restarted and updated."));
+                }
                 break;
             case QnMediaServerUpdateTool::Cancelled:
-                QMessageBox::information(this,
-                                         tr("Update cancelled"),
-                                         tr("Update has been cancelled."));
+                if (!m_minimalMode)
+                    QMessageBox::information(this, tr("Update cancelled"), m_updateTool->resultString());
                 break;
             case QnMediaServerUpdateTool::LockFailed:
-                QMessageBox::critical(this,
-                                      tr("Update failed"),
-                                      tr("Someone has already started an update."));
-                break;
             case QnMediaServerUpdateTool::DownloadingFailed:
-                QMessageBox::critical(this,
-                                      tr("Update failed"),
-                                      tr("Could not download updates."));
-                break;
             case QnMediaServerUpdateTool::UploadingFailed:
-                QMessageBox::critical(this,
-                                      tr("Update failed"),
-                                      tr("Could not upload updates to servers."));
-                break;
             case QnMediaServerUpdateTool::InstallationFailed:
-                QMessageBox::critical(this,
-                                      tr("Update failed"),
-                                      tr("Could not install updates on one or more servers."));
+            case QnMediaServerUpdateTool::RestInstallationFailed:
+                if (!m_minimalMode)
+                    QMessageBox::critical(this, tr("Update failed"), m_updateTool->resultString());
                 break;
             }
         }
@@ -203,6 +246,11 @@ void QnServerUpdatesWidget::updateUi() {
         cancellable = true;
         ui->updateStateLabel->setText(tr("Downloading updates"));
         break;
+    case QnMediaServerUpdateTool::InstallingToIncompatiblePeers:
+        applying = true;
+        cancellable = true;
+        ui->updateStateLabel->setText(tr("Installing udates to incompatible servers"));
+        break;
     case QnMediaServerUpdateTool::UploadingUpdate:
         applying = true;
         cancellable = true;
@@ -210,29 +258,35 @@ void QnServerUpdatesWidget::updateUi() {
         break;
     case QnMediaServerUpdateTool::InstallingUpdate:
         applying = true;
+        infiniteProgress = true;
+        installing = true;
         ui->updateStateLabel->setText(tr("Installing updates"));
         break;
     default:
         break;
     }
 
-    foreach (const QnMediaServerResourcePtr &server, m_updatesModel->servers())
-        m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(server->getId()));
-
-    ui->progressWidget->setVisible(checkingForUpdates);
-
     ui->cancelButton->setVisible(applying);
     ui->cancelButton->setEnabled(cancellable);
     ui->updateStateWidget->setVisible(applying);
+    ui->progressWidget->setVisible(checkingForUpdates);
+    ui->progressIndicator->setVisible(infiniteProgress);
+    ui->updateProgessBar->setVisible(!infiniteProgress);
+    ui->checkForUpdatesButton->setEnabled(!applying && !checkingForUpdates);
+    ui->installSpecificBuildButton->setEnabled(!applying && !checkingForUpdates);
+    ui->updateFromLocalSourceButton->setEnabled(!applying && !checkingForUpdates);
 
     m_previousToolState = m_updateTool->state();
 
+    if (installing) {
+        m_extraMessageTimer->start();
+    } else {
+        ui->extraMessageLabel->hide();
+        m_extraMessageTimer->stop();
+    }
+
     if (startUpdate)
         m_updateTool->updateServers();
-}
-
-void QnServerUpdatesWidget::createUpdatesDownloader() {
-
 }
 
 bool QnServerUpdatesWidget::confirm() {

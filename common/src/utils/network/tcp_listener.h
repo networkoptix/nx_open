@@ -25,6 +25,12 @@ public:
     explicit QnTcpListener(const QHostAddress& address, int port, int maxConnections = 1000);
     virtual ~QnTcpListener();
 
+    //!Bind to local address:port, specified in constructor
+    /*!
+        \return \a false if failed to bind
+    */
+    bool bindToLocalAddress();
+
     void updatePort(int newPort);
     void enableSSLMode();
 

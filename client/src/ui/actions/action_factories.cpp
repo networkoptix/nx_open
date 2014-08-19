@@ -23,7 +23,7 @@
 #include <ui/workbench/workbench_layout.h>
 
 QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnActionParameters &, QObject *parent) {
-    QnLayoutResourceList layouts = resourcePool()->getResourcesWithParentId(QnId()).filtered<QnLayoutResource>(); /* Multi-videos will go here. */
+    QnLayoutResourceList layouts = resourcePool()->getResourcesWithParentId(QUuid()).filtered<QnLayoutResource>(); /* Multi-videos will go here. */
     if(context()->user())
         layouts.append(resourcePool()->getResourcesWithParentId(context()->user()->getId()).filtered<QnLayoutResource>());
     

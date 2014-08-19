@@ -3,7 +3,6 @@
 #include <QtCore/QFileInfo>
 
 #include "utils/network/tcp_connection_priv.h"
-#include "rest/server/rest_server.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
 #include "api/serializer/serializer.h"
@@ -39,7 +38,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
     else {
         resource= qnResPool->getResourceByUniqId(resourceId);
         if (!resource) {
-            resource= qnResPool->getResourceById(resourceId);
+            resource= qnResPool->getResourceById(QUuid(resourceId));
             if (!resource)
                 errStr = tr("Resource with id '%1' not found \n").arg(resourceId);
         }
@@ -74,8 +73,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
     return CODE_OK;
 }
 
-int QnExternalBusinessEventRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnExternalBusinessEventRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
 {
-    Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }

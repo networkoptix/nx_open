@@ -238,6 +238,7 @@ android-client/**/*.prefs
 android-client/**/gen/*
 
 ios-client/build
+ios-client/stage
 ios-client/dist
 ios-client/target
 ios-client/ihdwitness.xcworkspace/xcuserdata
@@ -277,7 +278,10 @@ image_library_plugin/x64
 image_library_plugin/arm
 
 
-nx_sdk/nx_sdk
+nx_sdk/nx_sdk 
+holepuncher/x86
+holepuncher/x64
+holepuncher/arm
 
 
 libonvif/.build/

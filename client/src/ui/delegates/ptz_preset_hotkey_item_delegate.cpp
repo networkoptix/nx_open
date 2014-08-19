@@ -45,8 +45,9 @@ QWidget *QnPtzPresetHotkeyItemDelegate::createEditor(QWidget *parent, const QSty
     QnCharComboBox *result = new QnCharComboBox(parent);
 
     result->addItem(tr("None"), -1);
-    for(int i = 0; i <= 9; i++)
+    for(int i = 1; i <= 9; i++)
         result->addItem(QString::number(i), i);
+    result->addItem(QString::number(0), 0);
     
     /* Open the popup after geometry adjustments. */
     QMetaObject::invokeMethod(result, "showPopup", Qt::QueuedConnection);

@@ -11,32 +11,17 @@ extern "C"
 #include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
 
-
-QnId QnCameraTimePeriod::getServerId() const
+QnCameraHistory::QnCameraHistory():
+    m_mutex(QMutex::Recursive)
 {
-    QnId id;
-
-    QnResourcePtr resource = qnResPool->getResourceById(mediaServerGuid);
-    if (resource)
-        id = resource->getId();
-
-    return id;
 }
 
-QnCameraHistory::QnCameraHistory(): m_mutex(QMutex::Recursive)
-{
-
+QString QnCameraHistory::getCameraUniqueId() const {
+    return m_cameraUniqueId;
 }
 
-
-QString QnCameraHistory::getPhysicalId() const
-{
-    return m_physicalId;
-}
-
-void QnCameraHistory::setPhysicalId(const QString& physicalId)
-{
-    m_physicalId = physicalId;
+void QnCameraHistory::setCameraUniqueId(const QString &cameraUniqueId) {
+    m_cameraUniqueId = cameraUniqueId;
 }
 
 QnCameraTimePeriodList QnCameraHistory::getOnlineTimePeriods() const
@@ -46,13 +31,13 @@ QnCameraTimePeriodList QnCameraHistory::getOnlineTimePeriods() const
     for (QnCameraTimePeriodList::const_iterator itr = m_fullTimePeriods.constBegin(); itr != m_fullTimePeriods.constEnd(); ++itr)
     {
         QnResourcePtr resource = qnResPool->getResourceById(itr->mediaServerGuid);
-        if (resource && resource->getStatus() == QnResource::Online)
+        if (resource && resource->getStatus() == Qn::Online)
             result << *itr;        
     }
     return result;
 }
 
-QnCameraTimePeriodList::const_iterator QnCameraHistory::getMediaServerOnTimeItr(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, bool searchForward)
+QnCameraTimePeriodList::const_iterator QnCameraHistory::getMediaServerOnTimeItr(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, bool searchForward) const
 {
 
     if (timePeriods.isEmpty())
@@ -65,7 +50,22 @@ QnCameraTimePeriodList::const_iterator QnCameraHistory::getMediaServerOnTimeItr(
     return itr;
 }
 
-QnMediaServerResourcePtr QnCameraHistory::getMediaServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod, bool allowOfflineServers)
+QnMediaServerResourcePtr QnCameraHistory::getMediaServerOnTime(qint64 timestamp, bool searchForward, bool allowOfflineServers) const
+{
+    QMutexLocker lock(&m_mutex);
+    QnCameraTimePeriodList timePeriods = allowOfflineServers ? m_fullTimePeriods : getOnlineTimePeriods();
+
+    QnCameraTimePeriodList::const_iterator itr;
+    if (timestamp == DATETIME_NOW && !timePeriods.isEmpty())
+        itr = timePeriods.constEnd()-1;
+    else
+        itr = getMediaServerOnTimeItr(timePeriods, timestamp, searchForward);
+    if (itr == timePeriods.constEnd())
+        return QnMediaServerResourcePtr();
+    return qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(itr->mediaServerGuid));
+}
+
+QnMediaServerResourcePtr QnCameraHistory::getMediaServerAndPeriodOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod, bool allowOfflineServers)
 {
     QMutexLocker lock(&m_mutex);
     QnCameraTimePeriodList timePeriods = allowOfflineServers ? m_fullTimePeriods : getOnlineTimePeriods();
@@ -78,10 +78,30 @@ QnMediaServerResourcePtr QnCameraHistory::getMediaServerOnTime(qint64 timestamp,
     if (itr == timePeriods.constEnd())
         return QnMediaServerResourcePtr();
     currentPeriod = *itr;
-    return qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(itr->getServerId()));
+    return qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(itr->mediaServerGuid));
 }
 
-QnMediaServerResourcePtr QnCameraHistory::getNextMediaServerFromTime(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, QnTimePeriod& currentPeriod)
+QnMediaServerResourcePtr QnCameraHistory::getNextMediaServerFromTime(const QnCameraTimePeriodList& timePeriods, qint64 timestamp) const
+{
+    QnCameraTimePeriodList::const_iterator itr = getMediaServerOnTimeItr(timePeriods, timestamp, true);
+    if (itr == timePeriods.constEnd())
+        return QnMediaServerResourcePtr();
+    ++itr;
+    if (itr == timePeriods.constEnd())
+        return QnMediaServerResourcePtr();
+    return qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(itr->mediaServerGuid));
+}
+
+QnMediaServerResourcePtr QnCameraHistory::getPrevMediaServerFromTime(const QnCameraTimePeriodList& timePeriods, qint64 timestamp) const
+{
+    QnCameraTimePeriodList::const_iterator itr = getMediaServerOnTimeItr(timePeriods, timestamp, false);
+    if (itr == timePeriods.constEnd() || itr == timePeriods.constBegin())
+        return QnMediaServerResourcePtr();
+    --itr;
+    return qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(itr->mediaServerGuid));
+}
+
+QnMediaServerResourcePtr QnCameraHistory::getNextMediaServerAndPeriodFromTime(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, QnTimePeriod& currentPeriod)
 {
     QnCameraTimePeriodList::const_iterator itr = getMediaServerOnTimeItr(timePeriods, timestamp, true);
     if (itr == timePeriods.constEnd())
@@ -90,10 +110,10 @@ QnMediaServerResourcePtr QnCameraHistory::getNextMediaServerFromTime(const QnCam
     if (itr == timePeriods.constEnd())
         return QnMediaServerResourcePtr();
     currentPeriod = *itr;
-    return qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(itr->getServerId()));
+    return qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(itr->mediaServerGuid));
 }
 
-QnMediaServerResourcePtr QnCameraHistory::getPrevMediaServerFromTime(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, QnTimePeriod& currentPeriod)
+QnMediaServerResourcePtr QnCameraHistory::getPrevMediaServerAndPeriodFromTime(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, QnTimePeriod& currentPeriod)
 {
     QnCameraTimePeriodList::const_iterator itr = getMediaServerOnTimeItr(timePeriods, timestamp, false);
     if (itr == timePeriods.constEnd() || itr == timePeriods.constBegin())
@@ -102,14 +122,22 @@ QnMediaServerResourcePtr QnCameraHistory::getPrevMediaServerFromTime(const QnCam
     currentPeriod = *itr;
     qDebug() << "switch to previous video server. prevTime=" << QDateTime::fromMSecsSinceEpoch(timestamp).toString() << "newPeriod=" <<
         QDateTime::fromMSecsSinceEpoch(currentPeriod.startTimeMs).toString() << "-" << QDateTime::fromMSecsSinceEpoch(currentPeriod.endTimeMs()).toString();
-    return qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(itr->getServerId()));
+    return qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(itr->mediaServerGuid));
 }
 
-QnMediaServerResourcePtr QnCameraHistory::getNextMediaServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod)
+
+QnMediaServerResourcePtr QnCameraHistory::getNextMediaServerOnTime(qint64 timestamp, bool searchForward) const
 {
     QMutexLocker lock(&m_mutex);
     QnCameraTimePeriodList timePeriods = getOnlineTimePeriods();
-    return searchForward ? getNextMediaServerFromTime(timePeriods, timestamp, currentPeriod) : getPrevMediaServerFromTime(timePeriods, timestamp, currentPeriod);
+    return searchForward ? getNextMediaServerFromTime(timePeriods, timestamp) : getPrevMediaServerFromTime(timePeriods, timestamp);
+}
+
+QnMediaServerResourcePtr QnCameraHistory::getNextMediaServerAndPeriodOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod)
+{
+    QMutexLocker lock(&m_mutex);
+    QnCameraTimePeriodList timePeriods = getOnlineTimePeriods();
+    return searchForward ? getNextMediaServerAndPeriodFromTime(timePeriods, timestamp, currentPeriod) : getPrevMediaServerAndPeriodFromTime(timePeriods, timestamp, currentPeriod);
 }
 
 void QnCameraHistory::addTimePeriod(const QnCameraTimePeriod& period)
@@ -138,9 +166,9 @@ qint64 QnCameraHistory::getMinTime() const
     return m_fullTimePeriods.first().startTimeMs;
 }
 
-QnResourceList QnCameraHistory::getAllCameraServersInternal(const QnTimePeriod& timePeriod, const QnCameraTimePeriodList cameraHistory)
+QnMediaServerResourceList QnCameraHistory::getAllCameraServersInternal(const QnTimePeriod& timePeriod, const QnCameraTimePeriodList cameraHistory) const
 {
-    QSet<QnResourcePtr> rez;
+    QSet<QnMediaServerResourcePtr> rez;
 
     QMutexLocker lock (&m_mutex);
 
@@ -151,7 +179,7 @@ QnResourceList QnCameraHistory::getAllCameraServersInternal(const QnTimePeriod& 
 
     for (QnCameraTimePeriodList::const_iterator itr = itrStart; itr < itrEnd; ++itr)
     {
-        QnResourcePtr mServer = qnResPool->getResourceById(itr->getServerId());
+        QnMediaServerResourcePtr mServer = qnResPool->getResourceById(itr->mediaServerGuid).dynamicCast<QnMediaServerResource>();
         if (mServer)
             rez.insert(mServer);
     }
@@ -159,20 +187,17 @@ QnResourceList QnCameraHistory::getAllCameraServersInternal(const QnTimePeriod& 
     return rez.toList();
 }
 
-QnResourceList QnCameraHistory::getAllCameraServers(const QnTimePeriod& timePeriod)
-{
+QnMediaServerResourceList QnCameraHistory::getAllCameraServers(const QnTimePeriod& timePeriod) const {
     return getAllCameraServersInternal(timePeriod, m_fullTimePeriods);
 }
 
-QnResourceList QnCameraHistory::getOnlineCameraServers(const QnTimePeriod& timePeriod)
-{
+QnMediaServerResourceList QnCameraHistory::getOnlineCameraServers(const QnTimePeriod& timePeriod) const {
     return getAllCameraServersInternal(timePeriod, getOnlineTimePeriods());
 }
 
-QnResourceList QnCameraHistory::getAllCameraServers() {
+QnMediaServerResourceList QnCameraHistory::getAllCameraServers() const {
     return getAllCameraServers(QnTimePeriod(getMinTime(), -1));
 }
-
 
 // ------------------- CameraHistory Pool ------------------------
 
@@ -192,59 +217,57 @@ QnCameraHistoryPool* QnCameraHistoryPool::instance()
     return QnCameraHistoryPool_instance();
 }
 
-QnCameraHistoryPtr QnCameraHistoryPool::getCameraHistory(const QString& physicalId)
-{
+QnCameraHistoryPtr QnCameraHistoryPool::getCameraHistory(const QnResourcePtr& camera) const {
     QMutexLocker lock(&m_mutex);
-    return m_cameraHistory.value(physicalId);
+    return m_cameraHistory.value(camera->getUniqueId());
 }
 
-QnResourceList QnCameraHistoryPool::getCurrentServer(const QnNetworkResourcePtr &camera)
+QnMediaServerResourceList QnCameraHistoryPool::getCurrentServer(const QnNetworkResourcePtr &camera) const
 {
-    QnResourceList rez;
-    QnResourcePtr mServer = qnResPool->getResourceById(camera->getParentId());
-    if (mServer)
-        rez << mServer;
-    return  rez;
+    QnMediaServerResourceList rez;
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    if (server)
+        rez << server;
+    return rez;
 }
 
-QnResourceList QnCameraHistoryPool::getAllCameraServers(const QnNetworkResourcePtr &camera) 
+QnMediaServerResourceList QnCameraHistoryPool::getAllCameraServers(const QnNetworkResourcePtr &camera) const
 {
-    QnCameraHistoryPtr history = getCameraHistory(camera->getPhysicalId());
+    QnCameraHistoryPtr history = getCameraHistory(camera);
     return history ? history->getAllCameraServers() : getCurrentServer(camera);
 }
 
-QnResourceList QnCameraHistoryPool::getAllCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod)
+QnMediaServerResourceList QnCameraHistoryPool::getAllCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod) const
 {
-    QnCameraHistoryPtr history = getCameraHistory(camera->getPhysicalId());
+    QnCameraHistoryPtr history = getCameraHistory(camera);
     return history ? history->getAllCameraServers(timePeriod) : getCurrentServer(camera);
 }
 
-QnResourceList QnCameraHistoryPool::getOnlineCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod)
+QnMediaServerResourceList QnCameraHistoryPool::getOnlineCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod) const
 {
-    QnCameraHistoryPtr history = getCameraHistory(camera->getPhysicalId());
+    QnCameraHistoryPtr history = getCameraHistory(camera);
     return history ? history->getOnlineCameraServers(timePeriod) : getCurrentServer(camera);
 }
 
-qint64 QnCameraHistoryPool::getMinTime(const QnNetworkResource* camera)
+qint64 QnCameraHistoryPool::getMinTime(const QnNetworkResourcePtr &camera)
 {
     if (!camera)
         return AV_NOPTS_VALUE;
-    QnCameraHistoryPtr history = getCameraHistory(camera->getPhysicalId());
+
+    QnCameraHistoryPtr history = getCameraHistory(camera);
     if (!history)
         return AV_NOPTS_VALUE;
 
     return history->getMinTime();
 }
 
-void QnCameraHistoryPool::addCameraHistory(QnCameraHistoryPtr history)
+void QnCameraHistoryPool::addCameraHistory(const QnCameraHistoryPtr &history)
 {
     QnCameraHistoryPtr oldHistory, newHistory;
-    QnTimePeriod emptyTimePeriod;
-
     {
         QMutexLocker lock(&m_mutex);
         
-        QString key = history->getPhysicalId();
+        QString key = history->getCameraUniqueId();
         
         oldHistory = m_cameraHistory.value(key);
         newHistory = history;
@@ -252,8 +275,8 @@ void QnCameraHistoryPool::addCameraHistory(QnCameraHistoryPtr history)
         m_cameraHistory[key] = history;
     }
     
-    if(!oldHistory || (oldHistory->getMediaServerOnTime(DATETIME_NOW, true, emptyTimePeriod, true) != newHistory->getMediaServerOnTime(DATETIME_NOW, true, emptyTimePeriod, true))) {
-        QnNetworkResourcePtr camera = qnResPool->getNetResourceByPhysicalId(history->getPhysicalId());
+    if(!oldHistory || (oldHistory->getMediaServerOnTime(DATETIME_NOW, true, true) != newHistory->getMediaServerOnTime(DATETIME_NOW, true, true))) {
+        QnNetworkResourcePtr camera = qnResPool->getResourceByUniqId(history->getCameraUniqueId()).dynamicCast<QnNetworkResource>();
         if (camera)
             emit currentCameraChanged(camera);
     }
@@ -263,33 +286,32 @@ void QnCameraHistoryPool::addCameraHistoryItem(const QnCameraHistoryItem &histor
 {
     QnResourcePtr oldServer, newServer;
     QnCameraHistoryPtr cameraHistory;
-    QnTimePeriod emptyTimePeriod;
 
     {
         QMutexLocker lock(&m_mutex);
 
-        CameraHistoryMap::const_iterator iter = m_cameraHistory.find(historyItem.physicalId);
+        CameraHistoryMap::const_iterator iter = m_cameraHistory.find(historyItem.cameraUniqueId);
 
         if (iter != m_cameraHistory.constEnd()) {
             cameraHistory = iter.value();
 
-            oldServer = cameraHistory->getMediaServerOnTime(DATETIME_NOW, true, emptyTimePeriod, true);
+            oldServer = cameraHistory->getMediaServerOnTime(DATETIME_NOW, true, true);
         } else {
             cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
-            cameraHistory->setPhysicalId(historyItem.physicalId);
+            cameraHistory->setCameraUniqueId(historyItem.cameraUniqueId);
 
             oldServer = QnResourcePtr();
         }
         QnCameraTimePeriod timePeriod(historyItem.timestamp, -1, historyItem.mediaServerGuid);
         cameraHistory->addTimePeriod(timePeriod);
 
-        m_cameraHistory[historyItem.physicalId] = cameraHistory;
+        m_cameraHistory[historyItem.cameraUniqueId] = cameraHistory;
         
-        newServer = cameraHistory->getMediaServerOnTime(DATETIME_NOW, true, emptyTimePeriod, true);
+        newServer = cameraHistory->getMediaServerOnTime(DATETIME_NOW, true, true);
     }
 
     if(oldServer != newServer) {
-        QnNetworkResourcePtr camera = qnResPool->getNetResourceByPhysicalId(historyItem.physicalId);
+        QnNetworkResourcePtr camera = qnResPool->getResourceByUniqId(historyItem.cameraUniqueId).dynamicCast<QnNetworkResource>();
         if (camera)
             emit currentCameraChanged(camera);
     }

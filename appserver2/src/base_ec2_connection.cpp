@@ -5,10 +5,16 @@
 
 #include "base_ec2_connection.h"
 
+#include <utils/common/concurrent.h>
+
+#include "ec2_thread_pool.h"
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 #include "common/common_module.h"
 #include "transaction/transaction_message_bus.h"
+#include "managers/time_manager.h"
+#include "nx_ec/data/api_data.h"
+
 
 namespace ec2
 {
@@ -28,10 +34,19 @@ namespace ec2
         m_layoutManager( new QnLayoutManager<T>(m_queryProcessor, resCtx) ),
         m_videowallManager( new QnVideowallManager<T>(m_queryProcessor, resCtx) ),
         m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) ),
-        m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) )
+        m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) ),
+        m_miscManager( new QnMiscManager<T>(m_queryProcessor) ),
+        m_discoveryManager( new QnDiscoveryManager<T>(m_queryProcessor) )
     {
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerFound, this, &BaseEc2Connection<T>::remotePeerFound, Qt::DirectConnection);
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,  this, &BaseEc2Connection<T>::remotePeerLost, Qt::DirectConnection);
+
+        connect (TimeSynchronizationManager::instance(), &TimeSynchronizationManager::primaryTimeServerSelectionRequired,
+                 this, &BaseEc2Connection<T>::primaryTimeServerSelectionRequired,
+                 Qt::DirectConnection );
+        connect (TimeSynchronizationManager::instance(), &TimeSynchronizationManager::timeChanged,
+                 this, &BaseEc2Connection<T>::timeChanged,
+                 Qt::DirectConnection );
 
         m_notificationManager.reset(
             new ECConnectionNotificationManager(
@@ -46,7 +61,9 @@ namespace ec2
                 m_layoutManager.get(),
                 m_videowallManager.get(),
                 m_storedFileManager.get(),
-                m_updatesManager.get() ) );
+                m_updatesManager.get(),
+                m_miscManager.get(),
+                m_discoveryManager.get() ) );
     }
 
     template<class T>
@@ -110,6 +127,18 @@ namespace ec2
     }
 
     template<class T>
+    AbstractMiscManagerPtr BaseEc2Connection<T>::getMiscManager()
+    {
+        return m_miscManager;
+    }
+
+    template<class T>
+    AbstractDiscoveryManagerPtr BaseEc2Connection<T>::getDiscoveryManager()
+    {
+        return m_discoveryManager;
+    }
+
+    template<class T>
     int BaseEc2Connection<T>::setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
@@ -120,7 +149,7 @@ namespace ec2
         auto tran = prepareTransaction( command, value );
 
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1) );
+        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1) );
 
         return reqID;
     }
@@ -129,39 +158,64 @@ namespace ec2
     int BaseEc2Connection<T>::getCurrentTime( impl::CurrentTimeHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiTimeData& currentTime) {
-            qint64 outData = 0;
-            if( errorCode == ErrorCode::ok )
-                outData = currentTime.value;
-            handler->done( reqID, errorCode, outData);
-        };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiTimeData, decltype(queryDoneHandler)> (
-            ApiCommand::getCurrentTime, nullptr, queryDoneHandler );
-
+        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+        QnConcurrent::run(
+            Ec2ThreadPool::instance(),
+            std::bind( &impl::CurrentTimeHandler::done, handler, reqID, ec2::ErrorCode::ok, TimeSynchronizationManager::instance()->getSyncTime() ) );
         return reqID;
     }
     
+    template <class T>
+    int BaseEc2Connection<T>::forcePrimaryTimeServer( const QUuid& serverGuid, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+
+        QnTransaction<ApiIdData> tran( ApiCommand::forcePrimaryTimeServer );
+        tran.params.id = serverGuid;
+
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1) );
+
+        return reqID;
+    }
+
 
 
     template<class T>
-    int BaseEc2Connection<T>::dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr /*handler*/ )
+    int BaseEc2Connection<T>::dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+        const int reqID = generateRequestID();
+
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiDatabaseDumpData& data) {
+            ApiDatabaseDumpData outData;
+            if( errorCode == ErrorCode::ok )
+                outData = data;
+            handler->done( reqID, errorCode, outData );
+        };
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiDatabaseDumpData, decltype(queryDoneHandler)> ( 
+            ApiCommand::dumpDatabase, nullptr, queryDoneHandler);
+        return reqID;
     }
 
     template<class T>
-    int BaseEc2Connection<T>::restoreDatabaseAsync( const QByteArray& /*dbFile*/, impl::SimpleHandlerPtr /*handler*/ )
+    int BaseEc2Connection<T>::restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+        const int reqID = generateRequestID();
+
+        QnTransaction<ApiDatabaseDumpData> tran(ApiCommand::resotreDatabase);
+        tran.isLocal = true;
+        tran.params = data;
+
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1) );
+
+        return reqID;
     }
 
     template<class T>
     QnTransaction<ApiPanicModeData> BaseEc2Connection<T>::prepareTransaction( ApiCommand::Value command, const Qn::PanicMode& mode)
     {
-        QnTransaction<ApiPanicModeData> tran(command, true);
+        QnTransaction<ApiPanicModeData> tran(command);
         tran.params.mode = mode;
         return tran;
     }
@@ -187,6 +241,16 @@ namespace ec2
         url.setQuery(q);
         QnTransactionMessageBus::instance()->removeConnectionFromPeer(url);
     }
+
+
+    template<class T>
+    void ec2::BaseEc2Connection<T>::sendRuntimeData(const ec2::ApiRuntimeData &data)
+    {
+        ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged);
+        tran.params = data;
+        qnTransactionBus->sendTransaction(tran);
+    }
+
 
 
     template class BaseEc2Connection<FixedUrlClientQueryProcessor>;

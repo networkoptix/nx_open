@@ -32,6 +32,7 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(VideoWallMatrix,         qnSkin->icon("tree/matrix.png"));
 
     m_cache.insert(Server | Offline,        qnSkin->icon("tree/server_offline.png"));
+    m_cache.insert(Server | Incompatible,   qnSkin->icon("tree/server_incompatible.png"));
     m_cache.insert(Camera | Offline,        qnSkin->icon("tree/camera_offline.png"));
     m_cache.insert(Camera | Unauthorized,   qnSkin->icon("tree/camera_unauthorized.png"));
     m_cache.insert(Layout | Locked,         qnSkin->icon("tree/layout_locked.png"));
@@ -94,24 +95,24 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr &resource)
             return key;
     }
 
-    QnResource::Flags flags = resource->flags();
-    if ((flags & QnResource::local_server) == QnResource::local_server) {
+    Qn::ResourceFlags flags = resource->flags();
+    if ((flags & Qn::local_server) == Qn::local_server) {
         key = Local;
-    } else if ((flags & QnResource::server) == QnResource::server) {
+    } else if ((flags & Qn::server) == Qn::server) {
         key = Server;
-    } else if ((flags & QnResource::layout) == QnResource::layout) {
+    } else if ((flags & Qn::layout) == Qn::layout) {
         key = Layout;
-    } else if ((flags & QnResource::live_cam) == QnResource::live_cam) {
+    } else if ((flags & Qn::live_cam) == Qn::live_cam) {
         key = Camera;
-    } else if ((flags & QnResource::SINGLE_SHOT) == QnResource::SINGLE_SHOT) {
+    } else if ((flags & Qn::SINGLE_SHOT) == Qn::SINGLE_SHOT) {
         key = Image;
-    } else if ((flags & QnResource::ARCHIVE) == QnResource::ARCHIVE) {
+    } else if ((flags & Qn::ARCHIVE) == Qn::ARCHIVE) {
         key = Media;
-    } else if ((flags & QnResource::server_archive) == QnResource::server_archive) {
+    } else if ((flags & Qn::server_archive) == Qn::server_archive) {
         key = Media;
-    } else if ((flags & QnResource::user) == QnResource::user) {
+    } else if ((flags & Qn::user) == Qn::user) {
         key = User;
-    } else if ((flags & QnResource::videowall) == QnResource::videowall) {
+    } else if ((flags & Qn::videowall) == Qn::videowall) {
         key = VideoWall;
     } 
 
@@ -124,14 +125,17 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr &resource)
     }
     else {
         switch (resource->getStatus()) {
-        case QnResource::Online:
+        case Qn::Online:
             status = Online;
             break;
-        case QnResource::Offline:
+        case Qn::Offline:
             status = Offline;
             break;
-        case QnResource::Unauthorized:
+        case Qn::Unauthorized:
             status = Unauthorized;
+            break;
+        case Qn::Incompatible:
+            status = Incompatible;
             break;
         default:
             break;

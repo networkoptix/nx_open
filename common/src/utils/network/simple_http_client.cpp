@@ -69,13 +69,13 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QUrl& url, unsigned int timeout, co
     m_dataRestLen(0),
     m_localPort(0)
 {
-    initSocket();
+    initSocket(url.scheme() == lit("https"));
 }
 
 
-void CLSimpleHTTPClient::initSocket()
+void CLSimpleHTTPClient::initSocket(bool ssl)
 {
-    m_sock = TCPSocketPtr( SocketFactory::createStreamSocket() );
+    m_sock = TCPSocketPtr(SocketFactory::createStreamSocket(ssl));
 
     if( !m_sock->setRecvTimeout(m_timeout) || !m_sock->setSendTimeout(m_timeout) )
     {
@@ -402,12 +402,17 @@ void CLSimpleHTTPClient::readAll(QByteArray& data)
         m_dataRestLen = 0;
     }
 
+    if (m_contentLen && m_contentLen == data.size())
+        return;
+
     static const unsigned long BUFSIZE = 1024;
     int nRead;
     char buf[BUFSIZE];
     while ((nRead = read(buf, BUFSIZE)) > 0)
     {
         data.append(buf, nRead);
+        if (m_contentLen && m_contentLen == data.size())
+            return;
     }
 }
 

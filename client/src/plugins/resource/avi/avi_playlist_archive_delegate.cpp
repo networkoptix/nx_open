@@ -2,6 +2,7 @@
 
 #include <QtCore/QMutex>
 
+#include <core/resource/resource.h>
 #include "utils/common/util.h"
 
 /*

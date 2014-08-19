@@ -12,7 +12,7 @@ public:
     QnExternalBusinessEventRestHandler();
 
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, QByteArray& contentType);
 
 signals:
     void mserverFailure(QnResourcePtr resource, qint64 time, QnBusiness::EventReason reason, const QString& reasonText);

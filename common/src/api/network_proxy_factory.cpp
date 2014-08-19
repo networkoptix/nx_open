@@ -141,9 +141,9 @@ QNetworkProxy QnNetworkProxyFactory::getProxyToResource( const QnResourcePtr& re
         const QString& proxyHost = mediaServerResource->getPrimaryIF();
         if( proxyHost == QnMediaServerResource::USE_PROXY )
         {
-            //proxying via EC
-            proxy.setHostName( QnAppServerConnectionFactory::defaultUrl().host() );
-            proxy.setPort( QnAppServerConnectionFactory::defaultUrl().port() );
+            //proxying via Server
+            proxy.setHostName( QnAppServerConnectionFactory::url().host() );
+            proxy.setPort( QnAppServerConnectionFactory::url().port() );
         }
         else
         {
@@ -152,8 +152,8 @@ QNetworkProxy QnNetworkProxyFactory::getProxyToResource( const QnResourcePtr& re
             proxy.setHostName( mServerApiUrl.host() );
             proxy.setPort( mServerApiUrl.port() );
         }
-        proxy.setUser( QnAppServerConnectionFactory::defaultUrl().userName() );
-        proxy.setPassword( QnAppServerConnectionFactory::defaultUrl().password() );
+        proxy.setUser( QnAppServerConnectionFactory::url().userName() );
+        proxy.setPassword( QnAppServerConnectionFactory::url().password() );
         return proxy;
     }
     else if( const QnMediaServerResource* mediaServerResource = dynamic_cast<QnMediaServerResource*>(resource.data()) )
@@ -162,11 +162,11 @@ QNetworkProxy QnNetworkProxyFactory::getProxyToResource( const QnResourcePtr& re
         const QString& proxyHost = mediaServerResource->getPrimaryIF();
         if( proxyHost == QnMediaServerResource::USE_PROXY )
         {
-            //proxying via EC
-            proxy.setHostName( QnAppServerConnectionFactory::defaultUrl().host() );
-            proxy.setPort( QnAppServerConnectionFactory::defaultUrl().port() );
-            proxy.setUser( QnAppServerConnectionFactory::defaultUrl().userName() );
-            proxy.setPassword( QnAppServerConnectionFactory::defaultUrl().password() );
+            //proxying via Server
+            proxy.setHostName( QnAppServerConnectionFactory::url().host() );
+            proxy.setPort( QnAppServerConnectionFactory::url().port() );
+            proxy.setUser( QnAppServerConnectionFactory::url().userName() );
+            proxy.setPassword( QnAppServerConnectionFactory::url().password() );
             return proxy;
         }
         else

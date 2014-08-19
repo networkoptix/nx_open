@@ -36,8 +36,9 @@ void QnPtzPresetDialog::loadData(const QnPtzData &data) {
         return;
 
     QList<int> hotkeys;
-    for(int i = 0; i < 10; i++)
+    for(int i = 1; i < 10; i++)
         hotkeys.push_back(i);
+    hotkeys.push_back(0);
 
     QnPtzHotkeyHash usedHotkeys = m_hotkeysDelegate->hotkeys();
     foreach (const QnPtzPreset &preset, data.presets) {

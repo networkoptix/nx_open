@@ -53,7 +53,7 @@ public:
      * \param resourceTypeId            Identifier of the type to check.
      * \returns                         Whether this factory can be used to create resources of the given type.
      */
-    virtual bool isResourceTypeSupported(QnId resourceTypeId) const;
+    virtual bool isResourceTypeSupported(QUuid resourceTypeId) const;
 
     /**
      * \returns                         Name of the manufacturer for the resources this searcher adds. 

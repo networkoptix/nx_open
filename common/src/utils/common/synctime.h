@@ -9,15 +9,16 @@
 
 
 /** 
- * Time provider that is synchronized with Enterprise Controller.
+ * Time provider that is synchronized with Server.
  */
 class QnSyncTime: public QObject {
     Q_OBJECT;
 
 public:
     QnSyncTime();
+    virtual ~QnSyncTime();
 
-    static QnSyncTime *instance();
+    static QnSyncTime* instance();
 
     qint64 currentMSecsSinceEpoch();
     qint64 currentUSecsSinceEpoch();
@@ -25,9 +26,13 @@ public:
 
     void reset();
 
+public slots:
+    //!Sets new synchronized time to \a newTime
+    void updateTime(qint64 newTime);
+
 signals:
     /**
-     * This signal is emitted whenever time on EC changes. 
+     * This signal is emitted whenever time on Server changes. 
      */
     void timeChanged();
 
@@ -40,6 +45,7 @@ private:
     bool m_syncTimeRequestIssued;
 
 private slots:
+    //!Sets new synchronized time to \a newTime
     void updateTime(int reqID, ec2::ErrorCode errorCode, qint64 newTime);
 };
 

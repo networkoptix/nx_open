@@ -13,13 +13,13 @@ class QnDesktopCameraConnectionProcessorPrivate;
 class QnDesktopCameraConnectionProcessor;
 
 /*
-*   This class used for connection from desktop camera to media server
+*   This class used for connection from desktop camera to server
 */
 
 class QnDesktopCameraConnection: public QnLongRunnable
 {
 public:
-    QnDesktopCameraConnection(QnDesktopResource* owner, QnMediaServerResourcePtr mServer);
+    QnDesktopCameraConnection(QnDesktopResource* owner, const QnMediaServerResourcePtr &mServer);
     virtual ~QnDesktopCameraConnection();
 
     virtual void pleaseStop() override;
@@ -33,6 +33,11 @@ private:
     CLSimpleHTTPClient* connection;
     QnDesktopCameraConnectionProcessor* processor;
     QMutex m_mutex;
+    struct {
+        QString username;
+        QString password;
+        QString clientGuid;
+    } m_auth;
 };
 
 typedef QSharedPointer<QnDesktopCameraConnection> QnDesktopCameraConnectionPtr;

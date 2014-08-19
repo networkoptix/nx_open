@@ -24,7 +24,6 @@ public:
     virtual void updateFromSettings() override;
 
     virtual bool confirm() override;
-
 private:
     void initTranslations();
 
@@ -34,15 +33,14 @@ private slots:
     void at_removeExtraMediaFolderButton_clicked();
     void at_extraMediaFoldersList_selectionChanged();
     void at_timeModeComboBox_activated();
-    void at_downmixAudioCheckBox_toggled(bool checked);
-    void at_languageComboBox_currentIndexChanged(int index);
-    void at_skinComboBox_currentIndexChanged(int index);
+
     void at_browseLogsButton_clicked();
 
 private:
     QScopedPointer<Ui::GeneralPreferencesWidget> ui;
 
     bool m_oldDownmix;
+    bool m_oldDoubleBuffering;
     int m_oldLanguage;
     int m_oldSkin;
 };

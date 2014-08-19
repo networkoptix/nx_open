@@ -8,6 +8,7 @@
 #include <client/client_settings.h>
 
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -15,8 +16,7 @@
 #include <utils/media/audio_player.h>
 
 QnNotificationSoundManagerDialog::QnNotificationSoundManagerDialog(QWidget *parent) :
-    QDialog(parent),
-    QnWorkbenchContextAware(parent),
+    base_type(parent),
     ui(new Ui::QnNotificationSoundManagerDialog)
 {
     ui->setupUi(this);
@@ -61,7 +61,7 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
     QString supportedFormats = tr("Sound files");
     supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
 
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Select file..."), qnSettings->mediaFolder(), supportedFormats));
+    QScopedPointer<QnCustomFileDialog> dialog(new QnWorkbenchStateDependentDialog<QnCustomFileDialog> (this, tr("Select file..."), qnSettings->mediaFolder(), supportedFormats));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
     int cropSoundSecs = 5;
@@ -70,6 +70,10 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
     dialog->addSpinBox(tr("Clip sound up to %1 seconds").arg(QnCustomFileDialog::valueSpacer()), 1, 10, &cropSoundSecs);
     dialog->addLineEdit(tr("Custom Title:"), &title); // TODO: #Elric #TR no caps in 2nd word
     if(!dialog->exec())
+        return;
+
+    /* Check if we were disconnected (server shut down) while the dialog was open. */
+    if (!context()->user())
         return;
 
     QString fileName = dialog->selectedFile();

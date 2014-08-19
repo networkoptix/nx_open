@@ -33,8 +33,12 @@ public:
     QString getEmail() const;
     void setEmail(const QString &email);
 signals:
-    void emailChanged(const QnUserResourcePtr &user);
-    void permissionsChanged(const QnUserResourcePtr &user);
+    void hashChanged(const QnResourcePtr &resource);
+    void passwordChanged(const QnResourcePtr &resource);
+    void digestChanged(const QnResourcePtr &resource);
+    void permissionsChanged(const QnResourcePtr &user);
+    void adminChanged(const QnResourcePtr &resource);
+    void emailChanged(const QnResourcePtr &user);
 protected:
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 

@@ -36,6 +36,9 @@ public:
     void submitToResources();
     void reject();
 
+    /** Check if second stream is enabled if there are Motion+LQ tasks in schedule. */
+    bool isValidSecondStream();
+
     bool hasDbChanges() const {
         return m_hasDbChanges;
     }

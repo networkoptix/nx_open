@@ -22,31 +22,30 @@ public:
     virtual void updateResource(const QnResourcePtr &resource) override;
     bool isProxy(const nx_http::Request& request) const;
 protected:
-    virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status ) override;
+    virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus ) override;
     virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
-    virtual void afterRemovingResource(const QnId& id) override;
+    virtual void afterRemovingResource(const QUuid& id) override;
     void execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) override;
     bool isLocalAddress(const QString& addr) const;
-    virtual bool canRemoveResource(const QnId& resourceId) override;
-    virtual void removeResourceIgnored(const QnId& resourceId) override;
+    virtual bool canRemoveResource(const QUuid& resourceId) override;
+    virtual void removeResourceIgnored(const QUuid& resourceId) override;
 
 private slots:
-    void at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);
-    void at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy);
-
     void at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
     void at_updateInstallationRequested(const QString &updateId);
 
+    void at_systemNameChangeRequested(const QString &systemName);
+
 private:
-    void updateAllIPList(const QnId& id, const QList<QHostAddress>& addrList);
-    void updateAllIPList(const QnId& id, const QList<QString>& addr);
-    void updateAllIPList(const QnId& id, const QString& addr);
-    void removeIPList(const QnId& id);
+    void updateAllIPList(const QUuid& id, const QList<QHostAddress>& addrList);
+    void updateAllIPList(const QUuid& id, const QList<QString>& addr);
+    void updateAllIPList(const QUuid& id, const QString& addr);
+    void removeIPList(const QUuid& id);
 
 private:
     mutable QMutex m_mutexAddrList;
     QHash<QString, int> m_allIPAddress;
-    QHash<QnId, QList<QString> > m_addrById;
+    QHash<QUuid, QList<QString> > m_addrById;
     const int m_serverPort;
     mutable QnMediaServerResourcePtr m_mServer;
 };

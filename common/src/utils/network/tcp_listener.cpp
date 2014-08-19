@@ -7,17 +7,11 @@
 #include <utils/common/systemerror.h>
 
 
-// ------------------------ QnRtspListenerPrivate ---------------------------
+// ------------------------ QnTcpListenerPrivate ---------------------------
 
 class QnTcpListenerPrivate
 {
 public:
-    QnTcpListenerPrivate() {
-        serverSocket = 0;
-        newPort = 0;
-        localPort = 0;
-        useSSL = false;
-    }
     AbstractStreamServerSocket* serverSocket;
     QList<QnLongRunnable*> connections;
     QByteArray authDigest;
@@ -29,9 +23,20 @@ public:
     bool useSSL;
     int maxConnections;
     bool ddosWarned;
+
+    QnTcpListenerPrivate()
+    :
+        serverSocket(nullptr),
+        newPort(0),
+        localPort(0),
+        useSSL(false),
+        maxConnections(0),
+        ddosWarned(false)
+    {
+    }
 };
 
-// ------------------------ QnRtspListener ---------------------------
+// ------------------------ QnTcpListener ---------------------------
 
 bool QnTcpListener::authenticate(const nx_http::Request& request, nx_http::Response& response) const
 {
@@ -76,6 +81,27 @@ QnTcpListener::~QnTcpListener()
     d->serverSocket->close();
     delete d->serverSocket;
     delete d_ptr;
+}
+
+bool QnTcpListener::bindToLocalAddress()
+{
+    Q_D(QnTcpListener);
+
+    d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
+    if( !d->serverSocket->setReuseAddrFlag( true ) ||
+        !d->serverSocket->bind( SocketAddress( d->serverAddress.toString(), d->localPort ) ) ||
+        !d->serverSocket->listen() )
+    {
+        const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+        NX_LOG(lit("TCPListener (%1:%2). Initial bind failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
+            arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING);
+        qCritical() << "Can't start TCP listener at address" << d->serverAddress << ":" << d->localPort << ". "
+            "Reason: " << SystemError::toString(prevErrorCode) << "(" << prevErrorCode << ")";
+        return false;
+    }
+
+    NX_LOG(lit("Server started at %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logINFO);
+    return true;
 }
 
 void QnTcpListener::doPeriodicTasks()
@@ -181,25 +207,9 @@ void QnTcpListener::run()
 
     initSystemThreadId();
 
-    d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
-    //d->serverSocket = new TCPServerSocket(address.toString(), port, 5, true);
     d->ddosWarned = false;
-    if( !d->serverSocket->setReuseAddrFlag(true) ||
-        !d->serverSocket->bind(SocketAddress(d->serverAddress.toString(), d->localPort)) ||
-        !d->serverSocket->listen() )
-        //if( d->serverSocket->failed() )
-    {
-        const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-
-        NX_LOG( lit("TCPListener (%1:%2). Initial bind failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
-            arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING );
-        qCritical() << "Can't start TCP listener at address" << d->serverAddress << ":" << d->localPort << ". "
-            "Reason: " << SystemError::toString(prevErrorCode) << "("<<prevErrorCode<<")";
-    }
-    else {
-        NX_LOG(lit("Server started at %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logINFO);
-    }
-
+    if( !d->serverSocket )
+        bindToLocalAddress();
 
     NX_LOG( lit("Entered QnTcpListener::run. %1:%2, system thread id %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(systemThreadId()), cl_logWARNING );
     try
@@ -214,16 +224,8 @@ void QnTcpListener::run()
                 NX_LOG( lit("TCPListener (%1:%2). Switching port to: %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(d->newPort), cl_logWARNING );
                 removeAllConnections();
                 delete d->serverSocket;
-                //d->serverSocket = new TCPServerSocket(d->serverAddress.toString(), d->newPort);
-                //if( d->serverSocket->failed() )
-                d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
-                if( !d->serverSocket->setReuseAddrFlag(true) ||
-                    !d->serverSocket->bind(SocketAddress(d->serverAddress.toString(), d->newPort)) ||
-                    !d->serverSocket->listen() )
+                if( !bindToLocalAddress() )
                 {
-                    const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                    NX_LOG( lit("TCPListener (%1:%2). Bind failed: %3").arg(d->serverAddress.toString()).arg(d->localPort).
-                        arg(SystemError::toString(prevErrorCode)), cl_logWARNING );
                     QThread::msleep(1000);
                     continue;
                 }
@@ -234,8 +236,6 @@ void QnTcpListener::run()
             }
 
             AbstractStreamSocket* clientSocket = d->serverSocket->accept();
-//            delete clientSocket;
-//            clientSocket = NULL;
             if( clientSocket )
             {
                 if (d->connections.size() > d->maxConnections)

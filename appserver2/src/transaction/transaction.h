@@ -12,6 +12,11 @@
 #endif
 
 #include "utils/serialization/binary.h"
+#include "utils/serialization/json.h"
+#include "utils/serialization/xml.h"
+#include "utils/serialization/csv.h"
+#include "utils/serialization/ubjson.h"
+#include "common/common_module.h"
 
 namespace ec2
 {
@@ -20,7 +25,7 @@ namespace ec2
         // TODO: #Elric #enum
         enum Value
         {
-		    NotDefined                  = 0,
+            NotDefined                  = 0,
 
             /* System */
             tranSyncRequest             = 1,    /*< QnTranState */
@@ -77,7 +82,6 @@ namespace ec2
             saveVideowall               = 701,  /*< ApiVideowallData */
             removeVideowall             = 702,  /*< ApiIdData */
             videowallControl            = 703,  /*< ApiVideowallControlMessageData */
-            videowallInstanceStatus     = 704,  /*< ApiVideowallInstanceStatusData */
 
             /* Business rules */
             getBusinessRules            = 800,  /*< ApiBusinessRuleDataList */
@@ -98,78 +102,107 @@ namespace ec2
             getLicenses                 = 1000, /*< ApiLicenseDataList */
             addLicense                  = 1001, /*< ApiLicenseData */
             addLicenses                 = 1002, /*< ApiLicenseDataList */
+            removeLicense               = 1003, /*< ApiLicenseData */
+
+            /* Email */
+            testEmailSettings           = 1100, /*< ApiEmailSettingsData */
+            sendEmail                   = 1101, /*< ApiEmailData */
 
             /* Auto-updates */
             uploadUpdate                = 1200, /*< ApiUpdateUploadData */
             uploadUpdateResponce        = 1201, /*< ApiUpdateUploadResponceData */
             installUpdate               = 1202, /*< ApiUpdateInstallData  */
 
+            /* Module information */
+            moduleInfo                  = 1301, /*< ApiModuleData */
+            moduleInfoList              = 1302, /*< ApiModuleDataList */
+
+            /* Discovery */
+            discoverPeer                = 1401, /*< ApiDiscoveryData */
+            addDiscoveryInformation     = 1402, /*< ApiDiscoveryDataList*/
+            removeDiscoveryInformation  = 1403, /*< ApiDiscoveryDataList*/
+
+            addConnection               = 1501, /*< ApiConnectionData */
+            removeConnection            = 1502, /*< ApiConnectionData */
+            availableConnections        = 1503, /*< ApiConnectionDataList */
+
             /* Misc */
             getCurrentTime              = 9002,  /*< ApiTimeData */         
+            changeSystemName            = 9003,  /*< ApiSystemNameData */
+
             //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
+            dumpDatabase                = 9005,  /*< ApiDatabaseDumpData */
+            resotreDatabase             = 9006,  /*< ApiDatabaseDumpData */
+            forcePrimaryTimeServer      = 9007,  /*< ApiIdData */
+            broadcastPeerSystemTime     = 9008,  /*< ApiPeerSystemTimeData*/
 
-			maxTransactionValue         = 65535
+            maxTransactionValue         = 65535
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 
         QString toString( Value val );
+
+        /** Check if transaction can be sent independently of current connection state. MUST have sequence field filled. */
         bool isSystem( Value val );
+        bool isPersistent( Value val );
     }
 
     class QnAbstractTransaction
     {
     public:
-		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false), timestamp(0), isLocal(false) {}
-        QnAbstractTransaction(ApiCommand::Value command, bool persistent);
+		QnAbstractTransaction(): command(ApiCommand::NotDefined), isLocal(false) { peerID = qnCommon->moduleGUID(); }
+        QnAbstractTransaction(ApiCommand::Value value): command(value), isLocal(false) { peerID = qnCommon->moduleGUID(); }
         
         static void setStartSequence(int value);
-        void fillSequence();
+        void fillPersistentInfo();
 
-        struct ID
+        struct PersistentInfo
         {
-            ID(): sequence(0) {}
-            QUuid peerID;
+            PersistentInfo(): sequence(0), timestamp(0) {}
+            bool isNull() const { return dbID.isNull(); }
+
             QUuid dbID;
             qint32 sequence;
+            qint64 timestamp;
 
 #ifndef QN_NO_QT
-            friend uint qHash(const ec2::QnAbstractTransaction::ID &id) {
-                return ::qHash(id.peerID.toRfc4122().append(id.dbID.toRfc4122()), id.sequence);
+            friend uint qHash(const ec2::QnAbstractTransaction::PersistentInfo &id) {
+                return ::qHash(id.dbID.toRfc4122().append((const char*)&id.timestamp, sizeof(id.timestamp)), id.sequence);
             }
 #endif
 
-            bool operator==(const ID &other) const {
-                return peerID == other.peerID && dbID == other.dbID && sequence == other.sequence;
+            bool operator==(const PersistentInfo &other) const {
+                return dbID == other.dbID && sequence == other.sequence && timestamp == other.timestamp;
             }
         };
 
         ApiCommand::Value command;
-        ID id;
-        bool persistent;
-        qint64 timestamp;
+        QUuid peerID;
+        PersistentInfo persistentInfo;
         
         bool isLocal; // do not propagate transactions to other server peers
     };
 
-    typedef QnAbstractTransaction::ID QnAbstractTransaction_ID;
-#define QnAbstractTransaction_ID_Fields (peerID)(dbID)(sequence)
-#define QnAbstractTransaction_Fields (command)(id)(persistent)(timestamp)        
+    typedef QnAbstractTransaction::PersistentInfo QnAbstractTransaction_PERSISTENT;
+#define QnAbstractTransaction_PERSISTENT_Fields (dbID)(sequence)(timestamp)
+#define QnAbstractTransaction_Fields (command)(peerID)(persistentInfo)(isLocal)
 
     template <class T>
     class QnTransaction: public QnAbstractTransaction
     {
     public:
-        QnTransaction() {}
+        QnTransaction(): QnAbstractTransaction() {}
         QnTransaction(const QnAbstractTransaction& abstractTran): QnAbstractTransaction(abstractTran) {}
-        QnTransaction(ApiCommand::Value command, bool persistent): QnAbstractTransaction(command, persistent) {}
+        QnTransaction(ApiCommand::Value command): QnAbstractTransaction(command) {}
         
         T params;
     };
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary)(json))
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary)(json))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::PersistentInfo, (binary)(json)(ubjson))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary)(json)(ubjson))
 
+    //Binary format functions for QnTransaction<T>
     template <class T, class Output>
     void serialize(const QnTransaction<T> &transaction,  QnOutputBinaryStream<Output> *stream)
     {
@@ -185,10 +218,45 @@ namespace ec2
             QnBinary::deserialize(stream, &transaction->params);
     }
 
+
+    //Json format functions for QnTransaction<T>
+    template<class T>
+    void serialize(QnJsonContext* ctx, const QnTransaction<T>& tran, QJsonValue* target)
+    {
+        QJson::serialize(ctx, static_cast<const QnAbstractTransaction&>(tran), target);
+        QJsonObject localTarget = target->toObject();
+        QJson::serialize(ctx, tran.params, "params", &localTarget);
+        *target = localTarget;
+    }
+
+    template<class T>
+    bool deserialize(QnJsonContext* ctx, const QJsonValue& value, QnTransaction<T>* target)
+    {
+        return 
+            QJson::deserialize(ctx, value, static_cast<QnAbstractTransaction*>(target)) &&
+            QJson::deserialize(ctx, value.toObject(), "params", &target->params);
+    }
+
+    //QnUbjson format functions for QnTransaction<T>
+    template <class T, class Output>
+    void serialize(const QnTransaction<T> &transaction,  QnUbjsonWriter<Output> *stream)
+    {
+        QnUbjson::serialize(static_cast<const QnAbstractTransaction &>(transaction), stream);
+        QnUbjson::serialize(transaction.params, stream);
+    }
+
+    template <class T, class Input>
+    bool deserialize(QnUbjsonReader<Input>* stream,  QnTransaction<T> *transaction)
+    {
+        return 
+            QnUbjson::deserialize(stream,  static_cast<QnAbstractTransaction *>(transaction)) &&
+            QnUbjson::deserialize(stream, &transaction->params);
+    }
+
     int generateRequestID();
 } // namespace ec2
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value), (numeric))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value), (metatype)(numeric))
 
 #ifndef QN_NO_QT
 Q_DECLARE_METATYPE(ec2::QnAbstractTransaction)

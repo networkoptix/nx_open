@@ -1,5 +1,6 @@
 #include "server_updates_model.h"
 
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/style/resource_icon_cache.h>
@@ -12,6 +13,18 @@ QnServerUpdatesModel::QnServerUpdatesModel(QObject *parent) :
     connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnServerUpdatesModel::at_resourceChanged);
     connect(qnResPool,  &QnResourcePool::statusChanged,     this,   &QnServerUpdatesModel::at_resourceChanged);
 
+    resetResourses();
+}
+
+void QnServerUpdatesModel::setTargets(const QSet<QUuid> &targets) {
+    m_targets = targets;
+    resetResourses();
+}
+
+void QnServerUpdatesModel::setTargets(const QnMediaServerResourceList &targets) {
+    m_targets.clear();
+    foreach (const QnMediaServerResourcePtr &server, targets)
+        m_targets.insert(server->getId());
     resetResourses();
 }
 
@@ -55,7 +68,8 @@ QVariant QnServerUpdatesModel::data(const QModelIndex &index, int role) const {
 }
 
 QModelIndex QnServerUpdatesModel::index(int row, int column, const QModelIndex &parent) const {
-    Q_UNUSED(parent)
+    if (!hasIndex(row, column, parent))
+        return QModelIndex();
 
     return createIndex(row, column, m_items[row]);
 }
@@ -68,16 +82,7 @@ QModelIndex QnServerUpdatesModel::index(const QnMediaServerResourcePtr &server) 
     return base_type::index(it - m_items.begin(), 0);
 }
 
-QnMediaServerResourceList QnServerUpdatesModel::servers() const {
-    QnMediaServerResourceList servers;
-
-    foreach (const Item *item, m_items)
-        servers.append(item->server());
-
-    return servers;
-}
-
-void QnServerUpdatesModel::setUpdatesInformation(const QHash<QnId, QnMediaServerUpdateTool::PeerUpdateInformation> &updates) {
+void QnServerUpdatesModel::setUpdatesInformation(const QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> &updates) {
     foreach (Item *item, m_items)
         item->m_updateInfo = updates[item->server()->getId()];
 
@@ -86,6 +91,9 @@ void QnServerUpdatesModel::setUpdatesInformation(const QHash<QnId, QnMediaServer
 }
 
 void QnServerUpdatesModel::setUpdateInformation(const QnMediaServerUpdateTool::PeerUpdateInformation &update) {
+    if (!update.server)
+        return;
+
     m_updates[update.server->getId()] = update;
 
     for (int i = 0; i < m_items.size(); i++) {
@@ -104,9 +112,19 @@ void QnServerUpdatesModel::resetResourses() {
     qDeleteAll(m_items);
     m_items.clear();
 
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
-        QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-        m_items.append(new Item(server, m_updates[server->getId()]));
+    if (m_targets.isEmpty()) {
+        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::server)) {
+            QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
+            m_items.append(new Item(server, m_updates[server->getId()]));
+        }
+    } else {
+        foreach (const QUuid &id, m_targets) {
+            QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+            if (!server)
+                continue;
+
+            m_items.append(new Item(server, m_updates[server->getId()]));
+        }
     }
 
     endResetModel();
@@ -116,6 +134,14 @@ void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
         return;
+
+    if (m_targets.isEmpty()) {
+        if (server->getSystemName() != qnCommon->localSystemName())
+            return;
+    } else {
+        if (!m_targets.contains(resource->getId()))
+            return;
+    }
 
     beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
     m_items.append(new Item(server, m_updates[server->getId()]));
@@ -128,6 +154,8 @@ void QnServerUpdatesModel::at_resourceRemoved(const QnResourcePtr &resource) {
         return;
 
     QModelIndex idx = index(server);
+    if (!idx.isValid())
+        return;
 
     beginRemoveRows(QModelIndex(), idx.row(), idx.row());
     m_items.removeAt(idx.row());
@@ -142,6 +170,8 @@ void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
         return;
 
     QModelIndex idx = index(server);
+    if (!idx.isValid())
+        return;
 
     emit dataChanged(idx, idx.sibling(idx.row(), LastColumn));
 }
@@ -166,6 +196,8 @@ QVariant QnServerUpdatesModel::Item::data(int column, int role) const {
             return m_server->getVersion().toString(QnSoftwareVersion::FullFormat);
         case UpdateColumn: {
             switch (m_updateInfo.state) {
+            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateUnknown:
+                return QString();
             case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateNotFound:
                 return tr("Not found");
             case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateFound:

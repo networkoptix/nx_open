@@ -14,7 +14,7 @@ QnPlAxisResourceSearcher::QnPlAxisResourceSearcher()
 {
 }
 
-QnResourcePtr QnPlAxisResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlAxisResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -63,7 +63,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
 
 
     if (port < 0)
-        port = 80;
+        port = nx_http::DEFAULT_HTTP_PORT;
 
     CLHttpStatus status;
     QString response = QString(QLatin1String(downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=Network"), host, port, timeout, auth)));
@@ -100,7 +100,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
         return QList<QnResourcePtr>();
 
 
-    QnId typeId = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
+    QUuid typeId = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
     if (typeId.isNull())
         return QList<QnResourcePtr>();
 
@@ -144,9 +144,14 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     if (iqpos<0)
         return local_results;
 
+    QByteArray prefix2("axis-00");
     int macpos = responseData.indexOf("- 00", iqpos);
-    if (macpos < 0)
-        return local_results;
+    if (macpos < 0) {
+        macpos = responseData.indexOf("- AC", iqpos);
+        if (macpos < 0)
+            return local_results;
+        prefix2 = QByteArray("axis-ac");
+    }
     macpos += 2;
 
     for (int i = iqpos; i < macpos; i++)
@@ -154,7 +159,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
         name += QLatin1Char(responseData[i]);
     }
 
-    int macpos2 = responseData.indexOf("axis-00", macpos);
+    int macpos2 = responseData.indexOf(prefix2, macpos);
     if (macpos2 > 0)
         macpos = macpos2 + 5; // replace real MAC to virtual MAC if exists
 
@@ -204,7 +209,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
     QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
-    QnId rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
+    QUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
     if (rt.isNull())
         return local_results;
 
@@ -245,7 +250,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
         {
             QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
-            QnId rt = qnResTypePool->getLikeResourceTypeId(manufacture(), firstResource->getName());
+            QUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), firstResource->getName());
             if (rt.isNull())
                 return;
 

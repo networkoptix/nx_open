@@ -17,9 +17,13 @@ public:
     struct DeleteRecordInfo
     {
         DeleteRecordInfo(): startTimeMs(-1) {}
-        DeleteRecordInfo(const QByteArray& mac, QnServer::ChunksCatalog catalog, qint64 startTimeMs): mac(mac), catalog(catalog), startTimeMs(startTimeMs) {}
+        DeleteRecordInfo(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, qint64 startTimeMs): 
+            cameraUniqueId(cameraUniqueId),
+            catalog(catalog),
+            startTimeMs(startTimeMs) 
+        {}
 
-        QByteArray mac;
+        QString cameraUniqueId;
         QnServer::ChunksCatalog catalog;
         qint64 startTimeMs;
     };
@@ -29,23 +33,25 @@ public:
 
     bool open(const QString& fileName);
 
-    bool deleteRecords(const QByteArray& mac, QnServer::ChunksCatalog catalog, qint64 startTimeMs = -1);
-    void addRecord(const QByteArray& mac, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
+    bool deleteRecords(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, qint64 startTimeMs = -1);
+    void addRecord(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
     void flushRecords();
     bool createDatabase();
     QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
 
     void beforeDelete();
     void afterDelete();
-    bool replaceChunks(const QByteArray& mac, QnServer::ChunksCatalog catalog, const std::deque<DeviceFileCatalog::Chunk>& chunks);
+    bool replaceChunks(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const std::deque<DeviceFileCatalog::Chunk>& chunks);
 
-    bool removeCameraBookmarks(const QByteArray &mac);
-    bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark, const QByteArray &mac);
-    bool deleteCameraBookmark(const QnCameraBookmark &bookmark, const QByteArray &mac);
-    bool getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
+    bool removeCameraBookmarks(const QString& cameraUniqueId);
+    bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark, const QString& cameraUniqueId);
+    bool deleteCameraBookmark(const QnCameraBookmark &bookmark);
+    bool getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
 private:
+    bool initializeBookmarksFtsTable();
+
     bool deleteRecordsInternal(const DeleteRecordInfo& delRecord);
-    bool addRecordInternal(const QByteArray& mac, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
+    bool addRecordInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
 
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
     QVector<DeviceFileCatalogPtr> loadBookmarksFileCatalog();
@@ -55,19 +61,20 @@ private:
 
     struct DelayedData 
     {
-        DelayedData (const QByteArray& mac = QByteArray(), 
+        DelayedData (const QString& cameraUniqueId = QString(), 
                      QnServer::ChunksCatalog catalog = QnServer::ChunksCatalogCount, 
                      const DeviceFileCatalog::Chunk& chunk = DeviceFileCatalog::Chunk()): 
-        mac(mac), catalog(catalog), chunk(chunk) {}
+            cameraUniqueId(cameraUniqueId), 
+            catalog(catalog),
+            chunk(chunk) {}
 
-        QByteArray mac;
+        QString cameraUniqueId;
         QnServer::ChunksCatalog catalog;
         DeviceFileCatalog::Chunk chunk;
     };
 
     mutable QMutex m_mutex;
     QVector<DelayedData> m_delayedData;
-    QMap<QByteArray, int> m_addCount;
     QVector<DeleteRecordInfo> m_recordsToDelete;
     QMutex m_delMutex;
 };

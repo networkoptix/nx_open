@@ -7,29 +7,30 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <boost/operators.hpp>
+
 /**
  * This class contains all the necessary information to look up a videowall item.
  */
-class QnVideoWallItemIndex {
+class QnVideoWallItemIndex: public boost::equality_comparable1<QnVideoWallItemIndex>  {
 public:
     QnVideoWallItemIndex() {}
 
-    QnVideoWallItemIndex(const QnVideoWallResourcePtr &videowall, const QUuid &uuid):
-        m_videowall(videowall), m_uuid(uuid)
-    {}
+    QnVideoWallItemIndex(const QnVideoWallResourcePtr &videowall, const QUuid &uuid);
 
-    const QnVideoWallResourcePtr &videowall() const {
-        return m_videowall;
+    QnVideoWallResourcePtr videowall() const;
+    QnVideoWallItem item() const;
+    QUuid uuid() const;
+
+    /** \return true if the index item is not initialized. */
+    bool isNull() const;
+
+    /** \return true if the index contains valid videowall item data. */
+    bool isValid() const;
+
+    friend bool operator==(const QnVideoWallItemIndex &l, const QnVideoWallItemIndex &r) {
+        return l.m_videowall == r.m_videowall && l.m_uuid == r.m_uuid;
     }
-
-    const QUuid &uuid() const {
-        return m_uuid;
-    }
-
-    bool isNull() const {
-        return m_videowall.isNull() || m_uuid.isNull();
-    }
-
 private:
     QnVideoWallResourcePtr m_videowall;
     QUuid m_uuid;

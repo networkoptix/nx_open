@@ -24,6 +24,7 @@ public:
     };
 
     QnPreferencesDialog(QWidget *parent = 0);
+    ~QnPreferencesDialog();
 
     virtual void submitData() override;
 private:

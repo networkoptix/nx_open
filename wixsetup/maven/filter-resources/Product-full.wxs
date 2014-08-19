@@ -10,6 +10,7 @@
         <?include BuildVars.wxi ?>
 
         <?define ProductName="${product.name}"?>
+        <?define ECRegPath="Software\${company.name}\${appserver.name}"?>
         <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
         <?define ClientRegPath="Software\${company.name}\$(var.ProductName)"?>
 
@@ -26,6 +27,29 @@
 
         <?define LaunchClientChecBoxText="!(loc.Product_LaunchClient)" ?>
 
+        <?define Remove_S1="(INSTALL_SERVER <> 1 AND !ServerFeature = 3)"?>
+
+        <?define InstallServer="&ServerFeature = 3 AND !ServerFeature <> 3"?>
+
+        <?define Inst_S1="(INSTALL_SERVER=1 AND !ServerFeature <> 3)"?>
+        <?define Inst_C1="(INSTALL_CLIENT=1 AND !ClientFeature <> 3)"?>
+        <?define Inst_S0="(NOT $(var.Inst_S1))"?>
+        <?define Inst_C0="(NOT $(var.Inst_C1))"?>
+
+        <?define Inst_S0C0="($(var.Inst_S0) AND $(var.Inst_C0))"?>
+        <?define Inst_S0C1="($(var.Inst_S0) AND $(var.Inst_C1))"?>
+        <?define Inst_S1C0="($(var.Inst_S1) AND $(var.Inst_C0))"?>
+        <?define Inst_S1C1="($(var.Inst_S1) AND $(var.Inst_C1))"?>
+
+        <?define Changing_S1="NOT $(var.VmsInstalling) AND $(var.Inst_S1)"?>
+        <?define Changing_S0C1="NOT $(var.VmsInstalling) AND $(var.Inst_S0C1)"?>
+        <?define ChangingNothing="NOT $(var.VmsInstalling) AND $(var.Inst_S0C0)"?>
+
+        <?define PasswordsEqual="(SERVER_PASSWORD = SERVER_PASSWORD_CONFIRM)" ?>
+        <?define IsSettingsFilled="(SYSTEM_NAME AND SERVER_PORT AND SERVER_LOGIN AND SERVER_PASSWORD AND SERVER_PASSWORD_CONFIRM)"?>
+        <?define IsSettingsCorrect=$(var.IsSettingsFilled) AND $(var.PasswordsEqual)?>
+        <?define IsSettingsValid="($(var.IsSettingsFilled) AND $(var.PasswordsEqual) AND NOT BUSYPORT)"?>
+
         <?if $(var.arch) = x86 ?>
         <Condition Message="!(loc.Product_ArchMismatch)">
             <![CDATA[ NOT VersionNT64 ]]>
@@ -34,6 +58,9 @@
 
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
+
+        <SetProperty Action="SetServerPort1" Id="SERVER_PORT" Value="[SERVER_PORT_EC]" Before="SetServerPort2">NOT SERVER_PORT</SetProperty>
+        <SetProperty Action="SetServerPort2" Id="SERVER_PORT" Value="7001" Before="CostInitialize">NOT SERVER_PORT</SetProperty>
 
         <Property Id="INSTALL_SERVER" Secure="yes"/>
         <Property Id="INSTALL_CLIENT" Secure="yes"/>
@@ -66,7 +93,10 @@
         <Property Id="INSTALLTYPE" Secure="yes"/>
         <Property Id="BUSYPORT" Secure="yes"/>
 
+        <Property Id="REMOVE_DATABASE" Secure="yes" Value="0"/>
+
         <Property Id="MEDIASERVER_REGISTRY_PATH" Value="$(var.ServerRegPath)"/>
+        <Property Id="OLDEC_REGISTRY_PATH" Value="$(var.ECRegPath)"/>
         <Property Id="INSTALL_SHORTCUT_DESKTOP" Value="1"/>
 
         <!-- MediaServer properties-->
@@ -76,8 +106,13 @@
         </Property>
         
         <Property Id="SERVER_PORT" Secure="yes">
-            <RegistrySearch Id="ServerEcsPortReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="port" Type="raw" Win64="yes"/>
+            <RegistrySearch Id="ServerPortReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="port" Type="raw" Win64="yes"/>
         </Property>
+
+        <Property Id="SERVER_PORT_EC" Secure="yes">
+            <RegistrySearch Id="ServerEcsPortReg" Root="HKLM" Key="$(var.ECRegPath)" Name="port" Type="raw" Win64="yes"/>
+        </Property>
+
 
         <Property Id="SERVER_LOGIN" Value="admin"/>
         <Property Id="SERVER_PASSWORD" Secure="yes"/>
@@ -95,23 +130,52 @@
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>
         <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
+        <CustomAction Id="DeleteDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="DeleteDatabaseFile" Execute="deferred" Impersonate="no"/>
 
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
 
         <CustomAction Id="FindFreePorts" BinaryKey="CustomActions.dll" DllEntry="FindFreePorts" />
         <CustomAction Id="CheckPorts" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
-        <CustomAction Id="CheckPorts2" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
         <CustomAction Id="FixServerFolder" BinaryKey="CustomActions.dll" DllEntry="FixServerFolder"/>
+        <CustomAction Id="GenerateSystemName" BinaryKey="CustomActions.dll" DllEntry="GenerateSystemName"/>
+        <CustomAction Id="DetectIfSystemIsStandalone" BinaryKey="CustomActions.dll" DllEntry="DetectIfSystemIsStandalone"/>
+        
+        <CustomAction Id="CopyDatabaseFile_Cmd" Property="CopyDatabaseFile" Execute="immediate" Impersonate="yes"
+            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\ecs.sqlite"/>
+        <CustomAction Id="CopyDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="CopyDatabaseFile" Execute="deferred" Impersonate="no"/>
 
+        <CustomAction Id="DeleteOldMediaserverSettings_Cmd" Property="DeleteOldMediaserverSettings" Value="$(var.ServerRegPath)" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="DeleteOldMediaserverSettings" BinaryKey="CustomActions.dll" DllEntry="DeleteOldMediaserverSettings" Execute="deferred" Impersonate="no"/>
+        
         <!-- Assign default values for Quick installation -->
-        <CustomAction Id="AssignServerPort" Property="SERVER_PORT" Value="7001"/>
         <CustomAction Id="AssignClientPort" Property="CLIENT_PORT" Value="[SERVER_PORT]"/>
+
+        <CustomAction Id="CertGenAction_Cmd" Property="CertGenAction"
+                      Value="&quot;[#certgen.exe]&quot; -i" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="CertGenAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="check" Impersonate="no" />
+
+<!--        <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
+                      Value="&quot;[${customization}TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
+        <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="ignore" Impersonate="no" /> -->
 
         <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
                       Value="&quot;[${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]$(var.ProductName) Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
+        <CustomAction Id="SyncDatabaseAction_Cmd_WithWarning" Property="SyncDatabaseAction"
+                      Value="&quot;[#dbsync.exe]&quot;;1;!(loc.UpgradeDlg_DatabaseRecovery)" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="SyncDatabaseAction_Cmd_WithoutWarning" Property="SyncDatabaseAction"
+                      Value="&quot;[#dbsync.exe]&quot;;100500;" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="SyncDatabaseAction" BinaryKey="CustomActions.dll" DllEntry="CAQuitExecAndWarn"
+                      Execute="deferred" Return="check" Impersonate="no" />
+
+        <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="yes"
+                      Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\ecs.sqlite"/>
+
+<!--        <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/> -->
         <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="applauncher.exe" ExeCommand=""/>
 
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
@@ -127,8 +191,7 @@
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
-            <Custom Action="FindFreePorts" Before="AssignServerPort"/>
-            <Custom Action="AssignServerPort" Before="AssignClientPort">NOT SERVER_PORT</Custom>
+            <Custom Action="FindFreePorts" Before="AssignClientPort"/>
             <Custom Action="AssignClientPort" Before="FindConfiguredStorages">1</Custom>
             <Custom Action="FindConfiguredStorages" Before="CostInitialize"/> 
         </InstallUISequence>
@@ -137,12 +200,50 @@
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
+            <Custom Action="DetectIfSystemIsStandalone" Before="CostInitialize">$(var.VmsUpgrading)</Custom>
+            <Custom Action="GenerateSystemName" After="DetectIfSystemIsStandalone">$(var.VmsUpgrading) AND NOT SYSTEM_NAME AND STANDALONE_SYSTEM="yes"</Custom>
+
+            <Custom Action="CopyDatabaseFile_Cmd" After="InstallFiles">
+                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CopyDatabaseFile" After="CopyDatabaseFile_Cmd">
+            <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
+
+            <Custom Action="CertGenAction_Cmd" After="CopyDatabaseFile">
+                <![CDATA[ $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CertGenAction" After="CertGenAction_Cmd">
+                <![CDATA[ $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
+
+            <Custom Action="SyncDatabaseAction_Cmd_WithWarning" Before="SyncDatabaseAction">
+                <![CDATA[ $(var.VmsUpgrading) AND $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SyncDatabaseAction_Cmd_WithoutWarning" Before="SyncDatabaseAction">
+                <![CDATA[ (NOT $(var.VmsUpgrading)) AND $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
+
+            <Custom Action="SyncDatabaseAction" After="CertGenAction">
+                <![CDATA[ $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
+
+            <Custom Action="DeleteOldMediaserverSettings_Cmd" After="WriteRegistryValues">$(var.VmsUpgrading)</Custom>
+            <Custom Action="DeleteOldMediaserverSettings" After="DeleteOldMediaserverSettings_Cmd">$(var.VmsUpgrading)</Custom>
+
+<!--            <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">
+                <![CDATA[ NOT $(var.VmsInstalling) ]]>
+            </Custom>                                 
+            <Custom Action="CloseTrayToolAction" Before="StopServices">
+                <![CDATA[ NOT $(var.VmsInstalling) ]]>
+            </Custom> -->
+
             <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">
                 <![CDATA[ NOT $(var.VmsInstalling) ]]>
             </Custom>
             <Custom Action="CloseAppLauncherAction" Before="StopServices">
                 <![CDATA[ NOT $(var.VmsInstalling) ]]>
             </Custom>
+
+<!--            <Custom Action="LaunchTrayTool" After="InstallFinalize">
+            <![CDATA[ (!ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom> -->
+
+            <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
+            <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">REMOVE_DATABASE=1</Custom>
+
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
@@ -250,24 +351,6 @@
 
             <Binary Id="Warning" SourceFile="Binary\Exclam.ico" />
 
-            <?define Inst_S1="(INSTALL_SERVER=1 AND !ServerFeature <> 3)"?>
-            <?define Inst_C1="(INSTALL_CLIENT=1 AND !ClientFeature <> 3)"?>
-            <?define Inst_S0="(NOT $(var.Inst_S1))"?>
-            <?define Inst_C0="(NOT $(var.Inst_C1))"?>
-
-            <?define Inst_S0C0="($(var.Inst_S0) AND $(var.Inst_C0))"?>
-            <?define Inst_S0C1="($(var.Inst_S0) AND $(var.Inst_C1))"?>
-            <?define Inst_S1C0="($(var.Inst_S1) AND $(var.Inst_C0))"?>
-            <?define Inst_S1C1="($(var.Inst_S1) AND $(var.Inst_C1))"?>
-
-            <?define Changing_S1="NOT $(var.VmsInstalling) AND $(var.Inst_S1)"?>
-            <?define Changing_S0C1="NOT $(var.VmsInstalling) AND $(var.Inst_S0C1)"?>
-            <?define ChangingNothing="NOT $(var.VmsInstalling) AND $(var.Inst_S0C0)"?>
-
-            <?define PasswordsEqual="(SERVER_PASSWORD = SERVER_PASSWORD_CONFIRM)" ?>
-            <?define IsSettingsFilled="(SYSTEM_NAME AND SERVER_PORT AND SERVER_LOGIN AND SERVER_PASSWORD AND SERVER_PASSWORD_CONFIRM)"?>
-            <?define IsSettingsValid="($(var.IsSettingsFilled) AND $(var.PasswordsEqual))"?>
-
             <!-- WelcomeDlg -->
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT PREVIOUSVERSIONSINSTALLED</Publish>          
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSVERSIONSINSTALLED</Publish>
@@ -301,26 +384,41 @@
 
             <!-- MediaServerDlg -->
             <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg"/>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"> <![CDATA[ NOT $(var.IsSettingsFilled) ]]> </Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="InvalidPasswordDlg"> <![CDATA[ $(var.IsSettingsFilled) AND NOT $(var.PasswordsEqual) ]]> </Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg"> <![CDATA[ $(var.IsSettingsValid) AND $(var.Inst_C1) ]]> </Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"> <![CDATA[ $(var.IsSettingsValid) AND $(var.Inst_C0) ]]> </Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg" Order="1">NOT $(var.IsSettingsFilled)</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="InvalidPasswordDlg" Order="1">$(var.IsSettingsFilled) AND NOT $(var.PasswordsEqual)</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="BUSYPORT" Value="{}">$(var.IsSettingsCorrect)</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_PORT]" Order="1">$(var.IsSettingsCorrect)</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2">$(var.IsSettingsCorrect)</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">$(var.IsSettingsCorrect) AND BUSYPORT</Publish>
 
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_HOST" Value="localhost">1</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_PORT" Value="[SERVER_PORT]">1</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_LOGIN" Value="[SERVER_LOGIN]">1</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="4"> <![CDATA[ $(var.IsSettingsValid) AND $(var.Inst_C1) ]]> </Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"> <![CDATA[ $(var.IsSettingsValid) AND $(var.Inst_C0) ]]> </Publish>
+
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_HOST" Value="localhost" Order="4">1</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_PORT" Value="[SERVER_PORT]" Order="4">1</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_LOGIN" Value="[SERVER_LOGIN]" Order="4">1</Publish>
+
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="ClientDlg">INSTALL_CLIENT</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">NOT INSTALL_CLIENT</Publish>
+
+            <!-- PortIsBusyDlg -->
+            <Publish Dialog="PortIsBusyDlg" Control="Back" Event="NewDialog" Value="[PORT_DIALOG_BACK]">1</Publish>
+            <Publish Dialog="PortIsBusyDlg" Control="Next" Event="NewDialog" Value="[PORT_DIALOG_NEXT]">1</Publish>
 
             <!-- ClientDlg -->
             <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">NOT $(var.VmsChanging) AND $(var.Inst_S0)</Publish>
             <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg">NOT $(var.VmsChanging) AND $(var.Inst_S1)</Publish>
             <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">$(var.VmsChanging)</Publish>
-            <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+            <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg">$(var.Remove_S1)</Publish>
+            <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">NOT $(var.Remove_S1)</Publish>
 
             <!-- VerifyReadyDlg -->
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading) AND $(var.Inst_S1C0)</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading) AND $(var.Inst_C1)</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading) AND $(var.Inst_S0C0)</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">$(var.VmsRemoving)</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg"><![CDATA[ NOT $(var.Remove_S1) AND $(var.VmsRemoving) AND !ServerFeature <> 3 ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UninstallOptionsDlg">$(var.Remove_S1) OR (!ServerFeature = 3 AND $(var.VmsRemoving))</Publish>            
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">$(var.VmsUpgrading)</Publish>
             
             <Publish Dialog="VerifyReadyDlg" Control="Back" Property="REMOVE" Value="{}" Order="3"><![CDATA[ Installed ]]></Publish>
@@ -357,12 +455,23 @@
             <Publish Dialog="MaintenanceTypeDlg" Control="ChangeButton" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Property="REMOVE" Value="ALL">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="UninstallOptionsDlg">!ServerFeature = 3</Publish>
+            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[ !ServerFeature <> 3 ]]></Publish>            
             
             <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg">$(var.Inst_S1)</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="ClientDlg">$(var.Inst_C1)</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">$(var.Inst_S0C0)</Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg">$(var.ChangingNothing) AND $(var.Remove_S1)</Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">$(var.ChangingNothing) AND NOT $(var.Remove_S1)</Publish>
+
+            <Publish Dialog="UninstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="ClientDlg">$(var.Remove_S1) AND $(var.Inst_C1)</Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ $(var.Remove_S1) AND $(var.Inst_C0) AND WixUI_InstallMode <> "Remove" ]]></Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">NOT $(var.Remove_S1) OR WixUI_InstallMode = "Remove"</Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE" Value="{}">1</Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE_DATABASE" Value="0">1</Publish>
+            
         </UI>
     </Product>
 </Wix>

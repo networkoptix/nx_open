@@ -10,6 +10,7 @@
 #include <utils/common/string.h>
 
 #include <core/resource/camera_history.h>
+#include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -51,8 +52,10 @@ public:
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override {
         if (index.column() == Qn::CheckColumn && role == Qt::CheckStateRole) {
             Qt::CheckState checkState = (Qt::CheckState) value.toInt();
+            emit beforeRecursiveOperation();
             setCheckStateRecursive(index, checkState);
             setCheckStateRecursiveUp(index, checkState);
+            emit afterRecursiveOperation();
             return true;
         } else
             return base_type::setData(index, value, role);
@@ -68,7 +71,13 @@ protected:
         Qn::NodeType leftNode = left.data(Qn::NodeTypeRole).value<Qn::NodeType>();
         Qn::NodeType rightNode = right.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
-        /* Local node must be the last one in a list. */
+        /* "Other Systems" must be the last element */
+        bool leftOtherSystems = leftNode == Qn::OtherSystemsNode;
+        bool rightOtherSystems = rightNode == Qn::OtherSystemsNode;
+        if(leftOtherSystems ^ rightOtherSystems) /* One of the nodes is an "other systems" node, but not both. */
+            return rightOtherSystems;
+
+        /* Local node must be just before "other systems". */
         bool leftLocal = leftNode == Qn::LocalNode;
         bool rightLocal = rightNode == Qn::LocalNode;
         if(leftLocal ^ rightLocal) /* One of the nodes is a local node, but not both. */
@@ -81,6 +90,11 @@ protected:
         if(leftVideoWall ^ rightVideoWall) /* One of the nodes is a videowall node, but not both. */
             return rightVideoWall;
 
+        bool leftIncompatible = leftResource && (leftResource->getStatus() == Qn::Incompatible);
+        bool rightIncompatible = rightResource && (rightResource->getStatus() == Qn::Incompatible);
+        if(leftIncompatible ^ rightIncompatible) /* One of the nodes is incompatible server node, but not both. */
+            return rightIncompatible;
+
         // checking pairs of VideoWallItemNode + VideoWallMatrixNode
         if ((leftNode == Qn::VideoWallItemNode || rightNode == Qn::VideoWallItemNode)
             && leftNode != rightNode)
@@ -89,7 +103,7 @@ protected:
         /* Sort by name. */
         QString leftDisplay = left.data(Qt::DisplayRole).toString();
         QString rightDisplay = right.data(Qt::DisplayRole).toString();
-        int result = naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
+        int result = naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive , false );
         if(result != 0)
             return result < 0;
 
@@ -184,7 +198,7 @@ QAbstractItemModel *QnResourceTreeWidget::model() const {
 
 void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
     if (m_resourceProxyModel) {
-        disconnect(m_resourceProxyModel, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
+        disconnect(m_resourceProxyModel, NULL, this, NULL);
         delete m_resourceProxyModel;
         m_resourceProxyModel = NULL;
     }
@@ -203,7 +217,9 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
 
         ui->resourcesTreeView->setModel(m_resourceProxyModel);
 
-        connect(m_resourceProxyModel, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
+        connect(m_resourceProxyModel, SIGNAL(rowsInserted(const QModelIndex &, int, int)),   this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
+        connect(m_resourceProxyModel, &QnResourceSearchProxyModel::beforeRecursiveOperation, this, &QnResourceTreeWidget::beforeRecursiveOperation);
+        connect(m_resourceProxyModel, &QnResourceSearchProxyModel::afterRecursiveOperation, this, &QnResourceTreeWidget::afterRecursiveOperation);
         at_resourceProxyModel_rowsInserted(QModelIndex());
 
         updateCheckboxesVisibility();
@@ -368,7 +384,7 @@ void QnResourceTreeWidget::updateFilter() {
     m_resourceProxyModel->clearCriteria();
     m_resourceProxyModel->addCriterion(QnResourceCriterionGroup(filter));
     m_resourceProxyModel->addCriterion(m_criterion);
-    m_resourceProxyModel->addCriterion(QnResourceCriterion(QnResource::server));
+    m_resourceProxyModel->addCriterion(QnResourceCriterion(Qn::server));
 
     m_resourceProxyModel->setFilterEnabled(!filter.isEmpty() || !m_criterion.isNull());
     if (!filter.isEmpty())
@@ -423,8 +439,8 @@ void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
 
     // TODO: #Elric. This is totally evil. This check belongs to the slot that handles activation.
     if (resource &&
-        !(resource->flags() & QnResource::layout) &&    /* Layouts cannot be activated by double clicking. */
-        !(resource->flags() & QnResource::server))      /* Bug #1009: Servers should not be activated by double clicking. */
+        !(resource->flags() & Qn::layout) &&    /* Layouts cannot be activated by double clicking. */
+        !(resource->flags() & Qn::server))      /* Bug #1009: Servers should not be activated by double clicking. */
         emit activated(resource);
 }
 
@@ -455,7 +471,7 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
 void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if((resource && resource->hasFlags(QnResource::server)) || nodeType == Qn::ServersNode)
+    if((resource && resource->hasFlags(Qn::server)) || nodeType == Qn::ServersNode)
         ui->resourcesTreeView->expand(index);
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }

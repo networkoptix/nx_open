@@ -25,7 +25,7 @@ public:
     QWaitCondition cond;
     mutable QMutex mtx;
     //!map<pair<time, timerID>, handler>
-    std::map<std::pair<qint64, quint64>, TimerEventHandler* const> timeToTask;
+    std::map<std::pair<qint64, quint64>, std::function<void(quint64)> > timeToTask;
     //!map<timerID, time>
     std::map<quint64, qint64> taskToTime;
     bool terminated;
@@ -79,6 +79,14 @@ quint64 TimerManager::addTimer(
     TimerEventHandler* const taskManager,
     const unsigned int delay )
 {
+    using namespace std::placeholders;
+    return addTimer( std::bind( &TimerEventHandler::onTimer, taskManager, _1 ), delay );
+}
+
+quint64 TimerManager::addTimer(
+    std::function<void(quint64)> taskHandler,
+    const unsigned int delay )
+{
     static QAtomicInt lastTaskID = 0;
 
     QMutexLocker lk( &m_impl->mtx );
@@ -90,7 +98,7 @@ quint64 TimerManager::addTimer(
 
     if( !m_impl->timeToTask.insert( make_pair(
             make_pair( taskTime, timerID ),
-            taskManager ) ).second )
+            taskHandler ) ).second )
     {
         //ASSERT( false );
     }
@@ -155,11 +163,11 @@ void TimerManager::run()
                 if( m_impl->timeToTask.empty() )
                     break;
 
-                map<pair<qint64, quint64>, TimerEventHandler* const>::iterator taskIter = m_impl->timeToTask.begin();
+                auto taskIter = m_impl->timeToTask.begin();
                 if( currentTime < taskIter->first.first )
                     break;
 
-                TimerEventHandler* const taskManager = taskIter->second;
+                auto taskManager = taskIter->second;
                 const quint64 timerID = taskIter->first.second;
 
                 /*std::map<quint64, qint64>::size_type erasedCnt =*/ m_impl->taskToTime.erase( timerID );
@@ -171,7 +179,7 @@ void TimerManager::run()
                 {
                     m_impl->runningTaskID = timerID;
                     lk.unlock();
-                    taskManager->onTimer( timerID );
+                    taskManager( timerID );
                 }
                 catch( const std::exception& e )
                 {

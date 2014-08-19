@@ -7,6 +7,7 @@
 
 #include <utils/common/checked_cast.h>
 #include <common/common_meta_types.h>
+#include <common/common_module.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
@@ -58,7 +59,7 @@ QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, QObject *par
     m_urlsShown(true),
     m_rootNodeType(rootNodeType)
 {
-    m_rootNodeTypes << Qn::LocalNode << Qn::UsersNode << Qn::ServersNode << Qn::RootNode << Qn::BastardNode;
+    m_rootNodeTypes << Qn::LocalNode << Qn::UsersNode << Qn::ServersNode << Qn::OtherSystemsNode << Qn::RootNode << Qn::BastardNode;
 
     /* Create top-level nodes. */
     foreach(Qn::NodeType t, m_rootNodeTypes)
@@ -75,6 +76,7 @@ QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, QObject *par
     connect(snapshotManager(),  &QnWorkbenchLayoutSnapshotManager::flagsChanged,    this,   &QnResourcePoolModel::at_snapshotManager_flagsChanged);
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged,   this,   &QnResourcePoolModel::at_accessController_permissionsChanged);
     connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnResourcePoolModel::at_context_userChanged, Qt::QueuedConnection);
+    connect(qnCommon,           &QnCommonModule::systemNameChanged,                 this,   &QnResourcePoolModel::at_commonModule_systemNameChanged);
 
     QnResourceList resources = resourcePool()->getResources(); 
 
@@ -83,6 +85,7 @@ QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, QObject *par
     /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
     foreach(const QnResourcePtr &resource, resources)
         at_resPool_resourceAdded(resource);
+
 }
 
 QnResourcePoolModel::~QnResourcePoolModel() {
@@ -91,16 +94,17 @@ QnResourcePoolModel::~QnResourcePoolModel() {
     disconnect(resourcePool(), NULL, this, NULL);
     disconnect(snapshotManager(), NULL, this, NULL);
 
-    foreach(const QnResourcePtr &resource, resources)
-        at_resPool_resourceRemoved(resource);
-
     /* Free memory. */
     qDeleteAll(m_resourceNodeByResource);
     qDeleteAll(m_itemNodeByUuid);
+    qDeleteAll(m_systemNodeBySystemName);
     foreach(Qn::NodeType t, m_rootNodeTypes) {
         delete m_rootNodes[t];
         qDeleteAll(m_nodes[t]);
     }
+
+    /* Note, we don't have to check and remove all the resources from the resource pool
+       because they will be removed recursively starting from root nodes. */
 }
 
 QnResourcePtr QnResourcePoolModel::resource(const QModelIndex &index) const {
@@ -113,11 +117,11 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
 
     QHash<QnResourcePtr, QnResourcePoolModelNode *>::iterator pos = m_resourceNodeByResource.find(resource);
     if(pos == m_resourceNodeByResource.end()) {
-        Qn::NodeType nodeType = QnMediaServerResource::isEdgeServer(resource->getParentResource())
-            ? Qn::EdgeNode
-            : Qn::ResourceNode;
-        pos = m_resourceNodeByResource.insert(resource, new QnResourcePoolModelNode(this, resource, nodeType));
+        Qn::NodeType nodeType = Qn::ResourceNode;
+        if (QnMediaServerResource::isEdgeServer(resource->getParentResource()))
+            nodeType = Qn::EdgeNode;
 
+        pos = m_resourceNodeByResource.insert(resource, new QnResourcePoolModelNode(this, resource, nodeType));
     }
     return *pos;
 }
@@ -147,14 +151,24 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QModelIndex &index) con
 }
 
 QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource, const QString &groupId, const QString &groupName) {
-    RecorderHash recorderHash = m_recorderHashByResource[resource];
-    if (recorderHash.contains(groupId))
-        return recorderHash[groupId];
+    if (m_recorderHashByResource[resource].contains(groupId))
+        return m_recorderHashByResource[resource][groupId];
 
     QnResourcePoolModelNode* recorder = new QnResourcePoolModelNode(this, Qn::RecorderNode, groupName);
     recorder->setParent(m_resourceNodeByResource[resource]);
-    recorderHash[groupId] = recorder;
+    m_recorderHashByResource[resource][groupId] = recorder;
     return recorder;
+}
+
+QnResourcePoolModelNode *QnResourcePoolModel::systemNode(const QString &systemName) {
+    QnResourcePoolModelNode *node = m_systemNodeBySystemName[systemName];
+    if (node)
+        return node;
+
+    node = new QnResourcePoolModelNode(this, Qn::SystemNode, systemName);
+    node->setParent(m_rootNodes[Qn::OtherSystemsNode]);
+    m_systemNodeBySystemName[systemName] = node;
+    return node;
 }
 
 void QnResourcePoolModel::deleteNode(QnResourcePoolModelNode *node) {
@@ -195,7 +209,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
     if(!node->resource())
         return m_rootNodes[m_rootNodeType];
 
-    if(node->resourceFlags() & QnResource::user) {
+    if(node->resourceFlags() & Qn::user) {
         if(!accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission)) {
             return m_rootNodes[m_rootNodeType];
         } else {
@@ -206,15 +220,33 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
     if (node->type() == Qn::EdgeNode)
         return m_rootNodes[Qn::ServersNode];
 
-    if(node->resourceFlags() & QnResource::server)
-        return m_rootNodes[Qn::ServersNode];
+    if (node->resourceFlags() & Qn::server) {
+        if (node->resourceStatus() == Qn::Incompatible) {
+            QnMediaServerResourcePtr server = node->resource().staticCast<QnMediaServerResource>();
 
-    if (node->resourceFlags() & QnResource::videowall)
+            QString systemName = server->getSystemName();
+            if (systemName == qnCommon->localSystemName())
+                return m_rootNodes[Qn::ServersNode];
+
+            return systemName.isEmpty() ? m_rootNodes[Qn::OtherSystemsNode] : systemNode(systemName);
+        }
+        return m_rootNodes[Qn::ServersNode];
+    }
+
+    if (node->resourceFlags() & Qn::videowall)
         return m_rootNodes[Qn::RootNode];
 
+    // We are requesting for the list of users so we don't want to see their layouts
+    if (m_rootNodeType == Qn::UsersNode && !(node->resourceFlags() &  Qn::user)) 
+        return m_rootNodes[Qn::BastardNode];
+
+    // We are requesting for the list of users so we don't want to see their layouts
+    if (m_rootNodeType == Qn::UsersNode && !(node->resourceFlags() &  Qn::user)) 
+        return m_rootNodes[Qn::BastardNode];
+
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
-    if(!parentResource || (parentResource->flags() & QnResource::local_server) == QnResource::local_server) {
-        if(node->resourceFlags() & QnResource::local) {
+    if(!parentResource || (parentResource->flags() & Qn::local_server) == Qn::local_server) {
+        if(node->resourceFlags() & Qn::local) {
             return m_rootNodes[Qn::LocalNode];
         } else {
             return NULL;
@@ -386,8 +418,6 @@ QMimeData *QnResourcePoolModel::mimeData(const QModelIndexList &indexes) const {
 }
 
 bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction action, int row, int column, const QModelIndex &parent) {
-    qDebug() << "Qt::DropAction" << action;
-
     if (!mimeData)
         return false;
 
@@ -408,7 +438,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
     if(node->type() == Qn::ItemNode)
         node = node->parent(); /* Dropping into an item is the same as dropping into a layout. */
 
-    if(node->parent() && (node->parent()->resourceFlags() & QnResource::server))
+    if(node->parent() && (node->parent()->resourceFlags() & Qn::server))
         node = node->parent(); /* Dropping into a server item is the same as dropping into a server */
 
     if (node->type() == Qn::VideoWallItemNode) {
@@ -524,8 +554,15 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
     if (!m_resourceNodeByResource.contains(resource))
         return;
 
-    delete m_resourceNodeByResource.take(resource);
+    QnResourcePoolModelNode *node = m_resourceNodeByResource.take(resource);
+    QnResourcePoolModelNode *parent = node->parent();
+
+    delete node;
+
+    if (parent)
+        parent->update();
 }
+
 
 void QnResourcePoolModel::at_context_userChanged() {
     m_rootNodes[Qn::LocalNode]->update();
@@ -573,6 +610,7 @@ void QnResourcePoolModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout,
     } else {
         resource = resourcePool()->getResourceByUniqId(item.resource.path);
     }
+    //Q_ASSERT(resource);   //too many strange situations with invalid resources in layout items
 
     node->setResource(resource);
     node->setParent(parentNode);
@@ -625,4 +663,8 @@ void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResource
         recorder->m_displayName = camera->getGroupName();
         recorder->changeInternal();
     }
+}
+
+void QnResourcePoolModel::at_commonModule_systemNameChanged() {
+    m_rootNodes[Qn::ServersNode]->update();
 }

@@ -28,10 +28,10 @@ namespace ec2
     struct ApiObjectInfo
     {
         ApiObjectInfo() {}
-        ApiObjectInfo(const ApiOjectType& type, const QnId& id): type(type), id(id) {}
+        ApiObjectInfo(const ApiOjectType& type, const QUuid& id): type(type), id(id) {}
 
         ApiOjectType type;
-        QnId id;
+        QUuid id;
     };
     class ApiObjectInfoList: public std::vector<ApiObjectInfo>
     {
@@ -48,17 +48,15 @@ namespace ec2
         }
     };
 
-    class QnDbManager;
-
-    class QnDbManager: public QnDbHelper
+    class QnDbManager
+    :
+        public QObject,
+        public QnDbHelper
     {
-    public:
+        Q_OBJECT
 
-        QnDbManager(
-            QnResourceFactory* factory,
-            LicenseManagerImpl* const licenseManagerImpl,
-            const QString& dbFilePath,
-            const QString& dbFilePathStatic);
+    public:
+        QnDbManager();
         virtual ~QnDbManager();
 
 
@@ -74,23 +72,33 @@ namespace ec2
             QnDbManager* m_db;
         };
 
-        bool init();
+        bool init(
+            QnResourceFactory* factory,
+            const QString& dbFilePath,
+            const QString& dbFilePathStatic );
+        bool isInitialized() const;
 
         static QnDbManager* instance();
         
         template <class T>
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
+            Q_ASSERT_X(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
                 return result;
             return transactionLog->saveTransaction( tran, serializedTran);
         }
 
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiDatabaseDumpData>& tran, const QByteArray& /*serializedTran*/)
+        {
+            return executeTransactionInternal(tran);
+        }
 
         template <class T>
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
+            Q_ASSERT_X(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             QnDbTransactionLocker lock(&m_tran);
             ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
@@ -115,6 +123,9 @@ namespace ec2
         //getCurrentTime
         ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiTimeData& currentTime);
 
+        //dumpDatabase
+        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
+
         //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
         //getStorageData
@@ -124,7 +135,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
         //getCameras
-        ErrorCode doQueryNoLock(const QnId& mServerId, ApiCameraDataList& cameraList);
+        ErrorCode doQueryNoLock(const QUuid& mServerId, ApiCameraDataList& cameraList);
 
         //getServers
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
@@ -148,7 +159,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
 
         //getResourceParams
-        ErrorCode doQueryNoLock(const QnId& resourceId, ApiResourceParamsData& params);
+        ErrorCode doQueryNoLock(const QUuid& resourceId, ApiResourceParamsData& params);
 
         // ApiFullInfo
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiFullInfoData& data);
@@ -159,12 +170,23 @@ namespace ec2
         //getParams
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data);
 
+        // ApiDiscoveryDataList
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiDiscoveryDataList& data);
+
 		// --------- misc -----------------------------
         bool markLicenseOverflow(bool value, qint64 time);
         QUuid getID() const;
 
-        ApiOjectType getObjectType(const QnId& objectId);
+        ApiOjectType getObjectType(const QUuid& objectId);
         ApiObjectInfoList getNestedObjects(const ApiObjectInfo& parentObject);
+
+        bool saveMiscParam( const QByteArray& name, const QByteArray& value );
+        bool readMiscParam( const QByteArray& name, QByteArray* value );
+
+    signals:
+        //!Emitted after \a QnDbManager::init was successfully executed
+        void initialized();
+
     private:
         friend class QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
@@ -191,6 +213,8 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryDataList> &tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionInternal(const QnTransaction<ApiIdData>& tran);
@@ -223,12 +247,37 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallInstanceStatusData> &) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadData> &) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiModuleData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiModuleDataList> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoverPeerData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiConnectionData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiConnectionDataList> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemNameData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -263,7 +312,12 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode deleteTableRecord(const QnId& id, const QString& tableName, const QString& fieldName);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerSystemTimeData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode deleteTableRecord(const QUuid& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
         ErrorCode updateResource(const ApiResourceData& data, qint32 internalId);
@@ -280,74 +334,84 @@ namespace ec2
         ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
         ErrorCode updateCameraSchedule(const ApiCameraData& data, qint32 internalId);
         ErrorCode removeCameraSchedule(qint32 internalId);
-        ErrorCode removeCamera(const QnId& guid);
+        ErrorCode removeCamera(const QUuid& guid);
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
         ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
         ErrorCode updateStorages(const ApiMediaServerData&);
-        ErrorCode removeServer(const QnId& guid);
-        ErrorCode removeStoragesByServer(const QnId& serverGUID);
+        ErrorCode removeServer(const QUuid& guid);
+        ErrorCode removeStoragesByServer(const QUuid& serverGUID);
 
-        ErrorCode removeLayout(const QnId& id);
-        ErrorCode removeLayoutInternal(const QnId& id, const qint32 &internalId);
+        ErrorCode removeLayout(const QUuid& id);
+        ErrorCode removeLayoutInternal(const QUuid& id, const qint32 &internalId);
         ErrorCode saveLayout(const ApiLayoutData& params);
         ErrorCode insertOrReplaceLayout(const ApiLayoutData& data, qint32 internalId);
         ErrorCode updateLayoutItems(const ApiLayoutData& data, qint32 internalLayoutId);
         ErrorCode removeLayoutItems(qint32 id);
 
         ErrorCode deleteUserProfileTable(const qint32 id);
-        ErrorCode removeUser( const QnId& guid );
+        ErrorCode removeUser( const QUuid& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
+        ErrorCode checkExistingUser(const QString &name, qint32 internalId);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);
-        ErrorCode removeVideowall(const QnId& id);
+        ErrorCode removeVideowall(const QUuid& id);
         ErrorCode insertOrReplaceVideowall(const ApiVideowallData& data, qint32 internalId);
-        ErrorCode deleteVideowallPcs(const QnId &videowall_guid);
-        ErrorCode deleteVideowallItems(const QnId &videowall_guid);
+        ErrorCode deleteVideowallPcs(const QUuid &videowall_guid);
+        ErrorCode deleteVideowallItems(const QUuid &videowall_guid);
         ErrorCode updateVideowallItems(const ApiVideowallData& data);
         ErrorCode updateVideowallScreens(const ApiVideowallData& data);
-        ErrorCode removeLayoutFromVideowallItems(const QnId &layout_id);
-        ErrorCode deleteVideowallMatrices(const QnId &videowall_guid);
+        ErrorCode removeLayoutFromVideowallItems(const QUuid &layout_id);
+        ErrorCode deleteVideowallMatrices(const QUuid &videowall_guid);
         ErrorCode updateVideowallMatrices(const ApiVideowallData &data);
 
         ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule);
-        ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);
-        ErrorCode removeBusinessRule( const QnId& id );
+        ErrorCode insertBRuleResource(const QString& tableName, const QUuid& ruleGuid, const QUuid& resourceGuid);
+        ErrorCode removeBusinessRule( const QUuid& id );
         ErrorCode updateBusinessRule(const ApiBusinessRuleData& rule);
 
         ErrorCode saveLicense(const ApiLicenseData& license);
+        ErrorCode removeLicense(const ApiLicenseData& license);
 
         ErrorCode addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
         ErrorCode removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
 
-        bool createDatabase(bool *dbJustCreated);
+        bool createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2);
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
         
-        qint32 getResourceInternalId( const QnId& guid );
-        QnId getResourceGuid(const qint32 &internalId);
-        qint32 getBusinessRuleInternalId( const QnId& guid );
+        qint32 getResourceInternalId( const QUuid& guid );
+        QUuid getResourceGuid(const qint32 &internalId);
+        qint32 getBusinessRuleInternalId( const QUuid& guid );
 
         void beginTran();
         void commit();
         void rollback();
     private:
-        QMap<int, QnId> getGuidList(const QString& request);
-        bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
+        enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_INT};
+
+        QMap<int, QUuid> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
+
+        bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QUuid>& guids);
         bool updateGuids();
-        QnId getType(const QString& typeName);
+        QUuid getType(const QString& typeName);
+        bool resyncTransactionLog();
+
+        template <class ObjectType, class ObjectListType> 
+        bool fillTransactionLogInternal(ApiCommand::Value command);
+        bool addTransactionForGeneralSettings();
     private:
         QnResourceFactory* m_resourceFactory;
-        LicenseManagerImpl* const m_licenseManagerImpl;
-        QnId m_storageTypeId;
-        QnId m_serverTypeId;
-        QnId m_cameraTypeId;
-        QnId m_adminUserID;
+        QUuid m_storageTypeId;
+        QUuid m_serverTypeId;
+        QUuid m_cameraTypeId;
+        QUuid m_adminUserID;
         int m_adminUserInternalID;
         ApiResourceTypeDataList m_cachedResTypes;
         bool m_licenseOverflowMarked;
         qint64 m_licenseOverflowTime;
         QUuid m_dbInstanceId;
+        bool m_initialized;
         
         /*
         * Database for static or very rare modified data. Be carefull! It's not supported DB transactions for static DB
@@ -356,6 +420,7 @@ namespace ec2
         QSqlDatabase m_sdbStatic;
         QnDbTransaction m_tranStatic;
         mutable QReadWriteLock m_mutexStatic;
+        bool m_needResyncLog;
     };
 };
 

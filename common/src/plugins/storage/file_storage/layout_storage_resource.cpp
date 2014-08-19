@@ -407,8 +407,10 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
     if (m_index.entryCount >= (quint32)MAX_FILES_AT_LAYOUT)
         return false;
 
+#ifdef _DEBUG
     qint64 testPos = 0;
     Q_ASSERT_X(getFileOffset(srcFileName, &testPos) == -1, Q_FUNC_INFO, "Duplicate file name");
+#endif
 
     m_index.entries[m_index.entryCount++] = QnLayoutFileIndexEntry(fileSize - m_novFileOffset, qt4Hash(fileName));
 

@@ -130,22 +130,23 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_prevLQ(-1),
     m_doNotChangeDisplayTime(false),
     m_firstLivePacket(true),
-    m_multiView(false)
+    m_multiView(false),
+    m_fisheyeEnabled(false)
 {
 
-    if (resource && resource->toResource()->hasFlags(QnResource::live_cam))
+    if (resource && resource->toResource()->hasFlags(Qn::live_cam))
         m_isRealTimeSource = true;
     else
         m_isRealTimeSource = false;
 
-    if (resource && resource->toResource()->hasFlags(QnResource::still_image)) {
+    if (resource && resource->toResource()->hasFlags(Qn::still_image)) {
         m_isStillImage = true;
 
         QFileInfo fileInfo(resource->toResource()->getUrl());
         if (fileInfo.isReadable())
-            resource->toResource()->setStatus(QnResource::Online);
+            resource->toResource()->setStatus(Qn::Online);
         else
-            resource->toResource()->setStatus(QnResource::Offline);
+            resource->toResource()->setStatus(Qn::Offline);
     }
 
     m_storedMaxQueueSize = m_dataQueue.maxSize();
@@ -166,6 +167,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
 
 QnCamDisplay::~QnCamDisplay()
 {
+    qnRedAssController->unregisterConsumer(this);
+
     Q_ASSERT(!isRunning());
     stop();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -718,7 +721,7 @@ void QnCamDisplay::onBeforeJump(qint64 time)
     m_doNotChangeDisplayTime = false;
 
     m_emptyPacketCounter = 0;
-    if (m_extTimeSrc && m_eofSignalSended) {
+    if (m_extTimeSrc && m_eofSignalSended && time != DATETIME_NOW) {
         m_extTimeSrc->onEofReached(this, false);
         m_eofSignalSended = false;
     }
@@ -1101,7 +1104,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
         //bool playUnsync = (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync);
         bool isFillerPacket =  emptyData->timestamp > 0 && emptyData->timestamp < DATETIME_NOW;
-        if (m_emptyPacketCounter >= 3 || isFillerPacket)
+        //if (m_emptyPacketCounter >= 3 || isFillerPacket)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
             bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
@@ -1669,6 +1672,16 @@ void QnCamDisplay::setFullScreen(bool fullScreen)
     m_fullScreen = fullScreen;
 }
 
+bool QnCamDisplay::isFisheyeEnabled() const
+{
+    return m_fisheyeEnabled;
+}
+
+void QnCamDisplay::setFisheyeEnabled(bool fisheyeEnabled)
+{
+    m_fisheyeEnabled = fisheyeEnabled;
+}
+
 int QnCamDisplay::getAvarageFps() const
 {
     return m_fpsStat.getFps();
@@ -1681,7 +1694,7 @@ bool QnCamDisplay::isBuffering() const
     // for offline resource at LIVE position no any data. Check it
     if (!isRealTimeSource())
         return true; // if archive position then buffering mark should be resetted event for offline resource
-    return m_resource->toResource()->getStatus() == QnResource::Online || m_resource->toResource()->getStatus() == QnResource::Recording;
+    return m_resource->toResource()->getStatus() == Qn::Online || m_resource->toResource()->getStatus() == Qn::Recording;
 }
 
 qreal QnCamDisplay::overridenAspectRatio() const {

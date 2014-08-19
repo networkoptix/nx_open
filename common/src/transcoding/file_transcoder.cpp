@@ -294,7 +294,7 @@ bool FileTranscoder::openFiles()
 
     QnResourcePtr res( new DummyResource() );
     res->setUrl( m_srcFilePath );
-    res->setStatus( QnResource::Online );
+    res->setStatus( Qn::Online );
     if( !mediaFileReader->open( res ) )
         return false;
 

@@ -181,7 +181,11 @@ void QnCachingCameraDataLoader::setMotionRegions(const QList<QRegion> &motionReg
 
     m_motionRegions = motionRegions;
     m_requestedTimePeriods[Qn::MotionContent].clear();
-    m_timePeriodCameraData[Qn::MotionContent].clear();
+
+    if(!m_timePeriodCameraData[Qn::MotionContent].isEmpty()) {
+        m_timePeriodCameraData[Qn::MotionContent].clear();
+        emit periodsChanged(Qn::MotionContent);
+    }
     updateTimePeriods(Qn::MotionTimePeriod);
 }
 

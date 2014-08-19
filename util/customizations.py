@@ -14,7 +14,19 @@ class ColorDummy():
     Fore = Empty()
 
 colorer = ColorDummy()
+
+def info(message):
+    print colorer.Style.BRIGHT + message
+    
+def green(message):
+    print colorer.Style.BRIGHT + colorer.Fore.GREEN + message
         
+def warn(message):
+    print colorer.Style.BRIGHT + colorer.Fore.YELLOW + message
+        
+def err(message):
+    print colorer.Style.BRIGHT + colorer.Fore.RED + message
+
 class Customization():
     def __init__(self, name, path):
         self.name = name
@@ -37,7 +49,7 @@ class Customization():
                 if not 'parent.customization' in line:
                     continue
                 return (self.name in line)
-        print colorer.Style.BRIGHT + colorer.Fore.RED + 'Invalid build.properties file: ' + os.path.join(self.path, 'build.properties')
+        err('Invalid build.properties file: ' + os.path.join(self.path, 'build.properties'))
         return False
         
     def populateFileList(self):
@@ -60,31 +72,40 @@ class Customization():
         self.total = list(set(self.base + self.dark + self.light))
         
     def validateInner(self):
-        print colorer.Style.BRIGHT + 'Validating ' + self.name + '...'
+        info('Validating ' + self.name + '...')
+        clean = True
         for entry in self.base:
             if entry in self.dark and entry in self.light:
-                print colorer.Style.BRIGHT + colorer.Fore.YELLOW + 'File ' + os.path.join(self.basePath, entry) + ' duplicated in both skins'
+                clean = False
+                warn('File ' + os.path.join(self.basePath, entry) + ' duplicated in both skins')
 
         for entry in self.dark:
             if not entry in self.light:
+                clean = False
                 if entry in self.base:
-                    print colorer.Style.BRIGHT + colorer.Fore.YELLOW + 'File ' + os.path.join(self.lightPath, entry) + ' missing, using base version'
+                    warn('File ' + os.path.join(self.lightPath, entry) + ' missing, using base version')
                 else:
-                    print colorer.Style.BRIGHT + colorer.Fore.RED + 'File ' + os.path.join(self.darkPath, entry) + ' missing in light skin'
+                    err('File ' + os.path.join(self.darkPath, entry) + ' missing in light skin')
                 
         for entry in self.light:
             if not entry in self.dark:
+                clean = False
                 if entry in self.base:
-                    print colorer.Style.BRIGHT + colorer.Fore.YELLOW + 'File ' + os.path.join(self.darkPath, entry) + ' missing, using base version'
+                    warn('File ' + os.path.join(self.darkPath, entry) + ' missing, using base version')
                 else:
-                    print colorer.Style.BRIGHT + colorer.Fore.RED + 'File ' + os.path.join(self.lightPath, entry) + ' missing in dark skin'
-                
+                    err('File ' + os.path.join(self.lightPath, entry) + ' missing in dark skin')
+        if clean:
+            green('Success')
         
     def validateCross(self, other):
-        print colorer.Style.BRIGHT + 'Validating ' + self.name + ' vs ' + other.name + '...'
+        info('Validating ' + self.name + ' vs ' + other.name + '...')
+        clean = True
         for entry in self.total:
             if not entry in other.total:
-                print colorer.Style.BRIGHT + colorer.Fore.RED + 'File ' + os.path.join(self.basePath, entry) + ' missing in ' + other.name
+                clean = False
+                err('File ' + os.path.join(self.basePath, entry) + ' missing in ' + other.name)
+        if clean:
+            green('Success')
         
 def main():
 
@@ -116,7 +137,7 @@ def main():
     for c1, c2 in combinations(roots, 2):
         c1.validateCross(c2)
         c2.validateCross(c1)
-    print colorer.Style.BRIGHT + 'Done'
+    print colorer.Style.BRIGHT + 'Validation finished'
 
 if __name__ == "__main__":
     main()

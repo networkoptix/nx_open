@@ -179,6 +179,10 @@ void QnWorkbenchLayout::submit(const QnLayoutResourcePtr &resource) const {
     resource->setItems(datas);
 }
 
+void QnWorkbenchLayout::notifyTitleChanged() {
+    emit titleChanged();
+}
+
 void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
     if(item == NULL) {
         qnNullWarning(item);

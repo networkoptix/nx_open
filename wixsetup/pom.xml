@@ -17,10 +17,10 @@
         <root.dir>${basedir}/..</root.dir>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
+        <DbSync22Dir>${libdir}/${arch}/share/dbsync-2.2</DbSync22Dir>
     </properties>
 
     <build>
-        <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${install.type}-beta</finalName>
         <directory>${arch}</directory>
         <sourceDirectory>${basedir}</sourceDirectory>
         <plugins>
@@ -80,25 +80,35 @@
                     </execution>
                 </executions>
             </plugin>	
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
-                <executions>
-                    <execution>
-                        <id>compress</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <exec dir="${libdir}/bin/${build.configuration}" executable="${project.build.directory}/pack.bat" failifexecutionfails="true" />
-                            </target>
-                            <skip>${skip.compress}</skip>
-                        </configuration>
-                    </execution>    
-                </executions>
-            </plugin>                       
+					<plugin>
+						<groupId>com.google.code.maven-replacer-plugin</groupId>
+						<artifactId>replacer</artifactId>
+						<version>1.5.2</version>
+						<executions>
+							<execution>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>replace</goal>
+								</goals>
+								<configuration>
+									<encoding>utf-8</encoding>
+									<file>${project.build.directory}/CustomActions/CustomActions-${arch}.vcxproj</file>
+									<!-- <excludes>
+										<exclude>**/vmaxproxy-x64.vcproj</exclude>
+									</excludes> -->	
+									<ignoreMissingFile>true</ignoreMissingFile>                                    
+									<replacements>
+										<replacement>
+                                            <token>
+                                                <![CDATA[<PlatformToolset>v110</PlatformToolset>]]></token>
+                                            <value>
+                                                <![CDATA[<PlatformToolSet>${PlatformToolSet}</PlatformToolSet>]]></value>
+                                        </replacement>           
+									</replacements>
+								</configuration>								
+							</execution>
+						</executions>
+					</plugin>                     
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -108,7 +118,7 @@
 
                     <execution>
                         <id>package-CustomActions-with-msbuild</id>
-                        <phase>generate-resources</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
@@ -176,19 +186,5 @@
                 </executions>
             </plugin>                    
         </plugins>
-    </build>
-    <profiles>	      
-        <profile>
-            <id>nobeta</id>
-            <activation>
-                <property>
-                    <name>beta</name>
-                    <value>false</value>
-                </property>
-            </activation>
-            <properties>
-                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${install.type}</finalName>    
-            </properties>
-        </profile>	  
-    </profiles>        
+    </build>       
 </project>

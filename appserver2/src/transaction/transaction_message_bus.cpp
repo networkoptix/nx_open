@@ -4,7 +4,6 @@
 #include <QtCore/QTimer>
 
 #include "remote_ec_connection.h"
-#include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
 #include "ec2_connection.h"
 #include "common/common_module.h"
@@ -12,16 +11,22 @@
 #include <transaction/transaction_transport.h>
 
 #include "api/app_server_connection.h"
+#include "api/runtime_info_manager.h"
 #include "nx_ec/data/api_server_alive_data.h"
 #include "utils/common/synctime.h"
+#include "utils/network/global_module_finder.h"
+#include "utils/network/router.h"
+#include "nx_ec/data/api_server_alive_data.h"
 #include "ec_connection_notification_manager.h"
 #include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_resource_data.h"
+#include "managers/time_manager.h"
 
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
-#include "api/runtime_info_manager.h"
 
+
+#define TRANSACTION_MESSAGE_BUS_DEBUG
 
 namespace ec2
 {
@@ -48,10 +53,10 @@ struct SendTransactionToTransportFuction {
 };
 
 template<class T, class Function>
-bool handleTransactionParams(QnInputBinaryStream<QByteArray> *stream, const QnAbstractTransaction &abstractTransaction, Function function) 
+bool handleTransactionParams(QnUbjsonReader<QByteArray> *stream, const QnAbstractTransaction &abstractTransaction, Function function) 
 {
     QnTransaction<T> transaction(abstractTransaction);
-    if (!QnBinary::deserialize(stream, &transaction.params)) 
+    if (!QnUbjson::deserialize(stream, &transaction.params)) 
         return false;
             
     function(transaction);
@@ -62,8 +67,8 @@ template<class Function>
 bool handleTransaction(const QByteArray &serializedTransaction, const Function &function)
 {
     QnAbstractTransaction transaction;
-    QnInputBinaryStream<QByteArray> stream(&serializedTransaction);
-    if (!QnBinary::deserialize(&stream, &transaction)) {
+    QnUbjsonReader<QByteArray> stream(&serializedTransaction);
+    if (!QnUbjson::deserialize(&stream, &transaction)) {
         qnWarning("Ignore bad transaction data. size=%1.", serializedTransaction.size());
         return false;
     }
@@ -91,15 +96,14 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::saveVideowall:         return handleTransactionParams<ApiVideowallData>        (&stream, transaction, function);
     case ApiCommand::removeVideowall:       return handleTransactionParams<ApiIdData>               (&stream, transaction, function);
     case ApiCommand::videowallControl:      return handleTransactionParams<ApiVideowallControlMessageData>(&stream, transaction, function);
-    case ApiCommand::videowallInstanceStatus:  
-                                            return handleTransactionParams<ApiVideowallInstanceStatusData>(&stream, transaction, function);
     case ApiCommand::addStoredFile:
     case ApiCommand::updateStoredFile:      return handleTransactionParams<ApiStoredFileData>       (&stream, transaction, function);
     case ApiCommand::removeStoredFile:      return handleTransactionParams<ApiStoredFilePath>       (&stream, transaction, function);
     case ApiCommand::broadcastBusinessAction:
     case ApiCommand::execBusinessAction:    return handleTransactionParams<ApiBusinessActionData>   (&stream, transaction, function);
     case ApiCommand::addLicenses:           return handleTransactionParams<ApiLicenseDataList>      (&stream, transaction, function);
-    case ApiCommand::addLicense:            return handleTransactionParams<ApiLicenseData>          (&stream, transaction, function);
+    case ApiCommand::addLicense:            
+    case ApiCommand::removeLicense:         return handleTransactionParams<ApiLicenseData>          (&stream, transaction, function);
     case ApiCommand::resetBusinessRules:    return handleTransactionParams<ApiResetBusinessRuleData>(&stream, transaction, function);
     case ApiCommand::uploadUpdate:          return handleTransactionParams<ApiUpdateUploadData>     (&stream, transaction, function);
     case ApiCommand::uploadUpdateResponce:  return handleTransactionParams<ApiUpdateUploadResponceData>(&stream, transaction, function);
@@ -108,6 +112,21 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::removeCameraBookmarkTags:
                                             return handleTransactionParams<ApiCameraBookmarkTagDataList>(&stream, transaction, function);
 
+    case ApiCommand::moduleInfo:            return handleTransactionParams<ApiModuleData>           (&stream, transaction, function);
+    case ApiCommand::moduleInfoList:        return handleTransactionParams<ApiModuleDataList>       (&stream, transaction, function);
+
+    case ApiCommand::discoverPeer:          return handleTransactionParams<ApiDiscoverPeerData>     (&stream, transaction, function);
+    case ApiCommand::addDiscoveryInformation:
+    case ApiCommand::removeDiscoveryInformation:
+                                            return handleTransactionParams<ApiDiscoveryDataList>    (&stream, transaction, function);
+
+    case ApiCommand::addConnection:
+    case ApiCommand::removeConnection:
+                                            return handleTransactionParams<ApiConnectionData>       (&stream, transaction, function);
+    case ApiCommand::availableConnections:  return handleTransactionParams<ApiConnectionDataList>   (&stream, transaction, function);
+
+    case ApiCommand::changeSystemName:      return handleTransactionParams<ApiSystemNameData>       (&stream, transaction, function);
+
     case ApiCommand::lockRequest:
     case ApiCommand::lockResponse:
     case ApiCommand::unlockRequest:         return handleTransactionParams<ApiLockData>             (&stream, transaction, function); 
@@ -115,6 +134,8 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::tranSyncRequest:       return handleTransactionParams<QnTranState>             (&stream, transaction, function);
     case ApiCommand::tranSyncResponse:      return handleTransactionParams<QnTranStateResponse>     (&stream, transaction, function);
     case ApiCommand::runtimeInfoChanged:    return handleTransactionParams<ApiRuntimeData>          (&stream, transaction, function);
+    case ApiCommand::broadcastPeerSystemTime: return handleTransactionParams<ApiPeerSystemTimeData> (&stream, transaction, function);
+    case ApiCommand::forcePrimaryTimeServer:  return handleTransactionParams<ApiIdData>             (&stream, transaction, function);
 
     default:
         qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";
@@ -126,25 +147,20 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
 
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
-static QnTransactionMessageBus*m_globalInstance = 0;
+static QnTransactionMessageBus* m_globalInstance = 0;
 
 QnTransactionMessageBus* QnTransactionMessageBus::instance()
 {
     return m_globalInstance;
 }
 
-void QnTransactionMessageBus::initStaticInstance(QnTransactionMessageBus* instance)
-{
-    Q_ASSERT(m_globalInstance == 0 || instance == 0);
-    delete m_globalInstance;
-    m_globalInstance = instance;
-}
-
-QnTransactionMessageBus::QnTransactionMessageBus(): 
-    m_localPeer(QnId(), Qn::PT_Server),
+QnTransactionMessageBus::QnTransactionMessageBus()
+: 
+    m_localPeer(QUuid(), Qn::PT_Server),
     m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
-    m_handler(nullptr),
+    m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
+	m_handler(nullptr),
     m_timer(nullptr), 
     m_mutex(QMutex::Recursive),
     m_thread(nullptr)
@@ -160,6 +176,9 @@ QnTransactionMessageBus::QnTransactionMessageBus():
     connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
     m_timer->start(500);
     m_aliveSendTimer.invalidate();
+
+    assert( m_globalInstance == nullptr );
+    m_globalInstance = this;
 }
 
 void QnTransactionMessageBus::start()
@@ -171,6 +190,8 @@ void QnTransactionMessageBus::start()
 
 QnTransactionMessageBus::~QnTransactionMessageBus()
 {
+    m_globalInstance = nullptr;
+
     if (m_thread) {
         m_thread->exit();
         m_thread->wait();
@@ -179,7 +200,7 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
     delete m_timer;
 }
 
-void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QnId& gotFromPeer)
+void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QUuid& gotFromPeer)
 {
     AlivePeersMap::iterator itr = m_alivePeers.find(peerData.id);
     if (itr == m_alivePeers.end()) 
@@ -196,21 +217,23 @@ void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QnId&
     }
 }
 
-void QnTransactionMessageBus::removeAlivePeer(const QnId& id, bool isProxy)
+void QnTransactionMessageBus::removeAlivePeer(const QUuid& id, bool sendTran, bool isRecursive)
 {
     // 1. remove peer from alivePeers map
+
+    m_lastTranSeq.remove(id);
 
     auto itr = m_alivePeers.find(id);
     if (itr == m_alivePeers.end())
         return;
     
-    handlePeerAliveChanged(itr.value().peer, false, isProxy);
+    handlePeerAliveChanged(itr.value().peer, false, sendTran);
     m_alivePeers.erase(itr);
 
     // 2. remove peers proxy via current peer
-    if (isProxy)
+    if (isRecursive)
         return;
-    QSet<QnId> morePeersToRemove;
+    QSet<QUuid> morePeersToRemove;
     for (auto itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
         AlivePeerInfo& otherPeer = itr.value();
@@ -221,12 +244,15 @@ void QnTransactionMessageBus::removeAlivePeer(const QnId& id, bool isProxy)
             }
         }
     }
-    foreach(const QnId& p, morePeersToRemove)
-        removeAlivePeer(p, true);
+    foreach(const QUuid& p, morePeersToRemove)
+        removeAlivePeer(p, true, true);
 }
 
-void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QnId& gotFromPeer)
+void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QUuid& gotFromPeer)
 {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+    qDebug() << "received peerAlive transaction" << tran.params.peer.id << tran.params.peer.peerType;
+#endif
     if (tran.params.peer.id == m_localPeer.id)
         return; // ignore himself
 
@@ -236,12 +262,12 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAl
     {
         addAlivePeerInfo(ApiPeerData(tran.params.peer.id, tran.params.peer.peerType), gotFromPeer);
         if (!isPeerExist) 
-            emit peerFound(tran.params, true);
+            emit peerFound(tran.params);
     }
     else 
     {
         if (isPeerExist) {
-            removeAlivePeer(tran.params.peer.id, true);
+            removeAlivePeer(tran.params.peer.id, false);
         }
     }
 }
@@ -273,27 +299,35 @@ void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnTransacti
 void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, const QnTransaction<QnTranStateResponse> &tran) {
     Q_UNUSED(tran)
 	sender->setReadSync(true);
+
+    sendConnectionsData();
+    sendModulesData();
 }
 
 template <class T>
 void QnTransactionMessageBus::sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader) {
+    Q_ASSERT(!tran.isLocal);
     transport->sendTransaction(tran, transportHeader);
 }
         
 template <class T>
-void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) {
-    AlivePeersMap:: iterator itr = m_alivePeers.find(tran.id.peerID);
+void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) 
+{
+    QMutexLocker lock(&m_mutex);
+
+    AlivePeersMap:: iterator itr = m_alivePeers.find(tran.peerID);
     if (itr != m_alivePeers.end())
         itr.value().lastActivity.restart();
 
-    if (isSystem(tran.command)) {
-        if (m_lastTranSeq[tran.id.peerID] >= tran.id.sequence)
-            return; // already processed
-        m_lastTranSeq[tran.id.peerID] = tran.id.sequence;
-    }
+    if (m_lastTranSeq[tran.peerID] >= transportHeader.sequence)
+        return; // already processed
+    m_lastTranSeq[tran.peerID] = transportHeader.sequence;
 
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) {
-        qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "with time=" << tran.timestamp;
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+        qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "from" << tran.peerID << "transport seq=" << transportHeader.sequence 
+                 << "time=" << tran.persistentInfo.timestamp << "db seq=" << tran.persistentInfo.sequence;
+#endif
         // process system transactions
         switch(tran.command) {
         case ApiCommand::lockRequest:
@@ -312,32 +346,33 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         case ApiCommand::peerAliveInfo:
             onGotServerAliveInfo(tran, sender->remotePeer().id);
             break; // do not return. proxy this transaction
+        case ApiCommand::forcePrimaryTimeServer:
+            TimeSynchronizationManager::instance()->primaryTimeServerChanged( tran );
+            break;
+        case ApiCommand::broadcastPeerSystemTime:
+            TimeSynchronizationManager::instance()->peerSystemTimeReceived( tran );
+            break;
         default:
             // general transaction
-            if (!sender->isReadSync())
+            if (!sender->isReadSync(tran.command))
                 return;
 
-            if( tran.persistent && transactionLog && transactionLog->contains(tran) )
+            if (!tran.persistentInfo.isNull() && transactionLog && transactionLog->contains(tran))
+                return; // already processed
+            if (!tran.persistentInfo.isNull() && dbManager)
             {
-                // transaction is already processed
-            }
-            else 
-            {
-                if (tran.persistent && dbManager)
+                QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+                ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
+                if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
                 {
-                    QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
-                    ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
-                    if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
-                    {
-                        qWarning() << "Can't handle transaction" << ApiCommand::toString(tran.command) << "reopen connection";
-                        sender->setState(QnTransactionTransport::Error);
-                        return;
-                    }
+                    qWarning() << "Can't handle transaction" << ApiCommand::toString(tran.command) << "reopen connection";
+                    sender->setState(QnTransactionTransport::Error);
+                    return;
                 }
-
-                if( m_handler )
-                    m_handler->triggerNotification(tran);
             }
+
+            if( m_handler )
+                m_handler->triggerNotification(tran);
 
             // this is required to allow client place transactions directly into transaction message bus
             if (tran.command == ApiCommand::getFullInfo)
@@ -346,10 +381,10 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         }
     }
     else {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
         qDebug() << "skip transaction " << ApiCommand::toString(tran.command) << "for peers" << transportHeader.dstPeers;
+#endif
     }
-
-    QMutexLocker lock(&m_mutex);
 
     // proxy incoming transaction to other peers.
     if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty()) {
@@ -357,42 +392,63 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         return; // all dstPeers already processed
     }
 
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+    qDebug() << "proxy transaction " << ApiCommand::toString(tran.command) << " to " << transportHeader.dstPeers;
+#endif
+
     QnPeerSet processedPeers = transportHeader.processedPeers + connectedPeers(tran.command);
     processedPeers << m_localPeer.id;
 
-    for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) {
+    for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) 
+    {
         QnTransactionTransportPtr transport = *itr;
         if (transportHeader.processedPeers.contains(transport->remotePeer().id) || !transport->isReadyToSend(tran.command)) 
             continue;
 
-        //Q_ASSERT(transport->remotePeer().id != tran.id.peerID);
-        transport->sendTransaction(tran, QnTransactionTransportHeader(processedPeers));
+        //Q_ASSERT(transport->remotePeer().id != tran.peerID);
+        QnTransactionTransportHeader newHeader(processedPeers, transportHeader.dstPeers, transportHeader.sequence);
+        transport->sendTransaction(tran, newHeader);
     }
 
     emit transactionProcessed(tran);
+}
+
+void QnTransactionMessageBus::printTranState(const QnTranState& tranState)
+{
+    for(auto itr = tranState.values.constBegin(); itr != tranState.values.constEnd(); ++itr)
+        qDebug() << "key=" << itr.key().peerID << "(dbID=" << itr.key().dbID << ") need after=" << itr.value();
 }
 
 void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<QnTranState> &tran)
 {
     sender->setWriteSync(true);
 
+    QnTransactionTransportHeader ttUnicast;
+    ttUnicast.processedPeers << sender->remotePeer().id << m_localPeer.id;
+    ttUnicast.dstPeers << sender->remotePeer().id;
+
+    QnTransactionTransportHeader ttBroadcast(ttUnicast.processedPeers);
+
     QList<QByteArray> serializedTransactions;
     const ErrorCode errorCode = transactionLog->getTransactionsAfter(tran.params, serializedTransactions);
     if (errorCode == ErrorCode::ok) 
     {
-        QnTransaction<QnTranStateResponse> tran(ApiCommand::tranSyncResponse, false);
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+        qDebug() << "got sync request from peer" << sender->remotePeer().id << ". Need transactions after:";
+        printTranState(tran.params);
+        qDebug() << "exist " << serializedTransactions.size() << "new transactions";
+#endif
+        QnTransaction<QnTranStateResponse> tran(ApiCommand::tranSyncResponse);
         tran.params.result = 0;
-        tran.fillSequence();
         QByteArray chunkData;
-        QnPeerSet processedPeers(QnPeerSet() << sender->remotePeer().id << m_localPeer.id);
-        sender->sendTransaction(tran, processedPeers);
+        
+        sender->sendTransaction(tran, ttUnicast);
 
-        sendRuntimeInfo(sender, processedPeers);
+        sendRuntimeInfo(sender, ttBroadcast); // send as broadcast
 
-        QnTransactionTransportHeader transportHeader(processedPeers);
         using namespace std::placeholders;
         foreach(const QByteArray& serializedTran, serializedTransactions)
-            if(!handleTransaction(serializedTran, std::bind(SendTransactionToTransportFuction(), this, _1, sender, transportHeader)))
+            if(!handleTransaction(serializedTran, std::bind(SendTransactionToTransportFuction(), this, _1, sender, ttBroadcast)))
                 sender->setState(QnTransactionTransport::Error);
         return;
     }
@@ -405,18 +461,114 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
 {
     // send sync request
     transport->setReadSync(false);
-    QnTransaction<QnTranState> requestTran(ApiCommand::tranSyncRequest, false);
+    QnTransaction<QnTranState> requestTran(ApiCommand::tranSyncRequest);
     requestTran.params = transactionLog->getTransactionsState();
-    requestTran.fillSequence();
     transport->sendTransaction(requestTran, QnPeerSet() << transport->remotePeer().id << m_localPeer.id);
 }
 
-void QnTransactionMessageBus::connectToPeerLost(const QnId& id)
+bool QnTransactionMessageBus::doHandshake(QnTransactionTransport* transport)
+{
+    /** Send all data to the client peers on the connect. */
+    QnPeerSet processedPeers = QnPeerSet() << transport->remotePeer().id << m_localPeer.id;
+    if (transport->remotePeer().peerType == Qn::PT_DesktopClient || 
+        transport->remotePeer().peerType == Qn::PT_VideowallClient)     //TODO: #GDM #VW do not send fullInfo, just required part of it
+    {
+        /** Request all data to be sent to the client peers on the connect. */
+        QnTransaction<ApiFullInfoData> tran;
+        tran.command = ApiCommand::getFullInfo;
+        tran.peerID = m_localPeer.id;
+        if (dbManager->doQuery(nullptr, tran.params) != ErrorCode::ok) {
+            qWarning() << "Can't execute query for sync with client peer!";
+            return false;
+        }
+
+        QnTransaction<ApiModuleDataList> tranModules = prepareModulesDataTransaction();
+        tranModules.peerID = m_localPeer.id;
+
+        transport->setWriteSync(true);
+        sendRuntimeInfo(transport, processedPeers);
+        transport->sendTransaction(tran, processedPeers);
+        transport->sendTransaction(tranModules, processedPeers);
+        transport->setReadSync(true);
+    } else if (transport->remotePeer().peerType == Qn::PT_MobileClient) {
+        /** Request all data to be sent to the client peers on the connect. */
+        QnTransaction<ApiMediaServerDataList> tranServers;
+        tranServers.command = ApiCommand::getMediaServers;
+        tranServers.peerID = m_localPeer.id;
+        if (dbManager->doQuery(nullptr, tranServers.params) != ErrorCode::ok) {
+            qWarning() << "Can't execute query for sync with client peer!";
+            return false;
+        }
+
+        ec2::ApiCameraDataList cameras;
+        if (dbManager->doQuery(QUuid(), cameras) != ErrorCode::ok) {
+            qWarning() << "Can't execute query for sync with client peer!";
+            return false;
+        }
+        QnTransaction<ApiCameraDataList> tranCameras;
+        tranCameras.command = ApiCommand::getCameras;
+        tranCameras.peerID = m_localPeer.id;
+
+        // filter out desktop cameras
+        auto desktopCameraResourceType = qnResTypePool->desktopCameraResourceType();
+        QUuid desktopCameraTypeId = desktopCameraResourceType ? desktopCameraResourceType->getId() : QUuid();
+        if (desktopCameraTypeId.isNull()) {
+            tranCameras.params = cameras;
+        } else {
+            tranCameras.params.reserve(cameras.size());  //usually, there are only a few desktop cameras relatively to total cameras count
+            std::copy_if(cameras.cbegin(), cameras.cend(), std::back_inserter(tranCameras.params), [&desktopCameraTypeId](const ec2::ApiCameraData &camera){
+                return camera.typeId != desktopCameraTypeId;
+            });
+        }
+
+        QnTransaction<ApiUserDataList> tranUsers;
+        tranUsers.command = ApiCommand::getUsers;
+        tranUsers.peerID = m_localPeer.id;
+        if (dbManager->doQuery(nullptr, tranUsers.params) != ErrorCode::ok) {
+            qWarning() << "Can't execute query for sync with client peer!";
+            return false;
+        }
+
+        QnTransaction<ApiLayoutDataList> tranLayouts;
+        tranLayouts.command = ApiCommand::getLayouts;
+        tranLayouts.peerID = m_localPeer.id;
+        if (dbManager->doQuery(nullptr, tranLayouts.params) != ErrorCode::ok) {
+            qWarning() << "Can't execute query for sync with client peer!";
+            return false;
+        }
+
+        QnTransaction<ApiCameraServerItemDataList> tranCameraHistory;
+        tranCameraHistory.command = ApiCommand::getCameraHistoryItems;
+        tranCameraHistory.peerID = m_localPeer.id;
+        if (dbManager->doQuery(nullptr, tranCameraHistory.params) != ErrorCode::ok) {
+            qWarning() << "Can't execute query for sync with client peer!";
+            return false;
+        }
+
+        transport->setWriteSync(true);
+        sendRuntimeInfo(transport, processedPeers);
+        transport->sendTransaction(tranServers,         processedPeers);
+        transport->sendTransaction(tranCameras,         processedPeers);
+        transport->sendTransaction(tranUsers,           processedPeers);
+        transport->sendTransaction(tranLayouts,         processedPeers);
+        transport->sendTransaction(tranCameraHistory,   processedPeers);
+        transport->setReadSync(true);
+    }
+
+
+
+    if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
+        queueSyncRequest(transport);
+
+    return true;
+}
+
+void QnTransactionMessageBus::connectToPeerLost(const QUuid& id)
 {
     if (!m_alivePeers.contains(id)) 
         return;    
     
-    removeAlivePeer(id, false);
+    removeAlivePeer(id, true);
 }
 
 void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
@@ -425,46 +577,81 @@ void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
         return;
 
     addAlivePeerInfo(peer);
-    handlePeerAliveChanged(peer, true, false);
+    handlePeerAliveChanged(peer, true, true);
 }
 
-void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bool isAlive, bool isProxy) 
+void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bool isAlive, bool sendTran) 
 {
     ApiPeerAliveData aliveData;
     aliveData.peer.id = peer.id;
     aliveData.peer.peerType = peer.peerType;
     aliveData.isAlive = isAlive;
 
-    if (!isProxy)
+    if (sendTran)
     {
-        QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo, false);
+        QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo);
         tran.params = aliveData;
-        tran.fillSequence();
         sendTransaction(tran);
-
-        if (peer.peerType == Qn::PT_VideowallClient)
-            sendVideowallInstanceStatus(peer, isAlive);
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+        qDebug() << "sending peerAlive info" << peer.id << peer.peerType;
+#endif
     }
 
     if( peer.id == qnCommon->moduleGUID() )
         return; //sending keep-alive
 
     if (isAlive)
-        emit peerFound(aliveData, isProxy);
+        emit peerFound(aliveData);
     else
-        emit peerLost(aliveData, isProxy);
+        emit peerLost(aliveData);
 }
 
-void QnTransactionMessageBus::sendVideowallInstanceStatus(const ApiPeerData &peer, bool isAlive) {
-    QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::videowallInstanceStatus, false);
-    tran.params.online = isAlive;
-    tran.params.instanceGuid = peer.params["instanceGuid"];
-    tran.params.videowallGuid = peer.params["videowallGuid"];
-    tran.fillSequence();
-    sendTransaction(tran);
+void QnTransactionMessageBus::sendConnectionsData()
+{
+    if (!QnRouter::instance())
+        return;
+
+    QnTransaction<ApiConnectionDataList> transaction(ApiCommand::availableConnections);
+
+    QMultiHash<QUuid, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
+    for (auto it = connections.begin(); it != connections.end(); ++it) {
+        ApiConnectionData connection;
+        connection.discovererId = it.key();
+        connection.peerId = it->id;
+        connection.host = it->host;
+        connection.port = it->port;
+        transaction.params.push_back(connection);
+    }
+
+    sendTransaction(transaction);
 }
 
-QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
+QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTransaction() const {
+    QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList);
+
+    foreach (const QnModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules()) {
+        ApiModuleData data;
+        QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
+        data.isAlive = true;
+        data.discoverers = QnGlobalModuleFinder::instance()->discoverers(data.id);
+        transaction.params.push_back(data);
+    }
+
+    return transaction;
+}
+
+void QnTransactionMessageBus::sendModulesData()
+{
+    if (!QnGlobalModuleFinder::instance())
+        return;
+
+    QnTransaction<ApiModuleDataList> transaction = prepareModulesDataTransaction();
+    sendTransaction(transaction);
+}
+
+//TODO #ak use SocketAddress instead of this function. It will reduce QString instanciation count
+static QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
+
 bool QnTransactionMessageBus::isPeerUsing(const QUrl& url)
 {
     QString addr1 = getUrlAddr(url);
@@ -496,21 +683,29 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         transport->close();
         break;
     case QnTransactionTransport::Connected:
+    {
+        bool found = false;
         for (int i = 0; i < m_connectingConnections.size(); ++i) 
         {
             if (m_connectingConnections[i] == transport) {
+                Q_ASSERT(!m_connections.contains(transport->remotePeer().id));
                 m_connections[transport->remotePeer().id] = m_connectingConnections[i];
+                emit newDirectConnectionEstablished( m_connectingConnections[i] );
                 m_connectingConnections.removeAt(i);
+                found = true;
                 break;
             }
         }
+        Q_ASSERT(found);
         m_lastTranSeq[transport->remotePeer().id] = 0;
         transport->setState(QnTransactionTransport::ReadyForStreaming);
         // if sync already done or in progress do not send new request
-        if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
-            queueSyncRequest(transport);
-        connectToPeerEstablished(transport->remotePeer());
+        if (doHandshake(transport))
+            connectToPeerEstablished(transport->remotePeer());
+        else
+            transport->close();
         break;
+    }
     case QnTransactionTransport::Closed:
         for (int i = m_connectingConnections.size() -1; i >= 0; --i) 
         {
@@ -547,8 +742,6 @@ void QnTransactionMessageBus::doPeriodicTasks()
 {
     QMutexLocker lock(&m_mutex);
 
-    m_connectionsToRemove.clear();
-
     // add new outgoing connections
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     for (QMap<QUrl, RemoteUrlConnectInfo>::iterator itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
@@ -573,7 +766,12 @@ void QnTransactionMessageBus::doPeriodicTasks()
         m_aliveSendTimer.restart();
     if (m_aliveSendTimer.elapsed() > ALIVE_UPDATE_INTERVAL) {
         m_aliveSendTimer.restart();
-        handlePeerAliveChanged(m_localPeer, true, false);
+        handlePeerAliveChanged(m_localPeer, true, true);
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+    qDebug() << "Current transaction state:";
+    if (transactionLog)
+        printTranState(transactionLog->getTransactionsState());
+#endif
     }
 
     // check if some server not accessible any more
@@ -599,21 +797,33 @@ void QnTransactionMessageBus::doPeriodicTasks()
     }
 }
 
-void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport, const QnPeerSet& processedPeers)
+void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader)
 {
-    foreach (ApiRuntimeData info, QnRuntimeInfoManager::instance()->allData().values())
+    foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
     {
-        QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged, false);
-        tran.params = info;
-        transport->sendTransaction(tran, processedPeers);
+        {
+            ApiPeerAliveData aliveData;
+            aliveData.peer = info.data.peer;
+            aliveData.isAlive = true;
+
+            QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo);
+            tran.params = aliveData;
+            transport->sendTransaction(tran, transportHeader);
+        }
+
+        {
+            QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged);
+            tran.params = info.data;
+            transport->sendTransaction(tran, transportHeader);
+        }
     }
 }
 
-void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const ApiPeerData &remotePeer)
+void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer)
 {
     if (!dbManager)
     {
-        qWarning() << "This peer connected to remote EC. Ignoring incoming connection";
+        qWarning() << "This peer connected to remote Server. Ignoring incoming connection";
         return;
     }
 
@@ -621,121 +831,10 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
     connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
 
+    QMutexLocker lock(&m_mutex);
+    m_connectingConnections << transport;
     transport->setState(QnTransactionTransport::Connected);
-
-
-    /** Send all data to the client peers on the connect. */
-    QnPeerSet processedPeers = QnPeerSet() << remotePeer.id << m_localPeer.id;
-    if (remotePeer.peerType == Qn::PT_DesktopClient || 
-        remotePeer.peerType == Qn::PT_VideowallClient)     //TODO: #GDM #VW do not send fullInfo, just required part of it
-    {
-        /** Request all data to be sent to the client peers on the connect. */
-        QnTransaction<ApiFullInfoData> tran;
-        tran.command = ApiCommand::getFullInfo;
-        tran.id.peerID = m_localPeer.id;
-        if (dbManager->doQuery(nullptr, tran.params) != ErrorCode::ok) {
-            qWarning() << "Can't execute query for sync with client peer!";
-            QnTransactionTransport::connectDone(remotePeer.id); // release connection
-            return;
-        }
-
-        transport->setWriteSync(true);
-        sendRuntimeInfo(transport.data(), processedPeers);
-        transport->sendTransaction(tran, processedPeers);
-
-        if (remotePeer.peerType == Qn::PT_DesktopClient) {
-            foreach(QnTransactionTransportPtr connected, m_connections.values()) {
-                if (!connected)
-                    continue;
-                ApiPeerData peer = connected->remotePeer();
-                if (peer.peerType != Qn::PT_VideowallClient)
-                    continue;
-                
-                QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::videowallInstanceStatus, false);
-                tran.params.online = true;
-                tran.params.instanceGuid = peer.params["instanceGuid"];
-                tran.params.videowallGuid = peer.params["videowallGuid"];
-                transport->sendTransaction(tran, QnPeerSet() << remotePeer.id << m_localPeer.id);        
-            }
-        }
-
-        transport->setReadSync(true);
-    } else if (remotePeer.peerType == Qn::PT_MobileClient) {
-        /** Request all data to be sent to the client peers on the connect. */
-        QnTransaction<ApiMediaServerDataList> tranServers;
-        tranServers.command = ApiCommand::getMediaServers;
-        tranServers.id.peerID = m_localPeer.id;
-        if (dbManager->doQuery(nullptr, tranServers.params) != ErrorCode::ok) {
-            qWarning() << "Can't execute query for sync with client peer!";
-            QnTransactionTransport::connectDone(remotePeer.id); // release connection
-            return;
-        }
-
-        ec2::ApiCameraDataList cameras;
-        if (dbManager->doQuery(QnId(), cameras) != ErrorCode::ok) {
-            qWarning() << "Can't execute query for sync with client peer!";
-            QnTransactionTransport::connectDone(remotePeer.id); // release connection
-            return;
-        }
-        QnTransaction<ApiCameraDataList> tranCameras;
-        tranCameras.command = ApiCommand::getCameras;
-        tranCameras.id.peerID = m_localPeer.id;
-
-        // filter out desktop cameras
-        auto desktopCameraResourceType = qnResTypePool->desktopCameraResourceType();
-        QUuid desktopCameraTypeId = desktopCameraResourceType ? desktopCameraResourceType->getId() : QUuid();
-        if (desktopCameraTypeId.isNull()) {
-            tranCameras.params = cameras;
-        } else {
-            tranCameras.params.reserve(cameras.size());  //usually, there are only a few desktop cameras relatively to total cameras count
-            std::copy_if(cameras.cbegin(), cameras.cend(), std::back_inserter(tranCameras.params), [&desktopCameraTypeId](const ec2::ApiCameraData &camera){
-                return camera.typeId != desktopCameraTypeId;
-            });
-        }
-        
-        QnTransaction<ApiUserDataList> tranUsers;
-        tranUsers.command = ApiCommand::getUsers;
-        tranUsers.id.peerID = m_localPeer.id;
-        if (dbManager->doQuery(nullptr, tranUsers.params) != ErrorCode::ok) {
-            qWarning() << "Can't execute query for sync with client peer!";
-            QnTransactionTransport::connectDone(remotePeer.id); // release connection
-            return;
-        }
-
-        QnTransaction<ApiLayoutDataList> tranLayouts;
-        tranLayouts.command = ApiCommand::getLayouts;
-        tranLayouts.id.peerID = m_localPeer.id;
-        if (dbManager->doQuery(nullptr, tranLayouts.params) != ErrorCode::ok) {
-            qWarning() << "Can't execute query for sync with client peer!";
-            QnTransactionTransport::connectDone(remotePeer.id); // release connection
-            return;
-        }
-
-        QnTransaction<ApiCameraServerItemDataList> tranCameraHistory;
-        tranCameraHistory.command = ApiCommand::getCameraHistoryItems;
-        tranLayouts.id.peerID = m_localPeer.id;
-        if (dbManager->doQuery(nullptr, tranLayouts.params) != ErrorCode::ok) {
-            qWarning() << "Can't execute query for sync with client peer!";
-            QnTransactionTransport::connectDone(remotePeer.id); // release connection
-            return;
-        }
-
-        transport->setWriteSync(true);
-        sendRuntimeInfo(transport.data(), processedPeers);
-        transport->sendTransaction(tranServers,         processedPeers);
-        transport->sendTransaction(tranCameras,         processedPeers);
-        transport->sendTransaction(tranUsers,           processedPeers);
-        transport->sendTransaction(tranLayouts,         processedPeers);
-        transport->sendTransaction(tranCameraHistory,   processedPeers);
-        transport->setReadSync(true);
-    }
-    
-    {
-        QMutexLocker lock(&m_mutex);
-        if (m_connections[remotePeer.id]) 
-            m_connectionsToRemove << m_connections[remotePeer.id];
-        m_connections[remotePeer.id] = transport;
-    }
+    Q_ASSERT(!m_connections.contains(remotePeer.id));
 }
 
 void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, const QUuid& peer)
@@ -756,6 +855,16 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
             qWarning() << "Disconnected from peer" << url;
             transport->setState(QnTransactionTransport::Error);
         }
+    }
+}
+
+void QnTransactionMessageBus::dropConnections()
+{
+    QMutexLocker lock(&m_mutex);
+    m_remoteUrls.clear();
+    foreach(const QnTransactionTransportPtr &transport, m_connections) {
+        qWarning() << "Disconnected from peer" << transport->remoteAddr();
+        transport->setState(QnTransactionTransport::Error);
     }
 }
 

@@ -33,11 +33,13 @@ namespace ec2
 
         virtual int getLicenses( impl::GetLicensesHandlerPtr handler ) override;
         virtual int addLicenses( const QnLicenseList& licenses, impl::SimpleHandlerPtr handler ) override;
+        virtual int removeLicense( const QnLicensePtr& license, impl::SimpleHandlerPtr handler ) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
 
         QnTransaction<ApiLicenseDataList> prepareTransaction( ApiCommand::Value cmd, const QnLicenseList& licenses );
+        QnTransaction<ApiLicenseData> prepareTransaction( ApiCommand::Value cmd, const QnLicensePtr& license );
     };
 }
 

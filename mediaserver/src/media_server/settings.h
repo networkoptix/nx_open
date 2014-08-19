@@ -3,11 +3,10 @@
 
 #include <QtCore/QSettings>
 
-
 //!Contains constants with names of configuration parameters
 namespace nx_ms_conf
 {
-    //!Port, server listenes on. All requests (ec2 API, mediaserver API, rtsp) are accepted on this port, so name \a rtspPort does not reflects its purpose
+    //!Port, server listen on. All requests (ec2 API, mediaserver API, rtsp) are accepted on this port, so name \a rtspPort does not reflects its purpose
     static const QLatin1String RTSP_PORT( "port" );
     static const int DEFAULT_RTSP_PORT = 7001;
 
@@ -33,8 +32,8 @@ namespace nx_ms_conf
     /*!
         By hls specification, chunk, removed from playlist, SHOULD be available for period equal to chunk duration plus playlist duration.
         This results in 7-8 chunks (3-4 of them are already removed from playlist) are always in memory what can be too much for edge server.
-        This setting allows to override that behavour and keep different removed chunks number in memory.
-        \a -1 means spec-defined behavour is used (default), otherwise this is number of chunks removed from playlist which are still available for downloading
+        This setting allows to override that behavior and keep different removed chunks number in memory.
+        \a -1 means spec-defined behavior is used (default), otherwise this is number of chunks removed from playlist which are still available for downloading
         \warning Value of 0 is unreliable and can lead to improper playback (chunked removed after client has received playlist but before chunk has been downloaded),
             so 1 minimum is recommended
     */
@@ -59,6 +58,14 @@ namespace nx_ms_conf
     //!If no one uses HLS for thid time period (in seconds), than live media cache is stopped and cleaned. It will be restarted with next HLS request
     static const QLatin1String HLS_INACTIVITY_PERIOD( "hlsInactivityPeriod" );
     static const int DEFAULT_HLS_INACTIVITY_PERIOD = 150;
+
+    static const QLatin1String RESOURCE_INIT_THREADS_COUNT( "resourceInitThreadsCount" );
+    static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
+
+    static const QLatin1String SSL_CERTIFICATE_PATH( "sslCertificatePath" );
+
+    static const QLatin1String PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME( "progressiveDownloadSessionLiveTimeSec" );
+    static const int DEFAULT_PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME = 0;    //no limit
 }
 
 /*!

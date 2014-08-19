@@ -6,6 +6,8 @@
 
 #ifndef Q_MOC_RUN
 #include <boost/range/has_range_iterator.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/mpl/or.hpp>
 #endif // Q_MOC_RUN
 
 #include <utils/common/type_traits.h>

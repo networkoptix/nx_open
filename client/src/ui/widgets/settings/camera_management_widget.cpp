@@ -54,3 +54,20 @@ void QnCameraManagementWidget::submitToSettings() {
     settings->setCameraSettingsOptimizationEnabled(ui->autoSettingsCheckBox->isChecked());
 }
 
+bool QnCameraManagementWidget::hasChanges() const  {
+    QnGlobalSettings *settings = QnGlobalSettings::instance();
+
+    if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked
+        && !settings->disabledVendors().isEmpty())
+         return true;
+    
+    if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Unchecked
+        && settings->disabledVendors() != lit("all"))
+         return true;
+
+    if (settings->isCameraSettingsOptimizationEnabled() != ui->autoSettingsCheckBox->isChecked())
+        return true;
+
+    return false;
+}
+

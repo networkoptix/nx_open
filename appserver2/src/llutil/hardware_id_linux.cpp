@@ -7,6 +7,7 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
+#include <QtCore/QDebug>
 
 #ifdef __arm__
 #include <sys/types.h>
@@ -112,12 +113,16 @@ void fillHardwareIds(QList<QByteArray>& hardwareIds)
     QByteArray memory_info_ba = fromString(memory_info);
 
     QByteArray hardwareId = fromString(board_serial + product_uuid + board_vendor + board_name + product_serial + bios_vendor);
-    hardwareIds << hardwareId << hardwareId << (hardwareId + memory_info_ba);
+    hardwareIds[0] = hardwareId;
+	hardwareIds[1] = hardwareId;
+    hardwareIds[2] = (hardwareId + memory_info_ba);
     
     changeGuidByteOrder(product_uuid);
-
     hardwareId = fromString(board_serial + product_uuid + board_vendor + board_name + product_serial + bios_vendor);
-    hardwareIds << hardwareId << hardwareId << (hardwareId + memory_info_ba);
+
+    hardwareIds[3] = hardwareId;
+	hardwareIds[4] = hardwareId;
+    hardwareIds[5] = (hardwareId + memory_info_ba);
 }
 
 #elif defined(__arm__)

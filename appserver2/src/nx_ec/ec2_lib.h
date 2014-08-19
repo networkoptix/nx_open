@@ -7,6 +7,7 @@
 #define EC2_LIB_H
 
 #include <nx_ec/ec_api.h>
+#include <common/common_globals.h>
 
 
 extern "C"
@@ -14,7 +15,7 @@ extern "C"
     /*!
         \return This object MUST be freed by caller using operator delete()
     */
-    ec2::AbstractECConnectionFactory* getConnectionFactory();
+    ec2::AbstractECConnectionFactory* getConnectionFactory( Qn::PeerType peerType );
 }
 
 #endif  //EC2_LIB_H

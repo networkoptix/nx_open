@@ -2,10 +2,10 @@
 
 #include "droid_stream_reader.h"
 #include "droid_resource.h"
-#include "droid_controlport_listener.h"
 
 static const int DROID_TIMEOUT = 3 * 1000;
 
+static const int DROID_CONTROL_TCP_SERVER_PORT = 5690;
 
 QMutex PlDroidStreamReader::m_allReadersMutex;
 QMap<quint32, PlDroidStreamReader*> PlDroidStreamReader::m_allReaders;

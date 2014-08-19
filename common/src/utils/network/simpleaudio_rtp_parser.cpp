@@ -74,9 +74,23 @@ bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
     const quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
+
+    if (rtpHeader->extension)
+    {
+        if (bufferSize < RtpHeader::RTP_HEADER_SIZE + 4)
+            return false;
+
+        int extWords = ((int(curPtr[2]) << 8) + curPtr[3]);
+        curPtr += extWords*4 + 4;
+    }
     const quint8* end = rtpBuffer + bufferSize;
     if (curPtr >= end)
         return false;
+    if (rtpHeader->padding)
+        end -= end[-1];
+    if (curPtr >= end)
+        return false;
+
 
     QnWritableCompressedAudioDataPtr audioData = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, end - curPtr));
     audioData->compressionType = m_context->ctx()->codec_id;

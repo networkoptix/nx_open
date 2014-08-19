@@ -8,13 +8,13 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QMutexLocker>
 
-#include "../aio/aioservice.h"
+#include "utils/network/socket_factory.h"
 #include "../../common/log.h"
 #include "../../common/systemerror.h"
 
 
 //TODO: #ak persistent connection support
-//TODO: #ak MUST call removeFromWatch with 3rd parameter set to false
+//TODO: #ak MUST call cancelAsyncIO with 1st parameter set to false
 //TODO: #ak reconnect support
 
 static const int DEFAULT_CONNECT_TIMEOUT = 3000;
@@ -37,7 +37,7 @@ namespace nx_http
         m_contentEncodingUsed( true ),
         m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT )
     {
-        m_responseBuffer.resize(RESPONSE_BUFFER_SIZE);
+        m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
     }
 
     AsyncHttpClient::~AsyncHttpClient()
@@ -64,207 +64,208 @@ namespace nx_http
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
         if( m_socket )
         {
-            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etRead );
-            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite );
+            m_socket->cancelAsyncIO( aio::etWrite );
+            m_socket->cancelAsyncIO( aio::etRead );
 
             //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
         }
     }
 
-    //!Implementation of aio::AIOEventHandler::eventTriggered
-    void AsyncHttpClient::eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw()
+    void AsyncHttpClient::asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode )
     {
-        //TODO #AK: need to refactore this method: possibly split to multiple methods
+        std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
+
+        QMutexLocker lk( &m_mutex );
+
+        Q_ASSERT( sock == m_socket.data() );
+        if( m_terminated )
+            return;
+
+        if( m_state != sWaitingConnectToHost )
+        {
+            Q_ASSERT( false );
+            return;
+        }
+
+        if( errorCode == SystemError::noError )
+        {
+            //connect successful
+            serializeRequest();
+            m_state = sSendingRequest;
+            lk.unlock();
+            emit tcpConnectionEstablished( sharedThis );
+            lk.relock();
+            using namespace std::placeholders;
+            if( m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, sock, _1, _2 ) ) )
+                return;
+
+            NX_LOG( lit( "Failed to send request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+        }
+        else
+        {
+            NX_LOG( lit( "AsyncHttpClient. Failed to establish tcp connection to %1. %2" ).
+                arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
+            if( reconnectIfAppropriate() )
+                return;
+        }
+
+        m_state = sFailed;
+        lk.unlock();
+        emit done( sharedThis );
+        lk.relock();
+    }
+
+    void AsyncHttpClient::asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten )
+    {
+        std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
+
+        QMutexLocker lk( &m_mutex );
+
+        Q_ASSERT( sock == m_socket.data() );
+        if( m_terminated )
+            return;
+
+        if( m_state != sSendingRequest )
+        {
+            Q_ASSERT( false );
+            return;
+        }
+
+        if( errorCode != SystemError::noError )
+        {
+            if( reconnectIfAppropriate() )
+                return;
+            NX_LOG( lit( "Error sending (1) http request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
+            m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
+            lk.unlock();
+            emit done( sharedThis );
+            lk.relock();
+            return;
+        }
+
+        using namespace std::placeholders;
+
+        m_requestBytesSent += bytesWritten;
+        if( (int)m_requestBytesSent < m_requestBuffer.size() )
+        {
+            if( !m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, sock, _1, _2 ) ) )
+            {
+                NX_LOG( lit( "Error sending (2) http request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+                m_state = sFailed;
+                lk.unlock();
+                emit done( sharedThis );
+                lk.relock();
+            }
+            return;
+        }
+
+        NX_LOG( lit( "Http request has been successfully sent to %1" ).arg( m_url.toString() ), cl_logDEBUG2 );
+        m_state = sReceivingResponse;
+        m_responseBuffer.resize( 0 );
+        if( !m_socket->setRecvTimeout( DEFAULT_RESPONSE_READ_TIMEOUT ) ||
+            !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
+        {
+            NX_LOG( lit( "Error reading (1) http response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+            m_state = sFailed;
+            lk.unlock();
+            emit done( sharedThis );
+            lk.relock();
+        }
+    }
+
+    void AsyncHttpClient::onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead )
+    {
+        using namespace std::placeholders;
 
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
         QMutexLocker lk( &m_mutex );
 
         Q_ASSERT( sock == m_socket.data() );
-        while( !m_terminated )
+        if( m_terminated )
+            return;
+
+        if( errorCode != SystemError::noError )
         {
-            switch( m_state )
+            if( reconnectIfAppropriate() )
+                return;
+            NX_LOG(lit("Error reading (state %1) http response from %2. %3").arg( m_state ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
+            m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
+            lk.unlock();
+            emit done( sharedThis );
+            lk.relock();
+            return;
+        }
+
+        switch( m_state )
+        {
+            case sReceivingResponse:
             {
-                case sWaitingConnectToHost:
-                    switch( eventType )
-                    {
-                        case aio::etRead:
-                            Q_ASSERT( false );
-                            break;
+                readAndParseHttp( bytesRead );
+                //TODO/IMPL reconnect in case of error
 
-                        case aio::etWrite:
-                            //connect successful
-                            serializeRequest();
-                            m_state = sSendingRequest;
-                            lk.unlock();
-                            emit tcpConnectionEstablished( sharedThis );
-                            lk.relock();
-                            continue;
-
-                        case aio::etTimedOut:
-                        case aio::etError:
-                            NX_LOG( lit("AsyncHttpClient. Failed to establish tcp connection to %1. %2").
-                                arg(m_url.toString()).arg(QLatin1String(aio::toString(eventType))), cl_logDEBUG1 );
-                            if( reconnectIfAppropriate() )
-                                break;
-                            m_state = sFailed;
-                            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite );
-                            lk.unlock();
-                            emit done( sharedThis );
-                            lk.relock();
-                            break;
-
-                       default:
-                            break;
-                    }
-                    break;
-
-                case sSendingRequest:
-                    if( eventType == aio::etError || eventType == aio::etTimedOut )
-                    {
-                        if( eventType == aio::etError )
-                        {
-                            if( reconnectIfAppropriate() )
-                                break;
-                            NX_LOG( lit("Error sending http request to %1. %2").
-                                arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
-                        }
-                        else
-                        {
-                            NX_LOG( lit("Error sending http request from %1. Socket write operation has timed out").
-                                arg(m_url.toString()), cl_logDEBUG1 );
-                        }
-                        m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
-                        lk.unlock();
-                        emit done( sharedThis );
-                        lk.relock();
-                        break;
-                    }
-
-                    if( !sendRequest() )
-                    {
-                        NX_LOG( lit("Failed to send request to %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
-                        m_state = sFailed;
-                        aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite );
-                        lk.unlock();
-                        emit done( sharedThis );
-                        lk.relock();
-                        break;
-                    }
-                    if( (int)m_requestBytesSent == m_requestBuffer.size() )
-                    {
-                        NX_LOG( lit("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG2 );
-                        m_state = sReceivingResponse;
-                        aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite );
-                        m_socket->setRecvTimeout( m_responseReadTimeoutMs );
-                        aio::AIOService::instance()->watchSocket( m_socket, aio::etRead, this );
-                    }
-                    break;
-
-                case sReceivingResponse:
+                if( m_state == sFailed )
                 {
-                    Q_ASSERT( eventType != aio::etWrite );
-                    if( eventType == aio::etError || eventType == aio::etTimedOut )
+                    lk.unlock();
+                    emit done( sharedThis );
+                    lk.relock();
+                    break;
+                }
+
+                if( m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders )
+                {
+                    m_responseBuffer.resize( 0 );
+                    if( !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
                     {
-                        if( eventType == aio::etError )
-                        {
-                            if( reconnectIfAppropriate() )
-                                break;
-                            NX_LOG( lit("Error reading http response from %1. %2").
-                                arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
-                        }
-                        else
-                        {
-                            NX_LOG( lit("Error reading http response from %1. Socket read operation has timed out").
-                                arg(m_url.toString()), cl_logDEBUG1 );
-                        }
-                        m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
-                        lk.unlock();
-                        emit done( sharedThis );
-                        lk.relock();
-                        break;
-                    }
-
-                    readAndParseHttp();
-                    //TODO/IMPL reconnect in case of error
-
-                    if( m_state == sFailed )
-                    {
-                        lk.unlock();
-                        emit done( sharedThis );
-                        lk.relock();
-                        break;
-                    }
-
-                    if( m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders )
-                        break;  //response has not been read yet
-
-                    //read http message headers
-                    if( m_httpStreamReader.message().type != nx_http::MessageType::response )
-                    {
-                        NX_LOG( lit("Unexpectedly received request from %1:%2 while expecting response! Ignoring...").
-                            arg(m_url.host()).arg(m_url.port()), cl_logDEBUG1 );
+                        NX_LOG( lit( "Failed to read (1) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
                         m_state = sFailed;
                         lk.unlock();
                         emit done( sharedThis );
                         lk.relock();
-                        break;
                     }
+                    return;  //response has not been read yet
+                }
 
-                    //response read
-                    NX_LOG( lit("Http response from %1 has been successfully read. Status line: %2(%3)").
-                        arg(m_url.toString()).arg(m_httpStreamReader.message().response->statusLine.statusCode).
-                        arg(QLatin1String(m_httpStreamReader.message().response->statusLine.reasonPhrase)), cl_logDEBUG2 );
-
-                    const Response* response = m_httpStreamReader.message().response;
-                    if( response->statusLine.statusCode == StatusCode::unauthorized
-                        && !m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()) )
-                    {
-                        //trying authorization
-                        if( resendRequestWithAuthorization( *response ) )
-                            return;
-                    }
-
-                    const bool messageHasMessageBody = 
-                        (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) || (m_httpStreamReader.messageBodyBufferSize() > 0);
-
-                    m_state = sResponseReceived;
+                //read http message headers
+                if( m_httpStreamReader.message().type != nx_http::MessageType::response )
+                {
+                    NX_LOG( lit( "Unexpectedly received request from %1:%2 while expecting response! Ignoring..." ).
+                        arg( m_url.host() ).arg( m_url.port() ), cl_logDEBUG1 );
+                    m_state = sFailed;
                     lk.unlock();
-                    emit responseReceived( sharedThis );
+                    emit done( sharedThis );
                     lk.relock();
-                    if( m_terminated )
-                        break;
+                    break;
+                }
 
-                    //is message body follows?
-                    if( !messageHasMessageBody )
-                    {
-                        //no message body: done
-                        m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
-                        lk.unlock();
-                        emit done( sharedThis );
-                        lk.relock();
-                        break;
-                    }
+                //response read
+                NX_LOG( lit( "Http response from %1 has been successfully read. Status line: %2(%3)" ).
+                    arg( m_url.toString() ).arg( m_httpStreamReader.message().response->statusLine.statusCode ).
+                    arg( QLatin1String( m_httpStreamReader.message().response->statusLine.reasonPhrase ) ), cl_logDEBUG2 );
 
-                    //starting reading message body
-                    m_state = sReadingMessageBody;
+                const Response* response = m_httpStreamReader.message().response;
+                if( response->statusLine.statusCode == StatusCode::unauthorized
+                    && !m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()) )
+                {
+                    //trying authorization
+                    if( resendRequestWithAuthorization( *response ) )
+                        return;
+                }
 
-                    if( m_httpStreamReader.messageBodyBufferSize() > 0 &&   //some message body has been read
-                        m_state == sReadingMessageBody )                    //client wants to read message body
-                    {
-                        lk.unlock();
-                        emit someMessageBodyAvailable( sharedThis );
-                        lk.relock();
-                        if( m_terminated )
-                            break;
-                    }
+                const bool messageHasMessageBody =
+                    (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) || (m_httpStreamReader.messageBodyBufferSize() > 0);
 
-                    if( m_httpStreamReader.state() == HttpStreamReader::readingMessageBody )
-                        break; // wait for more data
+                m_state = sResponseReceived;
+                lk.unlock();
+                emit responseReceived( sharedThis );
+                lk.relock();
+                if( m_terminated )
+                    break;
 
-                    //message body has been received with request
-                    assert( m_httpStreamReader.state() == HttpStreamReader::messageDone || m_httpStreamReader.state() == HttpStreamReader::parseError );
-
+                //is message body follows?
+                if( !messageHasMessageBody )
+                {
+                    //no message body: done
                     m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
                     lk.unlock();
                     emit done( sharedThis );
@@ -272,56 +273,82 @@ namespace nx_http
                     break;
                 }
 
-                case sReadingMessageBody:
+                //starting reading message body
+                m_state = sReadingMessageBody;
+
+                if( m_httpStreamReader.messageBodyBufferSize() > 0 &&   //some message body has been read
+                    m_state == sReadingMessageBody )                    //client wants to read message body
                 {
-                    Q_ASSERT( eventType != aio::etWrite );
-                    if( eventType == aio::etError )
-                    {
-                        if( reconnectIfAppropriate() )
-                            break;
-                        NX_LOG( lit("Error reading http response message body from %1").arg(m_url.toString()), cl_logDEBUG1 );
-                        m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
-                        lk.unlock();
-                        emit done( sharedThis );
-                        lk.relock();
+                    lk.unlock();
+                    emit someMessageBodyAvailable( sharedThis );
+                    lk.relock();
+                    if( m_terminated )
                         break;
-                    }
+                }
 
-                    int bytesRead = readAndParseHttp();
-                    //TODO #ak reconnect in case of error
-                    if( m_state != sReadingMessageBody )
-                        aio::AIOService::instance()->removeFromWatch( m_socket, aio::etRead );
-                    if( bytesRead > 0 )
+                if( m_httpStreamReader.state() == HttpStreamReader::readingMessageBody )
+                {
+                    //reading more data
+                    m_responseBuffer.resize( 0 );
+                    if( !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
                     {
-                        lk.unlock();
-                        emit someMessageBodyAvailable( sharedThis );
-                        lk.relock();
-                        if( m_terminated )
-                            break;
-                    }
-                    if( m_state >= sFailed )
-                    {
+                        NX_LOG( lit( "Failed to read (1) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+                        m_state = sFailed;
                         lk.unlock();
                         emit done( sharedThis );
                         lk.relock();
                     }
-                    break;
+                    return;
                 }
 
-                default:
-                {
-                    Q_ASSERT( false );
-                    break;
-                }
+                //message body has been received with request
+                assert( m_httpStreamReader.state() == HttpStreamReader::messageDone || m_httpStreamReader.state() == HttpStreamReader::parseError );
+
+                m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
+                lk.unlock();
+                emit done( sharedThis );
+                lk.relock();
+                break;
             }
 
-            break;
-        }
+            case sReadingMessageBody:
+            {
+                const size_t bytesParsed = readAndParseHttp( bytesRead );
+                //TODO #ak reconnect in case of error
+                if( bytesParsed > 0 )
+                {
+                    lk.unlock();
+                    emit someMessageBodyAvailable( sharedThis );
+                    lk.relock();
+                    if( m_terminated )
+                        break;
+                }
 
-        if( m_state == sFailed || m_state == sDone )
-        {
-            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etRead );
-            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite );
+                if( m_state != sFailed && m_state != sDone )
+                {
+                    m_responseBuffer.resize( 0 );
+                    if( m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        NX_LOG( lit( "Failed to read (2) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+                        m_state = sFailed;
+                    }
+                }
+
+                lk.unlock();
+                emit done( sharedThis );
+                lk.relock();
+                break;
+            }
+
+            default:
+            {
+                Q_ASSERT( false );
+                break;
+            }
         }
     }
 
@@ -455,21 +482,25 @@ namespace nx_http
 
     bool AsyncHttpClient::initiateHttpMessageDelivery( const QUrl& url )
     {
+        using namespace std::placeholders;
+
         m_httpStreamReader.resetState();
 
         if( m_socket )
         {
-            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etRead );
-            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite );
+            m_socket->cancelAsyncIO( aio::etWrite );
+            m_socket->cancelAsyncIO( aio::etRead );
 
             serializeRequest();
             m_state = sSendingRequest;
+
+            if( m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2 ) ) )
+                return true;
         }
         else {
             m_state = sInit;
 
-
-            m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket() );
+            m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/) ); //TODO #ak uncomment when async ssl connection supported
             if( !m_socket->setNonBlockingMode( true ) ||
                 !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) )
             {
@@ -479,44 +510,33 @@ namespace nx_http
                 return false;
             }
 
+            m_url = url;
+            m_state = sWaitingConnectToHost;
+
             //starting async connect
-            if( !m_socket->connect( url.host(), url.port(DEFAULT_HTTP_PORT), 0 ) )
+            if( !m_socket->connectAsync(
+                    SocketAddress( url.host(), url.port( DEFAULT_HTTP_PORT ) ),
+                    std::bind( &AsyncHttpClient::asyncConnectDone, this, m_socket.data(), _1 ) ) )
             {
                 NX_LOG( lit("Failed to perform async connect to %1:%2. %3").
                     arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
                 m_socket.clear();
+                m_url.clear();
+                m_state = sInit;
                 return false;
             }
 
-            m_url = url;
-            m_state = sWaitingConnectToHost;
+            return true;
         }
 
-        //connect is done if socket is available for write
-        if( !aio::AIOService::instance()->watchSocket( m_socket, aio::etWrite, this ) )
-        {
-            NX_LOG( lit("Failed to add socket (connecting to %1:%2) to aio service. %3").
-                arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-            m_socket.clear();
-            return false;
-        }
-
-        return true;
+        NX_LOG( lit("Failed to init async socket call (connecting to %1:%2) to aio service. %3").
+            arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+        m_socket.clear();
+        return false;
     }
 
-    int AsyncHttpClient::readAndParseHttp()
+    size_t AsyncHttpClient::readAndParseHttp( size_t bytesRead )
     {
-        int bytesRead = m_socket->recv( m_responseBuffer.data(), m_responseBuffer.size(), 0 );
-        if( bytesRead < 0 )         //read error
-        {
-            if( SystemError::getLastOSErrorCode() == SystemError::wouldBlock || SystemError::getLastOSErrorCode() == SystemError::again )
-                return 0;
-            NX_LOG( lit("AsyncHttpClient. Error reading socket (%1). Url %2").
-                arg(SystemError::getLastOSErrorText()).arg(m_url.toString()), cl_logERROR );
-            m_state = sFailed;
-            return -1;
-        }
-
         if( bytesRead == 0 )   //connection closed
         {
             //closing connection is a valid HTTP way to signal message end
@@ -589,19 +609,17 @@ namespace nx_http
         m_requestBytesSent = 0;
     }
 
+#if 0
     bool AsyncHttpClient::sendRequest()
     {
         Q_ASSERT( (int)m_requestBytesSent < m_requestBuffer.size() );
         int bytesSent = m_socket->send( m_requestBuffer.data()+m_requestBytesSent, m_requestBuffer.size()-m_requestBytesSent );
-        if( (bytesSent == -1)
-            && (SystemError::getLastOSErrorCode() != SystemError::wouldBlock)
-            && (SystemError::getLastOSErrorCode() != SystemError::again) )
-        {
-            return false;
-        }
-        m_requestBytesSent += bytesSent;    //TODO it would be very usefull to use buffer with effective pop_front()
+        if( bytesSent == -1 )
+            return (SystemError::getLastOSErrorCode() == SystemError::wouldBlock) || (SystemError::getLastOSErrorCode() == SystemError::again);
+        m_requestBytesSent += bytesSent;    //TODO #ak it would be very usefull to use buffer with effective pop_front()
         return true;
     }
+#endif
 
     bool AsyncHttpClient::reconnectIfAppropriate()
     {

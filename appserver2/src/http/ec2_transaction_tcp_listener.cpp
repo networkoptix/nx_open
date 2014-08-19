@@ -52,30 +52,22 @@ void QnTransactionTcpProcessor::run()
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
     bool isClient = query.hasQueryItem("isClient");
     bool isMobileClient = query.hasQueryItem("isMobile");
-    QUuid remoteGuid  = query.queryItemValue("guid");
+    QUuid remoteGuid  = QUuid(query.queryItemValue("guid"));
     if (remoteGuid.isNull())
         remoteGuid = QUuid::createUuid();
-    QnId videowallGuid = query.queryItemValue("videowallGuid");
+    QUuid videowallGuid = QUuid(query.queryItemValue("videowallGuid"));
     bool isVideowall = (!videowallGuid.isNull());
-    QnId instanceGuid = isVideowall
-        ? query.queryItemValue("instanceGuid")
-        : QnId();
 
     Qn::PeerType peerType = isMobileClient  ? Qn::PT_MobileClient
         : isVideowall   ? Qn::PT_VideowallClient
         : isClient      ? Qn::PT_DesktopClient
         : Qn::PT_Server;
 
-    Qn::SerializationFormat dataFormat = Qn::BnsFormat;
+    Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
     if (query.hasQueryItem("format"))
          QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
 
     ApiPeerData remotePeer(remoteGuid, peerType, dataFormat);
-
-    if (isVideowall) {
-        remotePeer.params["videowallGuid"] = videowallGuid.toString();
-        remotePeer.params["instanceGuid"] = instanceGuid.toString();
-    }
 
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
 

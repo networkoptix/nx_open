@@ -8,7 +8,7 @@ CREATE TABLE "storage_bookmark_tag" (
 -- Bookmarks table
 CREATE TABLE "storage_bookmark" (
     guid            BLOB NOT NULL UNIQUE PRIMARY KEY,
-    camera_id       TEXT NOT NULL,                          -- ID of the related camera resource TODO: #vasilenko change to guid
+    unique_id       TEXT NOT NULL,                          -- unique id of the related camera resource
     start_time      INTEGER NOT NULL,
     duration        INTEGER NOT NULL,
     name            TEXT NULL,

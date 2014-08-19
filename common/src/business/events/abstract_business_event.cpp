@@ -124,7 +124,7 @@ QnBusinessEventParameters QnAbstractBusinessEvent::getRuntimeParams() const {
     QnBusinessEventParameters params;
     params.setEventType(m_eventType);
     params.setEventTimestamp(m_timeStamp);
-    params.setEventResourceId(m_resource ? m_resource->getId() : QnId());
+    params.setEventResourceId(m_resource ? m_resource->getId() : QUuid());
 
     return params;
 }

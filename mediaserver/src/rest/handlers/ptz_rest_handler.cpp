@@ -10,8 +10,13 @@
 #include <core/ptz/ptz_data.h>
 #include <core/ptz/ptz_controller_pool.h>
 
+#include <QtConcurrent>
+
 static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
+
+QMap<QString, QnPtzRestHandler::AsyncExecInfo> QnPtzRestHandler::m_workers;
+QMutex QnPtzRestHandler::m_asyncExecMutex;
 
 void QnPtzRestHandler::cleanupOldSequence()
 {
@@ -40,6 +45,38 @@ bool QnPtzRestHandler::checkSequence(const QString& id, int sequence)
     return true;
 }
 
+void QnPtzRestHandler::asyncExecutor(const QString& sequence, AsyncFunc function)
+{
+    function();
+
+    m_asyncExecMutex.lock();
+    
+    while (AsyncFunc nextFunction = m_workers[sequence].nextCommand) 
+    {
+        m_workers[sequence].nextCommand = AsyncFunc();
+        m_asyncExecMutex.unlock();
+        nextFunction();
+        m_asyncExecMutex.lock();
+    }
+    
+    m_workers.remove(sequence);
+    m_asyncExecMutex.unlock();
+}
+
+int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc function)
+{
+    QMutexLocker lock(&m_asyncExecMutex);
+
+    if (m_workers[sequence].inProgress) {
+        m_workers[sequence].nextCommand = function;
+    }
+    else {
+        m_workers[sequence].inProgress = true;
+        QtConcurrent::run(std::bind(&QnPtzRestHandler::asyncExecutor, sequence, function));
+    }
+    return CODE_OK;
+}
+
 int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
     QString sequenceId;
     int sequenceNumber = -1;
@@ -54,13 +91,15 @@ int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params
         return CODE_INVALID_PARAMETER;
     }
 
+    QString hash = QString(lit("%1-%2")).arg(params.value("resourceId")).arg(params.value("sequenceId"));
+    
     QnVirtualCameraResourcePtr camera = qnResPool->getNetResourceByPhysicalId(resourceId).dynamicCast<QnVirtualCameraResource>();
     if(!camera) {
         result.setError(QnJsonRestResult::InvalidParameter, lit("Camera resource '%1' not found.").arg(resourceId));
         return CODE_INVALID_PARAMETER;
     }
 
-    if (camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
+    if (camera->getStatus() == Qn::Offline || camera->getStatus() == Qn::Unauthorized) {
         result.setError(QnJsonRestResult::InvalidParameter, lit("Camera resource '%1' is not ready yet.").arg(resourceId));
         return CODE_INVALID_PARAMETER;
     }
@@ -75,8 +114,9 @@ int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params
         return CODE_OK;
 
     switch(command) {
-    case Qn::ContinuousMovePtzCommand:      return executeContinuousMove(controller, params, result);
-    case Qn::ContinuousFocusPtzCommand:     return executeContinuousFocus(controller, params, result);
+    case Qn::ContinuousMovePtzCommand:      return execCommandAsync(hash, std::bind(&QnPtzRestHandler::executeContinuousMove, this, controller, params, result));
+    case Qn::ContinuousFocusPtzCommand:     return execCommandAsync(hash, std::bind(&QnPtzRestHandler::executeContinuousFocus, this, controller, params, result));
+
     case Qn::AbsoluteDeviceMovePtzCommand:
     case Qn::AbsoluteLogicalMovePtzCommand: return executeAbsoluteMove(controller, params, result);
     case Qn::ViewportMovePtzCommand:        return executeViewportMove(controller, params, result);

@@ -23,7 +23,7 @@ QnResourceType::~QnResourceType()
 {
 }
 
-void QnResourceType::setParentId(const QnId &value) {
+void QnResourceType::setParentId(const QUuid &value) {
     m_parentId = value;
 }
 
@@ -40,7 +40,7 @@ bool QnResourceType::isCamera() const
         return m_isCamera;
     }
 
-    foreach (QnId parentId, allParentList())
+    foreach (QUuid parentId, allParentList())
     {
         if (!parentId.isNull())
         {
@@ -61,7 +61,7 @@ bool QnResourceType::isCamera() const
     return m_isCamera;
 }
 
-void QnResourceType::addAdditionalParent(QnId parent)
+void QnResourceType::addAdditionalParent(QUuid parent)
 {
     if (parent.isNull()) {
         qWarning() << "Adding NULL parentId";
@@ -72,9 +72,9 @@ void QnResourceType::addAdditionalParent(QnId parent)
         m_additionalParentList << parent;
 }
 
-QList<QnId> QnResourceType::allParentList() const
+QList<QUuid> QnResourceType::allParentList() const
 {
-    QList<QnId> result;
+    QList<QUuid> result;
     if (!m_parentId.isNull())
         result << m_parentId;
     result << m_additionalParentList;
@@ -102,7 +102,7 @@ const QList<QnParamTypePtr>& QnResourceType::paramTypeList() const
 
         paramTypeList += m_paramTypeList;
 
-        foreach (QnId parentId, allParentList()) {
+        foreach (QUuid parentId, allParentList()) {
             if (parentId.isNull()) {
                 continue;
             }
@@ -154,7 +154,7 @@ QnResourceTypePtr QnResourceTypePool::getResourceTypeByName(const QString& name)
     return QnResourceTypePtr();
 }
 
-QnResourceTypePtr QnResourceTypePool::getResourceType(QnId id) const
+QnResourceTypePtr QnResourceTypePool::getResourceType(QUuid id) const
 {
     QMutexLocker lock(&m_mutex);
     QnResourceTypeMap::const_iterator itr = m_resourceTypeMap.find(id);
@@ -184,7 +184,7 @@ void QnResourceTypePool::addResourceType(QnResourceTypePtr resourceType)
     m_resourceTypeMap.insert(resourceType->getId(), resourceType);
 }
 
-QnId QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning) const
+QUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning) const
 {
     QMutexLocker lock(&m_mutex);
     foreach(QnResourceTypePtr rt, m_resourceTypeMap)
@@ -199,13 +199,13 @@ QnId QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QSt
         qWarning() << "Cannot find such resource type!!!!: " << manufacture << name;
 
     // Q_ASSERT(false);
-    return QnId();
+    return QUuid();
 }
 
-QnId QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, const QString& name) const
+QUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, const QString& name) const
 {
     QMutexLocker lock(&m_mutex);
-    QnId result;
+    QUuid result;
     int bestLen = -1;
     foreach(QnResourceTypePtr rt, m_resourceTypeMap)
     {

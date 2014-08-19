@@ -55,7 +55,7 @@ public:
     //!Implementation of QnRestRequestHandler::executeGet
     virtual int executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType);
     //!Implementation of QnRestRequestHandler::executePost
-    virtual int executePost( const QString& path, const QnRequestParamList& params, const QByteArray& requestBody, QByteArray& responseMessageBody, QByteArray& contentType );
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& requestBody, const QByteArray& srcBodyContentType, QByteArray& responseMessageBody, QByteArray& contentType);
     //!Implementation of QnRestRequestHandler::description
     //virtual QString description(TCPSocket* tcpSocket) const;
 

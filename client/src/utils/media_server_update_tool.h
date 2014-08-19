@@ -5,35 +5,23 @@
 #include <core/resource/media_server_resource.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
+#include <utils/updates_common.h>
 #include <mutex/distributed_mutex.h>
 
-class QNetworkAccessManager;
 class QnUpdateUploader;
+
+class QnCheckForUpdatesPeerTask;
+class QnDownloadUpdatesPeerTask;
+class QnUploadUpdatesPeerTask;
+class QnInstallUpdatesPeerTask;
+class QnRestUpdatePeerTask;
 
 class QnMediaServerUpdateTool : public QObject {
     Q_OBJECT
 public:
-    struct UpdateFileInformation {
-        QnSoftwareVersion version;
-        QString fileName;
-        qint64 fileSize;
-        QString baseFileName;
-        QUrl url;
-
-        UpdateFileInformation() {}
-
-        UpdateFileInformation(const QnSoftwareVersion &version, const QString &fileName) :
-            version(version), fileName(fileName)
-        {}
-
-        UpdateFileInformation(const QnSoftwareVersion &version, const QUrl &url) :
-            version(version), url(url)
-        {}
-    };
-    typedef QSharedPointer<UpdateFileInformation> UpdateFileInformationPtr;
-
     struct PeerUpdateInformation {
         enum State {
+            UpdateUnknown,
             UpdateNotFound,
             UpdateFound,
             PendingDownloading,
@@ -50,7 +38,7 @@ public:
         QnMediaServerResourcePtr server;
         State state;
         QnSoftwareVersion sourceVersion;
-        UpdateFileInformationPtr updateInformation;
+        QnUpdateFileInformationPtr updateInformation;
 
         int progress;
 
@@ -61,6 +49,7 @@ public:
         Idle,
         CheckingForUpdates,
         DownloadingUpdate,
+        InstallingToIncompatiblePeers,
         UploadingUpdate,
         InstallingUpdate,
     };
@@ -70,7 +59,8 @@ public:
         InternetProblem,
         NoNewerVersion,
         NoSuchBuild,
-        UpdateImpossible
+        UpdateImpossible,
+        BadUpdateFile
     };
 
     enum UpdateResult {
@@ -79,10 +69,12 @@ public:
         LockFailed,
         DownloadingFailed,
         UploadingFailed,
-        InstallationFailed
+        InstallationFailed,
+        RestInstallationFailed
     };
 
     QnMediaServerUpdateTool(QObject *parent = 0);
+    ~QnMediaServerUpdateTool();
 
     State state() const;
 
@@ -90,98 +82,99 @@ public:
 
     CheckResult updateCheckResult() const;
     UpdateResult updateResult() const;
+    QString resultString() const;
 
     void updateServers();
 
     QnSoftwareVersion targetVersion() const;
 
-    PeerUpdateInformation updateInformation(const QnId &peerId) const;
+    void setDenyMajorUpdates(bool denyMajorUpdates);
+
+    PeerUpdateInformation updateInformation(const QUuid &peerId) const;
+
+    QnMediaServerResourceList targets() const;
+    void setTargets(const QSet<QUuid> &targets);
+
+    QnMediaServerResourceList actualTargets() const;
+
+    QUrl generateUpdatePackageUrl() const;
+
+    void reset();
 
 signals:
     void stateChanged(int state);
     void progressChanged(int progress);
-    void peerChanged(const QnId &peerId);
+    void peerChanged(const QUuid &peerId);
 
 public slots:
-    void checkForUpdates();
-    void checkForUpdates(const QnSoftwareVersion &version);
-    void checkForUpdates(const QString &path);
+    void checkForUpdates(const QnSoftwareVersion &version = QnSoftwareVersion());
+    void checkForUpdates(const QString &fileName);
     bool cancelUpdate();
 
-protected:
-    ec2::AbstractECConnectionPtr connection2() const;
-
-    void checkOnlineUpdates(const QnSoftwareVersion &version = QnSoftwareVersion());
-    void checkLocalUpdates();
-    void checkUpdateCoverage();
-
 private slots:
-    void at_updateReply_finished();
-    void at_buildReply_finished();
-    void at_downloadReply_finished();
-
-    void uploadNextUpdate();
-    void at_uploader_finished();
-    void at_uploader_failed();
-    void at_uploader_progressChanged(int progress);
-    void at_uploader_peerProgressChanged(const QnId &peerId, int progress);
-
-
-    void at_downloadReply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
-    void downloadNextUpdate();
-
     void at_mutexLocked();
     void at_mutexTimeout();
 
-    void at_resourceChanged(const QnResourcePtr &resource);
-    void at_installationTimeout();
+    void at_checkForUpdatesTask_finished(int errorCode);
+    void at_downloadTask_finished(int errorCode);
+    void at_uploadTask_finished(int errorCode);
+    void at_installTask_finished(int errorCode);
+    void at_restUpdateTask_finished(int errorCode);
+    void at_downloadTask_peerFinished(const QUuid &peerId);
+    void at_uploadTask_peerFinished(const QUuid &peerId);
+    void at_installTask_peerFinished(const QUuid &peerId);
+    void at_restUpdateTask_peerFinished(const QUuid &peerId);
+
+    void at_networkTask_peerProgressChanged(const QUuid &peerId, int progress);
 
 private:
     void setState(State state);
     void setCheckResult(CheckResult result);
     void setUpdateResult(UpdateResult result);
     void finishUpdate(UpdateResult result);
-    void setPeerState(const QnId &peerId, PeerUpdateInformation::State state);
-    void checkBuildOnline();
+    void setPeerState(const QUuid &peerId, PeerUpdateInformation::State state);
+    void removeTemporaryDir();
 
+    void downloadUpdates();
     void uploadUpdatesToServers();
     void installUpdatesToServers();
+    void installIncompatiblePeers();
 
+    void lockMutex();
     void unlockMutex();
 
 private:
+    QThread *m_tasksThread;
     State m_state;
     CheckResult m_checkResult;
     UpdateResult m_updateResult;
+    QString m_resultString;
 
-    QDir m_localUpdateDir;
-    QUrl m_onlineUpdateUrl;
-    QString m_updateLocationPrefix;
-
-    QScopedPointer<QFile> m_downloadFile;
+    QString m_localTemporaryDir;
 
     QnSoftwareVersion m_targetVersion;
     bool m_targetMustBeNewer;
+    bool m_denyMajorUpdates;
 
     QString m_updateId;
 
-    QMultiHash<QnSystemInformation, QnId> m_idBySystemInformation;
+    QHash<QnSystemInformation, QnUpdateFileInformationPtr> m_updateFiles;
 
-    QList<QnSystemInformation> m_pendingUploads;
-    QSet<QnId> m_pendingUploadPeers;
-    QSet<QnId> m_pendingInstallations;
+    ec2::QnDistributedMutex *m_distributedMutex;
 
-    QnUpdateUploader *m_uploader;
+    QHash<QUuid, PeerUpdateInformation> m_updateInformationById;
+    QMultiHash<QnSystemInformation, QUuid> m_idBySystemInformation;
 
-    QHash<QnSystemInformation, UpdateFileInformationPtr> m_updateFiles;
-    QSet<QnSystemInformation> m_downloadingUpdates;
+    QnMediaServerResourceList m_targets;
 
-    QNetworkAccessManager *m_networkAccessManager;
-    ec2::QnDistributedMutex* m_distributedMutex;
+    QnCheckForUpdatesPeerTask *m_checkForUpdatesPeerTask;
+    QnDownloadUpdatesPeerTask *m_downloadUpdatesPeerTask;
+    QnUploadUpdatesPeerTask *m_uploadUpdatesPeerTask;
+    QnInstallUpdatesPeerTask *m_installUpdatesPeerTask;
+    QnRestUpdatePeerTask *m_restUpdatePeerTask;
 
-    QSet<QnId> m_restartingServers;
-
-    QHash<QnId, PeerUpdateInformation> m_updateInformationById;
+    QSet<QUuid> m_incompatiblePeerIds;
+    QSet<QUuid> m_targetPeerIds;
 };
 
 #endif // QN_MEDIA_SERVER_UPDATE_TOOL_H

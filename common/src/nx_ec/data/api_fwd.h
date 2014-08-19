@@ -26,6 +26,7 @@ namespace ec2 {
     struct ApiLayoutItemWithRefData;
     struct ApiLayoutData;
     struct ApiLicenseData;
+    struct ApiDetailedLicenseData;
     struct ApiLockData;
     struct ApiMediaServerData;
     struct ApiPanicModeData;
@@ -45,7 +46,6 @@ namespace ec2 {
     struct ApiStoredFilePath;
     struct ApiUserData;
     struct ApiVideowallControlMessageData;
-    struct ApiVideowallInstanceStatusData;
     struct ApiVideowallData;
     struct ApiVideowallItemData;
     struct ApiVideowallItemWithRefData;
@@ -59,12 +59,20 @@ namespace ec2 {
     struct ApiUpdateUploadResponceData;
     struct ApiUpdateInstallData;
     struct ApiCameraBookmarkTagData;
+    struct ApiModuleData;
     struct ApiLoginData;
+    struct ApiDiscoveryData;
+    struct ApiDiscoverPeerData;
+    struct ApiConnectionData;
+    struct ApiSystemNameData;
 
     struct ApiTimeData;
+    struct ApiPeerSystemTimeData;
 
     struct ApiPeerData;
     struct ApiRuntimeData;
+
+    struct ApiDatabaseDumpData;
 
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
@@ -80,6 +88,9 @@ namespace ec2 {
     typedef std::vector<ApiUserData> ApiUserDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
     typedef std::vector<ApiCameraBookmarkTagData> ApiCameraBookmarkTagDataList;
+    typedef std::vector<ApiModuleData> ApiModuleDataList;
+    typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
+    typedef std::vector<ApiConnectionData> ApiConnectionDataList;
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
 
 #define QN_EC2_API_DATA_TYPES \
@@ -95,9 +106,11 @@ namespace ec2 {
     (ApiLayoutItemWithRefData)\
     (ApiLayoutData)\
     (ApiLicenseData)\
+    (ApiDetailedLicenseData)\
     (ApiLockData)\
     (ApiMediaServerData)\
     (ApiPanicModeData)\
+    (ApiPeerSystemTimeData)\
     (ApiPropertyTypeData)\
     (ApiResetBusinessRuleData)\
     (ApiResourceData)\
@@ -114,7 +127,6 @@ namespace ec2 {
     (ApiStoredFileData)\
     (ApiUserData)\
     (ApiVideowallControlMessageData)\
-    (ApiVideowallInstanceStatusData)\
     (ApiVideowallData)\
     (ApiVideowallItemData)\
     (ApiVideowallItemWithRefData)\
@@ -128,15 +140,21 @@ namespace ec2 {
     (ApiUpdateUploadData)\
     (ApiUpdateUploadResponceData)\
     (ApiCameraBookmarkTagData)\
+    (ApiModuleData)\
     (ApiLoginData)\
+    (ApiDiscoveryData)\
+    (ApiDiscoverPeerData)\
+    (ApiConnectionData)\
+    (ApiSystemNameData)\
     (ApiTimeData)\
     (ApiPeerData)\
     (ApiRuntimeData)\
+    (ApiDatabaseDumpData)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         QN_EC2_API_DATA_TYPES,
-        (ubj)(xml)(binary)(json)(sql_record)(csv_record)
+        (ubjson)(xml)(binary)(json)(sql_record)(csv_record)
     );
 #endif
     

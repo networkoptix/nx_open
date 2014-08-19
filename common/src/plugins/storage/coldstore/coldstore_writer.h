@@ -4,7 +4,8 @@
 #ifdef ENABLE_COLDSTORE
 
 #include "core/resource/resource_consumer.h"
-#include "utils/common/long_runnable.h"
+#include <utils/common/threadqueue.h>
+#include <utils/common/long_runnable.h>
 
 struct QnCSFile;
 

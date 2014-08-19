@@ -60,7 +60,10 @@ namespace ec2
         QString newPassword = users.front()->getPassword();
         queryProcessor->processUpdateAsync( tran, 
             [queryProcessor, handler, reqID, users, newPassword]( ec2::ErrorCode errorCode ){
-                if( errorCode == ec2::ErrorCode::ok && queryProcessor->userName() == users.front()->getName() )
+                if( errorCode == ec2::ErrorCode::ok 
+                    && queryProcessor->userName() == users.front()->getName()
+                    && !newPassword.isEmpty()
+                    )
                     queryProcessor->setPassword( newPassword );
                 handler->done( reqID, errorCode, users );
             });
@@ -72,7 +75,7 @@ namespace ec2
         //preparing output data
         QnUserResourceList users;
         if (resource->getId().isNull()) {
-            resource->setId(QnId::createUuid());
+            resource->setId(QUuid::createUuid());
         }
         users.push_back( resource );
 
@@ -83,7 +86,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnUserManager<T>::remove( const QnId& id, impl::SimpleHandlerPtr handler )
+    int QnUserManager<T>::remove( const QUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::removeUser, id );
@@ -95,15 +98,15 @@ namespace ec2
     template<class T>
     QnTransaction<ApiUserData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource )
     {
-        QnTransaction<ApiUserData> tran(command, true);
+        QnTransaction<ApiUserData> tran(command);
         fromResourceToApi(resource, tran.params);
         return tran;
     }
 
     template<class T>
-    QnTransaction<ApiIdData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
+    QnTransaction<ApiIdData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QUuid& id )
     {
-        QnTransaction<ApiIdData> tran(command, true);
+        QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;
         return tran;
     }

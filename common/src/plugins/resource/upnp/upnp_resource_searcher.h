@@ -35,12 +35,14 @@ protected:
         \param host Discovered device address
         \param devInfo Parameters, received by parsing \a xmlDevInfo
         \param xmlDevInfo xml data as defined in [UPnP Device Architecture 1.1, section 2.3]
+        \param auth Authentication data
     */
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
         const QString& host,
         const UpnpDeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
+        const QAuthenticator &auth,
         QnResourceList& result) = 0;
 private:
     QByteArray getDeviceDescription(const QByteArray& uuidStr, const QUrl& url);

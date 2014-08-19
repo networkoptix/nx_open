@@ -5,6 +5,7 @@
 
 #include "ec2_connection.h"
 
+#include <QtCore/QFileInfo>
 #include <QtCore/QUrlQuery>
 
 #include "mutex/distributed_mutex.h"
@@ -21,21 +22,19 @@ namespace ec2
         const QUrl& dbUrl)
     :
         BaseEc2Connection<ServerQueryProcessor>( queryProcessor, resCtx ),
-        m_dbManager( new QnDbManager(
-            resCtx.resFactory,
-            &m_licenseManagerImpl,
-            dbUrl.path(),
-            QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path"))),
-        m_auxManager(new QnAuxManager()),
-        m_transactionLog( new QnTransactionLog(m_dbManager.get() )),
+        m_auxManager( new QnAuxManager() ),
+        m_transactionLog( new QnTransactionLog(QnDbManager::instance()) ),
         m_connectionInfo( connectionInfo )
     {
         ec2::QnDistributedMutexManager::initStaticInstance( new ec2::QnDistributedMutexManager() );
 
-        m_dbManager->init();
+        QnDbManager::instance()->init(
+            resCtx.resFactory,
+            dbUrl.toLocalFile(),
+            QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path") );
 
         ApiResourceParamDataList paramList;
-        m_dbManager->doQueryNoLock(nullptr, paramList);
+        QnDbManager::instance()->doQueryNoLock(nullptr, paramList);
 
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
         QnTransactionMessageBus::instance()->setLocalPeer(ApiPeerData(qnCommon->moduleGUID(), Qn::PT_Server));

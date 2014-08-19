@@ -16,7 +16,7 @@ QnTimeSliderColors::QnTimeSliderColors() {
     selectionMarker = selection.lighter();
 
     pastBackground = QColor(255, 255, 255, 24);
-    futureBackground = QColor(0, 0, 0, 0);
+    futureBackground = QColor(0, 0, 0, 64);
 
     pastRecording = QColor(64, 255, 64, 128);
     futureRecording = QColor(64, 255, 64, 64);
@@ -118,6 +118,18 @@ QnLicensesListModelColors::QnLicensesListModelColors() {
     normal = QColor(255, 255, 255, 255);
     warning = QColor(Qt::yellow);
     expired = QColor(Qt::red);
+}
+
+QnRoutingManagementColors::QnRoutingManagementColors() {
+    readOnly = Qt::lightGray;
+}
+
+QnVideowallManageWidgetColors::QnVideowallManageWidgetColors() {
+    desktop = Qt::darkGray;
+    freeSpace = Qt::lightGray;
+    item = QColor(64, 130, 180);
+    text = Qt::white;
+    error = Qt::red;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

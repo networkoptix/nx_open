@@ -114,8 +114,6 @@ namespace ec2
                     return "removeVideowall";
                 case videowallControl:
                     return "videowallControl";
-                case videowallInstanceStatus:
-                    return "videowallInstanceStatus";
 
                 case listDirectory:
                     return "listDirectory";
@@ -134,6 +132,8 @@ namespace ec2
                     return "addLicense";
                 case getLicenses:
                     return "getLicenses";
+                case removeLicense:
+                    return "removeLicense";
 
                 case getCurrentTime:
                     return "getCurrentTime";
@@ -152,9 +152,43 @@ namespace ec2
                 case removeCameraBookmarkTags:
                     return "removeCameraBookmarkTags";
 
+                case moduleInfo:
+                    return "moduleInfo";
+                case moduleInfoList:
+                    return "moduleInfoList";
+
+                case discoverPeer:
+                    return "discoverPeer";
+                case addDiscoveryInformation:
+                    return "addDiscoveryInformation";
+                case removeDiscoveryInformation:
+                    return "removeDiscoveryInformation";
+
+                case addConnection:
+                    return "addConnection";
+                case removeConnection:
+                    return "removeConnection";
+                case availableConnections:
+                    return "availableConnections";
+
+                case changeSystemName:
+                    return "changeSystemName";
+
                 case runtimeInfoChanged:
                     return "runtimeInfoChanged";
+                case forcePrimaryTimeServer:
+                    return "forcePrimaryTimeServer";
+                case broadcastPeerSystemTime:
+                    return "broadcastPeerSystemTime";
 
+                case testEmailSettings:
+                    return "testEmailSettings";
+                case sendEmail:
+                    return "sendEmail";
+                case dumpDatabase:
+                    return "dumpDatabase";
+                case resotreDatabase:
+                    return "resotreDatabase";
                 default:
                     return "unknown " + QString::number((int)val);
             }
@@ -167,35 +201,61 @@ namespace ec2
                     val == unlockRequest ||
                     val == tranSyncRequest ||
                     val == tranSyncResponse ||
+                    val == runtimeInfoChanged ||
                     val == peerAliveInfo;
         }
 
+        bool isPersistent( Value val )
+        {
+            return  val == saveResource   ||
+                val == removeResource  ||
+                val == setResourceStatus ||
+                val == setResourceParams ||
+                val == setPanicMode ||
+                val == saveCamera ||
+                val == saveCameras ||
+                val == removeCamera ||
+                val == addCameraHistoryItem ||
+                val == addCameraBookmarkTags ||
+                val == removeCameraBookmarkTags ||
+                val == saveMediaServer ||
+                val == removeMediaServer ||
+                val == saveUser ||
+                val == removeUser ||
+                val == saveLayout ||
+                val == saveLayouts ||
+                val == removeLayout ||
+                val == saveVideowall ||
+                val == removeVideowall ||
+                val == saveBusinessRule ||
+                val == removeBusinessRule ||
+                val == resetBusinessRules ||
+                val == addStoredFile ||
+                val == updateStoredFile ||
+                val == removeStoredFile ||
+                val == addDiscoveryInformation ||
+                val == removeDiscoveryInformation ||
+                val == addLicense ||
+                val == addLicenses ||
+                val == removeLicense || 
+                val == resotreDatabase;
+        }
+
     }
 
-    QnAbstractTransaction::QnAbstractTransaction(ApiCommand::Value _command, bool _persistent)
-    {
-        command = _command;
-        persistent = _persistent;
-        id.peerID = qnCommon->moduleGUID();
-        id.sequence = 0;
-        timestamp = 0;
-        if (QnTransactionLog::instance()) {
-            timestamp = QnTransactionLog::instance()->getTimeStamp();
-            id.dbID = QnDbManager::instance()->getID();
-        }
-        isLocal = false;
-    }
 
     void QnAbstractTransaction::setStartSequence(int value)
     {
         qn_abstractTransaction_sequence = value;
     }
 
-    void QnAbstractTransaction::fillSequence()
+    void QnAbstractTransaction::fillPersistentInfo()
     {
-        id.sequence = qn_abstractTransaction_sequence.fetchAndAddAcquire(1);
-        if (!timestamp)
-            timestamp = QnTransactionLog::instance() ? QnTransactionLog::instance()->getTimeStamp() : 0;
+        if (QnDbManager::instance() && persistentInfo.isNull()) {
+            persistentInfo.sequence = qn_abstractTransaction_sequence.fetchAndAddAcquire(1);
+            persistentInfo.dbID = QnDbManager::instance()->getID();
+            persistentInfo.timestamp = QnTransactionLog::instance()->getTimeStamp();
+        }
     }
 
     int generateRequestID()
@@ -204,7 +264,8 @@ namespace ec2
         return ++requestID;
     }
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary)(json),   (peerID)(dbID)(sequence))
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary)(json),   (command)(id)(persistent)(timestamp))
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::PersistentInfo,    (binary)(json)(ubjson),   QnAbstractTransaction_PERSISTENT_Fields)
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,                    (binary)(json)(ubjson),   QnAbstractTransaction_Fields)
+	
 } // namespace ec2
 

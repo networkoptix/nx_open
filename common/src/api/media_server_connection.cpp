@@ -70,11 +70,15 @@ namespace {
         (EventLogObject,           "events")
         (ImageObject,              "image")
         (CameraDiagnosticsObject,  "doCameraDiagnosticsStep")
+        (GetSystemNameObject,      "getSystemName")
         (RebuildArchiveObject,     "rebuildArchive")
         (BookmarkAddObject,        "cameraBookmarks/add")
         (BookmarkUpdateObject,     "cameraBookmarks/update")
         (BookmarkDeleteObject,     "cameraBookmarks/delete")
         (BookmarksGetObject,       "cameraBookmarks/get")
+        (InstallUpdateObject,      "installUpdate")
+        (Restart,                  "restart")
+        (ConfigureObject,          "configure")
         (TestEmailSettingsObject,  "testEmailSettings")
     );
 
@@ -295,6 +299,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case CameraDiagnosticsObject:
         processJsonReply<QnCameraDiagnosticsReply>(this, response, handle);
         break;
+    case GetSystemNameObject:
+        emitFinished( this, response.status, QString::fromUtf8(response.data), handle );
+        break;
     case RebuildArchiveObject: {
         QnRebuildArchiveReply info;
         if (response.status == 0)
@@ -309,6 +316,15 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case BookmarksGetObject:
         processJsonReply<QnCameraBookmarkList>(this, response, handle);
+        break;
+    case InstallUpdateObject:
+        emitFinished(this, response.status, handle);
+        break;
+    case Restart:
+        emitFinished(this, response.status, handle);
+        break;
+    case ConfigureObject:
+        emitFinished(this, response.status, handle);
         break;
     default:
         assert(false); /* We should never get here. */
@@ -673,6 +689,11 @@ int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
     return sendAsyncGetRequest(TimeObject, QnRequestParamList(), QN_STRINGIZE_TYPE(QnTimeReply), target, slot);
 }
 
+int QnMediaServerConnection::getSystemNameAsync( QObject* target, const char* slot )
+{
+    return sendAsyncGetRequest(GetSystemNameObject, QnRequestParamList(), QN_STRINGIZE_TYPE(QString), target, slot);
+}
+
 int QnMediaServerConnection::testEmailSettingsAsync(const QnEmail::Settings &settings, QObject *target, const char *slot) 
 {
     QnRequestHeaderList headers;
@@ -683,7 +704,7 @@ int QnMediaServerConnection::testEmailSettingsAsync(const QnEmail::Settings &set
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
-    const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
+    const QUuid& cameraID, CameraDiagnostics::Step::Value previousStep,
     QObject* target, const char* slot )
 {
     QnRequestParamList params;
@@ -722,7 +743,7 @@ int QnMediaServerConnection::getEventLogAsync(
                   QnResourceList camList,
                   QnBusiness::EventType eventType,
                   QnBusiness::ActionType actionType,
-                  QnId businessRuleId,
+                  QUuid businessRuleId,
                   QObject *target, const char *slot)
 {
     QnRequestParamList params;
@@ -788,3 +809,25 @@ int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camer
     return sendAsyncGetRequest(BookmarksGetObject, headers, params, QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
 
+int QnMediaServerConnection::installUpdate(const QString &updateId, const QByteArray &data, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("updateId", updateId);
+
+    return sendAsyncPostRequest(InstallUpdateObject, params, data, NULL, target, slot);
+}
+
+int QnMediaServerConnection::restart(QObject *target, const char *slot) {
+    return sendAsyncGetRequest(Restart, QnRequestParamList(), NULL, target, slot);
+}
+
+int QnMediaServerConnection::configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, int port, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("wholeSystem", wholeSystem);
+    params << QnRequestParam("systemName", systemName);
+    params << QnRequestParam("password", password);
+    params << QnRequestParam("passwordHash", QString::fromLatin1(passwordHash));
+    params << QnRequestParam("passwordDigest", QString::fromLatin1(passwordDigest));
+    params << QnRequestParam("port", port);
+
+    return sendAsyncGetRequest(ConfigureObject, params, NULL, target, slot);
+}

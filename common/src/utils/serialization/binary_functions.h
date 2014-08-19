@@ -21,8 +21,9 @@
 #include <utils/common/collection.h>
 #include <utils/common/latin1_array.h>
 
-#include "binary.h"
 #include "collection_fwd.h"
+#include "binary.h"
+#include "binary_macros.h"
 #include "enum.h"
 
 

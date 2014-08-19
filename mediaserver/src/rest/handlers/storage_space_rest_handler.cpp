@@ -50,7 +50,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
             }
         }
 
-        if (storage->hasFlags(QnResource::deprecated))
+        if (storage->hasFlags(Qn::deprecated))
             continue;
 
         QnStorageSpaceData data;
@@ -91,7 +91,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
 
         QnStorageSpaceData data;
         data.url = partition.path + lit(QN_MEDIA_FOLDER_NAME);
-        data.storageId = QnId();
+        data.storageId = QUuid();
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
         data.reservedSpace = defaultStorageSpaceLimit;

@@ -1,17 +1,17 @@
 #ifndef WEEK_TIME_SCHEDULE_DIALOG_H
 #define WEEK_TIME_SCHEDULE_DIALOG_H
 
-#include <ui/dialogs/button_box_dialog.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 namespace Ui {
     class WeekTimeScheduleDialog;
 }
 
-class QnWeekTimeScheduleDialog : public QnButtonBoxDialog
+class QnWeekTimeScheduleDialog : public QnWorkbenchStateDependentButtonBoxDialog
 {
     Q_OBJECT
 
-    typedef QnButtonBoxDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
     explicit QnWeekTimeScheduleDialog(QWidget *parent = 0);
@@ -42,7 +42,7 @@ private:
     bool m_disableUpdateGridParams;
 
     /**
-     * @brief m_inUpdate                Counter that will prevent unnessesary calls when component update is in progress.
+     * @brief m_inUpdate                Counter that will prevent unnecessary calls when component update is in progress.
      */
     int m_inUpdate;
 };

@@ -23,23 +23,24 @@ public:
     QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader);
     virtual ~QnRtspClientArchiveDelegate();
 
-    void setResource(QnResourcePtr resource);
-    void setServer(QnResourcePtr mServer);
-    virtual bool open(const QnResourcePtr &resource);
-    virtual void close();
-    virtual qint64 startTime();
-    virtual qint64 endTime();
-    virtual QnAbstractMediaDataPtr getNextData();
-    virtual qint64 seek (qint64 time, bool findIFrame);
+    void setCamera(const QnVirtualCameraResourcePtr &camera);
+    void setServer(const QnMediaServerResourcePtr &server);
+
+    virtual bool open(const QnResourcePtr &resource) override;
+    virtual void close() override;
+    virtual qint64 startTime() override;
+    virtual qint64 endTime() override;
+    virtual QnAbstractMediaDataPtr getNextData() override;
+    virtual qint64 seek (qint64 time, bool findIFrame) override;
     qint64 seek(qint64 startTime, qint64 endTime);
-    virtual QnResourceVideoLayoutPtr getVideoLayout();
-    virtual QnResourceAudioLayoutPtr getAudioLayout();
+    virtual QnResourceVideoLayoutPtr getVideoLayout() override;
+    virtual QnResourceAudioLayoutPtr getAudioLayout() override;
 
-    virtual void onReverseMode(qint64 displayTime, bool value);
+    virtual void onReverseMode(qint64 displayTime, bool value) override;
 
-    virtual bool isRealTimeSource() const;
-    virtual void beforeClose();
-    virtual void setSingleshotMode(bool value);
+    virtual bool isRealTimeSource() const override;
+    virtual void beforeClose() override;
+    virtual void setSingleshotMode(bool value) override;
     
     // filter input data by motion region
     virtual void setMotionRegion(const QRegion& region);
@@ -47,10 +48,10 @@ public:
     // Send motion data to client
     virtual void setSendMotion(bool value) override;
 
-    virtual bool setQuality(MediaQuality quality, bool fastSwitch);
+    virtual bool setQuality(MediaQuality quality, bool fastSwitch) override;
 
-    virtual void beforeSeek(qint64 time);
-    virtual void beforeChangeReverseMode(bool reverseMode);
+    virtual void beforeSeek(qint64 time) override;
+    virtual void beforeChangeReverseMode(bool reverseMode) override;
 
     void setAdditionalAttribute(const QByteArray& name, const QByteArray& value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
@@ -67,12 +68,12 @@ private:
     void reopen();
 
     // determine camera's video server on specified time
-    QnResourcePtr getServerOnTime(qint64 time);
-    QnResourcePtr getNextMediaServerFromTime(QnResourcePtr resource, qint64 time);
+    QnMediaServerResourcePtr getServerOnTime(qint64 time);
+    QnMediaServerResourcePtr getNextMediaServerFromTime(const QnVirtualCameraResourcePtr &camera, qint64 time);
     QnAbstractMediaDataPtr getNextDataInternal();
-    QString getUrl(QnResourcePtr server, QnResourcePtr camera);
-    qint64 checkMinTimeFromOtherServer(QnResourcePtr resource);
-    void updateRtpParam(QnResourcePtr resource);
+    QString getUrl(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) const;
+    qint64 checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera) const;
+    void setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session, bool usePredefinedTracks) const;
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
 private:
     QMutex m_mutex;
@@ -84,8 +85,8 @@ private:
     qint64 m_position;
     QSharedPointer<QnDefaultResourceVideoLayout> m_defaultVideoLayout;
     bool m_opened;
-    QnResourcePtr m_resource;
-    QnResourcePtr m_server;
+    QnVirtualCameraResourcePtr m_camera;
+    QnMediaServerResourcePtr m_server;
     //bool m_waitBOF;
     int m_lastPacketFlags;
     bool m_closing;
@@ -110,6 +111,12 @@ private:
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
     
     QMap<int, QnFfmpegRtpParserPtr> m_parsers;
+    
+    struct {
+        QString username;
+        QString password;
+        QUuid videowall;
+    } m_auth;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

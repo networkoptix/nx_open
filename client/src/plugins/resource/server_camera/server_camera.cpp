@@ -6,13 +6,13 @@
 #include "api/app_server_connection.h"
 
 
-QnServerCamera::QnServerCamera(const QnId& resourceTypeId): QnVirtualCameraResource()
+QnServerCamera::QnServerCamera(const QUuid& resourceTypeId): QnVirtualCameraResource()
 {
     setTypeId(resourceTypeId);
-    addFlags(server_live_cam);
+    addFlags(Qn::server_live_cam);
     if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
-        addFlags(QnResource::motion);
-    m_tmpStatus = NotDefined;
+        addFlags(Qn::motion);
+    m_tmpStatus = Qn::NotDefined;
 }
 
 bool QnServerCamera::isResourceAccessible()
@@ -60,20 +60,20 @@ QnAbstractStreamDataProvider* QnServerCamera::createLiveDataProvider()
     return result;
 }
 
-QnResource::Status QnServerCamera::getStatus() const
+Qn::ResourceStatus QnServerCamera::getStatus() const
 {
-    if (m_tmpStatus != NotDefined)
+    if (m_tmpStatus != Qn::NotDefined)
         return m_tmpStatus;
     else
         return QnResource::getStatus();
 }
 
-void QnServerCamera::setTmpStatus(Status value)
+void QnServerCamera::setTmpStatus(Qn::ResourceStatus status)
 {
-    if (value != m_tmpStatus) {
-        Status oldStatus = getStatus();
-        m_tmpStatus = value;
-        Status newStatus = getStatus();
+    if (status != m_tmpStatus) {
+        Qn::ResourceStatus oldStatus = getStatus();
+        m_tmpStatus = status;
+        Qn::ResourceStatus newStatus = getStatus();
         if (oldStatus != newStatus)
             emit statusChanged(toSharedPointer(this));
     }

@@ -9,8 +9,8 @@ bool QnSortedServerUpdatesModel::lessThan(const QModelIndex &left, const QModelI
     QnServerUpdatesModel::Item *litem = reinterpret_cast<QnServerUpdatesModel::Item*>(left.internalPointer());
     QnServerUpdatesModel::Item *ritem = reinterpret_cast<QnServerUpdatesModel::Item*>(right.internalPointer());
 
-    bool lonline = litem->server()->getStatus() == QnResource::Online;
-    bool ronline = ritem->server()->getStatus() == QnResource::Online;
+    bool lonline = litem->server()->getStatus() == Qn::Online;
+    bool ronline = ritem->server()->getStatus() == Qn::Online;
 
     if (lonline != ronline)
         return lonline;

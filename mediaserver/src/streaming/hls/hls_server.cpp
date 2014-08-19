@@ -6,6 +6,7 @@
 
 #include <QtCore/QUrlQuery>
 #include <QtCore/QTimeZone>
+#include <QtCore/QCoreApplication>
 
 #include <algorithm>
 #include <limits>
@@ -64,7 +65,7 @@ namespace nx_hls
 
         if( m_currentChunk )
         {
-            //disconnecting and waiting for already-emmitted signals from m_currentChunk to be delivered and processed
+            //disconnecting and waiting for already-emitted signals from m_currentChunk to be delivered and processed
             //TODO #ak cancel on-going transcoding. Currently, it just wastes CPU time
             m_currentChunk->disconnectAndJoin( this );
             StreamingChunkCache::instance()->putBackUsedItem( m_currentChunk->params(), m_currentChunk );
@@ -205,7 +206,7 @@ namespace nx_hls
         response.headers.insert( std::make_pair(
             "Date",
             QLocale(QLocale::English).toString(QDateTime::currentDateTime(), lit("ddd, d MMM yyyy hh:mm:ss t")).toLatin1() ) );
-        response.headers.insert( std::make_pair( "Server", QN_APPLICATION_NAME " " QN_APPLICATION_VERSION ) );
+        response.headers.insert( std::make_pair( "Server", (lit(QN_APPLICATION_NAME) + lit(" ") + QCoreApplication::applicationVersion()).toLatin1().data()) );
         response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //getRequestedFile can override this
 
         if( request.requestLine.version == nx_http::http_1_1 )
@@ -699,7 +700,7 @@ namespace nx_hls
         //streaming chunk
         if( m_currentChunk )
         {
-            //disconnecting and waiting for already-emmitted signals from m_currentChunk to be delivered and processed
+            //disconnecting and waiting for already-emitted signals from m_currentChunk to be delivered and processed
             m_currentChunk->disconnectAndJoin( this );
             StreamingChunkCache::instance()->putBackUsedItem( currentChunkKey, m_currentChunk );
             m_currentChunk.reset();
@@ -837,7 +838,7 @@ namespace nx_hls
             //no chunks generated, waiting for at least one chunk to be generated
             QElapsedTimer monotonicTimer;
             monotonicTimer.restart();
-            while( monotonicTimer.elapsed() < session->targetDurationMS() * (MIN_PLAYLIST_SIZE_TO_START_STREAMING + 2) )
+            while( (quint64)monotonicTimer.elapsed() < session->targetDurationMS() * (MIN_PLAYLIST_SIZE_TO_START_STREAMING + 2) )
             {
                 chunkList.clear();
                 chunksGenerated = session->playlistManager(streamQuality)->generateChunkList( &chunkList, &isPlaylistClosed );

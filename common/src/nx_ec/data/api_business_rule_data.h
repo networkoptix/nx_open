@@ -13,15 +13,15 @@ namespace ec2
             eventType(QnBusiness::UndefinedEvent), eventState(QnBusiness::UndefinedState), actionType(QnBusiness::UndefinedAction), 
             aggregationPeriod(0), disabled(false), system(false) {}
 
-        QnId id;
+        QUuid id;
 
         QnBusiness::EventType eventType;
-        std::vector<QnId>  eventResourceIds;
+        std::vector<QUuid>  eventResourceIds;
         QByteArray eventCondition; 
         QnBusiness::EventState eventState;
 
         QnBusiness::ActionType actionType;
-        std::vector<QnId> actionResourceIds;
+        std::vector<QUuid> actionResourceIds;
         QByteArray actionParams;
 
         qint32 aggregationPeriod; // msecs
@@ -40,10 +40,10 @@ namespace ec2
         QnBusiness::ActionType actionType;
         QnBusiness::EventState toggleState;
         bool receivedFromRemoteHost;
-        std::vector<QnId> resourceIds;
+        std::vector<QUuid> resourceIds;
         QByteArray params;
         QByteArray runtimeParams;
-        QnId ruleId;
+        QUuid ruleId;
         qint32 aggregationCount;
     };
 #define ApiBusinessActionData_Fields (actionType)(toggleState)(receivedFromRemoteHost)(resourceIds)(params)(runtimeParams)(ruleId)(aggregationCount)

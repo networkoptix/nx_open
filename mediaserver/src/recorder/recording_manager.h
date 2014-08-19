@@ -87,7 +87,7 @@ class QnServerDataProviderFactory: public QnDataProviderFactory
 {
 public:
     static QnServerDataProviderFactory* instance();
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, QnResource::ConnectionRole role) override;
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role) override;
 };
 
 #define qnRecordingManager QnRecordingManager::instance()

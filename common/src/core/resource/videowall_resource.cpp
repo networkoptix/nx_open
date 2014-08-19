@@ -3,23 +3,23 @@
 QnVideoWallResource::QnVideoWallResource() :
     base_type(),
     m_autorun(false),
-    m_items(new QnResourceItemStorage<QnVideoWallItem>(&m_mutex, this)),
-    m_pcs(new QnResourceItemStorage<QnVideoWallPcData>(&m_mutex, this)),
-    m_matrices(new QnResourceItemStorage<QnVideoWallMatrix>(&m_mutex, this))
+    m_items(new QnThreadsafeItemStorage<QnVideoWallItem>(&m_mutex, this)),
+    m_pcs(new QnThreadsafeItemStorage<QnVideoWallPcData>(&m_mutex, this)),
+    m_matrices(new QnThreadsafeItemStorage<QnVideoWallMatrix>(&m_mutex, this))
 {
-    setStatus(Online, true);
-    addFlags(QnResource::videowall | QnResource::remote);
+    setStatus(Qn::Online, true);
+    addFlags(Qn::videowall | Qn::remote);
 }
 
-QnResourceItemStorage<QnVideoWallItem> * QnVideoWallResource::items() const {
+QnThreadsafeItemStorage<QnVideoWallItem> * QnVideoWallResource::items() const {
     return m_items.data();
 }
 
-QnResourceItemStorage<QnVideoWallPcData> * QnVideoWallResource::pcs() const {
+QnThreadsafeItemStorage<QnVideoWallPcData> * QnVideoWallResource::pcs() const {
     return m_pcs.data();
 }
 
-QnResourceItemStorage<QnVideoWallMatrix> * QnVideoWallResource::matrices() const {
+QnThreadsafeItemStorage<QnVideoWallMatrix> * QnVideoWallResource::matrices() const {
     return m_matrices.data();
 }
 

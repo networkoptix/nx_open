@@ -53,9 +53,9 @@ void QnWorkbenchLicenseNotifier::checkLicenses() {
     bool warn = false;
 
     bool someLicenseWillBeBlocked = false;
-    foreach (const ec2::ApiRuntimeData& runtimeData, QnRuntimeInfoManager::instance()->allData().values())
+    foreach (const QnPeerRuntimeInfo& runtimeInfo, QnRuntimeInfoManager::instance()->items()->getItems())
     {
-        if (runtimeData.prematureLicenseExperationDate)
+        if (runtimeInfo.data.prematureLicenseExperationDate)
             someLicenseWillBeBlocked = true;
     }
 
@@ -69,7 +69,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses() {
         }
 
         qint64 expirationTime = license->expirationTime();
-        // skip infinite lcense
+        // skip infinite license
         if(expirationTime < 0)
             continue;
 
@@ -100,7 +100,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses() {
     }
 
     if(warn) {
-        QScopedPointer<QnLicenseNotificationDialog> dialog(new QnLicenseNotificationDialog());
+        QScopedPointer<QnLicenseNotificationDialog> dialog(new QnLicenseNotificationDialog(mainWindow()));
         dialog->setLicenses(licenses);
         dialog->exec();
 

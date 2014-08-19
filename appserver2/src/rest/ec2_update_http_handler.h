@@ -15,6 +15,7 @@
 
 #include <rest/server/request_handler.h>
 #include <utils/network/http/httptypes.h>
+#include <utils/common/model_functions.h>
 #include <transaction/transaction.h>
 
 #include "server_query_processor.h"
@@ -29,9 +30,14 @@ namespace ec2
         public QnRestRequestHandler
     {
     public:
-        UpdateHttpHandler( Ec2DirectConnectionPtr  connection )
+        typedef std::function<void(const QnTransaction<RequestDataType>&)> CustomActionFuncType;
+
+        UpdateHttpHandler(
+            const Ec2DirectConnectionPtr& connection,
+            CustomActionFuncType customAction = CustomActionFuncType() )
         :
-            m_connection( connection )
+            m_connection( connection ),
+            m_customAction( customAction )
         {
         }
 
@@ -50,18 +56,39 @@ namespace ec2
             const QString& /*path*/,
             const QnRequestParamList& /*params*/,
             const QByteArray& body,
+            const QByteArray& srcBodyContentType,
             QByteArray& /*result*/,
             QByteArray& /*contentType*/ )
         {
             QnTransaction<RequestDataType> tran;
-            QnInputBinaryStream<QByteArray> stream( &body );
-            if (!QnBinary::deserialize(&stream, &tran))
-                return nx_http::StatusCode::badRequest;
-            
+
+            Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(srcBodyContentType);
+            switch( format )
+            {
+                case Qn::BnsFormat:
+                    tran = QnBinary::deserialized<QnTransaction<RequestDataType>>(body);
+                    break;
+                case Qn::JsonFormat:
+                    tran = QJson::deserialized<QnTransaction<RequestDataType>>(body);
+                    break;
+                case Qn::UbjsonFormat:
+                    tran = QnUbjson::deserialized<QnTransaction<RequestDataType>>(body);
+                    break;
+                //case Qn::CsvFormat:
+                //    tran = QnCsv::deserialized<QnTransaction<RequestDataType>>(body);
+                //    break;
+                //case Qn::XmlFormat:
+                //    tran = QnXml::deserialized<QnTransaction<RequestDataType>>(body);
+                //    break;
+                default:
+                    assert(false);
+            }
+
             // replace client GUID to own GUID (take transaction ownership).
-            tran.id.peerID = qnCommon->moduleGUID();
-            if (QnDbManager::instance())
-                tran.id.dbID = QnDbManager::instance()->getID();
+            tran.peerID = qnCommon->moduleGUID();
+            if (QnDbManager::instance() && ApiCommand::isPersistent(tran.command))
+                tran.fillPersistentInfo();
+
 
             ErrorCode errorCode = ErrorCode::ok;
             bool finished = false;
@@ -75,9 +102,14 @@ namespace ec2
             };
             m_connection->queryProcessor()->processUpdateAsync( tran, queryDoneHandler );
 
-            QMutexLocker lk( &m_mutex );
-            while( !finished )
-                m_cond.wait( lk.mutex() );
+            {
+                QMutexLocker lk( &m_mutex );
+                while( !finished )
+                    m_cond.wait( lk.mutex() );
+            }
+
+            if( m_customAction )
+                m_customAction( tran );
 
              // update local data
             if (errorCode == ErrorCode::ok)
@@ -92,6 +124,7 @@ namespace ec2
         Ec2DirectConnectionPtr m_connection;
         QWaitCondition m_cond;
         QMutex m_mutex;
+        CustomActionFuncType m_customAction;
     };
 }
 

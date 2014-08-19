@@ -324,7 +324,13 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
         sigar_net_interface_config_t config;
         if (INVOKE(sigar_net_interface_config_get(d->sigar, interfaceName.toLatin1().constData(), &config) != SIGAR_OK))
             continue;
-        if ((config.flags & (SIGAR_IFF_UP | SIGAR_IFF_RUNNING) ) == 0)
+       
+        /* Interface is down. */
+        if ((config.flags & (SIGAR_IFF_UP | SIGAR_IFF_RUNNING) ) != (SIGAR_IFF_UP | SIGAR_IFF_RUNNING) )
+            continue;
+
+        /* Interface has no address (QoS Scheduler or WAN Miniport)  */
+        if (!config.address.addr.in)
             continue;
 
         NetworkLoad load = d->networkLoad(interfaceName);

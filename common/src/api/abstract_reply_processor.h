@@ -67,11 +67,15 @@ protected:
         if(status == 0) {
             QnJsonRestResult result;
             if(!QJson::deserialize(response.data, &result) || !QJson::deserialize(result.reply(), &reply)) {
+#ifdef JSON_REPLY_DEBUG
                 qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
+#endif
                 status = 1;
             }
         } else {
+#ifdef JSON_REPLY_DEBUG
             qnWarning("Error processing request: %1.", response.errorString);
+#endif
         }
 
         emitFinished(derived, status, reply, handle);

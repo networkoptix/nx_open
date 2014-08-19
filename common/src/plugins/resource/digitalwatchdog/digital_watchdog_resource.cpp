@@ -62,7 +62,7 @@ bool QnPlWatchDogResource::isDualStreamingEnabled(bool& unauth)
     else if (status == CL_HTTP_AUTH_REQUIRED) 
     {
         unauth = true;
-        setStatus(Unauthorized);
+        setStatus(Qn::Unauthorized);
         return false;
     }
     
@@ -97,7 +97,7 @@ void QnPlWatchDogResource::enableOnvifSecondStream()
     request.append("onvif_use_discovery=true&onvif_use_security=true&onvif_security_opts=63&onvif_use_sa=true&reboot=true");
     http.doPOST(QByteArray("/cgi-bin/onvifsetup.cgi"), QLatin1String(request));
 
-    setStatus(Offline);
+    setStatus(Qn::Offline);
     // camera rebooting ....
 }
 

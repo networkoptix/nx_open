@@ -167,6 +167,9 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             while( !m_videoPacket.get() && !localHttpClientPtr->eof() )
                 m_multipartContentParser.processData( localHttpClientPtr->fetchMessageBodyBuffer() );
             break;
+
+        default:
+            break;
     }
 
     if( m_videoPacket.get() )

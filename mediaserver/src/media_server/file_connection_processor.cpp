@@ -47,10 +47,9 @@ class QnFileConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 public:
 };
 
-QnFileConnectionProcessor::QnFileConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
+QnFileConnectionProcessor::QnFileConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* /*_owner*/):
     QnTCPConnectionProcessor(new QnFileConnectionProcessorPrivate, socket)
 {
-    Q_D(QnFileConnectionProcessor);
 }
 
 QnFileConnectionProcessor::~QnFileConnectionProcessor()

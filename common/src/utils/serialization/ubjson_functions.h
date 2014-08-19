@@ -20,8 +20,9 @@
 #include <utils/common/collection.h>
 #include <utils/common/latin1_array.h>
 
-#include "ubjson.h"
 #include "collection_fwd.h"
+#include "ubjson.h"
+#include "ubjson_macros.h"
 #include "enum.h"
 
 

@@ -117,7 +117,7 @@ public:
         QnResourceList cameras,
         QnBusiness::EventType eventType, 
         QnBusiness::ActionType actionType,
-        QnId businessRuleId, 
+        QUuid businessRuleId, 
         QObject *target, 
         const char *slot);
 
@@ -185,13 +185,18 @@ public:
 
     int getTimeAsync(QObject *target, const char *slot);
 
+    //!Requests name of system, mediaserver is currently connected to
+    /*!
+        \param slot Slot MUST have signature (int, QString, int)
+    */
+    int getSystemNameAsync( QObject* target, const char* slot );
     //!Request server to run camera \a cameraID diagnostics step following \a previousStep
     /*!
         \param slot Slot MUST have signature (int, QnCameraDiagnosticsReply, int)
         \returns Request handle
     */
     int doCameraDiagnosticsStepAsync(
-        const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
+        const QUuid& cameraID, CameraDiagnostics::Step::Value previousStep,
         QObject* target, const char* slot );
 
     /**
@@ -204,6 +209,13 @@ public:
     int updateBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
     int deleteBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
     int getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot);
+
+    int installUpdate(const QString &updateId, const QByteArray &data, QObject *target, const char *slot);
+
+    int restart(QObject *target, const char *slot);
+
+    int configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, int port, QObject *target, const char *slot);
+
     int testEmailSettingsAsync(const QnEmail::Settings &settings, QObject *target, const char *slot);
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;

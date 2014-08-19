@@ -343,8 +343,18 @@ NameHelper::NameHelper()
     QnResourceTypePool::QnResourceTypeMap typeMap = qnResTypePool->getResourceTypeMap();
 
     foreach(QnResourceTypePtr rt, typeMap) {
+
+        if (rt->getParentId().isNull())
+            continue;
+
         QString normalizedManufacturer = rt->getManufacture().toLower().replace(UNNEEDED_CHARACTERS, QString());
-        QString normalizedName = rt->getName().toLower().replace(UNNEEDED_CHARACTERS, QString()).replace(normalizedManufacturer, QString());
+        QString normalizedName = rt->getName().toLower().replace(UNNEEDED_CHARACTERS, QString());
+
+        if (normalizedName == normalizedManufacturer + QString(lit("camera")))
+            continue;
+
+        normalizedName = normalizedName.replace(normalizedManufacturer, QString());
+
         camerasNames.insert(normalizedName);
     }
 }
@@ -364,14 +374,14 @@ bool NameHelper::isSupported(const QString& cameraName) const
     //qDebug() << "NameHelper::isSupported: camera name: " << cameraName << ", normalized: "
     //         << cameraName.toLower().replace(UNNEEDED_CHARACTERS, QString());
 
-    QSet<QString>::ConstIterator it = camerasNames.constFind(cameraName.toLower().replace(UNNEEDED_CHARACTERS, QString()));
-    if (it == camerasNames.constEnd()) {
-        //qDebug() << "NameHelper::isSupported: can't find " << cameraName;
-        return false;
-    }
-
-    //qDebug() << "NameHelper::isSupported: " << cameraName << " found";
-    return true;
+    QString normalizedCameraName = cameraName.toLower().replace(UNNEEDED_CHARACTERS, QString());
+    do {
+        QSet<QString>::ConstIterator it = camerasNames.constFind(normalizedCameraName);
+        if (it != camerasNames.constEnd())
+            return true;
+        normalizedCameraName.chop(1);
+    } while (normalizedCameraName.length() >= 4);
+    return false;
 }
 
 bool NameHelper::isManufacturerSupported(const QString& manufacturer) const

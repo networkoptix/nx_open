@@ -17,7 +17,7 @@ public:
         VerticalUp
     };
 
-    QnMediaDewarpingParams(): enabled(false), viewMode(VerticalDown), fovRot(0.0), xCenter(0.5), yCenter(0.5), radius(0.5) {}
+    QnMediaDewarpingParams(): enabled(false), viewMode(VerticalDown), fovRot(0.0), xCenter(0.5), yCenter(0.5), radius(0.5), hStretch(1.0) {}
 
     QnMediaDewarpingParams(const QnMediaDewarpingParams &other) {
         enabled = other.enabled;
@@ -26,6 +26,7 @@ public:
         xCenter = other.xCenter;
         yCenter = other.yCenter;
         radius = other.radius;
+        hStretch = other.hStretch;
     }
 
     friend bool operator==(const QnMediaDewarpingParams &l, const QnMediaDewarpingParams &r);
@@ -59,6 +60,9 @@ public:
 
     /** Circle radius in range 0..1 (r/width) */ 
     qreal radius;
+
+    /** Horizontal stretch. Value 1.0 means no stretch */ 
+    qreal hStretch;
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnMediaDewarpingParams, (json)(metatype))

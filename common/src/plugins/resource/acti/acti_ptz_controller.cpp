@@ -186,8 +186,11 @@ void QnActiPtzControllerPrivate::init() {
 bool QnActiPtzControllerPrivate::query(const QString &request, QByteArray *body, bool keepAllData) const {
     CLHttpStatus status;
     QByteArray data = resource->makeActiRequest(lit("encoder"), request, status, keepAllData);
-    if(body)
+    if(body) {
+        if (data.startsWith("OK: "))
+            data = data.mid(4);
         *body = data;
+    }
     return status == CL_HTTP_SUCCESS;
 }
 

@@ -17,6 +17,17 @@ namespace ec2
     };
 #define ApiLicenseData_Fields (key)(licenseBlock)
 
+    struct ApiDetailedLicenseData: public ApiLicenseData
+    {
+        QString name;
+        qint32 cameraCount;
+        QByteArray hardwareId;
+        QString licenseType;
+        QString version;
+        QString brand;
+        QString expiration;
+    };
+#define ApiDetailedLicenseData_Fields ApiLicenseData_Fields (name)(cameraCount)(hardwareId)(licenseType)(version)(brand)(expiration)
 }
 
 #endif  //API_LICENSE_DATA_H

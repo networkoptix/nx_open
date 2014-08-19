@@ -63,11 +63,11 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
         QnAbstractMediaDataPtr media = result.dynamicCast<QnAbstractMediaData>();
         if (media && (media->dataType != QnAbstractMediaData::EMPTY_DATA)) {
             m_lastMediaTimer.restart();
-            if (getResource()->getStatus() == QnResource::Unauthorized || getResource()->getStatus() == QnResource::Offline)
-                getResource()->setStatus(QnResource::Online);
+            if (getResource()->getStatus() == Qn::Unauthorized || getResource()->getStatus() == Qn::Offline)
+                getResource()->setStatus(Qn::Online);
         }
         else if (m_lastMediaTimer.elapsed() > MAX_FRAME_DURATION * 2) {
-            m_resource->setStatus(QnResource::Offline);
+            m_resource->setStatus(Qn::Offline);
         }
     }
 

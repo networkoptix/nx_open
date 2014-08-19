@@ -1,36 +1,66 @@
 #ifndef __RUNTIME_INFO_MANAGER_H_
 #define __RUNTIME_INFO_MANAGER_H_
 
-#include <QMap>
-#include "nx_ec/data/api_fwd.h"
-#include "nx_ec/data/api_runtime_data.h"
-#include "nx_ec/data/api_server_alive_data.h"
-#include "utils/common/id.h"
+#include <QtCore/QMap>
+#include <QtCore/QList>
 
-class QnRuntimeInfoManager: public QObject
+#include <nx_ec/data/api_fwd.h>
+#include <nx_ec/data/api_runtime_data.h>
+
+#include <utils/common/singleton.h>
+#include <utils/common/threadsafe_item_storage.h>
+
+struct QnPeerRuntimeInfo {
+    QnPeerRuntimeInfo(){}
+    QnPeerRuntimeInfo(const ec2::ApiRuntimeData& runtimeData):
+        uuid(runtimeData.peer.id),
+        data(runtimeData){}
+
+    QUuid uuid;
+    ec2::ApiRuntimeData data;
+
+    bool operator==(const QnPeerRuntimeInfo& other) const {
+        return uuid == other.uuid &&
+            data == other.data;
+    }
+};
+
+
+Q_DECLARE_METATYPE(QnPeerRuntimeInfo)
+Q_DECLARE_TYPEINFO(QnPeerRuntimeInfo, Q_MOVABLE_TYPE);
+
+typedef QList<QnPeerRuntimeInfo> QnPeerRuntimeInfoList;
+typedef QHash<QUuid, QnPeerRuntimeInfo> QnPeerRuntimeInfoMap;
+
+Q_DECLARE_METATYPE(QnPeerRuntimeInfoList)
+Q_DECLARE_METATYPE(QnPeerRuntimeInfoMap)
+
+
+class QnRuntimeInfoManager: public QObject, 
+    public Singleton<QnRuntimeInfoManager>,
+    private QnThreadsafeItemStorageNotifier<QnPeerRuntimeInfo>
 {
     Q_OBJECT
 public:
-    QnRuntimeInfoManager();
-    virtual ~QnRuntimeInfoManager();
+    QnRuntimeInfoManager(QObject* parent = NULL);
 
-    static QnRuntimeInfoManager* instance();
+    QnThreadsafeItemStorage<QnPeerRuntimeInfo> *items() const;
 
-    void update(const ec2::ApiRuntimeData& runtimeInfo);
-    QMap<QnId, ec2::ApiRuntimeData> allData() const;
-    ec2::ApiRuntimeData data(const QnId& id) const;
-
+    QnPeerRuntimeInfo localInfo() const;
+    QnPeerRuntimeInfo remoteInfo() const;
+    bool hasItem(const QUuid& id);
 signals:
-    void runtimeInfoChanged(ec2::ApiRuntimeData data);
-private slots:
-    void at_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
-    void at_remotePeerFound(const ec2::ApiPeerAliveData &data, bool isProxy);
-    void at_remotePeerLost(const ec2::ApiPeerAliveData &data, bool isProxy);
-    void at_connectionClosed();
-
+    void runtimeInfoAdded(const QnPeerRuntimeInfo &data);
+    void runtimeInfoChanged(const QnPeerRuntimeInfo &data);
+    void runtimeInfoRemoved(const QnPeerRuntimeInfo &data);
 private:
-    QMap<QnId, ec2::ApiRuntimeData> m_runtimeInfo;
+    virtual void storedItemAdded(const QnPeerRuntimeInfo &item) override;
+    virtual void storedItemRemoved(const QnPeerRuntimeInfo &item) override;
+    virtual void storedItemChanged(const QnPeerRuntimeInfo &item) override;
+private:
+    /** Mutex that is to be used when accessing items. */
     mutable QMutex m_mutex;
+    QScopedPointer<QnThreadsafeItemStorage<QnPeerRuntimeInfo> > m_items;
 };
 
 #endif

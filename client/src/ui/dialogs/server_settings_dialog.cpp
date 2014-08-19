@@ -105,7 +105,6 @@ namespace {
 
 QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server, QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::ServerSettingsDialog),
     m_server(server),
     m_hasStorageChanges(false),
@@ -149,6 +148,10 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
     connect(ui->rebuildStartButton,     SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
     connect(ui->rebuildStopButton,      SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
+
+    connect(ui->checkBoxRedundancy,     &QCheckBox::stateChanged,       this,   [this]{
+        ui->maxCamerasWidget->setEnabled(ui->checkBoxRedundancy->isChecked() && ui->checkBoxRedundancy->isEnabled());
+    });
 
     updateFromResources();
 }
@@ -253,7 +256,7 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
 
     result.isWritable = checkBoxItem->flags() & Qt::ItemIsEnabled;
     result.isUsedForWriting = checkBoxItem->checkState() == Qt::Checked;
-    result.storageId = qvariant_cast<QString>(checkBoxItem->data(StorageIdRole), QString());
+    result.storageId = checkBoxItem->data(StorageIdRole).value<QUuid>();
     result.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
 
     QString login = ui->storagesTable->item(row, LoginColumn)->text();
@@ -286,7 +289,7 @@ void QnServerSettingsDialog::updateFromResources()
     m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
     updateRebuildUi(RebuildState::Invalid);
 
-    if (m_server->getStatus() == QnResource::Online)
+    if (m_server->getStatus() == Qn::Online)
         sendNextArchiveRequest();
 
     setTableItems(QList<QnStorageSpaceData>());
@@ -296,9 +299,9 @@ void QnServerSettingsDialog::updateFromResources()
     ui->nameLineEdit->setText(m_server->getName());
     ui->nameLineEdit->setEnabled(!edge);
     ui->maxCamerasSpinBox->setValue(m_server->getMaxCameras());
-    ui->maxCamerasSpinBox->setEnabled(!edge);
     ui->checkBoxRedundancy->setChecked(m_server->isRedundancy());
     ui->checkBoxRedundancy->setEnabled(!edge);
+    ui->maxCamerasWidget->setEnabled(!edge && m_server->isRedundancy());
 
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
@@ -404,7 +407,7 @@ int QnServerSettingsDialog::dataRowCount() const {
 void QnServerSettingsDialog::at_tableBottomLabel_linkActivated() {
     QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, this));
     dialog->setProtocols(m_storageProtocols);
-    if(dialog->exec() != QDialog::Accepted)
+    if(!dialog->exec())
         return;
 
     QnStorageSpaceData item = dialog->storage();
@@ -473,7 +476,7 @@ void QnServerSettingsDialog::at_rebuildButton_clicked()
 
 void QnServerSettingsDialog::at_updateRebuildInfo()
 {
-    if (m_server->getStatus() == QnResource::Online)
+    if (m_server->getStatus() == Qn::Online)
         sendNextArchiveRequest();
     else
         updateRebuildUi(RebuildState::Invalid);

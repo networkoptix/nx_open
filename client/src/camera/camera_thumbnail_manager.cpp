@@ -135,9 +135,9 @@ void QnCameraThumbnailManager::at_resPool_resourceRemoved(const QnResourcePtr &r
 
 bool QnCameraThumbnailManager::isUpdateRequired(const QnResourcePtr &resource, const ThumbnailStatus status) const {
     switch (resource->getStatus()) {
-    case QnResource::Recording:
+    case Qn::Recording:
         return (status != Loading) && (status != Refreshing);
-    case QnResource::Online:
+    case Qn::Online:
         return (status == NoData) || (status == NoSignal);
     default:
         break;

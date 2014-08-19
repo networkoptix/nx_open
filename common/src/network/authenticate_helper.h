@@ -92,6 +92,9 @@ public:
 
     void setSessionKey(const QByteArray& value);
 
+    static QByteArray symmetricalEncode(const QByteArray& data);
+signals:
+    void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &);
@@ -107,7 +110,8 @@ private:
     mutable QMutex m_mutex;
     static QnAuthHelper* m_instance;
     //QMap<QByteArray, QElapsedTimer> m_nonces;
-    QMap<QnId, QnUserResourcePtr> m_users;
+    QMap<QUuid, QnUserResourcePtr> m_users;
+    QMap<QUuid, QnMediaServerResourcePtr> m_servers;
     QnAuthMethodRestrictionList m_authMethodRestrictionList;
 
     QByteArray m_sessionKey;

@@ -51,6 +51,13 @@ public:
     void setDiscoveryAddr(QHostAddress addr);
 
     virtual int httpPort() const;
+    virtual void setHttpPort( int newPort );
+
+    /*!
+        By default, it is rtsp port (554)
+    */
+    virtual int mediaPort() const;
+    void setMediaPort( int newPort );
 
     virtual QString toString() const;
     QString toSearchString() const;
@@ -97,6 +104,8 @@ public:
     */
     virtual bool ping();
 
+    static QUuid uniqueIdToId(const QString& uniqId);
+    virtual bool isAbstractResource() const { return false; }
 private:
     QAuthenticator m_auth;
     bool m_authenticated;
@@ -110,6 +119,8 @@ private:
     NetworkStatus m_networkStatus;
 
     unsigned int m_networkTimeout;
+    int m_httpPort;
+    int m_mediaPort;
 
     bool m_probablyNeedToUpdateStatus;
 };

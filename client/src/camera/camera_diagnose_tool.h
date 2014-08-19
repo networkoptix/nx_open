@@ -53,7 +53,7 @@ namespace CameraDiagnostics
             sDone
         };
 
-        DiagnoseTool( const QnId& cameraID, QObject *parent = NULL );
+        DiagnoseTool( const QUuid& cameraID, QObject *parent = NULL );
         virtual ~DiagnoseTool();
 
         //!Starts diagnostics and returns immediately
@@ -68,7 +68,8 @@ namespace CameraDiagnostics
         QString errorMessage() const;
 
     public slots:
-        //!Receives response from media server
+        void onGetServerSystemNameResponse( int status, QString serverSystemName, int handle );
+        //!Receives response from server
         /*!
             \param status \a QNetworkReply::NetworkError
             \param performedStep Constant from \a Step::Value enumeration
@@ -93,7 +94,7 @@ namespace CameraDiagnostics
         void diagnosticsDone( CameraDiagnostics::Step::Value finalStep, bool result, const QString &errorMessage );
 
     private:
-        const QnId m_cameraID;
+        const QUuid m_cameraID;
         State m_state;
         Step::Value m_step;
         QString m_serverHostAddress;

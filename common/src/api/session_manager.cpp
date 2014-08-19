@@ -89,7 +89,7 @@ QnSessionManager::~QnSessionManager() {
 void QnSessionManager::at_replyReceived(QNetworkReply * reply) 
 {
     QString errorString = reply->errorString();
-    // Common EC error looks like:
+    // Common Server error looks like:
     // "Error downloading https://user:password@host:port/path - server replied: INTERNAL SERVER ERROR"
     // displaying plain-text password is unsecure and strongly not recommended
     if (errorString.indexOf(QLatin1String("@")) > 0 && errorString.indexOf(QLatin1String(":")) > 0) {
@@ -287,8 +287,8 @@ void QnSessionManager::at_aboutToBeStopped() {
 
 void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & reply, QAuthenticator* authenticator)
 {
-    QString user = QnAppServerConnectionFactory::defaultUrl().userName();
-    QString password = QnAppServerConnectionFactory::defaultUrl().password();
+    QString user = QnAppServerConnectionFactory::url().userName();
+    QString password = QnAppServerConnectionFactory::url().password();
     authenticator->setUser(user);
     authenticator->setPassword(password);
 }
@@ -296,16 +296,16 @@ void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & re
 void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator)
 {
     // QnSessionManager instance can be used with different instances of QnAppServerConnection simultaneously
-    // so we first checking the reply url for login and password - they are present in case of EC connections
+    // so we first checking the reply url for login and password - they are present in case of Server connections
     // otherwise - mediaserver connections do not include login and password in the url, but we can have
-    // mediaserver connections only within one EC session so we can use defaultUrl() method
+    // mediaserver connections only within one Server session so we can use defaultUrl() method
 
     bool useDefaultValues = reply->url().userName().isEmpty();
     QString user = useDefaultValues
-            ? QnAppServerConnectionFactory::defaultUrl().userName()
+            ? QnAppServerConnectionFactory::url().userName()
             :reply->url().userName();
     QString password = useDefaultValues
-            ? QnAppServerConnectionFactory::defaultUrl().password()
+            ? QnAppServerConnectionFactory::url().password()
             : reply->url().password();
 
     // if current values are already present in authenticator, do not send them again -
@@ -313,7 +313,7 @@ void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenti
     if ((authenticator->user() == user && authenticator->password() == password))
         return;
 
-    authenticator->setUser(user);
+    authenticator->setUser(user.toLower());
     authenticator->setPassword(password);
 }
 

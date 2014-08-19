@@ -167,6 +167,8 @@ namespace QnConcurrent
             typedef QnFutureImplBase<T> base_type;
 
         public:
+            typedef typename base_type::size_type size_type;
+
             void setTotalTasksToRun( size_type totalTasksToRun )
             {
                 base_type::setTotalTasksToRun( totalTasksToRun );
@@ -175,13 +177,13 @@ namespace QnConcurrent
 
             T& resultAt( size_type index )
             {
-                QMutexLocker lk( &m_mutex );
+                QMutexLocker lk( &this->m_mutex );
                 return m_results[index];
             }
 
             const T& resultAt( size_type index ) const
             {
-                QMutexLocker lk( &m_mutex );
+                QMutexLocker lk( &this->m_mutex );
                 return m_results[index];
             }
 
@@ -189,18 +191,18 @@ namespace QnConcurrent
             void executeFunctionOnDataAtPos( size_type index, Function function, const Data& data )
             {
                 const T& result = function( data );
-                QMutexLocker lk( &m_mutex );
+                QMutexLocker lk( &this->m_mutex );
                 m_results[index] = std::move(result);
-                setCompletedAtNonSafe( index );
+                this->setCompletedAtNonSafe( index );
             }
 
             template<class Function>
             void executeFunctionOnDataAtPos( size_type index, Function function )
             {
                 const T& result = function();
-                QMutexLocker lk( &m_mutex );
+                QMutexLocker lk( &this->m_mutex );
                 m_results[index] = std::move(result);
-                setCompletedAtNonSafe( index );
+                this->setCompletedAtNonSafe( index );
             }
 
         private:
@@ -217,16 +219,16 @@ namespace QnConcurrent
             void executeFunctionOnDataAtPos( size_type index, Function function, const Data& data )
             {
                 function( data );
-                QMutexLocker lk( &m_mutex );
-                setCompletedAtNonSafe( index );
+                QMutexLocker lk( &this->m_mutex );
+                this->setCompletedAtNonSafe( index );
             }
 
             template<class Function>
             void executeFunctionOnDataAtPos( size_type index, Function function )
             {
                 function();
-                QMutexLocker lk( &m_mutex );
-                setCompletedAtNonSafe( index );
+                QMutexLocker lk( &this->m_mutex );
+                this->setCompletedAtNonSafe( index );
             }
         };
 
@@ -362,8 +364,10 @@ namespace QnConcurrent
         public QnFutureBase<T>
     {
     public:
-        T& resultAt( size_type index ) { return m_impl->resultAt( index ); }
-        const T& resultAt( size_type index ) const { return m_impl->resultAt( index ); }
+        typedef typename QnFutureBase<T>::size_type size_type;
+
+        T& resultAt( size_type index ) { return this->m_impl->resultAt( index ); }
+        const T& resultAt( size_type index ) const { return this->m_impl->resultAt( index ); }
     };
 
     template<>

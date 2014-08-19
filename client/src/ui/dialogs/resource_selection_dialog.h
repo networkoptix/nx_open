@@ -13,6 +13,8 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include "utils/common/id.h"
 
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
+
 namespace Ui {
     class ResourceSelectionDialog;
 }
@@ -20,9 +22,9 @@ namespace Ui {
 class QnResourcePoolModel;
 class QnCameraThumbnailManager;
 
-class QnResourceSelectionDialog : public QDialog, public QnWorkbenchContextAware {
+class QnResourceSelectionDialog : public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
-    typedef QDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
     enum SelectionTarget {
@@ -48,7 +50,7 @@ protected:
 
 private slots:
     void at_resourceModel_dataChanged();
-    void at_thumbnailReady(QnId resourceId, const QPixmap &thumbnail);
+    void at_thumbnailReady(QUuid resourceId, const QPixmap &thumbnail);
 
     QModelIndex itemIndexAt(const QPoint &pos) const;
     void updateThumbnail(const QModelIndex &index);
@@ -60,7 +62,7 @@ private:
     QnResourceSelectionDialogDelegate* m_delegate;
     QnCameraThumbnailManager *m_thumbnailManager;
     SelectionTarget m_target;
-    QnId m_tooltipResourceId;
+    QUuid m_tooltipResourceId;
 
     int m_screenshotIndex;
 

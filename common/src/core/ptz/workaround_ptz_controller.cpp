@@ -14,7 +14,7 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
     base_type(baseController),
     m_overrideContinuousMove(false),
     m_flip(0),
-    m_trait(Qn::NoPtzTraits),
+    m_traits(Qn::NoPtzTraits),
     m_overrideCapabilities(false),
     m_capabilities(Qn::NoPtzCapabilities)
 {
@@ -22,28 +22,19 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
     if(!camera)
         return;
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(camera, true);
-    
-    QString ptzTraits = resourceData.value<QString>(lit("ptzTraits"));
-    if(!ptzTraits.isEmpty())
-        if(!QnLexical::deserialize(ptzTraits, &m_trait)) // TODO: #Elric support flags in 2.3
-            qnWarning("Could not parse PTZ traits '%1'.", ptzTraits);
+    QnResourceData resourceData = qnCommon->dataPool()->data(camera);
+
+    resourceData.value(lit("ptzTraits"), &m_traits);
 
     if(resourceData.value<bool>(lit("panFlipped"), false))
         m_flip |= Qt::Horizontal;
     if(resourceData.value<bool>(lit("tiltFlipped"), false))
         m_flip |= Qt::Vertical;
 
-    m_overrideContinuousMove = m_flip != 0 || (m_trait & (Qn::FourWayPtzTrait | Qn::EightWayPtzTrait));
+    m_overrideContinuousMove = m_flip != 0 || (m_traits & (Qn::FourWayPtzTrait | Qn::EightWayPtzTrait));
 
-    QString ptzCapabilities = resourceData.value<QString>(lit("ptzCapabilities")); 
-    if(!ptzCapabilities.isEmpty()) {
-        if(QnLexical::deserialize(ptzCapabilities, &m_capabilities)) {
-            m_overrideCapabilities = true;
-        } else {
-            qnWarning("Could not parse PTZ capabilities '%1'.", ptzCapabilities);
-        }
-    }
+    if(resourceData.value(lit("ptzCapabilities"), &m_capabilities))
+        m_overrideCapabilities = true;
 }
 
 Qn::PtzCapabilities QnWorkaroundPtzController::getCapabilities() {
@@ -60,8 +51,8 @@ bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
     if(m_flip & Qt::Vertical)
         localSpeed.setY(localSpeed.y() * -1);
 
-    if(m_trait & (Qn::EightWayPtzTrait | Qn::FourWayPtzTrait)) {
-        float rounding = (m_trait & Qn::EightWayPtzTrait) ? M_PI / 4.0 : M_PI / 2.0; /* 45 or 90 degrees. */
+    if(m_traits & (Qn::EightWayPtzTrait | Qn::FourWayPtzTrait)) {
+        float rounding = (m_traits & Qn::EightWayPtzTrait) ? M_PI / 4.0 : M_PI / 2.0; /* 45 or 90 degrees. */
 
         QVector2D cartesianSpeed(localSpeed);
         QnPolarPoint<float> polarSpeed = cartesianToPolar(cartesianSpeed);

@@ -41,7 +41,7 @@ namespace {
     QList<QUrl> serializeResourcesToUriList(const QnResourceList &resources) {
         QList<QUrl> result;
         foreach (const QnResourcePtr &resource, resources) {
-            if (resource->hasFlags(QnResource::url))
+            if (resource->hasFlags(Qn::url))
                 result.append(QUrl::fromLocalFile(resource->getUrl()));
         }
         return result;
@@ -75,7 +75,7 @@ namespace {
             QString id, uniqueId;
             stream >> id >> uniqueId;
 
-            QnResourcePtr resource = qnResPool->getResourceById(id);
+            QnResourcePtr resource = qnResPool->getResourceById(QUuid(id));
             if(resource && resource->getUniqueId() == uniqueId) {
                 result.push_back(resource);
                 continue;

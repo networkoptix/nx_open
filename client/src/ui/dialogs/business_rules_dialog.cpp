@@ -22,6 +22,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/delegates/business_rule_item_delegate.h>
 #include <ui/style/resource_icon_cache.h>
+
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -30,7 +31,6 @@
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::BusinessRulesDialog()),
     m_popupMenu(new QMenu(this)),
     m_advancedAction(NULL),
@@ -92,51 +92,17 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     connect(ui->eventLogButton,                             &QPushButton::clicked,  context()->action(Qn::BusinessEventsLogAction), &QAction::trigger);
 
-    m_rulesViewModel->reloadData();
-
     connect(ui->filterLineEdit,                             &QLineEdit::textChanged, this, &QnBusinessRulesDialog::updateFilter);
     connect(ui->clearFilterButton,                          &QToolButton::clicked, this, &QnBusinessRulesDialog::at_clearFilterButton_clicked);
 
-    updateFilter();
+    updateFilter();  
 }
 
-QnBusinessRulesDialog::~QnBusinessRulesDialog()
-{
+QnBusinessRulesDialog::~QnBusinessRulesDialog() {
 }
 
 void QnBusinessRulesDialog::setFilter(const QString &filter) {
     ui->filterLineEdit->setText(filter);
-}
-
-bool QnBusinessRulesDialog::canClose() {
-    bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
-    bool loaded = m_rulesViewModel->isLoaded();
-    bool hasChanges = hasRights && loaded && (
-                !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
-             || !m_pendingDeleteRules.isEmpty()
-                ); //TODO: #GDM #Business calculate once and use anywhere
-    if (!hasChanges)
-        return true;
-
-    QMessageBox::StandardButton btn =  QMessageBox::question(this,
-                      tr("Confirm exit"),
-                      tr("Unsaved changes will be lost. Save?"),
-                      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                      QMessageBox::Cancel);
-
-    switch (btn) {
-    case QMessageBox::Yes:
-        if (!saveAll())
-            return false;   // Cancel was pressed in the confirmation dialog
-        break;
-    case QMessageBox::No:
-        m_rulesViewModel->reloadData();
-        break;
-    default:
-        return false;   // Cancel was pressed
-    }
-
-    return true;
 }
 
 void QnBusinessRulesDialog::accept()
@@ -148,7 +114,7 @@ void QnBusinessRulesDialog::accept()
 }
 
 void QnBusinessRulesDialog::reject() {
-    if (!canClose())
+    if (!tryClose(false))
         return;
 
     base_type::reject();
@@ -189,7 +155,7 @@ void QnBusinessRulesDialog::at_beforeModelChanged() {
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_message_ruleDeleted(QnId id) {
+void QnBusinessRulesDialog::at_message_ruleDeleted(const QUuid &id) {
     m_pendingDeleteRules.removeOne(id); //TODO: #GDM #Business ask user
 }
 
@@ -220,9 +186,6 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
     if (!(accessController()->globalPermissions() & Qn::GlobalProtectedPermission))
         return;
 
-    if (!m_rulesViewModel->isLoaded())
-        return;
-
     if (QMessageBox::warning(this,
                              tr("Confirm rules reset"),
                              tr("Are you sure you want to reset rules to the defaults?\n"\
@@ -233,8 +196,6 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
 
     QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->resetBusinessRules(
         ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
-//  m_rulesViewModel->clear();
-//  updateControlButtons();
 }
 
 void QnBusinessRulesDialog::at_clearFilterButton_clicked() {
@@ -360,7 +321,7 @@ bool QnBusinessRulesDialog::saveAll() {
     }
 
     //TODO: #GDM #Business replace with QnAppServerReplyProcessor
-    foreach (const QnId& id, m_pendingDeleteRules) {
+    foreach (const QUuid& id, m_pendingDeleteRules) {
         int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->deleteRule(
             id, this, &QnBusinessRulesDialog::at_resources_deleted );
         m_deleting[handle] = id;
@@ -370,7 +331,7 @@ bool QnBusinessRulesDialog::saveAll() {
 }
 
 void QnBusinessRulesDialog::deleteRule(QnBusinessRuleViewModel* ruleModel) {
-    if (ruleModel->id() > 0)
+    if (!ruleModel->id().isNull())
         m_pendingDeleteRules.append(ruleModel->id());
     m_rulesViewModel->deleteRule(ruleModel);
     updateControlButtons();
@@ -378,26 +339,25 @@ void QnBusinessRulesDialog::deleteRule(QnBusinessRuleViewModel* ruleModel) {
 
 void QnBusinessRulesDialog::updateControlButtons() {
     bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
-    bool loaded = m_rulesViewModel->isLoaded();
-    bool hasChanges = hasRights && loaded && (
+    bool hasChanges = hasRights && (
                 !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
                 );
-    bool canDelete = hasRights && loaded && m_currentDetailsWidget->model() && !m_currentDetailsWidget->model()->system();
+    bool canDelete = hasRights && m_currentDetailsWidget->model() && !m_currentDetailsWidget->model()->system();
 
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasRights && loaded);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasRights);
     ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasChanges);
-    m_resetDefaultsButton->setEnabled(hasRights && loaded);
+    m_resetDefaultsButton->setEnabled(hasRights);
 
     ui->deleteRuleButton->setEnabled(canDelete);
     m_deleteAction->setEnabled(canDelete);
 
-    ui->advancedButton->setEnabled(loaded && m_currentDetailsWidget->model());
-    m_advancedAction->setEnabled(loaded && m_currentDetailsWidget->model());
-    ui->addRuleButton->setEnabled(hasRights && loaded);
-    m_newAction->setEnabled(hasRights && loaded);
+    ui->advancedButton->setEnabled(m_currentDetailsWidget->model());
+    m_advancedAction->setEnabled(m_currentDetailsWidget->model());
+    ui->addRuleButton->setEnabled(hasRights);
+    m_newAction->setEnabled(hasRights);
 
-    setAdvancedMode(hasRights && loaded && advancedMode());
+    setAdvancedMode(hasRights && advancedMode());
 }
 
 bool isRuleVisible(QnBusinessRuleViewModel *ruleModel,
@@ -408,7 +368,7 @@ bool isRuleVisible(QnBusinessRuleViewModel *ruleModel,
     if (ruleModel->system())
         return false;
 
-    // all rules shoud be visible if filter is empty
+    // all rules should be visible if filter is empty
     if (filter.isEmpty())
         return true;
 
@@ -445,9 +405,6 @@ void QnBusinessRulesDialog::updateFilter() {
 
     ui->clearFilterButton->setVisible(!filter.isEmpty());
 
-    if (!m_rulesViewModel->isLoaded())
-        return;
-
     filter = filter.trimmed();
     bool anyCameraPassFilter = false;
     foreach (const QnResourcePtr camera, qnResPool->getAllCameras(QnResourcePtr()))  {
@@ -476,4 +433,40 @@ void QnBusinessRulesDialog::setAdvancedMode(bool value) {
 
     m_advancedMode = value;
     updateAdvancedAction();
+}
+
+bool QnBusinessRulesDialog::tryClose(bool force) {
+    if (force || isHidden()) {
+        m_rulesViewModel->reset();
+        hide();
+        return true;
+    }
+    
+    bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
+    bool hasChanges = hasRights && (
+        !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
+        || !m_pendingDeleteRules.isEmpty()
+        ); //TODO: #GDM #Business calculate once and use anywhere
+    if (!hasChanges)
+        return true;
+
+    QMessageBox::StandardButton btn =  QMessageBox::question(this,
+        tr("Confirm exit"),
+        tr("Unsaved changes will be lost. Save?"),
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+        QMessageBox::Cancel);
+
+    switch (btn) {
+    case QMessageBox::Yes:
+        if (!saveAll())
+            return false;   // Cancel was pressed in the confirmation dialog
+        break;
+    case QMessageBox::No:
+        m_rulesViewModel->reset();
+        break;
+    default:
+        return false;   // Cancel was pressed
+    }
+
+    return true;
 }

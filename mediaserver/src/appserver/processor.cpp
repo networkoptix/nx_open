@@ -11,12 +11,9 @@
 #include "api/common_message_processor.h"
 #include "mutex/camera_data_handler.h"
 
-QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
+QnAppserverResourceProcessor::QnAppserverResourceProcessor(QUuid serverId)
     : m_serverId(serverId)
 {
-    connect(qnResPool, &QnResourcePool::statusChanged, this, &QnAppserverResourceProcessor::at_resource_statusChanged);
-
-
     m_cameraDataHandler = new ec2::QnMutexCameraDataHandler();
     ec2::QnDistributedMutexManager::instance()->setUserDataHandler(m_cameraDataHandler);
 }
@@ -52,7 +49,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
         // previous comment: camera MUST be in the pool already;
         // but now (new version) camera NOT in resource pool!
-        resource->setStatus(QnResource::Online, true); // set status in silence mode. Do not send any signals e.t.c
+        resource->setStatus(Qn::Online, true); // set status in silence mode. Do not send any signals e.t.c
 
         QString password = cameraResource->getAuth().password();
 
@@ -74,6 +71,8 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         // cameras contains updated resource with all fields
         QnResourcePool::instance()->addResource(cameras.first());
         */
+        QString uniqueId = cameraResource->getUniqueId();
+        cameraResource->setId(cameraResource->uniqueIdToId(uniqueId));
         addNewCamera(cameraResource);
     }
 }
@@ -123,6 +122,7 @@ void QnAppserverResourceProcessor::at_mutexLocked()
 
 void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource)
 {
+    Q_ASSERT(!cameraResource->getId().isNull());
     QnVirtualCameraResourceList cameras;
     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
     const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
@@ -140,42 +140,6 @@ void QnAppserverResourceProcessor::at_mutexTimeout()
     mutex->deleteLater();
 }
 
-
-void QnAppserverResourceProcessor::updateResourceStatusAsync(const QnResourcePtr &resource)
-{
-    if (!resource)
-        return;
-
-    m_setStatusInProgress.insert(resource->getId());
-    QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatus(resource->getId(), resource->getStatus(), this, &QnAppserverResourceProcessor::requestFinished2);
-}
-
-void QnAppserverResourceProcessor::requestFinished2(int /*reqID*/, ec2::ErrorCode errCode, const QnId& id)
-{
-    if (errCode != ec2::ErrorCode::ok)
-        qCritical() << "Failed to update resource status" << id.toString();
-
-    m_setStatusInProgress.remove(id);
-    if (m_awaitingSetStatus.contains(id)) {
-        m_awaitingSetStatus.remove(id);
-        updateResourceStatusAsync(qnResPool->getResourceById(id));
-    }
-}
-
-bool QnAppserverResourceProcessor::isSetStatusInProgress(const QnResourcePtr &resource)
-{
-    return m_setStatusInProgress.contains(resource->getId());
-}
-
-void QnAppserverResourceProcessor::at_resource_statusChanged(const QnResourcePtr &resource)
-{
-    //Q_ASSERT_X(!resource->hasFlags(QnResource::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
-
-    if (!isSetStatusInProgress(resource))
-        updateResourceStatusAsync(resource);
-    else
-        m_awaitingSetStatus << resource->getId();
-}
 
 bool QnAppserverResourceProcessor::isBusy() const
 {

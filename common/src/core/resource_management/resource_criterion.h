@@ -6,7 +6,6 @@
 #include <QtCore/QList>
 
 #include <common/common_globals.h>
-#include <core/resource/resource.h> // TODO: #Elric remove once resource flags are moved out
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_property.h>
 
@@ -36,7 +35,7 @@ public:
 
     explicit QnResourceCriterion(const QRegExp &regExp, const char *propertyName = QnResourceProperty::searchString, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 
-    explicit QnResourceCriterion(QnResource::Flags flags, const char *propertyName = QnResourceProperty::flags, Operation matchOperation = Accept, Operation mismatchOperation = Next);
+    explicit QnResourceCriterion(Qn::ResourceFlags flags, const char *propertyName = QnResourceProperty::flags, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 
     explicit QnResourceCriterion(Qn::CameraCapabilities cameraCapabilities, const char *propertyName = QnResourceProperty::cameraCapabilities, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 
@@ -192,11 +191,11 @@ namespace QnResourceCriterionExpressions {
         QnResourceCriterion m_criterion;
     };
 
-    inline QnResourceCriterionExpression hasFlags(QnResource::Flags flags) {
+    inline QnResourceCriterionExpression hasFlags(Qn::ResourceFlags flags) {
         return QnResourceCriterion(flags);
     }
 
-    inline QnResourceCriterionExpression hasStatus(QnResource::Status status) {
+    inline QnResourceCriterionExpression hasStatus(Qn::ResourceStatus status) {
         return QnResourceCriterion(status, QnResourceCriterion::Equality, QnResourceProperty::status);
     }
 

@@ -33,14 +33,14 @@ public:
     void forceEnableAudio();
     void forceDisableAudio();
     bool isForcedAudioSupported() const;
+    void saveParams();
+    int saveAsync();
 public slots:
     void issueOccured();
     void noCameraIssues();
 private slots:
     void at_saveAsyncFinished(int, ec2::ErrorCode, const QnVirtualCameraResourceList &);
 protected:
-    void saveParams();
-    int saveAsync();
 
 private:
     QnAbstractDTSFactory* m_dtsFactory;

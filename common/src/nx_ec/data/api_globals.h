@@ -22,7 +22,7 @@
 #   include <utils/common/email.h>
 #   include <utils/common/latin1_array.h>
 #   include <api/model/email_attachment.h>
-#   include <core/resource/media_resource.h>
+#   include <core/resource/resource_fwd.h>
 #   include <business/business_fwd.h>
 #   include "utils/common/latin1_array.h"
 #endif

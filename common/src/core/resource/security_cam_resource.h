@@ -17,7 +17,7 @@ class QnDataProviderFactory {
 public:
     virtual ~QnDataProviderFactory() {}
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, QnResource::ConnectionRole role) = 0;
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role) = 0;
 };
 
 
@@ -35,6 +35,7 @@ public:
     int motionSensWindowCount() const;
 
 
+    bool hasMotion();
     Qn::MotionType getMotionType();
     void setMotionType(Qn::MotionType value);
 
@@ -78,6 +79,18 @@ public:
 
     /** Returns true if it is a analog camera */
     bool isAnalog() const;
+
+    /** Returns true if it is a analog encoder (described in resource_data.json) */
+    bool isAnalogEncoder() const;
+
+
+    /** Returns true if it is a edge camera */
+    bool isEdge() const;
+
+    /** Returns edge, analog or digital class */
+    virtual Qn::LicenseType licenseType() const;
+
+
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
@@ -215,7 +228,7 @@ protected slots:
 protected:
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role) override;
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role) override;
     virtual void initializationDone() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;

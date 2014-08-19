@@ -37,7 +37,7 @@ bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
         return false;
 
     /* Default drag is disabled for videowall items. */
-    if (target->resource()->hasFlags(QnResource::videowall))
+    if (target->resource()->hasFlags(Qn::videowall))
         return false;
 
     /* If a user ctrl-drags an item that is not selected, we should select it when dragging starts. */

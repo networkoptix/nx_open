@@ -16,6 +16,7 @@
 #include "api_license_data.h"
 #include "api_lock_data.h"
 #include "api_media_server_data.h"
+#include "api_peer_system_time_data.h"
 #include "api_resource_data.h"
 #include "api_resource_type_data.h"
 #include "api_server_alive_data.h"
@@ -24,6 +25,10 @@
 #include "api_user_data.h"
 #include "api_videowall_data.h"
 #include "api_update_data.h"
+#include "api_module_data.h"
+#include "api_discovery_data.h"
+#include "api_routing_data.h"
+#include "api_system_name_data.h"
 #include "api_peer_data.h"
 #include "api_runtime_data.h"
 #include "api_time_data.h"
@@ -55,7 +60,7 @@ inline void deserialize_field(const QVariant &, ec2::ApiRuntimeData *) { return;
 
 namespace ec2 {
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_EC2_API_DATA_TYPES, (ubj)(xml)(binary)(json)(sql_record)(csv_record), _Fields)
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_EC2_API_DATA_TYPES, (ubjson)(xml)(binary)(json)(sql_record)(csv_record), _Fields)
 
 } // namespace ec2
 

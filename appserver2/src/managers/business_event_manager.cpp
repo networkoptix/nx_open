@@ -46,7 +46,7 @@ int QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::S
     const int reqID = generateRequestID();
 
     if (rule->id().isNull())
-        rule->setId(QnId::createUuid());
+        rule->setId(QUuid::createUuid());
 
     auto tran = prepareTransaction( ApiCommand::saveBusinessRule, rule );
 
@@ -57,7 +57,7 @@ int QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::S
 }
 
 template<class T>
-int QnBusinessEventManager<T>::deleteRule( QnId ruleId, impl::SimpleHandlerPtr handler )
+int QnBusinessEventManager<T>::deleteRule( QUuid ruleId, impl::SimpleHandlerPtr handler )
 {
     const int reqID = generateRequestID();
     auto tran = prepareTransaction( ApiCommand::removeBusinessRule, ruleId );
@@ -78,7 +78,7 @@ int QnBusinessEventManager<T>::broadcastBusinessAction( const QnAbstractBusiness
 }
 
 template<class T>
-int QnBusinessEventManager<T>::sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnId& dstPeer, impl::SimpleHandlerPtr handler )
+int QnBusinessEventManager<T>::sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QUuid& dstPeer, impl::SimpleHandlerPtr handler )
 {
     const int reqID = generateRequestID();
     auto tran = prepareTransaction( ApiCommand::execBusinessAction, businessAction );
@@ -92,7 +92,7 @@ template<class T>
 int QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handler )
 {
     const int reqID = generateRequestID();
-    QnTransaction<ApiResetBusinessRuleData> tran(ApiCommand::resetBusinessRules, true);
+    QnTransaction<ApiResetBusinessRuleData> tran(ApiCommand::resetBusinessRules);
     fromResourceListToApi(QnBusinessEventRule::getDefaultRules(), tran.params.defaultRules);
 
     using namespace std::placeholders;
@@ -104,7 +104,7 @@ int QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handle
 template<class T>
 QnTransaction<ApiBusinessActionData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource )
 {
-    QnTransaction<ApiBusinessActionData> tran(command, false);
+    QnTransaction<ApiBusinessActionData> tran(command);
     fromResourceToApi(resource, tran.params);
     return tran;
 }
@@ -113,7 +113,7 @@ QnTransaction<ApiBusinessActionData> QnBusinessEventManager<T>::prepareTransacti
 template<class T>
 QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource )
 {
-    QnTransaction<ApiBusinessRuleData> tran(command, true);
+    QnTransaction<ApiBusinessRuleData> tran(command);
     fromResourceToApi(resource, tran.params);
     return tran;
 }
@@ -121,9 +121,8 @@ QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction
 template<class T>
 QnTransaction<ApiEmailSettingsData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnEmail::Settings& resource )
 {
-    QnTransaction<ApiEmailSettingsData> tran(command, true);
+    QnTransaction<ApiEmailSettingsData> tran(command);
     fromResourceToApi(resource, tran.params);
-    tran.persistent = false;
     tran.isLocal = true;
     return tran;
 }
@@ -131,17 +130,16 @@ QnTransaction<ApiEmailSettingsData> QnBusinessEventManager<T>::prepareTransactio
 template<class T>
 QnTransaction<ApiEmailData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const ApiEmailData& data )
 {
-    QnTransaction<ApiEmailData> tran(command, true);
+    QnTransaction<ApiEmailData> tran(command);
     tran.params = data;
-    tran.persistent = false;
     tran.isLocal = true;
     return tran;
 }
 
 template<class T>
-QnTransaction<ApiIdData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
+QnTransaction<ApiIdData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QUuid& id )
 {
-    QnTransaction<ApiIdData> tran(command, true);
+    QnTransaction<ApiIdData> tran(command);
     tran.params.id = id;
     return tran;
 }

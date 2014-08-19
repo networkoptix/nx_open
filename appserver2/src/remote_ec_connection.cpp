@@ -45,11 +45,8 @@ namespace ec2
         ApiPeerData localPeer(qnCommon->moduleGUID(), Qn::PT_DesktopClient);
 
         QUuid videowallGuid = QnAppServerConnectionFactory::videowallGuid();
-        if (!videowallGuid.isNull()) {
+        if (!videowallGuid.isNull())
             localPeer.peerType = Qn::PT_VideowallClient;
-            localPeer.params["videowallGuid"] = videowallGuid.toString();
-            localPeer.params["instanceGuid"] = QnAppServerConnectionFactory::instanceGuid().toString();
-        }
         
         QnTransactionMessageBus::instance()->setLocalPeer(localPeer);
         QnTransactionMessageBus::instance()->start();

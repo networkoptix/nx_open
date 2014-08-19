@@ -10,7 +10,6 @@
 #include <core/resource/media_server_resource.h>
 
 #include <ui/models/camera_list_model.h>
-#include <ui/workbench/workbench_context.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/grid_widget_helper.h>
@@ -18,9 +17,10 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <ui/workbench/workbench_context.h>
+
 QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::CameraListDialog),
     m_model(new QnCameraListModel(this)),
     m_resourceSearch(new QnResourceSearchProxyModel(this)),
@@ -37,7 +37,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     */
 
     m_resourceSearch->setSourceModel(m_model);
-    m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(lit("*"),Qt::CaseInsensitive, QRegExp::Wildcard)));
+    updateCriterion();
 
     connect(m_resourceSearch,   &QAbstractItemModel::rowsInserted,              this,   &QnCameraListDialog::updateWindowTitleLater);
     connect(m_resourceSearch,   &QAbstractItemModel::rowsRemoved,               this,   &QnCameraListDialog::updateWindowTitleLater);
@@ -72,6 +72,12 @@ QnCameraListDialog::~QnCameraListDialog() { }
 
 void QnCameraListDialog::setServer(const QnMediaServerResourcePtr &server) {
     m_model->setServer(server);
+    // This fix is for the first time, the user open the camera list that doesn't see
+    // the title of that dialog to indicate the camera numbers. I've noticed that the
+    // message/signal that invoke this updateWindowTitle slot will not be triggered 
+    // just by opening the dialog in the menu. This quick but not dirty fix just flush
+    // window title whenever a serverResource is changed .
+    updateWindowTitle();
 }
 
 QnMediaServerResourcePtr QnCameraListDialog::server() const {
@@ -95,10 +101,15 @@ void QnCameraListDialog::updateWindowTitle() {
         setWindowTitle(tr("Camera List for '%1' - %n camera(s) found", "", m_resourceSearch->rowCount()).arg(getFullResourceName(m_model->server(), true)));
 }
 
-void QnCameraListDialog::updateCriterion(const QString& text) {
-    QString searchString = QString(lit("*%1*")).arg(text);
+void QnCameraListDialog::updateCriterion() {
+    QString text = ui->filterEdit->text();
+
+    QString searchString = text.isEmpty()
+        ? lit("*")
+        : lit("*%1*").arg(text);
     m_resourceSearch->clearCriteria();
     m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(searchString, Qt::CaseInsensitive, QRegExp::Wildcard)));
+    m_resourceSearch->addCriterion(QnResourceCriterion(Qn::desktop_camera, QnResourceProperty::flags, QnResourceCriterion::Reject, QnResourceCriterion::Next));
 }
 
 void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex &index) {

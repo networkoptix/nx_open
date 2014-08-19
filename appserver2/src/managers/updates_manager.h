@@ -21,7 +21,7 @@ namespace ec2 {
         void triggerNotification(const QnTransaction<ApiUpdateInstallData> &transaction);
 
     private:
-        QHash<QnAbstractTransaction::ID, QString> m_requestedUpdateIds;
+        QHash<QnAbstractTransaction::PersistentInfo, QString> m_requestedUpdateIds;
 
         void at_transactionProcessed(const QnAbstractTransaction &transaction);
     };
@@ -38,14 +38,14 @@ namespace ec2 {
 
     protected:
         virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) override;
-        virtual int sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, impl::SimpleHandlerPtr handler) override;
+        virtual int sendUpdateUploadResponce(const QString &updateId, const QUuid &peerId, int chunks, impl::SimpleHandlerPtr handler) override;
         virtual int installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
 
         QnTransaction<ApiUpdateUploadData> prepareTransaction(const QString &updateId, const QByteArray &data, qint64 offset) const;
-        QnTransaction<ApiUpdateUploadResponceData> prepareTransaction(const QString &updateId, const QnId &peerId, int chunks) const;
+        QnTransaction<ApiUpdateUploadResponceData> prepareTransaction(const QString &updateId, const QUuid &peerId, int chunks) const;
         QnTransaction<ApiUpdateInstallData> prepareTransaction(const QString &updateId) const;
     };
 

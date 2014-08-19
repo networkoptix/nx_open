@@ -5,14 +5,16 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QDialogButtonBox>
 
-#include "button_box_dialog.h"
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 namespace Ui {
     class LayoutNameDialog;
 }
 
-class QnLayoutNameDialog: public QnButtonBoxDialog {
-    Q_OBJECT;
+class QnLayoutNameDialog: public QnWorkbenchStateDependentButtonBoxDialog {
+    Q_OBJECT
+
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 public:
     QnLayoutNameDialog(const QString &caption, const QString &text, const QString &name, QDialogButtonBox::StandardButtons buttons, QWidget *parent = NULL);
     QnLayoutNameDialog(QDialogButtonBox::StandardButtons buttons, QWidget *parent = NULL);
