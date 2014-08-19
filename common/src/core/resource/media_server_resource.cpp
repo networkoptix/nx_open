@@ -80,6 +80,32 @@ const QList<QHostAddress>& QnMediaServerResource::getNetAddrList() const
     return m_netAddrList;
 }
 
+void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
+{
+    QMutexLocker lock(&m_mutex);
+    m_additionalUrls = urls;
+    emit auxUrlsChanged(::toSharedPointer(this));
+}
+
+QList<QUrl> QnMediaServerResource::getAdditionalUrls() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_additionalUrls;
+}
+
+void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
+{
+    QMutexLocker lock(&m_mutex);
+    m_ignoredUrls = urls;
+    emit auxUrlsChanged(::toSharedPointer(this));
+}
+
+QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_ignoredUrls;
+}
+
 QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
 {
     QMutexLocker lock(&m_mutex);
@@ -272,6 +298,7 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_netAddrList = localOther->m_netAddrList;
         m_version = localOther->getVersion();
         m_systemInfo = localOther->getSystemInfo();
+        m_systemName = localOther->getSystemName();
         m_redundancy = localOther->isRedundancy();
         m_maxCameras = localOther->getMaxCameras();
 
@@ -360,6 +387,18 @@ void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo)
     QMutexLocker lock(&m_mutex);
 
     m_systemInfo = systemInfo;
+}
+
+QString QnMediaServerResource::getSystemName() const {
+    QMutexLocker lock(&m_mutex);
+
+    return m_systemName;
+}
+
+void QnMediaServerResource::setSystemName(const QString &systemName) {
+    QMutexLocker lock(&m_mutex);
+
+    m_systemName = systemName;
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {

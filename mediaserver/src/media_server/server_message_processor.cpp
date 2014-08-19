@@ -7,6 +7,9 @@
 #include <core/resource/videowall_resource.h>
 
 #include <media_server/server_update_tool.h>
+#include <media_server/settings.h>
+#include <nx_ec/dummy_handler.h>
+#include <utils/common/log.h>
 
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"
@@ -14,6 +17,7 @@
 #include "settings.h"
 #include "api/app_server_connection.h"
 
+#include "version.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor()
 :
@@ -159,10 +163,12 @@ void QnServerMessageProcessor::afterRemovingResource(const QUuid& id)
 
 void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
 {
-    connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateChunkReceived,
-        this, &QnServerMessageProcessor::at_updateChunkReceived );
-    connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
-        this, &QnServerMessageProcessor::at_updateInstallationRequested );
+    connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateChunkReceived,
+            this, &QnServerMessageProcessor::at_updateChunkReceived);
+    connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
+            this, &QnServerMessageProcessor::at_updateInstallationRequested);
+    connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
+            this, &QnServerMessageProcessor::at_systemNameChangeRequested);
 
     QnCommonMessageProcessor::init(connection);
 }
@@ -233,6 +239,22 @@ void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, c
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
     QnServerUpdateTool::instance()->installUpdate(updateId);
+}
+
+void QnServerMessageProcessor::at_systemNameChangeRequested(const QString &systemName) {
+    if (qnCommon->localSystemName() == systemName)
+        return;
+
+    qnCommon->setLocalSystemName(systemName);
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (!server) {
+        NX_LOG("Cannot find self server resource!", cl_logERROR);
+        return;
+
+        MSSettings::roSettings()->setValue("systemName", systemName);
+        server->setSystemName(systemName);
+        m_connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    }
 }
 
 bool QnServerMessageProcessor::canRemoveResource(const QUuid& resourceId) 

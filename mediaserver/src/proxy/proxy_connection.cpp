@@ -9,7 +9,7 @@
 #include "utils/network/compat_poll.h"
 #include "utils/network/tcp_listener.h"
 #include "utils/network/socket.h"
-
+#include "utils/network/router.h"
 #include "network/universal_tcp_listener.h"
 #include "api/app_server_connection.h"
 #include "media_server/server_message_processor.h"
@@ -196,6 +196,41 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
             itr->second = host.toUtf8();
         else if (itr->first == "x-server-guid")
             xServerGUID = itr->second;
+    }
+
+    QnRoute route;
+    if (!xServerGUID.isEmpty())
+        route = QnRouter::instance()->routeTo(xServerGUID);
+    else
+        route = QnRouter::instance()->routeTo(dstUrl.host(), dstUrl.port());
+
+    if (route.isValid()) {
+        if (route.points.size() > 1) {
+            QString path = urlPath;
+            if (!path.startsWith(QLatin1Char('/')))
+                path.prepend(QLatin1Char('/'));
+            path.prepend(QString(lit("/proxy/%1/%2:%3")).arg(dstUrl.scheme()).arg(dstUrl.host()).arg(dstUrl.port()));
+            d->request.requestLine.url = path;
+
+            dstUrl.setHost(route.points.first().host);
+            dstUrl.setPort(route.points.first().port);
+        } else if (route.points.size() == 1 && !xServerGUID.isEmpty()) {
+            // check connectivity and fix destination address if needed
+            QHostAddress address(dstUrl.host());
+            if (!address.isNull()) {
+                bool found = false;
+                foreach (const QnRouter::Endpoint &endpoint, QnRouter::instance()->connections().values(QUuid(xServerGUID))) {
+                    if (endpoint.host == address.toString() && endpoint.port == dstUrl.port()) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    dstUrl.setHost(route.points.first().host);
+                    dstUrl.setPort(route.points.first().port);
+                }
+            }
+        }
     }
 
     d->clientRequest.clear();

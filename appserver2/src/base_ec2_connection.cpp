@@ -34,7 +34,9 @@ namespace ec2
         m_layoutManager( new QnLayoutManager<T>(m_queryProcessor, resCtx) ),
         m_videowallManager( new QnVideowallManager<T>(m_queryProcessor, resCtx) ),
         m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) ),
-        m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) )
+        m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) ),
+        m_miscManager( new QnMiscManager<T>(m_queryProcessor) ),
+        m_discoveryManager( new QnDiscoveryManager<T>(m_queryProcessor) )
     {
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerFound, this, &BaseEc2Connection<T>::remotePeerFound, Qt::DirectConnection);
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,  this, &BaseEc2Connection<T>::remotePeerLost, Qt::DirectConnection);
@@ -59,7 +61,9 @@ namespace ec2
                 m_layoutManager.get(),
                 m_videowallManager.get(),
                 m_storedFileManager.get(),
-                m_updatesManager.get() ) );
+                m_updatesManager.get(),
+                m_miscManager.get(),
+                m_discoveryManager.get() ) );
     }
 
     template<class T>
@@ -120,6 +124,18 @@ namespace ec2
     AbstractUpdatesManagerPtr BaseEc2Connection<T>::getUpdatesManager()
     {
         return m_updatesManager;
+    }
+
+    template<class T>
+    AbstractMiscManagerPtr BaseEc2Connection<T>::getMiscManager()
+    {
+        return m_miscManager;
+    }
+
+    template<class T>
+    AbstractDiscoveryManagerPtr BaseEc2Connection<T>::getDiscoveryManager()
+    {
+        return m_discoveryManager;
     }
 
     template<class T>
@@ -232,7 +248,7 @@ namespace ec2
     {
         ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged);
         tran.params = data;
-        ec2::qnTransactionBus->sendTransaction(tran);
+        qnTransactionBus->sendTransaction(tran);
     }
 
 

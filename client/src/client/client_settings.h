@@ -142,6 +142,9 @@ public:
         /** Speed of background circles movement. Value is period (in seconds) of the full movement cycle. Default is 120 seconds. */
         RADIAL_BACKGROUND_CYCLE,
 
+        /** A list of the urls that were discovered by QnDirectModuleFinder. */
+        KNOWN_SERVER_URLS,
+
         VARIABLE_COUNT
     };
 
@@ -234,6 +237,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isVideoWallMode,        setVideoWallMode,           VIDEO_WALL_MODE,            false)
         QN_DECLARE_RW_PROPERTY(bool,                        isRainbowMode,          setRainbowMode,             RAINBOW_MODE,               false)
         QN_DECLARE_RW_PROPERTY (int,                        radialBackgroundCycle,  setRadialBackgroundCycle,   RADIAL_BACKGROUND_CYCLE,    120)
+        QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
     QN_END_PROPERTY_STORAGE()
 
 private:

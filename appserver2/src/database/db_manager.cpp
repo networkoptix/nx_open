@@ -9,6 +9,7 @@
 #include "managers/impl/license_manager_impl.h"
 #include "managers/time_manager.h"
 #include "nx_ec/data/api_business_rule_data.h"
+#include "nx_ec/data/api_discovery_data.h"
 #include "utils/serialization/binary_stream.h"
 #include "utils/serialization/sql_functions.h"
 #include "business/business_fwd.h"
@@ -761,6 +762,9 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
 
         if (!execSQLFile(lit(":/08_min_max_archive.sql"), m_sdb))
             return false;
+
+        if (!execSQLFile(lit(":/08_discovery.sql"), m_sdb))
+            return false;
     }
 
     QnDbTransactionLocker lockStatic(&m_tranStatic);
@@ -1016,8 +1020,8 @@ ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 i
 ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT OR REPLACE INTO vms_server (api_url,  auth_key, version, net_addr_list, system_info, flags, panic_mode, max_cameras, redundancy, resource_ptr_id) VALUES\
-                     (:apiUrl, :authKey, :version, :networkAddresses, :systemInfo, :flags, :panicMode, :maxCameras, :allowAutoRedundancy, :internalId)");
+    insQuery.prepare("INSERT OR REPLACE INTO vms_server (api_url, auth_key, version, net_addr_list, system_info, flags, panic_mode, max_cameras, redundancy, system_name, resource_ptr_id) VALUES\
+                     (:apiUrl, :authKey, :version, :networkAddresses, :systemInfo, :flags, :panicMode, :maxCameras, :allowAutoRedundancy, :systemName, :internalId)");
     QnSql::bind(data, &insQuery);
 
     if (data.authKey.isEmpty())
@@ -1490,6 +1494,32 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiVideowa
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDiscoveryDataList> &tran) {
+    if (tran.command == ApiCommand::addDiscoveryInformation) {
+        foreach (const ApiDiscoveryData &data, tran.params) {
+            QSqlQuery query(m_sdb);
+            query.prepare("INSERT OR REPLACE INTO vms_mserver_discovery (server_id, url, ignore) VALUES(:id, :url, :ignore)");
+            QnSql::bind(data, &query);
+            if (!query.exec()) {
+                qWarning() << Q_FUNC_INFO << query.lastError().text();
+                return ErrorCode::dbError;
+            }
+        }
+    } else if (tran.command == ApiCommand::removeDiscoveryInformation) {
+        foreach (const ApiDiscoveryData &data, tran.params) {
+            QSqlQuery query(m_sdb);
+            query.prepare("DELETE FROM vms_mserver_discovery WHERE server_id = :id AND url = :url");
+            QnSql::bind(data, &query);
+            if (!query.exec()) {
+                qWarning() << Q_FUNC_INFO << query.lastError().text();
+                return ErrorCode::dbError;
+            }
+        }
+    }
+
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& /*tran*/) {
     return ErrorCode::ok;
 }
@@ -1671,6 +1701,10 @@ ErrorCode QnDbManager::removeServer(const QUuid& guid)
         return err;
 
     err = deleteTableRecord(id, "vms_server", "resource_ptr_id");
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteTableRecord(id, "vms_mserver_discovery", "server_id");
     if (err != ErrorCode::ok)
         return err;
 
@@ -2106,7 +2140,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerD
     query.setForwardOnly(true);
     query.prepare(QString("select r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, r.status, \
                           s.api_url as apiUrl, s.auth_key as authKey, s.version, s.net_addr_list as networkAddresses, s.system_info as systemInfo, \
-                          s.flags, s.panic_mode as panicMode, s.max_cameras as maxCameras, s.redundancy as allowAutoRedundancy \
+                          s.flags, s.panic_mode as panicMode, s.max_cameras as maxCameras, s.redundancy as allowAutoRedundancy, s.system_name as systemName \
                           from vms_resource r \
                           join vms_server s on s.resource_ptr_id = r.id order by r.guid"));
 
@@ -2404,6 +2438,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     if ((err = doQueryNoLock(dummy, data.licenses)) != ErrorCode::ok)
         return err;
 
+    if ((err = doQueryNoLock(dummy, data.discoveryData)) != ErrorCode::ok)
+        return err;
+
     std::vector<ApiResourceParamWithRefData> kvPairs;
     QSqlQuery queryParams(m_sdb);
     queryParams.setForwardOnly(true);
@@ -2433,6 +2470,23 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiResourc
     if (rez == ErrorCode::ok)
         data = params.params;
     return rez;
+}
+
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t &, ApiDiscoveryDataList &data) {
+    QSqlQuery query(m_sdb);
+
+    QString q = QString(lit("SELECT server_id as id, url, ignore from vms_mserver_discovery"));
+    query.setForwardOnly(true);
+    query.prepare(q);
+
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
+        return ErrorCode::dbError;
+    }
+
+    QnSql::fetch_many(query, &data);
+
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& tran)

@@ -1,12 +1,7 @@
-/**********************************************************
-* 30 oct 2012
-* a.kolesnikov
-***********************************************************/
-#include "modulefinder.h"
+#include "multicast_module_finder.h"
 
 #include <memory>
 
-#include <QtCore/QCoreApplication>
 #include <QtCore/QDateTime>
 #include <QtCore/QScopedArrayPointer>
 #include <QtNetwork/QNetworkInterface>
@@ -28,7 +23,7 @@ namespace {
 
 } // anonymous namespace
 
-QnModuleFinder::QnModuleFinder(
+QnMulticastModuleFinder::QnMulticastModuleFinder(
     bool clientOnly,
     const QHostAddress &multicastGroupAddress,
     const unsigned int multicastGroupPort,
@@ -54,8 +49,8 @@ QnModuleFinder::QnModuleFinder(
         try {
             //if( addressToUse == QHostAddress(lit("127.0.0.1")) )
             //    continue;
-            std::unique_ptr<UDPSocket> sock( new UDPSocket() );
-            sock->bind(SocketAddress(address.toString(), 0));
+            std::auto_ptr<AbstractDatagramSocket> sock(SocketFactory::createDatagramSocket());
+            sock->bind(address.toString(), 0);
             sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
             sock->setDestAddr(multicastGroupAddress.toString(), multicastGroupPort);
             m_clientSockets.push_back(sock.release());
@@ -68,43 +63,52 @@ QnModuleFinder::QnModuleFinder(
     }
 }
 
-QnModuleFinder::~QnModuleFinder() {
+QnMulticastModuleFinder::~QnMulticastModuleFinder() {
     stop();
-    
+
     qDeleteAll(m_clientSockets);
     m_clientSockets.clear();
     delete m_serverSocket;
-    m_serverSocket = nullptr;
 }
 
-bool QnModuleFinder::isValid() const {
+bool QnMulticastModuleFinder::isValid() const {
     return !m_clientSockets.empty();
 }
 
-bool QnModuleFinder::isCompatibilityMode() const {
+bool QnMulticastModuleFinder::isCompatibilityMode() const {
     return m_compatibilityMode;
 }
 
-void QnModuleFinder::setCompatibilityMode(bool compatibilityMode) {
+void QnMulticastModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
 }
 
-QList<QnModuleInformation> QnModuleFinder::revealedModules() const {
-    QList<QnModuleInformation> modules;
+QList<QnModuleInformation> QnMulticastModuleFinder::revealedModules() const {
+    QMutexLocker lk(&m_mutex);
 
+    QList<QnModuleInformation> modules;
     foreach (const ModuleContext &moduleCOntext, m_knownEnterpriseControllers)
         modules.append(moduleCOntext.moduleInformation);
 
     return modules;
 }
 
-void QnModuleFinder::pleaseStop() {
+QnModuleInformation QnMulticastModuleFinder::moduleInformation(const QString &moduleId) const {
+    QMutexLocker lk(&m_mutex);
+
+    auto it = m_knownEnterpriseControllers.find(moduleId);
+    if (it == m_knownEnterpriseControllers.end())
+        return QnModuleInformation();
+
+    return it->moduleInformation;
+}
+
+void QnMulticastModuleFinder::pleaseStop() {
     QnLongRunnable::pleaseStop();
     m_pollSet.interrupt();
 }
 
-bool QnModuleFinder::processDiscoveryRequest( UDPSocket *udpSocket )
-{
+bool QnMulticastModuleFinder::processDiscoveryRequest(AbstractDatagramSocket *udpSocket) {
     static const size_t READ_BUFFER_SIZE = UDPSocket::MAX_PACKET_SIZE;
     quint8 readBuffer[READ_BUFFER_SIZE];
 
@@ -129,20 +133,21 @@ bool QnModuleFinder::processDiscoveryRequest( UDPSocket *udpSocket )
     }
 
     RevealResponse response;
-    response.version = QCoreApplication::instance()->applicationVersion();
-    QString moduleName = QCoreApplication::instance()->applicationName();
-    if( moduleName.startsWith( QCoreApplication::instance()->organizationName() ) )
-        moduleName = moduleName.mid( QCoreApplication::instance()->organizationName().length() ).trimmed();
-    
+    response.version = qnCommon->engineVersion().toString();
+    QString moduleName = qApp->applicationName();
+    if (moduleName.startsWith(qApp->organizationName()))
+        moduleName = moduleName.mid(qApp->organizationName().length()).trimmed();
+
     response.type = moduleName;
     response.customization = QString::fromLatin1(QN_CUSTOMIZATION_NAME);
-    response.seed = qnCommon->moduleGUID();
+    response.seed = qnCommon->moduleGUID().toString();
     response.name = qnCommon->localSystemName();
+    response.systemInformation = QnSystemInformation::currentSystemInformation().toString();
     response.typeSpecificParameters.insert(lit("port"), QString::number(qnCommon->moduleUrl().port()));
     quint8 *responseBufStart = readBuffer;
     if (!response.serialize(&responseBufStart, readBuffer + READ_BUFFER_SIZE))
         return false;
-    if (!udpSocket->sendTo(readBuffer, responseBufStart - readBuffer, SocketAddress(remoteAddressStr, remotePort))) {
+    if (!udpSocket->sendTo(readBuffer, responseBufStart - readBuffer, remoteAddressStr, remotePort)) {
         NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. Can't send response to address (%1:%2)").
             arg(remoteAddressStr).arg(remotePort), cl_logDEBUG1);
         return false;
@@ -152,8 +157,7 @@ bool QnModuleFinder::processDiscoveryRequest( UDPSocket *udpSocket )
     return true;
 }
 
-bool QnModuleFinder::processDiscoveryResponse( UDPSocket *udpSocket )
-{
+bool QnMulticastModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket) {
     static const size_t READ_BUFFER_SIZE = UDPSocket::MAX_PACKET_SIZE;
     quint8 readBuffer[READ_BUFFER_SIZE];
 
@@ -178,7 +182,7 @@ bool QnModuleFinder::processDiscoveryResponse( UDPSocket *udpSocket )
         return false;
     }
 
-    if (response.seed == qnCommon->moduleGUID())
+    if (response.seed == qnCommon->moduleGUID().toString())
         return true; // ignore requests to himself
 
     if (!m_compatibilityMode && response.customization.toLower() != qnProductFeatures().customizationName.toLower()) { // TODO: #2.1 #Elric #AK check for "default" VS "Vms"
@@ -186,11 +190,10 @@ bool QnModuleFinder::processDiscoveryResponse( UDPSocket *udpSocket )
             arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
         return false;
     }
-    
-    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(response.seed))
-        return false;
 
-    //received valid response, checking if already know this Server
+    QMutexLocker lk(&m_mutex);
+
+    //received valid response, checking if already know this enterprise controller
     auto it = m_knownEnterpriseControllers.find(response.seed);
     bool newModule = (it == m_knownEnterpriseControllers.end());
 
@@ -198,7 +201,7 @@ bool QnModuleFinder::processDiscoveryResponse( UDPSocket *udpSocket )
         it = m_knownEnterpriseControllers.insert(response.seed, ModuleContext(response));
 
     if (!it->signalledAddresses.contains(remoteAddressStr)) {
-        //new Server found
+        //new enterprise controller found
 
         it->signalledAddresses.insert(remoteAddressStr);
         const QHostAddress &localAddress = QHostAddress(udpSocket->getLocalAddress().address.toString());
@@ -220,9 +223,9 @@ bool QnModuleFinder::processDiscoveryResponse( UDPSocket *udpSocket )
     return true;
 }
 
-void QnModuleFinder::run() {
+void QnMulticastModuleFinder::run() {
     initSystemThreadId();
-    NX_LOG(lit("QnModuleFinder started"), cl_logDEBUG1);
+    NX_LOG(lit("NetworkOptixModuleFinder started"), cl_logDEBUG1);
 
     static const unsigned int SEARCH_PACKET_LENGTH = 64;
     quint8 searchPacket[SEARCH_PACKET_LENGTH];
@@ -232,13 +235,12 @@ void QnModuleFinder::run() {
     if (!searchRequest.serialize(&searchPacketBufStart, searchPacket + sizeof(searchPacket)))
         Q_ASSERT(false);
 
-    foreach( UDPSocket *socket, m_clientSockets )
-    {
-        if( !m_pollSet.add( socket->implementationDelegate(), aio::etRead, socket ) )
+    foreach (AbstractDatagramSocket *socket, m_clientSockets) {
+        if (!m_pollSet.add(socket, aio::etRead))
             Q_ASSERT(false);
     }
     if (m_serverSocket) {
-        if( !m_pollSet.add( m_serverSocket->implementationDelegate(), aio::etRead, m_serverSocket ) )
+        if (!m_pollSet.add(m_serverSocket, aio::etRead))
             Q_ASSERT(false);
     }
 
@@ -246,12 +248,12 @@ void QnModuleFinder::run() {
         quint64 currentClock = QDateTime::currentMSecsSinceEpoch();
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis) {
             //sending request via each socket
-            foreach( UDPSocket *socket, m_clientSockets )
-            {
+            foreach (AbstractDatagramSocket *socket, m_clientSockets) {
                 if (!socket->send(searchPacket, searchPacketBufStart - searchPacket)) {
                     //failed to send packet ???
-                    const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                    NX_LOG(lit("QnModuleFinder. Failed to send search packet to %1. %2").arg(socket->getPeerAddress().toString()).arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1);
+                    SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+                    NX_LOG(lit("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1);
+                    //TODO/IMPL if corresponding interface is down, should remove socket from set
                 }
             }
             m_prevPingClock = currentClock;
@@ -261,10 +263,8 @@ void QnModuleFinder::run() {
         if (socketCount == 0)
             continue;    //timeout
         if (socketCount < 0) {
-            const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-            if( prevErrorCode == SystemError::interrupted )
-                continue;
-            NX_LOG(lit("QnModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR);
+            SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+            NX_LOG(lit("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR);
             msleep(errorWaitTimeoutMs);
             continue;
         }
@@ -276,7 +276,7 @@ void QnModuleFinder::run() {
             if (!(it.eventType() & aio::etRead))
                 continue;
 
-            UDPSocket* udpSocket = static_cast<UDPSocket*>(it.userData());
+            AbstractDatagramSocket *udpSocket = dynamic_cast<AbstractDatagramSocket*>(it.socket());
             Q_ASSERT(udpSocket);
 
             if (udpSocket == m_serverSocket)
@@ -285,6 +285,7 @@ void QnModuleFinder::run() {
                 processDiscoveryResponse(udpSocket);
         }
 
+        QMutexLocker lk(&m_mutex);
         //checking for expired known hosts...
         for (auto it = m_knownEnterpriseControllers.begin(); it != m_knownEnterpriseControllers.end(); /* no inc */) {
             if(it->prevResponseReceiveClock + m_pingTimeoutMillis*m_keepAliveMultiply > currentClock) {
@@ -297,10 +298,10 @@ void QnModuleFinder::run() {
         }
     }
 
-    NX_LOG(lit("QnModuleFinder stopped"), cl_logDEBUG1);
+    NX_LOG(lit("NetworkOptixModuleFinder stopped"), cl_logDEBUG1);
 }
 
-QnModuleFinder::ModuleContext::ModuleContext(const RevealResponse &response)
+QnMulticastModuleFinder::ModuleContext::ModuleContext(const RevealResponse &response)
     : response(response),
       prevResponseReceiveClock(0)
 {
@@ -308,6 +309,6 @@ QnModuleFinder::ModuleContext::ModuleContext(const RevealResponse &response)
     moduleInformation.version = QnSoftwareVersion(response.version);
     moduleInformation.systemInformation = QnSystemInformation(response.systemInformation);
     moduleInformation.systemName = response.name;
-    moduleInformation.parameters = response.typeSpecificParameters;
-    moduleInformation.id = response.seed;
+    moduleInformation.port = response.typeSpecificParameters.value(lit("port")).toUShort();
+    moduleInformation.id = QUuid(response.seed);
 }

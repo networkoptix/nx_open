@@ -37,5 +37,4 @@ inline QUuid guidFromArbitraryData(const QByteArray &data) {
     return QUuid::fromRfc4122(bytes);
 }
 
-
 #endif // QN_ID_H

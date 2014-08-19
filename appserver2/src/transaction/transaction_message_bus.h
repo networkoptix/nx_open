@@ -34,6 +34,7 @@ namespace ec2
         void addConnectionToPeer(const QUrl& url, const QUuid& peer = QUuid());
         void removeConnectionFromPeer(const QUrl& url);
         void gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer);
+        void dropConnections();
         
         void setLocalPeer(const ApiPeerData localPeer);
         ApiPeerData localPeer() const;
@@ -172,6 +173,9 @@ namespace ec2
         void connectToPeerEstablished(const ApiPeerData &peerInfo);
         void connectToPeerLost(const QUuid& id);
         void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool sendTran);
+        QnTransaction<ApiModuleDataList> prepareModulesDataTransaction() const;
+        void sendConnectionsData();
+        void sendModulesData();
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QUuid& gotFromID);
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
@@ -217,6 +221,6 @@ namespace ec2
         QElapsedTimer m_aliveSendTimer;
     };
 }
-#define qnTransactionBus QnTransactionMessageBus::instance()
+#define qnTransactionBus ec2::QnTransactionMessageBus::instance()
 
 #endif // __TRANSACTION_MESSAGE_BUS_H_
