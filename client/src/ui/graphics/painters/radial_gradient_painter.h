@@ -7,9 +7,6 @@
 
 class QGLContext;
 
-class QnColorGLShaderProgramm;
-class QnPerVertexColoredGLShaderProgramm;
-
 class QnRadialGradientPainter: protected QOpenGLFunctions {
 public:
     QnRadialGradientPainter(int sectorCount, const QColor &innerColor, const QColor &outerColor, const QGLContext *context);
@@ -21,13 +18,16 @@ public:
     bool isAvailable() const;
 
 private:
+    void initialize(); 
+
+private:
     bool m_initialized;
-    int m_vertexCount;
+    const int m_sectorCount;
+    const QColor m_innerColor;
+    const QColor m_outerColor;
     QOpenGLVertexArrayObject m_vertices;
-    QnPerVertexColoredGLShaderProgramm* m_shader;
     QOpenGLBuffer m_positionBuffer;
     QOpenGLBuffer m_colorBuffer;
-    //QSharedPointer<QnColorGLShaderProgramm> m_shader;
 };
 
 
