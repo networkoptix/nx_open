@@ -8,6 +8,7 @@
 class QGLContext;
 
 class QnColorGLShaderProgramm;
+class QnPerVertexColoredGLShaderProgramm;
 
 class QnRadialGradientPainter: protected QOpenGLFunctions {
 public:
@@ -23,6 +24,10 @@ private:
     bool m_initialized;
     GLuint m_buffer;
     int m_vertexOffset, m_colorOffset, m_vertexCount;
+    QOpenGLVertexArrayObject m_vertices;
+    QnPerVertexColoredGLShaderProgramm* m_shader;
+    QOpenGLBuffer m_positionBuffer;
+    QOpenGLBuffer m_colorBuffer;
     //QSharedPointer<QnColorGLShaderProgramm> m_shader;
 };
 
