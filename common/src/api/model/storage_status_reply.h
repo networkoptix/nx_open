@@ -7,7 +7,7 @@
 #include <utils/common/id.h>
 
 struct QnStorageSpaceData {
-    QString path;
+    QString url;
     QUuid storageId;
     qint64 totalSpace;
     qint64 freeSpace;

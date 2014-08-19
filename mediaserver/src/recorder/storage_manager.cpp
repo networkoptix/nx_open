@@ -108,7 +108,6 @@ std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaDat
 
 
     QMap<qint64, DeviceFileCatalog::Chunk> newChunksMap;
-    QString rootDir = fileCatalog->rootFolder(storage, catalog);
     fileCatalog->scanMediaFiles(rootDir, storage, newChunksMap, emptyFileList, filter);
     std::deque<DeviceFileCatalog::Chunk> newChunks; // = newChunksMap.values().toVector();
     for(auto itr = newChunksMap.begin(); itr != newChunksMap.end(); ++itr)
@@ -974,7 +973,7 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
             int qualityLen = fileName.indexOf(separator, root.length()+1) - root.length();
             quality = fileName.mid(root.length(), qualityLen);
             int idPos = root.length() + qualityLen;
-            uniqueId = fileName.mid(macPos+1, fileName.indexOf(separator, idPos+1) - idPos-1);
+            uniqueId = fileName.mid(idPos+1, fileName.indexOf(separator, idPos+1) - idPos-1);
 
             storageIndex = itr.value()->getIndex();
             return *itr;

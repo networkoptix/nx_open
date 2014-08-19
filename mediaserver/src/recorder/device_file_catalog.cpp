@@ -686,7 +686,9 @@ QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
     if (!storage)
         return QString();
 
-    return rootFolder(storage, m_catalog) +
+    QString root = rootFolder(storage, m_catalog);
+    QString separator = getPathSeparator(root);
+    return root +
                 QnStorageManager::dateTimeStr(chunk.startTimeMs, chunk.timeZone, separator) + 
                 strPadLeft(QString::number(chunk.fileIndex), 3, '0') + 
                 QString(".mkv");

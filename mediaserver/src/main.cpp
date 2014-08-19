@@ -1232,7 +1232,7 @@ void QnMain::run()
     runtimeData.peer.peerType = Qn::PT_Server;
     runtimeData.box = lit(QN_ARM_BOX);
     runtimeData.brand = lit(QN_PRODUCT_NAME_SHORT);
-	runtimeInfo.platform = QN_APPLICATION_PLATFORM;
+	runtimeData.platform = QN_APPLICATION_PLATFORM;
     int guidCompatibility = 0;
     runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
     runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
