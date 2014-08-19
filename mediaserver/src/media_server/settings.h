@@ -63,6 +63,9 @@ namespace nx_ms_conf
     static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
 
     static const QLatin1String SSL_CERTIFICATE_PATH( "sslCertificatePath" );
+
+    static const QLatin1String PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME( "progressiveDownloadSessionLiveTimeSec" );
+    static const int DEFAULT_PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME = 0;    //no limit
 }
 
 /*!

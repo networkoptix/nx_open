@@ -23,6 +23,7 @@ namespace nx_http
             \a *lineBuffer is used to return found line.
             \a *lineBuffer can be pointer to \a data or to an internal buffer. It is valid to next \a parseByLines call or to object destruction
             \return true, if line read (it can be empty). false, if no line yet
+            \note If \a data contains multiple lines, this method returns first line and does not cache anything!
         */
         bool parseByLines(
             const ConstBufferRefType& data,

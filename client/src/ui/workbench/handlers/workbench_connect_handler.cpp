@@ -38,6 +38,7 @@
 
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
+#include <utils/common/synctime.h>
 #include <utils/network/global_module_finder.h>
 
 namespace {
@@ -95,11 +96,22 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
         connection2()->sendRuntimeData(info.data);
     });
 
+
+    connect( QnAppServerConnectionFactory::getConnection2().get(), &ec2::AbstractECConnection::timeChanged,
+        QnSyncTime::instance(), static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime) );
+
     //connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
     qnCommon->setLocalSystemName(connection2()->connectionInfo().systemName);
 }
 
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
+
+    if( QnAppServerConnectionFactory::getConnection2() )
+    {
+        disconnect( QnAppServerConnectionFactory::getConnection2().get(), nullptr, this, nullptr );
+        disconnect( QnAppServerConnectionFactory::getConnection2().get(), nullptr, QnSyncTime::instance(), nullptr );
+    }
+
     /* Don't do anything if we are closing client. */
     if (!mainWindow())
         return;

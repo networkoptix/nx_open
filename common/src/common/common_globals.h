@@ -473,6 +473,8 @@ public:
 
         SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
 
+        LocalSystemTimeRole,                        /**< Used with action SelectTimeServerAction. type qint64 */
+        PeersToChooseTimeServerFromRole             /**< Used with action SelectTimeServerAction. type QList<QPair<QnId, qint64> */
     };
 
     // TODO: #Elric #EC2 rename

@@ -545,6 +545,15 @@ namespace nx_http
             request = NULL;
     }
 
+    Message::Message( Message&& right )
+    :
+        type( right.type ),
+        request( right.request )
+    {
+        right.type = MessageType::none;
+        right.request = nullptr;
+    }
+
     Message::~Message()
     {
         clear();
@@ -559,6 +568,30 @@ namespace nx_http
         else if( type == MessageType::response )
             response = new Response( *right.response );
         return *this;
+    }
+
+    Message& Message::operator=(Message&& right)
+    {
+        clear();
+
+        type = right.type;
+        right.type = MessageType::none;
+        request = right.request;
+        right.request = nullptr;
+        return *this;
+    }
+
+    void Message::serialize( BufferType* const dstBuffer ) const
+    {
+        switch( type )
+        {
+            case MessageType::request:
+                return request->serialize( dstBuffer );
+            case MessageType::response:
+                return response->serialize( dstBuffer );
+            default:
+                return /*false*/;
+        }
     }
 
     void Message::clear()
@@ -810,4 +843,140 @@ namespace nx_http
             return true;
         }
     }
+
+
+    ChunkHeader::ChunkHeader()
+    :
+        chunkSize( 0 )
+    {
+    }
+
+    void ChunkHeader::clear()
+    {
+        chunkSize = 0;
+        extensions.clear();
+    }
+
+    /*!
+        \return bytes read from \a buf
+    */
+    int ChunkHeader::parse( const ConstBufferRefType& buf )
+    {
+        const char* curPos = buf.constData();
+        const char* dataEnd = curPos + buf.size();
+
+        enum State
+        {
+            readingChunkSize,
+            readingExtName,
+            readingExtVal,
+            readingCRLF
+        }
+        state = readingChunkSize;
+        chunkSize = 0;
+        const char* extNameStart = 0;
+        const char* extSepPos = 0;
+        const char* extValStart = 0;
+
+        for( ; curPos < dataEnd; ++curPos )
+        {
+            const char ch = *curPos;
+            switch( ch )
+            {
+                case ';':
+                    if( state == readingExtName )
+                    {
+                        if( curPos == extNameStart )
+                            return -1;  //empty extension
+                        extensions.push_back( std::make_pair( BufferType(extNameStart, curPos-extNameStart), BufferType() ) );
+                    }
+                    else if( state == readingExtVal )
+                    {
+                        if( extSepPos == extNameStart )
+                            return -1;  //empty extension
+                        extensions.push_back( std::make_pair( BufferType(extNameStart, extSepPos-extNameStart), BufferType(extValStart, curPos-extValStart) ) );
+                    }
+
+                    state = readingExtName;
+                    extNameStart = curPos+1;
+                    continue;
+
+                case '=':
+                    if( state == readingExtName )
+                    {
+                        state = readingExtVal;
+                        extSepPos = curPos;
+                        extValStart = curPos + 1;
+                    }
+                    else
+                    {
+                        //unexpected token
+                        return -1;
+                    }
+                    break;
+
+                case '\r':
+                    if( state == readingExtName )
+                    {
+                        if( curPos == extNameStart )
+                            return -1;  //empty extension
+                        extensions.push_back( std::make_pair( BufferType(extNameStart, curPos-extNameStart), BufferType() ) );
+                    }
+                    else if( state == readingExtVal )
+                    {
+                        if( extSepPos == extNameStart )
+                            return -1;  //empty extension
+                        extensions.push_back( std::make_pair( BufferType(extNameStart, extSepPos-extNameStart), BufferType(extValStart, curPos-extValStart) ) );
+                    }
+
+                    if( (dataEnd - curPos < 2) || *(curPos+1) != '\n' )
+                        return -1;
+                    return curPos + 2 - buf.constData();
+
+                default:
+                    if( state == readingChunkSize )
+                    {
+                        if (ch >= '0' && ch <= '9')
+                            chunkSize = (chunkSize << 4) | (ch - '0');
+                        else if (ch >= 'a' && ch <= 'f')
+                            chunkSize = (chunkSize << 4) | (ch - 'a' + 10);
+                        else if (ch >= 'A' && ch <= 'F')
+                            chunkSize = (chunkSize << 4) | (ch - 'A' + 10);
+                        else
+                            return -1;  //unexpected token
+                    }
+                    break;
+            }
+        }
+
+        return -1;
+    }
+
+    int ChunkHeader::serialize( BufferType* const /*dstBuffer*/ ) const
+    {
+        //TODO #ak
+        return -1;
+    }
+
+    /*
+    int ChunkHeader_parse_test()
+    {
+        nx_http::ChunkHeader chunkHeader;
+        int bytesRead = chunkHeader.parse( QByteArray("1f5c;her=hren\r\n") );
+        chunkHeader = nx_http::ChunkHeader();
+        bytesRead = chunkHeader.parse( QByteArray("0001f;\r\n") );
+        chunkHeader = nx_http::ChunkHeader();
+        bytesRead = chunkHeader.parse( QByteArray("0001f\r\n") );
+        chunkHeader = nx_http::ChunkHeader();
+        bytesRead = chunkHeader.parse( QByteArray("1000;lonely;one=two\r\n") );
+        chunkHeader = nx_http::ChunkHeader();
+        bytesRead = chunkHeader.parse( QByteArray("1000;lonely\r") );
+        chunkHeader = nx_http::ChunkHeader();
+        bytesRead = chunkHeader.parse( QByteArray("1000;lonely\n") );
+        chunkHeader = nx_http::ChunkHeader();
+        bytesRead = chunkHeader.parse( QByteArray("10") );
+        chunkHeader = nx_http::ChunkHeader();
+        return 0;
+    }
+    */
 }

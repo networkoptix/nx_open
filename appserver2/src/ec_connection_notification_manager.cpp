@@ -15,6 +15,7 @@
 #include "managers/user_manager.h"
 #include "managers/videowall_manager.h"
 #include "managers/updates_manager.h"
+#include "managers/time_manager.h"
 #include "managers/misc_manager.h"
 #include "managers/discovery_manager.h"
 
@@ -98,6 +99,9 @@ namespace ec2
             return m_layoutManager->triggerNotification( tran );
         case ApiCommand::removeVideowall:
             return m_videowallManager->triggerNotification( tran );
+        case ApiCommand::forcePrimaryTimeServer:
+            //#ak no notification needed
+            break;
         default:
             assert( false );
         }
@@ -200,6 +204,10 @@ namespace ec2
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList>& tran ) {
         m_cameraManager->triggerNotification(tran);
+    }
+
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPeerSystemTimeData>& /*tran*/ ) {
+        //#ak no notification needed in this case
     }
 
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiModuleData> &tran) {

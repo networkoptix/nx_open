@@ -44,6 +44,7 @@ class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
 class QnSystemAdministrationDialog;
+class QnTimeServerSelectionDialog;
 class QnGraphicsMessageBox;
 
 // TODO: #Elric get rid of these processors here
@@ -293,6 +294,8 @@ protected slots:
     void at_betaVersionMessageAction_triggered();
 
     void at_queueAppRestartAction_triggered();
+    void at_selectTimeServerAction_triggered();
+
 private:
     void notifyAboutUpdate();
 
@@ -318,6 +321,7 @@ private:
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
     QPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
     QPointer<QnSystemAdministrationDialog> m_systemAdministrationDialog;
+    QPointer<QnTimeServerSelectionDialog> m_timeServerSelectionDialog;
 
     bool m_delayedDropGuard;
     /** List of serialized resources that are to be dropped on the scene once

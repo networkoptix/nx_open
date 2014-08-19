@@ -6,6 +6,8 @@
 #include <memory>
 
 #include <QtCore/QObject>
+#include <QtCore/QPair>
+#include <QtCore/QList>
 #include <QtCore/QUrl>
 
 #include <utils/common/email.h>
@@ -46,6 +48,8 @@ namespace ec2
         QnLicenseList licenses;
     };
 
+    //list<pair<peerid, peer system time (UTC, millis from epoch)> >
+    typedef QList<QPair<QUuid, qint64>> QnPeerTimeInfoList;
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -858,6 +862,15 @@ namespace ec2
             return impl::doSyncCall<impl::CurrentTimeHandler>( std::bind(fn, this, _1), time );
         }
 
+        //!Set peer identified by \a serverGuid to be primary time server (every other peer synchronizes time with server \a serverGuid)
+        template<class TargetType, class HandlerType> int forcePrimaryTimeServer( const QUuid& serverGuid, TargetType* target, HandlerType handler )
+        {
+            return forcePrimaryTimeServer(
+                serverGuid,
+                std::static_pointer_cast<impl::SimpleHandler>(
+                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
         /*!
             \param handler Functor with params: (ErrorCode, QByteArray dbFile)
         */
@@ -900,11 +913,22 @@ namespace ec2
         void settingsChanged(QnKvPairList settings);
         void panicModeChanged(Qn::PanicMode mode);
 
+        //!Emitted when there is ambiguity while choosing primary time server automatically
+        /*!
+            User SHOULD call \a TimeSynchronizationManager::forcePrimaryTimeServer to set primary time server manually.
+            This signal is emitted periodically until ambiguity in choosing primary time server has been resolved (by user or automatically)
+            \param localSystemTime Local system time (UTC, millis from epoch)
+            \param peersAndTimes pair<peer id, peer local time (UTC, millis from epoch) corresponding to \a localSystemTime>
+        */
+        void primaryTimeServerSelectionRequired( qint64 localSystemTime, QnPeerTimeInfoList peersAndTimes );
+        //!Emitted when synchronized time has been changed
+        void timeChanged( qint64 syncTime );
         void databaseDumped();
 
     protected:
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) = 0;
+        virtual int forcePrimaryTimeServer( const QUuid& serverGuid, impl::SimpleHandlerPtr handler ) = 0;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) = 0;
     };  
@@ -994,5 +1018,6 @@ namespace ec2
 }
 
 Q_DECLARE_METATYPE(ec2::QnFullResourceData);
+Q_DECLARE_METATYPE(ec2::QnPeerTimeInfoList);
 
 #endif  //EC_API_H

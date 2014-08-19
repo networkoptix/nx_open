@@ -249,6 +249,7 @@
             <modules>
                 <module>build_variables</module>
                 <module>common</module>
+                <!-- <module>hole_punching_mediator</module> -->
                 <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
             </modules>

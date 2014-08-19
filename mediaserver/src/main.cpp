@@ -658,11 +658,13 @@ void initAppServerConnection(QSettings &settings)
     
     // ### remove
     QString host = settings.value("appserverHost").toString();
-    if (QUrl(host).scheme() == "file")
-        appServerUrl = QUrl(host); // it is a completed URL
+    if( QUrl( host ).scheme() == "file" )
+    {
+        appServerUrl = QUrl( host ); // it is a completed URL
+    }
     else if (host.isEmpty() || host == "localhost") 
     {
-        appServerUrl = QUrl(QString("file:///") + closeDirPath(getDataDirectory()));
+        appServerUrl = QUrl::fromLocalFile( closeDirPath( getDataDirectory() ) );
     }
     else {
         appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
@@ -715,7 +717,8 @@ void initAppServerConnection(QSettings &settings)
 }
 
 QnMain::QnMain(int argc, char* argv[])
-    : m_argc(argc),
+:
+    m_argc(argc),
     m_argv(argv),
     m_startMessageSent(false),
     m_firstRunningTime(0),
@@ -1134,6 +1137,8 @@ void QnMain::run()
         QnSSLSocket::initSSLEngine( certData );
     }
 
+    QnSyncTime syncTime;
+
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
@@ -1206,7 +1211,7 @@ void QnMain::run()
     qnCommon->setModuleGUID(serverGuid());
     qnCommon->setLocalSystemName(settings->value("systemName").toString());
 
-    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
+    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
@@ -1267,6 +1272,8 @@ void QnMain::run()
         localInfo.data.publicIP = publicIP;
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
+    connect( ec2Connection.get(), &ec2::AbstractECConnection::timeChanged,
+             QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo.ecsGuid.toUtf8());
@@ -1918,7 +1925,6 @@ static void printVersion();
 
 int main(int argc, char* argv[])
 {
-
 #if 0
 #if defined(__GNUC__)
 # if defined(__i386__)

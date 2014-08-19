@@ -30,11 +30,10 @@ namespace ec2
         virtual ~QnTransactionMessageBus();
 
         static QnTransactionMessageBus* instance();
-        static void initStaticInstance(QnTransactionMessageBus* instance);
 
         void addConnectionToPeer(const QUrl& url, const QUuid& peer = QUuid());
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const ApiPeerData &remotePeer);
+        void gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer);
         void dropConnections();
         
         void setLocalPeer(const ApiPeerData localPeer);
@@ -101,7 +100,10 @@ namespace ec2
 
     signals:
         void peerLost(ApiPeerAliveData data);
+        //!Emitted when a new peer has joined cluster or became online
         void peerFound(ApiPeerAliveData data);
+        //!Emitted on a new direct connection to a remote peer has been established
+        void newDirectConnectionEstablished(const QnTransactionTransportPtr& transport);
 
         void gotLockRequest(ApiLockData);
         //void gotUnlockRequest(ApiLockData);
@@ -117,7 +119,7 @@ namespace ec2
         bool isExists(const QUuid& removeGuid) const;
         bool isConnecting(const QUuid& removeGuid) const;
 
-        typedef QMap<QUuid, QSharedPointer<QnTransactionTransport>> QnConnectionMap;
+        typedef QMap<QUuid, QnTransactionTransportPtr> QnConnectionMap;
 
     private:
         template<class T>

@@ -419,8 +419,13 @@ QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QUuid& bus
     return NULL;
 }
 
-void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
-    QnNotificationWidget *item = findItem(message, resource);
+void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::MessageType message, const QVariant& params )
+{
+    QnResourcePtr resource;
+    if( params.canConvert<QnResourcePtr>() )
+        resource = params.value<QnResourcePtr>();
+
+    QnNotificationWidget *item = findItem( message, resource );
     if (item)
         return;
 
@@ -445,7 +450,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     case QnSystemHealth::SmtpIsNotSet:
         item->addActionButton(
             qnSkin->icon("events/smtp.png"),
-            tr("SMTP Settings"),
+            tr("SMTP Settin gs"),
             Qn::PreferencesSmtpTabAction
         );
         break;
@@ -464,6 +469,20 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             Qn::OpenLoginDialogAction
         );
         break;
+    case QnSystemHealth::NoPrimaryTimeServer:
+    {
+        QnActionParameters actionParams;
+        if( params.canConvert<QnActionParameters>() )
+            actionParams = params.value<QnActionParameters>();
+        item->addActionButton(
+            qnSkin->icon( "events/settings.png" ),
+            QnSystemHealthStringsHelper::messageTitle( QnSystemHealth::NoPrimaryTimeServer ),
+            //tr( "Connect to server" ),
+            Qn::SelectTimeServerAction,
+            actionParams
+        );
+        break;
+    }
     case QnSystemHealth::EmailSendError:
         item->addActionButton(
             qnSkin->icon("events/email.png"),
@@ -499,7 +518,11 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     m_itemsByMessageType.insert(message, item);
 }
 
-void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
+void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params) {
+    QnResourcePtr resource;
+    if( params.canConvert<QnResourcePtr>() )
+        resource = params.value<QnResourcePtr>();
+
     if (!resource) {
         foreach (QnNotificationWidget* item, m_itemsByMessageType.values(message))
             m_list->removeItem(item);
@@ -568,7 +591,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
         default:
             break;
         }
-        showSystemHealthMessage(message, resource);
+        showSystemHealthMessage(message, QVariant::fromValue(resource));
     }
 
     //TODO: #GDM #Business REMOVE DEBUG

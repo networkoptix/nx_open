@@ -90,8 +90,8 @@ signals:
     void notificationLevelChanged();
 
 private:
-    void showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
-    void hideSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
+    void showSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params);
+    void hideSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params);
     void showBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     void hideBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     void hideAll();

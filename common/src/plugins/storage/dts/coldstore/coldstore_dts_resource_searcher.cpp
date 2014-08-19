@@ -122,7 +122,7 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
             continue;
 
 
-        sendSocket.sendTo(m_request->data(), m_request->size(), groupAddress.toString(), coldStoreSendPort);
+        sendSocket.sendTo(m_request->data(), m_request->size(), SocketAddress(groupAddress.toString(), coldStoreSendPort));
 
 
         QElapsedTimer time;

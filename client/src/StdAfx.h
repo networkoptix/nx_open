@@ -12,6 +12,10 @@
 #   include <ws2tcpip.h>
 #   include <iphlpapi.h>
 
+#   if _MSC_VER < 1800
+#       define noexcept
+#   endif
+
 /* DXVA headers (should be included before ffmpeg headers). */
 #   ifdef _USE_DXVA
 #       include <d3d9.h>

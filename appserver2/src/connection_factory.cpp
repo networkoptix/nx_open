@@ -29,8 +29,11 @@
 
 namespace ec2
 {
-    Ec2DirectConnectionFactory::Ec2DirectConnectionFactory()
+    Ec2DirectConnectionFactory::Ec2DirectConnectionFactory( Qn::PeerType peerType )
     :
+        m_dbManager( peerType == Qn::PT_Server ? new QnDbManager() : nullptr ),   //dbmanager is initialized by direct connection
+        m_transactionMessageBus( new ec2::QnTransactionMessageBus() ),
+        m_timeSynchronizationManager( new TimeSynchronizationManager(peerType) ),
         m_terminated( false ),
         m_runningRequests( 0 )
     {
@@ -40,22 +43,18 @@ namespace ec2
         qRegisterMetaType<ErrorCode>( "ErrorCode" );
         qRegisterMetaType<AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
         qRegisterMetaType<QnFullResourceData>( "QnFullResourceData" ); // TODO: #Elric #EC2 register in a proper place!
+        qRegisterMetaType<QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
         qRegisterMetaType<QnTransactionTransportHeader>( "QnTransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiPeerAliveData>( "ApiPeerAliveData" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiRuntimeData>( "ApiRuntimeData" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); // TODO: #Elric #EC2 register in a proper place!
-
-        ec2::QnTransactionMessageBus::initStaticInstance(new ec2::QnTransactionMessageBus());
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
     {
         pleaseStop();
         join();
-
-        m_directConnection.reset();
-        ec2::QnTransactionMessageBus::initStaticInstance(0);
     }
 
     void Ec2DirectConnectionFactory::pleaseStop()
@@ -223,6 +222,10 @@ namespace ec2
 
         //AbstractECConnection
         registerGetFuncHandler<std::nullptr_t, ApiTimeData>( restProcessorPool, ApiCommand::getCurrentTime );
+        registerUpdateFuncHandler<ApiIdData>(
+            restProcessorPool,
+            ApiCommand::forcePrimaryTimeServer,
+            std::bind( &TimeSynchronizationManager::primaryTimeServerChanged, m_timeSynchronizationManager.get(), _1 ) );
 
 
         registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>( restProcessorPool, ApiCommand::getFullInfo );
@@ -475,6 +478,14 @@ namespace ec2
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
             new UpdateHttpHandler<InputDataType>(m_directConnection) );
+    }
+
+    template<class InputDataType, class CustomActionType>
+    void Ec2DirectConnectionFactory::registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, CustomActionType customAction )
+    {
+        restProcessorPool->registerHandler(
+            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+            new UpdateHttpHandler<InputDataType>(m_directConnection, customAction) );
     }
 
     template<class InputDataType, class OutputDataType>

@@ -216,6 +216,11 @@ namespace Qn {
          */
         QueueAppRestartAction,
 
+        /**
+         * Offers user to select server in cluster for other servers to synchronize time with
+         */
+        SelectTimeServerAction,
+
 
         /* Main menu actions. */
 

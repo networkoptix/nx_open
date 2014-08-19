@@ -25,7 +25,7 @@ namespace ec2
         // TODO: #Elric #enum
         enum Value
         {
-		    NotDefined                  = 0,
+            NotDefined                  = 0,
 
             /* System */
             tranSyncRequest             = 1,    /*< QnTranState */
@@ -134,6 +134,8 @@ namespace ec2
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
             dumpDatabase                = 9005,  /*< ApiDatabaseDumpData */
             resotreDatabase             = 9006,  /*< ApiDatabaseDumpData */
+            forcePrimaryTimeServer      = 9007,  /*< ApiIdData */
+            broadcastPeerSystemTime     = 9008,  /*< ApiPeerSystemTimeData*/
 
             maxTransactionValue         = 65535
         };
@@ -174,8 +176,6 @@ namespace ec2
                 return dbID == other.dbID && sequence == other.sequence && timestamp == other.timestamp;
             }
         };
-
-        bool isPersistentType() const;
 
         ApiCommand::Value command;
         QUuid peerID;

@@ -36,6 +36,8 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 
+#include <nx_ec/dummy_handler.h>
+
 #include <plugins/resource/archive/archive_stream_reader.h>
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
@@ -69,6 +71,7 @@
 #include <ui/dialogs/picture_settings_dialog.h>
 #include <ui/dialogs/ping_dialog.h>
 #include <ui/dialogs/system_administration_dialog.h>
+#include <ui/dialogs/time_server_selection_dialog.h>
 #include <ui/dialogs/non_modal_dialog_constructor.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -287,6 +290,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
     connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
+    connect(action(Qn::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -2383,7 +2387,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
               : QUrl();
     QByteArray auth = url.toEncoded();
 
-    bool isInstalled;
+    bool isInstalled = false;
     bool success = applauncher::isVersionInstalled(version, &isInstalled) == applauncher::api::ResultType::ok;
     if (success && isInstalled)
         success = applauncher::restartClient(version, auth) == applauncher::api::ResultType::ok;
@@ -2399,6 +2403,24 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     }
     menu()->trigger(Qn::ExitActionDelayed);
     applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
+}
+
+void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered()
+{
+    if( !m_timeServerSelectionDialog )
+    {
+        m_timeServerSelectionDialog = new QnTimeServerSelectionDialog( mainWindow(), context() );
+        m_timeServerSelectionDialog->setModal(true);
+    }
+
+    if( m_timeServerSelectionDialog->isVisible() )
+        return; //dialog still running from previous time
+
+    const qint64 localSystemTime = menu()->currentParameters(sender()).argument(Qn::LocalSystemTimeRole).toLongLong();
+    const ec2::QnPeerTimeInfoList& peers = menu()->currentParameters(sender()).argument(Qn::PeersToChooseTimeServerFromRole).value<ec2::QnPeerTimeInfoList>();
+    m_timeServerSelectionDialog->setData( localSystemTime, peers );
+
+    m_timeServerSelectionDialog->exec();
 }
 
 void QnWorkbenchActionHandler::deleteDialogs() {

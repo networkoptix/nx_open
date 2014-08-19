@@ -117,6 +117,14 @@ namespace ec2
         return reqID;
     }
 
+    int OldEcConnection::forcePrimaryTimeServer( const QUuid& /*serverGuid*/, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+        QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented ) );
+        return reqID;
+    }
+
     void OldEcConnection::addRemotePeer(const QUrl& /*url*/, const QUuid& /*peerGuid*/)
     {
     }

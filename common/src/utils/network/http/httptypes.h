@@ -14,6 +14,8 @@
 #include <QtCore/QMap>
 #include <QtCore/QUrl>
 
+#include "utils/network/buffer.h"
+
 #include "qnbytearrayref.h"
 
 
@@ -40,9 +42,10 @@ namespace nx_http
 
         Using QByteArray or any STL container results in many memory copy/relocation operations which make implementation not effecient
     */
-    typedef QByteArray BufferType;
+    typedef nx::Buffer BufferType;
     typedef QnByteArrayConstRef ConstBufferRefType;
-    typedef QByteArray StringType;
+    //TODO #ak not sure, if nx::Buffer is suitable for string type
+    typedef nx::Buffer StringType;
 
     /*!
         \return < 0, if \a one < \a two. 0 if \a one == \a two. > 0 if \a one > \a two
@@ -321,9 +324,13 @@ namespace nx_http
 
         Message( MessageType::Value _type = MessageType::none );
         Message( const Message& right );
+        Message( Message&& right );
         ~Message();
 
-        Message& operator=( const Message& right );
+        Message& operator=(const Message& right);
+        Message& operator=(Message&& right);
+
+        void serialize( BufferType* const dstBuffer ) const;
 
         void clear();
         HttpHeaders& headers() { return type == MessageType::request ? request->headers : response->headers; };
@@ -436,6 +443,35 @@ namespace nx_http
             bool parse( const BufferType& str );
         };
     }
+
+    typedef std::pair<StringType, StringType> ChunkExtension;
+
+    //! chunk-size [ chunk-extension ] CRLF
+    /*!
+        chunk-extension= *( ";" chunk-ext-name [ "=" chunk-ext-val ] )
+        chunk-ext-name = token
+        chunk-ext-val  = token | quoted-string
+    */
+    class ChunkHeader
+    {
+    public:
+        size_t chunkSize;
+        std::vector<ChunkExtension> extensions;
+
+        ChunkHeader();
+
+        void clear();
+
+        /*!
+            \return bytes read from \a buf. -1 in case of parse error
+            \note In case of parse error object state is indefined
+        */
+        int parse( const ConstBufferRefType& buf );
+        /*!
+            \return bytes written to \a dstBuffer. -1 in case of serialize error. In this case contents of \a dstBuffer are undefined
+        */
+        int serialize( BufferType* const dstBuffer ) const;
+    };
 }
 
 #endif  //HTTPTYPES_H

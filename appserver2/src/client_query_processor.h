@@ -40,6 +40,7 @@ namespace ec2
     public:
         virtual ~ClientQueryProcessor()
         {
+            //TODO #ak following assert can be triggered during client stop
             assert( m_runningHttpRequests.empty() );
         }
 

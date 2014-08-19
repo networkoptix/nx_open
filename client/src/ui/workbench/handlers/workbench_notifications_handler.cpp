@@ -1,6 +1,7 @@
 #include "workbench_notifications_handler.h"
 
 #include <api/global_settings.h>
+#include <api/app_server_connection.h>
 
 #include <common/common_module.h>
 
@@ -13,6 +14,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <ui/actions/action_parameters.h>
 #include <ui/workbench/watchers/workbench_user_email_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -21,6 +23,7 @@
 #include <utils/app_server_notification_cache.h>
 #include <utils/common/email.h>
 #include <utils/media/audio_player.h>
+
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent) :
     QObject(parent),
@@ -41,6 +44,8 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH), &QnPropertyNotifier::valueChanged, this, &QnWorkbenchNotificationsHandler::at_settings_valueChanged);
 
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::emailSettingsChanged,          this,   &QnWorkbenchNotificationsHandler::at_emailSettingsChanged);
+
+    connect( action( Qn::SelectTimeServerAction ), &QAction::triggered, this, [this](){ setSystemHealthEventVisible( QnSystemHealth::NoPrimaryTimeServer, false ); } );
 }
 
 QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler() {
@@ -97,7 +102,7 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
     if (!(qnSettings->popupSystemHealth() & (1ull << message)))
         return;
 
-    emit systemHealthEventAdded(message, resource);
+    setSystemHealthEventVisible( message, resource, true );
 }
 
 bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageType message) {
@@ -114,6 +119,7 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     case QnSystemHealth::StoragesNotConfigured:
     case QnSystemHealth::StoragesAreFull:
     case QnSystemHealth::ArchiveRebuildFinished:
+    case QnSystemHealth::NoPrimaryTimeServer:
         return true;
 
     default:
@@ -125,7 +131,12 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
 }
 
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible) {
-    setSystemHealthEventVisible(message, QnResourcePtr(), visible);
+    setSystemHealthEventVisible(message, QVariant(), visible);
+}
+
+void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QnActionParameters& actionParams, bool visible )
+{
+    setSystemHealthEventVisible( message, QVariant::fromValue(actionParams), visible );
 }
 
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr &resource, bool visible) {
@@ -148,10 +159,16 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
     /* Checking that we want to see this message */
     bool canShow = qnSettings->popupSystemHealth() & (1ull << message);
 
-    if (visible && canShow)
-        emit systemHealthEventAdded(message, resource);
+    setSystemHealthEventVisible( message, QVariant::fromValue( resource ), visible && canShow );
+
+}
+
+void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QVariant& params, bool visible )
+{
+    if( visible )
+        emit systemHealthEventAdded( message, params );
     else
-        emit systemHealthEventRemoved(message, resource);
+        emit systemHealthEventRemoved( message, params );
 }
 
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {
@@ -177,6 +194,9 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
         m_userEmailWatcher->forceCheckAll();
         return;
 
+    case QnSystemHealth::NoPrimaryTimeServer:
+        return;
+
     case QnSystemHealth::NoLicenses:
         at_licensePool_licensesChanged();
         return;
@@ -198,16 +218,31 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
 
 void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid) {
     if (context()->user() == user)
-        setSystemHealthEventVisible(QnSystemHealth::EmailIsEmpty, user, !isValid);
+        setSystemHealthEventVisible(QnSystemHealth::EmailIsEmpty, user.staticCast<QnResource>(), !isValid);
     else
-        setSystemHealthEventVisible(QnSystemHealth::UsersEmailIsEmpty, user, !isValid);
+        setSystemHealthEventVisible( QnSystemHealth::UsersEmailIsEmpty, user.staticCast<QnResource>(), !isValid );
+}
+
+void QnWorkbenchNotificationsHandler::at_primaryTimeServerSelectionRequired( qint64 localSystemTime, const QList<QPair<QUuid, qint64> >& peersAndTimes )
+{
+    setSystemHealthEventVisible(
+        QnSystemHealth::NoPrimaryTimeServer,
+        QnActionParameters().withArgument( Qn::LocalSystemTimeRole, localSystemTime ).withArgument( Qn::PeersToChooseTimeServerFromRole, peersAndTimes ),
+        true );
 }
 
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened() {
     setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, false);
+
+    connect( QnAppServerConnectionFactory::getConnection2().get(), &ec2::AbstractECConnection::primaryTimeServerSelectionRequired,
+             this, &QnWorkbenchNotificationsHandler::at_primaryTimeServerSelectionRequired );
 }
 
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed() {
+
+    disconnect( nullptr, &ec2::AbstractECConnection::primaryTimeServerSelectionRequired,
+                this, &QnWorkbenchNotificationsHandler::at_primaryTimeServerSelectionRequired );
+
     clear();
     if (!qnCommon->remoteGUID().isNull())
         setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, QnResourcePtr(), true);

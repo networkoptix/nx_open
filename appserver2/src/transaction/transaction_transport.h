@@ -1,9 +1,10 @@
 #ifndef __TRANSACTION_TRANSPORT_H__
 #define __TRANSACTION_TRANSPORT_H__
 
+#include <deque>
+
 #include <QUuid>
 #include <QByteArray>
-#include <QQueue>
 #include <QSet>
 
 #include <transaction/transaction.h>
@@ -13,7 +14,6 @@
 #include <transaction/transaction_transport_header.h>
 
 #include <utils/network/abstract_socket.h>
-#include "utils/network/aio/aioeventhandler.h"
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/common/id.h"
 
@@ -26,10 +26,16 @@
 namespace ec2
 {
 
-class QnTransactionTransport: public QObject, public aio::AIOEventHandler
+class QnTransactionTransport
+:
+    public QObject
 {
     Q_OBJECT
 public:
+    //not using Qt signal/slot because it is undefined in what thread this object lives and in what thread TimerSynchronizationManager lives
+    typedef std::function<void(QnTransactionTransport*, const std::vector<nx_http::ChunkExtension>&)> HttpChunkExtensonHandler;
+    typedef std::function<void(QnTransactionTransport*, std::vector<nx_http::ChunkExtension>*)> BeforeSendingChunkHandler;
+
     enum State {
         NotDefined,
         ConnectingStage1,
@@ -44,7 +50,7 @@ public:
 
     QnTransactionTransport(const ApiPeerData &localPeer,
         const ApiPeerData &remotePeer = ApiPeerData(QUuid(), Qn::PT_Server),
-        QSharedPointer<AbstractStreamSocket> socket = QSharedPointer<AbstractStreamSocket>());
+        const QSharedPointer<AbstractStreamSocket>& socket = QSharedPointer<AbstractStreamSocket>());
     ~QnTransactionTransport();
 
 signals:
@@ -107,11 +113,36 @@ public:
     void setState(State state);
     State getState() const;
 
+    //!Set \a eventHandler that will receive all http chunk extensions
+    /*!
+        \return event handler id that may be used to remove event handler with \a QnTransactionTransport::removeEventHandler call
+    */
+    int setHttpChunkExtensonHandler( HttpChunkExtensonHandler eventHandler );
+    //!Set \a eventHandler that will be called before sending each http chunk. It (handler) is allowed to add some extensions to the chunk
+    /*!
+        \return event handler id that may be used to remove event handler with \a QnTransactionTransport::removeEventHandler call
+    */
+    int setBeforeSendingChunkHandler( BeforeSendingChunkHandler eventHandler );
+    //!Remove event handler, installed by \a QnTransactionTransport::setHttpChunkExtensonHandler or \a QnTransactionTransport::setBeforeSendingChunkHandler
+    void removeEventHandler( int eventHandlerID );
+
+    AbstractStreamSocket* getSocket() const;
+
     static bool tryAcquireConnecting(const QUuid& remoteGuid, bool isOriginator);
     static bool tryAcquireConnected(const QUuid& remoteGuid, bool isOriginator);
     static void connectingCanceled(const QUuid& id, bool isOriginator);
     static void connectDone(const QUuid& id);
+
 private:
+    struct DataToSend
+    {
+        QByteArray sourceData;
+        QByteArray encodedSourceData;
+
+        DataToSend() {}
+        DataToSend( QByteArray&& _sourceData ) : sourceData( std::move(_sourceData) ) {}
+    };
+
     ApiPeerData m_localPeer;
     ApiPeerData m_remotePeer;
 
@@ -124,34 +155,49 @@ private:
     QSharedPointer<AbstractStreamSocket> m_socket;
     nx_http::AsyncHttpClientPtr m_httpClient;
     State m_state;
-    std::vector<quint8> m_readBuffer;
-    int m_readBufferLen;
+    /*std::vector<quint8>*/ nx::Buffer m_readBuffer;
     int m_chunkHeaderLen;
-    quint32 m_chunkLen;
+    size_t m_chunkLen;
     int m_sendOffset;
-    QQueue<QByteArray> m_dataToSend;
+    //!Holds raw data. It is serialized to http chunk just before sending to socket
+    std::deque<DataToSend> m_dataToSend;
     QUrl m_remoteAddr;
     bool m_connected;
+
+    std::map<int, HttpChunkExtensonHandler> m_httpChunkExtensonHandlers;
+    std::map<int, BeforeSendingChunkHandler> m_beforeSendingChunkHandlers;
+    int m_prevGivenHandlerID;
 
     static QSet<QUuid> m_existConn;
     typedef QMap<QUuid, QPair<bool, bool>> ConnectingInfoMap;
     static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
     static QMutex m_staticMutex;
+
     QByteArray m_extraData;
+
 private:
-    void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
+    //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
-    void addData(const QByteArray &data);
-    static void ensureSize(std::vector<quint8>& buffer, std::size_t size);
-    int getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size);
+    void addData(QByteArray &&data);
+    /*!
+        \return in case of success returns number of bytes read from \a data. In case of parse error returns 0
+        \note In case of error \a chunkHeader contents are undefined
+    */
+    int readChunkHeader(const quint8* data, int dataLen, nx_http::ChunkHeader* const chunkHeader);
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();
     static void connectingCanceledNoLock(const QUuid& remoteGuid, bool isOriginator);
+    void addHttpChunkExtensions( std::vector<nx_http::ChunkExtension>* const chunkExtensions );
+    void processChunkExtensions( const nx_http::ChunkHeader& httpChunkHeader );
+    void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead );
+    void serializeAndSendNextDataBuffer();
+    void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
     void setExtraDataBuffer(const QByteArray& data);
+
 private slots:
-    void at_responseReceived( nx_http::AsyncHttpClientPtr );
-    void at_httpClientDone(nx_http::AsyncHttpClientPtr);
+    void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
+    void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );
     void repeatDoGet();
 };
 

@@ -4,7 +4,6 @@
 #include <QtCore/QTimer>
 
 #include "remote_ec_connection.h"
-#include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
 #include "ec2_connection.h"
 #include "common/common_module.h"
@@ -12,6 +11,7 @@
 #include <transaction/transaction_transport.h>
 
 #include "api/app_server_connection.h"
+#include "api/runtime_info_manager.h"
 #include "nx_ec/data/api_server_alive_data.h"
 #include "utils/common/synctime.h"
 #include "utils/network/global_module_finder.h"
@@ -20,10 +20,10 @@
 #include "ec_connection_notification_manager.h"
 #include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_resource_data.h"
+#include "managers/time_manager.h"
 
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
-#include "api/runtime_info_manager.h"
 
 
 #define TRANSACTION_MESSAGE_BUS_DEBUG
@@ -134,6 +134,8 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::tranSyncRequest:       return handleTransactionParams<QnTranState>             (&stream, transaction, function);
     case ApiCommand::tranSyncResponse:      return handleTransactionParams<QnTranStateResponse>     (&stream, transaction, function);
     case ApiCommand::runtimeInfoChanged:    return handleTransactionParams<ApiRuntimeData>          (&stream, transaction, function);
+    case ApiCommand::broadcastPeerSystemTime: return handleTransactionParams<ApiPeerSystemTimeData> (&stream, transaction, function);
+    case ApiCommand::forcePrimaryTimeServer:  return handleTransactionParams<ApiIdData>             (&stream, transaction, function);
 
     default:
         qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";
@@ -145,21 +147,15 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
 
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
-static QnTransactionMessageBus*m_globalInstance = 0;
+static QnTransactionMessageBus* m_globalInstance = 0;
 
 QnTransactionMessageBus* QnTransactionMessageBus::instance()
 {
     return m_globalInstance;
 }
 
-void QnTransactionMessageBus::initStaticInstance(QnTransactionMessageBus* instance)
-{
-    Q_ASSERT(m_globalInstance == 0 || instance == 0);
-    delete m_globalInstance;
-    m_globalInstance = instance;
-}
-
-QnTransactionMessageBus::QnTransactionMessageBus(): 
+QnTransactionMessageBus::QnTransactionMessageBus()
+: 
     m_localPeer(QUuid(), Qn::PT_Server),
     m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
@@ -180,6 +176,9 @@ QnTransactionMessageBus::QnTransactionMessageBus():
     connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
     m_timer->start(500);
     m_aliveSendTimer.invalidate();
+
+    assert( m_globalInstance == nullptr );
+    m_globalInstance = this;
 }
 
 void QnTransactionMessageBus::start()
@@ -191,6 +190,8 @@ void QnTransactionMessageBus::start()
 
 QnTransactionMessageBus::~QnTransactionMessageBus()
 {
+    m_globalInstance = nullptr;
+
     if (m_thread) {
         m_thread->exit();
         m_thread->wait();
@@ -345,6 +346,12 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         case ApiCommand::peerAliveInfo:
             onGotServerAliveInfo(tran, sender->remotePeer().id);
             break; // do not return. proxy this transaction
+        case ApiCommand::forcePrimaryTimeServer:
+            TimeSynchronizationManager::instance()->primaryTimeServerChanged( tran );
+            break;
+        case ApiCommand::broadcastPeerSystemTime:
+            TimeSynchronizationManager::instance()->peerSystemTimeReceived( tran );
+            break;
         default:
             // general transaction
             if (!sender->isReadSync(tran.command))
@@ -642,7 +649,9 @@ void QnTransactionMessageBus::sendModulesData()
     sendTransaction(transaction);
 }
 
-QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
+//TODO #ak use SocketAddress instead of this function. It will reduce QString instanciation count
+static QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
+
 bool QnTransactionMessageBus::isPeerUsing(const QUrl& url)
 {
     QString addr1 = getUrlAddr(url);
@@ -681,6 +690,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
             if (m_connectingConnections[i] == transport) {
                 Q_ASSERT(!m_connections.contains(transport->remotePeer().id));
                 m_connections[transport->remotePeer().id] = m_connectingConnections[i];
+                emit newDirectConnectionEstablished( m_connectingConnections[i] );
                 m_connectingConnections.removeAt(i);
                 found = true;
                 break;
@@ -809,7 +819,7 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
     }
 }
 
-void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const ApiPeerData &remotePeer)
+void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer)
 {
     if (!dbManager)
     {
