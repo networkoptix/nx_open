@@ -248,28 +248,38 @@ void QnTransactionMessageBus::removeAlivePeer(const QUuid& id, bool sendTran, bo
         removeAlivePeer(p, true, true);
 }
 
-void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QUuid& gotFromPeer)
+void QnTransactionMessageBus::processAliveData(const ApiPeerAliveData &aliveData, const QUuid& gotFromPeer)
 {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-    qDebug() << "received peerAlive transaction" << tran.params.peer.id << tran.params.peer.peerType;
+    qDebug() << "received peerAlive transaction" << aliveData.peer.id << aliveData.peer.peerType;
 #endif
-    if (tran.params.peer.id == m_localPeer.id)
+    if (aliveData.peer.id == m_localPeer.id)
         return; // ignore himself
 
     // proxy alive info from non-direct connected host
-    bool isPeerExist = m_alivePeers.contains(tran.params.peer.id);
-    if (tran.params.isAlive) 
+    bool isPeerExist = m_alivePeers.contains(aliveData.peer.id);
+    if (aliveData.isAlive) 
     {
-        addAlivePeerInfo(ApiPeerData(tran.params.peer.id, tran.params.peer.peerType), gotFromPeer);
+        addAlivePeerInfo(ApiPeerData(aliveData.peer.id, aliveData.peer.peerType), gotFromPeer);
         if (!isPeerExist) 
-            emit peerFound(tran.params);
+            emit peerFound(aliveData);
     }
     else 
     {
         if (isPeerExist) {
-            removeAlivePeer(tran.params.peer.id, false);
+            removeAlivePeer(aliveData.peer.id, false);
         }
     }
+}
+
+void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QUuid& gotFromPeer)
+{
+    processAliveData(tran.params, gotFromPeer);
+}
+
+void QnTransactionMessageBus::onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, const QUuid& gotFromPeer)
+{
+    processAliveData(ApiPeerAliveData(tran.params.peer, true), gotFromPeer);
 }
 
 void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran, const QnTransactionTransportHeader &transportHeader)
@@ -343,9 +353,12 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         case ApiCommand::tranSyncResponse:
             onGotTransactionSyncResponse(sender, tran);
             return;
+        case ApiCommand::runtimeInfoChanged:
+            onGotServerRuntimeInfo(tran, sender->remotePeer().id);
+            break;
         case ApiCommand::peerAliveInfo:
             onGotServerAliveInfo(tran, sender->remotePeer().id);
-            break; // do not return. proxy this transaction
+            break;
         case ApiCommand::forcePrimaryTimeServer:
             TimeSynchronizationManager::instance()->primaryTimeServerChanged( tran );
             break;
@@ -805,21 +818,9 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
 {
     foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
     {
-        {
-            ApiPeerAliveData aliveData;
-            aliveData.peer = info.data.peer;
-            aliveData.isAlive = true;
-
-            QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo);
-            tran.params = aliveData;
-            transport->sendTransaction(tran, transportHeader);
-        }
-
-        {
-            QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged);
-            tran.params = info.data;
-            transport->sendTransaction(tran, transportHeader);
-        }
+        QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged);
+        tran.params = info.data;
+        transport->sendTransaction(tran, transportHeader);
     }
 }
 
