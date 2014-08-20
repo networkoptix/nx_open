@@ -4,6 +4,8 @@
 #include <QUrl>
 #include <QUrlQuery>
 
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 #include <utils/common/log.h>
 #include <utils/common/string.h>
 #include <utils/common/systemerror.h>
@@ -101,7 +103,7 @@ static bool isLocalAddress(const QString& addr)
 QString QnProxyConnectionProcessor::connectToRemoteHost(const QString& guid, const QUrl& url)
 {
     Q_D(QnProxyConnectionProcessor);
-    d->dstSocket = (dynamic_cast<QnUniversalTcpListener*> (d->owner))->getProxySocket(guid, CONNECT_TIMEOUT);
+    d->dstSocket = (static_cast<QnUniversalTcpListener*> (d->owner))->getProxySocket(guid, CONNECT_TIMEOUT);
     if (!d->dstSocket) {
 
 #ifdef PROXY_STRICT_IP
@@ -199,7 +201,18 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
             xServerGUID = itr->second;
     }
 
-    trimInPlace( &xServerGUID, lit("{}") );
+    if( dstUrl.host().isEmpty() )
+    {
+        //searching for resource by guid
+        QnResourcePtr res = QnResourcePool::instance()->getResourceById( xServerGUID );
+        const QnMediaServerResource* mediaServerRes = res.dynamicCast<QnMediaServerResource>().data();
+        if( mediaServerRes )
+        {
+            QUrl mServerApiUrl( mediaServerRes->getApiUrl() );
+            dstUrl.setHost( mServerApiUrl.host() );
+            dstUrl.setPort( mServerApiUrl.port(nx_http::DEFAULT_HTTP_PORT) );
+        }
+    }
 
     QnRoute route;
     if (!xServerGUID.isEmpty())
