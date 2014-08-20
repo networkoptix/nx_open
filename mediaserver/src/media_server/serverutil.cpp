@@ -14,21 +14,6 @@
 
 static QnMediaServerResourcePtr m_server;
 
-void syncStoragesToSettings(const QnMediaServerResourcePtr &server)
-{
-    const QnAbstractStorageResourceList& storages = server->getStorages();
-
-    MSSettings::roSettings()->beginWriteArray(QLatin1String("storages"));
-    MSSettings::roSettings()->remove(QLatin1String(""));
-    for (int i = 0; i < storages.size(); i++) {
-        QnAbstractStorageResourcePtr storage = storages.at(i);
-        MSSettings::roSettings()->setArrayIndex(i);
-        MSSettings::roSettings()->setValue("path", storage->getUrl());
-    }
-
-    MSSettings::roSettings()->endArray();
-}
-
 QString authKey()
 {
     return MSSettings::roSettings()->value("authKey").toString();

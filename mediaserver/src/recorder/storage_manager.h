@@ -61,7 +61,7 @@ public:
     * @param dateTimeMs UTC time in ms
     * timeZone server time zone offset in munutes. If value==-1 - current(system) time zone is used
     */
-    static QString dateTimeStr(qint64 dateTimeMs, qint16 timeZone);
+    static QString dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const QString& separator);
 
     QnStorageResourcePtr getStorageByUrl(const QString& fileName);
     QnStorageResourcePtr storageRoot(int storage_index) const { QMutexLocker lock(&m_mutexStorages); return m_storageRoots.value(storage_index); }

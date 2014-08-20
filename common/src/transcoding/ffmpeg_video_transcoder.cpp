@@ -148,7 +148,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     m_encoderCtx->time_base.den = 60;
     m_encoderCtx->sample_aspect_ratio.den = m_encoderCtx->sample_aspect_ratio.num = 1;
     if (m_mtMode)
-        m_encoderCtx->thread_count = QThread::idealThreadCount();
+        m_encoderCtx->thread_count = qMin(2, QThread::idealThreadCount());
 
     for( QMap<QString, QVariant>::const_iterator it = m_params.begin(); it != m_params.end(); ++it )
     {
