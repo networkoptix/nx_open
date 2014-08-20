@@ -22,11 +22,11 @@ public:
     
     void                setColor(const QVector4D& c);
     void                setColor(const QColor& c);
-    void                drawBindedTextureOnQuad(const QRectF &rect , QnTextureGLShaderProgram* shader = NULL);
-    void                drawBindedTextureOnQuad(const QRectF &rect , const QSizeF& size, QnTextureGLShaderProgram* shader = NULL);
+
+    void                drawBindedTextureOnQuad(const float* v_array, const float* tx_array);
+
     void                drawColoredQuad(const QRectF &rect , QnColorGLShaderProgram* shader = NULL);
     void                drawPerVertexColoredPolygon(unsigned int a_buffer , unsigned int a_vertices_size , unsigned int a_polygon_state = GL_TRIANGLE_FAN);
-    void                drawBindedTextureOnQuad(const float* v_array, const float* tx_array, QnGLShaderProgram* shader = NULL );
     void                drawColoredQuad(const float* v_array, QnColorGLShaderProgram* shader = NULL);
     
     void                drawArraysVao(QOpenGLVertexArrayObject* vao, GLenum mode, int count, QnColorGLShaderProgram* shader);

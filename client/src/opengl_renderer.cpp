@@ -41,42 +41,6 @@ void  QnOpenGLRenderer::setColor(const QColor& c)
     m_color.setW(c.alphaF()); 
 };
 
-void QnOpenGLRenderer::drawBindedTextureOnQuad( const QRectF &rect , QnTextureGLShaderProgram* shader)
-{
-    GLfloat vertices[] = {
-        (GLfloat)rect.left(),   (GLfloat)rect.top(),
-        (GLfloat)rect.right(),  (GLfloat)rect.top(),
-        (GLfloat)rect.right(),  (GLfloat)rect.bottom(),
-        (GLfloat)rect.left(),   (GLfloat)rect.bottom()
-    };
-
-    GLfloat texCoords[] = {
-        0.0, 0.0,
-        1.0, 0.0,
-        1.0, 1.0,
-        0.0, 1.0
-    };
-    drawBindedTextureOnQuad(vertices,texCoords,shader);
-};
-
-void QnOpenGLRenderer::drawBindedTextureOnQuad( const QRectF &rect , const QSizeF& size, QnTextureGLShaderProgram* shader)
-{
-    GLfloat vertices[] = {
-        (GLfloat)rect.left(),   (GLfloat)rect.top(),
-        (GLfloat)rect.right(),  (GLfloat)rect.top(),
-        (GLfloat)rect.right(),  (GLfloat)rect.bottom(),
-        (GLfloat)rect.left(),   (GLfloat)rect.bottom()
-    };
-
-    GLfloat texCoords[] = {
-        0.0, 0.0,
-        (GLfloat)size.width(), 0.0,
-        (GLfloat)size.width(), (GLfloat)size.height(),
-        0.0, (GLfloat)size.height()
-    };
-    drawBindedTextureOnQuad(vertices,texCoords,shader);
-};
-
 void QnOpenGLRenderer::drawColoredQuad( const QRectF &rect , QnColorGLShaderProgram* shader )
 {
     GLfloat vertices[] = {
@@ -172,55 +136,44 @@ void QnOpenGLRenderer::drawColoredQuad(const float* v_array, QnColorGLShaderProg
     }
 };
 
-void QnOpenGLRenderer::drawBindedTextureOnQuad( const float* v_array, const float* tx_array , QnGLShaderProgram* shader)
+void QnOpenGLRenderer::drawBindedTextureOnQuad( const float* v_array, const float* tx_array)
 {
-    bool empty_shader = false;
-    if ( !shader )
+    QnTextureGLShaderProgram* shader = m_textureColorProgram.data();
+
+    const int VERTEX_POS_SIZE = 2; // x, y
+    const int VERTEX_TEXCOORD0_SIZE = 2; // s and t
+    const int VERTEX_POS_INDX = 0;
+    const int VERTEX_TEXCOORD0_INDX = 1;
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glEnableVertexAttribArray(VERTEX_POS_INDX);
+    glEnableVertexAttribArray(VERTEX_TEXCOORD0_INDX);
+
+    glVertexAttribPointer(VERTEX_POS_INDX, VERTEX_POS_SIZE, GL_FLOAT, GL_FALSE, 0, v_array);
+    glVertexAttribPointer(VERTEX_TEXCOORD0_INDX,VERTEX_TEXCOORD0_SIZE, GL_FLOAT,GL_FALSE, 0, tx_array);
+
+
+    shader->bind();
+
+    shader->setModelViewProjectionMatrix(m_projectionMatrix*m_modelViewMatrix);
+
+    shader->setColor(m_color);
+
+    if ( !shader->initialized() )
     {
-        shader = m_textureColorProgram.data();
-        empty_shader = true;
-    };
+        shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
+        shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
+        shader->markInitialized();
+    };        
 
-    if ( shader )
-    {
-        const int VERTEX_POS_SIZE = 2; // x, y
-        const int VERTEX_TEXCOORD0_SIZE = 2; // s and t
-        const int VERTEX_POS_INDX = 0;
-        const int VERTEX_TEXCOORD0_INDX = 1;
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glEnableVertexAttribArray(VERTEX_POS_INDX);
-        glEnableVertexAttribArray(VERTEX_TEXCOORD0_INDX);
+    shader->setTexture(0);
 
-        glVertexAttribPointer(VERTEX_POS_INDX, VERTEX_POS_SIZE, GL_FLOAT, GL_FALSE, 0, v_array);
-        glVertexAttribPointer(VERTEX_TEXCOORD0_INDX,VERTEX_TEXCOORD0_SIZE, GL_FLOAT,GL_FALSE, 0, tx_array);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT,m_indices_for_render_quads);
 
-        if (empty_shader)
-            m_textureColorProgram->bind();
-
-        shader->setModelViewProjectionMatrix(m_projectionMatrix*m_modelViewMatrix);
-
-        if (empty_shader)
-            m_textureColorProgram->setColor(m_color);
-        
-        if ( !shader->initialized() )
-        {
-            shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
-            shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
-            shader->markInitialized();
-        };        
-
-        if (empty_shader)
-            m_textureColorProgram->setTexture(0);
-
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT,m_indices_for_render_quads);
-        if (empty_shader)
-            m_textureColorProgram->release();
-        glCheckError("render");
-        //glDisableVertexAttribArray(VERTEX_TEXCOORD0_INDX);
-        //glDisableVertexAttribArray(VERTEX_POS_INDX);
-    }
+    shader->release();
+    glCheckError("render");
     
 }
 
