@@ -9,6 +9,7 @@
 
 #include "transaction/transaction_message_bus.h"
 #include "common/common_module.h"
+#include "managers/time_manager.h"
 #include "mutex/distributed_mutex.h"
 
 
@@ -32,6 +33,9 @@ namespace ec2
     {
         QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
         QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
+
+        //TODO #ak next call can be placed here just because we always have just one connection to EC
+        TimeSynchronizationManager::instance()->forgetSynchronizedTime();
     }
 
     QnConnectionInfo RemoteEC2Connection::connectionInfo() const

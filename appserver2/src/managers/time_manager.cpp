@@ -361,6 +361,19 @@ namespace ec2
         return m_monotonicClock.elapsed();
     }
 
+    void TimeSynchronizationManager::forgetSynchronizedTime()
+    {
+        QMutexLocker lk( &m_mutex );
+
+        m_localSystemTimeDelta = std::numeric_limits<qint64>::min();
+        m_systemTimeByPeer.clear();
+        m_timeSynchronized = false;
+        m_usedTimeSyncInfo = TimeSyncInfo(
+            0,
+            currentMSecsSinceEpoch(),
+            m_localTimePriorityKey );
+    }
+
     void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
         QMutexLocker* const lock,
         const QUuid& remotePeerID,
