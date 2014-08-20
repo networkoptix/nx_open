@@ -217,16 +217,8 @@ public:
         m_sizeUpperExtension = sizeUpperExtension;
 
         if (m_view) {
-            qreal logScale;
-            calculateRelativeScale(&logScale);
-
             updateExtendedSizeBounds();
             updateSceneRect();
-
-            if (logScale > m_defaultStickyLogScaleResettingThreshold && logScale <= 1.0) {
-                calculateRelativeScale(&logScale);
-                m_stickyLogScaleResettingThreshold = logScale;
-            }
         }
     }
 
@@ -275,20 +267,21 @@ public:
         //QTransform oldSceneToViewport = m_sceneToViewport;
 
         /* Correct. */
-        if(!qFuzzyCompare(m_view->viewportTransform(), m_sceneToViewport)) {
-            /* Calculate old scale. */
-            qreal logOldScale = 1.0;
-            if(m_isSizeCorrected)
-                calculateRelativeScale(&logOldScale);
 
-            /* Calculate fixed point. */
-            bool fixedPointExists;
-            QPoint fixedPoint = calculateFixedPoint(m_viewportToScene * m_view->viewportTransform(), &fixedPointExists).toPoint();
-            if(fixedPointExists && m_viewportRect.contains(fixedPoint))
-                m_fixedPoint = fixedPoint;
+        /* Calculate old scale. */
+        qreal logOldScale = 1.0;
+        if(m_isSizeCorrected)
+            calculateRelativeScale(&logOldScale);
 
-            updateParameters();
+        /* Calculate fixed point. */
+        bool fixedPointExists;
+        QPoint fixedPoint = calculateFixedPoint(m_viewportToScene * m_view->viewportTransform(), &fixedPointExists).toPoint();
+        if(fixedPointExists && m_viewportRect.contains(fixedPoint))
+            m_fixedPoint = fixedPoint;
 
+        updateParameters();
+
+        if (!qFuzzyCompare(m_view->viewportTransform(), m_sceneToViewport)) {
             /* Apply zoom correction. */
             if(m_isSizeCorrected) {
                 qreal logScale, powFactor;
@@ -317,8 +310,6 @@ public:
 
                 updateParameters();
             }
-        } else {
-            m_fixedPoint = m_viewportRect.center();
         }
 
         /* Enforce. */
@@ -327,11 +318,12 @@ public:
             if(m_isSizeEnforced) {
                 qreal logScale, powFactor;
                 calculateRelativeScale(&logScale, &powFactor);
+
                 qreal logDirection = calculateDistance(logScale, m_stickyLogScaleLo, m_stickyLogScaleHi);
                 qreal scaleSpeed = m_logScaleSpeed;
                 if (qFuzzyIsNull(logDirection)) {
-                    if (logScale >= m_stickyLogScaleResettingThreshold) {
-                        logDirection = 1 - logScale;
+                    if (logScale > m_stickyLogScaleResettingThreshold) {
+                        logDirection = 1.0 - logScale;
                         scaleSpeed *= m_logScaleResettingSpeedMultiplier;
                     }
                 }
@@ -370,14 +362,14 @@ public:
         }
 
         /* Adjust sticky scale if needed. */
-        if(stickyScaleDirty && (!qFuzzyCompare(m_stickyLogScaleHi, 1.0) || !qFuzzyCompare(m_stickyLogScaleLo, 1.0) ||
-                                !qFuzzyCompare(m_stickyLogScaleResettingThreshold, m_defaultStickyLogScaleResettingThreshold))) {
+        if (stickyScaleDirty && (!qFuzzyCompare(m_stickyLogScaleHi, 1.0) || !qFuzzyCompare(m_stickyLogScaleLo, 1.0))) {
             qreal logScale, powFactor;
             calculateRelativeScale(&logScale, &powFactor);
 
             m_stickyLogScaleLo = qMin(-1.0, qMax(logScale, m_stickyLogScaleLo));
             m_stickyLogScaleHi = qMax( 1.0, qMin(logScale, m_stickyLogScaleHi));
-            m_stickyLogScaleResettingThreshold = qMin(m_defaultStickyLogScaleResettingThreshold, qMax(logScale, m_stickyLogScaleResettingThreshold));
+            if (!qFuzzyCompare(logScale, m_stickyLogScaleResettingThreshold))
+                m_stickyLogScaleResettingThreshold = m_defaultStickyLogScaleResettingThreshold;
         }
 
         m_lastTickTime = time;
@@ -389,6 +381,7 @@ public:
 
         m_stickyLogScaleLo = qMin(-1.0, logScale);
         m_stickyLogScaleHi = qMax(1.0, logScale);
+        m_stickyLogScaleResettingThreshold = logScale;
     }
 
 protected:
@@ -403,18 +396,7 @@ protected:
     }
 
     QRectF calculateCenterPositionBounds() const {
-        MarginsF margins = cwiseMul(m_positionBoundsExtension - MarginsF(0.5, 0.5, 0.5, 0.5), m_sceneViewportRect.size());
-        QRectF fullRect = truncated(dilated(m_positionBounds, margins));
-
-        QSizeF preferredRectSize = eroded(m_sceneViewportRect.size(), margins);
-        QSizeF sizeDiff = m_positionBounds.size() - preferredRectSize;
-        if (sizeDiff.height() < 0)
-            sizeDiff.setHeight(0);
-        if (sizeDiff.width() < 0)
-            sizeDiff.setWidth(0);
-
-        QPointF center = fullRect.center();
-        return QRectF(QPointF(center.x() - sizeDiff.width() / 2, center.y() - sizeDiff.height() / 2), sizeDiff);
+        return truncated(dilated(m_positionBounds, cwiseMul(m_positionBoundsExtension - MarginsF(0.5, 0.5, 0.5, 0.5), m_sceneViewportRect.size())));
     }
 
     /**
