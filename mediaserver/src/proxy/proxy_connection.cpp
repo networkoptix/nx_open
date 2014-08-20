@@ -4,7 +4,10 @@
 #include <QUrl>
 #include <QUrlQuery>
 
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 #include <utils/common/log.h>
+#include <utils/common/string.h>
 #include <utils/common/systemerror.h>
 #include "utils/network/compat_poll.h"
 #include "utils/network/tcp_listener.h"
@@ -100,7 +103,7 @@ static bool isLocalAddress(const QString& addr)
 QString QnProxyConnectionProcessor::connectToRemoteHost(const QString& guid, const QUrl& url)
 {
     Q_D(QnProxyConnectionProcessor);
-    d->dstSocket = (dynamic_cast<QnUniversalTcpListener*> (d->owner))->getProxySocket(guid, CONNECT_TIMEOUT);
+    d->dstSocket = (static_cast<QnUniversalTcpListener*> (d->owner))->getProxySocket(guid, CONNECT_TIMEOUT);
     if (!d->dstSocket) {
 
 #ifdef PROXY_STRICT_IP
@@ -229,6 +232,11 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
                     dstUrl.setHost(route.points.first().host);
                     dstUrl.setPort(route.points.first().port);
                 }
+            }
+            else
+            {
+                dstUrl.setHost( route.points.front().host );
+                dstUrl.setPort( route.points.front().port );
             }
         }
     }

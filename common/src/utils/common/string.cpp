@@ -333,3 +333,23 @@ void naturalStringCompareTest() {
     naturalStringCompareTestCase(lit("admin"), lit("admin1"), -1);
     naturalStringCompareTestCase(lit("20nov.nov"), lit("14exe_x64_read_only.exe"), 1);
 }
+
+void trimInPlace( QString* const str, const QString& symbols )
+{
+    int startPos = 0;
+    for( ; startPos < str->size(); ++startPos )
+    {
+        if( !symbols.contains( str->at( startPos ) ) )
+            break;
+    }
+
+    int endPos = str->size() - 1;
+    for( ; endPos >= 0; --endPos )
+    {
+        if( !symbols.contains( str->at( endPos ) ) )
+            break;
+    }
+    ++endPos;
+
+    *str = str->mid( startPos, endPos > startPos ? (endPos - startPos) : 0 );
+}

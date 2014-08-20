@@ -148,21 +148,22 @@ namespace ec2
     //   TimeSynchronizationManager
     //////////////////////////////////////////////
     static TimeSynchronizationManager* TimeManager_instance = nullptr;
-#ifdef TEST_PTS_SELECTION
-    static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10 * 1000;
-    static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10 * 1000;
+
+#ifdef _DEBUG
+    static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*1000;
+    static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 60*1000;
+    static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 30;
 #else
     static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*60*1000;
     //!Once per 10 minutes checking if manual time server selection is required
-    static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10 * 60 * 1000;
-#endif
-
+    static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10*60*1000;
     //!Accurate time is fetched from internet with this period
     static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 600;
+#endif
     //!If time synchronization with internet failes, period is multiplied on this value, but it cannot exceed \a MAX_PUBLIC_SYNC_TIME_PERIOD_SEC
     static const size_t INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF = 2;
     static const size_t MAX_INTERNET_SYNC_TIME_PERIOD_SEC = 24*60*60;
-    static const size_t INTERNET_TIME_EXPIRATION_PERIOD_SEC = 7*24*60*60;   //one week
+    //static const size_t INTERNET_TIME_EXPIRATION_PERIOD_SEC = 7*24*60*60;   //one week
     static const size_t MILLIS_PER_SEC = 1000;
     //!Considering internet time equal to local time if difference is no more than this value
     static const qint64 MAX_LOCAL_SYSTEM_TIME_DRIFT = 10*1000;
@@ -184,7 +185,10 @@ namespace ec2
 #ifndef EDGE_SERVER
         m_localTimePriorityKey.flags |= peerIsNotEdgeServer;
 #endif
-        m_localTimePriorityKey.seed = (rand() | (rand() * RAND_MAX)) + 1;
+        for( int i = 0; (m_localTimePriorityKey.seed == 0) && (i < 3); ++i )
+            m_localTimePriorityKey.seed = (rand() | (rand() * RAND_MAX));
+        if( m_localTimePriorityKey.seed == 0 )
+            m_localTimePriorityKey.seed = rand() + 1;
         //TODO #ak handle priority key duplicates or use guid?
         if( QElapsedTimer::isMonotonic() )
             m_localTimePriorityKey.flags |= peerHasMonotonicClock;
@@ -218,6 +222,7 @@ namespace ec2
             m_internetSynchronizationTaskID = TimerManager::instance()->addTimer(
                 std::bind( &TimeSynchronizationManager::syncTimeWithInternet, this, _1 ),
                 0 );
+            NX_LOG( lit( "TimeSynchronizationManager. Added time sync task %1, delay %2" ).arg( m_internetSynchronizationTaskID ).arg( m_internetTimeSynchronizationPeriod * MILLIS_PER_SEC ), cl_logDEBUG2 );
         }
         else
             m_manualTimerServerSelectionCheckTaskID = TimerManager::instance()->addTimer(
@@ -373,7 +378,7 @@ namespace ec2
         //if there is new maximum remotePeerTimePriorityKey than updating delta and emitting timeChanged
         if( remotePeerTimePriorityKey > m_usedTimeSyncInfo.timePriorityKey )
         {
-            NX_LOG( lit("Received sync time update from peer %1, peer's sync time (%2), peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5. Acceping peer's synchronized time").
+            NX_LOG( lit("Received sync time update from peer %1, peer's sync time (%2), peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5. Accepting peer's synchronized time").
                 arg( remotePeerID.toString() ).arg( QDateTime::fromMSecsSinceEpoch( remotePeerSyncTime ).toString( Qt::ISODate ) ).
                 arg( remotePeerTimePriorityKey.toUInt64(), 0, 16 ).arg( qnCommon->moduleGUID().toString() ).
                 arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logWARNING );
@@ -496,8 +501,10 @@ namespace ec2
         }
     }
 
-    void TimeSynchronizationManager::syncTimeWithInternet( quint64 /*taskID*/ )
+    void TimeSynchronizationManager::syncTimeWithInternet( quint64 taskID )
     {
+        NX_LOG( lit( "TimeSynchronizationManager::syncTimeWithInternet. taskID %1" ).arg( taskID ), cl_logDEBUG2 );
+
         {
             QMutexLocker lk( &m_mutex );
 
@@ -510,7 +517,16 @@ namespace ec2
 
         //synchronizing with some internet server
         using namespace std::placeholders;
-        m_timeSynchronizer.getTimeAsync( std::bind( &TimeSynchronizationManager::onTimeFetchingDone, this, _1, _2 ) );
+        if( !m_timeSynchronizer.getTimeAsync( std::bind( &TimeSynchronizationManager::onTimeFetchingDone, this, _1, _2 ) ) )
+        {
+            NX_LOG( lit( "Failed to start internet time synchronization. %1" ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+            //failure
+            m_internetTimeSynchronizationPeriod = std::min<>(
+                m_internetTimeSynchronizationPeriod * INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF,
+                MAX_INTERNET_SYNC_TIME_PERIOD_SEC );
+
+            addInternetTimeSynchronizationTask();
+        }
     }
 
     void TimeSynchronizationManager::onTimeFetchingDone( qint64 millisFromEpoch, SystemError::ErrorCode errorCode )
@@ -556,10 +572,18 @@ namespace ec2
                 MAX_INTERNET_SYNC_TIME_PERIOD_SEC );
         }
 
+        addInternetTimeSynchronizationTask();
+    }
+
+    void TimeSynchronizationManager::addInternetTimeSynchronizationTask()
+    {
+        assert( m_internetSynchronizationTaskID == 0 );
+
         using namespace std::placeholders;
         m_internetSynchronizationTaskID = TimerManager::instance()->addTimer(
             std::bind( &TimeSynchronizationManager::syncTimeWithInternet, this, _1 ),
             m_internetTimeSynchronizationPeriod * MILLIS_PER_SEC );
+        NX_LOG( lit( "TimeSynchronizationManager. Added time sync task %1, delay %2" ).arg( m_internetSynchronizationTaskID ).arg( m_internetTimeSynchronizationPeriod * MILLIS_PER_SEC ), cl_logDEBUG2 );
     }
 
     qint64 TimeSynchronizationManager::currentMSecsSinceEpoch() const
@@ -586,6 +610,8 @@ namespace ec2
                 TimeSyncInfo remotePeerTimeSyncInfo;
                 if( !remotePeerTimeSyncInfo.fromString( extension.second ) )
                     continue;
+
+                assert( remotePeerTimeSyncInfo.timePriorityKey.seed > 0 );
         
                 QMutexLocker lk( &m_mutex );
                 remotePeerTimeSyncUpdate(

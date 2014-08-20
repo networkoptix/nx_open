@@ -9,6 +9,9 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QUuid>
 
+#include <QNetworkReply>
+
+
 class QnRequestParam: public QPair<QString, QString> {
     typedef QPair<QString, QString> base_type;
 public:
@@ -76,18 +79,21 @@ typedef QHash<QString, QString> QnRequestParams;
 struct QnHTTPRawResponse
 {
     QnHTTPRawResponse()
+    :
+    status( QNetworkReply::NoError )
     {
     }
 
-    QnHTTPRawResponse(int status, const QnReplyHeaderList &headers, const QByteArray &data, const QByteArray &errorString)
-        : status(status),
-          headers(headers),
-          data(data),
-          errorString(errorString)
+    QnHTTPRawResponse( QNetworkReply::NetworkError status, const QnReplyHeaderList &headers, const QByteArray &data, const QByteArray &errorString )
+    :
+        status(status),
+        headers(headers),
+        data(data),
+        errorString(errorString)
     {
     }
 
-    int status;
+    QNetworkReply::NetworkError status;
     QnReplyHeaderList headers;
     QByteArray data;
     QByteArray errorString;

@@ -62,8 +62,10 @@ QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, QObject *par
     m_rootNodeTypes << Qn::LocalNode << Qn::UsersNode << Qn::ServersNode << Qn::OtherSystemsNode << Qn::RootNode << Qn::BastardNode;
 
     /* Create top-level nodes. */
-    foreach(Qn::NodeType t, m_rootNodeTypes)
+    foreach(Qn::NodeType t, m_rootNodeTypes) {
         m_rootNodes[t] = new QnResourcePoolModelNode(this, t);
+        m_allNodes.append(m_rootNodes[t]);
+    }
 
     Qn::NodeType parentNodeType = rootNodeType == Qn::RootNode ? Qn::RootNode : Qn::BastardNode;
     foreach(Qn::NodeType t, m_rootNodeTypes)
@@ -94,6 +96,10 @@ QnResourcePoolModel::~QnResourcePoolModel() {
     disconnect(resourcePool(), NULL, this, NULL);
     disconnect(snapshotManager(), NULL, this, NULL);
 
+    /* Make sure all nodes will have their parent empty. */
+    foreach(QnResourcePoolModelNode* node, m_allNodes)
+        node->clear();
+
     /* Free memory. */
     qDeleteAll(m_resourceNodeByResource);
     qDeleteAll(m_itemNodeByUuid);
@@ -122,6 +128,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
             nodeType = Qn::EdgeNode;
 
         pos = m_resourceNodeByResource.insert(resource, new QnResourcePoolModelNode(this, resource, nodeType));
+        m_allNodes.append(*pos);
     }
     return *pos;
 }
@@ -131,6 +138,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(Qn::NodeType nodeType, const 
     if (!m_nodes[nodeType].contains(key)) {
         QnResourcePoolModelNode* node = new QnResourcePoolModelNode(this, uuid, nodeType);
         m_nodes[nodeType].insert(key, node);
+        m_allNodes.append(node);
         return node;
     }
     return m_nodes[nodeType][key];
@@ -138,8 +146,10 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(Qn::NodeType nodeType, const 
 
 QnResourcePoolModelNode *QnResourcePoolModel::node(const QUuid &uuid) {
     QHash<QUuid, QnResourcePoolModelNode *>::iterator pos = m_itemNodeByUuid.find(uuid);
-    if(pos == m_itemNodeByUuid.end())
+    if(pos == m_itemNodeByUuid.end()) {
         pos = m_itemNodeByUuid.insert(uuid, new QnResourcePoolModelNode(this, uuid));
+        m_allNodes.append(*pos);
+    }
     return *pos;
 }
 
@@ -157,6 +167,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
     QnResourcePoolModelNode* recorder = new QnResourcePoolModelNode(this, Qn::RecorderNode, groupName);
     recorder->setParent(m_resourceNodeByResource[resource]);
     m_recorderHashByResource[resource][groupId] = recorder;
+    m_allNodes.append(recorder);
     return recorder;
 }
 
@@ -168,14 +179,15 @@ QnResourcePoolModelNode *QnResourcePoolModel::systemNode(const QString &systemNa
     node = new QnResourcePoolModelNode(this, Qn::SystemNode, systemName);
     node->setParent(m_rootNodes[Qn::OtherSystemsNode]);
     m_systemNodeBySystemName[systemName] = node;
+    m_allNodes.append(node);
     return node;
 }
 
-void QnResourcePoolModel::deleteNode(QnResourcePoolModelNode *node) {
+void QnResourcePoolModel::removeNode(QnResourcePoolModelNode *node) {
     switch(node->type()) {
     case Qn::VideoWallItemNode:
     case Qn::VideoWallMatrixNode:
-        deleteNode(node->type(), node->uuid(), node->resource());
+        removeNode(node->type(), node->uuid(), node->resource());
         return;
 
     case Qn::ResourceNode:
@@ -192,15 +204,25 @@ void QnResourcePoolModel::deleteNode(QnResourcePoolModelNode *node) {
         assert(false); //should never come here
     }
 
-    delete node;
+    deleteNode(node);
 }
 
-void QnResourcePoolModel::deleteNode(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource) {
+void QnResourcePoolModel::removeNode(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource) {
     NodeKey key(resource, uuid);
     if (!m_nodes[nodeType].contains(key))
         return;
 
-    delete m_nodes[nodeType].take(key);
+    deleteNode(m_nodes[nodeType].take(key));
+}
+
+void QnResourcePoolModel::deleteNode(QnResourcePoolModelNode *node) {
+    Q_ASSERT(m_allNodes.contains(node));
+    m_allNodes.removeOne(node);
+    foreach (QnResourcePoolModelNode* existing, m_allNodes)
+        if (existing->parent() == node)
+            existing->setParent(NULL);
+
+    delete node;
 }
 
 QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModelNode *node) {
@@ -557,7 +579,7 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
     QnResourcePoolModelNode *node = m_resourceNodeByResource.take(resource);
     QnResourcePoolModelNode *parent = node->parent();
 
-    delete node;
+    deleteNode(node);
 
     if (parent)
         parent->update();
@@ -617,7 +639,7 @@ void QnResourcePoolModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout,
 }
 
 void QnResourcePoolModel::at_layout_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &item) {
-    deleteNode(node(item.uuid));
+    removeNode(node(item.uuid));
 }
 
 void QnResourcePoolModel::at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
@@ -636,7 +658,7 @@ void QnResourcePoolModel::at_videoWall_itemAddedOrChanged(const QnVideoWallResou
 
 void QnResourcePoolModel::at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     Q_UNUSED(videoWall)
-    deleteNode(Qn::VideoWallItemNode, item.uuid, videoWall);
+    removeNode(Qn::VideoWallItemNode, item.uuid, videoWall);
 }
 
 void QnResourcePoolModel::at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix) {
@@ -650,7 +672,7 @@ void QnResourcePoolModel::at_videoWall_matrixAddedOrChanged(const QnVideoWallRes
 
 void QnResourcePoolModel::at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix) {
     Q_UNUSED(videoWall)
-    deleteNode(Qn::VideoWallMatrixNode, matrix.uuid, videoWall);
+    removeNode(Qn::VideoWallMatrixNode, matrix.uuid, videoWall);
 }
 
 void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera) {

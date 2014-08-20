@@ -8,6 +8,7 @@
 #include <sys/timeb.h>
 #include <sys/types.h>
 
+#include "utils/common/log.h"
 #include "utils/network/socket_factory.h"
 
 
@@ -21,8 +22,6 @@ static const int MILLIS_PER_SEC = 1000;
 static const int SEC_PER_MIN = 60;
 
 DaytimeNISTFetcher::DaytimeNISTFetcher()
-:
-    m_readBufferSize( 0 )
 {
     m_timeStr.reserve( MAX_TIME_STR_LENGTH );
 }
@@ -48,7 +47,9 @@ void DaytimeNISTFetcher::join()
 
 bool DaytimeNISTFetcher::getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc )
 {
-    m_readBufferSize = 0;
+    NX_LOG( lit( "NIST time_sync. Starting time synchronization with NIST server %1:%2" ).arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ), cl_logDEBUG2 );
+
+    assert( !m_tcpSock.get() );
 
     m_tcpSock.reset( SocketFactory::createStreamSocket( false, SocketFactory::nttDisabled ) );
     if( !m_tcpSock )
@@ -73,8 +74,12 @@ bool DaytimeNISTFetcher::getTimeAsync( std::function<void(qint64, SystemError::E
             SocketAddress( HostAddress( QLatin1String( DEFAULT_NIST_SERVER ) ), DAYTIME_PROTOCOL_DEFAULT_PORT ),
             std::bind( &DaytimeNISTFetcher::onConnectionEstablished, this, _1 ) ) )
     {
+        const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
+        NX_LOG( lit( "NIST time_sync. Failed to start async connect (2) from %1:%2. %3" ).
+            arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG2 );
         m_handlerFunc = std::function<void( qint64, SystemError::ErrorCode )>();
         m_tcpSock.reset();
+        SystemError::setLastErrorCode( errorCode );
         return false;
     }
 
@@ -117,6 +122,9 @@ static qint64 actsTimeToUTCMillis( const char* actsStr )
 
 void DaytimeNISTFetcher::onConnectionEstablished( SystemError::ErrorCode errorCode ) noexcept
 {
+    NX_LOG( lit( "NIST time_sync. Connection to NIST server %1:%2 completed with following result: %3" ).
+        arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ).arg(SystemError::toString(errorCode)), cl_logDEBUG2 );
+
     if( errorCode )
     {
         m_handlerFunc( -1, errorCode );
@@ -129,50 +137,67 @@ void DaytimeNISTFetcher::onConnectionEstablished( SystemError::ErrorCode errorCo
     using namespace std::placeholders;
     if( !m_tcpSock->readSomeAsync( &m_timeStr, std::bind( &DaytimeNISTFetcher::onSomeBytesRead, this, _1, _2 ) ) )
     {
-        m_tcpSock.reset();
-        m_handlerFunc( -1, SystemError::getLastOSErrorCode() );
+        const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
+        NX_LOG( lit( "NIST time_sync. Failed to start async read (1) from %1:%2. %3" ).
+            arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG2 );
+        m_handlerFunc( -1, errorCode );
     }
 }
 
 void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead ) noexcept
 {
-    auto scoped_guard_func = [this]( DaytimeNISTFetcher * ) { m_tcpSock.reset(); };
-    std::unique_ptr<DaytimeNISTFetcher, decltype(scoped_guard_func)> scopedTcpSocketDeleter( this, scoped_guard_func );
-
     if( errorCode )
     {
+        NX_LOG( lit( "NIST time_sync. Failed to read from NIST server %1:%2. %3" ).
+            arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
+
         if( errorCode == SystemError::timedOut && m_timeStr.size() > 0 )
         {
             //no response during the allotted time period
             //processing what we have
             assert( m_timeStr.size() < m_timeStr.capacity() );
             if( m_timeStr.isEmpty() )
+            {
                 m_handlerFunc( -1, SystemError::notConnected );
+                return;
+            }
             m_timeStr.append( '\0' );
             m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
+            return;
         }
-        else
-        {
-            m_handlerFunc( -1, errorCode );
-        }
+        m_handlerFunc( -1, errorCode );
         return;
     }
 
     if( bytesRead == 0 )
     {
+        NX_LOG( lit( "NIST time_sync. Connection to NIST server %1:%2 closed. Read text %3" ).
+            arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ).arg( QLatin1String(m_timeStr.trimmed()) ), cl_logDEBUG2 );
+
         //connection closed, analyzing what we have
         assert( m_timeStr.size() < m_timeStr.capacity() );
         if( m_timeStr.isEmpty() )
+        {
             m_handlerFunc( -1, SystemError::notConnected );
+            return;
+        }
         m_timeStr.append( '\0' );
         m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
         return;
     }
+    else
+    {
+        NX_LOG( lit( "NIST time_sync. Read %1 bytes from NIST server %2:%3" ).
+            arg( bytesRead ).arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ), cl_logDEBUG2 );
+    }
 
     if( m_timeStr.size() == m_timeStr.capacity() )
     {
+        NX_LOG( lit( "NIST time_sync. Read maximum from NIST server %1:%2: %3" ).
+            arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ).arg( QLatin1String( m_timeStr.trimmed() ) ), cl_logDEBUG1 );
+
         //max data size has been read, ignoring futher data
-        m_tcpSock->close();
+        m_tcpSock.reset();
         m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
         return;
     }
@@ -180,7 +205,10 @@ void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size
     //reading futher data
     using namespace std::placeholders;
     if( !m_tcpSock->readSomeAsync( &m_timeStr, std::bind( &DaytimeNISTFetcher::onSomeBytesRead, this, _1, _2 ) ) )
-        m_handlerFunc( -1, SystemError::getLastOSErrorCode() );
-    else
-        scopedTcpSocketDeleter.release();
+    {
+        const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
+        NX_LOG( lit( "NIST time_sync. Failed to start async read (2) from %1:%2. %3" ).
+            arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG2 );
+        m_handlerFunc( -1, errorCode );
+    }
 }

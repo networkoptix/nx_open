@@ -2,6 +2,7 @@
 
 #include <utils/network/tcp_connection_priv.h>
 #include <utils/network/module_information.h>
+#include <utils/network/networkoptixmodulerevealcommon.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -17,7 +18,7 @@ int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequ
         return CODE_INTERNAL_ERROR;
 
     QnModuleInformation moduleInformation;
-    moduleInformation.type = lit("Media Server");
+    moduleInformation.type = nxMediaServerId;
     moduleInformation.customization = lit(QN_CUSTOMIZATION_NAME);
     moduleInformation.version = qnCommon->engineVersion();
     moduleInformation.systemInformation = QnSystemInformation::currentSystemInformation();

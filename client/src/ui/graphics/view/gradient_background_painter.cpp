@@ -171,31 +171,18 @@ void QnGradientBackgroundPainter::drawLayer(QPainter *painter, const QRectF &rec
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
-        QMatrix4x4 m = QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix();
+        QMatrix4x4 m = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix();
 
         //glPushMatrix();
 
-        //qDebug()<<"model_view 1"<<QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix();
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().translate(center1.x(), center1.y());
-        //qDebug()<<"model_view translate"<<center1.x() <<center1.y()<<QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix();
-        //glTranslate(center1);
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().scale(radius, radius);
-        //qDebug()<<"model_view 3 scale"<<radius<<QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix();
-        //glScale(radius, radius);
+        const int circlesCount = 2;
+        const qreal distance = (center2.x() - center1.x()) / (circlesCount - 1);
+        for (int step = 0; step < circlesCount; ++step) {
+            QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix().translate(center1.x() + step * distance, center1.y());
+            QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix().scale(radius, radius);
             m_gradientPainter->paint(color);
-        //glPopMatrix();
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix() = m;
-
-        //glPushMatrix();
-        
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().translate(center2.x(), center2.y());
-        //glTranslate(center2);
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().scale(radius, radius);
-        //glScale(radius, radius);
-            m_gradientPainter->paint(color);
-
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix() = m;
-        //glPopMatrix();
+            QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix() = m;
+        }
 
             glDisable(GL_BLEND);
             //glPopAttrib();

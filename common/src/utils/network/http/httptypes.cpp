@@ -894,7 +894,14 @@ namespace nx_http
                     {
                         if( extSepPos == extNameStart )
                             return -1;  //empty extension
-                        extensions.push_back( std::make_pair( BufferType(extNameStart, extSepPos-extNameStart), BufferType(extValStart, curPos-extValStart) ) );
+
+                        if( *extValStart == '"' )
+                            ++extValStart;
+                        int extValSize = curPos - extValStart;
+                        if( extValSize > 0 && *(extValStart + extValSize - 1) == '"' )
+                            --extValSize;
+
+                        extensions.push_back( std::make_pair( BufferType( extNameStart, extSepPos - extNameStart ), BufferType( extValStart, extValSize ) ) );
                     }
 
                     state = readingExtName;
@@ -926,7 +933,14 @@ namespace nx_http
                     {
                         if( extSepPos == extNameStart )
                             return -1;  //empty extension
-                        extensions.push_back( std::make_pair( BufferType(extNameStart, extSepPos-extNameStart), BufferType(extValStart, curPos-extValStart) ) );
+
+                        if( *extValStart == '"' )
+                            ++extValStart;
+                        int extValSize = curPos - extValStart;
+                        if( extValSize > 0 && *(extValStart + extValSize - 1) == '"' )
+                            --extValSize;
+
+                        extensions.push_back( std::make_pair( BufferType( extNameStart, extSepPos - extNameStart ), BufferType( extValStart, extValSize ) ) );
                     }
 
                     if( (dataEnd - curPos < 2) || *(curPos+1) != '\n' )

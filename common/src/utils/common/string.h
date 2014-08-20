@@ -69,6 +69,7 @@ QString extractFileExtension(const QString &string);
 /** Returns string formed as "baseValue<spacer>(n)" that is not contained in the usedValues list. */
 QString generateUniqueString(const QStringList &usedStrings, const QString &defaultString, const QString &templateString);
 
+void trimInPlace( QString* const str, const QString& symbols = QLatin1String(" ") );
+
 
 #endif // QN_STRING_H
-

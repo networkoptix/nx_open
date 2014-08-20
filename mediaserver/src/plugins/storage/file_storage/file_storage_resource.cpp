@@ -15,10 +15,14 @@
 #include <media_server/settings.h>
 #include <recorder/storage_manager.h>
 
+#ifdef WIN32
+#pragma comment(lib, "mpr.lib")
+#endif
 
 QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
     QString fileName = removeProtocolPrefix(url);
+
     int ioBlockSize = 0;
     int ffmpegBufferSize = 0;
 
@@ -36,6 +40,27 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
     if (!rez->open(openMode))
         return 0;
     return rez.release();
+}
+
+void QnFileStorageResource::setUrl(const QString& url)
+{
+    QnStorageResource::setUrl(url);
+
+#ifdef WIN32
+    QUrl storageUrl(getUrl());
+    QString path = storageUrl.path().mid((1));
+    if (path.startsWith("\\\\") && !storageUrl.userName().isEmpty())
+    {
+        NETRESOURCE netRes;
+        memset(&netRes, 0, sizeof(netRes));
+        netRes.dwType = RESOURCETYPE_DISK;
+        netRes.lpRemoteName = (LPWSTR) path.constData();
+        LPWSTR password = (LPWSTR) storageUrl.password().constData();
+        LPWSTR user = (LPWSTR) storageUrl.userName().constData();
+        WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0);
+        //WNetUseConnection(0, &netRes, L"qweasd123", L"root", 0, 0, 0, 0);
+    }
+#endif
 }
 
 QnFileStorageResource::QnFileStorageResource():
@@ -91,12 +116,12 @@ bool QnFileStorageResource::isFileExists(const QString& url)
 
 qint64 QnFileStorageResource::getFreeSpace()
 {
-    return getDiskFreeSpace(removeProtocolPrefix(getUrl()));
+    return getDiskFreeSpace(getPath());
 }
 
 qint64 QnFileStorageResource::getTotalSpace()
 {
-    return getDiskTotalSpace(removeProtocolPrefix(getUrl()));
+    return getDiskTotalSpace(getPath());
 }
 
 QFileInfoList QnFileStorageResource::getFileList(const QString& dirName)
@@ -118,17 +143,17 @@ bool QnFileStorageResource::isStorageAvailableForWriting()
     if (hasFlags(Qn::deprecated))
         return false;
 
-    QDir dir(getUrl());
+    QDir dir(getPath());
 
     bool needRemoveDir = false;
     if (!dir.exists())
     {
-        if (!dir.mkpath(getUrl()))
+        if (!dir.mkpath(getPath()))
             return false;
         needRemoveDir = true;
     }
 
-    QFile file(closeDirPath(getUrl()) + QString("tmp") + QString::number((unsigned) ((rand() << 16) + rand())));
+    QFile file(closeDirPath(getPath()) + QString("tmp") + QString::number((unsigned) ((rand() << 16) + rand())));
     bool result = file.open(QFile::WriteOnly);
     if (result)
     {
@@ -137,7 +162,7 @@ bool QnFileStorageResource::isStorageAvailableForWriting()
     }
 
     if (needRemoveDir)
-        dir.remove(getUrl());
+        dir.remove(getPath());
 
     return result;
 }
@@ -147,7 +172,7 @@ bool QnFileStorageResource::isStorageAvailable()
     if( !isStorageDirMounted() )
         return false;
 
-    QString tmpDir = closeDirPath(getUrl()) + QString("tmp") + QString::number(rand());
+    QString tmpDir = closeDirPath(getPath()) + QString("tmp") + QString::number(rand());
     QDir dir(tmpDir);
     if (dir.exists()) {
         dir.remove(tmpDir);
@@ -194,13 +219,13 @@ QnStorageResource* QnFileStorageResource::instance()
 
 float QnFileStorageResource::getAvarageWritingUsage() const
 {
-    QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getUrl());
+    QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getPath());
     return writer ? writer->getAvarageUsage() : 0;
 }
 
 void QnFileStorageResource::setStorageBitrateCoeff(float value)
 {
-    qDebug() << "QnFileStorageResource " << getUrl() << "coeff " << value;
+    qDebug() << "QnFileStorageResource " << getPath() << "coeff " << value;
     m_storageBitrateCoeff = value;
 }
 
@@ -249,7 +274,7 @@ static bool readTabFile( const QString& filePath, QStringList* const mountPoints
 bool QnFileStorageResource::isStorageDirMounted()
 {
     //on unix, checking that storage directory is mounted, if it is to be mounted
-    const QString& storagePath = QDir(closeDirPath(getUrl())).canonicalPath();   //following symbolic link
+    const QString& storagePath = QDir(closeDirPath(getPath())).canonicalPath();   //following symbolic link
 
     QStringList mountPoints;
     if( !readTabFile( lit("/etc/fstab"), &mountPoints ) )

@@ -8,6 +8,8 @@
 #include <core/resource/media_server_resource.h>
 
 #include <api/media_server_connection.h>
+#include "common/common_module.h"
+#include "api/runtime_info_manager.h"
 
 QnStorageUrlDialog::QnStorageUrlDialog(const QnMediaServerResourcePtr &server, QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
@@ -47,9 +49,36 @@ QnStorageSpaceData QnStorageUrlDialog::storage() const {
     return m_storage;
 }
 
-void QnStorageUrlDialog::accept() {
+QString QnStorageUrlDialog::normalizePath(QString path) {
+    QString separator = lit("/");
+    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->item(m_server->getId()).data;
+    if (data.platform.toLower() == lit("windows"))
+        separator = lit("\\");
+    QString result = path.replace(L'/', separator);
+    result = path.replace(L'\\', separator);
+    if (result.endsWith(separator))
+        result.chop(1);
+    return result;
+}
+
+QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, const QString& password)
+{
+    if (login.isEmpty()) {
+        return normalizePath(path);
+    }
+    else {
+        QUrl url = QString(lit("file:///%1")).arg(normalizePath(path));
+        url.setUserName(login);
+        url.setPassword(password);
+        return url.toString();
+    }
+}
+
+void QnStorageUrlDialog::accept() 
+{
     QnConnectionRequestResult result;
-    m_server->apiConnection()->getStorageStatusAsync(ui->urlEdit->text(), &result, SLOT(processReply(int, const QVariant &, int)));
+    QString url = makeUrl(ui->urlEdit->text(), ui->loginLineEdit->text(), ui->passwordLineEdit->text());
+    m_server->apiConnection()->getStorageStatusAsync(url,  &result, SLOT(processReply(int, const QVariant &, int)));
 
     QEventLoop loop;
     connect(&result, SIGNAL(replyProcessed()), &loop, SLOT(quit()));

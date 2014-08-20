@@ -38,7 +38,6 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_tcpSock;
     QByteArray m_timeStr;
     std::function<void(qint64, SystemError::ErrorCode)> m_handlerFunc;
-    int m_readBufferSize;
 
     void onConnectionEstablished( SystemError::ErrorCode errorCode ) noexcept;
     void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead ) noexcept;

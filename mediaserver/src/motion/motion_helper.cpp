@@ -112,10 +112,12 @@ QnMotionHelper* QnMotionHelper::instance()
 
 QString QnMotionHelper::getBaseDir(const QString& cameraUniqueId)
 {
+    QString base = closeDirPath(getDataDirectory());
+    QString separator = getPathSeparator(base);
 #ifdef _TEST_TWO_SERVERS
-    return closeDirPath(getDataDirectory()) + QString("test/record_catalog/metadata/") + cameraUniqueId + L'/';
+    return base + QString("test%1record_catalog%2metadata%3").arg(separator).arg(separator).arg(separator) + cameraUniqueId + separator;
 #else
-    return closeDirPath(getDataDirectory()) + QString("record_catalog/metadata/") + cameraUniqueId + L'/';
+    return base + QString("record_catalog%1metadata%2").arg(separator).arg(separator) + cameraUniqueId + separator;
 #endif
 }
 

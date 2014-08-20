@@ -2,18 +2,14 @@
 #include "caching_proxy_widget.h"
 
 #include <cassert>
-//#ifdef Q_OS_MACX
-//#include <Glu.h>
-//#else
-//#include <GL/glu.h>
-//#endif
-//#define GL_GLEXT_PROTOTYPES 1
+
 #include <QtGui/qopengl.h>
 
 #include <QtCore/QEvent>
 #include <QtCore/QSysInfo>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
+#include <ui/graphics/opengl/gl_buffer_stream.h>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -27,7 +23,8 @@ CachingProxyWidget::CachingProxyWidget(QGraphicsItem *parent, Qt::WindowFlags wi
     QGraphicsProxyWidget(parent, windowFlags),
     m_maxTextureSize(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE)),
     m_texture(0),
-    m_wholeTextureDirty(true)
+    m_wholeTextureDirty(true),
+    m_initialized(false)
 {}
 
 CachingProxyWidget::~CachingProxyWidget() {
@@ -73,44 +70,100 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
     if (exposedWidgetRect.isEmpty())
         return;
 
-    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
-    //glPushAttrib(GL_COLOR_BUFFER_BIT | GL_TEXTURE_BIT);
-
-    ensureTextureSynchronized();
-
-    //Deprecated in OpenGL ES2.0
-    //glEnable(GL_TEXTURE_2D);
-//    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); /* For opacity to work. */
-
-    glBindTexture(GL_TEXTURE_2D, m_texture);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     QRectF vertexRect = this->rect();
     QRectF textureRect = QRectF(
         QPointF(0.0, 0.0),
         QnGeometry::cwiseDiv(vertexRect.size(), m_image.size())
-    );
+        );
 
-    QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(QVector4D(1.0f, 1.0f, 1.0f, effectiveOpacity()));
-    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawBindedTextureOnQuad(rect(),QnGeometry::cwiseDiv(vertexRect.size(), m_image.size()));
- /*   glBegin(GL_QUADS);
-    glColor(1.0, 1.0, 1.0, effectiveOpacity());
-    glTexCoord(textureRect.topLeft());
-    glVertex(vertexRect.topLeft());
-    glTexCoord(textureRect.topRight());
-    glVertex(vertexRect.topRight());
-    glTexCoord(textureRect.bottomRight());
-    glVertex(vertexRect.bottomRight());
-    glTexCoord(textureRect.bottomLeft());
-    glVertex(vertexRect.bottomLeft());
-    glEnd();*/
+    GLfloat vertices[] = {
+        (GLfloat)vertexRect.left(),   (GLfloat)vertexRect.top(),
+        (GLfloat)vertexRect.right(),  (GLfloat)vertexRect.top(),
+        (GLfloat)vertexRect.right(),  (GLfloat)vertexRect.bottom(),
+        (GLfloat)vertexRect.left(),   (GLfloat)vertexRect.bottom()
+    };
+
+    QSizeF size = QnGeometry::cwiseDiv(vertexRect.size(), m_image.size());
+    GLfloat texCoords[] = {
+        0.0, 0.0,
+        (GLfloat)size.width(), 0.0,
+        (GLfloat)size.width(), (GLfloat)size.height(),
+        0.0, (GLfloat)size.height()
+    };
+
+    QByteArray data, texData;
+    QnGlBufferStream<GLfloat> vertexStream(&data), texStream(&texData);
+
+    for(int i = 0; i < 8; i++) {
+        vertexStream << vertices[i];
+        texStream << texCoords[i];
+    }
+
+    const int VERTEX_POS_INDX = 0;
+    const int VERTEX_TEXCOORD0_INDX = 1;
+    const int VERTEX_POS_SIZE = 2; // x, y
+    const int VERTEX_TEXCOORD0_SIZE = 2; // s and t
+
+    auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getTextureShader();
+
+    if (!m_initialized) {
+        m_vertices.create();
+        m_vertices.bind();
+
+        m_positionBuffer.create();
+        m_positionBuffer.setUsagePattern( QOpenGLBuffer::DynamicDraw );
+        m_positionBuffer.bind();
+        m_positionBuffer.allocate( data.data(), data.size() );
+        shader->enableAttributeArray( VERTEX_POS_INDX );
+        shader->setAttributeBuffer( VERTEX_POS_INDX, GL_FLOAT, 0, VERTEX_POS_SIZE );
+
+        m_textureBuffer.create();
+        m_textureBuffer.setUsagePattern( QOpenGLBuffer::DynamicDraw );
+        m_textureBuffer.bind();
+        m_textureBuffer.allocate( texData.data(), texData.size());
+        shader->enableAttributeArray( VERTEX_TEXCOORD0_INDX );
+        shader->setAttributeBuffer( VERTEX_TEXCOORD0_INDX, GL_FLOAT, 0, VERTEX_TEXCOORD0_SIZE );
+
+        if (!shader->initialized()) {
+            shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
+            shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
+            shader->markInitialized();
+        };    
+
+        m_positionBuffer.release();
+        m_textureBuffer.release();
+        m_vertices.release();
+
+        m_initialized = true;
+    } else {
+        m_positionBuffer.bind();
+        m_positionBuffer.write(0, data.data(), data.size());
+        m_positionBuffer.release();
+
+        m_textureBuffer.bind();
+        m_textureBuffer.write(0, texData.data(), texData.size());
+        m_textureBuffer.release();
+
+    }
+
+
+    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
+
+    ensureTextureSynchronized();
+
+    glBindTexture(GL_TEXTURE_2D, m_texture);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    shader->bind();
+    shader->setColor(QVector4D(1.0f, 1.0f, 1.0f, effectiveOpacity()));
+    shader->setTexture(0);
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuadVao(&m_vertices, shader);
+    shader->release();
 
     glDisable(GL_BLEND);
-    //Deprecated in OpenGL ES2.0
-    // glDisable(GL_TEXTURE_2D);
 
-    //glPopAttrib();
     QnGlNativePainting::end(painter);
 }
 

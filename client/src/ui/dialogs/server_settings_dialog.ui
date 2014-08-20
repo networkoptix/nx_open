@@ -164,7 +164,7 @@
          <number>0</number>
         </property>
         <property name="columnCount">
-         <number>4</number>
+         <number>6</number>
         </property>
         <attribute name="horizontalHeaderVisible">
          <bool>true</bool>
@@ -198,7 +198,17 @@
         </column>
         <column>
          <property name="text">
-          <string>Video Storage</string>
+          <string>Login</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Password</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Space</string>
          </property>
         </column>
        </widget>

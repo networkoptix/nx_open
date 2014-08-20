@@ -248,7 +248,7 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
     for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
     {
         QnLayoutFileStorageResource* storage = *itr;
-        QString storageUrl = removeProtocolPrefix(storage->getUrl());
+        QString storageUrl = storage->getPath();
         if (storageUrl == removeProtocolPrefix(newName) || storageUrl == removeProtocolPrefix(oldName))
             storage->closeOpenedFiles();
     }
@@ -265,7 +265,7 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
     for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
     {
         QnLayoutFileStorageResource* storage = *itr;
-        QString storageUrl = removeProtocolPrefix(storage->getUrl());
+        QString storageUrl = storage->getPath();
         if (storageUrl == removeProtocolPrefix(newName)) {
             storage->setUrl(newName); // update binary offsetvalue
             storage->restoreOpenedFiles();
@@ -330,7 +330,7 @@ qint64 QnLayoutFileStorageResource::getFileSize(const QString& url) const
 
 bool QnLayoutFileStorageResource::isStorageAvailable()
 {
-    QString tmpDir = closeDirPath(removeProtocolPrefix(getUrl())) + QLatin1String("tmp") + QString::number(qrand());
+    QString tmpDir = closeDirPath(getPath()) + QLatin1String("tmp") + QString::number(qrand());
     QDir dir(tmpDir);
     if (dir.exists()) {
         dir.remove(tmpDir);

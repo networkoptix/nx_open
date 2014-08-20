@@ -42,6 +42,11 @@ private:
     QImage m_image;
     unsigned m_texture;
     bool m_wholeTextureDirty;
+
+    bool m_initialized;
+    QOpenGLVertexArrayObject m_vertices;
+    QOpenGLBuffer m_positionBuffer;
+    QOpenGLBuffer m_textureBuffer;
 };
 
 

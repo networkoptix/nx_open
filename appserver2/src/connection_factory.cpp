@@ -437,7 +437,6 @@ namespace ec2
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
         connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->box = lit(QN_ARM_BOX);
-
         return ErrorCode::ok;
     }
 
