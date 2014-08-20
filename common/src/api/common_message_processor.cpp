@@ -364,6 +364,7 @@ QMap<QUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() co
 
 void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource) 
 {
+#if 0
     if (dynamic_cast<const QnMediaServerResource*>(resource.data()))
     {
         if (QnRuntimeInfoManager::instance()->hasItem(resource->getId()))
@@ -371,5 +372,5 @@ void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource)
         else
             resource->setStatus(Qn::Offline);
     }
-
+#endif
 }
