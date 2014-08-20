@@ -794,8 +794,8 @@ void CommunicatingSocket::close()
     //checking that socket is not registered in aio
     assert( !aio::AIOService::instance()->isSocketBeingWatched( static_cast<Socket*>(this) ) );
 
-    Socket::close();
     m_connected = false;
+    Socket::close();
 }
 
 void CommunicatingSocket::shutdown()

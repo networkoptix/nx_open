@@ -81,7 +81,7 @@ public:
     //!Implementation of AbstractSocket::getPeerAddress
     SocketAddress getPeerAddress() const;
     //!Implementation of AbstractSocket::close
-    void close();
+    virtual void close();
     //!Implementation of AbstractSocket::isClosed
     bool isClosed() const;
     //!Implementation of AbstractSocket::setReuseAddrFlag
@@ -245,7 +245,7 @@ public:
 
 
     void shutdown();
-    void close();
+    virtual void close() override;
 
 
     /**
