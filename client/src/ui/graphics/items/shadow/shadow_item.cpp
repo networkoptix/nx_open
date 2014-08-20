@@ -113,6 +113,7 @@ void QnShadowItem::initializeVao() {
         shader->markInitialized();
     };
 
+    m_positionBuffer.release();
     m_vertices.release();
 
     m_vaoInitialized = true;

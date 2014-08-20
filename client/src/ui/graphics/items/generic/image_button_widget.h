@@ -118,6 +118,8 @@ protected:
     void invalidatePixmapCache();
     StateFlags validPixmapState(StateFlags flags) const;
 
+    void initializeVbo(const QRectF &rect);
+
     bool skipHoverEvent(QGraphicsSceneHoverEvent *event);
     bool skipMenuEvent(QGraphicsSceneMouseEvent *event);
 
@@ -145,6 +147,14 @@ private:
     bool m_actionIconOverridden;
 
     QSharedPointer<QnTextureTransitionShaderProgram> m_shader;
+
+    bool m_initialized;
+    QOpenGLVertexArrayObject m_verticesStatic;
+    QOpenGLVertexArrayObject m_verticesTransition;
+    QOpenGLBuffer m_positionBufferStatic;
+    QOpenGLBuffer m_positionBufferTransition;
+    QOpenGLBuffer m_textureBufferStatic;
+    QOpenGLBuffer m_textureBufferTransition;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)

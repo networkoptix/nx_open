@@ -150,6 +150,7 @@ void QnOpenGLRenderer::drawColoredQuad(const float* v_array, QnColorGLShaderProg
         glCheckError("render");
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        qDebug() << "drawColoredQuad";
         glEnableVertexAttribArray(VERTEX_POS_INDX);
         glVertexAttribPointer(VERTEX_POS_INDX, VERTEX_POS_SIZE, GL_FLOAT, GL_FALSE, 0, v_array);
         glCheckError("render");

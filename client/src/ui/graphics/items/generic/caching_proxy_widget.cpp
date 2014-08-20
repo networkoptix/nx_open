@@ -74,13 +74,8 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
         return;
 
     QnGlNativePainting::begin(QGLContext::currentContext(),painter);
-    //glPushAttrib(GL_COLOR_BUFFER_BIT | GL_TEXTURE_BIT);
 
     ensureTextureSynchronized();
-
-    //Deprecated in OpenGL ES2.0
-    //glEnable(GL_TEXTURE_2D);
-//    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); /* For opacity to work. */
 
     glBindTexture(GL_TEXTURE_2D, m_texture);
     glEnable(GL_BLEND);
@@ -94,23 +89,9 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
 
     QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(QVector4D(1.0f, 1.0f, 1.0f, effectiveOpacity()));
     QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuad(rect(),QnGeometry::cwiseDiv(vertexRect.size(), m_image.size()));
- /*   glBegin(GL_QUADS);
-    glColor(1.0, 1.0, 1.0, effectiveOpacity());
-    glTexCoord(textureRect.topLeft());
-    glVertex(vertexRect.topLeft());
-    glTexCoord(textureRect.topRight());
-    glVertex(vertexRect.topRight());
-    glTexCoord(textureRect.bottomRight());
-    glVertex(vertexRect.bottomRight());
-    glTexCoord(textureRect.bottomLeft());
-    glVertex(vertexRect.bottomLeft());
-    glEnd();*/
 
     glDisable(GL_BLEND);
-    //Deprecated in OpenGL ES2.0
-    // glDisable(GL_TEXTURE_2D);
 
-    //glPopAttrib();
     QnGlNativePainting::end(painter);
 }
 

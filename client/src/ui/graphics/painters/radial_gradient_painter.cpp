@@ -92,6 +92,8 @@ void QnRadialGradientPainter::initialize() {
         shader->markInitialized();
     };
 
+    m_positionBuffer.release();
+    m_colorBuffer.release();
     m_vertices.release();
 
     m_initialized = true;

@@ -634,6 +634,8 @@ void QnGLRenderer::drawBindedTexture( QnGLShaderProgram* shader , const float* v
             shader->markInitialized();
         };    
 
+        m_positionBuffer.release();
+        m_textureBuffer.release();
         m_vertices.release();
 
         m_initialized = true;

@@ -19,6 +19,7 @@
 
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/opengl/gl_buffer_stream.h>
 #include <ui/common/geometry.h>
 #include <ui/common/accessor.h>
 #include <ui/common/palette.h>
@@ -61,6 +62,9 @@ namespace {
     typedef QnGlContextData<QnTextureTransitionShaderProgram, QnGlContextDataForwardingFactory<QnTextureTransitionShaderProgram> > QnTextureTransitionShaderProgramStorage;
     Q_GLOBAL_STATIC(QnTextureTransitionShaderProgramStorage, qn_textureTransitionShaderProgramStorage)
 
+    const int VERTEX_POS_INDX = 0;
+    const int VERTEX_TEXCOORD0_INDX = 1;
+
 } // anonymous namespace
 
 class QnImageButtonHoverProgressAccessor: public AbstractAccessor {
@@ -87,7 +91,8 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags 
     m_skipNextHoverEvents(false),
     m_hoverProgress(0.0),
     m_action(NULL),
-    m_actionIconOverridden(false)
+    m_actionIconOverridden(false),
+    m_initialized(false)
 {
     setAcceptedMouseButtons(Qt::LeftButton);
     setClickableButtons(Qt::LeftButton);
@@ -251,6 +256,9 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 
 void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
 
+    if (!m_initialized) 
+        initializeVbo(rect);
+
     bool isZero = qFuzzyIsNull(progress);
     bool isOne = qFuzzyCompare(progress, 1.0);
 
@@ -268,12 +276,9 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     QnGlNativePainting::begin(QGLContext::currentContext(),painter);
 
     glEnable(GL_BLEND);
-    //Deprecated in OpenGL ES2.0
-    //glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //glColor(1.0, 1.0, 1.0, painter->opacity());
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(QVector4D(1.0, 1.0, 1.0, painter->opacity()));
+    QVector4D shaderColor = QVector4D(1.0, 1.0, 1.0, painter->opacity());
 
     if (isOne || isZero) {
         if (isZero) {
@@ -281,8 +286,13 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         } else {
             checkedBindTexture(widget, endPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         }
-        QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuad(rect);
-        //glDrawTexturedRect(rect);
+        auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getTextureShader();
+
+        shader->bind();
+        shader->setColor(shaderColor);
+        shader->setTexture(0);          
+        QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuadVao(&m_verticesStatic, shader);
+        shader->release();
     } else {
 
         glActiveTexture(GL_TEXTURE1);
@@ -294,16 +304,11 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         m_shader->setTexture1(1);
         m_shader->setTexture(0);
         m_shader->setColor(QVector4D(1.0, 1.0, 1.0, painter->opacity()));
-
-        QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuad(rect,m_shader.data());
-        //glDrawTexturedRect(rect);
-
+        QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuadVao(&m_verticesTransition, m_shader.data());
         m_shader->release();
     }
 
     glDisable(GL_BLEND);
-    //Deprecated in OpenGL ES2.0
-    //glDisable(GL_TEXTURE_2D);
     QnGlNativePainting::end(painter);
 }
 
@@ -590,6 +595,94 @@ QnImageButtonWidget::StateFlags QnImageButtonWidget::validPixmapState(StateFlags
     return findValidState(flags, m_pixmaps, [](const QPixmap &pixmap) { return !pixmap.isNull(); });
 }
 
+void QnImageButtonWidget::initializeVbo(const QRectF &rect) {
+
+    GLfloat vertices[] = {
+        (GLfloat)rect.left(),   (GLfloat)rect.top(),
+        (GLfloat)rect.right(),  (GLfloat)rect.top(),
+        (GLfloat)rect.right(),  (GLfloat)rect.bottom(),
+        (GLfloat)rect.left(),   (GLfloat)rect.bottom()
+    };
+
+    GLfloat texCoords[] = {
+        0.0, 0.0,
+        1.0, 0.0,
+        1.0, 1.0,
+        0.0, 1.0
+    };
+
+    QByteArray data, texData;
+    QnGlBufferStream<GLfloat> vertexStream(&data), texStream(&texData);
+
+    for(int i = 0; i < 8; i++) {
+        vertexStream << vertices[i];
+        texStream << texCoords[i];
+    }
+
+    const int VERTEX_POS_SIZE = 2; // x, y
+    const int VERTEX_TEXCOORD0_SIZE = 2; // s and t
+
+    /* Init static VBO */
+    auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getTextureShader();
+    m_verticesStatic.create();
+    m_verticesStatic.bind();
+
+    m_positionBufferStatic.create();
+    m_positionBufferStatic.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_positionBufferStatic.bind();
+    m_positionBufferStatic.allocate( data.data(), data.size() );
+    shader->enableAttributeArray( VERTEX_POS_INDX );
+    shader->setAttributeBuffer( VERTEX_POS_INDX, GL_FLOAT, 0, VERTEX_POS_SIZE );
+
+    m_textureBufferStatic.create();
+    m_textureBufferStatic.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_textureBufferStatic.bind();
+    m_textureBufferStatic.allocate( texData.data(), texData.size());
+    shader->enableAttributeArray( VERTEX_TEXCOORD0_INDX );
+    shader->setAttributeBuffer( VERTEX_TEXCOORD0_INDX, GL_FLOAT, 0, VERTEX_TEXCOORD0_SIZE );
+
+    if (!shader->initialized()) {
+        shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
+        shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
+        shader->markInitialized();
+    };
+
+    m_textureBufferStatic.release();
+    m_positionBufferStatic.release();
+    m_verticesStatic.release();
+
+    /* Init transition VBO */
+    m_verticesTransition.create();
+    m_verticesTransition.bind();
+
+    m_positionBufferTransition.create();
+    m_positionBufferTransition.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_positionBufferTransition.bind();
+    m_positionBufferTransition.allocate( data.data(), data.size() );
+    m_shader->enableAttributeArray( VERTEX_POS_INDX );
+    m_shader->setAttributeBuffer( VERTEX_POS_INDX, GL_FLOAT, 0, VERTEX_POS_SIZE );
+
+    m_textureBufferTransition.create();
+    m_textureBufferTransition.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_textureBufferTransition.bind();
+    m_textureBufferTransition.allocate( texData.data(), texData.size());
+    m_shader->enableAttributeArray( VERTEX_TEXCOORD0_INDX );
+    m_shader->setAttributeBuffer( VERTEX_TEXCOORD0_INDX, GL_FLOAT, 0, VERTEX_TEXCOORD0_SIZE );
+
+    if (!m_shader->initialized()) {
+        m_shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
+        m_shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
+        m_shader->markInitialized();
+    };    
+
+    m_textureBufferTransition.release();
+    m_positionBufferTransition.release();
+    m_verticesTransition.release();
+
+
+
+    m_initialized = true;
+}
 
 
 // -------------------------------------------------------------------------- //
