@@ -92,7 +92,7 @@ bool QnNetworkProxyFactory::fillUrlWithRouteToResource(
             break;
 
         case QNetworkProxy::HttpProxy:
-            requestUrl->setPath( lit("/proxy/{%1}%2").arg(targetResource->getId().toString()).arg(requestUrl->path()) );
+            requestUrl->setPath( lit("/proxy/%1%2").arg(targetResource->getId().toString()).arg(requestUrl->path()) );
             requestUrl->setHost( proxy.hostName() );
             requestUrl->setPort( proxy.port() );
             urlQuery.addQueryItem( lit("proxy_auth"), QLatin1String(QnAuthHelper::createHttpQueryAuthParam( requestUrl->userName(), requestUrl->password() )) );
