@@ -516,7 +516,16 @@ namespace ec2
 
         //synchronizing with some internet server
         using namespace std::placeholders;
-        m_timeSynchronizer.getTimeAsync( std::bind( &TimeSynchronizationManager::onTimeFetchingDone, this, _1, _2 ) );
+        if( !m_timeSynchronizer.getTimeAsync( std::bind( &TimeSynchronizationManager::onTimeFetchingDone, this, _1, _2 ) ) )
+        {
+            NX_LOG( lit( "Failed to start internet time synchronization. %1" ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+            //failure
+            m_internetTimeSynchronizationPeriod = std::min<>(
+                m_internetTimeSynchronizationPeriod * INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF,
+                MAX_INTERNET_SYNC_TIME_PERIOD_SEC );
+
+            addInternetTimeSynchronizationTask();
+        }
     }
 
     void TimeSynchronizationManager::onTimeFetchingDone( qint64 millisFromEpoch, SystemError::ErrorCode errorCode )
@@ -562,6 +571,11 @@ namespace ec2
                 MAX_INTERNET_SYNC_TIME_PERIOD_SEC );
         }
 
+        addInternetTimeSynchronizationTask();
+    }
+
+    void TimeSynchronizationManager::addInternetTimeSynchronizationTask()
+    {
         assert( m_internetSynchronizationTaskID == 0 );
 
         using namespace std::placeholders;

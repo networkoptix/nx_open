@@ -50,6 +50,7 @@ namespace SystemError
     QString toString( ErrorCode errorCode );
     //!Same as toString(getLastOSErrorCode())
     QString getLastOSErrorText();
+    void setLastErrorCode( ErrorCode errorCode );
 }
 
 #endif  //SYSTEMERROR_H

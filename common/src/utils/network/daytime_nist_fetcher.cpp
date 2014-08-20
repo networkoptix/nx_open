@@ -74,10 +74,12 @@ bool DaytimeNISTFetcher::getTimeAsync( std::function<void(qint64, SystemError::E
             SocketAddress( HostAddress( QLatin1String( DEFAULT_NIST_SERVER ) ), DAYTIME_PROTOCOL_DEFAULT_PORT ),
             std::bind( &DaytimeNISTFetcher::onConnectionEstablished, this, _1 ) ) )
     {
+        const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
         NX_LOG( lit( "NIST time_sync. Failed to start async connect (2) from %1:%2. %3" ).
-            arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG2 );
+            arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG2 );
         m_handlerFunc = std::function<void( qint64, SystemError::ErrorCode )>();
         m_tcpSock.reset();
+        SystemError::setLastErrorCode( errorCode );
         return false;
     }
 
