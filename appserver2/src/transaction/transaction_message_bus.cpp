@@ -428,8 +428,10 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     ttUnicast.dstPeers << sender->remotePeer().id;
 
     QnTransactionTransportHeader ttBroadcast(ttUnicast.processedPeers);
-    for(auto itr = m_connections.constBegin(); itr != m_connections.constEnd(); ++itr)
-        ttBroadcast.processedPeers << itr.key(); // dst peer should not proxy transactions to already connected peers
+    for(auto itr = m_connections.constBegin(); itr != m_connections.constEnd(); ++itr) {
+        if (itr.value()->isReadyToSend(ApiCommand::NotDefined))
+            ttBroadcast.processedPeers << itr.key(); // dst peer should not proxy transactions to already connected peers
+    }
 
     QList<QByteArray> serializedTransactions;
     const ErrorCode errorCode = transactionLog->getTransactionsAfter(tran.params, serializedTransactions);
