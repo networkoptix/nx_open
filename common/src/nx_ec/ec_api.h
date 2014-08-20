@@ -915,7 +915,7 @@ namespace ec2
 
         //!Emitted when there is ambiguity while choosing primary time server automatically
         /*!
-            User SHOULD call \a TimeSynchronizationManager::forcePrimaryTimeServer to set primary time server manually.
+            User SHOULD call \a AbstractECConnection::forcePrimaryTimeServer to set primary time server manually.
             This signal is emitted periodically until ambiguity in choosing primary time server has been resolved (by user or automatically)
             \param localSystemTime Local system time (UTC, millis from epoch)
             \param peersAndTimes pair<peer id, peer local time (UTC, millis from epoch) corresponding to \a localSystemTime>
