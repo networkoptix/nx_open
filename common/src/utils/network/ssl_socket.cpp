@@ -1533,4 +1533,15 @@ AbstractStreamSocket* TCPSslServerSocket::accept()
 #endif
 }
 
+AbstractStreamSocket* UdtSSLServerSocket::accept() {
+    AbstractStreamSocket* sock = UdtServerSocket::accept();
+    if(!sock) return NULL;
+    if(m_allowNonSecureConnect)
+        return new QnMixedSSLSocket(sock);
+    else
+        return new QnSSLSocket(sock,true);
+}
+
+UdtSSLServerSocket::~UdtSSLServerSocket(){}
+
 #endif // ENABLE_SSL

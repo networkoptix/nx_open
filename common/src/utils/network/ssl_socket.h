@@ -10,6 +10,7 @@
 #include "abstract_socket.h"
 #include "socket_common.h"
 #include "system_socket.h"
+#include "udt_socket.h"
 
 struct bio_st;
 typedef struct bio_st BIO; /* This one is from OpenSSL, which we don't want to include in this header. */
@@ -152,6 +153,20 @@ public:
 private:
     bool m_allowNonSecureConnect;
 };
+
+// SSL on top of NAT 
+class UdtSSLServerSocket : public UdtServerSocket {
+public:
+    UdtSSLServerSocket( bool allowNonSecureConnect = true ) :
+        m_allowNonSecureConnect(allowNonSecureConnect){}
+
+    virtual AbstractStreamSocket* accept() override;
+    virtual ~UdtSSLServerSocket();
+private:
+    bool m_allowNonSecureConnect;
+};
+
+
 #endif // ENABLE_SSL
 
 #endif // __SSL_SOCKET_H_
