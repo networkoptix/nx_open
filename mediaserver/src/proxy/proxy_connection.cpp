@@ -5,6 +5,7 @@
 #include <QUrlQuery>
 
 #include <utils/common/log.h>
+#include <utils/common/string.h>
 #include <utils/common/systemerror.h>
 #include "utils/network/compat_poll.h"
 #include "utils/network/tcp_listener.h"
@@ -197,6 +198,8 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
         else if (itr->first == "x-server-guid")
             xServerGUID = itr->second;
     }
+
+    trimInPlace( &xServerGUID, lit("{}") );
 
     QnRoute route;
     if (!xServerGUID.isEmpty())
