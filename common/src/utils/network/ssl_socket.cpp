@@ -558,24 +558,74 @@ public:
         Q_ASSERT(ubuf->capacity() >0);
         user_buffer_ = ubuf;
     }
+    // This is a revised version of drain_ssl_buffer. It uses assumption that the
+    // SSL's internal record is 16KB, which means the padding data cannot be exceed
+    // beyond 16KB .Otherwise it make no sense. 16KB = 1<< 14, so this allow us to 
+    // drain the SSL buffer in at most 14 SSL_read . Indeed , a hand crafted binary
+    // probing method will lead the average invoking times in log(14) , however it 
+    // is too complicated to put here . This version is way more better than the
+    // original conservative method to drain the buffer which requires at most 
+    // 16KB - 1 times SSL_read invocation !
+    // Original version:
+    // void drain_ssl_buffer() {
+    // char bytes_buffer;
+    // int ssl_return;
+    // do {
+    //    ssl_return = SSL_read(ssl(),&bytes_buffer,1);
+    //    if( ssl_return >0 ) {
+    //        user_buffer_->push_back(bytes_buffer);
+    //        ++read_bytes_;
+    //    } else {
+    //         return;
+    //     }
+    //  } while( true );
+    // }
+    
 
-    // This function is painfully slow but it will help to ensure the next call of
-    // asyncRead on SSL will always happened inside of the remote thread. Since we
-    // don't know the expected buffer for the next read, so every time a one byte 
-    // buffer will ensure the next call resides in the remote thread .
+#define SSL_DRAIN_(S) do { \
+    const int size = 1<<(S); \
+    int old_size = user_buffer_->size(); \
+    user_buffer_->resize(old_size+size); \
+    int ret = SSL_read(ssl(),(user_buffer_->data()+old_size),size); \
+    if(ret >0 ) { \
+        user_buffer_->resize(ret+old_size); \
+        read_bytes_ += ret; \
+    } else \
+    user_buffer_->resize(old_size); }while(0)
+
     void drain_ssl_buffer() {
-        char bytes_buffer;
-        int ssl_return;
-        do {
-            ssl_return = SSL_read(ssl(),&bytes_buffer,1);
-            if( ssl_return >0 ) {
-                user_buffer_->push_back(bytes_buffer);
-                ++read_bytes_;
-            } else {
-                return;
-            }
-        } while( true );
+        char byte;
+        while( SSL_read(ssl(),&byte,1) == 1 ) {
+            // We need to push back the lead byte here
+            user_buffer_->push_back(byte);
+            read_bytes_ += byte;
+            // Unroll the loop for 14 times reading. Expected call is 14 times.
+            // After such loop, any value that is  less than 16KB 
+            // will be drained from the buffer . And indeed a SSL
+            // record can be at most 16KB, so any data that left in the
+            // buffer , in theory , should be less than 16KB. However,put
+            // it into a loop ensure the situation that the SSL breaks the
+            // theory that read more than one record and buffered them.
+            // But with loop, we are able to handle all the situation.
+            SSL_DRAIN_(0);
+            SSL_DRAIN_(1);
+            SSL_DRAIN_(2);
+            SSL_DRAIN_(3);
+            SSL_DRAIN_(4);
+            SSL_DRAIN_(5);
+            SSL_DRAIN_(6);
+            SSL_DRAIN_(7);
+            SSL_DRAIN_(8);
+            SSL_DRAIN_(9);
+            SSL_DRAIN_(10);
+            SSL_DRAIN_(11);
+            SSL_DRAIN_(12);
+            SSL_DRAIN_(13);
+        }
+        Q_ASSERT(SSL_read(ssl(),&byte,1) <=0);
     }
+
+#undef SSL_DRAIN_
 
 private:
     std::function<void(SystemError::ErrorCode,std::size_t)> callback_;
