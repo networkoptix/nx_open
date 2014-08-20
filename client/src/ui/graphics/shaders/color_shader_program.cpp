@@ -36,12 +36,12 @@
 //} 
 
 
-QnColorGLShaderProgramm::QnColorGLShaderProgramm(const QGLContext *context, QObject *parent)
+QnColorGLShaderProgram::QnColorGLShaderProgram(const QGLContext *context, QObject *parent)
     : QnGLShaderProgram(context,parent)
 {
 }
 
-bool QnColorGLShaderProgramm::compile()
+bool QnColorGLShaderProgram::compile()
 {
     addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
         uniform mat4 uModelViewProjectionMatrix;

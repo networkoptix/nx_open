@@ -1,11 +1,11 @@
 #include "per_vertex_colored_shader_program.h"
 #include "ui/graphics/shaders/shader_source.h"
 
-QnPerVertexColoredGLShaderProgramm::QnPerVertexColoredGLShaderProgramm(const QGLContext *context, QObject *parent)
-    : QnColorGLShaderProgramm(context,parent)
+QnColorPerVertexGLShaderProgram::QnColorPerVertexGLShaderProgram(const QGLContext *context, QObject *parent)
+    : QnColorGLShaderProgram(context,parent)
 {
 }
-bool QnPerVertexColoredGLShaderProgramm::compile()
+bool QnColorPerVertexGLShaderProgram::compile()
 {
     addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
         uniform mat4 uModelViewProjectionMatrix;

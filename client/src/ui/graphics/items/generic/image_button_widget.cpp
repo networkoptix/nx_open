@@ -273,7 +273,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     //glColor(1.0, 1.0, 1.0, painter->opacity());
-    QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(QVector4D(1.0, 1.0, 1.0, painter->opacity()));
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(QVector4D(1.0, 1.0, 1.0, painter->opacity()));
 
     if (isOne || isZero) {
         if (isZero) {
@@ -281,7 +281,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         } else {
             checkedBindTexture(widget, endPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         }
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawBindedTextureOnQuad(rect);
+        QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuad(rect);
         //glDrawTexturedRect(rect);
     } else {
 
@@ -295,7 +295,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         m_shader->setTexture(0);
         m_shader->setColor(QVector4D(1.0, 1.0, 1.0, painter->opacity()));
 
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawBindedTextureOnQuad(rect,m_shader.data());
+        QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuad(rect,m_shader.data());
         //glDrawTexturedRect(rect);
 
         m_shader->release();

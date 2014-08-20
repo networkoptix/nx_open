@@ -309,8 +309,8 @@ void QnGLRenderer::drawVideoTextureDirectly(
     glBindTexture(GL_TEXTURE_2D, tex0ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
-    QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(QVector4D(1.0f,1.0f,1.0f,1.0f));
-    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawBindedTextureOnQuad(v_array,tx_array);
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(QVector4D(1.0f,1.0f,1.0f,1.0f));
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuad(v_array,tx_array);
     
 //    glColor4f( 1, 1, 1, 1 );
 
@@ -347,9 +347,9 @@ void QnGLRenderer::drawYV12VideoTexture(
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     */
-    //QnOpenGLRendererManager::instance(QGLContext::currentContext()).getProjectionMatrix().setToIdentity();
-    //QnOpenGLRendererManager::instance(QGLContext::currentContext()).getProjectionMatrix().ortho(-10000,10000,10000,-10000,-10000,10000);
-    //QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().setToIdentity();
+    //QnOpenGLRendererManager::instance(QGLContext::currentContext())->getProjectionMatrix().setToIdentity();
+    //QnOpenGLRendererManager::instance(QGLContext::currentContext())->getProjectionMatrix().ortho(-10000,10000,10000,-10000,-10000,10000);
+    //QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix().setToIdentity();
 
     float tx_array[8] = {
         (float)tex0Coords.x(), (float)tex0Coords.y(),
@@ -648,7 +648,7 @@ void QnGLRenderer::drawBindedTexture( QnGLShaderProgram* shader , const float* v
 
     }
 
-    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawBindedTextureOnQuadVao(&m_vertices, shader);
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuadVao(&m_vertices, shader);
 }
 
 qint64 QnGLRenderer::lastDisplayedTime() const

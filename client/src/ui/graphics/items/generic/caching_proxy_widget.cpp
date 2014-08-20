@@ -92,8 +92,8 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
         QnGeometry::cwiseDiv(vertexRect.size(), m_image.size())
     );
 
-    QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(QVector4D(1.0f, 1.0f, 1.0f, effectiveOpacity()));
-    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawBindedTextureOnQuad(rect(),QnGeometry::cwiseDiv(vertexRect.size(), m_image.size()));
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(QVector4D(1.0f, 1.0f, 1.0f, effectiveOpacity()));
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuad(rect(),QnGeometry::cwiseDiv(vertexRect.size(), m_image.size()));
  /*   glBegin(GL_QUADS);
     glColor(1.0, 1.0, 1.0, effectiveOpacity());
     glTexCoord(textureRect.topLeft());

@@ -4,16 +4,16 @@
 
 #include <QOpenGLFunctions>
 
-QnOpenGLRenderer::QnOpenGLRenderer(const QGLContext* a_context , QObject *parent)
+QnOpenGLRenderer::QnOpenGLRenderer(const QGLContext* a_context , QObject *parent):
+    m_colorProgram(new QnColorGLShaderProgram(a_context,parent)),
+    m_textureColorProgram(new QnTextureGLShaderProgram(a_context,parent)),
+    m_colorPerVertexShader(new QnColorPerVertexGLShaderProgram(a_context,parent))
 {
     QOpenGLFunctions::initializeOpenGLFunctions();
-    m_colorProgram.reset(new QnColorGLShaderProgramm(a_context,parent));
-    m_colorProgram->compile();
-    m_textureColorProgram.reset(new QnTextureColorGLShaderProgramm(a_context,parent));
-    m_textureColorProgram->compile();
 
-    m_texturePerVertexColoredProgram.reset(new QnPerVertexColoredGLShaderProgramm(a_context,parent));
-    m_texturePerVertexColoredProgram->compile();
+    m_colorProgram->compile();
+    m_textureColorProgram->compile();
+    m_colorPerVertexShader->compile();
 
     m_indices_for_render_quads[0] = 0;
     m_indices_for_render_quads[1] = 1;
@@ -41,7 +41,7 @@ void  QnOpenGLRenderer::setColor(const QColor& c)
     m_color.setW(c.alphaF()); 
 };
 
-void QnOpenGLRenderer::drawBindedTextureOnQuad( const QRectF &rect , QnTextureColorGLShaderProgramm* shader)
+void QnOpenGLRenderer::drawBindedTextureOnQuad( const QRectF &rect , QnTextureGLShaderProgram* shader)
 {
     GLfloat vertices[] = {
         (GLfloat)rect.left(),   (GLfloat)rect.top(),
@@ -59,7 +59,7 @@ void QnOpenGLRenderer::drawBindedTextureOnQuad( const QRectF &rect , QnTextureCo
     drawBindedTextureOnQuad(vertices,texCoords,shader);
 };
 
-void QnOpenGLRenderer::drawBindedTextureOnQuad( const QRectF &rect , const QSizeF& size, QnTextureColorGLShaderProgramm* shader)
+void QnOpenGLRenderer::drawBindedTextureOnQuad( const QRectF &rect , const QSizeF& size, QnTextureGLShaderProgram* shader)
 {
     GLfloat vertices[] = {
         (GLfloat)rect.left(),   (GLfloat)rect.top(),
@@ -77,7 +77,7 @@ void QnOpenGLRenderer::drawBindedTextureOnQuad( const QRectF &rect , const QSize
     drawBindedTextureOnQuad(vertices,texCoords,shader);
 };
 
-void QnOpenGLRenderer::drawColoredQuad( const QRectF &rect , QnColorGLShaderProgramm* shader )
+void QnOpenGLRenderer::drawColoredQuad( const QRectF &rect , QnColorGLShaderProgram* shader )
 {
     GLfloat vertices[] = {
         (GLfloat)rect.left(),   (GLfloat)rect.top(),
@@ -90,65 +90,56 @@ void QnOpenGLRenderer::drawColoredQuad( const QRectF &rect , QnColorGLShaderProg
 
 void QnOpenGLRenderer::drawPerVertexColoredPolygon( unsigned int a_buffer , unsigned int a_vertices_size , unsigned int a_polygon_state)
 {
-    QnPerVertexColoredGLShaderProgramm* shader = m_texturePerVertexColoredProgram.data();
+    QnColorPerVertexGLShaderProgram* shader = m_colorPerVertexShader.data();
 
-    if ( shader )
+    const int VERTEX_POS_SIZE = 2; // x, y
+    const int VERTEX_COLOR_SIZE = 4; // s and t
+    const int VERTEX_POS_INDX = 0;
+    const int VERTEX_COLOR_INDX = 1;
+    glBindBuffer(GL_ARRAY_BUFFER, a_buffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    glEnableVertexAttribArray(VERTEX_POS_INDX);
+    glEnableVertexAttribArray(VERTEX_COLOR_INDX);
+
+    shader->bind();
+    shader->setModelViewProjectionMatrix(m_projectionMatrix*m_modelViewMatrix);
+    shader->setColor(m_color);
+
+    if ( !shader->initialized() )
     {
-        const int VERTEX_POS_SIZE = 2; // x, y
-        const int VERTEX_COLOR_SIZE = 4; // s and t
-        const int VERTEX_POS_INDX = 0;
-        const int VERTEX_COLOR_INDX = 1;
-        glBindBuffer(GL_ARRAY_BUFFER, a_buffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
+        shader->bindAttributeLocation("aColor",VERTEX_COLOR_INDX);
+        shader->markInitialized();
+    };
 
-        glEnableVertexAttribArray(VERTEX_POS_INDX);
-        glEnableVertexAttribArray(VERTEX_COLOR_INDX);
-        
-        shader->bind();
-        shader->setModelViewProjectionMatrix(m_projectionMatrix*m_modelViewMatrix);
-        shader->setColor(m_color);
+    const char* ptr = NULL;
+    GLuint offset = 0;
+    glVertexAttribPointer(VERTEX_POS_INDX, VERTEX_POS_SIZE, GL_FLOAT, GL_FALSE, 0, (const void*)(ptr + offset));
+    offset += a_vertices_size*VERTEX_POS_SIZE* sizeof(GLfloat);
+    glVertexAttribPointer(VERTEX_COLOR_INDX,VERTEX_COLOR_SIZE, GL_FLOAT,GL_FALSE, 0, (const void*)(ptr + offset));
 
-        if ( !shader->initialized() )
-        {
-            shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
-            shader->bindAttributeLocation("aColor",VERTEX_COLOR_INDX);
-            shader->markInitialized();
-        };
+    glDrawArrays(a_polygon_state,0,a_vertices_size);
 
-        const char* ptr = NULL;
-        GLuint offset = 0;
-        glVertexAttribPointer(VERTEX_POS_INDX, VERTEX_POS_SIZE, GL_FLOAT, GL_FALSE, 0, (const void*)(ptr + offset));
-        offset += a_vertices_size*VERTEX_POS_SIZE* sizeof(GLfloat);
-        glVertexAttribPointer(VERTEX_COLOR_INDX,VERTEX_COLOR_SIZE, GL_FLOAT,GL_FALSE, 0, (const void*)(ptr + offset));
+    shader->release();
+    glCheckError("render");
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glDrawArrays(a_polygon_state,0,a_vertices_size);
-        
-        shader->release();
-        glCheckError("render");
-         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        //glDisableVertexAttribArray(VERTEX_COLOR_INDX);
-        //glDisableVertexAttribArray(VERTEX_POS_INDX);
-    }
 }
 
-void QnOpenGLRenderer::drawVao(QOpenGLVertexArrayObject* vao, int count) {
-    QnPerVertexColoredGLShaderProgramm* shader = m_texturePerVertexColoredProgram.data();
-    if (!shader)
-        return;
-
+void QnOpenGLRenderer::drawArraysVao(QOpenGLVertexArrayObject* vao, GLenum mode, int count, QnColorGLShaderProgram* shader) {
     vao->bind();
 
     shader->bind();
     shader->setModelViewProjectionMatrix(m_projectionMatrix*m_modelViewMatrix);
     shader->setColor(m_color);
 
-
-    glDrawArrays(GL_TRIANGLE_FAN, 0, count);
+    glDrawArrays(mode, 0, count);
     vao->release();
     glCheckError("render");
 }
 
-void QnOpenGLRenderer::drawColoredQuad(const float* v_array, QnColorGLShaderProgramm* shader)
+void QnOpenGLRenderer::drawColoredQuad(const float* v_array, QnColorGLShaderProgram* shader)
 {
     if ( !shader )
         shader = m_colorProgram.data();
@@ -240,66 +231,16 @@ void QnOpenGLRenderer::drawBindedTextureOnQuadVao(QOpenGLVertexArrayObject* vao,
     glCheckError("render");    
 }
 
-void    QnOpenGLRenderer:: drawColoredPolygon( const QPolygonF & a_polygon, QnColorGLShaderProgramm* shader)
-{
-    static std::vector<float> vertices;
-    vertices.resize(a_polygon.size()*2);
-    for ( int i = 0 ; i < a_polygon.size() ; i++)
-    {
-        vertices[i*2] = a_polygon[i].x();
-        vertices[i*2+1] = a_polygon[i].y();
-    }
-    drawColoredPolygon(&vertices[0],a_polygon.size(),shader);
-};
-
-void    QnOpenGLRenderer:: drawColoredPolygon( const QVector<QVector2D>& a_polygon, QnColorGLShaderProgramm* shader)
-{
-    static std::vector<float> vertices;
-    vertices.resize(a_polygon.size()*2);
-    for ( int i = 0 ; i < a_polygon.size() ; i++)
-    {
-        vertices[i*2] = a_polygon[i].x();
-        vertices[i*2+1] = a_polygon[i].y();
-    }
-    drawColoredPolygon(&vertices[0],a_polygon.size(),shader);
-};
-
-void    QnOpenGLRenderer:: drawColoredPolygon( const float* v_array, unsigned int size , QnColorGLShaderProgramm* shader)
-{
-    if ( !shader )
-        shader = m_colorProgram.data();
-    if ( shader )
-    {
-        const int VERTEX_POS_SIZE = 2; // x, y
-        const int VERTEX_POS_INDX = 0;
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glEnableVertexAttribArray(VERTEX_POS_INDX);
-        glVertexAttribPointer(VERTEX_POS_INDX, VERTEX_POS_SIZE, GL_FLOAT, GL_FALSE, 0, v_array);
-        
-        
-        shader->bind();
-        shader->setColor(m_color);
-        shader->setModelViewProjectionMatrix(m_projectionMatrix*m_modelViewMatrix);
-        
-        if ( !shader->initialized() )
-        {
-            shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
-            shader->markInitialized();
-        };     
-
-        glDrawArrays(GL_TRIANGLE_FAN,0,size);
-        shader->release();
-        //glDisableVertexAttribArray(VERTEX_POS_INDX);
-    }
+QnColorPerVertexGLShaderProgram* QnOpenGLRenderer::getColorPerVertexShader() const {
+    return m_colorPerVertexShader.data();
 }
 
-QnPerVertexColoredGLShaderProgramm* QnOpenGLRenderer::getColorShader() const {
-    return m_texturePerVertexColoredProgram.data();
-}
-
-QnTextureColorGLShaderProgramm* QnOpenGLRenderer::getTextureShader() const {
+QnTextureGLShaderProgram* QnOpenGLRenderer::getTextureShader() const {
     return m_textureColorProgram.data();
+}
+
+QnColorGLShaderProgram* QnOpenGLRenderer::getColorShader() const {
+    return m_colorProgram.data();
 }
 
 //=================================================================================================
@@ -307,7 +248,7 @@ QnTextureColorGLShaderProgramm* QnOpenGLRenderer::getTextureShader() const {
 Q_GLOBAL_STATIC(QnOpenGLRendererManager, qn_openGlRenderManager_instance)
 
 
-QnOpenGLRenderer& QnOpenGLRendererManager::instance(const QGLContext* a_context)
+QnOpenGLRenderer* QnOpenGLRendererManager::instance(const QGLContext* a_context)
 {
     QnOpenGLRendererManager* manager = qn_openGlRenderManager_instance();
 
@@ -315,8 +256,18 @@ QnOpenGLRenderer& QnOpenGLRendererManager::instance(const QGLContext* a_context)
     if ( it != manager->m_container.end() )
         return (*it);
 
-    manager->m_container.insert(a_context,QnOpenGLRenderer(a_context));
+    manager->m_container.insert(a_context, new QnOpenGLRenderer(a_context));
     return *(manager->m_container.find(a_context));
+}
+
+QnOpenGLRendererManager::QnOpenGLRendererManager(QObject* parent /*= NULL*/):
+    QObject(parent)
+{
+}
+
+QnOpenGLRendererManager::~QnOpenGLRendererManager() {
+    foreach (QnOpenGLRenderer* renderer, m_container.values())
+        delete renderer;
 }
 
 void loadImageData( int texture_wigth , int texture_height , int image_width , int image_heigth , int gl_bytes_per_pixel , int gl_format , const uchar* pixels )

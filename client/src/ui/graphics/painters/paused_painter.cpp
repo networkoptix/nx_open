@@ -64,8 +64,8 @@ QnPausedPainter::~QnPausedPainter() {
 void QnPausedPainter::paint(qreal opacity) {
     if(!m_initialized)
         return;
-    QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(QVector4D(1.0, 1.0, 1.0, opacity));
-    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawPerVertexColoredPolygon(m_buffer,m_vertexCount,GL_TRIANGLES);
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(QVector4D(1.0, 1.0, 1.0, opacity));
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawPerVertexColoredPolygon(m_buffer,m_vertexCount,GL_TRIANGLES);
 }
 
 void QnPausedPainter::paint() {

@@ -5,11 +5,11 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include "base_shader_program.h"
 
-class QnColorGLShaderProgramm : public QnGLShaderProgram 
+class QnColorGLShaderProgram : public QnGLShaderProgram 
 {
     Q_OBJECT
 public:
-    QnColorGLShaderProgramm(const QGLContext *context = NULL, QObject *parent = NULL);
+    QnColorGLShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
 
     void setColor(const QVector4D& a_vec) {
         setUniformValue(m_color, a_vec);
