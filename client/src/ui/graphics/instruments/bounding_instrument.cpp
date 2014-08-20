@@ -281,33 +281,35 @@ public:
 
         updateParameters();
 
-        /* Apply zoom correction. */
-        if(m_isSizeCorrected) {
-            qreal logScale, powFactor;
-            calculateRelativeScale(&logScale, &powFactor);
-            if(!qFuzzyBetween(m_stickyLogScaleLo, logScale, m_stickyLogScaleHi) && !qFuzzyCompare(logScale, logOldScale)) {
-                qreal logFactor = calculateCorrection(logOldScale, logScale, m_stickyLogScaleLo, m_stickyLogScaleHi);
+        if (!qFuzzyCompare(m_view->viewportTransform(), m_sceneToViewport)) {
+            /* Apply zoom correction. */
+            if(m_isSizeCorrected) {
+                qreal logScale, powFactor;
+                calculateRelativeScale(&logScale, &powFactor);
+                if(!qFuzzyBetween(m_stickyLogScaleLo, logScale, m_stickyLogScaleHi) && !qFuzzyCompare(logScale, logOldScale)) {
+                    qreal logFactor = calculateCorrection(logOldScale, logScale, m_stickyLogScaleLo, m_stickyLogScaleHi);
 
-                scaleViewport(m_view, std::exp(logFactor * powFactor));
+                    scaleViewport(m_view, std::exp(logFactor * powFactor));
 
-                /* Calculate relative correction and move viewport. */
-                qreal correction = logFactor / (logOldScale - logScale); /* Always positive. */
-                moveViewportScene(m_view, (oldCenter - m_sceneViewportCenter) * correction);
+                    /* Calculate relative correction and move viewport. */
+                    qreal correction = logFactor / (logOldScale - logScale); /* Always positive. */
+                    moveViewportScene(m_view, (oldCenter - m_sceneViewportCenter) * correction);
+
+                    updateParameters();
+                } else {
+                    stickyScaleDirty = true;
+                }
+            }
+
+            /* Apply center correction. */
+            QRectF centerPositionBounds = calculateCenterPositionBounds();
+            if(!centerPositionBounds.contains(m_sceneViewportCenter) && !qFuzzyEquals(m_sceneViewportCenter, oldCenter)) {
+                QPointF correction = calculateCorrection(oldCenter, m_sceneViewportCenter, centerPositionBounds);
+
+                moveViewportScene(m_view, correction);
 
                 updateParameters();
-            } else {
-                stickyScaleDirty = true;
             }
-        }
-
-        /* Apply center correction. */
-        QRectF centerPositionBounds = calculateCenterPositionBounds();
-        if(!centerPositionBounds.contains(m_sceneViewportCenter) && !qFuzzyEquals(m_sceneViewportCenter, oldCenter)) {
-            QPointF correction = calculateCorrection(oldCenter, m_sceneViewportCenter, centerPositionBounds);
-
-            moveViewportScene(m_view, correction);
-
-            updateParameters();
         }
 
         /* Enforce. */
