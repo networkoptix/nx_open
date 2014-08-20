@@ -148,21 +148,22 @@ namespace ec2
     //   TimeSynchronizationManager
     //////////////////////////////////////////////
     static TimeSynchronizationManager* TimeManager_instance = nullptr;
-#ifdef TEST_PTS_SELECTION
-    static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10 * 1000;
-    static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10 * 1000;
+
+#ifdef _DEBUG
+    static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*1000;
+    static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 60*1000;
+    static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 30;
 #else
     static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*60*1000;
     //!Once per 10 minutes checking if manual time server selection is required
-    static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10 * 60 * 1000;
-#endif
-
+    static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10*60*1000;
     //!Accurate time is fetched from internet with this period
     static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 600;
+#endif
     //!If time synchronization with internet failes, period is multiplied on this value, but it cannot exceed \a MAX_PUBLIC_SYNC_TIME_PERIOD_SEC
     static const size_t INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF = 2;
     static const size_t MAX_INTERNET_SYNC_TIME_PERIOD_SEC = 24*60*60;
-    static const size_t INTERNET_TIME_EXPIRATION_PERIOD_SEC = 7*24*60*60;   //one week
+    //static const size_t INTERNET_TIME_EXPIRATION_PERIOD_SEC = 7*24*60*60;   //one week
     static const size_t MILLIS_PER_SEC = 1000;
     //!Considering internet time equal to local time if difference is no more than this value
     static const qint64 MAX_LOCAL_SYSTEM_TIME_DRIFT = 10*1000;
