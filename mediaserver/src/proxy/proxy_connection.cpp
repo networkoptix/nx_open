@@ -201,19 +201,6 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
             xServerGUID = itr->second;
     }
 
-    if( dstUrl.host().isEmpty() )
-    {
-        //searching for resource by guid
-        QnResourcePtr res = QnResourcePool::instance()->getResourceById( xServerGUID );
-        const QnMediaServerResource* mediaServerRes = res.dynamicCast<QnMediaServerResource>().data();
-        if( mediaServerRes )
-        {
-            QUrl mServerApiUrl( mediaServerRes->getApiUrl() );
-            dstUrl.setHost( mServerApiUrl.host() );
-            dstUrl.setPort( mServerApiUrl.port(nx_http::DEFAULT_HTTP_PORT) );
-        }
-    }
-
     QnRoute route;
     if (!xServerGUID.isEmpty())
         route = QnRouter::instance()->routeTo(xServerGUID);
@@ -245,6 +232,11 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
                     dstUrl.setHost(route.points.first().host);
                     dstUrl.setPort(route.points.first().port);
                 }
+            }
+            else
+            {
+                dstUrl.setHost( route.points.front().host );
+                dstUrl.setPort( route.points.front().port );
             }
         }
     }
