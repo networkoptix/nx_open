@@ -1,7 +1,7 @@
 #include "yv12_to_rgb_shader_program.h"
 
 QnAbstractYv12ToRgbShaderProgram::QnAbstractYv12ToRgbShaderProgram(const QGLContext *context, QObject *parent):
-    QnAbstractBaseGLShaderProgramm(context, parent),
+    QnGLShaderProgram(context, parent),
     m_wasLinked(false)
 {
     addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
@@ -21,7 +21,7 @@ QnAbstractYv12ToRgbShaderProgram::QnAbstractYv12ToRgbShaderProgram(const QGLCont
 
 bool QnAbstractYv12ToRgbShaderProgram::link()
 {
-    m_wasLinked = QnAbstractBaseGLShaderProgramm::link();
+    m_wasLinked = QnGLShaderProgram::link();
     if (m_wasLinked) {
         m_yTextureLocation = uniformLocation("yTexture");
         m_uTextureLocation = uniformLocation("uTexture");
@@ -395,7 +395,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
 // ------------------------- QnAbstractRGBAShaderProgram ------------------------------
 
 QnAbstractRGBAShaderProgram::QnAbstractRGBAShaderProgram(const QGLContext *context, QObject *parent, bool final):
-    QnAbstractBaseGLShaderProgramm(context, parent) 
+    QnGLShaderProgram(context, parent) 
 {
     addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
     attribute vec4 aPosition;
@@ -414,7 +414,7 @@ QnAbstractRGBAShaderProgram::QnAbstractRGBAShaderProgram(const QGLContext *conte
 
 bool QnAbstractRGBAShaderProgram::link()
 {
-    bool rez = QnAbstractBaseGLShaderProgramm::link();
+    bool rez = QnGLShaderProgram::link();
     if (rez) {
         m_rgbaTextureLocation = uniformLocation("rgbaTexture");
         m_opacityLocation = uniformLocation("opacity");

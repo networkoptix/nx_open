@@ -299,7 +299,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     QGraphicsLayout::setInstantInvalidatePropagation(true);
 
     /* Install and configure instruments. */
-    m_fpsCountingInstrument = new FpsCountingInstrument(333, this);
+    m_fpsCountingInstrument = new FpsCountingInstrument(1000, this);
     m_controlsActivityInstrument = new ActivityListenerInstrument(true, hideConstrolsTimeoutMSec, this);
 
     m_instrumentManager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());

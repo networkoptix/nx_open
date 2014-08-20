@@ -4,11 +4,11 @@
 
 #include "color_shader_program.h"
 
-class QnTextureColorGLShaderProgramm : public QnColorGLShaderProgramm 
+class QnTextureGLShaderProgram : public QnColorGLShaderProgram 
 {
     Q_OBJECT
 public:
-    QnTextureColorGLShaderProgramm(const QGLContext *context = NULL, QObject *parent = NULL);
+    QnTextureGLShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
 
     void setTexture(int target){
         setUniformValue(m_texture, target);
@@ -17,7 +17,7 @@ public:
 
     virtual bool link() override
     {
-        bool rez = QnColorGLShaderProgramm::link();
+        bool rez = QnColorGLShaderProgram::link();
         if (rez) {
             m_texture = uniformLocation("uTexture");
         }

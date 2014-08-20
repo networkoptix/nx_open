@@ -7,7 +7,7 @@
 #include "texture_color_shader_program.h"
 
 
-class QnTextureTransitionShaderProgram: public QnTextureColorGLShaderProgramm {
+class QnTextureTransitionShaderProgram: public QnTextureGLShaderProgram {
     Q_OBJECT
 public:
     QnTextureTransitionShaderProgram(const QGLContext *context, QObject *parent = NULL);
@@ -24,7 +24,7 @@ public:
 
     virtual bool link() override
     {
-        bool rez = QnTextureColorGLShaderProgramm::link();
+        bool rez = QnTextureGLShaderProgram::link();
         if (rez) {
             m_texture1 = uniformLocation("uTexture1");
             m_progressLocation = uniformLocation("aProgress");

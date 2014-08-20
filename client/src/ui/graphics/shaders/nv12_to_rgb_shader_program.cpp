@@ -52,7 +52,7 @@ namespace {
 
 
 QnNv12ToRgbShaderProgram::QnNv12ToRgbShaderProgram(const QGLContext *context, QObject *parent):
-    QnAbstractBaseGLShaderProgramm(context, parent),
+    QnGLShaderProgram(context, parent),
     m_wasLinked(false)
 {
     addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(

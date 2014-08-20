@@ -6,7 +6,7 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include "base_shader_program.h"
 
-class QnNv12ToRgbShaderProgram: public QnAbstractBaseGLShaderProgramm {
+class QnNv12ToRgbShaderProgram: public QnGLShaderProgram {
     Q_OBJECT
 public:
     enum Colorspace {

@@ -13,7 +13,7 @@
 
 #include "base_shader_program.h"
 
-class QnAbstractYv12ToRgbShaderProgram : public QnAbstractBaseGLShaderProgramm {
+class QnAbstractYv12ToRgbShaderProgram : public QnGLShaderProgram {
     Q_OBJECT
 public:
     QnAbstractYv12ToRgbShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
@@ -43,7 +43,7 @@ private:
 };
 
 
-class QnAbstractRGBAShaderProgram : public QnAbstractBaseGLShaderProgramm {
+class QnAbstractRGBAShaderProgram : public QnGLShaderProgram {
     Q_OBJECT
 public:
     QnAbstractRGBAShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, bool final = true);
