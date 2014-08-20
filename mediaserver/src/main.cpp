@@ -454,8 +454,9 @@ QnAbstractStorageResourceList createStorages()
     return storages;
 }
 
-void updateStorages(QnMediaServerResourcePtr mServer)
+bool updateStorages(QnMediaServerResourcePtr mServer)
 {
+    bool isModified = false;
     // I've switched all patches to native separator to fix network patches like \\computer\share
     foreach(QnAbstractStorageResourcePtr abstractStorage, mServer->getStorages()) 
     {
@@ -466,7 +467,10 @@ void updateStorages(QnMediaServerResourcePtr mServer)
             QString updatedURL = QDir::toNativeSeparators(storage->getUrl());
             if (updatedURL.endsWith(QDir::separator()))
                 updatedURL.chop(1);
-            storage->setUrl(updatedURL);
+            if (storage->getUrl() != updatedURL) {
+                storage->setUrl(updatedURL);
+                isModified = true;
+            }
         }
 
     }
@@ -489,10 +493,12 @@ void updateStorages(QnMediaServerResourcePtr mServer)
         if (available < bigStorageThreshold) {
             if (storage->isUsedForWriting()) {
                 storage->setUsedForWriting(false);
+                isModified = true;
                 qWarning() << "Disable writing to storage" << storage->getPath() << "because of low storage size";
             }
         }
     }
+    return isModified;
 }
 
 void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddress, int port)
@@ -1405,15 +1411,27 @@ void QnMain::run()
             if (!isExists)
                 serverIfaceList << publicAddress;
         }
-        server->setNetAddrList(serverIfaceList);
+
+        bool isModified = false;
+        if (server->getNetAddrList() != serverIfaceList) {
+            server->setNetAddrList(serverIfaceList);
+            isModified = true;
+        }
 
         QnAbstractStorageResourceList storages = server->getStorages();
-        if (storages.isEmpty())
+        if (storages.isEmpty()) {
             server->setStorages(createStorages());
+            isModified = true;
+        }
+        else if (updateStorages(server)) {
+            isModified = true;
+        }
+        
+        if (isModified)
+            m_mediaServer = registerServer(ec2Connection, server);
         else
-            updateStorages(server);
+            m_mediaServer = server;
 
-        m_mediaServer = registerServer(ec2Connection, server);
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
     }
