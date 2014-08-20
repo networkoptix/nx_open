@@ -353,9 +353,6 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         case ApiCommand::tranSyncResponse:
             onGotTransactionSyncResponse(sender, tran);
             return;
-        case ApiCommand::runtimeInfoChanged:
-            onGotServerRuntimeInfo(tran, sender->remotePeer().id);
-            break;
         case ApiCommand::peerAliveInfo:
             onGotServerAliveInfo(tran, sender->remotePeer().id);
             break;
@@ -364,6 +361,11 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             break;
         case ApiCommand::broadcastPeerSystemTime:
             TimeSynchronizationManager::instance()->peerSystemTimeReceived( tran );
+            break;
+        case ApiCommand::runtimeInfoChanged:
+            onGotServerRuntimeInfo(tran, sender->remotePeer().id);
+            if( m_handler )
+                m_handler->triggerNotification(tran);
             break;
         default:
             // general transaction
