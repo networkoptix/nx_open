@@ -115,7 +115,7 @@ namespace ec2
 
         QByteArray result;
         result.resize( MAX_DECIMAL_DIGITS_IN_64BIT_INT*3 + 1 );
-        sprintf( result.data(), "%lld,%lld,%lld", monotonicClockValue, syncTime, timePriorityKey.toUInt64() );
+        sprintf( result.data(), "%lld_%lld_%lld", monotonicClockValue, syncTime, timePriorityKey.toUInt64() );
         result.resize( (int)strlen( result.data() ) );
         return result;
     }
@@ -125,7 +125,7 @@ namespace ec2
         int curSepPos = 0;
         for( int i = 0; curSepPos < str.size(); ++i )
         {
-            int nextSepPos = str.indexOf( ',', curSepPos );
+            int nextSepPos = str.indexOf( '_', curSepPos );
             if( nextSepPos == -1 )
                 nextSepPos = str.size();
             if( i == 0 )
@@ -415,14 +415,49 @@ namespace ec2
     }
 
     //!used to pass time sync information between peers
-    static const QByteArray TIME_SYNC_EXTENSION_NAME( "time_sync" );
+    static const QByteArray TIME_SYNC_EXTENSION_NAME( "time_sync_" );
 
     void TimeSynchronizationManager::onBeforeSendingHttpChunk(
         QnTransactionTransport* /*transport*/,
         std::vector<nx_http::ChunkExtension>* const extensions )
     {
-        //synchronizing time periodically with every transaction, why not?
-        extensions->emplace_back( TIME_SYNC_EXTENSION_NAME, getTimeSyncInfo().toString() );
+        //synchronizing time with every transaction, why not?
+        //NOTE shitty iOS does not support http chunk extensions properly, so avoiding using ,=
+        extensions->emplace_back( nx_http::ChunkExtension(TIME_SYNC_EXTENSION_NAME + getTimeSyncInfo().toString(), nx_http::StringType()) );
+    }
+
+    void TimeSynchronizationManager::onRecevingHttpChunkExtensions(
+        QnTransactionTransport* transport,
+        const std::vector<nx_http::ChunkExtension>& extensions )
+    {
+        for( auto extension : extensions )
+        {
+            if( extension.first.startsWith( TIME_SYNC_EXTENSION_NAME ) )
+            {
+                const nx_http::StringType& serializedTimeSync = extension.first.mid( TIME_SYNC_EXTENSION_NAME.size() );
+
+                //taking into account tcp connection round trip time
+                unsigned int rttMillis = 0;
+                StreamSocketInfo sockInfo;
+                if( transport->getSocket()->getConnectionStatistics( &sockInfo ) )
+                    rttMillis = sockInfo.rttVar;
+
+                TimeSyncInfo remotePeerTimeSyncInfo;
+                if( !remotePeerTimeSyncInfo.fromString( serializedTimeSync ) )
+                    continue;
+
+                assert( remotePeerTimeSyncInfo.timePriorityKey.seed > 0 );
+
+                QMutexLocker lk( &m_mutex );
+                remotePeerTimeSyncUpdate(
+                    &lk,
+                    transport->remotePeer().id,
+                    m_monotonicClock.elapsed(),
+                    remotePeerTimeSyncInfo.syncTime + rttMillis / 2,
+                    remotePeerTimeSyncInfo.timePriorityKey );
+                return;
+            }
+        }
     }
 
     void TimeSynchronizationManager::broadcastLocalSystemTime( quint64 taskID )
@@ -591,38 +626,6 @@ namespace ec2
         return m_localSystemTimeDelta == std::numeric_limits<qint64>::min()
             ? QDateTime::currentMSecsSinceEpoch()
             : m_monotonicClock.elapsed() + m_localSystemTimeDelta;
-    }
-
-    void TimeSynchronizationManager::onRecevingHttpChunkExtensions(
-        QnTransactionTransport* transport,
-        const std::vector<nx_http::ChunkExtension>& extensions )
-    {
-        for( auto extension: extensions )
-        {
-            if( extension.first == TIME_SYNC_EXTENSION_NAME )
-            {
-                //taking into account tcp connection round trip time
-                unsigned int rttMillis = 0;
-                StreamSocketInfo sockInfo;
-                if( transport->getSocket()->getConnectionStatistics( &sockInfo ) )
-                    rttMillis = sockInfo.rttVar;
-
-                TimeSyncInfo remotePeerTimeSyncInfo;
-                if( !remotePeerTimeSyncInfo.fromString( extension.second ) )
-                    continue;
-
-                assert( remotePeerTimeSyncInfo.timePriorityKey.seed > 0 );
-        
-                QMutexLocker lk( &m_mutex );
-                remotePeerTimeSyncUpdate(
-                    &lk,
-                    transport->remotePeer().id,
-                    m_monotonicClock.elapsed(),
-                    remotePeerTimeSyncInfo.syncTime + rttMillis / 2,
-                    remotePeerTimeSyncInfo.timePriorityKey );
-                return;
-            }
-        }
     }
 
     void TimeSynchronizationManager::onPeerLost( ApiPeerAliveData data )
