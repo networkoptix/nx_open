@@ -56,8 +56,9 @@ namespace ec2 {
         {
             result += ';';
             result += val.first;
-            result += '=';
+            result += "=\"";
             result += val.second;
+            result += "\"";
         }
         result += "\r\n";
         dataSize = htonl(dataSize);
