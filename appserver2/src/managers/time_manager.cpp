@@ -184,7 +184,10 @@ namespace ec2
 #ifndef EDGE_SERVER
         m_localTimePriorityKey.flags |= peerIsNotEdgeServer;
 #endif
-        m_localTimePriorityKey.seed = (rand() | (rand() * RAND_MAX)) + 1;
+        for( int i = 0; (m_localTimePriorityKey.seed == 0) && (i < 3); ++i )
+            m_localTimePriorityKey.seed = (rand() | (rand() * RAND_MAX));
+        if( m_localTimePriorityKey.seed == 0 )
+            m_localTimePriorityKey.seed = rand() + 1;
         //TODO #ak handle priority key duplicates or use guid?
         if( QElapsedTimer::isMonotonic() )
             m_localTimePriorityKey.flags |= peerHasMonotonicClock;
@@ -592,6 +595,8 @@ namespace ec2
                 TimeSyncInfo remotePeerTimeSyncInfo;
                 if( !remotePeerTimeSyncInfo.fromString( extension.second ) )
                     continue;
+
+                assert( remotePeerTimeSyncInfo.timePriorityKey.seed > 0 );
         
                 QMutexLocker lk( &m_mutex );
                 remotePeerTimeSyncUpdate(
