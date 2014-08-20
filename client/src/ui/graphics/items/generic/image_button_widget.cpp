@@ -257,7 +257,7 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
 
     if (!m_initialized) 
-        initializeVbo(rect);
+        initializeVao(rect);
 
     bool isZero = qFuzzyIsNull(progress);
     bool isOne = qFuzzyCompare(progress, 1.0);
@@ -595,7 +595,7 @@ QnImageButtonWidget::StateFlags QnImageButtonWidget::validPixmapState(StateFlags
     return findValidState(flags, m_pixmaps, [](const QPixmap &pixmap) { return !pixmap.isNull(); });
 }
 
-void QnImageButtonWidget::initializeVbo(const QRectF &rect) {
+void QnImageButtonWidget::initializeVao(const QRectF &rect) {
 
     GLfloat vertices[] = {
         (GLfloat)rect.left(),   (GLfloat)rect.top(),
@@ -622,7 +622,7 @@ void QnImageButtonWidget::initializeVbo(const QRectF &rect) {
     const int VERTEX_POS_SIZE = 2; // x, y
     const int VERTEX_TEXCOORD0_SIZE = 2; // s and t
 
-    /* Init static VBO */
+    /* Init static VAO */
     auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getTextureShader();
     m_verticesStatic.create();
     m_verticesStatic.bind();
@@ -651,7 +651,7 @@ void QnImageButtonWidget::initializeVbo(const QRectF &rect) {
     m_positionBufferStatic.release();
     m_verticesStatic.release();
 
-    /* Init transition VBO */
+    /* Init transition VAO */
     m_verticesTransition.create();
     m_verticesTransition.bind();
 

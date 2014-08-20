@@ -118,7 +118,7 @@ protected:
     void invalidatePixmapCache();
     StateFlags validPixmapState(StateFlags flags) const;
 
-    void initializeVbo(const QRectF &rect);
+    void initializeVao(const QRectF &rect);
 
     bool skipHoverEvent(QGraphicsSceneHoverEvent *event);
     bool skipMenuEvent(QGraphicsSceneMouseEvent *event);
