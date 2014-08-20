@@ -218,6 +218,7 @@ namespace ec2
             m_internetSynchronizationTaskID = TimerManager::instance()->addTimer(
                 std::bind( &TimeSynchronizationManager::syncTimeWithInternet, this, _1 ),
                 0 );
+            NX_LOG( lit( "TimeSynchronizationManager. Added time sync task %1, delay %2" ).arg( m_internetSynchronizationTaskID ).arg( m_internetTimeSynchronizationPeriod * MILLIS_PER_SEC ), cl_logDEBUG2 );
         }
         else
             m_manualTimerServerSelectionCheckTaskID = TimerManager::instance()->addTimer(
@@ -373,7 +374,7 @@ namespace ec2
         //if there is new maximum remotePeerTimePriorityKey than updating delta and emitting timeChanged
         if( remotePeerTimePriorityKey > m_usedTimeSyncInfo.timePriorityKey )
         {
-            NX_LOG( lit("Received sync time update from peer %1, peer's sync time (%2), peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5. Acceping peer's synchronized time").
+            NX_LOG( lit("Received sync time update from peer %1, peer's sync time (%2), peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5. Accepting peer's synchronized time").
                 arg( remotePeerID.toString() ).arg( QDateTime::fromMSecsSinceEpoch( remotePeerSyncTime ).toString( Qt::ISODate ) ).
                 arg( remotePeerTimePriorityKey.toUInt64(), 0, 16 ).arg( qnCommon->moduleGUID().toString() ).
                 arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logWARNING );
@@ -496,8 +497,10 @@ namespace ec2
         }
     }
 
-    void TimeSynchronizationManager::syncTimeWithInternet( quint64 /*taskID*/ )
+    void TimeSynchronizationManager::syncTimeWithInternet( quint64 taskID )
     {
+        NX_LOG( lit( "TimeSynchronizationManager::syncTimeWithInternet. taskID %1" ).arg( taskID ), cl_logDEBUG2 );
+
         {
             QMutexLocker lk( &m_mutex );
 
@@ -556,10 +559,13 @@ namespace ec2
                 MAX_INTERNET_SYNC_TIME_PERIOD_SEC );
         }
 
+        assert( m_internetSynchronizationTaskID == 0 );
+
         using namespace std::placeholders;
         m_internetSynchronizationTaskID = TimerManager::instance()->addTimer(
             std::bind( &TimeSynchronizationManager::syncTimeWithInternet, this, _1 ),
             m_internetTimeSynchronizationPeriod * MILLIS_PER_SEC );
+        NX_LOG( lit( "TimeSynchronizationManager. Added time sync task %1, delay %2" ).arg( m_internetSynchronizationTaskID ).arg( m_internetTimeSynchronizationPeriod * MILLIS_PER_SEC ), cl_logDEBUG2 );
     }
 
     qint64 TimeSynchronizationManager::currentMSecsSinceEpoch() const
