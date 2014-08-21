@@ -84,6 +84,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
                 mediaServer->setVersion(moduleInformation.version);
                 mediaServer->setSystemInfo(moduleInformation.systemInformation);
                 mediaServer->setSystemName(moduleInformation.systemName);
+                mediaServer->setStatus(Qn::Incompatible);
             }
         }
     }
@@ -95,12 +96,9 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
     }
     else {
         bool mserverStatusChanged = false;
-        bool compatibleStatusChanged = false;
         QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>();
-        if (mediaServer) {
+        if (mediaServer)
             mserverStatusChanged = ownResource->getStatus() != resource->getStatus();
-            compatibleStatusChanged = mserverStatusChanged && (ownResource->getStatus() == Qn::Incompatible || resource->getStatus() == Qn::Incompatible);
-        }
 
         // move incompatible resource to the main pool if it became normal
         if (ownResource && ownResource->getStatus() == Qn::Incompatible && resource->getStatus() != Qn::Incompatible)
@@ -110,10 +108,6 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 
         if (mserverStatusChanged && mediaServer)
             determineOptimalIF(mediaServer);
-
-        // move server into the other subtree if compatibility has been changed
-        if (compatibleStatusChanged && mediaServer)
-            mediaServer->parentIdChanged(mediaServer);
     }
 
     // TODO: #Elric #2.3 don't update layout if we're re-reading resources, 
