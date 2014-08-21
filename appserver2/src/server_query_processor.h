@@ -7,6 +7,7 @@
 #define SERVER_QUERY_PROCESSOR_H
 
 #include <QtCore/QDateTime>
+#include <QtCore/QDebug>
 
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/common/model_functions.h>
