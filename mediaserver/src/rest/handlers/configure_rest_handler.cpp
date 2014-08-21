@@ -105,14 +105,14 @@ int QnConfigureRestHandler::changeAdminPassword(const QString &password, const Q
 }
 
 int QnConfigureRestHandler::changePort(int port) {
-    if (port == 0 || port == MSSettings::roSettings()->value(nx_ms_conf::RTSP_PORT).toInt())
+    if (port == 0 || port == MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT).toInt())
         return ResultSkip;
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
     if (!server)
         return ResultFail;
 
-    MSSettings::roSettings()->setValue(nx_ms_conf::RTSP_PORT, port);
+    MSSettings::roSettings()->setValue(nx_ms_conf::SERVER_PORT, port);
 
     //TODO: update port in TCP listener
 

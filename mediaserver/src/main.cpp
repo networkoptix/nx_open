@@ -1003,7 +1003,7 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
     if (isCompatible(moduleInformation.version, qnCommon->engineVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
-        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
+        QString url = QString( lit( "%1://%2:%3" ) ).arg( moduleInformation.sslAllowed ? lit( "https" ) : lit( "http" ) ).arg( remoteAddress ).arg( moduleInformation.port );
         ec2Connection->addRemotePeer(url, moduleInformation.id);
     } else {
         at_peerLost(moduleInformation);
@@ -1020,7 +1020,7 @@ void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
 
 bool QnMain::initTcpListener()
 {
-    const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::RTSP_PORT, nx_ms_conf::DEFAULT_RTSP_PORT).toInt();
+    const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
     QnRestProcessorPool::instance()->registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/storageStatus", new QnStorageStatusRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/storageSpace", new QnStorageSpaceRestHandler());
@@ -1045,8 +1045,8 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler() );
+    QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/routingInformation", new QnRoutingInformationRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/joinSystem", new QnJoinSystemRestHandler());
@@ -1060,8 +1060,11 @@ bool QnMain::initTcpListener()
 #endif
     QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
 
-    m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
-    m_universalTcpListener->enableSSLMode();
+    m_universalTcpListener = new QnUniversalTcpListener(
+        QHostAddress::Any,
+        rtspPort,
+        QnTcpListener::DEFAULT_MAX_CONNECTIONS,
+        MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool() );
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
@@ -1342,6 +1345,7 @@ void QnMain::run()
         QCoreApplication::quit();
         return;
     }
+
     using namespace std::placeholders;
     m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>( std::bind( &QnServerMessageProcessor::isProxy, messageProcessor.data(), _1 ) );
 
@@ -1464,7 +1468,25 @@ void QnMain::run()
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
-    m_moduleFinder = new QnModuleFinder(false);
+    QString moduleName = qApp->applicationName();
+    if( moduleName.startsWith( qApp->organizationName() ) )
+        moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
+
+    QnModuleInformation selfInformation;
+    selfInformation.type = moduleName;
+    selfInformation.customization = lit( QN_CUSTOMIZATION_NAME );
+    selfInformation.version = qnCommon->engineVersion();
+    selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
+    selfInformation.systemName = qnCommon->localSystemName();
+    selfInformation.port = MSSettings::roSettings()->value( nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT ).toInt();
+    //selfInformation.remoteAddresses = ;
+    //selfInformation.isLocal = ; //!< true if at least one address from \a remoteHostAddress is a local address
+    selfInformation.id = serverGuid();
+    selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
+
+    qnCommon->setModuleInformation(selfInformation);
+
+    m_moduleFinder = new QnModuleFinder( false );
     if (cmdLineArguments.devModeKey == lit("razrazraz")) {
         m_moduleFinder->setCompatibilityMode(true);
         ec2ConnectionFactory->setCompatibilityMode(true);
@@ -1479,7 +1501,6 @@ void QnMain::run()
         if (!allowedPeers.isEmpty())
             m_moduleFinder->setAllowedPeers(allowedPeers);
     }
-
 
     QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleFound,     this,   &QnMain::at_peerFound,  Qt::DirectConnection);
     QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleLost,      this,   &QnMain::at_peerLost,   Qt::DirectConnection);

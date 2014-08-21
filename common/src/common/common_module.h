@@ -9,6 +9,7 @@
 #include <utils/common/singleton.h>
 #include <utils/common/instance_storage.h>
 #include <utils/common/software_version.h>
+#include <utils/network/module_information.h>
 #include "nx_ec/data/api_runtime_data.h"
 
 class QnSessionManager;
@@ -55,8 +56,8 @@ public:
     void setModuleUlr(const QUrl& url) { m_url = url; }
 
     void setLocalSystemName(const QString& value);
-    QString localSystemName() { return m_localSystemName; }
-    QByteArray getSystemPassword() { return "{61D85D22-E7AA-44EC-B5EC-1BEAC9FE19C5}"; }
+    QString localSystemName() const;
+    QByteArray getSystemPassword() const { return "{61D85D22-E7AA-44EC-B5EC-1BEAC9FE19C5}"; }
 
     void setDefaultAdminPassword(const QString& password) { m_defaultAdminPassword = password; }
     QString defaultAdminPassword() const { return m_defaultAdminPassword; }
@@ -66,6 +67,9 @@ public:
 
     QnSoftwareVersion engineVersion() const;
     void setEngineVersion(const QnSoftwareVersion &version);
+
+    void setModuleInformation( const QnModuleInformation& moduleInformation );
+    QnModuleInformation moduleInformation() const;
 
 signals:
     void systemNameChanged(const QString &systemName);
@@ -84,6 +88,7 @@ private:
     QUrl m_url;
     bool m_cloudMode;
     QnSoftwareVersion m_engineVersion;
+    QnModuleInformation m_moduleInformation;
     mutable QMutex m_mutex;
 };
 

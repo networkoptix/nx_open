@@ -132,18 +132,17 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
         return false;
     }
 
+    //TODO #ak RevealResponse class is excess here. Should send/receive QnModuleInformation
+    const QnModuleInformation& selfModuleInformation = qnCommon->moduleInformation();
     RevealResponse response;
-    response.version = qnCommon->engineVersion().toString();
-    QString moduleName = qApp->applicationName();
-    if (moduleName.startsWith(qApp->organizationName()))
-        moduleName = moduleName.mid(qApp->organizationName().length()).trimmed();
-
-    response.type = moduleName;
-    response.customization = QString::fromLatin1(QN_CUSTOMIZATION_NAME);
-    response.seed = qnCommon->moduleGUID().toString();
-    response.name = qnCommon->localSystemName();
-    response.systemInformation = QnSystemInformation::currentSystemInformation().toString();
-    response.typeSpecificParameters.insert(lit("port"), QString::number(qnCommon->moduleUrl().port()));
+    response.version = selfModuleInformation.version.toString();
+    response.type = selfModuleInformation.type;
+    response.customization = selfModuleInformation.customization;
+    response.seed = selfModuleInformation.id.toString();
+    response.name = selfModuleInformation.systemName;
+    response.systemInformation = selfModuleInformation.systemInformation.toString();
+    response.sslAllowed = selfModuleInformation.sslAllowed;
+    response.typeSpecificParameters.insert(lit("port"), QString::number(selfModuleInformation.port));
     quint8 *responseBufStart = readBuffer;
     if (!response.serialize(&responseBufStart, readBuffer + READ_BUFFER_SIZE))
         return false;
@@ -310,4 +309,5 @@ QnMulticastModuleFinder::ModuleContext::ModuleContext(const RevealResponse &resp
     moduleInformation.systemName = response.name;
     moduleInformation.port = response.typeSpecificParameters.value(lit("port")).toUShort();
     moduleInformation.id = QUuid(response.seed);
+    moduleInformation.sslAllowed = response.sslAllowed;
 }

@@ -57,6 +57,7 @@ namespace ec2
         Ec2ThreadPool m_ec2ThreadPool;
         bool m_terminated;
         int m_runningRequests;
+        bool m_sslEnabled;
 
         int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);
         int establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler );

@@ -56,6 +56,7 @@ namespace ec2
         QnTransactionMessageBus::instance()->start();
 
         QUrl url(m_queryProcessor->getUrl());
+        url.setScheme( m_connectionInfo.allowSslConnections ? lit("https") : lit("http") );
         url.setPath("ec2/events");
         QUrlQuery q;
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());

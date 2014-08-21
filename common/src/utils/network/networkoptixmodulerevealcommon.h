@@ -44,6 +44,9 @@ public:
     //!random string, unique for particular module instance
     QUuid seed;
     TypeSpecificParamMap typeSpecificParameters;
+    bool sslAllowed;
+
+    RevealResponse();
 
     bool serialize(quint8 ** const bufStart, const quint8 *bufEnd);
     bool deserialize(const quint8 **bufStart, const quint8 *bufEnd);
