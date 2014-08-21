@@ -397,7 +397,7 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
     for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
         it->state = PeerUpdateInformation::UpdateCanceled;
 
-    setState(Idle);
+    setUpdateResult(Cancelled);
     return true;
 }
 
