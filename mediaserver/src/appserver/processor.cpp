@@ -10,6 +10,7 @@
 
 #include "api/common_message_processor.h"
 #include "mutex/camera_data_handler.h"
+#include "mutex/distributed_mutex_manager.h"
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QUuid serverId)
     : m_serverId(serverId)

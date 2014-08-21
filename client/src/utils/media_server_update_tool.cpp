@@ -17,6 +17,7 @@
 #include <utils/upload_updates_peer_task.h>
 #include <utils/install_updates_peer_task.h>
 #include <utils/rest_update_peer_task.h>
+#include <mutex/distributed_mutex_manager.h>
 
 #include <version.h>
 
@@ -397,7 +398,7 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
     for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
         it->state = PeerUpdateInformation::UpdateCanceled;
 
-    setState(Idle);
+    setUpdateResult(Cancelled);
     return true;
 }
 

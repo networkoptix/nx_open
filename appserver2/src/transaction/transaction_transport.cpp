@@ -272,6 +272,9 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     if( errorCode || bytesRead == 0 )   //error or connection closed
         return setStateNoLock( State::Error );
 
+    if (m_state == Error)
+        return;
+
     assert( m_state == ReadyForStreaming );
 
     //TODO #ak it makes sense to use here some chunk parser class. At this moment http chunk parsing logic is implemented 

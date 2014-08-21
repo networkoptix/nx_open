@@ -616,7 +616,14 @@ void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resou
 }
 
 void QnResourcePoolModel::at_resource_resourceChanged(const QnResourcePtr &resource) {
-    node(resource)->update();
+    QnResourcePoolModelNode *node = this->node(resource);
+
+    bool oldIncompatible = node->resourceStatus() == Qn::Incompatible;
+
+    node->update();
+
+    if (oldIncompatible != (node->resourceStatus() == Qn::Incompatible))
+        node->setParent(expectedParent(node));
 
     foreach(QnResourcePoolModelNode *node, m_itemNodesByResource[resource])
         node->update();

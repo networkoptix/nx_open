@@ -27,7 +27,13 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     ui->setupUi(this);
 
     QnResourcePoolModel *serversModel = new QnResourcePoolModel(Qn::ServersNode, this);
-    ui->serversView->setModel(serversModel);
+    QSortFilterProxyModel *sortedServersModel = new QSortFilterProxyModel(this);
+    sortedServersModel->setSourceModel(serversModel);
+    sortedServersModel->setDynamicSortFilter(true);
+    sortedServersModel->setSortRole(Qt::DisplayRole);
+    sortedServersModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    sortedServersModel->sort(Qn::NameColumn);
+    ui->serversView->setModel(sortedServersModel);
 
     m_serverAddressesModel = new QnServerAddressesModel(this);
     m_sortedServerAddressesModel = new QnSortedServerAddressesModel(this);
