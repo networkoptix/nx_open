@@ -241,7 +241,6 @@ SocketAddress UdtSocketImpl::GetPeerAddress() const {
     }
 }
 
-
 bool UdtSocketImpl::Close() {
     CHECK_UDT_();
     Q_ASSERT(!IsClosed());
@@ -309,11 +308,16 @@ bool UdtSocketImpl::GetMtu( unsigned int* mtuValue ) const {
     return true;
 }
 
+// UDT will round the buffer size internally, so don't expect
+// what you give will definitly become the real buffer size .
+
 bool UdtSocketImpl::SetSendBufferSize( unsigned int buffSize ) {
     CHECK_UDT_();
     Q_ASSERT(!IsClosed());
+    Q_ASSERT( buffSize < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
+    int buff_size = static_cast<int>(buffSize);
     int ret = UDT::setsockopt(
-        handler_,0,UDT_SNDBUF,&buffSize,sizeof(buffSize));
+        handler_,0,UDT_SNDBUF,&buff_size,sizeof(buff_size));
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
     return ret == 0;
 }
@@ -321,18 +325,22 @@ bool UdtSocketImpl::SetSendBufferSize( unsigned int buffSize ) {
 bool UdtSocketImpl::GetSendBufferSize( unsigned int* buffSize ) const{
     CHECK_UDT_();
     Q_ASSERT(!IsClosed());
-    int len = sizeof(*buffSize);
+    int buff_size;
+    int len = sizeof(buff_size);
     int ret = UDT::getsockopt(
-        handler_,0,UDT_SNDBUF,buffSize,&len);
+        handler_,0,UDT_SNDBUF,&buff_size,&len);
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
+    *buffSize = static_cast<unsigned int>(buff_size);
     return ret == 0;
 }
 
 bool UdtSocketImpl::SetRecvBufferSize( unsigned int buffSize ){
     CHECK_UDT_();
     Q_ASSERT(!IsClosed());
+    Q_ASSERT( buffSize < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
+    int buff_size = static_cast<int>(buffSize);
     int ret = UDT::setsockopt(
-        handler_,0,UDT_RCVBUF,&buffSize,sizeof(buffSize));
+        handler_,0,UDT_RCVBUF,&buff_size,sizeof(buff_size));
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
     return ret == 0;
 }
@@ -340,18 +348,22 @@ bool UdtSocketImpl::SetRecvBufferSize( unsigned int buffSize ){
 bool UdtSocketImpl::GetRecvBufferSize( unsigned int* buffSize ) const{
     CHECK_UDT_();
     Q_ASSERT(!IsClosed());
-    int len = sizeof(*buffSize);
+    int buff_size;
+    int len = sizeof(buff_size);
     int ret = UDT::getsockopt(
-        handler_,0,UDT_RCVBUF,buffSize,&len);
+        handler_,0,UDT_RCVBUF,&buff_size,&len);
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
+    *buffSize = static_cast<unsigned int>(buff_size);
     return ret == 0;
 }
 
 bool UdtSocketImpl::SetRecvTimeout( unsigned int millis ) {
     CHECK_UDT_();
     Q_ASSERT(!IsClosed());
+    Q_ASSERT( millis < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
+    int time = static_cast<int>(millis);
     int ret = UDT::setsockopt(
-        handler_,0,UDT_RCVTIMEO,&millis,sizeof(millis));
+        handler_,0,UDT_RCVTIMEO,&time,sizeof(time));
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
     return ret == 0;
 }
@@ -359,18 +371,22 @@ bool UdtSocketImpl::SetRecvTimeout( unsigned int millis ) {
 bool UdtSocketImpl::GetRecvTimeout( unsigned int* millis ) const {
     CHECK_UDT_();
     Q_ASSERT(!IsClosed());
-    int len = sizeof(*millis);
+    int time;
+    int len = sizeof(time);
     int ret = UDT::getsockopt(
-        handler_,0,UDT_RCVTIMEO,millis,&len);
+        handler_,0,UDT_RCVTIMEO,&time,&len);
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
+    *millis = static_cast<int>(time);
     return ret == 0;
 }
 
 bool UdtSocketImpl::SetSendTimeout( unsigned int ms ) {
     CHECK_UDT_();
     Q_ASSERT(!IsClosed());
+    Q_ASSERT( ms < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
+    int time = static_cast<int>(ms);
     int ret = UDT::setsockopt(
-        handler_,0,UDT_SNDTIMEO,&ms,sizeof(ms));
+        handler_,0,UDT_SNDTIMEO,&time,sizeof(time));
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
     return ret == 0;
 }
@@ -378,18 +394,20 @@ bool UdtSocketImpl::SetSendTimeout( unsigned int ms ) {
 bool UdtSocketImpl::GetSendTimeout( unsigned int* millis ) const {
     CHECK_UDT_();
     Q_ASSERT(!IsClosed());
-    int len = sizeof(*millis);
+    int time;
+    int len = sizeof(time);
     int ret = UDT::getsockopt(
-        handler_,0,UDT_SNDTIMEO,millis,&len);
+        handler_,0,UDT_SNDTIMEO,&time,&len);
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
+    *millis = static_cast<unsigned int>(time);
     return ret == 0;
 }
 
 bool UdtSocketImpl::GetLastError( SystemError::ErrorCode* errorCode ) const {
     CHECK_UDT_();
     Q_ASSERT(!IsClosed());
-    Q_UNUSED(errorCode);
-    return false;
+    *errorCode = static_cast<SystemError::ErrorCode>(UDT::getlasterror().getErrorCode());
+    return true;
 }
 
 AbstractSocket::SOCKET_HANDLE UdtSocketImpl::handle() const {
@@ -404,8 +422,17 @@ int UdtSocketImpl::Recv( void* buffer, unsigned int bufferLen, int flags ) {
     CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     int sz = UDT::recv(handler_,reinterpret_cast<char*>(buffer),bufferLen,flags);
-    DEBUG_(
-        if(sz<0) TRACE_("UDT::recv",handler_));
+    if(sz <0) {
+        // UDT doesn't translate the EOF into a recv with zero return, but instead
+        // it returns error with 2001 error code. We need to detect this and translate
+        // back with a zero return here .
+        int error_code = UDT::getlasterror().getErrorCode();
+        if( error_code == CUDTException::ECONNLOST ) {
+            return 0;
+        } else {
+            DEBUG_(TRACE_("UDT::recv",handler_));
+        }
+    }
     return sz;
 }
 
@@ -422,10 +449,10 @@ int UdtSocketImpl::Send( const void* buffer, unsigned int bufferLen ) {
 // one if you bundle the states not_initialized into the original Socket design.
 bool UdtSocketImpl::Reopen() {
     CHECK_UDT_();
-    if(!IsClosed()) {
-        if(!Close()) return false;
+    if(IsClosed()) {
+        return Open();
     }
-    return Open();
+    return true;
 }
 
 // Connector / Acceptor 
@@ -444,6 +471,21 @@ public:
 
 private:
     UdtSocketImpl* impl_;
+};
+
+struct UdtEpollHandlerHelper {
+    UdtEpollHandlerHelper(int fd,UDTSOCKET udt_handler):
+        epoll_fd(fd){
+            VERIFY_(fd>=0,"UDT::epoll_create",udt_handler);
+    }
+    ~UdtEpollHandlerHelper() {
+        if(epoll_fd >=0) {
+            int ret = UDT::epoll_release(epoll_fd);
+            VERIFY_(ret ==0,"UDT::epoll_release",udt_handler);
+        }
+    }
+    int epoll_fd;
+    UDTSOCKET udt_handler;
 };
 
 bool UdtConnector::Connect( const QString& address , unsigned short port , int timeouts ) {
@@ -476,26 +518,24 @@ bool UdtConnector::Connect( const QString& address , unsigned short port , int t
             return true;
         }
     }
-    // When we reach here it means that we are in a nonblocking socket , so we need to use
-    // select to poll until that socket is ready for the connection .
-    // UDT also make the connection notification in recv set which is different with typical
-    // read set for select on Win32/Posix platform.
-    UDT::UDSET recv_set;
-    UD_ZERO(&recv_set);
-    UD_SET(impl_->udt_handler(),&recv_set);
-    timeval diff;
-    diff.tv_sec = timeouts/1000;
-    diff.tv_usec= (timeouts - diff.tv_sec*1000)*1000;
-    int res = UDT::select(0,&recv_set,NULL,NULL,&diff);
+    // Using epoll will ensure that it is correct with any value for the file descriptor. 
+    UdtEpollHandlerHelper epoll_fd(UDT::epoll_create(),impl_->udt_handler());
+    int write_ev = UDT_EPOLL_OUT;
+    ret = UDT::epoll_add_usock(epoll_fd.epoll_fd,impl_->udt_handler(),&write_ev);
+    VERIFY_(ret ==0,"UDT::epoll_add_ssock",impl_->udt_handler());
 
-    if( res < 0 ) {
-        DEBUG_(TRACE_("UDT::select",impl_->udt_handler()));
+    std::set<UDTSOCKET> write_fd;
+    // Waiting on epoll set
+    ret = UDT::epoll_wait(epoll_fd.epoll_fd,NULL,&write_fd,timeouts,NULL,NULL);
+    
+    if( ret < 0 ) {
+        DEBUG_(TRACE_("UDT::epoll_wait",impl_->udt_handler()));
         return false;
     } else {
-        if( res == 0 ) 
+        if( ret == 0 )  {
             return false; // Timeout
-        else {
-            Q_ASSERT(res == 1);
+        } else {
+            Q_ASSERT(ret == 1);
             impl_->state_ = UdtSocketImpl::ESTABLISHED;
             return true;
         }
@@ -517,7 +557,7 @@ private:
 
 UdtSocketImpl* UdtAcceptor::Accept() {
     CHECK_UDT_();
-    Q_ASSERT(impl_->state() == UdtSocketImpl::OPEN);
+    Q_ASSERT(impl_->state() == UdtSocketImpl::ESTABLISHED);
     UDTSOCKET ret = UDT::accept(impl_->udt_handler(),NULL,NULL);
     if( ret == UDT::INVALID_SOCK ) {
         DEBUG_(TRACE_("UDT::accept",impl_->udt_handler()));
