@@ -40,11 +40,14 @@ namespace ec2
 
         template<class T>
         QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header) {
+            return serializedTransactionWithHeader(serializedTransaction(tran), header);
+        }
+
+        QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header) {
             QByteArray result;
             QnOutputBinaryStream<QByteArray> stream(&result);
             QnBinary::serialize(header, &stream);
 
-            QByteArray serializedTran = serializedTransaction(tran);
             stream.write(serializedTran.data(), serializedTran.size());
             return result;
         }

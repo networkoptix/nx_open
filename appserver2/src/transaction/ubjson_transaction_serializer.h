@@ -27,6 +27,10 @@ namespace ec2
         {
         }
 
+        void addToCache(const QnAbstractTransaction::PersistentInfo& key, const QByteArray& data) {
+            m_cache.insert(key, new QByteArray(data), data.size());
+        }
+
         template<class T>
         QByteArray serializedTransaction(const QnTransaction<T>& tran) {
             QMutexLocker lock(&m_mutex);
@@ -51,11 +55,13 @@ namespace ec2
 
         template<class T>
         QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header) {
+            return serializedTransactionWithHeader(serializedTransaction(tran), header);
+        }
+
+        QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header) {
             QByteArray result;
             QnUbjsonWriter<QByteArray> stream(&result);
             QnUbjson::serialize(header, &stream);
-
-            QByteArray serializedTran = serializedTransaction(tran);
             result.append(serializedTran);
             return result;
         }
@@ -63,7 +69,7 @@ namespace ec2
         static bool deserializeTran(const quint8* chunkPayload, int len,  QnTransactionTransportHeader& transportHeader, QByteArray& tranData);
     private:
         mutable QMutex m_mutex;
-        QCache<QnAbstractTransaction::PersistentInfo, QByteArray> m_cache;
+        QCache<QnAbstractTransaction::PersistentInfo, const QByteArray> m_cache;
     };
 
 }
