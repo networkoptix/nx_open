@@ -21,6 +21,8 @@ struct QnModuleInformation {
     QUuid id;
 
     QnModuleInformation() : port(0), isLocal(false) {}
+
+    bool isCompatibleToCurrentSystem() const;
 };
 #define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(port)(remoteAddresses)(isLocal)(id)
 

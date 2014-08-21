@@ -79,13 +79,11 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
     // Use discovery information to update offline servers. They may be just incompatible.
     if (resource->getStatus() == Qn::Offline) {
         QnModuleInformation moduleInformation = QnGlobalModuleFinder::instance()->moduleInformation(resource->getId());
-        if (!moduleInformation.id.isNull()) {
+        if (!moduleInformation.id.isNull() && !moduleInformation.isCompatibleToCurrentSystem()) {
             if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) {
                 mediaServer->setVersion(moduleInformation.version);
                 mediaServer->setSystemInfo(moduleInformation.systemInformation);
                 mediaServer->setSystemName(moduleInformation.systemName);
-                if (moduleInformation.systemName != qnCommon->localSystemName() || moduleInformation.version != qnCommon->engineVersion())
-                    mediaServer->setStatus(Qn::Incompatible);
             }
         }
     }
