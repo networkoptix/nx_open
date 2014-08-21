@@ -85,10 +85,11 @@ namespace nx_tz
 
         std::ifstream tzNameFile( "/etc/timezone" );
         char buf[256];
-        tzNameFile.read(buf, sizeof(buf));
-        if( tzNameFile.fail() )
+        memset( buf, 0, sizeof(buf) );
+        tzNameFile.read(buf, sizeof(buf)-1);
+        if( !tzNameFile.eof() )
             return -1;
-        ISOTimezoneData tzData = TZIndex::instance()->getTzOffsets(QByteArray::fromRawData(buf, tzNameFile.gcount()));
+        ISOTimezoneData tzData = TZIndex::instance()->getTzOffsets(QByteArray::fromRawData(buf, tzNameFile.gcount()).trimmed());
         if( tzData.tz == nullptr )
             return -1;
         return tzData.utcOffset;
