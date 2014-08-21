@@ -9,6 +9,7 @@
 #include <QtCore/QUrlQuery>
 
 #include "mutex/distributed_mutex.h"
+#include "mutex/distributed_mutex_manager.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "transaction/transaction_message_bus.h"
 

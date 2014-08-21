@@ -17,6 +17,7 @@
 #include <utils/upload_updates_peer_task.h>
 #include <utils/install_updates_peer_task.h>
 #include <utils/rest_update_peer_task.h>
+#include <mutex/distributed_mutex_manager.h>
 
 #include <version.h>
 

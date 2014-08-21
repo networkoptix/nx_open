@@ -50,6 +50,7 @@ namespace ec2
         qRegisterMetaType<ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiRuntimeData>( "ApiRuntimeData" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); // TODO: #Elric #EC2 register in a proper place!
+        qRegisterMetaType<ApiLockData>( "ApiLockData" ); // TODO: #Elric #EC2 register in a proper place!
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
