@@ -55,6 +55,11 @@ namespace ec2
             return serializedTransaction(tran);
         }
 
+        QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header) {
+            Q_UNUSED(header);    //header is really unused in json clients
+            return serializedTran;
+        }
+
     private:
         mutable QMutex m_mutex;
         QCache<QnAbstractTransaction::PersistentInfo, QByteArray> m_cache;
