@@ -98,37 +98,6 @@ namespace ec2
         virtual bool checkUserData(const QString& name, const QByteArray& data) = 0;
     };
 
-    class QnDistributedMutexManager: public QObject
-    {
-        Q_OBJECT
-    public:
-        static const int DEFAULT_TIMEOUT = 1000 * 30;
-
-        QnDistributedMutexManager();
-        QnDistributedMutex* createMutex(const QString& name);
-
-        static void initStaticInstance(QnDistributedMutexManager*);
-        static QnDistributedMutexManager* instance();
-
-        void setUserDataHandler(QnMutexUserDataHandler* userDataHandler);
-    private:
-        qint64 newTimestamp();
-    private:
-        friend class QnDistributedMutex;
-
-        void at_gotLockRequest(ApiLockData lockInfo);
-        void at_gotLockResponse(ApiLockData lockInfo);
-        //void at_gotUnlockRequest(ApiLockData lockInfo);
-        void at_newPeerFound(QUuid peer);
-        void at_peerLost(QUuid peer);
-        void releaseMutex(const QString& name);
-    private:
-        QMap<QString, QnDistributedMutex*> m_mutexList;
-        mutable QMutex m_mutex;
-        qint64 m_timestamp;
-        QnMutexUserDataHandler* m_userDataHandler;
-    };
-
 }
 
 #endif // __DISTRIBUTED_MUTEX_H_

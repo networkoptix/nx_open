@@ -23,6 +23,7 @@
 #include <media_server/serverutil.h>
 #include "licensing/license.h"
 #include "mutex/camera_data_handler.h"
+#include "mutex/distributed_mutex_manager.h"
 #include "common/common_module.h"
 #include "transaction/transaction_log.h"
 #include "database/db_manager.h"

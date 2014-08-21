@@ -11,7 +11,7 @@
 #include "common/common_module.h"
 #include "managers/time_manager.h"
 #include "mutex/distributed_mutex.h"
-
+#include "mutex/distributed_mutex_manager.h"
 
 namespace ec2
 {

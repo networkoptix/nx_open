@@ -94,7 +94,6 @@ void QnTransactionTransport::setStateNoLock(State state)
             connectDone(m_remotePeer.id);
         m_connected = false;
         */
-        closeSocket();
     }
     else if (state == ReadyForStreaming) {
         processTransactionData(m_extraData);
@@ -272,6 +271,9 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 
     if( errorCode || bytesRead == 0 )   //error or connection closed
         return setStateNoLock( State::Error );
+
+    if (m_state == Error)
+        return;
 
     assert( m_state == ReadyForStreaming );
 
