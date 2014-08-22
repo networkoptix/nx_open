@@ -122,6 +122,15 @@ bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
     return true;
 }
 
+QnDbHelper::QnDbTransaction* QnDbHelper::getTransaction()
+{
+    return &m_tran;
+}
+
+const QnDbHelper::QnDbTransaction* QnDbHelper::getTransaction() const
+{
+    return &m_tran;
+}
 
 bool QnDbHelper::isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database)
 {
