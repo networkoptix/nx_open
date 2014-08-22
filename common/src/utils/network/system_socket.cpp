@@ -951,28 +951,39 @@ bool TCPSocket::getNoDelay( bool* value )
 bool TCPSocket::toggleStatisticsCollection( bool val )
 {
 #ifdef _WIN32
+    Win32TcpSocketImpl* d = static_cast<Win32TcpSocketImpl*>(m_implDelegate.impl());
+
     if( GetTcpRow(
             getLocalAddress().port,
             getForeignAddress().port,
             MIB_TCP_STATE_ESTAB,
-            &static_cast<Win32TcpSocketImpl*>(m_implDelegate.impl())->win32TcpTableRow ) != ERROR_SUCCESS )
+            &d->win32TcpTableRow) != ERROR_SUCCESS )
     {
+        memset(&d->win32TcpTableRow, 0, sizeof(d->win32TcpTableRow));
         return false;
     }
 
     auto freeLambda = [](void* ptr){ ::free(ptr); };
     std::unique_ptr<TCP_ESTATS_PATH_RW_v0, decltype(freeLambda)> pathRW( (TCP_ESTATS_PATH_RW_v0*)malloc( sizeof(TCP_ESTATS_PATH_RW_v0) ), freeLambda );
     if( !pathRW.get() )
+    {
+        memset(&d->win32TcpTableRow, 0, sizeof(d->win32TcpTableRow));
         return false;
+    }
 
     memset( pathRW.get(), 0, sizeof(*pathRW) ); // zero the buffer
     pathRW->EnableCollection = val ? TRUE : FALSE;
     //enabling statistics collection
-    return SetPerTcpConnectionEStats(
-            &static_cast<Win32TcpSocketImpl*>(m_implDelegate.impl())->win32TcpTableRow,
+    if( SetPerTcpConnectionEStats(
+            &d->win32TcpTableRow,
             TcpConnectionEstatsPath,
             (UCHAR*)pathRW.get(), 0, sizeof(*pathRW),
-            0 ) == NO_ERROR;
+            0) != NO_ERROR )
+    {
+        memset(&d->win32TcpTableRow, 0, sizeof(d->win32TcpTableRow));
+        return false;
+    }
+    return true;
 #else
     Q_UNUSED(val);
     return true;
@@ -984,7 +995,14 @@ static const size_t USEC_PER_MSEC = 1000;
 bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
 {
 #ifdef _WIN32
-    return readTcpStat( &static_cast<Win32TcpSocketImpl*>(m_implDelegate.impl())->win32TcpTableRow, info ) == ERROR_SUCCESS;
+    Win32TcpSocketImpl* d = static_cast<Win32TcpSocketImpl*>(m_implDelegate.impl());
+
+    if( !d->win32TcpTableRow.dwLocalAddr &&
+        !d->win32TcpTableRow.dwLocalPort )
+    {
+        return false;
+    }
+    return readTcpStat( &d->win32TcpTableRow, info ) == ERROR_SUCCESS;
 #else
     struct tcp_info tcpinfo;
     memset( &tcpinfo, 0, sizeof(tcpinfo) );

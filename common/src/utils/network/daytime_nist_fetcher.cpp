@@ -144,6 +144,8 @@ void DaytimeNISTFetcher::onConnectionEstablished( SystemError::ErrorCode errorCo
 
 void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead ) noexcept
 {
+    //TODO #ak take into account rtt/2
+
     if( errorCode )
     {
         NX_LOG( lit( "NIST time_sync. Failed to read from NIST server %1:%2. %3" ).

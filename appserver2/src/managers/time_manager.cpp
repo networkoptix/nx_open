@@ -203,7 +203,8 @@ namespace ec2
         assert( TimeManager_instance == nullptr );
         TimeManager_instance = this;
 
-        connect( QnDbManager::instance(), &QnDbManager::initialized, 
+        if (QnDbManager::instance())
+            connect( QnDbManager::instance(), &QnDbManager::initialized, 
                  this, &TimeSynchronizationManager::onDbManagerInitialized,
                  Qt::DirectConnection );
         connect( QnTransactionMessageBus::instance(), &QnTransactionMessageBus::newDirectConnectionEstablished,

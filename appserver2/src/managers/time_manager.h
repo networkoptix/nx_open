@@ -105,8 +105,8 @@ namespace ec2
     public:
         //!Need this flag to synchronize by server peer only
         static const int peerIsServer                            = 0x1000;
-        static const int peerTimeSetByUser                       = 0x0008;
-        static const int peerTimeSynchronizedWithInternetServer  = 0x0004;
+        static const int peerTimeSynchronizedWithInternetServer  = 0x0008;
+        static const int peerTimeSetByUser                       = 0x0004;
         static const int peerHasMonotonicClock                   = 0x0002;
         static const int peerIsNotEdgeServer                     = 0x0001;
 

@@ -590,6 +590,7 @@ void QnResourcePoolModel::at_context_userChanged() {
     m_rootNodes[Qn::LocalNode]->update();
     m_rootNodes[Qn::ServersNode]->update();
     m_rootNodes[Qn::UsersNode]->update();
+    m_rootNodes[Qn::OtherSystemsNode]->update();
 
     foreach(QnResourcePoolModelNode *node, m_resourceNodeByResource)
         node->setParent(expectedParent(node));

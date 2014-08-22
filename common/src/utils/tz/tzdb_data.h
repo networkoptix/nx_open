@@ -6,12 +6,20 @@ namespace nx_tz
 {
     struct ISOTimezoneData
     {
+        //!ISO 3166 2-character country code
         const char* cc;
+        //!Timezone name (TZ)
         const char* tz;
+        //!Offset are given in minutes to the east of UTC. Timezones to the east of UTC have positive offset, to the west - negative
         int utcOffset;
+        //!DST (daylight saving time) offset. Different from the UTC offset for zones where daylight saving time is observed
         int utcDSTOffset;
     };
 
+    /*!
+        Timezone list (ISO 3166 country code : timezone name : UTC offset : UTC DST offset).
+        Offset are given in minutes to the east of UTC. Timezones to the east of UTC have positive offset, to the west - negative
+    */
     static const ISOTimezoneData timezones[] =
     {
         { "CI", "Africa/Abidjan", 0, 0 },

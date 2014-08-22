@@ -13,6 +13,7 @@ namespace Ui {
 
 class QnServerAddressesModel;
 class QnSortedServerAddressesModel;
+class QnResourceListModel;
 
 class QnRoutingManagementWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -35,8 +36,12 @@ private slots:
     void at_currentServer_changed(const QnResourcePtr &resource);
     void at_serverAddressesModel_ignoreChangeRequested(const QString &address, bool ignore);
 
+    void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
+    void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
+
 private:
     QScopedPointer<Ui::QnRoutingManagementWidget> ui;
+    QnResourceListModel *m_serverListModel;
     QnServerAddressesModel *m_serverAddressesModel;
     QnSortedServerAddressesModel *m_sortedServerAddressesModel;
 };
