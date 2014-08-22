@@ -66,6 +66,7 @@ void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &module
             server->setSystemInfo(moduleInformation.systemInformation);
             server->setSystemName(moduleInformation.systemName);
             server->setStatus(moduleInformation.isCompatibleToCurrentSystem() ? Qn::Offline : Qn::Incompatible);
+            qnResPool->updateIncompatibility(server);
         }
         return;
     }
