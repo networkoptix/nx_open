@@ -8,6 +8,7 @@
 #include "nx_ec/ec_api.h"
 #include "nx_ec/dummy_handler.h"
 #include "core/resource/media_server_resource.h"
+
 #include "ui/models/resource_pool_model.h"
 #include "ui/models/server_addresses_model.h"
 
@@ -27,13 +28,16 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     ui->setupUi(this);
 
     QnResourcePoolModel *serversModel = new QnResourcePoolModel(Qn::ServersNode, this);
-    QSortFilterProxyModel *sortedServersModel = new QSortFilterProxyModel(this);
-    sortedServersModel->setSourceModel(serversModel);
-    sortedServersModel->setDynamicSortFilter(true);
-    sortedServersModel->setSortRole(Qt::DisplayRole);
-    sortedServersModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-    sortedServersModel->sort(Qn::NameColumn);
-    ui->serversView->setModel(sortedServersModel);
+
+    /* Leads to crash in reconnect process. */
+//     QSortFilterProxyModel *sortedServersModel = new QSortFilterProxyModel(this);
+//     sortedServersModel->setSourceModel(serversModel);
+//     sortedServersModel->setDynamicSortFilter(true);
+//     sortedServersModel->setSortRole(Qt::DisplayRole);
+//     sortedServersModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+//     sortedServersModel->sort(Qn::NameColumn);
+
+    ui->serversView->setModel(serversModel);
 
     m_serverAddressesModel = new QnServerAddressesModel(this);
     m_sortedServerAddressesModel = new QnSortedServerAddressesModel(this);
@@ -58,6 +62,9 @@ QnMediaServerResourcePtr QnRoutingManagementWidget::currentServer() const {
 }
 
 void QnRoutingManagementWidget::updateModel(const QnMediaServerResourcePtr &server) {
+    if (!server)
+        return;
+
     int port = QUrl(server->getApiUrl()).port();
     if (port == -1)
         port = defaultRtspPort;
@@ -204,7 +211,7 @@ void QnRoutingManagementWidget::at_addressesView_doubleClicked(const QModelIndex
         return;
 
     if (server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == QUrl(server->getApiUrl()).port()) {
-        QMessageBox::warning(this, tr("Warning"), tr("This URL is alerady in the address list."));
+        QMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
         return;
     }
 
@@ -218,7 +225,7 @@ void QnRoutingManagementWidget::at_addressesView_doubleClicked(const QModelIndex
 }
 
 void QnRoutingManagementWidget::at_currentServer_changed(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     updateModel(server);
 }
 
