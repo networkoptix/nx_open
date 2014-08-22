@@ -104,7 +104,7 @@ namespace nx_tz
             {
                 struct stat st;
                 memset( &st, 0, sizeof(st) );
-                if( stat( "/etc/localtime", &st ) != 0 )
+                if( lstat( "/etc/localtime", &st ) != 0 )
                     break;
                 if( !S_ISLNK(st.st_mode) )
                     break;
