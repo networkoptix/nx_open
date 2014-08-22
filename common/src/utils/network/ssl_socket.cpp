@@ -228,7 +228,7 @@ public:
     }
 
     int bio_read ( void* buffer , std::size_t len ) {
-        int digest_size = (std::min)(static_cast<int>(len),bio_in_buffer_.size()-recv_buffer_used_pos_) ;
+        int digest_size = static_cast<int>(std::min(len, bio_in_buffer_.size() - recv_buffer_used_pos_));
         if( digest_size == 0 )
             return 0;
         memcpy( buffer , 
