@@ -79,13 +79,12 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
     // Use discovery information to update offline servers. They may be just incompatible.
     if (resource->getStatus() == Qn::Offline) {
         QnModuleInformation moduleInformation = QnGlobalModuleFinder::instance()->moduleInformation(resource->getId());
-        if (!moduleInformation.id.isNull()) {
+        if (!moduleInformation.id.isNull() && !moduleInformation.isCompatibleToCurrentSystem()) {
             if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) {
                 mediaServer->setVersion(moduleInformation.version);
                 mediaServer->setSystemInfo(moduleInformation.systemInformation);
                 mediaServer->setSystemName(moduleInformation.systemName);
-                if (moduleInformation.systemName != qnCommon->localSystemName() || moduleInformation.version != qnCommon->engineVersion())
-                    mediaServer->setStatus(Qn::Incompatible);
+                mediaServer->setStatus(Qn::Incompatible);
             }
         }
     }
@@ -97,25 +96,17 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
     }
     else {
         bool mserverStatusChanged = false;
-        bool compatibleStatusChanged = false;
         QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>();
-        if (mediaServer) {
+        if (mediaServer)
             mserverStatusChanged = ownResource->getStatus() != resource->getStatus();
-            compatibleStatusChanged = mserverStatusChanged && (ownResource->getStatus() == Qn::Incompatible || resource->getStatus() == Qn::Incompatible);
-        }
-
-        // move incompatible resource to the main pool if it became normal
-        if (ownResource && ownResource->getStatus() == Qn::Incompatible && resource->getStatus() != Qn::Incompatible)
-            qnResPool->makeResourceNormal(ownResource);
 
         ownResource->update(resource);
 
+        if (ownResource)
+            qnResPool->updateIncompatibility(ownResource);
+
         if (mserverStatusChanged && mediaServer)
             determineOptimalIF(mediaServer);
-
-        // move server into the other subtree if compatibility has been changed
-        if (compatibleStatusChanged && mediaServer)
-            mediaServer->parentIdChanged(mediaServer);
     }
 
     // TODO: #Elric #2.3 don't update layout if we're re-reading resources, 

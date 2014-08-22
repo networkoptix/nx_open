@@ -61,7 +61,7 @@ namespace ec2
                 requestUrl.setPassword(QString());
             }
 
-            requestUrl.setPath( QString::fromLatin1("/ec2/%1").arg(ApiCommand::toString(tran.command)) );
+            requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(tran.command)) );
 
             QByteArray tranBuffer;
             Qn::SerializationFormat format = Qn::UbjsonFormat; /*Qn::JsonFormat*/;
@@ -112,7 +112,7 @@ namespace ec2
             if (!QnAppServerConnectionFactory::videowallGuid().isNull())
                 httpClient->addRequestHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
 
-            requestUrl.setPath( QString::fromLatin1("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
+            requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;
             toUrlParams( input, &query );
             requestUrl.setQuery( query );

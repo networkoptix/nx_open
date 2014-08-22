@@ -9,7 +9,7 @@
 
 class QnMulticastModuleFinder;
 class QnDirectModuleFinder;
-class QnDirectModuleFinderHelper;
+class QnModuleFinderHelper;
 
 class QnModuleFinder : public QObject, public Singleton<QnModuleFinder> {
     Q_OBJECT
@@ -26,7 +26,7 @@ public:
 
     QnMulticastModuleFinder *multicastModuleFinder() const;
     QnDirectModuleFinder *directModuleFinder() const;
-    QnDirectModuleFinderHelper *directModuleFinderHelper() const;
+    QnModuleFinderHelper *directModuleFinderHelper() const;
 
     /*! Hacky thing. This function emits moduleLost for every found module and then moduleFound for them.
      * It's used to force a server to drop all its connections and find new.
@@ -51,7 +51,7 @@ private slots:
 private:
     QnMulticastModuleFinder *m_multicastModuleFinder;
     QnDirectModuleFinder *m_directModuleFinder;
-    QnDirectModuleFinderHelper *m_directModuleFinderHelper;
+    QnModuleFinderHelper *m_directModuleFinderHelper;
 
     QHash<QUuid, QnModuleInformation> m_foundModules;
     QList<QUuid> m_allowedPeers;

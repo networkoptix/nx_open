@@ -10,6 +10,9 @@ namespace ec2
 {
     struct ApiPeerAliveData: ApiData
     {
+        ApiPeerAliveData(): isAlive(false) {}
+        ApiPeerAliveData(const ApiPeerData& peer, bool isAlive): peer(peer), isAlive(isAlive) {}
+
         ApiPeerData peer;
         bool isAlive;
     };

@@ -272,6 +272,9 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     if( errorCode || bytesRead == 0 )   //error or connection closed
         return setStateNoLock( State::Error );
 
+    if (m_state == Error)
+        return;
+
     assert( m_state == ReadyForStreaming );
 
     //TODO #ak it makes sense to use here some chunk parser class. At this moment http chunk parsing logic is implemented 
@@ -509,6 +512,34 @@ void QnTransactionTransport::processChunkExtensions( const nx_http::ChunkHeader&
 void QnTransactionTransport::setExtraDataBuffer(const QByteArray& data) 
 { 
     m_extraData = data; 
+}
+
+bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran, const QnTransactionTransportHeader& _header) 
+{
+    if (srcFormat != m_remotePeer.dataFormat)
+        return false;
+
+    QnTransactionTransportHeader header(_header);
+    assert(header.processedPeers.contains(m_localPeer.id));
+    if(header.sequence == 0) 
+        header.fillSequence();
+    switch (m_remotePeer.dataFormat) {
+    case Qn::JsonFormat:
+        addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
+        break;
+    case Qn::BnsFormat:
+        addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
+        break;
+    case Qn::UbjsonFormat:
+        addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
+        break;
+    default:
+        qWarning() << "Client has requested data in the unsupported format" << m_remotePeer.dataFormat;
+        addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
+        break;
+    }
+
+    return true;
 }
 
 }

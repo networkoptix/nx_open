@@ -454,8 +454,9 @@ QnAbstractStorageResourceList createStorages()
     return storages;
 }
 
-void updateStorages(QnMediaServerResourcePtr mServer)
+bool updateStorages(QnMediaServerResourcePtr mServer)
 {
+    bool isModified = false;
     // I've switched all patches to native separator to fix network patches like \\computer\share
     foreach(QnAbstractStorageResourcePtr abstractStorage, mServer->getStorages()) 
     {
@@ -466,7 +467,10 @@ void updateStorages(QnMediaServerResourcePtr mServer)
             QString updatedURL = QDir::toNativeSeparators(storage->getUrl());
             if (updatedURL.endsWith(QDir::separator()))
                 updatedURL.chop(1);
-            storage->setUrl(updatedURL);
+            if (storage->getUrl() != updatedURL) {
+                storage->setUrl(updatedURL);
+                isModified = true;
+            }
         }
 
     }
@@ -489,10 +493,12 @@ void updateStorages(QnMediaServerResourcePtr mServer)
         if (available < bigStorageThreshold) {
             if (storage->isUsedForWriting()) {
                 storage->setUsedForWriting(false);
+                isModified = true;
                 qWarning() << "Disable writing to storage" << storage->getPath() << "because of low storage size";
             }
         }
     }
+    return isModified;
 }
 
 void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddress, int port)
@@ -1003,7 +1009,7 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
     if (isCompatible(moduleInformation.version, qnCommon->engineVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
-        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
+        QString url = QString( lit( "%1://%2:%3" ) ).arg( moduleInformation.sslAllowed ? lit( "https" ) : lit( "http" ) ).arg( remoteAddress ).arg( moduleInformation.port );
         ec2Connection->addRemotePeer(url, moduleInformation.id);
     } else {
         at_peerLost(moduleInformation);
@@ -1020,7 +1026,7 @@ void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
 
 bool QnMain::initTcpListener()
 {
-    const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::RTSP_PORT, nx_ms_conf::DEFAULT_RTSP_PORT).toInt();
+    const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
     QnRestProcessorPool::instance()->registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/storageStatus", new QnStorageStatusRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/storageSpace", new QnStorageSpaceRestHandler());
@@ -1045,8 +1051,8 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler() );
+    QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/routingInformation", new QnRoutingInformationRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/joinSystem", new QnJoinSystemRestHandler());
@@ -1060,8 +1066,11 @@ bool QnMain::initTcpListener()
 #endif
     QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
 
-    m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
-    m_universalTcpListener->enableSSLMode();
+    m_universalTcpListener = new QnUniversalTcpListener(
+        QHostAddress::Any,
+        rtspPort,
+        QnTcpListener::DEFAULT_MAX_CONNECTIONS,
+        MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool() );
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
@@ -1342,6 +1351,7 @@ void QnMain::run()
         QCoreApplication::quit();
         return;
     }
+
     using namespace std::placeholders;
     m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>( std::bind( &QnServerMessageProcessor::isProxy, messageProcessor.data(), _1 ) );
 
@@ -1405,15 +1415,27 @@ void QnMain::run()
             if (!isExists)
                 serverIfaceList << publicAddress;
         }
-        server->setNetAddrList(serverIfaceList);
+
+        bool isModified = false;
+        if (server->getNetAddrList() != serverIfaceList) {
+            server->setNetAddrList(serverIfaceList);
+            isModified = true;
+        }
 
         QnAbstractStorageResourceList storages = server->getStorages();
-        if (storages.isEmpty())
+        if (storages.isEmpty()) {
             server->setStorages(createStorages());
+            isModified = true;
+        }
+        else if (updateStorages(server)) {
+            isModified = true;
+        }
+        
+        if (isModified)
+            m_mediaServer = registerServer(ec2Connection, server);
         else
-            updateStorages(server);
+            m_mediaServer = server;
 
-        m_mediaServer = registerServer(ec2Connection, server);
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
     }
@@ -1464,7 +1486,25 @@ void QnMain::run()
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
-    m_moduleFinder = new QnModuleFinder(false);
+    QString moduleName = qApp->applicationName();
+    if( moduleName.startsWith( qApp->organizationName() ) )
+        moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
+
+    QnModuleInformation selfInformation;
+    selfInformation.type = moduleName;
+    selfInformation.customization = lit( QN_CUSTOMIZATION_NAME );
+    selfInformation.version = qnCommon->engineVersion();
+    selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
+    selfInformation.systemName = qnCommon->localSystemName();
+    selfInformation.port = MSSettings::roSettings()->value( nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT ).toInt();
+    //selfInformation.remoteAddresses = ;
+    //selfInformation.isLocal = ; //!< true if at least one address from \a remoteHostAddress is a local address
+    selfInformation.id = serverGuid();
+    selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
+
+    qnCommon->setModuleInformation(selfInformation);
+
+    m_moduleFinder = new QnModuleFinder( false );
     if (cmdLineArguments.devModeKey == lit("razrazraz")) {
         m_moduleFinder->setCompatibilityMode(true);
         ec2ConnectionFactory->setCompatibilityMode(true);
@@ -1479,7 +1519,6 @@ void QnMain::run()
         if (!allowedPeers.isEmpty())
             m_moduleFinder->setAllowedPeers(allowedPeers);
     }
-
 
     QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleFound,     this,   &QnMain::at_peerFound,  Qt::DirectConnection);
     QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleLost,      this,   &QnMain::at_peerLost,   Qt::DirectConnection);
@@ -1646,7 +1685,7 @@ void QnMain::run()
 
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
     exec();
-
+    QnResourceDiscoveryManager::instance()->pleaseStop();
     stopObjects();
 
     QnResource::stopCommandProc();
@@ -1693,8 +1732,6 @@ void QnMain::run()
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
 
-    delete QnResourcePool::instance();
-    QnResourcePool::initStaticInstance( NULL );
 
     QnStorageManager::instance()->stopAsyncTasks();
 
@@ -1713,6 +1750,11 @@ void QnMain::run()
 
     QnSSLSocket::releaseSSLEngine();
     QnAuthHelper::initStaticInstance(NULL);
+
+    globalSettings.reset();
+
+    delete QnResourcePool::instance();
+    QnResourcePool::initStaticInstance( NULL );
 }
 
 void QnMain::at_appStarted()
@@ -1752,33 +1794,6 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
             } );
     }
 }
-
-#ifdef EDGE_SERVER
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <arpa/inet.h>
-#include <net/if.h>
-
-static void mac_eth0(char  MAC_str[13], char** host)
-{
-    #define HWADDR_len 6
-    int s,i;
-    struct ifreq ifr;
-    s = socket(AF_INET, SOCK_DGRAM, 0);
-    strcpy(ifr.ifr_name, "eth0");
-    if (ioctl(s, SIOCGIFHWADDR, &ifr) != -1) {
-        for (i=0; i<HWADDR_len; i++)
-            sprintf(&MAC_str[i*2],"%02X",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
-    }
-    if((ioctl(s, SIOCGIFADDR, &ifr)) != -1) {
-        const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
-        *host = inet_ntoa(ip->sin_addr);
-    }
-    close(s);
-}
-#endif
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
 {

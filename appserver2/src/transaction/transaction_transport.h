@@ -95,6 +95,8 @@ public:
         }
     }
 
+    bool sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran, const QnTransactionTransportHeader& _header);
+
     void doOutgoingConnect(QUrl remoteAddr);
     void close();
 

@@ -18,7 +18,10 @@ typedef QnSoftwareVersion SoftwareVersionType; // TODO: #Elric #ec2 remove
 
 
 struct QnConnectionInfo {
-    QnConnectionInfo() {}
+    QnConnectionInfo()
+    :
+        allowSslConnections( false )
+    {}
 
     QUrl ecUrl;
     SoftwareVersionType version;
@@ -27,9 +30,10 @@ struct QnConnectionInfo {
     QString ecsGuid;    //TODO: #GDM make QUuid
     QString brand;
     QString box;
+    bool allowSslConnections;
 };
 
-#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)(box)
+#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)(box)(allowSslConnections)
 
 #ifndef QN_NO_QT
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

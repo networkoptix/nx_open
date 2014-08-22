@@ -35,7 +35,8 @@ namespace ec2
         m_transactionMessageBus( new ec2::QnTransactionMessageBus() ),
         m_timeSynchronizationManager( new TimeSynchronizationManager(peerType) ),
         m_terminated( false ),
-        m_runningRequests( 0 )
+        m_runningRequests( 0 ),
+        m_sslEnabled( false )
     {
         srand( ::time(NULL) );
 
@@ -49,6 +50,7 @@ namespace ec2
         qRegisterMetaType<ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiRuntimeData>( "ApiRuntimeData" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); // TODO: #Elric #EC2 register in a proper place!
+        qRegisterMetaType<ApiLockData>( "ApiLockData" ); // TODO: #Elric #EC2 register in a proper place!
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
@@ -95,6 +97,8 @@ namespace ec2
     void Ec2DirectConnectionFactory::registerTransactionListener( QnUniversalTcpListener* universalTcpListener )
     {
         universalTcpListener->addHandler<QnTransactionTcpProcessor>("HTTP", "ec2/events");
+
+        m_sslEnabled = universalTcpListener->isSslEnabled();
     }
 
     void Ec2DirectConnectionFactory::registerRestHandlers( QnRestProcessorPool* const restProcessorPool )
@@ -319,7 +323,7 @@ namespace ec2
         ++data;
         if( data + fieldLen >= dataEnd )
             return false;
-        connectionInfo->version = QnSoftwareVersion(QByteArray(data, fieldLen));
+        connectionInfo->version = QnSoftwareVersion(QByteArray::fromRawData(data, fieldLen));
         return true;
     }
 
@@ -387,6 +391,7 @@ namespace ec2
         }
         QnConnectionInfo connectionInfoCopy(connectionInfo);
         connectionInfoCopy.ecUrl = ecURL;
+        connectionInfoCopy.ecUrl.setScheme( connectionInfoCopy.allowSslConnections ? lit("https") : lit("http") );
 
         AbstractECConnectionPtr connection(new RemoteEC2Connection(
             std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
@@ -437,6 +442,7 @@ namespace ec2
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
         connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->box = lit(QN_ARM_BOX);
+        connectionInfo->allowSslConnections = m_sslEnabled;
         return ErrorCode::ok;
     }
 

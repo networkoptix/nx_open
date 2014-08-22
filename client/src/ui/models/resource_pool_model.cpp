@@ -200,6 +200,8 @@ void QnResourcePoolModel::removeNode(QnResourcePoolModelNode *node) {
         break;
     case Qn::RecorderNode:
         break;  //nothing special
+    case Qn::SystemNode:
+        break;  //nothing special
     default:
         assert(false); //should never come here
     }
@@ -565,6 +567,11 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         foreach(const QnVideoWallMatrix &matrix, videoWall->matrices()->getItems())
             at_videoWall_matrixAddedOrChanged(videoWall, matrix);
     }
+
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) {
+        if (server->getStatus() == Qn::Incompatible)
+            m_rootNodes[Qn::OtherSystemsNode]->update();
+    }
 }
 
 void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
@@ -590,6 +597,7 @@ void QnResourcePoolModel::at_context_userChanged() {
     m_rootNodes[Qn::LocalNode]->update();
     m_rootNodes[Qn::ServersNode]->update();
     m_rootNodes[Qn::UsersNode]->update();
+    m_rootNodes[Qn::OtherSystemsNode]->update();
 
     foreach(QnResourcePoolModelNode *node, m_resourceNodeByResource)
         node->setParent(expectedParent(node));
@@ -616,7 +624,14 @@ void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resou
 }
 
 void QnResourcePoolModel::at_resource_resourceChanged(const QnResourcePtr &resource) {
-    node(resource)->update();
+    QnResourcePoolModelNode *node = this->node(resource);
+
+    bool oldIncompatible = node->resourceStatus() == Qn::Incompatible;
+
+    node->update();
+
+    if (oldIncompatible != (node->resourceStatus() == Qn::Incompatible))
+        node->setParent(expectedParent(node));
 
     foreach(QnResourcePoolModelNode *node, m_itemNodesByResource[resource])
         node->update();

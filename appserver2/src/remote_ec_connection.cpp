@@ -9,8 +9,9 @@
 
 #include "transaction/transaction_message_bus.h"
 #include "common/common_module.h"
+#include "managers/time_manager.h"
 #include "mutex/distributed_mutex.h"
-
+#include "mutex/distributed_mutex_manager.h"
 
 namespace ec2
 {
@@ -32,6 +33,9 @@ namespace ec2
     {
         QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
         QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
+
+        //TODO #ak next call can be placed here just because we always have just one connection to EC
+        TimeSynchronizationManager::instance()->forgetSynchronizedTime();
     }
 
     QnConnectionInfo RemoteEC2Connection::connectionInfo() const
@@ -52,6 +56,7 @@ namespace ec2
         QnTransactionMessageBus::instance()->start();
 
         QUrl url(m_queryProcessor->getUrl());
+        url.setScheme( m_connectionInfo.allowSslConnections ? lit("https") : lit("http") );
         url.setPath("ec2/events");
         QUrlQuery q;
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());

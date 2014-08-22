@@ -92,7 +92,8 @@ public:
     QnResourcePtr getIncompatibleResourceById(const QUuid &id, bool useCompatible = false) const;
     QnResourcePtr getIncompatibleResourceByUniqueId(const QString &uid) const;
     QnResourceList getAllIncompatibleResources() const;
-    void makeResourceNormal(const QnResourcePtr &resource);
+    void updateIncompatibility(const QnResourcePtr &resource);
+    void clearIncompatibleResources();
 
     QnUserResourcePtr getAdministrator() const;
 

@@ -162,20 +162,6 @@ static BIO_METHOD Proxy_server_socket =
 // ==================================== SSL Async Socket Implementation ====================================
 namespace {
 
-// This function make the buffer contains data after from index
-void BufferShinrkTo( nx::Buffer* buffer , int from ) {
-    if( from == 0 )
-        return;
-    Q_ASSERT(from <= buffer->size());
-    if( from == buffer->size() ) {
-        buffer->resize(0);
-    } else {
-        QByteArray temp(buffer->constData() + from , static_cast<int>(buffer->size())-from);
-        temp.reserve( buffer->capacity() );
-        buffer->swap(temp);
-    }
-}
-
 struct buffer_t {
     const nx::Buffer* read_buffer;
     nx::Buffer* write_buffer;
@@ -240,12 +226,18 @@ public:
             static_cast<const char*>(buffer),static_cast<int>(len));
         return static_cast<int>(len);
     }
+
     int bio_read ( void* buffer , std::size_t len ) {
-        int digest_size = (std::min)(static_cast<int>(len),bio_in_buffer_.size()) ;
+        int digest_size = static_cast<int>(std::min(len, bio_in_buffer_.size() - recv_buffer_used_pos_));
         if( digest_size == 0 )
             return 0;
-        memcpy( buffer , bio_in_buffer_.constData(), digest_size );
-        BufferShinrkTo(&bio_in_buffer_,digest_size);
+        memcpy( buffer , 
+            bio_in_buffer_.constData() + recv_buffer_used_pos_ , digest_size );
+        recv_buffer_used_pos_ += digest_size;
+        if( recv_buffer_used_pos_ == bio_in_buffer_.size() ) {
+            recv_buffer_used_pos_ = 0;
+            bio_in_buffer_.clear();
+        }
         return digest_size;
     }
 
@@ -260,6 +252,11 @@ public:
     bool eof() const {
         return eof_;
     }
+
+    const nx::Buffer& bio_input_buffer() const {
+        return bio_in_buffer_;
+    }
+    
 protected:
 
     nx::Buffer* mutable_bio_input_buffer() const {
@@ -516,6 +513,7 @@ private:
     mutable nx::Buffer bio_out_buffer_;
     mutable nx::Buffer recv_buffer_; // This is used to store the data 
                                      // that comes from async operations
+    std::size_t recv_buffer_used_pos_; // The position that recv buffer is used
     std::unique_ptr<ssl_async_recv_op> recv_op_;
     std::unique_ptr<ssl_async_send_op> send_op_;
     std::unique_ptr<ssl_async_handshake_op> handshake_op_;
@@ -524,7 +522,7 @@ private:
 // read operation 
 class ssl_async_recv_op : public ssl_async_op {
 public:
-    ssl_async_recv_op( SSL* ssl ) : ssl_async_op(ssl),read_bytes_(0){}
+    ssl_async_recv_op( async_ssl* async_ssl , SSL* ssl ) : ssl_async_op(ssl),read_bytes_(0),async_ssl_(async_ssl){}
     virtual int perform( int* ssl_err ) {
         // A bug here is just that I misunderstand the buffer usage.
         // The user suppose I will not touch the data that originally
@@ -559,28 +557,58 @@ public:
         user_buffer_ = ubuf;
     }
 
-    // This function is painfully slow but it will help to ensure the next call of
-    // asyncRead on SSL will always happened inside of the remote thread. Since we
-    // don't know the expected buffer for the next read, so every time a one byte 
-    // buffer will ensure the next call resides in the remote thread .
+    // This is a revised version of drain_ssl_buffer. It uses assumption that the
+    // SSL's internal record is 16KB, which means the padding data cannot be exceed
+    // beyond 16KB .Otherwise it make no sense. 16KB = 1<< 14, so this allow us to 
+    // drain the SSL buffer in at most 14 SSL_read . Indeed , a hand crafted binary
+    // probing method will lead the average invoking times in log(14) , however it 
+    // is too complicated to put here . This version is way more better than the
+    // original conservative method to drain the buffer which requires at most 
+    // 16KB - 1 times SSL_read invocation !
+    // Original version:
+    // void drain_ssl_buffer() {
+    // char bytes_buffer;
+    // int ssl_return;
+    // do {
+    //    ssl_return = SSL_read(ssl(),&bytes_buffer,1);
+    //    if( ssl_return >0 ) {
+    //        user_buffer_->push_back(bytes_buffer);
+    //        ++read_bytes_;
+    //    } else {
+    //         return;
+    //     }
+    //  } while( true );
+    // }
+
+    void drain_ssl_buffer_component( int bit_pos ) {
+        const int size = 1 <<(bit_pos);
+        int old_size = user_buffer_->size();
+        user_buffer_->resize(size+old_size);
+        int ret = SSL_read(ssl(),(user_buffer_->data()+old_size),size);
+        if( ret >0 ) {
+            user_buffer_->resize(ret+old_size);
+            read_bytes_ += ret;
+        } else 
+            user_buffer_->resize(old_size);
+    }
+
     void drain_ssl_buffer() {
-        char bytes_buffer;
-        int ssl_return;
-        do {
-            ssl_return = SSL_read(ssl(),&bytes_buffer,1);
-            if( ssl_return >0 ) {
-                user_buffer_->push_back(bytes_buffer);
-                ++read_bytes_;
-            } else {
-                return;
-            }
-        } while( true );
+        char byte;
+        while( SSL_read(ssl(),&byte,1) == 1 ) {
+            // We need to push back the lead byte here
+            user_buffer_->push_back(byte);
+            read_bytes_ += byte;
+            for( int i = 0 ; i < 14 ; ++i )
+                drain_ssl_buffer_component(i);
+        }
+        Q_ASSERT(SSL_read(ssl(),&byte,1) <=0);
     }
 
 private:
     std::function<void(SystemError::ErrorCode,std::size_t)> callback_;
     nx::Buffer* user_buffer_;
     int read_bytes_;
+    async_ssl* async_ssl_;
 };
 
 // write operation
@@ -712,7 +740,8 @@ async_ssl::async_ssl( SSL* ssl , bool server , AbstractStreamSocket* socket ) :
     server_(server),
     ssl_(ssl),
     socket_(socket),
-    recv_op_( new ssl_async_recv_op(ssl) ),
+    recv_buffer_used_pos_(0),
+    recv_op_( new ssl_async_recv_op(this,ssl) ),
     send_op_( new ssl_async_send_op(ssl) ),
     handshake_op_( new ssl_async_handshake_op(ssl) ) {
         bio_in_buffer_.reserve( bio_input_buffer_reserve );

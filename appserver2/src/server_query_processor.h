@@ -7,6 +7,7 @@
 #define SERVER_QUERY_PROCESSOR_H
 
 #include <QtCore/QDateTime>
+#include <QtCore/QDebug>
 
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/common/model_functions.h>
@@ -46,15 +47,17 @@ namespace ec2
         template<class QueryDataType, class HandlerType>
             void processUpdateAsync( QnTransaction<QueryDataType>& tran, HandlerType handler, void* /*dummy*/ = 0 )
         {
+            QMutexLocker lock(&m_updateDataMutex);
+
             //TODO #ak this method must be asynchronous
             ErrorCode errorCode = ErrorCode::ok;
 
-            if (ApiCommand::isPersistent(tran.command))
-                tran.fillPersistentInfo();
 
-            QnDbManager::Locker locker(dbManager);
-            if (!tran.persistentInfo.isNull())
-                locker.beginTran();
+            std::unique_ptr<QnDbManager::Locker> locker;
+            if (ApiCommand::isPersistent(tran.command)) {
+                locker.reset(new QnDbManager::Locker(dbManager));
+                tran.fillPersistentInfo();
+            }
 
             auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
                 QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
@@ -78,7 +81,7 @@ namespace ec2
                     return;
                 }
 
-                locker.commit();
+                locker->commit();
             }
 
             // delivering transaction to remote peers
@@ -160,6 +163,8 @@ namespace ec2
         void processMultiUpdateAsync(QnTransaction<QueryDataType>& multiTran, HandlerType handler, ApiCommand::Value command, const std::vector<SubDataType>& nestedList, bool isParentObjectTran)
         {
 
+            QMutexLocker lock(&m_updateDataMutex);
+
             Q_ASSERT(ApiCommand::isPersistent(multiTran.command));
 
             ErrorCode errorCode = ErrorCode::ok;
@@ -175,7 +180,6 @@ namespace ec2
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
             QnDbManager::Locker locker(dbManager);
-            locker.beginTran();
 
             foreach(const SubDataType& data, nestedList)
             {
@@ -255,6 +259,8 @@ namespace ec2
                 handler( errorCode, output );
             } );
         }
+        private:
+            static QMutex m_updateDataMutex;
     };
 }
 

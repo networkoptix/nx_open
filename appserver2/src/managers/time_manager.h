@@ -105,8 +105,8 @@ namespace ec2
     public:
         //!Need this flag to synchronize by server peer only
         static const int peerIsServer                            = 0x1000;
-        static const int peerTimeSetByUser                       = 0x0008;
-        static const int peerTimeSynchronizedWithInternetServer  = 0x0004;
+        static const int peerTimeSynchronizedWithInternetServer  = 0x0008;
+        static const int peerTimeSetByUser                       = 0x0004;
         static const int peerHasMonotonicClock                   = 0x0002;
         static const int peerIsNotEdgeServer                     = 0x0001;
 
@@ -124,8 +124,8 @@ namespace ec2
         TimeSyncInfo getTimeSyncInfo() const;
         //!Returns value of internal monotonic clock
         qint64 getMonotonicClock() const;
-        //!Priority key of local system. May differ from the one used (which returned by \a TimeSynchronizationManager::getTimeSyncInfo)
-        TimePriorityKey localTimePriorityKey() const;
+        //!Resets synchronized time to local system time with local peer priority
+        void forgetSynchronizedTime();
 
     signals:
         //!Emitted when there is ambiguity while choosing primary time server automatically
@@ -161,14 +161,10 @@ namespace ec2
 
         //!Delta (millis) from \a m_monotonicClock to local time, synchronized with internet
         qint64 m_localSystemTimeDelta;
-        //!Delta (millis) from \a m_monotonicClock to synchronized time. That is, sync_time = m_monotonicClock.elapsed + delta
-        qint64 m_timeDelta;
         //!Using monotonic clock to be proof to local system time change
         QElapsedTimer m_monotonicClock;
         //!priority key of current server
         TimePriorityKey m_localTimePriorityKey;
-        //!map<priority key, time info>
-        std::map<quint64, RemotePeerTimeInfo, std::greater<quint64> > m_timeInfoByPeer;
         mutable QMutex m_mutex;
         TimeSyncInfo m_usedTimeSyncInfo;
         quint64 m_broadcastSysTimeTaskID;

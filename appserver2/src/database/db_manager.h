@@ -65,11 +65,11 @@ namespace ec2
         public:
             Locker(QnDbManager* db);
             ~Locker();
-            void beginTran();
             void commit();
+
         private:
-            bool m_inTran;
             QnDbManager* m_db;
+            QnDbHelper::QnDbTransactionLocker m_scopedTran;
         };
 
         bool init(
@@ -99,7 +99,7 @@ namespace ec2
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
             Q_ASSERT_X(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
-            QnDbTransactionLocker lock(&m_tran);
+            Locker lock(this);
             ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
                 return result;
@@ -384,9 +384,9 @@ namespace ec2
         QUuid getResourceGuid(const qint32 &internalId);
         qint32 getBusinessRuleInternalId( const QUuid& guid );
 
-        void beginTran();
-        void commit();
-        void rollback();
+        //void beginTran();
+        //void commit();
+        //void rollback();
     private:
         enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_INT};
 

@@ -6,7 +6,7 @@
 
 struct QnModuleInformation;
 class QnDirectModuleFinder;
-class QnDirectModuleFinderHelper;
+class QnModuleFinderHelper;
 
 class QnWorkbenchServerAddressWatcher : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -14,14 +14,14 @@ public:
     explicit QnWorkbenchServerAddressWatcher(QObject *parent = 0);
 
     void setDirectModuleFinder(QnDirectModuleFinder *directModuleFinder);
-    void setDirectModuleFinderHelper(QnDirectModuleFinderHelper *directModuleFinderHelper);
+    void setDirectModuleFinderHelper(QnModuleFinderHelper *directModuleFinderHelper);
 
 private slots:
     void at_directModuleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QUrl &url);
 
 private:
     QnDirectModuleFinder *m_directModuleFinder;
-    QnDirectModuleFinderHelper *m_directModuleFinderHelper;
+    QnModuleFinderHelper *m_directModuleFinderHelper;
     QSet<QUrl> m_urls;
 };
 

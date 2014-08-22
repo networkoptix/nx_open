@@ -21,6 +21,10 @@ namespace {
     const unsigned defaultKeepAliveMultiply = 3;
     const unsigned errorWaitTimeoutMs = 1000;
 
+    QUrl makeUrl(const QHostAddress &address, quint16 port) {
+        return QUrl(lit("http://%1:%2").arg(address.toString()).arg(port));
+    }
+
 } // anonymous namespace
 
 QnMulticastModuleFinder::QnMulticastModuleFinder(
@@ -103,6 +107,21 @@ QnModuleInformation QnMulticastModuleFinder::moduleInformation(const QString &mo
     return it->moduleInformation;
 }
 
+void QnMulticastModuleFinder::addIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id) {
+    QUrl url = makeUrl(address, port);
+    if (!m_ignoredModules.contains(url, id))
+        m_ignoredModules.insert(url, id);
+}
+
+void QnMulticastModuleFinder::removeIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id) {
+    QUrl url = makeUrl(address, port);
+    m_ignoredModules.remove(url, id);
+}
+
+QMultiHash<QUrl, QUuid> QnMulticastModuleFinder::ignoredModules() const {
+    return m_ignoredModules;
+}
+
 void QnMulticastModuleFinder::pleaseStop() {
     QnLongRunnable::pleaseStop();
     m_pollSet.interrupt();
@@ -132,18 +151,17 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
         return false;
     }
 
+    //TODO #ak RevealResponse class is excess here. Should send/receive QnModuleInformation
+    const QnModuleInformation& selfModuleInformation = qnCommon->moduleInformation();
     RevealResponse response;
-    response.version = qnCommon->engineVersion().toString();
-    QString moduleName = qApp->applicationName();
-    if (moduleName.startsWith(qApp->organizationName()))
-        moduleName = moduleName.mid(qApp->organizationName().length()).trimmed();
-
-    response.type = moduleName;
-    response.customization = QString::fromLatin1(QN_CUSTOMIZATION_NAME);
-    response.seed = qnCommon->moduleGUID().toString();
-    response.name = qnCommon->localSystemName();
-    response.systemInformation = QnSystemInformation::currentSystemInformation().toString();
-    response.typeSpecificParameters.insert(lit("port"), QString::number(qnCommon->moduleUrl().port()));
+    response.version = selfModuleInformation.version.toString();
+    response.type = selfModuleInformation.type;
+    response.customization = selfModuleInformation.customization;
+    response.seed = selfModuleInformation.id.toString();
+    response.name = selfModuleInformation.systemName;
+    response.systemInformation = selfModuleInformation.systemInformation.toString();
+    response.sslAllowed = selfModuleInformation.sslAllowed;
+    response.typeSpecificParameters.insert(lit("port"), QString::number(selfModuleInformation.port));
     quint8 *responseBufStart = readBuffer;
     if (!response.serialize(&responseBufStart, readBuffer + READ_BUFFER_SIZE))
         return false;
@@ -190,6 +208,9 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
             arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
         return false;
     }
+
+    if (m_ignoredModules.contains(makeUrl(QHostAddress(remoteAddressStr), remotePort), response.seed))
+        return false;
 
     QMutexLocker lk(&m_mutex);
 
@@ -310,4 +331,5 @@ QnMulticastModuleFinder::ModuleContext::ModuleContext(const RevealResponse &resp
     moduleInformation.systemName = response.name;
     moduleInformation.port = response.typeSpecificParameters.value(lit("port")).toUShort();
     moduleInformation.id = QUuid(response.seed);
+    moduleInformation.sslAllowed = response.sslAllowed;
 }

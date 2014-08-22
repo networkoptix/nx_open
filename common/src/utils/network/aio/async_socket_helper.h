@@ -59,7 +59,8 @@ public:
     void terminate()
     {
         //cancel ongoing async I/O. Doing this only if AsyncSocketImplHelper::eventTriggered is down the stack
-        if( m_threadHandlerIsRunningIn.load( std::memory_order_relaxed ) == QThread::currentThreadId() )
+        std::atomic_thread_fence(std::memory_order_acquire);
+        if( m_threadHandlerIsRunningIn.load(std::memory_order_relaxed) == QThread::currentThreadId() )
         {
             if( m_connectSendHandlerTerminatedFlag )
                 aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite );

@@ -130,6 +130,8 @@ private:
     QRect m_storedGeometry;
 #endif
     bool m_enableBackgroundAnimation;
+
+    bool m_inFullscreenTransition;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);

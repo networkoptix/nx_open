@@ -19,10 +19,13 @@ struct QnModuleInformation {
     QSet<QString> remoteAddresses;
     bool isLocal; //!< true if at least one address from \a remoteHostAddress is a local address
     QUuid id;
+    bool sslAllowed;
 
-    QnModuleInformation() : port(0), isLocal(false) {}
+    QnModuleInformation() : port( 0 ), isLocal( false ), sslAllowed(false) {}
+
+    bool isCompatibleToCurrentSystem() const;
 };
-#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(port)(remoteAddresses)(isLocal)(id)
+#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(port)(remoteAddresses)(isLocal)(id)(sslAllowed)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (json)(metatype))
 

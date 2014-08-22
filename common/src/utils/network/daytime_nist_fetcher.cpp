@@ -10,6 +10,7 @@
 
 #include "utils/common/log.h"
 #include "utils/network/socket_factory.h"
+#include "utils/tz/tz.h"
 
 
 //TODO #ak try multiple servers in case of error or empty string (it happens pretty often)
@@ -114,10 +115,7 @@ static qint64 actsTimeToUTCMillis( const char* actsStr )
         return -1;
 
     //adjusting to local time: actually we should adjust curTime to local timezone, but it is more simple to do it now with utcTime
-    struct timeb tp;
-    memset( &tp, 0, sizeof(tp) );
-    ftime( &tp );
-    return ((qint64)utcTime - tp.timezone * SEC_PER_MIN) * MILLIS_PER_SEC;
+    return ((qint64)utcTime + nx_tz::getLocalTimeZoneOffset() * SEC_PER_MIN) * MILLIS_PER_SEC;
 }
 
 void DaytimeNISTFetcher::onConnectionEstablished( SystemError::ErrorCode errorCode ) noexcept
@@ -146,6 +144,8 @@ void DaytimeNISTFetcher::onConnectionEstablished( SystemError::ErrorCode errorCo
 
 void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead ) noexcept
 {
+    //TODO #ak take into account rtt/2
+
     if( errorCode )
     {
         NX_LOG( lit( "NIST time_sync. Failed to read from NIST server %1:%2. %3" ).
