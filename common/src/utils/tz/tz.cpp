@@ -5,10 +5,12 @@
 
 #include "tz.h"
 
+#include <sys/stat.h>
 #include <sys/timeb.h>
 
 #include <atomic>
 #include <fstream>
+#include <memory>
 #include <mutex>
 
 #include <QtCore/QByteArray>
@@ -83,13 +85,49 @@ namespace nx_tz
 #else //if defined(__linux__)
         //cannot rely on ftime on linux
 
+        ISOTimezoneData tzData;
         std::ifstream tzNameFile( "/etc/timezone" );
-        char buf[256];
-        memset( buf, 0, sizeof(buf) );
-        tzNameFile.read(buf, sizeof(buf)-1);
-        if( !tzNameFile.eof() )
-            return -1;
-        ISOTimezoneData tzData = TZIndex::instance()->getTzOffsets(QByteArray::fromRawData(buf, tzNameFile.gcount()).trimmed());
+        if( tzNameFile.is_open() )
+        {
+            char buf[256];
+            memset( buf, 0, sizeof(buf) );
+            tzNameFile.read(buf, sizeof(buf)-1);
+            if( !tzNameFile.eof() )
+                return -1;
+            tzData = TZIndex::instance()->getTzOffsets(QByteArray::fromRawData(buf, tzNameFile.gcount()).trimmed());
+            tzNameFile.close();
+        }
+        else
+        {
+            //trying /etc/localtime
+            for( int i = 0; i < 3; ++i )
+            {
+                struct stat st;
+                memset( &st, 0, sizeof(st) );
+                if( stat( "/etc/localtime", &st ) != 0 )
+                    break;
+                if( !S_ISLNK(st.st_mode) )
+                    break;
+
+                //reading link /etc/localtime
+                auto free_del = [](char* ptr){::free(ptr);};
+                std::unique_ptr<char, decltype(free_del)> linkTarget( (char*)malloc(st.st_size+1), free_del );
+                if( !linkTarget.get() )
+                    break;
+                int bytesRead = readlink( "/etc/localtime", linkTarget.get(), st.st_size+1 );
+                if( bytesRead == -1 )
+                    break;
+                if( bytesRead > st.st_size )
+                    continue;   //link increased in size between stat and readlink, trying once again
+                linkTarget.get()[bytesRead] = '\0';
+                //getting timezone from link
+                if( strncmp( linkTarget.get(), "/usr/share/zoneinfo/", sizeof("/usr/share/zoneinfo/")-1 ) != 0 )
+                    break;  //timezone link point to non-standard path  //TODO #ak better support that anyway
+                const char* tzName = linkTarget.get() + sizeof("/usr/share/zoneinfo/")-1;
+                tzData = TZIndex::instance()->getTzOffsets( QByteArray::fromRawData(tzName, strlen(tzName)) );
+                break;
+            }
+        }
         if( tzData.tz == nullptr )
             return -1;
         return tzData.utcOffset;
