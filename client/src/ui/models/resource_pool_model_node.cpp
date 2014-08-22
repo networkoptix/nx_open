@@ -125,7 +125,7 @@ QnResourcePoolModelNode::~QnResourcePoolModelNode() {
 
     foreach(QnResourcePoolModelNode *childNode, m_children) {
         childNode->setParent(NULL);
-        m_model->deleteNode(childNode);
+        m_model->removeNode(childNode);
     }
 }
 
