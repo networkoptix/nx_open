@@ -3,6 +3,7 @@
 #include <QtCore/QTimer>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
+#include <QtNetwork/QNetworkProxy>
 
 #include <utils/common/model_functions.h>
 #include <rest/server/json_rest_result.h>
@@ -39,6 +40,8 @@ QnDirectModuleFinder::QnDirectModuleFinder(QObject *parent) :
     m_periodicalCheckTimer(new QTimer(this))
 {
     m_periodicalCheckTimer->setInterval(periodicalCheckIntervalMs);
+    m_networkAccessManager->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
+
     connect(m_periodicalCheckTimer, &QTimer::timeout,                   this,   &QnDirectModuleFinder::at_periodicalCheckTimer_timeout);
     connect(m_networkAccessManager, &QNetworkAccessManager::finished,   this,   &QnDirectModuleFinder::at_reply_finished);
 }
