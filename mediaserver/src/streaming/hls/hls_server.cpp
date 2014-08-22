@@ -738,12 +738,24 @@ namespace nx_hls
         if( streamQuality == MEDIA_Quality_Low || streamQuality == MEDIA_Quality_Auto )
             requiredQualities.push_back( MEDIA_Quality_Low );
 
-        std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(StreamingParams::START_DATETIME_PARAM_NAME);
+        boost::optional<quint64> startTimestamp;
+        std::multimap<QString, QString>::const_iterator startTimestampIter = requestParams.find(StreamingParams::START_TIMESTAMP_PARAM_NAME);
+        if( startTimestampIter != requestParams.end() )
+        {
+            startTimestamp = startTimestampIter->second.toULongLong();
+        }
+        else
+        {
+            std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(StreamingParams::START_DATETIME_PARAM_NAME);
+            if( startDatetimeIter != requestParams.end() )
+                startTimestamp = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate).toMSecsSinceEpoch() * USEC_IN_MSEC;
+        }
+
         std::unique_ptr<HLSSession> newHlsSession(
             new HLSSession(
                 sessionID,
                 MSSettings::roSettings()->value( nx_ms_conf::HLS_TARGET_DURATION_MS, nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt(),
-                startDatetimeIter == requestParams.end(),   //if no start date specified, providing live stream
+                !startTimestamp,   //if no start date specified, providing live stream
                 streamQuality,
                 videoCamera ) );
         if( newHlsSession->isLive() )
@@ -764,14 +776,13 @@ namespace nx_hls
         else
         {
             //converting startDatetime to timestamp
-            const quint64 startTimestamp = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate).toMSecsSinceEpoch() * USEC_IN_MSEC;
             for( const MediaQuality quality: requiredQualities )
             {
                 //generating sliding playlist, holding not more than CHUNK_COUNT_IN_ARCHIVE_PLAYLIST archive chunks
                 nx_hls::ArchivePlaylistManagerPtr archivePlaylistManager = 
                     std::make_shared<ArchivePlaylistManager>(
                         camResource,
-                        startTimestamp,
+                        startTimestamp.get(),
                         CHUNK_COUNT_IN_ARCHIVE_PLAYLIST,
                         newHlsSession->targetDurationMS() * USEC_IN_MSEC,
                         quality );
