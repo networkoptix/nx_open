@@ -15,7 +15,7 @@ namespace Qn {
         RootNode,               /**< Root node for the tree. */
         LocalNode,              /**< Root node for local resources. */
         ServersNode,            /**< Root node for remote resources. */
-        OtherSystemsNode,/**< Root node for remote resources wich are incompatible with current system and cannot be used. */
+        OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
         UsersNode,              /**< Root node for user resources. */
 
         BastardNode,            /**< Root node for hidden resources. */
