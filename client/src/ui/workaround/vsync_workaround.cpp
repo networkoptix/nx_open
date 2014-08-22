@@ -4,11 +4,6 @@
 #include <QtCore/QEvent>
 #include <QtCore/QCoreApplication>
 
-namespace {
-    const int fpsLimit = 60;
-    const int millisecondsBetweenUpdates = 1000 / fpsLimit;
-}
-
 QnVSyncWorkaround::QnVSyncWorkaround(QObject *watched, QObject *parent) :
     QObject(parent),
     m_watched(watched),
@@ -19,36 +14,29 @@ QnVSyncWorkaround::QnVSyncWorkaround(QObject *watched, QObject *parent) :
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &QnVSyncWorkaround::updateWatchedWidget);
-    timer->start(millisecondsBetweenUpdates);   // to achieve 60 fps
-
-    m_elapsedTimer.start();
+    timer->start(16);   // to achieve 60 fps
 }
 
 bool QnVSyncWorkaround::eventFilter(QObject *object, QEvent *event) {
-    if (object != m_watched || event->type() != QEvent::UpdateRequest)
+    if (object != m_watched)
         return false;
 
-    /* Flag to update if someone asked us. */
-    m_updatePending |= event != m_updateEventToPass;
-
-    qint64 elapsed = m_elapsedTimer.elapsed();
-    if (elapsed < millisecondsBetweenUpdates && event != m_updateEventToPass)
+    // ignore all update requests but our own
+    if (event->type() == QEvent::UpdateRequest && event != m_updateEventToPass) {
+        m_updatePending = true;
         return true;
-   
-    if (!m_updatePending)
-        return true;
+    } else if (event == m_updateEventToPass) {
+        m_updatePending = false;
+    }
 
-    m_updatePending = false;
-
-    /* Avoiding double-redraw if someone will update us */
-    m_updateEventToPass = NULL;
-    m_elapsedTimer.restart();
     return false;
 }
 
 void QnVSyncWorkaround::updateWatchedWidget() {
-    QEvent* forcedUpdate = new QEvent(QEvent::UpdateRequest);
-    m_updateEventToPass = forcedUpdate;
+    if (!m_updatePending)
+        return;
+
+    m_updateEventToPass = new QEvent(QEvent::UpdateRequest);
     QCoreApplication::sendEvent(m_watched, m_updateEventToPass);
-    delete forcedUpdate;
+    delete m_updateEventToPass;
 }
