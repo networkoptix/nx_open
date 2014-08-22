@@ -1,10 +1,9 @@
 #ifndef __UDT_SOCKET_H__
 #define __UDT_SOCKET_H__
-
 #include "abstract_socket.h"
 #include "socket_common.h"
 #include "system_socket.h"
-
+#include "aio/pollset.h"
 #include <memory>
 
 // The following function _MUST_ be called before using any UDT socket.
@@ -17,7 +16,8 @@ bool DestroyUdtLibrary();
 // but some sacrifice on inline function.
 namespace detail {
 class UdtSocketImpl;
-
+class UdtPollSetImpl;
+class UdtPollSetConstIteratorImpl;
 // This is a work around for incomplete type within the unique_ptr. If this type is not
 // in the namespace scope, such work around will not be needed since a non trivial ctor/dtor
 // will be perfectly enough. However once in namespace scope, a wrapper pointer is needed
@@ -26,6 +26,17 @@ class UdtSocketImpl;
 struct UdtSocketImplPtr : public std::unique_ptr<UdtSocketImpl> {
     UdtSocketImplPtr( UdtSocketImpl* impl );
     ~UdtSocketImplPtr();
+};
+
+struct UdtPollSetImplPtr : public std::unique_ptr<UdtPollSetImpl> {
+    UdtPollSetImplPtr( UdtPollSetImpl* imp );
+    ~UdtPollSetImplPtr();
+};
+
+struct UdtPollSetConstIteratorImplPtr : public std::unique_ptr<UdtPollSetConstIteratorImpl> {
+    UdtPollSetConstIteratorImplPtr( UdtPollSetConstIteratorImpl* imp );
+    UdtPollSetConstIteratorImplPtr();
+    ~UdtPollSetConstIteratorImplPtr();
 };
 
 }// namespace detail
@@ -101,7 +112,7 @@ private:
 
 private:
     detail::UdtSocketImplPtr impl_;
-
+    friend class detail::UdtPollSetImpl;
     Q_DISABLE_COPY(UdtSocket)
 };
 
@@ -140,6 +151,62 @@ private:
     detail::UdtSocketImplPtr impl_;
 
     Q_DISABLE_COPY(UdtServerSocket)
+};
+
+// Udt poller 
+class UdtPollSet {
+public:
+    
+    class const_iterator {
+    public:
+        const_iterator();
+        const_iterator( const const_iterator& );
+        const_iterator( detail::UdtPollSetImpl* impl , bool end );
+        ~const_iterator();
+
+        const_iterator& operator=( const const_iterator& );
+        //!Selects next socket which state has been changed with previous \a poll call
+        const_iterator operator++(int);    //it++
+        //!Selects next socket which state has been changed with previous \a poll call
+        const_iterator& operator++();       //++it
+
+        Socket* socket();
+        const Socket* socket() const;
+        /*!
+            \return Triggered event
+        */
+        aio::EventType eventType() const;
+        void* userData();
+
+        bool operator==( const const_iterator& right ) const;
+        bool operator!=( const const_iterator& right ) const;
+
+    private:
+        detail::UdtPollSetConstIteratorImplPtr impl_;
+    };
+
+public:
+    UdtPollSet();
+    ~UdtPollSet();
+    bool isValid() const {
+        return impl_;
+    }
+    void interrupt();
+    bool add( Socket* const sock, aio::EventType eventType, void* userData = NULL );
+    void* remove( Socket* const sock, aio::EventType eventType );
+    size_t size() const;
+    void* getUserData( Socket* const sock, aio::EventType eventType ) const;
+    int poll( int millisToWait = aio::INFINITE_TIMEOUT );
+    bool canAcceptSocket( Socket* const sock ) const { Q_UNUSED(sock); return true; }
+    const_iterator begin() const;
+    const_iterator end() const;
+    static unsigned int maxPollSetSize() {
+        return std::numeric_limits<unsigned int>::max();
+    }
+private:
+    detail::UdtPollSetImplPtr impl_;
+
+    Q_DISABLE_COPY(UdtPollSet)
 };
 
 #endif // __UDT_SOCKET_H__
