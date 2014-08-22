@@ -12,14 +12,14 @@
 typedef QList<QHostAddress> QnHostAddressList;
 typedef QSet<QHostAddress> QnHostAddressSet;
 typedef QSet<QUrl> QnUrlSet;
+class QnModuleFinder;
 class QnDirectModuleFinder;
+class QnMulticastModuleFinder;
 
-class QnDirectModuleFinderHelper : public QObject {
+class QnModuleFinderHelper : public QObject {
     Q_OBJECT
 public:
-    explicit QnDirectModuleFinderHelper(QObject *parent = 0);
-
-    void setDirectModuleFinder(QnDirectModuleFinder *directModuleFinder);
+    explicit QnModuleFinderHelper(QnModuleFinder *moduleFinder);
 
     QnUrlSet urlsForPeriodicalCheck() const;
     void setUrlsForPeriodicalCheck(const QnUrlSet &urls);
@@ -32,7 +32,8 @@ private slots:
     void at_timer_timeout();
 
 private:
-    QPointer<QnDirectModuleFinder> m_directModuleFinder;
+    QnMulticastModuleFinder *m_multicastModuleFinder;
+    QnDirectModuleFinder *m_directModuleFinder;
     QHash<QUuid, QnHostAddressSet> m_addressesByServer;
     QHash<QUuid, QnUrlSet> m_manualAddressesByServer;
     QHash<QUuid, quint16> m_portByServer;

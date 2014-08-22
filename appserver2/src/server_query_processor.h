@@ -53,9 +53,9 @@ namespace ec2
             ErrorCode errorCode = ErrorCode::ok;
 
 
-            QnDbManager::Locker locker(dbManager);
+            std::unique_ptr<QnDbManager::Locker> locker;
             if (ApiCommand::isPersistent(tran.command)) {
-                locker.beginTran();
+                locker.reset(new QnDbManager::Locker(dbManager));
                 tran.fillPersistentInfo();
             }
 
@@ -81,7 +81,7 @@ namespace ec2
                     return;
                 }
 
-                locker.commit();
+                locker->commit();
             }
 
             // delivering transaction to remote peers
@@ -180,7 +180,6 @@ namespace ec2
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
             QnDbManager::Locker locker(dbManager);
-            locker.beginTran();
 
             foreach(const SubDataType& data, nestedList)
             {

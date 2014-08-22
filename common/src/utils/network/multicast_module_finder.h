@@ -61,6 +61,10 @@ public:
 
     QnModuleInformation moduleInformation(const QString &moduleId) const;
 
+    void addIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id);
+    void removeIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id);
+    QMultiHash<QUrl, QUuid> ignoredModules() const;
+
 public slots:
     virtual void pleaseStop() override;
 
@@ -101,6 +105,7 @@ private:
     QHash<QUuid, ModuleContext> m_knownEnterpriseControllers;
     QSet<QString> m_localNetworkAdresses;
     bool m_compatibilityMode;
+    QMultiHash<QUrl, QUuid> m_ignoredModules;
 };
 
 #endif // MULTICAST_MODULE_FINDER_H
