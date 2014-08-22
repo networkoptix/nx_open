@@ -323,7 +323,7 @@ namespace ec2
         ++data;
         if( data + fieldLen >= dataEnd )
             return false;
-        connectionInfo->version = QnSoftwareVersion(QByteArray(data, fieldLen));
+        connectionInfo->version = QnSoftwareVersion(QByteArray::fromRawData(data, fieldLen));
         return true;
     }
 

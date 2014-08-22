@@ -221,6 +221,16 @@ bool QnDbManager::init(
         return false;
     }
 
+    //tuning DB
+    {
+        QSqlQuery enableWalQuery(m_sdb);
+        enableWalQuery.prepare("PRAGMA journal_mode = WAL");
+        if( !enableWalQuery.exec() )
+        {
+            qWarning() << "Failed to enable WAL mode on sqlLite database!" << enableWalQuery.lastError().text();
+        }
+    }
+
     bool dbJustCreated = false;
     bool isMigrationFrom2_2 = false;
     if( !createDatabase( &dbJustCreated, &isMigrationFrom2_2 ) )
