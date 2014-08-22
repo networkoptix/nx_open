@@ -27,6 +27,8 @@ public:
 
     bool isRunning() const;
 
+    QSet<QUuid> targets() const;
+
 signals:
     void finished(int errorCode);
 
