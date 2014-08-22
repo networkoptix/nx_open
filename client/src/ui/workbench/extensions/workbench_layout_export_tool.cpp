@@ -293,11 +293,12 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
         m_currentCamera->setMotionIODevice(motionFileBuffer, i);
     }
 
-    QUuid id = resource->toResource()->getId();
+    QString uniqId = resource->toResource()->getUniqueId();
+    uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
     QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
     if (resource->toResource()->hasFlags(Qn::utc))
         role = QnStreamRecorder::Role_FileExportWithEmptyContext;
-    QnLayoutItemData itemData = m_layout->getItem(id);
+    QnLayoutItemData itemData = m_layout->getItem(resource->toResource()->getId());
 
     int timeOffset = 0;
     if(qnSettings->timeMode() == Qn::ServerTimeMode) {
@@ -308,7 +309,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
 
     m_currentCamera->exportMediaPeriodToFile(m_period.startTimeMs * 1000ll,
                                     (m_period.startTimeMs + m_period.durationMs) * 1000ll,
-                                    id.toString(),
+                                    uniqId,
                                     lit("mkv"),
                                     m_storage,
                                     role,
