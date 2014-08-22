@@ -7,7 +7,7 @@
 QnModuleFinder::QnModuleFinder(bool clientOnly) :
     m_multicastModuleFinder(new QnMulticastModuleFinder(clientOnly)),
     m_directModuleFinder(new QnDirectModuleFinder(this)),
-    m_directModuleFinderHelper(new QnDirectModuleFinderHelper(this))
+    m_directModuleFinderHelper(new QnModuleFinderHelper(this))
 {
     connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleFound,      this,       &QnModuleFinder::at_moduleFound);
     connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleLost,       this,       &QnModuleFinder::at_moduleLost);
@@ -40,7 +40,7 @@ QnDirectModuleFinder *QnModuleFinder::directModuleFinder() const {
     return m_directModuleFinder;
 }
 
-QnDirectModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
+QnModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
     return m_directModuleFinderHelper;
 }
 
@@ -59,13 +59,11 @@ void QnModuleFinder::setAllowedPeers(const QList<QUuid> &peerList) {
 void QnModuleFinder::start() {
     m_multicastModuleFinder->start();
     m_directModuleFinder->start();
-    m_directModuleFinderHelper->setDirectModuleFinder(m_directModuleFinder);
 }
 
 void QnModuleFinder::stop() {
     m_multicastModuleFinder->pleaseStop();
     m_directModuleFinder->stop();
-    m_directModuleFinderHelper->setDirectModuleFinder(NULL);
 }
 
 void QnModuleFinder::at_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
