@@ -1732,8 +1732,6 @@ void QnMain::run()
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
 
-    delete QnResourcePool::instance();
-    QnResourcePool::initStaticInstance( NULL );
 
     QnStorageManager::instance()->stopAsyncTasks();
 
@@ -1752,6 +1750,11 @@ void QnMain::run()
 
     QnSSLSocket::releaseSSLEngine();
     QnAuthHelper::initStaticInstance(NULL);
+
+    globalSettings.reset();
+
+    delete QnResourcePool::instance();
+    QnResourcePool::initStaticInstance( NULL );
 }
 
 void QnMain::at_appStarted()
