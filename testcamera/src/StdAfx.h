@@ -12,3 +12,7 @@ extern "C" {
     #include <libswscale/swscale.h>
     #include <libavutil/avstring.h>
 }
+
+#ifdef __cplusplus
+#   include <common/common_globals.h>
+#endif
