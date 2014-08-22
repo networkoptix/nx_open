@@ -554,6 +554,11 @@ QnResourceList QnResourcePool::getAllIncompatibleResources() const {
     return m_incompatibleResources.values();
 }
 
+void QnResourcePool::clearIncompatibleResources() {
+    QMutexLocker locker(&m_resourcesMtx);
+    m_incompatibleResources.clear();
+}
+
 void QnResourcePool::makeResourceNormal(const QnResourcePtr &resource) {
     QMutexLocker locker(&m_resourcesMtx);
     auto it = m_incompatibleResources.find(resource->getUniqueId());
