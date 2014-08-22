@@ -46,8 +46,6 @@ public:
     const QnDbTransaction* getTransaction() const;
 
 protected:
-    class QnDbTransactionLocker;
-
     bool isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database);
     void addDatabase(const QString& fileName, const QString& dbname);
 
