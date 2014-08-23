@@ -166,6 +166,11 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bo
 
     fetchUpdateAudioEncoder(soapWrapper, info, isPrimary);
 
+    if (m_resource->getUrl() == lit("192.168.0.91"))
+    {
+        int gg = 4;
+    }
+
     result = fetchUpdateProfile(soapWrapper, info, isPrimary);
     if( !result ) {
 #ifdef PL_ONVIF_DEBUG
@@ -536,7 +541,7 @@ Profile* QnOnvifStreamReader::fetchExistingProfile(const ProfilesResp& response,
     for (; iter != response.Profiles.end(); ++iter) 
     {
         Profile* profile = *iter;
-        if (!profile)
+        if (!profile || !availableProfiles.contains(QString::fromStdString(profile->token)))
             continue;
         bool vSourceMatched = profile->VideoSourceConfiguration && profile->VideoSourceConfiguration->token == info.videoSourceId.toStdString();
         bool vEncoderMatched = profile->VideoEncoderConfiguration && profile->VideoEncoderConfiguration->token == info.videoEncoderId.toStdString();

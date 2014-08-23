@@ -7,9 +7,9 @@
 #include "api/app_server_connection.h"
 #include "nx_ec/ec_api.h"
 #include "nx_ec/dummy_handler.h"
+#include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
-
-#include "ui/models/resource_pool_model.h"
+#include "ui/models/resource_list_model.h"
 #include "ui/models/server_addresses_model.h"
 
 namespace {
@@ -27,17 +27,14 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QnResourcePoolModel *serversModel = new QnResourcePoolModel(Qn::ServersNode, this);
-
-    /* Leads to crash in reconnect process. */
-//     QSortFilterProxyModel *sortedServersModel = new QSortFilterProxyModel(this);
-//     sortedServersModel->setSourceModel(serversModel);
-//     sortedServersModel->setDynamicSortFilter(true);
-//     sortedServersModel->setSortRole(Qt::DisplayRole);
-//     sortedServersModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-//     sortedServersModel->sort(Qn::NameColumn);
-
-    ui->serversView->setModel(serversModel);
+    m_serverListModel = new QnResourceListModel(this);
+    QSortFilterProxyModel *sortedServersModel = new QSortFilterProxyModel(this);
+    sortedServersModel->setSourceModel(m_serverListModel);
+    sortedServersModel->setDynamicSortFilter(true);
+    sortedServersModel->setSortRole(Qt::DisplayRole);
+    sortedServersModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    sortedServersModel->sort(Qn::NameColumn);
+    ui->serversView->setModel(sortedServersModel);
 
     m_serverAddressesModel = new QnServerAddressesModel(this);
     m_sortedServerAddressesModel = new QnSortedServerAddressesModel(this);
@@ -53,6 +50,8 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     connect(m_serverAddressesModel,             &QnServerAddressesModel::ignoreChangeRequested, this,   &QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested);
     connect(ui->addButton,                      &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_addButton_clicked);
     connect(ui->removeButton,                   &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_removeButton_clicked);
+
+    m_serverListModel->setResources(qnResPool->getResourcesWithFlag(Qn::server));
 }
 
 QnRoutingManagementWidget::~QnRoutingManagementWidget() {}
@@ -259,4 +258,14 @@ void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(co
             connection2()->getDiscoveryManager()->addDiscoveryInformation(server->getId(), QList<QUrl>() << url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
     server->setIgnoredUrls(ignoredUrls);
+}
+
+void QnRoutingManagementWidget::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
+    if (resource->hasFlags(Qn::server))
+        m_serverListModel->addResource(resource);
+}
+
+void QnRoutingManagementWidget::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
+    if (resource->hasFlags(Qn::server))
+        m_serverListModel->removeResource(resource);
 }

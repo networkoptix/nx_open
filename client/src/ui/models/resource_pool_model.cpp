@@ -200,6 +200,8 @@ void QnResourcePoolModel::removeNode(QnResourcePoolModelNode *node) {
         break;
     case Qn::RecorderNode:
         break;  //nothing special
+    case Qn::SystemNode:
+        break;  //nothing special
     default:
         assert(false); //should never come here
     }
@@ -564,6 +566,11 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
             at_videoWall_itemAddedOrChanged(videoWall, item);
         foreach(const QnVideoWallMatrix &matrix, videoWall->matrices()->getItems())
             at_videoWall_matrixAddedOrChanged(videoWall, matrix);
+    }
+
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) {
+        if (server->getStatus() == Qn::Incompatible)
+            m_rootNodes[Qn::OtherSystemsNode]->update();
     }
 }
 

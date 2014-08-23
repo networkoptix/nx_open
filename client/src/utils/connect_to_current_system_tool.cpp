@@ -52,6 +52,10 @@ bool QnConnectToCurrentSystemTool::isRunning() const {
     return m_running;
 }
 
+QSet<QUuid> QnConnectToCurrentSystemTool::targets() const {
+    return m_targets;
+}
+
 void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode) {
     m_running = false;
     m_updateDialog->hide();

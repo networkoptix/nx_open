@@ -39,6 +39,10 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
             targets.insert(resource->getId());
     }
 
+    connectToCurrentSystem(targets);
+}
+
+void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(const QSet<QUuid> &targets) {
     if (targets.isEmpty())
         return;
 
@@ -49,7 +53,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
     progressDialog()->setLabelText(tr("Connecting to the current system..."));
     progressDialog()->show();
 
-    tool->connectToCurrentSystem(targets, password);
+    connectToCurrentSystemTool()->connectToCurrentSystem(targets, password);
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_joinOtherSystemAction_triggered() {
@@ -110,12 +114,15 @@ QnProgressDialog *QnWorkbenchIncompatibleServersActionHandler::progressDialog() 
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_finished(int errorCode) {
+    progressDialog()->hide();
+
     switch (errorCode) {
     case QnConnectToCurrentSystemTool::NoError:
         QMessageBox::information(progressDialog(), tr("Information"), tr("The selected servers has been successfully connected to your system!"));
         break;
     case QnConnectToCurrentSystemTool::AuthentificationFailed:
         QMessageBox::critical(progressDialog(), tr("Error"), tr("Authentification failed.\nPlease, check the password you have entered."));
+        connectToCurrentSystem(connectToCurrentSystemTool()->targets());
         break;
     case QnConnectToCurrentSystemTool::ConfigurationFailed:
         QMessageBox::critical(progressDialog(), tr("Error"), tr("Could not configure the selected servers."));
@@ -126,7 +133,6 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_
     default:
         break;
     }
-    progressDialog()->hide();
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_joinSystemTool_finished(int errorCode) {
