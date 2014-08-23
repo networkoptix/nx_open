@@ -6,6 +6,7 @@
 #include <utils/common/log.h>
 #include <utils/common/checked_cast.h>
 #include <boost/optional.hpp>
+#include <mutex>
 
 #ifdef Q_OS_WIN
 #  include <ws2tcpip.h>
@@ -22,6 +23,8 @@
 // time using general log macro. This helpful for us to do debugging and
 // event tracing.
 
+
+#ifdef TRACE_UDT_SOCKET
 #define TRACE_(func,handler) \
     do { \
     NX_LOG( \
@@ -31,6 +34,9 @@
     arg(QLatin1String(UDT::getlasterror().getErrorMessage())). \
     arg(SystemError::getLastOSErrorText()). \
     arg(QLatin1String(__FILE__)).arg(__LINE__),cl_logERROR); } while(0)
+#else
+#define TRACE_(func,handler) (void*)(NULL)
+#endif // 
 
 // Verify macro is useful for us to push up the error detection in DEBUG mode
 // It will trigger a assertion failed in DEBUG version or LOG ERROR once in 
@@ -61,49 +67,38 @@
 #define STUB_(c) Q_ASSERT(!"Unimplemented!"); c
 #endif
 
+namespace detail{
 // =========================================================
 // Udt library initialization and tear down routine.
 // =========================================================
-#ifndef NDEBUG
-namespace {
-class UdtLibraryStatus {
+
+class UdtLibrary {
 public:
-    static bool IsUdtLibraryInitialized() {
-        return kFlag;
+    static UdtLibrary& GetInstance() {
+        static UdtLibrary kLib;
+        return kLib;
     }
-    UdtLibraryStatus() {
-        kFlag = true;
+    void Initialize() {
+        // We may use a 3 steps atomic lazy evaluation method. But that requires me to put
+        // to much code here, it won't worth so. If later on, it becomes the bottleneck, I
+        // can do the optimization for this double lock method here.
+        if(!initialized_) {
+            std::lock_guard<std::mutex> lock(mutex_);
+            if( initialized_ )
+                return;
+            else {
+                UDT::startup();
+                initialized_ = true;
+            }
+        }
     }
 private:
-    static bool kFlag;
+    bool initialized_;
+    std::mutex mutex_;
 };
-bool UdtLibraryStatus::kFlag = false;
-}// namespace
-#endif NDEBUG
-
-bool InitializeUdtLibrary() {
-#ifndef NDEBUG
-    static UdtLibraryStatus status;
-#endif
-    Q_ASSERT(status.IsUdtLibraryInitialized());
-    return UDT::startup() == 0; // Always success, offical documentation says.
-}
-
-bool DestroyUdtLibrary() {
-    Q_ASSERT(UdtLibraryStatus::IsUdtLibraryInitialized());
-    return UDT::cleanup() == 0;
-}
-
-#ifndef NDEBUG
-#define CHECK_UDT_() Q_ASSERT(UdtLibraryStatus::IsUdtLibraryInitialized())
-#else
-#define CHECK_UDT_() (void*)(NULL)
-#endif 
-
-namespace detail{
 
 void AddressFrom( const SocketAddress& local_addr , sockaddr_in* out ) {
-    memset(out, 0, sizeof(*out));  // Zero out address structure
+    memset(out, 0, sizeof(*out));    // Zero out address structure
     out->sin_family = AF_INET;       // Internet address
     out->sin_addr = local_addr.address.inAddr();
     out->sin_port = htons(local_addr.port);
@@ -126,7 +121,9 @@ public:
         ESTABLISHING,
         ESTABLISHED
     };
-    UdtSocketImpl(): handler_( UDT::INVALID_SOCK ) , state_(CLOSED) {}
+    UdtSocketImpl(): handler_( UDT::INVALID_SOCK ) , state_(CLOSED) {
+        UdtLibrary::GetInstance().Initialize();
+    }
     UdtSocketImpl( UDTSOCKET socket, int state ) : handler_(socket),state_(state){}
     ~UdtSocketImpl() {
         if(!IsClosed())
@@ -198,7 +195,6 @@ private:
 };
 
 bool UdtSocketImpl::Open() {
-    CHECK_UDT_();
     Q_ASSERT(IsClosed());
     handler_ = UDT::socket(AF_INET,SOCK_STREAM,0);
     VERIFY_(handler_ != UDT::INVALID_SOCK,"UDT::socket",0);
@@ -211,7 +207,6 @@ bool UdtSocketImpl::Open() {
 }
 
 bool UdtSocketImpl::Bind( const SocketAddress& localAddress ) {
-    CHECK_UDT_();
     sockaddr_in addr;
     AddressFrom(localAddress,&addr);
     int ret = UDT::bind(handler_,ADDR_(&addr),sizeof(addr));
@@ -220,7 +215,6 @@ bool UdtSocketImpl::Bind( const SocketAddress& localAddress ) {
 }
 
 SocketAddress UdtSocketImpl::GetLocalAddress() const {
-    CHECK_UDT_();
     sockaddr_in addr;
     int len = sizeof(addr);
     if(UDT::getsockname(handler_,ADDR_(&addr),&len) != 0) {
@@ -234,7 +228,6 @@ SocketAddress UdtSocketImpl::GetLocalAddress() const {
 
 
 SocketAddress UdtSocketImpl::GetPeerAddress() const {
-    CHECK_UDT_();
     sockaddr_in addr;
     int len = sizeof(addr);
     if(UDT::getpeername(handler_,ADDR_(&addr),&len) !=0) {
@@ -247,7 +240,6 @@ SocketAddress UdtSocketImpl::GetPeerAddress() const {
 }
 
 bool UdtSocketImpl::Close() {
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     int ret = UDT::close(handler_);
     VERIFY_(OK_(ret),"UDT::Close",handler_);
@@ -256,12 +248,10 @@ bool UdtSocketImpl::Close() {
 }
 
 bool UdtSocketImpl::IsClosed() const {
-    CHECK_UDT_();
     return state_ == CLOSED;
 }
 
 bool UdtSocketImpl::SetReuseAddrFlag( bool reuseAddr ) {
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     int ret = UDT::setsockopt(handler_,0,UDT_REUSEADDR,&reuseAddr,sizeof(reuseAddr));
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
@@ -269,7 +259,6 @@ bool UdtSocketImpl::SetReuseAddrFlag( bool reuseAddr ) {
 }
 
 bool UdtSocketImpl::GetReuseAddrFlag( bool* val ) const {
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     int len = sizeof(*val);
     int ret = UDT::getsockopt(handler_,0,UDT_REUSEADDR,val,&len);
@@ -278,7 +267,6 @@ bool UdtSocketImpl::GetReuseAddrFlag( bool* val ) const {
 }
 
 bool UdtSocketImpl::SetNonBlockingMode( bool val ) {
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     bool value = !val;
     int ret = UDT::setsockopt(handler_,0,UDT_SNDSYN,&value,sizeof(value));
@@ -289,7 +277,6 @@ bool UdtSocketImpl::SetNonBlockingMode( bool val ) {
 }
 
 bool UdtSocketImpl::GetNonBlockingMode( bool* val ) const {
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     int len = sizeof(*val);
     int ret = UDT::getsockopt(handler_,0,UDT_SNDSYN,val,&len);
@@ -307,17 +294,15 @@ bool UdtSocketImpl::GetNonBlockingMode( bool* val ) const {
 // and in modern switch, typically will change every half hour !!!
 // Better keep it opaque when you make decision what to send .
 bool UdtSocketImpl::GetMtu( unsigned int* mtuValue ) const {
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     *mtuValue = 1500; // Ethernet MTU 
     return true;
 }
 
 // UDT will round the buffer size internally, so don't expect
-// what you give will definitly become the real buffer size .
+// what you give will definitely become the real buffer size .
 
 bool UdtSocketImpl::SetSendBufferSize( unsigned int buffSize ) {
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     Q_ASSERT( buffSize < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
     int buff_size = static_cast<int>(buffSize);
@@ -328,7 +313,6 @@ bool UdtSocketImpl::SetSendBufferSize( unsigned int buffSize ) {
 }
 
 bool UdtSocketImpl::GetSendBufferSize( unsigned int* buffSize ) const{
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     int buff_size;
     int len = sizeof(buff_size);
@@ -340,7 +324,6 @@ bool UdtSocketImpl::GetSendBufferSize( unsigned int* buffSize ) const{
 }
 
 bool UdtSocketImpl::SetRecvBufferSize( unsigned int buffSize ){
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     Q_ASSERT( buffSize < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
     int buff_size = static_cast<int>(buffSize);
@@ -351,7 +334,6 @@ bool UdtSocketImpl::SetRecvBufferSize( unsigned int buffSize ){
 }
 
 bool UdtSocketImpl::GetRecvBufferSize( unsigned int* buffSize ) const{
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     int buff_size;
     int len = sizeof(buff_size);
@@ -363,7 +345,6 @@ bool UdtSocketImpl::GetRecvBufferSize( unsigned int* buffSize ) const{
 }
 
 bool UdtSocketImpl::SetRecvTimeout( unsigned int millis ) {
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     Q_ASSERT( millis < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
     int time = static_cast<int>(millis);
@@ -374,7 +355,6 @@ bool UdtSocketImpl::SetRecvTimeout( unsigned int millis ) {
 }
 
 bool UdtSocketImpl::GetRecvTimeout( unsigned int* millis ) const {
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     int time;
     int len = sizeof(time);
@@ -386,7 +366,6 @@ bool UdtSocketImpl::GetRecvTimeout( unsigned int* millis ) const {
 }
 
 bool UdtSocketImpl::SetSendTimeout( unsigned int ms ) {
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     Q_ASSERT( ms < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
     int time = static_cast<int>(ms);
@@ -397,7 +376,6 @@ bool UdtSocketImpl::SetSendTimeout( unsigned int ms ) {
 }
 
 bool UdtSocketImpl::GetSendTimeout( unsigned int* millis ) const {
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     int time;
     int len = sizeof(time);
@@ -409,14 +387,12 @@ bool UdtSocketImpl::GetSendTimeout( unsigned int* millis ) const {
 }
 
 bool UdtSocketImpl::GetLastError( SystemError::ErrorCode* errorCode ) const {
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     *errorCode = static_cast<SystemError::ErrorCode>(UDT::getlasterror().getErrorCode());
     return true;
 }
 
 AbstractSocket::SOCKET_HANDLE UdtSocketImpl::handle() const {
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     Q_ASSERT(sizeof(UDTSOCKET) == sizeof(AbstractSocket::SOCKET_HANDLE));
     return *reinterpret_cast<const AbstractSocket::SOCKET_HANDLE*>(&handler_);
@@ -424,7 +400,6 @@ AbstractSocket::SOCKET_HANDLE UdtSocketImpl::handle() const {
 
 
 int UdtSocketImpl::Recv( void* buffer, unsigned int bufferLen, int flags ) {
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     int sz = UDT::recv(handler_,reinterpret_cast<char*>(buffer),bufferLen,flags);
     if(sz <0) {
@@ -442,7 +417,6 @@ int UdtSocketImpl::Recv( void* buffer, unsigned int bufferLen, int flags ) {
 }
 
 int UdtSocketImpl::Send( const void* buffer, unsigned int bufferLen ) {
-    CHECK_UDT_();
     Q_ASSERT(!IsClosed());
     int sz = UDT::send(handler_,reinterpret_cast<const char*>(buffer),bufferLen,0);
     DEBUG_(
@@ -453,12 +427,12 @@ int UdtSocketImpl::Send( const void* buffer, unsigned int bufferLen ) {
 // This is a meaningless function. You could call Close and then create another
 // one if you bundle the states not_initialized into the original Socket design.
 bool UdtSocketImpl::Reopen() {
-    CHECK_UDT_();
     if(IsClosed()) {
         return Open();
     }
     return true;
 }
+
 
 // Connector / Acceptor 
 // We use a connector and acceptor to decide what kind of socket we want.
@@ -494,7 +468,6 @@ struct UdtEpollHandlerHelper {
 };
 
 bool UdtConnector::Connect( const QString& address , unsigned short port , int timeouts ) {
-    CHECK_UDT_();
     Q_ASSERT(impl_->state() == UdtSocketImpl::OPEN);
     sockaddr_in addr;
     AddressFrom(
@@ -561,7 +534,6 @@ private:
 };
 
 UdtSocketImpl* UdtAcceptor::Accept() {
-    CHECK_UDT_();
     Q_ASSERT(impl_->state() == UdtSocketImpl::ESTABLISHED);
     UDTSOCKET ret = UDT::accept(impl_->udt_handler(),NULL,NULL);
     if( ret == UDT::INVALID_SOCK ) {
@@ -574,7 +546,6 @@ UdtSocketImpl* UdtAcceptor::Accept() {
 
 
 bool UdtAcceptor::Listen( int backlog ) {
-    CHECK_UDT_();
     Q_ASSERT(impl_->state() == UdtSocketImpl::OPEN);
     int ret = UDT::listen(impl_->udt_handler(),backlog);
     if( ret != 0 ) {
@@ -592,83 +563,90 @@ bool UdtAcceptor::Listen( int backlog ) {
 // UdtSocket implementation
 // =====================================================================
 
-bool UdtSocket::bind( const SocketAddress& localAddress ) {
+UdtSocket::UdtSocket(): impl_( new detail::UdtSocketImpl() ) {}
+UdtSocket::~UdtSocket(){}
+UdtSocket::UdtSocket( detail::UdtSocketImpl* impl ) : impl_(impl)  {}
+
+// =====================================================================
+// UdtStreamSocket implementation
+// =====================================================================
+bool UdtStreamSocket::bind( const SocketAddress& localAddress ) {
     return impl_->Bind(localAddress);
 }
 
-SocketAddress UdtSocket::getLocalAddress() const {
+SocketAddress UdtStreamSocket::getLocalAddress() const {
     return impl_->GetLocalAddress();
 }
 
-SocketAddress UdtSocket::getPeerAddress() const {
+SocketAddress UdtStreamSocket::getPeerAddress() const {
     return impl_->GetPeerAddress();
 }
 
-void UdtSocket::close() {
+void UdtStreamSocket::close() {
     impl_->Close();
 }
 
-bool UdtSocket::isClosed() const {
+bool UdtStreamSocket::isClosed() const {
     return impl_->IsClosed();
 }
 
-bool UdtSocket::setReuseAddrFlag( bool reuseAddr ) {
+bool UdtStreamSocket::setReuseAddrFlag( bool reuseAddr ) {
     return impl_->SetReuseAddrFlag(reuseAddr);
 }
 
-bool UdtSocket::getReuseAddrFlag( bool* val ) {
+bool UdtStreamSocket::getReuseAddrFlag( bool* val ) {
     return impl_->GetReuseAddrFlag(val);
 }
 
-bool UdtSocket::setNonBlockingMode( bool val ) {
+bool UdtStreamSocket::setNonBlockingMode( bool val ) {
     return impl_->SetNonBlockingMode(val);
 }
 
-bool UdtSocket::getNonBlockingMode( bool* val ) const {
+bool UdtStreamSocket::getNonBlockingMode( bool* val ) const {
     return impl_->GetNonBlockingMode(val);
 }
 
-bool UdtSocket::getMtu( unsigned int* mtuValue ) {
+bool UdtStreamSocket::getMtu( unsigned int* mtuValue ) {
     return impl_->GetMtu(mtuValue);
 }
 
-bool UdtSocket::setSendBufferSize( unsigned int buffSize ) {
+bool UdtStreamSocket::setSendBufferSize( unsigned int buffSize ) {
     return impl_->SetSendBufferSize(buffSize);
 }
 
-bool UdtSocket::getSendBufferSize( unsigned int* buffSize ) {
+bool UdtStreamSocket::getSendBufferSize( unsigned int* buffSize ) {
     return impl_->GetSendBufferSize(buffSize);
 }
 
-bool UdtSocket::setRecvBufferSize( unsigned int buffSize ) {
+bool UdtStreamSocket::setRecvBufferSize( unsigned int buffSize ) {
     return impl_->SetRecvBufferSize(buffSize);
 }
 
-bool UdtSocket::getRecvBufferSize( unsigned int* buffSize ) {
+bool UdtStreamSocket::getRecvBufferSize( unsigned int* buffSize ) {
     return impl_->GetRecvBufferSize( buffSize );
 }
 
-bool UdtSocket::setRecvTimeout( unsigned int millis ) {
+bool UdtStreamSocket::setRecvTimeout( unsigned int millis ) {
     return impl_->SetRecvTimeout(millis);
 }
 
-bool UdtSocket::getRecvTimeout( unsigned int* millis ) {
+bool UdtStreamSocket::getRecvTimeout( unsigned int* millis ) {
     return impl_->GetRecvTimeout(millis);
 }
 
-bool UdtSocket::setSendTimeout( unsigned int ms )  {
+bool UdtStreamSocket::setSendTimeout( unsigned int ms )  {
     return impl_->SetSendTimeout(ms);
 }
 
-bool UdtSocket::getSendTimeout( unsigned int* millis ) {
+bool UdtStreamSocket::getSendTimeout( unsigned int* millis ) {
     return impl_->GetSendTimeout(millis);
 }
 
-bool UdtSocket::getLastError( SystemError::ErrorCode* errorCode ) {
+bool UdtStreamSocket::getLastError( SystemError::ErrorCode* errorCode ) {
     return impl_->GetLastError(errorCode);
 }
 
-bool UdtSocket::connect(
+bool UdtStreamSocket::connect(
     const QString& foreignAddress,
     unsigned short foreignPort,
     unsigned int timeoutMillis ) {
@@ -676,154 +654,156 @@ bool UdtSocket::connect(
             Connect(foreignAddress,foreignPort,timeoutMillis);
 }
 
-int UdtSocket::recv( void* buffer, unsigned int bufferLen, int flags ) {
+int UdtStreamSocket::recv( void* buffer, unsigned int bufferLen, int flags ) {
     return impl_->Recv(buffer,bufferLen,flags);
 }
 
-int UdtSocket::send( const void* buffer, unsigned int bufferLen ) {
+int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen ) {
     return impl_->Send(buffer,bufferLen);
 }
 
-bool UdtSocket::isConnected() const {
+bool UdtStreamSocket::isConnected() const {
     return impl_->IsConnected();
 }
 
-bool UdtSocket::reopen() {
+bool UdtStreamSocket::reopen() {
     return impl_->Reopen();
 }
 
-void UdtSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )  {
+void UdtStreamSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )  {
     return impl_->CancelAsyncIO(eventType,waitForRunningHandlerCompletion);
 }
 
-bool UdtSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) {
+bool UdtStreamSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) {
     return detail::UdtConnector(impl_.get()).AsyncConnect(addr,std::move(handler));
 }
 
-bool UdtSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
+bool UdtStreamSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
     return impl_->RecvAsyncImpl(buf,std::move(handler));
 }
 
-bool UdtSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
+bool UdtStreamSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
     return impl_->SendAsyncImpl(buf,std::move(handler));
 }
 
-AbstractSocket::SOCKET_HANDLE UdtSocket::handle() const {
+AbstractSocket::SOCKET_HANDLE UdtStreamSocket::handle() const {
     return impl_->handle();
 }
 
-UdtSocket::UdtSocket():impl_(new detail::UdtSocketImpl()) {
+UdtStreamSocket::UdtStreamSocket() {
     impl_->Open();
 }
 
-UdtSocket::~UdtSocket(){}
+UdtStreamSocket::UdtStreamSocket( detail::UdtSocketImpl* impl ) :
+    UdtSocket(impl){}
+
+UdtStreamSocket::~UdtStreamSocket(){}
 
 // =====================================================================
-// UdtServerSocket implementation
+// UdtStreamSocket implementation
 // =====================================================================
-
-bool UdtServerSocket::listen( int backlog )  {
+bool UdtStreamServerSocket::listen( int backlog )  {
     return detail::UdtAcceptor(impl_.get()).Listen(backlog);
 }
 
-AbstractStreamSocket* UdtServerSocket::accept()  {
+AbstractStreamSocket* UdtStreamServerSocket::accept()  {
     detail::UdtSocketImpl* impl = detail::UdtAcceptor(impl_.get()).Accept();
     if( impl == NULL )
         return NULL;
     else
-        return new UdtSocket(impl);
+        return new UdtStreamSocket(impl);
 }
 
-bool UdtServerSocket::bind( const SocketAddress& localAddress ) {
+bool UdtStreamServerSocket::bind( const SocketAddress& localAddress ) {
     return impl_->Bind(localAddress);
 }
 
-SocketAddress UdtServerSocket::getLocalAddress() const {
+SocketAddress UdtStreamServerSocket::getLocalAddress() const {
     return impl_->GetLocalAddress();
 }
 
-SocketAddress UdtServerSocket::getPeerAddress() const {
+SocketAddress UdtStreamServerSocket::getPeerAddress() const {
     return impl_->GetPeerAddress();
 }
 
-void UdtServerSocket::close() {
+void UdtStreamServerSocket::close() {
     impl_->Close();
 }
 
-bool UdtServerSocket::isClosed() const {
+bool UdtStreamServerSocket::isClosed() const {
     return impl_->IsClosed();
 }
 
-bool UdtServerSocket::setReuseAddrFlag( bool reuseAddr ) {
+bool UdtStreamServerSocket::setReuseAddrFlag( bool reuseAddr ) {
     return impl_->SetReuseAddrFlag(reuseAddr);
 }
 
-bool UdtServerSocket::getReuseAddrFlag( bool* val ) {
+bool UdtStreamServerSocket::getReuseAddrFlag( bool* val ) {
     return impl_->GetReuseAddrFlag(val);
 }
 
-bool UdtServerSocket::setNonBlockingMode( bool val ) {
+bool UdtStreamServerSocket::setNonBlockingMode( bool val ) {
     return impl_->SetNonBlockingMode(val);
 }
 
-bool UdtServerSocket::getNonBlockingMode( bool* val ) const {
+bool UdtStreamServerSocket::getNonBlockingMode( bool* val ) const {
     return impl_->GetNonBlockingMode(val);
 }
 
-bool UdtServerSocket::getMtu( unsigned int* mtuValue ) {
+bool UdtStreamServerSocket::getMtu( unsigned int* mtuValue ) {
     return impl_->GetMtu(mtuValue);
 }
 
-bool UdtServerSocket::setSendBufferSize( unsigned int buffSize ) {
+bool UdtStreamServerSocket::setSendBufferSize( unsigned int buffSize ) {
     return impl_->SetSendBufferSize(buffSize);
 }
 
-bool UdtServerSocket::getSendBufferSize( unsigned int* buffSize ) {
+bool UdtStreamServerSocket::getSendBufferSize( unsigned int* buffSize ) {
     return impl_->GetSendBufferSize(buffSize);
 }
 
-bool UdtServerSocket::setRecvBufferSize( unsigned int buffSize ) {
+bool UdtStreamServerSocket::setRecvBufferSize( unsigned int buffSize ) {
     return impl_->SetRecvBufferSize(buffSize);
 }
 
-bool UdtServerSocket::getRecvBufferSize( unsigned int* buffSize ) {
+bool UdtStreamServerSocket::getRecvBufferSize( unsigned int* buffSize ) {
     return impl_->GetRecvBufferSize(buffSize);
 }
 
-bool UdtServerSocket::setRecvTimeout( unsigned int millis ) {
+bool UdtStreamServerSocket::setRecvTimeout( unsigned int millis ) {
     return impl_->SetRecvTimeout(millis);
 }
 
-bool UdtServerSocket::getRecvTimeout( unsigned int* millis ) {
+bool UdtStreamServerSocket::getRecvTimeout( unsigned int* millis ) {
     return impl_->GetRecvTimeout(millis);
 }
 
-bool UdtServerSocket::setSendTimeout( unsigned int ms ) {
+bool UdtStreamServerSocket::setSendTimeout( unsigned int ms ) {
     return impl_->SetSendTimeout(ms);
 }
 
-bool UdtServerSocket::getSendTimeout( unsigned int* millis ) {
+bool UdtStreamServerSocket::getSendTimeout( unsigned int* millis ) {
     return impl_->GetSendTimeout(millis);
 }
 
-bool UdtServerSocket::getLastError( SystemError::ErrorCode* errorCode ) {
+bool UdtStreamServerSocket::getLastError( SystemError::ErrorCode* errorCode ) {
     return impl_->GetLastError(errorCode);
 }
 
-bool UdtServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) {
+bool UdtStreamServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) {
     Q_UNUSED(handler);
     STUB_(return false);
 }
 
-AbstractSocket::SOCKET_HANDLE UdtServerSocket::handle() const {
+AbstractSocket::SOCKET_HANDLE UdtStreamServerSocket::handle() const {
     return impl_->handle();
 }
 
-UdtServerSocket::UdtServerSocket() : impl_( new detail::UdtSocketImpl() ) {
+UdtStreamServerSocket::UdtStreamServerSocket() {
     impl_->Open();
 }
 
-UdtServerSocket::~UdtServerSocket(){}
+UdtStreamServerSocket::~UdtStreamServerSocket(){}
 
 
 // ========================================================
@@ -834,7 +814,7 @@ namespace {
 struct SocketUserData {
     boost::optional<void*> read_data;
     boost::optional<void*> write_data;
-    Socket* socket;
+    UdtSocket* socket;
     SocketUserData():socket(NULL){}
 };
 }// namespace 
@@ -855,9 +835,9 @@ class UdtPollSetImpl {
 public:
     UdtPollSetImpl():epoll_fd_(-1),size_(0){}
     int Poll( int milliseconds );
-    bool Add( Socket* socket , aio::EventType event , void* data );
-    void* GetUserData( Socket* sock, aio::EventType eventType ) const ;
-    void* Remove( Socket* socket , aio::EventType eventType );
+    bool Add( UdtSocket* socket , UdtSocketImpl* imp , aio::EventType event , void* data );
+    void* GetUserData( UdtSocketImpl* imp , aio::EventType eventType ) const ;
+    void* Remove( UdtSocketImpl* imp , aio::EventType eventType );
     bool Initialize();
     static UdtPollSetImpl* Create();
     bool Interrupt();
@@ -868,6 +848,13 @@ private:
     bool InitializeInterruptSocket();
     void RemoveFromEpoll( UDTSOCKET udt_handler , int event_type );
     static const int kInterruptionBufferLength = 128;
+    int MapAioEventToUdtEvent( aio::EventType et ) {
+        switch(et) {
+        case aio::etRead: return UDT_EPOLL_IN;
+        case aio::etWrite:return UDT_EPOLL_OUT;
+        default: Q_ASSERT(0); return 0;
+        }
+    }
 private:
     std::set<UDTSOCKET> udt_read_set_;
     std::set<UDTSOCKET> udt_write_set_;
@@ -891,15 +878,13 @@ void UdtPollSetImpl::RemoveFromEpoll( UDTSOCKET udt_handler , int event_type ) {
     }
 }
 
-void* UdtPollSetImpl::Remove( Socket* socket , aio::EventType eventType ) {
-    Q_ASSERT(socket != NULL);
-    UdtSocket* udt_socket = checked_cast<UdtSocket*>(socket);
-    Q_ASSERT(udt_socket);
+void* UdtPollSetImpl::Remove( UdtSocketImpl* imp , aio::EventType eventType ) {
+    Q_ASSERT(imp != NULL);
     switch(eventType) {
     case aio::etRead:
         {
             std::map<UDTSOCKET,SocketUserData>::iterator
-                ib = socket_user_data_.find(udt_socket->impl_->udt_handler());
+                ib = socket_user_data_.find(imp->udt_handler());
             if( ib == socket_user_data_.end() || ib->second.read_data == boost::none )
                 return NULL;
             void* rudata = ib->second.read_data.get();
@@ -911,14 +896,14 @@ void* UdtPollSetImpl::Remove( Socket* socket , aio::EventType eventType ) {
                 remain_event_type = UDT_EPOLL_OUT;
                 ib->second.read_data = boost::none;
             }
-            RemoveFromEpoll(udt_socket->impl_->udt_handler(),remain_event_type);
+            RemoveFromEpoll(imp->udt_handler(),remain_event_type);
             --size_;
             return rudata;
         }
     case aio::etWrite:
         {
             std::map<UDTSOCKET,SocketUserData>::iterator
-                ib = socket_user_data_.find(udt_socket->impl_->udt_handler());
+                ib = socket_user_data_.find(imp->udt_handler());
             if( ib == socket_user_data_.end() || ib->second.write_data == boost::none )
                 return false;
             void* rudata = ib->second.write_data.get();
@@ -929,7 +914,7 @@ void* UdtPollSetImpl::Remove( Socket* socket , aio::EventType eventType ) {
                 remain_event_type = UDT_EPOLL_IN;
                 ib->second.write_data = boost::none;
             }
-            RemoveFromEpoll(udt_socket->impl_->udt_handler(),remain_event_type);
+            RemoveFromEpoll(imp->udt_handler(),remain_event_type);
             --size_;
             return rudata;
         }
@@ -937,12 +922,10 @@ void* UdtPollSetImpl::Remove( Socket* socket , aio::EventType eventType ) {
     }
 }
 
-void* UdtPollSetImpl::GetUserData( Socket* sock, aio::EventType eventType ) const {
-    Q_ASSERT(sock != NULL);
-    UdtSocket* udt_socket = checked_cast<UdtSocket*>(sock);
-    Q_ASSERT(udt_socket != NULL);
+void* UdtPollSetImpl::GetUserData( UdtSocketImpl* imp , aio::EventType eventType ) const {
+    Q_ASSERT(imp != NULL);
     std::map<UDTSOCKET,SocketUserData>::const_iterator
-        ib = socket_user_data_.find(udt_socket->impl_->udt_handler());
+        ib = socket_user_data_.find(imp->udt_handler());
     if(ib == socket_user_data_.end())
         return NULL;
     else {
@@ -956,45 +939,21 @@ void* UdtPollSetImpl::GetUserData( Socket* sock, aio::EventType eventType ) cons
     }
 }
 
-bool UdtPollSetImpl::Add( Socket* socket , aio::EventType event , void* data ) {
+bool UdtPollSetImpl::Add( UdtSocket* socket , UdtSocketImpl* imp , aio::EventType event , void* data ) {
     Q_ASSERT(socket != NULL);
-    UdtSocket* udt_socket = checked_cast<UdtSocket*>(socket);
-    Q_ASSERT(udt_socket != NULL);
-    std::pair<
-        std::set<UDTSOCKET>::iterator,bool> ret;
-    switch(event) {
-    case aio::etRead:
-        {
-            int ev = UDT_EPOLL_IN;
-            int ret = UDT::epoll_add_usock(epoll_fd_,udt_socket->impl_->udt_handler(),&ev);
-            DEBUG_(if(ret <0) TRACE_("UDT::epoll_add_usock",udt_socket->impl_->udt_handler()));
-            if( ret <0 )
-                return false;
-            SocketUserData& ref = socket_user_data_[udt_socket->impl_->udt_handler()];
-            // This behavior is same as the existed implementation of PollSet
-            if(ref.read_data == boost::none)
-                ref.read_data = data;
-            ref.socket = socket;
-            ++size_;
-            return true;
-        }
-    case aio::etWrite:
-        {
-            int ev = UDT_EPOLL_OUT;
-            int ret = UDT::epoll_add_usock(epoll_fd_,udt_socket->impl_->udt_handler(),&ev);
-            DEBUG_(if(ret <0) TRACE_("UDT::epoll_add_usock",udt_socket->impl_->udt_handler()));
-            if( ret <0 )
-                return false;
-            SocketUserData& ref = socket_user_data_[udt_socket->impl_->udt_handler()];
-            // This behavior is same as the existed implementation of PollSet
-            if(ref.write_data == boost::none)
-                ref.write_data = data;
-            ref.socket = socket;
-            ++size_;
-            return true;
-        }
-    default: Q_ASSERT(0); return false;
-    }
+    int ev = MapAioEventToUdtEvent(event);
+    int ret = UDT::epoll_add_usock(epoll_fd_,imp->udt_handler(),&ev);
+    DEBUG_(if(ret <0) TRACE_("UDT::epoll_add_usock",imp->udt_handler()));
+    if( ret <0 )
+        return false;
+    SocketUserData& ref = socket_user_data_[imp->udt_handler()];
+    if( ev == UDT_EPOLL_IN )
+        ref.read_data = data;
+    else
+        ref.write_data = data;
+    ref.socket = socket;
+    ++size_;
+    return true;
 }
 
 int UdtPollSetImpl::Poll( int milliseconds ) {
@@ -1046,9 +1005,9 @@ bool UdtPollSetImpl::InitializeInterruptSocket() {
 }
 
 UdtPollSetImpl* UdtPollSetImpl::Create() {
-    UdtPollSetImpl* ret = new UdtPollSetImpl();
+    std::unique_ptr<UdtPollSetImpl> ret(new UdtPollSetImpl());
     if( ret->Initialize() )
-        return ret;
+        return ret.release();
     else
         return NULL;
 }
@@ -1089,7 +1048,7 @@ public:
         return iterator_ == impl_->udt_write_set_.end();
     }
 
-    Socket* GetSocket() const {
+    UdtSocket* GetSocket() const {
         return GetSocketUserData()->socket;
     }
 
@@ -1193,12 +1152,12 @@ bool UdtPollSet::const_iterator::operator!=( const UdtPollSet::const_iterator& r
     return !(*this == right);
 }
 
-Socket* UdtPollSet::const_iterator::socket() {
+UdtSocket* UdtPollSet::const_iterator::socket() {
     Q_ASSERT(!impl_);
     return impl_->GetSocket();
 }
 
-const Socket* UdtPollSet::const_iterator::socket() const {
+const UdtSocket* UdtPollSet::const_iterator::socket() const {
     Q_ASSERT(!impl_);
     return impl_->GetSocket();
 }
@@ -1213,6 +1172,7 @@ void* UdtPollSet::const_iterator::userData() {
     return impl_->GetUserData();
 }
 
+UdtPollSet::const_iterator::~const_iterator(){}
 
 // ============================================
 // UdtPollSet
@@ -1230,14 +1190,14 @@ void UdtPollSet::interrupt() {
     impl_->Interrupt();
 }
 
-bool UdtPollSet::add( Socket* const sock, aio::EventType eventType, void* userData ) {
+bool UdtPollSet::add( UdtSocket* socket , aio::EventType eventType, void* userData ) {
     Q_ASSERT(impl_);
-    return impl_->Add(sock,eventType,userData);
+    return impl_->Add(socket,socket->impl_.get(),eventType,userData);
 }
 
-void* UdtPollSet::remove( Socket* const sock, aio::EventType eventType ) {
+void* UdtPollSet::remove( UdtSocket* socket , aio::EventType eventType ) {
     Q_ASSERT(impl_);
-    return impl_->Remove(sock,eventType);
+    return impl_->Remove(socket->impl_.get(),eventType);
 }
 
 size_t UdtPollSet::size() const {
@@ -1245,9 +1205,9 @@ size_t UdtPollSet::size() const {
     return impl_->size();
 }
 
-void* UdtPollSet::getUserData( Socket* const sock, aio::EventType eventType ) const {
+void* UdtPollSet::getUserData( UdtSocket* socket, aio::EventType eventType ) const {
     Q_ASSERT(impl_);
-    return impl_->GetUserData(sock,eventType);
+    return impl_->GetUserData(socket->impl_.get(),eventType);
 }
 
 int UdtPollSet::poll( int millisToWait ) {

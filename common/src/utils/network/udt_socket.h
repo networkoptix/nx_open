@@ -6,10 +6,10 @@
 #include "aio/pollset.h"
 #include <memory>
 
-// The following function _MUST_ be called before using any UDT socket.
-bool InitializeUdtLibrary();
-bool DestroyUdtLibrary();
 
+class UdtPollSet;
+class UdtStreamSocket;
+class UdtStreamServerSocket;
 // I put the implementator inside of detail namespace to avoid namespace pollution.
 // The reason is that I see many of the class prefer using Implementator , maybe 
 // we want binary compatible of our source code. Anyway, this is not a bad thing
@@ -41,9 +41,21 @@ struct UdtPollSetConstIteratorImplPtr : public std::unique_ptr<UdtPollSetConstIt
 
 }// namespace detail
 
+// Adding a level indirection to make C++ type system happy.
+class UdtSocket {
+public:
+    UdtSocket();
+    ~UdtSocket();
+
+protected:
+    UdtSocket( detail::UdtSocketImpl* impl );
+    detail::UdtSocketImplPtr impl_;
+    friend class UdtPollSet;
+};
+
 // BTW: Why some getter function has const qualifier, and others don't have this in AbstractStreamSocket ??
 
-class UdtSocket : public AbstractStreamSocket {
+class UdtStreamSocket : public UdtSocket , public AbstractStreamSocket {
 public:
     // AbstractSocket --------------- interface
     virtual bool bind( const SocketAddress& localAddress );
@@ -98,12 +110,12 @@ public:
         Q_UNUSED(info);
         return false;
     }
-    UdtSocket();
-    UdtSocket( detail::UdtSocketImpl* impl ):impl_(impl){}
+    UdtStreamSocket();
+    UdtStreamSocket( detail::UdtSocketImpl* impl );
     // We must declare this trivial constructor even it is trivial.
     // Since this will make std::unique_ptr call correct destructor for our
     // partial, forward declaration of class UdtSocketImp;
-    virtual ~UdtSocket();
+    virtual ~UdtStreamSocket();
 private:
 
     virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler );
@@ -111,12 +123,10 @@ private:
     virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
 
 private:
-    detail::UdtSocketImplPtr impl_;
-    friend class detail::UdtPollSetImpl;
-    Q_DISABLE_COPY(UdtSocket)
+    Q_DISABLE_COPY(UdtStreamSocket)
 };
 
-class UdtServerSocket : public AbstractStreamServerSocket  {
+class UdtStreamServerSocket : public UdtSocket, public AbstractStreamServerSocket  {
 public:
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen( int queueLen = 128 ) ;
@@ -142,39 +152,29 @@ public:
     virtual bool getLastError( SystemError::ErrorCode* errorCode );
     virtual AbstractSocket::SOCKET_HANDLE handle() const;
 
-    UdtServerSocket();
-    virtual ~UdtServerSocket();
+    UdtStreamServerSocket();
+    virtual ~UdtStreamServerSocket();
 
 protected:
     virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) ;
 private:
-    detail::UdtSocketImplPtr impl_;
-
-    Q_DISABLE_COPY(UdtServerSocket)
+    Q_DISABLE_COPY(UdtStreamServerSocket)
 };
 
 // Udt poller 
 class UdtPollSet {
 public:
-    
     class const_iterator {
     public:
         const_iterator();
         const_iterator( const const_iterator& );
         const_iterator( detail::UdtPollSetImpl* impl , bool end );
         ~const_iterator();
-
         const_iterator& operator=( const const_iterator& );
-        //!Selects next socket which state has been changed with previous \a poll call
-        const_iterator operator++(int);    //it++
-        //!Selects next socket which state has been changed with previous \a poll call
-        const_iterator& operator++();       //++it
-
-        Socket* socket();
-        const Socket* socket() const;
-        /*!
-            \return Triggered event
-        */
+        const_iterator operator++(int);   
+        const_iterator& operator++();      
+        UdtSocket* socket();
+        const UdtSocket* socket() const;
         aio::EventType eventType() const;
         void* userData();
 
@@ -184,7 +184,6 @@ public:
     private:
         detail::UdtPollSetConstIteratorImplPtr impl_;
     };
-
 public:
     UdtPollSet();
     ~UdtPollSet();
@@ -192,20 +191,20 @@ public:
         return impl_;
     }
     void interrupt();
-    bool add( Socket* const sock, aio::EventType eventType, void* userData = NULL );
-    void* remove( Socket* const sock, aio::EventType eventType );
-    size_t size() const;
-    void* getUserData( Socket* const sock, aio::EventType eventType ) const;
+    bool add( UdtSocket* sock, aio::EventType eventType, void* userData = NULL );
+    void* remove( UdtSocket*  sock, aio::EventType eventType );
+    void* getUserData( UdtSocket*  sock, aio::EventType eventType ) const;
+    bool canAcceptSocket( UdtSocket* sock ) const { Q_UNUSED(sock); return true; }
     int poll( int millisToWait = aio::INFINITE_TIMEOUT );
-    bool canAcceptSocket( Socket* const sock ) const { Q_UNUSED(sock); return true; }
     const_iterator begin() const;
     const_iterator end() const;
+    size_t size() const;
     static unsigned int maxPollSetSize() {
         return std::numeric_limits<unsigned int>::max();
     }
+
 private:
     detail::UdtPollSetImplPtr impl_;
-
     Q_DISABLE_COPY(UdtPollSet)
 };
 

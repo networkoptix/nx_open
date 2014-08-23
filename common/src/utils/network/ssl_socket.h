@@ -155,7 +155,7 @@ private:
 };
 
 // SSL on top of NAT 
-class UdtSSLServerSocket : public UdtServerSocket {
+class UdtSSLServerSocket : public UdtStreamServerSocket {
 public:
     UdtSSLServerSocket( bool allowNonSecureConnect = true ) :
         m_allowNonSecureConnect(allowNonSecureConnect){}
