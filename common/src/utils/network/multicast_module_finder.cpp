@@ -21,6 +21,10 @@ namespace {
     const unsigned defaultKeepAliveMultiply = 3;
     const unsigned errorWaitTimeoutMs = 1000;
 
+    QUrl makeUrl(const QHostAddress &address, quint16 port) {
+        return QUrl(lit("http://%1:%2").arg(address.toString()).arg(port));
+    }
+
 } // anonymous namespace
 
 QnMulticastModuleFinder::QnMulticastModuleFinder(
@@ -101,6 +105,21 @@ QnModuleInformation QnMulticastModuleFinder::moduleInformation(const QString &mo
         return QnModuleInformation();
 
     return it->moduleInformation;
+}
+
+void QnMulticastModuleFinder::addIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id) {
+    QUrl url = makeUrl(address, port);
+    if (!m_ignoredModules.contains(url, id))
+        m_ignoredModules.insert(url, id);
+}
+
+void QnMulticastModuleFinder::removeIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id) {
+    QUrl url = makeUrl(address, port);
+    m_ignoredModules.remove(url, id);
+}
+
+QMultiHash<QUrl, QUuid> QnMulticastModuleFinder::ignoredModules() const {
+    return m_ignoredModules;
 }
 
 void QnMulticastModuleFinder::pleaseStop() {
@@ -189,6 +208,9 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
             arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
         return false;
     }
+
+    if (m_ignoredModules.contains(makeUrl(QHostAddress(remoteAddressStr), remotePort), response.seed))
+        return false;
 
     QMutexLocker lk(&m_mutex);
 

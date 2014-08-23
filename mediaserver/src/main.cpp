@@ -1685,7 +1685,7 @@ void QnMain::run()
 
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
     exec();
-
+    QnResourceDiscoveryManager::instance()->pleaseStop();
     stopObjects();
 
     QnResource::stopCommandProc();
@@ -1732,8 +1732,6 @@ void QnMain::run()
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
 
-    delete QnResourcePool::instance();
-    QnResourcePool::initStaticInstance( NULL );
 
     QnStorageManager::instance()->stopAsyncTasks();
 
@@ -1752,6 +1750,11 @@ void QnMain::run()
 
     QnSSLSocket::releaseSSLEngine();
     QnAuthHelper::initStaticInstance(NULL);
+
+    globalSettings.reset();
+
+    delete QnResourcePool::instance();
+    QnResourcePool::initStaticInstance( NULL );
 }
 
 void QnMain::at_appStarted()
@@ -1791,33 +1794,6 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
             } );
     }
 }
-
-#ifdef EDGE_SERVER
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <arpa/inet.h>
-#include <net/if.h>
-
-static void mac_eth0(char  MAC_str[13], char** host)
-{
-    #define HWADDR_len 6
-    int s,i;
-    struct ifreq ifr;
-    s = socket(AF_INET, SOCK_DGRAM, 0);
-    strcpy(ifr.ifr_name, "eth0");
-    if (ioctl(s, SIOCGIFHWADDR, &ifr) != -1) {
-        for (i=0; i<HWADDR_len; i++)
-            sprintf(&MAC_str[i*2],"%02X",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
-    }
-    if((ioctl(s, SIOCGIFADDR, &ifr)) != -1) {
-        const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
-        *host = inet_ntoa(ip->sin_addr);
-    }
-    close(s);
-}
-#endif
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
 {

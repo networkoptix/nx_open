@@ -7,9 +7,8 @@
 #include "camera_pool.h"
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "common/common_module.h"
+#include "utils/common/synctime.h"
 
-
-QSettings qSettings;	//TODO/FIXME remove this shit. Have to add to build common as shared object, since it requires extern qSettibns to be defined somewhere...
 
 QString doUnquote(const QString& fileName)
 {
@@ -42,6 +41,7 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
 
     QnCommonModule common(argc, argv);
+    QnSyncTime syncTime;
 
     new QnLongRunnablePool();
 

@@ -1,13 +1,16 @@
-#include <QDebug>
 
 #include "test_camera.h"
-#include "utils/media/nalUnits.h"
-#include "plugins/resources/test_camera/testcamera_const.h"
-#include "utils/common/sleep.h"
+
+#include <QDebug>
+
 #include "core/datapacket/media_data_packet.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
+#include "plugins/resource/avi/avi_resource.h"
+#include "plugins/resource/avi/avi_archive_delegate.h"
+#include "plugins/resource/test_camera/testcamera_const.h"
+#include "utils/common/sleep.h"
 #include "utils/media/ffmpeg_helper.h"
+#include "utils/media/nalUnits.h"
+
 
 QList<QnCompressedVideoDataPtr> QnFileCache::getMediaData(const QString& fileName)
 {
@@ -37,7 +40,7 @@ QList<QnCompressedVideoDataPtr> QnFileCache::getMediaData(const QString& fileNam
         if (!video)
             continue;
         rez << video;
-        totalSize += video->data.size();
+        totalSize += video->dataSize();
         if (totalSize > 1024*1024*100)
         {
             qDebug() << "File" << fileName << "too large. Using first 100M.";
@@ -101,7 +104,7 @@ int QnTestCamera::sendAll(AbstractStreamSocket* socket, const void* data, int si
     qWarning() << "sendAll: " << size;
     int sent = 0, sentTotal = 0;
     while (sentTotal < size) {
-        sent = socket->send(data + sentTotal, size - sentTotal);
+        sent = socket->send(static_cast<const quint8*>(data)+ sentTotal, size - sentTotal);
         if (sent < 1) {
             qWarning() << "TCP socket write error for camera " << m_mac << "send" << sent << "of" << size;
             break;
@@ -154,7 +157,7 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, Abstrac
             }
         }
 
-        quint32 packetLen = htonl(video->data.size());
+        quint32 packetLen = htonl(video->dataSize());
         quint16 codec = video->compressionType;
         if (video->flags & AV_PKT_FLAG_KEY)
             codec |= 0x8000;
@@ -168,7 +171,7 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, Abstrac
             return false;
         }
 
-        if (sendAll(socket, video->data.data(), video->data.size())) {
+        if (sendAll(socket, video->data(), video->dataSize())) {
             return false;
         }
 

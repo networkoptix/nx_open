@@ -100,11 +100,10 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
         if (mediaServer)
             mserverStatusChanged = ownResource->getStatus() != resource->getStatus();
 
-        // move incompatible resource to the main pool if it became normal
-        if (ownResource && ownResource->getStatus() == Qn::Incompatible && resource->getStatus() != Qn::Incompatible)
-            qnResPool->makeResourceNormal(ownResource);
-
         ownResource->update(resource);
+
+        if (ownResource)
+            qnResPool->updateIncompatibility(ownResource);
 
         if (mserverStatusChanged && mediaServer)
             determineOptimalIF(mediaServer);

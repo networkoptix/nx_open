@@ -26,7 +26,7 @@ void QnWorkbenchServerAddressWatcher::setDirectModuleFinder(QnDirectModuleFinder
         connect(m_directModuleFinder, &QnDirectModuleFinder::moduleFound, this, &QnWorkbenchServerAddressWatcher::at_directModuleFinder_moduleFound);
 }
 
-void QnWorkbenchServerAddressWatcher::setDirectModuleFinderHelper(QnDirectModuleFinderHelper *directModuleFinderHelper) {
+void QnWorkbenchServerAddressWatcher::setDirectModuleFinderHelper(QnModuleFinderHelper *directModuleFinderHelper) {
     m_directModuleFinderHelper = directModuleFinderHelper;
 }
 

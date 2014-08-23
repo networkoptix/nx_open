@@ -141,32 +141,20 @@ void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subD
     }
 }
 
-QnDbManager::Locker::Locker(QnDbManager* db): 
-    m_inTran(false), 
-    m_db(db) 
+QnDbManager::Locker::Locker(QnDbManager* db)
+: 
+    m_db(db),
+    m_scopedTran( db->getTransaction() )
 {
-
 }
+
 QnDbManager::Locker::~Locker()
 {
-    if (m_inTran)
-        m_db->rollback();
-}
-
-void QnDbManager::Locker::beginTran()
-{
-    if (!m_inTran) {
-        m_db->beginTran();
-        m_inTran = true;
-    }
 }
 
 void QnDbManager::Locker::commit()
 {
-    if (m_inTran) {
-        m_db->commit();
-        m_inTran = false;
-    }
+    m_scopedTran.commit();
 }
 
 
@@ -231,6 +219,16 @@ bool QnDbManager::init(
     {
         qWarning() << "can't initialize Server static sqlLite database " << m_sdbStatic.databaseName() << ". Error: " << m_sdbStatic.lastError().text();
         return false;
+    }
+
+    //tuning DB
+    {
+        QSqlQuery enableWalQuery(m_sdb);
+        enableWalQuery.prepare("PRAGMA journal_mode = WAL");
+        if( !enableWalQuery.exec() )
+        {
+            qWarning() << "Failed to enable WAL mode on sqlLite database!" << enableWalQuery.lastError().text();
+        }
     }
 
     bool dbJustCreated = false;
@@ -1884,12 +1882,15 @@ bool QnDbManager::saveMiscParam( const QByteArray& name, const QByteArray& value
     insQuery.prepare("INSERT INTO misc_data (key, data) values (?,?)");
     insQuery.addBindValue( name );
     insQuery.addBindValue( value );
-    return insQuery.exec();
+    if( !insQuery.exec() )
+        return false;
+    locker.commit();
+    return true;
 }
 
 bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
 {
-    QReadLocker lock(&m_mutex);
+    QReadLocker lock(&m_mutex); //locking it here since this method is public
 
     QSqlQuery query(m_sdb);
     query.prepare("SELECT data from misc_data where key = ?");
@@ -2909,21 +2910,6 @@ ErrorCode QnDbManager::removeLayoutFromVideowallItems(const QUuid &layout_id) {
 
     qWarning() << Q_FUNC_INFO << query.lastError().text();
     return ErrorCode::dbError;
-}
-
-void QnDbManager::beginTran()
-{
-    m_tran.beginTran();
-}
-
-void QnDbManager::commit()
-{
-    m_tran.commit();
-}
-
-void QnDbManager::rollback()
-{
-    m_tran.rollback();
 }
 
 bool QnDbManager::markLicenseOverflow(bool value, qint64 time)

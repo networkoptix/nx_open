@@ -28,14 +28,13 @@ void QnStorageDb::afterDelete()
 {
     QMutexLocker lock(&m_delMutex);
 
-    beginTran();
+    QnDbTransactionLocker tran(getTransaction());
     foreach(const DeleteRecordInfo& delRecord, m_recordsToDelete) {
         if (!deleteRecordsInternal(delRecord)) {
-            rollback();
             return; // keep record list to delete. try to the next time
         }
     }
-    commit();
+    tran.commit();
 
     m_recordsToDelete.clear();
 }
@@ -84,10 +83,10 @@ void QnStorageDb::addRecord(const QString& cameraUniqueId, QnServer::ChunksCatal
 
 void QnStorageDb::flushRecords()
 {
-    beginTran();
+    QnDbTransactionLocker tran(getTransaction());
     foreach(const DelayedData& data, m_delayedData)
         addRecordInternal(data.cameraUniqueId, data.catalog, data.chunk);
-    commit();
+    tran.commit();
     m_lastTranTime.restart();
     m_delayedData.clear();
 }
@@ -114,7 +113,7 @@ bool QnStorageDb::addRecordInternal(const QString& cameraUniqueId, QnServer::Chu
 
 bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const std::deque<DeviceFileCatalog::Chunk>& chunks)
 {
-    beginTran();
+    QnDbTransactionLocker tran(getTransaction());
 
     QSqlQuery query(m_sdb);
     query.prepare("DELETE FROM storage_data WHERE unique_id = ? AND role = ?");
@@ -123,7 +122,6 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksC
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
-        rollback();
         return false;
     }
 
@@ -133,12 +131,11 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksC
             continue;
 
         if (!addRecordInternal(cameraUniqueId, catalog, chunk)) {
-            rollback();
             return false;
         }
     }
 
-    commit();
+    tran.commit();
     return true;
 }
 
@@ -151,16 +148,14 @@ bool QnStorageDb::open(const QString& fileName)
 
 bool QnStorageDb::createDatabase()
 {
-    beginTran();
+    QnDbTransactionLocker tran(getTransaction());
     if (!isObjectExists(lit("table"), lit("storage_data"), m_sdb))
     {
         if (!execSQLFile(lit(":/01_create_storage_db.sql"), m_sdb)) {
-            rollback();
             return false;
         }
 
         if (!execSQLFile(lit(":/02_storage_bookmarks.sql"), m_sdb)) {
-            rollback();
             return false;
         }
     }
@@ -168,7 +163,7 @@ bool QnStorageDb::createDatabase()
     if (!initializeBookmarksFtsTable())
         return false;
 
-    commit();
+    tran.commit();
 
     m_lastTranTime.restart();
     return true;

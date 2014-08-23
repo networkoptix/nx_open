@@ -72,6 +72,8 @@
 
 #include <client/client_settings.h>
 
+#include <utils/common/scoped_value_rollback.h>
+
 #include "resource_browser_widget.h"
 #include "layout_tab_bar.h"
 #include "dwm.h"
@@ -148,7 +150,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_skipDoubleClick(false),
     m_dwm(NULL),
     m_drawCustomFrame(false),
-    m_enableBackgroundAnimation(true)
+    m_enableBackgroundAnimation(true),
+    m_inFullscreenTransition(false)
 {
 #ifdef Q_OS_MACX
     // TODO: #ivigasin check the neccesarity of this line. In Maveric fullscreen animation works fine without it.
@@ -419,6 +422,16 @@ void QnMainWindow::setMaximized(bool maximized) {
 void QnMainWindow::setFullScreen(bool fullScreen) {
     if(fullScreen == isFullScreen())
         return;
+
+    /*
+     * Animated minimize/maximize process starts event loop,
+     * so we can spoil m_storedGeometry value if enter 
+     * this method while already in animation progress.
+     */
+    if (m_inFullscreenTransition)
+        return;
+    QN_SCOPED_VALUE_ROLLBACK(&m_inFullscreenTransition, true);
+
 
     if(fullScreen) {
 #ifndef Q_OS_MACX

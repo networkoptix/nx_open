@@ -125,7 +125,7 @@ QnResourcePoolModelNode::~QnResourcePoolModelNode() {
 
     foreach(QnResourcePoolModelNode *childNode, m_children) {
         childNode->setParent(NULL);
-        m_model->deleteNode(childNode);
+        m_model->removeNode(childNode);
     }
 }
 
@@ -588,8 +588,16 @@ void QnResourcePoolModelNode::removeChildInternal(QnResourcePoolModelNode *child
     } else {
         m_children.removeOne(child);
     }
-    if (this->type() == Qn::RecorderNode && m_children.size() == 0)
-        setBastard(true);
+
+    switch(m_type) {
+    case Qn::RecorderNode:
+    case Qn::SystemNode:
+        if (m_children.size() == 0)
+            setBastard(true);
+        break;
+    default:
+        break;
+    }
 }
 
 void QnResourcePoolModelNode::addChildInternal(QnResourcePoolModelNode *child) {
@@ -605,8 +613,16 @@ void QnResourcePoolModelNode::addChildInternal(QnResourcePoolModelNode *child) {
     } else {
         m_children.push_back(child);
     }
-    if (this->type() == Qn::RecorderNode && m_children.size() > 0)
-        setBastard(false);
+
+    switch(m_type) {
+    case Qn::RecorderNode:
+    case Qn::SystemNode:
+        if (m_children.size() > 0)
+            setBastard(false);
+        break;
+    default:
+        break;
+    }
 }
 
 void QnResourcePoolModelNode::changeInternal() {
