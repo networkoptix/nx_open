@@ -530,9 +530,19 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
     case Qn::BnsFormat:
         addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
         break;
-    case Qn::UbjsonFormat:
+    case Qn::UbjsonFormat: {
+
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+        QnAbstractTransaction abtractTran;
+        QnUbjsonReader<QByteArray> stream(&serializedTran);
+        QnUbjson::deserialize(&stream, &abtractTran);
+        qDebug() << "send direct transaction to peer " << remotePeer().id << "command=" << ApiCommand::toString(abtractTran.command) 
+            << "transport seq=" << header.sequence << "db seq=" << abtractTran.persistentInfo.sequence << "timestamp=" << abtractTran.persistentInfo.timestamp;
+#endif
+
         addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
         break;
+    }
     default:
         qWarning() << "Client has requested data in the unsupported format" << m_remotePeer.dataFormat;
         addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
