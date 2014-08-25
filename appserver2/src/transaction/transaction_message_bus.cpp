@@ -755,6 +755,10 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
             transport->close();
         break;
     }
+    case QnTransactionTransport::ReadyForStreaming:
+        transport->processExtraData();
+        transport->startListening();
+        break;
     case QnTransactionTransport::Closed:
         for (int i = m_connectingConnections.size() -1; i >= 0; --i) 
         {
@@ -830,6 +834,8 @@ void QnTransactionMessageBus::doPeriodicTasks()
         {
             itr.value().lastActivity.restart();
             foreach(QSharedPointer<QnTransactionTransport> transport, m_connectingConnections) {
+                if (transport->getState() == QnTransactionTransport::Closed)
+                    continue; // it's going to close soon
                 if (transport->remotePeer().id == itr.key()) {
                     qWarning() << "No alive info during timeout. reconnect to peer" << transport->remotePeer().id;
                     transport->setState(QnTransactionTransport::Error);
@@ -837,6 +843,8 @@ void QnTransactionMessageBus::doPeriodicTasks()
             }
 
             foreach(QSharedPointer<QnTransactionTransport> transport, m_connections.values()) {
+                if (transport->getState() == QnTransactionTransport::Closed)
+                    continue; // it's going to close soon
                 if (transport->remotePeer().id == itr.key() && transport->remotePeer().peerType == Qn::PT_Server) {
                     qWarning() << "No alive info during timeout. reconnect to peer" << transport->remotePeer().id;
                     transport->setState(QnTransactionTransport::Error);
