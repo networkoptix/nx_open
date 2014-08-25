@@ -502,10 +502,12 @@ public:
     virtual bool listen( int queueLen ) override;
     //!Implementation of AbstractStreamServerSocket::accept
     virtual AbstractStreamSocket* accept() override;
+    //!Implementation of AbstractStreamServerSocket::cancelAsyncIO
+    virtual void cancelAsyncIO( bool waitForRunningHandlerCompletion ) override;
 
 protected:
     //!Implementation of AbstractStreamServerSocket::acceptAsyncImpl
-    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) override;
+    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) override;
 
 private:
     bool setListen(int queueLen) ;

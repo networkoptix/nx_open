@@ -187,7 +187,7 @@ namespace ec2
 
         void addAlivePeerInfo(ApiPeerData peerData, const QUuid& gotFromPeer = QUuid());
         void removeAlivePeer(const QUuid& id, bool sendTran, bool isRecursive = false);
-        bool doHandshake(QnTransactionTransport* transport);
+        bool sendInitialData(QnTransactionTransport* transport);
         void printTranState(const QnTranState& tranState);
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);

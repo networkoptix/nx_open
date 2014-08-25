@@ -1573,4 +1573,161 @@ AbstractStreamSocket* UdtSSLServerSocket::accept() {
 
 UdtSSLServerSocket::~UdtSSLServerSocket(){}
 
+
+
+//////////////////////////////////////////////////////////
+////////////// class SSLServerSocket
+//////////////////////////////////////////////////////////
+
+SSLServerSocket::SSLServerSocket(AbstractStreamServerSocket* delegateSocket, bool allowNonSecureConnect)
+:
+    m_allowNonSecureConnect( allowNonSecureConnect ),
+    m_delegateSocket( delegateSocket )
+{
+}
+
+bool SSLServerSocket::bind(const SocketAddress& localAddress)
+{
+    return m_delegateSocket->bind(localAddress);
+}
+
+SocketAddress SSLServerSocket::getLocalAddress() const
+{
+    return m_delegateSocket->getLocalAddress();
+}
+
+SocketAddress SSLServerSocket::getPeerAddress() const
+{
+    return m_delegateSocket->getPeerAddress();
+}
+
+void SSLServerSocket::close()
+{
+    return m_delegateSocket->close();
+}
+
+bool SSLServerSocket::isClosed() const
+{
+    return m_delegateSocket->isClosed();
+}
+
+bool SSLServerSocket::setReuseAddrFlag(bool reuseAddr)
+{
+    return m_delegateSocket->setReuseAddrFlag(reuseAddr);
+}
+
+bool SSLServerSocket::getReuseAddrFlag(bool* val)
+{
+    return m_delegateSocket->getReuseAddrFlag(val);
+}
+
+bool SSLServerSocket::setNonBlockingMode(bool val)
+{
+    return m_delegateSocket->setNonBlockingMode(val);
+}
+
+bool SSLServerSocket::getNonBlockingMode(bool* val) const
+{
+    return m_delegateSocket->getNonBlockingMode(val);
+}
+
+bool SSLServerSocket::getMtu(unsigned int* mtuValue)
+{
+    return m_delegateSocket->getMtu(mtuValue);
+}
+
+bool SSLServerSocket::setSendBufferSize(unsigned int buffSize)
+{
+    return m_delegateSocket->setSendBufferSize(buffSize);
+}
+
+bool SSLServerSocket::getSendBufferSize(unsigned int* buffSize)
+{
+    return m_delegateSocket->getSendBufferSize(buffSize);
+}
+
+bool SSLServerSocket::setRecvBufferSize(unsigned int buffSize)
+{
+    return m_delegateSocket->setRecvBufferSize(buffSize);
+}
+
+bool SSLServerSocket::getRecvBufferSize(unsigned int* buffSize)
+{
+    return m_delegateSocket->getRecvBufferSize(buffSize);
+}
+
+bool SSLServerSocket::setRecvTimeout(unsigned int ms)
+{
+    return m_delegateSocket->setRecvTimeout(ms);
+}
+
+bool SSLServerSocket::getRecvTimeout(unsigned int* millis)
+{
+    return m_delegateSocket->getRecvTimeout(millis);
+}
+
+bool SSLServerSocket::setSendTimeout(unsigned int ms)
+{
+    return m_delegateSocket->setSendTimeout(ms);
+}
+
+bool SSLServerSocket::getSendTimeout(unsigned int* millis)
+{
+    return m_delegateSocket->getSendTimeout(millis);
+}
+
+bool SSLServerSocket::getLastError(SystemError::ErrorCode* errorCode)
+{
+    return m_delegateSocket->getLastError(errorCode);
+}
+
+AbstractSocket::SOCKET_HANDLE SSLServerSocket::handle() const
+{
+    return m_delegateSocket->handle();
+}
+
+bool SSLServerSocket::listen(int queueLen)
+{
+    return m_delegateSocket->listen(queueLen);
+}
+
+AbstractStreamSocket* SSLServerSocket::accept()
+{
+    AbstractStreamSocket* acceptedSock = m_delegateSocket->accept();
+    if( !acceptedSock )
+        return nullptr;
+    if( m_allowNonSecureConnect )
+        return new QnMixedSSLSocket(acceptedSock);
+    else
+        return new QnSSLSocket(acceptedSock, true);
+}
+
+void SSLServerSocket::cancelAsyncIO(bool waitForRunningHandlerCompletion)
+{
+    return m_delegateSocket->cancelAsyncIO(waitForRunningHandlerCompletion);
+}
+
+bool SSLServerSocket::acceptAsyncImpl(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler)
+{
+    using namespace std::placeholders;
+    m_acceptHandler = std::move(handler);
+    if( !m_delegateSocket->acceptAsync(std::bind(&SSLServerSocket::connectionAccepted, this, _1, _2)) )
+    {
+        m_acceptHandler = std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>();
+        return false;
+    }
+    return true;
+}
+
+void SSLServerSocket::connectionAccepted(SystemError::ErrorCode errorCode, AbstractStreamSocket* newSocket)
+{
+    if( newSocket )
+        if( m_allowNonSecureConnect )
+            newSocket = new QnMixedSSLSocket(newSocket);
+        else
+            newSocket = new QnSSLSocket(newSocket, true);
+    auto handler = std::move(m_acceptHandler);
+    handler(errorCode, newSocket);
+}
+
 #endif // ENABLE_SSL

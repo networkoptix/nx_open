@@ -13,6 +13,7 @@
 #include <QtCore/QDateTime>
 
 #include "../system_socket.h"
+#include "../udt_socket.h"
 #include "../../common/log.h"
 #include "../../common/systemerror.h"
 
@@ -129,6 +130,7 @@ namespace aio
     {
         template<class SocketType> struct get {};
         template<> struct get<Socket> { typedef PollSet value; };
+        template<> struct get<UdtSocket> { typedef UdtPollSet value; };
     }
 
 
@@ -589,4 +591,5 @@ namespace aio
     }
 
     template class AIOThread<Socket>;
+    template class AIOThread<UdtSocket>;
 }

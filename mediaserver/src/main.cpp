@@ -510,12 +510,12 @@ void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddr
     server->setApiUrl(QString("http://%1:%2").arg(myAddress).arg(port));
 }
 
-QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection, Qn::PanicMode* pm)
+QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Connection, Qn::PanicMode* pm)
 {
     QnMediaServerResourceList servers;
     *pm = Qn::PM_None;
 
-    while (servers.isEmpty())
+    while (servers.isEmpty() && !needToStop())
     {
         ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->getServersSync( &servers);
         if( rez == ec2::ErrorCode::ok )
@@ -781,17 +781,23 @@ void QnMain::stopObjects()
     qWarning() << "QnMain::stopObjects() called";
 
     QnStorageManager::instance()->cancelRebuildCatalogAsync();
-    qnFileDeletor->pleaseStop();
+    if (qnFileDeletor)
+        qnFileDeletor->pleaseStop();
 
+    if (m_universalTcpListener)
+        m_universalTcpListener->pleaseStop();
+    if (m_moduleFinder)
+        m_moduleFinder->pleaseStop();
 
     if (m_universalTcpListener) {
-        m_universalTcpListener->pleaseStop();
+        m_universalTcpListener->stop();
         delete m_universalTcpListener;
         m_universalTcpListener = 0;
     }
 
     if (m_moduleFinder)
     {
+        m_moduleFinder->stop();
         delete m_moduleFinder;
         m_moduleFinder = 0;
     }
@@ -1443,8 +1449,10 @@ void QnMain::run()
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
     MSSettings::roSettings()->remove(ADMIN_PASSWORD);
 
-    if (needToStop())
+    if (needToStop()) {
+        stopObjects();
         return;
+    }
 
     do {
         if (needToStop())
@@ -1824,8 +1832,10 @@ protected:
         int res = application()->exec();
 #ifdef Q_OS_WIN
         // stop the service unexpectedly to let windows service management system restart it
-        HANDLE hProcess = GetCurrentProcess();
-        TerminateProcess(hProcess, ERROR_SERVICE_SPECIFIC_ERROR);
+        if (restartFlag) {
+            HANDLE hProcess = GetCurrentProcess();
+            TerminateProcess(hProcess, ERROR_SERVICE_SPECIFIC_ERROR);
+        }
 #endif
         return res;
     }
@@ -1966,6 +1976,7 @@ int main(int argc, char* argv[])
     ::srand( ::time(NULL) );
 #ifdef _WIN32
     win32_exception::installGlobalUnhandledExceptionHandler();
+    _tzset();
 #endif
 
     //parsing command-line arguments
@@ -2034,7 +2045,8 @@ int main(int argc, char* argv[])
     int res = service.exec();
     if (restartFlag && res == 0)
         return 1;
-    return res;
+    return 0;
+    //return res;
 }
 
 static void printVersion()

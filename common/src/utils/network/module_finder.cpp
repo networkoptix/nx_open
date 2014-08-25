@@ -61,8 +61,13 @@ void QnModuleFinder::start() {
     m_directModuleFinder->start();
 }
 
-void QnModuleFinder::stop() {
+void QnModuleFinder::pleaseStop() {
     m_multicastModuleFinder->pleaseStop();
+    m_directModuleFinder->pleaseStop();
+}
+
+void QnModuleFinder::stop() {
+    m_multicastModuleFinder->stop();
     m_directModuleFinder->stop();
 }
 

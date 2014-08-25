@@ -396,4 +396,88 @@ private:
     }
 };
 
+
+
+template <class SocketType>
+class AsyncServerSocketHelper
+:
+    public aio::AIOEventHandler<SocketType>
+{
+public:
+    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> acceptHandler;
+    std::atomic<int> acceptAsyncCallCount;
+
+    AsyncServerSocketHelper(SocketType* _sock, AbstractStreamServerSocket* _abstractServerSocket)
+    :
+        m_sock(_sock),
+        m_abstractServerSocket(_abstractServerSocket)
+    {
+    }
+
+    void terminate()
+    {
+        cancelAsyncIO(true);
+    }
+
+    virtual void eventTriggered(SocketType* sock, aio::EventType eventType) throw() override
+    {
+        assert(acceptHandler);
+
+        const int acceptAsyncCallCountBak = acceptAsyncCallCount;
+
+        switch( eventType )
+        {
+            case aio::etRead:
+            {
+                //accepting socket
+                AbstractStreamSocket* newSocket = m_abstractServerSocket->accept();
+                acceptHandler(
+                    newSocket != nullptr ? SystemError::noError : SystemError::getLastOSErrorCode(),
+                    newSocket);
+                break;
+            }
+
+            case aio::etReadTimedOut:
+                acceptHandler(SystemError::timedOut, nullptr);
+                break;
+
+            case aio::etError:
+            {
+                SystemError::ErrorCode errorCode = SystemError::noError;
+                sock->getLastError(&errorCode);
+                acceptHandler(errorCode, nullptr);
+                break;
+            }
+
+            default:
+                assert(false);
+                break;
+        }
+
+        //if asyncAccept has been called from onNewConnection, no need to call removeFromWatch
+        if( acceptAsyncCallCount > acceptAsyncCallCountBak )
+            return;
+
+        aio::AIOService::instance()->removeFromWatch(sock, aio::etRead);
+        acceptHandler = std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>();
+    }
+
+    bool acceptAsync(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler)
+    {
+        ++acceptAsyncCallCount;
+        acceptHandler = std::move(handler);
+        //TODO: #ak usually acceptAsyncImpl is called repeatedly. SHOULD avoid unneccessary watchSocket and removeFromWatch calls
+        return aio::AIOService::instance()->watchSocket(m_sock, aio::etRead, this);
+    }
+
+    void cancelAsyncIO(bool waitForRunningHandlerCompletion)
+    {
+        return aio::AIOService::instance()->removeFromWatch(m_sock, aio::etRead, waitForRunningHandlerCompletion);
+    }
+
+private:
+    SocketType* m_sock;
+    AbstractStreamServerSocket* m_abstractServerSocket;
+};
+
 #endif  //ASYNC_SOCKET_HELPER_H

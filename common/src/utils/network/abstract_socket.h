@@ -366,9 +366,14 @@ public:
         {
             return acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>( std::move(handler) ) );
         }
+    //!
+    /*!
+        \param waitForRunningHandlerCompletion If \a true, it is garanteed that after return of this method no async handler is running
+    */
+    virtual void cancelAsyncIO( bool waitForRunningHandlerCompletion = true ) = 0;
 
 protected:
-    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) = 0;
+    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) = 0;
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));

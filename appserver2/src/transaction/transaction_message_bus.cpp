@@ -13,6 +13,7 @@
 #include "api/app_server_connection.h"
 #include "api/runtime_info_manager.h"
 #include "nx_ec/data/api_server_alive_data.h"
+#include "utils/common/log.h"
 #include "utils/common/synctime.h"
 #include "utils/network/global_module_finder.h"
 #include "utils/network/router.h"
@@ -301,8 +302,19 @@ void QnTransactionMessageBus::onGotServerRuntimeInfo(const QnTransaction<ApiRunt
 void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran, const QnTransactionTransportHeader &transportHeader)
 {
     QnTransactionTransport* sender = checked_cast<QnTransactionTransport*>(this->sender());
-    if (!sender || sender->getState() != QnTransactionTransport::ReadyForStreaming)
+    if( !sender || sender->getState() != QnTransactionTransport::ReadyForStreaming )
+    {
+        if( sender )
+        {
+            NX_LOG(lit("Ignoring transaction with seq %1 from peer %2 having state %3").
+                arg(transportHeader.sequence).arg(sender->remotePeer().id.toString()).arg(sender->getState()), cl_logDEBUG1);
+        }
+        else
+        {
+            NX_LOG(lit("Ignoring transaction with seq %1 from unknown peer").arg(transportHeader.sequence), cl_logDEBUG1);
+        }
         return;
+    }
 
     Q_ASSERT(transportHeader.processedPeers.contains(sender->remotePeer().id));
 
@@ -503,7 +515,7 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
     transport->sendTransaction(requestTran, QnPeerSet() << transport->remotePeer().id << m_localPeer.id);
 }
 
-bool QnTransactionMessageBus::doHandshake(QnTransactionTransport* transport)
+bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
 {
     /** Send all data to the client peers on the connect. */
     QnPeerSet processedPeers = QnPeerSet() << transport->remotePeer().id << m_localPeer.id;
@@ -670,7 +682,7 @@ QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTran
         ApiModuleData data;
         QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
         data.isAlive = true;
-        data.discoverers = QnGlobalModuleFinder::instance()->discoverers(data.id);
+        data.discoverers = QnGlobalModuleFinder::instance()->discoverers(data.id).toList();
         transaction.params.push_back(data);
     }
 
@@ -736,13 +748,19 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         Q_ASSERT(found);
         m_lastTranSeq[transport->remotePeer().id] = 0;
         transport->setState(QnTransactionTransport::ReadyForStreaming);
+
+        transport->processExtraData();
+        transport->startListening();
+
         // if sync already done or in progress do not send new request
-        if (doHandshake(transport))
+        if (sendInitialData(transport))
             connectToPeerEstablished(transport->remotePeer());
         else
             transport->close();
         break;
     }
+    case QnTransactionTransport::ReadyForStreaming:
+        break;
     case QnTransactionTransport::Closed:
         for (int i = m_connectingConnections.size() -1; i >= 0; --i) 
         {
@@ -818,6 +836,8 @@ void QnTransactionMessageBus::doPeriodicTasks()
         {
             itr.value().lastActivity.restart();
             foreach(QSharedPointer<QnTransactionTransport> transport, m_connectingConnections) {
+                if (transport->getState() == QnTransactionTransport::Closed)
+                    continue; // it's going to close soon
                 if (transport->remotePeer().id == itr.key()) {
                     qWarning() << "No alive info during timeout. reconnect to peer" << transport->remotePeer().id;
                     transport->setState(QnTransactionTransport::Error);
@@ -825,6 +845,8 @@ void QnTransactionMessageBus::doPeriodicTasks()
             }
 
             foreach(QSharedPointer<QnTransactionTransport> transport, m_connections.values()) {
+                if (transport->getState() == QnTransactionTransport::Closed)
+                    continue; // it's going to close soon
                 if (transport->remotePeer().id == itr.key() && transport->remotePeer().peerType == Qn::PT_Server) {
                     qWarning() << "No alive info during timeout. reconnect to peer" << transport->remotePeer().id;
                     transport->setState(QnTransactionTransport::Error);

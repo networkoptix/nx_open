@@ -151,6 +151,11 @@ void QnDirectModuleFinder::stop() {
     m_requestQueue.clear();
 }
 
+void QnDirectModuleFinder::pleaseStop() {
+    m_periodicalCheckTimer->stop();
+    m_requestQueue.clear();
+}
+
 QList<QnModuleInformation> QnDirectModuleFinder::foundModules() const {
     return m_foundModules.values();
 }

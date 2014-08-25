@@ -1102,62 +1102,17 @@ static int acceptWithTimeout( int m_socketHandle, int timeoutMillis = DEFAULT_AC
 
 class TCPServerSocketPrivate
 :
-    public SocketImpl,
-    public aio::AIOEventHandler<Socket>
+    public SocketImpl
 {
 public:
-    std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> acceptHandler;
     int socketHandle;
-    std::atomic<int> acceptAsyncCallCount;
+    AsyncServerSocketHelper<Socket> asyncServerSocketHelper;
 
-    TCPServerSocketPrivate( TCPServerSocket* _sock )
+    TCPServerSocketPrivate( Socket* sock, AbstractStreamServerSocket* abstractSock )
     :
         socketHandle( -1 ),
-        m_sock( _sock )
+        asyncServerSocketHelper( sock, abstractSock )
     {
-    }
-
-    virtual void eventTriggered( Socket* sock, aio::EventType eventType ) throw() override
-    {
-        assert( acceptHandler );
-
-        const int acceptAsyncCallCountBak = acceptAsyncCallCount;
-
-        switch( eventType )
-        {
-            case aio::etRead:
-            {
-                //accepting socket
-                AbstractStreamSocket* newSocket = m_sock->accept();
-                acceptHandler(
-                    newSocket != nullptr ? SystemError::noError : SystemError::getLastOSErrorCode(),
-                    newSocket );
-                break;
-            }
-
-            case aio::etReadTimedOut:
-                acceptHandler( SystemError::timedOut, nullptr );
-                break;
-
-            case aio::etError:
-            {
-                SystemError::ErrorCode errorCode = SystemError::noError;
-                sock->getLastError( &errorCode );
-                acceptHandler( errorCode, nullptr );
-                break;
-            }
-
-            default:
-                assert( false );
-                break;
-        }
-
-        //if asyncAccept has been called from onNewConnection, no need to call removeFromWatch
-        if( acceptAsyncCallCount > acceptAsyncCallCountBak )
-            return;
-
-        aio::AIOService::instance()->removeFromWatch( sock, aio::etRead );
-        acceptHandler = std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>();
     }
 
     AbstractStreamSocket* accept( unsigned int recvTimeoutMs )
@@ -1180,17 +1135,13 @@ public:
         else
         {
             return nullptr;
-        
         }
     }
-
-private:
-    TCPServerSocket* m_sock;
 };
 
 TCPServerSocket::TCPServerSocket()
 :
-    base_type( SOCK_STREAM, IPPROTO_TCP, new TCPServerSocketPrivate( this ) )
+    base_type( SOCK_STREAM, IPPROTO_TCP, new TCPServerSocketPrivate( &m_implDelegate, this ) )
 {
     static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl())->socketHandle = m_implDelegate.handle();
     setRecvTimeout( DEFAULT_ACCEPT_TIMEOUT_MSEC );
@@ -1201,15 +1152,10 @@ int TCPServerSocket::accept(int sockDesc)
     return acceptWithTimeout( sockDesc );
 }
 
-bool TCPServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler )
+bool TCPServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler )
 {
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl());
-
-    ++d->acceptAsyncCallCount;
-
-    d->acceptHandler = std::move(handler);
-    //TODO: #ak usually acceptAsyncImpl is called repeatedly. SHOULD avoid unneccessary watchSocket and removeFromWatch calls
-    return aio::AIOService::instance()->watchSocket( &m_implDelegate, aio::etRead, d );
+    return d->asyncServerSocketHelper.acceptAsync( std::move(handler) );
 }
 
 //!Implementation of AbstractStreamServerSocket::listen
@@ -1228,6 +1174,12 @@ AbstractStreamSocket* TCPServerSocket::accept()
         return nullptr;
 
     return d->accept( recvTimeoutMs );
+}
+
+void TCPServerSocket::cancelAsyncIO( bool waitForRunningHandlerCompletion )
+{
+    TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl());
+    d->asyncServerSocketHelper.cancelAsyncIO(waitForRunningHandlerCompletion);
 }
 
 bool TCPServerSocket::setListen(int queueLen)
