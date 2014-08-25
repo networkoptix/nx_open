@@ -1563,7 +1563,7 @@ AbstractStreamSocket* TCPSslServerSocket::accept()
 }
 
 AbstractStreamSocket* UdtSSLServerSocket::accept() {
-    AbstractStreamSocket* sock = UdtServerSocket::accept();
+    AbstractStreamSocket* sock = UdtStreamServerSocket::accept();
     if(!sock) return NULL;
     if(m_allowNonSecureConnect)
         return new QnMixedSSLSocket(sock);
