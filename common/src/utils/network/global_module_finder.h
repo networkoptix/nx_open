@@ -23,8 +23,7 @@ public:
 
     QList<QnModuleInformation> foundModules() const;
 
-    QList<QUuid> discoverers(const QUuid &moduleId);
-    QMultiHash<QUuid, QUuid> discoverers() const;
+    QSet<QUuid> discoverers(const QUuid &moduleId);
 
     QnModuleInformation moduleInformation(const QUuid &id) const;
 
@@ -51,7 +50,7 @@ private:
     std::weak_ptr<ec2::AbstractECConnection> m_connection;  // just to know from where to disconnect
     QPointer<QnModuleFinder> m_moduleFinder;
     QHash<QUuid, QnModuleInformation> m_moduleInformationById;
-    QMultiHash<QUuid, QUuid> m_discovererIdByServerId;
+    QHash<QUuid, QSet<QUuid>> m_discovererIdByServerId;
 };
 
 #endif // GLOBAL_MODULE_FINDER_H

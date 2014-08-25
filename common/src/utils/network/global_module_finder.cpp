@@ -69,12 +69,8 @@ QList<QnModuleInformation> QnGlobalModuleFinder::foundModules() const {
     return m_moduleInformationById.values();
 }
 
-QList<QUuid> QnGlobalModuleFinder::discoverers(const QUuid &moduleId) {
-    return m_discovererIdByServerId.values(moduleId);
-}
-
-QMultiHash<QUuid, QUuid> QnGlobalModuleFinder::discoverers() const {
-    return m_discovererIdByServerId;
+QSet<QUuid> QnGlobalModuleFinder::discoverers(const QUuid &moduleId) {
+    return m_discovererIdByServerId.value(moduleId);
 }
 
 QnModuleInformation QnGlobalModuleFinder::moduleInformation(const QUuid &id) const {
@@ -121,7 +117,7 @@ void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformatio
 
     auto it = m_moduleInformationById.find(moduleInformation.id);
 
-    m_discovererIdByServerId.insert(moduleInformation.id, discoverer);
+    m_discovererIdByServerId[moduleInformation.id].insert(discoverer);
 
     if (it == m_moduleInformationById.end()) {
         m_moduleInformationById[moduleInformation.id] = moduleInformation;
@@ -139,8 +135,9 @@ void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInforma
     auto it = m_moduleInformationById.find(moduleInformation.id);
 
     if (it != m_moduleInformationById.end()) {
-        if (m_discovererIdByServerId.remove(it.key(), discoverer) > 0) {
-            if (!m_discovererIdByServerId.contains(it.key())) {
+        QSet<QUuid> &discoverers = m_discovererIdByServerId[it.key()];
+        if (discoverers.remove(discoverer) > 0) {
+            if (discoverers.isEmpty()) {
                 emit peerLost(it.value());
                 it = m_moduleInformationById.erase(it);
             }
@@ -155,8 +152,9 @@ void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QUuid &discoverer)
     }
 
     for (auto it = m_moduleInformationById.begin(); it != m_moduleInformationById.end(); /* no inc */) {
-        if (m_discovererIdByServerId.remove(it.key(), discoverer) > 0) {
-            if (!m_discovererIdByServerId.contains(it.key())) {
+        QSet<QUuid> &discoverers = m_discovererIdByServerId[it.key()];
+        if (discoverers.remove(discoverer) > 0) {
+            if (discoverers.isEmpty()) {
                 emit peerLost(it.value());
                 it = m_moduleInformationById.erase(it);
                 continue;
