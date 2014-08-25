@@ -197,6 +197,31 @@ QnColorGLShaderProgram* QnOpenGLRenderer::getColorShader() const {
     return m_colorProgram.data();
 }
 
+QMatrix4x4 QnOpenGLRenderer::getModelViewMatrix() const {
+    return m_modelViewMatrix;
+}
+
+void QnOpenGLRenderer::setModelViewMatrix(const QMatrix4x4 &matrix) {
+    m_modelViewMatrix = matrix;
+}
+
+QMatrix4x4 QnOpenGLRenderer::getProjectionMatrix() const {
+    return m_projectionMatrix;
+}
+
+void QnOpenGLRenderer::setProjectionMatrix(const QMatrix4x4 &matrix) {
+    m_projectionMatrix = matrix;
+}
+
+QMatrix4x4 QnOpenGLRenderer::pushModelViewMatrix() {
+    m_modelViewMatrixStack.push(m_modelViewMatrix);
+    return m_modelViewMatrix;
+}
+
+void QnOpenGLRenderer::popModelViewMatrix() {
+    m_modelViewMatrix = m_modelViewMatrixStack.pop();
+}
+
 //=================================================================================================
 
 Q_GLOBAL_STATIC(QnOpenGLRendererManager, qn_openGlRenderManager_instance)

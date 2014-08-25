@@ -32,11 +32,13 @@ public:
     void                drawArraysVao(QOpenGLVertexArrayObject* vao, GLenum mode, int count, QnColorGLShaderProgram* shader);
     void                drawBindedTextureOnQuadVao(QOpenGLVertexArrayObject* vao, QnGLShaderProgram* shader);
 
-    QMatrix4x4&         getModelViewMatrix() { return m_modelViewMatrix; };
-    const QMatrix4x4&   getModelViewMatrix() const { return m_modelViewMatrix; };
+    QMatrix4x4          getModelViewMatrix() const;
+    void                setModelViewMatrix(const QMatrix4x4 &matrix);
+    QMatrix4x4          pushModelViewMatrix();
+    void                popModelViewMatrix();
 
-    QMatrix4x4&         getProjectionMatrix() { return m_projectionMatrix; };
-    const QMatrix4x4&   getProjectionMatrix() const { return m_projectionMatrix; };
+    QMatrix4x4          getProjectionMatrix() const;
+    void                setProjectionMatrix(const QMatrix4x4 &matrix);
 
     QnColorPerVertexGLShaderProgram* getColorPerVertexShader() const;
     QnTextureGLShaderProgram* getTextureShader() const;
@@ -46,7 +48,9 @@ private:
     Q_DISABLE_COPY(QnOpenGLRenderer);
 
     QMatrix4x4 m_modelViewMatrix;
+    QStack<QMatrix4x4> m_modelViewMatrixStack;
     QMatrix4x4 m_projectionMatrix;
+    QStack<QMatrix4x4> m_projectionMatrixStack;
     QVector4D  m_color; 
 
     unsigned short m_indices_for_render_quads[6];

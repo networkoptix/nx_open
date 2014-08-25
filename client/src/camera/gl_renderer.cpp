@@ -340,17 +340,6 @@ void QnGLRenderer::drawYV12VideoTexture(
     const float* v_array,
     bool isStillImage)
 {
-    /*
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-10000,10000,10000,-10000,-10000,10000);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    */
-    //QnOpenGLRendererManager::instance(QGLContext::currentContext())->getProjectionMatrix().setToIdentity();
-    //QnOpenGLRendererManager::instance(QGLContext::currentContext())->getProjectionMatrix().ortho(-10000,10000,10000,-10000,-10000,10000);
-    //QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix().setToIdentity();
-
     float tx_array[8] = {
         (float)tex0Coords.x(), (float)tex0Coords.y(),
         (float)tex0Coords.right(), (float)tex0Coords.top(),
@@ -360,10 +349,6 @@ void QnGLRenderer::drawYV12VideoTexture(
 
     NX_LOG( lit("Rendering YUV420 textures %1, %2, %3").
         arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
-
-    //Deprecated in OpenGL ES2.0
-    //glEnable(GL_TEXTURE_2D);
-    //DEBUG_CODE(glCheckError("glEnable"));
 
     QnAbstractYv12ToRgbShaderProgram* shader;
     QnYv12ToRgbWithGammaShaderProgram* gammaShader = 0;
