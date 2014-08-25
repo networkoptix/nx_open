@@ -515,7 +515,7 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
     transport->sendTransaction(requestTran, QnPeerSet() << transport->remotePeer().id << m_localPeer.id);
 }
 
-bool QnTransactionMessageBus::doHandshake(QnTransactionTransport* transport)
+bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
 {
     /** Send all data to the client peers on the connect. */
     QnPeerSet processedPeers = QnPeerSet() << transport->remotePeer().id << m_localPeer.id;
@@ -748,16 +748,18 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         Q_ASSERT(found);
         m_lastTranSeq[transport->remotePeer().id] = 0;
         transport->setState(QnTransactionTransport::ReadyForStreaming);
+
+        transport->processExtraData();
+        transport->startListening();
+
         // if sync already done or in progress do not send new request
-        if (doHandshake(transport))
+        if (sendInitialData(transport))
             connectToPeerEstablished(transport->remotePeer());
         else
             transport->close();
         break;
     }
     case QnTransactionTransport::ReadyForStreaming:
-        transport->processExtraData();
-        transport->startListening();
         break;
     case QnTransactionTransport::Closed:
         for (int i = m_connectingConnections.size() -1; i >= 0; --i) 
