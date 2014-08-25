@@ -1966,6 +1966,7 @@ int main(int argc, char* argv[])
     ::srand( ::time(NULL) );
 #ifdef _WIN32
     win32_exception::installGlobalUnhandledExceptionHandler();
+    _tzset();
 #endif
 
     //parsing command-line arguments
