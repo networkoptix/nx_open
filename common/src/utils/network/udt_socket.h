@@ -8,6 +8,7 @@
 
 
 template<class SocketType> class AsyncSocketImplHelper;
+template<class SocketType> class AsyncServerSocketHelper;
 
 class UdtPollSet;
 class UdtStreamSocket;
@@ -138,7 +139,9 @@ public:
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen( int queueLen = 128 ) ;
     virtual AbstractStreamSocket* accept() ;
-    virtual bool bind( const SocketAddress& localAddress );
+    virtual void cancelAsyncIO(bool waitForRunningHandlerCompletion) override;
+
+    virtual bool bind(const SocketAddress& localAddress);
     virtual SocketAddress getLocalAddress() const;
     virtual SocketAddress getPeerAddress() const;
     virtual void close();
@@ -163,8 +166,10 @@ public:
     virtual ~UdtStreamServerSocket();
 
 protected:
-    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) ;
+    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) ;
 private:
+    std::unique_ptr<AsyncServerSocketHelper<UdtSocket>> m_aioHelper;
+
     Q_DISABLE_COPY(UdtStreamServerSocket)
 };
 

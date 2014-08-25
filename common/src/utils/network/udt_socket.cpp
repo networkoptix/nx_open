@@ -726,6 +726,11 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()  {
         return new UdtStreamSocket(impl);
 }
 
+void UdtStreamServerSocket::cancelAsyncIO(bool waitForRunningHandlerCompletion)
+{
+    m_aioHelper->cancelAsyncIO(waitForRunningHandlerCompletion);
+}
+
 bool UdtStreamServerSocket::bind( const SocketAddress& localAddress ) {
     return impl_->Bind(localAddress);
 }
@@ -802,16 +807,18 @@ bool UdtStreamServerSocket::getLastError( SystemError::ErrorCode* errorCode ) {
     return impl_->GetLastError(errorCode);
 }
 
-bool UdtStreamServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) {
-    Q_UNUSED(handler);
-    STUB_(return false);
+bool UdtStreamServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) {
+    return m_aioHelper->acceptAsync( std::move(handler) );
 }
 
 AbstractSocket::SOCKET_HANDLE UdtStreamServerSocket::handle() const {
     return impl_->handle();
 }
 
-UdtStreamServerSocket::UdtStreamServerSocket() {
+UdtStreamServerSocket::UdtStreamServerSocket()
+:
+    m_aioHelper(new AsyncServerSocketHelper<UdtSocket>( this, this ) )
+{
     impl_->Open();
 }
 

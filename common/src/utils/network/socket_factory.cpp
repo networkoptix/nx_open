@@ -5,6 +5,7 @@
 
 #include "socket_factory.h"
 
+#include "mixed_tcp_udt_server_socket.h"
 #include "system_socket.h"
 #include "ssl_socket.h"
 
@@ -25,14 +26,29 @@ AbstractStreamSocket* SocketFactory::createStreamSocket( bool sslRequired, Socke
     return result;
 }
 
-AbstractStreamServerSocket* SocketFactory::createStreamServerSocket( bool sslRequired, SocketFactory::NatTraversalType /*natTraversalRequired*/ )
+AbstractStreamServerSocket* SocketFactory::createStreamServerSocket( bool sslRequired, SocketFactory::NatTraversalType natTraversalRequired )
 {
+    AbstractStreamServerSocket* serverSocket = nullptr;
+    switch( natTraversalRequired )
+    {
+        case nttAuto:
+            serverSocket = new MixedTcpUdtServerSocket();
+            break;
+        case nttEnabled:
+            serverSocket = new UdtStreamServerSocket();
+            break;
+        case nttDisabled:
+            serverSocket = new TCPServerSocket();
+            break;
+    }
+
+    assert(serverSocket);
+    if( !serverSocket )
+        return nullptr;
+
 #ifdef ENABLE_SSL
-    if (sslRequired)
-        return new TCPSslServerSocket();
-    else
-        return new TCPServerSocket();
-#else
-    return new TCPServerSocket();
+    if( sslRequired )
+        serverSocket = new SSLServerSocket(serverSocket, false);
 #endif // ENABLE_SSL
+    return serverSocket;
 }
