@@ -1832,8 +1832,10 @@ protected:
         int res = application()->exec();
 #ifdef Q_OS_WIN
         // stop the service unexpectedly to let windows service management system restart it
-        HANDLE hProcess = GetCurrentProcess();
-        TerminateProcess(hProcess, ERROR_SERVICE_SPECIFIC_ERROR);
+        if (restartFlag) {
+            HANDLE hProcess = GetCurrentProcess();
+            TerminateProcess(hProcess, ERROR_SERVICE_SPECIFIC_ERROR);
+        }
 #endif
         return res;
     }
@@ -2043,7 +2045,8 @@ int main(int argc, char* argv[])
     int res = service.exec();
     if (restartFlag && res == 0)
         return 1;
-    return res;
+    return 0;
+    //return res;
 }
 
 static void printVersion()
