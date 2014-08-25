@@ -93,20 +93,24 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
         qnResPool->addResource(resource);
         if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
             determineOptimalIF(mediaServer);
-    }
-    else {
-        bool mserverStatusChanged = false;
-        QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>();
-        if (mediaServer)
-            mserverStatusChanged = ownResource->getStatus() != resource->getStatus();
-
+    } else {
+        Qn::ResourceStatus oldStatus = ownResource->getStatus();
         ownResource->update(resource);
 
-        if (ownResource)
-            qnResPool->updateIncompatibility(ownResource);
+        if (QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>()) {
+            /* Handling a case when an incompatibe server is changing its systemName at runtime and becoming compatible. */
+            if (resource->getStatus() == Qn::NotDefined && mediaServer->getStatus() == Qn::Incompatible) {
+                if (QnMediaServerResourcePtr updatedServer = resource.dynamicCast<QnMediaServerResource>()) {
+                    if (isCompatible(qnCommon->engineVersion(), updatedServer->getVersion()) && qnCommon->localSystemName() == updatedServer->getSystemName())
+                        mediaServer->setStatus(Qn::Online);
+                }
+            }
 
-        if (mserverStatusChanged && mediaServer)
-            determineOptimalIF(mediaServer);
+            if (oldStatus != mediaServer->getStatus()) {
+                qnResPool->updateIncompatibility(mediaServer);
+                determineOptimalIF(mediaServer);
+            }
+        }
     }
 
     // TODO: #Elric #2.3 don't update layout if we're re-reading resources, 

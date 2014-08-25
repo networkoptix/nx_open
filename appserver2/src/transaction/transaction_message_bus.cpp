@@ -13,6 +13,7 @@
 #include "api/app_server_connection.h"
 #include "api/runtime_info_manager.h"
 #include "nx_ec/data/api_server_alive_data.h"
+#include "utils/common/log.h"
 #include "utils/common/synctime.h"
 #include "utils/network/global_module_finder.h"
 #include "utils/network/router.h"
@@ -301,8 +302,19 @@ void QnTransactionMessageBus::onGotServerRuntimeInfo(const QnTransaction<ApiRunt
 void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran, const QnTransactionTransportHeader &transportHeader)
 {
     QnTransactionTransport* sender = checked_cast<QnTransactionTransport*>(this->sender());
-    if (!sender || sender->getState() != QnTransactionTransport::ReadyForStreaming)
+    if( !sender || sender->getState() != QnTransactionTransport::ReadyForStreaming )
+    {
+        if( sender )
+        {
+            NX_LOG(lit("Ignoring transaction with seq %1 from peer %2 having state %3").
+                arg(transportHeader.sequence).arg(sender->remotePeer().id.toString()).arg(sender->getState()), cl_logDEBUG1);
+        }
+        else
+        {
+            NX_LOG(lit("Ignoring transaction with seq %1 from unknown peer").arg(transportHeader.sequence), cl_logDEBUG1);
+        }
         return;
+    }
 
     Q_ASSERT(transportHeader.processedPeers.contains(sender->remotePeer().id));
 
@@ -670,7 +682,7 @@ QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTran
         ApiModuleData data;
         QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
         data.isAlive = true;
-        data.discoverers = QnGlobalModuleFinder::instance()->discoverers(data.id);
+        data.discoverers = QnGlobalModuleFinder::instance()->discoverers(data.id).toList();
         transaction.params.push_back(data);
     }
 

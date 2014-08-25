@@ -53,6 +53,9 @@
 
 namespace ec2
 {
+    /*!
+        \note \a sequence has less priority than \a TimeSynchronizationManager::peerIsServer and \a TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
+    */
     struct TimePriorityKey
     {
         //!sequence number. Incremented with each peer selection by user

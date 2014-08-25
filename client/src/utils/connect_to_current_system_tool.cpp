@@ -104,7 +104,8 @@ void QnConnectToCurrentSystemTool::updatePeers() {
     m_updateDialog->setTargets(m_updateTargets);
     m_updateDialog->show();
     m_prevToolState = CheckingForUpdates;
-    m_updateTool->checkForUpdates(qnCommon->engineVersion());
+    m_updateTool->setDenyMajorUpdates(true);
+    m_updateTool->checkForUpdates();
 }
 
 void QnConnectToCurrentSystemTool::revertApiUrls() {
@@ -134,7 +135,7 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
         if (!server)
             continue;
 
-        if (server->getVersion() != qnCommon->engineVersion())
+        if (!isCompatible(server->getVersion(), qnCommon->engineVersion()))
             m_updateTargets.insert(id);
     }
 
