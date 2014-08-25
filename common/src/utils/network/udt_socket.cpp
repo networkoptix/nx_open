@@ -1017,7 +1017,7 @@ public:
 
     UdtPollSetConstIteratorImpl( UdtPollSetImpl* impl , bool end = false ) : 
         impl_(impl),
-        in_read_set_(true),
+        in_read_set_(!end),
         iterator_( end ? impl->udt_write_set_.end() : impl->udt_read_set_.begin() ){}
 
 
@@ -1041,11 +1041,19 @@ public:
             iterator_ = impl_->udt_write_set_.begin();
         } else {
             ++iterator_;
+            if( iterator_ == impl_->udt_read_set_.end() ) {
+                in_read_set_ = false;
+                iterator_ = impl_->udt_write_set_.begin();
+            }
         }
     }
 
     bool Done() const {
-        return iterator_ == impl_->udt_write_set_.end();
+        if( in_read_set_ )
+            return false;
+        else {
+            return iterator_ == impl_->udt_write_set_.end();
+        }
     }
 
     UdtSocket* GetSocket() const {
@@ -1069,7 +1077,13 @@ public:
     }
 
     bool Equal( const UdtPollSetConstIteratorImpl& impl ) const {
-        return iterator_ == impl.iterator_;
+        // iterator from different set/map cannot compare 
+        bool result = in_read_set_ ^ impl.in_read_set_;
+        if( result ) {
+            return false;
+        } else {
+            return iterator_ == impl.iterator_;
+        }
     }
 private:
 
@@ -1122,7 +1136,7 @@ UdtPollSet::const_iterator& UdtPollSet::const_iterator::operator =( const UdtPol
 }
 
 UdtPollSet::const_iterator& UdtPollSet::const_iterator::operator ++() {
-    Q_ASSERT(!impl_);
+    Q_ASSERT(impl_);
     impl_->Next();
     return *this;
 }
@@ -1153,22 +1167,22 @@ bool UdtPollSet::const_iterator::operator!=( const UdtPollSet::const_iterator& r
 }
 
 UdtSocket* UdtPollSet::const_iterator::socket() {
-    Q_ASSERT(!impl_);
+    Q_ASSERT(impl_);
     return impl_->GetSocket();
 }
 
 const UdtSocket* UdtPollSet::const_iterator::socket() const {
-    Q_ASSERT(!impl_);
+    Q_ASSERT(impl_);
     return impl_->GetSocket();
 }
 
 aio::EventType UdtPollSet::const_iterator::eventType() const {
-    Q_ASSERT(!impl_);
+    Q_ASSERT(impl_);
     return impl_->GetEventType();
 }
 
 void* UdtPollSet::const_iterator::userData() {
-    Q_ASSERT(!impl_);
+    Q_ASSERT(impl_);
     return impl_->GetUserData();
 }
 
