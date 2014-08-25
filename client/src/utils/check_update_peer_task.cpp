@@ -194,7 +194,15 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished() {
     QByteArray data = reply->readAll();
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
     map = map.value(lit(QN_CUSTOMIZATION_NAME)).toMap();
-    QnSoftwareVersion latestVersion = QnSoftwareVersion(map.value(lit("latest_version")).toString());
+    QVariantMap releasesMap = map.value(lit("releases")).toMap();
+
+    QString currentRelease;
+    if (m_denyMajorUpdates)
+        currentRelease = qnCommon->engineVersion().toString(QnSoftwareVersion::MinorFormat);
+    else
+        currentRelease = map.value(lit("current_release")).toString();
+
+    QnSoftwareVersion latestVersion = QnSoftwareVersion(releasesMap.value(currentRelease).toString());
     QString updatesPrefix = map.value(lit("updates_prefix")).toString();
     if (latestVersion.isNull() || updatesPrefix.isEmpty()) {
         finish(InternetProblem);
