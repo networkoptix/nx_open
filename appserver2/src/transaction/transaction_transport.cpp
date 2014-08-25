@@ -4,6 +4,7 @@
 #include <QtCore/QTimer>
 
 #include "transaction_message_bus.h"
+#include "utils/common/log.h"
 #include "utils/common/systemerror.h"
 #include "transaction_log.h"
 #include <transaction/chunked_transfer_encoder.h>
@@ -83,30 +84,32 @@ void QnTransactionTransport::setState(State state)
     setStateNoLock(state);
 }
 
+void QnTransactionTransport::processExtraData()
+{
+    processTransactionData(m_extraData);
+    m_extraData.clear();
+}
+
+void QnTransactionTransport::startListening()
+{
+    if (m_socket) {
+        m_socket->setRecvTimeout(SOCKET_TIMEOUT);
+        m_socket->setSendTimeout(SOCKET_TIMEOUT);
+        m_socket->setNonBlockingMode(true);
+        m_chunkHeaderLen = 0;
+        using namespace std::placeholders;
+        m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) );
+    }
+}
+
 void QnTransactionTransport::setStateNoLock(State state)
 {
     if (state == Connected) {
         m_connected = true;
     }
     else if (state == Error) {
-        /*
-        if (m_connected)
-            connectDone(m_remotePeer.id);
-        m_connected = false;
-        */
     }
     else if (state == ReadyForStreaming) {
-        processTransactionData(m_extraData);
-        m_extraData.clear();
-
-        if (m_socket) {
-            m_socket->setRecvTimeout(SOCKET_TIMEOUT);
-            m_socket->setSendTimeout(SOCKET_TIMEOUT);
-            m_socket->setNonBlockingMode(true);
-            m_chunkHeaderLen = 0;
-            using namespace std::placeholders;
-            m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) );
-        }
     }
     if (this->m_state != state) {
         this->m_state = state;
@@ -165,6 +168,7 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     m_httpClient->setDecodeChunkedMessageBody( false ); //chunked decoding is done in this class
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
+    //connect(m_httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone, Qt::DirectConnection);
 
     m_httpClient->setUserName("system");    
@@ -323,7 +327,8 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
             transportHeader,
             serializedTran );
         assert( !transportHeader.processedPeers.empty() );
-        emit gotTransaction( serializedTran, transportHeader );
+        NX_LOG(lit("QnTransactionTransport::onSomeBytesRead. Got transaction with seq %1 from %2").arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
+        emit gotTransaction(serializedTran, transportHeader);
         readBufPos += fullChunkSize;
         m_chunkHeaderLen = 0;
 
@@ -389,6 +394,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);
         if (lockOK) {
             setState(ConnectingStage2);
+            assert( data.isEmpty() );
         }
         else {
             QUrlQuery query = QUrlQuery(m_remoteAddr);
@@ -438,6 +444,7 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
             QnTransactionTransportHeader transportHeader;
             QnUbjsonTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
             assert( !transportHeader.processedPeers.empty() );
+            NX_LOG(lit("QnTransactionTransport::processTransactionData. Got transaction with seq %1 from %2").arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
             emit gotTransaction(serializedTran, transportHeader);
 
             buffer += fullChunkLen;
@@ -511,7 +518,9 @@ void QnTransactionTransport::processChunkExtensions( const nx_http::ChunkHeader&
 
 void QnTransactionTransport::setExtraDataBuffer(const QByteArray& data) 
 { 
-    m_extraData = data; 
+    QMutexLocker lk( &m_mutex );
+    assert(m_extraData.isEmpty());
+    m_extraData = data;
 }
 
 bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran, const QnTransactionTransportHeader& _header) 
@@ -530,9 +539,19 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
     case Qn::BnsFormat:
         addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
         break;
-    case Qn::UbjsonFormat:
+    case Qn::UbjsonFormat: {
+
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+        QnAbstractTransaction abtractTran;
+        QnUbjsonReader<QByteArray> stream(&serializedTran);
+        QnUbjson::deserialize(&stream, &abtractTran);
+        qDebug() << "send direct transaction to peer " << remotePeer().id << "command=" << ApiCommand::toString(abtractTran.command) 
+            << "transport seq=" << header.sequence << "db seq=" << abtractTran.persistentInfo.sequence << "timestamp=" << abtractTran.persistentInfo.timestamp;
+#endif
+
         addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
         break;
+    }
     default:
         qWarning() << "Client has requested data in the unsupported format" << m_remotePeer.dataFormat;
         addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));

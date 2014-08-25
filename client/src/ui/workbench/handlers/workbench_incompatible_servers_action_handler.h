@@ -23,6 +23,8 @@ private:
     QnJoinSystemTool *joinSystemTool();
     QnProgressDialog *progressDialog();
 
+    void connectToCurrentSystem(const QSet<QUuid> &targets);
+
 private slots:
     void at_connectToCurrentSystemTool_finished(int errorCode);
     void at_joinSystemTool_finished(int errorCode);

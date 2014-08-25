@@ -74,14 +74,17 @@ namespace nx_tz
     std::mutex TZIndex::tzIndexInstanciationMutex;
 
 
+    static const int MIN_PER_HOUR = 60;
+    static const int SEC_PER_MIN = 60;
 
     int getLocalTimeZoneOffset()
     {
 #ifdef _WIN32
-        struct timeb tp;
-        memset(&tp, 0, sizeof(tp));
-        ftime(&tp);
-        return -tp.timezone;
+        int daylight;
+        _get_daylight(&daylight);
+        long timezone = 0;
+        _get_timezone(&timezone);
+        return -(timezone / SEC_PER_MIN) + (daylight ? MIN_PER_HOUR : 0);
 #else //if defined(__linux__)
         //cannot rely on ftime on linux
 
@@ -130,7 +133,11 @@ namespace nx_tz
         }
         if( tzData.tz == nullptr )
             return -1;
-        return tzData.utcOffset;
+        const time_t curUtcTime = time(NULL);
+        struct tm locTime;
+        memset(&locTime, 0, sizeof(locTime));
+        localtime_r(&curUtcTime, &locTime);
+        return locTime.tm_isdst ? tzData.utcDSTOffset : tzData.utcOffset;
 #endif
     }
 }

@@ -69,6 +69,20 @@ namespace ec2
 
     bool TimePriorityKey::operator<( const TimePriorityKey& right ) const
     {
+        const int peerIsServerSet = flags & TimeSynchronizationManager::peerIsServer;
+        const int right_peerIsServerSet = right.flags & TimeSynchronizationManager::peerIsServer;
+        if( peerIsServerSet < right_peerIsServerSet )
+            return true;
+        if( right_peerIsServerSet < peerIsServerSet )
+            return false;
+
+        const int internetFlagSet = flags & TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer;
+        const int right_internetFlagSet = right.flags & TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer;
+        if( internetFlagSet < right_internetFlagSet )
+            return true;
+        if( right_internetFlagSet < internetFlagSet )
+            return false;
+
         return
             sequence < right.sequence ? true :
             sequence > right.sequence ? false :
