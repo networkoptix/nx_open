@@ -38,6 +38,7 @@ public:
 
     void start();
     void stop();
+    void pleaseStop();
 
     QList<QnModuleInformation> foundModules() const;
     QnModuleInformation moduleInformation(const QUuid &id) const;

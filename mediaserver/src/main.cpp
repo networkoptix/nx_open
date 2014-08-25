@@ -510,12 +510,12 @@ void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddr
     server->setApiUrl(QString("http://%1:%2").arg(myAddress).arg(port));
 }
 
-QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection, Qn::PanicMode* pm)
+QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Connection, Qn::PanicMode* pm)
 {
     QnMediaServerResourceList servers;
     *pm = Qn::PM_None;
 
-    while (servers.isEmpty())
+    while (servers.isEmpty() && !needToStop())
     {
         ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->getServersSync( &servers);
         if( rez == ec2::ErrorCode::ok )
@@ -781,17 +781,23 @@ void QnMain::stopObjects()
     qWarning() << "QnMain::stopObjects() called";
 
     QnStorageManager::instance()->cancelRebuildCatalogAsync();
-    qnFileDeletor->pleaseStop();
+    if (qnFileDeletor)
+        qnFileDeletor->pleaseStop();
 
+    if (m_universalTcpListener)
+        m_universalTcpListener->pleaseStop();
+    if (m_moduleFinder)
+        m_moduleFinder->pleaseStop();
 
     if (m_universalTcpListener) {
-        m_universalTcpListener->pleaseStop();
+        m_universalTcpListener->stop();
         delete m_universalTcpListener;
         m_universalTcpListener = 0;
     }
 
     if (m_moduleFinder)
     {
+        m_moduleFinder->stop();
         delete m_moduleFinder;
         m_moduleFinder = 0;
     }
@@ -1443,8 +1449,10 @@ void QnMain::run()
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
     MSSettings::roSettings()->remove(ADMIN_PASSWORD);
 
-    if (needToStop())
+    if (needToStop()) {
+        stopObjects();
         return;
+    }
 
     do {
         if (needToStop())

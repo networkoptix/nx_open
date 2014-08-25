@@ -39,7 +39,7 @@ public:
 public slots:
     void start();
     void stop();
-
+    void pleaseStop();
 signals:
     void moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress);
     void moduleLost(const QnModuleInformation &moduleInformation);
