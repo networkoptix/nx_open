@@ -7,6 +7,8 @@
 #include <memory>
 
 
+template<class SocketType> class AsyncSocketImplHelper;
+
 class UdtPollSet;
 class UdtStreamSocket;
 class UdtStreamServerSocket;
@@ -46,6 +48,10 @@ class UdtSocket {
 public:
     UdtSocket();
     ~UdtSocket();
+
+    bool getLastError(SystemError::ErrorCode* errorCode);
+    bool getRecvTimeout(unsigned int* millis);
+    bool getSendTimeout(unsigned int* millis);
 
 protected:
     UdtSocket( detail::UdtSocketImpl* impl );
@@ -95,15 +101,15 @@ public:
     virtual bool reopen();
     virtual bool setNoDelay( bool value ) {
         Q_UNUSED(value);
-        return true;
+        return false;
     }
     virtual bool getNoDelay( bool* value ) {
         *value = true;
-        return true;
+        return false;
     }
     virtual bool toggleStatisticsCollection( bool val ) {
         Q_UNUSED(val);
-        return true;
+        return false;
     }
     virtual bool getConnectionStatistics( StreamSocketInfo* info ) {
         // Haven't found any way to get RTT sample from UDT
@@ -117,6 +123,7 @@ public:
     // partial, forward declaration of class UdtSocketImp;
     virtual ~UdtStreamSocket();
 private:
+    std::unique_ptr<AsyncSocketImplHelper<UdtSocket>> m_aioHelper;
 
     virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler );
     virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );

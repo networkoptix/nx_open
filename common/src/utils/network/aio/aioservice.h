@@ -11,6 +11,7 @@
 #include "aioeventhandler.h"
 #include "aiothread.h"
 #include "pollset.h"
+#include "../udt_socket.h"
 
 
 namespace aio
@@ -198,11 +199,24 @@ namespace aio
         };
 
         SocketAIOContext<Socket> m_systemSocketAIO;
+        SocketAIOContext<UdtSocket> m_udtSocketAIO;
         mutable QMutex m_mutex;
 
         template<class SocketType> SocketAIOContext<SocketType>& getAIOHandlingContext();
         template<class SocketType> const SocketAIOContext<SocketType>& getAIOHandlingContext() const;// { static_assert( false, "Bad socket type" ); }
+        template<class SocketType> void initializeAioThreadPool(SocketAIOContext<SocketType>* aioCtx, unsigned int threadCount)
+        {
+            typedef typename SocketAIOContext<SocketType>::AIOThreadType AIOThreadType;
 
+            for( unsigned int i = 0; i < threadCount; ++i )
+            {
+                std::unique_ptr<AIOThreadType> thread(new AIOThreadType(&m_mutex));
+                thread->start();
+                if( !thread->isRunning() )
+                    continue;
+                aioCtx->aioThreadPool.push_back(thread.release());
+            }
+        }
     };
 }
 

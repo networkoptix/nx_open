@@ -16,6 +16,8 @@
 #  include <netinet/tcp.h>
 #endif
 
+#include "aio/async_socket_helper.h"
+
 #define ADDR_(x) reinterpret_cast<sockaddr*>(x)
 
 // Tracking operation. This operation should be put inside of the DEBUG_
@@ -65,6 +67,8 @@
 
 #ifndef NDEBUG
 #define STUB_(c) Q_ASSERT(!"Unimplemented!"); c
+#else
+#define STUB_(c) c
 #endif
 
 namespace detail{
@@ -160,25 +164,6 @@ public:
     int Recv( void* buffer, unsigned int bufferLen, int flags );
     int Send( const void* buffer, unsigned int bufferLen );
     bool Reopen();
-
-    // Async implementation , N/A
-    void CancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) {
-        Q_UNUSED(waitForRunningHandlerCompletion);
-        Q_UNUSED(eventType);
-        STUB_(return); 
-    }
-
-    bool RecvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) { 
-        Q_UNUSED(buf);
-        Q_UNUSED(handler);
-        STUB_(return false); 
-    }
-
-    bool SendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) { 
-        Q_UNUSED(buf);
-        Q_UNUSED(handler);
-        STUB_(return false); 
-    }
 
     UDTSOCKET udt_handler() const {
         return handler_;
@@ -567,6 +552,22 @@ UdtSocket::UdtSocket(): impl_( new detail::UdtSocketImpl() ) {}
 UdtSocket::~UdtSocket(){}
 UdtSocket::UdtSocket( detail::UdtSocketImpl* impl ) : impl_(impl)  {}
 
+bool UdtSocket::getLastError(SystemError::ErrorCode* errorCode)
+{
+    return impl_->GetLastError(errorCode);
+}
+
+bool UdtSocket::getRecvTimeout(unsigned int* millis)
+{
+    return impl_->GetRecvTimeout(millis);
+}
+
+bool UdtSocket::getSendTimeout(unsigned int* millis)
+{
+    return impl_->GetSendTimeout(millis);
+}
+
+
 // =====================================================================
 // UdtStreamSocket implementation
 // =====================================================================
@@ -671,33 +672,44 @@ bool UdtStreamSocket::reopen() {
 }
 
 void UdtStreamSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )  {
-    return impl_->CancelAsyncIO(eventType,waitForRunningHandlerCompletion);
+    return m_aioHelper->cancelAsyncIO(eventType, waitForRunningHandlerCompletion);
 }
 
 bool UdtStreamSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) {
-    return detail::UdtConnector(impl_.get()).AsyncConnect(addr,std::move(handler));
+    //return detail::UdtConnector(impl_.get()).AsyncConnect(addr,std::move(handler));
+    return m_aioHelper->connectAsyncImpl( addr, std::move(handler) );
 }
 
 bool UdtStreamSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
-    return impl_->RecvAsyncImpl(buf,std::move(handler));
+    return m_aioHelper->recvAsyncImpl(buf, std::move(handler));
 }
 
 bool UdtStreamSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
-    return impl_->SendAsyncImpl(buf,std::move(handler));
+    return m_aioHelper->sendAsyncImpl(buf, std::move(handler));
 }
 
 AbstractSocket::SOCKET_HANDLE UdtStreamSocket::handle() const {
     return impl_->handle();
 }
 
-UdtStreamSocket::UdtStreamSocket() {
+UdtStreamSocket::UdtStreamSocket()
+:
+    m_aioHelper(new AsyncSocketImplHelper<UdtSocket>(this, this))
+{
     impl_->Open();
 }
 
-UdtStreamSocket::UdtStreamSocket( detail::UdtSocketImpl* impl ) :
-    UdtSocket(impl){}
+UdtStreamSocket::UdtStreamSocket( detail::UdtSocketImpl* impl )
+:
+    UdtSocket(impl),
+    m_aioHelper(new AsyncSocketImplHelper<UdtSocket>(this, this))
+{
+}
 
-UdtStreamSocket::~UdtStreamSocket(){}
+UdtStreamSocket::~UdtStreamSocket()
+{
+    m_aioHelper->terminate();
+}
 
 // =====================================================================
 // UdtStreamSocket implementation
