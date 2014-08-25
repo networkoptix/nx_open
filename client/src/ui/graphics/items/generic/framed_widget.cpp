@@ -135,17 +135,24 @@ void FramedBase::paintFrame(QPainter *painter, const QRectF &rect) {
     case Qn::RectangularFrame: {
         QBrush frameBrush = this->frameBrush();
         QBrush windowBrush = this->windowBrush();
-        if(frameBrush.style() == Qt::SolidPattern && windowBrush.style() == Qt::SolidPattern) {
+        if((frameBrush.style() == Qt::SolidPattern || !frameBrush.color().isValid())
+            && (windowBrush.style() == Qt::SolidPattern || !windowBrush.color().isValid())) {
             /* For some reason this code works WAY faster. */
             qreal l = rect.left(), t = rect.top(), w = rect.width(), h = rect.height();
             qreal fw = m_frameWidth;
 
             painter->setPen(Qt::NoPen);
-            painter->fillRect(QRectF(l + fw,        t + fw,     w - 2 * fw, h - 2 * fw), windowBrush);
-            painter->fillRect(QRectF(l,             t,          w,          fw),         frameBrush);
-            painter->fillRect(QRectF(l,             t + h - fw, w,          fw),         frameBrush);
-            painter->fillRect(QRectF(l,             t + fw,     fw,         h - 2 * fw), frameBrush);
-            painter->fillRect(QRectF(l + w - fw,    t + fw,     fw,         h - 2 * fw), frameBrush);
+
+            if (windowBrush.color().isValid()) {
+                painter->fillRect(QRectF(l + fw,        t + fw,     w - 2 * fw, h - 2 * fw), windowBrush);
+            }
+
+            if (frameBrush.color().isValid()) {
+                painter->fillRect(QRectF(l,             t,          w,          fw),         frameBrush);
+                painter->fillRect(QRectF(l,             t + h - fw, w,          fw),         frameBrush);
+                painter->fillRect(QRectF(l,             t + fw,     fw,         h - 2 * fw), frameBrush);
+                painter->fillRect(QRectF(l + w - fw,    t + fw,     fw,         h - 2 * fw), frameBrush);
+            }
         } else {
             painter->drawRect(frameRect);
         }
