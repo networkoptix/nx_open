@@ -1,10 +1,5 @@
 #include "gl_renderer.h"
 
-//#ifndef Q_OS_MACX
-//#define GL_GLEXT_PROTOTYPES
-//#include <GL/glext.h>
-//#endif
-//#define GL_GLEXT_PROTOTYPES 1
 #include <QtGui/qopengl.h>
 
 #include <cassert>
@@ -234,12 +229,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                     v_array );
                 break;
 
-            case PIX_FMT_YUV420P:
-                /*drawVideoTextureDirectly(
-                    QnGeometry::subRect(picLock->textureRect(), sourceRect),
-                    picLock->glTextures()[0],
-                    v_array );*/
-                
+            case PIX_FMT_YUV420P:              
                 Q_ASSERT( isYV12ToRgbShaderUsed() );
                 drawYV12VideoTexture(
                     picLock,
@@ -271,8 +261,6 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
         {
             if (m_timeChangeEnabled) {
                 m_lastDisplayedTime = picLock->pts();
-                //qDebug() << "QnGLRenderer::paint. Frame timestamp ("<<m_lastDisplayedTime<<") " <<
-                //    QDateTime::fromMSecsSinceEpoch(m_lastDisplayedTime/1000).toString(QLatin1String("hh:mm:ss.zzz"));
             }
         }
         m_prevFrameSequence = picLock->sequence();
@@ -302,19 +290,17 @@ void QnGLRenderer::drawVideoTextureDirectly(
         (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
 
-    //Deprecated in OpenGL ES2.0
-    //glEnable(GL_TEXTURE_2D);
-    //DEBUG_CODE(glCheckError("glEnable"));
-
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex0ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(QVector4D(1.0f,1.0f,1.0f,1.0f));
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuad(v_array,tx_array);
-    
-//    glColor4f( 1, 1, 1, 1 );
-
-    //drawBindedTexture( m_shaders->rgba, v_array, tx_array );
+    auto renderer = QnOpenGLRendererManager::instance(QGLContext::currentContext());
+    auto shader = renderer->getTextureShader();
+    shader->bind();
+    shader->setColor(QVector4D(1.0f,1.0f,1.0f,1.0f));
+    shader->setTexture(0);
+    drawBindedTexture(shader, v_array, tx_array);
+    shader->release();
 }
 
 void QnGLRenderer::setScreenshotInterface(ScreenshotInterface* value) { 
@@ -447,10 +433,6 @@ void QnGLRenderer::drawFisheyeRGBVideoTexture(
         (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
 
-    //Deprecated in OpenGL ES2.0
-    //glEnable(GL_TEXTURE_2D);
-    //DEBUG_CODE(glCheckError("glEnable"));
-
     QnFisheyeShaderProgram<QnAbstractRGBAShaderProgram>* fisheyeShader = 0;
     QnMediaDewarpingParams mediaParams;
     QnItemDewarpingParams itemParams;
@@ -511,9 +493,6 @@ void QnGLRenderer::drawYVA12VideoTexture(
 
     NX_LOG( lit("Rendering YUV420 textures %1, %2, %3").
         arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
-    //Deprecated in OpenGL ES2.0
-    //glEnable(GL_TEXTURE_2D);
-    //DEBUG_CODE(glCheckError("glEnable"));
 
     m_shaders->yv12ToRgba->bind();
     m_shaders->yv12ToRgba->setYTexture( 0 );
@@ -555,10 +534,6 @@ void QnGLRenderer::drawNV12VideoTexture(
         (float)tex0Coords.x(), (float)tex0Coords.y(),
         0.0f, (float)tex0Coords.y()
     };
-
-    //Deprecated in OpenGL ES2.0
-    //glEnable(GL_TEXTURE_2D);
-    //DEBUG_CODE(glCheckError("glEnable"));
 
     m_shaders->nv12ToRgb->bind();
     //m_shaders->nv12ToRgb->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
