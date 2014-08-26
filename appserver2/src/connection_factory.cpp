@@ -394,7 +394,7 @@ namespace ec2
         connectionInfoCopy.ecUrl.setScheme( connectionInfoCopy.allowSslConnections ? lit("https") : lit("http") );
 
         AbstractECConnectionPtr connection(new RemoteEC2Connection(
-            std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
+            std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, connectionInfoCopy.ecUrl),
             m_resCtx,
             connectionInfoCopy));
         handler->done(
