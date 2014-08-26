@@ -320,8 +320,7 @@ void QnMulticastModuleFinder::run() {
 }
 
 QnMulticastModuleFinder::ModuleContext::ModuleContext(const RevealResponse &response)
-    : response(response),
-      prevResponseReceiveClock(0)
+    : prevResponseReceiveClock(0)
 {
     moduleInformation.type = response.type;
     moduleInformation.version = QnSoftwareVersion(response.version);

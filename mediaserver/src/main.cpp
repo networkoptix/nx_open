@@ -1510,7 +1510,6 @@ void QnMain::run()
     selfInformation.systemName = qnCommon->localSystemName();
     selfInformation.port = MSSettings::roSettings()->value( nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT ).toInt();
     //selfInformation.remoteAddresses = ;
-    //selfInformation.isLocal = ; //!< true if at least one address from \a remoteHostAddress is a local address
     selfInformation.id = serverGuid();
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
 
