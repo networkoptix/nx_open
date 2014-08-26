@@ -28,6 +28,7 @@ namespace ec2
         }
 
         void addToCache(const QnAbstractTransaction::PersistentInfo& key, const QByteArray& data) {
+            QMutexLocker lock(&m_mutex);
             m_cache.insert(key, new QByteArray(data), data.size());
         }
 
