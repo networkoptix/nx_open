@@ -6,19 +6,15 @@
 #include <common/common_module.h>
 #include <utils/update_checker.h>
 
-#include "version.h"
-
 namespace {
     const int updatePeriodMSec = 60 * 60 * 1000; /* 1 hour. */
-    const QString QN_UPDATES_URL = lit("http://enk.me/bg/dklychkov/exmaple_update/updates");
 } // anonymous namespace
 
 QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject *parent):
     QObject(parent),
     m_checker(NULL)
 {
-//    QUrl updateFeedUrl(qnSettings->updateFeedUrl());
-    QUrl updateFeedUrl(QN_UPDATES_URL);
+    QUrl updateFeedUrl(qnSettings->updateFeedUrl());
     if(updateFeedUrl.isEmpty())
         return; 
 
