@@ -40,7 +40,7 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(
     if (isProxy(request))
         return m_proxyInfo.proxyHandler(clientSocket, this);
 
-    QString normPath = request.requestLine.url.path();;
+    QString normPath = request.requestLine.url.path();
     while (normPath.startsWith(L'/'))
         normPath = normPath.mid(1);
 

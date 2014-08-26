@@ -19,7 +19,7 @@ void QnRestProcessorPool::registerHandler( const QString& path, QnRestRequestHan
 
 QnRestRequestHandlerPtr QnRestProcessorPool::findHandler( QString path ) const
 {
-    if (path.startsWith(L'/'))
+    while (path.startsWith(L'/'))
         path = path.mid(1);
     if (path.endsWith(L'/'))
         path = path.left(path.length()-1);
