@@ -245,11 +245,11 @@ private:
         if( errorCode || bytesRead == 0 )
         {
             m_state = done;
+            int resultCode = m_responseBuffer.isEmpty()
+                ? SOAP_FAULT
+                : deserializeResponse();  //error or connection closed, trying to deserialize what we have
             m_socket.reset();
-            if( !m_responseBuffer.isEmpty() )
-                deserializeResponse();  //error or connection closed, trying to deserialize what we have
-            else
-                m_resultHandler( SOAP_FAULT );
+            m_resultHandler( resultCode );
             return;
         }
 
@@ -268,14 +268,14 @@ private:
         }
     }
 
-    void deserializeResponse()
+    int deserializeResponse()
     {
         m_responseDataPos = 0;
         const int resultCode = (m_syncWrapper->*m_syncFunc)(m_request, m_response);
         m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
         m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
         m_state = done;
-        m_resultHandler(resultCode);
+        return resultCode;
     }
 
 private:
