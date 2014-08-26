@@ -112,10 +112,6 @@ int QnTestCamera::sendAll(AbstractStreamSocket* socket, const void* data, int si
         sentTotal += sent;
     }
 
-    if (sentTotal != size) {
-        int gg=  4;
-    }
-
     return sentTotal == size;
 }
 
