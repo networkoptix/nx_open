@@ -357,8 +357,12 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     if (itr != m_alivePeers.end())
         itr.value().lastActivity.restart();
 
-    if (m_lastTranSeq[tran.peerID] >= transportHeader.sequence)
+    if (m_lastTranSeq[tran.peerID] >= transportHeader.sequence) {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+        qDebug() << "Ignore transaction because of transport sequence: " << transportHeader.sequence << "<=" << m_lastTranSeq[tran.peerID];
+#endif
         return; // already processed
+    }
     m_lastTranSeq[tran.peerID] = transportHeader.sequence;
 
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) {
