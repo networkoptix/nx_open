@@ -5,12 +5,17 @@
 #include "route_builder.h"
 #include "module_finder.h"
 
-QnRouter::QnRouter(QObject *parent) :
+QnRouter::QnRouter(QnModuleFinder *moduleFinder, QObject *parent) :
     QObject(parent),
     m_connection(std::weak_ptr<ec2::AbstractECConnection>()),
-    m_moduleFinder(0),
+    m_moduleFinder(moduleFinder),
     m_routeBuilder(new QnRouteBuilder(qnCommon->moduleGUID()))
 {
+    foreach (const QnModuleInformation &moduleInformation, moduleFinder->foundModules())
+        at_moduleFinder_moduleFound(moduleInformation);
+
+    connect(moduleFinder,               &QnModuleFinder::moduleFound,   this,   &QnRouter::at_moduleFinder_moduleFound);
+    connect(moduleFinder,               &QnModuleFinder::moduleLost,    this,   &QnRouter::at_moduleFinder_moduleLost);
 }
 
 QnRouter::~QnRouter() {}
@@ -26,21 +31,6 @@ void QnRouter::setConnection(const ec2::AbstractECConnectionPtr &connection) {
     if (connection) {
         connect(connection->getMiscManager().get(),         &ec2::AbstractMiscManager::connectionAdded,     this,   &QnRouter::at_connectionAdded);
         connect(connection->getMiscManager().get(),         &ec2::AbstractMiscManager::connectionRemoved,   this,   &QnRouter::at_connectionRemoved);
-    }
-}
-
-void QnRouter::setModuleFinder(QnModuleFinder *moduleFinder) {
-    if (m_moduleFinder)
-        m_moduleFinder->disconnect(this);
-
-    m_moduleFinder = moduleFinder;
-
-    if (moduleFinder) {
-        foreach (const QnModuleInformation &moduleInformation, moduleFinder->foundModules())
-            at_moduleFinder_moduleFound(moduleInformation);
-
-        connect(moduleFinder,               &QnModuleFinder::moduleFound,   this,   &QnRouter::at_moduleFinder_moduleFound);
-        connect(moduleFinder,               &QnModuleFinder::moduleLost,    this,   &QnRouter::at_moduleFinder_moduleLost);
     }
 }
 
@@ -87,6 +77,9 @@ void QnRouter::at_connectionRemoved(const QUuid &discovererId, const QUuid &peer
 }
 
 void QnRouter::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation) {
+    if (m_moduleFinder->isSendingFakeSignals())
+        return;
+
     foreach (const QString &address, moduleInformation.remoteAddresses) {
         Endpoint endpoint(moduleInformation.id, address, moduleInformation.port);
         if (m_connections.contains(qnCommon->moduleGUID(), endpoint))
@@ -99,7 +92,11 @@ void QnRouter::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInfo
     }
 }
 
+
 void QnRouter::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
+    if (m_moduleFinder->isSendingFakeSignals())
+        return;
+
     foreach (const Endpoint &endpoint, m_connections.values(qnCommon->moduleGUID())) {
         if (endpoint.id != moduleInformation.id)
             continue;

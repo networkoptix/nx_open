@@ -23,11 +23,10 @@ public:
         bool operator ==(const Endpoint &other) const { return id == other.id && host == other.host && port == other.port; }
     };
 
-    explicit QnRouter(QObject *parent = 0);
+    explicit QnRouter(QnModuleFinder *moduleFinder, QObject *parent = 0);
     ~QnRouter();
 
     void setConnection(const ec2::AbstractECConnectionPtr &connection);
-    void setModuleFinder(QnModuleFinder *moduleFinder);
 
     QMultiHash<QUuid, Endpoint> connections() const;
     QHash<QUuid, QnRouteList> routes() const;

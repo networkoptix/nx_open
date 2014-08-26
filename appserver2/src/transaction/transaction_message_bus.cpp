@@ -273,6 +273,25 @@ void QnTransactionMessageBus::processAliveData(const ApiPeerAliveData &aliveData
     if (aliveData.peer.id == m_localPeer.id)
         return; // ignore himself
 
+    if (!aliveData.isAlive && !gotFromPeer.isNull()) 
+    {
+        bool isPeerActuallyAlive = aliveData.peer.id == qnCommon->moduleGUID();
+        auto itr = m_connections.find(aliveData.peer.id);
+        if (itr != m_connections.end()) 
+        {
+            QnTransactionTransportPtr transport = itr.value();
+            if (transport->getState() == QnTransactionTransport::ReadyForStreaming)
+                isPeerActuallyAlive = true;
+        }
+        if (isPeerActuallyAlive) {
+            // ignore incoming offline peer info because we can see that peer online
+            QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo);
+            tran.params = aliveData;
+            tran.params.isAlive = true;
+            sendTransaction(tran); // resend alive info for that peer
+        }
+    }
+
     // proxy alive info from non-direct connected host
     bool isPeerExist = m_alivePeers.contains(aliveData.peer.id);
     if (aliveData.isAlive) 

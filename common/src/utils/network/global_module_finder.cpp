@@ -7,12 +7,21 @@
 #include <nx_ec/data/api_module_data.h>
 #include <nx_ec/dummy_handler.h>
 
-QnGlobalModuleFinder::QnGlobalModuleFinder(QObject *parent) :
+QnGlobalModuleFinder::QnGlobalModuleFinder(QnModuleFinder *moduleFinder, QObject *parent) :
     QObject(parent),
-    m_connection(std::weak_ptr<ec2::AbstractECConnection>())
+    m_connection(std::weak_ptr<ec2::AbstractECConnection>()),
+    m_moduleFinder(moduleFinder)
 {
     connect(qnResPool,      &QnResourcePool::statusChanged,         this,       &QnGlobalModuleFinder::at_resourcePool_statusChanged);
     connect(qnResPool,      &QnResourcePool::resourceRemoved,       this,       &QnGlobalModuleFinder::at_resourcePool_resourceRemoved);
+
+    if (moduleFinder) {
+        foreach (const QnModuleInformation &moduleInformation, moduleFinder->foundModules())
+            addModule(moduleInformation, qnCommon->moduleGUID());
+
+        connect(moduleFinder,               &QnModuleFinder::moduleFound,   this,   &QnGlobalModuleFinder::at_moduleFinder_moduleFound);
+        connect(moduleFinder,               &QnModuleFinder::moduleLost,    this,   &QnGlobalModuleFinder::at_moduleFinder_moduleLost);
+    }
 }
 
 void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &connection) {
@@ -25,23 +34,6 @@ void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &con
 
     if (connection)
         connect(connection->getMiscManager().get(),        &ec2::AbstractMiscManager::moduleChanged,  this,   &QnGlobalModuleFinder::at_moduleChanged);
-}
-
-void QnGlobalModuleFinder::setModuleFinder(QnModuleFinder *moduleFinder) {
-    if (m_moduleFinder){
-        disconnect(m_moduleFinder.data(),   &QnModuleFinder::moduleFound,   this,   &QnGlobalModuleFinder::at_moduleFinder_moduleFound);
-        disconnect(m_moduleFinder.data(),   &QnModuleFinder::moduleLost,    this,   &QnGlobalModuleFinder::at_moduleFinder_moduleLost);
-    }
-
-    m_moduleFinder = moduleFinder;
-
-    if (moduleFinder) {
-        foreach (const QnModuleInformation &moduleInformation, moduleFinder->foundModules())
-            at_moduleFinder_moduleFound(moduleInformation);
-
-        connect(moduleFinder,               &QnModuleFinder::moduleFound,   this,   &QnGlobalModuleFinder::at_moduleFinder_moduleFound);
-        connect(moduleFinder,               &QnModuleFinder::moduleLost,    this,   &QnGlobalModuleFinder::at_moduleFinder_moduleLost);
-    }
 }
 
 void QnGlobalModuleFinder::fillApiModuleData(const QnModuleInformation &moduleInformation, ec2::ApiModuleData *data) {
@@ -85,12 +77,18 @@ void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInf
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation) {
+    if (m_moduleFinder->isSendingFakeSignals())
+        return;
+
     addModule(moduleInformation, QUuid(qnCommon->moduleGUID()));
     if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
         connection->getMiscManager()->sendModuleInformation(moduleInformation, true, QUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
+    if (m_moduleFinder->isSendingFakeSignals())
+        return;
+
     removeModule(moduleInformation, QUuid(qnCommon->moduleGUID()));
     if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
         connection->getMiscManager()->sendModuleInformation(moduleInformation, false, QUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);

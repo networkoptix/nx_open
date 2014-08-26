@@ -231,12 +231,17 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         // TODO: #dklychkov deal with dns names
         moduleInformation.remoteAddresses.insert(url.host());
 
+        bool moduleChanged = true;
+
         auto it = m_foundModules.find(moduleInformation.id);
         if (it == m_foundModules.end()) {
             m_foundModules.insert(moduleInformation.id, moduleInformation);
         } else {
             moduleInformation.remoteAddresses += it->remoteAddresses;
-            *it = moduleInformation;
+            if (*it == moduleInformation)
+                moduleChanged = false;
+            else
+                *it = moduleInformation;
         }
 
         m_lastPingById[moduleInformation.id] = QDateTime::currentMSecsSinceEpoch();
@@ -245,8 +250,10 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         if (!m_urls.contains(url, moduleInformation.id))
             m_urls.insert(url, moduleInformation.id);
 
-        url.setPath(QString());
-        emit moduleFound(moduleInformation, url.host(), url);
+        if (moduleChanged) {
+            url.setPath(QString());
+            emit moduleFound(moduleInformation, url.host(), url);
+        }
     } else {
         QUuid id = m_moduleByUrl[url];
         if (id.isNull())
