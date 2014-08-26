@@ -42,6 +42,7 @@ typedef QSharedPointer<QnResourceCommand> QnResourceCommandPtr;
 
 
 class QnResourceFactory;
+class QnResourcePool;
 
 class QnResource;
 typedef QnSharedResourcePointer<QnResource> QnResourcePtr;

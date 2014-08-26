@@ -18,8 +18,8 @@ QnLayoutResource::QnLayoutResource():
     m_backgroundOpacity(0.7),
     m_locked(false)
 {
-    setStatus(Online, true);
-    addFlags(QnResource::layout);
+    setStatus(Qn::Online, true);
+    addFlags(Qn::layout);
 }
 
 QnLayoutResourcePtr QnLayoutResource::clone() const {

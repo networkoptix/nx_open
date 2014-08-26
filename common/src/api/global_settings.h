@@ -35,6 +35,7 @@ public:
     QnEmail::Settings emailSettings() const;
     void setEmailSettings(const QnEmail::Settings &settings);
 
+    void synchronizeNow();
 signals:
     void disabledVendorsChanged();
     void cameraSettingsOptimizationChanged();

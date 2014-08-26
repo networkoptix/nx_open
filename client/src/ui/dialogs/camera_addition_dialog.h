@@ -9,7 +9,9 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <utils/common/connective.h>
+#include <ui/workbench/workbench_context_aware.h>
+
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 namespace Ui {
     class CameraAdditionDialog;
@@ -24,6 +26,7 @@ public:
 
     Qt::CheckState checkState() const;
     void setCheckState(Qt::CheckState state);
+
 signals:
     void checkStateChanged(Qt::CheckState state);
 protected:
@@ -37,9 +40,9 @@ private:
 };
 
 
-class QnCameraAdditionDialog: public Connective<QDialog> {
+class QnCameraAdditionDialog: public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
-    typedef Connective<QDialog> base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 public:
     enum State {
         NoServer,           /**< No server is selected. */
@@ -61,6 +64,9 @@ public:
     void setServer(const QnMediaServerResourcePtr &server);
 
     State state() const;
+
+    virtual bool tryClose(bool force) override;
+    virtual void reject() override;
 private:
     Q_SLOT void clearTable();
 
@@ -79,6 +85,7 @@ private:
     bool ensureServerOnline();
     bool addingAllowed() const;
 
+    void updateTitle();
 private slots: 
     void at_startIPLineEdit_textChanged(QString value);
     void at_startIPLineEdit_editingFinished();
@@ -86,7 +93,6 @@ private slots:
     void at_camerasTable_cellChanged(int row, int column);
     void at_camerasTable_cellClicked(int row, int column);
     void at_header_checkStateChanged(Qt::CheckState state);
-    void at_closeButton_clicked();
     void at_scanButton_clicked();
     void at_stopScanButton_clicked();
     void at_addButton_clicked();
@@ -103,6 +109,7 @@ private:
     Q_DISABLE_COPY(QnCameraAdditionDialog)
 
     QScopedPointer<Ui::CameraAdditionDialog> ui;
+    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
     State m_state;
     QnMediaServerResourcePtr m_server;
     QnCheckBoxedHeaderView* m_header;

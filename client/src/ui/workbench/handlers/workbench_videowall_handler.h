@@ -21,6 +21,7 @@
 class QnWorkbenchItem;
 class QnResourceWidget;
 class QTimer;
+class QnVideoWallLicenseUsageHelper;
 
 class QnWorkbenchVideoWallHandler : public Connective<QObject>, public QnWorkbenchContextAware
 {
@@ -47,12 +48,9 @@ private:
     void swapLayouts(const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout);
 
     /** Updates item's layout with provided value. Provided layout should be saved. */
-    void updateItemsLayout(const QnVideoWallItemIndexList &items, const QnId &layoutId);
+    void updateItemsLayout(const QnVideoWallItemIndexList &items, const QUuid &layoutId);
 
     bool canStartVideowall(const QnVideoWallResourcePtr &videowall);
-
-    /** Sync check that we can close client silently. Ask about unsaved layouts etc. */
-    bool canClose();
 
     void startVideowallAndExit(const QnVideoWallResourcePtr &videoWall);
 
@@ -83,6 +81,8 @@ private:
 
     void updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action);
     void updateReviewLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action);
+
+    bool validateLicenses(const QString &detail) const;
 private slots:
 
     void at_newVideoWallAction_triggered();
@@ -173,6 +173,8 @@ private:
         QList<QnVideoWallControlMessage> cachedMessages;
         QTimer* cacheTimer;
     } m_controlMode;
+
+    QScopedPointer<QnVideoWallLicenseUsageHelper> m_licensesHelper;
 };
 
 #endif // WORKBENCH_VIDEOWALL_HANDLER_H

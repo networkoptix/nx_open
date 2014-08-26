@@ -11,7 +11,7 @@ class QnPlArecontResourceSearcher : public QnAbstractNetworkResourceSearcher
 public:
     QnPlArecontResourceSearcher();
 
-    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams& params) override;
 
     // returns all available devices
     virtual QnResourceList findResources();

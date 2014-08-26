@@ -5,17 +5,17 @@
 
 #include <core/resource/camera_bookmark_fwd.h>
 
-#include <ui/dialogs/button_box_dialog.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 namespace Ui {
 class QnCameraBookmarkDialog;
 }
 
-class QnCameraBookmarkDialog : public QnButtonBoxDialog
+class QnCameraBookmarkDialog : public QnWorkbenchStateDependentButtonBoxDialog
 {
     Q_OBJECT
 
-    typedef QnButtonBoxDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
     explicit QnCameraBookmarkDialog(QWidget *parent = 0);

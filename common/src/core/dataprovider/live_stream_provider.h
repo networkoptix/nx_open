@@ -6,12 +6,12 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 
-#include "../resource/media_resource.h"
 #include "motion/motion_estimation.h"
 #include "../resource/motion_window.h"
 #include "core/datapacket/video_data_packet.h"
 #include "core/resource/resource_fwd.h"
 #include "media_streamdataprovider.h"
+#include <core/resource/resource_media_layout.h>
 
 
 static const int  META_DATA_DURATION_MS = 300;
@@ -27,8 +27,8 @@ public:
     QnLiveStreamProvider(const QnResourcePtr& res);
     virtual ~QnLiveStreamProvider();
 
-    virtual void setRole(QnResource::ConnectionRole role) override;
-    QnResource::ConnectionRole getRole() const;
+    virtual void setRole(Qn::ConnectionRole role) override;
+    Qn::ConnectionRole getRole() const;
 
 
     void setSecondaryQuality(Qn::SecondStreamQuality  quality);
@@ -65,6 +65,7 @@ public:
 
     bool isCameraControlDisabled() const;
     void filterMotionByMask(const QnMetaDataV1Ptr& motion);
+    void updateSoftwareMotionStreamNum();
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
@@ -72,7 +73,7 @@ protected:
 
     QnMetaDataV1Ptr getMetaData();
     virtual QnMetaDataV1Ptr getCameraMetadata();
-    virtual QnResource::ConnectionRole roleForMotionEstimation();
+    virtual Qn::ConnectionRole roleForMotionEstimation();
     /*!
         \param picSize video size in pixels
     */
@@ -92,7 +93,9 @@ private:
     unsigned int m_framesSinceLastMetaData; // used only for live providers
     QTime m_timeSinceLastMetaData; //used only for live providers
 
-    QnResource::ConnectionRole m_softMotionRole;
+    QMutex m_motionRoleMtx;
+    Qn::ConnectionRole m_softMotionRole;
+    QString m_forcedMotionStream;
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
 #endif

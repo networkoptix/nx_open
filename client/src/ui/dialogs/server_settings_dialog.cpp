@@ -58,6 +58,8 @@ namespace {
         CheckBoxColumn,
         PathColumn,
         CapacityColumn,
+        LoginColumn,
+        PasswordColumn,
         ArchiveSpaceColumn,
         ColumnCount
     };
@@ -103,7 +105,6 @@ namespace {
 
 QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server, QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::ServerSettingsDialog),
     m_server(server),
     m_hasStorageChanges(false),
@@ -116,6 +117,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(CheckBoxColumn, QHeaderView::Fixed);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(PathColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(CapacityColumn, QHeaderView::ResizeToContents);
+    ui->storagesTable->horizontalHeader()->setSectionResizeMode(LoginColumn, QHeaderView::ResizeToContents);
+    ui->storagesTable->horizontalHeader()->setSectionResizeMode(PasswordColumn, QHeaderView::ResizeToContents);
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(ArchiveSpaceColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->setItemDelegateForColumn(ArchiveSpaceColumn, new ArchiveSpaceItemDelegate(this));
@@ -145,6 +148,10 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
     connect(ui->rebuildStartButton,     SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
     connect(ui->rebuildStopButton,      SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
+
+    connect(ui->checkBoxRedundancy,     &QCheckBox::stateChanged,       this,   [this]{
+        ui->maxCamerasWidget->setEnabled(ui->checkBoxRedundancy->isChecked() && ui->checkBoxRedundancy->isEnabled());
+    });
 
     updateFromResources();
 }
@@ -187,11 +194,20 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
     pathItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-    pathItem->setData(Qt::DisplayRole, item.path);
+    pathItem->setData(Qt::DisplayRole, QnAbstractStorageResource::urlToPath(item.url));
 
     QTableWidgetItem *capacityItem = new QTableWidgetItem();
     capacityItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     capacityItem->setData(Qt::DisplayRole, item.totalSpace == -1 ? tr("Not available") : QnStorageSpaceSlider::formatSize(item.totalSpace));
+
+    QUrl url(item.url);
+    QTableWidgetItem *loginItem = new QTableWidgetItem();
+    loginItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+    loginItem->setData(Qt::DisplayRole, url.userName());
+
+    QTableWidgetItem *passwordItem = new QTableWidgetItem();
+    passwordItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+    passwordItem->setData(Qt::DisplayRole, url.password());
 
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
     QTableWidgetItem *archiveSpaceItem = new QTableWidgetItem();
@@ -206,6 +222,8 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     ui->storagesTable->setItem(row, CheckBoxColumn, checkBoxItem);
     ui->storagesTable->setItem(row, PathColumn, pathItem);
     ui->storagesTable->setItem(row, CapacityColumn, capacityItem);
+    ui->storagesTable->setItem(row, LoginColumn, loginItem);
+    ui->storagesTable->setItem(row, PasswordColumn, passwordItem);
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
     ui->storagesTable->setItem(row, ArchiveSpaceColumn, archiveSpaceItem);
     ui->storagesTable->openPersistentEditor(archiveSpaceItem);
@@ -238,10 +256,19 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
 
     result.isWritable = checkBoxItem->flags() & Qt::ItemIsEnabled;
     result.isUsedForWriting = checkBoxItem->checkState() == Qt::Checked;
-    result.storageId = qvariant_cast<QString>(checkBoxItem->data(StorageIdRole), QString());
+    result.storageId = checkBoxItem->data(StorageIdRole).value<QUuid>();
     result.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
 
-    result.path = pathItem->text();
+    QString login = ui->storagesTable->item(row, LoginColumn)->text();
+    QString password = ui->storagesTable->item(row, PasswordColumn)->text();
+    if (login.isEmpty())
+        result.url = pathItem->text();
+    else {
+        QUrl url = QString(lit("file:///%1")).arg(pathItem->text());
+        url.setUserName(login);
+        url.setPassword(password);
+        result.url = url.toString();
+    }
 
     result.totalSpace = archiveSpaceItem->data(TotalSpaceRole).toLongLong();
     result.freeSpace = archiveSpaceItem->data(FreeSpaceRole).toLongLong();
@@ -262,7 +289,7 @@ void QnServerSettingsDialog::updateFromResources()
     m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
     updateRebuildUi(RebuildState::Invalid);
 
-    if (m_server->getStatus() == QnResource::Online)
+    if (m_server->getStatus() == Qn::Online)
         sendNextArchiveRequest();
 
     setTableItems(QList<QnStorageSpaceData>());
@@ -272,9 +299,9 @@ void QnServerSettingsDialog::updateFromResources()
     ui->nameLineEdit->setText(m_server->getName());
     ui->nameLineEdit->setEnabled(!edge);
     ui->maxCamerasSpinBox->setValue(m_server->getMaxCameras());
-    ui->maxCamerasSpinBox->setEnabled(!edge);
     ui->checkBoxRedundancy->setChecked(m_server->isRedundancy());
     ui->checkBoxRedundancy->setEnabled(!edge);
+    ui->maxCamerasWidget->setEnabled(!edge && m_server->isRedundancy());
 
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
@@ -289,7 +316,7 @@ void QnServerSettingsDialog::submitToResources() {
         QnAbstractStorageResourceList storages;
         foreach(const QnStorageSpaceData &item, tableItems()) {
             if(!item.isUsedForWriting && item.storageId.isNull()) {
-                serverStorageStates.insert(QnServerStorageKey(m_server->getId(), item.path), item.reservedSpace);
+                serverStorageStates.insert(QnServerStorageKey(m_server->getId(), item.url), item.reservedSpace);
                 continue;
             }
 
@@ -301,7 +328,7 @@ void QnServerSettingsDialog::submitToResources() {
                 storage->setTypeId(resType->getId());
             storage->setName(QUuid::createUuid().toString());
             storage->setParentId(m_server->getId());
-            storage->setUrl(item.path);
+            storage->setUrl(item.url);
             storage->setSpaceLimit(item.reservedSpace); //client does not change space limit anymore
             storage->setUsedForWriting(item.isUsedForWriting);
 
@@ -380,7 +407,7 @@ int QnServerSettingsDialog::dataRowCount() const {
 void QnServerSettingsDialog::at_tableBottomLabel_linkActivated() {
     QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, this));
     dialog->setProtocols(m_storageProtocols);
-    if(dialog->exec() != QDialog::Accepted)
+    if(!dialog->exec())
         return;
 
     QnStorageSpaceData item = dialog->storage();
@@ -404,7 +431,7 @@ void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
 void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent *) {
     int row = ui->storagesTable->currentRow();
     QnStorageSpaceData item = tableItem(row);
-    if(item.path.isEmpty() || !item.isExternal)
+    if(item.url.isEmpty() || !item.isExternal)
         return;
 
     QScopedPointer<QMenu> menu(new QMenu(this));
@@ -449,7 +476,7 @@ void QnServerSettingsDialog::at_rebuildButton_clicked()
 
 void QnServerSettingsDialog::at_updateRebuildInfo()
 {
-    if (m_server->getStatus() == QnResource::Online)
+    if (m_server->getStatus() == Qn::Online)
         sendNextArchiveRequest();
     else
         updateRebuildUi(RebuildState::Invalid);
@@ -520,18 +547,18 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceRe
         QnStorageSpaceData &item = items[i];
 
         if(item.reservedSpace == -1)
-            item.reservedSpace = serverStorageStates.value(QnServerStorageKey(m_server->getId(), item.path) , -1);
+            item.reservedSpace = serverStorageStates.value(QnServerStorageKey(m_server->getId(), item.url) , -1);
     }
 
     struct StorageSpaceDataLess {
         bool operator()(const QnStorageSpaceData &l, const QnStorageSpaceData &r) {
-            bool lLocal = l.path.contains(lit("://"));
-            bool rLocal = r.path.contains(lit("://"));
+            bool lLocal = l.url.contains(lit("://"));
+            bool rLocal = r.url.contains(lit("://"));
 
             if(lLocal != rLocal)
                 return lLocal;
 
-            return l.path < r.path;
+            return l.url < r.url;
         }
     };
     qSort(items.begin(), items.end(), StorageSpaceDataLess());

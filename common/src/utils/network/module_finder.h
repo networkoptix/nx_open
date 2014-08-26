@@ -9,7 +9,7 @@
 
 class QnMulticastModuleFinder;
 class QnDirectModuleFinder;
-class QnDirectModuleFinderHelper;
+class QnModuleFinderHelper;
 
 class QnModuleFinder : public QObject, public Singleton<QnModuleFinder> {
     Q_OBJECT
@@ -26,17 +26,20 @@ public:
 
     QnMulticastModuleFinder *multicastModuleFinder() const;
     QnDirectModuleFinder *directModuleFinder() const;
-    QnDirectModuleFinderHelper *directModuleFinderHelper() const;
+    QnModuleFinderHelper *directModuleFinderHelper() const;
 
     /*! Hacky thing. This function emits moduleLost for every found module and then moduleFound for them.
      * It's used to force a server to drop all its connections and find new.
      */
     void makeModulesReappear();
 
+    //! \param peerList Discovery peer if and only if peer exist in peerList
+    void setAllowedPeers(const QList<QUuid> &peerList);
+
 public slots:
     void start();
     void stop();
-
+    void pleaseStop();
 signals:
     void moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress);
     void moduleLost(const QnModuleInformation &moduleInformation);
@@ -48,9 +51,10 @@ private slots:
 private:
     QnMulticastModuleFinder *m_multicastModuleFinder;
     QnDirectModuleFinder *m_directModuleFinder;
-    QnDirectModuleFinderHelper *m_directModuleFinderHelper;
+    QnModuleFinderHelper *m_directModuleFinderHelper;
 
-    QHash<QnId, QnModuleInformation> m_foundModules;
+    QHash<QUuid, QnModuleInformation> m_foundModules;
+    QList<QUuid> m_allowedPeers;
 };
 
 #endif  //NETWORKOPTIXMODULEFINDER_H

@@ -18,16 +18,7 @@
     <widget class="QStackedWidget" name="stackedWidget">
      <widget class="QWidget" name="imagePage">
       <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
+       <property name="margin">
         <number>0</number>
        </property>
        <item>
@@ -70,6 +61,19 @@
             <number>100</number>
            </property>
            <property name="sliderPosition">
+            <number>50</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QSlider" name="stretchSlider">
+           <property name="maximum">
+            <number>100</number>
+           </property>
+           <property name="value">
             <number>50</number>
            </property>
            <property name="orientation">

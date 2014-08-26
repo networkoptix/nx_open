@@ -22,7 +22,6 @@
 #include "core/datapacket/media_data_packet.h"
 #include "soap_wrapper.h"
 #include "onvif_resource_settings.h"
-#include "gsoap_async_call_wrapper.h"
 
 
 class onvifXsd__AudioEncoderConfigurationOption;
@@ -43,6 +42,9 @@ class VideoOptionsLocal;
 //first = width, second = height
 
 class QDomElement;
+
+template<typename SyncWrapper, typename Request, typename Response>
+class GSoapAsyncCallWrapper;
 
 /*
 * This structure is used during discovery process. These data are read by getDeviceInformation request and may override data from multicast packet
@@ -189,9 +191,6 @@ public:
     QString getDeviceOnvifUrl() const;
     void setDeviceOnvifUrl(const QString& src);
 
-    QString getDeviceOnvifID() const;
-    void setDeviceOnvifID(const QString& src);
-
     CODECS getCodec(bool isPrimary) const;
     AUDIO_CODECS getAudioCodec() const;
 
@@ -286,7 +285,7 @@ private:
     QRect getVideoSourceMaxSize(const QString& configToken);
 
     bool isH264Allowed() const; // block H264 if need for compatble with some onvif devices
-
+    CameraDiagnostics::Result updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList);
 protected:
     std::auto_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     QList<QSize> m_resolutionList; //Sorted desc

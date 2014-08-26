@@ -15,7 +15,7 @@ QnJoinOtherSystemDialog::QnJoinOtherSystemDialog(QWidget *parent) :
     ui->setupUi(this);
     ui->urlComboBox->lineEdit()->setPlaceholderText(tr("http(s)://host:port"));
 
-    connect(ui->urlComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_urlComboBox_currentIndexChanged(int)));
+    connect(ui->urlComboBox, SIGNAL(activated(int)), this, SLOT(at_urlComboBox_activated(int)));
 
     updateUi();
 }
@@ -47,16 +47,16 @@ void QnJoinOtherSystemDialog::updateUi() {
     }
 
     ui->urlComboBox->setCurrentText(QString());
-}
-
-void QnJoinOtherSystemDialog::at_urlComboBox_currentIndexChanged(int index) {
-    if (index == -1)
-        return;
-
-    ui->urlComboBox->setCurrentText(ui->urlComboBox->itemData(index).toString());
 
     QString systemString;
     if (!qnCommon->localSystemName().isEmpty())
         systemString = lit(" (%1)").arg(qnCommon->localSystemName());
     ui->label->setText(tr("The specifien system will be joined to the current system%1.").arg(systemString));
+}
+
+void QnJoinOtherSystemDialog::at_urlComboBox_activated(int index) {
+    if (index == -1)
+        return;
+
+    ui->urlComboBox->setCurrentText(ui->urlComboBox->itemData(index).toString());
 }

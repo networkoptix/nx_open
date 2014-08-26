@@ -63,6 +63,8 @@
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
+#include <ui/graphics/view/gradient_background_painter.h>
+
 #include <ui/workaround/gl_widget_factory.h>
 #include <ui/workaround/gl_widget_workaround.h>
 
@@ -263,6 +265,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     /* Set up defaults. */
     connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);
+
+    connect(action(Qn::ToggleBackgroundAnimationAction),   &QAction::toggled,  this,   &QnWorkbenchDisplay::toggleBackgroundAnimation);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay() {
@@ -282,7 +286,7 @@ void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
         initSceneView();
 }
 
-void QnWorkbenchDisplay::setView(QGraphicsView *view) {
+void QnWorkbenchDisplay::setView(QnGraphicsView *view) {
     if(m_view == view)
         return;
 
@@ -320,6 +324,13 @@ void QnWorkbenchDisplay::deinitSceneView() {
     /* Clear grid. */
     if(!m_gridItem.isNull())
         delete m_gridItem.data();
+
+    /* Clear background painter. */
+    if (!m_backgroundPainter.isNull()) {
+        m_view->uninstallLayerPainter(m_backgroundPainter.data());
+        delete m_backgroundPainter.data();
+    }
+
 
     /* Deinit workbench. */
     disconnect(workbench(), NULL, this, NULL);
@@ -427,6 +438,16 @@ void QnWorkbenchDisplay::initSceneView() {
     gridBackgroundItem()->setOpacity(0.0);
     gridBackgroundItem()->setMapper(workbench()->mapper());
 
+    /* Set up background */ 
+    if (qnSettings->lightMode() & Qn::LightModeNoSceneBackground) {
+        action(Qn::ToggleBackgroundAnimationAction)->setDisabled(true);
+    } else {
+        /* Never set QObject* parent in the QScopedPointer-stored objects if not sure in the descruction order. */
+        m_backgroundPainter = new QnGradientBackgroundPainter(qnSettings->radialBackgroundCycle(), NULL, context());
+        if (action(Qn::ToggleBackgroundAnimationAction)->isChecked())
+            m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+    }
+
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),            SIGNAL(currentLayoutAboutToBeChanged()),        this,                   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
@@ -458,6 +479,18 @@ QnGridItem *QnWorkbenchDisplay::gridItem() const {
 QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
     return m_gridBackgroundItem.data();
 }
+
+
+void QnWorkbenchDisplay::toggleBackgroundAnimation(bool enabled) {
+    if (!m_scene || !m_view || !m_backgroundPainter)
+        return;
+
+    if(enabled) 
+        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+    else 
+        m_view->uninstallLayerPainter(m_backgroundPainter.data());
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: item properties
@@ -793,15 +826,15 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     }
 
     QnResourceWidget *widget;
-    if (resource->hasFlags(QnResource::server)) {
+    if (resource->hasFlags(Qn::server)) {
         widget = new QnServerResourceWidget(context(), item);
     }
     else
-    if (resource->hasFlags(QnResource::videowall)) {
+    if (resource->hasFlags(Qn::videowall)) {
         widget = new QnVideowallScreenWidget(context(), item);
     }
     else
-    if (resource->hasFlags(QnResource::media)) {
+    if (resource->hasFlags(Qn::media)) {
         widget = new QnMediaResourceWidget(context(), item);
     }
     else {
@@ -884,7 +917,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 if (time > 0) {
                     mediaWidget->display()->archiveReader()->jumpTo(time, time);
                 } else {
-                    if(m_widgets.size() == 1 && !mediaWidget->resource()->toResource()->hasFlags(QnResource::live))
+                    if(m_widgets.size() == 1 && !mediaWidget->resource()->toResource()->hasFlags(Qn::live))
                         mediaWidget->display()->archiveReader()->jumpTo(0, 0);
                 }
             }
@@ -1370,12 +1403,15 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
     MarginsF marginsExtension(0.0, 0.0, 0.0, 0.0);
-    if(currentMarginFlags() != 0)
+
+    /* If an item is zoomed then the margins should be null because all panels are hidden. */
+    if(currentMarginFlags() != 0 && !m_widgetByRole[Qn::ZoomedRole])
         marginsExtension = cwiseDiv(m_viewportAnimator->viewportMargins(), m_view->viewport()->size());
 
     /* Sync position extension. */
     {
         MarginsF positionExtension(0.0, 0.0, 0.0, 0.0);
+
         if(currentMarginFlags() & Qn::MarginsAffectPosition)
             positionExtension = marginsExtension;
 
@@ -1637,7 +1673,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
                 qint64 timeUSec = time == DATETIME_NOW ? DATETIME_NOW : time * 1000;
                 if(widget->display()->archiveReader())
                     widget->display()->archiveReader()->jumpTo(timeUSec, timeUSec);
-            } else if (!resource->hasFlags(QnResource::live)) {
+            } else if (!resource->hasFlags(Qn::live)) {
                 // default position in SyncPlay is LIVE. If current resource is synchronized and it is not camera (does not has live) seek to 0 (default position)
                 if(widget->display()->archiveReader())
                     widget->display()->archiveReader()->jumpTo(0, 0);
@@ -1661,7 +1697,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
                 displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: #Elric do offset adjustments in one place
 
             // TODO: #Elric move out, common code, another copy is in QnWorkbenchScreenshotHandler
-            QString timeString = (widget->resource()->toResource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(displayTime).toString(lit("hh:mm:ss"));
+            QString timeString = (widget->resource()->toResource()->flags() & Qn::utc) ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(displayTime).toString(lit("hh:mm:ss"));
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
 
@@ -1932,5 +1968,4 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         setLayer(splashItem, Qn::EffectsLayer);
     }
 }
-
 

@@ -92,10 +92,10 @@ public:
 
     void setDenyMajorUpdates(bool denyMajorUpdates);
 
-    PeerUpdateInformation updateInformation(const QnId &peerId) const;
+    PeerUpdateInformation updateInformation(const QUuid &peerId) const;
 
     QnMediaServerResourceList targets() const;
-    void setTargets(const QSet<QnId> &targets, bool client = false);
+    void setTargets(const QSet<QUuid> &targets, bool client = false);
 
     QnMediaServerResourceList actualTargets() const;
 
@@ -108,7 +108,7 @@ public:
 signals:
     void stateChanged(int state);
     void progressChanged(int progress);
-    void peerChanged(const QnId &peerId);
+    void peerChanged(const QUuid &peerId);
 
 public slots:
     void checkForUpdates(const QnSoftwareVersion &version = QnSoftwareVersion());
@@ -124,20 +124,20 @@ private slots:
     void at_uploadTask_finished(int errorCode);
     void at_installTask_finished(int errorCode);
     void at_restUpdateTask_finished(int errorCode);
-    void at_downloadTask_peerFinished(const QnId &peerId);
-    void at_uploadTask_peerFinished(const QnId &peerId);
-    void at_installTask_peerFinished(const QnId &peerId);
-    void at_restUpdateTask_peerFinished(const QnId &peerId);
+    void at_downloadTask_peerFinished(const QUuid &peerId);
+    void at_uploadTask_peerFinished(const QUuid &peerId);
+    void at_installTask_peerFinished(const QUuid &peerId);
+    void at_restUpdateTask_peerFinished(const QUuid &peerId);
     void at_clientUpdateInstalled();
 
-    void at_networkTask_peerProgressChanged(const QnId &peerId, int progress);
+    void at_networkTask_peerProgressChanged(const QUuid &peerId, int progress);
 
 private:
     void setState(State state);
     void setCheckResult(CheckResult result);
     void setUpdateResult(UpdateResult result);
     void finishUpdate(UpdateResult result);
-    void setPeerState(const QnId &peerId, PeerUpdateInformation::State state);
+    void setPeerState(const QUuid &peerId, PeerUpdateInformation::State state);
     void removeTemporaryDir();
 
     void downloadUpdates();
@@ -169,8 +169,8 @@ private:
 
     ec2::QnDistributedMutex *m_distributedMutex;
 
-    QHash<QnId, PeerUpdateInformation> m_updateInformationById;
-    QMultiHash<QnSystemInformation, QnId> m_idBySystemInformation;
+    QHash<QUuid, PeerUpdateInformation> m_updateInformationById;
+    QMultiHash<QnSystemInformation, QUuid> m_idBySystemInformation;
 
     QnMediaServerResourceList m_targets;
 
@@ -180,8 +180,8 @@ private:
     QnInstallUpdatesPeerTask *m_installUpdatesPeerTask;
     QnRestUpdatePeerTask *m_restUpdatePeerTask;
 
-    QSet<QnId> m_incompatiblePeerIds;
-    QSet<QnId> m_targetPeerIds;
+    QSet<QUuid> m_incompatiblePeerIds;
+    QSet<QUuid> m_targetPeerIds;
 
     bool m_clientRequiresInstaller;
     bool m_disableClientUpdates;

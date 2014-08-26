@@ -134,7 +134,7 @@ void QnVideowallScreenWidget::updateLayout(bool force) {
         QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, id, this, m_mainOverlayWidget);
         itemWidget->setFrameColors(frameColors());
         if (state.contains(id))
-            itemWidget->setInfoVisible(state[id] > 0);
+            itemWidget->setInfoVisible(state[id] > 0, false);
 
         connect(itemWidget, &QnVideowallItemWidget::infoVisibleChanged, this, [this, id](bool visible){
             if (!this->item())
@@ -188,7 +188,7 @@ void QnVideowallScreenWidget::updateLayout(bool force) {
 }
 
 
-void QnVideowallScreenWidget::at_thumbnailReady(const QnId &resourceId, const QPixmap &thumbnail) {
+void QnVideowallScreenWidget::at_thumbnailReady(const QUuid &resourceId, const QPixmap &thumbnail) {
     m_thumbs[resourceId] = thumbnail;
     update();
 }

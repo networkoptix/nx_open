@@ -151,7 +151,7 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
     if(!target)
         return false;
 
-    if(!target->resource()->toResource()->hasFlags(QnResource::motion))
+    if(!target->resource()->toResource()->hasFlags(Qn::motion))
         return false;
 
     Qt::KeyboardModifiers selectionModifiers = this->selectionModifiers(target);

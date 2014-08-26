@@ -35,15 +35,18 @@ Q_DECLARE_METATYPE(TypeSpecificParamMap)
 class RevealResponse
 {
 public:
-    //!Name of module (enterprise controller, media server, etc...)
+    //!Name of module (server, client, etc...)
     QString type;
     QString version;
     QString systemInformation;
     QString customization;
     QString name;
     //!random string, unique for particular module instance
-    QString seed;
+    QUuid seed;
     TypeSpecificParamMap typeSpecificParameters;
+    bool sslAllowed;
+
+    RevealResponse();
 
     bool serialize(quint8 ** const bufStart, const quint8 *bufEnd);
     bool deserialize(const quint8 **bufStart, const quint8 *bufEnd);

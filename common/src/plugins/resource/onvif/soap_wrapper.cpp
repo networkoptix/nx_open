@@ -16,7 +16,7 @@
 #include <onvif/soapSubscriptionManagerBindingProxy.h>
 #include <onvif/soapPullPointSubscriptionBindingProxy.h>
 #include <onvif/wsseapi.h>
-
+#include <utils/common/log.h>
 #include <QtCore/QtGlobal>
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
@@ -290,7 +290,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
     QString passwd;
     int soapRes = SOAP_OK;
     do {
-        qDebug() << "Trying login = " << login << ", password = " << passwd;
+        NX_LOG( QString::fromLatin1("Trying login = %1 password = %2)").arg(login).arg(passwd), cl_logDEBUG2 );
         setLogin(login);
         setPassword(passwd);
 
@@ -299,8 +299,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
         soapRes = getNetworkInterfaces(request1, response1);
 
         if (soapRes == SOAP_OK || !isNotAuthenticated()) {
-            qDebug() << "Finished picking password";
-
+            NX_LOG( lit("Finished picking password"), cl_logDEBUG2 );
             return soapRes == SOAP_OK;
         }
 

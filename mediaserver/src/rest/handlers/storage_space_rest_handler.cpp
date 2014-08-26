@@ -40,7 +40,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
 
     QList<QString> storagePaths;
     foreach(const QnStorageResourcePtr &storage, qnStorageMan->getStorages()) {
-        QString path = toNativeDirPath(storage->getUrl());
+        QString path = toNativeDirPath(storage->getPath());
         
         bool isExternal = true;
         foreach(const QnPlatformMonitor::PartitionSpace &partition, partitions) {
@@ -50,11 +50,11 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
             }
         }
 
-        if (storage->hasFlags(QnResource::deprecated))
+        if (storage->hasFlags(Qn::deprecated))
             continue;
 
         QnStorageSpaceData data;
-        data.path = storage->getUrl();
+        data.url = storage->getUrl();
         data.storageId = storage->getId();
         data.totalSpace = storage->getTotalSpace();
         data.freeSpace = storage->getFreeSpace();
@@ -90,8 +90,8 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
 
         QnStorageSpaceData data;
-        data.path = partition.path + lit(QN_MEDIA_FOLDER_NAME) + QDir::separator();
-        data.storageId = QnId();
+        data.url = partition.path + lit(QN_MEDIA_FOLDER_NAME);
+        data.storageId = QUuid();
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
         data.reservedSpace = defaultStorageSpaceLimit;
@@ -101,9 +101,9 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         if( data.totalSpace < defaultStorageSpaceLimit )
             continue;
 
-        QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.path, false));
+        QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.url, false));
         if (storage) {
-            storage->setUrl(data.path); /* createStorage does not fill url. */
+            storage->setUrl(data.url); /* createStorage does not fill url. */
             storage->setSpaceLimit( defaultStorageSpaceLimit );
             data.isWritable = storage->isStorageAvailableForWriting();
         } else {

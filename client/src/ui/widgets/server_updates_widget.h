@@ -23,7 +23,7 @@ public:
     bool cancelUpdate();
     bool isUpdating() const;
 
-    void setTargets(const QSet<QnId> &targets);
+    void setTargets(const QSet<QUuid> &targets);
 
     QnMediaServerUpdateTool *updateTool() const;
 
@@ -41,7 +41,7 @@ private slots:
     void at_installSpecificBuildButton_clicked();
     void at_updateFromLocalSourceButton_clicked();
     void at_updateButton_clicked();
-    void at_updateTool_peerChanged(const QnId &peerId);
+    void at_updateTool_peerChanged(const QUuid &peerId);
     void at_extraMessageTimer_timeout();
 
     void updateUi();

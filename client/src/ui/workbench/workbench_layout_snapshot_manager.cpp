@@ -16,7 +16,7 @@
 // QnWorkbenchLayoutReplyProcessor
 // -------------------------------------------------------------------------- //
 void QnWorkbenchLayoutReplyProcessor::processReply( int handle, ec2::ErrorCode errorCode ) {
-    /* Note that we may get reply of size 0 if EC is down.
+    /* Note that we may get reply of size 0 if Server is down.
      * This is why we use stored list of layouts. */
     if(m_manager)
         m_manager.data()->processReply((int)errorCode, m_resources, handle);
@@ -60,7 +60,7 @@ ec2::AbstractECConnectionPtr QnWorkbenchLayoutSnapshotManager::connection2() con
 }
 
 bool QnWorkbenchLayoutSnapshotManager::isFile(const QnLayoutResourcePtr &resource) {
-    return resource && (resource->flags() & QnResource::url) && !resource->getUrl().isEmpty();
+    return resource && (resource->flags() & Qn::url) && !resource->getUrl().isEmpty();
 }
 
 Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const {
@@ -205,7 +205,7 @@ void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr 
 Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::defaultFlags(const QnLayoutResourcePtr &resource) const {
     Qn::ResourceSavingFlags result;
 
-    if(resource->flags() & QnResource::local)
+    if(resource->flags() & Qn::local)
         result |= Qn::ResourceIsLocal;
 
     return result;
@@ -240,7 +240,7 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnRes
     Qn::ResourceSavingFlags flags = defaultFlags(layoutResource);
     setFlags(layoutResource, flags);
 
-    layoutResource->setFlags(flags & Qn::ResourceIsLocal ? layoutResource->flags() & ~QnResource::remote : layoutResource->flags() | QnResource::remote); // TODO: #Elric this code does not belong here.
+    layoutResource->setFlags(flags & Qn::ResourceIsLocal ? layoutResource->flags() & ~Qn::remote : layoutResource->flags() | Qn::remote); // TODO: #Elric this code does not belong here.
     
     /* Subscribe to changes to track changed status. */
     connectTo(layoutResource);

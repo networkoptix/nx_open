@@ -3,6 +3,8 @@
 #include <utils/common/log.h>
 #include <utils/common/util.h>
 
+#include <core/resource/security_cam_resource.h>
+
 #include "plugins/resource/avi/avi_archive_delegate.h"
 #include "plugins/resource/avi/thumbnails_archive_delegate.h"
 

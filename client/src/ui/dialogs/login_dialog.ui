@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>550</width>
-    <height>538</height>
+    <height>540</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>550</width>
+    <height>540</height>
+   </size>
   </property>
   <property name="modal">
    <bool>false</bool>
@@ -17,7 +23,16 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -50,7 +65,7 @@
         </sizepolicy>
        </property>
        <property name="title">
-        <string comment="Groupbox Title">Connect to Enterprise Controller</string>
+        <string comment="Groupbox Title">Connect to Server</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0">
         <item>
@@ -151,7 +166,16 @@
           <item row="2" column="1">
            <widget class="QWidget" name="widget" native="true">
             <layout class="QHBoxLayout" name="horizontalLayout">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item>
@@ -253,7 +277,16 @@
      <item>
       <widget class="QWidget" name="hostWidget" native="true">
        <layout class="QHBoxLayout" name="horizontalLayout_7">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
        </layout>

@@ -9,7 +9,8 @@
 QnWorkbenchSystemNameWatcher::QnWorkbenchSystemNameWatcher(QObject *parent) :
     QObject(parent)
 {
-    connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnWorkbenchSystemNameWatcher::at_resourceChanged);
+    connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnWorkbenchSystemNameWatcher::at_resourceChanged);
+    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnWorkbenchSystemNameWatcher::at_resourceChanged);
 }
 
 QnWorkbenchSystemNameWatcher::~QnWorkbenchSystemNameWatcher() {}
@@ -17,7 +18,7 @@ QnWorkbenchSystemNameWatcher::~QnWorkbenchSystemNameWatcher() {}
 void QnWorkbenchSystemNameWatcher::at_resourceChanged(const QnResourcePtr &resource) {
     ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
     if (connection) {
-        if (QnId(connection->connectionInfo().ecsGuid) != resource->getId())
+        if (QUuid(connection->connectionInfo().ecsGuid) != resource->getId())
             return;
 
         qnCommon->setLocalSystemName(resource.staticCast<QnMediaServerResource>()->getSystemName());

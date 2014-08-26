@@ -21,10 +21,17 @@ public:
     virtual void loadData();
     virtual void submitData();
 
+    bool tryClose(bool force);
 protected:
     void addPage(int key, QnAbstractPreferencesWidget *page, const QString &title);
 
     void setTabWidget(QTabWidget *tabWidget);
+
+    virtual bool confirm() const;
+    virtual bool discard() const;
+
+    virtual bool hasChanges() const;
+
 private:
     void initializeTabWidget();
 private:

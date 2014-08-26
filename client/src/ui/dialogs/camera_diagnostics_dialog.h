@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/camera/camera_diagnostics.h>
 
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 namespace Ui {
     class CameraDiagnosticsDialog;
@@ -16,9 +17,9 @@ namespace CameraDiagnostics {
     class DiagnoseTool;
 }
 
-class QnCameraDiagnosticsDialog: public QDialog {
+class QnCameraDiagnosticsDialog: public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT;
-    typedef QDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 public:
     QnCameraDiagnosticsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnCameraDiagnosticsDialog();

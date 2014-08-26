@@ -32,8 +32,26 @@ public:
 
     QnResourcePtr resource(const QModelIndex &index) const;
 
+protected:
+
+    // --------------------------------------------------------------
+    // Add a override function for lessThan to achieve customization
+    // --------------------------------------------------------------
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+
 signals:
     void criteriaChanged();
+
+    /**
+     * This signal is emitted when the tree prepares to start a recursive operation
+     * that may lead to a lot of dataChanged signals emitting.
+     */
+    void beforeRecursiveOperation();
+
+    /**
+     * This signal is emitted when the tree ends a recursive operation.
+     */
+    void afterRecursiveOperation();
 
 public slots:
     void invalidateFilter();

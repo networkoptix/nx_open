@@ -61,6 +61,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_staticTexts[UnauthorizedText] = tr("Unauthorized");
     m_staticTexts[UnauthorizedSubText] = tr("Please check authentication information<br/>in camera settings");
     m_staticTexts[AnalogLicenseText] = tr("Activate analog license to remove this message");
+    m_staticTexts[VideowallLicenseText] = tr("Activate Video Wall license to remove this message");
     m_staticTexts[LoadingText] = tr("Loading...");
 
     for(int i = 0; i < m_staticTexts.size(); i++) {
@@ -171,10 +172,10 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
             rect.center() - QPointF(unit / 10, unit / 10),
             QSizeF(unit / 5, unit / 5)
         );
-        QMatrix4x4 m = QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix();
+        QMatrix4x4 m = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix();
 
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().translate(overlayRect.center().x(), overlayRect.center().y(), 1.0);
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().scale(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
+        QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix().translate(overlayRect.center().x(), overlayRect.center().y(), 1.0);
+        QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix().scale(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
 //        glPushMatrix();
 //        glTranslatef(overlayRect.center().x(), overlayRect.center().y(), 1.0);
 //        glScalef(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
@@ -190,7 +191,7 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         } else if(m_statusOverlay == Qn::PausedOverlay) {
             m_pausedPainter->paint(0.5 * painter->opacity());
         }
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix() = m;
+        QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix() = m;
 //        glPopMatrix();
 
         glDisable(GL_BLEND);
@@ -226,7 +227,15 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
             for (int i = -count; i <= count; i++)
                 paintFlashingText(painter, m_staticTexts[AnalogLicenseText], 0.035, QPointF(0.0, 0.06 * i));
             break;
-        }        
+        }   
+    case Qn::VideowallWithoutLicenseOverlay:
+        {
+            QRectF rect = this->rect();
+            int count = qFloor(qMax(1.0, rect.height() / rect.width()) * 7.5);
+            for (int i = -count; i <= count; i++)
+                paintFlashingText(painter, m_staticTexts[VideowallLicenseText], 0.035, QPointF(0.0, 0.06 * i));
+            break;
+        }
     default:
         break;
     }

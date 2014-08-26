@@ -29,7 +29,14 @@
 
 namespace ec2
 {
-    Ec2DirectConnectionFactory::Ec2DirectConnectionFactory()
+    Ec2DirectConnectionFactory::Ec2DirectConnectionFactory( Qn::PeerType peerType )
+    :
+        m_dbManager( peerType == Qn::PT_Server ? new QnDbManager() : nullptr ),   //dbmanager is initialized by direct connection
+        m_transactionMessageBus( new ec2::QnTransactionMessageBus() ),
+        m_timeSynchronizationManager( new TimeSynchronizationManager(peerType) ),
+        m_terminated( false ),
+        m_runningRequests( 0 ),
+        m_sslEnabled( false )
     {
         srand( ::time(NULL) );
 
@@ -37,18 +44,36 @@ namespace ec2
         qRegisterMetaType<ErrorCode>( "ErrorCode" );
         qRegisterMetaType<AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
         qRegisterMetaType<QnFullResourceData>( "QnFullResourceData" ); // TODO: #Elric #EC2 register in a proper place!
+        qRegisterMetaType<QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
         qRegisterMetaType<QnTransactionTransportHeader>( "QnTransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiPeerAliveData>( "ApiPeerAliveData" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiRuntimeData>( "ApiRuntimeData" ); // TODO: #Elric #EC2 register in a proper place!
-
-        ec2::QnTransactionMessageBus::initStaticInstance(new ec2::QnTransactionMessageBus());
+        qRegisterMetaType<ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); // TODO: #Elric #EC2 register in a proper place!
+        qRegisterMetaType<ApiLockData>( "ApiLockData" ); // TODO: #Elric #EC2 register in a proper place!
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
     {
-        m_directConnection.reset();
-        ec2::QnTransactionMessageBus::initStaticInstance(0);
+        pleaseStop();
+        join();
+    }
+
+    void Ec2DirectConnectionFactory::pleaseStop()
+    {
+        QMutexLocker lk( &m_mutex );
+        m_terminated = true;
+    }
+
+    void Ec2DirectConnectionFactory::join()
+    {
+        QMutexLocker lk( &m_mutex );
+        while( m_runningRequests > 0 )
+        {
+            lk.unlock();
+            QThread::msleep( 1000 );
+            lk.relock();
+        }
     }
 
     //!Implementation of AbstractECConnectionFactory::testConnectionAsync
@@ -72,6 +97,8 @@ namespace ec2
     void Ec2DirectConnectionFactory::registerTransactionListener( QnUniversalTcpListener* universalTcpListener )
     {
         universalTcpListener->addHandler<QnTransactionTcpProcessor>("HTTP", "ec2/events");
+
+        m_sslEnabled = universalTcpListener->isSslEnabled();
     }
 
     void Ec2DirectConnectionFactory::registerRestHandlers( QnRestProcessorPool* const restProcessorPool )
@@ -85,7 +112,7 @@ namespace ec2
         //AbstractResourceManager::setResourceStatus
         registerUpdateFuncHandler<ApiSetResourceStatusData>( restProcessorPool, ApiCommand::setResourceStatus );
         //AbstractResourceManager::getKvPairs
-        registerGetFuncHandler<QnId, ApiResourceParamsData>( restProcessorPool, ApiCommand::getResourceParams );
+        registerGetFuncHandler<QUuid, ApiResourceParamsData>( restProcessorPool, ApiCommand::getResourceParams );
         //AbstractResourceManager::save
         registerUpdateFuncHandler<ApiResourceParamsData>( restProcessorPool, ApiCommand::setResourceParams );
         //AbstractResourceManager::save
@@ -107,7 +134,7 @@ namespace ec2
         //AbstractCameraManager::save
         registerUpdateFuncHandler<ApiCameraDataList>( restProcessorPool, ApiCommand::saveCameras );
         //AbstractCameraManager::getCameras
-        registerGetFuncHandler<QnId, ApiCameraDataList>( restProcessorPool, ApiCommand::getCameras );
+        registerGetFuncHandler<QUuid, ApiCameraDataList>( restProcessorPool, ApiCommand::getCameras );
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
         //AbstractCameraManager::getCameraHistoryItems
@@ -155,7 +182,6 @@ namespace ec2
         //AbstractLayoutManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeLayout );
 
-
         //AbstractStoredFileManager::listDirectory
         registerGetFuncHandler<ApiStoredFilePath, ApiStoredDirContents>( restProcessorPool, ApiCommand::listDirectory );
         //AbstractStoredFileManager::getStoredFile
@@ -196,11 +222,20 @@ namespace ec2
         registerUpdateFuncHandler<ApiConnectionDataList>(restProcessorPool, ApiCommand::availableConnections);
 
        //AbstractECConnection
+        registerUpdateFuncHandler<ApiDatabaseDumpData>( restProcessorPool, ApiCommand::resotreDatabase );
+
+        //AbstractECConnection
         registerGetFuncHandler<std::nullptr_t, ApiTimeData>( restProcessorPool, ApiCommand::getCurrentTime );
+        registerUpdateFuncHandler<ApiIdData>(
+            restProcessorPool,
+            ApiCommand::forcePrimaryTimeServer,
+            std::bind( &TimeSynchronizationManager::primaryTimeServerChanged, m_timeSynchronizationManager.get(), _1 ) );
 
 
         registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>( restProcessorPool, ApiCommand::getFullInfo );
         registerGetFuncHandler<std::nullptr_t, ApiLicenseDataList>( restProcessorPool, ApiCommand::getLicenses );
+
+        registerGetFuncHandler<std::nullptr_t, ApiDatabaseDumpData>( restProcessorPool, ApiCommand::dumpDatabase );
 
         //AbstractECConnectionFactory
         registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::connect,
@@ -224,8 +259,9 @@ namespace ec2
         connectionInfo.ecUrl = url;
         {
             QMutexLocker lk( &m_mutex );
-            if( !m_directConnection )
+            if( !m_directConnection ) {
                 m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
+            }
         }
         QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
         QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::ConnectHandler::done, handler, reqID, ec2::ErrorCode::ok, m_directConnection ) );
@@ -247,16 +283,22 @@ namespace ec2
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();
         loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
+        {
+            QMutexLocker lk( &m_mutex );
+            if( m_terminated )
+                return INVALID_REQ_ID;
+            ++m_runningRequests;
+        }
 #if 1
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
             addr, ApiCommand::connect, loginInfo, func );
 #else
-        //TODO: #ak investigate, what's wrong with following code
+        //TODO: #ak following does not compile due to msvc2012 restriction: no more than 6 arguments to std::bind
         using namespace std::placeholders;
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
-            ApiCommand::connect, loginInfo, std::bind(&Ec2DirectConnectionFactory::remoteConnectionFinished, this, _1, _2) );
+            addr, ApiCommand::connect, loginInfo, std::bind(&Ec2DirectConnectionFactory::remoteConnectionFinished, this, reqID, _1, _2, addr, handler) );
 #endif
         return reqID;
     }
@@ -281,12 +323,12 @@ namespace ec2
         ++data;
         if( data + fieldLen >= dataEnd )
             return false;
-        connectionInfo->version = QnSoftwareVersion(QByteArray(data, fieldLen));
+        connectionInfo->version = QnSoftwareVersion(QByteArray::fromRawData(data, fieldLen));
         return true;
     }
 
     template<class Handler>
-    void connectToOldEC(const QUrl& ecURL, Handler completionFunc)
+    void Ec2DirectConnectionFactory::connectToOldEC( const QUrl& ecURL, Handler completionFunc )
     {
         QAuthenticator auth;
         auth.setUser(ecURL.userName());
@@ -303,15 +345,23 @@ namespace ec2
                 QnConnectionInfo oldECConnectionInfo;
                 oldECConnectionInfo.ecUrl = ecURL;
                 if( parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo) )
-                    return completionFunc(ErrorCode::ok, oldECConnectionInfo);
+                    completionFunc(ErrorCode::ok, oldECConnectionInfo);
                 else
-                    return completionFunc(ErrorCode::badResponse, oldECConnectionInfo);
+                    completionFunc(ErrorCode::badResponse, oldECConnectionInfo);
+                break;
             }
+
             case CL_HTTP_AUTH_REQUIRED:
-                return completionFunc(ErrorCode::unauthorized, QnConnectionInfo());
+                completionFunc(ErrorCode::unauthorized, QnConnectionInfo());
+                break;
+
             default:
-                return completionFunc(ErrorCode::ioError, QnConnectionInfo());
+                completionFunc(ErrorCode::ioError, QnConnectionInfo());
+                break;
         }
+
+        QMutexLocker lk( &m_mutex );
+        --m_runningRequests;
     }
 
     void Ec2DirectConnectionFactory::remoteConnectionFinished(
@@ -327,7 +377,7 @@ namespace ec2
             QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
             QnConcurrent::run(
                 Ec2ThreadPool::instance(),
-                [ecURL, handler, reqID]() {
+                [this, ecURL, handler, reqID]() {
                     using namespace std::placeholders;
                     return connectToOldEC(
                         ecURL,
@@ -341,15 +391,19 @@ namespace ec2
         }
         QnConnectionInfo connectionInfoCopy(connectionInfo);
         connectionInfoCopy.ecUrl = ecURL;
+        connectionInfoCopy.ecUrl.setScheme( connectionInfoCopy.allowSslConnections ? lit("https") : lit("http") );
 
         AbstractECConnectionPtr connection(new RemoteEC2Connection(
             std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
             m_resCtx,
             connectionInfoCopy));
-        return handler->done(
+        handler->done(
             reqID,
             errorCode,
             connection);
+
+        QMutexLocker lk( &m_mutex );
+        --m_runningRequests;
     }
 
     void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
@@ -360,13 +414,18 @@ namespace ec2
         impl::TestConnectionHandlerPtr handler )
     {
         if( errorCode == ErrorCode::ok )
-            return handler->done(reqID, errorCode, connectionInfo);
+        {
+            handler->done( reqID, errorCode, connectionInfo );
+            QMutexLocker lk( &m_mutex );
+            --m_runningRequests;
+            return;
+        }
 
         //checking for old EC
         QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
         QnConcurrent::run(
             Ec2ThreadPool::instance(),
-            [ecURL, handler, reqID]() {
+            [this, ecURL, handler, reqID]() {
                 using namespace std::placeholders;
                 connectToOldEC(ecURL, std::bind(&impl::TestConnectionHandler::done, handler, reqID, _1, _2));
             }
@@ -381,8 +440,9 @@ namespace ec2
         connectionInfo->brand = isCompatibilityMode() ? QString() : lit(QN_PRODUCT_NAME_SHORT);
         connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
+        connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->box = lit(QN_ARM_BOX);
-
+        connectionInfo->allowSslConnections = m_sslEnabled;
         return ErrorCode::ok;
     }
 
@@ -400,6 +460,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
+        {
+            QMutexLocker lk( &m_mutex );
+            if( m_terminated )
+                return INVALID_REQ_ID;
+            ++m_runningRequests;
+        }
+
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();
         loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
@@ -416,6 +483,14 @@ namespace ec2
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
             new UpdateHttpHandler<InputDataType>(m_directConnection) );
+    }
+
+    template<class InputDataType, class CustomActionType>
+    void Ec2DirectConnectionFactory::registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, CustomActionType customAction )
+    {
+        restProcessorPool->registerHandler(
+            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+            new UpdateHttpHandler<InputDataType>(m_directConnection, customAction) );
     }
 
     template<class InputDataType, class OutputDataType>

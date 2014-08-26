@@ -12,10 +12,14 @@
 #include <ui/widgets/server_updates_widget.h>
 #include <ui/widgets/routing_management_widget.h>
 
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_state_manager.h>
+
 QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::QnSystemAdministrationDialog)
+    ui(new Ui::QnSystemAdministrationDialog),
+    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnSystemAdministrationDialog>(this))
 {
     ui->setupUi(this);
 
@@ -29,6 +33,8 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
 
     loadData();
 }
+
+QnSystemAdministrationDialog::~QnSystemAdministrationDialog() {}
 
 void QnSystemAdministrationDialog::reject() {
     if (!m_updatesWidget->cancelUpdate()) {

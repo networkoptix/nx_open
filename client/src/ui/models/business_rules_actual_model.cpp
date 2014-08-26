@@ -6,29 +6,17 @@
 #include "ui/workbench/workbench_context.h"
 
 QnBusinessRulesActualModel::QnBusinessRulesActualModel(QObject *parent): 
-    QnBusinessRulesViewModel(parent),
-    m_loadingHandle(-1),
-    m_isDataLoaded(false)
+    QnBusinessRulesViewModel(parent)
 {
-    connect(context(),  SIGNAL(userChanged(const QnUserResourcePtr &)),          
-            this, SLOT(reloadData()));
-    connect(QnCommonMessageProcessor::instance(),           SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
-            this, SLOT(at_message_ruleChanged(QnBusinessEventRulePtr)));
-    connect(QnCommonMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(QnId)),
-            this, SLOT(at_message_ruleDeleted(QnId)));
-    connect(QnCommonMessageProcessor::instance(),           SIGNAL(businessRuleReset(QnBusinessEventRuleList)),
-            this, SLOT(at_message_ruleReset(QnBusinessEventRuleList)));
+    connect(QnCommonMessageProcessor::instance(),           &QnCommonMessageProcessor::businessRuleChanged, this, &QnBusinessRulesActualModel::at_message_ruleChanged);
+    connect(QnCommonMessageProcessor::instance(),           &QnCommonMessageProcessor::businessRuleDeleted, this, &QnBusinessRulesActualModel::at_message_ruleDeleted);
+    connect(QnCommonMessageProcessor::instance(),           &QnCommonMessageProcessor::businessRuleReset,   this, &QnBusinessRulesActualModel::at_message_ruleReset);
 
+    reset();
 }
 
-void QnBusinessRulesActualModel::reloadData() 
-{
-    clear();
-    m_isDataLoaded = false;
-    m_loadingHandle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->getBusinessRules(
-        this, &QnBusinessRulesActualModel::at_resources_received );
-    m_savingRules.clear();
-    emit beforeModelChanged();
+void QnBusinessRulesActualModel::reset() {
+    at_message_ruleReset(QnCommonMessageProcessor::instance()->businessRules().values());
 }
 
 void QnBusinessRulesActualModel::saveRule(int row) {
@@ -37,24 +25,17 @@ void QnBusinessRulesActualModel::saveRule(int row) {
     if (m_savingRules.values().contains(ruleModel))
         return;
 
+    if (!QnAppServerConnectionFactory::getConnection2())
+        return;
+
     QnBusinessEventRulePtr rule = ruleModel->createRule();
-    using namespace std::placeholders;
+    //using namespace std::placeholders;
     int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->save(
         rule, this, [this, rule]( int handle, ec2::ErrorCode errorCode ){ at_resources_saved( handle, errorCode, rule ); } );
     m_savingRules[handle] = ruleModel;
 }
 
-void QnBusinessRulesActualModel::at_resources_received( int handle, ec2::ErrorCode errorCode, const QnBusinessEventRuleList& rules )
-{
-    if (handle != m_loadingHandle)
-        return;
-    m_isDataLoaded = errorCode == ec2::ErrorCode::ok;
-    addRules(rules);
-    emit afterModelChanged(RulesLoaded, m_isDataLoaded);
-    m_loadingHandle = -1;
-}
-
-void QnBusinessRulesActualModel::at_resources_saved( int handle, ec2::ErrorCode errorCode, QnBusinessEventRulePtr rule ) {
+void QnBusinessRulesActualModel::at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnBusinessEventRulePtr &rule) {
     if (!m_savingRules.contains(handle))
         return;
     QnBusinessRuleViewModel* model = m_savingRules[handle];
@@ -62,7 +43,7 @@ void QnBusinessRulesActualModel::at_resources_saved( int handle, ec2::ErrorCode 
 
     const bool success = errorCode == ec2::ErrorCode::ok;
     if(success) {
-        if (model->id() == 0)
+        if (model->id().isNull())
             deleteRule(model);
         updateRule(rule);
     }
@@ -74,21 +55,16 @@ void QnBusinessRulesActualModel::at_message_ruleChanged(const QnBusinessEventRul
     emit businessRuleChanged(rule->id());
 }
 
-void QnBusinessRulesActualModel::at_message_ruleDeleted(QnId id) {
+void QnBusinessRulesActualModel::at_message_ruleDeleted(const QUuid &id) {
     deleteRule(id);  //TODO: #GDM #Business ask user
     emit businessRuleDeleted(id);
 }
 
-void QnBusinessRulesActualModel::at_message_ruleReset(QnBusinessEventRuleList rules) {
+void QnBusinessRulesActualModel::at_message_ruleReset(const QnBusinessEventRuleList &rules) {
     emit beforeModelChanged();
     clear();
     foreach (const QnBusinessEventRulePtr &rule, rules)
         addRule(rule);
     emit afterModelChanged(RulesLoaded, true);
-}
-
-bool QnBusinessRulesActualModel::isLoaded() const
-{
-    return m_isDataLoaded;
 }
 

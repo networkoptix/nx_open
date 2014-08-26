@@ -16,7 +16,7 @@ QnServerUpdatesModel::QnServerUpdatesModel(QObject *parent) :
     resetResourses();
 }
 
-void QnServerUpdatesModel::setTargets(const QSet<QnId> &targets) {
+void QnServerUpdatesModel::setTargets(const QSet<QUuid> &targets) {
     m_targets = targets;
     resetResourses();
 }
@@ -82,7 +82,7 @@ QModelIndex QnServerUpdatesModel::index(const QnMediaServerResourcePtr &server) 
     return base_type::index(it - m_items.begin(), 0);
 }
 
-void QnServerUpdatesModel::setUpdatesInformation(const QHash<QnId, QnMediaServerUpdateTool::PeerUpdateInformation> &updates) {
+void QnServerUpdatesModel::setUpdatesInformation(const QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> &updates) {
     foreach (Item *item, m_items)
         item->m_updateInfo = updates[item->server()->getId()];
 
@@ -113,12 +113,12 @@ void QnServerUpdatesModel::resetResourses() {
     m_items.clear();
 
     if (m_targets.isEmpty()) {
-        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
+        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::server)) {
             QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
             m_items.append(new Item(server, m_updates[server->getId()]));
         }
     } else {
-        foreach (const QnId &id, m_targets) {
+        foreach (const QUuid &id, m_targets) {
             QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
             if (!server)
                 continue;

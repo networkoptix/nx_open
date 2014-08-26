@@ -18,7 +18,6 @@ class QnMediaServerResource : public QnResource
 {
     Q_OBJECT
     Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
-    Q_PROPERTY(QString streamingUrl READ getStreamingUrl WRITE setStreamingUrl)
 
 public:
     static const QString USE_PROXY;
@@ -30,9 +29,6 @@ public:
 
     void setApiUrl(const QString& restUrl);
     QString getApiUrl() const;
-
-    void setStreamingUrl(const QString& value);
-    const QString& getStreamingUrl() const;
 
     void setNetAddrList(const QList<QHostAddress>&);
     const QList<QHostAddress>& getNetAddrList() const;
@@ -63,7 +59,7 @@ public:
     Qn::ServerFlags getServerFlags() const;
     void setServerFlags(Qn::ServerFlags flags);
 
-    //virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+    //virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
 
     QString getProxyHost();
     int getProxyPort();
@@ -83,8 +79,11 @@ public:
     QString getSystemName() const;
     void setSystemName(const QString &systemName);
 
+    QString getAuthKey() const;
+    void setAuthKey(const QString& value);
+
     static bool isEdgeServer(const QnResourcePtr &resource);
-    virtual void setStatus(Status newStatus, bool silenceMode = false) override;
+    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
@@ -100,7 +99,6 @@ private:
     QnMediaServerConnectionPtr m_restConnection;
     QString m_apiUrl;
     QString m_primaryIf;
-    QString m_streamingUrl;
     QList<QHostAddress> m_netAddrList;
     QList<QHostAddress> m_prevNetAddrList;
     QList<QUrl> m_additionalUrls;
@@ -117,12 +115,13 @@ private:
     int m_maxCameras;
     bool m_redundancy;
     QElapsedTimer m_statusTimer;
+    QString m_authKey;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory
 {
 public:
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
+    QnResourcePtr createResource(QUuid resourceTypeId, const QnResourceParams& params);
 };
 
 Q_DECLARE_METATYPE(QnMediaServerResourcePtr);

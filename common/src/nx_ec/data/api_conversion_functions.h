@@ -18,7 +18,7 @@ namespace ec2 {
     void fromApiToResource(const ApiBusinessActionData &src, QnAbstractBusinessActionPtr &dst, QnResourcePool *resourcePool);
 
     void fromResourceToApi(const QnScheduleTask &src, ApiScheduleTaskData &dst);
-    void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QnId &resourceId);
+    void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QUuid &resourceId);
 
     void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst);
     void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst);
@@ -46,6 +46,7 @@ namespace ec2 {
 
     void fromResourceToApi(const QnLicensePtr &src, ApiLicenseData &dst);
     void fromApiToResource(const ApiLicenseData &src, QnLicensePtr &dst);
+    void fromResourceToApi(const QnLicensePtr &src, ApiDetailedLicenseData &dst);
     void fromResourceListToApi(const QnLicenseList &src, ApiLicenseDataList &dst);
     void fromApiToResourceList(const ApiLicenseDataList &src, QnLicenseList &dst);
 

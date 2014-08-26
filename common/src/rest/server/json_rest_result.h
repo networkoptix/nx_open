@@ -25,7 +25,7 @@ public:
         NoError = 0,
         MissingParameter = 1,
         InvalidParameter = 2,
-        InternalError = 3,
+        CantProcessRequest = 3,
     };
 
     QnJsonRestResult();

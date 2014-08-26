@@ -12,5 +12,9 @@ CopyAppServerNotificationFiles
 DeleteDatabaseFile
 BackupDatabaseFile
 RestoreDatabaseFile
+CopyDatabaseFile
 PopulateRestoreVersions
 CAQuitExecAndWarn
+DeleteOldMediaserverSettings
+GenerateSystemName
+DetectIfSystemIsStandalone

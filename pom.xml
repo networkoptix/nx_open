@@ -42,14 +42,14 @@
         <beta>true</beta>
         <!-- compile.option1. See profile no-webkit -->
         <webkit>true</webkit>
-		<!-- compile.option2. See profile angle  -->
+        <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
         <box/>
 
         <root.dir>${basedir}</root.dir>
-		<compile.option1>-webkit</compile.option1>
-		<compile.option2></compile.option2>
-		<compile.option3></compile.option3>
+        <compile.option1>-webkit</compile.option1>
+        <compile.option2></compile.option2>
+        <compile.option3></compile.option3>
         <compile.options>${compile.option1}${compile.option2}${compile.option3}</compile.options>
 
         <libdir>${root.dir}/build_environment/target</libdir>        
@@ -74,7 +74,7 @@
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>        
         <toolchain.version>none</toolchain.version>            
 
-        <additional.defines/>
+        <additional.defines>DISABLE_BOOKMARKS</additional.defines>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) --> 
         <qtlib1>Core</qtlib1>
@@ -249,6 +249,7 @@
             <modules>
                 <module>build_variables</module>
                 <module>common</module>
+                <!-- <module>hole_punching_mediator</module> -->
                 <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
             </modules>
@@ -299,7 +300,7 @@
                 </os>
             </activation>
             <modules>     
-                <!-- <module>traytool</module> -->
+                <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
                 <module>client</module>                     
@@ -315,13 +316,33 @@
                 <platform>windows</platform>
                 <compiler>msvc2012u3</compiler>
                 <arch>x64</arch>
+				<box>win78</box>
                 <force_x86>false</force_x86>
                 <qt.spec>win32-msvc2012</qt.spec>
+				<PlatformToolSet>v110</PlatformToolSet>
                 <profile.classifier>${platform}</profile.classifier>                
                 <windows>true</windows>
                 <unix>false</unix>
             </properties>
         </profile>
+        <profile>
+            <id>windows-xp</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>winxp</value>
+                </property>				
+            </activation>
+
+            <properties>
+                <qt.spec>win32-msvc2012xp</qt.spec>
+				<PlatformToolSet>v110_xp</PlatformToolSet>
+            </properties>
+        </profile>
+		
         <profile>
             <!-- Common Profile for Linux, Mac, Arm -->
             <id>unix</id>
@@ -335,7 +356,7 @@
                 <init.python.dir>${environment.dir}/python/bin</init.python.dir>                
                 <python.dir>${libdir}/${arch}/python/bin</python.dir>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
-				<qt.dir>${libdir}</qt.dir>
+                <qt.dir>${libdir}</qt.dir>
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
@@ -354,7 +375,7 @@
             <properties>            
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
-				<qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
+                <qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
@@ -413,8 +434,8 @@
             </activation>
             <properties>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-				<qt.classifier>${platform}-${arch}-${box}</qt.classifier>
-				<compile.option1></compile.option1>
+                <qt.classifier>${platform}-${arch}-${box}</qt.classifier>
+                <compile.option1></compile.option1>
                 <libdir>${root.dir}/build_environment/target-${box}</libdir>
             </properties>
             <build>
@@ -467,7 +488,7 @@
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.1f-SNAPSHOT</openssl.version>
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -608,6 +629,6 @@
             <properties>
                 <compile.option2>-angle</compile.option2>
             </properties>
-        </profile>  		
+        </profile>          
     </profiles> 
 </project>

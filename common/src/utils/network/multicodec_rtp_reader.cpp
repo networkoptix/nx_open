@@ -38,7 +38,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(const QnResourcePtr& res):
     m_timeHelper(res->getUniqueId()),
     m_pleaseStop(false),
     m_gotSomeFrame(false),
-    m_role(QnResource::Role_Default)
+    m_role(Qn::CR_Default)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
@@ -239,7 +239,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         }
         else {
             reason = QnBusiness::NetworkConnectionClosedReason;
-            reasonParamsEncoded = QnNetworkIssueBusinessEvent::encodePrimaryStream(m_role != QnResource::Role_SecondaryLiveVideo);
+            reasonParamsEncoded = QnNetworkIssueBusinessEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
         }
         emit networkIssue(getResource(),
                           qnSyncTime->currentUSecsSinceEpoch(),
@@ -472,14 +472,14 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         }
         else 
         {
-            QTextStream(&url) << "rtsp://" << nres->getHostAddress();
+            QTextStream(&url) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
             if (!m_request.startsWith(QLatin1Char('/')))
                 url += QLatin1Char('/');
             url += m_request;;
         }
     }
     else
-        QTextStream(&url) << "rtsp://" << nres->getHostAddress();
+        QTextStream( &url ) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
 
     m_RtpSession.setAuth(nres->getAuth(), RTPSession::authBasic);
 
@@ -509,7 +509,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     initIO(&m_videoIO, m_videoParser, RTPSession::TT_VIDEO);
     initIO(&m_audioIO, m_audioParser, RTPSession::TT_AUDIO);
 
-    if (m_role == QnResource::Role_LiveVideo)
+    if (m_role == Qn::CR_LiveVideo)
     {
         if (m_audioIO) {
             if (!camera->isAudioSupported())
@@ -567,7 +567,7 @@ void QnMulticodecRtpReader::setDefaultTransport( const RtpTransport::Value& _def
     defaultTransportToUse = _defaultTransportToUse;
 }
 
-void QnMulticodecRtpReader::setRole(QnResource::ConnectionRole role)
+void QnMulticodecRtpReader::setRole(Qn::ConnectionRole role)
 {
     m_role = role;
 }

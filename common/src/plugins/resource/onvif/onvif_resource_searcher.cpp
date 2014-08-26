@@ -5,6 +5,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <utils/common/log.h>
+#include <utils/network/http/httptypes.h>
 
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_pool.h"
@@ -44,11 +45,8 @@ static const int ONVIF_SERVICE_DEFAULT_PORTS[] =
     9988 // Dahui default port
 };
 
-OnvifResourceSearcher::OnvifResourceSearcher():
-    wsddSearcher(OnvifResourceSearcherWsdd::instance())
-    //mdnsSearcher(OnvifResourceSearcherMdns::instance()),
+OnvifResourceSearcher::OnvifResourceSearcher()
 {
-
 }
 
 OnvifResourceSearcher::~OnvifResourceSearcher()
@@ -98,7 +96,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     if (!typePtr)
         return resList;
 
-    int onvifPort = url.port(80);
+    const int onvifPort = url.port(nx_http::DEFAULT_HTTP_PORT);
     QString onvifUrl(QLatin1String("onvif/device_service"));
 
     QnPlOnvifResourcePtr resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
@@ -120,7 +118,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
             if (!resource->readDeviceInformation())
                 return resList; // no answer from camera
         }
-        else if (rpResource->getStatus() == QnResource::Offline)
+        else if (rpResource->getStatus() == Qn::Offline)
             return resList; // do not add 1..N channels if resource is offline
 
         resource->setPhysicalId(rpResource->getPhysicalId());
@@ -167,10 +165,10 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         }
 
         OnvifResourceInformationFetcher fetcher;
-        QnId rt = fetcher.getOnvifResourceType(manufacturer, modelName);
+        QUuid rt = fetcher.getOnvifResourceType(manufacturer, modelName);
         resource->setVendor( manufacturer );
         resource->setName( modelName );
-        //QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
+        //QUuid rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
         if (!rt.isNull())
             resource->setTypeId(rt);
 
@@ -209,7 +207,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 void OnvifResourceSearcher::pleaseStop()
 {
     QnAbstractNetworkResourceSearcher::pleaseStop();
-    wsddSearcher.pleaseStop();
+    m_wsddSearcher.pleaseStop();
 }
 
 QnResourceList OnvifResourceSearcher::findResources()
@@ -219,12 +217,12 @@ QnResourceList OnvifResourceSearcher::findResources()
 
     //Order is important! mdns should be the first to avoid creating ONVIF resource, when special is expected
     //mdnsSearcher.findResources(result, specialResourceCreator);
-    wsddSearcher.findResources(result);
+    m_wsddSearcher.findResources(result);
 
     return result;
 }
 
-QnResourcePtr OnvifResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr OnvifResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnResourcePtr result;
 

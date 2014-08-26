@@ -25,7 +25,6 @@ namespace ec2
         QString         networkAddresses;
         Qn::ServerFlags flags;
         Qn::PanicMode   panicMode;
-        QString         streamingUrl;
         QString         version; 
         QString         systemInfo;
         QString         authKey;
@@ -34,7 +33,7 @@ namespace ec2
         bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
         QString         systemName; //! < Server system name. It can be invalid sometimes, but it matters only when server is in incompatible state.
     };
-#define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(networkAddresses)(flags)(panicMode)(streamingUrl)(version)(systemInfo)(authKey)(storages)(maxCameras)(allowAutoRedundancy)(systemName)
+#define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(networkAddresses)(flags)(panicMode)(version)(systemInfo)(authKey)(storages)(maxCameras)(allowAutoRedundancy)(systemName)
 
 
     struct ApiPanicModeData: public ApiData

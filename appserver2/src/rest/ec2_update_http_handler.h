@@ -30,9 +30,14 @@ namespace ec2
         public QnRestRequestHandler
     {
     public:
-        UpdateHttpHandler( const Ec2DirectConnectionPtr& connection )
+        typedef std::function<void(const QnTransaction<RequestDataType>&)> CustomActionFuncType;
+
+        UpdateHttpHandler(
+            const Ec2DirectConnectionPtr& connection,
+            CustomActionFuncType customAction = CustomActionFuncType() )
         :
-            m_connection( connection )
+            m_connection( connection ),
+            m_customAction( customAction )
         {
         }
 
@@ -81,9 +86,6 @@ namespace ec2
 
             // replace client GUID to own GUID (take transaction ownership).
             tran.peerID = qnCommon->moduleGUID();
-            if (QnDbManager::instance() && ApiCommand::isPersistent(tran.command))
-                tran.fillPersistentInfo();
-
 
             ErrorCode errorCode = ErrorCode::ok;
             bool finished = false;
@@ -97,9 +99,14 @@ namespace ec2
             };
             m_connection->queryProcessor()->processUpdateAsync( tran, queryDoneHandler );
 
-            QMutexLocker lk( &m_mutex );
-            while( !finished )
-                m_cond.wait( lk.mutex() );
+            {
+                QMutexLocker lk( &m_mutex );
+                while( !finished )
+                    m_cond.wait( lk.mutex() );
+            }
+
+            if( m_customAction )
+                m_customAction( tran );
 
              // update local data
             if (errorCode == ErrorCode::ok)
@@ -114,6 +121,7 @@ namespace ec2
         Ec2DirectConnectionPtr m_connection;
         QWaitCondition m_cond;
         QMutex m_mutex;
+        CustomActionFuncType m_customAction;
     };
 }
 

@@ -30,18 +30,16 @@ void QnGenericTabbedDialog::setCurrentPage(int page) {
 }
 
 void QnGenericTabbedDialog::reject() {
-    foreach(QnAbstractPreferencesWidget* page, m_pages)
-        if (!page->discard())
-            return;
+    if (!tryClose(false))
+        return;
 
     loadData();
     base_type::reject();
 }
 
 void QnGenericTabbedDialog::accept() {
-    foreach(QnAbstractPreferencesWidget* page, m_pages)
-        if (!page->confirm())
-            return;
+    if (!confirm())
+        return;
 
     submitData();
     base_type::accept();
@@ -96,3 +94,61 @@ void QnGenericTabbedDialog::initializeTabWidget() {
 
     setTabWidget(tabWidgets[0]);
 }
+
+bool QnGenericTabbedDialog::confirm() const {
+    foreach(QnAbstractPreferencesWidget* page, m_pages)
+        if (!page->confirm())
+            return false;
+    return true;
+}
+
+bool QnGenericTabbedDialog::discard() const {
+    foreach(QnAbstractPreferencesWidget* page, m_pages)
+        if (!page->discard())
+            return false;
+    return true;
+}
+
+bool QnGenericTabbedDialog::hasChanges() const {
+    foreach(QnAbstractPreferencesWidget* page, m_pages)
+        if (page->hasChanges())
+            return true;
+    return false;
+}
+
+
+bool QnGenericTabbedDialog::tryClose(bool force) {
+    if (force) {
+        if (!discard())
+            return false;   //TODO: #dklychkov and what then? see QnWorkbenchConnectHandler
+        loadData();
+        hide();
+        return true;
+    }
+
+    if (isHidden() || !hasChanges())
+        return true;
+
+    QMessageBox::StandardButton btn =  QMessageBox::question(this,
+        tr("Confirm exit"),
+        tr("Unsaved changes will be lost. Save?"),
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+        QMessageBox::Cancel);
+
+    switch (btn) {
+    case QMessageBox::Yes:
+        if (!confirm())
+            return false;   // Cancel was pressed in the confirmation dialog
+
+        submitData();
+        break;
+    case QMessageBox::No:
+        loadData();
+        break;
+    default:
+        return false;   // Cancel was pressed
+    }
+
+    return true;
+}
+

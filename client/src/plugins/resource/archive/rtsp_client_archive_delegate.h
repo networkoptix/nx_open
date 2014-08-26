@@ -73,7 +73,7 @@ private:
     QnAbstractMediaDataPtr getNextDataInternal();
     QString getUrl(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) const;
     qint64 checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera) const;
-    void setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session) const;
+    void setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session, bool usePredefinedTracks) const;
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
 private:
     QMutex m_mutex;
@@ -111,6 +111,12 @@ private:
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
     
     QMap<int, QnFfmpegRtpParserPtr> m_parsers;
+    
+    struct {
+        QString username;
+        QString password;
+        QUuid videowall;
+    } m_auth;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

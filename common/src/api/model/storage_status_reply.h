@@ -7,8 +7,8 @@
 #include <utils/common/id.h>
 
 struct QnStorageSpaceData {
-    QString path;
-    QnId storageId;
+    QString url;
+    QUuid storageId;
     qint64 totalSpace;
     qint64 freeSpace;
     qint64 reservedSpace;
@@ -17,7 +17,7 @@ struct QnStorageSpaceData {
     bool isUsedForWriting;
 };
 
-#define QnStorageSpaceData_Fields (path)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting)
+#define QnStorageSpaceData_Fields (url)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting)
 
 struct QnStorageStatusReply {
     bool pluginExists;

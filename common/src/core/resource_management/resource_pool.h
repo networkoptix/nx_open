@@ -61,7 +61,7 @@ public:
 
     QnResourceList getResources() const;
 
-    QnResourcePtr getResourceById(const QnId &id) const;
+    QnResourcePtr getResourceById(const QUuid &id) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
     void updateUniqId(const QnResourcePtr& res, const QString &newUniqId);
@@ -81,18 +81,19 @@ public:
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
     QnResourceList getAllCameras(const QnResourcePtr &mServer) const;
     QnMediaServerResourceList getAllServers() const;
-    QnResourceList getResourcesByParentId(const QnId& parentId) const;
+    QnResourceList getResourcesByParentId(const QUuid& parentId) const;
 
     // returns list of resources with such flag
-    QnResourceList getResourcesWithFlag(QnResource::Flag flag) const;
+    QnResourceList getResourcesWithFlag(Qn::ResourceFlag flag) const;
 
-    QnResourceList getResourcesWithParentId(QnId id) const;
-    QnResourceList getResourcesWithTypeId(QnId id) const;
+    QnResourceList getResourcesWithParentId(QUuid id) const;
+    QnResourceList getResourcesWithTypeId(QUuid id) const;
 
-    QnResourcePtr getIncompatibleResourceById(const QnId &id, bool useCompatible = false) const;
+    QnResourcePtr getIncompatibleResourceById(const QUuid &id, bool useCompatible = false) const;
     QnResourcePtr getIncompatibleResourceByUniqueId(const QString &uid) const;
     QnResourceList getAllIncompatibleResources() const;
-    void makeResourceNormal(const QnResourcePtr &resource);
+    void updateIncompatibility(const QnResourcePtr &resource);
+    void clearIncompatibleResources();
 
     QnUserResourcePtr getAdministrator() const;
 
@@ -126,15 +127,7 @@ public:
 
     QStringList allTags() const;
 
-    int activeCamerasByClass(bool analog) const;
-
-    int activeDigital() const {
-        return activeCamerasByClass(false);
-    }
-
-    int activeAnalog() const {
-        return activeCamerasByClass(true);
-    }
+    int activeCamerasByLicenseType(Qn::LicenseType licenseType) const;
 
     //!Empties all internal dictionaries. Needed for correct destruction order at application stop
     void clear();

@@ -46,8 +46,6 @@ struct CameraInfo: public EndpointAdditionalInfo
 
 class OnvifResourceSearcherWsdd
 {
-    OnvifResourceSearcherWsdd();
-
     static QString& LOCAL_ADDR;
     static const char SCOPES_NAME_PREFIX[];
     static const char SCOPES_HARDWARE_PREFIX[];
@@ -62,9 +60,8 @@ class OnvifResourceSearcherWsdd
     //mutable QMutex m_mutex;
 
 public:
+    OnvifResourceSearcherWsdd();
     virtual ~OnvifResourceSearcherWsdd();
-
-    static OnvifResourceSearcherWsdd& instance();
 
     void findResources(QnResourceList& result);
 

@@ -8,7 +8,7 @@ QnAbstractStorageResource::QnAbstractStorageResource():
     m_usedForWriting(false),
     m_index(0)
 {
-    setStatus(Offline);
+    setStatus(Qn::Offline);
 }
 
 QnAbstractStorageResource::~QnAbstractStorageResource()
@@ -90,6 +90,19 @@ void QnAbstractStorageResource::releaseBitrate(QnAbstractMediaStreamDataProvider
     m_providers.remove(provider);
 }
 #endif
+
+QString QnAbstractStorageResource::getPath() const
+{
+    return urlToPath(getUrl());
+}
+
+QString QnAbstractStorageResource::urlToPath(const QString& url)
+{
+    if (!url.contains(lit("://")))
+        return url;
+    else
+        return QUrl(url).path().mid(1);
+}
 
 float QnAbstractStorageResource::getAvarageWritingUsage() const
 {

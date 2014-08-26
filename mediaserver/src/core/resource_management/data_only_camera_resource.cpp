@@ -5,7 +5,7 @@
 #include "data_only_camera_resource.h"
 
 
-DataOnlyCameraResource::DataOnlyCameraResource( const QnId& resourceTypeId )
+DataOnlyCameraResource::DataOnlyCameraResource( const QUuid& resourceTypeId )
 {
     setTypeId( resourceTypeId );
 }

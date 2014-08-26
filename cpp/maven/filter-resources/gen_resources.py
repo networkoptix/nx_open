@@ -148,7 +148,7 @@ if __name__ == '__main__':
             print(vc_path)
             os.environ["path"] += os.pathsep + vc_path
             os.system('echo %PATH%')
-            p = subprocess.Popen(r'${qt.dir}/bin/qmake -spec ${qt.spec} -tp vc -o ${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj %s' % output_pro_file, shell=True, stdout=PIPE)
+            p = subprocess.Popen(r'qmake.bat %s' % output_pro_file, shell=True, stdout=PIPE)
             p = subprocess.Popen(r'${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile %s' % output_pro_file, shell=True, stdout=PIPE)
             out, err = p.communicate()
             print out

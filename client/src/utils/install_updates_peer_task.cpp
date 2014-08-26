@@ -53,12 +53,12 @@ void QnInstallUpdatesPeerTask::doStart() {
 }
 
 void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource) {
-    QnId peerId = resource->getId();
+    QUuid peerId = resource->getId();
 
     if (!peers().contains(peerId))
         return;
 
-    if (resource->getStatus() == QnResource::Offline)
+    if (resource->getStatus() == Qn::Offline)
         m_restartingPeers.remove(peerId);
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
@@ -72,15 +72,14 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
     }
 
     if (m_pendingPeers.isEmpty()) {
-        disconnect(qnResPool, &QnResourcePool::resourceChanged, this, &QnInstallUpdatesPeerTask::at_resourceChanged);
         finish(NoError);
         return;
     }
 
     if (m_restartingPeers.isEmpty()) {
-        foreach (const QnId &id, m_pendingPeers) {
+        foreach (const QUuid &id, m_pendingPeers) {
             QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).staticCast<QnMediaServerResource>();
-            if (server->getStatus() == QnResource::Offline) {
+            if (server->getStatus() == Qn::Offline) {
                 return;
             } else if (server->getVersion() != m_version) {
                 finish(InstallationFailed);
@@ -92,10 +91,7 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
 }
 
 void QnInstallUpdatesPeerTask::at_checkTimeout() {
-    /* disconnect from resource pool and make final check */
-    disconnect(qnResPool, &QnResourcePool::resourceChanged, this, &QnInstallUpdatesPeerTask::at_resourceChanged);
-
-    foreach (const QnId &id, m_pendingPeers) {
+    foreach (const QUuid &id, m_pendingPeers) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (server->getVersion() == m_version) {
             m_pendingPeers.remove(id);
@@ -107,6 +103,7 @@ void QnInstallUpdatesPeerTask::at_checkTimeout() {
 }
 
 void QnInstallUpdatesPeerTask::finish(int errorCode) {
+    qnResPool->disconnect(this);
     static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(false);
     QnNetworkPeerTask::finish(errorCode);
 }

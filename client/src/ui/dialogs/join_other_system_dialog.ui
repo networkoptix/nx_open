@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>302</width>
+    <width>300</width>
     <height>112</height>
    </rect>
   </property>
@@ -70,6 +70,10 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>urlComboBox</tabstop>
+  <tabstop>passwordEdit</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

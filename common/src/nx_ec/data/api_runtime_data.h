@@ -8,19 +8,24 @@
 
 namespace ec2
 {
-    /*
+    /**
     * This structure contains all runtime data per peer. Runtime data is absent in a DB.
     */
-
     struct ApiRuntimeData: ApiData
     {
-        ApiRuntimeData(): ApiData(), prematureLicenseExperationDate(0) {}
+        ApiRuntimeData(): 
+            ApiData(), 
+            prematureLicenseExperationDate(0),
+            videoWallControlSessions(0)
+        {}
+
         bool operator==(const ApiRuntimeData& other) const {
             return peer == other.peer &&
                    platform == other.platform &&
                    box == other.box &&
                    publicIP == other.publicIP &&
                    videoWallInstanceGuid == other.videoWallInstanceGuid &&
+                   videoWallControlSessions == other.videoWallControlSessions &&
                    prematureLicenseExperationDate == other.prematureLicenseExperationDate;
         }
 
@@ -35,11 +40,14 @@ namespace ec2
         /** Guid of the videowall instance for the running videowall clients. */
         QUuid videoWallInstanceGuid;
 
+        /** Number of the videowall control sessions governed by the current client instance. */
+        int videoWallControlSessions;
+
         QList<QByteArray> mainHardwareIds;
         QList<QByteArray> compatibleHardwareIds;
     };
 
-#define ApiRuntimeData_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)(videoWallInstanceGuid)(mainHardwareIds)(compatibleHardwareIds)
+#define ApiRuntimeData_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)(videoWallInstanceGuid)(videoWallControlSessions)(mainHardwareIds)(compatibleHardwareIds)
 
 
 } // namespace ec2

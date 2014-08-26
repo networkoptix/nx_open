@@ -47,8 +47,8 @@ static QString fromLatinStdString(const std::string& value)
 QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource): 
     base_type(resource),
     m_resource(resource),
-    m_capabilities(0),
-    m_ptzPresetsReady(false)
+    m_capabilities(Qn::NoPtzCapabilities),
+    m_stopBroken(false)
 {
     m_limits.minPan = -1.0;
     m_limits.maxPan = 1.0;
@@ -60,15 +60,19 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     SpeedLimits defaultLimits(-1.0, 1.0);
     m_panSpeedLimits = m_tiltSpeedLimits = m_zoomSpeedLimits = m_focusSpeedLimits = defaultLimits;
 
-    m_capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability | Qn::LimitsPtzCapability | Qn::FlipPtzCapability;
-    if(m_resource->getPtzUrl().isEmpty())
-        m_capabilities = Qn::NoPtzCapabilities;
+    QnResourceData data = qnCommon->dataPool()->data(resource);
+    m_stopBroken = qnCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
+    bool absoluteMoveBroken = data.value<bool>(lit("onvifPtzAbsoluteMoveBroken"),   false);
+    bool focusEnabled       = data.value<bool>(lit("onvifPtzFocusEnabled"),         false);
+    bool presetsEnabled     = data.value<bool>(lit("onvifPtzPresetsEnabled"),       false);
 
-    m_stopBroken = qnCommon->dataPool()->data(resource, true).value<bool>(lit("onvifPtzStopBroken"), false);
-
-    initContinuousMove();
-
-    //initContinuousFocus(); // Disabled for now.
+    m_capabilities |= initMove();
+    if(absoluteMoveBroken)
+        m_capabilities &= ~(Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability);
+    if(focusEnabled)
+        m_capabilities |= initContinuousFocus();
+    if(presetsEnabled)
+        m_capabilities |= initPresets();
 
     // TODO: #PTZ #Elric actually implement flip!
 }
@@ -77,7 +81,7 @@ QnOnvifPtzController::~QnOnvifPtzController() {
     return;
 }
 
-Qn::PtzCapabilities QnOnvifPtzController::initContinuousMove() {
+Qn::PtzCapabilities QnOnvifPtzController::initMove() {
     QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
         return Qn::NoPtzCapabilities;
@@ -89,56 +93,86 @@ Qn::PtzCapabilities QnOnvifPtzController::initContinuousMove() {
     _onvifPtz__GetConfigurationsResponse response;
     if (ptz.doGetConfigurations(request, response) != SOAP_OK)
         return Qn::NoPtzCapabilities;
-    if(response.PTZConfiguration.empty())
+    if(response.PTZConfiguration.empty() || !response.PTZConfiguration[0])
         return Qn::NoPtzCapabilities;
 
 	// TODO: #PTZ #Elric we can init caps by examining spaces in response!
 
+    Qn::PtzCapabilities configCapabilities;
+    if(response.PTZConfiguration[0]->DefaultContinuousPanTiltVelocitySpace)
+        configCapabilities |= Qn::ContinuousPanCapability | Qn::ContinuousTiltCapability;
+    if(response.PTZConfiguration[0]->DefaultContinuousZoomVelocitySpace)
+        configCapabilities |= Qn::ContinuousZoomCapability;
+    if(response.PTZConfiguration[0]->DefaultAbsolutePantTiltPositionSpace)
+	    configCapabilities |= Qn::AbsolutePanCapability | Qn::AbsoluteTiltCapability;
+    if(response.PTZConfiguration[0]->DefaultAbsoluteZoomPositionSpace)
+        configCapabilities |= Qn::AbsoluteZoomCapability;
+
     _onvifPtz__GetNode nodeRequest;
     _onvifPtz__GetNodeResponse nodeResponse;
     nodeRequest.NodeToken = response.PTZConfiguration[0]->NodeToken;
-
     if (ptz.doGetNode(nodeRequest, nodeResponse) != SOAP_OK)
         return Qn::NoPtzCapabilities;
 
-    onvifXsd__PTZNode *ptzNode = nodeResponse.PTZNode;
-    if (!ptzNode) 
+    if (!nodeResponse.PTZNode || !nodeResponse.PTZNode->SupportedPTZSpaces) 
         return Qn::NoPtzCapabilities;
-    onvifXsd__PTZSpaces *spaces = ptzNode->SupportedPTZSpaces;
-    if (!spaces)
-        return Qn::NoPtzCapabilities;
+    onvifXsd__PTZSpaces *spaces = nodeResponse.PTZNode->SupportedPTZSpaces;
         
-    Qn::PtzCapabilities result = Qn::NoPtzCapabilities;
-    if (spaces->ContinuousPanTiltVelocitySpace.size() > 0 && spaces->ContinuousPanTiltVelocitySpace[0]) {
-        if (spaces->ContinuousPanTiltVelocitySpace[0]->XRange) {
+    Qn::PtzCapabilities nodeCapabilities = Qn::NoPtzCapabilities;
+    if(!spaces->ContinuousPanTiltVelocitySpace.empty() && spaces->ContinuousPanTiltVelocitySpace[0]) {
+        if(spaces->ContinuousPanTiltVelocitySpace[0]->XRange) {
             m_panSpeedLimits.min = spaces->ContinuousPanTiltVelocitySpace[0]->XRange->Min;
             m_panSpeedLimits.max = spaces->ContinuousPanTiltVelocitySpace[0]->XRange->Max;
-            result |= Qn::ContinuousPanCapability;
+            nodeCapabilities |= Qn::ContinuousPanCapability;
         }
-        if (spaces->ContinuousPanTiltVelocitySpace[0]->YRange) {
+        if(spaces->ContinuousPanTiltVelocitySpace[0]->YRange) {
             m_tiltSpeedLimits.min = spaces->ContinuousPanTiltVelocitySpace[0]->YRange->Min;
             m_tiltSpeedLimits.max = spaces->ContinuousPanTiltVelocitySpace[0]->YRange->Max;
-            result |= Qn::ContinuousTiltCapability;
+            nodeCapabilities |= Qn::ContinuousTiltCapability;
         }
     }
-    if (spaces->ContinuousZoomVelocitySpace.size() > 0 && spaces->ContinuousZoomVelocitySpace[0]) {
-        if (spaces->ContinuousZoomVelocitySpace[0]->XRange) {
+    if(!spaces->ContinuousZoomVelocitySpace.empty() && spaces->ContinuousZoomVelocitySpace[0]) {
+        if(spaces->ContinuousZoomVelocitySpace[0]->XRange) {
             m_zoomSpeedLimits.min = spaces->ContinuousZoomVelocitySpace[0]->XRange->Min;
             m_zoomSpeedLimits.max = spaces->ContinuousZoomVelocitySpace[0]->XRange->Max;
-            result |= Qn::ContinuousZoomCapability;
+            nodeCapabilities |= Qn::ContinuousZoomCapability;
         }
     }
+    if(!spaces->AbsolutePanTiltPositionSpace.empty() && spaces->AbsolutePanTiltPositionSpace[0]) {
+        if(spaces->AbsolutePanTiltPositionSpace[0]->XRange) {
+            m_limits.minPan = spaces->AbsolutePanTiltPositionSpace[0]->XRange->Min;
+            m_limits.maxPan = spaces->AbsolutePanTiltPositionSpace[0]->XRange->Max;
+            nodeCapabilities |= Qn::AbsolutePanCapability;
+        }
+        if(spaces->AbsolutePanTiltPositionSpace[0]->YRange) {
+            m_limits.minTilt = spaces->AbsolutePanTiltPositionSpace[0]->YRange->Min;
+            m_limits.maxTilt = spaces->AbsolutePanTiltPositionSpace[0]->YRange->Max;
+            nodeCapabilities |= Qn::AbsoluteTiltCapability;
+        }
+    }
+    if(!spaces->AbsoluteZoomPositionSpace.empty() && spaces->AbsoluteZoomPositionSpace[0]) {
+        if(spaces->AbsoluteZoomPositionSpace[0]->XRange) {
+            m_limits.minFov = spaces->AbsoluteZoomPositionSpace[0]->XRange->Min;
+            m_limits.maxFov = spaces->AbsoluteZoomPositionSpace[0]->XRange->Max;
+            nodeCapabilities |= Qn::AbsoluteZoomCapability;
+        }
+    }
+
+    Qn::PtzCapabilities result = configCapabilities & nodeCapabilities;
+    if(result & Qn::AbsolutePtzCapabilities) {
+        result |= Qn::DevicePositioningPtzCapability;
+
+        if(nodeCapabilities & Qn::AbsolutePtzCapabilities)
+            result |= Qn::LimitsPtzCapability;
+    }
+        
     return result;
 }
 
-bool QnOnvifPtzController::readBuiltinPresets()
-{
-    if (m_ptzPresetsReady)
-        return true;
-    
+Qn::PtzCapabilities QnOnvifPtzController::initPresets() {
     QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
-        return false;
+        return Qn::NoPtzCapabilities;
 
     QAuthenticator auth = m_resource->getAuth();
     PtzSoapWrapper ptz(ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
@@ -147,19 +181,18 @@ bool QnOnvifPtzController::readBuiltinPresets()
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
     GetPresetsResp response;
     if (ptz.getPresets(request, response) != SOAP_OK)
-        return false;
+        return Qn::NoPtzCapabilities;
 
-    m_builtinPresets.clear();
-    foreach(onvifXsd__PTZPreset* preset, response.Preset) {
+    m_presetNameByToken.clear();
+    for(onvifXsd__PTZPreset *preset: response.Preset) {
         if (preset) {
             QString id = QString::fromStdString(*preset->token);
             QString name = fromLatinStdString(*preset->Name);
-            m_builtinPresets.insert(id, name);
+            m_presetNameByToken.insert(id, name);
         }
     }
     
-    m_ptzPresetsReady = true;
-    return true;
+    return Qn::PresetsPtzCapability;
 }
 
 Qn::PtzCapabilities QnOnvifPtzController::initContinuousFocus() {
@@ -177,30 +210,22 @@ Qn::PtzCapabilities QnOnvifPtzController::initContinuousFocus() {
     if (imaging.getMoveOptions(moveOptionsRequest, moveOptionsResponse) != SOAP_OK)
         return Qn::NoPtzCapabilities;
 
-    onvifXsd__MoveOptions20 *moveOptions = moveOptionsResponse.MoveOptions;
-    if(!moveOptions)
+    if(!moveOptionsResponse.MoveOptions || !moveOptionsResponse.MoveOptions->Continuous || !moveOptionsResponse.MoveOptions->Continuous->Speed)
         return Qn::NoPtzCapabilities;
-
-    onvifXsd__ContinuousFocusOptions *continuousFocusOptions = moveOptions->Continuous;
-    if(!continuousFocusOptions)
-        return Qn::NoPtzCapabilities;
-
-    onvifXsd__FloatRange *speedLimits = continuousFocusOptions->Speed;
-    if(!speedLimits)
-        return Qn::NoPtzCapabilities;
+    onvifXsd__FloatRange *speedLimits = moveOptionsResponse.MoveOptions->Continuous->Speed;
 
     m_focusSpeedLimits.min = speedLimits->Min;
     m_focusSpeedLimits.max = speedLimits->Max;
     return Qn::ContinuousFocusCapability;
 }
 
-Qn::PtzCapabilities QnOnvifPtzController::getCapabilities() {
-    return m_capabilities;
-}
-
 double QnOnvifPtzController::normalizeSpeed(qreal speed, const SpeedLimits &speedLimits) {
     speed *= speed >= 0 ? speedLimits.max : -speedLimits.min;
     return qBound(speedLimits.min, speed, speedLimits.max);
+}
+
+Qn::PtzCapabilities QnOnvifPtzController::getCapabilities() {
+    return m_capabilities;
 }
 
 bool QnOnvifPtzController::stopInternal() {
@@ -317,7 +342,7 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
     onvifPosition.Zoom = &onvifZoom;
 
     onvifXsd__Vector2D onvifPanTiltSpeed;
-    onvifPanTiltSpeed.x = speed;
+    onvifPanTiltSpeed.x = speed; // TODO: #Elric #PTZ do we need to adjust speed to speed limits here?
     onvifPanTiltSpeed.y = speed;
 
     onvifXsd__Vector1D onvifZoomSpeed;
@@ -348,106 +373,6 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
         return false;
     }
 
-    return true;
-}
-
-QString QnOnvifPtzController::getPresetToken(const QString &presetId)
-{
-    QString internalId = m_extIdToIntId.value(presetId);
-    if (!internalId.isEmpty())
-        return internalId;
-    else
-        return presetId;
-}
-
-QString QnOnvifPtzController::getPresetName(const QString &presetId)
-{
-    QString internalId = m_extIdToIntId.value(presetId);
-    if (internalId.isEmpty())
-        internalId = presetId;
-    return m_builtinPresets.value(internalId);
-}
-
-bool QnOnvifPtzController::removePreset(const QString &presetId)
-{
-    QString ptzUrl = m_resource->getPtzUrl();
-    if(ptzUrl.isEmpty())
-        return false;
-
-    QAuthenticator auth(m_resource->getAuth());
-    PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-
-    RemovePresetReq request;
-    RemovePresetResp response;
-    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
-    request.PresetToken = getPresetToken(presetId).toStdString();
-    if (ptz.removePreset(request, response) != SOAP_OK) {
-        qnWarning("Execution of PTZ remove preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
-        return false;
-    }
-
-    return true;
-}
-
-bool QnOnvifPtzController::getPresets(QnPtzPresetList *presets)
-{
-    if (!readBuiltinPresets())
-        return false;
-    for (auto itr = m_builtinPresets.begin(); itr != m_builtinPresets.end(); ++itr)
-        presets->push_back(QnPtzPreset(itr.key(), itr.value()));
-    return true;
-}
-
-bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed)
-{
-    QString ptzUrl = m_resource->getPtzUrl();
-    if(ptzUrl.isEmpty())
-        return false;
-
-    QAuthenticator auth(m_resource->getAuth());
-    PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-
-    GotoPresetReq request;
-    GotoPresetResp response;
-    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
-    request.PresetToken = getPresetToken(presetId).toStdString();
-
-    if (ptz.gotoPreset(request, response) != SOAP_OK) {
-        qnWarning("Execution of PTZ goto preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
-        return false;
-    }
-
-    return true;
-}
-
-bool QnOnvifPtzController::updatePreset(const QnPtzPreset &preset)
-{
-    return createPreset(preset);
-}
-
-bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset)
-{
-    QString ptzUrl = m_resource->getPtzUrl();
-    if(ptzUrl.isEmpty())
-        return false;
-
-    QAuthenticator auth(m_resource->getAuth());
-    PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-
-    SetPresetReq request;
-    SetPresetResp response;
-    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
-    std::string stdPresetName = toLatinStdString(preset.name);
-    request.PresetName = &stdPresetName;
-
-    if (ptz.setPreset(request, response) != SOAP_OK) {
-        qnWarning("Execution of PTZ create preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
-        return false;
-    }
-
-    QString token = QString::fromStdString(response.PresetToken);
-    m_extIdToIntId.insert(preset.id, token);
-    m_builtinPresets.insert(token, preset.name);
     return true;
 }
 
@@ -499,4 +424,107 @@ bool QnOnvifPtzController::getFlip(Qt::Orientations *flip) {
     return true;
 }
 
-#endif //ENABLE_ONVIF
+QString QnOnvifPtzController::presetToken(const QString &presetId) {
+    QString internalId = m_presetTokenById.value(presetId);
+    if (!internalId.isEmpty())
+        return internalId;
+    else
+        return presetId;
+}
+
+QString QnOnvifPtzController::presetName(const QString &presetId) {
+    QString internalId = m_presetTokenById.value(presetId);
+    if (internalId.isEmpty())
+        internalId = presetId;
+    return m_presetNameByToken.value(internalId);
+}
+
+bool QnOnvifPtzController::removePreset(const QString &presetId) {
+    QString ptzUrl = m_resource->getPtzUrl();
+    if(ptzUrl.isEmpty())
+        return false;
+
+    QAuthenticator auth(m_resource->getAuth());
+    PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+
+    RemovePresetReq request;
+    RemovePresetResp response;
+    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    request.PresetToken = presetToken(presetId).toStdString();
+    if (ptz.removePreset(request, response) != SOAP_OK) {
+        qnWarning("Execution of PTZ remove preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
+        return false;
+    }
+
+    return true;
+}
+
+bool QnOnvifPtzController::getPresets(QnPtzPresetList *presets) {
+    for (auto itr = m_presetNameByToken.begin(); itr != m_presetNameByToken.end(); ++itr)
+        presets->push_back(QnPtzPreset(itr.key(), itr.value()));
+    return true;
+}
+
+bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed) {
+    QString ptzUrl = m_resource->getPtzUrl();
+    if(ptzUrl.isEmpty())
+        return false;
+
+    QAuthenticator auth(m_resource->getAuth());
+    PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+
+    onvifXsd__Vector2D onvifPanTiltSpeed;
+    onvifPanTiltSpeed.x = speed; // TODO: #Elric #PTZ do we need to adjust speed to speed limits here?
+    onvifPanTiltSpeed.y = speed;
+
+    onvifXsd__Vector1D onvifZoomSpeed;
+    onvifZoomSpeed.x = speed;
+
+    onvifXsd__PTZSpeed onvifSpeed;
+    onvifSpeed.PanTilt = &onvifPanTiltSpeed;
+    onvifSpeed.Zoom = &onvifZoomSpeed;
+
+    GotoPresetReq request;
+    GotoPresetResp response;
+    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    request.PresetToken = presetToken(presetId).toStdString();
+    request.Speed = &onvifSpeed;
+
+    if (ptz.gotoPreset(request, response) != SOAP_OK) {
+        qnWarning("Execution of PTZ goto preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
+        return false;
+    }
+
+    return true;
+}
+
+bool QnOnvifPtzController::updatePreset(const QnPtzPreset &preset) {
+    return createPreset(preset); // TODO: #Elric #PTZ wrong, update does not create new preset, and does not change saved position
+}
+
+bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset) {
+    QString ptzUrl = m_resource->getPtzUrl();
+    if(ptzUrl.isEmpty())
+        return false;
+
+    QAuthenticator auth(m_resource->getAuth());
+    PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+
+    SetPresetReq request;
+    SetPresetResp response;
+    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    std::string stdPresetName = toLatinStdString(preset.name);
+    request.PresetName = &stdPresetName;
+
+    if (ptz.setPreset(request, response) != SOAP_OK) {
+        qnWarning("Execution of PTZ create preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
+        return false;
+    }
+
+    QString token = QString::fromStdString(response.PresetToken);
+    m_presetTokenById.insert(preset.id, token);
+    m_presetNameByToken.insert(token, preset.name);
+    return true;
+}
+
+#endif // ENABLE_ONVIF

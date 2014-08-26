@@ -67,7 +67,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
     QAuthenticator auth;
     auth.setUser(QLatin1String("admin"));
 
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (rt.isNull())
         return;
 
@@ -87,7 +87,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
         bool needHttpData = true;
 
         QnPlVmax480ResourcePtr existsRes = qnResPool->getResourceByUniqId(uniqId).dynamicCast<QnPlVmax480Resource>();
-        if (existsRes && (existsRes->getStatus() == QnResource::Online || existsRes->getStatus() == QnResource::Recording)) 
+        if (existsRes && (existsRes->getStatus() == Qn::Online || existsRes->getStatus() == Qn::Recording)) 
         {
             resource->setName(existsRes->getName());
             int existHttpPort = QUrlQuery(QUrl(existsRes->getUrl()).query()).queryItemValue(lit("http_port")).toInt();
@@ -131,7 +131,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
     }
 }
 
-QnResourcePtr QnPlVmax480ResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnPlVmax480ResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -306,7 +306,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
             if (existsRes)
                 break;
         }
-        if (existsRes && (existsRes->getStatus() == QnResource::Online || existsRes->getStatus() == QnResource::Recording)) {
+        if (existsRes && (existsRes->getStatus() == Qn::Online || existsRes->getStatus() == Qn::Recording)) {
             channels = extractChannelCount(existsRes->getModel().toUtf8()); // avoid real requests
             QUrl url(existsRes->getUrl());
             apiPort = url.port(VMAX_API_PORT);
@@ -349,7 +349,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
 
     QString baseName = QString(QLatin1String("DW-VF")) + QString::number(channels);
 
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), baseName);
+    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), baseName);
     if (rt.isNull())
         return result;
 

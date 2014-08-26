@@ -3,10 +3,13 @@
 
 #include <QUuid>
 #include <QtCore/QObject>
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
 
 #include <utils/common/singleton.h>
 #include <utils/common/instance_storage.h>
 #include <utils/common/software_version.h>
+#include <utils/network/module_information.h>
 #include "nx_ec/data/api_runtime_data.h"
 
 class QnSessionManager;
@@ -37,6 +40,9 @@ public:
     void setModuleGUID(const QUuid& guid) { m_uuid = guid; }
     QUuid moduleGUID() const{ return m_uuid; }
 
+    void setObsoleteServerGuid(const QUuid& guid) { m_obsoleteUuid = guid; }
+    QUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
+    
     void setRemoteGUID(const QUuid& guid) {
         QMutexLocker lock(&m_mutex);
         m_remoteUuid = guid; 
@@ -50,8 +56,8 @@ public:
     void setModuleUlr(const QUrl& url) { m_url = url; }
 
     void setLocalSystemName(const QString& value);
-    QString localSystemName() { return m_localSystemName; }
-    QByteArray getSystemPassword() { return "{61D85D22-E7AA-44EC-B5EC-1BEAC9FE19C5}"; }
+    QString localSystemName() const;
+    QByteArray getSystemPassword() const { return "{61D85D22-E7AA-44EC-B5EC-1BEAC9FE19C5}"; }
 
     void setDefaultAdminPassword(const QString& password) { m_defaultAdminPassword = password; }
     QString defaultAdminPassword() const { return m_defaultAdminPassword; }
@@ -61,6 +67,9 @@ public:
 
     QnSoftwareVersion engineVersion() const;
     void setEngineVersion(const QnSoftwareVersion &version);
+
+    void setModuleInformation( const QnModuleInformation& moduleInformation );
+    QnModuleInformation moduleInformation() const;
 
 signals:
     void systemNameChanged(const QString &systemName);
@@ -74,10 +83,12 @@ private:
     QString m_localSystemName;
     QString m_defaultAdminPassword;
     QUuid m_uuid;
+    QUuid m_obsoleteUuid;
     QUuid m_remoteUuid;
     QUrl m_url;
     bool m_cloudMode;
     QnSoftwareVersion m_engineVersion;
+    QnModuleInformation m_moduleInformation;
     mutable QMutex m_mutex;
 };
 

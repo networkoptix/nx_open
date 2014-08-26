@@ -103,11 +103,19 @@ public:
     bool isFullScreen() const;
     bool isZoomWindow() const;
     void setFullScreen(bool fullScreen);
+
+    bool isFisheyeEnabled() const;
+    void setFisheyeEnabled(bool fisheyeEnabled);
+
     int getAvarageFps() const;
     virtual bool isBuffering() const override;
 
     qreal overridenAspectRatio() const;
     void setOverridenAspectRatio(qreal aspectRatio);
+
+    const QSize& getRawDataSize() const {
+        return m_display[0]->getRawDataSize();
+    }
 
 public slots:
     void onBeforeJump(qint64 time);
@@ -242,6 +250,7 @@ protected:
     bool m_doNotChangeDisplayTime;
     bool m_firstLivePacket;
     bool m_multiView;
+    bool m_fisheyeEnabled;
 };
 
 #endif //QN_CAM_DISPLAY_H

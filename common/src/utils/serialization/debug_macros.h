@@ -1,5 +1,5 @@
-#ifndef QN_SERIALIZATION_DEBUG_H
-#define QN_SERIALIZATION_DEBUG_H
+#ifndef QN_SERIALIZATION_DEBUG_MACROS_H
+#define QN_SERIALIZATION_DEBUG_MACROS_H
 
 #include <utils/fusion/fusion.h>
 
@@ -54,4 +54,4 @@ __VA_ARGS__ QDebug &operator<<(QDebug &stream, const TYPE &value) {             
 }
 
 
-#endif // QN_SERIALIZATION_DEBUG_H
+#endif // QN_SERIALIZATION_DEBUG_MACROS_H

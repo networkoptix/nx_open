@@ -24,13 +24,13 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
 
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
-        UDPSocket socket;
+        std::unique_ptr<AbstractDatagramSocket> socket( SocketFactory::createDatagramSocket() );
 
-        if (!socket.setLocalAddressAndPort(iface.address.toString(), 0))
+        if( !socket->bind( iface.address.toString(), 0 ) )
             continue;
 
         QString groupAddress(QLatin1String("224.111.111.1"));
-        if (!socket.joinGroup(groupAddress, iface.address.toString())) 
+        if (!socket->joinGroup(groupAddress, iface.address.toString())) 
             continue;
 
         QByteArray requestDatagram;
@@ -41,17 +41,17 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
         requestDatagram.insert(13, QByteArray("127.0.0.1"));
         requestDatagram.resize(43);
 
-        socket.sendTo(requestDatagram.data(), requestDatagram.size(), groupAddress, 6789);
+        socket->sendTo(requestDatagram.data(), requestDatagram.size(), groupAddress, 6789);
 
         QnSleep::msleep(150);
-        while(socket.hasData())
+        while(socket->hasData())
         {
             QByteArray reply;
             reply.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
             QString sender;
             quint16 senderPort;
-            int readed = socket.recvFrom(reply.data(), reply.size(), sender, senderPort);
+            int readed = socket->recvFrom(reply.data(), reply.size(), sender, senderPort);
             if (readed < 1)
                 continue;
                         
@@ -64,7 +64,7 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
             }
 
         }
-        socket.leaveGroup(groupAddress);
+        socket->leaveGroup( groupAddress );
     }
 
     

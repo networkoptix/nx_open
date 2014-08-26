@@ -209,7 +209,7 @@ QnConstCompressedAudioDataPtr QnVideoCameraGopKeeper::getLastAudioFrame() const
 void QnVideoCameraGopKeeper::updateCameraActivity()
 {
     qint64 usecTime = getUsecTimer();
-    if (!m_resource->hasFlags(QnResource::foreigner) && m_resource->isInitialized() &&
+    if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() &&
        (!m_lastKeyFrame || qnSyncTime->currentUSecsSinceEpoch() - m_lastKeyFrame->timestamp > CAMERA_UPDATE_INTERNVAL))
     {
         if (!m_activityStarted && usecTime > m_nextMinTryTime) {
@@ -241,8 +241,7 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
 QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
 :
     m_resource(resource),
-    //m_hlsInactivityPeriodMS( MSSettings::roSettings()->value( nx_ms_conf::HLS_INACTIVITY_PERIOD, nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC )
-    m_hlsInactivityPeriodMS( 10 * MSEC_PER_SEC )
+    m_hlsInactivityPeriodMS( MSSettings::roSettings()->value( nx_ms_conf::HLS_INACTIVITY_PERIOD, nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC )
 {
     m_primaryGopKeeper = 0;
     m_secondaryGopKeeper = 0;
@@ -314,7 +313,7 @@ void QnVideoCamera::at_camera_resourceChanged()
 void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 {
     const bool primaryLiveStream = catalog == QnServer::HiQualityCatalog;
-    const QnResource::ConnectionRole role = primaryLiveStream ? QnResource::Role_LiveVideo : QnResource::Role_SecondaryLiveVideo;
+    const Qn::ConnectionRole role = primaryLiveStream ? Qn::CR_LiveVideo : Qn::CR_SecondaryLiveVideo;
 
 	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
 	
@@ -333,7 +332,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 				delete dataProvider;
 			} else
 			{
-				if ( role ==  QnResource::Role_LiveVideo )
+				if ( role ==  Qn::CR_LiveVideo )
 					connect(reader->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
 					
 				QnVideoCameraGopKeeper* gopKeeper = new QnVideoCameraGopKeeper(this, m_resource, catalog);
@@ -420,7 +419,7 @@ void QnVideoCamera::notInUse(void* user)
 
 bool QnVideoCamera::isSomeActivity() const
 {
-    return !m_cameraUsers.isEmpty() && !m_resource->hasFlags(QnResource::foreigner);
+    return !m_cameraUsers.isEmpty() && !m_resource->hasFlags(Qn::foreigner);
 }
 
 void QnVideoCamera::updateActivity()
@@ -440,7 +439,7 @@ void QnVideoCamera::stopIfNoActivity()
     if( (m_liveCache[MEDIA_Quality_High] || m_liveCache[MEDIA_Quality_Low])     //has live cache ever been started?
         &&
         (!m_liveCache[MEDIA_Quality_High] ||                                    //has hi quality live cache been started?
-            (m_hlsLivePlaylistManager[MEDIA_Quality_High].unique() &&
+            (m_hlsLivePlaylistManager[MEDIA_Quality_High].unique() &&           //no one uses playlist
              m_hlsLivePlaylistManager[MEDIA_Quality_High]->inactivityPeriod() > m_hlsInactivityPeriodMS &&  //checking inactivity timer
              m_liveCache[MEDIA_Quality_High]->inactivityPeriod() > m_hlsInactivityPeriodMS))
         &&
@@ -535,7 +534,7 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, qint64 t
 
 QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCatalog catalog)
 {
-    if (!m_resource->hasFlags(QnResource::foreigner) && m_resource->isInitialized()) 
+    if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized()) 
     {
         if( (catalog == QnServer::HiQualityCatalog && m_primaryReader == 0) ||
             (catalog == QnServer::LowQualityCatalog && m_secondaryReader == 0) )

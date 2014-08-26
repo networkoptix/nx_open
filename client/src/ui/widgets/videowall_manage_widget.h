@@ -32,6 +32,13 @@ public:
     void loadFromResource(const QnVideoWallResourcePtr &videowall);
     void submitToResource(const QnVideoWallResourcePtr &videowall); 
 
+    virtual QSize minimumSizeHint() const;
+    /** Count of videowall items that is proposed to be on this PC. */	
+    int proposedItemsCount() const;
+
+signals:
+    void itemsChanged();
+
 protected:
     Q_DECLARE_PRIVATE(QnVideowallManageWidget);
 

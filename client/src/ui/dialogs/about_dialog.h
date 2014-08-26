@@ -3,17 +3,17 @@
 
 #include <QtCore/QScopedPointer>
 
-#include <ui/dialogs/button_box_dialog.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
     class AboutDialog;
 }
 
-class QnAboutDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware {
+class QnAboutDialog : public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
 
-    typedef QnButtonBoxDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 public:
     explicit QnAboutDialog(QWidget *parent = 0);
     virtual ~QnAboutDialog();
@@ -26,6 +26,8 @@ protected slots:
 
 private:
     void retranslateUi();
+
+    QString connectedServers() const;
 
 private:
     QScopedPointer<Ui::AboutDialog> ui;

@@ -67,10 +67,10 @@ QnSignHelper::QnSignHelper():
         m_hwIdStr = tr("Unknown");
 
     QList<QnLicensePtr> list = qnLicensePool->getLicenses();
-    m_licensedToStr = tr("FREE license");
+    m_licensedToStr = tr("Trial license");
     foreach (QnLicensePtr license, list)
     {
-        if (license->type() != QnLicense::FreeLicense)
+        if (license->type() != Qn::LC_Trial)
             m_licensedToStr = license->name();
     }
 }

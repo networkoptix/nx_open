@@ -21,10 +21,14 @@
 #include <QFileInfo>
 #include <QByteArray>
 
+#include <utils/common/log.h>
+
 
 /* [1] Constructors and destructors */
 
-SmtpClient::SmtpClient(const QString & host, int port, ConnectionType connectionType) :
+SmtpClient::SmtpClient(const QString & host, int port, ConnectionType connectionType)
+:
+    m_socket(nullptr),
     name(lit("localhost")),
     authMethod(AuthPlain),
     connectionTimeout(5000),
@@ -36,12 +40,12 @@ SmtpClient::SmtpClient(const QString & host, int port, ConnectionType connection
     this->host = host;
     this->port = port;
 
-    connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
-            this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
-            this, SLOT(socketError(QAbstractSocket::SocketError)));
-    connect(socket, SIGNAL(readyRead()),
-            this, SLOT(socketReadyRead()));
+    //connect(m_socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
+    //        this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
+    //connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)),
+    //        this, SLOT(socketError(QAbstractSocket::SocketError)));
+    //connect(m_socket, SIGNAL(readyRead()),
+    //        this, SLOT(socketReadyRead()));
 }
 
 SmtpClient::~SmtpClient() {}
@@ -80,15 +84,8 @@ void SmtpClient::setConnectionType(ConnectionType ct)
 {
     this->connectionType = ct;
 
-    switch (connectionType)
-    {
-    case TcpConnection:
-        socket = new QTcpSocket(this);
-        break;
-    case SslConnection:
-    case TlsConnection:
-        socket = new QSslSocket(this);
-    }
+    m_lineSpliter.reset();
+    m_socket = SocketFactory::createStreamSocket( connectionType == SslConnection || connectionType == TlsConnection );
 }
 
 const QString& SmtpClient::getHost() const
@@ -141,10 +138,6 @@ int SmtpClient::getResponseCode() const
     return responseCode;
 }
 
-QTcpSocket* SmtpClient::getSocket() {
-    return socket;
-}
-
 int SmtpClient::getConnectionTimeout() const
 {
     return connectionTimeout;
@@ -164,10 +157,12 @@ void SmtpClient::setResponseTimeout(int msec)
 {
     responseTimeout = msec;
 }
+
 int SmtpClient::getSendMessageTimeout() const
 {
   return sendMessageTimeout;
 }
+
 void SmtpClient::setSendMessageTimeout(int msec)
 {
   sendMessageTimeout = msec;
@@ -182,21 +177,22 @@ bool SmtpClient::connectToHost()
 {
     switch (connectionType)
     {
-    case TlsConnection:
-    case TcpConnection:
-        socket->connectToHost(host, port);
-        break;
-    case SslConnection:
-        ((QSslSocket*) socket)->connectToHostEncrypted(host, port);
-        break;
+        case SslConnection:
+        case TcpConnection:
+            if( !m_socket->connect( host, port, connectionTimeout ) )
+            {
+                emit smtpError( ConnectionTimeoutError );
+                return false;
+            }
+            break;
 
-    }
-
-    // Tries to connect to server
-    if (!socket->waitForConnected(connectionTimeout))
-    {
-        emit smtpError(ConnectionTimeoutError);
-        return false;
+        case TlsConnection:
+            if( !static_cast<AbstractEncryptedStreamSocket*>(m_socket)->connectWithoutEncryption( host, port, connectionTimeout ) )
+            {
+                emit smtpError( ConnectionTimeoutError );
+                return false;
+            }
+            break;
     }
 
     try
@@ -238,13 +234,19 @@ bool SmtpClient::connectToHost()
                 return false;
             };
 
-            ((QSslSocket*) socket)->startClientEncryption();
-
-            if (!((QSslSocket*) socket)->waitForEncrypted(connectionTimeout)) {
-                qDebug() << ((QSslSocket*) socket)->errorString();
+            if( !static_cast<AbstractEncryptedStreamSocket*>(m_socket)->enableClientEncryption() )
+            {
+                //qDebug() << ((QSslSocket*) socket)->errorString();
                 emit smtpError(ConnectionTimeoutError);
                 return false;
             }
+            //((QSslSocket*) socket)->startClientEncryption();
+
+            //if (!((QSslSocket*) socket)->waitForEncrypted(connectionTimeout)) {
+            //    qDebug() << ((QSslSocket*) socket)->errorString();
+            //    emit smtpError(ConnectionTimeoutError);
+            //    return false;
+            //}
 
             // Send ELHO one more time
             sendMessage(lit("EHLO ") + name);
@@ -325,7 +327,7 @@ bool SmtpClient::login(const QString &user, const QString &password, AuthMethod 
             }
         }
     }
-    catch (ResponseTimeoutException e)
+    catch (ResponseTimeoutException )
     {
         // Responce Timeout exceeded
         emit smtpError(AuthenticationFailedError);
@@ -423,35 +425,82 @@ void SmtpClient::quit()
 
 void SmtpClient::waitForResponse()
 {
-    do {
-        if (!socket->waitForReadyRead(responseTimeout))
+    QByteArray readBuffer;
+    readBuffer.reserve( 4*1024 );
+    
+    for( int bufPos = 0;; )
+    {
+        nx_http::ConstBufferRefType lineBufferRef;
+        size_t bytesParsed = 0;
+        assert( bufPos <= readBuffer.size() );
+        if( bufPos == readBuffer.size() ||
+            !m_lineSpliter.parseByLines(
+                nx_http::ConstBufferRefType( readBuffer, bufPos, readBuffer.size() ),
+                &lineBufferRef,
+                &bytesParsed ) )
         {
-            emit smtpError(ResponseTimeoutError);
-            throw ResponseTimeoutException();
+            readBuffer.resize( readBuffer.capacity() );
+            const int bytesRead = m_socket->recv( readBuffer.data(), readBuffer.size() );
+            if( bytesRead <= 0 )
+            {
+                NX_LOG( lit( "Error receiving data from SMTP server %1. %2" ).arg( m_socket->getForeignAddress().toString() ).
+                    arg( bytesRead == 0 ? lit( "Connection closed" ) : SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+                emit smtpError( ResponseTimeoutError );
+                throw ResponseTimeoutException();
+            }
+            readBuffer.resize( bytesRead );
+            bufPos = 0;
+            continue;
         }
 
-        while (socket->canReadLine()) {
-            // Save the server's response
-            responseText = QLatin1String(socket->readLine());
+        bufPos += bytesParsed;
 
-            // Extract the respose code from the server's responce (first 3 digits)
-            responseCode = responseText.left(3).toInt();
+        // Save the server's response
+        responseText = QLatin1String( lineBufferRef.toByteArrayWithRawData() );
 
-            if (responseCode / 100 == 4)
-                emit smtpError(ServerError);
+        // Extract the respose code from the server's responce (first 3 digits)
+        responseCode = responseText.left( 3 ).toInt();
 
-            if (responseCode / 100 == 5)
-                emit smtpError(ClientError);
+        if( responseCode / 100 == 4 )
+            emit smtpError( ServerError );
 
-            if (responseText[3] == QLatin1Char(' ')) { return; }
-        }
+        if( responseCode / 100 == 5 )
+            emit smtpError( ClientError );
+
+        if( responseText[3] == QLatin1Char( ' ' ) ) { return; }
+
+        
+
+        //if (!m_socket->waitForReadyRead(responseTimeout))
+        //{
+        //    emit smtpError(ResponseTimeoutError);
+        //    throw ResponseTimeoutException();
+        //}
+
+        //while (m_socket->canReadLine()) {
+        //    // Save the server's response
+        //    responseText = QLatin1String(m_socket->readLine());
+
+        //    // Extract the respose code from the server's responce (first 3 digits)
+        //    responseCode = responseText.left(3).toInt();
+
+        //    if (responseCode / 100 == 4)
+        //        emit smtpError(ServerError);
+
+        //    if (responseCode / 100 == 5)
+        //        emit smtpError(ClientError);
+
+        //    if (responseText[3] == QLatin1Char(' ')) { return; }
+        //}
     } while (true);
 }
 
 void SmtpClient::sendMessage(QString text)
 {
-    socket->write(text.toUtf8() + "\r\n");
-    if (! socket->waitForBytesWritten(sendMessageTimeout))
+    const int bytesSent = m_socket->send( text.toUtf8() + "\r\n" );
+    if( bytesSent == -1 )
+    //m_socket->write(text.toUtf8() + "\r\n");
+    //if (! m_socket->waitForBytesWritten(sendMessageTimeout))
     {
       emit smtpError(SendDataTimeoutError);
       throw SendMessageTimeoutException();
@@ -461,19 +510,19 @@ void SmtpClient::sendMessage(QString text)
 /* [4] --- */
 
 
-/* [5] Slots for the socket's signals */
+/* [5] Slots for the m_socket's signals */
 
-void SmtpClient::socketStateChanged(QAbstractSocket::SocketState )
-{
-}
-
-void SmtpClient::socketError(QAbstractSocket::SocketError )
-{
-}
-
-void SmtpClient::socketReadyRead()
-{
-}
+//void SmtpClient::socketStateChanged(QAbstractSocket::SocketState )
+//{
+//}
+//
+//void SmtpClient::socketError(QAbstractSocket::SocketError )
+//{
+//}
+//
+//void SmtpClient::socketReadyRead()
+//{
+//}
 
 /* [5] --- */
 

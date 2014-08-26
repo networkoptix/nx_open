@@ -14,8 +14,8 @@
 
 class QnVideowallManageWidget;
 
-class QnVideowallManageWidgetPrivate : private QnGeometry {
-    Q_DECLARE_TR_FUNCTIONS(QnVideowallManageWidgetPrivate);
+class QnVideowallManageWidgetPrivate : public QObject, private QnGeometry {
+    Q_OBJECT
 public:
     QnVideowallManageWidgetPrivate(QnVideowallManageWidget* q);
 
@@ -37,6 +37,12 @@ public:
     void dragEndAt(const QPoint &pos);
 
     void tick(int deltaMSecs);
+
+    /** Count of videowall items that is proposed to be on this PC. */
+    int proposedItemsCount() const;
+
+signals:
+    void itemsChanged();
 
 public:
     enum ItemTransformation {

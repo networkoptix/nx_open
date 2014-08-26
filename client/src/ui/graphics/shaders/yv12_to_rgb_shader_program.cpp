@@ -1,7 +1,7 @@
 #include "yv12_to_rgb_shader_program.h"
 
 QnAbstractYv12ToRgbShaderProgram::QnAbstractYv12ToRgbShaderProgram(const QGLContext *context, QObject *parent):
-    QnAbstractBaseGLShaderProgramm(context, parent),
+    QnGLShaderProgram(context, parent),
     m_wasLinked(false)
 {
     addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
@@ -21,7 +21,7 @@ QnAbstractYv12ToRgbShaderProgram::QnAbstractYv12ToRgbShaderProgram(const QGLCont
 
 bool QnAbstractYv12ToRgbShaderProgram::link()
 {
-    m_wasLinked = QnAbstractBaseGLShaderProgramm::link();
+    m_wasLinked = QnGLShaderProgram::link();
     if (m_wasLinked) {
         m_yTextureLocation = uniformLocation("yTexture");
         m_uTextureLocation = uniformLocation("uTexture");
@@ -153,6 +153,7 @@ QString QnFisheyeRectilinearProgram::getShaderText()
     uniform float yGamma;
     uniform float maxX;
     uniform float maxY;
+    uniform float xStretch;
 
     const float PI = 3.1415926535;
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
@@ -164,7 +165,7 @@ QString QnFisheyeRectilinearProgram::getShaderText()
 
     // avoid function call for better shader compatibility
     vec3 xVect  = vec3(sin(xShift + PI/2.0), cos(xShift + PI/2.0), 0.0) * kx; 
-    vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx;
+    vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx / xStretch;
     vec3 center = vec3(cos(-yShift) * sin(xShift), cos(-yShift)*cos(xShift), sin(-yShift));
 
     mat3 to3d = mat3(xVect.x,   yVect.x,    center.x,    
@@ -238,6 +239,7 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
     uniform float yGamma;
     uniform float maxX;
     uniform float maxY;
+    uniform float xStretch;
 
     const float PI = 3.1415926535;
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
@@ -249,8 +251,8 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         vec3(0.0, cos(-fovRot), -sin(-fovRot)),
         vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
-    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
+    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY));
+    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor ) + vec2(xShift, 0.0);
 
     vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
@@ -329,6 +331,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
     uniform float yGamma;
     uniform float maxX;
     uniform float maxY;
+    uniform float xStretch;
 
     const float PI = 3.1415926535;
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
@@ -340,8 +343,8 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         vec3(0.0, cos(-fovRot), -sin(-fovRot)),
         vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
-    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
+    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY));
+    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor ) + vec2(xShift, 0.0);
 
     vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
@@ -392,7 +395,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
 // ------------------------- QnAbstractRGBAShaderProgram ------------------------------
 
 QnAbstractRGBAShaderProgram::QnAbstractRGBAShaderProgram(const QGLContext *context, QObject *parent, bool final):
-    QnAbstractBaseGLShaderProgramm(context, parent) 
+    QnGLShaderProgram(context, parent) 
 {
     addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
     attribute vec4 aPosition;
@@ -411,7 +414,7 @@ QnAbstractRGBAShaderProgram::QnAbstractRGBAShaderProgram(const QGLContext *conte
 
 bool QnAbstractRGBAShaderProgram::link()
 {
-    bool rez = QnAbstractBaseGLShaderProgramm::link();
+    bool rez = QnGLShaderProgram::link();
     if (rez) {
         m_rgbaTextureLocation = uniformLocation("rgbaTexture");
         m_opacityLocation = uniformLocation("opacity");
@@ -445,6 +448,7 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
     uniform float radius;
     uniform float maxX;
     uniform float maxY;
+    uniform float xStretch;
 
     const float PI = 3.1415926535;
 
@@ -452,7 +456,7 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
 
     // avoid function call for better shader compatibility
     vec3 xVect  = vec3(sin(xShift + PI/2.0), cos(xShift + PI/2.0), 0.0) * kx; 
-    vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx;
+    vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx / xStretch;
     vec3 center = vec3(cos(-yShift) * sin(xShift), cos(-yShift)*cos(xShift), sin(-yShift));
 
     mat3 to3d = mat3(xVect.x,   yVect.x,    center.x,    
@@ -516,6 +520,7 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
     uniform float radius;
     uniform float maxX;
     uniform float maxY;
+    uniform float xStretch;
 
     const float PI = 3.1415926535;
 
@@ -523,8 +528,8 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
         vec3(0.0, cos(-fovRot), -sin(-fovRot)),
         vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
-    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
+    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY));
+    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor) + vec2(xShift, 0.0);
 
     vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
@@ -593,6 +598,7 @@ QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
     uniform float radius;
     uniform float maxX;
     uniform float maxY;
+    uniform float xStretch;
 
     const float PI = 3.1415926535;
 
@@ -600,8 +606,8 @@ QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
         vec3(0.0, cos(-fovRot), -sin(-fovRot)),
         vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
-    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
+    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY));
+    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor) + vec2(xShift, 0.0);
 
     vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);

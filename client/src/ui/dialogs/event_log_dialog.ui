@@ -265,7 +265,7 @@
        <item>
         <widget class="QLabel" name="warningLabel">
          <property name="text">
-          <string>All media servers are offline. Logs are not available.</string>
+          <string>All Servers are offline. Logs are not available.</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

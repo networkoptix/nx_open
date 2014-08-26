@@ -3,7 +3,7 @@
 #include "shader_source.h"
 
 QnTextureTransitionShaderProgram::QnTextureTransitionShaderProgram(const QGLContext *context, QObject *parent)
-    : QnTextureColorGLShaderProgramm(context,parent)
+    : QnTextureGLShaderProgram(context,parent)
 {
     compile();
 }

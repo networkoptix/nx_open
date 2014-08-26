@@ -1,7 +1,7 @@
 CREATE TABLE "storage_data" (
-    unique_id   VARCHAR(64) NOT NULL,           -- TODO: #vasilenko change to guid BLOB(16)
-	role        INTEGER  NOT NULL,
-	start_time  INTEGER  NOT NULL,
+    unique_id   TEXT NOT NULL,                          -- unique id of the related camera resource
+    role        INTEGER  NOT NULL,
+    start_time  INTEGER  NOT NULL,
     timezone    INTEGER  NOT NULL,
     file_index  INTEGER  NOT NULL, 
     duration    INTEGER,

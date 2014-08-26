@@ -15,7 +15,7 @@ namespace Qn {
         RootNode,               /**< Root node for the tree. */
         LocalNode,              /**< Root node for local resources. */
         ServersNode,            /**< Root node for remote resources. */
-        OtherSystemsNode,/**< Root node for remote resources wich are incompatible with current system and cannot be used. */
+        OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
         UsersNode,              /**< Root node for user resources. */
 
         BastardNode,            /**< Root node for hidden resources. */
@@ -106,13 +106,13 @@ namespace Qn {
 
     /**
      * Flags describing the differences between instances of the same resource
-     * on the client and on the enterprise controller.
+     * on the client and on the Server.
      */
     enum ResourceSavingFlag {
-        /** Resource is local and has never been saved to EC. */
+        /** Resource is local and has never been saved to Server. */
         ResourceIsLocal = 0x1,
 
-        /** Resource is currently being saved to EC. */
+        /** Resource is currently being saved to Server. */
         ResourceIsBeingSaved = 0x2,
 
         /** Unsaved changes are present in the resource. */
@@ -177,6 +177,7 @@ namespace Qn {
         UnauthorizedOverlay,
         OfflineOverlay,
         AnalogWithoutLicenseOverlay,
+        VideowallWithoutLicenseOverlay,
         ServerOfflineOverlay,
 
         OverlayCount

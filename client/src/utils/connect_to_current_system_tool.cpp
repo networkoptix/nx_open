@@ -20,11 +20,12 @@ namespace {
     };
 }
 
-QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QObject *parent) :
+QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *context, QObject *parent) :
     QObject(parent),
+    QnWorkbenchContextAware(context),
     m_running(false),
     m_configureTask(new QnConfigurePeerTask(this)),
-    m_updateDialog(new QnUpdateDialog())
+    m_updateDialog(new QnUpdateDialog(context))
 {
     m_updateTool = m_updateDialog->updateTool();
 
@@ -35,7 +36,7 @@ QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QObject *parent) :
 
 QnConnectToCurrentSystemTool::~QnConnectToCurrentSystemTool() {}
 
-void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QnId> &targets, const QString &password) {
+void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QUuid> &targets, const QString &password) {
     if (m_running)
         return;
 
@@ -51,6 +52,10 @@ bool QnConnectToCurrentSystemTool::isRunning() const {
     return m_running;
 }
 
+QSet<QUuid> QnConnectToCurrentSystemTool::targets() const {
+    return m_targets;
+}
+
 void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode) {
     m_running = false;
     m_updateDialog->hide();
@@ -64,7 +69,7 @@ void QnConnectToCurrentSystemTool::configureServer() {
         return;
     }
 
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::user)) {
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
         QnUserResourcePtr user = resource.staticCast<QnUserResource>();
         if (user->getName() == lit("admin")) {
             m_configureTask->setPasswordHash(user->getHash(), user->getDigest());
@@ -72,7 +77,7 @@ void QnConnectToCurrentSystemTool::configureServer() {
         }
     }
 
-    foreach (const QnId &id, m_targets) {
+    foreach (const QUuid &id, m_targets) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
@@ -99,7 +104,8 @@ void QnConnectToCurrentSystemTool::updatePeers() {
     m_updateDialog->setTargets(m_updateTargets);
     m_updateDialog->show();
     m_prevToolState = CheckingForUpdates;
-    m_updateTool->checkForUpdates(qnCommon->engineVersion());
+    m_updateTool->setDenyMajorUpdates(true);
+    m_updateTool->checkForUpdates();
 }
 
 void QnConnectToCurrentSystemTool::revertApiUrls() {
@@ -113,7 +119,7 @@ void QnConnectToCurrentSystemTool::revertApiUrls() {
     m_oldUrls.clear();
 }
 
-void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, const QSet<QnId> &failedPeers) {
+void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, const QSet<QUuid> &failedPeers) {
     revertApiUrls();
 
     if (errorCode != 0) {
@@ -124,12 +130,12 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
         return;
     }
 
-    foreach (const QnId &id, m_targets - failedPeers) {
+    foreach (const QUuid &id, m_targets - failedPeers) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 
-        if (server->getVersion() != qnCommon->engineVersion())
+        if (!isCompatible(server->getVersion(), qnCommon->engineVersion()))
             m_updateTargets.insert(id);
     }
 

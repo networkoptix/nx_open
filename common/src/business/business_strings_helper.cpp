@@ -11,6 +11,7 @@
 #include <business/events/network_issue_business_event.h>
 #include <business/events/camera_input_business_event.h>
 #include <business/events/conflict_business_event.h>
+#include <business/events/mserver_conflict_business_event.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
@@ -70,9 +71,9 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
     case StorageFailureEvent:   return tr("Storage Failure");
     case NetworkIssueEvent:     return tr("Network Issue");
     case CameraIpConflictEvent: return tr("Camera IP Conflict");
-    case ServerFailureEvent:    return tr("Media Server Failure");
-    case ServerConflictEvent:   return tr("Media Server Conflict");
-    case ServerStartEvent:      return tr("Media Server Started");
+    case ServerFailureEvent:    return tr("Server Failure");
+    case ServerConflictEvent:   return tr("Server Conflict");
+    case ServerStartEvent:      return tr("Server Started");
     case LicenseIssueEvent:     return tr("License Issue");
     case AnyCameraEvent:        return tr("Any Camera Issue");
     case AnyServerEvent:        return tr("Any Server Issue");
@@ -106,18 +107,18 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
         return tr("Network Issue at %1").arg(resourceName);
 
     case ServerFailureEvent:
-        return tr("Media Server \"%1\" Failure").arg(resourceName);
+        return tr("Server \"%1\" Failure").arg(resourceName);
 
     case CameraIpConflictEvent:
         return tr("Camera IP Conflict at %1").arg(resourceName);
 
     case ServerConflictEvent:
-        return tr("Media Server \"%1\" Conflict").arg(resourceName);
+        return tr("Server \"%1\" Conflict").arg(resourceName);
 
     case ServerStartEvent:
-        return tr("Media Server \"%1\" Started").arg(resourceName);
+        return tr("Server \"%1\" Started").arg(resourceName);
     case LicenseIssueEvent:
-        return tr("Media Server \"%1\" had license issue").arg(resourceName);
+        return tr("Server \"%1\" had license issue").arg(resourceName);
 
     default:
         break;
@@ -203,11 +204,19 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         break;
     }
     case ServerConflictEvent: {
-        QVariantList conflicts;
+        QnCameraConflictList conflicts;
+        conflicts.sourceServer = params.getSource();
+        conflicts.decode(params.getConflicts());
         int n = 0;
-        foreach (QString ip, params.getConflicts()) {
+        foreach (const QString &server, conflicts.camerasByServer.keys()) {
             result += delimiter;
-            result += tr("Conflicting EC #%1: %2").arg(n).arg(ip);
+            result += tr("Conflicting Server #%1: %2").arg(++n).arg(server);
+            int m = 0;
+            foreach (const QString &camera, conflicts.camerasByServer[server]) {
+                result += delimiter;
+                result += tr("Camera #%1 MAC: %2").arg(++m).arg(camera);
+            }
+
         }
         break;
     }
@@ -252,15 +261,22 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(const QnBusinessEventParam
         break;
     }
     case ServerConflictEvent: {
-        QVariantList conflicts;
+        QnCameraConflictList conflicts;
+        conflicts.sourceServer = params.getSource();
+        conflicts.decode(params.getConflicts());
+
+        QVariantList conflictsList;
         int n = 0;
-        foreach (QString ip, params.getConflicts()) {
-            QVariantHash conflict;
-            conflict[lit("number")] = ++n;
-            conflict[lit("ip")] = ip;
-            conflicts << conflict;
+        foreach (const QString &server, conflicts.camerasByServer.keys()) {
+            foreach (const QString &camera, conflicts.camerasByServer[server]) {
+                QVariantHash conflict;
+                conflict[lit("number")] = ++n;
+                conflict[lit("ip")] = server;
+                conflict[lit("mac")] = camera;
+                conflictsList << conflict;
+            }
         }
-        detailsMap[lit("msConflicts")] = conflicts;
+        detailsMap[lit("msConflicts")] = conflictsList;
         break;
     }
     default:
@@ -301,7 +317,7 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
 }
 
 QString QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params, bool useIp) {
-    QnId id = params.getEventResourceId();
+    QUuid id = params.getEventResourceId();
     QnResourcePtr res = !id.isNull() ? qnResPool->getResourceById(id) : QnResourcePtr();
     return getFullResourceName(res, useIp);
 }
@@ -399,7 +415,7 @@ QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(const QnAbstract
 }
 
 QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool isPublic) {
-    QnId id = params.getEventResourceId();
+    QUuid id = params.getEventResourceId();
     QnNetworkResourcePtr res = !id.isNull() ? 
                             qnResPool->getResourceById(id).dynamicCast<QnNetworkResource>() : 
                             QnNetworkResourcePtr();
@@ -410,24 +426,19 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     if (!mserverRes)
         return QString();
 
-    QUrl appServerUrl = QnAppServerConnectionFactory::publicUrl();
-    QUrl appServerDefaultUrl = QnAppServerConnectionFactory::defaultUrl();
+    QUrl appServerUrl = QnAppServerConnectionFactory::url();
     quint64 ts = params.getEventTimestamp();
 
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res->getPhysicalId());
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res);
     if (history) {
         QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, true, false);
         if (newServer)
             mserverRes = newServer;
     }
 
-    if (!isPublic || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
-        if (resolveAddress(appServerDefaultUrl.host()) != QHostAddress::LocalHost) {
-            appServerUrl = appServerDefaultUrl;
-        } else {
-            QUrl mserverUrl = mserverRes->getUrl();
-            appServerUrl.setHost(mserverUrl.host());
-        }
+    if (resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
+        QUrl mserverUrl = mserverRes->getUrl();
+        appServerUrl.setHost(mserverUrl.host());
     }
 
     QString result(lit("https://%1:%2/web/camera?physical_id=%3&pos=%4"));

@@ -24,7 +24,7 @@ QString QnUpdateUploader::updateId() const {
     return m_updateId;
 }
 
-QSet<QnId> QnUpdateUploader::peers() const {
+QSet<QUuid> QnUpdateUploader::peers() const {
     return m_peers;
 }
 
@@ -32,8 +32,8 @@ void QnUpdateUploader::cancel() {
     cleanUp();
 }
 
-bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &fileName, const QSet<QnId> &peers) {
-    if (m_updateFile || !m_updateId.isEmpty())
+bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &fileName, const QSet<QUuid> &peers) {
+    if (m_updateFile)
         return false;
 
     m_updateFile.reset(new QFile(fileName));
@@ -47,7 +47,7 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
     m_chunkCount = (m_updateFile->size() + m_chunkSize - 1) / m_chunkSize;
 
     m_progressById.clear();
-    foreach (const QnId &peerId, peers)
+    foreach (const QUuid &peerId, peers)
         m_progressById[peerId] = 0;
 
     connect(connection2()->getUpdatesManager().get(),   &ec2::AbstractUpdatesManager::updateUploadProgress,   this,   &QnUpdateUploader::at_updateManager_updateUploadProgress);
@@ -89,7 +89,7 @@ void QnUpdateUploader::chunkUploaded(int reqId, ec2::ErrorCode errorCode) {
         QTimer::singleShot(chunkDelay, this, SLOT(sendNextChunk()));
 }
 
-void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &updateId, const QnId &peerId, int chunks) {
+void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &updateId, const QUuid &peerId, int chunks) {
     if (updateId != m_updateId)
         return;
 
@@ -106,8 +106,8 @@ void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &upda
         m_progressById.erase(it);
 
         if (chunks == ec2::AbstractUpdatesManager::Failed) {
-            emit failed();
             cleanUp();
+            emit failed();
             return;
         } else {
             progress = 100;
@@ -124,8 +124,8 @@ void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &upda
     emit progressChanged(wholeProgress / m_peers.size());
 
     if (m_progressById.isEmpty()) {
-        emit finished();
         cleanUp();
+        emit finished();
     }
 }
 

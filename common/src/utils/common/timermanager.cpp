@@ -59,6 +59,8 @@ TimerManager::TimerManager()
     m_impl( new TimerManagerImpl() )
 {
     start();
+
+    setObjectName( lit("TimerManager") );
 }
 
 TimerManager::~TimerManager()

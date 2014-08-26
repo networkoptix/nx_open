@@ -402,12 +402,17 @@ void CLSimpleHTTPClient::readAll(QByteArray& data)
         m_dataRestLen = 0;
     }
 
+    if (m_contentLen && m_contentLen == data.size())
+        return;
+
     static const unsigned long BUFSIZE = 1024;
     int nRead;
     char buf[BUFSIZE];
     while ((nRead = read(buf, BUFSIZE)) > 0)
     {
         data.append(buf, nRead);
+        if (m_contentLen && m_contentLen == data.size())
+            return;
     }
 }
 

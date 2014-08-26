@@ -11,13 +11,18 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
 
+#include <api/app_server_connection.h>
+#include <api/session_manager.h>
+#include <api/model/connection_info.h>
+
 #include <client/client_connection_data.h>
+#include <client/client_settings.h>
+
+#include <common/common_module.h>
 
 #include <core/resource/resource.h>
 
-#include <api/app_server_connection.h>
-#include <api/session_manager.h>
-
+#include <ui/actions/action_manager.h>
 #include <ui/dialogs/message_box.h>
 #include <ui/dialogs/preferences_dialog.h>
 #include <ui/widgets/rendering_widget.h>
@@ -34,20 +39,15 @@
 #include "plugins/resource/archive/abstract_archive_stream_reader.h"
 #include "plugins/resource/avi/filetypesupport.h"
 
-#include <client/client_settings.h>
-#include <common/common_module.h>
-
 #include "connection_testing_dialog.h"
 
-#include <utils/network/global_module_finder.h>
-#include <utils/network/router.h>
-#include <api/model/connection_info.h>
-#include "compatibility_version_installation_dialog.h"
-#include "version.h"
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
-#include "compatibility.h"
-#include "common/common_module.h"
 
+#include <utils/connection_diagnostics_helper.h>
+
+
+#include "compatibility.h"
+#include "version.h"
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
@@ -73,14 +73,23 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::LoginDialog),
     m_requestHandle(-1),
-    m_renderingWidget(NULL),
-    m_restartPending(false),
-    m_autoConnectPending(false)
+    m_renderingWidget(NULL)
 {
     ui->setupUi(this);
 
-    setWindowTitle(tr("Connect to Enterprise Controller (%1)").arg(lit(QN_APPLICATION_VERSION)));
+    setWindowTitle(tr("Connect to Server..."));
     setHelpTopic(this, Qn::Login_Help);
+
+    QHBoxLayout* bbLayout = dynamic_cast<QHBoxLayout*>(ui->buttonBox->layout());
+    Q_ASSERT(bbLayout);
+    if (bbLayout) {
+        QLabel* versionLabel = new QLabel(ui->buttonBox);
+        versionLabel->setText(tr("Version %1").arg(lit(QN_APPLICATION_VERSION)));
+        QFont font = versionLabel->font();
+        font.setPointSize(7);
+        versionLabel->setFont(font);
+        bbLayout->insertWidget(0, versionLabel);
+    }
 
     static const char *introNames[] = { "intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg", NULL };
     QString introPath;
@@ -92,7 +101,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 
     QnAviResourcePtr resource = QnAviResourcePtr(new QnAviResource(lit("qtfile://") + introPath));
     if (FileTypeSupport::isImageFileExt(introPath))
-        resource->addFlags(QnResource::still_image);
+        resource->addFlags(Qn::still_image);
 
     m_renderingWidget = QnGlWidgetFactory::create<QnRenderingWidget>();
     m_renderingWidget->setResource(resource);
@@ -109,7 +118,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     m_lastUsedItem = NULL;
     m_savedSessionsItem = new QStandardItem(tr("Saved Sessions"));
     m_savedSessionsItem->setFlags(Qt::ItemIsEnabled);
-    m_autoFoundItem = new QStandardItem(tr("Auto-Discovered ECs"));
+    m_autoFoundItem = new QStandardItem(tr("Auto-Discovered Servers"));
     m_autoFoundItem->setFlags(Qt::ItemIsEnabled);
 
     m_connectionsModel->appendRow(m_savedSessionsItem);
@@ -144,24 +153,12 @@ void QnLoginDialog::updateFocus() {
 
 QUrl QnLoginDialog::currentUrl() const {
     QUrl url;
-    url.setScheme(QLatin1String("https"));
+    url.setScheme(lit("https"));
     url.setHost(ui->hostnameLineEdit->text().trimmed());
     url.setPort(ui->portSpinBox->value());
     url.setUserName(ui->loginLineEdit->text().trimmed());
     url.setPassword(ui->passwordLineEdit->text());
     return url;
-}
-
-QString QnLoginDialog::currentName() const {
-    return ui->connectionsComboBox->currentText();
-}
-
-QnConnectionInfo QnLoginDialog::currentInfo() const {
-    return m_connectInfo;
-}
-
-bool QnLoginDialog::restartPending() const {
-    return m_restartPending;
 }
 
 void QnLoginDialog::accept() {
@@ -171,16 +168,35 @@ void QnLoginDialog::accept() {
         return;
     }
 
-    QnAppServerConnectionFactory::ec2ConnectionFactory()->connect( url, this, &QnLoginDialog::at_ec2ConnectFinished );
+    QString name = ui->connectionsComboBox->currentText();
+
+    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
+        url,
+        this,
+        [this, url, name](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
+    {
+        if (m_requestHandle != handle)
+            return; //connect was cancelled
+
+        m_requestHandle = -1;
+        updateUsability();
+
+        QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
+        switch (status) {
+        case QnConnectionDiagnosticsHelper::Result::Failure:
+            return;
+        case QnConnectionDiagnosticsHelper::Result::Restart:
+            menu()->trigger(Qn::ExitActionDelayed);
+            break; // to avoid cycle
+        default:    //success
+            menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
+            updateStoredConnections(url, name);
+            break;
+        }
+
+        base_type::accept();
+    });
     updateUsability();
-}
-
-bool QnLoginDialog::rememberPassword() const {
-    return ui->rememberPasswordCheckBox->isChecked();
-}
-
-void QnLoginDialog::setAutoConnect(bool value) {
-    m_autoConnectPending = value;
 }
 
 void QnLoginDialog::reject() {
@@ -208,11 +224,7 @@ void QnLoginDialog::changeEvent(QEvent *event) {
 void QnLoginDialog::showEvent(QShowEvent *event) {
     base_type::showEvent(event);
 
-    if (m_autoConnectPending && ui->rememberPasswordCheckBox->isChecked() && !ui->passwordLineEdit->text().isEmpty() && currentUrl().isValid()) {
-        accept();
-    } else {
-        resetConnectionsModel();
-    }
+    resetConnectionsModel();
 
 #ifdef Q_OS_MAC
     if (focusWidget())
@@ -329,246 +341,51 @@ void QnLoginDialog::updateUsability() {
     }
 }
 
+void QnLoginDialog::updateStoredConnections(const QUrl &url, const QString &name) {
+    QnConnectionDataList connections = qnSettings->customConnections();
+
+    QnConnectionData connectionData(QString(), url);
+    qnSettings->setLastUsedConnection(connectionData);
+
+    qnSettings->setStoredPassword(ui->rememberPasswordCheckBox->isChecked()
+        ? url.password()
+        : QString()
+        );
+
+    // remove previous "Last used connection"
+    connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
+
+    QUrl cleanUrl(connectionData.url);
+    cleanUrl.setPassword(QString());
+    QnConnectionData selected = connections.getByName(name);
+    if (selected.url == cleanUrl){
+        connections.removeOne(selected.name);
+        connections.prepend(selected);
+    } else {
+        // save "Last used connection"
+        QnConnectionData last(connectionData);
+        last.name = QnConnectionDataList::defaultLastUsedNameKey();
+        last.url.setPassword(QString());
+        connections.prepend(last);
+    }
+    qnSettings->setCustomConnections(connections);
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-
-void QnLoginDialog::at_ec2ConnectFinished( int handle, ec2::ErrorCode errorCode, const ec2::AbstractECConnectionPtr &connection ) {
-    updateUsability();
-
-    QnConnectionInfo connectionInfo;
-    if (connection)
-        connectionInfo = connection->connectionInfo();
-
-    bool success = connection && errorCode == ec2::ErrorCode::ok;
-    if( success )
-    {
-        //checking compatibility
-        success = qnSettings->isDevMode() || connectionInfo.brand.isEmpty()
-                || connectionInfo.brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
-    }
-
-    QString detail;
-
-    if (errorCode == ec2::ErrorCode::unauthorized) {
-        detail = tr("Login or password you have entered are incorrect, please try again.");
-    } else if (errorCode != ec2::ErrorCode::ok) {
-        detail = tr("Connection to the Enterprise Controller could not be established.\n"
-                               "Connection details that you have entered are incorrect, please try again.\n\n"
-                               "If this error persists, please contact your VMS administrator.");
-    } else {
-        detail = tr("You are trying to connect to incompatible Enterprise Controller.");
-    }
-
-    if(!success) {
-        QnMessageBox::warning(
-            this,
-            Qn::Login_Help,
-            tr("Could not connect to Enterprise Controller"),
-            detail
-        );
-        updateFocus();
-        return;
-    }
-
-    QnCompatibilityChecker remoteChecker(connectionInfo.compatibilityItems);
-    QnCompatibilityChecker localChecker(localCompatibilityItems());
-
-    QnCompatibilityChecker *compatibilityChecker;
-    if (remoteChecker.size() > localChecker.size()) {
-        compatibilityChecker = &remoteChecker;
-    } else {
-        compatibilityChecker = &localChecker;
-    }
-
-    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), qnCommon->engineVersion(), QLatin1String("ECS"), connectionInfo.version)) {
-        QnSoftwareVersion minSupportedVersion("1.4"); 
-
-        m_restartPending = true;
-        if (connectionInfo.version < minSupportedVersion) {
-            QnMessageBox::warning(
-                this,
-                Qn::VersionMismatch_Help,
-                tr("Could not connect to Enterprise Controller"),
-                tr("You are about to connect to Enterprise Controller which has a different version:\n"
-                    " - Client version: %1.\n"
-                    " - EC version: %2.\n"
-                    "Compatibility mode for versions lower than %3 is not supported."
-                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(minSupportedVersion.toString()),
-                QMessageBox::Ok
-            );
-            m_restartPending = false;
-        }
-
-        if (connectionInfo.version > qnCommon->engineVersion()) {
-#ifndef Q_OS_MACX
-            QnMessageBox::warning(
-                this,
-                Qn::VersionMismatch_Help,
-                tr("Could not connect to Enterprise Controller"),
-                tr("Selected Enterprise controller has a different version:\n"
-                    " - Client version: %1.\n"
-                    " - EC version: %2.\n"
-                    "An error has occurred while trying to restart in compatibility mode."
-                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()),
-                QMessageBox::Ok
-            );
-#else
-            QnMessageBox::warning(
-                this,
-                Qn::VersionMismatch_Help,
-                tr("Could not connect to Enterprise Controller"),
-                tr("Selected Enterprise controller has a different version:\n"
-                    " - Client version: %1.\n"
-                    " - EC version: %2.\n"
-                    "The other version of client is needed in order to establish the connection to this server."
-                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()),
-                QMessageBox::Ok
-            );
-#endif
-            m_restartPending = false;
-        }
-
-        if(m_restartPending) {
-            for (;;) {
-                bool isInstalled = false;
-                if (applauncher::isVersionInstalled(connectionInfo.version, &isInstalled) != applauncher::api::ResultType::ok)
-                {
-#ifndef Q_OS_MACX
-                    QnMessageBox::warning(
-                        this,
-                        Qn::VersionMismatch_Help,
-                        tr("Could not connect to Enterprise Controller"),
-                        tr("Selected Enterprise controller has a different version:\n"
-                            " - Client version: %1.\n"
-                            " - EC version: %2.\n"
-                            "An error has occurred while trying to restart in compatibility mode."
-                        ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()),
-                        QMessageBox::Ok
-                    );
-#else
-                    QnMessageBox::warning(
-                        this,
-                        Qn::VersionMismatch_Help,
-                        tr("Could not connect to Enterprise Controller"),
-                        tr("Selected Enterprise controller has a different version:\n"
-                            " - Client version: %1.\n"
-                            " - EC version: %2.\n"
-                            "The other version of client is needed in order to establish the connection to this server."
-                        ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()),
-                        QMessageBox::Ok
-                    );
-#endif
-                    m_restartPending = false;
-                }
-                else if(isInstalled) {
-                    int button = QnMessageBox::warning(
-                        this,
-                        Qn::VersionMismatch_Help,
-                        tr("Could not connect to Enterprise Controller"),
-                        tr("You are about to connect to Enterprise Controller which has a different version:\n"
-                            " - Client version: %1.\n"
-                            " - EC version: %2.\n"
-                            "Would you like to restart in compatibility mode?"
-                        ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()),
-                        QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel), 
-                        QMessageBox::Cancel
-                    );
-                    if(button == QMessageBox::Ok) {
-                        switch( applauncher::restartClient(connectionInfo.version, currentUrl().toEncoded()) )
-                        {
-                            case applauncher::api::ResultType::ok:
-                                break;
-
-                            case applauncher::api::ResultType::connectError:
-                                QMessageBox::critical(
-                                    this,
-                                    tr("Launcher process is not found"),
-                                    tr("Cannot restart the client in compatibility mode.\n"
-                                        "Please close the application and start it again using the shortcut in the start menu.")
-                                );
-                                break;
-
-                            default:
-                            {
-                                //trying to restore installation
-                                int selectedButton = QnMessageBox::warning(
-                                    this,
-                                    Qn::VersionMismatch_Help,
-                                    tr("Failure"),
-                                    tr("Failed to launch compatibility version %1\n"
-                                       "Try to restore version %1?").
-                                       arg(connectionInfo.version.toString(QnSoftwareVersion::MinorFormat)),
-                                    QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
-                                    QMessageBox::Cancel
-                                );
-                                if( selectedButton == QMessageBox::Ok ) {
-                                    //starting installation
-                                    if( !m_installationDialog.get() )
-                                        m_installationDialog.reset( new CompatibilityVersionInstallationDialog( this ) );
-                                    m_installationDialog->setVersionToInstall( connectionInfo.version );
-                                    m_installationDialog->exec();
-                                    if( m_installationDialog->installationSucceeded() )
-                                        continue;   //offering to start newly-installed compatibility version
-                                }
-                                m_restartPending = false;
-                                break;
-                            }
-                        }
-                    } else {
-                        m_restartPending = false;
-                    }
-                } else {    //not installed
-                    int selectedButton = QnMessageBox::warning(
-                        this,
-                        Qn::VersionMismatch_Help,
-                        tr("Could not connect to Enterprise Controller"),
-                        tr("You are about to connect to Enterprise Controller which has a different version:\n"
-                            " - Client version: %1.\n"
-                            " - EC version: %2.\n"
-                            "Client version %3 is required to connect to this Enterprise Controller.\n"
-                            "Download version %3?"
-                        ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(connectionInfo.version.toString(QnSoftwareVersion::MinorFormat)),
-                        QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
-                        QMessageBox::Cancel
-                    );
-                    if( selectedButton == QMessageBox::Ok ) {
-                        //starting installation
-                        if( !m_installationDialog.get() )
-                            m_installationDialog.reset( new CompatibilityVersionInstallationDialog( this ) );
-                        m_installationDialog->setVersionToInstall( connectionInfo.version );
-                        m_installationDialog->exec();
-                        if( m_installationDialog->installationSucceeded() )
-                            continue;   //offering to start newly-installed compatibility version
-                    }
-                    m_restartPending = false;
-                }
-                break;
-            }
-        }
-        
-        if (!m_restartPending) {
-            updateFocus();
-            return;
-        }
-    }
-
-    QnAppServerConnectionFactory::setEc2Connection( connection );
-    m_connectInfo = connectionInfo;
-    qnCommon->setLocalSystemName(connectionInfo.systemName);
-    QnGlobalModuleFinder::instance()->setConnection(connection);
-    base_type::accept();
-}
 
 void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex &index) {
     QStandardItem* item = m_connectionsModel->itemFromIndex(index);
     QUrl url = item == NULL ? QUrl() : item->data(Qn::UrlRole).toUrl();
     ui->hostnameLineEdit->setText(url.host());
     ui->portSpinBox->setValue(url.port());
-    ui->loginLineEdit->setText(url.userName());
+    ui->loginLineEdit->setText(url.userName().isEmpty() 
+        ? lit("admin")  // 99% of users have only one login - admin
+        : url.userName());
     ui->passwordLineEdit->clear();
     ui->rememberPasswordCheckBox->setChecked(false);
+    ui->deleteButton->setEnabled(qnSettings->customConnections().contains(ui->connectionsComboBox->currentText()));
     updateFocus();
 }
 
@@ -648,14 +465,18 @@ void QnLoginDialog::at_saveButton_clicked() {
 }
 
 void QnLoginDialog::at_deleteButton_clicked() {
-    QString name = currentName();
+    QnConnectionDataList connections = qnSettings->customConnections();
+
+    QString name = ui->connectionsComboBox->currentText();
+    if (!connections.contains(name))
+        return;
 
     if (QMessageBox::warning(this, tr("Delete connections"),
                                    tr("Are you sure you want to delete the connection\n%1?").arg(name),
                              QMessageBox::Yes, QMessageBox::No) == QMessageBox::No)
         return;
 
-    QnConnectionDataList connections = qnSettings->customConnections();
+    
     connections.removeOne(name);
     qnSettings->setCustomConnections(connections);
     resetConnectionsModel();

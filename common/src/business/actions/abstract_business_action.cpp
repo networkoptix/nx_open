@@ -95,18 +95,18 @@ QnAbstractBusinessAction::~QnAbstractBusinessAction()
 {
 }
 
-void QnAbstractBusinessAction::setResources(const QVector<QnId>& resources) {
+void QnAbstractBusinessAction::setResources(const QVector<QUuid>& resources) {
     m_resources = resources;
 }
 
-const QVector<QnId>& QnAbstractBusinessAction::getResources() const {
+const QVector<QUuid>& QnAbstractBusinessAction::getResources() const {
     return m_resources;
 }
 
 QnResourceList QnAbstractBusinessAction::getResourceObjects() const
 {
     QnResourceList result;
-    foreach(const QnId& id, m_resources)
+    foreach(const QUuid& id, m_resources)
     {
         QnResourcePtr res = qnResPool->getResourceById(id);
         if (res)
@@ -135,11 +135,11 @@ const QnBusinessEventParameters& QnAbstractBusinessAction::getRuntimeParams() co
     return m_runtimeParams;
 }
 
-void QnAbstractBusinessAction::setBusinessRuleId(const QnId& value) {
+void QnAbstractBusinessAction::setBusinessRuleId(const QUuid& value) {
     m_businessRuleId = value;
 }
 
-QnId QnAbstractBusinessAction::getBusinessRuleId() const {
+QUuid QnAbstractBusinessAction::getBusinessRuleId() const {
     return m_businessRuleId;
 }
 

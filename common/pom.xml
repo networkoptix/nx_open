@@ -21,7 +21,7 @@
 	<name>HD Witness Common Lib</name>
 
     <properties>
-        <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
+        <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <!--Global libs-->
         <!-- <qt.libs>core gui network opengl xml multimedia sql</qt.libs> -->
         <global.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lonvif -lquazip</global.libs>

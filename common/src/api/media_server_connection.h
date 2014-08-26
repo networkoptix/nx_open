@@ -117,7 +117,7 @@ public:
         QnResourceList cameras,
         QnBusiness::EventType eventType, 
         QnBusiness::ActionType actionType,
-        QnId businessRuleId, 
+        QUuid businessRuleId, 
         QObject *target, 
         const char *slot);
 
@@ -185,13 +185,18 @@ public:
 
     int getTimeAsync(QObject *target, const char *slot);
 
+    //!Requests name of system, mediaserver is currently connected to
+    /*!
+        \param slot Slot MUST have signature (int, QString, int)
+    */
+    int getSystemNameAsync( QObject* target, const char* slot );
     //!Request server to run camera \a cameraID diagnostics step following \a previousStep
     /*!
         \param slot Slot MUST have signature (int, QnCameraDiagnosticsReply, int)
         \returns Request handle
     */
     int doCameraDiagnosticsStepAsync(
-        const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
+        const QUuid& cameraID, CameraDiagnostics::Step::Value previousStep,
         QObject* target, const char* slot );
 
     /**

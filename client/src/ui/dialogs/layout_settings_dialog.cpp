@@ -25,6 +25,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/widgets/framed_label.h>
+#include <ui/workbench/workbench_context.h>
 
 #include <utils/threaded_image_loader.h>
 #include <utils/app_server_image_cache.h>
@@ -36,11 +37,11 @@ namespace {
     enum DialogState {
         /** No image is selected. */
         NoImage,
-        /** Error is occured. */
+        /** Error is occurred. */
         Error,
-        /** Current layout image is being downloaded from the EC. */
+        /** Current layout image is being downloaded from the Server. */
         ImageDownloading,
-        /** Current layout image is downloaded from the EC. */
+        /** Current layout image is downloaded from the Server. */
         ImageDownloaded,
         /** Current layout image is downloaded and being loading. */
         ImageLoading,
@@ -52,7 +53,7 @@ namespace {
         NewImageLoading,
         /** New image is selected and loaded. */
         NewImageLoaded,
-        /** New image is selected being uploading to the EC. */
+        /** New image is selected being uploading to the Server. */
         NewImageUploading
     };
 
@@ -124,7 +125,7 @@ public:
 
 
 QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
-    QDialog(parent),
+    base_type(parent),
     ui(new Ui::LayoutSettingsDialog),
     d_ptr(new QnLayoutSettingsDialogPrivate()),
     m_cache(NULL),
@@ -149,7 +150,6 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     connect(ui->selectButton,               SIGNAL(clicked()),          this, SLOT(selectFile()));
     connect(ui->clearButton,                SIGNAL(clicked()),          this, SLOT(at_clearButton_clicked()));
     connect(ui->lockedCheckBox,             SIGNAL(clicked()),          this, SLOT(updateControls()));
-    connect(ui->buttonBox,                  SIGNAL(accepted()),         this, SLOT(at_accepted()));
     connect(ui->opacitySpinBox,             SIGNAL(valueChanged(int)),  this, SLOT(at_opacitySpinBox_valueChanged(int)));
     connect(ui->widthSpinBox,               SIGNAL(valueChanged(int)),  this, SLOT(at_widthSpinBox_valueChanged(int)));
     connect(ui->heightSpinBox,              SIGNAL(valueChanged(int)),  this, SLOT(at_heightSpinBox_valueChanged(int)));
@@ -186,7 +186,7 @@ bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
 void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout) {
     Q_D(QnLayoutSettingsDialog);
 
-    m_cache = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout) //TODO: #GDM #Common refactor duplicated code
+    m_cache = layout->hasFlags(Qn::url | Qn::local | Qn::layout) //TODO: #GDM #Common refactor duplicated code
             ? new QnLocalFileCache(this)
             : new QnAppServerImageCache(this);
     connect(m_cache, SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
@@ -345,7 +345,8 @@ void QnLayoutSettingsDialog::at_clearButton_clicked() {
     updateControls();
 }
 
-void QnLayoutSettingsDialog::at_accepted() {
+
+void QnLayoutSettingsDialog::accept() {
     Q_D(QnLayoutSettingsDialog);
 
     switch (d->state) {
@@ -355,7 +356,7 @@ void QnLayoutSettingsDialog::at_accepted() {
     case Error:
     case NewImageSelected:
     case ImageDownloaded:
-        accept();
+        base_type::accept();
         return;
 
     /* current progress should be cancelled before accepting */
@@ -370,7 +371,7 @@ void QnLayoutSettingsDialog::at_accepted() {
         if (d->canChangeAspectRatio() && ui->cropToMonitorCheckBox->isChecked())
             break;
         qnSettings->setLayoutKeepAspectRatio(ui->keepAspectRatioCheckBox->isChecked());
-        accept();
+        base_type::accept();
         return;
     case NewImageLoaded:
         break;
@@ -447,7 +448,7 @@ void QnLayoutSettingsDialog::at_imageStored(const QString &filename, bool ok) {
     d->state = NewImageLoaded;
     qnSettings->setLayoutKeepAspectRatio(ui->keepAspectRatioCheckBox->isChecked());
     //updateControls() is not needed, we are closing the dialog here
-    accept();
+    base_type::accept();
 }
 
 void QnLayoutSettingsDialog::loadPreview() {
@@ -494,13 +495,23 @@ void QnLayoutSettingsDialog::selectFile() {
     }
     nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
 
-    QString fileName = QnFileDialog::getOpenFileName(this,
-                                 tr("Open file"),
-                                 qnSettings->backgroundsFolder(),
-                                 tr("Pictures %1").arg(nameFilter),
-                                 0,
-                                 QnCustomFileDialog::fileDialogOptions());
+    QScopedPointer<QnCustomFileDialog> dialog(
+        new QnWorkbenchStateDependentDialog<QnCustomFileDialog> (
+            this, tr("Select file..."),
+            qnSettings->backgroundsFolder(),
+            tr("Pictures %1").arg(nameFilter)
+            )
+        );
+    dialog->setFileMode(QFileDialog::ExistingFile);
 
+    if(!dialog->exec())
+        return;
+
+    /* Check if we were disconnected (server shut down) while the dialog was open. */
+    if (!context()->user())
+        return;
+
+    QString fileName = dialog->selectedFile();
     if (fileName.isEmpty())
         return;
 
@@ -562,4 +573,3 @@ void QnLayoutSettingsDialog::setProgress(bool value) {
     ui->stackedWidget->setCurrentIndex(value ? 1 : 0);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!value);
 }
-

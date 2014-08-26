@@ -103,13 +103,13 @@ public:
     * Return module GUID. if destination action intended for current module, no route through message bus is required
     */
 
-    virtual QString getGuid() const { return QString(); }
+    virtual QUuid getGuid() const { return QUuid(); }
 
     bool broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
 public slots:
     /*
     * This function matches all business actions for specified business event and execute it
-    * So, call this function if business event occured
+    * So, call this function if business event occurred
     */
     void processBusinessEvent(const QnAbstractBusinessEventPtr& bEvent);
 
@@ -134,7 +134,7 @@ private slots:
     void at_actionDeliveryFailed(const QnAbstractBusinessActionPtr& action);
 
     void at_businessRuleChanged(const QnBusinessEventRulePtr& bRule);
-    void at_businessRuleDeleted(QnId id);
+    void at_businessRuleDeleted(QUuid id);
     void at_businessRuleReset(const QnBusinessEventRuleList& rules);
 
     void at_timer();
@@ -143,12 +143,12 @@ private slots:
 protected:
     virtual QImage getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const;
     
-    bool containResource(const QnResourceList& resList, const QnId& resId) const;
+    bool containResource(const QnResourceList& resList, const QUuid& resId) const;
     QnAbstractBusinessActionList matchActions(const QnAbstractBusinessEventPtr& bEvent);
     //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
 
     /*
-    * Some actions can be executed on media server only. In this case, function returns media server there action must be executed
+    * Some actions can be executed on server only. In this case, function returns server where action must be executed
     */
     QnMediaServerResourcePtr getDestMServer(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
 
@@ -174,8 +174,8 @@ private:
     struct RunningRuleInfo
     {
         RunningRuleInfo() {}
-        QMap<QnId, QnAbstractBusinessEventPtr> resources; 
-        QSet<QnId> isActionRunning; // actions that has been started by resource. Continues action starts only onces for all event resources.
+        QMap<QUuid, QnAbstractBusinessEventPtr> resources; 
+        QSet<QUuid> isActionRunning; // actions that has been started by resource. Continues action starts only onces for all event resources.
     };
     typedef QMap<QString, RunningRuleInfo> RunningRuleMap;
 

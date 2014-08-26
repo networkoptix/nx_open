@@ -83,7 +83,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
         MediaFlags_LowQuality           = 0x00100,
         MediaFlags_StillImage           = 0x00200,
 
-        MediaFlags_NewServer            = 0x00400, /**< switch archive to a new media server */
+        MediaFlags_NewServer            = 0x00400, /**< switch archive to a new server */
         MediaFlags_DecodeTwice          = 0x00800,
         MediaFlags_FCZ                  = 0x01000, /**< fast channel zapping flag */
         MediaFlags_AfterDrop            = 0x02000, /**< some data was dropped before current data */

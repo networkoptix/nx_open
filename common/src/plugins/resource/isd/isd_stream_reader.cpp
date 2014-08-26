@@ -30,7 +30,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 
-    QnResource::ConnectionRole role = getRole();
+    Qn::ConnectionRole role = getRole();
     m_rtpStreamParser.setRole(role);
     QnPlIsdResourcePtr res = getResource().dynamicCast<QnPlIsdResource>();
     CLHttpStatus status;
@@ -43,7 +43,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
         QString result;
         QTextStream t(&result);
 
-        if (role == QnResource::Role_SecondaryLiveVideo)
+        if (role == Qn::CR_SecondaryLiveVideo)
         {
             t << "VideoInput.1.h264.2.Resolution=" << res->getSecondaryResolution().width() << "x" << res->getSecondaryResolution().height() << "\r\n";
             t << "VideoInput.1.h264.2.FrameRate=5" << "\r\n";
@@ -63,14 +63,14 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
         QnSleep::msleep(100);
     }
 
-    QString urlrequest = (role == QnResource::Role_SecondaryLiveVideo)
+    QString urlrequest = (role == Qn::CR_SecondaryLiveVideo)
         ? QLatin1String("api/param.cgi?req=VideoInput.1.h264.2.Rtsp.AbsolutePath")
         : QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.Rtsp.AbsolutePath");
 
     QByteArray reslst = downloadFile(status, urlrequest,  res->getHostAddress(), 80, 3000, res->getAuth());
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        res->setStatus(QnResource::Unauthorized);
+        res->setStatus(Qn::Unauthorized);
         QUrl requestedUrl;
         requestedUrl.setHost( res->getHostAddress() );
         requestedUrl.setPort( 80 );

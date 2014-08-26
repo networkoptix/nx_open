@@ -35,18 +35,23 @@ QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
 
     connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,    ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setCenter);
     connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,    ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setRadius);
+    connect(m_calibrator,       &QnFisheyeCalibrator::stretchChanged,   ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setStretch);
     connect(m_calibrator,       &QnFisheyeCalibrator::finished,         this,               &QnFisheyeCalibrationWidget::at_calibrator_finished);
 
     connect(ui->autoButton,     &QPushButton::clicked,                  this,               &QnFisheyeCalibrationWidget::at_autoButton_clicked);
 
     connect(ui->xCenterSlider,  &QSlider::valueChanged,                 this,               &QnFisheyeCalibrationWidget::at_xCenterSlider_valueChanged);
+    connect(ui->stretchSlider,  &QSlider::valueChanged,                 this,               &QnFisheyeCalibrationWidget::at_stretchSlider_valueChanged);
+    
     connect(ui->yCenterSlider,  &QSlider::valueChanged,                 this,               &QnFisheyeCalibrationWidget::at_yCenterSlider_valueChanged);
     connect(ui->radiusSlider,   &QSlider::valueChanged,                 this,               &QnFisheyeCalibrationWidget::at_radiusSlider_valueChanged);
     connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,    this,               &QnFisheyeCalibrationWidget::at_calibrator_centerChanged);
     connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,    this,               &QnFisheyeCalibrationWidget::at_calibrator_radiusChanged);
+    connect(m_calibrator,       &QnFisheyeCalibrator::stretchChanged,   this,               &QnFisheyeCalibrationWidget::at_calibrator_stretchChanged);
 
     connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,    this,               &QnFisheyeCalibrationWidget::dataChanged);
     connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,    this,               &QnFisheyeCalibrationWidget::dataChanged);
+    connect(m_calibrator,       &QnFisheyeCalibrator::stretchChanged,   this,               &QnFisheyeCalibrationWidget::dataChanged);
 
     connect(ui->imageWidget,    &QnFisheyeCalibrationImageWidget::centerModified, this,     &QnFisheyeCalibrationWidget::setCenter);
     connect(ui->imageWidget,    &QnFisheyeCalibrationImageWidget::radiusModified, this,     &QnFisheyeCalibrationWidget::setRadius);
@@ -109,6 +114,15 @@ void QnFisheyeCalibrationWidget::setCenter(const QPointF &center) {
     update();
 }
 
+void QnFisheyeCalibrationWidget::setHorizontalStretch(const qreal &value) {
+    m_calibrator->setHorizontalStretch(value);
+    update();
+}
+
+qreal QnFisheyeCalibrationWidget::horizontalStretch() const {
+    return m_calibrator->horizontalStretch();
+}
+
 qreal QnFisheyeCalibrationWidget::radius() const {
     return m_calibrator->radius();
 }
@@ -159,6 +173,14 @@ void QnFisheyeCalibrationWidget::at_xCenterSlider_valueChanged(int value) {
     setCenter(QPointF(0.01 * value, center().y()));
 }
 
+void QnFisheyeCalibrationWidget::at_stretchSlider_valueChanged(int value) {
+    if (m_updating)
+        return;
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    setHorizontalStretch(value / 50.0);
+}
+
 void QnFisheyeCalibrationWidget::at_yCenterSlider_valueChanged(int value) {
     if (m_updating)
         return;
@@ -190,6 +212,14 @@ void QnFisheyeCalibrationWidget::at_calibrator_radiusChanged(qreal radius) {
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     ui->radiusSlider->setValue(radius * 100);
+}
+
+void QnFisheyeCalibrationWidget::at_calibrator_stretchChanged(qreal stretch) {
+    if (m_updating)
+        return;
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    ui->stretchSlider->setValue(stretch * 50.0);
 }
 
 void QnFisheyeCalibrationWidget::updateImage() {

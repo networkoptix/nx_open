@@ -71,7 +71,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStream()
 
     /*
     if (!m_onvifRes->isSoapAuthorized()) {
-        m_onvifRes->setStatus(QnResource::Unauthorized);
+        m_onvifRes->setStatus(Qn::Unauthorized);
         return;
     }
     */
@@ -102,7 +102,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStream()
     m_multiCodec.setRequest(streamUrl);
     result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED && canChangeStatus())
-        m_resource->setStatus(QnResource::Unauthorized);
+        m_resource->setStatus(Qn::Unauthorized);
     return result;
 }
 
@@ -131,7 +131,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
     if (!m_streamUrl.isEmpty() && 
         currentFps == m_cachedFps && 
         currentQuality == m_cachedQuality &&  
-        (secondaryQuality == m_cachedSecondaryQuality || getRole() != QnResource::Role_SecondaryLiveVideo) &&
+        (secondaryQuality == m_cachedSecondaryQuality || getRole() != Qn::CR_SecondaryLiveVideo) &&
         m_cachedTimer.elapsed() < MAX_CAHCE_URL_TIME)
     {
         *streamUrl = m_streamUrl;
@@ -139,7 +139,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
     }
 
     m_onvifRes->beforeConfigureStream();
-    CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl(getRole() == QnResource::Role_LiveVideo, streamUrl);
+    CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl(getRole() == Qn::CR_LiveVideo, streamUrl);
     m_onvifRes->afterConfigureStream();
 
     if (result.errorCode == CameraDiagnostics::ErrorCode::noError) {
@@ -165,6 +165,11 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bo
     info.videoSourceId = m_onvifRes->getVideoSourceId();
 
     fetchUpdateAudioEncoder(soapWrapper, info, isPrimary);
+
+    if (m_resource->getUrl() == lit("192.168.0.91"))
+    {
+        int gg = 4;
+    }
 
     result = fetchUpdateProfile(soapWrapper, info, isPrimary);
     if( !result ) {
@@ -398,7 +403,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoap
             << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
 #endif
         if (soapWrapper.isNotAuthenticated() && canChangeStatus()) {
-            m_onvifRes->setStatus(QnResource::Unauthorized);
+            m_onvifRes->setStatus(Qn::Unauthorized);
             return CameraDiagnostics::NotAuthorisedResult( soapWrapper.getEndpointUrl() );
         }
         return CameraDiagnostics::RequestFailedResult( QLatin1String("getVideoEncoderConfigurations"), soapWrapper.getLastError() );
@@ -536,7 +541,7 @@ Profile* QnOnvifStreamReader::fetchExistingProfile(const ProfilesResp& response,
     for (; iter != response.Profiles.end(); ++iter) 
     {
         Profile* profile = *iter;
-        if (!profile)
+        if (!profile || !availableProfiles.contains(QString::fromStdString(profile->token)))
             continue;
         bool vSourceMatched = profile->VideoSourceConfiguration && profile->VideoSourceConfiguration->token == info.videoSourceId.toStdString();
         bool vEncoderMatched = profile->VideoEncoderConfiguration && profile->VideoEncoderConfiguration->token == info.videoEncoderId.toStdString();
@@ -611,7 +616,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoPar
         }
     }
 
-    if (getRole() == QnResource::Role_LiveVideo)
+    if (getRole() == Qn::CR_LiveVideo)
     {
         if(!m_onvifRes->getPtzUrl().isEmpty() && !m_onvifRes->getPtzConfigurationToken().isEmpty()) {
             bool ptzMatched = profile && profile->PTZConfiguration;

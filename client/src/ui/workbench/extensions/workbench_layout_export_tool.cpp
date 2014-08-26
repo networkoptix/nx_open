@@ -109,7 +109,7 @@ bool QnLayoutExportTool::start() {
         QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
         if (mediaRes) {
             QString uniqueId = mediaRes->toResource()->getUniqueId();
-            localItem.resource.id = 0;
+            localItem.resource.id = mediaRes->toResource()->getId();
             localItem.resource.path = uniqueId;
             if (!uniqIdList.contains(uniqueId)) {
                 m_resources << mediaRes;
@@ -151,7 +151,7 @@ bool QnLayoutExportTool::start() {
     QScopedPointer<QIODevice> miscFile(m_storage->open(lit("misc.bin"), QIODevice::WriteOnly));
     quint32 flags = m_readOnly ? QnLayoutFileStorageResource::ReadOnly : 0;
     foreach (const QnMediaResourcePtr resource, m_resources) {
-        if (resource->toResource()->hasFlags(QnResource::utc)) {
+        if (resource->toResource()->hasFlags(Qn::utc)) {
             flags |= QnLayoutFileStorageResource::ContainsCameras;
             break;
         }
@@ -270,8 +270,8 @@ void QnLayoutExportTool::finishExport(bool success) {
         }
         else {
             QnLayoutResourcePtr layout =  QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl());
-            if (!resourcePool()->getResourceById(layout->getUniqueId())) {
-                layout->setStatus(QnResource::Online);
+            if (!resourcePool()->getResourceById(layout->getId())) {
+                layout->setStatus(Qn::Online);
                 resourcePool()->addResource(layout);
             }
         }
@@ -296,9 +296,9 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
     QString uniqId = resource->toResource()->getUniqueId();
     uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
     QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
-    if (resource->toResource()->hasFlags(QnResource::utc))
+    if (resource->toResource()->hasFlags(Qn::utc))
         role = QnStreamRecorder::Role_FileExportWithEmptyContext;
-    QnLayoutItemData itemData = m_layout->getItem(uniqId);
+    QnLayoutItemData itemData = m_layout->getItem(resource->toResource()->getId());
 
     int timeOffset = 0;
     if(qnSettings->timeMode() == Qn::ServerTimeMode) {

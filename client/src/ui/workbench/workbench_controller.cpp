@@ -185,7 +185,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_resizedWidget(NULL),
     m_dragDelta(invalidDragDelta()),
     m_screenRecorder(NULL),
-    m_countdownCanceled(false),
     m_recordingCountdownLabel(NULL),
     m_tourModeHintLabel(NULL),
     m_menuEnabled(true)
@@ -503,7 +502,7 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
 
 void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display) {
     foreach(QnResourceWidget *widget, widgets) {
-        if(!widget->resource()->hasFlags(QnResource::motion))
+        if(!widget->resource()->hasFlags(Qn::motion))
             continue;
         if (!widget->zoomRect().isNull())
             continue;
@@ -591,34 +590,29 @@ void QnWorkbenchController::startRecording() {
 
     action(Qn::ToggleScreenRecordingAction)->setChecked(true);
 
-    m_countdownCanceled = false;
     m_recordingCountdownLabel = QnGraphicsMessageBox::informationTicking(tr("Recording in...%1"), recordingCountdownMs);
     connect(m_recordingCountdownLabel, &QnGraphicsMessageBox::finished, this, &QnWorkbenchController::at_recordingAnimation_finished);
 }
 
 void QnWorkbenchController::stopRecording() {
-    if (!m_screenRecorder)
-        return;
+    if (m_recordingCountdownLabel) {
+        disconnect(m_recordingCountdownLabel, NULL, this, NULL);
+        m_recordingCountdownLabel->hideImmideately();
+        m_recordingCountdownLabel = NULL;
+    }
 
     action(Qn::ToggleScreenRecordingAction)->setChecked(false);
 
-    if (!m_screenRecorder->isRecording()) {
-        m_countdownCanceled = true;
-        return;
-    }
-
-    m_screenRecorder->stopRecording();
+    if (m_screenRecorder)
+        m_screenRecorder->stopRecording();
 }
 
 void QnWorkbenchController::at_recordingAnimation_finished() {
     if (m_recordingCountdownLabel)
         m_recordingCountdownLabel->setOpacity(0.0);
     m_recordingCountdownLabel = NULL;
-    if (!m_countdownCanceled) {
-        if (m_screenRecorder) // just in case =)
-            m_screenRecorder->startRecording();
-    }
-    m_countdownCanceled = false;
+    if (m_screenRecorder) // just in case =)
+        m_screenRecorder->startRecording();
 }
 
 
@@ -660,7 +654,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
             if (!QFile::rename(recordedFileName, filePath)) {
                 QString message = tr("Could not overwrite file '%1'. Please try another name.").arg(filePath);
                 CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
-                QMessageBox::warning(display()->view(), QObject::tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
+                QMessageBox::warning(display()->view(), tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
                 continue;
             }
 
@@ -1298,7 +1292,7 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
     if (widgets.isEmpty())
         return;
     QnResourceWidget *widget = widgets.at(0);
-    if(widget->resource()->flags() & QnResource::network)
+    if(widget->resource()->flags() & Qn::network)
         return;
     QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource(), mainWindow()));
     dialog->setModal(true);
@@ -1309,7 +1303,7 @@ void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
 
     foreach(QnResourceWidget *widget, widgets) {
-        if (!widget->resource()->hasFlags(QnResource::motion))
+        if (!widget->resource()->hasFlags(Qn::motion))
             continue;
 
         if (!widget->zoomRect().isNull())

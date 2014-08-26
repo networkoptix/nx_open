@@ -45,6 +45,7 @@
 #include <recording/time_period.h>
 
 #include <core/misc/schedule_task.h>
+#include <core/ptz/ptz_mapper.h>
 #include <core/ptz/ptz_data.h>
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
@@ -71,7 +72,7 @@ void QnCommonMetaTypes::initialize() {
         return;
 
     qRegisterMetaType<QUuid>();
-    qRegisterMetaType<QnId>("QnId");
+    qRegisterMetaType<QUuid>("QUuid");
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();
     qRegisterMetaType<Qt::ConnectionType>();
@@ -81,8 +82,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnPeerRuntimeInfo>();
 
     qRegisterMetaType<QnParam>();
-    qRegisterMetaType<QnId>();
-    qRegisterMetaType<QSet<QnId>>("QSet<QnId>");
+    qRegisterMetaType<QUuid>();
+    qRegisterMetaType<QSet<QUuid>>("QSet<QUuid>");
     
     qRegisterMetaType<QnKvPair>();
     qRegisterMetaType<QnKvPairList>();
@@ -91,7 +92,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnResourceTypeList>();
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
-    qRegisterMetaType<QnResource::Status>();
+    qRegisterMetaType<Qn::ResourceStatus>();
     qRegisterMetaType<QnBusiness::EventReason>();
     
     qRegisterMetaType<QnUserResourcePtr>();
@@ -172,14 +173,16 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnManualCameraSearchSingleCamera>();
 
     qRegisterMetaType<QnPtzPreset>();
-
     qRegisterMetaType<QnPtzPresetList>();
     qRegisterMetaType<QnPtzTour>();
     qRegisterMetaType<QnPtzTourList>();
     qRegisterMetaType<QnPtzData>();
     qRegisterMetaType<QnPtzLimits>();
+    qRegisterMetaType<QnPtzMapperPtr>();
     qRegisterMetaType<Qn::PtzDataFields>();
     qRegisterMetaType<Qn::PtzCommand>();
+    qRegisterMetaType<Qn::PtzTraits>();
+    qRegisterMetaType<Qn::PtzCapabilities>();
 
     qRegisterMetaType<QnMediaDewarpingParams>();
     qRegisterMetaType<QnItemDewarpingParams>();
@@ -193,6 +196,11 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnModuleInformation>();
 
     qRegisterMetaType<Qn::CameraDataType>();
+
+
+    QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
+    QnJsonSerializer::registerSerializer<Qn::PtzTraits>();
+    QnJsonSerializer::registerSerializer<Qn::PtzCapabilities>();
 
     qn_commonMetaTypes_initialized = true;
 }

@@ -12,7 +12,7 @@ public:
     virtual bool isResourceAccessible()  { return true; }
     virtual bool updateMACAddress()   { return true; }
 
-    virtual QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
+    virtual QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role);
 };
 
 typedef QnSharedResourcePointer<QnFakeCamera> QnFakeCameraPtr;

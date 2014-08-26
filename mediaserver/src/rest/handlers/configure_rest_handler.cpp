@@ -36,7 +36,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     /* set system name */
     int changeSystemNameResult = changeSystemName(systemName, wholeSystem);
     if (changeSystemNameResult == ResultFail)
-        result.setError(QnJsonRestResult::InternalError);
+        result.setError(QnJsonRestResult::CantProcessRequest);
 
     /* reset connections if systemName is changed */
     if (changeSystemNameResult == ResultOk && !wholeSystem)
@@ -45,12 +45,12 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     /* set port */
     int changePortResult = changePort(port);
     if (changePortResult == ResultFail)
-        result.setError(QnJsonRestResult::InternalError);
+        result.setError(QnJsonRestResult::CantProcessRequest);
 
     /* set password */
     int changeAdminPasswordResult = changeAdminPassword(password, passwordHash, passwordDigest);
     if (changeAdminPasswordResult == ResultFail)
-        result.setError(QnJsonRestResult::InternalError);
+        result.setError(QnJsonRestResult::CantProcessRequest);
 
     QJsonObject res;
     res.insert(lit("restartNeeded"), changePortResult == ResultOk);
@@ -82,7 +82,7 @@ int QnConfigureRestHandler::changeSystemName(const QString &systemName, bool who
 
 int QnConfigureRestHandler::changeAdminPassword(const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest) {
     if (!password.isEmpty() || (!passwordHash.isEmpty() && !passwordDigest.isEmpty())) {
-        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::user)) {
+        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
             QnUserResourcePtr user = resource.staticCast<QnUserResource>();
             if (user->getName() == lit("admin")) {
                 if (!password.isEmpty()) {
@@ -105,14 +105,14 @@ int QnConfigureRestHandler::changeAdminPassword(const QString &password, const Q
 }
 
 int QnConfigureRestHandler::changePort(int port) {
-    if (port == 0 || port == MSSettings::roSettings()->value(nx_ms_conf::RTSP_PORT).toInt())
+    if (port == 0 || port == MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT).toInt())
         return ResultSkip;
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
     if (!server)
         return ResultFail;
 
-    MSSettings::roSettings()->setValue(nx_ms_conf::RTSP_PORT, port);
+    MSSettings::roSettings()->setValue(nx_ms_conf::SERVER_PORT, port);
 
     //TODO: update port in TCP listener
 

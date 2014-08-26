@@ -51,7 +51,7 @@ void QnWorkbenchDesktopCameraWatcher::at_resourcePool_resourceAdded(const QnReso
             m_serverList << server;
             processServer(server);
         }
-        else if (server->getStatus() == QnResource::Online) {
+        else if (server->getStatus() == Qn::Online) {
             m_serverList << server;
             processServer(server);
         }
@@ -73,7 +73,7 @@ void QnWorkbenchDesktopCameraWatcher::at_resourcePool_resourceRemoved(const QnRe
         m_serverList.remove(server);
         disconnect(server.data(), NULL, this, NULL);
 
-        QnDesktopResourcePtr desktop = qnResPool->getResourceById(QnDesktopResource::getDesktopResourceUuid().toString()).dynamicCast<QnDesktopResource>();
+        QnDesktopResourcePtr desktop = qnResPool->getResourceById(QnDesktopResource::getDesktopResourceUuid()).dynamicCast<QnDesktopResource>();
         if (desktop)
             desktop->removeConnection(server);
     }
@@ -98,10 +98,10 @@ void QnWorkbenchDesktopCameraWatcher::at_resource_statusChanged(const QnResource
 
 void QnWorkbenchDesktopCameraWatcher::processServer(QnMediaServerResourcePtr server)
 {
-    QnDesktopResourcePtr desktop = qnResPool->getResourceById(QnDesktopResource::getDesktopResourceUuid().toString()).dynamicCast<QnDesktopResource>();
+    QnDesktopResourcePtr desktop = qnResPool->getResourceById(QnDesktopResource::getDesktopResourceUuid()).dynamicCast<QnDesktopResource>();
     if (desktop && m_serverList.contains(server)) 
     {
-        if (server->getStatus() == QnResource::Online)
+        if (server->getStatus() == Qn::Online)
             desktop->addConnection(server);
         else
             desktop->removeConnection(server);
@@ -110,7 +110,7 @@ void QnWorkbenchDesktopCameraWatcher::processServer(QnMediaServerResourcePtr ser
 
 void QnWorkbenchDesktopCameraWatcher::at_recordingSettingsChanged()
 {
-    QnDesktopResourcePtr desktop = qnResPool->getResourceById(QnDesktopResource::getDesktopResourceUuid().toString()).dynamicCast<QnDesktopResource>();
+    QnDesktopResourcePtr desktop = qnResPool->getResourceById(QnDesktopResource::getDesktopResourceUuid()).dynamicCast<QnDesktopResource>();
     if (!desktop)
         return;
 

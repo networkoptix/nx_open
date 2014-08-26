@@ -15,9 +15,25 @@ namespace Qn {
         /* Actions that are not assigned to any menu. */
 
         /**
-         * Opens connection setting dialog.
+         * Opens login dialog.
          */
-        ConnectToServerAction,
+        OpenLoginDialogAction,
+
+        /**
+         * Connects to server.
+         */
+        ConnectAction,
+
+        /**
+         * Disconnects from server.
+         */
+        DisconnectAction,
+
+        /**
+         * Forcefully disconnects from the current server (if any).
+         * Connects to the server using the last used URL set in <tt>QnSettings</tt>.
+         */
+        ReconnectAction,
 
         /**
          * Opens licenses preferences tab.
@@ -33,22 +49,6 @@ namespace Qn {
          * Opens notifications settings preferences tab.
          */
         PreferencesNotificationTabAction,
-
-        /**
-         * Reconnects to the Enterprise Controller using the last used URL
-         * set in <tt>QnSettings</tt>.
-         *
-         * Parameters.
-         * <tt>QnConnectInfoPtr ConnectionInfoRole</tt> --- a connection info
-         * to use. If not provided, action handler will try to send a connect
-         * request first.
-         */
-        ReconnectAction,
-
-        /**
-         * Disconnects from the Enterprise Controller
-         */
-        DisconnectAction,
 
         /**
          * Shows / hides FPS display.
@@ -73,7 +73,7 @@ namespace Qn {
 
         /**
          * Drops provided serialized resources on the current layout after
-         * connection to Enterprise Controller was established.
+         * connection to Server was established.
          *
          * Parameters:
          *
@@ -216,6 +216,11 @@ namespace Qn {
          */
         QueueAppRestartAction,
 
+        /**
+         * Offers user to select server in cluster for other servers to synchronize time with
+         */
+        SelectTimeServerAction,
+
 
         /* Main menu actions. */
 
@@ -319,6 +324,15 @@ namespace Qn {
          */
         ExitAction,
 
+        /** 
+         * Closes the client asynchronously.
+         */
+        ExitActionDelayed,
+
+        /** 
+         * Notifies all modules about client closing.
+         */
+        BeforeExitAction,
 
         /* Tree Root Nodes actions */
 
@@ -565,11 +579,6 @@ namespace Qn {
         OpenInCameraSettingsDialogAction,
 
         /**
-         * Clears the resource that is currently open in camera settings dialog.
-         */
-        ClearCameraSettingsAction,
-
-        /**
          * Opens server settings dialog.
          */
         ServerSettingsAction,
@@ -595,7 +604,7 @@ namespace Qn {
         ServerAddCameraManuallyAction,
 
         /**
-         * Opens camera list by media server
+         * Opens camera list by server
          */
         CameraListByServerAction,
 
@@ -739,7 +748,7 @@ namespace Qn {
         RemoveLayoutItemAction,
 
         /**
-         * Removes a resource from Enterprise Controller.
+         * Removes a resource from Server.
          */
         RemoveFromServerAction,
 
@@ -970,6 +979,10 @@ namespace Qn {
         JumpToLiveAction,
         ToggleSyncAction,
 
+        /**
+         * Toggle the background animation.
+         */
+        ToggleBackgroundAnimationAction,
 
         /* Debug actions. */
 

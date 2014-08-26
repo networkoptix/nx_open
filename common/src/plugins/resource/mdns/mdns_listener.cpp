@@ -6,6 +6,7 @@
 
 #include <utils/network/nettools.h>
 #include <utils/network/system_socket.h>
+#include <utils/network/socket_factory.h>
 
 #ifndef Q_OS_WIN
 #include <netinet/in.h>
@@ -21,15 +22,22 @@ static QString groupAddress(QLatin1String("224.0.0.251"));
 
 // -------------- QnMdnsListener ------------
 
-QnMdnsListener::QnMdnsListener():
+static QnMdnsListener* QnMdnsListener_instance = nullptr;
+
+QnMdnsListener::QnMdnsListener()
+:
     m_receiveSocket(0)
 {
     updateSocketList();
     readDataFromSocket();
+
+    assert(QnMdnsListener_instance == nullptr);
+    QnMdnsListener_instance = this;
 }
 
 QnMdnsListener::~QnMdnsListener()
 {
+    QnMdnsListener_instance = nullptr;
     deleteSocketList();
 }
 
@@ -135,7 +143,7 @@ void QnMdnsListener::updateSocketList()
         std::unique_ptr<UDPSocket> sock( new UDPSocket() );
         QString localAddress = iface.address.toString();
         //if (socket->bindToInterface(iface))
-        if (sock->setLocalAddressAndPort(iface.address.toString()))
+        if( sock->bind( SocketAddress( iface.address.toString() ) ) )
         {
             sock->setMulticastIF(localAddress);
             m_socketList << sock.release();
@@ -143,9 +151,9 @@ void QnMdnsListener::updateSocketList()
         }
     }
 
-    m_receiveSocket = new UDPSocket();
+    m_receiveSocket = SocketFactory::createDatagramSocket();
     m_receiveSocket->setReuseAddrFlag(true);
-    m_receiveSocket->setLocalPort(MDNS_PORT);
+    m_receiveSocket->bind( SocketAddress( HostAddress::anyHost, MDNS_PORT ) );
 
     for (int i = 0; i < m_localAddressList.size(); ++i)
         m_receiveSocket->joinGroup(groupAddress, m_localAddressList[i]);
@@ -175,11 +183,9 @@ QStringList QnMdnsListener::getLocalAddressList() const
 
 
 
-Q_GLOBAL_STATIC(QnMdnsListener, QnMdnsListener_instance);
-
 QnMdnsListener* QnMdnsListener::instance()
 {
-    return QnMdnsListener_instance();
+    return QnMdnsListener_instance;
 }
 
 #endif // ENABLE_MDNS

@@ -7,11 +7,8 @@
     <x>0</x>
     <y>0</y>
     <width>725</width>
-    <height>402</height>
+    <height>426</height>
    </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Camera settings</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -29,46 +26,30 @@
          <property name="title">
           <string>Authentication</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_5">
-          <item>
-           <layout class="QFormLayout" name="formLayout_2">
-            <property name="leftMargin">
-             <number>9</number>
+         <layout class="QFormLayout" name="formLayout_3">
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="loginEdit"/>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="passwordEdit">
+            <property name="echoMode">
+             <enum>QLineEdit::PasswordEchoOnEdit</enum>
             </property>
-            <property name="topMargin">
-             <number>9</number>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="passwordLabel">
+            <property name="text">
+             <string>Password:</string>
             </property>
-            <property name="rightMargin">
-             <number>9</number>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="loginLabel">
+            <property name="text">
+             <string>Login:</string>
             </property>
-            <property name="bottomMargin">
-             <number>9</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QLabel" name="loginLabel">
-              <property name="text">
-               <string>Login:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLineEdit" name="loginEdit"/>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="passwordLabel">
-              <property name="text">
-               <string>Password:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLineEdit" name="passwordEdit">
-              <property name="echoMode">
-               <enum>QLineEdit::PasswordEchoOnEdit</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -76,38 +57,73 @@
        <item>
         <widget class="QGroupBox" name="arGroupBox">
          <property name="title">
-          <string>Aspect Ratio Control</string>
+          <string>Image Control</string>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_6">
-          <item>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QComboBox" name="arComboBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="currentIndex">
+               <number>-1</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QComboBox" name="rotComboBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="0">
            <widget class="QCheckBox" name="arOverrideCheckBox">
             <property name="text">
              <string>Force aspect ratio to:</string>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QComboBox" name="arComboBox">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="currentIndex">
-             <number>-1</number>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="rotCheckBox">
+            <property name="text">
+             <string>Force rotation to:</string>
             </property>
            </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_5">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </widget>
@@ -144,13 +160,6 @@
              </spacer>
             </item>
             <item>
-             <widget class="QLabel" name="requiredLicensesLabel">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QPushButton" name="moreLicensesButton">
               <property name="text">
                <string>Get More Licenses...</string>
@@ -160,18 +169,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QLabel" name="digitalLicensesLabel">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="analogLicensesLabel">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
+           <widget class="QnLicensesUsageWidget" name="licensesUsageWidget" native="true"/>
           </item>
          </layout>
         </widget>
@@ -260,6 +258,12 @@
    <class>QnAdvancedSettingsWidget</class>
    <extends>QWidget</extends>
    <header>ui/widgets/properties/expert_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnLicensesUsageWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/licenses_usage_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

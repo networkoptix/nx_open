@@ -7,7 +7,7 @@
 
 QnRouter::QnRouter(QObject *parent) :
     QObject(parent),
-    m_connection(0),
+    m_connection(std::weak_ptr<ec2::AbstractECConnection>()),
     m_moduleFinder(0),
     m_routeBuilder(new QnRouteBuilder(qnCommon->moduleGUID()))
 {
@@ -16,14 +16,16 @@ QnRouter::QnRouter(QObject *parent) :
 QnRouter::~QnRouter() {}
 
 void QnRouter::setConnection(const ec2::AbstractECConnectionPtr &connection) {
-    if (m_connection)
-        m_connection->getMiscManager()->disconnect(this);
+    ec2::AbstractECConnectionPtr oldConnection = m_connection.lock();
+
+    if (oldConnection)
+        oldConnection->getMiscManager()->disconnect(this);
 
     m_connection = connection;
 
-    if (m_connection) {
-        connect(m_connection->getMiscManager().get(),       &ec2::AbstractMiscManager::connectionAdded,     this,   &QnRouter::at_connectionAdded);
-        connect(m_connection->getMiscManager().get(),       &ec2::AbstractMiscManager::connectionRemoved,   this,   &QnRouter::at_connectionRemoved);
+    if (connection) {
+        connect(connection->getMiscManager().get(),         &ec2::AbstractMiscManager::connectionAdded,     this,   &QnRouter::at_connectionAdded);
+        connect(connection->getMiscManager().get(),         &ec2::AbstractMiscManager::connectionRemoved,   this,   &QnRouter::at_connectionRemoved);
     }
 }
 
@@ -42,32 +44,32 @@ void QnRouter::setModuleFinder(QnModuleFinder *moduleFinder) {
     }
 }
 
-QMultiHash<QnId, QnRouter::Endpoint> QnRouter::connections() const {
+QMultiHash<QUuid, QnRouter::Endpoint> QnRouter::connections() const {
     return m_connections;
 }
 
-QHash<QnId, QnRouteList> QnRouter::routes() const {
+QHash<QUuid, QnRouteList> QnRouter::routes() const {
     return m_routeBuilder->routes();
 }
 
-QnRoute QnRouter::routeTo(const QnId &id) const {
+QnRoute QnRouter::routeTo(const QUuid &id) const {
     return m_routeBuilder->routeTo(id);
 }
 
 QnRoute QnRouter::routeTo(const QString &host, quint16 port) const {
-    QnId id = whoIs(host, port);
+    QUuid id = whoIs(host, port);
     return id.isNull() ? QnRoute() : routeTo(id);
 }
 
-QnId QnRouter::whoIs(const QString &host, quint16 port) const {
+QUuid QnRouter::whoIs(const QString &host, quint16 port) const {
     for (auto it = m_connections.begin(); it != m_connections.end(); ++it) {
         if (it->host == host && it->port == port)
             return it->id;
     }
-    return QnId();
+    return QUuid();
 }
 
-void QnRouter::at_connectionAdded(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port) {
+void QnRouter::at_connectionAdded(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port) {
     if (m_connections.contains(discovererId, Endpoint(peerId, host, port)))
         return;
 
@@ -75,7 +77,7 @@ void QnRouter::at_connectionAdded(const QnId &discovererId, const QnId &peerId, 
     m_routeBuilder->addConnection(discovererId, peerId, host, port);
 }
 
-void QnRouter::at_connectionRemoved(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port) {
+void QnRouter::at_connectionRemoved(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port) {
     if (!m_connections.contains(discovererId, Endpoint(peerId, host, port)))
         return;
 
@@ -92,8 +94,8 @@ void QnRouter::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInfo
 
         m_connections.insert(qnCommon->moduleGUID(), endpoint);
         m_routeBuilder->addConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
-        if (m_connection)
-            m_connection->getMiscManager()->addConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
+            connection->getMiscManager()->addConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
 }
 
@@ -104,21 +106,21 @@ void QnRouter::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInfor
 
         m_routeBuilder->removeConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
         m_connections.remove(qnCommon->moduleGUID(), endpoint);
-        if (m_connection)
-            m_connection->getMiscManager()->removeConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
+            connection->getMiscManager()->removeConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
     makeConsistent();
 }
 
 void QnRouter::makeConsistent() {
     // this function just makes endpoint availability test and removes connections to unavailable endpoints
-    QMultiHash<QnId, Endpoint> connections = m_connections;
+    QMultiHash<QUuid, Endpoint> connections = m_connections;
 
-    QQueue<QnId> pointsToCheck;
+    QQueue<QUuid> pointsToCheck;
     pointsToCheck.enqueue(qnCommon->moduleGUID());
 
     while (!pointsToCheck.isEmpty()) {
-        QnId point = pointsToCheck.dequeue();
+        QUuid point = pointsToCheck.dequeue();
 
         foreach (const Endpoint &endpoint, connections.values(point)) {
             connections.remove(point, endpoint);

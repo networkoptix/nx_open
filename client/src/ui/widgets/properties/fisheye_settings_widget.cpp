@@ -57,6 +57,7 @@ void QnFisheyeSettingsWidget::updateFromParams(const QnMediaDewarpingParams &par
         ui->calibrateWidget->setImageProvider(imageProvider);
     }
     ui->calibrateWidget->setRadius(params.radius);
+    ui->calibrateWidget->setHorizontalStretch(params.hStretch);
     ui->calibrateWidget->setCenter(QPointF(params.xCenter, params.yCenter));
 }
 
@@ -71,6 +72,7 @@ void QnFisheyeSettingsWidget::submitToParams(QnMediaDewarpingParams &params) {
     params.xCenter = ui->calibrateWidget->center().x();
     params.yCenter = ui->calibrateWidget->center().y();
     params.radius = ui->calibrateWidget->radius();
+    params.hStretch = ui->calibrateWidget->horizontalStretch();
 }
 
 void QnFisheyeSettingsWidget::updateSliderFromSpinbox(double value) {

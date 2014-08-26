@@ -87,7 +87,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
             {
                 QnTestCameraResourcePtr resource ( new QnTestCameraResource() );
 
-                QnId rt = qnResTypePool->getResourceTypeId(manufacture(), resName);
+                QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), resName);
                 if (rt.isNull())
                     continue;
 
@@ -117,7 +117,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
     return rez;
 }
 
-QnResourcePtr QnTestCameraResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnTestCameraResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 

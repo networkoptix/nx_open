@@ -7,6 +7,7 @@
 
 #include <QtNetwork/QNetworkReply>
 
+#include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
@@ -15,7 +16,7 @@
 
 namespace CameraDiagnostics
 {
-    DiagnoseTool::DiagnoseTool( const QnId& cameraID, QObject *parent )
+    DiagnoseTool::DiagnoseTool( const QUuid& cameraID, QObject *parent )
     :
         QObject(parent),
         m_cameraID( cameraID ),
@@ -76,6 +77,24 @@ namespace CameraDiagnostics
         return m_errorMessage;
     }
 
+    void DiagnoseTool::onGetServerSystemNameResponse( int status, QString serverSystemName, int /*handle*/ )
+    {
+        const ec2::AbstractECConnectionPtr& ecConnection = QnAppServerConnectionFactory::getConnection2();
+        if( (status != 0) || !ecConnection || (serverSystemName != ecConnection->connectionInfo().systemName) )
+        {
+            m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress).toString();
+
+            m_result = false;
+            emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
+            m_state = sDone;
+            emit diagnosticsDone( m_step, m_result, m_errorMessage );
+            return;
+        }
+
+        m_serverConnection->doCameraDiagnosticsStepAsync( m_cameraID, static_cast<Step::Value>(m_step+1),
+            this, SLOT(onCameraDiagnosticsStepResponse( int, QnCameraDiagnosticsReply, int )) );
+    }
+
     void DiagnoseTool::onCameraDiagnosticsStepResponse( int status, QnCameraDiagnosticsReply reply, int /*handle*/ )
     {
         if( status != 0 )
@@ -107,17 +126,9 @@ namespace CameraDiagnostics
             return;
         }
 
-        const Step::Value performedStep = static_cast<Step::Value>(reply.performedStep);
-        if( m_step == Step::mediaServerAvailability )
-        {
-            emit diagnosticsStepResult( m_step, true, QString() );
-            m_step = performedStep;
-            emit diagnosticsStepStarted( m_step );
-        }
-
         m_result = reply.errorCode == ErrorCode::noError;
         m_errorMessage = ErrorCode::toString(reply.errorCode, reply.errorParams);
-        emit diagnosticsStepResult( performedStep, m_result, m_errorMessage );
+        emit diagnosticsStepResult( static_cast<Step::Value>(reply.performedStep), m_result, m_errorMessage );
 
         const Step::Value nextStep = static_cast<Step::Value>(reply.performedStep+1);
 
@@ -141,7 +152,7 @@ namespace CameraDiagnostics
 
         if( !m_serverConnection )
         {
-            m_errorMessage = tr("No connection to media server %1.").arg(m_serverHostAddress);
+            m_errorMessage = tr("No connection to Server %1.").arg(m_serverHostAddress);
             m_result = false;
             emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
             m_state = sDone;
@@ -149,7 +160,6 @@ namespace CameraDiagnostics
             return;
         }
 
-        m_serverConnection->doCameraDiagnosticsStepAsync( m_cameraID, static_cast<Step::Value>(m_step+1),
-            this, SLOT(onCameraDiagnosticsStepResponse( int, QnCameraDiagnosticsReply, int )) );
+        m_serverConnection->getSystemNameAsync( this, SLOT(onGetServerSystemNameResponse(int, QString, int)) );
     }
 }

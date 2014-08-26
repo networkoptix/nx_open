@@ -276,7 +276,7 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
     QMutexLocker lock(&m_openMutex); // need refactor. Now open may be called from UI thread!!!
 
     m_resource = resource;
-    if (m_formatContext == 0 && m_resource->getStatus() != QnResource::Offline)
+    if (m_formatContext == 0 && m_resource->getStatus() != Qn::Offline)
     {
         m_eofReached = false;
         QString url = m_resource->getUrl(); // "c:/00-1A-07-03-BD-09.mkv"; //
@@ -290,14 +290,14 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
         m_formatContext->pb = m_ioContext = QnFfmpegHelper::createFfmpegIOContext(m_storage, url, QIODevice::ReadOnly);
         if (!m_ioContext) {
             close();
-            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccessible
+            m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
             return false;
         }
         m_initialized = avformat_open_input(&m_formatContext, "", 0, 0) >= 0;
 
         if (!m_initialized ) {
             close();
-            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccessible
+            m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
             return false;
         }
         
@@ -398,9 +398,9 @@ QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
                 if (start_time) {
                     m_startTime = QString(QLatin1String(start_time->value)).toLongLong()*1000ll;
                     if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
-                        m_resource->addFlags(QnResource::utc);
+                        m_resource->addFlags(Qn::utc);
                         if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage)) {
-                            m_resource->addFlags(QnResource::sync | QnResource::periods | QnResource::motion); // use sync for exported layout only
+                            m_resource->addFlags(Qn::sync | Qn::periods | Qn::motion); // use sync for exported layout only
                         }
                     }
                 }

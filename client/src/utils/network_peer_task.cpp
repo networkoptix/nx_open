@@ -7,16 +7,16 @@ QnNetworkPeerTask::QnNetworkPeerTask(QObject *parent) :
 
 QnNetworkPeerTask::~QnNetworkPeerTask() {}
 
-void QnNetworkPeerTask::start(const QSet<QnId> &peers) {
+void QnNetworkPeerTask::start(const QSet<QUuid> &peers) {
     m_peers = peers;
     doStart();
 }
 
-QSet<QnId> QnNetworkPeerTask::peers() const {
+QSet<QUuid> QnNetworkPeerTask::peers() const {
     return m_peers;
 }
 
-void QnNetworkPeerTask::setPeers(const QSet<QnId> &peers) {
+void QnNetworkPeerTask::setPeers(const QSet<QUuid> &peers) {
     m_peers = peers;
 }
 
@@ -24,6 +24,6 @@ void QnNetworkPeerTask::start() {
     doStart();
 }
 
-void QnNetworkPeerTask::finish(int errorCode, const QSet<QnId> &failedPeers) {
+void QnNetworkPeerTask::finish(int errorCode, const QSet<QUuid> &failedPeers) {
     emit finished(errorCode, failedPeers);
 }

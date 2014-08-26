@@ -48,7 +48,6 @@ namespace {
 // -------------------------------------------------------------------------- //
 QnResourceSelectionDialog::QnResourceSelectionDialog(SelectionTarget target, QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     m_resourceModel(NULL),
     m_delegate(NULL),
     m_thumbnailManager(NULL),
@@ -61,7 +60,6 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(SelectionTarget target, QWi
 
 QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     m_resourceModel(NULL),
     m_delegate(NULL),
     m_thumbnailManager(NULL),
@@ -101,11 +99,18 @@ void QnResourceSelectionDialog::init() {
 
     connect(m_resourceModel, &QnResourcePoolModel::dataChanged, this, &QnResourceSelectionDialog::at_resourceModel_dataChanged);
 
+
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
     ui->resourcesWidget->setEditingEnabled(false);
     ui->resourcesWidget->setSimpleSelectionEnabled(true);
     ui->resourcesWidget->treeView()->setMouseTracking(true);
+
+    connect(ui->resourcesWidget, &QnResourceTreeWidget::beforeRecursiveOperation,   this, [this]{ m_updating = true;});
+    connect(ui->resourcesWidget, &QnResourceTreeWidget::afterRecursiveOperation,   this, [this]{
+        m_updating = false;
+        at_resourceModel_dataChanged();
+    });
 
     ui->delegateFrame->setVisible(false);
 
@@ -221,7 +226,7 @@ void QnResourceSelectionDialog::updateThumbnail(const QModelIndex &index) {
     ui->detailsLabel->setText(toolTipText);
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    if (resource && (resource->flags() & QnResource::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
+    if (resource && (resource->flags() & Qn::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
         m_tooltipResourceId = resource->getId();
         m_thumbnailManager->selectResource(resource);
         ui->screenshotWidget->show();
@@ -235,7 +240,7 @@ void QnResourceSelectionDialog::at_resourceModel_dataChanged() {
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_delegate || m_delegate->validate(selectedResources()));
 }
 
-void QnResourceSelectionDialog::at_thumbnailReady(QnId resourceId, const QPixmap &thumbnail) {
+void QnResourceSelectionDialog::at_thumbnailReady(QUuid resourceId, const QPixmap &thumbnail) {
     if (m_tooltipResourceId != resourceId)
         return;
     m_screenshotIndex = 1 - m_screenshotIndex;

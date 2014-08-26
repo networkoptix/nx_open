@@ -18,6 +18,8 @@ public:
 
     virtual void updateFromSettings() override;
     virtual void submitToSettings() override;
+
+    virtual bool hasChanges() const override;
 private:
     QScopedPointer<Ui::GeneralSystemAdministrationWidget> ui;
 };

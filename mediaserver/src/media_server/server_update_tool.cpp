@@ -149,7 +149,11 @@ bool QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
         }
     }
 
-    if (data.isEmpty()) { // it means we're just got the size of the file
+    // Closed file means we've already finished downloading. Nothing to do is left.
+    if (!m_file->isOpen())
+        return true;
+
+    if (data.isEmpty()) { // it means we've just got the size of the file
         m_length = offset;
     } else {
         m_file->seek(offset);
@@ -162,8 +166,6 @@ bool QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
         m_file->close();
 
         bool ok = processUpdate(updateId, m_file.data());
-
-        m_file.reset();
 
         sendReply(ok ? ec2::AbstractUpdatesManager::Finished : ec2::AbstractUpdatesManager::Failed);
 

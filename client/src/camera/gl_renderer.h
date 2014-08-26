@@ -158,10 +158,16 @@ private:
      * \param v_array
      * \param tx_array texture vertexes array
      */
-    void drawBindedTexture( QnAbstractBaseGLShaderProgramm* program , const float* v_array, const float* tx_array );
+    void drawBindedTexture( QnGLShaderProgram* shader , const float* v_array, const float* tx_array );
     void updateTexture( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     bool isYuvFormat() const;
     int glRGBFormat() const;
+
+private:
+    bool m_initialized;
+    QOpenGLVertexArrayObject m_vertices;
+    QOpenGLBuffer m_positionBuffer;
+    QOpenGLBuffer m_textureBuffer;
 };
 
 #endif //QN_GL_RENDERER_H

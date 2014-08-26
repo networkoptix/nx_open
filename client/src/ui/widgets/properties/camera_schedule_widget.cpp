@@ -83,28 +83,23 @@ namespace {
         virtual bool validate(const QnResourceList &selected) override {
             QnVirtualCameraResourceList cameras = selected.filtered<QnVirtualCameraResource>();
 
-            QnLicenseUsageHelper helper(cameras, m_recordingEnabled);
+            QnCamLicenseUsageHelper helper(cameras, m_recordingEnabled);
 
             QPalette palette = m_parentPalette;
             bool licensesOk = helper.isValid();
-            if(!licensesOk)
+            QString licenseUsage = helper.getProposedUsageText();
+            if(!licensesOk) {
                 setWarningStyle(&palette);
-            m_licensesLabel->setPalette(palette);
-
-            QString usageText =
-                    tr("%n license(s) will be used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital());
-
-            if (helper.totalAnalog() > 0) {
-                usageText += L'\n';
-                usageText += tr("%n analog license(s) will be used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
+                licenseUsage += L'\n' + helper.getRequiredLicenseMsg();
             }
-            m_licensesLabel->setText(usageText);
+            m_licensesLabel->setText(licenseUsage);
+            m_licensesLabel->setPalette(palette);
 
             bool motionOk = true;
             if (m_motionUsed){
                 foreach (const QnVirtualCameraResourcePtr &camera, cameras)
                 {
-                    bool hasMotion = camera->getMotionType() != Qn::MT_NoMotion;
+                    bool hasMotion = camera->hasMotion();
                     if (!hasMotion) {
                         motionOk = false;
                         break;
@@ -179,6 +174,9 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
     ui->noRecordButton->setColor(qnGlobals->noRecordColor());
     ui->noRecordButton->setCheckedColor(qnGlobals->noRecordColor().lighter());
+
+    QnCamLicenseUsageHelper helper;
+    ui->licensesUsageWidget->init(&helper);
 
     connect(ui->recordAlwaysButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
     connect(ui->recordMotionButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
@@ -684,10 +682,7 @@ void QnCameraScheduleWidget::updateGridEnabledState()
 
 void QnCameraScheduleWidget::updateLicensesLabelText()
 {
-    QnLicenseUsageHelper helper;
-
-    int usedDigitalChange = helper.usedDigital();
-    int usedAnalogChange = helper.usedAnalog();
+    QnCamLicenseUsageHelper helper;
 
     switch(ui->enableRecordingCheckBox->checkState()) {
     case Qt::Checked:
@@ -699,59 +694,7 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
     default:
         break;
     }
-
-    usedDigitalChange = helper.usedDigital() - usedDigitalChange;
-    usedAnalogChange = helper.usedAnalog() - usedAnalogChange;
-
-    { // digital licenses
-        QString usageText = tr("%n license(s) are used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital());
-        ui->digitalLicensesLabel->setText(usageText);
-        QPalette palette = this->palette();
-        if (!helper.isValid() && helper.required() > 0)
-            setWarningStyle(&palette);
-        ui->digitalLicensesLabel->setPalette(palette);
-    }
-
-    { // analog licenses
-        QString usageText = tr("%n analog license(s) are used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
-        ui->analogLicensesLabel->setText(usageText);
-        QPalette palette = this->palette();
-        if (!helper.isValid() && helper.required() > 0)
-            setWarningStyle(&palette);
-        ui->analogLicensesLabel->setPalette(palette);
-        ui->analogLicensesLabel->setVisible(helper.totalAnalog() > 0);
-    }
-
-    if (ui->enableRecordingCheckBox->checkState() != Qt::Checked) {
-        ui->requiredLicensesLabel->setVisible(false);
-        return;
-    }
-
-    { // required licenses
-        QPalette palette = this->palette();
-        if (!helper.isValid())
-            setWarningStyle(&palette);
-        ui->requiredLicensesLabel->setPalette(palette);
-        ui->requiredLicensesLabel->setVisible(true);
-    }
-
-    if (helper.required() > 0) {
-        ui->requiredLicensesLabel->setText(tr("Activate %n more license(s).", "", helper.required()));
-    } else if (usedDigitalChange > 0 && usedAnalogChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%1 more licenses and %2 more analog licenses will be used.")
-                                           .arg(usedDigitalChange)
-                                           .arg(usedAnalogChange)
-                                           );
-    } else if (usedDigitalChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%n more license(s) will be used.", "", usedDigitalChange));
-    } else if (usedAnalogChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%n more analog license(s) will be used.", "", usedAnalogChange));
-    }
-    else {
-        ui->requiredLicensesLabel->setText(QString());
-    }
-
-
+    ui->licensesUsageWidget->loadData(&helper);
 }
 
 void QnCameraScheduleWidget::updateLicensesButtonVisible() {
@@ -773,7 +716,7 @@ void QnCameraScheduleWidget::updateMotionButtons() {
     bool hasMotion = !m_cameras.isEmpty();
     foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
         hasDualStreaming &= camera->hasDualStreaming2();
-        hasMotion &= camera->supportedMotionType() != Qn::MT_NoMotion;
+        hasMotion &= camera->hasMotion();
     }
 
     bool enabled;
@@ -892,7 +835,7 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
     bool hasMotion = !m_cameras.isEmpty();
     foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
         hasDualStreaming &= camera->hasDualStreaming2();
-        hasMotion &= camera->supportedMotionType() != Qn::MT_NoMotion;
+        hasMotion &= camera->hasMotion();
     }
 
     if(m_cameras.size() > 1) {
@@ -918,7 +861,7 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
     dialog->setDelegate(dialogDelegate);
     dialog->setSelectedResources(m_cameras);
     setHelpTopic(dialog.data(), Qn::CameraSettings_Recording_Export_Help);
-    if (dialog->exec() != QDialog::Accepted)
+    if (!dialog->exec())
         return;
 
     const bool copyArchiveLength = dialogDelegate->doCopyArchiveLength();

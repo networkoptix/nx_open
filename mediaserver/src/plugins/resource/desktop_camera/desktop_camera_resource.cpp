@@ -12,13 +12,13 @@ QString QnDesktopCameraResource::getDriverName() const
 }
 
 QnDesktopCameraResource::QnDesktopCameraResource(): QnPhysicalCameraResource() {
-    setFlags(flags() | no_last_gop | desktop_camera);
+    setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
 }
 
 
 QnDesktopCameraResource::QnDesktopCameraResource(const QString &userName): QnPhysicalCameraResource()
 {
-    setFlags(flags() | no_last_gop | desktop_camera);
+    setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
     setName(userName);
 }
 

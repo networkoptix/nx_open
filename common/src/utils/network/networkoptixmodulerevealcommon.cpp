@@ -32,14 +32,23 @@ bool RevealRequest::deserialize(const quint8 **bufStart, const quint8 *bufEnd) {
     return true;
 }
 
+
+
+RevealResponse::RevealResponse()
+:
+    sslAllowed(false)
+{
+}
+
 bool RevealResponse::serialize(quint8 **const bufStart, const quint8 *bufEnd) {
     QVariantMap map;
     map[lit("application")] = type;
     map[lit("version")] = version;
     map[lit("customization")] = customization;
-    map[lit("seed")] = seed;
+    map[lit("seed")] = seed.toString();
     map[lit("systemName")] = name;
     map[lit("systemInformation")] = systemInformation;
+    map[lit("sslAllowed")] = sslAllowed;
     for (auto it = typeSpecificParameters.begin(); it != typeSpecificParameters.end(); ++it)
         map[it.key()] = it.value();
 
@@ -63,7 +72,8 @@ bool RevealResponse::deserialize(const quint8 **bufStart, const quint8 *bufEnd) 
     systemInformation = map.take(lit("systemInformation")).toString();
     customization = map.take(lit("customization")).toString();
     name = map.take(lit("systemName")).toString();
-    seed = map.take(lit("seed")).toString();
+    seed = QUuid(map.take(lit("seed")).toString());
+    sslAllowed = map.take( lit( "sslAllowed" ) ).toBool();
     for (auto it = map.begin(); it != map.end(); ++it)
         typeSpecificParameters.insert(it.key(), it.value().toString());
 

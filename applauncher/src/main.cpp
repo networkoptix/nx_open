@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <iostream>
 
-#include <QtSingleApplication>
+#include <qtsinglecoreapplication.h>
 #include <QDir>
 #include <QThread>
 
@@ -70,7 +70,7 @@ int doInstallation(
     const QString& module,
     const QString& installationPath );
 
-int testHttpClient();
+int downloadFile( const QString& url, const QString& destFilePath );
 
 int main( int argc, char* argv[] )
 {
@@ -97,6 +97,9 @@ int main( int argc, char* argv[] )
     QString moduleToInstall( QString::fromLatin1("client") );
     QString installationPath;
     QString devModeKey;
+    
+    QString fileToDownload;
+    QString destFilePath;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter( &logLevel, "--log-level", NULL, QString() );
@@ -114,9 +117,11 @@ int main( int argc, char* argv[] )
     commandLineParser.addParameter( &moduleToInstall, "--module", NULL, QString(), QString() );
     commandLineParser.addParameter( &installationPath, "--install-path", NULL, QString(), QString() );
     commandLineParser.addParameter( &devModeKey, "--dev-mode-key", NULL, QString(), QString() );
+    commandLineParser.addParameter( &fileToDownload, "--get", "-g", QString(), QString() );
+    commandLineParser.addParameter( &destFilePath, "--out-file", "-o", QString(), QString() );
     commandLineParser.parse( argc, argv, stderr );
 
-    QtSingleApplication app( SERVICE_NAME, argc, argv );
+    QtSingleCoreApplication app( SERVICE_NAME, argc, argv );
     QDir::setCurrent( QCoreApplication::applicationDirPath() );
 
     QSettings globalSettings( QSettings::SystemScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
@@ -147,6 +152,8 @@ int main( int argc, char* argv[] )
 
     InstallationManager installationManager;
 
+    if( !fileToDownload.isEmpty() )
+        return downloadFile( fileToDownload, destFilePath );
     if( syncMode )
         return syncDir( localDir, remoteUrl );
     if( installMode )
@@ -252,6 +259,11 @@ int doInstallation(
         return 1;
     }
 
+    if( !installationManager.isValidVersionName(version) )
+    {
+        std::cerr<<"FAILURE. "<<version.toStdString()<<" is not a valid version to install"<<std::endl;
+        return 1; 
+    }
     QString effectiveInstallationPath = installationPath;
     if( effectiveInstallationPath.isEmpty() )
         effectiveInstallationPath = installationManager.installationDirForVersion(version);
@@ -295,34 +307,40 @@ int doInstallation(
 
 
 #include <fstream>
+#include <string.h>
 
 #include <utils/network/http/httpclient.h>
 
 //--rsync --dir=c:/temp/1 --url=http://enk.me/clients/2.1/default/windows/x64/
 
-int testHttpClient()
+int downloadFile( const QString& url, const QString& destFilePath )
 {
-    const char* SOURCE_URL = "http://10.0.2.222/client-2.0/mediaserver";
-    const char* DEST_FILE = "c:\\tmp\\mediaserver";
+    QUrl sourceUrl( url );
+
+    std::string destFile = destFilePath.isEmpty()
+        ? QFileInfo( sourceUrl.path() ).fileName().toStdString()
+        : destFilePath.toStdString();
 
     nx_http::HttpClient httpClient;
-    if( !httpClient.doGet( QUrl(SOURCE_URL) ) )
+    httpClient.setUserName( sourceUrl.userName() );
+    httpClient.setUserPassword( sourceUrl.password() );
+    if( !httpClient.doGet( sourceUrl ) )
     {
-        std::cerr<<"Failed to get "<<SOURCE_URL<<std::endl;
+        std::cerr << "Failed to get " << url.toStdString() << std::endl;
         return 1;
     }
 
     if( (httpClient.response()->statusLine.statusCode / 200 * 200) != nx_http::StatusCode::ok )
     {
-        std::cerr<<"Failed to get "<<SOURCE_URL<<". "<<httpClient.response()->statusLine.reasonPhrase.constData()<<std::endl;
+        std::cerr << "Failed to get " << url.toStdString() << ". " << httpClient.response()->statusLine.reasonPhrase.constData() << std::endl;
         return 1;
     }
 
     std::ofstream f;
-    f.open( DEST_FILE, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary );
+    f.open( destFile, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary );
     if( !f.is_open() )
     {
-        std::cerr<<"Failed to open "<<DEST_FILE<<std::endl;
+        std::cerr << "Failed to open " << destFile << std::endl;
         return 1;
     }
 

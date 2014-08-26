@@ -112,19 +112,36 @@ QString strPadLeft(const QString &str, int len, char ch)
     return str;
 }
 
+QString getPathSeparator(const QString& path)
+{
+    return path.contains(lit("\\")) ? lit("\\") : lit("/");
+}
+
 QString closeDirPath(const QString& value)
 {
-    QString tmp = value;
-    for (int i = 0; i < tmp.size(); ++i) {
-        if (tmp[i] == QLatin1Char('\\'))
-            tmp[i] = QLatin1Char('/');
-    }
-    if (tmp.endsWith(QLatin1Char('/')))
-        return tmp;
+    QString separator = getPathSeparator(value);
+    if (value.endsWith(separator))
+        return value;
     else
-        return tmp + QLatin1Char('/');
+        return value + separator;
 }
+
 #ifdef Q_OS_WIN32
+
+bool isLocalPath(const QString& folder)
+{
+    return folder.length() >= 2 && folder[1] == L':';
+}
+
+QString getParentFolder(const QString& root)
+{
+    QString newRoot = QDir::toNativeSeparators(root);
+    if (newRoot.endsWith(QDir::separator()))
+        newRoot.chop(1);
+    return newRoot.left(newRoot.lastIndexOf(QDir::separator())+1);
+}
+
+
 qint64 getDiskFreeSpace(const QString& root)
 {
     quint64 freeBytesAvailableToCaller = -1;
@@ -136,7 +153,11 @@ qint64 getDiskFreeSpace(const QString& root)
         (PULARGE_INTEGER) &totalNumberOfBytes, // receives the number of bytes on disk
         (PULARGE_INTEGER) &totalNumberOfFreeBytes // receives the free bytes on disk
     );
-    Q_UNUSED(status);
+    if (!status && isLocalPath(root)) {
+        QString newRoot = getParentFolder(root);
+        if (!newRoot.isEmpty())
+            return getDiskFreeSpace(newRoot); // try parent folder
+    }
     return totalNumberOfFreeBytes;
 };
 
@@ -151,7 +172,11 @@ qint64 getDiskTotalSpace(const QString& root)
         (PULARGE_INTEGER) &totalNumberOfBytes, // receives the number of bytes on disk
         (PULARGE_INTEGER) &totalNumberOfFreeBytes // receives the free bytes on disk
         );
-    Q_UNUSED(status);
+    if (!status && isLocalPath(root)) {
+        QString newRoot = getParentFolder(root);
+        if (!newRoot.isEmpty())
+            return getDiskTotalSpace(newRoot); // try parent folder
+    }
     return totalNumberOfBytes;
 };
 

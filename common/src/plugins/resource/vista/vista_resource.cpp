@@ -43,7 +43,7 @@ QnAbstractPtzController *QnVistaResource::createPtzControllerInternal() {
 
 bool QnVistaResource::startInputPortMonitoring()
 {
-    if( hasFlags(QnResource::foreigner) )     //we do not own camera
+    if( hasFlags(Qn::foreigner) )     //we do not own camera
     {
         return false;
     }

@@ -27,7 +27,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     if (connection) {
         assert(!m_connected);
         assert(qnCommon->remoteGUID().isNull());
-        qnCommon->setRemoteGUID(connection->connectionInfo().ecsGuid);
+        qnCommon->setRemoteGUID(QUuid(connection->connectionInfo().ecsGuid));
         connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
         connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
         connect( connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
@@ -36,8 +36,9 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
         assert(!qnCommon->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;
         data.peer.id = qnCommon->remoteGUID();
-        at_remotePeerLost(data, false);
         qnCommon->setRemoteGUID(QUuid());
+        m_connected = false;
+        emit connectionClosed();
     } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
         qnCommon->setRemoteGUID(QUuid());
     }
@@ -53,26 +54,37 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
         emit connectionClosed();
 }
 
-void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
+void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) {
     resource->setStatus(status);
     checkForTmpStatus(resource);
 }
 
-void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
+void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) 
+{
+    /* 
+     * In rare cases we can receive updateResource call when the client is
+     * in the reconnect process (it starts an event loop inside the main 
+     * thread). Populating the resource pool or changing resources is highly 
+     * inappropriate at that time.
+     * */
+    if (!m_connection)
+        return;
+
+    QnCommonMessageProcessor::updateResource(resource);
+
     QnResourcePtr ownResource;
 
     ownResource = qnResPool->getIncompatibleResourceById(resource->getId(), true);
 
     // Use discovery information to update offline servers. They may be just incompatible.
-    if (resource->getStatus() == QnResource::Offline) {
+    if (resource->getStatus() == Qn::Offline) {
         QnModuleInformation moduleInformation = QnGlobalModuleFinder::instance()->moduleInformation(resource->getId());
-        if (!moduleInformation.id.isNull()) {
+        if (!moduleInformation.id.isNull() && !moduleInformation.isCompatibleToCurrentSystem()) {
             if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) {
                 mediaServer->setVersion(moduleInformation.version);
                 mediaServer->setSystemInfo(moduleInformation.systemInformation);
                 mediaServer->setSystemName(moduleInformation.systemName);
-                if (moduleInformation.systemName != qnCommon->localSystemName() || moduleInformation.version != qnCommon->engineVersion())
-                    mediaServer->setStatus(QnResource::Incompatible);
+                mediaServer->setStatus(Qn::Incompatible);
             }
         }
     }
@@ -81,28 +93,24 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
         qnResPool->addResource(resource);
         if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
             determineOptimalIF(mediaServer);
-    }
-    else {
-        bool mserverStatusChanged = false;
-        bool compatibleStatusChanged = false;
-        QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>();
-        if (mediaServer) {
-            mserverStatusChanged = ownResource->getStatus() != resource->getStatus();
-            compatibleStatusChanged = mserverStatusChanged && (ownResource->getStatus() == QnResource::Incompatible || resource->getStatus() == QnResource::Incompatible);
-        }
-
-        // move incompatible resource to the main pool if it became normal
-        if (ownResource && ownResource->getStatus() == QnResource::Incompatible && resource->getStatus() != QnResource::Incompatible)
-            qnResPool->makeResourceNormal(ownResource);
-
+    } else {
+        Qn::ResourceStatus oldStatus = ownResource->getStatus();
         ownResource->update(resource);
 
-        if (mserverStatusChanged && mediaServer)
-            determineOptimalIF(mediaServer);
+        if (QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>()) {
+            /* Handling a case when an incompatibe server is changing its systemName at runtime and becoming compatible. */
+            if (resource->getStatus() == Qn::NotDefined && mediaServer->getStatus() == Qn::Incompatible) {
+                if (QnMediaServerResourcePtr updatedServer = resource.dynamicCast<QnMediaServerResource>()) {
+                    if (isCompatible(qnCommon->engineVersion(), updatedServer->getVersion()) && qnCommon->localSystemName() == updatedServer->getSystemName())
+                        mediaServer->setStatus(Qn::Online);
+                }
+            }
 
-        // move server into the other subtree if compatibility has been changed
-        if (compatibleStatusChanged && mediaServer)
-            mediaServer->parentIdChanged(mediaServer);
+            if (oldStatus != mediaServer->getStatus()) {
+                qnResPool->updateIncompatibility(mediaServer);
+                determineOptimalIF(mediaServer);
+            }
+        }
     }
 
     // TODO: #Elric #2.3 don't update layout if we're re-reading resources, 
@@ -126,36 +134,36 @@ void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
     // process tmp status
     if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) 
     {
-        if (mediaServer->getStatus() == QnResource::Offline)
-            updateServerTmpStatus(mediaServer->getId(), QnResource::Offline);
+        if (mediaServer->getStatus() == Qn::Offline)
+            updateServerTmpStatus(mediaServer->getId(), Qn::Offline);
         else
-            updateServerTmpStatus(mediaServer->getId(), QnResource::NotDefined);
+            updateServerTmpStatus(mediaServer->getId(), Qn::NotDefined);
     }
     else if (QnServerCameraPtr serverCamera = resource.dynamicCast<QnServerCamera>()) 
     {
         QnMediaServerResourcePtr mediaServer = qnResPool->getResourceById(serverCamera->getParentId()).dynamicCast<QnMediaServerResource>();
         if (mediaServer) {
-            if (mediaServer->getStatus() ==QnResource::Offline)
-                serverCamera->setTmpStatus(QnResource::Offline);
+            if (mediaServer->getStatus() ==Qn::Offline)
+                serverCamera->setTmpStatus(Qn::Offline);
             else
-                serverCamera->setTmpStatus(QnResource::NotDefined);
+                serverCamera->setTmpStatus(Qn::NotDefined);
         }
     }
 }
 
 void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr &resource)
 {
-    // set proxy. If some media server IF will be found, proxy address will be cleared
-    const QString& proxyAddr = QnAppServerConnectionFactory::defaultUrl().host();
+    // set proxy. If some servers IF will be found, proxy address will be cleared
+    const QString& proxyAddr = QnAppServerConnectionFactory::url().host();
     resource->apiConnection()->setProxyAddr(
         resource->getApiUrl(),
         proxyAddr,
-        QnAppServerConnectionFactory::defaultUrl().port() );    //starting with 2.3 proxy embedded to EC
+        QnAppServerConnectionFactory::url().port() );    //starting with 2.3 proxy embedded to Server
     disconnect(resource.data(), NULL, this, NULL);
     resource->determineOptimalNetIF();
 }
 
-void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource::Status status)
+void QnClientMessageProcessor::updateServerTmpStatus(const QUuid& id, Qn::ResourceStatus status)
 {
     QnResourcePtr server = qnResPool->getResourceById(id);
     if (!server)
@@ -167,7 +175,7 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource:
     }
 }
 
-void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy)
+void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
 {
     if (qnCommon->remoteGUID().isNull()) {
         qWarning() << "at_remotePeerFound received while disconnected";
@@ -177,14 +185,13 @@ void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bo
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-    assert(!isProxy);
     assert(!m_connected);
     
     m_connected = true;
     emit connectionOpened();
 }
 
-void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy)
+void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
 {
     if (qnCommon->remoteGUID().isNull()) {
         qWarning() << "at_remotePeerLost received while disconnected";
@@ -193,13 +200,12 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, boo
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
     if (server)
-        server->setStatus(QnResource::Offline);
+        server->setStatus(Qn::Offline);
 
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
 
-    Q_ASSERT_X(!isProxy, Q_FUNC_INFO, "!isProxy");
     Q_ASSERT_X(m_connected, Q_FUNC_INFO, "m_connected");
 
     m_connected = false;
@@ -223,8 +229,5 @@ void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     }
 
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
-    QnResourceDiscoveryManager::instance()->setReady(true);
-    //emit connectionOpened();
-
     m_incompatibleServerAdder = new QnIncompatibleServerAdder(this);
 }

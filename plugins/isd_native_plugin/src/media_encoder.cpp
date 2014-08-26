@@ -151,7 +151,7 @@ int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
 
 int MediaEncoder::setFps( const float& fps, float* selectedFps )
 {
-    std::cout<<"MediaEncoder::setFps. "<<fps<<std::endl;
+    //std::cout<<"MediaEncoder::setFps. "<<fps<<std::endl;
     *selectedFps = fps;
     int result = setCameraParam( QString::fromLatin1("VideoInput.1.h264.%1.FrameRate=%2\r\n").arg(m_encoderNum+1).arg(fps) );
     if( result )
@@ -165,7 +165,7 @@ int MediaEncoder::setFps( const float& fps, float* selectedFps )
     {
         m_fpsUsedToCalcBitrate = *selectedFps;
         int bitrateKbps = (int64_t)m_desiredStreamBitrateKbps * MAX_FPS / m_fpsUsedToCalcBitrate;
-        std::cout<<"MediaEncoder::setFps. setting bitrate to "<<bitrateKbps<<" Kbps"<<std::endl;
+        //std::cout<<"MediaEncoder::setFps. setting bitrate to "<<bitrateKbps<<" Kbps"<<std::endl;
         return setCameraParam( QString::fromLatin1("VideoInput.1.h264.%1.BitRate=%2\r\n").arg(m_encoderNum+1).arg(bitrateKbps) );
     }
     return result;
@@ -190,7 +190,7 @@ int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
         bitrateKbps = (int64_t)bitrateKbps * MAX_FPS / m_currentFps;
     }
 #endif
-    std::cout<<"MediaEncoder::setBitrate "<<bitrateKbps<<" Kbps"<<std::endl;
+    //std::cout<<"MediaEncoder::setBitrate "<<bitrateKbps<<" Kbps"<<std::endl;
     return setCameraParam( QString::fromLatin1("VideoInput.1.h264.%1.BitRate=%2\r\n").arg(m_encoderNum+1).arg(bitrateKbps) );
 }
 

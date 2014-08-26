@@ -115,13 +115,22 @@ bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
         QSqlQuery ddlQuery(database);
         ddlQuery.prepare(QString::fromUtf8(singleCommand));
         if (!ddlQuery.exec()) {
-            qWarning() << "can't create tables for sqlLite database:" << ddlQuery.lastError().text();
+            qWarning() << "can't create tables for sqlLite database:" << ddlQuery.lastError().text() << ". Query was: " << singleCommand;
             return false;
         }
     }
     return true;
 }
 
+QnDbHelper::QnDbTransaction* QnDbHelper::getTransaction()
+{
+    return &m_tran;
+}
+
+const QnDbHelper::QnDbTransaction* QnDbHelper::getTransaction() const
+{
+    return &m_tran;
+}
 
 bool QnDbHelper::isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database)
 {

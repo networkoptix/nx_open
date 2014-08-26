@@ -23,10 +23,9 @@ public:
 
     QList<QnModuleInformation> foundModules() const;
 
-    QList<QnId> discoverers(const QnId &moduleId);
-    QMultiHash<QnId, QnId> discoverers() const;
+    QSet<QUuid> discoverers(const QUuid &moduleId);
 
-    QnModuleInformation moduleInformation(const QnId &id) const;
+    QnModuleInformation moduleInformation(const QUuid &id) const;
 
 signals:
     void peerFound(const QnModuleInformation &moduleInformation);
@@ -34,7 +33,7 @@ signals:
     void peerLost(const QnModuleInformation &moduleInformation);
 
 private slots:
-    void at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer);
+    void at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer);
     void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation);
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
@@ -42,16 +41,16 @@ private slots:
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
 private:
-    void addModule(const QnModuleInformation &moduleInformation, const QnId &discoverer);
-    void removeModule(const QnModuleInformation &moduleInformation, const QnId &discoverer);
+    void addModule(const QnModuleInformation &moduleInformation, const QUuid &discoverer);
+    void removeModule(const QnModuleInformation &moduleInformation, const QUuid &discoverer);
 
-    void removeAllModulesDiscoveredBy(const QnId &discoverer);
+    void removeAllModulesDiscoveredBy(const QUuid &discoverer);
 
 private:
-    ec2::AbstractECConnectionPtr m_connection;  // just to know from where to disconnect
+    std::weak_ptr<ec2::AbstractECConnection> m_connection;  // just to know from where to disconnect
     QPointer<QnModuleFinder> m_moduleFinder;
-    QHash<QnId, QnModuleInformation> m_moduleInformationById;
-    QMultiHash<QnId, QnId> m_discovererIdByServerId;
+    QHash<QUuid, QnModuleInformation> m_moduleInformationById;
+    QHash<QUuid, QSet<QUuid>> m_discovererIdByServerId;
 };
 
 #endif // GLOBAL_MODULE_FINDER_H

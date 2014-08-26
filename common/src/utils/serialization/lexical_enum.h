@@ -37,7 +37,7 @@ namespace QnLexicalDetail {
 
 class QnEnumLexicalSerializerData {
 public:
-    QnEnumLexicalSerializerData(): m_caseSensitivity(Qt::CaseSensitive), m_flagged(false) {}
+    QnEnumLexicalSerializerData(): m_caseSensitivity(Qt::CaseSensitive), m_flagged(false), m_numeric(false) {}
 
     void load(const QMetaObject *metaObject, const char *enumName);
 
@@ -47,6 +47,9 @@ public:
 
     bool isFlagged() const;
     void setFlagged(bool flagged);
+
+    bool isNumeric() const;
+    void setNumeric(bool numeric);
 
     Qt::CaseSensitivity caseSensitivity() const;
     void setCaseSensitivity(Qt::CaseSensitivity caseSensitivity);
@@ -84,6 +87,7 @@ private:
     QString m_enumName;
     Qt::CaseSensitivity m_caseSensitivity;
     bool m_flagged;
+    bool m_numeric;
 };
 
 
@@ -215,6 +219,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ENUM, ELEMENTS, ##__VA_ARGS__)
 __VA_ARGS__ QnEnumLexicalSerializerData create_enum_lexical_serializer_data(const ENUM *) { \
     QnEnumLexicalSerializerData data;                                           \
     BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_DEFINE_EXPLICIT_ENUM_LEXICAL_SERIALIZER_FACTORY_FUNCTION_STEP_I, ~, ELEMENTS) \
+    data.setNumeric(QnLexical::is_numerically_serializable<ENUM>::value);       \
+    data.setFlagged(QnSerialization::is_flags<ENUM>::value);                    \
     return std::move(data);                                                     \
 }
 
@@ -230,6 +236,8 @@ __VA_ARGS__ QnEnumLexicalSerializerData create_enum_lexical_serializer_data(cons
 __VA_ARGS__ QnEnumLexicalSerializerData create_enum_lexical_serializer_data(const SCOPE::ENUM *) { \
     QnEnumLexicalSerializerData data;                                           \
     data.load(&SCOPE::staticMetaObject, BOOST_PP_STRINGIZE(ENUM));              \
+    data.setNumeric(QnLexical::is_numerically_serializable<SCOPE::ENUM>::value); \
+    data.setFlagged(QnSerialization::is_flags<SCOPE::ENUM>::value);             \
     return std::move(data);                                                     \
 }
 

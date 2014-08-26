@@ -188,12 +188,6 @@ OnvifResourceSearcherWsdd::~OnvifResourceSearcherWsdd()
     m_ifaceToSock.clear();
 }
 
-OnvifResourceSearcherWsdd& OnvifResourceSearcherWsdd::instance()
-{
-    static OnvifResourceSearcherWsdd inst;
-    return inst;
-}
-
 void OnvifResourceSearcherWsdd::pleaseStop()
 {
     m_shouldStop = true;
@@ -512,8 +506,10 @@ QString OnvifResourceSearcherWsdd::getManufacturer(const T* source, const QStrin
 
     int skipSize = sizeof(SCOPES_NAME_PREFIX) - 1;
     QByteArray percentEncodedValue = scopes.mid(posStart + skipSize, posEnd - posStart - skipSize).replace(name, "");
-
-    return QUrl::fromPercentEncoding(percentEncodedValue).trimmed();
+    QString result = QUrl::fromPercentEncoding(percentEncodedValue).trimmed();
+    if (result.endsWith(lit("_")))
+        result.chop(1);
+    return result;
 }
 
 template <class T>

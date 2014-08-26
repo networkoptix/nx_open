@@ -28,10 +28,10 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     m_redundancy(false)
 {
     setTypeId(resTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
-    addFlags(QnResource::server | QnResource::remote);
-    removeFlags(QnResource::media); // TODO: #Elric is this call needed here?
+    addFlags(Qn::server | Qn::remote);
+    removeFlags(Qn::media); // TODO: #Elric is this call needed here?
 
-    //TODO: #GDM #EDGE in case of EDGE servers getName should return name of its camera. Possibly name just should be synced on EC.
+    //TODO: #GDM #EDGE in case of EDGE servers getName should return name of its camera. Possibly name just should be synced on Server.
     setName(tr("Server"));
 
     m_primaryIFSelected = false;
@@ -48,7 +48,7 @@ QString QnMediaServerResource::getUniqueId() const
     QMutexLocker mutexLocker(&m_mutex); // needed here !!!
     QnMediaServerResource* nonConstThis = const_cast<QnMediaServerResource*> (this);
     if (getId().isNull())
-        nonConstThis->setId(QnId::createUuid());
+        nonConstThis->setId(QUuid::createUuid());
     return QLatin1String("Server ") + getId().toString();
 }
 
@@ -66,18 +66,6 @@ QString QnMediaServerResource::getApiUrl() const
 {
     QMutexLocker lock(&m_mutex);
     return m_apiUrl;
-}
-
-void QnMediaServerResource::setStreamingUrl(const QString& value)
-{
-    QMutexLocker lock(&m_mutex);
-    m_streamingUrl = value;
-}
-
-const QString& QnMediaServerResource::getStreamingUrl() const
-{
-    QMutexLocker lock(&m_mutex);
-    return m_streamingUrl;
 }
 
 void QnMediaServerResource::setNetAddrList(const QList<QHostAddress>& netAddrList)
@@ -130,7 +118,7 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     return m_restConnection;
 }
 
-QnResourcePtr QnMediaServerResourceFactory::createResource(QnId resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnMediaServerResourceFactory::createResource(QUuid resourceTypeId, const QnResourceParams& /*params*/)
 {
     Q_UNUSED(resourceTypeId)
 
@@ -180,8 +168,7 @@ void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int resp
     QMutexLocker lock(&m_mutex);
 
     const QString& urlStr = m_runningIfRequests.value(responseNum);
-    const QByteArray& guid = getId().toByteArray();
-    if (response.data.contains("Requested method is absent") || response.data.contains(guid) || response.data.contains("<time><clock>"))
+    if( response.status == QNetworkReply::NoError )
     {
         // server OK
         if (urlStr == QnMediaServerResource::USE_PROXY)
@@ -308,7 +295,6 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_serverFlags = localOther->m_serverFlags;
         netAddrListChanged = m_netAddrList != localOther->m_netAddrList;
         m_netAddrList = localOther->m_netAddrList;
-        m_streamingUrl = localOther->getStreamingUrl();
         m_version = localOther->getVersion();
         m_systemInfo = localOther->getSystemInfo();
         m_systemName = localOther->getSystemName();
@@ -317,7 +303,7 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
 
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         
-        /* Keep indices unchanged (EC does not provide this info). */
+        /* Keep indices unchanged (Server does not provide this info). */
         foreach(const QnAbstractStorageResourcePtr &storage, m_storages)
         {
             foreach(const QnAbstractStorageResourcePtr &otherStorage, otherStorages)
@@ -420,7 +406,7 @@ bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
     return false;
 }
 
-void QnMediaServerResource::setStatus(Status newStatus, bool silenceMode)
+void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
 {
     if (getStatus() != newStatus) {
         QMutexLocker lock(&m_mutex);
@@ -433,4 +419,14 @@ qint64 QnMediaServerResource::currentStatusTime() const
 {
     QMutexLocker lock(&m_mutex);
     return m_statusTimer.elapsed();
+}
+
+QString QnMediaServerResource::getAuthKey() const
+{
+    return m_authKey;
+}
+
+void QnMediaServerResource::setAuthKey(const QString& authKey)
+{
+    m_authKey = authKey;
 }

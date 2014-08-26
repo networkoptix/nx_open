@@ -63,10 +63,13 @@ private:
     QnResourcePoolModelNode *expectedParent(QnResourcePoolModelNode *node);
     bool isIgnored(const QnResourcePtr &resource) const;
 
+    void removeNode(QnResourcePoolModelNode *node);
+
+    void removeNode(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource);
+
+    /** Some nodes can have deleting node set as parent, but this node will not
+     ** have them as children because of their 'bastard' flag.*/
     void deleteNode(QnResourcePoolModelNode *node);
-
-    void deleteNode(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource);
-
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
@@ -121,6 +124,9 @@ private:
 
     /** Mapping for system nodes, by system name. */
     QHash<QString, QnResourcePoolModelNode *> m_systemNodeBySystemName;
+
+    /** Full list of all created nodes. */
+    QList<QnResourcePoolModelNode *> m_allNodes;
 
     /** Whether item urls should be shown. */
     bool m_urlsShown;

@@ -13,12 +13,12 @@ QnDualQualityHelper::QnDualQualityHelper()
 }
 
 void QnDualQualityHelper::setResource(const QnNetworkResourcePtr &netResource) {
-    openCamera(netResource->getPhysicalId().toUtf8());
+    openCamera(netResource->getUniqueId());
 }
 
-void QnDualQualityHelper::openCamera(const QByteArray & cameraGuid) {
-    m_catalogHi = qnStorageMan->getFileCatalog(cameraGuid, QnServer::HiQualityCatalog);
-    m_catalogLow = qnStorageMan->getFileCatalog(cameraGuid, QnServer::LowQualityCatalog);
+void QnDualQualityHelper::openCamera(const QString& cameraUniqueId) {
+    m_catalogHi = qnStorageMan->getFileCatalog(cameraUniqueId, QnServer::HiQualityCatalog);
+    m_catalogLow = qnStorageMan->getFileCatalog(cameraUniqueId, QnServer::LowQualityCatalog);
 }
 
 
@@ -52,7 +52,7 @@ void QnDualQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
         {
             if (timeDistanceAlt == 0)
             {
-                // if recording hole, alt quality chunk may be slighthy longer then primary. So, distance to such chunk still 0
+                // if recording hole, alt quality chunk may be slightly longer then primary. So, distance to such chunk still 0
                 // prevent change quality, if such chunk rest very low
                 if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && altChunk.endTimeMs()-time < findEps)
                 {
@@ -72,7 +72,7 @@ void QnDualQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
             }
 
             // alternate quality matched better
-            if (timeDistance != INT_MAX && altChunk.containsTime(chunk.startTimeMs))
+            if (timeDistance != INT64_MAX && altChunk.containsTime(chunk.startTimeMs))
                 altChunk.truncate(chunk.startTimeMs); // truncate to start of the next chunk of the required quality (if next chunk of requested quality is exists)
 
             catalog = catalogAlt;

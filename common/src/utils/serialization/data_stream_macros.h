@@ -1,5 +1,5 @@
-#ifndef QN_SERIALIZATION_DATA_STREAM_H
-#define QN_SERIALIZATION_DATA_STREAM_H
+#ifndef QN_SERIALIZATION_DATA_STREAM_MACROS_H
+#define QN_SERIALIZATION_DATA_STREAM_MACROS_H
 
 #include <QtCore/QDataStream>
 
@@ -85,4 +85,4 @@ __VA_ARGS__ QDataStream &operator>>(QDataStream &stream, TYPE &value) {         
 }
 
 
-#endif // QN_SERIALIZATION_DATA_STREAM_H
+#endif // QN_SERIALIZATION_DATA_STREAM_MACROS_H

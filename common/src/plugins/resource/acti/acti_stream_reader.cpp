@@ -25,7 +25,7 @@ QnActiStreamReader::~QnActiStreamReader()
 
 int QnActiStreamReader::getActiChannelNum() const
 {
-    return m_role == QnResource::Role_LiveVideo ? 1 : 2;
+    return m_role == Qn::CR_LiveVideo ? 1 : 2;
 }
 
 QString QnActiStreamReader::formatBitrateStr(int bitrateKbps) const
@@ -97,7 +97,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStream()
     m_multiCodec.setRequest(streamUrl);
     const CameraDiagnostics::Result result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
-        m_resource->setStatus(QnResource::Unauthorized);
+        m_resource->setStatus(Qn::Unauthorized);
     return result;
 }
 

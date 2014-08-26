@@ -26,6 +26,7 @@ namespace ec2 {
     struct ApiLayoutItemWithRefData;
     struct ApiLayoutData;
     struct ApiLicenseData;
+    struct ApiDetailedLicenseData;
     struct ApiLockData;
     struct ApiMediaServerData;
     struct ApiPanicModeData;
@@ -66,9 +67,12 @@ namespace ec2 {
     struct ApiSystemNameData;
 
     struct ApiTimeData;
+    struct ApiPeerSystemTimeData;
 
     struct ApiPeerData;
     struct ApiRuntimeData;
+
+    struct ApiDatabaseDumpData;
 
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
@@ -102,9 +106,11 @@ namespace ec2 {
     (ApiLayoutItemWithRefData)\
     (ApiLayoutData)\
     (ApiLicenseData)\
+    (ApiDetailedLicenseData)\
     (ApiLockData)\
     (ApiMediaServerData)\
     (ApiPanicModeData)\
+    (ApiPeerSystemTimeData)\
     (ApiPropertyTypeData)\
     (ApiResetBusinessRuleData)\
     (ApiResourceData)\
@@ -143,6 +149,7 @@ namespace ec2 {
     (ApiTimeData)\
     (ApiPeerData)\
     (ApiRuntimeData)\
+    (ApiDatabaseDumpData)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

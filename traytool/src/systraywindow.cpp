@@ -3,19 +3,12 @@
 #include <QtCore/QProcess>
 #include <QtNetwork/QTcpServer>
 #include <QtWidgets/QMenu>
+#include <QtWidgets/QApplication>
 #include <QtGui/QCloseEvent>
+#include <QtGui/QDesktopServices>
 #include <QtWidgets/QMessageBox>
 
-#include <utils/network/foundenterprisecontrollersmodel.h>
-
-#include <translation/translation_manager.h>
-#include <translation/translation_list_model.h>
-
 #include "systraywindow.h"
-#include "ui_settings.h"
-#include "ui_findappserverdialog.h"
-#include "connection_testing_dialog.h"
-#include "common/common_module.h"
 
 #include <shlobj.h>
 #include "version.h"
@@ -27,16 +20,10 @@
 #define USE_SINGLE_STREAMING_PORT
 
 static const QString MEDIA_SERVER_NAME(QString(lit(QN_ORGANIZATION_NAME)) + lit(" Media Server"));
-static const QString APP_SERVER_NAME(lit("Enterprise Controller"));
 static const QString CLIENT_NAME(QString(lit(QN_ORGANIZATION_NAME)) + lit(" ") + lit(QN_PRODUCT_NAME) + lit(" Client"));
 
-static const int DEFAULT_APP_SERVER_PORT = 8000;
 static const int MESSAGE_DURATION = 3 * 1000;
 static const int DEFAUT_PROXY_PORT = 7009;
-
-static const QString ECS_PUBLIC_IP_MODE_AUTO = lit("auto");
-static const QString ECS_PUBLIC_IP_MODE_MANUAL = lit("manual");
-static const QString ECS_PUBLIC_IP_MODE_DISABLED = lit("disabled");
 
 bool MyIsUserAnAdmin()
 {
@@ -67,45 +54,26 @@ bool MyIsUserAnAdmin()
    return isAdmin;
 }
 
-QnSystrayWindow::QnSystrayWindow(FoundEnterpriseControllersModel *const foundEnterpriseControllersModel):
-    ui(new Ui::SettingsDialog),
-    m_findAppServerDialog(new QDialog()),
-    m_findAppServerDialogUI(new Ui::FindAppServerDialog()),
-    m_mediaServerSettings(QSettings::SystemScope, qApp->organizationName(), MEDIA_SERVER_NAME),
-    m_appServerSettings(QSettings::SystemScope, qApp->organizationName(), APP_SERVER_NAME),
-    m_foundEnterpriseControllersModel( foundEnterpriseControllersModel )
+QnSystrayWindow::QnSystrayWindow()
+    : m_mediaServerSettings(QSettings::SystemScope, qApp->organizationName(), MEDIA_SERVER_NAME)
 {
-    ui->setupUi(this);
-    m_findAppServerDialogUI->setupUi(m_findAppServerDialog.data());
-    m_findAppServerDialogUI->foundEnterpriseControllersView->setModel( m_foundEnterpriseControllersModel );
-
-    connect(
-        m_findAppServerDialogUI->foundEnterpriseControllersView,
-        SIGNAL(doubleClicked(const QModelIndex&)),
-        m_findAppServerDialog.data(),
-        SLOT(accept()) );
-
     m_iconOK = QIcon(lit(":/traytool.png"));
     m_iconBad = QIcon(lit(":/traytool.png"));
 
     m_mediaServerHandle = 0;
-    m_appServerHandle = 0;
     m_skipTicks = 0;
 
     m_mediaServerServiceName = QString(lit(QN_CUSTOMIZATION_NAME)) + lit("MediaServer");
-    m_appServerServiceName = QString(lit(QN_CUSTOMIZATION_NAME)) + lit("AppServer");
 
     m_mediaServerStartAction = 0;
     m_mediaServerStopAction = 0;
-    m_appServerStartAction = 0;
-    m_appServerStopAction = 0;
+    m_mediaServerWebAction = 0;
+
     m_scManager = 0;
     m_firstTimeToolTipError = true;
     m_needStartMediaServer = false;
-    m_needStartAppServer = false;
     
     m_prevMediaServerStatus = -1;
-    m_prevAppServerStatus = -1;
     m_lastMessageTimer.restart();
 
     findServiceInfo();
@@ -114,12 +82,8 @@ QnSystrayWindow::QnSystrayWindow(FoundEnterpriseControllersModel *const foundEnt
     createTrayIcon();
 
 
-    connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton * )), this, SLOT(buttonClicked(QAbstractButton * )));
-
     connect(m_trayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
     connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
-
-    connect(ui->testButton, SIGNAL(clicked()), this, SLOT(onTestButtonClicked()));
 
     m_trayIcon->show();
 
@@ -128,50 +92,21 @@ QnSystrayWindow::QnSystrayWindow(FoundEnterpriseControllersModel *const foundEnt
     connect(&m_findServices, SIGNAL(timeout()), this, SLOT(findServiceInfo()));
     connect(&m_updateServiceStatus, SIGNAL(timeout()), this, SLOT(updateServiceInfo()));
 
-    connect(ui->findAppServerButton, SIGNAL(clicked()), this, SLOT(onFindAppServerButtonClicked()));
-
-    connect(ui->appServerUrlComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onAppServerUrlHistoryComboBoxCurrentChanged(int)));
-
-    connect(ui->radioButtonPublicIPAuto, SIGNAL(toggled (bool)), this, SLOT(onRadioButtonPublicIpChanged()));
-    connect(ui->radioButtonCustomPublicIP, SIGNAL(toggled (bool)), this, SLOT(onRadioButtonPublicIpChanged()));
-
-    connect(ui->ecsUseAutoPublicIp, SIGNAL(toggled (bool)), this, SLOT(onRadioButtonEcsPublicIpChanged()));
-    connect(ui->ecsUseManualPublicIp, SIGNAL(toggled (bool)), this, SLOT(onRadioButtonEcsPublicIpChanged()));
-
     m_findServices.start(10000);
     m_updateServiceStatus.start(500);
-
-    ui->informationLabel->setText(
-        tr(
-            "%1 Tray Assistant version %2 (%3).<br/>\n"
-            "Built for %5-%6 with %7.<br/>\n"
-        ).
-        arg(QLatin1String(QN_PRODUCT_NAME)).
-        arg(QLatin1String(QN_APPLICATION_VERSION)).
-        arg(QLatin1String(QN_APPLICATION_REVISION)).
-        arg(QLatin1String(QN_APPLICATION_PLATFORM)).
-        arg(QLatin1String(QN_APPLICATION_ARCH)).
-        arg(QLatin1String(QN_APPLICATION_COMPILER))
-    );
-
-    connect(ui->appServerPassword, SIGNAL(textChanged(const QString &)), this, SLOT(at_appServerPassword_textChanged(const QString &)));
 
     initTranslations();
 
     m_mediaServerStartAction->setVisible(false);
     m_mediaServerStopAction->setVisible(false);
-    m_showMediaServerLogAction->setVisible(false);
-    m_appServerStartAction->setVisible(false);
-    m_appServerStopAction->setVisible(false);
-    m_showAppLogAction->setVisible(false);
+    m_mediaServerWebAction->setVisible(true);
 }
 
 void QnSystrayWindow::initTranslations() {
-    QnTranslationManager *translationManager = qnCommon->instance<QnTranslationManager>();
+//    QnTranslationManager *translationManager = qnCommon->instance<QnTranslationManager>();
 
-    QnTranslationListModel *model = new QnTranslationListModel(this);
-    model->setTranslations(translationManager->loadTranslations());
-    ui->languageComboBox->setModel(model);
+//    QnTranslationListModel *model = new QnTranslationListModel(this);
+//    model->setTranslations(translationManager->loadTranslations());
 
     // TODO: #Elric code duplication
     QSettings clientSettings(QSettings::UserScope, qApp->organizationName(), CLIENT_NAME);
@@ -179,14 +114,6 @@ void QnSystrayWindow::initTranslations() {
     int index = translationPath.lastIndexOf(lit("client"));
     if(index != -1)
         translationPath.replace(index, 6, lit("traytool"));
-
-    for(int i = 0; i < ui->languageComboBox->count(); i++) {
-        QnTranslation translation = ui->languageComboBox->itemData(i, Qn::TranslationRole).value<QnTranslation>();
-        if(translation.filePaths().contains(translationPath)) {
-            ui->languageComboBox->setCurrentIndex(i);
-            break;
-        }
-    }
 }
 
 void QnSystrayWindow::handleMessage(const QString& message)
@@ -202,8 +129,6 @@ QnSystrayWindow::~QnSystrayWindow()
 {
     if (m_mediaServerHandle)
         CloseServiceHandle(m_mediaServerHandle);
-    if (m_appServerHandle)
-        CloseServiceHandle(m_appServerHandle);
     if (m_scManager)
         CloseServiceHandle(m_scManager);
 }
@@ -251,42 +176,10 @@ void QnSystrayWindow::findServiceInfo()
     if (m_mediaServerHandle == 0)
         m_mediaServerHandle = OpenService(m_scManager, (LPCWSTR) m_mediaServerServiceName.data(), SERVICE_QUERY_STATUS);
 
-    if (m_appServerHandle == 0)
-        m_appServerHandle  = OpenService(m_scManager, (LPCWSTR) m_appServerServiceName.data(),   SERVICE_ALL_ACCESS);
-    if (m_appServerHandle == 0)
-        m_appServerHandle  = OpenService(m_scManager, (LPCWSTR) m_appServerServiceName.data(),   SERVICE_QUERY_STATUS);
-
-    if (!m_mediaServerHandle && !m_appServerHandle && m_firstTimeToolTipError) {
+    if (!m_mediaServerHandle && m_firstTimeToolTipError) {
         showMessage(tr("No %1 services installed").arg(lit(QN_ORGANIZATION_NAME)));
      //   m_trayIcon->setIcon(m_iconBad);   //TODO: #Elric why do we have the same icon for error? And why it is crashed here?
         m_firstTimeToolTipError = false;
-    }
-}
-
-void QnSystrayWindow::setVisible(bool visible)
-{
-    //minimizeAction->setEnabled(visible);
-    //maximizeAction->setEnabled(!isMaximized());
-    m_settingsAction->setEnabled(isMaximized() || !visible);
-    QDialog::setVisible(visible);
-}
-
-void QnSystrayWindow::accept() {
-    base_type::accept();
-
-    QnTranslation translation = ui->languageComboBox->itemData(ui->languageComboBox->currentIndex(), Qn::TranslationRole).value<QnTranslation>();
-    if(!translation.isEmpty()) {
-        // TODO: #Elric code duplication.
-        QSettings clientSettings(QSettings::UserScope, qApp->organizationName(), CLIENT_NAME);
-        
-        QString translationPath;
-        if(!translation.filePaths().isEmpty())
-            translationPath = translation.filePaths()[0];
-        int index = translationPath.lastIndexOf(lit("traytool"));
-        if(index != -1)
-            translationPath.replace(index, 8, lit("client"));
-
-        clientSettings.setValue(lit("translationPath"), translationPath);
     }
 }
 
@@ -343,16 +236,6 @@ void QnSystrayWindow::showMessage(const QString& message)
     }
 }
 
-void QnSystrayWindow::onRadioButtonPublicIpChanged()
-{
-    ui->staticPublicIPEdit->setEnabled(ui->radioButtonCustomPublicIP->isChecked());
-}
-
-void QnSystrayWindow::onRadioButtonEcsPublicIpChanged()
-{
-    ui->ecsManuaPublicIPEdit->setEnabled(ui->ecsUseManualPublicIp->isChecked());
-}
-
 void QnSystrayWindow::onDelayedMessage()
 {
     if (!m_delayedMessages.isEmpty())
@@ -379,43 +262,10 @@ void QnSystrayWindow::updateServiceInfo()
         connect(mediaServerTask, SIGNAL(finished(quint64)), this, SLOT(mediaServerInfoUpdated(quint64)), Qt::QueuedConnection);
         QThreadPool::globalInstance()->start(mediaServerTask);
     }
-
-    if (m_appServerHandle) {
-        GetServiceInfoAsyncTask *appServerTask = new GetServiceInfoAsyncTask(m_appServerHandle);
-        connect(appServerTask, SIGNAL(finished(quint64)), this, SLOT(appServerInfoUpdated(quint64)), Qt::QueuedConnection);
-        QThreadPool::globalInstance()->start(appServerTask);
-    }
-}
-
-void QnSystrayWindow::appServerInfoUpdated(quint64 status) {
-    updateServiceInfoInternal(m_appServerHandle, status, m_appServerStartAction,   m_appServerStopAction, m_showAppLogAction);
-    m_settingsAction->setVisible(true);
-    if (status == SERVICE_STOPPED) 
-    {
-        if (m_needStartAppServer)
-        {
-            m_needStartAppServer = false;
-            StartService(m_appServerHandle, 0, 0);
-        }
-
-        if (m_prevAppServerStatus >= 0 && m_prevAppServerStatus != SERVICE_STOPPED && !m_needStartAppServer)
-        {
-            showMessage(tr("Enterprise controller has been stopped"));
-        }
-    }
-    else if (status == SERVICE_RUNNING)
-    {
-        if (m_prevAppServerStatus >= 0 && m_prevAppServerStatus != SERVICE_RUNNING)
-        {
-            showMessage(tr("Enterprise controller has been started"));
-        }
-    }
-    m_prevAppServerStatus = status;
 }
 
 void QnSystrayWindow::mediaServerInfoUpdated(quint64 status) {
-    updateServiceInfoInternal(m_mediaServerHandle, status, m_mediaServerStartAction, m_mediaServerStopAction, m_showMediaServerLogAction);
-    m_settingsAction->setVisible(true);
+    updateServiceInfoInternal(m_mediaServerHandle, status, m_mediaServerStartAction, m_mediaServerStopAction);
     if (status == SERVICE_STOPPED)
     {
         if (m_needStartMediaServer) 
@@ -439,15 +289,13 @@ void QnSystrayWindow::mediaServerInfoUpdated(quint64 status) {
     m_prevMediaServerStatus = status;
 }
 
-void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE handle, DWORD status, QAction* startAction, QAction* stopAction, QAction* logAction)
+void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE handle, DWORD status, QAction *startAction, QAction *stopAction)
 {
     if (!handle) {
         stopAction->setVisible(false);
         startAction->setVisible(false);
-        logAction->setVisible(false);
         return;
     }
-    logAction->setVisible(true);
 
     QAction *action = NULL;
     QString suffix;
@@ -533,41 +381,23 @@ void QnSystrayWindow::at_mediaServerStartAction()
     }
 }
 
-void QnSystrayWindow::at_mediaServerStopAction()
-{
-    //SERVICE_STATUS serviceStatus;
-    if (m_mediaServerHandle) 
-    {
-        if (QMessageBox::question(0, tr(""), tr("Media server is going to be stopped. Are you sure?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
-        {
-            //ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+void QnSystrayWindow::at_mediaServerStopAction() {
+    if (m_mediaServerHandle) {
+        if (QMessageBox::question(0, tr(""), tr("Media server is going to be stopped. Are you sure?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
             StopServiceAsyncTask *stopTask = new StopServiceAsyncTask(m_mediaServerHandle);
             connect(stopTask, SIGNAL(finished()), this, SLOT(updateServiceInfo()), Qt::QueuedConnection);
             QThreadPool::globalInstance()->start(stopTask);
-            updateServiceInfoInternal(m_mediaServerHandle, SERVICE_STOP_PENDING, m_mediaServerStartAction, m_mediaServerStopAction, m_showMediaServerLogAction);
+            updateServiceInfoInternal(m_mediaServerHandle, SERVICE_STOP_PENDING, m_mediaServerStartAction, m_mediaServerStopAction);
         }
     }
 }
 
-void QnSystrayWindow::at_appServerStartAction()
-{
-    if (m_appServerHandle) {
-        StartService(m_appServerHandle, 0, 0);
-    }
-}
+void QnSystrayWindow::at_mediaServerWebAction() {
+    static QString MEDIA_SERVER_NAME(QString(lit(QN_ORGANIZATION_NAME)) + lit(" Media Server"));
 
-void QnSystrayWindow::at_appServerStopAction()
-{
-    if (m_appServerHandle) 
-    {
-        if (QMessageBox::question(0, windowTitle(), tr("Enterprise controller is going to be stopped. Are you sure?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
-        {
-            StopServiceAsyncTask *stopTask = new StopServiceAsyncTask(m_appServerHandle);
-            connect(stopTask, SIGNAL(finished()), this, SLOT(updateServiceInfo()), Qt::QueuedConnection);
-            QThreadPool::globalInstance()->start(stopTask);
-            updateServiceInfoInternal(m_appServerHandle, SERVICE_STOP_PENDING, m_appServerStartAction, m_appServerStopAction, m_showAppLogAction);
-        }
-    }
+    QSettings settings(QSettings::SystemScope, qApp->organizationName(), MEDIA_SERVER_NAME);
+    QString serverAdminUrl = QString(lit("http://localhost:%1/static/index.html")).arg(settings.value(lit("port")).toInt());
+    QDesktopServices::openUrl(QUrl(serverAdminUrl));
 }
 
 QnElevationChecker::QnElevationChecker(QObject* parent, QString actionName, QObject* target, const char* slot): 
@@ -632,24 +462,13 @@ void QnSystrayWindow::connectElevatedAction(QAction* source, const char* signal,
 
 void QnSystrayWindow::createActions()
 {
-    m_settingsAction = new QAction(tr("&Settings"), this);
-    m_settingsAction->setObjectName(lit("showSettings"));
-    m_actions.push_back(m_settingsAction);
-    connectElevatedAction(m_settingsAction, SIGNAL(triggered()), this, SLOT(onSettingsAction()));
-    m_settingsAction->setVisible(m_mediaServerHandle || m_appServerHandle);
+    m_quitAction = new QAction(tr("&Quit"), this);
+    connect(m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     m_showMediaServerLogAction = new QAction(tr("Show &Media Server Log"), this);
     m_showMediaServerLogAction->setObjectName(lit("showMediaServerLog"));
     m_actions.push_back(m_showMediaServerLogAction);
     connectElevatedAction(m_showMediaServerLogAction, SIGNAL(triggered()), this, SLOT(onShowMediaServerLogAction()));
-
-    m_showAppLogAction = new QAction(tr("Show &Enterprise Controller Log"), this);
-    m_showAppLogAction->setObjectName(lit("showAppServerLog"));
-    m_actions.push_back(m_showAppLogAction);
-    connectElevatedAction(m_showAppLogAction, SIGNAL(triggered()), this, SLOT(onShowAppServerLogAction()));
-
-    m_quitAction = new QAction(tr("&Quit"), this);
-    connect(m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     m_mediaServerStartAction = new QAction(QString(tr("Start Media Server")), this);
     m_mediaServerStartAction->setObjectName(lit("startMediaServer"));
@@ -661,70 +480,12 @@ void QnSystrayWindow::createActions()
     m_actions.push_back(m_mediaServerStopAction);
     connectElevatedAction(m_mediaServerStopAction, SIGNAL(triggered()), this, SLOT(at_mediaServerStopAction()));
 
-    m_appServerStartAction = new QAction(QString(tr("Start Enterprise Controller")), this);
-    m_appServerStartAction->setObjectName(lit("startAppServer"));
-    m_actions.push_back(m_appServerStartAction);
-    connectElevatedAction(m_appServerStartAction, SIGNAL(triggered()), this, SLOT(at_appServerStartAction()));
-
-    m_appServerStopAction = new QAction(QString(tr("Stop Enterprise Controller")), this);
-    m_appServerStopAction->setObjectName(lit("stopAppServer"));
-    m_actions.push_back(m_appServerStopAction);
-    connectElevatedAction(m_appServerStopAction, SIGNAL(triggered()), this, SLOT(at_appServerStopAction()));
+    m_mediaServerWebAction = new QAction(QString(tr("Media Server Web Page")), this);
+    m_mediaServerWebAction->setObjectName(lit("startMediaServer"));
+    m_actions.push_back(m_mediaServerWebAction);
+    QObject::connect(m_mediaServerWebAction, SIGNAL(triggered()), this, SLOT(at_mediaServerWebAction()));
 
     updateServiceInfo();
-}
-
- QAction* QnSystrayWindow::actionByName(const QString &name)
- {
-     foreach(QAction *action, m_actions)
-        if (action->objectName() == name)
-            return action;
-     return NULL;
- }
-
- QString QnSystrayWindow::nameByAction(QAction* action)
- {
-     return action->objectName();
- }
-
-void QnSystrayWindow::createTrayIcon()
-{
-    m_trayIconMenu = new QMenu();
-
-    m_trayIconMenu->addAction(m_mediaServerStartAction);
-    m_trayIconMenu->addAction(m_mediaServerStopAction);
-    m_trayIconMenu->addAction(m_appServerStartAction);
-    m_trayIconMenu->addAction(m_appServerStopAction);
-    m_trayIconMenu->addSeparator();
-
-    m_trayIconMenu->addAction(m_settingsAction);
-    m_trayIconMenu->addSeparator();
-
-    m_trayIconMenu->addAction(m_showMediaServerLogAction);
-    m_trayIconMenu->addAction(m_showAppLogAction);
-    m_trayIconMenu->addSeparator();
-
-    m_trayIconMenu->addAction(m_quitAction);
-
-    m_trayIcon = new QSystemTrayIcon(this);
-    m_trayIcon->setContextMenu(m_trayIconMenu);    
-    m_trayIcon->setIcon(m_iconOK);
-}
-
-QUrl QnSystrayWindow::getAppServerURL() const
-{
-    QUrl appServerUrl;
-    appServerUrl.setScheme(lit("https"));
-    appServerUrl.setHost(m_mediaServerSettings.value(lit("appserverHost")).toString());
-    int appServerPort = m_mediaServerSettings.value(lit("appserverPort")).toInt();
-    appServerUrl.setPort(appServerPort != 0 ? appServerPort : DEFAULT_APP_SERVER_PORT);
-    return appServerUrl;
-}
-
-void QnSystrayWindow::setAppServerURL(const QUrl& url)
-{
-    m_mediaServerSettings.setValue(lit("appserverHost"), url.host());
-    m_mediaServerSettings.setValue(lit("appserverPort"), url.port(DEFAULT_APP_SERVER_PORT));
 }
 
 void QnSystrayWindow::onShowMediaServerLogAction()
@@ -733,370 +494,35 @@ void QnSystrayWindow::onShowMediaServerLogAction()
     QProcess::startDetached(lit("notepad ") + logFileName);
 };
 
-void QnSystrayWindow::onShowAppServerLogAction()
+QAction* QnSystrayWindow::actionByName(const QString &name)
 {
-    QString logFileName = m_appServerSettings.value(lit("logFile")).toString();
-    QProcess::startDetached(lit("notepad ") + logFileName);
+    foreach(QAction *action, m_actions)
+       if (action->objectName() == name)
+           return action;
+    return NULL;
 }
 
-Qt::CheckState QnSystrayWindow::getDiscoveryState() const
+QString QnSystrayWindow::nameByAction(QAction* action)
 {
-    Qt::CheckState discoveryState = Qt::Checked;
-    QString disabledVendors = m_mediaServerSettings.value(lit("disabledVendors")).toString().trimmed();
-    if (disabledVendors == lit("all"))
-        discoveryState = Qt::Unchecked;
-    else if (!disabledVendors.isEmpty())
-        discoveryState = Qt::PartiallyChecked;
-    return discoveryState;
+    return action->objectName();
 }
 
-bool QnSystrayWindow::readAllowCameraChanges() const {
-    QVariant result = m_appServerSettings.value(lit("allowCameraChanges"));
-    return result.convert(QMetaType::Bool) ? result.toBool() : true;
-}
-
-void QnSystrayWindow::writeAllowCameraChanges(bool allowCameraChanges) {
-    m_appServerSettings.setValue(lit("allowCameraChanges"), allowCameraChanges);
-}
-
-void QnSystrayWindow::onSettingsAction()
+void QnSystrayWindow::createTrayIcon()
 {
-    QUrl appServerUrl = getAppServerURL();
+    m_trayIconMenu = new QMenu();
 
-    QStringList urlList = m_settings.value(lit("appserverUrlHistory")).toString().split(L';');
-    urlList.insert(0, appServerUrl.toString());
-    urlList.removeDuplicates();
+    m_trayIconMenu->addAction(m_mediaServerWebAction);
 
-    ui->appServerUrlComboBox->clear();
-    ui->appServerUrlComboBox->addItem(tr("* Last used connection *"));
-    foreach(const QString& value, urlList)
-        ui->appServerUrlComboBox->addItem(value);
+    m_trayIconMenu->addSeparator();
+    m_trayIconMenu->addAction(m_mediaServerStartAction);
+    m_trayIconMenu->addAction(m_mediaServerStopAction);
+    m_trayIconMenu->addAction(m_showMediaServerLogAction);
 
-    ui->appIPEdit->setText(m_mediaServerSettings.value(lit("appserverHost")).toString());
-    ui->appPortSpinBox->setValue(m_mediaServerSettings.value(lit("appserverPort")).toInt());
-    ui->appServerLogin->setText(m_mediaServerSettings.value(lit("appserverLogin")).toString());
-    ui->appServerPassword->setText(m_mediaServerSettings.value(lit("appserverPassword")).toString());
-    
-    ui->staticPublicIPEdit->setText(m_mediaServerSettings.value(lit("staticPublicIP")).toString());
-    if (m_mediaServerSettings.value(lit("publicIPEnabled")).isNull())
-        m_mediaServerSettings.setValue(lit("publicIPEnabled"), 1);
-    int allowPublicIP = m_mediaServerSettings.value(lit("publicIPEnabled")).toInt();
-    ui->groupBoxPublicIP->setChecked(allowPublicIP > 0);
-    ui->radioButtonPublicIPAuto->setChecked(allowPublicIP < 1);
-    ui->radioButtonCustomPublicIP->setChecked(allowPublicIP > 1);
-    
-    //Qt::CheckState discoveryState = getDiscoveryState();
-    //ui->checkBoxDiscovery->setCheckState(discoveryState);
+    m_trayIconMenu->addSeparator();
+    m_trayIconMenu->addAction(m_quitAction);
 
-    onRadioButtonPublicIpChanged();
-
-    QString rtspTransport = m_mediaServerSettings.value(lit("rtspTransport"), lit("AUTO")).toString().toUpper();
-    if (rtspTransport == lit("UDP"))
-        ui->rtspTransportComboBox->setCurrentIndex(1);
-    else if (rtspTransport == lit("TCP"))
-        ui->rtspTransportComboBox->setCurrentIndex(2);
-    else
-        ui->rtspTransportComboBox->setCurrentIndex(0);
-
-#ifndef USE_SINGLE_STREAMING_PORT
-    ui->apiPortLineEdit->setText(m_mediaServerSettings.value(lit("apiPort")).toString());
-#endif
-
-    QString ecsPublicIpMode = m_appServerSettings.value(lit("publicIpMode")).toString();
-    ui->ecsAllowPublicIpGroupBox->setChecked(ecsPublicIpMode != ECS_PUBLIC_IP_MODE_DISABLED);
-    ui->ecsUseAutoPublicIp->setChecked(ecsPublicIpMode == ECS_PUBLIC_IP_MODE_AUTO);
-    ui->ecsUseManualPublicIp->setChecked(ecsPublicIpMode == ECS_PUBLIC_IP_MODE_MANUAL);
-    ui->ecsManuaPublicIPEdit->setText(m_appServerSettings.value(lit("manualPublicIp")).toString());
-
-    onRadioButtonEcsPublicIpChanged();
-    ui->ecsPortSpinBox->setValue(m_appServerSettings.value(lit("port")).toInt());
-
-    ui->tabAppServer->setEnabled(m_appServerHandle != 0);
-    ui->tabMediaServer->setEnabled(m_mediaServerHandle != 0);
-
-    //ui->ecsCameraControlCheckBox->setChecked(readAllowCameraChanges());
-
-    showNormal();
+    m_trayIcon = new QSystemTrayIcon(this);
+    m_trayIcon->setContextMenu(m_trayIconMenu);    
+    m_trayIcon->setIcon(m_iconOK);
 }
-
-bool QnSystrayWindow::isAppServerParamChanged() const
-{
-    if (ui->ecsPortSpinBox->value() != m_appServerSettings.value(lit("port")).toInt())
-        return true;
-
-    if (m_appServerSettings.value(lit("manualPublicIp")).toString().trimmed() != ui->ecsManuaPublicIPEdit->text().trimmed() && ui->ecsUseManualPublicIp->isChecked())
-        return true;
-
-    QString publicIpMode;
-    if (!ui->ecsAllowPublicIpGroupBox->isChecked())
-        publicIpMode = ECS_PUBLIC_IP_MODE_DISABLED;
-    else if (ui->ecsUseAutoPublicIp->isChecked())
-        publicIpMode = ECS_PUBLIC_IP_MODE_AUTO;
-    else
-        publicIpMode= ECS_PUBLIC_IP_MODE_MANUAL;
-
-    if (m_appServerSettings.value(lit("publicIpMode")).toString() != publicIpMode)
-        return true;
-
-    /*if(readAllowCameraChanges() != ui->ecsCameraControlCheckBox->isChecked())
-        return true;*/
-
-    return false;
-}
-
-bool QnSystrayWindow::isMediaServerParamChanged() const
-{
-    QUrl savedURL = getAppServerURL();
-    QUrl currentURL( QString::fromLatin1("https://%1:%2").arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
-    if (savedURL.host() != currentURL.host() || savedURL.port(DEFAULT_APP_SERVER_PORT) != currentURL.port(DEFAULT_APP_SERVER_PORT))
-        return true;
-
-    if (ui->appServerLogin->text() != m_mediaServerSettings.value(lit("appserverLogin")).toString())
-        return true;
-
-    if (ui->appServerPassword->text() != m_mediaServerSettings.value(lit("appserverPassword")).toString())
-        return true;
-
-    if (m_mediaServerSettings.value(lit("staticPublicIP")).toString().trimmed() != ui->staticPublicIPEdit->text().trimmed() && ui->radioButtonCustomPublicIP->isChecked())
-        return true;
-
-    int publicIPState;
-    if (!ui->groupBoxPublicIP->isChecked())
-        publicIPState = 0;
-    else if (ui->radioButtonPublicIPAuto->isChecked())
-        publicIPState = 1;
-    else
-        publicIPState = 2;
-    if (m_mediaServerSettings.value(lit("publicIPEnabled")).toInt() != publicIPState)
-        return true;
-
-    /*if (getDiscoveryState() != ui->checkBoxDiscovery->checkState())
-        return true;*/
-
-    return false;
-}
-
-void QnSystrayWindow::buttonClicked(QAbstractButton * button)
-{
-    if (ui->buttonBox->standardButton(button) == QDialogButtonBox::Ok)
-    {
-        if (validateData()) 
-        {
-            bool appServerParamChanged = isAppServerParamChanged();
-            bool mediaServerParamChanged = isMediaServerParamChanged();
-            saveData();
-            if (appServerParamChanged || mediaServerParamChanged)
-            {
-                QString requestStr;
-                if(appServerParamChanged && mediaServerParamChanged) {
-                    requestStr = tr("The changes you made require enterprise controller and media server to be restarted. Would you like to restart now?");
-                } else if(appServerParamChanged) {
-                    requestStr = tr("The changes you made require enterprise controller to be restarted. Would you like to restart now?");
-                } else {
-                    requestStr = tr("The changes you made require media server to be restarted. Would you like to restart now?");
-                }
-
-                if (QMessageBox::question(this, windowTitle(), requestStr, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
-                {
-                    //SERVICE_STATUS serviceStatus;
-                    if (appServerParamChanged) {
-                        //ControlService(m_appServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
-                        QThreadPool::globalInstance()->start(new StopServiceAsyncTask(m_appServerHandle));
-
-                        m_needStartAppServer = true;
-                        m_prevAppServerStatus = SERVICE_STOPPED;
-
-                    }
-                    if (mediaServerParamChanged) {
-                        //ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
-                        QThreadPool::globalInstance()->start(new StopServiceAsyncTask(m_mediaServerHandle));
-
-                        m_needStartMediaServer = true;
-                        m_prevMediaServerStatus = SERVICE_STOPPED;
-                    }
-                    updateServiceInfo();
-                    // restart services
-                }
-            }
-        }
-        else {
-            QTimer::singleShot(0, this, SLOT(showNormal()));
-        }
-    }
-}
-
-bool QnSystrayWindow::checkPortNum(int port, const QString& message)
-{
-    if (port < 1 || port > 65535)
-    {
-        QMessageBox::warning(this, windowTitle(), tr("Invalid %1 port specified.").arg(message));
-        return false;
-    }
-    return true;
-}
-
-bool QnSystrayWindow::isPortFree(int port)
-{
-    QTcpServer testServer;
-    return testServer.listen(QHostAddress::Any, port);
-}
-
-bool QnSystrayWindow::validateData()
-{
-    struct PortInfo
-    {
-        PortInfo(int _newPort, int _oldPort, const QString& _descriptor, int _tabIndex)
-        {
-            newPort = _newPort;
-            descriptor = _descriptor;
-            oldPort = _oldPort;
-            tabIndex = _tabIndex;
-        }
-
-        int newPort;
-        int oldPort;
-        QString descriptor;
-        int tabIndex;
-    };
-    QList<PortInfo> checkedPorts;
-
-    if (m_appServerHandle)
-    {
-        checkedPorts << PortInfo(ui->ecsPortSpinBox->value(), m_appServerSettings.value(lit("port")).toInt(), tr("enterprise controller"), 1);
-    }
-
-    for(int i = 0; i < checkedPorts.size(); ++i)
-    {
-        if (!checkPortNum(checkedPorts[i].newPort, checkedPorts[i].descriptor))
-        {
-            if( ui->tabWidget->currentIndex() != checkedPorts[i].tabIndex )
-                ui->tabWidget->setCurrentIndex( checkedPorts[i].tabIndex );
-            return false;
-        }
-        for (int j = i+1; j < checkedPorts.size(); ++j) {
-            if (checkedPorts[i].newPort == checkedPorts[j].newPort)
-            {
-                QMessageBox::warning(this, windowTitle(), tr("%1 port is same as %2 port").arg(checkedPorts[i].descriptor).arg(checkedPorts[j].descriptor));
-                return false;
-            }
-        }
-        bool isNewPort = true;
-        for (int j = 0; j < checkedPorts.size(); ++j) {
-            if (checkedPorts[j].oldPort == checkedPorts[i].newPort)
-                isNewPort = false;
-        }
-        if (isNewPort && !isPortFree(checkedPorts[i].newPort)) {
-            QMessageBox::warning(this, windowTitle(), tr("%1 port is already used by another process").arg(checkedPorts[i].descriptor));
-            return false;
-        }
-    }
-    QString staticPublicIP = ui->staticPublicIPEdit->text().trimmed();
-    if (!staticPublicIP.isEmpty() && QHostAddress(staticPublicIP).isNull())
-    {
-        QMessageBox::warning(this, windowTitle(), tr("Invalid IP address specified for public IP address"));
-        return false;
-    }
-
-    return true;
-}
-
-void QnSystrayWindow::saveData()
-{
-    m_mediaServerSettings.setValue(lit("appserverLogin"), ui->appServerLogin->text());
-    m_mediaServerSettings.setValue(lit("appserverPassword"),ui->appServerPassword->text());
-
-    m_mediaServerSettings.setValue(lit("rtspTransport"), ui->rtspTransportComboBox->currentText());
-
-    m_appServerSettings.setValue(lit("port"), QString::number(ui->ecsPortSpinBox->value()));
-
-    if (!ui->ecsAllowPublicIpGroupBox->isChecked())
-        m_appServerSettings.setValue(lit("publicIpMode"), ECS_PUBLIC_IP_MODE_DISABLED);
-    else if (ui->ecsUseAutoPublicIp->isChecked())
-        m_appServerSettings.setValue(lit("publicIpMode"), ECS_PUBLIC_IP_MODE_AUTO);
-    else
-        m_appServerSettings.setValue(lit("publicIpMode"), ECS_PUBLIC_IP_MODE_MANUAL);
-
-    m_appServerSettings.setValue(lit("manualPublicIp"), ui->ecsManuaPublicIPEdit->text());
-    QStringList urlList = m_settings.value(lit("appserverUrlHistory")).toString().split(L';');
-    urlList.insert(0, getAppServerURL().toString());
-    urlList.removeDuplicates();
-    QString rez;
-    foreach(QString str, urlList)
-    {
-        str = str.trimmed();
-        if (!str.isEmpty()) {
-            if (!rez.isEmpty())
-                rez += L';';
-            rez += str;
-        }
-    }
-    m_settings.setValue(lit("appserverUrlHistory"), rez);
-
-    setAppServerURL(QString(lit("https://%1:%2")).arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
-
-    //writeAllowCameraChanges(ui->ecsCameraControlCheckBox->isChecked());
-
-    m_mediaServerSettings.setValue(lit("staticPublicIP"), ui->staticPublicIPEdit->text());
-    if (!ui->groupBoxPublicIP->isChecked())
-        m_mediaServerSettings.setValue(lit("publicIPEnabled"), 0);
-    else if (ui->radioButtonPublicIPAuto->isChecked())
-        m_mediaServerSettings.setValue(lit("publicIPEnabled"), 1);
-    else
-        m_mediaServerSettings.setValue(lit("publicIPEnabled"), 2);
-
-    /*Qt::CheckState discoveryState = ui->checkBoxDiscovery->checkState();
-    if (discoveryState != Qt::PartiallyChecked)
-    {
-        QString disabledVendors;
-        if (discoveryState == Qt::Checked)
-            m_mediaServerSettings.setValue(lit("disabledVendors"), lit(""));
-        else
-            m_mediaServerSettings.setValue(lit("disabledVendors"), lit("all"));
-    }*/
-}
-
-void QnSystrayWindow::onTestButtonClicked()
-{
-    QUrl url( QString(lit("https://%1:%2")).arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
-
-    url.setUserName(ui->appServerLogin->text());
-    url.setPassword(ui->appServerPassword->text());
-
-    if (!url.isValid())
-    {
-        QMessageBox::warning(this, tr("Invalid parameters"), tr("You have entered invalid URL."));
-        return;
-    }
-
-    QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(this));
-    dialog->testEnterpriseController(url);
-    dialog->exec();
-}
-
-void QnSystrayWindow::onFindAppServerButtonClicked()
-{
-    if( !m_findAppServerDialog->exec() )
-        return; //cancel pressed
-    const QModelIndex& selectedSrvIndex = m_findAppServerDialogUI->foundEnterpriseControllersView->currentIndex();
-    if( !selectedSrvIndex.isValid() )
-        return;
-
-    ui->appIPEdit->setText( m_foundEnterpriseControllersModel->data(selectedSrvIndex, FoundEnterpriseControllersModel::IpRole).toString() );
-    ui->appPortSpinBox->setValue( m_foundEnterpriseControllersModel->data(selectedSrvIndex, FoundEnterpriseControllersModel::PortRole).toInt() );
-}
-
-void QnSystrayWindow::onAppServerUrlHistoryComboBoxCurrentChanged( int index )
-{
-    if( index == 0 )
-        return; //selected "Last used connection" element
-
-    //filling in edits with values
-    const QUrl urlToSet( ui->appServerUrlComboBox->currentText() );
-    ui->appIPEdit->setText( urlToSet.host() );
-    ui->appPortSpinBox->setValue( urlToSet.port() );
-    //ui->appServerLogin->setText( urlToSet.userName() );
-    //ui->appServerPassword->setText( urlToSet.password() );
-}
-void QnSystrayWindow::at_appServerPassword_textChanged(const QString &text) {
-    ui->testButton->setEnabled(!text.isEmpty());
-}
+;

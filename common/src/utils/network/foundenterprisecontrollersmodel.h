@@ -14,7 +14,7 @@
 struct QnModuleInformation;
 class QnModuleFinder;
 
-//!Connects to NetworkOptixModuleFinder and holds found enterprise controllers list
+//!Connects to NetworkOptixModuleFinder and holds found Servers list
 class QnFoundEnterpriseControllersModel : public QAbstractItemModel {
     Q_OBJECT
 public:
@@ -52,7 +52,7 @@ public slots:
 protected:
     class FoundModuleData {
     public:
-        QString seed;
+        QUuid seed;
         QString url;
         QList<QString> ipAddresses;
         quint16 port;

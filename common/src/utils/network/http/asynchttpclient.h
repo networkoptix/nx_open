@@ -14,8 +14,9 @@
 #include <QtCore/QUrl>
 #include <QSharedPointer>
 
+#include "utils/network/abstract_socket.h"
+
 #include "httpstreamreader.h"
-#include "../aio/aioeventhandler.h"
 
 
 namespace nx_http
@@ -23,7 +24,7 @@ namespace nx_http
     class AsyncHttpClient;
     typedef std::shared_ptr<AsyncHttpClient> AsyncHttpClientPtr;
 
-    //!Http client. All operations are done asynchronously using aio::AIOService
+    //!Http client. All operations are done asynchronously
     /*!
         It is strongly recommended to connect to signals using Qt::DirectConnection and slot should not use blocking calls.
         
@@ -41,7 +42,6 @@ namespace nx_http
     class AsyncHttpClient
     :
         public QObject,
-        public aio::AIOEventHandler,
         public std::enable_shared_from_this<AsyncHttpClient>
     {
         Q_OBJECT
@@ -134,7 +134,7 @@ namespace nx_http
         */
         void someMessageBodyAvailable( nx_http::AsyncHttpClientPtr );
         /*!
-            Emmitted when http request is done with any result (successfully executed request and received message body, 
+            Emitted when http request is done with any result (successfully executed request and received message body, 
             received response with error code, connection terminated unexpectedly).
             To get result code use method \a response()
             \note Some message body can still be stored in internal buffer. To read it, call \a AsyncHttpClient::fetchMessageBodyBuffer
@@ -142,10 +142,6 @@ namespace nx_http
         void done( nx_http::AsyncHttpClientPtr );
         //!Connection to server has been restored after a sudden disconnect
         void reconnected( nx_http::AsyncHttpClientPtr );
-
-    protected:
-        //!Implementation of aio::AIOEventHandler::eventTriggered
-        virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() override;
 
     private:
         State m_state;
@@ -166,28 +162,24 @@ namespace nx_http
         bool m_contentEncodingUsed;
         int m_responseReadTimeoutMs;
 
+        void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode );
+        void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten );
+        void onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead );
+
         void resetDataBeforeNewRequest();
         bool initiateHttpMessageDelivery( const QUrl& url );
         /*!
             \return Number of bytes, read from socket. -1 in case of read error
         */
-        int readAndParseHttp();
+        size_t readAndParseHttp( size_t bytesRead );
         void composeRequest( const nx_http::StringType& httpMethod );
         void serializeRequest();
-        //!Sends request through \a m_socket
-        /*!
-            This method performs exactly one non-blocking send call and updates m_requestBytesSent by sent bytes.
-            Whole request is sent if \a m_requestBytesSent == \a m_requestBuffer.size()
-            \return false in case of send error
-        */
-        bool sendRequest();
         /*!
             \return true, if connected
         */
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
         bool resendRequestWithAuthorization( const nx_http::Response& response );
-        void eventTriggeredPrivate( AbstractSocket* sock, aio::EventType eventType );
 
         static const char* toString( State state );
     };

@@ -127,6 +127,16 @@ signals:
     void activated(const QnResourcePtr &resource);
     void viewportSizeChanged();
 
+    /**
+     * This signal is emitted when the tree prepares to start a recursive operation
+     * that may lead to a lot of dataChanged signals emitting.
+     */
+    void beforeRecursiveOperation();
+
+    /**
+     * This signal is emitted when the tree ends a recursive operation.
+     */
+    void afterRecursiveOperation();
 private slots:
     void at_treeView_enterPressed(const QModelIndex &index);
     void at_treeView_spacePressed(const QModelIndex &index);

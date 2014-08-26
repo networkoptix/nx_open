@@ -14,12 +14,10 @@
 
 class QnSettingsScrollArea : public QScrollArea
 {
-    QnSettingsScrollArea();
-
+    Q_OBJECT;
 public:
-
-    QnSettingsScrollArea(QWidget* parent);
-    void addWidget(QWidget& widget);
+    explicit QnSettingsScrollArea(QWidget* parent);
+    void addWidget(QWidget *widget);
 };
 
 //==============================================
@@ -43,15 +41,15 @@ class QnAbstractSettingsWidget : public QWidget
 {
     Q_OBJECT
 public:
-    QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent, const QString& hint);
+    QnAbstractSettingsWidget(const CameraSetting &obj, QnSettingsScrollArea *parent, const QString &hint);
     virtual ~QnAbstractSettingsWidget();
 
-    const CameraSetting& param() const;
+    CameraSetting param() const;
 
     virtual void refresh() = 0;
 
 signals:
-    void setAdvancedParam(const CameraSetting& val);
+    void advancedParamChanged(const CameraSetting& val);
 
 public slots:
     virtual void updateParam(QString val) = 0;
@@ -60,8 +58,7 @@ protected:
     virtual void setParam(const CameraSettingValue& val);
 
 protected:
-    CameraSetting& m_param;
-    QObject* m_handler;
+    CameraSetting m_param;
     QHBoxLayout *m_layout;
     QString m_hint;
 };
@@ -70,7 +67,7 @@ class QnSettingsOnOffWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
 public:
-    QnSettingsOnOffWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent);
+    QnSettingsOnOffWidget(const CameraSetting &obj, QnSettingsScrollArea *parent);
     ~QnSettingsOnOffWidget();
 
     void refresh() override;
@@ -88,7 +85,7 @@ class QnSettingsMinMaxStepWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
 public:
-    QnSettingsMinMaxStepWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent);
+    QnSettingsMinMaxStepWidget(const CameraSetting &obj, QnSettingsScrollArea *parent);
 
     void refresh() override;
 
@@ -108,7 +105,7 @@ class QnSettingsEnumerationWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
 public:
-    QnSettingsEnumerationWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent);
+    QnSettingsEnumerationWidget(const CameraSetting &obj, QnSettingsScrollArea *parent);
 
     void refresh() override;
 
@@ -129,7 +126,7 @@ class QnSettingsButtonWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
 public:
-    QnSettingsButtonWidget(QObject* handler, const CameraSetting& obj, QnSettingsScrollArea& parent);
+    QnSettingsButtonWidget(const CameraSetting &obj, QnSettingsScrollArea *parent);
 
     void refresh() override;
 
@@ -138,9 +135,6 @@ public slots:
 
 private slots:
     void onClicked();
-
-private:
-    CameraSetting m_dummyVal;
 };
 
 //==============================================
@@ -148,7 +142,7 @@ class QnSettingsTextFieldWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
 public:
-    QnSettingsTextFieldWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent);
+    QnSettingsTextFieldWidget(const CameraSetting &obj, QnSettingsScrollArea *parent);
 
     void refresh() override;
 
@@ -167,7 +161,7 @@ class QnSettingsControlButtonsPairWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
 public:
-    QnSettingsControlButtonsPairWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent);
+    QnSettingsControlButtonsPairWidget(const CameraSetting &obj, QnSettingsScrollArea *parent);
 
     void refresh() override;
 

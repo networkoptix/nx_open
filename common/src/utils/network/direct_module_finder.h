@@ -19,20 +19,15 @@ public:
 
     void setCompatibilityMode(bool compatibilityMode);
 
-    void addUrl(const QUrl &url, const QnId &id);
-    void removeUrl(const QUrl &url, const QnId &id);
-    void addAddress(const QHostAddress &address, quint16 port, const QnId &id);
-    void removeAddress(const QHostAddress &address, quint16 port, const QnId &id);
+    void addUrl(const QUrl &url, const QUuid &id);
+    void removeUrl(const QUrl &url, const QUuid &id);
+    void addAddress(const QHostAddress &address, quint16 port, const QUuid &id);
+    void removeAddress(const QHostAddress &address, quint16 port, const QUuid &id);
 
-    void addManualUrl(const QUrl &url, const QnId &id);
-    void removeManualUrl(const QUrl &url, const QnId &id);
-    void addManualAddress(const QHostAddress &address, quint16 port, const QnId &id);
-    void removeManualAddress(const QHostAddress &address, quint16 port, const QnId &id);
-
-    void addIgnoredModule(const QUrl &url, const QnId &id);
-    void removeIgnoredModule(const QUrl &url, const QnId &id);
-    void addIgnoredModule(const QHostAddress &address, quint16 port, const QnId &id);
-    void removeIgnoredModule(const QHostAddress &address, quint16 port, const QnId &id);
+    void addIgnoredModule(const QUrl &url, const QUuid &id);
+    void removeIgnoredModule(const QUrl &url, const QUuid &id);
+    void addIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id);
+    void removeIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id);
 
     void addIgnoredUrl(const QUrl &url);
     void removeIgnoredUrl(const QUrl &url);
@@ -43,13 +38,16 @@ public:
 
     void start();
     void stop();
+    void pleaseStop();
 
     QList<QnModuleInformation> foundModules() const;
-    QnModuleInformation moduleInformation(const QnId &id) const;
+    QnModuleInformation moduleInformation(const QUuid &id) const;
 
-    QMultiHash<QUrl, QnId> autoUrls() const;
-    QMultiHash<QUrl, QnId> manualUrls() const;
-    QMultiHash<QUrl, QnId> ignoredModules() const;
+    //! Urls for periodical check
+    QMultiHash<QUrl, QUuid> urls() const;
+    //! Modules to be ignored when found
+    QMultiHash<QUrl, QUuid> ignoredModules() const;
+    //! Urls which may appear in url check list but must be ignored
     QSet<QUrl> ignoredUrls() const;
 
 signals:
@@ -62,35 +60,32 @@ signals:
 private:
     void enqueRequest(const QUrl &url);
 
-    void checkAndAddUrl(const QUrl &url, const QnId &id, QMultiHash<QUrl, QnId> *urls);
-    void checkAndAddAddress(const QHostAddress &address, quint16 port, const QnId &id, QMultiHash<QUrl, QnId> *urls);
-
-    QnIdSet expectedModuleIds(const QUrl &url) const;
+    void dropModule(const QUuid &id, bool emitSignal = true);
+    void dropModule(const QUrl &url, bool emitSignal = true);
 
 private slots:
     void activateRequests();
 
     void at_reply_finished(QNetworkReply *reply);
-    void at_manualCheckTimer_timeout();
+    void at_periodicalCheckTimer_timeout();
 
 private:
-    QMultiHash<QUrl, QnId> m_autoUrls;
-    QMultiHash<QUrl, QnId> m_manualUrls;
-    QMultiHash<QUrl, QnId> m_ignoredModules;
+    QMultiHash<QUrl, QUuid> m_urls;
+    QMultiHash<QUrl, QUuid> m_ignoredModules;
     QSet<QUrl> m_ignoredUrls;
 
     int m_maxConnections;
     QQueue<QUrl> m_requestQueue;
     QSet<QUrl> m_activeRequests;
 
-    QHash<QnId, QnModuleInformation> m_foundModules;
-    QHash<QnId, qint64> m_lastPingById;
-    QHash<QUrl, QnId> m_moduleByUrl;
+    QHash<QUuid, QnModuleInformation> m_foundModules;
+    QHash<QUuid, qint64> m_lastPingById;
+    QHash<QUrl, QUuid> m_moduleByUrl;
 
     bool m_compatibilityMode;
 
     QNetworkAccessManager *m_networkAccessManager;
-    QTimer *m_manualCheckTimer;
+    QTimer *m_periodicalCheckTimer;
 };
 
 #endif // DIRECT_MODULE_FINDER_H

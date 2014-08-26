@@ -52,7 +52,7 @@ void QnRestUpdatePeerTask::cancel() {
 }
 
 void QnRestUpdatePeerTask::doStart() {
-    foreach (const QnId &id, peers()) {
+    foreach (const QUuid &id, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             Q_ASSERT_X(0, "Non-server resource in server task.", Q_FUNC_INFO);
@@ -136,7 +136,7 @@ void QnRestUpdatePeerTask::at_shortTimeout() {
      * Otherwise the update has been failed :(
      */
     QnMediaServerResourcePtr server = m_currentServers.first();
-    if (server->getStatus() == QnResource::Offline)
+    if (server->getStatus() == Qn::Offline)
         return;
 
     if (server->getVersion() != m_version) {

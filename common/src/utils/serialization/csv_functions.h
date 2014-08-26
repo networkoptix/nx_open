@@ -17,6 +17,7 @@
 
 #include "collection_fwd.h"
 #include "csv.h"
+#include "csv_macros.h"
 #include "lexical.h"
 
 

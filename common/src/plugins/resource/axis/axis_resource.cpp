@@ -62,7 +62,7 @@ void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 
 bool QnPlAxisResource::startInputPortMonitoring()
 {
-    if( hasFlags(QnResource::foreigner)      //we do not own camera
+    if( hasFlags(Qn::foreigner)      //we do not own camera
         || m_inputPortNameToIndex.empty() )
     {
         return false;
@@ -193,7 +193,7 @@ bool QnPlAxisResource::readMotionInfo()
     CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=Motion"));
     if (status != CL_HTTP_SUCCESS) {
         if (status == CL_HTTP_AUTH_REQUIRED)
-            setStatus(QnResource::Unauthorized);
+            setStatus(Qn::Unauthorized);
         return false;
     }
     QByteArray body;
@@ -278,9 +278,27 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes&Image.I1.MPEG.UserDataEnabled=yes&Image.I2.MPEG.UserDataEnabled=yes&Image.I3.MPEG.UserDataEnabled=yes"));
         if (status != CL_HTTP_SUCCESS) {
             if (status == CL_HTTP_AUTH_REQUIRED)
-                setStatus(QnResource::Unauthorized);
+                setStatus(Qn::Unauthorized);
             return CameraDiagnostics::UnknownErrorResult();
         }
+    }
+
+    {
+        //reading RTSP port
+        CLSimpleHTTPClient http( getHostAddress(), QUrl( getUrl() ).port( DEFAULT_AXIS_API_PORT ), getNetworkTimeout(), getAuth() );
+        CLHttpStatus status = http.doGET( QByteArray( "axis-cgi/param.cgi?action=list&group=Network.RTSP.Port" ) );
+        if( status != CL_HTTP_SUCCESS )
+        {
+            if( status == CL_HTTP_AUTH_REQUIRED )
+                setStatus( Qn::Unauthorized );
+            return CameraDiagnostics::UnknownErrorResult();
+        }
+        QByteArray paramStr;
+        http.readAll( paramStr );
+        bool ok = false;
+        const int rtspPort = paramStr.trimmed().mid( paramStr.indexOf( '=' ) + 1 ).toInt( &ok );
+        if( ok )
+            setMediaPort( rtspPort );
     }
 
     readMotionInfo();
@@ -290,7 +308,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution"));
     if (status != CL_HTTP_SUCCESS) {
         if (status == CL_HTTP_AUTH_REQUIRED)
-            setStatus(QnResource::Unauthorized);
+            setStatus(Qn::Unauthorized);
         return CameraDiagnostics::UnknownErrorResult();
     }
 

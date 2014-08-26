@@ -90,7 +90,7 @@ void QnActiResourceSearcher::at_httpConnectionDone(nx_http::AsyncHttpClientPtr r
     m_httpInProgress.remove(host);
 }
 
-QnResourcePtr QnActiResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnActiResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -164,7 +164,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
         devInfo.timer.restart();
         m_cashedDevInfo[devUrl] = devInfo;
     }
-    processPacket(QHostAddress(), url.host(), devInfo.info, QByteArray(), result);
+    processPacket(QHostAddress(), url.host(), devInfo.info, QByteArray(), auth, result);
 
     return result;
 }
@@ -174,6 +174,7 @@ void QnActiResourceSearcher::processPacket(
     const QString& host,
     const UpnpDeviceInfo& devInfo,
     const QByteArray& /*xmlDevInfo*/,
+    const QAuthenticator &auth,
     QnResourceList& result)
 {
     Q_UNUSED(discoveryAddr)
@@ -181,7 +182,7 @@ void QnActiResourceSearcher::processPacket(
     if (!devInfo.manufacturer.toUpper().startsWith(manufacture()))
         return;
 
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
+    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
     if (rt.isNull())
         return;
 
@@ -194,11 +195,15 @@ void QnActiResourceSearcher::processPacket(
     QString sn = devInfo.serialNumber;
     sn = sn.replace(QLatin1String(":"), QLatin1String("_"));
     resource->setPhysicalId(QString(QLatin1String("ACTI_%1")).arg(sn));
-    QAuthenticator auth;
-    
-    auth.setUser(DEFAULT_LOGIN);
-    auth.setPassword(DEFAULT_PASSWORD);
-    resource->setAuth(auth);
+
+    if (!auth.isNull()) {
+        resource->setAuth(auth);
+    } else {
+        QAuthenticator defaultAuth;
+        defaultAuth.setUser(DEFAULT_LOGIN);
+        defaultAuth.setPassword(DEFAULT_PASSWORD);
+        resource->setAuth(defaultAuth);
+    }
 
     result << resource;
 }

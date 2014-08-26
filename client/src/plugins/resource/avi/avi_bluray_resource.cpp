@@ -15,7 +15,7 @@ QnAviBlurayResource::~QnAviBlurayResource()
 {
 }
 
-QnAbstractStreamDataProvider* QnAviBlurayResource::createDataProviderInternal(ConnectionRole /*role*/)
+QnAbstractStreamDataProvider* QnAviBlurayResource::createDataProviderInternal(Qn::ConnectionRole /*role*/)
 {
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
     result->setArchiveDelegate(new QnAVIBlurayArchiveDelegate());

@@ -81,7 +81,6 @@ QnClientSettings::QnClientSettings(QObject *parent):
     addArgumentName(SOFTWARE_YUV,           "--soft-yuv");
     addArgumentName(OPEN_LAYOUTS_ON_LOGIN,  "--open-layouts-on-login");
     addArgumentName(MAX_SCENE_VIDEO_ITEMS,  "--max-video-items");
-    addArgumentName(UPDATES_ENABLED,        "--updates-enabled");
     addArgumentName(RAINBOW_MODE,           "--rainbow");
 
     /* Load from internal resource. */
@@ -226,7 +225,6 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     //case SHOWCASE_ENABLED:
     case SETTINGS_URL:
     case DEV_MODE:
-    case UPDATES_ENABLED:
     case AUTO_CHECK_FOR_UPDATES:
     case GL_VSYNC:
     case LIGHT_MODE:

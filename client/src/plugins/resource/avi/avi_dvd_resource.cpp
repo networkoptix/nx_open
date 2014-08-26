@@ -16,7 +16,7 @@ QnAviDvdResource::~QnAviDvdResource()
 {
 }
 
-QnAbstractStreamDataProvider* QnAviDvdResource::createDataProviderInternal(ConnectionRole /*role*/)
+QnAbstractStreamDataProvider* QnAviDvdResource::createDataProviderInternal(Qn::ConnectionRole /*role*/)
 {
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
     result->setArchiveDelegate(new QnAVIDvdArchiveDelegate());

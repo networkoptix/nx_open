@@ -38,7 +38,7 @@ QnResourceDirectoryBrowser::QnResourceDirectoryBrowser() {
     m_resourceReady = false;
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnId &resourceTypeId, const QnResourceParams& params) {
+QnResourcePtr QnResourceDirectoryBrowser::createResource(const QUuid &resourceTypeId, const QnResourceParams& params) {
     QnResourcePtr result;
 
     if (!isResourceTypeSupported(resourceTypeId)) {
@@ -213,12 +213,13 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     }
 
 
-    layout->setParentId(0);
-    layout->setId(QnId::createUuid());
+    layout->setParentId(QUuid());
+    layout->setId(QUuid::createUuid());
     layout->setName(QFileInfo(xfile).fileName());
-    layout->addFlags(QnResource::local);
+    // No need to do so, at end of this function the author do it again. ---- DPENG
+    //layout->addFlags(Qn::local);
 
-    layout->addFlags(QnResource::url);
+    layout->addFlags(Qn::url);
     layout->setUrl(xfile);
 
     //QnLayoutItemDataMap items = layout->getItems();
@@ -245,7 +246,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
 
         QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
         if (layoutWithCameras)
-            aviResource->addFlags(QnResource::utc | QnResource::sync | QnResource::periods | QnResource::motion);
+            aviResource->addFlags(Qn::utc | Qn::sync | Qn::periods | Qn::motion);
         aviResource->setStorage(storage);
         aviResource->setParentId(layout->getId());
         QString itemName(itemNames.readLine());
@@ -289,7 +290,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     }
 
     layout->setItems(updatedItems);
-    layout->addFlags(QnResource::local);
+
+    layout->addFlags(Qn::local);
     return layout;
 }
 
@@ -306,8 +308,8 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& x
 
     if (FileTypeSupport::isImageFileExt(xfile)) {
         QnResourcePtr rez = QnResourcePtr(new QnAviResource(xfile));
-        rez->addFlags(QnResource::still_image);
-        rez->removeFlags(QnResource::video | QnResource::audio);
+        rez->addFlags(Qn::still_image);
+        rez->removeFlags(Qn::video | Qn::audio);
         return rez;
     }
 

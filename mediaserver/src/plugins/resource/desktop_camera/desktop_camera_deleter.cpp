@@ -18,7 +18,7 @@ QnDesktopCameraDeleter::QnDesktopCameraDeleter(QObject *parent): QObject(parent)
 
         // remove resources that have been offline for more than one iteration
         foreach (const QnResourcePtr &resource, m_queuedToDelete) {
-            if (resource->getStatus() != QnResource::Offline)
+            if (resource->getStatus() != Qn::Offline)
                 continue;
             QnAppServerConnectionFactory::getConnection2()->getCameraManager()->remove(resource->getId(), this, []{});
             qnResPool->removeResource(resource);
@@ -26,9 +26,9 @@ QnDesktopCameraDeleter::QnDesktopCameraDeleter(QObject *parent): QObject(parent)
         m_queuedToDelete.clear();
 
         // queue to removing all resources that went offline since the last check
-        QnResourceList desktopCameras = qnResPool->getResourcesWithFlag(QnResource::desktop_camera);
+        QnResourceList desktopCameras = qnResPool->getResourcesWithFlag(Qn::desktop_camera);
         foreach(const QnResourcePtr &resource, desktopCameras) {
-            if (resource->getStatus() == QnResource::Offline)
+            if (resource->getStatus() == Qn::Offline)
                 m_queuedToDelete << resource;
         }
     });

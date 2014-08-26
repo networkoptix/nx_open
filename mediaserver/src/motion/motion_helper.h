@@ -28,19 +28,19 @@ public:
 
     QnMotionArchive* getArchive(const QnResourcePtr& res, int channel);
 
-    static QString getMotionDir(const QDate& date, const QString& macAddress);
-    static void deleteUnusedFiles(const QList<QDate>& chunks, const QString& macAddress);
-    static QList<QDate> recordedMonth(const QString& macAddress);
+    static QString getMotionDir(const QDate& date, const QString& cameraUniqueId);
+    static void deleteUnusedFiles(const QList<QDate>& chunks, const QString& cameraUniqueId);
+    static QList<QDate> recordedMonth(const QString& cameraUniqueId);
 
     QnMotionHelper();
 
 private:
-    static QString getBaseDir(const QString& macAddress);
+    static QString getBaseDir(const QString& cameraUniqueId);
 
     // create Find mask by region
     void createMask(const QRegion& region);
 
-    // mach one motion image by mask
+    // match one motion image by mask
     void matchImage(
         const QList<QRegion>& regions,
         const QnResourcePtr& res,

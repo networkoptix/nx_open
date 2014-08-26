@@ -18,7 +18,7 @@ class QnAppserverResourceProcessor : public QObject, public QnResourceProcessor
     Q_OBJECT
 
 public:
-    QnAppserverResourceProcessor(QnId serverId);
+    QnAppserverResourceProcessor(QUuid serverId);
     virtual ~QnAppserverResourceProcessor();
 
     virtual bool isBusy() const override;
@@ -26,11 +26,8 @@ public:
 
 private:
     ec2::AbstractECConnectionPtr m_ec2Connection;
-    QnId m_serverId;
+    QUuid m_serverId;
     
-    QSet<QnId> m_awaitingSetStatus;
-    QSet<QnId> m_setStatusInProgress;
-
     struct LockData 
     {
         LockData(): mutex(0) {}
@@ -44,15 +41,10 @@ private:
     QMutex m_mutex;
 
 private:
-    void updateResourceStatusAsync(const QnResourcePtr &resource);
-    bool isSetStatusInProgress(const QnResourcePtr &resource);
     void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
     void addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource);
 
-private slots:
-    void at_resource_statusChanged(const QnResourcePtr& resource);
     //void requestFinished(const QnHTTPRawResponse& response, int handle);
-    void requestFinished2( int reqID, ec2::ErrorCode errCode, const QnId& id );
 
     void at_mutexLocked();
     void at_mutexTimeout();

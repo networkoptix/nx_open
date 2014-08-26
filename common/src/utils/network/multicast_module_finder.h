@@ -14,7 +14,7 @@
 #include "aio/pollset.h"
 #include "system_socket.h"
 
-class AbstractDatagramSocket;
+class UDPSocket;
 
 //!Searches for all Network Optix enterprise controllers in local network environment using multicast
 /*!
@@ -61,6 +61,10 @@ public:
 
     QnModuleInformation moduleInformation(const QString &moduleId) const;
 
+    void addIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id);
+    void removeIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id);
+    QMultiHash<QUrl, QUuid> ignoredModules() const;
+
 public slots:
     virtual void pleaseStop() override;
 
@@ -77,8 +81,8 @@ protected:
     virtual void run() override;
 
 private:
-    bool processDiscoveryRequest(AbstractDatagramSocket *udpSocket);
-    bool processDiscoveryResponse(AbstractDatagramSocket *udpSocket);
+    bool processDiscoveryRequest(UDPSocket *udpSocket);
+    bool processDiscoveryResponse(UDPSocket *udpSocket);
 
 private:
     struct ModuleContext {
@@ -93,14 +97,15 @@ private:
 
     mutable QMutex m_mutex;
     aio::PollSet m_pollSet;
-    QList<AbstractDatagramSocket*> m_clientSockets;
+    QList<UDPSocket*> m_clientSockets;
     UDPSocket *m_serverSocket;
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;
-    QHash<QString, ModuleContext> m_knownEnterpriseControllers;
+    QHash<QUuid, ModuleContext> m_knownEnterpriseControllers;
     QSet<QString> m_localNetworkAdresses;
     bool m_compatibilityMode;
+    QMultiHash<QUrl, QUuid> m_ignoredModules;
 };
 
 #endif // MULTICAST_MODULE_FINDER_H

@@ -10,6 +10,7 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
+#include <core/resource/resource.h>
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/network_resource.h>
@@ -124,7 +125,7 @@ void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* proce
     m_resourceProcessor = processor;
 }
 
-QnResourcePtr QnResourceDiscoveryManager::createResource(const QnId &resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnResourceDiscoveryManager::createResource(const QUuid &resourceTypeId, const QnResourceParams& params)
 {
     QnResourcePtr result;
 
@@ -250,7 +251,7 @@ void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
     }
 }
 
-static QnResourceList ChecHostAddrAsync(const QnManualCameraInfo& input) { return input.checkHostAddr(); }
+static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input) { return input.checkHostAddr(); }
 
 void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList& resources)
 {
@@ -258,7 +259,7 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
     QnManualCameraInfoMap cameras = m_manualCameraMap;
     m_searchersListMutex.unlock();
 
-    QFuture<QnResourceList> results = QtConcurrent::mapped(cameras, &ChecHostAddrAsync);
+    QFuture<QnResourceList> results = QtConcurrent::mapped(cameras, &CheckHostAddrAsync);
     results.waitForFinished();
     for (QFuture<QnResourceList>::const_iterator itr = results.constBegin(); itr != results.constEnd(); ++itr)
     {
@@ -287,7 +288,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             QnResourceList lst = searcher->search();
 
             // resources can be searched by client in or server.
-            // if this client in stand alone => lets add QnResource::local 
+            // if this client in stand alone => lets add Qn::local
             // server does not care about flags 
             for( QnResourceList::iterator
                 it = lst.begin();
@@ -315,7 +316,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                 }
 
                 if( searcher->isLocal() )
-                    (*it)->addFlags( QnResource::local );
+                    (*it)->addFlags(Qn::local);
 
                 ++it;
             }
@@ -397,8 +398,8 @@ void QnResourceDiscoveryManager::onInitAsyncFinished(const QnResourcePtr& res, b
     QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(res.data());
     if (initialized && rpNetRes)
     {
-        if (rpNetRes->getStatus() == QnResource::Offline || rpNetRes->getStatus() == QnResource::Unauthorized)
-            rpNetRes->setStatus(QnResource::Online);
+        if (rpNetRes->getStatus() == Qn::Offline || rpNetRes->getStatus() == Qn::Unauthorized)
+            rpNetRes->setStatus(Qn::Online);
     }
 }
 
