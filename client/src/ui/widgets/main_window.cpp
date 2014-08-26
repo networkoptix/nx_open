@@ -361,8 +361,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
      * * VSync is disabled in drivers
      * * double buffering is disabled in drivers or in our program
      */
-//     QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
-//     Q_UNUSED(vsyncWorkaround);
+    QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
+    Q_UNUSED(vsyncWorkaround);
 
     QnPtzManageDialog *manageDialog = new QnPtzManageDialog(this); //initializing instance of a singleton
     Q_UNUSED(manageDialog)
