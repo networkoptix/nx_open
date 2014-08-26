@@ -14,7 +14,7 @@ const char passwordChars[] = "abcdefghijklmnopqrstuvwxyz0123456789";
 const int passwordLength = 6;
 const int readBufferSize = 1024 * 16;
 
-bool verifyUpdatePackageInternal(QuaZipFile *infoFile, QnSoftwareVersion *version = 0, QnSystemInformation *sysInfo = 0) {
+bool verifyUpdatePackageInternal(QuaZipFile *infoFile, QnSoftwareVersion *version = 0, QnSystemInformation *sysInfo = 0, bool *isClient = 0) {
     if (!infoFile->open(QuaZipFile::ReadOnly))
         return false;
 
@@ -30,13 +30,16 @@ bool verifyUpdatePackageInternal(QuaZipFile *infoFile, QnSoftwareVersion *versio
     if (locVersion.isNull())
         return false;
 
-    if (!info.contains(lit("executable")))
+    bool client = info.value(lit("client")).toBool();
+    if (!client && !info.contains(lit("executable")))
         return false;
 
     if (version)
         *version = locVersion;
     if (sysInfo)
         *sysInfo = locSysInfo;
+    if (isClient)
+        *isClient = client;
 
     return true;
 }
@@ -44,20 +47,20 @@ bool verifyUpdatePackageInternal(QuaZipFile *infoFile, QnSoftwareVersion *versio
 } // anonymous namespace
 
 
-bool verifyUpdatePackage(const QString &fileName, QnSoftwareVersion *version, QnSystemInformation *sysInfo) {
+bool verifyUpdatePackage(const QString &fileName, QnSoftwareVersion *version, QnSystemInformation *sysInfo, bool *isClient) {
     QuaZipFile infoFile(fileName, infoEntryName);
-    return verifyUpdatePackageInternal(&infoFile, version, sysInfo);
+    return verifyUpdatePackageInternal(&infoFile, version, sysInfo, isClient);
 }
 
 
-bool verifyUpdatePackage(QIODevice *device, QnSoftwareVersion *version, QnSystemInformation *sysInfo) {
+bool verifyUpdatePackage(QIODevice *device, QnSoftwareVersion *version, QnSystemInformation *sysInfo, bool *isClient) {
     QuaZip zip(device);
     if (!zip.open(QuaZip::mdUnzip))
         return false;
 
     zip.setCurrentFile(infoEntryName);
     QuaZipFile infoFile(&zip);
-    return verifyUpdatePackageInternal(&infoFile, version, sysInfo);
+    return verifyUpdatePackageInternal(&infoFile, version, sysInfo, isClient);
 }
 
 QString updateFilePath(const QString &updatesDirPath, const QString &fileName) {

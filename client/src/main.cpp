@@ -327,6 +327,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QString sVideoWallGuid;
     QString sVideoWallItemGuid;
     QString engineVersion;
+    bool noClientUpdate = false;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -350,6 +351,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&sVideoWallGuid,         "--videowall",                  NULL,   QString());
     commandLineParser.addParameter(&sVideoWallItemGuid,     "--videowall-instance",         NULL,   QString());
     commandLineParser.addParameter(&engineVersion,          "--override-version",           NULL,   QString());
+    commandLineParser.addParameter(&noClientUpdate,         "--no-client-update",           NULL,   QString());
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
@@ -405,6 +407,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #endif
 
     qnSettings->setVSyncEnabled(!noVSync);
+
+    qnSettings->setClientUpdateDisabled(noClientUpdate);
 
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 

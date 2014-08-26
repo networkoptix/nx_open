@@ -233,6 +233,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     case VIDEO_WALL_MODE:
     case SOFTWARE_YUV:
     case RAINBOW_MODE:
+    case NO_CLIENT_UPDATE:
         break; /* Not to be saved to settings. */
     default:
         base_type::writeValueToSettings(settings, id, value);
