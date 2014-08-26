@@ -585,7 +585,7 @@ bool UdtStreamSocket::setReuseAddrFlag( bool reuseAddr ) {
     return impl_->SetReuseAddrFlag(reuseAddr);
 }
 
-bool UdtStreamSocket::getReuseAddrFlag( bool* val ) {
+bool UdtStreamSocket::getReuseAddrFlag( bool* val ) const {
     return impl_->GetReuseAddrFlag(val);
 }
 
@@ -597,7 +597,7 @@ bool UdtStreamSocket::getNonBlockingMode( bool* val ) const {
     return impl_->GetNonBlockingMode(val);
 }
 
-bool UdtStreamSocket::getMtu( unsigned int* mtuValue ) {
+bool UdtStreamSocket::getMtu( unsigned int* mtuValue ) const {
     return impl_->GetMtu(mtuValue);
 }
 
@@ -605,7 +605,7 @@ bool UdtStreamSocket::setSendBufferSize( unsigned int buffSize ) {
     return impl_->SetSendBufferSize(buffSize);
 }
 
-bool UdtStreamSocket::getSendBufferSize( unsigned int* buffSize ) {
+bool UdtStreamSocket::getSendBufferSize( unsigned int* buffSize ) const {
     return impl_->GetSendBufferSize(buffSize);
 }
 
@@ -613,7 +613,7 @@ bool UdtStreamSocket::setRecvBufferSize( unsigned int buffSize ) {
     return impl_->SetRecvBufferSize(buffSize);
 }
 
-bool UdtStreamSocket::getRecvBufferSize( unsigned int* buffSize ) {
+bool UdtStreamSocket::getRecvBufferSize( unsigned int* buffSize ) const {
     return impl_->GetRecvBufferSize( buffSize );
 }
 
@@ -621,7 +621,7 @@ bool UdtStreamSocket::setRecvTimeout( unsigned int millis ) {
     return impl_->SetRecvTimeout(millis);
 }
 
-bool UdtStreamSocket::getRecvTimeout( unsigned int* millis ) {
+bool UdtStreamSocket::getRecvTimeout( unsigned int* millis ) const {
     return impl_->GetRecvTimeout(millis);
 }
 
@@ -629,11 +629,11 @@ bool UdtStreamSocket::setSendTimeout( unsigned int ms )  {
     return impl_->SetSendTimeout(ms);
 }
 
-bool UdtStreamSocket::getSendTimeout( unsigned int* millis ) {
+bool UdtStreamSocket::getSendTimeout( unsigned int* millis ) const {
     return impl_->GetSendTimeout(millis);
 }
 
-bool UdtStreamSocket::getLastError( SystemError::ErrorCode* errorCode ) {
+bool UdtStreamSocket::getLastError( SystemError::ErrorCode* errorCode ) const {
     return impl_->GetLastError(errorCode);
 }
 
@@ -745,7 +745,7 @@ bool UdtStreamServerSocket::setReuseAddrFlag( bool reuseAddr ) {
     return impl_->SetReuseAddrFlag(reuseAddr);
 }
 
-bool UdtStreamServerSocket::getReuseAddrFlag( bool* val ) {
+bool UdtStreamServerSocket::getReuseAddrFlag( bool* val ) const {
     return impl_->GetReuseAddrFlag(val);
 }
 
@@ -757,7 +757,7 @@ bool UdtStreamServerSocket::getNonBlockingMode( bool* val ) const {
     return impl_->GetNonBlockingMode(val);
 }
 
-bool UdtStreamServerSocket::getMtu( unsigned int* mtuValue ) {
+bool UdtStreamServerSocket::getMtu( unsigned int* mtuValue ) const {
     return impl_->GetMtu(mtuValue);
 }
 
@@ -765,7 +765,7 @@ bool UdtStreamServerSocket::setSendBufferSize( unsigned int buffSize ) {
     return impl_->SetSendBufferSize(buffSize);
 }
 
-bool UdtStreamServerSocket::getSendBufferSize( unsigned int* buffSize ) {
+bool UdtStreamServerSocket::getSendBufferSize( unsigned int* buffSize ) const {
     return impl_->GetSendBufferSize(buffSize);
 }
 
@@ -773,7 +773,7 @@ bool UdtStreamServerSocket::setRecvBufferSize( unsigned int buffSize ) {
     return impl_->SetRecvBufferSize(buffSize);
 }
 
-bool UdtStreamServerSocket::getRecvBufferSize( unsigned int* buffSize ) {
+bool UdtStreamServerSocket::getRecvBufferSize( unsigned int* buffSize ) const {
     return impl_->GetRecvBufferSize(buffSize);
 }
 
@@ -781,7 +781,7 @@ bool UdtStreamServerSocket::setRecvTimeout( unsigned int millis ) {
     return impl_->SetRecvTimeout(millis);
 }
 
-bool UdtStreamServerSocket::getRecvTimeout( unsigned int* millis ) {
+bool UdtStreamServerSocket::getRecvTimeout( unsigned int* millis ) const {
     return impl_->GetRecvTimeout(millis);
 }
 
@@ -789,11 +789,11 @@ bool UdtStreamServerSocket::setSendTimeout( unsigned int ms ) {
     return impl_->SetSendTimeout(ms);
 }
 
-bool UdtStreamServerSocket::getSendTimeout( unsigned int* millis ) {
+bool UdtStreamServerSocket::getSendTimeout( unsigned int* millis ) const {
     return impl_->GetSendTimeout(millis);
 }
 
-bool UdtStreamServerSocket::getLastError( SystemError::ErrorCode* errorCode ) {
+bool UdtStreamServerSocket::getLastError( SystemError::ErrorCode* errorCode ) const {
     return impl_->GetLastError(errorCode);
 }
 

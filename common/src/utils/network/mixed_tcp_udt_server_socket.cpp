@@ -82,7 +82,7 @@ bool MixedTcpUdtServerSocket::setReuseAddrFlag(bool reuseAddr)
     DO_BOOL_FUNCTION(setReuseAddrFlag, reuseAddr)
 }
 
-bool MixedTcpUdtServerSocket::getReuseAddrFlag(bool* val)
+bool MixedTcpUdtServerSocket::getReuseAddrFlag(bool* val) const
 {
     DO_BOOL_FUNCTION(getReuseAddrFlag, val)
 }
@@ -97,7 +97,7 @@ bool MixedTcpUdtServerSocket::getNonBlockingMode(bool* val) const
     DO_BOOL_FUNCTION(getNonBlockingMode, val)
 }
 
-bool MixedTcpUdtServerSocket::getMtu(unsigned int* mtuValue)
+bool MixedTcpUdtServerSocket::getMtu(unsigned int* mtuValue) const
 {
     //mtu is not supported for UDT
     return m_socketDelegates[0]->getMtu(mtuValue);
@@ -108,7 +108,7 @@ bool MixedTcpUdtServerSocket::setSendBufferSize(unsigned int buffSize)
     DO_BOOL_FUNCTION(setSendBufferSize, buffSize)
 }
 
-bool MixedTcpUdtServerSocket::getSendBufferSize(unsigned int* buffSize)
+bool MixedTcpUdtServerSocket::getSendBufferSize(unsigned int* buffSize) const
 {
     DO_BOOL_FUNCTION(getSendBufferSize, buffSize)
 }
@@ -118,7 +118,7 @@ bool MixedTcpUdtServerSocket::setRecvBufferSize(unsigned int buffSize)
     DO_BOOL_FUNCTION(setRecvBufferSize, buffSize)
 }
 
-bool MixedTcpUdtServerSocket::getRecvBufferSize(unsigned int* buffSize)
+bool MixedTcpUdtServerSocket::getRecvBufferSize(unsigned int* buffSize) const
 {
     DO_BOOL_FUNCTION(getRecvBufferSize, buffSize)
 }
@@ -128,7 +128,7 @@ bool MixedTcpUdtServerSocket::setRecvTimeout(unsigned int ms)
     DO_BOOL_FUNCTION(setRecvTimeout, ms)
 }
 
-bool MixedTcpUdtServerSocket::getRecvTimeout(unsigned int* millis)
+bool MixedTcpUdtServerSocket::getRecvTimeout(unsigned int* millis) const
 {
     DO_BOOL_FUNCTION(getRecvTimeout, millis)
 }
@@ -138,12 +138,12 @@ bool MixedTcpUdtServerSocket::setSendTimeout(unsigned int ms)
     DO_BOOL_FUNCTION(setSendTimeout, ms)
 }
 
-bool MixedTcpUdtServerSocket::getSendTimeout(unsigned int* millis)
+bool MixedTcpUdtServerSocket::getSendTimeout(unsigned int* millis) const
 {
     DO_BOOL_FUNCTION(getSendTimeout, millis)
 }
 
-bool MixedTcpUdtServerSocket::getLastError(SystemError::ErrorCode* errorCode)
+bool MixedTcpUdtServerSocket::getLastError(SystemError::ErrorCode* errorCode) const
 {
     //TODO #ak
     DO_BOOL_FUNCTION(getLastError, errorCode)

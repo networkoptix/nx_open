@@ -41,31 +41,31 @@ public:
     //!Implementation of AbstractSocket::setReuseAddrFlag
     virtual bool setReuseAddrFlag(bool reuseAddr) override;
     //!Implementation of AbstractSocket::reuseAddrFlag
-    virtual bool getReuseAddrFlag(bool* val) override;
+    virtual bool getReuseAddrFlag(bool* val) const override;
     //!Implementation of AbstractSocket::setNonBlockingMode
     virtual bool setNonBlockingMode(bool val) override;
     //!Implementation of AbstractSocket::getNonBlockingMode
     virtual bool getNonBlockingMode(bool* val) const override;
     //!Implementation of AbstractSocket::getMtu
-    virtual bool getMtu(unsigned int* mtuValue) override;
+    virtual bool getMtu(unsigned int* mtuValue) const override;
     //!Implementation of AbstractSocket::setSendBufferSize
     virtual bool setSendBufferSize(unsigned int buffSize) override;
     //!Implementation of AbstractSocket::getSendBufferSize
-    virtual bool getSendBufferSize(unsigned int* buffSize) override;
+    virtual bool getSendBufferSize(unsigned int* buffSize) const override;
     //!Implementation of AbstractSocket::setRecvBufferSize
     virtual bool setRecvBufferSize(unsigned int buffSize) override;
     //!Implementation of AbstractSocket::getRecvBufferSize
-    virtual bool getRecvBufferSize(unsigned int* buffSize) override;
+    virtual bool getRecvBufferSize(unsigned int* buffSize) const override;
     //!Implementation of AbstractSocket::setRecvTimeout
     virtual bool setRecvTimeout(unsigned int ms) override;
     //!Implementation of AbstractSocket::getRecvTimeout
-    virtual bool getRecvTimeout(unsigned int* millis) override;
+    virtual bool getRecvTimeout(unsigned int* millis) const override;
     //!Implementation of AbstractSocket::setSendTimeout
     virtual bool setSendTimeout(unsigned int ms) override;
     //!Implementation of AbstractSocket::getSendTimeout
-    virtual bool getSendTimeout(unsigned int* millis) override;
+    virtual bool getSendTimeout(unsigned int* millis) const override;
     //!Implementation of AbstractSocket::getLastError
-    virtual bool getLastError(SystemError::ErrorCode* errorCode) override;
+    virtual bool getLastError(SystemError::ErrorCode* errorCode) const override;
     //!Implementation of AbstractSocket::handle
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
 

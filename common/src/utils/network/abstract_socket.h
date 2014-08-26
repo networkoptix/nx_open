@@ -69,7 +69,7 @@ public:
         \param val Filled with flag value in case of success. In case of error undefined
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool getReuseAddrFlag( bool* val ) = 0;
+    virtual bool getReuseAddrFlag( bool* val ) const = 0;
     //!if \a val is \a true turns non-blocking mode on, else turns it off
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
@@ -85,7 +85,7 @@ public:
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool getMtu( unsigned int* mtuValue ) = 0;
+    virtual bool getMtu( unsigned int* mtuValue ) const = 0;
     //!Set socket's send buffer size (in bytes)
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
@@ -95,7 +95,7 @@ public:
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool getSendBufferSize( unsigned int* buffSize ) = 0;
+    virtual bool getSendBufferSize( unsigned int* buffSize ) const = 0;
     //!Set socket's receive buffer (in bytes)
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
@@ -105,7 +105,7 @@ public:
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool getRecvBufferSize( unsigned int* buffSize ) = 0;
+    virtual bool getRecvBufferSize( unsigned int* buffSize ) const = 0;
     //!Change socket's receive timeout (in millis)
     /*!
         \param ms. New timeout value. 0 - no timeout
@@ -118,7 +118,7 @@ public:
         \param millis In case of error value is udefined
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool getRecvTimeout( unsigned int* millis ) = 0;
+    virtual bool getRecvTimeout( unsigned int* millis ) const = 0;
     //!Change socket's send timeout (in millis)
     /*!
         \param ms. New timeout value. 0 - no timeout
@@ -131,12 +131,12 @@ public:
         \param millis In case of error value is udefined
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool getSendTimeout( unsigned int* millis ) = 0;
+    virtual bool getSendTimeout( unsigned int* millis ) const = 0;
     //!Get socket's last error code. Needed in case of \a aio::etError
     /*!
         \return \a true if read error code successfully, \a false otherwise
     */
-    virtual bool getLastError( SystemError::ErrorCode* errorCode ) = 0;
+    virtual bool getLastError( SystemError::ErrorCode* errorCode ) const = 0;
     //!Returns system-specific socket handle
     /*!
         TODO: #ak remove this method after complete move to the new socket
@@ -290,7 +290,7 @@ public:
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool getNoDelay( bool* value ) = 0;
+    virtual bool getNoDelay( bool* value ) const = 0;
     //!Enable collection of socket statistics
     /*!
         \param val \a true - enable, \a false - diable

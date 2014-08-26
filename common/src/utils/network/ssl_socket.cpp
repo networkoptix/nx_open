@@ -17,6 +17,7 @@
 #undef min
 #endif
 
+
 static const int BUFFER_SIZE = 1024;
 const unsigned char sid[] = "Network Optix SSL socket";
 
@@ -1007,7 +1008,9 @@ public:
     }
 };
 
-QnSSLSocket::QnSSLSocket(AbstractStreamSocket* wrappedSocket, bool isServerSide):
+QnSSLSocket::QnSSLSocket(AbstractStreamSocket* wrappedSocket, bool isServerSide)
+:
+    base_type([wrappedSocket](){ return wrappedSocket; }),
     d_ptr(new QnSSLSocketPrivate())
 {
     Q_D(QnSSLSocket);
@@ -1018,7 +1021,9 @@ QnSSLSocket::QnSSLSocket(AbstractStreamSocket* wrappedSocket, bool isServerSide)
     init();
 }
 
-QnSSLSocket::QnSSLSocket(QnSSLSocketPrivate* priv, AbstractStreamSocket* wrappedSocket, bool isServerSide):
+QnSSLSocket::QnSSLSocket(QnSSLSocketPrivate* priv, AbstractStreamSocket* wrappedSocket, bool isServerSide)
+:
+    base_type([wrappedSocket](){ return wrappedSocket; }),
     d_ptr(priv)
 {
     Q_D(QnSSLSocket);
@@ -1153,9 +1158,9 @@ bool QnSSLSocket::setNoDelay( bool value )
     return d->wrappedSocket->setNoDelay(value);
 }
 
-bool QnSSLSocket::getNoDelay( bool* value )
+bool QnSSLSocket::getNoDelay( bool* value ) const
 {
-    Q_D(QnSSLSocket);
+    Q_D(const QnSSLSocket);
     return d->wrappedSocket->getNoDelay(value);
 }
 
@@ -1191,133 +1196,6 @@ bool QnSSLSocket::isConnected() const
 {
     Q_D(const QnSSLSocket);
     return d->wrappedSocket->isConnected();
-}
-
-bool QnSSLSocket::bind( const SocketAddress& localAddress )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->bind(localAddress);
-}
-
-//bool QnSSLSocket::bindToInterface( const QnInterfaceAndAddr& iface )
-//{
-//    Q_D(const QnSSLSocket);
-//    return d->wrappedSocket->bindToInterface(iface);
-//}
-
-SocketAddress QnSSLSocket::getLocalAddress() const
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->getLocalAddress();
-}
-
-SocketAddress QnSSLSocket::getPeerAddress() const
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->getPeerAddress();
-}
-
-void QnSSLSocket::close()
-{
-    Q_D(const QnSSLSocket);
-    d->wrappedSocket->close();
-}
-
-bool QnSSLSocket::isClosed() const
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->isClosed();
-}
-
-bool QnSSLSocket::setReuseAddrFlag( bool reuseAddr )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->setReuseAddrFlag(reuseAddr);
-}
-
-bool QnSSLSocket::getReuseAddrFlag( bool* val )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->getReuseAddrFlag(val);
-}
-
-bool QnSSLSocket::setNonBlockingMode( bool val )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->setNonBlockingMode(val);
-}
-
-bool QnSSLSocket::getNonBlockingMode( bool* val ) const
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->getNonBlockingMode(val);
-}
-
-bool QnSSLSocket::getMtu( unsigned int* mtuValue )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->getMtu(mtuValue);
-}
-
-bool QnSSLSocket::setSendBufferSize( unsigned int buffSize )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->setSendBufferSize(buffSize);
-}
-
-bool QnSSLSocket::getSendBufferSize( unsigned int* buffSize )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->getSendBufferSize(buffSize);
-}
-
-bool QnSSLSocket::setRecvBufferSize( unsigned int buffSize )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->setRecvBufferSize(buffSize);
-}
-
-bool QnSSLSocket::getRecvBufferSize( unsigned int* buffSize )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->getRecvBufferSize(buffSize);
-}
-
-bool QnSSLSocket::setRecvTimeout( unsigned int millis )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->setRecvTimeout(millis);
-}
-
-bool QnSSLSocket::getRecvTimeout( unsigned int* millis )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->getRecvTimeout(millis);
-}
-
-bool QnSSLSocket::setSendTimeout( unsigned int ms )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->setSendTimeout(ms);
-}
-
-bool QnSSLSocket::getSendTimeout( unsigned int* millis )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->getSendTimeout(millis);
-}
-
-//!Implementation of AbstractSocket::getLastError
-bool QnSSLSocket::getLastError( SystemError::ErrorCode* errorCode )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->getLastError(errorCode);
-}
-
-AbstractSocket::SOCKET_HANDLE QnSSLSocket::handle() const
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->handle();
 }
 
 bool QnSSLSocket::connectWithoutEncryption(
@@ -1581,109 +1459,10 @@ UdtSSLServerSocket::~UdtSSLServerSocket(){}
 
 SSLServerSocket::SSLServerSocket(AbstractStreamServerSocket* delegateSocket, bool allowNonSecureConnect)
 :
+    base_type([delegateSocket](){ return delegateSocket; }),
     m_allowNonSecureConnect( allowNonSecureConnect ),
     m_delegateSocket( delegateSocket )
 {
-}
-
-bool SSLServerSocket::bind(const SocketAddress& localAddress)
-{
-    return m_delegateSocket->bind(localAddress);
-}
-
-SocketAddress SSLServerSocket::getLocalAddress() const
-{
-    return m_delegateSocket->getLocalAddress();
-}
-
-SocketAddress SSLServerSocket::getPeerAddress() const
-{
-    return m_delegateSocket->getPeerAddress();
-}
-
-void SSLServerSocket::close()
-{
-    return m_delegateSocket->close();
-}
-
-bool SSLServerSocket::isClosed() const
-{
-    return m_delegateSocket->isClosed();
-}
-
-bool SSLServerSocket::setReuseAddrFlag(bool reuseAddr)
-{
-    return m_delegateSocket->setReuseAddrFlag(reuseAddr);
-}
-
-bool SSLServerSocket::getReuseAddrFlag(bool* val)
-{
-    return m_delegateSocket->getReuseAddrFlag(val);
-}
-
-bool SSLServerSocket::setNonBlockingMode(bool val)
-{
-    return m_delegateSocket->setNonBlockingMode(val);
-}
-
-bool SSLServerSocket::getNonBlockingMode(bool* val) const
-{
-    return m_delegateSocket->getNonBlockingMode(val);
-}
-
-bool SSLServerSocket::getMtu(unsigned int* mtuValue)
-{
-    return m_delegateSocket->getMtu(mtuValue);
-}
-
-bool SSLServerSocket::setSendBufferSize(unsigned int buffSize)
-{
-    return m_delegateSocket->setSendBufferSize(buffSize);
-}
-
-bool SSLServerSocket::getSendBufferSize(unsigned int* buffSize)
-{
-    return m_delegateSocket->getSendBufferSize(buffSize);
-}
-
-bool SSLServerSocket::setRecvBufferSize(unsigned int buffSize)
-{
-    return m_delegateSocket->setRecvBufferSize(buffSize);
-}
-
-bool SSLServerSocket::getRecvBufferSize(unsigned int* buffSize)
-{
-    return m_delegateSocket->getRecvBufferSize(buffSize);
-}
-
-bool SSLServerSocket::setRecvTimeout(unsigned int ms)
-{
-    return m_delegateSocket->setRecvTimeout(ms);
-}
-
-bool SSLServerSocket::getRecvTimeout(unsigned int* millis)
-{
-    return m_delegateSocket->getRecvTimeout(millis);
-}
-
-bool SSLServerSocket::setSendTimeout(unsigned int ms)
-{
-    return m_delegateSocket->setSendTimeout(ms);
-}
-
-bool SSLServerSocket::getSendTimeout(unsigned int* millis)
-{
-    return m_delegateSocket->getSendTimeout(millis);
-}
-
-bool SSLServerSocket::getLastError(SystemError::ErrorCode* errorCode)
-{
-    return m_delegateSocket->getLastError(errorCode);
-}
-
-AbstractSocket::SOCKET_HANDLE SSLServerSocket::handle() const
-{
-    return m_delegateSocket->handle();
 }
 
 bool SSLServerSocket::listen(int queueLen)

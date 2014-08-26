@@ -71,19 +71,19 @@ public:
     virtual void close();
     virtual bool isClosed() const;
     virtual bool setReuseAddrFlag( bool reuseAddr );
-    virtual bool getReuseAddrFlag( bool* val );
+    virtual bool getReuseAddrFlag( bool* val ) const;
     virtual bool setNonBlockingMode( bool val );
     virtual bool getNonBlockingMode( bool* val ) const;
-    virtual bool getMtu( unsigned int* mtuValue );
+    virtual bool getMtu( unsigned int* mtuValue ) const;
     virtual bool setSendBufferSize( unsigned int buffSize );
-    virtual bool getSendBufferSize( unsigned int* buffSize );
+    virtual bool getSendBufferSize( unsigned int* buffSize ) const;
     virtual bool setRecvBufferSize( unsigned int buffSize );
-    virtual bool getRecvBufferSize( unsigned int* buffSize );
+    virtual bool getRecvBufferSize( unsigned int* buffSize ) const;
     virtual bool setRecvTimeout( unsigned int millis );
-    virtual bool getRecvTimeout( unsigned int* millis );
+    virtual bool getRecvTimeout( unsigned int* millis ) const;
     virtual bool setSendTimeout( unsigned int ms ) ;
-    virtual bool getSendTimeout( unsigned int* millis ) ;
-    virtual bool getLastError( SystemError::ErrorCode* errorCode );
+    virtual bool getSendTimeout( unsigned int* millis ) const;
+    virtual bool getLastError( SystemError::ErrorCode* errorCode ) const;
     virtual AbstractSocket::SOCKET_HANDLE handle() const;
     // AbstractCommunicatingSocket ------- interface
     virtual bool connect(
@@ -104,8 +104,7 @@ public:
         Q_UNUSED(value);
         return false;
     }
-    virtual bool getNoDelay( bool* value ) {
-        *value = true;
+    virtual bool getNoDelay( bool* /*value*/ ) const {
         return false;
     }
     virtual bool toggleStatisticsCollection( bool val ) {
@@ -147,19 +146,19 @@ public:
     virtual void close();
     virtual bool isClosed() const;
     virtual bool setReuseAddrFlag( bool reuseAddr );
-    virtual bool getReuseAddrFlag( bool* val );
+    virtual bool getReuseAddrFlag( bool* val ) const;
     virtual bool setNonBlockingMode( bool val );
     virtual bool getNonBlockingMode( bool* val ) const;
-    virtual bool getMtu( unsigned int* mtuValue );
+    virtual bool getMtu( unsigned int* mtuValue ) const;
     virtual bool setSendBufferSize( unsigned int buffSize );
-    virtual bool getSendBufferSize( unsigned int* buffSize );
+    virtual bool getSendBufferSize( unsigned int* buffSize ) const;
     virtual bool setRecvBufferSize( unsigned int buffSize );
-    virtual bool getRecvBufferSize( unsigned int* buffSize );
+    virtual bool getRecvBufferSize( unsigned int* buffSize ) const;
     virtual bool setRecvTimeout( unsigned int millis );
-    virtual bool getRecvTimeout( unsigned int* millis );
+    virtual bool getRecvTimeout( unsigned int* millis ) const;
     virtual bool setSendTimeout( unsigned int ms ) ;
-    virtual bool getSendTimeout( unsigned int* millis ) ;
-    virtual bool getLastError( SystemError::ErrorCode* errorCode );
+    virtual bool getSendTimeout( unsigned int* millis ) const;
+    virtual bool getLastError( SystemError::ErrorCode* errorCode ) const;
     virtual AbstractSocket::SOCKET_HANDLE handle() const;
 
     UdtStreamServerSocket();

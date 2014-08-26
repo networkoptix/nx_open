@@ -190,7 +190,7 @@ bool Socket::setReuseAddrFlag( bool reuseAddr )
 }
 
 //!Implementation of AbstractSocket::reuseAddrFlag
-bool Socket::getReuseAddrFlag( bool* val )
+bool Socket::getReuseAddrFlag( bool* val ) const
 {
     int reuseAddrVal = 0;
     socklen_t optLen = 0;
@@ -247,7 +247,7 @@ bool Socket::getNonBlockingMode( bool* val ) const
 }
 
 //!Implementation of AbstractSocket::getMtu
-bool Socket::getMtu( unsigned int* mtuValue )
+bool Socket::getMtu( unsigned int* mtuValue ) const
 {
 #ifdef IP_MTU
     socklen_t optLen = 0;
@@ -265,7 +265,7 @@ bool Socket::setSendBufferSize( unsigned int buff_size )
 }
 
 //!Implementation of AbstractSocket::getSendBufferSize
-bool Socket::getSendBufferSize( unsigned int* buffSize )
+bool Socket::getSendBufferSize( unsigned int* buffSize ) const
 {
     socklen_t optLen = sizeof(*buffSize);
     return ::getsockopt(m_socketHandle, SOL_SOCKET, SO_SNDBUF, (char*)buffSize, &optLen) == 0;
@@ -278,7 +278,7 @@ bool Socket::setRecvBufferSize( unsigned int buff_size )
 }
 
 //!Implementation of AbstractSocket::getRecvBufferSize
-bool Socket::getRecvBufferSize( unsigned int* buffSize )
+bool Socket::getRecvBufferSize( unsigned int* buffSize ) const
 {
     socklen_t optLen = sizeof(*buffSize);
     return ::getsockopt(m_socketHandle, SOL_SOCKET, SO_RCVBUF, (char*)buffSize, &optLen) == 0;
@@ -305,7 +305,7 @@ bool Socket::setRecvTimeout( unsigned int ms )
 }
 
 //!Implementation of AbstractSocket::getRecvTimeout
-bool Socket::getRecvTimeout( unsigned int* millis )
+bool Socket::getRecvTimeout( unsigned int* millis ) const
 {
     *millis = m_readTimeoutMS;
     return true;
@@ -332,13 +332,13 @@ bool Socket::setSendTimeout( unsigned int ms )
 }
 
 //!Implementation of AbstractSocket::getSendTimeout
-bool Socket::getSendTimeout( unsigned int* millis )
+bool Socket::getSendTimeout( unsigned int* millis ) const
 {
     *millis = m_writeTimeoutMS;
     return true;
 }
 
-bool Socket::getLastError( SystemError::ErrorCode* errorCode )
+bool Socket::getLastError( SystemError::ErrorCode* errorCode ) const
 {
     socklen_t optLen = sizeof(*errorCode);
     return getsockopt(m_socketHandle, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(errorCode), &optLen) == 0;
@@ -931,7 +931,7 @@ bool TCPSocket::setNoDelay( bool value )
 }
 
 //!Implementation of AbstractStreamSocket::getNoDelay
-bool TCPSocket::getNoDelay( bool* value )
+bool TCPSocket::getNoDelay( bool* value ) const
 {
     int flag = 0;
     socklen_t optLen = 0;

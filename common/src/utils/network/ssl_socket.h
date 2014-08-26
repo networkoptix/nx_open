@@ -9,8 +9,10 @@
 
 #include "abstract_socket.h"
 #include "socket_common.h"
+#include "socket_impl_helper.h"
 #include "system_socket.h"
 #include "udt_socket.h"
+
 
 struct bio_st;
 typedef struct bio_st BIO; /* This one is from OpenSSL, which we don't want to include in this header. */
@@ -18,8 +20,12 @@ typedef struct bio_st BIO; /* This one is from OpenSSL, which we don't want to i
 class QnSSLSocketPrivate;
 class QnMixedSSLSocketPrivate;
 
-class QnSSLSocket : public AbstractEncryptedStreamSocket
+class QnSSLSocket
+:
+    public AbstractSocketImplementationDelegate<AbstractEncryptedStreamSocket, std::function<AbstractStreamSocket*()>>
 {
+    typedef AbstractSocketImplementationDelegate<AbstractEncryptedStreamSocket, std::function<AbstractStreamSocket*()>> base_type;
+
 public:
     QnSSLSocket(AbstractStreamSocket* wrappedSocket, bool isServerSide);
     virtual ~QnSSLSocket();
@@ -29,65 +35,48 @@ public:
 
     virtual bool reopen() override;
     virtual bool setNoDelay( bool value ) override;
-    virtual bool getNoDelay( bool* value ) override;
-    //!Implementation of AbstractStreamSocket::toggleStatisticsCollection
+    virtual bool getNoDelay( bool* value ) const override;
+    //!Implementation of \a AbstractStreamSocket::toggleStatisticsCollection
     virtual bool toggleStatisticsCollection( bool val ) override;
-    //!Implementation of AbstractStreamSocket::getConnectionStatistics
+    //!Implementation of \a AbstractStreamSocket::getConnectionStatistics
     virtual bool getConnectionStatistics( StreamSocketInfo* info ) override;
-
+    //!Implementation of \a AbstractStreamSocket::connect
     virtual bool connect(
         const QString& foreignAddress,
         unsigned short foreignPort,
         unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
-    virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
-    virtual int send( const void* buffer, unsigned int bufferLen ) override;
+    //!Implementation of \a AbstractStreamSocket::recv
+    virtual int recv(void* buffer, unsigned int bufferLen, int flags) override;
+    //!Implementation of \a AbstractStreamSocket::send
+    virtual int send(const void* buffer, unsigned int bufferLen) override;
 
     virtual SocketAddress getForeignAddress() const override;
     virtual bool isConnected() const override;
 
-    virtual bool bind( const SocketAddress& localAddress ) override;
-    //virtual bool bindToInterface( const QnInterfaceAndAddr& iface ) override;
-    virtual SocketAddress getLocalAddress() const override;
-    virtual SocketAddress getPeerAddress() const override;
-    virtual void close() override;
-    virtual bool isClosed() const override;
-    virtual bool setReuseAddrFlag( bool reuseAddr ) override;
-    virtual bool getReuseAddrFlag( bool* val ) override;
-    virtual bool setNonBlockingMode( bool val ) override;
-    virtual bool getNonBlockingMode( bool* val ) const override;
-    virtual bool getMtu( unsigned int* mtuValue ) override;
-    virtual bool setSendBufferSize( unsigned int buffSize ) override;
-    virtual bool getSendBufferSize( unsigned int* buffSize ) override;
-    virtual bool setRecvBufferSize( unsigned int buffSize ) override;
-    virtual bool getRecvBufferSize( unsigned int* buffSize ) override;
-    virtual bool setRecvTimeout( unsigned int millis ) override;
-    virtual bool getRecvTimeout( unsigned int* millis ) override;
-    virtual bool setSendTimeout( unsigned int ms ) override;
-    virtual bool getSendTimeout( unsigned int* millis ) override;
-    //!Implementation of AbstractSocket::getLastError
-    virtual bool getLastError(SystemError::ErrorCode* errorCode) override;
-    virtual SOCKET_HANDLE handle() const override;
-
-    //!Implementation of AbstractEncryptedStreamSocket::connectWithoutEncryption
+    //!Implementation of \a AbstractEncryptedStreamSocket::connectWithoutEncryption
     virtual bool connectWithoutEncryption(
         const QString& foreignAddress,
         unsigned short foreignPort,
         unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
-    //!Implementation of AbstractEncryptedStreamSocket::enableClientEncryption
+    //!Implementation of \a AbstractEncryptedStreamSocket::enableClientEncryption
     virtual bool enableClientEncryption() override;
 
     bool doServerHandshake();
     bool doClientHandshake();
 
-    //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
+    //!Implementation of \a AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) override;
 
-    enum {
+    enum
+    {
         ASYNC,
         SYNC
     };
 
 protected:
+    Q_DECLARE_PRIVATE(QnSSLSocket);
+    QnSSLSocketPrivate *d_ptr;
+
     friend int sock_read(BIO *b, char *out, int outl);
     friend int sock_write(BIO *b, const char *in, int inl);
 
@@ -108,9 +97,6 @@ private:
     int asyncSendInternal( const void* buffer , unsigned int bufferLen );
     int mode() const;
     void init();
-protected:
-    Q_DECLARE_PRIVATE(QnSSLSocket);
-    QnSSLSocketPrivate *d_ptr;
 };
 
 //!Can be used to accept both SSL and non-SSL connections on single port
@@ -169,55 +155,19 @@ private:
 
 class SSLServerSocket
 :
-    public AbstractStreamServerSocket
+    public AbstractSocketImplementationDelegate<AbstractStreamServerSocket, std::function<AbstractStreamServerSocket*()>>
 {
+    typedef AbstractSocketImplementationDelegate<AbstractStreamServerSocket, std::function<AbstractStreamServerSocket*()>> base_type;
+
 public:
-    SSLServerSocket(AbstractStreamServerSocket* delegateSocket, bool allowNonSecureConnect);
+    /*!
+        \param delegateSocket Ownership is passed to this class
+    */
+    SSLServerSocket( AbstractStreamServerSocket* delegateSocket, bool allowNonSecureConnect );
 
     //////////////////////////////////////////////////////////////////////
-    ///////// Implementation of AbstractSocket methods
+    ///////// Implementation of AbstractStreamServerSocket methods
     //////////////////////////////////////////////////////////////////////
-
-    //!Implementation of AbstractSocket::bind
-    virtual bool bind(const SocketAddress& localAddress) override;
-    //!Implementation of AbstractSocket::getLocalAddress
-    virtual SocketAddress getLocalAddress() const override;
-    //!Implementation of AbstractSocket::getPeerAddress
-    virtual SocketAddress getPeerAddress() const override;
-    //!Implementation of AbstractSocket::close
-    virtual void close() override;
-    //!Implementation of AbstractSocket::isClosed
-    virtual bool isClosed() const override;
-    //!Implementation of AbstractSocket::setReuseAddrFlag
-    virtual bool setReuseAddrFlag(bool reuseAddr) override;
-    //!Implementation of AbstractSocket::reuseAddrFlag
-    virtual bool getReuseAddrFlag(bool* val) override;
-    //!Implementation of AbstractSocket::setNonBlockingMode
-    virtual bool setNonBlockingMode(bool val) override;
-    //!Implementation of AbstractSocket::getNonBlockingMode
-    virtual bool getNonBlockingMode(bool* val) const override;
-    //!Implementation of AbstractSocket::getMtu
-    virtual bool getMtu(unsigned int* mtuValue) override;
-    //!Implementation of AbstractSocket::setSendBufferSize
-    virtual bool setSendBufferSize(unsigned int buffSize) override;
-    //!Implementation of AbstractSocket::getSendBufferSize
-    virtual bool getSendBufferSize(unsigned int* buffSize) override;
-    //!Implementation of AbstractSocket::setRecvBufferSize
-    virtual bool setRecvBufferSize(unsigned int buffSize) override;
-    //!Implementation of AbstractSocket::getRecvBufferSize
-    virtual bool getRecvBufferSize(unsigned int* buffSize) override;
-    //!Implementation of AbstractSocket::setRecvTimeout
-    virtual bool setRecvTimeout(unsigned int ms) override;
-    //!Implementation of AbstractSocket::getRecvTimeout
-    virtual bool getRecvTimeout(unsigned int* millis) override;
-    //!Implementation of AbstractSocket::setSendTimeout
-    virtual bool setSendTimeout(unsigned int ms) override;
-    //!Implementation of AbstractSocket::getSendTimeout
-    virtual bool getSendTimeout(unsigned int* millis) override;
-    //!Implementation of AbstractSocket::getLastError
-    virtual bool getLastError(SystemError::ErrorCode* errorCode) override;
-    //!Implementation of AbstractSocket::handle
-    virtual AbstractSocket::SOCKET_HANDLE handle() const override;
 
     //!Implementation of SSLServerSocket::listen
     virtual bool listen( int queueLen ) override;
@@ -232,7 +182,7 @@ protected:
 
 private:
     bool m_allowNonSecureConnect;
-    AbstractStreamServerSocket* m_delegateSocket;
+    std::unique_ptr<AbstractStreamServerSocket> m_delegateSocket;
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
 
     void connectionAccepted(SystemError::ErrorCode errorCode, AbstractStreamSocket* newSocket);
