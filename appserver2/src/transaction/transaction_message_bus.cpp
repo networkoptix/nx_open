@@ -461,14 +461,13 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         return; // all dstPeers already processed
     }
 
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-    qDebug() << "proxy transaction " << ApiCommand::toString(tran.command) << " to " << transportHeader.dstPeers;
-#endif
-
     QnPeerSet processedPeers = transportHeader.processedPeers + connectedPeers(tran.command);
     processedPeers << m_localPeer.id;
     QnTransactionTransportHeader newHeader(processedPeers, transportHeader.dstPeers, transportHeader.sequence);
 
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+    QSet<QUuid> proxyList;
+#endif
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) 
     {
         QnTransactionTransportPtr transport = *itr;
@@ -477,7 +476,15 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 
         //Q_ASSERT(transport->remotePeer().id != tran.peerID);
         transport->sendTransaction(tran, newHeader);
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+        proxyList << transport->remotePeer().id;
+#endif
     }
+
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+    if (!proxyList.isEmpty())
+        qDebug() << "proxy transaction " << ApiCommand::toString(tran.command) << " to " << proxyList;
+#endif
 
     emit transactionProcessed(tran);
 }
