@@ -9,6 +9,9 @@
 #include <functional>
 #include <type_traits>
 
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
+
 #include <onvif/stdsoap2.h>
 
 #include <utils/common/joinable.h>
@@ -56,7 +59,8 @@ public:
         m_syncFunc(syncFunc),
         m_state(init),
         m_responseDataPos(0),
-        m_bytesSent(0)
+        m_bytesSent(0),
+        m_terminatedFlagPtr(nullptr)
     {
         m_responseBuffer.reserve( READ_BUF_SIZE );
     }
@@ -72,6 +76,13 @@ public:
         soap_end(m_syncWrapper->getProxy()->soap);
         delete m_syncWrapper;
         m_syncWrapper = nullptr;
+
+        //if we are here, it is garanteed that 
+            //- completion handler is down the stack
+            //- or no completion handler is running and it will never be launched
+
+        if( m_terminatedFlagPtr )
+            *m_terminatedFlagPtr = true;
     }
 
     virtual void pleaseStop() override
@@ -83,11 +94,15 @@ public:
     */
     virtual void join() override
     {
-        if( m_socket )
+        std::unique_ptr<AbstractStreamSocket> socket;
         {
-            m_socket->cancelAsyncIO( aio::etRead );
-            m_socket->cancelAsyncIO( aio::etWrite );
-            m_socket.reset();
+            QMutexLocker lk( &m_mutex );
+            socket = std::move(m_socket);
+        }
+        if( socket )
+        {
+            socket->cancelAsyncIO(aio::etRead);
+            socket->cancelAsyncIO(aio::etWrite);
         }
     }
 
@@ -114,7 +129,18 @@ public:
     bool callAsync(const Request& request, ResultHandler resultHandler)
     {
         m_state = init;
-        m_resultHandler = resultHandler;
+        m_extCompletionHandler = std::move(resultHandler);
+        m_resultHandler = [this](int resultCode) {
+            bool terminated = false;
+            m_terminatedFlagPtr = &terminated;
+            m_extCompletionHandler(resultCode);
+            if( !terminated )
+            {
+                QMutexLocker lk(&m_mutex);
+                m_socket.reset();
+                m_terminatedFlagPtr = nullptr;
+            }
+        };
 
         m_socket.reset( SocketFactory::createStreamSocket( false, SocketFactory::nttDisabled ) );
         m_syncWrapper->getProxy()->soap->user = this;
@@ -189,7 +215,6 @@ private:
         if( errorCode )
         {
             m_state = done;
-            m_socket.reset();
             return m_resultHandler( SOAP_FAULT );
         }
 
@@ -200,15 +225,18 @@ private:
         m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
         m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
         soap_destroy( m_syncWrapper->getProxy()->soap );
-        soap_end( m_syncWrapper->getProxy()->soap );
+        soap_end(m_syncWrapper->getProxy()->soap);
 
-        //sending request
-        using namespace std::placeholders;
-        if( !m_socket->sendAsync( m_serializedRequest, std::bind( &GSoapAsyncCallWrapper::onRequestSent, this, _1, _2 ) ) )
         {
-            m_state = done;
-            m_socket.reset();
-            return m_resultHandler( SOAP_FAULT );
+            QMutexLocker lk(&m_mutex);
+            //sending request
+            using namespace std::placeholders;
+            if( !m_socket->sendAsync(m_serializedRequest, std::bind(&GSoapAsyncCallWrapper::onRequestSent, this, _1, _2)) )
+            {
+                m_state = done;
+                lk.unlock();
+                return m_resultHandler(SOAP_FAULT);
+            }
         }
     }
 
@@ -217,7 +245,6 @@ private:
         if( errorCode )
         {
             m_state = done;
-            m_socket.reset();
             return m_resultHandler( SOAP_FAULT );
         }
 
@@ -225,13 +252,16 @@ private:
         m_state = receivingResponse;
 
         m_responseBuffer.reserve( READ_BUF_SIZE );
-        m_responseBuffer.resize( 0 );
-        using namespace std::placeholders;
-        if( !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2 ) ) )
+        m_responseBuffer.resize(0);
         {
-            m_state = done;
-            m_socket.reset();
-            return m_resultHandler( SOAP_FAULT );
+            QMutexLocker lk(&m_mutex);
+            using namespace std::placeholders;
+            if( !m_socket->readSomeAsync(&m_responseBuffer, std::bind(&GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2)) )
+            {
+                m_state = done;
+                lk.unlock();
+                return m_resultHandler(SOAP_FAULT);
+            }
         }
     }
 
@@ -248,23 +278,25 @@ private:
             int resultCode = m_responseBuffer.isEmpty()
                 ? SOAP_FAULT
                 : deserializeResponse();  //error or connection closed, trying to deserialize what we have
-            m_socket.reset();
             m_resultHandler( resultCode );
             return;
         }
 
-        //reading until connection end
+        //reading until connection closure
         //TODO #ak it is better to parse http response and detect message boundary
 
         if( m_responseBuffer.capacity() - m_responseBuffer.size() < MIN_SOCKET_READ_SIZE )
-            m_responseBuffer.reserve( m_responseBuffer.capacity() + READ_BUFFER_GROW_STEP );
+            m_responseBuffer.reserve(m_responseBuffer.capacity() + READ_BUFFER_GROW_STEP);
 
-        using namespace std::placeholders;
-        if( !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2 ) ) )
         {
-            m_state = done;
-            m_socket.reset();
-            return m_resultHandler( SOAP_FAULT );
+            QMutexLocker lk(&m_mutex);
+            using namespace std::placeholders;
+            if( !m_socket->readSomeAsync(&m_responseBuffer, std::bind(&GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2)) )
+            {
+                m_state = done;
+                lk.unlock();
+                return m_resultHandler(SOAP_FAULT);
+            }
         }
     }
 
@@ -289,7 +321,10 @@ private:
     int m_responseDataPos;
     std::unique_ptr<AbstractStreamSocket> m_socket;
     int m_bytesSent;
+    std::function<void(int)> m_extCompletionHandler;
     std::function<void(int)> m_resultHandler;
+    bool* m_terminatedFlagPtr;
+    mutable QMutex m_mutex;
 };
 
 #endif  //GSOAP_ASYNC_CALL_WRAPPER_H
