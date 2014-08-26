@@ -18,5 +18,5 @@ bool QnModuleInformation::isLocal() const {
     return false;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformation, (json), QnModuleInformation_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformation, (json)(eq), QnModuleInformation_Fields)
 
