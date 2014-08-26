@@ -739,7 +739,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -775,7 +775,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -815,7 +815,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -849,7 +849,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -921,7 +921,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -955,7 +955,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -989,7 +989,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -1024,7 +1024,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -1058,7 +1058,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -1092,7 +1092,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -1128,7 +1128,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -1168,7 +1168,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -1209,7 +1209,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -1249,7 +1249,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -1290,7 +1290,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -1330,7 +1330,7 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'ubjson'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
