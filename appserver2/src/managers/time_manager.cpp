@@ -546,7 +546,8 @@ namespace ec2
             peersByTimePriorityFlags.emplace( it->second.timePriorityKey.flags, it );
 
 #ifndef TEST_PTS_SELECTION
-        if( peersByTimePriorityFlags.count(peersByTimePriorityFlags.cbegin()->first) > 1 )
+        if( (peersByTimePriorityFlags.count(peersByTimePriorityFlags.cbegin()->first) > 1) &&               //multiple servers have same priority
+            ((peersByTimePriorityFlags.cbegin()->first & peerTimeSynchronizedWithInternetServer) == 0) )    //those servers do not have internet access
 #endif
         {
             const qint64 currentLocalTime = currentMSecsSinceEpoch();

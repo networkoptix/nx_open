@@ -152,15 +152,7 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
 
     //TODO #ak RevealResponse class is excess here. Should send/receive QnModuleInformation
     const QnModuleInformation& selfModuleInformation = qnCommon->moduleInformation();
-    RevealResponse response;
-    response.version = selfModuleInformation.version.toString();
-    response.type = selfModuleInformation.type;
-    response.customization = selfModuleInformation.customization;
-    response.seed = selfModuleInformation.id.toString();
-    response.name = selfModuleInformation.systemName;
-    response.systemInformation = selfModuleInformation.systemInformation.toString();
-    response.sslAllowed = selfModuleInformation.sslAllowed;
-    response.typeSpecificParameters.insert(lit("port"), QString::number(selfModuleInformation.port));
+    RevealResponse response(qnCommon->moduleInformation());
     quint8 *responseBufStart = readBuffer;
     if (!response.serialize(&responseBufStart, readBuffer + READ_BUFFER_SIZE))
         return false;
@@ -320,14 +312,6 @@ void QnMulticastModuleFinder::run() {
 }
 
 QnMulticastModuleFinder::ModuleContext::ModuleContext(const RevealResponse &response)
-    : response(response),
-      prevResponseReceiveClock(0)
+    : prevResponseReceiveClock(0), moduleInformation(response.toModuleInformation())
 {
-    moduleInformation.type = response.type;
-    moduleInformation.version = QnSoftwareVersion(response.version);
-    moduleInformation.systemInformation = QnSystemInformation(response.systemInformation);
-    moduleInformation.systemName = response.name;
-    moduleInformation.port = response.typeSpecificParameters.value(lit("port")).toUShort();
-    moduleInformation.id = QUuid(response.seed);
-    moduleInformation.sslAllowed = response.sslAllowed;
 }

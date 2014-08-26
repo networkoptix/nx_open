@@ -87,7 +87,6 @@ private:
 private:
     struct ModuleContext {
         QHostAddress address;
-        RevealResponse response;
         quint64 prevResponseReceiveClock;
         QSet<QString> signalledAddresses;
         QnModuleInformation moduleInformation;
