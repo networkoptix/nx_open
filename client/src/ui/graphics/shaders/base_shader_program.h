@@ -24,25 +24,8 @@ public:
     void markInitialized() { m_initialized = true; };
     bool initialized() const { return m_initialized; };
 
-    void addShaderFromSourceCode(QGLShader::ShaderType type, const QString& source) {
-        addShaderFromSourceCode(type, source.toLatin1());
-    }
-
-    void addShaderFromSourceCode(QGLShader::ShaderType type, const QByteArray& source) {
-        switch (type) {
-        case QGLShader::Vertex:
-            QOpenGLShaderProgram::addShaderFromSourceCode(QOpenGLShader::Vertex, source);
-            break;
-        case QGLShader::Fragment:
-            QOpenGLShaderProgram::addShaderFromSourceCode(QOpenGLShader::Fragment, source);
-            break;
-        default:
-            assert(false);
-        }
-    }
-
 protected:
-    QnGLShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL)
+    QnGLShaderProgram(QObject *parent = NULL)
         : QOpenGLShaderProgram(parent),
           m_initialized(false)
     {

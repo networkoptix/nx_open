@@ -64,34 +64,35 @@ namespace {
 // -------------------------------------------------------------------------- //
 // QnGlRendererShaders
 // -------------------------------------------------------------------------- //
-QnGlRendererShaders::QnGlRendererShaders(const QGLContext *context, QObject *parent): QObject(parent) {
-    yv12ToRgb = new QnYv12ToRgbShaderProgram(context, this);
-    yv12ToRgbWithGamma = new QnYv12ToRgbWithGammaShaderProgram(context, this);
-    yv12ToRgba = new QnYv12ToRgbaShaderProgram(context, this);
-    nv12ToRgb = new QnNv12ToRgbShaderProgram(context, this);
+QnGlRendererShaders::QnGlRendererShaders(QObject *parent): QObject(parent) {
+    yv12ToRgb = new QnYv12ToRgbShaderProgram(this);
+    yv12ToRgbWithGamma = new QnYv12ToRgbWithGammaShaderProgram(this);
+    yv12ToRgba = new QnYv12ToRgbaShaderProgram(this);
+    nv12ToRgb = new QnNv12ToRgbShaderProgram(this);
     
     
     const QString GAMMA_STRING(lit("clamp(pow(max(y+ yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0)"));
 
-    fisheyePtzProgram = new QnFisheyeRectilinearProgram(context, this);
-    fisheyePtzGammaProgram =  new QnFisheyeRectilinearProgram(context, this, GAMMA_STRING);
+    fisheyePtzProgram = new QnFisheyeRectilinearProgram(this);
+    fisheyePtzGammaProgram =  new QnFisheyeRectilinearProgram(this, GAMMA_STRING);
 
-    fisheyePanoHProgram = new QnFisheyeEquirectangularHProgram(context, this);
-    fisheyePanoHGammaProgram = new QnFisheyeEquirectangularHProgram(context, this, GAMMA_STRING);
+    fisheyePanoHProgram = new QnFisheyeEquirectangularHProgram(this);
+    fisheyePanoHGammaProgram = new QnFisheyeEquirectangularHProgram(this, GAMMA_STRING);
 
-    fisheyePanoVProgram = new QnFisheyeEquirectangularVProgram(context, this);
-    fisheyePanoVGammaProgram = new QnFisheyeEquirectangularVProgram(context, this, GAMMA_STRING);
+    fisheyePanoVProgram = new QnFisheyeEquirectangularVProgram(this);
+    fisheyePanoVGammaProgram = new QnFisheyeEquirectangularVProgram(this, GAMMA_STRING);
 
-    fisheyeRGBPtzProgram = new QnFisheyeRGBRectilinearProgram(context, this);
-    fisheyeRGBPanoHProgram = new QnFisheyeRGBEquirectangularHProgram(context, this);
-    fisheyeRGBPanoVProgram = new QnFisheyeRGBEquirectangularVProgram(context, this);
+    fisheyeRGBPtzProgram = new QnFisheyeRGBRectilinearProgram(this);
+    fisheyeRGBPanoHProgram = new QnFisheyeRGBEquirectangularHProgram(this);
+    fisheyeRGBPanoVProgram = new QnFisheyeRGBEquirectangularVProgram(this);
 }
 
 QnGlRendererShaders::~QnGlRendererShaders() {
     return;
 }
 
-Q_GLOBAL_STATIC(QnGlContextData<QnGlRendererShaders>, qn_glRendererShaders_instanceStorage);
+typedef QnGlContextData<QnGlRendererShaders, QnGlContextDataStardardFactory<QnGlRendererShaders> > QnGlRendererShadersStorage;
+Q_GLOBAL_STATIC(QnGlRendererShadersStorage, qn_glRendererShaders_instanceStorage);
 
 
 // -------------------------------------------------------------------------- //

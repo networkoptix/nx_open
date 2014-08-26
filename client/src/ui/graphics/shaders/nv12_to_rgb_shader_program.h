@@ -16,7 +16,7 @@ public:
         YuvSmtp240m
     };
 
-    QnNv12ToRgbShaderProgram(const QGLContext *context, QObject *parent = NULL);
+    QnNv12ToRgbShaderProgram(QObject *parent = NULL);
 
     /**
      * \param target                    Number of the texture block that Y-plane is loaded to. 

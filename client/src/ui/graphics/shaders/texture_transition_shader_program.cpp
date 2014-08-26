@@ -2,14 +2,14 @@
 
 #include "shader_source.h"
 
-QnTextureTransitionShaderProgram::QnTextureTransitionShaderProgram(const QGLContext *context, QObject *parent)
-    : QnTextureGLShaderProgram(context,parent)
+QnTextureTransitionShaderProgram::QnTextureTransitionShaderProgram(QObject *parent)
+    : QnTextureGLShaderProgram(parent)
 {
 }
 
 bool QnTextureTransitionShaderProgram::compile()
 {
-    addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
+    addShaderFromSourceCode(QOpenGLShader::Vertex, QN_SHADER_SOURCE(
     uniform mat4 uModelViewProjectionMatrix;
     attribute vec2 aTexCoord;
     attribute vec4 aPosition;
@@ -37,7 +37,7 @@ bool QnTextureTransitionShaderProgram::compile()
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
 
-    addShaderFromSourceCode(QGLShader::Fragment, shader);
+    addShaderFromSourceCode(QOpenGLShader::Fragment, shader);
 
     return link();
 }

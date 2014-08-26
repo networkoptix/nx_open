@@ -10,11 +10,11 @@
 
 #include <QOpenGLFunctions>
 
-QnOpenGLRenderer::QnOpenGLRenderer(const QGLContext* a_context, QObject *parent):
-    m_colorProgram(new QnColorGLShaderProgram(a_context, parent)),
-    m_textureColorProgram(new QnTextureGLShaderProgram(a_context, parent)),
-    m_colorPerVertexShader(new QnColorPerVertexGLShaderProgram(a_context, parent)),
-    m_textureTransitionShader(new QnTextureTransitionShaderProgram(a_context, parent))
+QnOpenGLRenderer::QnOpenGLRenderer(QObject *parent):
+    m_colorProgram(new QnColorGLShaderProgram(parent)),
+    m_textureColorProgram(new QnTextureGLShaderProgram(parent)),
+    m_colorPerVertexShader(new QnColorPerVertexGLShaderProgram(parent)),
+    m_textureTransitionShader(new QnTextureTransitionShaderProgram(parent))
 {
     QOpenGLFunctions::initializeOpenGLFunctions();
 
@@ -205,7 +205,7 @@ QnOpenGLRenderer* QnOpenGLRendererManager::instance(const QGLContext* a_context)
     if ( it != manager->m_container.end() )
         return (*it);
 
-    manager->m_container.insert(a_context, new QnOpenGLRenderer(a_context));
+    manager->m_container.insert(a_context, new QnOpenGLRenderer());
     return *(manager->m_container.find(a_context));
 }
 

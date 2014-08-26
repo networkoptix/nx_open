@@ -8,7 +8,7 @@ class QnTextureGLShaderProgram : public QnColorGLShaderProgram
 {
     Q_OBJECT
 public:
-    QnTextureGLShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+    QnTextureGLShaderProgram(QObject *parent = NULL);
 
     void setTexture(int target){
         setUniformValue(m_texture, target);

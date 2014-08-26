@@ -17,7 +17,7 @@ class QnOpenGLRenderer : public QOpenGLFunctions
 {
 
 public:
-    QnOpenGLRenderer(const QGLContext* a_context , QObject *parent = NULL);
+    QnOpenGLRenderer(QObject *parent = NULL);
     
     void                setColor(const QVector4D& c);
     void                setColor(const QColor& c);

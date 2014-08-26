@@ -1,13 +1,13 @@
 #include "per_vertex_colored_shader_program.h"
 #include "ui/graphics/shaders/shader_source.h"
 
-QnColorPerVertexGLShaderProgram::QnColorPerVertexGLShaderProgram(const QGLContext *context, QObject *parent)
-    : QnColorGLShaderProgram(context,parent)
+QnColorPerVertexGLShaderProgram::QnColorPerVertexGLShaderProgram(QObject *parent)
+    : QnColorGLShaderProgram(parent)
 {
 }
 bool QnColorPerVertexGLShaderProgram::compile()
 {
-    addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
+    addShaderFromSourceCode(QOpenGLShader::Vertex, QN_SHADER_SOURCE(
     uniform lowp mat4 uModelViewProjectionMatrix;
     uniform lowp vec4 uColor;
     attribute lowp vec4 aPosition;
@@ -31,7 +31,7 @@ bool QnColorPerVertexGLShaderProgram::compile()
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
 
-    addShaderFromSourceCode(QGLShader::Fragment, shader);
+    addShaderFromSourceCode(QOpenGLShader::Fragment, shader);
 
     return link();
 };

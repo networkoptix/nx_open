@@ -5,14 +5,14 @@
 #include "shader_source.h"
 
 
-QnColorGLShaderProgram::QnColorGLShaderProgram(const QGLContext *context, QObject *parent)
-    : QnGLShaderProgram(context,parent)
+QnColorGLShaderProgram::QnColorGLShaderProgram(QObject *parent)
+    : QnGLShaderProgram(parent)
 {
 }
 
 bool QnColorGLShaderProgram::compile()
 {
-    addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
+    addShaderFromSourceCode(QOpenGLShader::Vertex, QN_SHADER_SOURCE(
         uniform mat4 uModelViewProjectionMatrix;
         attribute vec4 aPosition;
         void main() {
@@ -31,7 +31,7 @@ bool QnColorGLShaderProgram::compile()
     shader = QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
 
-    addShaderFromSourceCode(QGLShader::Fragment, shader);
+    addShaderFromSourceCode(QOpenGLShader::Fragment, shader);
 
     return link();
 };
