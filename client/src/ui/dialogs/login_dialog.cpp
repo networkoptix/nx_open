@@ -34,6 +34,7 @@
 
 #include <utils/applauncher_utils.h>
 #include <utils/network/module_finder.h>
+#include <utils/network/networkoptixmodulerevealcommon.h>
 
 #include "plugins/resource/avi/avi_resource.h"
 #include "plugins/resource/archive/abstract_archive_stream_reader.h"
