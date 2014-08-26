@@ -18,6 +18,7 @@
 #include <utils/rest_update_peer_task.h>
 #include <utils/applauncher_utils.h>
 #include <mutex/distributed_mutex_manager.h>
+#include <client/client_settings.h>
 
 #include <version.h>
 
@@ -338,7 +339,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QnSoftwareVersion &version) 
 
     m_checkForUpdatesPeerTask->setPeers(peers);
     m_checkForUpdatesPeerTask->setTargetVersion(version);
-    m_checkForUpdatesPeerTask->setDisableClientUpdates(m_disableClientUpdates);
+    m_checkForUpdatesPeerTask->setDisableClientUpdates(m_disableClientUpdates || qnSettings->isClientUpdateDisabled());
     m_tasksThread->start();
     QMetaObject::invokeMethod(m_checkForUpdatesPeerTask, "start", Qt::QueuedConnection);
 }
@@ -355,7 +356,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QString &fileName) {
 
     m_checkForUpdatesPeerTask->setPeers(peers);
     m_checkForUpdatesPeerTask->setUpdateFileName(fileName);
-    m_checkForUpdatesPeerTask->setDisableClientUpdates(m_disableClientUpdates);
+    m_checkForUpdatesPeerTask->setDisableClientUpdates(m_disableClientUpdates || qnSettings->isClientUpdateDisabled());
     m_tasksThread->start();
     QMetaObject::invokeMethod(m_checkForUpdatesPeerTask, "start", Qt::QueuedConnection);
 }
@@ -515,7 +516,7 @@ void QnMediaServerUpdateTool::uploadUpdatesToServers() {
 }
 
 void QnMediaServerUpdateTool::installClientUpdate() {
-    if (m_clientRequiresInstaller || m_disableClientUpdates || m_clientUpdateFile->version == qnCommon->engineVersion()) {
+    if (m_clientRequiresInstaller || m_disableClientUpdates || qnSettings->isClientUpdateDisabled() || m_clientUpdateFile->version == qnCommon->engineVersion()) {
         installIncompatiblePeers();
         return;
     }
