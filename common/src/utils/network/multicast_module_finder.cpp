@@ -225,9 +225,12 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
                 arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1);
         }
 
-        it->moduleInformation.remoteAddresses.insert(remoteAddressStr);
+        QnModuleInformation moduleInformation = response.toModuleInformation();
+        moduleInformation.remoteAddresses.insert(remoteAddressStr);
 
-        emit moduleFound(it->moduleInformation, remoteAddressStr, localAddress.toString());
+        it->moduleInformation = moduleInformation;
+
+        emit moduleFound(moduleInformation, remoteAddressStr, localAddress.toString());
     }
     it->prevResponseReceiveClock = QDateTime::currentMSecsSinceEpoch();
 

@@ -81,19 +81,16 @@ void QnModuleFinder::at_moduleFound(const QnModuleInformation &moduleInformation
     auto it = m_foundModules.find(moduleInformation.id);
     if (it == m_foundModules.end()) {
         m_foundModules.insert(moduleInformation.id, moduleInformation);
+        emit moduleFound(moduleInformation, remoteAddress);
     } else {
-        QSet<QString> oldAddresses = it->remoteAddresses;
-        if (oldAddresses.contains(remoteAddress)) {
-            if (moduleInformation.systemName == it->systemName)
-                return;
-        }
+        QnModuleInformation updatedModuleInformation(*it);
+        updatedModuleInformation.remoteAddresses += moduleInformation.remoteAddresses;
+        if (*it == updatedModuleInformation)
+            return;
 
-        // update module information collecting all known addresses
-        *it = moduleInformation;
-        it->remoteAddresses += oldAddresses;
+        *it = updatedModuleInformation;
+        emit moduleFound(moduleInformation, remoteAddress);
     }
-
-    emit moduleFound(moduleInformation, remoteAddress);
 }
 
 void QnModuleFinder::at_moduleLost(const QnModuleInformation &moduleInformation) {
