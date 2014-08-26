@@ -1879,7 +1879,7 @@ bool QnDbManager::saveMiscParam( const QByteArray& name, const QByteArray& value
     QnDbManager::Locker locker( this );
 
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT INTO misc_data (key, data) values (?,?)");
+    insQuery.prepare("INSERT OR REPLACE INTO misc_data (key, data) values (?,?)");
     insQuery.addBindValue( name );
     insQuery.addBindValue( value );
     if( !insQuery.exec() )
