@@ -9,6 +9,8 @@
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QMetaType>
 
+#include <utils/network/module_information.h>
+
 /*!
     This string represents client during search with NetworkOptixModuleFinder class.
     It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from version.h)
@@ -43,10 +45,13 @@ public:
     QString name;
     //!random string, unique for particular module instance
     QUuid seed;
-    TypeSpecificParamMap typeSpecificParameters;
+    quint16 port;
     bool sslAllowed;
 
     RevealResponse();
+    RevealResponse(const QnModuleInformation &moduleInformation);
+
+    QnModuleInformation toModuleInformation() const;
 
     bool serialize(quint8 ** const bufStart, const quint8 *bufEnd);
     bool deserialize(const quint8 **bufStart, const quint8 *bufEnd);

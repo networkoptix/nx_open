@@ -34,10 +34,29 @@ bool RevealRequest::deserialize(const quint8 **bufStart, const quint8 *bufEnd) {
 
 
 
-RevealResponse::RevealResponse()
-:
-    sslAllowed(false)
-{
+RevealResponse::RevealResponse() : port(0), sslAllowed(false) {}
+
+RevealResponse::RevealResponse(const QnModuleInformation &moduleInformation) {
+    type = moduleInformation.type;
+    version = moduleInformation.version.toString();
+    systemInformation = moduleInformation.systemInformation.toString();
+    customization = moduleInformation.customization;
+    name = moduleInformation.systemName;
+    seed = moduleInformation.id;
+    port = moduleInformation.port;
+    sslAllowed = moduleInformation.sslAllowed;
+}
+
+QnModuleInformation RevealResponse::toModuleInformation() const {
+    QnModuleInformation moduleInformation;
+    moduleInformation.type = type;
+    moduleInformation.version = QnSoftwareVersion(version);
+    moduleInformation.systemInformation = QnSystemInformation(systemInformation);
+    moduleInformation.systemName = name;
+    moduleInformation.id = seed;
+    moduleInformation.port = port;
+    moduleInformation.sslAllowed = sslAllowed;
+    return moduleInformation;
 }
 
 bool RevealResponse::serialize(quint8 **const bufStart, const quint8 *bufEnd) {
@@ -49,8 +68,7 @@ bool RevealResponse::serialize(quint8 **const bufStart, const quint8 *bufEnd) {
     map[lit("systemName")] = name;
     map[lit("systemInformation")] = systemInformation;
     map[lit("sslAllowed")] = sslAllowed;
-    for (auto it = typeSpecificParameters.begin(); it != typeSpecificParameters.end(); ++it)
-        map[it.key()] = it.value();
+    map[lit("port")] = port;
 
     QByteArray data = QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact);
     if (data.size() > bufEnd - *bufStart)
@@ -74,8 +92,7 @@ bool RevealResponse::deserialize(const quint8 **bufStart, const quint8 *bufEnd) 
     name = map.take(lit("systemName")).toString();
     seed = QUuid(map.take(lit("seed")).toString());
     sslAllowed = map.take( lit( "sslAllowed" ) ).toBool();
-    for (auto it = map.begin(); it != map.end(); ++it)
-        typeSpecificParameters.insert(it.key(), it.value().toString());
+    port = static_cast<quint16>(map.take(lit("port")).toUInt());
 
     return !type.isEmpty() && !version.isEmpty();
 }
