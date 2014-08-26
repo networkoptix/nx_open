@@ -101,7 +101,6 @@ void QnTestCamera::setOfflineFreq(double offlineFreq)
 }
 
 int QnTestCamera::sendAll(AbstractStreamSocket* socket, const void* data, int size) {
-    qWarning() << "sendAll: " << size;
     int sent = 0, sentTotal = 0;
     while (sentTotal < size) {
         sent = socket->send(static_cast<const quint8*>(data)+ sentTotal, size - sentTotal);
@@ -111,7 +110,10 @@ int QnTestCamera::sendAll(AbstractStreamSocket* socket, const void* data, int si
         }
 
         sentTotal += sent;
-        qWarning() << "SENT: " << sent << ", TOTAL: " << sentTotal;
+    }
+
+    if (sentTotal != size) {
+        int gg=  4;
     }
 
     return sentTotal == size;
@@ -167,11 +169,11 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, Abstrac
             return false;
         }
 
-        if (sendAll(socket, &packetLen, 4)) {
+        if (!sendAll(socket, &packetLen, 4)) {
             return false;
         }
 
-        if (sendAll(socket, video->data(), video->dataSize())) {
+        if (!sendAll(socket, video->data(), video->dataSize())) {
             return false;
         }
 
