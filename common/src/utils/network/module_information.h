@@ -17,16 +17,16 @@ struct QnModuleInformation {
     QString systemName;
     quint16 port;
     QSet<QString> remoteAddresses;
-    bool isLocal; //!< true if at least one address from \a remoteHostAddress is a local address
     QUuid id;
     bool sslAllowed;
 
-    QnModuleInformation() : port( 0 ), isLocal( false ), sslAllowed(false) {}
+    QnModuleInformation() : port(0), sslAllowed(false) {}
 
     bool isCompatibleToCurrentSystem() const;
+    bool isLocal() const; //!< true if at least one address from \a remoteHostAddress is a local address
 };
-#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(port)(remoteAddresses)(isLocal)(id)(sslAllowed)
+#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(port)(remoteAddresses)(id)(sslAllowed)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (json)(metatype)(eq))
 
 #endif // MODULE_INFORMATION_H

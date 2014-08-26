@@ -1385,7 +1385,6 @@ void QnMain::run()
         }
         server->setVersion(qnCommon->engineVersion());
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
-        server->setSystemName(qnCommon->localSystemName());
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
         bool isLocal = appserverHostString.isEmpty() || appserverHostString == "localhost" || QUrl(appserverHostString).scheme() == "file";
@@ -1434,6 +1433,11 @@ void QnMain::run()
             isModified = true;
         }
         else if (updateStorages(server)) {
+            isModified = true;
+        }
+
+        if (server->getSystemName() != qnCommon->localSystemName()) {
+            server->setSystemName(qnCommon->localSystemName());
             isModified = true;
         }
         
@@ -1694,6 +1698,7 @@ void QnMain::run()
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
     exec();
     QnResourceDiscoveryManager::instance()->pleaseStop();
+    QnResource::pleaseStopAsyncTasks();
     stopObjects();
 
     QnResource::stopCommandProc();

@@ -5,21 +5,50 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
 #include <utils/update/update_utils.h>
+#include <utils/applauncher_utils.h>
 
 #include "version.h"
 
 namespace {
-    const QString buildInformationSuffix = lit("update");
+    const QString buildInformationSuffix = lit("update.json");
+    const QString updateInformationFileName = (lit("update.json"));
+
+    QnSoftwareVersion minimalVersionForUpdatePackage(const QString &fileName) {
+        QuaZipFile infoFile(fileName, updateInformationFileName);
+        if (!infoFile.open(QuaZipFile::ReadOnly))
+            return QnSoftwareVersion();
+
+        QString data = QString::fromUtf8(infoFile.readAll());
+        infoFile.close();
+
+        QRegExp minimalVersionRegExp(lit("\"minimalVersion\"\\s*:\\s*\"([\\d\\.]+)\""));
+        if (minimalVersionRegExp.indexIn(data) != -1)
+            return QnSoftwareVersion(minimalVersionRegExp.cap(1));
+
+        return QnSoftwareVersion();
+    }
+
+    QnSoftwareVersion maximumAvailableVersion() {
+        QList<QnSoftwareVersion> versions;
+        if (applauncher::getInstalledVersions(&versions) != applauncher::api::ResultType::ok)
+            versions.append(QnSoftwareVersion(qApp->applicationVersion()));
+
+        return *std::max_element(versions.begin(), versions.end());
+    }
 }
 
 QnCheckForUpdatesPeerTask::QnCheckForUpdatesPeerTask(QObject *parent) :
     QnNetworkPeerTask(parent),
     m_networkAccessManager(new QNetworkAccessManager(this)),
-    m_denyMajorUpdates(true)
+    m_denyMajorUpdates(true),
+    m_disableClientUpdates(false)
 {
 }
 
@@ -45,8 +74,24 @@ QString QnCheckForUpdatesPeerTask::updateFileName() const {
     return m_updateFileName;
 }
 
+void QnCheckForUpdatesPeerTask::setDisableClientUpdates(bool f) {
+    m_disableClientUpdates = f;
+}
+
+bool QnCheckForUpdatesPeerTask::isDisableClientUpdates() const {
+    return m_disableClientUpdates;
+}
+
+bool QnCheckForUpdatesPeerTask::isClientRequiresInstaller() const {
+    return m_clientRequiresInstaller;
+}
+
 QHash<QnSystemInformation, QnUpdateFileInformationPtr> QnCheckForUpdatesPeerTask::updateFiles() const {
     return m_updateFiles;
+}
+
+QnUpdateFileInformationPtr QnCheckForUpdatesPeerTask::clientUpdateFile() const {
+    return m_clientUpdateFile;
 }
 
 QString QnCheckForUpdatesPeerTask::temporaryDir() const {
@@ -80,7 +125,19 @@ void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
         needUpdate |= this->needUpdate(server->getVersion(), updateFileInformation->version);
     }
 
+    if (!m_disableClientUpdates && !m_clientRequiresInstaller) {
+        if (!m_clientUpdateFile) {
+            cleanUp();
+            finish(UpdateImpossible);
+            return;
+        }
+
+        if ((m_targetMustBeNewer && m_clientUpdateFile->version > qnCommon->engineVersion()) || (!m_targetMustBeNewer && m_clientUpdateFile->version != qnCommon->engineVersion()))
+            needUpdate = true;
+    }
+
     finish(needUpdate ? UpdateFound : NoNewerVersion);
+    return;
 }
 
 void QnCheckForUpdatesPeerTask::checkBuildOnline() {
@@ -99,6 +156,7 @@ void QnCheckForUpdatesPeerTask::checkOnlineUpdates(const QnSoftwareVersion &vers
     }
 
     m_updateFiles.clear();
+    m_clientUpdateFile.clear();
 
     m_targetMustBeNewer = version.isNull();
     m_targetVersion = version;
@@ -145,8 +203,9 @@ void QnCheckForUpdatesPeerTask::checkLocalUpdates() {
         QString fileName = dir.absoluteFilePath(entry);
         QnSoftwareVersion version;
         QnSystemInformation sysInfo;
+        bool isClient;
 
-        if (!verifyUpdatePackage(fileName, &version, &sysInfo))
+        if (!verifyUpdatePackage(fileName, &version, &sysInfo, &isClient))
             continue;
 
         if (m_updateFiles.contains(sysInfo))
@@ -160,11 +219,25 @@ void QnCheckForUpdatesPeerTask::checkLocalUpdates() {
             return;
         }
 
+        if (isClient) {
+            if (m_disableClientUpdates)
+                continue;
+
+            if (sysInfo != QnSystemInformation::currentSystemInformation())
+                continue;
+        }
+
         QnUpdateFileInformationPtr updateFileInformation(new QnUpdateFileInformation(version, fileName));
         QFile file(fileName);
         updateFileInformation->fileSize = file.size();
         updateFileInformation->md5 = makeMd5(&file);
-        m_updateFiles.insert(sysInfo, updateFileInformation);
+        if (isClient) {
+            m_clientUpdateFile = updateFileInformation;
+            QnSoftwareVersion minimalVersion = minimalVersionForUpdatePackage(updateFileInformation->fileName);
+            m_clientRequiresInstaller = !minimalVersion.isNull() && minimalVersion > maximumAvailableVersion();
+        } else {
+            m_updateFiles.insert(sysInfo, updateFileInformation);
+        }
     }
 
     checkUpdateCoverage();
@@ -263,6 +336,28 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished() {
             info->md5 = package.value(lit("md5")).toString();
             m_updateFiles.insert(QnSystemInformation(platform.key(), architecture, modification), info);
         }
+    }
+
+    if (!m_disableClientUpdates) {
+        packages = map.value(lit("clientPackages")).toMap();
+        QString arch = lit(QN_APPLICATION_ARCH);
+        QString modification = lit(QN_ARM_BOX);
+        if (!modification.isEmpty())
+            arch += lit("_") + modification;
+        QVariantMap package = packages.value(lit(QN_APPLICATION_PLATFORM)).toMap().value(arch).toMap();
+
+        if (!package.isEmpty()) {
+            QString fileName = package.value(lit("file")).toString();
+            m_clientUpdateFile.reset(new QnUpdateFileInformation(m_targetVersion, QUrl(urlPrefix + fileName)));
+            m_clientUpdateFile->baseFileName = fileName;
+            m_clientUpdateFile->fileSize = package.value(lit("size")).toLongLong();
+            m_clientUpdateFile->md5 = package.value(lit("md5")).toString();
+        }
+
+        QnSoftwareVersion minimalVersionToUpdate(map.value(lit("minimalClientVersion")).toString());
+        m_clientRequiresInstaller = !minimalVersionToUpdate.isNull() && minimalVersionToUpdate > maximumAvailableVersion();
+    } else {
+        m_clientRequiresInstaller = true;
     }
 
     checkUpdateCoverage();

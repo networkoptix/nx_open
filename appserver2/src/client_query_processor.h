@@ -115,6 +115,7 @@ namespace ec2
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;
             toUrlParams( input, &query );
+            query.addQueryItem("format", QnLexical::serialized(Qn::UbjsonFormat));
             requestUrl.setQuery( query );
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );

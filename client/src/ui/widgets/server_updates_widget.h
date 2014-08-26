@@ -34,6 +34,8 @@ public:
     virtual bool confirm() override;
     virtual bool discard() override;
 
+    void checkForUpdates();
+
 private slots:
     void at_checkForUpdatesButton_clicked();
     void at_installSpecificBuildButton_clicked();

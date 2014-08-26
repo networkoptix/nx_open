@@ -78,7 +78,6 @@ QnModuleInformation QnCommonModule::moduleInformation() const
     if( qnResPool )
     {
         const QnMediaServerResource* server = dynamic_cast<const QnMediaServerResource*>(qnResPool->getResourceById(qnCommon->moduleGUID()).data());
-        moduleInformationCopy.isLocal = false;
         if( server )
         {
             foreach(const QHostAddress &address, server->getNetAddrList())

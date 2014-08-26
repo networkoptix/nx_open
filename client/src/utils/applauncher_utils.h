@@ -16,6 +16,8 @@ namespace applauncher
     */
     api::ResultType::Value isVersionInstalled( QnSoftwareVersion version, bool* const installed );
 
+    //!Retrieves a list of the installed versions
+    api::ResultType::Value getInstalledVersions(QList<QnSoftwareVersion> *versions);
     /*!
         Send the required version to the applauncher, close the current instance of the client.
         \return \a ResultType::ok if request has been performed successfully, otherwise - error code
@@ -31,6 +33,15 @@ namespace applauncher
     api::ResultType::Value startInstallation(
         const QnSoftwareVersion& version,
         unsigned int* installationID );
+    //!Installs client update from a zip file
+    /*!
+     * \param[in] version Version of the installation
+     * \param[in] zipFileName Path to zip file
+     * \return \a ResultType::ok if request has been performed successfully, otherwise - error code
+     */
+    api::ResultType::Value installZip(
+        const QnSoftwareVersion &version,
+        const QString &zipFileName );
     //!Check running installation status
     /*!
         \param[in] installationID ID returned by \a applauncher::startInstallation()

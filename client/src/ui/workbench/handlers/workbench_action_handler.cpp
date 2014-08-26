@@ -143,6 +143,7 @@
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
+    QColor redTextColor = Qt::red; // TODO: #dklychkov make it customizable
 }
 
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
@@ -225,6 +226,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
     connect(action(Qn::SystemAdministrationAction),             SIGNAL(triggered()),    this,   SLOT(at_systemAdministrationAction_triggered()));
+    connect(action(Qn::SystemUpdateAction),                     SIGNAL(triggered()),    this,   SLOT(at_systemUpdateAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
@@ -547,8 +549,15 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
 // -------------------------------------------------------------------------- //
 
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
-    if(!user)
+    if (!user) {
+        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
         return;
+    }
+
+    if (user->isAdmin())
+        context()->instance<QnWorkbenchUpdateWatcher>()->start();
+    else
+        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
 
     /* Open all user's layouts. */
     //if(qnSettings->isLayoutsOpenedOnLogin()) {
@@ -1013,30 +1022,50 @@ void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::notifyAboutUpdate() {
-    QnUpdateInfoItem update = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
-    if(update.isNull())
+    QnSoftwareVersion version = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
+    if(version.isNull())
         return;
 
-    QnSoftwareVersion ignoredUpdateVersion = qnSettings->ignoredUpdateVersion();
-    bool ignoreThisVersion = update.engineVersion <= ignoredUpdateVersion;
-    bool thisVersionWasIgnored = ignoreThisVersion;
-    if(ignoreThisVersion)
+    if (version <= qnSettings->ignoredUpdateVersion())
         return;
 
-    QnCheckableMessageBox::question(
-        mainWindow(),
-        Qn::Upgrade_Help,
-        tr("Software update is available"),
-        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString()),
-        tr("Don't notify again about this update."),
-        &ignoreThisVersion,
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Ok,
-        QDialogButtonBox::Cancel
-    );
+    QnSoftwareVersion current = qnCommon->engineVersion();
 
-    if(ignoreThisVersion != thisVersionWasIgnored)
-        qnSettings->setIgnoredUpdateVersion(ignoreThisVersion ? update.engineVersion : QnSoftwareVersion());
+    bool majorVersionChange = version.major() > current.major() || version.minor() > current.minor();
+
+    QString title;
+    QString message;
+    if (majorVersionChange) {
+        title = tr("Newer version is available");
+        message = tr("New version is available.");
+        message += lit("<br/>");
+        message += tr("Would you like to upgrade?");
+    } else {
+        title = tr("Upgrade is recommended");
+        message = tr("New version is available.");
+        message += lit("<br/>");
+        message += tr("Major issues have been fixed.");
+        message += lit("<br/><span style=\"color:%1;\">").arg(redTextColor.name());
+        message += tr("Update is strongly recommended.");
+        message += lit("</span><br/>");
+        message += tr("Would you like to upgrade?");
+    }
+
+    QnCheckableMessageBox messageBox(mainWindow());
+    messageBox.setWindowTitle(title);
+    messageBox.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Question));
+    messageBox.setRichText(message);
+    messageBox.setCheckBoxText(tr("Don't notify again about this update."));
+    messageBox.setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
+    setHelpTopic(&messageBox, Qn::Upgrade_Help);
+    int res = messageBox.exec();
+
+    if (res == QMessageBox::Accepted) {
+        at_systemUpdateAction_triggered();
+        systemAdministrationDialog()->checkForUpdates();
+    } else {
+        qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? version : QnSoftwareVersion());
+    }
 }
 
 void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePtr &layout) {
@@ -1130,6 +1159,11 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
     QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::GeneralPage);
+}
+
+void QnWorkbenchActionHandler::at_systemUpdateAction_triggered() {
+    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
+    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::UpdatesPage);
 }
 
 void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {

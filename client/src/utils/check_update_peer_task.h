@@ -29,7 +29,13 @@ public:
     void setUpdateFileName(const QString &fileName);
     QString updateFileName() const;
 
+    void setDisableClientUpdates(bool f);
+    bool isDisableClientUpdates() const;
+
+    bool isClientRequiresInstaller() const;
+
     QHash<QnSystemInformation, QnUpdateFileInformationPtr> updateFiles() const;
+    QnUpdateFileInformationPtr clientUpdateFile() const;
     QString temporaryDir() const;
 
     bool needUpdate(const QnSoftwareVersion &version, const QnSoftwareVersion &updateVersion) const;
@@ -61,8 +67,11 @@ private:
     QString m_updateLocationPrefix;
     bool m_targetMustBeNewer;
     bool m_denyMajorUpdates;
+    bool m_disableClientUpdates;
 
     QHash<QnSystemInformation, QnUpdateFileInformationPtr> m_updateFiles;
+    QnUpdateFileInformationPtr m_clientUpdateFile;
+    bool m_clientRequiresInstaller;
 };
 
 #endif // CHECK_UPDATE_PEER_TASK_H

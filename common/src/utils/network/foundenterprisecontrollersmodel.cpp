@@ -147,7 +147,7 @@ void QnFoundEnterpriseControllersModel::remoteModuleFound(const QnModuleInformat
     if (moduleInformation.type != nxMediaServerId)
         return;
 
-    const QString &remoteHostAddress = moduleInformation.isLocal ? QString::fromLatin1("127.0.0.1") : remoteAddress;
+    const QString &remoteHostAddress = moduleInformation.isLocal() ? QString::fromLatin1("127.0.0.1") : remoteAddress;
     const QString &url = QString(lit("https://%1:%2")).arg(remoteHostAddress).arg(moduleInformation.port);
     bool isNewElement = false;
 

@@ -5,7 +5,6 @@
 #include <utils/network/mac_address.h>
 #include <utils/common/request_param.h>
 #include <utils/serialization/json_functions.h>
-#include <utils/appcast/update_info.h>
 #include <utils/network/multicast_module_finder.h>
 #include <utils/math/space_mapper.h>
 
@@ -140,8 +139,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnSoftwareVersion>();
     qRegisterMetaType<QnSystemInformation>();
     qRegisterMetaTypeStreamOperators<QnSystemInformation>();
-    qRegisterMetaType<QnUpdateInfoItem>();
-    qRegisterMetaType<QnUpdateInfoItemList>();
 
     qRegisterMetaType<TypeSpecificParamMap>();
     qRegisterMetaType<QnStringBoolPairList>("QnStringBoolPairList");
