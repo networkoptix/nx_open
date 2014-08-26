@@ -136,7 +136,7 @@ void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInforma
 
     if (it != m_moduleInformationById.end()) {
         QSet<QUuid> &discoverers = m_discovererIdByServerId[it.key()];
-        if (discoverers.remove(discoverer) > 0) {
+        if (discoverers.remove(discoverer) ) {
             if (discoverers.isEmpty()) {
                 emit peerLost(it.value());
                 it = m_moduleInformationById.erase(it);
@@ -153,7 +153,7 @@ void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QUuid &discoverer)
 
     for (auto it = m_moduleInformationById.begin(); it != m_moduleInformationById.end(); /* no inc */) {
         QSet<QUuid> &discoverers = m_discovererIdByServerId[it.key()];
-        if (discoverers.remove(discoverer) > 0) {
+        if (discoverers.remove(discoverer) ) {
             if (discoverers.isEmpty()) {
                 emit peerLost(it.value());
                 it = m_moduleInformationById.erase(it);
