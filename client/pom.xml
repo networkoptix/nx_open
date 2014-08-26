@@ -25,7 +25,7 @@
         <!--Global libs-->
         <qt.libs>core gui network opengl xml sql multimedia concurrent</qt.libs>
         <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
-        <global.libs>-lcommon -lappserver2 -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
+        <global.libs>-lcommon -lappserver2 -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lFestival -lestools -leststring -lestbase -lquazip -ludt</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
         <windows.oslibs.release/>
