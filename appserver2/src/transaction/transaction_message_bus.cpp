@@ -372,17 +372,20 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 {
     QMutexLocker lock(&m_mutex);
 
-    AlivePeersMap:: iterator itr = m_alivePeers.find(tran.peerID);
+    AlivePeersMap:: iterator itr = m_alivePeers.find(transportHeader.sender);
     if (itr != m_alivePeers.end())
         itr.value().lastActivity.restart();
 
-    if (m_lastTranSeq[tran.peerID] >= transportHeader.sequence) {
+    if (!transportHeader.sender.isNull()) 
+    {
+        if (m_lastTranSeq[transportHeader.sender] >= transportHeader.sequence) {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "Ignore transaction because of transport sequence: " << transportHeader.sequence << "<=" << m_lastTranSeq[tran.peerID];
+            qDebug() << "Ignore transaction because of transport sequence: " << transportHeader.sequence << "<=" << m_lastTranSeq[transportHeader.sender];
 #endif
-        return; // already processed
+            return; // already processed
+        }
+        m_lastTranSeq[transportHeader.sender] = transportHeader.sequence;
     }
-    m_lastTranSeq[tran.peerID] = transportHeader.sequence;
 
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
