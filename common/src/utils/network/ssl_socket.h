@@ -126,32 +126,6 @@ private:
     Q_DECLARE_PRIVATE(QnMixedSSLSocket);
 };
 
-class TCPSslServerSocket: public TCPServerSocket
-{
-public:
-    /*
-    *   allowNonSecureConnect - allow mixed ssl and non ssl connect for socket
-    */
-    TCPSslServerSocket(bool allowNonSecureConnect = true);
-
-    virtual AbstractStreamSocket* accept() override;
-
-private:
-    bool m_allowNonSecureConnect;
-};
-
-// SSL on top of NAT 
-class UdtSSLServerSocket : public UdtStreamServerSocket {
-public:
-    UdtSSLServerSocket( bool allowNonSecureConnect = true ) :
-        m_allowNonSecureConnect(allowNonSecureConnect){}
-
-    virtual AbstractStreamSocket* accept() override;
-    virtual ~UdtSSLServerSocket();
-private:
-    bool m_allowNonSecureConnect;
-};
-
 
 class SSLServerSocket
 :

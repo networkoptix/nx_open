@@ -15,9 +15,26 @@ AbstractDatagramSocket* SocketFactory::createDatagramSocket()
     return new UDPSocket();
 }
 
-AbstractStreamSocket* SocketFactory::createStreamSocket( bool sslRequired, SocketFactory::NatTraversalType /*natTraversalRequired*/ )
+AbstractStreamSocket* SocketFactory::createStreamSocket( bool sslRequired, SocketFactory::NatTraversalType natTraversalRequired )
 {
     AbstractStreamSocket* result = new TCPSocket();
+    switch( natTraversalRequired )
+    {
+        case nttAuto:
+            result = new TCPSocket(); //TODO #ak
+            break;
+        case nttEnabled:
+            result = new UdtStreamSocket();
+            break;
+        case nttDisabled:
+            result = new TCPSocket();
+            break;
+    }
+
+    assert( result );
+    if( !result )
+        return nullptr;
+
 #ifdef ENABLE_SSL
     if (sslRequired)
         result = new QnSSLSocket(result, false);

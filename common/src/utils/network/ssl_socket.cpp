@@ -1406,54 +1406,6 @@ bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& buffer, std::function<vo
 
 
 //////////////////////////////////////////////////////////
-////////////// class TCPSslServerSocket
-//////////////////////////////////////////////////////////
-
-TCPSslServerSocket::TCPSslServerSocket(bool allowNonSecureConnect)
-:
-    TCPServerSocket(),
-    m_allowNonSecureConnect(allowNonSecureConnect)
-{
-}
-
-AbstractStreamSocket* TCPSslServerSocket::accept()
-{
-    AbstractStreamSocket* sock = TCPServerSocket::accept();
-    if (!sock)
-        return 0;
-
-    if (m_allowNonSecureConnect)
-        return new QnMixedSSLSocket(sock);
-
-    else
-        return new QnSSLSocket(sock, true);
-
-#if 0
-    // transparent accept required state machine here. doesn't implemented. Handshake implemented on first IO operations
-
-    QnSSLSocket* sslSock = new QnSSLSocket(sock);
-    if (sslSock->doServerHandshake())
-        return sslSock;
-    
-    delete sslSock;
-    return 0;
-#endif
-}
-
-AbstractStreamSocket* UdtSSLServerSocket::accept() {
-    AbstractStreamSocket* sock = UdtStreamServerSocket::accept();
-    if(!sock) return NULL;
-    if(m_allowNonSecureConnect)
-        return new QnMixedSSLSocket(sock);
-    else
-        return new QnSSLSocket(sock,true);
-}
-
-UdtSSLServerSocket::~UdtSSLServerSocket(){}
-
-
-
-//////////////////////////////////////////////////////////
 ////////////// class SSLServerSocket
 //////////////////////////////////////////////////////////
 
