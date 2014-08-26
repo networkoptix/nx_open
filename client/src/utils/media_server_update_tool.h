@@ -51,6 +51,7 @@ public:
         DownloadingUpdate,
         InstallingToIncompatiblePeers,
         UploadingUpdate,
+        InstallingClientUpdate,
         InstallingUpdate,
     };
 
@@ -69,6 +70,7 @@ public:
         LockFailed,
         DownloadingFailed,
         UploadingFailed,
+        ClientInstallationFailed,
         InstallationFailed,
         RestInstallationFailed
     };
@@ -93,13 +95,15 @@ public:
     PeerUpdateInformation updateInformation(const QUuid &peerId) const;
 
     QnMediaServerResourceList targets() const;
-    void setTargets(const QSet<QUuid> &targets);
+    void setTargets(const QSet<QUuid> &targets, bool client = false);
 
     QnMediaServerResourceList actualTargets() const;
 
     QUrl generateUpdatePackageUrl() const;
 
     void reset();
+
+    bool isClientRequiresInstaller() const;
 
 signals:
     void stateChanged(int state);
@@ -124,6 +128,7 @@ private slots:
     void at_uploadTask_peerFinished(const QUuid &peerId);
     void at_installTask_peerFinished(const QUuid &peerId);
     void at_restUpdateTask_peerFinished(const QUuid &peerId);
+    void at_clientUpdateInstalled();
 
     void at_networkTask_peerProgressChanged(const QUuid &peerId, int progress);
 
@@ -137,6 +142,7 @@ private:
 
     void downloadUpdates();
     void uploadUpdatesToServers();
+    void installClientUpdate();
     void installUpdatesToServers();
     void installIncompatiblePeers();
 
@@ -159,6 +165,7 @@ private:
     QString m_updateId;
 
     QHash<QnSystemInformation, QnUpdateFileInformationPtr> m_updateFiles;
+    QnUpdateFileInformationPtr m_clientUpdateFile;
 
     ec2::QnDistributedMutex *m_distributedMutex;
 
@@ -175,6 +182,9 @@ private:
 
     QSet<QUuid> m_incompatiblePeerIds;
     QSet<QUuid> m_targetPeerIds;
+
+    bool m_clientRequiresInstaller;
+    bool m_disableClientUpdates;
 };
 
 #endif // QN_MEDIA_SERVER_UPDATE_TOOL_H

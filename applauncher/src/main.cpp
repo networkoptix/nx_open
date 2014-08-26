@@ -66,7 +66,7 @@ int doInstallation(
     const QString& mirrorListUrl,
     const QString& productName,
     const QString& customization,
-    const QString& version,
+    const QnSoftwareVersion &version,
     const QString& module,
     const QString& installationPath );
 
@@ -79,7 +79,10 @@ int main( int argc, char* argv[] )
     QnLongRunnablePool runnablePool;
 
     QString logLevel = "WARN";
-    QString logFilePath = InstallationManager::defaultDirectoryForInstallations() + "/applauncher";
+    QString installationsDir = InstallationManager::defaultDirectoryForInstallations();
+    if (!QDir(installationsDir).exists())
+        QDir().mkpath(installationsDir);
+    QString logFilePath = installationsDir + "/applauncher";
     QString mirrorListUrl;
     bool quitMode = false;
     bool displayHelp = false;
@@ -159,7 +162,7 @@ int main( int argc, char* argv[] )
             mirrorListUrl,
             productNameToInstall,
             customizationToInstall,
-            versionToInstall,
+            QnSoftwareVersion(versionToInstall),
             moduleToInstall,
             installationPath );
 
@@ -246,24 +249,19 @@ int doInstallation(
     const QString& mirrorListUrl,
     const QString& productName,
     const QString& customization,
-    const QString& version,
+    const QnSoftwareVersion& version,
     const QString& module,
     const QString& installationPath )
 {
-    if( version.isEmpty() )
+    if( version.isNull() )
     {
         std::cerr<<"FAILURE. Missing required parameter \"version\""<<std::endl;
         return 1;
     }
 
-    if( !installationManager.isValidVersionName(version) )
-    {
-        std::cerr<<"FAILURE. "<<version.toStdString()<<" is not a valid version to install"<<std::endl;
-        return 1; 
-    }
     QString effectiveInstallationPath = installationPath;
     if( effectiveInstallationPath.isEmpty() )
-        effectiveInstallationPath = installationManager.getInstallDirForVersion(version);
+        effectiveInstallationPath = installationManager.installationDirForVersion(version);
 
     InstallationProcess installationProcess(
         productName,

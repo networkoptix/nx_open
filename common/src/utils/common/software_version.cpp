@@ -7,11 +7,27 @@
 
 #include <utils/common/model_functions.h>
 
+QnSoftwareVersion::QnSoftwareVersion(const QString &versionString) {
+    deserialize(versionString, this);
+}
+
+QnSoftwareVersion::QnSoftwareVersion(const char *versionString) {
+    deserialize(QLatin1String(versionString), this);
+}
+
+QnSoftwareVersion::QnSoftwareVersion(const QByteArray &versionString) {
+    deserialize(QLatin1String(versionString), this);
+}
+
 QString QnSoftwareVersion::toString(QnSoftwareVersion::Format format) const {
     QString result = QString::number(m_data[0]);
     for(int i = 1; i < format; i++)
         result += QLatin1Char('.') + QString::number(m_data[i]);
     return result;
+}
+
+bool QnSoftwareVersion::isNull() const {
+    return m_data[0] == 0 && m_data[1] == 0 && m_data[2] == 0 && m_data[3] == 0;
 }
 
 bool operator<(const QnSoftwareVersion &l, const QnSoftwareVersion &r) {

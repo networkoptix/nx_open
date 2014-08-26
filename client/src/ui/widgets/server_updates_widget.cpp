@@ -19,11 +19,14 @@
 
 #include <utils/common/software_version.h>
 #include <utils/media_server_update_tool.h>
+#include <utils/applauncher_utils.h>
 
 #include <version.h>
 
 namespace {
     const int longInstallWarningTimeout = 2 * 60 * 1000; // 2 minutes
+    // Time that is given to process to exit. After that, appauncher (if present) will try to terminate it.
+    static const quint32 processTerminateTimeout = 15000;
 }
 
 QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
@@ -103,10 +106,14 @@ void QnServerUpdatesWidget::updateFromSettings() {
     updateUi();
 }
 
-void QnServerUpdatesWidget::at_checkForUpdatesButton_clicked() {
+void QnServerUpdatesWidget::checkForUpdates() {
     m_updateTool->setDenyMajorUpdates(false);
     m_updateTool->checkForUpdates();
     m_updatesModel->setTargets(m_updateTool->actualTargets());
+}
+
+void QnServerUpdatesWidget::at_checkForUpdatesButton_clicked() {
+    checkForUpdates();
 }
 
 void QnServerUpdatesWidget::at_installSpecificBuildButton_clicked() {
@@ -173,21 +180,25 @@ void QnServerUpdatesWidget::updateUi() {
         if (m_previousToolState == QnMediaServerUpdateTool::CheckingForUpdates) {
             switch (m_updateTool->updateCheckResult()) {
             case QnMediaServerUpdateTool::UpdateFound:
-                if (!m_updateTool->targetVersion().isNull() && !m_minimalMode) { // null version means we've got here first time after the dialog has been showed
+                if (!m_updateTool->targetVersion().isNull() && !m_minimalMode) {
+                    // null version means we've got here for the first time after the dialog has been showed
                     QString message = tr("Do you want to update your system to version %1?").arg(m_updateTool->targetVersion().toString());
+                    if (m_updateTool->isClientRequiresInstaller()) {
+                        message += lit("\n\n");
+                        message += tr("You will have to update the client manually using an installer.");
+                    }
                     switch (QDateTime::currentDateTime().date().dayOfWeek()) {
                     case Qt::Thursday:
                     case Qt::Friday:
                     case Qt::Saturday:
                     case Qt::Sunday:
-                        message += lit("\n") + tr("As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week.");
+                        message += lit("\n\n");
+                        message += tr("As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week.");
                         break;
                     default:
                         break;
                     }
-
-                    int result = QMessageBox::question(this, tr("Update is found"), message, QMessageBox::Yes | QMessageBox::No);
-                    startUpdate = (result == QMessageBox::Yes);
+                    startUpdate = QMessageBox::question(this, tr("Update is found"), message, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes;
                 }
                 break;
             case QnMediaServerUpdateTool::InternetProblem: {
@@ -217,10 +228,26 @@ void QnServerUpdatesWidget::updateUi() {
             switch (m_updateTool->updateResult()) {
             case QnMediaServerUpdateTool::UpdateSuccessful:
                 if (!m_minimalMode) {
-                    QMessageBox::information(this,
-                                             tr("Update is successfull"),
-                                             tr("Update has been successfully finished.\n"
-                                                "Client will be restarted and updated."));
+                    QString message = tr("Update has been successfully finished.");
+                    message += lit("\n");
+                    if (m_updateTool->isClientRequiresInstaller())
+                        message += tr("Now you have to update the client to the newer version using an installer.");
+                    else
+                        message += tr("The client will be restarted to the updated version.");
+
+                    QMessageBox::information(this, tr("Update is successfull"), message);
+
+                    if (!m_updateTool->isClientRequiresInstaller()) {
+                        if (!applauncher::restartClient(m_updateTool->targetVersion()) == applauncher::api::ResultType::ok) {
+                            QMessageBox::critical(this,
+                                                  tr("Launcher process is not found"),
+                                                  tr("Cannot restart the client.\n"
+                                                     "Please close the application and start it again using the shortcut in the start menu."));
+                        } else {
+                            qApp->exit(0);
+                            applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);
+                        }
+                    }
                 }
                 break;
             case QnMediaServerUpdateTool::Cancelled:
@@ -245,6 +272,12 @@ void QnServerUpdatesWidget::updateUi() {
         applying = true;
         cancellable = true;
         ui->updateStateLabel->setText(tr("Downloading updates"));
+        break;
+    case QnMediaServerUpdateTool::InstallingClientUpdate:
+        applying = true;
+        cancellable = true;
+        ui->updateStateLabel->setText(tr("Installing client update"));
+        infiniteProgress = true;
         break;
     case QnMediaServerUpdateTool::InstallingToIncompatiblePeers:
         applying = true;

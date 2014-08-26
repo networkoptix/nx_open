@@ -51,3 +51,7 @@ void QnSystemAdministrationDialog::accept() {
     }
     base_type::accept();
 }
+
+void QnSystemAdministrationDialog::checkForUpdates() {
+    m_updatesWidget->checkForUpdates();
+}
