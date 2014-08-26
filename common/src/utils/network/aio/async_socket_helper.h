@@ -151,7 +151,7 @@ public:
         }
         else
         {
-            //TODO #ak AIO engine does not support truely async cancellation yet
+            //TODO #ak AIO engine does not support truly async cancellation yet
             assert( waitForRunningHandlerCompletion );
         }
     }
@@ -404,14 +404,19 @@ class AsyncServerSocketHelper
     public aio::AIOEventHandler<SocketType>
 {
 public:
-    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> acceptHandler;
-    std::atomic<int> acceptAsyncCallCount;
-
     AsyncServerSocketHelper(SocketType* _sock, AbstractStreamServerSocket* _abstractServerSocket)
     :
         m_sock(_sock),
-        m_abstractServerSocket(_abstractServerSocket)
+        m_abstractServerSocket(_abstractServerSocket),
+        m_terminatedFlagPtr(nullptr)
     {
+    }
+
+    ~AsyncServerSocketHelper()
+    {
+        //NOTE removing socket not from completion handler while completion handler is running in another thread is undefined behavour, so no synchronization here
+        if( m_terminatedFlagPtr )
+            *m_terminatedFlagPtr = true;
     }
 
     void terminate()
@@ -421,9 +426,24 @@ public:
 
     virtual void eventTriggered(SocketType* sock, aio::EventType eventType) throw() override
     {
-        assert(acceptHandler);
+        assert(m_acceptHandler);
 
-        const int acceptAsyncCallCountBak = acceptAsyncCallCount;
+        bool terminated = false;    //set to true just before object destruction
+        m_terminatedFlagPtr = &terminated;
+        m_threadHandlerIsRunningIn.store( QThread::currentThreadId(), std::memory_order_release );
+        const int acceptAsyncCallCountBak = m_acceptAsyncCallCount;
+        auto acceptHandlerBak = std::move( m_acceptHandler );
+
+        auto acceptHandlerBakLocal = [this, sock, acceptHandlerBak, &terminated, acceptAsyncCallCountBak]( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection ){
+            acceptHandlerBak( errorCode, newConnection );
+            if( terminated )
+                return;
+            //if asyncAccept has been called from onNewConnection, no need to call removeFromWatch
+            QMutexLocker lk( aio::AIOService::instance()->mutex() );
+            if( m_acceptAsyncCallCount == acceptAsyncCallCountBak )
+                aio::AIOService::instance()->removeFromWatchNonSafe(sock, aio::etRead);
+            m_threadHandlerIsRunningIn.store( nullptr, std::memory_order_release );
+        };
 
         switch( eventType )
         {
@@ -431,21 +451,21 @@ public:
             {
                 //accepting socket
                 AbstractStreamSocket* newSocket = m_abstractServerSocket->accept();
-                acceptHandler(
+                acceptHandlerBakLocal(
                     newSocket != nullptr ? SystemError::noError : SystemError::getLastOSErrorCode(),
                     newSocket);
                 break;
             }
 
             case aio::etReadTimedOut:
-                acceptHandler(SystemError::timedOut, nullptr);
+                acceptHandlerBakLocal(SystemError::timedOut, nullptr);
                 break;
 
             case aio::etError:
             {
                 SystemError::ErrorCode errorCode = SystemError::noError;
                 sock->getLastError(&errorCode);
-                acceptHandler(errorCode, nullptr);
+                acceptHandlerBakLocal(errorCode, nullptr);
                 break;
             }
 
@@ -453,31 +473,34 @@ public:
                 assert(false);
                 break;
         }
-
-        //if asyncAccept has been called from onNewConnection, no need to call removeFromWatch
-        if( acceptAsyncCallCount > acceptAsyncCallCountBak )
-            return;
-
-        aio::AIOService::instance()->removeFromWatch(sock, aio::etRead);
-        acceptHandler = std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>();
     }
 
     bool acceptAsync(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler)
     {
-        ++acceptAsyncCallCount;
-        acceptHandler = std::move(handler);
+        m_acceptHandler = std::move(handler);
+
+        QMutexLocker lk( aio::AIOService::instance()->mutex() );
+        ++m_acceptAsyncCallCount;
         //TODO: #ak usually acceptAsyncImpl is called repeatedly. SHOULD avoid unneccessary watchSocket and removeFromWatch calls
-        return aio::AIOService::instance()->watchSocket(m_sock, aio::etRead, this);
+        return aio::AIOService::instance()->watchSocketNonSafe(m_sock, aio::etRead, this);
     }
 
     void cancelAsyncIO(bool waitForRunningHandlerCompletion)
     {
-        return aio::AIOService::instance()->removeFromWatch(m_sock, aio::etRead, waitForRunningHandlerCompletion);
+        aio::AIOService::instance()->removeFromWatch(m_sock, aio::etRead, waitForRunningHandlerCompletion);
+        if( m_threadHandlerIsRunningIn.load( std::memory_order_acquire ) == QThread::currentThreadId() )
+            ++m_acceptAsyncCallCount;     //we are in aio thread, eventTriggered is down the stack
+        else
+            assert( waitForRunningHandlerCompletion );      //TODO #ak AIO engine does not support truly async cancellation yet
     }
 
 private:
     SocketType* m_sock;
     AbstractStreamServerSocket* m_abstractServerSocket;
+    std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
+    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
+    std::atomic<int> m_acceptAsyncCallCount;
+    bool* m_terminatedFlagPtr;
 };
 
 #endif  //ASYNC_SOCKET_HELPER_H

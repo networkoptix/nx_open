@@ -31,11 +31,11 @@
 
 
 MixedTcpUdtServerSocket::MixedTcpUdtServerSocket()
-:
-    m_accepting( false )
 {
     m_socketDelegates.push_back(new TCPServerSocket());
     m_socketDelegates.push_back(new UdtStreamServerSocket());
+
+    m_acceptingFlags.resize( m_socketDelegates.size() );
 }
 
 MixedTcpUdtServerSocket::~MixedTcpUdtServerSocket()
@@ -167,12 +167,13 @@ AbstractStreamSocket* MixedTcpUdtServerSocket::accept()
 {
     QMutexLocker lk(&m_mutex);
 
-    if( !m_accepting )
+    for( size_t i = 0; i < m_socketDelegates.size(); ++i )
     {
+        if( m_acceptingFlags[i] )
+            continue;
         using namespace std::placeholders;
-        for( AbstractStreamServerSocket* serverSocket : m_socketDelegates )
-            serverSocket->acceptAsync(std::bind(&MixedTcpUdtServerSocket::connectionAccepted, this, serverSocket, _1, _2));
-        m_accepting = true;
+        m_socketDelegates[i]->acceptAsync(std::bind(&MixedTcpUdtServerSocket::connectionAccepted, this, m_socketDelegates[i], i, _1, _2));
+        m_acceptingFlags[i] = true;
     }
 
     while( m_queue.empty() )
@@ -187,8 +188,13 @@ AbstractStreamSocket* MixedTcpUdtServerSocket::accept()
 
 void MixedTcpUdtServerSocket::cancelAsyncIO(bool waitForRunningHandlerCompletion)
 {
-    for( AbstractStreamServerSocket* serverSocket : m_socketDelegates )
-        serverSocket->cancelAsyncIO(waitForRunningHandlerCompletion);
+    for( size_t i = 0; i < m_socketDelegates.size(); ++i )
+    {
+        m_socketDelegates[i]->cancelAsyncIO(waitForRunningHandlerCompletion);
+        QMutexLocker lk(&m_mutex);
+        m_acceptingFlags[i] = false;
+        //TODO #ak synchronization is not ok here
+    }
 }
 
 bool MixedTcpUdtServerSocket::acceptAsyncImpl(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& /*handler*/)
@@ -200,15 +206,19 @@ bool MixedTcpUdtServerSocket::acceptAsyncImpl(std::function<void(SystemError::Er
 
 void MixedTcpUdtServerSocket::connectionAccepted(
     AbstractStreamServerSocket* serverSocket,
+    size_t serverSocketIndex,
     SystemError::ErrorCode errorCode,
     AbstractStreamSocket* newConnection )
 {
     using namespace std::placeholders;
 
-    //TODO #ak stop accepting connections when no ones listening requires using AIOService
+    //TODO #ak stop accepting connections when noone listening requires using AIOService
 
     QMutexLocker lk(&m_mutex);
     m_queue.push(std::make_pair(errorCode, newConnection));
-    if( errorCode == SystemError::noError )
-        serverSocket->acceptAsync(std::bind(&MixedTcpUdtServerSocket::connectionAccepted, this, serverSocket, _1, _2));
+    m_cond.wakeAll();
+    //if( errorCode == SystemError::noError )
+    //    serverSocket->acceptAsync(std::bind(&MixedTcpUdtServerSocket::connectionAccepted, this, serverSocket, serverSocketIndex, _1, _2));
+    //else
+        m_acceptingFlags[serverSocketIndex] = false;
 }

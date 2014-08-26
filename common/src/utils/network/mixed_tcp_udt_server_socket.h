@@ -81,16 +81,17 @@ protected:
     virtual bool acceptAsyncImpl(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler) override;
 
 private:
-    bool m_accepting;
     std::vector<AbstractStreamServerSocket*> m_socketDelegates;
+    std::vector<bool> m_acceptingFlags;
     mutable QMutex m_mutex;
     QWaitCondition m_cond;
     std::queue<std::pair<SystemError::ErrorCode, AbstractStreamSocket*> > m_queue;
 
     void connectionAccepted(
         AbstractStreamServerSocket* serverSocket,
+        size_t serverSocketIndex,
         SystemError::ErrorCode errorCode,
-        AbstractStreamSocket* newConnection);
+        AbstractStreamSocket* newConnection );
 };
 
 #endif  //MIXED_TCP_UDT_SERVER_SOCKET_H
