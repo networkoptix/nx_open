@@ -103,7 +103,6 @@ private:
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;
     QHash<QUuid, ModuleContext> m_knownEnterpriseControllers;
-    QSet<QString> m_localNetworkAdresses;
     bool m_compatibilityMode;
     QMultiHash<QUrl, QUuid> m_ignoredModules;
 };

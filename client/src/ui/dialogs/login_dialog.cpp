@@ -486,7 +486,7 @@ void QnLoginDialog::at_moduleFinder_moduleFound(const QnModuleInformation &modul
     //if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
     //    return;
 
-    QString host = moduleInformation.isLocal ? QLatin1String("127.0.0.1") : remoteAddress;
+    QString host = moduleInformation.isLocal() ? QLatin1String("127.0.0.1") : remoteAddress;
     QUrl url;
     url.setHost(host);
     url.setPort(moduleInformation.port);

@@ -58,7 +58,6 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
             sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
             sock->setDestAddr(multicastGroupAddress.toString(), multicastGroupPort);
             m_clientSockets.push_back(sock.release());
-            m_localNetworkAdresses.insert(address.toString());
             if (m_serverSocket)
                 m_serverSocket->joinGroup(multicastGroupAddress.toString(), address.toString());
         } catch(const std::exception &e) {
@@ -235,7 +234,6 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
         }
 
         it->moduleInformation.remoteAddresses.insert(remoteAddressStr);
-        it->moduleInformation.isLocal |= m_localNetworkAdresses.contains(remoteAddressStr);
 
         emit moduleFound(it->moduleInformation, remoteAddressStr, localAddress.toString());
     }
