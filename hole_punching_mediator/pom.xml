@@ -25,7 +25,7 @@
         <product.title>${company.name} Mediator</product.title>  
         <!--Global libs-->        
         <qt.libs>core network concurrent</qt.libs>
-        <global.libs>-lcommon</global.libs>
+        <global.libs>-lcommon -ludt</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
         <windows.oslibs.release/>
