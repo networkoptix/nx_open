@@ -28,10 +28,8 @@ void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &con
 }
 
 void QnGlobalModuleFinder::setModuleFinder(QnModuleFinder *moduleFinder) {
-    if (m_moduleFinder){
-        disconnect(m_moduleFinder.data(),   &QnModuleFinder::moduleFound,   this,   &QnGlobalModuleFinder::at_moduleFinder_moduleFound);
-        disconnect(m_moduleFinder.data(),   &QnModuleFinder::moduleLost,    this,   &QnGlobalModuleFinder::at_moduleFinder_moduleLost);
-    }
+    if (m_moduleFinder)
+        m_moduleFinder->disconnect(this);
 
     m_moduleFinder = moduleFinder;
 
