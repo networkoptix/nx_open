@@ -155,7 +155,7 @@ protected:
     virtual bool acceptAsyncImpl(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler) override;
 
 private:
-    bool m_allowNonSecureConnect;
+    const bool m_allowNonSecureConnect;
     std::unique_ptr<AbstractStreamServerSocket> m_delegateSocket;
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
 

@@ -70,7 +70,7 @@ QnTcpListener::QnTcpListener( const QHostAddress& address, int port, int maxConn
     Q_D(QnTcpListener);
     d->serverAddress = address;
     d->localPort = port;
-    d->serverSocket = 0;
+    d->serverSocket = nullptr;
     d->maxConnections = maxConnections;
     d->useSSL = useSSL;
 }
@@ -89,7 +89,7 @@ bool QnTcpListener::bindToLocalAddress()
 {
     Q_D(QnTcpListener);
 
-    d->serverSocket = SocketFactory::createStreamServerSocket(true/*d->useSSL*/);
+    d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
     if( !d->serverSocket->setReuseAddrFlag( true ) ||
         !d->serverSocket->bind( SocketAddress( d->serverAddress.toString(), d->localPort ) ) ||
         !d->serverSocket->listen() )

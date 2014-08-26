@@ -65,7 +65,7 @@ AbstractStreamServerSocket* SocketFactory::createStreamServerSocket( bool sslReq
 
 #ifdef ENABLE_SSL
     if( sslRequired )
-        serverSocket = new SSLServerSocket(serverSocket, false);
+        serverSocket = new SSLServerSocket(serverSocket, true);
 #endif // ENABLE_SSL
     return serverSocket;
 }
