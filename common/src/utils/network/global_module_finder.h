@@ -13,10 +13,9 @@ class QnModuleFinder;
 class QnGlobalModuleFinder : public QObject, public Singleton<QnGlobalModuleFinder> {
     Q_OBJECT
 public:
-    QnGlobalModuleFinder(QObject *parent = 0);
+    QnGlobalModuleFinder(QnModuleFinder *moduleFinder = 0, QObject *parent = 0);
 
     void setConnection(const ec2::AbstractECConnectionPtr &connection);
-    void setModuleFinder(QnModuleFinder *moduleFinder);
 
     static void fillApiModuleData(const QnModuleInformation &moduleInformation, ec2::ApiModuleData *data);
     static void fillFromApiModuleData(const ec2::ApiModuleData &data, QnModuleInformation *moduleInformation);

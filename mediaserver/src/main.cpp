@@ -1544,9 +1544,8 @@ void QnMain::run()
 #endif
     // ------------------------------------------
 
-    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
+    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder(m_moduleFinder));
     globalModuleFinder->setConnection(ec2Connection);
-    globalModuleFinder->setModuleFinder(m_moduleFinder);
 
     QScopedPointer<QnRouter> router(new QnRouter());
     router->setConnection(ec2Connection);
