@@ -3,7 +3,7 @@
 #include <common/common_module.h>
 #include <media_server/settings.h>
 
-void stopServer(int signal);
+void restartServer();
 
 namespace HttpStatusCode {
     enum Code {
@@ -17,7 +17,7 @@ int QnRestartRestHandler::executeGet(const QString &path, const QnRequestParamLi
     Q_UNUSED(result)
     Q_UNUSED(params)
 
-    stopServer(0);
+    restartServer();
     return HttpStatusCode::ok;
 }
 
