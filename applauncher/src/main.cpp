@@ -259,11 +259,6 @@ int doInstallation(
         return 1;
     }
 
-    if( !installationManager.isValidVersionName(version) )
-    {
-        std::cerr<<"FAILURE. "<<version.toStdString()<<" is not a valid version to install"<<std::endl;
-        return 1; 
-    }
     QString effectiveInstallationPath = installationPath;
     if( effectiveInstallationPath.isEmpty() )
         effectiveInstallationPath = installationManager.installationDirForVersion(version);
