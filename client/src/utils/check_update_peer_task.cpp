@@ -17,7 +17,7 @@
 #include "version.h"
 
 namespace {
-    const QString buildInformationSuffix = lit("update");
+    const QString buildInformationSuffix = lit("update.json");
     const QString updateInformationFileName = (lit("update.json"));
 
     QnSoftwareVersion minimalVersionForUpdatePackage(const QString &fileName) {

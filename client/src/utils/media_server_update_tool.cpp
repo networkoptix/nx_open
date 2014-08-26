@@ -24,7 +24,6 @@
 
 namespace {
 
-const QString QN_UPDATES_URL = lit("http://enk.me/bg/dklychkov/exmaple_update/updates");
 const QString QN_UPDATE_PACKAGE_URL = lit("http://enk.me/bg/dklychkov/exmaple_update/get_update");
 const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
 const QString mutexName = lit("auto_update");
@@ -76,7 +75,7 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     m_clientRequiresInstaller(false),
     m_disableClientUpdates(defaultDisableClientUpdates)
 {
-    m_checkForUpdatesPeerTask->setUpdatesUrl(QN_UPDATES_URL);
+    m_checkForUpdatesPeerTask->setUpdatesUrl(QUrl(qnSettings->updateFeedUrl()));
 
     m_checkForUpdatesPeerTask->moveToThread(m_tasksThread);
     m_downloadUpdatesPeerTask->moveToThread(m_tasksThread);
