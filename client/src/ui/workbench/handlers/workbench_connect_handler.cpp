@@ -323,6 +323,8 @@ void QnWorkbenchConnectHandler::hideMessageBox() {
 
 
 void QnWorkbenchConnectHandler::showLoginDialog() {
+    return;
+
     QnNonModalDialogConstructor<QnLoginDialog> dialogConstructor(m_loginDialog, mainWindow());
     dialogConstructor.resetGeometry();
     //just show dialog   

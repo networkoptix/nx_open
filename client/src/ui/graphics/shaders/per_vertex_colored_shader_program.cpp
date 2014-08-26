@@ -8,21 +8,22 @@ QnColorPerVertexGLShaderProgram::QnColorPerVertexGLShaderProgram(const QGLContex
 bool QnColorPerVertexGLShaderProgram::compile()
 {
     addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
-        uniform mat4 uModelViewProjectionMatrix;
-    attribute vec4 aPosition;
-    attribute vec4 aColor;
-    varying vec4 vColor;
+    uniform lowp mat4 uModelViewProjectionMatrix;
+    uniform lowp vec4 uColor;
+    attribute lowp vec4 aPosition;
+    attribute lowp vec4 aColor;
+    varying lowp vec4 vColor;
+
     void main() {
         gl_Position = uModelViewProjectionMatrix * aPosition;
-        vColor = aColor;
+        vColor = aColor*uColor;
     }
     ));
 
      QByteArray shader(QN_SHADER_SOURCE(
-     uniform vec4 uColor;
      varying vec4 vColor;
      void main() {
-         gl_FragColor = uColor*vColor;
+         gl_FragColor = vColor;
      }
      ));
 

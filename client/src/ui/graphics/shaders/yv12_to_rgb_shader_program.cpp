@@ -104,10 +104,10 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
         0.0,  0.0,    0.0,    opacity);
 
     void main() {
-        float y = texture2D(yTexture, vTexCoord).p;
+        float y = texture(yTexture, vTexCoord).p;
         gl_FragColor = vec4(clamp(pow(max(y+ yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0),
-            texture2D(uTexture, vTexCoord).p,
-            texture2D(vTexture, vTexCoord).p,
+            texture(uTexture, vTexCoord).p,
+            texture(vTexture, vTexCoord).p,
             1.0) * colorTransform;
     }
     ));
@@ -190,11 +190,11 @@ QString QnFisheyeRectilinearProgram::getShaderText()
         pos = pos * xy3 + xy4;
 
         // do gamma correction and color transformation yuv->RGB
-        float y = texture2D(yTexture, pos).p;
+        float y = texture(yTexture, pos).p;
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
             gl_FragColor = vec4(%1,
-            texture2D(uTexture, pos).p,
-            texture2D(vTexture, pos).p,
+            texture(uTexture, pos).p,
+            texture(vTexture, pos).p,
             1.0) * colorTransform;
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -282,11 +282,11 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         pos = pos * xy3 + xy4;
 
         // do gamma correction and color transformation yuv->RGB
-        float y = texture2D(yTexture, pos).p;
+        float y = texture(yTexture, pos).p;
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
             gl_FragColor = vec4(%1,
-            texture2D(uTexture, pos).p,
-            texture2D(vTexture, pos).p,
+            texture(uTexture, pos).p,
+            texture(vTexture, pos).p,
             1.0) * colorTransform;
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -374,11 +374,11 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         pos = pos * xy3 + xy4;
 
         // do gamma correction and color transformation yuv->RGB
-        float y = texture2D(yTexture, pos).p;
+        float y = texture(yTexture, pos).p;
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
             gl_FragColor = vec4(%1,
-            texture2D(uTexture, pos).p,
-            texture2D(vTexture, pos).p,
+            texture(uTexture, pos).p,
+            texture(vTexture, pos).p,
             1.0) * colorTransform;
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -481,7 +481,7 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
         pos = pos * xy3 + xy4;
 
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
-            gl_FragColor = texture2D(rgbaTexture, pos);
+            gl_FragColor = texture(rgbaTexture, pos);
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
@@ -559,7 +559,7 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
         pos = pos * xy3 + xy4;
 
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
-            gl_FragColor = texture2D(rgbaTexture, pos);
+            gl_FragColor = texture(rgbaTexture, pos);
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
@@ -637,7 +637,7 @@ QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
         pos = pos * xy3 + xy4;
 
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
-            gl_FragColor = texture2D(rgbaTexture, pos);
+            gl_FragColor = texture(rgbaTexture, pos);
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
@@ -677,10 +677,10 @@ QnYv12ToRgbaShaderProgram::QnYv12ToRgbaShaderProgram(const QGLContext *context, 
         0.0,  0.0,    0.0,    opacity);
 
     void main() {
-        gl_FragColor = vec4(texture2D(yTexture, vTexCoord).p,
-            texture2D(uTexture, vTexCoord).p-0.5,
-            texture2D(vTexture, vTexCoord).p-0.5,
-            texture2D(aTexture, vTexCoord).p) * colorTransform;
+        gl_FragColor = vec4(texture(yTexture, vTexCoord).p,
+            texture(uTexture, vTexCoord).p-0.5,
+            texture(vTexture, vTexCoord).p-0.5,
+            texture(aTexture, vTexCoord).p) * colorTransform;
     }
     ));
 
