@@ -154,7 +154,7 @@ void QnLoginDialog::updateFocus() {
 
 QUrl QnLoginDialog::currentUrl() const {
     QUrl url;
-    url.setScheme(lit("https"));
+    url.setScheme(lit("http"));
     url.setHost(ui->hostnameLineEdit->text().trimmed());
     url.setPort(ui->portSpinBox->value());
     url.setUserName(ui->loginLineEdit->text().trimmed());
