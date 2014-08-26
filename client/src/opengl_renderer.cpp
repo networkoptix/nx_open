@@ -2,18 +2,26 @@
 
 #include "ui/graphics/opengl/gl_shortcuts.h"
 
+#include <ui/graphics/shaders/base_shader_program.h>
+#include <ui/graphics/shaders/color_shader_program.h>
+#include <ui/graphics/shaders/texture_color_shader_program.h>
+#include <ui/graphics/shaders/per_vertex_colored_shader_program.h>
+#include <ui/graphics/shaders/texture_transition_shader_program.h>
+
 #include <QOpenGLFunctions>
 
-QnOpenGLRenderer::QnOpenGLRenderer(const QGLContext* a_context , QObject *parent):
-    m_colorProgram(new QnColorGLShaderProgram(a_context,parent)),
-    m_textureColorProgram(new QnTextureGLShaderProgram(a_context,parent)),
-    m_colorPerVertexShader(new QnColorPerVertexGLShaderProgram(a_context,parent))
+QnOpenGLRenderer::QnOpenGLRenderer(const QGLContext* a_context, QObject *parent):
+    m_colorProgram(new QnColorGLShaderProgram(a_context, parent)),
+    m_textureColorProgram(new QnTextureGLShaderProgram(a_context, parent)),
+    m_colorPerVertexShader(new QnColorPerVertexGLShaderProgram(a_context, parent)),
+    m_textureTransitionShader(new QnTextureTransitionShaderProgram(a_context, parent))
 {
     QOpenGLFunctions::initializeOpenGLFunctions();
 
     m_colorProgram->compile();
     m_textureColorProgram->compile();
     m_colorPerVertexShader->compile();
+    m_textureTransitionShader->compile();
 
     m_indices_for_render_quads[0] = 0;
     m_indices_for_render_quads[1] = 1;
@@ -114,7 +122,6 @@ void QnOpenGLRenderer::drawColoredQuad(const float* v_array, QnColorGLShaderProg
         glCheckError("render");
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        qDebug() << "drawColoredQuad";
         glEnableVertexAttribArray(VERTEX_POS_INDX);
         glVertexAttribPointer(VERTEX_POS_INDX, VERTEX_POS_SIZE, GL_FLOAT, GL_FALSE, 0, v_array);
         glCheckError("render");
@@ -154,6 +161,10 @@ QnTextureGLShaderProgram* QnOpenGLRenderer::getTextureShader() const {
 
 QnColorGLShaderProgram* QnOpenGLRenderer::getColorShader() const {
     return m_colorProgram.data();
+}
+
+QnTextureTransitionShaderProgram* QnOpenGLRenderer::getTextureTransitionShader() const {
+    return m_textureTransitionShader.data();
 }
 
 QMatrix4x4 QnOpenGLRenderer::getModelViewMatrix() const {

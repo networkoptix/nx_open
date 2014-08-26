@@ -6,15 +6,14 @@
 #include <QtCore/QScopedPointer>
 #include <QtOpenGL/QGLShaderProgram>
 
-
-#include "ui/graphics/shaders/base_shader_program.h"
-#include "ui/graphics/shaders/color_shader_program.h"
-#include "ui/graphics/shaders/texture_color_shader_program.h"
-#include "ui/graphics/shaders/per_vertex_colored_shader_program.h"
-
 class QOpenGLFunctions;
+class QnGLShaderProgram;
+class QnColorGLShaderProgram;
+class QnColorPerVertexGLShaderProgram;
+class QnTextureGLShaderProgram;
+class QnTextureTransitionShaderProgram;
 
-class QnOpenGLRenderer : protected QOpenGLFunctions
+class QnOpenGLRenderer : public QOpenGLFunctions
 {
 
 public:
@@ -41,6 +40,7 @@ public:
     QnColorPerVertexGLShaderProgram* getColorPerVertexShader() const;
     QnTextureGLShaderProgram* getTextureShader() const;
     QnColorGLShaderProgram* getColorShader() const;
+    QnTextureTransitionShaderProgram* getTextureTransitionShader() const;
 
 private:
     Q_DISABLE_COPY(QnOpenGLRenderer);
@@ -56,6 +56,7 @@ private:
     QScopedPointer<QnColorGLShaderProgram>          m_colorProgram;
     QScopedPointer<QnTextureGLShaderProgram>  m_textureColorProgram;
     QScopedPointer<QnColorPerVertexGLShaderProgram> m_colorPerVertexShader;
+    QScopedPointer<QnTextureTransitionShaderProgram> m_textureTransitionShader;
 };
 
 class QnOpenGLRendererManager: public QObject {

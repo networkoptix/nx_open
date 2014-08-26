@@ -21,6 +21,7 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_buffer_stream.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
+#include <ui/graphics/shaders/texture_color_shader_program.h>
 #include <ui/common/geometry.h>
 #include "ui/fisheye/fisheye_ptz_controller.h"
 

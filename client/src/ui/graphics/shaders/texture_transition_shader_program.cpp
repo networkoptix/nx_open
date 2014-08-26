@@ -5,7 +5,6 @@
 QnTextureTransitionShaderProgram::QnTextureTransitionShaderProgram(const QGLContext *context, QObject *parent)
     : QnTextureGLShaderProgram(context,parent)
 {
-    compile();
 }
 
 bool QnTextureTransitionShaderProgram::compile()
