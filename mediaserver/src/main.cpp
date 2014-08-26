@@ -1694,6 +1694,7 @@ void QnMain::run()
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
     exec();
     QnResourceDiscoveryManager::instance()->pleaseStop();
+    QnResource::pleaseStopAsyncTasks();
     stopObjects();
 
     QnResource::stopCommandProc();

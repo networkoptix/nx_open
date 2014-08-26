@@ -924,6 +924,10 @@ void QnResource::stopAsyncTasks()
     m_initAsyncPool.waitForDone();
 }
 
+void QnResource::pleaseStopAsyncTasks()
+{
+    m_appStopping = true;
+}
 
 void QnResource::initAsync(bool optional)
 {

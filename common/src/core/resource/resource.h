@@ -179,6 +179,7 @@ public:
     bool isInitialized() const;
 
     static void stopAsyncTasks();
+    static void pleaseStopAsyncTasks();
 
     /**
         Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
