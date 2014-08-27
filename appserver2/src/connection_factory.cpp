@@ -219,12 +219,14 @@ namespace ec2
        //AbstractECConnection
         registerUpdateFuncHandler<ApiDatabaseDumpData>( restProcessorPool, ApiCommand::resotreDatabase );
 
-        //AbstractECConnection
+        //AbstractTimeManager::getCurrentTimeImpl
         registerGetFuncHandler<std::nullptr_t, ApiTimeData>( restProcessorPool, ApiCommand::getCurrentTime );
+        //AbstractTimeManager::forcePrimaryTimeServer
         registerUpdateFuncHandler<ApiIdData>(
             restProcessorPool,
             ApiCommand::forcePrimaryTimeServer,
             std::bind( &TimeSynchronizationManager::primaryTimeServerChanged, m_timeSynchronizationManager.get(), _1 ) );
+        //TODO #ak register AbstractTimeManager::getPeerTimeInfoList
 
 
         registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>( restProcessorPool, ApiCommand::getFullInfo );

@@ -129,18 +129,24 @@ namespace ec2
         qint64 getMonotonicClock() const;
         //!Resets synchronized time to local system time with local peer priority
         void forgetSynchronizedTime();
+        QnPeerTimeInfoList getPeerTimeInfoList() const;
 
     signals:
         //!Emitted when there is ambiguity while choosing primary time server automatically
         /*!
             User SHOULD call \a TimeSynchronizationManager::forcePrimaryTimeServer to set primary time server manually.
             This signal is emitted periodically until ambiguity in choosing primary time server has been resolved (by user or automatically)
-            \param localSystemTime Local system time (UTC, millis from epoch)
-            \param peersAndTimes pair<peer id, peer local time (UTC, millis from epoch) corresponding to \a localSystemTime>
         */
         void primaryTimeServerSelectionRequired();
         //!Emitted when synchronized time has been changed
         void timeChanged( qint64 syncTime );
+        //!Emitted when peer \a peerId local time has changed
+        /*!
+            \param peerId
+            \param syncTime Synchronized time (UTC, millis from epoch) corresponding to \a peerLocalTime
+            \param peerLocalTime Peer local time (UTC, millis from epoch)
+        */
+        void peerTimeChanged(const QUuid &peerId, qint64 syncTime, qint64 peerLocalTime);
 
     private:
         struct RemotePeerTimeInfo

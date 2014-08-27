@@ -389,6 +389,20 @@ namespace ec2
             m_localTimePriorityKey );
     }
 
+    QnPeerTimeInfoList TimeSynchronizationManager::getPeerTimeInfoList() const
+    {
+        QMutexLocker lk( &m_mutex );
+
+        //list<pair<peerid, time> >
+        QnPeerTimeInfoList peers;
+
+        const qint64 currentClock = m_monotonicClock.elapsed();
+        for( auto it = m_systemTimeByPeer.cbegin(); it != m_systemTimeByPeer.cend(); ++it )
+            peers.push_back( QPair<QUuid, qint64>( it->first, it->second.syncTime + (currentClock - it->second.monotonicClockValue) ) );
+
+        return peers;
+    }
+
     void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
         QMutexLocker* const lock,
         const QUuid& remotePeerID,
@@ -539,7 +553,6 @@ namespace ec2
         if( m_systemTimeByPeer.empty() )
             return;
 
-        const qint64 currentClock = m_monotonicClock.elapsed();
         //map<priority flags, m_systemTimeByPeer iterator>
         std::multimap<unsigned int, std::map<QUuid, TimeSyncInfo>::const_iterator, std::greater<unsigned int>> peersByTimePriorityFlags;
         for( auto it = m_systemTimeByPeer.cbegin(); it != m_systemTimeByPeer.cend(); ++it )
@@ -550,16 +563,6 @@ namespace ec2
             ((peersByTimePriorityFlags.cbegin()->first & peerTimeSynchronizedWithInternetServer) == 0) )    //those servers do not have internet access
 #endif
         {
-            const qint64 currentLocalTime = currentMSecsSinceEpoch();
-
-            //list<pair<peerid, time> >
-            QList<QPair<QUuid, qint64> > peers;
-            for( auto val: peersByTimePriorityFlags )
-            {
-                if( val.first != peersByTimePriorityFlags.cbegin()->first )
-                    break;
-                peers.push_back( QPair<QUuid, qint64>( val.second->first, val.second->second.syncTime + (currentClock - val.second->second.monotonicClockValue) ) );
-            }
             //multiple peers have same priority, user selection is required
             emit primaryTimeServerSelectionRequired();
         }

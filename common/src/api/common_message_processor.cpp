@@ -117,7 +117,8 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
     connect( connection, &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::remotePeerFound );
     connect( connection, &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::remotePeerLost );
-    connect(connection, &ec2::AbstractECConnection::timeServerSelectionRequired, this, &QnCommonMessageProcessor::timeServerSelectionRequired);
+    connect( connection->getTimeManager(), &ec2::AbstractTimeManager::timeServerSelectionRequired,
+        this, &QnCommonMessageProcessor::timeServerSelectionRequired);
 
     connection->startReceivingNotifications();
 }
