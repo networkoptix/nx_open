@@ -80,6 +80,13 @@ public:
     void setFixedSize(qreal width, qreal height);
     void setFixedSize(const QSizeF &size);
 
+    /** If the button size can be changed in runtime. */
+    bool isDynamic() const;
+    /**
+     * Allow or forbid dynamic size changes in runtime.
+     * Must be set before first paint because used in the VAO generation. 
+     */
+    void setDynamic(bool value);
 public slots:
     void toggle() { setChecked(!isChecked()); }
     void click();
@@ -118,6 +125,7 @@ protected:
     StateFlags validPixmapState(StateFlags flags) const;
 
     void initializeVao(const QRectF &rect);
+    void updateVao(const QRectF &rect);
 
     bool skipHoverEvent(QGraphicsSceneHoverEvent *event);
     bool skipMenuEvent(QGraphicsSceneMouseEvent *event);
@@ -134,6 +142,7 @@ private:
     StateFlags m_state;
     bool m_checkable;
     bool m_cached;
+    bool m_dynamic;
     int m_skipNextHoverEvents;
     QPoint m_nextHoverEventPos;
     int m_skipNextMenuEvents;

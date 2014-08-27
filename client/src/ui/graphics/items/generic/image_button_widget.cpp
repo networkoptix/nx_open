@@ -85,6 +85,7 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags 
     m_state(0),
     m_checkable(false),
     m_cached(false),
+    m_dynamic(false),
     m_skipNextHoverEvents(false),
     m_hoverProgress(0.0),
     m_action(NULL),
@@ -247,9 +248,10 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 }
 
 void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
-
     if (!m_initialized) 
         initializeVao(rect);
+    else if (m_dynamic)
+        updateVao(rect);
 
     bool isZero = qFuzzyIsNull(progress);
     bool isOne = qFuzzyCompare(progress, 1.0);
@@ -544,6 +546,17 @@ void QnImageButtonWidget::setCached(bool cached) {
     invalidatePixmapCache();
 }
 
+bool QnImageButtonWidget::isDynamic() const {
+    return m_dynamic;
+}
+
+void QnImageButtonWidget::setDynamic(bool value) {
+    if (m_dynamic == value)
+        return;
+    Q_ASSERT(!m_initialized);   //This parameter should be set once before the first painting
+    m_dynamic = value;
+}
+
 void QnImageButtonWidget::setFixedSize(qreal size) {
     setFixedSize(QSizeF(size, size));
 }
@@ -618,52 +631,21 @@ void QnImageButtonWidget::initializeVao(const QRectF &rect) {
 
     /* Init static VAO */
     {
-    auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getTextureShader();
-    m_verticesStatic.create();
-    m_verticesStatic.bind();
+        auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getTextureShader();
+        m_verticesStatic.create();
+        m_verticesStatic.bind();
 
-    m_positionBufferStatic.create();
-    m_positionBufferStatic.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    m_positionBufferStatic.bind();
-    m_positionBufferStatic.allocate( data.data(), data.size() );
-    shader->enableAttributeArray( VERTEX_POS_INDX );
-    shader->setAttributeBuffer( VERTEX_POS_INDX, GL_FLOAT, 0, VERTEX_POS_SIZE );
-
-    m_textureBufferStatic.create();
-    m_textureBufferStatic.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    m_textureBufferStatic.bind();
-    m_textureBufferStatic.allocate( texData.data(), texData.size());
-    shader->enableAttributeArray( VERTEX_TEXCOORD0_INDX );
-    shader->setAttributeBuffer( VERTEX_TEXCOORD0_INDX, GL_FLOAT, 0, VERTEX_TEXCOORD0_SIZE );
-
-    if (!shader->initialized()) {
-        shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
-        shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
-        shader->markInitialized();
-    };
-
-    m_textureBufferStatic.release();
-    m_positionBufferStatic.release();
-    m_verticesStatic.release();
-    }
-
-    /* Init transition VAO */
-    {
-        auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getTextureTransitionShader();
-    m_verticesTransition.create();
-    m_verticesTransition.bind();
-
-    m_positionBufferTransition.create();
-    m_positionBufferTransition.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    m_positionBufferTransition.bind();
-    m_positionBufferTransition.allocate( data.data(), data.size() );
+        m_positionBufferStatic.create();
+        m_positionBufferStatic.setUsagePattern( m_dynamic ? QOpenGLBuffer::DynamicDraw :QOpenGLBuffer::StaticDraw );
+        m_positionBufferStatic.bind();
+        m_positionBufferStatic.allocate( data.data(), data.size() );
         shader->enableAttributeArray( VERTEX_POS_INDX );
         shader->setAttributeBuffer( VERTEX_POS_INDX, GL_FLOAT, 0, VERTEX_POS_SIZE );
 
-    m_textureBufferTransition.create();
-    m_textureBufferTransition.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    m_textureBufferTransition.bind();
-    m_textureBufferTransition.allocate( texData.data(), texData.size());
+        m_textureBufferStatic.create();
+        m_textureBufferStatic.setUsagePattern( QOpenGLBuffer::StaticDraw );
+        m_textureBufferStatic.bind();
+        m_textureBufferStatic.allocate( texData.data(), texData.size());
         shader->enableAttributeArray( VERTEX_TEXCOORD0_INDX );
         shader->setAttributeBuffer( VERTEX_TEXCOORD0_INDX, GL_FLOAT, 0, VERTEX_TEXCOORD0_SIZE );
 
@@ -671,16 +653,70 @@ void QnImageButtonWidget::initializeVao(const QRectF &rect) {
             shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
             shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
             shader->markInitialized();
-    };    
+        };
 
-    m_textureBufferTransition.release();
-    m_positionBufferTransition.release();
-    m_verticesTransition.release();
+        m_textureBufferStatic.release();
+        m_positionBufferStatic.release();
+        m_verticesStatic.release();
+    }
+
+    /* Init transition VAO */
+    {
+        auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getTextureTransitionShader();
+        m_verticesTransition.create();
+        m_verticesTransition.bind();
+
+        m_positionBufferTransition.create();
+        m_positionBufferTransition.setUsagePattern( m_dynamic ? QOpenGLBuffer::DynamicDraw :QOpenGLBuffer::StaticDraw );
+        m_positionBufferTransition.bind();
+        m_positionBufferTransition.allocate( data.data(), data.size() );
+        shader->enableAttributeArray( VERTEX_POS_INDX );
+        shader->setAttributeBuffer( VERTEX_POS_INDX, GL_FLOAT, 0, VERTEX_POS_SIZE );
+
+        m_textureBufferTransition.create();
+        m_textureBufferTransition.setUsagePattern( QOpenGLBuffer::StaticDraw );
+        m_textureBufferTransition.bind();
+        m_textureBufferTransition.allocate( texData.data(), texData.size());
+        shader->enableAttributeArray( VERTEX_TEXCOORD0_INDX );
+        shader->setAttributeBuffer( VERTEX_TEXCOORD0_INDX, GL_FLOAT, 0, VERTEX_TEXCOORD0_SIZE );
+
+        if (!shader->initialized()) {
+            shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
+            shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
+            shader->markInitialized();
+        };    
+
+        m_textureBufferTransition.release();
+        m_positionBufferTransition.release();
+        m_verticesTransition.release();
     }
 
     m_initialized = true;
 }
 
+void QnImageButtonWidget::updateVao(const QRectF &rect) {
+
+    GLfloat vertices[] = {
+        (GLfloat)rect.left(),   (GLfloat)rect.top(),
+        (GLfloat)rect.right(),  (GLfloat)rect.top(),
+        (GLfloat)rect.right(),  (GLfloat)rect.bottom(),
+        (GLfloat)rect.left(),   (GLfloat)rect.bottom()
+    };
+
+    QByteArray data;
+    QnGlBufferStream<GLfloat> vertexStream(&data);
+
+    for(int i = 0; i < 8; i++)
+        vertexStream << vertices[i];
+
+    m_positionBufferStatic.bind();
+    m_positionBufferStatic.write(0, data.data(), data.size());
+    m_positionBufferStatic.release();
+
+    m_positionBufferTransition.bind();
+    m_positionBufferTransition.write(0, data.data(), data.size());
+    m_positionBufferTransition.release();
+}
 
 // -------------------------------------------------------------------------- //
 // QnRotatingImageButtonWidget
