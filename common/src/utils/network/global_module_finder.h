@@ -33,7 +33,7 @@ signals:
 
 private slots:
     void at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer);
-    void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation);
+    void at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation);
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
     void at_resourcePool_statusChanged(const QnResourcePtr &resource);

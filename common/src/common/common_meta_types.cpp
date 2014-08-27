@@ -197,6 +197,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<Qn::CameraDataType>();
 
+    qRegisterMetaType<QnNetworkAddress>();
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();

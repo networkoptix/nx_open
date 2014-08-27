@@ -4,16 +4,32 @@
 #include "direct_module_finder.h"
 #include "direct_module_finder_helper.h"
 
+namespace {
+    QUrl addressToUrl(const QnNetworkAddress &address) {
+        return QUrl(lit("http://%1:%2").arg(address.host().toString()).arg(address.port()));
+    }
+
+    QUrl trimUrl(const QUrl &url) {
+        QUrl newUrl;
+        newUrl.setScheme(lit("http"));
+        newUrl.setHost(url.host());
+        newUrl.setPort(url.port());
+        return newUrl;
+    }
+}
+
 QnModuleFinder::QnModuleFinder(bool clientOnly) :
     m_multicastModuleFinder(new QnMulticastModuleFinder(clientOnly)),
     m_directModuleFinder(new QnDirectModuleFinder(this)),
     m_directModuleFinderHelper(new QnModuleFinderHelper(this)),
     m_sendingFakeSignals(false)
 {
-    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleFound,      this,       &QnModuleFinder::at_moduleFound);
-    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleLost,       this,       &QnModuleFinder::at_moduleLost);
-    connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleFound,         this,       &QnModuleFinder::at_moduleFound);
-    connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleLost,          this,       &QnModuleFinder::at_moduleLost);
+    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleAddressFound,       this,       &QnModuleFinder::at_moduleAddressFound);
+    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleAddressLost,        this,       &QnModuleFinder::at_moduleAddressLost);
+    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleChanged,            this,       &QnModuleFinder::at_moduleChanged);
+    connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlFound,              this,       &QnModuleFinder::at_moduleUrlFound);
+    connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlLost,               this,       &QnModuleFinder::at_moduleUrlLost);
+    connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleChanged,               this,       &QnModuleFinder::at_moduleChanged);
 }
 
 QnModuleFinder::~QnModuleFinder() {
@@ -47,11 +63,11 @@ QnModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
 
 void QnModuleFinder::makeModulesReappear() {
     m_sendingFakeSignals = true;
-    foreach (const QnModuleInformation &moduleInformation, m_foundModules) {
-        emit moduleLost(moduleInformation);
-        foreach (const QString &address, moduleInformation.remoteAddresses)
-            emit moduleFound(moduleInformation, address);
-    }
+//    foreach (const QnModuleInformation &moduleInformation, m_foundModules) {
+//        emit moduleLost(moduleInformation);
+//        foreach (const QString &address, moduleInformation.remoteAddresses)
+//            emit moduleFound(moduleInformation, address);
+//    }
     m_sendingFakeSignals = false;
 }
 
@@ -73,49 +89,91 @@ void QnModuleFinder::pleaseStop() {
     m_directModuleFinder->pleaseStop();
 }
 
+void QnModuleFinder::at_moduleAddressFound(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address) {
+    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+        return;
+
+    QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
+    if (oldModuleInformation != moduleInformation) {
+        oldModuleInformation = moduleInformation;
+        emit moduleChanged(moduleInformation);
+    }
+
+    QUrl url = addressToUrl(address);
+
+    m_directModuleFinder->addIgnoredAddress(address.host(), address.port());
+
+    if (!m_multicastFoundUrls.contains(moduleInformation.id, url)) {
+        m_multicastFoundUrls.insert(moduleInformation.id, url);
+
+        if (!m_directFoundUrls.contains(moduleInformation.id, url))
+            emit moduleUrlFound(moduleInformation, url);
+    }
+}
+
+void QnModuleFinder::at_moduleAddressLost(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address) {
+    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+        return;
+
+    QUrl url = addressToUrl(address);
+
+    m_directModuleFinder->removeIgnoredAddress(address.host(), address.port());
+    if (m_multicastFoundUrls.remove(moduleInformation.id, url)) {
+        emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
+
+        if (!m_multicastFoundUrls.contains(moduleInformation.id) && !m_directFoundUrls.contains(moduleInformation.id))
+            emit moduleLost(m_foundModules.take(moduleInformation.id));
+    }
+}
+
+void QnModuleFinder::at_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &foundUrl) {
+    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+        return;
+
+    QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
+    if (oldModuleInformation != moduleInformation) {
+        oldModuleInformation = moduleInformation;
+        emit moduleChanged(moduleInformation);
+    }
+
+    QUrl url = trimUrl(foundUrl);
+
+    if (!m_directFoundUrls.contains(moduleInformation.id, url)) {
+        m_directFoundUrls.insert(moduleInformation.id, url);
+
+        if (!m_multicastFoundUrls.contains(moduleInformation.id, url))
+            emit moduleUrlFound(moduleInformation, url);
+    }
+}
+
+void QnModuleFinder::at_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &foundUrl) {
+    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+        return;
+
+    QUrl url = trimUrl(foundUrl);
+
+    if (m_directFoundUrls.remove(moduleInformation.id, url)) {
+        emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
+
+        if (!m_multicastFoundUrls.contains(moduleInformation.id) && !m_directFoundUrls.contains(moduleInformation.id))
+            emit moduleLost(m_foundModules.take(moduleInformation.id));
+    }
+
+}
+
+void QnModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation) {
+    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+        return;
+
+    QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
+    if (!oldModuleInformation.id.isNull() && oldModuleInformation != moduleInformation) {
+        oldModuleInformation = moduleInformation;
+        emit moduleChanged(moduleInformation);
+    }
+}
+
 void QnModuleFinder::stop() {
     m_multicastModuleFinder->stop();
     m_directModuleFinder->stop();
 }
 
-void QnModuleFinder::at_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
-    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
-        return;
-
-    if (sender() == m_multicastModuleFinder)
-        m_directModuleFinder->addIgnoredAddress(QHostAddress(remoteAddress), moduleInformation.port);
-
-    auto it = m_foundModules.find(moduleInformation.id);
-    if (it == m_foundModules.end()) {
-        m_foundModules.insert(moduleInformation.id, moduleInformation);
-        emit moduleFound(moduleInformation, remoteAddress);
-    } else {
-        QnModuleInformation updatedModuleInformation(*it);
-        updatedModuleInformation.remoteAddresses += moduleInformation.remoteAddresses;
-        if (*it == updatedModuleInformation)
-            return;
-
-        *it = updatedModuleInformation;
-        emit moduleFound(moduleInformation, remoteAddress);
-    }
-}
-
-void QnModuleFinder::at_moduleLost(const QnModuleInformation &moduleInformation) {
-    bool stay = true;
-
-    if (sender() == m_multicastModuleFinder) {
-        foreach (const QString &address, moduleInformation.remoteAddresses)
-            m_directModuleFinder->removeIgnoredAddress(QHostAddress(address), moduleInformation.port);
-
-        if (m_directModuleFinder->moduleInformation(moduleInformation.id).id.isNull())
-            stay = false;
-    } else {
-        if (m_multicastModuleFinder->moduleInformation(moduleInformation.id.toString()).id.isNull())
-            stay = false;
-    }
-
-    if (!stay) {
-        m_foundModules.remove(moduleInformation.id);
-        emit moduleLost(moduleInformation);
-    }
-}

@@ -21,10 +21,6 @@ namespace {
     const unsigned defaultKeepAliveMultiply = 3;
     const unsigned errorWaitTimeoutMs = 1000;
 
-    QUrl makeUrl(const QHostAddress &address, quint16 port) {
-        return QUrl(lit("http://%1:%2").arg(address.toString()).arg(port));
-    }
-
 } // anonymous namespace
 
 QnMulticastModuleFinder::QnMulticastModuleFinder(
@@ -86,38 +82,29 @@ void QnMulticastModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
 }
 
-QList<QnModuleInformation> QnMulticastModuleFinder::revealedModules() const {
+QnModuleInformation QnMulticastModuleFinder::moduleInformation(const QUuid &moduleId) const {
     QMutexLocker lk(&m_mutex);
-
-    QList<QnModuleInformation> modules;
-    foreach (const ModuleContext &moduleCOntext, m_knownEnterpriseControllers)
-        modules.append(moduleCOntext.moduleInformation);
-
-    return modules;
+    return m_foundModules[moduleId];
 }
 
-QnModuleInformation QnMulticastModuleFinder::moduleInformation(const QString &moduleId) const {
+QList<QnModuleInformation> QnMulticastModuleFinder::foundModules() const {
     QMutexLocker lk(&m_mutex);
-
-    auto it = m_knownEnterpriseControllers.find(moduleId);
-    if (it == m_knownEnterpriseControllers.end())
-        return QnModuleInformation();
-
-    return it->moduleInformation;
+    return m_foundModules.values();
 }
 
-void QnMulticastModuleFinder::addIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id) {
-    QUrl url = makeUrl(address, port);
-    if (!m_ignoredModules.contains(url, id))
-        m_ignoredModules.insert(url, id);
+void QnMulticastModuleFinder::addIgnoredModule(const QnNetworkAddress &address, const QUuid &id) {
+    QMutexLocker lk(&m_mutex);
+    if (!m_ignoredModules.contains(address, id))
+        m_ignoredModules.insert(address, id);
 }
 
-void QnMulticastModuleFinder::removeIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id) {
-    QUrl url = makeUrl(address, port);
-    m_ignoredModules.remove(url, id);
+void QnMulticastModuleFinder::removeIgnoredModule(const QnNetworkAddress &address, const QUuid &id) {
+    QMutexLocker lk(&m_mutex);
+    m_ignoredModules.remove(address, id);
 }
 
-QMultiHash<QUrl, QUuid> QnMulticastModuleFinder::ignoredModules() const {
+QMultiHash<QnNetworkAddress, QUuid> QnMulticastModuleFinder::ignoredModules() const {
+    QMutexLocker lk(&m_mutex);
     return m_ignoredModules;
 }
 
@@ -151,7 +138,6 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
     }
 
     //TODO #ak RevealResponse class is excess here. Should send/receive QnModuleInformation
-    const QnModuleInformation& selfModuleInformation = qnCommon->moduleInformation();
     RevealResponse response(qnCommon->moduleInformation());
     quint8 *responseBufStart = readBuffer;
     if (!response.serialize(&responseBufStart, readBuffer + READ_BUFFER_SIZE))
@@ -200,39 +186,33 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
         return false;
     }
 
-    if (m_ignoredModules.contains(makeUrl(QHostAddress(remoteAddressStr), remotePort), response.seed))
+    QnNetworkAddress address(QHostAddress(remoteAddressStr), remotePort);
+    QnModuleInformation moduleInformation = response.toModuleInformation();
+    if (moduleInformation.remoteAddresses.isEmpty())
+        moduleInformation.remoteAddresses.insert(address.host().toString());
+
+    if (m_ignoredModules.contains(address, moduleInformation.id))
         return false;
 
     QMutexLocker lk(&m_mutex);
 
-    //received valid response, checking if already know this enterprise controller
-    auto it = m_knownEnterpriseControllers.find(response.seed);
-    bool newModule = (it == m_knownEnterpriseControllers.end());
-
-    if (newModule)
-        it = m_knownEnterpriseControllers.insert(response.seed, ModuleContext(response));
-
-    if (!it->signalledAddresses.contains(remoteAddressStr)) {
-        //new enterprise controller found
-
-        it->signalledAddresses.insert(remoteAddressStr);
-        const QHostAddress &localAddress = QHostAddress(udpSocket->getLocalAddress().address.toString());
-        if (newModule) { // new module has been found
-            NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. New remote server of type %1 found at address (%2:%3) on local interface %4").
-                arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1);
-        } else { // new address of existing module
-            NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. New address (%2:%3) of remote server of type %1 found on local interface %4").
-                arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1);
-        }
-
-        QnModuleInformation moduleInformation = response.toModuleInformation();
-        moduleInformation.remoteAddresses.insert(remoteAddressStr);
-
-        it->moduleInformation = moduleInformation;
-
-        emit moduleFound(moduleInformation, remoteAddressStr, localAddress.toString());
+    QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
+    if (oldModuleInformation != moduleInformation) {
+        oldModuleInformation = moduleInformation;
+        emit moduleChanged(moduleInformation);
     }
-    it->prevResponseReceiveClock = QDateTime::currentMSecsSinceEpoch();
+
+    //received valid response, checking if already know this enterprise controller
+    auto addressIt = m_foundAddresses.find(address);
+
+    if (addressIt == m_foundAddresses.end()) {
+        addressIt = m_foundAddresses.insert(address, ModuleContext(response));
+
+        emit moduleAddressFound(moduleInformation, address);
+        NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. New address (%2:%3) of remote server of type %1 found on local interface %4").
+            arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
+    }
+    addressIt->prevResponseReceiveClock = QDateTime::currentMSecsSinceEpoch();
 
     return true;
 }
@@ -300,14 +280,14 @@ void QnMulticastModuleFinder::run() {
 
         QMutexLocker lk(&m_mutex);
         //checking for expired known hosts...
-        for (auto it = m_knownEnterpriseControllers.begin(); it != m_knownEnterpriseControllers.end(); /* no inc */) {
+        for (auto it = m_foundAddresses.begin(); it != m_foundAddresses.end(); /* no inc */) {
             if(it->prevResponseReceiveClock + m_pingTimeoutMillis*m_keepAliveMultiply > currentClock) {
                 ++it;
                 continue;
             }
 
-            emit moduleLost(it->moduleInformation);
-            it = m_knownEnterpriseControllers.erase(it);
+            emit moduleAddressLost(m_foundModules[it->moduleId], it.key());
+            it = m_foundAddresses.erase(it);
         }
     }
 
@@ -315,6 +295,6 @@ void QnMulticastModuleFinder::run() {
 }
 
 QnMulticastModuleFinder::ModuleContext::ModuleContext(const RevealResponse &response)
-    : prevResponseReceiveClock(0), moduleInformation(response.toModuleInformation())
+    : prevResponseReceiveClock(0), moduleId(response.seed)
 {
 }

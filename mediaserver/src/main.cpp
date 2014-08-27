@@ -1011,23 +1011,23 @@ void QnMain::at_cameraIPConflict(const QHostAddress& host, const QStringList& ma
         qnSyncTime->currentUSecsSinceEpoch());
 }
 
-void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
+void QnMain::at_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
     if (isCompatible(moduleInformation.version, qnCommon->engineVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
-        QString url = QString( lit( "%1://%2:%3" ) ).arg( moduleInformation.sslAllowed ? lit( "https" ) : lit( "http" ) ).arg( remoteAddress ).arg( moduleInformation.port );
-        ec2Connection->addRemotePeer(url, moduleInformation.id);
+        QUrl moduleUrl = url;
+        moduleUrl.setScheme(moduleInformation.sslAllowed ? lit("https") : lit("http"));
+        ec2Connection->addRemotePeer(moduleUrl.toString(), moduleInformation.id);
     } else {
-        at_peerLost(moduleInformation);
+        at_moduleUrlLost(moduleInformation, url);
     }
 }
-void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
+void QnMain::at_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url) {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
-    foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
-        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
-        ec2Connection->deleteRemotePeer(url);
-    }
+    QUrl moduleUrl = url;
+    moduleUrl.setScheme(moduleInformation.sslAllowed ? lit("https") : lit("http"));
+    ec2Connection->deleteRemotePeer(moduleUrl.toString());
 }
 
 bool QnMain::initTcpListener()
@@ -1531,8 +1531,8 @@ void QnMain::run()
             m_moduleFinder->setAllowedPeers(allowedPeers);
     }
 
-    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleFound,     this,   &QnMain::at_peerFound,  Qt::DirectConnection);
-    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleLost,      this,   &QnMain::at_peerLost,   Qt::DirectConnection);
+    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleUrlFound,    this,   &QnMain::at_moduleUrlFound,     Qt::DirectConnection);
+    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleUrlLost,     this,   &QnMain::at_moduleUrlLost,      Qt::DirectConnection);
 
     QUrl url = ec2Connection->connectionInfo().ecUrl;
 #if 1

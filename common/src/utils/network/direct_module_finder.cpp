@@ -50,28 +50,6 @@ void QnDirectModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
 }
 
-void QnDirectModuleFinder::dropModule(const QUuid &id, bool emitSignal) {
-    QnModuleInformation moduleInformation = m_foundModules.take(id);
-    if (moduleInformation.id.isNull())
-        return;
-
-    foreach (const QUrl &url, m_moduleByUrl.keys(id))
-        m_moduleByUrl.remove(url);
-    m_lastPingById.remove(id);
-
-    if (emitSignal)
-        emit moduleLost(moduleInformation);
-}
-
-void QnDirectModuleFinder::dropModule(const QUrl &url, bool emitSignal) {
-    QUuid id = m_moduleByUrl.take(url);
-    if (id.isNull())
-        return;
-
-    if (m_moduleByUrl.keys(id).isEmpty())
-        dropModule(id, emitSignal);
-}
-
 void QnDirectModuleFinder::addUrl(const QUrl &url, const QUuid &id) {
     Q_ASSERT(id != qnCommon->moduleGUID());
 
@@ -83,8 +61,12 @@ void QnDirectModuleFinder::addUrl(const QUrl &url, const QUuid &id) {
 }
 
 void QnDirectModuleFinder::removeUrl(const QUrl &url, const QUuid &id) {
-    if (m_urls.remove(makeRequestUrl(url), id))
-        dropModule(id, false);
+    if (m_urls.remove(makeRequestUrl(url), id)) {
+        if (m_lastPingByUrl.take(url) != 0) {
+            QUuid id = m_moduleByUrl.take(url);
+            emit moduleUrlLost(m_foundModules.value(id), url);
+        }
+    }
 }
 
 void QnDirectModuleFinder::addAddress(const QHostAddress &address, quint16 port, const QUuid &id) {
@@ -99,9 +81,12 @@ void QnDirectModuleFinder::addIgnoredModule(const QUrl &url, const QUuid &id) {
     QUrl requestUrl = makeRequestUrl(url);
     if (!m_ignoredModules.contains(requestUrl, id)) {
         m_ignoredModules.insert(requestUrl, id);
-        enqueRequest(requestUrl);
 
-        dropModule(id, false);
+        if (m_moduleByUrl.value(url) == id) {
+            m_lastPingByUrl.remove(url);
+            m_moduleByUrl.remove(url);
+            emit moduleUrlLost(m_foundModules.value(id), url);
+        }
     }
 }
 
@@ -120,7 +105,10 @@ void QnDirectModuleFinder::removeIgnoredModule(const QHostAddress &address, quin
 void QnDirectModuleFinder::addIgnoredUrl(const QUrl &url) {
     QUrl requestUrl = makeRequestUrl(url);
     m_ignoredUrls.insert(requestUrl);
-    dropModule(requestUrl);
+    if (m_lastPingByUrl.take(url) != 0) {
+        QUuid id = m_moduleByUrl.take(url);
+        emit moduleUrlLost(m_foundModules.value(id), url);
+    }
 }
 
 void QnDirectModuleFinder::removeIgnoredUrl(const QUrl &url) {
@@ -226,41 +214,32 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         if (!expectedIds.isEmpty() && !expectedIds.contains(moduleInformation.id))
             return;
 
-        // we don't want use addresses reported by the server
-        moduleInformation.remoteAddresses.clear();
-        // TODO: #dklychkov deal with dns names
-        moduleInformation.remoteAddresses.insert(url.host());
+        QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
+        qint64 &lastPing = m_lastPingByUrl[url];
+        QUuid &moduleId = m_moduleByUrl[url];
 
-        bool moduleChanged = true;
-
-        auto it = m_foundModules.find(moduleInformation.id);
-        if (it == m_foundModules.end()) {
-            m_foundModules.insert(moduleInformation.id, moduleInformation);
-        } else {
-            moduleInformation.remoteAddresses += it->remoteAddresses;
-            if (*it == moduleInformation)
-                moduleChanged = false;
-            else
-                *it = moduleInformation;
+        if (oldModuleInformation != moduleInformation) {
+            oldModuleInformation = moduleInformation;
+            emit moduleChanged(moduleInformation);
         }
 
-        m_lastPingById[moduleInformation.id] = QDateTime::currentMSecsSinceEpoch();
-        m_moduleByUrl[url] = moduleInformation.id;
-
-        if (!m_urls.contains(url, moduleInformation.id))
-            m_urls.insert(url, moduleInformation.id);
-
-        if (moduleChanged) {
-            url.setPath(QString());
-            emit moduleFound(moduleInformation, url.host(), url);
+        if (!moduleId.isNull() && moduleId != moduleInformation.id) {
+            emit moduleUrlLost(m_foundModules[moduleId], url);
+            lastPing = 0;
         }
+        moduleId = moduleInformation.id;
+
+        if (lastPing == 0)
+            emit moduleUrlFound(moduleInformation, url);
+
+        lastPing = QDateTime::currentMSecsSinceEpoch();
     } else {
-        QUuid id = m_moduleByUrl[url];
+        QUuid id = m_moduleByUrl.value(url);
         if (id.isNull())
             return;
 
-        if (m_lastPingById[id] + maxPingTimeoutMs < QDateTime::currentMSecsSinceEpoch())
-            dropModule(id, true);
+        if (m_lastPingByUrl.value(url) + maxPingTimeoutMs < QDateTime::currentMSecsSinceEpoch())
+            emit moduleUrlLost(m_foundModules.value(id), url);
     }
 }
 

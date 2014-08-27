@@ -6,6 +6,7 @@
 
 #include <utils/common/singleton.h>
 #include <utils/network/module_information.h>
+#include <utils/network/full_network_address.h>
 
 class QnMulticastModuleFinder;
 class QnDirectModuleFinder;
@@ -43,12 +44,17 @@ public slots:
     void stop();
     void pleaseStop();
 signals:
-    void moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress);
+    void moduleChanged(const QnModuleInformation &moduleInformation);
     void moduleLost(const QnModuleInformation &moduleInformation);
+    void moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
 
 private slots:
-    void at_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress);
-    void at_moduleLost(const QnModuleInformation &moduleInformation);
+    void at_moduleAddressFound(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address);
+    void at_moduleAddressLost(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address);
+    void at_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void at_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void at_moduleChanged(const QnModuleInformation &moduleInformation);
 
 private:
     QnMulticastModuleFinder *m_multicastModuleFinder;
@@ -56,6 +62,8 @@ private:
     QnModuleFinderHelper *m_directModuleFinderHelper;
 
     QHash<QUuid, QnModuleInformation> m_foundModules;
+    QMultiHash<QUuid, QUrl> m_multicastFoundUrls;
+    QMultiHash<QUuid, QUrl> m_directFoundUrls;
     QList<QUuid> m_allowedPeers;
     bool m_sendingFakeSignals;
 };

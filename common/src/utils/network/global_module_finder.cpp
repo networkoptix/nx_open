@@ -19,7 +19,7 @@ QnGlobalModuleFinder::QnGlobalModuleFinder(QnModuleFinder *moduleFinder, QObject
         foreach (const QnModuleInformation &moduleInformation, moduleFinder->foundModules())
             addModule(moduleInformation, qnCommon->moduleGUID());
 
-        connect(moduleFinder,               &QnModuleFinder::moduleFound,   this,   &QnGlobalModuleFinder::at_moduleFinder_moduleFound);
+        connect(moduleFinder,               &QnModuleFinder::moduleChanged, this,   &QnGlobalModuleFinder::at_moduleFinder_moduleChanged);
         connect(moduleFinder,               &QnModuleFinder::moduleLost,    this,   &QnGlobalModuleFinder::at_moduleFinder_moduleLost);
     }
 }
@@ -76,7 +76,7 @@ void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInf
         removeModule(moduleInformation, discoverer);
 }
 
-void QnGlobalModuleFinder::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation) {
+void QnGlobalModuleFinder::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
     if (m_moduleFinder->isSendingFakeSignals())
         return;
 

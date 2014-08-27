@@ -23,15 +23,14 @@ void QnWorkbenchServerAddressWatcher::setDirectModuleFinder(QnDirectModuleFinder
     m_directModuleFinder = directModuleFinder;
 
     if (m_directModuleFinder)
-        connect(m_directModuleFinder, &QnDirectModuleFinder::moduleFound, this, &QnWorkbenchServerAddressWatcher::at_directModuleFinder_moduleFound);
+        connect(m_directModuleFinder, &QnDirectModuleFinder::moduleUrlFound, this, &QnWorkbenchServerAddressWatcher::at_directModuleFinder_moduleUrlFound);
 }
 
 void QnWorkbenchServerAddressWatcher::setDirectModuleFinderHelper(QnModuleFinderHelper *directModuleFinderHelper) {
     m_directModuleFinderHelper = directModuleFinderHelper;
 }
 
-void QnWorkbenchServerAddressWatcher::at_directModuleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QUrl &url) {
-    Q_UNUSED(remoteAddress)
+void QnWorkbenchServerAddressWatcher::at_directModuleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
     Q_UNUSED(moduleInformation)
 
     if (m_urls.contains(url))
