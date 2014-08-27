@@ -160,6 +160,8 @@ void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr
         proxyAddr,
         QnAppServerConnectionFactory::url().port() );    //starting with 2.3 proxy embedded to Server
     disconnect(resource.data(), NULL, this, NULL);
+    connect(resource.data(), &QnMediaServerResource::serverIfFound, this, &QnClientMessageProcessor::at_serverIfFound);
+
     resource->determineOptimalNetIF();
 }
 
@@ -230,4 +232,10 @@ void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
 
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     m_incompatibleServerAdder = new QnIncompatibleServerAdder(this);
+}
+
+void QnClientMessageProcessor::at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url, const QString& origApiUrl)
+{
+    if (url != QLatin1String("proxy"))
+        resource->apiConnection()->setProxyAddr(origApiUrl, QString(), 0);
 }
