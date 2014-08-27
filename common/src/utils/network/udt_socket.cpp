@@ -31,10 +31,12 @@
     do { \
     NX_LOG( \
     QString(QLatin1String("Udt function[%1]:%2 has error!\nUdt Error Message:%3.\nSystem Error Message:%4\n" \
-    "File:%5 Line:%6")). \
+    "Udt Error Code:%5\n" \
+    "File:%6 Line:%7")). \
     arg(static_cast<int>(handler)).arg(QLatin1String(func)). \
     arg(QLatin1String(UDT::getlasterror().getErrorMessage())). \
     arg(SystemError::getLastOSErrorText()). \
+    arg(UDT::getlasterror_code()). \
     arg(QLatin1String(__FILE__)).arg(__LINE__),cl_logERROR); } while(0)
 #else
 #define TRACE_(func,handler) (void*)(NULL)
@@ -45,16 +47,14 @@
 // the RELEASE version. This is useful for those ALWAYS RIGHT error, like 
 // create a thread, or close a socket .
 
-#ifndef NDEBUG
+#ifdef VERIFY_UDT_RETURN
 #define VERIFY_(cond,func,handler) \
     do { \
     bool eval = (cond); \
     if(!eval) TRACE_(func,handler); Q_ASSERT(cond);}while(0)
 #else
 #define VERIFY_(cond,func,handler) \
-    do { \
-    bool eval = (cond); \
-    if(!eval) TRACE_(func,handler); }while(0)
+    (void*)(NULL)
 #endif // NDEBUG
 
 #ifndef NDEBUG
@@ -225,9 +225,10 @@ SocketAddress UdtSocketImpl::GetPeerAddress() const {
 }
 
 bool UdtSocketImpl::Close() {
-    Q_ASSERT(!IsClosed());
+    //Q_ASSERT(!IsClosed());
     int ret = UDT::close(handler_);
-    VERIFY_(OK_(ret),"UDT::Close",handler_);
+    //VERIFY_(OK_(ret),"UDT::Close",handler_);
+    handler_ = UDT::INVALID_SOCK;
     state_ = CLOSED;
     return ret == 0;
 }
@@ -990,7 +991,15 @@ int UdtPollSetImpl::Poll( int milliseconds ) {
     int ret = UDT::epoll_wait(
         epoll_fd_,&udt_read_set_,&udt_write_set_,milliseconds,&udt_sys_socket_read_set_,NULL);
     if( ret <0 ) {
-        DEBUG_(TRACE_("UDT::epoll_wait",UDT::INVALID_SOCK));
+        // UDT documentation is wrong, after "carefully" inspect its source code, the epoll_wait
+        // for UDT will _NEVER_ return zero when time out, it will 1) return a positive number 
+        // 2) -1 as time out or other error. The documentation says it will return zero . :(
+        // And the ETIMEOUT's related error string is not even _IMPLEMENTED_ in its getErrorMessage
+        // function !
+        if( UDT::getlasterror_code() == CUDTException::ETIMEOUT ) {
+            return 0; // Translate this error code
+        } 
+        TRACE_("UDT::epoll_wait",UDT::INVALID_SOCK);
         return -1;
     } else {
         if( !udt_sys_socket_read_set_.empty() ) {
