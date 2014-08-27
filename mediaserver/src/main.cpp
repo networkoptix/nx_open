@@ -955,7 +955,9 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
 
 void QnMain::at_localInterfacesChanged()
 {
-    m_mediaServer->setNetAddrList(allLocalAddresses());
+    auto intfList = allLocalAddresses();
+    intfList << m_publicAddress;
+    m_mediaServer->setNetAddrList(intfList);
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     ec2Connection->getMediaServerManager()->save(m_mediaServer, this, &QnMain::at_serverSaved);
 }
@@ -1296,10 +1298,10 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
     
-    QString publicIP = getPublicAddress().toString();
-    if (!publicIP.isEmpty()) {
+    m_publicAddress = getPublicAddress();
+    if (!m_publicAddress.isNull()) {
         QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-        localInfo.data.publicIP = publicIP;
+        localInfo.data.publicIP = m_publicAddress.toString();
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
     connect( ec2Connection.get(), &ec2::AbstractECConnection::timeChanged,
@@ -1369,8 +1371,7 @@ void QnMain::run()
     //m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
 
 
-    QHostAddress publicAddress = getPublicAddress();
-    qnCommon->setModuleUlr(QString("http://%1:%2").arg(publicAddress.toString()).arg(m_universalTcpListener->getPort()));
+    qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
 
     Qn::PanicMode pm;
     while (m_mediaServer.isNull() && !needToStop())
@@ -1395,7 +1396,7 @@ void QnMain::run()
 #endif
         if (!isLocal)
             serverFlags |= Qn::SF_RemoteEC;
-        if (!publicAddress.isNull())
+        if (!m_publicAddress.isNull())
             serverFlags |= Qn::SF_HasPublicIP;
 
         server->setServerFlags((Qn::ServerFlags) serverFlags);
@@ -1410,15 +1411,15 @@ void QnMain::run()
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost), m_universalTcpListener->getPort());
 
         QList<QHostAddress> serverIfaceList = allLocalAddresses();
-        if (!publicAddress.isNull()) {
+        if (!m_publicAddress.isNull()) {
             bool isExists = false;
             for (int i = 0; i < serverIfaceList.size(); ++i)
             {
-                if (serverIfaceList[i] == publicAddress)
+                if (serverIfaceList[i] == m_publicAddress)
                     isExists = true;
             }
             if (!isExists)
-                serverIfaceList << publicAddress;
+                serverIfaceList << m_publicAddress;
         }
 
         bool isModified = false;
