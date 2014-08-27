@@ -72,10 +72,6 @@
   DEFINES += ENABLE_SSL
 }
 
-!contains( DEFINES, DISABLE_BOOKMARKS) {
-  DEFINES += QN_ENABLE_BOOKMARKS
-}
-
 contains(NAME, mediaserver) || contains(NAME, common) {
   IS_VMAX_ENABLED=${vmax}
   contains( IS_VMAX_ENABLED, true ) {
