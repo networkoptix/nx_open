@@ -26,7 +26,8 @@ namespace {
     const int replyDelay = 200;
 
     QDir getUpdatesDir() {
-        QDir dir = QDir::temp();
+        const QString& dataDir = MSSettings::roSettings()->value( "dataDir" ).toString();
+        QDir dir = dataDir.isEmpty() ? QDir::temp() : dataDir;
         if (!dir.exists(updatesDirSuffix))
             dir.mkpath(updatesDirSuffix);
         dir.cd(updatesDirSuffix);
