@@ -26,7 +26,7 @@
 
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent) :
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this)),
     m_popupSystemHealthFilter(qnSettings->popupSystemHealth())
@@ -40,6 +40,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     connect(messageProcessor,   &QnCommonMessageProcessor::connectionOpened,                this,   &QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened);
     connect(messageProcessor,   &QnCommonMessageProcessor::connectionClosed,                this,   &QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed);
     connect(messageProcessor,   &QnCommonMessageProcessor::businessActionReceived,          this,   &QnWorkbenchNotificationsHandler::at_eventManager_actionReceived);
+    connect(messageProcessor,   &QnCommonMessageProcessor::timeServerSelectionRequired,     this,   &QnWorkbenchNotificationsHandler::at_timeServerSelectionRequired);
 
     connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH), &QnPropertyNotifier::valueChanged, this, &QnWorkbenchNotificationsHandler::at_settings_valueChanged);
 
@@ -223,27 +224,15 @@ void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserRe
         setSystemHealthEventVisible( QnSystemHealth::UsersEmailIsEmpty, user.staticCast<QnResource>(), !isValid );
 }
 
-void QnWorkbenchNotificationsHandler::at_primaryTimeServerSelectionRequired( qint64 localSystemTime, const QList<QPair<QUuid, qint64> >& peersAndTimes )
-{
-    setSystemHealthEventVisible(
-        QnSystemHealth::NoPrimaryTimeServer,
-        QnActionParameters().withArgument( Qn::LocalSystemTimeRole, localSystemTime ).withArgument( Qn::PeersToChooseTimeServerFromRole, peersAndTimes ),
-        true );
+void QnWorkbenchNotificationsHandler::at_timeServerSelectionRequired() {
+    setSystemHealthEventVisible(QnSystemHealth::NoPrimaryTimeServer, true);
 }
 
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened() {
     setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, false);
-
-    connect( QnAppServerConnectionFactory::getConnection2().get(), &ec2::AbstractECConnection::primaryTimeServerSelectionRequired,
-             this, &QnWorkbenchNotificationsHandler::at_primaryTimeServerSelectionRequired );
 }
 
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed() {
-
-    if( QnAppServerConnectionFactory::getConnection2().get() )
-        disconnect( QnAppServerConnectionFactory::getConnection2().get(), &ec2::AbstractECConnection::primaryTimeServerSelectionRequired,
-                    this, &QnWorkbenchNotificationsHandler::at_primaryTimeServerSelectionRequired );
-
     clear();
     if (!qnCommon->remoteGUID().isNull())
         setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, QnResourcePtr(), true);

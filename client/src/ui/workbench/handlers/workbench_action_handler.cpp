@@ -2439,8 +2439,10 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
 }
 
-void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered()
-{
+void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered() {
+    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
+    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::TimeServerSelection);
+
     if( !m_timeServerSelectionDialog )
     {
         m_timeServerSelectionDialog = new QnTimeServerSelectionDialog( mainWindow(), context() );

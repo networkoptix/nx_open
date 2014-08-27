@@ -920,7 +920,7 @@ namespace ec2
             \param localSystemTime Local system time (UTC, millis from epoch)
             \param peersAndTimes pair<peer id, peer local time (UTC, millis from epoch) corresponding to \a localSystemTime>
         */
-        void primaryTimeServerSelectionRequired( qint64 localSystemTime, QnPeerTimeInfoList peersAndTimes );
+        void timeServerSelectionRequired();
         //!Emitted when synchronized time has been changed
         void timeChanged( qint64 syncTime );
         void databaseDumped();

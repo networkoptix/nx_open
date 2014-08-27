@@ -42,7 +42,7 @@ namespace ec2
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,  this, &BaseEc2Connection<T>::remotePeerLost, Qt::DirectConnection);
 
         connect (TimeSynchronizationManager::instance(), &TimeSynchronizationManager::primaryTimeServerSelectionRequired,
-                 this, &BaseEc2Connection<T>::primaryTimeServerSelectionRequired,
+                 this, &BaseEc2Connection<T>::timeServerSelectionRequired,
                  Qt::DirectConnection );
         connect (TimeSynchronizationManager::instance(), &TimeSynchronizationManager::timeChanged,
                  this, &BaseEc2Connection<T>::timeChanged,

@@ -41,16 +41,7 @@ namespace ec2
         srand( ::time(NULL) );
 
         //registering ec2 types with Qt meta types system
-        qRegisterMetaType<ErrorCode>( "ErrorCode" );
-        qRegisterMetaType<AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
-        qRegisterMetaType<QnFullResourceData>( "QnFullResourceData" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
         qRegisterMetaType<QnTransactionTransportHeader>( "QnTransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<ApiPeerAliveData>( "ApiPeerAliveData" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<ApiRuntimeData>( "ApiRuntimeData" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<ApiLockData>( "ApiLockData" ); // TODO: #Elric #EC2 register in a proper place!
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()

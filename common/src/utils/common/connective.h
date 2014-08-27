@@ -5,6 +5,8 @@
 #include <boost/type_traits/is_base_of.hpp>
 #endif
 
+#include <memory>
+
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
@@ -36,6 +38,11 @@ namespace Qn {
     template<class T>
     inline const T *connector(const QPointer<T> &object) {
         return connector(object.data());
+    }
+
+    template<class T>
+    inline const T *connector(const std::shared_ptr<T> &object) {
+        return connector(object.get());
     }
 
     template<class T1, class S1, class T2, class S2>

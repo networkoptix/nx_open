@@ -1,6 +1,8 @@
 #include "common_message_processor.h"
 
+#include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_discovery_data.h>
+
 #include <api/app_server_connection.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -18,7 +20,7 @@
 #include "version.h"
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
-    QObject(parent)
+    base_type(parent)
 {
 }
 
@@ -32,89 +34,90 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     if (!connection)
         return;
 
-    connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::at_remotePeerFound );
-    connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::at_remotePeerLost );
+    connect( connection, &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::at_remotePeerFound );
+    connect( connection, &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::at_remotePeerLost );
 
-    connect( connection.get(), &ec2::AbstractECConnection::initNotification,
+    connect( connection, &ec2::AbstractECConnection::initNotification,
         this, &QnCommonMessageProcessor::on_gotInitialNotification );
-    connect( connection.get(), &ec2::AbstractECConnection::runtimeInfoChanged,
+    connect( connection, &ec2::AbstractECConnection::runtimeInfoChanged,
         this, &QnCommonMessageProcessor::runtimeInfoChanged );
 
-    connect( connection->getResourceManager().get(), &ec2::AbstractResourceManager::statusChanged,
+    connect( connection->getResourceManager(), &ec2::AbstractResourceManager::statusChanged,
         this, &QnCommonMessageProcessor::on_resourceStatusChanged );
-    connect( connection->getResourceManager().get(), &ec2::AbstractResourceManager::resourceChanged,
+    connect( connection->getResourceManager(), &ec2::AbstractResourceManager::resourceChanged,
         this, [this](const QnResourcePtr &resource){updateResource(resource);});
-    connect( connection->getResourceManager().get(), &ec2::AbstractResourceManager::resourceParamsChanged,
+    connect( connection->getResourceManager(), &ec2::AbstractResourceManager::resourceParamsChanged,
         this, &QnCommonMessageProcessor::on_resourceParamsChanged );
-    connect( connection->getResourceManager().get(), &ec2::AbstractResourceManager::resourceRemoved,
+    connect( connection->getResourceManager(), &ec2::AbstractResourceManager::resourceRemoved,
         this, &QnCommonMessageProcessor::on_resourceRemoved );
 
-    connect( connection->getMediaServerManager().get(), &ec2::AbstractMediaServerManager::addedOrUpdated,
+    connect( connection->getMediaServerManager(), &ec2::AbstractMediaServerManager::addedOrUpdated,
         this, [this](const QnMediaServerResourcePtr &server){updateResource(server);});
-    connect( connection->getMediaServerManager().get(), &ec2::AbstractMediaServerManager::removed,
+    connect( connection->getMediaServerManager(), &ec2::AbstractMediaServerManager::removed,
         this, &QnCommonMessageProcessor::on_resourceRemoved );
 
-    connect( connection->getCameraManager().get(), &ec2::AbstractCameraManager::cameraAddedOrUpdated,
+    connect( connection->getCameraManager(), &ec2::AbstractCameraManager::cameraAddedOrUpdated,
         this, [this](const QnVirtualCameraResourcePtr &camera){updateResource(camera);});
-    connect( connection->getCameraManager().get(), &ec2::AbstractCameraManager::cameraHistoryChanged,
+    connect( connection->getCameraManager(), &ec2::AbstractCameraManager::cameraHistoryChanged,
         this, &QnCommonMessageProcessor::on_cameraHistoryChanged );
-    connect( connection->getCameraManager().get(), &ec2::AbstractCameraManager::cameraRemoved,
+    connect( connection->getCameraManager(), &ec2::AbstractCameraManager::cameraRemoved,
         this, &QnCommonMessageProcessor::on_resourceRemoved );
-    connect( connection->getCameraManager().get(), &ec2::AbstractCameraManager::cameraBookmarkTagsAdded,
+    connect( connection->getCameraManager(), &ec2::AbstractCameraManager::cameraBookmarkTagsAdded,
         this, &QnCommonMessageProcessor::cameraBookmarkTagsAdded );
-    connect( connection->getCameraManager().get(), &ec2::AbstractCameraManager::cameraBookmarkTagsRemoved,
+    connect( connection->getCameraManager(), &ec2::AbstractCameraManager::cameraBookmarkTagsRemoved,
         this, &QnCommonMessageProcessor::cameraBookmarkTagsRemoved );
 
-    connect( connection->getLicenseManager().get(), &ec2::AbstractLicenseManager::licenseChanged,
+    connect( connection->getLicenseManager(), &ec2::AbstractLicenseManager::licenseChanged,
         this, &QnCommonMessageProcessor::on_licenseChanged );
-    connect( connection->getLicenseManager().get(), &ec2::AbstractLicenseManager::licenseRemoved,
+    connect( connection->getLicenseManager(), &ec2::AbstractLicenseManager::licenseRemoved,
         this, &QnCommonMessageProcessor::on_licenseRemoved );
 
-    connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::addedOrUpdated,
+    connect( connection->getBusinessEventManager(), &ec2::AbstractBusinessEventManager::addedOrUpdated,
         this, &QnCommonMessageProcessor::on_businessEventAddedOrUpdated );
-    connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::removed,
+    connect( connection->getBusinessEventManager(), &ec2::AbstractBusinessEventManager::removed,
         this, &QnCommonMessageProcessor::on_businessEventRemoved );
-    connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::businessActionBroadcasted,
+    connect( connection->getBusinessEventManager(), &ec2::AbstractBusinessEventManager::businessActionBroadcasted,
         this, &QnCommonMessageProcessor::on_businessActionBroadcasted );
-    connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::businessRuleReset,
+    connect( connection->getBusinessEventManager(), &ec2::AbstractBusinessEventManager::businessRuleReset,
         this, &QnCommonMessageProcessor::on_businessRuleReset );
-    connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::gotBroadcastAction,
+    connect( connection->getBusinessEventManager(), &ec2::AbstractBusinessEventManager::gotBroadcastAction,
         this, &QnCommonMessageProcessor::on_broadcastBusinessAction );
-    connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::execBusinessAction,
+    connect( connection->getBusinessEventManager(), &ec2::AbstractBusinessEventManager::execBusinessAction,
         this, &QnCommonMessageProcessor::on_execBusinessAction );
 
-    connect( connection->getUserManager().get(), &ec2::AbstractUserManager::addedOrUpdated,
+    connect( connection->getUserManager(), &ec2::AbstractUserManager::addedOrUpdated,
         this, [this](const QnUserResourcePtr &user){updateResource(user);});
-    connect( connection->getUserManager().get(), &ec2::AbstractUserManager::removed,
+    connect( connection->getUserManager(), &ec2::AbstractUserManager::removed,
         this, &QnCommonMessageProcessor::on_resourceRemoved );
 
-    connect( connection->getLayoutManager().get(), &ec2::AbstractLayoutManager::addedOrUpdated,
+    connect( connection->getLayoutManager(), &ec2::AbstractLayoutManager::addedOrUpdated,
         this, [this](const QnLayoutResourcePtr &layout){updateResource(layout);});
-    connect( connection->getLayoutManager().get(), &ec2::AbstractLayoutManager::removed,
+    connect( connection->getLayoutManager(), &ec2::AbstractLayoutManager::removed,
         this, &QnCommonMessageProcessor::on_resourceRemoved );
 
-    connect( connection->getStoredFileManager().get(), &ec2::AbstractStoredFileManager::added,
+    connect( connection->getStoredFileManager(), &ec2::AbstractStoredFileManager::added,
         this, &QnCommonMessageProcessor::fileAdded );
-    connect( connection->getStoredFileManager().get(), &ec2::AbstractStoredFileManager::updated,
+    connect( connection->getStoredFileManager(), &ec2::AbstractStoredFileManager::updated,
         this, &QnCommonMessageProcessor::fileUpdated );
-    connect( connection->getStoredFileManager().get(), &ec2::AbstractStoredFileManager::removed,
+    connect( connection->getStoredFileManager(), &ec2::AbstractStoredFileManager::removed,
         this, &QnCommonMessageProcessor::fileRemoved );
 
-    connect( connection.get(), &ec2::AbstractECConnection::panicModeChanged,
+    connect( connection, &ec2::AbstractECConnection::panicModeChanged,
         this, &QnCommonMessageProcessor::on_panicModeChanged );
 
-    connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::addedOrUpdated,
+    connect( connection->getVideowallManager(), &ec2::AbstractVideowallManager::addedOrUpdated,
         this, [this](const QnVideoWallResourcePtr &videowall){updateResource(videowall);});
-    connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::removed,
+    connect( connection->getVideowallManager(), &ec2::AbstractVideowallManager::removed,
         this, &QnCommonMessageProcessor::on_resourceRemoved );
-    connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::controlMessage,
+    connect( connection->getVideowallManager(), &ec2::AbstractVideowallManager::controlMessage,
         this, &QnCommonMessageProcessor::videowallControlMessageReceived );
 
-    connect( connection->getDiscoveryManager().get(), &ec2::AbstractDiscoveryManager::discoveryInformationChanged,
+    connect( connection->getDiscoveryManager(), &ec2::AbstractDiscoveryManager::discoveryInformationChanged,
         this, &QnCommonMessageProcessor::on_gotDiscoveryData );
 
-    connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::remotePeerFound );
-    connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::remotePeerLost );
+    connect( connection, &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::remotePeerFound );
+    connect( connection, &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::remotePeerLost );
+    connect(connection, &ec2::AbstractECConnection::timeServerSelectionRequired, this, &QnCommonMessageProcessor::timeServerSelectionRequired);
 
     connection->startReceivingNotifications();
 }
