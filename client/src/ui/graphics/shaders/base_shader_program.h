@@ -2,8 +2,9 @@
 #define QN_BASE_SHADER_PROGRAM_H
 
 #include <QtOpenGL/QGLShaderProgram>
+#include <QtGui/QOpenGLShaderProgram>
 
-class QnGLShaderProgram : public QGLShaderProgram 
+class QnGLShaderProgram : public QOpenGLShaderProgram 
 {
     Q_OBJECT
 public:
@@ -13,7 +14,7 @@ public:
 
     virtual bool link() override
     {
-        bool rez = QGLShaderProgram::link();
+        bool rez = QOpenGLShaderProgram::link();
         if (rez) {
             m_modelViewProjection = uniformLocation("uModelViewProjectionMatrix");
         }
@@ -24,8 +25,8 @@ public:
     bool initialized() const { return m_initialized; };
 
 protected:
-    QnGLShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL)
-        : QGLShaderProgram(context,parent),
+    QnGLShaderProgram(QObject *parent = NULL)
+        : QOpenGLShaderProgram(parent),
           m_initialized(false)
     {
     };

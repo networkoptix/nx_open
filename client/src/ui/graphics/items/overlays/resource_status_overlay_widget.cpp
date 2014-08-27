@@ -172,14 +172,11 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
             rect.center() - QPointF(unit / 10, unit / 10),
             QSizeF(unit / 5, unit / 5)
         );
-        QMatrix4x4 m = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix();
+        QMatrix4x4 m = QnOpenGLRendererManager::instance(QGLContext::currentContext())->pushModelViewMatrix();
 
-        QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix().translate(overlayRect.center().x(), overlayRect.center().y(), 1.0);
-        QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix().scale(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
-//        glPushMatrix();
-//        glTranslatef(overlayRect.center().x(), overlayRect.center().y(), 1.0);
-//        glScalef(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
-        //glRotatef(-1.0 * m_overlayRotation, 0.0, 0.0, 1.0);
+        m.translate(overlayRect.center().x(), overlayRect.center().y(), 1.0);
+        m.scale(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
+        QnOpenGLRendererManager::instance(QGLContext::currentContext())->setModelViewMatrix(m);
         if(m_statusOverlay == Qn::LoadingOverlay) {
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
             qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
@@ -191,8 +188,7 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         } else if(m_statusOverlay == Qn::PausedOverlay) {
             m_pausedPainter->paint(0.5 * painter->opacity());
         }
-        QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix() = m;
-//        glPopMatrix();
+        QnOpenGLRendererManager::instance(QGLContext::currentContext())->popModelViewMatrix();
 
         glDisable(GL_BLEND);
         QnGlNativePainting::end(painter);

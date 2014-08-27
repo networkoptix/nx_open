@@ -51,11 +51,11 @@ namespace {
 } // anonymous namespace
 
 
-QnNv12ToRgbShaderProgram::QnNv12ToRgbShaderProgram(const QGLContext *context, QObject *parent):
-    QnGLShaderProgram(context, parent),
+QnNv12ToRgbShaderProgram::QnNv12ToRgbShaderProgram(QObject *parent):
+    QnGLShaderProgram(parent),
     m_wasLinked(false)
 {
-    addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
+    addShaderFromSourceCode(QOpenGLShader::Vertex, QN_SHADER_SOURCE(
         attribute vec4 aPosition;
         attribute vec2 aTexCoord;
         uniform mat4 uModelViewProjectionMatrix;
@@ -76,9 +76,9 @@ QnNv12ToRgbShaderProgram::QnNv12ToRgbShaderProgram(const QGLContext *context, QO
     void main() {
         vec4 yuv, rgb;
         yuv.rgba = vec4(
-            texture2D(yTexture, vTexCoord.st).r,
-            texture2D(uvTexture, vTexCoord.st).r,
-            texture2D(uvTexture, vTexCoord.st).a,
+            texture(yTexture, vTexCoord.st).r,
+            texture(uvTexture, vTexCoord.st).r,
+            texture(uvTexture, vTexCoord.st).a,
             1.0
             );
 
@@ -91,7 +91,7 @@ QnNv12ToRgbShaderProgram::QnNv12ToRgbShaderProgram(const QGLContext *context, QO
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
 
-    addShaderFromSourceCode(QGLShader::Fragment, shader);
+    addShaderFromSourceCode(QOpenGLShader::Fragment, shader);
     m_wasLinked = link();
 
     m_yTextureLocation = uniformLocation("yTexture");

@@ -273,6 +273,7 @@ void QnTransactionMessageBus::processAliveData(const ApiPeerAliveData &aliveData
     if (aliveData.peer.id == m_localPeer.id)
         return; // ignore himself
 
+#if 0
     if (!aliveData.isAlive && !gotFromPeer.isNull()) 
     {
         bool isPeerActuallyAlive = aliveData.peer.id == qnCommon->moduleGUID();
@@ -291,6 +292,7 @@ void QnTransactionMessageBus::processAliveData(const ApiPeerAliveData &aliveData
             sendTransaction(tran); // resend alive info for that peer
         }
     }
+#endif
 
     // proxy alive info from non-direct connected host
     bool isPeerExist = m_alivePeers.contains(aliveData.peer.id);

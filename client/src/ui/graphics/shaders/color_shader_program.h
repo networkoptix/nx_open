@@ -9,7 +9,7 @@ class QnColorGLShaderProgram : public QnGLShaderProgram
 {
     Q_OBJECT
 public:
-    QnColorGLShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+    QnColorGLShaderProgram(QObject *parent = NULL);
 
     void setColor(const QVector4D& a_vec) {
         setUniformValue(m_color, a_vec);
