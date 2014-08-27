@@ -51,6 +51,9 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     connect(ui->addButton,                      &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_addButton_clicked);
     connect(ui->removeButton,                   &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_removeButton_clicked);
 
+    connect( qnResPool, &QnResourcePool::resourceAdded, this, &QnRoutingManagementWidget::at_resourcePool_resourceAdded );
+    connect( qnResPool, &QnResourcePool::resourceRemoved, this, &QnRoutingManagementWidget::at_resourcePool_resourceRemoved );
+
     m_serverListModel->setResources(qnResPool->getResourcesWithFlag(Qn::server));
 }
 
@@ -262,7 +265,12 @@ void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(co
 
 void QnRoutingManagementWidget::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     if (resource->hasFlags(Qn::server))
-        m_serverListModel->addResource(resource);
+    {
+        QnMediaServerResource* mediaServerRes = dynamic_cast<QnMediaServerResource*>( resource.data() );
+        ec2::AbstractECConnectionPtr ecConnection = QnAppServerConnectionFactory::getConnection2();
+        if( mediaServerRes && ecConnection && (mediaServerRes->getSystemName() == ecConnection->connectionInfo().systemName) )
+            m_serverListModel->addResource(resource);   //adding server belonging to the system we are connected to
+    }
 }
 
 void QnRoutingManagementWidget::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
