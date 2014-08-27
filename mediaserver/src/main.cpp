@@ -1851,6 +1851,7 @@ protected:
         QUuid guid = serverGuid();
         if (guid.isNull())
         {
+            qDebug() << "Can't save guid. Run once as administrator.";
             NX_LOG("Can't save guid. Run once as administrator.", cl_logERROR);
             qApp->quit();
             return;
