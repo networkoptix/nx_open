@@ -510,12 +510,12 @@ void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddr
     server->setApiUrl(QString("http://%1:%2").arg(myAddress).arg(port));
 }
 
-QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection, Qn::PanicMode* pm)
+QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Connection, Qn::PanicMode* pm)
 {
     QnMediaServerResourceList servers;
     *pm = Qn::PM_None;
 
-    while (servers.isEmpty())
+    while (servers.isEmpty() && !needToStop())
     {
         ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->getServersSync( &servers);
         if( rez == ec2::ErrorCode::ok )
@@ -781,17 +781,23 @@ void QnMain::stopObjects()
     qWarning() << "QnMain::stopObjects() called";
 
     QnStorageManager::instance()->cancelRebuildCatalogAsync();
-    qnFileDeletor->pleaseStop();
+    if (qnFileDeletor)
+        qnFileDeletor->pleaseStop();
 
+    if (m_universalTcpListener)
+        m_universalTcpListener->pleaseStop();
+    if (m_moduleFinder)
+        m_moduleFinder->pleaseStop();
 
     if (m_universalTcpListener) {
-        m_universalTcpListener->pleaseStop();
+        m_universalTcpListener->stop();
         delete m_universalTcpListener;
         m_universalTcpListener = 0;
     }
 
     if (m_moduleFinder)
     {
+        m_moduleFinder->stop();
         delete m_moduleFinder;
         m_moduleFinder = 0;
     }
@@ -1379,7 +1385,6 @@ void QnMain::run()
         }
         server->setVersion(qnCommon->engineVersion());
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
-        server->setSystemName(qnCommon->localSystemName());
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
         bool isLocal = appserverHostString.isEmpty() || appserverHostString == "localhost" || QUrl(appserverHostString).scheme() == "file";
@@ -1430,6 +1435,11 @@ void QnMain::run()
         else if (updateStorages(server)) {
             isModified = true;
         }
+
+        if (server->getSystemName() != qnCommon->localSystemName()) {
+            server->setSystemName(qnCommon->localSystemName());
+            isModified = true;
+        }
         
         if (isModified)
             m_mediaServer = registerServer(ec2Connection, server);
@@ -1443,8 +1453,10 @@ void QnMain::run()
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
     MSSettings::roSettings()->remove(ADMIN_PASSWORD);
 
-    if (needToStop())
+    if (needToStop()) {
+        stopObjects();
         return;
+    }
 
     do {
         if (needToStop())
@@ -1498,7 +1510,6 @@ void QnMain::run()
     selfInformation.systemName = qnCommon->localSystemName();
     selfInformation.port = MSSettings::roSettings()->value( nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT ).toInt();
     //selfInformation.remoteAddresses = ;
-    //selfInformation.isLocal = ; //!< true if at least one address from \a remoteHostAddress is a local address
     selfInformation.id = serverGuid();
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
 
@@ -1533,13 +1544,11 @@ void QnMain::run()
 #endif
     // ------------------------------------------
 
-    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
+    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder(m_moduleFinder));
     globalModuleFinder->setConnection(ec2Connection);
-    globalModuleFinder->setModuleFinder(m_moduleFinder);
 
-    QScopedPointer<QnRouter> router(new QnRouter());
+    QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder));
     router->setConnection(ec2Connection);
-    router->setModuleFinder(m_moduleFinder);
 
     QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
 
@@ -1686,6 +1695,7 @@ void QnMain::run()
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
     exec();
     QnResourceDiscoveryManager::instance()->pleaseStop();
+    QnResource::pleaseStopAsyncTasks();
     stopObjects();
 
     QnResource::stopCommandProc();
@@ -1824,8 +1834,10 @@ protected:
         int res = application()->exec();
 #ifdef Q_OS_WIN
         // stop the service unexpectedly to let windows service management system restart it
-        HANDLE hProcess = GetCurrentProcess();
-        TerminateProcess(hProcess, ERROR_SERVICE_SPECIFIC_ERROR);
+        if (restartFlag) {
+            HANDLE hProcess = GetCurrentProcess();
+            TerminateProcess(hProcess, ERROR_SERVICE_SPECIFIC_ERROR);
+        }
 #endif
         return res;
     }
@@ -2035,7 +2047,8 @@ int main(int argc, char* argv[])
     int res = service.exec();
     if (restartFlag && res == 0)
         return 1;
-    return res;
+    return 0;
+    //return res;
 }
 
 static void printVersion()

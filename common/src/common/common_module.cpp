@@ -63,24 +63,20 @@ void QnCommonModule::setEngineVersion(const QnSoftwareVersion &version) {
     m_engineVersion = version;
 }
 
-void QnCommonModule::setModuleInformation(const QnModuleInformation& moduleInformation)
-{
+void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInformation) {
     QMutexLocker lk(&m_mutex);
     m_moduleInformation = moduleInformation;
 }
 
-QnModuleInformation QnCommonModule::moduleInformation() const
-{
+QnModuleInformation QnCommonModule::moduleInformation() const {
     QMutexLocker lk(&m_mutex);
 
     QnModuleInformation moduleInformationCopy(m_moduleInformation);
     //filling dynamic fields
-    if( qnResPool )
-    {
-        const QnMediaServerResource* server = dynamic_cast<const QnMediaServerResource*>(qnResPool->getResourceById(qnCommon->moduleGUID()).data());
-        moduleInformationCopy.isLocal = false;
-        if( server )
-        {
+    if (qnResPool) {
+        moduleInformationCopy.remoteAddresses.clear();
+        const QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+        if (server) {
             foreach(const QHostAddress &address, server->getNetAddrList())
                 moduleInformationCopy.remoteAddresses.insert(address.toString());
         }

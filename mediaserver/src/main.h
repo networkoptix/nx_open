@@ -58,6 +58,7 @@ private:
     void updateAllowCameraCHangesIfNeed();
     bool initTcpListener();
     QHostAddress getPublicAddress();
+    QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection, Qn::PanicMode* pm);
 private:
     int m_argc;
     char** m_argv;

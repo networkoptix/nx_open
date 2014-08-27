@@ -34,6 +34,7 @@
 
 #include <utils/applauncher_utils.h>
 #include <utils/network/module_finder.h>
+#include <utils/network/networkoptixmodulerevealcommon.h>
 
 #include "plugins/resource/avi/avi_resource.h"
 #include "plugins/resource/archive/abstract_archive_stream_reader.h"
@@ -153,7 +154,7 @@ void QnLoginDialog::updateFocus() {
 
 QUrl QnLoginDialog::currentUrl() const {
     QUrl url;
-    url.setScheme(lit("https"));
+    url.setScheme(lit("http"));
     url.setHost(ui->hostnameLineEdit->text().trimmed());
     url.setPort(ui->portSpinBox->value());
     url.setUserName(ui->loginLineEdit->text().trimmed());
@@ -486,7 +487,7 @@ void QnLoginDialog::at_moduleFinder_moduleFound(const QnModuleInformation &modul
     //if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
     //    return;
 
-    QString host = moduleInformation.isLocal ? QLatin1String("127.0.0.1") : remoteAddress;
+    QString host = moduleInformation.isLocal() ? QLatin1String("127.0.0.1") : remoteAddress;
     QUrl url;
     url.setHost(host);
     url.setPort(moduleInformation.port);

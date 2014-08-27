@@ -273,6 +273,25 @@ void QnTransactionMessageBus::processAliveData(const ApiPeerAliveData &aliveData
     if (aliveData.peer.id == m_localPeer.id)
         return; // ignore himself
 
+    if (!aliveData.isAlive && !gotFromPeer.isNull()) 
+    {
+        bool isPeerActuallyAlive = aliveData.peer.id == qnCommon->moduleGUID();
+        auto itr = m_connections.find(aliveData.peer.id);
+        if (itr != m_connections.end()) 
+        {
+            QnTransactionTransportPtr transport = itr.value();
+            if (transport->getState() == QnTransactionTransport::ReadyForStreaming)
+                isPeerActuallyAlive = true;
+        }
+        if (isPeerActuallyAlive) {
+            // ignore incoming offline peer info because we can see that peer online
+            QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo);
+            tran.params = aliveData;
+            tran.params.isAlive = true;
+            sendTransaction(tran); // resend alive info for that peer
+        }
+    }
+
     // proxy alive info from non-direct connected host
     bool isPeerExist = m_alivePeers.contains(aliveData.peer.id);
     if (aliveData.isAlive) 
@@ -353,13 +372,20 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 {
     QMutexLocker lock(&m_mutex);
 
-    AlivePeersMap:: iterator itr = m_alivePeers.find(tran.peerID);
+    AlivePeersMap:: iterator itr = m_alivePeers.find(transportHeader.sender);
     if (itr != m_alivePeers.end())
         itr.value().lastActivity.restart();
 
-    if (m_lastTranSeq[tran.peerID] >= transportHeader.sequence)
-        return; // already processed
-    m_lastTranSeq[tran.peerID] = transportHeader.sequence;
+    if (!transportHeader.sender.isNull()) 
+    {
+        if (m_lastTranSeq[transportHeader.sender] >= transportHeader.sequence) {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+            qDebug() << "Ignore transaction because of transport sequence: " << transportHeader.sequence << "<=" << m_lastTranSeq[transportHeader.sender];
+#endif
+            return; // already processed
+        }
+        m_lastTranSeq[transportHeader.sender] = transportHeader.sequence;
+    }
 
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
@@ -435,14 +461,13 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         return; // all dstPeers already processed
     }
 
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-    qDebug() << "proxy transaction " << ApiCommand::toString(tran.command) << " to " << transportHeader.dstPeers;
-#endif
-
     QnPeerSet processedPeers = transportHeader.processedPeers + connectedPeers(tran.command);
     processedPeers << m_localPeer.id;
     QnTransactionTransportHeader newHeader(processedPeers, transportHeader.dstPeers, transportHeader.sequence);
 
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+    QSet<QUuid> proxyList;
+#endif
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) 
     {
         QnTransactionTransportPtr transport = *itr;
@@ -451,7 +476,15 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 
         //Q_ASSERT(transport->remotePeer().id != tran.peerID);
         transport->sendTransaction(tran, newHeader);
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+        proxyList << transport->remotePeer().id;
+#endif
     }
+
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+    if (!proxyList.isEmpty())
+        qDebug() << "proxy transaction " << ApiCommand::toString(tran.command) << " to " << proxyList;
+#endif
 
     emit transactionProcessed(tran);
 }
@@ -515,7 +548,7 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
     transport->sendTransaction(requestTran, QnPeerSet() << transport->remotePeer().id << m_localPeer.id);
 }
 
-bool QnTransactionMessageBus::doHandshake(QnTransactionTransport* transport)
+bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
 {
     /** Send all data to the client peers on the connect. */
     QnPeerSet processedPeers = QnPeerSet() << transport->remotePeer().id << m_localPeer.id;
@@ -748,13 +781,19 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         Q_ASSERT(found);
         m_lastTranSeq[transport->remotePeer().id] = 0;
         transport->setState(QnTransactionTransport::ReadyForStreaming);
+
+        transport->processExtraData();
+        transport->startListening();
+
         // if sync already done or in progress do not send new request
-        if (doHandshake(transport))
+        if (sendInitialData(transport))
             connectToPeerEstablished(transport->remotePeer());
         else
             transport->close();
         break;
     }
+    case QnTransactionTransport::ReadyForStreaming:
+        break;
     case QnTransactionTransport::Closed:
         for (int i = m_connectingConnections.size() -1; i >= 0; --i) 
         {
@@ -830,6 +869,8 @@ void QnTransactionMessageBus::doPeriodicTasks()
         {
             itr.value().lastActivity.restart();
             foreach(QSharedPointer<QnTransactionTransport> transport, m_connectingConnections) {
+                if (transport->getState() == QnTransactionTransport::Closed)
+                    continue; // it's going to close soon
                 if (transport->remotePeer().id == itr.key()) {
                     qWarning() << "No alive info during timeout. reconnect to peer" << transport->remotePeer().id;
                     transport->setState(QnTransactionTransport::Error);
@@ -837,6 +878,8 @@ void QnTransactionMessageBus::doPeriodicTasks()
             }
 
             foreach(QSharedPointer<QnTransactionTransport> transport, m_connections.values()) {
+                if (transport->getState() == QnTransactionTransport::Closed)
+                    continue; // it's going to close soon
                 if (transport->remotePeer().id == itr.key() && transport->remotePeer().peerType == Qn::PT_Server) {
                     qWarning() << "No alive info during timeout. reconnect to peer" << transport->remotePeer().id;
                     transport->setState(QnTransactionTransport::Error);

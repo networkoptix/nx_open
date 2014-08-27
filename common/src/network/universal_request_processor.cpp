@@ -48,11 +48,6 @@ bool QnUniversalRequestProcessor::authenticate()
     if (d->needAuth)
     {
         QUrl url = getDecodedUrl();
-        QString path = url.path().trimmed();
-        if (path.endsWith(L'/'))
-            path = path.left(path.size()-1);
-        if (path.startsWith(L'/'))
-            path = path.mid(1);
         const bool isProxy = static_cast<QnUniversalTcpListener*>(d->owner)->isProxy(d->request);
         QElapsedTimer t;
         t.restart();

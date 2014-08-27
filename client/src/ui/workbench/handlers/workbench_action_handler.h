@@ -211,6 +211,7 @@ protected slots:
     void at_cameraListAction_triggered();
     void at_webClientAction_triggered();
     void at_systemAdministrationAction_triggered();
+    void at_systemUpdateAction_triggered();
     void at_preferencesGeneralTabAction_triggered();
     void at_preferencesLicensesTabAction_triggered();
     void at_preferencesSmtpTabAction_triggered();

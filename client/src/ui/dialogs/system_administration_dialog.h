@@ -32,6 +32,8 @@ public:
     virtual void accept() override;
     virtual void reject() override;
 
+    void checkForUpdates();
+
 private:
     Q_DISABLE_COPY(QnSystemAdministrationDialog)
 

@@ -7,7 +7,8 @@
 QnModuleFinder::QnModuleFinder(bool clientOnly) :
     m_multicastModuleFinder(new QnMulticastModuleFinder(clientOnly)),
     m_directModuleFinder(new QnDirectModuleFinder(this)),
-    m_directModuleFinderHelper(new QnModuleFinderHelper(this))
+    m_directModuleFinderHelper(new QnModuleFinderHelper(this)),
+    m_sendingFakeSignals(false)
 {
     connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleFound,      this,       &QnModuleFinder::at_moduleFound);
     connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleLost,       this,       &QnModuleFinder::at_moduleLost);
@@ -45,15 +46,21 @@ QnModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
 }
 
 void QnModuleFinder::makeModulesReappear() {
+    m_sendingFakeSignals = true;
     foreach (const QnModuleInformation &moduleInformation, m_foundModules) {
         emit moduleLost(moduleInformation);
         foreach (const QString &address, moduleInformation.remoteAddresses)
             emit moduleFound(moduleInformation, address);
     }
+    m_sendingFakeSignals = false;
 }
 
 void QnModuleFinder::setAllowedPeers(const QList<QUuid> &peerList) {
     m_allowedPeers = peerList;
+}
+
+bool QnModuleFinder::isSendingFakeSignals() const {
+    return m_sendingFakeSignals;
 }
 
 void QnModuleFinder::start() {
@@ -61,8 +68,13 @@ void QnModuleFinder::start() {
     m_directModuleFinder->start();
 }
 
-void QnModuleFinder::stop() {
+void QnModuleFinder::pleaseStop() {
     m_multicastModuleFinder->pleaseStop();
+    m_directModuleFinder->pleaseStop();
+}
+
+void QnModuleFinder::stop() {
+    m_multicastModuleFinder->stop();
     m_directModuleFinder->stop();
 }
 
@@ -76,19 +88,16 @@ void QnModuleFinder::at_moduleFound(const QnModuleInformation &moduleInformation
     auto it = m_foundModules.find(moduleInformation.id);
     if (it == m_foundModules.end()) {
         m_foundModules.insert(moduleInformation.id, moduleInformation);
+        emit moduleFound(moduleInformation, remoteAddress);
     } else {
-        QSet<QString> oldAddresses = it->remoteAddresses;
-        if (oldAddresses.contains(remoteAddress)) {
-            if (moduleInformation.systemName == it->systemName)
-                return;
-        }
+        QnModuleInformation updatedModuleInformation(*it);
+        updatedModuleInformation.remoteAddresses += moduleInformation.remoteAddresses;
+        if (*it == updatedModuleInformation)
+            return;
 
-        // update module information collecting all known addresses
-        *it = moduleInformation;
-        it->remoteAddresses += oldAddresses;
+        *it = updatedModuleInformation;
+        emit moduleFound(moduleInformation, remoteAddress);
     }
-
-    emit moduleFound(moduleInformation, remoteAddress);
 }
 
 void QnModuleFinder::at_moduleLost(const QnModuleInformation &moduleInformation) {

@@ -58,7 +58,6 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
             sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
             sock->setDestAddr(multicastGroupAddress.toString(), multicastGroupPort);
             m_clientSockets.push_back(sock.release());
-            m_localNetworkAdresses.insert(address.toString());
             if (m_serverSocket)
                 m_serverSocket->joinGroup(multicastGroupAddress.toString(), address.toString());
         } catch(const std::exception &e) {
@@ -153,15 +152,7 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
 
     //TODO #ak RevealResponse class is excess here. Should send/receive QnModuleInformation
     const QnModuleInformation& selfModuleInformation = qnCommon->moduleInformation();
-    RevealResponse response;
-    response.version = selfModuleInformation.version.toString();
-    response.type = selfModuleInformation.type;
-    response.customization = selfModuleInformation.customization;
-    response.seed = selfModuleInformation.id.toString();
-    response.name = selfModuleInformation.systemName;
-    response.systemInformation = selfModuleInformation.systemInformation.toString();
-    response.sslAllowed = selfModuleInformation.sslAllowed;
-    response.typeSpecificParameters.insert(lit("port"), QString::number(selfModuleInformation.port));
+    RevealResponse response(qnCommon->moduleInformation());
     quint8 *responseBufStart = readBuffer;
     if (!response.serialize(&responseBufStart, readBuffer + READ_BUFFER_SIZE))
         return false;
@@ -234,10 +225,12 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
                 arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1);
         }
 
-        it->moduleInformation.remoteAddresses.insert(remoteAddressStr);
-        it->moduleInformation.isLocal |= m_localNetworkAdresses.contains(remoteAddressStr);
+        QnModuleInformation moduleInformation = response.toModuleInformation();
+        moduleInformation.remoteAddresses.insert(remoteAddressStr);
 
-        emit moduleFound(it->moduleInformation, remoteAddressStr, localAddress.toString());
+        it->moduleInformation = moduleInformation;
+
+        emit moduleFound(moduleInformation, remoteAddressStr, localAddress.toString());
     }
     it->prevResponseReceiveClock = QDateTime::currentMSecsSinceEpoch();
 
@@ -322,14 +315,6 @@ void QnMulticastModuleFinder::run() {
 }
 
 QnMulticastModuleFinder::ModuleContext::ModuleContext(const RevealResponse &response)
-    : response(response),
-      prevResponseReceiveClock(0)
+    : prevResponseReceiveClock(0), moduleInformation(response.toModuleInformation())
 {
-    moduleInformation.type = response.type;
-    moduleInformation.version = QnSoftwareVersion(response.version);
-    moduleInformation.systemInformation = QnSystemInformation(response.systemInformation);
-    moduleInformation.systemName = response.name;
-    moduleInformation.port = response.typeSpecificParameters.value(lit("port")).toUShort();
-    moduleInformation.id = QUuid(response.seed);
-    moduleInformation.sslAllowed = response.sslAllowed;
 }

@@ -84,30 +84,32 @@ void QnTransactionTransport::setState(State state)
     setStateNoLock(state);
 }
 
+void QnTransactionTransport::processExtraData()
+{
+    processTransactionData(m_extraData);
+    m_extraData.clear();
+}
+
+void QnTransactionTransport::startListening()
+{
+    if (m_socket) {
+        m_socket->setRecvTimeout(SOCKET_TIMEOUT);
+        m_socket->setSendTimeout(SOCKET_TIMEOUT);
+        m_socket->setNonBlockingMode(true);
+        m_chunkHeaderLen = 0;
+        using namespace std::placeholders;
+        m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) );
+    }
+}
+
 void QnTransactionTransport::setStateNoLock(State state)
 {
     if (state == Connected) {
         m_connected = true;
     }
     else if (state == Error) {
-        /*
-        if (m_connected)
-            connectDone(m_remotePeer.id);
-        m_connected = false;
-        */
     }
     else if (state == ReadyForStreaming) {
-        processTransactionData(m_extraData);
-        m_extraData.clear();
-
-        if (m_socket) {
-            m_socket->setRecvTimeout(SOCKET_TIMEOUT);
-            m_socket->setSendTimeout(SOCKET_TIMEOUT);
-            m_socket->setNonBlockingMode(true);
-            m_chunkHeaderLen = 0;
-            using namespace std::placeholders;
-            m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) );
-        }
     }
     if (this->m_state != state) {
         this->m_state = state;

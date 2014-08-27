@@ -24,17 +24,20 @@ QnAuthMethodRestrictionList::QnAuthMethodRestrictionList()
 
 unsigned int QnAuthMethodRestrictionList::getAllowedAuthMethods( const nx_http::Request& request ) const
 {
+    QString path = request.requestLine.url.path();
+    while (path.startsWith(lit("//")))
+        path = path.mid(1);
     unsigned int allowed = AuthMethod::cookie | AuthMethod::http | AuthMethod::videowall;   //by default
     for( std::pair<QString, unsigned int> allowRule: m_allowed )
     {
-        if( !wildcardMatch( allowRule.first, request.requestLine.url.path() ) )
+        if( !wildcardMatch( allowRule.first, path ) )
             continue;
         allowed |= allowRule.second;
     }
 
     for( std::pair<QString, unsigned int> denyRule: m_denied )
     {
-        if( !wildcardMatch( denyRule.first, request.requestLine.url.path() ) )
+        if( !wildcardMatch( denyRule.first, path ) )
             continue;
         allowed &= ~denyRule.second;
     }

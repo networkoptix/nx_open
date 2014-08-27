@@ -7,7 +7,6 @@
 
 #include <api/model/connection_info.h>
 #include <nx_ec/ec_api.h>
-#include <utils/network/foundenterprisecontrollersmodel.h>
 
 #include <client/client_settings.h>
 #include <ui/workbench/workbench_context_aware.h>

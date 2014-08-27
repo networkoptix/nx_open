@@ -36,10 +36,12 @@ public:
     //! \param peerList Discovery peer if and only if peer exist in peerList
     void setAllowedPeers(const QList<QUuid> &peerList);
 
+    bool isSendingFakeSignals() const;
+
 public slots:
     void start();
     void stop();
-
+    void pleaseStop();
 signals:
     void moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress);
     void moduleLost(const QnModuleInformation &moduleInformation);
@@ -55,6 +57,7 @@ private:
 
     QHash<QUuid, QnModuleInformation> m_foundModules;
     QList<QUuid> m_allowedPeers;
+    bool m_sendingFakeSignals;
 };
 
 #endif  //NETWORKOPTIXMODULEFINDER_H

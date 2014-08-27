@@ -135,6 +135,8 @@ public:
     static void connectingCanceled(const QUuid& id, bool isOriginator);
     static void connectDone(const QUuid& id);
 
+    void processExtraData();
+    void startListening();
 private:
     struct DataToSend
     {
