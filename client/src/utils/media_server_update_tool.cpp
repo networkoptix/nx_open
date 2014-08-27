@@ -618,7 +618,7 @@ void QnMediaServerUpdateTool::at_downloadTask_finished(int errorCode) {
         if (resultingFiles.contains(it.value()->url))
             it.value()->fileName = resultingFiles[it.value()->url];
     }
-    if (resultingFiles.contains(m_clientUpdateFile->url))
+    if (!m_clientRequiresInstaller && resultingFiles.contains(m_clientUpdateFile->url))
         m_clientUpdateFile->fileName = resultingFiles[m_clientUpdateFile->url];
 
     installClientUpdate();

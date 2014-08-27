@@ -216,6 +216,7 @@ int QnSessionManager::sendAsyncRequest(int operation, const QUrl& url, const QSt
     reqInfo.object = target;
     reqInfo.slot = slot;
     reqInfo.connectionType = connectionType;
+    qDebug() << "send async request to" << url << data << params;
     emit asyncRequestQueued(operation, reqInfo, url, objectName, headers, params, data);
     return reqInfo.handle;
 }
@@ -332,6 +333,8 @@ void QnSessionManager::at_asyncRequestQueued(int operation, AsyncRequestInfo req
 
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
+
+    qDebug() << "api url" << request.url();
 
     bool skipContentType = false;
     foreach (QnRequestHeader header, headers) {
