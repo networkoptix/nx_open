@@ -1,10 +1,10 @@
 #include "yv12_to_rgb_shader_program.h"
 
-QnAbstractYv12ToRgbShaderProgram::QnAbstractYv12ToRgbShaderProgram(const QGLContext *context, QObject *parent):
-    QnGLShaderProgram(context, parent),
+QnAbstractYv12ToRgbShaderProgram::QnAbstractYv12ToRgbShaderProgram(QObject *parent):
+    QnGLShaderProgram(parent),
     m_wasLinked(false)
 {
-    addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
+    addShaderFromSourceCode(QOpenGLShader::Vertex, QN_SHADER_SOURCE(
         attribute vec4 aPosition;
         attribute vec2 aTexCoord;
         uniform mat4 uModelViewProjectionMatrix;
@@ -33,8 +33,8 @@ bool QnAbstractYv12ToRgbShaderProgram::link()
 
 // ============================= QnYv12ToRgbShaderProgram ==================
 
-QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QObject *parent): 
-    QnAbstractYv12ToRgbShaderProgram(context, parent) 
+QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(QObject *parent): 
+    QnAbstractYv12ToRgbShaderProgram(parent) 
 {
 
     QByteArray shader(QN_SHADER_SOURCE(
@@ -64,7 +64,7 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QO
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
 
-    addShaderFromSourceCode(QGLShader::Fragment, shader);
+    addShaderFromSourceCode(QOpenGLShader::Fragment, shader);
     link();
 }
 
@@ -81,8 +81,8 @@ bool QnYv12ToRgbWithGammaShaderProgram::link()
     return rez;
 }
 
-QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLContext *context, QObject *parent, bool final): 
-    QnAbstractYv12ToRgbShaderProgram(context, parent),
+QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(QObject *parent, bool final): 
+    QnAbstractYv12ToRgbShaderProgram(parent),
     m_gammaStr(lit("y"))
 {
     if (!final)
@@ -104,10 +104,10 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
         0.0,  0.0,    0.0,    opacity);
 
     void main() {
-        float y = texture2D(yTexture, vTexCoord).p;
+        float y = texture(yTexture, vTexCoord).p;
         gl_FragColor = vec4(clamp(pow(max(y+ yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0),
-            texture2D(uTexture, vTexCoord).p,
-            texture2D(vTexture, vTexCoord).p,
+            texture(uTexture, vTexCoord).p,
+            texture(vTexture, vTexCoord).p,
             1.0) * colorTransform;
     }
     ));
@@ -115,7 +115,7 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
 #ifdef QT_OPENGL_ES_2
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
-    addShaderFromSourceCode(QGLShader::Fragment, shader);
+    addShaderFromSourceCode(QOpenGLShader::Fragment, shader);
     link();
 }
 
@@ -124,8 +124,8 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
 
 // ---------------------------- QnFisheyeRectilinearProgram ------------------------------------
 
-QnFisheyeRectilinearProgram::QnFisheyeRectilinearProgram(const QGLContext *context, QObject *parent, const QString& gammaStr):
-    QnFisheyeShaderProgram(context, parent)
+QnFisheyeRectilinearProgram::QnFisheyeRectilinearProgram(QObject *parent, const QString& gammaStr):
+    QnFisheyeShaderProgram(parent)
 {
     setGammaStr(gammaStr);
 }
@@ -190,11 +190,11 @@ QString QnFisheyeRectilinearProgram::getShaderText()
         pos = pos * xy3 + xy4;
 
         // do gamma correction and color transformation yuv->RGB
-        float y = texture2D(yTexture, pos).p;
+        float y = texture(yTexture, pos).p;
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
             gl_FragColor = vec4(%1,
-            texture2D(uTexture, pos).p,
-            texture2D(vTexture, pos).p,
+            texture(uTexture, pos).p,
+            texture(vTexture, pos).p,
             1.0) * colorTransform;
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -210,8 +210,8 @@ QString QnFisheyeRectilinearProgram::getShaderText()
 
 // ------------------------- QnFisheyeEquirectangularHProgram -----------------------------
 
-QnFisheyeEquirectangularHProgram::QnFisheyeEquirectangularHProgram(const QGLContext *context, QObject *parent, const QString& gammaStr)
-    :QnFisheyeShaderProgram(context, parent)
+QnFisheyeEquirectangularHProgram::QnFisheyeEquirectangularHProgram(QObject *parent, const QString& gammaStr)
+    :QnFisheyeShaderProgram(parent)
 {
     setGammaStr(gammaStr);
 }
@@ -282,11 +282,11 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         pos = pos * xy3 + xy4;
 
         // do gamma correction and color transformation yuv->RGB
-        float y = texture2D(yTexture, pos).p;
+        float y = texture(yTexture, pos).p;
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
             gl_FragColor = vec4(%1,
-            texture2D(uTexture, pos).p,
-            texture2D(vTexture, pos).p,
+            texture(uTexture, pos).p,
+            texture(vTexture, pos).p,
             1.0) * colorTransform;
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -302,8 +302,8 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
 
 // ----------------------------------------- QnFisheyeEquirectangularVProgram ---------------------------------------
 
-QnFisheyeEquirectangularVProgram::QnFisheyeEquirectangularVProgram(const QGLContext *context, QObject *parent, const QString& gammaStr)
-    :QnFisheyeShaderProgram(context, parent)
+QnFisheyeEquirectangularVProgram::QnFisheyeEquirectangularVProgram(QObject *parent, const QString& gammaStr)
+    :QnFisheyeShaderProgram(parent)
 {
     setGammaStr(gammaStr);
 }
@@ -374,11 +374,11 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         pos = pos * xy3 + xy4;
 
         // do gamma correction and color transformation yuv->RGB
-        float y = texture2D(yTexture, pos).p;
+        float y = texture(yTexture, pos).p;
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
             gl_FragColor = vec4(%1,
-            texture2D(uTexture, pos).p,
-            texture2D(vTexture, pos).p,
+            texture(uTexture, pos).p,
+            texture(vTexture, pos).p,
             1.0) * colorTransform;
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -394,10 +394,11 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
 
 // ------------------------- QnAbstractRGBAShaderProgram ------------------------------
 
-QnAbstractRGBAShaderProgram::QnAbstractRGBAShaderProgram(const QGLContext *context, QObject *parent, bool final):
-    QnGLShaderProgram(context, parent) 
+QnAbstractRGBAShaderProgram::QnAbstractRGBAShaderProgram(QObject *parent, bool final):
+    QnGLShaderProgram(parent) 
 {
-    addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
+    Q_UNUSED(final)
+    addShaderFromSourceCode(QOpenGLShader::Vertex, QN_SHADER_SOURCE(
     attribute vec4 aPosition;
     attribute vec2 aTexCoord;
     uniform mat4 uModelViewProjectionMatrix;
@@ -425,8 +426,8 @@ bool QnAbstractRGBAShaderProgram::link()
 
 // ---------------------------- QnFisheyeRGBRectilinearProgram ------------------------------------
 
-QnFisheyeRGBRectilinearProgram::QnFisheyeRGBRectilinearProgram(const QGLContext *context, QObject *parent):
-    QnFisheyeShaderProgram(context, parent)
+QnFisheyeRGBRectilinearProgram::QnFisheyeRGBRectilinearProgram(QObject *parent):
+    QnFisheyeShaderProgram(parent)
 {
 
 }
@@ -481,7 +482,7 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
         pos = pos * xy3 + xy4;
 
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
-            gl_FragColor = texture2D(rgbaTexture, pos);
+            gl_FragColor = texture(rgbaTexture, pos);
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
@@ -496,8 +497,8 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
 
 // ------------------------- QnFisheyeRGBEquirectangularHProgram -----------------------------
 
-QnFisheyeRGBEquirectangularHProgram::QnFisheyeRGBEquirectangularHProgram(const QGLContext *context, QObject *parent)
-    :QnFisheyeShaderProgram(context, parent)
+QnFisheyeRGBEquirectangularHProgram::QnFisheyeRGBEquirectangularHProgram(QObject *parent)
+    :QnFisheyeShaderProgram(parent)
 {
 
 }
@@ -559,7 +560,7 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
         pos = pos * xy3 + xy4;
 
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
-            gl_FragColor = texture2D(rgbaTexture, pos);
+            gl_FragColor = texture(rgbaTexture, pos);
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
@@ -574,8 +575,8 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
 
 // ----------------------------------------- QnFisheyeRGBEquirectangularVProgram ---------------------------------------
 
-QnFisheyeRGBEquirectangularVProgram::QnFisheyeRGBEquirectangularVProgram(const QGLContext *context, QObject *parent)
-    :QnFisheyeShaderProgram(context, parent)
+QnFisheyeRGBEquirectangularVProgram::QnFisheyeRGBEquirectangularVProgram(QObject *parent)
+    :QnFisheyeShaderProgram(parent)
 {
 
 }
@@ -637,7 +638,7 @@ QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
         pos = pos * xy3 + xy4;
 
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
-            gl_FragColor = texture2D(rgbaTexture, pos);
+            gl_FragColor = texture(rgbaTexture, pos);
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
@@ -660,8 +661,8 @@ bool QnYv12ToRgbaShaderProgram::link()
     return rez;
 }
 
-QnYv12ToRgbaShaderProgram::QnYv12ToRgbaShaderProgram(const QGLContext *context, QObject *parent):
-    QnAbstractYv12ToRgbShaderProgram(context, parent) 
+QnYv12ToRgbaShaderProgram::QnYv12ToRgbaShaderProgram(QObject *parent):
+    QnAbstractYv12ToRgbShaderProgram(parent) 
 {
     QByteArray shader(QN_SHADER_SOURCE(
     varying vec2 vTexCoord;
@@ -677,10 +678,10 @@ QnYv12ToRgbaShaderProgram::QnYv12ToRgbaShaderProgram(const QGLContext *context, 
         0.0,  0.0,    0.0,    opacity);
 
     void main() {
-        gl_FragColor = vec4(texture2D(yTexture, vTexCoord).p,
-            texture2D(uTexture, vTexCoord).p-0.5,
-            texture2D(vTexture, vTexCoord).p-0.5,
-            texture2D(aTexture, vTexCoord).p) * colorTransform;
+        gl_FragColor = vec4(texture(yTexture, vTexCoord).p,
+            texture(uTexture, vTexCoord).p-0.5,
+            texture(vTexture, vTexCoord).p-0.5,
+            texture(aTexture, vTexCoord).p) * colorTransform;
     }
     ));
 
@@ -688,7 +689,7 @@ QnYv12ToRgbaShaderProgram::QnYv12ToRgbaShaderProgram(const QGLContext *context, 
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
 
-    addShaderFromSourceCode(QGLShader::Fragment, shader);
+    addShaderFromSourceCode(QOpenGLShader::Fragment, shader);
 
     link();
 }

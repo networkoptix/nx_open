@@ -179,6 +179,8 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
                 }
             }
 
+            if (resources.isEmpty() && required > 0)
+                return Qn::InvisibleAction;
             if((accessController()->permissions(resources) & required) != required)
                 return Qn::InvisibleAction;
             if((accessController()->permissions(resources) & forbidden) != 0)

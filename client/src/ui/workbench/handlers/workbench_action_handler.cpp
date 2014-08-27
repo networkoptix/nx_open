@@ -1818,14 +1818,14 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     if (resources.size() == onlineAutoDiscoveredCameras.size()) 
         question = tr("These %n cameras are auto-discovered.\n"\
             "They may be auto-discovered again after removing.\n"\
-            "Are you sure you want to delete them",
+            "Are you sure you want to delete them?",
             "", resources.size());
     else 
     /* Second version - some cameras are auto-discovered, some not. */
     if (!onlineAutoDiscoveredCameras.isEmpty())
         question = tr("%n of these %1 cameras are auto-discovered.\n"\
             "They may be auto-discovered again after removing.\n"\
-            "Are you sure you want to delete them",
+            "Are you sure you want to delete them?",
             "", onlineAutoDiscoveredCameras.size()).arg(resources.size());
      else
     /* Third version - no auto-discovered cameras in the list. */
