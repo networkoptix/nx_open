@@ -176,8 +176,11 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
           }
           break;
       case Qt::DecorationRole:
-          if (column == Columns::NameColumn)
+          if (column == Columns::NameColumn){
+              if (QnMediaServerResource::isEdgeServer(server))
+                  return qnResIconCache->icon(QnResourceIconCache::Camera);
               return qnResIconCache->icon(QnResourceIconCache::Server);
+          }
           break;
       case Qt::CheckStateRole:
           if (column == Columns::CheckboxColumn)
