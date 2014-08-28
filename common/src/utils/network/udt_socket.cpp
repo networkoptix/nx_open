@@ -387,7 +387,6 @@ AbstractSocket::SOCKET_HANDLE UdtSocketImpl::handle() const {
 
 
 int UdtSocketImpl::Recv( void* buffer, unsigned int bufferLen, int flags ) {
-    Q_ASSERT(!IsClosed());
     int sz = UDT::recv(handler_,reinterpret_cast<char*>(buffer),bufferLen,flags);
     if(sz <0) {
         // UDT doesn't translate the EOF into a recv with zero return, but instead
