@@ -25,7 +25,7 @@
 #include "transaction/transaction_message_bus.h"
 #include "http/ec2_transaction_tcp_listener.h"
 #include "version.h"
-
+#include "mutex/distributed_mutex_manager.h"
 
 namespace ec2
 {
@@ -41,22 +41,17 @@ namespace ec2
         srand( ::time(NULL) );
 
         //registering ec2 types with Qt meta types system
-        qRegisterMetaType<ErrorCode>( "ErrorCode" );
-        qRegisterMetaType<AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
-        qRegisterMetaType<QnFullResourceData>( "QnFullResourceData" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
         qRegisterMetaType<QnTransactionTransportHeader>( "QnTransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<ApiPeerAliveData>( "ApiPeerAliveData" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<ApiRuntimeData>( "ApiRuntimeData" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<ApiLockData>( "ApiLockData" ); // TODO: #Elric #EC2 register in a proper place!
+
+        ec2::QnDistributedMutexManager::initStaticInstance( new ec2::QnDistributedMutexManager() );
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
     {
         pleaseStop();
         join();
+
+        ec2::QnDistributedMutexManager::initStaticInstance(0);
     }
 
     void Ec2DirectConnectionFactory::pleaseStop()

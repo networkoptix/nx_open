@@ -27,7 +27,7 @@ class QnFisheyePtzController;
 class QnGlRendererShaders: public QObject {
     Q_OBJECT;
 public:
-    QnGlRendererShaders(const QGLContext *context, QObject *parent = NULL);
+    QnGlRendererShaders(QObject *parent = NULL);
     virtual ~QnGlRendererShaders();
 
     QnYv12ToRgbShaderProgram *yv12ToRgb;

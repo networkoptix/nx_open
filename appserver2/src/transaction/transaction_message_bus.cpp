@@ -273,6 +273,7 @@ void QnTransactionMessageBus::processAliveData(const ApiPeerAliveData &aliveData
     if (aliveData.peer.id == m_localPeer.id)
         return; // ignore himself
 
+#if 0
     if (!aliveData.isAlive && !gotFromPeer.isNull()) 
     {
         bool isPeerActuallyAlive = aliveData.peer.id == qnCommon->moduleGUID();
@@ -291,6 +292,7 @@ void QnTransactionMessageBus::processAliveData(const ApiPeerAliveData &aliveData
             sendTransaction(tran); // resend alive info for that peer
         }
     }
+#endif
 
     // proxy alive info from non-direct connected host
     bool isPeerExist = m_alivePeers.contains(aliveData.peer.id);
@@ -372,13 +374,20 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 {
     QMutexLocker lock(&m_mutex);
 
-    AlivePeersMap:: iterator itr = m_alivePeers.find(tran.peerID);
+    AlivePeersMap:: iterator itr = m_alivePeers.find(transportHeader.sender);
     if (itr != m_alivePeers.end())
         itr.value().lastActivity.restart();
 
-    if (m_lastTranSeq[tran.peerID] >= transportHeader.sequence)
-        return; // already processed
-    m_lastTranSeq[tran.peerID] = transportHeader.sequence;
+    if (!transportHeader.sender.isNull()) 
+    {
+        if (m_lastTranSeq[transportHeader.sender] >= transportHeader.sequence) {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+            qDebug() << "Ignore transaction because of transport sequence: " << transportHeader.sequence << "<=" << m_lastTranSeq[transportHeader.sender];
+#endif
+            return; // already processed
+        }
+        m_lastTranSeq[transportHeader.sender] = transportHeader.sequence;
+    }
 
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
@@ -454,14 +463,13 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         return; // all dstPeers already processed
     }
 
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-    qDebug() << "proxy transaction " << ApiCommand::toString(tran.command) << " to " << transportHeader.dstPeers;
-#endif
-
     QnPeerSet processedPeers = transportHeader.processedPeers + connectedPeers(tran.command);
     processedPeers << m_localPeer.id;
     QnTransactionTransportHeader newHeader(processedPeers, transportHeader.dstPeers, transportHeader.sequence);
 
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+    QSet<QUuid> proxyList;
+#endif
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) 
     {
         QnTransactionTransportPtr transport = *itr;
@@ -470,7 +478,15 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 
         //Q_ASSERT(transport->remotePeer().id != tran.peerID);
         transport->sendTransaction(tran, newHeader);
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+        proxyList << transport->remotePeer().id;
+#endif
     }
+
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+    if (!proxyList.isEmpty())
+        qDebug() << "proxy transaction " << ApiCommand::toString(tran.command) << " to " << proxyList;
+#endif
 
     emit transactionProcessed(tran);
 }

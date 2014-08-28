@@ -179,9 +179,11 @@ class ssl_async_handshake_op;
 
 class ssl_async_op {
 public:
+    virtual void init() = 0;
     virtual int perform( int* ssl_err ) = 0;
     virtual void notify( SystemError::ErrorCode ) =0;
     virtual void error( SystemError::ErrorCode ec ) = 0;
+    virtual void end_of_stream( SystemError::ErrorCode ) = 0;
     ssl_async_op( SSL* ssl ) : ssl_(ssl) {}
     SSL* ssl() const {
         return ssl_;
@@ -215,7 +217,7 @@ private:
 static const std::size_t bio_input_buffer_reserve = 1024;
 static const std::size_t bio_output_buffer_reserve= 2048;
 static const std::size_t async_buffer_default_size= 1024;
-static const int ssl_internal_error = 100;
+static const SystemError::ErrorCode ssl_internal_error = 100;
 
 class async_ssl {
 public:
@@ -310,21 +312,18 @@ private:
     // the original blocking version does not call SSL_shutdown before calling the 
     // socket->close. But I will detect it as an error . Anyway, I will handle the eof
 
-    bool check_shutdown( int bytes , int ssl_error ) {
-        if( bytes == 0 ) {
-            // For normal clean shutdown comes from SSL_shutdown
-            if( SSL_get_shutdown(ssl_) == SSL_RECEIVED_SHUTDOWN || 
-                ssl_error == SSL_ERROR_ZERO_RETURN ) {
-                    // This should be the normal shutdown which means the
-                    // peer at least call SSL_shutdown once
-                    ssl_shutdown_ = true;
-                    return true;
-            } else if( ssl_error == SSL_ERROR_SYSCALL ) {
-                // Brute shutdown for SSL connection
-                if( ERR_get_error() == 0 ) {
-                    ssl_shutdown_ = true;
-                    return true;
-                }
+    bool check_shutdown( int ssl_error ) {
+        if( SSL_get_shutdown(ssl_) == SSL_RECEIVED_SHUTDOWN || 
+            ssl_error == SSL_ERROR_ZERO_RETURN ) {
+                // This should be the normal shutdown which means the
+                // peer at least call SSL_shutdown once
+                ssl_shutdown_ = true;
+                return true;
+        } else if( ssl_error == SSL_ERROR_SYSCALL ) {
+            // Brute shutdown for SSL connection
+            if( ERR_get_error() == 0 ) {
+                ssl_shutdown_ = true;
+                return true;
             }
         }
         return eof_;
@@ -359,15 +358,15 @@ private:
         // perform SSL operation and get the result
         int bytes = op->perform( &ssl_error );
         // checking the SSL stream is shutdown or not 
-        if( check_shutdown(bytes,ssl_error) ) {
-            ssl_finalize(op,buffer);
+        if( bytes == 0 && check_shutdown(ssl_error) ) {
+            ssl_finalize(op,buffer,true);
             return;
         }
         // check SSL_error and then perform the task
         switch( ssl_error ) {
         case SSL_ERROR_NONE: 
             // We are done, so we finalize the operation here
-            ssl_finalize(op,buffer);
+            ssl_finalize(op,buffer,false);
             return;
         case SSL_ERROR_WANT_READ:
             // Feed the ssl with async operation and push the op to the completion
@@ -388,7 +387,7 @@ private:
             handle_error( ssl_error );
             // Call user's callback function and passing a fake ssl_internal_error
             // number to let user get notification that we are in trouble here !
-            op->error( static_cast<SystemError::ErrorCode>(ssl_internal_error) );
+            op->error( ssl_internal_error );
             return;
         }
     }
@@ -471,11 +470,11 @@ private:
         });
     }
 
-    void ssl_finalize( ssl_async_op* op, buffer_t buffer ) {
+    void ssl_finalize( ssl_async_op* op, buffer_t buffer , bool eof ) {
         if( !bio_out_buffer_.isEmpty() ) {
             do_send( 
             buffer,
-            [this,op](SystemError::ErrorCode ec,std::size_t ) {
+            [this,op,eof](SystemError::ErrorCode ec,std::size_t ) {
                 // Until now , we should have been sent the data out and
                 // what we need to do is just calling the callback function
                 if( ec ) {
@@ -487,10 +486,19 @@ private:
                 // Invoke the callback, the final output has been stored inside
                 // of user data instead of buffer_t object. This is transient data
                 // object and we should not own this buffer object in any sense
-                op->notify(SystemError::noError);
+                if(eof) {
+                    op->end_of_stream(SystemError::noError);
+                } else {
+                    op->notify(SystemError::noError);
+                }
             });
-        } else 
-           op->notify(SystemError::noError);
+        } else {
+            if(eof) {
+                op->end_of_stream(SystemError::noError);
+            } else {
+                op->notify(SystemError::noError);
+            }
+        }
     }
 
     buffer_t make_read_write_buffer( std::size_t rcap, std::size_t wcap ) const {
@@ -524,6 +532,9 @@ private:
 class ssl_async_recv_op : public ssl_async_op {
 public:
     ssl_async_recv_op( async_ssl* async_ssl , SSL* ssl ) : ssl_async_op(ssl),read_bytes_(0),async_ssl_(async_ssl){}
+    virtual void init() {
+        read_bytes_ = 0;
+    }
     virtual int perform( int* ssl_err ) {
         // A bug here is just that I misunderstand the buffer usage.
         // The user suppose I will not touch the data that originally
@@ -549,6 +560,14 @@ public:
     }
     virtual void error( SystemError::ErrorCode ec ) {
         callback_(ec,static_cast<std::size_t>(-1));
+    }
+    virtual void end_of_stream( SystemError::ErrorCode ec ) {
+        // For recv, the end of stream is just a normal read with a zero bytes return
+        // But, we don't know how many bytes we have already read so just call notify
+        // which will ensure that the bytes_transferred to be set correctly. And also
+        // if user issue a recv again on this socket, it will goes directly to the notify
+        // which ensure that the read_bytes_ is zero there.
+        notify(ec);
     }
     void set_callback( const std::function<void(SystemError::ErrorCode,std::size_t)>& cb ) {
         callback_ = cb;
@@ -616,6 +635,9 @@ private:
 class ssl_async_send_op : public ssl_async_op {
 public:
     ssl_async_send_op( SSL* ssl ) : ssl_async_op(ssl){}
+    virtual void init() {
+        send_bytes_ = 0;
+    }
     virtual int perform( int* ssl_err ) {
         if( user_buffer_->isEmpty() ) {
             *ssl_err = SSL_ERROR_NONE;
@@ -624,6 +646,9 @@ public:
         int bytes = SSL_write( ssl() , 
             user_buffer_->constData() , static_cast<int>(user_buffer_->size()) );
         *ssl_err = SSL_get_error(ssl(),bytes);
+        if( bytes > 0 ) {
+            send_bytes_ += bytes;
+        }
         return bytes;
     }
     virtual void notify( SystemError::ErrorCode ec ) {
@@ -631,6 +656,19 @@ public:
     }
     virtual void error( SystemError::ErrorCode ec ) {
         callback_(ec,static_cast<std::size_t>(-1));
+    }
+    virtual void end_of_stream( SystemError::ErrorCode ec ) {
+        Q_UNUSED(ec);
+        // We may have already sent out the whole buffer here , so we should not issue
+        // an error on send but just normally called notify 
+        if( send_bytes_ == user_buffer_->size() ) {
+            notify(0);
+        } else {
+            // This means we receive end of the stream during the middle
+            // of transmission , so we haven't sent out all the data
+            // and it should be an error here .
+            error( ssl_internal_error );
+        }
     }
     void set_callback( const std::function<void(SystemError::ErrorCode,std::size_t)>& cb ) {
         callback_ = cb;
@@ -641,6 +679,7 @@ public:
 private:
     std::function<void(SystemError::ErrorCode,std::size_t)> callback_;
     const nx::Buffer* user_buffer_;
+    std::size_t send_bytes_;
 };
 
 // handshake operation
@@ -653,6 +692,7 @@ public:
         else 
             SSL_set_connect_state(ssl());
     }
+    virtual void init() {}
     virtual int perform( int* ssl_err ) {
         int bytes = SSL_do_handshake(ssl());
         *ssl_err = SSL_get_error(ssl(),bytes);
@@ -663,6 +703,13 @@ public:
     }
     virtual void error( SystemError::ErrorCode ec ) {
         callback_(ec);
+    }
+    virtual void end_of_stream( SystemError::ErrorCode ec ) {
+        Q_UNUSED(ec);
+        // For handshake, it will never receive end of stream
+        // otherwise, the handshake will fail here. So we notify
+        // user that we have an error during the handshake
+        error( ssl_internal_error );
     }
     void set_callback( const std::function<void(SystemError::ErrorCode)>& callback ) {
         callback_ = callback;
@@ -683,11 +730,15 @@ void async_ssl::async_recv(
             // perform async handshake here
             async_handshake(
                 [this,buffer,op]( SystemError::ErrorCode ec ) {
-                    if(ec) return;
+                    if(ec) {
+                        op(ec,static_cast<std::size_t>(-1));
+                        return;
+                    }
                     // We delay the async_recv operation until the async handshake finished
                     async_recv(buffer,op);
                 });
         } else {
+            recv_op_->init();
             recv_op_->set_user_buffer(buffer);
             recv_op_->set_callback(op);
             ssl_perform(SystemError::noError,0,recv_op_.get(),
@@ -707,13 +758,17 @@ void async_ssl::async_send(
             // perform async handshake here
             async_handshake(
                 [this,buffer,op]( SystemError::ErrorCode ec ) {
-                    if(ec) return;
+                    if(ec) {
+                        op(ec,static_cast<std::size_t>(-1));
+                        return;
+                    }
                     // We delay the async_recv operation until the async handshake finished
                     // We will have potential stack overflow here. Suppose a async_handshake
                     // failed. It will 
                     async_send(buffer,op);
             });
         }  else {
+            send_op_->init();
             // For sending operation, we need to issue SSL operation at first
             send_op_->set_user_buffer(&buffer);
             send_op_->set_callback(op);
@@ -729,6 +784,7 @@ void async_ssl::async_handshake( const std::function<void(SystemError::ErrorCode
     Q_ASSERT(!SSL_is_init_finished(ssl_));
     buffer_t buf = make_read_write_buffer(async_buffer_default_size,
                                           async_buffer_default_size);
+    handshake_op_->init();
     handshake_op_->set_callback(op);
     handshake_op_->set_model(server_);
     // Then we trigger our async handshake by using ssl_perform operation

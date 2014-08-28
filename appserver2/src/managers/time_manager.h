@@ -78,7 +78,7 @@ namespace ec2
     {
     public:
         qint64 monotonicClockValue;
-        //!synchorionized millis from epoch, corresponding to \a monotonicClockValue
+        //!synchronized millis from epoch, corresponding to \a monotonicClockValue
         qint64 syncTime;
         //!priority key, corresponding to \a syncTime value. This is not necessarily priority key of current server
         /*!
@@ -123,7 +123,7 @@ namespace ec2
         //!Called when primary time server has been changed by user
         void primaryTimeServerChanged( const QnTransaction<ApiIdData>& tran );
         void peerSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeData>& tran );
-        //!Returns synchrionized time with time priority key (not local, but the one used)
+        //!Returns synchronized time with time priority key (not local, but the one used)
         TimeSyncInfo getTimeSyncInfo() const;
         //!Returns value of internal monotonic clock
         qint64 getMonotonicClock() const;
@@ -138,7 +138,7 @@ namespace ec2
             \param localSystemTime Local system time (UTC, millis from epoch)
             \param peersAndTimes pair<peer id, peer local time (UTC, millis from epoch) corresponding to \a localSystemTime>
         */
-        void primaryTimeServerSelectionRequired( qint64 localSystemTime, QList<QPair<QUuid, qint64> > peersAndTimes );
+        void primaryTimeServerSelectionRequired();
         //!Emitted when synchronized time has been changed
         void timeChanged( qint64 syncTime );
 
@@ -147,7 +147,7 @@ namespace ec2
         {
             QUuid peerID;
             qint64 localMonotonicClock;
-            //!synchorionized millis from epoch, corresponding to \a monotonicClockValue
+            //!synchronized millis from epoch, corresponding to \a monotonicClockValue
             qint64 remotePeerSyncTime;
 
             RemotePeerTimeInfo(

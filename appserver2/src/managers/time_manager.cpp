@@ -561,7 +561,7 @@ namespace ec2
                 peers.push_back( QPair<QUuid, qint64>( val.second->first, val.second->second.syncTime + (currentClock - val.second->second.monotonicClockValue) ) );
             }
             //multiple peers have same priority, user selection is required
-            emit primaryTimeServerSelectionRequired( currentLocalTime, peers );
+            emit primaryTimeServerSelectionRequired();
         }
     }
 

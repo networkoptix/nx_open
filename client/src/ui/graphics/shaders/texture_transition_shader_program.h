@@ -10,7 +10,7 @@
 class QnTextureTransitionShaderProgram: public QnTextureGLShaderProgram {
     Q_OBJECT
 public:
-    QnTextureTransitionShaderProgram(const QGLContext *context, QObject *parent = NULL);
+    QnTextureTransitionShaderProgram(QObject *parent = NULL);
 
 
     void setTexture1(int target) {

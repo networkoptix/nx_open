@@ -28,27 +28,19 @@ void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
 #else
     QnGlNativePainting::begin(QGLContext::currentContext(),painter);
 
-    QMatrix4x4 m = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix();
-    //glPushMatrix();
-
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix().setToIdentity();
-    //glLoadIdentity();
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->pushModelViewMatrix();
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setModelViewMatrix(QMatrix4x4());
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
     QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(m_color);
     QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawColoredQuad(widget->geometry());
-    /*
-    glBegin(GL_QUADS);
-    glColor(m_color);
-    glVertices(widget->geometry());
-    glEnd();*/
 
     glDisable(GL_BLEND); 
 
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix() = m;
-    //glPopMatrix();
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->popModelViewMatrix();
+
     QnGlNativePainting::end(painter);
 #endif //  Q_OS_WIN
 }

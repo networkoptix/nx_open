@@ -671,6 +671,11 @@ int serverMain(int argc, char *argv[])
     return 0;
 }
 
+bool isLocalAppServer(const QString& appserverHostString)
+{
+    return appserverHostString.isEmpty() || appserverHostString == "localhost" || QUrl(appserverHostString).scheme() == "file";
+}
+
 void initAppServerConnection(QSettings &settings)
 {
     QUrl appServerUrl;
@@ -704,7 +709,8 @@ void initAppServerConnection(QSettings &settings)
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
     QString password = settings.value("appserverPassword", QLatin1String("")).toString();
     QByteArray authKey = settings.value("authKey").toByteArray();
-    if (!authKey.isEmpty())
+    QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
+    if (!authKey.isEmpty() && !isLocalAppServer(appserverHostString))
     {
         // convert from v2.2 format and encode value
         QByteArray prefix("SK_");
@@ -955,7 +961,9 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
 
 void QnMain::at_localInterfacesChanged()
 {
-    m_mediaServer->setNetAddrList(allLocalAddresses());
+    auto intfList = allLocalAddresses();
+    intfList << m_publicAddress;
+    m_mediaServer->setNetAddrList(intfList);
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     ec2Connection->getMediaServerManager()->save(m_mediaServer, this, &QnMain::at_serverSaved);
 }
@@ -1296,10 +1304,10 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
     
-    QString publicIP = getPublicAddress().toString();
-    if (!publicIP.isEmpty()) {
+    m_publicAddress = getPublicAddress();
+    if (!m_publicAddress.isNull()) {
         QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-        localInfo.data.publicIP = publicIP;
+        localInfo.data.publicIP = m_publicAddress.toString();
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
     connect( ec2Connection.get(), &ec2::AbstractECConnection::timeChanged,
@@ -1369,8 +1377,7 @@ void QnMain::run()
     //m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
 
 
-    QHostAddress publicAddress = getPublicAddress();
-    qnCommon->setModuleUlr(QString("http://%1:%2").arg(publicAddress.toString()).arg(m_universalTcpListener->getPort()));
+    qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
 
     Qn::PanicMode pm;
     while (m_mediaServer.isNull() && !needToStop())
@@ -1387,7 +1394,7 @@ void QnMain::run()
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
-        bool isLocal = appserverHostString.isEmpty() || appserverHostString == "localhost" || QUrl(appserverHostString).scheme() == "file";
+        bool isLocal = isLocalAppServer(appserverHostString);
 
         int serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 #ifdef EDGE_SERVER
@@ -1395,7 +1402,7 @@ void QnMain::run()
 #endif
         if (!isLocal)
             serverFlags |= Qn::SF_RemoteEC;
-        if (!publicAddress.isNull())
+        if (!m_publicAddress.isNull())
             serverFlags |= Qn::SF_HasPublicIP;
 
         server->setServerFlags((Qn::ServerFlags) serverFlags);
@@ -1410,15 +1417,15 @@ void QnMain::run()
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost), m_universalTcpListener->getPort());
 
         QList<QHostAddress> serverIfaceList = allLocalAddresses();
-        if (!publicAddress.isNull()) {
+        if (!m_publicAddress.isNull()) {
             bool isExists = false;
             for (int i = 0; i < serverIfaceList.size(); ++i)
             {
-                if (serverIfaceList[i] == publicAddress)
+                if (serverIfaceList[i] == m_publicAddress)
                     isExists = true;
             }
             if (!isExists)
-                serverIfaceList << publicAddress;
+                serverIfaceList << m_publicAddress;
         }
 
         bool isModified = false;
@@ -1436,8 +1443,16 @@ void QnMain::run()
             isModified = true;
         }
 
-        if (server->getSystemName() != qnCommon->localSystemName()) {
+        bool needUpdateAuthKey = server->getAuthKey().isEmpty();
+        if (server->getSystemName() != qnCommon->localSystemName()) 
+        {
+            if (!server->getSystemName().isEmpty())
+                needUpdateAuthKey = true;
             server->setSystemName(qnCommon->localSystemName());
+            isModified = true;
+        }
+        if (needUpdateAuthKey) {
+            server->setAuthKey(QUuid::createUuid().toString());
             isModified = true;
         }
         
@@ -1851,6 +1866,7 @@ protected:
         QUuid guid = serverGuid();
         if (guid.isNull())
         {
+            qDebug() << "Can't save guid. Run once as administrator.";
             NX_LOG("Can't save guid. Run once as administrator.", cl_logERROR);
             qApp->quit();
             return;

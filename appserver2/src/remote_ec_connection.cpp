@@ -10,8 +10,6 @@
 #include "transaction/transaction_message_bus.h"
 #include "common/common_module.h"
 #include "managers/time_manager.h"
-#include "mutex/distributed_mutex.h"
-#include "mutex/distributed_mutex_manager.h"
 
 namespace ec2
 {
@@ -24,8 +22,6 @@ namespace ec2
         m_queryProcessor( queryProcessor ),
         m_connectionInfo( connectionInfo )
     {
-        ec2::QnDistributedMutexManager::initStaticInstance(new ec2::QnDistributedMutexManager());
-
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
     }
 

@@ -18,9 +18,8 @@
 #include <api/model/connection_info.h>
 #include <api/model/time_reply.h>
 #include <api/model/rebuild_archive_reply.h>
+#include <api/model/test_email_settings_reply.h>
 #include <api/runtime_info_manager.h>
-
-#include <recording/time_period_list.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
@@ -43,6 +42,7 @@
 #include <core/resource/videowall_matrix.h>
 
 #include <recording/time_period.h>
+#include <recording/time_period_list.h>
 
 #include <core/misc/schedule_task.h>
 #include <core/ptz/ptz_mapper.h>
@@ -56,8 +56,10 @@
 #include <business/business_fwd.h>
 
 #include <licensing/license.h>
-#include "api/model/test_email_settings_reply.h"
 
+#include <nx_ec/ec_api.h>
+#include <nx_ec/data/api_lock_data.h>
+#include <nx_ec/data/api_discovery_data.h>
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -72,7 +74,7 @@ void QnCommonMetaTypes::initialize() {
         return;
 
     qRegisterMetaType<QUuid>();
-    qRegisterMetaType<QUuid>("QUuid");
+    qRegisterMetaType<QSet<QUuid>>("QSet<QUuid>");
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();
     qRegisterMetaType<Qt::ConnectionType>();
@@ -82,8 +84,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnPeerRuntimeInfo>();
 
     qRegisterMetaType<QnParam>();
-    qRegisterMetaType<QUuid>();
-    qRegisterMetaType<QSet<QUuid>>("QSet<QUuid>");
     
     qRegisterMetaType<QnKvPair>();
     qRegisterMetaType<QnKvPairList>();
@@ -197,6 +197,15 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<Qn::CameraDataType>();
 
+    qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
+    qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
+    qRegisterMetaType<ec2::QnFullResourceData>( "QnFullResourceData" );
+    qRegisterMetaType<ec2::QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
+    qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" ); 
+    qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); 
+    qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" ); 
+    qRegisterMetaType<ec2::ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); 
+    qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" ); 
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();
