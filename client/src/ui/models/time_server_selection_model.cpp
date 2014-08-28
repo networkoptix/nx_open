@@ -30,7 +30,9 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
     QnWorkbenchContextAware(parent),
     m_timeBase(0)
 {
-    
+ 
+    m_checked = Qt::Unchecked;
+
     auto processor = QnCommonMessageProcessor::instance();
 
     connect(processor, &QnCommonMessageProcessor::syncTimeChanged, this, [this](qint64 syncTime) {
@@ -179,10 +181,36 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
           break;
       case Qt::CheckStateRole:
           if (column == Columns::CheckboxColumn)
-              return (item.priority & ec2::ApiRuntimeData::tpfPeerTimeSetByUser) > 0 ? Qt::Checked : Qt::Unchecked;
+              return m_checked;
+              //return (item.priority & ec2::ApiRuntimeData::tpfPeerTimeSetByUser) > 0 ? Qt::Checked : Qt::Unchecked;
           break;
     }
     return QVariant();
+}
+
+bool QnTimeServerSelectionModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/) {
+    if (index.column() != Columns::CheckboxColumn || role != Qt::CheckStateRole)
+        return false;
+
+    m_checked = (Qt::CheckState)value.toInt();
+    emit dataChanged(index, index, QVector<int>() << Qt::DisplayRole << Qt::CheckStateRole);
+    return true;
+}
+
+Qt::ItemFlags QnTimeServerSelectionModel::flags(const QModelIndex &index) const  {
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
+        return 0;
+
+    if (index.row() < 0 || index.row() >= m_items.size())
+        return 0;
+
+    Columns column = static_cast<Columns>(index.column());
+    Item item = m_items[index.row()];
+
+    if (column == Columns::CheckboxColumn)
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
+
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
 void QnTimeServerSelectionModel::updateTime() {
@@ -192,3 +220,4 @@ void QnTimeServerSelectionModel::updateTime() {
     int column = Columns::TimeColumn;
     emit dataChanged(index(0, column), index(m_items.size() - 1, column), textRoles);
 }
+

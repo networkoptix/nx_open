@@ -23,10 +23,13 @@ public:
 
     void updateTime();
 
-    int columnCount(const QModelIndex &parent) const override;
-    int rowCount(const QModelIndex &parent) const override;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
+    virtual int columnCount(const QModelIndex &parent) const override;
+    virtual int rowCount(const QModelIndex &parent) const override;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    virtual QVariant data(const QModelIndex &index, int role) const override;
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
 private:
     struct Item {
         QUuid peerId;
@@ -36,6 +39,7 @@ private:
 
     QList<Item> m_items;
     qint64 m_timeBase;
+    Qt::CheckState m_checked;
 };
 
 #endif // TIME_SERVER_SELECTION_MODEL_H
