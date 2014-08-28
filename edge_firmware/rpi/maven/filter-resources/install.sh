@@ -3,7 +3,7 @@
 COMPANY_NAME=${deb.customization.company.name}
 DISTRIB=$COMPANY_NAME-mediaserver-${release.version}.${buildNumber}-${box}-${build.configuration}-beta
 
-function update () {
+update () {
     /etc/init.d/S99$COMPANY_NAME-mediaserver stop
     tar xfv $DISTRIB.tar.gz -C /
     /etc/init.d/S99$COMPANY_NAME-mediaserver start
