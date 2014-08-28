@@ -165,6 +165,11 @@ public:
         const QString& foreignAddress,
         unsigned short foreignPort,
         unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) = 0;
+    bool connect( const SocketAddress& addr, unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS )
+    {
+        //TODO #ak this method MUST replace the previous one
+        return connect( addr.address.toString(), addr.port, timeoutMillis );
+    }
     //!Read into the given \a buffer up to \a bufferLen bytes data from this socket
     /*!
         Call \a AbstractCommunicatingSocket::connect() before calling \a AbstractCommunicatingSocket::recv()
