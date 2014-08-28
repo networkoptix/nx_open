@@ -178,7 +178,7 @@ private:
     static QMutex m_staticMutex;
 
     QByteArray m_extraData;
-
+    bool m_authByKey;
 private:
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
@@ -198,7 +198,7 @@ private:
     void serializeAndSendNextDataBuffer();
     void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
     void setExtraDataBuffer(const QByteArray& data);
-
+    void fillAuthInfo();
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
     void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );
