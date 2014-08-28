@@ -26,6 +26,7 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /*= NUL
             return;
         m_model->updateTime();
     });
+    timer->start();
 }
 
 

@@ -100,12 +100,13 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     connect(storedFileManager, &ec2::AbstractStoredFileManager::updated,            this, &QnCommonMessageProcessor::fileUpdated );
     connect(storedFileManager, &ec2::AbstractStoredFileManager::removed,            this, &QnCommonMessageProcessor::fileRemoved );
 
+    auto timeManager = connection->getTimeManager();
+    connect(timeManager, &ec2::AbstractTimeManager::timeServerSelectionRequired,    this, &QnCommonMessageProcessor::timeServerSelectionRequired);
+    connect(timeManager, &ec2::AbstractTimeManager::timeChanged,                    this, &QnCommonMessageProcessor::syncTimeChanged);
+    connect(timeManager, &ec2::AbstractTimeManager::peerTimeChanged,                this, &QnCommonMessageProcessor::peerTimeChanged);
+
     connect( connection->getDiscoveryManager(), &ec2::AbstractDiscoveryManager::discoveryInformationChanged,
         this, &QnCommonMessageProcessor::on_gotDiscoveryData );
-
-   
-    connect( connection->getTimeManager(), &ec2::AbstractTimeManager::timeServerSelectionRequired,
-        this, &QnCommonMessageProcessor::timeServerSelectionRequired);
 
     connection->startReceivingNotifications();
 }
@@ -346,7 +347,28 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     processLicenses(fullData.licenses);
     processCameraServerItems(fullData.cameraHistory);
     //on_runtimeInfoChanged(fullData.serverInfo);
-    qnSyncTime->reset();
+    qnSyncTime->reset();   
+
+    if (!m_connection)
+        return;
+
+    auto timeManager = m_connection->getTimeManager();
+    timeManager->getCurrentTime(this, [this](int handle, ec2::ErrorCode errCode, qint64 syncTime) {
+        Q_UNUSED(handle);
+        if (errCode != ec2::ErrorCode::ok || !m_connection)
+            return;
+
+        emit syncTimeChanged(syncTime);
+
+        ec2::QnPeerTimeInfoList peers = m_connection->getTimeManager()->getPeerTimeInfoList();
+        foreach(const ec2::QnPeerTimeInfo &info, peers) {
+            Q_ASSERT(QnRuntimeInfoManager::instance()->hasItem(info.peerId));
+            if (QnRuntimeInfoManager::instance()->item(info.peerId).data.peer.peerType != Qn::PT_Server)
+                continue;
+            emit peerTimeChanged(info.peerId, syncTime, info.time);
+        }
+    });
+   
 }
 
 QMap<QUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() const {

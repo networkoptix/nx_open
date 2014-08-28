@@ -13,6 +13,11 @@ namespace ec2
     */
     struct ApiRuntimeData: ApiData
     {
+        static const quint64 tpfPeerTimeSynchronizedWithInternetServer  = 0x0008LL << 32;
+        static const quint64 tpfPeerTimeSetByUser                       = 0x0004LL << 32;
+        static const quint64 tpfPeerHasMonotonicClock                   = 0x0002LL << 32;
+        static const quint64 tpfPeerIsNotEdgeServer                     = 0x0001LL << 32;
+
         ApiRuntimeData(): 
             ApiData(), 
             prematureLicenseExperationDate(0),

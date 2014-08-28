@@ -357,6 +357,9 @@ namespace ec2
             m_monotonicClock.elapsed(),
             tran.params.peerSysTime,
             peerPriorityKey );
+
+        lk.unlock();
+        emit peerTimeChanged( tran.params.peerID, getSyncTime(), tran.params.peerSysTime );
     }
 
     TimeSyncInfo TimeSynchronizationManager::getTimeSyncInfo() const
