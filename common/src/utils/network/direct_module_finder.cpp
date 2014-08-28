@@ -141,10 +141,11 @@ QSet<QUrl> QnDirectModuleFinder::ignoredUrls() const {
 }
 
 void QnDirectModuleFinder::enqueRequest(const QUrl &url) {
-    if (m_activeRequests.contains(url) || m_requestQueue.contains(url))
+    QUrl reqUrl = requestUrl(url);
+    if (m_activeRequests.contains(reqUrl) || m_requestQueue.contains(reqUrl))
         return;
 
-    m_requestQueue.enqueue(requestUrl(url));
+    m_requestQueue.enqueue(reqUrl);
     QTimer::singleShot(0, this, SLOT(activateRequests()));
 }
 
