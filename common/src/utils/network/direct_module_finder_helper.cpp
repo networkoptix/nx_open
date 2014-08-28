@@ -72,7 +72,7 @@ void QnModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource) {
 
     if (m_directModuleFinder) {
         foreach (const QHostAddress &address, addresses)
-            m_directModuleFinder->addAddress(address, port, serverId);
+            m_directModuleFinder->addUrl(QnNetworkAddress(address, port).toUrl(), serverId);
 
         foreach (const QUrl &url, server->getAdditionalUrls())
             m_directModuleFinder->addUrl(url, serverId);
@@ -118,10 +118,10 @@ void QnModuleFinderHelper::at_resourceChanged(const QnResourcePtr &resource) {
 
     if (m_directModuleFinder) {
         foreach (const QHostAddress &address, oldAddresses - commonAddresses)
-            m_directModuleFinder->removeAddress(address, oldPort, serverId);
+            m_directModuleFinder->removeUrl(QnNetworkAddress(address, oldPort).toUrl(), serverId);
 
         foreach (const QHostAddress &address, newAddresses - commonAddresses)
-            m_directModuleFinder->addAddress(address, newPort, serverId);
+            m_directModuleFinder->addUrl(QnNetworkAddress(address, newPort).toUrl(), serverId);
 
         if (oldPort != newPort) {
             foreach (const QUrl &url, server->getAdditionalUrls())
@@ -222,7 +222,7 @@ void QnModuleFinderHelper::at_resourceRemoved(const QnResourcePtr &resource) {
 
     if (m_directModuleFinder) {
         foreach (const QHostAddress &address, addresses)
-            m_directModuleFinder->removeAddress(address, port, serverId);
+            m_directModuleFinder->removeUrl(QnNetworkAddress(address, port).toUrl(), serverId);
 
         foreach (const QUrl &url, server->getAdditionalUrls())
             m_directModuleFinder->removeUrl(url, serverId);

@@ -7,6 +7,7 @@
 
 #include <utils/common/id.h>
 #include <utils/network/module_information.h>
+#include <utils/network/full_network_address.h>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -21,18 +22,12 @@ public:
 
     void addUrl(const QUrl &url, const QUuid &id);
     void removeUrl(const QUrl &url, const QUuid &id);
-    void addAddress(const QHostAddress &address, quint16 port, const QUuid &id);
-    void removeAddress(const QHostAddress &address, quint16 port, const QUuid &id);
 
     void addIgnoredModule(const QUrl &url, const QUuid &id);
     void removeIgnoredModule(const QUrl &url, const QUuid &id);
-    void addIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id);
-    void removeIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id);
 
     void addIgnoredUrl(const QUrl &url);
     void removeIgnoredUrl(const QUrl &url);
-    void addIgnoredAddress(const QHostAddress &address, quint16 port);
-    void removeIgnoredAddress(const QHostAddress &address, quint16 port);
 
     void checkUrl(const QUrl &url);
 

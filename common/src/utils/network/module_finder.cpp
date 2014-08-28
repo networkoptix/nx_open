@@ -9,7 +9,7 @@ namespace {
         return QUrl(lit("http://%1:%2").arg(address.host().toString()).arg(address.port()));
     }
 
-    QUrl trimUrl(const QUrl &url) {
+    QUrl trimmedUrl(const QUrl &url) {
         QUrl newUrl;
         newUrl.setScheme(lit("http"));
         newUrl.setHost(url.host());
@@ -101,7 +101,7 @@ void QnModuleFinder::at_moduleAddressFound(const QnModuleInformation &moduleInfo
 
     QUrl url = addressToUrl(address);
 
-    m_directModuleFinder->addIgnoredAddress(address.host(), address.port());
+    m_directModuleFinder->addIgnoredUrl(address.toUrl());
 
     if (!m_multicastFoundUrls.contains(moduleInformation.id, url)) {
         m_multicastFoundUrls.insert(moduleInformation.id, url);
@@ -117,7 +117,7 @@ void QnModuleFinder::at_moduleAddressLost(const QnModuleInformation &moduleInfor
 
     QUrl url = addressToUrl(address);
 
-    m_directModuleFinder->removeIgnoredAddress(address.host(), address.port());
+    m_directModuleFinder->removeIgnoredUrl(address.toUrl());
     if (m_multicastFoundUrls.remove(moduleInformation.id, url)) {
         emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
 
@@ -136,7 +136,7 @@ void QnModuleFinder::at_moduleUrlFound(const QnModuleInformation &moduleInformat
         emit moduleChanged(moduleInformation);
     }
 
-    QUrl url = trimUrl(foundUrl);
+    QUrl url = trimmedUrl(foundUrl);
 
     if (!m_directFoundUrls.contains(moduleInformation.id, url)) {
         m_directFoundUrls.insert(moduleInformation.id, url);
@@ -150,7 +150,7 @@ void QnModuleFinder::at_moduleUrlLost(const QnModuleInformation &moduleInformati
     if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
         return;
 
-    QUrl url = trimUrl(foundUrl);
+    QUrl url = trimmedUrl(foundUrl);
 
     if (m_directFoundUrls.remove(moduleInformation.id, url)) {
         emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
