@@ -186,8 +186,8 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
         return false;
     }
 
-    QnNetworkAddress address(QHostAddress(remoteAddressStr), remotePort);
     QnModuleInformation moduleInformation = response.toModuleInformation();
+    QnNetworkAddress address(QHostAddress(remoteAddressStr), moduleInformation.port);
     if (moduleInformation.remoteAddresses.isEmpty())
         moduleInformation.remoteAddresses.insert(address.host().toString());
 
