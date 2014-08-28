@@ -984,9 +984,12 @@ bool TCPSocket::toggleStatisticsCollection( bool val )
         return false;
     }
     return true;
-#else
+#elif defined(__linux__)
     Q_UNUSED(val);
     return true;
+#else
+    Q_UNUSED(val);
+    return false;
 #endif
 }
 
@@ -1003,7 +1006,7 @@ bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
         return false;
     }
     return readTcpStat( &d->win32TcpTableRow, info ) == ERROR_SUCCESS;
-#else
+#elif defined(__linux__)
     struct tcp_info tcpinfo;
     memset( &tcpinfo, 0, sizeof(tcpinfo) );
     socklen_t tcp_info_length = sizeof(tcpinfo);
@@ -1011,6 +1014,9 @@ bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
         return false;
     info->rttVar = tcpinfo.tcpi_rttvar / USEC_PER_MSEC;
     return true;
+#else
+    Q_UNUSED(info);
+    return false;
 #endif
 }
 
