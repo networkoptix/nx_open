@@ -48,8 +48,18 @@ namespace ec2
         QnLicenseList licenses;
     };
 
-    //list<pair<peerid, peer system time (UTC, millis from epoch)> >
-    typedef QList<QPair<QUuid, qint64>> QnPeerTimeInfoList;
+    struct QnPeerTimeInfo {
+
+        QnPeerTimeInfo():
+            time(0){}
+        QnPeerTimeInfo(QUuid peerId, qint64 time):
+            peerId(peerId), time(time){}
+
+        QUuid peerId;
+
+        /** Peer system time (UTC, millis from epoch) */
+        qint64 time;
+    };
 
     /*!
         \note All methods are asynchronous if other not specified

@@ -8,9 +8,7 @@
 class QString;
 
 namespace ec2 {
-    struct ResourceContext;
-    struct QnFullResourceData; // TODO: #Elric move these out?
-
+    struct ResourceContext; // TODO: #Elric move this out?
 
     struct ApiData;
 

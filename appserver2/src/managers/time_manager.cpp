@@ -398,7 +398,7 @@ namespace ec2
 
         const qint64 currentClock = m_monotonicClock.elapsed();
         for( auto it = m_systemTimeByPeer.cbegin(); it != m_systemTimeByPeer.cend(); ++it )
-            peers.push_back( QPair<QUuid, qint64>( it->first, it->second.syncTime + (currentClock - it->second.monotonicClockValue) ) );
+            peers.push_back( QnPeerTimeInfo( it->first, it->second.syncTime + (currentClock - it->second.monotonicClockValue) ) );
 
         return peers;
     }
