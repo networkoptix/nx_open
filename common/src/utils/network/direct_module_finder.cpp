@@ -217,8 +217,11 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         if (id.isNull())
             return;
 
-        if (m_lastPingByUrl.value(url) + maxPingTimeoutMs < QDateTime::currentMSecsSinceEpoch())
+        if (m_lastPingByUrl.value(url) + maxPingTimeoutMs < QDateTime::currentMSecsSinceEpoch()) {
+            m_moduleByUrl.remove(url);
+            m_lastPingByUrl.remove(url);
             emit moduleUrlLost(m_foundModules.value(id), url);
+        }
     }
 }
 
