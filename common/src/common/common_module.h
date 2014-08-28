@@ -57,7 +57,6 @@ public:
 
     void setLocalSystemName(const QString& value);
     QString localSystemName() const;
-    QByteArray getSystemPassword() const { return "{61D85D22-E7AA-44EC-B5EC-1BEAC9FE19C5}"; }
 
     void setDefaultAdminPassword(const QString& password) { m_defaultAdminPassword = password; }
     QString defaultAdminPassword() const { return m_defaultAdminPassword; }
