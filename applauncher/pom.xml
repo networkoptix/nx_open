@@ -24,7 +24,7 @@
         <product.title>${applauncher.name}</product.title>  
         <!--Global libs-->		
         <qt.libs>core gui network xml widgets</qt.libs>
-        <global.libs>-lcommon -lquazip</global.libs>
+        <global.libs>-lcommon -lquazip -ludt</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib ssleay32.lib libeay32.lib Ws2_32.lib Iphlpapi.lib</windows.oslibs>
         <windows.oslibs.release></windows.oslibs.release> 
