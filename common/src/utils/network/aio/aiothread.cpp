@@ -43,24 +43,27 @@ namespace aio
         TaskType type;
         int timeout;
         std::atomic<int>* taskCompletionEvent;
+        std::function<void()> taskCompletionHandler;
 
         /*!
             \param taskCompletionEvent if not NULL, set to 1 after processing task
-            */
+        */
         SocketAddRemoveTask(
             SocketType* const _socket,
             aio::EventType _eventType,
             AIOEventHandler<SocketType>* const _eventHandler,
             TaskType _type,
             int _timeout = 0,
-            std::atomic<int>* const _taskCompletionEvent = nullptr )
-            :
+            std::atomic<int>* const _taskCompletionEvent = nullptr,
+            std::function<void()> _taskCompletionHandler = std::function<void()>() )
+        :
             socket( _socket ),
             eventType( _eventType ),
             eventHandler( _eventHandler ),
             type( _type ),
             timeout( _timeout ),
-            taskCompletionEvent( _taskCompletionEvent )
+            taskCompletionEvent( _taskCompletionEvent ),
+            taskCompletionHandler( _taskCompletionHandler )
         {
         }
     };
@@ -200,6 +203,8 @@ namespace aio
                 }
                 if( task.taskCompletionEvent )
                     task.taskCompletionEvent->store( 1, std::memory_order_relaxed );
+                if( task.taskCompletionHandler )
+                    task.taskCompletionHandler();
                 it = pollSetModificationQueue.erase( it );
             }
         }
@@ -418,7 +423,8 @@ namespace aio
         SocketType* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler<SocketType>* const eventHandler,
-        int timeoutMs )
+        int timeoutMs,
+        std::function<void()> socketAddedToPollHandler )
     {
         //NOTE m_impl->mutex is locked up the stack
 
@@ -440,7 +446,9 @@ namespace aio
             eventToWatch,
             eventHandler,
             TaskType::tAdding,
-            timeoutMs ) );
+            timeoutMs,
+            nullptr,
+            socketAddedToPollHandler ) );
         if( eventToWatch == aio::etRead )
             ++m_impl->newReadMonitorTaskCount;
         else if( eventToWatch == aio::etWrite )

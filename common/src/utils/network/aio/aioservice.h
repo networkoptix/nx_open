@@ -51,10 +51,11 @@ namespace aio
         bool watchSocket(
             SocketType* const sock,
             aio::EventType eventToWatch,
-            AIOEventHandler<SocketType>* const eventHandler )
+            AIOEventHandler<SocketType>* const eventHandler,
+            std::function<void()> socketAddedToPollHandler = std::function<void()>() )
         {
             QMutexLocker lk( &m_mutex );
-            return watchSocketNonSafe( sock, eventToWatch, eventHandler );
+            return watchSocketNonSafe( sock, eventToWatch, eventHandler, socketAddedToPollHandler );
         }
 
         //!Cancel monitoring \a sock for event \a eventType
@@ -91,11 +92,15 @@ namespace aio
         QMutex* mutex() const { return &m_mutex; }
 
         //!Same as \a AIOService::watchSocket, but does not lock mutex. Calling entity MUST lock \a AIOService::mutex() before calling this method
+        /*!
+            \param socketAddedToPollHandler Called after socket has been added to pollset but before pollset.poll has been called
+        */
         template<class SocketType>
         bool watchSocketNonSafe(
             SocketType* const sock,
             aio::EventType eventToWatch,
-            AIOEventHandler<SocketType>* const eventHandler )
+            AIOEventHandler<SocketType>* const eventHandler,
+            std::function<void()> socketAddedToPollHandler = std::function<void()>() )
         {
             SocketAIOContext<SocketType>& aioHandlingContext = getAIOHandlingContext<SocketType>();
 
@@ -154,7 +159,7 @@ namespace aio
                 aioHandlingContext.aioThreadPool.push_back( newThread.release() );
             }
 
-            if( threadToUse->watchSocket( sock, eventToWatch, eventHandler, sockTimeoutMS ) )
+            if( threadToUse->watchSocket( sock, eventToWatch, eventHandler, sockTimeoutMS, socketAddedToPollHandler ) )
             {
                 aioHandlingContext.sockets.insert( std::make_pair( sockCtx, threadToUse ) );
                 return true;

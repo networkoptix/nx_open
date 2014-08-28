@@ -8,6 +8,7 @@
 
 #include <atomic>
 #include <functional>
+#include <type_traits>
 
 #include <QtCore/QThread>
 
@@ -79,6 +80,8 @@ public:
 
     bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
     {
+        //TODO with UDT we have to maintain pollset.add(socket), socket.connect, pollset.poll pipeline
+
         unsigned int sendTimeout = 0;
 #ifdef _DEBUG
         bool isNonBlockingModeEnabled = false;
@@ -87,8 +90,6 @@ public:
         assert( isNonBlockingModeEnabled );
 #endif
         if( !m_abstractSocketPtr->getSendTimeout( &sendTimeout ) )
-            return false;
-        if( !m_abstractSocketPtr->connect( addr.address.toString(), addr.port, sendTimeout ) )
             return false;
 
 #ifdef _DEBUG
@@ -100,7 +101,11 @@ public:
 
         QMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_connectSendAsyncCallCounter;
-        return aio::AIOService::instance()->watchSocketNonSafe( m_socket, aio::etWrite, this );
+        return aio::AIOService::instance()->watchSocketNonSafe(
+            m_socket,
+            aio::etWrite,
+            this,
+            [this, addr, sendTimeout](){ m_abstractSocketPtr->connect( addr, sendTimeout ); } );    //to be called between pollset.add and pollset.poll
     }
 
     bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )

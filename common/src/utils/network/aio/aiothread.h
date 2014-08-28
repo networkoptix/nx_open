@@ -48,7 +48,8 @@ namespace aio
             SocketType* const sock,
             aio::EventType eventToWatch,
             AIOEventHandler<SocketType>* const eventHandler,
-            int timeoutMS = 0 );
+            int timeoutMS = 0,
+            std::function<void()> socketAddedToPollHandler = std::function<void()>() );
         //!Do not monitor \a sock for event \a eventType
         /*!
             Garantees that no \a eventTriggered will be called after return of this method.
