@@ -1,19 +1,34 @@
 #include "module_finder.h"
 
+#include "core/resource_management/resource_pool.h"
+#include "core/resource/media_server_resource.h"
 #include "multicast_module_finder.h"
 #include "direct_module_finder.h"
 #include "direct_module_finder_helper.h"
 
+namespace {
+    QUrl trimmedUrl(const QUrl &url) {
+        QUrl newUrl;
+        newUrl.setScheme(lit("http"));
+        newUrl.setHost(url.host());
+        newUrl.setPort(url.port());
+        return newUrl;
+    }
+}
+
 QnModuleFinder::QnModuleFinder(bool clientOnly) :
     m_multicastModuleFinder(new QnMulticastModuleFinder(clientOnly)),
     m_directModuleFinder(new QnDirectModuleFinder(this)),
-    m_directModuleFinderHelper(new QnModuleFinderHelper(this)),
-    m_sendingFakeSignals(false)
+    m_directModuleFinderHelper(new QnModuleFinderHelper(this))
 {
-    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleFound,      this,       &QnModuleFinder::at_moduleFound);
-    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleLost,       this,       &QnModuleFinder::at_moduleLost);
-    connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleFound,         this,       &QnModuleFinder::at_moduleFound);
-    connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleLost,          this,       &QnModuleFinder::at_moduleLost);
+    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleAddressFound,       this,       &QnModuleFinder::at_moduleAddressFound);
+    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleAddressLost,        this,       &QnModuleFinder::at_moduleAddressLost);
+    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleChanged,            this,       &QnModuleFinder::at_moduleChanged);
+    connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlFound,              this,       &QnModuleFinder::at_moduleUrlFound);
+    connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlLost,               this,       &QnModuleFinder::at_moduleUrlLost);
+    connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleChanged,               this,       &QnModuleFinder::at_moduleChanged);
+    connect(qnResPool,                      &QnResourcePool::resourceAdded,                     this,       &QnModuleFinder::at_resourcePool_resourceChanged);
+    connect(qnResPool,                      &QnResourcePool::resourceChanged,                   this,       &QnModuleFinder::at_resourcePool_resourceChanged);
 }
 
 QnModuleFinder::~QnModuleFinder() {
@@ -45,22 +60,8 @@ QnModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
     return m_directModuleFinderHelper;
 }
 
-void QnModuleFinder::makeModulesReappear() {
-    m_sendingFakeSignals = true;
-    foreach (const QnModuleInformation &moduleInformation, m_foundModules) {
-        emit moduleLost(moduleInformation);
-        foreach (const QString &address, moduleInformation.remoteAddresses)
-            emit moduleFound(moduleInformation, address);
-    }
-    m_sendingFakeSignals = false;
-}
-
 void QnModuleFinder::setAllowedPeers(const QList<QUuid> &peerList) {
     m_allowedPeers = peerList;
-}
-
-bool QnModuleFinder::isSendingFakeSignals() const {
-    return m_sendingFakeSignals;
 }
 
 void QnModuleFinder::start() {
@@ -73,49 +74,115 @@ void QnModuleFinder::pleaseStop() {
     m_directModuleFinder->pleaseStop();
 }
 
+void QnModuleFinder::at_moduleAddressFound(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address) {
+    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+        return;
+
+    QUrl url = address.toUrl();
+    m_directModuleFinder->addIgnoredUrl(url);
+
+    if (!m_multicastFoundUrls.contains(moduleInformation.id, url)) {
+        m_multicastFoundUrls.insert(moduleInformation.id, url);
+
+        if (!m_directFoundUrls.contains(moduleInformation.id, url))
+            emit moduleUrlFound(m_foundModules.value(moduleInformation.id), url);
+    }
+}
+
+void QnModuleFinder::at_moduleAddressLost(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address) {
+    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+        return;
+
+    QUrl url = address.toUrl();
+
+    m_directModuleFinder->removeIgnoredUrl(url);
+    if (m_multicastFoundUrls.remove(moduleInformation.id, url)) {
+        emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
+
+        QnModuleInformation locModuleInformation = m_foundModules.value(moduleInformation.id);
+        if (locModuleInformation.remoteAddresses.isEmpty()) {
+            m_foundModules.remove(moduleInformation.id);
+            emit moduleLost(locModuleInformation);
+        }
+    }
+}
+
+void QnModuleFinder::at_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &foundUrl) {
+    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+        return;
+
+    QUrl url = trimmedUrl(foundUrl);
+
+    if (!m_directFoundUrls.contains(moduleInformation.id, url)) {
+        m_directFoundUrls.insert(moduleInformation.id, url);
+
+        if (!m_multicastFoundUrls.contains(moduleInformation.id, url))
+            emit moduleUrlFound(m_foundModules.value(moduleInformation.id), url);
+    }
+}
+
+void QnModuleFinder::at_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &foundUrl) {
+    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+        return;
+
+    QUrl url = trimmedUrl(foundUrl);
+
+    if (m_directFoundUrls.remove(moduleInformation.id, url)) {
+        emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
+
+        QnModuleInformation locModuleInformation = m_foundModules.value(moduleInformation.id);
+        if (locModuleInformation.remoteAddresses.isEmpty()) {
+            m_foundModules.remove(moduleInformation.id);
+            emit moduleLost(locModuleInformation);
+        }
+    }
+}
+
+void QnModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation) {
+    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+        return;
+
+    QnModuleInformation updatedModuleInformation = moduleInformation;
+
+    if (sender() == m_multicastModuleFinder)
+        updatedModuleInformation.remoteAddresses.unite(m_directModuleFinder->moduleInformation(moduleInformation.id).remoteAddresses);
+    else if (sender() == m_directModuleFinder)
+        updatedModuleInformation.remoteAddresses.unite(m_multicastModuleFinder->moduleInformation(moduleInformation.id).remoteAddresses);
+    else
+        Q_ASSERT_X(0, "Invalid sender in slot", Q_FUNC_INFO);
+
+    QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
+    if (oldModuleInformation != updatedModuleInformation) {
+        oldModuleInformation = updatedModuleInformation;
+
+        /* Don't emit when there is no more remote addresses. moduleLost() will be emited just after moduleUrlLost(). */
+        if (!updatedModuleInformation.remoteAddresses.isEmpty())
+            emit moduleChanged(updatedModuleInformation);
+    }
+}
+
+void QnModuleFinder::at_resourcePool_resourceChanged(const QnResourcePtr &resource) {
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return;
+
+    auto it = m_foundModules.find(server->getId());
+    if (it == m_foundModules.end())
+        return;
+
+    QnModuleInformation moduleInformation = server->getModuleInformation();
+    moduleInformation.remoteAddresses = it->remoteAddresses;
+    moduleInformation.sslAllowed = it->sslAllowed;
+
+    if (moduleInformation == *it)
+        return;
+
+    *it = moduleInformation;
+    emit moduleChanged(moduleInformation);
+}
+
 void QnModuleFinder::stop() {
     m_multicastModuleFinder->stop();
     m_directModuleFinder->stop();
 }
 
-void QnModuleFinder::at_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
-    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
-        return;
-
-    if (sender() == m_multicastModuleFinder)
-        m_directModuleFinder->addIgnoredAddress(QHostAddress(remoteAddress), moduleInformation.port);
-
-    auto it = m_foundModules.find(moduleInformation.id);
-    if (it == m_foundModules.end()) {
-        m_foundModules.insert(moduleInformation.id, moduleInformation);
-        emit moduleFound(moduleInformation, remoteAddress);
-    } else {
-        QnModuleInformation updatedModuleInformation(*it);
-        updatedModuleInformation.remoteAddresses += moduleInformation.remoteAddresses;
-        if (*it == updatedModuleInformation)
-            return;
-
-        *it = updatedModuleInformation;
-        emit moduleFound(moduleInformation, remoteAddress);
-    }
-}
-
-void QnModuleFinder::at_moduleLost(const QnModuleInformation &moduleInformation) {
-    bool stay = true;
-
-    if (sender() == m_multicastModuleFinder) {
-        foreach (const QString &address, moduleInformation.remoteAddresses)
-            m_directModuleFinder->removeIgnoredAddress(QHostAddress(address), moduleInformation.port);
-
-        if (m_directModuleFinder->moduleInformation(moduleInformation.id).id.isNull())
-            stay = false;
-    } else {
-        if (m_multicastModuleFinder->moduleInformation(moduleInformation.id.toString()).id.isNull())
-            stay = false;
-    }
-
-    if (!stay) {
-        m_foundModules.remove(moduleInformation.id);
-        emit moduleLost(moduleInformation);
-    }
-}

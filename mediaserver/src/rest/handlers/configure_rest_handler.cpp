@@ -7,6 +7,7 @@
 #include "common/common_module.h"
 #include "media_server/settings.h"
 #include "media_server/serverutil.h"
+#include "media_server/server_connector.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/media_server_resource.h"
@@ -125,6 +126,6 @@ void QnConfigureRestHandler::resetConnections() {
         qnTransactionBus->dropConnections();
     }
 
-    if (QnModuleFinder::instance())
-        QnModuleFinder::instance()->makeModulesReappear();
+    if (QnServerConnector::instance())
+        QnServerConnector::instance()->reconnect();
 }

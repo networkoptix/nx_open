@@ -39,8 +39,8 @@ public:
 private slots:
     void at_connectionAdded(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
     void at_connectionRemoved(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
-    void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation);
-    void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
+    void at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
 
 private:
     void makeConsistent();

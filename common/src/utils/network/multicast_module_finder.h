@@ -10,6 +10,7 @@
 #include <utils/common/system_information.h>
 
 #include "module_information.h"
+#include "network_address.h"
 #include "networkoptixmodulerevealcommon.h"
 #include "aio/pollset.h"
 #include "system_socket.h"
@@ -57,25 +58,20 @@ public:
     //! \param compatibilityMode         New compatibility mode state.
     void setCompatibilityMode(bool compatibilityMode);
 
-    QList<QnModuleInformation> revealedModules() const;
+    QnModuleInformation moduleInformation(const QUuid &moduleId) const;
+    QList<QnModuleInformation> foundModules() const;
 
-    QnModuleInformation moduleInformation(const QString &moduleId) const;
-
-    void addIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id);
-    void removeIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id);
-    QMultiHash<QUrl, QUuid> ignoredModules() const;
+    void addIgnoredModule(const QnNetworkAddress &address, const QUuid &id);
+    void removeIgnoredModule(const QnNetworkAddress &address, const QUuid &id);
+    QMultiHash<QnNetworkAddress, QUuid> ignoredModules() const;
 
 public slots:
     virtual void pleaseStop() override;
 
 signals:
-    //!Emitted when new enterprise controller has been found
-    void moduleFound(const QnModuleInformation &moduleInformation,
-                     const QString &remoteAddress,
-                     const QString &localInterfaceAddress);
-
-    //!Emmited when previously found module did not respond to request in predefined timeout
-    void moduleLost(const QnModuleInformation &moduleInformation);
+    void moduleChanged(const QnModuleInformation &moduleInformation);
+    void moduleAddressFound(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address);
+    void moduleAddressLost(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address);
 
 protected:
     virtual void run() override;
@@ -86,10 +82,8 @@ private:
 
 private:
     struct ModuleContext {
-        QHostAddress address;
         quint64 prevResponseReceiveClock;
-        QSet<QString> signalledAddresses;
-        QnModuleInformation moduleInformation;
+        QUuid moduleId;
 
         ModuleContext(const RevealResponse &response);
     };
@@ -101,9 +95,10 @@ private:
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;
-    QHash<QUuid, ModuleContext> m_knownEnterpriseControllers;
     bool m_compatibilityMode;
-    QMultiHash<QUrl, QUuid> m_ignoredModules;
+    QHash<QnNetworkAddress, ModuleContext> m_foundAddresses;
+    QHash<QUuid, QnModuleInformation> m_foundModules;
+    QMultiHash<QnNetworkAddress, QUuid> m_ignoredModules;
 };
 
 #endif // MULTICAST_MODULE_FINDER_H
