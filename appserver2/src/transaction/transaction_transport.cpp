@@ -9,6 +9,9 @@
 #include "transaction_log.h"
 #include <transaction/chunked_transfer_encoder.h>
 #include "common/common_module.h"
+#include "core/resource_management/resource_pool.h"
+#include "core/resource/media_server_resource.h"
+#include "api/app_server_connection.h"
 
 
 namespace ec2
@@ -33,7 +36,8 @@ QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, con
     m_chunkLen(0), 
     m_sendOffset(0), 
     m_connected(false),
-    m_prevGivenHandlerID(0)
+    m_prevGivenHandlerID(0),
+    m_authByKey(true)
 {
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
 }
@@ -162,6 +166,21 @@ void QnTransactionTransport::close()
     setState(State::Closed);
 }
 
+void QnTransactionTransport::fillAuthInfo()
+{
+    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (ownServer && m_authByKey) 
+    {
+        m_httpClient->setUserName(ownServer->getId().toString().toLower());    
+        m_httpClient->setUserPassword(ownServer->getAuthKey());
+    }
+    else {
+        QUrl url = QnAppServerConnectionFactory::url();
+        m_httpClient->setUserName(url.userName());
+        m_httpClient->setUserPassword(url.password());
+    }
+}
+
 void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
 {
     setState(ConnectingStage1);
@@ -170,9 +189,9 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
     //connect(m_httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone, Qt::DirectConnection);
+    
+    fillAuthInfo();
 
-    m_httpClient->setUserName("system");    
-    m_httpClient->setUserPassword(qnCommon->getSystemPassword());
     if (!remoteAddr.userName().isEmpty())
     {
         remoteAddr.setUserName(QString());
@@ -379,11 +398,24 @@ void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_
 
 void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientPtr& client)
 {
+    int statusCode = client->response()->statusLine.statusCode;
+    if (statusCode == nx_http::StatusCode::unauthorized && m_authByKey)
+    {
+        m_authByKey = false;
+        fillAuthInfo();
+        QTimer::singleShot(0, this, SLOT(repeatDoGet()));
+        return;
+    }
+
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
 
-    if (itrGuid == client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (itrGuid == client->response()->headers.end() || statusCode != nx_http::StatusCode::ok)
     {
         cancelConnecting();
+        return;
+    }
+
+    if (getState() == QnTransactionTransport::Error || getState() == QnTransactionTransport::Closed) {
         return;
     }
 

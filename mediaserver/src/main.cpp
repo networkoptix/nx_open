@@ -671,6 +671,11 @@ int serverMain(int argc, char *argv[])
     return 0;
 }
 
+bool isLocalAppServer(const QString& appserverHostString)
+{
+    return appserverHostString.isEmpty() || appserverHostString == "localhost" || QUrl(appserverHostString).scheme() == "file";
+}
+
 void initAppServerConnection(QSettings &settings)
 {
     QUrl appServerUrl;
@@ -704,7 +709,8 @@ void initAppServerConnection(QSettings &settings)
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
     QString password = settings.value("appserverPassword", QLatin1String("")).toString();
     QByteArray authKey = settings.value("authKey").toByteArray();
-    if (!authKey.isEmpty())
+    QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
+    if (!authKey.isEmpty() && !isLocalAppServer(appserverHostString))
     {
         // convert from v2.2 format and encode value
         QByteArray prefix("SK_");
@@ -1388,7 +1394,7 @@ void QnMain::run()
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
-        bool isLocal = appserverHostString.isEmpty() || appserverHostString == "localhost" || QUrl(appserverHostString).scheme() == "file";
+        bool isLocal = isLocalAppServer(appserverHostString);
 
         int serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 #ifdef EDGE_SERVER
@@ -1437,8 +1443,16 @@ void QnMain::run()
             isModified = true;
         }
 
-        if (server->getSystemName() != qnCommon->localSystemName()) {
+        bool needUpdateAuthKey = server->getAuthKey().isEmpty();
+        if (server->getSystemName() != qnCommon->localSystemName()) 
+        {
+            if (!server->getSystemName().isEmpty())
+                needUpdateAuthKey = true;
             server->setSystemName(qnCommon->localSystemName());
+            isModified = true;
+        }
+        if (needUpdateAuthKey) {
+            server->setAuthKey(QUuid::createUuid().toString());
             isModified = true;
         }
         
