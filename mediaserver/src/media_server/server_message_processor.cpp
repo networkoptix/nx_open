@@ -258,7 +258,6 @@ void QnServerMessageProcessor::at_systemNameChangeRequested(const QString &syste
 
 void QnServerMessageProcessor::at_remotePeerUnauthorized(const QUrl& url)
 {
-    QString _host = url.host();
     QHostAddress host(url.host());
     int port = url.port();
     foreach (QnMediaServerResourcePtr mServer, qnResPool->getAllServers()) 

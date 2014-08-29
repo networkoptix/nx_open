@@ -1034,6 +1034,20 @@ void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
     foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
         QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
         ec2Connection->deleteRemotePeer(url);
+
+        QHostAddress host(remoteAddress);
+        int port = moduleInformation.port;
+
+        foreach (QnMediaServerResourcePtr mServer, qnResPool->getAllServers()) 
+        {
+            if (mServer->getStatus() == Qn::Unauthorized) {
+                QList<QHostAddress> addrList = mServer->getNetAddrList();
+                if (addrList.contains(host) && QUrl(mServer->getApiUrl()).port() == port) {
+                    mServer->setStatus(Qn::Offline);
+                    break;
+                }
+            }
+        }
     }
 }
 
@@ -1289,7 +1303,7 @@ void QnMain::run()
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverPort");
         MSSettings::roSettings()->remove("appserverLogin");
-        //MSSettings::roSettings()->remove("appserverPassword");
+        MSSettings::roSettings()->remove("appserverPassword");
         MSSettings::roSettings()->remove(PENDING_SWITCH_TO_CLUSTER_MODE);
         MSSettings::roSettings()->sync();
 
@@ -1465,6 +1479,7 @@ void QnMain::run()
     }
 
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
+    MSSettings::roSettings()->remove("appserverPassword");
 
     if (needToStop()) {
         stopObjects();

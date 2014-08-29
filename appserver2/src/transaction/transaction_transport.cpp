@@ -12,6 +12,8 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "api/app_server_connection.h"
+#include "core/resource/user_resource.h"
+#include "api/global_settings.h"
 
 
 namespace ec2
@@ -36,8 +38,7 @@ QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, con
     m_chunkLen(0), 
     m_sendOffset(0), 
     m_connected(false),
-    m_prevGivenHandlerID(0),
-    m_authByKey(true)
+    m_prevGivenHandlerID(0)
 {
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
 }
@@ -177,7 +178,12 @@ void QnTransactionTransport::fillAuthInfo()
     else {
         QUrl url = QnAppServerConnectionFactory::url();
         m_httpClient->setUserName(url.userName());
-        m_httpClient->setUserPassword(url.password());
+		
+	    QnUserResourcePtr adminUser = QnGlobalSettings::instance()->getAdminUser();
+	    if (adminUser) {
+	        m_httpClient->setUserPassword(adminUser->getDigest());
+	        m_httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+	    }
     }
 }
 
@@ -459,8 +465,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 void QnTransactionTransport::at_httpClientDone( const nx_http::AsyncHttpClientPtr& client )
 {
     nx_http::AsyncHttpClient::State state = client->state();
-    if( state == nx_http::AsyncHttpClient::sFailed )
+    if( state == nx_http::AsyncHttpClient::sFailed ) {
         cancelConnecting();
+    }
 }
 
 void QnTransactionTransport::processTransactionData(const QByteArray& data)

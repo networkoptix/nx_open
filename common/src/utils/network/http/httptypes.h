@@ -82,6 +82,9 @@ namespace nx_http
     */
     HttpHeaders::iterator insertOrReplaceHeader( HttpHeaders* const headers, const HttpHeader& newHeader );
 
+    void removeHeader( HttpHeaders* const headers, const StringType& headerName );
+
+
 
     static const size_t BufferNpos = size_t(-1);
 

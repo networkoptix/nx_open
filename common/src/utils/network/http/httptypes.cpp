@@ -52,6 +52,13 @@ namespace nx_http
         }
     }
 
+    void removeHeader( HttpHeaders* const headers, const StringType& headerName )
+    {
+        HttpHeaders::iterator itr = headers->lower_bound( headerName );
+        while (itr != headers->end() && itr->first == headerName)
+            itr = headers->erase(itr);
+    }
+
     ////////////////////////////////////////////////////////////
     //// parse utils
     ////////////////////////////////////////////////////////////

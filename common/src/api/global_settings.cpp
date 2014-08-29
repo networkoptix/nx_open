@@ -182,3 +182,8 @@ void QnGlobalSettings::synchronizeNow() {
     foreach (QnAbstractResourcePropertyAdaptor* adaptor, m_allAdaptors)
         adaptor->synchronizeNow();
 }
+
+QnUserResourcePtr QnGlobalSettings::getAdminUser()
+{
+    return m_admin;
+}
