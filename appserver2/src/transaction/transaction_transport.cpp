@@ -14,6 +14,7 @@
 #include "api/app_server_connection.h"
 #include "core/resource/user_resource.h"
 #include "api/global_settings.h"
+#include "database/db_manager.h"
 
 
 namespace ec2
@@ -178,12 +179,16 @@ void QnTransactionTransport::fillAuthInfo()
     else {
         QUrl url = QnAppServerConnectionFactory::url();
         m_httpClient->setUserName(url.userName());
-		
-	    QnUserResourcePtr adminUser = QnGlobalSettings::instance()->getAdminUser();
-	    if (adminUser) {
-	        m_httpClient->setUserPassword(adminUser->getDigest());
-	        m_httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
-	    }
+		if (dbManager) {
+	        QnUserResourcePtr adminUser = QnGlobalSettings::instance()->getAdminUser();
+	        if (adminUser) {
+	            m_httpClient->setUserPassword(adminUser->getDigest());
+	            m_httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+	        }
+        }
+        else {
+            m_httpClient->setUserPassword(url.password());
+        }
     }
 }
 
