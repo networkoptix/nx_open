@@ -61,6 +61,21 @@ void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &module
             server->setSystemInfo(moduleInformation.systemInformation);
             server->setSystemName(moduleInformation.systemName);
             server->setStatus(moduleInformation.isCompatibleToCurrentSystem() ? Qn::Offline : Qn::Incompatible);
+
+            QList<QHostAddress> addresses;
+            foreach (const QString &address, moduleInformation.remoteAddresses) {
+                QHostAddress hostAddress(address);
+                if (hostAddress.isNull())
+                    continue;
+                addresses.append(hostAddress);
+            }
+            if (!addresses.isEmpty()) {
+                server->setNetAddrList(addresses);
+                QString url = QString(lit("http://%1:%2")).arg(addresses.first().toString()).arg(moduleInformation.port);
+                server->setApiUrl(url);
+                server->setUrl(url);
+            }
+
             qnResPool->updateIncompatibility(server);
         }
         return;
