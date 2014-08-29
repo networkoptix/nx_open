@@ -27,8 +27,8 @@ bool QnTextureTransitionShaderProgram::compile()
     uniform sampler2D uTexture1;
     uniform float aProgress;
     void main() {
-        vec4 texColor = texture(uTexture, vTexColor);
-        vec4 texColor1 = texture(uTexture1, vTexColor);
+        vec4 texColor = texture2D(uTexture, vTexColor);
+        vec4 texColor1 = texture2D(uTexture1, vTexColor);
         gl_FragColor = uColor * (texColor * (1.0 - aProgress) + texColor1 * aProgress);
     }
     ));
