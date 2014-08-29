@@ -74,9 +74,6 @@ void QnRouter::at_connectionRemoved(const QUuid &discovererId, const QUuid &peer
 }
 
 void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
-    if (m_moduleFinder->isSendingFakeSignals())
-        return;
-
     Endpoint endpoint(moduleInformation.id, url.host(), url.port());
     if (m_connections.contains(qnCommon->moduleGUID(), endpoint))
         return;
@@ -89,9 +86,6 @@ void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleI
 
 
 void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url) {
-    if (m_moduleFinder->isSendingFakeSignals())
-        return;
-
     Endpoint endpoint(moduleInformation.id, url.host(), url.port());
     if (!m_connections.remove(qnCommon->moduleGUID(), endpoint))
         return;

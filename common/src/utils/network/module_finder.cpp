@@ -17,8 +17,7 @@ namespace {
 QnModuleFinder::QnModuleFinder(bool clientOnly) :
     m_multicastModuleFinder(new QnMulticastModuleFinder(clientOnly)),
     m_directModuleFinder(new QnDirectModuleFinder(this)),
-    m_directModuleFinderHelper(new QnModuleFinderHelper(this)),
-    m_sendingFakeSignals(false)
+    m_directModuleFinderHelper(new QnModuleFinderHelper(this))
 {
     connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleAddressFound,       this,       &QnModuleFinder::at_moduleAddressFound);
     connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleAddressLost,        this,       &QnModuleFinder::at_moduleAddressLost);
@@ -57,22 +56,8 @@ QnModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
     return m_directModuleFinderHelper;
 }
 
-void QnModuleFinder::makeModulesReappear() {
-    m_sendingFakeSignals = true;
-//    foreach (const QnModuleInformation &moduleInformation, m_foundModules) {
-//        emit moduleLost(moduleInformation);
-//        foreach (const QString &address, moduleInformation.remoteAddresses)
-//            emit moduleFound(moduleInformation, address);
-//    }
-    m_sendingFakeSignals = false;
-}
-
 void QnModuleFinder::setAllowedPeers(const QList<QUuid> &peerList) {
     m_allowedPeers = peerList;
-}
-
-bool QnModuleFinder::isSendingFakeSignals() const {
-    return m_sendingFakeSignals;
 }
 
 void QnModuleFinder::start() {

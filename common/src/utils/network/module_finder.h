@@ -29,15 +29,8 @@ public:
     QnDirectModuleFinder *directModuleFinder() const;
     QnModuleFinderHelper *directModuleFinderHelper() const;
 
-    /*! Hacky thing. This function emits moduleLost for every found module and then moduleFound for them.
-     * It's used to force a server to drop all its connections and find new.
-     */
-    void makeModulesReappear();
-
     //! \param peerList Discovery peer if and only if peer exist in peerList
     void setAllowedPeers(const QList<QUuid> &peerList);
-
-    bool isSendingFakeSignals() const;
 
 public slots:
     void start();
@@ -65,7 +58,6 @@ private:
     QMultiHash<QUuid, QUrl> m_multicastFoundUrls;
     QMultiHash<QUuid, QUrl> m_directFoundUrls;
     QList<QUuid> m_allowedPeers;
-    bool m_sendingFakeSignals;
 };
 
 #endif  //NETWORKOPTIXMODULEFINDER_H

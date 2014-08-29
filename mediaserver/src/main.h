@@ -46,9 +46,6 @@ private slots:
     void at_timer();
     void at_connectionOpened();
 
-    void at_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
-    void at_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
-
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
     void at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);

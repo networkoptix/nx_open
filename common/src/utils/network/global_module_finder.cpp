@@ -77,18 +77,12 @@ void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInf
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
-    if (m_moduleFinder->isSendingFakeSignals())
-        return;
-
     addModule(moduleInformation, QUuid(qnCommon->moduleGUID()));
     if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
         connection->getMiscManager()->sendModuleInformation(moduleInformation, true, QUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
-    if (m_moduleFinder->isSendingFakeSignals())
-        return;
-
     removeModule(moduleInformation, QUuid(qnCommon->moduleGUID()));
     if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
         connection->getMiscManager()->sendModuleInformation(moduleInformation, false, QUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
