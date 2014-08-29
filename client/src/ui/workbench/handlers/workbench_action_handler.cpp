@@ -71,7 +71,6 @@
 #include <ui/dialogs/picture_settings_dialog.h>
 #include <ui/dialogs/ping_dialog.h>
 #include <ui/dialogs/system_administration_dialog.h>
-#include <ui/dialogs/time_server_selection_dialog.h>
 #include <ui/dialogs/non_modal_dialog_constructor.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -2442,17 +2441,6 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
 void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered() {
     QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::TimeServerSelection);
-
-    if( !m_timeServerSelectionDialog )
-    {
-        m_timeServerSelectionDialog = new QnTimeServerSelectionDialog( mainWindow(), context() );
-        m_timeServerSelectionDialog->setModal(true);
-    }
-
-    if( m_timeServerSelectionDialog->isVisible() )
-        return; //dialog still running from previous time
-
-    m_timeServerSelectionDialog->exec();
 }
 
 void QnWorkbenchActionHandler::deleteDialogs() {
