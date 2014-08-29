@@ -11,6 +11,7 @@
 #include "common/common_module.h"
 #include "media_server/settings.h"
 #include "media_server/serverutil.h"
+#include "media_server/server_connector.h"
 #include "utils/network/simple_http_client.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/module_finder.h"
@@ -103,9 +104,8 @@ bool QnJoinSystemRestHandler::changeSystemName(const QString &systemName) {
         ec2Connection()->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
 
-    /* disconnect from the original system */
-    if (QnModuleFinder::instance())
-        QnModuleFinder::instance()->makeModulesReappear();
+    if (QnServerConnector::instance())
+        QnServerConnector::instance()->reconnect();
 
     return true;
 }

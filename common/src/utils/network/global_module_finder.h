@@ -27,13 +27,12 @@ public:
     QnModuleInformation moduleInformation(const QUuid &id) const;
 
 signals:
-    void peerFound(const QnModuleInformation &moduleInformation);
     void peerChanged(const QnModuleInformation &moduleInformation);
     void peerLost(const QnModuleInformation &moduleInformation);
 
 private slots:
     void at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer);
-    void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation);
+    void at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation);
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
     void at_resourcePool_statusChanged(const QnResourcePtr &resource);
@@ -44,12 +43,14 @@ private:
     void removeModule(const QnModuleInformation &moduleInformation, const QUuid &discoverer);
 
     void removeAllModulesDiscoveredBy(const QUuid &discoverer);
+    QSet<QString> getModuleAddresses(const QUuid &id) const;
 
 private:
     std::weak_ptr<ec2::AbstractECConnection> m_connection;  // just to know from where to disconnect
     QPointer<QnModuleFinder> m_moduleFinder;
     QHash<QUuid, QnModuleInformation> m_moduleInformationById;
     QHash<QUuid, QSet<QUuid>> m_discovererIdByServerId;
+    QHash<QUuid, QHash<QUuid, QSet<QString>>> m_discoveredAddresses;
 };
 
 #endif // GLOBAL_MODULE_FINDER_H

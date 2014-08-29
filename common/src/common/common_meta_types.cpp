@@ -197,6 +197,8 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<Qn::CameraDataType>();
 
+    qRegisterMetaType<QnNetworkAddress>();
+
     qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
     qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
     qRegisterMetaType<ec2::QnFullResourceData>( "QnFullResourceData" );

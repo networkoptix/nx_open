@@ -7,7 +7,8 @@
 #include "api/session_manager.h"
 #include <api/app_server_connection.h>
 #include "utils/common/sleep.h"
-
+#include "utils/network/networkoptixmodulerevealcommon.h"
+#include "version.h"
 
 const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
 
@@ -398,6 +399,23 @@ void QnMediaServerResource::setSystemName(const QString &systemName) {
     QMutexLocker lock(&m_mutex);
 
     m_systemName = systemName;
+}
+
+QnModuleInformation QnMediaServerResource::getModuleInformation() const {
+    QMutexLocker lock(&m_mutex);
+
+    QnModuleInformation moduleInformation;
+    moduleInformation.type = nxMediaServerId;
+    moduleInformation.customization = lit(QN_CUSTOMIZATION_NAME);
+    moduleInformation.version = m_version;
+    moduleInformation.systemInformation = m_systemInfo;
+    moduleInformation.systemName = m_systemName;
+    moduleInformation.port = QUrl(m_apiUrl).port();
+    foreach (const QHostAddress &address, m_netAddrList)
+        moduleInformation.remoteAddresses.insert(address.toString());
+    moduleInformation.id = getId();
+    moduleInformation.sslAllowed = false;
+    return moduleInformation;
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {

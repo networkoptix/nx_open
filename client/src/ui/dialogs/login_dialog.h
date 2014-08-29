@@ -69,8 +69,8 @@ private slots:
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
 
-    void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress);
-    void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
+    void at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
 
 private:
     QUrl currentUrl() const;
