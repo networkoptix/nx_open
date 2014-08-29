@@ -212,6 +212,7 @@ namespace ec2
         //!Returns time received from the internet or current local system time
         qint64 currentMSecsSinceEpoch() const;
 
+        void updateRuntimeInfoPriority(quint64 priority);
     private slots:
         void onNewConnectionEstablished( const QnTransactionTransportPtr& transport );
         void onPeerLost( ApiPeerAliveData data );
