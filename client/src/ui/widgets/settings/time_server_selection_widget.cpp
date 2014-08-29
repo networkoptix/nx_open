@@ -95,5 +95,15 @@ void QnTimeServerSelectionWidget::updateTime() {
         return;
 
     m_model->updateTime();
-    ui->timeLabel->setText(qnSyncTime->currentDateTime().toString(Qt::ISODate));
+
+    QDateTime syncTime;
+    if (m_model->sameTimezone()) {
+        syncTime.setTimeSpec(Qt::LocalTime);
+        syncTime.setMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch());
+        ui->timeLabel->setText(syncTime.toString(lit("yyyy-MM-dd HH:mm:ss")));
+    } else {
+        syncTime.setTimeSpec(Qt::UTC);
+        syncTime.setMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch());
+        ui->timeLabel->setText(syncTime.toString(lit("yyyy-MM-dd HH:mm:ss t")));
+    }
 }

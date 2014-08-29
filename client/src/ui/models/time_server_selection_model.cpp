@@ -12,10 +12,13 @@
 #include <nx_ec/data/api_runtime_data.h>
 
 #include <ui/style/resource_icon_cache.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <utils/common/collection.h>
 #include <utils/common/qtimespan.h>
 #include <utils/common/synctime.h>
+#include <utils/tz/tz.h>
 
 namespace {
     QVector<int> textRoles = QVector<int>() 
@@ -33,7 +36,9 @@ namespace {
 
 QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*/):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_sameTimezone(false),
+    m_sameTimezoneValid(false)
 {
     auto processor = QnCommonMessageProcessor::instance();
 
@@ -92,6 +97,10 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
         if (idx < 0)
             return;
 
+        m_sameTimezoneValid = false;
+        updateColumn(Columns::TimeColumn);
+        updateColumn(Columns::OffsetColumn);
+
         emit dataChanged(
             this->index(idx, Columns::NameColumn), 
             this->index(idx, Columns::NameColumn),
@@ -99,6 +108,12 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
     });
 
     connect(qnSyncTime, &QnSyncTime::timeChanged, this, [this]{
+        updateColumn(Columns::TimeColumn);
+        updateColumn(Columns::OffsetColumn);
+    });
+
+    connect(context()->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::offsetsChanged, this, [this]{
+        m_sameTimezoneValid = false;
         updateColumn(Columns::TimeColumn);
         updateColumn(Columns::OffsetColumn);
     });
@@ -182,7 +197,27 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
               if (!item.ready)
                   return tr("Synchronizing...");
 
-              return QDateTime::fromMSecsSinceEpoch(currentTime + item.offset).toString(Qt::ISODate);
+              qint64 mSecsSinceEpoch = currentTime + item.offset;
+              QDateTime time;
+              if (sameTimezone()) {
+                  time.setTimeSpec(Qt::LocalTime);
+                  time.setMSecsSinceEpoch(mSecsSinceEpoch);
+                  return time.toString(lit("yyyy-MM-dd HH:mm:ss"));
+              } else {
+                  qint64 utcOffset = server 
+                      ? context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(server)
+                      : Qn::InvalidUtcOffset;
+
+                  if (utcOffset != Qn::InvalidUtcOffset) {
+                      time.setTimeSpec(Qt::OffsetFromUTC);
+                      time.setUtcOffset(utcOffset / 1000);
+                      time.setMSecsSinceEpoch(mSecsSinceEpoch);
+                  } else {
+                      time.setTimeSpec(Qt::UTC);
+                      time.setMSecsSinceEpoch(mSecsSinceEpoch);
+                  }
+                  return time.toString(lit("yyyy-MM-dd HH:mm:ss t"));
+              } 
           }
           if (column == Columns::OffsetColumn) {
               if (!item.ready)
@@ -257,6 +292,8 @@ void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo &info, qint64 t
     if (time > 0)
         item.offset = time - qnSyncTime->currentMSecsSinceEpoch();
     m_items << item;
+
+    m_sameTimezoneValid = false;
 }
 
 QUuid QnTimeServerSelectionModel::selectedServer() const {
@@ -310,4 +347,38 @@ QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMSec) {
         return format.arg(sign).arg(span.toMinutes(), 2, 'g', 2).arg(tr("m"));
     else 
         return format.arg(sign).arg(span.toSecs(), 2, 'g', 2).arg(tr("s"));
+}
+
+bool QnTimeServerSelectionModel::sameTimezone() const {
+    if (!m_sameTimezoneValid) {
+        m_sameTimezone = calculateSameTimezone();
+        m_sameTimezoneValid = true;
+    }
+    return m_sameTimezone;  
+}
+
+bool QnTimeServerSelectionModel::calculateSameTimezone() const {
+    auto watcher = context()->instance<QnWorkbenchServerTimeWatcher>();
+    qint64 localOffset = nx_tz::getLocalTimeZoneOffset(); /* In minutes. */
+    qint64 commonOffset = localOffset == -1 
+        ? Qn::InvalidUtcOffset
+        : localOffset*60;   
+
+    foreach (const Item &item, m_items) {
+        QnMediaServerResourcePtr server = qnResPool->getResourceById(item.peerId).dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+
+        qint64 offset = watcher->utcOffset(server); /* In milliseconds. */
+        if (offset == Qn::InvalidUtcOffset)
+            continue;
+        offset /= 1000;
+
+        if (commonOffset == Qn::InvalidUtcOffset)
+            commonOffset = offset;
+        else
+            if (commonOffset != offset)
+                return false;
+    }
+    return true;
 }
