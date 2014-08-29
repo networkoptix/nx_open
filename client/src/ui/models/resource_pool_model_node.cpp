@@ -172,6 +172,10 @@ void QnResourcePoolModelNode::update() {
             m_searchString = QString();
             m_icon = QIcon();
         } else {
+            if (m_name == lit("Server-7005")) {
+                int gg = 4;
+            }
+
             m_name = m_resource->getName();
             m_flags = m_resource->flags();
             m_status = m_resource->getStatus();

@@ -70,6 +70,9 @@ QnModuleInformation QnGlobalModuleFinder::moduleInformation(const QUuid &id) con
 }
 
 void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer) {
+    if (moduleInformation.id == qnCommon->moduleGUID())
+        return;
+
     if (isAlive)
         addModule(moduleInformation, discoverer);
     else

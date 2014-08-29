@@ -36,6 +36,7 @@ public:
     void setEmailSettings(const QnEmail::Settings &settings);
 
     void synchronizeNow();
+    QnUserResourcePtr getAdminUser();
 signals:
     void disabledVendorsChanged();
     void cameraSettingsOptimizationChanged();

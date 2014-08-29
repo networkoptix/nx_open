@@ -843,9 +843,10 @@ void QnTransactionMessageBus::doPeriodicTasks()
                 continue;
 
             itr.value().lastConnectedTime = currentTime;
-            QnTransactionTransportPtr transport(new QnTransactionTransport(m_localPeer));
+            QnTransactionTransportPtr transport(new QnTransactionTransport(m_localPeer, ApiPeerData(itr.value().peer, Qn::PT_Server)));
             connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
             connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
+            connect(transport.data(), &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::remotePeerUnauthorized,  Qt::DirectConnection);
             transport->doOutgoingConnect(url);
             m_connectingConnections << transport;
         }
@@ -912,6 +913,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<A
     QnTransactionTransportPtr transport(new QnTransactionTransport(m_localPeer, remotePeer, socket));
     connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
     connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
+    connect(transport.data(), &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::remotePeerUnauthorized,  Qt::DirectConnection);
 
     QMutexLocker lock(&m_mutex);
     m_connectingConnections << transport;

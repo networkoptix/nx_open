@@ -1018,6 +1018,7 @@ void QnMain::at_cameraIPConflict(const QHostAddress& host, const QStringList& ma
         qnSyncTime->currentUSecsSinceEpoch());
 }
 
+
 bool QnMain::initTcpListener()
 {
     const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
@@ -1270,7 +1271,7 @@ void QnMain::run()
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverPort");
         MSSettings::roSettings()->remove("appserverLogin");
-        //MSSettings::roSettings()->remove("appserverPassword");
+        MSSettings::roSettings()->remove("appserverPassword");
         MSSettings::roSettings()->remove(PENDING_SWITCH_TO_CLUSTER_MODE);
         MSSettings::roSettings()->sync();
 
@@ -1449,6 +1450,7 @@ void QnMain::run()
     }
 
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
+    MSSettings::roSettings()->remove("appserverPassword");
 
     if (needToStop()) {
         stopObjects();

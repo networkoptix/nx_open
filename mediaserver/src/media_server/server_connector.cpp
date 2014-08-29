@@ -5,6 +5,8 @@
 #include "utils/network/module_finder.h"
 #include "utils/network/module_information.h"
 #include "utils/common/log.h"
+#include "core/resource_management/resource_pool.h"
+#include "core/resource/media_server_resource.h"
 
 namespace {
     QUrl trimmedUrl(const QUrl &url) {
@@ -89,6 +91,13 @@ void QnServerConnector::removeConnection(const QnModuleInformation &moduleInform
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     ec2Connection->deleteRemotePeer(urlStr);
+
+    QHostAddress host(url.host());
+    int port = moduleInformation.port;
+
+    QnResourcePtr mServer = qnResPool->getResourceById(moduleInformation.id);
+    if (mServer && mServer->getStatus() == Qn::Unauthorized)
+        mServer->setStatus(Qn::Offline);
 }
 
 void QnServerConnector::reconnect() {

@@ -952,6 +952,7 @@ namespace ec2
 
         void remotePeerFound(ApiPeerAliveData data);
         void remotePeerLost(ApiPeerAliveData data);
+        void remotePeerUnauthorized(const QUuid& id);
 
         void settingsChanged(QnKvPairList settings);
         void panicModeChanged(Qn::PanicMode mode);
