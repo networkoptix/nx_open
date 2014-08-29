@@ -66,6 +66,7 @@ private:
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QUuid> m_updateUserRequests;
+    QHostAddress m_publicAddress;
 };
 
 #endif // MAIN_H

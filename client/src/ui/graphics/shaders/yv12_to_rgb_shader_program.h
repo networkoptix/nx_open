@@ -16,7 +16,7 @@
 class QnAbstractYv12ToRgbShaderProgram : public QnGLShaderProgram {
     Q_OBJECT
 public:
-    QnAbstractYv12ToRgbShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+    QnAbstractYv12ToRgbShaderProgram(QObject *parent = NULL);
 
     void setYTexture(int target) {
         setUniformValue(m_yTextureLocation, target);
@@ -46,7 +46,7 @@ private:
 class QnAbstractRGBAShaderProgram : public QnGLShaderProgram {
     Q_OBJECT
 public:
-    QnAbstractRGBAShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, bool final = true);
+    QnAbstractRGBAShaderProgram(QObject *parent = NULL, bool final = true);
 
     void setRGBATexture(int target) {
         setUniformValue(m_rgbaTextureLocation, target);
@@ -66,14 +66,14 @@ private:
 class QnYv12ToRgbShaderProgram: public QnAbstractYv12ToRgbShaderProgram {
     Q_OBJECT
 public:
-    QnYv12ToRgbShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+    QnYv12ToRgbShaderProgram(QObject *parent = NULL);
 };
 
 
 class QnYv12ToRgbWithGammaShaderProgram: public QnAbstractYv12ToRgbShaderProgram {
     Q_OBJECT
 public:
-    QnYv12ToRgbWithGammaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, bool final = true);
+    QnYv12ToRgbWithGammaShaderProgram(QObject *parent = NULL, bool final = true);
 
     void setImageCorrection(const ImageCorrectionResult& value) {
         setUniformValue(m_yLevels1Location, value.aCoeff);
@@ -96,8 +96,8 @@ template <class Base>
 class QnFisheyeShaderProgram : public Base {
     typedef Base base_type;
 public:
-    QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL)
-        : Base(context, parent, false),
+    QnFisheyeShaderProgram(QObject *parent = NULL)
+        : Base(parent, false),
           m_add_shader(false)
     {
     }
@@ -155,7 +155,7 @@ public:
     virtual bool link() override {
         if ( !m_add_shader )
         {
-            addShaderFromSourceCode(QGLShader::Fragment, getShaderText());
+            addShaderFromSourceCode(QOpenGLShader::Fragment, getShaderText());
             m_add_shader = true;
         }        
         bool rez = base_type::link();
@@ -206,7 +206,7 @@ class QnFisheyeRectilinearProgram : public QnFisheyeShaderProgram<QnYv12ToRgbWit
 {
     Q_OBJECT
 public:
-    QnFisheyeRectilinearProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
+    QnFisheyeRectilinearProgram(QObject *parent = NULL, const QString& gammaStr = lit("y"));
 protected:
     virtual QString getShaderText() override;
 };
@@ -215,7 +215,7 @@ class QnFisheyeEquirectangularHProgram : public QnFisheyeShaderProgram<QnYv12ToR
 {
     Q_OBJECT
 public:
-    QnFisheyeEquirectangularHProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
+    QnFisheyeEquirectangularHProgram(QObject *parent = NULL, const QString& gammaStr = lit("y"));
 protected:
     virtual QString getShaderText() override;
 };
@@ -224,7 +224,7 @@ class QnFisheyeEquirectangularVProgram : public QnFisheyeShaderProgram<QnYv12ToR
 {
     Q_OBJECT
 public:
-    QnFisheyeEquirectangularVProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
+    QnFisheyeEquirectangularVProgram(QObject *parent = NULL, const QString& gammaStr = lit("y"));
 protected:
     virtual QString getShaderText() override;
 };
@@ -235,7 +235,7 @@ class QnFisheyeRGBRectilinearProgram : public QnFisheyeShaderProgram<QnAbstractR
 {
     Q_OBJECT
 public:
-    QnFisheyeRGBRectilinearProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+    QnFisheyeRGBRectilinearProgram(QObject *parent = NULL);
 protected:
     virtual QString getShaderText() override;
 };
@@ -244,7 +244,7 @@ class QnFisheyeRGBEquirectangularHProgram : public QnFisheyeShaderProgram<QnAbst
 {
     Q_OBJECT
 public:
-    QnFisheyeRGBEquirectangularHProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+    QnFisheyeRGBEquirectangularHProgram(QObject *parent = NULL);
 protected:
     virtual QString getShaderText() override;
 };
@@ -253,7 +253,7 @@ class QnFisheyeRGBEquirectangularVProgram : public QnFisheyeShaderProgram<QnAbst
 {
     Q_OBJECT
 public:
-    QnFisheyeRGBEquirectangularVProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+    QnFisheyeRGBEquirectangularVProgram(QObject *parent = NULL);
 protected:
     virtual QString getShaderText() override;
 };
@@ -263,7 +263,7 @@ protected:
 class QnYv12ToRgbaShaderProgram: public QnAbstractYv12ToRgbShaderProgram {
     Q_OBJECT
 public:
-    QnYv12ToRgbaShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+    QnYv12ToRgbaShaderProgram(QObject *parent = NULL);
 
     virtual bool link() override;
 

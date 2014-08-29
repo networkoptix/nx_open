@@ -22,6 +22,7 @@ public:
         SmtpPage,
         UpdatesPage,
         RoutingManagement,
+        TimeServerSelection,
 
         PageCount
     };

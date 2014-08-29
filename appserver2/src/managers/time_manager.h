@@ -78,7 +78,7 @@ namespace ec2
     {
     public:
         qint64 monotonicClockValue;
-        //!synchorionized millis from epoch, corresponding to \a monotonicClockValue
+        //!synchronized millis from epoch, corresponding to \a monotonicClockValue
         qint64 syncTime;
         //!priority key, corresponding to \a syncTime value. This is not necessarily priority key of current server
         /*!
@@ -123,31 +123,37 @@ namespace ec2
         //!Called when primary time server has been changed by user
         void primaryTimeServerChanged( const QnTransaction<ApiIdData>& tran );
         void peerSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeData>& tran );
-        //!Returns synchrionized time with time priority key (not local, but the one used)
+        //!Returns synchronized time with time priority key (not local, but the one used)
         TimeSyncInfo getTimeSyncInfo() const;
         //!Returns value of internal monotonic clock
         qint64 getMonotonicClock() const;
         //!Resets synchronized time to local system time with local peer priority
         void forgetSynchronizedTime();
+        QnPeerTimeInfoList getPeerTimeInfoList() const;
 
     signals:
         //!Emitted when there is ambiguity while choosing primary time server automatically
         /*!
             User SHOULD call \a TimeSynchronizationManager::forcePrimaryTimeServer to set primary time server manually.
             This signal is emitted periodically until ambiguity in choosing primary time server has been resolved (by user or automatically)
-            \param localSystemTime Local system time (UTC, millis from epoch)
-            \param peersAndTimes pair<peer id, peer local time (UTC, millis from epoch) corresponding to \a localSystemTime>
         */
-        void primaryTimeServerSelectionRequired( qint64 localSystemTime, QList<QPair<QUuid, qint64> > peersAndTimes );
+        void primaryTimeServerSelectionRequired();
         //!Emitted when synchronized time has been changed
         void timeChanged( qint64 syncTime );
+        //!Emitted when peer \a peerId local time has changed
+        /*!
+            \param peerId
+            \param syncTime Synchronized time (UTC, millis from epoch) corresponding to \a peerLocalTime
+            \param peerLocalTime Peer local time (UTC, millis from epoch)
+        */
+        void peerTimeChanged(const QUuid &peerId, qint64 syncTime, qint64 peerLocalTime);
 
     private:
         struct RemotePeerTimeInfo
         {
             QUuid peerID;
             qint64 localMonotonicClock;
-            //!synchorionized millis from epoch, corresponding to \a monotonicClockValue
+            //!synchronized millis from epoch, corresponding to \a monotonicClockValue
             qint64 remotePeerSyncTime;
 
             RemotePeerTimeInfo(
@@ -206,6 +212,7 @@ namespace ec2
         //!Returns time received from the internet or current local system time
         qint64 currentMSecsSinceEpoch() const;
 
+        void updateRuntimeInfoPriority(quint64 priority);
     private slots:
         void onNewConnectionEstablished( const QnTransactionTransportPtr& transport );
         void onPeerLost( ApiPeerAliveData data );

@@ -1,10 +1,5 @@
 #include "gl_renderer.h"
 
-//#ifndef Q_OS_MACX
-//#define GL_GLEXT_PROTOTYPES
-//#include <GL/glext.h>
-//#endif
-//#define GL_GLEXT_PROTOTYPES 1
 #include <QtGui/qopengl.h>
 
 #include <cassert>
@@ -26,6 +21,7 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_buffer_stream.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
+#include <ui/graphics/shaders/texture_color_shader_program.h>
 #include <ui/common/geometry.h>
 #include "ui/fisheye/fisheye_ptz_controller.h"
 
@@ -68,34 +64,35 @@ namespace {
 // -------------------------------------------------------------------------- //
 // QnGlRendererShaders
 // -------------------------------------------------------------------------- //
-QnGlRendererShaders::QnGlRendererShaders(const QGLContext *context, QObject *parent): QObject(parent) {
-    yv12ToRgb = new QnYv12ToRgbShaderProgram(context, this);
-    yv12ToRgbWithGamma = new QnYv12ToRgbWithGammaShaderProgram(context, this);
-    yv12ToRgba = new QnYv12ToRgbaShaderProgram(context, this);
-    nv12ToRgb = new QnNv12ToRgbShaderProgram(context, this);
+QnGlRendererShaders::QnGlRendererShaders(QObject *parent): QObject(parent) {
+    yv12ToRgb = new QnYv12ToRgbShaderProgram(this);
+    yv12ToRgbWithGamma = new QnYv12ToRgbWithGammaShaderProgram(this);
+    yv12ToRgba = new QnYv12ToRgbaShaderProgram(this);
+    nv12ToRgb = new QnNv12ToRgbShaderProgram(this);
     
     
     const QString GAMMA_STRING(lit("clamp(pow(max(y+ yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0)"));
 
-    fisheyePtzProgram = new QnFisheyeRectilinearProgram(context, this);
-    fisheyePtzGammaProgram =  new QnFisheyeRectilinearProgram(context, this, GAMMA_STRING);
+    fisheyePtzProgram = new QnFisheyeRectilinearProgram(this);
+    fisheyePtzGammaProgram =  new QnFisheyeRectilinearProgram(this, GAMMA_STRING);
 
-    fisheyePanoHProgram = new QnFisheyeEquirectangularHProgram(context, this);
-    fisheyePanoHGammaProgram = new QnFisheyeEquirectangularHProgram(context, this, GAMMA_STRING);
+    fisheyePanoHProgram = new QnFisheyeEquirectangularHProgram(this);
+    fisheyePanoHGammaProgram = new QnFisheyeEquirectangularHProgram(this, GAMMA_STRING);
 
-    fisheyePanoVProgram = new QnFisheyeEquirectangularVProgram(context, this);
-    fisheyePanoVGammaProgram = new QnFisheyeEquirectangularVProgram(context, this, GAMMA_STRING);
+    fisheyePanoVProgram = new QnFisheyeEquirectangularVProgram(this);
+    fisheyePanoVGammaProgram = new QnFisheyeEquirectangularVProgram(this, GAMMA_STRING);
 
-    fisheyeRGBPtzProgram = new QnFisheyeRGBRectilinearProgram(context, this);
-    fisheyeRGBPanoHProgram = new QnFisheyeRGBEquirectangularHProgram(context, this);
-    fisheyeRGBPanoVProgram = new QnFisheyeRGBEquirectangularVProgram(context, this);
+    fisheyeRGBPtzProgram = new QnFisheyeRGBRectilinearProgram(this);
+    fisheyeRGBPanoHProgram = new QnFisheyeRGBEquirectangularHProgram(this);
+    fisheyeRGBPanoVProgram = new QnFisheyeRGBEquirectangularVProgram(this);
 }
 
 QnGlRendererShaders::~QnGlRendererShaders() {
     return;
 }
 
-Q_GLOBAL_STATIC(QnGlContextData<QnGlRendererShaders>, qn_glRendererShaders_instanceStorage);
+typedef QnGlContextData<QnGlRendererShaders, QnGlContextDataStardardFactory<QnGlRendererShaders> > QnGlRendererShadersStorage;
+Q_GLOBAL_STATIC(QnGlRendererShadersStorage, qn_glRendererShaders_instanceStorage);
 
 
 // -------------------------------------------------------------------------- //
@@ -234,12 +231,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                     v_array );
                 break;
 
-            case PIX_FMT_YUV420P:
-                /*drawVideoTextureDirectly(
-                    QnGeometry::subRect(picLock->textureRect(), sourceRect),
-                    picLock->glTextures()[0],
-                    v_array );*/
-                
+            case PIX_FMT_YUV420P:              
                 Q_ASSERT( isYV12ToRgbShaderUsed() );
                 drawYV12VideoTexture(
                     picLock,
@@ -271,8 +263,6 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
         {
             if (m_timeChangeEnabled) {
                 m_lastDisplayedTime = picLock->pts();
-                //qDebug() << "QnGLRenderer::paint. Frame timestamp ("<<m_lastDisplayedTime<<") " <<
-                //    QDateTime::fromMSecsSinceEpoch(m_lastDisplayedTime/1000).toString(QLatin1String("hh:mm:ss.zzz"));
             }
         }
         m_prevFrameSequence = picLock->sequence();
@@ -302,19 +292,17 @@ void QnGLRenderer::drawVideoTextureDirectly(
         (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
 
-    //Deprecated in OpenGL ES2.0
-    //glEnable(GL_TEXTURE_2D);
-    //DEBUG_CODE(glCheckError("glEnable"));
-
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex0ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(QVector4D(1.0f,1.0f,1.0f,1.0f));
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuad(v_array,tx_array);
-    
-//    glColor4f( 1, 1, 1, 1 );
-
-    //drawBindedTexture( m_shaders->rgba, v_array, tx_array );
+    auto renderer = QnOpenGLRendererManager::instance(QGLContext::currentContext());
+    auto shader = renderer->getTextureShader();
+    shader->bind();
+    shader->setColor(QVector4D(1.0f,1.0f,1.0f,1.0f));
+    shader->setTexture(0);
+    drawBindedTexture(shader, v_array, tx_array);
+    shader->release();
 }
 
 void QnGLRenderer::setScreenshotInterface(ScreenshotInterface* value) { 
@@ -340,17 +328,6 @@ void QnGLRenderer::drawYV12VideoTexture(
     const float* v_array,
     bool isStillImage)
 {
-    /*
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-10000,10000,10000,-10000,-10000,10000);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    */
-    //QnOpenGLRendererManager::instance(QGLContext::currentContext())->getProjectionMatrix().setToIdentity();
-    //QnOpenGLRendererManager::instance(QGLContext::currentContext())->getProjectionMatrix().ortho(-10000,10000,10000,-10000,-10000,10000);
-    //QnOpenGLRendererManager::instance(QGLContext::currentContext())->getModelViewMatrix().setToIdentity();
-
     float tx_array[8] = {
         (float)tex0Coords.x(), (float)tex0Coords.y(),
         (float)tex0Coords.right(), (float)tex0Coords.top(),
@@ -360,10 +337,6 @@ void QnGLRenderer::drawYV12VideoTexture(
 
     NX_LOG( lit("Rendering YUV420 textures %1, %2, %3").
         arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
-
-    //Deprecated in OpenGL ES2.0
-    //glEnable(GL_TEXTURE_2D);
-    //DEBUG_CODE(glCheckError("glEnable"));
 
     QnAbstractYv12ToRgbShaderProgram* shader;
     QnYv12ToRgbWithGammaShaderProgram* gammaShader = 0;
@@ -462,10 +435,6 @@ void QnGLRenderer::drawFisheyeRGBVideoTexture(
         (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
 
-    //Deprecated in OpenGL ES2.0
-    //glEnable(GL_TEXTURE_2D);
-    //DEBUG_CODE(glCheckError("glEnable"));
-
     QnFisheyeShaderProgram<QnAbstractRGBAShaderProgram>* fisheyeShader = 0;
     QnMediaDewarpingParams mediaParams;
     QnItemDewarpingParams itemParams;
@@ -526,9 +495,6 @@ void QnGLRenderer::drawYVA12VideoTexture(
 
     NX_LOG( lit("Rendering YUV420 textures %1, %2, %3").
         arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
-    //Deprecated in OpenGL ES2.0
-    //glEnable(GL_TEXTURE_2D);
-    //DEBUG_CODE(glCheckError("glEnable"));
 
     m_shaders->yv12ToRgba->bind();
     m_shaders->yv12ToRgba->setYTexture( 0 );
@@ -570,10 +536,6 @@ void QnGLRenderer::drawNV12VideoTexture(
         (float)tex0Coords.x(), (float)tex0Coords.y(),
         0.0f, (float)tex0Coords.y()
     };
-
-    //Deprecated in OpenGL ES2.0
-    //glEnable(GL_TEXTURE_2D);
-    //DEBUG_CODE(glCheckError("glEnable"));
 
     m_shaders->nv12ToRgb->bind();
     //m_shaders->nv12ToRgb->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );

@@ -1818,14 +1818,14 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     if (resources.size() == onlineAutoDiscoveredCameras.size()) 
         question = tr("These %n cameras are auto-discovered.\n"\
             "They may be auto-discovered again after removing.\n"\
-            "Are you sure you want to delete them",
+            "Are you sure you want to delete them?",
             "", resources.size());
     else 
     /* Second version - some cameras are auto-discovered, some not. */
     if (!onlineAutoDiscoveredCameras.isEmpty())
         question = tr("%n of these %1 cameras are auto-discovered.\n"\
             "They may be auto-discovered again after removing.\n"\
-            "Are you sure you want to delete them",
+            "Are you sure you want to delete them?",
             "", onlineAutoDiscoveredCameras.size()).arg(resources.size());
      else
     /* Third version - no auto-discovered cameras in the list. */
@@ -2439,8 +2439,10 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
 }
 
-void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered()
-{
+void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered() {
+    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
+    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::TimeServerSelection);
+
     if( !m_timeServerSelectionDialog )
     {
         m_timeServerSelectionDialog = new QnTimeServerSelectionDialog( mainWindow(), context() );
@@ -2449,10 +2451,6 @@ void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered()
 
     if( m_timeServerSelectionDialog->isVisible() )
         return; //dialog still running from previous time
-
-    const qint64 localSystemTime = menu()->currentParameters(sender()).argument(Qn::LocalSystemTimeRole).toLongLong();
-    const ec2::QnPeerTimeInfoList& peers = menu()->currentParameters(sender()).argument(Qn::PeersToChooseTimeServerFromRole).value<ec2::QnPeerTimeInfoList>();
-    m_timeServerSelectionDialog->setData( localSystemTime, peers );
 
     m_timeServerSelectionDialog->exec();
 }

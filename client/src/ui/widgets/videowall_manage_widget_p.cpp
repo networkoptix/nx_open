@@ -741,7 +741,7 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
         if (item->itemType == ItemType::Existing) {
             if (QMessageBox::question(q_ptr, 
                 tr("Delete Screen"),
-                tr("Are you sure you want to delete %1").arg(item->name),
+                tr("Are you sure you want to delete %1?").arg(item->name),
                 QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Cancel)
                 return;
         }

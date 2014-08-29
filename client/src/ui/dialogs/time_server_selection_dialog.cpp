@@ -111,7 +111,7 @@ void QnTimeServerSelectionDialog::accept()
     const ec2::AbstractECConnectionPtr& connection = QnAppServerConnectionFactory::getConnection2();
     if( !connection )
         return;
-    connection->forcePrimaryTimeServer(
+    connection->getTimeManager()->forcePrimaryTimeServer(
         selectedPeerID,
         ec2::DummyHandler::instance(),
         &ec2::DummyHandler::onRequestDone );

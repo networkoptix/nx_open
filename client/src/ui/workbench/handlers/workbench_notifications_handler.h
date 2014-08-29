@@ -10,15 +10,19 @@
 #include <health/system_health.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <nx_ec/ec_api.h>
+
 #include <utils/common/email.h>
+#include <utils/common/connective.h>
 
 class QnWorkbenchUserEmailWatcher;
 class QnActionParameters;
 class QnBusinessEventsFilterResourcePropertyAdaptor;
 
-class QnWorkbenchNotificationsHandler : public QObject, public QnWorkbenchContextAware
+class QnWorkbenchNotificationsHandler : public Connective<QObject>, public QnWorkbenchContextAware
 {
     Q_OBJECT
+
+    typedef Connective<QObject> base_type;
 public:
     explicit QnWorkbenchNotificationsHandler(QObject *parent = 0);
     virtual ~QnWorkbenchNotificationsHandler();
@@ -41,7 +45,7 @@ public slots:
 private slots:
     void at_context_userChanged();
     void at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid);
-    void at_primaryTimeServerSelectionRequired( qint64 localSystemTime, const QList<QPair<QUuid, qint64> >& peersAndTimes );
+    void at_timeServerSelectionRequired();
 
     void at_eventManager_connectionOpened();
     void at_eventManager_connectionClosed();
