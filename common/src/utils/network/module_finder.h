@@ -4,6 +4,7 @@
 #include <QtCore/QHash>
 #include <QtNetwork/QHostAddress>
 
+#include <core/resource/resource_fwd.h>
 #include <utils/common/singleton.h>
 #include <utils/network/module_information.h>
 #include <utils/network/full_network_address.h>
@@ -48,6 +49,7 @@ private slots:
     void at_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
     void at_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
     void at_moduleChanged(const QnModuleInformation &moduleInformation);
+    void at_resourcePool_resourceChanged(const QnResourcePtr &resource);
 
 private:
     QnMulticastModuleFinder *m_multicastModuleFinder;
