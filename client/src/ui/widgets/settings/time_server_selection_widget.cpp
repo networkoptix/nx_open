@@ -10,6 +10,8 @@
 
 #include <ui/models/time_server_selection_model.h>
 
+#include <utils/common/synctime.h>
+
 namespace {
 
     class QnSortServersByPriorityProxyModel: public QSortFilterProxyModel {
@@ -41,16 +43,15 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /*= NUL
     ui->serversTable->horizontalHeader()->setSectionResizeMode(QnTimeServerSelectionModel::CheckboxColumn, QHeaderView::ResizeToContents);
     ui->serversTable->horizontalHeader()->setSectionResizeMode(QnTimeServerSelectionModel::NameColumn, QHeaderView::Stretch);
     ui->serversTable->horizontalHeader()->setSectionResizeMode(QnTimeServerSelectionModel::TimeColumn, QHeaderView::ResizeToContents);
+    ui->serversTable->horizontalHeader()->setSectionResizeMode(QnTimeServerSelectionModel::OffsetColumn, QHeaderView::ResizeToContents);
     ui->serversTable->horizontalHeader()->setSectionsClickable(false);
+
+    connect(qnSyncTime, &QnSyncTime::timeChanged, this, &QnTimeServerSelectionWidget::updateTime);
 
     QTimer* timer = new QTimer(this);
     timer->setInterval(1000);
     timer->setSingleShot(false);
-    connect(timer, &QTimer::timeout, this, [this]{
-        if (!isVisible())
-            return;
-        m_model->updateTime();
-    });
+    connect(timer, &QTimer::timeout, this,  &QnTimeServerSelectionWidget::updateTime);
     timer->start();
 }
 
@@ -87,4 +88,12 @@ QUuid QnTimeServerSelectionWidget::selectedServer() const {
         return runtimeInfo.uuid;
     }
     return QUuid();
+}
+
+void QnTimeServerSelectionWidget::updateTime() {
+    if (!isVisible())
+        return;
+
+    m_model->updateTime();
+    ui->timeLabel->setText(qnSyncTime->currentDateTime().toString(Qt::ISODate));
 }

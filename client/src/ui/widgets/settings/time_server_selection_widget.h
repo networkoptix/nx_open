@@ -25,6 +25,8 @@ public:
     virtual bool hasChanges() const override;
 
 private:
+    void updateTime();
+
     QUuid selectedServer() const;
 
 private:

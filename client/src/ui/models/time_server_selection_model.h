@@ -18,6 +18,7 @@ public:
         CheckboxColumn,
         NameColumn,
         TimeColumn,
+        OffsetColumn,
         ColumnCount
     };
 
@@ -37,19 +38,21 @@ public:
     void setSelectedServer(const QUuid &serverId);
 
     static bool isSelected(quint64 priority);
+    static QString formattedOffset(qint64 offsetMSec);
+
 private:
-    void addItem(const QnPeerRuntimeInfo &info,  qint64 time = -1);
+    void addItem(const QnPeerRuntimeInfo &info,  qint64 time = 0);
     void updateColumn(Columns column);
 
 private:
     struct Item {
         QUuid peerId;
-        qint64 time;
+        qint64 offset;
         quint64 priority;
+        bool ready;
     };
 
     QList<Item> m_items;
-    qint64 m_timeBase;
     QUuid m_selectedServer;
 };
 

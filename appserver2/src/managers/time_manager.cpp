@@ -546,7 +546,7 @@ namespace ec2
         tran.params.timePriorityKey = m_localTimePriorityKey.toUInt64();
         {
             QMutexLocker lk( &m_mutex );
-            tran.params.peerSysTime = currentMSecsSinceEpoch();
+            tran.params.peerSysTime = QDateTime::currentMSecsSinceEpoch();  //currentMSecsSinceEpoch();
         }
         QnTransactionMessageBus::instance()->sendTransaction( tran );
     }

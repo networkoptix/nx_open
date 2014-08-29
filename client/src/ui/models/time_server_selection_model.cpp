@@ -14,6 +14,8 @@
 #include <ui/style/resource_icon_cache.h>
 
 #include <utils/common/collection.h>
+#include <utils/common/qtimespan.h>
+#include <utils/common/synctime.h>
 
 namespace {
     QVector<int> textRoles = QVector<int>() 
@@ -31,32 +33,18 @@ namespace {
 
 QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*/):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
-    m_timeBase(0)
+    QnWorkbenchContextAware(parent)
 {
     auto processor = QnCommonMessageProcessor::instance();
 
-    /* Handle synchronized time updates. */
-    connect(processor, &QnCommonMessageProcessor::syncTimeChanged, this, [this](qint64 syncTime) {
-        m_timeBase = syncTime;
-    });
-
     /* Handle peer time updates. */
     connect(processor, &QnCommonMessageProcessor::peerTimeChanged, this, [this](const QUuid &peerId, qint64 syncTime, qint64 peerTime) {
-        bool syncTimeChanged = m_timeBase != syncTime;
-        m_timeBase = syncTime;
-        for (int i = 0; i < m_items.size(); ++i) {
-            if (m_items[i].peerId != peerId)
-                continue;;
-            m_items[i].time = peerTime;
-            if (!syncTimeChanged) {
-                emit dataChanged(index(i, TimeColumn), index(i, TimeColumn), textRoles);
-                return; //update only what needed
-            }
-        }
-
-        if (syncTimeChanged)
-            updateTime();
+        int idx = qnIndexOf(m_items, [peerId](const Item &item) {return item.peerId == peerId; });
+        if (idx < 0)
+            return;
+        m_items[idx].offset = peerTime - syncTime;
+        m_items[idx].ready = true;
+        emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), textRoles);
     });
 
     /* Handle adding new online server peers. */
@@ -110,18 +98,15 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
             textRoles);
     });
 
+    connect(qnSyncTime, &QnSyncTime::timeChanged, this, [this]{
+        updateColumn(Columns::TimeColumn);
+        updateColumn(Columns::OffsetColumn);
+    });
 
     /* Requesting initial time. */
     QHash<QUuid, qint64> timeByPeer;
     if (auto connection = QnAppServerConnectionFactory::getConnection2()) {
         auto timeManager = connection->getTimeManager();
-        timeManager->getCurrentTime(this, [this](int handle, ec2::ErrorCode errCode, qint64 syncTime) {
-            Q_UNUSED(handle);
-            if (errCode != ec2::ErrorCode::ok)
-                return;
-            m_timeBase = syncTime;
-        });
-
         foreach(const ec2::QnPeerTimeInfo &info, timeManager->getPeerTimeInfoList())
             timeByPeer[info.peerId] = info.time;
     }
@@ -131,7 +116,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
     foreach (const QnPeerRuntimeInfo &runtimeInfo, QnRuntimeInfoManager::instance()->items()->getItems()) {
         if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
             continue;
-        addItem(runtimeInfo, timeByPeer.value(runtimeInfo.uuid, -1));
+        addItem(runtimeInfo, timeByPeer.value(runtimeInfo.uuid, 0));
     }
     endResetModel();
 }
@@ -159,7 +144,9 @@ QVariant QnTimeServerSelectionModel::headerData(int section, Qt::Orientation ori
         case Columns::NameColumn:
             return tr("Server");
         case Columns::TimeColumn:
-            return tr("Local Time");
+            return tr("Server Time");
+        case Columns::OffsetColumn:
+            return tr("Offset");
         default:
             break;
         }
@@ -177,7 +164,7 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
     Columns column = static_cast<Columns>(index.column());
     Item item = m_items[index.row()];
 
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById(item.peerId).dynamicCast<QnMediaServerResource>();
     QString title = server ? getFullResourceName(server, true) : tr("Server");
@@ -192,9 +179,15 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
           if (column == Columns::NameColumn)
               return title;
           if (column == Columns::TimeColumn) {
-              if (item.time < 0 || m_timeBase == 0)
+              if (!item.ready)
                   return tr("Synchronizing...");
-              return QDateTime::fromMSecsSinceEpoch(currentTime - m_timeBase + item.time).toString(Qt::ISODate);
+
+              return QDateTime::fromMSecsSinceEpoch(currentTime + item.offset).toString(Qt::ISODate);
+          }
+          if (column == Columns::OffsetColumn) {
+              if (!item.ready)
+                  return QString();
+              return formattedOffset(item.offset);
           }
           break;
       case Qt::DecorationRole:
@@ -260,7 +253,9 @@ void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo &info, qint64 t
     item.priority = info.data.serverTimePriority;
     if (isSelected(item.priority))
         m_selectedServer = item.peerId;
-    item.time = time;
+    item.ready = time > 0;
+    if (time > 0)
+        item.offset = time - qnSyncTime->currentMSecsSinceEpoch();
     m_items << item;
 }
 
@@ -295,4 +290,24 @@ void QnTimeServerSelectionModel::updateColumn(Columns column) {
 
 bool QnTimeServerSelectionModel::isSelected(quint64 priority) {
     return (priority & ec2::ApiRuntimeData::tpfPeerTimeSetByUser) > 0;
+}
+
+QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMSec) {
+    if (offsetMSec == 0)
+        return lit("0.00");
+    QString sign = offsetMSec < 0 
+        ? L'-'
+        : L'+';
+
+    QTimeSpan span(offsetMSec);
+    span.normalize();
+    QString body;
+
+    QString format = lit("%1%2%3");
+    if (span > QTimeSpan::Hour)
+        return format.arg(sign).arg(span.toHours(), 2, 'g', 2).arg(tr("h"));
+    else if (span > QTimeSpan::Minute)
+        return format.arg(sign).arg(span.toMinutes(), 2, 'g', 2).arg(tr("m"));
+    else 
+        return format.arg(sign).arg(span.toSecs(), 2, 'g', 2).arg(tr("s"));
 }
