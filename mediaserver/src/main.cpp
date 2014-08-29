@@ -1370,7 +1370,6 @@ void QnMain::run()
             server->setPanicMode(pm);
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
         }
-        server->setVersion(qnCommon->engineVersion());
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
@@ -1429,6 +1428,10 @@ void QnMain::run()
             if (!server->getSystemName().isEmpty())
                 needUpdateAuthKey = true;
             server->setSystemName(qnCommon->localSystemName());
+            isModified = true;
+        }
+        if (server->getVersion() != qnCommon->engineVersion()) {
+            server->setVersion(qnCommon->engineVersion());
             isModified = true;
         }
         if (needUpdateAuthKey) {
