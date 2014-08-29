@@ -17,9 +17,11 @@ public:
 private slots:
     void at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
     void at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation);
 
 private:
     void addConnection(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void removeConnection(const QnModuleInformation &moduleInformation, const QUrl &url);
 
 private:
     QnModuleFinder *m_moduleFinder;

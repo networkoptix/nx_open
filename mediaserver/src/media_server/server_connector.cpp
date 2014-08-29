@@ -22,6 +22,7 @@ QnServerConnector::QnServerConnector(QnModuleFinder *moduleFinder, QObject *pare
 {
     connect(m_moduleFinder,     &QnModuleFinder::moduleUrlFound,    this,   &QnServerConnector::at_moduleFinder_moduleUrlFound);
     connect(m_moduleFinder,     &QnModuleFinder::moduleUrlLost,     this,   &QnServerConnector::at_moduleFinder_moduleUrlLost);
+    connect(m_moduleFinder,     &QnModuleFinder::moduleChanged,     this,   &QnServerConnector::at_moduleFinder_moduleChanged);
 }
 
 void QnServerConnector::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
@@ -49,15 +50,19 @@ void QnServerConnector::at_moduleFinder_moduleUrlFound(const QnModuleInformation
 }
 
 void QnServerConnector::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url) {
-    QUrl trimmed = trimmedUrl(url);
-    QString urlStr = m_usedUrls.take(trimmed);
-    if (urlStr.isEmpty())
+    removeConnection(moduleInformation, url);
+}
+
+void QnServerConnector::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
+    if (moduleInformation.isCompatibleToCurrentSystem())
         return;
 
-    NX_LOG(lit("QnServerConnector: Removing connection from module %1. Url = %2").arg(moduleInformation.id.toString()).arg(urlStr), cl_logINFO);
-
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    ec2Connection->deleteRemotePeer(urlStr);
+    foreach (const QString &address, moduleInformation.remoteAddresses) {
+        QUrl url;
+        url.setHost(address);
+        url.setPort(moduleInformation.port);
+        removeConnection(moduleInformation, url);
+    }
 }
 
 void QnServerConnector::addConnection(const QnModuleInformation &moduleInformation, const QUrl &url) {
@@ -72,6 +77,18 @@ void QnServerConnector::addConnection(const QnModuleInformation &moduleInformati
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     ec2Connection->addRemotePeer(urlStr, moduleInformation.id);
+}
+
+void QnServerConnector::removeConnection(const QnModuleInformation &moduleInformation, const QUrl &url) {
+    QUrl trimmed = trimmedUrl(url);
+    QString urlStr = m_usedUrls.take(trimmed);
+    if (urlStr.isEmpty())
+        return;
+
+    NX_LOG(lit("QnServerConnector: Removing connection from module %1. Url = %2").arg(moduleInformation.id.toString()).arg(urlStr), cl_logINFO);
+
+    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    ec2Connection->deleteRemotePeer(urlStr);
 }
 
 void QnServerConnector::reconnect() {
