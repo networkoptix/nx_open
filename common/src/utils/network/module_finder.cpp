@@ -5,10 +5,6 @@
 #include "direct_module_finder_helper.h"
 
 namespace {
-    QUrl addressToUrl(const QnNetworkAddress &address) {
-        return QUrl(lit("http://%1:%2").arg(address.host().toString()).arg(address.port()));
-    }
-
     QUrl trimmedUrl(const QUrl &url) {
         QUrl newUrl;
         newUrl.setScheme(lit("http"));
@@ -93,21 +89,14 @@ void QnModuleFinder::at_moduleAddressFound(const QnModuleInformation &moduleInfo
     if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
         return;
 
-    QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
-    if (oldModuleInformation != moduleInformation) {
-        oldModuleInformation = moduleInformation;
-        emit moduleChanged(moduleInformation);
-    }
-
-    QUrl url = addressToUrl(address);
-
-    m_directModuleFinder->addIgnoredUrl(address.toUrl());
+    QUrl url = address.toUrl();
+    m_directModuleFinder->addIgnoredUrl(url);
 
     if (!m_multicastFoundUrls.contains(moduleInformation.id, url)) {
         m_multicastFoundUrls.insert(moduleInformation.id, url);
 
         if (!m_directFoundUrls.contains(moduleInformation.id, url))
-            emit moduleUrlFound(moduleInformation, url);
+            emit moduleUrlFound(m_foundModules.value(moduleInformation.id), url);
     }
 }
 
@@ -115,14 +104,17 @@ void QnModuleFinder::at_moduleAddressLost(const QnModuleInformation &moduleInfor
     if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
         return;
 
-    QUrl url = addressToUrl(address);
+    QUrl url = address.toUrl();
 
-    m_directModuleFinder->removeIgnoredUrl(address.toUrl());
+    m_directModuleFinder->removeIgnoredUrl(url);
     if (m_multicastFoundUrls.remove(moduleInformation.id, url)) {
         emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
 
-        if (!m_multicastFoundUrls.contains(moduleInformation.id) && !m_directFoundUrls.contains(moduleInformation.id))
-            emit moduleLost(m_foundModules.take(moduleInformation.id));
+        QnModuleInformation locModuleInformation = m_foundModules.value(moduleInformation.id);
+        if (locModuleInformation.remoteAddresses.isEmpty()) {
+            m_foundModules.remove(moduleInformation.id);
+            emit moduleLost(locModuleInformation);
+        }
     }
 }
 
@@ -130,19 +122,13 @@ void QnModuleFinder::at_moduleUrlFound(const QnModuleInformation &moduleInformat
     if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
         return;
 
-    QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
-    if (oldModuleInformation != moduleInformation) {
-        oldModuleInformation = moduleInformation;
-        emit moduleChanged(moduleInformation);
-    }
-
     QUrl url = trimmedUrl(foundUrl);
 
     if (!m_directFoundUrls.contains(moduleInformation.id, url)) {
         m_directFoundUrls.insert(moduleInformation.id, url);
 
         if (!m_multicastFoundUrls.contains(moduleInformation.id, url))
-            emit moduleUrlFound(moduleInformation, url);
+            emit moduleUrlFound(m_foundModules.value(moduleInformation.id), url);
     }
 }
 
@@ -155,20 +141,34 @@ void QnModuleFinder::at_moduleUrlLost(const QnModuleInformation &moduleInformati
     if (m_directFoundUrls.remove(moduleInformation.id, url)) {
         emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
 
-        if (!m_multicastFoundUrls.contains(moduleInformation.id) && !m_directFoundUrls.contains(moduleInformation.id))
-            emit moduleLost(m_foundModules.take(moduleInformation.id));
+        QnModuleInformation locModuleInformation = m_foundModules.value(moduleInformation.id);
+        if (locModuleInformation.remoteAddresses.isEmpty()) {
+            m_foundModules.remove(moduleInformation.id);
+            emit moduleLost(locModuleInformation);
+        }
     }
-
 }
 
 void QnModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation) {
     if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
         return;
 
+    QnModuleInformation updatedModuleInformation = moduleInformation;
+
+    if (sender() == m_multicastModuleFinder)
+        updatedModuleInformation.remoteAddresses.unite(m_directModuleFinder->moduleInformation(moduleInformation.id).remoteAddresses);
+    else if (sender() == m_directModuleFinder)
+        updatedModuleInformation.remoteAddresses.unite(m_multicastModuleFinder->moduleInformation(moduleInformation.id).remoteAddresses);
+    else
+        Q_ASSERT_X(0, "Invalid sender in slot", Q_FUNC_INFO);
+
     QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
-    if (!oldModuleInformation.id.isNull() && oldModuleInformation != moduleInformation) {
-        oldModuleInformation = moduleInformation;
-        emit moduleChanged(moduleInformation);
+    if (oldModuleInformation != updatedModuleInformation) {
+        oldModuleInformation = updatedModuleInformation;
+
+        /* Don't emit when there is no more remote addresses. moduleLost() will be emited just after moduleUrlLost(). */
+        if (!updatedModuleInformation.remoteAddresses.isEmpty())
+            emit moduleChanged(updatedModuleInformation);
     }
 }
 

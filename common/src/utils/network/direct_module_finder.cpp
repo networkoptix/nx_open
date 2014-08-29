@@ -197,16 +197,23 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         qint64 &lastPing = m_lastPingByUrl[url];
         QUuid &moduleId = m_moduleByUrl[url];
 
+        moduleInformation.remoteAddresses.clear();
+        moduleInformation.remoteAddresses.insert(url.host());
+        moduleInformation.remoteAddresses.unite(oldModuleInformation.remoteAddresses);
+
+        if (!moduleId.isNull() && moduleId != moduleInformation.id) {
+            QnModuleInformation &prevModuleInformation = m_foundModules[moduleId];
+            prevModuleInformation.remoteAddresses.remove(url.host());
+            emit moduleChanged(prevModuleInformation);
+            emit moduleUrlLost(prevModuleInformation, url);
+            lastPing = 0;
+        }
+        moduleId = moduleInformation.id;
+
         if (oldModuleInformation != moduleInformation) {
             oldModuleInformation = moduleInformation;
             emit moduleChanged(moduleInformation);
         }
-
-        if (!moduleId.isNull() && moduleId != moduleInformation.id) {
-            emit moduleUrlLost(m_foundModules[moduleId], url);
-            lastPing = 0;
-        }
-        moduleId = moduleInformation.id;
 
         if (lastPing == 0)
             emit moduleUrlFound(moduleInformation, url);
@@ -220,7 +227,10 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         if (m_lastPingByUrl.value(url) + maxPingTimeoutMs < QDateTime::currentMSecsSinceEpoch()) {
             m_moduleByUrl.remove(url);
             m_lastPingByUrl.remove(url);
-            emit moduleUrlLost(m_foundModules.value(id), url);
+            QnModuleInformation &moduleInformation = m_foundModules[id];
+            moduleInformation.remoteAddresses.remove(url.host());
+            emit moduleChanged(moduleInformation);
+            emit moduleUrlLost(moduleInformation, url);
         }
     }
 }

@@ -113,15 +113,16 @@ void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformatio
     if (moduleInformation.id == qnCommon->moduleGUID())
         return;
 
-    auto it = m_moduleInformationById.find(moduleInformation.id);
+    m_discoveredAddresses[moduleInformation.id][discoverer] = moduleInformation.remoteAddresses;
+
+    QnModuleInformation updatedModuleInformation = moduleInformation;
+    updatedModuleInformation.remoteAddresses = getModuleAddresses(moduleInformation.id);
 
     m_discovererIdByServerId[moduleInformation.id].insert(discoverer);
 
-    if (it == m_moduleInformationById.end()) {
-        m_moduleInformationById[moduleInformation.id] = moduleInformation;
-        emit peerFound(moduleInformation);
-    } else {
-        *it = moduleInformation;
+    QnModuleInformation &oldModuleInformation = m_moduleInformationById[moduleInformation.id];
+    if (oldModuleInformation != updatedModuleInformation) {
+        oldModuleInformation = updatedModuleInformation;
         emit peerChanged(moduleInformation);
     }
 }
@@ -130,16 +131,19 @@ void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInforma
     if (moduleInformation.id == qnCommon->moduleGUID())
         return;
 
-    auto it = m_moduleInformationById.find(moduleInformation.id);
+    m_discoveredAddresses[moduleInformation.id].remove(discoverer);
 
-    if (it != m_moduleInformationById.end()) {
-        QSet<QUuid> &discoverers = m_discovererIdByServerId[it.key()];
-        if (discoverers.remove(discoverer) ) {
-            if (discoverers.isEmpty()) {
-                emit peerLost(it.value());
-                it = m_moduleInformationById.erase(it);
-            }
-        }
+    QnModuleInformation updatedModuleInformation = moduleInformation;
+    updatedModuleInformation.remoteAddresses = getModuleAddresses(moduleInformation.id);
+
+    m_discovererIdByServerId[moduleInformation.id].remove(discoverer);
+
+    if (updatedModuleInformation.remoteAddresses.isEmpty()) {
+        m_moduleInformationById.remove(updatedModuleInformation.id);
+        emit peerLost(updatedModuleInformation);
+    } else {
+        m_moduleInformationById[moduleInformation.id] = updatedModuleInformation;
+        emit peerChanged(updatedModuleInformation);
     }
 }
 
@@ -160,4 +164,16 @@ void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QUuid &discoverer)
         }
         ++it;
     }
+
+    for (auto it = m_discoveredAddresses.begin(); it != m_discoveredAddresses.end(); ++it)
+        it.value().remove(discoverer);
+}
+
+QSet<QString> QnGlobalModuleFinder::getModuleAddresses(const QUuid &id) const {
+    QSet<QString> result;
+
+    foreach (const QSet<QString> &addresses, m_discoveredAddresses.value(id))
+        result.unite(addresses);
+
+    return result;
 }

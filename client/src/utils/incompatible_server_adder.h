@@ -13,7 +13,6 @@ public:
 signals:
 
 private slots:
-    void at_peerFound(const QnModuleInformation &moduleInformation);
     void at_peerChanged(const QnModuleInformation &moduleInformation);
     void at_peerLost(const QnModuleInformation &moduleInformation);
 };

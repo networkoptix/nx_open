@@ -188,8 +188,6 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
 
     QnModuleInformation moduleInformation = response.toModuleInformation();
     QnNetworkAddress address(QHostAddress(remoteAddressStr), moduleInformation.port);
-    if (moduleInformation.remoteAddresses.isEmpty())
-        moduleInformation.remoteAddresses.insert(address.host().toString());
 
     if (m_ignoredModules.contains(address, moduleInformation.id))
         return false;
@@ -197,6 +195,11 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     QMutexLocker lk(&m_mutex);
 
     QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
+
+    moduleInformation.remoteAddresses.clear();
+    moduleInformation.remoteAddresses.insert(remoteAddressStr);
+    moduleInformation.remoteAddresses.unite(oldModuleInformation.remoteAddresses);
+
     if (oldModuleInformation != moduleInformation) {
         oldModuleInformation = moduleInformation;
         emit moduleChanged(moduleInformation);
@@ -286,7 +289,12 @@ void QnMulticastModuleFinder::run() {
                 continue;
             }
 
-            emit moduleAddressLost(m_foundModules[it->moduleId], it.key());
+            QnModuleInformation &moduleInformation = m_foundModules[it->moduleId];
+            moduleInformation.remoteAddresses.remove(it.key().host().toString());
+
+            emit moduleChanged(moduleInformation);
+            emit moduleAddressLost(moduleInformation, it.key());
+
             it = m_foundAddresses.erase(it);
         }
     }
