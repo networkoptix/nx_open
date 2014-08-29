@@ -40,10 +40,12 @@ public:
     static bool isSelected(quint64 priority);
     static QString formattedOffset(qint64 offsetMSec);
 
+    bool sameTimezone() const;
 private:
     void addItem(const QnPeerRuntimeInfo &info,  qint64 time = 0);
     void updateColumn(Columns column);
 
+    bool calculateSameTimezone() const;
 private:
     struct Item {
         QUuid peerId;
@@ -54,6 +56,9 @@ private:
 
     QList<Item> m_items;
     QUuid m_selectedServer;
+
+    mutable bool m_sameTimezone;
+    mutable bool m_sameTimezoneValid;
 };
 
 #endif // TIME_SERVER_SELECTION_MODEL_H
