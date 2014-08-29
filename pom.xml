@@ -305,7 +305,7 @@
                 <!--<module>vmaxproxy</module>  -->
                 <module>client</module>                     
                 <module>wixsetup/wixsetup-full</module>
-                <!-- <module>wixsetup/wixsetup-client-only</module> -->
+                <module>wixsetup/wixsetup-client-only</module>
             </modules>
             <properties>
                 <qt.dir>${libdir}/${arch}</qt.dir>
