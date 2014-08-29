@@ -1,4 +1,4 @@
-#include "full_network_address.h"
+#include "network_address.h"
 
 #include <QtCore/QUrl>
 

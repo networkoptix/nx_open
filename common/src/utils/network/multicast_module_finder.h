@@ -10,7 +10,7 @@
 #include <utils/common/system_information.h>
 
 #include "module_information.h"
-#include "full_network_address.h"
+#include "network_address.h"
 #include "networkoptixmodulerevealcommon.h"
 #include "aio/pollset.h"
 #include "system_socket.h"

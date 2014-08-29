@@ -7,7 +7,7 @@
 
 #include <utils/common/id.h>
 #include <utils/network/module_information.h>
-#include <utils/network/full_network_address.h>
+#include <utils/network/network_address.h>
 
 class QNetworkAccessManager;
 class QNetworkReply;
