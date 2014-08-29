@@ -185,7 +185,6 @@ namespace {
     const QString SERVER_GUID2 = lit("serverGuid2");
     const QString OBSOLETE_SERVER_GUID = lit("obsoleteServerGuid");
     const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode");
-    const QString ADMIN_PASSWORD = lit("adminPassword");
 };
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
@@ -1241,7 +1240,7 @@ void QnMain::run()
 
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
-    qnCommon->setDefaultAdminPassword(settings->value(ADMIN_PASSWORD, QLatin1String("")).toString());
+    qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("")).toString());
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnMain::at_runtimeInfoChanged);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
 
@@ -1290,7 +1289,7 @@ void QnMain::run()
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverPort");
         MSSettings::roSettings()->remove("appserverLogin");
-        MSSettings::roSettings()->remove("appserverPassword");
+        //MSSettings::roSettings()->remove("appserverPassword");
         MSSettings::roSettings()->remove(PENDING_SWITCH_TO_CLUSTER_MODE);
         MSSettings::roSettings()->sync();
 
@@ -1466,7 +1465,6 @@ void QnMain::run()
     }
 
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
-    MSSettings::roSettings()->remove(ADMIN_PASSWORD);
 
     if (needToStop()) {
         stopObjects();
