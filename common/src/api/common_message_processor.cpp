@@ -27,97 +27,86 @@ QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
 void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
 {
     if (m_connection) {
+        /* Safety check in case connection will not be deleted instantly. */
         m_connection->disconnect(this);
+        m_connection->getResourceManager()->disconnect(this);
+        m_connection->getMediaServerManager()->disconnect(this);
+        m_connection->getCameraManager()->disconnect(this);
+        m_connection->getLicenseManager()->disconnect(this);
+        m_connection->getBusinessEventManager()->disconnect(this);
+        m_connection->getUserManager()->disconnect(this);
+        m_connection->getLayoutManager()->disconnect(this);
+        m_connection->getStoredFileManager()->disconnect(this);
+        m_connection->getDiscoveryManager()->disconnect(this);
+        m_connection->getTimeManager()->disconnect(this);
     }
     m_connection = connection;
 
     if (!connection)
         return;
 
-    connect( connection, &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::at_remotePeerFound );
-    connect( connection, &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::at_remotePeerLost );
+    connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnCommonMessageProcessor::at_remotePeerFound );
+    connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnCommonMessageProcessor::at_remotePeerLost );
+    connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnCommonMessageProcessor::remotePeerFound );
+    connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnCommonMessageProcessor::remotePeerLost );
+    connect(connection, &ec2::AbstractECConnection::initNotification,               this, &QnCommonMessageProcessor::on_gotInitialNotification );
+    connect(connection, &ec2::AbstractECConnection::runtimeInfoChanged,             this, &QnCommonMessageProcessor::runtimeInfoChanged );
+    connect(connection, &ec2::AbstractECConnection::panicModeChanged,               this, &QnCommonMessageProcessor::on_panicModeChanged );
 
-    connect( connection, &ec2::AbstractECConnection::initNotification,
-        this, &QnCommonMessageProcessor::on_gotInitialNotification );
-    connect( connection, &ec2::AbstractECConnection::runtimeInfoChanged,
-        this, &QnCommonMessageProcessor::runtimeInfoChanged );
+    auto resourceManager = connection->getResourceManager();
+    connect(resourceManager, &ec2::AbstractResourceManager::resourceChanged,        this, [this](const QnResourcePtr &resource){updateResource(resource);});
+    connect(resourceManager, &ec2::AbstractResourceManager::statusChanged,          this, &QnCommonMessageProcessor::on_resourceStatusChanged );
+    connect(resourceManager, &ec2::AbstractResourceManager::resourceParamsChanged,  this, &QnCommonMessageProcessor::on_resourceParamsChanged );
+    connect(resourceManager, &ec2::AbstractResourceManager::resourceRemoved,        this, &QnCommonMessageProcessor::on_resourceRemoved );
 
-    connect( connection->getResourceManager(), &ec2::AbstractResourceManager::statusChanged,
-        this, &QnCommonMessageProcessor::on_resourceStatusChanged );
-    connect( connection->getResourceManager(), &ec2::AbstractResourceManager::resourceChanged,
-        this, [this](const QnResourcePtr &resource){updateResource(resource);});
-    connect( connection->getResourceManager(), &ec2::AbstractResourceManager::resourceParamsChanged,
-        this, &QnCommonMessageProcessor::on_resourceParamsChanged );
-    connect( connection->getResourceManager(), &ec2::AbstractResourceManager::resourceRemoved,
-        this, &QnCommonMessageProcessor::on_resourceRemoved );
+    auto mediaServerManager = connection->getMediaServerManager();
+    connect(mediaServerManager, &ec2::AbstractMediaServerManager::addedOrUpdated,   this, [this](const QnMediaServerResourcePtr &server){updateResource(server);});
+    connect(mediaServerManager, &ec2::AbstractMediaServerManager::removed,          this, &QnCommonMessageProcessor::on_resourceRemoved );
 
-    connect( connection->getMediaServerManager(), &ec2::AbstractMediaServerManager::addedOrUpdated,
-        this, [this](const QnMediaServerResourcePtr &server){updateResource(server);});
-    connect( connection->getMediaServerManager(), &ec2::AbstractMediaServerManager::removed,
-        this, &QnCommonMessageProcessor::on_resourceRemoved );
+    auto cameraManager = connection->getCameraManager();
+    connect(cameraManager, &ec2::AbstractCameraManager::cameraAddedOrUpdated,       this, [this](const QnVirtualCameraResourcePtr &camera){updateResource(camera);});
+    connect(cameraManager, &ec2::AbstractCameraManager::cameraHistoryChanged,       this, &QnCommonMessageProcessor::on_cameraHistoryChanged );
+    connect(cameraManager, &ec2::AbstractCameraManager::cameraRemoved,              this, &QnCommonMessageProcessor::on_resourceRemoved );
+    connect(cameraManager, &ec2::AbstractCameraManager::cameraBookmarkTagsAdded,    this, &QnCommonMessageProcessor::cameraBookmarkTagsAdded );
+    connect(cameraManager, &ec2::AbstractCameraManager::cameraBookmarkTagsRemoved,  this, &QnCommonMessageProcessor::cameraBookmarkTagsRemoved );
 
-    connect( connection->getCameraManager(), &ec2::AbstractCameraManager::cameraAddedOrUpdated,
-        this, [this](const QnVirtualCameraResourcePtr &camera){updateResource(camera);});
-    connect( connection->getCameraManager(), &ec2::AbstractCameraManager::cameraHistoryChanged,
-        this, &QnCommonMessageProcessor::on_cameraHistoryChanged );
-    connect( connection->getCameraManager(), &ec2::AbstractCameraManager::cameraRemoved,
-        this, &QnCommonMessageProcessor::on_resourceRemoved );
-    connect( connection->getCameraManager(), &ec2::AbstractCameraManager::cameraBookmarkTagsAdded,
-        this, &QnCommonMessageProcessor::cameraBookmarkTagsAdded );
-    connect( connection->getCameraManager(), &ec2::AbstractCameraManager::cameraBookmarkTagsRemoved,
-        this, &QnCommonMessageProcessor::cameraBookmarkTagsRemoved );
+    auto userManager = connection->getUserManager();
+    connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, [this](const QnUserResourcePtr &user){updateResource(user);});
+    connect(userManager, &ec2::AbstractUserManager::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved );
 
-    connect( connection->getLicenseManager(), &ec2::AbstractLicenseManager::licenseChanged,
-        this, &QnCommonMessageProcessor::on_licenseChanged );
-    connect( connection->getLicenseManager(), &ec2::AbstractLicenseManager::licenseRemoved,
-        this, &QnCommonMessageProcessor::on_licenseRemoved );
+    auto layoutManager = connection->getLayoutManager();
+    connect(layoutManager, &ec2::AbstractLayoutManager::addedOrUpdated,             this, [this](const QnLayoutResourcePtr &layout){updateResource(layout);});
+    connect(layoutManager, &ec2::AbstractLayoutManager::removed,                    this, &QnCommonMessageProcessor::on_resourceRemoved );
 
-    connect( connection->getBusinessEventManager(), &ec2::AbstractBusinessEventManager::addedOrUpdated,
-        this, &QnCommonMessageProcessor::on_businessEventAddedOrUpdated );
-    connect( connection->getBusinessEventManager(), &ec2::AbstractBusinessEventManager::removed,
-        this, &QnCommonMessageProcessor::on_businessEventRemoved );
-    connect( connection->getBusinessEventManager(), &ec2::AbstractBusinessEventManager::businessActionBroadcasted,
-        this, &QnCommonMessageProcessor::on_businessActionBroadcasted );
-    connect( connection->getBusinessEventManager(), &ec2::AbstractBusinessEventManager::businessRuleReset,
-        this, &QnCommonMessageProcessor::on_businessRuleReset );
-    connect( connection->getBusinessEventManager(), &ec2::AbstractBusinessEventManager::gotBroadcastAction,
-        this, &QnCommonMessageProcessor::on_broadcastBusinessAction );
-    connect( connection->getBusinessEventManager(), &ec2::AbstractBusinessEventManager::execBusinessAction,
-        this, &QnCommonMessageProcessor::on_execBusinessAction );
+    auto videowallManager = connection->getVideowallManager();
+    connect(videowallManager, &ec2::AbstractVideowallManager::addedOrUpdated,       this, [this](const QnVideoWallResourcePtr &videowall){updateResource(videowall);});
+    connect(videowallManager, &ec2::AbstractVideowallManager::removed,              this, &QnCommonMessageProcessor::on_resourceRemoved );
+    connect(videowallManager, &ec2::AbstractVideowallManager::controlMessage,       this, &QnCommonMessageProcessor::videowallControlMessageReceived );
 
-    connect( connection->getUserManager(), &ec2::AbstractUserManager::addedOrUpdated,
-        this, [this](const QnUserResourcePtr &user){updateResource(user);});
-    connect( connection->getUserManager(), &ec2::AbstractUserManager::removed,
-        this, &QnCommonMessageProcessor::on_resourceRemoved );
+    auto licenseManager = connection->getLicenseManager();
+    connect(licenseManager, &ec2::AbstractLicenseManager::licenseChanged,           this, &QnCommonMessageProcessor::on_licenseChanged );
+    connect(licenseManager, &ec2::AbstractLicenseManager::licenseRemoved,           this, &QnCommonMessageProcessor::on_licenseRemoved );
 
-    connect( connection->getLayoutManager(), &ec2::AbstractLayoutManager::addedOrUpdated,
-        this, [this](const QnLayoutResourcePtr &layout){updateResource(layout);});
-    connect( connection->getLayoutManager(), &ec2::AbstractLayoutManager::removed,
-        this, &QnCommonMessageProcessor::on_resourceRemoved );
+    auto eventManager = connection->getBusinessEventManager();
+    connect(eventManager, &ec2::AbstractBusinessEventManager::addedOrUpdated,       this, &QnCommonMessageProcessor::on_businessEventAddedOrUpdated );
+    connect(eventManager, &ec2::AbstractBusinessEventManager::removed,              this, &QnCommonMessageProcessor::on_businessEventRemoved );
+    connect(eventManager, &ec2::AbstractBusinessEventManager::businessActionBroadcasted, this, &QnCommonMessageProcessor::on_businessActionBroadcasted );
+    connect(eventManager, &ec2::AbstractBusinessEventManager::businessRuleReset,    this, &QnCommonMessageProcessor::on_businessRuleReset );
+    connect(eventManager, &ec2::AbstractBusinessEventManager::gotBroadcastAction,   this, &QnCommonMessageProcessor::on_broadcastBusinessAction );
+    connect(eventManager, &ec2::AbstractBusinessEventManager::execBusinessAction,   this, &QnCommonMessageProcessor::on_execBusinessAction );
 
-    connect( connection->getStoredFileManager(), &ec2::AbstractStoredFileManager::added,
-        this, &QnCommonMessageProcessor::fileAdded );
-    connect( connection->getStoredFileManager(), &ec2::AbstractStoredFileManager::updated,
-        this, &QnCommonMessageProcessor::fileUpdated );
-    connect( connection->getStoredFileManager(), &ec2::AbstractStoredFileManager::removed,
-        this, &QnCommonMessageProcessor::fileRemoved );
+    auto storedFileManager = connection->getStoredFileManager();
+    connect(storedFileManager, &ec2::AbstractStoredFileManager::added,              this, &QnCommonMessageProcessor::fileAdded );
+    connect(storedFileManager, &ec2::AbstractStoredFileManager::updated,            this, &QnCommonMessageProcessor::fileUpdated );
+    connect(storedFileManager, &ec2::AbstractStoredFileManager::removed,            this, &QnCommonMessageProcessor::fileRemoved );
 
-    connect( connection, &ec2::AbstractECConnection::panicModeChanged,
-        this, &QnCommonMessageProcessor::on_panicModeChanged );
-
-    connect( connection->getVideowallManager(), &ec2::AbstractVideowallManager::addedOrUpdated,
-        this, [this](const QnVideoWallResourcePtr &videowall){updateResource(videowall);});
-    connect( connection->getVideowallManager(), &ec2::AbstractVideowallManager::removed,
-        this, &QnCommonMessageProcessor::on_resourceRemoved );
-    connect( connection->getVideowallManager(), &ec2::AbstractVideowallManager::controlMessage,
-        this, &QnCommonMessageProcessor::videowallControlMessageReceived );
+    auto timeManager = connection->getTimeManager();
+    connect(timeManager, &ec2::AbstractTimeManager::timeServerSelectionRequired,    this, &QnCommonMessageProcessor::timeServerSelectionRequired);
+    connect(timeManager, &ec2::AbstractTimeManager::timeChanged,                    this, &QnCommonMessageProcessor::syncTimeChanged);
+    connect(timeManager, &ec2::AbstractTimeManager::peerTimeChanged,                this, &QnCommonMessageProcessor::peerTimeChanged);
 
     connect( connection->getDiscoveryManager(), &ec2::AbstractDiscoveryManager::discoveryInformationChanged,
         this, &QnCommonMessageProcessor::on_gotDiscoveryData );
-
-    connect( connection, &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::remotePeerFound );
-    connect( connection, &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::remotePeerLost );
-    connect(connection, &ec2::AbstractECConnection::timeServerSelectionRequired, this, &QnCommonMessageProcessor::timeServerSelectionRequired);
 
     connection->startReceivingNotifications();
 }
@@ -358,7 +347,28 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     processLicenses(fullData.licenses);
     processCameraServerItems(fullData.cameraHistory);
     //on_runtimeInfoChanged(fullData.serverInfo);
-    qnSyncTime->reset();
+    qnSyncTime->reset();   
+
+    if (!m_connection)
+        return;
+
+    auto timeManager = m_connection->getTimeManager();
+    timeManager->getCurrentTime(this, [this](int handle, ec2::ErrorCode errCode, qint64 syncTime) {
+        Q_UNUSED(handle);
+        if (errCode != ec2::ErrorCode::ok || !m_connection)
+            return;
+
+        emit syncTimeChanged(syncTime);
+
+        ec2::QnPeerTimeInfoList peers = m_connection->getTimeManager()->getPeerTimeInfoList();
+        foreach(const ec2::QnPeerTimeInfo &info, peers) {
+            Q_ASSERT(QnRuntimeInfoManager::instance()->hasItem(info.peerId));
+            if (QnRuntimeInfoManager::instance()->item(info.peerId).data.peer.peerType != Qn::PT_Server)
+                continue;
+            emit peerTimeChanged(info.peerId, syncTime, info.time);
+        }
+    });
+   
 }
 
 QMap<QUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() const {

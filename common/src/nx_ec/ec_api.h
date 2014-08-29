@@ -48,8 +48,18 @@ namespace ec2
         QnLicenseList licenses;
     };
 
-    //list<pair<peerid, peer system time (UTC, millis from epoch)> >
-    typedef QList<QPair<QUuid, qint64>> QnPeerTimeInfoList;
+    struct QnPeerTimeInfo {
+
+        QnPeerTimeInfo():
+            time(0){}
+        QnPeerTimeInfo(QUuid peerId, qint64 time):
+            peerId(peerId), time(time){}
+
+        QUuid peerId;
+
+        /** Peer system time (UTC, millis from epoch) */
+        qint64 time;
+    };
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -750,6 +760,61 @@ namespace ec2
     };
     typedef std::shared_ptr<AbstractDiscoveryManager> AbstractDiscoveryManagerPtr;
 
+    class AbstractTimeManager : public QObject {
+        Q_OBJECT
+    public:
+        virtual ~AbstractTimeManager() {}
+
+        //!Returns current synchronized time (UTC, millis from epoch)
+        /*!
+            \param handler Functor with params: (ErrorCode, qint64)
+        */
+        template<class TargetType, class HandlerType> int getCurrentTime( TargetType* target, HandlerType handler ) {
+            return getCurrentTimeImpl( std::static_pointer_cast<impl::CurrentTimeHandler>(
+                std::make_shared<impl::CustomCurrentTimeHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+        ErrorCode getCurrentTimeSync(qint64* const time) {
+            using namespace std::placeholders;
+            int(AbstractTimeManager::*fn)(impl::CurrentTimeHandlerPtr) = &AbstractTimeManager::getCurrentTimeImpl;
+            return impl::doSyncCall<impl::CurrentTimeHandler>( std::bind(fn, this, _1), time );
+        }
+
+        //!Set peer identified by \a serverGuid to be primary time server (every other peer synchronizes time with server \a serverGuid)
+        template<class TargetType, class HandlerType> int forcePrimaryTimeServer( const QUuid& serverGuid, TargetType* target, HandlerType handler )
+        {
+            return forcePrimaryTimeServerImpl(
+                serverGuid,
+                std::static_pointer_cast<impl::SimpleHandler>(
+                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+        //!Returns list of peers whose local system time is known
+        virtual QnPeerTimeInfoList getPeerTimeInfoList() const = 0;
+
+    signals:
+        //!Emitted when there is ambiguity while choosing primary time server automatically
+        /*!
+            User SHOULD call \a AbstractTimeManager::forcePrimaryTimeServer to set primary time server manually.
+            This signal is emitted periodically until ambiguity in choosing primary time server has been resolved (by user or automatically)
+        */
+        void timeServerSelectionRequired();
+        //!Emitted when synchronized time has been changed
+        void timeChanged( qint64 syncTime );
+        //!Emitted when peer \a peerId local time has changed
+        /*!
+            \param peerId
+            \param syncTime Synchronized time (UTC, millis from epoch) corresponding to \a peerLocalTime
+            \param peerLocalTime Peer local time (UTC, millis from epoch)
+        */
+        void peerTimeChanged(const QUuid &peerId, qint64 syncTime, qint64 peerLocalTime);
+
+    protected:
+        virtual int getCurrentTimeImpl( impl::CurrentTimeHandlerPtr handler ) = 0;
+        virtual int forcePrimaryTimeServerImpl( const QUuid& serverGuid, impl::SimpleHandlerPtr handler ) = 0;
+    };
+    typedef std::shared_ptr<AbstractTimeManager> AbstractTimeManagerPtr;
+
     class AbstractMiscManager : public QObject {
         Q_OBJECT
     public:
@@ -833,6 +898,7 @@ namespace ec2
         virtual AbstractUpdatesManagerPtr getUpdatesManager() = 0;
         virtual AbstractMiscManagerPtr getMiscManager() = 0;
         virtual AbstractDiscoveryManagerPtr getDiscoveryManager() = 0;
+        virtual AbstractTimeManagerPtr getTimeManager() = 0;
 
         /*!
             \param handler Functor with params: (ErrorCode)
@@ -846,29 +912,6 @@ namespace ec2
             using namespace std::placeholders;
             int(AbstractECConnection::*fn)(Qn::PanicMode, impl::SimpleHandlerPtr) = &AbstractECConnection::setPanicMode;
             return impl::doSyncCall<impl::SimpleHandler>( std::bind(fn, this, value, _1));
-        }
-
-        /*!
-            \param handler Functor with params: (ErrorCode, qint64)
-        */
-        template<class TargetType, class HandlerType> int getCurrentTime( TargetType* target, HandlerType handler ) {
-            return getCurrentTime( std::static_pointer_cast<impl::CurrentTimeHandler>(
-                std::make_shared<impl::CustomCurrentTimeHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-        ErrorCode getCurrentTimeSync(qint64* const time) {
-            using namespace std::placeholders;
-            int(AbstractECConnection::*fn)(impl::CurrentTimeHandlerPtr) = &AbstractECConnection::getCurrentTime;
-            return impl::doSyncCall<impl::CurrentTimeHandler>( std::bind(fn, this, _1), time );
-        }
-
-        //!Set peer identified by \a serverGuid to be primary time server (every other peer synchronizes time with server \a serverGuid)
-        template<class TargetType, class HandlerType> int forcePrimaryTimeServer( const QUuid& serverGuid, TargetType* target, HandlerType handler )
-        {
-            return forcePrimaryTimeServer(
-                serverGuid,
-                std::static_pointer_cast<impl::SimpleHandler>(
-                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
         /*!
@@ -913,22 +956,10 @@ namespace ec2
         void settingsChanged(QnKvPairList settings);
         void panicModeChanged(Qn::PanicMode mode);
 
-        //!Emitted when there is ambiguity while choosing primary time server automatically
-        /*!
-            User SHOULD call \a AbstractECConnection::forcePrimaryTimeServer to set primary time server manually.
-            This signal is emitted periodically until ambiguity in choosing primary time server has been resolved (by user or automatically)
-            \param localSystemTime Local system time (UTC, millis from epoch)
-            \param peersAndTimes pair<peer id, peer local time (UTC, millis from epoch) corresponding to \a localSystemTime>
-        */
-        void timeServerSelectionRequired();
-        //!Emitted when synchronized time has been changed
-        void timeChanged( qint64 syncTime );
         void databaseDumped();
 
     protected:
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) = 0;
-        virtual int forcePrimaryTimeServer( const QUuid& serverGuid, impl::SimpleHandlerPtr handler ) = 0;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) = 0;
     };  

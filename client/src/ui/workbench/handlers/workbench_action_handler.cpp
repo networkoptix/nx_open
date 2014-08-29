@@ -2452,10 +2452,6 @@ void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered() {
     if( m_timeServerSelectionDialog->isVisible() )
         return; //dialog still running from previous time
 
-    const qint64 localSystemTime = menu()->currentParameters(sender()).argument(Qn::LocalSystemTimeRole).toLongLong();
-    const ec2::QnPeerTimeInfoList& peers = menu()->currentParameters(sender()).argument(Qn::PeersToChooseTimeServerFromRole).value<ec2::QnPeerTimeInfoList>();
-    m_timeServerSelectionDialog->setData( localSystemTime, peers );
-
     m_timeServerSelectionDialog->exec();
 }
 
