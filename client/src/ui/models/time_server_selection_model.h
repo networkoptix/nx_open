@@ -7,6 +7,8 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+struct QnPeerRuntimeInfo;
+
 class QnTimeServerSelectionModel : public Connective<QAbstractTableModel>, public QnWorkbenchContextAware {
     Q_OBJECT
 
@@ -30,6 +32,15 @@ public:
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+    QUuid selectedServer() const;
+    void setSelectedServer(const QUuid &serverId);
+
+    static bool isSelected(quint64 priority);
+private:
+    void addItem(const QnPeerRuntimeInfo &info,  qint64 time = -1);
+    void updateColumn(Columns column);
+
 private:
     struct Item {
         QUuid peerId;
@@ -39,7 +50,7 @@ private:
 
     QList<Item> m_items;
     qint64 m_timeBase;
-    Qt::CheckState m_checked;
+    QUuid m_selectedServer;
 };
 
 #endif // TIME_SERVER_SELECTION_MODEL_H

@@ -465,6 +465,7 @@ public:
         ValidRole,                                  /**< Role for valid state. Value of type bool. */
         ActionIsInstantRole,                        /**< Role for instant state for business rule actions. Value of type bool. */
         ShortTextRole,                              /**< Role for short text. Value of type QString. */
+        PriorityRole,                               /**< Role for priority value. Value of type quint64. */
 
         EventTypeRole,                              /**< Role for business event type. Value of type QnBusiness::EventType. */
         EventResourcesRole,                         /**< Role for business event resources list. Value of type QnResourceList. */

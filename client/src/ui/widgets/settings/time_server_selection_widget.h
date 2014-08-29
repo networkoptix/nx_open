@@ -25,6 +25,9 @@ public:
     virtual bool hasChanges() const override;
 
 private:
+    QUuid selectedServer() const;
+
+private:
     QScopedPointer<Ui::TimeServerSelectionWidget> ui;
     QnTimeServerSelectionModel* m_model;
 };

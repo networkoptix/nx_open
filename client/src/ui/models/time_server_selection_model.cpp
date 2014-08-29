@@ -23,6 +23,10 @@ namespace {
         << Qt::AccessibleTextRole
         << Qt::AccessibleDescriptionRole
         << Qt::ToolTipRole;
+
+    QVector<int> checkboxRoles = QVector<int>()
+        << Qt::DisplayRole 
+        << Qt::CheckStateRole;
 }
 
 QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*/):
@@ -30,15 +34,14 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
     QnWorkbenchContextAware(parent),
     m_timeBase(0)
 {
- 
-    m_checked = Qt::Unchecked;
-
     auto processor = QnCommonMessageProcessor::instance();
 
+    /* Handle synchronized time updates. */
     connect(processor, &QnCommonMessageProcessor::syncTimeChanged, this, [this](qint64 syncTime) {
         m_timeBase = syncTime;
     });
 
+    /* Handle peer time updates. */
     connect(processor, &QnCommonMessageProcessor::peerTimeChanged, this, [this](const QUuid &peerId, qint64 syncTime, qint64 peerTime) {
         bool syncTimeChanged = m_timeBase != syncTime;
         m_timeBase = syncTime;
@@ -56,20 +59,28 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
             updateTime();
     });
 
+    /* Handle adding new online server peers. */
     connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoAdded,    this, [this](const QnPeerRuntimeInfo &info) {
         if (info.data.peer.peerType != Qn::PT_Server)
             return;
 
-        Item item;
-        item.peerId = info.uuid;
-        item.priority = info.data.serverTimePriority;
-        item.time = -1;
-        
         beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
-        m_items << item;
+        addItem(info);
         endInsertRows();
     });
+
+    /* Handle changing server peers priority (selection). */
+    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, [this](const QnPeerRuntimeInfo &info) {
+        if (info.data.peer.peerType != Qn::PT_Server)
+            return;
+
+        if (isSelected(info.data.serverTimePriority))
+            setSelectedServer(info.uuid);
+        else if (info.uuid == m_selectedServer)
+            setSelectedServer(QUuid());
+    });
     
+    /* Handle removing online server peers. */
     connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoRemoved,  this,  [this](const QnPeerRuntimeInfo &info) {
         if (info.data.peer.peerType != Qn::PT_Server)
             return;
@@ -83,6 +94,24 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
         endRemoveRows();
     });
 
+    /* Handle adding new servers (to display name correctly). */
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, [this](const QnResourcePtr &resource){
+        if (!resource.dynamicCast<QnMediaServerResource>())
+            return;
+
+        QUuid id = resource->getId();
+        int idx = qnIndexOf(m_items, [id](const Item &item){return item.peerId == id; });
+        if (idx < 0)
+            return;
+
+        emit dataChanged(
+            this->index(idx, Columns::NameColumn), 
+            this->index(idx, Columns::NameColumn),
+            textRoles);
+    });
+
+
+    /* Requesting initial time. */
     QHash<QUuid, qint64> timeByPeer;
     if (auto connection = QnAppServerConnectionFactory::getConnection2()) {
         auto timeManager = connection->getTimeManager();
@@ -97,16 +126,12 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
             timeByPeer[info.peerId] = info.time;
     }
 
+    /* Fill table with current data. */
     beginResetModel();
     foreach (const QnPeerRuntimeInfo &runtimeInfo, QnRuntimeInfoManager::instance()->items()->getItems()) {
         if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
             continue;
-        
-        Item item;
-        item.peerId = runtimeInfo.uuid;
-        item.priority = runtimeInfo.data.serverTimePriority;
-        item.time = timeByPeer.value(runtimeInfo.uuid, -1);
-        m_items << item;
+        addItem(runtimeInfo, timeByPeer.value(runtimeInfo.uuid, -1));
     }
     endResetModel();
 }
@@ -149,16 +174,13 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
     if (index.row() < 0 || index.row() >= m_items.size())
         return QVariant();
 
-    
-
     Columns column = static_cast<Columns>(index.column());
     Item item = m_items[index.row()];
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(item.peerId).dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return QVariant();
-
     qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(item.peerId).dynamicCast<QnMediaServerResource>();
+    QString title = server ? getFullResourceName(server, true) : tr("Server");
 
     switch (role) {
       case Qt::DisplayRole:
@@ -168,7 +190,7 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
       case Qt::AccessibleDescriptionRole:
       case Qt::ToolTipRole:
           if (column == Columns::NameColumn)
-              return getFullResourceName(server, true);
+              return title;
           if (column == Columns::TimeColumn) {
               if (item.time < 0 || m_timeBase == 0)
                   return tr("Loading...");
@@ -184,19 +206,31 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
           break;
       case Qt::CheckStateRole:
           if (column == Columns::CheckboxColumn)
-              return m_checked;
-              //return (item.priority & ec2::ApiRuntimeData::tpfPeerTimeSetByUser) > 0 ? Qt::Checked : Qt::Unchecked;
+              return item.peerId == m_selectedServer ? Qt::Checked : Qt::Unchecked;
           break;
+      case Qn::PriorityRole:
+          return item.priority;
     }
     return QVariant();
 }
 
 bool QnTimeServerSelectionModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/) {
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
+        return 0;
+
+    if (index.row() < 0 || index.row() >= m_items.size())
+        return 0;
+
     if (index.column() != Columns::CheckboxColumn || role != Qt::CheckStateRole)
         return false;
 
-    m_checked = (Qt::CheckState)value.toInt();
-    emit dataChanged(index, index, QVector<int>() << Qt::DisplayRole << Qt::CheckStateRole);
+    Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
+
+    // do not allow to uncheck element
+    if (state == Qt::Unchecked)
+        return false;
+
+    setSelectedServer(m_items[index.row()].peerId);
     return true;
 }
 
@@ -217,10 +251,48 @@ Qt::ItemFlags QnTimeServerSelectionModel::flags(const QModelIndex &index) const 
 }
 
 void QnTimeServerSelectionModel::updateTime() {
+    updateColumn(Columns::TimeColumn);
+}
+
+void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo &info, qint64 time) {
+    Item item;
+    item.peerId = info.uuid;
+    item.priority = info.data.serverTimePriority;
+    if (isSelected(item.priority))
+        m_selectedServer = item.peerId;
+    item.time = time;
+    m_items << item;
+}
+
+QUuid QnTimeServerSelectionModel::selectedServer() const {
+    return m_selectedServer;
+}
+
+void QnTimeServerSelectionModel::setSelectedServer(const QUuid &serverId) {
+    if (m_selectedServer == serverId)
+        return;
+
+    if (!serverId.isNull()) {
+        int idx = qnIndexOf(m_items, [serverId](const Item &item){return item.peerId == serverId; });
+        if (idx < 0)
+            return;
+    }
+
+    m_selectedServer = serverId;
+    updateColumn(Columns::CheckboxColumn);
+}
+
+void QnTimeServerSelectionModel::updateColumn(Columns column) {
     if (m_items.isEmpty())
         return;
 
-    int column = Columns::TimeColumn;
-    emit dataChanged(index(0, column), index(m_items.size() - 1, column), textRoles);
+    QVector<int> roles = column == Columns::CheckboxColumn 
+        ? checkboxRoles
+        : textRoles;
+
+    emit dataChanged(index(0, column), index(m_items.size() - 1, column), roles);
 }
 
+bool QnTimeServerSelectionModel::isSelected(quint64 priority) {
+    return (priority & ec2::ApiRuntimeData::tpfPeerTimeSetByUser) > 0;
+}
