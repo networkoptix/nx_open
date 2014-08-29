@@ -1,5 +1,6 @@
 #include "incompatible_server_adder.h"
 
+#include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <utils/network/global_module_finder.h>
@@ -38,18 +39,12 @@ bool isSuitable(const QnModuleInformation &moduleInformation) {
 QnIncompatibleServerAdder::QnIncompatibleServerAdder(QObject *parent) :
     QObject(parent)
 {
-    connect(QnGlobalModuleFinder::instance(),   &QnGlobalModuleFinder::peerFound,   this,   &QnIncompatibleServerAdder::at_peerFound);
-    connect(QnGlobalModuleFinder::instance(),   &QnGlobalModuleFinder::peerLost,    this,   &QnIncompatibleServerAdder::at_peerLost);
     connect(QnGlobalModuleFinder::instance(),   &QnGlobalModuleFinder::peerChanged, this,   &QnIncompatibleServerAdder::at_peerChanged);
+    connect(QnGlobalModuleFinder::instance(),   &QnGlobalModuleFinder::peerLost,    this,   &QnIncompatibleServerAdder::at_peerLost);
 
     // fill resource pool with already found modules
     foreach (const QnModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules())
-        at_peerFound(moduleInformation);
-}
-
-
-void QnIncompatibleServerAdder::at_peerFound(const QnModuleInformation &moduleInformation) {
-    at_peerChanged(moduleInformation);
+        at_peerChanged(moduleInformation);
 }
 
 void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &moduleInformation) {
@@ -66,6 +61,21 @@ void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &module
             server->setSystemInfo(moduleInformation.systemInformation);
             server->setSystemName(moduleInformation.systemName);
             server->setStatus(moduleInformation.isCompatibleToCurrentSystem() ? Qn::Offline : Qn::Incompatible);
+
+            QList<QHostAddress> addresses;
+            foreach (const QString &address, moduleInformation.remoteAddresses) {
+                QHostAddress hostAddress(address);
+                if (hostAddress.isNull())
+                    continue;
+                addresses.append(hostAddress);
+            }
+            if (!addresses.isEmpty()) {
+                server->setNetAddrList(addresses);
+                QString url = QString(lit("http://%1:%2")).arg(addresses.first().toString()).arg(moduleInformation.port);
+                server->setApiUrl(url);
+                server->setUrl(url);
+            }
+
             qnResPool->updateIncompatibility(server);
         }
         return;

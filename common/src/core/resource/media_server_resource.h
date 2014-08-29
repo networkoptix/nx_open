@@ -79,6 +79,8 @@ public:
     QString getSystemName() const;
     void setSystemName(const QString &systemName);
 
+    QnModuleInformation getModuleInformation() const;
+
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
 

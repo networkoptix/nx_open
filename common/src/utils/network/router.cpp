@@ -11,11 +11,8 @@ QnRouter::QnRouter(QnModuleFinder *moduleFinder, QObject *parent) :
     m_moduleFinder(moduleFinder),
     m_routeBuilder(new QnRouteBuilder(qnCommon->moduleGUID()))
 {
-    foreach (const QnModuleInformation &moduleInformation, moduleFinder->foundModules())
-        at_moduleFinder_moduleFound(moduleInformation);
-
-    connect(moduleFinder,               &QnModuleFinder::moduleFound,   this,   &QnRouter::at_moduleFinder_moduleFound);
-    connect(moduleFinder,               &QnModuleFinder::moduleLost,    this,   &QnRouter::at_moduleFinder_moduleLost);
+    connect(moduleFinder,       &QnModuleFinder::moduleUrlFound,    this,   &QnRouter::at_moduleFinder_moduleUrlFound);
+    connect(moduleFinder,       &QnModuleFinder::moduleUrlLost,     this,   &QnRouter::at_moduleFinder_moduleUrlLost);
 }
 
 QnRouter::~QnRouter() {}
@@ -76,36 +73,27 @@ void QnRouter::at_connectionRemoved(const QUuid &discovererId, const QUuid &peer
     makeConsistent();
 }
 
-void QnRouter::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation) {
-    if (m_moduleFinder->isSendingFakeSignals())
+void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
+    Endpoint endpoint(moduleInformation.id, url.host(), url.port());
+    if (m_connections.contains(qnCommon->moduleGUID(), endpoint))
         return;
 
-    foreach (const QString &address, moduleInformation.remoteAddresses) {
-        Endpoint endpoint(moduleInformation.id, address, moduleInformation.port);
-        if (m_connections.contains(qnCommon->moduleGUID(), endpoint))
-            return;
-
-        m_connections.insert(qnCommon->moduleGUID(), endpoint);
-        m_routeBuilder->addConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
-        if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
-            connection->getMiscManager()->addConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-    }
+    m_connections.insert(qnCommon->moduleGUID(), endpoint);
+    m_routeBuilder->addConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
+    if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
+        connection->getMiscManager()->addConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 
-void QnRouter::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
-    if (m_moduleFinder->isSendingFakeSignals())
+void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url) {
+    Endpoint endpoint(moduleInformation.id, url.host(), url.port());
+    if (!m_connections.remove(qnCommon->moduleGUID(), endpoint))
         return;
 
-    foreach (const Endpoint &endpoint, m_connections.values(qnCommon->moduleGUID())) {
-        if (endpoint.id != moduleInformation.id)
-            continue;
+    m_routeBuilder->removeConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
+    if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
+        connection->getMiscManager()->removeConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
-        m_routeBuilder->removeConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
-        m_connections.remove(qnCommon->moduleGUID(), endpoint);
-        if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
-            connection->getMiscManager()->removeConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-    }
     makeConsistent();
 }
 

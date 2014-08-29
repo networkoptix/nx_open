@@ -47,6 +47,7 @@ public:
     QUuid seed;
     quint16 port;
     bool sslAllowed;
+    QStringList remoteAddresses;
 
     RevealResponse();
     RevealResponse(const QnModuleInformation &moduleInformation);

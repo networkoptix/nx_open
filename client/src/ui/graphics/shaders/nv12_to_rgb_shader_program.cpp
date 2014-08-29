@@ -76,9 +76,9 @@ QnNv12ToRgbShaderProgram::QnNv12ToRgbShaderProgram(QObject *parent):
     void main() {
         vec4 yuv, rgb;
         yuv.rgba = vec4(
-            texture(yTexture, vTexCoord.st).r,
-            texture(uvTexture, vTexCoord.st).r,
-            texture(uvTexture, vTexCoord.st).a,
+            texture2D(yTexture, vTexCoord.st).r,
+            texture2D(uvTexture, vTexCoord.st).r,
+            texture2D(uvTexture, vTexCoord.st).a,
             1.0
             );
 

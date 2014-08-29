@@ -159,4 +159,6 @@ typedef QList<QnVideoWallItemIndex> QnVideoWallItemIndexList;
 class QnVideoWallMatrixIndex;
 typedef QList<QnVideoWallMatrixIndex> QnVideoWallMatrixIndexList;
 
+
+
 #endif // QN_RESOURCE_FWD_H

@@ -13,10 +13,16 @@ namespace ec2
     */
     struct ApiRuntimeData: ApiData
     {
+        static const quint64 tpfPeerTimeSynchronizedWithInternetServer  = 0x0008LL << 32;
+        static const quint64 tpfPeerTimeSetByUser                       = 0x0004LL << 32;
+        static const quint64 tpfPeerHasMonotonicClock                   = 0x0002LL << 32;
+        static const quint64 tpfPeerIsNotEdgeServer                     = 0x0001LL << 32;
+
         ApiRuntimeData(): 
             ApiData(), 
             prematureLicenseExperationDate(0),
-            videoWallControlSessions(0)
+            videoWallControlSessions(0),
+            serverTimePriority(0)
         {}
 
         bool operator==(const ApiRuntimeData& other) const {
@@ -26,6 +32,7 @@ namespace ec2
                    publicIP == other.publicIP &&
                    videoWallInstanceGuid == other.videoWallInstanceGuid &&
                    videoWallControlSessions == other.videoWallControlSessions &&
+                   serverTimePriority == other.serverTimePriority &&
                    prematureLicenseExperationDate == other.prematureLicenseExperationDate;
         }
 
@@ -43,11 +50,14 @@ namespace ec2
         /** Number of the videowall control sessions governed by the current client instance. */
         int videoWallControlSessions;
 
+        /** Priority of this peer as the time synchronization server. */
+        quint64 serverTimePriority;
+
         QList<QByteArray> mainHardwareIds;
         QList<QByteArray> compatibleHardwareIds;
     };
 
-#define ApiRuntimeData_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)(videoWallInstanceGuid)(videoWallControlSessions)(mainHardwareIds)(compatibleHardwareIds)
+#define ApiRuntimeData_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)(videoWallInstanceGuid)(videoWallControlSessions)(serverTimePriority)(mainHardwareIds)(compatibleHardwareIds)
 
 
 } // namespace ec2

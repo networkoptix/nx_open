@@ -17,7 +17,7 @@ public:
     void setDirectModuleFinderHelper(QnModuleFinderHelper *directModuleFinderHelper);
 
 private slots:
-    void at_directModuleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QUrl &url);
+    void at_directModuleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
 
 private:
     QnDirectModuleFinder *m_directModuleFinder;

@@ -465,16 +465,15 @@ public:
         ValidRole,                                  /**< Role for valid state. Value of type bool. */
         ActionIsInstantRole,                        /**< Role for instant state for business rule actions. Value of type bool. */
         ShortTextRole,                              /**< Role for short text. Value of type QString. */
+        PriorityRole,                               /**< Role for priority value. Value of type quint64. */
 
         EventTypeRole,                              /**< Role for business event type. Value of type QnBusiness::EventType. */
         EventResourcesRole,                         /**< Role for business event resources list. Value of type QnResourceList. */
         ActionTypeRole,                             /**< Role for business action type. Value of type QnBusiness::ActionType. */
         ActionResourcesRole,                        /**< Role for business action resources list. Value of type QnResourceList. */
 
-        SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
+        SoftwareVersionRole                         /**< Role for software version. Value of type QnSoftwareVersion. */
 
-        LocalSystemTimeRole,                        /**< Used with action SelectTimeServerAction. type qint64 */
-        PeersToChooseTimeServerFromRole             /**< Used with action SelectTimeServerAction. type QList<QPair<QnId, qint64> */
     };
 
     // TODO: #Elric #EC2 rename

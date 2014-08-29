@@ -36,18 +36,12 @@ namespace ec2
         m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) ),
         m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) ),
         m_miscManager( new QnMiscManager<T>(m_queryProcessor) ),
-        m_discoveryManager( new QnDiscoveryManager<T>(m_queryProcessor) )
+        m_discoveryManager( new QnDiscoveryManager<T>(m_queryProcessor) ),
+        m_timeManager( new QnTimeManager<T>(m_queryProcessor) )
     {
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerFound, this, &BaseEc2Connection<T>::remotePeerFound, Qt::DirectConnection);
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,  this, &BaseEc2Connection<T>::remotePeerLost, Qt::DirectConnection);
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::remotePeerUnauthorized,  this, &BaseEc2Connection<T>::remotePeerUnauthorized, Qt::DirectConnection);
-
-        connect (TimeSynchronizationManager::instance(), &TimeSynchronizationManager::primaryTimeServerSelectionRequired,
-                 this, &BaseEc2Connection<T>::timeServerSelectionRequired,
-                 Qt::DirectConnection );
-        connect (TimeSynchronizationManager::instance(), &TimeSynchronizationManager::timeChanged,
-                 this, &BaseEc2Connection<T>::timeChanged,
-                 Qt::DirectConnection );
 
         m_notificationManager.reset(
             new ECConnectionNotificationManager(
@@ -140,6 +134,12 @@ namespace ec2
     }
 
     template<class T>
+    AbstractTimeManagerPtr BaseEc2Connection<T>::getTimeManager()
+    {
+        return m_timeManager;
+    }
+
+    template<class T>
     int BaseEc2Connection<T>::setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
@@ -154,32 +154,6 @@ namespace ec2
 
         return reqID;
     }
-
-    template <class T>
-    int BaseEc2Connection<T>::getCurrentTime( impl::CurrentTimeHandlerPtr handler )
-    {
-        const int reqID = generateRequestID();
-        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
-        QnConcurrent::run(
-            Ec2ThreadPool::instance(),
-            std::bind( &impl::CurrentTimeHandler::done, handler, reqID, ec2::ErrorCode::ok, TimeSynchronizationManager::instance()->getSyncTime() ) );
-        return reqID;
-    }
-    
-    template <class T>
-    int BaseEc2Connection<T>::forcePrimaryTimeServer( const QUuid& serverGuid, impl::SimpleHandlerPtr handler )
-    {
-        const int reqID = generateRequestID();
-
-        QnTransaction<ApiIdData> tran( ApiCommand::forcePrimaryTimeServer );
-        tran.params.id = serverGuid;
-
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1) );
-
-        return reqID;
-    }
-
 
 
     template<class T>

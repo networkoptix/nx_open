@@ -48,6 +48,10 @@ public:
         return writeNumberInternal(QnUbjson::Int64Marker, value);
     }
 
+    void writeUInt64(quint64 value) {
+        return writeNumberInternal(QnUbjson::Int64Marker, (qint64)value);
+    }
+
     void writeFloat(float value) {
         // TODO: #Elric support NaN (like in JSON spec)
         return writeNumberInternal(QnUbjson::FloatMarker, value);

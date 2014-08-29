@@ -24,7 +24,7 @@ bool QnTextureGLShaderProgram::compile()
     uniform vec4 uColor;
     uniform sampler2D uTexture;
     void main() {
-        vec4 texColor = texture(uTexture, vTexColor);
+        vec4 texColor = texture2D(uTexture, vTexColor);
         gl_FragColor = uColor * texColor;
     }
     ));

@@ -135,12 +135,12 @@
 #include <utils/network/module_finder.h>
 #include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
-#include <media_server/server_update_tool.h>
-
 
 #include <media_server/server_message_processor.h>
 #include <media_server/settings.h>
 #include <media_server/serverutil.h>
+#include <media_server/server_update_tool.h>
+#include <media_server/server_connector.h>
 #include "version.h"
 
 #ifdef _WIN32
@@ -1018,38 +1018,6 @@ void QnMain::at_cameraIPConflict(const QHostAddress& host, const QStringList& ma
         qnSyncTime->currentUSecsSinceEpoch());
 }
 
-void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-
-    if (isCompatible(moduleInformation.version, qnCommon->engineVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
-        QString url = QString( lit( "%1://%2:%3" ) ).arg( moduleInformation.sslAllowed ? lit( "https" ) : lit( "http" ) ).arg( remoteAddress ).arg( moduleInformation.port );
-        ec2Connection->addRemotePeer(url, moduleInformation.id);
-    } else {
-        at_peerLost(moduleInformation);
-    }
-}
-void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-
-    foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
-        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
-        ec2Connection->deleteRemotePeer(url);
-
-        QHostAddress host(remoteAddress);
-        int port = moduleInformation.port;
-
-        foreach (QnMediaServerResourcePtr mServer, qnResPool->getAllServers()) 
-        {
-            if (mServer->getStatus() == Qn::Unauthorized) {
-                QList<QHostAddress> addrList = mServer->getNetAddrList();
-                if (addrList.contains(host) && QUrl(mServer->getApiUrl()).port() == port) {
-                    mServer->setStatus(Qn::Offline);
-                    break;
-                }
-            }
-        }
-    }
-}
 
 bool QnMain::initTcpListener()
 {
@@ -1323,7 +1291,7 @@ void QnMain::run()
         localInfo.data.publicIP = m_publicAddress.toString();
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
-    connect( ec2Connection.get(), &ec2::AbstractECConnection::timeChanged,
+    connect( ec2Connection->getTimeManager().get(), &ec2::AbstractTimeManager::timeChanged,
              QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
@@ -1403,7 +1371,6 @@ void QnMain::run()
             server->setPanicMode(pm);
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
         }
-        server->setVersion(qnCommon->engineVersion());
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
@@ -1462,6 +1429,10 @@ void QnMain::run()
             if (!server->getSystemName().isEmpty())
                 needUpdateAuthKey = true;
             server->setSystemName(qnCommon->localSystemName());
+            isModified = true;
+        }
+        if (server->getVersion() != qnCommon->engineVersion()) {
+            server->setVersion(qnCommon->engineVersion());
             isModified = true;
         }
         if (needUpdateAuthKey) {
@@ -1559,8 +1530,7 @@ void QnMain::run()
             m_moduleFinder->setAllowedPeers(allowedPeers);
     }
 
-    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleFound,     this,   &QnMain::at_peerFound,  Qt::DirectConnection);
-    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleLost,      this,   &QnMain::at_peerLost,   Qt::DirectConnection);
+    QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(m_moduleFinder));
 
     QUrl url = ec2Connection->connectionInfo().ecUrl;
 #if 1
