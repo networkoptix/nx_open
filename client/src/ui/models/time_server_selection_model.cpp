@@ -193,7 +193,7 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
               return title;
           if (column == Columns::TimeColumn) {
               if (item.time < 0 || m_timeBase == 0)
-                  return tr("Loading...");
+                  return tr("Synchronizing...");
               return QDateTime::fromMSecsSinceEpoch(currentTime - m_timeBase + item.time).toString(Qt::ISODate);
           }
           break;
