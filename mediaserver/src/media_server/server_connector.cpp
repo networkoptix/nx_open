@@ -95,25 +95,9 @@ void QnServerConnector::removeConnection(const QnModuleInformation &moduleInform
     QHostAddress host(url.host());
     int port = moduleInformation.port;
 
-    if (!moduleInformation.id.isNull())
-    {
-        QnResourcePtr mServer = qnResPool->getResourceById(moduleInformation.id);
-        if (mServer && mServer->getStatus() == Qn::Unauthorized)
-            mServer->setStatus(Qn::Offline);
-    }
-    else {
-        // todo: need rafactor. local address conflict is possible
-        foreach (QnMediaServerResourcePtr mServer, qnResPool->getAllServers()) 
-        {
-            if (mServer->getStatus() == Qn::Unauthorized) {
-                QList<QHostAddress> addrList = mServer->getNetAddrList();
-                if (addrList.contains(host) && QUrl(mServer->getApiUrl()).port() == port) {
-                    mServer->setStatus(Qn::Offline);
-                    break;
-                }
-            }
-        }
-    }
+    QnResourcePtr mServer = qnResPool->getResourceById(moduleInformation.id);
+    if (mServer && mServer->getStatus() == Qn::Unauthorized)
+        mServer->setStatus(Qn::Offline);
 }
 
 void QnServerConnector::reconnect() {

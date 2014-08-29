@@ -256,18 +256,11 @@ void QnServerMessageProcessor::at_systemNameChangeRequested(const QString &syste
     }
 }
 
-void QnServerMessageProcessor::at_remotePeerUnauthorized(const QUrl& url)
+void QnServerMessageProcessor::at_remotePeerUnauthorized(const QUuid& id)
 {
-    QHostAddress host(url.host());
-    int port = url.port();
-    foreach (QnMediaServerResourcePtr mServer, qnResPool->getAllServers()) 
-    {
-        QList<QHostAddress> addrList = mServer->getNetAddrList();
-        if (addrList.contains(host) && QUrl(mServer->getApiUrl()).port() == port) {
-            mServer->setStatus(Qn::Unauthorized);
-            break;
-        }
-    }
+    QnResourcePtr mServer = qnResPool->getResourceById(id);
+    if (mServer)
+        mServer->setStatus(Qn::Unauthorized);
 }
 
 bool QnServerMessageProcessor::canRemoveResource(const QUuid& resourceId) 

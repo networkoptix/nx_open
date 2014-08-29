@@ -31,7 +31,7 @@ namespace ec2
 
         static QnTransactionMessageBus* instance();
 
-        void addConnectionToPeer(const QUrl& url, const QUuid& peer = QUuid());
+        void addConnectionToPeer(const QUrl& url, const QUuid& peer);
         void removeConnectionFromPeer(const QUrl& url);
         void gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer);
         void dropConnections();
@@ -110,7 +110,7 @@ namespace ec2
         void gotLockResponse(ApiLockData);
 
         void transactionProcessed(const QnAbstractTransaction &transaction);
-        void remotePeerUnauthorized(const QUrl& url);
+        void remotePeerUnauthorized(const QUuid& id);
     private:
         friend class QnTransactionTransport;
         friend struct GotTransactionFuction;

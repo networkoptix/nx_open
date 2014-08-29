@@ -418,7 +418,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             QTimer::singleShot(0, this, SLOT(repeatDoGet()));
         }
         else {
-            emit remotePeerUnauthorized(remoteAddr());
+            emit remotePeerUnauthorized(remotePeer().id);
             cancelConnecting();
         }
         return;

@@ -58,6 +58,6 @@ namespace ec2
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());
         url.setQuery(q);
         m_peerUrl = url;
-        QnTransactionMessageBus::instance()->addConnectionToPeer(url);
+        QnTransactionMessageBus::instance()->addConnectionToPeer(url, QUuid());
     }
 }

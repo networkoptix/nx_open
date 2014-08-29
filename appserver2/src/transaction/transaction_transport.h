@@ -56,7 +56,7 @@ public:
 signals:
     void gotTransaction(const QByteArray &data, const QnTransactionTransportHeader &transportHeader);
     void stateChanged(State state);
-    void remotePeerUnauthorized(const QUrl& url);
+    void remotePeerUnauthorized(const QUuid& id);
 public:
 
     template<class T> 
