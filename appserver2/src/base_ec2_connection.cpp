@@ -40,6 +40,7 @@ namespace ec2
     {
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerFound, this, &BaseEc2Connection<T>::remotePeerFound, Qt::DirectConnection);
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,  this, &BaseEc2Connection<T>::remotePeerLost, Qt::DirectConnection);
+        connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::remotePeerUnauthorized,  this, &BaseEc2Connection<T>::remotePeerUnauthorized, Qt::DirectConnection);
 
         connect (TimeSynchronizationManager::instance(), &TimeSynchronizationManager::primaryTimeServerSelectionRequired,
                  this, &BaseEc2Connection<T>::timeServerSelectionRequired,

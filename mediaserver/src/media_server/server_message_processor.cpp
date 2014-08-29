@@ -167,6 +167,8 @@ void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
             this, &QnServerMessageProcessor::at_systemNameChangeRequested);
 
+    connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
+
     QnCommonMessageProcessor::init(connection);
 }
 
@@ -251,6 +253,21 @@ void QnServerMessageProcessor::at_systemNameChangeRequested(const QString &syste
         MSSettings::roSettings()->setValue("systemName", systemName);
         server->setSystemName(systemName);
         m_connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    }
+}
+
+void QnServerMessageProcessor::at_remotePeerUnauthorized(const QUrl& url)
+{
+    QString _host = url.host();
+    QHostAddress host(url.host());
+    int port = url.port();
+    foreach (QnMediaServerResourcePtr mServer, qnResPool->getAllServers()) 
+    {
+        QList<QHostAddress> addrList = mServer->getNetAddrList();
+        if (addrList.contains(host) && QUrl(mServer->getApiUrl()).port() == port) {
+            mServer->setStatus(Qn::Unauthorized);
+            break;
+        }
     }
 }
 

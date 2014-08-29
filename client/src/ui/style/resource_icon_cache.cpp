@@ -38,6 +38,7 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(Layout | Locked,         qnSkin->icon("tree/layout_locked.png"));
 
     m_cache.insert(Offline,                 qnSkin->icon("tree/offline.png"));
+    m_cache.insert(Unauthorized,            qnSkin->icon("tree/unauthorized.png"));
 }
 
 QnResourceIconCache::~QnResourceIconCache() {
@@ -58,6 +59,7 @@ QIcon QnResourceIconCache::icon(Key key, bool unchecked) {
     if(m_cache.contains(key))
         return m_cache.value(key);
 
+    int gggKey = key;
     QIcon icon = m_cache.value(key & TypeMask);
     QIcon overlay = m_cache.value(key & StatusMask);
     if(!icon.isNull() && !overlay.isNull()) {

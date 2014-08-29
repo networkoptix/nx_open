@@ -110,7 +110,7 @@ namespace ec2
         void gotLockResponse(ApiLockData);
 
         void transactionProcessed(const QnAbstractTransaction &transaction);
-
+        void remotePeerUnauthorized(const QUrl& url);
     private:
         friend class QnTransactionTransport;
         friend struct GotTransactionFuction;

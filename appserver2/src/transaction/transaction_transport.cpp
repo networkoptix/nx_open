@@ -399,13 +399,20 @@ void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_
 void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientPtr& client)
 {
     int statusCode = client->response()->statusLine.statusCode;
-    if (statusCode == nx_http::StatusCode::unauthorized && m_authByKey)
+    if (statusCode == nx_http::StatusCode::unauthorized)
     {
-        m_authByKey = false;
-        fillAuthInfo();
-        QTimer::singleShot(0, this, SLOT(repeatDoGet()));
+        if (m_authByKey) {
+            m_authByKey = false;
+            fillAuthInfo();
+            QTimer::singleShot(0, this, SLOT(repeatDoGet()));
+        }
+        else {
+            emit remotePeerUnauthorized(remoteAddr());
+            cancelConnecting();
+        }
         return;
     }
+
 
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
 

@@ -35,7 +35,7 @@ private slots:
     void at_updateInstallationRequested(const QString &updateId);
 
     void at_systemNameChangeRequested(const QString &systemName);
-
+    void at_remotePeerUnauthorized(const QUrl& url);
 private:
     void updateAllIPList(const QUuid& id, const QList<QHostAddress>& addrList);
     void updateAllIPList(const QUuid& id, const QList<QString>& addr);
