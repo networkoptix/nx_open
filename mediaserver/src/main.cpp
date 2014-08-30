@@ -2054,3 +2054,4 @@ static void printVersion()
 {
     std::cout << "  " << QN_APPLICATION_NAME << " v." << QCoreApplication::applicationVersion().toUtf8().data() << std::endl;
 }
+
