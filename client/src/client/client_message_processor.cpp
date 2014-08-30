@@ -153,6 +153,7 @@ void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
 
 void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr &resource)
 {
+    return;
     // set proxy. If some servers IF will be found, proxy address will be cleared
     const QString& proxyAddr = QnAppServerConnectionFactory::url().host();
     resource->apiConnection()->setProxyAddr(
