@@ -48,16 +48,27 @@ namespace {
         return false;
     }
 
+    Qn::NodeType rootNodeTypeForScope(QnResourcePoolModel::Scope scope) {
+        switch (scope) {
+        case QnResourcePoolModel::CamerasScope:
+            return Qn::ServersNode;
+        case QnResourcePoolModel::UsersScope:
+            return Qn::UsersNode;
+        default:
+            return Qn::RootNode;
+        }
+    }
+
 } // namespace
 
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
-QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, QObject *parent):
+QnResourcePoolModel::QnResourcePoolModel(Scope scope, QObject *parent):
     base_type(parent), 
     QnWorkbenchContextAware(parent),
     m_urlsShown(true),
-    m_rootNodeType(rootNodeType)
+    m_scope(scope)
 {
     m_rootNodeTypes << Qn::LocalNode << Qn::UsersNode << Qn::ServersNode << Qn::OtherSystemsNode << Qn::RootNode << Qn::BastardNode;
 
@@ -67,7 +78,10 @@ QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, QObject *par
         m_allNodes.append(m_rootNodes[t]);
     }
 
-    Qn::NodeType parentNodeType = rootNodeType == Qn::RootNode ? Qn::RootNode : Qn::BastardNode;
+    
+    Qn::NodeType parentNodeType = scope == FullScope ? Qn::RootNode : Qn::BastardNode;
+    Qn::NodeType rootNodeType = rootNodeTypeForScope(m_scope);
+
     foreach(Qn::NodeType t, m_rootNodeTypes)
         if (t != rootNodeType && t != parentNodeType)
             m_rootNodes[t]->setParent(m_rootNodes[parentNodeType]);
@@ -119,7 +133,7 @@ QnResourcePtr QnResourcePoolModel::resource(const QModelIndex &index) const {
 
 QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource) {
     if(!resource)
-        return m_rootNodes[m_rootNodeType];
+        return m_rootNodes[Qn::BastardNode];
 
     QHash<QnResourcePtr, QnResourcePoolModelNode *>::iterator pos = m_resourceNodeByResource.find(resource);
     if(pos == m_resourceNodeByResource.end()) {
@@ -154,8 +168,9 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QUuid &uuid) {
 }
 
 QnResourcePoolModelNode *QnResourcePoolModel::node(const QModelIndex &index) const {
+    /* Root node. */
     if(!index.isValid())
-        return m_rootNodes[m_rootNodeType];
+        return m_rootNodes[rootNodeTypeForScope(m_scope)];
 
     return static_cast<QnResourcePoolModelNode *>(index.internalPointer());
 }
@@ -165,7 +180,10 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
         return m_recorderHashByResource[resource][groupId];
 
     QnResourcePoolModelNode* recorder = new QnResourcePoolModelNode(this, Qn::RecorderNode, groupName);
-    recorder->setParent(m_resourceNodeByResource[resource]);
+    if (m_scope != UsersScope)
+        recorder->setParent(m_resourceNodeByResource[resource]);
+    else
+        recorder->setParent(m_rootNodes[Qn::BastardNode]);
     m_recorderHashByResource[resource][groupId] = recorder;
     m_allNodes.append(recorder);
     return recorder;
@@ -177,7 +195,10 @@ QnResourcePoolModelNode *QnResourcePoolModel::systemNode(const QString &systemNa
         return node;
 
     node = new QnResourcePoolModelNode(this, Qn::SystemNode, systemName);
+    if (m_scope == FullScope)
     node->setParent(m_rootNodes[Qn::OtherSystemsNode]);
+    else
+        node->setParent(m_rootNodes[Qn::BastardNode]);
     m_systemNodeBySystemName[systemName] = node;
     m_allNodes.append(node);
     return node;
@@ -231,23 +252,36 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
     assert(node->type() == Qn::ResourceNode || node->type() == Qn::EdgeNode);
 
     if(!node->resource())
-        return m_rootNodes[m_rootNodeType];
+        return m_rootNodes[Qn::BastardNode];
 
     if(node->resourceFlags() & Qn::user) {
+        if (m_scope == UsersScope)
+            return m_rootNodes[Qn::UsersNode];
+        if (m_scope == CamerasScope)
+            return m_rootNodes[Qn::BastardNode];
+
+        //TODO: #GDM non-admin scope?
         if(!accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission)) {
-            return m_rootNodes[m_rootNodeType];
+            return m_rootNodes[Qn::RootNode];
         } else {
             return m_rootNodes[Qn::UsersNode];
         }
     }
+
+    /* In UsersScope all other nodes should be hidden. */
+    if (m_scope == UsersScope)
+        return m_rootNodes[Qn::BastardNode];
+
 
     if (node->type() == Qn::EdgeNode)
         return m_rootNodes[Qn::ServersNode];
 
     if (node->resourceFlags() & Qn::server) {
         if (node->resourceStatus() == Qn::Incompatible) {
-            QnMediaServerResourcePtr server = node->resource().staticCast<QnMediaServerResource>();
+            if (m_scope == CamerasScope)
+                return m_rootNodes[Qn::BastardNode];
 
+            QnMediaServerResourcePtr server = node->resource().staticCast<QnMediaServerResource>();
             QString systemName = server->getSystemName();
             if (systemName == qnCommon->localSystemName())
                 return m_rootNodes[Qn::ServersNode];
@@ -257,23 +291,19 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
         return m_rootNodes[Qn::ServersNode];
     }
 
-    if (node->resourceFlags() & Qn::videowall)
+    if (node->resourceFlags() & Qn::videowall) {
+        if (m_scope == CamerasScope)
+            return m_rootNodes[Qn::BastardNode];
+        else
         return m_rootNodes[Qn::RootNode];
-
-    // We are requesting for the list of users so we don't want to see their layouts
-    if (m_rootNodeType == Qn::UsersNode && !(node->resourceFlags() &  Qn::user)) 
-        return m_rootNodes[Qn::BastardNode];
-
-    // We are requesting for the list of users so we don't want to see their layouts
-    if (m_rootNodeType == Qn::UsersNode && !(node->resourceFlags() &  Qn::user)) 
-        return m_rootNodes[Qn::BastardNode];
+    }
 
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
     if(!parentResource || (parentResource->flags() & Qn::local_server) == Qn::local_server) {
         if(node->resourceFlags() & Qn::local) {
             return m_rootNodes[Qn::LocalNode];
         } else {
-            return NULL;
+            return m_rootNodes[Qn::BastardNode];
         }
     } else {
         QnResourcePoolModelNode* parent = this->node(parentResource);
@@ -299,13 +329,9 @@ void QnResourcePoolModel::setUrlsShown(bool urlsShown) {
 
     m_urlsShown = urlsShown;
 
-    m_rootNodes[m_rootNodeType]->updateRecursive();
+    Qn::NodeType rootNodeType = rootNodeTypeForScope(m_scope);
+    m_rootNodes[rootNodeType]->updateRecursive();
 }
-
-Qn::NodeType QnResourcePoolModel::rootNodeType() const {
-    return m_rootNodeType;
-}
-
 
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: QAbstractItemModel implementation
