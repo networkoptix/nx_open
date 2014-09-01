@@ -300,6 +300,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
             fillerTran.peerID = key.peerID;
             fillerTran.persistentInfo.dbID = key.dbID;
             fillerTran.persistentInfo.sequence = latestSequence;
+            fillerTran.params.seqTo = latestSequence;
             result << QnUbjsonTransactionSerializer::instance()->serializedTransaction(fillerTran);
         }
     }
