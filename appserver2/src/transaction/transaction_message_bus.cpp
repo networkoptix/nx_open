@@ -395,10 +395,10 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
         qDebug() << "GAP in persistent data detected! Expected seq=" << persistentSeq + 1 <<", but got seq=" << tran.persistentInfo.sequence;
 #endif
 
-        if (!transport->remotePeer().isClient() && !m_localPeer.isClient()) {
+        if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
             queueSyncRequest(transport);
-            return false;
-        }
+        else 
+            transport->setState(QnTransactionTransport::Error); // reopen
         m_lastTranSeq[transportHeader.sender].persistentSeq = tran.persistentInfo.sequence;
     }
     return true;
