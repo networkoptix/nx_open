@@ -215,12 +215,8 @@ namespace ec2
         AlivePeersMap m_alivePeers;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
 
-        struct SeqInfo {
-            SeqInfo(): transportSeq(0), persistentSeq(0) {}
-            int transportSeq;
-            int persistentSeq;
-        };
-        QMap<QUuid, SeqInfo> m_lastTranSeq;
+        QMap<QUuid, int> m_lastTransportSeq;
+        QMap<QUuid, int> m_lastPersistentSeq;
 
         // alive control
         QElapsedTimer m_aliveSendTimer;
