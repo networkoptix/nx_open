@@ -30,7 +30,9 @@ HostAddress::HostAddress( const QString& addrStr )
     m_addrStr( addrStr )
 {
     memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
-    m_sinAddr.s_addr = inet_addr( addrStr.toLatin1().constData() );
+    if( !addrStr.isEmpty() )
+        m_sinAddr.s_addr = inet_addr( addrStr.toLatin1().constData() );
+    //otherwise considering 0.0.0.0
 }
 
 uint32_t HostAddress::ipv4() const
