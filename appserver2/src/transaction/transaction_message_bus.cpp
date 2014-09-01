@@ -388,7 +388,9 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     // 2. check persistent sequence
     if (tran.persistentInfo.isNull())
         return true; // nothing to check
-    int persistentSeq = m_lastPersistentSeq[tran.peerID];
+    
+    QnTranStateKey persistentKey(tran.peerID, tran.persistentInfo.dbID);
+    int persistentSeq = m_lastPersistentSeq[persistentKey];
     if (persistentSeq && tran.persistentInfo.sequence > persistentSeq + 1) {
         // gap in persistent data detect, do resync
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
@@ -400,7 +402,7 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
         else 
             transport->setState(QnTransactionTransport::Error); // reopen
     }
-    m_lastPersistentSeq[tran.peerID] = tran.persistentInfo.sequence;
+    m_lastPersistentSeq[persistentKey] = tran.persistentInfo.sequence;
     return true;
 }
 
