@@ -351,11 +351,14 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 
         QByteArray serializedTran;
         QnTransactionTransportHeader transportHeader;
-        QnUbjsonTransactionSerializer::deserializeTran(
-            reinterpret_cast<const quint8*>(m_readBuffer.constData()) + readBufPos + m_chunkHeaderLen + 4,
-            m_chunkLen - 4,
-            transportHeader,
-            serializedTran );
+        if( !QnUbjsonTransactionSerializer::deserializeTran(
+                reinterpret_cast<const quint8*>(m_readBuffer.constData()) + readBufPos + m_chunkHeaderLen + 4,
+                m_chunkLen - 4,
+                transportHeader,
+                serializedTran ) )
+        {
+            assert( false );
+        }
         assert( !transportHeader.processedPeers.empty() );
         NX_LOG(lit("QnTransactionTransport::onSomeBytesRead. Got transaction with seq %1 from %2").arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
         emit gotTransaction(serializedTran, transportHeader);
