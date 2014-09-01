@@ -6,7 +6,8 @@
 #ifndef STUN_STREAM_SOCKET_SERVER_H
 #define STUN_STREAM_SOCKET_SERVER_H
 
-#include "stream_socket_server.h"
+#include <utils/network/connection_server/stream_socket_server.h>
+
 #include "stun_server_connection.h"
 
 

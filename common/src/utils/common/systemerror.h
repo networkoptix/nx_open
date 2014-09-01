@@ -33,6 +33,7 @@ namespace SystemError
     static const ErrorCode notConnected = WSAENOTCONN;
     static const ErrorCode interrupted = WSAEINTR;
     static const ErrorCode again = EAGAIN;
+    static const ErrorCode hostUnreach = WSAEHOSTUNREACH;
 #else
     static const ErrorCode wouldBlock = EWOULDBLOCK;
     static const ErrorCode inProgress = EINPROGRESS;
@@ -42,6 +43,7 @@ namespace SystemError
     static const ErrorCode notConnected = ENOTCONN;
     static const ErrorCode interrupted = EINTR;
     static const ErrorCode again = EAGAIN;
+    static const ErrorCode hostUnreach = EHOSTUNREACH;
 #endif
 
     //!Returns error code of previous system call

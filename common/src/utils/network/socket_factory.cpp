@@ -17,11 +17,11 @@ AbstractDatagramSocket* SocketFactory::createDatagramSocket()
 
 AbstractStreamSocket* SocketFactory::createStreamSocket( bool sslRequired, SocketFactory::NatTraversalType natTraversalRequired )
 {
-    AbstractStreamSocket* result = new TCPSocket();
+    AbstractStreamSocket* result = nullptr;
     switch( natTraversalRequired )
     {
         case nttAuto:
-            result = new TCPSocket(); //TODO #ak
+            result = new TCPSocket(); //new HybridStreamSocket();  //that's where hole punching kicks in
             break;
         case nttEnabled:
             result = new UdtStreamSocket();
@@ -31,7 +31,6 @@ AbstractStreamSocket* SocketFactory::createStreamSocket( bool sslRequired, Socke
             break;
     }
 
-    assert( result );
     if( !result )
         return nullptr;
 

@@ -6,8 +6,7 @@
 #ifndef HTTP_SERVER_CONNECTION_H
 #define HTTP_SERVER_CONNECTION_H
 
-#include "base_stream_protocol_connection.h"
-
+#include <utils/network/connection_server/base_stream_protocol_connection.h>
 #include <utils/network/http/httptypes.h>
 #include <utils/network/http/http_parser.h>
 #include <utils/network/http/http_serializer.h>

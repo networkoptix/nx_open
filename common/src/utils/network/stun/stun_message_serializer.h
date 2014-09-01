@@ -11,7 +11,7 @@
 #include <utils/network/buffer.h>
 
 #include "stun_message.h"
-#include "../base_protocol_message_types.h"
+#include "../connection_server/base_protocol_message_types.h"
 
 
 namespace nx_stun

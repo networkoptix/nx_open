@@ -6,11 +6,11 @@
 #ifndef STUN_SERVER_CONNECTION_H
 #define STUN_SERVER_CONNECTION_H
 
-#include "base_stream_protocol_connection.h"
-#include "stun/stun_message.h"
-#include "stun/stun_message_parser.h"
-#include "stun/stun_message_parse_handler.h"
-#include "stun/stun_message_serializer.h"
+#include <utils/network/stun/stun_message.h>
+#include <utils/network/stun/stun_message_parser.h>
+#include <utils/network/stun/stun_message_parse_handler.h>
+#include <utils/network/stun/stun_message_serializer.h>
+#include <utils/network/connection_server/base_stream_protocol_connection.h>
 
 
 class StunStreamSocketServer;

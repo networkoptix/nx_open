@@ -6,7 +6,8 @@
 #ifndef HTTP_STREAM_SOCKET_SERVER_H
 #define HTTP_STREAM_SOCKET_SERVER_H
 
-#include "stream_socket_server.h"
+#include <utils/network/connection_server/stream_socket_server.h>
+
 #include "http_server_connection.h"
 
 

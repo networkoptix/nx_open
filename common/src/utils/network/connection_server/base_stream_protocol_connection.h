@@ -78,7 +78,7 @@ namespace nx_api
             {
                 //parsing message
                 size_t bytesProcessed = 0;
-                switch( m_parser.parse( pos > 0 ? buf.mid(pos) : buf, &bytesProcessed ) )
+                switch( m_parser.parse( pos > 0 ? buf.mid((int)pos) : buf, &bytesProcessed ) )
                 {
                     case ParserState::init:
                     case ParserState::inProgress:
