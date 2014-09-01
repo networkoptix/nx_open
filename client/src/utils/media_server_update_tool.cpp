@@ -177,7 +177,7 @@ void QnMediaServerUpdateTool::setUpdateResult(QnMediaServerUpdateTool::UpdateRes
         m_resultString = tr("Could not upload updates to servers.");
         break;
     case ClientInstallationFailed:
-        m_resultString = tr("Could not install an pdate to the client.");
+        m_resultString = tr("Could not install an update to the client.");
         break;
     case InstallationFailed:
     case RestInstallationFailed:

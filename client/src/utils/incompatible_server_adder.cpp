@@ -4,15 +4,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <utils/network/global_module_finder.h>
+#include <common/common_module.h>
 
 namespace {
 
-QnMediaServerResourcePtr makeResource(const QnModuleInformation &moduleInformation) {
-    QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
-
-    server->setId(moduleInformation.id);
-    server->setStatus(Qn::Incompatible, true);
-
+void updateServer(const QnMediaServerResourcePtr &server, const QnModuleInformation &moduleInformation) {
     QList<QHostAddress> addressList;
     foreach (const QString &address, moduleInformation.remoteAddresses)
         addressList.append(QHostAddress(address));
@@ -26,6 +22,16 @@ QnMediaServerResourcePtr makeResource(const QnModuleInformation &moduleInformati
     server->setVersion(moduleInformation.version);
     server->setSystemInfo(moduleInformation.systemInformation);
     server->setSystemName(moduleInformation.systemName);
+    server->setProperty(lit("guid"), moduleInformation.id.toString());
+}
+
+QnMediaServerResourcePtr makeResource(const QnModuleInformation &moduleInformation) {
+    QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
+
+    server->setId(QUuid::createUuid());
+    server->setStatus(Qn::Incompatible, true);
+
+    updateServer(server, moduleInformation);
 
     return server;
 }
@@ -41,6 +47,8 @@ QnIncompatibleServerAdder::QnIncompatibleServerAdder(QObject *parent) :
 {
     connect(QnGlobalModuleFinder::instance(),   &QnGlobalModuleFinder::peerChanged, this,   &QnIncompatibleServerAdder::at_peerChanged);
     connect(QnGlobalModuleFinder::instance(),   &QnGlobalModuleFinder::peerLost,    this,   &QnIncompatibleServerAdder::at_peerLost);
+    connect(qnResPool,                          &QnResourcePool::resourceAdded,     this,   &QnIncompatibleServerAdder::at_reourcePool_resourceChanged);
+    connect(qnResPool,                          &QnResourcePool::resourceChanged,   this,   &QnIncompatibleServerAdder::at_reourcePool_resourceChanged);
 
     // fill resource pool with already found modules
     foreach (const QnModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules())
@@ -48,53 +56,56 @@ QnIncompatibleServerAdder::QnIncompatibleServerAdder(QObject *parent) :
 }
 
 void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &moduleInformation) {
-    QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(moduleInformation.id, true).dynamicCast<QnMediaServerResource>();
-
-    // don't add servers having version < 2.3 because they cannot be connected to the system anyway
-    if (!isSuitable(moduleInformation))
-        return;
-
-    // don't touch normal servers
-    if (server) {
-        if (server->getStatus() == Qn::Offline || server->getStatus() == Qn::Incompatible) {
-            server->setVersion(moduleInformation.version);
-            server->setSystemInfo(moduleInformation.systemInformation);
-            server->setSystemName(moduleInformation.systemName);
-            server->setStatus(moduleInformation.isCompatibleToCurrentSystem() ? Qn::Offline : Qn::Incompatible);
-
-            QList<QHostAddress> addresses;
-            foreach (const QString &address, moduleInformation.remoteAddresses) {
-                QHostAddress hostAddress(address);
-                if (hostAddress.isNull())
-                    continue;
-                addresses.append(hostAddress);
-            }
-            if (!addresses.isEmpty()) {
-                server->setNetAddrList(addresses);
-                QString url = QString(lit("http://%1:%2")).arg(addresses.first().toString()).arg(moduleInformation.port);
-                server->setApiUrl(url);
-                server->setUrl(url);
-            }
-
-            qnResPool->updateIncompatibility(server);
-        }
+    if (moduleInformation.isCompatibleToCurrentSystem()) {
+        removeResource(moduleInformation.id);
         return;
     }
 
-    qnResPool->addResource(makeResource(moduleInformation));
+    if (moduleInformation.systemName == qnCommon->localSystemName()) {
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(moduleInformation.id, true).dynamicCast<QnMediaServerResource>();
+        if (server) {
+            updateServer(server, moduleInformation);
+            server->setStatus(Qn::Incompatible);
+            return;
+        }
+    }
+
+    QUuid id = m_serverUuidByModuleUuid[moduleInformation.id];
+    if (id.isNull()) {
+        // add a resource
+        if (!isSuitable(moduleInformation))
+            return;
+
+        QnMediaServerResourcePtr server = makeResource(moduleInformation);
+        m_serverUuidByModuleUuid[moduleInformation.id] = server->getId();
+        qnResPool->addResource(server);
+    } else {
+        // update the resource
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
+        Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
+        updateServer(server, moduleInformation);
+    }
 }
 
 void QnIncompatibleServerAdder::at_peerLost(const QnModuleInformation &moduleInformation) {
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
+    removeResource(moduleInformation.id);
+}
 
-    // don't touch normal servers
-    if (server && server->getStatus() != Qn::Incompatible)
+void QnIncompatibleServerAdder::at_reourcePool_resourceChanged(const QnResourcePtr &resource) {
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (!server)
         return;
 
-    QnResourcePtr incompatibleResource = qnResPool->getIncompatibleResourceById(moduleInformation.id);
+    Qn::ResourceStatus status = server->getStatus();
+    if (status == Qn::Online)
+        removeResource(server->getId());
+}
 
-    if (incompatibleResource)
-        qnResPool->removeResource(incompatibleResource);
-    else if (server)
-        server->setStatus(Qn::Offline);
+void QnIncompatibleServerAdder::removeResource(const QUuid &id) {
+    if (id.isNull())
+        return;
+
+    QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
+    if (server)
+        qnResPool->removeResource(server);
 }
