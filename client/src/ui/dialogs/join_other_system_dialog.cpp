@@ -51,7 +51,7 @@ void QnJoinOtherSystemDialog::updateUi() {
     QString systemString;
     if (!qnCommon->localSystemName().isEmpty())
         systemString = lit(" (%1)").arg(qnCommon->localSystemName());
-    ui->label->setText(tr("The specifien system will be joined to the current system%1.").arg(systemString));
+    ui->label->setText(tr("The specified system will be joined to the current system%1.").arg(systemString));
 }
 
 void QnJoinOtherSystemDialog::at_urlComboBox_activated(int index) {
