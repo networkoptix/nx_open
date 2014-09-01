@@ -52,6 +52,7 @@
 #include "api/app_server_connection.h"
 #include "api/network_proxy_factory.h"
 #include "client/client_settings.h"
+#include "camera_advanced_settings_web_page.h"
 
 
 namespace {
@@ -299,6 +300,7 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
             advancedSplitter->setSizes(sizes);
 #ifdef QT_WEBKITWIDGETS_LIB
             advancedWebView = new QWebView(ui->advancedTab);
+            advancedWebView->setPage( new CameraAdvancedSettingsWebPage( advancedWebView ) );
 
             QStyle* style = QStyleFactory().create(lit("fusion"));
             advancedWebView->setStyle(style);
