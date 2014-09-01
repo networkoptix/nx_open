@@ -382,10 +382,16 @@ namespace ec2
                     return connectToOldEC(
                         ecURL,
                         [reqID, handler](ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo) {
-                            handler->done(
-                                reqID,
-                                errorCode,
-                                errorCode == ErrorCode::ok ? std::make_shared<OldEcConnection>(oldECConnectionInfo) : AbstractECConnectionPtr() );
+                            if( errorCode == ErrorCode::ok && oldECConnectionInfo.version >= SoftwareVersionType( 2, 3, 0 ) )
+                                handler->done(  //somehow, connected to 2.3 server ith old ec connection. Returning error, since could not connect to ec 2.3 during normal connect
+                                    reqID,
+                                    ErrorCode::ioError,
+                                    AbstractECConnectionPtr() );
+                            else
+                                handler->done(
+                                    reqID,
+                                    errorCode,
+                                    errorCode == ErrorCode::ok ? std::make_shared<OldEcConnection>(oldECConnectionInfo) : AbstractECConnectionPtr() );
                         }
                     );
                 }
