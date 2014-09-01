@@ -399,8 +399,8 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
             queueSyncRequest(transport);
             return false;
         }
-        m_lastTranSeq[transportHeader.sender].persistentSeq = tran.persistentInfo.sequence;
     }
+    m_lastTranSeq[transportHeader.sender].persistentSeq = tran.persistentInfo.sequence;
     return true;
 }
 
