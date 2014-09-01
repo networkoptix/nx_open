@@ -25,21 +25,22 @@
 // time using general log macro. This helpful for us to do debugging and
 // event tracing.
 
-
 #ifdef TRACE_UDT_SOCKET
-#define TRACE_(func,handler) \
-    do { \
-    NX_LOG( \
-    QString(QLatin1String("Udt function[%1]:%2 has error!\nUdt Error Message:%3.\nSystem Error Message:%4\n" \
-    "Udt Error Code:%5\n" \
-    "File:%6 Line:%7")). \
-    arg(static_cast<int>(handler)).arg(QLatin1String(func)). \
-    arg(QLatin1String(UDT::getlasterror().getErrorMessage())). \
-    arg(SystemError::getLastOSErrorText()). \
-    arg(UDT::getlasterror_code()). \
-    arg(QLatin1String(__FILE__)).arg(__LINE__),cl_logERROR); } while(0)
+#define TRACE_(func,handler)                                                                                            \
+    do {                                                                                                                \
+        NX_LOG(                                                                                                         \
+            QString(QLatin1String("Udt function[%1]:%2 has error!\nUdt Error Message:%3.\nSystem Error Message:%4\n"    \
+            "Udt Error Code:%5\n"                                                                                       \
+            "File:%6 Line:%7")).                                                                                        \
+            arg(static_cast<int>(handler)).arg(QLatin1String(func)).                                                    \
+            arg(QLatin1String(UDT::getlasterror().getErrorMessage())).                                                  \
+            arg(SystemError::getLastOSErrorText()).                                                                     \
+            arg(UDT::getlasterror_code()).                                                                              \
+            arg(QLatin1String(__FILE__)).arg(__LINE__),cl_logERROR);                                                    \
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());                                                  \
+    } while(0)
 #else
-#define TRACE_(func,handler) (void*)(NULL)
+#define TRACE_(func,handler) SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
 #endif // 
 
 // Verify macro is useful for us to push up the error detection in DEBUG mode
