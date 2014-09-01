@@ -31,7 +31,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     addPage(SmtpPage, new QnSmtpSettingsWidget(this), tr("Email"));
     addPage(UpdatesPage, m_updatesWidget, tr("Updates"));
     addPage(RoutingManagement, new QnRoutingManagementWidget(this), tr("Routing Management"));
-    addPage(TimeServerSelection, new QnTimeServerSelectionWidget(this), tr("Primary Time Server"));
+    addPage(TimeServerSelection, new QnTimeServerSelectionWidget(this), tr("Time Synchronization"));
 
     loadData();
 }
