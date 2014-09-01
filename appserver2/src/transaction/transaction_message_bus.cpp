@@ -389,7 +389,7 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     if (tran.persistentInfo.isNull())
         return true; // nothing to check
     int persistentSeq = m_lastTranSeq[transportHeader.sender].persistentSeq;
-    if (tran.persistentInfo.sequence > persistentSeq + 1) {
+    if (persistentSeq && tran.persistentInfo.sequence > persistentSeq + 1) {
         // gap in persistent data detect, do resync
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
         qDebug() << "GAP in persistent data detected! Expected seq=" << persistentSeq + 1 <<", but got seq=" << tran.persistentInfo.sequence;
