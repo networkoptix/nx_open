@@ -46,7 +46,7 @@ void QnUpdateStatusItemDelegate::paintProgressBar(QPainter *painter, const QStyl
     progressBarStyleOption.maximum = 100;
     progressBarStyleOption.textAlignment = Qt::AlignCenter;
     progressBarStyleOption.progress = progress ;
-    progressBarStyleOption.text = QString(lit("%1%")).arg(progress);
+    progressBarStyleOption.text = tr("Updating: %1%").arg(progress);
     progressBarStyleOption.textVisible = true;
 
     QApplication::style()->drawControl(QStyle::CE_ProgressBar, &progressBarStyleOption, painter, option.widget);

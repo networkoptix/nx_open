@@ -62,6 +62,19 @@ QVariant QnServerUpdatesModel::data(const QModelIndex &index, int role) const {
 
     Item *item = reinterpret_cast<Item*>(index.internalPointer());
 
+    if (role == Qt::ForegroundRole && index.column() == VersionColumn) {
+        if (item->m_updateInfo.state == QnMediaServerUpdateTool::PeerUpdateInformation::UpdateFound)
+            return QColor(Qt::yellow);
+
+        if (!m_latestVersion.isNull() &&
+            item->m_updateInfo.state == QnMediaServerUpdateTool::PeerUpdateInformation::UpdateNotFound) {
+                if (item->m_server->getVersion() == m_latestVersion)
+                    return QColor(Qt::green);
+                return QColor(Qt::red);
+        }
+        return QVariant();
+    }
+
     return item->data(index.column(), role);
 }
 
@@ -174,6 +187,20 @@ void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
     emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
 }
 
+QnSoftwareVersion QnServerUpdatesModel::latestVersion() const {
+    return m_latestVersion;
+}
+
+void QnServerUpdatesModel::setLatestVersion(const QnSoftwareVersion &version) {
+    if (m_latestVersion == version)
+        return;
+    m_latestVersion = version;
+    if (m_items.isEmpty())
+        return;
+
+    emit dataChanged(index(0, VersionColumn), index(m_items.size() - 1, VersionColumn));
+}
+
 
 QnMediaServerResourcePtr QnServerUpdatesModel::Item::server() const {
     return m_server;
@@ -200,8 +227,7 @@ QVariant QnServerUpdatesModel::Item::data(int column, int role) const {
         if (column == NameColumn)
             return qnResIconCache->icon(m_server);
         break;
-    case Qt::BackgroundRole:
-        break;
+        
     case StateRole:
         return m_updateInfo.state;
     case ProgressRole:

@@ -16,6 +16,7 @@
 #include <ui/dialogs/build_number_dialog.h>
 #include <ui/dialogs/update_url_dialog.h>
 #include <ui/delegates/update_status_item_delegate.h>
+#include <ui/style/warning_style.h>
 
 #include <utils/common/software_version.h>
 #include <utils/media_server_update_tool.h>
@@ -26,7 +27,9 @@
 namespace {
     const int longInstallWarningTimeout = 2 * 60 * 1000; // 2 minutes
     // Time that is given to process to exit. After that, applauncher (if present) will try to terminate it.
-    static const quint32 processTerminateTimeout = 15000;
+    const quint32 processTerminateTimeout = 15000;
+
+    const int tooLateDayOfWeek = Qt::Thursday;
 }
 
 QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
@@ -66,6 +69,11 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     m_previousToolState = m_updateTool->state();
 
     ui->progressWidget->setText(tr("Checking for updates..."));
+
+    setWarningStyle(ui->dayWarningLabel);
+    static_assert(tooLateDayOfWeek <= Qt::Sunday, "In case of future days order change.");
+    ui->dayWarningLabel->setVisible(QDateTime::currentDateTime().date().dayOfWeek() >= tooLateDayOfWeek);
+
     updateUi();
 }
 
@@ -174,6 +182,9 @@ void QnServerUpdatesWidget::updateUi() {
 
     foreach (const QnMediaServerResourcePtr &server, m_updateTool->actualTargets())
         m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(server->getId()));
+    m_updatesModel->setLatestVersion(m_updateTool->targetVersion());
+    if (!m_updateTool->targetVersion().isNull())
+        ui->latestVersionLabel->setText(m_updateTool->targetVersion().toString());
 
     switch (m_updateTool->state()) {
     case QnMediaServerUpdateTool::Idle:
@@ -187,17 +198,7 @@ void QnServerUpdatesWidget::updateUi() {
                         message += lit("\n\n");
                         message += tr("You will have to update the client manually using an installer.");
                     }
-                    switch (QDateTime::currentDateTime().date().dayOfWeek()) {
-                    case Qt::Thursday:
-                    case Qt::Friday:
-                    case Qt::Saturday:
-                    case Qt::Sunday:
-                        message += lit("\n\n");
-                        message += tr("As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week.");
-                        break;
-                    default:
-                        break;
-                    }
+                    
                     startUpdate = QMessageBox::question(this, tr("Update is found"), message, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes;
                 }
                 break;
