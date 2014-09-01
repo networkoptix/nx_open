@@ -166,11 +166,6 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bo
 
     fetchUpdateAudioEncoder(soapWrapper, info, isPrimary);
 
-    if (m_resource->getUrl() == lit("192.168.0.91"))
-    {
-        int gg = 4;
-    }
-
     result = fetchUpdateProfile(soapWrapper, info, isPrimary);
     if( !result ) {
 #ifdef PL_ONVIF_DEBUG
