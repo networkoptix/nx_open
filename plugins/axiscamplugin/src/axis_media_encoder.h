@@ -60,6 +60,7 @@ private:
     int m_currentBitrateKbps;
     bool m_audioEnabled;
     float m_maxAllowedFps;
+    mutable int m_rtspPort;
 
     int fetchCameraResolutionList() const;
 };

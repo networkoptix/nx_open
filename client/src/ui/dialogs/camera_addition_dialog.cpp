@@ -217,6 +217,7 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         ui->actionButtonsStackedWidget->setEnabled(true);
         ui->scanButton->setFocus();
         ui->scanButton->setDefault(true);
+        ui->scanButton->setEnabled(true);
         clearTable();
         break;
     case InitialOffline:
@@ -225,6 +226,7 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         ui->actionButtonsStackedWidget->setCurrentWidget(ui->scanButtonPage);
         ui->actionButtonsStackedWidget->setEnabled(false);
         ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
+        ui->scanButton->setEnabled(false);
         clearTable();
         break;
     case Searching:

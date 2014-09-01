@@ -140,12 +140,20 @@ int QnManualCameraAdditionRestHandler::addCamerasAction(const QnRequestParams &p
 
     QnManualCameraInfoMap infos;
     for(int i = 0, skipped = 0; skipped < 5; i++) {
-        QString url = params.value("url" + QString::number(i));
+        QString urlStr = params.value("url" + QString::number(i));
         QString manufacturer = params.value("manufacturer" + QString::number(i));
 
-        if(url.isEmpty() || manufacturer.isEmpty()) {
+        if(urlStr.isEmpty() || manufacturer.isEmpty()) {
             skipped++;
             continue;
+        }
+
+        QUrl url( urlStr );
+        if( url.host().isEmpty() && !url.path().isEmpty() )
+        {
+            //urlStr is just an ip address or a hostname, QUrl parsed it as path, restoring justice...
+            url.setHost( url.path() );
+            url.setPath( QByteArray() );
         }
 
         QnManualCameraInfo info(url, auth, manufacturer);
@@ -154,7 +162,7 @@ int QnManualCameraAdditionRestHandler::addCamerasAction(const QnRequestParams &p
             return CODE_INVALID_PARAMETER;
         }
 
-        infos.insert(url, info);
+        infos.insert(urlStr, info);
     }
 
     bool registered = QnResourceDiscoveryManager::instance()->registerManualCameras(infos);

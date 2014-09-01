@@ -534,13 +534,20 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, qint64 t
 
 QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCatalog catalog)
 {
-    if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized()) 
+    if( m_resource->hasFlags(Qn::foreigner) )
+        return QnLiveStreamProviderPtr();
+
+    if( m_resource->isInitialized() )
     {
         if( (catalog == QnServer::HiQualityCatalog && m_primaryReader == 0) ||
             (catalog == QnServer::LowQualityCatalog && m_secondaryReader == 0) )
         {
             createReader(catalog);
         }
+    }
+    else
+    {
+        m_resource->initAsync( true );
     }
 	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
 	if ( cameraResource && !cameraResource->hasDualStreaming2() && catalog == QnServer::LowQualityCatalog )
