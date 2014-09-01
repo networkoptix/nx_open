@@ -105,8 +105,9 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QUuid &resourceT
 
     Q_ASSERT( discoveryManager->getRef() );
 
-    const QByteArray& resourceNameLatin1 = params.vendor.toLatin1();
-    strcpy( cameraInfo.modelName, resourceNameLatin1.data() + discoveryManager->getVendorName().size() + 1 );   //skipping vendor name and '-'
+    const QByteArray& resourceNameLatin1 = params.vendor.toLatin1();    //TODO #ak vendor, really?
+    if( resourceNameLatin1.startsWith( discoveryManager->getVendorName().toLatin1() + "-" ) )
+        strcpy( cameraInfo.modelName, resourceNameLatin1.data() + discoveryManager->getVendorName().size() + 1 );   //skipping vendor name and '-'
 
     nxcip::BaseCameraManager* camManager = discoveryManager->createCameraManager( cameraInfo );
     if( !camManager )
