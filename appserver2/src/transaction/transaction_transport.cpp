@@ -581,8 +581,7 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
 
     QnTransactionTransportHeader header(_header);
     assert(header.processedPeers.contains(m_localPeer.id));
-    if(header.sequence == 0) 
-        header.fillSequence();
+    header.fillSequence();
     switch (m_remotePeer.dataFormat) {
     case Qn::JsonFormat:
         addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));

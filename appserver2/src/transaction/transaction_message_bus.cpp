@@ -994,12 +994,4 @@ ec2::ApiPeerData QnTransactionMessageBus::localPeer() const {
     return m_localPeer;
 }
 
-void QnTransactionMessageBus::sendTransaction(const QnTransaction<ec2::ApiVideowallControlMessageData>& tran, const QnPeerSet& dstPeers /*= QnPeerSet()*/)
-{
-    //TODO: #GDM #VW fill dstPeers based on m_alivePeers info
-    Q_ASSERT(tran.command == ApiCommand::videowallControl);
-    QMutexLocker lock(&m_mutex);
-    sendTransactionInternal(tran, QnTransactionTransportHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers));
-}
-
 }

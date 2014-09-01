@@ -60,22 +60,17 @@ namespace ec2
         {
             Q_ASSERT(tran.command != ApiCommand::NotDefined);
             QMutexLocker lock(&m_mutex);
+            if (m_connections.isEmpty())
+                return;
             QnTransactionTransportHeader ttHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers);
             ttHeader.fillSequence();
             sendTransactionInternal(tran, ttHeader);
         }
 
-        /** Template specialization to fill dstPeers from the transaction params. */
-        void sendTransaction(const QnTransaction<ec2::ApiVideowallControlMessageData>& tran, const QnPeerSet& dstPeers = QnPeerSet());
-
         template <class T>
         void sendTransaction(const QnTransaction<T>& tran, const QUuid& dstPeerId)
         {
-            Q_ASSERT(tran.command != ApiCommand::NotDefined);
-            QnPeerSet pSet;
-            if (!dstPeerId.isNull())
-                pSet << dstPeerId;
-            sendTransaction(tran, pSet);
+            dstPeerId.isNull() ? sendTransaction(tran) : sendTransaction(tran, QnPeerSet() << dstPeerId);
         }
 
         struct AlivePeerInfo

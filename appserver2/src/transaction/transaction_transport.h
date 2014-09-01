@@ -64,8 +64,7 @@ public:
     {
         QnTransactionTransportHeader header(_header);
         assert(header.processedPeers.contains(m_localPeer.id));
-        if(header.sequence == 0) 
-            header.fillSequence();
+        header.fillSequence();
 #ifdef _DEBUG
 
         foreach (const QUuid& peer, header.dstPeers) {

@@ -9,8 +9,10 @@ namespace ec2
 
     void QnTransactionTransportHeader::fillSequence()
     {
-        sequence = qn_transportHeader_sequence.fetchAndAddAcquire(1);
-        sender = qnCommon->moduleGUID();
+        if (sequence == 0) {
+            sequence = qn_transportHeader_sequence.fetchAndAddAcquire(1);
+            sender = qnCommon->moduleGUID();
+        }
     }
 
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTransactionTransportHeader, (binary)(json)(ubjson), QnTransactionTransportHeader_Fields);
