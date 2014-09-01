@@ -333,8 +333,8 @@ QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMSec) {
     if (offsetMSec == 0)
         return lit("0.00");
     QString sign = offsetMSec < 0 
-        ? L'-'
-        : L'+';
+        ? lit("-")
+        : lit("+");
 
     QTimeSpan span(offsetMSec);
     span.normalize();
