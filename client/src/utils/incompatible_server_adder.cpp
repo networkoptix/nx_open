@@ -60,9 +60,7 @@ void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &module
             server->setVersion(moduleInformation.version);
             server->setSystemInfo(moduleInformation.systemInformation);
             server->setSystemName(moduleInformation.systemName);
-            if (!moduleInformation.isCompatibleToCurrentSystem())
-                server->setStatus(Qn::Incompatible); // todo: #denis. You should update logic here
-            //server->setStatus(moduleInformation.isCompatibleToCurrentSystem() ? Qn::Online : Qn::Incompatible);
+            server->setStatus(moduleInformation.isCompatibleToCurrentSystem() ? Qn::Offline : Qn::Incompatible);
 
             QList<QHostAddress> addresses;
             foreach (const QString &address, moduleInformation.remoteAddresses) {
