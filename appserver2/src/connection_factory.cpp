@@ -382,7 +382,10 @@ namespace ec2
                     return connectToOldEC(
                         ecURL,
                         [reqID, handler](ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo) {
-                            handler->done(reqID, errorCode, std::make_shared<OldEcConnection>(oldECConnectionInfo));
+                            handler->done(
+                                reqID,
+                                errorCode,
+                                errorCode == ErrorCode::ok ? std::make_shared<OldEcConnection>(oldECConnectionInfo) : AbstractECConnectionPtr() );
                         }
                     );
                 }

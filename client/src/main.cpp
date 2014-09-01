@@ -477,6 +477,15 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 	ec2ConnectionFactory->setContext( resCtx );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
+    QObject::connect( qnResPool, &QnResourcePool::resourceAdded, application, []( const QnResourcePtr& resource ){
+        if( resource->hasFlags(Qn::foreigner) )
+            return;
+        QnMediaServerResource* mediaServerRes = dynamic_cast<QnMediaServerResource*>(resource.data());
+        ec2::AbstractECConnectionPtr ecConnection = QnAppServerConnectionFactory::getConnection2();
+        if( mediaServerRes && ecConnection && (mediaServerRes->getSystemName() == ecConnection->connectionInfo().systemName) )
+            mediaServerRes->determineOptimalNetIF();
+    } );
+
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 

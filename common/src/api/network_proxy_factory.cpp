@@ -162,11 +162,12 @@ QNetworkProxy QnNetworkProxyFactory::getProxyToResource( const QnResourcePtr& re
         const QString& proxyHost = mediaServerResource->getPrimaryIF();
         if( proxyHost == QnMediaServerResource::USE_PROXY )
         {
+            const QUrl proxyUrl = QnAppServerConnectionFactory::url();
             //proxying via Server
-            proxy.setHostName( QnAppServerConnectionFactory::url().host() );
-            proxy.setPort( QnAppServerConnectionFactory::url().port() );
-            proxy.setUser( QnAppServerConnectionFactory::url().userName() );
-            proxy.setPassword( QnAppServerConnectionFactory::url().password() );
+            proxy.setHostName( proxyUrl.host() );
+            proxy.setPort( proxyUrl.port() );
+            proxy.setUser( proxyUrl.userName() );
+            proxy.setPassword( proxyUrl.password() );
             return proxy;
         }
         else
