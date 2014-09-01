@@ -71,6 +71,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
     case Qn::SystemNode:
         m_displayName = m_name = name;
         m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
+        m_bastard = true; /* Invisible by default until has children. */
         break;
     default:
         break;
