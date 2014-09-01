@@ -48,8 +48,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->tableView->setModel(sortedUpdatesModel);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::ResourceNameColumn, QHeaderView::Stretch);
-    // TODO: #dklychkov fix progress bar painting and uncomment the line below
-//    ui->tableView->setItemDelegateForColumn(QnServerUpdatesModel::UpdateColumn, new QnUpdateStatusItemDelegate(ui->tableView));
+    ui->tableView->setItemDelegateForColumn(QnServerUpdatesModel::UpdateColumn, new QnUpdateStatusItemDelegate(ui->tableView));
 
     connect(ui->updateFromLocalSourceButton,        &QPushButton::clicked,      this,           &QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked);
     connect(ui->checkForUpdatesButton,              &QPushButton::clicked,      this,           &QnServerUpdatesWidget::at_checkForUpdatesButton_clicked);

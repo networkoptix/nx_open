@@ -13,6 +13,7 @@ public:
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
 };
 
 #endif // UPDATE_STATUS_ITEM_DELEGATE_H

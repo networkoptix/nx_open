@@ -30,8 +30,12 @@ void QnUpdateStatusItemDelegate::paint(QPainter *painter, const QStyleOptionView
         progressBarStyleOption.text = QString(lit("%1%")).arg(progress);
         progressBarStyleOption.textVisible = true;
 
-        QApplication::style()->drawControl(QStyle::CE_ProgressBar, &progressBarStyleOption, painter);
+        QApplication::style()->drawControl(QStyle::CE_ProgressBar, &progressBarStyleOption, painter, option.widget);
     } else {
         base_type::paint(painter, option, index);
     }
+}
+
+void QnUpdateStatusItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const {
+    base_type::initStyleOption(option, index);
 }
