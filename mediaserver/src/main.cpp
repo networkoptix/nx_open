@@ -1147,10 +1147,20 @@ void QnMain::run()
     QFile f(sslCertPath);
     if (!f.open(QIODevice::ReadOnly)) {
         qWarning() << "Could not find SSL certificate at "<<f.fileName()<<". Generating a new one";
-        generateSslCertificate(sslCertPath);
+
+        QDir parentDir = QFileInfo(f).absoluteDir();
+        if (!parentDir.exists()) {
+            if (!QDir().mkpath(parentDir.absolutePath())) {
+                qWarning() << "Could not create directory " << parentDir.absolutePath();
+            }
+        }
+
+        if (generateSslCertificate(sslCertPath.toLatin1(), QN_APPLICATION_NAME, "US", QN_ORGANIZATION_NAME)) {
+            qWarning() << "Could not generate SSL certificate ";
+        }
 
         if( !f.open( QIODevice::ReadOnly ) )
-            qWarning() << "Could not load built-in SSL certificate "<<f.fileName();
+            qWarning() << "Could not load SSL certificate "<<f.fileName();
     }
     if( f.isOpen() )
     {

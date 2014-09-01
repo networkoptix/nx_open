@@ -2,17 +2,20 @@
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 
-int generateSslCertificate(const char *outpath)
+int generateSslCertificate(const char *outpath, const char *commonName, const char *country, const char *companyName)
 {
     int returnValue = -1;
 
-    EVP_PKEY * pkey;
+    EVP_PKEY * pkey = NULL;
+    RSA * rsa = NULL;
+    X509 * x509 = NULL;
+    FILE * f = NULL;
+
     pkey = EVP_PKEY_new();
     if (!pkey) {
         goto finish;
     }
 
-    RSA * rsa;
     rsa = RSA_generate_key(
                            2048,   /* number of bits for the key - 2048 is a sensible value */
                            RSA_F4, /* exponent - RSA_F4 is defined as 0x10001L */
@@ -26,13 +29,12 @@ int generateSslCertificate(const char *outpath)
 
     EVP_PKEY_assign_RSA(pkey, rsa);
 
-    X509 * x509;
     x509 = X509_new();
 
     ASN1_INTEGER_set(X509_get_serialNumber(x509), 1);
 
     X509_gmtime_adj(X509_get_notBefore(x509), 0);
-    X509_gmtime_adj(X509_get_notAfter(x509), 31536000L);
+    X509_gmtime_adj(X509_get_notAfter(x509), 157680000L); // 5 years
 
     X509_set_pubkey(x509, pkey);
 
@@ -40,16 +42,15 @@ int generateSslCertificate(const char *outpath)
     name = X509_get_subject_name(x509);
 
     X509_NAME_add_entry_by_txt(name, "C",  MBSTRING_ASC,
-                               (unsigned char *)"US", -1, -1, 0);
+                               (unsigned char *)country, -1, -1, 0);
     X509_NAME_add_entry_by_txt(name, "O",  MBSTRING_ASC,
-                               (unsigned char *)"Network Optix Inc.", -1, -1, 0);
+                               (unsigned char *)companyName, -1, -1, 0);
     X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC,
-                               (unsigned char *)"Network Optix Server", -1, -1, 0);
+                               (unsigned char *)commonName, -1, -1, 0);
 
     X509_set_issuer_name(x509, name);
     X509_sign(x509, pkey, EVP_sha1());
 
-    FILE * f = NULL;
     f = fopen(outpath, "wb");
     if (!f) {
         goto finish;
