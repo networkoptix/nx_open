@@ -185,13 +185,12 @@ namespace ec2
         bool sendInitialData(QnTransactionTransport* transport);
         void printTranState(const QnTranState& tranState);
         template <class T> void proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader);
-        void updatePersistentSeq(const QnTransaction<ApiFillerData> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader);
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
         void at_gotTransaction(const QByteArray &serializedTran, const QnTransactionTransportHeader &transportHeader);
         void doPeriodicTasks();
-        bool checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport, const void* params);
+        bool checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport);
     private:
         /** Info about us. Should be set before start(). */
         ApiPeerData m_localPeer;

@@ -370,7 +370,7 @@ void QnTransactionMessageBus::sendTransactionToTransport(const QnTransaction<T> 
     transport->sendTransaction(tran, transportHeader);
 }
 
-bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport, const void* params)
+bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport)
 {
     if (transportHeader.sender.isNull())
         return true; // old version, nothing to check
@@ -390,13 +390,10 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
         return true; // nothing to check
 
     QnTranStateKey persistentKey(tran.peerID, tran.persistentInfo.dbID);
-    if (tran.command == ApiCommand::updatePersistentSequence) {
-        const ApiFillerData* fillerData = static_cast<const ApiFillerData*> (params);
-        m_lastPersistentSeq[persistentKey] = qMax(m_lastPersistentSeq[persistentKey], fillerData->seqTo);
-    }
-
-    
     int persistentSeq = m_lastPersistentSeq[persistentKey];
+    if (tran.command == ApiCommand::updatePersistentSequence) 
+        persistentSeq = qMax(persistentSeq, tran.persistentInfo.sequence);
+
     if (persistentSeq && tran.persistentInfo.sequence > persistentSeq + 1) {
         // gap in persistent data detect, do resync
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
@@ -412,12 +409,6 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     return true;
 }
 
-void QnTransactionMessageBus::updatePersistentSeq(const QnTransaction<ApiFillerData> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) 
-{
-    QnTranStateKey persistentKey(tran.peerID, tran.persistentInfo.dbID);
-    m_lastPersistentSeq[persistentKey] = qMax(m_lastPersistentSeq[persistentKey], tran.params.seqTo);
-}
-
 template <class T>
 void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) 
 {
@@ -427,7 +418,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     if (itr != m_alivePeers.end())
         itr.value().lastActivity.restart();
 
-    if (!checkSequence(transportHeader, tran, sender, &tran.params))
+    if (!checkSequence(transportHeader, tran, sender))
         return;
 
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) {
@@ -479,7 +470,6 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
                         // proxy filler transaction to avoid gaps in the persistent sequence
                         QnTransaction<ApiFillerData> fillerTran(ApiCommand::updatePersistentSequence);
                         fillerTran.persistentInfo = tran.persistentInfo;
-                        fillerTran.params.seqTo = tran.persistentInfo.sequence;
                         transactionLog->saveTransaction(tran);
                         proxyTransaction(fillerTran, transportHeader);
                     }

@@ -23,10 +23,10 @@ struct ApiDatabaseDumpData: public ApiData {
 
 struct ApiFillerData: public ApiData 
 {
-    ApiFillerData(): seqTo(0) {}
-    int seqTo;
+    ApiFillerData(): filler(0) {}
+    int filler;
 };
-#define ApiFillerData_Fields (seqTo)
+#define ApiFillerData_Fields (filler)
 
 
 } // namespace ec2
