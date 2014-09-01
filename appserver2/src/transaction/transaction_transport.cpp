@@ -12,6 +12,9 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "api/app_server_connection.h"
+#include "core/resource/user_resource.h"
+#include "api/global_settings.h"
+#include "database/db_manager.h"
 
 
 namespace ec2
@@ -36,8 +39,7 @@ QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, con
     m_chunkLen(0), 
     m_sendOffset(0), 
     m_connected(false),
-    m_prevGivenHandlerID(0),
-    m_authByKey(true)
+    m_prevGivenHandlerID(0)
 {
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
 }
@@ -177,7 +179,16 @@ void QnTransactionTransport::fillAuthInfo()
     else {
         QUrl url = QnAppServerConnectionFactory::url();
         m_httpClient->setUserName(url.userName());
-        m_httpClient->setUserPassword(url.password());
+		if (dbManager) {
+	        QnUserResourcePtr adminUser = QnGlobalSettings::instance()->getAdminUser();
+	        if (adminUser) {
+	            m_httpClient->setUserPassword(adminUser->getDigest());
+	            m_httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+	        }
+        }
+        else {
+            m_httpClient->setUserPassword(url.password());
+        }
     }
 }
 
@@ -340,11 +351,14 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 
         QByteArray serializedTran;
         QnTransactionTransportHeader transportHeader;
-        QnUbjsonTransactionSerializer::deserializeTran(
-            reinterpret_cast<const quint8*>(m_readBuffer.constData()) + readBufPos + m_chunkHeaderLen + 4,
-            m_chunkLen - 4,
-            transportHeader,
-            serializedTran );
+        if( !QnUbjsonTransactionSerializer::deserializeTran(
+                reinterpret_cast<const quint8*>(m_readBuffer.constData()) + readBufPos + m_chunkHeaderLen + 4,
+                m_chunkLen - 4,
+                transportHeader,
+                serializedTran ) )
+        {
+            assert( false );
+        }
         assert( !transportHeader.processedPeers.empty() );
         NX_LOG(lit("QnTransactionTransport::onSomeBytesRead. Got transaction with seq %1 from %2").arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
         emit gotTransaction(serializedTran, transportHeader);
@@ -399,13 +413,20 @@ void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_
 void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientPtr& client)
 {
     int statusCode = client->response()->statusLine.statusCode;
-    if (statusCode == nx_http::StatusCode::unauthorized && m_authByKey)
+    if (statusCode == nx_http::StatusCode::unauthorized)
     {
-        m_authByKey = false;
-        fillAuthInfo();
-        QTimer::singleShot(0, this, SLOT(repeatDoGet()));
+        if (m_authByKey) {
+            m_authByKey = false;
+            fillAuthInfo();
+            QTimer::singleShot(0, this, SLOT(repeatDoGet()));
+        }
+        else {
+            emit remotePeerUnauthorized(remotePeer().id);
+            cancelConnecting();
+        }
         return;
     }
+
 
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
 
@@ -452,8 +473,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 void QnTransactionTransport::at_httpClientDone( const nx_http::AsyncHttpClientPtr& client )
 {
     nx_http::AsyncHttpClient::State state = client->state();
-    if( state == nx_http::AsyncHttpClient::sFailed )
+    if( state == nx_http::AsyncHttpClient::sFailed ) {
         cancelConnecting();
+    }
 }
 
 void QnTransactionTransport::processTransactionData(const QByteArray& data)
@@ -562,8 +584,7 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
 
     QnTransactionTransportHeader header(_header);
     assert(header.processedPeers.contains(m_localPeer.id));
-    if(header.sequence == 0) 
-        header.fillSequence();
+    header.fillSequence();
     switch (m_remotePeer.dataFormat) {
     case Qn::JsonFormat:
         addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));

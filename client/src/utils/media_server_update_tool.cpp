@@ -339,6 +339,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QnSoftwareVersion &version) 
     m_checkForUpdatesPeerTask->setPeers(peers);
     m_checkForUpdatesPeerTask->setTargetVersion(version);
     m_checkForUpdatesPeerTask->setDisableClientUpdates(m_disableClientUpdates || qnSettings->isClientUpdateDisabled());
+    m_checkForUpdatesPeerTask->setDenyMajorUpdates(m_denyMajorUpdates);
     m_tasksThread->start();
     QMetaObject::invokeMethod(m_checkForUpdatesPeerTask, "start", Qt::QueuedConnection);
 }
@@ -356,6 +357,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QString &fileName) {
     m_checkForUpdatesPeerTask->setPeers(peers);
     m_checkForUpdatesPeerTask->setUpdateFileName(fileName);
     m_checkForUpdatesPeerTask->setDisableClientUpdates(m_disableClientUpdates || qnSettings->isClientUpdateDisabled());
+    m_checkForUpdatesPeerTask->setDenyMajorUpdates(m_denyMajorUpdates);
     m_tasksThread->start();
     QMetaObject::invokeMethod(m_checkForUpdatesPeerTask, "start", Qt::QueuedConnection);
 }
@@ -692,7 +694,27 @@ void QnMediaServerUpdateTool::at_restUpdateTask_finished(int errorCode) {
 }
 
 void QnMediaServerUpdateTool::at_networkTask_peerProgressChanged(const QUuid &peerId, int progress) {
-    m_updateInformationById[peerId].progress = progress;
+
+    const int StagesCount = 3;
+
+    int progressBase = 0;
+    switch (m_updateInformationById[peerId].state) {
+    case PeerUpdateInformation::PendingUpload:
+    case PeerUpdateInformation::UpdateUploading:
+        progressBase = 100 / StagesCount;
+        break;
+    case PeerUpdateInformation::PendingInstallation:
+    case PeerUpdateInformation::UpdateInstalling:
+        progressBase = 2 * 100 / StagesCount;
+        break;
+    default:
+        break;
+//             UpdateFinished,
+//             UpdateFailed,
+//             UpdateCanceled
+    }
+
+    m_updateInformationById[peerId].progress = progressBase + (progress / StagesCount);
     emit peerChanged(peerId);
 }
 

@@ -19,6 +19,17 @@ QnSoftwareVersion::QnSoftwareVersion(const QByteArray &versionString) {
     deserialize(QLatin1String(versionString), this);
 }
 
+QnSoftwareVersion::QnSoftwareVersion() {
+    std::fill(m_data.begin(), m_data.end(), 0);
+}
+
+QnSoftwareVersion::QnSoftwareVersion(int major, int minor, int bugfix /*= 0*/, int build /*= 0*/) {
+    m_data[0] = major;
+    m_data[1] = minor;
+    m_data[2] = bugfix;
+    m_data[3] = build;
+}
+
 QString QnSoftwareVersion::toString(QnSoftwareVersion::Format format) const {
     QString result = QString::number(m_data[0]);
     for(int i = 1; i < format; i++)

@@ -56,6 +56,7 @@ public:
 signals:
     void gotTransaction(const QByteArray &data, const QnTransactionTransportHeader &transportHeader);
     void stateChanged(State state);
+    void remotePeerUnauthorized(const QUuid& id);
 public:
 
     template<class T> 
@@ -63,8 +64,7 @@ public:
     {
         QnTransactionTransportHeader header(_header);
         assert(header.processedPeers.contains(m_localPeer.id));
-        if(header.sequence == 0) 
-            header.fillSequence();
+        header.fillSequence();
 #ifdef _DEBUG
 
         foreach (const QUuid& peer, header.dstPeers) {

@@ -219,12 +219,14 @@ namespace ec2
        //AbstractECConnection
         registerUpdateFuncHandler<ApiDatabaseDumpData>( restProcessorPool, ApiCommand::resotreDatabase );
 
-        //AbstractECConnection
+        //AbstractTimeManager::getCurrentTimeImpl
         registerGetFuncHandler<std::nullptr_t, ApiTimeData>( restProcessorPool, ApiCommand::getCurrentTime );
+        //AbstractTimeManager::forcePrimaryTimeServer
         registerUpdateFuncHandler<ApiIdData>(
             restProcessorPool,
             ApiCommand::forcePrimaryTimeServer,
             std::bind( &TimeSynchronizationManager::primaryTimeServerChanged, m_timeSynchronizationManager.get(), _1 ) );
+        //TODO #ak register AbstractTimeManager::getPeerTimeInfoList
 
 
         registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>( restProcessorPool, ApiCommand::getFullInfo );
@@ -325,10 +327,13 @@ namespace ec2
     template<class Handler>
     void Ec2DirectConnectionFactory::connectToOldEC( const QUrl& ecURL, Handler completionFunc )
     {
+        QUrl httpsEcUrl = ecURL;    //old EC supports only https
+        httpsEcUrl.setScheme( lit("https") );
+
         QAuthenticator auth;
-        auth.setUser(ecURL.userName());
-        auth.setPassword(ecURL.password());
-        CLSimpleHTTPClient simpleHttpClient(ecURL, 3000, auth);
+        auth.setUser(httpsEcUrl.userName());
+        auth.setPassword(httpsEcUrl.password());
+        CLSimpleHTTPClient simpleHttpClient(httpsEcUrl, 3000, auth);
         const CLHttpStatus statusCode = simpleHttpClient.doGET(QByteArray::fromRawData(oldEcConnectPath, sizeof(oldEcConnectPath)));
         switch( statusCode )
         {
@@ -338,7 +343,7 @@ namespace ec2
                 QByteArray oldECResponse;
                 simpleHttpClient.readAll(oldECResponse);
                 QnConnectionInfo oldECConnectionInfo;
-                oldECConnectionInfo.ecUrl = ecURL;
+                oldECConnectionInfo.ecUrl = httpsEcUrl;
                 if( parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo) )
                     completionFunc(ErrorCode::ok, oldECConnectionInfo);
                 else
@@ -377,7 +382,16 @@ namespace ec2
                     return connectToOldEC(
                         ecURL,
                         [reqID, handler](ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo) {
-                            handler->done(reqID, errorCode, std::make_shared<OldEcConnection>(oldECConnectionInfo));
+                            if( errorCode == ErrorCode::ok && oldECConnectionInfo.version >= SoftwareVersionType( 2, 3, 0 ) )
+                                handler->done(  //somehow, connected to 2.3 server ith old ec connection. Returning error, since could not connect to ec 2.3 during normal connect
+                                    reqID,
+                                    ErrorCode::ioError,
+                                    AbstractECConnectionPtr() );
+                            else
+                                handler->done(
+                                    reqID,
+                                    errorCode,
+                                    errorCode == ErrorCode::ok ? std::make_shared<OldEcConnection>(oldECConnectionInfo) : AbstractECConnectionPtr() );
                         }
                     );
                 }

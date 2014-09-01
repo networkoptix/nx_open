@@ -27,7 +27,15 @@ class QnResourcePoolModel : public Connective<QAbstractItemModel>, public QnWork
 
     typedef Connective<QAbstractItemModel> base_type;
 public:
-    explicit QnResourcePoolModel(Qn::NodeType rootNodeType = Qn::RootNode, QObject *parent = NULL);
+    /** Narrowed scope for the minor widgets and dialogs. */
+    enum Scope {
+        FullScope,
+        CamerasScope,
+        UsersScope
+        //TODO: #GDM non-admin-scope?
+    };
+
+    explicit QnResourcePoolModel(Scope scope = FullScope, QObject *parent = NULL);
     virtual ~QnResourcePoolModel();
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
@@ -51,8 +59,6 @@ public:
 
     bool isUrlsShown();
     void setUrlsShown(bool urlsShown);
-
-    Qn::NodeType rootNodeType() const;
 private:
     QnResourcePoolModelNode *node(const QnResourcePtr &resource);
     QnResourcePoolModelNode *node(const QUuid &uuid);
@@ -131,8 +137,8 @@ private:
     /** Whether item urls should be shown. */
     bool m_urlsShown;
 
-    /** Type of root node - for the models with narrowed scopes */
-    Qn::NodeType m_rootNodeType;
+    /** Narrowed scope for displaying the limited set of nodes. */
+    Scope m_scope;
 };
 
 #endif // QN_RESOURCE_POOL_MODEL_H

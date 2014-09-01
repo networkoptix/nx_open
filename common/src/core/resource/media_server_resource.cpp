@@ -6,8 +6,10 @@
 #include "utils/common/delete_later.h"
 #include "api/session_manager.h"
 #include <api/app_server_connection.h>
+#include <api/network_proxy_factory.h>
 #include "utils/common/sleep.h"
-
+#include "utils/network/networkoptixmodulerevealcommon.h"
+#include "version.h"
 
 const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
 
@@ -243,8 +245,10 @@ void QnMediaServerResource::setServerFlags(Qn::ServerFlags flags)
 void QnMediaServerResource::determineOptimalNetIF()
 {
     QMutexLocker lock(&m_mutex);
-    //if (m_prevNetAddrList == m_netAddrList)
-    //    return;
+    
+    //using proxy before we able to establish direct connection
+    setPrimaryIF( QnMediaServerResource::USE_PROXY );
+
     m_prevNetAddrList = m_netAddrList;
     m_primaryIFSelected = false;
 
@@ -252,33 +256,14 @@ void QnMediaServerResource::determineOptimalNetIF()
     {
         QUrl url(m_apiUrl);
         url.setHost(m_netAddrList[i].toString());
-        //TestConnectionTask *task = new TestConnectionTask(::toSharedPointer(this), url);
-        //QThreadPool::globalInstance()->start(task);
         int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(url, QLatin1String("ping"), this, "at_pingResponse", Qt::DirectConnection);
         m_runningIfRequests.insert(requestNum, url.toString());
     }
-
-    // send request via proxy (ping request always send directly, other request are sent via proxy here)
-    QTimer *timer = new QTimer();
-    timer->setSingleShot(true);
-    connect(timer, SIGNAL(timeout()), this, SLOT(determineOptimalNetIF_testProxy()), Qt::DirectConnection);
-    connect(timer, SIGNAL(timeout()), timer, SLOT(deleteLater()));
-    timer->start(5); // send request slighty later to preffer direct connect // TODO: #Elric still bad, implement properly
-    timer->moveToThread(qApp->thread());
-
-    m_runningIfRequests.insert(-1, QString());
 
     if(!m_guard) {
         m_guard = new QnMediaServerResourceGuard(::toSharedPointer(this));
         m_guard->moveToThread(qApp->thread());
     }
-}
-
-void QnMediaServerResource::determineOptimalNetIF_testProxy() {
-    QMutexLocker lock(&m_mutex);
-    m_runningIfRequests.remove(-1);
-    int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(QUrl(m_apiUrl), QLatin1String("gettime"), this, "at_pingResponse", Qt::DirectConnection);
-    m_runningIfRequests.insert(requestNum, QnMediaServerResource::USE_PROXY);
 }
 
 void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
@@ -398,6 +383,23 @@ void QnMediaServerResource::setSystemName(const QString &systemName) {
     QMutexLocker lock(&m_mutex);
 
     m_systemName = systemName;
+}
+
+QnModuleInformation QnMediaServerResource::getModuleInformation() const {
+    QMutexLocker lock(&m_mutex);
+
+    QnModuleInformation moduleInformation;
+    moduleInformation.type = nxMediaServerId;
+    moduleInformation.customization = lit(QN_CUSTOMIZATION_NAME);
+    moduleInformation.version = m_version;
+    moduleInformation.systemInformation = m_systemInfo;
+    moduleInformation.systemName = m_systemName;
+    moduleInformation.port = QUrl(m_apiUrl).port();
+    foreach (const QHostAddress &address, m_netAddrList)
+        moduleInformation.remoteAddresses.insert(address.toString());
+    moduleInformation.id = getId();
+    moduleInformation.sslAllowed = false;
+    return moduleInformation;
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {

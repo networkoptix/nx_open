@@ -18,6 +18,7 @@
         <install.type>full</install.type>
         <client_name>client.exe</client_name>
         <product_name>${product.name}.exe</product_name>
+		<final.artifact.name>${namespace.additional}-full</final.artifact.name>				
     </properties>
 
     <build>

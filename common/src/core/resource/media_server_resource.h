@@ -79,6 +79,8 @@ public:
     QString getSystemName() const;
     void setSystemName(const QString &systemName);
 
+    QnModuleInformation getModuleInformation() const;
+
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
 
@@ -87,7 +89,6 @@ public:
     qint64 currentStatusTime() const;
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
-    void determineOptimalNetIF_testProxy();
 
 signals:
     void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );

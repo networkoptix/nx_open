@@ -442,16 +442,16 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
 
         painter->setBrush(gradient);
         if (w * progress > 12) {
-            painter->drawRoundedRect(x, y, w * progress, y + h, 6, 6);
+            painter->drawRoundedRect(x, y, w * progress, h, 6, 6);
         } else {
-            painter->setClipRegion(QRegion(x, y, 12, y + h, QRegion::Ellipse));
-            painter->drawRoundedRect(x - 12, y, 12 + w * progress, y + h, 6, 6);
+            painter->setClipRegion(QRegion(x, y, 12, h, QRegion::Ellipse));
+            painter->drawRoundedRect(x - 12, y, 12 + w * progress, h, 6, 6);
             painter->setClipping(false);
         }
     }
 
     /* Draw groove. */
-    QLinearGradient gradient(x, 0, x, y + h);
+    QLinearGradient gradient(x, y, x, y + h);
     gradient.setColorAt(0,      toTransparent(pb->palette.color(QPalette::Button).lighter(), 0.5));
     gradient.setColorAt(0.2,    toTransparent(pb->palette.color(QPalette::Button), 0.5));
     gradient.setColorAt(0.4,    toTransparent(pb->palette.color(QPalette::Button), 0.5));

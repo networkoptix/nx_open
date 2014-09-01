@@ -28,9 +28,9 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
         assert(!m_connected);
         assert(qnCommon->remoteGUID().isNull());
         qnCommon->setRemoteGUID(QUuid(connection->connectionInfo().ecsGuid));
-        connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
-        connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
-        connect( connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
+        connect( connection, &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
+        connect( connection, &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
+        connect( connection->getMiscManager(), &ec2::AbstractMiscManager::systemNameChangeRequested,
                  this, &QnClientMessageProcessor::at_systemNameChangeRequested );
     } else if (m_connected) { // double init by null is allowed
         assert(!qnCommon->remoteGUID().isNull());
@@ -98,7 +98,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
         ownResource->update(resource);
 
         if (QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>()) {
-            /* Handling a case when an incompatibe server is changing its systemName at runtime and becoming compatible. */
+            /* Handling a case when an incompatible server is changing its systemName at runtime and becoming compatible. */
             if (resource->getStatus() == Qn::NotDefined && mediaServer->getStatus() == Qn::Incompatible) {
                 if (QnMediaServerResourcePtr updatedServer = resource.dynamicCast<QnMediaServerResource>()) {
                     if (isCompatible(qnCommon->engineVersion(), updatedServer->getVersion()) && qnCommon->localSystemName() == updatedServer->getSystemName())
@@ -153,6 +153,7 @@ void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
 
 void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr &resource)
 {
+    return;
     // set proxy. If some servers IF will be found, proxy address will be cleared
     const QString& proxyAddr = QnAppServerConnectionFactory::url().host();
     resource->apiConnection()->setProxyAddr(

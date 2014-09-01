@@ -135,12 +135,12 @@
 #include <utils/network/module_finder.h>
 #include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
-#include <media_server/server_update_tool.h>
-
 
 #include <media_server/server_message_processor.h>
 #include <media_server/settings.h>
 #include <media_server/serverutil.h>
+#include <media_server/server_update_tool.h>
+#include <media_server/server_connector.h>
 #include "version.h"
 
 #ifdef _WIN32
@@ -185,7 +185,6 @@ namespace {
     const QString SERVER_GUID2 = lit("serverGuid2");
     const QString OBSOLETE_SERVER_GUID = lit("obsoleteServerGuid");
     const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode");
-    const QString ADMIN_PASSWORD = lit("adminPassword");
 };
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
@@ -1019,24 +1018,6 @@ void QnMain::at_cameraIPConflict(const QHostAddress& host, const QStringList& ma
         qnSyncTime->currentUSecsSinceEpoch());
 }
 
-void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-
-    if (isCompatible(moduleInformation.version, qnCommon->engineVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
-        QString url = QString( lit( "%1://%2:%3" ) ).arg( moduleInformation.sslAllowed ? lit( "https" ) : lit( "http" ) ).arg( remoteAddress ).arg( moduleInformation.port );
-        ec2Connection->addRemotePeer(url, moduleInformation.id);
-    } else {
-        at_peerLost(moduleInformation);
-    }
-}
-void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-
-    foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
-        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
-        ec2Connection->deleteRemotePeer(url);
-    }
-}
 
 bool QnMain::initTcpListener()
 {
@@ -1241,7 +1222,7 @@ void QnMain::run()
 
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
-    qnCommon->setDefaultAdminPassword(settings->value(ADMIN_PASSWORD, QLatin1String("")).toString());
+    qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("")).toString());
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnMain::at_runtimeInfoChanged);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
 
@@ -1310,7 +1291,7 @@ void QnMain::run()
         localInfo.data.publicIP = m_publicAddress.toString();
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
-    connect( ec2Connection.get(), &ec2::AbstractECConnection::timeChanged,
+    connect( ec2Connection->getTimeManager().get(), &ec2::AbstractTimeManager::timeChanged,
              QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
@@ -1390,7 +1371,6 @@ void QnMain::run()
             server->setPanicMode(pm);
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
         }
-        server->setVersion(qnCommon->engineVersion());
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
@@ -1451,6 +1431,10 @@ void QnMain::run()
             server->setSystemName(qnCommon->localSystemName());
             isModified = true;
         }
+        if (server->getVersion() != qnCommon->engineVersion()) {
+            server->setVersion(qnCommon->engineVersion());
+            isModified = true;
+        }
         if (needUpdateAuthKey) {
             server->setAuthKey(QUuid::createUuid().toString());
             isModified = true;
@@ -1466,7 +1450,7 @@ void QnMain::run()
     }
 
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
-    MSSettings::roSettings()->remove(ADMIN_PASSWORD);
+    MSSettings::roSettings()->remove("appserverPassword");
 
     if (needToStop()) {
         stopObjects();
@@ -1546,8 +1530,7 @@ void QnMain::run()
             m_moduleFinder->setAllowedPeers(allowedPeers);
     }
 
-    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleFound,     this,   &QnMain::at_peerFound,  Qt::DirectConnection);
-    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleLost,      this,   &QnMain::at_peerLost,   Qt::DirectConnection);
+    QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(m_moduleFinder));
 
     QUrl url = ec2Connection->connectionInfo().ecUrl;
 #if 1
@@ -2071,3 +2054,4 @@ static void printVersion()
 {
     std::cout << "  " << QN_APPLICATION_NAME << " v." << QCoreApplication::applicationVersion().toUtf8().data() << std::endl;
 }
+

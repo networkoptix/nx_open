@@ -38,7 +38,8 @@
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
         <skip.sign>true</skip.sign>
-		<finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
+		<final.artifact.name>${project.artifactId}</final.artifact.name>
+		<finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
         <beta>true</beta>
         <!-- compile.option1. See profile no-webkit -->
         <webkit>true</webkit>
@@ -305,7 +306,7 @@
                 <!--<module>vmaxproxy</module>  -->
                 <module>client</module>                     
                 <module>wixsetup/wixsetup-full</module>
-                <!-- <module>wixsetup/wixsetup-client-only</module> -->
+                <module>wixsetup/wixsetup-client-only</module>
             </modules>
             <properties>
                 <qt.dir>${libdir}/${arch}</qt.dir>
@@ -599,7 +600,7 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>
+                <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>
                 <skip.sign>false</skip.sign>
             </properties>
         </profile>     

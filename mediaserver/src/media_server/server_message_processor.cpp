@@ -167,6 +167,8 @@ void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
             this, &QnServerMessageProcessor::at_systemNameChangeRequested);
 
+    connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
+
     QnCommonMessageProcessor::init(connection);
 }
 
@@ -252,6 +254,13 @@ void QnServerMessageProcessor::at_systemNameChangeRequested(const QString &syste
         server->setSystemName(systemName);
         m_connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
+}
+
+void QnServerMessageProcessor::at_remotePeerUnauthorized(const QUuid& id)
+{
+    QnResourcePtr mServer = qnResPool->getResourceById(id);
+    if (mServer)
+        mServer->setStatus(Qn::Unauthorized);
 }
 
 bool QnServerMessageProcessor::canRemoveResource(const QUuid& resourceId) 

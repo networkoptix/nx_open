@@ -13,12 +13,9 @@ class QnServerUpdatesModel : public QAbstractTableModel {
 
     typedef QAbstractTableModel base_type;
 public:
-
     enum Columns {
-        ResourceNameColumn,
-        CurrentVersionColumn,
-        UpdateColumn,
-        LastColumn = UpdateColumn,
+        NameColumn,
+        VersionColumn,
         ColumnCount
     };
 
@@ -61,6 +58,9 @@ public:
     void setUpdatesInformation(const QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> &updates);
     void setUpdateInformation(const QnMediaServerUpdateTool::PeerUpdateInformation &update);
 
+    QnSoftwareVersion latestVersion() const;
+    void setLatestVersion(const QnSoftwareVersion &version);
+
 private:
     void resetResourses();
 
@@ -73,6 +73,7 @@ private:
     QList<Item*> m_items;
     QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> m_updates;
     QSet<QUuid> m_targets;
+    QnSoftwareVersion m_latestVersion;
 };
 
 #endif // SERVER_UPDATES_MODEL_H

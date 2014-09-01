@@ -54,6 +54,8 @@ signals:
     void remotePeerFound(const ec2::ApiPeerAliveData &data);
     void remotePeerLost(const ec2::ApiPeerAliveData &data);
 
+    void syncTimeChanged(qint64 syncTime);
+    void peerTimeChanged(const QUuid &peerId, qint64 syncTime, qint64 peerTime);
     void timeServerSelectionRequired();
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);

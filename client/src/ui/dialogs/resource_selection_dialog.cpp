@@ -75,27 +75,27 @@ void QnResourceSelectionDialog::init() {
     ui.reset(new Ui::ResourceSelectionDialog);
     ui->setupUi(this);
 
-    Qn::NodeType rootNodeType;
+    QnResourcePoolModel::Scope scope;
 
     switch (m_target) {
     case UserResourceTarget:
-        rootNodeType = Qn::UsersNode;
+        scope = QnResourcePoolModel::UsersScope;
         setWindowTitle(tr("Select users..."));
         ui->detailsWidget->hide();
         resize(minimumSize());
         break;
     case CameraResourceTarget:
-        rootNodeType = Qn::ServersNode;
+        scope = QnResourcePoolModel::CamerasScope;
         setWindowTitle(tr("Select cameras..."));
         break;
     default:
-        rootNodeType = Qn::RootNode;
+        scope = QnResourcePoolModel::FullScope;
         setWindowTitle(tr("Select resources..."));
         ui->detailsWidget->hide();
         resize(minimumSize());
         break;
     }
-    m_resourceModel = new QnResourcePoolModel(rootNodeType, this);
+    m_resourceModel = new QnResourcePoolModel(scope, this);
 
     connect(m_resourceModel, &QnResourcePoolModel::dataChanged, this, &QnResourceSelectionDialog::at_resourceModel_dataChanged);
 

@@ -1,11 +1,11 @@
 #!/bin/bash
 
 COMPANY_NAME=${deb.customization.company.name}
-DISTRIB=$COMPANY_NAME-mediaserver-${release.version}.${buildNumber}-${box}-${build.configuration}-beta
+DISTRIB=$COMPANY_NAME-mediaserver-${release.version}.${buildNumber}-${box}-beta
 
 update () {
     /etc/init.d/S99$COMPANY_NAME-mediaserver stop
-    tar xfv $DISTRIB.tar.gz -C /
+    tar xfv $DISTRIB.tar.gz  --exclude='./usr/local/apps/networkoptix/mediaserver/etc/mediaserver.conf' -C /
     /etc/init.d/S99$COMPANY_NAME-mediaserver start
 }
 

@@ -12,50 +12,47 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QTableWidget" name="serversTable">
-     <property name="autoFillBackground">
-      <bool>false</bool>
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+     <item>
+      <widget class="QLabel" name="timeDescLabel">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Current system time:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="timeLabel">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Synchronizing...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="descriptionLabel">
+     <property name="text">
+      <string>Choose the server which is going to be used as a time server if the system has no internet access:</string>
      </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::NoSelection</enum>
-     </property>
-     <property name="rowCount">
-      <number>0</number>
-     </property>
-     <property name="columnCount">
-      <number>3</number>
-     </property>
-     <attribute name="horizontalHeaderVisible">
-      <bool>false</bool>
-     </attribute>
-     <attribute name="horizontalHeaderCascadingSectionResizes">
+     <property name="wordWrap">
       <bool>true</bool>
-     </attribute>
-     <attribute name="horizontalHeaderDefaultSectionSize">
-      <number>20</number>
-     </attribute>
-     <attribute name="horizontalHeaderMinimumSectionSize">
-      <number>20</number>
-     </attribute>
-     <attribute name="verticalHeaderVisible">
-      <bool>false</bool>
-     </attribute>
-     <column>
-      <property name="text">
-       <string notr="true"/>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Manuf.</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Name</string>
-      </property>
-     </column>
+     </property>
     </widget>
+   </item>
+   <item>
+    <widget class="QTableView" name="serversTable"/>
    </item>
   </layout>
  </widget>

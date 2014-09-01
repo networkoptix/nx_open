@@ -21,16 +21,9 @@ public:
         MinorFormat = 2
     };
 
-    QnSoftwareVersion() { 
-        m_data[0] = m_data[1] = m_data[2] = m_data[3] = 0;
-    }
+    QnSoftwareVersion();
 
-    QnSoftwareVersion(int major, int minor, int bugfix = 0, int build = 0) {
-        m_data[0] = major;
-        m_data[1] = minor;
-        m_data[2] = bugfix;
-        m_data[3] = build;
-    }
+    QnSoftwareVersion(int major, int minor, int bugfix = 0, int build = 0);
 
     /**
      * Creates a software version object from a string. Note that this function

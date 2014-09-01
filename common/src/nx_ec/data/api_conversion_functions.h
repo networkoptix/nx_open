@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <business/business_fwd.h>
+#include <nx_ec/ec_api_fwd.h>
 
 namespace ec2 {
 

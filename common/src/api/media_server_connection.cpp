@@ -339,7 +339,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 // QnMediaServerConnection
 // -------------------------------------------------------------------------- //
 QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, const QUuid &videowallGuid, QObject *parent):
-    base_type(parent),
+    base_type(parent, mserver),
     m_proxyPort(0)
 {
     setUrl(mserver->getApiUrl());

@@ -35,7 +35,8 @@ namespace nx_http
         m_terminated( false ),
         m_totalBytesRead( 0 ),
         m_contentEncodingUsed( true ),
-        m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT )
+        m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT ),
+        m_authType(authBasicAndDigest)
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
     }
@@ -587,13 +588,20 @@ namespace nx_http
             m_request.headers.insert( std::make_pair("Host", m_url.host().toLatin1()) );
         }
         //adding user credentials
-        if( !m_userName.isEmpty() || !m_userPassword.isEmpty() )
+
+        if (m_authType == authBasicAndDigest)
         {
-            nx_http::insertOrReplaceHeader(
-                &m_request.headers,
-                nx_http::HttpHeader(
-                    Header::Authorization::NAME,
-                    Header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
+            if( !m_userName.isEmpty() || !m_userPassword.isEmpty() )
+            {
+                nx_http::insertOrReplaceHeader(
+                    &m_request.headers,
+                    nx_http::HttpHeader(
+                        Header::Authorization::NAME,
+                        Header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
+            }
+        }
+        else {
+            nx_http::removeHeader(&m_request.headers, Header::Authorization::NAME);
         }
     }
 
@@ -736,15 +744,20 @@ namespace nx_http
         if( qop.indexOf("auth-int") != -1 ) //TODO #ak qop can have value "auth,auth-int". That should be supported
             return false;   //qop=auth-int is not supported
 
+        BufferType ha1;
         QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
-
-        //HA1
-        md5HashCalc.addData( m_userName.toLatin1() );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( realm );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( m_userPassword.toLatin1() );
-        const BufferType& ha1 = md5HashCalc.result().toHex();
+        if (m_authType == authDigestWithPasswordHash) {
+            ha1 = m_userPassword.toUtf8();
+        }
+        else {
+            //HA1
+            md5HashCalc.addData( m_userName.toLatin1() );
+            md5HashCalc.addData( ":" );
+            md5HashCalc.addData( realm );
+            md5HashCalc.addData( ":" );
+            md5HashCalc.addData( m_userPassword.toLatin1() );
+            ha1 = md5HashCalc.result().toHex();
+        }
         //HA2, qop=auth-int is not supported
         md5HashCalc.reset();
         md5HashCalc.addData( m_request.requestLine.method );
@@ -815,5 +828,10 @@ namespace nx_http
             default:
                 return "unknown";
         }
+    }
+
+    void AsyncHttpClient::setAuthType(AuthType value)
+    {
+        m_authType = value;
     }
 }
