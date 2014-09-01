@@ -14,6 +14,12 @@ public:
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
+
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+private:
+    void paintProgressBar(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
 };
 
 #endif // UPDATE_STATUS_ITEM_DELEGATE_H

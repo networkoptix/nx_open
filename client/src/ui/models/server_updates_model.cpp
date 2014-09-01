@@ -45,12 +45,10 @@ int QnServerUpdatesModel::rowCount(const QModelIndex &parent) const {
 QVariant QnServerUpdatesModel::headerData(int section, Qt::Orientation orientation, int role) const {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         switch (section) {
-        case ResourceNameColumn:
+        case NameColumn:
             return tr("Server");
-        case CurrentVersionColumn:
+        case VersionColumn:
             return tr("Current Version");
-        case UpdateColumn:
-            return tr("Update Status");
         default:
             break;
         }
@@ -87,7 +85,7 @@ void QnServerUpdatesModel::setUpdatesInformation(const QHash<QUuid, QnMediaServe
         item->m_updateInfo = updates[item->server()->getId()];
 
     if (!m_items.isEmpty())
-        emit dataChanged(index(0, UpdateColumn), index(m_items.size() - 1, UpdateColumn));
+        emit dataChanged(index(0, VersionColumn), index(m_items.size() - 1, VersionColumn));
 }
 
 void QnServerUpdatesModel::setUpdateInformation(const QnMediaServerUpdateTool::PeerUpdateInformation &update) {
@@ -100,7 +98,7 @@ void QnServerUpdatesModel::setUpdateInformation(const QnMediaServerUpdateTool::P
         Item *item = m_items[i];
         if (item->server() == update.server) {
             item->m_updateInfo = update;
-            emit dataChanged(index(i, UpdateColumn), index(i, UpdateColumn));
+            emit dataChanged(index(i, VersionColumn), index(i, VersionColumn));
             break;
         }
     }
@@ -173,7 +171,7 @@ void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
     if (!idx.isValid())
         return;
 
-    emit dataChanged(idx, idx.sibling(idx.row(), LastColumn));
+    emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
 }
 
 
@@ -190,45 +188,16 @@ QVariant QnServerUpdatesModel::Item::data(int column, int role) const {
     case Qt::DisplayRole:
     case Qt::ToolTipRole:
         switch (column) {
-        case ResourceNameColumn:
+        case NameColumn:
             return getResourceName(m_server);
-        case CurrentVersionColumn:
+        case VersionColumn:
             return m_server->getVersion().toString(QnSoftwareVersion::FullFormat);
-        case UpdateColumn: {
-            switch (m_updateInfo.state) {
-            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateUnknown:
-                return QString();
-            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateNotFound:
-                return tr("Not found");
-            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateFound:
-                return (m_updateInfo.sourceVersion == m_updateInfo.updateInformation->version)
-                        ? tr("Not needed") : m_updateInfo.updateInformation->version.toString(QnSoftwareVersion::FullFormat);
-            case QnMediaServerUpdateTool::PeerUpdateInformation::PendingDownloading:
-                return tr("Pending...");
-            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateDownloading:
-                return QString::number(m_updateInfo.progress) + lit("%");
-            case QnMediaServerUpdateTool::PeerUpdateInformation::PendingUpload:
-                return tr("Downloaded");
-            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateUploading:
-                return QString::number(m_updateInfo.progress) + lit("%");
-            case QnMediaServerUpdateTool::PeerUpdateInformation::PendingInstallation:
-                return tr("Uploaded");
-            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateInstalling:
-                return tr("Installing...");
-            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateFinished:
-                return tr("Finished");
-            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateFailed:
-                return tr("Failed");
-            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateCanceled:
-                return tr("Canceled");
-            }
-        }
         default:
             break;
         }
         break;
     case Qt::DecorationRole:
-        if (column == ResourceNameColumn)
+        if (column == NameColumn)
             return qnResIconCache->icon(m_server);
         break;
     case Qt::BackgroundRole:

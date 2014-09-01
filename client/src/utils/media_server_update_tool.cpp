@@ -692,7 +692,27 @@ void QnMediaServerUpdateTool::at_restUpdateTask_finished(int errorCode) {
 }
 
 void QnMediaServerUpdateTool::at_networkTask_peerProgressChanged(const QUuid &peerId, int progress) {
-    m_updateInformationById[peerId].progress = progress;
+
+    const int StagesCount = 3;
+
+    int progressBase = 0;
+    switch (m_updateInformationById[peerId].state) {
+    case PeerUpdateInformation::PendingUpload:
+    case PeerUpdateInformation::UpdateUploading:
+        progressBase = 100 / StagesCount;
+        break;
+    case PeerUpdateInformation::PendingInstallation:
+    case PeerUpdateInformation::UpdateInstalling:
+        progressBase = 2 * 100 / StagesCount;
+        break;
+    default:
+        break;
+//             UpdateFinished,
+//             UpdateFailed,
+//             UpdateCanceled
+    }
+
+    m_updateInformationById[peerId].progress = progressBase + (progress / StagesCount);
     emit peerChanged(peerId);
 }
 

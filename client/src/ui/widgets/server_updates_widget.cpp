@@ -25,7 +25,7 @@
 
 namespace {
     const int longInstallWarningTimeout = 2 * 60 * 1000; // 2 minutes
-    // Time that is given to process to exit. After that, appauncher (if present) will try to terminate it.
+    // Time that is given to process to exit. After that, applauncher (if present) will try to terminate it.
     static const quint32 processTerminateTimeout = 15000;
 }
 
@@ -46,9 +46,10 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     sortedUpdatesModel->sort(0); // the column does not matter because the model uses column-independent sorting
 
     ui->tableView->setModel(sortedUpdatesModel);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::ResourceNameColumn, QHeaderView::Stretch);
-    ui->tableView->setItemDelegateForColumn(QnServerUpdatesModel::UpdateColumn, new QnUpdateStatusItemDelegate(ui->tableView));
+    ui->tableView->setItemDelegateForColumn(QnServerUpdatesModel::VersionColumn, new QnUpdateStatusItemDelegate(ui->tableView));
+
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::NameColumn, QHeaderView::Stretch);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::VersionColumn, QHeaderView::ResizeToContents);   
 
     connect(ui->updateFromLocalSourceButton,        &QPushButton::clicked,      this,           &QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked);
     connect(ui->checkForUpdatesButton,              &QPushButton::clicked,      this,           &QnServerUpdatesWidget::at_checkForUpdatesButton_clicked);
@@ -234,7 +235,7 @@ void QnServerUpdatesWidget::updateUi() {
                     else
                         message += tr("The client will be restarted to the updated version.");
 
-                    QMessageBox::information(this, tr("Update is successfull"), message);
+                    QMessageBox::information(this, tr("Update is successful"), message);
 
                     if (!m_updateTool->isClientRequiresInstaller()) {
                         if (!applauncher::restartClient(m_updateTool->targetVersion()) == applauncher::api::ResultType::ok) {
@@ -281,7 +282,7 @@ void QnServerUpdatesWidget::updateUi() {
     case QnMediaServerUpdateTool::InstallingToIncompatiblePeers:
         applying = true;
         cancellable = true;
-        ui->updateStateLabel->setText(tr("Installing udates to incompatible servers"));
+        ui->updateStateLabel->setText(tr("Installing updates to incompatible servers"));
         break;
     case QnMediaServerUpdateTool::UploadingUpdate:
         applying = true;

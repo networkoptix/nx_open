@@ -15,10 +15,8 @@ class QnServerUpdatesModel : public QAbstractTableModel {
 public:
 
     enum Columns {
-        ResourceNameColumn,
-        CurrentVersionColumn,
-        UpdateColumn,
-        LastColumn = UpdateColumn,
+        NameColumn,
+        VersionColumn,
         ColumnCount
     };
 
