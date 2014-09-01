@@ -339,6 +339,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QnSoftwareVersion &version) 
     m_checkForUpdatesPeerTask->setPeers(peers);
     m_checkForUpdatesPeerTask->setTargetVersion(version);
     m_checkForUpdatesPeerTask->setDisableClientUpdates(m_disableClientUpdates || qnSettings->isClientUpdateDisabled());
+    m_checkForUpdatesPeerTask->setDenyMajorUpdates(m_denyMajorUpdates);
     m_tasksThread->start();
     QMetaObject::invokeMethod(m_checkForUpdatesPeerTask, "start", Qt::QueuedConnection);
 }
@@ -356,6 +357,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QString &fileName) {
     m_checkForUpdatesPeerTask->setPeers(peers);
     m_checkForUpdatesPeerTask->setUpdateFileName(fileName);
     m_checkForUpdatesPeerTask->setDisableClientUpdates(m_disableClientUpdates || qnSettings->isClientUpdateDisabled());
+    m_checkForUpdatesPeerTask->setDenyMajorUpdates(m_denyMajorUpdates);
     m_tasksThread->start();
     QMetaObject::invokeMethod(m_checkForUpdatesPeerTask, "start", Qt::QueuedConnection);
 }

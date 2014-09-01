@@ -86,6 +86,10 @@ bool QnCheckForUpdatesPeerTask::isClientRequiresInstaller() const {
     return m_clientRequiresInstaller;
 }
 
+void QnCheckForUpdatesPeerTask::setDenyMajorUpdates(bool denyMajorUpdates) {
+    m_disableClientUpdates = denyMajorUpdates;
+}
+
 QHash<QnSystemInformation, QnUpdateFileInformationPtr> QnCheckForUpdatesPeerTask::updateFiles() const {
     return m_updateFiles;
 }
@@ -362,3 +366,4 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished() {
 
     checkUpdateCoverage();
 }
+

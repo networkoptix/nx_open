@@ -34,6 +34,8 @@ public:
 
     bool isClientRequiresInstaller() const;
 
+    void setDenyMajorUpdates(bool denyMajorUpdates);
+
     QHash<QnSystemInformation, QnUpdateFileInformationPtr> updateFiles() const;
     QnUpdateFileInformationPtr clientUpdateFile() const;
     QString temporaryDir() const;
