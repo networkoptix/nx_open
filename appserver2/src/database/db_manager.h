@@ -317,6 +317,10 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiFillerData> &) {
+            return ErrorCode::ok; // nothing to do
+        }
+
         ErrorCode deleteTableRecord(const QUuid& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
