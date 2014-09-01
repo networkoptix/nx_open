@@ -105,7 +105,7 @@ void QnJoinSystemTool::findResource() {
 }
 
 void QnJoinSystemTool::joinResource() {
-    if (m_targetServer->getVersion() != qnCommon->engineVersion()) {
+    if (!isCompatible(m_targetServer->getVersion(), qnCommon->engineVersion())) {
         finish(VersionError);
         return;
     }
