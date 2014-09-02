@@ -55,15 +55,6 @@ public:
         InstallingUpdate,
     };
 
-    enum CheckResult {
-        UpdateFound,
-        InternetProblem,
-        NoNewerVersion,
-        NoSuchBuild,
-        UpdateImpossible,
-        BadUpdateFile
-    };
-
     enum UpdateResult {
         UpdateSuccessful,
         Cancelled,
@@ -83,9 +74,8 @@ public:
     bool isUpdating() const;
     bool idle() const;
 
-    CheckResult updateCheckResult() const;
+    QnCheckForUpdateResult updateCheckResult() const;
     UpdateResult updateResult() const;
-    QString resultString() const;
 
     void updateServers();
 
@@ -135,7 +125,7 @@ private slots:
 
 private:
     void setState(State state);
-    void setCheckResult(CheckResult result);
+    void setCheckResult(QnCheckForUpdateResult result);
     void setUpdateResult(UpdateResult result);
     void finishUpdate(UpdateResult result);
     void setPeerState(const QUuid &peerId, PeerUpdateInformation::State state);
@@ -153,9 +143,8 @@ private:
 private:
     QThread *m_tasksThread;
     State m_state;
-    CheckResult m_checkResult;
+    QnCheckForUpdateResult m_checkResult;
     UpdateResult m_updateResult;
-    QString m_resultString;
 
     QString m_localTemporaryDir;
 

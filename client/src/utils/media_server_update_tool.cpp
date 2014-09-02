@@ -64,7 +64,7 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     QObject(parent),
     m_tasksThread(new QThread(this)),
     m_state(Idle),
-    m_checkResult(UpdateFound),
+    m_checkResult(QnCheckForUpdateResult::UpdateFound),
     m_denyMajorUpdates(false),
     m_distributedMutex(0),
     m_checkForUpdatesPeerTask(new QnCheckForUpdatesPeerTask()),
@@ -131,64 +131,13 @@ void QnMediaServerUpdateTool::setState(State state) {
     emit stateChanged(state);
 }
 
-void QnMediaServerUpdateTool::setCheckResult(QnMediaServerUpdateTool::CheckResult result) {
+void QnMediaServerUpdateTool::setCheckResult(QnCheckForUpdateResult result) {
     m_checkResult = result;
-
-    switch (result) {
-    case UpdateFound:
-        m_resultString = tr("Update has been successfully finished.");
-        break;
-    case InternetProblem:
-        m_resultString = tr("Check for updates failed.");
-        break;
-    case NoNewerVersion:
-        m_resultString = tr("All component in your system are already up to date.");
-        break;
-    case NoSuchBuild:
-        m_resultString = tr("There is no such build on the update server");
-        break;
-    case UpdateImpossible:
-        if (m_clientUpdateFile.isNull())
-            m_resultString = tr("Cannot start update.\nAn update for the client was not found.");
-        else
-            m_resultString = tr("Cannot start update.\nAn update for one or more servers was not found.");
-        break;
-    case BadUpdateFile:
-        m_resultString = tr("Cannot update from this file:\n%1").arg(QFileInfo(m_checkForUpdatesPeerTask->updateFileName()).fileName());
-        break;
-    }
-
     setState(Idle);
 }
 
 void QnMediaServerUpdateTool::setUpdateResult(QnMediaServerUpdateTool::UpdateResult result) {
     m_updateResult = result;
-
-    switch (result) {
-    case UpdateSuccessful:
-        m_resultString = tr("Update has been successfully finished.");
-        break;
-    case Cancelled:
-        m_resultString = tr("Update has been cancelled.");
-        break;
-    case LockFailed:
-        m_resultString = tr("Someone has already started an update.");
-        break;
-    case DownloadingFailed:
-        m_resultString = tr("Could not download updates.");
-        break;
-    case UploadingFailed:
-        m_resultString = tr("Could not upload updates to servers.");
-        break;
-    case ClientInstallationFailed:
-        m_resultString = tr("Could not install an update to the client.");
-        break;
-    case InstallationFailed:
-    case RestInstallationFailed:
-        m_resultString = tr("Could not install updates on one or more servers.");
-        break;
-    }
-
     setState(Idle);
 }
 
@@ -210,16 +159,12 @@ void QnMediaServerUpdateTool::setPeerState(const QUuid &peerId, QnMediaServerUpd
     }
 }
 
-QnMediaServerUpdateTool::CheckResult QnMediaServerUpdateTool::updateCheckResult() const {
+QnCheckForUpdateResult QnMediaServerUpdateTool::updateCheckResult() const {
     return m_checkResult;
 }
 
 QnMediaServerUpdateTool::UpdateResult QnMediaServerUpdateTool::updateResult() const {
     return m_updateResult;
-}
-
-QString QnMediaServerUpdateTool::resultString() const {
-    return m_resultString;
 }
 
 QnSoftwareVersion QnMediaServerUpdateTool::targetVersion() const {
@@ -604,7 +549,7 @@ void QnMediaServerUpdateTool::at_checkForUpdatesTask_finished(int errorCode) {
     m_clientRequiresInstaller = m_checkForUpdatesPeerTask->isClientRequiresInstaller();
     m_clientUpdateFile = m_checkForUpdatesPeerTask->clientUpdateFile();
 
-    setCheckResult((CheckResult)errorCode); // codes are the same now
+    setCheckResult(static_cast<QnCheckForUpdateResult>(errorCode)); // codes are the same now
 }
 
 void QnMediaServerUpdateTool::at_downloadTask_finished(int errorCode) {

@@ -148,11 +148,11 @@ void QnConnectToCurrentSystemTool::at_updateTool_stateChanged(int state) {
 
     if (m_prevToolState == CheckingForUpdates) {
         switch (m_updateTool->updateCheckResult()) {
-        case QnMediaServerUpdateTool::UpdateFound:
+        case QnCheckForUpdateResult::UpdateFound:
             m_prevToolState = Updating;
             m_updateTool->updateServers();
             return;
-        case QnMediaServerUpdateTool::NoNewerVersion:
+        case QnCheckForUpdateResult::NoNewerVersion:
             break;
         default:
             m_updateFailed = true;
