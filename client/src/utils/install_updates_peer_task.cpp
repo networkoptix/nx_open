@@ -10,6 +10,7 @@
 
 namespace {
     const int checkTimeout = 10 * 60 * 1000;
+    const int shortTimeout = 5 * 1000;
 
     ec2::AbstractECConnectionPtr connection2() {
         return QnAppServerConnectionFactory::getConnection2();
@@ -20,7 +21,6 @@ QnInstallUpdatesPeerTask::QnInstallUpdatesPeerTask(QObject *parent) :
     QnNetworkPeerTask(parent)
 {
     m_checkTimer = new QTimer(this);
-    m_checkTimer->setInterval(checkTimeout);
     m_checkTimer->setSingleShot(true);
 
     connect(m_checkTimer,   &QTimer::timeout,                       this,           &QnInstallUpdatesPeerTask::at_checkTimeout);
@@ -43,31 +43,32 @@ void QnInstallUpdatesPeerTask::doStart() {
 
     connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnInstallUpdatesPeerTask::at_resourceChanged);
 
-    m_restartingPeers = m_pendingPeers = peers();
+    m_stoppingPeers = m_restartingPeers = m_pendingPeers = peers();
 
     static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(true);
 
     connection2()->getUpdatesManager()->installUpdate(m_updateId, m_pendingPeers,
                                                       this, [this](int, ec2::ErrorCode){});
-    m_checkTimer->start();
+    m_checkTimer->start(checkTimeout);
 }
 
 void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource) {
     QUuid peerId = resource->getId();
 
-    if (!peers().contains(peerId))
+    if (!m_pendingPeers.contains(peerId))
         return;
 
     if (resource->getStatus() == Qn::Offline)
+        m_stoppingPeers.remove(peerId);
+    else if (!m_stoppingPeers.contains(peerId))
         m_restartingPeers.remove(peerId);
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
 
-    if (!m_pendingPeers.contains(server->getId()))
-        return;
-
     if (server->getVersion() == m_version) {
         m_pendingPeers.remove(peerId);
+        m_stoppingPeers.remove(peerId);
+        m_restartingPeers.remove(peerId);
         emit peerFinished(peerId);
     }
 
@@ -77,16 +78,10 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
     }
 
     if (m_restartingPeers.isEmpty()) {
-        foreach (const QUuid &id, m_pendingPeers) {
-            QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).staticCast<QnMediaServerResource>();
-            if (server->getStatus() == Qn::Offline) {
-                return;
-            } else if (server->getVersion() != m_version) {
-                finish(InstallationFailed);
-                return;
-            }
-        }
-        finish(NoError);
+        /* When all peers were restarted we only have to wait for saveServer transactions.
+           It shouldn't take long time. So restart timer to a short timeout. */
+        m_checkTimer->stop();
+        m_checkTimer->start(shortTimeout);
     }
 }
 
