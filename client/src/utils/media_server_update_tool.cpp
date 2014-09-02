@@ -24,27 +24,45 @@
 
 namespace {
 
-const QString QN_UPDATE_PACKAGE_URL = lit("http://enk.me/bg/dklychkov/exmaple_update/get_update");
-const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
-const QString mutexName = lit("auto_update");
+    const QString QN_UPDATE_PACKAGE_URL = lit("http://enk.me/bg/dklychkov/exmaple_update/get_update");
+    const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
+    const QString mutexName = lit("auto_update");
 
-#ifdef Q_OS_MACX
-const bool defaultDisableClientUpdates = true;
-#else
-const bool defaultDisableClientUpdates = false;
-#endif
+    #ifdef Q_OS_MACX
+    const bool defaultDisableClientUpdates = true;
+    #else
+    const bool defaultDisableClientUpdates = false;
+    #endif
 
-bool verifyFile(const QString &fileName, qint64 size, const QString &md5) {
-    QFile file(fileName);
+    bool verifyFile(const QString &fileName, qint64 size, const QString &md5) {
+        QFile file(fileName);
 
-    if (!file.exists() || file.size() != size)
-        return false;
+        if (!file.exists() || file.size() != size)
+            return false;
 
-    if (!md5.isEmpty() && makeMd5(&file) != md5)
-        return false;
+        if (!md5.isEmpty() && makeMd5(&file) != md5)
+            return false;
 
-    return true;
-}
+        return true;
+    }
+
+    enum class PeerUpdateStage {
+        Download,           /**< Download update package for the peer. */
+        Push,               /**< Push update package to the peer. */
+        Install,            /**< Install update. */
+
+        Count
+    };
+
+    enum class FullUpdateStage {
+        Download,           /**< Download update packages. */
+        Client,             /**< Install client update. */
+        Incompatible,       /**< Install updates to the incompatible servers. */
+        Push,               /**< Push update package to the normal servers. */
+        Servers,            /**< Install updates to the normal servers. */
+
+        Count
+    };
 
 } // anonymous namespace
 
@@ -651,23 +669,22 @@ void QnMediaServerUpdateTool::at_restUpdateTask_finished(int errorCode) {
 
 void QnMediaServerUpdateTool::at_networkTask_peerProgressChanged(const QUuid &peerId, int progress) {
 
-    const int StagesCount = 3;
+    PeerUpdateStage stage = PeerUpdateStage::Download;
 
-    int progressBase = 0;
     switch (m_updateInformationById[peerId].state) {
     case PeerUpdateInformation::PendingUpload:
     case PeerUpdateInformation::UpdateUploading:
-        progressBase = 100 / StagesCount;
+        stage = PeerUpdateStage::Push;
         break;
     case PeerUpdateInformation::PendingInstallation:
     case PeerUpdateInformation::UpdateInstalling:
-        progressBase = 2 * 100 / StagesCount;
+        stage = PeerUpdateStage::Install;
         break;
     default:
         break;
     }
 
-    m_updateInformationById[peerId].progress = progressBase + (progress / StagesCount);
+    m_updateInformationById[peerId].progress = (progress + static_cast<int>(stage)*100) / ( static_cast<int>(PeerUpdateStage::Count) ) ;
     emit peerChanged(peerId);
 }
 
