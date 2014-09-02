@@ -6,6 +6,7 @@
 #include "time_manager.h"
 
 #include <algorithm>
+#include <atomic>
 
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QDateTime>
@@ -166,7 +167,7 @@ namespace ec2
     //////////////////////////////////////////////
     //   TimeSynchronizationManager
     //////////////////////////////////////////////
-    static TimeSynchronizationManager* TimeManager_instance = nullptr;
+    static std::atomic<TimeSynchronizationManager*> TimeManager_instance( nullptr );
 
 #ifdef _DEBUG
     static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*1000;
@@ -219,9 +220,6 @@ namespace ec2
             currentMSecsSinceEpoch(),
             m_localTimePriorityKey ); 
 
-        assert( TimeManager_instance == nullptr );
-        TimeManager_instance = this;
-
         if (QnDbManager::instance())
             connect( QnDbManager::instance(), &QnDbManager::initialized, 
                  this, &TimeSynchronizationManager::onDbManagerInitialized,
@@ -248,10 +246,16 @@ namespace ec2
             m_manualTimerServerSelectionCheckTaskID = TimerManager::instance()->addTimer(
                 std::bind( &TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired, this, _1 ),
                 MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS );
+
+        assert( TimeManager_instance.load(std::memory_order_relaxed) == nullptr );
+        TimeManager_instance.store( this, std::memory_order_relaxed );
     }
 
     TimeSynchronizationManager::~TimeSynchronizationManager()
     {
+        assert( TimeManager_instance.load(std::memory_order_relaxed) == this );
+        TimeManager_instance.store( nullptr, std::memory_order_relaxed );
+
         quint64 broadcastSysTimeTaskID = 0;
         quint64 manualTimerServerSelectionCheckTaskID = 0;
         quint64 internetSynchronizationTaskID = 0;
@@ -281,16 +285,13 @@ namespace ec2
             m_internetSynchronizationTaskID = 0;
         }
 
-        assert( TimeManager_instance == this );
-        TimeManager_instance = nullptr;
-
         m_timeSynchronizer.pleaseStop();
         m_timeSynchronizer.join();
     }
 
     TimeSynchronizationManager* TimeSynchronizationManager::instance()
     {
-        return TimeManager_instance;
+        return TimeManager_instance.load(std::memory_order_relaxed);
     }
 
     qint64 TimeSynchronizationManager::getSyncTime() const
@@ -359,19 +360,22 @@ namespace ec2
     {
         QMutexLocker lk( &m_mutex );
 
-        NX_LOG( lit("TimeSynchronizationManager. Received peer %1 system time (%2), peer time priority key 0x%3").
-            arg( tran.params.peerID.toString() ).arg( QDateTime::fromMSecsSinceEpoch( tran.params.peerSysTime ).toString( Qt::ISODate ) ).
-            arg(tran.params.timePriorityKey, 0, 16), cl_logDEBUG2 );
-
-        TimePriorityKey peerPriorityKey;
-        peerPriorityKey.fromUInt64( tran.params.timePriorityKey );
-        m_systemTimeByPeer[tran.params.peerID] = TimeSyncInfo(
-            m_monotonicClock.elapsed(),
-            tran.params.peerSysTime,
-            peerPriorityKey );
+        peerSystemTimeReceivedNonSafe( tran.params );
 
         lk.unlock();
         emit peerTimeChanged( tran.params.peerID, getSyncTime(), tran.params.peerSysTime );
+    }
+
+    void TimeSynchronizationManager::knownPeersSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeDataList>& tran )
+    {
+        for( const ApiPeerSystemTimeData& data: tran.params )
+        {
+            {
+                QMutexLocker lk( &m_mutex );
+                peerSystemTimeReceivedNonSafe( data );
+            }
+            emit peerTimeChanged( data.peerID, getSyncTime(), data.peerSysTime );
+        }
     }
 
     TimeSyncInfo TimeSynchronizationManager::getTimeSyncInfo() const
@@ -416,6 +420,25 @@ namespace ec2
             peers.push_back( QnPeerTimeInfo( it->first, it->second.syncTime + (currentClock - it->second.monotonicClockValue) ) );
 
         return peers;
+    }
+
+    ApiPeerSystemTimeDataList TimeSynchronizationManager::getKnownPeersSystemTime() const
+    {
+        QMutexLocker lk( &m_mutex );
+
+        ApiPeerSystemTimeDataList result;
+        result.reserve( m_systemTimeByPeer.size() );
+        const qint64 currentClock = m_monotonicClock.elapsed();
+        for( auto it = m_systemTimeByPeer.cbegin(); it != m_systemTimeByPeer.cend(); ++it )
+        {
+            ApiPeerSystemTimeData data;
+            data.peerID = it->first;
+            data.timePriorityKey = it->second.timePriorityKey.toUInt64();
+            data.peerSysTime = it->second.syncTime + (currentClock - it->second.monotonicClockValue);
+            result.push_back( std::move(data) );
+        }
+
+        return result;
     }
 
     void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
@@ -548,6 +571,7 @@ namespace ec2
             QMutexLocker lk( &m_mutex );
             tran.params.peerSysTime = QDateTime::currentMSecsSinceEpoch();  //currentMSecsSinceEpoch();
         }
+        peerSystemTimeReceived( tran ); //remembering own system time
         QnTransactionMessageBus::instance()->sendTransaction( tran );
     }
 
@@ -725,4 +749,17 @@ namespace ec2
         }
     }
 
+    void TimeSynchronizationManager::peerSystemTimeReceivedNonSafe( const ApiPeerSystemTimeData& data )
+    {
+        NX_LOG( lit("TimeSynchronizationManager. Received peer %1 system time (%2), peer time priority key 0x%3").
+            arg(data.peerID.toString()).arg( QDateTime::fromMSecsSinceEpoch(data.peerSysTime).toString( Qt::ISODate ) ).
+            arg(data.timePriorityKey, 0, 16), cl_logDEBUG2 );
+
+        TimePriorityKey peerPriorityKey;
+        peerPriorityKey.fromUInt64( data.timePriorityKey );
+        m_systemTimeByPeer[data.peerID] = TimeSyncInfo(
+            m_monotonicClock.elapsed(),
+            data.peerSysTime,
+            peerPriorityKey );
+    }
 }

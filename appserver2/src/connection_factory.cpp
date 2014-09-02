@@ -217,7 +217,7 @@ namespace ec2
         registerUpdateFuncHandler<ApiConnectionDataList>(restProcessorPool, ApiCommand::availableConnections);
 
        //AbstractECConnection
-        registerUpdateFuncHandler<ApiDatabaseDumpData>( restProcessorPool, ApiCommand::resotreDatabase );
+        registerUpdateFuncHandler<ApiDatabaseDumpData>( restProcessorPool, ApiCommand::restoreDatabase );
 
         //AbstractTimeManager::getCurrentTimeImpl
         registerGetFuncHandler<std::nullptr_t, ApiTimeData>( restProcessorPool, ApiCommand::getCurrentTime );
@@ -371,6 +371,8 @@ namespace ec2
         const QUrl& ecURL,
         impl::ConnectHandlerPtr handler)
     {
+        //TODO #ak async ssl is working now, make async request to old ec here
+
         if( errorCode != ErrorCode::ok )
         {
             //checking for old EC

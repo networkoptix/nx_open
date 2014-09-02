@@ -153,6 +153,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::runtimeInfoChanged:    return handleTransactionParams<ApiRuntimeData>          (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::broadcastPeerSystemTime: return handleTransactionParams<ApiPeerSystemTimeData> (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::forcePrimaryTimeServer:  return handleTransactionParams<ApiIdData>             (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::getKnownPeersSystemTime: return handleTransactionParams<ApiPeerSystemTimeDataList> (serializedTransaction, &stream, transaction, function, fastFunction);
 
     default:
         qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";
@@ -418,6 +419,9 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         case ApiCommand::broadcastPeerSystemTime:
             TimeSynchronizationManager::instance()->peerSystemTimeReceived( tran );
             break;
+        case ApiCommand::getKnownPeersSystemTime:
+            TimeSynchronizationManager::instance()->knownPeersSystemTimeReceived( tran );
+            break;
         case ApiCommand::runtimeInfoChanged:
             onGotServerRuntimeInfo(tran, sender->remotePeer().id);
             if( m_handler )
@@ -574,6 +578,17 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         transport->sendTransaction(tran, processedPeers);
         transport->sendTransaction(tranModules, processedPeers);
         transport->setReadSync(true);
+
+        //sending local time information on known servers
+        TimeSynchronizationManager* timeManager = TimeSynchronizationManager::instance();
+        if( timeManager )
+        {
+            QnTransaction<ApiPeerSystemTimeDataList> tran;
+            tran.params = timeManager->getKnownPeersSystemTime();
+            tran.command = ApiCommand::getKnownPeersSystemTime;
+            tran.peerID = m_localPeer.id;
+            transport->sendTransaction(tran, processedPeers);
+        }
     } else if (transport->remotePeer().peerType == Qn::PT_MobileClient) {
         /** Request all data to be sent to the client peers on the connect. */
         QnTransaction<ApiMediaServerDataList> tranServers;
