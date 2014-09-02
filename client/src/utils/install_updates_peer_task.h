@@ -33,6 +33,7 @@ private:
 private:
     QString m_updateId;
     QnSoftwareVersion m_version;
+    QSet<QUuid> m_stoppingPeers;
     QSet<QUuid> m_restartingPeers;
     QSet<QUuid> m_pendingPeers;
     QTimer *m_checkTimer;

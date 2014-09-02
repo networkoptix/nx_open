@@ -135,8 +135,10 @@ namespace ec2
                 case removeLicense:
                     return "removeLicense";
 
-                case getCurrentTime:
-                    return "getCurrentTime";
+                case testEmailSettings:
+                    return "testEmailSettings";
+                case sendEmail:
+                    return "sendEmail";
 
                 case uploadUpdate:
                     return "uploadUpdate";
@@ -171,24 +173,23 @@ namespace ec2
                 case availableConnections:
                     return "availableConnections";
 
-                case changeSystemName:
-                    return "changeSystemName";
-
-                case runtimeInfoChanged:
-                    return "runtimeInfoChanged";
                 case forcePrimaryTimeServer:
                     return "forcePrimaryTimeServer";
                 case broadcastPeerSystemTime:
                     return "broadcastPeerSystemTime";
+                case getCurrentTime:
+                    return "getCurrentTime";
+                case changeSystemName:
+                    return "changeSystemName";
+                case getKnownPeersSystemTime:
+                    return "getKnownPeersSystemTime";
 
-                case testEmailSettings:
-                    return "testEmailSettings";
-                case sendEmail:
-                    return "sendEmail";
+                case runtimeInfoChanged:
+                    return "runtimeInfoChanged";
                 case dumpDatabase:
                     return "dumpDatabase";
-                case resotreDatabase:
-                    return "resotreDatabase";
+                case restoreDatabase:
+                    return "restoreDatabase";
                 default:
                     return "unknown " + QString::number((int)val);
             }
@@ -202,7 +203,8 @@ namespace ec2
                     val == tranSyncRequest ||
                     val == tranSyncResponse ||
                     val == runtimeInfoChanged ||
-                    val == peerAliveInfo;
+                    val == peerAliveInfo ||
+                    val == broadcastPeerSystemTime;
         }
 
         bool isPersistent( Value val )
@@ -238,7 +240,7 @@ namespace ec2
                 val == addLicense ||
                 val == addLicenses ||
                 val == removeLicense || 
-                val == resotreDatabase;
+                val == restoreDatabase;
         }
 
     }
