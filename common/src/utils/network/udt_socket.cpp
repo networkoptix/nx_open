@@ -37,10 +37,9 @@
             arg(SystemError::getLastOSErrorText()).                                                                     \
             arg(UDT::getlasterror_code()).                                                                              \
             arg(QLatin1String(__FILE__)).arg(__LINE__),cl_logERROR);                                                    \
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());                                                  \
     } while(0)
 #else
-#define TRACE_(func,handler) SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+#define TRACE_(func,handler) (void*)(NULL)
 #endif // 
 
 // Verify macro is useful for us to push up the error detection in DEBUG mode
@@ -188,6 +187,7 @@ bool UdtSocketImpl::Open() {
         state_ = OPEN;
         return true;
     } else {
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
         return false;
     }
 }
@@ -197,6 +197,8 @@ bool UdtSocketImpl::Bind( const SocketAddress& localAddress ) {
     AddressFrom(localAddress,&addr);
     int ret = UDT::bind(handler_,ADDR_(&addr),sizeof(addr));
     DEBUG_(if(ret !=0) TRACE_("UDT::bind",handler_));
+    if( ret != 0 )
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     return ret == 0;
 }
 
@@ -205,6 +207,7 @@ SocketAddress UdtSocketImpl::GetLocalAddress() const {
     int len = sizeof(addr);
     if(UDT::getsockname(handler_,ADDR_(&addr),&len) != 0) {
         DEBUG_(TRACE_("UDT::getsockname",handler_));
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
         return SocketAddress();
     } else {
         return SocketAddress(
@@ -218,6 +221,7 @@ SocketAddress UdtSocketImpl::GetPeerAddress() const {
     int len = sizeof(addr);
     if(UDT::getpeername(handler_,ADDR_(&addr),&len) !=0) {
         DEBUG_(TRACE_("UDT::getsockname",handler_));
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
         return SocketAddress();
     } else {
         return SocketAddress(
@@ -242,6 +246,8 @@ bool UdtSocketImpl::SetReuseAddrFlag( bool reuseAddr ) {
     Q_ASSERT(!IsClosed());
     int ret = UDT::setsockopt(handler_,0,UDT_REUSEADDR,&reuseAddr,sizeof(reuseAddr));
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
+    if( ret != 0 )
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     return ret == 0;
 }
 
@@ -250,6 +256,8 @@ bool UdtSocketImpl::GetReuseAddrFlag( bool* val ) const {
     int len = sizeof(*val);
     int ret = UDT::getsockopt(handler_,0,UDT_REUSEADDR,val,&len);
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
+    if( ret != 0 )
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     return ret == 0;
 }
 
@@ -258,8 +266,15 @@ bool UdtSocketImpl::SetNonBlockingMode( bool val ) {
     bool value = !val;
     int ret = UDT::setsockopt(handler_,0,UDT_SNDSYN,&value,sizeof(value));
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
+    if( ret != 0 )
+    {
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        return false;
+    }
     ret = UDT::setsockopt(handler_,0,UDT_RCVSYN,&value,sizeof(value));
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
+    if( ret != 0 )
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     return ret == 0;
 }
 
@@ -273,6 +288,8 @@ bool UdtSocketImpl::GetNonBlockingMode( bool* val ) const {
         ret = UDT::getsockopt(handler_,0,UDT_RCVSYN,&bval,&len); 
         VERIFY_(OK_(ret) && *val == bval,"UDT::getsockopt",handler_));
 
+    if( ret != 0 )
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     *val = !*val;
     return ret == 0;
 }
@@ -281,6 +298,11 @@ bool UdtSocketImpl::GetNonBlockingMode( bool* val ) const {
 // No one knows the MTU, they use ICMP/UDP to try to detect it,
 // and in modern switch, typically will change every half hour !!!
 // Better keep it opaque when you make decision what to send .
+
+//mtu is known per path and is available for connected socket only.
+//It present in AbstractStreamSocket since it was implemented only by TcpSocket
+//BTW, I have never seen it changing once per 30 minutes for a given path
+
 bool UdtSocketImpl::GetMtu( unsigned int* mtuValue ) const {
     Q_ASSERT(!IsClosed());
     *mtuValue = 1500; // Ethernet MTU 
@@ -297,6 +319,8 @@ bool UdtSocketImpl::SetSendBufferSize( unsigned int buffSize ) {
     int ret = UDT::setsockopt(
         handler_,0,UDT_SNDBUF,&buff_size,sizeof(buff_size));
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
+    if( ret != 0 )
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     return ret == 0;
 }
 
@@ -308,6 +332,8 @@ bool UdtSocketImpl::GetSendBufferSize( unsigned int* buffSize ) const{
         handler_,0,UDT_SNDBUF,&buff_size,&len);
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
     *buffSize = static_cast<unsigned int>(buff_size);
+    if( ret != 0 )
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     return ret == 0;
 }
 
@@ -318,6 +344,8 @@ bool UdtSocketImpl::SetRecvBufferSize( unsigned int buffSize ){
     int ret = UDT::setsockopt(
         handler_,0,UDT_RCVBUF,&buff_size,sizeof(buff_size));
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
+    if( ret != 0 )
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     return ret == 0;
 }
 
@@ -329,6 +357,8 @@ bool UdtSocketImpl::GetRecvBufferSize( unsigned int* buffSize ) const{
         handler_,0,UDT_RCVBUF,&buff_size,&len);
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
     *buffSize = static_cast<unsigned int>(buff_size);
+    if( ret != 0 )
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     return ret == 0;
 }
 
@@ -339,6 +369,8 @@ bool UdtSocketImpl::SetRecvTimeout( unsigned int millis ) {
     int ret = UDT::setsockopt(
         handler_,0,UDT_RCVTIMEO,&time,sizeof(time));
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
+    if( ret != 0 )
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     return ret == 0;
 }
 
@@ -350,6 +382,8 @@ bool UdtSocketImpl::GetRecvTimeout( unsigned int* millis ) const {
         handler_,0,UDT_RCVTIMEO,&time,&len);
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
     *millis = static_cast<int>(time);
+    if( ret != 0 )
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     return ret == 0;
 }
 
@@ -360,6 +394,8 @@ bool UdtSocketImpl::SetSendTimeout( unsigned int ms ) {
     int ret = UDT::setsockopt(
         handler_,0,UDT_SNDTIMEO,&time,sizeof(time));
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
+    if( ret != 0 )
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     return ret == 0;
 }
 
@@ -371,12 +407,14 @@ bool UdtSocketImpl::GetSendTimeout( unsigned int* millis ) const {
         handler_,0,UDT_SNDTIMEO,&time,&len);
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
     *millis = static_cast<unsigned int>(time);
+    if( ret != 0 )
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     return ret == 0;
 }
 
 bool UdtSocketImpl::GetLastError( SystemError::ErrorCode* errorCode ) const {
     Q_ASSERT(!IsClosed());
-    *errorCode = static_cast<SystemError::ErrorCode>(UDT::getlasterror().getErrorCode());
+    *errorCode = static_cast<SystemError::ErrorCode>(UDT::getlasterror().getErrno());
     return true;
 }
 
@@ -399,6 +437,7 @@ int UdtSocketImpl::Recv( void* buffer, unsigned int bufferLen, int flags ) {
         } else {
             DEBUG_(TRACE_("UDT::recv",handler_));
         }
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     }
     return sz;
 }
@@ -408,6 +447,8 @@ int UdtSocketImpl::Send( const void* buffer, unsigned int bufferLen ) {
     int sz = UDT::send(handler_,reinterpret_cast<const char*>(buffer),bufferLen,0);
     DEBUG_(
         if(sz<0) TRACE_("UDT::send",handler_));
+    if( sz < 0 )
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     return sz;
 }
 
@@ -469,6 +510,7 @@ bool UdtConnector::Connect( const QString& address , unsigned short port , int t
     if( ret != 0 ) {
         // Error happened
         DEBUG_(TRACE_("UDT::connect",impl_->udt_handler()));
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
         return false;
     } else {
         if( nbk_sock ) {
@@ -488,9 +530,11 @@ bool UdtConnector::Connect( const QString& address , unsigned short port , int t
     
     if( ret < 0 ) {
         DEBUG_(TRACE_("UDT::epoll_wait",impl_->udt_handler()));
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
         return false;
     } else {
         if( ret == 0 )  {
+            SystemError::setLastErrorCode( SystemError::timedOut );
             return false; // Timeout
         } else {
             Q_ASSERT(ret == 1);
@@ -514,6 +558,7 @@ UdtSocketImpl* UdtAcceptor::Accept() {
     UDTSOCKET ret = UDT::accept(impl_->udt_handler(),NULL,NULL);
     if( ret == UDT::INVALID_SOCK ) {
         DEBUG_(TRACE_("UDT::accept",impl_->udt_handler()));
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
         return NULL;
     } else {
         return new UdtSocketImpl( ret , UdtSocketImpl::ESTABLISHED );
@@ -526,6 +571,7 @@ bool UdtAcceptor::Listen( int backlog ) {
     int ret = UDT::listen(impl_->udt_handler(),backlog);
     if( ret != 0 ) {
         DEBUG_(TRACE_("UDT::listen",impl_->udt_handler()));
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
         return false;
     } else {
         impl_->state_ = UdtSocketImpl::ESTABLISHED;
@@ -889,6 +935,8 @@ void UdtPollSetImpl::RemoveFromEpoll( UDTSOCKET udt_handler , int event_type ) {
         Q_ASSERT( event_type == UDT_EPOLL_IN || event_type == UDT_EPOLL_OUT );
         ret = UDT::epoll_add_usock(epoll_fd_,udt_handler,&event_type);
         VERIFY_(ret ==0,"UDT::epoll_remove_usock",udt_handler);
+         if( ret != 0 )
+            SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     }
 }
 
@@ -961,7 +1009,10 @@ bool UdtPollSetImpl::Add( UdtSocket* socket , UdtSocketImpl* imp , aio::EventTyp
     int ret = UDT::epoll_add_usock(epoll_fd_,imp->udt_handler(),&ev);
     DEBUG_(if(ret <0) TRACE_("UDT::epoll_add_usock",imp->udt_handler()));
     if( ret <0 )
+    {
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
         return false;
+    }
     SocketUserData& ref = socket_user_data_[imp->udt_handler()];
     if( ev == UDT_EPOLL_IN )
         ref.read_data = data;
@@ -1000,6 +1051,7 @@ int UdtPollSetImpl::Poll( int milliseconds ) {
             return 0; // Translate this error code
         } 
         TRACE_("UDT::epoll_wait",UDT::INVALID_SOCK);
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
         return -1;
     } else {
         if( !udt_sys_socket_read_set_.empty() ) {
@@ -1016,6 +1068,7 @@ bool UdtPollSetImpl::Initialize() {
     epoll_fd_ = UDT::epoll_create();
     if( epoll_fd_ <0 ) {
         DEBUG_(TRACE_("UDT::epoll_create",UDT::INVALID_SOCK));
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
         return false;
     }
     return InitializeInterruptSocket();
@@ -1034,6 +1087,7 @@ bool UdtPollSetImpl::InitializeInterruptSocket() {
     int ret = UDT::epoll_add_ssock(epoll_fd_,interrupt_socket_.handle());
     if( ret <0 ) {
         DEBUG_(TRACE_("UDT::epoll_add_ssock",UDT::INVALID_SOCK));
+        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
         return false;
     } 
     return true;
