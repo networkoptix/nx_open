@@ -80,8 +80,6 @@ namespace ec2
         QnTransaction<ApiBusinessRuleData> prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QUuid& id );
         QnTransaction<ApiBusinessActionData> prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource );
-        QnTransaction<ApiEmailSettingsData> prepareTransaction( ApiCommand::Value command, const QnEmail::Settings& resource );
-        QnTransaction<ApiEmailData> prepareTransaction( ApiCommand::Value command, const ApiEmailData& data );
     };
 }
 

@@ -167,6 +167,9 @@ ErrorCode QnTransactionLog::updateSequence(const QnAbstractTransaction& tran)
 
 ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QUuid& hash, const QByteArray& data)
 {
+    if (tran.isLocal)
+        return ErrorCode::ok; // local transactions just changes DB without logging
+
     if (tran.command != ApiCommand::updatePersistentSequence)
     {
     #ifdef TRANSACTION_MESSAGE_BUS_DEBUG

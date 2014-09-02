@@ -252,7 +252,8 @@ namespace ec2
     void QnAbstractTransaction::fillPersistentInfo()
     {
         if (QnDbManager::instance() && persistentInfo.isNull()) {
-            persistentInfo.sequence = qn_abstractTransaction_sequence.fetchAndAddAcquire(1);
+            if (!isLocal)
+                persistentInfo.sequence = qn_abstractTransaction_sequence.fetchAndAddAcquire(1);
             persistentInfo.dbID = QnDbManager::instance()->getID();
             persistentInfo.timestamp = QnTransactionLog::instance()->getTimeStamp();
         }
