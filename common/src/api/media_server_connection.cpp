@@ -346,7 +346,8 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     setSerializer(QnLexical::newEnumSerializer<RequestObject, int>());
 
     QnRequestHeaderList extraHeaders;
-    extraHeaders.insert(lit("x-server-guid"), mserver->getId().toString());
+    QString guid = mserver->getProperty(lit("guid"));
+    extraHeaders.insert(lit("x-server-guid"), guid.isEmpty() ? mserver->getId().toString() : guid);
     if (!videowallGuid.isNull())
         extraHeaders.insert(lit("X-NetworkOptix-VideoWall"), videowallGuid.toString());
     setExtraHeaders(extraHeaders);

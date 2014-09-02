@@ -22,7 +22,6 @@ void updateServer(const QnMediaServerResourcePtr &server, const QnModuleInformat
     server->setVersion(moduleInformation.version);
     server->setSystemInfo(moduleInformation.systemInformation);
     server->setSystemName(moduleInformation.systemName);
-    server->setProperty(lit("guid"), moduleInformation.id.toString());
 }
 
 QnMediaServerResourcePtr makeResource(const QnModuleInformation &moduleInformation) {
@@ -30,6 +29,7 @@ QnMediaServerResourcePtr makeResource(const QnModuleInformation &moduleInformati
 
     server->setId(QUuid::createUuid());
     server->setStatus(Qn::Incompatible, true);
+    server->setProperty(lit("guid"), moduleInformation.id.toString());
 
     updateServer(server, moduleInformation);
 

@@ -23,12 +23,24 @@ QnWaitCompatibleServersPeerTask::QnWaitCompatibleServersPeerTask(QObject *parent
 
 void QnWaitCompatibleServersPeerTask::doStart() {
     m_targets = peers();
-    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnWaitCompatibleServersPeerTask::at_resourcePool_resourceAdded);
-    connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnWaitCompatibleServersPeerTask::at_resourcePool_resourceAdded);
+
+    foreach (const QUuid &id, m_targets) {
+        QnResourcePtr resource = qnResPool->getResourceById(id);
+        if (resource && resource->getStatus() != Qn::Offline)
+            m_targets.remove(id);
+    }
+
+    if (m_targets.isEmpty()) {
+        finish(NoError);
+        return;
+    }
+
+    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnWaitCompatibleServersPeerTask::at_resourcePool_resourceChanged);
+    connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnWaitCompatibleServersPeerTask::at_resourcePool_resourceChanged);
     m_timer->start();
 }
 
-void QnWaitCompatibleServersPeerTask::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
+void QnWaitCompatibleServersPeerTask::at_resourcePool_resourceChanged(const QnResourcePtr &resource) {
     QUuid id = resource->getId();
 
     if (m_targets.contains(id) && resource->getStatus() != Qn::Offline)

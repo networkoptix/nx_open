@@ -20,7 +20,7 @@ protected:
     virtual void doStart() override;
 
 private slots:
-    void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
+    void at_resourcePool_resourceChanged(const QnResourcePtr &resource);
     void at_timer_timeout();
 
 private:
