@@ -20,7 +20,8 @@ private:
     void removeResource(const QUuid &id);
 
 private:
-    QHash<QUuid, QUuid> m_serverUuidByModuleUuid;
+    QHash<QUuid, QUuid> m_fakeUuidByServerUuid;
+    QHash<QUuid, QUuid> m_serverUuidByFakeUuid;
 };
 
 #endif // INCOMPATIBLE_SERVER_ADDER_H

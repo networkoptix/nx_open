@@ -70,14 +70,15 @@ void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &module
         }
     }
 
-    QUuid id = m_serverUuidByModuleUuid[moduleInformation.id];
+    QUuid id = m_fakeUuidByServerUuid[moduleInformation.id];
     if (id.isNull()) {
         // add a resource
         if (!isSuitable(moduleInformation))
             return;
 
         QnMediaServerResourcePtr server = makeResource(moduleInformation);
-        m_serverUuidByModuleUuid[moduleInformation.id] = server->getId();
+        m_fakeUuidByServerUuid[moduleInformation.id] = server->getId();
+        m_serverUuidByFakeUuid[server->getId()] = moduleInformation.id;
         qnResPool->addResource(server);
     } else {
         // update the resource
@@ -98,12 +99,18 @@ void QnIncompatibleServerAdder::at_reourcePool_resourceChanged(const QnResourceP
 
     Qn::ResourceStatus status = server->getStatus();
     if (status == Qn::Online)
-        removeResource(server->getId());
+        removeResource(m_fakeUuidByServerUuid[server->getId()]);
 }
 
 void QnIncompatibleServerAdder::removeResource(const QUuid &id) {
     if (id.isNull())
         return;
+
+    QUuid serverId = m_serverUuidByFakeUuid.take(id);
+    if (serverId.isNull())
+        return;
+
+    m_fakeUuidByServerUuid.remove(serverId);
 
     QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
     if (server)
