@@ -119,6 +119,10 @@ bool QnMediaServerUpdateTool::isUpdating() const {
     return m_state >= DownloadingUpdate;
 }
 
+bool QnMediaServerUpdateTool::idle() const {
+    return m_state == Idle;
+}
+
 void QnMediaServerUpdateTool::setState(State state) {
     if (m_state == state)
         return;
@@ -177,7 +181,7 @@ void QnMediaServerUpdateTool::setUpdateResult(QnMediaServerUpdateTool::UpdateRes
         m_resultString = tr("Could not upload updates to servers.");
         break;
     case ClientInstallationFailed:
-        m_resultString = tr("Could not install an pdate to the client.");
+        m_resultString = tr("Could not install an update to the client.");
         break;
     case InstallationFailed:
     case RestInstallationFailed:
@@ -300,9 +304,9 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl() const {
         systemInformationList = QSet<QnSystemInformation>::fromList(m_idBySystemInformation.keys());
     }
 
-    query.addQueryItem(lit("client"), QnSystemInformation::currentSystemInformation().toString().replace(QLatin1Char(' '), QLatin1Char('_')));
+    query.addQueryItem(lit("client"), QnSystemInformation::currentSystemInformation().toString().replace(L' ', L'_'));
     foreach (const QnSystemInformation &systemInformation, systemInformationList)
-        query.addQueryItem(lit("server"), systemInformation.toString().replace(QLatin1Char(' '), QLatin1Char('_')));
+        query.addQueryItem(lit("server"), systemInformation.toString().replace(L' ', L'_'));
 
     QUrl url(QN_UPDATE_PACKAGE_URL + versionSuffix);
     url.setQuery(query);

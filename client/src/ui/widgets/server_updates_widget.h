@@ -3,12 +3,16 @@
 
 #include <QtWidgets/QWidget>
 
+#include <array>
+
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 #include <ui_server_updates_widget.h>
+
 #include <utils/common/id.h>
+#include <utils/common/software_version.h>
 
 class QnServerUpdatesModel;
 class QnMediaServerUpdateTool;
@@ -27,9 +31,6 @@ public:
 
     QnMediaServerUpdateTool *updateTool() const;
 
-    bool isMinimalMode() const;
-    void setMinimalMode(bool minimalMode);
-
     virtual void updateFromSettings() override;
     virtual bool confirm() override;
     virtual bool discard() override;
@@ -37,24 +38,36 @@ public:
     void checkForUpdates();
 
 private slots:
-    void at_checkForUpdatesButton_clicked();
-    void at_installSpecificBuildButton_clicked();
-    void at_updateFromLocalSourceButton_clicked();
-    void at_updateButton_clicked();
-    void at_updateTool_peerChanged(const QUuid &peerId);
-    void at_extraMessageTimer_timeout();
-
     void updateUi();
 
 private:
+    void initMenu();
+
+private:
+    enum UpdateSource {
+        InternetSource,
+        LocalSource,
+        SpecificBuildSource,
+
+        UpdateSourceCount
+    };
+
     QScopedPointer<Ui::QnServerUpdatesWidget> ui;
-    bool m_minimalMode;
 
     QnServerUpdatesModel *m_updatesModel;
     QnMediaServerUpdateTool *m_updateTool;
     int m_previousToolState;
 
     QTimer *m_extraMessageTimer;
+
+    
+    struct {
+        UpdateSource source;
+        QString filename;
+        QnSoftwareVersion build;
+    } m_updateInfo;
+
+    std::array<QAction*, UpdateSourceCount> m_updateSourceActions;
 };
 
 #endif // SERVER_UPDATES_WIDGET_H

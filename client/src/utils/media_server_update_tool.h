@@ -81,6 +81,7 @@ public:
     State state() const;
 
     bool isUpdating() const;
+    bool idle() const;
 
     CheckResult updateCheckResult() const;
     UpdateResult updateResult() const;
