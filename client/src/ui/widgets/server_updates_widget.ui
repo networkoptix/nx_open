@@ -80,6 +80,13 @@
     </layout>
    </item>
    <item>
+    <widget class="QLabel" name="detailLabel">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QTableView" name="tableView"/>
    </item>
    <item>

@@ -114,13 +114,19 @@ bool QnCheckForUpdatesPeerTask::needUpdate(const QnSoftwareVersion &version, con
 }
 
 void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
+    if (m_updateFiles.isEmpty()) {
+        cleanUp();
+        finishTask(QnCheckForUpdateResult::BadUpdateFile);
+        return;
+    }
+
     bool needUpdate = false;
     foreach (const QUuid &peerId, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(peerId, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 
-        QnUpdateFileInformationPtr updateFileInformation = m_updateFiles[server->getSystemInfo()];
+        QnUpdateFileInformationPtr updateFileInformation = m_updateFiles.value(server->getSystemInfo(), QnUpdateFileInformationPtr());
         if (!updateFileInformation) {
             cleanUp();
             finishTask(QnCheckForUpdateResult::ServerUpdateImpossible);

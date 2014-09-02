@@ -244,40 +244,39 @@ void QnServerUpdatesWidget::updateUi() {
     switch (m_updateTool->state()) {
     case QnMediaServerUpdateTool::Idle:
         if (m_previousToolState == QnMediaServerUpdateTool::CheckingForUpdates) {
+            QPalette detailPalette = this->palette();
             switch (m_updateTool->updateCheckResult()) {
             case QnCheckForUpdateResult::UpdateFound:
-                if (!m_updateTool->targetVersion().isNull()) {
-                    // null version means we've got here for the first time after the dialog has been showed
-                    QString message = tr("Do you want to update your system to version %1?").arg(m_updateTool->targetVersion().toString());
-                    if (m_updateTool->isClientRequiresInstaller()) {
-                        message += lit("\n\n");
-                        message += tr("You will have to update the client manually using an installer.");
-                    }
-                }
+                if (!m_updateTool->targetVersion().isNull() && m_updateTool->isClientRequiresInstaller())
+                    ui->detailLabel->setText(tr("You will have to update the client manually using an installer."));
+                else
+                    ui->detailLabel->setText(QString());
                 break;
-            case QnCheckForUpdateResult::InternetProblem: {
-                //  tr("Check for updates failed.")
-                QnUpdateUrlDialog dialog;
-                dialog.setUpdatesUrl(m_updateTool->generateUpdatePackageUrl().toString());
-                dialog.exec();
+            case QnCheckForUpdateResult::InternetProblem:
+                ui->detailLabel->setText(m_updateTool->generateUpdatePackageUrl().toString());
                 break;
-                                                           }
             case QnCheckForUpdateResult::NoNewerVersion:
-                QMessageBox::information(this, tr("Update is not found"), tr("All component in your system are already up to date."));
+                ui->detailLabel->setText(tr("All components in your system are up to date."));
                 break;
             case QnCheckForUpdateResult::NoSuchBuild:
-                QMessageBox::critical(this, tr("Wrong build number"), tr("There is no such build on the update server"));
+                ui->detailLabel->setText(tr("There is no such build on the update server"));
+                setWarningStyle(&detailPalette);
                 break;
             case QnCheckForUpdateResult::ServerUpdateImpossible:
-                QMessageBox::critical(this, tr("Update is impossible"), tr("Cannot start update.\nAn update for one or more servers was not found."));
+                ui->detailLabel->setText(tr("Cannot start update. An update for one or more servers was not found."));
+                setWarningStyle(&detailPalette);
                 break;
             case QnCheckForUpdateResult::ClientUpdateImpossible:
-                QMessageBox::critical(this, tr("Update is impossible"), tr("Cannot start update.\nAn update for the client was not found."));
+                ui->detailLabel->setText(tr("Cannot start update. An update for the client was not found."));
+                setWarningStyle(&detailPalette);
                 break;
             case QnCheckForUpdateResult::BadUpdateFile:
-                QMessageBox::critical(this, tr("Update check failed"), tr("Cannot update from this file:\n%1").arg(m_updateInfo.filename));
+                ui->detailLabel->setText(tr("Cannot update from this file: %1").arg(m_updateInfo.filename));
+                setWarningStyle(&detailPalette);
                 break;
             }
+            ui->detailLabel->setVisible(!ui->detailLabel->text().isEmpty());
+            ui->detailLabel->setPalette(detailPalette);
         } else if (m_previousToolState > QnMediaServerUpdateTool::CheckingForUpdates) {
             switch (m_updateTool->updateResult()) {
             case QnMediaServerUpdateTool::UpdateSuccessful:
