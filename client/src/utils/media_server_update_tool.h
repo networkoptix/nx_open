@@ -55,17 +55,6 @@ public:
         InstallingUpdate,
     };
 
-    enum UpdateResult {
-        UpdateSuccessful,
-        Cancelled,
-        LockFailed,
-        DownloadingFailed,
-        UploadingFailed,
-        ClientInstallationFailed,
-        InstallationFailed,
-        RestInstallationFailed
-    };
-
     QnMediaServerUpdateTool(QObject *parent = 0);
     ~QnMediaServerUpdateTool();
 
@@ -75,7 +64,7 @@ public:
     bool idle() const;
 
     QnCheckForUpdateResult updateCheckResult() const;
-    UpdateResult updateResult() const;
+    QnUpdateResult updateResult() const;
 
     void updateServers();
 
@@ -96,10 +85,15 @@ public:
 
     bool isClientRequiresInstaller() const;
 
+    bool canStartUpdate() const;
+
 signals:
     void stateChanged(int state);
     void progressChanged(int progress);
     void peerChanged(const QUuid &peerId);
+
+    void checkForUpdatesFinished(QnCheckForUpdateResult result);
+    void updateFinished(QnUpdateResult result);
 
 public slots:
     void checkForUpdates(const QnSoftwareVersion &version = QnSoftwareVersion());
@@ -126,8 +120,8 @@ private slots:
 private:
     void setState(State state);
     void setCheckResult(QnCheckForUpdateResult result);
-    void setUpdateResult(UpdateResult result);
-    void finishUpdate(UpdateResult result);
+    void setUpdateResult(QnUpdateResult result);
+    void finishUpdate(QnUpdateResult result);
     void setPeerState(const QUuid &peerId, PeerUpdateInformation::State state);
     void removeTemporaryDir();
 
@@ -144,7 +138,7 @@ private:
     QThread *m_tasksThread;
     State m_state;
     QnCheckForUpdateResult m_checkResult;
-    UpdateResult m_updateResult;
+    QnUpdateResult m_updateResult;
 
     QString m_localTemporaryDir;
 

@@ -159,7 +159,7 @@ void QnConnectToCurrentSystemTool::at_updateTool_stateChanged(int state) {
             break;
         }
     } else if (m_prevToolState == Updating) {
-        m_updateFailed = (m_updateTool->updateResult() != QnMediaServerUpdateTool::UpdateSuccessful);
+        m_updateFailed = (m_updateTool->updateResult() != QnUpdateResult::Successful);
     }
 
     m_updateDialog->hide();

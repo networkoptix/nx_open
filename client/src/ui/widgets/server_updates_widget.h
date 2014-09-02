@@ -14,6 +14,8 @@
 #include <utils/common/id.h>
 #include <utils/common/software_version.h>
 
+#include <utils/updates_common.h>
+
 class QnServerUpdatesModel;
 class QnMediaServerUpdateTool;
 
@@ -40,6 +42,8 @@ public:
 private slots:
     void updateUi();
 
+    void at_checkForUpdatesFinished(QnCheckForUpdateResult result);
+    void at_updateFinished(QnUpdateResult result);
 private:
     void initMenu();
 
@@ -56,10 +60,8 @@ private:
 
     QnServerUpdatesModel *m_updatesModel;
     QnMediaServerUpdateTool *m_updateTool;
-    int m_previousToolState;
 
     QTimer *m_extraMessageTimer;
-
     
     struct {
         UpdateSource source;

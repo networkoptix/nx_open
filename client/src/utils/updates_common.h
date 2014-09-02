@@ -13,6 +13,17 @@ enum class QnCheckForUpdateResult {
     BadUpdateFile
 };
 
+enum class QnUpdateResult {
+    Successful,
+    Cancelled,
+    LockFailed,
+    DownloadingFailed,
+    UploadingFailed,
+    ClientInstallationFailed,
+    InstallationFailed,
+    RestInstallationFailed
+};
+
 
 struct QnUpdateFileInformation {
     QnSoftwareVersion version;

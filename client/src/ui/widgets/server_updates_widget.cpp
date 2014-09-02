@@ -66,6 +66,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     connect(m_updateTool,       &QnMediaServerUpdateTool::peerChanged,          this,           [this](const QUuid &peerId) {
         m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(peerId));
     });
+    connect(m_updateTool,       &QnMediaServerUpdateTool::checkForUpdatesFinished,  this, &QnServerUpdatesWidget::at_checkForUpdatesFinished);
+    connect(m_updateTool,       &QnMediaServerUpdateTool::updateFinished,           this, &QnServerUpdatesWidget::at_updateFinished);
 
     m_extraMessageTimer->setInterval(longInstallWarningTimeout);
     connect(m_extraMessageTimer, &QTimer::timeout, this, [this] {
@@ -73,13 +75,9 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
             ui->extraMessageLabel->show();
     });
 
-    m_previousToolState = m_updateTool->state();
-
-    ui->progressWidget->setText(tr("Checking for updates..."));
-
     setWarningStyle(ui->dayWarningLabel);
     static_assert(tooLateDayOfWeek <= Qt::Sunday, "In case of future days order change.");
-    ui->dayWarningLabel->setVisible(QDateTime::currentDateTime().date().dayOfWeek() >= tooLateDayOfWeek);
+    ui->dayWarningLabel->setVisible(false);
 
     
    initMenu();
@@ -238,6 +236,14 @@ void QnServerUpdatesWidget::updateUi() {
     if (!m_updateTool->targetVersion().isNull())
         ui->latestVersionLabel->setText(m_updateTool->targetVersion().toString());
 
+    ui->startUpdateButton->setVisible(m_updateTool->canStartUpdate() ||
+        m_updateTool->isUpdating());
+    ui->startUpdateButton->setEnabled(m_updateTool->canStartUpdate());
+
+    ui->dayWarningLabel->setVisible(QDateTime::currentDateTime().date().dayOfWeek() >= tooLateDayOfWeek 
+        && m_updateTool->canStartUpdate());
+
+    ui->updateProgessBar->setVisible(m_updateTool->isUpdating());
 
     bool checkingForUpdates = false;
     bool applying = false;
@@ -245,125 +251,40 @@ void QnServerUpdatesWidget::updateUi() {
     bool infiniteProgress = false;
     bool installing = false;
 
-    ui->detailLabel->setVisible(false);
-    ui->startUpdateButton->setVisible(false);
-
     switch (m_updateTool->state()) {
     case QnMediaServerUpdateTool::Idle:
-        if (m_previousToolState == QnMediaServerUpdateTool::CheckingForUpdates) {
-            QPalette detailPalette = this->palette();
-            switch (m_updateTool->updateCheckResult()) {
-            case QnCheckForUpdateResult::UpdateFound:
-                if (!m_updateTool->targetVersion().isNull() && m_updateTool->isClientRequiresInstaller())
-                    ui->detailLabel->setText(tr("You will have to update the client manually using an installer."));
-                else
-                    ui->detailLabel->setText(QString());
-                ui->startUpdateButton->setVisible(true);
-                break;
-            case QnCheckForUpdateResult::InternetProblem:
-                ui->detailLabel->setText(tr("Cannot check for updates via the Internet. "\
-                    "Click <a href=%1>here</a> to download updates manually.")
-                    .arg(m_updateTool->generateUpdatePackageUrl().toString()));
-                break;
-            case QnCheckForUpdateResult::NoNewerVersion:
-                ui->detailLabel->setText(tr("All components in your system are up to date."));
-                break;
-            case QnCheckForUpdateResult::NoSuchBuild:
-                ui->detailLabel->setText(tr("There is no such build on the update server"));
-                setWarningStyle(&detailPalette);
-                break;
-            case QnCheckForUpdateResult::ServerUpdateImpossible:
-                ui->detailLabel->setText(tr("Cannot start update. An update for one or more servers was not found."));
-                setWarningStyle(&detailPalette);
-                break;
-            case QnCheckForUpdateResult::ClientUpdateImpossible:
-                ui->detailLabel->setText(tr("Cannot start update. An update for the client was not found."));
-                setWarningStyle(&detailPalette);
-                break;
-            case QnCheckForUpdateResult::BadUpdateFile:
-                ui->detailLabel->setText(tr("Cannot update from this file: %1").arg(m_updateInfo.filename));
-                setWarningStyle(&detailPalette);
-                break;
-            }
-            ui->detailLabel->setVisible(!ui->detailLabel->text().isEmpty());
-            ui->detailLabel->setPalette(detailPalette);
-        } else if (m_previousToolState > QnMediaServerUpdateTool::CheckingForUpdates) {
-            switch (m_updateTool->updateResult()) {
-            case QnMediaServerUpdateTool::UpdateSuccessful:
-                {
-                    QString message = tr("Update has been successfully finished.");
-                    message += lit("\n");
-                    if (m_updateTool->isClientRequiresInstaller())
-                        message += tr("Now you have to update the client to the newer version using an installer.");
-                    else
-                        message += tr("The client will be restarted to the updated version.");
-
-                    QMessageBox::information(this, tr("Update is successful"), message);
-
-                    if (!m_updateTool->isClientRequiresInstaller()) {
-                        if (!applauncher::restartClient(m_updateTool->targetVersion()) == applauncher::api::ResultType::ok) {
-                            QMessageBox::critical(this,
-                                tr("Launcher process is not found"),
-                                tr("Cannot restart the client.\n"
-                                "Please close the application and start it again using the shortcut in the start menu."));
-                        } else {
-                            qApp->exit(0);
-                            applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);
-                        }
-                    }
-                    break;
-                }
-            case QnMediaServerUpdateTool::Cancelled:
-                QMessageBox::information(this, tr("Update cancelled"), tr("Update has been cancelled."));
-                break;
-            case QnMediaServerUpdateTool::LockFailed:
-                QMessageBox::critical(this, tr("Update failed"), tr("Someone has already started an update."));
-                break;
-            case QnMediaServerUpdateTool::DownloadingFailed:
-                QMessageBox::critical(this, tr("Update failed"), tr("Could not download updates."));
-                break;
-            case QnMediaServerUpdateTool::UploadingFailed:
-                QMessageBox::critical(this, tr("Update failed"), tr("Could not upload updates to servers."));
-                break;
-            case QnMediaServerUpdateTool::ClientInstallationFailed:
-                QMessageBox::critical(this, tr("Update failed"), tr("Could not install an update to the client."));
-                break;
-            case QnMediaServerUpdateTool::InstallationFailed:
-            case QnMediaServerUpdateTool::RestInstallationFailed:
-                QMessageBox::critical(this, tr("Update failed"), tr("Could not install updates on one or more servers."));
-                break;
-            }
-        }
         break;
     case QnMediaServerUpdateTool::CheckingForUpdates:
+        ui->detailLabel->setText(tr("Checking for updates..."));
+        infiniteProgress = true;
         checkingForUpdates = true;
         break;
     case QnMediaServerUpdateTool::DownloadingUpdate:
         applying = true;
         cancellable = true;
-        ui->updateStateLabel->setText(tr("Downloading updates"));
+        ui->detailLabel->setText(tr("Downloading updates"));
         break;
     case QnMediaServerUpdateTool::InstallingClientUpdate:
         applying = true;
         cancellable = true;
-        ui->updateStateLabel->setText(tr("Installing client update"));
+        ui->detailLabel->setText(tr("Installing client update"));
         infiniteProgress = true;
         break;
     case QnMediaServerUpdateTool::InstallingToIncompatiblePeers:
         applying = true;
         cancellable = true;
-        ui->updateStateLabel->setText(tr("Installing updates to incompatible servers"));
+        ui->detailLabel->setText(tr("Installing updates to incompatible servers"));
         break;
     case QnMediaServerUpdateTool::UploadingUpdate:
         applying = true;
         cancellable = true;
-        ui->updateStateLabel->setText(tr("Uploading updates to servers"));
+        ui->detailLabel->setText(tr("Pushing updates to servers"));
         break;
     case QnMediaServerUpdateTool::InstallingUpdate:
         applying = true;
         infiniteProgress = true;
         installing = true;
-        ui->updateStateLabel->setText(tr("Installing updates"));
+        ui->detailLabel->setText(tr("Installing updates"));
         break;
     default:
         break;
@@ -372,12 +293,7 @@ void QnServerUpdatesWidget::updateUi() {
     ui->cancelButton->setVisible(applying);
     ui->cancelButton->setEnabled(cancellable);
     ui->updateStateWidget->setVisible(applying);
-    ui->progressWidget->setVisible(checkingForUpdates);
-    ui->progressIndicator->setVisible(infiniteProgress);
-    ui->updateProgessBar->setVisible(!infiniteProgress);
-
-
-    m_previousToolState = m_updateTool->state();
+    ui->infiniteProgressWidget->setVisible(infiniteProgress); 
 
     if (installing) {
         m_extraMessageTimer->start();
@@ -404,4 +320,91 @@ bool QnServerUpdatesWidget::discard() {
     }
 
     return true;
+}
+
+void QnServerUpdatesWidget::at_checkForUpdatesFinished(QnCheckForUpdateResult result) {
+    QPalette detailPalette = this->palette();
+    QString detail;
+
+    switch (result) {
+    case QnCheckForUpdateResult::UpdateFound:
+        if (!m_updateTool->targetVersion().isNull() && m_updateTool->isClientRequiresInstaller())
+            detail = tr("You will have to update the client manually using an installer.");
+        break;
+    case QnCheckForUpdateResult::InternetProblem:
+        detail = tr("Cannot check for updates via the Internet. "\
+            "Click <a href=%1>here</a> to download updates manually.")
+            .arg(m_updateTool->generateUpdatePackageUrl().toString());
+        break;
+    case QnCheckForUpdateResult::NoNewerVersion:
+        detail = tr("All components in your system are up to date.");
+        break;
+    case QnCheckForUpdateResult::NoSuchBuild:
+        detail = tr("There is no such build on the update server");
+        setWarningStyle(&detailPalette);
+        break;
+    case QnCheckForUpdateResult::ServerUpdateImpossible:
+        detail = tr("Cannot start update. An update for one or more servers was not found.");
+        setWarningStyle(&detailPalette);
+        break;
+    case QnCheckForUpdateResult::ClientUpdateImpossible:
+        detail = tr("Cannot start update. An update for the client was not found.");
+        setWarningStyle(&detailPalette);
+        break;
+    case QnCheckForUpdateResult::BadUpdateFile:
+        detail = tr("Cannot update from this file: %1").arg(m_updateInfo.filename);
+        setWarningStyle(&detailPalette);
+        break;
+    }
+    ui->detailLabel->setVisible(!detail.isEmpty());
+    ui->detailLabel->setText(detail);
+    ui->detailLabel->setPalette(detailPalette);
+}
+
+void QnServerUpdatesWidget::at_updateFinished(QnUpdateResult result) {
+    switch (result) {
+    case QnUpdateResult::Successful:
+        {
+            QString message = tr("Update has been successfully finished.");
+            message += lit("\n");
+            if (m_updateTool->isClientRequiresInstaller())
+                message += tr("Now you have to update the client to the newer version using an installer.");
+            else
+                message += tr("The client will be restarted to the updated version.");
+
+            QMessageBox::information(this, tr("Update is successful"), message);
+
+            if (!m_updateTool->isClientRequiresInstaller()) {
+                if (!applauncher::restartClient(m_updateTool->targetVersion()) == applauncher::api::ResultType::ok) {
+                    QMessageBox::critical(this,
+                        tr("Launcher process is not found"),
+                        tr("Cannot restart the client.\n"
+                        "Please close the application and start it again using the shortcut in the start menu."));
+                } else {
+                    qApp->exit(0);
+                    applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);
+                }
+            }
+            break;
+        }
+    case QnUpdateResult::Cancelled:
+        QMessageBox::information(this, tr("Update cancelled"), tr("Update has been cancelled."));
+        break;
+    case QnUpdateResult::LockFailed:
+        QMessageBox::critical(this, tr("Update failed"), tr("Someone has already started an update."));
+        break;
+    case QnUpdateResult::DownloadingFailed:
+        QMessageBox::critical(this, tr("Update failed"), tr("Could not download updates."));
+        break;
+    case QnUpdateResult::UploadingFailed:
+        QMessageBox::critical(this, tr("Update failed"), tr("Could not push updates to servers."));
+        break;
+    case QnUpdateResult::ClientInstallationFailed:
+        QMessageBox::critical(this, tr("Update failed"), tr("Could not install an update to the client."));
+        break;
+    case QnUpdateResult::InstallationFailed:
+    case QnUpdateResult::RestInstallationFailed:
+        QMessageBox::critical(this, tr("Update failed"), tr("Could not install updates on one or more servers."));
+        break;
+    }
 }
