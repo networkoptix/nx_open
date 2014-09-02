@@ -87,7 +87,7 @@ bool QnCheckForUpdatesPeerTask::isClientRequiresInstaller() const {
 }
 
 void QnCheckForUpdatesPeerTask::setDenyMajorUpdates(bool denyMajorUpdates) {
-    m_disableClientUpdates = denyMajorUpdates;
+    m_denyMajorUpdates = denyMajorUpdates;
 }
 
 QHash<QnSystemInformation, QnUpdateFileInformationPtr> QnCheckForUpdatesPeerTask::updateFiles() const {
