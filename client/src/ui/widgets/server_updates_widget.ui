@@ -22,7 +22,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="versionLayout" stretch="0,0,1">
+    <layout class="QHBoxLayout" name="versionLayout" stretch="0,0,1,0">
      <item>
       <widget class="QPushButton" name="sourceButton">
        <property name="sizePolicy">
@@ -77,6 +77,13 @@
        </property>
        <property name="text">
         <string>Unknown</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="startUpdateButton">
+       <property name="text">
+        <string>Update</string>
        </property>
       </widget>
      </item>

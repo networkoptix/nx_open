@@ -54,7 +54,12 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::NameColumn, QHeaderView::Stretch);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::VersionColumn, QHeaderView::ResizeToContents);   
 
-    connect(ui->cancelButton,                       &QPushButton::clicked,      m_updateTool,   &QnMediaServerUpdateTool::cancelUpdate);
+    connect(ui->cancelButton,       &QPushButton::clicked,      m_updateTool,   &QnMediaServerUpdateTool::cancelUpdate);
+    connect(ui->startUpdateButton,  &QPushButton::clicked,      this, [this] {
+        if (!m_updateTool->idle())
+            return;
+        m_updateTool->updateServers();
+    });
 
     connect(m_updateTool,       &QnMediaServerUpdateTool::stateChanged,         this,           &QnServerUpdatesWidget::updateUi);
     connect(m_updateTool,       &QnMediaServerUpdateTool::progressChanged,      ui->updateProgessBar,   &QProgressBar::setValue);
@@ -240,6 +245,9 @@ void QnServerUpdatesWidget::updateUi() {
     bool infiniteProgress = false;
     bool installing = false;
 
+    ui->detailLabel->setVisible(false);
+    ui->startUpdateButton->setVisible(false);
+
     switch (m_updateTool->state()) {
     case QnMediaServerUpdateTool::Idle:
         if (m_previousToolState == QnMediaServerUpdateTool::CheckingForUpdates) {
@@ -250,6 +258,7 @@ void QnServerUpdatesWidget::updateUi() {
                     ui->detailLabel->setText(tr("You will have to update the client manually using an installer."));
                 else
                     ui->detailLabel->setText(QString());
+                ui->startUpdateButton->setVisible(true);
                 break;
             case QnCheckForUpdateResult::InternetProblem:
                 ui->detailLabel->setText(tr("Cannot check for updates via the Internet. "\
@@ -377,8 +386,6 @@ void QnServerUpdatesWidget::updateUi() {
         m_extraMessageTimer->stop();
     }
 
-//     if (startUpdate)
-//         m_updateTool->updateServers();
 }
 
 bool QnServerUpdatesWidget::confirm() {
