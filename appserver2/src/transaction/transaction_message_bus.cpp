@@ -470,7 +470,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
                         // proxy filler transaction to avoid gaps in the persistent sequence
                         QnTransaction<ApiFillerData> fillerTran(ApiCommand::updatePersistentSequence);
                         fillerTran.persistentInfo = tran.persistentInfo;
-                        transactionLog->saveTransaction(tran);
+                        transactionLog->saveTransaction(fillerTran);
                         proxyTransaction(fillerTran, transportHeader);
                     }
                     return; 
