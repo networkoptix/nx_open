@@ -206,6 +206,8 @@ namespace ec2
                     val == tranSyncResponse ||
                     val == runtimeInfoChanged ||
                     val == peerAliveInfo ||
+                    val == broadcastPeerSystemTime ||
+                    val == syncDoneMarker;
         }
 
         bool isPersistent( Value val )
