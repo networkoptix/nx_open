@@ -269,7 +269,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     foreach(const QnTranStateKey& key, m_state.values.keys())
     {
         QSqlQuery query(m_dbManager->getDB());
-        query.prepare("SELECT tran_data, sequence FROM transaction_log WHERE peer_guid = ? and db_guid = ? and sequence > ?  order by timestamp, peer_guid, db_guid, sequence");
+        query.prepare("SELECT tran_data, sequence FROM transaction_log WHERE peer_guid = ? and db_guid = ? and sequence > ?  order by sequence");
         query.addBindValue(key.peerID.toRfc4122());
         query.addBindValue(key.dbID.toRfc4122());
         query.addBindValue(state.values.value(key));
