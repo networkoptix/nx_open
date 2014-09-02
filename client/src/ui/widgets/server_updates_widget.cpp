@@ -14,7 +14,6 @@
 #include <ui/dialogs/file_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/build_number_dialog.h>
-#include <ui/dialogs/update_url_dialog.h>
 #include <ui/delegates/update_status_item_delegate.h>
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
