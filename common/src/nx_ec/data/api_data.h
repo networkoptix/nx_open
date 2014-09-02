@@ -21,12 +21,20 @@ struct ApiDatabaseDumpData: public ApiData {
 };
 #define ApiDatabaseDumpData_Fields (data)
 
-struct ApiFillerData: public ApiData 
+struct ApiSyncMarkerRecord: public ApiData
 {
-    ApiFillerData(): filler(0) {}
-    int filler;
+    ApiSyncMarkerRecord(): sequence(0) {}
+    QUuid peerID;
+    QUuid dbID;
+    int sequence;
 };
-#define ApiFillerData_Fields (filler)
+#define ApiSyncMarkerRecord_Fields (peerID)(dbID)(sequence)
+
+struct ApiSyncMarkerData: public ApiData 
+{
+    std::vector<ApiSyncMarkerRecord> markers;
+};
+#define ApiSyncMarkerData_Fields (markers)
 
 
 } // namespace ec2

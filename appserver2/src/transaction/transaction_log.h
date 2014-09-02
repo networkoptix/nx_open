@@ -193,7 +193,6 @@ namespace ec2
         QUuid transactionHash(const ApiResetBusinessRuleData& /*tran*/) const    { return makeHash("reset_brule", ADD_HASH_DATA); }
         QUuid transactionHash(const ApiCameraBookmarkTagDataList& params) const  { return makeHash("add_bookmark_tags", params); }
         QUuid transactionHash(const ApiDiscoveryDataList &params) const          { return makeHash("discovery_data_list", params); }
-        QUuid transactionHash(const ApiFillerData& ) const                       { return makeHash("filler_data"); }
         
         QUuid transactionHash(const ApiFullInfoData& ) const                   { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiCameraDataList& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
@@ -225,10 +224,10 @@ namespace ec2
         QUuid transactionHash(const ApiDatabaseDumpData& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiResourceData& ) const                   { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
-
+        ErrorCode updateSequence(const ApiSyncMarkerData& data);
     private:
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QUuid& hash, const QByteArray& data);
-        ErrorCode updateSequence(const QnAbstractTransaction& tran);
+        ErrorCode updateSequenceNoLock(const QUuid& peerID, const QUuid& dbID, int sequence);
     private:
         QnDbManager* m_dbManager;
         QnTranState m_state;

@@ -18,9 +18,10 @@ namespace ec2 {
     struct ApiCameraServerItemData;
     struct ApiEmailData;
     struct ApiEmailSettingsData;
-    struct ApiFullInfoData;
+	struct ApiFullInfoData;
+    struct ApiSyncMarkerRecord;
+    struct ApiSyncMarkerData;
     struct ApiIdData;
-    struct ApiFillerData;
     struct ApiLayoutItemData;
     struct ApiLayoutItemWithRefData;
     struct ApiLayoutData;
@@ -102,7 +103,8 @@ namespace ec2 {
     (ApiEmailSettingsData)\
     (ApiFullInfoData)\
     (ApiIdData)\
-    (ApiFillerData)\
+    (ApiSyncMarkerRecord)\
+    (ApiSyncMarkerData)\
     (ApiLayoutItemData)\
     (ApiLayoutItemWithRefData)\
     (ApiLayoutData)\

@@ -137,7 +137,7 @@ namespace ec2
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
             dumpDatabase                = 9005,  /*< ApiDatabaseDumpData */
             restoreDatabase             = 9006,  /*< ApiDatabaseDumpData */
-            syncDoneMarker              = 9009,  /*< ApiFillerData*/
+            syncDoneMarker              = 9009,  /*< ApiSyncMarkerData*/
 
             maxTransactionValue         = 65535
         };
