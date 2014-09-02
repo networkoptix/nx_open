@@ -186,7 +186,7 @@ bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
 void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout) {
     Q_D(QnLayoutSettingsDialog);
 
-    m_cache = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout) //TODO: #GDM #Common refactor duplicated code
+    m_cache = layout->hasFlags(Qn::url | Qn::local | Qn::layout) //TODO: #GDM #Common refactor duplicated code
             ? new QnLocalFileCache(this)
             : new QnAppServerImageCache(this);
     connect(m_cache, SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));

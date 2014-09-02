@@ -18,7 +18,7 @@ class QnAppserverResourceProcessor : public QObject, public QnResourceProcessor
     Q_OBJECT
 
 public:
-    QnAppserverResourceProcessor(QnId serverId);
+    QnAppserverResourceProcessor(QUuid serverId);
     virtual ~QnAppserverResourceProcessor();
 
     virtual bool isBusy() const override;
@@ -26,7 +26,7 @@ public:
 
 private:
     ec2::AbstractECConnectionPtr m_ec2Connection;
-    QnId m_serverId;
+    QUuid m_serverId;
     
     struct LockData 
     {

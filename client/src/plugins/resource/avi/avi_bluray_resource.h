@@ -11,7 +11,7 @@ public:
     QnAviBlurayResource(const QString& file);
     virtual ~QnAviBlurayResource();
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
     static bool isAcceptedUrl(const QString& url);
 
 protected:

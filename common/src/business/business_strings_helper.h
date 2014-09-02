@@ -48,6 +48,7 @@ public:
 
     static QString renderEventDetailsText(QVariantHash contextMap);
 
+    //TODO: #vasilenko isPublic field is not used, why?
     static QString motionUrl(const QnBusinessEventParameters &params, bool isPublic);
 private:
     /** Details of event: aggregation info, date and time, other info */

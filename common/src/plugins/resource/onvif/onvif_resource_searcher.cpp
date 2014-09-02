@@ -117,7 +117,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
             if (!resource->readDeviceInformation())
                 return resList; // no answer from camera
         }
-        else if (rpResource->getStatus() == QnResource::Offline)
+        else if (rpResource->getStatus() == Qn::Offline)
             return resList; // do not add 1..N channels if resource is offline
 
         resource->setPhysicalId(rpResource->getPhysicalId());
@@ -164,10 +164,10 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         }
 
         OnvifResourceInformationFetcher fetcher;
-        QnId rt = fetcher.getOnvifResourceType(manufacturer, modelName);
+        QUuid rt = fetcher.getOnvifResourceType(manufacturer, modelName);
         resource->setVendor( manufacturer );
         resource->setName( modelName );
-        //QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
+        //QUuid rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
         if (!rt.isNull())
             resource->setTypeId(rt);
 
@@ -221,7 +221,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     return result;
 }
 
-QnResourcePtr OnvifResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr OnvifResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnResourcePtr result;
 

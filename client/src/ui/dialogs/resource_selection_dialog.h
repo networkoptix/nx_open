@@ -50,7 +50,7 @@ protected:
 
 private slots:
     void at_resourceModel_dataChanged();
-    void at_thumbnailReady(QnId resourceId, const QPixmap &thumbnail);
+    void at_thumbnailReady(QUuid resourceId, const QPixmap &thumbnail);
 
     QModelIndex itemIndexAt(const QPoint &pos) const;
     void updateThumbnail(const QModelIndex &index);
@@ -62,7 +62,7 @@ private:
     QnResourceSelectionDialogDelegate* m_delegate;
     QnCameraThumbnailManager *m_thumbnailManager;
     SelectionTarget m_target;
-    QnId m_tooltipResourceId;
+    QUuid m_tooltipResourceId;
 
     int m_screenshotIndex;
 

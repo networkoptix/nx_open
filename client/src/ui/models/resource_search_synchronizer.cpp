@@ -230,10 +230,10 @@ void QnResourceSearchSynchronizer::at_model_rowsInserted(const QModelIndex &pare
             continue;
 
         // server widgets can be present in the tree but should not be present on the scene
-        if (resource->hasFlags(QnResource::server))
+        if (resource->hasFlags(Qn::server))
             continue;
         // layouts can be present in the tree but should not be present on the scene
-        if (resource->hasFlags(QnResource::layout))
+        if (resource->hasFlags(Qn::layout))
             continue;
 
         addModelResource(resource);

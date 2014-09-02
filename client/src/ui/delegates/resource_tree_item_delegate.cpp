@@ -80,7 +80,7 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
     decorationRect.moveLeft(decorationRect.left() - decorationRect.width());
     bool recording = false, scheduled = false;
     if(resource) {
-        if(resource->getStatus() == QnResource::Recording && resource.dynamicCast<QnVirtualCameraResource>())
+        if(resource->getStatus() == Qn::Recording && resource.dynamicCast<QnVirtualCameraResource>())
             recording = true;
 
         if(!recording)

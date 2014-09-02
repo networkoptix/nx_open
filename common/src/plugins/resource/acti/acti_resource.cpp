@@ -242,7 +242,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     QByteArray resolutions= makeActiRequest(QLatin1String("system"), QLatin1String("VIDEO_RESOLUTION_CAP"), status);
 
     if (status == CL_HTTP_AUTH_REQUIRED) 
-        setStatus(QnResource::Unauthorized);
+        setStatus(Qn::Unauthorized);
     if (status != CL_HTTP_SUCCESS)
         return CameraDiagnostics::UnknownErrorResult();
 
@@ -488,14 +488,14 @@ int QnActiResource::getMaxFps() const
     return m_availFps[0].last();
 }
 
-QSize QnActiResource::getResolution(QnResource::ConnectionRole role) const
+QSize QnActiResource::getResolution(Qn::ConnectionRole role) const
 {
-    return (role == QnResource::Role_LiveVideo ? m_resolution[0] : m_resolution[1]);
+    return (role == Qn::CR_LiveVideo ? m_resolution[0] : m_resolution[1]);
 }
 
-int QnActiResource::roundFps(int srcFps, QnResource::ConnectionRole role) const
+int QnActiResource::roundFps(int srcFps, Qn::ConnectionRole role) const
 {
-    QList<int> availFps = (role == QnResource::Role_LiveVideo ? m_availFps[0] : m_availFps[1]);
+    QList<int> availFps = (role == Qn::CR_LiveVideo ? m_availFps[0] : m_availFps[1]);
     int minDistance = INT_MAX;
     int result = srcFps;
     for (int i = 0; i < availFps.size(); ++i)

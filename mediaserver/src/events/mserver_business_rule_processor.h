@@ -5,6 +5,8 @@
 #include <business/actions/recording_business_action.h>
 #include "events_db.h"
 
+#include <core/resource/resource_fwd.h>
+
 /*
 * QnMServerBusinessRuleProcessor can execute business actions
 */
@@ -16,7 +18,7 @@ public:
     QnMServerBusinessRuleProcessor();
     virtual ~QnMServerBusinessRuleProcessor();
 
-    virtual QString getGuid() const override;
+    virtual QUuid getGuid() const override;
     
     /*
     * How long to keep event log in usecs

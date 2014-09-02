@@ -640,9 +640,9 @@ void QnResourceWidget::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay)
 }
 
 Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(int resourceStatus) const {
-    if (resourceStatus == QnResource::Offline) {
+    if (resourceStatus == Qn::Offline) {
         return Qn::OfflineOverlay;
-    } else if (resourceStatus == QnResource::Unauthorized) {
+    } else if (resourceStatus == Qn::Unauthorized) {
         return Qn::UnauthorizedOverlay;
     } else if(m_renderStatus == Qn::NewFrameRendered) {
         return Qn::EmptyOverlay;

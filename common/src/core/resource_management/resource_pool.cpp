@@ -97,14 +97,14 @@ void QnResourcePool::addResources(const QnResourceList &resources)
             }
             else
             {
-                resource->setId(QnId::createUuid());
+                resource->setId(QUuid::createUuid());
             }
         }
 
         resource->setResourcePool(this);
     }
 
-    QMap<QnId, QnResourcePtr> newResources; // sort by id
+    QMap<QUuid, QnResourcePtr> newResources; // sort by id
 
     foreach (const QnResourcePtr &resource, resources)
     {
@@ -127,9 +127,9 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),    this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
 
-        if (!resource->hasFlags(QnResource::foreigner))
+        if (!resource->hasFlags(Qn::foreigner))
         {
-            if (resource->getStatus() != QnResource::Offline)
+            if (resource->getStatus() != Qn::Offline)
                 resource->initAsync(false);
         }
 
@@ -159,7 +159,7 @@ namespace
     class MatchResourceByID
     {
     public:
-        MatchResourceByID( const QnId& _idToFind )
+        MatchResourceByID( const QUuid& _idToFind )
         :
             idToFind( _idToFind )
         {
@@ -171,7 +171,7 @@ namespace
         }
 
     private:
-        QnId idToFind;
+        QUuid idToFind;
     };
 }
 
@@ -241,7 +241,7 @@ QnResourceList QnResourcePool::getResources() const
     return m_resources.values();
 }
 
-QnResourcePtr QnResourcePool::getResourceById(const QnId &id) const {
+QnResourcePtr QnResourcePool::getResourceById(const QUuid &id) const {
     QMutexLocker locker(&m_resourcesMtx);
 
     QHash<QString, QnResourcePtr>::const_iterator resIter = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByID(id) );
@@ -303,7 +303,7 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac)
 
 QnResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer) const 
 {
-    QnId parentId = mServer ? mServer->getId() : QnId();
+    QUuid parentId = mServer ? mServer->getId() : QUuid();
     QnResourceList result;
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) 
@@ -330,7 +330,7 @@ QnMediaServerResourceList QnResourcePool::getAllServers() const
     return result;
 }
 
-QnResourceList QnResourcePool::getResourcesByParentId(const QnId& parentId) const
+QnResourceList QnResourcePool::getResourcesByParentId(const QUuid& parentId) const
 {
     QnResourceList result;
     QMutexLocker locker(&m_resourcesMtx);
@@ -411,7 +411,7 @@ bool QnResourcePool::hasSuchResource(const QString &uniqid) const
     return !getResourceByUniqId(uniqid).isNull();
 }
 
-QnResourceList QnResourcePool::getResourcesWithFlag(QnResource::Flag flag) const
+QnResourceList QnResourcePool::getResourcesWithFlag(Qn::ResourceFlag flag) const
 {
     QnResourceList result;
 
@@ -423,11 +423,11 @@ QnResourceList QnResourcePool::getResourcesWithFlag(QnResource::Flag flag) const
     return result;
 }
 
-QnResourceList QnResourcePool::getResourcesWithParentId(QnId id) const
+QnResourceList QnResourcePool::getResourcesWithParentId(QUuid id) const
 {
     QMutexLocker locker(&m_resourcesMtx);
 
-    // TODO: #Elrik cache it, but remember that id and parentId of a resource may change
+    // TODO: #Elric cache it, but remember that id and parentId of a resource may change
     // while it's in the pool.
 
     QnResourceList result;
@@ -437,7 +437,7 @@ QnResourceList QnResourcePool::getResourcesWithParentId(QnId id) const
     return result;
 }
 
-QnResourceList QnResourcePool::getResourcesWithTypeId(QnId id) const
+QnResourceList QnResourcePool::getResourcesWithTypeId(QUuid id) const
 {
     QMutexLocker locker(&m_resourcesMtx);
 
@@ -480,7 +480,7 @@ int QnResourcePool::activeCamerasByLicenseType(Qn::LicenseType licenseType) cons
         if (camera && !camera->isScheduleDisabled()) 
         {
             QnMediaServerResourcePtr mServer = getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
-            if (mServer && mServer->getStatus() != QnResource::Offline)
+            if (mServer && mServer->getStatus() != Qn::Offline)
             {
                 if (camera->licenseType() == licenseType)
                     count++;

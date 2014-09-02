@@ -117,7 +117,7 @@ public:
         QnResourceList cameras,
         QnBusiness::EventType eventType, 
         QnBusiness::ActionType actionType,
-        QnId businessRuleId, 
+        QUuid businessRuleId, 
         QObject *target, 
         const char *slot);
 
@@ -196,7 +196,7 @@ public:
         \returns Request handle
     */
     int doCameraDiagnosticsStepAsync(
-        const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
+        const QUuid& cameraID, CameraDiagnostics::Step::Value previousStep,
         QObject* target, const char* slot );
 
     /**

@@ -67,7 +67,7 @@ private:
     QnModuleFinder* m_moduleFinder;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
-    QSet<QnId> m_updateUserRequests;
+    QSet<QUuid> m_updateUserRequests;
 };
 
 #endif // MAIN_H

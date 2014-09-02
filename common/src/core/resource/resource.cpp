@@ -25,8 +25,6 @@
 #include "utils/common/util.h"
 #include "resource_command.h"
 
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnResource, Status)
-
 bool QnResource::m_appStopping = false;
 QnInitResPool QnResource::m_initAsyncPool;
 
@@ -108,7 +106,7 @@ QnResource::QnResource():
     m_initMutex(QMutex::Recursive),
     m_resourcePool(NULL),
     m_flags(0),
-    m_status(NotDefined),
+    m_status(Qn::NotDefined),
     m_initialized(false),
     m_lastInitTime(0),
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
@@ -205,7 +203,7 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode)
         updateInner(other, modifiedFields);
     }
 
-    silenceMode |= other->hasFlags(QnResource::foreigner);
+    silenceMode |= other->hasFlags(Qn::foreigner);
     setStatus(other->m_status, silenceMode);
     afterUpdateInner(modifiedFields);
 
@@ -227,16 +225,16 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode)
         consumer->afterUpdate();
 }
 
-QnId QnResource::getParentId() const
+QUuid QnResource::getParentId() const
 {
     QMutexLocker locker(&m_mutex);
     return m_parentId;
 }
 
-void QnResource::setParentId(QnId parent)
+void QnResource::setParentId(QUuid parent)
 {
     bool initializedChanged = false;
-    QnId oldParentId;
+    QUuid oldParentId;
     {
         QMutexLocker locker(&m_mutex);
         if (m_parentId == parent)
@@ -277,13 +275,13 @@ void QnResource::setName(const QString& name)
     emit nameChanged(toSharedPointer(this));
 }
 
-QnResource::Flags QnResource::flags() const
+Qn::ResourceFlags QnResource::flags() const
 {
     //QMutexLocker mutexLocker(&m_mutex);
     return m_flags;
 }
 
-void QnResource::setFlags(Flags flags)
+void QnResource::setFlags(Qn::ResourceFlags flags)
 {
     {
         QMutexLocker mutexLocker(&m_mutex);
@@ -296,7 +294,7 @@ void QnResource::setFlags(Flags flags)
     emit flagsChanged(toSharedPointer(this));
 }
 
-void QnResource::addFlags(Flags flags)
+void QnResource::addFlags(Qn::ResourceFlags flags)
 {
     {
         QMutexLocker mutexLocker(&m_mutex);
@@ -309,7 +307,7 @@ void QnResource::addFlags(Flags flags)
     emit flagsChanged(toSharedPointer(this));
 }
 
-void QnResource::removeFlags(Flags flags)
+void QnResource::removeFlags(Qn::ResourceFlags flags)
 {
     {
         QMutexLocker mutexLocker(&m_mutex);
@@ -334,7 +332,7 @@ QString QnResource::toSearchString() const
 
 QnResourcePtr QnResource::getParentResource() const
 {
-    QnId parentID;
+    QUuid parentID;
     QnResourcePool* resourcePool = NULL;
     {
         QMutexLocker mutexLocker(&m_mutex);
@@ -355,7 +353,7 @@ QnParamList QnResource::getResourceParamList() const
     
     if (!m_resourceParamList.isEmpty())
         return m_resourceParamList;
-    QnId resTypeId = m_typeId;
+    QUuid resTypeId = m_typeId;
     
     QnParamList resourceParamList;
 
@@ -535,13 +533,13 @@ bool QnResource::unknownResource() const
     return getName().isEmpty();
 }
 
-QnId QnResource::getTypeId() const
+QUuid QnResource::getTypeId() const
 {
     QMutexLocker mutexLocker(&m_mutex);
     return m_typeId;
 }
 
-void QnResource::setTypeId(QnId id)
+void QnResource::setTypeId(QUuid id)
 {
     QMutexLocker mutexLocker(&m_mutex);
     m_typeId = id;
@@ -554,20 +552,18 @@ void QnResource::setTypeByName(const QString& resTypeName)
         setTypeId(resType->getId());
 }
 
-QnResource::Status QnResource::getStatus() const
+Qn::ResourceStatus QnResource::getStatus() const
 {
     QMutexLocker mutexLocker(&m_mutex);
     return m_status;
 }
 
-void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
+void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
 {
-    if (newStatus == QnResource::NotDefined)
-    {
+    if (newStatus == Qn::NotDefined)
         return;
-    }
 
-    Status oldStatus;
+    Qn::ResourceStatus oldStatus;
     {
         QMutexLocker mutexLocker(&m_mutex);
         oldStatus = m_status;
@@ -588,14 +584,14 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
     qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
 #endif
 
-    if (newStatus == Offline || newStatus == Unauthorized) {
+    if (newStatus == Qn::Offline || newStatus == Qn::Unauthorized) {
         if(m_initialized) {
             m_initialized = false;
             emit initializedChanged(toSharedPointer(this));
         }
     }
 
-    if (oldStatus == Offline && newStatus == Online && !hasFlags(foreigner))
+    if (oldStatus == Qn::Offline && newStatus == Qn::Online && !hasFlags(Qn::foreigner))
         init();
 
 
@@ -630,19 +626,19 @@ void QnResource::setLastDiscoveredTime(const QDateTime &time)
     m_lastDiscoveredTime = time;
 }
 
-QnId QnResource::getId() const
+QUuid QnResource::getId() const
 {
     QMutexLocker mutexLocker(&m_mutex);
     return m_id;
 }
 
-void QnResource::setId(const QnId& id) {
+void QnResource::setId(const QUuid& id) {
     QMutexLocker mutexLocker(&m_mutex);
 
     if(m_id == id)
         return;
 
-    //QnId oldId = m_id;
+    //QUuid oldId = m_id;
     m_id = id;
 }
 
@@ -747,7 +743,7 @@ void QnResource::disconnectAllConsumers()
 }
 
 #ifdef ENABLE_DATA_PROVIDERS
-QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role)
+QnAbstractStreamDataProvider* QnResource::createDataProvider(Qn::ConnectionRole role)
 {
     QnAbstractStreamDataProvider* dataProvider = createDataProviderInternal(role);
 
@@ -757,7 +753,7 @@ QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role
     return dataProvider;
 }
 
-QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(ConnectionRole)
+QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(Qn::ConnectionRole)
 {
     return NULL;
 }
@@ -870,8 +866,8 @@ bool QnResource::init()
     bool changed = m_initialized;
     if(m_initialized) {
         initializationDone();
-    } else if (getStatus() == Online || getStatus() == Recording) {
-        setStatus(Offline);
+    } else if (getStatus() == Qn::Online || getStatus() == Qn::Recording) {
+        setStatus(Qn::Offline);
     }
 
     m_initMutex.unlock();

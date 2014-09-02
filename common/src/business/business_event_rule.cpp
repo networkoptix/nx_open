@@ -21,11 +21,11 @@ QnBusinessEventRule::~QnBusinessEventRule() {
 
 }
 
-QnId QnBusinessEventRule::id() const {
+QUuid QnBusinessEventRule::id() const {
     return m_id;
 }
 
-void QnBusinessEventRule::setId(const QnId& value) {
+void QnBusinessEventRule::setId(const QUuid& value) {
     m_id = value;
 }
 
@@ -38,14 +38,14 @@ void QnBusinessEventRule::setEventType(QnBusiness::EventType eventType) {
 }
 
 
-QVector<QnId> QnBusinessEventRule::eventResources() const {
+QVector<QUuid> QnBusinessEventRule::eventResources() const {
     return m_eventResources;
 }
 
 QnResourceList QnBusinessEventRule::eventResourceObjects() const 
 {
     QnResourceList result;
-    foreach(const QnId& id, m_eventResources) {
+    foreach(const QUuid& id, m_eventResources) {
         QnResourcePtr res = qnResPool->getResourceById(id);
         if (res)
             result << res;
@@ -53,7 +53,7 @@ QnResourceList QnBusinessEventRule::eventResourceObjects() const
     return result;
 }
 
-void QnBusinessEventRule::setEventResources(const QVector<QnId> &value) {
+void QnBusinessEventRule::setEventResources(const QVector<QUuid> &value) {
     m_eventResources = value;
 }
 
@@ -83,14 +83,14 @@ void QnBusinessEventRule::setActionType(QnBusiness::ActionType actionType) {
     //TODO: #GDM #Business fill action params with default values? filter action resources?
 }
 
-QVector<QnId> QnBusinessEventRule::actionResources() const {
+QVector<QUuid> QnBusinessEventRule::actionResources() const {
     return m_actionResources;
 }
 
 QnResourceList QnBusinessEventRule::actionResourceObjects() const 
 {
     QnResourceList result;
-    foreach(const QnId& id, m_actionResources) {
+    foreach(const QUuid& id, m_actionResources) {
         QnResourcePtr res = qnResPool->getResourceById(id);
         if (res)
             result << res;
@@ -98,7 +98,7 @@ QnResourceList QnBusinessEventRule::actionResourceObjects() const
     return result;
 }
 
-void QnBusinessEventRule::setActionResources(const QVector<QnId> &value) {
+void QnBusinessEventRule::setActionResources(const QVector<QUuid> &value) {
     m_actionResources = value;
 }
 
@@ -215,7 +215,7 @@ QnBusinessEventRule* QnBusinessEventRule::clone()
     return newRule;
 }
 
-void QnBusinessEventRule::removeResource(const QnId& resId)
+void QnBusinessEventRule::removeResource(const QUuid& resId)
 {
     for (int i = m_actionResources.size() - 1; i >= 0; --i)
     {

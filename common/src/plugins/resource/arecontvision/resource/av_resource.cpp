@@ -349,7 +349,7 @@ bool QnPlAreconVisionResource::getParamPhysical(const QnParam &param, QVariant &
 
     CLHttpStatus status = connection.doGET(request);
     if (status == CL_HTTP_AUTH_REQUIRED)
-        setStatus(QnResource::Unauthorized);
+        setStatus(Qn::Unauthorized);
 
     if (status != CL_HTTP_SUCCESS)
         return false;
@@ -395,7 +395,7 @@ bool QnPlAreconVisionResource::setParamPhysical(const QnParam &param, const QVar
 
     if (CL_HTTP_AUTH_REQUIRED == status)
     {
-        setStatus(QnResource::Unauthorized);
+        setStatus(Qn::Unauthorized);
         return false;
     }
 
@@ -404,7 +404,7 @@ bool QnPlAreconVisionResource::setParamPhysical(const QnParam &param, const QVar
 
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString &name)
 {
-    QnId rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, name);
+    QUuid rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, name);
     if (rt.isNull())
     {
         if ( name.left(2).toLower() == lit("av") )
@@ -423,7 +423,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const Q
 
 }
 
-QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId rt)
+QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QUuid rt)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(rt);
 

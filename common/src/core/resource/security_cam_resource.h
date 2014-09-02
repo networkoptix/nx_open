@@ -17,7 +17,7 @@ class QnDataProviderFactory {
 public:
     virtual ~QnDataProviderFactory() {}
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, QnResource::ConnectionRole role) = 0;
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role) = 0;
 };
 
 
@@ -229,7 +229,7 @@ protected:
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
 #ifdef ENABLE_DATA_PROVIDERS
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role) override;
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role) override;
 #endif
 
     virtual void initializationDone() override;

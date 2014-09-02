@@ -16,11 +16,11 @@ public:
     //QnResourceType(const QString& name);
     virtual ~QnResourceType();
 
-    void setId(const QnId& value) { m_id = value; }
-    QnId getId() const { return m_id;}
+    void setId(const QUuid& value) { m_id = value; }
+    QUuid getId() const { return m_id;}
 
-    void setParentId(const QnId &value);
-    QnId getParentId() const { return m_parentId;}
+    void setParentId(const QUuid &value);
+    QUuid getParentId() const { return m_parentId;}
 
     void setName(const QString& value) { m_name = value; }
     QString getName() const { return m_name;}
@@ -30,19 +30,19 @@ public:
 
     bool isCamera() const;
 
-    void addAdditionalParent(QnId parent);
-    QList<QnId> allParentList() const;
+    void addAdditionalParent(QUuid parent);
+    QList<QUuid> allParentList() const;
 
     void addParamType(QnParamTypePtr param);
 
     const QList<QnParamTypePtr>& paramTypeList() const;
 
 private:
-    QnId m_id;
-    QnId m_parentId;
+    QUuid m_id;
+    QUuid m_parentId;
     QString m_name;
     QString m_manufacture;
-    QList<QnId> m_additionalParentList;
+    QList<QUuid> m_additionalParentList;
 
     typedef QList<QnParamTypePtr> ParamTypeList;
     ParamTypeList m_paramTypeList;
@@ -59,21 +59,21 @@ Q_DECLARE_METATYPE(QnResourceTypeList)
 class QN_EXPORT QnResourceTypePool
 {
 public:
-    typedef QMap<QnId, QnResourceTypePtr> QnResourceTypeMap;
+    typedef QMap<QUuid, QnResourceTypePtr> QnResourceTypeMap;
 
     static QnResourceTypePool *instance();
 
     QnResourceTypePtr getResourceTypeByName(const QString& name) const;
-    QnResourceTypePtr getResourceType(QnId id) const;
+    QnResourceTypePtr getResourceType(QUuid id) const;
     void addResourceType(QnResourceTypePtr resourceType);
     void addResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
     void replaceResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
 
     /* exact match name */
-    QnId getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning = true) const;
+    QUuid getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning = true) const;
 
     /* match name using like operation */
-    QnId getLikeResourceTypeId(const QString& manufacture, const QString& name) const;
+    QUuid getLikeResourceTypeId(const QString& manufacture, const QString& name) const;
 
     QnResourceTypeMap getResourceTypeMap() const;
 

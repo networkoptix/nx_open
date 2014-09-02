@@ -11,7 +11,7 @@
 #include "api/common_message_processor.h"
 #include "mutex/camera_data_handler.h"
 
-QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
+QnAppserverResourceProcessor::QnAppserverResourceProcessor(QUuid serverId)
     : m_serverId(serverId)
 {
     m_cameraDataHandler = new ec2::QnMutexCameraDataHandler();
@@ -49,7 +49,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
         // previous comment: camera MUST be in the pool already;
         // but now (new version) camera NOT in resource pool!
-        resource->setStatus(QnResource::Online, true); // set status in silence mode. Do not send any signals e.t.c
+        resource->setStatus(Qn::Online, true); // set status in silence mode. Do not send any signals e.t.c
 
         QString password = cameraResource->getAuth().password();
 

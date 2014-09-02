@@ -212,7 +212,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
     bool gotFrame = false;
 
     if (time == DATETIME_NOW) {
-        if (res->getStatus() == QnResource::Online || res->getStatus() == QnResource::Recording)
+        if (res->getStatus() == Qn::Online || res->getStatus() == Qn::Recording)
         {
             gotFrame = decoder.decode(video, &outFrame);
             if (!gotFrame)

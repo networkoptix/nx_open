@@ -27,7 +27,7 @@ namespace ec2
 
     struct ApiScheduleTaskWithRefData: ApiScheduleTaskData
     {
-        QnId sourceId;
+        QUuid sourceId;
     };
 #define ApiScheduleTaskWithRefData_Fields ApiScheduleTaskData_Fields (sourceId)
 

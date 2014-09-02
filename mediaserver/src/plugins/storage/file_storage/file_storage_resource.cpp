@@ -115,7 +115,7 @@ bool QnFileStorageResource::isStorageAvailableForWriting()
     if( !isStorageDirMounted() )
         return false;
 
-    if (hasFlags(deprecated))
+    if (hasFlags(Qn::deprecated))
         return false;
 
     QDir dir(getUrl());

@@ -6,8 +6,8 @@ QnAbstractArchiveResource::QnAbstractArchiveResource()
 {
     QnMediaResource::initMediaResource();
 
-    addFlags(QnResource::ARCHIVE);
-    setStatus(Online, true);
+    addFlags(Qn::ARCHIVE);
+    setStatus(Qn::Online, true);
 }
 
 QnAbstractArchiveResource::~QnAbstractArchiveResource()
@@ -26,7 +26,7 @@ void QnAbstractArchiveResource::setUniqId(const QString& value)
 }
 
 
-void QnAbstractArchiveResource::setStatus(QnResource::Status newStatus, bool silenceMode)
+void QnAbstractArchiveResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
 {
     QnResource::setStatus(newStatus, silenceMode);
     return;

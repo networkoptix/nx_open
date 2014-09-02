@@ -10,7 +10,7 @@ namespace ec2 {
     };
 
     struct ApiIdData: ApiData {
-        QnId id;
+        QUuid id;
     };
 #define ApiIdData_Fields (id)
 

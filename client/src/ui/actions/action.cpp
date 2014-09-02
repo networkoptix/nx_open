@@ -5,6 +5,8 @@
 #include <QtWidgets/QGraphicsWidget>
 
 #include <utils/common/warnings.h>
+
+#include <core/resource/media_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -161,9 +163,11 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
             if(parameters.hasArgument(key)) {
                 resources = QnActionParameterTypes::resources(parameters.argument(key));
             } else if(key == Qn::CurrentLayoutResourceRole) {
-                resources.push_back(context()->workbench()->currentLayout()->resource());
+                if (QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource())
+                    resources.push_back(layout);
             } else if(key == Qn::CurrentUserResourceRole) {
-                resources.push_back(context()->user());
+                if (QnUserResourcePtr user = context()->user())
+                    resources.push_back(user);
             } else if(key == Qn::CurrentMediaServerResourcesRole) {
                 resources = context()->resourcePool()->getResources().filtered<QnMediaServerResource>();
             } else if(key == Qn::CurrentLayoutMediaItemsRole) {
@@ -173,7 +177,6 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
                     if( res.dynamicCast<QnMediaResource>() )
                         resources.push_back( res );
                 }
-                //resources = QnActionParameterTypes::resources(context()->display()->widgets()).filtered<QnMediaResource>();
             }
 
             if((accessController()->permissions(resources) & required) != required)

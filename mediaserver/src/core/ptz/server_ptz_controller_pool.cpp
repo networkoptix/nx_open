@@ -35,7 +35,7 @@ void QnServerPtzControllerPool::unregisterResource(const QnResourcePtr &resource
 }
 
 QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourcePtr &resource) const {
-    if(resource->flags() & QnResource::foreigner)
+    if(resource->flags() & Qn::foreigner)
         return QnPtzControllerPtr(); /* That's not our resource! */
 
     if(!resource->isInitialized())

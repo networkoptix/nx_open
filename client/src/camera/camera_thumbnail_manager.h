@@ -18,7 +18,7 @@ public:
     void selectResource(const QnResourcePtr &resource);
     void setThumbnailSize(const QSize &size);
 signals:
-    void thumbnailReady(const QnId &resourceId, const QPixmap& thumbnail);
+    void thumbnailReady(const QUuid &resourceId, const QPixmap& thumbnail);
 
 private slots:
     void at_resPool_statusChanged(const QnResourcePtr &resource);
@@ -26,7 +26,7 @@ private slots:
     void at_thumbnailReceived(int status, const QImage& thumbnail, int handle);
 
 private:
-    Q_SIGNAL void thumbnailReadyDelayed(const QnId &resourceId, const QPixmap& thumbnail);
+    Q_SIGNAL void thumbnailReadyDelayed(const QUuid &resourceId, const QPixmap& thumbnail);
     enum ThumbnailStatus {
         None,
         Loading,

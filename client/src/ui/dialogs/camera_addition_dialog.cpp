@@ -170,7 +170,7 @@ void QnCameraAdditionDialog::setServer(const QnMediaServerResourcePtr &server) {
 
     m_server = server;
     if (server) {
-        setState(server->getStatus() == QnResource::Offline
+        setState(server->getStatus() == Qn::Offline
                  ? InitialOffline
                  : Initial);
 
@@ -371,7 +371,7 @@ void QnCameraAdditionDialog::updateSubnetMode() {
 }
 
 bool QnCameraAdditionDialog::serverOnline() const {
-    return m_server && m_server->getStatus() != QnResource::Offline;
+    return m_server && m_server->getStatus() != Qn::Offline;
 }
 
 bool QnCameraAdditionDialog::ensureServerOnline() {
@@ -643,7 +643,7 @@ void QnCameraAdditionDialog::at_backToScanButton_clicked() {
         return;
     }
 
-    setState(m_server->getStatus() == QnResource::Offline
+    setState(m_server->getStatus() == Qn::Offline
              ? InitialOffline
              : Initial);
 }
@@ -664,7 +664,7 @@ void QnCameraAdditionDialog::at_server_statusChanged(const QnResourcePtr &resour
     if (resource != m_server)
         return;
 
-    if (resource->getStatus() == QnResource::Offline) {
+    if (resource->getStatus() == Qn::Offline) {
         switch (m_state) {
         case Initial:
             setState(InitialOffline);

@@ -52,7 +52,7 @@ public slots:
 protected:
     class FoundModuleData {
     public:
-        QString seed;
+        QUuid seed;
         QString url;
         QList<QString> ipAddresses;
         TypeSpecificParamMap params;

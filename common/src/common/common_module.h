@@ -3,6 +3,8 @@
 
 #include <QUuid>
 #include <QtCore/QObject>
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
 
 #include <utils/common/singleton.h>
 #include <utils/common/instance_storage.h>

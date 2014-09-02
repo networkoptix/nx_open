@@ -56,11 +56,11 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 
-    //setRole(QnResource::Role_SecondaryLiveVideo);
+    //setRole(Qn::CR_SecondaryLiveVideo);
     m_rtpReader.setRole(getRole());
 
     //==== init if needed
-    QnResource::ConnectionRole role = getRole();
+    Qn::ConnectionRole role = getRole();
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
     if (!res->getCamInfo().inited())
     {
@@ -84,7 +84,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        getResource()->setStatus(QnResource::Unauthorized);
+        getResource()->setStatus(Qn::Unauthorized);
         QUrl requestedUrl;
         requestedUrl.setHost( res->getHostAddress() );
         requestedUrl.setPort( 80 );
@@ -104,7 +104,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
     }
 
     if (!isCameraControlDisabled()) {
-        if (role != QnResource::Role_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
+        if (role != Qn::CR_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
         {
             res->setMotionMaskPhysical(0);
         }
@@ -116,13 +116,13 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
     //if (m_h264) //look_for_this_comment
     {
         QnDlink_cam_info info = res->getCamInfo();
-        if (info.videoProfileUrls.size() < 2 && role == QnResource::Role_SecondaryLiveVideo)
+        if (info.videoProfileUrls.size() < 2 && role == Qn::CR_SecondaryLiveVideo)
         {
             qWarning() << "No dualstreaming for DLink camera " << m_resource->getUrl() << ". Ignore second url request";
             return CameraDiagnostics::NoErrorResult();
         }
 
-        const int dlinkProfile = role == QnResource::Role_SecondaryLiveVideo ? 2 : 1;
+        const int dlinkProfile = role == Qn::CR_SecondaryLiveVideo ? 2 : 1;
         QString url =  getRTPurl( dlinkProfile );
         if (url.isEmpty())
         {
@@ -148,7 +148,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
         }
 
 
-        QString url = (role == QnResource::Role_SecondaryLiveVideo) ? info.videoProfileUrls[2] : info.videoProfileUrls[1];
+        QString url = (role == Qn::CR_SecondaryLiveVideo) ? info.videoProfileUrls[2] : info.videoProfileUrls[1];
 
         if (url.length() > 1 && url.at(0)==QLatin1Char('/'))
             url = url.mid(1);
@@ -282,12 +282,12 @@ QString PlDlinkStreamReader::composeVideoProfile()
     if (!info.inited())
         return QString();
 
-    QnResource::ConnectionRole role = getRole();
+    Qn::ConnectionRole role = getRole();
 
     int profileNum;
     QSize resolution;
 
-    if (role == QnResource::Role_SecondaryLiveVideo)
+    if (role == Qn::CR_SecondaryLiveVideo)
     {
         profileNum = 2;
         resolution = info.secondaryStreamResolution();
@@ -505,7 +505,7 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        res->setStatus(QnResource::Unauthorized);
+        res->setStatus(Qn::Unauthorized);
         return QnMetaDataV1Ptr(0);
     }
 

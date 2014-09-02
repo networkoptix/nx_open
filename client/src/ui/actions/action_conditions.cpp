@@ -132,7 +132,7 @@ Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetLi
     if(widgets.size() != 1 || !widgets[0])
         return Qn::InvisibleAction;
 
-    if (widgets[0]->resource()->flags() & QnResource::videowall)
+    if (widgets[0]->resource()->flags() & Qn::videowall)
         return Qn::InvisibleAction;
 
     return ((widgets[0]->item() == workbench()->item(Qn::ZoomedRole)) == m_requiredZoomedState) ? Qn::EnabledAction : Qn::InvisibleAction;
@@ -143,7 +143,7 @@ Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetL
         if(!widget)
             continue;
 
-        if(!widget->resource()->hasFlags(QnResource::motion))
+        if(!widget->resource()->hasFlags(Qn::motion))
             continue;
 
         if(!widget->zoomRect().isNull())
@@ -206,8 +206,8 @@ Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResource
             continue;
 
         bool isUnsupported = 
-            (widget->resource()->flags() & (QnResource::network | QnResource::still_image | QnResource::server)) ||
-            !(widget->resource()->flags() & QnResource::utc); // TODO: #GDM #Common this is wrong, we need a flag for exported files.
+            (widget->resource()->flags() & (Qn::network | Qn::still_image | Qn::server)) ||
+            !(widget->resource()->flags() & Qn::utc); // TODO: #GDM #Common this is wrong, we need a flag for exported files.
         if(isUnsupported)
             return Qn::InvisibleAction;
     }
@@ -276,17 +276,17 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
         if(!resource)
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(QnResource::layout) && !resource->hasFlags(QnResource::local))
+        if(resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::local))
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(QnResource::user) || resource->hasFlags(QnResource::videowall))
+        if(resource->hasFlags(Qn::user) || resource->hasFlags(Qn::videowall))
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(QnResource::live_cam))
+        if(resource->hasFlags(Qn::live_cam))
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(QnResource::remote_server)) // TODO: #Elric move this to permissions.
-            if(resource->getStatus() == QnResource::Offline)
+        if(resource->hasFlags(Qn::remote_server)) // TODO: #Elric move this to permissions.
+            if(resource->getStatus() == Qn::Offline)
                 continue; /* Can remove only if offline. */
 
         return Qn::InvisibleAction;
@@ -363,7 +363,7 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
         return Qn::InvisibleAction;
 
     QnResourceWidget *widget = widgets[0];
-    if(widget->resource()->flags() & (QnResource::still_image | QnResource::server))
+    if(widget->resource()->flags() & (Qn::still_image | Qn::server))
         return Qn::InvisibleAction;
 
     Qn::RenderStatus renderStatus = widget->renderStatus();
@@ -378,11 +378,11 @@ Qn::ActionVisibility QnAdjustVideoActionCondition::check(const QnResourceWidgetL
         return Qn::InvisibleAction;
 
     QnResourceWidget *widget = widgets[0];
-    if(widget->resource()->flags() & (QnResource::server | QnResource::videowall))
+    if(widget->resource()->flags() & (Qn::server | Qn::videowall))
         return Qn::InvisibleAction;
 
     QString url = widget->resource()->getUrl().toLower();
-    if((widget->resource()->flags() & QnResource::still_image) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
+    if((widget->resource()->flags() & Qn::still_image) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
         return Qn::InvisibleAction;
 
     Qn::RenderStatus renderStatus = widget->renderStatus();
@@ -418,7 +418,7 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     // Export selection
     if (m_centralItemRequired) {
         QnResourcePtr resource = parameters.resource();
-        if(resource->flags() & QnResource::sync) {
+        if(resource->flags() & Qn::sync) {
             QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
             if(!periods.intersects(period))
                 return Qn::DisabledAction;
@@ -446,7 +446,7 @@ Qn::ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameter
         return Qn::DisabledAction;
 
     QnResourcePtr resource = parameters.resource();
-    if(resource->flags() & QnResource::sync) {
+    if(resource->flags() & Qn::sync) {
         QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
         if(!periods.intersects(period))
             return Qn::DisabledAction;
@@ -476,7 +476,7 @@ Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &p
     if(!media)
         return Qn::InvisibleAction;
 
-    bool isImage = media->toResource()->flags() & QnResource::still_image;
+    bool isImage = media->toResource()->flags() & Qn::still_image;
     if (isImage)
         return Qn::InvisibleAction;
 
@@ -505,7 +505,7 @@ Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resou
     if(resources.size() != 1)
         return Qn::InvisibleAction;
 
-    bool watchable = !(resources[0]->flags() & QnResource::live) || (accessController()->globalPermissions() & Qn::GlobalViewArchivePermission);
+    bool watchable = !(resources[0]->flags() & Qn::live) || (accessController()->globalPermissions() & Qn::GlobalViewArchivePermission);
     return watchable ? Qn::EnabledAction : Qn::InvisibleAction;
 
     // TODO: #Elric this will fail (?) if we have sync with some UTC resource on the scene.
@@ -524,9 +524,9 @@ Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &
         return Qn::InvisibleAction;
 
     QnResourcePtr resource = resources[0];
-    bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
+    bool isLocalResource = resource->hasFlags(Qn::url | Qn::local | Qn::media)
             && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
-    bool isExportedLayout = resource->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+    bool isExportedLayout = resource->hasFlags(Qn::url | Qn::local | Qn::layout);
 
     return isLocalResource || isExportedLayout ? Qn::EnabledAction : Qn::InvisibleAction;
 }
@@ -555,8 +555,8 @@ Qn::ActionVisibility QnLayoutSettingsActionCondition::check(const QnResourceList
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
 
-//    bool isExportedLayout = resource->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
-//    return resource->hasFlags(QnResource::layout) && !isExportedLayout
+//    bool isExportedLayout = resource->hasFlags(Qn::url | Qn::local | Qn::layout);
+//    return resource->hasFlags(Qn::layout) && !isExportedLayout
 //            ? Qn::EnabledAction
 //            : Qn::InvisibleAction;
 }
@@ -594,9 +594,9 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
 
     foreach (const QnResourcePtr &resource, resources) {
         //TODO: #GDM #Common refactor duplicated code
-        bool isServer = resource->hasFlags(QnResource::server);
-        bool isMediaResource = resource->hasFlags(QnResource::media);
-        bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
+        bool isServer = resource->hasFlags(Qn::server);
+        bool isMediaResource = resource->hasFlags(Qn::media);
+        bool isLocalResource = resource->hasFlags(Qn::url | Qn::local | Qn::media)
             && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
         bool allowed = isServer || isMediaResource;
         bool forbidden = isExportedLayout && (isServer || isLocalResource);
@@ -608,7 +608,7 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
 
 Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceList &resources) {
     foreach(const QnResourcePtr &resource, resources)
-        if(resource->hasFlags(QnResource::media) || resource->hasFlags(QnResource::server))
+        if(resource->hasFlags(Qn::media) || resource->hasFlags(Qn::server))
             return Qn::EnabledAction;
 
     return Qn::InvisibleAction;
@@ -628,7 +628,7 @@ Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnResourceLis
     if(resources.size() != 1)
         return Qn::InvisibleAction;
     QnResourcePtr resource = resources[0];
-    if (!resource->hasFlags(QnResource::url | QnResource::local | QnResource::still_image))
+    if (!resource->hasFlags(Qn::url | Qn::local | Qn::still_image))
         return Qn::InvisibleAction;
 
     QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
@@ -706,7 +706,7 @@ bool QnPtzActionCondition::check(const QnPtzControllerPtr &controller) {
 
 Qn::ActionVisibility QnNonEmptyVideowallActionCondition::check(const QnResourceList &resources) {
     foreach(const QnResourcePtr &resource, resources) {
-        if(!resource->hasFlags(QnResource::videowall)) 
+        if(!resource->hasFlags(Qn::videowall)) 
             continue;
 
         QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
@@ -729,7 +729,7 @@ Qn::ActionVisibility QnSaveVideowallReviewActionCondition::check(const QnResourc
             layouts << workbench()->currentLayout()->resource();
     } else {
         foreach(const QnResourcePtr &resource, resources) {
-            if(!resource->hasFlags(QnResource::videowall)) 
+            if(!resource->hasFlags(Qn::videowall)) 
                 continue;
 
             QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
@@ -756,7 +756,7 @@ Qn::ActionVisibility QnSaveVideowallReviewActionCondition::check(const QnResourc
 Qn::ActionVisibility QnRunningVideowallActionCondition::check(const QnResourceList &resources) {
     bool hasNonEmptyVideowall = false;
     foreach(const QnResourcePtr &resource, resources) {
-        if(!resource->hasFlags(QnResource::videowall)) 
+        if(!resource->hasFlags(Qn::videowall)) 
             continue;
 
         QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
@@ -786,7 +786,7 @@ Qn::ActionVisibility QnStartVideowallActionCondition::check(const QnResourceList
 
     bool hasAttachedItems = false;
     foreach(const QnResourcePtr &resource, resources) {
-        if(!resource->hasFlags(QnResource::videowall)) 
+        if(!resource->hasFlags(Qn::videowall)) 
             continue;
 
         QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
@@ -908,7 +908,7 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
         return Qn::InvisibleAction;
 
     QString userName = context()->user()->getName();
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::desktop_camera)) 
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::desktop_camera)) 
         if (resource->getUniqueId() == QnAppServerConnectionFactory::clientGuid())
             return Qn::EnabledAction;
     

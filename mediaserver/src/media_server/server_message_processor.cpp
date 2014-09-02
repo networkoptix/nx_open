@@ -23,7 +23,7 @@ QnServerMessageProcessor::QnServerMessageProcessor()
 
 }
 
-void QnServerMessageProcessor::updateAllIPList(const QnId& id, const QList<QHostAddress>& addrList)
+void QnServerMessageProcessor::updateAllIPList(const QUuid& id, const QList<QHostAddress>& addrList)
 {
     QStringList addrListStr;
     foreach(const QHostAddress& addr, addrList)
@@ -32,16 +32,16 @@ void QnServerMessageProcessor::updateAllIPList(const QnId& id, const QList<QHost
     updateAllIPList(id, addrListStr);
 }
 
-void QnServerMessageProcessor::updateAllIPList(const QnId& id, const QString& addr)
+void QnServerMessageProcessor::updateAllIPList(const QUuid& id, const QString& addr)
 {
     updateAllIPList(id, QList<QString>() << addr);
 }
 
-void QnServerMessageProcessor::updateAllIPList(const QnId& id, const QList<QString>& addrList)
+void QnServerMessageProcessor::updateAllIPList(const QUuid& id, const QList<QString>& addrList)
 {
     QMutexLocker lock(&m_mutexAddrList);
 
-    QHash<QnId, QList<QString> >::iterator itr = m_addrById.find(id);
+    QHash<QUuid, QList<QString> >::iterator itr = m_addrById.find(id);
     if (itr != m_addrById.end()) 
     {
         foreach(const QString& addr, itr.value()) 
@@ -70,11 +70,11 @@ void QnServerMessageProcessor::updateAllIPList(const QnId& id, const QList<QStri
 
 }
 
-void QnServerMessageProcessor::removeIPList(const QnId& id)
+void QnServerMessageProcessor::removeIPList(const QUuid& id)
 {
     QMutexLocker lock(&m_mutexAddrList);
 
-    QHash<QnId, QList<QString> >::iterator itr = m_addrById.find(id);
+    QHash<QUuid, QList<QString> >::iterator itr = m_addrById.find(id);
     if (itr != m_addrById.end()) 
     {
         foreach(const QString& addr, itr.value()) 
@@ -89,7 +89,9 @@ void QnServerMessageProcessor::removeIPList(const QnId& id)
     }
 }
 
-void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
+void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) 
+{
+    QnCommonMessageProcessor::updateResource(resource);
     QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>();
 
     const bool isServer = dynamic_cast<const QnMediaServerResource*>(resource.data()) != nullptr;
@@ -107,7 +109,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     {
         bool needProxyToCamera = true;
         if (resource->getParentId() != ownMediaServer->getId()) {
-            resource->addFlags( QnResource::foreigner );
+            resource->addFlags( Qn::foreigner );
         }
         else {
 #ifdef EDGE_SERVER
@@ -124,7 +126,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     if (isServer) 
     {
         if (resource->getId() != ownMediaServer->getId()) {
-            resource->addFlags( QnResource::foreigner );
+            resource->addFlags( Qn::foreigner );
             // update all known IP list
             updateAllIPList(resource->getId(), dynamic_cast<const QnMediaServerResource*>(resource.data())->getNetAddrList());
         }
@@ -133,9 +135,9 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     // We are always online
     if (isServer && resource->getId() == serverGuid()) 
     {
-        if (resource->getStatus() != QnResource::Online && resource->getStatus() != QnResource::NotDefined) {
+        if (resource->getStatus() != Qn::Online && resource->getStatus() != Qn::NotDefined) {
             qWarning() << "ServerMessageProcessor: Received message that our status is " << resource->getStatus() << ". change to online";
-            resource->setStatus(QnResource::Online);
+            resource->setStatus(Qn::Online);
         }
     }
 
@@ -149,7 +151,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
 
 }
 
-void QnServerMessageProcessor::afterRemovingResource(const QnId& id)
+void QnServerMessageProcessor::afterRemovingResource(const QUuid& id)
 {
     QnCommonMessageProcessor::afterRemovingResource(id);
     removeIPList(id);
@@ -157,9 +159,6 @@ void QnServerMessageProcessor::afterRemovingResource(const QnId& id)
 
 void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
 {
-    connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnServerMessageProcessor::at_remotePeerFound );
-    connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnServerMessageProcessor::at_remotePeerLost );
-
     connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateChunkReceived,
         this, &QnServerMessageProcessor::at_updateChunkReceived );
     connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
@@ -175,41 +174,18 @@ bool QnServerMessageProcessor::isKnownAddr(const QString& addr) const
     return !addr.isEmpty() && m_allIPAddress.contains(addr);
 }
 
-/*
-* EC2 related processing. Need move to other class
-*/
-
-void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool /*isProxy*/)
+void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) 
 {
-    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
-    if (res)
-        res->setStatus(QnResource::Online);
-
-}
-
-void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool /*isProxy*/)
-{
-    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
-    if (res) {
-        res->setStatus(QnResource::Offline);
-        if (data.peer.peerType != Qn::PT_Server) {
-            // This server hasn't own DB
-            foreach(QnResourcePtr camera, qnResPool->getAllCameras(res))
-                camera->setStatus(QnResource::Offline);
-        }
-    }
-}
-
-void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) 
-{
-    if (resource->getId() == qnCommon->moduleGUID() && resource->getStatus() != QnResource::Online)
+#if 0
+    if (resource->getId() == qnCommon->moduleGUID() && resource->getStatus() != Qn::Online)
     {
         // it's own server. change status to online
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(resource->getId(), QnResource::Online);
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(resource->getId(), Qn::Online);
     }
     else {
         resource->setStatus(status, true);
     }
+#endif
 }
 
 bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
@@ -261,20 +237,20 @@ void QnServerMessageProcessor::at_updateInstallationRequested(const QString &upd
     QnServerUpdateTool::instance()->installUpdate(updateId);
 }
 
-bool QnServerMessageProcessor::canRemoveResource(const QnId& resourceId) 
+bool QnServerMessageProcessor::canRemoveResource(const QUuid& resourceId) 
 { 
     QnResourcePtr res = qnResPool->getResourceById(resourceId);
     bool isOwnServer = (res && res->getId() == qnCommon->moduleGUID());
     return !isOwnServer;
 }
 
-void QnServerMessageProcessor::removeResourceIgnored(const QnId& resourceId) 
+void QnServerMessageProcessor::removeResourceIgnored(const QUuid& resourceId) 
 {
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(resourceId).dynamicCast<QnMediaServerResource>();
     bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());
     if (isOwnServer) {
         QnMediaServerResourcePtr savedServer;
         QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(mServer, &savedServer);
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(mServer->getId(), QnResource::Online);
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(mServer->getId(), Qn::Online);
     }
 }

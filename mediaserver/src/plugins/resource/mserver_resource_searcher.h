@@ -14,6 +14,7 @@
 
 
 class UDPSocket;
+struct QnCameraConflictList;
 
 class QnMServerResourceSearcher : public QnLongRunnable
 {
@@ -30,7 +31,7 @@ private:
     void updateSocketList();
     void deleteSocketList();
     void readDataFromSocket();
-    void readSocketInternal(AbstractDatagramSocket* socket, QSet<QByteArray>& conflictList);
+    void readSocketInternal(AbstractDatagramSocket* socket, QnCameraConflictList& conflictList);
 private:
     QStringList m_localAddressList;
     QList<AbstractDatagramSocket*> m_socketList;

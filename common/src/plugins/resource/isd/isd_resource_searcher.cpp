@@ -12,7 +12,7 @@ QnPlISDResourceSearcher::QnPlISDResourceSearcher()
 {
 }
 
-QnResourcePtr QnPlISDResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlISDResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -114,7 +114,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
 
 
 
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (rt.isNull())
         return QList<QnResourcePtr>();
 
@@ -211,7 +211,7 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
 
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (rt.isNull())
     {
         return local_result;

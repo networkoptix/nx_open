@@ -24,7 +24,7 @@ struct QnConnectionInfo {
     SoftwareVersionType version;
     QList<QnCompatibilityItem> compatibilityItems;
     QString systemName;
-    QString ecsGuid;
+    QString ecsGuid;    //TODO: #GDM make QUuid
     QString brand;
     QString box;
 };

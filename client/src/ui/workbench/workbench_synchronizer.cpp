@@ -56,7 +56,7 @@ void QnWorkbenchSynchronizer::submit() {
             resource = QnLayoutResourcePtr(new QnLayoutResource());
             resource->setId(QUuid::createUuid());
             resource->setTypeByName(lit("Layout"));
-            resource->addFlags(QnResource::local); // TODO: #Elric #EC2
+            resource->addFlags(Qn::local); // TODO: #Elric #EC2
 
             QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(layout, resource, this);
             synchronizer->setAutoDeleting(true);

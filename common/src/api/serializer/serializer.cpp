@@ -1,8 +1,5 @@
 #include "serializer.h"
 
-// TODO: #Elric get rid of this definition
-#include <core/resource/resource_media_layout.h>  //for CL_MAX_CHANNELS
-
 void parseRegion(QRegion& region, const QString& regionString)
 {
     foreach (QString rectString, regionString.split(QLatin1Char(';')))

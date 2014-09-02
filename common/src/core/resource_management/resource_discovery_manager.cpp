@@ -10,6 +10,7 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
+#include <core/resource/resource.h>
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/network_resource.h>
@@ -124,7 +125,7 @@ void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* proce
     m_resourceProcessor = processor;
 }
 
-QnResourcePtr QnResourceDiscoveryManager::createResource(const QnId &resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnResourceDiscoveryManager::createResource(const QUuid &resourceTypeId, const QnResourceParams& params)
 {
     QnResourcePtr result;
 
@@ -315,7 +316,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                 }
 
                 if( searcher->isLocal() )
-                    (*it)->addFlags( QnResource::local );
+                    (*it)->addFlags(Qn::local);
 
                 ++it;
             }
@@ -397,8 +398,8 @@ void QnResourceDiscoveryManager::onInitAsyncFinished(const QnResourcePtr& res, b
     QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(res.data());
     if (initialized && rpNetRes)
     {
-        if (rpNetRes->getStatus() == QnResource::Offline || rpNetRes->getStatus() == QnResource::Unauthorized)
-            rpNetRes->setStatus(QnResource::Online);
+        if (rpNetRes->getStatus() == Qn::Offline || rpNetRes->getStatus() == Qn::Unauthorized)
+            rpNetRes->setStatus(Qn::Online);
     }
 }
 

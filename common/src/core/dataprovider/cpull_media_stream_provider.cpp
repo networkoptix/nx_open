@@ -72,14 +72,14 @@ void QnClientPullMediaStreamProvider::run()
 
             if (mFramesLost % MAX_LOST_FRAME == 0) // if we lost MAX_LOST_FRAME frames => connection is lost for sure 
             {
-                if (canChangeStatus() && getResource()->getStatus() != QnResource::Unauthorized) // avoid offline->unauthorized->offline loop
-                    getResource()->setStatus(QnResource::Offline);
+                if (canChangeStatus() && getResource()->getStatus() != Qn::Unauthorized) // avoid offline->unauthorized->offline loop
+                    getResource()->setStatus(Qn::Offline);
 
                 m_stat[0].onLostConnection();
             }
 
             /*
-            if (getResource()->getStatus() == QnResource::Offline) {
+            if (getResource()->getStatus() == Qn::Offline) {
                 for (int i = 0; i < 100 && !m_needStop; ++i)
                     QnSleep::msleep(10);
             }
@@ -93,7 +93,7 @@ void QnClientPullMediaStreamProvider::run()
 
         
         
-        if (getResource()->hasFlags(QnResource::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag; 
+        if (getResource()->hasFlags(Qn::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag; 
         {
             data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
         }
@@ -102,8 +102,8 @@ void QnClientPullMediaStreamProvider::run()
         const QnResourcePtr& resource = getResource();
         if (dynamic_cast<QnPhysicalCameraResource*>(resource.data()))
         {
-            if (getResource()->getStatus() == QnResource::Unauthorized || getResource()->getStatus() == QnResource::Offline)
-                getResource()->setStatus(QnResource::Online);
+            if (getResource()->getStatus() == Qn::Unauthorized || getResource()->getStatus() == Qn::Offline)
+                getResource()->setStatus(Qn::Online);
         }
 
         QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
@@ -149,7 +149,7 @@ void QnClientPullMediaStreamProvider::run()
             if (lp)
                 lp->onGotVideoFrame(videoData);
         }
-        if (data && lp && lp->getRole() == QnResource::Role_SecondaryLiveVideo)
+        if (data && lp && lp->getRole() == Qn::CR_SecondaryLiveVideo)
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 
 

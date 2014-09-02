@@ -43,7 +43,7 @@ public:
     static QString toString( State state );
 
     QnTransactionTransport(const ApiPeerData &localPeer,
-        const ApiPeerData &remotePeer = ApiPeerData(QnId(), Qn::PT_Server),
+        const ApiPeerData &remotePeer = ApiPeerData(QUuid(), Qn::PT_Server),
         QSharedPointer<AbstractStreamSocket> socket = QSharedPointer<AbstractStreamSocket>());
     ~QnTransactionTransport();
 
@@ -61,7 +61,7 @@ public:
             header.fillSequence();
 #ifdef _DEBUG
 
-        foreach (const QnId& peer, header.dstPeers) {
+        foreach (const QUuid& peer, header.dstPeers) {
             Q_ASSERT(!peer.isNull());
             Q_ASSERT(peer != qnCommon->moduleGUID());
         }
@@ -107,10 +107,10 @@ public:
     void setState(State state);
     State getState() const;
 
-    static bool tryAcquireConnecting(const QnId& remoteGuid, bool isOriginator);
-    static bool tryAcquireConnected(const QnId& remoteGuid, bool isOriginator);
-    static void connectingCanceled(const QnId& id, bool isOriginator);
-    static void connectDone(const QnId& id);
+    static bool tryAcquireConnecting(const QUuid& remoteGuid, bool isOriginator);
+    static bool tryAcquireConnected(const QUuid& remoteGuid, bool isOriginator);
+    static void connectingCanceled(const QUuid& id, bool isOriginator);
+    static void connectDone(const QUuid& id);
 private:
     ApiPeerData m_localPeer;
     ApiPeerData m_remotePeer;
@@ -137,6 +137,7 @@ private:
     typedef QMap<QUuid, QPair<bool, bool>> ConnectingInfoMap;
     static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
     static QMutex m_staticMutex;
+    QByteArray m_extraData;
 private:
     void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
@@ -146,7 +147,8 @@ private:
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();
-    static void connectingCanceledNoLock(const QnId& remoteGuid, bool isOriginator);
+    static void connectingCanceledNoLock(const QUuid& remoteGuid, bool isOriginator);
+    void setExtraDataBuffer(const QByteArray& data);
 private slots:
     void at_responseReceived( nx_http::AsyncHttpClientPtr );
     void at_httpClientDone(nx_http::AsyncHttpClientPtr);

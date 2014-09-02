@@ -23,8 +23,8 @@ QString getFullResourceName(const QnResourcePtr &resource, bool showIp) {
     if (!resource)
         return QString();
 
-    QnResource::Flags flags = resource->flags();
-    if (showIp && ((flags & QnResource::network) || (flags & QnResource::server && flags & QnResource::remote))) {
+    Qn::ResourceFlags flags = resource->flags();
+    if (showIp && ((flags & Qn::network) || (flags & Qn::server && flags & Qn::remote))) {
         QString host = extractHost(resource->getUrl());
         if(!host.isEmpty())
             return QString(QLatin1String("%1 (%2)")).arg(resource->getName()).arg(host);

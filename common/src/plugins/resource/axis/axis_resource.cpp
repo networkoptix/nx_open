@@ -62,7 +62,7 @@ void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 
 bool QnPlAxisResource::startInputPortMonitoring()
 {
-    if( hasFlags(QnResource::foreigner)      //we do not own camera
+    if( hasFlags(Qn::foreigner)      //we do not own camera
         || m_inputPortNameToIndex.empty() )
     {
         return false;
@@ -193,7 +193,7 @@ bool QnPlAxisResource::readMotionInfo()
     CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=Motion"));
     if (status != CL_HTTP_SUCCESS) {
         if (status == CL_HTTP_AUTH_REQUIRED)
-            setStatus(QnResource::Unauthorized);
+            setStatus(Qn::Unauthorized);
         return false;
     }
     QByteArray body;
@@ -278,7 +278,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes&Image.I1.MPEG.UserDataEnabled=yes&Image.I2.MPEG.UserDataEnabled=yes&Image.I3.MPEG.UserDataEnabled=yes"));
         if (status != CL_HTTP_SUCCESS) {
             if (status == CL_HTTP_AUTH_REQUIRED)
-                setStatus(QnResource::Unauthorized);
+                setStatus(Qn::Unauthorized);
             return CameraDiagnostics::UnknownErrorResult();
         }
     }
@@ -290,7 +290,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         if( status != CL_HTTP_SUCCESS )
         {
             if( status == CL_HTTP_AUTH_REQUIRED )
-                setStatus( QnResource::Unauthorized );
+                setStatus( Qn::Unauthorized );
             return CameraDiagnostics::UnknownErrorResult();
         }
         QByteArray paramStr;
@@ -308,7 +308,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution"));
     if (status != CL_HTTP_SUCCESS) {
         if (status == CL_HTTP_AUTH_REQUIRED)
-            setStatus(QnResource::Unauthorized);
+            setStatus(Qn::Unauthorized);
         return CameraDiagnostics::UnknownErrorResult();
     }
 

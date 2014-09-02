@@ -5,7 +5,6 @@
 
 #include <QtCore/QSharedPointer>
 #include "core/dataprovider/statistics.h"
-#include "../resource/media_resource.h"
 #include "abstract_streamdataprovider.h"
 #include "../datapacket/media_data_packet.h"
 #include "utils/camera/camera_diagnostics.h"

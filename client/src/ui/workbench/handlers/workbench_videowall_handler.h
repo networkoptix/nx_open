@@ -48,7 +48,7 @@ private:
     void swapLayouts(const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout);
 
     /** Updates item's layout with provided value. Provided layout should be saved. */
-    void updateItemsLayout(const QnVideoWallItemIndexList &items, const QnId &layoutId);
+    void updateItemsLayout(const QnVideoWallItemIndexList &items, const QUuid &layoutId);
 
     bool canStartVideowall(const QnVideoWallResourcePtr &videowall);
 

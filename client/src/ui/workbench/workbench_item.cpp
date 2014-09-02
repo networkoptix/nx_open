@@ -59,7 +59,7 @@ QnLayoutItemData QnWorkbenchItem::data() const {
 
     data.uuid = m_uuid;
     data.resource.path = m_resourceUid;
-    data.resource.id = resource ? resource->getId() : QnId();
+    data.resource.id = resource ? resource->getId() : QUuid();
     data.flags = flags();
     data.rotation = rotation();
     data.combinedGeometry = combinedGeometry();
@@ -78,7 +78,7 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data) {
 
 #ifdef _DEBUG
     QnResourcePtr resource = qnResPool->getResourceByUniqId(resourceUid());
-    QnId localId = resource ? resource->getId() : QnId();
+    QUuid localId = resource ? resource->getId() : QUuid();
     if(data.resource.id != localId && data.resource.path != m_resourceUid)
         qnWarning("Updating item '%1' from a data with different ids (%2 != %3 and %4 != %5).", resourceUid(), localId.toString(), data.resource.id.toString(), data.resource.path, m_resourceUid);
 #endif
@@ -104,7 +104,7 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const {
         qnWarning("Submitting item '%1' to a data with different uuid (%2 != %3).", resourceUid(), data.uuid, uuid());
 
 #ifdef _DEBUG
-    QnId localId = qnResPool->getResourceByUniqId(resourceUid())->getId();
+    QUuid localId = qnResPool->getResourceByUniqId(resourceUid())->getId();
     if(data.resource.id != localId && data.resource.path != m_resourceUid)
         qnWarning("Submitting item '%1' to a data with different ids (%2 != %3 and %4 != %5).", resourceUid(), localId.toString(), data.resource.id.toString(), data.resource.path, m_resourceUid);
 #endif

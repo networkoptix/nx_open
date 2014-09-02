@@ -95,12 +95,12 @@ public:
 
     QnSoftwareVersion targetVersion() const;
 
-    PeerUpdateInformation updateInformation(const QnId &peerId) const;
+    PeerUpdateInformation updateInformation(const QUuid &peerId) const;
 
 signals:
     void stateChanged(int state);
     void progressChanged(int progress);
-    void peerChanged(const QnId &peerId);
+    void peerChanged(const QUuid &peerId);
 
 public slots:
     void checkForUpdates();
@@ -124,7 +124,7 @@ private slots:
     void at_uploader_finished();
     void at_uploader_failed();
     void at_uploader_progressChanged(int progress);
-    void at_uploader_peerProgressChanged(const QnId &peerId, int progress);
+    void at_uploader_peerProgressChanged(const QUuid &peerId, int progress);
 
 
     void at_downloadReply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
@@ -141,7 +141,7 @@ private:
     void setCheckResult(CheckResult result);
     void setUpdateResult(UpdateResult result);
     void finishUpdate(UpdateResult result);
-    void setPeerState(const QnId &peerId, PeerUpdateInformation::State state);
+    void setPeerState(const QUuid &peerId, PeerUpdateInformation::State state);
     void checkBuildOnline();
 
     void uploadUpdatesToServers();
@@ -165,11 +165,11 @@ private:
 
     QString m_updateId;
 
-    QMultiHash<QnSystemInformation, QnId> m_idBySystemInformation;
+    QMultiHash<QnSystemInformation, QUuid> m_idBySystemInformation;
 
     QList<QnSystemInformation> m_pendingUploads;
-    QSet<QnId> m_pendingUploadPeers;
-    QSet<QnId> m_pendingInstallations;
+    QSet<QUuid> m_pendingUploadPeers;
+    QSet<QUuid> m_pendingInstallations;
 
     QnUpdateUploader *m_uploader;
 
@@ -179,9 +179,9 @@ private:
     QNetworkAccessManager *m_networkAccessManager;
     ec2::QnDistributedMutex* m_distributedMutex;
 
-    QSet<QnId> m_restartingServers;
+    QSet<QUuid> m_restartingServers;
 
-    QHash<QnId, PeerUpdateInformation> m_updateInformationById;
+    QHash<QUuid, PeerUpdateInformation> m_updateInformationById;
 };
 
 #endif // QN_MEDIA_SERVER_UPDATE_TOOL_H

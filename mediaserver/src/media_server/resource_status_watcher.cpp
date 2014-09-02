@@ -1,6 +1,10 @@
 #include "resource_status_watcher.h"
-#include "core/resource_management/resource_pool.h"
+
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_pool.h>
+
 #include "api/app_server_connection.h"
+#include "core/resource/media_server_resource.h"
 
 QnResourceStatusWatcher::QnResourceStatusWatcher()
 {
@@ -14,7 +18,10 @@ bool QnResourceStatusWatcher::isSetStatusInProgress(const QnResourcePtr &resourc
 
 void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr &resource)
 {
-    //Q_ASSERT_X(!resource->hasFlags(QnResource::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
+    //Q_ASSERT_X(!resource->hasFlags(Qn::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
+
+    if (resource.dynamicCast<QnMediaServerResource>())
+        return;
 
     if (!isSetStatusInProgress(resource))
         updateResourceStatusAsync(resource);
@@ -31,7 +38,7 @@ void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr &res
     QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatus(resource->getId(), resource->getStatus(), this, &QnResourceStatusWatcher::requestFinished2);
 }
 
-void QnResourceStatusWatcher::requestFinished2(int /*reqID*/, ec2::ErrorCode errCode, const QnId& id)
+void QnResourceStatusWatcher::requestFinished2(int /*reqID*/, ec2::ErrorCode errCode, const QUuid& id)
 {
     if (errCode != ec2::ErrorCode::ok)
         qCritical() << "Failed to update resource status" << id.toString();

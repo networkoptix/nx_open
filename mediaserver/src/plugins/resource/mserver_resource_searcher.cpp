@@ -1,5 +1,6 @@
 #include "mserver_resource_searcher.h"
 
+#include <business/events/mserver_conflict_business_event.h>
 #include "utils/network/nettools.h"
 #include "utils/network/system_socket.h"
 #include "utils/common/sleep.h"
@@ -92,16 +93,16 @@ public:
         }
     }
 
-    static QList<QByteArray> getLocalUsingCameras()
+    static QStringList getLocalUsingCameras()
     {
-        QList<QByteArray> result;
+        QStringList result;
         QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
         if (mediaServer) {
             QnResourceList resList = qnResPool->getResourcesWithParentId(mediaServer->getId());
             for (int i = 0; i < resList.size(); ++i) {
                 QnNetworkResourcePtr netRes = resList[i].dynamicCast<QnNetworkResource>();
                 if (netRes && hasRunningLiveProvider(netRes))
-                    result << netRes->getPhysicalId().toUtf8();
+                    result << netRes->getPhysicalId();
             }
         }
         return result;
@@ -125,19 +126,22 @@ public:
         result << guidStr;
         result << appServerGuid;
         result << localAppServerHost();
-        QList<QByteArray> cameras = getLocalUsingCameras();
-        result.append(cameras);
-
+        QStringList cameras = getLocalUsingCameras();
+        foreach (const QString &camera, cameras)
+            result.append(camera.toUtf8());
         return listToByteArray(result);
     }
 
-    bool isCameraConflict() const {
-        QList<QByteArray> localCameras = getLocalUsingCameras();
-        for (int i = 0; i < m_cameras.size(); ++i) {
-            if (localCameras.contains(m_cameras[i]))
-                return true;
+    void fillCameraConflictList(QStringList &result) const {
+        QStringList localCameras = getLocalUsingCameras();
+        if (localCameras.isEmpty())
+            return;
+
+        foreach (const QByteArray &camera, m_cameras) {
+            QString cam = QString::fromUtf8(camera);
+            if (localCameras.contains(cam) && !result.contains(cam))
+                result << cam;
         }
-        return false;
     }
 };
 
@@ -237,18 +241,17 @@ void QnMServerResourceSearcher::readDataFromSocket()
     for (int i = 0; i < 600 && !m_needStop; ++i)
         QnSleep::msleep(100);
 
-    QSet<QByteArray> conflictList;
-    readSocketInternal(m_receiveSocket.get(), conflictList);
-    if (!conflictList.isEmpty()) {
-        QList<QByteArray> cList = conflictList.toList();
-        cList.insert(0, localAppServerHost());
+    QnCameraConflictList conflicts;
+    readSocketInternal(m_receiveSocket.get(), conflicts);
+    if (!conflicts.camerasByServer.isEmpty()) {
+        conflicts.sourceServer = localAppServerHost();
         QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
         if (mediaServer)
-            qnBusinessRuleConnector->at_mediaServerConflict(mediaServer, qnSyncTime->currentUSecsSinceEpoch(), cList);
+            qnBusinessRuleConnector->at_mediaServerConflict(mediaServer, qnSyncTime->currentUSecsSinceEpoch(), conflicts);
     }
 }
 
-void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socket, QSet<QByteArray>& conflictList)
+void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socket, QnCameraConflictList& conflictList)
 {
     quint8 tmpBuffer[1024*16];
     while (socket->hasData())
@@ -259,8 +262,14 @@ void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socke
         if (datagramSize > 0) {
             QByteArray responseData((const char*) tmpBuffer, datagramSize);
             DiscoveryPacket packet(responseData);
-            if (packet.isValidPacket() && packet.appServerGuid() != m_appServerGuid && packet.isCameraConflict())
-                conflictList.insert(packet.appServerHost());
+            if (packet.isValidPacket() && packet.appServerGuid() != m_appServerGuid) {
+                QStringList cameras = conflictList.camerasByServer.contains(packet.appServerHost())
+                    ? conflictList.camerasByServer[packet.appServerHost()]
+                    : QStringList();
+                packet.fillCameraConflictList(cameras);
+                if (!cameras.isEmpty())
+                    conflictList.camerasByServer[packet.appServerHost()] = cameras;
+            }
         }
     }
 }

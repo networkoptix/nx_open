@@ -212,7 +212,7 @@ void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &propose
     foreach (const QnVirtualCameraResourcePtr &camera, proposedCameras) 
     {
         QnResourcePtr mserver = qnResPool->getResourceById(camera->getParentId());
-        if (!mserver || mserver->getStatus() == QnResource::Offline)
+        if (!mserver || mserver->getStatus() == Qn::Offline)
             continue;
 
         // if schedule is disabled and we are enabling it
@@ -309,7 +309,7 @@ int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType license
                 QnResourcePtr resource = (!data.resource.id.isNull())
                     ? qnResPool->getResourceById(data.resource.id)
                     : qnResPool->getResourceByUniqId(data.resource.path); //TODO: #EC2
-                if (!resource || !resource->hasFlags(QnResource::desktop_camera))
+                if (!resource || !resource->hasFlags(Qn::desktop_camera))
                     continue;
 
                 result++;   //desktop camera found

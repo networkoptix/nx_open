@@ -8,7 +8,7 @@ QnAbstractStorageResource::QnAbstractStorageResource():
     m_usedForWriting(false),
     m_index(0)
 {
-    setStatus(Offline);
+    setStatus(Qn::Offline);
 }
 
 QnAbstractStorageResource::~QnAbstractStorageResource()

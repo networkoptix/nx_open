@@ -75,7 +75,7 @@ qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaResourcePtr &resou
 }
 
 void QnWorkbenchServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &server) {
-    if(server->getStatus() == QnResource::Offline)
+    if(server->getStatus() == Qn::Offline)
         return;
 
     if(server->getPrimaryIF().isNull())

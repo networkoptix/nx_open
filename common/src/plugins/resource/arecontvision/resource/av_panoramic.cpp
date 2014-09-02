@@ -59,7 +59,7 @@ bool QnArecontPanoramicResource::getParamPhysical(int channel, const QString& na
 
     CLHttpStatus status = connection.doGET(request);
     if (status == CL_HTTP_AUTH_REQUIRED)
-        setStatus(QnResource::Unauthorized);
+        setStatus(Qn::Unauthorized);
 
     if (status != CL_HTTP_SUCCESS)
         return false;

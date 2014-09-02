@@ -205,7 +205,7 @@ private:
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
     mutable QnMediaServerConnectionPtr m_serverConnection;
 
-    QHash<QnId, QnImageProvider*> m_imageProvidersByResourceId;
+    QHash<QUuid, QnImageProvider*> m_imageProvidersByResourceId;
 	QUrl m_lastCameraPageUrl;
 };
 

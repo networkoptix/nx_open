@@ -37,11 +37,8 @@ QUuid serverGuid() {
     if (!guid.isNull())
         return guid;
 
-    guid = MSSettings::roSettings()->value(lit("serverGuid")).toString();
+    guid = QUuid(MSSettings::roSettings()->value(lit("serverGuid")).toString());
 
-#ifdef _TEST_TWO_SERVERS
-    return guid + "test";
-#endif
     return guid;
 }
 

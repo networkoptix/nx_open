@@ -89,7 +89,7 @@ void QnServerUpdatesWidget::at_updateButton_clicked() {
     bool haveOffline = false;
     QList<QnMediaServerResourcePtr> servers = m_updatesModel->servers();
     foreach (const QnMediaServerResourcePtr &resource, servers) {
-        if (resource->getStatus() == QnResource::Offline) {
+        if (resource->getStatus() == Qn::Offline) {
             haveOffline = true;
             break;
         }

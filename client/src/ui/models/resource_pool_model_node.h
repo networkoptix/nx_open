@@ -53,9 +53,9 @@ public:
 
     const QnResourcePtr &resource() const;
 
-    QnResource::Flags resourceFlags() const;
+    Qn::ResourceFlags resourceFlags() const;
 
-    QnResource::Status resourceStatus() const ;
+    Qn::ResourceStatus resourceStatus() const ;
 
     const QUuid &uuid() const ;
 
@@ -130,7 +130,7 @@ private:
     /* Resource-related state. */
 
     /** Resource flags. */
-    QnResource::Flags m_flags;
+    Qn::ResourceFlags m_flags;
 
     /** Display name of this node */
     QString m_displayName;
@@ -139,7 +139,7 @@ private:
     QString m_name;
 
     /** Status of this node. */
-    QnResource::Status m_status;
+    Qn::ResourceStatus m_status;
 
     /** Search string of this node. */
     QString m_searchString;

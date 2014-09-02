@@ -26,7 +26,7 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
     m_mediaResource = resource.dynamicCast<QnMediaResource>();
 
-    m_dataProvider = resource->createDataProvider(QnResource::Role_Default);
+    m_dataProvider = resource->createDataProvider(Qn::CR_Default);
 
     if(m_dataProvider != NULL) {
         m_archiveReader = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider);
@@ -194,7 +194,7 @@ bool QnResourceDisplay::isPaused() {
 }
 
 bool QnResourceDisplay::isStillImage() const {
-    return m_resource->flags() & QnResource::still_image;
+    return m_resource->flags() & Qn::still_image;
 }
 
 void QnResourceDisplay::addRenderer(QnAbstractRenderer *renderer) {

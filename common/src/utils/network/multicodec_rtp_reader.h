@@ -63,7 +63,7 @@ public:
     virtual void pleaseStop() override;
 
     void setRequest(const QString& request);
-    void setRole(QnResource::ConnectionRole role);
+    void setRole(Qn::ConnectionRole role);
 
     static void setDefaultTransport( const RtpTransport::Value& defaultTransportToUse );
 
@@ -101,7 +101,7 @@ private:
     bool m_pleaseStop;
     QElapsedTimer m_rtcpReportTimer;
     bool m_gotSomeFrame;
-    QnResource::ConnectionRole m_role;
+    Qn::ConnectionRole m_role;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

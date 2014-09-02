@@ -506,8 +506,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
-    //if (getStatus() == QnResource::Offline || getStatus() == QnResource::Unauthorized)
-    //    setStatus(QnResource::Online, true); // to avoid infinit status loop in this version
+    //if (getStatus() == Qn::Offline || getStatus() == Qn::Unauthorized)
+    //    setStatus(Qn::Online, true); // to avoid infinit status loop in this version
 
     //Additional camera settings
     fetchAndSetCameraSettings();
@@ -1964,7 +1964,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoSourceToCamera(VideoSource
 #endif
 
         if (soapWrapper.isNotAuthenticated())
-            setStatus(QnResource::Unauthorized);
+            setStatus(Qn::Unauthorized);
 
         return CameraDiagnostics::NoErrorResult(); // ignore error because of some cameras is not ONVIF profile S compatible and doesn't support this request
         //return CameraDiagnostics::RequestFailedResult(QLatin1String("setVideoSourceConfiguration"), soapWrapper.getLastError());
@@ -2025,7 +2025,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
 #endif
         if (soapWrapper.isNotAuthenticated())
         {
-            setStatus(QnResource::Unauthorized);
+            setStatus(Qn::Unauthorized);
             return CameraDiagnostics::NotAuthorisedResult( getMediaUrl() );
         }
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoSources"), soapWrapper.getLastError());
@@ -2344,7 +2344,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncod
     if (soapRes != SOAP_OK) {
 
         if (soapWrapper.isNotAuthenticated())
-            setStatus(QnResource::Unauthorized);
+            setStatus(Qn::Unauthorized);
 
 #ifdef PL_ONVIF_DEBUG
         qCritical() << "QnOnvifStreamReader::sendVideoEncoderToCamera: can't set required values into ONVIF physical device (URL: " 
@@ -2489,7 +2489,7 @@ QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal()
 
 bool QnPlOnvifResource::startInputPortMonitoring()
 {
-    if( hasFlags(QnResource::foreigner) )     //we do not own camera
+    if( hasFlags(Qn::foreigner) )     //we do not own camera
     {
         return false;
     }
@@ -3113,7 +3113,7 @@ CameraDiagnostics::Result QnPlOnvifResource::getFullUrlInfo()
 #endif
         if (soapWrapper.isNotAuthenticated())
         {
-            setStatus(QnResource::Unauthorized);
+            setStatus(Qn::Unauthorized);
             return CameraDiagnostics::NotAuthorisedResult( getDeviceOnvifUrl() );
         }
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getCapabilities"), soapWrapper.getLastError());
