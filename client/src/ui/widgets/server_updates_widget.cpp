@@ -253,7 +253,9 @@ void QnServerUpdatesWidget::updateUi() {
                     ui->detailLabel->setText(QString());
                 break;
             case QnCheckForUpdateResult::InternetProblem:
-                ui->detailLabel->setText(m_updateTool->generateUpdatePackageUrl().toString());
+                ui->detailLabel->setText(tr("Cannot check for updates via the Internet. "\
+                    "Click <a href=%1>here</a> to download updates manually.")
+                    .arg(m_updateTool->generateUpdatePackageUrl().toString()));
                 break;
             case QnCheckForUpdateResult::NoNewerVersion:
                 ui->detailLabel->setText(tr("All components in your system are up to date."));
