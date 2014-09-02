@@ -162,7 +162,7 @@ ErrorCode QnTransactionLog::updateSequence(const ApiSyncMarkerData& data)
 ErrorCode QnTransactionLog::updateSequenceNoLock(const QUuid& peerID, const QUuid& dbID, int sequence)
 {
     QnTranStateKey key(peerID, dbID);
-    if (m_state.values[key] > sequence)
+    if (m_state.values[key] >= sequence)
         return ErrorCode::ok;
 
     QSqlQuery query(m_dbManager->getDB());
