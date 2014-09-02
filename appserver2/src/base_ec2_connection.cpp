@@ -177,7 +177,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        QnTransaction<ApiDatabaseDumpData> tran(ApiCommand::resotreDatabase);
+        QnTransaction<ApiDatabaseDumpData> tran(ApiCommand::restoreDatabase);
         tran.isLocal = true;
         tran.params = data;
 

@@ -123,6 +123,7 @@ namespace ec2
         //!Called when primary time server has been changed by user
         void primaryTimeServerChanged( const QnTransaction<ApiIdData>& tran );
         void peerSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeData>& tran );
+        void knownPeersSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeDataList>& tran );
         //!Returns synchronized time with time priority key (not local, but the one used)
         TimeSyncInfo getTimeSyncInfo() const;
         //!Returns value of internal monotonic clock
@@ -130,6 +131,7 @@ namespace ec2
         //!Resets synchronized time to local system time with local peer priority
         void forgetSynchronizedTime();
         QnPeerTimeInfoList getPeerTimeInfoList() const;
+        ApiPeerSystemTimeDataList getKnownPeersSystemTime() const;
 
     signals:
         //!Emitted when there is ambiguity while choosing primary time server automatically
@@ -180,6 +182,9 @@ namespace ec2
         quint64 m_internetSynchronizationTaskID;
         quint64 m_manualTimerServerSelectionCheckTaskID;
         bool m_terminated;
+        /*!
+            \a TimeSyncInfo::syncTime stores local time on specified server
+        */
         std::map<QUuid, TimeSyncInfo> m_systemTimeByPeer;
         const Qn::PeerType m_peerType;
         DaytimeNISTFetcher m_timeSynchronizer;
@@ -213,6 +218,8 @@ namespace ec2
         qint64 currentMSecsSinceEpoch() const;
 
         void updateRuntimeInfoPriority(quint64 priority);
+        void peerSystemTimeReceivedNonSafe( const ApiPeerSystemTimeData& tran );
+
     private slots:
         void onNewConnectionEstablished( const QnTransactionTransportPtr& transport );
         void onPeerLost( ApiPeerAliveData data );

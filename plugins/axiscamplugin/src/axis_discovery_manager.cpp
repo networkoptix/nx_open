@@ -152,9 +152,6 @@ int AxisCameraDiscoveryManager::fromMDNSData(
     int mdnsResponsePacketSize,
     nxcip::CameraInfo* cameraInfo )
 {
-    return 0;
-
-
     const QByteArray& msdnResponse = QByteArray::fromRawData( (const char*)mdnsResponsePacket, mdnsResponsePacketSize );
 
     //parsing mdns response
