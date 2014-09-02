@@ -397,7 +397,7 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     if (persistentSeq && tran.persistentInfo.sequence > persistentSeq + 1) {
         // gap in persistent data detect, do resync
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "GAP in persistent data detected! Expected seq=" << persistentSeq + 1 <<", but got seq=" << tran.persistentInfo.sequence;
+        qDebug() << "GAP in persistent data detected! for peer" << tran.peerID << "Expected seq=" << persistentSeq + 1 <<", but got seq=" << tran.persistentInfo.sequence;
 #endif
 
         if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
