@@ -31,7 +31,7 @@
         <linux.oslibs>-lssl -lcrypto</linux.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>                
-        <mac.oslibs>-lssl -lcrypto -lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+        <mac.oslibs>-lssl -lcrypto -lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
         <!--Global defines-->
         <global.defines></global.defines>
         <!--Specific os defines-->
