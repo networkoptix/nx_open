@@ -153,7 +153,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::runtimeInfoChanged:    return handleTransactionParams<ApiRuntimeData>          (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::broadcastPeerSystemTime: return handleTransactionParams<ApiPeerSystemTimeData> (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::forcePrimaryTimeServer:  return handleTransactionParams<ApiIdData>             (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::updatePersistentSequence: return handleTransactionParams<ApiFillerData>        (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::syncDoneMarker:          return handleTransactionParams<ApiFillerData>         (serializedTransaction, &stream, transaction, function, fastFunction);
 
     default:
         qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";
@@ -391,10 +391,12 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
 
     QnTranStateKey persistentKey(tran.peerID, tran.persistentInfo.dbID);
     int persistentSeq = m_lastPersistentSeq[persistentKey];
-    if (tran.command == ApiCommand::updatePersistentSequence) 
+    if (tran.command == ApiCommand::syncDoneMarker) {
         persistentSeq = qMax(persistentSeq, tran.persistentInfo.sequence);
+        transport->setSyncDone(true);
+    }
 
-    if (persistentSeq && tran.persistentInfo.sequence > persistentSeq + 1) {
+    if (transport->isSyncDone() && persistentSeq && tran.persistentInfo.sequence > persistentSeq + 1) {
         // gap in persistent data detect, do resync
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
         qDebug() << "GAP in persistent data detected! for peer" << tran.peerID << "Expected seq=" << persistentSeq + 1 <<", but got seq=" << tran.persistentInfo.sequence;
@@ -468,7 +470,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
                     // already processed
                     if (isContains == QnTransactionLog::Reason_Timestamp) {
                         // proxy filler transaction to avoid gaps in the persistent sequence
-                        QnTransaction<ApiFillerData> fillerTran(ApiCommand::updatePersistentSequence);
+                        QnTransaction<ApiFillerData> fillerTran(ApiCommand::syncDoneMarker);
                         fillerTran.persistentInfo = tran.persistentInfo;
                         transactionLog->saveTransaction(fillerTran);
                         proxyTransaction(fillerTran, transportHeader);

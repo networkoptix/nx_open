@@ -189,8 +189,8 @@ namespace ec2
                     return "dumpDatabase";
                 case resotreDatabase:
                     return "resotreDatabase";
-                case updatePersistentSequence:
-                    return "updatePersistentSequence";
+                case syncDoneMarker:
+                    return "syncDoneMarker";
                 default:
                     return "unknown " + QString::number((int)val);
             }
@@ -205,7 +205,7 @@ namespace ec2
                     val == tranSyncResponse ||
                     val == runtimeInfoChanged ||
                     val == peerAliveInfo ||
-                    val == updatePersistentSequence;
+                    val == syncDoneMarker;
         }
 
         bool isPersistent( Value val )

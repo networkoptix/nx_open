@@ -136,7 +136,7 @@ namespace ec2
             resotreDatabase             = 9006,  /*< ApiDatabaseDumpData */
             forcePrimaryTimeServer      = 9007,  /*< ApiIdData */
             broadcastPeerSystemTime     = 9008,  /*< ApiPeerSystemTimeData*/
-            updatePersistentSequence    = 9009,  /*< ApiData*/
+            syncDoneMarker              = 9009,  /*< ApiData*/
 
             maxTransactionValue         = 65535
         };

@@ -170,7 +170,7 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QU
     if (tran.isLocal)
         return ErrorCode::ok; // local transactions just changes DB without logging
 
-    if (tran.command != ApiCommand::updatePersistentSequence)
+    if (tran.command != ApiCommand::syncDoneMarker)
     {
     #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
         qDebug() << "add transaction to log " << tran.peerID << "command=" << ApiCommand::toString(tran.command) 
@@ -297,14 +297,14 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     {
         QnTranStateKey key(QUuid::fromRfc4122(query.value(0).toByteArray()), QUuid::fromRfc4122(query.value(1).toByteArray()));
         int latestSequence =  query.value(2).toInt();
-        if (latestSequence > tranLogSequence.value(key)) {
-            // add filler transaction with latest sequence
-            QnTransaction<ApiFillerData> fillerTran(ApiCommand::updatePersistentSequence);
-            fillerTran.peerID = key.peerID;
-            fillerTran.persistentInfo.dbID = key.dbID;
-            fillerTran.persistentInfo.sequence = latestSequence;
-            result << QnUbjsonTransactionSerializer::instance()->serializedTransaction(fillerTran);
-        }
+        
+        // add filler transaction with latest sequence
+        QnTransaction<ApiFillerData> fillerTran(ApiCommand::syncDoneMarker);
+        fillerTran.peerID = key.peerID;
+        fillerTran.persistentInfo.dbID = key.dbID;
+        fillerTran.persistentInfo.sequence = latestSequence;
+        result << QnUbjsonTransactionSerializer::instance()->serializedTransaction(fillerTran);
+        
     }
     
     return ErrorCode::ok;
