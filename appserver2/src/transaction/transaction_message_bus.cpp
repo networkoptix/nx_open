@@ -406,6 +406,7 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
             queueSyncRequest(transport);
         else 
             transport->setState(QnTransactionTransport::Error); // reopen
+        return false;
     }
     m_lastPersistentSeq[persistentKey] = tran.persistentInfo.sequence;
     return true;
