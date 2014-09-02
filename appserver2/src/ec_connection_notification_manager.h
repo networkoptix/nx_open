@@ -88,7 +88,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiPeerSystemTimeDataList>& tran );
         void triggerNotification( const QnTransaction<ApiDatabaseDumpData> & /*tran*/ );
 
-        void triggerNotification(const QnTransaction<ApiFillerData> &/*tran*/) { /* nothing to do */ }
+        void triggerNotification(const QnTransaction<ApiSyncMarkerData> &/*tran*/) { /* nothing to do */ }
 
         void triggerNotification(const QnTransaction<ApiLockData> &/*tran*/) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here

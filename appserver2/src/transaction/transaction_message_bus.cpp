@@ -154,7 +154,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::broadcastPeerSystemTime: return handleTransactionParams<ApiPeerSystemTimeData> (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::forcePrimaryTimeServer:  return handleTransactionParams<ApiIdData>             (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::getKnownPeersSystemTime: return handleTransactionParams<ApiPeerSystemTimeDataList> (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::syncDoneMarker:          return handleTransactionParams<ApiFillerData>         (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::syncDoneMarker:          return handleTransactionParams<ApiSyncMarkerData>         (serializedTransaction, &stream, transaction, function, fastFunction);
 
     default:
         qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";
@@ -392,10 +392,6 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
 
     QnTranStateKey persistentKey(tran.peerID, tran.persistentInfo.dbID);
     int persistentSeq = m_lastPersistentSeq[persistentKey];
-    if (tran.command == ApiCommand::syncDoneMarker) {
-        persistentSeq = qMax(persistentSeq, tran.persistentInfo.sequence);
-        transport->setSyncDone(true);
-    }
 
     if (transport->isSyncDone() && persistentSeq && tran.persistentInfo.sequence > persistentSeq + 1) {
         // gap in persistent data detect, do resync
@@ -411,6 +407,17 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     }
     m_lastPersistentSeq[persistentKey] = tran.persistentInfo.sequence;
     return true;
+}
+
+void QnTransactionMessageBus::updatePersistentMarker(const QnTransaction<ApiSyncMarkerData>& tran, QnTransactionTransport* transport)
+{
+    transport->setSyncDone(true);
+    if (transactionLog)
+        transactionLog->updateSequence(tran.params);
+    foreach(const ApiSyncMarkerRecord& record, tran.params.markers) {
+        QnTranStateKey key(record.peerID, record.dbID);
+        m_lastPersistentSeq[key] = qMax(m_lastPersistentSeq[key], record.sequence);
+    }
 }
 
 template <class T>
@@ -462,6 +469,9 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             if( m_handler )
                 m_handler->triggerNotification(tran);
             break;
+        case ApiCommand::syncDoneMarker:
+            updatePersistentMarker(tran, sender);
+            break;
         default:
             // general transaction
             if (!sender->isReadSync(tran.command))
@@ -475,9 +485,13 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
                     // already processed
                     if (isContains == QnTransactionLog::Reason_Timestamp) {
                         // proxy filler transaction to avoid gaps in the persistent sequence
-                        QnTransaction<ApiFillerData> fillerTran(ApiCommand::syncDoneMarker);
-                        fillerTran.persistentInfo = tran.persistentInfo;
-                        transactionLog->saveTransaction(fillerTran);
+                        QnTransaction<ApiSyncMarkerData> fillerTran(ApiCommand::syncDoneMarker);
+                        ApiSyncMarkerRecord record;
+                        record.peerID = tran.peerID;
+                        record.dbID = tran.persistentInfo.dbID;
+                        record.sequence = tran.persistentInfo.sequence;
+                        fillerTran.params.markers.push_back(record);
+                        transactionLog->updateSequence(fillerTran.params);
                         proxyTransaction(fillerTran, transportHeader);
                     }
                     return; 
