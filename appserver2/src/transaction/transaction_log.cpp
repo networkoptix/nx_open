@@ -286,12 +286,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
         
         while (query.next()) {
             result << query.value(0).toByteArray();
-            auto itrLastSeq = tranLogSequence.find(key);
-            int seq = query.value(1).toInt();
-            if (itrLastSeq == tranLogSequence.end())
-                itrLastSeq = tranLogSequence.insert(key, seq);
-            else
-                itrLastSeq.value() = qMax(itrLastSeq.value(), seq);
+            tranLogSequence[key] = query.value(1).toInt();
         }
     }
 
@@ -306,16 +301,16 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     {
         QnTranStateKey key(QUuid::fromRfc4122(query.value(0).toByteArray()), QUuid::fromRfc4122(query.value(1).toByteArray()));
         int latestSequence =  query.value(2).toInt();
-        
-        // add filler transaction with latest sequence
-        ApiSyncMarkerRecord record;
-        record.peerID = key.peerID;
-        record.dbID = key.dbID;
-        record.sequence = latestSequence;
-        syncMarkersTran.params.markers.push_back(record);
+        if (latestSequence > tranLogSequence[key]) {
+            // add filler transaction with latest sequence
+            ApiSyncMarkerRecord record;
+            record.peerID = key.peerID;
+            record.dbID = key.dbID;
+            record.sequence = latestSequence;
+            syncMarkersTran.params.markers.push_back(record);
+        }
     }
-    if (!syncMarkersTran.params.markers.empty())
-        result << QnUbjsonTransactionSerializer::instance()->serializedTransaction(syncMarkersTran);
+    result << QnUbjsonTransactionSerializer::instance()->serializedTransaction(syncMarkersTran);
     
     return ErrorCode::ok;
 }
