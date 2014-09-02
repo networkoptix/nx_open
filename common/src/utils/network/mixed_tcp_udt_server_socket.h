@@ -6,11 +6,12 @@
 #ifndef MIXED_TCP_UDT_SERVER_SOCKET_H
 #define MIXED_TCP_UDT_SERVER_SOCKET_H
 
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
-
+#include <atomic>
 #include <vector>
 #include <queue>
+
+#include <QtCore/QMutex>
+#include <QtCore/QWaitCondition>
 
 #include "abstract_socket.h"
 
@@ -86,8 +87,15 @@ private:
     mutable QMutex m_mutex;
     QWaitCondition m_cond;
     std::queue<std::pair<SystemError::ErrorCode, AbstractStreamSocket*> > m_queue;
+    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_asyncHandler;
+    std::atomic<bool> m_inSyncAccept;
 
-    void connectionAccepted(
+    void connectionAcceptedSync(
+        AbstractStreamServerSocket* serverSocket,
+        size_t serverSocketIndex,
+        SystemError::ErrorCode errorCode,
+        AbstractStreamSocket* newConnection );
+    void connectionAcceptedAsync(
         AbstractStreamServerSocket* serverSocket,
         size_t serverSocketIndex,
         SystemError::ErrorCode errorCode,
