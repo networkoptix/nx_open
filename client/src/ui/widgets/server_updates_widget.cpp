@@ -78,9 +78,9 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     setWarningStyle(ui->dayWarningLabel);
     static_assert(tooLateDayOfWeek <= Qt::Sunday, "In case of future days order change.");
     ui->dayWarningLabel->setVisible(false);
+    ui->detailWidget->setVisible(false);    
 
-    
-   initMenu();
+    initMenu();
 
     m_updateInfo.source = InternetSource;
 
@@ -224,7 +224,6 @@ void QnServerUpdatesWidget::checkForUpdates() {
 }
 
 void QnServerUpdatesWidget::updateUi() {
-
     m_updateSourceActions[m_updateInfo.source]->setChecked(true);
     ui->sourceButton->setEnabled(m_updateTool->idle());
     for (QAction* action: m_updateSourceActions)
@@ -243,65 +242,50 @@ void QnServerUpdatesWidget::updateUi() {
     ui->dayWarningLabel->setVisible(QDateTime::currentDateTime().date().dayOfWeek() >= tooLateDayOfWeek 
         && m_updateTool->canStartUpdate());
 
-    ui->updateProgessBar->setVisible(m_updateTool->isUpdating());
+    ui->updateStateWidget->setVisible(m_updateTool->isUpdating());
+    ui->infiniteProgressWidget->setVisible(!m_updateTool->idle()); 
 
-    bool checkingForUpdates = false;
-    bool applying = false;
-    bool cancellable = false;
-    bool infiniteProgress = false;
-    bool installing = false;
+    if (!m_updateTool->idle())
+        ui->detailLabel->setPalette(this->palette());   /* Remove warning style. */
 
-    switch (m_updateTool->state()) {
-    case QnMediaServerUpdateTool::Idle:
-        break;
-    case QnMediaServerUpdateTool::CheckingForUpdates:
-        ui->detailLabel->setText(tr("Checking for updates..."));
-        infiniteProgress = true;
-        checkingForUpdates = true;
-        break;
-    case QnMediaServerUpdateTool::DownloadingUpdate:
-        applying = true;
-        cancellable = true;
-        ui->detailLabel->setText(tr("Downloading updates"));
-        break;
-    case QnMediaServerUpdateTool::InstallingClientUpdate:
-        applying = true;
-        cancellable = true;
-        ui->detailLabel->setText(tr("Installing client update"));
-        infiniteProgress = true;
-        break;
-    case QnMediaServerUpdateTool::InstallingToIncompatiblePeers:
-        applying = true;
-        cancellable = true;
-        ui->detailLabel->setText(tr("Installing updates to incompatible servers"));
-        break;
-    case QnMediaServerUpdateTool::UploadingUpdate:
-        applying = true;
-        cancellable = true;
-        ui->detailLabel->setText(tr("Pushing updates to servers"));
-        break;
-    case QnMediaServerUpdateTool::InstallingUpdate:
-        applying = true;
-        infiniteProgress = true;
-        installing = true;
-        ui->detailLabel->setText(tr("Installing updates"));
-        break;
-    default:
-        break;
-    }
-
-    ui->cancelButton->setVisible(applying);
-    ui->cancelButton->setEnabled(cancellable);
-    ui->updateStateWidget->setVisible(applying);
-    ui->infiniteProgressWidget->setVisible(infiniteProgress); 
-
-    if (installing) {
+    if (m_updateTool->state() == QnMediaServerUpdateTool::InstallingUpdate) {
         m_extraMessageTimer->start();
     } else {
         ui->extraMessageLabel->hide();
         m_extraMessageTimer->stop();
     }
 
+    bool cancellable = false;
+
+    switch (m_updateTool->state()) {
+    case QnMediaServerUpdateTool::CheckingForUpdates:
+        ui->detailLabel->setText(tr("Checking for updates..."));
+        break;
+    case QnMediaServerUpdateTool::DownloadingUpdate:
+        cancellable = true;
+        ui->detailLabel->setText(tr("Downloading updates"));
+        break;
+    case QnMediaServerUpdateTool::InstallingClientUpdate:
+        cancellable = true;
+        ui->detailLabel->setText(tr("Installing client update"));
+        break;
+    case QnMediaServerUpdateTool::InstallingToIncompatiblePeers:
+        cancellable = true;
+        ui->detailLabel->setText(tr("Installing updates to incompatible servers"));
+        break;
+    case QnMediaServerUpdateTool::UploadingUpdate:
+        cancellable = true;
+        ui->detailLabel->setText(tr("Pushing updates to servers"));
+        break;
+    case QnMediaServerUpdateTool::InstallingUpdate:
+        ui->detailLabel->setText(tr("Installing updates"));
+        break;
+    default:
+        break;
+    }
+
+    ui->detailWidget->setVisible(!ui->detailLabel->text().isEmpty());
+    ui->cancelButton->setEnabled(cancellable);
 }
 
 bool QnServerUpdatesWidget::confirm() {
@@ -356,7 +340,7 @@ void QnServerUpdatesWidget::at_checkForUpdatesFinished(QnCheckForUpdateResult re
         setWarningStyle(&detailPalette);
         break;
     }
-    ui->detailLabel->setVisible(!detail.isEmpty());
+    ui->detailWidget->setVisible(!detail.isEmpty());
     ui->detailLabel->setText(detail);
     ui->detailLabel->setPalette(detailPalette);
 }
