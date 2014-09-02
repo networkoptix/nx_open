@@ -20,6 +20,7 @@ namespace ec2 {
     struct ApiEmailSettingsData;
     struct ApiFullInfoData;
     struct ApiIdData;
+    struct ApiFillerData;
     struct ApiLayoutItemData;
     struct ApiLayoutItemWithRefData;
     struct ApiLayoutData;
@@ -101,6 +102,7 @@ namespace ec2 {
     (ApiEmailSettingsData)\
     (ApiFullInfoData)\
     (ApiIdData)\
+    (ApiFillerData)\
     (ApiLayoutItemData)\
     (ApiLayoutItemWithRefData)\
     (ApiLayoutData)\

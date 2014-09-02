@@ -137,16 +137,6 @@ namespace ec2
     {
         QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;
-        
-        if (command == ApiCommand::setResourceStatus) 
-        {
-            QnResourcePtr res = m_resCtx.pool->getResourceById(id);
-            if (id == qnCommon->moduleGUID())
-                tran.isLocal = true;
-            else if (res && res->hasFlags(Qn::foreigner))
-                tran.isLocal = true;
-        }
-
         return tran;
     }
 

@@ -70,6 +70,13 @@ namespace ec2
     class QnTransactionLog
     {
     public:
+
+        enum ContainsReason {
+            Reason_None,
+            Reason_Sequence,
+            Reason_Timestamp
+        };
+
         QnTransactionLog(QnDbManager* db);
 
         static QnTransactionLog* instance();
@@ -79,7 +86,7 @@ namespace ec2
         QnTranState getTransactionsState();
         
         template <class T>
-        bool contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.params)); }
+        ContainsReason contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.params)); }
 
         template <class T>
         ErrorCode saveTransaction(const QnTransaction<T>& tran) 
@@ -156,7 +163,7 @@ namespace ec2
         qint64 getTimeStamp();
         void init();
 
-        bool contains(const QnAbstractTransaction& tran, const QUuid& hash) const;
+        ContainsReason contains(const QnAbstractTransaction& tran, const QUuid& hash) const;
         QUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray()) const;
         QUuid makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) const;
         QUuid makeHash(const QString &extraData, const ApiDiscoveryDataList &data) const;
@@ -186,6 +193,7 @@ namespace ec2
         QUuid transactionHash(const ApiResetBusinessRuleData& /*tran*/) const    { return makeHash("reset_brule", ADD_HASH_DATA); }
         QUuid transactionHash(const ApiCameraBookmarkTagDataList& params) const  { return makeHash("add_bookmark_tags", params); }
         QUuid transactionHash(const ApiDiscoveryDataList &params) const          { return makeHash("discovery_data_list", params); }
+        QUuid transactionHash(const ApiFillerData& ) const                       { return makeHash("filler_data"); }
         
         QUuid transactionHash(const ApiFullInfoData& ) const                   { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiCameraDataList& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
@@ -220,6 +228,7 @@ namespace ec2
 
     private:
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QUuid& hash, const QByteArray& data);
+        ErrorCode updateSequence(const QnAbstractTransaction& tran);
     private:
         QnDbManager* m_dbManager;
         QnTranState m_state;
@@ -237,6 +246,7 @@ namespace ec2
         QElapsedTimer m_relativeTimer;
         qint64 m_currentTime;
         qint64 m_lastTimestamp;
+        //QMap<QnTranStateKey, QnAbstractTransaction::PersistentInfo> m_fillerInfo;
     };
 };
 
