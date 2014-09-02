@@ -16,9 +16,6 @@ public:
 
     explicit QnWaitCompatibleServersPeerTask(QObject *parent = 0);
 
-    void setTargets(const QHash<QUuid, QUuid> &uuids);
-    QHash<QUuid, QUuid> targets() const;
-
 protected:
     virtual void doStart() override;
 
@@ -30,8 +27,7 @@ private:
     void finishTask(int errorCode);
 
 private:
-    QHash<QUuid, QUuid> m_targets;
-    QSet<QUuid> m_realTargets;
+    QSet<QUuid> m_targets;
 
     QTimer *m_timer;
 };

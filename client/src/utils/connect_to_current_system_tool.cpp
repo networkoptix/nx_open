@@ -51,11 +51,28 @@ void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QUuid> &tar
     if (m_running)
         return;
 
+    if (targets.isEmpty()) {
+        finish(NoError);
+        return;
+    }
+
     m_running = true;
     m_targets = targets;
     m_password = password;
     m_restartTargets.clear();
     m_updateTargets.clear();
+    m_waitTargets.clear();
+
+    foreach (const QUuid &id, m_targets) {
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+
+        QUuid targetId(server->getProperty(lit("guid")));
+        if (!targetId.isNull())
+            m_waitTargets[id] = targetId;
+    }
+
     configureServer();
 }
 
@@ -75,17 +92,11 @@ void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode) {
 }
 
 void QnConnectToCurrentSystemTool::configureServer() {
-    if (m_targets.isEmpty()) {
-        finish(NoError);
-        return;
-    }
-
     QnUserResourcePtr adminUser = getAdminUser();
     if (!adminUser) {
         finish(ConfigurationFailed);
         return;
     }
-    m_configureTask->setPasswordHash(adminUser->getHash(), adminUser->getDigest());
 
     foreach (const QUuid &id, m_targets) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
@@ -98,28 +109,15 @@ void QnConnectToCurrentSystemTool::configureServer() {
         url.setUserName(lit("admin"));
         url.setPassword(m_password);
         server->apiConnection()->setUrl(url);
-
     }
 
-    QHash<QUuid, QUuid> waitTargets;
-
-    foreach (const QUuid &id, m_targets) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
-        if (!server)
-            continue;
-
-        QUuid targetId(server->getProperty(lit("guid")));
-        if (!targetId.isNull())
-            waitTargets[id] = targetId;
-    }
-
-    m_waitTask->setTargets(waitTargets);
-
+    m_configureTask->setPasswordHash(adminUser->getHash(), adminUser->getDigest());
     m_configureTask->setSystemName(qnCommon->localSystemName());
     m_configureTask->start(m_targets);
 }
 
 void QnConnectToCurrentSystemTool::waitPeers() {
+    m_waitTask->setPeers(QSet<QUuid>::fromList(m_waitTargets.values()));
     m_waitTask->start();
 }
 
@@ -179,12 +177,6 @@ void QnConnectToCurrentSystemTool::at_waitTask_finished(int errorCode) {
     if (errorCode != 0) {
         finish(ConfigurationFailed);
         return;
-    }
-
-    QHash<QUuid, QUuid> targets = m_waitTask->targets();
-    for (auto it = targets.begin(); it != targets.end(); ++it) {
-        if (m_targets.remove(it.key()))
-            m_targets.insert(it.value());
     }
 
     updatePeers();

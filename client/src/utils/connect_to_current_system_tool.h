@@ -53,6 +53,7 @@ private:
     QSet<QUuid> m_restartTargets;
     QSet<QUuid> m_updateTargets;
     QHash<QUuid, QUrl> m_oldUrls;
+    QHash<QUuid, QUuid> m_waitTargets;
     QnConfigurePeerTask *m_configureTask;
     QnWaitCompatibleServersPeerTask *m_waitTask;
     QScopedPointer<QnUpdateDialog> m_updateDialog;

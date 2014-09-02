@@ -21,43 +21,20 @@ QnWaitCompatibleServersPeerTask::QnWaitCompatibleServersPeerTask(QObject *parent
     connect(m_timer, &QTimer::timeout, this, &QnWaitCompatibleServersPeerTask::at_timer_timeout);
 }
 
-void QnWaitCompatibleServersPeerTask::setTargets(const QHash<QUuid, QUuid> &uuids) {
-    m_targets = uuids;
-}
-
-QHash<QUuid, QUuid> QnWaitCompatibleServersPeerTask::targets() const {
-    return m_targets;
-}
-
 void QnWaitCompatibleServersPeerTask::doStart() {
-    m_realTargets.clear();
-
-    foreach (const QUuid &id, m_targets.keys()) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
-        if (!server)
-            continue;
-
-        QUuid originalId = m_targets.value(id);
-        if (!originalId.isNull())
-            m_realTargets.insert(originalId);
-    }
-
+    m_targets = peers();
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnWaitCompatibleServersPeerTask::at_resourcePool_resourceAdded);
     connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnWaitCompatibleServersPeerTask::at_resourcePool_resourceAdded);
     m_timer->start();
 }
 
 void QnWaitCompatibleServersPeerTask::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
+    QUuid id = resource->getId();
 
-    QUuid id = server->getId();
+    if (m_targets.contains(id) && resource->getStatus() != Qn::Offline)
+        m_targets.remove(id);
 
-    if (m_realTargets.contains(id) && server->getSystemName() == qnCommon->localSystemName())
-        m_realTargets.remove(id);
-
-    if (m_realTargets.isEmpty())
+    if (m_targets.isEmpty())
         finishTask(NoError);
 }
 
