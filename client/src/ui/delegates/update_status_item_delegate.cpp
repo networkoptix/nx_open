@@ -13,7 +13,7 @@ namespace {
 QnUpdateStatusItemDelegate::QnUpdateStatusItemDelegate(QWidget *parent) :
     QStyledItemDelegate(parent)
 {
-    for(int i = 0; i < static_cast<int>(QnPeerUpdateStage::Count); ++i) {
+    for(int i = 1; i < static_cast<int>(QnPeerUpdateStage::Count); ++i) {
         m_stageSeparators.append(i * 100 / static_cast<int>(QnPeerUpdateStage::Count));
     }
 }

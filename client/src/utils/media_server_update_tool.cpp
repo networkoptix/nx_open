@@ -158,14 +158,14 @@ void QnMediaServerUpdateTool::setState(State state) {
 
 void QnMediaServerUpdateTool::setCheckResult(QnCheckForUpdateResult result) {
     m_checkResult = result;
-    emit checkForUpdatesFinished(result);
     setState(Idle);
+    emit checkForUpdatesFinished(result);
 }
 
 void QnMediaServerUpdateTool::setUpdateResult(QnUpdateResult result) {
     m_updateResult = result;
-    emit updateFinished(result);
     setState(Idle);
+    emit updateFinished(result);
 }
 
 void QnMediaServerUpdateTool::finishUpdate(QnUpdateResult result) {

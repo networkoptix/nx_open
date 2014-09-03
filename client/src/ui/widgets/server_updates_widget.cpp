@@ -81,7 +81,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->detailWidget->setVisible(false);   
 
     QList<int> progressSeparators;
-    for(int i = 0; i < static_cast<int>(QnFullUpdateStage::Count); ++i) {
+    for(int i = 1; i < static_cast<int>(QnFullUpdateStage::Count); ++i) {
         progressSeparators.append(i * 100 / static_cast<int>(QnFullUpdateStage::Count));
     }
     ui->updateProgessBar->setSeparators(progressSeparators);
@@ -319,7 +319,7 @@ void QnServerUpdatesWidget::at_checkForUpdatesFinished(QnCheckForUpdateResult re
     switch (result) {
     case QnCheckForUpdateResult::UpdateFound:
         if (!m_updateTool->targetVersion().isNull() && m_updateTool->isClientRequiresInstaller())
-            detail = tr("You will have to update the client manually using an installer.");
+            detail = tr("Newer version found. You will have to update the client manually using an installer.");
         break;
     case QnCheckForUpdateResult::InternetProblem:
         detail = tr("Cannot check for updates via the Internet. "\
@@ -397,4 +397,5 @@ void QnServerUpdatesWidget::at_updateFinished(QnUpdateResult result) {
         QMessageBox::critical(this, tr("Update failed"), tr("Could not install updates on one or more servers."));
         break;
     }
+    checkForUpdates();
 }
