@@ -791,8 +791,15 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         }
         //if (!execSQLQuery("drop table vms_license", m_sdb))
         //    return false;
-
     }
+
+    if (!isObjectExists(lit("table"), lit("transaction_sequence"), m_sdb))
+    {
+        if (!execSQLFile(lit(":/10_transaction_sequence_table.sql"), m_sdb))
+            return false;
+    }
+
+
     lockStatic.commit();
     lock.commit();
 #ifdef DB_DEBUG

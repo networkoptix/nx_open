@@ -18,7 +18,9 @@ namespace ec2 {
     struct ApiCameraServerItemData;
     struct ApiEmailData;
     struct ApiEmailSettingsData;
-    struct ApiFullInfoData;
+	struct ApiFullInfoData;
+    struct ApiSyncMarkerRecord;
+    struct ApiSyncMarkerData;
     struct ApiIdData;
     struct ApiLayoutItemData;
     struct ApiLayoutItemWithRefData;
@@ -66,6 +68,7 @@ namespace ec2 {
 
     struct ApiTimeData;
     struct ApiPeerSystemTimeData;
+    typedef std::vector<ApiPeerSystemTimeData> ApiPeerSystemTimeDataList;
 
     struct ApiPeerData;
     struct ApiRuntimeData;
@@ -100,6 +103,8 @@ namespace ec2 {
     (ApiEmailSettingsData)\
     (ApiFullInfoData)\
     (ApiIdData)\
+    (ApiSyncMarkerRecord)\
+    (ApiSyncMarkerData)\
     (ApiLayoutItemData)\
     (ApiLayoutItemWithRefData)\
     (ApiLayoutData)\

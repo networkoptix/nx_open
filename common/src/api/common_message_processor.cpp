@@ -363,8 +363,9 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
         ec2::QnPeerTimeInfoList peers = m_connection->getTimeManager()->getPeerTimeInfoList();
         foreach(const ec2::QnPeerTimeInfo &info, peers) {
             Q_ASSERT(QnRuntimeInfoManager::instance()->hasItem(info.peerId));
-            if (QnRuntimeInfoManager::instance()->item(info.peerId).data.peer.peerType != Qn::PT_Server)
+            if( !QnRuntimeInfoManager::instance()->hasItem(info.peerId) )
                 continue;
+            Q_ASSERT(QnRuntimeInfoManager::instance()->item(info.peerId).data.peer.peerType == Qn::PT_Server);
             emit peerTimeChanged(info.peerId, syncTime, info.time);
         }
     });

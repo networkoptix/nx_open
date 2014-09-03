@@ -2,6 +2,8 @@
 
 #include <cstring> /* For std::strstr. */
 
+#include <api/network_proxy_factory.h>
+#include <core/resource/resource.h>
 #include <utils/serialization/lexical_enum.h>
 
 #include "session_manager.h"
@@ -22,8 +24,9 @@ bool QnAbstractReplyProcessor::connect(const char *signal, QObject *receiver, co
     }
 }
 
-QnAbstractConnection::QnAbstractConnection(QObject *parent): 
-    base_type(parent)
+QnAbstractConnection::QnAbstractConnection(QObject *parent, QnResource* targetRes): 
+    base_type(parent),
+    m_targetRes(targetRes)
 {}
 
 QnAbstractConnection::~QnAbstractConnection() {
@@ -63,6 +66,10 @@ QString QnAbstractConnection::objectName(int object) const {
 }
 
 int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot) {
+    //TODO #ak all requests are queued in a single thread, so following call is safe: it will not be overwritten by another call before we actually make this call
+        //after move to own http implementation (in 2.4) remove it and make proxying transparent by introducing target id to every http request to camera or server
+    QnNetworkProxyFactory::instance()->bindHostToResource( m_url.host(), m_targetRes->toSharedPointer() );
+
     QnAbstractReplyProcessor *processor = newReplyProcessor(object);
 
     if (target && slot) {

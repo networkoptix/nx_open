@@ -217,7 +217,7 @@ namespace ec2
         registerUpdateFuncHandler<ApiConnectionDataList>(restProcessorPool, ApiCommand::availableConnections);
 
        //AbstractECConnection
-        registerUpdateFuncHandler<ApiDatabaseDumpData>( restProcessorPool, ApiCommand::resotreDatabase );
+        registerUpdateFuncHandler<ApiDatabaseDumpData>( restProcessorPool, ApiCommand::restoreDatabase );
 
         //AbstractTimeManager::getCurrentTimeImpl
         registerGetFuncHandler<std::nullptr_t, ApiTimeData>( restProcessorPool, ApiCommand::getCurrentTime );
@@ -371,6 +371,8 @@ namespace ec2
         const QUrl& ecURL,
         impl::ConnectHandlerPtr handler)
     {
+        //TODO #ak async ssl is working now, make async request to old ec here
+
         if( errorCode != ErrorCode::ok )
         {
             //checking for old EC
@@ -382,7 +384,16 @@ namespace ec2
                     return connectToOldEC(
                         ecURL,
                         [reqID, handler](ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo) {
-                            handler->done(reqID, errorCode, std::make_shared<OldEcConnection>(oldECConnectionInfo));
+                            if( errorCode == ErrorCode::ok && oldECConnectionInfo.version >= SoftwareVersionType( 2, 3, 0 ) )
+                                handler->done(  //somehow, connected to 2.3 server ith old ec connection. Returning error, since could not connect to ec 2.3 during normal connect
+                                    reqID,
+                                    ErrorCode::ioError,
+                                    AbstractECConnectionPtr() );
+                            else
+                                handler->done(
+                                    reqID,
+                                    errorCode,
+                                    errorCode == ErrorCode::ok ? std::make_shared<OldEcConnection>(oldECConnectionInfo) : AbstractECConnectionPtr() );
                         }
                     );
                 }

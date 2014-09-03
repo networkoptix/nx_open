@@ -119,24 +119,6 @@ QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction
 }
 
 template<class T>
-QnTransaction<ApiEmailSettingsData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnEmail::Settings& resource )
-{
-    QnTransaction<ApiEmailSettingsData> tran(command);
-    fromResourceToApi(resource, tran.params);
-    tran.isLocal = true;
-    return tran;
-}
-
-template<class T>
-QnTransaction<ApiEmailData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const ApiEmailData& data )
-{
-    QnTransaction<ApiEmailData> tran(command);
-    tran.params = data;
-    tran.isLocal = true;
-    return tran;
-}
-
-template<class T>
 QnTransaction<ApiIdData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QUuid& id )
 {
     QnTransaction<ApiIdData> tran(command);

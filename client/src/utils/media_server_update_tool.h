@@ -55,36 +55,16 @@ public:
         InstallingUpdate,
     };
 
-    enum CheckResult {
-        UpdateFound,
-        InternetProblem,
-        NoNewerVersion,
-        NoSuchBuild,
-        UpdateImpossible,
-        BadUpdateFile
-    };
-
-    enum UpdateResult {
-        UpdateSuccessful,
-        Cancelled,
-        LockFailed,
-        DownloadingFailed,
-        UploadingFailed,
-        ClientInstallationFailed,
-        InstallationFailed,
-        RestInstallationFailed
-    };
-
     QnMediaServerUpdateTool(QObject *parent = 0);
     ~QnMediaServerUpdateTool();
 
     State state() const;
 
     bool isUpdating() const;
+    bool idle() const;
 
-    CheckResult updateCheckResult() const;
-    UpdateResult updateResult() const;
-    QString resultString() const;
+    QnCheckForUpdateResult updateCheckResult() const;
+    QnUpdateResult updateResult() const;
 
     void updateServers();
 
@@ -105,10 +85,15 @@ public:
 
     bool isClientRequiresInstaller() const;
 
+    bool canStartUpdate() const;
+
 signals:
     void stateChanged(int state);
     void progressChanged(int progress);
     void peerChanged(const QUuid &peerId);
+
+    void checkForUpdatesFinished(QnCheckForUpdateResult result);
+    void updateFinished(QnUpdateResult result);
 
 public slots:
     void checkForUpdates(const QnSoftwareVersion &version = QnSoftwareVersion());
@@ -134,9 +119,9 @@ private slots:
 
 private:
     void setState(State state);
-    void setCheckResult(CheckResult result);
-    void setUpdateResult(UpdateResult result);
-    void finishUpdate(UpdateResult result);
+    void setCheckResult(QnCheckForUpdateResult result);
+    void setUpdateResult(QnUpdateResult result);
+    void finishUpdate(QnUpdateResult result);
     void setPeerState(const QUuid &peerId, PeerUpdateInformation::State state);
     void removeTemporaryDir();
 
@@ -152,9 +137,8 @@ private:
 private:
     QThread *m_tasksThread;
     State m_state;
-    CheckResult m_checkResult;
-    UpdateResult m_updateResult;
-    QString m_resultString;
+    QnCheckForUpdateResult m_checkResult;
+    QnUpdateResult m_updateResult;
 
     QString m_localTemporaryDir;
 

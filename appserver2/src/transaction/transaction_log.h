@@ -70,6 +70,13 @@ namespace ec2
     class QnTransactionLog
     {
     public:
+
+        enum ContainsReason {
+            Reason_None,
+            Reason_Sequence,
+            Reason_Timestamp
+        };
+
         QnTransactionLog(QnDbManager* db);
 
         static QnTransactionLog* instance();
@@ -79,7 +86,7 @@ namespace ec2
         QnTranState getTransactionsState();
         
         template <class T>
-        bool contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.params)); }
+        ContainsReason contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.params)); }
 
         template <class T>
         ErrorCode saveTransaction(const QnTransaction<T>& tran) 
@@ -156,7 +163,8 @@ namespace ec2
         qint64 getTimeStamp();
         void init();
 
-        bool contains(const QnAbstractTransaction& tran, const QUuid& hash) const;
+        ContainsReason contains(const QnAbstractTransaction& tran, const QUuid& hash) const;
+        int getLatestSequence(const QnTranStateKey& key) const;
         QUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray()) const;
         QUuid makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) const;
         QUuid makeHash(const QString &extraData, const ApiDiscoveryDataList &data) const;
@@ -213,12 +221,15 @@ namespace ec2
         QUuid transactionHash(const QnTranStateResponse& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiRuntimeData& ) const                    { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiPeerSystemTimeData& ) const             { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const ApiPeerSystemTimeDataList& ) const         { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiDatabaseDumpData& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiResourceData& ) const                   { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const ApiSyncMarkerData& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
-
+        ErrorCode updateSequence(const ApiSyncMarkerData& data);
     private:
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QUuid& hash, const QByteArray& data);
+        ErrorCode updateSequenceNoLock(const QUuid& peerID, const QUuid& dbID, int sequence);
     private:
         QnDbManager* m_dbManager;
         QnTranState m_state;
@@ -236,6 +247,7 @@ namespace ec2
         QElapsedTimer m_relativeTimer;
         qint64 m_currentTime;
         qint64 m_lastTimestamp;
+        //QMap<QnTranStateKey, QnAbstractTransaction::PersistentInfo> m_fillerInfo;
     };
 };
 

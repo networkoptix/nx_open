@@ -210,6 +210,10 @@ namespace ec2
         //#ak no notification needed in this case
     }
 
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPeerSystemTimeDataList>& /*tran*/ ) {
+        //#ak no notification needed in this case
+    }
+
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiModuleData> &tran) {
         m_miscManager->triggerNotification(tran);
     }

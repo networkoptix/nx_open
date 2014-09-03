@@ -10,7 +10,6 @@ QnUpdateDialog::QnUpdateDialog(QnWorkbenchContext *context, QWidget *parent) :
 {
     ui->setupUi(this);
     m_updatesWidget = new QnServerUpdatesWidget(this);
-    m_updatesWidget->setMinimalMode(true);
     ui->layout->addWidget(m_updatesWidget);
 }
 

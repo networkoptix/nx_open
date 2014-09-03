@@ -127,15 +127,17 @@ namespace ec2
             availableConnections        = 1503, /*< ApiConnectionDataList */
 
             /* Misc */
-            getCurrentTime              = 9002,  /*< ApiTimeData */         
-            changeSystemName            = 9003,  /*< ApiSystemNameData */
+            forcePrimaryTimeServer      = 2001,  /*< ApiIdData */
+            broadcastPeerSystemTime     = 2002,  /*< ApiPeerSystemTimeData*/
+            getCurrentTime              = 2003,  /*< ApiTimeData */         
+            changeSystemName            = 2004,  /*< ApiSystemNameData */
+            getKnownPeersSystemTime     = 2005,  /*< ApiPeerSystemTimeDataList */
 
             //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
             dumpDatabase                = 9005,  /*< ApiDatabaseDumpData */
-            resotreDatabase             = 9006,  /*< ApiDatabaseDumpData */
-            forcePrimaryTimeServer      = 9007,  /*< ApiIdData */
-            broadcastPeerSystemTime     = 9008,  /*< ApiPeerSystemTimeData*/
+            restoreDatabase             = 9006,  /*< ApiDatabaseDumpData */
+            syncDoneMarker              = 9009,  /*< ApiSyncMarkerData*/
 
             maxTransactionValue         = 65535
         };

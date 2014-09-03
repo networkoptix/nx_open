@@ -86,6 +86,10 @@ bool QnCheckForUpdatesPeerTask::isClientRequiresInstaller() const {
     return m_clientRequiresInstaller;
 }
 
+void QnCheckForUpdatesPeerTask::setDenyMajorUpdates(bool denyMajorUpdates) {
+    m_denyMajorUpdates = denyMajorUpdates;
+}
+
 QHash<QnSystemInformation, QnUpdateFileInformationPtr> QnCheckForUpdatesPeerTask::updateFiles() const {
     return m_updateFiles;
 }
@@ -110,16 +114,22 @@ bool QnCheckForUpdatesPeerTask::needUpdate(const QnSoftwareVersion &version, con
 }
 
 void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
+    if (m_updateFiles.isEmpty()) {
+        cleanUp();
+        finishTask(QnCheckForUpdateResult::BadUpdateFile);
+        return;
+    }
+
     bool needUpdate = false;
     foreach (const QUuid &peerId, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(peerId, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 
-        QnUpdateFileInformationPtr updateFileInformation = m_updateFiles[server->getSystemInfo()];
+        QnUpdateFileInformationPtr updateFileInformation = m_updateFiles.value(server->getSystemInfo(), QnUpdateFileInformationPtr());
         if (!updateFileInformation) {
             cleanUp();
-            finish(UpdateImpossible);
+            finishTask(QnCheckForUpdateResult::ServerUpdateImpossible);
             return;
         }
         needUpdate |= this->needUpdate(server->getVersion(), updateFileInformation->version);
@@ -128,7 +138,7 @@ void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
     if (!m_disableClientUpdates && !m_clientRequiresInstaller) {
         if (!m_clientUpdateFile) {
             cleanUp();
-            finish(UpdateImpossible);
+            finishTask(QnCheckForUpdateResult::ClientUpdateImpossible);
             return;
         }
 
@@ -136,7 +146,7 @@ void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
             needUpdate = true;
     }
 
-    finish(needUpdate ? UpdateFound : NoNewerVersion);
+    finishTask(needUpdate ? QnCheckForUpdateResult::UpdateFound : QnCheckForUpdateResult::NoNewerVersion);
     return;
 }
 
@@ -150,7 +160,7 @@ void QnCheckForUpdatesPeerTask::checkOnlineUpdates(const QnSoftwareVersion &vers
     if (m_denyMajorUpdates && !version.isNull()) {
         QnSoftwareVersion currentVersion = qnCommon->engineVersion();
         if (version.major() != currentVersion.major() || version.minor() != currentVersion.minor()) {
-            finish(NoSuchBuild);
+            finishTask(QnCheckForUpdateResult::NoSuchBuild);
             return;
         }
     }
@@ -172,7 +182,7 @@ void QnCheckForUpdatesPeerTask::checkLocalUpdates() {
     m_temporaryUpdateDir.clear();
 
     if (!QFile::exists(m_updateFileName)) {
-        finish(BadUpdateFile);
+        finishTask(QnCheckForUpdateResult::BadUpdateFile);
         return;
     }
 
@@ -183,7 +193,7 @@ void QnCheckForUpdatesPeerTask::checkLocalUpdates() {
             continue;
 
         if (!dir.mkdir(dirName)) {
-            finish(BadUpdateFile);
+            finishTask(QnCheckForUpdateResult::BadUpdateFile);
             return;
         }
 
@@ -194,7 +204,7 @@ void QnCheckForUpdatesPeerTask::checkLocalUpdates() {
 
     if (!extractZipArchive(m_updateFileName, dir)) {
         cleanUp();
-        finish(BadUpdateFile);
+        finishTask(QnCheckForUpdateResult::BadUpdateFile);
         return;
     }
 
@@ -215,7 +225,7 @@ void QnCheckForUpdatesPeerTask::checkLocalUpdates() {
             m_targetVersion = version;
 
         if (m_targetVersion != version) {
-            finish(BadUpdateFile);
+            finishTask(QnCheckForUpdateResult::BadUpdateFile);
             return;
         }
 
@@ -260,7 +270,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished() {
     reply->deleteLater();
 
     if (reply->error() != QNetworkReply::NoError) {
-        finish(InternetProblem);
+        finishTask(QnCheckForUpdateResult::InternetProblem);
         return;
     }
 
@@ -278,7 +288,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished() {
     QnSoftwareVersion latestVersion = QnSoftwareVersion(releasesMap.value(currentRelease).toString());
     QString updatesPrefix = map.value(lit("updates_prefix")).toString();
     if (latestVersion.isNull() || updatesPrefix.isEmpty()) {
-        finish(InternetProblem);
+        finishTask(QnCheckForUpdateResult::InternetProblem);
         return;
     }
 
@@ -299,7 +309,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished() {
     reply->deleteLater();
 
     if (reply->error() != QNetworkReply::NoError) {
-        finish((reply->error() == QNetworkReply::ContentNotFoundError) ? NoSuchBuild : InternetProblem);
+        finishTask((reply->error() == QNetworkReply::ContentNotFoundError) ? QnCheckForUpdateResult::NoSuchBuild : QnCheckForUpdateResult::InternetProblem);
         return;
     }
 
@@ -309,7 +319,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished() {
     m_targetVersion = QnSoftwareVersion(map.value(lit("version")).toString());
 
     if (m_targetVersion.isNull()) {
-        finish(NoSuchBuild);
+        finishTask(QnCheckForUpdateResult::NoSuchBuild);
         return;
     }
 
@@ -362,3 +372,8 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished() {
 
     checkUpdateCoverage();
 }
+
+void QnCheckForUpdatesPeerTask::finishTask(QnCheckForUpdateResult result) {
+    finish(static_cast<int>(result));
+}
+

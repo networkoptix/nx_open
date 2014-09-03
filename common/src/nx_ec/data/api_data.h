@@ -8,6 +8,7 @@ namespace ec2 {
     struct ApiData {
         virtual ~ApiData() {}
     };
+    #define ApiData_Fields ()
 
     struct ApiIdData: ApiData {
         QUuid id;
@@ -18,8 +19,23 @@ struct ApiDatabaseDumpData: public ApiData {
     QByteArray data;
 
 };
-
 #define ApiDatabaseDumpData_Fields (data)
+
+struct ApiSyncMarkerRecord: public ApiData
+{
+    ApiSyncMarkerRecord(): sequence(0) {}
+    QUuid peerID;
+    QUuid dbID;
+    int sequence;
+};
+#define ApiSyncMarkerRecord_Fields (peerID)(dbID)(sequence)
+
+struct ApiSyncMarkerData: public ApiData 
+{
+    std::vector<ApiSyncMarkerRecord> markers;
+};
+#define ApiSyncMarkerData_Fields (markers)
+
 
 } // namespace ec2
 

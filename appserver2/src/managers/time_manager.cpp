@@ -6,10 +6,16 @@
 #include "time_manager.h"
 
 #include <algorithm>
+#include <atomic>
 
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QDateTime>
 #include <QtCore/QMutexLocker>
+#ifdef Q_OS_MACX
+#include <zlib.h>
+#else
+#include <QtZlib/zlib.h>
+#endif
 
 #include <api/runtime_info_manager.h>
 
@@ -30,27 +36,35 @@ namespace ec2
 {
     //!This parameter holds difference between local system time and synchronized time
     static const QByteArray TIME_DELTA_PARAM_NAME = "sync_time_delta";
+    static const QByteArray TIME_PRIORITY_KEY_PARAM_NAME = "time_priority_key";
 
-    class SaveTimeDeltaTask
+    template<class Function>
+    class CustomRunnable
     :
         public QRunnable
     {
     public:
-        SaveTimeDeltaTask( qint64 timeDelta )
+        CustomRunnable( Function&& function )
         :
-            m_timeDelta( timeDelta )
+            m_function( std::move(function) )
         {
             setAutoDelete( true );
         }
 
         virtual void run()
         {
-            QnDbManager::instance()->saveMiscParam( TIME_DELTA_PARAM_NAME, QByteArray::number(m_timeDelta) );
+            m_function();
         }
 
     private:
-        qint64 m_timeDelta;
+        Function m_function;
     };
+
+    template<class Function>
+    CustomRunnable<Function>* make_custom_runnable( Function&& function )
+    {
+        return new CustomRunnable<Function>( std::move( function ) );
+    }
 
 
     //////////////////////////////////////////////
@@ -166,7 +180,7 @@ namespace ec2
     //////////////////////////////////////////////
     //   TimeSynchronizationManager
     //////////////////////////////////////////////
-    static TimeSynchronizationManager* TimeManager_instance = nullptr;
+    static std::atomic<TimeSynchronizationManager*> TimeManager_instance( nullptr );
 
 #ifdef _DEBUG
     static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*1000;
@@ -204,11 +218,9 @@ namespace ec2
 #ifndef EDGE_SERVER
         m_localTimePriorityKey.flags |= peerIsNotEdgeServer;
 #endif
-        for( int i = 0; (m_localTimePriorityKey.seed == 0) && (i < 3); ++i )
-            m_localTimePriorityKey.seed = (rand() | (rand() * RAND_MAX));
-        if( m_localTimePriorityKey.seed == 0 )
-            m_localTimePriorityKey.seed = rand() + 1;
-        //TODO #ak handle priority key duplicates or use guid?
+        const QByteArray& localGUID = qnCommon->moduleGUID().toByteArray();
+        m_localTimePriorityKey.seed = crc32(0, (const Bytef*)localGUID.constData(), localGUID.size());
+        //TODO #ak use guid to avoid handle priority key duplicates
         if( QElapsedTimer::isMonotonic() )
             m_localTimePriorityKey.flags |= peerHasMonotonicClock;
 
@@ -218,9 +230,6 @@ namespace ec2
             0,
             currentMSecsSinceEpoch(),
             m_localTimePriorityKey ); 
-
-        assert( TimeManager_instance == nullptr );
-        TimeManager_instance = this;
 
         if (QnDbManager::instance())
             connect( QnDbManager::instance(), &QnDbManager::initialized, 
@@ -248,10 +257,16 @@ namespace ec2
             m_manualTimerServerSelectionCheckTaskID = TimerManager::instance()->addTimer(
                 std::bind( &TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired, this, _1 ),
                 MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS );
+
+        assert( TimeManager_instance.load(std::memory_order_relaxed) == nullptr );
+        TimeManager_instance.store( this, std::memory_order_relaxed );
     }
 
     TimeSynchronizationManager::~TimeSynchronizationManager()
     {
+        assert( TimeManager_instance.load(std::memory_order_relaxed) == this );
+        TimeManager_instance.store( nullptr, std::memory_order_relaxed );
+
         quint64 broadcastSysTimeTaskID = 0;
         quint64 manualTimerServerSelectionCheckTaskID = 0;
         quint64 internetSynchronizationTaskID = 0;
@@ -281,16 +296,13 @@ namespace ec2
             m_internetSynchronizationTaskID = 0;
         }
 
-        assert( TimeManager_instance == this );
-        TimeManager_instance = nullptr;
-
         m_timeSynchronizer.pleaseStop();
         m_timeSynchronizer.join();
     }
 
     TimeSynchronizationManager* TimeSynchronizationManager::instance()
     {
-        return TimeManager_instance;
+        return TimeManager_instance.load(std::memory_order_relaxed);
     }
 
     qint64 TimeSynchronizationManager::getSyncTime() const
@@ -301,9 +313,12 @@ namespace ec2
 
     void TimeSynchronizationManager::primaryTimeServerChanged( const QnTransaction<ApiIdData>& tran )
     {
-        quint64 priority;
+        quint64 localTimePriorityBak = 0;
+        quint64 newLocalTimePriority = 0;
         {
             QMutexLocker lk( &m_mutex );
+
+            localTimePriorityBak = m_localTimePriorityKey.toUInt64();
 
             NX_LOG( lit("TimeSynchronizationManager. Received primary time server change transaction. new peer %1, local peer %2").
                 arg( tran.params.id.toString() ).arg( qnCommon->moduleGUID().toString() ), cl_logDEBUG1 );
@@ -329,7 +344,11 @@ namespace ec2
                     m_timeSynchronized = true;
                     //saving synchronized time to DB
                     if( QnDbManager::instance() && QnDbManager::instance()->isInitialized() )
-                        Ec2ThreadPool::instance()->start( new SaveTimeDeltaTask( 0 ) );
+                        Ec2ThreadPool::instance()->start( make_custom_runnable( std::bind(
+                            &QnDbManager::saveMiscParam,
+                            QnDbManager::instance(),
+                            TIME_DELTA_PARAM_NAME,
+                            QByteArray::number(0) ) ) );
 
                     if( !synchronizingByCurrentServer )
                     {
@@ -348,30 +367,40 @@ namespace ec2
             {
                 m_localTimePriorityKey.flags &= ~peerTimeSetByUser;
             }
-            priority = m_localTimePriorityKey.toUInt64();
+            newLocalTimePriority = m_localTimePriorityKey.toUInt64();
+            if( newLocalTimePriority != localTimePriorityBak && QnDbManager::instance() && QnDbManager::instance()->isInitialized() )
+                Ec2ThreadPool::instance()->start( make_custom_runnable( std::bind(
+                    &QnDbManager::saveMiscParam,
+                    QnDbManager::instance(),
+                    TIME_PRIORITY_KEY_PARAM_NAME,
+                    QByteArray::number(newLocalTimePriority) ) ) );
         }
 
         /* Can cause signal, going out of mutex locker. */
-        updateRuntimeInfoPriority(priority);
+        if( newLocalTimePriority != localTimePriorityBak )
+            updateRuntimeInfoPriority(newLocalTimePriority);
     }
 
     void TimeSynchronizationManager::peerSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeData>& tran )
     {
         QMutexLocker lk( &m_mutex );
 
-        NX_LOG( lit("TimeSynchronizationManager. Received peer %1 system time (%2), peer time priority key 0x%3").
-            arg( tran.params.peerID.toString() ).arg( QDateTime::fromMSecsSinceEpoch( tran.params.peerSysTime ).toString( Qt::ISODate ) ).
-            arg(tran.params.timePriorityKey, 0, 16), cl_logDEBUG2 );
-
-        TimePriorityKey peerPriorityKey;
-        peerPriorityKey.fromUInt64( tran.params.timePriorityKey );
-        m_systemTimeByPeer[tran.params.peerID] = TimeSyncInfo(
-            m_monotonicClock.elapsed(),
-            tran.params.peerSysTime,
-            peerPriorityKey );
+        peerSystemTimeReceivedNonSafe( tran.params );
 
         lk.unlock();
         emit peerTimeChanged( tran.params.peerID, getSyncTime(), tran.params.peerSysTime );
+    }
+
+    void TimeSynchronizationManager::knownPeersSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeDataList>& tran )
+    {
+        for( const ApiPeerSystemTimeData& data: tran.params )
+        {
+            {
+                QMutexLocker lk( &m_mutex );
+                peerSystemTimeReceivedNonSafe( data );
+            }
+            emit peerTimeChanged( data.peerID, getSyncTime(), data.peerSysTime );
+        }
     }
 
     TimeSyncInfo TimeSynchronizationManager::getTimeSyncInfo() const
@@ -418,6 +447,25 @@ namespace ec2
         return peers;
     }
 
+    ApiPeerSystemTimeDataList TimeSynchronizationManager::getKnownPeersSystemTime() const
+    {
+        QMutexLocker lk( &m_mutex );
+
+        ApiPeerSystemTimeDataList result;
+        result.reserve( m_systemTimeByPeer.size() );
+        const qint64 currentClock = m_monotonicClock.elapsed();
+        for( auto it = m_systemTimeByPeer.cbegin(); it != m_systemTimeByPeer.cend(); ++it )
+        {
+            ApiPeerSystemTimeData data;
+            data.peerID = it->first;
+            data.timePriorityKey = it->second.timePriorityKey.toUInt64();
+            data.peerSysTime = it->second.syncTime + (currentClock - it->second.monotonicClockValue);
+            result.push_back( std::move(data) );
+        }
+
+        return result;
+    }
+
     void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
         QMutexLocker* const lock,
         const QUuid& remotePeerID,
@@ -448,7 +496,11 @@ namespace ec2
             //saving synchronized time to DB
             m_timeSynchronized = true;
             if( QnDbManager::instance() && QnDbManager::instance()->isInitialized() )
-                Ec2ThreadPool::instance()->start( new SaveTimeDeltaTask( QDateTime::currentMSecsSinceEpoch() - curSyncTime ) );
+                Ec2ThreadPool::instance()->start( make_custom_runnable( std::bind(
+                    &QnDbManager::saveMiscParam,
+                    QnDbManager::instance(),
+                    TIME_DELTA_PARAM_NAME,
+                    QByteArray::number(QDateTime::currentMSecsSinceEpoch() - curSyncTime) ) ) );
             if( m_peerType == Qn::PT_Server )
             {
                 using namespace std::placeholders;
@@ -548,6 +600,7 @@ namespace ec2
             QMutexLocker lk( &m_mutex );
             tran.params.peerSysTime = QDateTime::currentMSecsSinceEpoch();  //currentMSecsSinceEpoch();
         }
+        peerSystemTimeReceived( tran ); //remembering own system time
         QnTransactionMessageBus::instance()->sendTransaction( tran );
     }
 
@@ -613,9 +666,12 @@ namespace ec2
 
     void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoch, SystemError::ErrorCode errorCode )
     {
-        quint64 priority;
+        quint64 localTimePriorityBak = 0;
+        quint64 newLocalTimePriority = 0;
         {
             QMutexLocker lk( &m_mutex );
+
+            localTimePriorityBak = m_localTimePriorityKey.toUInt64();
 
             if( millisFromEpoch > 0 )
             {
@@ -658,11 +714,18 @@ namespace ec2
 
             addInternetTimeSynchronizationTask();
 
-            priority = m_localTimePriorityKey.toUInt64();
+            newLocalTimePriority = m_localTimePriorityKey.toUInt64();
+            if( newLocalTimePriority != localTimePriorityBak && QnDbManager::instance() && QnDbManager::instance()->isInitialized() )
+                Ec2ThreadPool::instance()->start( make_custom_runnable( std::bind(
+                    &QnDbManager::saveMiscParam,
+                    QnDbManager::instance(),
+                    TIME_PRIORITY_KEY_PARAM_NAME,
+                    QByteArray::number(newLocalTimePriority) ) ) );
         }
 
         /* Can cause signal, going out of mutex locker. */
-        updateRuntimeInfoPriority(priority);
+        if( newLocalTimePriority != localTimePriorityBak )
+            updateRuntimeInfoPriority(newLocalTimePriority);
     }
 
     void TimeSynchronizationManager::addInternetTimeSynchronizationTask()
@@ -706,6 +769,28 @@ namespace ec2
     {
         QMutexLocker lk( &m_mutex );
 
+        //restoring local time priority from DB
+        QByteArray timePriorityStr;
+        if( QnDbManager::instance()->readMiscParam( TIME_PRIORITY_KEY_PARAM_NAME, &timePriorityStr ) )
+        {
+            const quint64 restoredPriorityKeyVal = timePriorityStr.toULongLong();
+            TimePriorityKey restoredPriorityKey;
+            restoredPriorityKey.fromUInt64( restoredPriorityKeyVal );
+
+            if( m_localTimePriorityKey.sequence < restoredPriorityKey.sequence )
+                m_localTimePriorityKey.sequence = restoredPriorityKey.sequence;
+            if( restoredPriorityKey.flags & peerTimeSetByUser )
+                m_localTimePriorityKey.flags |= peerTimeSetByUser;
+
+            ApiPeerSystemTimeData peerSystemTimeData;
+            peerSystemTimeData.peerID = qnCommon->moduleGUID();
+            peerSystemTimeData.timePriorityKey = m_localTimePriorityKey.toUInt64();
+            peerSystemTimeData.peerSysTime = QDateTime::currentMSecsSinceEpoch();
+            peerSystemTimeReceivedNonSafe( peerSystemTimeData );
+
+            NX_LOG( lit("TimeSynchronizationManager. Successfully restored time priority key %1 from DB").arg(restoredPriorityKeyVal), cl_logWARNING );
+        }
+
         if( m_timeSynchronized )
         {
             //saving time sync information to DB
@@ -725,4 +810,17 @@ namespace ec2
         }
     }
 
+    void TimeSynchronizationManager::peerSystemTimeReceivedNonSafe( const ApiPeerSystemTimeData& data )
+    {
+        NX_LOG( lit("TimeSynchronizationManager. Received peer %1 system time (%2), peer time priority key 0x%3").
+            arg(data.peerID.toString()).arg( QDateTime::fromMSecsSinceEpoch(data.peerSysTime).toString( Qt::ISODate ) ).
+            arg(data.timePriorityKey, 0, 16), cl_logDEBUG2 );
+
+        TimePriorityKey peerPriorityKey;
+        peerPriorityKey.fromUInt64( data.timePriorityKey );
+        m_systemTimeByPeer[data.peerID] = TimeSyncInfo(
+            m_monotonicClock.elapsed(),
+            data.peerSysTime,
+            peerPriorityKey );
+    }
 }

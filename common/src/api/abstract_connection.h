@@ -107,7 +107,7 @@ class QnAbstractConnection: public Connective<QObject> {
     typedef Connective<QObject> base_type;
 
 public:
-    QnAbstractConnection(QObject *parent = NULL);
+    QnAbstractConnection(QObject *parent = NULL, QnResource* targetRes = nullptr);
     virtual ~QnAbstractConnection();
 
     QUrl url() const;
@@ -171,6 +171,7 @@ private:
     QUrl m_url;
     QScopedPointer<QnLexicalSerializer> m_serializer;
     QnRequestHeaderList m_extraHeaders;
+    QnResource* m_targetRes;
 };
 
 
