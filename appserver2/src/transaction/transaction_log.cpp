@@ -243,6 +243,12 @@ QnTranState QnTransactionLog::getTransactionsState()
     return m_state;
 }
 
+int QnTransactionLog::getLatestSequence(const QnTranStateKey& key) const
+{
+    QReadLocker lock(&m_dbManager->getMutex());
+    return m_state.values.value(key);
+}
+
 QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& hash) const
 {
 

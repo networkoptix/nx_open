@@ -217,7 +217,6 @@ namespace ec2
         QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
 
         QMap<QUuid, int> m_lastTransportSeq;
-        QMap<QnTranStateKey, int> m_lastPersistentSeq;
 
         // alive control
         QElapsedTimer m_aliveSendTimer;
