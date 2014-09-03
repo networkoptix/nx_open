@@ -93,6 +93,7 @@ void QnRestUpdatePeerTask::installNextUpdate() {
     }
 
     QnMediaServerResourcePtr server = m_currentServers.first();
+    m_targetId = QUuid(server->getProperty(lit("guid")));
     server->apiConnection()->installUpdate(m_updateId, m_currentData, this, SLOT(at_updateInstalled(int,int)));
 }
 
@@ -116,16 +117,29 @@ void QnRestUpdatePeerTask::at_updateInstalled(int status, int handle) {
         return;
     }
 
-    QnMediaServerResourcePtr server = m_currentServers.first();
-    connect(server.data(), &QnMediaServerResource::resourceChanged, this, &QnRestUpdatePeerTask::at_resourceChanged);
+    if (m_targetId.isNull()) {
+        QnMediaServerResourcePtr server = m_currentServers.first();
+        connect(server.data(), &QnMediaServerResource::resourceChanged, this, &QnRestUpdatePeerTask::at_resourceChanged);
+    } else {
+        connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnRestUpdatePeerTask::at_resourceChanged);
+    }
     m_shortTimer->start();
     m_longTimer->start();
 }
 
-void QnRestUpdatePeerTask::at_resourceChanged() {
+void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = m_currentServers.first();
+    if (!m_targetId.isNull()) {
+        if (m_targetId != resource->getId())
+            return;
+
+        server = qnResPool->getResourceById(m_targetId).dynamicCast<QnMediaServerResource>();
+        if (!server)
+            return;
+    }
+
     if (server->getVersion() == m_version) {
-        disconnect(server.data(), &QnMediaServerResource::resourceChanged, this, &QnRestUpdatePeerTask::at_resourceChanged);
+        sender()->disconnect(this);
         finishPeer();
     }
 }

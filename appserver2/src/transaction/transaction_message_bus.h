@@ -196,7 +196,7 @@ namespace ec2
         /** Info about us. Should be set before start(). */
         ApiPeerData m_localPeer;
 
-        QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
+        //QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
         QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
 		QScopedPointer<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
 

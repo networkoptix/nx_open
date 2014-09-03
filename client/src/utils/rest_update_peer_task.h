@@ -33,7 +33,7 @@ private:
 
 private slots:
     void at_updateInstalled(int status, int handle);
-    void at_resourceChanged();
+    void at_resourceChanged(const QnResourcePtr &resource);
     void at_shortTimeout();
     void at_longTimeout();
     void at_finished();
@@ -46,6 +46,7 @@ private:
 
     QByteArray m_currentData;
     QList<QnMediaServerResourcePtr> m_currentServers;
+    QUuid m_targetId;
     QTimer *m_shortTimer;
     QTimer *m_longTimer;
 };

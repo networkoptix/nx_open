@@ -15,5 +15,5 @@ namespace ec2
         }
     }
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTransactionTransportHeader, (binary)(json)(ubjson), QnTransactionTransportHeader_Fields);
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTransactionTransportHeader, (json)(ubjson), QnTransactionTransportHeader_Fields);
 }
