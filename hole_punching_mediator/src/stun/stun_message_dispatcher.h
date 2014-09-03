@@ -12,7 +12,7 @@
 
 #include <utils/common/stoppable.h>
 
-#include "../stun_server_connection.h"
+#include "stun_server_connection.h"
 
 
 //!Dispatches STUN protocol messages to corresponding processor
