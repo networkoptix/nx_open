@@ -217,9 +217,9 @@
             <ComponentGroupRef Id="VmaxProxySDK"/>
             <?endif?>       
 
-<!--            <ComponentRef Id="traytool.exe"/>
+            <ComponentRef Id="traytool.exe"/>
             <ComponentGroupRef Id="TrayToolQTLibraries"/>
-            <ComponentGroupRef Id="TraytoolPlatforms" />            -->
+            <ComponentGroupRef Id="TraytoolPlatforms" />
 
         </Feature>
 

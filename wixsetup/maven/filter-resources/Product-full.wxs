@@ -155,14 +155,24 @@
         <CustomAction Id="CertGenAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
 
-<!--        <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
+        <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
                       Value="&quot;[${customization}TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
-                      Execute="deferred" Return="ignore" Impersonate="no" /> -->
+                      Execute="deferred" Return="ignore" Impersonate="no" />
+
+        <CustomAction Id="CloseTrayToolAction2_Cmd" Property="CloseTrayToolAction2"
+                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM traytool.exe' Execute="immediate" />
+        <CustomAction Id="CloseTrayToolAction2" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="ignore" Impersonate="no" />
 
         <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
                       Value="&quot;[${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]$(var.ProductName) Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="ignore" Impersonate="no" />
+
+        <CustomAction Id="CloseAppLauncherAction2_Cmd" Property="CloseAppLauncherAction2"
+                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "$(var.ProductName) Launcher.exe"' Execute="immediate" />
+        <CustomAction Id="CloseAppLauncherAction2" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
         <CustomAction Id="SyncDatabaseAction_Cmd_WithWarning" Property="SyncDatabaseAction"
@@ -175,7 +185,7 @@
         <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="yes"
                       Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\ecs.sqlite"/>
 
-<!--        <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/> -->
+        <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
         <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="applauncher.exe" ExeCommand=""/>
 
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
@@ -224,22 +234,20 @@
             <Custom Action="DeleteOldMediaserverSettings_Cmd" After="WriteRegistryValues">$(var.VmsUpgrading)</Custom>
             <Custom Action="DeleteOldMediaserverSettings" After="DeleteOldMediaserverSettings_Cmd">$(var.VmsUpgrading)</Custom>
 
-<!--            <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">
-                <![CDATA[ NOT $(var.VmsInstalling) ]]>
-            </Custom>                                 
-            <Custom Action="CloseTrayToolAction" Before="StopServices">
-                <![CDATA[ NOT $(var.VmsInstalling) ]]>
-            </Custom> -->
+            <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">NOT $(var.VmsInstalling)</Custom>                                 
+            <Custom Action="CloseTrayToolAction" Before="CloseTrayToolAction2_Cmd">NOT $(var.VmsInstalling)</Custom>
 
-            <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">
-                <![CDATA[ NOT $(var.VmsInstalling) ]]>
-            </Custom>
-            <Custom Action="CloseAppLauncherAction" Before="StopServices">
-                <![CDATA[ NOT $(var.VmsInstalling) ]]>
-            </Custom>
+            <Custom Action="CloseTrayToolAction2_Cmd" Before="CloseTrayToolAction2">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="CloseTrayToolAction2" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
 
-<!--            <Custom Action="LaunchTrayTool" After="InstallFinalize">
-            <![CDATA[ (!ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom> -->
+            <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="CloseAppLauncherAction" Before="CloseAppLauncherAction2_Cmd">NOT $(var.VmsInstalling)</Custom>
+
+            <Custom Action="CloseAppLauncherAction2_Cmd" Before="CloseAppLauncherAction2">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="CloseAppLauncherAction2" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
+
+            <Custom Action="LaunchTrayTool" After="InstallFinalize">
+            <![CDATA[ (!ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom>
 
             <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
             <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">REMOVE_DATABASE=1</Custom>
