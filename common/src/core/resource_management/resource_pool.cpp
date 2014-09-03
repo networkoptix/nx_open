@@ -554,27 +554,6 @@ QnResourceList QnResourcePool::getAllIncompatibleResources() const {
     return m_incompatibleResources.values();
 }
 
-void QnResourcePool::updateIncompatibility(const QnResourcePtr &resource) {
-    QMutexLocker locker(&m_resourcesMtx);
-    Qn::ResourceStatus status = resource->getStatus();
-
-    if (status == Qn::Incompatible) {
-        auto it = m_resources.find(resource->getUniqueId());
-        if (it == m_resources.end() || it.value() != resource)
-            return;
-
-        m_resources.erase(it);
-        insertOrUpdateResource(resource, &m_incompatibleResources);
-    } else {
-        auto it = m_incompatibleResources.find(resource->getUniqueId());
-        if (it == m_incompatibleResources.end() || it.value() != resource)
-            return;
-
-        m_incompatibleResources.erase(it);
-        insertOrUpdateResource(resource, &m_resources);
-    }
-}
-
 void QnResourcePool::clearIncompatibleResources() {
     QMutexLocker locker(&m_resourcesMtx);
     m_incompatibleResources.clear();

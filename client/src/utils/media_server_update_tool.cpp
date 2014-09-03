@@ -24,27 +24,45 @@
 
 namespace {
 
-const QString QN_UPDATE_PACKAGE_URL = lit("http://enk.me/bg/dklychkov/exmaple_update/get_update");
-const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
-const QString mutexName = lit("auto_update");
+    const QString QN_UPDATE_PACKAGE_URL = lit("http://enk.me/bg/dklychkov/exmaple_update/get_update");
+    const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
+    const QString mutexName = lit("auto_update");
 
-#ifdef Q_OS_MACX
-const bool defaultDisableClientUpdates = true;
-#else
-const bool defaultDisableClientUpdates = false;
-#endif
+    #ifdef Q_OS_MACX
+    const bool defaultDisableClientUpdates = true;
+    #else
+    const bool defaultDisableClientUpdates = false;
+    #endif
 
-bool verifyFile(const QString &fileName, qint64 size, const QString &md5) {
-    QFile file(fileName);
+    bool verifyFile(const QString &fileName, qint64 size, const QString &md5) {
+        QFile file(fileName);
 
-    if (!file.exists() || file.size() != size)
-        return false;
+        if (!file.exists() || file.size() != size)
+            return false;
 
-    if (!md5.isEmpty() && makeMd5(&file) != md5)
-        return false;
+        if (!md5.isEmpty() && makeMd5(&file) != md5)
+            return false;
 
-    return true;
-}
+        return true;
+    }
+
+    enum class PeerUpdateStage {
+        Download,           /**< Download update package for the peer. */
+        Push,               /**< Push update package to the peer. */
+        Install,            /**< Install update. */
+
+        Count
+    };
+
+    enum class FullUpdateStage {
+        Download,           /**< Download update packages. */
+        Client,             /**< Install client update. */
+        Incompatible,       /**< Install updates to the incompatible servers. */
+        Push,               /**< Push update package to the normal servers. */
+        Servers,            /**< Install updates to the normal servers. */
+
+        Count
+    };
 
 } // anonymous namespace
 
@@ -64,7 +82,8 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     QObject(parent),
     m_tasksThread(new QThread(this)),
     m_state(Idle),
-    m_checkResult(UpdateFound),
+    m_checkResult(QnCheckForUpdateResult::NoNewerVersion),
+    m_updateResult(QnUpdateResult::Successful),
     m_denyMajorUpdates(false),
     m_distributedMutex(0),
     m_checkForUpdatesPeerTask(new QnCheckForUpdatesPeerTask()),
@@ -119,6 +138,10 @@ bool QnMediaServerUpdateTool::isUpdating() const {
     return m_state >= DownloadingUpdate;
 }
 
+bool QnMediaServerUpdateTool::idle() const {
+    return m_state == Idle;
+}
+
 void QnMediaServerUpdateTool::setState(State state) {
     if (m_state == state)
         return;
@@ -127,68 +150,19 @@ void QnMediaServerUpdateTool::setState(State state) {
     emit stateChanged(state);
 }
 
-void QnMediaServerUpdateTool::setCheckResult(QnMediaServerUpdateTool::CheckResult result) {
+void QnMediaServerUpdateTool::setCheckResult(QnCheckForUpdateResult result) {
     m_checkResult = result;
-
-    switch (result) {
-    case UpdateFound:
-        m_resultString = tr("Update has been successfully finished.");
-        break;
-    case InternetProblem:
-        m_resultString = tr("Check for updates failed.");
-        break;
-    case NoNewerVersion:
-        m_resultString = tr("All component in your system are already up to date.");
-        break;
-    case NoSuchBuild:
-        m_resultString = tr("There is no such build on the update server");
-        break;
-    case UpdateImpossible:
-        if (m_clientUpdateFile.isNull())
-            m_resultString = tr("Cannot start update.\nAn update for the client was not found.");
-        else
-            m_resultString = tr("Cannot start update.\nAn update for one or more servers was not found.");
-        break;
-    case BadUpdateFile:
-        m_resultString = tr("Cannot update from this file:\n%1").arg(QFileInfo(m_checkForUpdatesPeerTask->updateFileName()).fileName());
-        break;
-    }
-
+    emit checkForUpdatesFinished(result);
     setState(Idle);
 }
 
-void QnMediaServerUpdateTool::setUpdateResult(QnMediaServerUpdateTool::UpdateResult result) {
+void QnMediaServerUpdateTool::setUpdateResult(QnUpdateResult result) {
     m_updateResult = result;
-
-    switch (result) {
-    case UpdateSuccessful:
-        m_resultString = tr("Update has been successfully finished.");
-        break;
-    case Cancelled:
-        m_resultString = tr("Update has been cancelled.");
-        break;
-    case LockFailed:
-        m_resultString = tr("Someone has already started an update.");
-        break;
-    case DownloadingFailed:
-        m_resultString = tr("Could not download updates.");
-        break;
-    case UploadingFailed:
-        m_resultString = tr("Could not upload updates to servers.");
-        break;
-    case ClientInstallationFailed:
-        m_resultString = tr("Could not install an pdate to the client.");
-        break;
-    case InstallationFailed:
-    case RestInstallationFailed:
-        m_resultString = tr("Could not install updates on one or more servers.");
-        break;
-    }
-
+    emit updateFinished(result);
     setState(Idle);
 }
 
-void QnMediaServerUpdateTool::finishUpdate(QnMediaServerUpdateTool::UpdateResult result) {
+void QnMediaServerUpdateTool::finishUpdate(QnUpdateResult result) {
     m_tasksThread->quit();
     unlockMutex();
     removeTemporaryDir();
@@ -206,16 +180,12 @@ void QnMediaServerUpdateTool::setPeerState(const QUuid &peerId, QnMediaServerUpd
     }
 }
 
-QnMediaServerUpdateTool::CheckResult QnMediaServerUpdateTool::updateCheckResult() const {
+QnCheckForUpdateResult QnMediaServerUpdateTool::updateCheckResult() const {
     return m_checkResult;
 }
 
-QnMediaServerUpdateTool::UpdateResult QnMediaServerUpdateTool::updateResult() const {
+QnUpdateResult QnMediaServerUpdateTool::updateResult() const {
     return m_updateResult;
-}
-
-QString QnMediaServerUpdateTool::resultString() const {
-    return m_resultString;
 }
 
 QnSoftwareVersion QnMediaServerUpdateTool::targetVersion() const {
@@ -300,9 +270,9 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl() const {
         systemInformationList = QSet<QnSystemInformation>::fromList(m_idBySystemInformation.keys());
     }
 
-    query.addQueryItem(lit("client"), QnSystemInformation::currentSystemInformation().toString().replace(QLatin1Char(' '), QLatin1Char('_')));
+    query.addQueryItem(lit("client"), QnSystemInformation::currentSystemInformation().toString().replace(L' ', L'_'));
     foreach (const QnSystemInformation &systemInformation, systemInformationList)
-        query.addQueryItem(lit("server"), systemInformation.toString().replace(QLatin1Char(' '), QLatin1Char('_')));
+        query.addQueryItem(lit("server"), systemInformation.toString().replace(L' ', L'_'));
 
     QUrl url(QN_UPDATE_PACKAGE_URL + versionSuffix);
     url.setQuery(query);
@@ -324,6 +294,10 @@ void QnMediaServerUpdateTool::reset() {
 
 bool QnMediaServerUpdateTool::isClientRequiresInstaller() const {
     return m_clientRequiresInstaller;
+}
+
+bool QnMediaServerUpdateTool::canStartUpdate() const {
+    return m_state == Idle && m_checkResult == QnCheckForUpdateResult::UpdateFound;
 }
 
 void QnMediaServerUpdateTool::checkForUpdates(const QnSoftwareVersion &version) {
@@ -437,7 +411,7 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
     for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
         it->state = PeerUpdateInformation::UpdateCanceled;
 
-    setUpdateResult(Cancelled);
+    setUpdateResult(QnUpdateResult::Cancelled);
     return true;
 }
 
@@ -564,6 +538,19 @@ void QnMediaServerUpdateTool::installIncompatiblePeers() {
     QMetaObject::invokeMethod(m_restUpdatePeerTask, "start", Qt::QueuedConnection);
 }
 
+void QnMediaServerUpdateTool::prepareToUpload() {
+    connect(qnResPool, &QnResourcePool::statusChanged, this, &QnMediaServerUpdateTool::at_resourcePool_statusChanged);
+
+    foreach (const QnMediaServerResourcePtr &server, m_targets) {
+        if (server->getStatus() != Qn::Online) {
+            finishUpdate(QnUpdateResult::UploadingFailed);
+            return;
+        }
+    }
+
+    lockMutex();
+}
+
 void QnMediaServerUpdateTool::lockMutex() {
     setState(UploadingUpdate);
 
@@ -588,7 +575,7 @@ void QnMediaServerUpdateTool::at_mutexLocked() {
 void QnMediaServerUpdateTool::at_mutexTimeout() {
     m_distributedMutex->deleteLater();
     m_distributedMutex = 0;
-    finishUpdate(LockFailed);
+    finishUpdate(QnUpdateResult::LockFailed);
 }
 
 void QnMediaServerUpdateTool::at_checkForUpdatesTask_finished(int errorCode) {
@@ -600,7 +587,7 @@ void QnMediaServerUpdateTool::at_checkForUpdatesTask_finished(int errorCode) {
     m_clientRequiresInstaller = m_checkForUpdatesPeerTask->isClientRequiresInstaller();
     m_clientUpdateFile = m_checkForUpdatesPeerTask->clientUpdateFile();
 
-    setCheckResult((CheckResult)errorCode); // codes are the same now
+    setCheckResult(static_cast<QnCheckForUpdateResult>(errorCode)); // codes are the same now
 }
 
 void QnMediaServerUpdateTool::at_downloadTask_finished(int errorCode) {
@@ -610,7 +597,7 @@ void QnMediaServerUpdateTool::at_downloadTask_finished(int errorCode) {
     if (errorCode != 0) {
         for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
             setPeerState(it.key(), PeerUpdateInformation::UpdateFailed);
-        finishUpdate(DownloadingFailed);
+        finishUpdate(QnUpdateResult::DownloadingFailed);
         return;
     }
 
@@ -639,7 +626,7 @@ void QnMediaServerUpdateTool::at_clientUpdateInstalled() {
     if (futureWatcher->result() != applauncher::api::ResultType::ok) {
         for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
             setPeerState(it.key(), PeerUpdateInformation::UpdateFailed);
-        finishUpdate(InstallationFailed);
+        finishUpdate(QnUpdateResult::InstallationFailed);
         return;
     }
 
@@ -653,7 +640,7 @@ void QnMediaServerUpdateTool::at_uploadTask_finished(int errorCode) {
     if (errorCode != 0) {
         for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
             setPeerState(it.key(), PeerUpdateInformation::UpdateFailed);
-        finishUpdate(UploadingFailed);
+        finishUpdate(QnUpdateResult::UploadingFailed);
         return;
     }
 
@@ -667,11 +654,11 @@ void QnMediaServerUpdateTool::at_installTask_finished(int errorCode) {
     if (errorCode != 0) {
         for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
             setPeerState(it.key(), PeerUpdateInformation::UpdateFailed);
-        finishUpdate(InstallationFailed);
+        finishUpdate(QnUpdateResult::InstallationFailed);
         return;
     }
 
-    finishUpdate(UpdateSuccessful);
+    finishUpdate(QnUpdateResult::Successful);
 }
 
 void QnMediaServerUpdateTool::at_restUpdateTask_finished(int errorCode) {
@@ -681,41 +668,50 @@ void QnMediaServerUpdateTool::at_restUpdateTask_finished(int errorCode) {
     if (errorCode != 0) {
         for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
             setPeerState(it.key(), PeerUpdateInformation::UpdateFailed);
-        finishUpdate(RestInstallationFailed);
+        finishUpdate(QnUpdateResult::RestInstallationFailed);
         return;
     }
 
     if ((m_targetPeerIds - m_incompatiblePeerIds).isEmpty()) {
-        finishUpdate(UpdateSuccessful);
+        finishUpdate(QnUpdateResult::Successful);
         return;
     }
 
-    lockMutex();
+    prepareToUpload();
 }
 
 void QnMediaServerUpdateTool::at_networkTask_peerProgressChanged(const QUuid &peerId, int progress) {
 
-    const int StagesCount = 3;
+    PeerUpdateStage stage = PeerUpdateStage::Download;
 
-    int progressBase = 0;
     switch (m_updateInformationById[peerId].state) {
     case PeerUpdateInformation::PendingUpload:
     case PeerUpdateInformation::UpdateUploading:
-        progressBase = 100 / StagesCount;
+        stage = PeerUpdateStage::Push;
         break;
     case PeerUpdateInformation::PendingInstallation:
     case PeerUpdateInformation::UpdateInstalling:
-        progressBase = 2 * 100 / StagesCount;
+        stage = PeerUpdateStage::Install;
         break;
     default:
         break;
-//             UpdateFinished,
-//             UpdateFailed,
-//             UpdateCanceled
     }
 
-    m_updateInformationById[peerId].progress = progressBase + (progress / StagesCount);
+    m_updateInformationById[peerId].progress = (progress + static_cast<int>(stage)*100) / ( static_cast<int>(PeerUpdateStage::Count) ) ;
     emit peerChanged(peerId);
+}
+
+void QnMediaServerUpdateTool::at_resourcePool_statusChanged(const QnResourcePtr &resource) {
+    if (m_state != UploadingUpdate)
+        return;
+
+    if (!m_targetPeerIds.contains(resource->getId()))
+        return;
+
+    if (resource->getStatus() != Qn::Online) {
+        m_uploadUpdatesPeerTask->cancel();
+        finishUpdate(QnUpdateResult::UploadingFailed);
+    }
 }
 
 void QnMediaServerUpdateTool::at_downloadTask_peerFinished(const QUuid &peerId) {

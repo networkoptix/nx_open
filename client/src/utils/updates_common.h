@@ -3,6 +3,28 @@
 
 #include <utils/common/software_version.h>
 
+enum class QnCheckForUpdateResult {
+    UpdateFound,
+    InternetProblem,
+    NoNewerVersion,
+    NoSuchBuild,
+    ServerUpdateImpossible,
+    ClientUpdateImpossible,
+    BadUpdateFile
+};
+
+enum class QnUpdateResult {
+    Successful,
+    Cancelled,
+    LockFailed,
+    DownloadingFailed,
+    UploadingFailed,
+    ClientInstallationFailed,
+    InstallationFailed,
+    RestInstallationFailed
+};
+
+
 struct QnUpdateFileInformation {
     QnSoftwareVersion version;
     QString fileName;

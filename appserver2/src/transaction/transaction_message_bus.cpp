@@ -154,6 +154,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::broadcastPeerSystemTime: return handleTransactionParams<ApiPeerSystemTimeData> (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::forcePrimaryTimeServer:  return handleTransactionParams<ApiIdData>             (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::getKnownPeersSystemTime: return handleTransactionParams<ApiPeerSystemTimeDataList> (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::syncDoneMarker:          return handleTransactionParams<ApiSyncMarkerData>         (serializedTransaction, &stream, transaction, function, fastFunction);
 
     default:
         qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";
@@ -239,7 +240,7 @@ void QnTransactionMessageBus::removeAlivePeer(const QUuid& id, bool sendTran, bo
 {
     // 1. remove peer from alivePeers map
 
-    m_lastTranSeq.remove(id);
+    m_lastTransportSeq.remove(id);
 
     auto itr = m_alivePeers.find(id);
     if (itr == m_alivePeers.end())
@@ -369,7 +370,52 @@ void QnTransactionMessageBus::sendTransactionToTransport(const QnTransaction<T> 
     Q_ASSERT(!tran.isLocal);
     transport->sendTransaction(tran, transportHeader);
 }
-        
+
+bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport)
+{
+    if (transportHeader.sender.isNull())
+        return true; // old version, nothing to check
+
+    // 1. check transport sequence
+    int transportSeq = m_lastTransportSeq[transportHeader.sender];
+    if (transportSeq >= transportHeader.sequence) {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+        qDebug() << "Ignore transaction because of transport sequence: " << transportHeader.sequence << "<=" << transportSeq;
+#endif
+        return false; // already processed
+    }
+    m_lastTransportSeq[transportHeader.sender] = transportHeader.sequence;
+
+    // 2. check persistent sequence
+    if (tran.persistentInfo.isNull() || !transactionLog)
+        return true; // nothing to check
+
+    QnTranStateKey persistentKey(tran.peerID, tran.persistentInfo.dbID);
+    int persistentSeq = transactionLog->getLatestSequence(persistentKey);
+
+    if (transport->isSyncDone() && persistentSeq && tran.persistentInfo.sequence > persistentSeq + 1) {
+        // gap in persistent data detect, do resync
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+        qDebug() << "GAP in persistent data detected! for peer" << tran.peerID << "Expected seq=" << persistentSeq + 1 <<", but got seq=" << tran.persistentInfo.sequence;
+#endif
+
+        if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
+            queueSyncRequest(transport);
+        else 
+            transport->setState(QnTransactionTransport::Error); // reopen
+        return false;
+    }
+    return true;
+}
+
+void QnTransactionMessageBus::updatePersistentMarker(const QnTransaction<ApiSyncMarkerData>& tran, QnTransactionTransport* transport)
+{
+    if (transport->remotePeer().id == tran.peerID)
+        transport->setSyncDone(true);
+    if (transactionLog)
+        transactionLog->updateSequence(tran.params);
+}
+
 template <class T>
 void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) 
 {
@@ -379,16 +425,8 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     if (itr != m_alivePeers.end())
         itr.value().lastActivity.restart();
 
-    if (!transportHeader.sender.isNull()) 
-    {
-        if (m_lastTranSeq[transportHeader.sender] >= transportHeader.sequence) {
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-            qDebug() << "Ignore transaction because of transport sequence: " << transportHeader.sequence << "<=" << m_lastTranSeq[transportHeader.sender];
-#endif
-            return; // already processed
-        }
-        m_lastTranSeq[transportHeader.sender] = transportHeader.sequence;
-    }
+    if (!checkSequence(transportHeader, tran, sender))
+        return;
 
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
@@ -427,13 +465,34 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             if( m_handler )
                 m_handler->triggerNotification(tran);
             break;
+        case ApiCommand::syncDoneMarker:
+            updatePersistentMarker(tran, sender);
+            break;
         default:
             // general transaction
             if (!sender->isReadSync(tran.command))
                 return;
 
-            if (!tran.persistentInfo.isNull() && transactionLog && transactionLog->contains(tran))
-                return; // already processed
+            if (!tran.persistentInfo.isNull() && transactionLog) 
+            {
+                QnTransactionLog::ContainsReason isContains = transactionLog->contains(tran);
+                if (isContains != QnTransactionLog::Reason_None) 
+                {
+                    // already processed
+                    if (isContains == QnTransactionLog::Reason_Timestamp) {
+                        // proxy filler transaction to avoid gaps in the persistent sequence
+                        QnTransaction<ApiSyncMarkerData> fillerTran(ApiCommand::syncDoneMarker);
+                        ApiSyncMarkerRecord record;
+                        record.peerID = tran.peerID;
+                        record.dbID = tran.persistentInfo.dbID;
+                        record.sequence = tran.persistentInfo.sequence;
+                        fillerTran.params.markers.push_back(record);
+                        transactionLog->updateSequence(fillerTran.params);
+                        proxyTransaction(fillerTran, transportHeader);
+                    }
+                    return; 
+                }
+            }
             if (!tran.persistentInfo.isNull() && dbManager)
             {
                 QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
@@ -461,6 +520,12 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 #endif
     }
 
+    proxyTransaction(tran, transportHeader);
+}
+
+template <class T>
+void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader) 
+{
     // proxy incoming transaction to other peers.
     if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty()) {
         emit transactionProcessed(tran);
@@ -493,7 +558,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 #endif
 
     emit transactionProcessed(tran);
-}
+};
 
 void QnTransactionMessageBus::printTranState(const QnTranState& tranState)
 {
@@ -549,6 +614,7 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
 {
     // send sync request
     transport->setReadSync(false);
+    transport->setSyncDone(false);
     QnTransaction<QnTranState> requestTran(ApiCommand::tranSyncRequest);
     requestTran.params = transactionLog->getTransactionsState();
     transport->sendTransaction(requestTran, QnPeerSet() << transport->remotePeer().id << m_localPeer.id);
@@ -796,7 +862,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
             }
         }
         Q_ASSERT(found);
-        m_lastTranSeq[transport->remotePeer().id] = 0;
+        m_lastTransportSeq.remove(transport->remotePeer().id);
         transport->setState(QnTransactionTransport::ReadyForStreaming);
 
         transport->processExtraData();

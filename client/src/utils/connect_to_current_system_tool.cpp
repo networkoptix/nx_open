@@ -7,6 +7,7 @@
 #include <common/common_module.h>
 #include <utils/network/global_module_finder.h>
 #include <utils/configure_peer_task.h>
+#include <utils/wait_compatible_servers_peer_task.h>
 #include <utils/media_server_update_tool.h>
 #include <utils/common/software_version.h>
 #include <ui/dialogs/update_dialog.h>
@@ -18,6 +19,15 @@ namespace {
         CheckingForUpdates,
         Updating
     };
+
+    QnUserResourcePtr getAdminUser() {
+        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
+            QnUserResourcePtr user = resource.staticCast<QnUserResource>();
+            if (user->getName() == lit("admin"))
+                return user;
+        }
+        return QnUserResourcePtr();
+    }
 }
 
 QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *context, QObject *parent) :
@@ -25,11 +35,13 @@ QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *c
     QnWorkbenchContextAware(context),
     m_running(false),
     m_configureTask(new QnConfigurePeerTask(this)),
+    m_waitTask(new QnWaitCompatibleServersPeerTask(this)),
     m_updateDialog(new QnUpdateDialog(context))
 {
     m_updateTool = m_updateDialog->updateTool();
 
     connect(m_configureTask,            &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_configureTask_finished);
+    connect(m_waitTask,                 &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_waitTask_finished);
     // queued connection is used to be sure that we'll get this signal AFTER it will be handled by update dialog
     connect(m_updateTool,               &QnMediaServerUpdateTool::stateChanged,     this,       &QnConnectToCurrentSystemTool::at_updateTool_stateChanged, Qt::QueuedConnection);
 }
@@ -40,11 +52,28 @@ void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QUuid> &tar
     if (m_running)
         return;
 
+    if (targets.isEmpty()) {
+        finish(NoError);
+        return;
+    }
+
     m_running = true;
     m_targets = targets;
     m_password = password;
     m_restartTargets.clear();
     m_updateTargets.clear();
+    m_waitTargets.clear();
+
+    foreach (const QUuid &id, m_targets) {
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+
+        QUuid targetId(server->getProperty(lit("guid")));
+        if (!targetId.isNull())
+            m_waitTargets[id] = targetId;
+    }
+
     configureServer();
 }
 
@@ -64,17 +93,10 @@ void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode) {
 }
 
 void QnConnectToCurrentSystemTool::configureServer() {
-    if (m_targets.isEmpty()) {
-        finish(NoError);
+    QnUserResourcePtr adminUser = getAdminUser();
+    if (!adminUser) {
+        finish(ConfigurationFailed);
         return;
-    }
-
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
-        QnUserResourcePtr user = resource.staticCast<QnUserResource>();
-        if (user->getName() == lit("admin")) {
-            m_configureTask->setPasswordHash(user->getHash(), user->getDigest());
-            break;
-        }
     }
 
     foreach (const QUuid &id, m_targets) {
@@ -90,8 +112,14 @@ void QnConnectToCurrentSystemTool::configureServer() {
         server->apiConnection()->setUrl(url);
     }
 
+    m_configureTask->setPasswordHash(adminUser->getHash(), adminUser->getDigest());
     m_configureTask->setSystemName(qnCommon->localSystemName());
     m_configureTask->start(m_targets);
+}
+
+void QnConnectToCurrentSystemTool::waitPeers() {
+    m_waitTask->setPeers(QSet<QUuid>::fromList(m_waitTargets.values()));
+    m_waitTask->start();
 }
 
 void QnConnectToCurrentSystemTool::updatePeers() {
@@ -135,8 +163,21 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
         if (!server)
             continue;
 
+        QUuid realId(server->getProperty(lit("guid")));
+        if (realId.isNull())
+            realId = id;
+
         if (!isCompatible(server->getVersion(), qnCommon->engineVersion()))
-            m_updateTargets.insert(id);
+            m_updateTargets.insert(realId);
+    }
+
+    waitPeers();
+}
+
+void QnConnectToCurrentSystemTool::at_waitTask_finished(int errorCode) {
+    if (errorCode != 0) {
+        finish(ConfigurationFailed);
+        return;
     }
 
     updatePeers();
@@ -148,18 +189,18 @@ void QnConnectToCurrentSystemTool::at_updateTool_stateChanged(int state) {
 
     if (m_prevToolState == CheckingForUpdates) {
         switch (m_updateTool->updateCheckResult()) {
-        case QnMediaServerUpdateTool::UpdateFound:
+        case QnCheckForUpdateResult::UpdateFound:
             m_prevToolState = Updating;
             m_updateTool->updateServers();
             return;
-        case QnMediaServerUpdateTool::NoNewerVersion:
+        case QnCheckForUpdateResult::NoNewerVersion:
             break;
         default:
             m_updateFailed = true;
             break;
         }
     } else if (m_prevToolState == Updating) {
-        m_updateFailed = (m_updateTool->updateResult() != QnMediaServerUpdateTool::UpdateSuccessful);
+        m_updateFailed = (m_updateTool->updateResult() != QnUpdateResult::Successful);
     }
 
     m_updateDialog->hide();

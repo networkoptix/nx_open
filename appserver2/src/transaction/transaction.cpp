@@ -190,6 +190,8 @@ namespace ec2
                     return "dumpDatabase";
                 case restoreDatabase:
                     return "restoreDatabase";
+                case syncDoneMarker:
+                    return "syncDoneMarker";
                 default:
                     return "unknown " + QString::number((int)val);
             }
@@ -204,7 +206,8 @@ namespace ec2
                     val == tranSyncResponse ||
                     val == runtimeInfoChanged ||
                     val == peerAliveInfo ||
-                    val == broadcastPeerSystemTime;
+                    val == broadcastPeerSystemTime ||
+                    val == syncDoneMarker;
         }
 
         bool isPersistent( Value val )
@@ -254,7 +257,8 @@ namespace ec2
     void QnAbstractTransaction::fillPersistentInfo()
     {
         if (QnDbManager::instance() && persistentInfo.isNull()) {
-            persistentInfo.sequence = qn_abstractTransaction_sequence.fetchAndAddAcquire(1);
+            if (!isLocal)
+                persistentInfo.sequence = qn_abstractTransaction_sequence.fetchAndAddAcquire(1);
             persistentInfo.dbID = QnDbManager::instance()->getID();
             persistentInfo.timestamp = QnTransactionLog::instance()->getTimeStamp();
         }

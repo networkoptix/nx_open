@@ -107,6 +107,10 @@ public:
     void setReadSync(bool value)  {m_readSync = value;}
     bool isReadyToSend(ApiCommand::Value command) const;
     void setWriteSync(bool value) { m_writeSync = value; }
+
+    bool isSyncDone() const { return m_syncDone; }
+    void setSyncDone(bool value)  {m_syncDone = value;} // end of sync marker received
+
     QUrl remoteAddr() const       { return m_remoteAddr; }
 
     ApiPeerData remotePeer() const { return m_remotePeer; }
@@ -154,6 +158,7 @@ private:
 
     bool m_readSync;
     bool m_writeSync;
+    bool m_syncDone;
 
     mutable QMutex m_mutex;
     QSharedPointer<AbstractStreamSocket> m_socket;

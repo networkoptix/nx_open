@@ -479,6 +479,9 @@ CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(
     )
 :
     CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>(id),
+#ifdef QT_WEBKITWIDGETS_LIB
+    m_webView(webView),
+#endif
     m_rootWidget(rootWidget),
     m_rootLayout(rootLayout),
     m_treeWidgetsById(),
@@ -487,9 +490,6 @@ CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(
     m_settings(0),
     m_id(id),
     m_cameraId(cameraId)
-#ifdef QT_WEBKITWIDGETS_LIB
-    , m_webView(webView)
-#endif
 {
     
 }

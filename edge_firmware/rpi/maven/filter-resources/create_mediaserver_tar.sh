@@ -107,6 +107,10 @@ popd
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 cp $BUILD_OUTPUT_DIR/bin/release/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 
+#copying plugins
+mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins
+cp $BUILD_OUTPUT_DIR/bin/release/plugins/*.* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
+
 #conf
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
 cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc

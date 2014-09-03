@@ -21,6 +21,15 @@ namespace {
         return QnAppServerConnectionFactory::getConnection2();
     }
 
+    QnUserResourcePtr getAdminUser() {
+        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
+            QnUserResourcePtr user = resource.staticCast<QnUserResource>();
+            if (user->getName() == lit("admin"))
+                return user;
+        }
+        return QnUserResourcePtr();
+    }
+
 } // anonymous namespace
 
 QnJoinSystemTool::QnJoinSystemTool(QObject *parent) :
@@ -42,8 +51,9 @@ void QnJoinSystemTool::start(const QUrl &url, const QString &password) {
     m_targetUrl.setScheme(url.scheme());
     m_targetUrl.setHost(url.host());
     m_targetUrl.setPort(url.port(defaultRtspPort));
-
     m_password = password;
+    m_targetServer.clear();
+    m_targetId = QUuid();
 
     m_running = true;
 
@@ -53,7 +63,7 @@ void QnJoinSystemTool::start(const QUrl &url, const QString &password) {
         return;
     }
 
-    m_possibleAddresses.append(address);
+    m_possibleAddresses.insert(address);
 
     findResource();
 }
@@ -66,29 +76,22 @@ void QnJoinSystemTool::findResource() {
 
     /* For the first try to find it in the resource pool. */
 
-    m_targetServer.clear();
-
-    QSet<QHostAddress> addresses = QSet<QHostAddress>::fromList(m_possibleAddresses);
-    QnMediaServerResourceList servers = qnResPool->getAllServers();
+    /* Look up through incompatible servers only. Compatible servers have our system name and don't need to be joined. */
     foreach (const QnResourcePtr &resource, qnResPool->getAllIncompatibleResources()) {
-        if (!resource->hasFlags(Qn::server))
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (!server)
             continue;
-        servers.append(resource.staticCast<QnMediaServerResource>());
-    }
 
-    foreach (const QnMediaServerResourcePtr &server, servers) {
         if (QUrl(server->getApiUrl()).port() != m_targetUrl.port())
             continue;
 
-        foreach (const QHostAddress &address, server->getNetAddrList()) {
-            if (addresses.contains(address)) {
-                m_targetServer = server;
-                break;
-            }
-        }
-
-        if (m_targetServer)
+        if (m_possibleAddresses.contains(QSet<QHostAddress>::fromList(server->getNetAddrList()))) {
+            m_targetServer = server;
+            m_targetId = QUuid(m_targetServer->getProperty(lit("guid")));
+            if (m_targetId.isNull())
+                m_targetId = m_targetServer->getId();
             break;
+        }
     }
 
     if (m_targetServer) {
@@ -96,8 +99,15 @@ void QnJoinSystemTool::findResource() {
         return;
     }
 
-    /* If there is no such server in the resource pool, try to discover it over the our network. */
+    /* Re-save admin user before discovery. If we don't do it we could get unlogined. */
+    QnUserResourcePtr adminUser = getAdminUser();
+    if (!adminUser) {
+        finish(InternalError);
+        return;
+    }
+    connection2()->getUserManager()->save(adminUser, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
+    /* If there is no such server in the resource pool, try to discover it over the our network. */
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnJoinSystemTool::at_resource_added);
 
     connection2()->getDiscoveryManager()->discoverPeer(m_targetUrl, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
@@ -110,24 +120,9 @@ void QnJoinSystemTool::joinResource() {
         return;
     }
 
-    if (m_targetServer->getSystemName() == qnCommon->localSystemName()) {
-        rediscoverPeer();
-        return;
-    }
-
-    QByteArray hash;
-    QByteArray digest;
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
-        QnUserResourcePtr user = resource.staticCast<QnUserResource>();
-        if (user->getName() == lit("admin")) {
-            hash = user->getHash();
-            digest = user->getDigest();
-            break;
-        }
-    }
-
-    if (hash.isEmpty() || digest.isEmpty()) {
-        finish(JoinError);
+    QnUserResourcePtr adminUser = getAdminUser();
+    if (adminUser.isNull()) {
+        finish(InternalError);
         return;
     }
 
@@ -140,7 +135,9 @@ void QnJoinSystemTool::joinResource() {
     apiUrl.setPassword(m_password);
     m_targetServer->apiConnection()->setUrl(apiUrl);
 
-    m_targetServer->apiConnection()->configureAsync(true, qnCommon->localSystemName(), QString(), hash, digest, 0, this, SLOT(at_targetServer_configured(int,int)));
+    m_targetServer->apiConnection()->configureAsync(true, qnCommon->localSystemName(), QString(),
+                                                    adminUser->getHash(), adminUser->getDigest(), 0,
+                                                    this, SLOT(at_targetServer_configured(int,int)));
 }
 
 void QnJoinSystemTool::rediscoverPeer() {
@@ -158,8 +155,10 @@ void QnJoinSystemTool::rediscoverPeer() {
 void QnJoinSystemTool::updateDiscoveryInformation() {
     QHostAddress address(m_targetUrl.host());
     // there is no need to add manual address if it's already in the database
-    if (!address.isNull() && m_targetServer->getNetAddrList().contains(address))
+    if (!address.isNull() && m_targetServer->getNetAddrList().contains(address)) {
+        finish(NoError);
         return;
+    }
 
     connection2()->getDiscoveryManager()->addDiscoveryInformation(m_targetServer->getId(), QList<QUrl>() << m_targetUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     finish(NoError);
@@ -168,6 +167,7 @@ void QnJoinSystemTool::updateDiscoveryInformation() {
 void QnJoinSystemTool::finish(int errorCode) {
     m_running = false;
     m_targetServer.clear();
+    m_targetId = QUuid();
     m_possibleAddresses.clear();
     m_targetUrl.clear();
     m_password.clear();
@@ -181,32 +181,33 @@ void QnJoinSystemTool::at_resource_added(const QnResourcePtr &resource) {
     if (!resource->hasFlags(Qn::server))
         return;
 
-    QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    Q_ASSERT(server);
 
     if (QUrl(server->getApiUrl()).port() != m_targetUrl.port())
         return;
 
-    bool match = false;
-    foreach (const QHostAddress &address, server->getNetAddrList()) {
-        if (m_possibleAddresses.contains(address)) {
-            match = true;
-            break;
-        }
-    }
-    if (!match)
+    if (!m_possibleAddresses.contains(QSet<QHostAddress>::fromList(server->getNetAddrList())))
         return;
 
     m_targetServer = server;
+    m_targetId = QUuid(m_targetServer->getProperty(lit("guid")));
+    if (m_targetId.isNull())
+        m_targetId = m_targetServer->getId();
     m_timer->stop();
+
     joinResource();
 }
 
 void QnJoinSystemTool::at_resource_statusChanged(const QnResourcePtr &resource) {
-    if (m_targetServer.isNull() || resource->getId() != m_targetServer->getId())
+    if (m_targetId.isNull() || resource->getId() != m_targetId)
         return;
 
-    if (resource->getStatus() == Qn::Online) {
-        disconnect(qnResPool, &QnResourcePool::statusChanged, this, &QnJoinSystemTool::at_resource_statusChanged);
+    m_targetServer = resource.dynamicCast<QnMediaServerResource>();
+    Q_ASSERT(m_targetServer);
+
+    if (resource->getStatus() != Qn::Offline) {
+        qnResPool->disconnect(this);
         m_timer->stop();
         updateDiscoveryInformation();
     }
@@ -231,11 +232,13 @@ void QnJoinSystemTool::at_hostLookedUp(const QHostInfo &hostInfo) {
         return;
     }
 
-    m_possibleAddresses = hostInfo.addresses();
+    m_possibleAddresses = QSet<QHostAddress>::fromList(hostInfo.addresses());
 }
 
 void QnJoinSystemTool::at_targetServer_configured(int status, int handle) {
     Q_UNUSED(handle)
+
+    m_targetServer->apiConnection()->setUrl(m_oldApiUrl);
 
     if (status != 0) {
         if (status == QNetworkReply::AuthenticationRequiredError)
@@ -244,9 +247,6 @@ void QnJoinSystemTool::at_targetServer_configured(int status, int handle) {
             finish(JoinError);
         return;
     }
-
-    // now revert to the default api url because the password has been reset to our own
-    m_targetServer->apiConnection()->setUrl(m_oldApiUrl);
 
     rediscoverPeer();
 }

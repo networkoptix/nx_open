@@ -10,15 +10,6 @@ class QNetworkAccessManager;
 class QnCheckForUpdatesPeerTask : public QnNetworkPeerTask {
     Q_OBJECT
 public:
-    enum CheckResult {
-        UpdateFound = 0,
-        InternetProblem,
-        NoNewerVersion,
-        NoSuchBuild,
-        UpdateImpossible,
-        BadUpdateFile
-    };
-
     explicit QnCheckForUpdatesPeerTask(QObject *parent = 0);
 
     void setUpdatesUrl(const QUrl &url);
@@ -54,6 +45,7 @@ private:
 
     void cleanUp();
 
+    void finishTask(QnCheckForUpdateResult result);
 private slots:
     void at_updateReply_finished();
     void at_buildReply_finished();

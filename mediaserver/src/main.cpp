@@ -959,6 +959,17 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
 
 }
 
+void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
+{
+    m_publicAddress = publicIP;
+
+    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+    localInfo.data.publicIP = m_publicAddress.toString();
+    QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
+
+    at_localInterfacesChanged();
+}
+
 void QnMain::at_localInterfacesChanged()
 {
     auto intfList = allLocalAddresses();
@@ -1096,49 +1107,19 @@ bool QnMain::initTcpListener()
 
 QHostAddress QnMain::getPublicAddress()
 {
-    static const QString DEFAULT_URL_LIST("http://checkrealip.com; http://www.thisip.org/cgi-bin/thisip.cgi; http://checkip.eurodyndns.org");
-    static const QRegExp iPRegExpr("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
+    m_ipDiscovery.reset(new QnPublicIPDiscovery());
 
     if (MSSettings::roSettings()->value("publicIPEnabled").isNull())
         MSSettings::roSettings()->setValue("publicIPEnabled", 1);
 
     int publicIPEnabled = MSSettings::roSettings()->value("publicIPEnabled").toInt();
-
     if (publicIPEnabled == 0)
         return QHostAddress(); // disabled
     else if (publicIPEnabled > 1)
         return QHostAddress(MSSettings::roSettings()->value("staticPublicIP").toString()); // manually added
-
-    QStringList urls = MSSettings::roSettings()->value("publicIPServers", DEFAULT_URL_LIST).toString().split(";");
-
-    QNetworkAccessManager networkManager;
-    QList<QNetworkReply*> replyList;
-    for (int i = 0; i < urls.size(); ++i)
-        replyList << networkManager.get(QNetworkRequest(urls[i].trimmed()));
-
-    QString result;
-    QTime t;
-    t.start();
-    while (t.elapsed() < 4000 && result.isEmpty())
-    {
-        msleep(1);
-        qApp->processEvents();
-        for (int i = 0; i < replyList.size(); ++i)
-        {
-            if (replyList[i]->isFinished()) {
-                QByteArray response = QByteArray(" ") + replyList[i]->readAll() + QByteArray(" ");
-                int ipPos = iPRegExpr.indexIn(response);
-                if (ipPos >= 0) {
-                    result = response.mid(ipPos+1, iPRegExpr.matchedLength()-2);
-                    break;
-                }
-            }
-        }
-    }
-    for (int i = 0; i < replyList.size(); ++i)
-        replyList[i]->deleteLater();
-
-    return QHostAddress(result);
+    m_ipDiscovery->update();
+    m_ipDiscovery->waitForFinished();
+    return m_ipDiscovery->publicIP();
 }
 
 void QnMain::run()
@@ -1299,7 +1280,15 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
     m_publicAddress = getPublicAddress();
-    if (!m_publicAddress.isNull()) {
+    if (!m_publicAddress.isNull()) 
+    {
+        if (!m_ipDiscovery->publicIP().isNull()) {
+            m_updatePiblicIpTimer.reset(new QTimer());
+            connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &QnPublicIPDiscovery::update);
+            connect(m_ipDiscovery.get(), &QnPublicIPDiscovery::found, this, &QnMain::at_updatePublicAddress);
+            m_updatePiblicIpTimer->start(60 * 1000 * 2);
+        }
+
         QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
         localInfo.data.publicIP = m_publicAddress.toString();
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
