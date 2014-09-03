@@ -13,6 +13,7 @@ class QnJoinSystemTool : public QObject {
     Q_OBJECT
 public:
     enum ErrorCode {
+        InternalError = -1,
         NoError,
         Timeout,
         HostLookupError,
@@ -50,8 +51,9 @@ private:
     QUrl m_targetUrl;
     QUrl m_oldApiUrl;
     QString m_password;
-    QList<QHostAddress> m_possibleAddresses;
+    QSet<QHostAddress> m_possibleAddresses;
     QnMediaServerResourcePtr m_targetServer;
+    QUuid m_targetId;
 
     QTimer *m_timer;
 };

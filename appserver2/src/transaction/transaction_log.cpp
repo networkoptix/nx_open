@@ -52,7 +52,6 @@ void QnTransactionLog::init()
                 QUuid dbID = QUuid::fromRfc4122(query.value(1).toByteArray());
                 int sequence = query.value(2).toInt();
                 QnTranStateKey key(peerID, dbID);
-                m_state.values.insert(key, sequence);
                 updateSequenceNoLock(peerID, dbID, sequence);
             }
         }
@@ -241,6 +240,12 @@ QnTranState QnTransactionLog::getTransactionsState()
 {
     QReadLocker lock(&m_dbManager->getMutex());
     return m_state;
+}
+
+int QnTransactionLog::getLatestSequence(const QnTranStateKey& key) const
+{
+    QReadLocker lock(&m_dbManager->getMutex());
+    return m_state.values.value(key);
 }
 
 QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& hash) const

@@ -118,6 +118,8 @@ private slots:
     void at_taskProgressChanged(int progress);
     void at_networkTask_peerProgressChanged(const QUuid &peerId, int progress);
 
+    void at_resourcePool_statusChanged(const QnResourcePtr &resource);
+
 private:
 
 
@@ -134,6 +136,7 @@ private:
     void installUpdatesToServers();
     void installIncompatiblePeers();
 
+    void prepareToUpload();
     void lockMutex();
     void unlockMutex();
 

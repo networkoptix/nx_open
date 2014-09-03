@@ -13,6 +13,7 @@
 
 #include "utils/common/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
+#include "utils/common/public_ip_discovery.h"
 
 
 class QnAppserverResourceProcessor;
@@ -50,6 +51,7 @@ private slots:
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
     void at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
     void at_restartServerRequired();
+    void at_updatePublicAddress(const QHostAddress& publicIP);
 private:
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
@@ -67,6 +69,8 @@ private:
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QUuid> m_updateUserRequests;
     QHostAddress m_publicAddress;
+    std::unique_ptr<QnPublicIPDiscovery> m_ipDiscovery;
+    std::unique_ptr<QTimer> m_updatePiblicIpTimer;
 };
 
 #endif // MAIN_H

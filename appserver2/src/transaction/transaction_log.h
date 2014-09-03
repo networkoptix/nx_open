@@ -164,6 +164,7 @@ namespace ec2
         void init();
 
         ContainsReason contains(const QnAbstractTransaction& tran, const QUuid& hash) const;
+        int getLatestSequence(const QnTranStateKey& key) const;
         QUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray()) const;
         QUuid makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) const;
         QUuid makeHash(const QString &extraData, const ApiDiscoveryDataList &data) const;

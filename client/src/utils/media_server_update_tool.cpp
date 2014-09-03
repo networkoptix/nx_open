@@ -541,6 +541,19 @@ void QnMediaServerUpdateTool::installIncompatiblePeers() {
     QMetaObject::invokeMethod(m_restUpdatePeerTask, "start", Qt::QueuedConnection);
 }
 
+void QnMediaServerUpdateTool::prepareToUpload() {
+    connect(qnResPool, &QnResourcePool::statusChanged, this, &QnMediaServerUpdateTool::at_resourcePool_statusChanged);
+
+    foreach (const QnMediaServerResourcePtr &server, m_targets) {
+        if (server->getStatus() != Qn::Online) {
+            finishUpdate(QnUpdateResult::UploadingFailed);
+            return;
+        }
+    }
+
+    lockMutex();
+}
+
 void QnMediaServerUpdateTool::lockMutex() {
     setState(UploadingUpdate);
 
@@ -667,7 +680,7 @@ void QnMediaServerUpdateTool::at_restUpdateTask_finished(int errorCode) {
         return;
     }
 
-    lockMutex();
+    prepareToUpload();
 }
 
 void QnMediaServerUpdateTool::at_taskProgressChanged(int progress) {
@@ -706,6 +719,19 @@ void QnMediaServerUpdateTool::at_networkTask_peerProgressChanged(const QUuid &pe
 
     m_updateInformationById[peerId].progress = (progress + static_cast<int>(stage)*100) / ( static_cast<int>(QnPeerUpdateStage::Count) ) ;
     emit peerChanged(peerId);
+}
+
+void QnMediaServerUpdateTool::at_resourcePool_statusChanged(const QnResourcePtr &resource) {
+    if (m_state != UploadingUpdate)
+        return;
+
+    if (!m_targetPeerIds.contains(resource->getId()))
+        return;
+
+    if (resource->getStatus() != Qn::Online) {
+        m_uploadUpdatesPeerTask->cancel();
+        finishUpdate(QnUpdateResult::UploadingFailed);
+    }
 }
 
 void QnMediaServerUpdateTool::at_downloadTask_peerFinished(const QUuid &peerId) {

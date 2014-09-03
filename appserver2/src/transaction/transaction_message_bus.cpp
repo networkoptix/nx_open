@@ -387,11 +387,11 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     m_lastTransportSeq[transportHeader.sender] = transportHeader.sequence;
 
     // 2. check persistent sequence
-    if (tran.persistentInfo.isNull())
+    if (tran.persistentInfo.isNull() || !transactionLog)
         return true; // nothing to check
 
     QnTranStateKey persistentKey(tran.peerID, tran.persistentInfo.dbID);
-    int persistentSeq = m_lastPersistentSeq[persistentKey];
+    int persistentSeq = transactionLog->getLatestSequence(persistentKey);
 
     if (transport->isSyncDone() && persistentSeq && tran.persistentInfo.sequence > persistentSeq + 1) {
         // gap in persistent data detect, do resync
@@ -405,19 +405,15 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
             transport->setState(QnTransactionTransport::Error); // reopen
         return false;
     }
-    m_lastPersistentSeq[persistentKey] = tran.persistentInfo.sequence;
     return true;
 }
 
 void QnTransactionMessageBus::updatePersistentMarker(const QnTransaction<ApiSyncMarkerData>& tran, QnTransactionTransport* transport)
 {
-    transport->setSyncDone(true);
+    if (transport->remotePeer().id == tran.peerID)
+        transport->setSyncDone(true);
     if (transactionLog)
         transactionLog->updateSequence(tran.params);
-    foreach(const ApiSyncMarkerRecord& record, tran.params.markers) {
-        QnTranStateKey key(record.peerID, record.dbID);
-        m_lastPersistentSeq[key] = qMax(m_lastPersistentSeq[key], record.sequence);
-    }
 }
 
 template <class T>
