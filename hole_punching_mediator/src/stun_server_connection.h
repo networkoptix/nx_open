@@ -37,7 +37,11 @@ public:
         StunStreamSocketServer* socketServer,
         AbstractCommunicatingSocket* sock );
 
-    void processMessage( const nx_stun::Message& request );
+    void processMessage( nx_stun::Message&& request );
+
+private:
+    void processGetIPAddressRequest( nx_stun::Message&& request );
+    void processProprietaryRequest( nx_stun::Message&& request );
 };
 
 #endif  //STUN_SERVER_CONNECTION_H

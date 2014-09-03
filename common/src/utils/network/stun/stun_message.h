@@ -33,18 +33,24 @@ namespace nx_stun
         errorResponse
     };
 
+    //!Contains STUN method types defined in RFC
+    enum class MethodType
+    {
+        binding = 1
+    };
+
     class Header
     {
     public:
         MessageClass messageClass;
-        int messageType;
+        int method;
         int messageLength;
         TransactionID transactionID;
 
         Header()
         :
             messageClass( MessageClass::request ),
-            messageType( 0 ),
+            method( 0 ),
             messageLength( 0 ),
             transactionID()
         {

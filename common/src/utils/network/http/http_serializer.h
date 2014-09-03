@@ -26,12 +26,12 @@ namespace nx_http
         MessageSerializer();
 
         //!Set message to serialize
-        void setMessage(const Message& message);
+        void setMessage(Message&& message);
         
         SerializerState::Type serialize( nx::Buffer* const buffer, size_t* const bytesWritten );
 
     private:
-        const Message* m_message;
+        Message m_message;
     };
 }
 

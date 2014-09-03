@@ -20,7 +20,7 @@ HttpServerConnection::~HttpServerConnection()
 {
 }
 
-void HttpServerConnection::processMessage( const nx_http::Message& request )
+void HttpServerConnection::processMessage( nx_http::Message&& request )
 {
     //TODO #ak
 

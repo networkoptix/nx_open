@@ -28,8 +28,9 @@ public:
         \param completionHandler Executed when asynchronous operation is interrupted. For example, in case with async socket operations, 
             \a completionHandler is triggered when socket completion handler returned or will never be called.
             Allowed to be \a null
+        \note If operation is already stopped it is allowed for \a completionHandler to be executed directly in \a QnStoppableAsync::pleaseStop
     */
-    virtual void pleaseStop( std::function<void()> completionHandler ) = 0;
+    virtual void pleaseStop( std::function<void()>&& completionHandler ) = 0;
 };
 
 #endif  //QNSTOPPABLE_H

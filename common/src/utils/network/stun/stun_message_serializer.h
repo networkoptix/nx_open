@@ -21,28 +21,9 @@ namespace nx_stun
     {
     public:
         //!Set message to serialize
-        void setMessage( const Message& message );
+        void setMessage( Message&& message );
 
         nx_api::SerializerState::Type serialize( nx::Buffer* const buffer, size_t* const bytesWritten );
-
-        /*!
-            Doesn't use \a *buf beyond its capacity
-            \param buf 
-            \param header
-            \return true if successfully serialized \a header. Otherwise, false (e.g., not enough space in \a *buf)
-            \note In case of error \a *buf value is the same on return
-        */
-        bool addHeader( nx::Buffer* const buf, const Header& header );
-        //!Serializes \a attr to \a *buf
-        /*!
-            Doesn't use \a *buf beyond its capacity
-            \param buf
-            \param attr
-            \return true if successfully serialized \a header. Otherwise, false (e.g., not enough space in \a *buf)
-            \note In case of error \a *buf value is the same on return
-        */
-        template<class AttributeType>
-            bool addAttribute( nx::Buffer* const buf, const AttributeType& attr );
     };
 }
 

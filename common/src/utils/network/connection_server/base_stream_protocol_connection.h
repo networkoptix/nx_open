@@ -9,8 +9,6 @@
 #include <atomic>
 #include <functional>
 
-#include <boost/optional.hpp>
-
 #include "base_protocol_message_types.h"
 #include "base_server_connection.h"
 
@@ -57,6 +55,8 @@ namespace nx_api
             SerializerType> SelfType;
         //typedef BaseStreamProtocolConnection<CustomConnectionType, CustomSocketServerType> SelfType;
         typedef BaseServerConnection<SelfType, CustomSocketServerType> BaseType;
+        //!Type of messages used by this connetion class. Request/response/indication is sub-class of message, so no difference at this level
+        typedef MessageType message_type;
 
         BaseStreamProtocolConnection(
             CustomSocketServerType* streamServer,
@@ -89,7 +89,7 @@ namespace nx_api
                     {
                         //processing request
                         //NOTE interleaving is not supported yet
-                        static_cast<CustomConnectionType*>(this)->processMessage( m_request );
+                        static_cast<CustomConnectionType*>(this)->processMessage( std::move(m_request) );
                         m_parser.reset();
                         m_request.clear();
                         m_parser.setMessage( &m_request );
@@ -135,37 +135,18 @@ namespace nx_api
             Initiates asynchoronous message send
         */
         template<class Handler>
-        bool sendMessage( const MessageType& msg, Handler handler = std::function<void()>() )
-        {
-            if( m_isSendingMessage > 0 )
-                return false;   //TODO: #ak interleaving is not supported yet
-
-            //TODO #ak avoid message copying
-            m_response = msg;
-            m_sendCompletionHandler = std::move(handler);
-            sendResponseMessage();
-            return true;
-        }
-
-        /*!
-            Initiates asynchoronous message send
-        */
-        template<class Handler>
         bool sendMessage( MessageType&& msg, Handler handler = std::function<void()>() )
         {
             if( m_isSendingMessage > 0 )
                 return false;   //TODO: #ak interleaving is not supported yet
 
-            //TODO #ak avoid message copying
-            m_response = std::move(msg);
             m_sendCompletionHandler = std::move(handler);
-            sendResponseMessage();
+            sendResponseMessage( std::move(msg) );
             return true;
         }
 
     private:
         MessageType m_request;
-        boost::optional<MessageType> m_response;
         ParserType m_parser;
         SerializerType m_serializer;
         SerializerState::Type m_serializerState;
@@ -173,10 +154,10 @@ namespace nx_api
         std::atomic<int> m_isSendingMessage;
         std::function<void()> m_sendCompletionHandler;
 
-        void sendResponseMessage()
+        void sendResponseMessage( MessageType&& msg )
         {
             //serializing message
-            m_serializer.setMessage( m_response.get() );
+            m_serializer.setMessage( std::move(msg) );
             m_serializerState = SerializerState::needMoreBufferSpace;
             m_isSendingMessage = 1;
             readyToSendData();

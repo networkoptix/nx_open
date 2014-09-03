@@ -6,6 +6,7 @@
 #ifndef BASE_SERVER_CONNECTION_H
 #define BASE_SERVER_CONNECTION_H
 
+#include <forward_list>
 #include <functional>
 #include <memory>
 
@@ -27,13 +28,16 @@ static const size_t READ_BUFFER_CAPACITY = 16*1024;
     \endcode
 
     \todo support message interleaving
+    \note This class is not thread-safe. All methods are expected to be executed in aio thread, undelying socket is bound to. 
+        In other case, it is caller's responsibility to syunchronize access to the connection object.
+    \note Despite absence of thread-safety simultaneous read/write operations all allowed in different threads
 */
 template<
     class CustomConnectionType,
     class CustomSocketServerType
 > class BaseServerConnection
 :
-    std::enable_shared_from_this<BaseServerConnection<CustomConnectionType, CustomSocketServerType> >
+    protected std::enable_shared_from_this<BaseServerConnection<CustomConnectionType, CustomSocketServerType> >
 {
 public:
     typedef BaseServerConnection<CustomConnectionType, CustomSocketServerType> SelfType;
@@ -54,6 +58,10 @@ public:
 
     ~BaseServerConnection()
     {
+        for( auto& handler: m_connectionCloseHandlers )
+            handler();
+        m_connectionCloseHandlers.clear();
+
         m_streamSocket->cancelAsyncIO( aio::etRead );
         m_streamSocket->cancelAsyncIO( aio::etWrite );
         m_streamSocket->close();
@@ -71,11 +79,21 @@ public:
         m_streamServer->connectionTerminated( std::static_pointer_cast<CustomSocketServerType::ConnectionType>(shared_from_this()) );
     }
 
+    //!Register handler to be executed when connection just about to be destroyed
+    /*!
+        \note It is unspecified from thread \a handler will be called (usually, it is aio thread corresponding to the socket)
+    */
+    void registerCloseHandler( std::function<void()>&& handler )
+    {
+        m_connectionCloseHandlers.push_back( std::move(handler) );
+    }
+
 private:
     CustomSocketServerType* m_streamServer;
     AbstractCommunicatingSocket* m_streamSocket;
     nx::Buffer m_readBuffer;
     size_t m_bytesToSend;
+    std::forward_list<std::function<void()>> m_connectionCloseHandlers;
 
     void onBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
     {

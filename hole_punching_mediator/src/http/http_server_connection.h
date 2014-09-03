@@ -40,7 +40,7 @@ public:
         AbstractCommunicatingSocket* sock );
     ~HttpServerConnection();
 
-    void processMessage( const nx_http::Message& request );
+    void processMessage( nx_http::Message&& request );
 
 private:
     void responseSent();
