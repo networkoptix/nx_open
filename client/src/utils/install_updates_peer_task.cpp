@@ -9,11 +9,7 @@
 #include <client/client_message_processor.h>
 
 namespace {
-#ifdef _DEBUG
-    const int checkTimeout = 30 * 1000;
-#else
     const int checkTimeout = 10 * 60 * 1000;
-#endif
     const int shortTimeout = 5 * 1000;
 
     ec2::AbstractECConnectionPtr connection2() {
