@@ -287,6 +287,8 @@ namespace nx_http
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
+
+        BufferType getCookieValue(const BufferType& name) const;
     };
 
     class Response

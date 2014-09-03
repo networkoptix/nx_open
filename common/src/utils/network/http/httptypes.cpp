@@ -471,6 +471,22 @@ namespace nx_http
         dstBuffer->append( messageBody );
     }
 
+    BufferType Request::getCookieValue(const BufferType& name) const
+    {
+        nx_http::HttpHeaders::const_iterator cookieIter = headers.find( "cookie" );
+        if (cookieIter == headers.end())
+            return BufferType();
+
+        foreach(const BufferType& value, cookieIter->second.split(';'))
+        {
+            QList<BufferType> params = value.split('=');
+            if (params.size() > 1 && params[0].trimmed() == name)
+                return params[1];
+        }
+
+        return BufferType();
+    }
+        
 
     ////////////////////////////////////////////////////////////
     //// class Response
