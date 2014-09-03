@@ -37,6 +37,7 @@ Attribute* Value_ParseXORMappedAddress( const nx::Buffer& raw , int length , con
 
     // Parsing the port 
     static const std::uint16_t kMagicCookieHigh = static_cast<std::uint16_t>(MAGIC_COOKIE >> 16);
+    static const std::uint16_t kMagicCookieLow = static_cast<std::uint16_t>(MAGIC_COOKIE & 0x0000ffff);
     std::uint16_t xor_port = qFromBigEndian(*reinterpret_cast<const std::uint16_t*>(raw.constData() + 2));
     attribute->port = xor_port ^ kMagicCookieHigh;
 
@@ -54,7 +55,7 @@ Attribute* Value_ParseXORMappedAddress( const nx::Buffer& raw , int length , con
         // The RFC doesn't indicate how to concatenate, I just assume it with the natural byte order
         std::uint16_t xor_comp;
         DO_(0,kMagicCookieHigh);
-        DO_(1,(MAGIC_COOKIE&0x0000ffff));
+        DO_(1,kMagicCookieLow);
         DO_(2,*reinterpret_cast<const std::uint16_t*>(header.transactionID.bytes));
         DO_(3,*reinterpret_cast<const std::uint16_t*>(header.transactionID.bytes+2));
         DO_(4,*reinterpret_cast<const std::uint16_t*>(header.transactionID.bytes+4));
