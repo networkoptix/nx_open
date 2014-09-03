@@ -115,9 +115,12 @@ private slots:
     void at_restUpdateTask_peerFinished(const QUuid &peerId);
     void at_clientUpdateInstalled();
 
+    void at_taskProgressChanged(int progress);
     void at_networkTask_peerProgressChanged(const QUuid &peerId, int progress);
 
 private:
+
+
     void setState(State state);
     void setCheckResult(QnCheckForUpdateResult result);
     void setUpdateResult(QnUpdateResult result);

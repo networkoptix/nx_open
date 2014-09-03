@@ -383,6 +383,11 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
     /* Bespin's progress bar painting is way too ugly, so we do it our way. */
 
     const QStyleOptionProgressBarV2 *pb = qstyleoption_cast<const QStyleOptionProgressBarV2 *>(option);
+    const QnStyleOptionProgressBar *pb3 = qstyleoption_cast<const QnStyleOptionProgressBar *>(option);
+
+    if (pb3)
+        pb = pb3;
+
     if (!pb)
         return false;
 
@@ -460,6 +465,16 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
     painter->setBrush(gradient);
     painter->setPen(pb->palette.color(QPalette::Window));
     painter->drawRoundedRect(x, y, w, h, 6, 6);
+
+    if (pb3 && !pb3->separators.isEmpty()) {
+        painter->setPen(Qt::white);
+        QVector<QPointF> points;
+        foreach (int separator, pb3->separators) {
+            const qreal pos = (qreal)separator / qreal(pb->maximum - pb->minimum);
+            points << QPointF(x + w * pos, y - 2) << QPointF(x + w * pos, y + h + 2);
+        }
+        painter->drawLines(points);
+    }
 
     /* Draw label. */
     if (pb->textVisible) {

@@ -145,7 +145,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,0">
         <item>
-         <widget class="QProgressBar" name="updateProgessBar"/>
+         <widget class="QnProgressBar" name="updateProgessBar"/>
         </item>
         <item>
          <widget class="QPushButton" name="cancelButton">
@@ -180,6 +180,11 @@
    <extends>QWidget</extends>
    <header location="global">ui/widgets/progress_widget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnProgressBar</class>
+   <extends>QProgressBar</extends>
+   <header location="global">ui/widgets/progress_bar.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

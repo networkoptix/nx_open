@@ -78,7 +78,13 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     setWarningStyle(ui->dayWarningLabel);
     static_assert(tooLateDayOfWeek <= Qt::Sunday, "In case of future days order change.");
     ui->dayWarningLabel->setVisible(false);
-    ui->detailWidget->setVisible(false);    
+    ui->detailWidget->setVisible(false);   
+
+    QList<int> progressSeparators;
+    for(int i = 0; i < static_cast<int>(QnFullUpdateStage::Count); ++i) {
+        progressSeparators.append(i * 100 / static_cast<int>(QnFullUpdateStage::Count));
+    }
+    ui->updateProgessBar->setSeparators(progressSeparators);
 
     initMenu();
 
