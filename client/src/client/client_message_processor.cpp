@@ -72,22 +72,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 
     QnCommonMessageProcessor::updateResource(resource);
 
-    QnResourcePtr ownResource;
-
-    ownResource = qnResPool->getIncompatibleResourceById(resource->getId(), true);
-
-    // Use discovery information to update offline servers. They may be just incompatible.
-    if (resource->getStatus() == Qn::Offline) {
-        QnModuleInformation moduleInformation = QnGlobalModuleFinder::instance()->moduleInformation(resource->getId());
-        if (!moduleInformation.id.isNull() && !moduleInformation.isCompatibleToCurrentSystem()) {
-            if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) {
-                mediaServer->setVersion(moduleInformation.version);
-                mediaServer->setSystemInfo(moduleInformation.systemInformation);
-                mediaServer->setSystemName(moduleInformation.systemName);
-                mediaServer->setStatus(Qn::Incompatible);
-            }
-        }
-    }
+    QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
 
     if (ownResource.isNull()) {
         qnResPool->addResource(resource);
@@ -101,15 +86,13 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
             /* Handling a case when an incompatible server is changing its systemName at runtime and becoming compatible. */
             if (resource->getStatus() == Qn::NotDefined && mediaServer->getStatus() == Qn::Incompatible) {
                 if (QnMediaServerResourcePtr updatedServer = resource.dynamicCast<QnMediaServerResource>()) {
-                    if (isCompatible(qnCommon->engineVersion(), updatedServer->getVersion()) && qnCommon->localSystemName() == updatedServer->getSystemName())
+                    if (isCompatible(qnCommon->engineVersion(), updatedServer->getVersion()))
                         mediaServer->setStatus(Qn::Online);
                 }
             }
 
-            if (oldStatus != mediaServer->getStatus()) {
-                qnResPool->updateIncompatibility(mediaServer);
+            if (oldStatus != mediaServer->getStatus())
                 determineOptimalIF(mediaServer);
-            }
         }
     }
 
