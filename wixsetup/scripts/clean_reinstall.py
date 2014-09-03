@@ -6,8 +6,8 @@ from pbs import Command, which
 
 import _winreg 
 
-COMPANY = 'Digital Watchdog'
-PRODUCT = 'DW Spectrum'
+COMPANY = 'Network Optix'
+PRODUCT = 'HD Witness'
 
 def enum_key(hKey):
     i = 0
@@ -84,5 +84,5 @@ if reg_key_exists(_winreg.HKEY_LOCAL_MACHINE, optix_reg_path):
     print 'Wiping registry'
     reg_delete_key(_winreg.HKEY_LOCAL_MACHINE, optix_reg_path);
 
-#print "Installing %s" % PRODUCT
-#Command('inst.bat')()
+print "Installing %s" % PRODUCT
+Command('inst.bat')()

@@ -212,7 +212,10 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
             QString path = urlPath;
             if (!path.startsWith(QLatin1Char('/')))
                 path.prepend(QLatin1Char('/'));
-            path.prepend(QString(lit("/proxy/%1/%2:%3")).arg(dstUrl.scheme()).arg(dstUrl.host()).arg(dstUrl.port()));
+            if (xServerGUID.isEmpty())
+                path.prepend(QString(lit("/proxy/%1/%2:%3")).arg(dstUrl.scheme()).arg(dstUrl.host()).arg(dstUrl.port()));
+            else
+                path.prepend(QString(lit("/proxy/%1/%2")).arg(dstUrl.scheme()).arg(xServerGUID));
             d->request.requestLine.url = path;
 
             dstUrl.setHost(route.points.first().host);
