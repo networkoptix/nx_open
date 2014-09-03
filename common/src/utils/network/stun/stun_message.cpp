@@ -8,12 +8,9 @@
 
 namespace nx_stun
 {
-    Message::Message()
-    {
-    }
 
     void Message::clear()
     {
-        //TODO/IMPL
+        attributes.clear();
     }
 }

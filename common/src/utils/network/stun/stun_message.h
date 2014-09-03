@@ -7,11 +7,11 @@
 #define STUN_MESSAGE_H
 
 #include <stdint.h>
-
+#include <utils/network/buffer.h>
 #include <memory>
 #include <unordered_map>
 #include <vector>
-
+#include <array>
 
 //!Implementation of STUN protocol (rfc5389)
 namespace nx_stun
@@ -19,10 +19,18 @@ namespace nx_stun
     static const uint32_t MAGIC_COOKIE = 0x2112A442;
 
     //96-bit transaction ID
+    // RFC indicates this should be treated as a bytes group, but here
+    // we have numeric high and low associated with the bytes , I don't
+    // know what should I put for high and low separately.
     struct TransactionID
     {
-        uint32_t high;
-        uint64_t lo;
+        union {
+            unsigned char bytes[12];
+            struct {
+                uint32_t high;
+                uint64_t lo;
+            } value;
+        };
     };
 
     enum class MessageClass
@@ -98,10 +106,12 @@ namespace nx_stun
             union
             {
                 uint32_t ipv4;
-                struct
-                {
-                    uint64_t hi;
-                    uint64_t lo;
+                union {
+                    struct {
+                        uint64_t hi;
+                        uint64_t lo;
+                    } numeric;
+                    uint16_t array[8];
                 } ipv6;
             } address;  //!< address in host byte order
         };
@@ -127,14 +137,19 @@ namespace nx_stun
             uint32_t crc32;
         };
 
-        static const int SHA1_HASH_SIZE = 20;
 
         class MessageIntegrity
         :
             public Attribute
         {
         public:
-            uint8_t hmac[SHA1_HASH_SIZE];
+            static const int SHA1_HASH_SIZE = 20;
+            // for me to avoid raw loop when doing copy.
+            std::array<uint8_t,SHA1_HASH_SIZE> hmac;
+        };
+
+        struct UnknownAttribute : public Attribute {
+            nx::Buffer value;
         };
 
         class UnknownAttributes
@@ -148,11 +163,10 @@ namespace nx_stun
     {
     public:
         Header header;
-        std::unordered_multimap<attr::AttributeType, std::unique_ptr<attr::Attribute>> attributes;
-
-        Message();
+        std::unordered_multimap<attr::AttributeType, std::unique_ptr<attr::Attribute> > attributes;
 
         void clear();
+
     };
 }
 
