@@ -46,6 +46,7 @@ private slots:
     void at_updateFinished(QnUpdateResult result);
 private:
     void initMenu();
+    void initLinkHandlers();
 
 private:
     enum UpdateSource {
