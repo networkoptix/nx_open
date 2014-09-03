@@ -5,7 +5,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
-#include "utils/serialization/binary_functions.h"
+#include "utils/serialization/ubjson.h"
 
 int QnBusinessActionRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
 {
@@ -28,8 +28,8 @@ int QnBusinessActionRestHandler::executePost(const QString& path, const QnReques
 
     QnAbstractBusinessActionPtr action;
     ec2::ApiBusinessActionData apiData;
-    QnInputBinaryStream<QByteArray> stream(&body);
-    if (QnBinary::deserialize(&stream, &apiData))
+    QnUbjsonReader<QByteArray> stream(&body);
+    if (QnUbjson::deserialize(&stream, &apiData))
         fromApiToResource(apiData, action, qnResPool);
     
     if (action) {

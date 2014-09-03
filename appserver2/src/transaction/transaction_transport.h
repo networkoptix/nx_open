@@ -82,9 +82,9 @@ public:
         case Qn::JsonFormat:
             addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
-        case Qn::BnsFormat:
-            addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
-            break;
+        //case Qn::BnsFormat:
+        //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+        //    break;
         case Qn::UbjsonFormat:
             addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;

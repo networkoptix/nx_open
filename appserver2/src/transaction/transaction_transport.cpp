@@ -590,8 +590,8 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
     case Qn::JsonFormat:
         addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
         break;
-    case Qn::BnsFormat:
-        addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
+    //case Qn::BnsFormat:
+    //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
         break;
     case Qn::UbjsonFormat: {
 

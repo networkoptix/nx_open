@@ -1,3 +1,6 @@
+
+#if 0
+
 #include "binary_transaction_serializer.h"
 
 namespace ec2
@@ -19,3 +22,5 @@ namespace ec2
         return true;
     }
 }
+
+#endif

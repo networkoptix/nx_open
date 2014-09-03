@@ -176,7 +176,7 @@ QnTransactionMessageBus* QnTransactionMessageBus::instance()
 QnTransactionMessageBus::QnTransactionMessageBus()
 : 
     m_localPeer(QUuid(), Qn::PT_Server),
-    m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
+    //m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
 	m_handler(nullptr),
