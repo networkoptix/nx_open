@@ -8,6 +8,7 @@
 #include "time_reply.h"
 #include "connection_info.h"
 #include "test_email_settings_reply.h"
+#include "ping_reply.h"
 
 #define QN_MS_API_DATA_TYPES \
     (QnCameraDiagnosticsReply)\
@@ -21,5 +22,6 @@
     (QnTestEmailSettingsReply)\
     (QnConnectionInfo)\
     (QnCompatibilityItem)\
+    (QnPingReply)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_MS_API_DATA_TYPES, (ubjson)(xml)(json)(csv_record), _Fields)
