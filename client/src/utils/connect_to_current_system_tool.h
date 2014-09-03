@@ -9,6 +9,7 @@
 class QnConfigurePeerTask;
 class QnUpdateDialog;
 class QnMediaServerUpdateTool;
+class QnWaitCompatibleServersPeerTask;
 
 class QnConnectToCurrentSystemTool : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -35,11 +36,13 @@ signals:
 private:
     void finish(ErrorCode errorCode);
     void configureServer();
+    void waitPeers();
     void updatePeers();
     void revertApiUrls();
 
 private slots:
     void at_configureTask_finished(int errorCode, const QSet<QUuid> &failedPeers);
+    void at_waitTask_finished(int errorCode);
     void at_updateTool_stateChanged(int state);
 
 private:
@@ -50,7 +53,9 @@ private:
     QSet<QUuid> m_restartTargets;
     QSet<QUuid> m_updateTargets;
     QHash<QUuid, QUrl> m_oldUrls;
+    QHash<QUuid, QUuid> m_waitTargets;
     QnConfigurePeerTask *m_configureTask;
+    QnWaitCompatibleServersPeerTask *m_waitTask;
     QScopedPointer<QnUpdateDialog> m_updateDialog;
     QnMediaServerUpdateTool *m_updateTool;
     int m_prevToolState;
