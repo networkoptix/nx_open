@@ -52,7 +52,6 @@ void QnTransactionLog::init()
                 QUuid dbID = QUuid::fromRfc4122(query.value(1).toByteArray());
                 int sequence = query.value(2).toInt();
                 QnTranStateKey key(peerID, dbID);
-                m_state.values.insert(key, sequence);
                 updateSequenceNoLock(peerID, dbID, sequence);
             }
         }
