@@ -37,7 +37,6 @@ private:
 private slots:
     void at_updateInstalled(int status, int handle);
     void at_resourceChanged(const QnResourcePtr &resource);
-    void at_shortTimeout();
     void at_timer_timeout();
     void at_finished();
 
