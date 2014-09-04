@@ -7,6 +7,8 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <core/resource/resource_fwd.h>
 
+#include <utils/common/connective.h>
+
 namespace Ui {
     class QnRoutingManagementWidget;
 }
@@ -15,16 +17,17 @@ class QnServerAddressesModel;
 class QnSortedServerAddressesModel;
 class QnResourceListModel;
 
-class QnRoutingManagementWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware {
+class QnRoutingManagementWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
 
-    typedef QnAbstractPreferencesWidget base_type;
+    typedef Connective<QnAbstractPreferencesWidget> base_type;
 public:
     explicit QnRoutingManagementWidget(QWidget *parent = 0);
     ~QnRoutingManagementWidget();
 
+    virtual void updateFromSettings() override;
+
 private:
-    QnMediaServerResourcePtr currentServer() const;
     void updateModel(const QnMediaServerResourcePtr &server);
 
 private slots:
@@ -44,6 +47,7 @@ private:
     QnResourceListModel *m_serverListModel;
     QnServerAddressesModel *m_serverAddressesModel;
     QnSortedServerAddressesModel *m_sortedServerAddressesModel;
+    QnMediaServerResourcePtr m_server;
 };
 
 #endif // ROUTING_MANAGEMENT_WIDGET_H

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>616</width>
-    <height>698</height>
+    <width>580</width>
+    <height>517</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -526,25 +526,6 @@
          </widget>
         </item>
        </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="networkInterfacesGroupBox">
-     <property name="title">
-      <string>Network Interfaces</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_13">
-      <item>
-       <widget class="QListWidget" name="networkInterfacesList">
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>110</height>
-         </size>
-        </property>
-       </widget>
       </item>
      </layout>
     </widget>

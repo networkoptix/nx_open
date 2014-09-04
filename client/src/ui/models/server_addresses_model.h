@@ -32,6 +32,7 @@ public:
     void setIgnoredAddresses(const QSet<QUrl> &ignoredAddresses);
     QSet<QUrl> ignoredAddresses() const;
 
+    void clear();
     void resetModel(const QList<QUrl> &addresses, const QList<QUrl> &manualAddresses, const QSet<QUrl> &ignoredAddresses);
 
     bool isManualAddress(const QModelIndex &index) const;

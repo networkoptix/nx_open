@@ -514,18 +514,6 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
         }
     }
 
-    if (pb3 && !pb3->separators.isEmpty()) {
-/*
-        painter->setPen(Qt::white);
-        QVector<QPointF> points;
-        foreach (int separator, pb3->separators) {
-            const qreal pos = (qreal)separator / qreal(pb->maximum - pb->minimum);
-            points << QPointF(x + w * pos, y - 2) << QPointF(x + w * pos, y + h + 2);
-        }
-        painter->drawLines(points);
-*/
-    }
-
     /* Draw label. */
     if (pb->textVisible) {
         QRect rect(x, y, w, h);
