@@ -27,9 +27,8 @@ QSet<QUuid> QnTransactionTransport::m_existConn;
 QnTransactionTransport::ConnectingInfoMap QnTransactionTransport::m_connectingConn;
 QMutex QnTransactionTransport::m_staticMutex;
 
-QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, const ApiPeerData &remotePeer, const QSharedPointer<AbstractStreamSocket>& socket):
+QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, const QSharedPointer<AbstractStreamSocket>& socket):
     m_localPeer(localPeer),
-    m_remotePeer(remotePeer),
     m_lastConnectTime(0), 
     m_readSync(false), 
     m_writeSync(false),
@@ -422,7 +421,11 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             QTimer::singleShot(0, this, SLOT(repeatDoGet()));
         }
         else {
-            emit remotePeerUnauthorized(remotePeer().id);
+            QUuid guid(nx_http::getHeaderValue( client->response()->headers, "x-server-guid" ));
+            if (!guid.isNull()) {
+                emit peerIdDiscovered(m_remoteAddr, guid);
+                emit remotePeerUnauthorized(guid);
+            }
             cancelConnecting();
         }
         return;
@@ -443,6 +446,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
     m_remotePeer.id = QUuid(itrGuid->second);
+    emit peerIdDiscovered(m_remoteAddr, m_remotePeer.id);
 
     if (getState() == ConnectingStage1) {
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);

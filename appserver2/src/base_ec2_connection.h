@@ -62,7 +62,7 @@ namespace ec2
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) override;
 
-        virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) override;
+        virtual void addRemotePeer(const QUrl& url) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
 

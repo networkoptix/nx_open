@@ -882,7 +882,7 @@ namespace ec2
             \note Calling entity MUST connect to all interesting signals prior to calling this method so that received data is consistent
         */
         virtual void startReceivingNotifications() = 0;
-        virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) = 0;
+        virtual void addRemotePeer(const QUrl& url) = 0;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) = 0;
 
