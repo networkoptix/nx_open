@@ -267,6 +267,7 @@
                 <module>plugins/genericrtspplugin</module>
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
+                <module>plugins/pacidal_dvbt_plugin</module>
                 <module>mediaserver</module>
                 <!--<module>mediaproxy</module> -->
                 <!-- <module>testcamera</module> -->
