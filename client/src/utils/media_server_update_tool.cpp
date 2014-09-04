@@ -132,27 +132,31 @@ void QnMediaServerUpdateTool::setState(State state) {
     emit stateChanged(state);
 
     QnFullUpdateStage stage = QnFullUpdateStage::Download;
+    int offset = 0; // infinite stages
 
     switch (m_state) {
     case DownloadingUpdate:
         break;
     case InstallingClientUpdate:
         stage = QnFullUpdateStage::Client;
+        offset = 50;
         break;
     case InstallingToIncompatiblePeers:
         stage = QnFullUpdateStage::Incompatible;
+        offset = 50;
         break;
     case UploadingUpdate:
         stage = QnFullUpdateStage::Push;
         break;
     case InstallingUpdate:
         stage = QnFullUpdateStage::Servers;
+        offset = 50;
         break;
     default:
         return;
     }
 
-    int progress = (static_cast<int>(stage)*100) / ( static_cast<int>(QnFullUpdateStage::Count) );
+    int progress = (static_cast<int>(stage)*100 + offset) / ( static_cast<int>(QnFullUpdateStage::Count) );
     emit progressChanged(progress);    
 }
 
@@ -712,6 +716,7 @@ void QnMediaServerUpdateTool::at_networkTask_peerProgressChanged(const QUuid &pe
     case PeerUpdateInformation::PendingInstallation:
     case PeerUpdateInformation::UpdateInstalling:
         stage = QnPeerUpdateStage::Install;
+        progress = 50;
         break;
     default:
         break;

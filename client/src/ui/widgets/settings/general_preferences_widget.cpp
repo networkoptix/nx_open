@@ -28,8 +28,6 @@
 #include <ui/workaround/mac_utils.h>
 #include <ui/workaround/qt5_combobox_workaround.h>
 
-#include <utils/network/nettools.h>
-
 QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -56,7 +54,6 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
     setHelpTopic(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
     setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
-    setHelpTopic(ui->networkInterfacesGroupBox,                               Qn::SystemSettings_General_NetworkInterfaces_Help);
     setHelpTopic(ui->lookAndFeelGroupBox,                                     Qn::SystemSettings_General_Customizing_Help);
     setHelpTopic(ui->browseLogsButton,                                        Qn::SystemSettings_General_Logs_Help);
     setHelpTopic(ui->pauseOnInactivityLabel,  ui->pauseOnInactivityCheckBox,  Qn::SystemSettings_General_AutoPause_Help);
@@ -159,10 +156,6 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     ui->extraMediaFoldersList->clear();
     foreach (const QString &extraMediaFolder, qnSettings->extraMediaFolders())
         ui->extraMediaFoldersList->addItem(QDir::toNativeSeparators(extraMediaFolder));
-
-    ui->networkInterfacesList->clear();
-    foreach (const QNetworkAddressEntry &entry, getAllIPv4AddressEntries())
-        ui->networkInterfacesList->addItem(tr("IP Address: %1, Network Mask: %2").arg(entry.ip().toString()).arg(entry.netmask().toString()));
 
     m_oldLanguage = 0;
     QString translationPath = qnSettings->translationPath();

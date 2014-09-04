@@ -12,11 +12,7 @@ namespace {
 
 QnUpdateStatusItemDelegate::QnUpdateStatusItemDelegate(QWidget *parent) :
     QStyledItemDelegate(parent)
-{
-    for(int i = 1; i < static_cast<int>(QnPeerUpdateStage::Count); ++i) {
-        m_stageSeparators.append(i * 100 / static_cast<int>(QnPeerUpdateStage::Count));
-    }
-}
+{}
 
 QnUpdateStatusItemDelegate::~QnUpdateStatusItemDelegate() {}
 
@@ -51,7 +47,6 @@ void QnUpdateStatusItemDelegate::paintProgressBar(QPainter *painter, const QStyl
     progressBarStyleOption.progress = progress ;
     progressBarStyleOption.text = tr("%1%").arg(progress);
     progressBarStyleOption.textVisible = true;
-    progressBarStyleOption.separators = m_stageSeparators;
 
     QApplication::style()->drawControl(QStyle::CE_ProgressBar, &progressBarStyleOption, painter, option.widget);
 }

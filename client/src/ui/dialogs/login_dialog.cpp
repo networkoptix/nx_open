@@ -66,6 +66,8 @@ namespace {
         return result;
     }
 
+    const QSize saveConnectionAsSize(300, 100);
+
 } // anonymous namespace
 
 
@@ -424,12 +426,20 @@ void QnLoginDialog::at_saveButton_clicked() {
 
     QnConnectionDataList connections = qnSettings->customConnections();
 
-    bool ok = false;
-
     QString name = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
-    name = QInputDialog::getText(this, tr("Save connection as..."), tr("Enter name:"), QLineEdit::Normal, name, &ok);
-    if (!ok)
-        return;
+    {
+        QInputDialog dialog(this);
+        dialog.setWindowTitle(tr("Save connection as..."));
+        dialog.setLabelText(tr("Enter name:"));
+        dialog.setTextValue(name);
+        dialog.resize(saveConnectionAsSize);
+
+        if (!dialog.exec())
+            return;
+
+        name = dialog.textValue();
+    }
+
 
     // save here because of the 'connections' field modifying
     QString password = ui->passwordLineEdit->text();
