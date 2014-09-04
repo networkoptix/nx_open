@@ -11,6 +11,7 @@
 #include "core/resource/media_server_resource.h"
 #include "ui/models/resource_list_model.h"
 #include "ui/models/server_addresses_model.h"
+#include "common/common_module.h"
 
 namespace {
     const int defaultRtspPort = 7001;
@@ -51,8 +52,8 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     connect(ui->addButton,                      &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_addButton_clicked);
     connect(ui->removeButton,                   &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_removeButton_clicked);
 
-    connect( qnResPool, &QnResourcePool::resourceAdded, this, &QnRoutingManagementWidget::at_resourcePool_resourceAdded );
-    connect( qnResPool, &QnResourcePool::resourceRemoved, this, &QnRoutingManagementWidget::at_resourcePool_resourceRemoved );
+    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnRoutingManagementWidget::at_resourcePool_resourceAdded);
+    connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnRoutingManagementWidget::at_resourcePool_resourceRemoved);
 
     m_serverListModel->setResources(qnResPool->getResourcesWithFlag(Qn::server));
 }
@@ -265,11 +266,11 @@ void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(co
 }
 
 void QnRoutingManagementWidget::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
-    if (QnMediaServerResourcePtr mediaServerRes = resource.dynamicCast<QnMediaServerResource>()) {
-        ec2::AbstractECConnectionPtr ecConnection = QnAppServerConnectionFactory::getConnection2();
-        if(ecConnection && (mediaServerRes->getSystemName() == ecConnection->connectionInfo().systemName) )
-            m_serverListModel->addResource(resource);   //adding server belonging to the system we are connected to
-    }
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (!server || server->getStatus() == Qn::Incompatible)
+        return;
+
+    m_serverListModel->addResource(resource);
 }
 
 void QnRoutingManagementWidget::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
