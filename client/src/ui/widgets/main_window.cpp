@@ -255,6 +255,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::OpenNewWindowAction));
     addAction(action(Qn::CloseLayoutAction));
     addAction(action(Qn::MainMenuAction));
+    addAction(action(Qn::OpenLoginDialogAction));
     addAction(action(Qn::OpenInFolderAction));
     addAction(action(Qn::RemoveLayoutItemAction));
     addAction(action(Qn::RemoveFromServerAction));
