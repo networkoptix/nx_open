@@ -18,8 +18,6 @@ protected:
 
 private:
     void paintProgressBar(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-
-    QList<int> m_stageSeparators;
 };
 
 #endif // UPDATE_STATUS_ITEM_DELEGATE_H
