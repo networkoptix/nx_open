@@ -22,6 +22,7 @@ private slots:
 private:
     QNetworkAccessManager m_networkManager;
     QHostAddress m_publicIP;
+    bool m_ipFound;
     int m_replyInProgress;
 };
 
