@@ -47,8 +47,7 @@ private:
     QByteArray m_currentData;
     QList<QnMediaServerResourcePtr> m_currentServers;
     QUuid m_targetId;
-    QTimer *m_shortTimer;
-    QTimer *m_longTimer;
+    QTimer *m_timer;
 };
 
 #endif // REST_UPDATE_PEER_TASK_H
