@@ -24,8 +24,9 @@ namespace nx_stun
     // know what should I put for high and low separately.
     struct TransactionID
     {
+        static const std::size_t TRANSACTION_ID_LENGTH = 12;
         union {
-            unsigned char bytes[12];
+            unsigned char bytes[TRANSACTION_ID_LENGTH];
             struct {
                 uint32_t high;
                 uint64_t lo;

@@ -24,6 +24,13 @@ namespace nx_stun
         void setMessage( Message&& message );
 
         nx_api::SerializerState::Type serialize( nx::Buffer* const buffer, size_t* const bytesWritten );
+
+
+    private:
+
+
+
+
     };
 }
 
