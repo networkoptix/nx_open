@@ -160,6 +160,7 @@
 #include "rest/handlers/old_client_connect_rest_handler.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "media_server/resource_status_watcher.h"
+#include "nx_ec/dummy_handler.h"
 
 
 // This constant is used while checking for compatibility.
@@ -967,6 +968,20 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
     QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
 
     at_localInterfacesChanged();
+
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (server) {
+        Qn::ServerFlags serverFlags = server->getServerFlags();
+        if (m_publicAddress.isNull())
+            serverFlags &= ~Qn::SF_HasPublicIP;
+        else
+            serverFlags |= Qn::SF_HasPublicIP;
+        if (serverFlags != server->getServerFlags()) {
+            server->setServerFlags(serverFlags);
+            ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+            ec2Connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        }
+    }
 }
 
 void QnMain::at_localInterfacesChanged()
