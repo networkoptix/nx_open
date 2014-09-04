@@ -578,6 +578,8 @@ int MessageParserImpl::ParseEndMessageIntegrity( std::size_t* consumed_bytes ) {
 
 // Save me some typings for each ParseXXX function 
 
+#if 0
+
 #define INVOKE(x) \
     do { \
     std::size_t b; \
@@ -634,6 +636,82 @@ int MessageParserImpl::Parse( const nx::Buffer* buffer , std::size_t* bytes_tran
 }
 
 #undef INVOKE
+
+#else
+
+int MessageParserImpl::Parse( const nx::Buffer* buffer , std::size_t* bytes_transferred ) {
+    Q_ASSERT( !buffer->isEmpty() );
+    // Setting up the buffer environment variables
+    buffer_.Bind(buffer);
+    // We will drain the buffer, no matter how many data it contains
+    *bytes_transferred = buffer->size();
+    // Tick the parsing state machine
+    do {
+        std::size_t b = 0;                                      
+        int ret = 0;                                    
+        switch(state_)
+        {
+            case HEADER_INITIAL_AND_TYPE:
+                ret = ParseHeader_InitialAndType(&b);
+                break;
+            case HEADER_LENGTH:
+                ret = ParseHeader_Length(&b);
+                break;
+            case HEADER_MAGIC_ID:
+                ret = ParseHeader_MagicId(&b);
+                break;
+            case HEADER_TRANSACTION_ID:
+                ret = ParseHeader_TransactionId(&b);
+                break;
+            case ATTRIBUTE_TYPE:
+                ret = ParseAttribute_Type(&b);
+                break;
+            case ATTRIBUTE_LENGTH:
+                ret = ParseAttribute_Length(&b);
+                break;
+            case ATTRIBUTE_VALUE:
+                ret = ParseAttribute_Value(&b);
+                break;
+            case ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_TYPE:
+                ret = ParseAttribute_FingerprintType(&b);
+                break;
+            case ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_LENGTH:
+                ret = ParseAttribute_FingerprintLength(&b);
+                break;
+            case ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_VALUE:
+                ret = ParseAttribute_FinterprintValue(&b);
+                break;
+            case MORE_VALUE:
+                ret = ParseMoreValue(&b);
+                break;
+            case END_FINGERPRINT:
+                ret = ParseEndWithFingerprint(&b);
+                break;
+            case END_MESSAGE_INTEGRITY:
+                ret = ParseEndMessageIntegrity(&b);
+                break;
+            default:
+                Q_ASSERT(0);
+                return 0;
+        }
+
+        switch(ret) {                                       
+            case DONE:                                      
+                *bytes_transferred += b;
+                break;  //continuing parsing
+            case IN_PROGRESS:                               
+                return nx_api::ParserState::inProgress;     
+            case FAILED:                                    
+                return nx_api::ParserState::failed;         
+            case MESSAGE_FINISH:                            
+                return nx_api::ParserState::done;           
+            default :                                       
+                Q_ASSERT(0);                                
+                return nx_api::ParserState::failed;                                      
+        }                                                       
+    } while( true );
+}
+#endif
 
 MessageParserImplPtr::MessageParserImplPtr( MessageParserImpl* ptr ) :
     std::unique_ptr<MessageParserImpl>(ptr){}
