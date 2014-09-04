@@ -49,7 +49,6 @@ public:
     static QString toString( State state );
 
     QnTransactionTransport(const ApiPeerData &localPeer,
-        const ApiPeerData &remotePeer = ApiPeerData(QUuid(), Qn::PT_Server),
         const QSharedPointer<AbstractStreamSocket>& socket = QSharedPointer<AbstractStreamSocket>());
     ~QnTransactionTransport();
 
@@ -57,6 +56,7 @@ signals:
     void gotTransaction(const QByteArray &data, const QnTransactionTransportHeader &transportHeader);
     void stateChanged(State state);
     void remotePeerUnauthorized(const QUuid& id);
+    void peerIdDiscovered(const QUrl& url, const QUuid& id);
 public:
 
     template<class T> 
@@ -141,6 +141,7 @@ public:
 
     void processExtraData();
     void startListening();
+    void setRemotePeer(const ApiPeerData& value) { m_remotePeer = value; }
 private:
     struct DataToSend
     {

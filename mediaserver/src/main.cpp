@@ -989,6 +989,23 @@ void QnMain::at_localInterfacesChanged()
     auto intfList = allLocalAddresses();
     intfList << m_publicAddress;
     m_mediaServer->setNetAddrList(intfList);
+
+    QString defaultAddress = QUrl(m_mediaServer->getApiUrl()).host();
+    int port = QUrl(m_mediaServer->getApiUrl()).port();
+    bool found = false;
+    foreach(const QHostAddress& addr, intfList) {
+        if (addr.toString() == defaultAddress) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        QHostAddress newAddress;
+        if (!intfList.isEmpty())
+            newAddress = intfList.first();
+        setServerNameAndUrls(m_mediaServer, newAddress.toString(), port);
+    }
+
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     ec2Connection->getMediaServerManager()->save(m_mediaServer, this, &QnMain::at_serverSaved);
 }
