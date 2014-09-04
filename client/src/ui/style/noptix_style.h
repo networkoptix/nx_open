@@ -13,6 +13,17 @@ class QnSkin;
 class QnGlobals;
 class QnCustomizer;
 
+class QnStyleOptionProgressBar: public QStyleOptionProgressBarV2 {
+public:
+    enum StyleOptionVersion { Version = 3 };
+
+    QnStyleOptionProgressBar():
+        QStyleOptionProgressBar(Version)
+    {}
+
+    QList<int> separators;
+};
+
 class QnNoptixStyle: public QProxyStyle, public GraphicsStyle {
     Q_OBJECT;
 

@@ -48,7 +48,7 @@ QVariant QnServerUpdatesModel::headerData(int section, Qt::Orientation orientati
         case NameColumn:
             return tr("Server");
         case VersionColumn:
-            return tr("Current Version");
+            return tr("Status");
         default:
             break;
         }

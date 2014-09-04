@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <QtCore/QElapsedTimer>
+#include <QTime>
 
 #include <nx_ec/ec_api.h>
 #include "nx_ec/data/api_lock_data.h"
@@ -31,7 +32,7 @@ namespace ec2
 
         static QnTransactionMessageBus* instance();
 
-        void addConnectionToPeer(const QUrl& url, const QUuid& peer);
+        void addConnectionToPeer(const QUrl& url);
         void removeConnectionFromPeer(const QUrl& url);
         void gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer);
         void dropConnections();
@@ -192,18 +193,20 @@ namespace ec2
         void at_gotTransaction(const QByteArray &serializedTran, const QnTransactionTransportHeader &transportHeader);
         void doPeriodicTasks();
         bool checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport);
+        void at_peerIdDiscovered(const QUrl& url, const QUuid& id);
     private:
         /** Info about us. Should be set before start(). */
         ApiPeerData m_localPeer;
 
-        QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
+        //QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
         QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
 		QScopedPointer<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
 
         struct RemoteUrlConnectInfo {
-            RemoteUrlConnectInfo(const QUuid& peer = QUuid()): peer(peer), lastConnectedTime(0) {}
-            QUuid peer;
+            RemoteUrlConnectInfo(): lastConnectedTime(0) {}
             qint64 lastConnectedTime;
+            QUuid discoveredPeer;
+            QTime discoveredTimeout;
         };
 
         QMap<QUrl, RemoteUrlConnectInfo> m_remoteUrls;

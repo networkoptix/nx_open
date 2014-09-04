@@ -270,8 +270,8 @@ namespace ec2
         return ++requestID;
     }
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::PersistentInfo,    (binary)(json)(ubjson),   QnAbstractTransaction_PERSISTENT_Fields)
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,                    (binary)(json)(ubjson),   QnAbstractTransaction_Fields)
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::PersistentInfo,    (json)(ubjson),   QnAbstractTransaction_PERSISTENT_Fields)
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,                    (json)(ubjson),   QnAbstractTransaction_Fields)
 	
 } // namespace ec2
 

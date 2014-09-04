@@ -3,13 +3,17 @@
 #include <QtCore/QUrl>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
+
 #include "utils/common/delete_later.h"
 #include "api/session_manager.h"
 #include <api/app_server_connection.h>
+#include <api/model/ping_reply.h>
 #include <api/network_proxy_factory.h>
+#include <rest/server/json_rest_result.h>
 #include "utils/common/sleep.h"
 #include "utils/network/networkoptixmodulerevealcommon.h"
 #include "version.h"
+
 
 const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
 
@@ -172,11 +176,16 @@ void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int resp
     const QString& urlStr = m_runningIfRequests.value(responseNum);
     if( response.status == QNetworkReply::NoError )
     {
-        // server OK
-        if (urlStr == QnMediaServerResource::USE_PROXY)
-            setPrimaryIF(urlStr);
-        else
-            setPrimaryIF(QUrl(urlStr).host());
+        QnPingReply reply;
+        QnJsonRestResult result;
+        if( QJson::deserialize(response.data, &result) && QJson::deserialize(result.reply(), &reply) && (reply.moduleGuid == getId()) )
+        {
+            // server OK
+            if (urlStr == QnMediaServerResource::USE_PROXY)
+                setPrimaryIF(urlStr);
+            else
+                setPrimaryIF(QUrl(urlStr).host());
+        }
     }
 
     m_runningIfRequests.remove(responseNum);

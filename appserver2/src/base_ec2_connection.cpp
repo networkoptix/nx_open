@@ -196,14 +196,14 @@ namespace ec2
     }
 
     template<class T>
-    void BaseEc2Connection<T>::addRemotePeer(const QUrl& _url, const QUuid& peerGuid)
+    void BaseEc2Connection<T>::addRemotePeer(const QUrl& _url)
     {
         QUrl url(_url);
         url.setPath("/ec2/events");
         QUrlQuery q;
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());
         url.setQuery(q);
-        QnTransactionMessageBus::instance()->addConnectionToPeer(url, peerGuid);
+        QnTransactionMessageBus::instance()->addConnectionToPeer(url);
     }
 
     template<class T>

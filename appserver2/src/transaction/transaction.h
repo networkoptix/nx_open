@@ -201,24 +201,24 @@ namespace ec2
         T params;
     };
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::PersistentInfo, (binary)(json)(ubjson))
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary)(json)(ubjson))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::PersistentInfo, (json)(ubjson))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (json)(ubjson))
 
     //Binary format functions for QnTransaction<T>
-    template <class T, class Output>
-    void serialize(const QnTransaction<T> &transaction,  QnOutputBinaryStream<Output> *stream)
-    {
-        QnBinary::serialize(static_cast<const QnAbstractTransaction &>(transaction), stream);
-        QnBinary::serialize(transaction.params, stream);
-    }
+    //template <class T, class Output>
+    //void serialize(const QnTransaction<T> &transaction,  QnOutputBinaryStream<Output> *stream)
+    //{
+    //    QnBinary::serialize(static_cast<const QnAbstractTransaction &>(transaction), stream);
+    //    QnBinary::serialize(transaction.params, stream);
+    //}
 
-    template <class T, class Input>
-    bool deserialize(QnInputBinaryStream<Input>* stream,  QnTransaction<T> *transaction)
-    {
-        return 
-            QnBinary::deserialize(stream,  static_cast<QnAbstractTransaction *>(transaction)) &&
-            QnBinary::deserialize(stream, &transaction->params);
-    }
+    //template <class T, class Input>
+    //bool deserialize(QnInputBinaryStream<Input>* stream,  QnTransaction<T> *transaction)
+    //{
+    //    return 
+    //        QnBinary::deserialize(stream,  static_cast<QnAbstractTransaction *>(transaction)) &&
+    //        QnBinary::deserialize(stream, &transaction->params);
+    //}
 
 
     //Json format functions for QnTransaction<T>

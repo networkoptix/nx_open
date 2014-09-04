@@ -91,6 +91,7 @@ signals:
     void stateChanged(int state);
     void progressChanged(int progress);
     void peerChanged(const QUuid &peerId);
+    void targetsChanged(const QSet<QUuid> &targets);
 
     void checkForUpdatesFinished(QnCheckForUpdateResult result);
     void updateFinished(QnUpdateResult result);
@@ -112,14 +113,17 @@ private slots:
     void at_downloadTask_peerFinished(const QUuid &peerId);
     void at_uploadTask_peerFinished(const QUuid &peerId);
     void at_installTask_peerFinished(const QUuid &peerId);
-    void at_restUpdateTask_peerFinished(const QUuid &peerId);
+    void at_restUpdateTask_peerUpdateFinished(const QUuid &incompatibleId, const QUuid &id);
     void at_clientUpdateInstalled();
 
+    void at_taskProgressChanged(int progress);
     void at_networkTask_peerProgressChanged(const QUuid &peerId, int progress);
 
     void at_resourcePool_statusChanged(const QnResourcePtr &resource);
 
 private:
+
+
     void setState(State state);
     void setCheckResult(QnCheckForUpdateResult result);
     void setUpdateResult(QnUpdateResult result);

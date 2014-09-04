@@ -35,7 +35,7 @@ namespace ec2
         virtual AbstractDiscoveryManagerPtr getDiscoveryManager() override;
         virtual AbstractTimeManagerPtr getTimeManager() override;
 
-        virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) override;
+        virtual void addRemotePeer(const QUrl& url) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
 

@@ -4,7 +4,7 @@
 #include <QtWidgets/QApplication>
 
 #include <ui/models/server_updates_model.h>
-#include <utils/media_server_update_tool.h>
+#include <ui/style/noptix_style.h>
 
 namespace {
     const int defaultWidth = 200;
@@ -12,8 +12,7 @@ namespace {
 
 QnUpdateStatusItemDelegate::QnUpdateStatusItemDelegate(QWidget *parent) :
     QStyledItemDelegate(parent)
-{
-}
+{}
 
 QnUpdateStatusItemDelegate::~QnUpdateStatusItemDelegate() {}
 
@@ -37,7 +36,7 @@ void QnUpdateStatusItemDelegate::paint(QPainter *painter, const QStyleOptionView
 
 
 void QnUpdateStatusItemDelegate::paintProgressBar(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    QStyleOptionProgressBar progressBarStyleOption;
+    QnStyleOptionProgressBar progressBarStyleOption;
     progressBarStyleOption.rect = option.rect.adjusted(4, 4, -4, -4);
 
     const int progress = index.data(QnServerUpdatesModel::ProgressRole).toInt();
@@ -46,7 +45,7 @@ void QnUpdateStatusItemDelegate::paintProgressBar(QPainter *painter, const QStyl
     progressBarStyleOption.maximum = 100;
     progressBarStyleOption.textAlignment = Qt::AlignCenter;
     progressBarStyleOption.progress = progress ;
-    progressBarStyleOption.text = tr("Updating: %1%").arg(progress);
+    progressBarStyleOption.text = tr("%1%").arg(progress);
     progressBarStyleOption.textVisible = true;
 
     QApplication::style()->drawControl(QStyle::CE_ProgressBar, &progressBarStyleOption, painter, option.widget);
@@ -59,8 +58,5 @@ QSize QnUpdateStatusItemDelegate::sizeHint(const QStyleOptionViewItem &option, c
     return result;
 }
 
-void QnUpdateStatusItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const {
-    base_type::initStyleOption(option, index);
-}
 
 

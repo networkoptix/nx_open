@@ -46,24 +46,6 @@ namespace {
         return true;
     }
 
-    enum class PeerUpdateStage {
-        Download,           /**< Download update package for the peer. */
-        Push,               /**< Push update package to the peer. */
-        Install,            /**< Install update. */
-
-        Count
-    };
-
-    enum class FullUpdateStage {
-        Download,           /**< Download update packages. */
-        Client,             /**< Install client update. */
-        Incompatible,       /**< Install updates to the incompatible servers. */
-        Push,               /**< Push update package to the normal servers. */
-        Servers,            /**< Install updates to the normal servers. */
-
-        Count
-    };
-
 } // anonymous namespace
 
 QnMediaServerUpdateTool::PeerUpdateInformation::PeerUpdateInformation(const QnMediaServerResourcePtr &server) :
@@ -110,9 +92,9 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     connect(m_downloadUpdatesPeerTask,                  &QnNetworkPeerTask::peerFinished,               this,   &QnMediaServerUpdateTool::at_downloadTask_peerFinished);
     connect(m_uploadUpdatesPeerTask,                    &QnNetworkPeerTask::peerFinished,               this,   &QnMediaServerUpdateTool::at_uploadTask_peerFinished);
     connect(m_installUpdatesPeerTask,                   &QnNetworkPeerTask::peerFinished,               this,   &QnMediaServerUpdateTool::at_installTask_peerFinished);
-    connect(m_restUpdatePeerTask,                       &QnNetworkPeerTask::peerFinished,               this,   &QnMediaServerUpdateTool::at_restUpdateTask_peerFinished);
-    connect(m_downloadUpdatesPeerTask,                  &QnNetworkPeerTask::progressChanged,            this,   &QnMediaServerUpdateTool::progressChanged);
-    connect(m_uploadUpdatesPeerTask,                    &QnNetworkPeerTask::progressChanged,            this,   &QnMediaServerUpdateTool::progressChanged);
+    connect(m_restUpdatePeerTask,                       &QnRestUpdatePeerTask::peerUpdateFinished,      this,   &QnMediaServerUpdateTool::at_restUpdateTask_peerUpdateFinished);
+    connect(m_downloadUpdatesPeerTask,                  &QnNetworkPeerTask::progressChanged,            this,   &QnMediaServerUpdateTool::at_taskProgressChanged);
+    connect(m_uploadUpdatesPeerTask,                    &QnNetworkPeerTask::progressChanged,            this,   &QnMediaServerUpdateTool::at_taskProgressChanged);
     connect(m_downloadUpdatesPeerTask,                  &QnNetworkPeerTask::peerProgressChanged,        this,   &QnMediaServerUpdateTool::at_networkTask_peerProgressChanged);
     connect(m_uploadUpdatesPeerTask,                    &QnNetworkPeerTask::peerProgressChanged,        this,   &QnMediaServerUpdateTool::at_networkTask_peerProgressChanged);
 }
@@ -148,18 +130,46 @@ void QnMediaServerUpdateTool::setState(State state) {
 
     m_state = state;
     emit stateChanged(state);
+
+    QnFullUpdateStage stage = QnFullUpdateStage::Download;
+    int offset = 0; // infinite stages
+
+    switch (m_state) {
+    case DownloadingUpdate:
+        break;
+    case InstallingClientUpdate:
+        stage = QnFullUpdateStage::Client;
+        offset = 50;
+        break;
+    case InstallingToIncompatiblePeers:
+        stage = QnFullUpdateStage::Incompatible;
+        offset = 50;
+        break;
+    case UploadingUpdate:
+        stage = QnFullUpdateStage::Push;
+        break;
+    case InstallingUpdate:
+        stage = QnFullUpdateStage::Servers;
+        offset = 50;
+        break;
+    default:
+        return;
+    }
+
+    int progress = (static_cast<int>(stage)*100 + offset) / ( static_cast<int>(QnFullUpdateStage::Count) );
+    emit progressChanged(progress);    
 }
 
 void QnMediaServerUpdateTool::setCheckResult(QnCheckForUpdateResult result) {
     m_checkResult = result;
-    emit checkForUpdatesFinished(result);
     setState(Idle);
+    emit checkForUpdatesFinished(result);
 }
 
 void QnMediaServerUpdateTool::setUpdateResult(QnUpdateResult result) {
     m_updateResult = result;
-    emit updateFinished(result);
     setState(Idle);
+    emit updateFinished(result);
 }
 
 void QnMediaServerUpdateTool::finishUpdate(QnUpdateResult result) {
@@ -219,14 +229,19 @@ QnMediaServerResourceList QnMediaServerUpdateTool::targets() const {
 void QnMediaServerUpdateTool::setTargets(const QSet<QUuid> &targets, bool client) {
     m_targets.clear();
 
+    QSet<QUuid> suitableTargets;
+
     foreach (const QUuid &id, targets) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
         m_targets.append(server);
+        suitableTargets.insert(id);
     }
 
     m_disableClientUpdates = !client;
+
+    emit targetsChanged(suitableTargets);
 }
 
 QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
@@ -242,7 +257,6 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
                     result.append(server);
             }
         }
-
     } else {
         result = m_targets;
     }
@@ -461,7 +475,6 @@ void QnMediaServerUpdateTool::downloadUpdates() {
         }
     }
 
-    emit progressChanged(0);
     setState(DownloadingUpdate);
 
     m_downloadUpdatesPeerTask->setTargetDir(updatesDirName);
@@ -482,8 +495,6 @@ void QnMediaServerUpdateTool::uploadUpdatesToServers() {
         if (!m_incompatiblePeerIds.contains(it.key()))
             it->state = PeerUpdateInformation::UpdateUploading;
     }
-
-    emit progressChanged(0);
 
     m_uploadUpdatesPeerTask->setUpdateId(m_updateId);
     m_uploadUpdatesPeerTask->setUploads(fileBySystemInformation);
@@ -680,24 +691,42 @@ void QnMediaServerUpdateTool::at_restUpdateTask_finished(int errorCode) {
     prepareToUpload();
 }
 
+void QnMediaServerUpdateTool::at_taskProgressChanged(int progress) {
+    QnFullUpdateStage stage = QnFullUpdateStage::Download;
+    switch (m_state) {
+    case DownloadingUpdate:
+        break;
+    case UploadingUpdate:
+        stage = QnFullUpdateStage::Push;
+        break;
+    default:
+        return;
+    }
+
+    int fullProgress = (progress + static_cast<int>(stage)*100) / ( static_cast<int>(QnFullUpdateStage::Count) ) ;
+    emit progressChanged(fullProgress);
+}
+
+
 void QnMediaServerUpdateTool::at_networkTask_peerProgressChanged(const QUuid &peerId, int progress) {
 
-    PeerUpdateStage stage = PeerUpdateStage::Download;
+    QnPeerUpdateStage stage = QnPeerUpdateStage::Download;
 
     switch (m_updateInformationById[peerId].state) {
     case PeerUpdateInformation::PendingUpload:
     case PeerUpdateInformation::UpdateUploading:
-        stage = PeerUpdateStage::Push;
+        stage = QnPeerUpdateStage::Push;
         break;
     case PeerUpdateInformation::PendingInstallation:
     case PeerUpdateInformation::UpdateInstalling:
-        stage = PeerUpdateStage::Install;
+        stage = QnPeerUpdateStage::Install;
+        progress = 50;
         break;
     default:
         break;
     }
 
-    m_updateInformationById[peerId].progress = (progress + static_cast<int>(stage)*100) / ( static_cast<int>(PeerUpdateStage::Count) ) ;
+    m_updateInformationById[peerId].progress = (progress + static_cast<int>(stage)*100) / ( static_cast<int>(QnPeerUpdateStage::Count) ) ;
     emit peerChanged(peerId);
 }
 
@@ -726,6 +755,11 @@ void QnMediaServerUpdateTool::at_installTask_peerFinished(const QUuid &peerId) {
     setPeerState(peerId, PeerUpdateInformation::UpdateFinished);
 }
 
-void QnMediaServerUpdateTool::at_restUpdateTask_peerFinished(const QUuid &peerId) {
-    setPeerState(peerId, PeerUpdateInformation::UpdateFinished);
+void QnMediaServerUpdateTool::at_restUpdateTask_peerUpdateFinished(const QUuid &incompatibleId, const QUuid &id) {
+    PeerUpdateInformation info = m_updateInformationById.take(incompatibleId);
+    info.state = PeerUpdateInformation::UpdateFinished;
+    info.server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+    m_updateInformationById.insert(id, info);
+    emit targetsChanged(QSet<QUuid>::fromList(m_updateInformationById.keys()));
+    emit peerChanged(id);
 }

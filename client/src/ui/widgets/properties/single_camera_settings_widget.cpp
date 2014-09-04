@@ -79,6 +79,9 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_inUpdateMaxFps(false),
     m_widgetsRecreator(0),
     m_serverConnection(0)
+#ifdef QT_WEBKITWIDGETS_LIB
+    ,m_cameraAdvancedSettingsWebPage(0)
+#endif
 {
     ui->setupUi(this);
 
@@ -214,6 +217,8 @@ void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout ,
 {
     if (!m_camera)
         return;
+    if (m_cameraAdvancedSettingsWebPage)
+        m_cameraAdvancedSettingsWebPage->setCamera(m_camera);
     if ( qnCommon )
     {
         QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
@@ -300,7 +305,8 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
             advancedSplitter->setSizes(sizes);
 #ifdef QT_WEBKITWIDGETS_LIB
             advancedWebView = new QWebView(ui->advancedTab);
-            advancedWebView->setPage( new CameraAdvancedSettingsWebPage( advancedWebView ) );
+            m_cameraAdvancedSettingsWebPage = new CameraAdvancedSettingsWebPage( advancedWebView );
+            advancedWebView->setPage(m_cameraAdvancedSettingsWebPage);
 
             QStyle* style = QStyleFactory().create(lit("fusion"));
             advancedWebView->setStyle(style);

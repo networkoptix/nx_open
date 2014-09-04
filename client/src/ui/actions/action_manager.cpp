@@ -506,8 +506,9 @@ QnActionManager::QnActionManager(QObject *parent):
         icon(qnSkin->icon("titlebar/main_menu.png"));
 
     factory(Qn::OpenLoginDialogAction).
-        flags(Qn::Main).
+        flags(Qn::Main | Qn::GlobalHotkey).
         text(tr("Connect to Server...")).
+        shortcut(tr("Ctrl+Shift+C")).
         icon(qnSkin->icon("titlebar/disconnected.png")).
         autoRepeat(false);
 

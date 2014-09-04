@@ -45,6 +45,14 @@ void QnServerAddressesModel::resetModel(const QList<QUrl> &addresses, const QLis
     endResetModel();
 }
 
+void QnServerAddressesModel::clear() {
+    beginResetModel();
+    m_addresses.clear();
+    m_manualAddresses.clear();
+    m_ignoredAddresses.clear();
+    endResetModel();
+}
+
 bool QnServerAddressesModel::isManualAddress(const QModelIndex &index) const {
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return false;
@@ -164,7 +172,6 @@ QUrl QnServerAddressesModel::addressAtIndex(const QModelIndex &index) const {
     else
         return m_manualAddresses[index.row() - m_addresses.size()];
 }
-
 
 
 QnSortedServerAddressesModel::QnSortedServerAddressesModel(QObject *parent) : QSortFilterProxyModel(parent) {}
