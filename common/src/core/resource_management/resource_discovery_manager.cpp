@@ -255,9 +255,13 @@ static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input) { retu
 
 void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList& resources)
 {
-    m_searchersListMutex.lock();
-    QnManualCameraInfoMap cameras = m_manualCameraMap;
-    m_searchersListMutex.unlock();
+    QnManualCameraInfoMap cameras;
+    {
+        QMutexLocker locker(&m_searchersListMutex);
+        cameras = m_manualCameraMap;
+        if (cameras.isEmpty())
+            return;
+    }
 
     QFuture<QnResourceList> results = QtConcurrent::mapped(cameras, &CheckHostAddrAsync);
     results.waitForFinished();
