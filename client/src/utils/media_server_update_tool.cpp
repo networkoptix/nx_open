@@ -92,7 +92,7 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     connect(m_downloadUpdatesPeerTask,                  &QnNetworkPeerTask::peerFinished,               this,   &QnMediaServerUpdateTool::at_downloadTask_peerFinished);
     connect(m_uploadUpdatesPeerTask,                    &QnNetworkPeerTask::peerFinished,               this,   &QnMediaServerUpdateTool::at_uploadTask_peerFinished);
     connect(m_installUpdatesPeerTask,                   &QnNetworkPeerTask::peerFinished,               this,   &QnMediaServerUpdateTool::at_installTask_peerFinished);
-    connect(m_restUpdatePeerTask,                       &QnNetworkPeerTask::peerFinished,               this,   &QnMediaServerUpdateTool::at_restUpdateTask_peerFinished);
+    connect(m_restUpdatePeerTask,                       &QnRestUpdatePeerTask::peerUpdateFinished,      this,   &QnMediaServerUpdateTool::at_restUpdateTask_peerUpdateFinished);
     connect(m_downloadUpdatesPeerTask,                  &QnNetworkPeerTask::progressChanged,            this,   &QnMediaServerUpdateTool::at_taskProgressChanged);
     connect(m_uploadUpdatesPeerTask,                    &QnNetworkPeerTask::progressChanged,            this,   &QnMediaServerUpdateTool::at_taskProgressChanged);
     connect(m_downloadUpdatesPeerTask,                  &QnNetworkPeerTask::peerProgressChanged,        this,   &QnMediaServerUpdateTool::at_networkTask_peerProgressChanged);
@@ -229,14 +229,19 @@ QnMediaServerResourceList QnMediaServerUpdateTool::targets() const {
 void QnMediaServerUpdateTool::setTargets(const QSet<QUuid> &targets, bool client) {
     m_targets.clear();
 
+    QSet<QUuid> suitableTargets;
+
     foreach (const QUuid &id, targets) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
         m_targets.append(server);
+        suitableTargets.insert(id);
     }
 
     m_disableClientUpdates = !client;
+
+    emit targetsChanged(suitableTargets);
 }
 
 QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
@@ -252,7 +257,6 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
                     result.append(server);
             }
         }
-
     } else {
         result = m_targets;
     }
@@ -751,6 +755,11 @@ void QnMediaServerUpdateTool::at_installTask_peerFinished(const QUuid &peerId) {
     setPeerState(peerId, PeerUpdateInformation::UpdateFinished);
 }
 
-void QnMediaServerUpdateTool::at_restUpdateTask_peerFinished(const QUuid &peerId) {
-    setPeerState(peerId, PeerUpdateInformation::UpdateFinished);
+void QnMediaServerUpdateTool::at_restUpdateTask_peerUpdateFinished(const QUuid &incompatibleId, const QUuid &id) {
+    PeerUpdateInformation info = m_updateInformationById.take(incompatibleId);
+    info.state = PeerUpdateInformation::UpdateFinished;
+    info.server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+    m_updateInformationById.insert(id, info);
+    emit targetsChanged(QSet<QUuid>::fromList(m_updateInformationById.keys()));
+    emit peerChanged(id);
 }

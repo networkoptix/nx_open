@@ -44,9 +44,6 @@ public:
 
     explicit QnServerUpdatesModel(QObject *parent = 0);
 
-    void setTargets(const QSet<QUuid> &targets);
-    void setTargets(const QnMediaServerResourceList &targets);
-
     int columnCount(const QModelIndex &parent) const override;
     int rowCount(const QModelIndex &parent) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
@@ -60,6 +57,10 @@ public:
 
     QnSoftwareVersion latestVersion() const;
     void setLatestVersion(const QnSoftwareVersion &version);
+
+public slots:
+    void setTargets(const QSet<QUuid> &targets);
+    void setTargets(const QnMediaServerResourceList &targets);
 
 private:
     void resetResourses();

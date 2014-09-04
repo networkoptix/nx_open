@@ -69,6 +69,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     connect(m_updateTool,       &QnMediaServerUpdateTool::peerChanged,          this,           [this](const QUuid &peerId) {
         m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(peerId));
     });
+    connect(m_updateTool,       SIGNAL(targetsChanged(QSet<QUuid>)),            m_updatesModel, SLOT(setTargets(QSet<QUuid>)));
     connect(m_updateTool,       &QnMediaServerUpdateTool::checkForUpdatesFinished,  this, &QnServerUpdatesWidget::at_checkForUpdatesFinished);
     connect(m_updateTool,       &QnMediaServerUpdateTool::updateFinished,           this, &QnServerUpdatesWidget::at_updateFinished);
 
@@ -237,7 +238,6 @@ bool QnServerUpdatesWidget::isUpdating() const {
 }
 
 void QnServerUpdatesWidget::setTargets(const QSet<QUuid> &targets) {
-    m_updatesModel->setTargets(targets);
     m_updateTool->setTargets(targets);
 }
 
