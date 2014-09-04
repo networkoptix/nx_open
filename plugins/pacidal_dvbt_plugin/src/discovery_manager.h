@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <map>
+#include <mutex>
 
 #include <plugins/camera_plugin.h>
 
@@ -51,6 +52,7 @@ namespace pacidal
 
         static DiscoveryManager* Instance;
         std::map<unsigned, CameraPtr> cameras_;
+        std::mutex m_mutex;
     };
 }
 

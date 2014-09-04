@@ -1,11 +1,10 @@
 #include "camera_manager.h"
 #include "discovery_manager.h"
 
+#include <dirent.h>
 #include <string>
 
-#include <QtCore/QCryptographicHash>
-
-//#include "../src/utils/common/log.h"
+#include "camera_manager.h"
 
 extern "C"
 {
@@ -16,6 +15,12 @@ extern "C"
     {
         return new pacidal::DiscoveryManager();
     }
+}
+
+namespace
+{
+    static const char* VENDOR_NAME = "Pacidal";
+    static const char* MODEL_NAME = "DVB-T it930x (Endeavour)";
 }
 
 namespace pacidal
@@ -52,51 +57,34 @@ namespace pacidal
         return nullptr;
     }
 
-    static const char* VENDOR_NAME = "Pacidal";
-    static const char* MODEL_NAME = "DVB-T it930x (Endeavour)";
-
     void DiscoveryManager::getVendorName( char* buf ) const
     {
         strcpy( buf, VENDOR_NAME );
     }
 
-    // TODO
-    int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr )
+    // BUG v.2.2 Restore only modelName and url fields in CameraInfo after restart
+    int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*localInterfaceIPAddr*/ )
     {
-        std::string id;
-        if (localInterfaceIPAddr)
+        unsigned cameraNum = 0;
+
+        DIR* dir = ::opendir( "/dev" );
+        if( dir != NULL )
         {
-            const QByteArray uidStr = QCryptographicHash::hash(
-                QByteArray::fromRawData(localInterfaceIPAddr, strlen(localInterfaceIPAddr)), QCryptographicHash::Md5 ).toHex();
-            id = std::string(uidStr.constData(), uidStr.size());
+            struct dirent * ent;
+            while( (ent = ::readdir( dir )) != NULL )
+            {
+                std::string file( ent->d_name );
+                if (file.find( CameraManager::DEVICE_PATTERN ) != std::string::npos)
+                {
+                    memset( &cameras[cameraNum], 0, sizeof(cameras[cameraNum]) );
+                    strncpy( cameras[cameraNum].modelName, MODEL_NAME, std::min(strlen(MODEL_NAME), sizeof(nxcip::CameraInfo::modelName)-1) );
+                    strncpy( cameras[cameraNum].uid, file.c_str(), std::min(file.size(), sizeof(nxcip::CameraInfo::uid)-1) );
+                    strncpy( cameras[cameraNum].url, file.c_str(), std::min(file.size(), sizeof(nxcip::CameraInfo::uid)-1) );
+                    ++cameraNum;
+                }
+            }
         }
 
-#if 0
-        unsigned cameraNum = 1;
-
-        memset( &cameras[0], 0, sizeof(cameras[0]) );
-        strncpy( cameras[0].modelName, MODEL_NAME, std::min(strlen(MODEL_NAME), sizeof(nxcip::CameraInfo::modelName)-1) );
-        strncpy( cameras[0].uid, id.c_str(), std::min(id.size(), sizeof(nxcip::CameraInfo::uid)-1) );
-        strncpy( cameras[0].url, id.c_str(), std::min(id.size(), sizeof(nxcip::CameraInfo::url)-1) );
-        cameras[0].auxiliaryData[0] = 1;
-        cameras[0].auxiliaryData[1] = 0;
-#else
-        unsigned cameraNum = 4; // TODO: get from filesystem - /dev/usb-it930x*
-
-        for (uint8_t i=0; i<cameraNum; ++i)
-        {
-            std::string camId = id;
-            camId[0] = '0';
-            camId[0] += i;
-
-            memset( &cameras[i], 0, sizeof(cameras[i]) );
-            strncpy( cameras[i].modelName, MODEL_NAME, std::min(strlen(MODEL_NAME), sizeof(nxcip::CameraInfo::modelName)-1) );
-            strncpy( cameras[i].uid, camId.c_str(), std::min(camId.size(), sizeof(nxcip::CameraInfo::uid)-1) );
-            strncpy( cameras[i].url, camId.c_str(), std::min(camId.size(), sizeof(nxcip::CameraInfo::uid)-1) );
-            //cameras[i].auxiliaryData[0] = i;
-            //cameras[i].auxiliaryData[0] = 0;
-        }
-#endif
         return cameraNum;
     }
 
@@ -119,10 +107,11 @@ namespace pacidal
         return nxcip::NX_NO_ERROR;
     }
 
-    // TODO: lock?
     nxcip::BaseCameraManager* DiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )
     {
-        uint8_t id = info.uid[0] - '0';
+        unsigned id = CameraManager::cameraId( info );
+
+        std::lock_guard<std::mutex> lock(m_mutex); // LOCK
 
         auto it = cameras_.find(id);
         if (it == cameras_.end())

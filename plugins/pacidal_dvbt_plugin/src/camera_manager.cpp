@@ -1,6 +1,5 @@
 #include <string>
-
-#include "../src/utils/common/log.h"
+#include <sstream>
 
 #include "pacidal_it930x.h"
 #include "camera_manager.h"
@@ -72,9 +71,8 @@ namespace pacidal
 namespace pacidal
 {
     static const unsigned DEFAULT_FREQUENCY = 177000;
-    static const unsigned MIN_SIGNAL_STRENGTH = 20; // 0..100
-    static const unsigned MAX_SAVED_PACKETS = 60;   // 30 fps => 2 sec
-    static const unsigned MAX_READ_ATTEMPTS = 30;
+    static const unsigned MIN_SIGNAL_STRENGTH = 50; // 0..100
+    static const unsigned MAX_READ_ATTEMPTS = 42;
 
     static const unsigned DEFAULT_FRAME_SIZE = PacidalIt930x::DEFAULT_PACKETS_NUM * PacidalIt930x::MPEG_TS_PACKET_SIZE;
 
@@ -84,14 +82,20 @@ namespace pacidal
     :
         m_refManager( DiscoveryManager::refManager() ),
         m_info( info ),
-        m_device(new PacidalIt930x(info.uid[0]-'0')),
+        m_errorStr(nullptr),
         devInited_(false),
         encInited_(false)
     {
-        std::string msg = "PACIDAL - CameraManager(), id: ";
-        msg += '0' + info.auxiliaryData[0];
-
-        NX_LOG( msg.c_str(), cl_logINFO );
+        try
+        {
+            unsigned id = cameraId( info );
+            m_device.reset( new PacidalIt930x( id ) );
+        }
+        catch (const char * msg)
+        {
+            m_errorStr = msg;
+            return;
+        }
 
         initDevice();
         if (devInited_)
@@ -100,13 +104,10 @@ namespace pacidal
 
     CameraManager::~CameraManager()
     {
-        NX_LOG( "PACIDAL - ~CameraManager()", cl_logINFO );
     }
 
     void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
-        NX_LOG( "PACIDAL - queryInterface()", cl_logINFO );
-
         if( interfaceID == nxcip::IID_BaseCameraManager2 )
         {
             addRef();
@@ -128,8 +129,6 @@ namespace pacidal
     //!Implementation of nxcip::BaseCameraManager::getEncoderCount
     int CameraManager::getEncoderCount( int* encoderCount ) const
     {
-        NX_LOG( "PACIDAL - getEncoderCount()", cl_logINFO );
-
         *encoderCount = m_encoders.size();
         return nxcip::NX_NO_ERROR;
     }
@@ -137,9 +136,7 @@ namespace pacidal
     //!Implementation of nxcip::BaseCameraManager::getEncoder
     int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
     {
-        NX_LOG( "PACIDAL - getEncoder()", cl_logINFO );
-
-        if( !encInited_ || encoderIndex > m_encoders.size() )
+        if( !encInited_ || static_cast<unsigned>(encoderIndex) > m_encoders.size() )
             return nxcip::NX_INVALID_ENCODER_NUMBER;
 
         m_encoders[encoderIndex]->addRef();
@@ -150,8 +147,6 @@ namespace pacidal
     //!Implementation of nxcip::BaseCameraManager::getCameraInfo
     int CameraManager::getCameraInfo( nxcip::CameraInfo* info ) const
     {
-        NX_LOG( "PACIDAL - getCameraInfo()", cl_logINFO );
-
         memcpy( info, &m_info, sizeof(m_info) );
         return nxcip::NX_NO_ERROR;
     }
@@ -159,8 +154,6 @@ namespace pacidal
     //!Implementation of nxcip::BaseCameraManager::getCameraCapabilities
     int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
     {
-        NX_LOG( "PACIDAL - getCameraCapabilities()", cl_logINFO );
-
         *capabilitiesMask =
                 nxcip::BaseCameraManager::nativeMediaStreamCapability |
                 nxcip::BaseCameraManager::primaryStreamSoftMotionCapability;
@@ -170,68 +163,55 @@ namespace pacidal
     //!Implementation of nxcip::BaseCameraManager::setCredentials
     void CameraManager::setCredentials( const char* /*username*/, const char* /*password*/ )
     {
-        NX_LOG( "PACIDAL - setCredentials()", cl_logINFO );
     }
 
     //!Implementation of nxcip::BaseCameraManager::setAudioEnabled
     int CameraManager::setAudioEnabled( int /*audioEnabled*/ )
     {
-        NX_LOG( "PACIDAL - setAudioEnabled()", cl_logINFO );
-
         return nxcip::NX_NO_ERROR;
     }
 
     //!Implementation of nxcip::BaseCameraManager::getPTZManager
     nxcip::CameraPtzManager* CameraManager::getPtzManager() const
     {
-        NX_LOG( "PACIDAL - getPtzManager()", cl_logINFO );
-
         return nullptr;
     }
 
     //!Implementation of nxcip::BaseCameraManager::getCameraMotionDataProvider
     nxcip::CameraMotionDataProvider* CameraManager::getCameraMotionDataProvider() const
     {
-        NX_LOG( "PACIDAL - getCameraMotionDataProvider()", cl_logINFO );
-
         return nullptr;
     }
 
     //!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
     nxcip::CameraRelayIOManager* CameraManager::getCameraRelayIOManager() const
     {
-        NX_LOG( "PACIDAL - getCameraRelayIOManager()", cl_logINFO );
-
         return nullptr;
     }
 
     //!Implementation of nxcip::BaseCameraManager::getLastErrorString
     void CameraManager::getLastErrorString( char* errorString ) const
     {
-        NX_LOG( "PACIDAL - getLastErrorString()", cl_logINFO );
-
-        if (errorString)
+        if( errorString )
+        {
             errorString[0] = '\0';
+            if( m_errorStr )
+                strncpy( errorString, m_errorStr, nxcip::MAX_TEXT_LEN );
+        }
     }
 
     int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** /*dtsArchiveReader*/ ) const
     {
-        NX_LOG( "PACIDAL - createDtsArchiveReader()", cl_logINFO );
-
         return nxcip::NX_NOT_IMPLEMENTED;
     }
 
     int CameraManager::find( nxcip::ArchiveSearchOptions* /*searchOptions*/, nxcip::TimePeriods** /*timePeriods*/ ) const
     {
-        NX_LOG( "PACIDAL - find()", cl_logINFO );
-
         return nxcip::NX_NOT_IMPLEMENTED;
     }
 
     int CameraManager::setMotionMask( nxcip::Picture* /*motionMask*/ )
     {
-        NX_LOG( "PACIDAL - setMotionMask()", cl_logINFO );
-
         return nxcip::NX_NOT_IMPLEMENTED;
     }
 
@@ -239,8 +219,6 @@ namespace pacidal
 
     void CameraManager::initDevice()
     {
-        NX_LOG( "PACIDAL - initDevice()", cl_logINFO );
-
         m_device->lockChannel(DEFAULT_FREQUENCY);
 
         bool locked, presented;
@@ -258,8 +236,6 @@ namespace pacidal
 
     void CameraManager::initEncoders()
     {
-        NX_LOG( "PACIDAL - initEncoders()", cl_logINFO );
-
         m_libAV.reset(new LibAV(m_devReader.get(), readDevice));
 
         m_encoders.reserve( m_libAV->streamsCount() );
@@ -272,8 +248,6 @@ namespace pacidal
 
     void CameraManager::resolution( unsigned encoderNum, nxcip::ResolutionInfo& outRes ) const
     {
-        NX_LOG( "PACIDAL - resolution()", cl_logINFO );
-
         AVStream * stream = m_libAV->stream(encoderNum);
 
         if( stream )
@@ -316,12 +290,8 @@ namespace pacidal
                 return packet.release();
 
             std::shared_ptr<VideoPacket> sp( packet.release() );
-            if (m_encQueues[streamNum].size() >= MAX_SAVED_PACKETS)
-            {
-                m_encQueues[streamNum].pop_front();
-                while (m_encQueues[streamNum].size() && ! (*m_encQueues[streamNum].begin())->isKey())
-                    m_encQueues[streamNum].pop_front();
-            }
+            if( sp->isKey() )
+                m_encQueues[streamNum].clear();
             m_encQueues[streamNum].push_back(sp);
         }
 
@@ -345,5 +315,17 @@ namespace pacidal
         streamNum = avPacket.stream_index;
         m_libAV->freePacket(&avPacket);
         return packet;
+    }
+
+    unsigned CameraManager::cameraId(const nxcip::CameraInfo& info)
+    {
+        std::string name( info.url );
+        name.erase( name.find( DEVICE_PATTERN ), strlen( DEVICE_PATTERN ) );
+
+        unsigned num;
+        std::stringstream ss;
+        ss << name;
+        ss >> num;
+        return num;
     }
 }

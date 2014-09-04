@@ -29,6 +29,8 @@ namespace pacidal
         DEF_REF_COUNTER
 
     public:
+        constexpr static const char* DEVICE_PATTERN = "usb-it930x";
+
         CameraManager( const nxcip::CameraInfo& info );
         virtual ~CameraManager();
 
@@ -61,9 +63,10 @@ namespace pacidal
         virtual int setMotionMask( nxcip::Picture* motionMask ) override;
 
         const nxcip::CameraInfo& info() const { return m_info; }
-
         void resolution( unsigned encoderNum, nxcip::ResolutionInfo& out ) const;
         VideoPacket* nextPacket( unsigned encoderNumber );
+
+        static unsigned cameraId( const nxcip::CameraInfo& info );
 
     private:
         typedef std::shared_ptr<VideoPacket> VideoPacketPtr;
@@ -79,6 +82,7 @@ namespace pacidal
 
         std::vector<std::shared_ptr<MediaEncoder>> m_encoders;
         std::vector<VideoPacketQueue> m_encQueues;
+        const char * m_errorStr;
         bool devInited_;
         bool encInited_;
 

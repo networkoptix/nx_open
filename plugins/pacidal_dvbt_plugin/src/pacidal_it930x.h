@@ -49,11 +49,6 @@ namespace pacidal
             handle_ = DTV_DeviceOpen(ENDEAVOUR, number);
             if (handle_ < 0)
                 throw "DTV_DeviceOpen";
-#if 0
-            printDriverInfo();
-#endif
-            //enable(NullPacketFilter); // default
-            //disable(NullPacketFilter);
         }
 
         ~PacidalIt930x()
@@ -125,7 +120,7 @@ namespace pacidal
 
     private:
         int handle_;
-
+#if 0
         void printDriverInfo() const
         {
             Word rxDeviceID = 0xFFFF;
@@ -137,7 +132,7 @@ namespace pacidal
             result = DTV_GetDriverInformation(handle_, &driverInfo);
             if (result)
                 throw "DTV_GetVersion";
-#if 0
+
             printf("DriverVerion  = %s\n", driverInfo.DriverVersion);
             printf("APIVerion     = %s\n", driverInfo.APIVersion);
             printf("FWVerionLink  = %s\n", driverInfo.FWVersionLink);
@@ -145,9 +140,8 @@ namespace pacidal
             printf("Company       = %s\n", driverInfo.Company);
             printf("SupportHWInfo = %s\n", driverInfo.SupportHWInfo);
             printf("RxDeviceID    = 0x%x\n", rxDeviceID);
-#endif
         }
-
+#endif
         void setNullPacketFilter(bool flag)
         {
             PIDFilter pidFilter;

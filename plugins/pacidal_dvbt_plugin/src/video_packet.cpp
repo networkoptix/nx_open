@@ -30,6 +30,7 @@ namespace pacidal
             m_data = std::shared_ptr<uint8_t>(
                 (uint8_t*)nxpt::mallocAligned( size + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT), freeAlignedX );
             memcpy( m_data.get(), data, size );
+            memset( m_data.get() + size, 0, nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE );
             m_size = size;
         }
     }

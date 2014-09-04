@@ -13,7 +13,6 @@ namespace pacidal
         m_refManager( DiscoveryManager::refManager() ),
         m_cameraManager( cameraManager ),
         m_encoderNumber( encoderNumber )
-        //m_terminated( false )
     {
     }
 
@@ -45,8 +44,5 @@ namespace pacidal
 
     void StreamReader::interrupt()
     {
-        //QMutexLocker lk( &m_mutex );
-        //m_terminated = true;
-        //m_cond.wakeAll();
     }
 }
