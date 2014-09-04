@@ -89,14 +89,6 @@ QDataStream &operator>>(QDataStream &stream, QnSoftwareVersion &version) {
 
 QN_FUSION_DEFINE_FUNCTIONS(QnSoftwareVersion, (json_lexical)(xml_lexical))
 
-void serialize(const QnSoftwareVersion &value, QnOutputBinaryStream<QByteArray> *stream) {
-    QnBinary::serialize(value.m_data, stream);
-}
-
-bool deserialize(QnInputBinaryStream<QByteArray> *stream, QnSoftwareVersion *target) {
-    return QnBinary::deserialize(stream, &target->m_data);
-}
-
 void serialize(const QnSoftwareVersion &value, QnUbjsonWriter<QByteArray> *stream) {
     QnUbjson::serialize(value.m_data, stream);
 }

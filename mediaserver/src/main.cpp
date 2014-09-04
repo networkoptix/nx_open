@@ -87,7 +87,6 @@
 
 #include <rest/handlers/acti_event_rest_handler.h>
 #include <rest/handlers/business_event_log_rest_handler.h>
-#include <rest/handlers/business_action_rest_handler.h>
 #include <rest/handlers/get_system_name_rest_handler.h>
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
@@ -1043,7 +1042,6 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/manualCamera", new QnManualCameraAdditionRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ptz", new QnPtzRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/image", new QnImageRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/execAction", new QnBusinessActionRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/onEvent", new QnExternalBusinessEventRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/gettime", new QnTimeRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());

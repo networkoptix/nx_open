@@ -65,9 +65,9 @@ namespace ec2
             Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(srcBodyContentType);
             switch( format )
             {
-                case Qn::BnsFormat:
-                    tran = QnBinary::deserialized<QnTransaction<RequestDataType>>(body);
-                    break;
+                //case Qn::BnsFormat:
+                //    tran = QnBinary::deserialized<QnTransaction<RequestDataType>>(body);
+                //    break;
                 case Qn::JsonFormat:
                     tran = QJson::deserialized<QnTransaction<RequestDataType>>(body);
                     break;

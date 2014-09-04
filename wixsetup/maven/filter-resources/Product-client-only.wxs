@@ -9,7 +9,7 @@
         <?include ControlPanel.wxi ?>
         <?include BuildVars.wxi ?>
 
-        <Property Id="REINSTALLMODE" Value="amus"/>
+        <Property Id="REINSTALLMODE" Value="omus"/>
 
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>

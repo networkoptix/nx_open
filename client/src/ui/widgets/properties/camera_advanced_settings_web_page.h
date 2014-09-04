@@ -9,7 +9,9 @@
 #ifdef QT_WEBKITWIDGETS_LIB
 
 #include <QWebPage>
+#include "core/resource/resource_fwd.h"
 
+class QnCustomCookieJar;
 
 class CameraAdvancedSettingsWebPage
 :
@@ -17,10 +19,12 @@ class CameraAdvancedSettingsWebPage
 {
 public:
     CameraAdvancedSettingsWebPage( QObject* parent = 0 );
-
+    void setCamera(QnResourcePtr camRes);
 protected:
     //!Implementation of QWebPage::userAgentForUrl
     virtual QString	userAgentForUrl( const QUrl& url ) const override;
+private:
+    QnCustomCookieJar* m_cookieJar;
 };
 
 #endif
