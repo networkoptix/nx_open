@@ -47,6 +47,7 @@ private slots:
 private:
     void initMenu();
     void initLinkHandlers();
+    bool canStartUpdate();
 
 private:
     enum UpdateSource {

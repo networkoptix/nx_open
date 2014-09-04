@@ -45,7 +45,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->setupUi(this);
 
     m_updateTool = new QnMediaServerUpdateTool(this);
-    m_updatesModel = new QnServerUpdatesModel(this);
+    m_updatesModel = new QnServerUpdatesModel(m_updateTool, this);
 
     QnSortedServerUpdatesModel *sortedUpdatesModel = new QnSortedServerUpdatesModel(this);
     sortedUpdatesModel->setSourceModel(m_updatesModel);
@@ -57,19 +57,11 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::NameColumn, QHeaderView::Stretch);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::VersionColumn, QHeaderView::ResizeToContents);   
 
-    connect(ui->cancelButton,       &QPushButton::clicked,      m_updateTool,   &QnMediaServerUpdateTool::cancelUpdate);
-    connect(ui->startUpdateButton,  &QPushButton::clicked,      this, [this] {
-        if (!m_updateTool->idle())
-            return;
-        m_updateTool->updateServers();
-    });
+    connect(ui->cancelButton,       &QPushButton::clicked,      m_updateTool, &QnMediaServerUpdateTool::cancelUpdate);
+    connect(ui->startUpdateButton,  &QPushButton::clicked,      m_updateTool, &QnMediaServerUpdateTool::updateServers);
 
     connect(m_updateTool,       &QnMediaServerUpdateTool::stateChanged,         this,           &QnServerUpdatesWidget::updateUi);
     connect(m_updateTool,       &QnMediaServerUpdateTool::progressChanged,      ui->updateProgessBar,   &QProgressBar::setValue);
-    connect(m_updateTool,       &QnMediaServerUpdateTool::peerChanged,          this,           [this](const QUuid &peerId) {
-        m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(peerId));
-    });
-    connect(m_updateTool,       SIGNAL(targetsChanged(QSet<QUuid>)),            m_updatesModel, SLOT(setTargets(QSet<QUuid>)));
     connect(m_updateTool,       &QnMediaServerUpdateTool::checkForUpdatesFinished,  this, &QnServerUpdatesWidget::at_checkForUpdatesFinished);
     connect(m_updateTool,       &QnMediaServerUpdateTool::updateFinished,           this, &QnServerUpdatesWidget::at_updateFinished);
 
@@ -172,17 +164,17 @@ void QnServerUpdatesWidget::initMenu() {
     });
 
 
-    ui->sourceButton->setIcon(qnSkin->icon("tree/branch_open.png"));
+ /*   ui->sourceButton->setIcon(qnSkin->icon("tree/branch_open.png"));
     connect(ui->sourceButton, &QPushButton::clicked, this, [this, menu] {
         QPoint local = ui->sourceButton->geometry().bottomLeft();
         menu->popup(ui->sourceButton->mapToGlobal(local));
-    });
+    });*/
 }
 
 void QnServerUpdatesWidget::initLinkHandlers() {
 
     auto copyAction = [this] {
-        QString package = m_updateTool->generateUpdatePackageUrl().toString();
+        QString package = m_updateTool->generateUpdatePackageUrl(QnSoftwareVersion()).toString();
         qApp->clipboard()->setText(package);
         QMessageBox::information(this, tr("Success"), tr("URL copied to clipboard."));
     };
@@ -212,7 +204,7 @@ void QnServerUpdatesWidget::initLinkHandlers() {
             return;
         }
 
-        QString package = m_updateTool->generateUpdatePackageUrl().toString();
+        QString package = m_updateTool->generateUpdatePackageUrl(QnSoftwareVersion()).toString();
         QTextStream out(&data);
         out << lit("[InternetShortcut]") << endl << package << endl;
 
@@ -226,6 +218,11 @@ void QnServerUpdatesWidget::initLinkHandlers() {
            saveAction();
     });
 }
+
+bool QnServerUpdatesWidget::canStartUpdate() {
+    return m_updateTool->idle(); //TODO: #GDM implement
+}
+
 
 bool QnServerUpdatesWidget::cancelUpdate() {
     if (m_updateTool->isUpdating())
@@ -253,7 +250,6 @@ void QnServerUpdatesWidget::checkForUpdates() {
     if (!m_updateTool->idle())
         return;
 
-    m_updateTool->setDenyMajorUpdates(m_updateInfo.source == SpecificBuildSource);
     switch (m_updateInfo.source) {
     case InternetSource:
         m_updateTool->checkForUpdates();
@@ -262,34 +258,29 @@ void QnServerUpdatesWidget::checkForUpdates() {
         m_updateTool->checkForUpdates(m_updateInfo.filename);
         break;
     case  SpecificBuildSource:
-        m_updateTool->checkForUpdates(m_updateInfo.build);
+        m_updateTool->checkForUpdates(m_updateInfo.build, true);
         break;
     default:
         Q_ASSERT(false); //should never get here
         break;
     }
-    m_updatesModel->setTargets(m_updateTool->actualTargets());
-
 }
 
 void QnServerUpdatesWidget::updateUi() {
     m_updateSourceActions[m_updateInfo.source]->setChecked(true);
-    ui->sourceButton->setEnabled(m_updateTool->idle());
+/*    ui->sourceButton->setEnabled(m_updateTool->idle());*/
     for (QAction* action: m_updateSourceActions)
         action->setEnabled(m_updateTool->idle());
 
-    foreach (const QnMediaServerResourcePtr &server, m_updateTool->actualTargets())
-        m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(server->getId()));
-    m_updatesModel->setLatestVersion(m_updateTool->targetVersion());
     if (!m_updateTool->targetVersion().isNull())
         ui->latestVersionLabel->setText(m_updateTool->targetVersion().toString());
 
-    ui->startUpdateButton->setVisible(m_updateTool->canStartUpdate() ||
+    ui->startUpdateButton->setVisible(canStartUpdate() ||
         m_updateTool->isUpdating());
-    ui->startUpdateButton->setEnabled(m_updateTool->canStartUpdate());
+    ui->startUpdateButton->setEnabled(canStartUpdate());
 
     ui->dayWarningLabel->setVisible(QDateTime::currentDateTime().date().dayOfWeek() >= tooLateDayOfWeek 
-        && m_updateTool->canStartUpdate());
+        && canStartUpdate());
 
     ui->updateStateWidget->setVisible(m_updateTool->isUpdating());
     ui->infiniteProgressWidget->setVisible(!m_updateTool->idle()); 
@@ -368,7 +359,7 @@ void QnServerUpdatesWidget::at_checkForUpdatesFinished(QnCheckForUpdateResult re
         detail = tr("No Internet connection available. "\
             "To update manually, download an archive with the following <a href=%1>link<.a>. "\
             "You can also <a href=%1>Copy link</a> or <a href=%2>Save link to file</a>.")
-             .arg(m_updateTool->generateUpdatePackageUrl().toString()).arg(copyLinkAction).arg(saveLinkAction);
+             .arg(m_updateTool->generateUpdatePackageUrl(QnSoftwareVersion()).toString()).arg(copyLinkAction).arg(saveLinkAction);
         break;
     case QnCheckForUpdateResult::NoNewerVersion:
         detail = tr("All components in your system are up to date.");

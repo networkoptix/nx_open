@@ -42,7 +42,7 @@ public:
         friend class QnServerUpdatesModel;
     };
 
-    explicit QnServerUpdatesModel(QObject *parent = 0);
+    explicit QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObject *parent = 0);
 
     int columnCount(const QModelIndex &parent) const override;
     int rowCount(const QModelIndex &parent) const override;
@@ -60,17 +60,15 @@ public:
 
 public slots:
     void setTargets(const QSet<QUuid> &targets);
-    void setTargets(const QnMediaServerResourceList &targets);
 
 private:
     void resetResourses();
 
 private slots:
-    void at_resourceAdded(const QnResourcePtr &resource);
-    void at_resourceRemoved(const QnResourcePtr &resource);
     void at_resourceChanged(const QnResourcePtr &resource);
 
 private:
+    QnMediaServerUpdateTool* m_updateTool;
     QList<Item*> m_items;
     QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> m_updates;
     QSet<QUuid> m_targets;

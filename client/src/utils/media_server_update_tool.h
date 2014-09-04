@@ -63,14 +63,9 @@ public:
     bool isUpdating() const;
     bool idle() const;
 
-    QnCheckForUpdateResult updateCheckResult() const;
-    QnUpdateResult updateResult() const;
-
     void updateServers();
 
     QnSoftwareVersion targetVersion() const;
-
-    void setDenyMajorUpdates(bool denyMajorUpdates);
 
     PeerUpdateInformation updateInformation(const QUuid &peerId) const;
 
@@ -78,15 +73,14 @@ public:
     void setTargets(const QSet<QUuid> &targets, bool client = false);
 
     QnMediaServerResourceList actualTargets() const;
+    QSet<QUuid> actualTargetIds() const;
 
-    QUrl generateUpdatePackageUrl() const;
+    /** Generate url for download update file, depending on actual targets list. */
+    QUrl generateUpdatePackageUrl(const QnSoftwareVersion &targetVersion) const;
 
     void reset();
 
     bool isClientRequiresInstaller() const;
-
-    bool canStartUpdate() const;
-
 signals:
     void stateChanged(int state);
     void progressChanged(int progress);
@@ -97,7 +91,7 @@ signals:
     void updateFinished(QnUpdateResult result);
 
 public slots:
-    void checkForUpdates(const QnSoftwareVersion &version = QnSoftwareVersion());
+    void checkForUpdates(const QnSoftwareVersion &version = QnSoftwareVersion(), bool denyMajorUpdates = false);
     void checkForUpdates(const QString &fileName);
     bool cancelUpdate();
 
@@ -122,11 +116,7 @@ private slots:
     void at_resourcePool_statusChanged(const QnResourcePtr &resource);
 
 private:
-
-
     void setState(State state);
-    void setCheckResult(QnCheckForUpdateResult result);
-    void setUpdateResult(QnUpdateResult result);
     void finishUpdate(QnUpdateResult result);
     void setPeerState(const QUuid &peerId, PeerUpdateInformation::State state);
     void removeTemporaryDir();
@@ -144,14 +134,11 @@ private:
 private:
     QThread *m_tasksThread;
     State m_state;
-    QnCheckForUpdateResult m_checkResult;
-    QnUpdateResult m_updateResult;
 
     QString m_localTemporaryDir;
 
     QnSoftwareVersion m_targetVersion;
     bool m_targetMustBeNewer;
-    bool m_denyMajorUpdates;
 
     QString m_updateId;
 

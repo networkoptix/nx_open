@@ -31,12 +31,12 @@ public:
     QnUpdateFileInformationPtr clientUpdateFile() const;
     QString temporaryDir() const;
 
-    bool needUpdate(const QnSoftwareVersion &version, const QnSoftwareVersion &updateVersion) const;
-
 protected:
     virtual void doStart() override;
 
 private:
+    bool needUpdate(const QnSoftwareVersion &version, const QnSoftwareVersion &updateVersion) const;
+
     void checkUpdateCoverage();
 
     void checkBuildOnline();

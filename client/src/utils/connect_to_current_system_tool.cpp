@@ -132,8 +132,7 @@ void QnConnectToCurrentSystemTool::updatePeers() {
     m_updateDialog->setTargets(m_updateTargets);
     m_updateDialog->show();
     m_prevToolState = CheckingForUpdates;
-    m_updateTool->setDenyMajorUpdates(true);
-    m_updateTool->checkForUpdates();
+    m_updateTool->checkForUpdates(QnSoftwareVersion(), true);
 }
 
 void QnConnectToCurrentSystemTool::revertApiUrls() {
@@ -188,7 +187,7 @@ void QnConnectToCurrentSystemTool::at_updateTool_stateChanged(int state) {
         return;
 
     if (m_prevToolState == CheckingForUpdates) {
-        switch (m_updateTool->updateCheckResult()) {
+    /*    switch (m_updateTool->updateCheckResult()) {
         case QnCheckForUpdateResult::UpdateFound:
             m_prevToolState = Updating;
             m_updateTool->updateServers();
@@ -198,9 +197,9 @@ void QnConnectToCurrentSystemTool::at_updateTool_stateChanged(int state) {
         default:
             m_updateFailed = true;
             break;
-        }
+        }*/
     } else if (m_prevToolState == Updating) {
-        m_updateFailed = (m_updateTool->updateResult() != QnUpdateResult::Successful);
+/*        m_updateFailed = (m_updateTool->updateResult() != QnUpdateResult::Successful);*/
     }
 
     m_updateDialog->hide();

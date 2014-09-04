@@ -5,26 +5,30 @@
 #include <ui/common/ui_resource_name.h>
 #include <ui/style/resource_icon_cache.h>
 
-QnServerUpdatesModel::QnServerUpdatesModel(QObject *parent) :
-    QAbstractTableModel(parent)
+QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObject *parent) :
+    QAbstractTableModel(parent),
+    m_updateTool(tool)
 {
-    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnServerUpdatesModel::at_resourceAdded);
-    connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnServerUpdatesModel::at_resourceRemoved);
+    connect(m_updateTool,  &QnMediaServerUpdateTool::peerChanged,          this,           [this](const QUuid &peerId) {
+        setUpdateInformation(m_updateTool->updateInformation(peerId));
+    });
+
+    connect(m_updateTool, &QnMediaServerUpdateTool::stateChanged,    this,  [this]() {
+        foreach (const QnMediaServerResourcePtr &server, m_updateTool->actualTargets())
+            setUpdateInformation(m_updateTool->updateInformation(server->getId()));
+        setLatestVersion(m_updateTool->targetVersion());
+    });
+
+    connect(m_updateTool, &QnMediaServerUpdateTool::targetsChanged,  this,  &QnServerUpdatesModel::setTargets);
+
     connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnServerUpdatesModel::at_resourceChanged);
     connect(qnResPool,  &QnResourcePool::statusChanged,     this,   &QnServerUpdatesModel::at_resourceChanged);
 
-    resetResourses();
+    setTargets(m_updateTool->actualTargetIds());
 }
 
 void QnServerUpdatesModel::setTargets(const QSet<QUuid> &targets) {
     m_targets = targets;
-    resetResourses();
-}
-
-void QnServerUpdatesModel::setTargets(const QnMediaServerResourceList &targets) {
-    m_targets.clear();
-    foreach (const QnMediaServerResourcePtr &server, targets)
-        m_targets.insert(server->getId());
     resetResourses();
 }
 
@@ -139,40 +143,6 @@ void QnServerUpdatesModel::resetResourses() {
     }
 
     endResetModel();
-}
-
-void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
-
-    if (m_targets.isEmpty()) {
-        if (server->getSystemName() != qnCommon->localSystemName())
-            return;
-    } else {
-        if (!m_targets.contains(resource->getId()))
-            return;
-    }
-
-    beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
-    m_items.append(new Item(server, m_updates[server->getId()]));
-    endInsertRows();
-}
-
-void QnServerUpdatesModel::at_resourceRemoved(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
-
-    QModelIndex idx = index(server);
-    if (!idx.isValid())
-        return;
-
-    beginRemoveRows(QModelIndex(), idx.row(), idx.row());
-    m_items.removeAt(idx.row());
-    endRemoveRows();
-
-    delete static_cast<Item*>(idx.internalPointer());
 }
 
 void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
