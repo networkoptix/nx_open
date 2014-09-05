@@ -8,7 +8,6 @@
 QnRouter::QnRouter(QnModuleFinder *moduleFinder, QObject *parent) :
     QObject(parent),
     m_connection(std::weak_ptr<ec2::AbstractECConnection>()),
-    m_moduleFinder(moduleFinder),
     m_routeBuilder(new QnRouteBuilder(qnCommon->moduleGUID()))
 {
     connect(moduleFinder,       &QnModuleFinder::moduleUrlFound,    this,   &QnRouter::at_moduleFinder_moduleUrlFound);
