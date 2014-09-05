@@ -1371,7 +1371,7 @@ void QnMain::run()
     if( QnAppServerConnectionFactory::url().scheme().toLower() == lit("file") )
         ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
 
-    nx_hls::HLSSessionPool hlsSessionPool;
+    std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
     if( !initTcpListener() )
     {
@@ -1730,6 +1730,8 @@ void QnMain::run()
     stopObjects();
 
     QnResource::stopCommandProc();
+
+    hlsSessionPool.reset();
 
     delete QnRecordingManager::instance();
     QnRecordingManager::initStaticInstance( NULL );
