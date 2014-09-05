@@ -31,11 +31,11 @@ namespace nx_stun
     private:
         class MessageSerializerBuffer;
         // header serialization
-        nx_api::SerializerState::Type serializeHeader( MessageSerializerBuffer* buffer , std::uint16_t** header_position );
+        nx_api::SerializerState::Type serializeHeader( MessageSerializerBuffer* buffer );
         nx_api::SerializerState::Type serializeHeaderInitial( MessageSerializerBuffer* buffer );
         // We cannot serialize header before we finish serialization of the body/attributes
         // So this method is just make a mark internally.
-        nx_api::SerializerState::Type serializeHeaderLengthStart ( MessageSerializerBuffer* buffer , std::uint16_t** header_position );
+        nx_api::SerializerState::Type serializeHeaderLengthStart ( MessageSerializerBuffer* buffer );
         // transaction id and magic cookie serialization
         nx_api::SerializerState::Type serializeMagicCookieAndTransactionID( MessageSerializerBuffer* buffer );
         // attribute serialization

@@ -1,11 +1,13 @@
 #include "stun_message_parser.h"
 #include "stun_message.h"
-#include <QtEndian>
-#include <QString>
-
 #include <bitset>
 #include <cstdint>
 #include <deque>
+#include <QtEndian>
+#include <QString>
+
+
+
 
 namespace nx_stun{
 using namespace attr;
@@ -63,7 +65,8 @@ bool MessageParser::MessageParserBuffer::Ensure( std::size_t byte_size , void* b
         std::size_t pos = 0;
         // 1. Drain the buffer from the temporary buffer here
         if( temp_buffer_ != NULL ) {
-            for( std::size_t i = 0 ; i < temp_buffer_->size() && byte_size != pos; ++i , ++pos) {
+            const std::size_t temp_buffer_size = temp_buffer_->size();
+            for( std::size_t i = 0 ; i < temp_buffer_size && byte_size != pos; ++i , ++pos) {
                 *(reinterpret_cast<char*>(buffer)+pos) = temp_buffer_->front();
                 temp_buffer_->pop_front();
             }
@@ -200,6 +203,10 @@ Attribute* MessageParser::parseErrorCode() {
     if( phrase_length > 0 ) {
         QByteArray utf8_byte_array( attribute_.value.constData() + 4 , static_cast<int>(phrase_length) );
         attribute->reasonPhrase = QString::fromUtf8(utf8_byte_array).toStdString();
+        // The RFC says that the decoded UTF8 string should only contain less than 127 characters
+        if( attribute->reasonPhrase.size() >127 ) {
+            return NULL;
+        }
     }
     return attribute.release();
 }

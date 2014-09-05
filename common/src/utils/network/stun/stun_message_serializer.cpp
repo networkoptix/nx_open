@@ -7,12 +7,17 @@
 #include <QtEndian>
 #include <bitset>
 
+#include <boost/crc.hpp>
+
 namespace nx_stun {
 using namespace attr;
 
 class MessageSerializer::MessageSerializerBuffer {
 public:
-    MessageSerializerBuffer( nx::Buffer* buffer ) :buffer_(buffer){}
+    MessageSerializerBuffer( nx::Buffer* buffer ) :
+        buffer_(buffer),
+        header_length_(NULL){}
+
     void* WriteUint16( std::uint16_t value );
     void* WriteUint32( std::uint32_t value );
     void* WriteIPV6Address( const std::uint16_t* value );
@@ -22,8 +27,28 @@ public:
     std::size_t position() const {
         return static_cast<std::size_t>(buffer_->size());
     }
+    std::size_t size() const {
+        return buffer_->size();
+    }
+    // Use this function to set up the message length position 
+    std::uint16_t* WriteMessageLength() {
+        Q_ASSERT(header_length_ == NULL);
+        void* ret = Poke(2);
+        if( ret == NULL ) return NULL;
+        header_length_ = reinterpret_cast<std::uint16_t*>(ret);
+        return header_length_;
+    }
+    std::uint16_t* WriteMessageLength( std::uint16_t length ) {
+        Q_ASSERT(header_length_ != NULL);
+        qToBigEndian(length,reinterpret_cast<uchar*>(header_length_));
+        return header_length_;
+    }
+    const nx::Buffer* buffer() const {
+        return buffer_;
+    }
 private:
     nx::Buffer* buffer_;
+    std::uint16_t* header_length_;
 };
 
 void* MessageSerializer::MessageSerializerBuffer::Poke( std::size_t size ) {
@@ -113,9 +138,8 @@ nx_api::SerializerState::Type MessageSerializer::serializeHeaderInitial( Message
     }
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeHeaderLengthStart( MessageSerializerBuffer* buffer , std::uint16_t** header_position ) {
-    *header_position = reinterpret_cast<std::uint16_t*>(buffer->Poke(sizeof(std::uint16_t)));
-    if( *header_position == NULL ) 
+nx_api::SerializerState::Type MessageSerializer::serializeHeaderLengthStart( MessageSerializerBuffer* buffer ) {
+    if( buffer->WriteMessageLength() == NULL ) 
         return nx_api::SerializerState::needMoreBufferSpace;
     else
         return nx_api::SerializerState::done;
@@ -133,10 +157,10 @@ nx_api::SerializerState::Type MessageSerializer::serializeMagicCookieAndTransact
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeHeader( MessageSerializerBuffer* buffer , std::uint16_t** header_position ) {
+nx_api::SerializerState::Type MessageSerializer::serializeHeader( MessageSerializerBuffer* buffer ) {
     if( serializeHeaderInitial(buffer) == nx_api::SerializerState::needMoreBufferSpace )
         return nx_api::SerializerState::needMoreBufferSpace;
-    if( serializeHeaderLengthStart(buffer,header_position) == nx_api::SerializerState::needMoreBufferSpace )
+    if( serializeHeaderLengthStart(buffer) == nx_api::SerializerState::needMoreBufferSpace )
         return nx_api::SerializerState::needMoreBufferSpace;
     if( serializeMagicCookieAndTransactionID(buffer) == nx_api::SerializerState::needMoreBufferSpace )
         return nx_api::SerializerState::needMoreBufferSpace;
@@ -199,15 +223,36 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMapp
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Fingerprint( MessageSerializerBuffer* ,const attr::FingerPrint* , std::size_t* ) {
-    // TODO
-    Q_ASSERT(0);
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attr::FingerPrint* attribute , std::size_t* value ) {
+    Q_ASSERT( buffer->size() >= 24 ); // Header + FingerprintHeader
+    // Ignore original FingerPrint message
+    Q_UNUSED(attribute);
+    boost::crc_32_type crc32;
+    // The RFC says that we MUST set the length field in header correctly so it means
+    // The length should cover the CRC32 attributes, the length is 4+4 = 8, and the 
+    // buffer currently only contains the header for Fingerprint but not the value,so
+    // we need to fix the length in the buffer here.
+    buffer->WriteMessageLength( static_cast<std::uint16_t>(buffer->size() + 4) );
+    // Now we calculate the CRC32 value , since the buffer has 4 bytes which is not needed
+    // so we must ignore those bytes in the buffer.
+    crc32.process_block( buffer->buffer()->constData() , buffer->buffer()->constData() + buffer->size()-4 );
+    // Get CRC result value
+    std::uint32_t val = static_cast<std::uint32_t>( crc32.checksum() );
+    // Do the XOR operation on it
+    std::uint32_t xor_result = 0;
+    xor_result |= (val & 0x000000ff) ^ STUN_FINGERPRINT_XORMASK[0];
+    xor_result |= (val & 0x0000ff00) ^ STUN_FINGERPRINT_XORMASK[1];
+    xor_result |= (val & 0x00ff0000) ^ STUN_FINGERPRINT_XORMASK[2];
+    xor_result |= (val & 0xff000000) ^ STUN_FINGERPRINT_XORMASK[3];
+    // Serialize this message into the buffer body
+    buffer->WriteUint32(xor_result);
+    *value = 4;
     return nx_api::SerializerState::done;
 }
 
 nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_MessageIntegrity( MessageSerializerBuffer* ,const attr::MessageIntegrity* , std::size_t* ) {
-    // TODO
     Q_ASSERT(0);
+    // Needs username/password to implement this , I don't know how to do it now :(
     return nx_api::SerializerState::done;
 }
 
@@ -230,8 +275,9 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCo
     std::size_t cur_pos = buffer->position();
     std::uint32_t error_header = attribute->code % 100;
     // We don't use attribute->_class value since we can get what we want from code
+    // but we check the validation here for the attribute->_class value
     error_header |= (attribute->code / 100)<<8;
-    if( buffer->WriteUint32(error_header) != NULL )
+    if( buffer->WriteUint32(error_header) == NULL )
         return nx_api::SerializerState::needMoreBufferSpace;
     // UTF8 string 
     QByteArray utf8_bytes = QString::fromStdString(attribute->reasonPhrase).toUtf8();
@@ -305,16 +351,34 @@ bool MessageSerializer::checkMessageIntegratiy() {
     if( ib != message_.attributes.end() && ++ib != message_.attributes.end() ) {
         return false;
     }
+    // 3. Checking the validation for specific attributes
+    // ErrorCode message
+    ib = message_.attributes.find(AttributeType::errorCode);
+    if( ib !=  message_.attributes.end() ) {
+        // Checking the error code message
+        ErrorCode* error_code = static_cast<ErrorCode*>(
+            ib->second.get());
+        if( error_code->_class <3 || error_code->_class >6 )
+            return false;
+        if( error_code->code < 300 || error_code->code >= 700 )
+            return false;
+        // class code should match the hundreds of full error code
+        if( error_code->_class != (error_code->code/100) )
+            return false;
+        // RFC: The reason phrase string will at most be 127 characters
+        if( error_code->reasonPhrase.size() > 127 )
+            return false;
+    }
     return true;
 }
 
 nx_api::SerializerState::Type MessageSerializer::serialize( nx::Buffer* const user_buffer, size_t* const bytesWritten ) {
-    Q_ASSERT(initialized_);
+    Q_ASSERT(initialized_ && checkMessageIntegratiy());
+    Q_ASSERT(user_buffer->size() == 0 && user_buffer->capacity() != 0);
     MessageSerializerBuffer buffer(user_buffer);
     *bytesWritten = user_buffer->size();
     // header serialization
-    std::uint16_t* header_position;
-    if( serializeHeader(&buffer,&header_position) == nx_api::SerializerState::needMoreBufferSpace )
+    if( serializeHeader(&buffer) == nx_api::SerializerState::needMoreBufferSpace )
         return nx_api::SerializerState::needMoreBufferSpace;
     // attributes serialization
     std::uint16_t length = 0;
@@ -322,7 +386,7 @@ nx_api::SerializerState::Type MessageSerializer::serialize( nx::Buffer* const us
         return nx_api::SerializerState::needMoreBufferSpace;
     }
     // setting the header value 
-    qToBigEndian(length,reinterpret_cast<uchar*>(header_position));
+    buffer.WriteMessageLength(length);
     initialized_ = false;
     *bytesWritten = user_buffer->size() - *bytesWritten;
     return nx_api::SerializerState::done;

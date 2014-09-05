@@ -20,6 +20,14 @@ namespace nx_stun
     // Four components for MAGIC_COOKIE which is used for parsing/serialization of XorMappedAddress
     static const std::uint16_t MAGIC_COOKIE_HIGH = static_cast<std::uint16_t>( MAGIC_COOKIE >> 16 );
     static const std::uint16_t MAGIC_COOKIE_LOW  = static_cast<std::uint16_t>( MAGIC_COOKIE & 0x0000ffff );
+    // For STUN crc32 calculation 
+    // 0x5354554e;
+    static const std::uint32_t STUN_FINGERPRINT_XORMASK[4] = {
+        0x0000004e,
+        0x00005500,
+        0x00540000,
+        0x53000000
+    };
     //96-bit transaction ID
     // RFC indicates this should be treated as a bytes group, but here
     // we have numeric high and low associated with the bytes , I don't
