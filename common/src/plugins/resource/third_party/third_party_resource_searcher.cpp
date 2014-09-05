@@ -58,36 +58,14 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QUuid &resourceT
     }
 
     if( resourceType->getManufacture() != manufacture() )
-    {
-        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
         return result;
-    }
 
     nxcip::CameraInfo cameraInfo;
     //todo: #a.kolesnikov Check if only url parameter is enough. Create resource SHOULDN'T use a lot of parameters to create new resource instance
     strcpy( cameraInfo.url, params.url.toLatin1().constData() );
-    
-
-    //analyzing parameters, getting discoveryManager and filling in cameraInfo
-    //QString resourceName;
-
-    /*
-    for( QnResourceParameters::const_iterator
-        it = parameters.begin();
-        it != parameters.end();
-        ++it )
-    {
-        const QByteArray& valLatin1 = it.value().toLatin1();
-        if( it.key() == "physicalId")
-            strcpy( cameraInfo.uid, valLatin1.data() );
-        else if( it.key() == "url")
-            strcpy( cameraInfo.url, valLatin1.data() );
-        else if( it.key() == "name")
-            resourceName = it.value();
-    }
-    */
 
     nxcip_qt::CameraDiscoveryManager* discoveryManager = NULL;
+    //vendor is required to find plugin to use
     //choosing correct plugin
     for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
         it = m_thirdPartyCamPlugins.begin();
@@ -104,30 +82,15 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QUuid &resourceT
         return QnThirdPartyResourcePtr();
 
     Q_ASSERT( discoveryManager->getRef() );
-
-    const QByteArray& resourceNameLatin1 = params.vendor.toLatin1();    //TODO #ak vendor, really?
-    if( resourceNameLatin1.startsWith( discoveryManager->getVendorName().toLatin1() + "-" ) )
-        strcpy( cameraInfo.modelName, resourceNameLatin1.data() + discoveryManager->getVendorName().size() + 1 );   //skipping vendor name and '-'
-
-    nxcip::BaseCameraManager* camManager = discoveryManager->createCameraManager( cameraInfo );
-    if( !camManager )
-        return QnThirdPartyResourcePtr();
-
-    result = QnThirdPartyResourcePtr( new QnThirdPartyResource( cameraInfo, camManager, *discoveryManager ) );
+    //NOTE not calling discoveryManager->createCameraManager here because we do not know camera parameters (model, firmware, even uid), 
+        //so just instanciating QnThirdPartyResource
+    result = QnThirdPartyResourcePtr( new QnThirdPartyResource( cameraInfo, nullptr, *discoveryManager ) );
     result->setTypeId(resourceTypeId);
     result->setPhysicalId(QString::fromUtf8(cameraInfo.uid).trimmed());
-
-    unsigned int caps = 0;
-    if (camManager->getCameraCapabilities(&caps) == 0) 
-    {
-        if( caps & nxcip::BaseCameraManager::shareIpCapability )
-            result->setCameraCapability( Qn::ShareIpCapability, true );
-    }
 
     NX_LOG( lit("Created third party resource (manufacturer %1, res type id %2)").
         arg(discoveryManager->getVendorName()).arg(resourceTypeId.toString()), cl_logDEBUG2 );
 
-    //result->deserialize( parameters );
     return result;
 }
 
@@ -315,6 +278,8 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid).trimmed() );
     resource->setVendor( vendor );
+    if( strlen(cameraInfo.auxiliaryData) > 0 )
+        resource->setProperty( QnThirdPartyResource::AUX_DATA_PARAM_NAME, QString::fromLatin1(cameraInfo.auxiliaryData) );
 
     if( !qnResPool->getNetResourceByPhysicalId( resource->getPhysicalId() ) )
     {
