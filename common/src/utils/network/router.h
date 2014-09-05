@@ -47,7 +47,6 @@ private:
 
 private:
     std::weak_ptr<ec2::AbstractECConnection> m_connection;
-    QnModuleFinder *m_moduleFinder;
     QScopedPointer<QnRouteBuilder> m_routeBuilder;
     QMultiHash<QUuid, Endpoint> m_connections;
 };
