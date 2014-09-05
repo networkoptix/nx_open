@@ -358,6 +358,7 @@
 				<profile.classifier>${platform}</profile.classifier>                
 				<windows>true</windows>
 				<unix>false</unix>
+				<global.windows.defines>ENABLE_VMAX</global.windows.defines>
 			</properties>
 		</profile>
 		<profile>
@@ -496,7 +497,7 @@
 				<toolchain.version>codesourcery-2013.11</toolchain.version>
 				<compiler>2011.09</compiler>
 				<openssl.version>1.0.0j-SNAPSHOT</openssl.version>
-				<additional.defines>ENABLE_VMAX DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines>
+				<additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines>
 				<!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines> -->
 			</properties>
 			<modules>
