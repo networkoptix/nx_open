@@ -2,6 +2,7 @@
 #define ROUTER_H
 
 #include <QtCore/QObject>
+#include <QtCore/QMutex>
 
 #include <nx_ec/ec_api.h>
 #include <utils/common/singleton.h>
@@ -50,6 +51,7 @@ private:
     void makeConsistent();
 
 private:
+    mutable QMutex m_mutex;
     std::weak_ptr<ec2::AbstractECConnection> m_connection;
     QScopedPointer<QnRouteBuilder> m_routeBuilder;
     QMultiHash<QUuid, Endpoint> m_connections;
