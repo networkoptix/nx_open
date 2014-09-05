@@ -108,7 +108,7 @@
 	</properties>
 
 	<build>
-		<defaultGoal>install</defaultGoal>
+		<defaultGoal>package</defaultGoal>
 		<finalName>${finalName}</finalName>
 		<plugins>
 			<plugin>
