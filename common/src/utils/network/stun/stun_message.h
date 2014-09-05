@@ -29,9 +29,6 @@ namespace nx_stun
         0x53000000
     };
     //96-bit transaction ID
-    // RFC indicates this should be treated as a bytes group, but here
-    // we have numeric high and low associated with the bytes , I don't
-    // know what should I put for high and low separately.
     struct TransactionID
     {
         static const std::size_t TRANSACTION_ID_LENGTH = 12;
