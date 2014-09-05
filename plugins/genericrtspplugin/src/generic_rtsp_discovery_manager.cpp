@@ -83,6 +83,7 @@ int GenericRTSPDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, c
     if (modelname.isEmpty())    //should not occur, security check
         modelname = url.toString();
     strncpy( cameras[0].modelName, modelname.toUtf8().data(), sizeof(cameras[0].modelName)-1 );
+    strcpy( cameras[0].auxiliaryData, "generic_rtsp_plugin_aux" );
 
     return 1;
 }
