@@ -18,7 +18,7 @@
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
 
-#include <utils/media_server_update_tool.h>
+#include <update/media_server_update_tool.h>
 #include <utils/applauncher_utils.h>
 
 #include <version.h>

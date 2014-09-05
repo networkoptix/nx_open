@@ -3,6 +3,7 @@
 #include <QtCore/QTimer>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 
 namespace {
     const int timeout = 2 * 60 * 1000;

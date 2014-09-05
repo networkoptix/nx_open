@@ -14,7 +14,7 @@
 #include <utils/common/id.h>
 #include <utils/common/software_version.h>
 
-#include <utils/updates_common.h>
+#include <update/updates_common.h>
 
 class QnServerUpdatesModel;
 class QnMediaServerUpdateTool;

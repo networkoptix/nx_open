@@ -1,7 +1,7 @@
 #ifndef UPLOAD_UPDATES_PEER_TASK_H
 #define UPLOAD_UPDATES_PEER_TASK_H
 
-#include <utils/network_peer_task.h>
+#include <update/task/network_peer_task.h>
 #include <utils/common/system_information.h>
 
 class QnUpdateUploader;

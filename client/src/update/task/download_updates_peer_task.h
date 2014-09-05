@@ -3,7 +3,7 @@
 
 #include <QtCore/QDir>
 
-#include <utils/network_peer_task.h>
+#include <update/task/network_peer_task.h>
 
 class QNetworkAccessManager;
 

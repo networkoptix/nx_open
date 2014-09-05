@@ -1,7 +1,7 @@
 #ifndef REST_UPDATE_PEER_TASK_H
 #define REST_UPDATE_PEER_TASK_H
 
-#include <utils/network_peer_task.h>
+#include <update/task/network_peer_task.h>
 #include <utils/common/system_information.h>
 #include <core/resource/media_server_resource.h>
 

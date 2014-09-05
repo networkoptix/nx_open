@@ -11,11 +11,11 @@
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
 #include <utils/update/update_utils.h>
-#include <utils/check_update_peer_task.h>
-#include <utils/download_updates_peer_task.h>
-#include <utils/upload_updates_peer_task.h>
-#include <utils/install_updates_peer_task.h>
-#include <utils/rest_update_peer_task.h>
+#include <update/task/check_update_peer_task.h>
+#include <update/task/download_updates_peer_task.h>
+#include <update/task/upload_updates_peer_task.h>
+#include <update/task/install_updates_peer_task.h>
+#include <update/task/rest_update_peer_task.h>
 #include <utils/applauncher_utils.h>
 #include <mutex/distributed_mutex_manager.h>
 #include <client/client_settings.h>

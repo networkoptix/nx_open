@@ -2,13 +2,11 @@
 #define QN_MEDIA_SERVER_UPDATE_TOOL_H
 
 #include <QtCore/QObject>
-#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_fwd.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
-#include <utils/updates_common.h>
+#include <update/updates_common.h>
 #include <mutex/distributed_mutex.h>
-
-class QnUpdateUploader;
 
 class QnCheckForUpdatesPeerTask;
 class QnDownloadUpdatesPeerTask;

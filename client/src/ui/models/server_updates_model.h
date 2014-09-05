@@ -6,7 +6,8 @@
 #include <core/resource/media_server_resource.h>
 #include <utils/common/system_information.h>
 #include <utils/common/software_version.h>
-#include <utils/media_server_update_tool.h>
+
+#include <update/media_server_update_tool.h>
 
 class QnServerUpdatesModel : public QAbstractTableModel {
     Q_OBJECT

@@ -2,7 +2,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <utils/update_uploader.h>
+#include <update/update_uploader.h>
 
 QnUploadUpdatesPeerTask::QnUploadUpdatesPeerTask(QObject *parent) :
     QnNetworkPeerTask(parent),

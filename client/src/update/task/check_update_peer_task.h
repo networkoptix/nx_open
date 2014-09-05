@@ -1,9 +1,10 @@
 #ifndef CHECK_UPDATE_PEER_TASK_H
 #define CHECK_UPDATE_PEER_TASK_H
 
-#include <utils/network_peer_task.h>
+#include <update/task/network_peer_task.h>
+#include <update/updates_common.h>
+
 #include <utils/common/system_information.h>
-#include <utils/updates_common.h>
 
 class QNetworkAccessManager;
 
