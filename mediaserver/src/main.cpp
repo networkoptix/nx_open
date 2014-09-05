@@ -987,7 +987,8 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
 void QnMain::at_localInterfacesChanged()
 {
     auto intfList = allLocalAddresses();
-    intfList << m_publicAddress;
+    if (!m_publicAddress.isNull())
+        intfList << m_publicAddress;
     m_mediaServer->setNetAddrList(intfList);
 
     QString defaultAddress = QUrl(m_mediaServer->getApiUrl()).host();
