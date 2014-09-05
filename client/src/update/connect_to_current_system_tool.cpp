@@ -4,12 +4,16 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
+
+#include <update/task/configure_peer_task.h>
+#include <update/task/wait_compatible_servers_peer_task.h>
+#include <update/media_server_update_tool.h>
+
 #include <utils/network/global_module_finder.h>
-#include <utils/configure_peer_task.h>
-#include <utils/wait_compatible_servers_peer_task.h>
-#include <utils/media_server_update_tool.h>
 #include <utils/common/software_version.h>
+
 #include <ui/dialogs/update_dialog.h>
 
 #include "version.h"
