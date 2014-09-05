@@ -5,8 +5,6 @@
 
 #ifndef STUN_MESSAGE_PARSER_H
 #define STUN_MESSAGE_PARSER_H
-
-#include <stdint.h>
 #include <memory>
 #include <cstdint>
 #include <deque>
@@ -51,10 +49,11 @@ namespace nx_stun
             FAILED
         };
     public:
-        MessageParser():
+        MessageParser() :
             output_message_(NULL),
             left_message_length_(0),
-            state_(HEADER_INITIAL_AND_TYPE) {}
+            state_(HEADER_INITIAL_AND_TYPE){
+        }
 
         //!set message object to parse to
         void setMessage( Message* const msg ) {
@@ -85,12 +84,12 @@ namespace nx_stun
     private:
         class MessageParserBuffer;
         // Attribute value parsing
-        attr::Attribute* parseXORMappedAddress( const nx::Buffer& raw , int length , const Header& header );
-        attr::Attribute* parseErrorCode( const nx::Buffer& raw , int length , const Header& header );
-        attr::Attribute* parseFingerprint( const nx::Buffer& raw , int length , const Header& header );
-        attr::Attribute* parseMessageIntegrity( const nx::Buffer& raw , int length , const Header& header );
-        attr::Attribute* parseUnknownAttribute( const nx::Buffer& raw , int length , const Header& header );
-        attr::Attribute* parseValue(const nx::Buffer& raw , int type , int length , const Header& header);
+        attr::Attribute* parseXORMappedAddress();
+        attr::Attribute* parseErrorCode();
+        attr::Attribute* parseFingerprint();
+        attr::Attribute* parseMessageIntegrity();
+        attr::Attribute* parseUnknownAttribute();
+        attr::Attribute* parseValue();
         // LAP implementation
         int parseHeaderInitialAndType( MessageParserBuffer& buffer );
         int parseHeaderLength( MessageParserBuffer& buffer );
@@ -158,6 +157,8 @@ namespace nx_stun
         Message* output_message_;
         std::size_t left_message_length_;
         int state_;
+        // This is for opaque usage  
+        std::deque<char> temp_buffer_;
     };
 }
 

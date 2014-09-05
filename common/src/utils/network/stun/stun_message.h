@@ -6,7 +6,7 @@
 #ifndef STUN_MESSAGE_H
 #define STUN_MESSAGE_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <utils/network/buffer.h>
 #include <memory>
 #include <unordered_map>
@@ -16,8 +16,16 @@
 //!Implementation of STUN protocol (rfc5389)
 namespace nx_stun
 {
-    static const uint32_t MAGIC_COOKIE = 0x2112A442;
-
+    static const std::uint32_t MAGIC_COOKIE = 0x2112A442;
+    // Four components for MAGIC_COOKIE which is used for parsing/serialization of XorMappedAddress
+    static const std::uint16_t MAGIC_COOKIE_HIGH = static_cast<std::uint16_t>( MAGIC_COOKIE >> 16 );
+    static const std::uint16_t MAGIC_COOKIE_LOW  = static_cast<std::uint16_t>( MAGIC_COOKIE & 0x0000ffff );
+    static const std::uint8_t MAGIC_COOKIE_COMPONENTS[] = {
+        static_cast<std::uint8_t>(  MAGIC_COOKIE & 0x000000ff ),
+        static_cast<std::uint8_t>( (MAGIC_COOKIE & 0x0000ff00)>>8 ),
+        static_cast<std::uint8_t>( (MAGIC_COOKIE & 0x00ff0000)>>16 ),
+        static_cast<std::uint8_t>( (MAGIC_COOKIE & 0xff000000)>>24)
+    };
     //96-bit transaction ID
     // RFC indicates this should be treated as a bytes group, but here
     // we have numeric high and low associated with the bytes , I don't
@@ -26,7 +34,7 @@ namespace nx_stun
     {
         static const std::size_t TRANSACTION_ID_LENGTH = 12;
         union {
-            unsigned char bytes[TRANSACTION_ID_LENGTH];
+            char bytes[TRANSACTION_ID_LENGTH];
             struct {
                 uint32_t high;
                 uint64_t lo;
@@ -75,7 +83,7 @@ namespace nx_stun
             username = 0x06,
             messageIntegrity = 0x08,
             errorCode = 0x09,
-            unknownAttributes = 0x0a,
+            unknownAttribute = 0x0a,
             realm = 0x14,
             nonce = 0x15,
             xorMappedAddress = 0x20,
@@ -102,6 +110,10 @@ namespace nx_stun
             public Attribute
         {
         public:
+            enum {
+                IPV4 = 1,
+                IPV6
+            };
             int family;
             int port;
             union
@@ -164,11 +176,22 @@ namespace nx_stun
     {
     public:
         Header header;
-        std::unordered_multimap<attr::AttributeType, std::unique_ptr<attr::Attribute> > attributes;
-
+        typedef std::unordered_multimap<attr::AttributeType, std::unique_ptr<attr::Attribute> > AttributesMap;
+        AttributesMap attributes;
+        Message( Message&& message ) :
+            attributes( std::move(message.attributes) ),
+            header( std::move(message.header) ) {}
+        Message& operator = ( Message&& message ) {
+            if( this == &message ) return *this;
+            attributes = std::move(message.attributes);
+            header = message.header;
+            return *this;
+        }
+        Message(){}
+        ~Message(){}
         void clear();
-
     };
+
 }
 
 #endif  //STUN_MESSAGE_H
