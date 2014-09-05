@@ -42,29 +42,39 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
     return rez.release();
 }
 
+bool QnFileStorageResource::updatePermissions() const
+{
+    QMutexLocker lock(&m_mutex);
+    if (m_durty) {
+        m_durty = false;
+        QUrl storageUrl(getUrl());
+        QString path = storageUrl.path().mid((1));
+#ifdef WIN32
+        if (path.startsWith("\\\\") && !storageUrl.userName().isEmpty())
+        {
+            NETRESOURCE netRes;
+            memset(&netRes, 0, sizeof(netRes));
+            netRes.dwType = RESOURCETYPE_DISK;
+            netRes.lpRemoteName = (LPWSTR) path.constData();
+            LPWSTR password = (LPWSTR) storageUrl.password().constData();
+            LPWSTR user = (LPWSTR) storageUrl.userName().constData();
+            WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0);
+        }
+#endif
+    }
+    return true;
+}
+
 void QnFileStorageResource::setUrl(const QString& url)
 {
+    QMutexLocker lock(&m_mutex);
     QnStorageResource::setUrl(url);
-
-#ifdef WIN32
-    QUrl storageUrl(getUrl());
-    QString path = storageUrl.path().mid((1));
-    if (path.startsWith("\\\\") && !storageUrl.userName().isEmpty())
-    {
-        NETRESOURCE netRes;
-        memset(&netRes, 0, sizeof(netRes));
-        netRes.dwType = RESOURCETYPE_DISK;
-        netRes.lpRemoteName = (LPWSTR) path.constData();
-        LPWSTR password = (LPWSTR) storageUrl.password().constData();
-        LPWSTR user = (LPWSTR) storageUrl.userName().constData();
-        WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0);
-        //WNetUseConnection(0, &netRes, L"qweasd123", L"root", 0, 0, 0, 0);
-    }
-#endif
+    m_durty = true;
 }
 
 QnFileStorageResource::QnFileStorageResource():
-    m_storageBitrateCoeff(1.0)
+    m_storageBitrateCoeff(1.0),
+    m_durty(false)
 {
 
 };
@@ -81,6 +91,7 @@ bool QnFileStorageResource::isNeedControlFreeSpace()
 
 bool QnFileStorageResource::removeFile(const QString& url)
 {
+    updatePermissions();
     QFile file(url);
     qnFileDeletor->deleteFile(removeProtocolPrefix(url));
     return true;
@@ -88,18 +99,21 @@ bool QnFileStorageResource::removeFile(const QString& url)
 
 bool QnFileStorageResource::renameFile(const QString& oldName, const QString& newName)
 {
+    updatePermissions();
     return QFile::rename(oldName, newName);
 }
 
 
 bool QnFileStorageResource::removeDir(const QString& url)
 {
+    updatePermissions();
     qnFileDeletor->deleteDir(removeProtocolPrefix(url));
     return true;
 }
 
 bool QnFileStorageResource::isDirExists(const QString& url)
 {
+    updatePermissions();
     QDir d(url);
     return d.exists(removeProtocolPrefix(url));
 }
@@ -111,27 +125,32 @@ bool QnFileStorageResource::isCatalogAccessible()
 
 bool QnFileStorageResource::isFileExists(const QString& url)
 {
+    updatePermissions();
     return QFile::exists(removeProtocolPrefix(url));
 }
 
 qint64 QnFileStorageResource::getFreeSpace()
 {
+    updatePermissions();
     return getDiskFreeSpace(getPath());
 }
 
 qint64 QnFileStorageResource::getTotalSpace()
 {
+    updatePermissions();
     return getDiskTotalSpace(getPath());
 }
 
 QFileInfoList QnFileStorageResource::getFileList(const QString& dirName)
 {
+    updatePermissions();
     QDir dir(dirName);
     return dir.entryInfoList(QDir::Files);
 }
 
 qint64 QnFileStorageResource::getFileSize(const QString& url) const
 {
+    updatePermissions();
     return QnFile::getFileSize(url);
 }
 
@@ -139,6 +158,8 @@ bool QnFileStorageResource::isStorageAvailableForWriting()
 {
     if( !isStorageDirMounted() )
         return false;
+
+    updatePermissions();
 
     if (hasFlags(Qn::deprecated))
         return false;
@@ -171,6 +192,8 @@ bool QnFileStorageResource::isStorageAvailable()
 {
     if( !isStorageDirMounted() )
         return false;
+
+    updatePermissions();
 
     QString tmpDir = closeDirPath(getPath()) + QString("tmp") + QString::number(rand());
     QDir dir(tmpDir);
