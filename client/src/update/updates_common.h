@@ -33,6 +33,8 @@ enum class QnPeerUpdateStage {
 };
 
 enum class QnFullUpdateStage {
+    Init,               /**< Prepare updater tool. */
+    Check,              /**< Check for updates. */
     Download,           /**< Download update packages. */
     Client,             /**< Install client update. */
     Incompatible,       /**< Install updates to the incompatible servers. */
