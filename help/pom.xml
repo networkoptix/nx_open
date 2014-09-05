@@ -25,7 +25,6 @@
 	</properties>
 
 	<build>
-		<defaultGoal>compile</defaultGoal>
 		<directory>target</directory>
 		<finalName>${project.artifactId}-${project.version}</finalName>
 		<plugins>

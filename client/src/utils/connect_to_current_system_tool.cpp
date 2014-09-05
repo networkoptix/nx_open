@@ -67,11 +67,7 @@ void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QUuid> &tar
     foreach (const QUuid &id, m_targets) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
         if (!server)
-            continue;
-
-        QUuid targetId(server->getProperty(lit("guid")));
-        if (!targetId.isNull())
-            m_waitTargets[id] = targetId;
+            m_targets.remove(id);
     }
 
     configureServer();
@@ -147,6 +143,9 @@ void QnConnectToCurrentSystemTool::revertApiUrls() {
 }
 
 void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, const QSet<QUuid> &failedPeers) {
+    if (!m_running)
+        return;
+
     revertApiUrls();
 
     if (errorCode != 0) {
@@ -158,22 +157,23 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
     }
 
     foreach (const QUuid &id, m_targets - failedPeers) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 
-        QUuid realId(server->getProperty(lit("guid")));
-        if (realId.isNull())
-            realId = id;
-
         if (!isCompatible(server->getVersion(), qnCommon->engineVersion()))
-            m_updateTargets.insert(realId);
+            m_updateTargets.insert(server->getId());
+        else
+            m_waitTargets.insert(server->getId(), QUuid(server->getProperty(lit("guid"))));
     }
 
     waitPeers();
 }
 
 void QnConnectToCurrentSystemTool::at_waitTask_finished(int errorCode) {
+    if (!m_running)
+        return;
+
     if (errorCode != 0) {
         finish(ConfigurationFailed);
         return;
@@ -183,6 +183,9 @@ void QnConnectToCurrentSystemTool::at_waitTask_finished(int errorCode) {
 }
 
 void QnConnectToCurrentSystemTool::at_updateTool_stateChanged(int state) {
+    if (!m_running)
+        return;
+
     if (state != QnMediaServerUpdateTool::Idle)
         return;
 

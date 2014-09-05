@@ -446,6 +446,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
     m_remotePeer.id = QUuid(itrGuid->second);
+    m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server peers only
     emit peerIdDiscovered(m_remoteAddr, m_remotePeer.id);
 
     if (getState() == ConnectingStage1) {
