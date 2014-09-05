@@ -1657,6 +1657,8 @@ ErrorCode QnDbManager::removeCamera(const QUuid& guid)
 {
     qint32 id = getResourceInternalId(guid);
 
+    qWarning() << "remove camera" << getResourceName(id) << "from database";
+
     ErrorCode err = deleteAddParams(id);
     if (err != ErrorCode::ok)
         return err;
@@ -1932,11 +1934,11 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>
 ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
 {
     ErrorCode result;
-    
+/*    
     ApiObjectInfoList nestedList = getNestedObjects(apiObject);
     foreach(const ApiObjectInfo& nestedObject, nestedList)
         removeObject(nestedObject);
-
+*/
     switch (apiObject.type)
     {
     case ApiObject_Camera:
