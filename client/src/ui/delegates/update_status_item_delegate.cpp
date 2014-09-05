@@ -20,12 +20,12 @@ void QnUpdateStatusItemDelegate::paint(QPainter *painter, const QStyleOptionView
     int state = index.data(QnServerUpdatesModel::StateRole).toInt();
 
     switch (state) {
-    case QnMediaServerUpdateTool::PeerUpdateInformation::PendingDownloading:
-    case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateDownloading:
-    case QnMediaServerUpdateTool::PeerUpdateInformation::PendingUpload:
-    case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateUploading:
-    case QnMediaServerUpdateTool::PeerUpdateInformation::PendingInstallation:
-    case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateInstalling:
+    case QnPeerUpdateInformation::PendingDownloading:
+    case QnPeerUpdateInformation::UpdateDownloading:
+    case QnPeerUpdateInformation::PendingUpload:
+    case QnPeerUpdateInformation::UpdateUploading:
+    case QnPeerUpdateInformation::PendingInstallation:
+    case QnPeerUpdateInformation::UpdateInstalling:
         paintProgressBar(painter, option, index);
         break;
     default:

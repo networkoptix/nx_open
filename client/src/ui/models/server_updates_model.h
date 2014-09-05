@@ -27,18 +27,18 @@ public:
 
     class Item {
     public:
-        Item(const QnMediaServerResourcePtr &server, const QnMediaServerUpdateTool::PeerUpdateInformation &updateInfo) :
+        Item(const QnMediaServerResourcePtr &server, const QnPeerUpdateInformation &updateInfo) :
             m_server(server), m_updateInfo(updateInfo)
         {}
 
         QnMediaServerResourcePtr server() const;
-        QnMediaServerUpdateTool::PeerUpdateInformation updateInformation() const;
+        QnPeerUpdateInformation updateInformation() const;
 
         QVariant data(int column, int role) const;
 
     private:
         QnMediaServerResourcePtr m_server;
-        QnMediaServerUpdateTool::PeerUpdateInformation m_updateInfo;
+        QnPeerUpdateInformation m_updateInfo;
 
         friend class QnServerUpdatesModel;
     };
@@ -53,8 +53,8 @@ public:
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     QModelIndex index(const QnMediaServerResourcePtr &server) const;
 
-    void setUpdatesInformation(const QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> &updates);
-    void setUpdateInformation(const QnMediaServerUpdateTool::PeerUpdateInformation &update);
+    void setUpdatesInformation(const QHash<QUuid, QnPeerUpdateInformation> &updates);
+    void setUpdateInformation(const QnPeerUpdateInformation &update);
 
     QnSoftwareVersion latestVersion() const;
     void setLatestVersion(const QnSoftwareVersion &version);
@@ -71,7 +71,7 @@ private slots:
 private:
     QnMediaServerUpdateTool* m_updateTool;
     QList<Item*> m_items;
-    QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> m_updates;
+    QHash<QUuid, QnPeerUpdateInformation> m_updates;
     QSet<QUuid> m_targets;
     QnSoftwareVersion m_latestVersion;
 };

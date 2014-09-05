@@ -2,11 +2,16 @@
 #define QN_MEDIA_SERVER_UPDATE_TOOL_H
 
 #include <QtCore/QObject>
+
 #include <core/resource/resource_fwd.h>
+
+#include <mutex/distributed_mutex.h>
+
+#include <update/updates_common.h>
+#include <update/update_process.h>
+
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
-#include <update/updates_common.h>
-#include <mutex/distributed_mutex.h>
 
 class QnCheckForUpdatesPeerTask;
 class QnDownloadUpdatesPeerTask;
@@ -17,32 +22,6 @@ class QnRestUpdatePeerTask;
 class QnMediaServerUpdateTool : public QObject {
     Q_OBJECT
 public:
-    struct PeerUpdateInformation {
-        enum State {
-            UpdateUnknown,
-            UpdateNotFound,
-            UpdateFound,
-            PendingDownloading,
-            UpdateDownloading,
-            PendingUpload,
-            UpdateUploading,
-            PendingInstallation,
-            UpdateInstalling,
-            UpdateFinished,
-            UpdateFailed,
-            UpdateCanceled
-        };
-
-        QnMediaServerResourcePtr server;
-        State state;
-        QnSoftwareVersion sourceVersion;
-        QnUpdateFileInformationPtr updateInformation;
-
-        int progress;
-
-        PeerUpdateInformation(const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr());
-    };
-
     enum State {
         Idle,
         CheckingForUpdates,
@@ -65,7 +44,7 @@ public:
 
     QnSoftwareVersion targetVersion() const;
 
-    PeerUpdateInformation updateInformation(const QUuid &peerId) const;
+    QnPeerUpdateInformation updateInformation(const QUuid &peerId) const;
 
     QnMediaServerResourceList targets() const;
     void setTargets(const QSet<QUuid> &targets, bool client = false);
@@ -116,7 +95,7 @@ private slots:
 private:
     void setState(State state);
     void finishUpdate(QnUpdateResult result);
-    void setPeerState(const QUuid &peerId, PeerUpdateInformation::State state);
+    void setPeerState(const QUuid &peerId, QnPeerUpdateInformation::State state);
     void removeTemporaryDir();
 
     void downloadUpdates();
@@ -130,34 +109,14 @@ private:
     void unlockMutex();
 
 private:
-    struct UpdateProcess {
-        QUuid id;
-        QHash<QnSystemInformation, QnUpdateFileInformationPtr> updateFiles;
-        QString localTemporaryDir;
-        QnSoftwareVersion targetVersion;
-        bool clientRequiresInstaller;
-        QnUpdateFileInformationPtr clientUpdateFile;
-        QHash<QUuid, PeerUpdateInformation> updateInformationById;
-        QMultiHash<QnSystemInformation, QUuid> idBySystemInformation;
-    };
-
-
     QThread *m_tasksThread;
     State m_state;
-
-    
-
     
     bool m_targetMustBeNewer;
 
-    
-    UpdateProcess m_updateProcess;
-    
-    
+    QnUpdateProcess m_updateProcess;
 
     ec2::QnDistributedMutex *m_distributedMutex;
-
-
 
     QnMediaServerResourceList m_targets;
 

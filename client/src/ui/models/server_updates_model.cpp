@@ -67,11 +67,11 @@ QVariant QnServerUpdatesModel::data(const QModelIndex &index, int role) const {
     Item *item = reinterpret_cast<Item*>(index.internalPointer());
 
     if (role == Qt::ForegroundRole && index.column() == VersionColumn) {
-        if (item->m_updateInfo.state == QnMediaServerUpdateTool::PeerUpdateInformation::UpdateFound)
+        if (item->m_updateInfo.state == QnPeerUpdateInformation::UpdateFound)
             return QColor(Qt::yellow);
 
         if (!m_latestVersion.isNull() &&
-            item->m_updateInfo.state == QnMediaServerUpdateTool::PeerUpdateInformation::UpdateNotFound) {
+            item->m_updateInfo.state == QnPeerUpdateInformation::UpdateNotFound) {
                 if (item->m_server->getVersion() == m_latestVersion)
                     return QColor(Qt::green);
                 return QColor(Qt::red);
@@ -97,7 +97,7 @@ QModelIndex QnServerUpdatesModel::index(const QnMediaServerResourcePtr &server) 
     return base_type::index(it - m_items.begin(), 0);
 }
 
-void QnServerUpdatesModel::setUpdatesInformation(const QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> &updates) {
+void QnServerUpdatesModel::setUpdatesInformation(const QHash<QUuid, QnPeerUpdateInformation> &updates) {
     foreach (Item *item, m_items)
         item->m_updateInfo = updates[item->server()->getId()];
 
@@ -105,7 +105,7 @@ void QnServerUpdatesModel::setUpdatesInformation(const QHash<QUuid, QnMediaServe
         emit dataChanged(index(0, VersionColumn), index(m_items.size() - 1, VersionColumn));
 }
 
-void QnServerUpdatesModel::setUpdateInformation(const QnMediaServerUpdateTool::PeerUpdateInformation &update) {
+void QnServerUpdatesModel::setUpdateInformation(const QnPeerUpdateInformation &update) {
     if (!update.server)
         return;
 
@@ -176,7 +176,7 @@ QnMediaServerResourcePtr QnServerUpdatesModel::Item::server() const {
     return m_server;
 }
 
-QnMediaServerUpdateTool::PeerUpdateInformation QnServerUpdatesModel::Item::updateInformation() const {
+QnPeerUpdateInformation QnServerUpdatesModel::Item::updateInformation() const {
     return m_updateInfo;
 }
 
