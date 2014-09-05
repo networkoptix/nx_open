@@ -22,7 +22,7 @@ void QnUploadUpdatesPeerTask::setUpdateId(const QString &updateId) {
     m_updateId = updateId;
 }
 
-void QnUploadUpdatesPeerTask::cancel() {
+void QnUploadUpdatesPeerTask::doCancel() {
     m_pendingUploads.clear();
     if (m_uploader)
         m_uploader->cancel();

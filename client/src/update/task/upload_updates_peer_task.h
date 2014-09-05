@@ -20,10 +20,9 @@ public:
     void setUploads(const QHash<QnSystemInformation, QString> &fileBySystemInformation);
     void setUpdateId(const QString &updateId);
 
-    virtual void cancel() override;
-
 protected:
     virtual void doStart() override;
+    virtual void doCancel() override;
 
 private:
     void uploadNextUpdate();

@@ -130,23 +130,34 @@ private:
     void unlockMutex();
 
 private:
+    struct UpdateProcess {
+        QUuid id;
+        QHash<QnSystemInformation, QnUpdateFileInformationPtr> updateFiles;
+        QString localTemporaryDir;
+        QnSoftwareVersion targetVersion;
+        bool clientRequiresInstaller;
+        QnUpdateFileInformationPtr clientUpdateFile;
+        QHash<QUuid, PeerUpdateInformation> updateInformationById;
+        QMultiHash<QnSystemInformation, QUuid> idBySystemInformation;
+    };
+
+
     QThread *m_tasksThread;
     State m_state;
 
-    QString m_localTemporaryDir;
+    
 
-    QnSoftwareVersion m_targetVersion;
+    
     bool m_targetMustBeNewer;
 
-    QString m_updateId;
-
-    QHash<QnSystemInformation, QnUpdateFileInformationPtr> m_updateFiles;
-    QnUpdateFileInformationPtr m_clientUpdateFile;
+    
+    UpdateProcess m_updateProcess;
+    
+    
 
     ec2::QnDistributedMutex *m_distributedMutex;
 
-    QHash<QUuid, PeerUpdateInformation> m_updateInformationById;
-    QMultiHash<QnSystemInformation, QUuid> m_idBySystemInformation;
+
 
     QnMediaServerResourceList m_targets;
 
@@ -159,7 +170,7 @@ private:
     QSet<QUuid> m_incompatiblePeerIds;
     QSet<QUuid> m_targetPeerIds;
 
-    bool m_clientRequiresInstaller;
+    
     bool m_disableClientUpdates;
 };
 

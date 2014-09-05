@@ -22,12 +22,11 @@ public:
     void setUpdateId(const QString &updateId);
     void setVersion(const QnSoftwareVersion &version);
 
-    virtual void cancel() override;
-
 signals:
     void peerUpdateFinished(const QUuid &incompatibleId, const QUuid &id);
 
 protected:
+    virtual void doCancel() override;
     virtual void doStart() override;
 
 private:

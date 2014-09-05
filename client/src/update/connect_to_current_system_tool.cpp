@@ -118,8 +118,7 @@ void QnConnectToCurrentSystemTool::configureServer() {
 }
 
 void QnConnectToCurrentSystemTool::waitPeers() {
-    m_waitTask->setPeers(QSet<QUuid>::fromList(m_waitTargets.values()));
-    m_waitTask->start();
+    m_waitTask->start(QSet<QUuid>::fromList(m_waitTargets.values()));
 }
 
 void QnConnectToCurrentSystemTool::updatePeers() {

@@ -33,7 +33,7 @@ void QnRestUpdatePeerTask::setVersion(const QnSoftwareVersion &version) {
     m_version = version;
 }
 
-void QnRestUpdatePeerTask::cancel() {
+void QnRestUpdatePeerTask::doCancel() {
     if (!m_currentServers.isEmpty()) {
         QnMediaServerResourcePtr server = m_currentServers.first();
         disconnect(server.data(), &QnMediaServerResource::resourceChanged, this, &QnRestUpdatePeerTask::at_resourceChanged);
