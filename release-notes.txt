@@ -1,7 +1,7 @@
 ----------------------------------------------2.3.0.xxxx-------------------------------------------
 Features:
 
-Video Wall
+Video Wall. Allows users to control unlimited number of monitors in the realtime mode.
 No Single Point of Failure
 Failover
 793 Automatic cameras move to reserve servers
@@ -14,6 +14,8 @@ Web Based Camera Settings (ISD Cam, Vista?)
 Paxton ACS Integration Plug-In
 Camera Groups via Views
 Web Client Removal
+  #3839 Routing management
+  #3738 Joining Systems and server to system (Other systems in resource tree)
 
 Server web page
 3593 System Administration
@@ -51,11 +53,15 @@ Server web page
 3137: Remove redundant information from progress bar during multi-video export
 3276: Remove group element for generic rtsp/http links
 3167: Windows XP support
-1779: External Storage support
+1779: External Storage support for Linux #1779 Improved "Add external storage" for windows
+#3595 memory and cpu usage in the logs
+Archive indexes move to DB (база с индексами хранится на каждом сторедже..кстати, кейса я не нашла..если найдешь, скинь, плиз)
+  #3917 Added a new event "License issue". 
+Improved PTZ control (Рома переделывал его..теперь должно не так сильно тормозить и дергаться)
 
 3799 feedback form for users 
 3883 Never suggest to save layout 
-
+#2658 Timeline and last minute - ???
 
 BUGS
 3659 Double-click works incorrectly in Dewarping mode if panoramic is 360°
@@ -102,6 +108,15 @@ BUGS
 3781: Motion mask is displayed for multi-video only when video is played backward
 3122: IOS - Camera streaming isn't loading for remote connections (EC and MS are in different networks)
 3109: Chunks flickering while playback (Linux)
+#3540 Wrong CPU usage on health monitoring. Windows 8.
+#3283 Smart Search doesn't work for generic rtsp/http links on Linux after rebuilding archive index
+ Vista:
+ #3710 Shows Pan and Tilt GUI on Motorised Zoom Only Camera's
+ #3693 Database Backup not working correctly
+Changed profile's name for Onvif and Axis cameras (for Vista it was in 2.1).
+
+
+
 
 ----------------------------------------------2.2.1.xxxx-------------------------------------------
 
