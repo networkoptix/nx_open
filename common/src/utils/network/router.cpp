@@ -5,10 +5,11 @@
 #include "route_builder.h"
 #include "module_finder.h"
 
-QnRouter::QnRouter(QnModuleFinder *moduleFinder, QObject *parent) :
+QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) :
     QObject(parent),
     m_connection(std::weak_ptr<ec2::AbstractECConnection>()),
-    m_routeBuilder(new QnRouteBuilder(qnCommon->moduleGUID()))
+    m_routeBuilder(new QnRouteBuilder(qnCommon->moduleGUID())),
+    m_passive(passive)
 {
     connect(moduleFinder,       &QnModuleFinder::moduleUrlFound,    this,   &QnRouter::at_moduleFinder_moduleUrlFound);
     connect(moduleFinder,       &QnModuleFinder::moduleUrlLost,     this,   &QnRouter::at_moduleFinder_moduleUrlLost);
@@ -79,8 +80,11 @@ void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleI
 
     m_connections.insert(qnCommon->moduleGUID(), endpoint);
     m_routeBuilder->addConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
-    if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
-        connection->getMiscManager()->addConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+
+    if (!m_passive) {
+        if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
+            connection->getMiscManager()->addConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    }
 }
 
 
@@ -90,8 +94,11 @@ void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleIn
         return;
 
     m_routeBuilder->removeConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
-    if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
-        connection->getMiscManager()->removeConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+
+    if (!m_passive) {
+        if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
+            connection->getMiscManager()->removeConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    }
 
     makeConsistent();
 }

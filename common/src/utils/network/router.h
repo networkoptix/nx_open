@@ -23,7 +23,7 @@ public:
         bool operator ==(const Endpoint &other) const { return id == other.id && host == other.host && port == other.port; }
     };
 
-    explicit QnRouter(QnModuleFinder *moduleFinder, QObject *parent = 0);
+    explicit QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent = 0);
     ~QnRouter();
 
     void setConnection(const ec2::AbstractECConnectionPtr &connection);
@@ -49,6 +49,7 @@ private:
     std::weak_ptr<ec2::AbstractECConnection> m_connection;
     QScopedPointer<QnRouteBuilder> m_routeBuilder;
     QMultiHash<QUuid, Endpoint> m_connections;
+    bool m_passive;
 };
 
 #endif // ROUTER_H
