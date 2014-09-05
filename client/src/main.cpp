@@ -114,7 +114,9 @@ extern "C"
 #include <nx_ec/dummy_handler.h>
 #include <utils/network/module_finder.h>
 #include <utils/network/global_module_finder.h>
+#include <utils/network/router.h>
 #include <api/network_proxy_factory.h>
+#include <utils/server_interface_watcher.h>
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
@@ -529,6 +531,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     moduleFinder->start();
 
     QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
+
+    QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data(), true));
+
+    QScopedPointer<QnServerInterfaceWatcher> serverInterfaceWatcher(new QnServerInterfaceWatcher(router.data()));
 
     //===========================================================================
 

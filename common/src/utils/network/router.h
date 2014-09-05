@@ -36,6 +36,10 @@ public:
 
     QUuid whoIs(const QString &host, quint16 port) const;
 
+signals:
+    void connectionAdded(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
+    void connectionRemoved(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
+
 private slots:
     void at_connectionAdded(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
     void at_connectionRemoved(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);

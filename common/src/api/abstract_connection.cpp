@@ -1,5 +1,7 @@
 #include "abstract_connection.h"
 
+#include <QtCore/QUrlQuery>
+
 #include <cstring> /* For std::strstr. */
 
 #include <api/network_proxy_factory.h>
@@ -41,6 +43,14 @@ void QnAbstractConnection::setExtraHeaders(const QnRequestHeaderList& extraHeade
     m_extraHeaders = extraHeaders;
 }
 
+const QnRequestParamList &QnAbstractConnection::extraQueryParameters() const {
+    return m_extraQueryParameters;
+}
+
+void QnAbstractConnection::setExtraQueryParameters(const QnRequestParamList &extraQueryParameters) {
+    m_extraQueryParameters = extraQueryParameters;
+}
+
 QUrl QnAbstractConnection::url() const {
     return m_url;
 }
@@ -66,10 +76,6 @@ QString QnAbstractConnection::objectName(int object) const {
 }
 
 int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot) {
-    //TODO #ak all requests are queued in a single thread, so following call is safe: it will not be overwritten by another call before we actually make this call
-        //after move to own http implementation (in 2.4) remove it and make proxying transparent by introducing target id to every http request to camera or server
-    QnNetworkProxyFactory::instance()->bindHostToResource( m_url.host(), m_targetRes->toSharedPointer() );
-
     QnAbstractReplyProcessor *processor = newReplyProcessor(object);
 
     if (target && slot) {
@@ -86,9 +92,15 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
     if(!m_extraHeaders.isEmpty())
         actualHeaders.append(m_extraHeaders);
 
+    QUrlQuery urlQuery(m_url);
+    for (auto it = m_extraQueryParameters.begin(); it != m_extraQueryParameters.end(); ++it)
+        urlQuery.addQueryItem(it->first, it->second);
+    QUrl url = m_url;
+    url.setQuery(urlQuery);
+
     return QnSessionManager::instance()->sendAsyncRequest(
         operation,
-        m_url, 
+        url,
         objectName(processor->object()), 
         actualHeaders, 
         params, 

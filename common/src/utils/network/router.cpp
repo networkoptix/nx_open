@@ -20,8 +20,20 @@ QnRouter::~QnRouter() {}
 void QnRouter::setConnection(const ec2::AbstractECConnectionPtr &connection) {
     ec2::AbstractECConnectionPtr oldConnection = m_connection.lock();
 
-    if (oldConnection)
+    if (oldConnection) {
         oldConnection->getMiscManager()->disconnect(this);
+
+        QUuid localId = qnCommon->moduleGUID();
+        for (auto it = m_connections.begin(); it != m_connections.end(); /* no increment */) {
+            if (it.key() == localId) {
+                ++it;
+                continue;
+            }
+
+            m_routeBuilder->removeConnection(it.key(), it->id, it->host, it->port);
+            it = m_connections.erase(it);
+        }
+    }
 
     m_connection = connection;
 
@@ -62,6 +74,7 @@ void QnRouter::at_connectionAdded(const QUuid &discovererId, const QUuid &peerId
 
     m_connections.insert(discovererId, Endpoint(peerId, host, port));
     m_routeBuilder->addConnection(discovererId, peerId, host, port);
+    emit connectionAdded(discovererId, peerId, host, port);
 }
 
 void QnRouter::at_connectionRemoved(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port) {
@@ -71,6 +84,7 @@ void QnRouter::at_connectionRemoved(const QUuid &discovererId, const QUuid &peer
     m_routeBuilder->removeConnection(discovererId, peerId, host, port);
     m_connections.remove(discovererId, Endpoint(peerId, host, port));
     makeConsistent();
+    emit connectionRemoved(discovererId, peerId, host, port);
 }
 
 void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
@@ -85,6 +99,8 @@ void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleI
         if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
             connection->getMiscManager()->addConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
+
+    emit connectionAdded(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
 }
 
 
@@ -101,6 +117,7 @@ void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleIn
     }
 
     makeConsistent();
+    emit connectionAdded(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
 }
 
 void QnRouter::makeConsistent() {
