@@ -319,19 +319,6 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
     }
 }
 
-
-QString QnMediaServerResource::getProxyHost()
-{
-    QnMediaServerConnectionPtr connection = apiConnection();
-    return connection ? connection->getProxyHost() : QString();
-}
-
-int QnMediaServerResource::getProxyPort()
-{
-    QnMediaServerConnectionPtr connection = apiConnection();
-    return connection ? connection->getProxyPort() : 0;
-}
-
 QnSoftwareVersion QnMediaServerResource::getVersion() const
 {
     QMutexLocker lock(&m_mutex);

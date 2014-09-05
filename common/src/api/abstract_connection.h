@@ -123,6 +123,8 @@ protected:
 
     const QnRequestHeaderList &extraHeaders() const;
     void setExtraHeaders(const QnRequestHeaderList &extraHeaders);
+    const QnRequestParamList &extraQueryParameters() const;
+    void setExtraQueryParameters(const QnRequestParamList &extraQueryParameters);
 
     int sendAsyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot);
     int sendAsyncGetRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot);
@@ -171,6 +173,7 @@ private:
     QUrl m_url;
     QScopedPointer<QnLexicalSerializer> m_serializer;
     QnRequestHeaderList m_extraHeaders;
+    QnRequestParamList m_extraQueryParameters;
     QnResource* m_targetRes;
 };
 

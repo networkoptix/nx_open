@@ -61,9 +61,6 @@ public:
 
     //virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
 
-    QString getProxyHost();
-    int getProxyPort();
-
     int getMaxCameras() const;
     void setMaxCameras(int value);
 

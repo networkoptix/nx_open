@@ -1491,7 +1491,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
-    if(!server)
+    if (!server)
         return;
 
     if (!context()->user())
@@ -1499,23 +1499,14 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
 
     QUrl url = server->getApiUrl();
     url.setScheme(lit("http"));
-    url.setPath( lit("/api/showLog") );
+    url.setPath(lit("/api/showLog"));
     url.setQuery(lit("lines=1000"));
     
     //setting credentials for access to resource
     url.setUserName(QnAppServerConnectionFactory::url().userName());
     url.setPassword(QnAppServerConnectionFactory::url().password());
 
-    if( !QnNetworkProxyFactory::instance()->fillUrlWithRouteToResource(
-            server,
-            &url,
-            QnNetworkProxyFactory::placeCredentialsToUrl ) )
-    {
-        //could not find route to server. Can it really happen?
-        //TODO: #ak some error message
-    }
-    
-    QDesktopServices::openUrl(url);
+    QDesktopServices::openUrl(QnNetworkProxyFactory::instance()->urlToResource(url, server));
 }
 
 void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
