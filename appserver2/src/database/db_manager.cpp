@@ -1657,8 +1657,6 @@ ErrorCode QnDbManager::removeCamera(const QUuid& guid)
 {
     qint32 id = getResourceInternalId(guid);
 
-    qWarning() << "remove camera" << getResourceName(id) << "from database";
-
     ErrorCode err = deleteAddParams(id);
     if (err != ErrorCode::ok)
         return err;
