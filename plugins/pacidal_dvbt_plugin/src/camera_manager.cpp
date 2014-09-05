@@ -1,5 +1,6 @@
 #include <string>
 #include <sstream>
+#include <chrono>
 
 #include "pacidal_it930x.h"
 #include "camera_manager.h"
@@ -12,6 +13,7 @@
 
 namespace pacidal
 {
+    //!
     class DevReader
     {
     public:
@@ -66,19 +68,80 @@ namespace pacidal
         DevReader * r = reinterpret_cast<DevReader*>(opaque);
         return r->read(buf, bufSize);
     }
+
+    //!
+    class ReadThread
+    {
+    public:
+        static const unsigned PACKETS_QUEUE_SIZE = 32*1024;
+
+        ReadThread(CameraManager* camera, LibAV* lib)
+        :
+            m_camera( camera ),
+            m_libAV( lib )
+        {
+        }
+
+        void operator () ()
+        {
+            for(;;)
+            {
+                unsigned streamNum;
+                std::unique_ptr<VideoPacket> packet = nextDevPacket( streamNum );
+                if (! packet)
+                    continue;
+
+                std::shared_ptr<VideoPacket> sp( packet.release() );
+
+                {
+                    std::shared_ptr<VideoPacketQueue> queue = m_camera->queue( streamNum );
+
+                    std::lock_guard<std::mutex> lock( queue->mutex() ); // LOCK
+
+                    if( queue->size() >= PACKETS_QUEUE_SIZE )
+                        queue->pop_front();
+                    queue->push_back(sp);
+                }
+            }
+        }
+
+    private:
+        CameraManager* m_camera;
+        LibAV* m_libAV;
+
+        std::unique_ptr<VideoPacket> nextDevPacket(unsigned& streamNum)
+        {
+            AVPacket avPacket;
+            if( m_libAV->nextFrame( &avPacket ) < 0 || avPacket.flags & AV_PKT_FLAG_CORRUPT )
+            {
+                m_libAV->freePacket( &avPacket );
+                return std::unique_ptr<VideoPacket>();
+            }
+
+            std::unique_ptr<VideoPacket> packet( new VideoPacket( avPacket.data, avPacket.size ) );
+            packet->setTime( avPacket.pts );
+            if( avPacket.flags & AV_PKT_FLAG_KEY )
+                packet->setKeyFlag();
+
+            streamNum = avPacket.stream_index;
+            m_libAV->freePacket( &avPacket );
+            return packet;
+        }
+    };
 }
 
 namespace pacidal
 {
     static const unsigned DEFAULT_FREQUENCY = 177000;
     static const unsigned MIN_SIGNAL_STRENGTH = 50; // 0..100
-    static const unsigned MAX_READ_ATTEMPTS = 42;
+    static const unsigned MAX_READ_ATTEMPTS = 10;
+    static const unsigned SLEEP_DURATION_MS = 30;
 
     static const unsigned DEFAULT_FRAME_SIZE = PacidalIt930x::DEFAULT_PACKETS_NUM * PacidalIt930x::MPEG_TS_PACKET_SIZE;
 
     DEFAULT_REF_COUNTER(CameraManager)
 
-    CameraManager::CameraManager( const nxcip::CameraInfo& info )
+    CameraManager::CameraManager( const nxcip::CameraInfo& info, bool test )
     :
         m_refManager( DiscoveryManager::refManager() ),
         m_info( info ),
@@ -98,12 +161,19 @@ namespace pacidal
         }
 
         initDevice();
-        if (devInited_)
+        if( devInited_ && !test )
             initEncoders();
     }
 
     CameraManager::~CameraManager()
     {
+        try
+        {
+            m_readThread.join();
+        }
+        catch (...)
+        {
+        }
     }
 
     void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -219,14 +289,14 @@ namespace pacidal
 
     void CameraManager::initDevice()
     {
-        m_device->lockChannel(DEFAULT_FREQUENCY);
+        m_device->lockChannel( DEFAULT_FREQUENCY );
 
         bool locked, presented;
         uint8_t quality, strength;
         m_device->statistic(locked, presented, quality, strength);
 
         // low signal == no data. Don't capture trash.
-        if (strength < MIN_SIGNAL_STRENGTH)
+        if( strength < MIN_SIGNAL_STRENGTH )
             return;
 
         m_devStream.reset( new PacidalStream(*m_device) ); // after lockChannel()
@@ -242,79 +312,48 @@ namespace pacidal
         for( unsigned i=0; i<m_libAV->streamsCount(); ++i )
             m_encoders.push_back( std::make_shared<MediaEncoder>(this, i) );
 
-        m_encQueues.resize( m_encoders.size() );
+        m_encQueues.reserve( m_encoders.size() );
+        for(size_t i=0; i < m_encoders.size(); ++i)
+            m_encQueues.push_back( std::make_shared<VideoPacketQueue>() );
+
+        ReadThread rt( this, m_libAV.get() );
+        m_readThread = std::thread( rt );
+
         encInited_ = true;
     }
 
     void CameraManager::resolution( unsigned encoderNum, nxcip::ResolutionInfo& outRes ) const
     {
-        AVStream * stream = m_libAV->stream(encoderNum);
-
-        if( stream )
-        {
-            outRes.maxFps = float(stream->avg_frame_rate.num) / stream->avg_frame_rate.den;
-
-            if( stream->codec )
-            {
-                outRes.resolution.width = stream->codec->width;     // coded_width ?
-                outRes.resolution.height = stream->codec->height;   // coded_height ?
-            }
-        }
+        outRes.maxFps = m_libAV->fps( encoderNum );
+        m_libAV->resolution( encoderNum, outRes.resolution.width, outRes.resolution.height );
     }
 
     VideoPacket* CameraManager::nextPacket( unsigned encoderNumber )
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::shared_ptr<VideoPacketQueue> wantedQueue = queue( encoderNumber );
 
-        if( m_encQueues[encoderNumber].size() )
-        {
-            std::unique_ptr<VideoPacket> packet( new VideoPacket() );
-            (*m_encQueues[encoderNumber].begin())->swap(*packet);
-            m_encQueues[encoderNumber].pop_front();
-
-            return packet.release();
-        }
-
-        // prevent infinite loop
         for( unsigned i=0; i < MAX_READ_ATTEMPTS; ++i )
         {
-            unsigned streamNum;
-            std::unique_ptr<VideoPacket> packet = nextDevPacket(streamNum);
-            if (! packet)
-                continue;
+            {
+                std::lock_guard<std::mutex> lock( wantedQueue->mutex() ); // LOCK
 
-            if( streamNum )
-                packet->setLowQualityFlag();
+                if( wantedQueue->size() )
+                {
+                    std::unique_ptr<VideoPacket> packet( new VideoPacket() );
+                    wantedQueue->front()->swap( *packet );
+                    wantedQueue->pop_front();
 
-            if( streamNum == encoderNumber )
-                return packet.release();
+                    if( encoderNumber )
+                        packet->setLowQualityFlag();
+                    return packet.release();
+                }
+            }
 
-            std::shared_ptr<VideoPacket> sp( packet.release() );
-            if( sp->isKey() )
-                m_encQueues[streamNum].clear();
-            m_encQueues[streamNum].push_back(sp);
+            std::chrono::milliseconds dura( SLEEP_DURATION_MS );
+            std::this_thread::sleep_for( dura );
         }
 
         return new VideoPacket();
-    }
-
-    std::unique_ptr<VideoPacket> CameraManager::nextDevPacket(unsigned& streamNum)
-    {
-        AVPacket avPacket;
-        if( m_libAV->nextFrame(&avPacket) < 0 || avPacket.flags & AV_PKT_FLAG_CORRUPT )
-        {
-            m_libAV->freePacket(&avPacket);
-            return std::unique_ptr<VideoPacket>();
-        }
-
-        std::unique_ptr<VideoPacket> packet( new VideoPacket(avPacket.data, avPacket.size) );
-        packet->setTime(avPacket.pts);
-        if( avPacket.flags & AV_PKT_FLAG_KEY )
-            packet->setKeyFlag();
-
-        streamNum = avPacket.stream_index;
-        m_libAV->freePacket(&avPacket);
-        return packet;
     }
 
     unsigned CameraManager::cameraId(const nxcip::CameraInfo& info)
@@ -327,5 +366,37 @@ namespace pacidal
         ss << name;
         ss >> num;
         return num;
+    }
+
+    void CameraManager::driverInfo(std::string& driverVersion, std::string& fwVersion, std::string& company, std::string& model) const
+    {
+        if( m_device )
+        {
+            char verDriver[32] = "";
+            char verAPI[32] = "";
+            char verFWLink[32] = "";
+            char verFWOFDM[32] = "";
+            char xCompany[32] = "";
+            char xModel[32] = "";
+
+            m_device->info(verDriver, verAPI, verFWLink, verFWOFDM, xCompany, xModel);
+
+            driverVersion = std::string(verDriver) + "-" + std::string(verAPI);
+            fwVersion = std::string(verFWLink) + "-" + std::string(verFWOFDM);
+            company = std::string(xCompany);
+            model = std::string(xModel);
+        }
+    }
+
+    void CameraManager::fillInfo(nxcip::CameraInfo& info) const
+    {
+        std::string driver, firmware, company, model;
+        driverInfo( driver, firmware, company, model );
+
+        driver += " ";
+        driver += firmware;
+
+        strncpy( info.modelName, model.c_str(), model.size() );
+        strncpy( info.firmware, driver.c_str(), driver.size() );
     }
 }

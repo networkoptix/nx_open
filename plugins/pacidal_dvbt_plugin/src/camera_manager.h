@@ -4,12 +4,12 @@
 #include <vector>
 #include <deque>
 #include <memory>
+#include <thread>
 #include <mutex>
 
 #include <plugins/camera_plugin.h>
 
 #include "ref_counter.h"
-
 
 namespace pacidal
 {
@@ -21,6 +21,26 @@ namespace pacidal
     struct LibAV;
     class DevReader;
 
+    typedef std::shared_ptr<VideoPacket> VideoPacketPtr;
+
+    //!
+    class VideoPacketQueue
+    {
+    public:
+        typedef std::deque<VideoPacketPtr> QueueT;
+
+        void push_back(VideoPacketPtr p) { m_deque.push_back( p ); }
+        void pop_front() { m_deque.pop_front(); }
+
+        VideoPacketPtr front() { return m_deque.front(); }
+        size_t size() const { return m_deque.size(); }
+        std::mutex& mutex() { return m_mutex; }
+
+    private:
+        mutable std::mutex m_mutex;
+        QueueT m_deque;
+    };
+
     //!
     class CameraManager
     :
@@ -31,7 +51,7 @@ namespace pacidal
     public:
         constexpr static const char* DEVICE_PATTERN = "usb-it930x";
 
-        CameraManager( const nxcip::CameraInfo& info );
+        CameraManager( const nxcip::CameraInfo& info, bool testOnly = false );
         virtual ~CameraManager();
 
         //!Implementation of nxcip::BaseCameraManager::getEncoderCount
@@ -68,20 +88,22 @@ namespace pacidal
 
         static unsigned cameraId( const nxcip::CameraInfo& info );
 
-    private:
-        typedef std::shared_ptr<VideoPacket> VideoPacketPtr;
-        typedef std::deque<VideoPacketPtr> VideoPacketQueue;
+        bool devInitialised() const { return devInited_; }
+        void fillInfo(nxcip::CameraInfo& info) const;
 
-        std::mutex m_mutex;
+        std::shared_ptr<VideoPacketQueue> queue(unsigned num) { return m_encQueues[num]; }
+
+    private:
         nxcip::CameraInfo m_info;
 
         std::unique_ptr<PacidalIt930x> m_device;
         std::unique_ptr<PacidalStream> m_devStream;
         std::unique_ptr<LibAV> m_libAV; // pimpl
         std::unique_ptr<DevReader> m_devReader;
+        std::thread m_readThread;
 
         std::vector<std::shared_ptr<MediaEncoder>> m_encoders;
-        std::vector<VideoPacketQueue> m_encQueues;
+        std::vector<std::shared_ptr<VideoPacketQueue>> m_encQueues;
         const char * m_errorStr;
         bool devInited_;
         bool encInited_;
@@ -91,6 +113,7 @@ namespace pacidal
         void readDeviceStream();
 
         std::unique_ptr<VideoPacket> nextDevPacket(unsigned& streamNum);
+        void driverInfo(std::string& driverVersion, std::string& fwVersion, std::string& company, std::string& model) const;
     };
 }
 

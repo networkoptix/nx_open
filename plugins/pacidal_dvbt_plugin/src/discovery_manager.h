@@ -51,8 +51,9 @@ namespace pacidal
         typedef std::shared_ptr<CameraManager> CameraPtr;
 
         static DiscoveryManager* Instance;
-        std::map<unsigned, CameraPtr> cameras_;
-        std::mutex m_mutex;
+        std::map<unsigned, CameraPtr> m_cameras;
+        mutable std::mutex m_mutex;
+        bool m_firstTime;
     };
 }
 

@@ -118,28 +118,30 @@ namespace pacidal
             strength = statisic.signalStrength;
         }
 
+        void info(char* verDriver, char* verAPI, char* verFWLink, char* verFWOFDM, char* company, char* model)
+        {
+            DemodDriverInfo driverInfo;
+            int result = DTV_GetDriverInformation(handle_, &driverInfo);
+            if (result)
+                return;
+
+            strncpy(verDriver,  (const char *)driverInfo.DriverVersion, 16);
+            strncpy(verAPI,     (const char *)driverInfo.APIVersion, 32);
+            strncpy(verFWLink,  (const char *)driverInfo.FWVersionLink, 16);
+            strncpy(verFWOFDM,  (const char *)driverInfo.FWVersionOFDM, 16);
+            strncpy(company,    (const char *)driverInfo.Company, 8);
+            strncpy(model,      (const char *)driverInfo.SupportHWInfo, 32);
+        }
+
     private:
         int handle_;
 #if 0
-        void printDriverInfo() const
+        void getDeviceID() const
         {
             Word rxDeviceID = 0xFFFF;
             unsigned result = DTV_GetDeviceID(handle_, &rxDeviceID);
             if (result)
                 throw "DTV_GetDeviceID";
-
-            DemodDriverInfo driverInfo;
-            result = DTV_GetDriverInformation(handle_, &driverInfo);
-            if (result)
-                throw "DTV_GetVersion";
-
-            printf("DriverVerion  = %s\n", driverInfo.DriverVersion);
-            printf("APIVerion     = %s\n", driverInfo.APIVersion);
-            printf("FWVerionLink  = %s\n", driverInfo.FWVersionLink);
-            printf("FWVerionOFDM  = %s\n", driverInfo.FWVersionOFDM);
-            printf("Company       = %s\n", driverInfo.Company);
-            printf("SupportHWInfo = %s\n", driverInfo.SupportHWInfo);
-            printf("RxDeviceID    = 0x%x\n", rxDeviceID);
         }
 #endif
         void setNullPacketFilter(bool flag)

@@ -20,7 +20,6 @@ extern "C"
 namespace
 {
     static const char* VENDOR_NAME = "Pacidal";
-    static const char* MODEL_NAME = "DVB-T it930x (Endeavour)";
 }
 
 namespace pacidal
@@ -31,7 +30,8 @@ namespace pacidal
 
     DiscoveryManager::DiscoveryManager()
     :
-        m_refManager( this )
+        m_refManager( this ),
+        m_firstTime( true )
     {
         Instance = this;
     }
@@ -74,17 +74,42 @@ namespace pacidal
             while( (ent = ::readdir( dir )) != NULL )
             {
                 std::string file( ent->d_name );
-                if (file.find( CameraManager::DEVICE_PATTERN ) != std::string::npos)
+                if( file.find( CameraManager::DEVICE_PATTERN ) != std::string::npos )
                 {
                     memset( &cameras[cameraNum], 0, sizeof(cameras[cameraNum]) );
-                    strncpy( cameras[cameraNum].modelName, MODEL_NAME, std::min(strlen(MODEL_NAME), sizeof(nxcip::CameraInfo::modelName)-1) );
+                    strncpy( cameras[cameraNum].url, file.c_str(), std::min(file.size(), sizeof(nxcip::CameraInfo::url)-1) );
                     strncpy( cameras[cameraNum].uid, file.c_str(), std::min(file.size(), sizeof(nxcip::CameraInfo::uid)-1) );
-                    strncpy( cameras[cameraNum].url, file.c_str(), std::min(file.size(), sizeof(nxcip::CameraInfo::uid)-1) );
-                    ++cameraNum;
+
+                    unsigned id = CameraManager::cameraId( cameras[cameraNum] );
+                    bool alreadyFound = false;
+
+                    {
+                        std::lock_guard<std::mutex> lock(m_mutex); // LOCK
+
+                        auto it = m_cameras.find(id);
+                        if( it != m_cameras.end() )
+                        {
+                            //it->second->fillInfo( cameras[cameraNum] );
+                            ++cameraNum;
+                            alreadyFound = true;
+                        }
+                    }
+
+                    if( m_firstTime && !alreadyFound )
+                    {
+                        CameraManager cam( cameras[cameraNum], true );
+                        if( cam.devInitialised() )
+                        {
+                            cam.fillInfo( cameras[cameraNum] );
+                            ++cameraNum;
+                        }
+                    }
                 }
             }
+            ::closedir( dir );
         }
 
+        m_firstTime = false;
         return cameraNum;
     }
 
@@ -113,11 +138,11 @@ namespace pacidal
 
         std::lock_guard<std::mutex> lock(m_mutex); // LOCK
 
-        auto it = cameras_.find(id);
-        if (it == cameras_.end())
+        auto it = m_cameras.find(id);
+        if (it == m_cameras.end())
         {
-            cameras_[id] = std::make_shared<CameraManager>( info );
-            return cameras_[id].get();
+            m_cameras[id] = std::make_shared<CameraManager>( info );
+            return m_cameras[id].get();
         }
 
         (it->second)->addRef();

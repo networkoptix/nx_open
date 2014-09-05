@@ -3,75 +3,6 @@
 
 #include <memory>
 
-
-#if 0 // dummy
-
-#define AV_PKT_FLAG_KEY 0x1
-#define AV_PKT_FLAG_CORRUPT 0x2
-
-struct AVPacket
-{
-    int64_t pts;
-    int64_t dts;
-    uint8_t *data;
-    int   size;
-    int   stream_index;
-    int   flags;
-};
-
-struct AVStream
-{
-    struct
-    {
-        unsigned num;
-        unsigned den;
-    } avg_frame_rate;
-    struct
-    {
-        unsigned width;
-        unsigned height;
-    } * codec;
-};
-
-namespace pacidal
-{
-    //!
-    class LibAV
-    {
-    public:
-        typedef int (*FuncT)(void* opaque, uint8_t* buf, int bufSize);
-
-        LibAV(void * opaque, FuncT func, unsigned frameSize)
-        {
-        }
-
-        ~LibAV()
-        {
-        }
-
-        std::shared_ptr<AVPacket> nextFrame()
-        {
-            return std::make_shared<AVPacket>();
-        }
-
-        unsigned streamsCount() const
-        {
-            return 0;
-        }
-
-        AVStream * stream(unsigned num) const
-        {
-            return nullptr;
-        }
-
-        static void freePacket(AVPacket * pkt)
-        {
-        }
-    };
-}
-
-#else //
-
 extern "C"
 {
 #include <libavutil/avutil.h>
@@ -125,11 +56,22 @@ namespace pacidal
             return 0;
         }
 
-        AVStream * stream(unsigned num) const
+        float fps(unsigned streamNum) const
         {
-            if (m_avContext && num < streamsCount())
-                return m_avContext->streams[num];
-            return nullptr;
+            AVStream * s = stream( streamNum );
+            if( s )
+                return float(s->avg_frame_rate.num) / s->avg_frame_rate.den;
+            return 0;
+        }
+
+        void resolution(unsigned streamNum, int& width, int& height) const
+        {
+            AVStream * s = stream( streamNum );
+            if( s && s->codec )
+            {
+                width = s->codec->width;
+                height = s->codec->height;
+            }
         }
 
         void freePacket(AVPacket * pkt)
@@ -163,8 +105,14 @@ namespace pacidal
             m_avIO = nullptr;
             m_avContext = nullptr;
         }
+
+        AVStream * stream(unsigned num) const
+        {
+            if (m_avContext && num < streamsCount())
+                return m_avContext->streams[num];
+            return nullptr;
+        }
     };
 }
-#endif
 
 #endif //LIBAV_WRAP
