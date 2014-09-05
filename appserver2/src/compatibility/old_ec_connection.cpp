@@ -114,7 +114,7 @@ namespace ec2
         return reqID;
     }
 
-    void OldEcConnection::addRemotePeer(const QUrl& /*url*/, const QUuid& /*peerGuid*/)
+    void OldEcConnection::addRemotePeer(const QUrl& /*url*/)
     {
     }
 

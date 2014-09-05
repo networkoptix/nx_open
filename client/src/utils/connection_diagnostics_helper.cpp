@@ -2,6 +2,7 @@
 
 #include <api/model/connection_info.h>
 
+#include <common/common_module.h>
 #include <client/client_settings.h>
 
 #include <nx_ec/ec_api.h>
@@ -59,7 +60,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         compatibilityChecker = &localChecker;
     }
 
-    if (compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo.version)) 
+    if (compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(qnCommon->engineVersion().toString()), QLatin1String("ECS"), connectionInfo.version))
         return Result::Success;
 
     if (connectionInfo.version < minSupportedVersion) {
@@ -71,13 +72,13 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             " - Client version: %1.\n"
             " - Server version: %2.\n"
             "Compatibility mode for versions lower than %3 is not supported."
-            ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo.version.toString()).arg(minSupportedVersion.toString()),
+            ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(minSupportedVersion.toString()),
             QMessageBox::Ok
             );
         return Result::Failure;
     }
 
-    if (connectionInfo.version > QnSoftwareVersion(QN_ENGINE_VERSION)) {
+    if (connectionInfo.version > QnSoftwareVersion(qnCommon->engineVersion().toString())) {
 #ifndef Q_OS_MACX
         QnMessageBox::warning(
             parentWidget,
@@ -87,7 +88,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             " - Client version: %1.\n"
             " - Server version: %2.\n"
             "An error has occurred while trying to restart in compatibility mode."
-            ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo.version.toString()),
+            ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()),
             QMessageBox::Ok
             );
 #else
@@ -99,7 +100,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             " - Client version: %1.\n"
             " - Server version: %2.\n"
             "The other version of the Client is needed in order to establish the connection to this Server."
-            ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo.version.toString()),
+            ).arg(QLatin1String(qnCommon->engineVersion().toString())).arg(connectionInfo.version.toString()),
             QMessageBox::Ok
             );
 #endif
@@ -120,7 +121,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 " - Client version: %1.\n"
                 " - Server version: %2.\n"
                 "An error has occurred while trying to restart in compatibility mode."
-                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo.version.toString()),
+                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()),
                 QMessageBox::Ok
                 );
 #else
@@ -132,7 +133,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 " - Client version: %1.\n"
                 " - Server version: %2.\n"
                 "The other version of the Client is needed in order to establish the connection to this Server."
-                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo.version.toString()),
+                ).arg(QLatin1String(qnCommon->engineVersion().toString())).arg(connectionInfo.version.toString()),
                 QMessageBox::Ok
                 );
 #endif
@@ -149,7 +150,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 " - Server version: %2.\n"
                 "Client version %3 is required to connect to this Server.\n"
                 "Download version %3?"
-                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo.version.toString()).arg(connectionInfo.version.toString(QnSoftwareVersion::MinorFormat)),
+                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(connectionInfo.version.toString(QnSoftwareVersion::MinorFormat)),
                 QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
                 QMessageBox::Cancel
                 );
@@ -173,7 +174,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             " - Client version: %1.\n"
             " - Server version: %2.\n"
             "Would you like to restart the Client in compatibility mode?"
-            ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo.version.toString()),
+            ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()),
             QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel), 
             QMessageBox::Cancel
             );

@@ -24,7 +24,7 @@ namespace ec2 {
     };
 #define QnTransactionTransportHeader_Fields (processedPeers)(dstPeers)(sequence)(sender)
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnTransactionTransportHeader, (binary)(json)(ubjson))
+    QN_FUSION_DECLARE_FUNCTIONS(QnTransactionTransportHeader, (json)(ubjson))
 
 } // namespace ec2
 

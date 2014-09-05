@@ -24,6 +24,24 @@ enum class QnUpdateResult {
     RestInstallationFailed
 };
 
+enum class QnPeerUpdateStage {
+    Download,           /**< Download update package for the peer. */
+    Push,               /**< Push update package to the peer. */
+    Install,            /**< Install update. */
+
+    Count
+};
+
+enum class QnFullUpdateStage {
+    Download,           /**< Download update packages. */
+    Client,             /**< Install client update. */
+    Incompatible,       /**< Install updates to the incompatible servers. */
+    Push,               /**< Push update package to the normal servers. */
+    Servers,            /**< Install updates to the normal servers. */
+
+    Count
+};
+
 
 struct QnUpdateFileInformation {
     QnSoftwareVersion version;

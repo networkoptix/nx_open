@@ -271,7 +271,7 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
     inputData.put( ProductParameters::product, m_productName );
     inputData.put( ProductParameters::customization, m_customization );
     inputData.put( ProductParameters::module, m_module );
-    inputData.put( ProductParameters::version, m_version.toString() );
+    inputData.put( ProductParameters::version, m_version.toString(QnSoftwareVersion::MinorFormat) );
 #ifdef _MSC_VER
 #ifdef _WIN64
     inputData.put( ProductParameters::arch, "x64" );

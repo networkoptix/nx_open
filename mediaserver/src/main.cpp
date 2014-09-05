@@ -87,7 +87,6 @@
 
 #include <rest/handlers/acti_event_rest_handler.h>
 #include <rest/handlers/business_event_log_rest_handler.h>
-#include <rest/handlers/business_action_rest_handler.h>
 #include <rest/handlers/get_system_name_rest_handler.h>
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
@@ -161,6 +160,7 @@
 #include "rest/handlers/old_client_connect_rest_handler.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "media_server/resource_status_watcher.h"
+#include "nx_ec/dummy_handler.h"
 
 
 // This constant is used while checking for compatibility.
@@ -968,6 +968,20 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
     QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
 
     at_localInterfacesChanged();
+
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (server) {
+        Qn::ServerFlags serverFlags = server->getServerFlags();
+        if (m_publicAddress.isNull())
+            serverFlags &= ~Qn::SF_HasPublicIP;
+        else
+            serverFlags |= Qn::SF_HasPublicIP;
+        if (serverFlags != server->getServerFlags()) {
+            server->setServerFlags(serverFlags);
+            ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+            ec2Connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        }
+    }
 }
 
 void QnMain::at_localInterfacesChanged()
@@ -975,6 +989,23 @@ void QnMain::at_localInterfacesChanged()
     auto intfList = allLocalAddresses();
     intfList << m_publicAddress;
     m_mediaServer->setNetAddrList(intfList);
+
+    QString defaultAddress = QUrl(m_mediaServer->getApiUrl()).host();
+    int port = QUrl(m_mediaServer->getApiUrl()).port();
+    bool found = false;
+    foreach(const QHostAddress& addr, intfList) {
+        if (addr.toString() == defaultAddress) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        QHostAddress newAddress;
+        if (!intfList.isEmpty())
+            newAddress = intfList.first();
+        setServerNameAndUrls(m_mediaServer, newAddress.toString(), port);
+    }
+
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     ec2Connection->getMediaServerManager()->save(m_mediaServer, this, &QnMain::at_serverSaved);
 }
@@ -1043,7 +1074,6 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/manualCamera", new QnManualCameraAdditionRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ptz", new QnPtzRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/image", new QnImageRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/execAction", new QnBusinessActionRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/onEvent", new QnExternalBusinessEventRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/gettime", new QnTimeRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());

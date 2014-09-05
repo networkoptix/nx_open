@@ -1,6 +1,8 @@
 #ifndef __BINARY_TRANSACTION_SERIALIZER_H_
 #define __BINARY_TRANSACTION_SERIALIZER_H_
 
+#if 0
+
 #include <QtCore/QCache>
 
 #include <transaction/transaction.h>
@@ -60,5 +62,6 @@ namespace ec2
 
 }
 
+#endif
 
 #endif // __BINARY_TRANSACTION_SERIALIZER_H_

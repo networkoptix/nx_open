@@ -78,7 +78,7 @@ void QnServerConnector::addConnection(const QnModuleInformation &moduleInformati
     NX_LOG(lit("QnServerConnector: Adding connection to module %1. Url = %2").arg(moduleInformation.id.toString()).arg(urlStr), cl_logINFO);
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    ec2Connection->addRemotePeer(urlStr, moduleInformation.id);
+    ec2Connection->addRemotePeer(urlStr);
 }
 
 void QnServerConnector::removeConnection(const QnModuleInformation &moduleInformation, const QUrl &url) {

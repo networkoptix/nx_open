@@ -17,6 +17,7 @@ QnPublicIPDiscovery::QnPublicIPDiscovery():
 
 void QnPublicIPDiscovery::update()
 {
+    m_ipFound = false;
     QStringList urls = MSSettings::roSettings()->value("publicIPServers", DEFAULT_URL_LIST).toString().split(";");
 
     for (int i = 0; i < urls.size(); ++i) {
@@ -43,15 +44,24 @@ void QnPublicIPDiscovery::at_reply_finished(QNetworkReply * reply)
         int ipPos = iPRegExpr.indexIn(response);
         if (ipPos >= 0) {
             QString result = response.mid(ipPos+1, iPRegExpr.matchedLength()-2);
-            if (!result.isEmpty()) {
+            if (!result.isEmpty()) 
+            {
                 QHostAddress newAddress = QHostAddress(result);
-                if (newAddress != m_publicIP) {
-                    m_publicIP = newAddress;
-                    emit found(m_publicIP);
+                if (!newAddress.isNull()) 
+                {
+                    m_ipFound = true;
+                    if (newAddress != m_publicIP) {
+                        m_publicIP = newAddress;
+                        emit found(m_publicIP);
+                    }
                 }
             }
         }
     }
     reply->deleteLater();
     m_replyInProgress--;
+    if (m_replyInProgress == 0 && !m_ipFound && !m_publicIP.isNull()) {
+        m_publicIP.clear();
+        emit found(m_publicIP);
+    }
 }
