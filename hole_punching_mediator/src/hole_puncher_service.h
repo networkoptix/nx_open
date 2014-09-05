@@ -17,9 +17,8 @@
 
 #include "hole_punching_requests_processor.h"
 #include "multi_address_server.h"
-#include "stun_stream_socket_server.h"
+#include "stun/stun_stream_socket_server.h"
 #include "http/http_stream_socket_server.h"
-//#include "stun_server_connection.h"
 
 
 class HolePuncherProcess
@@ -45,9 +44,8 @@ private:
     std::unique_ptr<MultiAddressServer<StunStreamSocketServer>> m_multiAddressStunServer;
     std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>> m_multiAddressHttpServer;
 
-    bool initialize();
-    void deinitialize();
     QString getDataDirectory();
+    int printHelp();
 };
 
 #endif  //HOLE_PUNCHER_SERVICE_H

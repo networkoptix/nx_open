@@ -17,6 +17,8 @@
 #include <utils/network/aio/aioservice.h>
 #include <utils/common/systemerror.h>
 
+#include "http/http_message_dispatcher.h"
+#include "http/register_http_handler.h"
 #include "version.h"
 
 
@@ -35,41 +37,6 @@ void HolePuncherProcess::pleaseStop()
 }
 
 int HolePuncherProcess::executeApplication()
-{
-    if( !initialize() )
-        return 1;
-
-    const int result = application()->exec();
-
-    deinitialize();
-    return result;
-}
-
-void HolePuncherProcess::start()
-{
-    QtSingleCoreApplication* application = this->application();
-
-    if( application->isRunning() )
-    {
-        NX_LOG( "Server already started", cl_logERROR );
-        application->quit();
-        return;
-    }
-}
-
-void HolePuncherProcess::stop()
-{
-    application()->quit();
-}
-
-static int printHelp()
-{
-    //TODO/IMPL
-
-    return 0;
-}
-
-bool HolePuncherProcess::initialize()
 {
     static const QLatin1String DEFAULT_LOG_LEVEL( "ERROR" );
     static const QLatin1String DEFAULT_ADDRESS_TO_LISTEN( ":3345" );
@@ -123,7 +90,7 @@ bool HolePuncherProcess::initialize()
     if( addrToListenList.empty() )
     {
         NX_LOG( "No address to listen", cl_logALWAYS );
-        return false;
+        return 1;
     }
 
     //m_multiAddressStunServer.reset( new MultiAddressServer<StunStreamSocketServer>(std::move(addrToListenList)) );
@@ -132,23 +99,52 @@ bool HolePuncherProcess::initialize()
     //if( !m_multiAddressStunServer->bind() )
     //    return false;
     if( !m_multiAddressHttpServer->bind() )
-        return false;
+        return 2;
 
     //TODO: #ak process privilege reduction should be made here
+
+    RegisterHttpHandler registerHttpHandler;
+
+    nx_http::MessageDispatcher httpMessageDispatcher;
+
+    httpMessageDispatcher.registerRequestProcessor(
+        RegisterHttpHandler::HANDLER_PATH,
+        [&registerHttpHandler](const std::weak_ptr<HttpServerConnection>& connection, nx_http::Message&& message) -> bool {
+            return registerHttpHandler.processRequest( connection, std::move(message) );
+        }
+    );
 
     //if( !m_multiAddressStunServer->listen() )
     //    return false;
     if( !m_multiAddressHttpServer->listen() )
-        return false;
+        return 3;
 
-    return true;
-}
 
-void HolePuncherProcess::deinitialize()
-{
+    const int result = application()->exec();
+
+
     //stopping accepting incoming connections
     m_multiAddressStunServer.reset();
     m_multiAddressHttpServer.reset();
+
+    return result;
+}
+
+void HolePuncherProcess::start()
+{
+    QtSingleCoreApplication* application = this->application();
+
+    if( application->isRunning() )
+    {
+        NX_LOG( "Server already started", cl_logERROR );
+        application->quit();
+        return;
+    }
+}
+
+void HolePuncherProcess::stop()
+{
+    application()->quit();
 }
 
 QString HolePuncherProcess::getDataDirectory()
@@ -165,4 +161,11 @@ QString HolePuncherProcess::getDataDirectory()
     const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
     return dataDirList.isEmpty() ? QString() : dataDirList[0];
 #endif
+}
+
+int HolePuncherProcess::printHelp()
+{
+    //TODO #ak
+
+    return 0;
 }

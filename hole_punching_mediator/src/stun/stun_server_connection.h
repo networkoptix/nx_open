@@ -21,7 +21,7 @@ class StunServerConnection
         StunServerConnection,
         StunStreamSocketServer,
         nx_stun::Message,
-        nx_stun::MessageParser<nx_stun::MessageParseHandler>,
+        nx_stun::MessageParser,
         nx_stun::MessageSerializer>
 {
 public:
@@ -29,7 +29,7 @@ public:
         StunServerConnection,
         StunStreamSocketServer,
         nx_stun::Message,
-        nx_stun::MessageParser<nx_stun::MessageParseHandler>,
+        nx_stun::MessageParser,
         nx_stun::MessageSerializer
     > BaseType;
 
