@@ -7,8 +7,9 @@
 QnServerInterfaceWatcher::QnServerInterfaceWatcher(QnRouter *router, QObject *parent) :
     QObject(parent)
 {
-    connect(router,     &QnRouter::connectionAdded,     this,   &QnServerInterfaceWatcher::at_connectionChanged, Qt::QueuedConnection);
-    connect(router,     &QnRouter::connectionRemoved,   this,   &QnServerInterfaceWatcher::at_connectionChanged, Qt::QueuedConnection);
+    connect(router,     &QnRouter::connectionAdded,     this,   &QnServerInterfaceWatcher::at_connectionChanged);
+    connect(router,     &QnRouter::connectionRemoved,   this,   &QnServerInterfaceWatcher::at_connectionChanged);
+    connect(qnResPool,  &QnResourcePool::statusChanged, this,   &QnServerInterfaceWatcher::at_resourcePool_statusChanged);
 }
 
 void QnServerInterfaceWatcher::at_connectionChanged(const QUuid &discovererId, const QUuid &peerId) {
@@ -18,12 +19,28 @@ void QnServerInterfaceWatcher::at_connectionChanged(const QUuid &discovererId, c
     if (!router)
         return;
 
-    QnRoute route = QnRouter::instance()->routeTo(peerId);
-    if (!route.isValid())
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(peerId).dynamicCast<QnMediaServerResource>();
+
+    if (!server)
         return;
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(peerId).dynamicCast<QnMediaServerResource>();
+    updatePriaryInterface(server);
+}
+
+void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr &resource) {
+    if (!resource->hasFlags(Qn::server))
+        return;
+
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
+        return;
+
+    updatePriaryInterface(server);
+}
+
+void QnServerInterfaceWatcher::updatePriaryInterface(const QnMediaServerResourcePtr &server) {
+    QnRoute route = QnRouter::instance()->routeTo(server->getId());
+    if (!route.isValid())
         return;
 
     server->setPrimaryIF(route.points.last().host);

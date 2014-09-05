@@ -3,6 +3,8 @@
 
 #include <QtCore/QObject>
 
+#include <core/resource/resource_fwd.h>
+
 class QnRouter;
 
 class QnServerInterfaceWatcher : public QObject {
@@ -12,6 +14,10 @@ public:
 
 private slots:
     void at_connectionChanged(const QUuid &discovererId, const QUuid &peerId);
+    void at_resourcePool_statusChanged(const QnResourcePtr &resource);
+
+private:
+    void updatePriaryInterface(const QnMediaServerResourcePtr &server);
 };
 
 #endif // SERVER_INTERFACE_WATCHER_H
