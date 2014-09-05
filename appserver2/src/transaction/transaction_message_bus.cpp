@@ -638,12 +638,14 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         }
 
         QnTransaction<ApiModuleDataList> tranModules = prepareModulesDataTransaction();
+        QnTransaction<ApiConnectionDataList> tranConnections = prepareConnectionsDataTransaction();
         tranModules.peerID = m_localPeer.id;
 
         transport->setWriteSync(true);
         sendRuntimeInfo(transport, processedPeers);
         transport->sendTransaction(tran, processedPeers);
         transport->sendTransaction(tranModules, processedPeers);
+        transport->sendTransaction(tranConnections, processedPeers);
         transport->setReadSync(true);
 
         //sending local time information on known servers
@@ -772,26 +774,6 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
         emit peerLost(aliveData);
 }
 
-void QnTransactionMessageBus::sendConnectionsData()
-{
-    if (!QnRouter::instance())
-        return;
-
-    QnTransaction<ApiConnectionDataList> transaction(ApiCommand::availableConnections);
-
-    QMultiHash<QUuid, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
-    for (auto it = connections.begin(); it != connections.end(); ++it) {
-        ApiConnectionData connection;
-        connection.discovererId = it.key();
-        connection.peerId = it->id;
-        connection.host = it->host;
-        connection.port = it->port;
-        transaction.params.push_back(connection);
-    }
-
-    sendTransaction(transaction);
-}
-
 QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTransaction() const {
     QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList);
 
@@ -812,6 +794,32 @@ void QnTransactionMessageBus::sendModulesData()
         return;
 
     QnTransaction<ApiModuleDataList> transaction = prepareModulesDataTransaction();
+    sendTransaction(transaction);
+}
+
+QnTransaction<ApiConnectionDataList> QnTransactionMessageBus::prepareConnectionsDataTransaction() const
+{
+    QnTransaction<ApiConnectionDataList> transaction(ApiCommand::availableConnections);
+
+    QMultiHash<QUuid, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
+    for (auto it = connections.begin(); it != connections.end(); ++it) {
+        ApiConnectionData connection;
+        connection.discovererId = it.key();
+        connection.peerId = it->id;
+        connection.host = it->host;
+        connection.port = it->port;
+        transaction.params.push_back(connection);
+    }
+
+    return transaction;
+}
+
+void QnTransactionMessageBus::sendConnectionsData()
+{
+    if (!QnRouter::instance())
+        return;
+
+    QnTransaction<ApiConnectionDataList> transaction = prepareConnectionsDataTransaction();
     sendTransaction(transaction);
 }
 

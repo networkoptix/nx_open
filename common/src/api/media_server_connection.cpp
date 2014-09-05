@@ -345,9 +345,13 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     setUrl(mserver->getApiUrl());
     setSerializer(QnLexical::newEnumSerializer<RequestObject, int>());
 
-    QnRequestHeaderList extraHeaders;
     QString guid = mserver->getProperty(lit("guid"));
+
+    QnRequestHeaderList extraHeaders;
     extraHeaders.insert(lit("x-server-guid"), guid.isEmpty() ? mserver->getId().toString() : guid);
+
+    setExtraQueryParameters(extraHeaders);
+
     if (!videowallGuid.isNull())
         extraHeaders.insert(lit("X-NetworkOptix-VideoWall"), videowallGuid.toString());
     setExtraHeaders(extraHeaders);
@@ -359,17 +363,6 @@ QnMediaServerConnection::~QnMediaServerConnection() {
 
 QnAbstractReplyProcessor *QnMediaServerConnection::newReplyProcessor(int object) {
     return new QnMediaServerReplyProcessor(object);
-}
-
-void QnMediaServerConnection::setProxyAddr(const QUrl &apiUrl, const QString &addr, int port) {
-    m_proxyAddr = addr;
-    m_proxyPort = port;
-
-    if (port) {
-        QnNetworkProxyFactory::instance()->addToProxyList(apiUrl.host(), addr, port);
-    } else {
-        QnNetworkProxyFactory::instance()->removeFromProxyList(apiUrl.host());
-    }
 }
 
 int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const

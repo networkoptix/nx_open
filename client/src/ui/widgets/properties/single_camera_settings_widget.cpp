@@ -225,15 +225,13 @@ void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout ,
         bool showUrl = resourceData.value<bool>(lit("showUrl"), false);
         if ( showUrl && m_camera->getStatus() != Qn::Offline )
         {
-            QnNetworkProxyFactory::instance()->removeFromProxyList(m_lastCameraPageUrl.host());
-            
             m_lastCameraPageUrl = QString(QLatin1String("http://%1:%2/%3")).
                 arg(m_camera->getHostAddress()).arg(m_camera->httpPort()).
                 arg(resourceData.value<QString>(lit("urlLocalePath"), QString()));
             m_lastCameraPageUrl.setUserName( m_camera->getAuth().user() );
             m_lastCameraPageUrl.setPassword( m_camera->getAuth().password() );
+            m_cameraAdvancedSettingsWebPage->networkAccessManager()->setProxy(QnNetworkProxyFactory::instance()->proxyToResource(m_camera));
 
-            QnNetworkProxyFactory::instance()->bindHostToResource( m_lastCameraPageUrl.host(), m_camera );
             advancedWebView->reload();
             advancedWebView->load( QNetworkRequest(m_lastCameraPageUrl) );
             advancedWebView->show();

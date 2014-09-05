@@ -76,10 +76,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 
     if (ownResource.isNull()) {
         qnResPool->addResource(resource);
-        if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
-            determineOptimalIF(mediaServer);
     } else {
-        Qn::ResourceStatus oldStatus = ownResource->getStatus();
         ownResource->update(resource);
 
         if (QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>()) {
@@ -90,9 +87,6 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
                         mediaServer->setStatus(Qn::Online);
                 }
             }
-
-            if (oldStatus != mediaServer->getStatus())
-                determineOptimalIF(mediaServer);
         }
     }
 
@@ -132,21 +126,6 @@ void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
                 serverCamera->setTmpStatus(Qn::NotDefined);
         }
     }
-}
-
-void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr &resource)
-{
-    return;
-    // set proxy. If some servers IF will be found, proxy address will be cleared
-    const QString& proxyAddr = QnAppServerConnectionFactory::url().host();
-    resource->apiConnection()->setProxyAddr(
-        resource->getApiUrl(),
-        proxyAddr,
-        QnAppServerConnectionFactory::url().port() );    //starting with 2.3 proxy embedded to Server
-    disconnect(resource.data(), NULL, this, NULL);
-    connect(resource.data(), &QnMediaServerResource::serverIfFound, this, &QnClientMessageProcessor::at_serverIfFound);
-
-    resource->determineOptimalNetIF();
 }
 
 void QnClientMessageProcessor::updateServerTmpStatus(const QUuid& id, Qn::ResourceStatus status)
@@ -216,10 +195,4 @@ void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
 
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     m_incompatibleServerAdder = new QnIncompatibleServerAdder(this);
-}
-
-void QnClientMessageProcessor::at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url, const QString& origApiUrl)
-{
-    if (url != QLatin1String("proxy"))
-        resource->apiConnection()->setProxyAddr(origApiUrl, QString(), 0);
 }
