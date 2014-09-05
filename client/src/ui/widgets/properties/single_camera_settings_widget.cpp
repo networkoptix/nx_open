@@ -230,6 +230,7 @@ void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout ,
                 arg(resourceData.value<QString>(lit("urlLocalePath"), QString()));
             m_lastCameraPageUrl.setUserName( m_camera->getAuth().user() );
             m_lastCameraPageUrl.setPassword( m_camera->getAuth().password() );
+            m_lastCameraPageUrl = QnNetworkProxyFactory::instance()->urlToResource(m_lastCameraPageUrl, m_camera);
 
             advancedWebView->reload();
             advancedWebView->load( QNetworkRequest(m_lastCameraPageUrl) );
