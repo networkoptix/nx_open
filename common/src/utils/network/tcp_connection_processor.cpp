@@ -147,10 +147,6 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
         sended = d->socket->send(data, size);
         if( sended <= 0 )
             break;
-
-#ifdef DEBUG_RTSP
-        dumpRtspData(data, sended);
-#endif
         data += sended;
         size -= sended;
     }
@@ -227,9 +223,7 @@ bool QnTCPConnectionProcessor::sendChunk( const char* data, int size )
     result.append(data, size);  //TODO/IMPL avoid copying by implementing writev in socket
     result.append("\r\n");
 
-    int sended;
-    sended = d->socket->send(result);
-    return sended == result.size();
+    return sendData( result.constData(), result.size() );
 }
 
 QString QnTCPConnectionProcessor::codeToMessage(int code)
