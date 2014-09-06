@@ -27,16 +27,15 @@ Improvements:
 3496 In multi-server system the version of servers may be different as they are cross-compatible. However it is strongly recommended to have exact same builds to avoid issues and to simplify investigations in case of a problem. Thus, if there is Servers of other versions, they are displayed in red in the About dialog
 3280 Mouse wheel zoom behavior changed when viewing several videos (used to be Mouse Wheel or ALT+Mouse Wheel)
 3492 Now it is possible to set up E-Mail notifications template (System Settings).
-3643 Use Alt+Enter for fullscreen, ESC for cancel
-3707 3884 Login dialog improvements
-3672 Add possibility to delete invalid licenses
-??? 3689 Add parameter 'mode' to activate license request. If parameter 'mode=info' license server should not generate license signature and don't insert license to database.
-3525 Add "Force rotation" on "Camera settings -> Default"
-3423 autodiscovery improved
-2466 media server conflicts - message should contain the specific list of cameras with ip and mac addresses which is used by both servers.
-3019 Add more default event rules into installer 
-3578 If connection to EC is lost, display appropriate message
-3258 Support streaming without transcoding (HLS)
+3643 ESC behavior changed. Use Alt+Enter for fullscreen, ESC for cancel (ESC used to toggle fullscreen)
+3707 3884 Login dialog improvements: admin is automatically put as username. Moreover session can be saved with password (If Auto-Login is checked and user saves the connection)
+3672 Add possibility to delete invalid and expired licenses
+3525 Ability to save camera rotation ("Force rotation" option on "Camera settings -> Default")
+3423 Autodiscovery improved
+2466 Media server conflicts notification improved. Now message contains the specific list of cameras that are used by both servers.
+3019 More default event rules are added: ..............
+3578 If connection to Server is lost, the appropriate message is displayed
+3258 Support streaming without transcoding to mobile devices (HLS). This may greatly reduce Server load 
 3629 Error messages when activating licenses improved
 3353 Add version to login dialog and "beta version" message
 3582 Add possibility to delete online cameras from resource tree
@@ -60,6 +59,7 @@ Archive indexes move to DB (база с индексами хранится на каждом сторедже..кстати
   #3917 Added a new event "License issue". 
 Improved PTZ control (Рома переделывал его..теперь должно не так сильно тормозить и дергаться)
 
+??? 3689 Add parameter 'mode' to activate license request. If parameter 'mode=info' license server should not generate license signature and don't insert license to database.
 3667 Added ability to send support e-mail in the About dialog
 3799 feedback form for users 
 3883 Never suggest to save layout 
