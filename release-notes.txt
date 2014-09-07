@@ -1,39 +1,41 @@
 ----------------------------------------------2.3.0.xxxx-------------------------------------------
 Features:
 
-Video Wall
-No Single Point of Failure
-Failover
-793 Automatic cameras move to reserve servers
-Server API & SDK
-Edge (SWARM)
-Universal Fisheye Dewarping
-Max/Min Recording Time per Camera
-One-Click System-Wide Upgrades
-Web Based Camera Settings (ISD Cam, Vista?)
-Paxton ACS Integration Plug-In
+Video Wall. Allows users to control unlimited number of monitors in the realtime mode.
+No Single Point of Failure. Previous versions the database was stored on Enterprise Controller. In case of EC failure the whole system was down. Now database is being replicated to each server, so there are no central component. If a server is down, the system continues working. 
+Failover. In case of server failure the cameras will be transferred to other servers (793 Automatic cameras move to reserve servers)
+Server API & SDK. SDK provides an easy way to easily integrate various devices into VMS and API allows integrating third-party application with Server. API and SDK are available on the web page of Server.
+Edge (SWARM). Due to decent architectural changes Server can be run on potentially any ARM device, including cameras that support EDGE technology. This allows running Server on a small low-cost boxes, or even without any dedicated server!
+Universal Fisheye Dewarping. Now almost all type of fish-eye lenses are supported.
+Max/Min Recording Time per Camera. Ability to specify the minimum and maximum amount of footage according to recording policies. This setting is per-camera. For instance, one camera can store only 3 days of storage and another-one at least 5 days.
+One-Click System-Wide Upgrades. It is possible to upgrade the whole system to a newer version or to a specific build from a single machine Client is rinning on (Administrative privilege required). If the system is in a isolated network, then the special file is created. If run this file, it will download the upgrade package to a jumpdrive. This jumpdrive should pe plugged in the computer Client is running on. After that the system can be updated in one click.
+Web Based Camera Settings. Ability to display camera's web page inside VMS to be able to fully control cameras. 
+Paxton ACS Integration Plug-In. 
 Camera Groups via Views
-Web Client Removal
+Web Client Removal. Redesigned web client will be introduced in the upcoming version. Mobile clients are still included.
+#3738 Joining Systems and server to system (Other systems in resource tree). Now it is possible to join different systems. In this case the licenses will be combined. 
+  #3839 Routing management
+Server web page introduced. Unlike traytool, it allows users to manage server from a remote computer. Moreover it provides additional functionality to control Server: ..............
+3593 System Administration - All system-related settings are combined in te single form to simplify setup and user experience.
 
-Server web page
-3593 System Administration
+
+Improvements:
+
 3881 3568 Main Menu and Context Menu reorganized
 3539 ctrl + alt + t to disable background animation
 3569 Preview Search simplified
-3496 Old Media servers in About displayed in red
-3667 support e-mail on about
-3280 mouse wheel zoom behavior changed
-3492 Add possibility of the template changing to the system settings.
-3643 Use Alt+Enter for fullscreen, ESC for cancel
-3707 3884 Login dialog improvements
-3672 Add possibility to delete invalid licenses
-??? 3689 Add parameter 'mode' to activate license request. If parameter 'mode=info' license server should not generate license signature and don't insert license to database.
-3525 Add "Force rotation" on "Camera settings -> Default"
-3423 autodiscovery improved
-2466 media server conflicts - message should contain the specific list of cameras with ip and mac addresses which is used by both servers.
-3019 Add more default event rules into installer 
-3578 If connection to EC is lost, display appropriate message
-3258 Support streaming without transcoding (HLS)
+3496 In multi-server system the version of servers may be different as they are cross-compatible. However it is strongly recommended to have exact same builds to avoid issues and to simplify investigations in case of a problem. Thus, if there is Servers of other versions, they are displayed in red in the About dialog
+3280 Mouse wheel zoom behavior changed when viewing several videos (used to be Mouse Wheel or ALT+Mouse Wheel)
+3492 Now it is possible to set up E-Mail notifications template (System Settings).
+3643 ESC behavior changed. Use Alt+Enter for fullscreen, ESC for cancel (ESC used to toggle fullscreen)
+3707 3884 Login dialog improvements: admin is automatically put as username. Moreover session can be saved with password (If Auto-Login is checked and user saves the connection)
+3672 Add possibility to delete invalid and expired licenses
+3525 Ability to save camera rotation ("Force rotation" option on "Camera settings -> Default")
+3423 Autodiscovery improved
+2466 Media server conflicts notification improved. Now message contains the specific list of cameras that are used by both servers.
+3019 More default event rules are added: ..............
+3578 If connection to Server is lost, the appropriate message is displayed
+3258 Support streaming without transcoding to mobile devices (HLS). This may greatly reduce Server load 
 3629 Error messages when activating licenses improved
 3353 Add version to login dialog and "beta version" message
 3582 Add possibility to delete online cameras from resource tree
@@ -51,11 +53,17 @@ Server web page
 3137: Remove redundant information from progress bar during multi-video export
 3276: Remove group element for generic rtsp/http links
 3167: Windows XP support
-1779: External Storage support
+1779: External Storage support for Linux #1779 Improved "Add external storage" for windows
+#3595 memory and cpu usage in the logs
+Archive indexes move to DB (база с индексами хранится на каждом сторедже..кстати, кейса я не нашла..если найдешь, скинь, плиз)
+  #3917 Added a new event "License issue". 
+Improved PTZ control (Рома переделывал его..теперь должно не так сильно тормозить и дергаться)
 
+??? 3689 Add parameter 'mode' to activate license request. If parameter 'mode=info' license server should not generate license signature and don't insert license to database.
+3667 Added ability to send support e-mail in the About dialog
 3799 feedback form for users 
 3883 Never suggest to save layout 
-
+#2658 Timeline and last minute - ???
 
 BUGS
 3659 Double-click works incorrectly in Dewarping mode if panoramic is 360°
@@ -102,6 +110,15 @@ BUGS
 3781: Motion mask is displayed for multi-video only when video is played backward
 3122: IOS - Camera streaming isn't loading for remote connections (EC and MS are in different networks)
 3109: Chunks flickering while playback (Linux)
+#3540 Wrong CPU usage on health monitoring. Windows 8.
+#3283 Smart Search doesn't work for generic rtsp/http links on Linux after rebuilding archive index
+ Vista:
+ #3710 Shows Pan and Tilt GUI on Motorised Zoom Only Camera's
+ #3693 Database Backup not working correctly
+Changed profile's name for Onvif and Axis cameras (for Vista it was in 2.1).
+
+
+
 
 ----------------------------------------------2.2.1.xxxx-------------------------------------------
 
