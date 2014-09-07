@@ -145,14 +145,12 @@ uchar* rotateImage(AVFrame& pict, int rotate)
             }
         }
         else {
-            if (rotate == 90) 
-            {
-                for (int y = 0; y < h; ++y) {
-                    quint8* src = pict.data[i] + pict.linesize[i] * y;
-                    quint8* dst = dstPict.data[i] + dstPict.linesize[i] * (h-1-y) + w-1;
-                    for (int x = 0; x < w; ++x) {
-                        *dst-- = *src++;
-                    }
+            for (int y = 0; y < h; ++y) {
+                quint8* src = pict.data[i] + pict.linesize[i] * y;
+                quint8* dst = dstPict.data[i] + dstPict.linesize[i] * (w - 1) + y;
+                for (int x = 0; x < w; ++x) {
+                    *dst = *src++;
+                    dst -= dstPict.linesize[i];
                 }
             }
         }
@@ -174,6 +172,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
     QByteArray colorSpace("argb");
     QSize dstSize;
     int rotate = 0;
+    bool rotateDefined = false;
 
     for (int i = 0; i < params.size(); ++i)
     {
@@ -192,6 +191,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         }
         else if (params[i].first == "rotate") {
             rotate = params[i].second.toInt();
+            rotateDefined = true;
         }
         else if (params[i].first == "method") {
             QString val = params[i].second.toLower().trimmed(); 
@@ -239,6 +239,9 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         result.append("</root>\n");
         return CODE_INVALID_PARAMETER;
     }
+
+    if (!rotateDefined)
+        rotate = res->getProperty(QnMediaResource::rotationKey()).toInt();
 
 #ifdef EDGE_SERVER
     if (dstSize.height() < 1)
@@ -357,20 +360,21 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
     if (format == "jpg" || format == "jpeg")
     {
         // prepare image using ffmpeg encoder
+        AVFrame dstPict;
+        dstPict.width = dstSize.width();
+        dstPict.height = dstSize.height();
+        dstPict.format = outFrame->format;
+        if (dstPict.format == PIX_FMT_YUV422P)
+            dstPict.format = PIX_FMT_YUV420P; // avoid different pixel dense for X and Y. It's avoid rotation problem
 
-        int numBytes = avpicture_get_size((PixelFormat) outFrame->format, roundedWidth, roundedHeight);
+        int numBytes = avpicture_get_size((PixelFormat) dstPict.format, roundedWidth, roundedHeight);
         uchar* scaleBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
         SwsContext* scaleContext = sws_getContext(outFrame->width, outFrame->height, PixelFormat(outFrame->format), 
-            dstSize.width(), dstSize.height(), (PixelFormat) outFrame->format, SWS_BICUBIC, NULL, NULL, NULL);
+            dstPict.width, dstPict.height, (PixelFormat)dstPict.format, SWS_BICUBIC, NULL, NULL, NULL);
 
-        AVFrame dstPict;
-        avpicture_fill((AVPicture*) &dstPict, scaleBuffer, (PixelFormat) outFrame->format, roundedWidth, roundedHeight);
+        avpicture_fill((AVPicture*) &dstPict, scaleBuffer, (PixelFormat) dstPict.format, roundedWidth, roundedHeight);
         sws_scale(scaleContext, outFrame->data, outFrame->linesize, 0, outFrame->height, dstPict.data, dstPict.linesize);
         sws_freeContext(scaleContext);
-
-        dstPict.width = roundedWidth;
-        dstPict.height = roundedHeight;
-        dstPict.format = outFrame->format;
 
         if (rotate != 0) {
             uchar* newbuffer = rotateImage(dstPict, rotate);
@@ -381,7 +385,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         AVCodecContext* videoEncoderCodecCtx = avcodec_alloc_context3(0);
         videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         videoEncoderCodecCtx->codec_id = (format == "jpg" || format == "jpeg") ? CODEC_ID_MJPEG : CODEC_ID_PNG;
-        videoEncoderCodecCtx->pix_fmt = updatePixelFormat((PixelFormat) outFrame->format);
+        videoEncoderCodecCtx->pix_fmt = updatePixelFormat((PixelFormat) dstPict.format);
         videoEncoderCodecCtx->width = dstPict.width;
         videoEncoderCodecCtx->height = dstPict.height;
         videoEncoderCodecCtx->bit_rate = dstPict.width*dstPict.height;
