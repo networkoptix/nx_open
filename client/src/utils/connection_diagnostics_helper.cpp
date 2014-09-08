@@ -100,7 +100,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             " - Client version: %1.\n"
             " - Server version: %2.\n"
             "The other version of the Client is needed in order to establish the connection to this Server."
-            ).arg(QLatin1String(qnCommon->engineVersion().toString())).arg(connectionInfo.version.toString()),
+            ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()),
             QMessageBox::Ok
             );
 #endif
@@ -133,7 +133,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 " - Client version: %1.\n"
                 " - Server version: %2.\n"
                 "The other version of the Client is needed in order to establish the connection to this Server."
-                ).arg(QLatin1String(qnCommon->engineVersion().toString())).arg(connectionInfo.version.toString()),
+                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()),
                 QMessageBox::Ok
                 );
 #endif

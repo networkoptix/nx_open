@@ -11,6 +11,7 @@ extern "C"
 
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
+#include <api/network_proxy_factory.h>
 
 #include <core/datapacket/media_data_packet.h>
 #include <core/resource_management/resource_pool.h>
@@ -781,7 +782,9 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
         session->setAdditionAttribute("X-NetworkOptix-VideoWall", m_auth.videowall.toString().toUtf8());
 
     if (server) {
-        session->setProxyAddr(server->getProxyHost(), server->getProxyPort());
+        QNetworkProxy proxy = QnNetworkProxyFactory::instance()->proxyToResource(server);
+        if (proxy.type() != QNetworkProxy::NoProxy)
+            session->setProxyAddr(proxy.hostName(), proxy.port());
         session->setAdditionAttribute("x-server-guid", server->getId().toByteArray());
     }
 

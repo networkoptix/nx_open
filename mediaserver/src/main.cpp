@@ -987,7 +987,8 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
 void QnMain::at_localInterfacesChanged()
 {
     auto intfList = allLocalAddresses();
-    intfList << m_publicAddress;
+    if (!m_publicAddress.isNull())
+        intfList << m_publicAddress;
     m_mediaServer->setNetAddrList(intfList);
 
     QString defaultAddress = QUrl(m_mediaServer->getApiUrl()).host();
@@ -1370,7 +1371,7 @@ void QnMain::run()
     if( QnAppServerConnectionFactory::url().scheme().toLower() == lit("file") )
         ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
 
-    nx_hls::HLSSessionPool hlsSessionPool;
+    std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
     if( !initTcpListener() )
     {
@@ -1577,7 +1578,7 @@ void QnMain::run()
     QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder(m_moduleFinder));
     globalModuleFinder->setConnection(ec2Connection);
 
-    QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder));
+    QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder, false));
     router->setConnection(ec2Connection);
 
     QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
@@ -1729,6 +1730,8 @@ void QnMain::run()
     stopObjects();
 
     QnResource::stopCommandProc();
+
+    hlsSessionPool.reset();
 
     delete QnRecordingManager::instance();
     QnRecordingManager::initStaticInstance( NULL );

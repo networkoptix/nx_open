@@ -47,10 +47,6 @@ public:
     QnMediaServerConnection(QnMediaServerResource* mserver, const QUuid& videowallGuid = QUuid(), QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
 
-    void setProxyAddr(const QUrl &apiUrl, const QString &addr, int port);
-    int getProxyPort() { return m_proxyPort; }
-    QString getProxyHost() { return m_proxyAddr; }
-
     int getTimePeriodsAsync(
         const QnNetworkResourceList &list,
         qint64 startTimeMs, 

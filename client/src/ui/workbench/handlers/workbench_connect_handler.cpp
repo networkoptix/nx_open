@@ -40,6 +40,7 @@
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/synctime.h>
 #include <utils/network/global_module_finder.h>
+#include <utils/network/router.h>
 
 namespace {
     const int videowallReconnectTimeoutMSec = 5000;
@@ -282,6 +283,7 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl) {
     context()->setUserName(appServerUrl.userName());
 
     QnGlobalModuleFinder::instance()->setConnection(result.connection());
+    QnRouter::instance()->setConnection(result.connection());
 
     return true;
 }
@@ -296,6 +298,9 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
     }
 
     hideMessageBox();
+
+    QnGlobalModuleFinder::instance()->setConnection(NULL);
+    QnRouter::instance()->setConnection(NULL);
 
     QnClientMessageProcessor::instance()->init(NULL);
 

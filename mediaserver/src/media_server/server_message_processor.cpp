@@ -92,10 +92,11 @@ void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
 void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) 
 {
-    if (resource->getId() == qnCommon->moduleGUID() && resource->getStatus() != Qn::Online)
+    if (resource->getId() == qnCommon->moduleGUID() && status != Qn::Online)
     {
         // it's own server. change status to online
         QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(resource->getId(), Qn::Online);
+        resource->setStatus(Qn::Online, true);
     }
     else {
         resource->setStatus(status, true);

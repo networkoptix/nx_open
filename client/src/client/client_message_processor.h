@@ -29,9 +29,7 @@ private slots:
     void at_remotePeerFound(ec2::ApiPeerAliveData data);
     void at_remotePeerLost(ec2::ApiPeerAliveData data);
     void at_systemNameChangeRequested(const QString &systemName);
-    void at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url, const QString&origApiUrl );
 private:
-    void determineOptimalIF(const QnMediaServerResourcePtr &resource);
     void updateServerTmpStatus(const QUuid& id, Qn::ResourceStatus status);
     void checkForTmpStatus(const QnResourcePtr& resource);
 

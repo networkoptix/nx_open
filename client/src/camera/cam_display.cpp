@@ -403,26 +403,25 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     //qDebug() << "vd->flags & QnAbstractMediaData::MediaFlags_FCZ" << (vd->flags & QnAbstractMediaData::MediaFlags_FCZ);
 
+    bool canSwitchToMT = isFullScreen() || qnRedAssController->counsumerCount() == 1;
+    bool shouldSwitchToMT = (m_isRealTimeSource && m_totalFrames > 100 && m_dataQueue.size() >= m_dataQueue.size()-1) || !m_isRealTimeSource;
+    if (canSwitchToMT && shouldSwitchToMT) {
+        if (!m_useMTRealTimeDecode) {
+            m_useMTRealTimeDecode = true;
+            setMTDecoding(true); 
+        }
+    }
+    else {
+        m_totalFrames = 0;
+        if (m_useMTRealTimeDecode) {
+            m_useMTRealTimeDecode = false;
+            setMTDecoding(false); 
+        }
+    }
+
+
     if (m_isRealTimeSource)
     {
-
-        if (isFullScreen() || qnRedAssController->counsumerCount() == 1) {
-            if (m_dataQueue.size() >= m_dataQueue.maxSize()-1)
-            {
-                // looks like not enought CPU for camera with high FPS value. I've add fps to switch logic to reduce real-time lag (MT decoding has addition 2-th frame delay)
-                if (m_totalFrames > 100 && !m_useMTRealTimeDecode) {
-                    m_useMTRealTimeDecode = true;
-                    setMTDecoding(true); 
-                }
-            }
-        }
-        else {
-            m_totalFrames = 0;
-            if (m_useMTRealTimeDecode) {
-                m_useMTRealTimeDecode = false;
-                setMTDecoding(false); 
-            }
-        }
 
         if (m_firstLivePacket) {
             m_delay.afterdelay();
@@ -1219,11 +1218,14 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
                     if (!(vd->flags & AV_REVERSE_BLOCK_START) && vd->timestamp - m_lastVideoPacketTime < -MIN_VIDEO_DETECT_JUMP_INTERVAL*3)
                     {
                         // I have found avi file where sometimes 290 ms between frames. At reverse mode, bad afterJump affect file very strong
+                        m_buffering = getBufferingMask();
                         afterJump(vd);
                     }
                 }
-                else
+                else {
+                    m_buffering = getBufferingMask();
                     afterJump(vd);
+                }
             }
             m_lastVideoPacketTime = vd->timestamp;
 

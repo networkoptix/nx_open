@@ -1,3 +1,7 @@
+INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_condition",schedule,system,comments,disabled,"action_type","event_state",id,"event_type" ) VALUES ( '21600','{  }','{  }',NULL,'0',NULL,'0','6','2','20','9' );
+INSERT INTO "vms_businessrule_action_resources" ( "businessrule_id","resource_id" ) VALUES ( '20','1' );
+
+
 update vms_resource set guid = id
 where guid = "";
 
