@@ -19,29 +19,13 @@ class QnRestUpdatePeerTask;
 class QnMediaServerUpdateTool : public QObject {
     Q_OBJECT
 public:
-    enum State {
-        Idle,
-        CheckingForUpdates,
-        DownloadingUpdate,
-        InstallingToIncompatiblePeers,
-        UploadingUpdate,
-        InstallingClientUpdate,
-        InstallingUpdate,
-    };
-
     QnMediaServerUpdateTool(QObject *parent = 0);
     ~QnMediaServerUpdateTool();
 
-    State state() const;
+    QnFullUpdateStage stage() const;
 
     bool isUpdating() const;
     bool idle() const;
-
-    void updateServers();
-
-    QnSoftwareVersion targetVersion() const;
-
-    QnPeerUpdateInformation updateInformation(const QUuid &peerId) const;
 
     QnMediaServerResourceList targets() const;
     void setTargets(const QSet<QUuid> &targets, bool client = false);
@@ -51,47 +35,39 @@ public:
 
     /** Generate url for download update file, depending on actual targets list. */
     QUrl generateUpdatePackageUrl(const QnSoftwareVersion &targetVersion) const;
-
-    void reset();
-
-    bool isClientRequiresInstaller() const;
 signals:
-    void stateChanged(int state);
+    void stageChanged(QnFullUpdateStage stage);
     void progressChanged(int progress);
-    void peerChanged(const QUuid &peerId);
+    void peerStageChanged(const QUuid &peerId, QnPeerUpdateStage stage);
+    void peerProgressChanged(const QUuid &peerId, int progress);
+
     void targetsChanged(const QSet<QUuid> &targets);
 
-    void checkForUpdatesFinished(QnCheckForUpdateResult result);
+    void checkForUpdatesFinished(const QnCheckForUpdateResult &result);
     void updateFinished(QnUpdateResult result);
 
 public slots:
     void checkForUpdates(const QnSoftwareVersion &version = QnSoftwareVersion(), bool denyMajorUpdates = false);
     void checkForUpdates(const QString &fileName);
+
+    void startUpdate(const QnSoftwareVersion &version = QnSoftwareVersion(), bool denyMajorUpdates = false);
+    void startUpdate(const QString &fileName);
+
     bool cancelUpdate();
 
-private slots:
-    void at_checkForUpdatesTask_finished(int errorCode);
-        
-    void at_taskProgressChanged(int progress);
-    void at_networkTask_peerProgressChanged(const QUuid &peerId, int progress);
 private:
-    void setState(State state);
+    void startUpdate(const QnUpdateTarget &target);
+    void checkForUpdates(const QnUpdateTarget &target);
+
+    void setStage(QnFullUpdateStage stage);
     void finishUpdate(QnUpdateResult result);
     
-    void removeTemporaryDir();
-
 private:
-    QThread *m_tasksThread;
-    State m_state;
+    QnFullUpdateStage m_stage;
     
-    bool m_targetMustBeNewer;
-
     QnUpdateProcess* m_updateProcess;
 
     QnMediaServerResourceList m_targets;
-
-    QnCheckForUpdatesPeerTask *m_checkForUpdatesPeerTask;
-
     
     bool m_disableClientUpdates;
 };

@@ -47,7 +47,7 @@ QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *c
     connect(m_configureTask,            &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_configureTask_finished);
     connect(m_waitTask,                 &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_waitTask_finished);
     // queued connection is used to be sure that we'll get this signal AFTER it will be handled by update dialog
-    connect(m_updateTool,               &QnMediaServerUpdateTool::stateChanged,     this,       &QnConnectToCurrentSystemTool::at_updateTool_stateChanged, Qt::QueuedConnection);
+ //   connect(m_updateTool,               &QnMediaServerUpdateTool::stateChanged,     this,       &QnConnectToCurrentSystemTool::at_updateTool_stateChanged, Qt::QueuedConnection);
 }
 
 QnConnectToCurrentSystemTool::~QnConnectToCurrentSystemTool() {}
@@ -189,8 +189,10 @@ void QnConnectToCurrentSystemTool::at_updateTool_stateChanged(int state) {
     if (!m_running)
         return;
 
+/*
     if (state != QnMediaServerUpdateTool::Idle)
         return;
+*/
 
     if (m_prevToolState == CheckingForUpdates) {
     /*    switch (m_updateTool->updateCheckResult()) {

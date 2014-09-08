@@ -42,7 +42,7 @@ public:
 private slots:
     void updateUi();
 
-    void at_checkForUpdatesFinished(QnCheckForUpdateResult result);
+    void at_checkForUpdatesFinished(const QnCheckForUpdateResult &result);
     void at_updateFinished(QnUpdateResult result);
 private:
     void initMenu();

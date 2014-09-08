@@ -32,19 +32,10 @@ namespace {
 
 QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     QObject(parent),
-    m_tasksThread(new QThread(this)),
-    m_state(Idle),
-    m_targetMustBeNewer(true),
+    m_stage(QnFullUpdateStage::Init),
     m_updateProcess(NULL),
-    m_checkForUpdatesPeerTask(new QnCheckForUpdatesPeerTask()),
     m_disableClientUpdates(defaultDisableClientUpdates)
 {
-    m_checkForUpdatesPeerTask->setUpdatesUrl(QUrl(qnSettings->updateFeedUrl()));
-
-    m_checkForUpdatesPeerTask->moveToThread(m_tasksThread);
-
-    connect(m_checkForUpdatesPeerTask,                  &QnNetworkPeerTask::finished,                   this,   &QnMediaServerUpdateTool::at_checkForUpdatesTask_finished);
-
     auto targetsWatcher = [this] {
         if (!m_targets.isEmpty())
             return;
@@ -56,55 +47,43 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
 }
 
 QnMediaServerUpdateTool::~QnMediaServerUpdateTool() {
-    if (m_tasksThread->isRunning()) {
-        m_tasksThread->quit();
-        m_tasksThread->wait();
-    }
-
-    delete m_checkForUpdatesPeerTask;
-
     if (m_updateProcess)
         delete m_updateProcess;
 }
 
-QnMediaServerUpdateTool::State QnMediaServerUpdateTool::state() const {
-    return m_state;
+QnFullUpdateStage QnMediaServerUpdateTool::stage() const {
+    return m_stage;
 }
 
 bool QnMediaServerUpdateTool::isUpdating() const {
-    return m_state >= DownloadingUpdate;
+    return m_stage >= QnFullUpdateStage::Download;
 }
 
 bool QnMediaServerUpdateTool::idle() const {
-    return m_state == Idle;
+    return m_stage == QnFullUpdateStage::Init;
 }
 
-void QnMediaServerUpdateTool::setState(State state) {
-    if (m_state == state)
+void QnMediaServerUpdateTool::setStage(QnFullUpdateStage stage) {
+    if (m_stage == stage)
         return;
 
-    m_state = state;
-    emit stateChanged(state);
+    m_stage = stage;
+    emit stageChanged(stage);
 
-    QnFullUpdateStage stage = QnFullUpdateStage::Download;
     int offset = 0; // infinite stages
 
-    switch (m_state) {
-    case DownloadingUpdate:
+    switch (m_stage) {
+    case QnFullUpdateStage::Download:
         break;
-    case InstallingClientUpdate:
-        stage = QnFullUpdateStage::Client;
+    case QnFullUpdateStage::Client:
         offset = 50;
         break;
-    case InstallingToIncompatiblePeers:
-        stage = QnFullUpdateStage::Incompatible;
+    case QnFullUpdateStage::Incompatible:
         offset = 50;
         break;
-    case UploadingUpdate:
-        stage = QnFullUpdateStage::Push;
+    case QnFullUpdateStage::Push:
         break;
-    case InstallingUpdate:
-        stage = QnFullUpdateStage::Servers;
+    case QnFullUpdateStage::Servers:
         offset = 50;
         break;
     default:
@@ -116,30 +95,8 @@ void QnMediaServerUpdateTool::setState(State state) {
 }
 
 void QnMediaServerUpdateTool::finishUpdate(QnUpdateResult result) {
-    m_tasksThread->quit();
-    removeTemporaryDir();
-    setState(Idle);
+    setStage(QnFullUpdateStage::Init);
     emit updateFinished(result);
-}
-
-QnSoftwareVersion QnMediaServerUpdateTool::targetVersion() const {
-    return m_updateProcess->targetVersion;
-}
-
-QnPeerUpdateInformation QnMediaServerUpdateTool::updateInformation(const QUuid &peerId) const {
-    auto it = m_updateProcess->updateInformationById.find(peerId);
-    if (it != m_updateProcess->updateInformationById.end())
-        return it.value();
-
-    QnPeerUpdateInformation info(qnResPool->getIncompatibleResourceById(peerId, true).dynamicCast<QnMediaServerResource>());
-    if (info.server && m_state == Idle) {
-        info.updateInformation = m_updateProcess->updateFiles[info.server->getSystemInfo()];
-        if (m_updateProcess->targetVersion.isNull())
-            info.state = QnPeerUpdateInformation::UpdateUnknown;
-        else
-            info.state = info.updateInformation ? QnPeerUpdateInformation::UpdateFound : QnPeerUpdateInformation::UpdateNotFound;
-    }
-    return info;
 }
 
 QnMediaServerResourceList QnMediaServerUpdateTool::targets() const {
@@ -222,113 +179,25 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &
     return url;
 }
 
-void QnMediaServerUpdateTool::reset() {
-    if (m_state != Idle)
-        return;
-
-    if (m_updateProcess)
-        delete m_updateProcess;
-    m_updateProcess = NULL;
-
-    m_disableClientUpdates = defaultDisableClientUpdates;
-}
-
-bool QnMediaServerUpdateTool::isClientRequiresInstaller() const {
-    return m_updateProcess->clientRequiresInstaller;
-}
-
 void QnMediaServerUpdateTool::checkForUpdates(const QnSoftwareVersion &version, bool denyMajorUpdates) {
-    if (m_state >= CheckingForUpdates)
-        return;
-
-    setState(CheckingForUpdates);
-
-    QSet<QUuid> peers;
-    foreach (const QnMediaServerResourcePtr &server, actualTargets())
-        peers.insert(server->getId());
-
-    
-    m_tasksThread->start();
-    m_checkForUpdatesPeerTask->setTargetVersion(version);
-    m_checkForUpdatesPeerTask->setDisableClientUpdates(m_disableClientUpdates || qnSettings->isClientUpdateDisabled());
-    m_checkForUpdatesPeerTask->setDenyMajorUpdates(denyMajorUpdates);
-    m_checkForUpdatesPeerTask->start(peers);
+    QnUpdateTarget target(actualTargetIds(), version, m_disableClientUpdates || qnSettings->isClientUpdateDisabled(), denyMajorUpdates);
+    checkForUpdates(target);
 }
 
 void QnMediaServerUpdateTool::checkForUpdates(const QString &fileName) {
-    if (m_state >= CheckingForUpdates)
-        return;
-
-    setState(CheckingForUpdates);
-
-    QSet<QUuid> peers;
-    foreach (const QnMediaServerResourcePtr &server, actualTargets())
-        peers.insert(server->getId());
-
-    m_tasksThread->start();
-    m_checkForUpdatesPeerTask->setUpdateFileName(fileName);
-    m_checkForUpdatesPeerTask->setDisableClientUpdates(m_disableClientUpdates || qnSettings->isClientUpdateDisabled());
-    m_checkForUpdatesPeerTask->setDenyMajorUpdates(false);
-    m_checkForUpdatesPeerTask->start(peers);
+    QnUpdateTarget target(actualTargetIds(), fileName, m_disableClientUpdates || qnSettings->isClientUpdateDisabled());
+    checkForUpdates(target);
 }
 
-void QnMediaServerUpdateTool::removeTemporaryDir() {
-    if (m_updateProcess->localTemporaryDir.isEmpty())
-        return;
 
-    QDir(m_updateProcess->localTemporaryDir).removeRecursively();
-    m_updateProcess->localTemporaryDir = QString();
+void QnMediaServerUpdateTool::startUpdate(const QnSoftwareVersion &version /*= QnSoftwareVersion()*/, bool denyMajorUpdates /*= false*/) {
+    QnUpdateTarget target(actualTargetIds(), version, m_disableClientUpdates || qnSettings->isClientUpdateDisabled(), denyMajorUpdates);
+    startUpdate(target);
 }
 
-void QnMediaServerUpdateTool::updateServers() {
-    if (m_state != Idle)
-        return;
-
-    if (m_updateProcess)
-        delete m_updateProcess;
-
-    m_updateProcess = new QnUpdateProcess(actualTargets());
-    m_updateProcess->updateFiles = m_checkForUpdatesPeerTask->updateFiles();
-    m_updateProcess->localTemporaryDir = m_checkForUpdatesPeerTask->temporaryDir();
-    m_updateProcess->targetVersion = m_checkForUpdatesPeerTask->targetVersion();
-    m_updateProcess->clientRequiresInstaller = m_checkForUpdatesPeerTask->isClientRequiresInstaller();
-    m_updateProcess->clientUpdateFile = m_checkForUpdatesPeerTask->clientUpdateFile();
-    m_updateProcess->disableClientUpdates = m_checkForUpdatesPeerTask->isDisableClientUpdates();
-
-    connect(m_updateProcess, &QnUpdateProcess::peerChanged,                     this, &QnMediaServerUpdateTool::peerChanged);
-    connect(m_updateProcess, &QnUpdateProcess::taskProgressChanged,             this, &QnMediaServerUpdateTool::at_taskProgressChanged);
-    connect(m_updateProcess, &QnUpdateProcess::networkTask_peerProgressChanged, this, &QnMediaServerUpdateTool::at_networkTask_peerProgressChanged);
-    connect(m_updateProcess, &QnUpdateProcess::updateFinished,                  this, &QnMediaServerUpdateTool::finishUpdate);
-    connect(m_updateProcess, &QnUpdateProcess::targetsChanged,                  this, &QnMediaServerUpdateTool::targetsChanged);
-    connect(m_updateProcess, &QnUpdateProcess::stageChanged,                    this, [this](QnFullUpdateStage stage) {
-        QnMediaServerUpdateTool::State state = Idle;
-        switch (stage) {
-        case QnFullUpdateStage::Check:
-            state = CheckingForUpdates;
-            break;
-        case QnFullUpdateStage::Download:
-            state = DownloadingUpdate;
-            break;
-        case QnFullUpdateStage::Client:
-            state = InstallingClientUpdate;
-            break;
-        case QnFullUpdateStage::Incompatible:
-            state = InstallingToIncompatiblePeers;
-            break;
-        case QnFullUpdateStage::Push:
-            state = UploadingUpdate;
-            break;
-        case QnFullUpdateStage::Servers:
-            state = InstallingUpdate;
-            break;
-        default:
-            break;
-        }
-        setState(state);
-    });
-
-    m_tasksThread->start();
-    m_updateProcess->downloadUpdates();
+void QnMediaServerUpdateTool::startUpdate(const QString &fileName) {
+    QnUpdateTarget target(actualTargetIds(), fileName, m_disableClientUpdates || qnSettings->isClientUpdateDisabled());
+    startUpdate(target);
 }
 
 bool QnMediaServerUpdateTool::cancelUpdate() {
@@ -337,54 +206,26 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
     return m_updateProcess->cancel();
 }
 
-void QnMediaServerUpdateTool::at_checkForUpdatesTask_finished(int errorCode) {
-    m_tasksThread->quit();
-
-    m_updateProcess->updateFiles = m_checkForUpdatesPeerTask->updateFiles();
-    m_updateProcess->localTemporaryDir = m_checkForUpdatesPeerTask->temporaryDir();
-    m_updateProcess->targetVersion = m_checkForUpdatesPeerTask->targetVersion();
-    m_updateProcess->clientRequiresInstaller = m_checkForUpdatesPeerTask->isClientRequiresInstaller();
-    m_updateProcess->clientUpdateFile = m_checkForUpdatesPeerTask->clientUpdateFile();
-
-    setState(Idle);
-    emit checkForUpdatesFinished(static_cast<QnCheckForUpdateResult>(errorCode));
-}
-
-void QnMediaServerUpdateTool::at_taskProgressChanged(int progress) {
-    QnFullUpdateStage stage = QnFullUpdateStage::Download;
-    switch (m_state) {
-    case DownloadingUpdate:
-        break;
-    case UploadingUpdate:
-        stage = QnFullUpdateStage::Push;
-        break;
-    default:
-        return;
-    }
-
-    int fullProgress = (progress + static_cast<int>(stage)*100) / ( static_cast<int>(QnFullUpdateStage::Count) ) ;
-    emit progressChanged(fullProgress);
+void QnMediaServerUpdateTool::checkForUpdates(const QnUpdateTarget &target) {
+    QnCheckForUpdatesPeerTask *checkForUpdatesTask = new QnCheckForUpdatesPeerTask(target);
+    connect(checkForUpdatesTask,  &QnCheckForUpdatesPeerTask::checkFinished,  this,  &QnMediaServerUpdateTool::checkForUpdatesFinished);
+    connect(checkForUpdatesTask,  &QnNetworkPeerTask::finished,             checkForUpdatesTask, &QObject::deleteLater);
+    checkForUpdatesTask->start();
 }
 
 
-void QnMediaServerUpdateTool::at_networkTask_peerProgressChanged(const QUuid &peerId, int progress) {
+void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
+    if (m_updateProcess)
+        delete m_updateProcess;
 
-    QnPeerUpdateStage stage = QnPeerUpdateStage::Download;
+    m_updateProcess = new QnUpdateProcess(target);
+    connect(m_updateProcess, &QnUpdateProcess::stageChanged,                    this, &QnMediaServerUpdateTool::setStage);
+    connect(m_updateProcess, &QnUpdateProcess::progressChanged,                 this, &QnMediaServerUpdateTool::progressChanged);
+    connect(m_updateProcess, &QnUpdateProcess::peerStageChanged,                this, &QnMediaServerUpdateTool::peerStageChanged);
+    connect(m_updateProcess, &QnUpdateProcess::peerProgressChanged,             this, &QnMediaServerUpdateTool::peerProgressChanged);
+    connect(m_updateProcess, &QnUpdateProcess::updateFinished,                  this, &QnMediaServerUpdateTool::finishUpdate);
+    connect(m_updateProcess, &QnUpdateProcess::targetsChanged,                  this, &QnMediaServerUpdateTool::targetsChanged);
 
-    switch (m_updateProcess->updateInformationById[peerId].state) {
-    case QnPeerUpdateInformation::PendingUpload:
-    case QnPeerUpdateInformation::UpdateUploading:
-        stage = QnPeerUpdateStage::Push;
-        break;
-    case QnPeerUpdateInformation::PendingInstallation:
-    case QnPeerUpdateInformation::UpdateInstalling:
-        stage = QnPeerUpdateStage::Install;
-        progress = 50;
-        break;
-    default:
-        break;
-    }
-
-    m_updateProcess->updateInformationById[peerId].progress = (progress + static_cast<int>(stage)*100) / ( static_cast<int>(QnPeerUpdateStage::Count) ) ;
-    emit peerChanged(peerId);
+    m_updateProcess->start();
 }
+

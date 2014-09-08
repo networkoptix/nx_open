@@ -9,11 +9,11 @@ QnNetworkPeerTask::~QnNetworkPeerTask() {}
 
 void QnNetworkPeerTask::start(const QSet<QUuid> &peers) {
     m_peers = peers;
-    QMetaObject::invokeMethod(this, "doStart", Qt::QueuedConnection);
+    doStart();
 }
 
 void QnNetworkPeerTask::cancel() {
-    QMetaObject::invokeMethod(this, "doCancel", Qt::QueuedConnection);
+    doCancel();
 }
 
 QSet<QUuid> QnNetworkPeerTask::peers() const {

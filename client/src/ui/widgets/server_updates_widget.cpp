@@ -58,16 +58,16 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::VersionColumn, QHeaderView::ResizeToContents);   
 
     connect(ui->cancelButton,       &QPushButton::clicked,      m_updateTool, &QnMediaServerUpdateTool::cancelUpdate);
-    connect(ui->startUpdateButton,  &QPushButton::clicked,      m_updateTool, &QnMediaServerUpdateTool::updateServers);
+//    connect(ui->startUpdateButton,  &QPushButton::clicked,      m_updateTool, &QnMediaServerUpdateTool::updateServers);
 
-    connect(m_updateTool,       &QnMediaServerUpdateTool::stateChanged,         this,           &QnServerUpdatesWidget::updateUi);
+//    connect(m_updateTool,       &QnMediaServerUpdateTool::stateChanged,         this,           &QnServerUpdatesWidget::updateUi);
     connect(m_updateTool,       &QnMediaServerUpdateTool::progressChanged,      ui->updateProgessBar,   &QProgressBar::setValue);
     connect(m_updateTool,       &QnMediaServerUpdateTool::checkForUpdatesFinished,  this, &QnServerUpdatesWidget::at_checkForUpdatesFinished);
     connect(m_updateTool,       &QnMediaServerUpdateTool::updateFinished,           this, &QnServerUpdatesWidget::at_updateFinished);
 
     m_extraMessageTimer->setInterval(longInstallWarningTimeout);
     connect(m_extraMessageTimer, &QTimer::timeout, this, [this] {
-        if (m_updateTool->state() == QnMediaServerUpdateTool::InstallingUpdate)
+        if (m_updateTool->stage() == QnFullUpdateStage::Servers)
             ui->extraMessageLabel->show();
     });
 
@@ -272,8 +272,8 @@ void QnServerUpdatesWidget::updateUi() {
     for (QAction* action: m_updateSourceActions)
         action->setEnabled(m_updateTool->idle());
 
-    if (!m_updateTool->targetVersion().isNull())
-        ui->latestVersionLabel->setText(m_updateTool->targetVersion().toString());
+  /*  if (!m_updateTool->targetVersion().isNull())
+        ui->latestVersionLabel->setText(m_updateTool->targetVersion().toString());*/
 
     ui->startUpdateButton->setVisible(canStartUpdate() ||
         m_updateTool->isUpdating());
@@ -288,7 +288,7 @@ void QnServerUpdatesWidget::updateUi() {
     if (!m_updateTool->idle())
         ui->detailLabel->setPalette(this->palette());   /* Remove warning style. */
 
-    if (m_updateTool->state() == QnMediaServerUpdateTool::InstallingUpdate) {
+    if (m_updateTool->stage() == QnFullUpdateStage::Servers) {
         m_extraMessageTimer->start();
     } else {
         ui->extraMessageLabel->hide();
@@ -297,27 +297,27 @@ void QnServerUpdatesWidget::updateUi() {
 
     bool cancellable = false;
 
-    switch (m_updateTool->state()) {
-    case QnMediaServerUpdateTool::CheckingForUpdates:
+    switch (m_updateTool->stage()) {
+    case QnFullUpdateStage::Check:
         ui->detailLabel->setText(tr("Checking for updates..."));
         break;
-    case QnMediaServerUpdateTool::DownloadingUpdate:
+    case QnFullUpdateStage::Download:
         cancellable = true;
         ui->detailLabel->setText(tr("Downloading updates"));
         break;
-    case QnMediaServerUpdateTool::InstallingClientUpdate:
+    case QnFullUpdateStage::Client:
         cancellable = true;
         ui->detailLabel->setText(tr("Installing client update"));
         break;
-    case QnMediaServerUpdateTool::InstallingToIncompatiblePeers:
+    case QnFullUpdateStage::Incompatible:
         cancellable = true;
         ui->detailLabel->setText(tr("Installing updates to incompatible servers"));
         break;
-    case QnMediaServerUpdateTool::UploadingUpdate:
+    case QnFullUpdateStage::Push:
         cancellable = true;
         ui->detailLabel->setText(tr("Pushing updates to servers"));
         break;
-    case QnMediaServerUpdateTool::InstallingUpdate:
+    case QnFullUpdateStage::Servers:
         ui->detailLabel->setText(tr("Installing updates"));
         break;
     default:
@@ -346,13 +346,13 @@ bool QnServerUpdatesWidget::discard() {
     return true;
 }
 
-void QnServerUpdatesWidget::at_checkForUpdatesFinished(QnCheckForUpdateResult result) {
+void QnServerUpdatesWidget::at_checkForUpdatesFinished(const QnCheckForUpdateResult &result) {
     QPalette detailPalette = this->palette();
     QString detail;
 
-    switch (result) {
+    switch (result.result) {
     case QnCheckForUpdateResult::UpdateFound:
-        if (!m_updateTool->targetVersion().isNull() && m_updateTool->isClientRequiresInstaller())
+        if (!result.latestVersion.isNull() && result.clientInstallerRequired)
             detail = tr("Newer version found. You will have to update the client manually using an installer.");
         break;
     case QnCheckForUpdateResult::InternetProblem:
@@ -382,7 +382,7 @@ void QnServerUpdatesWidget::at_checkForUpdatesFinished(QnCheckForUpdateResult re
         break;
     }
 
-    bool local = (result == QnCheckForUpdateResult::InternetProblem);
+    bool local = (result.result == QnCheckForUpdateResult::InternetProblem);
 
     ui->localUpdateButton->setVisible(local);
     ui->startUpdateButton->setVisible(!local);
@@ -393,7 +393,7 @@ void QnServerUpdatesWidget::at_checkForUpdatesFinished(QnCheckForUpdateResult re
 }
 
 void QnServerUpdatesWidget::at_updateFinished(QnUpdateResult result) {
-    switch (result) {
+ /*   switch (result) {
     case QnUpdateResult::Successful:
         {
             QString message = tr("Update has been successfully finished.");
@@ -438,5 +438,5 @@ void QnServerUpdatesWidget::at_updateFinished(QnUpdateResult result) {
         QMessageBox::critical(this, tr("Update failed"), tr("Could not install updates on one or more servers."));
         break;
     }
-    checkForUpdates();
+    checkForUpdates();*/
 }

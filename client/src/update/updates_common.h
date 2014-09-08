@@ -2,15 +2,27 @@
 #define UPDATES_COMMON_H
 
 #include <utils/common/software_version.h>
+#include <utils/common/system_information.h>
 
-enum class QnCheckForUpdateResult {
-    UpdateFound,
-    InternetProblem,
-    NoNewerVersion,
-    NoSuchBuild,
-    ServerUpdateImpossible,
-    ClientUpdateImpossible,
-    BadUpdateFile
+struct QnCheckForUpdateResult {
+    enum Value {
+        UpdateFound,
+        InternetProblem,
+        NoNewerVersion,
+        NoSuchBuild,
+        ServerUpdateImpossible,
+        ClientUpdateImpossible,
+        BadUpdateFile
+    };
+
+    explicit QnCheckForUpdateResult(Value result):
+        result(result) {}
+
+    Value result;
+    QSet<QnSystemInformation> systems;  /**< Set of supported system, for which updates were found. */
+    QnSoftwareVersion latestVersion;
+    bool clientInstallerRequired;
+
 };
 
 enum class QnUpdateResult {
@@ -25,6 +37,7 @@ enum class QnUpdateResult {
 };
 
 enum class QnPeerUpdateStage {
+    Init,               /**< Prepare peer update. */
     Download,           /**< Download update package for the peer. */
     Push,               /**< Push update package to the peer. */
     Install,            /**< Install update. */
@@ -43,7 +56,6 @@ enum class QnFullUpdateStage {
 
     Count
 };
-
 
 struct QnUpdateFileInformation {
     QnSoftwareVersion version;
@@ -64,5 +76,28 @@ struct QnUpdateFileInformation {
     {}
 };
 typedef QSharedPointer<QnUpdateFileInformation> QnUpdateFileInformationPtr;
+
+struct QnUpdateTarget {
+
+    QnUpdateTarget(QSet<QUuid> targets, const QnSoftwareVersion &version, bool denyClientUpdates = false, bool denyMajorUpdates = false) :
+        targets(targets),
+        version(version),
+        denyClientUpdates(denyClientUpdates),
+        denyMajorUpdates(denyMajorUpdates)
+    {}
+
+    QnUpdateTarget(QSet<QUuid> targets, const QString &fileName, bool denyClientUpdates = false, bool denyMajorUpdates = false) :
+        targets(targets),
+        fileName(fileName),
+        denyClientUpdates(denyClientUpdates),
+        denyMajorUpdates(denyMajorUpdates)
+    {}
+
+    QSet<QUuid> targets;
+    QnSoftwareVersion version;
+    QString fileName;
+    bool denyClientUpdates;
+    bool denyMajorUpdates;
+};
 
 #endif // UPDATES_COMMON_H

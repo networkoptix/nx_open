@@ -21,26 +21,8 @@ public:
     };
 
     enum Roles {
-        StateRole = Qt::UserRole + 1,
+        StageRole = Qn::LastItemDataRole + 1,
         ProgressRole
-    };
-
-    class Item {
-    public:
-        Item(const QnMediaServerResourcePtr &server, const QnPeerUpdateInformation &updateInfo) :
-            m_server(server), m_updateInfo(updateInfo)
-        {}
-
-        QnMediaServerResourcePtr server() const;
-        QnPeerUpdateInformation updateInformation() const;
-
-        QVariant data(int column, int role) const;
-
-    private:
-        QnMediaServerResourcePtr m_server;
-        QnPeerUpdateInformation m_updateInfo;
-
-        friend class QnServerUpdatesModel;
     };
 
     explicit QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObject *parent = 0);
@@ -52,12 +34,10 @@ public:
 
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     QModelIndex index(const QnMediaServerResourcePtr &server) const;
+    QModelIndex index(const QUuid &id) const;
 
-    void setUpdatesInformation(const QHash<QUuid, QnPeerUpdateInformation> &updates);
-    void setUpdateInformation(const QnPeerUpdateInformation &update);
-
-    QnSoftwareVersion latestVersion() const;
-    void setLatestVersion(const QnSoftwareVersion &version);
+    QnCheckForUpdateResult checkResult() const;
+    void setCheckResult(const QnCheckForUpdateResult &result);
 
 public slots:
     void setTargets(const QSet<QUuid> &targets);
@@ -69,11 +49,30 @@ private slots:
     void at_resourceChanged(const QnResourcePtr &resource);
 
 private:
+    class Item {
+    public:
+        Item(const QnMediaServerResourcePtr &server) :
+            m_server(server)
+        {}
+
+        QnMediaServerResourcePtr server() const;
+        QnPeerUpdateStage stage() const;
+
+        QVariant data(int column, int role) const;
+
+    private:
+        QnMediaServerResourcePtr m_server;
+        QnPeerUpdateStage m_stage;
+        int m_progress;
+
+        friend class QnServerUpdatesModel;
+    };
+
     QnMediaServerUpdateTool* m_updateTool;
     QList<Item*> m_items;
-    QHash<QUuid, QnPeerUpdateInformation> m_updates;
     QSet<QUuid> m_targets;
-    QnSoftwareVersion m_latestVersion;
+
+    QnCheckForUpdateResult m_checkResult;
 };
 
 #endif // SERVER_UPDATES_MODEL_H

@@ -36,6 +36,8 @@ struct QnPeerUpdateInformation {
 
 class QnNetworkPeerTask;
 class QnDownloadUpdatesPeerTask;
+class QnCheckForUpdatesPeerTask;
+
 namespace ec2 {
     class QnDistributedMutex;
 }
@@ -45,32 +47,18 @@ class QnUpdateProcess: public QObject {
 
     typedef QObject base_type;
 public:
-    QnUpdateProcess(const QnMediaServerResourceList &targets, QObject *parent = NULL);
+    QnUpdateProcess(const QnUpdateTarget &target, QObject *parent = NULL);
 
-    void downloadUpdates();
+    void start();
     bool cancel();
-
-
-    const QUuid id;
-
-    QHash<QnSystemInformation, QnUpdateFileInformationPtr> updateFiles;
-    QString localTemporaryDir;
-    QnSoftwareVersion targetVersion;
-    bool clientRequiresInstaller;
-    bool disableClientUpdates;
-    QnUpdateFileInformationPtr clientUpdateFile;
-    QHash<QUuid, QnPeerUpdateInformation> updateInformationById;
-    QMultiHash<QnSystemInformation, QUuid> idBySystemInformation;
-
-    QSet<QUuid> m_incompatiblePeerIds;
-    QSet<QUuid> m_targetPeerIds;
 
 signals:
     void stageChanged(QnFullUpdateStage stage);
+    void peerStageChanged(const QUuid &peerId, QnPeerUpdateStage stage);
 
-    void peerChanged(const QUuid &peerId);
-    void taskProgressChanged(int progress);
-    void networkTask_peerProgressChanged(const QUuid &peerId, int progress);
+    void progressChanged(int progress);
+    void peerProgressChanged(const QUuid &peerId, int progress);
+
     void targetsChanged(const QSet<QUuid> &targets);
 
     void updateFinished(QnUpdateResult result);
@@ -78,10 +66,11 @@ private:
     void setStage(QnFullUpdateStage stage);
 
     void setPeerState(const QUuid &peerId, QnPeerUpdateInformation::State state);
-    void setPeersState(QnPeerUpdateInformation::State state);
     void setAllPeersState(QnPeerUpdateInformation::State state);
+    void setCompatiblePeersState(QnPeerUpdateInformation::State state);
     void setIncompatiblePeersState(QnPeerUpdateInformation::State state);
 
+    void downloadUpdates();
     void installClientUpdate();
     void installIncompatiblePeers();
     void uploadUpdatesToServers();
@@ -92,7 +81,10 @@ private:
     void prepareToUpload();
     void lockMutex();
     void unlockMutex();
+
+    void removeTemporaryDir();
 private:
+    void at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* task, const QnCheckForUpdateResult &result);
     void at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, int errorCode);
     void at_restUpdateTask_finished(int errorCode);
     void at_uploadTask_finished(int errorCode);
@@ -104,9 +96,19 @@ private:
     void at_mutexLocked();
     void at_mutexTimeout();
 private:
+    const QUuid m_id;
+    QnUpdateTarget m_target;
     QPointer<QnNetworkPeerTask> m_currentTask;
     QnFullUpdateStage m_stage;
     ec2::QnDistributedMutex *m_distributedMutex;
+    QString m_localTemporaryDir;
+    QSet<QUuid> m_incompatiblePeerIds;
+    QSet<QUuid> m_targetPeerIds;
+    bool m_clientRequiresInstaller;
+    QHash<QnSystemInformation, QnUpdateFileInformationPtr> m_updateFiles;
+    QnUpdateFileInformationPtr m_clientUpdateFile;
+    QHash<QUuid, QnPeerUpdateInformation> m_updateInformationById;
+    QMultiHash<QnSystemInformation, QUuid> m_idBySystemInformation;
 };
 
 

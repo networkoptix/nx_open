@@ -13,6 +13,7 @@
 #include <mutex/distributed_mutex_manager.h>
 #include <mutex/distributed_mutex.h>
 
+#include <update/task/check_update_peer_task.h>
 #include <update/task/download_updates_peer_task.h>
 #include <update/task/rest_update_peer_task.h>
 #include <update/task/upload_updates_peer_task.h>
@@ -52,44 +53,26 @@ QnPeerUpdateInformation::QnPeerUpdateInformation(const QnMediaServerResourcePtr 
         sourceVersion = server->getVersion();
 }
 
-QnUpdateProcess::QnUpdateProcess(const QnMediaServerResourceList &targets, QObject *parent):
+QnUpdateProcess::QnUpdateProcess(const QnUpdateTarget &target, QObject *parent):
     base_type(parent),
-    id(QUuid::createUuid()),
+    m_id(QUuid::createUuid()),
+    m_target(target),
     m_stage(QnFullUpdateStage::Init),
-    m_distributedMutex(NULL)
+    m_distributedMutex(NULL),
+    m_clientRequiresInstaller(true)
 {
-    foreach (const QnMediaServerResourcePtr &server, targets) {
-        bool incompatible = (server->getStatus() == Qn::Incompatible);
+   
+}
 
-        if (server->getStatus() != Qn::Online && !incompatible)
-            continue;
-
-        if (!server->getSystemInfo().isValid())
-            continue;
-
-        if (!targetVersion.isNull() && server->getVersion() == targetVersion)
-            continue;
-
-        QUuid peerId = server->getId();
-
-        m_targetPeerIds.insert(peerId);
-        if (incompatible)
-            m_incompatiblePeerIds.insert(peerId);
-
-        QnPeerUpdateInformation info(server);
-        info.updateInformation = updateFiles.value(server->getSystemInfo());
-
-        if (!info.updateInformation) {
-            Q_ASSERT_X(0, "No update info for server", Q_FUNC_INFO);
-            return;
-        }
-
-        info.state = info.updateInformation->fileName.isEmpty() ? QnPeerUpdateInformation::PendingDownloading
-            : QnPeerUpdateInformation::PendingUpload;
-
-        updateInformationById.insert(peerId, info);
-        idBySystemInformation.insert(server->getSystemInfo(), peerId);
-    }
+void QnUpdateProcess::start() {
+    QnCheckForUpdatesPeerTask *checkForUpdatesTask = new QnCheckForUpdatesPeerTask(m_target);
+    connect(checkForUpdatesTask,  &QnCheckForUpdatesPeerTask::checkFinished,   this,  [this, checkForUpdatesTask](const QnCheckForUpdateResult &result){
+        at_checkForUpdatesTaskFinished(checkForUpdatesTask, result);
+    });
+    connect(checkForUpdatesTask,  &QnNetworkPeerTask::finished,  checkForUpdatesTask, &QObject::deleteLater);
+    m_currentTask = checkForUpdatesTask;
+    setStage(QnFullUpdateStage::Check);
+    checkForUpdatesTask->start();
 }
 
 void QnUpdateProcess::downloadUpdates() {
@@ -99,8 +82,8 @@ void QnUpdateProcess::downloadUpdates() {
     QHash<QUrl, QString> hashByUrl;
     QHash<QUrl, qint64> fileSizeByUrl;
 
-    for (auto it = updateFiles.begin(); it != updateFiles.end(); ++it) {
-        QList<QUuid> peers = idBySystemInformation.values(it.key());
+    for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it) {
+        QList<QUuid> peers = m_idBySystemInformation.values(it.key());
         if (peers.isEmpty())
             continue;
 
@@ -118,24 +101,25 @@ void QnUpdateProcess::downloadUpdates() {
         fileSizeByUrl.insert(it.value()->url, it.value()->fileSize);
         foreach (const QUuid &peerId, peers) {
             peerAssociations.insert(it.value()->url, peerId);
-            QnPeerUpdateInformation &updateInformation = updateInformationById[peerId];
+            QnPeerUpdateInformation &updateInformation = m_updateInformationById[peerId];
             updateInformation.state = QnPeerUpdateInformation::UpdateDownloading;
             updateInformation.progress = 0;
+            emit peerStageChanged(peerId, QnPeerUpdateStage::Download);
         }
     }
 
-    if (!clientRequiresInstaller) {
-        QString fileName = clientUpdateFile->fileName;
+    if (!m_clientRequiresInstaller) {
+        QString fileName = m_clientUpdateFile->fileName;
         if (fileName.isEmpty())
-            fileName = updateFilePath(updatesDirName, clientUpdateFile->baseFileName);
+            fileName = updateFilePath(updatesDirName, m_clientUpdateFile->baseFileName);
 
-        if (!fileName.isEmpty() && verifyFile(fileName, clientUpdateFile->fileSize, clientUpdateFile->md5)) {
-            clientUpdateFile->fileName = fileName;
+        if (!fileName.isEmpty() && verifyFile(fileName, m_clientUpdateFile->fileSize, m_clientUpdateFile->md5)) {
+            m_clientUpdateFile->fileName = fileName;
         } else {
-            downloadTargets.insert(clientUpdateFile->url, clientUpdateFile->baseFileName);
-            hashByUrl.insert(clientUpdateFile->url, clientUpdateFile->md5);
-            fileSizeByUrl.insert(clientUpdateFile->url, clientUpdateFile->fileSize);
-            peerAssociations.insert(clientUpdateFile->url, qnCommon->moduleGUID());
+            downloadTargets.insert(m_clientUpdateFile->url, m_clientUpdateFile->baseFileName);
+            hashByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->md5);
+            fileSizeByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->fileSize);
+            peerAssociations.insert(m_clientUpdateFile->url, qnCommon->moduleGUID());
         }
     }
 
@@ -147,8 +131,8 @@ void QnUpdateProcess::downloadUpdates() {
     connect(downloadUpdatesPeerTask,  &QnNetworkPeerTask::peerFinished,         this,  [this](const QUuid &peerId) {
         setPeerState(peerId, QnPeerUpdateInformation::PendingUpload);
     });
-    connect(downloadUpdatesPeerTask,  &QnNetworkPeerTask::progressChanged,      this,  &QnUpdateProcess::taskProgressChanged);
-    connect(downloadUpdatesPeerTask,  &QnNetworkPeerTask::peerProgressChanged,  this,  &QnUpdateProcess::networkTask_peerProgressChanged);
+    connect(downloadUpdatesPeerTask,  &QnNetworkPeerTask::progressChanged,      this,  &QnUpdateProcess::progressChanged);
+    connect(downloadUpdatesPeerTask,  &QnNetworkPeerTask::peerProgressChanged,  this,  &QnUpdateProcess::peerProgressChanged);
     connect(downloadUpdatesPeerTask,  &QnNetworkPeerTask::finished,             downloadUpdatesPeerTask, &QObject::deleteLater);
 
     downloadUpdatesPeerTask->setTargetDir(updatesDirName);
@@ -158,57 +142,110 @@ void QnUpdateProcess::downloadUpdates() {
     downloadUpdatesPeerTask->setPeerAssociations(peerAssociations);
     m_currentTask = downloadUpdatesPeerTask;
     setStage(QnFullUpdateStage::Download);
-    downloadUpdatesPeerTask->start(QSet<QUuid>::fromList(updateInformationById.keys()));
+    downloadUpdatesPeerTask->start(QSet<QUuid>::fromList(m_updateInformationById.keys()));
 }
+
 
 void QnUpdateProcess::setPeerState(const QUuid &peerId, QnPeerUpdateInformation::State state) {
-    auto it = updateInformationById.find(peerId);
-    if (it == updateInformationById.end())
+    if (!m_updateInformationById.contains(peerId))
         return;
 
-    if (it->state != state) {
-        it->state = state;
-        emit peerChanged(peerId);
-    }
-}
+    QnPeerUpdateInformation &info = m_updateInformationById[peerId];
+    if (info.state == state) 
+        return;
+    
+    auto stateToStage = [](QnPeerUpdateInformation::State state) {
+        switch (state) {
+        case QnPeerUpdateInformation::PendingDownloading:
+        case QnPeerUpdateInformation::UpdateDownloading:
+            return QnPeerUpdateStage::Download;
+        case QnPeerUpdateInformation::PendingUpload:
+        case QnPeerUpdateInformation::UpdateUploading:
+            return QnPeerUpdateStage::Push;
+        case QnPeerUpdateInformation::PendingInstallation:
+        case QnPeerUpdateInformation::UpdateInstalling:
+            return QnPeerUpdateStage::Install;
+        default:
+            return QnPeerUpdateStage::Init;
+        }
+    };
 
+    QnPeerUpdateStage oldStage = stateToStage(info.state);
+    info.state = state;
+    QnPeerUpdateStage stage = stateToStage(state);
+    if (oldStage != stage)
+        emit peerStageChanged(peerId, stage);
+}
 
 void QnUpdateProcess::setAllPeersState(QnPeerUpdateInformation::State state) {
-    for (auto it = updateInformationById.begin(); it != updateInformationById.end(); ++it) {
-        if (it->state == state)
-            continue;
-
-        it->state = state;
-        emit peerChanged(it.key());
-    }
+    foreach(const QUuid &key, m_updateInformationById.keys())
+        setPeerState(key, state);
 }
 
 
-void QnUpdateProcess::setPeersState(QnPeerUpdateInformation::State state) {
-    for (auto it = updateInformationById.begin(); it != updateInformationById.end(); ++it) {
-        if (m_incompatiblePeerIds.contains(it.key()))
-            continue;
-
-        if (it->state == state)
-            continue;
-
-        it->state = state;
-        emit peerChanged(it.key());
-    }
+void QnUpdateProcess::setCompatiblePeersState(QnPeerUpdateInformation::State state) {
+    foreach(const QUuid &key, m_updateInformationById.keys())
+        if (!m_incompatiblePeerIds.contains(key))
+            setPeerState(key, state);
 }
 
 void QnUpdateProcess::setIncompatiblePeersState(QnPeerUpdateInformation::State state) {
-    for (auto it = updateInformationById.begin(); it != updateInformationById.end(); ++it) {
-        if (!m_incompatiblePeerIds.contains(it.key()))
+    foreach(const QUuid &key, m_updateInformationById.keys())
+        if (m_incompatiblePeerIds.contains(key))
+            setPeerState(key, state);
+}
+
+void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* task, const QnCheckForUpdateResult &result) {
+    if (result.result != QnCheckForUpdateResult::UpdateFound) {
+        setAllPeersState(QnPeerUpdateInformation::UpdateFailed);
+        finishUpdate(QnUpdateResult::DownloadingFailed);
+        return;
+    }
+
+    m_target.version = result.latestVersion; /* Version can be updated if loading from local file or seeking for latest version. */
+    m_clientRequiresInstaller = result.clientInstallerRequired;
+    m_localTemporaryDir = task->temporaryDir();
+    m_updateFiles = task->updateFiles();
+    m_clientUpdateFile = task->clientUpdateFile();
+
+    foreach (const QUuid &serverId, m_target.targets) {
+        QnMediaServerResourcePtr server = qnResPool->getResourceById(serverId).dynamicCast<QnMediaServerResource>();
+        if (!server)
             continue;
 
-        if (it->state == state)
+        bool incompatible = (server->getStatus() == Qn::Incompatible);
+
+        if (server->getStatus() != Qn::Online && !incompatible)
             continue;
 
-        it->state = state;
-        emit peerChanged(it.key());
+        if (!server->getSystemInfo().isValid())
+            continue;
+
+        if (!m_target.version.isNull() && server->getVersion() == m_target.version)
+            continue;
+
+        QUuid peerId = server->getId();
+
+        m_targetPeerIds.insert(peerId);
+        if (incompatible)
+            m_incompatiblePeerIds.insert(peerId);
+
+        QnPeerUpdateInformation info(server);
+        info.updateInformation = m_updateFiles.value(server->getSystemInfo());
+
+        if (!info.updateInformation) {
+            Q_ASSERT_X(0, "No update info for server", Q_FUNC_INFO);
+            return;
+        }
+
+        info.state = info.updateInformation->fileName.isEmpty() ? QnPeerUpdateInformation::PendingDownloading
+            : QnPeerUpdateInformation::PendingUpload;
+
+        m_updateInformationById.insert(peerId, info);
+        m_idBySystemInformation.insert(server->getSystemInfo(), peerId);
     }
 }
+
 
 void QnUpdateProcess::at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, int errorCode) {
     if (errorCode != 0) {
@@ -219,34 +256,35 @@ void QnUpdateProcess::at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, i
 
     QHash<QUrl, QString> resultingFiles = task->resultingFiles();
 
-    for (auto it = updateFiles.begin(); it != updateFiles.end(); ++it) {
+    for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it) {
         if (resultingFiles.contains(it.value()->url))
             it.value()->fileName = resultingFiles[it.value()->url];
     }
-    if (!clientRequiresInstaller && resultingFiles.contains(clientUpdateFile->url))
-        clientUpdateFile->fileName = resultingFiles[clientUpdateFile->url];
+    if (!m_clientRequiresInstaller && resultingFiles.contains(m_clientUpdateFile->url))
+        m_clientUpdateFile->fileName = resultingFiles[m_clientUpdateFile->url];
 
     installClientUpdate();
 }
 
 void QnUpdateProcess::finishUpdate(QnUpdateResult result) {
     unlockMutex();
+    removeTemporaryDir();
     emit updateFinished(result);
 }
 
 void QnUpdateProcess::installClientUpdate() {
     /* Check if we skip this step. */
-    if (clientRequiresInstaller 
-        || disableClientUpdates 
+    if (m_clientRequiresInstaller 
+        || m_target.denyClientUpdates
         || qnSettings->isClientUpdateDisabled() 
-        || clientUpdateFile->version == qnCommon->engineVersion()) {
+        || m_clientUpdateFile->version == qnCommon->engineVersion()) {
             installIncompatiblePeers();
             return;
     }
 
     setStage(QnFullUpdateStage::Client);
 
-    QFuture<applauncher::api::ResultType::Value> future = QtConcurrent::run(&applauncher::installZip, targetVersion, clientUpdateFile->fileName);
+    QFuture<applauncher::api::ResultType::Value> future = QtConcurrent::run(&applauncher::installZip, m_target.version, m_clientUpdateFile->fileName);
     QFutureWatcher<applauncher::api::ResultType::Value> *futureWatcher = new QFutureWatcher<applauncher::api::ResultType::Value>(this);
     futureWatcher->setFuture(future);
     connect(futureWatcher, &QFutureWatcher<applauncher::api::ResultType::Value>::finished, this, &QnUpdateProcess::at_clientUpdateInstalled);
@@ -276,15 +314,15 @@ void QnUpdateProcess::at_clientUpdateInstalled() {
 
 void QnUpdateProcess::installIncompatiblePeers() {
     QHash<QnSystemInformation, QString> targetFiles;
-    for (auto it = updateFiles.begin(); it != updateFiles.end(); ++it) {
+    for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it) {
         targetFiles[it.key()] = it.value()->fileName;
         setIncompatiblePeersState(QnPeerUpdateInformation::UpdateInstalling);
     }
 
     QnRestUpdatePeerTask* restUpdatePeerTask = new QnRestUpdatePeerTask();
-    restUpdatePeerTask->setUpdateId(id.toString());
+    restUpdatePeerTask->setUpdateId(m_id.toString());
     restUpdatePeerTask->setUpdateFiles(targetFiles);
-    restUpdatePeerTask->setVersion(targetVersion);
+    restUpdatePeerTask->setVersion(m_target.version);
     connect(restUpdatePeerTask, &QnNetworkPeerTask::finished,                   this,   &QnUpdateProcess::at_restUpdateTask_finished);
     connect(restUpdatePeerTask, &QnRestUpdatePeerTask::peerUpdateFinished,      this,   &QnUpdateProcess::at_restUpdateTask_peerUpdateFinished);
     connect(restUpdatePeerTask, &QnNetworkPeerTask::finished,                   restUpdatePeerTask,   &QObject::deleteLater);
@@ -294,12 +332,12 @@ void QnUpdateProcess::installIncompatiblePeers() {
 }
 
 void QnUpdateProcess::at_restUpdateTask_peerUpdateFinished(const QUuid &incompatibleId, const QUuid &id) {
-    QnPeerUpdateInformation info = updateInformationById.take(incompatibleId);
+    QnPeerUpdateInformation info = m_updateInformationById.take(incompatibleId);
     info.state = QnPeerUpdateInformation::UpdateFinished;
     info.server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
-    updateInformationById.insert(id, info);
-    emit targetsChanged(QSet<QUuid>::fromList(updateInformationById.keys()));
-    emit peerChanged(id);
+    m_updateInformationById.insert(id, info);
+    emit targetsChanged(QSet<QUuid>::fromList(m_updateInformationById.keys()));
+    emit peerStageChanged(id, QnPeerUpdateStage::Init);
 }
 
 void QnUpdateProcess::at_restUpdateTask_finished(int errorCode) {
@@ -357,20 +395,20 @@ void QnUpdateProcess::at_mutexTimeout() {
 
 void QnUpdateProcess::uploadUpdatesToServers() {
     QHash<QnSystemInformation, QString> fileBySystemInformation;
-    for (auto it = updateFiles.begin(); it != updateFiles.end(); ++it)
+    for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it)
         fileBySystemInformation[it.key()] = it.value()->fileName;
 
-    setPeersState(QnPeerUpdateInformation::UpdateUploading);
+    setCompatiblePeersState(QnPeerUpdateInformation::UpdateUploading);
 
     QnUploadUpdatesPeerTask* uploadUpdatesPeerTask = new QnUploadUpdatesPeerTask();
-    uploadUpdatesPeerTask->setUpdateId(id.toString());
+    uploadUpdatesPeerTask->setUpdateId(m_id.toString());
     uploadUpdatesPeerTask->setUploads(fileBySystemInformation);
     connect(uploadUpdatesPeerTask,  &QnNetworkPeerTask::finished,             this,     &QnUpdateProcess::at_uploadTask_finished);
     connect(uploadUpdatesPeerTask,  &QnNetworkPeerTask::peerFinished,         this,     [this](const QUuid &peerId) {
             setPeerState(peerId, QnPeerUpdateInformation::PendingInstallation);
     });
-    connect(uploadUpdatesPeerTask,  &QnNetworkPeerTask::progressChanged,      this,     &QnUpdateProcess::taskProgressChanged);
-    connect(uploadUpdatesPeerTask,  &QnNetworkPeerTask::peerProgressChanged,  this,     &QnUpdateProcess::networkTask_peerProgressChanged);
+    connect(uploadUpdatesPeerTask,  &QnNetworkPeerTask::progressChanged,      this,     &QnUpdateProcess::progressChanged);
+    connect(uploadUpdatesPeerTask,  &QnNetworkPeerTask::peerProgressChanged,  this,     &QnUpdateProcess::peerProgressChanged);
     connect(uploadUpdatesPeerTask,  &QnNetworkPeerTask::finished,             uploadUpdatesPeerTask,     &QObject::deleteLater);
     m_currentTask = uploadUpdatesPeerTask;
     uploadUpdatesPeerTask->start(m_targetPeerIds - m_incompatiblePeerIds);
@@ -396,15 +434,15 @@ void QnUpdateProcess::uploadUpdatesToServers() {
 
 void QnUpdateProcess::installUpdatesToServers() {
     QnInstallUpdatesPeerTask* installUpdatesPeerTask = new QnInstallUpdatesPeerTask();
-    installUpdatesPeerTask->setUpdateId(id.toString());
-    installUpdatesPeerTask->setVersion(targetVersion);
+    installUpdatesPeerTask->setUpdateId(m_id.toString());
+    installUpdatesPeerTask->setVersion(m_target.version);
     connect(installUpdatesPeerTask, &QnNetworkPeerTask::finished,                   this,   &QnUpdateProcess::at_installTask_finished);
     connect(installUpdatesPeerTask, &QnNetworkPeerTask::peerFinished,               this,   [this](const QUuid &peerId) {
         setPeerState(peerId, QnPeerUpdateInformation::UpdateFinished);
     });
     connect(installUpdatesPeerTask, &QnNetworkPeerTask::finished,                   installUpdatesPeerTask,   &QObject::deleteLater);
     setStage(QnFullUpdateStage::Servers);
-    setPeersState(QnPeerUpdateInformation::UpdateInstalling);
+    setCompatiblePeersState(QnPeerUpdateInformation::UpdateInstalling);
     installUpdatesPeerTask->start(m_targetPeerIds - m_incompatiblePeerIds);
 }
 
@@ -438,4 +476,12 @@ bool QnUpdateProcess::cancel() {
     setAllPeersState(QnPeerUpdateInformation::UpdateCanceled);
     finishUpdate(QnUpdateResult::Cancelled);
     return true;
+}
+
+void QnUpdateProcess::removeTemporaryDir() {
+    if (m_localTemporaryDir.isEmpty())
+        return;
+
+    QDir(m_localTemporaryDir).removeRecursively();
+    m_localTemporaryDir = QString();
 }

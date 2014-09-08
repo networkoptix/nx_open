@@ -10,27 +10,20 @@ class QNetworkAccessManager;
 
 class QnCheckForUpdatesPeerTask : public QnNetworkPeerTask {
     Q_OBJECT
+
+    typedef QnNetworkPeerTask base_type;
 public:
-    explicit QnCheckForUpdatesPeerTask(QObject *parent = 0);
-
-    void setUpdatesUrl(const QUrl &url);
-
-    void setTargetVersion(const QnSoftwareVersion &version);
-    QnSoftwareVersion targetVersion() const;
-
-    void setUpdateFileName(const QString &fileName);
-    QString updateFileName() const;
-
-    void setDisableClientUpdates(bool f);
-    bool isDisableClientUpdates() const;
-
-    bool isClientRequiresInstaller() const;
-
-    void setDenyMajorUpdates(bool denyMajorUpdates);
+    explicit QnCheckForUpdatesPeerTask(const QnUpdateTarget &target, QObject *parent = 0);
 
     QHash<QnSystemInformation, QnUpdateFileInformationPtr> updateFiles() const;
     QnUpdateFileInformationPtr clientUpdateFile() const;
     QString temporaryDir() const;
+
+    void start();
+
+    QnUpdateTarget target() const;
+signals:
+    void checkFinished(const QnCheckForUpdateResult &result);
 
 protected:
     virtual void doStart() override;
@@ -41,12 +34,12 @@ private:
     void checkUpdateCoverage();
 
     void checkBuildOnline();
-    void checkOnlineUpdates(const QnSoftwareVersion &version = QnSoftwareVersion());
+    void checkOnlineUpdates();
     void checkLocalUpdates();
 
     void cleanUp();
 
-    void finishTask(QnCheckForUpdateResult result);
+    void finishTask(QnCheckForUpdateResult::Value result);
 private slots:
     void at_updateReply_finished();
     void at_buildReply_finished();
@@ -54,15 +47,12 @@ private slots:
 private:
     QNetworkAccessManager *m_networkAccessManager;
     QUrl m_updatesUrl;
+    QnUpdateTarget m_target;
 
-    QnSoftwareVersion m_targetVersion;
-    QString m_updateFileName;
     QString m_temporaryUpdateDir;
 
     QString m_updateLocationPrefix;
     bool m_targetMustBeNewer;
-    bool m_denyMajorUpdates;
-    bool m_disableClientUpdates;
 
     QHash<QnSystemInformation, QnUpdateFileInformationPtr> m_updateFiles;
     QnUpdateFileInformationPtr m_clientUpdateFile;
