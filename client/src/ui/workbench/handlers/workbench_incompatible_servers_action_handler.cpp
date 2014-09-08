@@ -50,8 +50,14 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(const Q
     if (password.isEmpty())
         return;
 
-    progressDialog()->setLabelText(tr("Connecting to the current system..."));
+    progressDialog()->setWindowTitle(tr("Connecting to the current system..."));
     progressDialog()->show();
+
+    QnConnectToCurrentSystemTool *tool = connectToCurrentSystemTool();
+
+    connect(tool, &QnConnectToCurrentSystemTool::progressChanged, progressDialog(), &QnProgressDialog::setValue);
+    connect(tool, &QnConnectToCurrentSystemTool::stateChanged, progressDialog(), &QnProgressDialog::setLabelText);
+    connect(progressDialog(), &QnProgressDialog::canceled, tool, &QnConnectToCurrentSystemTool::cancel);
 
     connectToCurrentSystemTool()->connectToCurrentSystem(targets, password);
 }
@@ -82,6 +88,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_joinOtherSystemAction_trigg
     }
 
     progressDialog()->setLabelText(tr("Joining system..."));
+    progressDialog()->setInfiniteProgress();
     progressDialog()->show();
 
     tool->start(url, password);
@@ -106,15 +113,15 @@ QnJoinSystemTool *QnWorkbenchIncompatibleServersActionHandler::joinSystemTool() 
 QnProgressDialog *QnWorkbenchIncompatibleServersActionHandler::progressDialog() {
     if (!m_progressDialog) {
         m_progressDialog = new QnProgressDialog(mainWindow());
+        m_progressDialog->setAttribute(Qt::WA_DeleteOnClose);
         m_progressDialog->setCancelButton(NULL);
-        m_progressDialog->setInfiniteProgress();
         m_progressDialog->setModal(true);
     }
     return m_progressDialog;
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_finished(int errorCode) {
-    progressDialog()->hide();
+    progressDialog()->close();
 
     switch (errorCode) {
     case QnConnectToCurrentSystemTool::NoError:
@@ -133,6 +140,10 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_
     default:
         break;
     }
+}
+
+void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_canceled() {
+    progressDialog()->close();
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_joinSystemTool_finished(int errorCode) {
@@ -156,5 +167,5 @@ void QnWorkbenchIncompatibleServersActionHandler::at_joinSystemTool_finished(int
         QMessageBox::critical(progressDialog(), tr("Error"), tr("Could not join the system."));
         break;
     }
-    progressDialog()->hide();
+    progressDialog()->close();
 }

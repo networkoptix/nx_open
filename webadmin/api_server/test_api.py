@@ -9,9 +9,20 @@ settings = {
 def index(name):
     return template('<b>Hello {{name}}</b>!', name=name)
 
-@get('/ec2/settings')
+@get('/ec2/moduleInformation')
 def get_settings():
-    return settings
+    return '''{
+  "reply": {
+    "version": "2.3.0.0",
+    "type": "Media Server",
+    "systemName": "poe123",
+    "systemInformation": "linux x64",
+    "id": "{59f2e1b2-3259-43d7-b276-4e1c69d48c68}",
+    "customization": "default"
+  },
+  "errorString": "",
+  "error": 0
+}'''
 
 @post('/ec2/settings')
 def save_settings():

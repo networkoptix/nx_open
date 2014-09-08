@@ -2,7 +2,14 @@
 
 angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver) {
-        $scope.settings = mediaserver.settings.get();
+        $scope.settings = mediaserver.getSettings();
+
+        $scope.settings.then(function (r) {
+            $scope.settings = {
+                systemName: r.data.reply.systemName,
+                port: r.data.reply.port};
+        });
+
         $scope.confirmPassword = '';
 
         $scope.openJoinDialog = function () {
@@ -24,7 +31,7 @@ angular.module('webadminApp')
         };
 
         $scope.save = function () {
-            mediaserver.settings.save($scope.settings);
+            mediaserver.saveSettings($scope.settings.systemName);
         };
 
         $scope.restart = function () {

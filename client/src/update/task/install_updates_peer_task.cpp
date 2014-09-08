@@ -81,7 +81,6 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
     if (m_restartingPeers.isEmpty()) {
         /* When all peers were restarted we only have to wait for saveServer transactions.
            It shouldn't take long time. So restart timer to a short timeout. */
-        m_checkTimer->stop();
         m_checkTimer->start(shortTimeout);
     }
 }
