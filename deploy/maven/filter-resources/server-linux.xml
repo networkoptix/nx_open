@@ -1,48 +1,24 @@
  <assembly>
-    <id>2.1-${platform}-${arch}-${customization}</id>
+    <id>${platform}-${arch}-${release.version}.${buildNumber}</id>
     <formats>
-        <format>dir</format>
+        <format>zip</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>${libdir}/bin/release</directory>
-            <outputDirectory>../2.1/bin</outputDirectory>
+            <directory>${root.dir}/debsetup/mediaserver-deb/${arch}</directory>
+            <outputDirectory>..</outputDirectory>
             <includes>
-                <include>imageformats/*.so</include>
-                <include>styles/**</include>
-                <include>vox/**</include>
-                <include>x264</include>
-                <include>client-bin</include>
+                <include>${finalName}.deb</include>
             </includes>		
-        </fileSet>
+        </fileSet>	
         <fileSet>
-            <directory>${libdir}/build/bin/release</directory>
-            <outputDirectory>../2.1/lib</outputDirectory>
+            <directory>${project.build.directory}/server</directory>
+            <outputDirectory>..</outputDirectory>
             <includes>
-                <include>libavcodec.so.54</include>
-                <include>libavformat.so.54</include>
-                <include>libavutil.so.51</include>
-                <include>libprotobuf-lite.so.7</include>
-                <include>libprotobuf.so.7</include>
-                <include>libsigar.so</include>
-                <include>libswscale.so.2</include>
-                <include>libQtMultimedia.so.4</include>
-                <include>libQtXml.so.4</include>
-                <include>libQtGui.so.4</include>
-                <include>libQtCore.so.4</include>
-                <include>libQtNetwork.so.4</include>
-                <include>libQtOpenGL.so.4</include>
-                <include>libfaac.so.0</include>
-                <include>libmp3lame.so.0</include>
-                <include>libvorbis.so.0</include>
-                <include>libvorbisenc.so.2</include>
-                <include>libvpx.so.1</include>
-                <include>libcrypto.so.1.0.0</include>
-                <include>libssl.so.1.0.0</include>
-                <include>libqjson.so.0</include>      
-                <include>libcommon.so.210</include>      
+                <include>update.json</include>
+                <include>install.sh</include>
             </includes>		
-        </fileSet>	        		
+        </fileSet>				
     </fileSets>
 </assembly>
