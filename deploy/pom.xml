@@ -16,9 +16,9 @@
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>2.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>deploy-clients</artifactId>
+    <artifactId>deploy</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Clients Deployment Script</name>
+    <name>HD Witness Deployment Scripts</name>
 
     <properties>
         <root.dir>${basedir}/..</root.dir>
@@ -53,53 +53,29 @@
                 <version>2.2.2</version>
                 <executions>
                     <execution>
-                        <id>pack-1.4</id>
+                        <id>pack-client</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>${project.build.directory}/binaries14-${platform}.xml</descriptor>
+                                <descriptor>${project.build.directory}/client-${platform}.xml</descriptor>
                             </descriptors>	
                         </configuration>
                     </execution>
                     <execution>
-                        <id>pack-1.5</id>
+                        <id>pack-server</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>${project.build.directory}/binaries15-${platform}.xml</descriptor>
+                                <descriptor>${project.build.directory}/server-${platform}.xml</descriptor>
                             </descriptors>	
                         </configuration>
-                    </execution>
-                    <execution>
-                        <id>pack-2.0</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>${project.build.directory}/binaries20-${platform}.xml</descriptor>
-                            </descriptors>	
-                        </configuration>
-                    </execution>    
-                    <execution>
-                        <id>pack-2.1</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>${project.build.directory}/binaries21-${platform}.xml</descriptor>
-                            </descriptors>	
-                        </configuration>
-                    </execution>                    
+                    </execution>                  
                 </executions>
             </plugin>
             <plugin>
@@ -108,7 +84,7 @@
                 <version>1.1.1</version>
                 <executions>
                     <execution>
-                        <id>gen-qrc</id>
+                        <id>gen-scripts</id>
                         <phase>package</phase>
                         <goals>
                             <goal>exec</goal>
@@ -145,9 +121,6 @@
                                     <failOnError>false</failOnError>
                                     <target>
                                         <copy file="${libdir}/bin/${build.configuration}/client.exe" tofile="${libdir}/bin/${build.configuration}/${product.name}.exe" />
-                                        <copy file="${libdir}/1.4/bin/client.exe" tofile="${libdir}/1.4/bin/${product.name}.exe" />
-                                        <copy file="${libdir}/1.5/bin/client.exe" tofile="${libdir}/1.5/bin/${product.name}.exe" />
-                                        <copy file="${libdir}/2.0.2/bin/client.exe" tofile="${libdir}/2.0.2/bin/${product.name}.exe" />
                                     </target>
                                 </configuration>
                                 <goals>
@@ -160,5 +133,4 @@
             </build>
         </profile>
     </profiles>
-
 </project>
