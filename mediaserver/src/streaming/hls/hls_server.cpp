@@ -53,7 +53,8 @@ namespace nx_hls
         QnTCPConnectionProcessor( socket ),
         m_state( sReceiving ),
         m_switchToChunkedTransfer( false ),
-        m_useChunkedTransfer( false )
+        m_useChunkedTransfer( false ),
+        m_bytesSent( 0 )
     {
         m_readBuffer.reserve( READ_BUFFER_SIZE );
         setObjectName( "QnHttpLiveStreamingProcessor" );
@@ -69,6 +70,7 @@ namespace nx_hls
             //TODO #ak cancel on-going transcoding. Currently, it just wastes CPU time
             m_currentChunk->disconnectAndJoin( this );
             StreamingChunkCache::instance()->putBackUsedItem( m_currentChunk->params(), m_currentChunk );
+            m_chunkInputStream.reset();
             m_currentChunk.reset();
         }
 
@@ -99,21 +101,28 @@ namespace nx_hls
                     if( m_useChunkedTransfer )
                         bytesSent = sendChunk( m_writeBuffer ) ? m_writeBuffer.size() : -1;
                     else
-                        bytesSent = sendData( m_writeBuffer ) ? m_writeBuffer.size() : -1;;
+                        bytesSent = sendData( m_writeBuffer ) ? m_writeBuffer.size() : -1;
                     if( bytesSent < 0 )
                     {
-                        NX_LOG( QString::fromLatin1("Error sending data to %1 (%2). Terminating connection...").
-                            arg(remoteHostAddress().toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                        NX_LOG( QString::fromLatin1("Error sending data to %1 (%2). Sent %3 bytes total. Terminating connection...").
+                            arg(remoteHostAddress().toString()).arg(SystemError::getLastOSErrorText()).arg(m_bytesSent), cl_logWARNING );
                         m_state = sDone;
                         break;
                     }
-                    m_writeBuffer.remove( 0, bytesSent );
+                    else
+                    {
+                        m_bytesSent += bytesSent;
+                    }
+                    if( bytesSent == m_writeBuffer.size() )
+                        m_writeBuffer.clear();
+                    else
+                        m_writeBuffer.remove( 0, bytesSent );
                     if( !m_writeBuffer.isEmpty() )
                         break;  //continuing sending
                     if( !prepareDataToSend() )
                     {
-                        NX_LOG( QString::fromLatin1("Finished uploading %1 data to %2. Closing connection...").
-                            arg(m_currentFileName).arg(remoteHostAddress().toString()), cl_logDEBUG1 );
+                        NX_LOG( QString::fromLatin1("Finished uploading %1 data to %2. Sent %3 bytes total. Closing connection...").
+                            arg(m_currentFileName).arg(remoteHostAddress().toString()).arg(m_bytesSent), cl_logDEBUG1 );
                         //sending empty chunk to signal EOF
                         if( m_useChunkedTransfer )
                             sendChunk( QByteArray() );
@@ -327,6 +336,7 @@ namespace nx_hls
             m_switchToChunkedTransfer = true;
         m_writeBuffer.clear();
         response.serialize( &m_writeBuffer );
+        m_bytesSent = (size_t)0 - m_writeBuffer.size();
 
         NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
             arg(remoteHostAddress().toString()).
@@ -339,7 +349,7 @@ namespace nx_hls
     {
         Q_ASSERT( m_writeBuffer.isEmpty() );
 
-        if( !m_currentChunk )
+        if( !m_chunkInputStream )
             return false;
 
         if( m_switchToChunkedTransfer )
@@ -352,8 +362,12 @@ namespace nx_hls
         for( ;; )
         {
             //reading chunk data
-            if( m_currentChunk->tryRead( &m_chunkReadCtx, &m_writeBuffer ) )
+            const int sizeBak = m_writeBuffer.size();
+            if( m_chunkInputStream->tryRead( &m_writeBuffer ) )
+            {
+                NX_LOG( lit("Read %1 bytes from streaming chunk %2").arg(m_writeBuffer.size()-sizeBak).arg((size_t)m_currentChunk.get(), 0, 16), cl_logDEBUG1 );
                 return !m_writeBuffer.isEmpty();
+            }
 
             //waiting for data to arrive to chunk
             m_cond.wait( lk.mutex() );
@@ -711,16 +725,56 @@ namespace nx_hls
             m_currentChunk.get(), &StreamingChunk::newDataIsAvailable,
             this,                 &QnHttpLiveStreamingProcessor::chunkDataAvailable,
             Qt::DirectConnection );
-        m_chunkReadCtx = StreamingChunk::SequentialReadingContext();
+        m_chunkInputStream.reset( new StreamingChunkInputStream( m_currentChunk.get() ) );
+
+        //using this simplified test for accept-encoding since hls client do not use syntax with q= ...
+        nx_http::header::AcceptEncodingHeader acceptEncoding( nx_http::getHeaderValue( request.headers, "Accept-Encoding" ) );
 
         response->headers.insert( make_pair( "Content-Type", m_currentChunk->mimeType().toLatin1() ) );
-        if( m_currentChunk->isClosed() && m_currentChunk->sizeInBytes() > 0 )
-            response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number((qlonglong)m_currentChunk->sizeInBytes()) ) );
-        else
+        if( acceptEncoding.encodingIsAllowed("chunked") )
+        {
             response->headers.insert( make_pair( "Transfer-Encoding", "chunked" ) );
-        response->statusLine.version = nx_http::http_1_1;
+            response->statusLine.version = nx_http::http_1_1;
+            return nx_http::StatusCode::ok;
+        }
+        else if( acceptEncoding.encodingIsAllowed("identity") )
+        {
+            //if client requests identity encoding, MUST return identity
+            m_currentChunk->waitForChunkReady();    //waiting for chunk to be prepared
+            //chunk is ready, using it
+            NX_LOG( lit("Streaming chunk %1 with size %2").arg((size_t)m_currentChunk.get(), 0, 16).arg(m_currentChunk->sizeInBytes()), cl_logDEBUG1 );
 
-        return nx_http::StatusCode::ok;
+            auto rangeIter = request.headers.find( "Range" );
+            if( rangeIter == request.headers.end() )
+            {
+                response->headers.insert( make_pair( "Transfer-Encoding", "identity" ) );
+                response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number((qlonglong)m_currentChunk->sizeInBytes()) ) );
+                response->statusLine.version = request.requestLine.version; //do not require HTTP/1.1 here
+                return nx_http::StatusCode::ok;
+            }
+
+            //partial content request
+            response->statusLine.version = nx_http::http_1_1;   //Range is supported by HTTP/1.1
+            nx_http::header::Range range;
+            if( !range.parse( rangeIter->second ) || !range.validateByContentSize(m_currentChunk->sizeInBytes()) )
+            {
+                response->headers.insert( make_pair( "Content-Range", "*/"+nx_http::StringType::number(m_currentChunk->sizeInBytes()) ) );
+                m_chunkInputStream.reset();
+                return nx_http::StatusCode::rangeNotSatisfiable;
+            }
+
+            response->headers.insert( make_pair( "Transfer-Encoding", "identity" ) );
+            response->headers.insert( make_pair( "Content-Range", rangeIter->second+"/"+nx_http::StringType::number(m_currentChunk->sizeInBytes()) ) );
+            response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number(range.totalRangeLength(m_currentChunk->sizeInBytes())) ) );
+
+            static_cast<StreamingChunkInputStream*>(m_chunkInputStream.get())->setByteRange( range );
+            return nx_http::StatusCode::partialContent;
+        }
+        else
+        {
+            m_chunkInputStream.reset();
+            return nx_http::StatusCode::notAcceptable;
+        }
     }
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::createSession(
