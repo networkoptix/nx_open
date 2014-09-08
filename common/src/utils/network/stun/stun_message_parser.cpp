@@ -224,10 +224,10 @@ Attribute* MessageParser::parseFingerprint() {
     Q_ASSERT(ok);
     // XOR back the value that we get from our CRC32 value
     attribute->crc32 = 
-      (xor_crc_32 & 0x000000ff) ^ STUN_FINGERPRINT_XORMASK[0] |
-      (xor_crc_32 & 0x0000ff00) ^ STUN_FINGERPRINT_XORMASK[1] |
-      (xor_crc_32 & 0x00ff0000) ^ STUN_FINGERPRINT_XORMASK[2] |
-      (xor_crc_32 & 0xff000000) ^ STUN_FINGERPRINT_XORMASK[3];
+      ((xor_crc_32 & 0x000000ff) ^ STUN_FINGERPRINT_XORMASK[0]) |
+      ((xor_crc_32 & 0x0000ff00) ^ STUN_FINGERPRINT_XORMASK[1]) |
+      ((xor_crc_32 & 0x00ff0000) ^ STUN_FINGERPRINT_XORMASK[2]) |
+      ((xor_crc_32 & 0xff000000) ^ STUN_FINGERPRINT_XORMASK[3]);
     return attribute.release();
 }
 
