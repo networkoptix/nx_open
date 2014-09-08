@@ -33,6 +33,7 @@
 #include "session_manager.h"
 #include "media_server_reply_processor.h"
 #include "nx_ec/data/api_conversion_functions.h"
+#include "model/camera_list_reply.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
@@ -69,6 +70,7 @@ namespace {
         (CameraAddObject,          "manualCamera/add")
         (EventLogObject,           "events")
         (ImageObject,              "image")
+        (checkCamerasObject,       "checkDiscovery")
         (CameraDiagnosticsObject,  "doCameraDiagnosticsStep")
         (GetSystemNameObject,      "getSystemName")
         (RebuildArchiveObject,     "rebuildArchive")
@@ -296,6 +298,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, image, handle);
         break;
     }
+    case checkCamerasObject:
+        processJsonReply<QnCameraListReply>(this, response, handle);
+        break;
     case CameraDiagnosticsObject:
         processJsonReply<QnCameraDiagnosticsReply>(this, response, handle);
         break;
@@ -384,6 +389,18 @@ int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camer
         methodStr = lit("after");
     params << QnRequestParam("method", methodStr);
     return sendAsyncGetRequest(ImageObject, params, QN_STRINGIZE_TYPE(QImage), target, slot);
+}
+
+int QnMediaServerConnection::checkCameraList(const QnNetworkResourceList &cameras, QObject *target, const char *slot)
+{
+    QnCameraListReply camList;
+    foreach(const QnResourcePtr& c, cameras)
+        camList.uniqueIdList << c->getUniqueId();
+
+    QnRequestHeaderList headers;
+    headers << QnRequestParam("content-type",   "application/json");
+
+    return sendAsyncPostRequest(checkCamerasObject, headers, QnRequestParamList(), QJson::serialized(camList), QN_STRINGIZE_TYPE(QnCameraListReply), target, slot);
 }
 
 int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &list, 
