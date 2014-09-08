@@ -38,15 +38,14 @@ public:
     virtual bool discard() override;
 
 private slots:
-    void updateUi();
-
-    void at_checkForUpdatesFinished(const QnCheckForUpdateResult &result);
     void at_updateFinished(QnUpdateResult result);
+
+    void at_tool_stageChanged(QnFullUpdateStage stage);
 private:
     void initLinkButtons();
     void initBuildSelectionButtons();
 
-    void checkForUpdatesInternet(bool firstTime = false);
+    void checkForUpdatesInternet(bool autoSwitch = false);
     void checkForUpdatesLocal();
 
     bool canStartUpdate();
@@ -68,6 +67,7 @@ private:
     QTimer *m_extraMessageTimer;
     
     QnSoftwareVersion m_targetVersion;
+    QnSoftwareVersion m_latestVersion;
     bool m_checkingInternet;
     bool m_checkingLocal;
 };

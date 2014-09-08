@@ -10,7 +10,7 @@
     <height>635</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,0,0,0,0,1">
+  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,0,0,0,1">
    <item>
     <widget class="QLabel" name="dayWarningLabel">
      <property name="text">
@@ -100,16 +100,57 @@
         </layout>
        </item>
        <item>
-        <widget class="QPushButton" name="internetUpdateButton">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Update</string>
-         </property>
+        <widget class="QWidget" name="detailWidget_2" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="internetUpdateButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Update</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="internetDetailLabel">
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QnProgressWidget" name="internetInfiniteProgress" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>16</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
@@ -142,36 +183,9 @@
         <number>0</number>
        </property>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0">
-         <item>
-          <widget class="QLabel" name="fileTitleLabel">
-           <property name="text">
-            <string>Update from file:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="filenameLineEdit"/>
-         </item>
-         <item>
-          <widget class="QToolButton" name="browseFileButton">
-           <property name="text">
-            <string>...</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QPushButton" name="localUpdateButton">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
+        <widget class="QLabel" name="connectionProblemLabel">
          <property name="text">
-          <string>Update</string>
+          <string>Cannot check updates via the internet.</string>
          </property>
         </widget>
        </item>
@@ -207,6 +221,87 @@
          </item>
         </layout>
        </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0">
+         <item>
+          <widget class="QLabel" name="fileTitleLabel">
+           <property name="text">
+            <string>Update from file:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="filenameLineEdit"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="browseFileButton">
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QWidget" name="detailWidget_3" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="localUpdateButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Update</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="localDetailLabel">
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QnProgressWidget" name="localInfiniteProgress" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>16</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -223,47 +318,6 @@
      <property name="text">
       <string>&lt;a href='latest'&gt;I want latest version&lt;/a&gt;</string>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="detailWidget" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="detailLabel">
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QnProgressWidget" name="infiniteProgressWidget" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>16</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </item>
    <item>
