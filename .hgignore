@@ -155,6 +155,8 @@ debsetup/client-deb/x64
 debsetup/appserver-deb/package
 debsetup/appserver-deb/x86
 debsetup/appserver-deb/x64
+deploy/x64
+deploy/x86
 
 genericrtspplugin/x86
 genericrtspplugin/x64

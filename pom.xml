@@ -647,5 +647,17 @@
 				<compile.option2>-angle</compile.option2>
 			</properties>
 		</profile>          
+		<profile>
+			<id>deploy</id>
+			<activation>
+				<property>
+					<name>deploy</name>
+					<value>!false</value>
+				</property>                
+			</activation>
+			<modules>
+				<module>deploy</module>
+			</modules> 
+		</profile> 		
 	</profiles> 
 </project>
