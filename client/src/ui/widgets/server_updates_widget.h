@@ -37,16 +37,18 @@ public:
     virtual bool confirm() override;
     virtual bool discard() override;
 
-    void checkForUpdates();
-
 private slots:
     void updateUi();
 
     void at_checkForUpdatesFinished(const QnCheckForUpdateResult &result);
     void at_updateFinished(QnUpdateResult result);
 private:
-    void initMenu();
-    void initLinkHandlers();
+    void initLinkButtons();
+    void initBuildSelectionButtons();
+
+    void checkForUpdatesInternet(bool firstTime = false);
+    void checkForUpdatesLocal();
+
     bool canStartUpdate();
 
 private:
@@ -65,13 +67,9 @@ private:
 
     QTimer *m_extraMessageTimer;
     
-    struct {
-        UpdateSource source;
-        QString filename;
-        QnSoftwareVersion build;
-    } m_updateInfo;
-
-    std::array<QAction*, UpdateSourceCount> m_updateSourceActions;
+    QnSoftwareVersion m_targetVersion;
+    bool m_checkingInternet;
+    bool m_checkingLocal;
 };
 
 #endif // SERVER_UPDATES_WIDGET_H

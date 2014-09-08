@@ -30,7 +30,7 @@ namespace {
 
     const int tooLateDayOfWeek = Qt::Thursday;
 
-    const int autoCheckIntervalMs = 5 * 60 * 1000;  // 5 minutes
+    const int autoCheckIntervalMs = 1 * 60 * 1000;  // 5 minutes
 
     const QString copyLinkAction = lit("copyLink");
     const QString saveLinkAction = lit("saveLink");
@@ -40,7 +40,9 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::QnServerUpdatesWidget),
-    m_extraMessageTimer(new QTimer(this))
+    m_extraMessageTimer(new QTimer(this)),
+    m_checkingInternet(false),
+    m_checkingLocal(false)
 {
     ui->setupUi(this);
 
@@ -57,12 +59,40 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::NameColumn, QHeaderView::Stretch);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::VersionColumn, QHeaderView::ResizeToContents);   
 
-    connect(ui->cancelButton,       &QPushButton::clicked,      m_updateTool, &QnMediaServerUpdateTool::cancelUpdate);
-//    connect(ui->startUpdateButton,  &QPushButton::clicked,      m_updateTool, &QnMediaServerUpdateTool::updateServers);
+    connect(ui->cancelButton,           &QPushButton::clicked,      m_updateTool, &QnMediaServerUpdateTool::cancelUpdate);
+    connect(ui->internetUpdateButton,   &QPushButton::clicked,      this, [this] {
+        m_updateTool->startUpdate(m_targetVersion, !m_targetVersion.isNull());
+    });
+    connect(ui->localUpdateButton,      &QPushButton::clicked,      this, [this] {
+        m_updateTool->startUpdate(ui->filenameLineEdit->text());
+    });
+
+    connect(ui->internetRadioButton,    &QRadioButton::toggled,     this, [this] {
+        ui->sourceWidget->setCurrentWidget(ui->internetPage);
+    });
+
+    connect(ui->localRadioButton,       &QRadioButton::toggled,     this, [this] {
+        ui->sourceWidget->setCurrentWidget(ui->localPage);
+    });
+
+    connect(ui->refreshButton,          &QPushButton::clicked,      this, [this] {
+        checkForUpdatesInternet();
+    });
+
+    connect(ui->browseFileButton,       &QPushButton::clicked,      this, [this] {
+        QString fileName = QnFileDialog::getOpenFileName(this, tr("Select Update File..."), QString(), tr("Update Files (*.zip)"), 0, QnCustomFileDialog::fileDialogOptions());
+        if (fileName.isEmpty()) 
+            return;
+        ui->filenameLineEdit->setText(fileName);
+        checkForUpdatesLocal();
+    });
+
+    initLinkButtons();
+    initBuildSelectionButtons();
 
 //    connect(m_updateTool,       &QnMediaServerUpdateTool::stateChanged,         this,           &QnServerUpdatesWidget::updateUi);
     connect(m_updateTool,       &QnMediaServerUpdateTool::progressChanged,      ui->updateProgessBar,   &QProgressBar::setValue);
-    connect(m_updateTool,       &QnMediaServerUpdateTool::checkForUpdatesFinished,  this, &QnServerUpdatesWidget::at_checkForUpdatesFinished);
+    //connect(m_updateTool,       &QnMediaServerUpdateTool::checkForUpdatesFinished,  this, &QnServerUpdatesWidget::at_checkForUpdatesFinished);
     connect(m_updateTool,       &QnMediaServerUpdateTool::updateFinished,           this, &QnServerUpdatesWidget::at_updateFinished);
 
     m_extraMessageTimer->setInterval(longInstallWarningTimeout);
@@ -76,110 +106,29 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->dayWarningLabel->setVisible(false);
     ui->detailWidget->setVisible(false);   
 
-    initMenu();
-    initLinkHandlers();
-
-    connect(ui->localUpdateButton, &QPushButton::clicked, m_updateSourceActions[LocalSource], &QAction::trigger);
-    ui->localUpdateButton->setVisible(false);
-
-    m_updateInfo.source = InternetSource;
-
     QTimer* updateTimer = new QTimer(this);
     updateTimer->setSingleShot(false);
     updateTimer->setInterval(autoCheckIntervalMs);
     connect(updateTimer, &QTimer::timeout, this, [this] {
-        /* Auto refresh only if updates are loaded from internet. */
-        if (m_updateInfo.source != InternetSource)
-            return;
-
         /* Do not check while updating. */
         if (!m_updateTool->idle())
             return;
 
-        checkForUpdates();
+        checkForUpdatesInternet();
     });
     updateTimer->start();
 
     updateUi();
-    checkForUpdates();
+    checkForUpdatesInternet(true);
 }
 
-void QnServerUpdatesWidget::initMenu() {
-    QMenu *menu = new QMenu(this);
-    QActionGroup* actionGroup = new QActionGroup(this);
-    actionGroup->setExclusive(true);
-
-    m_updateSourceActions[InternetSource] = menu->addAction(tr("Internet..."));
-    m_updateSourceActions[LocalSource] = menu->addAction(tr("Local source..."));
-    m_updateSourceActions[SpecificBuildSource] = menu->addAction(tr("Specific build..."));
-
-    for (QAction* action: m_updateSourceActions) {
-        action->setCheckable(true);
-        action->setActionGroup(actionGroup);
-    }
-
-    connect(m_updateSourceActions[InternetSource], &QAction::triggered, this, [this] {
-        if (!m_updateTool->idle())
-            return;
-
-        m_updateInfo.source = InternetSource;
-        updateUi();
-        checkForUpdates();
-    });
-
-    connect(m_updateSourceActions[LocalSource], &QAction::triggered, this, [this] {
-        if (!m_updateTool->idle())
-            return;
-
-        QString fileName = QnFileDialog::getOpenFileName(this, tr("Select Update File..."), QString(), tr("Update Files (*.zip)"), 0, QnCustomFileDialog::fileDialogOptions());
-        if (fileName.isEmpty()) {
-            updateUi();
-            return;
-        }
-
-        m_updateInfo.source = LocalSource;
-        m_updateInfo.filename = fileName;
-
-        updateUi();
-        checkForUpdates();
-    });
-
-
-    connect(m_updateSourceActions[SpecificBuildSource], &QAction::triggered, this, [this] {
-        if (!m_updateTool->idle())
-            return;
-
-        QnBuildNumberDialog dialog(this);
-        if (!dialog.exec()) {
-            updateUi();
-            return;
-        }
-
-        m_updateInfo.source = SpecificBuildSource;
-        QnSoftwareVersion version = qnCommon->engineVersion();
-        m_updateInfo.build = QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber());
-
-        updateUi();
-        checkForUpdates();
-    });
-
-
- /*   ui->sourceButton->setIcon(qnSkin->icon("tree/branch_open.png"));
-    connect(ui->sourceButton, &QPushButton::clicked, this, [this, menu] {
-        QPoint local = ui->sourceButton->geometry().bottomLeft();
-        menu->popup(ui->sourceButton->mapToGlobal(local));
-    });*/
-}
-
-void QnServerUpdatesWidget::initLinkHandlers() {
-
-    auto copyAction = [this] {
-        QString package = m_updateTool->generateUpdatePackageUrl(QnSoftwareVersion()).toString();
-        qApp->clipboard()->setText(package);
+void QnServerUpdatesWidget::initLinkButtons() {
+    connect(ui->copyLinkButton, &QPushButton::clicked, this, [this] {
+        qApp->clipboard()->setText(ui->linkLineEdit->text());
         QMessageBox::information(this, tr("Success"), tr("URL copied to clipboard."));
-    };
+    });
 
-    auto saveAction = [this] {
+    connect(ui->saveLinkButton, &QPushButton::clicked, this, [this] {
         QString fileName = QnFileDialog::getSaveFileName(this, tr("Save to file..."), QString(), tr("Url Files (*.url)"), 0, QnCustomFileDialog::fileDialogOptions());
         if (fileName.isEmpty())
             return;
@@ -204,19 +153,47 @@ void QnServerUpdatesWidget::initLinkHandlers() {
             return;
         }
 
-        QString package = m_updateTool->generateUpdatePackageUrl(QnSoftwareVersion()).toString();
+        QString package = ui->linkLineEdit->text();
         QTextStream out(&data);
         out << lit("[InternetShortcut]") << endl << package << endl;
 
         data.close();
-    };
-
-    connect(ui->detailLabel, &QLabel::linkActivated, this, [this, copyAction, saveAction](const QString &link) {       
-        if (link == copyLinkAction)
-            copyAction();
-        else if (link == saveLinkAction)
-           saveAction();
     });
+    
+    connect(ui->linkLineEdit,           &QLineEdit::textChanged,    this, [this](const QString &text){
+        ui->copyLinkButton->setEnabled(!text.isEmpty());
+        ui->saveLinkButton->setEnabled(!text.isEmpty());
+    });
+
+    ui->copyLinkButton->setEnabled(false);
+    ui->saveLinkButton->setEnabled(false);
+}
+
+void QnServerUpdatesWidget::initBuildSelectionButtons() {
+    connect(ui->latestBuildLabel,   &QLabel::linkActivated, this, [this] {
+        m_targetVersion = QnSoftwareVersion();
+        ui->linkLineEdit->setText(m_updateTool->generateUpdatePackageUrl(m_targetVersion).toString());
+        ui->latestBuildLabel->setVisible(false);
+        ui->specificBuildLabel->setVisible(true);
+        checkForUpdatesInternet();
+    });
+
+    connect(ui->specificBuildLabel,   &QLabel::linkActivated, this, [this] {
+
+        QnBuildNumberDialog dialog(this);
+        if (!dialog.exec())
+            return;
+
+        QnSoftwareVersion version = qnCommon->engineVersion();
+        m_targetVersion = QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber());
+
+        ui->linkLineEdit->setText(m_updateTool->generateUpdatePackageUrl(m_targetVersion).toString());
+        ui->specificBuildLabel->setVisible(false);
+        ui->latestBuildLabel->setVisible(true);
+        checkForUpdatesInternet();
+    });
+
+    ui->latestBuildLabel->setVisible(false);
 }
 
 bool QnServerUpdatesWidget::canStartUpdate() {
@@ -243,41 +220,28 @@ QnMediaServerUpdateTool *QnServerUpdatesWidget::updateTool() const {
 }
 
 void QnServerUpdatesWidget::updateFromSettings() {
-    m_updateSourceActions[InternetSource]->trigger();
-}
-
-void QnServerUpdatesWidget::checkForUpdates() {
     if (!m_updateTool->idle())
         return;
 
-    switch (m_updateInfo.source) {
-    case InternetSource:
-        m_updateTool->checkForUpdates();
-        break;
-    case LocalSource:
-        m_updateTool->checkForUpdates(m_updateInfo.filename);
-        break;
-    case  SpecificBuildSource:
-        m_updateTool->checkForUpdates(m_updateInfo.build, true);
-        break;
-    default:
-        Q_ASSERT(false); //should never get here
-        break;
-    }
+    ui->internetRadioButton->setChecked(true);
+    checkForUpdatesInternet();
 }
 
 void QnServerUpdatesWidget::updateUi() {
-    m_updateSourceActions[m_updateInfo.source]->setChecked(true);
+
 /*    ui->sourceButton->setEnabled(m_updateTool->idle());*/
+/*
     for (QAction* action: m_updateSourceActions)
         action->setEnabled(m_updateTool->idle());
+*/
 
   /*  if (!m_updateTool->targetVersion().isNull())
         ui->latestVersionLabel->setText(m_updateTool->targetVersion().toString());*/
 
-    ui->startUpdateButton->setVisible(canStartUpdate() ||
+   /* ui->startUpdateButton->setVisible(canStartUpdate() ||
         m_updateTool->isUpdating());
     ui->startUpdateButton->setEnabled(canStartUpdate());
+*/
 
     ui->dayWarningLabel->setVisible(QDateTime::currentDateTime().date().dayOfWeek() >= tooLateDayOfWeek 
         && canStartUpdate());
@@ -359,7 +323,7 @@ void QnServerUpdatesWidget::at_checkForUpdatesFinished(const QnCheckForUpdateRes
         detail = tr("No Internet connection available. "\
             "To update manually, download an archive with the following <a href=%1>link<.a>. "\
             "You can also <a href=%1>Copy link</a> or <a href=%2>Save link to file</a>.")
-             .arg(m_updateTool->generateUpdatePackageUrl(QnSoftwareVersion()).toString()).arg(copyLinkAction).arg(saveLinkAction);
+             .arg(m_updateTool->generateUpdatePackageUrl(result.latestVersion).toString()).arg(copyLinkAction).arg(saveLinkAction);
         break;
     case QnCheckForUpdateResult::NoNewerVersion:
         detail = tr("All components in your system are up to date.");
@@ -377,15 +341,12 @@ void QnServerUpdatesWidget::at_checkForUpdatesFinished(const QnCheckForUpdateRes
         setWarningStyle(&detailPalette);
         break;
     case QnCheckForUpdateResult::BadUpdateFile:
-        detail = tr("Cannot update from this file: %1").arg(m_updateInfo.filename);
+        detail = tr("Cannot update from this file");
         setWarningStyle(&detailPalette);
         break;
     }
 
     bool local = (result.result == QnCheckForUpdateResult::InternetProblem);
-
-    ui->localUpdateButton->setVisible(local);
-    ui->startUpdateButton->setVisible(!local);
 
     ui->detailWidget->setVisible(!detail.isEmpty());
     ui->detailLabel->setText(detail);
@@ -440,3 +401,115 @@ void QnServerUpdatesWidget::at_updateFinished(QnUpdateResult result) {
     }
     checkForUpdates();*/
 }
+
+void QnServerUpdatesWidget::checkForUpdatesInternet(bool firstTime) {
+    if (m_checkingInternet)
+        false;
+    m_checkingInternet = true;
+
+    m_updateTool->checkForUpdates(m_targetVersion, !m_targetVersion.isNull(), [this, firstTime](const QnCheckForUpdateResult &result) {
+        QPalette detailPalette = this->palette();
+        QPalette statusPalette = this->palette();
+        QString detail;
+        QString status;
+
+        switch (result.result) {
+        case QnCheckForUpdateResult::UpdateFound:
+            if (!result.latestVersion.isNull() && result.clientInstallerRequired)
+                detail = tr("Newer version found. You will have to update the client manually using an installer.");
+            status = result.latestVersion.toString();
+            break;
+        case QnCheckForUpdateResult::InternetProblem:
+            status = tr("Internet connection problem");
+            setWarningStyle(&statusPalette);
+            break;
+        case QnCheckForUpdateResult::NoNewerVersion:
+            status = result.latestVersion.toString();
+            break;
+        case QnCheckForUpdateResult::NoSuchBuild:
+            status = result.latestVersion.toString();
+            detail = tr("There is no such build on the update server");
+            setWarningStyle(&statusPalette);
+            setWarningStyle(&detailPalette);
+            break;
+        case QnCheckForUpdateResult::ServerUpdateImpossible:
+            status = result.latestVersion.toString();
+            detail = tr("Cannot start update. An update for one or more servers was not found.");
+            setWarningStyle(&detailPalette);
+            break;
+        case QnCheckForUpdateResult::ClientUpdateImpossible:
+            status = result.latestVersion.toString();
+            detail = tr("Cannot start update. An update for the client was not found.");
+            setWarningStyle(&detailPalette);
+            break;
+        default:
+            Q_ASSERT(false);    //should never get here
+        }
+
+        if (firstTime && result.result == QnCheckForUpdateResult::InternetProblem) {
+            ui->localRadioButton->setChecked(true);
+        }
+
+        ui->detailWidget->setVisible(!detail.isEmpty());
+        ui->detailLabel->setText(detail);
+        ui->detailLabel->setPalette(detailPalette);
+        ui->latestVersionLabel->setText(status);
+        ui->latestVersionLabel->setPalette(statusPalette);
+
+        m_checkingInternet = false;
+    });
+
+}
+
+void QnServerUpdatesWidget::checkForUpdatesLocal() {
+    if (m_checkingLocal)
+        false;
+    m_checkingLocal = true;
+
+    m_updateTool->checkForUpdates(ui->filenameLineEdit->text(), [this](const QnCheckForUpdateResult &result){
+
+
+        QPalette detailPalette = this->palette();
+        QString detail;
+
+        switch (result.result) {
+        case QnCheckForUpdateResult::UpdateFound:
+            if (!result.latestVersion.isNull() && result.clientInstallerRequired)
+                detail = tr("Newer version found. You will have to update the client manually using an installer.");
+            break;
+        case QnCheckForUpdateResult::InternetProblem:
+            detail = tr("No Internet connection available.");
+            break;
+        case QnCheckForUpdateResult::NoNewerVersion:
+            detail = tr("All components in your system are up to date.");
+            break;
+        case QnCheckForUpdateResult::NoSuchBuild:
+            detail = tr("There is no such build on the update server");
+            setWarningStyle(&detailPalette);
+            break;
+        case QnCheckForUpdateResult::ServerUpdateImpossible:
+            detail = tr("Cannot start update. An update for one or more servers was not found.");
+            setWarningStyle(&detailPalette);
+            break;
+        case QnCheckForUpdateResult::ClientUpdateImpossible:
+            detail = tr("Cannot start update. An update for the client was not found.");
+            setWarningStyle(&detailPalette);
+            break;
+        case QnCheckForUpdateResult::BadUpdateFile:
+            detail = tr("Cannot update from this file");
+            setWarningStyle(&detailPalette);
+            break;
+        default:
+            Q_ASSERT(false);    //should never get here
+        }
+
+        bool local = (result.result == QnCheckForUpdateResult::InternetProblem);
+
+        ui->detailWidget->setVisible(!detail.isEmpty());
+        ui->detailLabel->setText(detail);
+        ui->detailLabel->setPalette(detailPalette);
+
+        m_checkingLocal = false;
+    });
+}
+

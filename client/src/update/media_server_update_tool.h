@@ -35,6 +35,14 @@ public:
 
     /** Generate url for download update file, depending on actual targets list. */
     QUrl generateUpdatePackageUrl(const QnSoftwareVersion &targetVersion) const;
+
+    void checkForUpdates(const QnSoftwareVersion &version = QnSoftwareVersion(), bool denyMajorUpdates = false, std::function<void(const QnCheckForUpdateResult &result)> func = NULL);
+    void checkForUpdates(const QString &fileName, std::function<void(const QnCheckForUpdateResult &result)> func = NULL);
+
+    void startUpdate(const QnSoftwareVersion &version = QnSoftwareVersion(), bool denyMajorUpdates = false);
+    void startUpdate(const QString &fileName);
+
+    bool cancelUpdate();
 signals:
     void stageChanged(QnFullUpdateStage stage);
     void progressChanged(int progress);
@@ -45,19 +53,9 @@ signals:
 
     void checkForUpdatesFinished(const QnCheckForUpdateResult &result);
     void updateFinished(QnUpdateResult result);
-
-public slots:
-    void checkForUpdates(const QnSoftwareVersion &version = QnSoftwareVersion(), bool denyMajorUpdates = false);
-    void checkForUpdates(const QString &fileName);
-
-    void startUpdate(const QnSoftwareVersion &version = QnSoftwareVersion(), bool denyMajorUpdates = false);
-    void startUpdate(const QString &fileName);
-
-    bool cancelUpdate();
-
 private:
     void startUpdate(const QnUpdateTarget &target);
-    void checkForUpdates(const QnUpdateTarget &target);
+    void checkForUpdates(const QnUpdateTarget &target, std::function<void(const QnCheckForUpdateResult &result)> func = NULL);
 
     void setStage(QnFullUpdateStage stage);
     void finishUpdate(QnUpdateResult result);
