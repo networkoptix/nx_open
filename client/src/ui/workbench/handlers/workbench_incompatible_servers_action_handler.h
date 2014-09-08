@@ -27,12 +27,13 @@ private:
 
 private slots:
     void at_connectToCurrentSystemTool_finished(int errorCode);
+    void at_connectToCurrentSystemTool_canceled();
     void at_joinSystemTool_finished(int errorCode);
 
 private:
     QnConnectToCurrentSystemTool *m_connectToCurrentSystemTool;
     QnJoinSystemTool *m_joinSystemTool;
-    QnProgressDialog *m_progressDialog;
+    QPointer<QnProgressDialog> m_progressDialog;
 };
 
 #endif // WORKBENCH_INCOMPATIBLE_SERVERS_ACTION_HANDLER_H

@@ -10,11 +10,13 @@
 #include <utils/wait_compatible_servers_peer_task.h>
 #include <utils/media_server_update_tool.h>
 #include <utils/common/software_version.h>
-#include <ui/dialogs/progress_dialog.h>
 
 #include "version.h"
 
 namespace {
+    static const int configureProgress = 25;
+    static const int waitProgress = 50;
+
     enum UpdateToolState {
         CheckingForUpdates,
         Updating
@@ -79,17 +81,27 @@ QSet<QUuid> QnConnectToCurrentSystemTool::targets() const {
     return m_targets;
 }
 
+void QnConnectToCurrentSystemTool::cancel() {
+    if (!m_running)
+        return;
+
+    m_configureTask->cancel();
+    m_waitTask->cancel();
+    m_updateTool->cancelUpdate();
+
+    emit canceled();
+}
+
 void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode) {
     m_running = false;
-    if (m_updateProgressDialog) {
-        m_updateProgressDialog->hide();
-        m_updateProgressDialog.reset();
-    }
     revertApiUrls();
     emit finished(errorCode);
 }
 
 void QnConnectToCurrentSystemTool::configureServer() {
+    emit progressChanged(0);
+    emit stateChanged(tr("Configuring server(s)"));
+
     QnUserResourcePtr adminUser = getAdminUser();
     if (!adminUser) {
         finish(ConfigurationFailed);
@@ -115,6 +127,7 @@ void QnConnectToCurrentSystemTool::configureServer() {
 }
 
 void QnConnectToCurrentSystemTool::waitPeers() {
+    emit progressChanged(configureProgress);
     m_waitTask->setPeers(QSet<QUuid>::fromList(m_waitTargets.values()));
     m_waitTask->start();
 }
@@ -125,19 +138,14 @@ void QnConnectToCurrentSystemTool::updatePeers() {
         return;
     }
 
+    emit stateChanged(tr("Updating server(s)"));
+    at_updateTool_progressChanged(0);
+
     m_updateFailed = false;
     m_updateTool->setTargets(m_updateTargets);
     m_prevToolState = CheckingForUpdates;
     m_updateTool->setDenyMajorUpdates(true);
     m_updateTool->checkForUpdates();
-
-    m_updateProgressDialog.reset(new QnProgressDialog(mainWindow()));
-    m_updateProgressDialog->setWindowTitle(tr("Updating Servers"));
-    m_updateProgressDialog->setMinimumDuration(1000);
-    m_updateProgressDialog->setModal(false);
-    connect(m_updateProgressDialog,     &QnProgressDialog::cancel,                  m_updateTool,               &QnMediaServerUpdateTool::cancelUpdate);
-    connect(m_updateTool,               &QnMediaServerUpdateTool::progressChanged,  m_updateProgressDialog,     &QnProgressDialog::setValue);
-    m_updateProgressDialog->show();
 }
 
 void QnConnectToCurrentSystemTool::revertApiUrls() {
@@ -214,7 +222,9 @@ void QnConnectToCurrentSystemTool::at_updateTool_stateChanged(int state) {
         m_updateFailed = (m_updateTool->updateResult() != QnUpdateResult::Successful);
     }
 
-    m_updateProgressDialog->hide();
-    m_updateProgressDialog.reset();
     finish(m_updateFailed ? UpdateFailed : NoError);
+}
+
+void QnConnectToCurrentSystemTool::at_updateTool_progressChanged(int progress) {
+    emit progressChanged(waitProgress + progress / 2);
 }

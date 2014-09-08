@@ -10,7 +10,6 @@
 class QnConfigurePeerTask;
 class QnMediaServerUpdateTool;
 class QnWaitCompatibleServersPeerTask;
-class QnProgressDialog;
 
 class QnConnectToCurrentSystemTool : public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -32,8 +31,14 @@ public:
 
     QSet<QUuid> targets() const;
 
+public slots:
+    void cancel();
+
 signals:
     void finished(int errorCode);
+    void canceled();
+    void progressChanged(int progress);
+    void stateChanged(const QString &stateText);
 
 private:
     void finish(ErrorCode errorCode);
@@ -46,6 +51,7 @@ private slots:
     void at_configureTask_finished(int errorCode, const QSet<QUuid> &failedPeers);
     void at_waitTask_finished(int errorCode);
     void at_updateTool_stateChanged(int state);
+    void at_updateTool_progressChanged(int progress);
 
 private:
     bool m_running;
@@ -59,7 +65,6 @@ private:
     QnConfigurePeerTask *m_configureTask;
     QnWaitCompatibleServersPeerTask *m_waitTask;
     QnMediaServerUpdateTool *m_updateTool;
-    QScopedPointer<QnProgressDialog> m_updateProgressDialog;
     int m_prevToolState;
     bool m_updateFailed;
     bool m_restartAllPeers;
