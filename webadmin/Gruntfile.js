@@ -79,7 +79,18 @@ module.exports = function (grunt) {
                     context: '/ec2/',
                     host: 'localhost',
                     port: 9001,
+                },
+                {
+                    context: '/api/',
+                    host: 'mono',
+                    port: 40000,
                 }
+                /* ,
+                {
+                    context: '/',
+                    host: 'mono',
+                    port: 41000,
+                } */
             ],
             livereload: {
                 options: {

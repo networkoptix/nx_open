@@ -242,21 +242,25 @@ namespace ec2
                  this, &TimeSynchronizationManager::onPeerLost,
                  Qt::DirectConnection );
 
-        using namespace std::placeholders;
-        if( peerType == Qn::PT_Server )
         {
-            m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
-                std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
-                0 );
-            m_internetSynchronizationTaskID = TimerManager::instance()->addTimer(
-                std::bind( &TimeSynchronizationManager::syncTimeWithInternet, this, _1 ),
-                0 );
-            NX_LOG( lit( "TimeSynchronizationManager. Added time sync task %1, delay %2" ).arg( m_internetSynchronizationTaskID ).arg( m_internetTimeSynchronizationPeriod * MILLIS_PER_SEC ), cl_logDEBUG2 );
+            QMutexLocker lk( &m_mutex );
+
+            using namespace std::placeholders;
+            if( peerType == Qn::PT_Server )
+            {
+                m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
+                    std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
+                    0 );
+                m_internetSynchronizationTaskID = TimerManager::instance()->addTimer(
+                    std::bind( &TimeSynchronizationManager::syncTimeWithInternet, this, _1 ),
+                    0 );
+                NX_LOG( lit( "TimeSynchronizationManager. Added time sync task %1, delay %2" ).arg( m_internetSynchronizationTaskID ).arg( m_internetTimeSynchronizationPeriod * MILLIS_PER_SEC ), cl_logDEBUG2 );
+            }
+            else
+                m_manualTimerServerSelectionCheckTaskID = TimerManager::instance()->addTimer(
+                    std::bind( &TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired, this, _1 ),
+                    MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS );
         }
-        else
-            m_manualTimerServerSelectionCheckTaskID = TimerManager::instance()->addTimer(
-                std::bind( &TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired, this, _1 ),
-                MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS );
 
         assert( TimeManager_instance.load(std::memory_order_relaxed) == nullptr );
         TimeManager_instance.store( this, std::memory_order_relaxed );
