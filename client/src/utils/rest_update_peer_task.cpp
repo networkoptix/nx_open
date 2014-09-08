@@ -46,6 +46,9 @@ void QnRestUpdatePeerTask::cancel() {
 }
 
 void QnRestUpdatePeerTask::doStart() {
+    m_currentServers.clear();
+    m_serverBySystemInformation.clear();
+
     foreach (const QUuid &id, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
         Q_ASSERT_X(server, "An incompatible server resource is expected here.", Q_FUNC_INFO);
@@ -91,6 +94,7 @@ void QnRestUpdatePeerTask::installNextUpdate() {
 }
 
 void QnRestUpdatePeerTask::finishPeer() {
+    qnResPool->disconnect(this);
     QnMediaServerResourcePtr server = m_currentServers.takeFirst();
     emit peerFinished(server->getId());
     emit peerUpdateFinished(server->getId(), QUuid(server->getProperty(lit("guid"))));
@@ -117,6 +121,9 @@ void QnRestUpdatePeerTask::at_updateInstalled(int status, int handle) {
 }
 
 void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr &resource) {
+    if (m_currentServers.isEmpty())
+        return;
+
     if (m_targetId != resource->getId())
         return;
 
@@ -124,20 +131,20 @@ void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr &resource) {
     if (!server)
         return;
 
-    if (server->getVersion() == m_version) {
-        sender()->disconnect(this);
-        finishPeer();
-        return;
-    }
-
     if (server->getStatus() != Qn::Offline && server->getStatus() != Qn::Incompatible) {
         /* The situation is the same as in QnInstallUpdatesPeerTask.
            If the server has gone online we should get resource update soon, so we don't have to wait minutes before we know the new version. */
         m_timer->start(shortTimeout);
+
+        if (server->getVersion() == m_version)
+            finishPeer();
     }
 }
 
 void QnRestUpdatePeerTask::at_timer_timeout() {
+    if (m_currentServers.isEmpty())
+        return;
+
     finish(InstallationError);
 }
 
