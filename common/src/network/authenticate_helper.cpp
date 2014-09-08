@@ -166,12 +166,12 @@ bool QnAuthHelper::authenticate( const QAuthenticator& auth, const nx_http::Resp
     const nx_http::BufferType& authHeaderBuf = nx_http::getHeaderValue(
         response.headers,
         response.statusLine.statusCode == nx_http::StatusCode::proxyAuthenticationRequired ? "Proxy-Authenticate" : "WWW-Authenticate" );
-    nx_http::Header::WWWAuthenticate authenticateHeader;
+    nx_http::header::WWWAuthenticate authenticateHeader;
     if( !authenticateHeader.parse( authHeaderBuf ) )
         return false;
     switch( authenticateHeader.authScheme )
     {
-        case nx_http::Header::AuthScheme::digest:
+        case nx_http::header::AuthScheme::digest:
             nx_http::insertOrReplaceHeader(
                 &request->headers,
                 nx_http::parseHeader( CLSimpleHTTPClient::digestAccess(
@@ -183,7 +183,7 @@ bool QnAuthHelper::authenticate( const QAuthenticator& auth, const nx_http::Resp
                     response.statusLine.statusCode == nx_http::StatusCode::proxyAuthenticationRequired ).toLatin1() ) );
             return true;
 
-        case nx_http::Header::AuthScheme::basic:
+        case nx_http::header::AuthScheme::basic:
             nx_http::insertOrReplaceHeader(
                 &request->headers,
                 nx_http::parseHeader( CLSimpleHTTPClient::basicAuth(auth) ) );

@@ -522,8 +522,8 @@ namespace nxcip
         */
         virtual bool atEnd() const = 0;
         /*!
-            \param[out] start Start of time period (usec since 1970-01-01, UTC)
-            \param[out] end End of time period (usec since 1970-01-01, UTC)
+            \param[out] start Start of time period (usec (microseconds) since 1970-01-01, UTC)
+            \param[out] end End of time period (usec (microseconds) since 1970-01-01, UTC)
             \return \a true, if data present (cursor is on valid position)
         */
         virtual bool get( UsecUTCTimestamp* start, UsecUTCTimestamp* end ) const = 0;
@@ -815,7 +815,7 @@ namespace nxcip
             fStreamReset        = 0x10
         };
 
-        //!Packet's timestamp (usec since 1970-01-01, UTC)
+        //!Packet's timestamp (usec (microseconds) since 1970-01-01, UTC)
         virtual UsecUTCTimestamp timestamp() const = 0;
         //!Packet type
         virtual DataPacketType type() const = 0;
@@ -1018,12 +1018,12 @@ namespace nxcip
             \a DtsArchiveReader instance holds reference to returned \a StreamReader instance
         */
         virtual StreamReader* getStreamReader() = 0;
-        //!Returns timestamp (usec since 1970-01-01, UTC) of oldest data, present in the archive
+        //!Returns timestamp (usec (microseconds) since 1970-01-01, UTC) of oldest data, present in the archive
         /*!
             This value can be changed at any time (if record is ongoing)
         */
         virtual UsecUTCTimestamp startTime() const = 0;
-        //!Returns timestamp (usec since 1970-01-01, UTC) of newest data, present in the archive
+        //!Returns timestamp (usec (microseconds) since 1970-01-01, UTC) of newest data, present in the archive
         /*!
             This value can be changed at any time (if record is ongoing)
         */
@@ -1087,7 +1087,7 @@ namespace nxcip
             bool waitForKeyFrame ) = 0;
         //!Play time range [start; end) skipping frames
         /*!
-            Tells to skip media packets for inter-packet timestamp gap to be at least \a step usec.
+            Tells to skip media packets for inter-packet timestamp gap to be at least \a step usec (microseconds).
             When frame skipping is implied, audio packets SHOULD not be reported
             \param[in] cSeq New value of command sequence counter
             \param start Position to seek to

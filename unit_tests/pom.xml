@@ -1,0 +1,23 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>cpp</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.3.0-SNAPSHOT</version>
+        <relativePath>../cpp</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.3.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>unit_tests</artifactId>
+    <packaging>pom</packaging>
+    <name>HD Witness Unit Tests</name>
+
+    <properties>
+        <root.dir>${basedir}/../..</root.dir>
+<!--
+        <libtype>plugin</libtype>
+        <buildLib>sharedlib</buildLib>
+-->
+    </properties>
+</project>
