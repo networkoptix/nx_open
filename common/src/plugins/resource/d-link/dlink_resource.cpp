@@ -196,8 +196,6 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         return CameraDiagnostics::UnknownErrorResult();
 
 
-    QMutexLocker mutexLocker(&m_mutex);
-
     QString file_s = QLatin1String(cam_info_file);
     QStringList lines = file_s.split(QLatin1String("\r\n"), QString::SkipEmptyParts);
 
