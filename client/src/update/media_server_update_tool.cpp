@@ -154,10 +154,6 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &
     }
 
     QSet<QnSystemInformation> systemInformationList;
-    m_targetPeerIds.clear();
-    m_incompatiblePeerIds.clear();
-    m_targetPeerIds.clear();
-    m_incompatiblePeerIds.clear();
     foreach (const QnMediaServerResourcePtr &server, actualTargets()) {
         bool incompatible = (server->getStatus() == Qn::Incompatible);
 
