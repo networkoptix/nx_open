@@ -55,17 +55,15 @@ namespace nx_hls
 
         nx_http::HttpStreamReader m_httpStreamReader;
         State m_state;
-        nx::Buffer m_readBuffer;
-        nx::Buffer m_writeBuffer;
+        nx_http::BufferType m_readBuffer;
+        nx_http::BufferType m_writeBuffer;
         StreamingChunkPtr m_currentChunk;
-        //!For reading data from \a m_currentChunk
-        std::unique_ptr<AbstractInputByteStream> m_chunkInputStream;
+        StreamingChunk::SequentialReadingContext m_chunkReadCtx;
         QMutex m_mutex;
         QWaitCondition m_cond;
         bool m_switchToChunkedTransfer;
         bool m_useChunkedTransfer;
         QString m_currentFileName;
-        size_t m_bytesSent;
 
         /*!
             \return false in case if error

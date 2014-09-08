@@ -10,8 +10,6 @@
 #include <functional>
 #include <map>
 
-#include <boost/optional.hpp>
-
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
 #include <QtCore/QUrl>
@@ -216,9 +214,7 @@ namespace nx_http
             forbidden = 403,
             notFound = 404,
             notAllowed = 405,
-            notAcceptable = 406,
             proxyAuthenticationRequired = 407,
-            rangeNotSatisfiable = 416,
             internalServerError = 500,
             notImplemented = 501,
             serviceUnavailable = 503
@@ -348,7 +344,7 @@ namespace nx_http
     };
 
     //!Contains http header structures
-    namespace header
+    namespace Header
     {
         //!Http authentication scheme enumeration
         namespace AuthScheme
@@ -396,7 +392,7 @@ namespace nx_http
             void serialize( BufferType* const dstBuffer ) const;
         };
 
-        //!Authorization header ([rfc2616, 14.8], rfc2617)
+        //!Authorization header (rfc2616, rfc2617)
         class Authorization
         {
         public:
@@ -441,7 +437,6 @@ namespace nx_http
             void addParam( const BufferType& name, const BufferType& value );
         };
 
-        //![rfc2616, 14.47]
         class WWWAuthenticate
         {
         public:
@@ -451,59 +446,6 @@ namespace nx_http
             WWWAuthenticate();
 
             bool parse( const BufferType& str );
-        };
-
-        //![rfc2616, 14.3]
-        class AcceptEncodingHeader
-        {
-        public:
-            AcceptEncodingHeader( const nx_http::StringType& strValue );
-
-            //!Returns \a true if \a encodingName is present in header and returns corresponding qvalue in \a *q (if not null)
-            bool encodingIsAllowed( const nx_http::StringType& encodingName, float* q = nullptr ) const;
-
-        private:
-            nx_http::StringType m_strValue;
-        };
-
-        //![rfc2616, 14.35]
-        class Range
-        {
-        public:
-            /*!
-                \note Boundaries are inclusive
-            */
-            class RangeSpec
-            {
-            public:
-                quint64 start;
-                boost::optional<quint64> end;
-
-                RangeSpec()
-                :
-                    start( 0 )
-                {
-                }
-            };
-
-
-            Range();
-
-            /*!
-                \note In case of parse error, contents of this object are undefined
-            */
-            bool parse( const nx_http::StringType& strValue );
-
-            //!Returns \a true if range is satisfiable for content of size \a contentSize
-            bool validateByContentSize( size_t contentSize ) const;
-            //!\a true, if empty range (does not include any bytes of content)
-            bool empty() const;
-            //!\a true, if range is full (includes all bytes of content of size \a contentSize)
-            bool full( size_t contentSize ) const;
-            //!Returns range length for content of size \a contentSize
-            quint64 totalRangeLength( size_t contentSize ) const;
-
-            std::vector<RangeSpec> rangeSpecList;
         };
     }
 

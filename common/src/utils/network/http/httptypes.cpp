@@ -235,12 +235,8 @@ namespace nx_http
                     return StringType("Not Found");
                 case notAllowed:
                     return StringType("Not Allowed");
-                case notAcceptable:
-                    return StringType("Not Acceptable");
                 case proxyAuthenticationRequired:
                     return StringType("Proxy Authentication Required");
-                case rangeNotSatisfiable:
-                    return StringType("Requested range not satisfiable");
                 case internalServerError:
                     return StringType("Internal Server Error");
                 case notImplemented:
@@ -649,7 +645,7 @@ namespace nx_http
     }
 
 
-	namespace header
+	namespace Header
 	{
 		namespace AuthScheme
 		{
@@ -868,138 +864,6 @@ namespace nx_http
             }
 
             return true;
-        }
-
-
-        //////////////////////////////////////////////
-        //   Accept-Encoding
-        //////////////////////////////////////////////
-
-        AcceptEncodingHeader::AcceptEncodingHeader( const nx_http::StringType& strValue )
-        :
-            m_strValue( strValue )
-        {
-        }
-
-        bool AcceptEncodingHeader::encodingIsAllowed( const nx_http::StringType& encodingName, float* q ) const
-        {
-            //TODO #ak using very simplified (and incorrect) implementation because it is currently use only by hls and this implementation is enough for hls client
-            if( m_strValue.isEmpty() ||                         //empty Accept-Encoding means any encoding will do
-                m_strValue.indexOf(encodingName) >= 0 || 
-                m_strValue.indexOf('*') >= 0 )
-            {
-                if( q )
-                    *q = 0.5;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-
-        //////////////////////////////////////////////
-        //   Range
-        //////////////////////////////////////////////
-
-        Range::Range()
-        {
-        }
-
-        bool Range::parse( const nx_http::StringType& strValue )
-        {
-            auto simpleRangeList = strValue.split(',');
-            rangeSpecList.reserve( simpleRangeList.size() );
-            for( const StringType& simpleRangeStr: simpleRangeList )
-            {
-                if( simpleRangeStr.isEmpty() )
-                    return false;
-                RangeSpec rangeSpec;
-                const int sepPos = simpleRangeStr.indexOf('-');
-                if( sepPos == -1 )
-                {
-                    rangeSpec.start = simpleRangeStr.toULongLong();
-                    rangeSpec.end = rangeSpec.start;
-                }
-                else
-                {
-                    rangeSpec.start = StringType::fromRawData(simpleRangeStr.constData(), sepPos).toULongLong();
-                    if( sepPos < simpleRangeStr.size()-1 )  //range end is not empty
-                       rangeSpec.end = StringType::fromRawData(simpleRangeStr.constData()+sepPos+1, simpleRangeStr.size()-sepPos-1).toULongLong();
-                }
-                if( rangeSpec.end && rangeSpec.end < rangeSpec.start )
-                    return false;
-                rangeSpecList.push_back( std::move(rangeSpec) );
-            }
-
-            return true;
-        }
-
-        bool Range::validateByContentSize( size_t contentSize ) const
-        {
-            for( const RangeSpec& rangeSpec: rangeSpecList )
-            {
-                if( (rangeSpec.start >= contentSize) || (rangeSpec.end && rangeSpec.end >= contentSize) )
-                    return false;
-            }
-
-            return true;
-        }
-
-        bool Range::empty() const
-        {
-            return rangeSpecList.empty();
-        }
-
-        bool Range::full( size_t contentSize ) const
-        {
-            if( contentSize == 0 )
-                return true;
-
-            //map<start, end>
-            std::map<quint64, quint64> rangesSorted;
-            for( const RangeSpec& rangeSpec: rangeSpecList )
-                rangesSorted.emplace( rangeSpec.start, rangeSpec.end ? rangeSpec.end.get() : contentSize );
-
-            quint64 curPos = 0;
-            for( const std::pair<quint64, quint64>& range: rangesSorted )
-            {
-                if( range.first > curPos )
-                    return false;
-                if( range.second >= curPos )
-                    curPos = range.second+1;
-            }
-
-            return curPos >= contentSize;
-        }
-
-        quint64 Range::totalRangeLength( size_t contentSize ) const
-        {
-            if( contentSize == 0 || rangeSpecList.empty() )
-                return 0;
-
-            //map<start, end>
-            std::map<quint64, quint64> rangesSorted;
-            for( const RangeSpec& rangeSpec: rangeSpecList )
-                rangesSorted.emplace( rangeSpec.start, rangeSpec.end ? rangeSpec.end.get() : contentSize );
-
-            quint64 curPos = 0;
-            quint64 totalLength = 0;
-            for( const std::pair<quint64, quint64>& range: rangesSorted )
-            {
-                if( curPos < range.first )
-                    curPos = range.first;
-                if( range.second < curPos )
-                    continue;
-                const quint64 endPos = std::min<quint64>( contentSize-1, range.second );
-                totalLength += endPos - curPos + 1;
-                curPos = endPos + 1;
-                if( curPos >= contentSize )
-                    break;
-            }
-
-            return totalLength;
         }
     }
 
