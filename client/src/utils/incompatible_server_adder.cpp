@@ -61,7 +61,7 @@ void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &module
         return;
     }
 
-    QUuid id = m_fakeUuidByServerUuid[moduleInformation.id];
+    QUuid id = m_fakeUuidByServerUuid.value(moduleInformation.id);
     if (id.isNull()) {
         // add a resource
         if (!isSuitable(moduleInformation))
