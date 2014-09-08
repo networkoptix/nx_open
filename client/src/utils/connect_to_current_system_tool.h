@@ -4,15 +4,17 @@
 #include <QtCore/QObject>
 
 #include <utils/common/id.h>
+#include <utils/common/connective.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnConfigurePeerTask;
-class QnUpdateDialog;
 class QnMediaServerUpdateTool;
 class QnWaitCompatibleServersPeerTask;
+class QnProgressDialog;
 
-class QnConnectToCurrentSystemTool : public QObject, public QnWorkbenchContextAware {
+class QnConnectToCurrentSystemTool : public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT
+    typedef Connective<QObject> base_type;
 public:
     enum ErrorCode {
         NoError,
@@ -56,8 +58,8 @@ private:
     QHash<QUuid, QUuid> m_waitTargets;
     QnConfigurePeerTask *m_configureTask;
     QnWaitCompatibleServersPeerTask *m_waitTask;
-    QScopedPointer<QnUpdateDialog> m_updateDialog;
     QnMediaServerUpdateTool *m_updateTool;
+    QScopedPointer<QnProgressDialog> m_updateProgressDialog;
     int m_prevToolState;
     bool m_updateFailed;
     bool m_restartAllPeers;

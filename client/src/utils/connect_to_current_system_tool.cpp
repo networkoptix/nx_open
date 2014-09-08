@@ -10,7 +10,7 @@
 #include <utils/wait_compatible_servers_peer_task.h>
 #include <utils/media_server_update_tool.h>
 #include <utils/common/software_version.h>
-#include <ui/dialogs/update_dialog.h>
+#include <ui/dialogs/progress_dialog.h>
 
 #include "version.h"
 
@@ -31,15 +31,13 @@ namespace {
 }
 
 QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *context, QObject *parent) :
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(context),
     m_running(false),
     m_configureTask(new QnConfigurePeerTask(this)),
     m_waitTask(new QnWaitCompatibleServersPeerTask(this)),
-    m_updateDialog(new QnUpdateDialog(context))
+    m_updateTool(new QnMediaServerUpdateTool(this))
 {
-    m_updateTool = m_updateDialog->updateTool();
-
     connect(m_configureTask,            &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_configureTask_finished);
     connect(m_waitTask,                 &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_waitTask_finished);
     // queued connection is used to be sure that we'll get this signal AFTER it will be handled by update dialog
@@ -83,7 +81,10 @@ QSet<QUuid> QnConnectToCurrentSystemTool::targets() const {
 
 void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode) {
     m_running = false;
-    m_updateDialog->hide();
+    if (m_updateProgressDialog) {
+        m_updateProgressDialog->hide();
+        m_updateProgressDialog.reset();
+    }
     revertApiUrls();
     emit finished(errorCode);
 }
@@ -125,11 +126,18 @@ void QnConnectToCurrentSystemTool::updatePeers() {
     }
 
     m_updateFailed = false;
-    m_updateDialog->setTargets(m_updateTargets);
-    m_updateDialog->show();
+    m_updateTool->setTargets(m_updateTargets);
     m_prevToolState = CheckingForUpdates;
     m_updateTool->setDenyMajorUpdates(true);
     m_updateTool->checkForUpdates();
+
+    m_updateProgressDialog.reset(new QnProgressDialog(mainWindow()));
+    m_updateProgressDialog->setWindowTitle(tr("Updating Servers"));
+    m_updateProgressDialog->setMinimumDuration(1000);
+    m_updateProgressDialog->setModal(false);
+    connect(m_updateProgressDialog,     &QnProgressDialog::cancel,                  m_updateTool,               &QnMediaServerUpdateTool::cancelUpdate);
+    connect(m_updateTool,               &QnMediaServerUpdateTool::progressChanged,  m_updateProgressDialog,     &QnProgressDialog::setValue);
+    m_updateProgressDialog->show();
 }
 
 void QnConnectToCurrentSystemTool::revertApiUrls() {
@@ -206,6 +214,7 @@ void QnConnectToCurrentSystemTool::at_updateTool_stateChanged(int state) {
         m_updateFailed = (m_updateTool->updateResult() != QnUpdateResult::Successful);
     }
 
-    m_updateDialog->hide();
+    m_updateProgressDialog->hide();
+    m_updateProgressDialog.reset();
     finish(m_updateFailed ? UpdateFailed : NoError);
 }
