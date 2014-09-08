@@ -5,14 +5,14 @@
 #include <core/resource_management/resource_pool.h>
 
 namespace {
-    const int updateTimeout = 5 * 60 * 1000;
+    const int checkTimeout = 10 * 60 * 1000;
+    const int shortTimeout = 5 * 1000;
 }
 
 QnRestUpdatePeerTask::QnRestUpdatePeerTask(QObject *parent) :
     QnNetworkPeerTask(parent)
 {
     m_timer = new QTimer(this);
-    m_timer->setInterval(updateTimeout);
     m_timer->setSingleShot(true);
 
     connect(m_timer, &QTimer::timeout, this, &QnRestUpdatePeerTask::at_timer_timeout);
@@ -113,7 +113,7 @@ void QnRestUpdatePeerTask::at_updateInstalled(int status, int handle) {
 
     connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnRestUpdatePeerTask::at_resourceChanged);
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnRestUpdatePeerTask::at_resourceChanged);
-    m_timer->start();
+    m_timer->start(checkTimeout);
 }
 
 void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr &resource) {
@@ -127,6 +127,13 @@ void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr &resource) {
     if (server->getVersion() == m_version) {
         sender()->disconnect(this);
         finishPeer();
+        return;
+    }
+
+    if (server->getStatus() != Qn::Offline && server->getStatus() != Qn::Incompatible) {
+        /* The situation is the same as in QnInstallUpdatesPeerTask.
+           If the server has gone online we should get resource update soon, so we don't have to wait minutes before we know the new version. */
+        m_timer->start(shortTimeout);
     }
 }
 
