@@ -285,6 +285,13 @@
 					<type>tar.gz</type>
 					<classifier>${profile.classifier}</classifier>
 				</dependency>      
+				<dependency>
+                                        <groupId>com.google</groupId>
+                                        <artifactId>gtest</artifactId>
+                                        <version>1.7.0-SNAPSHOT</version>
+					<type>tar.gz</type>
+					<classifier>${profile.classifier}-${compiler}</classifier>
+				</dependency>      
 			</dependencies>           
 		</profile>
 		<profile>
