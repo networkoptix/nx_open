@@ -66,7 +66,7 @@ namespace {
         return result;
     }
 
-    const QSize saveConnectionAsSize(300, 100);
+    const QSize saveConnectionAsSize(250, 100);
 
 } // anonymous namespace
 
