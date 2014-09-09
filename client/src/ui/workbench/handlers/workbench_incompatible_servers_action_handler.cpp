@@ -11,8 +11,8 @@
 #include <ui/dialogs/join_other_system_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
 
-#include <utils/connect_to_current_system_tool.h>
-#include <utils/join_system_tool.h>
+#include <update/connect_to_current_system_tool.h>
+#include <update/join_system_tool.h>
 
 QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActionHandler(QObject *parent) :
     QObject(parent),

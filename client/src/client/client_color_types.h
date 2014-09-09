@@ -173,12 +173,21 @@ struct QnRoutingManagementColors {
 };
 #define QnRoutingManagementColors_Fields (readOnly)
 
+struct QnServerUpdatesColors {
+    QnServerUpdatesColors();
+
+    QColor latest;
+    QColor target;
+    QColor error;
+};
+#define QnServerUpdatesColors_Fields (latest)(target)(error)
 
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
     (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
-    (QnRoutingManagementColors)(QnVideowallManageWidgetColors)
+    (QnRoutingManagementColors)(QnVideowallManageWidgetColors) \
+    (QnServerUpdatesColors)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,

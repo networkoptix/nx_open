@@ -1,7 +1,7 @@
 #ifndef UPLOAD_UPDATES_PEER_TASK_H
 #define UPLOAD_UPDATES_PEER_TASK_H
 
-#include <utils/network_peer_task.h>
+#include <update/task/network_peer_task.h>
 #include <utils/common/system_information.h>
 
 class QnUpdateUploader;
@@ -20,10 +20,9 @@ public:
     void setUploads(const QHash<QnSystemInformation, QString> &fileBySystemInformation);
     void setUpdateId(const QString &updateId);
 
-    virtual void cancel() override;
-
 protected:
     virtual void doStart() override;
+    virtual void doCancel() override;
 
 private:
     void uploadNextUpdate();

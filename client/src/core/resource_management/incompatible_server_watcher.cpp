@@ -1,4 +1,4 @@
-#include "incompatible_server_adder.h"
+#include "incompatible_server_watcher.h"
 
 #include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
@@ -44,20 +44,20 @@ bool isSuitable(const QnModuleInformation &moduleInformation) {
 
 } // anonymous namespace
 
-QnIncompatibleServerAdder::QnIncompatibleServerAdder(QObject *parent) :
+QnIncompatibleServerWatcher::QnIncompatibleServerWatcher(QObject *parent) :
     QObject(parent)
 {
-    connect(QnGlobalModuleFinder::instance(),   &QnGlobalModuleFinder::peerChanged, this,   &QnIncompatibleServerAdder::at_peerChanged);
-    connect(QnGlobalModuleFinder::instance(),   &QnGlobalModuleFinder::peerLost,    this,   &QnIncompatibleServerAdder::at_peerLost);
-    connect(qnResPool,                          &QnResourcePool::resourceAdded,     this,   &QnIncompatibleServerAdder::at_reourcePool_resourceChanged);
-    connect(qnResPool,                          &QnResourcePool::resourceChanged,   this,   &QnIncompatibleServerAdder::at_reourcePool_resourceChanged);
+    connect(QnGlobalModuleFinder::instance(),   &QnGlobalModuleFinder::peerChanged, this,   &QnIncompatibleServerWatcher::at_peerChanged);
+    connect(QnGlobalModuleFinder::instance(),   &QnGlobalModuleFinder::peerLost,    this,   &QnIncompatibleServerWatcher::at_peerLost);
+    connect(qnResPool,                          &QnResourcePool::resourceAdded,     this,   &QnIncompatibleServerWatcher::at_resourcePool_resourceChanged);
+    connect(qnResPool,                          &QnResourcePool::resourceChanged,   this,   &QnIncompatibleServerWatcher::at_resourcePool_resourceChanged);
 
     // fill resource pool with already found modules
     foreach (const QnModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules())
         at_peerChanged(moduleInformation);
 }
 
-void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &moduleInformation) {
+void QnIncompatibleServerWatcher::at_peerChanged(const QnModuleInformation &moduleInformation) {
     if (moduleInformation.isCompatibleToCurrentSystem()) {
         removeResource(moduleInformation.id);
         return;
@@ -81,11 +81,11 @@ void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &module
     }
 }
 
-void QnIncompatibleServerAdder::at_peerLost(const QnModuleInformation &moduleInformation) {
+void QnIncompatibleServerWatcher::at_peerLost(const QnModuleInformation &moduleInformation) {
     removeResource(m_fakeUuidByServerUuid.value(moduleInformation.id));
 }
 
-void QnIncompatibleServerAdder::at_reourcePool_resourceChanged(const QnResourcePtr &resource) {
+void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
         return;
@@ -100,7 +100,7 @@ void QnIncompatibleServerAdder::at_reourcePool_resourceChanged(const QnResourceP
         removeResource(m_fakeUuidByServerUuid.value(id));
 }
 
-void QnIncompatibleServerAdder::removeResource(const QUuid &id) {
+void QnIncompatibleServerWatcher::removeResource(const QUuid &id) {
     if (id.isNull())
         return;
 

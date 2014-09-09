@@ -6,7 +6,7 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/resource_fwd.h>
 
-class QnIncompatibleServerAdder;
+class QnIncompatibleServerWatcher;
 
 class QnClientMessageProcessor : public QnCommonMessageProcessor
 {
@@ -34,7 +34,7 @@ private:
     void checkForTmpStatus(const QnResourcePtr& resource);
 
 private:
-    QnIncompatibleServerAdder *m_incompatibleServerAdder;
+    QSharedPointer<QnIncompatibleServerWatcher> m_incompatibleServerWatcher;
     bool m_connected;
     bool m_holdConnection;
 };

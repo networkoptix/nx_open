@@ -17,15 +17,12 @@ QnUpdateStatusItemDelegate::QnUpdateStatusItemDelegate(QWidget *parent) :
 QnUpdateStatusItemDelegate::~QnUpdateStatusItemDelegate() {}
 
 void QnUpdateStatusItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    int state = index.data(QnServerUpdatesModel::StateRole).toInt();
+    int state = index.data(QnServerUpdatesModel::StageRole).toInt();
 
     switch (state) {
-    case QnMediaServerUpdateTool::PeerUpdateInformation::PendingDownloading:
-    case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateDownloading:
-    case QnMediaServerUpdateTool::PeerUpdateInformation::PendingUpload:
-    case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateUploading:
-    case QnMediaServerUpdateTool::PeerUpdateInformation::PendingInstallation:
-    case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateInstalling:
+    case QnPeerUpdateStage::Download:
+    case QnPeerUpdateStage::Push:
+    case QnPeerUpdateStage::Install:
         paintProgressBar(painter, option, index);
         break;
     default:
