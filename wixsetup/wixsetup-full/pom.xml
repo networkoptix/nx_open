@@ -1,46 +1,60 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <parent>
-        <artifactId>wixsetup</artifactId>
-        <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.3.0-SNAPSHOT</version>
-        <relativePath>..</relativePath>
-    </parent>
+	<parent>
+		<artifactId>wixsetup</artifactId>
+		<groupId>com.networkoptix.hdwitness</groupId>
+		<version>2.3.0-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
 
-    <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.3.0-SNAPSHOT</version>
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>wixsetup-full</artifactId>
-    <packaging>pom</packaging>
-    <name>HD Witness Full Installer</name>
+	<groupId>com.networkoptix.hdwitness</groupId>
+	<version>2.3.0-SNAPSHOT</version>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>wixsetup-full</artifactId>
+	<packaging>pom</packaging>
+	<name>HD Witness Full Installer</name>
 
-    <properties>
-        <root.dir>${basedir}/../..</root.dir>
-        <install.type>full</install.type>
-        <client_name>client.exe</client_name>
-        <product_name>${product.name}.exe</product_name>
+	<properties>
+		<root.dir>${basedir}/../..</root.dir>
+		<install.type>full</install.type>
+		<client_name>client.exe</client_name>
+		<product_name>${product.name}.exe</product_name>
 		<final.artifact.name>${namespace.additional}-full</final.artifact.name>
-    </properties>
+	</properties>
 
-    <build>
-        <plugins>                
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2.2</version>
-                <executions>
-                    <execution>
-                        <id>pack-binaries</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>${project.build.directory}/binaries.xml</descriptor>
-                            </descriptors>	
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>    
-        </plugins>    
-    </build>
+	<build>
+		<plugins>                
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.2</version>
+				<executions>
+					<execution>
+						<id>pack-debug</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>${project.build.directory}/assembly-debug.xml</descriptor>
+							</descriptors>	
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>server-update-package</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>${project.build.directory}/assembly-update-server.xml</descriptor>
+							</descriptors>
+							<finalName>server-update</finalName>							
+						</configuration>
+					</execution>	
+				</executions>				
+			</plugin> 		
+		</plugins>    
+	</build>
 </project>
