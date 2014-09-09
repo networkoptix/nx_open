@@ -36,6 +36,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         //Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(cameraResource->getPhysicalId()).isEmpty());
 
         cameraResource->setParentId(m_serverId);
+        cameraResource->setPrefferedServerId(m_serverId);
     }
 
     //QnResourcePool::instance()->addResources(resources);

@@ -64,8 +64,11 @@ static void printInLogNetResources(const QnResourceList& resources)
 
 }
 
-bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnResourcePtr& camera)
+bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourcePtr& camera)
 {
+    if (!camera)
+        return false;
+
 #ifdef EDGE_SERVER
     // return own camera back for edge server
     char  mac[MAC_ADDR_LEN];
@@ -75,10 +78,14 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnResourcePtr
         return true;
 #endif
 
+    QUuid ownGuid = qnCommon->moduleGUID();
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
-    if (!mServer || mServer->getStatus() == Qn::Online)
+    if (!mServer)
         return false;
-    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (mServer->getStatus() == Qn::Online && camera->prefferedServerId() != ownGuid)
+        return false;
+
+    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(ownGuid).dynamicCast<QnMediaServerResource>();
     if (!ownServer || !ownServer->isRedundancy())
         return false; // redundancy is disabled
 
@@ -135,7 +142,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         if (rpResource->hasFlags(Qn::foreigner))
         {
-            if (!canTakeForeignCamera(rpResource)) 
+            if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>())) 
             {
                 it = resources.erase(it); // do not touch foreign resource
                 continue;
@@ -151,7 +158,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 ipsList[ips].insert(newNetRes);
         }
 
-        if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || rpResource->hasFlags(Qn::foreigner))
+        bool isForeign = rpResource->hasFlags(Qn::foreigner);
+        if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || isForeign)
         {
             QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
             if (existCamRes)
