@@ -101,7 +101,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     initBuildSelectionButtons();
 
     connect(m_updateTool,       &QnMediaServerUpdateTool::stageChanged,         this,           &QnServerUpdatesWidget::at_tool_stageChanged);
-    connect(m_updateTool,       &QnMediaServerUpdateTool::progressChanged,      ui->updateProgessBar,   &QProgressBar::setValue);
+    connect(m_updateTool,       &QnMediaServerUpdateTool::progressChanged,      this,           &QnServerUpdatesWidget::at_tool_progressChanged);
     connect(m_updateTool,       &QnMediaServerUpdateTool::updateFinished,           this, &QnServerUpdatesWidget::at_updateFinished);
 
     m_extraMessageTimer->setInterval(longInstallWarningTimeout);
@@ -265,17 +265,20 @@ bool QnServerUpdatesWidget::discard() {
 }
 
 void QnServerUpdatesWidget::at_updateFinished(QnUpdateResult result) {
- /*   switch (result) {
+    switch (result) {
     case QnUpdateResult::Successful:
         {
             QString message = tr("Update has been successfully finished.");
+/*
             message += lit("\n");
             if (m_updateTool->isClientRequiresInstaller())
                 message += tr("Now you have to update the client to the newer version using an installer.");
             else
                 message += tr("The client will be restarted to the updated version.");
+*/
 
             QMessageBox::information(this, tr("Update is successful"), message);
+/*
 
             if (!m_updateTool->isClientRequiresInstaller()) {
                 if (!applauncher::restartClient(m_updateTool->targetVersion()) == applauncher::api::ResultType::ok) {
@@ -287,7 +290,7 @@ void QnServerUpdatesWidget::at_updateFinished(QnUpdateResult result) {
                     qApp->exit(0);
                     applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);
                 }
-            }
+            }*/
             break;
         }
     case QnUpdateResult::Cancelled:
@@ -310,7 +313,7 @@ void QnServerUpdatesWidget::at_updateFinished(QnUpdateResult result) {
         QMessageBox::critical(this, tr("Update failed"), tr("Could not install updates on one or more servers."));
         break;
     }
-    checkForUpdates();*/
+    checkForUpdatesInternet(true);
 }
 
 void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
@@ -339,12 +342,6 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
 
         switch (result.result) {
         case QnCheckForUpdateResult::UpdateFound:
-            /*
-            if (result.clientInstallerRequired)
-                detail = tr("Newer version found. You will have to update the client manually using an installer.");
-             */
-            status = result.latestVersion.toString();
-            break;
         case QnCheckForUpdateResult::NoNewerVersion:
             status = result.latestVersion.toString();
             break;
@@ -397,9 +394,7 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
         false;
     m_checkingLocal = true;
 
-    m_updateTool->checkForUpdates(ui->filenameLineEdit->text(), [this](const QnCheckForUpdateResult &result){
-
-
+    m_updateTool->checkForUpdates(ui->filenameLineEdit->text(), [this](const QnCheckForUpdateResult &result) {
         QPalette detailPalette = this->palette();
         QString detail;
 
@@ -470,31 +465,45 @@ void QnServerUpdatesWidget::at_tool_stageChanged(QnFullUpdateStage stage) {
 
     switch (stage) {
     case QnFullUpdateStage::Check:
-        ui->updateProgessBar->setFormat(tr("Checking for updates... %p%"));
-        break;
     case QnFullUpdateStage::Download:
-        cancellable = true;
-        ui->updateProgessBar->setFormat(tr("Downloading updates... %p%"));
-        break;
     case QnFullUpdateStage::Client:
-        cancellable = true;
-        ui->updateProgessBar->setFormat(tr("Installing client update... %p%"));
-        break;
     case QnFullUpdateStage::Incompatible:
-        cancellable = true;
-        ui->updateProgessBar->setFormat(tr("Installing updates to incompatible servers... %p%"));
-        break;
     case QnFullUpdateStage::Push:
         cancellable = true;
-        ui->updateProgessBar->setFormat(tr("Pushing updates to servers... %p%"));
-        break;
-    case QnFullUpdateStage::Servers:
-        ui->updateProgessBar->setFormat(tr("Installing updates... %p%"));
         break;
     default:
         break;
     }
 
     ui->cancelButton->setEnabled(cancellable);
+}
+
+void QnServerUpdatesWidget::at_tool_progressChanged(QnFullUpdateStage stage, int progress) {
+    QString status;
+    switch (stage) {
+    case QnFullUpdateStage::Check:
+        status = tr("Checking for updates... %1%");
+        break;
+    case QnFullUpdateStage::Download:
+        status = tr("Downloading updates... %1%");
+        break;
+    case QnFullUpdateStage::Client:
+        status = tr("Installing client update... %1%");
+        break;
+    case QnFullUpdateStage::Incompatible:
+        status = tr("Installing updates to incompatible servers... %1%");
+        break;
+    case QnFullUpdateStage::Push:
+        status = tr("Pushing updates to servers... %1%");
+        break;
+    case QnFullUpdateStage::Servers:
+        status = tr("Installing updates... %1%");
+        break;
+    default:
+        status = lit("%1");
+        break;
+    }
+    ui->updateProgessBar->setValue(progress);
+    ui->updateProgessBar->setFormat(status.arg(progress));
 }
 

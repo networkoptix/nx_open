@@ -70,29 +70,30 @@ void QnMediaServerUpdateTool::setStage(QnFullUpdateStage stage) {
     m_stage = stage;
     emit stageChanged(stage);
 
+    setStageProgress(0);
+}
+
+void QnMediaServerUpdateTool::setStageProgress(int progress) {
     int offset = 0; // infinite stages
 
     switch (m_stage) {
-    case QnFullUpdateStage::Download:
-        break;
     case QnFullUpdateStage::Client:
         offset = 50;
         break;
     case QnFullUpdateStage::Incompatible:
         offset = 50;
         break;
-    case QnFullUpdateStage::Push:
-        break;
     case QnFullUpdateStage::Servers:
         offset = 50;
         break;
     default:
-        return;
+        break;
     }
 
-    int progress = (static_cast<int>(stage)*100 + offset) / ( static_cast<int>(QnFullUpdateStage::Count) );
-    emit progressChanged(progress);    
+    int value = (static_cast<int>(m_stage)*100 + offset + progress) / ( static_cast<int>(QnFullUpdateStage::Count) );
+    emit progressChanged(m_stage, value);    
 }
+
 
 void QnMediaServerUpdateTool::finishUpdate(QnUpdateResult result) {
     setStage(QnFullUpdateStage::Init);
@@ -225,7 +226,7 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
 
     m_updateProcess = new QnUpdateProcess(target);
     connect(m_updateProcess, &QnUpdateProcess::stageChanged,                    this, &QnMediaServerUpdateTool::setStage);
-    connect(m_updateProcess, &QnUpdateProcess::progressChanged,                 this, &QnMediaServerUpdateTool::progressChanged);
+    connect(m_updateProcess, &QnUpdateProcess::progressChanged,                 this, &QnMediaServerUpdateTool::setStageProgress);
     connect(m_updateProcess, &QnUpdateProcess::peerStageChanged,                this, &QnMediaServerUpdateTool::peerStageChanged);
     connect(m_updateProcess, &QnUpdateProcess::peerProgressChanged,             this, &QnMediaServerUpdateTool::peerProgressChanged);
     connect(m_updateProcess, &QnUpdateProcess::updateFinished,                  this, &QnMediaServerUpdateTool::finishUpdate);

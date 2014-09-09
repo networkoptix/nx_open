@@ -41,6 +41,7 @@ private slots:
     void at_updateFinished(QnUpdateResult result);
 
     void at_tool_stageChanged(QnFullUpdateStage stage);
+    void at_tool_progressChanged(QnFullUpdateStage stage, int progress);
 private:
     void initLinkButtons();
     void initBuildSelectionButtons();

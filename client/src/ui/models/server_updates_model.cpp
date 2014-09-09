@@ -70,14 +70,6 @@ QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObjec
         emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
     });
 
-    connect(m_updateTool, &QnMediaServerUpdateTool::stageChanged,    this,  [this](QnFullUpdateStage stage) {
-        
-    });
-
-    connect(m_updateTool, &QnMediaServerUpdateTool::progressChanged,    this,  [this](int progress) {
-
-    });
-
     connect(m_updateTool, &QnMediaServerUpdateTool::targetsChanged,  this,  &QnServerUpdatesModel::setTargets);
 
     connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnServerUpdatesModel::at_resourceChanged);

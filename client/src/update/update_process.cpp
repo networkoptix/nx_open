@@ -244,6 +244,8 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
         m_updateInformationById.insert(peerId, info);
         m_idBySystemInformation.insert(server->getSystemInfo(), peerId);
     }
+
+    downloadUpdates();
 }
 
 
