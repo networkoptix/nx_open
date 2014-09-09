@@ -64,7 +64,7 @@ signals:
 
     void targetsChanged(const QSet<QUuid> &targets);
 
-    void updateFinished(QnUpdateResult result);
+    void updateFinished(const QnUpdateResult &result);
 private:
     void setStage(QnFullUpdateStage stage);
 
@@ -79,7 +79,7 @@ private:
     void uploadUpdatesToServers();
     void installUpdatesToServers();
 
-    void finishUpdate(QnUpdateResult result);
+    void finishUpdate(QnUpdateResult::Value value);
 
     void prepareToUpload();
     void lockMutex();
@@ -112,7 +112,7 @@ private:
     QnUpdateFileInformationPtr m_clientUpdateFile;
     QHash<QUuid, QnPeerUpdateInformation> m_updateInformationById;
     QMultiHash<QnSystemInformation, QUuid> m_idBySystemInformation;
-    QnUpdateResult m_updateResult;
+    QnUpdateResult::Value m_updateResult;
 };
 
 
