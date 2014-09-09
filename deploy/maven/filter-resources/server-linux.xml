@@ -6,10 +6,10 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>${root.dir}/debsetup/mediaserver-deb/${arch}</directory>
+            <directory>${root.dir}/debsetup/mediaserver-deb/${arch}/deb</directory>
             <outputDirectory>..</outputDirectory>
             <includes>
-                <include>${finalName}.deb</include>
+                <include>${server.finalName}.deb</include>
             </includes>		
         </fileSet>	
         <fileSet>

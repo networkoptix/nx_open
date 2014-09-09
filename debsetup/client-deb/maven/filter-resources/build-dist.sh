@@ -100,4 +100,4 @@ install -m 755 debian/postinst $STAGE/DEBIAN
 (cd $STAGE; find * -type f -not -regex '^DEBIAN/.*' -print0 | xargs -0 md5sum > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
 (cd $STAGEBASE; fakeroot dpkg-deb -b ${PACKAGENAME}-$FINALNAME)
-echo "$FINALNAME" >> finalname-client.properties
+echo "client.finalName=$FINALNAME" >> finalname-client.properties
