@@ -92,7 +92,12 @@ void QnUpdateProcess::run() {
 
     unlockMutex();
     removeTemporaryDir();
-    emit updateFinished(m_updateResult);
+
+    QnUpdateResult result(m_updateResult);
+    result.targetVersion = m_target.version;
+    result.clientInstallerRequired = m_clientRequiresInstaller;
+
+    emit updateFinished(result);
 }
 
 void QnUpdateProcess::downloadUpdates() {
@@ -290,8 +295,8 @@ void QnUpdateProcess::at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, i
     installClientUpdate();
 }
 
-void QnUpdateProcess::finishUpdate(QnUpdateResult result) {
-    m_updateResult = result;
+void QnUpdateProcess::finishUpdate(QnUpdateResult::Value value) {
+    m_updateResult = value;
     stop();
 }
 

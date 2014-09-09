@@ -303,24 +303,23 @@ bool QnServerUpdatesWidget::discard() {
     return true;
 }
 
-void QnServerUpdatesWidget::at_updateFinished(QnUpdateResult result) {
-    switch (result) {
+void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
+    switch (result.result) {
     case QnUpdateResult::Successful:
         {
             QString message = tr("Update has been successfully finished.");
-/*
+
             message += lit("\n");
-            if (m_updateTool->isClientRequiresInstaller())
+            if (result.clientInstallerRequired)
                 message += tr("Now you have to update the client to the newer version using an installer.");
             else
                 message += tr("The client will be restarted to the updated version.");
-*/
+
 
             QMessageBox::information(this, tr("Update is successful"), message);
-/*
 
-            if (!m_updateTool->isClientRequiresInstaller()) {
-                if (!applauncher::restartClient(m_updateTool->targetVersion()) == applauncher::api::ResultType::ok) {
+            if (!result.clientInstallerRequired) {
+                if (!applauncher::restartClient(result.targetVersion) == applauncher::api::ResultType::ok) {
                     QMessageBox::critical(this,
                         tr("Launcher process is not found"),
                         tr("Cannot restart the client.\n"
@@ -329,7 +328,7 @@ void QnServerUpdatesWidget::at_updateFinished(QnUpdateResult result) {
                     qApp->exit(0);
                     applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);
                 }
-            }*/
+            }
             break;
         }
     case QnUpdateResult::Cancelled:
@@ -352,7 +351,6 @@ void QnServerUpdatesWidget::at_updateFinished(QnUpdateResult result) {
         QMessageBox::critical(this, tr("Update failed"), tr("Could not install updates on one or more servers."));
         break;
     }
-/*    checkForUpdatesInternet(true);*/
 }
 
 void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
