@@ -122,9 +122,6 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     });
     updateTimer->start();
 
-
-    ui->localInfiniteProgress->setVisible(false);
-
     at_tool_stageChanged(QnFullUpdateStage::Init);
 
     ui->releaseNotesLabel->setVisible(false);

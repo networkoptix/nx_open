@@ -5,6 +5,8 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QUrlQuery>
 
+#include <QtConcurrent>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
@@ -215,7 +217,8 @@ void QnMediaServerUpdateTool::checkForUpdates(const QnUpdateTarget &target, std:
     else
         connect(checkForUpdatesTask,  &QnCheckForUpdatesPeerTask::checkFinished,  this,  &QnMediaServerUpdateTool::checkForUpdatesFinished);
     connect(checkForUpdatesTask,  &QnNetworkPeerTask::finished,             checkForUpdatesTask, &QObject::deleteLater);
-    checkForUpdatesTask->start();
+    QtConcurrent::run(checkForUpdatesTask, &QnCheckForUpdatesPeerTask::start);
+    //checkForUpdatesTask->start();
 }
 
 

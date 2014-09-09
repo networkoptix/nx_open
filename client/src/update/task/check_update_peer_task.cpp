@@ -25,7 +25,7 @@ namespace {
     const QString buildInformationSuffix = lit("update.json");
     const QString updateInformationFileName = (lit("update.json"));
 
-    const int httpResponseTimeoutMs = 10000;
+    const int httpResponseTimeoutMs = 30000;
 
     QnSoftwareVersion minimalVersionForUpdatePackage(const QString &fileName) {
         QuaZipFile infoFile(fileName, updateInformationFileName);
@@ -277,16 +277,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(const nx_http::AsyncHttpC
 
     client->terminate();
     if (client->failed()) {
-        finishTask(QnCheckForUpdateResult::InternetProblem);
-        return;
-    }
-
-    if(client->response()->statusLine.statusCode != nx_http::StatusCode::ok ) {
-        qDebug() << "status code" << client->response()->statusLine.statusCode;
-
-        finishTask(client->response()->statusLine.statusCode == QNetworkReply::ContentNotFoundError
-            ? QnCheckForUpdateResult::NoSuchBuild 
-            : QnCheckForUpdateResult::InternetProblem);
+        finishTask(QnCheckForUpdateResult::NoSuchBuild);
         return;
     }
 
