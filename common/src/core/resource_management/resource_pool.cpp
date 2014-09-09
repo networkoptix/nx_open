@@ -102,7 +102,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         }
 
         if (!incompatible)
-            m_incompatibleResources.remove(resource->getUniqueId());
+            m_incompatibleResources.remove(resource->getId());
     }
 
     m_resourcesMtx.unlock();
