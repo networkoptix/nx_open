@@ -198,25 +198,26 @@ void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int resp
 
 void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
 {
-    QMutexLocker lock(&m_mutex);
-    if (m_primaryIFSelected)
-        return;
-    m_primaryIFSelected = true;
-    
     QUrl origApiUrl = getApiUrl();
-
-    if (primaryIF != USE_PROXY)
     {
-        QUrl apiUrl(getApiUrl());
-        apiUrl.setHost(primaryIF);
-        setApiUrl(apiUrl.toString());
+        QMutexLocker lock(&m_mutex);
+        if (m_primaryIFSelected)
+            return;
+        m_primaryIFSelected = true;
+    
+        if (primaryIF != USE_PROXY)
+        {
+            QUrl apiUrl(getApiUrl());
+            apiUrl.setHost(primaryIF);
+            setApiUrl(apiUrl.toString());
 
-        QUrl url(getUrl());
-        url.setHost(primaryIF);
-        setUrl(url.toString());
+            QUrl url(getUrl());
+            url.setHost(primaryIF);
+            setUrl(url.toString());
+        }
+
+        m_primaryIf = primaryIF;
     }
-
-    m_primaryIf = primaryIF;
     emit serverIfFound(::toSharedPointer(this), primaryIF, origApiUrl.toString());
 }
 
