@@ -77,13 +77,38 @@ module.exports = function (grunt) {
             proxies: [
                 {
                     context: '/ec2/',
-                    host: 'localhost',
-                    port: 9001,
+                    host: '10.0.2.229',
+                    port: 7039,
+                    headers: { //admin:123
+                        "Authorization": "Basic YWRtaW46MTIz"
+                    }
                 },
-                {
+                /*{//Daria
                     context: '/api/',
-                    host: 'mono',
-                    port: 40000,
+                    host: '10.0.2.229',
+                    port: 7039,
+                    headers: { //admin:123
+                        "Authorization": "Basic YWRtaW46MTIz"
+                    }
+
+                },*/
+
+                /*{//Sergey Yuldashev
+                    context: '/api/',
+                    host: '10.0.2.203',
+                    port: 7501,
+                    headers: { //admin:123
+                        "Authorization": "Basic YWRtaW46MTIz"
+                    }
+                },*/
+                {//Denis
+                    context: '/api/',
+                    host: '10.0.2.182',
+                    port: 7001,
+                    headers: { //admin:123
+                        "Authorization": "Basic YWRtaW46MTIz"
+                    }
+
                 }
                 /* ,
                 {
