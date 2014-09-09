@@ -98,7 +98,10 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCam
     if (camerasCount >= ownServer->getMaxCameras())
         return false;
     
-    return mServer->currentStatusTime() > MSERVER_OFFLINE_TIMEOUT;
+    if (camera->preferedServerId() == ownGuid)
+        return true;
+    else
+        return mServer->currentStatusTime() > MSERVER_OFFLINE_TIMEOUT;
 }
 
 bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
