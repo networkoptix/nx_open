@@ -20,7 +20,7 @@ private:
     typedef QPair<QnRoutePoint, int> WeightedPoint;
 
 private:
-    void insertRoute(const QnRoute &route);
+    bool insertRoute(const QnRoute &route);
     void buildRoutes(const QList<QnRoute> &initialRoutes);
     QMultiHash<QUuid, WeightedPoint>::iterator findConnection(const QUuid &from, const QnRoutePoint &point);
 

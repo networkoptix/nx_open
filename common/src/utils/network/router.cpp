@@ -77,6 +77,9 @@ QUuid QnRouter::whoIs(const QString &host, quint16 port) const {
 }
 
 void QnRouter::at_connectionAdded(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port) {
+    if (discovererId == peerId)
+        return;
+
     QMutexLocker lk(&m_mutex);
 
     if (m_connections.contains(discovererId, Endpoint(peerId, host, port)))
@@ -104,6 +107,9 @@ void QnRouter::at_connectionRemoved(const QUuid &discovererId, const QUuid &peer
 }
 
 void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
+    if (moduleInformation.id == qnCommon->moduleGUID())
+        return;
+
     QMutexLocker lk(&m_mutex);
 
     Endpoint endpoint(moduleInformation.id, url.host(), url.port());
@@ -134,10 +140,13 @@ void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleIn
     m_routeBuilder->removeConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
 
     if (!m_passive) {
-        if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
+        if (ec2::AbstractECConnectionPtr connection = m_connection.lock()) {
+            lk.unlock();
             connection->getMiscManager()->removeConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        }
     }
 
+    lk.relock();
     makeConsistent();
 
     lk.unlock();
@@ -145,8 +154,6 @@ void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleIn
 }
 
 void QnRouter::makeConsistent() {
-    QMutexLocker lk(&m_mutex);
-
     // this function just makes endpoint availability test and removes connections to unavailable endpoints
     QMultiHash<QUuid, Endpoint> connections = m_connections;
 

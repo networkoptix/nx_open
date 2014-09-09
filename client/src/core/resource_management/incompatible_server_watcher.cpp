@@ -19,6 +19,8 @@ void updateServer(const QnMediaServerResourcePtr &server, const QnModuleInformat
         server->setApiUrl(url);
         server->setUrl(url);
     }
+    if (!moduleInformation.name.isEmpty())
+        server->setName(moduleInformation.name);
     server->setVersion(moduleInformation.version);
     server->setSystemInfo(moduleInformation.systemInformation);
     server->setSystemName(moduleInformation.systemName);

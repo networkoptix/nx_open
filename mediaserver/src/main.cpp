@@ -1542,6 +1542,7 @@ void QnMain::run()
     selfInformation.version = qnCommon->engineVersion();
     selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
     selfInformation.systemName = qnCommon->localSystemName();
+    selfInformation.name = m_mediaServer->getName();
     selfInformation.port = MSSettings::roSettings()->value( nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT ).toInt();
     //selfInformation.remoteAddresses = ;
     selfInformation.id = serverGuid();

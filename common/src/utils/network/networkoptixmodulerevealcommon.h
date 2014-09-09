@@ -43,6 +43,7 @@ public:
     QString systemInformation;
     QString customization;
     QString name;
+    QString moduleName;
     //!random string, unique for particular module instance
     QUuid seed;
     quint16 port;

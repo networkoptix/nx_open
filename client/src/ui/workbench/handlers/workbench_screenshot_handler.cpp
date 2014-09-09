@@ -34,6 +34,8 @@
 #include <utils/common/environment.h>
 #include <utils/common/warnings.h>
 #include "transcoding/filters/fisheye_image_filter.h"
+#include "core/resource_management/resource_pool.h"
+#include "core/resource/media_server_resource.h"
 
 //#define QN_SCREENSHOT_DEBUG
 #ifdef QN_SCREENSHOT_DEBUG
@@ -181,6 +183,11 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScre
 
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
     bool anyQuality = layout->channelCount() > 1;   // screenshots for panoramic cameras will be done locally
+
+    const QnMediaServerResourcePtr server = qnResPool->getResourceById(display->mediaResource()->toResource()->getParentId()).dynamicCast<QnMediaServerResource>();
+    if (server->getServerFlags() & Qn::SF_Edge)
+        anyQuality = true; // screenshots for edge cameras will be done locally
+
     for (int i = 0; i < layout->channelCount(); ++i) {
         QImage channelImage = display->camDisplay()->getScreenshot(i, parameters.imageCorrectionParams, parameters.mediaDewarpingParams, parameters.itemDewarpingParams, anyQuality);
         if (channelImage.isNull())

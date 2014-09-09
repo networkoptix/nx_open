@@ -2449,8 +2449,10 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
     int currentFps = rangeHi;
     int prevFpsValue = -1;
 
+    m_mutex.lock();
     vEncoder->Resolution->Width = m_resolutionList[0].width();
     vEncoder->Resolution->Height = m_resolutionList[0].height();
+    m_mutex.unlock();
     
     while (currentFps != prevFpsValue)
     {
