@@ -2114,7 +2114,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QUuid& mServerId, ApiCameraDataList& 
         c.region as motionMask, c.schedule_enabled as scheduleEnabled, c.motion_type as motionType, \
         c.group_name as groupName, c.group_id as groupId, c.mac, c. model, c.secondary_quality as secondaryStreamQuality, \
 		c.status_flags as statusFlags, c.physical_id as physicalId, c.password, login, c.dewarping_params as dewarpingParams, \
-        c.min_archive_days as minArchiveDays, c.max_archive_days as maxArchiveDays, c.preffered_server_id as prefferedServerId \
+        c.min_archive_days as minArchiveDays, c.max_archive_days as maxArchiveDays, c.prefered_server_id as preferedServerId \
         FROM vms_resource r \
         JOIN vms_camera c on c.resource_ptr_id = r.id %1 ORDER BY r.guid").arg(filterStr));
 
