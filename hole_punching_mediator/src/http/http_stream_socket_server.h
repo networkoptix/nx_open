@@ -17,8 +17,16 @@ namespace nx_http
     :
         public StreamSocketServer<HttpStreamSocketServer, HttpServerConnection>
     {
+        typedef StreamSocketServer<HttpStreamSocketServer, HttpServerConnection> base_type;
+
     public:
         typedef HttpServerConnection ConnectionType;
+
+        HttpStreamSocketServer( bool sslRequired, SocketFactory::NatTraversalType natTraversalRequired )
+        :
+            base_type( sslRequired, natTraversalRequired )
+        {
+        }
     };
 }
 

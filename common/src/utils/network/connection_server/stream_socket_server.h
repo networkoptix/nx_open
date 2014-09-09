@@ -28,16 +28,16 @@ public:
     typedef typename std::shared_ptr<ConnectionType> ConnectionPtr;
 
     //!Initialization
-    StreamSocketServer()
+    StreamSocketServer( bool sslRequired, SocketFactory::NatTraversalType natTraversalRequired )
     :
-        m_socket( SocketFactory::createStreamServerSocket() )
+        m_socket( SocketFactory::createStreamServerSocket( sslRequired, natTraversalRequired ) )
     {
         m_socket->setRecvTimeout( 0 );
     }
 
     ~StreamSocketServer()
     {
-        //TODO/IMPL
+        m_socket->cancelAsyncIO();
     }
 
     //!Binds to specified addresses

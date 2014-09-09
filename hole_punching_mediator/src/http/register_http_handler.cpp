@@ -12,6 +12,8 @@ const QString RegisterHttpHandler::HANDLER_PATH = QLatin1String("/register");
 
 bool RegisterHttpHandler::processRequest( const std::weak_ptr<HttpServerConnection>& connection, nx_http::Message&& message )
 {
+    //RegisteredSystemsDataManager::saveRegistrationDataAsync
+
     //TODO #ak
     assert( message.type == nx_http::MessageType::request );
 

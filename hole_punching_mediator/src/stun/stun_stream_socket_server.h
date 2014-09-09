@@ -15,8 +15,16 @@ class StunStreamSocketServer
 :
     public StreamSocketServer<StunStreamSocketServer, StunServerConnection>
 {
+    typedef StreamSocketServer<StunStreamSocketServer, StunServerConnection> base_type;
+
 public:
     typedef StunServerConnection ConnectionType;
+
+    StunStreamSocketServer( bool sslRequired, SocketFactory::NatTraversalType natTraversalRequired )
+    :
+        base_type( sslRequired, natTraversalRequired )
+    {
+    }
 };
 
 #endif  //STUN_STREAM_SOCKET_SERVER_H

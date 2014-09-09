@@ -17,8 +17,11 @@
 #include <utils/network/aio/aioservice.h>
 #include <utils/common/systemerror.h>
 
+#include "stun/custom_stun.h"
 #include "http/http_message_dispatcher.h"
 #include "http/register_http_handler.h"
+#include "stun/stun_message_dispatcher.h"
+#include "listening_peer_pool.h"
 #include "version.h"
 
 
@@ -93,13 +96,13 @@ int HolePuncherProcess::executeApplication()
         return 1;
     }
 
-    //m_multiAddressStunServer.reset( new MultiAddressServer<StunStreamSocketServer>(std::move(addrToListenList)) );
-    m_multiAddressHttpServer.reset( new MultiAddressServer<nx_http::HttpStreamSocketServer>(std::move(addrToListenList)) );
+    m_multiAddressStunServer.reset( new MultiAddressServer<StunStreamSocketServer>( addrToListenList, true, SocketFactory::nttEnabled ) );
+    m_multiAddressHttpServer.reset( new MultiAddressServer<nx_http::HttpStreamSocketServer>( addrToListenList, true, SocketFactory::nttDisabled ) );
 
-    //if( !m_multiAddressStunServer->bind() )
-    //    return false;
-    if( !m_multiAddressHttpServer->bind() )
+    if( !m_multiAddressStunServer->bind() )
         return 2;
+    if( !m_multiAddressHttpServer->bind() )
+        return 3;
 
     //TODO: #ak process privilege reduction should be made here
 
@@ -114,14 +117,28 @@ int HolePuncherProcess::executeApplication()
         }
     );
 
-    //if( !m_multiAddressStunServer->listen() )
-    //    return false;
+    using namespace std::placeholders;
+
+    ListeningPeerPool listeningPeerPool;
+    STUNMessageDispatcher stunMessageDispatcher;
+    stunMessageDispatcher.registerRequestProcessor(
+        nx_hpm::StunMethods::bind,
+        [&listeningPeerPool](const std::weak_ptr<StunServerConnection>& connection, nx_stun::Message&& message) -> bool {
+            return listeningPeerPool.processBindRequest( connection, std::move(message) );
+        } );
+    stunMessageDispatcher.registerRequestProcessor(
+        nx_hpm::StunMethods::connect,
+        [&listeningPeerPool](const std::weak_ptr<StunServerConnection>& connection, nx_stun::Message&& message) -> bool {
+            return listeningPeerPool.processConnectRequest( connection, std::move(message) );
+        } );
+
+    if( !m_multiAddressStunServer->listen() )
+        return 4;
     if( !m_multiAddressHttpServer->listen() )
-        return 3;
+        return 5;
 
-
+    //application's main loop
     const int result = application()->exec();
-
 
     //stopping accepting incoming connections
     m_multiAddressStunServer.reset();

@@ -33,7 +33,7 @@ public:
     typedef MessageType message_type;
     typedef ProcessorDictionaryType processor_dictionary_type;
 
-    //!Mesasge processor functor type
+    //!Message processor functor type
     /*!
         \note It is guaranteed that connection cannot be freed while in processor function. But, it can be closed at any moment after return of processor.
             To receive connection close event use \a BaseServerConnection::registerCloseHandler.
@@ -44,7 +44,7 @@ public:
 
     //!Implementation of \a QnStoppableAsync::pleaseStop
     /*!
-        Stop dispatching requests. \a StunRequestDispatcher::dispatchRequest will returns \a false
+        Stop dispatching requests. \a StunRequestDispatcher::dispatchRequest returns \a false if dispatcher has been stopped
         \note request dispatching cannot be resumed after it has been stopped
     */
     virtual void pleaseStop( std::function<void()>&& /*completionHandler*/ ) override

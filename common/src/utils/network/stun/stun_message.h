@@ -52,7 +52,9 @@ namespace nx_stun
     //!Contains STUN method types defined in RFC
     enum class MethodType
     {
-        binding = 1
+        binding = 1,
+        //!Starting value for custom STUN methods
+        user_method = 2
     };
 
     class Header

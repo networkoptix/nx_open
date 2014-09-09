@@ -11,6 +11,7 @@
 
 #include <utils/common/log.h>
 #include <utils/network/socket_common.h>
+#include <utils/network/socket_factory.h>
 
 
 //!Listens multiple addresses by creating multiple servers (\a SocketServerType)
@@ -18,15 +19,14 @@ template<class SocketServerType>
     class MultiAddressServer
 {
 public:
-    MultiAddressServer( const std::list<SocketAddress>& addrToListenList )
+    MultiAddressServer(
+        const std::list<SocketAddress>& addrToListenList,
+        bool sslRequired = false,
+        SocketFactory::NatTraversalType natTraversalRequired = SocketFactory::nttAuto )
     :
-        m_addrToListenList( addrToListenList )
-    {
-    }
-
-    MultiAddressServer( const std::list<SocketAddress>&& addrToListenList )
-    :
-        m_addrToListenList( addrToListenList )
+        m_addrToListenList( addrToListenList ),
+        m_sslRequired( sslRequired ),
+        m_natTraversalRequired( natTraversalRequired )
     {
     }
 
@@ -39,7 +39,7 @@ public:
         //binding to address(-es) to listen
         for( const SocketAddress& addr : m_addrToListenList )
         {
-            std::unique_ptr<SocketServerType> socketServer( new SocketServerType() );
+            std::unique_ptr<SocketServerType> socketServer( new SocketServerType( m_sslRequired, m_natTraversalRequired ) );
             if( !socketServer->bind( addr ) )
             {
                 NX_LOG( QString::fromLatin1("Failed to bind to address %1. %2").arg(addr.toString()).arg(SystemError::getLastOSErrorText()), cl_logERROR );
@@ -81,6 +81,8 @@ public:
 private:
     const std::list<SocketAddress> m_addrToListenList;
     std::list<std::unique_ptr<SocketServerType> > m_listeners;
+    bool m_sslRequired;
+    SocketFactory::NatTraversalType m_natTraversalRequired;
 };
 
 #endif  //MULTI_ADDRESS_SERVER_H
