@@ -51,9 +51,7 @@ private slots:
 private:
     class Item {
     public:
-        Item(const QnMediaServerResourcePtr &server) :
-            m_server(server)
-        {}
+        Item(const QnMediaServerResourcePtr &server);
 
         QnMediaServerResourcePtr server() const;
         QnPeerUpdateStage stage() const;

@@ -50,8 +50,6 @@ private:
     void checkForUpdatesInternet(bool autoSwitch = false);
     void checkForUpdatesLocal();
 
-    bool canStartUpdate();
-
 private:
     enum UpdateSource {
         InternetSource,

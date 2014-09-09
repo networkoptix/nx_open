@@ -46,6 +46,12 @@ QVariant QnServerUpdatesModel::Item::data(int column, int role) const {
     return QVariant();
 }
 
+QnServerUpdatesModel::Item::Item(const QnMediaServerResourcePtr &server) :
+    m_server(server),
+    m_stage(QnPeerUpdateStage::Init)
+{
+}
+
 QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObject *parent) :
     QAbstractTableModel(parent),
     m_updateTool(tool),
@@ -66,6 +72,7 @@ QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObjec
 
         int value = (static_cast<int>(stage)*100 + progress) / ( static_cast<int>(QnPeerUpdateStage::Count) );
 
+        m_items[idx.row()]->m_stage = stage;
         m_items[idx.row()]->m_progress = value;
         emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
     });
@@ -165,23 +172,32 @@ QModelIndex QnServerUpdatesModel::index(const QUuid &id) const {
 void QnServerUpdatesModel::resetResourses() {
     beginResetModel();
 
-    qDeleteAll(m_items);
+    QHash<QnMediaServerResourcePtr, Item*> existingItems;
+    foreach (Item* item, m_items)
+        existingItems[item->server()] = item;
+
     m_items.clear();
 
     if (m_targets.isEmpty()) {
         foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::server)) {
             QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-            m_items.append(new Item(server));
+            if (existingItems.contains(server))
+                m_items.append(existingItems.take(server));
+            else
+                m_items.append(new Item(server));
         }
     } else {
         foreach (const QUuid &id, m_targets) {
             QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
             if (!server)
                 continue;
-
-            m_items.append(new Item(server));
+            if (existingItems.contains(server))
+                m_items.append(existingItems.take(server));
+            else
+                m_items.append(new Item(server));
         }
     }
+    qDeleteAll(existingItems.values());
 
     endResetModel();
 }

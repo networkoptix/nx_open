@@ -31,7 +31,7 @@ namespace {
 
     const int tooLateDayOfWeek = Qt::Thursday;
 
-    const int autoCheckIntervalMs = 1 * 60 * 1000;  // 5 minutes
+    const int autoCheckIntervalMs = 5 * 60 * 1000;  // 5 minutes
 }
 
 QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
@@ -259,11 +259,6 @@ void QnServerUpdatesWidget::initBuildSelectionButtons() {
     ui->latestBuildLabel->setVisible(false);
 }
 
-bool QnServerUpdatesWidget::canStartUpdate() {
-    return m_updateTool->idle(); //TODO: #GDM implement
-}
-
-
 bool QnServerUpdatesWidget::cancelUpdate() {
     if (m_updateTool->isUpdating())
         return m_updateTool->cancelUpdate();
@@ -423,7 +418,7 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
         ui->latestVersionLabel->setPalette(statusPalette);
 
         m_checkingInternet = false;
-        ui->internetUpdateButton->setEnabled(result.result == QnCheckForUpdateResult::UpdateFound);
+        ui->internetUpdateButton->setEnabled(result.result == QnCheckForUpdateResult::UpdateFound && m_updateTool->idle());
         ui->internetRefreshWidget->setCurrentWidget(ui->internetRefreshPage);
     });
 
@@ -477,29 +472,31 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
         ui->localDetailLabel->setPalette(detailPalette);
 
         m_checkingLocal = false;
-        ui->localUpdateButton->setEnabled(result.result == QnCheckForUpdateResult::UpdateFound);
+        ui->localUpdateButton->setEnabled(result.result == QnCheckForUpdateResult::UpdateFound && m_updateTool->idle());
         ui->localRefreshWidget->setCurrentWidget(ui->localBrowsePage);
     });
 }
 
 void QnServerUpdatesWidget::at_tool_stageChanged(QnFullUpdateStage stage) {
-    
-/*    ui->sourceButton->setEnabled(m_updateTool->idle());*/
-/*
+    ui->sourceButton->setEnabled(m_updateTool->idle());
     for (QAction* action: m_updateSourceActions)
         action->setEnabled(m_updateTool->idle());
-*/
 
-  /*  if (!m_updateTool->targetVersion().isNull())
-        ui->latestVersionLabel->setText(m_updateTool->targetVersion().toString());*/
+    if (!m_updateTool->idle()) {
+        ui->internetUpdateButton->setEnabled(false);
+        ui->localUpdateButton->setEnabled(false);
+        ui->latestBuildLabel->setEnabled(false);
+        ui->specificBuildLabel->setEnabled(false);
+    } else { /* Stage returned to idle, update finished. */
+        if (m_updateSourceActions[LocalSource]->isChecked())
+            ui->localUpdateButton->setEnabled(true);
+        else
+            ui->internetUpdateButton->setEnabled(true);
+        ui->latestBuildLabel->setEnabled(true);
+        ui->specificBuildLabel->setEnabled(true);
+    }
 
-   /* ui->startUpdateButton->setVisible(canStartUpdate() ||
-        m_updateTool->isUpdating());
-    ui->startUpdateButton->setEnabled(canStartUpdate());
-*/
-
-    ui->dayWarningLabel->setVisible(QDateTime::currentDateTime().date().dayOfWeek() >= tooLateDayOfWeek 
-        && canStartUpdate());
+    ui->dayWarningLabel->setVisible(QDateTime::currentDateTime().date().dayOfWeek() >= tooLateDayOfWeek);
 
     ui->updateStateWidget->setVisible(stage != QnFullUpdateStage::Init);
 
