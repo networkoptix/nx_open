@@ -1,69 +1,90 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
+	<!--
     Example pom for delegating maven goals to msbuild so it builds the "solution"
  
     A solution can be a group of projects, but here we only have one.
     It should also be possible to have one maven project per solution project, 
     and have a parent pom to deletegate the build.
   -->
-    <parent>
-        <artifactId>hdwitness</artifactId>
-        <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.3.0-SNAPSHOT</version>
-        <relativePath>..</relativePath>
-    </parent>
+	<parent>
+		<artifactId>hdwitness</artifactId>
+		<groupId>com.networkoptix.hdwitness</groupId>
+		<version>2.3.0-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
 
-    <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.3.0-SNAPSHOT</version>
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>deploy</artifactId>
-    <packaging>pom</packaging>
-    <name>HD Witness Deployment Scripts</name>
+	<groupId>com.networkoptix.hdwitness</groupId>
+	<version>2.3.0-SNAPSHOT</version>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>deploy</artifactId>
+	<packaging>pom</packaging>
+	<name>HD Witness Deployment Scripts</name>
 
-    <properties>
-        <root.dir>${basedir}/..</root.dir>
-        <arch>x64</arch>
-        <libdir>../build_environment/${arch}</libdir>
+	<properties>
+		<root.dir>${basedir}/..</root.dir>
+		<arch>x64</arch>
+		<libdir>../build_environment/${arch}</libdir>
 		<final.artifact.name>${namespace.additional}-full</final.artifact.name>
-    </properties>    
+	</properties>    
 
-    <build>
-        <directory>${arch}</directory> 
-        <finalName>client</finalName>
-        <plugins>   
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2.2</version>
-                <executions>
-                    <!-- <execution>
-                        <id>pack-client</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <finalName>server-update</finalName>
+	<build>
+		<directory>${arch}</directory> 
+		<finalName>client</finalName>
+		<plugins>   
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<executions>
+					<execution>
+						<id>read</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>${root.dir}/debsetup/client-deb/${arch}/finalname-client.properties</file>
+								<file>${root.dir}/debsetup/client-deb/${arch}/finalname-mediaserver.properties</file>
+							</files>
+							<quiet>true</quiet>
+						</configuration>
+					</execution>                   
+				</executions>
+			</plugin>				
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.2</version>
+				<executions>
+					<execution>
+						<id>pack-client</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<finalName>server-update</finalName>
 							<descriptors>
-                                <descriptor>${project.build.directory}/client-${platform}.xml</descriptor>
-                            </descriptors>	
-                        </configuration>
-                    </execution> -->
-                   <execution>
-                        <id>pack-server</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>${project.build.directory}/server-${platform}.xml</descriptor>
-                            </descriptors>
+								<descriptor>${project.build.directory}/client-${platform}.xml</descriptor>
+							</descriptors>	
+						</configuration>
+					</execution>
+					<execution>
+						<id>pack-server</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>${project.build.directory}/server-${assembly.descriptor}.xml</descriptor>
+							</descriptors>
 							<finalName>server-update</finalName>							
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- <plugin>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
@@ -84,38 +105,39 @@
                     </execution>
                 </executions>
             </plugin>	-->            
-        </plugins>                    
-    </build>    
-<!--    <profiles>
-        <profile>
-            <id>windows</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.7</version>
-                        <executions>
-                            <execution>
-                                <phase>initialize</phase>
-                                <configuration>
-                                    <failOnError>false</failOnError>
-                                    <target>
-                                        <copy file="${libdir}/bin/${build.configuration}/client.exe" tofile="${libdir}/bin/${build.configuration}/${product.name}.exe" />
-                                    </target>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>    
-                </plugins>
-            </build>
-        </profile>
-    </profiles> -->
+		</plugins>                    
+	</build>    
+	<profiles>
+		<profile>
+			<id>noarm</id>
+			<activation>
+				<property>
+					<name>arch</name>
+					<value>!arm</value>
+				</property>
+			</activation>
+			<properties>
+				<assembly.descriptor>${platform}</assembly.descriptor>
+			</properties>
+		</profile>
+		<profile>
+			<id>arm</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>linux</name>
+				</os>
+				<property>
+					<name>arch</name>
+					<value>arm</value>
+				</property>				
+			</activation>
+			<properties>
+				<assembly.descriptor>${box}</assembly.descriptor>
+			</properties>
+			<build>
+				<directory>${box}</directory>
+			</build>
+		</profile>
+	</profiles>
 </project>
