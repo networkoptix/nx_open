@@ -68,10 +68,14 @@ void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInfor
     m_moduleInformation = moduleInformation;
 }
 
-QnModuleInformation QnCommonModule::moduleInformation() const {
-    QMutexLocker lk(&m_mutex);
-
-    QnModuleInformation moduleInformationCopy(m_moduleInformation);
+QnModuleInformation QnCommonModule::moduleInformation() const 
+{
+    QnModuleInformation moduleInformationCopy;
+    {
+        QMutexLocker lk(&m_mutex);
+        moduleInformationCopy = m_moduleInformation;
+        moduleInformationCopy.systemName = m_localSystemName;
+    }
     //filling dynamic fields
     if (qnResPool) {
         moduleInformationCopy.remoteAddresses.clear();
@@ -82,7 +86,6 @@ QnModuleInformation QnCommonModule::moduleInformation() const {
         }
     }
 
-    moduleInformationCopy.systemName = m_localSystemName;
     return moduleInformationCopy;
 }
 

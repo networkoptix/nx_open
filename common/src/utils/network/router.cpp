@@ -114,10 +114,11 @@ void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleI
     m_routeBuilder->addConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
 
     if (!m_passive) {
-        if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
+        if (ec2::AbstractECConnectionPtr connection = m_connection.lock()) {
+            lk.unlock();
             connection->getMiscManager()->addConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        }
     }
-
     lk.unlock();
     emit connectionAdded(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
 }

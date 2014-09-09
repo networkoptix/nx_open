@@ -10,16 +10,17 @@ Universal Fisheye Dewarping. Now almost all type of fish-eye lenses are supporte
 Max/Min Recording Time per Camera. Ability to specify the minimum and maximum amount of footage according to recording policies. This setting is per-camera. For instance, one camera can store only 3 days of storage and another-one at least 5 days.
 One-Click System-Wide Upgrades. It is possible to upgrade the whole system to a newer version or to a specific build from a single machine Client is rinning on (Administrative privilege required). If the system is in a isolated network, then the special file is created. If run this file, it will download the upgrade package to a jumpdrive. This jumpdrive should pe plugged in the computer Client is running on. After that the system can be updated in one click.
 Web Based Camera Settings. Ability to display camera's web page inside VMS to be able to fully control cameras. 
-Paxton ACS Integration Plug-In. 
-Camera Groups via Views
+remove Paxton ACS Integration Plug-In. 
+Camera Groups via Views - ????????????
 Web Client Removal. Redesigned web client will be introduced in the upcoming version. Mobile clients are still included.
 #3738 Joining Systems and server to system (Other systems in resource tree). Now it is possible to join different systems. In this case the licenses will be combined (3246). 
-  #3839 Routing management. Clairify ..........
-Server web page introduced. Unlike traytool, it allows users to manage server from a remote computer. Moreover it provides additional functionality to control Server: ..............
+#3839 Simplified and flexible network setup between servers (Routing management). It is possible to specify IP addresses that can be used for accessing Servers (like public/internal IP addresses, domain names etc)
+Server web page introduced. Unlike traytool, it allows users to manage server from a remote computer. Moreover it provides additional functionality to control Server: start/stop, change System ID, port, login and password, join to other systems, configure storages, gain server information, 
 3593 System Administration - All system-related settings are combined in te single form to simplify setup and user experience.
 
 Improvements:
 
+Video playback on live is smoother
 3881 3568 Main Menu and Context Menu reorganized
 3539 ctrl + alt + t to disable background animation
 3569 Preview Search simplified
@@ -31,14 +32,14 @@ Improvements:
 3672 Add possibility to delete invalid and expired licenses
 3525 Ability to save camera rotation ("Force rotation" option on "Camera settings -> Default")
 2466 Media server conflicts notification improved. Now message contains the specific list of cameras that are used by both servers.
-3019 More default event rules are added: ..............
+3019 More default event rules are added: Event "Media server started" Action "Write to log" and E-mail Notification
 3578 If connection to Server is lost, the appropriate message is displayed (used to be the notification in the right panel)
 3258 Support streaming without transcoding to mobile devices (HLS). This may greatly reduce Server load
 3629 Error messages when activating licenses improved
 3353 Current version is displayed in the login dialog and the "beta version" form (used to be "About" form)
 3582 It is possibile to delete online cameras from resource tree. In this case camera may be discovered again after some time. To prevent it from re-discovering change the server auto-discovery setting
 2269 If Login dialog is active it is possible to perform other actions with the interfact (in previous version it was not allowed to interact with the client as soon as this dialog was active)
-3636 It ius possible for user to use and change administrators' layouts. It is possible to save such layouts with different names. Clairify ...............
+* 3636 User It is possible for  to use and change layouts administrators'. It is possible to save such layouts with different names. Clairify ...............
 3551 3668 3687 3669 3688 License types reorganized: VMAX (DW only), SWarm (for ARM devices), Analog Encoder, Video Wall 
 3486 Licenses information is moved to the separate database. This allows cleaning Server database without losing the license information
 3575 It is possible to adjust rtsp transport per-acmera (used to be per-server). 
@@ -54,16 +55,14 @@ Archive is more redundant: archive index is stored in Server database (used to b
 3423 Auto-discovery improved
 Improved PTZ control
 Onvif improvements
+In 2.2 and early versions the number of servers were restricted (about 20). Now it is not
 2900: Cameras with the same name are sorted by IP in Resources Tree
 3160, 3110 3673 UI Animation is improved (especially if using E-Mapping 3023)
 
 +++++++++++++ Clairify +++++++++++++
 
-??? 3689 Add parameter 'mode' to activate license request. If parameter 'mode=info' license server should not generate license signature and don't insert license to database.
-3667 Added ability to send support e-mail in the About dialog
-3799 feedback form for users 
+3667 Added ability to send support e-mail in the About dialog - ???
 3883 Never suggest to save layout 
-#2658 Timeline and last minute - ???
 
 BUGS
 Fisheye fixes:
@@ -89,7 +88,7 @@ HTTP/RTSP links fixes:
  
 Motion Mask dialog fixes:
  3679: Motion Mask displayed incorrectly if there were a lot of motion mask areas. Fixed
- 3497: Deafult motion mask value is reduced to ..........
+ 3497: Deafult motion mask value is reduced to 5
 
 PTZ Fixes: 
  3220: PTZ camera controls didn't work for non-admin user, if it was moved from another server. Fixed

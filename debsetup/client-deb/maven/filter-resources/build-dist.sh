@@ -19,9 +19,15 @@ ICONTARGET=$USRTARGET/share/icons
 LIBTARGET=$TARGET/lib
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
+BETA=""
+if [[ "$beta" == "true" ]]; then 
+  $BETA="-beta" 
+fi 
+
+FINALNAME=${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}$BETA
 
 STAGEBASE=deb
-STAGE=$STAGEBASE/${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}-beta
+STAGE=$STAGEBASE/$FINALNAME
 BINSTAGE=$STAGE$BINTARGET
 BGSTAGE=$STAGE$BGTARGET
 HELPSTAGE=$STAGE$HELPTARGET
@@ -93,4 +99,5 @@ install -m 755 debian/postinst $STAGE/DEBIAN
 
 (cd $STAGE; find * -type f -not -regex '^DEBIAN/.*' -print0 | xargs -0 md5sum > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
-(cd $STAGEBASE; fakeroot dpkg-deb -b ${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}-beta)
+(cd $STAGEBASE; fakeroot dpkg-deb -b ${PACKAGENAME}-$FINALNAME)
+echo "$FINALNAME" >> finalname-client.properties

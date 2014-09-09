@@ -99,6 +99,7 @@
 #include <rest/handlers/ping_rest_handler.h>
 #include <rest/handlers/ping_system_rest_handler.h>
 #include <rest/handlers/ptz_rest_handler.h>
+#include <rest/handlers/can_accept_cameras_rest_handler.h>
 #include <rest/handlers/rebuild_archive_rest_handler.h>
 #include <rest/handlers/recorded_chunks_rest_handler.h>
 #include <rest/handlers/statistics_rest_handler.h>
@@ -875,9 +876,9 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         QnManualCameraInfoMap manualCameras;
         foreach(const QnSecurityCamResourcePtr &camera, cameras) {
             messageProcessor->updateResource(camera);
-            if (camera->isManuallyAdded()) {
+            if (camera->isManuallyAdded() && camera->getParentId() == m_mediaServer->getId()) {
                 QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
-                manualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
+                manualCameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
             }
         }
         QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
@@ -1080,6 +1081,7 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testEmailSettings", new QnTestEmailSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler());
@@ -1998,6 +2000,14 @@ static void printVersion();
 
 int main(int argc, char* argv[])
 {
+    {
+        QMutex ggg;
+        QMutexLocker gggL(&ggg);
+        gggL.unlock();
+        gggL.unlock();
+    }
+    int gg = 4;
+
 #if 0
 #if defined(__GNUC__)
 # if defined(__i386__)
