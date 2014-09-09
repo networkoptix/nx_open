@@ -1,8 +1,8 @@
 #ifndef INSTALL_UPDATES_PEER_TASK_H
 #define INSTALL_UPDATES_PEER_TASK_H
 
-#include <core/resource/resource.h>
-#include <utils/network_peer_task.h>
+#include <core/resource/resource_fwd.h>
+#include <update/task/network_peer_task.h>
 #include <utils/common/software_version.h>
 
 class QTimer;

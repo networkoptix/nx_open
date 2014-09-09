@@ -132,6 +132,14 @@ QnVideowallManageWidgetColors::QnVideowallManageWidgetColors() {
     error = Qt::red;
 }
 
+
+QnServerUpdatesColors::QnServerUpdatesColors() {
+    latest = Qt::green;
+    target = Qt::yellow;
+    error = Qt::red;
+}
+
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,
     (json),

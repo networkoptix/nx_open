@@ -2,7 +2,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <utils/update_uploader.h>
+#include <update/update_uploader.h>
 
 QnUploadUpdatesPeerTask::QnUploadUpdatesPeerTask(QObject *parent) :
     QnNetworkPeerTask(parent),
@@ -22,7 +22,7 @@ void QnUploadUpdatesPeerTask::setUpdateId(const QString &updateId) {
     m_updateId = updateId;
 }
 
-void QnUploadUpdatesPeerTask::cancel() {
+void QnUploadUpdatesPeerTask::doCancel() {
     m_pendingUploads.clear();
     if (m_uploader)
         m_uploader->cancel();

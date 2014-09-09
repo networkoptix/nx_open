@@ -1,7 +1,7 @@
 #ifndef CONFIGURE_PEER_TASK_H
 #define CONFIGURE_PEER_TASK_H
 
-#include <utils/network_peer_task.h>
+#include <update/task/network_peer_task.h>
 
 class QnConfigurePeerTask : public QnNetworkPeerTask {
     Q_OBJECT

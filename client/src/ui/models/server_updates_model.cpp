@@ -5,26 +5,88 @@
 #include <ui/common/ui_resource_name.h>
 #include <ui/style/resource_icon_cache.h>
 
-QnServerUpdatesModel::QnServerUpdatesModel(QObject *parent) :
-    QAbstractTableModel(parent)
+
+QnMediaServerResourcePtr QnServerUpdatesModel::Item::server() const {
+    return m_server;
+}
+
+QnPeerUpdateStage QnServerUpdatesModel::Item::stage() const {
+    return m_stage;
+}
+
+QVariant QnServerUpdatesModel::Item::data(int column, int role) const {
+    switch (role) {
+    case Qt::DisplayRole:
+    case Qt::ToolTipRole:
+        switch (column) {
+        case NameColumn:
+            return getResourceName(m_server);
+        case VersionColumn:
+            return m_server->getVersion().toString(QnSoftwareVersion::FullFormat);
+        default:
+            break;
+        }
+        break;
+    case Qt::DecorationRole:
+        if (column == NameColumn)
+            return qnResIconCache->icon(m_server);
+        break;
+
+    case Qn::MediaServerResourceRole:
+        return QVariant::fromValue<QnMediaServerResourcePtr>(m_server);
+
+    case StageRole:
+        return static_cast<int>(m_stage);
+    case ProgressRole:
+        return m_progress;
+    default:
+        break;
+    }
+
+    return QVariant();
+}
+
+QnServerUpdatesModel::Item::Item(const QnMediaServerResourcePtr &server) :
+    m_server(server),
+    m_stage(QnPeerUpdateStage::Init)
 {
-    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnServerUpdatesModel::at_resourceAdded);
-    connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnServerUpdatesModel::at_resourceRemoved);
+}
+
+QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObject *parent) :
+    QAbstractTableModel(parent),
+    m_updateTool(tool),
+    m_checkResult(QnCheckForUpdateResult::BadUpdateFile)
+{
+    connect(m_updateTool,  &QnMediaServerUpdateTool::peerStageChanged,  this, [this](const QUuid &peerId, QnPeerUpdateStage stage) {
+        QModelIndex idx = index(peerId);
+        if (!idx.isValid())
+            return;
+        m_items[idx.row()]->m_stage = stage;
+        emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
+    });
+
+    connect(m_updateTool,  &QnMediaServerUpdateTool::peerStageProgressChanged,  this, [this](const QUuid &peerId, QnPeerUpdateStage stage, int progress) {
+        QModelIndex idx = index(peerId);
+        if (!idx.isValid())
+            return;
+
+        int value = (static_cast<int>(stage)*100 + progress) / ( static_cast<int>(QnPeerUpdateStage::Count) );
+
+        m_items[idx.row()]->m_stage = stage;
+        m_items[idx.row()]->m_progress = value;
+        emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
+    });
+
+    connect(m_updateTool, &QnMediaServerUpdateTool::targetsChanged,  this,  &QnServerUpdatesModel::setTargets);
+
     connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnServerUpdatesModel::at_resourceChanged);
     connect(qnResPool,  &QnResourcePool::statusChanged,     this,   &QnServerUpdatesModel::at_resourceChanged);
 
-    resetResourses();
+    setTargets(m_updateTool->actualTargetIds());
 }
 
 void QnServerUpdatesModel::setTargets(const QSet<QUuid> &targets) {
     m_targets = targets;
-    resetResourses();
-}
-
-void QnServerUpdatesModel::setTargets(const QnMediaServerResourceList &targets) {
-    m_targets.clear();
-    foreach (const QnMediaServerResourcePtr &server, targets)
-        m_targets.insert(server->getId());
     resetResourses();
 }
 
@@ -63,14 +125,20 @@ QVariant QnServerUpdatesModel::data(const QModelIndex &index, int role) const {
     Item *item = reinterpret_cast<Item*>(index.internalPointer());
 
     if (role == Qt::ForegroundRole && index.column() == VersionColumn) {
-        if (item->m_updateInfo.state == QnMediaServerUpdateTool::PeerUpdateInformation::UpdateFound)
-            return QColor(Qt::yellow);
+        
+        if (m_checkResult.result == QnCheckForUpdateResult::NoNewerVersion)
+            return m_colors.latest;
 
-        if (!m_latestVersion.isNull() &&
-            item->m_updateInfo.state == QnMediaServerUpdateTool::PeerUpdateInformation::UpdateNotFound) {
-                if (item->m_server->getVersion() == m_latestVersion)
-                    return QColor(Qt::green);
-                return QColor(Qt::red);
+        if (m_checkResult.result == QnCheckForUpdateResult::UpdateFound &&
+            !m_checkResult.latestVersion.isNull()) {
+
+            if (item->m_server->getVersion() == m_checkResult.latestVersion)
+                return m_colors.latest;
+
+            if (m_checkResult.systems.contains(item->m_server->getSystemInfo()))
+                return m_colors.target;
+
+            return m_colors.error;
         }
         return QVariant();
     }
@@ -93,86 +161,45 @@ QModelIndex QnServerUpdatesModel::index(const QnMediaServerResourcePtr &server) 
     return base_type::index(it - m_items.begin(), 0);
 }
 
-void QnServerUpdatesModel::setUpdatesInformation(const QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> &updates) {
-    foreach (Item *item, m_items)
-        item->m_updateInfo = updates[item->server()->getId()];
+QModelIndex QnServerUpdatesModel::index(const QUuid &id) const {
+    auto it = std::find_if(m_items.begin(), m_items.end(), [&id](Item *item){ return item->server()->getId() == id; });
+    if (it == m_items.end())
+        return QModelIndex();
 
-    if (!m_items.isEmpty())
-        emit dataChanged(index(0, VersionColumn), index(m_items.size() - 1, VersionColumn));
-}
-
-void QnServerUpdatesModel::setUpdateInformation(const QnMediaServerUpdateTool::PeerUpdateInformation &update) {
-    if (!update.server)
-        return;
-
-    m_updates[update.server->getId()] = update;
-
-    for (int i = 0; i < m_items.size(); i++) {
-        Item *item = m_items[i];
-        if (item->server() == update.server) {
-            item->m_updateInfo = update;
-            emit dataChanged(index(i, VersionColumn), index(i, VersionColumn));
-            break;
-        }
-    }
+    return base_type::index(it - m_items.begin(), 0);
 }
 
 void QnServerUpdatesModel::resetResourses() {
     beginResetModel();
 
-    qDeleteAll(m_items);
+    QHash<QnMediaServerResourcePtr, Item*> existingItems;
+    foreach (Item* item, m_items)
+        existingItems[item->server()] = item;
+
     m_items.clear();
 
     if (m_targets.isEmpty()) {
         foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::server)) {
             QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-            m_items.append(new Item(server, m_updates[server->getId()]));
+            if (existingItems.contains(server))
+                m_items.append(existingItems.take(server));
+            else
+                m_items.append(new Item(server));
         }
     } else {
         foreach (const QUuid &id, m_targets) {
             QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
             if (!server)
                 continue;
-
-            m_items.append(new Item(server, m_updates[server->getId()]));
+            if (existingItems.contains(server))
+                m_items.append(existingItems.take(server));
+            else
+                m_items.append(new Item(server));
         }
     }
+    qDeleteAll(existingItems.values());
 
     endResetModel();
-}
-
-void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
-
-    if (m_targets.isEmpty()) {
-        if (server->getSystemName() != qnCommon->localSystemName())
-            return;
-    } else {
-        if (!m_targets.contains(resource->getId()))
-            return;
-    }
-
-    beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
-    m_items.append(new Item(server, m_updates[server->getId()]));
-    endInsertRows();
-}
-
-void QnServerUpdatesModel::at_resourceRemoved(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
-
-    QModelIndex idx = index(server);
-    if (!idx.isValid())
-        return;
-
-    beginRemoveRows(QModelIndex(), idx.row(), idx.row());
-    m_items.removeAt(idx.row());
-    endRemoveRows();
-
-    delete static_cast<Item*>(idx.internalPointer());
 }
 
 void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
@@ -187,54 +214,26 @@ void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
     emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
 }
 
-QnSoftwareVersion QnServerUpdatesModel::latestVersion() const {
-    return m_latestVersion;
+QnCheckForUpdateResult QnServerUpdatesModel::checkResult() const {
+    return m_checkResult;
 }
 
-void QnServerUpdatesModel::setLatestVersion(const QnSoftwareVersion &version) {
-    if (m_latestVersion == version)
-        return;
-    m_latestVersion = version;
+void QnServerUpdatesModel::setCheckResult(const QnCheckForUpdateResult &result) {
+    m_checkResult = result;
     if (m_items.isEmpty())
         return;
 
     emit dataChanged(index(0, VersionColumn), index(m_items.size() - 1, VersionColumn));
 }
 
-
-QnMediaServerResourcePtr QnServerUpdatesModel::Item::server() const {
-    return m_server;
+QnServerUpdatesColors QnServerUpdatesModel::colors() const {
+    return m_colors;
 }
 
-QnMediaServerUpdateTool::PeerUpdateInformation QnServerUpdatesModel::Item::updateInformation() const {
-    return m_updateInfo;
-}
+void QnServerUpdatesModel::setColors(const QnServerUpdatesColors &colors) {
+    m_colors = colors;
 
-QVariant QnServerUpdatesModel::Item::data(int column, int role) const {
-    switch (role) {
-    case Qt::DisplayRole:
-    case Qt::ToolTipRole:
-        switch (column) {
-        case NameColumn:
-            return getResourceName(m_server);
-        case VersionColumn:
-            return m_server->getVersion().toString(QnSoftwareVersion::FullFormat);
-        default:
-            break;
-        }
-        break;
-    case Qt::DecorationRole:
-        if (column == NameColumn)
-            return qnResIconCache->icon(m_server);
-        break;
-        
-    case StateRole:
-        return m_updateInfo.state;
-    case ProgressRole:
-        return m_updateInfo.progress;
-    default:
-        break;
-    }
-
-    return QVariant();
+    if (m_items.isEmpty())
+        return;
+    emit dataChanged(index(0, VersionColumn), index(m_items.size() - 1, VersionColumn));
 }

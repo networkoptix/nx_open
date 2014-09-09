@@ -1,7 +1,7 @@
 #ifndef WAIT_COMPATIBLE_SERVERS_PEER_TASK_H
 #define WAIT_COMPATIBLE_SERVERS_PEER_TASK_H
 
-#include <utils/network_peer_task.h>
+#include <update/task/network_peer_task.h>
 #include <core/resource/resource_fwd.h>
 
 class QTimer;
