@@ -185,8 +185,8 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScre
     bool anyQuality = layout->channelCount() > 1;   // screenshots for panoramic cameras will be done locally
 
     const QnMediaServerResourcePtr server = qnResPool->getResourceById(display->mediaResource()->toResource()->getParentId()).dynamicCast<QnMediaServerResource>();
-    if (server->getServerFlags() & Qn::SF_Edge)
-        anyQuality = true; // screenshots for edge cameras will be done locally
+    if (!server || (server->getServerFlags() & Qn::SF_Edge))
+        anyQuality = true; // local file or edge cameras will be done locally
 
     for (int i = 0; i < layout->channelCount(); ++i) {
         QImage channelImage = display->camDisplay()->getScreenshot(i, parameters.imageCorrectionParams, parameters.mediaDewarpingParams, parameters.itemDewarpingParams, anyQuality);
