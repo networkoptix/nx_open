@@ -60,6 +60,7 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QnAboutDialog::reject);
     connect(m_copyButton, &QPushButton::clicked, this, &QnAboutDialog::at_copyButton_clicked);
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::emailSettingsChanged, this, &QnAboutDialog::retranslateUi);
+    connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged, this, &QnAboutDialog::retranslateUi);
 
     retranslateUi();
 }

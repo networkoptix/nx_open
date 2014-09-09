@@ -63,7 +63,7 @@ private:
     void setPeerStage(const QUuid &peerId, QnPeerUpdateStage stage);
     void setPeerStageProgress(const QUuid &peerId, QnPeerUpdateStage stage, int progress);
 
-    void finishUpdate(QnUpdateResult result);
+    void finishUpdate(const QnUpdateResult &result);
     
 private:
     QnFullUpdateStage m_stage;

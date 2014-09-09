@@ -12,10 +12,27 @@
 #include <version.h>
 
 QnWorkbenchVersionMismatchWatcher::QnWorkbenchVersionMismatchWatcher(QObject *parent):
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent)
 {
     connect(context(),  SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateMismatchData()));
+
+    connect(qnResPool, &QnResourcePool::resourceAdded,  this, [this] (const QnResourcePtr &resource) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (!server)
+            return;
+        connect(server, &QnMediaServerResource::versionChanged, this, &QnWorkbenchVersionMismatchWatcher::updateMismatchData);
+        updateMismatchData();
+    });
+
+    connect(qnResPool, &QnResourcePool::resourceRemoved,  this, [this] (const QnResourcePtr &resource) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (!server)
+            return;
+        disconnect(server, NULL, this, NULL);
+        updateMismatchData();
+    });
+
     updateMismatchData();
 }
 

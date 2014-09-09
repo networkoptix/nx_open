@@ -232,12 +232,13 @@ Qn::PanicMode QnMediaServerResource::getPanicMode() const {
 }
 
 void QnMediaServerResource::setPanicMode(Qn::PanicMode panicMode) {
-    if(m_panicMode == panicMode)
-        return;
-
-    m_panicMode = panicMode;
-
-    emit panicModeChanged(::toSharedPointer(this)); // TODO: #Elric emit it AFTER mutex unlock.
+    {
+        QMutexLocker lock(&m_mutex);
+        if(m_panicMode == panicMode)
+            return;
+        m_panicMode = panicMode;
+    }
+    emit panicModeChanged(::toSharedPointer(this));
 }
 
 Qn::ServerFlags QnMediaServerResource::getServerFlags() const
@@ -284,16 +285,19 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
     if(localOther) {
         if (m_panicMode != localOther->m_panicMode)
             modifiedFields << "panicModeChanged";
+        if (m_version != localOther->m_version)
+            modifiedFields << "versionChanged";
+
         m_panicMode = localOther->m_panicMode;
 
         m_serverFlags = localOther->m_serverFlags;
         netAddrListChanged = m_netAddrList != localOther->m_netAddrList;
         m_netAddrList = localOther->m_netAddrList;
-        m_version = localOther->getVersion();
-        m_systemInfo = localOther->getSystemInfo();
-        m_systemName = localOther->getSystemName();
-        m_redundancy = localOther->isRedundancy();
-        m_maxCameras = localOther->getMaxCameras();
+        m_version = localOther->m_version;
+        m_systemInfo = localOther->m_systemInfo;
+        m_systemName = localOther->m_systemName;
+        m_redundancy = localOther->m_redundancy;
+        m_maxCameras = localOther->m_maxCameras;
 
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         
@@ -352,9 +356,13 @@ void QnMediaServerResource::setMaxCameras(int value)
 
 void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
 {
-    QMutexLocker lock(&m_mutex);
-
-    m_version = version;
+    {
+        QMutexLocker lock(&m_mutex);
+        if (m_version == version)
+            return;
+        m_version = version;
+    }
+    emit versionChanged(::toSharedPointer(this));
 }
 
 QnSystemInformation QnMediaServerResource::getSystemInfo() const {

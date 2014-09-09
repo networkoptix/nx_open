@@ -91,9 +91,9 @@ void QnMediaServerUpdateTool::setPeerStageProgress(const QUuid &peerId, QnPeerUp
     emit peerStageProgressChanged(peerId, stage, progress);
 }
 
-void QnMediaServerUpdateTool::finishUpdate(QnUpdateResult result) {
-    setStage(QnFullUpdateStage::Init);
+void QnMediaServerUpdateTool::finishUpdate(const QnUpdateResult &result) {
     emit updateFinished(result);
+    setStage(QnFullUpdateStage::Init);
 }
 
 QnMediaServerResourceList QnMediaServerUpdateTool::targets() const {

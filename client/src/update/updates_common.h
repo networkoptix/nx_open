@@ -28,15 +28,28 @@ struct QnCheckForUpdateResult {
 };
 Q_DECLARE_METATYPE(QnCheckForUpdateResult);
 
-enum class QnUpdateResult {
-    Successful,
-    Cancelled,
-    LockFailed,
-    DownloadingFailed,
-    UploadingFailed,
-    ClientInstallationFailed,
-    InstallationFailed,
-    RestInstallationFailed
+
+struct QnUpdateResult {
+    enum Value {
+        Successful,
+        Cancelled,
+        LockFailed,
+        DownloadingFailed,
+        UploadingFailed,
+        ClientInstallationFailed,
+        InstallationFailed,
+        RestInstallationFailed
+    };
+
+    QnUpdateResult():
+        result(Cancelled) {}
+
+    explicit QnUpdateResult(Value result):
+        result(result) {}
+
+    Value result;
+    QnSoftwareVersion targetVersion;
+    bool clientInstallerRequired;
 };
 Q_DECLARE_METATYPE(QnUpdateResult);
 

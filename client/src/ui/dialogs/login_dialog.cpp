@@ -66,7 +66,7 @@ namespace {
         return result;
     }
 
-    const QSize saveConnectionAsSize(300, 100);
+    const QSize saveConnectionAsSize(250, 100);
 
 } // anonymous namespace
 
@@ -338,6 +338,7 @@ void QnLoginDialog::updateUsability() {
         ui->buttonBox->button(QDialogButtonBox::Cancel)->unsetCursor();
 
         updateAcceptibility();
+        updateFocus();
     } else {
         ::setEnabled(children(), ui->buttonBox, false);
         ::setEnabled(ui->buttonBox->children(), ui->buttonBox->button(QDialogButtonBox::Cancel), false);

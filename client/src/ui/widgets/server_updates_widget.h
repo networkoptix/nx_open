@@ -38,7 +38,7 @@ public:
     virtual bool discard() override;
 
 private slots:
-    void at_updateFinished(QnUpdateResult result);
+    void at_updateFinished(const QnUpdateResult &result);
 
     void at_tool_stageChanged(QnFullUpdateStage stage);
     void at_tool_stageProgressChanged(QnFullUpdateStage stage, int progress);

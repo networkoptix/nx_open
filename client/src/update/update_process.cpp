@@ -92,7 +92,12 @@ void QnUpdateProcess::run() {
 
     unlockMutex();
     removeTemporaryDir();
-    emit updateFinished(m_updateResult);
+
+    QnUpdateResult result(m_updateResult);
+    result.targetVersion = m_target.version;
+    result.clientInstallerRequired = m_clientRequiresInstaller;
+
+    emit updateFinished(result);
 }
 
 void QnUpdateProcess::downloadUpdates() {
@@ -290,8 +295,8 @@ void QnUpdateProcess::at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, i
     installClientUpdate();
 }
 
-void QnUpdateProcess::finishUpdate(QnUpdateResult result) {
-    m_updateResult = result;
+void QnUpdateProcess::finishUpdate(QnUpdateResult::Value value) {
+    m_updateResult = value;
     stop();
 }
 
@@ -464,6 +469,10 @@ void QnUpdateProcess::installUpdatesToServers() {
     connect(installUpdatesPeerTask, &QnNetworkPeerTask::finished,                   this,   &QnUpdateProcess::at_installTask_finished);
     connect(installUpdatesPeerTask, &QnNetworkPeerTask::peerFinished,               this,   [this](const QUuid &peerId) {
         setPeerState(peerId, QnPeerUpdateInformation::UpdateFinished);
+    });
+    connect(installUpdatesPeerTask,  &QnNetworkPeerTask::progressChanged,           this,     &QnUpdateProcess::progressChanged);
+    connect(installUpdatesPeerTask,  &QnNetworkPeerTask::peerProgressChanged,       this,     [this](const QUuid &peerId, int progress) {
+        emit peerStageProgressChanged(peerId, QnPeerUpdateStage::Install, progress);
     });
     connect(installUpdatesPeerTask, &QnNetworkPeerTask::finished,                   installUpdatesPeerTask,   &QObject::deleteLater);
     setStage(QnFullUpdateStage::Servers);
