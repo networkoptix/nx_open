@@ -472,8 +472,9 @@ public:
         ActionTypeRole,                             /**< Role for business action type. Value of type QnBusiness::ActionType. */
         ActionResourcesRole,                        /**< Role for business action resources list. Value of type QnResourceList. */
 
-        SoftwareVersionRole                         /**< Role for software version. Value of type QnSoftwareVersion. */
+        SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
 
+        LastItemDataRole
     };
 
     // TODO: #Elric #EC2 rename

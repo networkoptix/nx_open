@@ -74,6 +74,7 @@ class Customization():
     def validateInner(self):
         info('Validating ' + self.name + '...')
         clean = True
+        error = False
         for entry in self.base:
             if entry in self.dark and entry in self.light:
                 clean = False
@@ -85,6 +86,7 @@ class Customization():
                 if entry in self.base:
                     warn('File ' + os.path.join(self.lightPath, entry) + ' missing, using base version')
                 else:
+                    error = True
                     err('File ' + os.path.join(self.darkPath, entry) + ' missing in light skin')
                 
         for entry in self.light:
@@ -93,9 +95,13 @@ class Customization():
                 if entry in self.base:
                     warn('File ' + os.path.join(self.darkPath, entry) + ' missing, using base version')
                 else:
+                    error = True
                     err('File ' + os.path.join(self.lightPath, entry) + ' missing in dark skin')
         if clean:
             green('Success')
+        if error:
+            return 1
+        return 0
         
     def validateCross(self, other):
         info('Validating ' + self.name + ' vs ' + other.name + '...')
@@ -106,9 +112,10 @@ class Customization():
                 err('File ' + os.path.join(self.basePath, entry) + ' missing in ' + other.name)
         if clean:
             green('Success')
+            return 0
+        return 1
         
 def main():
-
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--color', action='store_true', help="colorized output")
     args = parser.parse_args()
@@ -118,9 +125,11 @@ def main():
         global colorer
         import colorama as colorer
 
-    rootDir = '../customization';
+    scriptDir = os.path.dirname(os.path.abspath(__file__))
+    rootDir = os.path.join(scriptDir, '../customization')
     customizations = {}
     roots = []
+    invalidInner = 0
     for entry in os.listdir(rootDir):
         if (entry[:1] == '_'):
             continue;   
@@ -130,14 +139,20 @@ def main():
         c = Customization(entry, path)
         if c.isRoot():
             c.populateFileList()
-            c.validateInner()
+            invalidInner += c.validateInner()
             roots.append(c)
         customizations[entry] = c
     
+    invalidCross = 0
     for c1, c2 in combinations(roots, 2):
-        c1.validateCross(c2)
-        c2.validateCross(c1)
+        invalidCross += c1.validateCross(c2)
+        invalidCross += c2.validateCross(c1)
     print colorer.Style.BRIGHT + 'Validation finished'
+    if invalidInner > 0:
+        sys.exit(1)
+    if invalidCross > 0:
+        sys.exit(2)
+    sys.exit(0)
 
 if __name__ == "__main__":
     main()

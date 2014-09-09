@@ -854,6 +854,7 @@ void QnCamDisplay::setSpeed(float speed)
     if (qAbs(speed-m_speed) > FPS_EPS)
     {
         if ((speed >= 0 && m_prevSpeed < 0) || (speed < 0 && m_prevSpeed >= 0)) {
+            m_afterJumpTimer.restart();
             m_executingChangeSpeed = true; // do not show "No data" while display preparing for new speed. 
             qint64 time = getExternalTime();
             if (time != DATETIME_NOW)

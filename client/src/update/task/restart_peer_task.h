@@ -1,9 +1,9 @@
 #ifndef RESTART_PEER_TASK_H
 #define RESTART_PEER_TASK_H
 
-#include <utils/network_peer_task.h>
+#include <update/task/network_peer_task.h>
 #include <utils/common/system_information.h>
-#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_fwd.h>
 
 class QnRestartPeerTask : public QnNetworkPeerTask {
     Q_OBJECT

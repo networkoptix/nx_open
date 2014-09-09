@@ -1,16 +1,19 @@
 #include "sorted_server_updates_model.h"
 
+#include <core/resource/media_server_resource.h>
+
 QnSortedServerUpdatesModel::QnSortedServerUpdatesModel(QObject *parent) :
     QSortFilterProxyModel(parent)
 {
 }
 
 bool QnSortedServerUpdatesModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
-    QnServerUpdatesModel::Item *litem = reinterpret_cast<QnServerUpdatesModel::Item*>(left.internalPointer());
-    QnServerUpdatesModel::Item *ritem = reinterpret_cast<QnServerUpdatesModel::Item*>(right.internalPointer());
 
-    bool lonline = litem->server()->getStatus() == Qn::Online;
-    bool ronline = ritem->server()->getStatus() == Qn::Online;
+    QnMediaServerResourcePtr lServer = left.data(Qn::MediaServerResourceRole).value<QnMediaServerResourcePtr>();
+    QnMediaServerResourcePtr rServer = right.data(Qn::MediaServerResourceRole).value<QnMediaServerResourcePtr>();
+
+    bool lonline = lServer->getStatus() == Qn::Online;
+    bool ronline = rServer->getStatus() == Qn::Online;
 
     if (lonline != ronline)
         return lonline;

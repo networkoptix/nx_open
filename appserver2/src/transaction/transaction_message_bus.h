@@ -76,11 +76,12 @@ namespace ec2
 
         struct AlivePeerInfo
         {
-            AlivePeerInfo(): peer(QUuid(), Qn::PT_Server) { lastActivity.restart(); }
+            AlivePeerInfo(): peer(QUuid(), Qn::PT_Server), directAccess(false) { lastActivity.restart(); }
             AlivePeerInfo(const ApiPeerData &peer): peer(peer) { lastActivity.restart(); }
             ApiPeerData peer;
             QSet<QUuid> proxyVia;
             QElapsedTimer lastActivity;
+            bool directAccess;
         };
         typedef QMap<QUuid, AlivePeerInfo> AlivePeersMap;
 

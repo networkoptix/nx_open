@@ -4,10 +4,10 @@
 #include "core/resource/media_server_resource.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
+#include <core/resource_management/incompatible_server_watcher.h>
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
 #include "plugins/resource/server_camera/server_camera.h"
-#include "utils/incompatible_server_adder.h"
 #include "utils/network/global_module_finder.h"
 
 #include "version.h"
@@ -15,7 +15,6 @@
 
 QnClientMessageProcessor::QnClientMessageProcessor():
     base_type(),
-    m_incompatibleServerAdder(NULL),
     m_connected(false),
     m_holdConnection(false)
 {
@@ -96,7 +95,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
     if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();
 
-    checkForTmpStatus(resource);
+    checkForTmpStatus(ownResource);
 }
 
 void QnClientMessageProcessor::processResources(const QnResourceList& resources)
@@ -109,9 +108,12 @@ void QnClientMessageProcessor::processResources(const QnResourceList& resources)
 void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
 {
     // process tmp status
+    
     if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) 
     {
-        if (mediaServer->getStatus() == Qn::Offline)
+        if (mediaServer->getStatus() == Qn::NotDefined)
+            return;
+        else if (mediaServer->getStatus() == Qn::Offline)
             updateServerTmpStatus(mediaServer->getId(), Qn::Offline);
         else
             updateServerTmpStatus(mediaServer->getId(), Qn::NotDefined);
@@ -188,11 +190,6 @@ void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &syste
 
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
-    if (m_incompatibleServerAdder) {
-        delete m_incompatibleServerAdder;
-        m_incompatibleServerAdder = 0;
-    }
-
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
-    m_incompatibleServerAdder = new QnIncompatibleServerAdder(this);
+    m_incompatibleServerWatcher.reset(new QnIncompatibleServerWatcher(this));
 }

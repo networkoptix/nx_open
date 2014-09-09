@@ -16,6 +16,8 @@
 #include <ui/customization/palette_data.h>
 #include <ui/customization/pen_data.h>
 
+#include <update/updates_common.h>
+
 #include "client_globals.h"
 #include "client_model_types.h"
 #include "client_color_types.h"
@@ -86,6 +88,11 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnVideowallManageWidgetColors>();
 
     qRegisterMetaType<QnAbstractCameraDataPtr>();
+
+    qRegisterMetaType<QnPeerUpdateStage>();
+    qRegisterMetaType<QnFullUpdateStage>();
+    qRegisterMetaType<QnUpdateResult>();
+    qRegisterMetaType<QnCheckForUpdateResult>();
 
     QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
     QnJsonSerializer::registerSerializer<QnTimeScrollBarColors>();

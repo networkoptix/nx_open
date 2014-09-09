@@ -5,7 +5,9 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
+
 #include <utils/common/software_version.h>
+#include <utils/common/connective.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -21,9 +23,10 @@ struct QnVersionMismatchData {
     bool isValid() const {return component != Qn::AnyComponent; }
 };
 
-class QnWorkbenchVersionMismatchWatcher: public QObject, public QnWorkbenchContextAware {
+class QnWorkbenchVersionMismatchWatcher: public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT
 
+    typedef Connective<QObject> base_type;
 public:
     QnWorkbenchVersionMismatchWatcher(QObject *parent = NULL);
     virtual ~QnWorkbenchVersionMismatchWatcher();

@@ -9,6 +9,7 @@ QnProgressWidget::QnProgressWidget(QWidget *parent):
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setSizeConstraint(QLayout::SetFixedSize);
+    layout->setContentsMargins(0, 0, 0, 0);
 
     QMovie* movie = qnSkin->newMovie("loading.gif", this);
     m_img->setMovie(movie);
