@@ -95,7 +95,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
     if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();
 
-    checkForTmpStatus(resource);
+    checkForTmpStatus(ownResource);
 }
 
 void QnClientMessageProcessor::processResources(const QnResourceList& resources)
@@ -108,9 +108,12 @@ void QnClientMessageProcessor::processResources(const QnResourceList& resources)
 void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
 {
     // process tmp status
+    
     if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) 
     {
-        if (mediaServer->getStatus() == Qn::Offline)
+        if (mediaServer->getStatus() == Qn::NotDefined)
+            return;
+        else if (mediaServer->getStatus() == Qn::Offline)
             updateServerTmpStatus(mediaServer->getId(), Qn::Offline);
         else
             updateServerTmpStatus(mediaServer->getId(), Qn::NotDefined);
