@@ -3,6 +3,8 @@
 
 #include <QtCore/QAbstractTableModel>
 
+#include <client/client_color_types.h>
+
 #include <core/resource/media_server_resource.h>
 #include <utils/common/system_information.h>
 #include <utils/common/software_version.h>
