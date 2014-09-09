@@ -91,6 +91,11 @@ namespace CameraDiagnostics
             return;
         }
 
+        m_result = true;
+        m_errorMessage = ErrorCode::toString(ErrorCode::noError, QList<QString>());
+        emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
+
+        emit diagnosticsStepStarted( static_cast<Step::Value>(m_step+1) );
         m_serverConnection->doCameraDiagnosticsStepAsync( m_cameraID, static_cast<Step::Value>(m_step+1),
             this, SLOT(onCameraDiagnosticsStepResponse( int, QnCameraDiagnosticsReply, int )) );
     }
