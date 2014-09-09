@@ -94,8 +94,6 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 
     if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();
-
-    checkForTmpStatus(resource);
 }
 
 void QnClientMessageProcessor::processResources(const QnResourceList& resources)
