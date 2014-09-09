@@ -215,6 +215,7 @@ void QnServerUpdatesWidget::initLinkButtons() {
     connect(ui->linkLineEdit,           &QLineEdit::textChanged,    this, [this](const QString &text){
         ui->copyLinkButton->setEnabled(!text.isEmpty());
         ui->saveLinkButton->setEnabled(!text.isEmpty());
+        ui->linkLineEdit->setCursorPosition(0);
     });
 
     ui->copyLinkButton->setEnabled(false);
