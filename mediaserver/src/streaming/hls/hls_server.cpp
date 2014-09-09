@@ -758,13 +758,13 @@ namespace nx_hls
             nx_http::header::Range range;
             if( !range.parse( rangeIter->second ) || !range.validateByContentSize(m_currentChunk->sizeInBytes()) )
             {
-                response->headers.insert( make_pair( "Content-Range", "*/"+nx_http::StringType::number(m_currentChunk->sizeInBytes()) ) );
+                response->headers.insert( make_pair( "Content-Range", "*/"+nx_http::StringType::number((quint64)m_currentChunk->sizeInBytes()) ) );
                 m_chunkInputStream.reset();
                 return nx_http::StatusCode::rangeNotSatisfiable;
             }
 
             response->headers.insert( make_pair( "Transfer-Encoding", "identity" ) );
-            response->headers.insert( make_pair( "Content-Range", rangeIter->second+"/"+nx_http::StringType::number(m_currentChunk->sizeInBytes()) ) );
+            response->headers.insert( make_pair( "Content-Range", rangeIter->second+"/"+nx_http::StringType::number((quint64)m_currentChunk->sizeInBytes()) ) );
             response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number(range.totalRangeLength(m_currentChunk->sizeInBytes())) ) );
 
             static_cast<StreamingChunkInputStream*>(m_chunkInputStream.get())->setByteRange( range );

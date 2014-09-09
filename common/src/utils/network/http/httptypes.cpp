@@ -940,7 +940,7 @@ namespace nx_http
         {
             for( const RangeSpec& rangeSpec: rangeSpecList )
             {
-                if( (rangeSpec.start >= contentSize) || (rangeSpec.end && rangeSpec.end >= contentSize) )
+                if( (rangeSpec.start >= contentSize) || (rangeSpec.end && rangeSpec.end.get() >= contentSize) )
                     return false;
             }
 
