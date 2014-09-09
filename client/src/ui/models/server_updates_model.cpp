@@ -55,7 +55,7 @@ QnServerUpdatesModel::Item::Item(const QnMediaServerResourcePtr &server) :
 QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObject *parent) :
     QAbstractTableModel(parent),
     m_updateTool(tool),
-    m_checkResult(QnCheckForUpdateResult::NoNewerVersion)
+    m_checkResult(QnCheckForUpdateResult::BadUpdateFile)
 {
     connect(m_updateTool,  &QnMediaServerUpdateTool::peerStageChanged,  this, [this](const QUuid &peerId, QnPeerUpdateStage stage) {
         QModelIndex idx = index(peerId);
@@ -127,18 +127,18 @@ QVariant QnServerUpdatesModel::data(const QModelIndex &index, int role) const {
     if (role == Qt::ForegroundRole && index.column() == VersionColumn) {
         
         if (m_checkResult.result == QnCheckForUpdateResult::NoNewerVersion)
-            return QColor(Qt::green);
+            return m_colors.latest;
 
         if (m_checkResult.result == QnCheckForUpdateResult::UpdateFound &&
             !m_checkResult.latestVersion.isNull()) {
 
             if (item->m_server->getVersion() == m_checkResult.latestVersion)
-                return QColor(Qt::green);
+                return m_colors.latest;
 
             if (m_checkResult.systems.contains(item->m_server->getSystemInfo()))
-                return QColor(Qt::yellow);
+                return m_colors.target;
 
-            return QColor(Qt::red);
+            return m_colors.error;
         }
         return QVariant();
     }
@@ -223,5 +223,17 @@ void QnServerUpdatesModel::setCheckResult(const QnCheckForUpdateResult &result) 
     if (m_items.isEmpty())
         return;
 
+    emit dataChanged(index(0, VersionColumn), index(m_items.size() - 1, VersionColumn));
+}
+
+QnServerUpdatesColors QnServerUpdatesModel::colors() const {
+    return m_colors;
+}
+
+void QnServerUpdatesModel::setColors(const QnServerUpdatesColors &colors) {
+    m_colors = colors;
+
+    if (m_items.isEmpty())
+        return;
     emit dataChanged(index(0, VersionColumn), index(m_items.size() - 1, VersionColumn));
 }

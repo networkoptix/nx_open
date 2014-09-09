@@ -12,6 +12,8 @@
 class QnServerUpdatesModel : public QAbstractTableModel {
     Q_OBJECT
 
+    Q_PROPERTY(QnServerUpdatesColors colors READ colors WRITE setColors)
+
     typedef QAbstractTableModel base_type;
 public:
     enum Columns {
@@ -26,6 +28,9 @@ public:
     };
 
     explicit QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObject *parent = 0);
+
+    QnServerUpdatesColors colors() const;
+    void setColors(const QnServerUpdatesColors &colors);
 
     int columnCount(const QModelIndex &parent) const override;
     int rowCount(const QModelIndex &parent) const override;
@@ -71,6 +76,7 @@ private:
     QSet<QUuid> m_targets;
 
     QnCheckForUpdateResult m_checkResult;
+    QnServerUpdatesColors m_colors;
 };
 
 #endif // SERVER_UPDATES_MODEL_H

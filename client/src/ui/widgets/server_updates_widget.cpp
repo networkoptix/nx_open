@@ -421,6 +421,8 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
         m_checkingInternet = false;
         ui->internetUpdateButton->setEnabled(result.result == QnCheckForUpdateResult::UpdateFound && m_updateTool->idle());
         ui->internetRefreshWidget->setCurrentWidget(ui->internetRefreshPage);
+
+        m_updatesModel->setCheckResult(result);
     });
 
 }
@@ -475,6 +477,8 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
         m_checkingLocal = false;
         ui->localUpdateButton->setEnabled(result.result == QnCheckForUpdateResult::UpdateFound && m_updateTool->idle());
         ui->localRefreshWidget->setCurrentWidget(ui->localBrowsePage);
+
+        m_updatesModel->setCheckResult(result);
     });
 }
 
