@@ -858,7 +858,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     for (auto itr = modifiedResources.begin(); itr != modifiedResources.end();) {
         if (reply.uniqueIdList.contains((*itr)->getUniqueId())) {
             (*itr)->setParentId(server->getId());
-            (*itr)->setPrefferedServerId(server->getId());
+            (*itr)->setPreferedServerId(server->getId());
             ++itr;
         }
         else {
