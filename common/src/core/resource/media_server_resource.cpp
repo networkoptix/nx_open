@@ -390,6 +390,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.version = m_version;
     moduleInformation.systemInformation = m_systemInfo;
     moduleInformation.systemName = m_systemName;
+    moduleInformation.name = getName();
     moduleInformation.port = QUrl(m_apiUrl).port();
     foreach (const QHostAddress &address, m_netAddrList)
         moduleInformation.remoteAddresses.insert(address.toString());

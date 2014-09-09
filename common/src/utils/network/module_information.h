@@ -15,6 +15,7 @@ struct QnModuleInformation {
     QnSoftwareVersion version;
     QnSystemInformation systemInformation;
     QString systemName;
+    QString name;
     quint16 port;
     QSet<QString> remoteAddresses;
     QUuid id;
@@ -25,7 +26,7 @@ struct QnModuleInformation {
     bool isCompatibleToCurrentSystem() const;
     bool isLocal() const; //!< true if at least one address from \a remoteHostAddress is a local address
 };
-#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(port)(remoteAddresses)(id)(sslAllowed)
+#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(remoteAddresses)(id)(sslAllowed)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (json)(metatype)(eq))
 
