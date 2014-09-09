@@ -697,6 +697,62 @@ bool QnDbManager::migrateBusinessEvents()
     return true;
 }
 
+bool QnDbManager::applyUpdates()
+{
+    QSqlQuery existsUpdatesQuery(m_sdb);
+    existsUpdatesQuery.prepare("SELECT migration from south_migrationhistory");
+    if (!existsUpdatesQuery.exec())
+        return false;
+    QStringList existUpdates;
+    while (existsUpdatesQuery.next())
+        existUpdates << existsUpdatesQuery.value(0).toString();
+
+
+    QDir dir(":/updates");
+    foreach(const QFileInfo& entry, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name))
+    {
+        QString fileName = entry.absoluteFilePath();
+        if (!existUpdates.contains(fileName)) 
+        {
+            if (!beforeInstallUpdate(fileName))
+                return false;
+            if (!execSQLFile(fileName, m_sdb))
+                return false;
+            if (!afterInstallUpdate(fileName))
+                return false;
+
+            QSqlQuery insQuery(m_sdb);
+            insQuery.prepare("INSERT INTO south_migrationhistory (app_name, migration, applied) values(?, ?, ?)");
+            insQuery.addBindValue(QN_APPLICATION_NAME);
+            insQuery.addBindValue(fileName);
+            insQuery.addBindValue(QDateTime::currentDateTime());
+            if (!insQuery.exec()) {
+                qWarning() << Q_FUNC_INFO << __LINE__ << insQuery.lastError();
+                return false;
+                }
+        }
+    }
+
+    return true;
+}
+
+bool QnDbManager::beforeInstallUpdate(const QString& updateName)
+{
+    return true;
+}
+
+bool QnDbManager::afterInstallUpdate(const QString& updateName)
+{
+    if (updateName == lit(":/updates/07_videowall.sql")) 
+    {
+        QMap<int, QUuid> guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'Videowall'", CM_MakeHash);
+        if (!updateTableGuids("vms_resourcetype", "guid", guids))
+            return false;
+    }
+
+    return true;
+}
+
 bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
 {
     QnDbTransactionLocker lock(&m_tran);
@@ -720,10 +776,6 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         if (!execSQLFile(lit(":/02_insert_all_vendors.sql"), m_sdb))
             return false;
         //#endif
-
-
-
-
     }
 
     if (!isObjectExists(lit("table"), lit("transaction_log"), m_sdb))
@@ -743,33 +795,13 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
             return false;
         if (!execSQLFile(lit(":/04_update_2.2_stage2.sql"), m_sdb))
             return false;
-
-        { //Videowall-related scripts
-            if (!execSQLFile(lit(":/05_videowall.sql"), m_sdb))
-                return false;
-            QMap<int, QUuid> guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'Videowall'", CM_MakeHash);
-            if (!updateTableGuids("vms_resourcetype", "guid", guids))
-                return false;
-        }
-
-        if (!execSQLFile(lit(":/06_bookmarks.sql"), m_sdb))
-            return false;
-
-        if (!execSQLFile(lit(":/07_refactor_firmware.sql"), m_sdb))
-            return false;
-
-        if (!execSQLFile(lit(":/08_min_max_archive.sql"), m_sdb))
-            return false;
-
-        if (!execSQLFile(lit(":/08_discovery.sql"), m_sdb))
-            return false;
     }
 
     QnDbTransactionLocker lockStatic(&m_tranStatic);
 
     if (!isObjectExists(lit("table"), lit("vms_license"), m_sdbStatic))
     {
-        if (!execSQLFile(lit(":/09_staticdb_add_license_table.sql"), m_sdbStatic))
+        if (!execSQLFile(lit(":/06_staticdb_add_license_table.sql"), m_sdbStatic))
             return false;
 
         // move license table to static DB
@@ -793,12 +825,8 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         //    return false;
     }
 
-    if (!isObjectExists(lit("table"), lit("transaction_sequence"), m_sdb))
-    {
-        if (!execSQLFile(lit(":/10_transaction_sequence_table.sql"), m_sdb))
-            return false;
-    }
-
+    if (!applyUpdates())
+        return false;
 
     lockStatic.commit();
     lock.commit();
@@ -1008,9 +1036,9 @@ ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 i
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO vms_camera (audio_enabled, control_enabled, vendor, manually_added, resource_ptr_id, region, schedule_enabled, motion_type, group_name, group_id,\
-                     mac, model, secondary_quality, status_flags, physical_id, password, login, dewarping_params, resource_ptr_id, min_archive_days, max_archive_days) VALUES\
+                     mac, model, secondary_quality, status_flags, physical_id, password, login, dewarping_params, resource_ptr_id, min_archive_days, max_archive_days, preffered_server_id) VALUES\
                      (:audioEnabled, :controlEnabled, :vendor, :manuallyAdded, :id, :motionMask, :scheduleEnabled, :motionType, :groupName, :groupId,\
-                     :mac, :model, :secondaryStreamQuality, :statusFlags, :physicalId, :password, :login, :dewarpingParams, :internalId, :minArchiveDays, :maxArchiveDays)");
+                     :mac, :model, :secondaryStreamQuality, :statusFlags, :physicalId, :password, :login, :dewarpingParams, :internalId, :minArchiveDays, :maxArchiveDays, :prefferedServerId)");
     QnSql::bind(data, &insQuery);
     insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec()) {
@@ -2086,7 +2114,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QUuid& mServerId, ApiCameraDataList& 
         c.region as motionMask, c.schedule_enabled as scheduleEnabled, c.motion_type as motionType, \
         c.group_name as groupName, c.group_id as groupId, c.mac, c. model, c.secondary_quality as secondaryStreamQuality, \
 		c.status_flags as statusFlags, c.physical_id as physicalId, c.password, login, c.dewarping_params as dewarpingParams, \
-        c.min_archive_days as minArchiveDays, c.max_archive_days as maxArchiveDays \
+        c.min_archive_days as minArchiveDays, c.max_archive_days as maxArchiveDays, c.preffered_server_id as prefferedServerId \
         FROM vms_resource r \
         JOIN vms_camera c on c.resource_ptr_id = r.id %1 ORDER BY r.guid").arg(filterStr));
 

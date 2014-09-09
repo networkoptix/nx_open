@@ -188,6 +188,7 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     dst->setVendor(src.vendor);
     dst->setMinDays(src.minArchiveDays);
     dst->setMaxDays(src.maxArchiveDays);
+    dst->setPrefferedServerId(src.preferredServerId);
     Q_ASSERT(dst->getId() == QnVirtualCameraResource::uniqueIdToId(dst->getUniqueId()));
 
 }
@@ -224,6 +225,7 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.vendor = src->getVendor();
     dst.minArchiveDays = src->minDays();
     dst.maxArchiveDays = src->maxDays();
+    dst.preferredServerId = src->prefferedServerId();
 }
 
 template<class List> 
