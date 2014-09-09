@@ -57,10 +57,10 @@ namespace ec2
         QString             vendor;
         int                 minArchiveDays;
         int                 maxArchiveDays;
-        QUuid               preferredServerId;
+        QUuid               preferedServerId;
     };
 #define ApiCameraData_Fields ApiResourceData_Fields (scheduleEnabled)(motionType)(motionMask)(mac)(login)(password)(scheduleTasks)(audioEnabled)(physicalId)(manuallyAdded)(model) \
-                            (groupId)(groupName)(secondaryStreamQuality)(controlEnabled)(statusFlags)(dewarpingParams)(vendor)(minArchiveDays)(maxArchiveDays)(preferredServerId)
+                            (groupId)(groupName)(secondaryStreamQuality)(controlEnabled)(statusFlags)(dewarpingParams)(vendor)(minArchiveDays)(maxArchiveDays)(preferedServerId)
 
 } // namespace ec2
 
