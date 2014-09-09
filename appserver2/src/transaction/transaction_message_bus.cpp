@@ -224,17 +224,12 @@ void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QUuid
 {
     AlivePeersMap::iterator itr = m_alivePeers.find(peerData.id);
     if (itr == m_alivePeers.end()) 
-    {
-        AlivePeerInfo peer(peerData);
-        if (!gotFromPeer.isNull())
-            peer.proxyVia << gotFromPeer;
-        m_alivePeers.insert(peerData.id, peer);
-    }
-    else {
-        AlivePeerInfo& currentValue = itr.value();
-        if (!currentValue.proxyVia.isEmpty() && !gotFromPeer.isNull())
-            currentValue.proxyVia << gotFromPeer; // if peer is accessible directly (proxyVia is empty), do not extend proxy list
-    }
+        itr = m_alivePeers.insert(peerData.id, peer);
+    AlivePeerInfo& currentValue = itr.value();
+    if (gotFromPeer.isNull())
+        currentValue.directAccess = true;
+    else
+        currentValue.proxyVia << gotFromPeer;
 }
 
 void QnTransactionMessageBus::removeAlivePeer(const QUuid& id, bool sendTran, bool isRecursive)
@@ -259,7 +254,7 @@ void QnTransactionMessageBus::removeAlivePeer(const QUuid& id, bool sendTran, bo
         AlivePeerInfo& otherPeer = itr.value();
         if (otherPeer.proxyVia.contains(id)) {
             otherPeer.proxyVia.remove(id);
-            if (otherPeer.proxyVia.isEmpty()) {
+            if (otherPeer.proxyVia.isEmpty() && !otherPeer.directAccess) {
                 morePeersToRemove << otherPeer.peer.id;
             }
         }
@@ -276,7 +271,7 @@ void QnTransactionMessageBus::processAliveData(const ApiPeerAliveData &aliveData
     if (aliveData.peer.id == m_localPeer.id)
         return; // ignore himself
 
-#if 0
+#if 1
     if (!aliveData.isAlive && !gotFromPeer.isNull()) 
     {
         bool isPeerActuallyAlive = aliveData.peer.id == qnCommon->moduleGUID();
@@ -293,6 +288,7 @@ void QnTransactionMessageBus::processAliveData(const ApiPeerAliveData &aliveData
             tran.params = aliveData;
             tran.params.isAlive = true;
             sendTransaction(tran); // resend alive info for that peer
+            return; // ignore peer offline transaction
         }
     }
 #endif
