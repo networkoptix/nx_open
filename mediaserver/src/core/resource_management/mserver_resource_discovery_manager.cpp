@@ -82,7 +82,7 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCam
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
     if (!mServer)
         return false;
-    if (mServer->getStatus() == Qn::Online && camera->prefferedServerId() != ownGuid)
+    if (mServer->getStatus() == Qn::Online && camera->preferedServerId() != ownGuid)
         return false;
 
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(ownGuid).dynamicCast<QnMediaServerResource>();
