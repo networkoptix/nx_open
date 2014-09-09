@@ -143,13 +143,13 @@ private:
     mutable QMutex m_resourcesMtx;
     bool m_tranInProgress;
     QnResourceList m_tmpResources;
-    QHash<QString, QnResourcePtr> m_resources;
-    QHash<QString, QnResourcePtr> m_incompatibleResources;
+    QHash<QUuid, QnResourcePtr> m_resources;
+    QHash<QUuid, QnResourcePtr> m_incompatibleResources;
 
     /*!
         \return true, if \a resource has been inserted. false - if updated existing resource
     */
-    bool insertOrUpdateResource( const QnResourcePtr &resource, QHash<QString, QnResourcePtr>* const resourcePool );
+    bool insertOrUpdateResource( const QnResourcePtr &resource, QHash<QUuid, QnResourcePtr>* const resourcePool );
 };
 
 

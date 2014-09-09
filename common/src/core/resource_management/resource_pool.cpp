@@ -161,22 +161,22 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
 namespace
 {
-    class MatchResourceByID
+    class MatchResourceByUniqueID
     {
     public:
-        MatchResourceByID( const QUuid& _idToFind )
+        MatchResourceByUniqueID( const QString& _uniqueIdToFind )
         :
-            idToFind( _idToFind )
+            uniqueIdToFind( _uniqueIdToFind )
         {
         }
 
         bool operator()( const QnResourcePtr& res ) const
         {
-            return res->getId() == idToFind;
+            return res->getUniqueId() == uniqueIdToFind;
         }
 
     private:
-        QUuid idToFind;
+        QString uniqueIdToFind;
     };
 }
 
@@ -199,7 +199,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         //    removedResources.append(resource);
         
         //have to remove by id, since uniqueId can be MAC and, as a result, not unique among friend and foreign resources
-        QHash<QString, QnResourcePtr>::iterator resIter = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByID(resource->getId()) );
+        QHash<QUuid, QnResourcePtr>::iterator resIter = m_resources.find(resource->getId());
         if( resIter != m_resources.end() )
         {
             m_resources.erase( resIter );
@@ -207,7 +207,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         }
         else
         {
-            resIter = std::find_if(m_incompatibleResources.begin(), m_incompatibleResources.end(), MatchResourceByID(resource->getId()));
+            resIter = m_incompatibleResources.find(resource->getId());
             if (resIter != m_incompatibleResources.end())
             {
                 m_incompatibleResources.erase(resIter);
@@ -260,7 +260,7 @@ QnResourceList QnResourcePool::getResources() const
 QnResourcePtr QnResourcePool::getResourceById(const QUuid &id) const {
     QMutexLocker locker(&m_resourcesMtx);
 
-    QHash<QString, QnResourcePtr>::const_iterator resIter = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByID(id) );
+    QHash<QUuid, QnResourcePtr>::const_iterator resIter = m_resources.find(id);
     if( resIter != m_resources.end() )
         return resIter.value();
 
@@ -405,21 +405,17 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QStri
     return result;
 }
 
-QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const
+QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &uniqueID) const
 {
     QMutexLocker locker(&m_resourcesMtx);
-    QHash<QString, QnResourcePtr>::const_iterator itr = m_resources.find(id);
+    auto itr = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByUniqueID(uniqueID));
     return itr != m_resources.end() ? itr.value() : QnResourcePtr(0);
 }
 
 void QnResourcePool::updateUniqId(const QnResourcePtr& res, const QString &newUniqId)
 {
     QMutexLocker locker(&m_resourcesMtx);
-    QHash<QString, QnResourcePtr>::iterator itr = m_resources.find(res->getUniqueId());
-    if (itr != m_resources.end())
-        m_resources.erase(itr);
     res->setUniqId(newUniqId);
-    m_resources.insert(newUniqId, res);
 }
 
 bool QnResourcePool::hasSuchResource(const QString &uniqid) const
@@ -513,28 +509,26 @@ void QnResourcePool::clear()
     m_resources.clear();
 }
 
-bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHash<QString, QnResourcePtr>* const resourcePool )
+bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHash<QUuid, QnResourcePtr>* const resourcePool )
 {
-    const QString& uniqueId = resource->getUniqueId();
-
-    if (resourcePool->contains(uniqueId))
-    {
-        // if we already have such resource in the pool
-        (*resourcePool)[uniqueId]->update(resource);
-        return false;
-    }
-    else
-    {
+    const QUuid& id = resource->getId();
+    auto itr = resourcePool->find(id);
+    if (itr == resourcePool->end()) {
         // new resource
-        (*resourcePool)[uniqueId] = resource;
+        resourcePool->insert(id, resource);
         return true;
+    }
+    else {
+        // if we already have such resource in the pool
+        itr.value()->update(resource);
+        return false;
     }
 }
 
 QnResourcePtr QnResourcePool::getIncompatibleResourceById(const QUuid &id, bool useCompatible) const {
     QMutexLocker locker(&m_resourcesMtx);
 
-    auto it = std::find_if(m_incompatibleResources.begin(), m_incompatibleResources.end(), MatchResourceByID(id));
+    auto it = m_incompatibleResources.find(id);
     if (it != m_incompatibleResources.end())
         return it.value();
 
