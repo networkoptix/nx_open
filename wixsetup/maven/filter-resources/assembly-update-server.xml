@@ -12,10 +12,8 @@
 				<include>bin/${finalName}.msi</include>
 			</includes>		
 		</fileSet>				
-	</fileSets>
-	<fileSets>
 		<fileSet>
-			<directory>${project.build.directory}</directory>
+			<directory>${project.build.directory}/server</directory>
 			<outputDirectory>..</outputDirectory>
 			<includes>
 				<include>update.json</include>

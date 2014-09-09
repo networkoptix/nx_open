@@ -52,6 +52,20 @@
 							</descriptors>
 							<finalName>server-update</finalName>							
 						</configuration>
+					</execution>
+
+					<execution>
+						<id>client-update-package</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>${project.build.directory}/assembly-update-client.xml</descriptor>
+							</descriptors>
+							<finalName>client-update</finalName>							
+						</configuration>
 					</execution>	
 				</executions>				
 			</plugin> 		
