@@ -1092,7 +1092,6 @@ void QnWorkbenchActionHandler::notifyAboutUpdate() {
 
     if (res == QMessageBox::Accepted) {
         at_systemUpdateAction_triggered();
-        systemAdministrationDialog()->checkForUpdates();
     } else {
         qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? version : QnSoftwareVersion());
     }

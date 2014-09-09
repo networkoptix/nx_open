@@ -8,7 +8,11 @@
 
 namespace {
     bool checkPassword(int buildNumber, const QString &password) {
+#ifdef _DEBUG
+        return true;
+#else
         return passwordForBuild((unsigned)buildNumber) == password;
+#endif
     }
 }
 

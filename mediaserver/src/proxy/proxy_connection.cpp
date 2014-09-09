@@ -180,8 +180,12 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
         dstUrl = QUrl(lit("%1://%2:%3").arg(protocol).arg(hostAndPort[0]).arg(port));
     }
     else {
-        int defaultPort = getDefaultPortByProtocol(url.scheme());
-        dstUrl = QUrl(lit("%1://%2:%3").arg(url.scheme()).arg(url.host()).arg(url.port(defaultPort)));
+        QString scheme = url.scheme();
+        if (scheme.isEmpty())
+            scheme = lit("http");
+
+        int defaultPort = getDefaultPortByProtocol(scheme);
+        dstUrl = QUrl(lit("%1://%2:%3").arg(scheme).arg(url.host()).arg(url.port(defaultPort)));
     }
 
     if (urlPath.isEmpty())

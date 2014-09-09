@@ -12,12 +12,9 @@ public:
     ~QnNetworkPeerTask();
 
     QSet<QUuid> peers() const;
-    void setPeers(const QSet<QUuid> &peers);
 
-public slots:
-    void start();
     void start(const QSet<QUuid> &peers);
-    virtual void cancel() {}
+    void cancel();
 
 signals:
     void finished(int errorCode, const QSet<QUuid> &failedPeers);
@@ -29,6 +26,7 @@ protected:
     void finish(int errorCode, const QSet<QUuid> &failedPeers = QSet<QUuid>());
 
     virtual void doStart() = 0;
+    virtual void doCancel() {}
 
 private:
     QSet<QUuid> m_peers;

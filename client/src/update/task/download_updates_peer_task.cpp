@@ -55,7 +55,7 @@ void QnDownloadUpdatesPeerTask::setPeerAssociations(const QMultiHash<QUrl, QUuid
     m_peersByUrl = peersByUrl;
 }
 
-void QnDownloadUpdatesPeerTask::cancel() {
+void QnDownloadUpdatesPeerTask::doCancel() {
     m_currentPeers.clear();
     m_pendingDownloads.clear();
     m_file.reset();

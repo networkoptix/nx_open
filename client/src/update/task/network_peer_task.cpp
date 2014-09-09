@@ -12,16 +12,12 @@ void QnNetworkPeerTask::start(const QSet<QUuid> &peers) {
     doStart();
 }
 
+void QnNetworkPeerTask::cancel() {
+    doCancel();
+}
+
 QSet<QUuid> QnNetworkPeerTask::peers() const {
     return m_peers;
-}
-
-void QnNetworkPeerTask::setPeers(const QSet<QUuid> &peers) {
-    m_peers = peers;
-}
-
-void QnNetworkPeerTask::start() {
-    doStart();
 }
 
 void QnNetworkPeerTask::finish(int errorCode, const QSet<QUuid> &failedPeers) {
