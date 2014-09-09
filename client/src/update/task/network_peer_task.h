@@ -26,7 +26,7 @@ protected:
     void finish(int errorCode, const QSet<QUuid> &failedPeers = QSet<QUuid>());
 
     virtual void doStart() = 0;
-    Q_SLOT virtual void doCancel() {}
+    virtual void doCancel() {}
 
 private:
     QSet<QUuid> m_peers;

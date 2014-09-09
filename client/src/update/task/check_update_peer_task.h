@@ -1,12 +1,14 @@
 #ifndef CHECK_UPDATE_PEER_TASK_H
 #define CHECK_UPDATE_PEER_TASK_H
 
+#include <memory>
+#include <unordered_set>
+
 #include <update/task/network_peer_task.h>
 #include <update/updates_common.h>
 
 #include <utils/common/system_information.h>
-
-class QNetworkAccessManager;
+#include <utils/network/http/asynchttpclient.h>
 
 class QnCheckForUpdatesPeerTask : public QnNetworkPeerTask {
     Q_OBJECT
@@ -41,11 +43,10 @@ private:
 
     void finishTask(QnCheckForUpdateResult::Value result);
 private slots:
-    void at_updateReply_finished();
-    void at_buildReply_finished();
+    void at_updateReply_finished(const nx_http::AsyncHttpClientPtr &client);
+    void at_buildReply_finished(const nx_http::AsyncHttpClientPtr &client);
 
 private:
-    QNetworkAccessManager *m_networkAccessManager;
     QUrl m_updatesUrl;
     QnUpdateTarget m_target;
 
@@ -57,6 +58,8 @@ private:
     QHash<QnSystemInformation, QnUpdateFileInformationPtr> m_updateFiles;
     QnUpdateFileInformationPtr m_clientUpdateFile;
     bool m_clientRequiresInstaller;
+
+    std::unordered_set<nx_http::AsyncHttpClientPtr> m_runningRequests;
 };
 
 #endif // CHECK_UPDATE_PEER_TASK_H

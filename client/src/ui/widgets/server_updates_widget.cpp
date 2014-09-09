@@ -61,14 +61,12 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     connect(ui->internetUpdateButton,   &QPushButton::clicked,      this, [this] {
         m_updateTool->startUpdate(m_targetVersion, !m_targetVersion.isNull());
     });
+    ui->internetUpdateButton->setEnabled(false);
 
-    connect(ui->filenameLineEdit,   &QLineEdit::textChanged,    this, [this](const QString &text) {
-        ui->localUpdateButton->setEnabled(!text.isEmpty());
-    });
-    ui->localUpdateButton->setEnabled(false);
     connect(ui->localUpdateButton,      &QPushButton::clicked,      this, [this] {
         m_updateTool->startUpdate(ui->filenameLineEdit->text());
     });
+    ui->localUpdateButton->setEnabled(false);
 
     connect(ui->refreshButton,          &QPushButton::clicked,      this, [this] {
         checkForUpdatesInternet();
@@ -146,17 +144,19 @@ void QnServerUpdatesWidget::initSourceMenu() {
         action->setActionGroup(actionGroup);
     }
     m_updateSourceActions[InternetSource]->setChecked(true);
-    ui->sourceButton->setText(tr("Update from Internet"));
 
-    QPalette palette = this->palette();
-
-    {
-        palette.setColor(QPalette::HighlightedText, palette.color(QPalette::WindowText));
+    {   /* Setup 'Source' button */
+        ui->sourceButton->setText(tr("Update from Internet"));
+        QPalette palette(this->palette());
         palette.setColor(QPalette::Link, palette.color(QPalette::WindowText));
+        ui->sourceButton->setPalette(palette);
+
+        ui->sourceButton->setIcon(qnSkin->icon("buttons/dropdown_menu.png"));
+        connect(ui->sourceButton, &QPushButton::clicked, this, [this, menu] {
+            QPoint local = ui->sourceButton->geometry().bottomLeft();
+            menu->popup(ui->sourceButton->mapToGlobal(local));
+        });
     }
-    
-    
-    ui->sourceButton->setPalette(palette);
 
     connect(m_updateSourceActions[InternetSource], &QAction::triggered, this, [this] {
         if (!m_updateTool->idle())
@@ -173,12 +173,6 @@ void QnServerUpdatesWidget::initSourceMenu() {
 
         ui->sourceWidget->setCurrentWidget(ui->localPage);
         ui->sourceButton->setText(tr("Update from local source"));
-    });
-
-    ui->sourceButton->setIcon(qnSkin->icon("buttons/dropdown_menu.png"));
-    connect(ui->sourceButton, &QPushButton::clicked, this, [this, menu] {
-        QPoint local = ui->sourceButton->geometry().bottomLeft();
-        menu->popup(ui->sourceButton->mapToGlobal(local));
     });
 }
 
@@ -373,21 +367,16 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
         false;
     m_checkingInternet = true;
 
-    auto updateUi = [this](bool enabled) {
-        ui->refreshButton->setEnabled(enabled);
-        ui->internetUpdateButton->setEnabled(enabled);
-        ui->latestBuildLabel->setEnabled(enabled);
-        ui->specificBuildLabel->setEnabled(enabled);
-        ui->internetRefreshWidget->setCurrentWidget(enabled ? ui->refreshButtonPage : ui->refreshProgressPage);
-    };
-    updateUi(false);
+    ui->internetUpdateButton->setEnabled(false);
+    ui->internetRefreshWidget->setCurrentWidget(ui->internetProgressPage);
     ui->internetDetailLabel->setPalette(this->palette());
     ui->internetDetailLabel->setText(tr("Checking for updates..."));
     ui->internetDetailLabel->setVisible(true);
+    ui->latestVersionLabel->setPalette(this->palette());
 
     QnSoftwareVersion targetVersion = m_targetVersion;
 
-    m_updateTool->checkForUpdates(m_targetVersion, !m_targetVersion.isNull(), [this, autoSwitch, updateUi, targetVersion](const QnCheckForUpdateResult &result) {
+    m_updateTool->checkForUpdates(m_targetVersion, !m_targetVersion.isNull(), [this, autoSwitch, targetVersion](const QnCheckForUpdateResult &result) {
         QPalette detailPalette = this->palette();
         QPalette statusPalette = this->palette();
         QString detail;
@@ -426,12 +415,8 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
         if (targetVersion.isNull() && !result.latestVersion.isNull())
             m_latestVersion = result.latestVersion;
 
-        if (autoSwitch) {
-            UpdateSource autoSource = result.result == QnCheckForUpdateResult::InternetProblem
-                ? LocalSource
-                : InternetSource;
-            m_updateSourceActions[autoSource]->trigger();
-        }
+        if (autoSwitch && result.result == QnCheckForUpdateResult::InternetProblem)
+            m_updateSourceActions[LocalSource]->trigger();
         
         ui->connectionProblemLabel->setVisible(result.result == QnCheckForUpdateResult::InternetProblem);
 
@@ -441,7 +426,8 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
         ui->latestVersionLabel->setPalette(statusPalette);
 
         m_checkingInternet = false;
-        updateUi(true);
+        ui->internetUpdateButton->setEnabled(result.result == QnCheckForUpdateResult::UpdateFound);
+        ui->internetRefreshWidget->setCurrentWidget(ui->internetRefreshPage);
     });
 
 }
@@ -450,6 +436,13 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
     if (m_checkingLocal)
         false;
     m_checkingLocal = true;
+
+    ui->localUpdateButton->setEnabled(false);
+    ui->localRefreshWidget->setCurrentWidget(ui->localProgressPage);
+    ui->internetDetailLabel->setPalette(this->palette());
+    ui->internetDetailLabel->setText(tr("Checking for updates..."));
+    ui->internetDetailLabel->setVisible(true);
+    ui->latestVersionLabel->setPalette(this->palette());
 
     m_updateTool->checkForUpdates(ui->filenameLineEdit->text(), [this](const QnCheckForUpdateResult &result) {
         QPalette detailPalette = this->palette();
@@ -487,6 +480,8 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
         ui->localDetailLabel->setPalette(detailPalette);
 
         m_checkingLocal = false;
+        ui->localUpdateButton->setEnabled(result.result == QnCheckForUpdateResult::UpdateFound);
+        ui->localRefreshWidget->setCurrentWidget(ui->localBrowsePage);
     });
 }
 

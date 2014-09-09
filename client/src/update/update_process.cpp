@@ -20,6 +20,7 @@
 #include <update/task/install_updates_peer_task.h>
 
 #include <utils/applauncher_utils.h>
+#include <utils/common/sleep.h>
 #include <utils/update/update_utils.h>
 
 #include <version.h>
@@ -53,18 +54,20 @@ QnPeerUpdateInformation::QnPeerUpdateInformation(const QnMediaServerResourcePtr 
         sourceVersion = server->getVersion();
 }
 
-QnUpdateProcess::QnUpdateProcess(const QnUpdateTarget &target, QObject *parent):
-    base_type(parent),
+QnUpdateProcess::QnUpdateProcess(const QnUpdateTarget &target):
+    base_type(),
     m_id(QUuid::createUuid()),
     m_target(target),
     m_stage(QnFullUpdateStage::Init),
     m_distributedMutex(NULL),
-    m_clientRequiresInstaller(true)
+    m_clientRequiresInstaller(true),
+    m_updateResult(QnUpdateResult::Cancelled)
 {
    
 }
 
-void QnUpdateProcess::start() {
+
+void QnUpdateProcess::run() {
     QnCheckForUpdatesPeerTask *checkForUpdatesTask = new QnCheckForUpdatesPeerTask(m_target);
     connect(checkForUpdatesTask,  &QnCheckForUpdatesPeerTask::checkFinished,   this,  [this, checkForUpdatesTask](const QnCheckForUpdateResult &result){
         at_checkForUpdatesTaskFinished(checkForUpdatesTask, result);
@@ -73,6 +76,20 @@ void QnUpdateProcess::start() {
     m_currentTask = checkForUpdatesTask;
     setStage(QnFullUpdateStage::Check);
     checkForUpdatesTask->start();
+
+    while(!needToStop()) {
+        QnSleep::msleep(100);
+    }
+ 
+    if (m_updateResult == QnUpdateResult::Cancelled) {
+        if (m_currentTask)
+            m_currentTask->cancel();
+        setAllPeersState(QnPeerUpdateInformation::UpdateCanceled);
+    }
+
+    unlockMutex();
+    removeTemporaryDir();
+    emit updateFinished(m_updateResult);
 }
 
 void QnUpdateProcess::downloadUpdates() {
@@ -271,9 +288,8 @@ void QnUpdateProcess::at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, i
 }
 
 void QnUpdateProcess::finishUpdate(QnUpdateResult result) {
-    unlockMutex();
-    removeTemporaryDir();
-    emit updateFinished(result);
+    m_updateResult = result;
+    stop();
 }
 
 void QnUpdateProcess::installClientUpdate() {
@@ -471,17 +487,6 @@ void QnUpdateProcess::at_installTask_finished(int errorCode) {
     }
 
     finishUpdate(QnUpdateResult::Successful);
-}
-
-bool QnUpdateProcess::cancel() {
-    if (m_stage == QnFullUpdateStage::Servers)
-        return false;
-
-    if (m_currentTask)
-        m_currentTask->cancel();
-    setAllPeersState(QnPeerUpdateInformation::UpdateCanceled);
-    finishUpdate(QnUpdateResult::Cancelled);
-    return true;
 }
 
 void QnUpdateProcess::removeTemporaryDir() {

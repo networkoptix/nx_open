@@ -7,6 +7,7 @@
 
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
+#include <utils/common/long_runnable.h>
 
 struct QnPeerUpdateInformation {
     enum State {
@@ -42,15 +43,15 @@ namespace ec2 {
     class QnDistributedMutex;
 }
 
-class QnUpdateProcess: public QObject {
+class QnUpdateProcess: public QnLongRunnable {
     Q_OBJECT
 
-    typedef QObject base_type;
+    typedef QnLongRunnable base_type;
 public:
-    QnUpdateProcess(const QnUpdateTarget &target, QObject *parent = NULL);
+    QnUpdateProcess(const QnUpdateTarget &target);
 
-    void start();
-    bool cancel();
+protected:
+    virtual void run() override;
 
 signals:
     void stageChanged(QnFullUpdateStage stage);
@@ -109,6 +110,7 @@ private:
     QnUpdateFileInformationPtr m_clientUpdateFile;
     QHash<QUuid, QnPeerUpdateInformation> m_updateInformationById;
     QMultiHash<QnSystemInformation, QUuid> m_idBySystemInformation;
+    QnUpdateResult m_updateResult;
 };
 
 

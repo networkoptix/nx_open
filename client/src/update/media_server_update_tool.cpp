@@ -47,8 +47,10 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
 }
 
 QnMediaServerUpdateTool::~QnMediaServerUpdateTool() {
-    if (m_updateProcess)
+    if (m_updateProcess) {
+        m_updateProcess->stop();
         delete m_updateProcess;
+    }
 }
 
 QnFullUpdateStage QnMediaServerUpdateTool::stage() const {
@@ -56,7 +58,7 @@ QnFullUpdateStage QnMediaServerUpdateTool::stage() const {
 }
 
 bool QnMediaServerUpdateTool::isUpdating() const {
-    return m_stage >= QnFullUpdateStage::Download;
+    return m_updateProcess;
 }
 
 bool QnMediaServerUpdateTool::idle() const {
@@ -196,7 +198,12 @@ void QnMediaServerUpdateTool::startUpdate(const QString &fileName) {
 bool QnMediaServerUpdateTool::cancelUpdate() {
     if (!m_updateProcess)
         return true;
-    return m_updateProcess->cancel();
+
+    if (m_stage == QnFullUpdateStage::Servers)
+        return false;
+
+    m_updateProcess->pleaseStop();
+    return true;
 }
 
 void QnMediaServerUpdateTool::checkForUpdates(const QnUpdateTarget &target, std::function<void(const QnCheckForUpdateResult &result)> func) {
@@ -214,7 +221,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QnUpdateTarget &target, std:
 
 void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
     if (m_updateProcess)
-        delete m_updateProcess;
+        return;
 
     m_updateProcess = new QnUpdateProcess(target);
     connect(m_updateProcess, &QnUpdateProcess::stageChanged,                    this, &QnMediaServerUpdateTool::setStage);
@@ -223,6 +230,10 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
     connect(m_updateProcess, &QnUpdateProcess::peerStageProgressChanged,        this, &QnMediaServerUpdateTool::setPeerStageProgress);
     connect(m_updateProcess, &QnUpdateProcess::updateFinished,                  this, &QnMediaServerUpdateTool::finishUpdate);
     connect(m_updateProcess, &QnUpdateProcess::targetsChanged,                  this, &QnMediaServerUpdateTool::targetsChanged);
+    connect(m_updateProcess, &QThread::finished, this, [this]{
+        m_updateProcess->deleteLater();
+        m_updateProcess = NULL;
+    });
 
     m_updateProcess->start();
 }

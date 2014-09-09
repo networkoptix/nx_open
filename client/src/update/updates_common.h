@@ -15,6 +15,9 @@ struct QnCheckForUpdateResult {
         BadUpdateFile
     };
 
+    QnCheckForUpdateResult():
+        result(NoNewerVersion) {}
+
     explicit QnCheckForUpdateResult(Value result):
         result(result) {}
 
@@ -22,8 +25,8 @@ struct QnCheckForUpdateResult {
     QSet<QnSystemInformation> systems;  /**< Set of supported system, for which updates were found. */
     QnSoftwareVersion latestVersion;
     bool clientInstallerRequired;
-
 };
+Q_DECLARE_METATYPE(QnCheckForUpdateResult);
 
 enum class QnUpdateResult {
     Successful,
@@ -35,6 +38,7 @@ enum class QnUpdateResult {
     InstallationFailed,
     RestInstallationFailed
 };
+Q_DECLARE_METATYPE(QnUpdateResult);
 
 enum class QnPeerUpdateStage {
     Init,               /**< Prepare peer update. */
@@ -44,6 +48,7 @@ enum class QnPeerUpdateStage {
 
     Count
 };
+Q_DECLARE_METATYPE(QnPeerUpdateStage);
 
 enum class QnFullUpdateStage {
     Init,               /**< Prepare updater tool. */
@@ -56,6 +61,7 @@ enum class QnFullUpdateStage {
 
     Count
 };
+Q_DECLARE_METATYPE(QnFullUpdateStage);
 
 struct QnUpdateFileInformation {
     QnSoftwareVersion version;
