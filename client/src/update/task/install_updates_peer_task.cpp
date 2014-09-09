@@ -4,6 +4,7 @@
 
 #include <api/app_server_connection.h>
 #include <nx_ec/ec_api.h>
+#include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <client/client_message_processor.h>

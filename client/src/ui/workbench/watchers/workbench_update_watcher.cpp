@@ -4,7 +4,7 @@
 
 #include <client/client_settings.h>
 #include <common/common_module.h>
-#include <utils/update_checker.h>
+#include <update/update_checker.h>
 
 namespace {
     const int updatePeriodMSec = 60 * 60 * 1000; /* 1 hour. */

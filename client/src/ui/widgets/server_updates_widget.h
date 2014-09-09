@@ -14,7 +14,7 @@
 #include <utils/common/id.h>
 #include <utils/common/software_version.h>
 
-#include <utils/updates_common.h>
+#include <update/updates_common.h>
 
 class QnServerUpdatesModel;
 class QnMediaServerUpdateTool;
@@ -37,22 +37,23 @@ public:
     virtual bool confirm() override;
     virtual bool discard() override;
 
-    void checkForUpdates();
-
 private slots:
-    void updateUi();
-
-    void at_checkForUpdatesFinished(QnCheckForUpdateResult result);
     void at_updateFinished(QnUpdateResult result);
+
+    void at_tool_stageChanged(QnFullUpdateStage stage);
+    void at_tool_stageProgressChanged(QnFullUpdateStage stage, int progress);
 private:
-    void initMenu();
-    void initLinkHandlers();
+    void initSourceMenu();
+    void initLinkButtons();
+    void initBuildSelectionButtons();
+
+    void checkForUpdatesInternet(bool autoSwitch = false);
+    void checkForUpdatesLocal();
 
 private:
     enum UpdateSource {
         InternetSource,
         LocalSource,
-        SpecificBuildSource,
 
         UpdateSourceCount
     };
@@ -61,16 +62,14 @@ private:
 
     QnServerUpdatesModel *m_updatesModel;
     QnMediaServerUpdateTool *m_updateTool;
+    std::array<QAction*, UpdateSourceCount> m_updateSourceActions;
 
     QTimer *m_extraMessageTimer;
     
-    struct {
-        UpdateSource source;
-        QString filename;
-        QnSoftwareVersion build;
-    } m_updateInfo;
-
-    std::array<QAction*, UpdateSourceCount> m_updateSourceActions;
+    QnSoftwareVersion m_targetVersion;
+    QnSoftwareVersion m_latestVersion;
+    bool m_checkingInternet;
+    bool m_checkingLocal;
 };
 
 #endif // SERVER_UPDATES_WIDGET_H

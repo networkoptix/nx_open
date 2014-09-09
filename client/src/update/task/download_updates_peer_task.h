@@ -3,7 +3,7 @@
 
 #include <QtCore/QDir>
 
-#include <utils/network_peer_task.h>
+#include <update/task/network_peer_task.h>
 
 class QNetworkAccessManager;
 
@@ -25,10 +25,9 @@ public:
     QHash<QUrl, QString> resultingFiles() const;
     void setPeerAssociations(const QMultiHash<QUrl, QUuid> &peersByUrl);
 
-    virtual void cancel() override;
-
 protected:
     virtual void doStart() override;
+    virtual void doCancel() override;
 
 private:
     void downloadNextUpdate();

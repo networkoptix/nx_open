@@ -4,12 +4,16 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
+
+#include <update/task/configure_peer_task.h>
+#include <update/task/wait_compatible_servers_peer_task.h>
+#include <update/media_server_update_tool.h>
+
 #include <utils/network/global_module_finder.h>
-#include <utils/configure_peer_task.h>
-#include <utils/wait_compatible_servers_peer_task.h>
-#include <utils/media_server_update_tool.h>
 #include <utils/common/software_version.h>
+
 
 #include "version.h"
 
@@ -43,7 +47,7 @@ QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *c
     connect(m_configureTask,            &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_configureTask_finished);
     connect(m_waitTask,                 &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_waitTask_finished);
     // queued connection is used to be sure that we'll get this signal AFTER it will be handled by update dialog
-    connect(m_updateTool,               &QnMediaServerUpdateTool::stateChanged,     this,       &QnConnectToCurrentSystemTool::at_updateTool_stateChanged, Qt::QueuedConnection);
+ //   connect(m_updateTool,               &QnMediaServerUpdateTool::stateChanged,     this,       &QnConnectToCurrentSystemTool::at_updateTool_stateChanged, Qt::QueuedConnection);
 }
 
 QnConnectToCurrentSystemTool::~QnConnectToCurrentSystemTool() {}
@@ -127,9 +131,8 @@ void QnConnectToCurrentSystemTool::configureServer() {
 }
 
 void QnConnectToCurrentSystemTool::waitPeers() {
+    m_waitTask->start(QSet<QUuid>::fromList(m_waitTargets.values()));
     emit progressChanged(configureProgress);
-    m_waitTask->setPeers(QSet<QUuid>::fromList(m_waitTargets.values()));
-    m_waitTask->start();
 }
 
 void QnConnectToCurrentSystemTool::updatePeers() {
@@ -144,8 +147,7 @@ void QnConnectToCurrentSystemTool::updatePeers() {
     m_updateFailed = false;
     m_updateTool->setTargets(m_updateTargets);
     m_prevToolState = CheckingForUpdates;
-    m_updateTool->setDenyMajorUpdates(true);
-    m_updateTool->checkForUpdates();
+    m_updateTool->checkForUpdates(QnSoftwareVersion(), true);
 }
 
 void QnConnectToCurrentSystemTool::revertApiUrls() {
@@ -203,11 +205,13 @@ void QnConnectToCurrentSystemTool::at_updateTool_stateChanged(int state) {
     if (!m_running)
         return;
 
+/*
     if (state != QnMediaServerUpdateTool::Idle)
         return;
+*/
 
     if (m_prevToolState == CheckingForUpdates) {
-        switch (m_updateTool->updateCheckResult()) {
+    /*    switch (m_updateTool->updateCheckResult()) {
         case QnCheckForUpdateResult::UpdateFound:
             m_prevToolState = Updating;
             m_updateTool->updateServers();
@@ -217,9 +221,9 @@ void QnConnectToCurrentSystemTool::at_updateTool_stateChanged(int state) {
         default:
             m_updateFailed = true;
             break;
-        }
+        }*/
     } else if (m_prevToolState == Updating) {
-        m_updateFailed = (m_updateTool->updateResult() != QnUpdateResult::Successful);
+/*        m_updateFailed = (m_updateTool->updateResult() != QnUpdateResult::Successful);*/
     }
 
     finish(m_updateFailed ? UpdateFailed : NoError);

@@ -3,13 +3,18 @@
 
 #include <QtCore/QAbstractTableModel>
 
+#include <client/client_color_types.h>
+
 #include <core/resource/media_server_resource.h>
 #include <utils/common/system_information.h>
 #include <utils/common/software_version.h>
-#include <utils/media_server_update_tool.h>
+
+#include <update/media_server_update_tool.h>
 
 class QnServerUpdatesModel : public QAbstractTableModel {
     Q_OBJECT
+
+    Q_PROPERTY(QnServerUpdatesColors colors READ colors WRITE setColors)
 
     typedef QAbstractTableModel base_type;
 public:
@@ -20,29 +25,14 @@ public:
     };
 
     enum Roles {
-        StateRole = Qt::UserRole + 1,
+        StageRole = Qn::LastItemDataRole + 1,
         ProgressRole
     };
 
-    class Item {
-    public:
-        Item(const QnMediaServerResourcePtr &server, const QnMediaServerUpdateTool::PeerUpdateInformation &updateInfo) :
-            m_server(server), m_updateInfo(updateInfo)
-        {}
+    explicit QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObject *parent = 0);
 
-        QnMediaServerResourcePtr server() const;
-        QnMediaServerUpdateTool::PeerUpdateInformation updateInformation() const;
-
-        QVariant data(int column, int role) const;
-
-    private:
-        QnMediaServerResourcePtr m_server;
-        QnMediaServerUpdateTool::PeerUpdateInformation m_updateInfo;
-
-        friend class QnServerUpdatesModel;
-    };
-
-    explicit QnServerUpdatesModel(QObject *parent = 0);
+    QnServerUpdatesColors colors() const;
+    void setColors(const QnServerUpdatesColors &colors);
 
     int columnCount(const QModelIndex &parent) const override;
     int rowCount(const QModelIndex &parent) const override;
@@ -51,30 +41,44 @@ public:
 
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     QModelIndex index(const QnMediaServerResourcePtr &server) const;
+    QModelIndex index(const QUuid &id) const;
 
-    void setUpdatesInformation(const QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> &updates);
-    void setUpdateInformation(const QnMediaServerUpdateTool::PeerUpdateInformation &update);
-
-    QnSoftwareVersion latestVersion() const;
-    void setLatestVersion(const QnSoftwareVersion &version);
+    QnCheckForUpdateResult checkResult() const;
+    void setCheckResult(const QnCheckForUpdateResult &result);
 
 public slots:
     void setTargets(const QSet<QUuid> &targets);
-    void setTargets(const QnMediaServerResourceList &targets);
 
 private:
     void resetResourses();
 
 private slots:
-    void at_resourceAdded(const QnResourcePtr &resource);
-    void at_resourceRemoved(const QnResourcePtr &resource);
     void at_resourceChanged(const QnResourcePtr &resource);
 
 private:
+    class Item {
+    public:
+        Item(const QnMediaServerResourcePtr &server);
+
+        QnMediaServerResourcePtr server() const;
+        QnPeerUpdateStage stage() const;
+
+        QVariant data(int column, int role) const;
+
+    private:
+        QnMediaServerResourcePtr m_server;
+        QnPeerUpdateStage m_stage;
+        int m_progress;
+
+        friend class QnServerUpdatesModel;
+    };
+
+    QnMediaServerUpdateTool* m_updateTool;
     QList<Item*> m_items;
-    QHash<QUuid, QnMediaServerUpdateTool::PeerUpdateInformation> m_updates;
     QSet<QUuid> m_targets;
-    QnSoftwareVersion m_latestVersion;
+
+    QnCheckForUpdateResult m_checkResult;
+    QnServerUpdatesColors m_colors;
 };
 
 #endif // SERVER_UPDATES_MODEL_H
