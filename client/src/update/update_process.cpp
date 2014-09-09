@@ -63,12 +63,17 @@ QnUpdateProcess::QnUpdateProcess(const QnUpdateTarget &target):
     m_clientRequiresInstaller(true),
     m_updateResult(QnUpdateResult::Cancelled)
 {
-   
+    moveToThread(this);
 }
 
+void QnUpdateProcess::pleaseStop() {
+    base_type::pleaseStop();
+    quit();
+}
 
 void QnUpdateProcess::run() {
     QnCheckForUpdatesPeerTask *checkForUpdatesTask = new QnCheckForUpdatesPeerTask(m_target);
+    //checkForUpdatesTask->moveToThread(this);
     connect(checkForUpdatesTask,  &QnCheckForUpdatesPeerTask::checkFinished,   this,  [this, checkForUpdatesTask](const QnCheckForUpdateResult &result){
         at_checkForUpdatesTaskFinished(checkForUpdatesTask, result);
     });
@@ -77,9 +82,7 @@ void QnUpdateProcess::run() {
     setStage(QnFullUpdateStage::Check);
     checkForUpdatesTask->start();
 
-    while(!needToStop()) {
-        QnSleep::msleep(100);
-    }
+    exec();
  
     if (m_updateResult == QnUpdateResult::Cancelled) {
         if (m_currentTask)
@@ -496,3 +499,4 @@ void QnUpdateProcess::removeTemporaryDir() {
     QDir(m_localTemporaryDir).removeRecursively();
     m_localTemporaryDir = QString();
 }
+

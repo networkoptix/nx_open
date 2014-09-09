@@ -50,6 +50,8 @@ class QnUpdateProcess: public QnLongRunnable {
 public:
     QnUpdateProcess(const QnUpdateTarget &target);
 
+
+    virtual void pleaseStop() override;
 protected:
     virtual void run() override;
 
