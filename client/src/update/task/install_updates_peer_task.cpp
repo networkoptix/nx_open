@@ -51,6 +51,37 @@ void QnInstallUpdatesPeerTask::doStart() {
     connection2()->getUpdatesManager()->installUpdate(m_updateId, m_pendingPeers,
                                                       this, [this](int, ec2::ErrorCode){});
     m_checkTimer->start(checkTimeout);
+
+    int peersSize = m_pendingPeers.size();
+
+    QTimer *progressTimer = new QTimer(this);
+    progressTimer->setInterval(1000);
+    progressTimer->setSingleShot(false);
+    connect(progressTimer, &QTimer::timeout,  this, [this, peersSize] {
+        int progress = (checkTimeout - m_checkTimer->remainingTime()) * 100 / checkTimeout;
+        progress = qBound(0, progress, 100);
+        
+        /* Count finished peers. */
+        int totalProgress = (peersSize - m_pendingPeers.size()) * 100;
+
+        foreach (const QUuid &peerId, m_pendingPeers) {
+            int peerProgress = progress;
+            /* Peer already restarted. */
+            if (!m_restartingPeers.contains(peerId))
+                peerProgress = qMax(progress, 99);
+            /* Peer already stopped. */
+            else if (!m_stoppingPeers.contains(peerId))
+                peerProgress = qMax(progress, 95);
+            emit peerProgressChanged(peerId, peerProgress);
+
+            /* Count processing peers. */
+            totalProgress += peerProgress;
+        }      
+
+        emit progressChanged(totalProgress / peersSize);
+    });
+    connect(this,   &QnInstallUpdatesPeerTask::finished,    progressTimer,    &QTimer::stop);
+    progressTimer->start();
 }
 
 void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource) {

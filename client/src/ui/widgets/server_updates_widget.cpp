@@ -537,9 +537,6 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
     case QnFullUpdateStage::Incompatible:
         offset = 50;
         break;
-    case QnFullUpdateStage::Servers:
-        offset = 50;
-        break;
     default:
         break;
     }

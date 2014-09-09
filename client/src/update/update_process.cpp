@@ -470,6 +470,10 @@ void QnUpdateProcess::installUpdatesToServers() {
     connect(installUpdatesPeerTask, &QnNetworkPeerTask::peerFinished,               this,   [this](const QUuid &peerId) {
         setPeerState(peerId, QnPeerUpdateInformation::UpdateFinished);
     });
+    connect(installUpdatesPeerTask,  &QnNetworkPeerTask::progressChanged,           this,     &QnUpdateProcess::progressChanged);
+    connect(installUpdatesPeerTask,  &QnNetworkPeerTask::peerProgressChanged,       this,     [this](const QUuid &peerId, int progress) {
+        emit peerStageProgressChanged(peerId, QnPeerUpdateStage::Install, progress);
+    });
     connect(installUpdatesPeerTask, &QnNetworkPeerTask::finished,                   installUpdatesPeerTask,   &QObject::deleteLater);
     setStage(QnFullUpdateStage::Servers);
     setCompatiblePeersState(QnPeerUpdateInformation::UpdateInstalling);
