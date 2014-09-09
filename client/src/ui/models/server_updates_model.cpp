@@ -46,9 +46,6 @@ QVariant QnServerUpdatesModel::Item::data(int column, int role) const {
     return QVariant();
 }
 
-
-
-
 QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObject *parent) :
     QAbstractTableModel(parent),
     m_updateTool(tool),
@@ -62,11 +59,14 @@ QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObjec
         emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
     });
 
-    connect(m_updateTool,  &QnMediaServerUpdateTool::peerProgressChanged,  this, [this](const QUuid &peerId, int progress) {
+    connect(m_updateTool,  &QnMediaServerUpdateTool::peerStageProgressChanged,  this, [this](const QUuid &peerId, QnPeerUpdateStage stage, int progress) {
         QModelIndex idx = index(peerId);
         if (!idx.isValid())
             return;
-        m_items[idx.row()]->m_progress = progress;
+
+        int value = (static_cast<int>(stage)*100 + progress) / ( static_cast<int>(QnPeerUpdateStage::Count) );
+
+        m_items[idx.row()]->m_progress = value;
         emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
     });
 

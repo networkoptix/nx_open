@@ -45,9 +45,9 @@ public:
     bool cancelUpdate();
 signals:
     void stageChanged(QnFullUpdateStage stage);
-    void progressChanged(QnFullUpdateStage stage, int progress);
+    void stageProgressChanged(QnFullUpdateStage stage, int progress);
     void peerStageChanged(const QUuid &peerId, QnPeerUpdateStage stage);
-    void peerProgressChanged(const QUuid &peerId, int progress);
+    void peerStageProgressChanged(const QUuid &peerId, QnPeerUpdateStage stage, int progress);
 
     void targetsChanged(const QSet<QUuid> &targets);
 
@@ -59,6 +59,10 @@ private:
 
     void setStage(QnFullUpdateStage stage);
     void setStageProgress(int progress);
+
+    void setPeerStage(const QUuid &peerId, QnPeerUpdateStage stage);
+    void setPeerStageProgress(const QUuid &peerId, QnPeerUpdateStage stage, int progress);
+
     void finishUpdate(QnUpdateResult result);
     
 private:

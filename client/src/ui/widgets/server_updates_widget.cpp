@@ -32,9 +32,6 @@ namespace {
     const int tooLateDayOfWeek = Qt::Thursday;
 
     const int autoCheckIntervalMs = 1 * 60 * 1000;  // 5 minutes
-
-    const QString copyLinkAction = lit("copyLink");
-    const QString saveLinkAction = lit("saveLink");
 }
 
 QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
@@ -73,17 +70,10 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
         m_updateTool->startUpdate(ui->filenameLineEdit->text());
     });
 
-    connect(ui->internetRadioButton,    &QRadioButton::toggled,     this, [this] {
-        ui->sourceWidget->setCurrentWidget(ui->internetPage);
-    });
-
-    connect(ui->localRadioButton,       &QRadioButton::toggled,     this, [this] {
-        ui->sourceWidget->setCurrentWidget(ui->localPage);
-    });
-
     connect(ui->refreshButton,          &QPushButton::clicked,      this, [this] {
         checkForUpdatesInternet();
     });
+    ui->refreshButton->setIcon(qnSkin->icon("refresh.png"));
 
     connect(ui->browseFileButton,       &QPushButton::clicked,      this, [this] {
         QString fileName = QnFileDialog::getOpenFileName(this, 
@@ -97,11 +87,12 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
         checkForUpdatesLocal();
     });
 
+    initSourceMenu();
     initLinkButtons();
     initBuildSelectionButtons();
 
-    connect(m_updateTool,       &QnMediaServerUpdateTool::stageChanged,         this,           &QnServerUpdatesWidget::at_tool_stageChanged);
-    connect(m_updateTool,       &QnMediaServerUpdateTool::progressChanged,      this,           &QnServerUpdatesWidget::at_tool_progressChanged);
+    connect(m_updateTool,       &QnMediaServerUpdateTool::stageChanged,             this,           &QnServerUpdatesWidget::at_tool_stageChanged);
+    connect(m_updateTool,       &QnMediaServerUpdateTool::stageProgressChanged,     this,           &QnServerUpdatesWidget::at_tool_stageProgressChanged);
     connect(m_updateTool,       &QnMediaServerUpdateTool::updateFinished,           this, &QnServerUpdatesWidget::at_updateFinished);
 
     m_extraMessageTimer->setInterval(longInstallWarningTimeout);
@@ -125,13 +116,72 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
         if (!m_updateTool->idle())
             return;
 
+        /* Do not recheck specific build. */
+        if (!m_targetVersion.isNull())
+            return;
+
         checkForUpdatesInternet();
     });
     updateTimer->start();
 
+
+    ui->localInfiniteProgress->setVisible(false);
+
     at_tool_stageChanged(QnFullUpdateStage::Init);
-    checkForUpdatesInternet(true);
+
+    ui->releaseNotesLabel->setVisible(false);
 }
+
+
+void QnServerUpdatesWidget::initSourceMenu() {
+    QMenu *menu = new QMenu(this);
+    QActionGroup* actionGroup = new QActionGroup(this);
+    actionGroup->setExclusive(true);
+
+    m_updateSourceActions[InternetSource] = menu->addAction(tr("Update from Internet..."));
+    m_updateSourceActions[LocalSource] = menu->addAction(tr("Update from local source..."));
+
+    for (QAction* action: m_updateSourceActions) {
+        action->setCheckable(true);
+        action->setActionGroup(actionGroup);
+    }
+    m_updateSourceActions[InternetSource]->setChecked(true);
+    ui->sourceButton->setText(tr("Update from Internet"));
+
+    QPalette palette = this->palette();
+
+    {
+        palette.setColor(QPalette::HighlightedText, palette.color(QPalette::WindowText));
+        palette.setColor(QPalette::Link, palette.color(QPalette::WindowText));
+    }
+    
+    
+    ui->sourceButton->setPalette(palette);
+
+    connect(m_updateSourceActions[InternetSource], &QAction::triggered, this, [this] {
+        if (!m_updateTool->idle())
+            return;
+        
+        ui->sourceWidget->setCurrentWidget(ui->internetPage);
+        ui->sourceButton->setText(tr("Update from Internet"));
+        checkForUpdatesInternet();
+    });
+
+    connect(m_updateSourceActions[LocalSource], &QAction::triggered, this, [this] {
+        if (!m_updateTool->idle())
+            return;
+
+        ui->sourceWidget->setCurrentWidget(ui->localPage);
+        ui->sourceButton->setText(tr("Update from local source"));
+    });
+
+    ui->sourceButton->setIcon(qnSkin->icon("buttons/dropdown_menu.png"));
+    connect(ui->sourceButton, &QPushButton::clicked, this, [this, menu] {
+        QPoint local = ui->sourceButton->geometry().bottomLeft();
+        menu->popup(ui->sourceButton->mapToGlobal(local));
+    });
+}
+
 
 void QnServerUpdatesWidget::initLinkButtons() {
     connect(ui->copyLinkButton, &QPushButton::clicked, this, [this] {
@@ -191,6 +241,7 @@ void QnServerUpdatesWidget::initBuildSelectionButtons() {
             ui->latestVersionLabel->setText(tr("Unknown"));
         else
             ui->latestVersionLabel->setText(m_latestVersion.toString());
+        ui->versionTitleLabel->setText(tr("Latest version:"));
 
         checkForUpdatesInternet(true);
     });
@@ -208,10 +259,12 @@ void QnServerUpdatesWidget::initBuildSelectionButtons() {
         ui->latestBuildLabel->setVisible(true);
 
         ui->latestVersionLabel->setText(m_targetVersion.toString());
+        ui->versionTitleLabel->setText(tr("Target version:"));
 
         checkForUpdatesInternet(true);
     });
 
+    ui->linkLineEdit->setText(m_updateTool->generateUpdatePackageUrl(m_targetVersion).toString());
     ui->latestBuildLabel->setVisible(false);
 }
 
@@ -242,8 +295,7 @@ void QnServerUpdatesWidget::updateFromSettings() {
     if (!m_updateTool->idle())
         return;
 
-    ui->internetRadioButton->setChecked(true);
-    checkForUpdatesInternet();
+    checkForUpdatesInternet(true);
 }
 
 bool QnServerUpdatesWidget::confirm() {
@@ -313,7 +365,7 @@ void QnServerUpdatesWidget::at_updateFinished(QnUpdateResult result) {
         QMessageBox::critical(this, tr("Update failed"), tr("Could not install updates on one or more servers."));
         break;
     }
-    checkForUpdatesInternet(true);
+/*    checkForUpdatesInternet(true);*/
 }
 
 void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
@@ -326,9 +378,10 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
         ui->internetUpdateButton->setEnabled(enabled);
         ui->latestBuildLabel->setEnabled(enabled);
         ui->specificBuildLabel->setEnabled(enabled);
-        ui->internetInfiniteProgress->setVisible(!enabled);
+        ui->internetRefreshWidget->setCurrentWidget(enabled ? ui->refreshButtonPage : ui->refreshProgressPage);
     };
     updateUi(false);
+    ui->internetDetailLabel->setPalette(this->palette());
     ui->internetDetailLabel->setText(tr("Checking for updates..."));
     ui->internetDetailLabel->setVisible(true);
 
@@ -373,9 +426,13 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
         if (targetVersion.isNull() && !result.latestVersion.isNull())
             m_latestVersion = result.latestVersion;
 
-        if (autoSwitch && result.result == QnCheckForUpdateResult::InternetProblem) {
-            ui->localRadioButton->setChecked(true);
+        if (autoSwitch) {
+            UpdateSource autoSource = result.result == QnCheckForUpdateResult::InternetProblem
+                ? LocalSource
+                : InternetSource;
+            m_updateSourceActions[autoSource]->trigger();
         }
+        
         ui->connectionProblemLabel->setVisible(result.result == QnCheckForUpdateResult::InternetProblem);
 
         ui->internetDetailLabel->setText(detail);
@@ -478,7 +535,25 @@ void QnServerUpdatesWidget::at_tool_stageChanged(QnFullUpdateStage stage) {
     ui->cancelButton->setEnabled(cancellable);
 }
 
-void QnServerUpdatesWidget::at_tool_progressChanged(QnFullUpdateStage stage, int progress) {
+void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage, int progress) {
+
+    int offset = 0;
+    switch (stage) {
+    case QnFullUpdateStage::Client:
+        offset = 50;
+        break;
+    case QnFullUpdateStage::Incompatible:
+        offset = 50;
+        break;
+    case QnFullUpdateStage::Servers:
+        offset = 50;
+        break;
+    default:
+        break;
+    }
+
+    int value = (static_cast<int>(stage)*100 + offset + progress) / ( static_cast<int>(QnFullUpdateStage::Count) );
+
     QString status;
     switch (stage) {
     case QnFullUpdateStage::Check:
@@ -503,7 +578,7 @@ void QnServerUpdatesWidget::at_tool_progressChanged(QnFullUpdateStage stage, int
         status = lit("%1");
         break;
     }
-    ui->updateProgessBar->setValue(progress);
-    ui->updateProgessBar->setFormat(status.arg(progress));
+    ui->updateProgessBar->setValue(value);
+    ui->updateProgessBar->setFormat(status.arg(value));
 }
 

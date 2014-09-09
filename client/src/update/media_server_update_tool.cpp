@@ -74,26 +74,18 @@ void QnMediaServerUpdateTool::setStage(QnFullUpdateStage stage) {
 }
 
 void QnMediaServerUpdateTool::setStageProgress(int progress) {
-    int offset = 0; // infinite stages
-
-    switch (m_stage) {
-    case QnFullUpdateStage::Client:
-        offset = 50;
-        break;
-    case QnFullUpdateStage::Incompatible:
-        offset = 50;
-        break;
-    case QnFullUpdateStage::Servers:
-        offset = 50;
-        break;
-    default:
-        break;
-    }
-
-    int value = (static_cast<int>(m_stage)*100 + offset + progress) / ( static_cast<int>(QnFullUpdateStage::Count) );
-    emit progressChanged(m_stage, value);    
+    emit stageProgressChanged(m_stage, progress);    
 }
 
+
+void QnMediaServerUpdateTool::setPeerStage(const QUuid &peerId, QnPeerUpdateStage stage) {
+    emit peerStageChanged(peerId, stage);
+    setPeerStageProgress(peerId, stage, 0);
+}
+
+void QnMediaServerUpdateTool::setPeerStageProgress(const QUuid &peerId, QnPeerUpdateStage stage, int progress) {
+    emit peerStageProgressChanged(peerId, stage, progress);
+}
 
 void QnMediaServerUpdateTool::finishUpdate(QnUpdateResult result) {
     setStage(QnFullUpdateStage::Init);
@@ -227,8 +219,8 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
     m_updateProcess = new QnUpdateProcess(target);
     connect(m_updateProcess, &QnUpdateProcess::stageChanged,                    this, &QnMediaServerUpdateTool::setStage);
     connect(m_updateProcess, &QnUpdateProcess::progressChanged,                 this, &QnMediaServerUpdateTool::setStageProgress);
-    connect(m_updateProcess, &QnUpdateProcess::peerStageChanged,                this, &QnMediaServerUpdateTool::peerStageChanged);
-    connect(m_updateProcess, &QnUpdateProcess::peerProgressChanged,             this, &QnMediaServerUpdateTool::peerProgressChanged);
+    connect(m_updateProcess, &QnUpdateProcess::peerStageChanged,                this, &QnMediaServerUpdateTool::setPeerStage);
+    connect(m_updateProcess, &QnUpdateProcess::peerStageProgressChanged,        this, &QnMediaServerUpdateTool::setPeerStageProgress);
     connect(m_updateProcess, &QnUpdateProcess::updateFinished,                  this, &QnMediaServerUpdateTool::finishUpdate);
     connect(m_updateProcess, &QnUpdateProcess::targetsChanged,                  this, &QnMediaServerUpdateTool::targetsChanged);
 

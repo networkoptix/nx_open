@@ -57,7 +57,7 @@ signals:
     void peerStageChanged(const QUuid &peerId, QnPeerUpdateStage stage);
 
     void progressChanged(int progress);
-    void peerProgressChanged(const QUuid &peerId, int progress);
+    void peerStageProgressChanged(const QUuid &peerId, QnPeerUpdateStage stage, int progress);
 
     void targetsChanged(const QSet<QUuid> &targets);
 

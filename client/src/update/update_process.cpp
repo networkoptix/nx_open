@@ -132,7 +132,9 @@ void QnUpdateProcess::downloadUpdates() {
         setPeerState(peerId, QnPeerUpdateInformation::PendingUpload);
     });
     connect(downloadUpdatesPeerTask,  &QnNetworkPeerTask::progressChanged,      this,  &QnUpdateProcess::progressChanged);
-    connect(downloadUpdatesPeerTask,  &QnNetworkPeerTask::peerProgressChanged,  this,  &QnUpdateProcess::peerProgressChanged);
+    connect(downloadUpdatesPeerTask,  &QnNetworkPeerTask::peerProgressChanged,  this,  [this](const QUuid &peerId, int progress) {
+        emit peerStageProgressChanged(peerId, QnPeerUpdateStage::Download, progress);
+    });
     connect(downloadUpdatesPeerTask,  &QnNetworkPeerTask::finished,             downloadUpdatesPeerTask, &QObject::deleteLater);
 
     downloadUpdatesPeerTask->setTargetDir(updatesDirName);
@@ -410,7 +412,9 @@ void QnUpdateProcess::uploadUpdatesToServers() {
             setPeerState(peerId, QnPeerUpdateInformation::PendingInstallation);
     });
     connect(uploadUpdatesPeerTask,  &QnNetworkPeerTask::progressChanged,      this,     &QnUpdateProcess::progressChanged);
-    connect(uploadUpdatesPeerTask,  &QnNetworkPeerTask::peerProgressChanged,  this,     &QnUpdateProcess::peerProgressChanged);
+    connect(uploadUpdatesPeerTask,  &QnNetworkPeerTask::peerProgressChanged,  this,     [this](const QUuid &peerId, int progress) {
+        emit peerStageProgressChanged(peerId, QnPeerUpdateStage::Push, progress);
+    });
     connect(uploadUpdatesPeerTask,  &QnNetworkPeerTask::finished,             uploadUpdatesPeerTask,     &QObject::deleteLater);
     m_currentTask = uploadUpdatesPeerTask;
     uploadUpdatesPeerTask->start(m_targetPeerIds - m_incompatiblePeerIds);

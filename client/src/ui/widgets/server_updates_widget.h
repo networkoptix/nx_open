@@ -41,8 +41,9 @@ private slots:
     void at_updateFinished(QnUpdateResult result);
 
     void at_tool_stageChanged(QnFullUpdateStage stage);
-    void at_tool_progressChanged(QnFullUpdateStage stage, int progress);
+    void at_tool_stageProgressChanged(QnFullUpdateStage stage, int progress);
 private:
+    void initSourceMenu();
     void initLinkButtons();
     void initBuildSelectionButtons();
 
@@ -55,7 +56,6 @@ private:
     enum UpdateSource {
         InternetSource,
         LocalSource,
-        SpecificBuildSource,
 
         UpdateSourceCount
     };
@@ -64,6 +64,7 @@ private:
 
     QnServerUpdatesModel *m_updatesModel;
     QnMediaServerUpdateTool *m_updateTool;
+    std::array<QAction*, UpdateSourceCount> m_updateSourceActions;
 
     QTimer *m_extraMessageTimer;
     
