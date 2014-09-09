@@ -224,7 +224,7 @@ void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QUuid
 {
     AlivePeersMap::iterator itr = m_alivePeers.find(peerData.id);
     if (itr == m_alivePeers.end()) 
-        itr = m_alivePeers.insert(peerData.id, peer);
+        itr = m_alivePeers.insert(peerData.id, peerData);
     AlivePeerInfo& currentValue = itr.value();
     if (gotFromPeer.isNull())
         currentValue.directAccess = true;
