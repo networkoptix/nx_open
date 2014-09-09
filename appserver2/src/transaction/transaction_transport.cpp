@@ -434,7 +434,17 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
 
-    if (itrGuid == client->response()->headers.end() || statusCode != nx_http::StatusCode::ok)
+    if (itrGuid == client->response()->headers.end())
+    {
+        cancelConnecting();
+        return;
+    }
+
+    m_remotePeer.id = QUuid(itrGuid->second);
+    m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server peers only
+    emit peerIdDiscovered(m_remoteAddr, m_remotePeer.id);
+
+    if (statusCode != nx_http::StatusCode::ok)
     {
         cancelConnecting();
         return;
@@ -445,8 +455,6 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
     }
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
-    m_remotePeer.id = QUuid(itrGuid->second);
-    emit peerIdDiscovered(m_remoteAddr, m_remotePeer.id);
 
     if (getState() == ConnectingStage1) {
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);

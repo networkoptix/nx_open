@@ -319,19 +319,6 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
     }
 }
 
-
-QString QnMediaServerResource::getProxyHost()
-{
-    QnMediaServerConnectionPtr connection = apiConnection();
-    return connection ? connection->getProxyHost() : QString();
-}
-
-int QnMediaServerResource::getProxyPort()
-{
-    QnMediaServerConnectionPtr connection = apiConnection();
-    return connection ? connection->getProxyPort() : 0;
-}
-
 QnSoftwareVersion QnMediaServerResource::getVersion() const
 {
     QMutexLocker lock(&m_mutex);
@@ -403,6 +390,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.version = m_version;
     moduleInformation.systemInformation = m_systemInfo;
     moduleInformation.systemName = m_systemName;
+    moduleInformation.name = getName();
     moduleInformation.port = QUrl(m_apiUrl).port();
     foreach (const QHostAddress &address, m_netAddrList)
         moduleInformation.remoteAddresses.insert(address.toString());

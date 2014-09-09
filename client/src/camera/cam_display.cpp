@@ -29,7 +29,7 @@
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
 static const int REDASS_DELAY_INTERVAL = 2 * 1000*1000ll; // if archive frame delayed for interval, mark stream as slow
-static const int LIVE_MEDIA_LEN_THRESHOLD = 300*1000ll;   // do not sleep in live mode if queue is large
+static const int LIVE_MEDIA_LEN_THRESHOLD = 400*1000ll;   // do not sleep in live mode if queue is large
 
 static void updateActivity()
 {
@@ -403,26 +403,25 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     //qDebug() << "vd->flags & QnAbstractMediaData::MediaFlags_FCZ" << (vd->flags & QnAbstractMediaData::MediaFlags_FCZ);
 
+    bool canSwitchToMT = isFullScreen() || qnRedAssController->counsumerCount() == 1;
+    bool shouldSwitchToMT = (m_isRealTimeSource && m_totalFrames > 100 && m_dataQueue.size() >= m_dataQueue.size()-1) || !m_isRealTimeSource;
+    if (canSwitchToMT && shouldSwitchToMT) {
+        if (!m_useMTRealTimeDecode) {
+            m_useMTRealTimeDecode = true;
+            setMTDecoding(true); 
+        }
+    }
+    else {
+        m_totalFrames = 0;
+        if (m_useMTRealTimeDecode) {
+            m_useMTRealTimeDecode = false;
+            setMTDecoding(false); 
+        }
+    }
+
+
     if (m_isRealTimeSource)
     {
-
-        if (isFullScreen() || qnRedAssController->counsumerCount() == 1) {
-            if (m_dataQueue.size() >= m_dataQueue.maxSize()-1)
-            {
-                // looks like not enought CPU for camera with high FPS value. I've add fps to switch logic to reduce real-time lag (MT decoding has addition 2-th frame delay)
-                if (m_totalFrames > 100 && !m_useMTRealTimeDecode) {
-                    m_useMTRealTimeDecode = true;
-                    setMTDecoding(true); 
-                }
-            }
-        }
-        else {
-            m_totalFrames = 0;
-            if (m_useMTRealTimeDecode) {
-                m_useMTRealTimeDecode = false;
-                setMTDecoding(false); 
-            }
-        }
 
         if (m_firstLivePacket) {
             m_delay.afterdelay();
@@ -855,6 +854,7 @@ void QnCamDisplay::setSpeed(float speed)
     if (qAbs(speed-m_speed) > FPS_EPS)
     {
         if ((speed >= 0 && m_prevSpeed < 0) || (speed < 0 && m_prevSpeed >= 0)) {
+            m_afterJumpTimer.restart();
             m_executingChangeSpeed = true; // do not show "No data" while display preparing for new speed. 
             qint64 time = getExternalTime();
             if (time != DATETIME_NOW)
@@ -1219,11 +1219,14 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
                     if (!(vd->flags & AV_REVERSE_BLOCK_START) && vd->timestamp - m_lastVideoPacketTime < -MIN_VIDEO_DETECT_JUMP_INTERVAL*3)
                     {
                         // I have found avi file where sometimes 290 ms between frames. At reverse mode, bad afterJump affect file very strong
+                        m_buffering = getBufferingMask();
                         afterJump(vd);
                     }
                 }
-                else
+                else {
+                    m_buffering = getBufferingMask();
                     afterJump(vd);
+                }
             }
             m_lastVideoPacketTime = vd->timestamp;
 

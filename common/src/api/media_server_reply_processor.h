@@ -16,6 +16,7 @@
 #include "api/model/test_email_settings_reply.h"
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/manual_camera_seach_reply.h>
+#include <api/model/camera_list_reply.h>
 
 #include "media_server_connection.h"
 
@@ -31,6 +32,7 @@ public:
 
 signals:
     void finished(int status, const QnRebuildArchiveReply &reply, int handle);
+    void finished(int status, const QnCameraListReply &reply, int handle);
     void finished(int status, const QnStorageStatusReply &reply, int handle);
     void finished(int status, const QnStorageSpaceReply &reply, int handle);
     void finished(int status, const QnTimePeriodList &reply, int handle);

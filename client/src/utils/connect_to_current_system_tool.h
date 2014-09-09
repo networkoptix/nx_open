@@ -4,15 +4,16 @@
 #include <QtCore/QObject>
 
 #include <utils/common/id.h>
+#include <utils/common/connective.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnConfigurePeerTask;
-class QnUpdateDialog;
 class QnMediaServerUpdateTool;
 class QnWaitCompatibleServersPeerTask;
 
-class QnConnectToCurrentSystemTool : public QObject, public QnWorkbenchContextAware {
+class QnConnectToCurrentSystemTool : public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT
+    typedef Connective<QObject> base_type;
 public:
     enum ErrorCode {
         NoError,
@@ -30,8 +31,14 @@ public:
 
     QSet<QUuid> targets() const;
 
+public slots:
+    void cancel();
+
 signals:
     void finished(int errorCode);
+    void canceled();
+    void progressChanged(int progress);
+    void stateChanged(const QString &stateText);
 
 private:
     void finish(ErrorCode errorCode);
@@ -44,6 +51,7 @@ private slots:
     void at_configureTask_finished(int errorCode, const QSet<QUuid> &failedPeers);
     void at_waitTask_finished(int errorCode);
     void at_updateTool_stateChanged(int state);
+    void at_updateTool_progressChanged(int progress);
 
 private:
     bool m_running;
@@ -56,7 +64,6 @@ private:
     QHash<QUuid, QUuid> m_waitTargets;
     QnConfigurePeerTask *m_configureTask;
     QnWaitCompatibleServersPeerTask *m_waitTask;
-    QScopedPointer<QnUpdateDialog> m_updateDialog;
     QnMediaServerUpdateTool *m_updateTool;
     int m_prevToolState;
     bool m_updateFailed;

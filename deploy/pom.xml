@@ -9,107 +9,68 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.1.0-SNAPSHOT</version>
+        <version>2.3.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.1.0-SNAPSHOT</version>
+    <version>2.3.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>deploy-clients</artifactId>
+    <artifactId>deploy</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Clients Deployment Script</name>
+    <name>HD Witness Deployment Scripts</name>
 
     <properties>
         <root.dir>${basedir}/..</root.dir>
         <arch>x64</arch>
         <libdir>../build_environment/${arch}</libdir>
+		<final.artifact.name>${namespace.additional}-full</final.artifact.name>
     </properties>    
 
     <build>
         <directory>${arch}</directory> 
         <finalName>client</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <version>1.0-alpha-2</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>read-project-properties</goal>
-                        </goals>
-                        <configuration>
-                            <files>
-                                <file>${root.dir}/build-${customization}.properties</file>
-                            </files>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>    
+        <plugins>   
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.2.2</version>
                 <executions>
-                    <execution>
-                        <id>pack-1.4</id>
+                    <!-- <execution>
+                        <id>pack-client</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>server-update</finalName>
+							<descriptors>
+                                <descriptor>${project.build.directory}/client-${platform}.xml</descriptor>
+                            </descriptors>	
+                        </configuration>
+                    </execution> -->
+                   <execution>
+                        <id>pack-server</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>${project.build.directory}/binaries14-${platform}.xml</descriptor>
-                            </descriptors>	
+                                <descriptor>${project.build.directory}/server-${platform}.xml</descriptor>
+                            </descriptors>
+							<finalName>server-update</finalName>							
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>pack-1.5</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>${project.build.directory}/binaries15-${platform}.xml</descriptor>
-                            </descriptors>	
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>pack-2.0</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>${project.build.directory}/binaries20-${platform}.xml</descriptor>
-                            </descriptors>	
-                        </configuration>
-                    </execution>    
-                    <execution>
-                        <id>pack-2.1</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>${project.build.directory}/binaries21-${platform}.xml</descriptor>
-                            </descriptors>	
-                        </configuration>
-                    </execution>                    
                 </executions>
             </plugin>
-            <plugin>
+            <!-- <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
                 <executions>
                     <execution>
-                        <id>gen-qrc</id>
-                        <phase>package</phase>
+                        <id>gen-scripts</id>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
@@ -122,10 +83,10 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>	            
+            </plugin>	-->            
         </plugins>                    
     </build>    
-    <profiles>
+<!--    <profiles>
         <profile>
             <id>windows</id>
             <activation>
@@ -145,9 +106,6 @@
                                     <failOnError>false</failOnError>
                                     <target>
                                         <copy file="${libdir}/bin/${build.configuration}/client.exe" tofile="${libdir}/bin/${build.configuration}/${product.name}.exe" />
-                                        <copy file="${libdir}/1.4/bin/client.exe" tofile="${libdir}/1.4/bin/${product.name}.exe" />
-                                        <copy file="${libdir}/1.5/bin/client.exe" tofile="${libdir}/1.5/bin/${product.name}.exe" />
-                                        <copy file="${libdir}/2.0.2/bin/client.exe" tofile="${libdir}/2.0.2/bin/${product.name}.exe" />
                                     </target>
                                 </configuration>
                                 <goals>
@@ -159,6 +117,5 @@
                 </plugins>
             </build>
         </profile>
-    </profiles>
-
+    </profiles> -->
 </project>

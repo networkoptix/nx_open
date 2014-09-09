@@ -1,108 +1,137 @@
 ----------------------------------------------2.3.0.xxxx-------------------------------------------
 Features:
 
-Video Wall
-No Single Point of Failure
-Failover
-793 Automatic cameras move to reserve servers
-Server API & SDK
-Edge (SWARM)
-Universal Fisheye Dewarping
-Max/Min Recording Time per Camera
-One-Click System-Wide Upgrades
-Web Based Camera Settings (ISD Cam, Vista?)
-Paxton ACS Integration Plug-In
-Camera Groups via Views
-Web Client Removal
+Video Wall. Allows users to control unlimited number of monitors in the realtime mode. Requires Video Wall Licenses. To activate the feature it is necessary to have 5 licenses. Each license allows controlling 1 display.
+No Single Point of Failure. Previous versions the database was stored on Enterprise Controller. In case of EC failure the whole system was down. Now database is being replicated to each server, so there are no central component. If a server is down, the system continues working. 
+Failover. In case of server failure the cameras will be transferred to other servers (793 Automatic cameras move to reserve servers)
+Server API & SDK. SDK provides an easy way to easily integrate various devices into VMS and API allows integrating third-party application with Server. API and SDK are available on the web page of Server.
+Edge (SWARM). Due to decent architectural changes Server can be run on potentially any ARM device, including cameras that support EDGE technology. This allows running Server on a small low-cost boxes, or even without any dedicated server!
+Universal Fisheye Dewarping. Now almost all type of fish-eye lenses are supported.
+Max/Min Recording Time per Camera. Ability to specify the minimum and maximum amount of footage according to recording policies. This setting is per-camera. For instance, one camera can store only 3 days of storage and another-one at least 5 days.
+One-Click System-Wide Upgrades. It is possible to upgrade the whole system to a newer version or to a specific build from a single machine Client is rinning on (Administrative privilege required). If the system is in a isolated network, then the special file is created. If run this file, it will download the upgrade package to a jumpdrive. This jumpdrive should pe plugged in the computer Client is running on. After that the system can be updated in one click.
+Web Based Camera Settings. Ability to display camera's web page inside VMS to be able to fully control cameras. 
+remove Paxton ACS Integration Plug-In. 
+Camera Groups via Views - ????????????
+Web Client Removal. Redesigned web client will be introduced in the upcoming version. Mobile clients are still included.
+#3738 Joining Systems and server to system (Other systems in resource tree). Now it is possible to join different systems. In this case the licenses will be combined (3246). 
+#3839 Simplified and flexible network setup between servers (Routing management). It is possible to specify IP addresses that can be used for accessing Servers (like public/internal IP addresses, domain names etc)
+Server web page introduced. Unlike traytool, it allows users to manage server from a remote computer. Moreover it provides additional functionality to control Server: start/stop, change System ID, port, login and password, join to other systems, configure storages, gain server information, 
+3593 System Administration - All system-related settings are combined in te single form to simplify setup and user experience.
 
-Server web page
-3593 System Administration
+Improvements:
+
+Video playback on live is smoother
 3881 3568 Main Menu and Context Menu reorganized
 3539 ctrl + alt + t to disable background animation
 3569 Preview Search simplified
-3496 Old Media servers in About displayed in red
-3667 support e-mail on about
-3280 mouse wheel zoom behavior changed
-3492 Add possibility of the template changing to the system settings.
-3643 Use Alt+Enter for fullscreen, ESC for cancel
-3707 3884 Login dialog improvements
-3672 Add possibility to delete invalid licenses
-??? 3689 Add parameter 'mode' to activate license request. If parameter 'mode=info' license server should not generate license signature and don't insert license to database.
-3525 Add "Force rotation" on "Camera settings -> Default"
-3423 autodiscovery improved
-2466 media server conflicts - message should contain the specific list of cameras with ip and mac addresses which is used by both servers.
-3019 Add more default event rules into installer 
-3578 If connection to EC is lost, display appropriate message
-3258 Support streaming without transcoding (HLS)
+3496 In multi-server system the version of servers may be different as they are cross-compatible. However it is strongly recommended to have exact same builds to avoid issues and to simplify investigations in case of a problem. Thus, if there is Servers of other versions, they are displayed in red in the About dialog
+3280 Mouse wheel zoom behavior changed when viewing several videos (used to be Mouse Wheel or ALT+Mouse Wheel)
+3492 Now it is possible to set up E-Mail notifications template (System Settings).
+3643 ESC behavior changed. Use Alt+Enter for fullscreen, ESC for cancel (ESC used to toggle fullscreen)
+3707 3884 Login dialog improvements: admin is automatically put as username. Moreover session can be saved with password (If Auto-Login is checked and user saves the connection)
+3672 Add possibility to delete invalid and expired licenses
+3525 Ability to save camera rotation ("Force rotation" option on "Camera settings -> Default")
+2466 Media server conflicts notification improved. Now message contains the specific list of cameras that are used by both servers.
+3019 More default event rules are added: Event "Media server started" Action "Write to log" and E-mail Notification
+3578 If connection to Server is lost, the appropriate message is displayed (used to be the notification in the right panel)
+3258 Support streaming without transcoding to mobile devices (HLS). This may greatly reduce Server load
 3629 Error messages when activating licenses improved
-3353 Add version to login dialog and "beta version" message
-3582 Add possibility to delete online cameras from resource tree
-2269 Make a login dialog not modal
-3636 Add "Save Layout As..." to the context menu of admin's layout for users
-3246 Support license merging in p2p systems
-3551 VMAX license	
-3668 swarm license	
-3669 VW licenses	3688 Minumum amount of VW licenses	Olga Mironenko
-3687 Analog Encoder license
-3575 Add rtsp transport on expert camera settings
-3666 "Do not archive primary stream" option
-2694 fixed aspect ratio for some video resources
-3486 Move licensece to separate db
-3137: Remove redundant information from progress bar during multi-video export
-3276: Remove group element for generic rtsp/http links
+3353 Current version is displayed in the login dialog and the "beta version" form (used to be "About" form)
+3582 It is possibile to delete online cameras from resource tree. In this case camera may be discovered again after some time. To prevent it from re-discovering change the server auto-discovery setting
+2269 If Login dialog is active it is possible to perform other actions with the interfact (in previous version it was not allowed to interact with the client as soon as this dialog was active)
+* 3636 User It is possible for  to use and change layouts administrators'. It is possible to save such layouts with different names. Clairify ...............
+3551 3668 3687 3669 3688 License types reorganized: VMAX (DW only), SWarm (for ARM devices), Analog Encoder, Video Wall 
+3486 Licenses information is moved to the separate database. This allows cleaning Server database without losing the license information
+3575 It is possible to adjust rtsp transport per-acmera (used to be per-server). 
+3666 "Do not archive primary stream" option added. See expert camera settings
+2694 Adjusted aspect ratios for some cameras to display them correctly
+3137: Multi-video export dialog improved
+3276: Generic rtsp/http links look neat in Resource tree
 3167: Windows XP support
-1779: External Storage support
+External storage support improved: Added external Storage support for Linux (1779), improved "Add external storage" for windows (#1779). Added ability to use password-protected external storage
+#3595 Server logs contain memory and cpu usage
+Archive is more redundant: archive index is stored in Server database (used to be stored on the file system).
+#3917 Added a new event "License issue". 
+3423 Auto-discovery improved
+Improved PTZ control
+Onvif improvements
+In 2.2 and early versions the number of servers were restricted (about 20). Now it is not
+2900: Cameras with the same name are sorted by IP in Resources Tree
+3160, 3110 3673 UI Animation is improved (especially if using E-Mapping 3023)
 
-3799 feedback form for users 
++++++++++++++ Clairify +++++++++++++
+
+3667 Added ability to send support e-mail in the About dialog - ???
 3883 Never suggest to save layout 
 
-
 BUGS
-3659 Double-click works incorrectly in Dewarping mode if panoramic is 360°
-3498: Screenshots from dewarped cameras work incorrect for low-quality 
-3216: If move the camera from server to another, checkbox "Fish-eye" is released and all saved positions and tours are removed
-3565: Notification on input signal doesn't work 
-3714: Any number of axis cameras use the same rtsp port in case if you add them with public_IP
-2646: Alarm/Event Rules for specific cameras don't work after moving cameras to another media server
-2834: Camera list is empty
-3623: If add ACTI camera manually with right credentials, it becomes unauthorized
-3597: If change IP address and then try to add a camera manually, server's IP in the dialog still previous-one
-3120: "Add selected" should be disabled if all cameras are already in resources tree
-3225: Motion detection doesn't work for http-link
-3283: Smart Search doesn't work for generic rtsp/http links on Linux after rebuilding archive index
-3679: Numbers on motion quality capture are overlaying on each other
-3497: Deafult motion mask value should be reduced
-3220: PTZ camera doesn't work under user, if it was moved from another server
-2284: If camera status has been changed from "Unathorized" to "Online", than advanced ptz looks like "zoom only"
-3239: Layout displays in resource tree, if it has been removed unser user
-3233: If open item in a new window, layout cannot be saved.
-2952: Displays uncreated layout
-1174: The camera are not marked with a small red circle in layouts if it was moved from one server to another
-3170: If layout has been created after the user has logged in, than cameras aren't displayed
-3686: It's possible to change user's login to "admin"
-3052: Replay sound renaming dialogue can go under other dialogues(although it should be always on top)
-2988: Incorrect timestamp in archive screenshot's name
-3528: screen recording + sound enabled + windows 8.1 issue
-3471: Cannot save exported layout after changes
-2421: Save-on-close dialog doesn't close if it was opened for milti-video
-3772: NO DATA is displayed on LIVE
-3771: Video starts to play after openning new camera on layout
-1502: Status of camera hasn't been changed, If it has been moved from one server to another in another client
-3223: Camera cannot be added as http link, if it has been removed from another MS
-3224: Client crashes if user searches cameras when admin's layout is opened
-3268: Empty rows in resources tree after deleting cameras
-2900: Cameras with the same name should be sorted by IP in Resources Tree
-3023: Moving item on the scene with uploaded background drastically lowers FPS
-3037: NO DATA is not displayed on items without archive
-3274: Time isn't refreshed on zoom item, that was made from panoramic camera
-3160, 3110 3673 some animation fixes
-2499: Info is getting disabled for zoom item if move zoom window on another item.
-3214: Some event rules don't work if one of MS is behind NAT
-3624: Camera Diagnostics works incorrectly on non-standard discovery port
-3781: Motion mask is displayed for multi-video only when video is played backward
-3122: IOS - Camera streaming isn't loading for remote connections (EC and MS are in different networks)
-3109: Chunks flickering while playback (Linux)
+Fisheye fixes:
+ 3659 Double-click worked incorrectly in Dewarping mode if panoramic is 360°: instead of full zoom out, zoom was changed to a random value. Fixed.
+ 3498: Screenshots from dewarped cameras worked incorrect for low-resolution streams. Fixed
+ 3216: If move the camera from server to another, checkbox "Fish-eye" was reset and all saved positions and tours were removed. Fixed
 
+Alarm/Event Rules fixes: 
+ 3565: Fixed notification on input signal that didn't work in some cases
+ 2646: Alarm/Event Rules for specific cameras didn't work after moving them to another media server. Fixed
+ 3214: Fixed some event rules that didn't work if one of Servers was behind NAT
+
+Manual Camera adding fixes: 
+ 3714: Fixed the error whan it was impossible to manually add several AXIS cameras if they use public IPs and the same rtsp port
+ 3623: Fixed the bug with ACTI authorization error if ACTI cameras was added manually (sometimes credentials were reset to default-ones)
+ 3120: Sometimes it was possible to add the camera manually even if it was already in the list. Fixed
+ 3624: Camera Diagnostics worked incorrectly if a camera was added manually with non-standard discovery port
+ 
+HTTP/RTSP links fixes:
+ 3225: Fixed Motion detection for http-link
+ 3283: Smart Search didn't work for generic rtsp/http links on Linux after rebuilding archive index. Fixed
+ 3223: Camera could not be added as http link, if it had been added and then removed from another Server
+ 
+Motion Mask dialog fixes:
+ 3679: Motion Mask displayed incorrectly if there were a lot of motion mask areas. Fixed
+ 3497: Deafult motion mask value is reduced to 5
+
+PTZ Fixes: 
+ 3220: PTZ camera controls didn't work for non-admin user, if it was moved from another server. Fixed
+ 2284: PTZ controls displayed incorrectly after authorization credentials were entered (zoom only was available). Fixed
+
+Layout fixes:
+ 3239: Fixed the issue with deleting layout that remains in Resource Tree until Client is restarted.
+ 3233: If open item in a new window, It was not possible to save a layout there. Fixed
+ 3170: If layout has been created after the user has logged in, than cameras aren't displayed
+
+Multi-Video fixes
+ 3471: Fixed the issue with saving exported layout after changes. The message about local files presence was displayed sometimes, even if there were no local files
+ 2421: Sometimes the Save-on-close dialog was stuck if close Milti-Video. Fixed
+ 3771: When set to pause, video started playing after openning new camera on layout. Fixed
+ 3781: In some environments Motion mask was displayed for multi-video only when video was played backward. Fixed
+
+Zoom WIndow Fixes:
+ 3274: Time wasn't refreshed on zoom item, that was made from panoramic camera. Fixed
+ 2499: Info was disabled for zoom item if move zoom window on another item. Fixed
+ 
+2834: In rare circumstances no cameras were displayed in the Camera list form when opened. Fixed
+1174/1502: If a camera was moved from one server to another its status was displayed incorrectly in Resource Tree sometimes. Fixed
+3686: It was possible to rename user login to "admin" that caused multiple confusions. Fixed
+3052: Some dialogs could be displayed under other dialogs instead of displaying on top (update notification, sound renaming). This could block the UI interaction. Fixed
+2988: Fixed Incorrect timestamp in archive screenshot's name
+3528: In rare cases the application could crash when performing screen recording with sound enabled on Windows 8.1
+3268: Sometimes empty rows appeared in Resources Tree after deleting cameras. Fixed
+3772: Fixed the issue when NO DATA was displayed on LIVE position in rare cases. 
+#3540 Fixed incorrect CPU usage on health monitoring on Windows 8
+3109: Fixed Chunks flickering while playback (Linux only)
+
+Vista:
+ #3710 PTZ Controls are displayed on Motorised Zoom Only Camera's
+ #3693 Database Backup did not work correctly in some cases. Fixed
+
++++++++++++++ Clairify/remove +++++++++++++
+
+remove 3122: IOS - Camera did not stream if EC and MS are in different networks)
+remove Changed profile's name for Onvif and Axis cameras (for Vista it was in 2.1).
+3224: Fixed Client crash if non-admin user searches cameras when admin's layout is opened. Clairify............. How user can open admin's layout?
+remove 3597: If change IP address and then try to add a camera manually, server's IP in the dialog still previous-one
+remove 2952: Displays uncreated layout
+ 
 ----------------------------------------------2.2.1.xxxx-------------------------------------------
 
 Improvements:

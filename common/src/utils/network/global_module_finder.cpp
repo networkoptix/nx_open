@@ -27,8 +27,18 @@ QnGlobalModuleFinder::QnGlobalModuleFinder(QnModuleFinder *moduleFinder, QObject
 void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &connection) {
     ec2::AbstractECConnectionPtr oldConnection = m_connection.lock();
 
-    if (oldConnection)
+    if (oldConnection) {
         oldConnection->getMiscManager()->disconnect(this);
+
+        QSet<QUuid> discoverers;
+        foreach (const QSet<QUuid> &moduleDiscoverer, m_discovererIdByServerId)
+            discoverers.unite(moduleDiscoverer);
+
+        discoverers.remove(qnCommon->moduleGUID());
+
+        foreach (const QUuid &id, discoverers)
+            removeAllModulesDiscoveredBy(id);
+    }
 
     m_connection = connection;
 

@@ -596,12 +596,12 @@ namespace nx_http
                 nx_http::insertOrReplaceHeader(
                     &m_request.headers,
                     nx_http::HttpHeader(
-                        Header::Authorization::NAME,
-                        Header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
+                        header::Authorization::NAME,
+                        header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
             }
         }
         else {
-            nx_http::removeHeader(&m_request.headers, Header::Authorization::NAME);
+            nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
         }
     }
 
@@ -640,10 +640,10 @@ namespace nx_http
     //    const QString& userName,
     //    const QString& userPassword,
     //    const QUrl& url,
-    //    const Header::WWWAuthenticate& wwwAuthenticateHeader,
-    //    Header::DigestAuthorization* const digestAuthorizationHeader )
+    //    const header::WWWAuthenticate& wwwAuthenticateHeader,
+    //    header::DigestAuthorization* const digestAuthorizationHeader )
     //{
-    //    if( wwwAuthenticateHeader.authScheme != Header::AuthScheme::digest )
+    //    if( wwwAuthenticateHeader.authScheme != header::AuthScheme::digest )
     //        return false;
 
     //    //reading params
@@ -705,11 +705,11 @@ namespace nx_http
     //}
 
 
-//    nx_http::Header::WWWAuthenticate wwwAuthenticateHeader;
-//    wwwAuthenticateHeader.authScheme = nx_http::Header::AuthScheme::digest;
+//    nx_http::header::WWWAuthenticate wwwAuthenticateHeader;
+//    wwwAuthenticateHeader.authScheme = nx_http::header::AuthScheme::digest;
 //    wwwAuthenticateHeader.params["realm"] = "Surveillance Server";
 //    wwwAuthenticateHeader.params["nonce"] = "06737538";
-//    nx_http::Header::DigestAuthorization digestAuthorizationHeader;
+//    nx_http::header::DigestAuthorization digestAuthorizationHeader;
 //
 //    bool res = nx_http::calcDigestResponse(
 //        lit("DESCRIBE"),
@@ -728,9 +728,9 @@ namespace nx_http
         if( wwwAuthenticateIter == response.headers.end() )
             return false;
 
-        Header::WWWAuthenticate wwwAuthenticateHeader;
+        header::WWWAuthenticate wwwAuthenticateHeader;
         wwwAuthenticateHeader.parse( wwwAuthenticateIter->second );
-        if( wwwAuthenticateHeader.authScheme != Header::AuthScheme::digest )
+        if( wwwAuthenticateHeader.authScheme != header::AuthScheme::digest )
             return false;
 
         //reading params
@@ -765,7 +765,7 @@ namespace nx_http
         md5HashCalc.addData( m_url.path().toLatin1() );
         const BufferType& ha2 = md5HashCalc.result().toHex();
         //response
-        Header::DigestAuthorization digestAuthorizationHeader;
+        header::DigestAuthorization digestAuthorizationHeader;
         digestAuthorizationHeader.addParam( "username", m_userName.toLatin1() );
         digestAuthorizationHeader.addParam( "realm", realm );
         digestAuthorizationHeader.addParam( "nonce", nonce );
@@ -799,7 +799,7 @@ namespace nx_http
 
         nx_http::insertOrReplaceHeader(
             &m_request.headers,
-            nx_http::HttpHeader( Header::Authorization::NAME, authorizationStr ) );
+            nx_http::HttpHeader( header::Authorization::NAME, authorizationStr ) );
 
         m_authorizationTried = true;
         return initiateHttpMessageDelivery( m_url );

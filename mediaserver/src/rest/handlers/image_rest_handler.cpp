@@ -3,6 +3,13 @@
 extern "C"
 {
     #include <libswscale/swscale.h>
+    #ifdef WIN32
+        #define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+    #endif
+    #include <libavutil/pixdesc.h>
+    #ifdef WIN32
+        #undef AVPixFmtDescriptor
+    #endif
 }
 
 #include <QtCore/QBuffer>
@@ -16,6 +23,7 @@ extern "C"
 #include "core/datapacket/media_data_packet.h"
 #include "decoders/video/ffmpeg.h"
 #include "camera/camera_pool.h"
+#include "qmath.h"
 
 static const int MAX_GOP_LEN = 100;
 static const qint64 LATEST_IMAGE = -1;
@@ -75,6 +83,82 @@ PixelFormat updatePixelFormat(PixelFormat fmt)
     }
 }
 
+/*
+* Rotate image. only values 90, 180, 270 is supported
+*/
+uchar* rotateImage(AVFrame& pict, int rotate)
+{
+    if (rotate > 180)
+        rotate = 270;
+    else if (rotate > 90)
+        rotate = 180;
+    else
+        rotate = 90;
+
+    int dstWidth = pict.width;
+    int dstHeight = pict.height;
+    if (rotate != 180)
+        qSwap(dstWidth, dstHeight);
+
+    int numBytes = avpicture_get_size((PixelFormat) pict.format, dstWidth, dstHeight);
+    uchar* newBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
+    AVFrame dstPict = pict;
+    avpicture_fill((AVPicture*) &dstPict, newBuffer, (PixelFormat) pict.format, dstWidth, dstHeight);
+    dstPict.width = dstWidth;
+    dstPict.height = dstHeight;
+
+    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[pict.format];
+    for (int i = 0; i < descr->nb_components && pict.data[i]; ++i) 
+    {
+        int filler = (i == 0 ? 0x0 : 0x80);
+        int numButes = dstPict.linesize[i] * dstHeight;
+        if (i > 0)
+            numButes >>= descr->log2_chroma_h;
+        memset(dstPict.data[i], filler, numButes);
+
+        int w = pict.width;
+        int h = pict.height;
+        if (i > 0) {
+            w >>= descr->log2_chroma_w;
+            h >>= descr->log2_chroma_h;
+        }
+
+        if (rotate == 90) 
+        {
+            for (int y = 0; y < h; ++y) {
+                quint8* src = pict.data[i] + pict.linesize[i] * y;
+                quint8* dst = dstPict.data[i] + h -1 - y;
+                for (int x = 0; x < w; ++x) {
+                    *dst = *src++;
+                    dst += dstPict.linesize[i];
+                }
+            }
+        }
+        else if (rotate == 180) 
+        {
+            for (int y = 0; y < h; ++y) {
+                quint8* src = pict.data[i] + pict.linesize[i] * y;
+                quint8* dst = dstPict.data[i] + dstPict.linesize[i] * (h-1 - y) + w-1;
+                for (int x = 0; x < w; ++x) {
+                    *dst-- = *src++;
+                }
+            }
+        }
+        else {
+            for (int y = 0; y < h; ++y) {
+                quint8* src = pict.data[i] + pict.linesize[i] * y;
+                quint8* dst = dstPict.data[i] + dstPict.linesize[i] * (w - 1) + y;
+                for (int x = 0; x < w; ++x) {
+                    *dst = *src++;
+                    dst -= dstPict.linesize[i];
+                }
+            }
+        }
+    }
+    pict = dstPict;
+    return newBuffer;
+}
+
 int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
@@ -87,6 +171,8 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
     QByteArray format("jpg");
     QByteArray colorSpace("argb");
     QSize dstSize;
+    int rotate = 0;
+    bool rotateDefined = false;
 
     for (int i = 0; i < params.size(); ++i)
     {
@@ -102,6 +188,10 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
                 time = LATEST_IMAGE;
             else
                 time = parseDateTime(params[i].second.toUtf8());
+        }
+        else if (params[i].first == "rotate") {
+            rotate = params[i].second.toInt();
+            rotateDefined = true;
         }
         else if (params[i].first == "method") {
             QString val = params[i].second.toLower().trimmed(); 
@@ -149,6 +239,9 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         result.append("</root>\n");
         return CODE_INVALID_PARAMETER;
     }
+
+    if (!rotateDefined)
+        rotate = res->getProperty(QnMediaResource::rotationKey()).toInt();
 
 #ifdef EDGE_SERVER
     if (dstSize.height() < 1)
@@ -261,32 +354,41 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         return CODE_INTERNAL_ERROR;
     }
 
-    const int roundedWidth = qPower2Ceil((unsigned) dstSize.width(), 8);
-    const int roundedHeight = qPower2Ceil((unsigned) dstSize.height(), 2);
+    int roundedWidth = qPower2Ceil((unsigned) dstSize.width(), 8);
+    int roundedHeight = qPower2Ceil((unsigned) dstSize.height(), 2);
 
     if (format == "jpg" || format == "jpeg")
     {
         // prepare image using ffmpeg encoder
+        AVFrame dstPict;
+        dstPict.width = dstSize.width();
+        dstPict.height = dstSize.height();
+        dstPict.format = outFrame->format;
+        if (dstPict.format == PIX_FMT_YUV422P)
+            dstPict.format = PIX_FMT_YUV420P; // avoid different pixel dense for X and Y. It's avoid rotation problem
 
-        int numBytes = avpicture_get_size((PixelFormat) outFrame->format, roundedWidth, roundedHeight);
+        int numBytes = avpicture_get_size((PixelFormat) dstPict.format, roundedWidth, roundedHeight);
         uchar* scaleBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
         SwsContext* scaleContext = sws_getContext(outFrame->width, outFrame->height, PixelFormat(outFrame->format), 
-            dstSize.width(), dstSize.height(), (PixelFormat) outFrame->format, SWS_BICUBIC, NULL, NULL, NULL);
+            dstPict.width, dstPict.height, (PixelFormat)dstPict.format, SWS_BICUBIC, NULL, NULL, NULL);
 
-        AVFrame dstPict;
-        avpicture_fill((AVPicture*) &dstPict, scaleBuffer, (PixelFormat) outFrame->format, roundedWidth, roundedHeight);
+        avpicture_fill((AVPicture*) &dstPict, scaleBuffer, (PixelFormat) dstPict.format, roundedWidth, roundedHeight);
         sws_scale(scaleContext, outFrame->data, outFrame->linesize, 0, outFrame->height, dstPict.data, dstPict.linesize);
-        dstPict.width = roundedWidth;
-        dstPict.height = roundedHeight;
-        dstPict.format = outFrame->format;
+        sws_freeContext(scaleContext);
+
+        if (rotate != 0) {
+            uchar* newbuffer = rotateImage(dstPict, rotate);
+            qFreeAligned(scaleBuffer);
+            scaleBuffer = newbuffer;
+        }
 
         AVCodecContext* videoEncoderCodecCtx = avcodec_alloc_context3(0);
         videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         videoEncoderCodecCtx->codec_id = (format == "jpg" || format == "jpeg") ? CODEC_ID_MJPEG : CODEC_ID_PNG;
-        videoEncoderCodecCtx->pix_fmt = updatePixelFormat((PixelFormat) outFrame->format);
-        videoEncoderCodecCtx->width = dstSize.width();
-        videoEncoderCodecCtx->height = dstSize.height();
-        videoEncoderCodecCtx->bit_rate = roundedWidth*roundedHeight;
+        videoEncoderCodecCtx->pix_fmt = updatePixelFormat((PixelFormat) dstPict.format);
+        videoEncoderCodecCtx->width = dstPict.width;
+        videoEncoderCodecCtx->height = dstPict.height;
+        videoEncoderCodecCtx->bit_rate = dstPict.width*dstPict.height;
         videoEncoderCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
         videoEncoderCodecCtx->time_base.num = 1;
         videoEncoderCodecCtx->time_base.den = 30;
@@ -297,7 +399,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
             qWarning() << "Can't initialize ffmpeg encoder for encoding image to format " << format;
         }
         else {
-            const int MAX_VIDEO_FRAME = roundedWidth * roundedHeight * 3 / 2;
+            const int MAX_VIDEO_FRAME = dstPict.width * dstPict.height * 3 / 2;
             quint8* m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
             int encoded = avcodec_encode_video(videoEncoderCodecCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, &dstPict);
             result.append((const char*) m_videoEncodingBuffer, encoded);
@@ -305,7 +407,6 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
             avcodec_close(videoEncoderCodecCtx);
         }
         av_freep(&videoEncoderCodecCtx);
-        sws_freeContext(scaleContext);
         qFreeAligned(scaleBuffer);
     }
     else
@@ -332,7 +433,16 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         sws_scale(scaleContext, outFrame->data, outFrame->linesize, 0, outFrame->height, dstPict.data, dstPict.linesize);
 
         QBuffer output(&result);
-        image.save(&output, format);
+        
+        if (rotate != 0) {
+            QTransform transform;
+            transform.rotate(rotate);
+            QImage rotatedImage =  image.transformed(transform);
+            rotatedImage.save(&output, format);
+        }
+        else {
+            image.save(&output, format);
+        }
 
         sws_freeContext(scaleContext);
         qFreeAligned(scaleBuffer);

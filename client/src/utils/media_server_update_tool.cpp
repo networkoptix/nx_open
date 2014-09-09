@@ -301,6 +301,8 @@ void QnMediaServerUpdateTool::reset() {
     m_updateInformationById.clear();
     m_updateFiles.clear();
     m_clientUpdateFile.clear();
+    m_targetPeerIds.clear();
+    m_incompatiblePeerIds.clear();
     m_targetVersion = QnSoftwareVersion();
     m_clientRequiresInstaller = false;
     m_disableClientUpdates = defaultDisableClientUpdates;
@@ -362,6 +364,8 @@ void QnMediaServerUpdateTool::updateServers() {
     m_updateId = QUuid::createUuid().toString();
     m_updateInformationById.clear();
     m_idBySystemInformation.clear();
+    m_targetPeerIds.clear();
+    m_incompatiblePeerIds.clear();
 
     foreach (const QnMediaServerResourcePtr &server, actualTargets()) {
         bool incompatible = (server->getStatus() == Qn::Incompatible);

@@ -19,6 +19,8 @@ void updateServer(const QnMediaServerResourcePtr &server, const QnModuleInformat
         server->setApiUrl(url);
         server->setUrl(url);
     }
+    if (!moduleInformation.name.isEmpty())
+        server->setName(moduleInformation.name);
     server->setVersion(moduleInformation.version);
     server->setSystemInfo(moduleInformation.systemInformation);
     server->setSystemName(moduleInformation.systemName);
@@ -61,7 +63,7 @@ void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &module
         return;
     }
 
-    QUuid id = m_fakeUuidByServerUuid[moduleInformation.id];
+    QUuid id = m_fakeUuidByServerUuid.value(moduleInformation.id);
     if (id.isNull()) {
         // add a resource
         if (!isSuitable(moduleInformation))

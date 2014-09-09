@@ -4,6 +4,10 @@ bool QnRoute::isValid() const {
     return !points.isEmpty();
 }
 
+bool QnRoute::isEqual(const QnRoute &other) const {
+    return points == other.points;
+}
+
 bool QnRoute::addPoint(const QnRoutePoint &point, int weight) {
     // prevent loops in routes
     foreach (const QnRoutePoint &p, points) {
@@ -32,7 +36,6 @@ bool QnRoute::operator <(const QnRoute &other) const {
     else
         return points.size() < other.points.size();
 }
-
 
 bool QnRoutePoint::operator ==(const QnRoutePoint &other) const {
     return peerId == other.peerId && host == other.host && port == other.port;

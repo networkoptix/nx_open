@@ -99,6 +99,7 @@
 #include <rest/handlers/ping_rest_handler.h>
 #include <rest/handlers/ping_system_rest_handler.h>
 #include <rest/handlers/ptz_rest_handler.h>
+#include <rest/handlers/can_accept_cameras_rest_handler.h>
 #include <rest/handlers/rebuild_archive_rest_handler.h>
 #include <rest/handlers/recorded_chunks_rest_handler.h>
 #include <rest/handlers/statistics_rest_handler.h>
@@ -875,9 +876,9 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         QnManualCameraInfoMap manualCameras;
         foreach(const QnSecurityCamResourcePtr &camera, cameras) {
             messageProcessor->updateResource(camera);
-            if (camera->isManuallyAdded()) {
+            if (camera->isManuallyAdded() && camera->getParentId() == m_mediaServer->getId()) {
                 QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
-                manualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
+                manualCameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
             }
         }
         QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
@@ -987,7 +988,8 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
 void QnMain::at_localInterfacesChanged()
 {
     auto intfList = allLocalAddresses();
-    intfList << m_publicAddress;
+    if (!m_publicAddress.isNull())
+        intfList << m_publicAddress;
     m_mediaServer->setNetAddrList(intfList);
 
     QString defaultAddress = QUrl(m_mediaServer->getApiUrl()).host();
@@ -1079,6 +1081,7 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testEmailSettings", new QnTestEmailSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler());
@@ -1370,7 +1373,7 @@ void QnMain::run()
     if( QnAppServerConnectionFactory::url().scheme().toLower() == lit("file") )
         ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
 
-    nx_hls::HLSSessionPool hlsSessionPool;
+    std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
     if( !initTcpListener() )
     {
@@ -1539,6 +1542,7 @@ void QnMain::run()
     selfInformation.version = qnCommon->engineVersion();
     selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
     selfInformation.systemName = qnCommon->localSystemName();
+    selfInformation.name = m_mediaServer->getName();
     selfInformation.port = MSSettings::roSettings()->value( nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT ).toInt();
     //selfInformation.remoteAddresses = ;
     selfInformation.id = serverGuid();
@@ -1577,7 +1581,7 @@ void QnMain::run()
     QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder(m_moduleFinder));
     globalModuleFinder->setConnection(ec2Connection);
 
-    QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder));
+    QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder, false));
     router->setConnection(ec2Connection);
 
     QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
@@ -1729,6 +1733,8 @@ void QnMain::run()
     stopObjects();
 
     QnResource::stopCommandProc();
+
+    hlsSessionPool.reset();
 
     delete QnRecordingManager::instance();
     QnRecordingManager::initStaticInstance( NULL );
@@ -1995,6 +2001,14 @@ static void printVersion();
 
 int main(int argc, char* argv[])
 {
+    {
+        QMutex ggg;
+        QMutexLocker gggL(&ggg);
+        gggL.unlock();
+        gggL.unlock();
+    }
+    int gg = 4;
+
 #if 0
 #if defined(__GNUC__)
 # if defined(__i386__)

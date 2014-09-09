@@ -388,4 +388,9 @@ void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource)
             resource->setStatus(Qn::Offline);
     }
 #endif
+    if (resource->getId() == qnCommon->moduleGUID()) {
+        QnModuleInformation moduleInformation = qnCommon->moduleInformation();
+        moduleInformation.name = resource->getName();
+        qnCommon->setModuleInformation(moduleInformation);
+    }
 }

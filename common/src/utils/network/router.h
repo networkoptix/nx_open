@@ -2,6 +2,7 @@
 #define ROUTER_H
 
 #include <QtCore/QObject>
+#include <QtCore/QMutex>
 
 #include <nx_ec/ec_api.h>
 #include <utils/common/singleton.h>
@@ -23,7 +24,7 @@ public:
         bool operator ==(const Endpoint &other) const { return id == other.id && host == other.host && port == other.port; }
     };
 
-    explicit QnRouter(QnModuleFinder *moduleFinder, QObject *parent = 0);
+    explicit QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent = 0);
     ~QnRouter();
 
     void setConnection(const ec2::AbstractECConnectionPtr &connection);
@@ -36,6 +37,10 @@ public:
 
     QUuid whoIs(const QString &host, quint16 port) const;
 
+signals:
+    void connectionAdded(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
+    void connectionRemoved(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
+
 private slots:
     void at_connectionAdded(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
     void at_connectionRemoved(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
@@ -46,10 +51,11 @@ private:
     void makeConsistent();
 
 private:
+    mutable QMutex m_mutex;
     std::weak_ptr<ec2::AbstractECConnection> m_connection;
-    QnModuleFinder *m_moduleFinder;
     QScopedPointer<QnRouteBuilder> m_routeBuilder;
     QMultiHash<QUuid, Endpoint> m_connections;
+    bool m_passive;
 };
 
 #endif // ROUTER_H

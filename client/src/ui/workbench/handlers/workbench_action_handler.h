@@ -23,6 +23,7 @@
 #include <ui/dialogs/camera_list_dialog.h>
 
 #include <utils/color_space/image_correction.h>
+#include "api/model/camera_list_reply.h"
 
 class QAction;
 class QMenu;
@@ -295,7 +296,7 @@ protected slots:
 
     void at_queueAppRestartAction_triggered();
     void at_selectTimeServerAction_triggered();
-
+    void at_cameraListChecked(int status, const QnCameraListReply& reply, int handle);
 private:
     void notifyAboutUpdate();
 
@@ -335,6 +336,14 @@ private:
     QnStorageResourcePtr m_exportStorage;
 
     QTimer *m_tourTimer;
+    struct CameraMovingInfo 
+    {
+        CameraMovingInfo() {}
+        CameraMovingInfo(const QnVirtualCameraResourceList& cameras, const QnResourcePtr& dstServer): cameras(cameras), dstServer(dstServer) {}
+        QnVirtualCameraResourceList cameras;
+        QnResourcePtr dstServer;
+    };
+    QMap<int, CameraMovingInfo> m_awaitingMoveCameras;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

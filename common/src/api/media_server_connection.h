@@ -47,10 +47,6 @@ public:
     QnMediaServerConnection(QnMediaServerResource* mserver, const QUuid& videowallGuid = QUuid(), QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
 
-    void setProxyAddr(const QUrl &apiUrl, const QString &addr, int port);
-    int getProxyPort() { return m_proxyPort; }
-    QString getProxyHost() { return m_proxyAddr; }
-
     int getTimePeriodsAsync(
         const QnNetworkResourceList &list,
         qint64 startTimeMs, 
@@ -85,6 +81,20 @@ public:
      * \returns                         Request handle.
      */
     int getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot);
+
+    /** 
+     * Check \a list of cameras for discovery. Return new list with contains only accessible cameras.
+     * 
+     * Returns immediately. On request completion \a slot of object \a target 
+     * is called with signature <tt>(int status, QImage reply, int handle)</tt>.
+     * Status is 0 in case of success, in other cases it holds error code.
+     * 
+     * \param cameras
+     * \param target
+     * \param slot
+     * \returns                         Request handle.
+     */
+    int checkCameraList(const QnNetworkResourceList &cameras, QObject *target, const char *slot);
 
     /** 
      * Get \a camera params. 

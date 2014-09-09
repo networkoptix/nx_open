@@ -832,34 +832,38 @@ void QnWorkbenchActionHandler::at_openNewWindowAction_triggered() {
     openNewWindow(QStringList());
 }
 
-void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
-    QnActionParameters parameters = menu()->currentParameters(sender());
-
-    QnResourceList resources = parameters.resources();
-    QnMediaServerResourcePtr server = parameters.argument<QnMediaServerResourcePtr>(Qn::MediaServerResourceRole);
-    if(!server)
+void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraListReply& reply, int handle)
+{
+    if (!m_awaitingMoveCameras.contains(handle))
         return;
-    QnVirtualCameraResourceList serverCameras = resourcePool()->getResourcesWithParentId(server->getId()).filtered<QnVirtualCameraResource>();
+    QnVirtualCameraResourceList modifiedResources = m_awaitingMoveCameras.value(handle).cameras;
+    QnResourcePtr server = m_awaitingMoveCameras.value(handle).dstServer;
+    m_awaitingMoveCameras.remove(handle);
 
-    QnVirtualCameraResourceList modifiedResources;
+    if (status != 0) {
+        QnResourceListDialog::exec(
+            mainWindow(),
+            modifiedResources,
+            Qn::MainWindow_Tree_DragCameras_Help,
+            tr("Error"),
+            tr("Can't move camera(s) to other server. Media server %1 doesn't answer to request. These camera list will stay unchanged").arg(server->getName()), // TODO: #Elric need saner error message
+            QDialogButtonBox::Ok
+            );
+        return;
+    }
+
     QnResourceList errorResources; // TODO: #Elric check server cameras
 
     // TODO: #Elric implement proper rollback in case of an error
-
-    foreach(const QnResourcePtr &resource, resources) {
-        if(resource->getParentId() == server->getId())
-            continue; /* Moving resource into its owner does nothing. */
-
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if(!camera)
-            continue;
-
-        camera->setParentId(server->getId());
-        camera->setStatus(Qn::Offline);
-        modifiedResources.push_back(camera);
-
-        if (server->getStatus() == Qn::Offline)
-            camera->setStatus(Qn::Offline);
+    for (auto itr = modifiedResources.begin(); itr != modifiedResources.end();) {
+        if (reply.uniqueIdList.contains((*itr)->getUniqueId())) {
+            (*itr)->setParentId(server->getId());
+            ++itr;
+        }
+        else {
+            errorResources << *itr;
+            itr = modifiedResources.erase(itr);
+        }
     }
 
     if(!errorResources.empty()) {
@@ -870,18 +874,44 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
             tr("Error"),
             tr("Camera(s) cannot be moved to server '%1'. It might have been offline since the server is up.").arg(server->getName()), // TODO: #Elric need saner error message
             QDialogButtonBox::Ok
-        );
+            );
     }
 
     if(!modifiedResources.empty()) {
         detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources);
+
         connection2()->getCameraManager()->save(
             modifiedResources, 
             processor,
             [processor, modifiedResources](int reqID, ec2::ErrorCode errorCode) {
                 processor->at_replyReceived(reqID, errorCode, modifiedResources);
-            }
+        }
         );
+    }
+}
+
+void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnResourceList resources = parameters.resources();
+    QnMediaServerResourcePtr server = parameters.argument<QnMediaServerResourcePtr>(Qn::MediaServerResourceRole);
+    if(!server)
+        return;
+    QnVirtualCameraResourceList resourcesToMove;
+
+    foreach(const QnResourcePtr &resource, resources) {
+        if(resource->getParentId() == server->getId())
+            continue; /* Moving resource into its owner does nothing. */
+
+        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if(!camera)
+            continue;
+
+        resourcesToMove.push_back(camera);
+    }
+    if (!resourcesToMove.isEmpty()) {
+        int handle = server->apiConnection()->checkCameraList(resourcesToMove, this, SLOT(at_cameraListChecked(int, const QnCameraListReply &, int)));
+        m_awaitingMoveCameras.insert(handle, CameraMovingInfo(resourcesToMove, server));
     }
 }
 
@@ -1491,7 +1521,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
-    if(!server)
+    if (!server)
         return;
 
     if (!context()->user())
@@ -1499,23 +1529,14 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
 
     QUrl url = server->getApiUrl();
     url.setScheme(lit("http"));
-    url.setPath( lit("/api/showLog") );
+    url.setPath(lit("/api/showLog"));
     url.setQuery(lit("lines=1000"));
     
     //setting credentials for access to resource
     url.setUserName(QnAppServerConnectionFactory::url().userName());
     url.setPassword(QnAppServerConnectionFactory::url().password());
 
-    if( !QnNetworkProxyFactory::instance()->fillUrlWithRouteToResource(
-            server,
-            &url,
-            QnNetworkProxyFactory::placeCredentialsToUrl ) )
-    {
-        //could not find route to server. Can it really happen?
-        //TODO: #ak some error message
-    }
-    
-    QDesktopServices::openUrl(url);
+    QDesktopServices::openUrl(QnNetworkProxyFactory::instance()->urlToResource(url, server));
 }
 
 void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
