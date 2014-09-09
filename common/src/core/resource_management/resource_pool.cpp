@@ -81,26 +81,10 @@ void QnResourcePool::addResources(const QnResourceList &resources)
     foreach (const QnResourcePtr &resource, resources)
     {
         assert(resource->toSharedPointer()); /* Getting an assert here? Did you forget to use QnSharedResourcePointer? */
+        assert(!resource->getId().isNull());
 
         if(resource->resourcePool() != NULL)
             qnWarning("Given resource '%1' is already in the pool.", resource->metaObject()->className());
-            
-        if (resource->getId().isNull())
-        {
-            // must be just found local resource; => shold not be in the pool already
-
-            if (QnResourcePtr existing = getResourceByUniqId(resource->getUniqueId()))
-            {
-                // qnWarning("Resource with UID '%1' is already in the pool. Expect troubles.", resource->getUniqueId()); // TODO
-
-                resource->setId(existing->getId());
-            }
-            else
-            {
-                resource->setId(QUuid::createUuid());
-            }
-        }
-
         resource->setResourcePool(this);
     }
 
