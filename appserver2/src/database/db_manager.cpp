@@ -801,7 +801,7 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
 
     if (!isObjectExists(lit("table"), lit("vms_license"), m_sdbStatic))
     {
-        if (!execSQLFile(lit(":/06_staticdb_add_license_table.sql"), m_sdbStatic))
+        if (!execSQLFile(lit(":/05_staticdb_add_license_table.sql"), m_sdbStatic))
             return false;
 
         // move license table to static DB
