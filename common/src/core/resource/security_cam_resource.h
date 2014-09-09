@@ -177,8 +177,8 @@ public:
     void setMinDays(int value);
     int minDays() const;
 
-    void setPrefferedServerId(const QUuid& value);
-    QUuid prefferedServerId() const;
+    void setPreferedServerId(const QUuid& value);
+    QUuid preferedServerId() const;
 
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
@@ -273,7 +273,7 @@ private:
     QString m_vendor;
     int m_minDays;
     int m_maxDays;
-    QUuid m_prefferedServerId;
+    QUuid m_preferedServerId;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)
