@@ -26,8 +26,7 @@
                 <include>swscale-2.dll</include>
                 <include>wrap_oal.dll</include>
                 <include>zlibwapi.dll</include>
-                <include>client.exe</include>
-                <include>applauncher.exe</include>
+                <include>${product.name}*.exe</include>
             </includes>		
         </fileSet>			
 		<fileSet>
