@@ -118,7 +118,7 @@ void QnConnectToCurrentSystemTool::configureServer() {
 
         QUrl url = server->apiConnection()->url();
         m_oldUrls.insert(id, url);
-        url.setScheme(lit("https"));
+        url.setScheme(lit("http")); // TODO: #dklychkov Fix a bug in QNetworkAccessManager and use https
         url.setUserName(lit("admin"));
         url.setPassword(m_password);
         server->apiConnection()->setUrl(url);
