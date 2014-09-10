@@ -10,7 +10,7 @@
 class QnConfigurePeerTask;
 class QnMediaServerUpdateTool;
 class QnWaitCompatibleServersPeerTask;
-class QnUpdateResult;
+struct QnUpdateResult;
 
 class QnConnectToCurrentSystemTool : public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT
