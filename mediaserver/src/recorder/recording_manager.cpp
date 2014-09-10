@@ -584,7 +584,6 @@ void QnRecordingManager::at_checkLicenses()
             QnAppServerConnectionFactory::getConnection2()->getMiscManager()->markLicenseOverflowSync(true, licenseOverflowTime);
         }
         if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < LICENSE_RECORDING_STOP_TIME) {
-            emit notEnoughLicense();
             return; // not enough license, but timeout not reached yet
         }
 

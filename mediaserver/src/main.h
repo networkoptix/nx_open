@@ -46,7 +46,6 @@ private slots:
     void at_storageManager_rebuildFinished();
     void at_timer();
     void at_connectionOpened();
-    void at_license_issue();
 
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
