@@ -145,7 +145,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     QByteArray layoutData = layoutFile->readAll();
     layoutFile.reset();
     
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
     ec2::ApiLayoutData apiLayout;
     if (!QJson::deserialize(layoutData, &apiLayout)) {
         QnProto::Message<ec2::ApiLayoutData> apiLayoutMessage;

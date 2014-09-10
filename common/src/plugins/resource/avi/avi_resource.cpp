@@ -26,6 +26,7 @@ QnAviResource::QnAviResource(const QString& file)
     if (FileTypeSupport::isImageFileExt(file)) 
         addFlags(Qn::still_image);
     m_timeZoneOffset = Qn::InvalidUtcOffset;
+    setId(guidFromArbitraryData(getUniqueId().toUtf8()));
 }
 
 QnAviResource::~QnAviResource()

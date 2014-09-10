@@ -33,7 +33,7 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     m_maxCameras(0),
     m_redundancy(false)
 {
-    setTypeId(resTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
+    setTypeId(resTypePool->getFixedResourceTypeId(lit("Server")));
     addFlags(Qn::server | Qn::remote);
     removeFlags(Qn::media); // TODO: #Elric is this call needed here?
 
@@ -51,10 +51,7 @@ QnMediaServerResource::~QnMediaServerResource()
 
 QString QnMediaServerResource::getUniqueId() const
 {
-    QMutexLocker mutexLocker(&m_mutex); // needed here !!!
-    QnMediaServerResource* nonConstThis = const_cast<QnMediaServerResource*> (this);
-    if (getId().isNull())
-        nonConstThis->setId(QUuid::createUuid());
+    assert(!getId().isNull());
     return QLatin1String("Server ") + getId().toString();
 }
 

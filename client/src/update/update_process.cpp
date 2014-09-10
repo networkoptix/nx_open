@@ -236,7 +236,7 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
     m_clientUpdateFile = task->clientUpdateFile();
 
     foreach (const QUuid &serverId, m_target.targets) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(serverId).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(serverId, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 
@@ -342,10 +342,10 @@ void QnUpdateProcess::at_clientUpdateInstalled() {
 
 void QnUpdateProcess::installIncompatiblePeers() {
     QHash<QnSystemInformation, QString> targetFiles;
-    for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it) {
+    for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it)
         targetFiles[it.key()] = it.value()->fileName;
-        setIncompatiblePeersState(QnPeerUpdateInformation::UpdateInstalling);
-    }
+
+    setIncompatiblePeersState(QnPeerUpdateInformation::UpdateInstalling);
 
     QnRestUpdatePeerTask* restUpdatePeerTask = new QnRestUpdatePeerTask();
     restUpdatePeerTask->setUpdateId(m_id.toString());

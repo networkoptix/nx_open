@@ -24,6 +24,7 @@
 #include "nx_ec/data/api_routing_data.h"
 #include "nx_ec/data/api_system_name_data.h"
 #include "nx_ec/data/api_runtime_data.h"
+#include "nx_ec/data/api_license_overflow_data.h"
 #include "nx_ec/data/api_peer_system_time_data.h"
 #include "utils/db/db_helper.h"
 #include "binary_transaction_serializer.h"
@@ -101,6 +102,11 @@ namespace ec2
         }
 
         ErrorCode saveTransaction(const QnTransaction<ApiFullInfoData>& , const QByteArray&) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode saveTransaction(const QnTransaction<ApiLicenseOverflowData>& , const QByteArray&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -225,6 +231,7 @@ namespace ec2
         QUuid transactionHash(const ApiDatabaseDumpData& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiResourceData& ) const                   { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiSyncMarkerData& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const ApiLicenseOverflowData& ) const            { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
         ErrorCode updateSequence(const ApiSyncMarkerData& data);
     private:

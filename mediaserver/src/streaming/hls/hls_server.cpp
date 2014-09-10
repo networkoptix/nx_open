@@ -12,6 +12,7 @@
 #include <limits>
 #include <map>
 
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
 #include <utils/common/log.h>
@@ -471,6 +472,21 @@ namespace nx_hls
         nx_hls::VariantPlaylistData playlistData;
         playlistData.url = baseUrl;
         playlistData.url.setPath( request.requestLine.url.path() );
+        //if needed, adding proxy information to playlist url
+        nx_http::HttpHeaders::const_iterator viaIter = request.headers.find( "Via" );
+        if( viaIter != request.headers.end() )
+        {
+            nx_http::header::Via via;
+            if( !via.parse( viaIter->second ) )
+                return nx_http::StatusCode::badRequest;
+            if( !via.entries.empty() )
+            {
+                //TODO #ak check that request has been proxied via media server, not regular Http proxy
+                const QString& currentPath = playlistData.url.path();
+                playlistData.url.setPath( lit("/proxy/%1/%2").arg(qnCommon->moduleGUID().toString()).
+                    arg(currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath) );
+            }
+        }
         QList<QPair<QString, QString> > queryItems = QUrlQuery(request.requestLine.url.query()).queryItems();
         //removing SESSION_ID_PARAM_NAME
         for( QList<QPair<QString, QString> >::iterator
@@ -589,6 +605,23 @@ namespace nx_hls
                 baseChunkUrl.setPort( sockAddress.port );
             baseChunkUrl.setScheme( QLatin1String("http") );
         }
+        baseChunkUrl.setPath( HLS_PREFIX + camResource->getUniqueId() );
+
+        //if needed, adding proxy information to playlist url
+        nx_http::HttpHeaders::const_iterator viaIter = request.headers.find( "Via" );
+        if( viaIter != request.headers.end() )
+        {
+            nx_http::header::Via via;
+            if( !via.parse( viaIter->second ) )
+                return nx_http::StatusCode::badRequest;
+            if( !via.entries.empty() )
+            {
+                //TODO #ak check that request has been proxied via media server, not regular Http proxy
+                const QString& currentPath = baseChunkUrl.path();
+                baseChunkUrl.setPath( lit("/proxy/%1/%2").arg(qnCommon->moduleGUID().toString()).
+                    arg(currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath) );
+            }
+        }
 
         for( std::vector<nx_hls::AbstractPlaylistManager::ChunkData>::size_type
             i = 0;
@@ -598,7 +631,6 @@ namespace nx_hls
             nx_hls::Chunk hlsChunk;
             hlsChunk.duration = chunkList[i].duration / (double)USEC_IN_SEC;
             hlsChunk.url = baseChunkUrl;
-            hlsChunk.url.setPath( HLS_PREFIX + camResource->getUniqueId() );
             QUrlQuery hlsChunkUrlQuery( hlsChunk.url.query() );
             foreach( RequestParamsType::value_type param, commonChunkParams )
                 hlsChunkUrlQuery.addQueryItem( param.first, param.second );

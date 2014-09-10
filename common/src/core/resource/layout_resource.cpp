@@ -9,7 +9,7 @@
 #include "core/resource_management/resource_pool.h"
 
 
-QnLayoutResource::QnLayoutResource(): 
+QnLayoutResource::QnLayoutResource(const QnResourceTypePool* resTypePool): 
     base_type(),
     m_cellAspectRatio(-1.0),
     m_cellSpacing(-1.0, -1.0),
@@ -20,14 +20,14 @@ QnLayoutResource::QnLayoutResource():
 {
     setStatus(Qn::Online, true);
     addFlags(Qn::layout);
+    setTypeId(resTypePool->getFixedResourceTypeId(lit("Layout")));
 }
 
 QnLayoutResourcePtr QnLayoutResource::clone() const {
     QMutexLocker locker(&m_mutex);
 
-    QnLayoutResourcePtr result(new QnLayoutResource());
+    QnLayoutResourcePtr result(new QnLayoutResource(qnResTypePool));
     result->setId(QUuid::createUuid());
-    result->setTypeId(getTypeId());
     result->setName(m_name);
     result->setParentId(m_parentId);
     result->setCellSpacing(m_cellSpacing);
@@ -368,4 +368,3 @@ void QnLayoutResource::setLocked(bool value) {
     }
     emit lockedChanged(::toSharedPointer(this));
 }
-

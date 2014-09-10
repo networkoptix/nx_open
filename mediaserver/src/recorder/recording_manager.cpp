@@ -25,8 +25,6 @@
 #include "mutex/camera_data_handler.h"
 #include "mutex/distributed_mutex_manager.h"
 #include "common/common_module.h"
-#include "transaction/transaction_log.h"
-#include "database/db_manager.h"
 #include "api/runtime_info_manager.h"
 #include "utils/license_usage_helper.h"
 
@@ -569,7 +567,7 @@ QnResourceList QnRecordingManager::getLocalControlledCameras()
 
 void QnRecordingManager::at_checkLicenses()
 {
-    if (!ec2::QnTransactionLog::instance() || m_licenseMutex)
+    if (m_licenseMutex)
         return;
 
     QnCamLicenseUsageHelper helper;
@@ -580,10 +578,14 @@ void QnRecordingManager::at_checkLicenses()
             return; // do not report license problem immediately. Server should wait several minutes, probably other servers will be available soon
 
 
-        ec2::QnDbManager::instance()->markLicenseOverflow(true, qnSyncTime->currentMSecsSinceEpoch());
         qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->localInfo().data.prematureLicenseExperationDate;
-        if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < LICENSE_RECORDING_STOP_TIME)
+        if (licenseOverflowTime == 0) {
+            licenseOverflowTime = qnSyncTime->currentMSecsSinceEpoch();
+            QnAppServerConnectionFactory::getConnection2()->getMiscManager()->markLicenseOverflowSync(true, licenseOverflowTime);
+        }
+        if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < LICENSE_RECORDING_STOP_TIME) {
             return; // not enough license, but timeout not reached yet
+        }
 
         // Too many licenses. check if server has own recording cameras and force to disable recording
         QnResourceList ownCameras = getLocalControlledCameras();
@@ -603,7 +605,9 @@ void QnRecordingManager::at_checkLicenses()
         }
     }
     else {
-        ec2::QnDbManager::instance()->markLicenseOverflow(false, 0);
+        qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->localInfo().data.prematureLicenseExperationDate;
+        if (licenseOverflowTime)
+            QnAppServerConnectionFactory::getConnection2()->getMiscManager()->markLicenseOverflowSync(false, 0);
         m_tooManyRecordingCnt = 0;
     }
 }

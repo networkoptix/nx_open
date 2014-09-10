@@ -52,21 +52,20 @@ int QnCameraSettingsRestHandler::executeGet( const QString& path, const QnReques
     } cmdType;
     NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. Received request %1").arg(path), cl_logDEBUG1 );
 
+    QnRequestParamList locParams = params;
+
+    QnRequestParamList::iterator serverGuidIter = locParams.find(lit("x-server-guid"));
+    if (serverGuidIter != locParams.end())
+        locParams.erase(serverGuidIter);
+
     //TODO it would be nice to fill reasonPhrase too
-    if( params.empty() )
+    if( locParams.empty() )
         return HttpStatusCode::badRequest;
 
-    QnRequestParamList::const_iterator camIDIter = params.begin();
-    for( ;
-        camIDIter != params.end();
-        ++camIDIter )
+    QnRequestParamList::const_iterator camIDIter = locParams.find(lit("res_id"));
+    if( camIDIter == locParams.end() )
     {
-        if( camIDIter->first == "res_id" )
-            break;
-    }
-    if( camIDIter == params.end() )
-    {
-        NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. No res_id params in request %1. Ignoring...").arg(path), cl_logWARNING );
+        NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. No res_id param in request %1. Ignoring...").arg(path), cl_logWARNING );
         return HttpStatusCode::badRequest;
     }
     const QString& camID = camIDIter->second;
@@ -125,8 +124,8 @@ int QnCameraSettingsRestHandler::executeGet( const QString& path, const QnReques
             SLOT(asyncParamSetComplete(const QnResourcePtr &, const QString&, const QVariant&, bool)),
             Qt::DirectConnection );
     for( QnRequestParamList::const_iterator
-        it = params.begin();
-        it != params.end();
+        it = locParams.begin();
+        it != locParams.end();
         ++it )
     {
         if( it == camIDIter )

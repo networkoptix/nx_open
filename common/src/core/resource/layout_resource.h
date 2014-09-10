@@ -15,7 +15,7 @@ class QnLayoutResource: public QnResource {
     typedef QnResource base_type;
 
 public:
-    QnLayoutResource();
+    QnLayoutResource(const QnResourceTypePool* resTypePool);
 
     QnLayoutResourcePtr clone() const;
 

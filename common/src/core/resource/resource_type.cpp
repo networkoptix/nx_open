@@ -202,6 +202,18 @@ QUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QS
     return QUuid();
 }
 
+QUuid QnResourceTypePool::getFixedResourceTypeId(const QString& name) const {
+    QUuid result = guidFromArbitraryData(name.toUtf8() + QByteArray("-"));
+
+#ifdef _DEBUG
+    QUuid online = getResourceTypeId(QString(), name, false);
+    if (!online.isNull())
+        Q_ASSERT(result == online);
+#endif
+
+    return result;
+}
+
 QUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, const QString& name) const
 {
     QMutexLocker lock(&m_mutex);

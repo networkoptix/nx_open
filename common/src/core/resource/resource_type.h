@@ -72,6 +72,9 @@ public:
     /* exact match name */
     QUuid getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning = true) const;
 
+    /* exact match name for fixed resourceTypes (Layout, Server, etc) */
+    QUuid getFixedResourceTypeId(const QString& name) const;
+
     /* match name using like operation */
     QUuid getLikeResourceTypeId(const QString& manufacture, const QString& name) const;
 
