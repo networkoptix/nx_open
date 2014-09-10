@@ -580,10 +580,15 @@ void QnRecordingManager::at_checkLicenses()
             return; // do not report license problem immediately. Server should wait several minutes, probably other servers will be available soon
 
 
-        ec2::QnDbManager::instance()->markLicenseOverflow(true, qnSyncTime->currentMSecsSinceEpoch());
         qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->localInfo().data.prematureLicenseExperationDate;
-        if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < LICENSE_RECORDING_STOP_TIME)
+        if (licenseOverflowTime == 0) {
+            licenseOverflowTime = qnSyncTime->currentMSecsSinceEpoch();
+            QnAppServerConnectionFactory::getConnection2()->getMiscManager()->markLicenseOverflowSync(true, licenseOverflowTime);
+        }
+        if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < LICENSE_RECORDING_STOP_TIME) {
+            emit notEnoughLicense();
             return; // not enough license, but timeout not reached yet
+        }
 
         // Too many licenses. check if server has own recording cameras and force to disable recording
         QnResourceList ownCameras = getLocalControlledCameras();
@@ -603,7 +608,7 @@ void QnRecordingManager::at_checkLicenses()
         }
     }
     else {
-        ec2::QnDbManager::instance()->markLicenseOverflow(false, 0);
+        QnAppServerConnectionFactory::getConnection2()->getMiscManager()->markLicenseOverflowSync(false, 0);
         m_tooManyRecordingCnt = 0;
     }
 }

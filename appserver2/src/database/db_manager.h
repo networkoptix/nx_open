@@ -174,7 +174,6 @@ namespace ec2
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiDiscoveryDataList& data);
 
 		// --------- misc -----------------------------
-        bool markLicenseOverflow(bool value, qint64 time);
         QUuid getID() const;
 
         ApiOjectType getObjectType(const QUuid& objectId);
@@ -322,6 +321,8 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseOverflowData> &);
+
         ErrorCode executeTransactionInternal(const QnTransaction<ApiSyncMarkerData> &) {
             return ErrorCode::notImplemented;
         }
@@ -423,7 +424,6 @@ namespace ec2
         int m_adminUserInternalID;
         ApiResourceTypeDataList m_cachedResTypes;
         bool m_licenseOverflowMarked;
-        qint64 m_licenseOverflowTime;
         QUuid m_dbInstanceId;
         bool m_initialized;
         /*

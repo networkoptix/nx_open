@@ -178,7 +178,6 @@ QUuid QnDbManager::getType(const QString& typeName)
 QnDbManager::QnDbManager()
 :
     m_licenseOverflowMarked(false),
-    m_licenseOverflowTime(0),
     m_initialized(false),
     m_tranStatic(m_sdbStatic, m_mutexStatic),
     m_needResyncLog(false)
@@ -318,16 +317,17 @@ bool QnDbManager::init(
     QSqlQuery query( m_sdb );
     query.prepare( "SELECT data from misc_data where key = ?" );
     query.addBindValue( LICENSE_EXPIRED_TIME_KEY );
+    qint64 licenseOverflowTime = 0;
     if( query.exec() && query.next() )
     {
-        m_licenseOverflowTime = query.value( 0 ).toByteArray().toLongLong();
-        m_licenseOverflowMarked = m_licenseOverflowTime > 0;
+        licenseOverflowTime = query.value( 0 ).toByteArray().toLongLong();
+        m_licenseOverflowMarked = licenseOverflowTime > 0;
     }
 
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-    if( localInfo.data.prematureLicenseExperationDate != m_licenseOverflowTime )
+    if( localInfo.data.prematureLicenseExperationDate != licenseOverflowTime )
     {
-        localInfo.data.prematureLicenseExperationDate = m_licenseOverflowTime;
+        localInfo.data.prematureLicenseExperationDate = licenseOverflowTime;
         QnRuntimeInfoManager::instance()->items()->updateItem( localInfo.uuid, localInfo );
     }
 
@@ -2947,29 +2947,28 @@ ErrorCode QnDbManager::removeLayoutFromVideowallItems(const QUuid &layout_id) {
     return ErrorCode::dbError;
 }
 
-bool QnDbManager::markLicenseOverflow(bool value, qint64 time)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseOverflowData>& tran)
 {
-    if (m_licenseOverflowMarked == value)
-        return true;
-    m_licenseOverflowMarked = value;
-    m_licenseOverflowTime = value ? time : 0;
+    if (m_licenseOverflowMarked == tran.params.value)
+        return ErrorCode::ok;
+    m_licenseOverflowMarked = tran.params.value;
 
     QSqlQuery query(m_sdb);
     query.prepare("INSERT OR REPLACE into misc_data (key, data) values(?, ?) ");
     query.addBindValue(LICENSE_EXPIRED_TIME_KEY);
-    query.addBindValue(QByteArray::number(m_licenseOverflowTime));
+    query.addBindValue(QByteArray::number(tran.params.time));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return false;
+        return ErrorCode::failure;
     }
 
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-    if (localInfo.data.prematureLicenseExperationDate != m_licenseOverflowTime) {
-        localInfo.data.prematureLicenseExperationDate = m_licenseOverflowTime;
+    if (localInfo.data.prematureLicenseExperationDate != tran.params.time) {
+        localInfo.data.prematureLicenseExperationDate = tran.params.time;
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
     
-    return true;
+    return ErrorCode::ok;
 }
 
 QUuid QnDbManager::getID() const
