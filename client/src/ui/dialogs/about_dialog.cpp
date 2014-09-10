@@ -27,6 +27,8 @@
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/style/globals.h>
 
+#include <utils/common/email.h>
+
 #include "openal/qtvaudiodevice.h"
 #include "version.h"
 
@@ -180,8 +182,13 @@ void QnAboutDialog::retranslateUi()
     ui->gpuLabel->setText(gpu);
     ui->serversLabel->setText(servers);
 
-    QString emailLink = lit("<a href=mailto:%1>%1</a>").arg(QnGlobalSettings::instance()->emailSettings().supportEmail);
-    ui->supportEmailLabel->setText(tr("<b>Email</b>: %1").arg(emailLink));
+    QString supportAddress = QnGlobalSettings::instance()->emailSettings().supportEmail;
+    QString supportLink = supportAddress;
+    if (QnEmail::isValid(supportAddress))
+        supportLink = lit("<a href=mailto:%1>%1</a>").arg(supportAddress);
+    else if (!supportAddress.isEmpty())
+        supportLink = lit("<a href=%1>%1</a>").arg(supportAddress);
+    ui->supportEmailLabel->setText(tr("<b>Support</b>: %1").arg(supportLink));
 }
 
 // -------------------------------------------------------------------------- //
