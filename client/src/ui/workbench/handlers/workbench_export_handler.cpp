@@ -528,7 +528,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         previousDir = qnSettings->mediaFolder();
 
     QString suggestion = replaceNonFileNameCharacters(layout->getName(), QLatin1Char('_'));
-    suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
+    suggestion = QnEnvironment::getUniqueFileName(previousDir, QFileInfo(suggestion).baseName());
 
     QString fileName;
     bool readOnly = false;
