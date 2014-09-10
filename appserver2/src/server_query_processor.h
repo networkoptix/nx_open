@@ -56,8 +56,7 @@ namespace ec2
             std::unique_ptr<QnDbManager::Locker> locker;
             if (ApiCommand::isPersistent(tran.command)) {
                 locker.reset(new QnDbManager::Locker(dbManager));
-                if (!tran.isLocal)
-                    tran.fillPersistentInfo();
+                tran.fillPersistentInfo();
             }
 
             auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){

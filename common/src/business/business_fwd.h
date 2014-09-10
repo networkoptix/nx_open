@@ -58,7 +58,8 @@ public:
         StorageIoErrorReason,
         StorageTooSlowReason,
         StorageFullReason,
-        LicenseRemoved
+        LicenseRemoved,
+        NotEnoughLicense
     };
 
     enum EventState {

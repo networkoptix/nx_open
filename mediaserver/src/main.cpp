@@ -1029,6 +1029,12 @@ void QnMain::at_connectionOpened()
     m_firstRunningTime = 0;
 }
 
+void QnMain::at_license_issue()
+{
+    qnBusinessRuleConnector->at_licenseIssueEvent(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch(),
+                                                  QnBusiness::NotEnoughLicense, QString());
+}
+
 void QnMain::at_timer()
 {
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
@@ -1529,6 +1535,7 @@ void QnMain::run()
     qnStorageMan->doMigrateCSVCatalog();
 
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
+    connect(QnRecordingManager::instance(), &QnRecordingManager::notEnoughLicense, this, &QnMain::at_license_issue);
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
