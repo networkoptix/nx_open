@@ -78,28 +78,19 @@ namespace detail{
 
 class UdtLibrary {
 public:
-    static UdtLibrary& GetInstance() {
-        static UdtLibrary kLib;
-        return kLib;
+    static void Initialize() {
+        std::call_once(kOnceFlag,&UdtLibrary::InitializeUdt);
     }
-    void Initialize() {
-        // We may use a 3 steps atomic lazy evaluation method. But that requires me to put
-        // to much code here, it won't worth so. If later on, it becomes the bottleneck, I
-        // can do the optimization for this double lock method here.
-        if(!initialized_) {
-            std::lock_guard<std::mutex> lock(mutex_);
-            if( initialized_ )
-                return;
-            else {
-                UDT::startup();
-                initialized_ = true;
-            }
-        }
+
+private:
+    static void InitializeUdt() {
+        UDT::startup();
     }
 private:
-    bool initialized_;
-    std::mutex mutex_;
+    static std::once_flag kOnceFlag;
 };
+
+std::once_flag UdtLibrary::kOnceFlag;
 
 void AddressFrom( const SocketAddress& local_addr , sockaddr_in* out ) {
     memset(out, 0, sizeof(*out));    // Zero out address structure
@@ -126,7 +117,7 @@ public:
         ESTABLISHED
     };
     UdtSocketImpl(): handler_( UDT::INVALID_SOCK ) , state_(CLOSED) {
-        UdtLibrary::GetInstance().Initialize();
+        UdtLibrary::Initialize();
     }
     UdtSocketImpl( UDTSOCKET socket, int state ) : handler_(socket),state_(state){}
     ~UdtSocketImpl() {
