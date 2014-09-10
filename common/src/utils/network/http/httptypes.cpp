@@ -1001,6 +1001,96 @@ namespace nx_http
 
             return totalLength;
         }
+
+
+        //////////////////////////////////////////////
+        //   Via
+        //////////////////////////////////////////////
+
+        bool Via::parse( const nx_http::StringType& strValue )
+        {
+            if( strValue.isEmpty() )
+                return true;
+
+            //introducing loop counter to guarantee method finiteness in case of bug in code
+            for( size_t curEntryEnd = nx_http::find_first_of(strValue, ","), curEntryStart = 0, i = 0;
+                curEntryStart != -1 && (i < 1000);
+                curEntryStart = (curEntryEnd == -1 ? curEntryEnd : curEntryEnd+1), curEntryEnd = nx_http::find_first_of(strValue, ",", curEntryEnd+1), ++i )
+            {
+                ProxyEntry entry;
+
+                //skipping spaces at the start of entry
+                while( (strValue.at(curEntryStart) == ' ') && (curEntryStart < (curEntryEnd == -1 ? strValue.size() : curEntryEnd)) )
+                    ++curEntryStart;
+
+                //curEntryStart points first char after comma
+                size_t receivedProtoEnd = nx_http::find_first_of( strValue, " ", curEntryStart );
+                if( receivedProtoEnd == nx_http::BufferNpos )
+                    return false;
+                ConstBufferRefType protoNameVersion( strValue, curEntryStart, receivedProtoEnd-curEntryStart );
+                size_t nameVersionSep = nx_http::find_first_of( protoNameVersion, "/" );
+                if( nameVersionSep == nx_http::BufferNpos )
+                {
+                    //only version present
+                    entry.protoVersion = protoNameVersion;
+                }
+                else
+                {
+                    entry.protoName = protoNameVersion.mid( 0, nameVersionSep );
+                    entry.protoVersion = protoNameVersion.mid( nameVersionSep+1 );
+                }
+
+                size_t receivedByStart = nx_http::find_first_not_of( strValue, " ", receivedProtoEnd+1 );
+                if( receivedByStart == nx_http::BufferNpos || receivedByStart > curEntryEnd )
+                    return false;   //no receivedBy field
+
+                size_t receivedByEnd = nx_http::find_first_of( strValue, " ", receivedByStart );
+                if( receivedByEnd == nx_http::BufferNpos || (receivedByEnd > curEntryEnd) )
+                {
+                    receivedByEnd = curEntryEnd;
+                }
+                else
+                {
+                    //comment present
+                    size_t commentStart = nx_http::find_first_not_of( strValue, " ", receivedByEnd+1 );
+                    if( commentStart != nx_http::BufferNpos && commentStart < curEntryEnd )
+                        entry.comment = strValue.mid( commentStart, curEntryEnd == nx_http::BufferNpos ? -1 : (curEntryEnd-commentStart) ); //space are allowed in comment
+                }
+                entry.receivedBy = strValue.mid( receivedByStart, receivedByEnd-receivedByStart );
+
+                entries.push_back( entry );
+            }
+
+            return true;
+        }
+
+        StringType Via::toString() const
+        {
+            StringType result;
+
+            //TODO #ak estimate required buffer size and allocate in advance
+
+            for( const ProxyEntry& entry: entries )
+            {
+                if( !result.isEmpty() )
+                    result += ", ";
+
+                if( entry.protoName )
+                {
+                    result += entry.protoName.get();
+                    result += "/";
+                }
+                result += entry.protoVersion;
+                result += ' ';
+                result += entry.receivedBy;
+                if( !entry.comment.isEmpty() )
+                {
+                    result += ' ';
+                    result += entry.comment;
+                }
+            }
+            return result;
+        }
     }
 
 

@@ -76,6 +76,8 @@ namespace ec2
                 errorCode = dbManager->executeTransactionNoLock( tran, serializedTran );
                 if( errorCode != ErrorCode::ok )
                 {
+                    tran.cancel(); // it's possible for single thread processing mode only. for MT mode transaction should be modified to filler transaction instead of reverting sequence
+
                     if( errorCode == ErrorCode::skipped )
                         errorCode = ErrorCode::ok;
                     return;
@@ -194,6 +196,8 @@ namespace ec2
 
                 QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
                 errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
+                if (errorCode != ErrorCode::ok)
+                    tran.cancel(); // it's possible for single thread processing mode only. for MT mode transaction should be modified to filler transaction instead of reverting sequence
 				if (errorCode == ErrorCode::skipped)
 					continue;
                 if( errorCode != ErrorCode::ok )
@@ -209,6 +213,8 @@ namespace ec2
                 errorCode = ErrorCode::ok;
                 QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(multiTran);
                 errorCode = dbManager->executeTransactionNoLock(multiTran, serializedTran);
+                if (errorCode != ErrorCode::ok)
+                    multiTran.cancel(); // it's possible for single thread processing mode only. for MT mode transaction should be modified to filler transaction instead of reverting sequence
                 if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
                     return;
                 processMultiTran = (errorCode == ErrorCode::ok);

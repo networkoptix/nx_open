@@ -46,8 +46,7 @@ QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *c
 {
     connect(m_configureTask,            &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_configureTask_finished);
     connect(m_waitTask,                 &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_waitTask_finished);
-    // queued connection is used to be sure that we'll get this signal AFTER it will be handled by update dialog
- //   connect(m_updateTool,               &QnMediaServerUpdateTool::stateChanged,     this,       &QnConnectToCurrentSystemTool::at_updateTool_stateChanged, Qt::QueuedConnection);
+    connect(m_updateTool,               &QnMediaServerUpdateTool::updateFinished,   this,       &QnConnectToCurrentSystemTool::at_updateTool_finished);
 }
 
 QnConnectToCurrentSystemTool::~QnConnectToCurrentSystemTool() {}
@@ -119,7 +118,7 @@ void QnConnectToCurrentSystemTool::configureServer() {
 
         QUrl url = server->apiConnection()->url();
         m_oldUrls.insert(id, url);
-        url.setScheme(lit("https"));
+        url.setScheme(lit("http")); // TODO: #dklychkov Fix a bug in QNetworkAccessManager and use https
         url.setUserName(lit("admin"));
         url.setPassword(m_password);
         server->apiConnection()->setUrl(url);
@@ -146,8 +145,7 @@ void QnConnectToCurrentSystemTool::updatePeers() {
 
     m_updateFailed = false;
     m_updateTool->setTargets(m_updateTargets);
-    m_prevToolState = CheckingForUpdates;
-    m_updateTool->checkForUpdates(QnSoftwareVersion(), true);
+    m_updateTool->startUpdate(QnSoftwareVersion(), true);
 }
 
 void QnConnectToCurrentSystemTool::revertApiUrls() {
@@ -201,34 +199,13 @@ void QnConnectToCurrentSystemTool::at_waitTask_finished(int errorCode) {
     updatePeers();
 }
 
-void QnConnectToCurrentSystemTool::at_updateTool_stateChanged(int state) {
+void QnConnectToCurrentSystemTool::at_updateTool_finished(const QnUpdateResult &result) {
     if (!m_running)
         return;
 
-/*
-    if (state != QnMediaServerUpdateTool::Idle)
-        return;
-*/
-
-    if (m_prevToolState == CheckingForUpdates) {
-    /*    switch (m_updateTool->updateCheckResult()) {
-        case QnCheckForUpdateResult::UpdateFound:
-            m_prevToolState = Updating;
-            m_updateTool->updateServers();
-            return;
-        case QnCheckForUpdateResult::NoNewerVersion:
-            break;
-        default:
-            m_updateFailed = true;
-            break;
-        }*/
-    } else if (m_prevToolState == Updating) {
-/*        m_updateFailed = (m_updateTool->updateResult() != QnUpdateResult::Successful);*/
-    }
-
-    finish(m_updateFailed ? UpdateFailed : NoError);
+    finish(result.result == QnUpdateResult::Successful ? NoError : UpdateFailed);
 }
 
 void QnConnectToCurrentSystemTool::at_updateTool_progressChanged(int progress) {
-    emit progressChanged(waitProgress + progress / 2);
+    emit progressChanged(waitProgress + progress * static_cast<int>(QnFullUpdateStage::Count) / 100 / 2);
 }
