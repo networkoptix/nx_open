@@ -177,14 +177,14 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode, const QnMediaServerResourceList& servers)
         */
-        template<class TargetType, class HandlerType> int getServers( TargetType* target, HandlerType handler ) {
-            return getServers( std::static_pointer_cast<impl::GetServersHandler>(std::make_shared<impl::CustomGetServersHandler<TargetType, HandlerType>>(target, handler)) );
+        template<class TargetType, class HandlerType> int getServers( const QUuid& mediaServerId,  TargetType* target, HandlerType handler ) {
+            return getServers(mediaServerId, std::static_pointer_cast<impl::GetServersHandler>(std::make_shared<impl::CustomGetServersHandler<TargetType, HandlerType>>(target, handler)) );
         }
         
-        ErrorCode getServersSync(QnMediaServerResourceList* const serverList ) {
+        ErrorCode getServersSync( const QUuid& mediaServerId, QnMediaServerResourceList* const serverList ) {
             return impl::doSyncCall<impl::GetServersHandler>( 
                 [=](const impl::GetServersHandlerPtr &handler) {
-                    return this->getServers(handler);
+                    return this->getServers(mediaServerId, handler);
                 }, 
                 serverList 
             );
@@ -217,7 +217,7 @@ namespace ec2
         void addedOrUpdated( QnMediaServerResourcePtr camera );
         void removed( QUuid id );
     protected:
-        virtual int getServers( impl::GetServersHandlerPtr handler ) = 0;
+        virtual int getServers( const QUuid& mediaServerId,  impl::GetServersHandlerPtr handler ) = 0;
         virtual int save( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) = 0;
         virtual int remove( const QUuid& id, impl::SimpleHandlerPtr handler ) = 0;
     };

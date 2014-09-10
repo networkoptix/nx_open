@@ -518,7 +518,7 @@ QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Conn
 
     while (servers.isEmpty() && !needToStop())
     {
-        ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->getServersSync( &servers);
+        ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->getServersSync(QUuid(), &servers);
         if( rez == ec2::ErrorCode::ok )
             break;
 
@@ -850,7 +850,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
     {
         //reading servers list
         QnMediaServerResourceList mediaServerList;
-        while( ec2Connection->getMediaServerManager()->getServersSync( &mediaServerList) != ec2::ErrorCode::ok )
+        while( ec2Connection->getMediaServerManager()->getServersSync(QUuid(), &mediaServerList) != ec2::ErrorCode::ok )
         {
             NX_LOG( lit("QnMain::run(). Can't get servers."), cl_logERROR );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
