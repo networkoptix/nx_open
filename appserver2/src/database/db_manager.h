@@ -87,6 +87,8 @@ namespace ec2
             ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
                 return result;
+            if (tran.isLocal)
+                return ErrorCode::ok;
             return transactionLog->saveTransaction( tran, serializedTran);
         }
 
