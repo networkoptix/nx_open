@@ -8,6 +8,34 @@
 #include <utils/network/http/httptypes.h>
 
 
+namespace nx_http
+{
+    namespace header
+    {
+        void PrintTo(const Via& val, ::std::ostream* os)
+        {
+            PrintTo( val.toString(), os );
+        }
+
+        bool operator==( const Via::ProxyEntry& left, const Via::ProxyEntry& right )
+        {
+            return left.protoName == right.protoName &&
+                   left.protoVersion == right.protoVersion&&
+                   left.receivedBy == right.receivedBy &&
+                   left.comment == right.comment;
+        }
+
+        bool operator==( const Via& left, const Via& right )
+        {
+            return left.entries == right.entries;
+        }
+    }
+}
+
+//////////////////////////////////////////////
+//   Range header tests
+//////////////////////////////////////////////
+
 TEST( HttpRangeHeaderTest, parse )
 {
     nx_http::header::Range range;
@@ -119,4 +147,128 @@ TEST( HttpRangeHeaderTest, totalRangeLength )
     EXPECT_EQ( range.totalRangeLength(1000), 1 );
     EXPECT_EQ( range.totalRangeLength(1), 1 );
     EXPECT_EQ( range.totalRangeLength(0), 0 );
+}
+
+
+//////////////////////////////////////////////
+//   Via header tests
+//////////////////////////////////////////////
+
+TEST( HttpViaHeaderTest, parse )
+{
+    nx_http::header::Via via;
+    EXPECT_TRUE( via.parse("1.0 fred, 1.1 nowhere.com (Apache/1.1)") );
+    EXPECT_EQ( via.entries.size(), 2 );
+    EXPECT_FALSE( via.entries[0].protoName );
+    EXPECT_EQ( via.entries[0].protoVersion, QByteArray("1.0") );
+    EXPECT_EQ( via.entries[0].receivedBy, QByteArray("fred") );
+    EXPECT_TRUE( via.entries[0].comment.isEmpty() );
+    EXPECT_EQ( via.entries[1].protoVersion, QByteArray("1.1") );
+    EXPECT_EQ( via.entries[1].receivedBy, QByteArray("nowhere.com") );
+    EXPECT_EQ( via.entries[1].comment, QByteArray("(Apache/1.1)") );
+
+
+    via.entries.clear();
+    EXPECT_TRUE( via.parse("1.0 ricky, 1.1 ethel, 1.1 fred, 1.0 lucy") );
+    EXPECT_EQ( via.entries.size(), 4 );
+    EXPECT_FALSE( via.entries[0].protoName );
+    EXPECT_EQ( via.entries[0].protoVersion, QByteArray("1.0") );
+    EXPECT_EQ( via.entries[0].receivedBy, QByteArray("ricky") );
+    EXPECT_TRUE( via.entries[0].comment.isEmpty() );
+    EXPECT_FALSE( via.entries[1].protoName );
+    EXPECT_EQ( via.entries[1].protoVersion, QByteArray("1.1") );
+    EXPECT_EQ( via.entries[1].receivedBy, QByteArray("ethel") );
+    EXPECT_TRUE( via.entries[1].comment.isEmpty() );
+    EXPECT_FALSE( via.entries[2].protoName );
+    EXPECT_EQ( via.entries[2].protoVersion, QByteArray("1.1") );
+    EXPECT_EQ( via.entries[2].receivedBy, QByteArray("fred") );
+    EXPECT_TRUE( via.entries[2].comment.isEmpty() );
+    EXPECT_FALSE( via.entries[3].protoName );
+    EXPECT_EQ( via.entries[3].protoVersion, QByteArray("1.0") );
+    EXPECT_EQ( via.entries[3].receivedBy, QByteArray("lucy") );
+    EXPECT_TRUE( via.entries[3].comment.isEmpty() );
+
+
+    via.entries.clear();
+    EXPECT_TRUE( via.parse("HTTP/1.0 ricky") );
+    EXPECT_EQ( via.entries.size(), 1 );
+    EXPECT_EQ( via.entries[0].protoName, QByteArray("HTTP") );
+    EXPECT_EQ( via.entries[0].protoVersion, QByteArray("1.0") );
+    EXPECT_EQ( via.entries[0].receivedBy, QByteArray("ricky") );
+
+
+    via.entries.clear();
+    EXPECT_FALSE( via.parse("HTTP/1.0, hren") );
+
+
+    via.entries.clear();
+    EXPECT_TRUE( via.parse("") );
+
+
+    via.entries.clear();
+    EXPECT_FALSE( via.parse("h") );
+
+
+    via.entries.clear();
+    EXPECT_TRUE( via.parse("h g") );
+    EXPECT_EQ( via.entries.size(), 1 );
+    EXPECT_FALSE( via.entries[0].protoName );
+    EXPECT_EQ( via.entries[0].protoVersion, QByteArray("h") );
+    EXPECT_EQ( via.entries[0].receivedBy, QByteArray("g") );
+    EXPECT_TRUE( via.entries[0].comment.isEmpty() );
+
+
+    via.entries.clear();
+    EXPECT_TRUE( via.parse("  h  g   ,    h   z   mm , p/v  ps") );
+    EXPECT_EQ( via.entries.size(), 3 );
+    EXPECT_FALSE( via.entries[0].protoName );
+    EXPECT_EQ( via.entries[0].protoVersion, QByteArray("h") );
+    EXPECT_EQ( via.entries[0].receivedBy, QByteArray("g") );
+    EXPECT_TRUE( via.entries[0].comment.isEmpty() );
+    EXPECT_FALSE( via.entries[1].protoName );
+    EXPECT_EQ( via.entries[1].protoVersion, QByteArray("h") );
+    EXPECT_EQ( via.entries[1].receivedBy, QByteArray("z") );
+    EXPECT_EQ( via.entries[1].comment, QByteArray("mm ") );
+    EXPECT_EQ( via.entries[2].protoName.get(), QByteArray("p") );
+    EXPECT_EQ( via.entries[2].protoVersion, QByteArray("v") );
+    EXPECT_EQ( via.entries[2].receivedBy, QByteArray("ps") );
+    EXPECT_TRUE( via.entries[2].comment.isEmpty() );
+
+
+    via.entries.clear();
+    EXPECT_TRUE( via.parse("1.0 fred, 1.1 nowhere.com (Apache/1.1) Commanch Whooyanch") );
+    EXPECT_EQ( via.entries.size(), 2 );
+    EXPECT_FALSE( via.entries[0].protoName );
+    EXPECT_EQ( via.entries[0].protoVersion, QByteArray("1.0") );
+    EXPECT_EQ( via.entries[0].receivedBy, QByteArray("fred") );
+    EXPECT_TRUE( via.entries[0].comment.isEmpty() );
+    EXPECT_EQ( via.entries[1].protoVersion, QByteArray("1.1") );
+    EXPECT_EQ( via.entries[1].receivedBy, QByteArray("nowhere.com") );
+    EXPECT_EQ( via.entries[1].comment, QByteArray("(Apache/1.1) Commanch Whooyanch") );
+}
+
+TEST( HttpViaHeaderTest, toString )
+{
+    nx_http::header::Via via;
+    nx_http::header::Via::ProxyEntry entry;
+    entry.protoVersion = "1.0";
+    entry.receivedBy = "{bla-bla-bla}";
+    via.entries.push_back( entry );
+
+    entry.protoName = "HTTP";
+    entry.protoVersion = "1.0";
+    entry.receivedBy = "{bla-bla-bla-bla}";
+    via.entries.push_back( entry );
+
+    entry.protoName = "HTTP";
+    entry.protoVersion = "1.1";
+    entry.receivedBy = "{blya-blya-blya-blya}";
+    entry.comment = "qweasd123";
+    via.entries.push_back( entry );
+
+    EXPECT_EQ( via.toString(), QByteArray("1.0 {bla-bla-bla}, HTTP/1.0 {bla-bla-bla-bla}, HTTP/1.1 {blya-blya-blya-blya} qweasd123") );
+
+    nx_http::header::Via via2;
+    EXPECT_TRUE( via2.parse( via.toString() ) );
+    EXPECT_EQ( via, via2 );
 }
