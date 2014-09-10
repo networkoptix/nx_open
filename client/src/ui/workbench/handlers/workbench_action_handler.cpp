@@ -1374,10 +1374,9 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const int matrixWidth = qMax(1, qRound(std::sqrt(desiredAspectRatio * itemCount)));
 
     /* Construct and add a new layout. */
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
     layout->setId(QUuid::createUuid());
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
-    layout->setTypeByName(lit("Layout"));
     if(context()->user())
         layout->setParentId(context()->user()->getId());
 

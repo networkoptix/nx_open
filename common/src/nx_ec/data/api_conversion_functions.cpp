@@ -328,7 +328,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.servers, dst.resources, ctx);
     fromApiToResourceList(src.cameras, dst.resources, ctx.resFactory);
     fromApiToResourceList(src.users, dst.resources);
-    fromApiToResourceList(src.layouts, dst.resources);
+    fromApiToResourceList(src.layouts, dst.resources, ctx);
     fromApiToResourceList(src.videowalls, dst.resources);
     fromApiToResourceList(src.licenses, dst.licenses);
     fromApiToResourceList(src.rules, dst.bRules, ctx.pool);
@@ -412,21 +412,21 @@ void fromResourceToApi(const QnLayoutResourcePtr &src, ApiLayoutData &dst) {
 }
 
 template<class List>
-void fromApiToResourceList(const ApiLayoutDataList &src, List &dst, const overload_tag &) {
+void fromApiToResourceList(const ApiLayoutDataList &src, List &dst, const ResourceContext &ctx, const overload_tag &) {
     dst.reserve(dst.size() + (int)src.size());
     for(const ApiLayoutData &srcLayout: src) {
-        QnLayoutResourcePtr dstLayout(new QnLayoutResource());
+        QnLayoutResourcePtr dstLayout(new QnLayoutResource(ctx.resTypePool));
         fromApiToResource(srcLayout, dstLayout);
         dst.push_back(dstLayout);
     }
 }
 
-void fromApiToResourceList(const ApiLayoutDataList &src, QnResourceList &dst) {
-    fromApiToResourceList(src, dst, overload_tag());
+void fromApiToResourceList(const ApiLayoutDataList &src, QnResourceList &dst, const ResourceContext &ctx) {
+    fromApiToResourceList(src, dst, ctx, overload_tag());
 }
 
-void fromApiToResourceList(const ApiLayoutDataList &src, QnLayoutResourceList &dst) {
-    fromApiToResourceList(src, dst, overload_tag());
+void fromApiToResourceList(const ApiLayoutDataList &src, QnLayoutResourceList &dst, const ResourceContext &ctx) {
+    fromApiToResourceList(src, dst, ctx, overload_tag());
 }
 
 void fromResourceListToApi(const QnLayoutResourceList &src, ApiLayoutDataList &dst) {
@@ -602,9 +602,9 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
 void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
     dst->setId(src.id);
     //dst->setGuid(guid);
+    dst->setName(src.name);
     dst->setTypeId(src.typeId);
     dst->setParentId(src.parentId);
-    dst->setName(src.name);
     dst->setUrl(src.url);
     dst->setStatus(src.status, true);
 

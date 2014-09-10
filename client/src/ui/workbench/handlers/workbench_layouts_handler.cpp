@@ -219,9 +219,8 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
 
     QnLayoutResourcePtr newLayout;
 
-    newLayout = QnLayoutResourcePtr(new QnLayoutResource());
+    newLayout = QnLayoutResourcePtr(new QnLayoutResource(qnResTypePool));
     newLayout->setId(QUuid::createUuid());
-    newLayout->setTypeByName(lit("Layout"));
     newLayout->setName(name);
     newLayout->setParentId(user->getId());
     newLayout->setCellSpacing(layout->cellSpacing());
@@ -531,9 +530,8 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
         }
     } while (button != QMessageBox::Yes);
 
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
     layout->setId(QUuid::createUuid());
-    layout->setTypeByName(lit("Layout"));
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
     layout->setUserCanEdit(context()->user() == user);
