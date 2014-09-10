@@ -65,11 +65,6 @@ void QnRoutingManagementWidget::updateFromSettings() {
 }
 
 void QnRoutingManagementWidget::updateModel(const QnMediaServerResourcePtr &server) {
-    if (server == m_server)
-        return;
-
-    m_server = server;
-
     if (!server) {
         m_serverAddressesModel->clear();
         return;
@@ -167,7 +162,12 @@ void QnRoutingManagementWidget::at_serversView_currentIndexChanged(const QModelI
     if (m_server)
         disconnect(m_server, NULL, this, NULL);
 
+
     QnMediaServerResourcePtr server = current.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnMediaServerResource>();
+    if (server == m_server)
+        return;
+
+    m_server = server;
     updateModel(server);
 
     if (server) {
