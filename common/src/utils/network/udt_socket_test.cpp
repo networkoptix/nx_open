@@ -10,6 +10,7 @@
 #include <random>
 #include <ctime>
 #include <iostream>
+#include <atomic>
 
 #include <QCoreApplication>
 #include <QCommandLineParser>
@@ -61,8 +62,31 @@ private:
     std::mutex mutex_;
 };
 
-// Events 
+class Ticker {
+public:
+    Ticker() : 
+        last_schedule_time_(-1),
+        frequency_(-1) {}
+    void SetUp( std::function<void()>&& callback , std::uint32_t frequency ) {
+        callback_ = std::move(callback);
+        last_schedule_time_ = 0;
+        frequency_ = frequency;
+    }
+    void Tick( std::uint32_t time_offset ) {
+        Q_ASSERT(last_schedule_time_ != -1 && frequency_ != -1);
+        last_schedule_time_ += time_offset;
+        if( last_schedule_time_ >= frequency_ ) {
+            last_schedule_time_ -= frequency_;
+            callback_();
+        }
+    }
+private:
+    std::function<void()> callback_;
+    std::uint32_t last_schedule_time_;
+    std::uint32_t frequency_;
+};
 
+// Events 
 enum {
     PENDING_EV_READ,
     PENDING_EV_WRITE,
@@ -111,9 +135,21 @@ struct Accept : public PendingEvent {
 };
 
 struct Close : public PendingEvent {
-    std::function<void(UdtStreamSocket*)> callback;
+    enum {
+        SERVER,
+        CLIENT
+    };
+    int socket_type;
+    std::function<void(UdtStreamSocket*)> callback_client;
+    std::function<void(UdtStreamServerSocket*)> callback_server;
     Close( std::function<void(UdtStreamSocket*)>&& cb , UdtStreamSocket* socket ) :
-        callback(std::move(cb)) , PendingEvent( PENDING_EV_CLOSE , socket ) {}
+        socket_type(CLIENT),
+        callback_client(std::move(cb)) , 
+        PendingEvent( PENDING_EV_CLOSE , socket ) {}
+    Close( std::function<void(UdtStreamServerSocket*)>&& cb , UdtStreamServerSocket* socket ) :
+        socket_type(SERVER),
+        callback_server(std::move(cb)) , 
+        PendingEvent( PENDING_EV_CLOSE , socket ) {}
 };
 
 struct ShutdownWorker : public PendingEvent {
@@ -147,9 +183,6 @@ private:
     void HandleConnect( Connect* connect );
     void HandleAccept( Accept* accept );
     void HandleClose( Close* close );
-    void DeleteSocket( UdtStreamSocket* socket ) {
-        delete socket;
-    }
     void ThreadMain();
 private:
     std::mutex mutex_;
@@ -201,6 +234,7 @@ public:
     Proactor() :
         quit_(false),
         finger_(0){}
+public:
     void NotifyRead( UdtStreamSocket* socket , std::function<void(UdtStreamSocket*,const std::vector<char>&,bool)>&& callback ) {
         queue_.Push(  new Read(std::move(callback),socket) );
     }
@@ -217,7 +251,10 @@ public:
         queue_.Push( new Connect(std::move(callback),socket) );
     }
     void NotifyClose( UdtStreamSocket* socket , std::function<void(UdtStreamSocket*)>&& callback ) {
-         queue_.Push( new Close(std::move(callback),socket) );
+        queue_.Push( new Close(std::move(callback),socket) );
+    }
+    void NotifyClose( UdtStreamServerSocket* socket , std::function<void(UdtStreamServerSocket*)>&& callback ) {
+        queue_.Push( new Close(std::move(callback),socket) );
     }
     bool Run( std::size_t thread_pool_size , int timeout , std::function<void()>&& on_idel = std::function<void()>() );
     void Quit();
@@ -272,12 +309,12 @@ void Proactor::PreparePendingIO() {
 void Proactor::ExecutePendingIO() {
     UdtPollSet::const_iterator ib = reactor_.begin();
     for( ; ib != reactor_.end() ; ++ib ) {
-        void* user_data = ib.userData();
-        // Remove the descriptor 
-        reactor_.remove( ib.socket() , ib.eventType() );
-        // Schedule the completion IO operation
-        ScheduleNextIOCompletionHandle()->PostPendingEvent(
-            reinterpret_cast<PendingEvent*>(user_data));
+        PendingEvent* pending_event = reinterpret_cast<PendingEvent*>(ib.userData());
+        // Remove it from the poller
+        reactor_.remove(ib.socket(),ib.eventType());
+        // Blocked the pending object but we don't remove FD 
+        // which allow us not to lose any single event here.
+        ScheduleNextIOCompletionHandle()->PostPendingEvent(pending_event);
     }
 }
 
@@ -370,23 +407,21 @@ void CompletionHandleWorker::HandleAccept( Accept* ptr ) {
     UdtStreamServerSocket* server = static_cast<UdtStreamServerSocket*>(accept->socket);
     // accept as much as possible here
     std::vector<UdtStreamSocket*> accept_sockets;
-    do {
-        // The UDT has bug, it doesn't remove the accepted sockets, I don't know
-        // why I cannot call the server->accept in a loop instead of painfully let
-        // poll notify us and get only _ONE_ 
-        UdtStreamSocket* socket = static_cast<UdtStreamSocket*>(server->accept());
-        if( socket != NULL ) {
-            accept_sockets.push_back(socket);
-            socket->setNonBlockingMode(true);
+    // The UDT has bug, it doesn't remove the accepted sockets, I don't know
+    // why I cannot call the server->accept in a loop instead of painfully let
+    // poll notify us and get only _ONE_ 
+    UdtStreamSocket* socket = static_cast<UdtStreamSocket*>(server->accept());
+    if( socket != NULL ) {
+        accept_sockets.push_back(socket);
+        socket->setNonBlockingMode(true);
+    } else {
+        if( accept_sockets.empty() ) {
+            accept->callback(server,accept_sockets,false);
         } else {
-            if( accept_sockets.empty() ) {
-                accept->callback(server,accept_sockets,false);
-            } else {
-                accept->callback(server,accept_sockets,true);
-            }
-            return;
+            accept->callback(server,accept_sockets,true);
         }
-    } while(true);
+        return;
+    }
 }
 
 void CompletionHandleWorker::HandleConnect( Connect* ptr ) {
@@ -398,9 +433,15 @@ void CompletionHandleWorker::HandleConnect( Connect* ptr ) {
 
 void CompletionHandleWorker::HandleClose( Close* ptr ) {
     std::unique_ptr<Close> close(ptr);
-    UdtStreamSocket* socket = static_cast<UdtStreamSocket*>(close->socket);
-    socket->close();
-    close->callback(socket);
+    if( ptr->socket_type == Close::CLIENT ) {
+        UdtStreamSocket* socket = static_cast<UdtStreamSocket*>(close->socket);
+        socket->close();
+        close->callback_client(socket);
+    } else {
+        UdtStreamServerSocket* socket = static_cast<UdtStreamServerSocket*>(close->socket);
+        socket->close();
+        close->callback_server(socket);
+    }
 }
 
 // Configuration or client/server
@@ -437,11 +478,15 @@ struct ClientConfig {
 class UdtSocketProfileServer : public UdtSocketProfile {
 public:
     UdtSocketProfileServer( const ServerConfig& config ) :
-     thread_size_(config.thread_size),
-     address_(config.address),
-     port_(config.port),
-     current_conn_size_(0) { }
+        thread_size_(config.thread_size),
+        address_(config.address),
+        port_(config.port),
+        current_conn_size_(0) {
+    }
     virtual bool run() {
+        // Set up the print statistic function callback 
+        ticker_.SetUp( std::bind(&UdtSocketProfileServer::PrintStatistic,this),kPrintStatisticFrequency );
+        // Set up the listen fd
         server_socket_.setNonBlockingMode(true);
         if( !server_socket_.bind(SocketAddress( HostAddress(address_) , port_ ) ) ) 
             return false;
@@ -451,7 +496,7 @@ public:
         std::cout<<"The server("
             <<address_.toStdString()<<":"<<port_<<")"
             <<"starts listening!"<<std::endl;
-
+        // Start accept
         proactor_.NotifyAccept(&server_socket_,
             std::bind(
             &UdtSocketProfileServer::OnAccept,
@@ -459,11 +504,13 @@ public:
             std::placeholders::_1,
             std::placeholders::_2,
             std::placeholders::_3));
-        static const int kMaximumSleepTime = 400;
+        PrintStatistic();
+        // Block into the poll
         return proactor_.Run( thread_size_ , kMaximumSleepTime ,
             std::bind(
-            &UdtSocketProfileServer::PrintStatistic,
-            this));
+            &Ticker::Tick,
+            &ticker_,
+            kMaximumSleepTime));
     }
     virtual void quit() {
         proactor_.Quit();
@@ -478,7 +525,7 @@ private:
             std::placeholders::_1));
     }
     void OnAccept( UdtStreamServerSocket* server , const std::vector<UdtStreamSocket*>& conn , bool ok ) {
-        // Register Read callback
+        // Register read callback
         if(ok) {
             for( std::size_t i = 0 ; i < conn.size() ; ++i ) {
                 proactor_.NotifyRead(
@@ -502,7 +549,7 @@ private:
             std::placeholders::_3));
     }
     void OnRead( UdtStreamSocket* conn , const std::vector<char>& read , bool ok ) {
-        // ignore what we have read.
+        // Ignore what we have read.
         Q_UNUSED(read);
         if( !ok ) {
             HandleError(conn);
@@ -529,6 +576,8 @@ private:
         std::cout<<"===================================================="<<std::endl;
     }
 private:
+    static const int kMaximumSleepTime = 400;
+    static const std::uint32_t kPrintStatisticFrequency = 5000;
     // Server socket
     UdtStreamServerSocket server_socket_;
     // Proactor
@@ -539,7 +588,8 @@ private:
     int port_;
     // Statistic 
     int current_conn_size_;
-
+    // Ticker
+    Ticker ticker_;
 };
 
 namespace {
@@ -594,18 +644,23 @@ public:
         maximum_allowed_content_(config.content_max_size),
         minimum_allowed_content_(config.content_min_size),
         maximum_allowed_concurrent_connection_(config.maximum_connection_size),
-        active_conn_sockets_size_(0){
+        active_conn_sockets_size_(0),
+        closed_conn_socket_size_(0),
+        failed_connection_size_(0){
             prev_position_ = sleep_list_.begin();
     }
+
     virtual bool run() {
-        static const int kMaximumSleepTime = 200;
+        ticker_.SetUp(std::bind(&UdtSocketProfileClient::PrintStatistic,this),kPrintStatisticFrequency);
         ScheduleConnection();
         std::cout<<"The client starts running!"<<std::endl;
+        PrintStatistic();
         return proactor_.Run( thread_size_ , kMaximumSleepTime , 
             std::bind(
             &UdtSocketProfileClient::OnIdle,
             this));
     }
+
 private:
     void HandleError( UdtStreamSocket* socket ) {
         proactor_.NotifyClose(socket,
@@ -651,22 +706,25 @@ private:
     void OnClose( UdtStreamSocket* socket ) {
         delete socket;
         --active_conn_sockets_size_;
+        ++closed_conn_socket_size_;
     }
 
 private:
     // Socket simulation schedule function
     void OnIdle() {
         DoSchedule();
-        PrintStatistic();
+        ticker_.Tick(kMaximumSleepTime);
     }
     void PrintStatistic() {
         std::cout<<"====================================================\n";
         std::cout<<"Active connection:"<<active_conn_sockets_size_<<"\n";
+        std::cout<<"Closed connection:"<<closed_conn_socket_size_<<"\n";
+        std::cout<<"Failed connection:"<<failed_connection_size_<<"\n";
         std::cout<<"===================================================="<<std::endl;
     }
     void DoSchedule() {
         ScheduleSleepSockets();
-        ScheduleConnection();
+        //ScheduleConnection();
     }
     void ScheduleSleepSockets();
     bool ScheduleSleepSocket( UdtStreamSocket* socket ) {
@@ -698,6 +756,8 @@ private:
     }
 
 private:
+    static const int kMaximumSleepTime = 200;
+    static const std::uint32_t kPrintStatisticFrequency = 5000;
     std::size_t thread_size_;
     QString address_;
     int port_;
@@ -710,11 +770,14 @@ private:
     int minimum_allowed_content_;
     int maximum_allowed_concurrent_connection_;
     int active_conn_sockets_size_;
-
+    int failed_connection_size_;
+    int closed_conn_socket_size_;
     // the list that cache all the inactive sockets
     std::list<UdtStreamSocket*> sleep_list_;
     // list will not invalid the existed iterator 
     std::list<UdtStreamSocket*>::iterator prev_position_;
+    // Ticker
+    Ticker ticker_;
 };
 
 void UdtSocketProfileClient::ScheduleSleepSockets() {
@@ -746,8 +809,10 @@ void UdtSocketProfileClient::ScheduleConnection() {
         if( random_.Roll( GetConnectionProbability() ) ) {
             std::unique_ptr<UdtStreamSocket> socket( new UdtStreamSocket() );
             socket->setNonBlockingMode(true);
-            if(!socket->connect( address_, port_ ))
+            if(!socket->connect( address_, port_ )) {
+                ++failed_connection_size_;
                 continue;
+            }
             proactor_.NotifyConnect(socket.release(),
                 std::bind(
                 &UdtSocketProfileClient::OnConnect,

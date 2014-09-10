@@ -223,6 +223,7 @@ SocketAddress UdtSocketImpl::GetPeerAddress() const {
 bool UdtSocketImpl::Close() {
     //Q_ASSERT(!IsClosed());
     int ret = UDT::close(handler_);
+    const char*message = UDT::getlasterror().getErrorMessage();
     //VERIFY_(OK_(ret),"UDT::Close",handler_);
     handler_ = UDT::INVALID_SOCK;
     state_ = CLOSED;
@@ -418,7 +419,7 @@ AbstractSocket::SOCKET_HANDLE UdtSocketImpl::handle() const {
 
 int UdtSocketImpl::Recv( void* buffer, unsigned int bufferLen, int flags ) {
     int sz = UDT::recv(handler_,reinterpret_cast<char*>(buffer),bufferLen,flags);
-    if(sz <0) {
+    if( sz == UDT::ERROR ) {
         // UDT doesn't translate the EOF into a recv with zero return, but instead
         // it returns error with 2001 error code. We need to detect this and translate
         // back with a zero return here .
@@ -437,8 +438,8 @@ int UdtSocketImpl::Send( const void* buffer, unsigned int bufferLen ) {
     Q_ASSERT(!IsClosed());
     int sz = UDT::send(handler_,reinterpret_cast<const char*>(buffer),bufferLen,0);
     DEBUG_(
-        if(sz<0) TRACE_("UDT::send",handler_));
-    if( sz < 0 )
+        if(sz == UDT::ERROR ) TRACE_("UDT::send",handler_));
+    if( sz == UDT::ERROR )
         SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
     return sz;
 }
@@ -904,6 +905,16 @@ private:
         }
     }
     void ReclaimSocket();
+    int RemovePhantomSockets( std::set<UDTSOCKET>* sockets_set );
+    bool IsPhantomSocket( UDTSOCKET fd ) {
+        std::map<UDTSOCKET,SocketUserData>::iterator it = 
+            socket_user_data_.find(fd);
+        if( it == socket_user_data_.end() ) {
+            return true;
+        } else {
+            return it->second.deleted;
+        }
+    }
 private:
     std::set<UDTSOCKET> udt_read_set_;
     std::set<UDTSOCKET> udt_write_set_;
@@ -916,6 +927,25 @@ private:
     std::list<socket_iterator> reclaim_list_;
     friend class UdtPollSetConstIteratorImpl;
 };
+
+// I have observed that in multi-thread environment, the epoll_wait can give
+// notification for those sockets that has been closed/removed from epoll_set.
+// This workaround ensure that only the socket has been added to the epoll set
+// will get the notification. But this assume that the user needs to _remove_
+// all the waiting fd from the pollset before calling the close operation .
+
+int UdtPollSetImpl::RemovePhantomSockets( std::set<UDTSOCKET>* sockets_set ) {
+    int count = 0;
+    for( std::set<UDTSOCKET>::iterator ib = sockets_set->begin() ; ib != sockets_set->end() ; ) {
+        if( IsPhantomSocket(*ib) ) {
+            ib = sockets_set->erase(ib);
+            ++count;
+        } else {
+            ++ib;
+        }
+    }
+    return count;
+}
 
 void UdtPollSetImpl::RemoveFromEpoll( UDTSOCKET udt_handler , int event_type ) {
     // UDT will remove all the related event type related to a certain UDT handler, so if a udt
@@ -1045,6 +1075,11 @@ int UdtPollSetImpl::Poll( int milliseconds ) {
         SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
         return -1;
     } else {
+        // Remove those phantom sockets
+        ret -= RemovePhantomSockets(&udt_read_set_);
+        ret -= RemovePhantomSockets(&udt_write_set_);
+        Q_ASSERT( ret >= 0 );
+        // Remove control sockets
         if( !udt_sys_socket_read_set_.empty() ) {
             char buffer[kInterruptionBufferLength];
             interrupt_socket_.recv(buffer,kInterruptionBufferLength,0);
