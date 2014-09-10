@@ -20,7 +20,7 @@ LIBTARGET=$TARGET/lib
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 BETA=""
-if [[ "$beta" == "true" ]]; then 
+if [[ "${beta}" == "true" ]]; then 
   $BETA="-beta" 
 fi 
 
@@ -105,5 +105,5 @@ cp -r bin/update.json $STAGETARGET
 echo "client.finalName=$FINALNAME" >> finalname-client.properties
 echo "zip -y -r client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip $STAGETARGET"
 cd $STAGETARGET 
-zip -y -r client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip ./*
-mv -f client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip ${project.build.directory}
+zip -y -r client-update-${platform}-${arch}-${release.version}.${buildNumber}$BETA.zip ./*
+mv -f client-update-${platform}-${arch}-${release.version}.${buildNumber}$BETA.zip ${project.build.directory}
