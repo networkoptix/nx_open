@@ -29,9 +29,13 @@ MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
 BOX_NAME=${box}
-
-PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$VERSION-$BOX_NAME-beta
-PACKAGE_NAME=$PACKAGE.tar.gz
+BETA=""
+if [[ "${beta}" == "true" ]]; then 
+  BETA="-beta" 
+fi 
+PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
+PACKAGE_NAME=$PACKAGE$BETA.tar.gz
+UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
 
 BUILD_DIR=/tmp/hdw_$BOX_NAME_build.tmp
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
@@ -147,7 +151,7 @@ mv $PACKAGE_NAME ./zip
 mv update.* ./zip
 mv install.sh ./zip
 cd zip
-zip ./$PACKAGE.zip ./*
+zip ./$UPDATE_NAME.zip ./*
 mv ./* ../
 cd ..
 rm -Rf zip
