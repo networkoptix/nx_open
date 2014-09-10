@@ -158,6 +158,7 @@ namespace ec2
         
         static void setStartSequence(int value);
         void fillPersistentInfo();
+        void cancel();
 
         struct PersistentInfo
         {
