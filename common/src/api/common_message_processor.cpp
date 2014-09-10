@@ -370,7 +370,8 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
             emit peerTimeChanged(info.peerId, syncTime, info.time);
         }
     });
-   
+
+    emit initialResourcesReceived();
 }
 
 QMap<QUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() const {

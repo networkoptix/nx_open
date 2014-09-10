@@ -298,10 +298,11 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
-    connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), SIGNAL(mismatchDataChanged()), this, SLOT(at_versionMismatchWatcher_mismatchDataChanged()));
 
     connect(action(Qn::ExitActionDelayed), &QAction::triggered, action(Qn::ExitAction), &QAction::trigger, Qt::QueuedConnection);
     connect(action(Qn::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
+
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   &QnWorkbenchActionHandler::checkVersionMismatches);
 
     /* Run handlers that update state. */
     at_panicWatcher_panicModeChanged();
@@ -1094,6 +1095,10 @@ void QnWorkbenchActionHandler::notifyAboutUpdate() {
     } else {
         qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? version : QnSoftwareVersion());
     }
+}
+
+void QnWorkbenchActionHandler::checkVersionMismatches() {
+    menu()->trigger(Qn::VersionMismatchMessageAction);
 }
 
 void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePtr &layout) {
@@ -2414,10 +2419,6 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     ).arg(components).arg(latestMsVersion.toString());
 
     QnMessageBox::warning(mainWindow(), Qn::VersionMismatch_Help, tr("Version Mismatch"), message);
-}
-
-void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
-    menu()->trigger(Qn::VersionMismatchMessageAction);
 }
 
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {

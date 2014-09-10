@@ -35,6 +35,8 @@ signals:
     void connectionClosed();
     void connectionReset( QnCommonMessageProcessor* );
 
+    void initialResourcesReceived();
+
     void fileAdded(const QString &filename);
     void fileUpdated(const QString &filename);
     void fileRemoved(const QString &filename);
