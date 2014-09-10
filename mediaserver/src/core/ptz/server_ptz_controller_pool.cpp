@@ -70,9 +70,11 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
             controller.reset(new QnWorkaroundPtzController(controller));
     }
 
-    camera->setPtzCapabilities(controller ? controller->getCapabilities() : Qn::NoPtzCapabilities);
-    QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addCamera(camera, this, &QnServerPtzControllerPool::at_addCameraDone);
-    
+    Qn::PtzCapabilities caps = controller ? controller->getCapabilities() : Qn::NoPtzCapabilities;
+    if (camera->getPtzCapabilities() != caps) {
+        camera->setPtzCapabilities(caps);
+        camera->saveParamsAsync();
+    }
     return controller;
 }
 

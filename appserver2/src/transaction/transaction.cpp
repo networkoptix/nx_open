@@ -192,6 +192,8 @@ namespace ec2
                     return "restoreDatabase";
                 case syncDoneMarker:
                     return "syncDoneMarker";
+                case markLicenseOverflow:
+                    return "markLicenseOverflow";
                 default:
                     return "unknown " + QString::number((int)val);
             }
@@ -243,7 +245,8 @@ namespace ec2
                 val == addLicense ||
                 val == addLicenses ||
                 val == removeLicense || 
-                val == restoreDatabase;
+                val == restoreDatabase ||
+                val == markLicenseOverflow;
         }
 
     }

@@ -25,6 +25,7 @@
 #include <nx_ec/data/api_email_data.h>
 #include <nx_ec/data/api_server_alive_data.h>
 #include <nx_ec/data/api_time_data.h>
+#include <nx_ec/data/api_license_overflow_data.h>
 
 #include "ec_api_fwd.h"
 
@@ -176,14 +177,14 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode, const QnMediaServerResourceList& servers)
         */
-        template<class TargetType, class HandlerType> int getServers( TargetType* target, HandlerType handler ) {
-            return getServers( std::static_pointer_cast<impl::GetServersHandler>(std::make_shared<impl::CustomGetServersHandler<TargetType, HandlerType>>(target, handler)) );
+        template<class TargetType, class HandlerType> int getServers( const QUuid& mediaServerId,  TargetType* target, HandlerType handler ) {
+            return getServers(mediaServerId, std::static_pointer_cast<impl::GetServersHandler>(std::make_shared<impl::CustomGetServersHandler<TargetType, HandlerType>>(target, handler)) );
         }
         
-        ErrorCode getServersSync(QnMediaServerResourceList* const serverList ) {
+        ErrorCode getServersSync( const QUuid& mediaServerId, QnMediaServerResourceList* const serverList ) {
             return impl::doSyncCall<impl::GetServersHandler>( 
                 [=](const impl::GetServersHandlerPtr &handler) {
-                    return this->getServers(handler);
+                    return this->getServers(mediaServerId, handler);
                 }, 
                 serverList 
             );
@@ -216,7 +217,7 @@ namespace ec2
         void addedOrUpdated( QnMediaServerResourcePtr camera );
         void removed( QUuid id );
     protected:
-        virtual int getServers( impl::GetServersHandlerPtr handler ) = 0;
+        virtual int getServers( const QUuid& mediaServerId,  impl::GetServersHandlerPtr handler ) = 0;
         virtual int save( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) = 0;
         virtual int remove( const QUuid& id, impl::SimpleHandlerPtr handler ) = 0;
     };
@@ -848,6 +849,18 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
+        template<class TargetType, class HandlerType> int markLicenseOverflow(bool value, qint64 time, TargetType *target, HandlerType handler) {
+            return markLicenseOverflow(value, time, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        ErrorCode markLicenseOverflowSync(bool value, qint64 time) {
+            using namespace std::placeholders;
+            int(AbstractMiscManager::*fn)(bool, qint64, impl::SimpleHandlerPtr) = &AbstractMiscManager::markLicenseOverflow;
+            return impl::doSyncCall<impl::SimpleHandler>( std::bind(fn, this, value, time, _1));
+        }
+
+
     signals:
         void moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer);
         void systemNameChangeRequested(const QString &systemName);
@@ -861,6 +874,7 @@ namespace ec2
         virtual int addConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
         virtual int removeConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
         virtual int sendAvailableConnections(impl::SimpleHandlerPtr handler) = 0;
+        virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
 
