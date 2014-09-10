@@ -366,7 +366,15 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomRect = params.zoomWindow;
     data.zoomTargetUuid = params.zoomUuid;
-    data.rotation = params.rotation;
+    
+    if (!qFuzzyIsNull(params.rotation)) {
+        data.rotation = params.rotation;
+    }
+    else {
+        QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
+        if (!forcedRotation.isEmpty()) 
+            data.rotation = forcedRotation.toInt();
+    }
     data.contrastParams = params.contrastParams;
     data.dewarpingParams = params.dewarpingParams;
     data.dataByRole[Qn::ItemTimeRole] = params.time;
