@@ -61,6 +61,16 @@ public:
 
     QnResourceList getResources() const;
 
+    template <class Resource>
+    QnSharedResourcePointerList<Resource> getResources() const {
+        QMutexLocker locker(&m_resourcesMtx);
+        QnSharedResourcePointerList<Resource> result;
+        for (const QnResourcePtr &resource : m_resources)
+            if(QnSharedResourcePointer<Resource> derived = resource.template dynamicCast<Resource>())
+                result.push_back(derived);
+        return result;
+    }
+
     QnResourcePtr getResourceById(const QUuid &id) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;

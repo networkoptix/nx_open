@@ -141,7 +141,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     resourcePool()->clearIncompatibleResources();
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
-    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>()) {
+    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources<QnLayoutResource>()) {
         bool isLocal = snapshotManager()->isLocal(layout);
         bool isFile = snapshotManager()->isFile(layout);
         if(isLocal && isFile)  //do not remove exported layouts

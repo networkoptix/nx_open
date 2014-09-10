@@ -269,7 +269,7 @@ QnVideoWallLicenseUsageHelper::QnVideoWallLicenseUsageHelper(QObject *parent):
     connect(qnResPool, &QnResourcePool::resourceAdded,   this,   connectIfNeeded);
     connect(qnResPool, &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
-    foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources().filtered<QnVideoWallResource>())
+    foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources<QnVideoWallResource>())
         connectTo(videowall);
 
     connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoAdded,    this, &QnVideoWallLicenseUsageHelper::update);
@@ -290,7 +290,7 @@ int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType license
         /* Calculating running control sessions. */
         result += info.data.videoWallControlSessions;
 
-    foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources().filtered<QnVideoWallResource>()) {
+    foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources<QnVideoWallResource>()) {
         /* Calculating total screens. */
         result += videowall->items()->getItems().size();
 

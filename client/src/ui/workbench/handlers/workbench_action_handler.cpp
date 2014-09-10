@@ -2259,7 +2259,7 @@ void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
-    QnMediaServerResourceList resources = resourcePool()->getResources().filtered<QnMediaServerResource>();
+    QnMediaServerResourceList resources = resourcePool()->getResources<QnMediaServerResource>();
 
     foreach(QnMediaServerResourcePtr resource, resources)
     {

@@ -215,7 +215,7 @@ void QnResourcePoolModelNode::update() {
         m_searchString = QString();
         m_flags = 0; 
         m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallMatrix);
-        foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources().filtered<QnVideoWallResource>()) {
+        foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources<QnVideoWallResource>()) {
             if (!videowall->matrices()->hasItem(m_uuid))
                 continue;
             m_displayName = m_name = videowall->matrices()->getItem(m_uuid).name;
