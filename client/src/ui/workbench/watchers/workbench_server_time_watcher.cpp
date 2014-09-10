@@ -88,7 +88,7 @@ void QnWorkbenchServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &s
 // -------------------------------------------------------------------------- //
 void QnWorkbenchServerTimeWatcher::timerEvent(QTimerEvent *event) {
     if(event->timerId() == m_timer.timerId()) {
-        foreach(const QnMediaServerResourcePtr &server, resourcePool()->getResources().filtered<QnMediaServerResource>())
+        foreach(const QnMediaServerResourcePtr &server, resourcePool()->getResources<QnMediaServerResource>())
             sendRequest(server);
     } else {
         base_type::timerEvent(event);

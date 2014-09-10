@@ -859,6 +859,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     for (auto itr = modifiedResources.begin(); itr != modifiedResources.end();) {
         if (reply.uniqueIdList.contains((*itr)->getUniqueId())) {
             (*itr)->setParentId(server->getId());
+            (*itr)->setPreferedServerId(server->getId());
             ++itr;
         }
         else {
@@ -2262,7 +2263,7 @@ void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
-    QnMediaServerResourceList resources = resourcePool()->getResources().filtered<QnMediaServerResource>();
+    QnMediaServerResourceList resources = resourcePool()->getResources<QnMediaServerResource>();
 
     foreach(QnMediaServerResourcePtr resource, resources)
     {

@@ -23,7 +23,7 @@ namespace ec2 {
     public:
         QnMiscManager(QueryProcessorType * const queryProcessor);
         virtual ~QnMiscManager();
-
+        virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) override;
     protected:
         virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer, impl::SimpleHandlerPtr handler) override;
         virtual int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QUuid, QUuid> &discoverersByPeer, impl::SimpleHandlerPtr handler) override;

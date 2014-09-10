@@ -32,6 +32,7 @@
 #include "api_peer_data.h"
 #include "api_runtime_data.h"
 #include "api_time_data.h"
+#include "api_license_overflow_data.h"
 
 /* Some fields are not meant to be bound or fetched. */
 template<class T, class Allocator>

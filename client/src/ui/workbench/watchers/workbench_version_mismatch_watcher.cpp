@@ -106,7 +106,7 @@ void QnWorkbenchVersionMismatchWatcher::updateMismatchData() {
     m_mismatchData.push_back(clientData);
 
     if(context()->user()) {
-        foreach(const QnMediaServerResourcePtr &mediaServerResource, resourcePool()->getResources().filtered<QnMediaServerResource>()) {
+        foreach(const QnMediaServerResourcePtr &mediaServerResource, resourcePool()->getResources<QnMediaServerResource>()) {
             QnVersionMismatchData msData(Qn::ServerComponent, mediaServerResource->getVersion());
             msData.resource = mediaServerResource;
             m_mismatchData.push_back(msData);

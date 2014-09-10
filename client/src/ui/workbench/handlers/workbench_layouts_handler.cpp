@@ -477,7 +477,7 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
 }
 
 bool QnWorkbenchLayoutsHandler::closeAllLayouts(bool waitForReply, bool force) {
-    return closeLayouts(resourcePool()->getResources().filtered<QnLayoutResource>(), waitForReply, force);
+    return closeLayouts(resourcePool()->getResources<QnLayoutResource>(), waitForReply, force);
 }
 
 // -------------------------------------------------------------------------- //

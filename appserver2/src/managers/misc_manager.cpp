@@ -4,6 +4,7 @@
 #include "utils/network/router.h"
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
+#include "nx_ec/data/api_license_overflow_data.h"
 
 namespace ec2 {
 
@@ -177,6 +178,21 @@ QnTransaction<ApiConnectionDataList> QnMiscManager<QueryProcessorType>::prepareA
 
     return transaction;
 }
+
+template<class QueryProcessorType>
+int QnMiscManager<QueryProcessorType>::markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) {
+    const int reqId = generateRequestID();
+    QnTransaction<ApiLicenseOverflowData> transaction(ApiCommand::markLicenseOverflow);
+    transaction.params.value = value;
+    transaction.params.time = time;
+    transaction.isLocal = true;
+
+    using namespace std::placeholders;
+    m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
+
+    return reqId;
+}
+
 
 template class QnMiscManager<ServerQueryProcessor>;
 template class QnMiscManager<FixedUrlClientQueryProcessor>;
