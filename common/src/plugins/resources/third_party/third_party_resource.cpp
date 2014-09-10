@@ -317,7 +317,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         return CameraDiagnostics::UnknownErrorResult();
     }
 
-    setParam( lit("hasDualStreaming"), m_encoderCount > 1, QnDomainDatabase );
+    setParam( lit("hasDualStreaming"), (m_encoderCount > 1) ? 1 : 0, QnDomainDatabase );
 
     //setting camera capabilities
     unsigned int cameraCapabilities = 0;
