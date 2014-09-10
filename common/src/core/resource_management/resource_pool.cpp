@@ -208,13 +208,13 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
     foreach (const QnResourcePtr &resource, removedResources) {
         disconnect(resource.data(), NULL, this, NULL);
 
-        foreach(const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
+        foreach(const QnLayoutResourcePtr &layoutResource, getResources<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
             foreach(const QnLayoutItemData &data, layoutResource->getItems())
                 if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
                     layoutResource->removeItem(data);
 
         if (resource.dynamicCast<QnLayoutResource>()) {
-            foreach (const QnVideoWallResourcePtr &videowall, getResources().filtered<QnVideoWallResource>()) { // TODO: #Elric this is way beyond what one may call 'suboptimal'.
+            foreach (const QnVideoWallResourcePtr &videowall, getResources<QnVideoWallResource>()) { // TODO: #Elric this is way beyond what one may call 'suboptimal'.
                 foreach (QnVideoWallItem item, videowall->items()->getItems()) {
                     if (item.layout != resource->getId())
                         continue;
