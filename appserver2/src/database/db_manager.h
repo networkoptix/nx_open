@@ -140,7 +140,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const QUuid& mServerId, ApiCameraDataList& cameraList);
 
         //getServers
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
+        ErrorCode doQueryNoLock(const QUuid& mServerId, ApiMediaServerDataList& serverList);
 
         //getCameraServerItems
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);

@@ -46,7 +46,7 @@ namespace ec2
         QnMediaServerManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
 
         //!Implementation of QnMediaServerManager::getServers
-        virtual int getServers( impl::GetServersHandlerPtr handler ) override;
+        virtual int getServers( const QUuid& mediaServerId,  impl::GetServersHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::saveServer
         virtual int save( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::remove
