@@ -28,6 +28,7 @@ FINALNAME=${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}$
 
 STAGEBASE=deb
 STAGE=$STAGEBASE/$FINALNAME
+STAGETARGET=$STAGE/$TARGET
 BINSTAGE=$STAGE$BINTARGET
 BGSTAGE=$STAGE$BGTARGET
 HELPSTAGE=$STAGE$HELPTARGET
@@ -99,5 +100,10 @@ install -m 755 debian/postinst $STAGE/DEBIAN
 
 (cd $STAGE; find * -type f -not -regex '^DEBIAN/.*' -print0 | xargs -0 md5sum > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
-(cd $STAGEBASE; fakeroot dpkg-deb -b ${PACKAGENAME}-$FINALNAME)
+(cd $STAGEBASE; fakeroot dpkg-deb -b $FINALNAME)
+cp -r bin/update.json $STAGETARGET
 echo "client.finalName=$FINALNAME" >> finalname-client.properties
+echo "zip -y -r client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip $STAGETARGET"
+cd $STAGETARGET 
+zip -y -r client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip ./*
+mv -f client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip ${project.build.directory}
