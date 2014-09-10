@@ -25,8 +25,6 @@
 #include "mutex/camera_data_handler.h"
 #include "mutex/distributed_mutex_manager.h"
 #include "common/common_module.h"
-#include "transaction/transaction_log.h"
-#include "database/db_manager.h"
 #include "api/runtime_info_manager.h"
 #include "utils/license_usage_helper.h"
 
@@ -569,7 +567,7 @@ QnResourceList QnRecordingManager::getLocalControlledCameras()
 
 void QnRecordingManager::at_checkLicenses()
 {
-    if (!ec2::QnTransactionLog::instance() || m_licenseMutex)
+    if (m_licenseMutex)
         return;
 
     QnCamLicenseUsageHelper helper;
@@ -608,7 +606,9 @@ void QnRecordingManager::at_checkLicenses()
         }
     }
     else {
-        QnAppServerConnectionFactory::getConnection2()->getMiscManager()->markLicenseOverflowSync(false, 0);
+        qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->localInfo().data.prematureLicenseExperationDate;
+        if (licenseOverflowTime)
+            QnAppServerConnectionFactory::getConnection2()->getMiscManager()->markLicenseOverflowSync(false, 0);
         m_tooManyRecordingCnt = 0;
     }
 }
