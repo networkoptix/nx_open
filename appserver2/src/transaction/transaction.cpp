@@ -267,6 +267,12 @@ namespace ec2
         }
     }
 
+    void QnAbstractTransaction::cancel()
+    {
+        if (persistentInfo.sequence)
+            qn_abstractTransaction_sequence.fetchAndAddAcquire(-1);
+    }
+
     int generateRequestID()
     {
         static std::atomic<int> requestID;
