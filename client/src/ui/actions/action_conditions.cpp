@@ -951,3 +951,33 @@ Qn::ActionVisibility QnAutoStartAllowedActionCodition::check(const QnActionParam
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
+
+
+QnDisjunctionActionCondition::QnDisjunctionActionCondition(const QList<QnActionCondition *> conditions, QObject *parent) :
+    QnActionCondition(parent),
+    m_conditions(conditions)
+{
+}
+
+QnDisjunctionActionCondition::QnDisjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QObject *parent) :
+    QnActionCondition(parent)
+{
+    m_conditions.append(condition1);
+    m_conditions.append(condition2);
+}
+
+QnDisjunctionActionCondition::QnDisjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QObject *parent) :
+    QnActionCondition(parent)
+{
+    m_conditions.append(condition1);
+    m_conditions.append(condition2);
+    m_conditions.append(condition3);
+}
+
+Qn::ActionVisibility QnDisjunctionActionCondition::check(const QnActionParameters &parameters) {
+    Qn::ActionVisibility result = Qn::EnabledAction;
+    foreach (QnActionCondition *condition, m_conditions)
+        result = qMax(result, condition->check(parameters));
+
+    return result;
+}

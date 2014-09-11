@@ -1346,7 +1346,10 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ConnectToCurrentSystem).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
         text(tr("Connect to the Current System")).
-        condition(new QnResourceStatusActionCondition(Qn::Incompatible, false, this));
+        condition(new QnDisjunctionActionCondition(
+                      new QnResourceStatusActionCondition(Qn::Incompatible, false, this),
+                      new QnResourceStatusActionCondition(Qn::Unauthorized, false, this),
+                      this));
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
