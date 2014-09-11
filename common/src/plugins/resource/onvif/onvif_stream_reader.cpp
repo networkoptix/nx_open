@@ -14,7 +14,7 @@
 #include "onvif/soapMediaBindingProxy.h"
 
 #include "onvif_resource.h"
-#include <utils/common/app_info.h>
+#include "version.h"
 
 static const int MAX_CAHCE_URL_TIME = 1000 * 300;
 
@@ -55,10 +55,10 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStream()
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 
-    NETOPTIX_PRIMARY_NAME = QString(lit("%1 Primary")).arg(QnAppInfo::productNameShort()).toUtf8();
-    NETOPTIX_SECONDARY_NAME = QString(lit("%1 Secondary")).arg(QnAppInfo::productNameShort()).toUtf8();
-    NETOPTIX_PRIMARY_TOKEN = QString(lit("%1P")).arg(QnAppInfo::productNameShort()).toUtf8();
-    NETOPTIX_SECONDARY_TOKEN = QString(lit("%1S")).arg(QnAppInfo::productNameShort()).toUtf8();
+    NETOPTIX_PRIMARY_NAME = QString(lit("%1 Primary")).arg(lit(QN_PRODUCT_NAME_SHORT)).toUtf8();
+    NETOPTIX_SECONDARY_NAME = QString(lit("%1 Secondary")).arg(lit(QN_PRODUCT_NAME_SHORT)).toUtf8();
+    NETOPTIX_PRIMARY_TOKEN = QString(lit("%1P")).arg(lit(QN_PRODUCT_NAME_SHORT)).toUtf8();
+    NETOPTIX_SECONDARY_TOKEN = QString(lit("%1S")).arg(lit(QN_PRODUCT_NAME_SHORT)).toUtf8();
 
     int channel = m_onvifRes->getChannel();
     if (channel > 0) {

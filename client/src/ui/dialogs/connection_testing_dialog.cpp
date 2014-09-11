@@ -26,7 +26,7 @@
 
 #include <utils/common/warnings.h>
 
-#include <utils/common/app_info.h>
+#include "version.h"
 #include "compatibility.h"
 
 QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) :
@@ -96,7 +96,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
     int helpTopicId = -1;
 
     bool compatibleProduct = qnSettings->isDevMode() || connectionInfo.brand.isEmpty()
-            || connectionInfo.brand == QnAppInfo::productNameShort();
+            || connectionInfo.brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
 
     if (errorCode == ec2::ErrorCode::unauthorized) {
         success = false;

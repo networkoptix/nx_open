@@ -1,7 +1,7 @@
 
 #include "aux_manager.h"
 
-#include <utils/common/app_info.h>
+#include "version.h"
 
 #include "common/common_module.h"
 #include "nx_ec/data/api_conversion_functions.h"

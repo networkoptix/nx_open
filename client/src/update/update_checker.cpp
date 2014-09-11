@@ -3,7 +3,7 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
-#include <utils/common/app_info.h>
+#include "version.h"
 
 QnUpdateChecker::QnUpdateChecker(const QUrl &url, QObject *parent) :
     QObject(parent),
@@ -29,7 +29,7 @@ void QnUpdateChecker::at_networkReply_finished() {
 
     QByteArray data = reply->readAll();
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
-    map = map.value(QnAppInfo::customizationName()).toMap();
+    map = map.value(lit(QN_CUSTOMIZATION_NAME)).toMap();
     QnSoftwareVersion latestVersion(map.value(lit("latest_version")).toString());
     emit updateAvailable(latestVersion);
 }

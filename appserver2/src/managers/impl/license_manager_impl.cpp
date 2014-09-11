@@ -5,7 +5,7 @@
 
 #include "license_manager_impl.h"
 #include "llutil/hardware_id.h"
-#include <utils/common/app_info.h>
+#include "version.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/data/api_runtime_data.h"
 

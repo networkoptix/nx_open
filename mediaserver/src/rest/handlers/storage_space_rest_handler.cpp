@@ -14,7 +14,7 @@
 #include "recorder/storage_manager.h"
 #include "media_server/settings.h"
 
-#include <utils/common/app_info.h>
+#include <version.h>
 
 
 namespace {
@@ -90,7 +90,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
 
         QnStorageSpaceData data;
-        data.url = partition.path + QnAppInfo::mediaFolderName();
+        data.url = partition.path + lit(QN_MEDIA_FOLDER_NAME);
         data.storageId = QUuid();
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;

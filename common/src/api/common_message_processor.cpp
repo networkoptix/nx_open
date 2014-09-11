@@ -17,7 +17,7 @@
 #include "utils/common/synctime.h"
 #include "runtime_info_manager.h"
 
-#include <utils/common/app_info.h>
+#include "version.h"
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     base_type(parent)

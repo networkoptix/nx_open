@@ -9,7 +9,7 @@
 #include "utils/network/nettools.h"
 #include "utils/network/system_socket.h"
 
-#include <utils/common/app_info.h>
+#include "version.h"
 
 static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
@@ -254,7 +254,7 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
         data.append("M-SEARCH * HTTP/1.1\r\n");
         //data.append("Host: 192.168.0.150:1900\r\n");
         data.append("Host: ").append(sock->getLocalAddress().toString()).append("\r\n");
-        data.append(lit("ST:urn:schemas-upnp-org:device:%1 Server:1\r\n").arg(QnAppInfo::organizationName()));
+        data.append(lit("ST:urn:schemas-upnp-org:device:%1 Server:1\r\n").arg(lit(QN_ORGANIZATION_NAME)));
         data.append("Man:\"ssdp:discover\"\r\n");
         data.append("MX:3\r\n\r\n");
         sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);

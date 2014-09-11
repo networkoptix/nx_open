@@ -11,7 +11,7 @@
 
 #include "axis_resource.h"
 #include "axis_resource.h"
-#include <utils/common/app_info.h>
+#include "version.h"
 static const char AXIS_SEI_UUID[] = "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa";
 static const int AXIS_SEI_PRODUCT_INFO = 0x0a00;
 static const int AXIS_SEI_TIMESTAMP = 0x0a01;
@@ -87,12 +87,12 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
 
     if (role == Qn::CR_LiveVideo)
     {
-        profileName = lit("%1Primary%2").arg(QnAppInfo::productNameShort()).arg(profileSufix).toUtf8();
-        profileDescription = QString(lit("%1 Primary Stream")).arg(QnAppInfo::productNameShort()).toUtf8();
+        profileName = QString(lit("%1Primary%2")).arg(lit(QN_PRODUCT_NAME_SHORT)).arg(profileSufix).toUtf8();
+        profileDescription = QString(lit("%1 Primary Stream")).arg(lit(QN_PRODUCT_NAME_SHORT)).toUtf8();
     }
     else {
-        profileName = lit("%1Secondary%2").arg(QnAppInfo::productNameShort()).arg(profileSufix).toUtf8();
-        profileDescription = QString(lit("%1 Secondary Stream")).arg(QnAppInfo::productNameShort()).toUtf8();
+        profileName = QString(lit("%1Secondary%2")).arg(lit(QN_PRODUCT_NAME_SHORT)).arg(profileSufix).toUtf8();
+        profileDescription = QString(lit("%1 Secondary Stream")).arg(lit(QN_PRODUCT_NAME_SHORT)).toUtf8();
     }
 
 

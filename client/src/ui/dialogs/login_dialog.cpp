@@ -48,7 +48,7 @@
 
 
 #include "compatibility.h"
-#include <utils/common/app_info.h>
+#include "version.h"
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
@@ -87,7 +87,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     Q_ASSERT(bbLayout);
     if (bbLayout) {
         QLabel* versionLabel = new QLabel(ui->buttonBox);
-        versionLabel->setText(tr("Version %1").arg(QnAppInfo::applicationVersion()));
+        versionLabel->setText(tr("Version %1").arg(lit(QN_APPLICATION_VERSION)));
         QFont font = versionLabel->font();
         font.setPointSize(7);
         versionLabel->setFont(font);

@@ -17,7 +17,7 @@
 #include "settings.h"
 #include "api/app_server_connection.h"
 
-#include <utils/common/app_info.h>
+#include "version.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor()
 :

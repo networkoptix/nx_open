@@ -124,8 +124,8 @@ int main( int argc, char* argv[] )
     QtSingleCoreApplication app( SERVICE_NAME, argc, argv );
     QDir::setCurrent( QCoreApplication::applicationDirPath() );
 
-    QSettings globalSettings( QSettings::SystemScope, QnVersion::organizationName(), QN_APPLICATION_NAME );
-    QSettings userSettings( QSettings::UserScope, QnVersion::organizationName(), QN_APPLICATION_NAME );
+    QSettings globalSettings( QSettings::SystemScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
+    QSettings userSettings( QSettings::UserScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
 
     if( mirrorListUrl.isEmpty() )
         mirrorListUrl = globalSettings.value( "mirrorListUrl", QN_MIRRORLIST_URL ).toString();

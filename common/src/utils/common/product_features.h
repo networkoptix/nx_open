@@ -6,7 +6,7 @@
 #include <cstring> /* For strcmp. */
 #include <cassert>
 
-#include <utils/common/app_info.h>
+#include <version.h>
 
 struct QnProductFeatures {
     QString customizationName;
@@ -21,10 +21,10 @@ namespace Qn {
 
     inline QnProductFeatures calculateProductFeatures() {
         QnProductFeatures result;
-        result.customizationName = QnAppInfo::customizationName();
-        result.freeLicenseIsTrial = QnAppInfo::freeLicenseIsTrial();
-        result.freeLicenseCount = QnAppInfo::freeLicenseCount();
-        result.freeLicenseKey = QnAppInfo::freeLicenseKey();
+        result.customizationName = QLatin1String(QN_CUSTOMIZATION_NAME);
+        result.freeLicenseIsTrial = QN_FREE_LICENSE_IS_TRIAL;
+        result.freeLicenseCount = QN_FREE_LICENSE_COUNT;
+        result.freeLicenseKey = QLatin1String(QN_FREE_LICENSE_KEY);
         return result;
     }
 

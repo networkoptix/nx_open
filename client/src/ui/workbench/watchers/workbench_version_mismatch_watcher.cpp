@@ -9,7 +9,7 @@
 
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/common/app_info.h>
+#include <version.h>
 
 QnWorkbenchVersionMismatchWatcher::QnWorkbenchVersionMismatchWatcher(QObject *parent):
     base_type(parent),
@@ -44,13 +44,13 @@ bool QnWorkbenchVersionMismatchWatcher::hasMismatches() const {
     return m_hasMismatches;
 }
 
-QList<QnAppInfoMismatchData> QnWorkbenchVersionMismatchWatcher::mismatchData() const {
+QList<QnVersionMismatchData> QnWorkbenchVersionMismatchWatcher::mismatchData() const {
     return m_mismatchData;
 }
 
 QnSoftwareVersion QnWorkbenchVersionMismatchWatcher::latestVersion(Qn::SystemComponent component) const {
     QnSoftwareVersion result;
-    foreach(const QnAppInfoMismatchData &data, m_mismatchData) {
+    foreach(const QnVersionMismatchData &data, m_mismatchData) {
         if (component != Qn::AnyComponent && component != data.component)
             continue;
         result = qMax(data.version, result);
@@ -76,7 +76,7 @@ void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
 
     QnSoftwareVersion latest;
     QnSoftwareVersion latestMs;
-    foreach(const QnAppInfoMismatchData &data, m_mismatchData) {
+    foreach(const QnVersionMismatchData &data, m_mismatchData) {
         latest = qMax(data.version, latest);
         if (data.component != Qn::ServerComponent)
             continue;
@@ -85,7 +85,7 @@ void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
     if (versionMismatches(latest, latestMs))
         latestMs = latest;
 
-    foreach(const QnAppInfoMismatchData &data, m_mismatchData) {
+    foreach(const QnVersionMismatchData &data, m_mismatchData) {
         switch (data.component) {
         case Qn::ServerComponent:
             m_hasMismatches |= QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMs, true);
@@ -102,12 +102,12 @@ void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
 void QnWorkbenchVersionMismatchWatcher::updateMismatchData() {
     m_mismatchData.clear();
 
-    QnAppInfoMismatchData clientData(Qn::ClientComponent, qnCommon->engineVersion());
+    QnVersionMismatchData clientData(Qn::ClientComponent, qnCommon->engineVersion());
     m_mismatchData.push_back(clientData);
 
     if(context()->user()) {
         foreach(const QnMediaServerResourcePtr &mediaServerResource, resourcePool()->getResources<QnMediaServerResource>()) {
-            QnAppInfoMismatchData msData(Qn::ServerComponent, mediaServerResource->getVersion());
+            QnVersionMismatchData msData(Qn::ServerComponent, mediaServerResource->getVersion());
             msData.resource = mediaServerResource;
             m_mismatchData.push_back(msData);
         }

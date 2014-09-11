@@ -77,7 +77,7 @@ bool HolePuncherProcess::initialize()
 
     //reading settings
 #ifdef _WIN32
-    m_settings.reset( new QSettings(QSettings::SystemScope, QnVersion::organizationName(), QN_APPLICATION_NAME) );
+    m_settings.reset( new QSettings(QSettings::SystemScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME) );
 #else
     const QString configFileName = QString("/opt/%1/%2/etc/%2.conf").arg(VER_LINUX_ORGANIZATION_NAME).arg(VER_PRODUCTNAME_STR);
     m_settings.reset( new QSettings(configFileName, QSettings::IniFormat) );

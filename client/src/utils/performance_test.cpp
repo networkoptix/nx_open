@@ -5,7 +5,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtOpenGL/QGLWidget>
 
-#include <utils/common/app_info.h>
+#include <version.h>
 #include <utils/common/performance.h>
 #include <client/client_globals.h>
 #include <client/client_settings.h>
@@ -61,7 +61,7 @@ void QnPerformanceTest::detectLightMode() {
             QCoreApplication::translate("QnPerformance", "Warning"),
             QCoreApplication::translate("QnPerformance", "Performance of this computer allows running %1 in configuration mode only. "
                                                          "For full-featured mode please use another computer.").
-                    arg(QnAppInfo::productNameLong()),
+                    arg(QLatin1String(QN_PRODUCT_NAME_LONG)),
             QMessageBox::StandardButtons(QMessageBox::Ok),
             QMessageBox::Ok
         );

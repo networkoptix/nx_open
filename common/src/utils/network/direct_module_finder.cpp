@@ -9,7 +9,7 @@
 #include <rest/server/json_rest_result.h>
 #include <common/common_module.h>
 
-#include <utils/common/app_info.h>
+#include <version.h>
 
 namespace {
 
@@ -180,7 +180,7 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         if (moduleInformation.id.isNull())
             return;
 
-        if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())
+        if (!m_compatibilityMode && moduleInformation.customization != lit(QN_CUSTOMIZATION_NAME))
             return;
 
         if (m_ignoredModules.contains(url, moduleInformation.id))

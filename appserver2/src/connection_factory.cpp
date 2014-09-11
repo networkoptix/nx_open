@@ -24,7 +24,7 @@
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
 #include "http/ec2_transaction_tcp_listener.h"
-#include <utils/common/app_info.h>
+#include "version.h"
 #include "mutex/distributed_mutex_manager.h"
 
 namespace ec2
@@ -448,11 +448,11 @@ namespace ec2
         QnConnectionInfo* const connectionInfo )
     {
         connectionInfo->version = qnCommon->engineVersion();
-        connectionInfo->brand = isCompatibilityMode() ? QString() : QnAppInfo::productNameShort();
+        connectionInfo->brand = isCompatibilityMode() ? QString() : lit(QN_PRODUCT_NAME_SHORT);
         connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
         connectionInfo->systemName = qnCommon->localSystemName();
-        connectionInfo->box = QnAppInfo::armBox();
+        connectionInfo->box = lit(QN_ARM_BOX);
         connectionInfo->allowSslConnections = m_sslEnabled;
         return ErrorCode::ok;
     }

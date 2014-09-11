@@ -15,7 +15,7 @@
 
 #include <common/common_globals.h>
 #include <utils/mac_utils.h>
-#include <utils/common/app_info.h>
+#include "version.h"
 
 
 bool removeDir(const QString &dirName)
@@ -56,10 +56,10 @@ QString getMoviesDirectory()
 {
 #ifdef Q_OS_MACX
     QString moviesDir = mac_getMoviesDir();
-    return moviesDir.isEmpty() ? QString() : moviesDir + QLatin1String("/") + QnAppInfo::mediaFolderName();
+    return moviesDir.isEmpty() ? QString() : moviesDir + QLatin1String("/") + QLatin1String(QN_MEDIA_FOLDER_NAME);
 #else
     const QStringList& moviesDirs = QStandardPaths::standardLocations(QStandardPaths::MoviesLocation);
-    return moviesDirs.isEmpty() ? QString() : (moviesDirs[0] + QLatin1String("/") + QnAppInfo::mediaFolderName()) ;
+    return moviesDirs.isEmpty() ? QString() : (moviesDirs[0] + QLatin1String("/") + QLatin1String(QN_MEDIA_FOLDER_NAME) );
 #endif
 }
 
@@ -67,9 +67,9 @@ QString getBackgroundsDirectory() {
     const QStringList& pictureFolderList = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
     QString baseDir = pictureFolderList.isEmpty() ? QString(): pictureFolderList[0];
 #ifdef Q_OS_WIN
-    QString productDir = baseDir + QDir::toNativeSeparators(QString(lit("/%1 Backgrounds")).arg(QnAppInfo::productNameLong()));
+    QString productDir = baseDir + QDir::toNativeSeparators(QString(lit("/%1 Backgrounds")).arg(lit(QN_PRODUCT_NAME_LONG)));
 #else
-    QString productDir = QDir::toNativeSeparators(QString(lit("/opt/%1/client/share/pictures/sample-backgrounds")).arg(QnAppInfo::linuxOrganizationName()));
+    QString productDir = QDir::toNativeSeparators(QString(lit("/opt/%1/client/share/pictures/sample-backgrounds")).arg(lit(VER_LINUX_ORGANIZATION_NAME)));
 #endif
 
     return QDir(productDir).exists()

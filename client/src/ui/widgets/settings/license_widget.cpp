@@ -18,8 +18,6 @@
 
 #include <licensing/license.h>
 
-#include <utils/common/app_info.h>
-
 namespace {
     bool isValidSerialKey(const QString &key) {
         return key.length() == qnProductFeatures().freeLicenseKey.length() && !key.contains(QLatin1Char(' '));
@@ -42,7 +40,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     ui->manualActivationTextWidget->setText(tr(
          "Please send email with the Serial Key and the Hardware ID provided to <a href=\"mailto:%1\">%1</a>. "
          "Then we'll send you an Activation Key file."
-     ).arg(QnAppInfo::licensingEmailAddress())); // TODO: #Elric move to product features?
+     ).arg(QLatin1String(QN_LICENSING_MAIL_ADDRESS))); // TODO: #Elric move to product features?
 
     connect(ui->serialKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
     connect(ui->activationTypeComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_activationTypeComboBox_currentIndexChanged()));

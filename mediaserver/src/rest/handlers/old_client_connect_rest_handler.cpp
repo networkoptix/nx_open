@@ -1,6 +1,6 @@
 #include "old_client_connect_rest_handler.h"
 #include <utils/network/http/httptypes.h>
-#include <utils/common/app_info.h>
+#include "version.h"
 #include <QFile>
 
 int QnOldClientConnectRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &responseMessageBody, QByteArray &contentType)
@@ -17,9 +17,9 @@ int QnOldClientConnectRestHandler::executeGet(const QString &path, const QnReque
 
         char ch = 0xa;
         responseMessageBody.append(&ch, 1); // string field type
-        ch = QnAppInfo::applicationVersion().length();
+        ch = QByteArray(QN_APPLICATION_VERSION).length();
         responseMessageBody.append(&ch, 1); // string field len
-        responseMessageBody.append(QnAppInfo::applicationVersion());
+        responseMessageBody.append(QN_APPLICATION_VERSION);
         responseMessageBody.append(pattern);
 
         return nx_http::StatusCode::ok;

@@ -1,6 +1,6 @@
 #include "db_manager.h"
 
-#include <utils/common/app_info.h>
+#include "version.h"
 
 #include <QtSql/QtSql>
 
@@ -269,14 +269,14 @@ bool QnDbManager::init(
     QSqlQuery insVersionQuery( m_sdb );
     insVersionQuery.prepare( "INSERT OR REPLACE INTO misc_data (key, data) values (?,?)" );
     insVersionQuery.addBindValue( "VERSION" );
-    insVersionQuery.addBindValue( QnAppInfo::applicationVersion() );
+    insVersionQuery.addBindValue( QN_APPLICATION_VERSION );
     if( !insVersionQuery.exec() )
     {
         qWarning() << "can't initialize sqlLite database!" << insVersionQuery.lastError().text();
         return false;
     }
     insVersionQuery.addBindValue( "BUILD" );
-    insVersionQuery.addBindValue( QnAppInfo::applicationRevision() );
+    insVersionQuery.addBindValue( QN_APPLICATION_REVISION );
     if( !insVersionQuery.exec() )
     {
         qWarning() << "can't initialize sqlLite database!" << insVersionQuery.lastError().text();
@@ -723,7 +723,7 @@ bool QnDbManager::applyUpdates()
 
             QSqlQuery insQuery(m_sdb);
             insQuery.prepare("INSERT INTO south_migrationhistory (app_name, migration, applied) values(?, ?, ?)");
-            insQuery.addBindValue(QnAppInfo::applicationName());
+            insQuery.addBindValue(QN_APPLICATION_NAME);
             insQuery.addBindValue(fileName);
             insQuery.addBindValue(QDateTime::currentDateTime());
             if (!insQuery.exec()) {

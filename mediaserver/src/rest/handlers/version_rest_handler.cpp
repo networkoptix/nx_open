@@ -6,9 +6,9 @@
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include "common/common_module.h"
-#include <utils/common/app_info.h>
+#include "version.h"
 
-int QnAppInfoRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnVersionRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
     Q_UNUSED(params)
@@ -18,7 +18,7 @@ int QnAppInfoRestHandler::executeGet(const QString& path, const QnRequestParamLi
     return CODE_OK;
 }
 
-int QnAppInfoRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray&, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
+int QnVersionRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray&, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
 {
     return executeGet(path, params, result, contentType);
 }

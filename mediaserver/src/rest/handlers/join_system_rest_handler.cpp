@@ -16,7 +16,7 @@
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/module_finder.h"
 #include "utils/network/direct_module_finder.h"
-#include <utils/common/app_info.h>
+#include "version.h"
 
 namespace {
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
@@ -70,7 +70,7 @@ int QnJoinSystemRestHandler::executeGet(const QString &path, const QnRequestPara
         return CODE_OK;
     }
 
-    if (moduleInformation.version != qnCommon->engineVersion() || moduleInformation.customization != QnAppInfo::customizationName()) {
+    if (moduleInformation.version != qnCommon->engineVersion() || moduleInformation.customization != lit(QN_CUSTOMIZATION_NAME)) {
         result.setErrorString(lit("INCOMPATIBLE"));
         return CODE_OK;
     }

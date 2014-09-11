@@ -10,7 +10,7 @@
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include <utils/common/log.h>
-#include <utils/common/app_info.h>
+#include "version.h"
 
 static QnMediaServerResourcePtr m_server;
 
@@ -37,7 +37,7 @@ QString getDataDirectory()
         return dataDirFromSettings;
 
 #ifdef Q_OS_LINUX
-    QString defVarDirName = QString("/opt/%1/mediaserver/var").arg(QnAppInfo::linuxOrganizationName());
+    QString defVarDirName = QString("/opt/%1/mediaserver/var").arg(VER_LINUX_ORGANIZATION_NAME);
     QString varDirName = MSSettings::roSettings()->value("varDir", defVarDirName).toString();
     return varDirName;
 #else

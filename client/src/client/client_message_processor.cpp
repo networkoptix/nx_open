@@ -10,7 +10,7 @@
 #include "plugins/resource/server_camera/server_camera.h"
 #include "utils/network/global_module_finder.h"
 
-#include <utils/common/app_info.h>
+#include "version.h"
 
 
 QnClientMessageProcessor::QnClientMessageProcessor():

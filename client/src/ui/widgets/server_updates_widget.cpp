@@ -22,7 +22,7 @@
 
 #include <utils/applauncher_utils.h>
 
-#include <utils/common/app_info.h>
+#include <version.h>
 
 namespace {
     const int longInstallWarningTimeout = 2 * 60 * 1000; // 2 minutes

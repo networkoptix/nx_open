@@ -7,7 +7,7 @@
 
 #include "resource_property_adaptor.h"
 
-#include <utils/common/app_info.h>
+#include "version.h"
 
 namespace {
     QSet<QString> parseDisabledVendors(QString disabledVendors) {
@@ -53,7 +53,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameUser, QString(), this);
     m_passwordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(namePassword, QString(), this);
     m_signatureAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSignature, QString(), this);
-    m_supportEmailAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSupportEmail, QnAppInfo::supportAddress()), this;
+    m_supportEmailAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSupportEmail, lit(QN_SUPPORT_MAIL_ADDRESS), this);
     m_connectionTypeAdaptor = new  QnLexicalResourcePropertyAdaptor<QnEmail::ConnectionType>(nameConnectionType, QnEmail::Unsecure, this);
     m_portAdaptor = new QnLexicalResourcePropertyAdaptor<int>(namePort, 0, this);
     m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(nameTimeout, QnEmail::defaultTimeoutSec(), this);

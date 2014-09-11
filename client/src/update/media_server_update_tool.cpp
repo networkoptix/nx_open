@@ -15,7 +15,7 @@
 
 #include <client/client_settings.h>
 
-#include <utils/common/app_info.h>
+#include <version.h>
 
 namespace {
 

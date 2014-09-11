@@ -1,6 +1,6 @@
 #include "license_manager_widget.h"
 #include "ui_license_manager_widget.h"
-#include <utils/common/app_info.h>
+#include "version.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
