@@ -11,12 +11,12 @@
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/log.h>
+#include <utils/common/app_info.h>
 
 #include "applauncher_process.h"
 #include "installation_process.h"
 #include "rdir_syncher.h"
 #include "process_utils.h"
-#include "version.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -31,7 +31,7 @@ static BOOL WINAPI stopServer_WIN(DWORD /*dwCtrlType*/)
 }
 #endif
 
-static QString SERVICE_NAME = QString::fromLatin1("%1%2").arg(QLatin1String(QN_CUSTOMIZATION_NAME)).arg(QLatin1String("AppLauncher"));
+static QString SERVICE_NAME = QString::fromLatin1("%1%2").arg(QnAppInfo::customizationName()).arg(QLatin1String("AppLauncher"));
 
 static void printHelp()
 {
@@ -51,8 +51,8 @@ static void printHelp()
         "  Installation mode (installs requested version)\n"
         "    --install Run in installation mode (install version specified by following parameters)\n"
         "    --version= Mandatory in installation mode\n"
-        "    --product-name= Optional. By default, \""<<QN_PRODUCT_NAME_SHORT<<"\"\n"
-        "    --customization= Optional. By default, \""<<QN_CUSTOMIZATION_NAME<<"\"\n"
+        "    --product-name= Optional. By default, \""<<QnAppInfo::productNameShort().toUtf8().data()<<"\"\n"
+        "    --customization= Optional. By default, \""<<QnAppInfo::customizationName().toUtf8().data()<<"\"\n"
         "    --module= Optional. By default, \"client\"\n"
         "    --install-path= Optional. By default, " << InstallationManager::defaultDirectoryForInstallations().toStdString() << "/{version}\n"
         "\n"
@@ -92,8 +92,8 @@ int main( int argc, char* argv[] )
     QString remoteUrl;
     bool installMode = false;
     QString versionToInstall;
-    QString productNameToInstall( QString::fromUtf8(QN_PRODUCT_NAME_SHORT) );
-    QString customizationToInstall( QString::fromUtf8(QN_CUSTOMIZATION_NAME) );
+    QString productNameToInstall( QnAppInfo::productNameShort() );
+    QString customizationToInstall( QnAppInfo::customizationName() );
     QString moduleToInstall( QString::fromLatin1("client") );
     QString installationPath;
     QString devModeKey;
@@ -146,9 +146,9 @@ int main( int argc, char* argv[] )
         QnLog::initLog( logLevel );
     }
 
-    NX_LOG( QN_APPLICATION_NAME " started", cl_logALWAYS );
-    NX_LOG( "Software version: " QN_APPLICATION_VERSION, cl_logALWAYS );
-    NX_LOG( "Software revision: " QN_APPLICATION_REVISION, cl_logALWAYS );
+    NX_LOG( QnAppInfo::applicationName() + " started", cl_logALWAYS );
+    NX_LOG( "Software version: " + QnAppInfo::applicationVersion(), cl_logALWAYS );
+    NX_LOG( "Software revision: " + QnAppInfo::applicationRevision(), cl_logALWAYS );
 
     InstallationManager installationManager;
 

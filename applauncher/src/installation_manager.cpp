@@ -12,7 +12,7 @@
 #include <utils/common/log.h>
 #include <utils/update/update_utils.h>
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 
 namespace {
@@ -63,11 +63,11 @@ void InstallationManager::updateInstalledVersionsInformation()
     QMap<QnSoftwareVersion, QnClientInstallationPtr> installations;
 
     // detect current installation
-    NX_LOG(QString::fromLatin1("Checking current version (%1)").arg(QN_APPLICATION_VERSION), cl_logDEBUG1);
+    NX_LOG(QString::fromLatin1("Checking current version (%1)").arg(QnAppInfo::applicationVersion()), cl_logDEBUG1);
 
     QnClientInstallationPtr current = QnClientInstallation::installationForPath(QCoreApplication::applicationDirPath());
     if (current) {
-        current->setVersion(QnSoftwareVersion(QN_APPLICATION_VERSION));
+        current->setVersion(QnSoftwareVersion(QnAppInfo::applicationVersion()));
         installations.insert(current->version(), current);
     } else {
         NX_LOG(QString::fromLatin1("Can't find client binary in %1").arg(QCoreApplication::applicationDirPath()), cl_logWARNING);
