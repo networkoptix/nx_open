@@ -68,7 +68,7 @@ void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QUuid> &tar
     m_waitTargets.clear();
 
     foreach (const QUuid &id, m_targets) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             m_targets.remove(id);
     }
@@ -112,7 +112,7 @@ void QnConnectToCurrentSystemTool::configureServer() {
     }
 
     foreach (const QUuid &id, m_targets) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 

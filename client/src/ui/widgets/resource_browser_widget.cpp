@@ -443,19 +443,6 @@ QnVideoWallMatrixIndexList QnResourceBrowserWidget::selectedVideoWallMatrices() 
     return result;
 }
 
-QnResourceList QnResourceBrowserWidget::selectedIncompatibleServers() const {
-    QnResourceList result;
-
-    foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
-        if (index.data(Qn::ResourceStatusRole).value<Qn::ResourceStatus>() != Qn::Incompatible)
-            continue;
-
-        result.append(index.data(Qn::ResourceRole).value<QnResourcePtr>());
-    }
-
-    return result;
-}
-
 Qn::ActionScope QnResourceBrowserWidget::currentScope() const {
     return Qn::TreeScope;
 }

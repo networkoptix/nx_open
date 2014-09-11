@@ -49,6 +49,7 @@ public:
     quint16 port;
     bool sslAllowed;
     QStringList remoteAddresses;
+    QByteArray authHash;
 
     RevealResponse();
     RevealResponse(const QnModuleInformation &moduleInformation);
