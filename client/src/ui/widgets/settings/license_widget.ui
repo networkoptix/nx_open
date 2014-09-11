@@ -238,6 +238,17 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>activationTypeComboBox</tabstop>
+  <tabstop>onlineKeyEdit</tabstop>
+  <tabstop>manualKeyEdit</tabstop>
+  <tabstop>hardwareIdEdit</tabstop>
+  <tabstop>copyHwidButton</tabstop>
+  <tabstop>fileLineEdit</tabstop>
+  <tabstop>browseLicenseFileButton</tabstop>
+  <tabstop>activateFreeLicenseButton</tabstop>
+  <tabstop>activateLicenseButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <slots>

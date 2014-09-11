@@ -128,6 +128,24 @@ private:
     QList<QnActionCondition*> m_conditions;
 };
 
+/**
+ * Condition wich is a disjunction of two or more conditions.
+ * It acts like logical OR, e.g. an action is enabled if one of conditions in the conjunction is true.
+ * But the result (Qn::ActionVisibility) may have 3 values: [Invisible, Disabled, Enabled], so this action condition chooses
+ * the maximal value from its conjuncts.
+ */
+class QnDisjunctionActionCondition: public QnActionCondition {
+public:
+    QnDisjunctionActionCondition(const QList<QnActionCondition*> conditions, QObject *parent = NULL);
+    QnDisjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QObject *parent = NULL);
+    QnDisjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QObject *parent = NULL);
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+
+private:
+    QList<QnActionCondition*> m_conditions;
+};
+
 class QnNegativeActionCondition: public QnActionCondition {
 public:
     QnNegativeActionCondition(QnActionCondition *condition, QObject *parent = NULL) : QnActionCondition(parent), m_condition(condition) {}

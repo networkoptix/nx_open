@@ -20,13 +20,14 @@ struct QnModuleInformation {
     QSet<QString> remoteAddresses;
     QUuid id;
     bool sslAllowed;
+    QByteArray authHash;
 
     QnModuleInformation() : port(0), sslAllowed(false) {}
 
     bool isCompatibleToCurrentSystem() const;
     bool isLocal() const; //!< true if at least one address from \a remoteHostAddress is a local address
 };
-#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(remoteAddresses)(id)(sslAllowed)
+#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(remoteAddresses)(id)(sslAllowed)(authHash)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (json)(metatype)(eq))
 

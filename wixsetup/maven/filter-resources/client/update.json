@@ -3,5 +3,6 @@
     "platform" : "${platform}",
     "arch" : "${arch}",
     "client" : true,
+	"modification" : "${box}",
     "minimalVersion" : "${release.version}.0"
 }
