@@ -370,7 +370,7 @@ bool QnDbManager::init(
     }
 
     QString defaultAdminPassword = qnCommon->defaultAdminPassword();
-    if( users[0].password.isEmpty() && defaultAdminPassword.isEmpty() ) {
+    if( users[0].hash.isEmpty() && defaultAdminPassword.isEmpty() ) {
         defaultAdminPassword = lit("123");
     }
 
