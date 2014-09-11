@@ -2,6 +2,5 @@
     "version" : "${release.version}.${buildNumber}",
     "platform" : "${platform}",
     "arch" : "${arch}",
-    "client" : true,
-    "minimalVersion" : "${release.version}.0"
+    "executable" : "install.bat"
 }
