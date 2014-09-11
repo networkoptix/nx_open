@@ -124,11 +124,11 @@ int main( int argc, char* argv[] )
     QtSingleCoreApplication app( SERVICE_NAME, argc, argv );
     QDir::setCurrent( QCoreApplication::applicationDirPath() );
 
-    QSettings globalSettings( QSettings::SystemScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
-    QSettings userSettings( QSettings::UserScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
+    QSettings globalSettings( QSettings::SystemScope, QnAppInfo::organizationName(), QnAppInfo::applicationName() );
+    QSettings userSettings( QSettings::UserScope, QnAppInfo::organizationName(), QnAppInfo::applicationName() );
 
     if( mirrorListUrl.isEmpty() )
-        mirrorListUrl = globalSettings.value( "mirrorListUrl", QN_MIRRORLIST_URL ).toString();
+        mirrorListUrl = globalSettings.value( "mirrorListUrl", QnAppInfo::mirrorListUrl() ).toString();
 
     if (mirrorListUrl.isEmpty())
         NX_LOG( "MirrorListUrl is empty", cl_logWARNING );
