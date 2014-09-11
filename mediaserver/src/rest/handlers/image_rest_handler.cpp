@@ -174,6 +174,12 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
     int rotate = 0;
     bool rotateDefined = false;
 
+    //validating input parameters
+    auto widthIter = params.find( "width" );
+    auto heightIter = params.find( "height" );
+    if( (widthIter != params.end()) && (heightIter == params.end() || heightIter->second.toInt() < 1) )
+        return nx_http::StatusCode::badRequest; //width cannot be specified without height, but only height is acceptable
+
     for (int i = 0; i < params.size(); ++i)
     {
         if (params[i].first == "res_id" || params[i].first == "physicalId")
@@ -245,7 +251,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
 
 #ifdef EDGE_SERVER
     if (dstSize.height() < 1)
-        dstSize.setHeight(360); // default value
+        dstSize.setHeight(360); //on edge instead of full-size image we return 360p
 #endif
 
     bool useHQ = true;
