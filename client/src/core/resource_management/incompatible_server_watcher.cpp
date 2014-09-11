@@ -99,7 +99,7 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
         return;
 
     Qn::ResourceStatus status = server->getStatus();
-    if (status != Qn::Offline && status != Qn::Incompatible)
+    if (status != Qn::Offline)
         removeResource(m_fakeUuidByServerUuid.value(id));
 }
 
