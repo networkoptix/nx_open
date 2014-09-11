@@ -11,6 +11,7 @@
 #include "core/resource/media_server_resource.h"
 #include "ui/models/resource_list_model.h"
 #include "ui/models/server_addresses_model.h"
+#include "ui/style/warning_style.h"
 #include "common/common_module.h"
 
 namespace {
@@ -27,6 +28,7 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     ui(new Ui::QnRoutingManagementWidget)
 {
     ui->setupUi(this);
+    setWarningStyle(ui->warningLabel);
 
     m_serverListModel = new QnResourceListModel(this);
     QSortFilterProxyModel *sortedServersModel = new QSortFilterProxyModel(this);
@@ -56,8 +58,6 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnRoutingManagementWidget::at_resourcePool_resourceRemoved);
 
     m_serverListModel->setResources(qnResPool->getResourcesWithFlag(Qn::server));
-
-    updateUi();
 }
 
 QnRoutingManagementWidget::~QnRoutingManagementWidget() {}
@@ -69,19 +69,6 @@ void QnRoutingManagementWidget::updateFromSettings() {
 bool QnRoutingManagementWidget::confirm() {
     ui->warningLabel->hide();
     return true;
-}
-
-const QnRoutingManagementColors QnRoutingManagementWidget::colors() const {
-    return m_colors;
-}
-
-void QnRoutingManagementWidget::setColors(const QnRoutingManagementColors &colors) {
-    m_colors = colors;
-    updateUi();
-}
-
-void QnRoutingManagementWidget::updateUi() {
-    ui->warningLabel->setText(lit("<span style=\"color:%1;\">%2</span>").arg(m_colors.warningColor.name()).arg(tr("Removing this connection option could lead to system malfunction.")));
 }
 
 void QnRoutingManagementWidget::updateModel() {

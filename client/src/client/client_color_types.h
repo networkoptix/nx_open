@@ -170,9 +170,8 @@ struct QnRoutingManagementColors {
     QnRoutingManagementColors();
 
     QColor readOnly;
-    QColor warningColor;
 };
-#define QnRoutingManagementColors_Fields (readOnly)(warningColor)
+#define QnRoutingManagementColors_Fields (readOnly)
 
 struct QnServerUpdatesColors {
     QnServerUpdatesColors();
