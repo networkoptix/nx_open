@@ -851,6 +851,12 @@
                             <optional>true</optional>
                             <values/>
                         </param>
+                        <param>
+                            <name>oldPassword</name>
+                            <description>Old admin password.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
                     </params>
                     <result>
                         <caption>JSON with error code and flag "restartNeeded" that shows if the server must be restarted to apply settings.</caption>

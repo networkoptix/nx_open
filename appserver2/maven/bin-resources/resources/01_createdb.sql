@@ -496,5 +496,3 @@ INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES (
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '4','Storage',NULL,NULL );
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '5','Local',NULL,NULL );
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '6','Camera',NULL,NULL );
-
-INSERT INTO "vms_propertytype" ( id,"resource_type_id",name,type,min,max,step,"values","ui_values","default_value",netHelper,"group","sub_group",description,ui,readonly ) VALUES ( '17238','6','mediaStreams','1',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0' );

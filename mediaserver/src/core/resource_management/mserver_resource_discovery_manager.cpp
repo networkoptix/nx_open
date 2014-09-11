@@ -22,9 +22,9 @@
 #include "plugins/storage/dts/abstract_dts_searcher.h"
 #include "common/common_module.h"
 #include "data_only_camera_resource.h"
+#include "media_server/settings.h"
 
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
-static const int MSERVER_OFFLINE_TIMEOUT = 1000 * 60 * 1;
 
 QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
 :
@@ -32,6 +32,8 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
 {
     netStateTime.restart();
     connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected, qnBusinessRuleConnector, &QnBusinessEventConnector::at_cameraDisconnected);
+    m_serverOfflineTimeout = MSSettings::roSettings()->value("redundancyTimeout", 60).toInt() * 1000;
+    m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
 }
 
 QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
@@ -101,7 +103,7 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCam
     if (camera->preferedServerId() == ownGuid)
         return true;
     else
-        return mServer->currentStatusTime() > MSERVER_OFFLINE_TIMEOUT;
+        return mServer->currentStatusTime() > m_serverOfflineTimeout;
 }
 
 bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)

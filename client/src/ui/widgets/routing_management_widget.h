@@ -19,13 +19,14 @@ class QnResourceListModel;
 
 class QnRoutingManagementWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
-
     typedef Connective<QnAbstractPreferencesWidget> base_type;
+
 public:
     explicit QnRoutingManagementWidget(QWidget *parent = 0);
     ~QnRoutingManagementWidget();
 
     virtual void updateFromSettings() override;
+    virtual bool confirm() override;
 
 private:
     void updateModel();

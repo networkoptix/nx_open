@@ -2001,14 +2001,6 @@ static void printVersion();
 
 int main(int argc, char* argv[])
 {
-    {
-        QMutex ggg;
-        QMutexLocker gggL(&ggg);
-        gggL.unlock();
-        gggL.unlock();
-    }
-    int gg = 4;
-
 #if 0
 #if defined(__GNUC__)
 # if defined(__i386__)
