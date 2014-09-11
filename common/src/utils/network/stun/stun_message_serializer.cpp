@@ -181,7 +181,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeTypeAndLength
 nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue( MessageSerializerBuffer* buffer ,const attr::Attribute* attribute , std::size_t* value ) {
     switch( attribute->type ) {
     case AttributeType::errorCode:
-        return serializeAttributeValue_ErrorCode( buffer , static_cast<const ErrorCode*>(attribute) ,value);
+        return serializeAttributeValue_ErrorCode( buffer , static_cast<const ErrorDescription*>(attribute) ,value);
     case AttributeType::fingerprint:
         return serializeAttributeValue_Fingerprint( buffer , static_cast<const FingerPrint*>(attribute) ,value);
     case AttributeType::xorMappedAddress:
@@ -271,7 +271,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Unknown
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attr::ErrorCode*  attribute , std::size_t* value ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attr::ErrorDescription*  attribute , std::size_t* value ) {
     std::size_t cur_pos = buffer->position();
     std::uint32_t error_header = attribute->code % 100;
     // We don't use attribute->_class value since we can get what we want from code
@@ -356,7 +356,7 @@ bool MessageSerializer::checkMessageIntegratiy() {
     ib = message_.attributes.find(AttributeType::errorCode);
     if( ib !=  message_.attributes.end() ) {
         // Checking the error code message
-        ErrorCode* error_code = static_cast<ErrorCode*>(
+        ErrorDescription* error_code = static_cast<ErrorDescription*>(
             ib->second.get());
         if( error_code->_class <3 || error_code->_class >6 )
             return false;

@@ -45,7 +45,7 @@ namespace nx_stun
         // value 
         nx_api::SerializerState::Type serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attr::XorMappedAddress* , std::size_t* value );
         nx_api::SerializerState::Type serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attr::FingerPrint* , std::size_t* value );
-        nx_api::SerializerState::Type serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attr::ErrorCode* , std::size_t* value );
+        nx_api::SerializerState::Type serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attr::ErrorDescription* , std::size_t* value );
         nx_api::SerializerState::Type serializeAttributeValue_MessageIntegrity( MessageSerializerBuffer* buffer ,const attr::MessageIntegrity* , std::size_t* value );
         nx_api::SerializerState::Type serializeAttributeValue_UnknownAttribute( MessageSerializerBuffer* buffer ,const attr::UnknownAttribute* , std::size_t* value );
         // this function will do minimum checking for the message object

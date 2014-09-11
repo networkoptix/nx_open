@@ -75,6 +75,17 @@ namespace nx_stun
         }
     };
 
+    namespace ErrorCode
+    {
+        static const int tryAlternate = 300;
+        static const int badRequest = 400;
+        static const int unauthorized = 401;
+        static const int notFound = 404;
+        static const int unknownAttribute = 420;
+        static const int staleNonce = 438;
+        static const int serverError = 500;
+    }
+
     //!Contains STUN attributes
     namespace attr
     {
@@ -130,7 +141,8 @@ namespace nx_stun
             } address;  //!< address in host byte order
         };
 
-        class ErrorCode
+        //!ERROR-CODE attribute [rfc5389, 15.6]
+        class ErrorDescription
         :
             public Attribute
         {

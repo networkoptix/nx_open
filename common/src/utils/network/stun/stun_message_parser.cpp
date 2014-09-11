@@ -181,7 +181,7 @@ Attribute* MessageParser::parseErrorCode() {
     // The first 21 bits is for reservation, but the RFC says it SHOULD be zero, so ignore it.
     std::bitset<16> value(val & 0x0000ffff);
     // First comes 3 bits class
-    std::unique_ptr<ErrorCode> attribute( new ErrorCode() );
+    std::unique_ptr<ErrorDescription> attribute( new ErrorDescription() );
     attribute->length = attribute_.length;
     attribute->type = AttributeType::errorCode;
     attribute->_class =0;
