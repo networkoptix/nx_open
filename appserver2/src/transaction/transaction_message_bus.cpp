@@ -358,8 +358,21 @@ void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTranspor
     Q_UNUSED(tran)
 	sender->setReadSync(true);
 
-    sendConnectionsData();
-    sendModulesData();
+    QnPeerSet processedPeers;
+    for(auto it = m_connections.constBegin(); it != m_connections.constEnd(); ++it) {
+        if (it.value()->isReadyToSend(ApiCommand::NotDefined))
+            processedPeers.insert(it.key()); // dst peer should not proxy transactions to already connected peers
+    }
+
+    if (QnRouter::instance()) {
+        QnTransaction<ApiConnectionDataList> transaction = prepareConnectionsDataTransaction();
+        sendTransaction(transaction, processedPeers);
+    }
+
+    if (QnGlobalModuleFinder::instance()) {
+        QnTransaction<ApiModuleDataList> transaction = prepareModulesDataTransaction();
+        sendTransaction(transaction, processedPeers);
+    }
 }
 
 template <class T>
@@ -784,15 +797,6 @@ QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTran
     return transaction;
 }
 
-void QnTransactionMessageBus::sendModulesData()
-{
-    if (!QnGlobalModuleFinder::instance())
-        return;
-
-    QnTransaction<ApiModuleDataList> transaction = prepareModulesDataTransaction();
-    sendTransaction(transaction);
-}
-
 QnTransaction<ApiConnectionDataList> QnTransactionMessageBus::prepareConnectionsDataTransaction() const
 {
     QnTransaction<ApiConnectionDataList> transaction(ApiCommand::availableConnections);
@@ -808,15 +812,6 @@ QnTransaction<ApiConnectionDataList> QnTransactionMessageBus::prepareConnections
     }
 
     return transaction;
-}
-
-void QnTransactionMessageBus::sendConnectionsData()
-{
-    if (!QnRouter::instance())
-        return;
-
-    QnTransaction<ApiConnectionDataList> transaction = prepareConnectionsDataTransaction();
-    sendTransaction(transaction);
 }
 
 //TODO #ak use SocketAddress instead of this function. It will reduce QString instanciation count
