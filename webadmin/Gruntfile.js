@@ -82,8 +82,8 @@ module.exports = function (grunt) {
                     headers: { //admin:123
                         "Authorization": "Basic YWRtaW46MTIz"
                     }
-                },
-                /*{//Daria
+                }
+                /*,{//Daria
                     context: '/api/',
                     host: '10.0.2.229',
                     port: 7039,
@@ -91,17 +91,17 @@ module.exports = function (grunt) {
                         "Authorization": "Basic YWRtaW46MTIz"
                     }
 
-                },*/
+                }*/
 
-                /*{//Sergey Yuldashev
+                ,{//Sergey Yuldashev
                     context: '/api/',
                     host: '10.0.2.203',
                     port: 7501,
                     headers: { //admin:123
                         "Authorization": "Basic YWRtaW46MTIz"
                     }
-                },*/
-                {//Denis
+                }
+                /*,{//Denis
                     context: '/api/',
                     host: '10.0.2.182',
                     port: 7001,
@@ -109,7 +109,7 @@ module.exports = function (grunt) {
                         "Authorization": "Basic YWRtaW46MTIz"
                     }
 
-                }
+                }*/
                 /* ,
                 {
                     context: '/',

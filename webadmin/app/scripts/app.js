@@ -19,7 +19,7 @@ angular.module('webadminApp', [
             })
             .when('/info', {
                 templateUrl: 'views/info.html',
-                controller: 'MainCtrl'
+                controller: 'InfoCtrl'
             })
             .when('/developers', {
                 templateUrl: 'views/developers.html',
@@ -37,6 +37,11 @@ angular.module('webadminApp', [
               templateUrl: 'views/login.html',
               controller: 'LoginCtrl'
             })
+            .when('/advanced', {
+                templateUrl: 'views/advanced.html',
+                controller: 'AdvancedCtrl'
+            })
+
             .otherwise({
                 redirectTo: '/settings'
             });
