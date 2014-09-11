@@ -15,7 +15,6 @@
 
 #include "ec2_thread_pool.h"
 #include "database/db_manager.h"
-#include "managers/aux_manager.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
 #include "transaction/transaction_message_bus.h"
@@ -65,10 +64,6 @@ namespace ec2
             };
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)>
                 SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
-
-            errorCode = auxManager->executeTransaction(tran);
-            if( errorCode != ErrorCode::ok )
-                return;
 
             if( !tran.persistentInfo.isNull() )
             {
@@ -189,10 +184,6 @@ namespace ec2
                 tran.params = data;
                 tran.fillPersistentInfo();
                 tran.isLocal = multiTran.isLocal;
-
-                errorCode = auxManager->executeTransaction(tran);
-                if( errorCode != ErrorCode::ok )
-                    return;
 
                 QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
                 errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
