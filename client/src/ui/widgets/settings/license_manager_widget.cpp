@@ -26,6 +26,8 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/warning_style.h>
 #include <ui/models/license_list_model.h>
+#include <ui/dialogs/license_details_dialog.h>
+
 #include <utils/license_usage_helper.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/common/product_features.h>
@@ -276,21 +278,11 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
 }
 
 void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license) {
-    QString features = (license->type() == Qn::LC_VideoWall)
-        ? tr("Screens and Control Sessions Allowed: %1").arg(license->cameraCount())
-        : tr("Archive Streams Allowed: %1").arg(license->cameraCount());
-    
-    QString details = tr("<b>Generic:</b><br />\n"
-        "License Type: %1<br />\n"
-        "License Key: %2<br />\n"
-        "Locked to Hardware ID: %3<br />\n"
-        "<br />\n"
-        "<b>Features:</b><br />\n")
-        .arg(license->displayName())
-        .arg(QLatin1String(license->key()))
-        .arg(QLatin1String(qnLicensePool->currentHardwareId()))
-        ;
-    QMessageBox::information(this, tr("License Details"), details + features);
+    if (!license)
+        return;
+
+    QScopedPointer<QnLicenseDetailsDialog> dialog(new QnLicenseDetailsDialog(license, this));
+    dialog->exec();
 }
 
 void QnLicenseManagerWidget::updateDetailsButtonEnabled() 
