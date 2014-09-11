@@ -41,7 +41,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
 
     ui->manualActivationTextWidget->setText(tr(
          "Please send email with the Serial Key and the Hardware ID provided to <a href=\"mailto:%1\">%1</a>. "
-         "Then we'll send you an Activation Key which should be filled in the field below."
+         "Then we'll send you an Activation Key file."
      ).arg(QnAppInfo::licensingEmailAddress())); // TODO: #Elric move to product features?
 
     connect(ui->serialKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
@@ -101,16 +101,7 @@ void QnLicenseWidget::setSerialKey(const QString &serialKey) {
 }
 
 QByteArray QnLicenseWidget::activationKey() const {
-    QStringList lines = ui->activationKeyTextEdit->toPlainText().split(QLatin1Char('\n'));
-    QStringList filtered_lines;
-    foreach(QString line, lines) {
-        line = line.trimmed();
-        if (!line.isEmpty()) {
-            filtered_lines.append(line);
-        }
-    }
-
-    return filtered_lines.join(QLatin1Char('\n')).toLatin1();
+    return m_activationKey;
 }
 
 void QnLicenseWidget::updateControls() {
@@ -142,10 +133,8 @@ void QnLicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
     ui->manualActivationTextWidget->setVisible(!isOnline);
     ui->hardwareIdLabel->setVisible(!isOnline);
     ui->hardwareIdEdit->setVisible(!isOnline);
-    ui->activationKeyLabel->setVisible(!isOnline);
-    ui->activationKeyTextEdit->setVisible(!isOnline);
     ui->activationKeyFileLabel->setVisible(!isOnline);
-    ui->licenseFileLabel->setVisible(!isOnline);
+    ui->fileLineEdit->setVisible(!isOnline);
     ui->browseLicenseFileButton->setVisible(!isOnline);
 
     updateControls();
@@ -162,10 +151,24 @@ void QnLicenseWidget::at_browseLicenseFileButton_clicked() {
         return;
 
     QFile file(fileName);
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        ui->activationKeyTextEdit->setPlainText(QLatin1String(file.readAll()));
-        ui->licenseFileLabel->setText(file.fileName());
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, tr("Error"), tr("Could not open the file %1").arg(fileName));
+        return;
     }
+
+    ui->fileLineEdit->setText(file.fileName());
+    QString source = QString::fromLatin1(file.readAll());
+    file.close();
+
+    QStringList lines = source.split(L'\n');
+    QStringList filtered_lines;
+    foreach(QString line, lines) {
+        line = line.trimmed();
+        if (!line.isEmpty()) {
+            filtered_lines.append(line);
+        }
+    }
+    m_activationKey = filtered_lines.join(L'\n').toLatin1();   
 }
 
 void QnLicenseWidget::at_activateFreeLicenseButton_clicked() {

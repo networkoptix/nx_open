@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>409</width>
-    <height>306</height>
+    <height>170</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1,0">
@@ -33,6 +33,9 @@
    </item>
    <item>
     <layout class="QFormLayout" name="formLayout_2">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+     </property>
      <item row="0" column="0">
       <widget class="QLabel" name="serialKeyLabel">
        <property name="text">
@@ -70,28 +73,18 @@
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="activationKeyLabel">
+      <widget class="QLabel" name="activationKeyFileLabel">
        <property name="text">
-        <string>Activation Key:</string>
+        <string>Activation Key File:</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QPlainTextEdit" name="activationKeyTextEdit">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="tabChangesFocus">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
        <item>
-        <widget class="QLabel" name="licenseFileLabel">
-         <property name="text">
-          <string>...</string>
+        <widget class="QLineEdit" name="fileLineEdit">
+         <property name="readOnly">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -106,13 +99,6 @@
         </widget>
        </item>
       </layout>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="activationKeyFileLabel">
-       <property name="text">
-        <string>Activation Key File:</string>
-       </property>
-      </widget>
      </item>
     </layout>
    </item>
