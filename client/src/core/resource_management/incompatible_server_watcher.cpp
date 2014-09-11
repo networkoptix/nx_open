@@ -26,11 +26,11 @@ void updateServer(const QnMediaServerResourcePtr &server, const QnModuleInformat
     server->setSystemName(moduleInformation.systemName);
 }
 
-QnMediaServerResourcePtr makeResource(const QnModuleInformation &moduleInformation) {
+QnMediaServerResourcePtr makeResource(const QnModuleInformation &moduleInformation, Qn::ResourceStatus initialStatus) {
     QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
 
     server->setId(QUuid::createUuid());
-    server->setStatus(Qn::Incompatible, true);
+    server->setStatus(initialStatus, true);
     server->setProperty(lit("guid"), moduleInformation.id.toString());
 
     updateServer(server, moduleInformation);
@@ -58,8 +58,11 @@ QnIncompatibleServerWatcher::QnIncompatibleServerWatcher(QObject *parent) :
 }
 
 void QnIncompatibleServerWatcher::at_peerChanged(const QnModuleInformation &moduleInformation) {
-    if (moduleInformation.isCompatibleToCurrentSystem()) {
-        removeResource(moduleInformation.id);
+    bool compatible = moduleInformation.isCompatibleToCurrentSystem();
+    bool authorized = moduleInformation.authHash == qnCommon->moduleInformation().authHash;
+
+    if (compatible && (authorized || qnResPool->getResourceById(moduleInformation.id))) {
+        removeResource(m_fakeUuidByServerUuid.value(moduleInformation.id));
         return;
     }
 
@@ -69,7 +72,7 @@ void QnIncompatibleServerWatcher::at_peerChanged(const QnModuleInformation &modu
         if (!isSuitable(moduleInformation))
             return;
 
-        QnMediaServerResourcePtr server = makeResource(moduleInformation);
+        QnMediaServerResourcePtr server = makeResource(moduleInformation, (compatible && !authorized) ? Qn::Unauthorized : Qn::Incompatible);
         m_fakeUuidByServerUuid[moduleInformation.id] = server->getId();
         m_serverUuidByFakeUuid[server->getId()] = moduleInformation.id;
         qnResPool->addResource(server);
