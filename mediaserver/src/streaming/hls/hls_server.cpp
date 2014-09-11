@@ -32,6 +32,8 @@
 #include "utils/network/tcp_connection_priv.h"
 
 
+//TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
+
 using std::make_pair;
 using namespace nx_http;
 
@@ -419,10 +421,17 @@ namespace nx_hls
                     : MEDIA_Quality_Low;
             }
 
-            if( !camResource->hasDualStreaming() && streamQuality == MEDIA_Quality_Low )
+            if( !camResource->hasDualStreaming() )
             {
-                NX_LOG( QString::fromLatin1("Got request to unavailable low quality of camera %2").arg(camResource->getUniqueId()), cl_logDEBUG1 );
-                return nx_http::StatusCode::notFound;
+                if( streamQuality == MEDIA_Quality_Low )
+                {
+                    NX_LOG( QString::fromLatin1("Got request to unavailable low quality of camera %2").arg(camResource->getUniqueId()), cl_logDEBUG1 );
+                    return nx_http::StatusCode::notFound;
+                }
+                else if( streamQuality == MEDIA_Quality_Auto )
+                {
+                    streamQuality = MEDIA_Quality_High;
+                }
             }
 
             const nx_http::StatusCode::Value result = createSession(

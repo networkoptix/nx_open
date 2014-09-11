@@ -544,7 +544,9 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
 
     QnPeerSet processedPeers = transportHeader.processedPeers + connectedPeers(tran.command);
     processedPeers << m_localPeer.id;
-    QnTransactionTransportHeader newHeader(processedPeers, transportHeader.dstPeers, transportHeader.sequence);
+    QnTransactionTransportHeader newHeader(processedPeers, transportHeader.dstPeers);
+    newHeader.sequence = transportHeader.sequence;
+    newHeader.sender = transportHeader.sender;
 
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
     QSet<QUuid> proxyList;
