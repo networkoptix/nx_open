@@ -8,9 +8,9 @@
 #include "http_stream_socket_server.h"
 
 
-const QString RegisterHttpHandler::HANDLER_PATH = QLatin1String("/register");
+const QString RegisterSystemHttpHandler::HANDLER_PATH = QLatin1String("/register");
 
-bool RegisterHttpHandler::processRequest( const std::weak_ptr<HttpServerConnection>& connection, nx_http::Message&& message )
+bool RegisterSystemHttpHandler::processRequest( const std::weak_ptr<HttpServerConnection>& connection, nx_http::Message&& message )
 {
     //RegisteredSystemsDataManager::saveRegistrationDataAsync
 
@@ -27,11 +27,11 @@ bool RegisterHttpHandler::processRequest( const std::weak_ptr<HttpServerConnecti
     response.response->headers.insert( nx_http::HttpHeader( "Content-Type", "text/html" ) );
     response.response->headers.insert( nx_http::HttpHeader( "Content-Size", QByteArray::number( response.response->messageBody.size() ) ) );
 
-    return connection.lock()->sendMessage( std::move( response ), std::bind( &RegisterHttpHandler::responseSent, this, connection ) );
+    return connection.lock()->sendMessage( std::move( response ), std::bind( &RegisterSystemHttpHandler::responseSent, this, connection ) );
 }
 
 
-void RegisterHttpHandler::responseSent( const std::weak_ptr<HttpServerConnection>& connection )
+void RegisterSystemHttpHandler::responseSent( const std::weak_ptr<HttpServerConnection>& connection )
 {
     const std::shared_ptr<HttpServerConnection>& strongConnectionRef = connection.lock();
     if( !strongConnectionRef )

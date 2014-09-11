@@ -14,7 +14,7 @@
 #include "http_server_connection.h"
 
 
-class RegisterHttpHandler
+class RegisterSystemHttpHandler
 {
 public:
     static const QString HANDLER_PATH;

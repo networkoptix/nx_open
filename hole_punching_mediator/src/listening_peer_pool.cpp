@@ -24,8 +24,7 @@ bool ListeningPeerPool::processBindRequest( const std::weak_ptr<StunServerConnec
         //address to bind to. This address MUST have following format: {server_guid}.{system_name}
         //registration_key. It is variable-length string
 
-    //checking that system_name has been registered previously with supplied registration_key
-        //RegisteredSystemsDataManager::findRegistrationData
+    //checking that system_name has been registered previously with supplied registration_key by invoking RegisteredDomainsDataManager::getDomainData
 
     //checking that address {server_guid}.{system_name} is not occupied already
 

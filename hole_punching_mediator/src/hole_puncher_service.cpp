@@ -96,22 +96,15 @@ int HolePuncherProcess::executeApplication()
         return 1;
     }
 
-    m_multiAddressStunServer.reset( new MultiAddressServer<StunStreamSocketServer>( addrToListenList, true, SocketFactory::nttEnabled ) );
-    m_multiAddressHttpServer.reset( new MultiAddressServer<nx_http::HttpStreamSocketServer>( addrToListenList, true, SocketFactory::nttDisabled ) );
+    //TODO opening database
+    nx_hpm::RegisteredDomainsDataManager registeredDomainsDataManager;
 
-    if( !m_multiAddressStunServer->bind() )
-        return 2;
-    if( !m_multiAddressHttpServer->bind() )
-        return 3;
-
-    //TODO: #ak process privilege reduction should be made here
-
-    RegisterHttpHandler registerHttpHandler;
+    //HTTP handlers
+    RegisterSystemHttpHandler registerHttpHandler;
 
     nx_http::MessageDispatcher httpMessageDispatcher;
-
     httpMessageDispatcher.registerRequestProcessor(
-        RegisterHttpHandler::HANDLER_PATH,
+        RegisterSystemHttpHandler::HANDLER_PATH,
         [&registerHttpHandler](const std::weak_ptr<HttpServerConnection>& connection, nx_http::Message&& message) -> bool {
             return registerHttpHandler.processRequest( connection, std::move(message) );
         }
@@ -119,7 +112,9 @@ int HolePuncherProcess::executeApplication()
 
     using namespace std::placeholders;
 
+    //STUN handlers
     ListeningPeerPool listeningPeerPool;
+
     STUNMessageDispatcher stunMessageDispatcher;
     stunMessageDispatcher.registerRequestProcessor(
         nx_hpm::StunMethods::bind,
@@ -131,6 +126,16 @@ int HolePuncherProcess::executeApplication()
         [&listeningPeerPool](const std::weak_ptr<StunServerConnection>& connection, nx_stun::Message&& message) -> bool {
             return listeningPeerPool.processConnectRequest( connection, std::move(message) );
         } );
+
+    m_multiAddressStunServer.reset( new MultiAddressServer<StunStreamSocketServer>( addrToListenList, true, SocketFactory::nttEnabled ) );
+    m_multiAddressHttpServer.reset( new MultiAddressServer<nx_http::HttpStreamSocketServer>( addrToListenList, true, SocketFactory::nttDisabled ) );
+
+    if( !m_multiAddressStunServer->bind() )
+        return 2;
+    if( !m_multiAddressHttpServer->bind() )
+        return 3;
+
+    //TODO: #ak process privilege reduction should be made here
 
     if( !m_multiAddressStunServer->listen() )
         return 4;

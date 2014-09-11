@@ -13,10 +13,11 @@
 
 namespace nx_hpm
 {
-    class SystemRegistrationData
+    class DomainRegistrationData
     {
     public:
-        QString systemName;
+        //!Any token
+        QString domain;
         QString authenticationKey;
         //TODO add some security information: user key (if supplied), mediaserver guid, ipaddress, timestamp, something else
     };
@@ -29,14 +30,20 @@ namespace nx_hpm
     };
 
     /*!
-        \note Contains cache inside, so read operations are done in sync mode (sonce no blocking operations are implied)
+        \note Contains cache inside, so read operations can be completed immediately
     */
-    class RegisteredSystemsDataManager
+    class RegisteredDomainsDataManager
     {
     public:
-        bool saveRegistrationDataAsync( const SystemRegistrationData& registrationData, std::function<void(DbErrorCode)> );
-        //!Get operation is done in sync mode, since it always hits im-memory cache
-        bool findRegistrationData( const QString& systemName, SystemRegistrationData* const registrationData );
+        bool saveDomainDataAsync( const DomainRegistrationData& registrationData, std::function<void(DbErrorCode)>&& completionHandler );
+        //!
+        /*!
+            \note \a completionHandler is allowed to be invoked directly from this method (if get operation hit cache). TODO really?
+            \note This method is reentrant
+        */
+        bool getDomainData( const QString& domain, std::function<void(DbErrorCode, const DomainRegistrationData&)>&& completionHandler );
+
+        static DomainRegistrationData* instance();
     };
 }
 
