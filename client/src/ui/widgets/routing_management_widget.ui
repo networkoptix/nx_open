@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>566</width>
-    <height>381</height>
+    <width>564</width>
+    <height>379</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -83,6 +83,9 @@
    </item>
    <item>
     <widget class="QLabel" name="warningLabel">
+     <property name="text">
+      <string>Removing this connection option could lead to system malfunction.</string>
+     </property>
      <property name="textFormat">
       <enum>Qt::RichText</enum>
      </property>

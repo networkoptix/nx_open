@@ -122,7 +122,6 @@ QnLicensesListModelColors::QnLicensesListModelColors() {
 
 QnRoutingManagementColors::QnRoutingManagementColors() {
     readOnly = Qt::lightGray;
-    warningColor = Qt::red;
 }
 
 QnVideowallManageWidgetColors::QnVideowallManageWidgetColors() {
