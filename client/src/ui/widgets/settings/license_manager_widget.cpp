@@ -69,7 +69,6 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     connect(m_videowallUsageHelper,             &QnLicenseUsageHelper::licensesChanged,                             this,   &QnLicenseManagerWidget::updateLicenses);
 
     updateLicenses();
-    updateDetailsButtonEnabled();
 }
 
 QnLicenseManagerWidget::~QnLicenseManagerWidget()
@@ -157,6 +156,8 @@ void QnLicenseManagerWidget::updateLicenses() {
     if(useRedLabel)
         setWarningStyle(&palette);
     ui->infoLabel->setPalette(palette);
+
+    updateDetailsButtonEnabled();
 }
 
 void QnLicenseManagerWidget::showMessage(const QString &title, const QString &message, bool warning) {
@@ -441,6 +442,7 @@ void QnLicenseManagerWidget::at_licenseRemoved(int reqID, ec2::ErrorCode errorCo
     else {
         emit showMessageLater(tr("Remove license"), tr("Can't remove license from server:  %1").arg(ec2::toString(errorCode)), true);
     }
+    updateLicenses();
 }
 
 void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
@@ -460,7 +462,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
             QString message;
             switch (errCode) {
             case QnLicense::InvalidSignature:
-                message = tr("The manual activation key you have entered is invalid. Please check that manual activation key is entered correctly. "
+                message = tr("The manual activation key file you have selected is invalid. Select correct manual activation key file. "
                              "If problem continues, please contact support team.");
                 break;
             case QnLicense::InvalidHardwareID:
@@ -483,8 +485,3 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
     }
 }
-
-
-
-
-
