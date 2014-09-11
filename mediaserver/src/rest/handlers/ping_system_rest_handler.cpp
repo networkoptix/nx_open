@@ -31,9 +31,9 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
 
     if (status != CL_HTTP_SUCCESS) {
         if (status == CL_HTTP_AUTH_REQUIRED)
-            result.setErrorString(lit("UNAUTHORIZED"));
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("UNAUTHORIZED"));
         else
-            result.setErrorString(lit("FAIL"));
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
         return CODE_OK;
     }
 
@@ -47,12 +47,12 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
 
     if (moduleInformation.systemName.isEmpty()) {
         /* Hmm there's no system name. It would be wrong system. Reject it. */
-        result.setErrorString(lit("FAIL"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
         return CODE_OK;
     }
 
     if (moduleInformation.version != qnCommon->engineVersion() || moduleInformation.customization != lit(QN_CUSTOMIZATION_NAME)) {
-        result.setErrorString(lit("INCOMPATIBLE"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return CODE_OK;
     }
 

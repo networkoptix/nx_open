@@ -374,6 +374,10 @@ QByteArray QnProgressiveDownloadingConsumer::getMimeType(const QByteArray& strea
         return "video/3gp";
     else if (streamingFormat == "rtp")
         return "video/3gp";
+    else if (streamingFormat == "flv")
+        return "video/x-flv";
+    else if (streamingFormat == "f4v")
+        return "video/x-f4v";
     else if (streamingFormat == "mpjpeg")
         return "multipart/x-mixed-replace;boundary=--ffserver";
     else 
@@ -396,6 +400,10 @@ void QnProgressiveDownloadingConsumer::updateCodecByFormat(const QByteArray& str
         d->videoCodec = CODEC_ID_MPEG4;
     else if (streamingFormat == "mpjpeg")
         d->videoCodec = CODEC_ID_MJPEG;
+    else if (streamingFormat == "flv")
+        d->videoCodec = CODEC_ID_H264;  //TODO #ak need to use "copy"
+    else if (streamingFormat == "f4v")
+        d->videoCodec = CODEC_ID_H264;  //TODO #ak need to use "copy"
 }
 
 void QnProgressiveDownloadingConsumer::run()
@@ -479,7 +487,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         if (d->transcoder.setVideoCodec(
                 d->videoCodec,
-                QnTranscoder::TM_FfmpegTranscode,
+                d->videoCodec == CODEC_ID_H264 ? QnTranscoder::TM_DirectStreamCopy : QnTranscoder::TM_FfmpegTranscode,
                 quality,
                 videoSize,
                 -1,
@@ -523,12 +531,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         if (isLive)
         {
-            if (resource->getStatus() != Qn::Online && resource->getStatus() != Qn::Recording)
-            {
-                d->responseBody = "Video camera is not ready yet";
-                sendResponse(CODE_NOT_FOUND, "text/plain");
-                return;
-            }
+            //if camera is offline trying to put it online
 
             if (isUTCRequest)
             {
@@ -538,7 +541,7 @@ void QnProgressiveDownloadingConsumer::run()
             }
 
             if (!camera) {
-                d->responseBody = "Media not found";
+                d->responseBody = "Media not found\r\n";
                 sendResponse(CODE_NOT_FOUND, "text/plain");
                 return;
             }
@@ -620,7 +623,7 @@ void QnProgressiveDownloadingConsumer::run()
         
         if (dataProvider == 0)
         {
-            d->responseBody = "Video camera is not ready yet";
+            d->responseBody = "Video camera is not ready yet\r\n";
             sendResponse(CODE_NOT_FOUND, "text/plain");
             return;
         }
