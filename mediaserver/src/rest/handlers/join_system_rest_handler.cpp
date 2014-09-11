@@ -48,7 +48,10 @@ int QnJoinSystemRestHandler::executeGet(const QString &path, const QnRequestPara
     CLHttpStatus status = client.doGET(lit("api/moduleInformationAuthenticated"));
 
     if (status != CL_HTTP_SUCCESS) {
-        result.setErrorString(lit("FAIL"));
+        if (status == CL_HTTP_AUTH_REQUIRED)
+            result.setErrorString(lit("UNAUTHORIZED"));
+        else
+            result.setErrorString(lit("FAIL"));
         return CODE_OK;
     }
 

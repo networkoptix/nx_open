@@ -56,12 +56,32 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnRoutingManagementWidget::at_resourcePool_resourceRemoved);
 
     m_serverListModel->setResources(qnResPool->getResourcesWithFlag(Qn::server));
+
+    updateUi();
 }
 
 QnRoutingManagementWidget::~QnRoutingManagementWidget() {}
 
 void QnRoutingManagementWidget::updateFromSettings() {
+    ui->warningLabel->hide();
+}
 
+bool QnRoutingManagementWidget::confirm() {
+    ui->warningLabel->hide();
+    return true;
+}
+
+const QnRoutingManagementColors QnRoutingManagementWidget::colors() const {
+    return m_colors;
+}
+
+void QnRoutingManagementWidget::setColors(const QnRoutingManagementColors &colors) {
+    m_colors = colors;
+    updateUi();
+}
+
+void QnRoutingManagementWidget::updateUi() {
+    ui->warningLabel->setText(lit("<span style=\"color:%1;\">%2</span>").arg(m_colors.warningColor.name()).arg(tr("Removing this connection option could lead to system malfunction.")));
 }
 
 void QnRoutingManagementWidget::updateModel() {
@@ -248,6 +268,8 @@ void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(co
             return;
         ignoredUrls.append(url);
         connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), QList<QUrl>() << url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        if (url.port() == -1)
+            ui->warningLabel->show();
     } else {
         if (!ignoredUrls.removeOne(url))
             return;
