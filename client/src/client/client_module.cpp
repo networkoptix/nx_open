@@ -7,7 +7,7 @@
 #include "client_meta_types.h"
 #include "client_settings.h"
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(client);
@@ -15,10 +15,10 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
     QnClientMetaTypes::initialize();
 
     /* Set up application parameters so that QSettings know where to look for settings. */
-    QApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
-    QApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
+    QApplication::setOrganizationName(QnAppInfo::organizationName());
+    QApplication::setApplicationName(QnAppInfo::applicationName());
     if (QApplication::applicationVersion().isEmpty())
-        QApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
+        QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
     /* We don't want changes in desktop color settings to mess up our custom style. */
     QApplication::setDesktopSettingsAware(false);

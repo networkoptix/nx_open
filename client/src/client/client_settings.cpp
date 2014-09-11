@@ -19,7 +19,7 @@
 
 #include <client/client_meta_types.h>
 
-#include <version.h>
+#include <utils/common/app_info.h>
 
 
 namespace {
@@ -66,8 +66,8 @@ QnClientSettings::QnClientSettings(QObject *parent):
 #ifdef Q_OS_DARWIN
     setAudioDownmixed(true); /* Mac version uses SPDIF by default for multichannel audio. */
 #endif
-    setShowcaseUrl(QUrl(lit(QN_SHOWCASE_URL)));
-    setSettingsUrl(QUrl(lit(QN_SETTINGS_URL)));
+    setShowcaseUrl(QUrl(QnAppInfo::showcaseUrl()));
+    setSettingsUrl(QUrl(QnAppInfo::settingsUrl()));
 
     /* Set names. */
     setName(MEDIA_FOLDER,           lit("mediaRoot"));

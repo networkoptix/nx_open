@@ -10,7 +10,7 @@
 #   include <unistd.h>
 #endif
 
-#include "version.h"
+#include <utils/common/app_info.h>
 #include "ui/widgets/main_window.h"
 #include "client/client_settings.h"
 #include <api/global_settings.h>
@@ -496,7 +496,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     runtimeData.peer.peerType = videowallInstanceGuid.isNull()
         ? Qn::PT_DesktopClient
         : Qn::PT_VideowallClient;
-    runtimeData.brand = lit(QN_PRODUCT_NAME_SHORT);
+    runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.videoWallInstanceGuid = videowallInstanceGuid;
     QnRuntimeInfoManager::instance()->items()->addItem(runtimeData);    // initializing localInfo
 
@@ -515,7 +515,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnHelpHandler helpHandler;
     qApp->installEventFilter(&helpHandler);
 
-    cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
+    cl_log.log(QnAppInfo::applicationName(), " started", cl_logALWAYS);
     cl_log.log("Software version: ", QApplication::applicationVersion(), cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
@@ -621,7 +621,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // show beta version warning message for the main instance only
     if (!noSingleApplication &&
         !qnSettings->isDevMode() &&
-        QLatin1String(QN_BETA) == lit("true"))
+        QnAppInfo::beta())
         context->action(Qn::BetaVersionMessageAction)->trigger();
 
     /* If no input files were supplied --- open connection settings dialog. */

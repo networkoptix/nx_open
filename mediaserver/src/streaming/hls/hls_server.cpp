@@ -19,7 +19,7 @@
 #include <utils/common/systemerror.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/media_stream_cache.h>
-#include <version.h>
+#include <utils/common/app_info.h>
 
 #include "camera/camera_pool.h"
 #include "hls_archive_playlist_manager.h"
@@ -216,7 +216,7 @@ namespace nx_hls
         response.headers.insert( std::make_pair(
             "Date",
             QLocale(QLocale::English).toString(QDateTime::currentDateTime(), lit("ddd, d MMM yyyy hh:mm:ss t")).toLatin1() ) );
-        response.headers.insert( std::make_pair( "Server", (lit(QN_APPLICATION_NAME) + lit(" ") + QCoreApplication::applicationVersion()).toLatin1().data()) );
+        response.headers.insert( std::make_pair( "Server", (QnAppInfo::applicationName() + lit(" ") + QCoreApplication::applicationVersion()).toLatin1().data()) );
         response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //getRequestedFile can override this
 
         if( request.requestLine.version == nx_http::http_1_1 )

@@ -10,7 +10,7 @@
 #include <common/common_globals.h>
 #include <utils/network/system_socket.h>
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 using namespace std;
 
@@ -281,7 +281,7 @@ void UPNPDeviceSearcher::dispatchDiscoverPackets()
         data.append("M-SEARCH * HTTP/1.1\r\n");
         //data.append("Host: 192.168.0.150:1900\r\n");
         data.append("Host: ").append(sock->getLocalAddress().toString()).append("\r\n");
-        data.append(lit("ST:urn:schemas-upnp-org:device:%1 Server:1\r\n").arg(lit(QN_ORGANIZATION_NAME)));
+        data.append(lit("ST:urn:schemas-upnp-org:device:%1 Server:1\r\n").arg(QnAppInfo::organizationName()));
         data.append("Man:\"ssdp:discover\"\r\n");
         data.append("MX:3\r\n\r\n");
         sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);

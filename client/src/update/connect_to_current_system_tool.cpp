@@ -15,7 +15,7 @@
 #include <utils/common/software_version.h>
 
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 namespace {
     static const int configureProgress = 25;

@@ -18,6 +18,8 @@
 
 #include <licensing/license.h>
 
+#include <utils/common/app_info.h>
+
 namespace {
     bool isValidSerialKey(const QString &key) {
         return key.length() == qnProductFeatures().freeLicenseKey.length() && !key.contains(QLatin1Char(' '));

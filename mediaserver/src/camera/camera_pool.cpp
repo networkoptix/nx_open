@@ -7,7 +7,7 @@
 #   include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"
 #endif
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 QMutex QnVideoCameraPool::m_staticMtx;
 
