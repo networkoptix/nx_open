@@ -142,7 +142,7 @@
 #include <media_server/serverutil.h>
 #include <media_server/server_update_tool.h>
 #include <media_server/server_connector.h>
-#include "version.h"
+#include <utils/common/app_info.h>
 
 #ifdef _WIN32
 #include "common/systemexcept_win32.h"
@@ -168,7 +168,7 @@
 // Do not change it until you know what you're doing.
 static const char COMPONENT_NAME[] = "MediaServer";
 
-static QString SERVICE_NAME = lit("%1 Server").arg(lit(QN_ORGANIZATION_NAME));
+static QString SERVICE_NAME = lit("%1 Server").arg(QnAppInfo::organizationName());
 static const quint64 DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
 static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
 static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
@@ -401,7 +401,7 @@ static QStringList listRecordFolders()
         if (GetDriveType(path.toStdWString().c_str()) != DRIVE_FIXED)
             continue;
 
-        folderPaths.append(QDir::toNativeSeparators(path) + QN_MEDIA_FOLDER_NAME);
+        folderPaths.append(QDir::toNativeSeparators(path) + QnAppInfo::mediaFolderName());
         /*
         int freeSpace = freeGB(path);
 
@@ -412,14 +412,14 @@ static QStringList listRecordFolders()
 
         if (freeSpace >= 100) {
             NX_LOG(QString("Drive %1 has more than 100GB free space. Using it for storage.").arg(path), cl_logINFO);
-            folderPaths.append(path + QN_MEDIA_FOLDER_NAME);
+            folderPaths.append(path + QnAppInfo::mediaFolderName());
         }
         */
     }
     /*
     if (folderPaths.isEmpty()) {
         NX_LOG(QString("There are no drives with more than 100GB free space. Using drive %1 as it has the most free space: %2 GB").arg(maxFreeSpaceDrive).arg(maxFreeSpace), cl_logINFO);
-        folderPaths.append(maxFreeSpaceDrive + QN_MEDIA_FOLDER_NAME);
+        folderPaths.append(maxFreeSpaceDrive + QnAppInfo::mediaFolderName());
     }
     */
 #endif
@@ -619,10 +619,10 @@ int serverMain(int argc, char *argv[])
 
 //    av_log_set_callback(decoderLogCallback);
 
-    QCoreApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
-    QCoreApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
+    QCoreApplication::setOrganizationName(QnAppInfo::organizationName());
+    QCoreApplication::setApplicationName(QnAppInfo::applicationName());
     if (QCoreApplication::applicationVersion().isEmpty())
-        QCoreApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
+        QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
     const QString& dataLocation = getDataDirectory();
     QDir::setCurrent(qApp->applicationDirPath());
@@ -651,9 +651,9 @@ int serverMain(int argc, char *argv[])
     else if (cmdLineArguments.rebuildArchive == "lq")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_LQ);
 
-    NX_LOG(lit("%1 started").arg(QN_APPLICATION_NAME), cl_logALWAYS);
+    NX_LOG(lit("%1 started").arg(QnAppInfo::applicationName()), cl_logALWAYS);
     NX_LOG(lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
-    NX_LOG(lit("Software revision: %1").arg(QN_APPLICATION_REVISION), cl_logALWAYS);
+    NX_LOG(lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
     NX_LOG(lit("binary path: %1").arg(QFile::decodeName(argv[0])), cl_logALWAYS);
 
     if( cmdLineArguments.logLevel != lit("none") )
@@ -1168,7 +1168,8 @@ void QnMain::run()
             }
         }
 
-        if (generateSslCertificate(sslCertPath.toLatin1(), QN_APPLICATION_NAME, "US", QN_ORGANIZATION_NAME)) {
+        //TODO: #ivigasin sslCertPath can contain non-latin1 symbols
+        if (generateSslCertificate(sslCertPath.toLatin1(), QnAppInfo::applicationName().toLatin1(), "US", QnAppInfo::organizationName().toLatin1())) {
             qWarning() << "Could not generate SSL certificate ";
         }
 
@@ -1260,9 +1261,9 @@ void QnMain::run()
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
     runtimeData.peer.peerType = Qn::PT_Server;
-    runtimeData.box = lit(QN_ARM_BOX);
-    runtimeData.brand = lit(QN_PRODUCT_NAME_SHORT);
-	runtimeData.platform = QN_APPLICATION_PLATFORM;
+    runtimeData.box = QnAppInfo::armBox();
+    runtimeData.brand = QnAppInfo::productNameShort();
+    runtimeData.platform = QnAppInfo::applicationPlatform();
     int guidCompatibility = 0;
     runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
     runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
@@ -1537,7 +1538,7 @@ void QnMain::run()
 
     QnModuleInformation selfInformation;
     selfInformation.type = moduleName;
-    selfInformation.customization = lit( QN_CUSTOMIZATION_NAME );
+    selfInformation.customization = QnAppInfo::customizationName();
     selfInformation.version = qnCommon->engineVersion();
     selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
     selfInformation.systemName = qnCommon->localSystemName();
@@ -2083,7 +2084,7 @@ int main(int argc, char* argv[])
     if (!engineVersion.isEmpty()) {
         QnSoftwareVersion version(engineVersion);
         if (!version.isNull()) {
-            qWarning() << "Starting with overriden version: " << version.toString();
+            qWarning() << "Starting with overridden version: " << version.toString();
             service.setOverrideVersion(version);
         }
     }
@@ -2097,5 +2098,5 @@ int main(int argc, char* argv[])
 
 static void printVersion()
 {
-    std::cout << "  " << QN_APPLICATION_NAME << " v." << QCoreApplication::applicationVersion().toUtf8().data() << std::endl;
+    std::cout << "  " << QnAppInfo::applicationName().toUtf8().data() << " v." << QCoreApplication::applicationVersion().toUtf8().data() << std::endl;
 }

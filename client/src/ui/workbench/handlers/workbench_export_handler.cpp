@@ -42,7 +42,7 @@
 #include <utils/common/environment.h>
 #include <utils/common/string.h>
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 namespace {
 
@@ -84,9 +84,9 @@ QnWorkbenchExportHandler::QnWorkbenchExportHandler(QObject *parent):
 #ifdef Q_OS_WIN
 QString QnWorkbenchExportHandler::binaryFilterName() const {
 #ifdef Q_OS_WIN64
-    return tr("Executable %1 Media File (x64) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
+    return tr("Executable %1 Media File (x64) (*.exe)").arg(QnAppInfo::organizationName());
 #else
-    return tr("Executable %1 Media File (x86) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
+    return tr("Executable %1 Media File (x86) (*.exe)").arg(QnAppInfo::organizationName());
 #endif
 }
 #endif
@@ -535,7 +535,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 #ifdef Q_OS_WIN
     QString filterSeparator(QLatin1String(";;"));
 #endif
-    QString mediaFileFilter = tr("%1 Media File (*.nov)").arg(lit(QN_ORGANIZATION_NAME))
+    QString mediaFileFilter = tr("%1 Media File (*.nov)").arg(QnAppInfo::organizationName())
 #ifdef Q_OS_WIN
             + filterSeparator
             + binaryFilterName()

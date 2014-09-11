@@ -73,7 +73,7 @@
 #include <utils/common/string.h>
 #include <utils/license_usage_helper.h>
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG
@@ -222,7 +222,7 @@ protected:
         return result;
     }
 
-    virtual QString autoStartKey() const override { return lit(QN_APPLICATION_NAME) + L' ' + m_videoWallUuid.toString(); }
+    virtual QString autoStartKey() const override { return QnAppInfo::applicationName() + L' ' + m_videoWallUuid.toString(); }
 private:
     QUuid m_videoWallUuid;
 };
@@ -464,7 +464,7 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
             mainWindow(),
             tr("Switch to Video Wall Mode..."),
             tr("Video Wall will be started now. Do you want to close this %1 Client instance?")
-                .arg(lit(QN_PRODUCT_NAME_LONG)), //TODO: #VW #TR
+                .arg(QnAppInfo::productNameLong()), //TODO: #VW #TR
             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
             QMessageBox::Yes
             );
