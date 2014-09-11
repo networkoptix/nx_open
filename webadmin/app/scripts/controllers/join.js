@@ -2,31 +2,33 @@
 
 angular.module('webadminApp')
     .controller('JoinCtrl', function ($scope, $modalInstance, $interval, mediaserver) {
-        $scope.url = '';
-        $scope.password = '';
-
-        $scope.testProgressBarVisible = false;
-        $scope.testProgress = 0;
+        $scope.settings = {url :'',  password :''};
 
         $scope.test = function () {
-            $scope.testProgress = 0;
-
-            mediaserver.ping.get();
-            var progress = $interval(function () {
-                if ($scope.testProgress >= 100) {
-                    $scope.testProgressBarVisible = false;
-                    $interval.cancel(progress);
-                    console.log('done');
-                    return;
+            console.log("test", $scope.settings);
+            mediaserver.pingSystem($scope.settings.url, $scope.settings.password).then(function(r){
+                if(r.data.error!=0){
+                    var errorToShow = r.data.errorString;
+                    switch(errorToShow){
+                        case 'FAIL':
+                            errorToShow = "System is unreachable or doesn't exist.";
+                            break;
+                        case 'UNAUTHORIZED':
+                            errorToShow = "Wrong password.";
+                            break;
+                        case 'INCOMPATIBLE':
+                            errorToShow = "Found system has incompatible version.";
+                            break;
+                    }
+                    alert("Connection failed. " + errorToShow);
+                }else {
+                    alert("Connection succeed.");
                 }
-
-                $scope.testProgressBarVisible = true;
-                $scope.testProgress++;
-            }, 100);
+            });
         };
 
         $scope.join = function () {
-            $modalInstance.close({url: $scope.url, password: $scope.password});
+            $modalInstance.close({url: $scope.settings.url, password: $scope.settings.password});
         };
 
         $scope.cancel = function () {

@@ -3,11 +3,11 @@
 angular.module('webadminApp')
     .factory('mediaserver', function ($http, $resource) {
         return {
-            ping: $resource('/ec2/ping'),
             getSettings: function() { return $http.get('/api/moduleInformation'); },
-            saveSystemName: function(systemName) { return $http.post('/api/configure?systemName=' + systemName); },
-            savePort: function(port) { return $http.post('/api/configure?port=' + port); },
-            savePassword: function(password) { return $http.post('/api/configure?systemName=' + password); },
+            saveSettings: function(systemName,port) { return $http.post('/api/configure?systemName=' + systemName + '&port=' + port); },
+            changePassword: function(password,oldPassword) { return $http.post('/api/configure?password=' + password  + '&oldPassword=' + oldPassword); },
+            joinSystem:function(url,password){return $http.post('/api/joinSystem?password=' + password  + '&url=' + encodeURIComponent(url));  },
+            pingSystem:function(url,password){return $http.post('/api/pingSystem?password=' + password  + '&url=' + encodeURIComponent(url));  },
             restart: function() { return $http.post('/api/restart'); },
             getStorages: function(){ return $http.get('/api/storageSpace');}
         };
