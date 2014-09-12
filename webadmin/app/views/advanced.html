@@ -6,20 +6,23 @@
 
 
 <h2>Storages</h2>
+<form class="form" role="form">
 
 <table class="table">
     <thead>
         <tr>
-            <th width="30%">
+            <th >
                 Url
             </th>
-            <th width="30%">
+            <th width="200">
                 Free Space
             </th>
-            <th width="30%">
+            <th width="150">
                 Reserved Space
             </th>
-            <th width="10%">
+            <th >
+            </th>
+            <th width="70">
                 &nbsp;
             </th>
         </tr>
@@ -30,15 +33,17 @@
             <td>
 
                 <div class="progress" style="margin-top:5px"
-                     title="Reserved: {{formatSpace(storage.reservedSpace)}}, Free: {{formatSpace(storage.freeSpace)}}, Occupied: {{formatSpace(storage.totalSpace-storage.freeSpace)}}, Total: {{formatSpace(storage.totalSpace)}}">
-                    <div class="progress-label">{{formatSpace(storage.freeSpace)}} of {{formatSpace(storage.totalSpace)}}</div>
+                     title="Reserved: {{formatSpace(storage.reservedSpace)}}, &#013;Free: {{formatSpace(storage.freeSpace)}}, &#013;Occupied: {{formatSpace(storage.totalSpace-storage.freeSpace)}}, &#013;Total: {{formatSpace(storage.totalSpace)}}">
 
-                    <div class="progress-bar progress-bar-warning progress-bar-striped" role="progressbar"
+                    <div class="progress-overlay progress-bar progress-bar-warning progress-bar-striped" role="progressbar"
                          style="width: {{storage.reservedSpace*100/storage.totalSpace}}%">
                     </div>
 
+                    <div class="progress-label">{{formatSpace(storage.freeSpace)}} of {{formatSpace(storage.totalSpace)}}</div>
+
+
                     <div class="progress-bar progress-bar-success" role="progressbar"
-                         style="width: {{(storage.freeSpace-storage.reservedSpace)*100/storage.totalSpace}}%">
+                         style="width: {{(storage.freeSpace)*100/storage.totalSpace}}%">
                     </div>
 
                     <div class="progress-bar progress-bar-danger"
@@ -49,16 +54,42 @@
 
             </td>
             <td>
-                <input type="text"  class="form-control" ng-model="storage.reservedSpace" placeholder="Reserved space"/>
+                <div class="input-group {{storage.warning?'has-error':''}}">
+                    <input type="number"  class="form-control input-sm"
+                           ng-model="storage.reservedSpaceGb"
+                           min="1"
+                           max="{{toGBs(storage.totalSpace)}}"
+                           placeholder="Reserved space"/>
+
+                    <div class="input-group-addon">GB</div>
+                </div>
             </td>
+
+
             <td>
-                <icon for="{{storage.isExternal}}" on-true="globe" on-false="hdd" title-true="External" title-false="Intrenal" />
-                <icon for="{{storage.isUsedForWriting}}" on-true="pencil" title-true="Used for writing"/>
-                <icon for="{{storage.isWritable && !storage.isUsedForWriting}}" on-true="pencil" title-true="Writable" class="icon-inactive"/>
+                   <label>
+                        <input type="checkbox"
+                           ng-model="storage.isUsedForWriting"
+                           ng-disabled="!storage.isWritable"
+                           placeholder="Use for writing"/>
+
+                        <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"/>
+                        <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"/>
+
+                   </label>
+            </td>
+
+            <td>
+                <icon for="storage.isExternal" on-true="globe" on-false="hdd" title-true="External" title-false="Intrenal" />
+
+                <icon for="storage.warning || form.$invalid" on-true="warning-sign" title-true="Writable" class="icon-warning"/>
+
             </td>
         </tr>
     </tbody>
 </table>
-
-<button class="btn btn-primary" ng-click="save()">Save</button>
+<button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>
 <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+
+
+</form>
