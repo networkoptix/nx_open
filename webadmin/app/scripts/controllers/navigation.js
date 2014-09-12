@@ -10,6 +10,7 @@ angular.module('webadminApp')
                 name:r.data.reply.name,
                 remoteAddresses:r.data.reply.remoteAddresses.join("\n")
             };
+            console.log(r.data.reply);
         });
         $scope.isActive = function (path) {
             var currentPath = $location.path().split('/')[1];

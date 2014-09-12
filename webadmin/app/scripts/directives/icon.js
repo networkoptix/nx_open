@@ -17,24 +17,6 @@ angular.module('webadminApp')
                 scope.class = attrs.class;
                 scope.titleTrue = attrs.titleTrue;
                 scope.titleFalse = attrs.titleFalse;
-/*
-
-                var isTrue = scope.for=="true";
-                var icon = isTrue ? attrs.onTrue : attrs.onFalse;
-                attrs.title = isTrue? attrs.titleTrue : attrs.titleFalse;
-
-                var template = icon ? '<span class="glyphicon glyphicon-' + icon + ' ' + attrs.class + '" title="' + attrs.title + '"></span>' : '';
-                //$(element).append(template);
-
-                /*scope.$watch("for",function(){
-                   // $(element).children().remove();
-                    var isTrue = scope.for=="true";
-                    var icon = isTrue ? attrs.onTrue : attrs.onFalse;
-                    attrs.title = isTrue? attrs.titleTrue : attrs.titleFalse;
-
-                    var template = icon ? '<span class="glyphicon glyphicon-' + icon + ' ' + attrs.class + '" title="' + attrs.title + '"></span>' : '';
-                    //$(element).append(template);
-                })*/
             }
         };
     });

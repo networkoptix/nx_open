@@ -11,7 +11,8 @@ angular.module('webadminApp')
             for(var i in $scope.storages){
                 $scope.storages[i].reservedSpaceGb = Math.round(1.*$scope.storages[i].reservedSpace / (1024*1024*1024));
             }
-            console.log($scope.storages);
+
+            console.log("storages",$scope.storages);
 
             $scope.$watch(function(){
                 for(var i in $scope.storages){
@@ -19,8 +20,7 @@ angular.module('webadminApp')
                     storage.reservedSpace = storage.reservedSpaceGb * (1024*1024*1024);
                     storage.warning = storage.isUsedForWriting && (storage.reservedSpace <= 0 ||  storage.reservedSpace >= storage.totalSpace );
                 }
-                console.log($scope.storages);
-            })
+            });
 
         });
 
@@ -39,8 +39,43 @@ angular.module('webadminApp')
             return    Math.floor(total / (1024*1024*1024));
         }
         $scope.save = function(){
-            console.log("call saveSpace");
-            alert("saveSpace not implemented yet");
+            var needConfirm = false;
+            var hasStorageForWriting;
+            _.each($scope.storages,function(storageinfo){
+                hasStorageForWriting = hasStorageForWriting || storageinfo.isUsedForWriting;
+
+                if(storageinfo.reservedSpace > storageinfo.freeSpace ){
+                    needConfirm = "Set reserved space is greater than free space left. Possible partial remove of the video footage is expected. Do you want to continue?";
+                }
+            });
+
+            if(!hasStorageForWriting){
+                alert("You should select at least one storage for writing");
+                return;
+            }
+
+            if(needConfirm && !confirm(needConfirm ))
+                return;
+
+
+            mediaserver.getSettings().then(function(settingsReply){
+                mediaserver.getMediaServer(settingsReply.data.reply.id.replace("{","").replace("}","")).then(function(mediaServerReply){
+                    var info = mediaServerReply.data[0];
+                    // Вот тут проапдейтить флаги в стореджах
+
+                    _.each($scope.storages,function(storageinfo){
+                        var storageToUpdate = _.findWhere(info.storages, {id: storageinfo.storageId});
+                        if(storageToUpdate!=null) {
+                            storageToUpdate.spaceLimit = storageinfo.reservedSpace;
+                            storageToUpdate.usedForWriting = storageinfo.isUsedForWriting;
+                        }
+                    });
+
+                    mediaserver.saveMediaServer(info).then(function(saveMediaServerReply){
+                       console.log("saveMediaServerReply", saveMediaServerReply);
+                    });
+                });
+            });
         };
 
         $scope.cancel = function(){
