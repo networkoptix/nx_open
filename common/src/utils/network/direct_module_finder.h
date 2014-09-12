@@ -5,12 +5,11 @@
 #include <QtCore/QQueue>
 #include <QtNetwork/QHostAddress>
 
+#include <utils/network/http/asynchttpclient.h>
 #include <utils/common/id.h>
 #include <utils/network/module_information.h>
 #include <utils/network/network_address.h>
 
-class QNetworkAccessManager;
-class QNetworkReply;
 class QTimer;
 
 class QnDirectModuleFinder : public QObject {
@@ -56,8 +55,9 @@ private:
 private slots:
     void activateRequests();
 
-    void at_reply_finished(QNetworkReply *reply);
-    void at_periodicalCheckTimer_timeout();
+    void at_reply_finished(const nx_http::AsyncHttpClientPtr &request);
+    void at_discoveryCheckTimer_timeout();
+    void at_aliveCheckTimer_timeout();
 
 private:
     QMultiHash<QUrl, QUuid> m_urls;
@@ -66,7 +66,7 @@ private:
 
     int m_maxConnections;
     QQueue<QUrl> m_requestQueue;
-    QSet<QUrl> m_activeRequests;
+    QHash<QUrl, nx_http::AsyncHttpClientPtr> m_activeRequests;
 
     QHash<QUuid, QnModuleInformation> m_foundModules;
     QHash<QUrl, qint64> m_lastPingByUrl;
@@ -74,8 +74,8 @@ private:
 
     bool m_compatibilityMode;
 
-    QNetworkAccessManager *m_networkAccessManager;
-    QTimer *m_periodicalCheckTimer;
+    QTimer *m_discoveryCheckTimer;
+    QTimer *m_aliveCheckTimer;
 };
 
 #endif // DIRECT_MODULE_FINDER_H

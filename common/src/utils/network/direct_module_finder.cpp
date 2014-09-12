@@ -15,8 +15,9 @@
 namespace {
 
     const int defaultMaxConnections = 30;
-    const int periodicalCheckIntervalMs = 15 * 1000;
-    const int maxPingTimeoutMs = 60 * 1000;
+    const int discoveryCheckIntervalMs = 60 * 1000;
+    const int aliveCheckIntervalMs = 7 * 1000;
+    const int maxPingTimeoutMs = 12 * 1000;
 
     QUrl trimmedUrl(const QUrl &url) {
         QUrl result;
@@ -38,14 +39,13 @@ QnDirectModuleFinder::QnDirectModuleFinder(QObject *parent) :
     QObject(parent),
     m_maxConnections(defaultMaxConnections),
     m_compatibilityMode(false),
-    m_networkAccessManager(new QNetworkAccessManager(this)),
-    m_periodicalCheckTimer(new QTimer(this))
+    m_discoveryCheckTimer(new QTimer(this)),
+    m_aliveCheckTimer(new QTimer(this))
 {
-    m_periodicalCheckTimer->setInterval(periodicalCheckIntervalMs);
-    m_networkAccessManager->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
-
-    connect(m_periodicalCheckTimer, &QTimer::timeout,                   this,   &QnDirectModuleFinder::at_periodicalCheckTimer_timeout);
-    connect(m_networkAccessManager, &QNetworkAccessManager::finished,   this,   &QnDirectModuleFinder::at_reply_finished);
+    m_discoveryCheckTimer->setInterval(discoveryCheckIntervalMs);
+    m_aliveCheckTimer->setInterval(aliveCheckIntervalMs);
+    connect(m_discoveryCheckTimer,  &QTimer::timeout,                   this,   &QnDirectModuleFinder::at_discoveryCheckTimer_timeout);
+    connect(m_aliveCheckTimer,      &QTimer::timeout,                   this,   &QnDirectModuleFinder::at_aliveCheckTimer_timeout);
 }
 
 void QnDirectModuleFinder::setCompatibilityMode(bool compatibilityMode) {
@@ -110,17 +110,19 @@ void QnDirectModuleFinder::checkUrl(const QUrl &url) {
 }
 
 void QnDirectModuleFinder::start() {
-    at_periodicalCheckTimer_timeout();
-    m_periodicalCheckTimer->start();
+    at_discoveryCheckTimer_timeout();
+    m_discoveryCheckTimer->start();
+    m_aliveCheckTimer->start();
 }
 
 void QnDirectModuleFinder::stop() {
-    m_periodicalCheckTimer->stop();
+    m_discoveryCheckTimer->stop();
+    m_aliveCheckTimer->stop();
     m_requestQueue.clear();
 }
 
 void QnDirectModuleFinder::pleaseStop() {
-    m_periodicalCheckTimer->stop();
+    m_discoveryCheckTimer->stop();
     m_requestQueue.clear();
 }
 
@@ -156,25 +158,28 @@ void QnDirectModuleFinder::enqueRequest(const QUrl &url) {
 void QnDirectModuleFinder::activateRequests() {
     while (m_activeRequests.size() < m_maxConnections && !m_requestQueue.isEmpty()) {
         QUrl url = m_requestQueue.dequeue();
-        m_activeRequests.insert(url);
-        m_networkAccessManager->get(QNetworkRequest(url));
+
+        nx_http::AsyncHttpClientPtr request = std::make_shared<nx_http::AsyncHttpClient>();
+        connect(request.get(), &nx_http::AsyncHttpClient::done, this, &QnDirectModuleFinder::at_reply_finished, Qt::DirectConnection);
+
+        m_activeRequests.insert(url, request);
+        request->doGet(url);
     }
 }
 
-void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
-    QUrl url = reply->request().url();
-    if (!m_activeRequests.contains(url))
+void QnDirectModuleFinder::at_reply_finished(const nx_http::AsyncHttpClientPtr &request) {
+    request->terminate();
+
+    QUrl url = request->url();
+    if (!m_activeRequests.take(url))
         Q_ASSERT_X(0, "Reply that is not in the set of active requests has finished!", Q_FUNC_INFO);
 
-    reply->deleteLater();
-
-    m_activeRequests.remove(url);
     activateRequests();
 
     url = trimmedUrl(url);
 
-    if (reply->error() == QNetworkReply::NoError) {
-        QByteArray data = reply->readAll();
+    if (!request->failed()) {
+        QByteArray data = request->fetchMessageBodyBuffer();
 
         QnJsonRestResult result;
         QJson::deserialize(data, &result);
@@ -243,9 +248,14 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
     }
 }
 
-void QnDirectModuleFinder::at_periodicalCheckTimer_timeout() {
-    QSet<QUrl> urls = QSet<QUrl>::fromList(m_urls.keys()) - m_ignoredUrls;
+void QnDirectModuleFinder::at_discoveryCheckTimer_timeout() {
+    QSet<QUrl> urls = QSet<QUrl>::fromList(m_urls.keys()) - m_ignoredUrls - QSet<QUrl>::fromList(m_lastPingByUrl.keys());
 
     foreach (const QUrl &url, urls)
+        enqueRequest(url);
+}
+
+void QnDirectModuleFinder::at_aliveCheckTimer_timeout() {
+    foreach (const QUrl &url, m_lastPingByUrl.keys())
         enqueRequest(url);
 }

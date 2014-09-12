@@ -24,7 +24,7 @@ public:
     virtual ~QnRtspClientArchiveDelegate();
 
     void setCamera(const QnVirtualCameraResourcePtr &camera);
-    void setServer(const QnMediaServerResourcePtr &server);
+    void setFixedServer(const QnMediaServerResourcePtr &server);
 
     virtual bool open(const QnResourcePtr &resource) override;
     virtual void close() override;
@@ -87,6 +87,7 @@ private:
     bool m_opened;
     QnVirtualCameraResourcePtr m_camera;
     QnMediaServerResourcePtr m_server;
+    QnMediaServerResourcePtr m_fixedServer;
     //bool m_waitBOF;
     int m_lastPacketFlags;
     bool m_closing;

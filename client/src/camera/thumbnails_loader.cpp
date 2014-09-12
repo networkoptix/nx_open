@@ -388,7 +388,7 @@ void QnThumbnailsLoader::process() {
                 rtspDelegate->setQuality(MEDIA_Quality_High, true);
             QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(rtspDelegate));
             rtspDelegate->setCamera(camera);
-            rtspDelegate->setServer(servers[i]);
+            rtspDelegate->setFixedServer(servers[i]);
             delegates << thumbnailDelegate;
         }
     }

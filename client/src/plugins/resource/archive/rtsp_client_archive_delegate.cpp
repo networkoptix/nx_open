@@ -84,8 +84,9 @@ void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr &ca
     setupRtspSession(camera, m_server, &m_rtspSession, m_playNowModeAllowed);
 }
 
-void QnRtspClientArchiveDelegate::setServer(const QnMediaServerResourcePtr &server){
+void QnRtspClientArchiveDelegate::setFixedServer(const QnMediaServerResourcePtr &server){
     m_server = server;
+    m_fixedServer = m_server;
 }
 
 QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate() {
@@ -95,6 +96,8 @@ QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate() {
 
 QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime(const QnVirtualCameraResourcePtr &camera, qint64 time) {
     if (!camera)
+        return QnMediaServerResourcePtr();
+    if (m_fixedServer)
         return QnMediaServerResourcePtr();
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera);
     if (!history)
@@ -200,8 +203,12 @@ bool QnRtspClientArchiveDelegate::openInternal() {
 
     m_customVideoLayout.reset();
    
-    if (m_server == 0 || m_server->getStatus() == Qn::Offline)
-        return false;
+    if (m_server == 0 || m_server->getStatus() == Qn::Offline) {
+        if (!m_fixedServer) 
+            m_server = getServerOnTime(m_position/1000); // try to update server
+        if (m_server == 0 || m_server->getStatus() == Qn::Offline)
+            return false;
+    }
 
     setupRtspSession(m_camera, m_server, &m_rtspSession, m_playNowModeAllowed);
     m_rtpData = 0;
