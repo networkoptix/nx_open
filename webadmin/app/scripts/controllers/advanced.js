@@ -50,11 +50,10 @@ angular.module('webadminApp')
             });
 
             if(!hasStorageForWriting){
-                alert("You should select at least one storage for writing");
-                return;
+                needConfirm = "No storages were selected for writing - video will not be recorded on this server. Do you want to continue?";
             }
 
-            if(needConfirm && !confirm(needConfirm ))
+            if(needConfirm && !confirm(needConfirm))
                 return;
 
 
