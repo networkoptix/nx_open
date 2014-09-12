@@ -1,5 +1,5 @@
  <assembly>
-	<id>${platform}-${arch}-${release.version}.${buildNumber}</id>
+	<id>${box}-${arch}-${release.version}.${buildNumber}</id>
 	<formats>
 		<format>zip</format>
 	</formats>
@@ -9,7 +9,7 @@
 			<directory>${project.build.directory}/bin</directory>
 			<outputDirectory>..</outputDirectory>
 			<includes>
-				<include>bin/${finalName}.msi</include>
+				<include>${finalName}.msi</include>
 			</includes>		
 		</fileSet>				
 		<fileSet>

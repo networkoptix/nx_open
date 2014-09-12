@@ -11,6 +11,7 @@
 #include "core/resource/media_server_resource.h"
 #include "ui/models/resource_list_model.h"
 #include "ui/models/server_addresses_model.h"
+#include "ui/style/warning_style.h"
 #include "common/common_module.h"
 
 namespace {
@@ -27,6 +28,7 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     ui(new Ui::QnRoutingManagementWidget)
 {
     ui->setupUi(this);
+    setWarningStyle(ui->warningLabel);
 
     m_serverListModel = new QnResourceListModel(this);
     QSortFilterProxyModel *sortedServersModel = new QSortFilterProxyModel(this);
@@ -61,7 +63,12 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
 QnRoutingManagementWidget::~QnRoutingManagementWidget() {}
 
 void QnRoutingManagementWidget::updateFromSettings() {
+    ui->warningLabel->hide();
+}
 
+bool QnRoutingManagementWidget::confirm() {
+    ui->warningLabel->hide();
+    return true;
 }
 
 void QnRoutingManagementWidget::updateModel() {
@@ -248,6 +255,8 @@ void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(co
             return;
         ignoredUrls.append(url);
         connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), QList<QUrl>() << url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        if (url.port() == -1)
+            ui->warningLabel->show();
     } else {
         if (!ignoredUrls.removeOne(url))
             return;

@@ -184,6 +184,14 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_downloadProgress(qint64 bytesRe
         m_fileSizeByUrl.insert(m_pendingDownloads.first(), bytesTotal);
     }
 
+    if (bytesReceived > bytesTotal) {
+        m_file->close();
+        m_file->remove();
+        doCancel();
+        finish(DownloadError);
+        return;
+    }
+
     foreach (const QUuid &peerId, m_currentPeers)
         emit peerProgressChanged(peerId, bytesReceived * 100 / bytesTotal);
 

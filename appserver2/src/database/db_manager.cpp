@@ -369,11 +369,16 @@ bool QnDbManager::init(
         return false;
     }
 
-    if( !qnCommon->defaultAdminPassword().isEmpty() )
+    QString defaultAdminPassword = qnCommon->defaultAdminPassword();
+    if( users[0].hash.isEmpty() && defaultAdminPassword.isEmpty() ) {
+        defaultAdminPassword = lit("123");
+    }
+
+    if( !defaultAdminPassword.isEmpty() )
     {
         QnUserResourcePtr userResource( new QnUserResource() );
         fromApiToResource( users[0], userResource );
-        userResource->setPassword( qnCommon->defaultAdminPassword() );
+        userResource->setPassword( defaultAdminPassword );
 
         QnTransaction<ApiUserData> userTransaction( ApiCommand::saveUser );
         userTransaction.fillPersistentInfo();

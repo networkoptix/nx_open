@@ -20,6 +20,9 @@ public:
     virtual void submitToSettings() override;
 
     virtual bool hasChanges() const override;
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 private:
     QScopedPointer<Ui::GeneralSystemAdministrationWidget> ui;
 };

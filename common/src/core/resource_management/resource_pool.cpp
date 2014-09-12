@@ -532,11 +532,6 @@ QnResourceList QnResourcePool::getAllIncompatibleResources() const {
     return m_incompatibleResources.values();
 }
 
-void QnResourcePool::clearIncompatibleResources() {
-    QMutexLocker locker(&m_resourcesMtx);
-    m_incompatibleResources.clear();
-}
-
 QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QUuid &uuid) const {
     foreach (const QnResourcePtr &resource, m_resources) {
         QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();

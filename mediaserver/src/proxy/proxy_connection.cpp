@@ -214,6 +214,18 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
 
     if (route.isValid()) {
         if (route.points.size() > 1) {
+            nx_http::StringType ttlString = nx_http::getHeaderValue(d->request.headers, "x-proxy-ttl");
+            bool ok;
+            int ttl = ttlString.toInt(&ok);
+            if (!ok)
+                ttl = route.points.size();
+            --ttl;
+
+            if (ttl <= 0)
+                return false;
+
+            nx_http::insertOrReplaceHeader(&d->request.headers, nx_http::HttpHeader("x-proxy-ttl", QByteArray::number(ttl)));
+
             QString path = urlPath;
             if (!path.startsWith(QLatin1Char('/')))
                 path.prepend(QLatin1Char('/'));

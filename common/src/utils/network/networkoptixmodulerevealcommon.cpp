@@ -47,6 +47,7 @@ RevealResponse::RevealResponse(const QnModuleInformation &moduleInformation) {
     port = moduleInformation.port;
     sslAllowed = moduleInformation.sslAllowed;
     remoteAddresses = moduleInformation.remoteAddresses.toList();
+    authHash = moduleInformation.authHash;
 }
 
 QnModuleInformation RevealResponse::toModuleInformation() const {
@@ -60,6 +61,7 @@ QnModuleInformation RevealResponse::toModuleInformation() const {
     moduleInformation.port = port;
     moduleInformation.remoteAddresses = QSet<QString>::fromList(remoteAddresses);
     moduleInformation.sslAllowed = sslAllowed;
+    moduleInformation.authHash = authHash;
     return moduleInformation;
 }
 
@@ -75,6 +77,7 @@ bool RevealResponse::serialize(quint8 **const bufStart, const quint8 *bufEnd) {
     map[lit("sslAllowed")] = sslAllowed;
     map[lit("port")] = port;
     map[lit("remoteAddresses")] = remoteAddresses;
+    map[lit("authHash")] = authHash;
 
     QByteArray data = QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact);
     if (data.size() > bufEnd - *bufStart)
@@ -101,6 +104,7 @@ bool RevealResponse::deserialize(const quint8 **bufStart, const quint8 *bufEnd) 
     sslAllowed = map.take( lit( "sslAllowed" ) ).toBool();
     port = static_cast<quint16>(map.take(lit("port")).toUInt());
     remoteAddresses = map.take(lit("remoteAddresses")).toStringList();
+    authHash = map.take(lit("authHash")).toByteArray();
 
     return !type.isEmpty() && !version.isEmpty();
 }

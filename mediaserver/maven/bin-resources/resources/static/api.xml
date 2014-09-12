@@ -394,6 +394,34 @@
                     </result>
                 </function>
                 <function>
+                    <name>pingSystem</name>
+                    <description>Ping the system.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>url</name>
+                            <description>System URL to ping.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                        <param>
+                            <name>password</name>
+                            <description>System admin password.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>JSON with error code and error string.
+                            Error string could be
+                            empty in case of successful ping,
+                            "FAIL" if the specified system is unrechable or there is no any system,
+                            "UNAUTHORIZED" if the authentification credentials are invalid, and
+                            "INCOMPATIBLE" if the found system has incompatible version or different customization.
+                        </caption>
+                    </result>
+                </function>
+                <function>
                     <name>ptz/move</name>
                     <description>Start camera moving.</description>
                     <method>POST</method>
@@ -721,6 +749,156 @@
                     <method>POST</method>
                     <params/>
                     <result/>
+                </function>
+                <function>
+                    <name>restart</name>
+                    <description>Restart the server.</description>
+                    <method>GET</method>
+                    <params/>
+                    <result/>
+                </function>
+                <function>
+                    <name>installUpdate</name>
+                    <description>Install update from zip package wich should be in the request body.</description>
+                    <method>POST</method>
+                    <params/>
+                    <result/>
+                </function>
+                <function>
+                    <name>moduleInformation</name>
+                    <description>Get information about the server.</description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>JSON object with module information.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>moduleInformationAuthenticated</name>
+                    <description>The same as moduleInformation but requires authentication. Useful to test connectibility.</description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>JSON object with module information.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>routingInformation/connections</name>
+                    <description>Get all connections established in the current system.</description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>HTML with connection list.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>routingInformation/routes</name>
+                    <description>Get all routes to all peers in the current system.</description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>HTML with route list.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>routingInformation/routeTo</name>
+                    <description>Get the shortest route to the specified peer.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>target</name>
+                            <description>GUID or host:port of the target.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>HTML with route.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>configure</name>
+                    <description>Configure server parameters.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>systemName</name>
+                            <description>New system name for the server.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <params>
+                        <param>
+                            <name>wholeSystem</name>
+                            <description>Flag shows if the specified system name must be set to the all servers in the system.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <params>
+                        <param>
+                            <name>port</name>
+                            <description>New listening port.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <params>
+                        <param>
+                            <name>password</name>
+                            <description>New admin password.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                        <param>
+                            <name>oldPassword</name>
+                            <description>Old admin password.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>JSON with error code and flag "restartNeeded" that shows if the server must be restarted to apply settings.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>joinSystem</name>
+                    <description>Join the system.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>url</name>
+                            <description>URL of one server in the system to join.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                        <param>
+                            <name>password</name>
+                            <description>Admin password of the target system.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>JSON with error code and error string.
+                            Error string could be
+                            empty in case of successful ping,
+                            "FAIL" if the specified system is unrechable or there is no any system,
+                            "UNAUTHORIZED" if the authentification credentials are invalid,
+                            "INCOMPATIBLE" if the found system has incompatible version or different customization, and
+                            "BACKUP_ERROR" if database backup could not been created.
+                        </caption>
+                    </result>
+                </function>
+                <function>
+                    <name>backupDatabase</name>
+                    <description>Backup server database.</description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>JSON with error code.</caption>
+                    </result>
                 </function>
             </functions>
         </group>

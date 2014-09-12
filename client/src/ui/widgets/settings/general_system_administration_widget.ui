@@ -16,65 +16,83 @@
      <property name="title">
       <string>Administration</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
-      <item>
-       <widget class="QWidget" name="widget" native="true">
-        <layout class="QVBoxLayout" name="verticalLayout_5">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QPushButton" name="businessRulesButton">
-           <property name="text">
-            <string>&amp;Alarm/Event Rules</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="eventLogButton">
-           <property name="text">
-            <string>&amp;Event Log</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="cameraListButton">
-           <property name="text">
-            <string>&amp;Camera List</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="healthMonitorButton">
-           <property name="text">
-            <string>&amp;Health Monitoring</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+     <layout class="QFormLayout" name="formLayout_2">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="businessRulesButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>&amp;Alarm/Event Rules</string>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+E</string>
+        </property>
        </widget>
       </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="eventLogButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
+        <property name="text">
+         <string>&amp;Event Log</string>
         </property>
-       </spacer>
+        <property name="shortcut">
+         <string>Ctrl+L</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="eventRulesLabel">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Alarm/Event Rules Management (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+E&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QPushButton" name="cameraListButton">
+        <property name="text">
+         <string>&amp;Camera List</string>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+M</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="eventLogLabel">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Event Log (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+L&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="cameraListLabel">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Camera List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QPushButton" name="healthMonitorButton">
+        <property name="text">
+         <string>&amp;Health Monitoring</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="healthMonitoringLabel">
+        <property name="text">
+         <string>Open all servers statistics on one layout</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

@@ -10,7 +10,7 @@ public:
 
 private:
     int changeSystemName(const QString &systemName, bool wholeSystem);
-    int changeAdminPassword(const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest);
+    int changeAdminPassword(const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, const QString &oldPassword);
     int changePort(int port);
     void resetConnections();
 };

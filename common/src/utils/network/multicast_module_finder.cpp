@@ -212,8 +212,8 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
         addressIt = m_foundAddresses.insert(address, ModuleContext(response));
 
         emit moduleAddressFound(moduleInformation, address);
-        NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. New address (%2:%3) of remote server of type %1 found on local interface %4").
-            arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
+        NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. New address (%2:%3) of remote server %1 found on local interface %4").
+            arg(response.seed.toString()).arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
     }
     addressIt->prevResponseReceiveClock = QDateTime::currentMSecsSinceEpoch();
 
@@ -291,6 +291,9 @@ void QnMulticastModuleFinder::run() {
 
             QnModuleInformation &moduleInformation = m_foundModules[it->moduleId];
             moduleInformation.remoteAddresses.remove(it.key().host().toString());
+
+            NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. Module address (%2:%3) of remote server %1 is lost").
+                arg(it->moduleId.toString()).arg(it.key().host().toString()).arg(it.key().port()), cl_logDEBUG1);
 
             emit moduleChanged(moduleInformation);
             emit moduleAddressLost(moduleInformation, it.key());

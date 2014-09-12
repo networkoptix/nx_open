@@ -115,6 +115,7 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_vendor = other_casted->m_vendor;
         m_minDays = other_casted->m_minDays;
         m_maxDays = other_casted->m_maxDays;
+        m_preferedServerId = other_casted->m_preferedServerId;
     }
 }
 

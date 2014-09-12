@@ -581,7 +581,13 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 }
 
 /** Initialize log. */
-void initLog(const QString &logLevel) {
+void initLog(const QString& _logLevel) 
+{
+    QString logLevel = _logLevel;
+    const QString& configLogLevel = MSSettings::roSettings()->value( "log-level").toString();
+    if (!configLogLevel.isEmpty())
+        logLevel = configLogLevel;
+
     if(logLevel == lit("none"))
         return;
 
@@ -628,15 +634,8 @@ int serverMain(int argc, char *argv[])
 
     initLog(cmdLineArguments.logLevel);
 
-    QString logLevel;
-    QString rebuildArchive;
 
-    QnCommandLineParser commandLineParser;
-    commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString());
-    commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL, QString(), "all");
-    commandLineParser.parse(argc, argv, stderr);
-
-    QnLog::initLog(logLevel);
+    initLog(cmdLineArguments.logLevel);
 
     if( cmdLineArguments.msgLogLevel != lit("none") )
         QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
@@ -645,7 +644,7 @@ int serverMain(int argc, char *argv[])
             DEFAULT_MSG_LOG_ARCHIVE_SIZE,
             QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
 
-    if (rebuildArchive == "all")
+    if (cmdLineArguments.rebuildArchive == "all")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
     else if (cmdLineArguments.rebuildArchive == "hq")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_HQ);
@@ -2001,14 +2000,6 @@ static void printVersion();
 
 int main(int argc, char* argv[])
 {
-    {
-        QMutex ggg;
-        QMutexLocker gggL(&ggg);
-        gggL.unlock();
-        gggL.unlock();
-    }
-    int gg = 4;
-
 #if 0
 #if defined(__GNUC__)
 # if defined(__i386__)

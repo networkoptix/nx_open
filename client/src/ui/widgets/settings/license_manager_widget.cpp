@@ -26,6 +26,8 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/warning_style.h>
 #include <ui/models/license_list_model.h>
+#include <ui/dialogs/license_details_dialog.h>
+
 #include <utils/license_usage_helper.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/common/product_features.h>
@@ -69,7 +71,6 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     connect(m_videowallUsageHelper,             &QnLicenseUsageHelper::licensesChanged,                             this,   &QnLicenseManagerWidget::updateLicenses);
 
     updateLicenses();
-    updateDetailsButtonEnabled();
 }
 
 QnLicenseManagerWidget::~QnLicenseManagerWidget()
@@ -157,6 +158,8 @@ void QnLicenseManagerWidget::updateLicenses() {
     if(useRedLabel)
         setWarningStyle(&palette);
     ui->infoLabel->setPalette(palette);
+
+    updateDetailsButtonEnabled();
 }
 
 void QnLicenseManagerWidget::showMessage(const QString &title, const QString &message, bool warning) {
@@ -275,21 +278,11 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
 }
 
 void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license) {
-    QString features = (license->type() == Qn::LC_VideoWall)
-        ? tr("Screens and Control Sessions Allowed: %1").arg(license->cameraCount())
-        : tr("Archive Streams Allowed: %1").arg(license->cameraCount());
-    
-    QString details = tr("<b>Generic:</b><br />\n"
-        "License Type: %1<br />\n"
-        "License Key: %2<br />\n"
-        "Locked to Hardware ID: %3<br />\n"
-        "<br />\n"
-        "<b>Features:</b><br />\n")
-        .arg(license->displayName())
-        .arg(QLatin1String(license->key()))
-        .arg(QLatin1String(qnLicensePool->currentHardwareId()))
-        ;
-    QMessageBox::information(this, tr("License Details"), details + features);
+    if (!license)
+        return;
+
+    QScopedPointer<QnLicenseDetailsDialog> dialog(new QnLicenseDetailsDialog(license, this));
+    dialog->exec();
 }
 
 void QnLicenseManagerWidget::updateDetailsButtonEnabled() 
@@ -441,6 +434,7 @@ void QnLicenseManagerWidget::at_licenseRemoved(int reqID, ec2::ErrorCode errorCo
     else {
         emit showMessageLater(tr("Remove license"), tr("Can't remove license from server:  %1").arg(ec2::toString(errorCode)), true);
     }
+    updateLicenses();
 }
 
 void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
@@ -460,7 +454,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
             QString message;
             switch (errCode) {
             case QnLicense::InvalidSignature:
-                message = tr("The manual activation key you have entered is invalid. Please check that manual activation key is entered correctly. "
+                message = tr("The manual activation key file you have selected is invalid. Select correct manual activation key file. "
                              "If problem continues, please contact support team.");
                 break;
             case QnLicense::InvalidHardwareID:
@@ -483,8 +477,3 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
     }
 }
-
-
-
-
-

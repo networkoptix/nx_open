@@ -3,8 +3,9 @@
 
 #include "api_globals.h"
 #include "api_data.h"
-#include "api_server_info_data.h"
 #include "api_discovery_data.h"
+#include "api_resource_type_data.h"
+#include "api_server_info_data.h"
 
 namespace ec2 
 {

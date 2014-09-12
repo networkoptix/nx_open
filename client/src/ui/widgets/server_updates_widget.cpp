@@ -43,6 +43,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     m_checkingLocal(false)
 {
     ui->setupUi(this);
+    setWarningStyle(ui->dayWarningLabel);
 
     m_updateTool = new QnMediaServerUpdateTool(this);
     m_updatesModel = new QnServerUpdatesModel(m_updateTool, this);

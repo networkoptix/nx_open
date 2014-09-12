@@ -56,7 +56,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         QString password = cameraResource->getAuth().password();
 
 
-        if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(cameraResource->getUniqueId()))
+        if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(cameraResource->getUrl()))
             continue; //race condition. manual camera just deleted
         /*
         QnVirtualCameraResourceList cameras;

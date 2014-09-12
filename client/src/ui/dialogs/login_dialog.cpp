@@ -154,6 +154,7 @@ QnLoginDialog::~QnLoginDialog() {}
 
 void QnLoginDialog::updateFocus() {
     ui->passwordLineEdit->setFocus();
+    ui->passwordLineEdit->selectAll();
 }
 
 QUrl QnLoginDialog::currentUrl() const {
