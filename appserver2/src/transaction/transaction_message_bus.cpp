@@ -925,6 +925,22 @@ void QnTransactionMessageBus::doPeriodicTasks()
 {
     QMutexLocker lock(&m_mutex);
 
+    // send HTTP level keep alive (empty chunk) for server <---> server connections
+    if (!m_localPeer.isClient()) 
+    {
+        foreach(QSharedPointer<QnTransactionTransport> transport, m_connections.values()) 
+        {
+            if (transport->getState() == QnTransactionTransport::ReadyForStreaming && !transport->remotePeer().isClient()) 
+            {
+                transport->sendHttpKeepAlive();
+                if (transport->isHttpKeepAliveTimeout()) {
+                    qWarning() << "Transaction Transport HTTP keep-alive timeout for connection" << transport->remotePeer().id;
+                    transport->setState(QnTransactionTransport::Error);
+                }
+            }
+        }
+    }
+
     // add new outgoing connections
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     for (QMap<QUrl, RemoteUrlConnectInfo>::iterator itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
