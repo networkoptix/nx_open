@@ -39,7 +39,7 @@
 		<buildNumber>0</buildNumber>
 		<skip.sign>true</skip.sign>
 		<final.artifact.name>${project.artifactId}</final.artifact.name>
-		<finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
+		<finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${box}-${arch}-${build.configuration}-beta</finalName>
 		<beta>true</beta>
 		<mobile>false</mobile>
 		<!-- compile.option1. See profile no-webkit -->
@@ -616,7 +616,7 @@
 				</property>
 			</activation>
 			<properties>
-				<finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>
+				<finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${box}-${arch}</finalName>
 				<skip.sign>false</skip.sign>
 			</properties>
 		</profile>     
