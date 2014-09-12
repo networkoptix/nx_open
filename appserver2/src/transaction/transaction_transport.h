@@ -6,6 +6,7 @@
 #include <QUuid>
 #include <QByteArray>
 #include <QSet>
+#include <QTime>
 
 #include <transaction/transaction.h>
 #include <transaction/binary_transaction_serializer.h>
@@ -142,6 +143,7 @@ public:
     void processExtraData();
     void startListening();
     void setRemotePeer(const ApiPeerData& value) { m_remotePeer = value; }
+    void processKeepAlive();
 private:
     struct DataToSend
     {
@@ -185,6 +187,8 @@ private:
 
     QByteArray m_extraData;
     bool m_authByKey;
+    QTime m_lastReceiveTimer;
+    QTime m_sendTimer;
 private:
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
