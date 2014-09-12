@@ -69,8 +69,9 @@ QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObjec
         QModelIndex idx = index(peerId);
         if (!idx.isValid())
             return;
-
-        int value = (static_cast<int>(stage)*100 + progress) / ( static_cast<int>(QnPeerUpdateStage::Count) );
+        
+        int displayStage = qMax(static_cast<int>(stage) - 1, 0);
+        int value = (displayStage*100 + progress) / ( static_cast<int>(QnPeerUpdateStage::Count) - 1 );
 
         m_items[idx.row()]->m_stage = stage;
         m_items[idx.row()]->m_progress = value;

@@ -10,23 +10,23 @@
 #include <utils/common/long_runnable.h>
 
 struct QnPeerUpdateInformation {
-    enum State {
-        UpdateUnknown,
-        UpdateNotFound,
-        UpdateFound,
-        PendingDownloading,
-        UpdateDownloading,
-        PendingUpload,
-        UpdateUploading,
-        PendingInstallation,
-        UpdateInstalling,
-        UpdateFinished,
-        UpdateFailed,
-        UpdateCanceled
-    };
+//     enum State {
+//         UpdateUnknown,
+//         UpdateNotFound,
+//         UpdateFound,
+//         PendingDownloading,
+//         UpdateDownloading,
+//         PendingUpload,
+//         UpdateUploading,
+//         PendingInstallation,
+//         UpdateInstalling,
+//         UpdateFinished,
+//         UpdateFailed,
+//         UpdateCanceled
+//     };
 
     QnMediaServerResourcePtr server;
-    State state;
+    QnPeerUpdateStage stage;
     QnSoftwareVersion sourceVersion;
     QnUpdateFileInformationPtr updateInformation;
 
@@ -68,10 +68,10 @@ signals:
 private:
     void setStage(QnFullUpdateStage stage);
 
-    void setPeerState(const QUuid &peerId, QnPeerUpdateInformation::State state);
-    void setAllPeersState(QnPeerUpdateInformation::State state);
-    void setCompatiblePeersState(QnPeerUpdateInformation::State state);
-    void setIncompatiblePeersState(QnPeerUpdateInformation::State state);
+    void setPeerStage(const QUuid &peerId, QnPeerUpdateStage stage);
+    void setAllPeersStage(QnPeerUpdateStage stage);
+    void setCompatiblePeersStage(QnPeerUpdateStage stage);
+    void setIncompatiblePeersStage(QnPeerUpdateStage stage);
 
     void downloadUpdates();
     void installClientUpdate();

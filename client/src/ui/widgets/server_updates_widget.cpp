@@ -535,7 +535,8 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
         break;
     }
 
-    int value = (static_cast<int>(stage)*100 + offset + progress) / ( static_cast<int>(QnFullUpdateStage::Count) );
+    int displayStage = qMax(static_cast<int>(stage) - 1, 0);
+    int value = (displayStage*100 + offset + progress) / ( static_cast<int>(QnFullUpdateStage::Count) - 1 );
 
     QString status;
     switch (stage) {
