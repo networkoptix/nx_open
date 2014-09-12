@@ -1,6 +1,6 @@
 {
     "settings": {
-        "updateFeedUrl":            "http://updates.hdwitness.com/updates.json",
+        "updateFeedUrl":            "${updateFeedUrl}",
         "translationPath":          ":/translations/common_${translation1}.qm",
         "isAutoCheckForUpdates":    ${updatefeed.auto},
         "clientSkin":               "${default.skin}",
