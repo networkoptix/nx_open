@@ -38,7 +38,6 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::QnServerUpdatesWidget),
-    m_extraMessageTimer(new QTimer(this)),
     m_checkingInternet(false),
     m_checkingLocal(false)
 {
@@ -57,17 +56,20 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
 
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::NameColumn, QHeaderView::Stretch);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::VersionColumn, QHeaderView::ResizeToContents);   
+    ui->tableView->horizontalHeader()->setSectionsClickable(false);
 
     connect(ui->cancelButton,           &QPushButton::clicked,      m_updateTool, &QnMediaServerUpdateTool::cancelUpdate);
     connect(ui->internetUpdateButton,   &QPushButton::clicked,      this, [this] {
         m_updateTool->startUpdate(m_targetVersion, !m_targetVersion.isNull());
     });
     ui->internetUpdateButton->setEnabled(false);
+    ui->internetDetailLabel->setVisible(false);
 
     connect(ui->localUpdateButton,      &QPushButton::clicked,      this, [this] {
         m_updateTool->startUpdate(ui->filenameLineEdit->text());
     });
     ui->localUpdateButton->setEnabled(false);
+    ui->localDetailLabel->setVisible(false);
 
     connect(ui->refreshButton,          &QPushButton::clicked,      this, [this] {
         checkForUpdatesInternet();
@@ -93,12 +95,6 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     connect(m_updateTool,       &QnMediaServerUpdateTool::stageChanged,             this,           &QnServerUpdatesWidget::at_tool_stageChanged);
     connect(m_updateTool,       &QnMediaServerUpdateTool::stageProgressChanged,     this,           &QnServerUpdatesWidget::at_tool_stageProgressChanged);
     connect(m_updateTool,       &QnMediaServerUpdateTool::updateFinished,           this, &QnServerUpdatesWidget::at_updateFinished);
-
-    m_extraMessageTimer->setInterval(longInstallWarningTimeout);
-    connect(m_extraMessageTimer, &QTimer::timeout, this, [this] {
-        if (m_updateTool->stage() == QnFullUpdateStage::Servers)
-            ui->extraMessageLabel->show();
-    });
 
     setWarningStyle(ui->dayWarningLabel);
     setWarningStyle(ui->connectionProblemLabel);
@@ -151,8 +147,10 @@ void QnServerUpdatesWidget::initSourceMenu() {
 
         ui->sourceButton->setIcon(qnSkin->icon("buttons/dropdown_menu.png"));
         connect(ui->sourceButton, &QPushButton::clicked, this, [this, menu] {
+            if (menu->isVisible())
+                return;
             QPoint local = ui->sourceButton->geometry().bottomLeft();
-            menu->popup(ui->sourceButton->mapToGlobal(local));
+            menu->popup(ui->sourceButton->parentWidget()->mapToGlobal(local));
         });
     }
 
@@ -414,6 +412,7 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
 
         ui->internetDetailLabel->setText(detail);
         ui->internetDetailLabel->setPalette(detailPalette);
+        ui->internetDetailLabel->setVisible(!detail.isEmpty());
         ui->latestVersionLabel->setText(status);
         ui->latestVersionLabel->setPalette(statusPalette);
 
@@ -433,9 +432,9 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
 
     ui->localUpdateButton->setEnabled(false);
     ui->localRefreshWidget->setCurrentWidget(ui->localProgressPage);
-    ui->internetDetailLabel->setPalette(this->palette());
-    ui->internetDetailLabel->setText(tr("Checking for updates..."));
-    ui->internetDetailLabel->setVisible(true);
+    ui->localDetailLabel->setPalette(this->palette());
+    ui->localDetailLabel->setText(tr("Checking for updates..."));
+    ui->localDetailLabel->setVisible(true);
     ui->latestVersionLabel->setPalette(this->palette());
 
     m_updateTool->checkForUpdates(ui->filenameLineEdit->text(), [this](const QnCheckForUpdateResult &result) {
@@ -472,6 +471,7 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
 
         ui->localDetailLabel->setText(detail);
         ui->localDetailLabel->setPalette(detailPalette);
+        ui->localDetailLabel->setVisible(!detail.isEmpty());
 
         m_checkingLocal = false;
         ui->localUpdateButton->setEnabled(result.result == QnCheckForUpdateResult::UpdateFound && m_updateTool->idle());
@@ -503,13 +503,6 @@ void QnServerUpdatesWidget::at_tool_stageChanged(QnFullUpdateStage stage) {
     ui->dayWarningLabel->setVisible(QDateTime::currentDateTime().date().dayOfWeek() >= tooLateDayOfWeek);
 
     ui->updateStateWidget->setVisible(stage != QnFullUpdateStage::Init);
-
-    if (stage == QnFullUpdateStage::Servers) {
-        m_extraMessageTimer->start();
-    } else {
-        ui->extraMessageLabel->hide();
-        m_extraMessageTimer->stop();
-    }
 
     bool cancellable = false;
 
