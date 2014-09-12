@@ -2,6 +2,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <utils/network/module_finder.h>
+#include <utils/common/log.h>
 #include <common/common_module.h>
 #include <api/app_server_connection.h>
 #include <nx_ec/data/api_module_data.h>
@@ -80,7 +81,7 @@ QnModuleInformation QnGlobalModuleFinder::moduleInformation(const QUuid &id) con
 }
 
 void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer) {
-    if (moduleInformation.id == qnCommon->moduleGUID())
+    if (moduleInformation.id == qnCommon->moduleGUID() || discoverer == qnCommon->moduleGUID())
         return;
 
     if (isAlive)
@@ -90,13 +91,13 @@ void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInf
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
-    addModule(moduleInformation, QUuid(qnCommon->moduleGUID()));
+    addModule(moduleInformation, qnCommon->moduleGUID());
     if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
         connection->getMiscManager()->sendModuleInformation(moduleInformation, true, QUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
-    removeModule(moduleInformation, QUuid(qnCommon->moduleGUID()));
+    removeModule(moduleInformation, qnCommon->moduleGUID());
     if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
         connection->getMiscManager()->sendModuleInformation(moduleInformation, false, QUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
@@ -130,6 +131,9 @@ void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformatio
     QnModuleInformation &oldModuleInformation = m_moduleInformationById[moduleInformation.id];
     if (oldModuleInformation != updatedModuleInformation) {
         oldModuleInformation = updatedModuleInformation;
+        NX_LOG(lit("QnGlobalModuleFinder. Module %1 is changed, addresses = [%2]")
+               .arg(updatedModuleInformation.id.toString())
+               .arg(QStringList(QStringList::fromSet(updatedModuleInformation.remoteAddresses)).join(lit(", "))), cl_logDEBUG1);
         emit peerChanged(moduleInformation);
     }
 }
@@ -138,18 +142,24 @@ void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInforma
     if (moduleInformation.id == qnCommon->moduleGUID())
         return;
 
+    QSet<QUuid> &discoverers = m_discovererIdByServerId[moduleInformation.id];
+    if (!discoverers.remove(discoverer))
+        return;
+
     m_discoveredAddresses[moduleInformation.id].remove(discoverer);
 
     QnModuleInformation updatedModuleInformation = moduleInformation;
     updatedModuleInformation.remoteAddresses = getModuleAddresses(moduleInformation.id);
 
-    m_discovererIdByServerId[moduleInformation.id].remove(discoverer);
-
-    if (updatedModuleInformation.remoteAddresses.isEmpty()) {
+    if (discoverers.isEmpty()) {
         m_moduleInformationById.remove(updatedModuleInformation.id);
+        NX_LOG(lit("QnGlobalModuleFinder. Module %1 is lost.").arg(updatedModuleInformation.id.toString()), cl_logDEBUG1);
         emit peerLost(updatedModuleInformation);
     } else {
         m_moduleInformationById[moduleInformation.id] = updatedModuleInformation;
+        NX_LOG(lit("QnGlobalModuleFinder. Module %1 is changed, addresses = [%2]")
+               .arg(updatedModuleInformation.id.toString())
+               .arg(QStringList(QStringList::fromSet(updatedModuleInformation.remoteAddresses)).join(lit(", "))), cl_logDEBUG1);
         emit peerChanged(updatedModuleInformation);
     }
 }
@@ -162,8 +172,9 @@ void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QUuid &discoverer)
 
     for (auto it = m_moduleInformationById.begin(); it != m_moduleInformationById.end(); /* no inc */) {
         QSet<QUuid> &discoverers = m_discovererIdByServerId[it.key()];
-        if (discoverers.remove(discoverer) ) {
+        if (discoverers.remove(discoverer)) {
             if (discoverers.isEmpty()) {
+                NX_LOG(lit("QnGlobalModuleFinder. Module %1 is lost.").arg(it.value().id.toString()), cl_logDEBUG1);
                 emit peerLost(it.value());
                 it = m_moduleInformationById.erase(it);
                 continue;
@@ -172,8 +183,13 @@ void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QUuid &discoverer)
         ++it;
     }
 
-    for (auto it = m_discoveredAddresses.begin(); it != m_discoveredAddresses.end(); ++it)
+    for (auto it = m_discoveredAddresses.begin(); it != m_discoveredAddresses.end(); /* no inc */) {
         it.value().remove(discoverer);
+        if (it.value().isEmpty())
+            it = m_discoveredAddresses.erase(it);
+        else
+            ++it;
+    }
 }
 
 QSet<QString> QnGlobalModuleFinder::getModuleAddresses(const QUuid &id) const {

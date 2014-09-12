@@ -78,7 +78,7 @@ void QnIncompatibleServerWatcher::at_peerChanged(const QnModuleInformation &modu
         qnResPool->addResource(server);
     } else {
         // update the resource
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
         updateServer(server, moduleInformation);
     }
@@ -113,7 +113,7 @@ void QnIncompatibleServerWatcher::removeResource(const QUuid &id) {
 
     m_fakeUuidByServerUuid.remove(serverId);
 
-    QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
     if (server)
         qnResPool->removeResource(server);
 }

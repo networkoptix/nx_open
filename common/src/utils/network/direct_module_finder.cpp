@@ -6,6 +6,7 @@
 #include <QtNetwork/QNetworkProxy>
 
 #include <utils/common/model_functions.h>
+#include <utils/common/log.h>
 #include <rest/server/json_rest_result.h>
 #include <common/common_module.h>
 
@@ -66,6 +67,7 @@ void QnDirectModuleFinder::removeUrl(const QUrl &url, const QUuid &id) {
     if (m_urls.remove(locUrl, id)) {
         if (m_lastPingByUrl.take(locUrl) != 0) {
             QUuid id = m_moduleByUrl.take(locUrl);
+            NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is removed.").arg(id.toString()).arg(locUrl.toString()), cl_logDEBUG1);
             emit moduleUrlLost(m_foundModules.value(id), locUrl);
         }
     }
@@ -79,6 +81,7 @@ void QnDirectModuleFinder::addIgnoredModule(const QUrl &url, const QUuid &id) {
         if (m_moduleByUrl.value(locUrl) == id) {
             m_lastPingByUrl.remove(locUrl);
             m_moduleByUrl.remove(locUrl);
+            NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is removed.").arg(id.toString()).arg(locUrl.toString()), cl_logDEBUG1);
             emit moduleUrlLost(m_foundModules.value(id), locUrl);
         }
     }
@@ -93,6 +96,7 @@ void QnDirectModuleFinder::addIgnoredUrl(const QUrl &url) {
     m_ignoredUrls.insert(locUrl);
     if (m_lastPingByUrl.take(locUrl) != 0) {
         QUuid id = m_moduleByUrl.take(locUrl);
+        NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is removed.").arg(id.toString()).arg(locUrl.toString()), cl_logDEBUG1);
         emit moduleUrlLost(m_foundModules.value(id), locUrl);
     }
 }
@@ -204,6 +208,7 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         if (!moduleId.isNull() && moduleId != moduleInformation.id) {
             QnModuleInformation &prevModuleInformation = m_foundModules[moduleId];
             prevModuleInformation.remoteAddresses.remove(url.host());
+            NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is lost.").arg(prevModuleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
             emit moduleChanged(prevModuleInformation);
             emit moduleUrlLost(prevModuleInformation, url);
             lastPing = 0;
@@ -215,8 +220,10 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
             emit moduleChanged(moduleInformation);
         }
 
-        if (lastPing == 0)
+        if (lastPing == 0) {
+            NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is found.").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
             emit moduleUrlFound(moduleInformation, url);
+        }
 
         lastPing = QDateTime::currentMSecsSinceEpoch();
     } else {
@@ -229,6 +236,7 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
             m_lastPingByUrl.remove(url);
             QnModuleInformation &moduleInformation = m_foundModules[id];
             moduleInformation.remoteAddresses.remove(url.host());
+            NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is lost.").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
             emit moduleChanged(moduleInformation);
             emit moduleUrlLost(moduleInformation, url);
         }
