@@ -61,19 +61,22 @@ namespace ec2
             QByteArray& /*contentType*/ )
         {
             QnTransaction<RequestDataType> tran;
-
-            Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(srcBodyContentType);
+            bool success = false;
+            QByteArray srcFormat = srcBodyContentType.split(';')[0];
+            Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(srcFormat);
             switch( format )
             {
                 //case Qn::BnsFormat:
                 //    tran = QnBinary::deserialized<QnTransaction<RequestDataType>>(body);
                 //    break;
                 case Qn::JsonFormat:
-                    tran = QJson::deserialized<QnTransaction<RequestDataType>>(body);
+                    tran = QJson::deserialized<QnTransaction<RequestDataType>>(body, QnTransaction<RequestDataType>(), &success);
                     break;
                 case Qn::UbjsonFormat:
-                    tran = QnUbjson::deserialized<QnTransaction<RequestDataType>>(body);
+                    tran = QnUbjson::deserialized<QnTransaction<RequestDataType>>(body, QnTransaction<RequestDataType>(), &success);
                     break;
+                case Qn::UnsupportedFormat:
+                    return nx_http::StatusCode::internalServerError;
                 //case Qn::CsvFormat:
                 //    tran = QnCsv::deserialized<QnTransaction<RequestDataType>>(body);
                 //    break;
@@ -83,6 +86,9 @@ namespace ec2
                 default:
                     assert(false);
             }
+
+            if (!success)
+                return nx_http::StatusCode::internalServerError;
 
             // replace client GUID to own GUID (take transaction ownership).
             tran.peerID = qnCommon->moduleGUID();
