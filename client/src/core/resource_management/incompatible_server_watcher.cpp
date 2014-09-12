@@ -113,7 +113,7 @@ void QnIncompatibleServerWatcher::removeResource(const QUuid &id) {
 
     m_fakeUuidByServerUuid.remove(serverId);
 
-    QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
     if (server)
         qnResPool->removeResource(server);
 }
