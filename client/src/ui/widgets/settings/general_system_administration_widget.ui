@@ -52,7 +52,7 @@
       <item row="0" column="1">
        <widget class="QLabel" name="eventRulesLabel">
         <property name="text">
-         <string>Open Alarm/Event Rules Management (&lt;a href=&quot;rules&quot;&gt;Ctrl+E&lt;/a&gt;)</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Alarm/Event Rules Management (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+E&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -69,14 +69,14 @@
       <item row="1" column="1">
        <widget class="QLabel" name="eventLogLabel">
         <property name="text">
-         <string>Open Event Log (&lt;a href=&quot;log&quot;&gt;Ctrl+L&lt;/a&gt;)</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Event Log (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+L&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
        <widget class="QLabel" name="cameraListLabel">
         <property name="text">
-         <string>Open Camera List (&lt;a href=&quot;log&quot;&gt;Ctrl+M&lt;/a&gt;)</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Camera List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>

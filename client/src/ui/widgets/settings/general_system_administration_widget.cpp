@@ -19,14 +19,8 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     ui->setupUi(this);
 
     connect(ui->businessRulesButton,    &QPushButton::clicked,  this, [this] { menu()->trigger(Qn::OpenBusinessRulesAction); } );
-    connect(ui->eventRulesLabel,        &QLabel::linkActivated, this, [this] { menu()->trigger(Qn::OpenBusinessRulesAction); } );
-
     connect(ui->cameraListButton,       &QPushButton::clicked, this, [this] { menu()->trigger(Qn::CameraListAction); } );
-    connect(ui->cameraListLabel,        &QLabel::linkActivated, this, [this] { menu()->trigger(Qn::OpenBusinessRulesAction); } );
-
     connect(ui->eventLogButton,         &QPushButton::clicked, this, [this] { menu()->trigger(Qn::BusinessEventsLogAction); } );
-    connect(ui->eventLogLabel,          &QLabel::linkActivated, this, [this] { menu()->trigger(Qn::OpenBusinessRulesAction); } );
-
     connect(ui->healthMonitorButton,    &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenInNewLayoutAction, qnResPool->getResourcesWithFlag(Qn::server)); } );
 }
 
@@ -58,4 +52,6 @@ void QnGeneralSystemAdministrationWidget::resizeEvent(QResizeEvent *event) {
     }))->width();
     for(QPushButton* button: buttons)
         button->setMinimumWidth(maxWidht);
+
+    updateGeometry();
 }

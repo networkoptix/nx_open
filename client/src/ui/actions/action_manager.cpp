@@ -410,7 +410,8 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::PreferencesNotificationTabAction).
         flags(Qn::NoTarget).
-        text(tr("Settings..."));
+        icon(qnSkin->icon("events/filter.png")).
+        text(tr("Filter..."));
 
     factory(Qn::ConnectAction).
         flags(Qn::NoTarget);
@@ -442,6 +443,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenBusinessLogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        icon(qnSkin->icon("events/log.png")).
         text(tr("Event Log..."));
 
     factory(Qn::OpenBusinessRulesAction).
@@ -745,6 +747,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::GlobalHotkey).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Alarm/Event Rules...")).
+        icon(qnSkin->icon("events/settings.png")).
         shortcut(tr("Ctrl+E")).
         autoRepeat(false);
 
@@ -752,6 +755,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::GlobalHotkey).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Event Log...")).
+        icon(qnSkin->icon("events/log.png")).
         shortcut(tr("Ctrl+L")).
         autoRepeat(false);
 
