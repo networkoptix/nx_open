@@ -35,10 +35,12 @@ private slots:
 
     void at_systemNameChangeRequested(const QString &systemName);
     void at_remotePeerUnauthorized(const QUuid& id);
+    void at_connectionsTimer_timeout();
 private:
     mutable QMutex m_mutexAddrList;
     const int m_serverPort;
     mutable QnMediaServerResourcePtr m_mServer;
+    QTimer *m_connectionsTimer;
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H
