@@ -1,5 +1,6 @@
 #include "router.h"
 
+#include "utils/common/log.h"
 #include "nx_ec/dummy_handler.h"
 #include "common/common_module.h"
 #include "route_builder.h"
@@ -89,6 +90,7 @@ void QnRouter::at_connectionAdded(const QUuid &discovererId, const QUuid &peerId
     m_routeBuilder->addConnection(discovererId, peerId, host, port);
 
     lk.unlock();
+    NX_LOG(lit("QnRouter. Connection added: %1 -> %2[%3:%4]").arg(discovererId.toString()).arg(peerId.toString()).arg(host).arg(port), cl_logDEBUG1);
     emit connectionAdded(discovererId, peerId, host, port);
 }
 
@@ -103,6 +105,7 @@ void QnRouter::at_connectionRemoved(const QUuid &discovererId, const QUuid &peer
     makeConsistent();
 
     lk.unlock();
+    NX_LOG(lit("QnRouter. Connection removed: %1 -> %2[%3:%4]").arg(discovererId.toString()).arg(peerId.toString()).arg(host).arg(port), cl_logDEBUG1);
     emit connectionRemoved(discovererId, peerId, host, port);
 }
 
@@ -126,6 +129,7 @@ void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleI
         }
     }
     lk.unlock();
+    NX_LOG(lit("QnRouter. Connection added: %1 -> %2[%3:%4]").arg(qnCommon->moduleGUID().toString()).arg(endpoint.id.toString()).arg(endpoint.host).arg(endpoint.port), cl_logDEBUG1);
     emit connectionAdded(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
 }
 
@@ -150,7 +154,8 @@ void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleIn
     makeConsistent();
 
     lk.unlock();
-    emit connectionAdded(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
+    NX_LOG(lit("QnRouter. Connection removed: %1 -> %2[%3:%4]").arg(qnCommon->moduleGUID().toString()).arg(endpoint.id.toString()).arg(endpoint.host).arg(endpoint.port), cl_logDEBUG1);
+    emit connectionRemoved(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
 }
 
 void QnRouter::makeConsistent() {
