@@ -36,6 +36,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         //Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(cameraResource->getPhysicalId()).isEmpty());
 
         cameraResource->setParentId(m_serverId);
+        cameraResource->setPreferedServerId(m_serverId);
     }
 
     //QnResourcePool::instance()->addResources(resources);
@@ -55,7 +56,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         QString password = cameraResource->getAuth().password();
 
 
-        if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(cameraResource->getUniqueId()))
+        if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(cameraResource->getUrl()))
             continue; //race condition. manual camera just deleted
         /*
         QnVirtualCameraResourceList cameras;

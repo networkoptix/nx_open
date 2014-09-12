@@ -15,8 +15,8 @@ ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 BETA=""
-if [[ "$beta" == "true" ]]; then 
-  $BETA="-beta" 
+if [[ "${beta}" == "true" ]]; then 
+  BETA="-beta" 
 fi 
 
 FINALNAME=${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}$BETA
@@ -108,5 +108,6 @@ cp -P $SERVER_LIB_PATH/*.debug ${project.build.directory}
 cp -P $SERVER_BIN_PATH/*.debug ${project.build.directory}
 cp -P $SERVER_LIB_PLUGIN_PATH/*.debug ${project.build.directory}
 tar czf ./$FINALNAME-debug-symbols.tar.gz ./*.debug
-(cd $STAGEBASE; zip ./$FINALNAME.zip ./* -x ./$FINALNAME)
-echo "$FINALNAME" >> finalname-server.properties
+(cd $STAGEBASE; zip -y ./server-update-${platform}-$VERSION.${buildNumber}-${arch}.zip ./* -i *.*)
+mv $STAGEBASE/server-update-${platform}-$VERSION.${buildNumber}-${arch}.zip ${project.build.directory}
+echo "server.finalName=$FINALNAME" >> finalname-server.properties

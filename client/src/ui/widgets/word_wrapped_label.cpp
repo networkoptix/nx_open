@@ -32,4 +32,5 @@ QString QnWordWrappedLabel::text() const {
 
 void QnWordWrappedLabel::setText(const QString &value) {
     m_label->setText(value);
+    updateGeometry();
 }

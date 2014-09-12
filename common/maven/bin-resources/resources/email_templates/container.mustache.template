@@ -81,7 +81,7 @@
                                             <td>                
                                                 <h5 class="">Support Info:</h5>
                                                 <p>Web: <strong><a href="{{companyUrl}}">{{companyUrl}}</a></strong></p>
-                                                <p>Email: <strong><a href="emailto:{{supportEmail}}">{{supportEmail}}</a></strong></p>
+                                                <p>Support: <strong><a href="mailto:{{supportEmail}}">{{supportEmail}}</a></strong></p>
                                             </td>
                                         </tr>
                                     </table>

@@ -290,7 +290,6 @@ protected slots:
     void at_browseUrlAction_triggered();
 
     void at_versionMismatchMessageAction_triggered();
-    void at_versionMismatchWatcher_mismatchDataChanged();
 
     void at_betaVersionMessageAction_triggered();
 
@@ -299,6 +298,7 @@ protected slots:
     void at_cameraListChecked(int status, const QnCameraListReply& reply, int handle);
 private:
     void notifyAboutUpdate();
+    void checkVersionMismatches();
 
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
 

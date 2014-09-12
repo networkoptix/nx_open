@@ -170,6 +170,11 @@ void QnTransactionTransport::close()
 
 void QnTransactionTransport::fillAuthInfo()
 {
+    if (!QnAppServerConnectionFactory::videowallGuid().isNull()) {
+        m_httpClient->addRequestHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
+        return;
+    }
+
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
     if (ownServer && m_authByKey) 
     {

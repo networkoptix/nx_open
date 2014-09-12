@@ -143,7 +143,7 @@
           <item row="3" column="0">
            <widget class="QLabel" name="simpleSupportEmailLabel">
             <property name="text">
-             <string>Support Email:</string>
+             <string>Support Signature:</string>
             </property>
            </widget>
           </item>
@@ -335,7 +335,7 @@
             <item row="1" column="0">
              <widget class="QLabel" name="supportEmailLabel">
               <property name="text">
-               <string>Support Email:</string>
+               <string>Support Signature:</string>
               </property>
              </widget>
             </item>

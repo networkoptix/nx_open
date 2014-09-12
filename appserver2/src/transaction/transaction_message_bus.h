@@ -171,9 +171,7 @@ namespace ec2
         void connectToPeerLost(const QUuid& id);
         void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool sendTran);
         QnTransaction<ApiModuleDataList> prepareModulesDataTransaction() const;
-        void sendModulesData();
         QnTransaction<ApiConnectionDataList> prepareConnectionsDataTransaction() const;
-        void sendConnectionsData();
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QUuid& gotFromID);
         void onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, const QUuid& gotFromPeer);

@@ -87,6 +87,8 @@ namespace ec2
             ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
                 return result;
+            if (tran.isLocal)
+                return ErrorCode::ok;
             return transactionLog->saveTransaction( tran, serializedTran);
         }
 
@@ -138,7 +140,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const QUuid& mServerId, ApiCameraDataList& cameraList);
 
         //getServers
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
+        ErrorCode doQueryNoLock(const QUuid& mServerId, ApiMediaServerDataList& serverList);
 
         //getCameraServerItems
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
@@ -174,7 +176,6 @@ namespace ec2
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiDiscoveryDataList& data);
 
 		// --------- misc -----------------------------
-        bool markLicenseOverflow(bool value, qint64 time);
         QUuid getID() const;
 
         ApiOjectType getObjectType(const QUuid& objectId);
@@ -322,6 +323,8 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseOverflowData> &);
+
         ErrorCode executeTransactionInternal(const QnTransaction<ApiSyncMarkerData> &) {
             return ErrorCode::notImplemented;
         }
@@ -409,6 +412,11 @@ namespace ec2
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
         bool addTransactionForGeneralSettings();
+        bool applyUpdates();
+
+        bool beforeInstallUpdate(const QString& updateName);
+        bool afterInstallUpdate(const QString& updateName);
+
     private:
         QnResourceFactory* m_resourceFactory;
         QUuid m_storageTypeId;
@@ -418,10 +426,8 @@ namespace ec2
         int m_adminUserInternalID;
         ApiResourceTypeDataList m_cachedResTypes;
         bool m_licenseOverflowMarked;
-        qint64 m_licenseOverflowTime;
         QUuid m_dbInstanceId;
         bool m_initialized;
-        
         /*
         * Database for static or very rare modified data. Be carefull! It's not supported DB transactions for static DB
         * So, only atomic SQL updates are allowed. m_mutexStatic is used for createDB only. Common mutex/transaction is sharing for both DB

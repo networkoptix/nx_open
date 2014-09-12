@@ -565,10 +565,10 @@ void QnNotificationsCollectionWidget::at_eventLogButton_clicked() {
 }
 
 void QnNotificationsCollectionWidget::at_debugButton_clicked() {
-    QnResourceList servers = qnResPool->getResources().filtered<QnMediaServerResource>();
+    QnResourceList servers = qnResPool->getResources<QnMediaServerResource>();
     QnResourcePtr sampleServer = servers.isEmpty() ? QnResourcePtr() : servers.first();
 
-    QnResourceList cameras = qnResPool->getResources().filtered<QnVirtualCameraResource>();
+    QnResourceList cameras = qnResPool->getResources<QnVirtualCameraResource>();
     QnResourcePtr sampleCamera = cameras.isEmpty() ? QnResourcePtr() : cameras.first();
 
     //TODO: #GDM #Business REMOVE DEBUG
@@ -580,7 +580,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
             resource = context()->user();
             break;
         case QnSystemHealth::UsersEmailIsEmpty:
-            resource = qnResPool->getResources().filtered<QnUserResource>().last();
+            resource = qnResPool->getResources<QnUserResource>().last();
             break;
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::StoragesAreFull:

@@ -93,7 +93,7 @@ public:
     void setReady(bool ready);
 
     bool registerManualCameras(const QnManualCameraInfoMap& cameras);
-    bool containManualCamera(const QString& uniqId);
+    bool containManualCamera(const QString& url);
     void fillManualCamInfo(QnManualCameraInfoMap& cameras, const QnSecurityCamResourcePtr& camera);
 
     ResourceSearcherList plugins() const;

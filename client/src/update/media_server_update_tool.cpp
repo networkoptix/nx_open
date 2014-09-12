@@ -19,7 +19,7 @@
 
 namespace {
 
-    const QString QN_UPDATE_PACKAGE_URL = lit("http://enk.me/bg/dklychkov/exmaple_update/get_update");
+    const QString QN_UPDATE_PACKAGE_URL = lit("http://hdw.mx/upcombiner/upcombine");
     
 
     #ifdef Q_OS_MACX
@@ -27,6 +27,15 @@ namespace {
     #else
     const bool defaultDisableClientUpdates = false;
     #endif
+
+    QnSoftwareVersion getCurrentVersion() {
+        QnSoftwareVersion minimalVersion = qnCommon->engineVersion();
+        foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllServers()) {
+            if (server->getVersion() < minimalVersion)
+                minimalVersion = server->getVersion();
+        }
+        return minimalVersion;
+    }
 
 } // anonymous namespace
 
@@ -91,9 +100,9 @@ void QnMediaServerUpdateTool::setPeerStageProgress(const QUuid &peerId, QnPeerUp
     emit peerStageProgressChanged(peerId, stage, progress);
 }
 
-void QnMediaServerUpdateTool::finishUpdate(QnUpdateResult result) {
-    setStage(QnFullUpdateStage::Init);
+void QnMediaServerUpdateTool::finishUpdate(const QnUpdateResult &result) {
     emit updateFinished(result);
+    setStage(QnFullUpdateStage::Init);
 }
 
 QnMediaServerResourceList QnMediaServerUpdateTool::targets() const {
@@ -143,11 +152,11 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &
 
     QString versionSuffix;
     if (targetVersion.isNull()) {
-        versionSuffix = lit("/latest");
-        query.addQueryItem(lit("current"), qnCommon->engineVersion().toString());
+        query.addQueryItem(lit("version"), qnCommon->engineVersion().toString());
+        query.addQueryItem(lit("current"), getCurrentVersion().toString());
     } else {
-        versionSuffix = QString(lit("/%1-%2"))
-            .arg(targetVersion.toString(), passwordForBuild(static_cast<unsigned>(targetVersion.build())));
+        query.addQueryItem(lit("version"), targetVersion.toString());
+        query.addQueryItem(lit("password"), passwordForBuild(static_cast<unsigned>(targetVersion.build())));
     }
 
     QSet<QnSystemInformation> systemInformationList;

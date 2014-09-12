@@ -488,6 +488,18 @@
    <header location="global">ui/widgets/progress_bar.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>refreshButton</tabstop>
+  <tabstop>internetUpdateButton</tabstop>
+  <tabstop>linkLineEdit</tabstop>
+  <tabstop>copyLinkButton</tabstop>
+  <tabstop>saveLinkButton</tabstop>
+  <tabstop>filenameLineEdit</tabstop>
+  <tabstop>browseFileButton</tabstop>
+  <tabstop>localUpdateButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+  <tabstop>tableView</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -61,6 +61,16 @@ public:
 
     QnResourceList getResources() const;
 
+    template <class Resource>
+    QnSharedResourcePointerList<Resource> getResources() const {
+        QMutexLocker locker(&m_resourcesMtx);
+        QnSharedResourcePointerList<Resource> result;
+        for (const QnResourcePtr &resource : m_resources)
+            if(QnSharedResourcePointer<Resource> derived = resource.template dynamicCast<Resource>())
+                result.push_back(derived);
+        return result;
+    }
+
     QnResourcePtr getResourceById(const QUuid &id) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
@@ -92,7 +102,6 @@ public:
     QnResourcePtr getIncompatibleResourceById(const QUuid &id, bool useCompatible = false) const;
     QnResourcePtr getIncompatibleResourceByUniqueId(const QString &uid) const;
     QnResourceList getAllIncompatibleResources() const;
-    void clearIncompatibleResources();
 
     QnUserResourcePtr getAdministrator() const;
 
@@ -143,13 +152,13 @@ private:
     mutable QMutex m_resourcesMtx;
     bool m_tranInProgress;
     QnResourceList m_tmpResources;
-    QHash<QString, QnResourcePtr> m_resources;
-    QHash<QString, QnResourcePtr> m_incompatibleResources;
+    QHash<QUuid, QnResourcePtr> m_resources;
+    QHash<QUuid, QnResourcePtr> m_incompatibleResources;
 
     /*!
         \return true, if \a resource has been inserted. false - if updated existing resource
     */
-    bool insertOrUpdateResource( const QnResourcePtr &resource, QHash<QString, QnResourcePtr>* const resourcePool );
+    bool insertOrUpdateResource( const QnResourcePtr &resource, QHash<QUuid, QnResourcePtr>* const resourcePool );
 };
 
 

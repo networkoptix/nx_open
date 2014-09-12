@@ -387,8 +387,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         if (existingLayout)
             removeLayoutFromPool(existingLayout);
 
-        QnLayoutResourcePtr newLayout(new QnLayoutResource());
-        newLayout->setTypeByName(lit("Layout"));
+        QnLayoutResourcePtr newLayout(new QnLayoutResource(qnResTypePool));
 
         itemData.uuid = QUuid::createUuid();
         newLayout->addItem(itemData);
@@ -528,7 +527,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         previousDir = qnSettings->mediaFolder();
 
     QString suggestion = replaceNonFileNameCharacters(layout->getName(), QLatin1Char('_'));
-    suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
+    suggestion = QnEnvironment::getUniqueFileName(previousDir, QFileInfo(suggestion).baseName());
 
     QString fileName;
     bool readOnly = false;

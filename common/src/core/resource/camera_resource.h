@@ -34,6 +34,7 @@ public:
     void forceDisableAudio();
     bool isForcedAudioSupported() const;
     void saveParams();
+    void saveParamsAsync();
     int saveAsync();
 public slots:
     void issueOccured();

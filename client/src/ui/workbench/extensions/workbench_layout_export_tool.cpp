@@ -52,9 +52,8 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
     m_stopped(false),
     m_currentCamera(0)
 {
-    m_layout.reset(new QnLayoutResource());
+    m_layout.reset(new QnLayoutResource(qnResTypePool));
     m_layout->setId(layout->getId()); //before update() uuid's must be the same
-    m_layout->setTypeId(layout->getTypeId());
     m_layout->update(layout);
 
     // If exporting layout, create new guid. If layout just renamed, keep guid

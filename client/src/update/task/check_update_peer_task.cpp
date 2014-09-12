@@ -261,7 +261,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(const nx_http::AsyncHttp
     QnSoftwareVersion latestVersion = QnSoftwareVersion(releasesMap.value(currentRelease).toString());
     QString updatesPrefix = map.value(lit("updates_prefix")).toString();
     if (latestVersion.isNull() || updatesPrefix.isEmpty()) {
-        finishTask(QnCheckForUpdateResult::InternetProblem);
+        finishTask(QnCheckForUpdateResult::NoNewerVersion);
         return;
     }
 

@@ -132,6 +132,7 @@ namespace ec2
             getCurrentTime              = 2003,  /*< ApiTimeData */         
             changeSystemName            = 2004,  /*< ApiSystemNameData */
             getKnownPeersSystemTime     = 2005,  /*< ApiPeerSystemTimeDataList */
+            markLicenseOverflow         = 2006,  /*< ApiLicenseOverflowData */
 
             //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
@@ -158,6 +159,7 @@ namespace ec2
         
         static void setStartSequence(int value);
         void fillPersistentInfo();
+        void cancel();
 
         struct PersistentInfo
         {

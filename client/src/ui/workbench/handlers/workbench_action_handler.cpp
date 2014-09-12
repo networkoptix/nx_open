@@ -298,10 +298,11 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
-    connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), SIGNAL(mismatchDataChanged()), this, SLOT(at_versionMismatchWatcher_mismatchDataChanged()));
 
     connect(action(Qn::ExitActionDelayed), &QAction::triggered, action(Qn::ExitAction), &QAction::trigger, Qt::QueuedConnection);
     connect(action(Qn::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
+
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   &QnWorkbenchActionHandler::checkVersionMismatches);
 
     /* Run handlers that update state. */
     at_panicWatcher_panicModeChanged();
@@ -365,7 +366,15 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomRect = params.zoomWindow;
     data.zoomTargetUuid = params.zoomUuid;
-    data.rotation = params.rotation;
+    
+    if (!qFuzzyIsNull(params.rotation)) {
+        data.rotation = params.rotation;
+    }
+    else {
+        QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
+        if (!forcedRotation.isEmpty()) 
+            data.rotation = forcedRotation.toInt();
+    }
     data.contrastParams = params.contrastParams;
     data.dewarpingParams = params.dewarpingParams;
     data.dataByRole[Qn::ItemTimeRole] = params.time;
@@ -858,6 +867,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     for (auto itr = modifiedResources.begin(); itr != modifiedResources.end();) {
         if (reply.uniqueIdList.contains((*itr)->getUniqueId())) {
             (*itr)->setParentId(server->getId());
+            (*itr)->setPreferedServerId(server->getId());
             ++itr;
         }
         else {
@@ -1094,6 +1104,10 @@ void QnWorkbenchActionHandler::notifyAboutUpdate() {
     } else {
         qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? version : QnSoftwareVersion());
     }
+}
+
+void QnWorkbenchActionHandler::checkVersionMismatches() {
+    menu()->trigger(Qn::VersionMismatchMessageAction);
 }
 
 void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePtr &layout) {
@@ -1369,10 +1383,9 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const int matrixWidth = qMax(1, qRound(std::sqrt(desiredAspectRatio * itemCount)));
 
     /* Construct and add a new layout. */
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
     layout->setId(QUuid::createUuid());
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
-    layout->setTypeByName(lit("Layout"));
     if(context()->user())
         layout->setParentId(context()->user()->getId());
 
@@ -2258,7 +2271,7 @@ void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
-    QnMediaServerResourceList resources = resourcePool()->getResources().filtered<QnMediaServerResource>();
+    QnMediaServerResourceList resources = resourcePool()->getResources<QnMediaServerResource>();
 
     foreach(QnMediaServerResourcePtr resource, resources)
     {
@@ -2414,10 +2427,6 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     ).arg(components).arg(latestMsVersion.toString());
 
     QnMessageBox::warning(mainWindow(), Qn::VersionMismatch_Help, tr("Version Mismatch"), message);
-}
-
-void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
-    menu()->trigger(Qn::VersionMismatchMessageAction);
 }
 
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {

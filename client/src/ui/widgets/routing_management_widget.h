@@ -19,16 +19,17 @@ class QnResourceListModel;
 
 class QnRoutingManagementWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
-
     typedef Connective<QnAbstractPreferencesWidget> base_type;
+
 public:
     explicit QnRoutingManagementWidget(QWidget *parent = 0);
     ~QnRoutingManagementWidget();
 
     virtual void updateFromSettings() override;
+    virtual bool confirm() override;
 
 private:
-    void updateModel(const QnMediaServerResourcePtr &server);
+    void updateModel();
 
 private slots:
     void at_addButton_clicked();
@@ -36,7 +37,6 @@ private slots:
     void at_serversView_currentIndexChanged(const QModelIndex &current, const QModelIndex &previous);
     void at_addressesView_currentIndexChanged(const QModelIndex &index);
     void at_addressesView_doubleClicked(const QModelIndex &index);
-    void at_currentServer_changed(const QnResourcePtr &resource);
     void at_serverAddressesModel_ignoreChangeRequested(const QString &address, bool ignore);
 
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);

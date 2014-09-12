@@ -230,11 +230,10 @@ private:
 class QnVideowallReviewLayoutResource: public QnLayoutResource {
 public:
     QnVideowallReviewLayoutResource(const QnVideoWallResourcePtr &videowall):
-        QnLayoutResource()
+        QnLayoutResource(qnResTypePool)
     {
         setId(QUuid::createUuid());
         addFlags(Qn::local);
-        setTypeByName(lit("Layout"));
         setName(videowall->getName());
         setCellSpacing(0.1, 0.1);
         setCellAspectRatio(defaultReviewAR);
@@ -1050,9 +1049,8 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
             desiredAspectRatio = ar;
     }
 
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
     layout->setId(QUuid::createUuid());
-    layout->setTypeByName(lit("Layout"));
     if (filtered.size() == 1)
         layout->setName(generateUniqueLayoutName(context()->user(),
                                                  filtered.first()->getName(),

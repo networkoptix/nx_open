@@ -279,7 +279,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbs
 }
 
 void QnWorkbenchNotificationsHandler::at_licensePool_licensesChanged() {
-    setSystemHealthEventVisible(QnSystemHealth::NoLicenses, qnLicensePool->isEmpty());
+    setSystemHealthEventVisible(QnSystemHealth::NoLicenses, context()->user() && qnLicensePool->isEmpty());
 }
 
 void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id) {

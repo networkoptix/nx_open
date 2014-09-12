@@ -173,6 +173,7 @@ namespace ec2
         QnFullResourceData fullResData;
         fromApiToResourceList(tran.params, fullResData, m_resCtx);
         emit m_ecConnection->initNotification(fullResData);
+        m_discoveryManager->triggerNotification(tran.params.discoveryData);
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPanicModeData>& tran ) {

@@ -34,7 +34,6 @@ namespace ec2
         virtual void startReceivingNotifications() override;
 
     private:
-        std::unique_ptr<QnAuxManager> m_auxManager;
         std::unique_ptr<QnTransactionLog> m_transactionLog;
         const QnConnectionInfo m_connectionInfo;
     };

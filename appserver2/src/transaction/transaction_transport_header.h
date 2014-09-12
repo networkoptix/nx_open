@@ -10,10 +10,10 @@ namespace ec2 {
     struct QnTransactionTransportHeader
     {
         QnTransactionTransportHeader(): sequence(0) {}
-        QnTransactionTransportHeader(QnPeerSet processedPeers, QnPeerSet dstPeers = QnPeerSet(), int sequence = 0):
+        QnTransactionTransportHeader(QnPeerSet processedPeers, QnPeerSet dstPeers = QnPeerSet()):
             processedPeers(processedPeers), 
             dstPeers(dstPeers), 
-            sequence(sequence) {}
+            sequence(0) {}
 
         void fillSequence();
 

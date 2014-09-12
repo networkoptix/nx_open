@@ -17,7 +17,7 @@ QnUpdateStatusItemDelegate::QnUpdateStatusItemDelegate(QWidget *parent) :
 QnUpdateStatusItemDelegate::~QnUpdateStatusItemDelegate() {}
 
 void QnUpdateStatusItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    int state = index.data(QnServerUpdatesModel::StageRole).toInt();
+    QnPeerUpdateStage state = (QnPeerUpdateStage)index.data(QnServerUpdatesModel::StageRole).toInt();
 
     switch (state) {
     case QnPeerUpdateStage::Download:

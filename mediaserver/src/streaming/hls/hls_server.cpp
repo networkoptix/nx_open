@@ -12,6 +12,7 @@
 #include <limits>
 #include <map>
 
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
 #include <utils/common/log.h>
@@ -30,6 +31,8 @@
 #include "streaming/streaming_params.h"
 #include "utils/network/tcp_connection_priv.h"
 
+
+//TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
 using std::make_pair;
 using namespace nx_http;
@@ -418,10 +421,17 @@ namespace nx_hls
                     : MEDIA_Quality_Low;
             }
 
-            if( !camResource->hasDualStreaming() && streamQuality == MEDIA_Quality_Low )
+            if( !camResource->hasDualStreaming() )
             {
-                NX_LOG( QString::fromLatin1("Got request to unavailable low quality of camera %2").arg(camResource->getUniqueId()), cl_logDEBUG1 );
-                return nx_http::StatusCode::notFound;
+                if( streamQuality == MEDIA_Quality_Low )
+                {
+                    NX_LOG( QString::fromLatin1("Got request to unavailable low quality of camera %2").arg(camResource->getUniqueId()), cl_logDEBUG1 );
+                    return nx_http::StatusCode::notFound;
+                }
+                else if( streamQuality == MEDIA_Quality_Auto )
+                {
+                    streamQuality = MEDIA_Quality_High;
+                }
             }
 
             const nx_http::StatusCode::Value result = createSession(
@@ -471,6 +481,21 @@ namespace nx_hls
         nx_hls::VariantPlaylistData playlistData;
         playlistData.url = baseUrl;
         playlistData.url.setPath( request.requestLine.url.path() );
+        //if needed, adding proxy information to playlist url
+        nx_http::HttpHeaders::const_iterator viaIter = request.headers.find( "Via" );
+        if( viaIter != request.headers.end() )
+        {
+            nx_http::header::Via via;
+            if( !via.parse( viaIter->second ) )
+                return nx_http::StatusCode::badRequest;
+            if( !via.entries.empty() )
+            {
+                //TODO #ak check that request has been proxied via media server, not regular Http proxy
+                const QString& currentPath = playlistData.url.path();
+                playlistData.url.setPath( lit("/proxy/%1/%2").arg(qnCommon->moduleGUID().toString()).
+                    arg(currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath) );
+            }
+        }
         QList<QPair<QString, QString> > queryItems = QUrlQuery(request.requestLine.url.query()).queryItems();
         //removing SESSION_ID_PARAM_NAME
         for( QList<QPair<QString, QString> >::iterator
@@ -589,6 +614,23 @@ namespace nx_hls
                 baseChunkUrl.setPort( sockAddress.port );
             baseChunkUrl.setScheme( QLatin1String("http") );
         }
+        baseChunkUrl.setPath( HLS_PREFIX + camResource->getUniqueId() );
+
+        //if needed, adding proxy information to playlist url
+        nx_http::HttpHeaders::const_iterator viaIter = request.headers.find( "Via" );
+        if( viaIter != request.headers.end() )
+        {
+            nx_http::header::Via via;
+            if( !via.parse( viaIter->second ) )
+                return nx_http::StatusCode::badRequest;
+            if( !via.entries.empty() )
+            {
+                //TODO #ak check that request has been proxied via media server, not regular Http proxy
+                const QString& currentPath = baseChunkUrl.path();
+                baseChunkUrl.setPath( lit("/proxy/%1/%2").arg(qnCommon->moduleGUID().toString()).
+                    arg(currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath) );
+            }
+        }
 
         for( std::vector<nx_hls::AbstractPlaylistManager::ChunkData>::size_type
             i = 0;
@@ -598,7 +640,6 @@ namespace nx_hls
             nx_hls::Chunk hlsChunk;
             hlsChunk.duration = chunkList[i].duration / (double)USEC_IN_SEC;
             hlsChunk.url = baseChunkUrl;
-            hlsChunk.url.setPath( HLS_PREFIX + camResource->getUniqueId() );
             QUrlQuery hlsChunkUrlQuery( hlsChunk.url.query() );
             foreach( RequestParamsType::value_type param, commonChunkParams )
                 hlsChunkUrlQuery.addQueryItem( param.first, param.second );

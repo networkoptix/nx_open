@@ -505,6 +505,29 @@ namespace nx_http
 
             std::vector<RangeSpec> rangeSpecList;
         };
+
+        //![rfc2616, 14.45]
+        class Via
+        {
+        public:
+            class ProxyEntry
+            {
+            public:
+                boost::optional<StringType> protoName;
+                StringType protoVersion;
+                //!( host [ ":" port ] ) | pseudonym
+                StringType receivedBy;
+                StringType comment;
+            };
+
+            std::vector<ProxyEntry> entries;
+
+            /*!
+                \note In case of parse error, contents of this object are undefined
+            */
+            bool parse( const nx_http::StringType& strValue );
+            StringType toString() const;
+        };
     }
 
     typedef std::pair<StringType, StringType> ChunkExtension;
