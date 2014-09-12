@@ -925,10 +925,20 @@ void QnTransactionMessageBus::doPeriodicTasks()
 {
     QMutexLocker lock(&m_mutex);
 
-    // send TCP level keep alive
-    foreach(QSharedPointer<QnTransactionTransport> transport, m_connections.values()) {
-        if (transport->getState() == QnTransactionTransport::ReadyForStreaming && !m_localPeer.isClient() && !transport->remotePeer().isClient())
-            transport->processKeepAlive();
+    // send HTTP level keep alive (empty chunk) for server <---> server connections
+    if (!m_localPeer.isClient()) 
+    {
+        foreach(QSharedPointer<QnTransactionTransport> transport, m_connections.values()) 
+        {
+            if (transport->getState() == QnTransactionTransport::ReadyForStreaming && !transport->remotePeer().isClient()) 
+            {
+                transport->sendHttpKeepAlive();
+                if (transport->isHttpKeepAliveTimeout()) {
+                    qWarning() << "Transaction Transport HTTP keep-alive timeout for connection" << transport->remotePeer().id;
+                    transport->setState(QnTransactionTransport::Error);
+                }
+            }
+        }
     }
 
     // add new outgoing connections

@@ -45,6 +45,7 @@ QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, con
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_sendTimer.restart();
     m_lastReceiveTimer.restart();
+    m_emptyChunkData = QnChunkedTransferEncoder::serializedTransaction(QByteArray(), std::vector<nx_http::ChunkExtension>());
 }
 
 
@@ -61,8 +62,6 @@ QnTransactionTransport::~QnTransactionTransport()
 
 void QnTransactionTransport::addData(QByteArray&& data)
 {
-    using namespace std::placeholders;
-
     QMutexLocker lock(&m_mutex);
     m_dataToSend.push_back( std::move( data ) );
     if( (m_dataToSend.size() == 1) && m_socket )
@@ -389,18 +388,21 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) );
 }
 
-void QnTransactionTransport::processKeepAlive()
+void QnTransactionTransport::sendHttpKeepAlive()
 {
     QMutexLocker lock(&m_mutex);
-    if (m_sendTimer.elapsed() > TCP_KEEPALIVE_TIMEOUT) 
+    if (m_sendTimer.elapsed() > TCP_KEEPALIVE_TIMEOUT && m_dataToSend.empty() && m_socket) 
     {
-        m_sendTimer.restart();
-        if (m_dataToSend.empty() && m_socket) {
-            QByteArray data = QnChunkedTransferEncoder::serializedTransaction(QByteArray(), std::vector<nx_http::ChunkExtension>());
-            using namespace std::placeholders;
-            m_socket->sendAsync( data, std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) );
-        }
+        m_dataToSend.push_back( QByteArray() );
+        m_dataToSend.front().encodedSourceData = m_emptyChunkData;
+        serializeAndSendNextDataBuffer();
     }
+}
+
+bool QnTransactionTransport::isHttpKeepAliveTimeout() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_lastReceiveTimer.elapsed() > TCP_KEEPALIVE_TIMEOUT * 2;
 }
 
 void QnTransactionTransport::serializeAndSendNextDataBuffer()
@@ -427,7 +429,6 @@ void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_
 
     if( errorCode )
         return setStateNoLock( State::Error );
-
     assert( bytesSent == (size_t)m_dataToSend.front().encodedSourceData.size() );
 
     m_dataToSend.pop_front();
