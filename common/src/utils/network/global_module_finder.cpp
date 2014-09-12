@@ -80,7 +80,7 @@ QnModuleInformation QnGlobalModuleFinder::moduleInformation(const QUuid &id) con
 }
 
 void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer) {
-    if (moduleInformation.id == qnCommon->moduleGUID())
+    if (moduleInformation.id == qnCommon->moduleGUID() || discoverer == qnCommon->moduleGUID())
         return;
 
     if (isAlive)
@@ -90,13 +90,13 @@ void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInf
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
-    addModule(moduleInformation, QUuid(qnCommon->moduleGUID()));
+    addModule(moduleInformation, qnCommon->moduleGUID());
     if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
         connection->getMiscManager()->sendModuleInformation(moduleInformation, true, QUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
-    removeModule(moduleInformation, QUuid(qnCommon->moduleGUID()));
+    removeModule(moduleInformation, qnCommon->moduleGUID());
     if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
         connection->getMiscManager()->sendModuleInformation(moduleInformation, false, QUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
@@ -138,14 +138,16 @@ void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInforma
     if (moduleInformation.id == qnCommon->moduleGUID())
         return;
 
+    QSet<QUuid> &discoverers = m_discovererIdByServerId[moduleInformation.id];
+    if (!discoverers.remove(discoverer))
+        return;
+
     m_discoveredAddresses[moduleInformation.id].remove(discoverer);
 
     QnModuleInformation updatedModuleInformation = moduleInformation;
     updatedModuleInformation.remoteAddresses = getModuleAddresses(moduleInformation.id);
 
-    m_discovererIdByServerId[moduleInformation.id].remove(discoverer);
-
-    if (updatedModuleInformation.remoteAddresses.isEmpty()) {
+    if (discoverers.isEmpty()) {
         m_moduleInformationById.remove(updatedModuleInformation.id);
         emit peerLost(updatedModuleInformation);
     } else {
@@ -162,7 +164,7 @@ void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QUuid &discoverer)
 
     for (auto it = m_moduleInformationById.begin(); it != m_moduleInformationById.end(); /* no inc */) {
         QSet<QUuid> &discoverers = m_discovererIdByServerId[it.key()];
-        if (discoverers.remove(discoverer) ) {
+        if (discoverers.remove(discoverer)) {
             if (discoverers.isEmpty()) {
                 emit peerLost(it.value());
                 it = m_moduleInformationById.erase(it);
@@ -172,8 +174,13 @@ void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QUuid &discoverer)
         ++it;
     }
 
-    for (auto it = m_discoveredAddresses.begin(); it != m_discoveredAddresses.end(); ++it)
+    for (auto it = m_discoveredAddresses.begin(); it != m_discoveredAddresses.end(); /* no inc */) {
         it.value().remove(discoverer);
+        if (it.value().isEmpty())
+            it = m_discoveredAddresses.erase(it);
+        else
+            ++it;
+    }
 }
 
 QSet<QString> QnGlobalModuleFinder::getModuleAddresses(const QUuid &id) const {
