@@ -163,14 +163,16 @@ void QnRouter::makeConsistent() {
     QMultiHash<QUuid, Endpoint> connections = m_connections;
 
     QQueue<QUuid> pointsToCheck;
+    QSet<QUuid> checkedPoints;
     pointsToCheck.enqueue(qnCommon->moduleGUID());
 
     while (!pointsToCheck.isEmpty()) {
         QUuid point = pointsToCheck.dequeue();
+        checkedPoints.insert(point);
 
         foreach (const Endpoint &endpoint, connections.values(point)) {
             connections.remove(point, endpoint);
-            if (!pointsToCheck.contains(endpoint.id))
+            if (!checkedPoints.contains(endpoint.id))
                 pointsToCheck.enqueue(endpoint.id);
         }
     }
