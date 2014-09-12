@@ -186,8 +186,8 @@
         <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="yes"
                       Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\ecs.sqlite"/>
 
-        <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
-        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="applauncher.exe" ExeCommand=""/>
+        <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" Directory="${customization}TrayToolDir" ExeCommand="[${customization}TrayToolDir]traytool.exe"/>
+        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir" ExeCommand="[${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]applauncher.exe"/>
 
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
 
