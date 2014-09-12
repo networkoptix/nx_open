@@ -90,20 +90,39 @@ module.exports = function (grunt) {
                  }
                  */
 
-                //Sergey Yuldashev
+                /*//Sergey Yuldashev
                 {
                     context: '/api/',
                     host: '10.0.2.203',
                     port: 7501,
-                    headers: { //admin:123
-                        "Authorization": "Basic YWRtaW46MTIz"
+                    headers: {
+
+                        //"Authorization": "Basic YWRtaW46MTIzNA==" //admin:1234
+                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
                 }, {
                     context: '/ec2/',
                     host: '10.0.2.203',
                     port: 7501,
-                    headers: { //admin:123
-                        "Authorization": "Basic YWRtaW46MTIz"
+                    headers: {
+                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
+                    }
+                }*/
+
+                //Roman
+                {
+                    context: '/api/',
+                    host: '192.168.0.215',
+                    port: 7005,
+                    headers: {
+                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
+                    }
+                }, {
+                    context: '/ec2/',
+                    host: '192.168.0.215',
+                    port: 7005,
+                    headers: {
+                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
                 }
 
@@ -114,15 +133,15 @@ module.exports = function (grunt) {
                     context: '/api/',
                     host: '10.0.2.182',
                     port: 7001,
-                    headers: { //admin:123
-                        "Authorization": "Basic YWRtaW46MTIz"
+                    headers: {
+                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
                  ,{
                      context: '/ec2/',
                      host: '10.0.2.182',
                      port: 7001,
-                     headers: { //admin:123
-                     "Authorization": "Basic YWRtaW46MTIz"
+                     headers: {
+                     "Authorization": "Basic YWRtaW46MTIz" //admin:123
                  }
                 }*/
             ],

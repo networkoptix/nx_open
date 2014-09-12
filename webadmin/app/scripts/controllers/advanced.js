@@ -12,8 +12,6 @@ angular.module('webadminApp')
                 $scope.storages[i].reservedSpaceGb = Math.round(1.*$scope.storages[i].reservedSpace / (1024*1024*1024));
             }
 
-            console.log("storages",$scope.storages);
-
             $scope.$watch(function(){
                 for(var i in $scope.storages){
                     var storage = $scope.storages[i];

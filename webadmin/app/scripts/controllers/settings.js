@@ -51,11 +51,13 @@ angular.module('webadminApp')
         };
 
         function restartServer(){
-            mediaserver.restart();
+            $modal.open({
+                templateUrl: 'views/restart.html',
+                controller: 'RestartCtrl'
+            });
         }
 
         function successHandler (r){
-            console.log(r);
             if(r.data.reply.restartNeeded){
                 if(confirm("Changes will be applied after restart. Do you want to restart server now?")){
                     restartServer();

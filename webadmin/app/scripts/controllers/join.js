@@ -5,7 +5,6 @@ angular.module('webadminApp')
         $scope.settings = {url :'',  password :''};
 
         $scope.test = function () {
-            console.log("test", $scope.settings);
             mediaserver.pingSystem($scope.settings.url, $scope.settings.password).then(function(r){
                 if(r.data.error!=0){
                     var errorToShow = r.data.errorString;

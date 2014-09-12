@@ -23,9 +23,11 @@
             <td>{{storage.url}}</td>
             <td>{{formatSpace(storage.totalSpace)}}</td>
             <td>
-                <icon for="{{storage.isExternal}}" on-true="globe" on-false="hdd" title-true="External" title-false="Intrenal" />
-                <icon for="{{storage.isUsedForWriting}}" on-true="pencil" title-true="Used for writing"/>
-                <icon for="{{storage.isWritable && !storage.isUsedForWriting}}" on-true="pencil" title-true="Writable" class="icon-inactive"/>
+                <icon for="storage.isExternal" on-true="globe" on-false="hdd" title-true="External" title-false="Intrenal" />
+
+                <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"/>
+                <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"/>
+
             </td>
         </tr>
     </tbody>
