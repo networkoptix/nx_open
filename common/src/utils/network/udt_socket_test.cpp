@@ -23,34 +23,30 @@
 // This may simplify our test client program.
 
 namespace {
-
 class Proactor;
 
-template< typename T >
+template<typename T>
 class DualQueue {
 public:
     DualQueue():
         front_queue_(&q1_),
         back_queue_(&q2_){}
     std::list<T>* LockBackQueue() {
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-            std::swap(front_queue_,back_queue_);
-        }
+        std::lock_guard<std::mutex> lock(mutex_);
+        std::swap(front_queue_,back_queue_);
         return back_queue_;
     }
     void Push( const T& val ) {
-        // Using this temporary list trick is good for 
-        // 1) move exception possible code outside the lock
-        // 2) move slow memory allocation code outside of the lock
-        std::list<T> element(1,val);
+        std::list<T> element;
+        element.emplace_back(val);
         {
             std::lock_guard<std::mutex> lock(mutex_);
             front_queue_->splice(front_queue_->end(),std::move(element));
         }
     }
     void Push( T&& val ) {
-        std::list<T> element(1,std::move(val));
+        std::list<T> element;
+        element.emplace_back(std::move(val));
         {
             std::lock_guard<std::mutex> lock(mutex_);
             front_queue_->splice(front_queue_->end(),std::move(element));
@@ -58,7 +54,7 @@ public:
     }
 private:
     std::list<T> q1_,q2_;
-    std::list<T>* front_queue_ , *back_queue_;
+    std::list<T>* front_queue_,*back_queue_;
     std::mutex mutex_;
 };
 
@@ -88,20 +84,23 @@ private:
 
 // Events 
 enum {
-    PENDING_EV_READ,
-    PENDING_EV_WRITE,
-    PENDING_EV_ACCEPT,
-    PENDING_EV_CONNECT,
-    PENDING_EV_CLOSE,
-    PENDING_EV_SHUTDOWN_WORKER
+    PENDING_EV_NONE = 0 ,
+    PENDING_EV_READ = 1<<0 ,
+    PENDING_EV_WRITE = 1<<1 ,
+    PENDING_EV_ACCEPT = 1<<2 ,
+    PENDING_EV_CONNECT = 1<<3,
+    PENDING_EV_REMOVE  = 1<<4,
+    PENDING_EV_SHUTDOWN_WORKER = 1<<11,
 };
 
 struct PendingEvent {
-    int pending_event;
     UdtSocket* socket;
+    int pending_event;
+    bool has_exception;
     PendingEvent():pending_event(-1),socket(NULL){}
     PendingEvent( int ev , UdtSocket* sock ) :
         pending_event(ev),
+        has_exception(false),
         socket(sock){}
 };
 
@@ -110,7 +109,6 @@ struct Read : public PendingEvent {
     std::function<void(UdtStreamSocket*,const std::vector<char>&,bool)> callback;
     Read( std::function<void(UdtStreamSocket*,const std::vector<char>&,bool)>&& cb , UdtStreamSocket* socket ) :
          callback( std::move(cb) ),PendingEvent(PENDING_EV_READ,socket) {}
-
 };
 
 struct Write : public PendingEvent {
@@ -134,30 +132,191 @@ struct Accept : public PendingEvent {
         callback(std::move(cb)) , PendingEvent(PENDING_EV_ACCEPT,socket){}
 };
 
-struct Close : public PendingEvent {
-    enum {
-        SERVER,
-        CLIENT
-    };
-    int socket_type;
-    std::function<void(UdtStreamSocket*)> callback_client;
+struct Remove : public PendingEvent {
     std::function<void(UdtStreamServerSocket*)> callback_server;
-    Close( std::function<void(UdtStreamSocket*)>&& cb , UdtStreamSocket* socket ) :
-        socket_type(CLIENT),
-        callback_client(std::move(cb)) , 
-        PendingEvent( PENDING_EV_CLOSE , socket ) {}
-    Close( std::function<void(UdtStreamServerSocket*)>&& cb , UdtStreamServerSocket* socket ) :
-        socket_type(SERVER),
-        callback_server(std::move(cb)) , 
-        PendingEvent( PENDING_EV_CLOSE , socket ) {}
+    std::function<void(UdtStreamSocket*)> callback_client;
+    Remove( std::function<void(UdtStreamSocket*)>&& callback , UdtStreamSocket* socket ) :
+        callback_client( std::move(callback) ) , PendingEvent(PENDING_EV_REMOVE,socket){}
+    Remove( std::function<void(UdtStreamServerSocket*)>&& callback , UdtStreamServerSocket* socket ) :
+        callback_server( std::move(callback) ) , PendingEvent(PENDING_EV_REMOVE,socket){}
 };
 
 struct ShutdownWorker : public PendingEvent {
     ShutdownWorker() : PendingEvent( PENDING_EV_SHUTDOWN_WORKER , NULL ) {}
 };
 
-// Completion
+class AsyncUdtSocketContextQueue;
+class AsyncUdtSocketContext {
+public:
+    enum {
+        PENDING,
+        BEFORE_EXECUTION,
+        EXECUTION
+    };
 
+    int read_lock() const {
+        return read_lock_.load(std::memory_order::memory_order_acquire);
+    }
+    int write_lock() const {
+        return write_lock_.load(std::memory_order::memory_order_acquire);
+    }
+    void set_read_lock( int lk ) {
+        return read_lock_.store(lk,std::memory_order::memory_order_release);
+    }
+    void set_write_lock( int lk ) {
+        return write_lock_.store(lk,std::memory_order::memory_order_release);
+    }
+
+    class ReadExecutionLock {
+    public:
+        ReadExecutionLock( AsyncUdtSocketContext* context ):
+            context_(context){
+            context->set_read_lock( AsyncUdtSocketContext::EXECUTION );
+        }
+        ~ReadExecutionLock() {
+            context_->set_read_lock( AsyncUdtSocketContext::PENDING );
+        }
+    private:
+        AsyncUdtSocketContext* context_;
+    };
+    class WriteExecutionLock {
+    public:
+        WriteExecutionLock( AsyncUdtSocketContext* context ):
+            context_(context){
+                context->set_write_lock( AsyncUdtSocketContext::EXECUTION );
+        }
+        ~WriteExecutionLock() {
+            context_->set_write_lock( AsyncUdtSocketContext::PENDING );
+        }
+    private:
+        AsyncUdtSocketContext* context_;
+    };
+
+    UdtSocket* udt_socket();
+    PendingEvent* next_read_event() const {
+        return next_read_event_;
+    }
+    PendingEvent* next_write_event() const {
+        return next_write_event_;
+    }
+    bool has_next_read_event() const {
+        return next_read_event_ != NULL;
+    }
+    bool has_next_write_event() const {
+        return next_write_event_ != NULL;
+    }
+
+    PendingEvent* RemoveReadEvent() {
+        PendingEvent* ev = next_read_event_;
+        next_read_event_ = NULL;
+        return ev;
+    }
+    PendingEvent* RemoveWriteEvent() {
+        PendingEvent* ev = next_write_event_;
+        next_write_event_ = NULL;
+        return ev;
+    }
+
+    // Using these 2 functions to add the pending IO event, and if the 
+    // function returns false, it means there's a pending event that
+    // haven't been finished, so the user is not allow to post new event
+    bool AddReadEvent( PendingEvent* event ) {
+        if( read_lock() != EXECUTION )
+            return false;
+        Q_ASSERT( next_read_event_ == NULL );
+        next_read_event_ = event;
+        return true;
+    }
+    bool AddWriteEvent( PendingEvent* event ) {
+        if( write_lock() != EXECUTION )
+            return false;
+        Q_ASSERT( next_write_event_ == NULL );
+        next_write_event_ = event;
+        return true;
+    }
+private:
+    AsyncUdtSocketContext(  UdtSocket* socket ,
+        PendingEvent* read_event,
+        PendingEvent* write_event ):
+    read_lock_(PENDING),
+        write_lock_(PENDING),
+        udt_socket_(socket),
+        next_read_event_(read_event),
+        next_write_event_(write_event) {}
+
+    // Since UDT allows full duplex , therefore 2 lock is needed here 
+    std::atomic<int> read_lock_;
+    std::atomic<int> write_lock_;
+
+    // UdtSocket pointer
+    UdtSocket* udt_socket_;
+
+    // IO event can happen at the same time since the UDT is full duplex
+    // Additionally :
+    // connect->write
+    // accept->read
+    PendingEvent* next_read_event_;
+    PendingEvent* next_write_event_;
+
+    friend class AsyncUdtSocketContextQueue;
+    Q_DISABLE_COPY(AsyncUdtSocketContext)
+};
+
+// Dual queue seems not work with the UDT::epoll_set, it is not only a edge triggered, but also
+// a none queueable trigger. Therefore, we need to continue the fd registered state until the
+// user explicitly tells me to stop it. Therefore a DualQueue which may introduce arbitrary delay
+// will not work here. What we gonna do is having a safe shared data structure to store all the
+// socket related event information and just manipulate this data structure and reflects the operation
+// underwood later on. This is definitely slower but I guess it should be OK , otherwise multiple 
+// epoll set must be set up which seems to be an invariant to our existed code base .
+class AsyncUdtSocketContextQueue {
+public:
+    AsyncUdtSocketContextQueue(){}
+    // The return pointer is only valid that if the deleted tag is not there
+    // otherwise it is not safe to do so and the most important thing is that
+    // after you set the delete to true, do not use this pointer anymore .
+    std::weak_ptr<AsyncUdtSocketContext> LookUp( UdtSocket* socket ) const {
+        std::lock_guard<std::mutex> lock(mutex_);
+        std::map< UdtSocket* , std::shared_ptr<AsyncUdtSocketContext> >::const_iterator 
+            ib = async_socket_map_.find(socket);
+        return ib == async_socket_map_.cend() ? std::weak_ptr<AsyncUdtSocketContext>() :
+            std::weak_ptr<AsyncUdtSocketContext>(ib->second);
+    }
+    std::shared_ptr<AsyncUdtSocketContext> CreateRead( UdtSocket* socket , PendingEvent* read_event ) {
+        Q_ASSERT(LookUp(socket).expired());
+        std::shared_ptr<AsyncUdtSocketContext> context( new AsyncUdtSocketContext(socket,read_event,NULL) );
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            async_socket_map_.emplace(socket,context);
+        }
+        return context;
+    }
+    std::shared_ptr<AsyncUdtSocketContext> CreateWrite( UdtSocket* socket , PendingEvent* write_event ) {
+        Q_ASSERT(LookUp(socket).expired());
+        std::shared_ptr<AsyncUdtSocketContext> context( new AsyncUdtSocketContext(socket,NULL,write_event) );
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            async_socket_map_.emplace(socket,context);
+        }
+        return context;
+    }
+    bool Delete( UdtSocket* socket ) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        std::map<UdtSocket*,std::shared_ptr<AsyncUdtSocketContext> >::iterator
+            ib = async_socket_map_.find(socket);
+        if( ib != async_socket_map_.end() ) {
+            async_socket_map_.erase(ib);
+            return true;
+        }
+        return false;
+    }
+private:
+    mutable std::mutex mutex_;
+    std::map< UdtSocket* , std::shared_ptr<AsyncUdtSocketContext> > async_socket_map_;
+    Q_DISABLE_COPY(AsyncUdtSocketContextQueue)
+};
+
+// Completion
 class CompletionHandleWorker {
 public:
     CompletionHandleWorker( Proactor* proactor ) :
@@ -165,8 +324,7 @@ public:
             thread_ = std::thread(&CompletionHandleWorker::ThreadMain,this);
     }
     void PostPendingEvent( PendingEvent* ptr ) {
-        std::unique_ptr<PendingEvent> event(ptr);
-        std::list< PendingEvent* > element(1,event.release());
+        std::list< PendingEvent* > element(1,ptr);
         {
             std::lock_guard<std::mutex> lock(mutex_);
             event_queue_.splice(event_queue_.end(),std::move(element));
@@ -179,10 +337,13 @@ public:
     }
 private:
     void HandleRead( Read* read );
+    void DoRead( Read* read );
     void HandleWrite( Write* write );
+    void DoWrite( Write* write );
     void HandleConnect( Connect* connect );
     void HandleAccept( Accept* accept );
-    void HandleClose( Close* close );
+    void DoAccept( Accept* accept );
+    void HandleRemove( Remove* remove );
     void ThreadMain();
 private:
     std::mutex mutex_;
@@ -207,9 +368,6 @@ void CompletionHandleWorker::ThreadMain() {
         case PENDING_EV_ACCEPT:
             HandleAccept( static_cast<Accept*>(pending_event) );
             break;
-        case PENDING_EV_CLOSE:
-            HandleClose( static_cast<Close*>(pending_event) );
-            break;
         case PENDING_EV_CONNECT:
             HandleConnect( static_cast<Connect*>(pending_event) );
             break;
@@ -218,6 +376,9 @@ void CompletionHandleWorker::ThreadMain() {
             break;
         case PENDING_EV_WRITE:
             HandleWrite( static_cast<Write*>(pending_event) );
+            break;
+        case PENDING_EV_REMOVE:
+            HandleRemove( static_cast<Remove*>(pending_event) );
             break;
         case PENDING_EV_SHUTDOWN_WORKER:
             delete pending_event;
@@ -228,40 +389,67 @@ void CompletionHandleWorker::ThreadMain() {
 }
 
 // Proactor
-
 class Proactor {
 public:
     Proactor() :
         quit_(false),
         finger_(0){}
 public:
-    void NotifyRead( UdtStreamSocket* socket , std::function<void(UdtStreamSocket*,const std::vector<char>&,bool)>&& callback ) {
-        queue_.Push(  new Read(std::move(callback),socket) );
-    }
-    void NotifyAccept( UdtStreamServerSocket* socket , std::function<void(UdtStreamServerSocket*,const std::vector<UdtStreamSocket*>&,bool)>&& callback) {
-        queue_.Push(  new Accept(std::move(callback),socket) );
-    }
-    void NotifyWrite( UdtStreamSocket* socket , const std::vector<char>& buffer , std::function<void(UdtStreamSocket*,bool)>&& callback) {
-        queue_.Push(  new Write(buffer,std::move(callback),socket) );
-    }
-    void NotifyWrite( UdtStreamSocket* socket , std::vector<char>&& buffer , std::function<void(UdtStreamSocket*,bool)>&& callback) { 
-        queue_.Push( new Write(std::move(buffer),std::move(callback),socket) );
-    }
-    void NotifyConnect( UdtStreamSocket* socket , std::function<void(UdtStreamSocket*,bool)>&& callback ) {
-        queue_.Push( new Connect(std::move(callback),socket) );
-    }
-    void NotifyClose( UdtStreamSocket* socket , std::function<void(UdtStreamSocket*)>&& callback ) {
-        queue_.Push( new Close(std::move(callback),socket) );
-    }
-    void NotifyClose( UdtStreamServerSocket* socket , std::function<void(UdtStreamServerSocket*)>&& callback ) {
-        queue_.Push( new Close(std::move(callback),socket) );
-    }
+    bool NotifyRead( UdtStreamSocket* socket , std::function<void(UdtStreamSocket*,const std::vector<char>&,bool)>&& callback ) ;
+    bool NotifyAccept( UdtStreamServerSocket* socket , std::function<void(UdtStreamServerSocket*,const std::vector<UdtStreamSocket*>&,bool)>&& callback);
+    bool NotifyWrite( UdtStreamSocket* socket , const std::vector<char>& buffer , std::function<void(UdtStreamSocket*,bool)>&& callback);
+    bool NotifyWrite( UdtStreamSocket* socket , std::vector<char>&& buffer , std::function<void(UdtStreamSocket*,bool)>&& callback);
+    bool NotifyConnect( UdtStreamSocket* socket , std::function<void(UdtStreamSocket*,bool)>&& callback );
+    bool NotifyRemove( UdtStreamSocket* socket , std::function<void(UdtStreamSocket*)>&& callback );
+    bool NotifyRemove( UdtStreamServerSocket* socket, std::function<void(UdtStreamServerSocket*)>&& callback );
     bool Run( std::size_t thread_pool_size , int timeout , std::function<void()>&& on_idel = std::function<void()>() );
     void Quit();
 private:
-    void PreparePendingIO();
     void ExecutePendingIO();
     void InitializeWorkerQueue( std::size_t );
+
+    struct UdtPollSetOperation {
+        enum {
+            ADD_READ,
+            ADD_WRITE,
+            ADD,
+            REMOVE_READ,
+            REMOVE_WRITE,
+            REMOVE
+        };
+        int type;
+        UdtSocket* socket;
+        PendingEvent* close_event;
+        UdtPollSetOperation( UdtSocket* s ) :
+            type(ADD),socket(s){}
+        UdtPollSetOperation( UdtSocket* s , PendingEvent* ev ) :
+            type(REMOVE),socket(s),close_event(ev){}
+        UdtPollSetOperation( UdtSocket* s , PendingEvent* ev , int et ) :
+            type(et),socket(s),close_event(ev){}
+        UdtPollSetOperation( UdtSocket* s , int et ) :
+            type(et),socket(s),close_event(NULL){}
+    };
+
+    void EPollAddRead( UdtSocket* socket ) {
+        udt_epoll_set_operations_.Push( UdtPollSetOperation(socket,UdtPollSetOperation::ADD_READ) );
+    }
+    void EPollAddWrite( UdtSocket* socket ) {
+        udt_epoll_set_operations_.Push( UdtPollSetOperation(socket,UdtPollSetOperation::ADD_WRITE) );
+    }
+    void EPollAdd( UdtSocket* socket ) {
+        udt_epoll_set_operations_.Push( UdtPollSetOperation(socket) );
+    }
+    void EPollRemoveRead( UdtSocket* socket ) {
+        udt_epoll_set_operations_.Push( UdtPollSetOperation(socket,NULL,UdtPollSetOperation::REMOVE_READ) );
+    }
+    void EPollRemoveWrite( UdtSocket* socket ) {
+        udt_epoll_set_operations_.Push( UdtPollSetOperation(socket,NULL,UdtPollSetOperation::REMOVE_WRITE) );
+    }
+    void EPollRemove( UdtSocket* socket , PendingEvent* close_event ) {
+        udt_epoll_set_operations_.Push( UdtPollSetOperation(socket,close_event) );
+    }
+    void ExecuteEPollOperations();
+
     // A simple RR scheduler 
     CompletionHandleWorker* ScheduleNextIOCompletionHandle() {
         CompletionHandleWorker* ret = compleition_worker_queue_[finger_].get();
@@ -271,57 +459,182 @@ private:
         }
         return ret;
     }
-    DualQueue< PendingEvent* > queue_;
+private:
+    AsyncUdtSocketContextQueue udt_socket_queue_;
     UdtPollSet reactor_;
     std::vector< std::unique_ptr<CompletionHandleWorker> > compleition_worker_queue_;
+    DualQueue<UdtPollSetOperation> udt_epoll_set_operations_;
     bool quit_;
     int finger_;
+    friend class CompletionHandleWorker;
 };
 
-void Proactor::PreparePendingIO() {
-    std::list<PendingEvent*>* q = queue_.LockBackQueue();
-    // ignore the current status of the back_queue_
-    std::list<PendingEvent*>::iterator ib = q->begin();
+void Proactor::ExecuteEPollOperations() {
+    std::list<UdtPollSetOperation>* q = udt_epoll_set_operations_.LockBackQueue();
+    std::list<UdtPollSetOperation>::iterator ib = q->begin();
     for( ; ib != q->end() ; ++ib ) {
-        // just push all the pending events into the poller sets here
-        switch( (*ib)->pending_event ) {
-        case PENDING_EV_ACCEPT:
-            reactor_.add( (*ib)->socket , aio::etRead , *ib );
+        switch( ib->type ) {
+        case UdtPollSetOperation::ADD:
+            reactor_.add(ib->socket,aio::etRead,NULL);
+            reactor_.add(ib->socket,aio::etWrite,NULL);
             break;
-        case PENDING_EV_CLOSE:
-            ScheduleNextIOCompletionHandle()->PostPendingEvent(*ib);
+        case UdtPollSetOperation::ADD_READ:
+            reactor_.add(ib->socket,aio::etRead,NULL);
             break;
-        case PENDING_EV_WRITE:
-            reactor_.add( (*ib)->socket , aio::etWrite , *ib );
+        case UdtPollSetOperation::ADD_WRITE:
+            reactor_.add(ib->socket,aio::etWrite,NULL);
             break;
-        case PENDING_EV_READ:
-            reactor_.add( (*ib)->socket , aio::etRead , *ib );
+        case UdtPollSetOperation::REMOVE_READ:
+            reactor_.remove(ib->socket,aio::etRead);
             break;
-        case PENDING_EV_CONNECT:
-            reactor_.add( (*ib)->socket , aio::etWrite , *ib );
+        case UdtPollSetOperation::REMOVE_WRITE:
+            reactor_.remove(ib->socket,aio::etWrite);
+            break;
+        case UdtPollSetOperation::REMOVE:
+            reactor_.remove(ib->socket,aio::etRead);
+            reactor_.remove(ib->socket,aio::etWrite);
+            ScheduleNextIOCompletionHandle()->PostPendingEvent(
+                ib->close_event);
             break;
         default: Q_ASSERT(0); break;
         }
     }
+    // Clear the queue
     q->clear();
+}
+
+bool Proactor::NotifyRead( UdtStreamSocket* socket , std::function<void(UdtStreamSocket*,const std::vector<char>&,bool)>&& callback ) {
+    std::shared_ptr<AsyncUdtSocketContext> ptr = udt_socket_queue_.LookUp(socket).lock();
+    if( !ptr ) {
+        ptr = udt_socket_queue_.CreateRead(socket, new Read(std::move(callback),socket));
+        // Add the read here
+        EPollAddRead(socket);
+    } else {
+        if(!ptr->AddReadEvent( new Read(std::move(callback),socket) ))
+            return false;
+    }
+    return true;
+}
+
+bool Proactor::NotifyAccept( UdtStreamServerSocket* socket , std::function<void(UdtStreamServerSocket*,const std::vector<UdtStreamSocket*>&,bool)>&& callback ) {
+    std::shared_ptr<AsyncUdtSocketContext> ptr = udt_socket_queue_.LookUp(socket).lock();
+    if( !ptr ) {
+        ptr = udt_socket_queue_.CreateRead(socket, new Accept(std::move(callback),socket));
+        EPollAddRead(socket);
+    } else {
+        if(!ptr->AddReadEvent( new Accept(std::move(callback),socket) ))
+            return false;
+    }
+    return true;
+}
+
+bool Proactor::NotifyWrite( UdtStreamSocket* socket , const std::vector<char>& buffer , std::function<void(UdtStreamSocket*,bool)>&& callback ) {
+    std::shared_ptr<AsyncUdtSocketContext> ptr = udt_socket_queue_.LookUp(socket).lock();
+    if( !ptr ) {
+        ptr = udt_socket_queue_.CreateWrite(socket,new Write(buffer,std::move(callback),socket));
+        EPollAdd(socket);
+    } else {
+        if(!ptr->AddWriteEvent(new Write(buffer,std::move(callback),socket)))
+            return false;
+    }
+    return true;
+}
+
+bool Proactor::NotifyWrite( UdtStreamSocket* socket , std::vector<char>&& buffer , std::function<void(UdtStreamSocket*,bool)>&& callback) {
+    std::shared_ptr<AsyncUdtSocketContext> ptr = udt_socket_queue_.LookUp(socket).lock();
+    if( !ptr ) {
+        ptr = udt_socket_queue_.CreateWrite(socket,new Write(std::move(buffer),std::move(callback),socket));
+        EPollAdd(socket);
+    } else {
+        if(!ptr->AddWriteEvent(new Write(std::move(buffer),std::move(callback),socket)))
+            return false;
+    }
+    return true;
+}
+
+bool Proactor::NotifyConnect( UdtStreamSocket* socket , std::function<void(UdtStreamSocket*,bool)>&& callback ) {
+    std::shared_ptr<AsyncUdtSocketContext> ptr = udt_socket_queue_.LookUp(socket).lock();
+    if( !ptr ) {
+        ptr = udt_socket_queue_.CreateWrite(socket,new Connect(std::move(callback),socket) );
+        EPollAddWrite(socket);
+    } else {
+        if(!ptr->AddWriteEvent(new Connect(std::move(callback),socket)))
+            return false;
+    }
+    return true;
+}
+
+bool Proactor::NotifyRemove( UdtStreamServerSocket* socket, std::function<void(UdtStreamServerSocket*)>&& callback ) {
+    if(!udt_socket_queue_.Delete(socket))
+        return false;
+    EPollRemove(socket,new Remove(std::move(callback),socket));
+    return true;
+}
+
+bool Proactor::NotifyRemove( UdtStreamSocket* socket, std::function<void(UdtStreamSocket*)>&& callback ) {
+    if(!udt_socket_queue_.Delete(socket))
+        return false; 
+    EPollRemove(socket,new Remove(std::move(callback),socket));
+    return true;
 }
 
 void Proactor::ExecutePendingIO() {
     UdtPollSet::const_iterator ib = reactor_.begin();
     for( ; ib != reactor_.end() ; ++ib ) {
-        PendingEvent* pending_event = reinterpret_cast<PendingEvent*>(ib.userData());
-        // Remove it from the poller
-        reactor_.remove(ib.socket(),ib.eventType());
-        // Blocked the pending object but we don't remove FD 
-        // which allow us not to lose any single event here.
-        ScheduleNextIOCompletionHandle()->PostPendingEvent(pending_event);
+        std::shared_ptr<AsyncUdtSocketContext> socket_context =
+            udt_socket_queue_.LookUp(ib.socket()).lock();
+        if( !socket_context ) {
+            continue;
+        }
+        // Dispatching the event 
+        switch( ib.eventType() ) {
+        case aio::etRead: 
+            if( socket_context->read_lock() == AsyncUdtSocketContext::PENDING && 
+                socket_context->has_next_read_event() ) {
+                    socket_context->next_read_event()->has_exception = false;
+                    socket_context->set_read_lock( AsyncUdtSocketContext::BEFORE_EXECUTION );
+                    ScheduleNextIOCompletionHandle()
+                        ->PostPendingEvent(socket_context->RemoveReadEvent());
+            } 
+            break;
+        case aio::etWrite:
+            if( socket_context->write_lock() == AsyncUdtSocketContext::PENDING && 
+                socket_context->has_next_write_event() ) {
+                    socket_context->next_write_event()->has_exception = false;
+                    socket_context->set_write_lock( AsyncUdtSocketContext::BEFORE_EXECUTION );
+                    ScheduleNextIOCompletionHandle()
+                        ->PostPendingEvent(socket_context->RemoveWriteEvent());
+            } 
+            break;
+        case aio::etError:
+            // For error, we invoke read/write handler to notify the user because we don't
+            // know this aio::etError is cuased by the read or by the write here .This may
+            // need more consideration, since our deletion operation right now can handle 
+            // dummy deletion internally. We don't care how many read/write has been invoked.
+            if( socket_context->write_lock() == AsyncUdtSocketContext::PENDING && 
+                socket_context->has_next_write_event() ) {
+                    socket_context->next_write_event()->has_exception = true;
+                    socket_context->set_write_lock( AsyncUdtSocketContext::BEFORE_EXECUTION );
+                    ScheduleNextIOCompletionHandle()
+                        ->PostPendingEvent(socket_context->RemoveWriteEvent());
+            } 
+            if( socket_context->read_lock() == AsyncUdtSocketContext::PENDING &&
+                socket_context->has_next_read_event() ) {
+                    socket_context->next_write_event()->has_exception = true;
+                    socket_context->set_read_lock( AsyncUdtSocketContext::BEFORE_EXECUTION );
+                    ScheduleNextIOCompletionHandle()
+                        ->PostPendingEvent(socket_context->RemoveReadEvent());
+            }
+            break;
+        default: Q_ASSERT(0); break;
+        }
     }
 }
 
 bool Proactor::Run( std::size_t thread_size , int timeout , std::function<void()>&& on_idel ) {
     InitializeWorkerQueue(thread_size);
     do {
-        PreparePendingIO();
+        ExecuteEPollOperations();
         int what = reactor_.poll( timeout );
         if( what < 0 ) 
             return false;
@@ -347,42 +660,49 @@ void Proactor::InitializeWorkerQueue( std::size_t thread_size ) {
     }
 }
 
-void CompletionHandleWorker::HandleRead( Read* ptr ) {
-    // Read all the data from the kernel and then invoke the user's
-    // callback function in this thread 
+void CompletionHandleWorker::DoRead( Read* read ) {
     static const int kMaxStackBufferSize = 1024;
-    std::unique_ptr<Read> read(ptr);
     UdtStreamSocket* socket = static_cast<UdtStreamSocket*>(read->socket);
     std::vector<char> buffer;
     read->buffer.clear();
     while (true) {
         buffer.resize(kMaxStackBufferSize);
         int sz = socket->recv(&(*buffer.begin()),kMaxStackBufferSize);
-        if( sz == 0 ) {
-            if( read->buffer.empty() ) {
-                read->callback( static_cast<UdtStreamSocket*>(read->socket) , (read->buffer) , false );
-            } else {
-                return;
-            }
+        if( sz < 0 ) {
+            read->callback(static_cast<UdtStreamSocket*>(read->socket) , (read->buffer) , false );
+            return;
         } else {
-            if( sz <0 ) {
-                read->callback(static_cast<UdtStreamSocket*>(read->socket) , (read->buffer) , false );
-                return;
-            } else {
-                buffer.resize(sz);
-                read->buffer.insert( read->buffer.end() , buffer.begin() , buffer.end() );
-                if( sz < kMaxStackBufferSize ) {
-                    read->callback( static_cast<UdtStreamSocket*>(read->socket) , (read->buffer) , true );
-                    return;
+            if( sz < kMaxStackBufferSize ) {
+                if( sz != 0 ) {
+                    buffer.resize(sz);
+                    read->buffer.insert( read->buffer.end() , buffer.begin() , buffer.end() );
                 }
-                // continue
+                read->callback(static_cast<UdtStreamSocket*>(read->socket),(read->buffer),true);
+                return;
             }
         }
     }
 }
 
-void CompletionHandleWorker::HandleWrite( Write* ptr ) {
-    std::unique_ptr<Write> write(ptr);
+void CompletionHandleWorker::HandleRead( Read* ptr ) {
+    std::unique_ptr<Read> read(ptr);
+    std::shared_ptr<AsyncUdtSocketContext> socket_context = 
+        proactor_->udt_socket_queue_.LookUp(read->socket).lock();
+    if( !socket_context )
+        return;
+    // Lock the read
+    AsyncUdtSocketContext::ReadExecutionLock read_lock(socket_context.get());
+    PendingEvent* next_write_event = socket_context->next_write_event();
+    DoRead(ptr);
+    // We never remove the read operation since it will make our framework
+    // lost event , so just keep it inside of the epoll set will be a good idea.
+    if( socket_context->next_write_event() != next_write_event ){
+        // User also wants the write notification
+        proactor_->EPollAddWrite(read->socket);
+    }
+}
+
+void CompletionHandleWorker::DoWrite( Write* write ) {
     UdtStreamSocket* socket = static_cast<UdtStreamSocket*>(write->socket);
     int bytes = socket->send(&(*write->buffer.begin()),static_cast<int>(write->buffer.size()));
     if( bytes > 0 ) {
@@ -393,54 +713,89 @@ void CompletionHandleWorker::HandleWrite( Write* ptr ) {
         if( write->buffer.empty() ) {
             write->callback( static_cast<UdtStreamSocket*>(write->socket),true);
         } else {
-            // still working on write
-            proactor_->NotifyWrite( static_cast<UdtStreamSocket*>(ptr->socket) , std::move(write->buffer) , std::move(ptr->callback) );
+            proactor_->NotifyWrite( static_cast<UdtStreamSocket*>(write->socket) , std::move(write->buffer) , std::move(write->callback) );
         }
     } else {
-        // error 
         write->callback( static_cast<UdtStreamSocket*>(write->socket),false );
+    }
+}
+
+void CompletionHandleWorker::HandleWrite( Write* ptr ) {
+    std::unique_ptr<Write> write(ptr);
+    std::shared_ptr<AsyncUdtSocketContext> socket_context = 
+        proactor_->udt_socket_queue_.LookUp(write->socket).lock();
+    if( !socket_context )
+        return;
+    AsyncUdtSocketContext::WriteExecutionLock write_lock(socket_context.get());
+    Q_ASSERT(socket_context->next_write_event() == NULL);
+    DoWrite(ptr);
+    if( socket_context->next_write_event() == NULL ) {
+        // Remove the write event
+        proactor_->EPollRemoveWrite(write->socket);
     }
 }
 
 void CompletionHandleWorker::HandleAccept( Accept* ptr ) {
     std::unique_ptr<Accept> accept(ptr);
+    std::shared_ptr<AsyncUdtSocketContext> socket_context = 
+        proactor_->udt_socket_queue_.LookUp(accept->socket).lock();
+    if( !socket_context )
+        return;
+    AsyncUdtSocketContext::ReadExecutionLock read_lock(socket_context.get());
+    PendingEvent* next_write_event = socket_context->next_write_event();
+    DoAccept(ptr);
+    if( socket_context->next_write_event() != next_write_event ){
+        proactor_->EPollAddWrite(accept->socket);
+    }
+}
+
+void CompletionHandleWorker::DoAccept( Accept* accept ) {
+    // checking the pending read buffer size
     UdtStreamServerSocket* server = static_cast<UdtStreamServerSocket*>(accept->socket);
     // accept as much as possible here
     std::vector<UdtStreamSocket*> accept_sockets;
-    // The UDT has bug, it doesn't remove the accepted sockets, I don't know
-    // why I cannot call the server->accept in a loop instead of painfully let
-    // poll notify us and get only _ONE_ 
-    UdtStreamSocket* socket = static_cast<UdtStreamSocket*>(server->accept());
-    if( socket != NULL ) {
-        accept_sockets.push_back(socket);
-        socket->setNonBlockingMode(true);
-    } else {
-        if( accept_sockets.empty() ) {
-            accept->callback(server,accept_sockets,false);
+    do {
+        UdtStreamSocket* socket = static_cast<UdtStreamSocket*>(server->accept());
+        if( socket != NULL ) {
+            accept_sockets.push_back(socket);
+            socket->setNonBlockingMode(true);
         } else {
-            accept->callback(server,accept_sockets,true);
+            if( accept_sockets.empty() ) {
+                accept->callback(server,accept_sockets,false);
+            } else {
+                accept->callback(server,accept_sockets,true);
+            }
+            return;
         }
-        return;
-    }
+    } while( true );
 }
 
 void CompletionHandleWorker::HandleConnect( Connect* ptr ) {
     std::unique_ptr<Connect> connect(ptr);
+    std::shared_ptr<AsyncUdtSocketContext> socket_context = 
+        proactor_->udt_socket_queue_.LookUp(connect->socket).lock();
+    if( !socket_context )
+        return;
+    // Lock the write
+    AsyncUdtSocketContext::WriteExecutionLock write_lock(socket_context.get());
+
     UdtStreamSocket* socket = static_cast<UdtStreamSocket*>(connect->socket);
     // We cannot safely say that the socket is connected or not 
-    connect->callback(socket,true);
+    connect->callback(socket,!connect->has_exception);
+    if( socket_context->next_write_event() == NULL ) {
+        // Remove the write event
+        proactor_->EPollRemoveWrite(connect->socket);
+    }
 }
 
-void CompletionHandleWorker::HandleClose( Close* ptr ) {
-    std::unique_ptr<Close> close(ptr);
-    if( ptr->socket_type == Close::CLIENT ) {
-        UdtStreamSocket* socket = static_cast<UdtStreamSocket*>(close->socket);
-        socket->close();
-        close->callback_client(socket);
+void CompletionHandleWorker::HandleRemove( Remove* ptr ) {
+    std::unique_ptr<Remove> remove(ptr);
+    if( remove->callback_client ) {
+        remove->callback_client( 
+            static_cast<UdtStreamSocket*>(remove->socket));
     } else {
-        UdtStreamServerSocket* socket = static_cast<UdtStreamServerSocket*>(close->socket);
-        socket->close();
-        close->callback_server(socket);
+        remove->callback_server(
+            static_cast<UdtStreamServerSocket*>(remove->socket));
     }
 }
 
@@ -518,12 +873,13 @@ public:
 private:
     void HandleError( UdtStreamSocket* socket ) {
         // We simply close this socket here
-        proactor_.NotifyClose(socket,
+        proactor_.NotifyRemove(socket,
             std::bind(
             &UdtSocketProfileServer::OnClose,
             this,
             std::placeholders::_1));
     }
+
     void OnAccept( UdtStreamServerSocket* server , const std::vector<UdtStreamSocket*>& conn , bool ok ) {
         // Register read callback
         if(ok) {
@@ -548,10 +904,10 @@ private:
             std::placeholders::_2,
             std::placeholders::_3));
     }
+
     void OnRead( UdtStreamSocket* conn , const std::vector<char>& read , bool ok ) {
-        // Ignore what we have read.
         Q_UNUSED(read);
-        if( !ok ) {
+        if( !ok || read.empty() ) {
             HandleError(conn);
             return;
         }
@@ -564,10 +920,13 @@ private:
             std::placeholders::_2,
             std::placeholders::_3));
     }
+
     void OnClose( UdtStreamSocket* conn ) {
+        conn->close();
         delete conn;
         --current_conn_size_;
     }
+
     // This function will be called in idle time but not 
     // sure whether it gonna be called or not
     void PrintStatistic() {
@@ -575,9 +934,10 @@ private:
         std::cout<<"Active connection:"<<current_conn_size_<<"\n";
         std::cout<<"===================================================="<<std::endl;
     }
+
 private:
     static const int kMaximumSleepTime = 400;
-    static const std::uint32_t kPrintStatisticFrequency = 5000;
+    static const std::uint32_t kPrintStatisticFrequency = 1000;
     // Server socket
     UdtStreamServerSocket server_socket_;
     // Proactor
@@ -663,7 +1023,7 @@ public:
 
 private:
     void HandleError( UdtStreamSocket* socket ) {
-        proactor_.NotifyClose(socket,
+        proactor_.NotifyRemove(socket,
             std::bind(
             &UdtSocketProfileClient::OnClose,
             this,
@@ -704,6 +1064,7 @@ private:
         sleep_list_.push_back( socket );
     }
     void OnClose( UdtStreamSocket* socket ) {
+        socket->close();
         delete socket;
         --active_conn_sockets_size_;
         ++closed_conn_socket_size_;
@@ -723,7 +1084,7 @@ private:
         std::cout<<"===================================================="<<std::endl;
     }
     void DoSchedule() {
-        ScheduleSleepSockets();
+        //ScheduleSleepSockets();
         //ScheduleConnection();
     }
     void ScheduleSleepSockets();
@@ -733,7 +1094,7 @@ private:
             ScheduleWrite( socket );
             return true;
         } else if( random_.Roll(disconnect_rate_) ) {
-            proactor_.NotifyClose(socket,
+            proactor_.NotifyRemove(socket,
                 std::bind(
                 &UdtSocketProfileClient::OnClose,
                 this,
@@ -757,7 +1118,7 @@ private:
 
 private:
     static const int kMaximumSleepTime = 200;
-    static const std::uint32_t kPrintStatisticFrequency = 5000;
+    static const std::uint32_t kPrintStatisticFrequency = 1000;
     std::size_t thread_size_;
     QString address_;
     int port_;
@@ -776,7 +1137,7 @@ private:
     std::list<UdtStreamSocket*> sleep_list_;
     // list will not invalid the existed iterator 
     std::list<UdtStreamSocket*>::iterator prev_position_;
-    // Ticker
+    // ticker
     Ticker ticker_;
 };
 

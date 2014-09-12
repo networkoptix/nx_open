@@ -223,7 +223,6 @@ SocketAddress UdtSocketImpl::GetPeerAddress() const {
 bool UdtSocketImpl::Close() {
     //Q_ASSERT(!IsClosed());
     int ret = UDT::close(handler_);
-    const char*message = UDT::getlasterror().getErrorMessage();
     //VERIFY_(OK_(ret),"UDT::Close",handler_);
     handler_ = UDT::INVALID_SOCK;
     state_ = CLOSED;
@@ -453,7 +452,6 @@ bool UdtSocketImpl::Reopen() {
     return true;
 }
 
-
 // Connector / Acceptor 
 // We use a connector and acceptor to decide what kind of socket we want.
 
@@ -468,11 +466,17 @@ private:
 struct UdtEpollHandlerHelper {
     UdtEpollHandlerHelper(int fd,UDTSOCKET udt_handler):
         epoll_fd(fd){
+#ifndef TRACE_UDT_SOCKET
+            Q_UNUSED(udt_handler);
+#endif
             VERIFY_(fd>=0,"UDT::epoll_create",udt_handler);
     }
     ~UdtEpollHandlerHelper() {
         if(epoll_fd >=0) {
             int ret = UDT::epoll_release(epoll_fd);
+#ifndef TRACE_UDT_SOCKET
+            Q_UNUSED(ret);
+#endif
             VERIFY_(ret ==0,"UDT::epoll_release",udt_handler);
         }
     }
@@ -595,7 +599,6 @@ bool UdtSocket::getSendTimeout(unsigned int* millis)
 {
     return impl_->GetSendTimeout(millis);
 }
-
 
 // =====================================================================
 // UdtStreamSocket implementation
@@ -899,22 +902,12 @@ private:
     static const int kInterruptionBufferLength = 128;
     int MapAioEventToUdtEvent( aio::EventType et ) {
         switch(et) {
-        case aio::etRead: return UDT_EPOLL_IN;
-        case aio::etWrite:return UDT_EPOLL_OUT;
+        case aio::etRead: return UDT_EPOLL_IN|UDT_EPOLL_ERR;
+        case aio::etWrite:return UDT_EPOLL_OUT|UDT_EPOLL_ERR;
         default: Q_ASSERT(0); return 0;
         }
     }
     void ReclaimSocket();
-    int RemovePhantomSockets( std::set<UDTSOCKET>* sockets_set );
-    bool IsPhantomSocket( UDTSOCKET fd ) {
-        std::map<UDTSOCKET,SocketUserData>::iterator it = 
-            socket_user_data_.find(fd);
-        if( it == socket_user_data_.end() ) {
-            return true;
-        } else {
-            return it->second.deleted;
-        }
-    }
 private:
     std::set<UDTSOCKET> udt_read_set_;
     std::set<UDTSOCKET> udt_write_set_;
@@ -927,25 +920,6 @@ private:
     std::list<socket_iterator> reclaim_list_;
     friend class UdtPollSetConstIteratorImpl;
 };
-
-// I have observed that in multi-thread environment, the epoll_wait can give
-// notification for those sockets that has been closed/removed from epoll_set.
-// This workaround ensure that only the socket has been added to the epoll set
-// will get the notification. But this assume that the user needs to _remove_
-// all the waiting fd from the pollset before calling the close operation .
-
-int UdtPollSetImpl::RemovePhantomSockets( std::set<UDTSOCKET>* sockets_set ) {
-    int count = 0;
-    for( std::set<UDTSOCKET>::iterator ib = sockets_set->begin() ; ib != sockets_set->end() ; ) {
-        if( IsPhantomSocket(*ib) ) {
-            ib = sockets_set->erase(ib);
-            ++count;
-        } else {
-            ++ib;
-        }
-    }
-    return count;
-}
 
 void UdtPollSetImpl::RemoveFromEpoll( UDTSOCKET udt_handler , int event_type ) {
     // UDT will remove all the related event type related to a certain UDT handler, so if a udt
@@ -1035,7 +1009,7 @@ bool UdtPollSetImpl::Add( UdtSocket* socket , UdtSocketImpl* imp , aio::EventTyp
         return false;
     }
     SocketUserData& ref = socket_user_data_[imp->udt_handler()];
-    if( ev == UDT_EPOLL_IN )
+    if( ev == (UDT_EPOLL_IN|UDT_EPOLL_ERR) )
         ref.read_data = data;
     else
         ref.write_data = data;
@@ -1075,10 +1049,6 @@ int UdtPollSetImpl::Poll( int milliseconds ) {
         SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
         return -1;
     } else {
-        // Remove those phantom sockets
-        ret -= RemovePhantomSockets(&udt_read_set_);
-        ret -= RemovePhantomSockets(&udt_write_set_);
-        Q_ASSERT( ret >= 0 );
         // Remove control sockets
         if( !udt_sys_socket_read_set_.empty() ) {
             char buffer[kInterruptionBufferLength];
@@ -1184,16 +1154,38 @@ public:
 
     void* GetUserData() const {
         const SocketUserData* ref = GetSocketUserData();
-        if( in_read_set_ ) {
+        aio::EventType event_type = GetEventType();
+        if( event_type == aio::etRead ) {
             return ref->read_data == boost::none ? NULL : ref->read_data.get();
-        } else {
+        } else if( event_type == aio::etWrite ) {
             return ref->write_data == boost::none ? NULL : ref->write_data.get();
+        } else {
+            // For an error, what we need to return , an NULL pointer ?
+            return NULL;
         }
     }
 
     aio::EventType GetEventType() const {
         Q_ASSERT(!Done());
-        return in_read_set_ ? aio::etRead : aio::etWrite;
+        if( in_read_set_ ) {
+            return aio::etRead;
+        } else {
+            // This work around will make the UDT::epoll_wait like 
+            // posix epoll and not trapped into the UDT::epoll_wait 
+            // bug with broken connection .
+            int pending_epoll_event;
+            int pending_epoll_event_size = sizeof(int);
+            int ret = UDT::getsockopt(*iterator_,0,UDT_EVENT,
+                &pending_epoll_event,&pending_epoll_event_size);
+            if( ret != 0 )
+                return aio::etWrite;
+            else {
+                if( pending_epoll_event & UDT_EPOLL_ERR )
+                    return aio::etError;
+                else 
+                    return aio::etWrite;
+            }
+        }
     }
 
     bool Equal( const UdtPollSetConstIteratorImpl& impl ) const {
