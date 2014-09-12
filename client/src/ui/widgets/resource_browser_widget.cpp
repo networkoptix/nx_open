@@ -306,7 +306,9 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
 
     QnActionManager *manager = context()->menu();
 
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, mainWindow(), ignoreSelection ? QnActionParameters() : currentParameters(Qn::TreeScope)));
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, mainWindow(), ignoreSelection 
+        ? QnActionParameters().withArgument(Qn::NodeTypeRole, Qn::RootNode)
+        : currentParameters(Qn::TreeScope)));
 
     if(currentTreeWidget() == ui->searchTreeWidget) {
         /* Disable rename action for search view. */

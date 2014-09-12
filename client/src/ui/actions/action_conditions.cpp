@@ -333,7 +333,6 @@ Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutIte
 
 Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &resources) {
     QnLayoutResourcePtr layout;
-    QnVideoWallResourcePtr videowall;
 
     if(m_current) {
         layout = workbench()->currentLayout()->resource();
@@ -357,6 +356,26 @@ Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &re
     }
 }
 
+Qn::ActionVisibility QnSaveLayoutAsActionCondition::check(const QnResourceList &resources) {
+    QnLayoutResourcePtr layout;
+
+    if(m_current) {
+        layout = workbench()->currentLayout()->resource();
+    } else {
+        if(resources.size() != 1)
+            return Qn::InvisibleAction;
+
+        layout = resources[0].dynamicCast<QnLayoutResource>();
+    }
+
+    if(!layout)
+        return Qn::InvisibleAction;
+
+    if (layout->data().contains(Qn::VideoWallResourceRole))
+        return Qn::InvisibleAction;
+
+    return Qn::EnabledAction;
+}
 
 Qn::ActionVisibility QnLayoutCountActionCondition::check(const QnWorkbenchLayoutList &) {
     if(workbench()->layouts().size() < m_minimalRequiredCount)

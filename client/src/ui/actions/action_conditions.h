@@ -319,6 +319,18 @@ private:
     bool m_current;
 };
 
+/**
+ * Condition for saving of a layout with a new name.
+ */
+class QnSaveLayoutAsActionCondition: public QnActionCondition {
+public:
+    QnSaveLayoutAsActionCondition(bool isCurrent, QObject *parent): QnActionCondition(parent), m_current(isCurrent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+
+private:
+    bool m_current;
+};
 
 /**
  * Condition based on the count of layouts that are currently open.
