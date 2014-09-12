@@ -41,7 +41,7 @@
 		<final.artifact.name>${project.artifactId}</final.artifact.name>
 		<finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${box}-${arch}-${build.configuration}-beta</finalName>
 		<beta>true</beta>
-		<updateFeedUrl>testUpdateFeedUrl</updateFeedUrl>
+		<updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
 		<mobile>false</mobile>
 		<!-- compile.option1. See profile no-webkit -->
 		<webkit>true</webkit>
@@ -618,7 +618,7 @@
 			</activation>
 			<properties>
 				<finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${box}-${arch}</finalName>
-				<updateFeedUrl>prodUpdateFeedUrl</updateFeedUrl>
+				<updateFeedUrl>${prodUpdateFeedUrl}</updateFeedUrl>
 				<skip.sign>false</skip.sign>
 			</properties>
 		</profile>     
