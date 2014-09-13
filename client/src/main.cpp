@@ -498,7 +498,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         : Qn::PT_VideowallClient;
     runtimeData.brand = lit(QN_PRODUCT_NAME_SHORT);
     runtimeData.videoWallInstanceGuid = videowallInstanceGuid;
-    QnRuntimeInfoManager::instance()->items()->addItem(runtimeData);    // initializing localInfo
+    QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
     qnSettings->save();
     if (!QDir(qnSettings->mediaFolder()).exists())

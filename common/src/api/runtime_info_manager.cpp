@@ -82,6 +82,7 @@ bool QnRuntimeInfoManager::hasItem(const QUuid& id)
 void QnRuntimeInfoManager::updateLocalItem(const QnPeerRuntimeInfo& value)
 {
     QMutexLocker lock(&m_updateMutex);
+    Q_ASSERT(value.uuid == qnCommon->moduleGUID());
     if (m_items->hasItem(value.uuid)) {
         int oldVersion = m_items->getItem(value.uuid).data.version;
         QnPeerRuntimeInfo modifiedValue = value;
