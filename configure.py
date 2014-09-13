@@ -4,6 +4,7 @@ import argparse
 import subprocess
 from main import get_environment_variable, cd
 from os.path import dirname, join
+import re
 
 def runProcess(exe): 
     p = subprocess.Popen(exe, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -49,14 +50,8 @@ if __name__ == '__main__':
     except IOError:
         print 'not configured'
         branch = ""
-    def run_command(cmd):
-        '''given shell command, returns communication tuple of stdout and stderr'''
-        return subprocess.Popen(cmd, 
-                                stdout=subprocess.PIPE, 
-                                stderr=subprocess.PIPE, 
-                                stdin=subprocess.PIPE).communicate()
 
-    newbranch = run_command('hg branch')[0][:-1] 
+    newbranch = os.popen('hg branch').read()[:-1]
     f = open('configure_settings_tmp.py', 'w')
     print >> f, \
     'customization = "%s" \nconfiguration = "%s" \nbuild_arch = "%s" \nbranch = "%s"' %(build_customization, build_configuration, build_arch, newbranch)
