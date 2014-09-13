@@ -965,7 +965,7 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
 
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
     localInfo.data.publicIP = m_publicAddress.toString();
-    QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
+    QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
 
     at_localInterfacesChanged();
 
@@ -1266,7 +1266,7 @@ void QnMain::run()
     int guidCompatibility = 0;
     runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
     runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
-    QnRuntimeInfoManager::instance()->items()->addItem(runtimeData);    // initializing localInfo
+    QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
     ec2::ResourceContext resCtx(
         QnResourceDiscoveryManager::instance(),
@@ -1323,7 +1323,7 @@ void QnMain::run()
 
         QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
         localInfo.data.publicIP = m_publicAddress.toString();
-        QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
+        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
     }
     connect( ec2Connection->getTimeManager().get(), &ec2::AbstractTimeManager::timeChanged,
              QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );

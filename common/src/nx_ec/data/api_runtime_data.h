@@ -11,7 +11,7 @@ namespace ec2
     /**
     * This structure contains all runtime data per peer. Runtime data is absent in a DB.
     */
-    struct ApiRuntimeData: ApiData
+    struct ApiRuntimeData: ApiDataWithVersion
     {
         static const quint64 tpfPeerTimeSynchronizedWithInternetServer  = 0x0008LL << 32;
         static const quint64 tpfPeerTimeSetByUser                       = 0x0004LL << 32;
@@ -19,7 +19,7 @@ namespace ec2
         static const quint64 tpfPeerIsNotEdgeServer                     = 0x0001LL << 32;
 
         ApiRuntimeData(): 
-            ApiData(), 
+            ApiDataWithVersion(), 
             prematureLicenseExperationDate(0),
             videoWallControlSessions(0),
             serverTimePriority(0)
@@ -33,7 +33,9 @@ namespace ec2
                    videoWallInstanceGuid == other.videoWallInstanceGuid &&
                    videoWallControlSessions == other.videoWallControlSessions &&
                    serverTimePriority == other.serverTimePriority &&
-                   prematureLicenseExperationDate == other.prematureLicenseExperationDate;
+                   prematureLicenseExperationDate == other.prematureLicenseExperationDate &&
+                   mainHardwareIds == other.mainHardwareIds &&
+                   compatibleHardwareIds == other.compatibleHardwareIds;
         }
 
         ApiPeerData peer;
@@ -57,7 +59,7 @@ namespace ec2
         QList<QByteArray> compatibleHardwareIds;
     };
 
-#define ApiRuntimeData_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)(videoWallInstanceGuid)(videoWallControlSessions)(serverTimePriority)(mainHardwareIds)(compatibleHardwareIds)
+#define ApiRuntimeData_Fields ApiDataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)(videoWallInstanceGuid)(videoWallControlSessions)(serverTimePriority)(mainHardwareIds)(compatibleHardwareIds)
 
 
 } // namespace ec2

@@ -15,6 +15,12 @@ namespace ec2 {
     };
 #define ApiIdData_Fields (id)
 
+struct ApiDataWithVersion: public ApiData {
+    ApiDataWithVersion(): version(0) {}
+    int version;
+};
+#define ApiDataWithVersion_Fields (version)
+
 struct ApiDatabaseDumpData: public ApiData {
     QByteArray data;
 

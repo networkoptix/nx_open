@@ -328,7 +328,7 @@ bool QnDbManager::init(
     if( localInfo.data.prematureLicenseExperationDate != licenseOverflowTime )
     {
         localInfo.data.prematureLicenseExperationDate = licenseOverflowTime;
-        QnRuntimeInfoManager::instance()->items()->updateItem( localInfo.uuid, localInfo );
+        QnRuntimeInfoManager::instance()->updateLocalItem( localInfo );
     }
 
     query.addBindValue( DB_INSTANCE_KEY );
@@ -2975,7 +2975,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
     if (localInfo.data.prematureLicenseExperationDate != tran.params.time) {
         localInfo.data.prematureLicenseExperationDate = tran.params.time;
-        QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
+        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
     }
     
     return ErrorCode::ok;
