@@ -39,6 +39,9 @@ namespace ec2 {
     struct ApiResourceTypeData;
     struct ApiScheduleTaskData;
     struct ApiScheduleTaskWithRefData;
+    struct QnTranStateKey;
+    struct QnTranState;
+    struct QnTranStateResponse;
     struct ApiPeerAliveData;
     struct ApiSetResourceStatusData;
     struct ApiStorageData;
@@ -124,6 +127,9 @@ namespace ec2 {
     (ApiResourceTypeData)\
     (ApiScheduleTaskData)\
     (ApiScheduleTaskWithRefData)\
+    (QnTranStateKey)\
+    (QnTranState)\
+    (QnTranStateResponse)\
     (ApiPeerAliveData)\
     (ApiSetResourceStatusData)\
     (ApiStoredFilePath)\

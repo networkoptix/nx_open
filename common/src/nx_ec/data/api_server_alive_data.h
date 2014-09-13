@@ -6,7 +6,7 @@
 #include "utils/common/latin1_array.h"
 #include "api_peer_data.h"
 #include "api_fwd.h"
-#include "tran_state_data.h"
+#include "api_tran_state_data.h"
 
 namespace ec2
 {

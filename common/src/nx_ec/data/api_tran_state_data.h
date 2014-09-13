@@ -40,8 +40,6 @@ struct QnTranStateResponse
 #define QnTranStateResponse_Fields (result)
 
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnTranStateKey)(QnTranState)(QnTranStateResponse), (json)(ubjson))
-
 }
 
 #endif // __TRAN_STATE_DATA_H_
