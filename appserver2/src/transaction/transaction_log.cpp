@@ -330,11 +330,4 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     return ErrorCode::ok;
 }
 
-#define QN_TRANSACTION_LOG_DATA_TYPES \
-    (QnTranStateKey)\
-    (QnTranState)\
-    (QnTranStateResponse)\
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_TRANSACTION_LOG_DATA_TYPES,  (json)(ubjson), _Fields)
-
 } // namespace ec2
