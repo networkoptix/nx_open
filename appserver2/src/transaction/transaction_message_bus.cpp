@@ -12,7 +12,6 @@
 
 #include "api/app_server_connection.h"
 #include "api/runtime_info_manager.h"
-#include "api_tran_state_data.h"
 #include "nx_ec/data/api_server_alive_data.h"
 #include "utils/common/log.h"
 #include "utils/common/synctime.h"
