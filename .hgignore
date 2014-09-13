@@ -28,6 +28,7 @@ ecs.db-wal
 !launcher*.vcproj
 compatibility_info.cpp
 *_tmp.py*
+donotrebuild
 
 .DS_Store
 Debug

@@ -55,7 +55,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${python.dir}/python</executable>
+                            <executable>${init.python.dir}/python</executable>
                             <arguments>
                                 <argument>configure.py</argument>
                                 <argument>--cst</argument>
@@ -79,7 +79,7 @@
                 </os>           
             </activation>
             <properties>
-                <path>${python.dir};${python.dir}\Lib\site-packages\pywin32_system32;${env.PATH}</path>
+                <path>${init.python.dir};${init.python.dir}\Lib\site-packages\pywin32_system32;${env.PATH}</path>
             </properties>           
         </profile>
         <profile>
