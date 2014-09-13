@@ -21,7 +21,6 @@
 
 	<properties>
 		<release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
-		<timestamp>${angle}-${webkit}-20140625.timestamp</timestamp>
 		<appserver.name>Enterprise Controller</appserver.name>
 		<appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
 		<client.name>${company.name} ${product.name} Client</client.name>

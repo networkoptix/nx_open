@@ -48,7 +48,7 @@ if __name__ == '__main__':
             print >> sys.stderr, 'old branch is: %s' % branch   
     except IOError:
         print 'not configured'
-        
+        branch = ""
     def run_command(cmd):
         '''given shell command, returns communication tuple of stdout and stderr'''
         return subprocess.Popen(cmd, 
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     print >> sys.stderr, 'configuration is: %s' % build_configuration
     print >> sys.stderr, 'build_arch is: %s' % build_arch
     print >> sys.stderr, 'branch is: %s' % newbranch
-    if branch == newbranch:
+    if branch == newbranch and os.path.isfile('build_environment/target/donotrebuild'):
         f = open('donotrebuild', 'w')
         f.close()
         print "++++++++++++++++++++++++ Reconfigure is NOT required ++++++++++++++++++++++++"
@@ -75,3 +75,5 @@ if __name__ == '__main__':
         print "++++++++++++++++++++++++ Reconfigure is required ++++++++++++++++++++++++"
         if os.path.isfile('donotrebuild'):
             os.unlink('donotrebuild')
+        if os.path.isfile('build_environment/target/donotrebuild'):    
+            os.unlink('build_environment/target/donotrebuild')
