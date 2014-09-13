@@ -248,19 +248,6 @@
 				<module>ios-client</module>
 			</modules>
 		</profile>
-		<profile>
-			<id>build-env-win</id>
-			<!-- preparing build-environment only if it is not ready. The last operation is installing llutil to x64 python virtualenv so it can be used as a criteria -->
-			<activation>        
-				<file>
-					<!-- the dumb activator does not recognize variables so I cannot put libdir here -->
-					<missing>build_environment/target/${timestamp}</missing>
-				</file> 
-			</activation>
-			<modules>   
-				<module>build_environment</module>
-			</modules>  
-		</profile>  
 
 		<profile>
 			<id>quicksync</id>
@@ -284,6 +271,7 @@
 			</activation>
 			<modules>
 				<module>build_variables</module>
+				<module>build_environment</module>
 				<module>common</module>
 				<!-- <module>hole_punching_mediator</module> -->
 				<module>appserver2</module>
