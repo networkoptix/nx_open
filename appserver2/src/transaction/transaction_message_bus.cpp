@@ -322,9 +322,12 @@ void QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
     }
 }
 
-void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, QnTransactionTransport* transport)
+void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader)
 {
     gotAliveData(tran.params, transport);
+    QnTransaction<ApiPeerAliveData> modifiedTran(tran);
+    modifiedTran.params.persistentState.values.clear(); // do not proxy persistent state to other peers. this checking required for directly connected peers only
+    proxyTransaction(tran, ttHeader);
 }
 
 void QnTransactionMessageBus::onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, QnTransactionTransport* transport)
@@ -375,16 +378,6 @@ void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTranspor
     for(auto it = m_connections.constBegin(); it != m_connections.constEnd(); ++it) {
         if (it.value()->isReadyToSend(ApiCommand::NotDefined))
             processedPeers.insert(it.key()); // dst peer should not proxy transactions to already connected peers
-    }
-
-    if (QnRouter::instance()) {
-        QnTransaction<ApiConnectionDataList> transaction = prepareConnectionsDataTransaction();
-        sendTransaction(transaction, processedPeers);
-    }
-
-    if (QnGlobalModuleFinder::instance()) {
-        QnTransaction<ApiModuleDataList> transaction = prepareModulesDataTransaction();
-        sendTransaction(transaction, processedPeers);
     }
 }
 
@@ -461,19 +454,17 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         case ApiCommand::lockRequest:
         case ApiCommand::lockResponse:
         case ApiCommand::unlockRequest: 
-            {
-                onGotDistributedMutexTransaction(tran);
-                break;
-            }
+            onGotDistributedMutexTransaction(tran);
+            break;
         case ApiCommand::tranSyncRequest:
             onGotTransactionSyncRequest(sender, tran);
-            return;
+            return; // do not proxy
         case ApiCommand::tranSyncResponse:
             onGotTransactionSyncResponse(sender, tran);
-            return;
+            return; // do not proxy
         case ApiCommand::peerAliveInfo:
-            onGotServerAliveInfo(tran, sender);
-            break;
+            onGotServerAliveInfo(tran, sender, transportHeader);
+            return; // do not proxy. this call contains built in proxy
         case ApiCommand::forcePrimaryTimeServer:
             TimeSynchronizationManager::instance()->primaryTimeServerChanged( tran );
             break;
@@ -661,15 +652,10 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
             return false;
         }
 
-        QnTransaction<ApiModuleDataList> tranModules = prepareModulesDataTransaction();
-        QnTransaction<ApiConnectionDataList> tranConnections = prepareConnectionsDataTransaction();
-        tranModules.peerID = m_localPeer.id;
 
         transport->setWriteSync(true);
         sendRuntimeInfo(transport, processedPeers);
         transport->sendTransaction(tran, processedPeers);
-        transport->sendTransaction(tranModules, processedPeers);
-        transport->sendTransaction(tranConnections, processedPeers);
         transport->setReadSync(true);
 
         //sending local time information on known servers
@@ -810,7 +796,7 @@ QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTran
         data.discoverers = QnGlobalModuleFinder::instance()->discoverers(data.id).toList();
         transaction.params.push_back(data);
     }
-
+    transaction.peerID = m_localPeer.id;
     return transaction;
 }
 
@@ -1031,6 +1017,8 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
         tran.params = info.data;
         transport->sendTransaction(tran, transportHeader);
     }
+    transport->sendTransaction(prepareModulesDataTransaction(), transportHeader);
+    transport->sendTransaction(prepareConnectionsDataTransaction(), transportHeader);
 }
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer)
