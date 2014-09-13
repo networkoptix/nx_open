@@ -277,6 +277,7 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
 
 bool QnTransactionLog::contains(const QnTranState& state) const
 {
+    QReadLocker lock(&m_dbManager->getMutex());
     for (auto itr = state.values.begin(); itr != state.values.end(); ++itr)
     {
         if (itr.value() > m_state.values.value(itr.key()))

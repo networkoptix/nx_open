@@ -783,7 +783,7 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
     {
         QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo);
         tran.params = aliveData;
-        if (isAlive && transactionLog)
+        if (isAlive && transactionLog && peer.id == m_localPeer.id)
             tran.params.persistentState = transactionLog->getTransactionsState();
         sendTransaction(tran);
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
