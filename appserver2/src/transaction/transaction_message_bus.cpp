@@ -312,7 +312,7 @@ void QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
         }
     }
 
-    if (transport) 
+    if (transport && transport->isSyncDone()) 
     {
         if (aliveData.isAlive && !aliveData.persistentState.values.empty() && transactionLog) {
             // check current persistent state
