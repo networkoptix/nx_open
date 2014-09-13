@@ -70,5 +70,3 @@ if __name__ == '__main__':
         print "++++++++++++++++++++++++ Reconfigure is required ++++++++++++++++++++++++"
         if os.path.isfile('donotrebuild'):
             os.unlink('donotrebuild')
-        if os.path.isfile('build_environment/target/donotrebuild'):    
-            os.unlink('build_environment/target/donotrebuild')
