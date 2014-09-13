@@ -747,6 +747,8 @@ void QnTransactionMessageBus::connectToPeerLost(const QUuid& id)
         return;    
     
     removeAlivePeer(id, true);
+    m_lostPeers << id; // in case of transaction was undelivered to that peer
+
 }
 
 void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
@@ -755,6 +757,7 @@ void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
         return;
 
     addAlivePeerInfo(peer);
+    m_lostPeers.remove(peer.id);
     handlePeerAliveChanged(peer, true, true);
 }
 
@@ -975,6 +978,10 @@ void QnTransactionMessageBus::doPeriodicTasks()
     if (m_aliveSendTimer.elapsed() > ALIVE_UPDATE_INTERVAL) {
         m_aliveSendTimer.restart();
         handlePeerAliveChanged(m_localPeer, true, true);
+        if (!m_lostPeers.isEmpty()) {
+            sendRuntimeInfo();
+            m_lostPeers.clear();
+        }
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
     qDebug() << "Current transaction state:";
     if (transactionLog)
@@ -1019,6 +1026,18 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
     }
     transport->sendTransaction(prepareModulesDataTransaction(), transportHeader);
     transport->sendTransaction(prepareConnectionsDataTransaction(), transportHeader);
+}
+
+void QnTransactionMessageBus::sendRuntimeInfo()
+{
+    foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
+    {
+        QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged);
+        tran.params = info.data;
+        sendTransaction(tran);
+    }
+    sendTransaction(prepareModulesDataTransaction());
+    sendTransaction(prepareConnectionsDataTransaction());
 }
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer)

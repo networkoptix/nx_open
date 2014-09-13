@@ -180,6 +180,7 @@ namespace ec2
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
 
         void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader);
+        void sendRuntimeInfo();
 
         void addAlivePeerInfo(ApiPeerData peerData, const QUuid& gotFromPeer = QUuid());
         void removeAlivePeer(const QUuid& id, bool sendTran, bool isRecursive = false);
@@ -223,6 +224,7 @@ namespace ec2
 
         // alive control
         QElapsedTimer m_aliveSendTimer;
+        QSet<QUuid> m_lostPeers;
     };
 }
 #define qnTransactionBus ec2::QnTransactionMessageBus::instance()
