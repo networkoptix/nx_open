@@ -12,7 +12,7 @@
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_user_data.h"
 #include "nx_ec/data/api_resource_data.h"
-#include "api_tran_state_data.h"
+#include "nx_ec/data/api_tran_state_data.h"
 #include "nx_ec/data/api_layout_data.h"
 #include "nx_ec/data/api_videowall_data.h"
 #include "nx_ec/data/api_camera_server_item_data.h"
