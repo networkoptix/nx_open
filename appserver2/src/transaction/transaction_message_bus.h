@@ -173,9 +173,9 @@ namespace ec2
         QnTransaction<ApiModuleDataList> prepareModulesDataTransaction() const;
         QnTransaction<ApiConnectionDataList> prepareConnectionsDataTransaction() const;
         bool isPeerUsing(const QUrl& url);
-        void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QUuid& gotFromID);
-        void onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, const QUuid& gotFromPeer);
-        void processAliveData(const ApiPeerAliveData &aliveData, const QUuid& gotFromPeer);
+        void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, QnTransactionTransport* transport);
+        void onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, QnTransactionTransport* transport);
+        void gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport);
 
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
 

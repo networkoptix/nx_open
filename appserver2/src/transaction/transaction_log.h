@@ -36,37 +36,6 @@ namespace ec2
 
     class QnDbManager;
 
-    struct QnTranStateKey {
-        QnTranStateKey() {}
-        QnTranStateKey(QUuid peerID, QUuid dbID): peerID(peerID), dbID(dbID) {}
-        QUuid peerID;
-        QUuid dbID;
-
-        bool operator<(const QnTranStateKey& other) const {
-            if (peerID != other.peerID)
-                return peerID < other.peerID;
-            return dbID < other.dbID;
-        }
-        bool operator>(const QnTranStateKey& other) const {
-            if (peerID != other.peerID)
-                return peerID > other.peerID;
-            return dbID > other.dbID;
-        }
-    };
-    #define QnTranStateKey_Fields (peerID)(dbID)
-
-    struct QnTranState {
-         QMap<QnTranStateKey, qint32> values;
-    };
-    #define QnTranState_Fields (values)
-
-    struct QnTranStateResponse
-    {
-        int result;
-    };
-    #define QnTranStateResponse_Fields (result)
-  
-    QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnTranStateKey)(QnTranState)(QnTranStateResponse), (json)(ubjson))
 
     class QnTransactionLog
     {
@@ -88,6 +57,7 @@ namespace ec2
         
         template <class T>
         ContainsReason contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.params)); }
+        bool contains(const QnTranState& state) const;
 
         template <class T>
         ErrorCode saveTransaction(const QnTransaction<T>& tran) 

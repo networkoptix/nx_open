@@ -275,6 +275,16 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
     }
 }
 
+bool QnTransactionLog::contains(const QnTranState& state) const
+{
+    for (auto itr = state.values.begin(); itr != state.values.end(); ++itr)
+    {
+        if (itr.value() > m_state.values.value(itr.key()))
+            return false;
+    }
+    return true;
+}
+
 ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result)
 {
     QReadLocker lock(&m_dbManager->getMutex());

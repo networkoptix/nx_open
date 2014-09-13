@@ -263,8 +263,12 @@ void QnTransactionMessageBus::removeAlivePeer(const QUuid& id, bool sendTran, bo
         removeAlivePeer(p, true, true);
 }
 
-void QnTransactionMessageBus::processAliveData(const ApiPeerAliveData &aliveData, const QUuid& gotFromPeer)
+void QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport)
 {
+    QUuid gotFromPeer;
+    if (transport)
+        gotFromPeer = transport->remotePeer().id;
+
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
     qDebug() << "received peerAlive transaction" << aliveData.peer.id << aliveData.peer.peerType;
 #endif
@@ -307,16 +311,25 @@ void QnTransactionMessageBus::processAliveData(const ApiPeerAliveData &aliveData
             removeAlivePeer(aliveData.peer.id, false);
         }
     }
+
+    if (transport) 
+    {
+        if (aliveData.isAlive && !aliveData.persistentState.values.empty() && transactionLog) {
+            // check current persistent state
+            if (!transactionLog->contains(aliveData.persistentState))
+                queueSyncRequest(transport);
+        }
+    }
 }
 
-void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QUuid& gotFromPeer)
+void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, QnTransactionTransport* transport)
 {
-    processAliveData(tran.params, gotFromPeer);
+    gotAliveData(tran.params, transport);
 }
 
-void QnTransactionMessageBus::onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, const QUuid& gotFromPeer)
+void QnTransactionMessageBus::onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, QnTransactionTransport* transport)
 {
-    processAliveData(ApiPeerAliveData(tran.params.peer, true), gotFromPeer);
+    gotAliveData(ApiPeerAliveData(tran.params.peer, true), transport);
 }
 
 void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran, const QnTransactionTransportHeader &transportHeader)
@@ -459,7 +472,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             onGotTransactionSyncResponse(sender, tran);
             return;
         case ApiCommand::peerAliveInfo:
-            onGotServerAliveInfo(tran, sender->remotePeer().id);
+            onGotServerAliveInfo(tran, sender);
             break;
         case ApiCommand::forcePrimaryTimeServer:
             TimeSynchronizationManager::instance()->primaryTimeServerChanged( tran );
@@ -471,7 +484,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             TimeSynchronizationManager::instance()->knownPeersSystemTimeReceived( tran );
             break;
         case ApiCommand::runtimeInfoChanged:
-            onGotServerRuntimeInfo(tran, sender->remotePeer().id);
+            onGotServerRuntimeInfo(tran, sender);
             if( m_handler )
                 m_handler->triggerNotification(tran);
             break;
@@ -770,6 +783,8 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
     {
         QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo);
         tran.params = aliveData;
+        if (isAlive && transactionLog)
+            tran.params.persistentState = transactionLog->getTransactionsState();
         sendTransaction(tran);
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
         qDebug() << "sending peerAlive info" << peer.id << peer.peerType;
