@@ -747,13 +747,12 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
     return true;
 }
 
-void QnTransactionMessageBus::connectToPeerLost(const QUuid& id)
+void QnTransactionMessageBus::connectToPeerLost(const QnTransactionTransport* transport)
 {
-    if (!m_alivePeers.contains(id)) 
-        return;    
-    
-    removeAlivePeer(id, true);
-    m_lostPeers << id; // in case of transaction was undelivered to that peer
+    if (m_alivePeers.contains(transport->remotePeer().id))
+        removeAlivePeer(transport->remotePeer().id, true);
+    if (transport->hasUnsendData())
+        m_lostData << transport->remotePeer().id; // in case of transaction was undelivered to that peer
 
 }
 
@@ -763,7 +762,7 @@ void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
         return;
 
     addAlivePeerInfo(peer);
-    m_lostPeers.remove(peer.id);
+    m_lostData.remove(peer.id);
     handlePeerAliveChanged(peer, true, true);
 }
 
@@ -903,7 +902,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         {
             QnTransactionTransportPtr transportPtr = itr.value();
             if (transportPtr == transport) {
-                connectToPeerLost(transport->remotePeer().id);
+                connectToPeerLost(transport);
                 m_connections.erase(itr);
                 break;
             }
@@ -984,9 +983,9 @@ void QnTransactionMessageBus::doPeriodicTasks()
     if (m_aliveSendTimer.elapsed() > ALIVE_UPDATE_INTERVAL) {
         m_aliveSendTimer.restart();
         handlePeerAliveChanged(m_localPeer, true, true);
-        if (!m_lostPeers.isEmpty()) {
+        if (!m_lostData.isEmpty()) {
             sendRuntimeInfo();
-            m_lostPeers.clear();
+            m_lostData.clear();
         }
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
     qDebug() << "Current transaction state:";

@@ -168,7 +168,7 @@ namespace ec2
         void queueSyncRequest(QnTransactionTransport* transport);
 
         void connectToPeerEstablished(const ApiPeerData &peerInfo);
-        void connectToPeerLost(const QUuid& id);
+        void connectToPeerLost(const QnTransactionTransport* transport);
         void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool sendTran);
         QnTransaction<ApiModuleDataList> prepareModulesDataTransaction() const;
         QnTransaction<ApiConnectionDataList> prepareConnectionsDataTransaction() const;
@@ -224,7 +224,7 @@ namespace ec2
 
         // alive control
         QElapsedTimer m_aliveSendTimer;
-        QSet<QUuid> m_lostPeers;
+        QSet<QUuid> m_lostData;
     };
 }
 #define qnTransactionBus ec2::QnTransactionMessageBus::instance()

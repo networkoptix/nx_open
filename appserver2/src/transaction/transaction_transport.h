@@ -145,6 +145,7 @@ public:
     void setRemotePeer(const ApiPeerData& value) { m_remotePeer = value; }
     void sendHttpKeepAlive();
     bool isHttpKeepAliveTimeout() const;
+    bool hasUnsendData() const;
 private:
     struct DataToSend
     {

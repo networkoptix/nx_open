@@ -165,7 +165,6 @@ void QnTransactionTransport::close()
         assert( !m_socket );
         m_readSync = false;
         m_writeSync = false;
-        m_dataToSend.clear();
     }
     setState(State::Closed);
 }
@@ -386,6 +385,12 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 
     using namespace std::placeholders;
     m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) );
+}
+
+bool QnTransactionTransport::hasUnsendData() const
+{
+    QMutexLocker lock(&m_mutex);
+    return !m_dataToSend.empty();
 }
 
 void QnTransactionTransport::sendHttpKeepAlive()
