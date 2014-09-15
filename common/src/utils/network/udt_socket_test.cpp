@@ -217,22 +217,13 @@ public:
         return ev;
     }
 
-    // Using these 2 functions to add the pending IO event, and if the 
-    // function returns false, it means there's a pending event that
-    // haven't been finished, so the user is not allow to post new event
-    bool AddReadEvent( PendingEvent* event ) {
-        if( read_lock() != EXECUTION )
-            return false;
+    void AddReadEvent( PendingEvent* event ) {
         Q_ASSERT( next_read_event_ == NULL );
         next_read_event_ = event;
-        return true;
     }
-    bool AddWriteEvent( PendingEvent* event ) {
-        if( write_lock() != EXECUTION )
-            return false;
+    void AddWriteEvent( PendingEvent* event ) {
         Q_ASSERT( next_write_event_ == NULL );
         next_write_event_ = event;
-        return true;
     }
 private:
     AsyncUdtSocketContext(  UdtSocket* socket ,
@@ -510,8 +501,7 @@ bool Proactor::NotifyRead( UdtStreamSocket* socket , std::function<void(UdtStrea
         // Add the read here
         EPollAddRead(socket);
     } else {
-        if(!ptr->AddReadEvent( new Read(std::move(callback),socket) ))
-            return false;
+        ptr->AddReadEvent( new Read(std::move(callback),socket) );
     }
     return true;
 }
@@ -522,8 +512,7 @@ bool Proactor::NotifyAccept( UdtStreamServerSocket* socket , std::function<void(
         ptr = udt_socket_queue_.CreateRead(socket, new Accept(std::move(callback),socket));
         EPollAddRead(socket);
     } else {
-        if(!ptr->AddReadEvent( new Accept(std::move(callback),socket) ))
-            return false;
+        ptr->AddReadEvent( new Accept(std::move(callback),socket) );
     }
     return true;
 }
@@ -534,8 +523,9 @@ bool Proactor::NotifyWrite( UdtStreamSocket* socket , const std::vector<char>& b
         ptr = udt_socket_queue_.CreateWrite(socket,new Write(buffer,std::move(callback),socket));
         EPollAdd(socket);
     } else {
-        if(!ptr->AddWriteEvent(new Write(buffer,std::move(callback),socket)))
-            return false;
+        if(!ptr->has_next_write_event())
+            EPollAddWrite(socket);
+        ptr->AddWriteEvent(new Write(buffer,std::move(callback),socket));
     }
     return true;
 }
@@ -546,8 +536,9 @@ bool Proactor::NotifyWrite( UdtStreamSocket* socket , std::vector<char>&& buffer
         ptr = udt_socket_queue_.CreateWrite(socket,new Write(std::move(buffer),std::move(callback),socket));
         EPollAdd(socket);
     } else {
-        if(!ptr->AddWriteEvent(new Write(std::move(buffer),std::move(callback),socket)))
-            return false;
+        if(!ptr->has_next_write_event())
+            EPollAddWrite(socket);
+        ptr->AddWriteEvent(new Write(buffer,std::move(callback),socket));
     }
     return true;
 }
@@ -558,8 +549,7 @@ bool Proactor::NotifyConnect( UdtStreamSocket* socket , std::function<void(UdtSt
         ptr = udt_socket_queue_.CreateWrite(socket,new Connect(std::move(callback),socket) );
         EPollAddWrite(socket);
     } else {
-        if(!ptr->AddWriteEvent(new Connect(std::move(callback),socket)))
-            return false;
+        ptr->AddWriteEvent(new Connect(std::move(callback),socket));
     }
     return true;
 }
@@ -836,6 +826,9 @@ public:
         thread_size_(config.thread_size),
         address_(config.address),
         port_(config.port),
+        total_recv_bytes_(0),
+        broken_or_error_conn_(0),
+        closed_conn_(0),
         current_conn_size_(0) {
     }
     virtual bool run() {
@@ -906,9 +899,14 @@ private:
     }
 
     void OnRead( UdtStreamSocket* conn , const std::vector<char>& read , bool ok ) {
-        Q_UNUSED(read);
-        if( !ok || read.empty() ) {
+        total_recv_bytes_+= read.size();
+        if( !ok ) {
             HandleError(conn);
+            ++broken_or_error_conn_;
+            return;
+        } else if( read.empty() ) {
+            HandleError(conn);
+            ++closed_conn_;
             return;
         }
         proactor_.NotifyRead(
@@ -932,6 +930,9 @@ private:
     void PrintStatistic() {
         std::cout<<"====================================================\n";
         std::cout<<"Active connection:"<<current_conn_size_<<"\n";
+        std::cout<<"Total read bytes :"<<total_recv_bytes_<<"\n";
+        std::cout<<"Broken or error connection:"<<broken_or_error_conn_<<"\n";
+        std::cout<<"Closed connection:"<<closed_conn_<<"\n";
         std::cout<<"===================================================="<<std::endl;
     }
 
@@ -948,6 +949,9 @@ private:
     int port_;
     // Statistic 
     int current_conn_size_;
+    std::size_t total_recv_bytes_;
+    std::size_t broken_or_error_conn_;
+    std::size_t closed_conn_;
     // Ticker
     Ticker ticker_;
 };
@@ -1084,21 +1088,16 @@ private:
         std::cout<<"===================================================="<<std::endl;
     }
     void DoSchedule() {
-        //ScheduleSleepSockets();
-        //ScheduleConnection();
+        ScheduleSleepSockets();
+        ScheduleConnection();
     }
     void ScheduleSleepSockets();
     bool ScheduleSleepSocket( UdtStreamSocket* socket ) {
+        // Because UDT has bug related to detect closed socket in epoll API
+        // so we don't issue any Clean Close in remote peer and no test for
         if( random_.Roll(active_load_factor_) ) {
             // Schedule this sleepy socket
             ScheduleWrite( socket );
-            return true;
-        } else if( random_.Roll(disconnect_rate_) ) {
-            proactor_.NotifyRemove(socket,
-                std::bind(
-                &UdtSocketProfileClient::OnClose,
-                this,
-                std::placeholders::_1));
             return true;
         }
         return false;
