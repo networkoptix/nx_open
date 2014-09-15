@@ -108,6 +108,17 @@ int QnMiscManager<QueryProcessorType>::removeConnection(const QUuid &discovererI
 }
 
 template<class QueryProcessorType>
+int QnMiscManager<QueryProcessorType>::sendConnections(const ApiConnectionDataList &connections, impl::SimpleHandlerPtr handler) {
+    const int reqId = generateRequestID();
+    auto transaction = prepareTransaction(connections);
+
+    using namespace std::placeholders;
+    m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
+
+    return reqId;
+}
+
+template<class QueryProcessorType>
 int QnMiscManager<QueryProcessorType>::sendAvailableConnections(impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareAvailableConnectionsTransaction();
@@ -159,6 +170,13 @@ QnTransaction<ApiConnectionData> QnMiscManager<QueryProcessorType>::prepareTrans
     transaction.params.host = host;
     transaction.params.port = port;
 
+    return transaction;
+}
+
+template<class QueryProcessorType>
+QnTransaction<ApiConnectionDataList> QnMiscManager<QueryProcessorType>::prepareTransaction(const ApiConnectionDataList &connections) const {
+    QnTransaction<ApiConnectionDataList> transaction(ApiCommand::availableConnections);
+    transaction.params = connections;
     return transaction;
 }
 

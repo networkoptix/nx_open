@@ -844,6 +844,11 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
+        template<class TargetType, class HandlerType> int sendConnections(const ApiConnectionDataList &connections, TargetType *target, HandlerType handler) {
+            return sendConnections(connections, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
         template<class TargetType, class HandlerType> int sendAvailableConnections(TargetType *target, HandlerType handler) {
             return sendAvailableConnections(std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
@@ -873,6 +878,7 @@ namespace ec2
         virtual int changeSystemName(const QString &systemName, impl::SimpleHandlerPtr handler) = 0;
         virtual int addConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
         virtual int removeConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendConnections(const ApiConnectionDataList &connections, impl::SimpleHandlerPtr handler) = 0;
         virtual int sendAvailableConnections(impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
     };
