@@ -145,7 +145,7 @@ QUuid QnTransactionLog::makeHash(const QString &extraData, const ApiDiscoveryDat
     return QUuid::fromRfc4122(hash.result());
 }
 
-ErrorCode QnTransactionLog::updateSequence(const ApiSyncMarkerData& data)
+ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
 {
     QnDbManager::Locker locker(dbManager);
     foreach(const ApiSyncMarkerRecord& record, data.markers) 
@@ -312,7 +312,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     if (!query.exec())
         return ErrorCode::failure;
     
-    QnTransaction<ApiSyncMarkerData> syncMarkersTran(ApiCommand::syncDoneMarker);
+    QnTransaction<ApiUpdateSequenceData> syncMarkersTran(ApiCommand::updatePersistentSequence);
     while (query.next()) 
     {
         QnTranStateKey key(QUuid::fromRfc4122(query.value(0).toByteArray()), QUuid::fromRfc4122(query.value(1).toByteArray()));

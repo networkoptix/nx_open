@@ -24,6 +24,8 @@ namespace ec2
                     return "tranSyncRequest";
                 case tranSyncResponse:
                     return "tranSyncResponse";
+                case tranSyncDone:
+                    return "tranSyncDone";
                 case lockRequest:
                     return "lockRequest";
                 case lockResponse:
@@ -183,8 +185,8 @@ namespace ec2
                     return "dumpDatabase";
                 case restoreDatabase:
                     return "restoreDatabase";
-                case syncDoneMarker:
-                    return "syncDoneMarker";
+                case updatePersistentSequence:
+                    return "updatePersistentSequence";
                 case markLicenseOverflow:
                     return "markLicenseOverflow";
                 default:
@@ -202,7 +204,7 @@ namespace ec2
                     val == runtimeInfoChanged ||
                     val == peerAliveInfo ||
                     val == broadcastPeerSystemTime ||
-                    val == syncDoneMarker;
+                    val == tranSyncDone;
         }
 
         bool isPersistent( Value val )

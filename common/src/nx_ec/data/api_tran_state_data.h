@@ -39,6 +39,12 @@ struct QnTranStateResponse
 };
 #define QnTranStateResponse_Fields (result)
 
+struct ApiTranSyncDoneData
+{
+    int result;
+};
+#define ApiTranSyncDoneData_Fields (result)
+
 
 }
 

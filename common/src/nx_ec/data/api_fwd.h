@@ -20,7 +20,7 @@ namespace ec2 {
     struct ApiEmailSettingsData;
 	struct ApiFullInfoData;
     struct ApiSyncMarkerRecord;
-    struct ApiSyncMarkerData;
+    struct ApiUpdateSequenceData;
     struct ApiIdData;
     struct ApiLayoutItemData;
     struct ApiLayoutItemWithRefData;
@@ -42,6 +42,7 @@ namespace ec2 {
     struct QnTranStateKey;
     struct QnTranState;
     struct QnTranStateResponse;
+    struct ApiTranSyncDoneData;
     struct ApiPeerAliveData;
     struct ApiSetResourceStatusData;
     struct ApiStorageData;
@@ -107,7 +108,7 @@ namespace ec2 {
     (ApiFullInfoData)\
     (ApiIdData)\
     (ApiSyncMarkerRecord)\
-    (ApiSyncMarkerData)\
+    (ApiUpdateSequenceData)\
     (ApiLayoutItemData)\
     (ApiLayoutItemWithRefData)\
     (ApiLayoutData)\
@@ -129,6 +130,7 @@ namespace ec2 {
     (QnTranStateKey)\
     (QnTranState)\
     (QnTranStateResponse)\
+    (ApiTranSyncDoneData)\
     (ApiPeerAliveData)\
     (ApiSetResourceStatusData)\
     (ApiStoredFilePath)\

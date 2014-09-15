@@ -146,11 +146,12 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::peerAliveInfo:         return handleTransactionParams<ApiPeerAliveData>        (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::tranSyncRequest:       return handleTransactionParams<QnTranState>             (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::tranSyncResponse:      return handleTransactionParams<QnTranStateResponse>     (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::tranSyncDone:          return handleTransactionParams<ApiTranSyncDoneData>     (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::runtimeInfoChanged:    return handleTransactionParams<ApiRuntimeData>          (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::broadcastPeerSystemTime: return handleTransactionParams<ApiPeerSystemTimeData> (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::forcePrimaryTimeServer:  return handleTransactionParams<ApiIdData>             (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::getKnownPeersSystemTime: return handleTransactionParams<ApiPeerSystemTimeDataList> (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::syncDoneMarker:          return handleTransactionParams<ApiSyncMarkerData>         (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::updatePersistentSequence:          return handleTransactionParams<ApiUpdateSequenceData>         (serializedTransaction, &stream, transaction, function, fastFunction);
 
     default:
         qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";
@@ -370,12 +371,11 @@ void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnTransacti
 void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, const QnTransaction<QnTranStateResponse> &tran) {
     Q_UNUSED(tran)
 	sender->setReadSync(true);
+}
 
-    QnPeerSet processedPeers;
-    for(auto it = m_connections.constBegin(); it != m_connections.constEnd(); ++it) {
-        if (it.value()->isReadyToSend(ApiCommand::NotDefined))
-            processedPeers.insert(it.key()); // dst peer should not proxy transactions to already connected peers
-    }
+void QnTransactionMessageBus::onGotTransactionSyncDone(QnTransactionTransport* sender, const QnTransaction<ApiTranSyncDoneData> &tran) {
+    Q_UNUSED(tran)
+        sender->setSyncDone(true);
 }
 
 template <class T>
@@ -436,10 +436,8 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     return true;
 }
 
-void QnTransactionMessageBus::updatePersistentMarker(const QnTransaction<ApiSyncMarkerData>& tran, QnTransactionTransport* transport)
+void QnTransactionMessageBus::updatePersistentMarker(const QnTransaction<ApiUpdateSequenceData>& tran, QnTransactionTransport* transport)
 {
-    if (transport->remotePeer().id == tran.peerID)
-        transport->setSyncDone(true);
     if (transactionLog)
         transactionLog->updateSequence(tran.params);
 }
@@ -483,6 +481,9 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         case ApiCommand::tranSyncResponse:
             onGotTransactionSyncResponse(sender, tran);
             return; // do not proxy
+        case ApiCommand::tranSyncDone:
+            onGotTransactionSyncDone(sender, tran);
+            return; // do not proxy
         case ApiCommand::peerAliveInfo:
             onGotServerAliveInfo(tran, sender, transportHeader);
             return; // do not proxy. this call contains built in proxy
@@ -500,7 +501,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             if( m_handler )
                 m_handler->triggerNotification(tran);
             break;
-        case ApiCommand::syncDoneMarker:
+        case ApiCommand::updatePersistentSequence:
             updatePersistentMarker(tran, sender);
             break;
         default:
@@ -513,7 +514,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
                     // already processed
                     if (isContains == QnTransactionLog::Reason_Timestamp) {
                         // proxy filler transaction to avoid gaps in the persistent sequence
-                        QnTransaction<ApiSyncMarkerData> fillerTran(ApiCommand::syncDoneMarker);
+                        QnTransaction<ApiUpdateSequenceData> fillerTran(ApiCommand::updatePersistentSequence);
                         ApiSyncMarkerRecord record;
                         record.peerID = tran.peerID;
                         record.dbID = tran.persistentInfo.dbID;
@@ -623,11 +624,9 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
         printTranState(tran.params);
         qDebug() << "exist " << serializedTransactions.size() << "new transactions";
 #endif
-        QnTransaction<QnTranStateResponse> tran(ApiCommand::tranSyncResponse);
-        tran.params.result = 0;
-        QByteArray chunkData;
-        
-        sender->sendTransaction(tran, ttUnicast);
+        QnTransaction<QnTranStateResponse> tranSyncResponse(ApiCommand::tranSyncResponse);
+        tranSyncResponse.params.result = 0;
+        sender->sendTransaction(tranSyncResponse, ttUnicast);
 
         sendRuntimeInfo(sender, ttBroadcast); // send as broadcast
 
@@ -637,6 +636,11 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
                                   std::bind(SendTransactionToTransportFuction(), this, _1, sender, ttBroadcast), 
                                   std::bind(SendTransactionToTransportFastFuction(), this, _1, _2, sender, ttBroadcast)))
                                   sender->setState(QnTransactionTransport::Error);
+
+        QnTransaction<ApiTranSyncDoneData> tranSyncDone(ApiCommand::tranSyncDone);
+        tranSyncResponse.params.result = 0;
+        sender->sendTransaction(tranSyncDone, ttUnicast);
+
         return;
     }
     else {

@@ -34,6 +34,7 @@ namespace ec2
             lockResponse                = 4,    /*< ApiLockData */
             unlockRequest               = 5,    /*< ApiLockData */
             peerAliveInfo               = 6,    /*< ApiPeerAliveData */
+            tranSyncDone                = 7,    /*< ApiTranSyncDoneData */
 
             /* Connection */
             testConnection              = 100,  /*< ApiLoginData */
@@ -134,7 +135,7 @@ namespace ec2
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
             dumpDatabase                = 9005,  /*< ApiDatabaseDumpData */
             restoreDatabase             = 9006,  /*< ApiDatabaseDumpData */
-            syncDoneMarker              = 9009,  /*< ApiSyncMarkerData*/
+            updatePersistentSequence              = 9009,  /*< ApiUpdateSequenceData*/
 
             maxTransactionValue         = 65535
         };

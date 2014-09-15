@@ -36,11 +36,11 @@ struct ApiSyncMarkerRecord: public ApiData
 };
 #define ApiSyncMarkerRecord_Fields (peerID)(dbID)(sequence)
 
-struct ApiSyncMarkerData: public ApiData 
+struct ApiUpdateSequenceData: public ApiData 
 {
     std::vector<ApiSyncMarkerRecord> markers;
 };
-#define ApiSyncMarkerData_Fields (markers)
+#define ApiUpdateSequenceData_Fields (markers)
 
 
 } // namespace ec2

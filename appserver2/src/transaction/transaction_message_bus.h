@@ -164,6 +164,7 @@ namespace ec2
 
         void onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<QnTranState> &tran);
         void onGotTransactionSyncResponse(QnTransactionTransport* sender, const QnTransaction<QnTranStateResponse> &tran);
+        void onGotTransactionSyncDone(QnTransactionTransport* sender, const QnTransaction<ApiTranSyncDoneData> &tran);
         void onGotDistributedMutexTransaction(const QnTransaction<ApiLockData>& tran);
         void queueSyncRequest(QnTransactionTransport* transport);
 
@@ -186,7 +187,7 @@ namespace ec2
         bool sendInitialData(QnTransactionTransport* transport);
         void printTranState(const QnTranState& tranState);
         template <class T> void proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader);
-        void updatePersistentMarker(const QnTransaction<ApiSyncMarkerData>& tran, QnTransactionTransport* transport);
+        void updatePersistentMarker(const QnTransaction<ApiUpdateSequenceData>& tran, QnTransactionTransport* transport);
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
