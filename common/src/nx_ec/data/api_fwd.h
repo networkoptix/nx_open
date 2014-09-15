@@ -95,7 +95,6 @@ namespace ec2 {
     typedef std::vector<ApiCameraBookmarkTagData> ApiCameraBookmarkTagDataList;
     typedef std::vector<ApiModuleData> ApiModuleDataList;
     typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
-    typedef std::vector<ApiConnectionData> ApiConnectionDataList;
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
 
 #define QN_EC2_API_DATA_TYPES \

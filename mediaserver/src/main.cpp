@@ -1581,7 +1581,6 @@ void QnMain::run()
     globalModuleFinder->setConnection(ec2Connection);
 
     QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder, false));
-    router->setConnection(ec2Connection);
 
     QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
 

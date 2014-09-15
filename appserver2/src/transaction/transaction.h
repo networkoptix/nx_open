@@ -122,10 +122,6 @@ namespace ec2
             addDiscoveryInformation     = 1402, /*< ApiDiscoveryDataList*/
             removeDiscoveryInformation  = 1403, /*< ApiDiscoveryDataList*/
 
-            addConnection               = 1501, /*< ApiConnectionData */
-            removeConnection            = 1502, /*< ApiConnectionData */
-            availableConnections        = 1503, /*< ApiConnectionDataList */
-
             /* Misc */
             forcePrimaryTimeServer      = 2001,  /*< ApiIdData */
             broadcastPeerSystemTime     = 2002,  /*< ApiPeerSystemTimeData*/

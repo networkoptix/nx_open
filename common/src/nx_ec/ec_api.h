@@ -834,26 +834,6 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int addConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, TargetType *target, HandlerType handler) {
-            return addConnection(discovererId, peerId, host, port, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
-
-        template<class TargetType, class HandlerType> int removeConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, TargetType *target, HandlerType handler) {
-            return removeConnection(discovererId, peerId, host, port, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
-
-        template<class TargetType, class HandlerType> int sendConnections(const ApiConnectionDataList &connections, TargetType *target, HandlerType handler) {
-            return sendConnections(connections, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
-
-        template<class TargetType, class HandlerType> int sendAvailableConnections(TargetType *target, HandlerType handler) {
-            return sendAvailableConnections(std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
-
         template<class TargetType, class HandlerType> int markLicenseOverflow(bool value, qint64 time, TargetType *target, HandlerType handler) {
             return markLicenseOverflow(value, time, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
@@ -869,17 +849,11 @@ namespace ec2
     signals:
         void moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer);
         void systemNameChangeRequested(const QString &systemName);
-        void connectionAdded(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
-        void connectionRemoved(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
 
     protected:
         virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer, impl::SimpleHandlerPtr handler) = 0;
         virtual int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QUuid, QUuid> &discoverersByPeer, impl::SimpleHandlerPtr handler) = 0;
         virtual int changeSystemName(const QString &systemName, impl::SimpleHandlerPtr handler) = 0;
-        virtual int addConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
-        virtual int removeConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
-        virtual int sendConnections(const ApiConnectionDataList &connections, impl::SimpleHandlerPtr handler) = 0;
-        virtual int sendAvailableConnections(impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;

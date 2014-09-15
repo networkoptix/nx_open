@@ -138,11 +138,6 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::removeDiscoveryInformation:
                                             return handleTransactionParams<ApiDiscoveryDataList>    (serializedTransaction, &stream, transaction, function, fastFunction);
 
-    case ApiCommand::addConnection:
-    case ApiCommand::removeConnection:
-                                            return handleTransactionParams<ApiConnectionData>       (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::availableConnections:  return handleTransactionParams<ApiConnectionDataList>   (serializedTransaction, &stream, transaction, function, fastFunction);
-
     case ApiCommand::changeSystemName:      return handleTransactionParams<ApiSystemNameData>       (serializedTransaction, &stream, transaction, function, fastFunction);
 
     case ApiCommand::lockRequest:
@@ -808,23 +803,6 @@ QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTran
     return transaction;
 }
 
-QnTransaction<ApiConnectionDataList> QnTransactionMessageBus::prepareConnectionsDataTransaction() const
-{
-    QnTransaction<ApiConnectionDataList> transaction(ApiCommand::availableConnections);
-
-    QMultiHash<QUuid, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
-    for (auto it = connections.begin(); it != connections.end(); ++it) {
-        ApiConnectionData connection;
-        connection.discovererId = it.key();
-        connection.peerId = it->id;
-        connection.host = it->host;
-        connection.port = it->port;
-        transaction.params.push_back(connection);
-    }
-
-    return transaction;
-}
-
 //TODO #ak use SocketAddress instead of this function. It will reduce QString instanciation count
 static QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
 
@@ -1030,7 +1008,6 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
         transport->sendTransaction(tran, transportHeader);
     }
     transport->sendTransaction(prepareModulesDataTransaction(), transportHeader);
-    transport->sendTransaction(prepareConnectionsDataTransaction(), transportHeader);
 }
 
 void QnTransactionMessageBus::sendRuntimeInfo()
@@ -1042,7 +1019,6 @@ void QnTransactionMessageBus::sendRuntimeInfo()
         sendTransaction(tran);
     }
     sendTransaction(prepareModulesDataTransaction());
-    sendTransaction(prepareConnectionsDataTransaction());
 }
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer)

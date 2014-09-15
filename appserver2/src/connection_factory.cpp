@@ -209,13 +209,6 @@ namespace ec2
         //AbstractMiscManager::changeSystemName
         registerUpdateFuncHandler<ApiSystemNameData>(restProcessorPool, ApiCommand::changeSystemName);
 
-        //AbstractMiscManager::addConnection
-        registerUpdateFuncHandler<ApiConnectionData>(restProcessorPool, ApiCommand::addConnection);
-        //AbstractMiscManager::removeConnection
-        registerUpdateFuncHandler<ApiConnectionData>(restProcessorPool, ApiCommand::removeConnection);
-        //AbstractMiscManager::availableConnections
-        registerUpdateFuncHandler<ApiConnectionDataList>(restProcessorPool, ApiCommand::availableConnections);
-
        //AbstractECConnection
         registerUpdateFuncHandler<ApiDatabaseDumpData>( restProcessorPool, ApiCommand::restoreDatabase );
 

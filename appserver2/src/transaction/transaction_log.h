@@ -122,16 +122,6 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode saveTransaction(const QnTransaction<ApiConnectionData>& , const QByteArray&) {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
-            return ErrorCode::notImplemented;
-        }
-
-        ErrorCode saveTransaction(const QnTransaction<ApiConnectionDataList>& , const QByteArray&) {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
-            return ErrorCode::notImplemented;
-        }
-
         ErrorCode saveTransaction(const QnTransaction<ApiSystemNameData>& , const QByteArray&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
@@ -188,8 +178,6 @@ namespace ec2
         QUuid transactionHash(const ApiModuleData& ) const                     { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiModuleDataList& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiDiscoverPeerData& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
-        QUuid transactionHash(const ApiConnectionData& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
-        QUuid transactionHash(const ApiConnectionDataList& ) const             { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiSystemNameData& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
         QUuid transactionHash(const ApiLockData& ) const                       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
