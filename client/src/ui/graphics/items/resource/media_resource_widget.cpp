@@ -974,9 +974,6 @@ QCursor QnMediaResourceWidget::calculateCursor() const {
 }
 
 Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const {
-    if (qnSettings->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
-        return Qn::VideowallWithoutLicenseOverlay;
-
     QnResourcePtr resource = m_display->resource();
 
     if (resource->hasFlags(Qn::SINGLE_SHOT)) {

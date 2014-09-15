@@ -361,13 +361,6 @@ namespace Qn {
          */
         SystemAdministrationAction,
 
-        /**
-         * System update dialog.
-         */
-        SystemUpdateAction,
-
-        //ShowMediaServerLogs,
-
 
         /* Tab bar actions. */
 

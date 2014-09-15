@@ -97,9 +97,6 @@ private:
     void hideAll();
     void updateBlinker();
 
-    void at_settingsButton_clicked();
-    void at_filterButton_clicked();
-    void at_eventLogButton_clicked();
     void at_debugButton_clicked();
     void at_list_itemRemoved(QnNotificationWidget *item);
     void at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);

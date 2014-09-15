@@ -63,9 +63,7 @@ private:
     QnServerUpdatesModel *m_updatesModel;
     QnMediaServerUpdateTool *m_updateTool;
     std::array<QAction*, UpdateSourceCount> m_updateSourceActions;
-
-    QTimer *m_extraMessageTimer;
-    
+  
     QnSoftwareVersion m_targetVersion;
     QnSoftwareVersion m_latestVersion;
     bool m_checkingInternet;

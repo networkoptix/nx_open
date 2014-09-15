@@ -32,7 +32,7 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
 {
     netStateTime.restart();
     connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected, qnBusinessRuleConnector, &QnBusinessEventConnector::at_cameraDisconnected);
-    m_serverOfflineTimeout = MSSettings::roSettings()->value("redundancyTimeout", 60).toInt() * 1000;
+    m_serverOfflineTimeout = MSSettings::roSettings()->value("redundancyTimeout", 20).toInt() * 1000;
     m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
 }
 

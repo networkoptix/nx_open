@@ -338,6 +338,9 @@ QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMSec) {
 
     QTimeSpan span(offsetMSec);
     span.normalize();
+    return span.toApproximateString();
+
+/*
     QString body;
 
     QString format = lit("%1%2%3");
@@ -347,6 +350,7 @@ QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMSec) {
         return format.arg(sign).arg(span.toMinutes(), 2, 'g', 2).arg(tr("m"));
     else 
         return format.arg(sign).arg(span.toSecs(), 2, 'g', 2).arg(tr("s"));
+*/
 }
 
 bool QnTimeServerSelectionModel::sameTimezone() const {

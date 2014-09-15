@@ -30,7 +30,8 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     params.addQueryItem(QLatin1String("license_key"), licenseKey);
     params.addQueryItem(QLatin1String("box"), runtimeData.box);
     params.addQueryItem(QLatin1String("brand"), runtimeData.brand);
-    params.addQueryItem(QLatin1String("version"), QnAppInfo::engineVersion());
+    params.addQueryItem(QLatin1String("version"), QnAppInfo::engineVersion()); //TODO: #GDM replace with qnCommon->engineVersion()? And what if --override-version?
+
     QLocale locale;
     params.addQueryItem(QLatin1String("lang"), QLocale::languageToString(locale.language()));
 

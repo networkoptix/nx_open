@@ -28,8 +28,11 @@ bool QnLinuxShortcuts::createShortcut(const QString &sourceFile, const QString &
     return false;
 }
 
-bool QnLinuxShortcuts::shortcutExists(const QString &destinationPath, const QString &name) const 
-{
+bool QnLinuxShortcuts::deleteShortcut(const QString &destinationPath, const QString &name) const {
+    return true;
+}
+
+bool QnLinuxShortcuts::shortcutExists(const QString &destinationPath, const QString &name) const {
     return false;
 }
 

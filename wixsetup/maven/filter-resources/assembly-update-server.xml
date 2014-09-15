@@ -1,5 +1,5 @@
  <assembly>
-	<id>${platform}-${arch}-${release.version}.${buildNumber}</id>
+	<id>${box}-${arch}-${release.version}.${buildNumber}</id>
 	<formats>
 		<format>zip</format>
 	</formats>

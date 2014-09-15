@@ -4,12 +4,14 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFile>
+#include <QtCore/QCryptographicHash>
 
 #include <api/session_manager.h>
 #include <common/common_meta_types.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
 #include <utils/common/product_features.h>
 
 
@@ -83,6 +85,15 @@ QnModuleInformation QnCommonModule::moduleInformation() const
         if (server) {
             foreach(const QHostAddress &address, server->getNetAddrList())
                 moduleInformationCopy.remoteAddresses.insert(address.toString());
+        }
+
+        foreach (const QnUserResourcePtr &user, qnResPool->getResourcesWithFlag(Qn::user).filtered<QnUserResource>()) {
+            if (user->getName() == lit("admin")) {
+                QCryptographicHash md5(QCryptographicHash::Md5);
+                md5.addData(user->getHash());
+                md5.addData(moduleInformationCopy.id.toByteArray());
+                moduleInformationCopy.authHash = md5.result();
+            }
         }
     }
 

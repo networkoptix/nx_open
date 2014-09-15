@@ -89,6 +89,18 @@
           <enum>QFrame::StyledPanel</enum>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_5">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,1,0,0">
             <item>
@@ -119,6 +131,9 @@
                 <property name="rightMargin">
                  <number>0</number>
                 </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
                 <item>
                  <widget class="QPushButton" name="refreshButton">
                   <property name="minimumSize">
@@ -132,6 +147,9 @@
                     <width>24</width>
                     <height>24</height>
                    </size>
+                  </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::NoFocus</enum>
                   </property>
                   <property name="flat">
                    <bool>true</bool>
@@ -237,7 +255,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>40</height>
+              <height>5</height>
              </size>
             </property>
            </spacer>
@@ -264,6 +282,18 @@
        <item>
         <widget class="QFrame" name="localFrame">
          <layout class="QVBoxLayout" name="verticalLayout_4">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item>
            <widget class="QLabel" name="linkTitleLabel">
             <property name="text">
@@ -430,7 +460,7 @@
    </item>
    <item>
     <widget class="QWidget" name="updateStateWidget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -457,21 +487,18 @@
         </item>
        </layout>
       </item>
-      <item>
-       <widget class="QLabel" name="extraMessageLabel">
-        <property name="text">
-         <string>It looks like the update process is taking more time than usual. Please keep waiting.</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QTableView" name="tableView"/>
+    <widget class="QTableView" name="tableView">
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <attribute name="horizontalHeaderHighlightSections">
+      <bool>false</bool>
+     </attribute>
+    </widget>
    </item>
   </layout>
  </widget>
@@ -488,6 +515,18 @@
    <header location="global">ui/widgets/progress_bar.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>refreshButton</tabstop>
+  <tabstop>internetUpdateButton</tabstop>
+  <tabstop>linkLineEdit</tabstop>
+  <tabstop>copyLinkButton</tabstop>
+  <tabstop>saveLinkButton</tabstop>
+  <tabstop>filenameLineEdit</tabstop>
+  <tabstop>browseFileButton</tabstop>
+  <tabstop>localUpdateButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+  <tabstop>tableView</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

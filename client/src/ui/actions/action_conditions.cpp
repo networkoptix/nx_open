@@ -333,7 +333,6 @@ Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutIte
 
 Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &resources) {
     QnLayoutResourcePtr layout;
-    QnVideoWallResourcePtr videowall;
 
     if(m_current) {
         layout = workbench()->currentLayout()->resource();
@@ -357,6 +356,26 @@ Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &re
     }
 }
 
+Qn::ActionVisibility QnSaveLayoutAsActionCondition::check(const QnResourceList &resources) {
+    QnLayoutResourcePtr layout;
+
+    if(m_current) {
+        layout = workbench()->currentLayout()->resource();
+    } else {
+        if(resources.size() != 1)
+            return Qn::InvisibleAction;
+
+        layout = resources[0].dynamicCast<QnLayoutResource>();
+    }
+
+    if(!layout)
+        return Qn::InvisibleAction;
+
+    if (layout->data().contains(Qn::VideoWallResourceRole))
+        return Qn::InvisibleAction;
+
+    return Qn::EnabledAction;
+}
 
 Qn::ActionVisibility QnLayoutCountActionCondition::check(const QnWorkbenchLayoutList &) {
     if(workbench()->layouts().size() < m_minimalRequiredCount)
@@ -950,4 +969,34 @@ Qn::ActionVisibility QnAutoStartAllowedActionCodition::check(const QnActionParam
     if(!context()->instance<QnWorkbenchAutoStarter>()->isSupported())
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
+}
+
+
+QnDisjunctionActionCondition::QnDisjunctionActionCondition(const QList<QnActionCondition *> conditions, QObject *parent) :
+    QnActionCondition(parent),
+    m_conditions(conditions)
+{
+}
+
+QnDisjunctionActionCondition::QnDisjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QObject *parent) :
+    QnActionCondition(parent)
+{
+    m_conditions.append(condition1);
+    m_conditions.append(condition2);
+}
+
+QnDisjunctionActionCondition::QnDisjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QObject *parent) :
+    QnActionCondition(parent)
+{
+    m_conditions.append(condition1);
+    m_conditions.append(condition2);
+    m_conditions.append(condition3);
+}
+
+Qn::ActionVisibility QnDisjunctionActionCondition::check(const QnActionParameters &parameters) {
+    Qn::ActionVisibility result = Qn::EnabledAction;
+    foreach (QnActionCondition *condition, m_conditions)
+        result = qMax(result, condition->check(parameters));
+
+    return result;
 }

@@ -177,7 +177,6 @@ namespace Qn {
         UnauthorizedOverlay,
         OfflineOverlay,
         AnalogWithoutLicenseOverlay,
-        VideowallWithoutLicenseOverlay,
         ServerOfflineOverlay,
 
         OverlayCount

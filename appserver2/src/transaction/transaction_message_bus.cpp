@@ -544,7 +544,9 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
 
     QnPeerSet processedPeers = transportHeader.processedPeers + connectedPeers(tran.command);
     processedPeers << m_localPeer.id;
-    QnTransactionTransportHeader newHeader(processedPeers, transportHeader.dstPeers, transportHeader.sequence);
+    QnTransactionTransportHeader newHeader(processedPeers, transportHeader.dstPeers);
+    newHeader.sequence = transportHeader.sequence;
+    newHeader.sender = transportHeader.sender;
 
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
     QSet<QUuid> proxyList;
@@ -634,7 +636,13 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
 {
     /** Send all data to the client peers on the connect. */
     QnPeerSet processedPeers = QnPeerSet() << transport->remotePeer().id << m_localPeer.id;
-    if (transport->remotePeer().peerType == Qn::PT_DesktopClient || 
+    if (m_localPeer.isClient()) {
+        transport->setWriteSync(true);
+        sendRuntimeInfo(transport, processedPeers);
+        transport->setReadSync(true);
+        sendRuntimeInfo(transport, processedPeers);
+    }
+    else if (transport->remotePeer().peerType == Qn::PT_DesktopClient || 
         transport->remotePeer().peerType == Qn::PT_VideowallClient)     //TODO: #GDM #VW do not send fullInfo, just required part of it
     {
         /** Request all data to be sent to the client peers on the connect. */
@@ -922,6 +930,22 @@ void QnTransactionMessageBus::at_peerIdDiscovered(const QUrl& url, const QUuid& 
 void QnTransactionMessageBus::doPeriodicTasks()
 {
     QMutexLocker lock(&m_mutex);
+
+    // send HTTP level keep alive (empty chunk) for server <---> server connections
+    if (!m_localPeer.isClient()) 
+    {
+        foreach(QSharedPointer<QnTransactionTransport> transport, m_connections.values()) 
+        {
+            if (transport->getState() == QnTransactionTransport::ReadyForStreaming && !transport->remotePeer().isClient()) 
+            {
+                transport->sendHttpKeepAlive();
+                if (transport->isHttpKeepAliveTimeout()) {
+                    qWarning() << "Transaction Transport HTTP keep-alive timeout for connection" << transport->remotePeer().id;
+                    transport->setState(QnTransactionTransport::Error);
+                }
+            }
+        }
+    }
 
     // add new outgoing connections
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
