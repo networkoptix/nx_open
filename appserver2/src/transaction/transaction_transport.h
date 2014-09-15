@@ -76,7 +76,7 @@ public:
 
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
         qDebug() << "send transaction to peer " << remotePeer().id << "command=" << ApiCommand::toString(transaction.command) 
-                 << "transport seq=" << header.sequence << "db seq=" << transaction.persistentInfo.sequence << "timestamp=" << transaction.persistentInfo.timestamp;
+                 << "tt seq=" << header.sequence << "db seq=" << transaction.persistentInfo.sequence << "timestamp=" << transaction.persistentInfo.timestamp;
 #endif
 
         switch (m_remotePeer.dataFormat) {

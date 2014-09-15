@@ -393,7 +393,8 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     int transportSeq = m_lastTransportSeq[transportHeader.sender];
     if (transportSeq >= transportHeader.sequence) {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "Ignore transaction " << toString(tran.command) << "because of transport sequence: " << transportHeader.sequence << "<=" << transportSeq;
+        qDebug() << "Ignore transaction " << toString(tran.command) << "from peer"  << tran.peerID << "received via" 
+            << transportHeader.sender << "because of transport sequence: " << transportHeader.sequence << "<=" << transportSeq;
 #endif
         return false; // already processed
     }
@@ -441,10 +442,19 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     if (!checkSequence(transportHeader, tran, sender))
         return;
 
+    if (!sender->isReadSync(tran.command)) {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+        qDebug() << "reject transaction " << ApiCommand::toString(tran.command) << "from" << tran.peerID << "tt seq=" << transportHeader.sequence 
+            << "time=" << tran.persistentInfo.timestamp << "db seq=" << tran.persistentInfo.sequence << "via" << sender->remotePeer().id;
+#endif
+        return;
+    }
+
+
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "from" << tran.peerID << "transport seq=" << transportHeader.sequence 
-                 << "time=" << tran.persistentInfo.timestamp << "db seq=" << tran.persistentInfo.sequence;
+        qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "from" << tran.peerID << "tt seq=" << transportHeader.sequence 
+                 << "time=" << tran.persistentInfo.timestamp << "db seq=" << tran.persistentInfo.sequence << "via" << sender->remotePeer().id;
 #endif
         // process system transactions
         switch(tran.command) {
@@ -481,9 +491,6 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             break;
         default:
             // general transaction
-            if (!sender->isReadSync(tran.command))
-                return;
-
             if (!tran.persistentInfo.isNull() && transactionLog) 
             {
                 QnTransactionLog::ContainsReason isContains = transactionLog->contains(tran);

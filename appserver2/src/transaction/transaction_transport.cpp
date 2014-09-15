@@ -661,7 +661,7 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
         QnUbjsonReader<QByteArray> stream(&serializedTran);
         QnUbjson::deserialize(&stream, &abtractTran);
         qDebug() << "send direct transaction to peer " << remotePeer().id << "command=" << ApiCommand::toString(abtractTran.command) 
-            << "transport seq=" << header.sequence << "db seq=" << abtractTran.persistentInfo.sequence << "timestamp=" << abtractTran.persistentInfo.timestamp;
+            << "tt seq=" << header.sequence << "db seq=" << abtractTran.persistentInfo.sequence << "timestamp=" << abtractTran.persistentInfo.timestamp;
 #endif
 
         addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
