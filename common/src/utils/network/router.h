@@ -46,6 +46,7 @@ private slots:
     void at_connectionRemoved(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
     void at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
     void at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void at_timer_timeout();
 
 private:
     void makeConsistent();
@@ -56,6 +57,8 @@ private:
     QScopedPointer<QnRouteBuilder> m_routeBuilder;
     QMultiHash<QUuid, Endpoint> m_connections;
     bool m_passive;
+
+    QTimer *m_timer;
 };
 
 #endif // ROUTER_H

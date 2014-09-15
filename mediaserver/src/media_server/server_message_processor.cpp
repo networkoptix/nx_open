@@ -21,17 +21,11 @@
 
 #include "version.h"
 
-namespace {
-    const int connectionsTimeout = 15 * 1000;
-}
-
 QnServerMessageProcessor::QnServerMessageProcessor()
 :
     base_type(),
-    m_serverPort( MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt() ),
-    m_connectionsTimer(new QTimer(this))
+    m_serverPort( MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt() )
 {
-    m_connectionsTimer->setInterval(connectionsTimeout);
 }
 
 void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) 
@@ -94,11 +88,7 @@ void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
     connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
 
-    connect(m_connectionsTimer, &QTimer::timeout, this, &QnServerMessageProcessor::at_connectionsTimer_timeout);
-
     QnCommonMessageProcessor::init(connection);
-
-    m_connectionsTimer->start();
 }
 
 void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) 
@@ -192,22 +182,6 @@ void QnServerMessageProcessor::at_remotePeerUnauthorized(const QUuid& id)
     QnResourcePtr mServer = qnResPool->getResourceById(id);
     if (mServer)
         mServer->setStatus(Qn::Unauthorized);
-}
-
-void QnServerMessageProcessor::at_connectionsTimer_timeout() {
-    ec2::QnTransaction<ec2::ApiConnectionDataList> transaction(ec2::ApiCommand::availableConnections);
-
-    QMultiHash<QUuid, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
-    for (auto it = connections.begin(); it != connections.end(); ++it) {
-        ec2::ApiConnectionData connection;
-        connection.discovererId = it.key();
-        connection.peerId = it->id;
-        connection.host = it->host;
-        connection.port = it->port;
-        transaction.params.push_back(connection);
-    }
-
-    qnTransactionBus->sendTransaction(transaction);
 }
 
 bool QnServerMessageProcessor::canRemoveResource(const QUuid& resourceId) 

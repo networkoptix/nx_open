@@ -30,6 +30,7 @@ namespace ec2 {
         virtual int changeSystemName(const QString &systemName, impl::SimpleHandlerPtr handler) override;
         virtual int addConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) override;
         virtual int removeConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) override;
+        virtual int sendConnections(const ApiConnectionDataList &connections, impl::SimpleHandlerPtr handler) override;
         virtual int sendAvailableConnections(impl::SimpleHandlerPtr handler) override;
 
     private:
@@ -39,6 +40,7 @@ namespace ec2 {
         QnTransaction<ApiModuleDataList> prepareTransaction(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QUuid, QUuid> &discoverersByPeer) const;
         QnTransaction<ApiSystemNameData> prepareTransaction(const QString &systemName) const;
         QnTransaction<ApiConnectionData> prepareTransaction(ApiCommand::Value command, const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port) const;
+        QnTransaction<ApiConnectionDataList> prepareTransaction(const ApiConnectionDataList &connections) const;
         QnTransaction<ApiConnectionDataList> prepareAvailableConnectionsTransaction() const;
     };
 
