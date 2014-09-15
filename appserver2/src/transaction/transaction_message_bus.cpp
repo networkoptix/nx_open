@@ -407,17 +407,31 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     QnTranStateKey persistentKey(tran.peerID, tran.persistentInfo.dbID);
     int persistentSeq = transactionLog->getLatestSequence(persistentKey);
 
-    if (transport->isSyncDone() && persistentSeq && tran.persistentInfo.sequence > persistentSeq + 1) {
-        // gap in persistent data detect, do resync
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "GAP in persistent data detected! for peer" << tran.peerID << "Expected seq=" << persistentSeq + 1 <<", but got seq=" << tran.persistentInfo.sequence;
+    if (!transport->isSyncDone() && transport->isReadSync(ApiCommand::NotDefined) && transportHeader.sender != transport->remotePeer().id) 
+        qWarning() << "Got transcaction from peer" << transportHeader.sender << "while sync with peer" << transport->remotePeer().id << "in progress";
 #endif
 
-        if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
-            queueSyncRequest(transport);
-        else 
-            transport->setState(QnTransactionTransport::Error); // reopen
-        return false;
+    if (persistentSeq && tran.persistentInfo.sequence > persistentSeq + 1) 
+    {
+        if (transport->isSyncDone()) 
+        {
+        // gap in persistent data detect, do resync
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+            qDebug() << "GAP in persistent data detected! for peer" << tran.peerID << "Expected seq=" << persistentSeq + 1 <<", but got seq=" << tran.persistentInfo.sequence;
+#endif
+
+            if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
+                queueSyncRequest(transport);
+            else 
+                transport->setState(QnTransactionTransport::Error); // reopen
+            return false;
+        }
+        else {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+            qDebug() << "GAP in persistent data, but sync in progress" << tran.peerID << "Expected seq=" << persistentSeq + 1 <<", but got seq=" << tran.persistentInfo.sequence;
+#endif
+        }
     }
     return true;
 }
