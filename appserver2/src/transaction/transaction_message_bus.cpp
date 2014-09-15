@@ -391,7 +391,7 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     int transportSeq = m_lastTransportSeq[transportHeader.sender];
     if (transportSeq >= transportHeader.sequence) {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "Ignore transaction because of transport sequence: " << transportHeader.sequence << "<=" << transportSeq;
+        qDebug() << "Ignore transaction " << toString(tran.command) << "because of transport sequence: " << transportHeader.sequence << "<=" << transportSeq;
 #endif
         return false; // already processed
     }
