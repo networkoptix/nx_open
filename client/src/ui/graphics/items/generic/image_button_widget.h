@@ -128,7 +128,6 @@ protected:
     void updateVao(const QRectF &rect);
 
     bool skipHoverEvent(QGraphicsSceneHoverEvent *event);
-    bool skipMenuEvent(QGraphicsSceneMouseEvent *event);
 
     void clickInternal(QGraphicsSceneMouseEvent *event);
 
@@ -145,8 +144,6 @@ private:
     bool m_dynamic;
     int m_skipNextHoverEvents;
     QPoint m_nextHoverEventPos;
-    int m_skipNextMenuEvents;
-    QPoint m_nextMenuEventPos;
 
     VariantAnimator *m_animator;
     qreal m_hoverProgress;
