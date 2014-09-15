@@ -7,6 +7,8 @@
 
 #include <QtCore/QSettings>
 
+#include <QtCore/QCoreApplication>
+
 #include <utils/common/app_info.h>
 
 
@@ -43,7 +45,7 @@ static QSettings* getSettingsInstance(
 #ifndef _WIN32
     settingsInstance = new QSettings( defaultConfigFileName, QSettings::IniFormat );
 #else
-    settingsInstance = new QSettings( QSettings::SystemScope, QnAppInfo::organizationName(), QnAppInfo::applicationName() );
+    settingsInstance = new QSettings( QSettings::SystemScope, QnAppInfo::organizationName(), QCoreApplication::applicationName() );
 #endif
 
     return settingsInstance;

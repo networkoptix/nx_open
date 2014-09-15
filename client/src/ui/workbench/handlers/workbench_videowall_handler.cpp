@@ -222,7 +222,7 @@ protected:
         return result;
     }
 
-    virtual QString autoStartKey() const override { return QnAppInfo::applicationName() + L' ' + m_videoWallUuid.toString(); }
+    virtual QString autoStartKey() const override { return qApp->applicationName() + L' ' + m_videoWallUuid.toString(); }
 private:
     QUuid m_videoWallUuid;
 };

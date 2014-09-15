@@ -728,7 +728,7 @@ bool QnDbManager::applyUpdates()
 
             QSqlQuery insQuery(m_sdb);
             insQuery.prepare("INSERT INTO south_migrationhistory (app_name, migration, applied) values(?, ?, ?)");
-            insQuery.addBindValue(QnAppInfo::applicationName());
+            insQuery.addBindValue(qApp->applicationName());
             insQuery.addBindValue(fileName);
             insQuery.addBindValue(QDateTime::currentDateTime());
             if (!insQuery.exec()) {

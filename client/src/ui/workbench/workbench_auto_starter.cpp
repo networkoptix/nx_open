@@ -71,7 +71,7 @@ int QnWorkbenchAutoStarter::settingsKey() const {
 }
 
 QString QnWorkbenchAutoStarter::autoStartKey() const {
-    return QnAppInfo::applicationName();
+    return qApp->applicationName();
 }
 
 QString QnWorkbenchAutoStarter::autoStartPath() const {

@@ -2451,7 +2451,7 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
     QMessageBox::warning(mainWindow(),
                          tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
                          tr("You are running beta version of %1.")
-                         .arg(QnAppInfo::applicationName()));
+                         .arg(qApp->applicationName()));
 }
 
 void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {

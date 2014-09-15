@@ -9,6 +9,8 @@
 
 #include <utils/common/app_info.h>
 
+#include "version.h"
+
 QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(client);
 
@@ -16,7 +18,7 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
 
     /* Set up application parameters so that QSettings know where to look for settings. */
     QApplication::setOrganizationName(QnAppInfo::organizationName());
-    QApplication::setApplicationName(QnAppInfo::applicationName());
+    QApplication::setApplicationName(lit(QN_APPLICATION_NAME));
     if (QApplication::applicationVersion().isEmpty())
         QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 

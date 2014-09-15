@@ -163,6 +163,7 @@
 #include "media_server/resource_status_watcher.h"
 #include "nx_ec/dummy_handler.h"
 
+#include "version.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -619,10 +620,7 @@ int serverMain(int argc, char *argv[])
 
 //    av_log_set_callback(decoderLogCallback);
 
-    QCoreApplication::setOrganizationName(QnAppInfo::organizationName());
-    QCoreApplication::setApplicationName(QnAppInfo::applicationName());
-    if (QCoreApplication::applicationVersion().isEmpty())
-        QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
+
 
     const QString& dataLocation = getDataDirectory();
     QDir::setCurrent(qApp->applicationDirPath());
@@ -651,7 +649,7 @@ int serverMain(int argc, char *argv[])
     else if (cmdLineArguments.rebuildArchive == "lq")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_LQ);
 
-    NX_LOG(lit("%1 started").arg(QnAppInfo::applicationName()), cl_logALWAYS);
+    NX_LOG(lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
     NX_LOG(lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
     NX_LOG(lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
     NX_LOG(lit("binary path: %1").arg(QFile::decodeName(argv[0])), cl_logALWAYS);
@@ -1169,7 +1167,7 @@ void QnMain::run()
         }
 
         //TODO: #ivigasin sslCertPath can contain non-latin1 symbols
-        if (generateSslCertificate(sslCertPath.toLatin1(), QnAppInfo::applicationName().toLatin1(), "US", QnAppInfo::organizationName().toLatin1())) {
+        if (generateSslCertificate(sslCertPath.toLatin1(), qApp->applicationName().toLatin1(), "US", QnAppInfo::organizationName().toLatin1())) {
             qWarning() << "Could not generate SSL certificate ";
         }
 
@@ -1882,6 +1880,11 @@ protected:
     {
         QtSingleCoreApplication *application = this->application();
 
+        QCoreApplication::setOrganizationName(QnAppInfo::organizationName());
+        QCoreApplication::setApplicationName(lit(QN_APPLICATION_NAME));
+        if (QCoreApplication::applicationVersion().isEmpty())
+            QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
+
         updateGuidIfNeeded();
 
         QUuid guid = serverGuid();
@@ -2090,5 +2093,5 @@ int main(int argc, char* argv[])
 
 static void printVersion()
 {
-    std::cout << "  " << QnAppInfo::applicationName().toUtf8().data() << " v." << QCoreApplication::applicationVersion().toUtf8().data() << std::endl;
+    std::cout << "  " << qApp->applicationName().toUtf8().data() << " v." << QCoreApplication::applicationVersion().toUtf8().data() << std::endl;
 }

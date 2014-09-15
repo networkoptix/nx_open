@@ -126,7 +126,7 @@ void QnAboutDialog::retranslateUi()
             "<b>%1</b> version %2 (%3).<br/>\n"
             "Built for %5-%6 with %7.<br/>\n"
         ).
-        arg(QnAppInfo::applicationName()).
+        arg(qApp->applicationName()).
         arg(QApplication::applicationVersion()).
         arg(QnAppInfo::applicationRevision()).
         arg(QnAppInfo::applicationPlatform()).
@@ -149,8 +149,8 @@ void QnAboutDialog::retranslateUi()
             "<b>SIGAR %7</b> - Copyright (c) 2004-2011 VMware Inc.<br/>\n"
             "<b>Boost %8</b> - Copyright (c) 2000-2012 Boost developers.<br/>\n"
         ).
-        arg(QnAppInfo::organizationName()) + lit("(tm)").
-        arg(QnAppInfo::applicationName()).
+        arg(QnAppInfo::organizationName() + lit("(tm)")).
+        arg(qApp->applicationName()).
         arg(QLatin1String(QT_VERSION_STR)).
         arg(versionString(QnAppInfo::ffmpegVersion())).
         arg(QtvAudioDevice::instance()->versionString()).
