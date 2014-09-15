@@ -34,6 +34,7 @@ if __name__ == '__main__':
     parser.add_argument("--cfg", help="configuration, default - release or environment variable <configuration>")
     parser.add_argument("--cst", help="customization, default - HD Witness or environment variable <customization>")
     parser.add_argument("--arch", help="build architecture, default - python executable architecture")
+    parser.add_argument("--box", help="build cross-platform target, default - none")
 
     args = parser.parse_args()    
     if args.cfg:
@@ -53,15 +54,22 @@ if __name__ == '__main__':
     if args.arch:
         build_arch = args.arch
     else:
-        get_environment_variable('arch')        
+        build_arch = get_environment_variable('arch')        
+
+    if args.box:
+        build_box = args.box
+    else:
+        build_box = get_environment_variable('box')
 
     try:
         with open(join(dirname(os.path.abspath(__file__)),'configure_settings_tmp.py')): 
-            from configure_settings_tmp import branch
+            from configure_settings_tmp import branch,arch,box
             print >> sys.stderr, 'old branch is: %s' % branch   
     except IOError:
         print 'not configured'
         branch = ""
+        arch = ""
+        box = ""
 
     build_branch = os.popen('hg branch').read()[:-1]
     
@@ -70,17 +78,23 @@ if __name__ == '__main__':
     print >> sys.stderr, 'configuration is: %s' % build_configuration
     print >> sys.stderr, 'build_arch is: %s' % build_arch
     print >> sys.stderr, 'branch is: %s\n' % build_branch
+    print >> sys.stderr, 'box is: %s\n' % build_box
+    if build_arch == 'arm':
+        targetdir = 'build_environment/target-%s' % build_box
+    else:
+        targetdir = 'build_environment/target'
+    print targetdir
     if get_environment_variable('platform') == 'windows':
-        if branch == build_branch and os.path.isfile('build_environment/target/donotrebuild'):
+        if branch == build_branch and os.path.isfile('%s/donotrebuild' % targetdir):
             donotrebuild('true')
         else:
             donotrebuild('false')        
     else:
-        if arch == build_arch and box == build.box and branch == build_branch and os.path.isfile('build_environment/target/donotrebuild'):
+        if arch == build_arch and box == build_box and branch == build_branch and os.path.isfile('%s/donotrebuild' % targetdir):
             donotrebuild('true')
         else:
             donotrebuild('false')    
     f = open('configure_settings_tmp.py', 'w')
     print >> f, \
-    'customization = "%s" \nconfiguration = "%s" \nbuild_arch = "%s" \nbranch = "%s"' %(build_customization, build_configuration, build_arch, build_branch)
+    'customization = "%s" \nconfiguration = "%s" \narch = "%s" \nbranch = "%s" \nbox = "%s"' %(build_customization, build_configuration, build_arch, build_branch, build_box)
     f.close()            

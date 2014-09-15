@@ -83,6 +83,8 @@
                                 <argument>${build.configuration}</argument>                                
                                 <argument>--arch</argument>
                                 <argument>${arch}</argument>                                
+                                <argument>--box</argument>
+                                <argument>${box}</argument>
                             </arguments>
                             <workingDirectory>${root.dir}</workingDirectory>		
                         </configuration>
