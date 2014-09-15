@@ -13,7 +13,7 @@
 
 /*!
     This string represents client during search with NetworkOptixModuleFinder class.
-    It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from version.h)
+    It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from app_info.h)
 */
 static const QString nxClientId = lit("client.exe");
 static const QString nxMediaServerId = lit("Media Server");

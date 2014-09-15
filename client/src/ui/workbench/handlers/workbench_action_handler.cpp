@@ -131,7 +131,7 @@
 #include <utils/mac_utils.h>
 #endif
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 // TODO: #Elric remove this include
 #include "../extensions/workbench_stream_synchronizer.h"
@@ -2399,7 +2399,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         latestMsVersion = latestVersion;
 
     QString components;
-    foreach(const QnVersionMismatchData &data, watcher->mismatchData()) {
+    foreach(const QnAppInfoMismatchData &data, watcher->mismatchData()) {
         QString component;
         switch(data.component) {
         case Qn::ClientComponent:
@@ -2449,9 +2449,9 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
 
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
     QMessageBox::warning(mainWindow(),
-                         tr("Beta version %1").arg(lit(QN_APPLICATION_VERSION)),
+                         tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
                          tr("You are running beta version of %1.")
-                         .arg(lit(QN_APPLICATION_NAME)));
+                         .arg(qApp->applicationName()));
 }
 
 void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {

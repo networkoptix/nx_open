@@ -19,7 +19,7 @@
 #include "api/app_server_connection.h"
 #include "utils/network/router.h"
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 QnServerMessageProcessor::QnServerMessageProcessor()
 :

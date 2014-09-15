@@ -30,11 +30,11 @@
 #include <utils/common/email.h>
 
 #include "openal/qtvaudiodevice.h"
-#include "version.h"
+#include <utils/common/app_info.h>
 
 namespace {
-    QString versionString(const char *version) {
-        QString result = QLatin1String(version);
+    QString versionString(const QString &version) {
+        QString result = version;
         result.replace(lit("-SNAPSHOT"), QString());
         return result;
     }
@@ -91,7 +91,7 @@ QString QnAboutDialog::connectedServers() const {
         latestMsVersion = latestVersion;
 
     QString servers;
-    foreach(const QnVersionMismatchData &data, watcher->mismatchData()) {
+    foreach(const QnAppInfoMismatchData &data, watcher->mismatchData()) {
         if (data.component != Qn::ServerComponent)
             continue;
 
@@ -126,12 +126,12 @@ void QnAboutDialog::retranslateUi()
             "<b>%1</b> version %2 (%3).<br/>\n"
             "Built for %5-%6 with %7.<br/>\n"
         ).
-        arg(QLatin1String(QN_APPLICATION_NAME)).
+        arg(qApp->applicationName()).
         arg(QApplication::applicationVersion()).
-        arg(QLatin1String(QN_APPLICATION_REVISION)).
-        arg(QLatin1String(QN_APPLICATION_PLATFORM)).
-        arg(QLatin1String(QN_APPLICATION_ARCH)).
-        arg(QLatin1String(QN_APPLICATION_COMPILER));
+        arg(QnAppInfo::applicationRevision()).
+        arg(QnAppInfo::applicationPlatform()).
+        arg(QnAppInfo::applicationArch()).
+        arg(QnAppInfo::applicationCompiler());
 
 //    QnSoftwareVersion ecsVersion = QnAppServerConnectionFactory::currentVersion();
     QString servers = connectedServers();
@@ -149,14 +149,14 @@ void QnAboutDialog::retranslateUi()
             "<b>SIGAR %7</b> - Copyright (c) 2004-2011 VMware Inc.<br/>\n"
             "<b>Boost %8</b> - Copyright (c) 2000-2012 Boost developers.<br/>\n"
         ).
-        arg(QLatin1String(QN_ORGANIZATION_NAME) + QLatin1String("(tm)")).
-        arg(QLatin1String(QN_APPLICATION_NAME)).
+        arg(QnAppInfo::organizationName() + lit("(tm)")).
+        arg(qApp->applicationName()).
         arg(QLatin1String(QT_VERSION_STR)).
-        arg(versionString(QN_FFMPEG_VERSION)).
+        arg(versionString(QnAppInfo::ffmpegVersion())).
         arg(QtvAudioDevice::instance()->versionString()).
         arg(QtvAudioDevice::instance()->company()).
-        arg(versionString(QN_SIGAR_VERSION)).
-        arg(versionString(QN_BOOST_VERSION));
+        arg(versionString(QnAppInfo::sigarVersion())).
+        arg(versionString(QnAppInfo::boostVersion()));
 
 #ifndef Q_OS_DARWIN
     credits += tr("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.<br/>");

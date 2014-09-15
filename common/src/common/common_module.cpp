@@ -18,7 +18,7 @@
 QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(common);
     m_cloudMode = false;
-    m_engineVersion = QnSoftwareVersion(QN_ENGINE_VERSION);
+    m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
 
     QnCommonMetaTypes::initialize();
     

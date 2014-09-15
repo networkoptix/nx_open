@@ -23,11 +23,11 @@
 #include <utils/common/sleep.h>
 #include <utils/update/update_utils.h>
 
-#include <version.h>
+#include <utils/common/app_info.h>
 
 namespace {
 
-    const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
+    const QString updatesDirName = QnAppInfo::productNameShort() + lit("_updates");
     const QString mutexName = lit("auto_update");
 
     bool verifyFile(const QString &fileName, qint64 size, const QString &md5) {

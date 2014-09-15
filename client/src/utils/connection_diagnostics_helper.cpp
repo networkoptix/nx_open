@@ -15,7 +15,7 @@
 #include <utils/common/software_version.h>
 
 #include "compatibility.h"
-#include "version.h"
+#include <utils/common/app_info.h>
 
 namespace {
     QnSoftwareVersion minSupportedVersion("1.4"); 
@@ -26,7 +26,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
 
     //checking brand compatibility
     if (success)
-        success |= qnSettings->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+        success |= qnSettings->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
 
     QString detail;
 

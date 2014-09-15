@@ -5,7 +5,6 @@
 
 #include <common/common_module.h>
 
-#include "version.h"
 
 #include <api/applauncher_api.h>
 #include <api/ipc_pipe_names.h>

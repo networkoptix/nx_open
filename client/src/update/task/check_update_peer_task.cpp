@@ -17,7 +17,7 @@
 #include <utils/update/update_utils.h>
 #include <utils/applauncher_utils.h>
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 #define QnNetworkReplyError static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error)
 
@@ -249,7 +249,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(const nx_http::AsyncHttp
     QByteArray data = client->fetchMessageBodyBuffer();
     
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
-    map = map.value(lit(QN_CUSTOMIZATION_NAME)).toMap();
+    map = map.value(QnAppInfo::customizationName()).toMap();
     QVariantMap releasesMap = map.value(lit("releases")).toMap();
 
     QString currentRelease;
@@ -318,11 +318,11 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(const nx_http::AsyncHttpC
 
     if (!m_target.denyClientUpdates) {
         packages = map.value(lit("clientPackages")).toMap();
-        QString arch = lit(QN_APPLICATION_ARCH);
-        QString modification = lit(QN_ARM_BOX);
+        QString arch = QnAppInfo::applicationArch();
+        QString modification = QnAppInfo::armBox();
         if (!modification.isEmpty())
             arch += lit("_") + modification;
-        QVariantMap package = packages.value(lit(QN_APPLICATION_PLATFORM)).toMap().value(arch).toMap();
+        QVariantMap package = packages.value(QnAppInfo::applicationPlatform()).toMap().value(arch).toMap();
 
         if (!package.isEmpty()) {
             QString fileName = package.value(lit("file")).toString();
