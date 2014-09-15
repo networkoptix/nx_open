@@ -38,6 +38,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::QnServerUpdatesWidget),
+    m_latestVersion(qnCommon->engineVersion()),
     m_checkingInternet(false),
     m_checkingLocal(false)
 {
@@ -94,7 +95,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
 
     connect(m_updateTool,       &QnMediaServerUpdateTool::stageChanged,             this,           &QnServerUpdatesWidget::at_tool_stageChanged);
     connect(m_updateTool,       &QnMediaServerUpdateTool::stageProgressChanged,     this,           &QnServerUpdatesWidget::at_tool_stageProgressChanged);
-    connect(m_updateTool,       &QnMediaServerUpdateTool::updateFinished,           this, &QnServerUpdatesWidget::at_updateFinished);
+    connect(m_updateTool,       &QnMediaServerUpdateTool::updateFinished,           this,           &QnServerUpdatesWidget::at_updateFinished);
 
     setWarningStyle(ui->dayWarningLabel);
     setWarningStyle(ui->connectionProblemLabel);
@@ -228,10 +229,7 @@ void QnServerUpdatesWidget::initBuildSelectionButtons() {
         ui->latestBuildLabel->setVisible(false);
         ui->specificBuildLabel->setVisible(true);
 
-        if (m_latestVersion.isNull())
-            ui->latestVersionLabel->setText(tr("Unknown"));
-        else
-            ui->latestVersionLabel->setText(m_latestVersion.toString());
+        ui->latestVersionLabel->setText(m_latestVersion.toString());
         ui->versionTitleLabel->setText(tr("Latest version:"));
 
         checkForUpdatesInternet(true);
@@ -303,6 +301,9 @@ bool QnServerUpdatesWidget::discard() {
 }
 
 void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
+    ui->updateProgessBar->setValue(100);
+    ui->updateProgessBar->setFormat(tr("Update finished... 100%"));
+
     switch (result.result) {
     case QnUpdateResult::Successful:
         {
@@ -310,7 +311,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
 
             message += lit("\n");
             if (result.clientInstallerRequired)
-                message += tr("Now you have to update the client to the newer version using an installer.");
+                message += tr("Now you have to update the client using an installer.");
             else
                 message += tr("The client will be restarted to the updated version.");
 
@@ -328,8 +329,8 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                     applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);
                 }
             }
-            break;
         }
+        break;
     case QnUpdateResult::Cancelled:
         QMessageBox::information(this, tr("Update cancelled"), tr("Update has been cancelled."));
         break;
@@ -350,6 +351,12 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
         QMessageBox::critical(this, tr("Update failed"), tr("Could not install updates on one or more servers."));
         break;
     }
+
+    bool canUpdate = result.result != QnUpdateResult::Successful;
+    if (m_updateSourceActions[LocalSource]->isChecked())
+        ui->localUpdateButton->setEnabled(canUpdate);
+    else
+        ui->internetUpdateButton->setEnabled(canUpdate);
 }
 
 void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
@@ -372,38 +379,40 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
         QString detail;
         QString status;
 
+        /* Update latest version if we have checked for updates in the internet. */
+        if (targetVersion.isNull() && !result.latestVersion.isNull()) {
+            m_latestVersion = result.latestVersion;
+            m_updatesModel->setLatestVersion(m_latestVersion);
+        }
+
         switch (result.result) {
         case QnCheckForUpdateResult::UpdateFound:
         case QnCheckForUpdateResult::NoNewerVersion:
-            status = result.latestVersion.toString();
+            status = m_latestVersion.toString();
             break;
         case QnCheckForUpdateResult::InternetProblem:
             status = tr("Internet connection problem");
             setWarningStyle(&statusPalette);
             break;
         case QnCheckForUpdateResult::NoSuchBuild:
-            status = m_targetVersion.toString();
+            status = targetVersion.toString();
             detail = tr("There is no such build on the update server");
             setWarningStyle(&statusPalette);
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::ServerUpdateImpossible:
-            status = result.latestVersion.toString();
+            status = m_latestVersion.toString();
             detail = tr("Cannot start update. An update for one or more servers was not found.");
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::ClientUpdateImpossible:
-            status = result.latestVersion.toString();
+            status = m_latestVersion.toString();
             detail = tr("Cannot start update. An update for the client was not found.");
             setWarningStyle(&detailPalette);
             break;
         default:
             Q_ASSERT(false);    //should never get here
         }
-
-        /* Update latest version if we have checked for updates in the internet. */
-        if (targetVersion.isNull() && !result.latestVersion.isNull())
-            m_latestVersion = result.latestVersion;
 
         if (autoSwitch && result.result == QnCheckForUpdateResult::InternetProblem)
             m_updateSourceActions[LocalSource]->trigger();
@@ -492,10 +501,6 @@ void QnServerUpdatesWidget::at_tool_stageChanged(QnFullUpdateStage stage) {
         ui->latestBuildLabel->setEnabled(false);
         ui->specificBuildLabel->setEnabled(false);
     } else { /* Stage returned to idle, update finished. */
-        if (m_updateSourceActions[LocalSource]->isChecked())
-            ui->localUpdateButton->setEnabled(true);
-        else
-            ui->internetUpdateButton->setEnabled(true);
         ui->latestBuildLabel->setEnabled(true);
         ui->specificBuildLabel->setEnabled(true);
     }

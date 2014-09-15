@@ -2,8 +2,11 @@
 
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
+
 #include <ui/common/ui_resource_name.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
 
 QnMediaServerResourcePtr QnServerUpdatesModel::Item::server() const {
@@ -54,6 +57,7 @@ QnServerUpdatesModel::Item::Item(const QnMediaServerResourcePtr &server) :
 
 QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObject *parent) :
     QAbstractTableModel(parent),
+    QnWorkbenchContextAware(parent),
     m_updateTool(tool),
     m_checkResult(QnCheckForUpdateResult::BadUpdateFile)
 {
@@ -82,6 +86,7 @@ QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObjec
 
     connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnServerUpdatesModel::at_resourceChanged);
     connect(qnResPool,  &QnResourcePool::statusChanged,     this,   &QnServerUpdatesModel::at_resourceChanged);
+    connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged,  this, &QnServerUpdatesModel::updateVersionColumn);
 
     setTargets(m_updateTool->actualTargetIds());
 }
@@ -126,22 +131,13 @@ QVariant QnServerUpdatesModel::data(const QModelIndex &index, int role) const {
     Item *item = reinterpret_cast<Item*>(index.internalPointer());
 
     if (role == Qt::ForegroundRole && index.column() == VersionColumn) {
-        
-        if (m_checkResult.result == QnCheckForUpdateResult::NoNewerVersion)
+        if (m_latestVersion <= item->m_server->getVersion())
             return m_colors.latest;
 
-        if (m_checkResult.result == QnCheckForUpdateResult::UpdateFound &&
-            !m_checkResult.latestVersion.isNull()) {
+        if (m_checkResult.systems.contains(item->m_server->getSystemInfo()))
+            return m_colors.target;
 
-            if (item->m_server->getVersion() == m_checkResult.latestVersion)
-                return m_colors.latest;
-
-            if (m_checkResult.systems.contains(item->m_server->getSystemInfo()))
-                return m_colors.target;
-
-            return m_colors.error;
-        }
-        return QVariant();
+        return m_colors.error;
     }
 
     return item->data(index.column(), role);
@@ -203,6 +199,12 @@ void QnServerUpdatesModel::resetResourses() {
     endResetModel();
 }
 
+void QnServerUpdatesModel::updateVersionColumn() {
+    if (m_items.isEmpty())
+        return;
+    emit dataChanged(index(0, VersionColumn), index(m_items.size() - 1, VersionColumn));
+}
+
 void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
@@ -215,16 +217,25 @@ void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
     emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
 }
 
+QnSoftwareVersion QnServerUpdatesModel::latestVersion() const {
+    return m_latestVersion;
+}
+
+void QnServerUpdatesModel::setLatestVersion(const QnSoftwareVersion &version) {
+    if (m_latestVersion == version)
+        return;
+    m_latestVersion = version;
+    updateVersionColumn();
+}
+
+
 QnCheckForUpdateResult QnServerUpdatesModel::checkResult() const {
     return m_checkResult;
 }
 
 void QnServerUpdatesModel::setCheckResult(const QnCheckForUpdateResult &result) {
     m_checkResult = result;
-    if (m_items.isEmpty())
-        return;
-
-    emit dataChanged(index(0, VersionColumn), index(m_items.size() - 1, VersionColumn));
+    updateVersionColumn();
 }
 
 QnServerUpdatesColors QnServerUpdatesModel::colors() const {

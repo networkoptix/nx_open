@@ -36,8 +36,6 @@ bool QnSystemInformation::isValid() const {
 
 QnSystemInformation QnSystemInformation::currentSystemInformation() {
     QString arch(lit(QN_APPLICATION_ARCH));
-    QString mod;
-    if (arch == lit("arm"))
-        mod = lit(QN_ARM_BOX);
+    QString mod(lit(QN_ARM_BOX));
     return QnSystemInformation(lit(QN_APPLICATION_PLATFORM), arch, mod);
 }

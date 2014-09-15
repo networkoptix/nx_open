@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Attach to Video Wall...</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
    <item>
     <widget class="QGroupBox" name="previewGroupBox">
      <property name="title">
@@ -24,13 +24,6 @@
        <widget class="QnVideowallManageWidget" name="manageWidget" native="true"/>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="licensesLabel">
-     <property name="text">
-      <string notr="true">&lt;Licenses usage text&gt;</string>
-     </property>
     </widget>
    </item>
    <item>

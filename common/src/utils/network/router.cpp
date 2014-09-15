@@ -2,19 +2,30 @@
 
 #include "utils/common/log.h"
 #include "nx_ec/dummy_handler.h"
+#include "nx_ec/data/api_routing_data.h"
 #include "common/common_module.h"
 #include "route_builder.h"
 #include "module_finder.h"
+
+namespace {
+    const int connectionsTimeout = 15 * 1000;
+} // anonymous namespace
 
 QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) :
     QObject(parent),
     m_mutex(QMutex::Recursive),
     m_connection(std::weak_ptr<ec2::AbstractECConnection>()),
     m_routeBuilder(new QnRouteBuilder(qnCommon->moduleGUID())),
-    m_passive(passive)
+    m_passive(passive),
+    m_timer(new QTimer(this))
 {
+    m_timer->setInterval(connectionsTimeout);
+
     connect(moduleFinder,       &QnModuleFinder::moduleUrlFound,    this,   &QnRouter::at_moduleFinder_moduleUrlFound);
     connect(moduleFinder,       &QnModuleFinder::moduleUrlLost,     this,   &QnRouter::at_moduleFinder_moduleUrlLost);
+    connect(m_timer,            &QTimer::timeout,                   this,   &QnRouter::at_timer_timeout);
+
+    m_timer->start();
 }
 
 QnRouter::~QnRouter() {}
@@ -156,6 +167,30 @@ void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleIn
     lk.unlock();
     NX_LOG(lit("QnRouter. Connection removed: %1 -> %2[%3:%4]").arg(qnCommon->moduleGUID().toString()).arg(endpoint.id.toString()).arg(endpoint.host).arg(endpoint.port), cl_logDEBUG1);
     emit connectionRemoved(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
+}
+
+void QnRouter::at_timer_timeout() {
+    QMutexLocker lk(&m_mutex);
+
+    ec2::AbstractECConnectionPtr ec2connection = m_connection.lock();
+    if (m_passive || !ec2connection)
+        return;
+
+    QUuid ownId = qnCommon->moduleGUID();
+    ec2::ApiConnectionDataList connections;
+
+    foreach (const Endpoint &endpoint, m_connections.values(ownId)) {
+        ec2::ApiConnectionData connection;
+        connection.discovererId = ownId;
+        connection.peerId = endpoint.id;
+        connection.host = endpoint.host;
+        connection.port = endpoint.port;
+        connections.push_back(connection);
+    }
+
+    lk.unlock();
+
+    ec2connection->getMiscManager()->sendConnections(connections, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnRouter::makeConsistent() {
