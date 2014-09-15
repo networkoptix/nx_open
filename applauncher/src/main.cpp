@@ -12,6 +12,7 @@
 #include <utils/common/command_line_parser.h>
 #include <utils/common/log.h>
 #include <utils/common/app_info.h>
+#include "version.h"
 
 #include "applauncher_process.h"
 #include "installation_process.h"
@@ -124,8 +125,10 @@ int main( int argc, char* argv[] )
     QtSingleCoreApplication app( SERVICE_NAME, argc, argv );
     QDir::setCurrent( QCoreApplication::applicationDirPath() );
 
-    QSettings globalSettings( QSettings::SystemScope, QnAppInfo::organizationName(), QnAppInfo::applicationName() );
-    QSettings userSettings( QSettings::UserScope, QnAppInfo::organizationName(), QnAppInfo::applicationName() );
+    QString appName = QStringLiteral(QN_APPLICATION_NAME);  //TODO: #GDM implement the common way
+    
+    QSettings globalSettings( QSettings::SystemScope, QnAppInfo::organizationName(), appName );
+    QSettings userSettings( QSettings::UserScope, QnAppInfo::organizationName(), appName );
 
     if( mirrorListUrl.isEmpty() )
         mirrorListUrl = globalSettings.value( "mirrorListUrl", QnAppInfo::mirrorListUrl() ).toString();
@@ -146,7 +149,7 @@ int main( int argc, char* argv[] )
         QnLog::initLog( logLevel );
     }
 
-    NX_LOG( QnAppInfo::applicationName() + " started", cl_logALWAYS );
+    NX_LOG( appName + " started", cl_logALWAYS );
     NX_LOG( "Software version: " + QnAppInfo::applicationVersion(), cl_logALWAYS );
     NX_LOG( "Software revision: " + QnAppInfo::applicationRevision(), cl_logALWAYS );
 

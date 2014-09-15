@@ -37,7 +37,7 @@ QString InstallationManager::defaultDirectoryForInstallations()
 {
     QString defaultDirectoryForNewInstallations = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
     if (!defaultDirectoryForNewInstallations.isEmpty())
-        defaultDirectoryForNewInstallations += QString::fromLatin1("/%1/%2/client/%3/").arg(installationPathPrefix, QnVersion::organizationName(), QN_CUSTOMIZATION_NAME);
+        defaultDirectoryForNewInstallations += QString::fromLatin1("/%1/%2/client/%3/").arg(installationPathPrefix, QnAppInfo::organizationName(), QnAppInfo::customizationName());
 
     return defaultDirectoryForNewInstallations;
 }
