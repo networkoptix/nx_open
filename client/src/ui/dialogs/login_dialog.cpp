@@ -35,6 +35,7 @@
 #include <utils/applauncher_utils.h>
 #include <utils/network/module_finder.h>
 #include <utils/network/networkoptixmodulerevealcommon.h>
+#include <utils/common/url.h>
 
 #include "plugins/resource/avi/avi_resource.h"
 #include "plugins/resource/archive/abstract_archive_stream_reader.h"
@@ -266,10 +267,6 @@ void QnLoginDialog::resetConnectionsModel() {
         selectedIndex = m_connectionsModel->index(0, 0, m_savedSessionsItem->index());
     ui->connectionsComboBox->setCurrentIndex(selectedIndex);
     at_connectionsComboBox_currentIndexChanged(selectedIndex);
-
-    QString password = qnSettings->storedPassword();
-    ui->passwordLineEdit->setText(password);
-    ui->rememberPasswordCheckBox->setChecked(!password.isEmpty());
 }
 
 void QnLoginDialog::resetSavedSessionsModel() {
@@ -351,28 +348,24 @@ void QnLoginDialog::updateUsability() {
 void QnLoginDialog::updateStoredConnections(const QUrl &url, const QString &name) {
     QnConnectionDataList connections = qnSettings->customConnections();
 
-    QnConnectionData connectionData(QString(), url);
-    qnSettings->setLastUsedConnection(connectionData);
+    QUrl urlToSave(url);
+    if (!ui->rememberPasswordCheckBox->isChecked())
+        urlToSave.setPassword(QString());
 
-    qnSettings->setStoredPassword(ui->rememberPasswordCheckBox->isChecked()
-        ? url.password()
-        : QString()
-        );
+    QnConnectionData connectionData(name, urlToSave);
+    qnSettings->setLastUsedConnection(connectionData);
 
     // remove previous "Last used connection"
     connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
 
-    QUrl cleanUrl(connectionData.url);
-    cleanUrl.setPassword(QString());
     QnConnectionData selected = connections.getByName(name);
-    if (selected.url == cleanUrl){
+    if (qnUrlEqual(selected.url, url)) {
         connections.removeOne(selected.name);
-        connections.prepend(selected);
+        connections.prepend(connectionData);    /* Update url if we set/clean checkbox. */
     } else {
         // save "Last used connection"
         QnConnectionData last(connectionData);
         last.name = QnConnectionDataList::defaultLastUsedNameKey();
-        last.url.setPassword(QString());
         connections.prepend(last);
     }
     qnSettings->setCustomConnections(connections);
@@ -390,8 +383,8 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
     ui->loginLineEdit->setText(url.userName().isEmpty() 
         ? lit("admin")  // 99% of users have only one login - admin
         : url.userName());
-    ui->passwordLineEdit->clear();
-    ui->rememberPasswordCheckBox->setChecked(false);
+    ui->passwordLineEdit->setText(url.password());
+    ui->rememberPasswordCheckBox->setChecked(!url.password().isEmpty());
     ui->deleteButton->setEnabled(qnSettings->customConnections().contains(ui->connectionsComboBox->currentText()));
     updateFocus();
 }
@@ -466,7 +459,8 @@ void QnLoginDialog::at_saveButton_clicked() {
     }
 
     QnConnectionData connectionData(name, currentUrl());
-    connectionData.url.setPassword(QString());
+    if (!ui->rememberPasswordCheckBox->isChecked())
+        connectionData.url.setPassword(QString());
     connections.prepend(connectionData);
     qnSettings->setCustomConnections(connections);
 

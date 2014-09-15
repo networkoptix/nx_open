@@ -199,8 +199,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
             url = qnSettings->defaultConnection().url;
 
         /* Try to connect with saved password. */
-        if (url.isValid() && !qnSettings->storedPassword().isEmpty()) {
-            url.setPassword(qnSettings->storedPassword());
+        if (url.isValid() && !url.password().isEmpty()) {
             if (!connectToServer(url))
                 showLoginDialog();
         } else 
@@ -292,10 +291,8 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force))
         return false;
 
-    if (!force) {
-        qnSettings->setStoredPassword(QString());
+    if (!force)
         QnGlobalSettings::instance()->synchronizeNow();
-    }
 
     hideMessageBox();
 

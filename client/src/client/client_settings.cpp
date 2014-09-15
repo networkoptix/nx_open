@@ -23,13 +23,19 @@
 
 
 namespace {
+    const QString xorKey = lit("ItIsAGoodDayToDie");
+
     QnConnectionData readConnectionData(QSettings *settings)
     {
         QnConnectionData connection;
-        connection.name = settings->value(QLatin1String("name")).toString();
-        connection.url = settings->value(QLatin1String("url")).toString();
+        connection.name = settings->value(lit("name")).toString();
+        connection.url = settings->value(lit("url")).toString();
         connection.url.setScheme(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http"));
-        connection.readOnly = (settings->value(QLatin1String("readOnly")).toString() == QLatin1String("true"));
+        connection.readOnly = (settings->value(lit("readOnly")).toString() == lit("true"));
+
+        QString password = settings->value(lit("pwd")).toString();
+        if (!password.isEmpty())
+            connection.url.setPassword(xorDecrypt(password, xorKey));
 
         return connection;
     }
@@ -37,14 +43,17 @@ namespace {
     void writeConnectionData(QSettings *settings, const QnConnectionData &connection)
     {
         QUrl url = connection.url;
-        url.setPassword(QString()); /* Don't store password. */
+        QString password = url.password().isEmpty()
+            ? QString()
+            : xorEncrypt(url.password(), xorKey);
 
-        settings->setValue(QLatin1String("name"), connection.name);
-        settings->setValue(QLatin1String("url"), url.toString());
-        settings->setValue(QLatin1String("readOnly"), connection.readOnly);
+        url.setPassword(QString()); /* Don't store password in plain text. */
+
+        settings->setValue(lit("name"), connection.name);
+        settings->setValue(lit("pwd"), password);
+        settings->setValue(lit("url"), url.toString());
+        settings->setValue(lit("readOnly"), connection.readOnly);
     }
-
-    const QString xorKey = QLatin1String("ItIsAGoodDayToDie");
 
 } // anonymous namespace
 
@@ -163,10 +172,6 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
         } else {
             return defaultValue;
         }
-    case STORED_PASSWORD: {
-            QString result = xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), xorKey);
-            return result;
-        }
     case DEBUG_COUNTER:
     case DEV_MODE:
     case VIDEO_WALL_MODE:
@@ -215,10 +220,6 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         settings->endGroup();
         break;
     }
-    case STORED_PASSWORD: {
-            base_type::writeValueToSettings(settings, id, xorEncrypt(value.toString(), xorKey));
-            break;
-        }
     case DEBUG_COUNTER:
     case UPDATE_FEED_URL:
     //case SHOWCASE_URL:
