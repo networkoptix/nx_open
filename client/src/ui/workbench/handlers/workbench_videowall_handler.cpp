@@ -1489,13 +1489,17 @@ void QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered() {
     dialog->loadFromResource(videowall);
     dialog->setShortcutsSupported(shortcutsSupported);
     if (shortcutsSupported)
-        dialog->setCreateShortcut(!shortcutExists(videowall));
+        dialog->setCreateShortcut(shortcutExists(videowall));
     if (!dialog->exec())
         return;
 
     dialog->submitToResource(videowall);
-    if (shortcutsSupported && dialog->isCreateShortcut())
-        createShortcut(videowall);
+    if (shortcutsSupported) {
+        if (dialog->isCreateShortcut())
+            createShortcut(videowall);
+        else
+            deleteShortcut(videowall);
+    }
 
     saveVideowall(videowall);
 }
@@ -2139,6 +2143,13 @@ bool QnWorkbenchVideoWallHandler::createShortcut(const QnVideoWallResourcePtr &v
     arguments << QString::fromUtf8(url.toEncoded());
 
     return qnPlatform->shortcuts()->createShortcut(qApp->applicationFilePath(), destinationPath, videowall->getName(), arguments);
+}
+
+bool QnWorkbenchVideoWallHandler::deleteShortcut(const QnVideoWallResourcePtr &videowall) {
+    QString destinationPath = shortcutPath();
+    if (destinationPath.isEmpty())
+        return true;
+    return qnPlatform->shortcuts()->deleteShortcut(destinationPath, videowall->getName());
 }
 
 void QnWorkbenchVideoWallHandler::saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout) {

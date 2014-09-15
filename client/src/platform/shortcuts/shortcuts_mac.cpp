@@ -118,6 +118,10 @@ bool QnMacShortcuts::createShortcut(const QString &sourceFile, const QString &de
     return false;
 }
 
+bool QnMacShortcuts::deleteShortcut(const QString &destinationPath, const QString &name) const {
+    return true;
+}
+
 bool QnMacShortcuts::shortcutExists(const QString &destinationPath, const QString &name) const 
 {
     return false;
