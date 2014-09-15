@@ -75,7 +75,7 @@
             <activation>
                 <file>
                     <!-- the dumb activator does not recognize variables so I can only put hardcode here -->
-                    <missing>../donotrebuild</missing>
+                    <missing>../build_variables/target/donotrebuild</missing>
                 </file> 
             </activation>
             <build>

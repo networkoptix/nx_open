@@ -29,19 +29,38 @@
         <plugins>      
 
 
-      <plugin>
-        <artifactId>maven-clean-plugin</artifactId>
-        <version>2.5</version>
-        <executions>
-          <execution>
-            <id>auto-clean</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>clean</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>auto-clean</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>manual-clean</id>
+                        <phase>pre-clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>${libdir}</directory>
+                                    <includes>
+                                        <include>donotrebuild</include>
+                                    </includes>
+                                </fileset>                                
+                            </filesets>
+                            <skip>${clean-skip}</skip>							
+                        </configuration>            
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -62,6 +81,8 @@
                                 <argument>${customization}</argument>
                                 <argument>--cfg</argument>
                                 <argument>${build.configuration}</argument>                                
+                                <argument>--arch</argument>
+                                <argument>${arch}</argument>                                
                             </arguments>
                             <workingDirectory>${root.dir}</workingDirectory>		
                         </configuration>

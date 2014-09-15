@@ -50,7 +50,7 @@ def extract(tar_url, extract_path='.'):
     os.unlink(file)
 if __name__ == '__main__':        
 
-    buildenv = join('${root.dir}', 'donotrebuild')
+    buildenv = join('${project.build.directory}', 'donotrebuild')
     if os.path.exists(buildenv): 
         os.unlink(buildenv)
 
