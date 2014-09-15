@@ -640,7 +640,13 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
 {
     /** Send all data to the client peers on the connect. */
     QnPeerSet processedPeers = QnPeerSet() << transport->remotePeer().id << m_localPeer.id;
-    if (transport->remotePeer().peerType == Qn::PT_DesktopClient || 
+    if (m_localPeer.isClient()) {
+        transport->setWriteSync(true);
+        sendRuntimeInfo(transport, processedPeers);
+        transport->setReadSync(true);
+        sendRuntimeInfo(transport, processedPeers);
+    }
+    else if (transport->remotePeer().peerType == Qn::PT_DesktopClient || 
         transport->remotePeer().peerType == Qn::PT_VideowallClient)     //TODO: #GDM #VW do not send fullInfo, just required part of it
     {
         /** Request all data to be sent to the client peers on the connect. */
