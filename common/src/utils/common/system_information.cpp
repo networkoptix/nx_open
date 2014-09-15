@@ -37,5 +37,7 @@ bool QnSystemInformation::isValid() const {
 QnSystemInformation QnSystemInformation::currentSystemInformation() {
     QString arch(lit(QN_APPLICATION_ARCH));
     QString mod(lit(QN_ARM_BOX));
+    if (mod == lit("none")) /* TODO: #dklychkov remove this temporary hack as soon as possible */
+        mod.clear();
     return QnSystemInformation(lit(QN_APPLICATION_PLATFORM), arch, mod);
 }
