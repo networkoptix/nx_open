@@ -81,7 +81,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     //TODO: #GDM #Business show description label if no rules are loaded
 
-    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &QnBusinessRulesDialog::at_saveAllButton_clicked);
+    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &QnBusinessRulesDialog::saveAll);
     connect(ui->addRuleButton,                              &QPushButton::clicked, this, &QnBusinessRulesDialog::at_newRuleButton_clicked);
     connect(ui->deleteRuleButton,                           &QPushButton::clicked, this, &QnBusinessRulesDialog::at_deleteButton_clicked);
     connect(ui->advancedButton,                             &QPushButton::clicked, this, &QnBusinessRulesDialog::toggleAdvancedMode);
@@ -96,6 +96,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->clearFilterButton,                          &QToolButton::clicked, this, &QnBusinessRulesDialog::at_clearFilterButton_clicked);
 
     updateFilter();  
+    updateControlButtons();
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog() {
@@ -167,10 +168,6 @@ void QnBusinessRulesDialog::at_newRuleButton_clicked() {
         ui->tableView->horizontalHeader()->setStretchLastSection(true);
         ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
     }
-}
-
-void QnBusinessRulesDialog::at_saveAllButton_clicked() {
-    saveAll();
 }
 
 void QnBusinessRulesDialog::at_deleteButton_clicked() {
