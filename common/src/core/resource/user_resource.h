@@ -21,6 +21,8 @@ public:
     QString getPassword() const;
     void setPassword(const QString &password);
 
+    void generateHash();
+
     QByteArray getDigest() const;
     void setDigest(const QByteArray& digest);
 

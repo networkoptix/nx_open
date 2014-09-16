@@ -702,28 +702,8 @@ void fromApiToResource(const ApiUserData &src, QnUserResourcePtr &dst) {
 
 void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
     fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
-
-    QString password = src->getPassword();
-
-    if (!password.isEmpty()) {
-        QByteArray salt = QByteArray::number(rand(), 16);
-        QCryptographicHash md5(QCryptographicHash::Md5);
-        md5.addData(salt);
-        md5.addData(password.toUtf8());
-        dst.hash = "md5$";
-        dst.hash.append(salt);
-        dst.hash.append("$");
-        dst.hash.append(md5.result().toHex());
-
-        dst.digest = QnAuthHelper::createUserPasswordDigest( src->getName(), password );
-    }
-    else
-    {
-        //hash and digest already calculated?
-        dst.hash = src->getHash();
-        dst.digest = src->getDigest();
-    }
-
+    dst.hash = src->getHash();
+    dst.digest = src->getDigest();
     dst.isAdmin = src->isAdmin();
     dst.permissions = src->getPermissions();
     dst.email = src->getEmail();
