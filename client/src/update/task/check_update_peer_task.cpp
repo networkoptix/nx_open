@@ -141,6 +141,7 @@ void QnCheckForUpdatesPeerTask::checkOnlineUpdates() {
 
     m_updateFiles.clear();
     m_clientUpdateFile.clear();
+    m_releaseNotesUrl.clear();
 
     m_targetMustBeNewer = m_target.version.isNull();
 
@@ -157,6 +158,7 @@ void QnCheckForUpdatesPeerTask::checkLocalUpdates() {
     m_updateFiles.clear();
     m_targetMustBeNewer = false;
     m_temporaryUpdateDir.clear();
+    m_releaseNotesUrl.clear();
 
     if (!QFile::exists(m_target.fileName)) {
         finishTask(QnCheckForUpdateResult::BadUpdateFile);
@@ -268,6 +270,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(const nx_http::AsyncHttp
     if (m_target.version.isNull())
         m_target.version = latestVersion;
     m_updateLocationPrefix = updatesPrefix;
+    m_releaseNotesUrl = QUrl(map.value(lit("release_notes")).toString());
 
     checkBuildOnline();
 }
@@ -346,6 +349,7 @@ void QnCheckForUpdatesPeerTask::finishTask(QnCheckForUpdateResult::Value value) 
     result.latestVersion = m_target.version;
     result.systems = m_updateFiles.keys().toSet();
     result.clientInstallerRequired = m_clientRequiresInstaller;
+    result.releaseNotesUrl = m_releaseNotesUrl;
 
     emit checkFinished(result);
     finish(static_cast<int>(value));

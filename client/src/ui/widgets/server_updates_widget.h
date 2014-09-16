@@ -68,6 +68,8 @@ private:
     QnSoftwareVersion m_latestVersion;
     bool m_checkingInternet;
     bool m_checkingLocal;
+
+    QUrl m_releaseNotesUrl;
 };
 
 #endif // SERVER_UPDATES_WIDGET_H
