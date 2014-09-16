@@ -9,9 +9,9 @@ fi
 DISTRIB=$COMPANY_NAME-mediaserver-$box-${release.version}.${buildNumber}$BETA
 
 update () {
-    /etc/init.d/S99$COMPANY_NAME-mediaserver stop
-    tar xfv $DISTRIB.tar.gz -C /
-    /etc/init.d/S99$COMPANY_NAME-mediaserver start
+    /etc/init.d/$COMPANY_NAME-mediaserver stop
+    tar xfv $DISTRIB.tar.gz --exclude='./opt/networkoptix/mediaserver/etc/mediaserver.conf' -C /
+    /etc/init.d/$COMPANY_NAME-mediaserver start
 }
 
 if [ "$1" != "" ]
