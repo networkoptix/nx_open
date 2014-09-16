@@ -13,6 +13,7 @@
 #include "transaction_transport.h"
 #include <transaction/transaction_log.h>
 #include "common/common_module.h"
+#include "runtime_transaction_log.h"
 
 #include <transaction/binary_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
@@ -56,6 +57,19 @@ namespace ec2
                 m_handler = nullptr;
         }
 
+        void sendTransaction(const QnTransaction<ApiRuntimeData>& tran, const QnPeerSet& dstPeers = QnPeerSet())
+        {
+            Q_ASSERT(tran.command == ApiCommand::runtimeInfoChanged);
+            QMutexLocker lock(&m_mutex);
+            if (runtimeTransactionLog)
+                runtimeTransactionLog->saveTransaction(tran);
+            if (m_connections.isEmpty())
+                return;
+            QnTransactionTransportHeader ttHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers);
+            ttHeader.fillSequence();
+            sendTransactionInternal(tran, ttHeader);
+        }
+
         template<class T>
         void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
         {
@@ -76,7 +90,7 @@ namespace ec2
 
         struct AlivePeerInfo
         {
-            AlivePeerInfo(): peer(QUuid(), Qn::PT_Server), directAccess(false) { lastActivity.restart(); }
+            AlivePeerInfo(): peer(QUuid(), QUuid(), Qn::PT_Server), directAccess(false) { lastActivity.restart(); }
             AlivePeerInfo(const ApiPeerData &peer): peer(peer), directAccess(false) { lastActivity.restart(); }
             ApiPeerData peer;
             QSet<QUuid> proxyVia;
@@ -162,7 +176,7 @@ namespace ec2
         template <class T>
         void gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader);
 
-        void onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<QnTranState> &tran);
+        void onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<ApiSyncRequestData> &tran);
         void onGotTransactionSyncResponse(QnTransactionTransport* sender, const QnTransaction<QnTranStateResponse> &tran);
         void onGotTransactionSyncDone(QnTransactionTransport* sender, const QnTransaction<ApiTranSyncDoneData> &tran);
         void onGotDistributedMutexTransaction(const QnTransaction<ApiLockData>& tran);
@@ -174,13 +188,12 @@ namespace ec2
         QnTransaction<ApiModuleDataList> prepareModulesDataTransaction() const;
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader);
-        void onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, QnTransactionTransport* transport);
+        bool onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, QnTransactionTransport* transport);
         void gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport);
 
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
 
-        void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader);
-        void sendRuntimeInfo();
+        void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState);
 
         void addAlivePeerInfo(ApiPeerData peerData, const QUuid& gotFromPeer = QUuid());
         void removeAlivePeer(const QUuid& id, bool sendTran, bool isRecursive = false);
@@ -224,7 +237,6 @@ namespace ec2
 
         // alive control
         QElapsedTimer m_aliveSendTimer;
-        QSet<QUuid> m_lostData;
     };
 }
 #define qnTransactionBus ec2::QnTransactionMessageBus::instance()

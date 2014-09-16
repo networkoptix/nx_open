@@ -28,7 +28,7 @@ namespace ec2
             NotDefined                  = 0,
 
             /* System */
-            tranSyncRequest             = 1,    /*< QnTranState */
+            tranSyncRequest             = 1,    /*< ApiSyncRequestData */
             tranSyncResponse            = 2,    /*< QnTranStateResponse */       
             lockRequest                 = 3,    /*< ApiLockData */
             lockResponse                = 4,    /*< ApiLockData */

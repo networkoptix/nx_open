@@ -20,8 +20,9 @@ namespace ec2
         ApiPeerData peer;
         bool isAlive;
         QnTranState persistentState;
+        QnTranState runtimeState;
     };
-#define ApiPeerAliveData_Fields (peer)(isAlive)(persistentState)
+#define ApiPeerAliveData_Fields (peer)(isAlive)(persistentState)(runtimeState)
 
 
 } // namespace ec2

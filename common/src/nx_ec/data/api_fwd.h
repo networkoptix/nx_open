@@ -42,6 +42,7 @@ namespace ec2 {
     struct QnTranStateKey;
     struct QnTranState;
     struct QnTranStateResponse;
+    struct ApiSyncRequestData;
     struct ApiTranSyncDoneData;
     struct ApiPeerAliveData;
     struct ApiSetResourceStatusData;
@@ -129,6 +130,7 @@ namespace ec2 {
     (ApiScheduleTaskWithRefData)\
     (QnTranStateKey)\
     (QnTranState)\
+    (ApiSyncRequestData)\
     (QnTranStateResponse)\
     (ApiTranSyncDoneData)\
     (ApiPeerAliveData)\

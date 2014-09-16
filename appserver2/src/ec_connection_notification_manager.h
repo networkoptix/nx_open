@@ -94,7 +94,7 @@ namespace ec2
         void triggerNotification(const QnTransaction<ApiPeerAliveData> &/*tran*/)  {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
-        void triggerNotification(const QnTransaction<QnTranState> &/*tran*/)  {
+        void triggerNotification(const QnTransaction<ApiSyncRequestData> &/*tran*/)  {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
         void triggerNotification(const QnTransaction<QnTranStateResponse> &/*tran*/) {

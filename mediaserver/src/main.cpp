@@ -1259,6 +1259,7 @@ void QnMain::run()
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
+    runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
     runtimeData.peer.peerType = Qn::PT_Server;
     runtimeData.box = lit(QN_ARM_BOX);
     runtimeData.brand = lit(QN_PRODUCT_NAME_SHORT);

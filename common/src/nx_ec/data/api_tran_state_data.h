@@ -35,16 +35,24 @@ struct QnTranState {
 
 struct QnTranStateResponse
 {
+    QnTranStateResponse(): result(0) {}
     int result;
 };
 #define QnTranStateResponse_Fields (result)
 
 struct ApiTranSyncDoneData
 {
+    ApiTranSyncDoneData(): result(0) {}
     int result;
 };
 #define ApiTranSyncDoneData_Fields (result)
 
+
+struct ApiSyncRequestData {
+    QnTranState persistentState;
+    QnTranState runtimeState;
+};
+#define ApiSyncRequestData_Fields (persistentState)(runtimeState)
 
 }
 

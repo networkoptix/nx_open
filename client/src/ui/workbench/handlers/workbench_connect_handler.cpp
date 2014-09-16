@@ -299,7 +299,7 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
     hideMessageBox();
 
     QnGlobalModuleFinder::instance()->setConnection(NULL);
-
+    QnClientMessageProcessor::instance()->init(NULL);
     QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());

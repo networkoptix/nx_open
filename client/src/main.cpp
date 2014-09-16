@@ -493,6 +493,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
+    runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
     runtimeData.peer.peerType = videowallInstanceGuid.isNull()
         ? Qn::PT_DesktopClient
         : Qn::PT_VideowallClient;

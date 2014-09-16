@@ -293,7 +293,7 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<QnTranState> &) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiSyncRequestData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }

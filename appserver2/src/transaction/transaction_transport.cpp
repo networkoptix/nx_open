@@ -466,6 +466,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 
 
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
+    nx_http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find("runtime-guid");
 
     if (itrGuid == client->response()->headers.end())
     {
@@ -474,6 +475,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
     }
 
     m_remotePeer.id = QUuid(itrGuid->second);
+    if (itrRuntimeGuid != client->response()->headers.end())
+        m_remotePeer.instanceId = QUuid(itrRuntimeGuid->second);
+    Q_ASSERT(!m_remotePeer.instanceId.isNull());
     m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server peers only
     emit peerIdDiscovered(m_remoteAddr, m_remotePeer.id);
 
