@@ -93,15 +93,7 @@ int QnConfigureRestHandler::changeAdminPassword(const QString &password, const Q
 
         if (!password.isEmpty()) {
             /* check old password */
-            QList<QByteArray> values =  user->getHash().split(L'$');
-            if (values.size() != 3)
-                return ResultFail;
-
-            QByteArray salt = values[1];
-            QCryptographicHash md5(QCryptographicHash::Md5);
-            md5.addData(salt);
-            md5.addData(oldPassword.toUtf8());
-            if (md5.result().toHex() != values[2])
+            if (!user->checkPassword(oldPassword))
                 return ResultFail;
 
             /* set new password */

@@ -1,6 +1,7 @@
 #include "server_updates_widget.h"
 #include "ui_server_updates_widget.h"
 
+#include <QtGui/QDesktopServices>
 #include <QtWidgets/QMessageBox>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
@@ -121,8 +122,6 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     updateTimer->start();
 
     at_tool_stageChanged(QnFullUpdateStage::Init);
-
-    ui->releaseNotesLabel->setVisible(false);
 }
 
 
@@ -220,6 +219,11 @@ void QnServerUpdatesWidget::initLinkButtons() {
 
     ui->copyLinkButton->setEnabled(false);
     ui->saveLinkButton->setEnabled(false);
+
+    connect(ui->releaseNotesLabel,  &QLabel::linkActivated, this, [this] {
+        if (!m_releaseNotesUrl.isEmpty())
+            QDesktopServices::openUrl(m_releaseNotesUrl);
+    });
 }
 
 void QnServerUpdatesWidget::initBuildSelectionButtons() {
@@ -420,6 +424,8 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
         if (autoSwitch && result.result == QnCheckForUpdateResult::InternetProblem)
             m_updateSourceActions[LocalSource]->trigger();
         
+        m_releaseNotesUrl = result.releaseNotesUrl;
+
         ui->connectionProblemLabel->setVisible(result.result == QnCheckForUpdateResult::InternetProblem);
 
         ui->internetDetailLabel->setText(detail);
@@ -427,6 +433,7 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
         ui->internetDetailLabel->setVisible(!detail.isEmpty());
         ui->latestVersionLabel->setText(status);
         ui->latestVersionLabel->setPalette(statusPalette);
+        ui->releaseNotesLabel->setVisible(!m_releaseNotesUrl.isEmpty());
 
         m_checkingInternet = false;
         ui->internetUpdateButton->setEnabled(result.result == QnCheckForUpdateResult::UpdateFound && m_updateTool->idle());
@@ -484,6 +491,7 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
         ui->localDetailLabel->setText(detail);
         ui->localDetailLabel->setPalette(detailPalette);
         ui->localDetailLabel->setVisible(!detail.isEmpty());
+        ui->releaseNotesLabel->hide();
 
         m_checkingLocal = false;
         ui->localUpdateButton->setEnabled(result.result == QnCheckForUpdateResult::UpdateFound && m_updateTool->idle());
