@@ -57,6 +57,14 @@ QnIncompatibleServerWatcher::QnIncompatibleServerWatcher(QObject *parent) :
         at_peerChanged(moduleInformation);
 }
 
+QnIncompatibleServerWatcher::~QnIncompatibleServerWatcher() {
+    foreach (const QUuid &id, m_fakeUuidByServerUuid) {
+        QnResourcePtr resource = qnResPool->getIncompatibleResourceById(id, true);
+        if (resource)
+            qnResPool->removeResource(resource);
+    }
+}
+
 void QnIncompatibleServerWatcher::at_peerChanged(const QnModuleInformation &moduleInformation) {
     bool compatible = moduleInformation.isCompatibleToCurrentSystem();
     bool authorized = moduleInformation.authHash == qnCommon->moduleInformation().authHash;
