@@ -79,6 +79,8 @@ public:
     virtual bool run() {
         if(!server_socket_.bind( SocketAddress(HostAddress(address_),port_)))
             return false;
+        if(!server_socket_.listen()) 
+            return false;
         bool ret = server_socket_.acceptAsync(
             std::bind(
             &UdtSocketProfileServer::OnAccept,
@@ -105,6 +107,9 @@ private:
     struct Connection {
         UdtStreamSocket* socket;
         nx::Buffer buffer;
+        Connection() {
+            buffer.reserve(1024);
+        }
     };
     void OnAccept( SystemError::ErrorCode error_code , AbstractStreamSocket* new_conn ) {
         // read for each new_conn
