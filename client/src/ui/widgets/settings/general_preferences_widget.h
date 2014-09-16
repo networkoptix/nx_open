@@ -26,6 +26,7 @@ public:
     virtual bool confirm() override;
 private:
     void initTranslations();
+    void updateCurrentBgColor();
 
 private slots:
     void at_browseMainMediaFolderButton_clicked();
@@ -43,6 +44,7 @@ private:
     bool m_oldDoubleBuffering;
     int m_oldLanguage;
     int m_oldSkin;
+    QColor m_bgColor;
 };
 
 #endif // GENERAL_PREFERENCES_WIDGET_H

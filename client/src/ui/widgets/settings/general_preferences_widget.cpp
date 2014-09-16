@@ -5,6 +5,7 @@
 #include <QtCore/QStandardPaths>
 #include <QtGui/QDesktopServices>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QColorDialog>
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>
@@ -95,6 +96,17 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
         ui->doubleBufferRestartLabel->setVisible(toggled != m_oldDoubleBuffering);
     });
 
+    connect(ui->selectColorButton,                      &QPushButton::clicked,          this,   [this] {
+        QColorDialog dialog(this);
+        dialog.setCurrentColor(m_bgColor);
+        if (!dialog.exec())
+            return;
+        m_bgColor = dialog.currentColor();
+        updateCurrentBgColor();
+    });
+
+
+
 }
 
 QnGeneralPreferencesWidget::~QnGeneralPreferencesWidget()
@@ -167,6 +179,8 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
         }
     }
     ui->languageComboBox->setCurrentIndex(m_oldLanguage);
+
+    //m_bgColor = qnSettings->radialBackgroundCycle
 }
 
 bool QnGeneralPreferencesWidget::confirm() {
@@ -205,6 +219,13 @@ void QnGeneralPreferencesWidget::initTranslations() {
     model->setTranslations(qnCommon->instance<QnClientTranslationManager>()->loadTranslations());
     ui->languageComboBox->setModel(model);
 }
+
+void QnGeneralPreferencesWidget::updateCurrentBgColor() {
+    QPixmap pixmap(16, 16);
+    pixmap.fill(m_bgColor);
+    ui->selectColorButton->setIcon(QIcon(pixmap));
+}
+
 
 #include "ui/workaround/mac_utils.h"
 // -------------------------------------------------------------------------- //
