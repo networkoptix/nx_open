@@ -291,8 +291,10 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force))
         return false;
 
-    if (!force)
+    if (!force) {
         QnGlobalSettings::instance()->synchronizeNow();
+        qnSettings->setLastUsedConnection(QnConnectionData());
+    }
 
     hideMessageBox();
 
