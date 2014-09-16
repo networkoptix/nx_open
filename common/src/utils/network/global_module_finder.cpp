@@ -44,7 +44,7 @@ void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &con
     m_connection = connection;
 
     if (connection)
-        connect(connection->getMiscManager().get(),        &ec2::AbstractMiscManager::moduleChanged,  this,   &QnGlobalModuleFinder::at_moduleChanged);
+        connect(connection->getMiscManager().get(),        &ec2::AbstractMiscManager::moduleChanged,  this,   &QnGlobalModuleFinder::at_moduleChanged,  Qt::QueuedConnection);
 }
 
 void QnGlobalModuleFinder::fillApiModuleData(const QnModuleInformation &moduleInformation, ec2::ApiModuleData *data) {
