@@ -948,22 +948,24 @@ void QnTransactionMessageBus::doPeriodicTasks()
     }
 
     // add new outgoing connections
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     for (QMap<QUrl, RemoteUrlConnectInfo>::iterator itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
     {
         const QUrl& url = itr.key();
         RemoteUrlConnectInfo& connectInfo = itr.value();
-        if (currentTime - connectInfo.lastConnectedTime > RECONNECT_TIMEOUT && !isPeerUsing(url)) 
+        bool isTimeout = !connectInfo.lastConnectedTime.isValid() || connectInfo.lastConnectedTime.hasExpired(RECONNECT_TIMEOUT);
+        if (isTimeout && !isPeerUsing(url)) 
         {
             if (!connectInfo.discoveredPeer.isNull() ) 
             {
-                if (connectInfo.discoveredTimeout.elapsed() > DISCOVERED_PEER_TIMEOUT)
+                if (connectInfo.discoveredTimeout.elapsed() > DISCOVERED_PEER_TIMEOUT) {
                     connectInfo.discoveredPeer = QUuid();
+                    connectInfo.discoveredTimeout.restart();
+                }
                 else if (m_connections.contains(connectInfo.discoveredPeer))
                     continue;
             }
 
-            itr.value().lastConnectedTime = currentTime;
+            itr.value().lastConnectedTime.restart();
             QnTransactionTransportPtr transport(new QnTransactionTransport(m_localPeer));
             connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
             connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
