@@ -385,7 +385,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     //we support only two streams from camera
     m_encoderCount = m_encoderCount > 2 ? 2 : m_encoderCount;
 
-    setParam( Qn::HAS_DUAL_STREAMING_PARAM_NAME, m_encoderCount > 1, QnDomainDatabase );
+    setParam( Qn::HAS_DUAL_STREAMING_PARAM_NAME, (m_encoderCount > 1) ? 1 : 0, QnDomainDatabase );
 
     //setting camera capabilities
     unsigned int cameraCapabilities = 0;
