@@ -379,6 +379,7 @@ bool QnDbManager::init(
         QnUserResourcePtr userResource( new QnUserResource() );
         fromApiToResource( users[0], userResource );
         userResource->setPassword( defaultAdminPassword );
+        userResource->generateHash();
 
         QnTransaction<ApiUserData> userTransaction( ApiCommand::saveUser );
         userTransaction.fillPersistentInfo();

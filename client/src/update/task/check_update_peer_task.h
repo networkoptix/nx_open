@@ -59,6 +59,8 @@ private:
     QnUpdateFileInformationPtr m_clientUpdateFile;
     bool m_clientRequiresInstaller;
 
+    QUrl m_releaseNotesUrl;
+
     std::unordered_set<nx_http::AsyncHttpClientPtr> m_runningRequests;
 };
 

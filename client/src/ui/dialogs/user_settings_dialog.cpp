@@ -221,8 +221,10 @@ void QnUserSettingsDialog::submitToResource() {
     if (permissions & Qn::WriteNamePermission)
         m_user->setName(ui->loginEdit->text().trimmed());
 
-    if (permissions & Qn::WritePasswordPermission)
+    if (permissions & Qn::WritePasswordPermission) {
         m_user->setPassword(ui->passwordEdit->text()); //empty text means 'no change'
+        m_user->generateHash();
+    }
 
     /* User cannot change it's own rights */
     if (permissions & Qn::WriteAccessRightsPermission) {

@@ -118,8 +118,8 @@ bool QnJoinSystemRestHandler::changeAdminPassword(const QString &password) {
         QnUserResourcePtr user = resource.staticCast<QnUserResource>();
         if (user->getName() == lit("admin")) {
             user->setPassword(password);
+            user->generateHash();
             ec2Connection()->getUserManager()->save(user, this, [](int, ec2::ErrorCode) { return; });
-            user->setPassword(QString());
             return true;
         }
     }

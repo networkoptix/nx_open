@@ -10,6 +10,7 @@ class QnIncompatibleServerWatcher : public QObject {
     Q_OBJECT
 public:
     explicit QnIncompatibleServerWatcher(QObject *parent = 0);
+    ~QnIncompatibleServerWatcher();
 
 private slots:
     void at_peerChanged(const QnModuleInformation &moduleInformation);

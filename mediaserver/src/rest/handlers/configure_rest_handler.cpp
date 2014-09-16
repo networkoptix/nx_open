@@ -106,6 +106,7 @@ int QnConfigureRestHandler::changeAdminPassword(const QString &password, const Q
 
             /* set new password */
             user->setPassword(password);
+            user->generateHash();
             QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(user, this, [](int, ec2::ErrorCode) { return; });
             user->setPassword(QString());
         } else {

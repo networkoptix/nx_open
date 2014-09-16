@@ -1824,6 +1824,7 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
     {
         user->setPassword(password);
         user->setName(login);
+        user->generateHash();
         m_updateUserRequests << user->getId();
         appServerConnection->getUserManager()->save(
             user, this,
