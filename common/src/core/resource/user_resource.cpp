@@ -61,6 +61,18 @@ void QnUserResource::generateHash() {
     setDigest(digest);
 }
 
+bool QnUserResource::checkPassword(const QString &password) {
+    QList<QByteArray> values =  getHash().split(L'$');
+    if (values.size() != 3)
+        return false;
+
+    QByteArray salt = values[1];
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    md5.addData(salt);
+    md5.addData(password.toUtf8());
+    return md5.result().toHex() == values[2];
+}
+
 void QnUserResource::setDigest(const QByteArray& digest)
 {
     {
