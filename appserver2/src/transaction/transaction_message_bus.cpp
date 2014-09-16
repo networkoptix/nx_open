@@ -340,6 +340,8 @@ void QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
 
 void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader)
 {
+    Q_ASSERT(tran.peerID != qnCommon->moduleGUID());
+
     gotAliveData(tran.params, transport);
 
     QnTransaction<ApiPeerAliveData> modifiedTran(tran);
