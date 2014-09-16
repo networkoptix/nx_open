@@ -319,7 +319,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(const nx_http::AsyncHttpC
     if (!m_target.denyClientUpdates) {
         packages = map.value(lit("clientPackages")).toMap();
         QString arch = QnAppInfo::applicationArch();
-        QString modification = QnAppInfo::armBox();
+        QString modification = QnAppInfo::applicationPlatformModification();
         if (!modification.isEmpty())
             arch += lit("_") + modification;
         QVariantMap package = packages.value(QnAppInfo::applicationPlatform()).toMap().value(arch).toMap();

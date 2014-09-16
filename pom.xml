@@ -38,6 +38,7 @@
 		<buildNumber>0</buildNumber>
 		<skip.sign>true</skip.sign>
 		<box>none</box>
+        <modification/>
 		<final.artifact.name>${project.artifactId}</final.artifact.name>
 		<finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${box}-${arch}-${build.configuration}-beta</finalName>
 		<beta>true</beta>
@@ -340,6 +341,7 @@
 				<compiler>msvc2012u3</compiler>
 				<arch>x64</arch>
 				<box>win78</box>
+                <modification>win78</modification>
 				<force_x86>false</force_x86>
 				<qt.spec>win32-msvc2012</qt.spec>
 				<PlatformToolSet>v110</PlatformToolSet>
@@ -364,6 +366,7 @@
 			<properties>
 				<qt.spec>win32-msvc2012xp</qt.spec>
 				<PlatformToolSet>v110_xp</PlatformToolSet>
+                <modification>winxp</modification>
 			</properties>
 		</profile>
 
@@ -441,6 +444,9 @@
 				<module>debsetup/client-deb</module>
 				<module>debsetup/mediaserver-deb</module>
 			</modules>  
+            <properties>
+                <modification>ubuntu</modification>
+            </properties>
 		</profile>         
 
 		<profile>
@@ -487,6 +493,7 @@
 				<openssl.version>1.0.0j-SNAPSHOT</openssl.version>
 				<additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines>
 				<!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines> -->
+                <modification>isd</modification>
 			</properties>
 			<modules>
 				<module>plugins/isd_native_plugin</module>
@@ -513,6 +520,7 @@
 				<compiler>${toolchain.version}</compiler>
 				<openssl.version>1.0.1f-SNAPSHOT</openssl.version>
 				<additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines>
+                <modification>isd_s2</modification>
 			</properties>
 			<modules>
 				<module>plugins/isd_native_plugin</module>
@@ -538,6 +546,7 @@
 				<compiler>${toolchain.version}</compiler>
 				<openssl.version>1.0.0j-SNAPSHOT</openssl.version>
 				<ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
+                <modification>rpi</modification>
 			</properties>
 			<modules>
 				<module>edge_firmware/rpi</module>

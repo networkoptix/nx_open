@@ -30,6 +30,10 @@ QString QnAppInfo::applicationArch() {
     return QStringLiteral("${arch}");
 }
 
+QString QnAppInfo::applicationPlatformModification() {
+    return QStringLiteral("${modification}");
+}
+
 QString QnAppInfo::applicationCompiler() {
     return QStringLiteral("${additional.compiler}");
 }

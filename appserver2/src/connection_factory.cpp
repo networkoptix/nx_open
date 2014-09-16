@@ -451,7 +451,6 @@ namespace ec2
         connectionInfo->brand = isCompatibilityMode() ? QString() : QnAppInfo::productNameShort();
         connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
-        connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->box = QnAppInfo::armBox();
         connectionInfo->allowSslConnections = m_sslEnabled;
         return ErrorCode::ok;
