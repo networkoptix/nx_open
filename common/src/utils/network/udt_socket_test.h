@@ -21,7 +21,6 @@
 // --s    : Set it up as an server, if --s is not there, it is a client
 // --addr : The IPV4 address it gonna use, for a server, it is the bind address; a client, it is the connect address
 // --port : Port number
-// --thread_size: The worker thread pool size
 // 
 // Client specific parameters
 // 
