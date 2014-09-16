@@ -152,6 +152,7 @@ private:
                 conn->socket->close();
             } else {
                 total_recv_bytes_ += bytes_transferred;
+                conn->buffer.resize(0);
                 if(!conn->socket->readSomeAsync(
                     &(conn->buffer),
                     std::bind(
@@ -370,6 +371,8 @@ void UdtSocketProfileClient::ScheduleSleepSockets() {
 
 void UdtSocketProfileClient::ScheduleConnection() {
     // Schedule the connection
+    std::size_t scheduled_size = 0;
+    static const int kMaximumPerAllocation = 100;
     for( std::size_t i = active_conn_sockets_size_ ; i < maximum_allowed_concurrent_connection_ ; ++i ) {
         if( random_.Roll( GetConnectionProbability() ) ) {
             std::unique_ptr<Connection> conn( new Connection() );
@@ -386,6 +389,10 @@ void UdtSocketProfileClient::ScheduleConnection() {
                 conn.release();
             }
             ++active_conn_sockets_size_;
+            ++scheduled_size;
+            if( scheduled_size > kMaximumPerAllocation ) {
+                break;
+            }
         }
     }
 }
