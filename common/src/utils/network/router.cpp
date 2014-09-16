@@ -91,8 +91,6 @@ void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleIn
         }
     }
 
-    makeConsistent();
-
     emit connectionRemoved(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
 }
 
@@ -150,37 +148,10 @@ bool QnRouter::removeConnection(const QUuid &id, const QnRouter::Endpoint &endpo
 
     m_routeBuilder->removeConnection(id, endpoint.id, endpoint.host, endpoint.port);
 
-    lk.relock();
-    makeConsistent();
-
     lk.unlock();
+
     NX_LOG(lit("QnRouter. Connection removed: %1 -> %2[%3:%4]").arg(id.toString()).arg(endpoint.id.toString()).arg(endpoint.host).arg(endpoint.port), cl_logDEBUG1);
     emit connectionRemoved(id, endpoint.id, endpoint.host, endpoint.port);
 
     return true;
-}
-
-void QnRouter::makeConsistent() {
-    // this function just makes endpoint availability test and removes connections to unavailable endpoints
-    QMultiHash<QUuid, Endpoint> connections = m_connections;
-
-    QQueue<QUuid> pointsToCheck;
-    QSet<QUuid> checkedPoints;
-    pointsToCheck.enqueue(qnCommon->moduleGUID());
-
-    while (!pointsToCheck.isEmpty()) {
-        QUuid point = pointsToCheck.dequeue();
-        checkedPoints.insert(point);
-
-        foreach (const Endpoint &endpoint, connections.values(point)) {
-            connections.remove(point, endpoint);
-            if (!checkedPoints.contains(endpoint.id))
-                pointsToCheck.enqueue(endpoint.id);
-        }
-    }
-
-    for (auto it = connections.begin(); it != connections.end(); ++it) {
-        m_routeBuilder->removeConnection(it.key(), it->id, it->host, it->port);
-        m_connections.remove(it.key(), it.value());
-    }
 }

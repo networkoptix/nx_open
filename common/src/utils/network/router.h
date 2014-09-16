@@ -52,8 +52,6 @@ private:
     bool addConnection(const QUuid &id, const Endpoint &endpoint);
     bool removeConnection(const QUuid &id, const Endpoint &endpoint);
 
-    void makeConsistent();
-
 private:
     mutable QMutex m_mutex;
     std::weak_ptr<ec2::AbstractECConnection> m_connection;
