@@ -388,29 +388,32 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
             m_latestVersion = result.latestVersion;
             m_updatesModel->setLatestVersion(m_latestVersion);
         }
+        QnSoftwareVersion displayVersion = targetVersion.isNull()
+            ? m_latestVersion
+            : targetVersion;
 
         switch (result.result) {
         case QnCheckForUpdateResult::UpdateFound:
         case QnCheckForUpdateResult::NoNewerVersion:
-            status = m_latestVersion.toString();
+            status = displayVersion.toString();
             break;
         case QnCheckForUpdateResult::InternetProblem:
             status = tr("Internet connection problem");
             setWarningStyle(&statusPalette);
             break;
         case QnCheckForUpdateResult::NoSuchBuild:
-            status = targetVersion.toString();
+            status = displayVersion.toString();
             detail = tr("There is no such build on the update server");
             setWarningStyle(&statusPalette);
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::ServerUpdateImpossible:
-            status = m_latestVersion.toString();
+            status = displayVersion.toString();
             detail = tr("Cannot start update. An update for one or more servers was not found.");
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::ClientUpdateImpossible:
-            status = m_latestVersion.toString();
+            status = displayVersion.toString();
             detail = tr("Cannot start update. An update for the client was not found.");
             setWarningStyle(&detailPalette);
             break;

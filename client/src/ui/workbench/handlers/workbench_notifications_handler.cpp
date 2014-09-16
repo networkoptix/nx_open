@@ -141,6 +141,10 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible( QnSystemHealt
 }
 
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr &resource, bool visible) {
+    /* No events but 'Connection lost' should be displayed if we are disconnected. */
+    if (visible && message != QnSystemHealth::ConnectionLost)
+        Q_ASSERT(context()->user());
+
     /* Only admins can see some system health events */
     if (visible && adminOnlyMessage(message) && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission))
         return;
@@ -304,5 +308,5 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id) {
 void QnWorkbenchNotificationsHandler::at_emailSettingsChanged() {
     QnEmail::Settings settings = QnGlobalSettings::instance()->emailSettings();
     bool isInvalid = settings.server.isEmpty() || settings.user.isEmpty() || settings.password.isEmpty();
-    setSystemHealthEventVisible(QnSystemHealth::SmtpIsNotSet, isInvalid);
+    setSystemHealthEventVisible(QnSystemHealth::SmtpIsNotSet, context()->user() && isInvalid);
 }
