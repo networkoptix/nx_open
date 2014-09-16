@@ -135,20 +135,21 @@
         </Directory>
 
         <DirectoryRef Id="TARGETDIR">
-            <Merge Id="VCRedist1" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <!-- <Merge Id="VCRedist2" SourceFile="$(var.commonProgramFiles)Merge Modules\policy_11_0_Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/> -->
+            <Merge Id="VCRedist100" SourceFile="MergeModules\Microsoft_VC100_CRT_${arch}.msm" DiskId="1" Language="0"/>
+            <Merge Id="VCRedist110" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/>
             <?if ${build.configuration} = debug ?>
-            <Merge Id="VCRedist3" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
-            <!-- <Merge Id="VCRedist4" SourceFile="$(var.commonProgramFiles)Merge Modules\policy_11_0_Microsoft_VC110_DebugCRT_${arch}.msm" DiskId="1" Language="0"/> -->
+            <Merge Id="VCRedist110Debug" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
             <?endif?>
         </DirectoryRef>
 
-        <Feature Id="VCRedist" Title="Visual C++ 11.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <MergeRef Id="VCRedist1"/>
-            <!-- <MergeRef Id="VCRedist2"/> -->
+        <Feature Id="VCRedistVS10" Title="Visual C++ 10.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+            <MergeRef Id="VCRedist100"/>
+        </Feature>
+
+        <Feature Id="VCRedistVS11" Title="Visual C++ 11.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+            <MergeRef Id="VCRedist110"/>
             <?if ${build.configuration} = debug ?>
-            <MergeRef Id="VCRedist3"/>
-            <!-- <MergeRef Id="VCRedist4"/> -->
+            <MergeRef Id="VCRedist110Debug"/>
             <?endif?>
         </Feature>
 
