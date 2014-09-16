@@ -27,7 +27,8 @@ namespace ec2
         {}
 
         bool operator==(const ApiRuntimeData& other) const {
-            return peer == other.peer &&
+            return version == other.version &&
+                   peer == other.peer &&
                    platform == other.platform &&
                    box == other.box &&
                    publicIP == other.publicIP &&

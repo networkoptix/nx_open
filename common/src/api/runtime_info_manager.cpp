@@ -17,8 +17,8 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
         QMutexLocker lock(&m_updateMutex);
         QnPeerRuntimeInfo info(runtimeData);
         if (m_items->hasItem(info.uuid)) {
-            if (runtimeData.version > m_items->getItem(runtimeData.peer.id).data.version)
-                m_items->updateItem(info.uuid, info);
+            //if (runtimeData.version > m_items->getItem(runtimeData.peer.id).data.version)
+            m_items->updateItem(info.uuid, info);
         }
         else
             m_items->addItem(info);
@@ -83,6 +83,17 @@ void QnRuntimeInfoManager::updateLocalItem(const QnPeerRuntimeInfo& value)
 {
     QMutexLocker lock(&m_updateMutex);
     Q_ASSERT(value.uuid == qnCommon->moduleGUID());
+    updateItemNoLock(value);
+}
+
+void QnRuntimeInfoManager::updateItem(const QnPeerRuntimeInfo& value)
+{
+    QMutexLocker lock(&m_updateMutex);
+    updateItemNoLock(value);
+}
+
+void QnRuntimeInfoManager::updateItemNoLock(const QnPeerRuntimeInfo& value)
+{
     if (m_items->hasItem(value.uuid)) {
         int oldVersion = m_items->getItem(value.uuid).data.version;
         QnPeerRuntimeInfo modifiedValue = value;

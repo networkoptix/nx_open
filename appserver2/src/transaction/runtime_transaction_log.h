@@ -34,6 +34,7 @@ namespace ec2
         void clearRuntimeData();
     private:
         QnTranState m_state;
+        QMap<QnTranStateKey, ApiRuntimeData> m_data;
         mutable QMutex m_mutex;
     };
 };

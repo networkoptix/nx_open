@@ -23,27 +23,40 @@ void QnRuntimeTransactionLog::clearOldRuntimeData(const QnTranStateKey& key)
     QMutexLocker lock(&m_mutex);
     Q_ASSERT(!key.dbID.isNull());
     auto itr = m_state.values.lowerBound(QnTranStateKey(key.peerID, QUuid()));
+    bool newPeerFound = false;
+    bool oldPeerFound = false;
     while (itr != m_state.values.end() && itr.key().peerID == key.peerID) 
     {
-        if (itr.key().dbID == key.dbID)
+        if (itr.key().dbID == key.dbID) {
+            newPeerFound = true;
             ++itr;
-        else
+        }
+        else {
+            oldPeerFound = true;
+            m_data.remove(itr.key());
             itr = m_state.values.erase(itr);
+        }
     }
+    if (newPeerFound && oldPeerFound)
+        QnRuntimeInfoManager::instance()->updateItem(m_data[key]);
 }
 
 void QnRuntimeTransactionLog::clearRuntimeData(const QUuid& id)
 {
     QMutexLocker lock(&m_mutex);
     auto itr = m_state.values.lowerBound(QnTranStateKey(id, QUuid()));
-    while (itr != m_state.values.end() && itr.key().peerID == id) 
+    while (itr != m_state.values.end() && itr.key().peerID == id)  {
+        m_data.remove(itr.key());
         itr = m_state.values.erase(itr);
+    }
 }
 
 void QnRuntimeTransactionLog::clearRuntimeData()
 {
     QMutexLocker lock(&m_mutex);
     m_state.values.clear();
+    m_data.clear();
+    
 }
 
 bool QnRuntimeTransactionLog::contains(const QnTranState& state) const
@@ -69,6 +82,7 @@ ErrorCode QnRuntimeTransactionLog::saveTransaction(const QnTransaction<ApiRuntim
     QMutexLocker lock(&m_mutex);
     QnTranStateKey key(tran.params.peer.id, tran.params.peer.instanceId);
     m_state.values[key] = tran.params.version;
+    m_data[key] = tran.params;
     return ErrorCode::ok;
 }
 
@@ -81,12 +95,12 @@ QnTranState QnRuntimeTransactionLog::getTransactionsState()
 ErrorCode QnRuntimeTransactionLog::getTransactionsAfter(const QnTranState& state, QList<QnTransaction<ApiRuntimeData>>& result)
 {
     QMutexLocker lock(&m_mutex);
-    foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
+    foreach (const ApiRuntimeData &data, m_data)
     {
-        QnTranStateKey key(info.data.peer.id, info.data.peer.instanceId);
-        if (info.data.version > state.values.value(key)) {
+        QnTranStateKey key(data.peer.id, data.peer.instanceId);
+        if (data.version > state.values.value(key)) {
             QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged);
-            tran.params = info.data;
+            tran.params = data;
             result << tran;
         }
     }
