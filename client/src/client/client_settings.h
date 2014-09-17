@@ -135,9 +135,16 @@ public:
         /** Unique id for this PC for videowall construction. */
         PC_UUID,
 
-        /** Flag that client is run in videowall mode */
+        /** Flag that client is run in videowall mode. */
         VIDEO_WALL_MODE,
 
+        /** Default color of the background circles (read from customization). */
+        DEFAULT_BACKGROUND_COLOR,
+
+        /** Color of the background circles. */
+        BACKGROUND_COLOR,
+
+        /** Flag that background circles change color automatically. */
         RAINBOW_MODE,
 
         /** Speed of background circles movement. Value is period (in seconds) of the full movement cycle. Default is 120 seconds. */
@@ -236,6 +243,8 @@ private:
         QN_DECLARE_RW_PROPERTY(Qn::ClientSkin,              clientSkin,             setClientSkin,              CLIENT_SKIN,                Qn::DarkSkin)
         QN_DECLARE_RW_PROPERTY(QUuid,                       pcUuid,                 setPcUuid,                  PC_UUID,                    QUuid())
         QN_DECLARE_RW_PROPERTY(bool,                        isVideoWallMode,        setVideoWallMode,           VIDEO_WALL_MODE,            false)
+        QN_DECLARE_RW_PROPERTY(QColor,                      defaultBackgroundColor, setDefaultBackgroundColor,  DEFAULT_BACKGROUND_COLOR,   QColor())
+        QN_DECLARE_RW_PROPERTY(QColor,                      backgroundColor,        setBackgroundColor,         BACKGROUND_COLOR,           QColor())
         QN_DECLARE_RW_PROPERTY(bool,                        isRainbowMode,          setRainbowMode,             RAINBOW_MODE,               false)
         QN_DECLARE_RW_PROPERTY (int,                        radialBackgroundCycle,  setRadialBackgroundCycle,   RADIAL_BACKGROUND_CYCLE,    120)
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())

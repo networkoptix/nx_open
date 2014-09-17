@@ -29,10 +29,15 @@
 #include <ui/workaround/mac_utils.h>
 #include <ui/workaround/qt5_combobox_workaround.h>
 
+#include <utils/common/scoped_value_rollback.h>
+#include <utils/math/color_transformations.h>
+
 QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::GeneralPreferencesWidget),
+    m_colorDialog(new QColorDialog()),
+    m_updating(false),
     m_oldDownmix(false),
     m_oldDoubleBuffering(false),
     m_oldLanguage(0),
@@ -73,6 +78,8 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     ui->idleTimeoutWidget->setEnabled(false);
     ui->doubleBufferRestartLabel->setVisible(false);
 
+    m_colorDialog->setCurrentColor(defaultBackgroundColor());
+
     connect(ui->browseMainMediaFolderButton,            &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_browseMainMediaFolderButton_clicked);
     connect(ui->addExtraMediaFolderButton,              &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked);
     connect(ui->removeExtraMediaFolderButton,           &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_removeExtraMediaFolderButton_clicked);
@@ -97,16 +104,14 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     });
 
     connect(ui->selectColorButton,                      &QPushButton::clicked,          this,   [this] {
-        QColorDialog dialog(this);
-        dialog.setCurrentColor(m_bgColor);
-        if (!dialog.exec())
-            return;
-        m_bgColor = dialog.currentColor();
-        updateCurrentBgColor();
+        if (m_colorDialog->exec())
+            updateBackgroundColor();
     });
 
-
-
+    connect(ui->defaultBackgroundCheckBox,  &QCheckBox::stateChanged,   this, [this](int state) {
+        ui->selectColorButton->setEnabled(state != Qt::Checked);
+        updateBackgroundColor();
+    });
 }
 
 QnGeneralPreferencesWidget::~QnGeneralPreferencesWidget()
@@ -141,9 +146,16 @@ void QnGeneralPreferencesWidget::submitToSettings() {
                 qnSettings->setTranslationPath(translation.filePaths()[0]);
         }
     }
+
+    if (ui->defaultBackgroundCheckBox->isChecked())
+        qnSettings->setBackgroundColor(QColor());
+    else
+        qnSettings->setBackgroundColor(backgroundColor());
 }
 
 void QnGeneralPreferencesWidget::updateFromSettings() {
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
     ui->mainMediaFolderLabel->setText(QDir::toNativeSeparators(qnSettings->mediaFolder()));
 
     m_oldDownmix = qnSettings->isAudioDownmixed();
@@ -180,7 +192,12 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     }
     ui->languageComboBox->setCurrentIndex(m_oldLanguage);
 
-    //m_bgColor = qnSettings->radialBackgroundCycle
+    m_oldBackgroundColor = qnSettings->backgroundColor();
+    ui->defaultBackgroundCheckBox->setChecked(!qnSettings->backgroundColor().isValid());
+    m_colorDialog->setCurrentColor(qnSettings->backgroundColor().isValid() 
+        ? withAlpha(qnSettings->backgroundColor(), 255)
+        : defaultBackgroundColor());
+    updateBackgroundColor();
 }
 
 bool QnGeneralPreferencesWidget::confirm() {
@@ -214,16 +231,36 @@ bool QnGeneralPreferencesWidget::confirm() {
     return true;
 }
 
+bool QnGeneralPreferencesWidget::discard() {
+    qnSettings->setBackgroundColor(m_oldBackgroundColor);
+    return true;
+}
+
+
 void QnGeneralPreferencesWidget::initTranslations() {
     QnTranslationListModel *model = new QnTranslationListModel(this);
     model->setTranslations(qnCommon->instance<QnClientTranslationManager>()->loadTranslations());
     ui->languageComboBox->setModel(model);
 }
 
-void QnGeneralPreferencesWidget::updateCurrentBgColor() {
+QColor QnGeneralPreferencesWidget::defaultBackgroundColor() const {
+    return qnSettings->defaultBackgroundColor();
+}
+
+QColor QnGeneralPreferencesWidget::backgroundColor() const {
+    if (ui->defaultBackgroundCheckBox->isChecked())
+        return defaultBackgroundColor();
+    QColor opaque = m_colorDialog->currentColor();
+    return withAlpha(opaque, defaultBackgroundColor().alpha());
+}
+
+void QnGeneralPreferencesWidget::updateBackgroundColor() {
     QPixmap pixmap(16, 16);
-    pixmap.fill(m_bgColor);
-    ui->selectColorButton->setIcon(QIcon(pixmap));
+    pixmap.fill(withAlpha(backgroundColor(), 255));
+    ui->selectColorButton->setIcon(pixmap);
+
+    if (!m_updating)
+        qnSettings->setBackgroundColor(backgroundColor());
 }
 
 
