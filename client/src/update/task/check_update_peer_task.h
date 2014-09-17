@@ -63,7 +63,7 @@ private:
 
     QUrl m_releaseNotesUrl;
 
-    QSet<QnAsyncHttpClientReply> m_runningRequests;
+    QSet<QnAsyncHttpClientReply*> m_runningRequests;
 };
 
 #endif // CHECK_UPDATE_PEER_TASK_H
