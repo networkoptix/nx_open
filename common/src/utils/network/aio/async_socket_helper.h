@@ -33,8 +33,10 @@ public:
         m_recvAsyncCallCounter( 0 ),
         m_sendBuffer( nullptr ),
         m_sendBufPos( 0 ),
+        m_registerTimerCallCounter( 0 ),
         m_connectSendHandlerTerminatedFlag( nullptr ),
-        m_recvHandlerTerminatedFlag( nullptr )
+        m_recvHandlerTerminatedFlag( nullptr ),
+        m_timerHandlerTerminatedFlag( nullptr )
 #ifdef _DEBUG
         , m_asyncSendIssued( false )
 #endif
@@ -54,6 +56,8 @@ public:
             *m_connectSendHandlerTerminatedFlag = true;
         if( m_recvHandlerTerminatedFlag )
             *m_recvHandlerTerminatedFlag = true;
+        if( m_timerHandlerTerminatedFlag )
+            *m_timerHandlerTerminatedFlag = true;
     }
 
     void terminate()
@@ -66,6 +70,8 @@ public:
                 aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite );
             if( m_recvHandlerTerminatedFlag )
                 aio::AIOService::instance()->removeFromWatch( m_socket, aio::etRead );
+            if( m_timerHandlerTerminatedFlag )
+                aio::AIOService::instance()->removeFromWatch( m_socket, aio::etTimedOut );
         }
         else
         {
@@ -137,6 +143,15 @@ public:
         return aio::AIOService::instance()->watchSocketNonSafe( m_socket, aio::etWrite, this );
     }
 
+    bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
+    {
+        m_timerHandler = std::move( handler );
+
+        QMutexLocker lk( aio::AIOService::instance()->mutex() );
+        ++m_registerTimerCallCounter;
+        return aio::AIOService::instance()->watchSocketNonSafe( m_socket, aio::etTimedOut, this, timeoutMs );
+    }
+
     void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
     {
         aio::AIOService::instance()->removeFromWatch( m_socket, eventType, waitForRunningHandlerCompletion );
@@ -148,6 +163,8 @@ public:
                 ++m_recvAsyncCallCounter;
             else if( eventType == aio::etWrite )
                 ++m_connectSendAsyncCallCounter;
+            else if( eventType == aio::etTimedOut )
+                ++m_registerTimerCallCounter;
         }
         else
         {
@@ -171,8 +188,12 @@ private:
     const nx::Buffer* m_sendBuffer;
     int m_sendBufPos;
 
+    std::function<void()> m_timerHandler;
+    size_t m_registerTimerCallCounter;
+
     bool* m_connectSendHandlerTerminatedFlag;
     bool* m_recvHandlerTerminatedFlag;
+    bool* m_timerHandlerTerminatedFlag;
 
     std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
 
@@ -266,6 +287,26 @@ private:
             m_connectSendHandlerTerminatedFlag = nullptr;
         };
 
+        const size_t registerTimerCallCounterBak = m_registerTimerCallCounter;
+        auto timerHandlerLocal = [this, registerTimerCallCounterBak, sock, &terminated]()
+        {
+            auto timerHandlerBak = std::move( m_timerHandler );
+            timerHandlerBak();
+
+            if( terminated )
+                return;     //most likely, socket has been removed in handler
+            QMutexLocker lk( aio::AIOService::instance()->mutex() );
+            if( registerTimerCallCounterBak == m_registerTimerCallCounter )
+                aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etTimedOut );
+        };
+
+        auto __finally_timer = [this, &terminated]( AsyncSocketImplHelper* /*pThis*/ )
+        {
+            if( terminated )
+                return;     //most likely, socket has been removed in handler
+            m_timerHandlerTerminatedFlag = nullptr;
+        };
+
         switch( eventType )
         {
             case aio::etRead:
@@ -327,6 +368,20 @@ private:
                         if( m_sendBufPos == (size_t)m_sendBuffer->size() )
                             sendHandlerLocal( SystemError::noError, m_sendBufPos );
                     }
+                }
+                break;
+            }
+
+            case aio::etTimedOut:
+            {
+                //timer on socket (not read/write timeout, but some timer)
+                m_timerHandlerTerminatedFlag = &terminated;
+
+                if( m_timerHandler )
+                {
+                    //async connect. If we are here than connect succeeded
+                    std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_timer)> cleanupGuard( this, __finally_timer );
+                    timerHandlerLocal();
                 }
                 break;
             }

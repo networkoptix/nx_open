@@ -852,6 +852,11 @@ bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<vo
     return m_aioHelper->sendAsyncImpl( buf, std::move( handler ) );
 }
 
+bool CommunicatingSocket::registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
+{
+    return m_aioHelper->registerTimerImpl( timeoutMs, std::move( handler ) );
+}
+
 
 //////////////////////////////////////////////////////////
 ///////// class TCPSocket

@@ -240,6 +240,8 @@ public:
     bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
     //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
     bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
+    //!Implementation of AbstractCommunicatingSocket::registerTimerImpl
+    bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler );
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion );
 
@@ -420,6 +422,10 @@ public:
     //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
     virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
         return this->m_implDelegate.sendAsyncImpl( buf, std::move( handler ) );
+    }
+    //!Implementation of AbstractCommunicatingSocket::registerTimerImpl
+    virtual bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) override {
+        return this->m_implDelegate.registerTimerImpl( timeoutMs, std::move( handler ) );
     }
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) {

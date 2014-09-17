@@ -16,6 +16,8 @@
 #include "../../common/log.h"
 #include "../../common/systemerror.h"
 
+//TODO #ak memory order semantic used with std::atomic
+
 
 //!used as clock for periodic events. Function introduced since implementation can be changed
 static qint64 getSystemTimerVal()
@@ -45,7 +47,7 @@ namespace aio
 
         /*!
             \param taskCompletionEvent if not NULL, set to 1 after processing task
-            */
+        */
         SocketAddRemoveTask(
             SocketType* const _socket,
             aio::EventType _eventType,
@@ -53,7 +55,7 @@ namespace aio
             TaskType _type,
             int _timeout = 0,
             std::atomic<int>* const _taskCompletionEvent = nullptr )
-            :
+        :
             socket( _socket ),
             eventType( _eventType ),
             eventHandler( _eventHandler ),
@@ -88,6 +90,7 @@ namespace aio
     class AIOEventHandlingDataHolder
     {
     public:
+        //!Why the fuck do we need shared_ptr inside object instanciated on heap?
         std::shared_ptr<AIOEventHandlingData<SocketType>> data;
 
         AIOEventHandlingDataHolder( AIOEventHandler<SocketType>* _eventHandler )
@@ -182,19 +185,29 @@ namespace aio
 
                 if( task.type == TaskType::tAdding )
                 { 
-                    addSockToPollset( task.socket, task.eventType, task.timeout, task.eventHandler );
                     if( task.eventType == aio::etRead )
+                    {
+                        addSockToPollset( task.socket, task.eventType, task.timeout, task.eventHandler );
                         --newReadMonitorTaskCount;
+                    }
                     else if( task.eventType == aio::etWrite )
+                    {
+                        addSockToPollset( task.socket, task.eventType, task.timeout, task.eventHandler );
                         --newWriteMonitorTaskCount;
-                    else
-                        Q_ASSERT( false );
+                    }
+                    else if( task.eventType == aio::etTimedOut )
+                    {
+                        addSocketTimer( task.socket, task.timeout, task.eventHandler );
+                    }
                 }
                 else    //task.type == TaskType::tRemoving
                 {
-                    void* userData = pollSet.remove( task.socket, task.eventType );
-                    if( userData )
-                        delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
+                    if( task.eventType == aio::etRead || task.eventType == aio::etWrite )
+                    {
+                        void* userData = pollSet.remove( task.socket, task.eventType );
+                        if( userData )
+                            delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
+                    }
                 }
                 if( task.taskCompletionEvent )
                     task.taskCompletionEvent->store( 1, std::memory_order_relaxed );
@@ -231,6 +244,25 @@ namespace aio
             return true;
         }
 
+        void addSocketTimer(
+            SocketType* socket,
+            int timeout,
+            AIOEventHandler<SocketType>* eventHandler )
+        {
+            std::unique_ptr<AIOEventHandlingDataHolder<SocketType>> handlingData( new AIOEventHandlingDataHolder<SocketType>( eventHandler ) );
+
+            if( timeout > 0 )
+            {
+                //adding periodic task associated with socket
+                handlingData->data->timeout = timeout;
+                addPeriodicTask(
+                    getSystemTimerVal() + timeout,
+                    handlingData.get()->data,
+                    socket,
+                    aio::etTimedOut );
+            }
+        }
+
         void removeSocketsFromPollSet()
         {
             processPollSetModificationQueue( TaskType::tRemoving );
@@ -245,10 +277,10 @@ namespace aio
         {
             Q_UNUSED(eventHandler)
 
-                for( typename std::deque<SocketAddRemoveTaskType>::iterator
-                    it = pollSetModificationQueue.begin();
-                    it != pollSetModificationQueue.end();
-                    ++it )
+            for( typename std::deque<SocketAddRemoveTaskType>::iterator
+                it = pollSetModificationQueue.begin();
+                it != pollSetModificationQueue.end();
+                ++it )
             {
                 if( it->socket == sock && it->eventType == eventType && it->type != taskType )
                 {
@@ -443,8 +475,6 @@ namespace aio
             ++m_impl->newReadMonitorTaskCount;
         else if( eventToWatch == aio::etWrite )
             ++m_impl->newWriteMonitorTaskCount;
-        else
-            Q_ASSERT( false );
         if( currentThreadSystemId() != systemThreadId() )  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
             m_impl->pollSet.interrupt();
 
@@ -496,13 +526,10 @@ namespace aio
             m_impl->mutex->unlock();
 
             //waiting for event handler completion (if it running)
-            if( handlingData->beingProcessed.load() > 0 )
+            while( handlingData->beingProcessed.load() > 0 )
             {
-                while( handlingData->beingProcessed.load() > 0 )
-                {
-                    m_impl->processEventsMutex.lock();
-                    m_impl->processEventsMutex.unlock();
-                }
+                m_impl->processEventsMutex.lock();
+                m_impl->processEventsMutex.unlock();
             }
 
             //waiting for socket to be removed from pollset
