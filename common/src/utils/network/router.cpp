@@ -16,6 +16,11 @@ QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) 
 {
     connect(moduleFinder,       &QnModuleFinder::moduleUrlFound,    this,   &QnRouter::at_moduleFinder_moduleUrlFound);
     connect(moduleFinder,       &QnModuleFinder::moduleUrlLost,     this,   &QnRouter::at_moduleFinder_moduleUrlLost);
+
+    QnRuntimeInfoManager *runtimeInfoManager = QnRuntimeInfoManager::instance();
+    connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoAdded,    this,   &QnRouter::at_runtimeInfoManager_runtimeInfoAdded);
+    connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged,  this,   &QnRouter::at_runtimeInfoManager_runtimeInfoChanged);
+    connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoRemoved,  this,   &QnRouter::at_runtimeInfoManager_runtimeInfoRemoved);
 }
 
 QnRouter::~QnRouter() {}
