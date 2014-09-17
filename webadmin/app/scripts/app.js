@@ -41,7 +41,14 @@ angular.module('webadminApp', [
                 templateUrl: 'views/advanced.html',
                 controller: 'AdvancedCtrl'
             })
-
+            .when('/webclient', {
+                templateUrl: 'views/webclient.html',
+                controller: 'WebclientCtrl'
+            })
+            .when('/sdkeula', {
+                templateUrl: 'views/sdkeula.html',
+                controller: 'SdkeulaCtrl'
+            })
             .otherwise({
                 redirectTo: '/settings'
             });

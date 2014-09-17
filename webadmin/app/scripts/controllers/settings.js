@@ -62,6 +62,8 @@ angular.module('webadminApp')
                 if(confirm("Changes will be applied after restart. Do you want to restart server now?")){
                     restartServer();
                 }
+            }else{
+                alert("Settings saved");
             }
         }
 

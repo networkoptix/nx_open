@@ -60,16 +60,20 @@ angular.module('webadminApp')
                     var info = mediaServerReply.data[0];
                     // Вот тут проапдейтить флаги в стореджах
 
-                    _.each($scope.storages,function(storageinfo){
+                    /*_.each($scope.storages,function(storageinfo){
                         var storageToUpdate = _.findWhere(info.storages, {id: storageinfo.storageId});
                         if(storageToUpdate!=null) {
                             storageToUpdate.spaceLimit = storageinfo.reservedSpace;
                             storageToUpdate.usedForWriting = storageinfo.isUsedForWriting;
                         }
-                    });
+                    });*/
 
-                    mediaserver.saveMediaServer(info).then(function(saveMediaServerReply){
-                       console.log("saveMediaServerReply", saveMediaServerReply);
+                    mediaserver.saveMediaServer(info).error(function(saveMediaServerReply){
+                        alert("Error: Couldn't save settings");
+                        console.log("saveMediaServerError", saveMediaServerReply);
+                    }).then(function(saveMediaServerReply){
+                        alert("Settings saved");
+                        console.log("saveMediaServerReply", saveMediaServerReply);
                     });
                 });
             });
