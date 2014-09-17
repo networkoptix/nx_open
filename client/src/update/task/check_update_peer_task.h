@@ -10,6 +10,8 @@
 #include <utils/common/system_information.h>
 #include <utils/network/http/asynchttpclient.h>
 
+class QnAsyncHttpClientReply;
+
 class QnCheckForUpdatesPeerTask : public QnNetworkPeerTask {
     Q_OBJECT
 
@@ -43,8 +45,8 @@ private:
 
     void finishTask(QnCheckForUpdateResult::Value result);
 private slots:
-    void at_updateReply_finished(const nx_http::AsyncHttpClientPtr &client);
-    void at_buildReply_finished(const nx_http::AsyncHttpClientPtr &client);
+    void at_updateReply_finished(QnAsyncHttpClientReply *reply);
+    void at_buildReply_finished(QnAsyncHttpClientReply *reply);
 
 private:
     QUrl m_updatesUrl;
@@ -61,7 +63,7 @@ private:
 
     QUrl m_releaseNotesUrl;
 
-    std::unordered_set<nx_http::AsyncHttpClientPtr> m_runningRequests;
+    QSet<QnAsyncHttpClientReply> m_runningRequests;
 };
 
 #endif // CHECK_UPDATE_PEER_TASK_H
