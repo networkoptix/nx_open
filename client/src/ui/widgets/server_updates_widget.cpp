@@ -254,7 +254,7 @@ void QnServerUpdatesWidget::initBuildSelectionButtons() {
         ui->latestVersionLabel->setText(m_targetVersion.toString());
         ui->versionTitleLabel->setText(tr("Target version:"));
 
-        checkForUpdatesInternet(true);
+        checkForUpdatesInternet(true, true);
     });
 
     ui->linkLineEdit->setText(m_updateTool->generateUpdatePackageUrl(m_targetVersion).toString());
@@ -363,12 +363,14 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
         ui->internetUpdateButton->setEnabled(canUpdate);
 }
 
-void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
+void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoStart) {
     if (m_checkingInternet || !m_updateTool->idle())
         false;
     m_checkingInternet = true;
 
     ui->internetUpdateButton->setEnabled(false);
+    ui->latestBuildLabel->setEnabled(false);
+    ui->specificBuildLabel->setEnabled(false);
     ui->internetRefreshWidget->setCurrentWidget(ui->internetProgressPage);
     ui->internetDetailLabel->setPalette(this->palette());
     ui->internetDetailLabel->setText(tr("Checking for updates..."));
@@ -377,7 +379,7 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
 
     QnSoftwareVersion targetVersion = m_targetVersion;
 
-    m_updateTool->checkForUpdates(m_targetVersion, !m_targetVersion.isNull(), [this, autoSwitch, targetVersion](const QnCheckForUpdateResult &result) {
+    m_updateTool->checkForUpdates(m_targetVersion, !m_targetVersion.isNull(), [this, autoSwitch, autoStart, targetVersion](const QnCheckForUpdateResult &result) {
         QPalette detailPalette = this->palette();
         QPalette statusPalette = this->palette();
         QString detail;
@@ -434,12 +436,17 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch) {
         ui->latestVersionLabel->setText(status);
         ui->latestVersionLabel->setPalette(statusPalette);
         ui->releaseNotesLabel->setVisible(!m_releaseNotesUrl.isEmpty());
+        ui->latestBuildLabel->setEnabled(true);
+        ui->specificBuildLabel->setEnabled(true);
 
         m_checkingInternet = false;
         ui->internetUpdateButton->setEnabled(result.result == QnCheckForUpdateResult::UpdateFound && m_updateTool->idle());
         ui->internetRefreshWidget->setCurrentWidget(ui->internetRefreshPage);
 
         m_updatesModel->setCheckResult(result);
+
+        if (autoStart && result.result == QnCheckForUpdateResult::UpdateFound)
+            m_updateTool->startUpdate(targetVersion, !targetVersion.isNull());
     });
 
 }
@@ -506,19 +513,18 @@ void QnServerUpdatesWidget::at_tool_stageChanged(QnFullUpdateStage stage) {
     for (QAction* action: m_updateSourceActions)
         action->setEnabled(m_updateTool->idle());
 
-    if (!m_updateTool->idle()) {
+    if (stage != QnFullUpdateStage::Init) {
         ui->internetUpdateButton->setEnabled(false);
         ui->localUpdateButton->setEnabled(false);
-        ui->latestBuildLabel->setEnabled(false);
-        ui->specificBuildLabel->setEnabled(false);
     } else { /* Stage returned to idle, update finished. */
-        ui->latestBuildLabel->setEnabled(true);
-        ui->specificBuildLabel->setEnabled(true);
     }
 
     ui->dayWarningLabel->setVisible(QDateTime::currentDateTime().date().dayOfWeek() >= tooLateDayOfWeek);
 
-    ui->updateStateWidget->setVisible(stage != QnFullUpdateStage::Init);
+    ui->progressStatusWidget->setCurrentWidget(stage == QnFullUpdateStage::Init
+        ? ui->updateTargetPage
+        : ui->updateRunningPage
+        );
 
     bool cancellable = false;
 

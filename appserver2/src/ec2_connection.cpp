@@ -33,7 +33,7 @@ namespace ec2
         QnDbManager::instance()->doQueryNoLock(nullptr, paramList);
 
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
-        QnTransactionMessageBus::instance()->setLocalPeer(ApiPeerData(qnCommon->moduleGUID(), Qn::PT_Server));
+        QnTransactionMessageBus::instance()->setLocalPeer(ApiPeerData(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), Qn::PT_Server));
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()

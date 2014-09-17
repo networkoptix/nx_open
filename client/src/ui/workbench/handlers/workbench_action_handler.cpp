@@ -345,6 +345,9 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     if (layout->getItems().size() >= maxItems)
         return;
 
+    if (resource->hasFlags(Qn::desktop_camera))
+        return;
+
     {
         //TODO: #GDM #Common refactor duplicated code
         bool isServer = resource->hasFlags(Qn::server);

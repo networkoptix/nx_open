@@ -16,7 +16,7 @@ namespace {
 QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveResource() 
 {
     m_mainWidget = mainWindow;
-    addFlags(Qn::local_live_cam);
+    addFlags(Qn::local_live_cam | Qn::desktop_camera);
 
     const QString name = lit("Desktop");
     setName(name);

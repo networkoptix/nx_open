@@ -876,7 +876,7 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
 
         QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
         localInfo.data.videoWallControlSessions++;
-        QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
+        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
     } else {
         disconnect(workbench(),    &QnWorkbench::itemChanged,           this,   &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
         disconnect(layout,         &QnWorkbenchLayout::itemAdded,       this,   &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode);
@@ -894,7 +894,7 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
 
         QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
         localInfo.data.videoWallControlSessions--;
-        QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
+        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
     }
 }
 
@@ -1097,6 +1097,14 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 /*------------------------------------ HANDLERS ------------------------------------------*/
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
+    QnLicenseListHelper licenseList(qnLicensePool->getLicenses());
+    if (licenseList.totalLicenseByType(Qn::LC_VideoWall) < videowallStarterPackAmount) {
+        QMessageBox::warning(mainWindow(),
+            tr("More licenses required"),
+            tr("To enable the feature please activate Video Wall starter license"));
+        return;
+    }
+
 	QStringList usedNames;
     foreach(const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::videowall))
         usedNames << resource->getName().trimmed().toLower();

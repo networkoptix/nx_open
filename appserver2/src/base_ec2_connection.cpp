@@ -202,6 +202,7 @@ namespace ec2
         url.setPath("/ec2/events");
         QUrlQuery q;
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());
+        q.addQueryItem("runtime-guid", qnCommon->runningInstanceGUID().toString());
         url.setQuery(q);
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);
     }
@@ -213,6 +214,7 @@ namespace ec2
         url.setPath("/ec2/events");
         QUrlQuery q;
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());
+        q.addQueryItem("runtime-guid", qnCommon->runningInstanceGUID().toString());
         url.setQuery(q);
         QnTransactionMessageBus::instance()->removeConnectionFromPeer(url);
     }

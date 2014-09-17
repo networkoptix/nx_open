@@ -637,9 +637,12 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
 }
 
 Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceList &resources) {
-    foreach(const QnResourcePtr &resource, resources)
-        if(resource->hasFlags(Qn::media) || resource->hasFlags(Qn::server))
+    foreach(const QnResourcePtr &resource, resources) {
+        if (resource->hasFlags(Qn::desktop_camera))
+            continue;
+        if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::server))
             return Qn::EnabledAction;
+    }
 
     return Qn::InvisibleAction;
 }

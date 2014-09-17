@@ -28,12 +28,13 @@ namespace ec2
             NotDefined                  = 0,
 
             /* System */
-            tranSyncRequest             = 1,    /*< QnTranState */
+            tranSyncRequest             = 1,    /*< ApiSyncRequestData */
             tranSyncResponse            = 2,    /*< QnTranStateResponse */       
             lockRequest                 = 3,    /*< ApiLockData */
             lockResponse                = 4,    /*< ApiLockData */
             unlockRequest               = 5,    /*< ApiLockData */
             peerAliveInfo               = 6,    /*< ApiPeerAliveData */
+            tranSyncDone                = 7,    /*< ApiTranSyncDoneData */
 
             /* Connection */
             testConnection              = 100,  /*< ApiLoginData */
@@ -122,10 +123,6 @@ namespace ec2
             addDiscoveryInformation     = 1402, /*< ApiDiscoveryDataList*/
             removeDiscoveryInformation  = 1403, /*< ApiDiscoveryDataList*/
 
-            addConnection               = 1501, /*< ApiConnectionData */
-            removeConnection            = 1502, /*< ApiConnectionData */
-            availableConnections        = 1503, /*< ApiConnectionDataList */
-
             /* Misc */
             forcePrimaryTimeServer      = 2001,  /*< ApiIdData */
             broadcastPeerSystemTime     = 2002,  /*< ApiPeerSystemTimeData*/
@@ -138,7 +135,7 @@ namespace ec2
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
             dumpDatabase                = 9005,  /*< ApiDatabaseDumpData */
             restoreDatabase             = 9006,  /*< ApiDatabaseDumpData */
-            syncDoneMarker              = 9009,  /*< ApiSyncMarkerData*/
+            updatePersistentSequence              = 9009,  /*< ApiUpdateSequenceData*/
 
             maxTransactionValue         = 65535
         };

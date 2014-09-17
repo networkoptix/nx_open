@@ -19,6 +19,7 @@
 #include "api_peer_system_time_data.h"
 #include "api_resource_data.h"
 #include "api_resource_type_data.h"
+#include "api_tran_state_data.h"
 #include "api_server_alive_data.h"
 #include "api_server_info_data.h"
 #include "api_stored_file_data.h"
@@ -46,6 +47,8 @@ inline void serialize_field(const QList<T> &, QVariant *) { return; }
 
 inline void serialize_field(const ec2::ApiPeerData &, QVariant *) { return; }
 inline void serialize_field(const ec2::ApiRuntimeData &, QVariant *) { return; }
+inline void serialize_field(const ec2::ApiPeerAliveData &, QVariant *) { return; }
+inline void serialize_field(const ec2::QnTranState &, QVariant *) { return; }
 
 template<class T, class Allocator>
 inline void deserialize_field(const QVariant &, std::vector<T, Allocator> *) { return; }
@@ -58,6 +61,8 @@ inline void deserialize_field(const QVariant &, QList<T> *) { return; }
 
 inline void deserialize_field(const QVariant &, ec2::ApiPeerData *) { return; }
 inline void deserialize_field(const QVariant &, ec2::ApiRuntimeData *) { return; }
+inline void deserialize_field(const QVariant &, ec2::ApiPeerAliveData *) { return; }
+inline void deserialize_field(const QVariant &, ec2::QnTranState *) { return; }
 
 namespace ec2 {
 

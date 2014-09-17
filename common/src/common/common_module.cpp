@@ -31,6 +31,7 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
 
     /* Init members. */
     m_sessionManager = new QnSessionManager(); //instance<QnSessionManager>();
+    m_runUuid = QUuid::createUuid();
 }
 
 QnCommonModule::~QnCommonModule() {

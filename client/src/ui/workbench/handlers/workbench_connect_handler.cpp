@@ -282,7 +282,6 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl) {
     context()->setUserName(appServerUrl.userName());
 
     QnGlobalModuleFinder::instance()->setConnection(result.connection());
-    QnRouter::instance()->setConnection(result.connection());
 
     return true;
 }
@@ -299,10 +298,7 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
     hideMessageBox();
 
     QnGlobalModuleFinder::instance()->setConnection(NULL);
-    QnRouter::instance()->setConnection(NULL);
-
     QnClientMessageProcessor::instance()->init(NULL);
-
     QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
