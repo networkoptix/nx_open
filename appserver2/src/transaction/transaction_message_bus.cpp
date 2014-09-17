@@ -289,6 +289,7 @@ void QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
             QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo);
             tran.params = aliveData;
             tran.params.isAlive = true;
+            Q_ASSERT(!aliveData.peer.instanceId.isNull());
             sendTransaction(tran); // resend alive info for that peer
             return; // ignore peer offline transaction
         }
@@ -346,6 +347,7 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAl
     gotAliveData(tran.params, transport);
 
     QnTransaction<ApiPeerAliveData> modifiedTran(tran);
+    Q_ASSERT(!modifiedTran.params.peer.instanceId.isNull());
     modifiedTran.params.persistentState.values.clear(); // do not proxy persistent state to other peers. this checking required for directly connected peers only
     modifiedTran.params.runtimeState.values.clear();
     proxyTransaction(tran, ttHeader);
@@ -824,6 +826,7 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
     {
         QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo);
         tran.params = aliveData;
+        Q_ASSERT(!tran.params.peer.instanceId.isNull());
         if (isAlive && transactionLog && peer.id == m_localPeer.id) {
             tran.params.persistentState = transactionLog->getTransactionsState();
             tran.params.runtimeState = runtimeTransactionLog->getTransactionsState();
