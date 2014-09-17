@@ -84,6 +84,7 @@ private:
     void prepareToUpload();
     void lockMutex();
     void unlockMutex();
+    void clearUpdateFlag();
 
     void removeTemporaryDir();
 private:

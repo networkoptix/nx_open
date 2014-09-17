@@ -22,8 +22,9 @@
 #include <utils/applauncher_utils.h>
 #include <utils/common/sleep.h>
 #include <utils/update/update_utils.h>
-
 #include <utils/common/app_info.h>
+
+#include <api/runtime_info_manager.h>
 
 namespace {
 
@@ -90,6 +91,7 @@ void QnUpdateProcess::run() {
     }
 
     unlockMutex();
+    clearUpdateFlag();
     removeTemporaryDir();
 
     QnUpdateResult result(m_updateResult);
@@ -391,7 +393,28 @@ void QnUpdateProcess::unlockMutex() {
     }
 }
 
+void QnUpdateProcess::clearUpdateFlag() {
+    QnPeerRuntimeInfo runtimeInfo = QnRuntimeInfoManager::instance()->localInfo();
+    if (runtimeInfo.data.updateStarted) {
+        runtimeInfo.data.updateStarted = false;
+        QnRuntimeInfoManager::instance()->updateLocalItem(runtimeInfo);
+    }
+}
+
 void QnUpdateProcess::at_mutexLocked() {
+    QnRuntimeInfoManager *runtimeInfoManager = QnRuntimeInfoManager::instance();
+    foreach (const QnPeerRuntimeInfo &runtimeInfo, runtimeInfoManager->items()->getItems()) {
+        if (runtimeInfo.data.updateStarted) {
+            unlockMutex();
+            finishUpdate(QnUpdateResult::LockFailed);
+            return;
+        }
+    }
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
+    localInfo.data.updateStarted = true;
+    runtimeInfoManager->updateLocalItem(localInfo);
+    unlockMutex();
+
     uploadUpdatesToServers();
 }
 
