@@ -165,7 +165,6 @@ void QnTransactionTransport::close()
         assert( !m_socket );
         m_readSync = false;
         m_writeSync = false;
-        m_dataToSend.clear();
     }
     setState(State::Closed);
 }
@@ -388,6 +387,12 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) );
 }
 
+bool QnTransactionTransport::hasUnsendData() const
+{
+    QMutexLocker lock(&m_mutex);
+    return !m_dataToSend.empty();
+}
+
 void QnTransactionTransport::sendHttpKeepAlive()
 {
     QMutexLocker lock(&m_mutex);
@@ -461,6 +466,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 
 
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
+    nx_http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find("runtime-guid");
 
     if (itrGuid == client->response()->headers.end())
     {
@@ -469,6 +475,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
     }
 
     m_remotePeer.id = QUuid(itrGuid->second);
+    if (itrRuntimeGuid != client->response()->headers.end())
+        m_remotePeer.instanceId = QUuid(itrRuntimeGuid->second);
+    Q_ASSERT(!m_remotePeer.instanceId.isNull());
     m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server peers only
     emit peerIdDiscovered(m_remoteAddr, m_remotePeer.id);
 
@@ -656,7 +665,7 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
         QnUbjsonReader<QByteArray> stream(&serializedTran);
         QnUbjson::deserialize(&stream, &abtractTran);
         qDebug() << "send direct transaction to peer " << remotePeer().id << "command=" << ApiCommand::toString(abtractTran.command) 
-            << "transport seq=" << header.sequence << "db seq=" << abtractTran.persistentInfo.sequence << "timestamp=" << abtractTran.persistentInfo.timestamp;
+            << "tt seq=" << header.sequence << "db seq=" << abtractTran.persistentInfo.sequence << "timestamp=" << abtractTran.persistentInfo.timestamp;
 #endif
 
         addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));

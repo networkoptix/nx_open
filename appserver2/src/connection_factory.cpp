@@ -26,6 +26,7 @@
 #include "http/ec2_transaction_tcp_listener.h"
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
+#include "transaction/runtime_transaction_log.h"
 
 namespace ec2
 {
@@ -44,6 +45,7 @@ namespace ec2
         qRegisterMetaType<QnTransactionTransportHeader>( "QnTransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
 
         ec2::QnDistributedMutexManager::initStaticInstance( new ec2::QnDistributedMutexManager() );
+        m_runtimeTransactionLog.reset(new QnRuntimeTransactionLog());
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
@@ -208,13 +210,6 @@ namespace ec2
         registerUpdateFuncHandler<ApiDiscoveryDataList>(restProcessorPool, ApiCommand::removeDiscoveryInformation);
         //AbstractMiscManager::changeSystemName
         registerUpdateFuncHandler<ApiSystemNameData>(restProcessorPool, ApiCommand::changeSystemName);
-
-        //AbstractMiscManager::addConnection
-        registerUpdateFuncHandler<ApiConnectionData>(restProcessorPool, ApiCommand::addConnection);
-        //AbstractMiscManager::removeConnection
-        registerUpdateFuncHandler<ApiConnectionData>(restProcessorPool, ApiCommand::removeConnection);
-        //AbstractMiscManager::availableConnections
-        registerUpdateFuncHandler<ApiConnectionDataList>(restProcessorPool, ApiCommand::availableConnections);
 
        //AbstractECConnection
         registerUpdateFuncHandler<ApiDatabaseDumpData>( restProcessorPool, ApiCommand::restoreDatabase );
