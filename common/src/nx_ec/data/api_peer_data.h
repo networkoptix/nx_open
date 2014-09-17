@@ -30,6 +30,10 @@ namespace ec2
             return peerType != Qn::PT_Server;
         }
 
+        bool isServer() const {
+            return peerType == Qn::PT_Server;
+        }
+
         /** Unique ID of the peer. */ 
         QUuid id;
 

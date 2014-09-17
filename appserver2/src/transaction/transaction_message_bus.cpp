@@ -982,7 +982,6 @@ void QnTransactionMessageBus::doPeriodicTasks()
         {
             if (transport->getState() == QnTransactionTransport::ReadyForStreaming && !transport->remotePeer().isClient()) 
             {
-                transport->sendHttpKeepAlive();
                 if (transport->isHttpKeepAliveTimeout()) {
                     qWarning() << "Transaction Transport HTTP keep-alive timeout for connection" << transport->remotePeer().id;
                     transport->setState(QnTransactionTransport::Error);

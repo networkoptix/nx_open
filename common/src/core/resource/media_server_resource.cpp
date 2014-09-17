@@ -382,9 +382,15 @@ QString QnMediaServerResource::getSystemName() const {
 }
 
 void QnMediaServerResource::setSystemName(const QString &systemName) {
-    QMutexLocker lock(&m_mutex);
+    {
+        QMutexLocker lock(&m_mutex);
 
-    m_systemName = systemName;
+        if (m_systemName == systemName)
+            return;
+
+        m_systemName = systemName;
+    }
+    emit systemNameChanged(toSharedPointer(this));
 }
 
 QnModuleInformation QnMediaServerResource::getModuleInformation() const {

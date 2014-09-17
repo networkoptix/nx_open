@@ -21,7 +21,6 @@
 
 #include "utils/common/log.h"
 #include "aio/async_socket_helper.h"
-#include "system_socket_impl.h"
 
 
 #ifdef Q_OS_WIN
@@ -850,6 +849,11 @@ bool CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<vo
 bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
 {
     return m_aioHelper->sendAsyncImpl( buf, std::move( handler ) );
+}
+
+bool CommunicatingSocket::registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
+{
+    return m_aioHelper->registerTimerImpl( timeoutMs, std::move( handler ) );
 }
 
 
