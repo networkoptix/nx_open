@@ -83,13 +83,14 @@ void QnRuntimeInfoManager::updateLocalItem(const QnPeerRuntimeInfo& value)
 {
     QMutexLocker lock(&m_updateMutex);
     Q_ASSERT(value.uuid == qnCommon->moduleGUID());
+    QnPeerRuntimeInfo modifiedValue = value;
     if (m_items->hasItem(value.uuid)) {
         int oldVersion = m_items->getItem(value.uuid).data.version;
-        QnPeerRuntimeInfo modifiedValue = value;
         modifiedValue.data.version = oldVersion + 1;
         m_items->updateItem(value.uuid, modifiedValue);
     }
     else {
-        m_items->addItem(value);
+        modifiedValue.data.version = 1;
+        m_items->addItem(modifiedValue);
     }
 }
