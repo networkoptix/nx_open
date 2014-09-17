@@ -208,6 +208,7 @@ namespace ec2
         void doPeriodicTasks();
         bool checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport);
         void at_peerIdDiscovered(const QUrl& url, const QUuid& id);
+        void at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
     private:
         /** Info about us. Should be set before start(). */
         ApiPeerData m_localPeer;

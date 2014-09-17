@@ -201,6 +201,7 @@ void QnTransactionMessageBus::start()
     assert(!m_localPeer.id.isNull());
     if (!m_thread->isRunning())
         m_thread->start();
+    connect(QnRuntimeTransactionLog::instance(), &QnRuntimeTransactionLog::runtimeDataUpdated, this, &QnTransactionMessageBus::at_runtimeDataUpdated);
 }
 
 QnTransactionMessageBus::~QnTransactionMessageBus()
@@ -352,6 +353,9 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAl
 
 bool QnTransactionMessageBus::onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, QnTransactionTransport* transport)
 {
+    if (tran.params.peer.id == qnCommon->moduleGUID())
+        return false; // ignore himself
+
     gotAliveData(ApiPeerAliveData(tran.params.peer, true), transport);
     if (runtimeTransactionLog->contains(tran))
         return false;
@@ -1150,4 +1154,12 @@ ec2::ApiPeerData QnTransactionMessageBus::localPeer() const {
     return m_localPeer;
 }
 
+void QnTransactionMessageBus::at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& tran)
+{
+    // data was changed by local transaction log (old data instance for same peer was removed), emit notification to apply new data version outside
+    if( m_handler )
+        m_handler->triggerNotification(tran);
 }
+
+}
+

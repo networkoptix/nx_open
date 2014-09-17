@@ -13,8 +13,9 @@
 
 namespace ec2
 {
-    class QnRuntimeTransactionLog
+    class QnRuntimeTransactionLog: public QObject
     {
+        Q_OBJECT
     public:
 
         QnRuntimeTransactionLog();
@@ -32,6 +33,13 @@ namespace ec2
         QnTranState getTransactionsState();
         ErrorCode getTransactionsAfter(const QnTranState& state, QList<QnTransaction<ApiRuntimeData>>& result);
         void clearRuntimeData();
+signals:
+        /*
+        * In case if some peer has been restarted, but old runtine data (with old instaceID) still present in the cloud.
+        * So, old data will be removed soon. If we have 2 different data for same peer and old data has been deleted
+        * this signal is emitted
+        */
+        void runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
     private:
         QnTranState m_state;
         QMap<QnTranStateKey, ApiRuntimeData> m_data;

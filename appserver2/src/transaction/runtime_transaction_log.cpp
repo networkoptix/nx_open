@@ -1,5 +1,4 @@
 #include "runtime_transaction_log.h"
-#include "api/runtime_info_manager.h"
 
 namespace ec2
 {
@@ -37,8 +36,11 @@ void QnRuntimeTransactionLog::clearOldRuntimeData(const QnTranStateKey& key)
             itr = m_state.values.erase(itr);
         }
     }
-    if (newPeerFound && oldPeerFound)
-        QnRuntimeInfoManager::instance()->updateItem(m_data[key]);
+    if (newPeerFound && oldPeerFound) {
+        QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged);
+        tran.params = m_data[key];
+        emit runtimeDataUpdated(tran);
+    }
 }
 
 void QnRuntimeTransactionLog::clearRuntimeData(const QUuid& id)

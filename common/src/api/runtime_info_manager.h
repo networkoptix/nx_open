@@ -52,7 +52,6 @@ public:
     QnPeerRuntimeInfo item(const QUuid& id) const;
 
     void updateLocalItem(const QnPeerRuntimeInfo& value);
-    void updateItem(const QnPeerRuntimeInfo& value);
 signals:
     void runtimeInfoAdded(const QnPeerRuntimeInfo &data);
     void runtimeInfoChanged(const QnPeerRuntimeInfo &data);
@@ -61,8 +60,6 @@ private:
     virtual void storedItemAdded(const QnPeerRuntimeInfo &item) override;
     virtual void storedItemRemoved(const QnPeerRuntimeInfo &item) override;
     virtual void storedItemChanged(const QnPeerRuntimeInfo &item) override;
-
-    void updateItemNoLock(const QnPeerRuntimeInfo& value);
 private:
     /** Mutex that is to be used when accessing items. */
     mutable QMutex m_mutex;
