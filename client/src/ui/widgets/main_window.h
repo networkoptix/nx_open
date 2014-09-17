@@ -57,7 +57,7 @@ public:
 
     void updateDecorationsState();
 public slots:
-    void handleMessage(const QString &message);
+    bool handleMessage(const QString &message);
 
 protected:
     virtual bool event(QEvent *event) override;

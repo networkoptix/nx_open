@@ -602,8 +602,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     //PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
 
     /* Process input files. */
+    bool haveInputFiles = false;
     for (int i = 1; i < argc; ++i)
-        mainWindow->handleMessage(QFile::decodeName(argv[i]));
+        haveInputFiles |= mainWindow->handleMessage(QFile::decodeName(argv[i]));
     if(!noSingleApplication)
         QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
 
@@ -628,11 +629,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* If no input files were supplied --- open connection settings dialog. */
     
     /* 
-     * Do not try to connect in the only case: we were not connected and clicked "Open in new window".
+     * Do not try to connect in the following cases:
+     * * we were not connected and clicked "Open in new window"
+     * * we have opened exported exe-file 
      * Otherwise we should try to connect or show Login Dialog.
      */    
-    if (instantDrop.isEmpty()) {
-
+    if (instantDrop.isEmpty() && !haveInputFiles) {
         /* Set authentication parameters from command line. */
         QUrl appServerUrl = QUrl::fromUserInput(authenticationString);
         if (!videowallGuid.isNull()) {
