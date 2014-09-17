@@ -577,6 +577,12 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         connect(camera,     &QnVirtualCameraResource::groupNameChanged, this,   &QnResourcePoolModel::at_camera_groupNameChanged);
     }
 
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (server && server->getStatus() == Qn::Incompatible) {
+        connect(server,     &QnMediaServerResource::systemNameChanged,  this,   &QnResourcePoolModel::at_server_systemNameChanged);
+        m_rootNodes[Qn::OtherSystemsNode]->update();
+    }
+
     QnResourcePoolModelNode *node = this->node(resource);
     node->setResource(resource);
 
@@ -592,11 +598,6 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
             at_videoWall_itemAddedOrChanged(videoWall, item);
         foreach(const QnVideoWallMatrix &matrix, videoWall->matrices()->getItems())
             at_videoWall_matrixAddedOrChanged(videoWall, matrix);
-    }
-
-    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) {
-        if (server->getStatus() == Qn::Incompatible)
-            m_rootNodes[Qn::OtherSystemsNode]->update();
     }
 }
 
@@ -652,12 +653,7 @@ void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resou
 void QnResourcePoolModel::at_resource_resourceChanged(const QnResourcePtr &resource) {
     QnResourcePoolModelNode *node = this->node(resource);
 
-    bool oldIncompatible = node->resourceStatus() == Qn::Incompatible;
-
     node->update();
-
-    if (oldIncompatible != (node->resourceStatus() == Qn::Incompatible))
-        node->setParent(expectedParent(node));
 
     foreach(QnResourcePoolModelNode *node, m_itemNodesByResource[resource])
         node->update();
@@ -726,6 +722,15 @@ void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResource
         recorder->m_displayName = camera->getGroupName();
         recorder->changeInternal();
     }
+}
+
+void QnResourcePoolModel::at_server_systemNameChanged(const QnResourcePtr &resource) {
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return;
+
+    QnResourcePoolModelNode *node = this->node(resource);
+    node->setParent(expectedParent(node));
 }
 
 void QnResourcePoolModel::at_commonModule_systemNameChanged() {

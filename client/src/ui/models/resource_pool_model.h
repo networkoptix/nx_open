@@ -98,6 +98,7 @@ private slots:
 
     void at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera);
 
+    void at_server_systemNameChanged(const QnResourcePtr &resource);
     void at_commonModule_systemNameChanged();
 
 private:
