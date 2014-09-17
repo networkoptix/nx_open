@@ -154,6 +154,14 @@ public:
 
     void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
     {
+        if( eventType == aio::etNone )
+        {
+            cancelAsyncIO( aio::etRead, waitForRunningHandlerCompletion );
+            cancelAsyncIO( aio::etWrite, waitForRunningHandlerCompletion );
+            cancelAsyncIO( aio::etTimedOut, waitForRunningHandlerCompletion );
+            return;
+        }
+
         aio::AIOService::instance()->removeFromWatch( m_socket, eventType, waitForRunningHandlerCompletion );
         std::atomic_thread_fence( std::memory_order_acquire );
         if( m_threadHandlerIsRunningIn.load( std::memory_order_relaxed ) == QThread::currentThreadId() )

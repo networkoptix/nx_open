@@ -79,8 +79,7 @@ int QnTransactionTransport::readChunkHeader(const quint8* data, int dataLen, nx_
 void QnTransactionTransport::closeSocket()
 {
     if (m_socket) {
-        m_socket->cancelAsyncIO( aio::etRead );
-        m_socket->cancelAsyncIO( aio::etWrite );
+        m_socket->cancelAsyncIO();
         m_socket->close();
         m_socket.reset();
     }
@@ -100,13 +99,18 @@ void QnTransactionTransport::processExtraData()
 
 void QnTransactionTransport::startListening()
 {
-    if (m_socket) {
+    assert( m_socket );
+
+    if( m_socket )
+    {
         m_socket->setRecvTimeout(SOCKET_TIMEOUT);
         m_socket->setSendTimeout(SOCKET_TIMEOUT);
         m_socket->setNonBlockingMode(true);
         m_chunkHeaderLen = 0;
         using namespace std::placeholders;
         m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) );
+        //if( m_remotePeer.isClient() )
+            m_socket->registerTimer( TCP_KEEPALIVE_TIMEOUT, std::bind(&QnTransactionTransport::sendHttpKeepAlive, this) );
     }
 }
 
@@ -396,12 +400,13 @@ bool QnTransactionTransport::hasUnsendData() const
 void QnTransactionTransport::sendHttpKeepAlive()
 {
     QMutexLocker lock(&m_mutex);
-    if (m_sendTimer.elapsed() > TCP_KEEPALIVE_TIMEOUT && m_dataToSend.empty() && m_socket) 
+    if (m_dataToSend.empty()) 
     {
         m_dataToSend.push_back( QByteArray() );
         m_dataToSend.front().encodedSourceData = m_emptyChunkData;
         serializeAndSendNextDataBuffer();
     }
+    m_socket->registerTimer( TCP_KEEPALIVE_TIMEOUT, std::bind(&QnTransactionTransport::sendHttpKeepAlive, this) );
 }
 
 bool QnTransactionTransport::isHttpKeepAliveTimeout() const
