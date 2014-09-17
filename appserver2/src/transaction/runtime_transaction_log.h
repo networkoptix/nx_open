@@ -10,6 +10,7 @@
 #include "nx_ec/data/api_runtime_data.h"
 #include "ubjson_transaction_serializer.h"
 #include "nx_ec/data/api_tran_state_data.h"
+#include "api/runtime_info_manager.h"
 
 namespace ec2
 {
@@ -40,6 +41,8 @@ signals:
         * this signal is emitted
         */
         void runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
+private slots:
+        void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
     private:
         QnTranState m_state;
         QMap<QnTranStateKey, ApiRuntimeData> m_data;

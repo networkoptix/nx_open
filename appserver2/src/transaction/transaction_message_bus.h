@@ -57,19 +57,6 @@ namespace ec2
                 m_handler = nullptr;
         }
 
-        void sendTransaction(const QnTransaction<ApiRuntimeData>& tran, const QnPeerSet& dstPeers = QnPeerSet())
-        {
-            Q_ASSERT(tran.command == ApiCommand::runtimeInfoChanged);
-            QMutexLocker lock(&m_mutex);
-            if (runtimeTransactionLog)
-                runtimeTransactionLog->saveTransaction(tran);
-            if (m_connections.isEmpty())
-                return;
-            QnTransactionTransportHeader ttHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers);
-            ttHeader.fillSequence();
-            sendTransactionInternal(tran, ttHeader);
-        }
-
         template<class T>
         void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
         {

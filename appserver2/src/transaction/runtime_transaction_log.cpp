@@ -15,6 +15,17 @@ QnRuntimeTransactionLog::QnRuntimeTransactionLog()
 {
     Q_ASSERT(!globalInstance);
     globalInstance = this;
+    
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
+}
+
+void QnRuntimeTransactionLog::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
+{
+    QMutexLocker lock(&m_mutex);
+    QnTranStateKey key(runtimeInfo.data.peer.id, runtimeInfo.data.peer.instanceId);
+    m_state.values[key] = runtimeInfo.data.version;
+    m_data[key] = runtimeInfo.data;
 }
 
 void QnRuntimeTransactionLog::clearOldRuntimeData(const QnTranStateKey& key)
