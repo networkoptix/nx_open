@@ -203,10 +203,10 @@ namespace ec2
 		QScopedPointer<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
 
         struct RemoteUrlConnectInfo {
-            RemoteUrlConnectInfo(): lastConnectedTime(0) {}
-            qint64 lastConnectedTime;
+            RemoteUrlConnectInfo()  { lastConnectedTime.invalidate(); }
+            QElapsedTimer lastConnectedTime;
             QUuid discoveredPeer;
-            QTime discoveredTimeout;
+            QElapsedTimer discoveredTimeout;
         };
 
         QMap<QUrl, RemoteUrlConnectInfo> m_remoteUrls;

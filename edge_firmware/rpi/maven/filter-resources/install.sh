@@ -6,7 +6,7 @@ BETA=
 if [[ "${beta}" == "true" ]]; then 
   BETA="-beta" 
 fi 
-DISTRIB=$COMPANY_NAME-mediaserver-$box-${release.version}.${buildNumber}$BETA
+DISTRIB=$COMPANY_NAME-mediaserver-${box}-${release.version}.${buildNumber}$BETA
 
 update () {
     /etc/init.d/$COMPANY_NAME-mediaserver stop
