@@ -482,6 +482,19 @@ void QnTransactionMessageBus::updatePersistentMarker(const QnTransaction<ApiUpda
         transactionLog->updateSequence(tran.params);
 }
 
+void QnTransactionMessageBus::proxyFillerTransaction(const QnAbstractTransaction& tran, const QnTransactionTransportHeader& transportHeader)
+{
+    // proxy filler transaction to avoid gaps in the persistent sequence
+    QnTransaction<ApiUpdateSequenceData> fillerTran(ApiCommand::updatePersistentSequence);
+    ApiSyncMarkerRecord record;
+    record.peerID = tran.peerID;
+    record.dbID = tran.persistentInfo.dbID;
+    record.sequence = tran.persistentInfo.sequence;
+    fillerTran.params.markers.push_back(record);
+    transactionLog->updateSequence(fillerTran.params);
+    proxyTransaction(fillerTran, transportHeader);
+}
+
 template <class T>
 void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) 
 {
@@ -547,35 +560,22 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             break;
         default:
             // general transaction
-            if (!tran.persistentInfo.isNull() && transactionLog) 
-            {
-                QnTransactionLog::ContainsReason isContains = transactionLog->contains(tran);
-                if (isContains != QnTransactionLog::Reason_None) 
-                {
-                    // already processed
-                    if (isContains == QnTransactionLog::Reason_Timestamp) {
-                        // proxy filler transaction to avoid gaps in the persistent sequence
-                        QnTransaction<ApiUpdateSequenceData> fillerTran(ApiCommand::updatePersistentSequence);
-                        ApiSyncMarkerRecord record;
-                        record.peerID = tran.peerID;
-                        record.dbID = tran.persistentInfo.dbID;
-                        record.sequence = tran.persistentInfo.sequence;
-                        fillerTran.params.markers.push_back(record);
-                        transactionLog->updateSequence(fillerTran.params);
-                        proxyTransaction(fillerTran, transportHeader);
-                    }
-                    return; 
-                }
-            }
             if (!tran.persistentInfo.isNull() && dbManager)
             {
                 QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
                 ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
-                if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
-                {
-                    qWarning() << "Can't handle transaction" << ApiCommand::toString(tran.command) << "reopen connection";
-                    sender->setState(QnTransactionTransport::Error);
-                    return;
+                switch(errorCode) {
+                    case ErrorCode::ok:
+                    case ErrorCode::skipped:
+                        break;
+                    case ErrorCode::containsBecauseTimestamp:
+                        proxyFillerTransaction(tran, transportHeader);
+                    case ErrorCode::containsBecauseSequence:
+                        return; // do not proxy if transaction already exists
+                    default:
+                        qWarning() << "Can't handle transaction" << ApiCommand::toString(tran.command) << "reopen connection";
+                        sender->setState(QnTransactionTransport::Error);
+                        return;
                 }
             }
 

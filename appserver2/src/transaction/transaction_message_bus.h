@@ -188,6 +188,7 @@ namespace ec2
         void printTranState(const QnTranState& tranState);
         template <class T> void proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader);
         void updatePersistentMarker(const QnTransaction<ApiUpdateSequenceData>& tran, QnTransactionTransport* transport);
+        void proxyFillerTransaction(const QnAbstractTransaction& tran, const QnTransactionTransportHeader& transportHeader);
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();

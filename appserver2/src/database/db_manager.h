@@ -84,6 +84,13 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
             Q_ASSERT_X(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
+            if (!tran.isLocal) {
+                QnTransactionLog::ContainsReason isContains = transactionLog->contains(tran);
+                if (isContains == QnTransactionLog::Reason_Timestamp)
+                    return ErrorCode::containsBecauseTimestamp;
+                else if (isContains == QnTransactionLog::Reason_Sequence)
+                    return ErrorCode::containsBecauseSequence;
+            }
             ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
                 return result;
@@ -102,11 +109,7 @@ namespace ec2
         {
             Q_ASSERT_X(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             Locker lock(this);
-            ErrorCode result = executeTransactionInternal(tran);
-            if (result != ErrorCode::ok)
-                return result;
-
-            result = transactionLog->saveTransaction( tran, serializedTran);
+            ErrorCode result = executeTransactionNoLock(tran, serializedTran);
             if (result == ErrorCode::ok)
                 lock.commit();
             return result;

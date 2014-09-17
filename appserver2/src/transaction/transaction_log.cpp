@@ -75,6 +75,7 @@ void QnTransactionLog::init()
     if (queryTime.exec() && queryTime.next()) {
         m_currentTime = qMax(m_currentTime, queryTime.value(0).toLongLong());
     }
+    m_lastTimestamp = m_currentTime;
     m_relativeTimer.start();
 
     QSqlQuery querySequence(m_dbManager->getDB());
@@ -251,7 +252,6 @@ int QnTransactionLog::getLatestSequence(const QnTranStateKey& key) const
 QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& hash) const
 {
 
-    QReadLocker lock(&m_dbManager->getMutex());
     QnTranStateKey key (tran.peerID, tran.persistentInfo.dbID);
     Q_ASSERT(tran.persistentInfo.sequence != 0);
     if (m_state.values.value(key) >= tran.persistentInfo.sequence) {
