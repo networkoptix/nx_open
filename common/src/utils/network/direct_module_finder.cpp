@@ -7,6 +7,8 @@
 
 #include <utils/common/model_functions.h>
 #include <utils/common/log.h>
+#include <utils/network/http/asynchttpclient.h>
+#include <utils/network/http/async_http_client_reply.h>
 #include <rest/server/json_rest_result.h>
 #include <common/common_module.h>
 
@@ -159,27 +161,28 @@ void QnDirectModuleFinder::activateRequests() {
     while (m_activeRequests.size() < m_maxConnections && !m_requestQueue.isEmpty()) {
         QUrl url = m_requestQueue.dequeue();
 
-        nx_http::AsyncHttpClientPtr request = std::make_shared<nx_http::AsyncHttpClient>();
-        connect(request.get(), &nx_http::AsyncHttpClient::done, this, &QnDirectModuleFinder::at_reply_finished, Qt::DirectConnection);
+        nx_http::AsyncHttpClientPtr client = std::make_shared<nx_http::AsyncHttpClient>();
+        QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(client, this);
+        connect(reply, &QnAsyncHttpClientReply::finished, this, &QnDirectModuleFinder::at_reply_finished);
 
-        m_activeRequests.insert(url, request);
-        request->doGet(url);
+        m_activeRequests.insert(url);
+        client->doGet(url);
     }
 }
 
-void QnDirectModuleFinder::at_reply_finished(const nx_http::AsyncHttpClientPtr &request) {
-    request->terminate();
+void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
+    reply->deleteLater();
 
-    QUrl url = request->url();
-    if (!m_activeRequests.take(url))
+    QUrl url = reply->url();
+    if (!m_activeRequests.remove(url))
         Q_ASSERT_X(0, "Reply that is not in the set of active requests has finished!", Q_FUNC_INFO);
 
     activateRequests();
 
     url = trimmedUrl(url);
 
-    if (!request->failed()) {
-        QByteArray data = request->fetchMessageBodyBuffer();
+    if (!reply->isFailed()) {
+        QByteArray data = reply->data();
 
         QnJsonRestResult result;
         QJson::deserialize(data, &result);
