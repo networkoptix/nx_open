@@ -109,7 +109,7 @@ void QnTransactionTransport::startListening()
         m_chunkHeaderLen = 0;
         using namespace std::placeholders;
         m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) );
-        //if( m_remotePeer.isClient() )
+        if( m_remotePeer.isServer() )
             m_socket->registerTimer( TCP_KEEPALIVE_TIMEOUT, std::bind(&QnTransactionTransport::sendHttpKeepAlive, this) );
     }
 }
