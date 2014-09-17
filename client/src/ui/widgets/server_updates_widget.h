@@ -47,7 +47,7 @@ private:
     void initLinkButtons();
     void initBuildSelectionButtons();
 
-    void checkForUpdatesInternet(bool autoSwitch = false);
+    void checkForUpdatesInternet(bool autoSwitch = false, bool autoStart = false);
     void checkForUpdatesLocal();
 
 private:

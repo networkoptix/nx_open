@@ -142,8 +142,10 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible( QnSystemHealt
 
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr &resource, bool visible) {
     /* No events but 'Connection lost' should be displayed if we are disconnected. */
-    if (visible && message != QnSystemHealth::ConnectionLost)
-        Q_ASSERT(context()->user());
+    if (visible && message != QnSystemHealth::ConnectionLost) {
+        //TODO: #sivanov There're users which could be added before admin.
+//        Q_ASSERT(context()->user());
+    }
 
     /* Only admins can see some system health events */
     if (visible && adminOnlyMessage(message) && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission))

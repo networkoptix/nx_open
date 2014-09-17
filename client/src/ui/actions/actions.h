@@ -361,6 +361,10 @@ namespace Qn {
          */
         SystemAdministrationAction,
 
+        /**
+         * System administration dialog - updates page.
+         */
+        SystemUpdateAction,
 
         /* Tab bar actions. */
 

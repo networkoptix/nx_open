@@ -997,7 +997,7 @@ QnDisjunctionActionCondition::QnDisjunctionActionCondition(QnActionCondition *co
 }
 
 Qn::ActionVisibility QnDisjunctionActionCondition::check(const QnActionParameters &parameters) {
-    Qn::ActionVisibility result = Qn::DisabledAction;
+    Qn::ActionVisibility result = Qn::InvisibleAction;
     foreach (QnActionCondition *condition, m_conditions)
         result = qMax(result, condition->check(parameters));
 

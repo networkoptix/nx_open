@@ -726,6 +726,11 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
+    factory(Qn::SystemUpdateAction).
+        flags(Qn::NoTarget).
+        text(tr("System Update...")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission);
+
     factory(Qn::PreferencesGeneralTabAction).
         flags(Qn::Main).
         text(tr("Local Settings...")).
