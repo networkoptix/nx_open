@@ -1097,6 +1097,14 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 /*------------------------------------ HANDLERS ------------------------------------------*/
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
+    QnLicenseListHelper licenseList(qnLicensePool->getLicenses());
+    if (licenseList.totalLicenseByType(Qn::LC_VideoWall) < videowallStarterPackAmount) {
+        QMessageBox::warning(mainWindow(),
+            tr("More licenses required"),
+            tr("To enable the feature please activate Video Wall starter license"));
+        return;
+    }
+
 	QStringList usedNames;
     foreach(const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::videowall))
         usedNames << resource->getName().trimmed().toLower();
