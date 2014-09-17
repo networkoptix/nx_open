@@ -242,18 +242,29 @@ public:
             return sendAsyncImpl( src, std::function<void( SystemError::ErrorCode, size_t )>( std::move( handler ) ) );
         }
 
+    //!Register timer on this socket
+    /*!
+        \param handler functor with no parameters
+    */
+    template<class HandlerType>
+        bool registerTimer( unsigned int timeoutMs, HandlerType handler )
+        {
+            return registerTimerImpl( timeoutMs, std::function<void()>( std::move( handler ) ) );
+        }
+
     //!
     /*!
         It is garanteed that after return of this method no async handler will be called
-        \param eventType Possible values: \a aio::etRead, \a aio::etWrite
+        \param eventType Possible values: \a aio::etRead, \a aio::etWrite, \a aio::etTimedOut or \a aio::etNone to cancel all async aio
         \param waitForRunningHandlerCompletion If \a true, it is garanteed that after return of this method no async handler is running
     */
-    virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion = true ) = 0;
+    virtual void cancelAsyncIO( aio::EventType eventType = aio::etNone, bool waitForRunningHandlerCompletion = true ) = 0;
 
 protected:
     virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) = 0;
     virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
     virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
+    virtual bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) = 0;
 };
 
 struct StreamSocketInfo

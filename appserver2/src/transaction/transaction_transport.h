@@ -143,7 +143,6 @@ public:
     void processExtraData();
     void startListening();
     void setRemotePeer(const ApiPeerData& value) { m_remotePeer = value; }
-    void sendHttpKeepAlive();
     bool isHttpKeepAliveTimeout() const;
     bool hasUnsendData() const;
 private:
@@ -193,6 +192,7 @@ private:
     QTime m_sendTimer;
     QByteArray m_emptyChunkData;
 private:
+    void sendHttpKeepAlive();
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
     void addData(QByteArray &&data);

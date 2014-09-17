@@ -435,6 +435,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
+    QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
@@ -488,8 +489,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         if( mediaServerRes && ecConnection && (mediaServerRes->getSystemName() == ecConnection->connectionInfo().systemName) )
             mediaServerRes->determineOptimalNetIF();
     } );
-
-    QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();

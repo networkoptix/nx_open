@@ -1442,6 +1442,11 @@ int QnSSLSocket::asyncSendInternal( const void* buffer , unsigned int bufferLen 
     return d->async_ssl_ptr->bio_write(buffer,bufferLen);
 }
 
+bool QnSSLSocket::registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) {
+    Q_D(QnSSLSocket);
+    return d->wrappedSocket->registerTimer( timeoutMs, std::move(handler) );
+}
+
 int QnSSLSocket::mode() const {
     Q_D(const QnSSLSocket);
     return d->mode;
@@ -1580,6 +1585,11 @@ bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& buffer, std::function<vo
         ssl_ptr->async_send( buffer, handler );
     }
     return true;
+}
+
+bool QnMixedSSLSocket::registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) {
+    Q_D(QnMixedSSLSocket);
+    return d->wrappedSocket->registerTimer( timeoutMs, std::move(handler) );
 }
 
 
