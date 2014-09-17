@@ -142,6 +142,7 @@ namespace ec2
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 
         QString toString( Value val );
+        Value fromString(const QString& val);
 
         /** Check if transaction can be sent independently of current connection state. MUST have sequence field filled. */
         bool isSystem( Value val );

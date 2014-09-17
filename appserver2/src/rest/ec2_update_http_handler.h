@@ -53,7 +53,7 @@ namespace ec2
 
         //!Implementation of QnRestRequestHandler::executePost
         virtual int executePost(
-            const QString& /*path*/,
+            const QString& path,
             const QnRequestParamList& /*params*/,
             const QByteArray& body,
             const QByteArray& srcBodyContentType,
@@ -70,8 +70,15 @@ namespace ec2
                 //    tran = QnBinary::deserialized<QnTransaction<RequestDataType>>(body);
                 //    break;
                 case Qn::JsonFormat:
-                    tran = QJson::deserialized<QnTransaction<RequestDataType>>(body, QnTransaction<RequestDataType>(), &success);
+                {
+                    tran.params = QJson::deserialized<RequestDataType>(body, RequestDataType(), &success);
+                    QStringList tmp = path.split('/');
+                    while (!tmp.isEmpty() && tmp.last().isEmpty())
+                        tmp.pop_back();
+                    if (!tmp.isEmpty())
+                        tran.command = ApiCommand::fromString(tmp.last());
                     break;
+                }
                 case Qn::UbjsonFormat:
                     tran = QnUbjson::deserialized<QnTransaction<RequestDataType>>(body, QnTransaction<RequestDataType>(), &success);
                     break;

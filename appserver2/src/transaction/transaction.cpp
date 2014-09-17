@@ -16,182 +16,129 @@ namespace ec2
 
     namespace ApiCommand
     {
-        QString toString( Value val )
+        struct ApiCommandName
         {
-            switch( val )
+            Value command;
+            const char* name;
+        };
+
+#define REGISTER_COMMAND(x) {x, #x}
+
+        static ApiCommandName COMMAND_NAMES[] =
+        {
+            REGISTER_COMMAND(tranSyncRequest),
+            REGISTER_COMMAND(tranSyncResponse),
+            REGISTER_COMMAND(tranSyncDone),
+            REGISTER_COMMAND(lockRequest),
+            REGISTER_COMMAND(lockResponse),
+            REGISTER_COMMAND(unlockRequest),
+            REGISTER_COMMAND(peerAliveInfo),
+
+            REGISTER_COMMAND(testConnection),
+            REGISTER_COMMAND(connect),
+
+            REGISTER_COMMAND(getResourceTypes),
+            REGISTER_COMMAND(setResourceStatus),
+            REGISTER_COMMAND(setResourceParams),
+            REGISTER_COMMAND(getResourceParams),
+            REGISTER_COMMAND(saveResource),
+            REGISTER_COMMAND(removeResource),
+            REGISTER_COMMAND(setPanicMode),
+            REGISTER_COMMAND(getFullInfo),
+
+            REGISTER_COMMAND(saveCamera),
+            REGISTER_COMMAND(saveCameras),
+            REGISTER_COMMAND(removeCamera),
+            REGISTER_COMMAND(getCameras),
+            REGISTER_COMMAND(getCameraHistoryItems),
+            REGISTER_COMMAND(addCameraHistoryItem),
+
+            REGISTER_COMMAND(getMediaServers),
+            REGISTER_COMMAND(saveMediaServer),
+            REGISTER_COMMAND(removeMediaServer),
+
+            REGISTER_COMMAND(saveUser),
+            REGISTER_COMMAND(getUsers),
+            REGISTER_COMMAND(removeUser),
+
+            REGISTER_COMMAND(saveBusinessRule),
+            REGISTER_COMMAND(removeBusinessRule),
+            REGISTER_COMMAND(broadcastBusinessAction),
+            REGISTER_COMMAND(execBusinessAction),
+            REGISTER_COMMAND(getBusinessRules),
+            REGISTER_COMMAND(resetBusinessRules),
+
+            REGISTER_COMMAND(saveLayout),
+            REGISTER_COMMAND(saveLayouts),
+            REGISTER_COMMAND(getLayouts),
+            REGISTER_COMMAND(removeLayout),
+
+            REGISTER_COMMAND(saveVideowall),
+            REGISTER_COMMAND(getVideowalls),
+            REGISTER_COMMAND(removeVideowall),
+            REGISTER_COMMAND(videowallControl),
+
+            REGISTER_COMMAND(listDirectory),
+            REGISTER_COMMAND(getStoredFile),
+            REGISTER_COMMAND(addStoredFile),
+            REGISTER_COMMAND(updateStoredFile),
+            REGISTER_COMMAND(removeStoredFile),
+
+            REGISTER_COMMAND(addLicenses),
+            REGISTER_COMMAND(addLicense),
+            REGISTER_COMMAND(getLicenses),
+            REGISTER_COMMAND(removeLicense),
+
+            REGISTER_COMMAND(testEmailSettings),
+            REGISTER_COMMAND(sendEmail),
+
+            REGISTER_COMMAND(uploadUpdate),
+            REGISTER_COMMAND(uploadUpdateResponce),
+            REGISTER_COMMAND(installUpdate),
+
+            REGISTER_COMMAND(addCameraBookmarkTags),
+            REGISTER_COMMAND(getCameraBookmarkTags),
+            REGISTER_COMMAND(removeCameraBookmarkTags),
+
+            REGISTER_COMMAND(moduleInfo),
+            REGISTER_COMMAND(moduleInfoList),
+
+            REGISTER_COMMAND(discoverPeer),
+            REGISTER_COMMAND(addDiscoveryInformation),
+            REGISTER_COMMAND(removeDiscoveryInformation),
+
+            REGISTER_COMMAND(forcePrimaryTimeServer),
+            REGISTER_COMMAND(broadcastPeerSystemTime),
+            REGISTER_COMMAND(getCurrentTime),
+            REGISTER_COMMAND(changeSystemName),
+            REGISTER_COMMAND(getKnownPeersSystemTime),
+
+            REGISTER_COMMAND(runtimeInfoChanged),
+            REGISTER_COMMAND(dumpDatabase),
+            REGISTER_COMMAND(restoreDatabase),
+            REGISTER_COMMAND(updatePersistentSequence),
+            REGISTER_COMMAND(markLicenseOverflow)
+        };
+
+        QString toString(Value val) 
+        {
+            for (int i = 0; i < sizeof(COMMAND_NAMES) / sizeof(ApiCommandName); ++i)
             {
-                case tranSyncRequest:
-                    return "tranSyncRequest";
-                case tranSyncResponse:
-                    return "tranSyncResponse";
-                case tranSyncDone:
-                    return "tranSyncDone";
-                case lockRequest:
-                    return "lockRequest";
-                case lockResponse:
-                    return "lockResponse";
-                case unlockRequest:
-                    return "unlockRequest";
-                case peerAliveInfo:
-                    return "peerAliveInfo";
-
-                case testConnection:
-                    return "testConnection";
-                case connect:
-                    return "connect";
-
-                case getResourceTypes:
-                    return "getResourceTypes";
-                case setResourceStatus:
-                    return "setResourceStatus";
-                //case setResourceDisabled:
-                //    return "setResourceDisabled";
-                case setResourceParams:
-                    return "setResourceParams";
-                case getResourceParams:
-                    return "getResourceParams";
-                case saveResource:
-                    return "saveResource";
-                case removeResource:
-                    return "removeResource";
-                case setPanicMode:
-                    return "setPanicMode";
-                case getFullInfo:
-                    return "getFullInfo";
-
-                case saveCamera:
-                    return "saveCamera";
-                case saveCameras:
-                    return "updateCameras";
-                case removeCamera:
-                    return "removeCamera";
-                case getCameras:
-                    return "getCameras";
-                case getCameraHistoryItems:
-                    return "getCameraHistoryItems";
-                case addCameraHistoryItem:
-                    return "addCameraHistoryItem";
-
-                case getMediaServers:
-                    return "getMediaServers";
-                case saveMediaServer:
-                    return "saveMediaServer";
-                case removeMediaServer:
-                    return "removeMediaServer";
-
-                case saveUser:
-                    return "saveUser";
-                case getUsers:
-                    return "getUsers";
-                case removeUser:
-                    return "removeUser";
-
-                case saveBusinessRule:
-                    return "saveBusinessRule";
-                case removeBusinessRule:
-                    return "removeBusinessRule";
-                case broadcastBusinessAction:
-                    return "broadcastBusinessAction";
-                case execBusinessAction:
-                    return "execBusinessAction";
-                case getBusinessRules:
-                    return "getBusinessRules";
-                case resetBusinessRules:
-                    return "resetBusinessRules";
-
-                case saveLayout:
-                    return "saveLayout";
-                case saveLayouts:
-                    return "addOrUpdateLayouts";
-                case getLayouts:
-                    return "getLayouts";
-                case removeLayout:
-                    return "removeLayout";
-
-                case saveVideowall:
-                    return "saveVideowall";
-                case getVideowalls:
-                    return "getVideowalls";
-                case removeVideowall:
-                    return "removeVideowall";
-                case videowallControl:
-                    return "videowallControl";
-
-                case listDirectory:
-                    return "listDirectory";
-                case getStoredFile:
-                    return "getStoredFile";
-                case addStoredFile:
-                    return "addStoredFile";
-                case updateStoredFile:
-                    return "updateStoredFile";
-                case removeStoredFile:
-                    return "removeStoredFile";
-
-                case addLicenses:
-                    return "addLicenses";
-                case addLicense:
-                    return "addLicense";
-                case getLicenses:
-                    return "getLicenses";
-                case removeLicense:
-                    return "removeLicense";
-
-                case testEmailSettings:
-                    return "testEmailSettings";
-                case sendEmail:
-                    return "sendEmail";
-
-                case uploadUpdate:
-                    return "uploadUpdate";
-                case uploadUpdateResponce:
-                    return "uploadUpdateResponce";
-                case installUpdate:
-                    return "installUpdate";
-
-                case addCameraBookmarkTags:
-                    return "addCameraBookmarkTags";
-                case getCameraBookmarkTags:
-                    return "getCameraBookmarkTags";
-                case removeCameraBookmarkTags:
-                    return "removeCameraBookmarkTags";
-
-                case moduleInfo:
-                    return "moduleInfo";
-                case moduleInfoList:
-                    return "moduleInfoList";
-
-                case discoverPeer:
-                    return "discoverPeer";
-                case addDiscoveryInformation:
-                    return "addDiscoveryInformation";
-                case removeDiscoveryInformation:
-                    return "removeDiscoveryInformation";
-
-                case forcePrimaryTimeServer:
-                    return "forcePrimaryTimeServer";
-                case broadcastPeerSystemTime:
-                    return "broadcastPeerSystemTime";
-                case getCurrentTime:
-                    return "getCurrentTime";
-                case changeSystemName:
-                    return "changeSystemName";
-                case getKnownPeersSystemTime:
-                    return "getKnownPeersSystemTime";
-
-                case runtimeInfoChanged:
-                    return "runtimeInfoChanged";
-                case dumpDatabase:
-                    return "dumpDatabase";
-                case restoreDatabase:
-                    return "restoreDatabase";
-                case updatePersistentSequence:
-                    return "updatePersistentSequence";
-                case markLicenseOverflow:
-                    return "markLicenseOverflow";
-                default:
-                    return "unknown " + QString::number((int)val);
+                if (COMMAND_NAMES[i].command == val)
+                    return QString::fromUtf8(COMMAND_NAMES[i].name);
             }
+            return "unknown " + QString::number((int)val);
+        }
+
+        Value fromString(const QString& val)
+        {
+            QByteArray data = val.toUtf8();
+            for (int i = 0; i < sizeof(COMMAND_NAMES) / sizeof(ApiCommandName); ++i)
+            {
+                if (COMMAND_NAMES[i].name == data)
+                    return COMMAND_NAMES[i].command;
+            }
+            return NotDefined;
         }
 
         bool isSystem( Value val )
