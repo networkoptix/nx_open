@@ -23,7 +23,8 @@ namespace ec2
             ApiDataWithVersion(), 
             prematureLicenseExperationDate(0),
             videoWallControlSessions(0),
-            serverTimePriority(0)
+            serverTimePriority(0),
+            updateStarted(false)
         {}
 
         bool operator==(const ApiRuntimeData& other) const {
@@ -63,6 +64,8 @@ namespace ec2
 
         QList<QByteArray> mainHardwareIds;
         QList<QByteArray> compatibleHardwareIds;
+
+        bool updateStarted;
     };
 
 #define ApiRuntimeData_Fields ApiDataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)\
