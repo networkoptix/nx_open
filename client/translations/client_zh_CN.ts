@@ -1104,7 +1104,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="162"/>
         <source>Show IP in tree:</source>
-        <translation>在树狀表中显示IP:</translation>
+        <translation>在树狀中显示IP:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="179"/>
@@ -1141,7 +1141,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="357"/>
         <source>Auto pause video</source>
-        <translation>自動停止视频</translation>
+        <translation>自动暂停视频</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="388"/>
@@ -6651,7 +6651,7 @@ At least %3 licenses are required.</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="232"/>
         <source>Invalid License. Please contact our support team to get a valid license.</source>
-        <translation>无效许可。請联系我们的技术支持团队取得有效许可。</translation>
+        <translation>无效许可。请联系我们的技术支持团队取得有效许可。</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="302"/>
@@ -10088,7 +10088,7 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source> Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation type="obsolete">您的录像修改尚未保存。請选择录像方式，FPS和质量并将此修改标记在日程中。</translation>
+        <translation type="obsolete">您的录像修改尚未保存。请选择录像方式，FPS和质量并将此修改标记在日程中。</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="492"/>
@@ -10210,7 +10210,7 @@ and you do not have the rights to overwrite it.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="483"/>
         <source> Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation>您的录像修改尚未保存。請选择录像方式，FPS和画质并将此修改标记在日程中。</translation>
+        <translation>您的录像修改尚未保存。请选择录像方式，FPS和画质并将此修改标记在日程中。</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="520"/>
@@ -11575,7 +11575,7 @@ Please wait for the camera to go online.</source>
     </message>
     <message>
         <source>Software (Max fps may be slightly decreased on media server)</source>
-        <translation type="obsolete">软件（在媒体服务器，最大每秒帧数可能会稍微降低）</translation>
+        <translation type="obsolete">选择在流媒体软件上启用移动侦测</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="73"/>
@@ -11585,7 +11585,7 @@ Please wait for the camera to go online.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="443"/>
         <source>Software (Max FPS may be slightly decreased on media server)</source>
-        <translation>软件（在媒体服务器，最大每秒帧数可能会稍微降低）</translation>
+        <translation>选择在流媒体软件上启用移动侦测</translation>
     </message>
 </context>
 <context>
