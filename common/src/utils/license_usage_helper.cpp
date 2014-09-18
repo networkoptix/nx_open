@@ -263,9 +263,13 @@ QList<Qn::LicenseType> QnVideoWallLicenseUsageHelper::calculateLicenseTypes() co
 int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType) const {
     Q_ASSERT(licenseType == Qn::LC_VideoWall);
     int result = 0;
-    foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
-        /* Calculating running control sessions. */
-        result += info.data.videoWallControlSessions;
+
+    /* Calculating running control sessions. */
+    foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems()) {
+        if (info.data.videoWallControlSession.isNull())
+            continue;
+        ++result;
+    }
 
     return result;
 }

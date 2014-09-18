@@ -22,7 +22,6 @@ namespace ec2
         ApiRuntimeData(): 
             ApiDataWithVersion(), 
             prematureLicenseExperationDate(0),
-            videoWallControlSessions(0),
             serverTimePriority(0),
             updateStarted(false)
         {}
@@ -34,7 +33,7 @@ namespace ec2
                    box == other.box &&
                    publicIP == other.publicIP &&
                    videoWallInstanceGuid == other.videoWallInstanceGuid &&
-                   videoWallControlSessions == other.videoWallControlSessions &&
+                   videoWallControlSession == other.videoWallControlSession &&
                    serverTimePriority == other.serverTimePriority &&
                    prematureLicenseExperationDate == other.prematureLicenseExperationDate &&
                    availableConnections == other.availableConnections &&
@@ -53,8 +52,8 @@ namespace ec2
         /** Guid of the videowall instance for the running videowall clients. */
         QUuid videoWallInstanceGuid;
 
-        /** Number of the videowall control sessions governed by the current client instance. */
-        int videoWallControlSessions;
+        /** Videowall item id, governed by the current client instance's control session. */
+        QUuid videoWallControlSession;
 
         /** Priority of this peer as the time synchronization server. */
         quint64 serverTimePriority;
@@ -69,7 +68,7 @@ namespace ec2
     };
 
 #define ApiRuntimeData_Fields ApiDataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)\
-                                                        (videoWallInstanceGuid)(videoWallControlSessions)(serverTimePriority)\
+                                                        (videoWallInstanceGuid)(videoWallControlSession)(serverTimePriority)\
                                                         (availableConnections)(mainHardwareIds)(compatibleHardwareIds)
 
 

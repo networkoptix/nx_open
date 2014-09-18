@@ -553,6 +553,34 @@
 			</modules>             
 		</profile>
 
+        <!-- Banana Pie box -->
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+		        <quazip.version>0.7-SNAPSHOT</quazip.version>
+                <toolchain.version>rpi</toolchain.version>
+                <compiler>bpi</compiler>
+                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <modification>bpi</modification>
+            </properties>
+            <modules>
+                <!-- Banana pie uses same distro as rpi -->
+                <module>edge_firmware/rpi</module>
+            </modules>
+        </profile>
+
 		<profile>
 			<id>linux-x64</id>
 			<activation>

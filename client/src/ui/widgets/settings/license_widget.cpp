@@ -32,7 +32,8 @@ namespace {
 QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     QWidget(parent),
     ui(new Ui::LicenseWidget),
-    m_state(Normal)
+    m_state(Normal),
+    m_freeLicenseAvailable(true)
 {
     ui->setupUi(this);
 
@@ -53,8 +54,16 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
 
     connect(ui->activationTypeComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_activationTypeComboBox_currentIndexChanged()));
     connect(ui->browseLicenseFileButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseLicenseFileButton_clicked()));
-    connect(ui->activateLicenseButton,      SIGNAL(clicked()),                  this,   SLOT(at_activateLicenseButton_clicked()));
-    connect(ui->activateFreeLicenseButton,  SIGNAL(clicked()),                  this,   SLOT(at_activateFreeLicenseButton_clicked()));
+
+    connect(ui->activateLicenseButton,      &QPushButton::clicked,              this,   [this] {
+        setState(Waiting);
+    });
+
+    connect(ui->activateFreeLicenseButton,  &QPushButton::clicked,              this,   [this] {
+        setSerialKey(qnProductFeatures().freeLicenseKey);
+        setState(Waiting);
+    });
+
     connect(ui->copyHwidButton, &QPushButton::clicked,  this, [this] {
         qApp->clipboard()->setText(ui->hardwareIdEdit->text());
         QMessageBox::information(this, tr("Success"), tr("Hardware ID copied to clipboard."));
@@ -91,11 +100,12 @@ void QnLicenseWidget::setOnline(bool online) {
 }
 
 bool QnLicenseWidget::isFreeLicenseAvailable() const {
-    return ui->activateFreeLicenseButton->isVisible();
+    return m_freeLicenseAvailable;
 }
 
 void QnLicenseWidget::setFreeLicenseAvailable(bool available) {
-    ui->activateFreeLicenseButton->setVisible(available);
+    m_freeLicenseAvailable = available;
+    ui->activateFreeLicenseButton->setVisible(m_freeLicenseAvailable && isOnline());
 }
 
 void QnLicenseWidget::setHardwareId(const QByteArray& hardwareId) {
@@ -152,6 +162,7 @@ void QnLicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
         ui->manualKeyEdit->setText(ui->onlineKeyEdit->text());
 
     ui->stackedWidget->setCurrentWidget(isOnline ? ui->onlinePage : ui->manualPage);
+    ui->activateFreeLicenseButton->setVisible(m_freeLicenseAvailable && isOnline);
 
     updateControls();
 }
@@ -190,18 +201,4 @@ void QnLicenseWidget::at_browseLicenseFileButton_clicked() {
     if (m_activationKey.isEmpty()) {
         setWarningStyle(ui->fileLineEdit);
     }
-}
-
-void QnLicenseWidget::at_activateFreeLicenseButton_clicked() {
-    setSerialKey(qnProductFeatures().freeLicenseKey);
-    if (!isOnline() && m_activationKey.isEmpty()) {
-        at_browseLicenseFileButton_clicked();
-        if (m_activationKey.isEmpty())
-            return;
-    }
-    at_activateLicenseButton_clicked();
-}
-
-void QnLicenseWidget::at_activateLicenseButton_clicked() {
-    setState(Waiting);
 }
