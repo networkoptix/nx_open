@@ -112,6 +112,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 {
     QMutexLocker lock(&m_discoveryMutex);
 
+    QnResourceList extraResources;
+
     if (netStateTime.elapsed() > NETSTATE_UPDATE_TIME) {
         netState.updateNetState();
         netStateTime.restart();
@@ -171,6 +173,36 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
             if (existCamRes)
             {
+                if (isForeign) {
+                    QUuid newTypeId = newNetRes->getTypeId();
+                    bool updateTypeId = existCamRes->getTypeId() != newNetRes->getTypeId() && !newNetRes->isAbstractResource();
+                    newNetRes->update(existCamRes);
+                    newNetRes->setParentId(qnCommon->moduleGUID());
+                    newNetRes->setFlags(existCamRes->flags() & ~Qn::foreigner);
+                    newNetRes->setId(existCamRes->getId());
+                    newNetRes->addFlags(Qn::parent_change);
+                    if (updateTypeId)
+                        newNetRes->setTypeId(newTypeId);
+                    extraResources << newNetRes;
+                }
+                else {
+                    QByteArray errorString;
+                    QnVirtualCameraResourceList cameras;
+                    ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
+                    const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( existCamRes, &cameras );
+                    if( errorCode != ec2::ErrorCode::ok )
+                        NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+                }
+            }
+        }
+
+        /*
+        bool isForeign = rpResource->hasFlags(Qn::foreigner);
+        if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || isForeign)
+        {
+            QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
+            if (existCamRes)
+            {
                 if (existCamRes->getTypeId() != newNetRes->getTypeId() && !newNetRes->isAbstractResource()) {
                     QUuid newTypeId = newNetRes->getTypeId();
                     newNetRes->update(existCamRes);
@@ -198,6 +230,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             }
 
         }
+        */
 
         // seems like resource is in the pool and has OK ip
         updateResourceStatus(rpNetRes, discoveredResources);
@@ -254,6 +287,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         }
     }
     resources = swapList;
+
+    resources << extraResources;
 
     if (resources.size())
     {
