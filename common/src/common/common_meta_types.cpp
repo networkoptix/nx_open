@@ -19,6 +19,7 @@
 #include <api/model/time_reply.h>
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/test_email_settings_reply.h>
+#include <api/model/configure_reply.h>
 #include <api/runtime_info_manager.h>
 
 #include <core/resource/resource_fwd.h>
@@ -198,6 +199,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qn::CameraDataType>();
 
     qRegisterMetaType<QnNetworkAddress>();
+
+    qRegisterMetaType<QnConfigureReply>();
 
     qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
     qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );

@@ -421,7 +421,7 @@ void QnUpdateProcess::at_mutexLocked() {
 void QnUpdateProcess::at_mutexTimeout() {
     m_distributedMutex->deleteLater();
     m_distributedMutex = 0;
-    finishUpdate(QnUpdateResult::LockFailed);
+    finishUpdate(QnUpdateResult::UploadingFailed);
 }
 
 void QnUpdateProcess::uploadUpdatesToServers() {

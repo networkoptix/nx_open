@@ -262,9 +262,9 @@
          </layout>
         </item>
         <item>
-         <widget class="QCheckBox" name="rememberPasswordCheckBox">
+         <widget class="QCheckBox" name="autoLoginCheckBox">
           <property name="text">
-           <string>S&amp;ave password</string>
+           <string>&amp;Auto-Login</string>
           </property>
           <property name="checked">
            <bool>false</bool>
@@ -325,7 +325,7 @@
   <tabstop>loginLineEdit</tabstop>
   <tabstop>passwordLineEdit</tabstop>
   <tabstop>testButton</tabstop>
-  <tabstop>rememberPasswordCheckBox</tabstop>
+  <tabstop>autoLoginCheckBox</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
