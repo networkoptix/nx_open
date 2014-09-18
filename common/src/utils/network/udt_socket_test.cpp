@@ -37,23 +37,26 @@ template< typename T >
 class Queue {
 public:
     void Enqueue( const T& val ) {
+        std::list<T> element(1,val);
         std::lock_guard<std::mutex> lock(mutex_);
-        queue_.push(val);
+        queue_.splice(queue_.end(),std::move(element));
     }
     void Enqueue( T&& val ) {
+        std::list<T> element(1,std::move(val));
         std::lock_guard<std::mutex> lock(mutex_);
-        queue_.push( std::move(val) );
+        queue_.splice(queue_.end(),std::move(element));
     }
     bool Dequeue( T* val ) {
         std::lock_guard<std::mutex> lock(mutex_);
         if(queue_.empty()) return false;
         *val = queue_.front();
-        queue_.pop();
+        // C++ standard says delete will _NEVER_ throw exception
+        queue_.pop_front();
         return true;
     }
 private:
     std::mutex mutex_;
-    std::queue<T> queue_;
+    std::list<T> queue_;
 };
 
 }// namespace 
@@ -81,7 +84,7 @@ public:
             return false;
         if(!server_socket_.listen()) 
             return false;
-        bool ret = server_socket_.acceptAsync(
+        server_socket_.acceptAsync(
             std::bind(
             &UdtSocketProfileServer::OnAccept,
             this,
@@ -184,7 +187,6 @@ private:
     std::size_t total_recv_bytes_;
     std::size_t broken_or_error_conn_;
     std::size_t closed_conn_;
-    // A thread for broadcasting the information
 };
 
 namespace {
