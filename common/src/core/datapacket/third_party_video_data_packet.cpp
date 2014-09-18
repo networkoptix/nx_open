@@ -17,13 +17,10 @@ QnThirdPartyCompressedVideoData::QnThirdPartyCompressedVideoData(
     QnCompressedVideoData( ctx ),
     m_videoPacket( videoPacket )
 {
-    NX_LOG( lit("QnThirdPartyCompressedVideoData::QnThirdPartyCompressedVideoData.  %1").arg((size_t)this), cl_logDEBUG1 );
 }
 
 QnThirdPartyCompressedVideoData::~QnThirdPartyCompressedVideoData()
 {
-    NX_LOG( lit("QnThirdPartyCompressedVideoData::~QnThirdPartyCompressedVideoData. %1").arg((size_t)this), cl_logDEBUG1 );
-
     m_videoPacket->releaseRef();
     m_videoPacket = nullptr;
 }
