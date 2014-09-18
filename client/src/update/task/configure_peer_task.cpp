@@ -5,6 +5,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <utils/network/global_module_finder.h>
+#include <api/model/configure_reply.h>
 
 QnConfigurePeerTask::QnConfigurePeerTask(QObject *parent) :
     QnNetworkPeerTask(parent),
@@ -75,7 +76,7 @@ void QnConfigurePeerTask::doStart() {
         finish(m_failedPeers.isEmpty() ? 0 : 1, m_failedPeers);
 }
 
-void QnConfigurePeerTask::processReply(int status, int handle) {
+void QnConfigurePeerTask::processReply(int status, const QnConfigureReply &reply, int handle) {
     QUuid id = m_pendingPeers.take(handle);
     if (id.isNull())
         return;
