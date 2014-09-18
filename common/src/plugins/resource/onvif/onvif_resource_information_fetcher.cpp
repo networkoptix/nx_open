@@ -139,8 +139,6 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), QString(), QString(), 0);
 
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
-    if (!existResource)
-        existResource = qnResPool->getResourceByParam(QnPlOnvifResource::ONVIF_ID_PARAM_NAME, info.uniqId).dynamicCast<QnVirtualCameraResource>();
 
     if (existResource) {
         soapWrapper.setLogin(existResource->getAuth().user());
@@ -164,7 +162,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             mac = existResource->getMAC().toString();
     }
 
-    if (model.isEmpty() || manufacturer.isEmpty() || mac.isEmpty())
+    if (model.isEmpty() || manufacturer.isEmpty()  || QnMacAddress(mac).isNull())
     {
         OnvifResExtInfo extInfo;
         QAuthenticator auth;
@@ -277,8 +275,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
     resource->setMAC(macAddr);
     resource->setFirmware(firmware);
 
-    if (macAddr.isNull())
-        resource->setPhysicalId(uniqId);
+	resource->setPhysicalId(uniqId);
 
     resource->setDeviceOnvifUrl(deviceUrl);
 
