@@ -760,7 +760,7 @@ namespace ec2
             return;
 
         localInfo.data.serverTimePriority = priority;
-        QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
+        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
     }
 
     void TimeSynchronizationManager::onPeerLost( ApiPeerAliveData data )

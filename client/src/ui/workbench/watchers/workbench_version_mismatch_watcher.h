@@ -11,9 +11,9 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-struct QnVersionMismatchData {
-    QnVersionMismatchData(): component(Qn::AnyComponent) {}
-    QnVersionMismatchData(Qn::SystemComponent component, QnSoftwareVersion version):
+struct QnAppInfoMismatchData {
+    QnAppInfoMismatchData(): component(Qn::AnyComponent) {}
+    QnAppInfoMismatchData(Qn::SystemComponent component, QnSoftwareVersion version):
         component(component), version(version){}
 
     Qn::SystemComponent component;
@@ -32,7 +32,7 @@ public:
     virtual ~QnWorkbenchVersionMismatchWatcher();
 
     bool hasMismatches() const;
-    QList<QnVersionMismatchData> mismatchData() const;
+    QList<QnAppInfoMismatchData> mismatchData() const;
     QnSoftwareVersion latestVersion(Qn::SystemComponent component = Qn::AnyComponent) const;
 
     static bool versionMismatches(QnSoftwareVersion left, QnSoftwareVersion right, bool concernBuild = false);
@@ -44,7 +44,7 @@ private slots:
     void updateHasMismatches();
 
 private:
-    QList<QnVersionMismatchData> m_mismatchData;
+    QList<QnAppInfoMismatchData> m_mismatchData;
     bool m_hasMismatches;
 };
 

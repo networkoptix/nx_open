@@ -15,16 +15,17 @@
 #include "transaction/transaction_message_bus.h"
 #include "business/business_message_bus.h"
 #include "settings.h"
+#include "nx_ec/data/api_connection_data.h"
 #include "api/app_server_connection.h"
+#include "utils/network/router.h"
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 QnServerMessageProcessor::QnServerMessageProcessor()
 :
     base_type(),
     m_serverPort( MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt() )
 {
-
 }
 
 void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) 

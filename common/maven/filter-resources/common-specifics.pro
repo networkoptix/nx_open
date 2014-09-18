@@ -32,3 +32,5 @@ TRANSLATIONS += ${basedir}/translations/common_en.ts \
 
   QMAKE_EXTRA_TARGETS += ext_debug ext_debug2
 }
+
+SOURCES += ${project.build.directory}/app_info_impl.cpp

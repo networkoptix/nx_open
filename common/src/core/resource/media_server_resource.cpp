@@ -12,7 +12,7 @@
 #include <rest/server/json_rest_result.h>
 #include "utils/common/sleep.h"
 #include "utils/network/networkoptixmodulerevealcommon.h"
-#include "version.h"
+#include <utils/common/app_info.h>
 
 
 const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
@@ -382,9 +382,15 @@ QString QnMediaServerResource::getSystemName() const {
 }
 
 void QnMediaServerResource::setSystemName(const QString &systemName) {
-    QMutexLocker lock(&m_mutex);
+    {
+        QMutexLocker lock(&m_mutex);
 
-    m_systemName = systemName;
+        if (m_systemName == systemName)
+            return;
+
+        m_systemName = systemName;
+    }
+    emit systemNameChanged(toSharedPointer(this));
 }
 
 QnModuleInformation QnMediaServerResource::getModuleInformation() const {
@@ -392,7 +398,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
 
     QnModuleInformation moduleInformation;
     moduleInformation.type = nxMediaServerId;
-    moduleInformation.customization = lit(QN_CUSTOMIZATION_NAME);
+    moduleInformation.customization = QnAppInfo::customizationName();
     moduleInformation.version = m_version;
     moduleInformation.systemInformation = m_systemInfo;
     moduleInformation.systemName = m_systemName;

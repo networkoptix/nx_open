@@ -99,6 +99,8 @@ namespace ec2
         skipped,
         //!Error executing DB request
         dbError,
+        containsBecauseTimestamp, // transaction already in database
+        containsBecauseSequence,  // transaction already in database
         //!Method is not implemented yet
         notImplemented
     };

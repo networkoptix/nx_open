@@ -1,5 +1,6 @@
 #include "module_finder.h"
 
+#include "utils/common/log.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "multicast_module_finder.h"
@@ -84,8 +85,10 @@ void QnModuleFinder::at_moduleAddressFound(const QnModuleInformation &moduleInfo
     if (!m_multicastFoundUrls.contains(moduleInformation.id, url)) {
         m_multicastFoundUrls.insert(moduleInformation.id, url);
 
-        if (!m_directFoundUrls.contains(moduleInformation.id, url))
+        if (!m_directFoundUrls.contains(moduleInformation.id, url)) {
+            NX_LOG(lit("QnModuleFinder: New URL from multicast finder: %1 %2").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
             emit moduleUrlFound(m_foundModules.value(moduleInformation.id), url);
+        }
     }
 }
 
@@ -97,11 +100,13 @@ void QnModuleFinder::at_moduleAddressLost(const QnModuleInformation &moduleInfor
 
     m_directModuleFinder->removeIgnoredUrl(url);
     if (m_multicastFoundUrls.remove(moduleInformation.id, url)) {
+        NX_LOG(lit("QnModuleFinder: URL from multicast finder is lost: %1 %2").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
         emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
 
         QnModuleInformation locModuleInformation = m_foundModules.value(moduleInformation.id);
         if (locModuleInformation.remoteAddresses.isEmpty()) {
             m_foundModules.remove(moduleInformation.id);
+            NX_LOG(lit("QnModuleFinder: Module %1 lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
             emit moduleLost(locModuleInformation);
         }
     }
@@ -116,8 +121,10 @@ void QnModuleFinder::at_moduleUrlFound(const QnModuleInformation &moduleInformat
     if (!m_directFoundUrls.contains(moduleInformation.id, url)) {
         m_directFoundUrls.insert(moduleInformation.id, url);
 
-        if (!m_multicastFoundUrls.contains(moduleInformation.id, url))
+        if (!m_multicastFoundUrls.contains(moduleInformation.id, url)) {
+            NX_LOG(lit("QnModuleFinder: New URL from direct finder: %1 %2").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
             emit moduleUrlFound(m_foundModules.value(moduleInformation.id), url);
+        }
     }
 }
 
@@ -128,11 +135,13 @@ void QnModuleFinder::at_moduleUrlLost(const QnModuleInformation &moduleInformati
     QUrl url = trimmedUrl(foundUrl);
 
     if (m_directFoundUrls.remove(moduleInformation.id, url)) {
+        NX_LOG(lit("QnModuleFinder: URL from direct finder is lost: %1 %2").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
         emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
 
         QnModuleInformation locModuleInformation = m_foundModules.value(moduleInformation.id);
         if (locModuleInformation.remoteAddresses.isEmpty()) {
             m_foundModules.remove(moduleInformation.id);
+            NX_LOG(lit("QnModuleFinder: Module %1 lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
             emit moduleLost(locModuleInformation);
         }
     }
@@ -156,8 +165,12 @@ void QnModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformati
         oldModuleInformation = updatedModuleInformation;
 
         /* Don't emit when there is no more remote addresses. moduleLost() will be emited just after moduleUrlLost(). */
-        if (!updatedModuleInformation.remoteAddresses.isEmpty())
+        if (!updatedModuleInformation.remoteAddresses.isEmpty()) {
+            NX_LOG(lit("QnModuleFinder. Module %1 is changed, addresses = [%2]")
+                   .arg(updatedModuleInformation.id.toString())
+                   .arg(QStringList(QStringList::fromSet(updatedModuleInformation.remoteAddresses)).join(lit(", "))), cl_logDEBUG1);
             emit moduleChanged(updatedModuleInformation);
+        }
     }
 }
 

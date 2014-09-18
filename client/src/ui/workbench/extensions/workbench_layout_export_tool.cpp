@@ -89,6 +89,12 @@ bool QnLayoutExportTool::start() {
     m_storage->setUrl(fullName);
 
     QScopedPointer<QIODevice> itemNamesIO(m_storage->open(lit("item_names.txt"), QIODevice::WriteOnly));
+    if (itemNamesIO.isNull()) {
+        m_errorMessage = tr("Could not create output file %1").arg(m_targetFilename);
+        emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required
+        return false;
+    }
+
     QTextStream itemNames(itemNamesIO.data());
 
     QList<qint64> itemTimeZones;

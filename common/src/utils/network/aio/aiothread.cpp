@@ -17,6 +17,8 @@
 #include "../../common/log.h"
 #include "../../common/systemerror.h"
 
+//TODO #ak memory order semantic used with std::atomic
+
 
 //!used as clock for periodic events. Function introduced since implementation can be changed
 static qint64 getSystemTimerVal()
@@ -92,6 +94,7 @@ namespace aio
     class AIOEventHandlingDataHolder
     {
     public:
+        //!Why the fuck do we need shared_ptr inside object instanciated on heap?
         std::shared_ptr<AIOEventHandlingData<SocketType>> data;
 
         AIOEventHandlingDataHolder( AIOEventHandler<SocketType>* _eventHandler )
@@ -187,19 +190,26 @@ namespace aio
 
                 if( task.type == TaskType::tAdding )
                 { 
-                    addSockToPollset( task.socket, task.eventType, task.timeout, task.eventHandler );
                     if( task.eventType == aio::etRead )
                         --newReadMonitorTaskCount;
                     else if( task.eventType == aio::etWrite )
                         --newWriteMonitorTaskCount;
-                    else
-                        Q_ASSERT( false );
+                    addSockToPollset( task.socket, task.eventType, task.timeout, task.eventHandler );
                 }
                 else    //task.type == TaskType::tRemoving
                 {
-                    void* userData = pollSet.remove( task.socket, task.eventType );
+                    //if( task.eventType == aio::etRead || task.eventType == aio::etWrite )
+                    //{
+                    //    void* userData = pollSet.remove( task.socket, task.eventType );
+                    //    if( userData )
+                    //        delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
+                    //}
+                    if( task.eventType == aio::etRead || task.eventType == aio::etWrite )
+                        pollSet.remove( task.socket, task.eventType );
+                    void*& userData = task.socket->impl()->getUserData(task.eventType);
                     if( userData )
                         delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
+                    userData = nullptr;
                 }
                 if( task.taskCompletionEvent )
                     task.taskCompletionEvent->store( 1, std::memory_order_relaxed );
@@ -216,12 +226,14 @@ namespace aio
             AIOEventHandler<SocketType>* eventHandler )
         {
             std::unique_ptr<AIOEventHandlingDataHolder<SocketType>> handlingData( new AIOEventHandlingDataHolder<SocketType>( eventHandler ) );
-            if( !pollSet.add( socket, eventType, handlingData.get() ) )
-            {
-                const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-                NX_LOG(lit("Failed to add socket to pollset. %1").arg(SystemError::toString(errorCode)), cl_logWARNING);
-                return false;
-            }
+            if( eventType != aio::etTimedOut )
+                if( !pollSet.add( socket, eventType, handlingData.get() ) )
+                {
+                    const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
+                    NX_LOG(lit("Failed to add socket to pollset. %1").arg(SystemError::toString(errorCode)), cl_logWARNING);
+                    return false;
+                }
+            socket->impl()->getUserData(eventType) = handlingData.get();
 
             if( timeout > 0 )
             {
@@ -252,10 +264,10 @@ namespace aio
         {
             Q_UNUSED(eventHandler)
 
-                for( typename std::deque<SocketAddRemoveTaskType>::iterator
-                    it = pollSetModificationQueue.begin();
-                    it != pollSetModificationQueue.end();
-                    ++it )
+            for( typename std::deque<SocketAddRemoveTaskType>::iterator
+                it = pollSetModificationQueue.begin();
+                it != pollSetModificationQueue.end();
+                ++it )
             {
                 if( it->socket == sock && it->eventType == eventType && it->type != taskType )
                 {
@@ -265,7 +277,8 @@ namespace aio
                         if( eventHandler != it->eventHandler )
                             continue;   //event handler changed, cannot ignore task
                         //cancelling remove task
-                        void* userData = pollSet.getUserData( sock, eventType );
+                        //void* userData = pollSet.getUserData( sock, eventType );
+                        void* userData = sock->impl()->getUserData(eventType);
                         Q_ASSERT( userData );
                         static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->markedForRemoval.store( 0 );
                     }
@@ -453,8 +466,6 @@ namespace aio
             ++m_impl->newReadMonitorTaskCount;
         else if( eventToWatch == aio::etWrite )
             ++m_impl->newWriteMonitorTaskCount;
-        else
-            Q_ASSERT( false );
         if( currentThreadSystemId() != systemThreadId() )  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
             m_impl->pollSet.interrupt();
 
@@ -473,7 +484,8 @@ namespace aio
         if( m_impl->removeReverseTask( sock, eventType, TaskType::tRemoving, NULL, 0 ) )
             return true;    //ignoring task
 
-        void* userData = m_impl->pollSet.getUserData( sock, eventType );
+        //void* userData = m_impl->pollSet.getUserData( sock, eventType );
+        void* userData = sock->impl()->getUserData(eventType);
         if( userData == NULL )
             return false;   //assert ???
         std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data;
@@ -506,13 +518,10 @@ namespace aio
             m_impl->mutex->unlock();
 
             //waiting for event handler completion (if it running)
-            if( handlingData->beingProcessed.load() > 0 )
+            while( handlingData->beingProcessed.load() > 0 )
             {
-                while( handlingData->beingProcessed.load() > 0 )
-                {
-                    m_impl->processEventsMutex.lock();
-                    m_impl->processEventsMutex.unlock();
-                }
+                m_impl->processEventsMutex.lock();
+                m_impl->processEventsMutex.unlock();
             }
 
             //waiting for socket to be removed from pollset

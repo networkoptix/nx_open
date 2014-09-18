@@ -333,7 +333,6 @@ Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutIte
 
 Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &resources) {
     QnLayoutResourcePtr layout;
-    QnVideoWallResourcePtr videowall;
 
     if(m_current) {
         layout = workbench()->currentLayout()->resource();
@@ -357,6 +356,26 @@ Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &re
     }
 }
 
+Qn::ActionVisibility QnSaveLayoutAsActionCondition::check(const QnResourceList &resources) {
+    QnLayoutResourcePtr layout;
+
+    if(m_current) {
+        layout = workbench()->currentLayout()->resource();
+    } else {
+        if(resources.size() != 1)
+            return Qn::InvisibleAction;
+
+        layout = resources[0].dynamicCast<QnLayoutResource>();
+    }
+
+    if(!layout)
+        return Qn::InvisibleAction;
+
+    if (layout->data().contains(Qn::VideoWallResourceRole))
+        return Qn::InvisibleAction;
+
+    return Qn::EnabledAction;
+}
 
 Qn::ActionVisibility QnLayoutCountActionCondition::check(const QnWorkbenchLayoutList &) {
     if(workbench()->layouts().size() < m_minimalRequiredCount)
@@ -618,9 +637,12 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
 }
 
 Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceList &resources) {
-    foreach(const QnResourcePtr &resource, resources)
-        if(resource->hasFlags(Qn::media) || resource->hasFlags(Qn::server))
+    foreach(const QnResourcePtr &resource, resources) {
+        if (resource->hasFlags(Qn::desktop_camera))
+            continue;
+        if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::server))
             return Qn::EnabledAction;
+    }
 
     return Qn::InvisibleAction;
 }
@@ -975,7 +997,7 @@ QnDisjunctionActionCondition::QnDisjunctionActionCondition(QnActionCondition *co
 }
 
 Qn::ActionVisibility QnDisjunctionActionCondition::check(const QnActionParameters &parameters) {
-    Qn::ActionVisibility result = Qn::EnabledAction;
+    Qn::ActionVisibility result = Qn::InvisibleAction;
     foreach (QnActionCondition *condition, m_conditions)
         result = qMax(result, condition->check(parameters));
 

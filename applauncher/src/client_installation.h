@@ -25,12 +25,16 @@ public:
     static QnClientInstallationPtr installationForPath(const QString &rootPath);
     bool createInstallationDat();
 
+    bool isNeedsVerification() const;
+    void setNeedsVerification(bool f);
+
 private:
     QnSoftwareVersion m_version;
 
     QString m_rootPath;
     QString m_binaryPath;
     QString m_libPath;
+    bool m_needsVerification;
 };
 
 #endif // CLIENT_INSTALLATION_H

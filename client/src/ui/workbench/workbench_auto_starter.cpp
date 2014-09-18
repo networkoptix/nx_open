@@ -4,7 +4,7 @@
 
 #include <client/client_settings.h>
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 namespace {
     const QString registryPath = lit("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run");
@@ -71,12 +71,12 @@ int QnWorkbenchAutoStarter::settingsKey() const {
 }
 
 QString QnWorkbenchAutoStarter::autoStartKey() const {
-    return lit(QN_APPLICATION_NAME);
+    return qApp->applicationName();
 }
 
 QString QnWorkbenchAutoStarter::autoStartPath() const {
     QFileInfo clientFile = QFileInfo(qApp->applicationFilePath());
-    QFileInfo launcherFile = QFileInfo(clientFile.dir(), lit(QN_APPLAUNCHER_EXECUTABLE_NAME));
+    QFileInfo launcherFile = QFileInfo(clientFile.dir(), QnAppInfo::applauncherExecutableName());
 
     QFileInfo resultFile = launcherFile.exists() ? launcherFile : clientFile;
     return toRegistryFormat(resultFile.canonicalFilePath());

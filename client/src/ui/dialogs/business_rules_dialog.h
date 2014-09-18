@@ -55,7 +55,6 @@ private slots:
     void at_message_ruleDeleted(const QUuid &id);
 
     void at_newRuleButton_clicked();
-    void at_saveAllButton_clicked();
     void at_deleteButton_clicked();
     void at_resetDefaultsButton_clicked();
     void at_clearFilterButton_clicked();

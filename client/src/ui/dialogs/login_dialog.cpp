@@ -24,7 +24,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/message_box.h>
-#include <ui/dialogs/preferences_dialog.h>
+#include <ui/dialogs/connection_name_dialog.h>
 #include <ui/widgets/rendering_widget.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
@@ -35,6 +35,7 @@
 #include <utils/applauncher_utils.h>
 #include <utils/network/module_finder.h>
 #include <utils/network/networkoptixmodulerevealcommon.h>
+#include <utils/common/url.h>
 
 #include "plugins/resource/avi/avi_resource.h"
 #include "plugins/resource/archive/abstract_archive_stream_reader.h"
@@ -48,7 +49,7 @@
 
 
 #include "compatibility.h"
-#include "version.h"
+#include <utils/common/app_info.h>
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
@@ -65,8 +66,6 @@ namespace {
         result->setData(connection.url, Qn::UrlRole);
         return result;
     }
-
-    const QSize saveConnectionAsSize(250, 100);
 
 } // anonymous namespace
 
@@ -87,7 +86,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     Q_ASSERT(bbLayout);
     if (bbLayout) {
         QLabel* versionLabel = new QLabel(ui->buttonBox);
-        versionLabel->setText(tr("Version %1").arg(lit(QN_APPLICATION_VERSION)));
+        versionLabel->setText(tr("Version %1").arg(QnAppInfo::applicationVersion()));
         QFont font = versionLabel->font();
         font.setPointSize(7);
         versionLabel->setFont(font);
@@ -127,6 +126,11 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     m_connectionsModel->appendRow(m_savedSessionsItem);
     m_connectionsModel->appendRow(m_autoFoundItem);
 
+    ui->autoLoginCheckBox->setCheckState(qnSettings->autoLogin() ? Qt::Checked : Qt::Unchecked);
+    connect(ui->autoLoginCheckBox, &QCheckBox::stateChanged,    this, [this](int state) {
+        qnSettings->setAutoLogin(state == Qt::Checked);
+    });
+
     connect(ui->connectionsComboBox,        SIGNAL(currentIndexChanged(QModelIndex)), this,   SLOT(at_connectionsComboBox_currentIndexChanged(QModelIndex)));
     connect(ui->testButton,                 SIGNAL(clicked()),                      this,   SLOT(at_testButton_clicked()));
     connect(ui->saveButton,                 SIGNAL(clicked()),                      this,   SLOT(at_saveButton_clicked()));
@@ -154,6 +158,7 @@ QnLoginDialog::~QnLoginDialog() {}
 
 void QnLoginDialog::updateFocus() {
     ui->passwordLineEdit->setFocus();
+    ui->passwordLineEdit->selectAll();
 }
 
 QUrl QnLoginDialog::currentUrl() const {
@@ -265,10 +270,6 @@ void QnLoginDialog::resetConnectionsModel() {
         selectedIndex = m_connectionsModel->index(0, 0, m_savedSessionsItem->index());
     ui->connectionsComboBox->setCurrentIndex(selectedIndex);
     at_connectionsComboBox_currentIndexChanged(selectedIndex);
-
-    QString password = qnSettings->storedPassword();
-    ui->passwordLineEdit->setText(password);
-    ui->rememberPasswordCheckBox->setChecked(!password.isEmpty());
 }
 
 void QnLoginDialog::resetSavedSessionsModel() {
@@ -350,28 +351,24 @@ void QnLoginDialog::updateUsability() {
 void QnLoginDialog::updateStoredConnections(const QUrl &url, const QString &name) {
     QnConnectionDataList connections = qnSettings->customConnections();
 
-    QnConnectionData connectionData(QString(), url);
-    qnSettings->setLastUsedConnection(connectionData);
+    QUrl urlToSave(url);
+    if (!ui->autoLoginCheckBox->isChecked())
+        urlToSave.setPassword(QString());
 
-    qnSettings->setStoredPassword(ui->rememberPasswordCheckBox->isChecked()
-        ? url.password()
-        : QString()
-        );
+    QnConnectionData connectionData(name, urlToSave);
+    qnSettings->setLastUsedConnection(connectionData);
 
     // remove previous "Last used connection"
     connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
 
-    QUrl cleanUrl(connectionData.url);
-    cleanUrl.setPassword(QString());
     QnConnectionData selected = connections.getByName(name);
-    if (selected.url == cleanUrl){
+    if (qnUrlEqual(selected.url, url)) {
         connections.removeOne(selected.name);
-        connections.prepend(selected);
+        connections.prepend(selected);    /* Reorder. */
     } else {
         // save "Last used connection"
         QnConnectionData last(connectionData);
         last.name = QnConnectionDataList::defaultLastUsedNameKey();
-        last.url.setPassword(QString());
         connections.prepend(last);
     }
     qnSettings->setCustomConnections(connections);
@@ -389,8 +386,7 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
     ui->loginLineEdit->setText(url.userName().isEmpty() 
         ? lit("admin")  // 99% of users have only one login - admin
         : url.userName());
-    ui->passwordLineEdit->clear();
-    ui->rememberPasswordCheckBox->setChecked(false);
+    ui->passwordLineEdit->setText(url.password());
     ui->deleteButton->setEnabled(qnSettings->customConnections().contains(ui->connectionsComboBox->currentText()));
     updateFocus();
 }
@@ -428,17 +424,18 @@ void QnLoginDialog::at_saveButton_clicked() {
     QnConnectionDataList connections = qnSettings->customConnections();
 
     QString name = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
+    bool savePassword = !ui->passwordLineEdit->text().isEmpty();
     {
-        QInputDialog dialog(this);
-        dialog.setWindowTitle(tr("Save connection as..."));
-        dialog.setLabelText(tr("Enter name:"));
-        dialog.setTextValue(name);
-        dialog.resize(saveConnectionAsSize);
+        QScopedPointer<QnConnectionNameDialog> dialog(new QnConnectionNameDialog(this));
+        dialog->setName(name);
+        dialog->setSavePasswordEnabled(savePassword);
+        dialog->setSavePassword(savePassword);
 
-        if (!dialog.exec())
+        if (!dialog->exec())
             return;
 
-        name = dialog.textValue();
+        name = dialog->name();
+        savePassword &= dialog->savePassword();
     }
 
 
@@ -465,7 +462,8 @@ void QnLoginDialog::at_saveButton_clicked() {
     }
 
     QnConnectionData connectionData(name, currentUrl());
-    connectionData.url.setPassword(QString());
+    if (!savePassword)
+        connectionData.url.setPassword(QString());
     connections.prepend(connectionData);
     qnSettings->setCustomConnections(connections);
 

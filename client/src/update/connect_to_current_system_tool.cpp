@@ -15,7 +15,7 @@
 #include <utils/common/software_version.h>
 
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 namespace {
     static const int configureProgress = 25;
@@ -150,7 +150,7 @@ void QnConnectToCurrentSystemTool::updatePeers() {
 
 void QnConnectToCurrentSystemTool::revertApiUrls() {
     for (auto it = m_oldUrls.begin(); it != m_oldUrls.end(); ++it) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(it.key()).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(it.key(), true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 
@@ -174,7 +174,7 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
     }
 
     foreach (const QUuid &id, m_targets - failedPeers) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 

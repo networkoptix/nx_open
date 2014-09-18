@@ -9,7 +9,7 @@
 #include "nx_ec/ec_api.h"
 #include "common/common_module.h"
 #include "nx_ec/data/api_conversion_functions.h"
-
+#include "nx_ec/data/api_resource_type_data.h"
 
 namespace ec2
 {

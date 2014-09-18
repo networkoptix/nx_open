@@ -25,6 +25,7 @@ struct QnCheckForUpdateResult {
     QSet<QnSystemInformation> systems;  /**< Set of supported system, for which updates were found. */
     QnSoftwareVersion latestVersion;
     bool clientInstallerRequired;
+    QUrl releaseNotesUrl;
 };
 Q_DECLARE_METATYPE(QnCheckForUpdateResult);
 

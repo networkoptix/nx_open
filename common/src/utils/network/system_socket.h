@@ -21,6 +21,8 @@
 #include "socket_impl_helper.h"
 #include "utils/common/byte_array.h"
 #include "../common/systemerror.h"
+#include "system_socket_impl.h"
+
 
 // TODO: #Elric why bother with maxlen and not use QByteArray directly? Remove.
 #define MAX_ERROR_MSG_LENGTH 1024
@@ -57,7 +59,7 @@ private:
 };
 
 
-class SocketImpl;
+//class SocketImpl;
 
 /**
  *   Base class representing basic communication endpoint
@@ -242,6 +244,8 @@ public:
     bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
     //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
     bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
+    //!Implementation of AbstractCommunicatingSocket::registerTimerImpl
+    bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler );
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion );
 

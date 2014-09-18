@@ -123,6 +123,7 @@
 #include <utils/common/email.h>
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/url.h>
 #include <utils/math/math.h>
 
 
@@ -130,7 +131,7 @@
 #include <utils/mac_utils.h>
 #endif
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 // TODO: #Elric remove this include
 #include "../extensions/workbench_stream_synchronizer.h"
@@ -343,6 +344,9 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
             : qnSettings->maxSceneVideoItems();
 
     if (layout->getItems().size() >= maxItems)
+        return;
+
+    if (resource->hasFlags(Qn::desktop_camera))
         return;
 
     {
@@ -1994,31 +1998,49 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(!dialog->exec() || !dialog->hasChanges())
         return;
 
-    if(permissions & Qn::SavePermission) {
-        dialog->submitToResource();
+    if (!(permissions & Qn::SavePermission))
+        return;
+    
+    
+    dialog->submitToResource();
+    connection2()->getUserManager()->save(
+        user, this, 
+        [this, user]( int reqID, ec2::ErrorCode errorCode ) {
+            at_resources_saved( reqID, errorCode, QnResourceList() << user );
+    } );
 
-        connection2()->getUserManager()->save(
-            user, this, 
-            [this, user]( int reqID, ec2::ErrorCode errorCode ) {
-                at_resources_saved( reqID, errorCode, QnResourceList() << user );
-            } );
+    QString newPassword = user->getPassword();
+    user->setPassword(QString());
 
-        QString newPassword = user->getPassword();
-        user->setPassword(QString());
-        if(user == context()->user() && !newPassword.isEmpty() && newPassword != currentPassword) {
-            /* Password was changed. Change it in global settings and hope for the best. */
-            QUrl url = QnAppServerConnectionFactory::url();
-            url.setPassword(newPassword);
+    if (user != context()->user() || newPassword.isEmpty() || newPassword == currentPassword)
+        return;
+    
 
-            // TODO #elric: This is a totally evil hack. Store password hash/salt in user.
-            context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(newPassword);
+    /* Password was changed. Change it in global settings and hope for the best. */
+    QUrl url = QnAppServerConnectionFactory::url();
+    url.setPassword(newPassword);
 
-            QnAppServerConnectionFactory::setUrl(url);
-            qnSettings->setStoredPassword(qnSettings->storedPassword().isEmpty()
-                ? QString()
-                : newPassword);
-        }
+    // TODO #elric: This is a totally evil hack. Store password hash/salt in user.
+    context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(newPassword);
+
+    QnAppServerConnectionFactory::setUrl(url);
+    QnConnectionDataList savedConnections = qnSettings->customConnections();
+    if (!savedConnections.isEmpty() 
+        && !savedConnections.first().url.password().isEmpty() 
+        && qnUrlEqual(savedConnections.first().url, url)) 
+    {
+        QnConnectionData current = savedConnections.takeFirst();
+        current.url = url;
+        savedConnections.prepend(current);
+        qnSettings->setCustomConnections(savedConnections);
     }
+
+    QnConnectionData lastUsed = qnSettings->lastUsedConnection();
+    if (!lastUsed.url.password().isEmpty() && qnUrlEqual(lastUsed.url, url)) {
+        lastUsed.url = url;
+        qnSettings->setLastUsedConnection(lastUsed);
+    }
+
 }
 
 void QnWorkbenchActionHandler::at_layoutSettingsAction_triggered() {
@@ -2381,7 +2403,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         latestMsVersion = latestVersion;
 
     QString components;
-    foreach(const QnVersionMismatchData &data, watcher->mismatchData()) {
+    foreach(const QnAppInfoMismatchData &data, watcher->mismatchData()) {
         QString component;
         switch(data.component) {
         case Qn::ClientComponent:
@@ -2426,14 +2448,22 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         "Please upgrade all components to the latest version %2."
     ).arg(components).arg(latestMsVersion.toString());
 
-    QnMessageBox::warning(mainWindow(), Qn::VersionMismatch_Help, tr("Version Mismatch"), message);
+    QScopedPointer<QMessageBox> messageBox(new QMessageBox(QMessageBox::Warning, tr("Version Mismatch"), message, QMessageBox::StandardButtons(QMessageBox::Cancel), mainWindow()));
+    setHelpTopic(messageBox.data(), Qn::VersionMismatch_Help);
+
+    QPushButton *updateButton = messageBox->addButton(tr("Upgrade..."), QMessageBox::HelpRole);
+    connect(updateButton, &QPushButton::clicked, this, [this] {
+        menu()->trigger(Qn::SystemUpdateAction);
+    }, Qt::QueuedConnection);
+    
+    messageBox->exec();
 }
 
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
     QMessageBox::warning(mainWindow(),
-                         tr("Beta version %1").arg(lit(QN_APPLICATION_VERSION)),
+                         tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
                          tr("You are running beta version of %1.")
-                         .arg(lit(QN_APPLICATION_NAME)));
+                         .arg(qApp->applicationName()));
 }
 
 void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {

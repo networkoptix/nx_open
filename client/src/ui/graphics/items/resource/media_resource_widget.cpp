@@ -854,6 +854,8 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 
     for(int i = 0; i < channelCount(); i++) {
         const QnStatistics *statistics = m_display->mediaProvider()->getStatistics(i);
+        if (statistics->isConnectionLost()) //TODO: #GDM check does not work, case #3993
+            continue;
         fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));
         mbps += statistics->getBitrate();
     }
@@ -974,9 +976,6 @@ QCursor QnMediaResourceWidget::calculateCursor() const {
 }
 
 Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const {
-    if (qnSettings->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
-        return Qn::VideowallWithoutLicenseOverlay;
-
     QnResourcePtr resource = m_display->resource();
 
     if (resource->hasFlags(Qn::SINGLE_SHOT)) {

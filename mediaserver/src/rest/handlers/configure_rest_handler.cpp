@@ -13,6 +13,7 @@
 #include "core/resource/media_server_resource.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/module_finder.h"
+#include "api/model/configure_reply.h"
 
 namespace {
     enum Result {
@@ -37,8 +38,10 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
 
     /* set system name */
     int changeSystemNameResult = changeSystemName(systemName, wholeSystem);
-    if (changeSystemNameResult == ResultFail)
+    if (changeSystemNameResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
+        result.setErrorString(lit("Can't change system name."));
+    }
 
     /* reset connections if systemName is changed */
     if (changeSystemNameResult == ResultOk && !wholeSystem)
@@ -46,18 +49,22 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
 
     /* set port */
     int changePortResult = changePort(port);
-    if (changePortResult == ResultFail)
+    if (changePortResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
+        result.setErrorString(lit("Can't change port."));
+    }
 
     /* set password */
     int changeAdminPasswordResult = changeAdminPassword(password, passwordHash, passwordDigest, oldPassword);
-    if (changeAdminPasswordResult == ResultFail)
+    if (changeAdminPasswordResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
+        result.setErrorString(lit("Can't change admin password."));
+    }
 
-    QJsonObject res;
-    res.insert(lit("restartNeeded"), changePortResult == ResultOk);
-    result.setReply(QJsonValue(res));
-    return result.error() == QnJsonRestResult::NoError ? CODE_OK : CODE_INTERNAL_ERROR;
+    QnConfigureReply reply;
+    reply.restartNeeded = changePortResult == ResultOk;
+    result.setReply(reply);
+    return CODE_OK;
 }
 
 int QnConfigureRestHandler::changeSystemName(const QString &systemName, bool wholeSystem) {
@@ -93,19 +100,12 @@ int QnConfigureRestHandler::changeAdminPassword(const QString &password, const Q
 
         if (!password.isEmpty()) {
             /* check old password */
-            QList<QByteArray> values =  user->getHash().split(L'$');
-            if (values.size() != 3)
-                return ResultFail;
-
-            QByteArray salt = values[1];
-            QCryptographicHash md5(QCryptographicHash::Md5);
-            md5.addData(salt);
-            md5.addData(oldPassword.toUtf8());
-            if (md5.result().toHex() != values[2])
+            if (!user->checkPassword(oldPassword))
                 return ResultFail;
 
             /* set new password */
             user->setPassword(password);
+            user->generateHash();
             QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(user, this, [](int, ec2::ErrorCode) { return; });
             user->setPassword(QString());
         } else {

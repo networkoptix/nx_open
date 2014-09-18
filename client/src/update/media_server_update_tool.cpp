@@ -15,7 +15,7 @@
 
 #include <client/client_settings.h>
 
-#include <version.h>
+#include <utils/common/app_info.h>
 
 namespace {
 
@@ -131,7 +131,11 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
     if (!m_targets.isEmpty())
         return m_targets;
 
-    QnMediaServerResourceList result = qnResPool->getResourcesWithFlag(Qn::server).filtered<QnMediaServerResource>();
+    QnMediaServerResourceList result;
+    foreach (const QnMediaServerResourcePtr &server, qnResPool->getResourcesWithFlag(Qn::server).filtered<QnMediaServerResource>()) {
+        if (server->getStatus() == Qn::Online)
+            result.append(server);
+    }
 
     foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllIncompatibleResources().filtered<QnMediaServerResource>()) {
         if (server->getSystemName() == qnCommon->localSystemName())

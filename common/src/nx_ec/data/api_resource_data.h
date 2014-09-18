@@ -47,14 +47,6 @@ namespace ec2
     };
 #define ApiResourceData_Fields (id)(parentId)(status)(name)(url)(typeId)(addParams)
 
-/*
-    struct ApiSetResourceDisabledData: ApiData {
-        QUuid id;
-        bool disabled;
-    };
-#define ApiSetResourceDisabledData_Fields (id)(disabled)
-*/
-
     struct ApiSetResourceStatusData: ApiData
     {
         QUuid id;

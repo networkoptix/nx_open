@@ -4,6 +4,7 @@ SET FILE=${finalName}.msi
 
 :update
     msiexec.exe /quiet /norestart /l*v %FILE%.log /i %FILE% INSTALL_SERVER=1 INSTALL_CLIENT=0
+    type %FILE%.log
     exit /b
 
 if "%1" != "" (
