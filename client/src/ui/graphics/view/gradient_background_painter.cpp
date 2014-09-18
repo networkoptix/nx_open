@@ -144,6 +144,9 @@ void QnGradientBackgroundPainter::drawLayer(QPainter *painter, const QRectF &rec
         updateBackgroundColorAnimated();
     }
 
+    if (!m_currentColor.isValid())
+        return;
+
     qreal pos = position();
 
     QColor color = linearCombine(1.0 + 0.5 * pos, currentColor());
