@@ -39,10 +39,12 @@ x64
 arm-isd
 arm-isd_s2
 arm-rpi
+arm-bpi
 target
 target-isd
 target-isd_s2
 target-rpi
+target-bpi
 
 build_environment/python/build_packages/*/build
 build_environment/python/packages/llutil/llutil.egg-info
