@@ -205,7 +205,7 @@ public:
     UdtPollSet();
     ~UdtPollSet();
     bool isValid() const {
-        return impl_;
+        return static_cast<bool>(impl_);
     }
     void interrupt();
     bool add( UdtSocket* sock, aio::EventType eventType, void* userData = NULL );

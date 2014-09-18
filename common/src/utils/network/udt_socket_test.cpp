@@ -75,10 +75,10 @@ public:
     UdtSocketProfileServer( const ServerConfig& config ) :
         address_(config.address),
         port_(config.port),
+        current_conn_size_(0),
         total_recv_bytes_(0),
         broken_or_error_conn_(0),
-        closed_conn_(0),
-        current_conn_size_(0) { }
+        closed_conn_(0) { }
     virtual bool run() {
         if(!server_socket_.bind( SocketAddress(HostAddress(address_),port_)))
             return false;
@@ -237,8 +237,8 @@ public:
         minimum_allowed_content_(config.content_min_size),
         maximum_allowed_concurrent_connection_(config.maximum_connection_size),
         active_conn_sockets_size_(0),
-        closed_conn_socket_size_(0),
         failed_connection_size_(0),
+        closed_conn_socket_size_(0),
         quit_(false) {
     }
     virtual bool run() {
