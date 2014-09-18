@@ -17,6 +17,7 @@
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/manual_camera_seach_reply.h>
 #include <api/model/camera_list_reply.h>
+#include <api/model/configure_reply.h>
 
 #include "media_server_connection.h"
 
@@ -54,6 +55,7 @@ signals:
     void finished(int status, const QnPtzData &reply, int handle);
     void finished(int status, const QnCameraBookmark &reply, int handle);
     void finished(int status, const QnCameraBookmarkList &reply, int handle);
+    void finished(int status, const QnConfigureReply &reply, int handle);
 
 private:
     friend class QnAbstractReplyProcessor;

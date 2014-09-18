@@ -34,6 +34,7 @@
 #include "media_server_reply_processor.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "model/camera_list_reply.h"
+#include "model/configure_reply.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
@@ -329,7 +330,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, handle);
         break;
     case ConfigureObject:
-        emitFinished(this, response.status, handle);
+        processJsonReply<QnConfigureReply>(this, response, handle);
         break;
     default:
         assert(false); /* We should never get here. */
@@ -840,5 +841,5 @@ int QnMediaServerConnection::configureAsync(bool wholeSystem, const QString &sys
     params << QnRequestParam("passwordDigest", QString::fromLatin1(passwordDigest));
     params << QnRequestParam("port", port);
 
-    return sendAsyncGetRequest(ConfigureObject, params, NULL, target, slot);
+    return sendAsyncGetRequest(ConfigureObject, params, QN_STRINGIZE_TYPE(QnConfigureReply), target, slot);
 }
