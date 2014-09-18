@@ -75,47 +75,94 @@ module.exports = function (grunt) {
                 livereload: 35729
             },
             proxies: [
-                {
+                /*{
                     context: '/ec2/',
                     host: '10.0.2.229',
                     port: 7039,
                     headers: { //admin:123
                         "Authorization": "Basic YWRtaW46MTIz"
                     }
-                },
-                /*{//Daria
-                    context: '/api/',
-                    host: '10.0.2.229',
-                    port: 7039,
-                    headers: { //admin:123
-                        "Authorization": "Basic YWRtaW46MTIz"
-                    }
+                 },
+                 {
+                     context: '/',
+                     host: 'mono',
+                     port: 41000,
+                 }
+                 */
 
-                },*/
-
-                /*{//Sergey Yuldashev
+              /*  //Sergey Yuldashev
+                {
                     context: '/api/',
                     host: '10.0.2.203',
                     port: 7501,
-                    headers: { //admin:123
-                        "Authorization": "Basic YWRtaW46MTIz"
+                    headers: {
+
+                        //"Authorization": "Basic YWRtaW46MTIzNA==" //admin:1234
+                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
-                },*/
-                {//Denis
+                }, {
+                    context: '/ec2/',
+                    host: '10.0.2.203',
+                    port: 7501,
+                    headers: {
+                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
+                    }
+                }*/
+
+                //Roman Vasilenko
+                {
+                    context: '/api/',
+                    host: '10.0.2.231',
+                    port: 7001,//7004,7005,2006
+                    headers: {
+                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
+                    }
+                }, {
+                    context: '/ec2/',
+                    host: '10.0.2.231',
+                    port: 7001,//7004,7005,2006
+                    headers: {
+                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
+                    }
+                }
+
+
+                //Daria
+                /*{
+                     context: '/api/',
+                     host: '10.0.2.229',
+                     port: 7039,
+                     headers: {
+                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
+                     }
+                },
+                {
+                     context: '/ec2/',
+                     host: '10.0.2.229',
+                     port: 7039,
+                     headers: {
+                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
+                     }
+                 }*/
+
+
+                /*
+                 //Denis
+                 {
                     context: '/api/',
                     host: '10.0.2.182',
                     port: 7001,
-                    headers: { //admin:123
-                        "Authorization": "Basic YWRtaW46MTIz"
+                    headers: {
+                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
-
-                }
-                /* ,
-                {
-                    context: '/',
-                    host: 'mono',
-                    port: 41000,
-                } */
+                 ,{
+                     context: '/ec2/',
+                     host: '10.0.2.182',
+                     port: 7001,
+                     headers: {
+                     "Authorization": "Basic YWRtaW46MTIz" //admin:123
+                 }
+                }*/
             ],
             livereload: {
                 options: {
