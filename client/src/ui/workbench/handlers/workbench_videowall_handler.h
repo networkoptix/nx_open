@@ -58,6 +58,7 @@ private:
     void openVideoWallItem(const QnVideoWallResourcePtr &videoWall);
     void closeInstanceDelayed();
 
+    bool canStartControlMode() const;
     void setControlMode(bool active);
     void updateMode();
 

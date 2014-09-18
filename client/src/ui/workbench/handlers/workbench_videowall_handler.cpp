@@ -835,22 +835,44 @@ void QnWorkbenchVideoWallHandler::restoreMessages(const QUuid &controllerUuid, q
     }
 }
 
-void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
-    if (active) {
-        QnLicenseListHelper licenseList(qnLicensePool->getLicenses());
-        if (licenseList.totalLicenseByType(Qn::LC_VideoWall) < videowallStarterPackAmount) {
-            QMessageBox::warning(mainWindow(),
-                tr("More licenses required"),
-                tr("To enable the feature please activate Video Wall starter license"));
-            return;
-        }
 
-        QnVideoWallLicenseUsageProposer proposer(m_licensesHelper.data(), 1);
-        if (!validateLicenses(tr("Could not start Video Wall control session."))) {
-            workbench()->currentLayout()->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QUuid()));
-            workbench()->currentLayout()->notifyTitleChanged();
-            return;
-        }
+bool QnWorkbenchVideoWallHandler::canStartControlMode() const {
+    QnLicenseListHelper licenseList(qnLicensePool->getLicenses());
+    if (licenseList.totalLicenseByType(Qn::LC_VideoWall) < videowallStarterPackAmount) {
+        QMessageBox::warning(mainWindow(),
+            tr("More licenses required"),
+            tr("To enable the feature please activate Video Wall starter license."));
+        return false;
+    }
+
+    QnVideoWallLicenseUsageProposer proposer(m_licensesHelper.data(), 1);
+    if (!validateLicenses(tr("Could not start Video Wall control session.")))
+        return false;
+    
+    foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems()) {
+        if (info.data.videoWallControlSession != workbench()->currentLayout()->resource()->getId())
+            continue;
+
+        /* Ignore our control session. */
+        if (info.uuid == QnRuntimeInfoManager::instance()->localInfo().uuid)
+            continue;
+
+        QMessageBox::warning(mainWindow(),
+            tr("Control session is already running"),
+            tr("Could not start control session.\nAnother user is already controlling this screen."));
+
+        return false;
+    }
+
+
+    return true;
+}
+
+void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
+    if (active && !canStartControlMode()) {
+        workbench()->currentLayout()->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QUuid()));
+        workbench()->currentLayout()->notifyTitleChanged();
+        return;
     }
 
     if (m_controlMode.active == active)
@@ -875,7 +897,7 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
         sendMessage(QnVideoWallControlMessage(QnVideoWallControlMessage::ControlStarted));  //TODO: #GDM #VW start control when item goes online
 
         QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-        localInfo.data.videoWallControlSessions++;
+        localInfo.data.videoWallControlSession = workbench()->currentLayout()->resource()->getId();
         QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
     } else {
         disconnect(workbench(),    &QnWorkbench::itemChanged,           this,   &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
@@ -893,7 +915,7 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
         m_controlMode.cacheTimer->stop();
 
         QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-        localInfo.data.videoWallControlSessions--;
+        localInfo.data.videoWallControlSession = QUuid();
         QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
     }
 }
@@ -2428,4 +2450,3 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(const QnVideoWall
         connection2()->getVideowallManager()->save(videowall, this, callback);
     }
 }
-
