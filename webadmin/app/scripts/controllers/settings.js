@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver) {
+    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,data) {
         $scope.settings = mediaserver.getSettings();
 
         $scope.settings.then(function (r) {
@@ -51,6 +51,7 @@ angular.module('webadminApp')
         };
 
         function restartServer(){
+            data.port = $scope.settings.port;
             $modal.open({
                 templateUrl: 'views/restart.html',
                 controller: 'RestartCtrl'

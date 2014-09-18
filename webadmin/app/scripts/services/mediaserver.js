@@ -12,6 +12,11 @@ angular.module('webadminApp')
             getStorages: function(){ return $http.get('/api/storageSpace'); },
 
             getMediaServer: function(id){return $http.get('/ec2/getMediaServers?id=' + id); },
-            saveMediaServer: function(info){return $http.post('/ec2/saveMediaServer',info); }
+            saveMediaServer: function(info){return $http.post('/ec2/saveMediaServer',info); },
+
+            statistics:function(url){
+                url = url || "";
+                return $http.get(url + '/api/statistics');
+            }
         };
     });
