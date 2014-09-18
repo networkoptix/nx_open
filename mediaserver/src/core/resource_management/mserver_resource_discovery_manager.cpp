@@ -76,8 +76,7 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCam
     char  mac[MAC_ADDR_LEN];
     char* host = 0;
     getMacFromPrimaryIF(mac, &host);
-    if (camera->getUniqueId().toLocal8Bit() == QByteArray(mac))
-        return true;
+    return (camera->getUniqueId().toLocal8Bit() == QByteArray(mac));
 #endif
 
     QUuid ownGuid = qnCommon->moduleGUID();

@@ -129,6 +129,10 @@ void QnAppserverResourceProcessor::at_mutexLocked()
 
 bool QnAppserverResourceProcessor::canTakeForeignCamera(const QnSecurityCamResourcePtr& newCamera)
 {
+#ifdef EDGE_SERVER
+    return true;
+#endif
+
     QnSecurityCamResourcePtr camera = qnResPool->getResourceById(newCamera->getId()).dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return false; // just deleted. do not updated
