@@ -14,7 +14,9 @@ def fileStructs(file):
             found = False
             for word in keywords:
                 if found:
-                    result.append('(' + word.strip(':\n') + ')')
+                    struct = '(' + word.strip(':\n') + ')'
+                    if ('(ApiData)' != struct):
+                        result.append(struct)
                     break
                     
                 if (word != 'struct'):
