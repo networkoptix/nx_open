@@ -68,6 +68,7 @@ void InstallationManager::updateInstalledVersionsInformation()
     QnClientInstallationPtr current = QnClientInstallation::installationForPath(QCoreApplication::applicationDirPath());
     if (current) {
         current->setVersion(QnSoftwareVersion(QnAppInfo::applicationVersion()));
+        current->setNeedsVerification(false);
         installations.insert(current->version(), current);
     } else {
         NX_LOG(QString::fromLatin1("Can't find client binary in %1").arg(QCoreApplication::applicationDirPath()), cl_logWARNING);

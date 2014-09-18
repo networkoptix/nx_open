@@ -315,7 +315,7 @@ bool ApplauncherProcess::startApplication(
     if( task->version != m_installationManager->latestVersion() ) {
         task->appArgs += QString::fromLatin1(" ") + m_settings->value( NON_RECENT_VERSION_ARGS_PARAM_NAME, NON_RECENT_VERSION_ARGS_DEFAULT_VALUE ).toString();
 
-        if (!installation->verify()) {
+        if (installation->isNeedsVerification() && !installation->verify()) {
             NX_LOG(QString::fromLatin1("Verification failed for version %1 (path %2)").arg(installation->version().toString()).arg(installation->rootPath()), cl_logDEBUG1);
             response->result = applauncher::api::ResultType::ioError;
 
