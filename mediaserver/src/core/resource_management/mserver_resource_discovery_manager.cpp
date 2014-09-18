@@ -82,13 +82,16 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCam
 
     QUuid ownGuid = qnCommon->moduleGUID();
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
-    if (!mServer)
-        return false;
-    if (mServer->getStatus() == Qn::Online && camera->preferedServerId() != ownGuid)
+    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(ownGuid).dynamicCast<QnMediaServerResource>();
+    if (!mServer || !ownServer)
         return false;
 
-    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(ownGuid).dynamicCast<QnMediaServerResource>();
-    if (!ownServer || !ownServer->isRedundancy())
+    if (camera->preferedServerId() == ownGuid)
+        return true;
+    else if (mServer->getStatus() == Qn::Online)
+        return false;
+
+    if (!ownServer->isRedundancy())
         return false; // redundancy is disabled
 
     QnResourceList cameras = qnResPool->getAllCameras(ownServer);
@@ -100,10 +103,7 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCam
     if (camerasCount >= ownServer->getMaxCameras())
         return false;
     
-    if (camera->preferedServerId() == ownGuid)
-        return true;
-    else
-        return mServer->currentStatusTime() > m_serverOfflineTimeout;
+    return mServer->currentStatusTime() > m_serverOfflineTimeout;
 }
 
 bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
