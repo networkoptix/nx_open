@@ -19,7 +19,6 @@ angular.module('webadminApp')
                     storage.warning = storage.isUsedForWriting && (storage.reservedSpace <= 0 ||  storage.reservedSpace >= storage.totalSpace );
                 }
             });
-
         });
 
         $scope.formatSpace = function(bytes){
@@ -53,7 +52,6 @@ angular.module('webadminApp')
 
             if(needConfirm && !confirm(needConfirm))
                 return;
-
 
             mediaserver.getSettings().then(function(settingsReply){
                 mediaserver.getMediaServer(settingsReply.data.reply.id.replace("{","").replace("}","")).then(function(mediaServerReply){
