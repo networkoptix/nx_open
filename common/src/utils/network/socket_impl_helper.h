@@ -188,6 +188,10 @@ public:
     virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
         return this->m_implDelegate.sendAsyncImpl( buf, std::move( handler ) );
     }
+    //!Implementation of AbstractCommunicatingSocket::registerTimerImpl
+    virtual bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) override {
+        return this->m_implDelegate.registerTimerImpl( timeoutMs, std::move( handler ) );
+    }
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) {
         return this->m_implDelegate.cancelAsyncIO( eventType, waitForRunningHandlerCompletion );

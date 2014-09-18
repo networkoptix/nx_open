@@ -108,7 +108,10 @@ UdtSocketImplPtr::UdtSocketImplPtr( UdtSocketImpl* imp ) :
 UdtSocketImplPtr::~UdtSocketImplPtr(){}
 
 // Implementator to keep the layout of class clean and achieve binary compatible
-class UdtSocketImpl {
+class UdtSocketImpl
+:
+    public SocketImpl
+{
 public:
     enum {
         CLOSED,
@@ -600,6 +603,16 @@ bool UdtSocket::getSendTimeout(unsigned int* millis)
     return impl_->GetSendTimeout(millis);
 }
 
+SocketImpl* UdtSocket::impl()
+{
+    return impl_.get();
+}
+
+const SocketImpl* UdtSocket::impl() const
+{
+    return impl_.get();
+}
+
 // =====================================================================
 // UdtStreamSocket implementation
 // =====================================================================
@@ -718,6 +731,10 @@ bool UdtStreamSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( 
 
 bool UdtStreamSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
     return m_aioHelper->sendAsyncImpl(buf, std::move(handler));
+}
+
+bool UdtStreamSocket::registerTimerImpl( unsigned int timeoutMillis, std::function<void()>&& handler ) {
+    return m_aioHelper->registerTimerImpl(timeoutMillis, std::move(handler));
 }
 
 AbstractSocket::SOCKET_HANDLE UdtStreamSocket::handle() const {

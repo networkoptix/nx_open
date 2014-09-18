@@ -111,6 +111,7 @@ public:
             m_socket,
             aio::etWrite,
             this,
+            boost::optional<unsigned int>(),
             [this, addr, sendTimeout](){ m_abstractSocketPtr->connect( addr, sendTimeout ); } );    //to be called between pollset.add and pollset.poll
     }
 

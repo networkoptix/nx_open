@@ -6,6 +6,8 @@
 #include "aio/pollset.h"
 #include <memory>
 
+#include "system_socket_impl.h"
+
 
 template<class SocketType> class AsyncSocketImplHelper;
 template<class SocketType> class AsyncServerSocketHelper;
@@ -53,6 +55,9 @@ public:
     bool getLastError(SystemError::ErrorCode* errorCode);
     bool getRecvTimeout(unsigned int* millis);
     bool getSendTimeout(unsigned int* millis);
+
+    SocketImpl* impl();
+    const SocketImpl* impl() const;
 
 protected:
     UdtSocket( detail::UdtSocketImpl* impl );
@@ -128,6 +133,7 @@ private:
     virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler );
     virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
     virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
+    virtual bool registerTimerImpl( unsigned int timeoutMillis, std::function<void()>&& handler );
 
 private:
     Q_DISABLE_COPY(UdtStreamSocket)

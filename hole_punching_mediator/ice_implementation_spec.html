@@ -1,0 +1,201 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>NX ICE implementation spec</title>
+</head>
+<body>
+    <h2>Abstract</h2>
+    <pre>
+    Contains description of technique to allow HDW peer (server or client) to connect to another peer without requiring any specific network configuration 
+    (static public IP or port forwarding)
+
+    </pre>
+
+
+
+    <h2>Introduction</h2>
+
+    <pre>
+    To simplify usage of HDW in public networks some NAT traversal functionality has to be added
+    Implementation of following techniques expected to deliver that:
+
+    - UDP hole punching (<a href="http://en.wikipedia.org/wiki/UDP_hole_punching">http://en.wikipedia.org/wiki/UDP_hole_punching</a>). 
+      This is method of sending data between peers each one behind different NAT
+
+    - UDT protocol (<a href="http://udt.sourceforge.net/">http://udt.sourceforge.net/</a>).
+      Connection-oriented protocol with reliable delivery built on top of UDP
+
+    - STUN (<a href="http://tools.ietf.org/html/rfc5389">http://tools.ietf.org/html/rfc5389</a>). 
+      Binary protocol designed to help for building of NAT traversal solution. Used as public api of mediator service. reasons of its selection
+        - STUN is designed to be part of NAT-traversal solution, so it is possible that NAT will detect STUN 
+          (there are special magic numbers in STUN packet to help NAT detect STUN) and help (or, at least, not prevent) usage of UDP hole punching
+        - it is simple binary protocol which can be customized for our needs. So, it is more effective than HTTP, 
+          still well-known and contains no overhead in comparison to some proprietary protocol
+
+    Usage of UDP hole punching requires introducing of some helper service which will be called <b>mediator</b> further.
+
+    </pre>
+
+
+
+    <h2>1. Type of client <-> server connections</h2>
+
+    <pre>
+    - <b>Direct TCP connection</b>
+      If both peers are in same local network, they connect by establishing direct tcp connection
+      If one peer has public address and the other one does not, the latter one should establishes tcp connection to the public one. 
+      In this case mediator service is required for public peer to notify nonpublic one there is a need to connect
+
+    - <b>Cross-NAT connection</b>
+      If both peers do not have public IP but have access to the Internet (each one is behind its own NAT), 
+      then TCP/UDP hole punching technique is used to establish direct connection between peers. This case also requires some mediator service
+
+    - <b>Proxying data via mediator</b>
+      If both peers behind different NAT but hole punching is not possible (due to NAT/firewall restrictions) than proxying data via mediator can be done. 
+      Due to possible high load on mediator it should be possible to proxy not all traffic, but, for example, only non-media data (if it still makes sense, of course)
+
+    </pre>
+
+
+
+    <h3>1.1 Cross-NAT connection (backward connection or hole punching)</h3>
+
+    <pre>
+    If desired server is behind NAT and no port forwarding present than NAT traversal is used.
+    This requires usage of mediator service which is always publicly available
+
+    Both server and client use TCP to talk to mediator
+
+    Each peer is behind its own NAT
+      - server, that wants to accept connections, establishes TCP-connection to the nearest mediator and reports its ID
+      - client, that wants to connect to some server, connects to mediator with TCP and requests connection to the server with some ID
+      - if requested server is registered on mediator than:
+        - server address:port (remote address of TCP connection) is sent to client
+        - client address:port (remote address of TCP connection) is sent to server
+      - on receiving another peer address, both server and client try to insdt
+      - on receiving another peer address, server and client initiate rendezvous connection by sending corresponding UDT-packets to each other’s address
+      - NOTE: NAT can change external port when peer sends data to another address. But, sometimes port is just increased by 1, so sometimes it is possible to guess that address
+
+    </pre>
+
+
+
+    <h2>2. Mediator</h2>
+
+    <pre>
+    <b>mediator</b> is a public network service with following primary functions:
+      - help two peers behind NAT to establish direct connection using UDP hole punching
+      - if UDP hole punching is not possible, mediator can be used to proxy traffic between server and client
+      - there can be multiple mediators (for example one per each continent)
+      - stores registered system names and currently binded servers in the persistent distributed database
+      - if connection request specifies system name only (no server guid) than mediator SHOULD select server nearest to the client 
+        (for beginning, random server is enough, later we can use IP address database to find server nearest to client)
+
+    </pre>
+
+
+
+    <h3>2.1. Mediator’s external API</h3>
+
+    <pre>
+      - implements STUN (http://tools.ietf.org/html/rfc5389) protocol (over UDT) for primary functionality 
+        (binding server, establishing cross-NAT connection) and HTTP over TCP for statistics and debugging
+
+    </pre>
+
+
+
+    <h3>2.2. HTTP interface</h3>
+    
+    <pre>
+    Each requests should be verified so that only our modules can connect.
+      - <b>register</b>. Registers system name in mediator
+        Request contains following data:
+          - <b>desired system name</b>
+        Response.
+          - Following response codes are defined:
+            - OK. system name unique and has been registered
+            - ALREADY_EXISTS. system name is not unique. Client has to choose another system name
+            - OTHER_ERROR. There is some error registering (e.g., DB error)
+          - On success, following data is returned:
+            - <b>system name</b> (same as in request)
+            - <b>authorization key</b>. Binary key which MUST be reported by server willing to accept connections on this system name
+      - <b>unregister</b>. Removes system name registration
+        - Request contains following data:
+          - <b>system name</b>
+          - <b>authorization key</b>, returned by register request
+      - TODO some statistics/debugging requests can be introduced in the future
+
+    </pre>
+
+
+
+    <h3>2.3. STUN interface</h3>
+
+    <pre>
+    Each requests should be verified so that only our modules can connect.
+    Following requests are required:
+      - <b>bind</b>
+        Register server accepting connections in mediator
+        - Requests params:
+          - system name
+          - authorization key provided by register request
+          - server id. ID unique between servers with same system name
+        - Response
+          - Result codes:
+            - OK
+            - NOT_FOUND. Unknown system name
+            - UNAUTHORIZED. bad authorization key
+            - ALREADY_EXISTS. Server with such system name and id is already registered
+      - <b>connect</b>
+        Client sends this request to connect to some server
+        - Requests params:
+          - system name
+          - server id (optional). If not specified, connection to the nearest server is proposed
+        - Response
+          - Result codes:
+            - OK
+            - NOT_FOUND. Unknown system name / server ID
+          - Data:
+            - server address:port is returned
+      - <b>connection_requested</b>
+        This notification is sent to the binded server when client requests connection to it
+        - Params:
+          - client address:port
+    </pre>
+
+
+
+    <h2>3. Server-side behaviour</h2>
+
+    <pre>
+    - server binds to local port and (if possible) establishes UDT-connection to the nearest mediator and reports its system name and server guid. 
+      Guid is required to distinguish different servers inside single system
+    - mediator can respond to the server that its system name is not registered
+    - if server receives notification from mediator about incoming connection request from some client
+      - if client has public address (how do we know that?) server establishes TCP-connection to client address
+      - if client is not public, server initiates rendezvous UDT-connection to reported client address
+
+    </pre>
+
+
+
+    <h2>4. Client behaviour</h2>
+
+    <pre>
+    - If server with required system name was found in local network, client establishes direct TCP-connection
+    - If direct connection could not be established client connects to mediator and asks for connection to server with required system name and (optionally) server guid
+    - If (system name, guid) not found, connection failed
+    - If pair (system name, guid) registered on another mediator, client connects to specified mediator and requests connection to specified server
+    - mediator responds with server address and port, client initiates rendezvous UDT-connection to reported server address
+    - To establish another connection client ...
+      - If client already has at least one connection to the server, client uses UDT to connect directly to the server address (same address we already connected to)
+      - If client does not have opened connection, starts with step 1
+
+    </pre>
+
+
+</body>
+</html>
