@@ -46,7 +46,7 @@
     <String Id="AppServerDlg_Network"                               Overridable="yes">网络配置</String>    
     <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">代理端口</String>
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">确认密码</String>   
-    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">额外的参数</String>   
+    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">系统优化设置</String>   
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">允许系统以优化相机设置（推荐）</String>     
 
     <!-- Associations -->
