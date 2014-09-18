@@ -28,8 +28,7 @@ namespace {
     }
 }
 
-QnClientInstallation::QnClientInstallation() {
-}
+QnClientInstallation::QnClientInstallation() : m_needsVerification(true) {}
 
 bool QnClientInstallation::exists() const {
     return !m_binaryPath.isEmpty() && QFile::exists(executableFilePath());
@@ -129,4 +128,12 @@ bool QnClientInstallation::createInstallationDat() {
     file.close();
 
     return true;
+}
+
+bool QnClientInstallation::isNeedsVerification() const {
+    return m_needsVerification;
+}
+
+void QnClientInstallation::setNeedsVerification(bool f) {
+    m_needsVerification = f;
 }
