@@ -1428,6 +1428,11 @@ void QnMain::run()
                 appserverHost = resolveHost(appserverHostString);
             } while (appserverHost.toIPv4Address() == 0);
         }
+
+        bool isModified = false;
+        if (m_universalTcpListener->getPort() != QUrl(server->getApiUrl()).port())
+            isModified = true;
+
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost), m_universalTcpListener->getPort());
 
         QList<QHostAddress> serverIfaceList = allLocalAddresses();
@@ -1442,7 +1447,6 @@ void QnMain::run()
                 serverIfaceList << m_publicAddress;
         }
 
-        bool isModified = false;
         if (server->getNetAddrList() != serverIfaceList) {
             server->setNetAddrList(serverIfaceList);
             isModified = true;
