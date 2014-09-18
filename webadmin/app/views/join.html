@@ -2,30 +2,29 @@
     <h3 class="modal-title">Connection</h3>
 </div>
 
-<div class="modal-body" class="col-sm-12">
-    <form class="form" role="form">
+<form class="form" role="form">
+    <div class="modal-body" class="col-sm-12">
+
         <div class="form-group">
             <label for="otherSystemUrl" class="control-label">Other System's URL</label>
             <div class="">
-                <input type="url" class="form-control" id="otherSystemUrl" placeholder="URL">
+                <input type="url" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="URL" required />
             </div>
         </div>
 
         <div class="form-group">
             <label for="otherSystemPassword" class="control-label">Other System's Password</label>
             <div class="">
-                <input type="password" class="form-control" id="otherSystemPassword" placeholder="Password">
+                <input type="password" ng-model="settings.password"  class="form-control" id="otherSystemPassword" placeholder="Password" required />
             </div>
         </div>
 
-        <div class="form-group" ng-show="testProgressBarVisible">
-            <progressbar value="testProgress"></progressbar>
-        </div>
-    </form>
-</div>
+    </div>
 
-<div class="modal-footer">
-    <button class="btn btn-primary pull-left" name="button" ng-click="test()">Test</button>
-    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-primary" name="button" ng-click="join()">Join</button>
-</div>
+    <div class="modal-footer">
+        <button class="btn btn-primary pull-left" name="button" ng-click="test()" ng-disabled="form.$invalid">Test</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-primary" name="button" ng-click="join()" ng-disabled="form.$invalid">Join</button>
+    </div>
+
+</form>
