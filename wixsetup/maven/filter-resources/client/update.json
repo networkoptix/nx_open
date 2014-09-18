@@ -2,6 +2,7 @@
     "version" : "${release.version}.${buildNumber}",
     "platform" : "${platform}",
     "arch" : "${arch}",
+    "modification" : "${modification}",
     "client" : true,
     "minimalVersion" : "${release.version}.0"
 }

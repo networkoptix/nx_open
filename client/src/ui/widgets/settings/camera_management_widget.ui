@@ -27,7 +27,7 @@
    <item>
     <widget class="QCheckBox" name="autoSettingsCheckBox">
      <property name="text">
-      <string>Enable automatic camera settings optimization</string>
+      <string>Allow system to optimize camera settings (Recommended)</string>
      </property>
     </widget>
    </item>

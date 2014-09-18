@@ -19,7 +19,7 @@
 #include <utils/common/systemerror.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/media_stream_cache.h>
-#include <version.h>
+#include <utils/common/app_info.h>
 
 #include "camera/camera_pool.h"
 #include "hls_archive_playlist_manager.h"
@@ -31,6 +31,8 @@
 #include "streaming/streaming_params.h"
 #include "utils/network/tcp_connection_priv.h"
 
+
+//TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
 using std::make_pair;
 using namespace nx_http;
@@ -216,7 +218,7 @@ namespace nx_hls
         response.headers.insert( std::make_pair(
             "Date",
             QLocale(QLocale::English).toString(QDateTime::currentDateTime(), lit("ddd, d MMM yyyy hh:mm:ss t")).toLatin1() ) );
-        response.headers.insert( std::make_pair( "Server", (lit(QN_APPLICATION_NAME) + lit(" ") + QCoreApplication::applicationVersion()).toLatin1().data()) );
+        response.headers.insert( std::make_pair( "Server", (qApp->applicationName() + lit(" ") + QCoreApplication::applicationVersion()).toLatin1().data()) );
         response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //getRequestedFile can override this
 
         if( request.requestLine.version == nx_http::http_1_1 )
@@ -419,10 +421,17 @@ namespace nx_hls
                     : MEDIA_Quality_Low;
             }
 
-            if( !camResource->hasDualStreaming() && streamQuality == MEDIA_Quality_Low )
+            if( !camResource->hasDualStreaming() )
             {
-                NX_LOG( QString::fromLatin1("Got request to unavailable low quality of camera %2").arg(camResource->getUniqueId()), cl_logDEBUG1 );
-                return nx_http::StatusCode::notFound;
+                if( streamQuality == MEDIA_Quality_Low )
+                {
+                    NX_LOG( QString::fromLatin1("Got request to unavailable low quality of camera %2").arg(camResource->getUniqueId()), cl_logDEBUG1 );
+                    return nx_http::StatusCode::notFound;
+                }
+                else if( streamQuality == MEDIA_Quality_Auto )
+                {
+                    streamQuality = MEDIA_Quality_High;
+                }
             }
 
             const nx_http::StatusCode::Value result = createSession(

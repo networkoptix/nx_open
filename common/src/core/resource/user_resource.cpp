@@ -1,4 +1,5 @@
 #include "user_resource.h"
+#include "network/authenticate_helper.h"
 
 QnUserResource::QnUserResource():
     m_permissions(0),
@@ -40,6 +41,36 @@ void QnUserResource::setPassword(const QString& password)
         m_password = password;
     }
     emit passwordChanged(::toSharedPointer(this));
+}
+
+void QnUserResource::generateHash() {
+    QString password = getPassword();
+
+    QByteArray salt = QByteArray::number(rand(), 16);
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    md5.addData(salt);
+    md5.addData(password.toUtf8());
+    QByteArray hash = "md5$";
+    hash.append(salt);
+    hash.append("$");
+    hash.append(md5.result().toHex());
+
+    QByteArray digest = QnAuthHelper::createUserPasswordDigest(getName(), password);
+
+    setHash(hash);
+    setDigest(digest);
+}
+
+bool QnUserResource::checkPassword(const QString &password) {
+    QList<QByteArray> values =  getHash().split(L'$');
+    if (values.size() != 3)
+        return false;
+
+    QByteArray salt = values[1];
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    md5.addData(salt);
+    md5.addData(password.toUtf8());
+    return md5.result().toHex() == values[2];
 }
 
 void QnUserResource::setDigest(const QByteArray& digest)

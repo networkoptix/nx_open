@@ -8,6 +8,8 @@
 
 #include <memory>
 
+#include <boost/optional.hpp>
+
 #include "aioeventhandler.h"
 #include "aiothread.h"
 #include "pollset.h"
@@ -33,7 +35,7 @@ namespace aio
             After object instanciation one must call \a isInitialized to check whether instanciation was a success
             \param threadCount This is minimal thread count. Actual thread poll may exceed this value because PollSet can monitor limited number of sockets.
             If zero, thread count is choosed automatically
-            */
+        */
         AIOService( unsigned int threadCount = 0 );
         virtual ~AIOService();
 
@@ -45,7 +47,7 @@ namespace aio
             \return true, if added successfully. If \a false, error can be read by \a SystemError::getLastOSErrorCode() function
             \note if no event in corresponding socket timeout (if not 0), then aio::etTimedOut event will be reported
             \note If not called from aio thread \a sock can be added to event loop with some delay
-            */
+        */
         template<class SocketType>
         bool watchSocket(
             SocketType* const sock,
@@ -65,7 +67,7 @@ namespace aio
             \note If \a waitForRunningHandlerCompletion is \a false events that are already posted to the queue can be called \b after return of this method
             \note If this method is called from asio thread, \a sock is processed in (e.g., from event handler associated with \a sock),
             this method does not block and always works like \a waitForRunningHandlerCompletion has been set to \a true
-            */
+        */
         template<class SocketType>
         void removeFromWatch(
             SocketType* const sock,
@@ -74,6 +76,20 @@ namespace aio
         {
             QMutexLocker lk( &m_mutex );
             return removeFromWatchNonSafe( sock, eventType, waitForRunningHandlerCompletion );
+        }
+
+        //!Register timeout, associated with socket \a sock
+        /*!
+            \a eventHandler->eventTriggered( \a sock, aio::etTimedOut ) will be called every \a timeoutMillis milliseconds until cancelled with \a aio::AIOService::removeFromWatch( \a sock, \a aio::etTimedOut )
+        */
+        template<class SocketType, class HandlerType>
+        bool registerTimer(
+            SocketType* const sock,
+            unsigned int timeoutMillis,
+            AIOEventHandler<SocketType>* const eventHandler )
+        {
+            QMutexLocker lk( &m_mutex );
+            return watchSocketNonSafe( sock, aio::etTimedOut, eventHandler, timeoutMillis );
         }
 
         //!Returns \a true, if socket is still listened for state changes
@@ -94,20 +110,29 @@ namespace aio
         bool watchSocketNonSafe(
             SocketType* const sock,
             aio::EventType eventToWatch,
-            AIOEventHandler<SocketType>* const eventHandler )
+            AIOEventHandler<SocketType>* const eventHandler,
+            boost::optional<unsigned int> timeoutMillis = boost::optional<unsigned int>() )
         {
             SocketAIOContext<SocketType>& aioHandlingContext = getAIOHandlingContext<SocketType>();
 
-            unsigned int sockTimeoutMS = 0;
-            if( eventToWatch == aio::etRead )
+            if( !timeoutMillis )
             {
-                if( !sock->getRecvTimeout( &sockTimeoutMS ) )
-                    return false;
-            }
-            else if( eventToWatch == aio::etWrite )
-            {
-                if( !sock->getSendTimeout( &sockTimeoutMS ) )
-                    return false;
+                unsigned int sockTimeoutMS = 0;
+                if( eventToWatch == aio::etRead )
+                {
+                    if( !sock->getRecvTimeout( &sockTimeoutMS ) )
+                        return false;
+                }
+                else if( eventToWatch == aio::etWrite )
+                {
+                    if( !sock->getSendTimeout( &sockTimeoutMS ) )
+                        return false;
+                }
+                else
+                {
+                    assert( false );
+                }
+                timeoutMillis = sockTimeoutMS;
             }
 
             //checking, if that socket is already monitored
@@ -120,7 +145,7 @@ namespace aio
             if( (it != aioHandlingContext.sockets.end()) && (it->first.first == sockCtx.first) )
             {
                 //socket is already monitored for other event. Trying to use same thread
-                if( it->second->watchSocket( sock, eventToWatch, eventHandler, sockTimeoutMS ) )
+                if( it->second->watchSocket( sock, eventToWatch, eventHandler, timeoutMillis.get() ) )
                 {
                     aioHandlingContext.sockets.insert( it, std::make_pair( sockCtx, it->second ) );
                     return true;
@@ -153,7 +178,7 @@ namespace aio
                 aioHandlingContext.aioThreadPool.push_back( newThread.release() );
             }
 
-            if( threadToUse->watchSocket( sock, eventToWatch, eventHandler, sockTimeoutMS ) )
+            if( threadToUse->watchSocket( sock, eventToWatch, eventHandler, timeoutMillis.get() ) )
             {
                 aioHandlingContext.sockets.insert( std::make_pair( sockCtx, threadToUse ) );
                 return true;

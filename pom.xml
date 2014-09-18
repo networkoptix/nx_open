@@ -21,7 +21,6 @@
 
 	<properties>
 		<release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
-		<timestamp>${angle}-${webkit}-20140625.timestamp</timestamp>
 		<appserver.name>Enterprise Controller</appserver.name>
 		<appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
 		<client.name>${company.name} ${product.name} Client</client.name>
@@ -38,15 +37,17 @@
 		<build.configuration>release</build.configuration>
 		<buildNumber>0</buildNumber>
 		<skip.sign>true</skip.sign>
+		<box>none</box>
+        <modification/>
 		<final.artifact.name>${project.artifactId}</final.artifact.name>
-		<finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
+		<finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${box}-${arch}-${build.configuration}-beta</finalName>
 		<beta>true</beta>
+		<updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
 		<mobile>false</mobile>
 		<!-- compile.option1. See profile no-webkit -->
 		<webkit>true</webkit>
 		<!-- compile.option2. See profile angle  -->
 		<angle>false</angle>
-		<box/>
 
 		<root.dir>${basedir}</root.dir>
 		<compile.option1>-webkit</compile.option1>
@@ -247,19 +248,6 @@
 				<module>ios-client</module>
 			</modules>
 		</profile>
-		<profile>
-			<id>build-env-win</id>
-			<!-- preparing build-environment only if it is not ready. The last operation is installing llutil to x64 python virtualenv so it can be used as a criteria -->
-			<activation>        
-				<file>
-					<!-- the dumb activator does not recognize variables so I cannot put libdir here -->
-					<missing>build_environment/target/${timestamp}</missing>
-				</file> 
-			</activation>
-			<modules>   
-				<module>build_environment</module>
-			</modules>  
-		</profile>  
 
 		<profile>
 			<id>quicksync</id>
@@ -283,6 +271,7 @@
 			</activation>
 			<modules>
 				<module>build_variables</module>
+				<module>build_environment</module>
 				<module>common</module>
 				<!-- <module>hole_punching_mediator</module> -->
 				<module>appserver2</module>
@@ -352,6 +341,7 @@
 				<compiler>msvc2012u3</compiler>
 				<arch>x64</arch>
 				<box>win78</box>
+                <modification>win78</modification>
 				<force_x86>false</force_x86>
 				<qt.spec>win32-msvc2012</qt.spec>
 				<PlatformToolSet>v110</PlatformToolSet>
@@ -376,6 +366,7 @@
 			<properties>
 				<qt.spec>win32-msvc2012xp</qt.spec>
 				<PlatformToolSet>v110_xp</PlatformToolSet>
+                <modification>winxp</modification>
 			</properties>
 		</profile>
 
@@ -453,6 +444,9 @@
 				<module>debsetup/client-deb</module>
 				<module>debsetup/mediaserver-deb</module>
 			</modules>  
+            <properties>
+                <modification>ubuntu</modification>
+            </properties>
 		</profile>         
 
 		<profile>
@@ -499,6 +493,7 @@
 				<openssl.version>1.0.0j-SNAPSHOT</openssl.version>
 				<additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines>
 				<!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines> -->
+                <modification>isd</modification>
 			</properties>
 			<modules>
 				<module>plugins/isd_native_plugin</module>
@@ -525,6 +520,7 @@
 				<compiler>${toolchain.version}</compiler>
 				<openssl.version>1.0.1f-SNAPSHOT</openssl.version>
 				<additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines>
+                <modification>isd_s2</modification>
 			</properties>
 			<modules>
 				<module>plugins/isd_native_plugin</module>
@@ -550,6 +546,7 @@
 				<compiler>${toolchain.version}</compiler>
 				<openssl.version>1.0.0j-SNAPSHOT</openssl.version>
 				<ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
+                <modification>rpi</modification>
 			</properties>
 			<modules>
 				<module>edge_firmware/rpi</module>
@@ -616,7 +613,8 @@
 				</property>
 			</activation>
 			<properties>
-				<finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>
+				<finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${box}-${arch}</finalName>
+				<updateFeedUrl>${prodUpdateFeedUrl}</updateFeedUrl>
 				<skip.sign>false</skip.sign>
 			</properties>
 		</profile>     

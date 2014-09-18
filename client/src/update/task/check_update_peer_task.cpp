@@ -16,8 +16,9 @@
 
 #include <utils/update/update_utils.h>
 #include <utils/applauncher_utils.h>
+#include <utils/network/http/async_http_client_reply.h>
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 #define QnNetworkReplyError static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error)
 
@@ -123,11 +124,12 @@ void QnCheckForUpdatesPeerTask::checkBuildOnline() {
 
     nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
-    connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnCheckForUpdatesPeerTask::at_buildReply_finished, Qt::DirectConnection );
+    QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient, this);
+    connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_buildReply_finished);
     if (!httpClient->doGet(url))
         finishTask(QnCheckForUpdateResult::InternetProblem);
     else 
-        m_runningRequests.insert(httpClient);
+        m_runningRequests.insert(reply);
 }
 
 void QnCheckForUpdatesPeerTask::checkOnlineUpdates() {
@@ -141,22 +143,25 @@ void QnCheckForUpdatesPeerTask::checkOnlineUpdates() {
 
     m_updateFiles.clear();
     m_clientUpdateFile.clear();
+    m_releaseNotesUrl.clear();
 
     m_targetMustBeNewer = m_target.version.isNull();
 
     nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
-    connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnCheckForUpdatesPeerTask::at_updateReply_finished, Qt::DirectConnection );
+    QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient, this);
+    connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_updateReply_finished);
     if (!httpClient->doGet(m_updatesUrl))
         finishTask(QnCheckForUpdateResult::InternetProblem);
     else 
-        m_runningRequests.insert(httpClient);
+        m_runningRequests.insert(reply);
 }
 
 void QnCheckForUpdatesPeerTask::checkLocalUpdates() {
     m_updateFiles.clear();
     m_targetMustBeNewer = false;
     m_temporaryUpdateDir.clear();
+    m_releaseNotesUrl.clear();
 
     if (!QFile::exists(m_target.fileName)) {
         finishTask(QnCheckForUpdateResult::BadUpdateFile);
@@ -237,19 +242,21 @@ void QnCheckForUpdatesPeerTask::cleanUp() {
     }
 }
 
-void QnCheckForUpdatesPeerTask::at_updateReply_finished(const nx_http::AsyncHttpClientPtr &client) {
-    m_runningRequests.erase(client);
+void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *reply) {
+    if (!m_runningRequests.remove(reply))
+        return;
 
-    client->terminate();
-    if (client->failed()) {
+    reply->deleteLater();
+
+    if (reply->isFailed()) {
         finishTask(QnCheckForUpdateResult::InternetProblem);
         return;
     }
 
-    QByteArray data = client->fetchMessageBodyBuffer();
+    QByteArray data = reply->data();
     
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
-    map = map.value(lit(QN_CUSTOMIZATION_NAME)).toMap();
+    map = map.value(QnAppInfo::customizationName()).toMap();
     QVariantMap releasesMap = map.value(lit("releases")).toMap();
 
     QString currentRelease;
@@ -268,20 +275,23 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(const nx_http::AsyncHttp
     if (m_target.version.isNull())
         m_target.version = latestVersion;
     m_updateLocationPrefix = updatesPrefix;
+    m_releaseNotesUrl = QUrl(map.value(lit("release_notes")).toString());
 
     checkBuildOnline();
 }
 
-void QnCheckForUpdatesPeerTask::at_buildReply_finished(const nx_http::AsyncHttpClientPtr &client) {
-    m_runningRequests.erase(client);
+void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *reply) {
+    if (!m_runningRequests.remove(reply))
+        return;
 
-    client->terminate();
-    if (client->failed()) {
+    reply->deleteLater();
+
+    if (reply->isFailed()) {
         finishTask(QnCheckForUpdateResult::NoSuchBuild);
         return;
     }
 
-    QByteArray data = client->fetchMessageBodyBuffer();
+    QByteArray data = reply->data();
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
 
     m_target.version = QnSoftwareVersion(map.value(lit("version")).toString());
@@ -318,11 +328,11 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(const nx_http::AsyncHttpC
 
     if (!m_target.denyClientUpdates) {
         packages = map.value(lit("clientPackages")).toMap();
-        QString arch = lit(QN_APPLICATION_ARCH);
-        QString modification = lit(QN_ARM_BOX);
+        QString arch = QnAppInfo::applicationArch();
+        QString modification = QnAppInfo::applicationPlatformModification();
         if (!modification.isEmpty())
             arch += lit("_") + modification;
-        QVariantMap package = packages.value(lit(QN_APPLICATION_PLATFORM)).toMap().value(arch).toMap();
+        QVariantMap package = packages.value(QnAppInfo::applicationPlatform()).toMap().value(arch).toMap();
 
         if (!package.isEmpty()) {
             QString fileName = package.value(lit("file")).toString();
@@ -346,6 +356,7 @@ void QnCheckForUpdatesPeerTask::finishTask(QnCheckForUpdateResult::Value value) 
     result.latestVersion = m_target.version;
     result.systems = m_updateFiles.keys().toSet();
     result.clientInstallerRequired = m_clientRequiresInstaller;
+    result.releaseNotesUrl = m_releaseNotesUrl;
 
     emit checkFinished(result);
     finish(static_cast<int>(value));

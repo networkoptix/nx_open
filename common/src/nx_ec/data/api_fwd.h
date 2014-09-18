@@ -20,7 +20,7 @@ namespace ec2 {
     struct ApiEmailSettingsData;
 	struct ApiFullInfoData;
     struct ApiSyncMarkerRecord;
-    struct ApiSyncMarkerData;
+    struct ApiUpdateSequenceData;
     struct ApiIdData;
     struct ApiLayoutItemData;
     struct ApiLayoutItemWithRefData;
@@ -39,6 +39,11 @@ namespace ec2 {
     struct ApiResourceTypeData;
     struct ApiScheduleTaskData;
     struct ApiScheduleTaskWithRefData;
+    struct QnTranStateKey;
+    struct QnTranState;
+    struct QnTranStateResponse;
+    struct ApiSyncRequestData;
+    struct ApiTranSyncDoneData;
     struct ApiPeerAliveData;
     struct ApiSetResourceStatusData;
     struct ApiStorageData;
@@ -92,7 +97,6 @@ namespace ec2 {
     typedef std::vector<ApiCameraBookmarkTagData> ApiCameraBookmarkTagDataList;
     typedef std::vector<ApiModuleData> ApiModuleDataList;
     typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
-    typedef std::vector<ApiConnectionData> ApiConnectionDataList;
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
 
 #define QN_EC2_API_DATA_TYPES \
@@ -105,7 +109,7 @@ namespace ec2 {
     (ApiFullInfoData)\
     (ApiIdData)\
     (ApiSyncMarkerRecord)\
-    (ApiSyncMarkerData)\
+    (ApiUpdateSequenceData)\
     (ApiLayoutItemData)\
     (ApiLayoutItemWithRefData)\
     (ApiLayoutData)\
@@ -124,6 +128,11 @@ namespace ec2 {
     (ApiResourceTypeData)\
     (ApiScheduleTaskData)\
     (ApiScheduleTaskWithRefData)\
+    (QnTranStateKey)\
+    (QnTranState)\
+    (ApiSyncRequestData)\
+    (QnTranStateResponse)\
+    (ApiTranSyncDoneData)\
     (ApiPeerAliveData)\
     (ApiSetResourceStatusData)\
     (ApiStoredFilePath)\

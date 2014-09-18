@@ -69,6 +69,9 @@ public:
         /** Do not show update notification for the selected version. */
         IGNORED_UPDATE_VERSION,
 
+        /** Do not show save confirmation when closing unsaved layouts. */
+        IGNORE_UNSAVED_LAYOUTS,
+
         SHOWCASE_URL,
         SHOWCASE_ENABLED,
 
@@ -88,8 +91,6 @@ public:
         TITLE_OPENED,
         NOTIFICATIONS_PINNED,
         NOTIFICATIONS_OPENED,
-
-        STORED_PASSWORD,
 
         CLOCK_24HOUR,
         CLOCK_WEEKDAY,
@@ -137,9 +138,16 @@ public:
         /** Unique id for this PC for videowall construction. */
         PC_UUID,
 
-        /** Flag that client is run in videowall mode */
+        /** Flag that client is run in videowall mode. */
         VIDEO_WALL_MODE,
 
+        /** Default color of the background circles (read from customization). */
+        DEFAULT_BACKGROUND_COLOR,
+
+        /** Color of the background circles. */
+        BACKGROUND_COLOR,
+
+        /** Flag that background circles change color automatically. */
         RAINBOW_MODE,
 
         /** Speed of background circles movement. Value is period (in seconds) of the full movement cycle. Default is 120 seconds. */
@@ -203,6 +211,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QString())
         QN_DECLARE_RW_PROPERTY(bool,                        isAutoCheckForUpdates,  setAutoCheckForUpdates,     AUTO_CHECK_FOR_UPDATES,     true)
         QN_DECLARE_RW_PROPERTY(QnSoftwareVersion,           ignoredUpdateVersion,   setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     QnSoftwareVersion())
+        QN_DECLARE_RW_PROPERTY(bool,                        ignoreUnsavedLayouts,   setIgnoreUnsavedLayouts,    IGNORE_UNSAVED_LAYOUTS,     false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClientUpdateDisabled, setClientUpdateDisabled,    NO_CLIENT_UPDATE,           false)
         QN_DECLARE_RW_PROPERTY(QUrl,                        showcaseUrl,            setShowcaseUrl,             SHOWCASE_URL,               QUrl())
         QN_DECLARE_RW_PROPERTY(bool,                        isShowcaseEnabled,      setShowcaseEnabled,         SHOWCASE_ENABLED,           false)
@@ -218,7 +227,6 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isTitleOpened,          setTitleOpened,             TITLE_OPENED,               true)
         QN_DECLARE_RW_PROPERTY(bool,                        isNotificationsPinned,  setNotificationsPinned,     NOTIFICATIONS_PINNED,       false)
         QN_DECLARE_RW_PROPERTY(bool,                        isNotificationsOpened,  setNotificationsOpened,     NOTIFICATIONS_OPENED,       false)
-        QN_DECLARE_RW_PROPERTY(QString,                     storedPassword,         setStoredPassword,          STORED_PASSWORD,            QString())
         QN_DECLARE_RW_PROPERTY(bool,                        isClock24Hour,          setClock24Hour,             CLOCK_24HOUR,               true)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockWeekdayOn,       setClockWeekdayOn,          CLOCK_WEEKDAY,              false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockDateOn,          setClockDateOn,             CLOCK_DATE,                 false)
@@ -239,6 +247,8 @@ private:
         QN_DECLARE_RW_PROPERTY(Qn::ClientSkin,              clientSkin,             setClientSkin,              CLIENT_SKIN,                Qn::DarkSkin)
         QN_DECLARE_RW_PROPERTY(QUuid,                       pcUuid,                 setPcUuid,                  PC_UUID,                    QUuid())
         QN_DECLARE_RW_PROPERTY(bool,                        isVideoWallMode,        setVideoWallMode,           VIDEO_WALL_MODE,            false)
+        QN_DECLARE_RW_PROPERTY(QColor,                      defaultBackgroundColor, setDefaultBackgroundColor,  DEFAULT_BACKGROUND_COLOR,   QColor())
+        QN_DECLARE_RW_PROPERTY(QColor,                      backgroundColor,        setBackgroundColor,         BACKGROUND_COLOR,           QColor())
         QN_DECLARE_RW_PROPERTY(bool,                        isRainbowMode,          setRainbowMode,             RAINBOW_MODE,               false)
         QN_DECLARE_RW_PROPERTY (int,                        radialBackgroundCycle,  setRadialBackgroundCycle,   RADIAL_BACKGROUND_CYCLE,    120)
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())

@@ -42,7 +42,7 @@ namespace ec2
     void RemoteEC2Connection::startReceivingNotifications() {
 
         // in remote mode we are always working as a client
-        ApiPeerData localPeer(qnCommon->moduleGUID(), Qn::PT_DesktopClient);
+        ApiPeerData localPeer(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), Qn::PT_DesktopClient);
 
         QUuid videowallGuid = QnAppServerConnectionFactory::videowallGuid();
         if (!videowallGuid.isNull())
@@ -56,6 +56,7 @@ namespace ec2
         url.setPath("ec2/events");
         QUrlQuery q;
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());
+        q.addQueryItem("runtime-guid", qnCommon->runningInstanceGUID().toString());
         url.setQuery(q);
         m_peerUrl = url;
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);

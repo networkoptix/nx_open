@@ -11,7 +11,9 @@
 
 #include <update/media_server_update_tool.h>
 
-class QnServerUpdatesModel : public QAbstractTableModel {
+#include <ui/workbench/workbench_context_aware.h>
+
+class QnServerUpdatesModel : public QAbstractTableModel, public QnWorkbenchContextAware {
     Q_OBJECT
 
     Q_PROPERTY(QnServerUpdatesColors colors READ colors WRITE setColors)
@@ -43,6 +45,9 @@ public:
     QModelIndex index(const QnMediaServerResourcePtr &server) const;
     QModelIndex index(const QUuid &id) const;
 
+    QnSoftwareVersion latestVersion() const;
+    void setLatestVersion(const QnSoftwareVersion &version);
+
     QnCheckForUpdateResult checkResult() const;
     void setCheckResult(const QnCheckForUpdateResult &result);
 
@@ -51,6 +56,7 @@ public slots:
 
 private:
     void resetResourses();
+    void updateVersionColumn();
 
 private slots:
     void at_resourceChanged(const QnResourcePtr &resource);
@@ -77,6 +83,7 @@ private:
     QList<Item*> m_items;
     QSet<QUuid> m_targets;
 
+    QnSoftwareVersion m_latestVersion;
     QnCheckForUpdateResult m_checkResult;
     QnServerUpdatesColors m_colors;
 };

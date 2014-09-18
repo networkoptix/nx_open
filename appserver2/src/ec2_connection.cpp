@@ -21,7 +21,6 @@ namespace ec2
         const QUrl& dbUrl)
     :
         BaseEc2Connection<ServerQueryProcessor>( queryProcessor, resCtx ),
-        m_auxManager( new QnAuxManager() ),
         m_transactionLog( new QnTransactionLog(QnDbManager::instance()) ),
         m_connectionInfo( connectionInfo )
     {
@@ -34,7 +33,7 @@ namespace ec2
         QnDbManager::instance()->doQueryNoLock(nullptr, paramList);
 
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
-        QnTransactionMessageBus::instance()->setLocalPeer(ApiPeerData(qnCommon->moduleGUID(), Qn::PT_Server));
+        QnTransactionMessageBus::instance()->setLocalPeer(ApiPeerData(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), Qn::PT_Server));
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()

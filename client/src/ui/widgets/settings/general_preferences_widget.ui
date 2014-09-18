@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>580</width>
-    <height>517</height>
+    <height>589</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -283,6 +283,50 @@
         </property>
        </widget>
       </item>
+      <item row="5" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_12">
+        <item>
+         <widget class="QPushButton" name="selectColorButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Select...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="defaultBackgroundCheckBox">
+          <property name="text">
+           <string>Use default</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="backgroundColorTitleLabel">
+        <property name="text">
+         <string>Background color:</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -420,43 +464,6 @@
         </item>
        </layout>
       </item>
-      <item row="6" column="0" colspan="2">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="browseLogsButton">
-          <property name="text">
-           <string>Browse logs</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="clearCacheButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Clear local cache</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
       <item row="3" column="0">
        <widget class="QLabel" name="autoStartLabel">
         <property name="sizePolicy">
@@ -498,7 +505,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Double Buffering:</string>
+         <string>Double buffering:</string>
         </property>
        </widget>
       </item>
@@ -522,6 +529,43 @@
          <widget class="QLabel" name="doubleBufferRestartLabel">
           <property name="text">
            <string>Restart required.</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="6" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="browseLogsButton">
+          <property name="text">
+           <string>Browse logs</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="clearCacheButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Clear local cache</string>
           </property>
          </widget>
         </item>

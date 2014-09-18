@@ -15,7 +15,6 @@
 
 #include "ec2_thread_pool.h"
 #include "database/db_manager.h"
-#include "managers/aux_manager.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
 #include "transaction/transaction_message_bus.h"
@@ -66,14 +65,11 @@ namespace ec2
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)>
                 SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
-            errorCode = auxManager->executeTransaction(tran);
-            if( errorCode != ErrorCode::ok )
-                return;
-
             if( !tran.persistentInfo.isNull() )
             {
                 const QByteArray& serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction( tran );
                 errorCode = dbManager->executeTransactionNoLock( tran, serializedTran );
+                assert(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
                 if( errorCode != ErrorCode::ok )
                 {
                     tran.cancel(); // it's possible for single thread processing mode only. for MT mode transaction should be modified to filler transaction instead of reverting sequence
@@ -190,12 +186,9 @@ namespace ec2
                 tran.fillPersistentInfo();
                 tran.isLocal = multiTran.isLocal;
 
-                errorCode = auxManager->executeTransaction(tran);
-                if( errorCode != ErrorCode::ok )
-                    return;
-
                 QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
                 errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
+                assert(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
                 if (errorCode != ErrorCode::ok)
                     tran.cancel(); // it's possible for single thread processing mode only. for MT mode transaction should be modified to filler transaction instead of reverting sequence
 				if (errorCode == ErrorCode::skipped)
@@ -213,6 +206,7 @@ namespace ec2
                 errorCode = ErrorCode::ok;
                 QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(multiTran);
                 errorCode = dbManager->executeTransactionNoLock(multiTran, serializedTran);
+                assert(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
                 if (errorCode != ErrorCode::ok)
                     multiTran.cancel(); // it's possible for single thread processing mode only. for MT mode transaction should be modified to filler transaction instead of reverting sequence
                 if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)

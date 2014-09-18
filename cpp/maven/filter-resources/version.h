@@ -5,7 +5,15 @@
 #define ${project.artifactId}_VERSION_H
 
 /* 
- * Some defines from the build system. Feel free to use these.
+ * Some defines from the build system. Using them directly strongly not recommended.
+ * 
+ * DO NOT USE THEM IN YOUR CODE. 
+ * DO NOT ADD NEW CONSTANTS HERE.
+ *
+ * All projects that are depend on "common" should use <utils/common/app_info.h> instead.
+ * The QN_APPLICATION_NAME should be read from QCoreApplication::applicationName().
+ *
+ * No new variables should be added here. The major part of the file will be wiped out asap.
  */
 #define QN_BETA                         "${beta}"
 #define QN_ORGANIZATION_NAME            "${company.name}"
@@ -22,6 +30,7 @@
 #define QN_APPLICATION_PLATFORM         "${platform}"
 #define QN_APPLICATION_ARCH             "${arch}"
 #define QN_APPLICATION_COMPILER         "${additional.compiler}"
+#define QN_APPLICATION_MODIFICATION     "${modification}"
 #define QN_FFMPEG_VERSION               "${ffmpeg.version}"
 #define QN_SIGAR_VERSION                "${sigar.version}"
 #define QN_BOOST_VERSION                "${boost.version}"

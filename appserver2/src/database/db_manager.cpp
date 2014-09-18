@@ -1,6 +1,6 @@
 #include "db_manager.h"
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 #include <QtSql/QtSql>
 
@@ -269,14 +269,14 @@ bool QnDbManager::init(
     QSqlQuery insVersionQuery( m_sdb );
     insVersionQuery.prepare( "INSERT OR REPLACE INTO misc_data (key, data) values (?,?)" );
     insVersionQuery.addBindValue( "VERSION" );
-    insVersionQuery.addBindValue( QN_APPLICATION_VERSION );
+    insVersionQuery.addBindValue( QnAppInfo::applicationVersion() );
     if( !insVersionQuery.exec() )
     {
         qWarning() << "can't initialize sqlLite database!" << insVersionQuery.lastError().text();
         return false;
     }
     insVersionQuery.addBindValue( "BUILD" );
-    insVersionQuery.addBindValue( QN_APPLICATION_REVISION );
+    insVersionQuery.addBindValue( QnAppInfo::applicationRevision() );
     if( !insVersionQuery.exec() )
     {
         qWarning() << "can't initialize sqlLite database!" << insVersionQuery.lastError().text();
@@ -328,7 +328,7 @@ bool QnDbManager::init(
     if( localInfo.data.prematureLicenseExperationDate != licenseOverflowTime )
     {
         localInfo.data.prematureLicenseExperationDate = licenseOverflowTime;
-        QnRuntimeInfoManager::instance()->items()->updateItem( localInfo.uuid, localInfo );
+        QnRuntimeInfoManager::instance()->updateLocalItem( localInfo );
     }
 
     query.addBindValue( DB_INSTANCE_KEY );
@@ -369,11 +369,17 @@ bool QnDbManager::init(
         return false;
     }
 
-    if( !qnCommon->defaultAdminPassword().isEmpty() )
+    QString defaultAdminPassword = qnCommon->defaultAdminPassword();
+    if( users[0].hash.isEmpty() && defaultAdminPassword.isEmpty() ) {
+        defaultAdminPassword = lit("123");
+    }
+
+    if( !defaultAdminPassword.isEmpty() )
     {
         QnUserResourcePtr userResource( new QnUserResource() );
         fromApiToResource( users[0], userResource );
-        userResource->setPassword( qnCommon->defaultAdminPassword() );
+        userResource->setPassword( defaultAdminPassword );
+        userResource->generateHash();
 
         QnTransaction<ApiUserData> userTransaction( ApiCommand::saveUser );
         userTransaction.fillPersistentInfo();
@@ -723,7 +729,7 @@ bool QnDbManager::applyUpdates()
 
             QSqlQuery insQuery(m_sdb);
             insQuery.prepare("INSERT INTO south_migrationhistory (app_name, migration, applied) values(?, ?, ?)");
-            insQuery.addBindValue(QN_APPLICATION_NAME);
+            insQuery.addBindValue(qApp->applicationName());
             insQuery.addBindValue(fileName);
             insQuery.addBindValue(QDateTime::currentDateTime());
             if (!insQuery.exec()) {
@@ -2970,7 +2976,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
     if (localInfo.data.prematureLicenseExperationDate != tran.params.time) {
         localInfo.data.prematureLicenseExperationDate = tran.params.time;
-        QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
+        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
     }
     
     return ErrorCode::ok;

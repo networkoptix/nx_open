@@ -75,6 +75,7 @@ void QnTransactionLog::init()
     if (queryTime.exec() && queryTime.next()) {
         m_currentTime = qMax(m_currentTime, queryTime.value(0).toLongLong());
     }
+    m_lastTimestamp = m_currentTime;
     m_relativeTimer.start();
 
     QSqlQuery querySequence(m_dbManager->getDB());
@@ -145,7 +146,7 @@ QUuid QnTransactionLog::makeHash(const QString &extraData, const ApiDiscoveryDat
     return QUuid::fromRfc4122(hash.result());
 }
 
-ErrorCode QnTransactionLog::updateSequence(const ApiSyncMarkerData& data)
+ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
 {
     QnDbManager::Locker locker(dbManager);
     foreach(const ApiSyncMarkerRecord& record, data.markers) 
@@ -251,7 +252,6 @@ int QnTransactionLog::getLatestSequence(const QnTranStateKey& key) const
 QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& hash) const
 {
 
-    QReadLocker lock(&m_dbManager->getMutex());
     QnTranStateKey key (tran.peerID, tran.persistentInfo.dbID);
     Q_ASSERT(tran.persistentInfo.sequence != 0);
     if (m_state.values.value(key) >= tran.persistentInfo.sequence) {
@@ -273,6 +273,17 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
     else {
         return Reason_None;
     }
+}
+
+bool QnTransactionLog::contains(const QnTranState& state) const
+{
+    QReadLocker lock(&m_dbManager->getMutex());
+    for (auto itr = state.values.begin(); itr != state.values.end(); ++itr)
+    {
+        if (itr.value() > m_state.values.value(itr.key()))
+            return false;
+    }
+    return true;
 }
 
 ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result)
@@ -301,7 +312,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     if (!query.exec())
         return ErrorCode::failure;
     
-    QnTransaction<ApiSyncMarkerData> syncMarkersTran(ApiCommand::syncDoneMarker);
+    QnTransaction<ApiUpdateSequenceData> syncMarkersTran(ApiCommand::updatePersistentSequence);
     while (query.next()) 
     {
         QnTranStateKey key(QUuid::fromRfc4122(query.value(0).toByteArray()), QUuid::fromRfc4122(query.value(1).toByteArray()));
@@ -319,12 +330,5 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     
     return ErrorCode::ok;
 }
-
-#define QN_TRANSACTION_LOG_DATA_TYPES \
-    (QnTranStateKey)\
-    (QnTranState)\
-    (QnTranStateResponse)\
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_TRANSACTION_LOG_DATA_TYPES,  (json)(ubjson), _Fields)
 
 } // namespace ec2

@@ -47,7 +47,7 @@ private:
     void initLinkButtons();
     void initBuildSelectionButtons();
 
-    void checkForUpdatesInternet(bool autoSwitch = false);
+    void checkForUpdatesInternet(bool autoSwitch = false, bool autoStart = false);
     void checkForUpdatesLocal();
 
 private:
@@ -63,13 +63,13 @@ private:
     QnServerUpdatesModel *m_updatesModel;
     QnMediaServerUpdateTool *m_updateTool;
     std::array<QAction*, UpdateSourceCount> m_updateSourceActions;
-
-    QTimer *m_extraMessageTimer;
-    
+  
     QnSoftwareVersion m_targetVersion;
     QnSoftwareVersion m_latestVersion;
     bool m_checkingInternet;
     bool m_checkingLocal;
+
+    QUrl m_releaseNotesUrl;
 };
 
 #endif // SERVER_UPDATES_WIDGET_H

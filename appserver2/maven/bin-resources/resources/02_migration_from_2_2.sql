@@ -22,4 +22,4 @@ INSERT INTO vms_kvpair (resource_id, value, name)
 update auth_user set id = (select resource_ptr_id from vms_userprofile where user_id = auth_user.id);
 update vms_userprofile set user_id = resource_ptr_id;
 
-INSERT INTO "vms_propertytype" ( id,"resource_type_id",name,type,min,max,step,"values","ui_values","default_value",netHelper,"group","sub_group",description,ui,readonly ) VALUES ( '17238','6','mediaStreams','1',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0' );
+INSERT INTO "vms_propertytype" VALUES ( '17238','6','mediaStreams','1',NULL,NULL,NULL,'','','0','','','','',0,0);

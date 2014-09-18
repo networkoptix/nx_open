@@ -5,9 +5,13 @@
 #include "api_data.h"
 #include "utils/common/latin1_array.h"
 #include "api_peer_data.h"
+#include "api_fwd.h"
+#include "api_tran_state_data.h"
 
 namespace ec2
 {
+
+
     struct ApiPeerAliveData: ApiData
     {
         ApiPeerAliveData(): isAlive(false) {}
@@ -15,8 +19,11 @@ namespace ec2
 
         ApiPeerData peer;
         bool isAlive;
+        QnTranState persistentState;
+        QnTranState runtimeState;
     };
-#define ApiPeerAliveData_Fields (peer)(isAlive)
+#define ApiPeerAliveData_Fields (peer)(isAlive)(persistentState)(runtimeState)
+
 
 } // namespace ec2
 

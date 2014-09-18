@@ -6,16 +6,20 @@
 #include <QtNetwork/QNetworkProxy>
 
 #include <utils/common/model_functions.h>
+#include <utils/common/log.h>
+#include <utils/network/http/asynchttpclient.h>
+#include <utils/network/http/async_http_client_reply.h>
 #include <rest/server/json_rest_result.h>
 #include <common/common_module.h>
 
-#include <version.h>
+#include <utils/common/app_info.h>
 
 namespace {
 
     const int defaultMaxConnections = 30;
-    const int periodicalCheckIntervalMs = 15 * 1000;
-    const int maxPingTimeoutMs = 60 * 1000;
+    const int discoveryCheckIntervalMs = 60 * 1000;
+    const int aliveCheckIntervalMs = 7 * 1000;
+    const int maxPingTimeoutMs = 12 * 1000;
 
     QUrl trimmedUrl(const QUrl &url) {
         QUrl result;
@@ -37,14 +41,13 @@ QnDirectModuleFinder::QnDirectModuleFinder(QObject *parent) :
     QObject(parent),
     m_maxConnections(defaultMaxConnections),
     m_compatibilityMode(false),
-    m_networkAccessManager(new QNetworkAccessManager(this)),
-    m_periodicalCheckTimer(new QTimer(this))
+    m_discoveryCheckTimer(new QTimer(this)),
+    m_aliveCheckTimer(new QTimer(this))
 {
-    m_periodicalCheckTimer->setInterval(periodicalCheckIntervalMs);
-    m_networkAccessManager->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
-
-    connect(m_periodicalCheckTimer, &QTimer::timeout,                   this,   &QnDirectModuleFinder::at_periodicalCheckTimer_timeout);
-    connect(m_networkAccessManager, &QNetworkAccessManager::finished,   this,   &QnDirectModuleFinder::at_reply_finished);
+    m_discoveryCheckTimer->setInterval(discoveryCheckIntervalMs);
+    m_aliveCheckTimer->setInterval(aliveCheckIntervalMs);
+    connect(m_discoveryCheckTimer,  &QTimer::timeout,                   this,   &QnDirectModuleFinder::at_discoveryCheckTimer_timeout);
+    connect(m_aliveCheckTimer,      &QTimer::timeout,                   this,   &QnDirectModuleFinder::at_aliveCheckTimer_timeout);
 }
 
 void QnDirectModuleFinder::setCompatibilityMode(bool compatibilityMode) {
@@ -66,6 +69,7 @@ void QnDirectModuleFinder::removeUrl(const QUrl &url, const QUuid &id) {
     if (m_urls.remove(locUrl, id)) {
         if (m_lastPingByUrl.take(locUrl) != 0) {
             QUuid id = m_moduleByUrl.take(locUrl);
+            NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is removed.").arg(id.toString()).arg(locUrl.toString()), cl_logDEBUG1);
             emit moduleUrlLost(m_foundModules.value(id), locUrl);
         }
     }
@@ -79,6 +83,7 @@ void QnDirectModuleFinder::addIgnoredModule(const QUrl &url, const QUuid &id) {
         if (m_moduleByUrl.value(locUrl) == id) {
             m_lastPingByUrl.remove(locUrl);
             m_moduleByUrl.remove(locUrl);
+            NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is removed.").arg(id.toString()).arg(locUrl.toString()), cl_logDEBUG1);
             emit moduleUrlLost(m_foundModules.value(id), locUrl);
         }
     }
@@ -93,6 +98,7 @@ void QnDirectModuleFinder::addIgnoredUrl(const QUrl &url) {
     m_ignoredUrls.insert(locUrl);
     if (m_lastPingByUrl.take(locUrl) != 0) {
         QUuid id = m_moduleByUrl.take(locUrl);
+        NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is removed.").arg(id.toString()).arg(locUrl.toString()), cl_logDEBUG1);
         emit moduleUrlLost(m_foundModules.value(id), locUrl);
     }
 }
@@ -106,17 +112,19 @@ void QnDirectModuleFinder::checkUrl(const QUrl &url) {
 }
 
 void QnDirectModuleFinder::start() {
-    at_periodicalCheckTimer_timeout();
-    m_periodicalCheckTimer->start();
+    at_discoveryCheckTimer_timeout();
+    m_discoveryCheckTimer->start();
+    m_aliveCheckTimer->start();
 }
 
 void QnDirectModuleFinder::stop() {
-    m_periodicalCheckTimer->stop();
+    m_discoveryCheckTimer->stop();
+    m_aliveCheckTimer->stop();
     m_requestQueue.clear();
 }
 
 void QnDirectModuleFinder::pleaseStop() {
-    m_periodicalCheckTimer->stop();
+    m_discoveryCheckTimer->stop();
     m_requestQueue.clear();
 }
 
@@ -152,25 +160,29 @@ void QnDirectModuleFinder::enqueRequest(const QUrl &url) {
 void QnDirectModuleFinder::activateRequests() {
     while (m_activeRequests.size() < m_maxConnections && !m_requestQueue.isEmpty()) {
         QUrl url = m_requestQueue.dequeue();
+
+        nx_http::AsyncHttpClientPtr client = std::make_shared<nx_http::AsyncHttpClient>();
+        QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(client, this);
+        connect(reply, &QnAsyncHttpClientReply::finished, this, &QnDirectModuleFinder::at_reply_finished);
+
         m_activeRequests.insert(url);
-        m_networkAccessManager->get(QNetworkRequest(url));
+        client->doGet(url);
     }
 }
 
-void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
-    QUrl url = reply->request().url();
-    if (!m_activeRequests.contains(url))
-        Q_ASSERT_X(0, "Reply that is not in the set of active requests has finished!", Q_FUNC_INFO);
-
+void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
     reply->deleteLater();
 
-    m_activeRequests.remove(url);
+    QUrl url = reply->url();
+    if (!m_activeRequests.remove(url))
+        Q_ASSERT_X(0, "Reply that is not in the set of active requests has finished!", Q_FUNC_INFO);
+
     activateRequests();
 
     url = trimmedUrl(url);
 
-    if (reply->error() == QNetworkReply::NoError) {
-        QByteArray data = reply->readAll();
+    if (!reply->isFailed()) {
+        QByteArray data = reply->data();
 
         QnJsonRestResult result;
         QJson::deserialize(data, &result);
@@ -180,7 +192,7 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         if (moduleInformation.id.isNull())
             return;
 
-        if (!m_compatibilityMode && moduleInformation.customization != lit(QN_CUSTOMIZATION_NAME))
+        if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())
             return;
 
         if (m_ignoredModules.contains(url, moduleInformation.id))
@@ -204,6 +216,7 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         if (!moduleId.isNull() && moduleId != moduleInformation.id) {
             QnModuleInformation &prevModuleInformation = m_foundModules[moduleId];
             prevModuleInformation.remoteAddresses.remove(url.host());
+            NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is lost.").arg(prevModuleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
             emit moduleChanged(prevModuleInformation);
             emit moduleUrlLost(prevModuleInformation, url);
             lastPing = 0;
@@ -215,8 +228,10 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
             emit moduleChanged(moduleInformation);
         }
 
-        if (lastPing == 0)
+        if (lastPing == 0) {
+            NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is found.").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
             emit moduleUrlFound(moduleInformation, url);
+        }
 
         lastPing = QDateTime::currentMSecsSinceEpoch();
     } else {
@@ -229,15 +244,21 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
             m_lastPingByUrl.remove(url);
             QnModuleInformation &moduleInformation = m_foundModules[id];
             moduleInformation.remoteAddresses.remove(url.host());
+            NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is lost.").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
             emit moduleChanged(moduleInformation);
             emit moduleUrlLost(moduleInformation, url);
         }
     }
 }
 
-void QnDirectModuleFinder::at_periodicalCheckTimer_timeout() {
-    QSet<QUrl> urls = QSet<QUrl>::fromList(m_urls.keys()) - m_ignoredUrls;
+void QnDirectModuleFinder::at_discoveryCheckTimer_timeout() {
+    QSet<QUrl> urls = QSet<QUrl>::fromList(m_urls.keys()) - m_ignoredUrls - QSet<QUrl>::fromList(m_lastPingByUrl.keys());
 
     foreach (const QUrl &url, urls)
+        enqueRequest(url);
+}
+
+void QnDirectModuleFinder::at_aliveCheckTimer_timeout() {
+    foreach (const QUrl &url, m_lastPingByUrl.keys())
         enqueRequest(url);
 }

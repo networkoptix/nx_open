@@ -1,3 +1,9 @@
+#ifndef QN_API_MODEL_FUNCTIONS_H
+#define QN_API_MODEL_FUNCTIONS_H
+
+// this file is not to be directly included in target modules
+// DO NOT INCLUDE THIS FILE UNLESS YOU KNOW WHAT ARE YOU DOING
+
 #include "api_fwd.h"
 
 #include <boost/preprocessor/seq/to_tuple.hpp>
@@ -19,6 +25,7 @@
 #include "api_peer_system_time_data.h"
 #include "api_resource_data.h"
 #include "api_resource_type_data.h"
+#include "api_tran_state_data.h"
 #include "api_server_alive_data.h"
 #include "api_server_info_data.h"
 #include "api_stored_file_data.h"
@@ -46,6 +53,8 @@ inline void serialize_field(const QList<T> &, QVariant *) { return; }
 
 inline void serialize_field(const ec2::ApiPeerData &, QVariant *) { return; }
 inline void serialize_field(const ec2::ApiRuntimeData &, QVariant *) { return; }
+inline void serialize_field(const ec2::ApiPeerAliveData &, QVariant *) { return; }
+inline void serialize_field(const ec2::QnTranState &, QVariant *) { return; }
 
 template<class T, class Allocator>
 inline void deserialize_field(const QVariant &, std::vector<T, Allocator> *) { return; }
@@ -58,10 +67,7 @@ inline void deserialize_field(const QVariant &, QList<T> *) { return; }
 
 inline void deserialize_field(const QVariant &, ec2::ApiPeerData *) { return; }
 inline void deserialize_field(const QVariant &, ec2::ApiRuntimeData *) { return; }
+inline void deserialize_field(const QVariant &, ec2::ApiPeerAliveData *) { return; }
+inline void deserialize_field(const QVariant &, ec2::QnTranState *) { return; }
 
-namespace ec2 {
-
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_EC2_API_DATA_TYPES, (ubjson)(xml)(json)(sql_record)(csv_record), _Fields)
-
-} // namespace ec2
-
+#endif //QN_API_MODEL_FUNCTIONS_H

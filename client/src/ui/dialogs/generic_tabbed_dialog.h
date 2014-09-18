@@ -27,15 +27,24 @@ protected:
 
     void setTabWidget(QTabWidget *tabWidget);
 
-    virtual bool confirm() const;
-    virtual bool discard() const;
+    bool confirm() const;
+    bool discard() const;
 
-    virtual bool hasChanges() const;
+    bool hasChanges() const;
 
 private:
     void initializeTabWidget();
 private:
-    QMap<int, QnAbstractPreferencesWidget*> m_pages;
+    struct Page {
+        int key;
+        QString title;
+        QnAbstractPreferencesWidget* widget;
+    };
+
+    QList<Page> modifiedPages() const;
+
+
+    QList<Page> m_pages;
     QPointer<QTabWidget> m_tabWidget;
 
 };

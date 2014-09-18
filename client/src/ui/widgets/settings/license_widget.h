@@ -54,6 +54,7 @@ private:
 
     QScopedPointer<Ui::LicenseWidget> ui;
     State m_state;
+    QByteArray m_activationKey;
 };
 
 #endif // QN_LICENSE_WIDGET_H

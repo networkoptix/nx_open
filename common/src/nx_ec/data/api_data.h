@@ -15,6 +15,12 @@ namespace ec2 {
     };
 #define ApiIdData_Fields (id)
 
+struct ApiDataWithVersion: public ApiData {
+    ApiDataWithVersion(): version(0) {}
+    int version;
+};
+#define ApiDataWithVersion_Fields (version)
+
 struct ApiDatabaseDumpData: public ApiData {
     QByteArray data;
 
@@ -30,11 +36,11 @@ struct ApiSyncMarkerRecord: public ApiData
 };
 #define ApiSyncMarkerRecord_Fields (peerID)(dbID)(sequence)
 
-struct ApiSyncMarkerData: public ApiData 
+struct ApiUpdateSequenceData: public ApiData 
 {
     std::vector<ApiSyncMarkerRecord> markers;
 };
-#define ApiSyncMarkerData_Fields (markers)
+#define ApiUpdateSequenceData_Fields (markers)
 
 
 } // namespace ec2

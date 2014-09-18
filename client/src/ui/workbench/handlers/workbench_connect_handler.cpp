@@ -199,8 +199,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
             url = qnSettings->defaultConnection().url;
 
         /* Try to connect with saved password. */
-        if (url.isValid() && !qnSettings->storedPassword().isEmpty()) {
-            url.setPassword(qnSettings->storedPassword());
+        if (url.isValid() && !url.password().isEmpty()) {
             if (!connectToServer(url))
                 showLoginDialog();
         } else 
@@ -283,7 +282,6 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl) {
     context()->setUserName(appServerUrl.userName());
 
     QnGlobalModuleFinder::instance()->setConnection(result.connection());
-    QnRouter::instance()->setConnection(result.connection());
 
     return true;
 }
@@ -293,17 +291,14 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
         return false;
 
     if (!force) {
-        qnSettings->setStoredPassword(QString());
         QnGlobalSettings::instance()->synchronizeNow();
+        qnSettings->setLastUsedConnection(QnConnectionData());
     }
 
     hideMessageBox();
 
     QnGlobalModuleFinder::instance()->setConnection(NULL);
-    QnRouter::instance()->setConnection(NULL);
-
     QnClientMessageProcessor::instance()->init(NULL);
-
     QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());

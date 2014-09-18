@@ -16,7 +16,7 @@
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/module_finder.h"
 #include "utils/network/direct_module_finder.h"
-#include "version.h"
+#include <utils/common/app_info.h>
 
 namespace {
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
@@ -49,9 +49,9 @@ int QnJoinSystemRestHandler::executeGet(const QString &path, const QnRequestPara
 
     if (status != CL_HTTP_SUCCESS) {
         if (status == CL_HTTP_AUTH_REQUIRED)
-            result.setErrorString(lit("UNAUTHORIZED"));
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("UNAUTHORIZED"));
         else
-            result.setErrorString(lit("FAIL"));
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
         return CODE_OK;
     }
 
@@ -66,17 +66,17 @@ int QnJoinSystemRestHandler::executeGet(const QString &path, const QnRequestPara
 
     if (moduleInformation.systemName.isEmpty()) {
         /* Hmm there's no system name. It would be wrong system. Reject it. */
-        result.setErrorString(lit("FAIL"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
         return CODE_OK;
     }
 
-    if (moduleInformation.version != qnCommon->engineVersion() || moduleInformation.customization != lit(QN_CUSTOMIZATION_NAME)) {
-        result.setErrorString(lit("INCOMPATIBLE"));
+    if (moduleInformation.version != qnCommon->engineVersion() || moduleInformation.customization != QnAppInfo::customizationName()) {
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return CODE_OK;
     }
 
     if (!changeSystemName(moduleInformation.systemName)) {
-        result.setErrorString(lit("BACKUP_ERROR"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
         return CODE_OK;
     }
     changeAdminPassword(password);
@@ -118,8 +118,8 @@ bool QnJoinSystemRestHandler::changeAdminPassword(const QString &password) {
         QnUserResourcePtr user = resource.staticCast<QnUserResource>();
         if (user->getName() == lit("admin")) {
             user->setPassword(password);
+            user->generateHash();
             ec2Connection()->getUserManager()->save(user, this, [](int, ec2::ErrorCode) { return; });
-            user->setPassword(QString());
             return true;
         }
     }

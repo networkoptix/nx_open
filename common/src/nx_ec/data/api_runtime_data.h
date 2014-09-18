@@ -4,6 +4,7 @@
 #include "api_globals.h"
 #include "api_data.h"
 #include "api_peer_data.h"
+#include "api_routing_data.h"
 #include "utils/common/latin1_array.h"
 
 namespace ec2
@@ -11,7 +12,7 @@ namespace ec2
     /**
     * This structure contains all runtime data per peer. Runtime data is absent in a DB.
     */
-    struct ApiRuntimeData: ApiData
+    struct ApiRuntimeData: ApiDataWithVersion
     {
         static const quint64 tpfPeerTimeSynchronizedWithInternetServer  = 0x0008LL << 32;
         static const quint64 tpfPeerTimeSetByUser                       = 0x0004LL << 32;
@@ -19,21 +20,26 @@ namespace ec2
         static const quint64 tpfPeerIsNotEdgeServer                     = 0x0001LL << 32;
 
         ApiRuntimeData(): 
-            ApiData(), 
+            ApiDataWithVersion(), 
             prematureLicenseExperationDate(0),
             videoWallControlSessions(0),
-            serverTimePriority(0)
+            serverTimePriority(0),
+            updateStarted(false)
         {}
 
         bool operator==(const ApiRuntimeData& other) const {
-            return peer == other.peer &&
+            return version == other.version &&
+                   peer == other.peer &&
                    platform == other.platform &&
                    box == other.box &&
                    publicIP == other.publicIP &&
                    videoWallInstanceGuid == other.videoWallInstanceGuid &&
                    videoWallControlSessions == other.videoWallControlSessions &&
                    serverTimePriority == other.serverTimePriority &&
-                   prematureLicenseExperationDate == other.prematureLicenseExperationDate;
+                   prematureLicenseExperationDate == other.prematureLicenseExperationDate &&
+                   availableConnections == other.availableConnections &&
+                   mainHardwareIds == other.mainHardwareIds &&
+                   compatibleHardwareIds == other.compatibleHardwareIds;
         }
 
         ApiPeerData peer;
@@ -53,11 +59,18 @@ namespace ec2
         /** Priority of this peer as the time synchronization server. */
         quint64 serverTimePriority;
 
+        /** A list of available connections to other peers. */
+        QList<ApiConnectionData> availableConnections;
+
         QList<QByteArray> mainHardwareIds;
         QList<QByteArray> compatibleHardwareIds;
+
+        bool updateStarted;
     };
 
-#define ApiRuntimeData_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)(videoWallInstanceGuid)(videoWallControlSessions)(serverTimePriority)(mainHardwareIds)(compatibleHardwareIds)
+#define ApiRuntimeData_Fields ApiDataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)\
+                                                        (videoWallInstanceGuid)(videoWallControlSessions)(serverTimePriority)\
+                                                        (availableConnections)(mainHardwareIds)(compatibleHardwareIds)
 
 
 } // namespace ec2

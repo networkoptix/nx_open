@@ -212,7 +212,7 @@ void QnImageButtonWidget::clickInternal(QGraphicsSceneMouseEvent *event) {
     if(!self)
         return;
 
-    if(m_action && m_action->menu() && (!event || !skipMenuEvent(event))) {
+    if(m_action && m_action->menu()) {
         QGraphicsView *view = NULL;
         if(event)
             view = qobject_cast<QGraphicsView *>(event->widget() ? event->widget()->parent() : NULL);
@@ -229,11 +229,6 @@ void QnImageButtonWidget::clickInternal(QGraphicsSceneMouseEvent *event) {
         updateState(m_state | Pressed);
         menu->exec(pos);
         updateState(m_state & ~Pressed);
-
-        /* Cannot use QMenu::setNoReplayFor, as it will block click events for the whole scene.
-         * This is why we resort to nasty hacks with mouse position comparisons. */
-        m_skipNextMenuEvents = 1;
-        m_nextMenuEventPos = QCursor::pos();
     }
 }
 
@@ -336,20 +331,6 @@ bool QnImageButtonWidget::skipHoverEvent(QGraphicsSceneHoverEvent *event) {
             return true;
         } else {
             m_skipNextHoverEvents = 0;
-            return false;
-        }
-    } else {
-        return false;
-    }
-}
-
-bool QnImageButtonWidget::skipMenuEvent(QGraphicsSceneMouseEvent *event) {
-    if(m_skipNextMenuEvents) {
-        if(event->screenPos() == m_nextMenuEventPos) {
-            m_skipNextMenuEvents--;
-            return true;
-        } else {
-            m_skipNextMenuEvents = 0;
             return false;
         }
     } else {

@@ -141,6 +141,11 @@ bool QnWindowsShortcuts::createShortcut(const QString &sourceFile, const QString
     return SUCCEEDED(rc);
 }
 
+bool QnWindowsShortcuts::deleteShortcut(const QString &destinationPath, const QString &name) const {
+    QString fullPath = QDir::toNativeSeparators(destinationPath) + lit("\\") + name + lit(".lnk");
+    return QFile::remove(fullPath);
+}
+
 bool QnWindowsShortcuts::shortcutExists(const QString &destinationPath, const QString &name) const {
     QString fullPath = QDir::toNativeSeparators(destinationPath) + lit("\\") + name + lit(".lnk");
     return QFileInfo::exists(fullPath);

@@ -36,6 +36,9 @@ public:
     const QnResourceList &resources() const;
     void setResources(const QnResourceList &resources);
 
+    void showIgnoreCheckbox();
+    bool isIgnoreCheckboxChecked() const;
+
     using QnButtonBoxDialog::exec;
 
     static QDialogButtonBox::StandardButton exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, const QString &bottomText, QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel, bool readOnly = true);

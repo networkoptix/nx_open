@@ -6,6 +6,7 @@
 #include <QUuid>
 #include <QByteArray>
 #include <QSet>
+#include <QTime>
 
 #include <transaction/transaction.h>
 #include <transaction/binary_transaction_serializer.h>
@@ -75,7 +76,7 @@ public:
 
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
         qDebug() << "send transaction to peer " << remotePeer().id << "command=" << ApiCommand::toString(transaction.command) 
-                 << "transport seq=" << header.sequence << "db seq=" << transaction.persistentInfo.sequence << "timestamp=" << transaction.persistentInfo.timestamp;
+                 << "tt seq=" << header.sequence << "db seq=" << transaction.persistentInfo.sequence << "timestamp=" << transaction.persistentInfo.timestamp;
 #endif
 
         switch (m_remotePeer.dataFormat) {
@@ -142,6 +143,8 @@ public:
     void processExtraData();
     void startListening();
     void setRemotePeer(const ApiPeerData& value) { m_remotePeer = value; }
+    bool isHttpKeepAliveTimeout() const;
+    bool hasUnsendData() const;
 private:
     struct DataToSend
     {
@@ -185,7 +188,11 @@ private:
 
     QByteArray m_extraData;
     bool m_authByKey;
+    QTime m_lastReceiveTimer;
+    QTime m_sendTimer;
+    QByteArray m_emptyChunkData;
 private:
+    void sendHttpKeepAlive();
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
     void addData(QByteArray &&data);

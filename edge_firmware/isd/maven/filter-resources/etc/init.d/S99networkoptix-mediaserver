@@ -3,7 +3,7 @@
 RETVAL=0
 
 SERVICE_NAME=mediaserver
-CUSTOMIZATION=${customization}
+CUSTOMIZATION=${deb.customization.company.name}
 PREFIX=/usr/local/apps/$CUSTOMIZATION/mediaserver/
 BIN_NAME=mediaserver
 BIN_PATH=$PREFIX/bin/$BIN_NAME
@@ -106,10 +106,12 @@ case "$1" in
         ;;
 
     stop)
+        stop_watchdog
         stop
         ;;
 
     kill)
+        stop_watchdog
         stop -9
         ;;
 
