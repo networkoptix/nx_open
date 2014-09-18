@@ -143,7 +143,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         QString fullName = resource->getName();
         int manufacturerPos = fullName.indexOf(QLatin1String("-"));
         QString manufacturer = fullName.mid(0,manufacturerPos).trimmed();
-        QString modelName = fullName.mid(manufacturerPos+1).trimmed().toLower();
+        QString modelName = fullName.mid(manufacturerPos+1).trimmed();
 
         if (NameHelper::instance().isSupported(modelName))
             return resList;
