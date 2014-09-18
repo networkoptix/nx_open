@@ -3,6 +3,8 @@
 
 #include <update/task/network_peer_task.h>
 
+class QnConfigureReply;
+
 class QnConfigurePeerTask : public QnNetworkPeerTask {
     Q_OBJECT
 public:
@@ -34,7 +36,7 @@ protected:
     virtual void doStart() override;
 
 private slots:
-    void processReply(int status, int handle);
+    void processReply(int status, const QnConfigureReply &reply, int handle);
 
 private:
     bool m_wholeSystem;

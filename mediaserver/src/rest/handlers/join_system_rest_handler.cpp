@@ -28,14 +28,22 @@ int QnJoinSystemRestHandler::executeGet(const QString &path, const QnRequestPara
     QUrl url = params.value(lit("url"));
     QString password = params.value(lit("password"));
 
+    if (url.isEmpty()) {
+        result.setError(QnJsonRestResult::MissingParameter);
+        result.setErrorString(lit("url"));
+        return CODE_OK;
+    }
+
     if (!url.isValid()) {
         result.setError(QnJsonRestResult::InvalidParameter);
-        return CODE_INVALID_PARAMETER;
+        result.setErrorString(lit("url"));
+        return CODE_OK;
     }
 
     if (password.isEmpty()) {
         result.setError(QnJsonRestResult::MissingParameter);
-        return CODE_INVALID_PARAMETER;
+        result.setErrorString(lit("password"));
+        return CODE_OK;
     }
 
     /* Get module information to get system name. */
