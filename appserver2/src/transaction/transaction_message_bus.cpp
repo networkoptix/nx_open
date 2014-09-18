@@ -21,6 +21,7 @@
 #include "ec_connection_notification_manager.h"
 #include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_resource_data.h"
+#include "nx_ec/data/api_resource_type_data.h"
 #include "managers/time_manager.h"
 
 #include <utils/common/checked_cast.h>

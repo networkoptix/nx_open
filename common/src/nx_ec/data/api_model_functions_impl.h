@@ -27,7 +27,6 @@
 #include "api_resource_type_data.h"
 #include "api_tran_state_data.h"
 #include "api_server_alive_data.h"
-#include "api_server_info_data.h"
 #include "api_stored_file_data.h"
 #include "api_user_data.h"
 #include "api_videowall_data.h"

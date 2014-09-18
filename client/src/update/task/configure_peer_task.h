@@ -3,7 +3,7 @@
 
 #include <update/task/network_peer_task.h>
 
-class QnConfigureReply;
+struct QnConfigureReply;
 
 class QnConfigurePeerTask : public QnNetworkPeerTask {
     Q_OBJECT

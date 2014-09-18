@@ -1,6 +1,7 @@
 #ifndef __EC2_BOOKMARK_DATA_H_
 #define __EC2_BOOKMARK_DATA_H_
 
+#include "api_data.h"
 #include "api_globals.h"
 
 namespace ec2
