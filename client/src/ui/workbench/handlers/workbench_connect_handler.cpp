@@ -199,7 +199,10 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
             url = qnSettings->defaultConnection().url;
 
         /* Try to connect with saved password. */
-        if (url.isValid() && !url.password().isEmpty()) {
+        if (qnSettings->autoLogin() 
+            && url.isValid() 
+            && !url.password().isEmpty()) 
+        {
             if (!connectToServer(url))
                 showLoginDialog();
         } else 

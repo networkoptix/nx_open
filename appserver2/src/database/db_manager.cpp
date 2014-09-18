@@ -937,7 +937,7 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
 {
     *internalId = getResourceInternalId(data.id);
 
-    Q_ASSERT_X(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
+    //Q_ASSERT_X(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
 
     QSqlQuery query(m_sdb);
     if (*internalId) {
