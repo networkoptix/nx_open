@@ -17,6 +17,7 @@
 #include "compatibility/old_ec_connection.h"
 #include "ec2_connection.h"
 #include "ec2_thread_pool.h"
+#include "nx_ec/data/api_resource_type_data.h"
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"

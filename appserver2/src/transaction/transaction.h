@@ -9,6 +9,7 @@
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_license_data.h"
 #include "nx_ec/data/api_email_data.h"
+#include "nx_ec/data/api_discovery_data.h"
 #endif
 
 #include "utils/serialization/binary.h"
