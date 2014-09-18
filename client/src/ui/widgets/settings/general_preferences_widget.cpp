@@ -32,6 +32,10 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/math/color_transformations.h>
 
+namespace {
+    const int defaultAlpha = 40;
+}
+
 QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -251,7 +255,9 @@ QColor QnGeneralPreferencesWidget::backgroundColor() const {
     if (ui->defaultBackgroundCheckBox->isChecked())
         return defaultBackgroundColor();
     QColor opaque = m_colorDialog->currentColor();
-    return withAlpha(opaque, defaultBackgroundColor().alpha());
+    return withAlpha(opaque, defaultBackgroundColor().isValid() 
+        ? defaultBackgroundColor().alpha()
+        : defaultAlpha);
 }
 
 void QnGeneralPreferencesWidget::updateBackgroundColor() {
