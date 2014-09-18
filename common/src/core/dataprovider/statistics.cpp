@@ -220,7 +220,7 @@ void QnStatistics::onLostConnection()
     m_connectionLostTime = QDateTime::currentDateTime();
 }
 
-bool QnStatistics::isConnectioLost() const
+bool QnStatistics::isConnectionLost() const
 {
     return m_connectionLost;
 }
