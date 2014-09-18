@@ -464,6 +464,7 @@
                 </dependency>      
             </dependencies>             
         </profile>
+
         <profile>
             <id>linux-arm-rpi</id>
             <activation>
@@ -479,6 +480,38 @@
             </activation>
 
             <dependencies>
+                <dependency>
+                    <groupId>org.ffmpeg</groupId>
+                    <artifactId>ffmpeg</artifactId>
+                    <version>${ffmpeg.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+
+            <dependencies>
+                <dependency>
+                    <groupId>org.openssl</groupId>
+                    <artifactId>openssl</artifactId>
+                    <version>${openssl.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>
                 <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>

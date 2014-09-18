@@ -273,10 +273,11 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
         resource->setName(model); 
     else
         resource->setName(manufacturer + model); 
-    resource->setMAC(QnMacAddress(mac));
+    QnMacAddress macAddr(mac);
+    resource->setMAC(macAddr);
     resource->setFirmware(firmware);
 
-    if (mac.isEmpty())
+    if (macAddr.isNull())
         resource->setPhysicalId(uniqId);
 
     resource->setDeviceOnvifUrl(deviceUrl);
