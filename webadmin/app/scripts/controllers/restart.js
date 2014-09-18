@@ -28,7 +28,7 @@ angular.module('webadminApp')
                     return reload();
                 }
                 oldUptime = newUptime;
-                setTimeput(pingServer,1000);
+                setTimeout(pingServer,1000);
             }).error(function(){
                 serverWasDown = true; // server was down once - next success should restart server
                 setTimeout(pingServer,1000);
