@@ -85,6 +85,8 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCam
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(ownGuid).dynamicCast<QnMediaServerResource>();
     if (!mServer || !ownServer)
         return false;
+    if (mServer->getServerFlags() & Qn::SF_Edge)
+        return false; // do not transfer cameras from edge server
 
     if (camera->preferedServerId() == ownGuid)
         return true;
