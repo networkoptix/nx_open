@@ -47,14 +47,17 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     m_updateProcess(NULL),
     m_disableClientUpdates(defaultDisableClientUpdates)
 {
-    auto targetsWatcher = [this] {
-        if (!m_targets.isEmpty())
-            return;
-        emit targetsChanged(actualTargetIds());
-    };
+    setAutoUpdateTargetList(true);
+}
 
-    connect(qnResPool,  &QnResourcePool::resourceAdded, this, targetsWatcher);
-    connect(qnResPool,  &QnResourcePool::resourceRemoved, this, targetsWatcher);
+void QnMediaServerUpdateTool::setAutoUpdateTargetList(bool f) {
+    if (f) {
+        connect(qnResPool,      &QnResourcePool::resourceAdded,     this,   &QnMediaServerUpdateTool::updateTargets,    Qt::UniqueConnection);
+        connect(qnResPool,      &QnResourcePool::resourceRemoved,   this,   &QnMediaServerUpdateTool::updateTargets,    Qt::UniqueConnection);
+    } else {
+        disconnect(qnResPool,   &QnResourcePool::resourceAdded,     this,   &QnMediaServerUpdateTool::updateTargets);
+        disconnect(qnResPool,   &QnResourcePool::resourceRemoved,   this,   &QnMediaServerUpdateTool::updateTargets);
+    }
 }
 
 QnMediaServerUpdateTool::~QnMediaServerUpdateTool() {
@@ -103,6 +106,13 @@ void QnMediaServerUpdateTool::setPeerStageProgress(const QUuid &peerId, QnPeerUp
 void QnMediaServerUpdateTool::finishUpdate(const QnUpdateResult &result) {
     emit updateFinished(result);
     setStage(QnFullUpdateStage::Init);
+}
+
+void QnMediaServerUpdateTool::updateTargets() {
+    if (!m_targets.isEmpty())
+        return;
+
+    emit targetsChanged(actualTargetIds());
 }
 
 QnMediaServerResourceList QnMediaServerUpdateTool::targets() const {
@@ -211,6 +221,8 @@ void QnMediaServerUpdateTool::startUpdate(const QString &fileName) {
 }
 
 bool QnMediaServerUpdateTool::cancelUpdate() {
+    setAutoUpdateTargetList(true);
+
     if (!m_updateProcess)
         return true;
 
@@ -239,6 +251,8 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
     if (m_updateProcess)
         return;
 
+    setAutoUpdateTargetList(false);
+
     m_updateProcess = new QnUpdateProcess(target);
     connect(m_updateProcess, &QnUpdateProcess::stageChanged,                    this, &QnMediaServerUpdateTool::setStage);
     connect(m_updateProcess, &QnUpdateProcess::progressChanged,                 this, &QnMediaServerUpdateTool::setStageProgress);
@@ -249,6 +263,7 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
     connect(m_updateProcess, &QThread::finished, this, [this]{
         m_updateProcess->deleteLater();
         m_updateProcess = NULL;
+        setAutoUpdateTargetList(true);
     });
 
     m_updateProcess->start();

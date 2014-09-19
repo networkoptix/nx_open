@@ -43,6 +43,7 @@ public:
     void startUpdate(const QString &fileName);
 
     bool cancelUpdate();
+
 signals:
     void stageChanged(QnFullUpdateStage stage);
     void stageProgressChanged(QnFullUpdateStage stage, int progress);
@@ -53,6 +54,7 @@ signals:
 
     void checkForUpdatesFinished(const QnCheckForUpdateResult &result);
     void updateFinished(QnUpdateResult result);
+
 private:
     void startUpdate(const QnUpdateTarget &target);
     void checkForUpdates(const QnUpdateTarget &target, std::function<void(const QnCheckForUpdateResult &result)> func = NULL);
@@ -64,7 +66,12 @@ private:
     void setPeerStageProgress(const QUuid &peerId, QnPeerUpdateStage stage, int progress);
 
     void finishUpdate(const QnUpdateResult &result);
+
+    void setAutoUpdateTargetList(bool f);
     
+private slots:
+    void updateTargets();
+
 private:
     QnFullUpdateStage m_stage;
     
