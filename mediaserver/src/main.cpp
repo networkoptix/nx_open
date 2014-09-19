@@ -632,9 +632,6 @@ int serverMain(int argc, char *argv[])
 
     initLog(cmdLineArguments.logLevel);
 
-
-    initLog(cmdLineArguments.logLevel);
-
     if( cmdLineArguments.msgLogLevel != lit("none") )
         QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
             dataLocation + QLatin1String("/log/http_log"),
