@@ -4,13 +4,16 @@
 #include <QtCore/QObject>
 
 #include <ui/workbench/workbench_context_aware.h>
+#include <utils/common/connective.h>
 
 class QnConnectToCurrentSystemTool;
 class QnJoinSystemTool;
 class QnProgressDialog;
 
-class QnWorkbenchIncompatibleServersActionHandler : public QObject, public QnWorkbenchContextAware {
+class QnWorkbenchIncompatibleServersActionHandler : public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT
+    typedef Connective<QObject> base_type;
+
 public:
     explicit QnWorkbenchIncompatibleServersActionHandler(QObject *parent = 0);
 
@@ -19,19 +22,18 @@ protected slots:
     void at_joinOtherSystemAction_triggered();
 
 private:
-    QnConnectToCurrentSystemTool *connectToCurrentSystemTool();
     QnJoinSystemTool *joinSystemTool();
     QnProgressDialog *progressDialog();
 
     void connectToCurrentSystem(const QSet<QUuid> &targets);
 
 private slots:
-    void at_connectToCurrentSystemTool_finished(int errorCode);
+    void at_connectTool_finished(int errorCode);
     void at_connectToCurrentSystemTool_canceled();
     void at_joinSystemTool_finished(int errorCode);
 
 private:
-    QnConnectToCurrentSystemTool *m_connectToCurrentSystemTool;
+    QPointer<QnConnectToCurrentSystemTool> m_connectTool;
     QnJoinSystemTool *m_joinSystemTool;
     QPointer<QnProgressDialog> m_progressDialog;
 };

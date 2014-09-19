@@ -37,8 +37,6 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    ui->onlineKeyEdit->setInputMask(QLatin1String(">NNNN-NNNN-NNNN-NNNN"));
-    ui->manualKeyEdit->setInputMask(QLatin1String(">NNNN-NNNN-NNNN-NNNN"));
     ui->onlineKeyEdit->setFocus();
     ui->activateFreeLicenseButton->setText(qnProductFeatures().freeLicenseIsTrial ? tr("Activate Trial License") : tr("Activate Free License"));
     setWarningStyle(ui->fileLineEdit);
@@ -49,9 +47,10 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
          "Then we'll send you an Activation Key file."
      ).arg(QnAppInfo::licensingEmailAddress())); // TODO: #Elric move to product features?
 
-    connect(ui->onlineKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
-    connect(ui->manualKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
+    setWarningStyle(ui->licenseKeyWarningLabel);
+    ui->licenseKeyWarningLabel->setVisible(false);
 
+    connect(ui->onlineKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
     connect(ui->activationTypeComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_activationTypeComboBox_currentIndexChanged()));
     connect(ui->browseLicenseFileButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseLicenseFileButton_clicked()));
 
@@ -67,6 +66,16 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     connect(ui->copyHwidButton, &QPushButton::clicked,  this, [this] {
         qApp->clipboard()->setText(ui->hardwareIdEdit->text());
         QMessageBox::information(this, tr("Success"), tr("Hardware ID copied to clipboard."));
+    });
+
+    connect(ui->pasteKeyButton, &QPushButton::clicked,  this, [this] {
+        ui->onlineKeyEdit->setText(qApp->clipboard()->text());
+    });
+
+    connect(ui->onlineKeyEdit, &QLineEdit::textChanged, this, [this] (const QString &text) {
+        const int minLength = 3;    // for the fixed input mask ">NNNN-NNNN-NNNN-NNNN" method ::text() returns at least "---"
+        ui->licenseKeyWarningLabel->setVisible(text.length() > minLength 
+            && text.length() != ui->onlineKeyEdit->maxLength());
     });
 
     updateControls();
@@ -114,14 +123,11 @@ void QnLicenseWidget::setHardwareId(const QByteArray& hardwareId) {
 }
 
 QString QnLicenseWidget::serialKey() const {
-    return isOnline() 
-        ? ui->onlineKeyEdit->text()
-        : ui->manualKeyEdit->text();
+    return ui->onlineKeyEdit->text();
 }
 
 void QnLicenseWidget::setSerialKey(const QString &serialKey) {
     ui->onlineKeyEdit->setText(serialKey);
-    ui->manualKeyEdit->setText(serialKey);
 }
 
 QByteArray QnLicenseWidget::activationKey() const {
@@ -131,10 +137,9 @@ QByteArray QnLicenseWidget::activationKey() const {
 void QnLicenseWidget::updateControls() {
     if(m_state == Normal) {
         ui->activateLicenseButton->setText(tr("Activate License"));
-
-        bool canActivate = isValidSerialKey(serialKey());
-        if (!isOnline())
-            canActivate &= !m_activationKey.isEmpty();
+        bool canActivate = isOnline()
+            ? isValidSerialKey(serialKey())
+            : !m_activationKey.isEmpty();
         ui->activateLicenseButton->setEnabled(canActivate);
     } else {
         ui->activateLicenseButton->setText(tr("Activating..."));
@@ -155,11 +160,6 @@ void QnLicenseWidget::changeEvent(QEvent *event) {
 
 void QnLicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
     bool isOnline = this->isOnline();
-
-    if (isOnline)
-        ui->onlineKeyEdit->setText(ui->manualKeyEdit->text());
-    else
-        ui->manualKeyEdit->setText(ui->onlineKeyEdit->text());
 
     ui->stackedWidget->setCurrentWidget(isOnline ? ui->onlinePage : ui->manualPage);
     ui->activateFreeLicenseButton->setVisible(m_freeLicenseAvailable && isOnline);

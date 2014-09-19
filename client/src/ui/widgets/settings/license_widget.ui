@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>446</width>
-    <height>175</height>
+    <height>149</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -57,15 +57,36 @@
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
-           <property name="buddy">
-            <cstring>manualKeyEdit</cstring>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="onlineKeyEdit">
+           <property name="inputMask">
+            <string notr="true">&gt;NNNN-NNNN-NNNN-NNNN</string>
+           </property>
+           <property name="text">
+            <string notr="true">---</string>
+           </property>
+           <property name="cursorPosition">
+            <number>0</number>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="onlineKeyEdit"/>
+          <widget class="QPushButton" name="pasteKeyButton">
+           <property name="text">
+            <string>Paste from Clipboard</string>
+           </property>
+          </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="licenseKeyWarningLabel">
+         <property name="text">
+          <string>License key is invalid</string>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="verticalSpacer">
@@ -75,7 +96,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>69</height>
+           <height>20</height>
           </size>
          </property>
         </spacer>
@@ -105,22 +126,6 @@
           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
          </property>
          <item row="0" column="0">
-          <widget class="QLabel" name="manualKeyLabel">
-           <property name="text">
-            <string>License Key:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-           <property name="buddy">
-            <cstring>manualKeyEdit</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="manualKeyEdit"/>
-         </item>
-         <item row="1" column="0">
           <widget class="QLabel" name="hardwareIdLabel">
            <property name="text">
             <string>Hardware ID:</string>
@@ -130,38 +135,7 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="activationKeyFileLabel">
-           <property name="text">
-            <string>Activation Key File:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <item>
-            <widget class="QLineEdit" name="fileLineEdit">
-             <property name="text">
-              <string>Select license file...</string>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="browseLicenseFileButton">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string>Browse...</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="1" column="1">
+         <item row="0" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
             <widget class="QLineEdit" name="hardwareIdEdit">
@@ -180,6 +154,37 @@
              </property>
              <property name="text">
               <string>Copy to Clipboard</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="activationKeyFileLabel">
+           <property name="text">
+            <string>Activation Key File:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLineEdit" name="fileLineEdit">
+             <property name="text">
+              <string>Select license file...</string>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="browseLicenseFileButton">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="text">
+              <string>Browse...</string>
              </property>
             </widget>
            </item>
@@ -241,7 +246,6 @@
  <tabstops>
   <tabstop>activationTypeComboBox</tabstop>
   <tabstop>onlineKeyEdit</tabstop>
-  <tabstop>manualKeyEdit</tabstop>
   <tabstop>hardwareIdEdit</tabstop>
   <tabstop>copyHwidButton</tabstop>
   <tabstop>fileLineEdit</tabstop>

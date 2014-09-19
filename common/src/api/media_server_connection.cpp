@@ -82,6 +82,7 @@ namespace {
         (InstallUpdateObject,      "installUpdate")
         (Restart,                  "restart")
         (ConfigureObject,          "configure")
+        (PingSystemObject,         "pingSystem")
         (TestEmailSettingsObject,  "testEmailSettings")
     );
 
@@ -273,6 +274,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case ConfigureObject:
         processJsonReply<QnConfigureReply>(this, response, handle);
+        break;
+    case PingSystemObject:
+        processJsonReply<QnModuleInformation>(this, response, handle);
         break;
     default:
         assert(false); /* We should never get here. */
@@ -784,4 +788,12 @@ int QnMediaServerConnection::configureAsync(bool wholeSystem, const QString &sys
     params << QnRequestParam("port", port);
 
     return sendAsyncGetRequest(ConfigureObject, params, QN_STRINGIZE_TYPE(QnConfigureReply), target, slot);
+}
+
+int QnMediaServerConnection::pingSystemAsync(const QUrl &url, const QString &password, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("url", url.toString());
+    params << QnRequestParam("password", password);
+
+    return sendAsyncGetRequest(PingSystemObject, params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
 }

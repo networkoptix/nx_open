@@ -1278,6 +1278,14 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered() {
     if(videoWall.isNull())
         return;
 
+    if (QMessageBox::warning(mainWindow(),
+        tr("Confirm Video Wall stop"),
+        tr("Are you sure you want to stop the Video Wall?\n"\
+        "You'll have to start it manually."),
+        QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
+        QMessageBox::Cancel) == QMessageBox::Cancel)
+        return;
+
     QnVideoWallControlMessage message(QnVideoWallControlMessage::Exit);
     message.videoWallGuid = videoWall->getId();
     foreach (const QnVideoWallItem &item, videoWall->items()->getItems()) {
