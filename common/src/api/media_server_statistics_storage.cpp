@@ -73,7 +73,7 @@ void QnMediaServerStatisticsStorage::setFlagsFilter(QnStatisticsDeviceType devic
 }
 
 void QnMediaServerStatisticsStorage::update() {
-    if (!m_listeners || m_updateRequests > 0) {
+    if (!m_listeners || m_updateRequests > 0 || m_server->getStatus() != Qn::Online) {
         m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
         m_lastId++;
 
