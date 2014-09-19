@@ -4,6 +4,8 @@
 #include <map>
 #include <set>
 
+#include <boost/optional.hpp>
+
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QFile>
 #include <QtCore/QDir>
@@ -430,8 +432,9 @@ qreal QnLinuxMonitor::totalRamUsage()
         return 0;
 
     char line[MAX_LINE_LENGTH];
-    uint64_t memTotalKB = 0;
-    uint64_t memFreeKB = 0;
+    boost::optional<uint64_t> memTotalKB;
+    boost::optional<uint64_t> memFreeKB;
+    boost::optional<uint64_t> memCachedKB;
     for( int i = 0; fgets(line, MAX_LINE_LENGTH, file) != NULL; ++i )
     {
         const size_t length = strlen(line);
@@ -449,14 +452,19 @@ qreal QnLinuxMonitor::totalRamUsage()
             memTotalKB = atoll( valStart );
         else if( strncmp( line, "MemFree", sepPos-line ) == 0 )
             memFreeKB = atoll( valStart );
+        else if( strncmp( line, "Cached", sepPos-line ) == 0 )
+            memCachedKB = atoll( valStart );
 
-        if( memTotalKB > 0 && memFreeKB > 0 )
+        if( memTotalKB && memFreeKB && memCachedKB )
             break;
     }
 
+    if( !memTotalKB || !memFreeKB || !memCachedKB )
+        return 0;
+
     fclose( file );
     file = nullptr;
-    return 1.0 - (memFreeKB / (qreal)(memTotalKB == 0 ? (memFreeKB+1) : memTotalKB));   //protecting from zero-memory-size error in /proc/meminfo. This situation is not possible in real life, so don't worry
+    return 1.0 - ((memFreeKB.get()+memCachedKB.get()) / (qreal)(memTotalKB.get() == 0 ? ((memFreeKB.get() + memCachedKB.get())+1) : memTotalKB.get()));   //protecting from zero-memory-size error in /proc/meminfo. This situation is not possible in real life, so don't worry
 }
 
 QList<QnPlatformMonitor::HddLoad> QnLinuxMonitor::totalHddLoad()

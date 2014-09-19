@@ -289,6 +289,8 @@ public:
         videowall = 0x200000,           /**< Videowall resource */
         desktop_camera = 0x400000,      /**< Desktop Camera resource */
 
+        parent_change = 0x800000,       /**< Camera discovery internal purpose */
+
         local_media = local | media,
         local_layout = local | layout,
 

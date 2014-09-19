@@ -126,11 +126,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     m_connectionsModel->appendRow(m_savedSessionsItem);
     m_connectionsModel->appendRow(m_autoFoundItem);
 
-    ui->autoLoginCheckBox->setCheckState(qnSettings->autoLogin() ? Qt::Checked : Qt::Unchecked);
-    connect(ui->autoLoginCheckBox, &QCheckBox::stateChanged,    this, [this](int state) {
-        qnSettings->setAutoLogin(state == Qt::Checked);
-    });
-
     connect(ui->connectionsComboBox,        SIGNAL(currentIndexChanged(QModelIndex)), this,   SLOT(at_connectionsComboBox_currentIndexChanged(QModelIndex)));
     connect(ui->testButton,                 SIGNAL(clicked()),                      this,   SLOT(at_testButton_clicked()));
     connect(ui->saveButton,                 SIGNAL(clicked()),                      this,   SLOT(at_saveButton_clicked()));
@@ -144,6 +139,12 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 
     resetConnectionsModel();
     updateFocus();
+
+    /* Should be done after model resetting to avoid state loss. */
+    ui->autoLoginCheckBox->setChecked(qnSettings->autoLogin());
+    connect(ui->autoLoginCheckBox, &QCheckBox::stateChanged,    this, [this](int state) {
+        qnSettings->setAutoLogin(state == Qt::Checked);
+    });
 
     connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleUrlFound,    this,   &QnLoginDialog::at_moduleFinder_moduleUrlFound);
     connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleUrlLost,     this,   &QnLoginDialog::at_moduleFinder_moduleUrlLost);
@@ -234,7 +235,9 @@ void QnLoginDialog::changeEvent(QEvent *event) {
 void QnLoginDialog::showEvent(QShowEvent *event) {
     base_type::showEvent(event);
 
+    bool autoLogin = qnSettings->autoLogin();
     resetConnectionsModel();
+    ui->autoLoginCheckBox->setChecked(autoLogin);
 
 #ifdef Q_OS_MAC
     if (focusWidget())
@@ -388,6 +391,7 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
         : url.userName());
     ui->passwordLineEdit->setText(url.password());
     ui->deleteButton->setEnabled(qnSettings->customConnections().contains(ui->connectionsComboBox->currentText()));
+    ui->autoLoginCheckBox->setChecked(false);
     updateFocus();
 }
 
@@ -441,6 +445,7 @@ void QnLoginDialog::at_saveButton_clicked() {
 
     // save here because of the 'connections' field modifying
     QString password = ui->passwordLineEdit->text();
+    bool autoLogin = qnSettings->autoLogin();
 
     if (connections.contains(name)){
         QMessageBox::StandardButton button = QMessageBox::warning(this, tr("Connection already exists"),
@@ -473,6 +478,7 @@ void QnLoginDialog::at_saveButton_clicked() {
     ui->connectionsComboBox->setCurrentIndex(idx);
     at_connectionsComboBox_currentIndexChanged(idx); // call directly in case index change will not work
     ui->passwordLineEdit->setText(password);         // password is cleared on index change
+    ui->autoLoginCheckBox->setChecked(autoLogin);
 
 }
 

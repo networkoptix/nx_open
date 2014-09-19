@@ -59,6 +59,8 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
         return CODE_OK;
     }
 
+    result.setReply(moduleInformation);
+
     if (moduleInformation.version != qnCommon->engineVersion() || moduleInformation.customization != QnAppInfo::customizationName()) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return CODE_OK;

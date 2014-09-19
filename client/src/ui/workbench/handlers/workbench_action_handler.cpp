@@ -1769,22 +1769,29 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         // I've removed command "saveResource" because it cause sync issue in p2p mode. The problem because of we have transactions with different hash:
         // for instance saveServer and saveResource. But result data will depend of transactions order.
 
-        QnMediaServerResourcePtr mServer = resource.dynamicCast<QnMediaServerResource>();
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
         QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
         QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
+        QnMediaServerResourcePtr mServer = resource.dynamicCast<QnMediaServerResource>();
+        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        
+        if (camera && nodeType == Qn::EdgeNode) {
+            if (mServer = resource->getParentResource().dynamicCast<QnMediaServerResource>())
+                mServer->setName(name);
+        }
+
         auto callback = [this, resource, oldName]( int reqID, ec2::ErrorCode errorCode ) {
             at_resources_saved( reqID, errorCode, QnResourceList() << resource );
             if (errorCode != ec2::ErrorCode::ok)
                 resource->setName(oldName);
         };
+
         if (mServer)
             connection2()->getMediaServerManager()->save(mServer, this, callback);
-        else if (camera)
+        if (camera)
             connection2()->getCameraManager()->save( QnVirtualCameraResourceList() << camera, this, callback);
-        else if (user) 
+        if (user) 
             connection2()->getUserManager()->save( user, this, callback );
-        else if (layout)
+        if (layout)
             connection2()->getLayoutManager()->save( QnLayoutResourceList() << layout, this, callback);
     }
 }

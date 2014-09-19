@@ -89,7 +89,7 @@ public:
     QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
-    QnResourceList getAllCameras(const QnResourcePtr &mServer) const;
+    QnResourceList getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras = false) const;
     QnMediaServerResourceList getAllServers() const;
     QnResourceList getResourcesByParentId(const QUuid& parentId) const;
 

@@ -487,14 +487,6 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     addOverlays();
 
     /* Setup buttons */
-    /*QnImageButtonWidget *pingButton = new QnImageButtonWidget();
-    pingButton->setIcon(qnSkin->icon("item/ping.png"));
-    pingButton->setCheckable(false);
-    pingButton->setProperty(Qn::NoBlockMotionSelection, true);
-    pingButton->setToolTip(tr("Ping"));
-    connect(pingButton, SIGNAL(clicked()), this, SLOT(at_pingButton_clicked()));
-    buttonBar()->addButton(PingButton, pingButton);*/
-
     QnImageButtonWidget *showLogButton = new QnImageButtonWidget();
     showLogButton->setIcon(qnSkin->icon("item/log.png"));
     showLogButton->setCheckable(false);
@@ -800,7 +792,7 @@ void QnServerResourceWidget::at_statistics_received() {
         return;
     }
 
-    if (id == m_lastHistoryId) {
+    if (id == m_lastHistoryId || m_resource->getStatus() != Qn::Online) {
         m_renderStatus = Qn::OldFrameRendered;
         return;
     }

@@ -45,11 +45,7 @@ public:
 
     QnImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnImageButtonWidget();
-
-    // TODO: #Elric get rid of these, leave only icon.
-    const QPixmap &pixmap(StateFlags flags) const;
-    void setPixmap(StateFlags flags, const QPixmap &pixmap);
-    
+  
     QIcon icon() const;
     void setIcon(const QIcon &icon);
 
@@ -130,6 +126,10 @@ protected:
     bool skipHoverEvent(QGraphicsSceneHoverEvent *event);
 
     void clickInternal(QGraphicsSceneMouseEvent *event);
+
+    // TODO: #Elric get rid of these, leave only icon.
+    const QPixmap &pixmap(StateFlags flags) const;
+    void setPixmap(StateFlags flags, const QPixmap &pixmap);
 
 private:
     friend class QnImageButtonHoverProgressAccessor;
