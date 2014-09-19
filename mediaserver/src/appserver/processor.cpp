@@ -89,9 +89,13 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
     }
 
     QMutexLocker lock(&m_mutex);
-    QByteArray name = cameraResource->getPhysicalId().toUtf8();
+    QString name;
     if (cameraResource->hasFlags(Qn::parent_change))
-        name += "__UPDATE";
+        name = ec2::QnMutexCameraDataHandler::CAM_UPD_PREFIX;
+    else
+        name = ec2::QnMutexCameraDataHandler::CAM_INS_PREFIX;
+    name.append(cameraResource->getPhysicalId());
+
     if (m_lockInProgress.contains(name))
         return; // camera already adding (in progress)
 
