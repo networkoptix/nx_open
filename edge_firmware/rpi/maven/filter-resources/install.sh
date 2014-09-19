@@ -10,7 +10,7 @@ DISTRIB=$COMPANY_NAME-mediaserver-${box}-${release.version}.${buildNumber}$BETA
 
 update () {
     /etc/init.d/$COMPANY_NAME-mediaserver stop
-    tar xfv $DISTRIB.tar.gz --exclude='./opt/networkoptix/mediaserver/etc/mediaserver.conf' -C /
+    tar xfv $DISTRIB.tar.gz --exclude='./opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf' -C /
     /etc/init.d/$COMPANY_NAME-mediaserver start
 }
 
