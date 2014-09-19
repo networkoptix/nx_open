@@ -1,4 +1,4 @@
-#include "join_system_rest_handler.h"
+#include "merge_systems_rest_handler.h"
 
 #include <QtCore/QRegExp>
 
@@ -30,7 +30,7 @@ namespace {
     }
 }
 
-int QnJoinSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
     Q_UNUSED(path)
 
     QUrl url = params.value(lit("url"));
@@ -129,7 +129,7 @@ int QnJoinSystemRestHandler::executeGet(const QString &path, const QnRequestPara
     return CODE_OK;
 }
 
-bool QnJoinSystemRestHandler::changeSystemName(const QString &systemName) {
+bool QnMergeSystemsRestHandler::changeSystemName(const QString &systemName) {
     QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
 
     if (!backupDatabase())
@@ -149,7 +149,7 @@ bool QnJoinSystemRestHandler::changeSystemName(const QString &systemName) {
     return true;
 }
 
-bool QnJoinSystemRestHandler::changeAdminPassword(const QString &password) {
+bool QnMergeSystemsRestHandler::changeAdminPassword(const QString &password) {
     if (QnUserResourcePtr admin = getAdminUser()) {
         admin->setPassword(password);
         admin->generateHash();
