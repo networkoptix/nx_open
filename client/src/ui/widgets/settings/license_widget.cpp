@@ -37,7 +37,6 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    ui->onlineKeyEdit->setInputMask(QLatin1String(">NNNN-NNNN-NNNN-NNNN"));
     ui->onlineKeyEdit->setFocus();
     ui->activateFreeLicenseButton->setText(qnProductFeatures().freeLicenseIsTrial ? tr("Activate Trial License") : tr("Activate Free License"));
     setWarningStyle(ui->fileLineEdit);
@@ -47,6 +46,9 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
          "Please send email with the Serial Key and the Hardware ID provided to <a href=\"mailto:%1\">%1</a>. "
          "Then we'll send you an Activation Key file."
      ).arg(QnAppInfo::licensingEmailAddress())); // TODO: #Elric move to product features?
+
+    setWarningStyle(ui->licenseKeyWarningLabel);
+    ui->licenseKeyWarningLabel->setVisible(false);
 
     connect(ui->onlineKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
     connect(ui->activationTypeComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_activationTypeComboBox_currentIndexChanged()));
@@ -64,6 +66,16 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     connect(ui->copyHwidButton, &QPushButton::clicked,  this, [this] {
         qApp->clipboard()->setText(ui->hardwareIdEdit->text());
         QMessageBox::information(this, tr("Success"), tr("Hardware ID copied to clipboard."));
+    });
+
+    connect(ui->pasteKeyButton, &QPushButton::clicked,  this, [this] {
+        ui->onlineKeyEdit->setText(qApp->clipboard()->text());
+    });
+
+    connect(ui->onlineKeyEdit, &QLineEdit::textChanged, this, [this] (const QString &text) {
+        const int minLength = 3;    // for the fixed input mask ">NNNN-NNNN-NNNN-NNNN" method ::text() returns at least "---"
+        ui->licenseKeyWarningLabel->setVisible(text.length() > minLength 
+            && text.length() != ui->onlineKeyEdit->maxLength());
     });
 
     updateControls();

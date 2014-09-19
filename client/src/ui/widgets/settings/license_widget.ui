@@ -60,9 +60,33 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="onlineKeyEdit"/>
+          <widget class="QLineEdit" name="onlineKeyEdit">
+           <property name="inputMask">
+            <string notr="true">&gt;NNNN-NNNN-NNNN-NNNN</string>
+           </property>
+           <property name="text">
+            <string notr="true">---</string>
+           </property>
+           <property name="cursorPosition">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pasteKeyButton">
+           <property name="text">
+            <string>Paste from Clipboard</string>
+           </property>
+          </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="licenseKeyWarningLabel">
+         <property name="text">
+          <string>License key is invalid</string>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="verticalSpacer">
