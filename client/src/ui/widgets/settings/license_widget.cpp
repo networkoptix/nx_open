@@ -38,7 +38,6 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     ui->setupUi(this);
 
     ui->onlineKeyEdit->setInputMask(QLatin1String(">NNNN-NNNN-NNNN-NNNN"));
-    ui->manualKeyEdit->setInputMask(QLatin1String(">NNNN-NNNN-NNNN-NNNN"));
     ui->onlineKeyEdit->setFocus();
     ui->activateFreeLicenseButton->setText(qnProductFeatures().freeLicenseIsTrial ? tr("Activate Trial License") : tr("Activate Free License"));
     setWarningStyle(ui->fileLineEdit);
@@ -50,8 +49,6 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
      ).arg(QnAppInfo::licensingEmailAddress())); // TODO: #Elric move to product features?
 
     connect(ui->onlineKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
-    connect(ui->manualKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
-
     connect(ui->activationTypeComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_activationTypeComboBox_currentIndexChanged()));
     connect(ui->browseLicenseFileButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseLicenseFileButton_clicked()));
 
@@ -114,14 +111,11 @@ void QnLicenseWidget::setHardwareId(const QByteArray& hardwareId) {
 }
 
 QString QnLicenseWidget::serialKey() const {
-    return isOnline() 
-        ? ui->onlineKeyEdit->text()
-        : ui->manualKeyEdit->text();
+    return ui->onlineKeyEdit->text();
 }
 
 void QnLicenseWidget::setSerialKey(const QString &serialKey) {
     ui->onlineKeyEdit->setText(serialKey);
-    ui->manualKeyEdit->setText(serialKey);
 }
 
 QByteArray QnLicenseWidget::activationKey() const {
@@ -131,10 +125,9 @@ QByteArray QnLicenseWidget::activationKey() const {
 void QnLicenseWidget::updateControls() {
     if(m_state == Normal) {
         ui->activateLicenseButton->setText(tr("Activate License"));
-
-        bool canActivate = isValidSerialKey(serialKey());
-        if (!isOnline())
-            canActivate &= !m_activationKey.isEmpty();
+        bool canActivate = isOnline()
+            ? isValidSerialKey(serialKey())
+            : !m_activationKey.isEmpty();
         ui->activateLicenseButton->setEnabled(canActivate);
     } else {
         ui->activateLicenseButton->setText(tr("Activating..."));
@@ -155,11 +148,6 @@ void QnLicenseWidget::changeEvent(QEvent *event) {
 
 void QnLicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
     bool isOnline = this->isOnline();
-
-    if (isOnline)
-        ui->onlineKeyEdit->setText(ui->manualKeyEdit->text());
-    else
-        ui->manualKeyEdit->setText(ui->onlineKeyEdit->text());
 
     ui->stackedWidget->setCurrentWidget(isOnline ? ui->onlinePage : ui->manualPage);
     ui->activateFreeLicenseButton->setVisible(m_freeLicenseAvailable && isOnline);
