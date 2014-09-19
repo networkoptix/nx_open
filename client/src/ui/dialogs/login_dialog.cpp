@@ -234,6 +234,11 @@ void QnLoginDialog::changeEvent(QEvent *event) {
 
 void QnLoginDialog::showEvent(QShowEvent *event) {
     base_type::showEvent(event);
+
+    bool autoLogin = qnSettings->autoLogin();
+    resetConnectionsModel();
+    ui->autoLoginCheckBox->setChecked(autoLogin);
+
 #ifdef Q_OS_MAC
     if (focusWidget())
         focusWidget()->activateWindow();
@@ -440,6 +445,7 @@ void QnLoginDialog::at_saveButton_clicked() {
 
     // save here because of the 'connections' field modifying
     QString password = ui->passwordLineEdit->text();
+    bool autoLogin = qnSettings->autoLogin();
 
     if (connections.contains(name)){
         QMessageBox::StandardButton button = QMessageBox::warning(this, tr("Connection already exists"),
@@ -472,6 +478,7 @@ void QnLoginDialog::at_saveButton_clicked() {
     ui->connectionsComboBox->setCurrentIndex(idx);
     at_connectionsComboBox_currentIndexChanged(idx); // call directly in case index change will not work
     ui->passwordLineEdit->setText(password);         // password is cleared on index change
+    ui->autoLoginCheckBox->setChecked(autoLogin);
 
 }
 
