@@ -545,7 +545,7 @@
 				<toolchain.version>rpi</toolchain.version>
 				<compiler>${toolchain.version}</compiler>
 				<openssl.version>1.0.0j-SNAPSHOT</openssl.version>
-				<ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
+				<ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>rpi</modification>
 			</properties>
 			<modules>

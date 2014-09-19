@@ -82,6 +82,7 @@ namespace {
         (InstallUpdateObject,      "installUpdate")
         (Restart,                  "restart")
         (ConfigureObject,          "configure")
+        (PingSystemObject,         "pingSystem")
         (TestEmailSettingsObject,  "testEmailSettings")
     );
 
@@ -135,65 +136,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     }
     case StatisticsObject: {
-        const QByteArray &data = response.data;
-        int status = response.status;
-        QnStatisticsReply reply;
-
-        if(status == 0) {
-            QByteArray cpuBlock = extractXmlBody(data, "cpuinfo");
-            reply.statistics.append(QnStatisticsDataItem(
-                QLatin1String("CPU"),
-                extractXmlBody(cpuBlock, "load").toDouble(),
-                CPU
-            ));
-
-            QByteArray memoryBlock = extractXmlBody(data, "memory");
-            reply.statistics.append(QnStatisticsDataItem(
-                QLatin1String("RAM"),
-                extractXmlBody(memoryBlock, "usage").toDouble(),
-                RAM
-            ));
-
-            QByteArray miscBlock = extractXmlBody(data, "misc");
-            reply.uptimeMs = extractXmlBody(miscBlock, "uptimeMs").toLongLong();
-
-            QByteArray storagesBlock = extractXmlBody(data, "storages"), storageBlock; {
-                int from = 0;
-                do {
-                    storageBlock = extractXmlBody(storagesBlock, "storage", &from);
-                    if (storageBlock.length() == 0)
-                        break;
-                    reply.statistics.append(QnStatisticsDataItem(
-                        QLatin1String(extractXmlBody(storageBlock, "url")),
-                        extractXmlBody(storageBlock, "usage").toDouble(),
-                        HDD
-                    ));
-                } while (storageBlock.length() > 0);
-            }
-
-            QByteArray networkBlock = extractXmlBody(data, "network"), interfaceBlock; {
-                int from = 0;
-                do {
-                    interfaceBlock = extractXmlBody(networkBlock, "interface", &from);
-                    if (interfaceBlock.length() == 0)
-                        break;
-
-                    QString interfaceName = QLatin1String(extractXmlBody(interfaceBlock, "name"));
-                    int interfaceType = extractXmlBody(interfaceBlock, "type").toInt();
-                    qint64 bytesIn = extractXmlBody(interfaceBlock, "in").toLongLong();
-                    qint64 bytesOut = extractXmlBody(interfaceBlock, "out").toLongLong();
-                    qint64 bytesMax = extractXmlBody(interfaceBlock, "max").toLongLong();
-
-                    if(bytesMax != 0)
-                        reply.statistics.push_back(QnStatisticsDataItem(interfaceName, static_cast<qreal>(qMax(bytesIn, bytesOut)) / bytesMax, NETWORK, interfaceType));
-                } while (networkBlock.length() > 0);
-            }
-
-            QByteArray paramsBlock = extractXmlBody(data, "params");
-            reply.updatePeriod = extractXmlBody(paramsBlock, "updatePeriod").toInt();
-        }
-
-        emitFinished(this, status, reply, handle);
+        processJsonReply<QnStatisticsReply>(this, response, handle);
         break;
     }
     case GetParamsObject: {
@@ -331,6 +274,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case ConfigureObject:
         processJsonReply<QnConfigureReply>(this, response, handle);
+        break;
+    case PingSystemObject:
+        processJsonReply<QnModuleInformation>(this, response, handle);
         break;
     default:
         assert(false); /* We should never get here. */
@@ -842,4 +788,12 @@ int QnMediaServerConnection::configureAsync(bool wholeSystem, const QString &sys
     params << QnRequestParam("port", port);
 
     return sendAsyncGetRequest(ConfigureObject, params, QN_STRINGIZE_TYPE(QnConfigureReply), target, slot);
+}
+
+int QnMediaServerConnection::pingSystemAsync(const QUrl &url, const QString &password, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("url", url.toString());
+    params << QnRequestParam("password", password);
+
+    return sendAsyncGetRequest(PingSystemObject, params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
 }

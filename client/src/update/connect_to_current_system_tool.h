@@ -7,9 +7,8 @@
 #include <utils/common/connective.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnConfigurePeerTask;
+class QnNetworkPeerTask;
 class QnMediaServerUpdateTool;
-class QnWaitCompatibleServersPeerTask;
 struct QnUpdateResult;
 
 class QnConnectToCurrentSystemTool : public Connective<QObject>, public QnWorkbenchContextAware {
@@ -26,9 +25,7 @@ public:
     explicit QnConnectToCurrentSystemTool(QnWorkbenchContext *context, QObject *parent = 0);
     ~QnConnectToCurrentSystemTool();
 
-    void connectToCurrentSystem(const QSet<QUuid> &targets, const QString &password);
-
-    bool isRunning() const;
+    void start(const QSet<QUuid> &targets, const QString &password);
 
     QSet<QUuid> targets() const;
 
@@ -55,7 +52,6 @@ private slots:
     void at_updateTool_progressChanged(int progress);
 
 private:
-    bool m_running;
     QSet<QUuid> m_targets;
     QString m_password;
 
@@ -63,10 +59,8 @@ private:
     QSet<QUuid> m_updateTargets;
     QHash<QUuid, QUrl> m_oldUrls;
     QHash<QUuid, QUuid> m_waitTargets;
-    QnConfigurePeerTask *m_configureTask;
-    QnWaitCompatibleServersPeerTask *m_waitTask;
+    QnNetworkPeerTask *m_currentTask;
     QnMediaServerUpdateTool *m_updateTool;
-    bool m_updateFailed;
     bool m_restartAllPeers;
 };
 
