@@ -39,28 +39,19 @@ namespace {
 QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *context, QObject *parent) :
     base_type(parent),
     QnWorkbenchContextAware(context),
-    m_running(false),
-    m_configureTask(new QnConfigurePeerTask(this)),
-    m_waitTask(new QnWaitCompatibleServersPeerTask(this)),
-    m_updateTool(new QnMediaServerUpdateTool(this))
+    m_currentTask(0),
+    m_updateTool(0)
 {
-    connect(m_configureTask,            &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_configureTask_finished);
-    connect(m_waitTask,                 &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_waitTask_finished);
-    connect(m_updateTool,               &QnMediaServerUpdateTool::updateFinished,   this,       &QnConnectToCurrentSystemTool::at_updateTool_finished);
 }
 
 QnConnectToCurrentSystemTool::~QnConnectToCurrentSystemTool() {}
 
-void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QUuid> &targets, const QString &password) {
-    if (m_running)
-        return;
-
+void QnConnectToCurrentSystemTool::start(const QSet<QUuid> &targets, const QString &password) {
     if (targets.isEmpty()) {
         finish(NoError);
         return;
     }
 
-    m_running = true;
     m_targets = targets;
     m_password = password;
     m_restartTargets.clear();
@@ -76,27 +67,21 @@ void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QUuid> &tar
     configureServer();
 }
 
-bool QnConnectToCurrentSystemTool::isRunning() const {
-    return m_running;
-}
-
 QSet<QUuid> QnConnectToCurrentSystemTool::targets() const {
     return m_targets;
 }
 
 void QnConnectToCurrentSystemTool::cancel() {
-    if (!m_running)
-        return;
+    if (m_currentTask)
+        m_currentTask->cancel();
 
-    m_configureTask->cancel();
-    m_waitTask->cancel();
-    m_updateTool->cancelUpdate();
+    if (m_updateTool)
+        m_updateTool->cancelUpdate();
 
     emit canceled();
 }
 
 void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode) {
-    m_running = false;
     revertApiUrls();
     emit finished(errorCode);
 }
@@ -124,13 +109,22 @@ void QnConnectToCurrentSystemTool::configureServer() {
         server->apiConnection()->setUrl(url);
     }
 
-    m_configureTask->setPasswordHash(adminUser->getHash(), adminUser->getDigest());
-    m_configureTask->setSystemName(qnCommon->localSystemName());
-    m_configureTask->start(m_targets);
+    QnConfigurePeerTask *task = new QnConfigurePeerTask(this);
+    m_currentTask = task;
+
+    connect(task, &QnNetworkPeerTask::finished, this, &QnConnectToCurrentSystemTool::at_configureTask_finished);
+    task->setPasswordHash(adminUser->getHash(), adminUser->getDigest());
+    task->setSystemName(qnCommon->localSystemName());
+    task->start(m_targets);
 }
 
 void QnConnectToCurrentSystemTool::waitPeers() {
-    m_waitTask->start(QSet<QUuid>::fromList(m_waitTargets.values()));
+    QnWaitCompatibleServersPeerTask *task = new QnWaitCompatibleServersPeerTask(this);
+    m_currentTask = task;
+
+    connect(task, &QnNetworkPeerTask::finished, this, &QnConnectToCurrentSystemTool::at_waitTask_finished);
+    task->start(QSet<QUuid>::fromList(m_waitTargets.values()));
+
     emit progressChanged(configureProgress);
 }
 
@@ -143,7 +137,9 @@ void QnConnectToCurrentSystemTool::updatePeers() {
     emit stateChanged(tr("Updating server(s)"));
     at_updateTool_progressChanged(0);
 
-    m_updateFailed = false;
+    m_updateTool = new QnMediaServerUpdateTool(this);
+    connect(m_updateTool, &QnMediaServerUpdateTool::updateFinished, this, &QnConnectToCurrentSystemTool::at_updateTool_finished);
+
     m_updateTool->setTargets(m_updateTargets);
     m_updateTool->startUpdate(QnSoftwareVersion(), true);
 }
@@ -160,9 +156,7 @@ void QnConnectToCurrentSystemTool::revertApiUrls() {
 }
 
 void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, const QSet<QUuid> &failedPeers) {
-    if (!m_running)
-        return;
-
+    m_currentTask = 0;
     revertApiUrls();
 
     if (errorCode != 0) {
@@ -188,8 +182,7 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
 }
 
 void QnConnectToCurrentSystemTool::at_waitTask_finished(int errorCode) {
-    if (!m_running)
-        return;
+    m_currentTask = 0;
 
     if (errorCode != 0) {
         finish(ConfigurationFailed);
@@ -200,8 +193,7 @@ void QnConnectToCurrentSystemTool::at_waitTask_finished(int errorCode) {
 }
 
 void QnConnectToCurrentSystemTool::at_updateTool_finished(const QnUpdateResult &result) {
-    if (!m_running)
-        return;
+    m_updateTool = 0;
 
     finish(result.result == QnUpdateResult::Successful ? NoError : UpdateFailed);
 }
