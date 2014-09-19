@@ -17,7 +17,7 @@
 QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActionHandler(QObject *parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_connectToCurrentSystemTool(NULL),
+    m_connectTool(NULL),
     m_joinSystemTool(NULL),
     m_progressDialog(NULL)
 {
@@ -26,9 +26,7 @@ QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActio
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemAction_triggered() {
-    QnConnectToCurrentSystemTool *tool = connectToCurrentSystemTool();
-
-    if (tool->isRunning()) {
+    if (m_connectTool) {
         QMessageBox::critical(mainWindow(), tr("Error"), tr("Please, wait before the previously requested servers will be added to your system."));
         return;
     }
@@ -50,16 +48,17 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(const Q
     if (password.isEmpty())
         return;
 
+    m_connectTool = new QnConnectToCurrentSystemTool(context(), this);
+
     progressDialog()->setWindowTitle(tr("Connecting to the current system..."));
     progressDialog()->show();
 
-    QnConnectToCurrentSystemTool *tool = connectToCurrentSystemTool();
+    connect(m_connectTool,      &QnConnectToCurrentSystemTool::finished,        this,                           &QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished);
+    connect(m_connectTool,      &QnConnectToCurrentSystemTool::progressChanged, progressDialog(),               &QnProgressDialog::setValue);
+    connect(m_connectTool,      &QnConnectToCurrentSystemTool::stateChanged,    progressDialog(),               &QnProgressDialog::setLabelText);
+    connect(progressDialog(),   &QnProgressDialog::canceled,                    m_connectTool,                  &QnConnectToCurrentSystemTool::cancel);
 
-    connect(tool, &QnConnectToCurrentSystemTool::progressChanged, progressDialog(), &QnProgressDialog::setValue);
-    connect(tool, &QnConnectToCurrentSystemTool::stateChanged, progressDialog(), &QnProgressDialog::setLabelText);
-    connect(progressDialog(), &QnProgressDialog::canceled, tool, &QnConnectToCurrentSystemTool::cancel);
-
-    connectToCurrentSystemTool()->connectToCurrentSystem(targets, password);
+    m_connectTool->start(targets, password);
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_joinOtherSystemAction_triggered() {
@@ -94,14 +93,6 @@ void QnWorkbenchIncompatibleServersActionHandler::at_joinOtherSystemAction_trigg
     tool->start(url, password);
 }
 
-QnConnectToCurrentSystemTool *QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystemTool() {
-    if (!m_connectToCurrentSystemTool) {
-        m_connectToCurrentSystemTool = new QnConnectToCurrentSystemTool(context(), this);
-        connect(m_connectToCurrentSystemTool, &QnConnectToCurrentSystemTool::finished, this, &QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_finished);
-    }
-    return m_connectToCurrentSystemTool;
-}
-
 QnJoinSystemTool *QnWorkbenchIncompatibleServersActionHandler::joinSystemTool() {
     if (!m_joinSystemTool) {
         m_joinSystemTool = new QnJoinSystemTool(this);
@@ -120,7 +111,7 @@ QnProgressDialog *QnWorkbenchIncompatibleServersActionHandler::progressDialog() 
     return m_progressDialog;
 }
 
-void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_finished(int errorCode) {
+void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int errorCode) {
     progressDialog()->close();
 
     switch (errorCode) {
@@ -129,7 +120,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_
         break;
     case QnConnectToCurrentSystemTool::AuthentificationFailed:
         QMessageBox::critical(progressDialog(), tr("Error"), tr("Authentification failed.\nPlease, check the password you have entered."));
-        connectToCurrentSystem(connectToCurrentSystemTool()->targets());
+        connectToCurrentSystem(m_connectTool->targets());
         break;
     case QnConnectToCurrentSystemTool::ConfigurationFailed:
         QMessageBox::critical(progressDialog(), tr("Error"), tr("Could not configure the selected servers."));
@@ -140,6 +131,8 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_
     default:
         break;
     }
+
+    delete m_connectTool;
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_canceled() {

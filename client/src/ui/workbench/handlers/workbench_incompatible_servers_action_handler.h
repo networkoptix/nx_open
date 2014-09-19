@@ -19,19 +19,18 @@ protected slots:
     void at_joinOtherSystemAction_triggered();
 
 private:
-    QnConnectToCurrentSystemTool *connectToCurrentSystemTool();
     QnJoinSystemTool *joinSystemTool();
     QnProgressDialog *progressDialog();
 
     void connectToCurrentSystem(const QSet<QUuid> &targets);
 
 private slots:
-    void at_connectToCurrentSystemTool_finished(int errorCode);
+    void at_connectTool_finished(int errorCode);
     void at_connectToCurrentSystemTool_canceled();
     void at_joinSystemTool_finished(int errorCode);
 
 private:
-    QnConnectToCurrentSystemTool *m_connectToCurrentSystemTool;
+    QPointer<QnConnectToCurrentSystemTool> m_connectTool;
     QnJoinSystemTool *m_joinSystemTool;
     QPointer<QnProgressDialog> m_progressDialog;
 };
