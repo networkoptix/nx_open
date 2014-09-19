@@ -20,6 +20,14 @@
 
 namespace {
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
+
+    QnUserResourcePtr getAdminUser() {
+        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
+            if (resource->getName() == lit("admin"))
+                return resource.dynamicCast<QnUserResource>();
+        }
+        return QnUserResourcePtr();
+    }
 }
 
 int QnJoinSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
@@ -27,6 +35,7 @@ int QnJoinSystemRestHandler::executeGet(const QString &path, const QnRequestPara
 
     QUrl url = params.value(lit("url"));
     QString password = params.value(lit("password"));
+    bool takeRemoteSettings = params.value(lit("takeRemoteSettings")) == lit("true");
 
     if (url.isEmpty()) {
         result.setError(QnJsonRestResult::MissingParameter);
@@ -63,7 +72,7 @@ int QnJoinSystemRestHandler::executeGet(const QString &path, const QnRequestPara
         return CODE_OK;
     }
 
-    /* if we get it successfully we know system name and admin password */
+    /* if we've got it successfully we know system name and admin password */
     QByteArray data;
     client.readAll(data);
 
@@ -83,11 +92,30 @@ int QnJoinSystemRestHandler::executeGet(const QString &path, const QnRequestPara
         return CODE_OK;
     }
 
-    if (!changeSystemName(moduleInformation.systemName)) {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
-        return CODE_OK;
+    if (takeRemoteSettings) {
+        if (!changeSystemName(moduleInformation.systemName)) {
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
+            return CODE_OK;
+        }
+        changeAdminPassword(password);
+    } else {
+        QnUserResourcePtr admin = getAdminUser();
+        if (!admin) {
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("INTERNAL_ERROR"));
+            return CODE_OK;
+        }
+
+        QString request = lit("api/configure?systemName=%1&passwordHash=%2&passwordDigest=%3")
+                          .arg(qnCommon->localSystemName())
+                          .arg(QString::fromLatin1(admin->getHash()))
+                          .arg(QString::fromLatin1(admin->getDigest()));
+
+        status = client.doGET(request);
+        if (status != CL_HTTP_SUCCESS) {
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("Cannot configure remote server."));
+            return CODE_OK;
+        }
     }
-    changeAdminPassword(password);
 
     if (qnResPool->getResourceById(moduleInformation.id).isNull()) {
         if (!moduleInformation.remoteAddresses.contains(url.host())) {
@@ -122,14 +150,11 @@ bool QnJoinSystemRestHandler::changeSystemName(const QString &systemName) {
 }
 
 bool QnJoinSystemRestHandler::changeAdminPassword(const QString &password) {
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
-        QnUserResourcePtr user = resource.staticCast<QnUserResource>();
-        if (user->getName() == lit("admin")) {
-            user->setPassword(password);
-            user->generateHash();
-            ec2Connection()->getUserManager()->save(user, this, [](int, ec2::ErrorCode) { return; });
-            return true;
-        }
+    if (QnUserResourcePtr admin = getAdminUser()) {
+        admin->setPassword(password);
+        admin->generateHash();
+        ec2Connection()->getUserManager()->save(admin, this, [](int, ec2::ErrorCode) { return; });
+        return true;
     }
     return false;
 }
