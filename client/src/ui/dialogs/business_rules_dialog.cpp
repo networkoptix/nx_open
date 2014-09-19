@@ -404,7 +404,7 @@ void QnBusinessRulesDialog::updateFilter() {
 
     filter = filter.trimmed();
     bool anyCameraPassFilter = false;
-    foreach (const QnResourcePtr camera, qnResPool->getAllCameras(QnResourcePtr()))  {
+    foreach (const QnResourcePtr camera, qnResPool->getAllCameras(QnResourcePtr(), true))  {
         anyCameraPassFilter = camera->toSearchString().contains(filter, Qt::CaseInsensitive);
         if (anyCameraPassFilter)
             break;

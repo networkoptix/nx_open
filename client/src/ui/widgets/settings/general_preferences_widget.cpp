@@ -27,7 +27,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workaround/mac_utils.h>
-#include <ui/workaround/qt5_combobox_workaround.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/math/color_transformations.h>

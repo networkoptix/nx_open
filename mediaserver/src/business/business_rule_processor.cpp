@@ -659,7 +659,7 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( const QnBus
             QnResourceList resList = businessRule->eventResourceObjects();
             if (resList.isEmpty()) {
                 const QnResourcePtr& mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-                resList = qnResPool->getAllCameras(mServer);
+                resList = qnResPool->getAllCameras(mServer, true);
             }
 
             for( QnResourceList::const_iterator it = resList.constBegin(); it != resList.constEnd(); ++it )

@@ -96,13 +96,7 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCam
     if (!ownServer->isRedundancy())
         return false; // redundancy is disabled
 
-    QnResourceList cameras = qnResPool->getAllCameras(ownServer);
-    int camerasCount = 0;
-    foreach(const QnResourcePtr& res, cameras) {
-        if (!(res->flags() & Qn::desktop_camera))
-            camerasCount++;
-    }
-    if (camerasCount >= ownServer->getMaxCameras())
+    if (qnResPool->getAllCameras(ownServer, true).size() >= ownServer->getMaxCameras())
         return false;
     
     return mServer->currentStatusTime() > m_serverOfflineTimeout;

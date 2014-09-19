@@ -551,9 +551,9 @@ void QnRecordingManager::onTimer()
 QnResourceList QnRecordingManager::getLocalControlledCameras()
 {
     // return own cameras + cameras from servers without DB (remote connected servers)
-    const QnResourceList& cameras = qnResPool->getAllCameras(QnResourcePtr());
+    QnResourceList cameras = qnResPool->getAllCameras(QnResourcePtr());
     QnResourceList result;
-    foreach(QnResourcePtr camRes, cameras)
+    foreach(const QnResourcePtr &camRes, cameras)
     {
         const QnResourcePtr& parentRes = camRes->getParentResource();
         const QnMediaServerResource* mServer = dynamic_cast<const QnMediaServerResource*>(parentRes.data());
