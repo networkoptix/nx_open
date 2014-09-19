@@ -4,13 +4,16 @@
 #include <QtCore/QObject>
 
 #include <ui/workbench/workbench_context_aware.h>
+#include <utils/common/connective.h>
 
 class QnConnectToCurrentSystemTool;
 class QnJoinSystemTool;
 class QnProgressDialog;
 
-class QnWorkbenchIncompatibleServersActionHandler : public QObject, public QnWorkbenchContextAware {
+class QnWorkbenchIncompatibleServersActionHandler : public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT
+    typedef Connective<QObject> base_type;
+
 public:
     explicit QnWorkbenchIncompatibleServersActionHandler(QObject *parent = 0);
 

@@ -15,7 +15,7 @@
 #include <update/join_system_tool.h>
 
 QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActionHandler(QObject *parent) :
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_connectTool(NULL),
     m_joinSystemTool(NULL),
