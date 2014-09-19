@@ -548,7 +548,16 @@ bool Socket::createSocket(int type, int protocol)
 #endif
 
     // Make a new socket
-    return (sockDesc = socket(PF_INET, type, protocol)) > 0;
+    //return (sockDesc = socket(PF_INET, type, protocol)) > 0;
+    sockDesc = socket(PF_INET, type, protocol);
+    if( sockDesc < 0 )
+        return false;
+
+#ifdef SO_NOSIGPIPE
+    int val = 1;
+    setsockopt(sockDesc, SOL_SOCKET, SO_NOSIGPIPE, (void *)&val, sizeof(val));
+#endif
+    return true;
 }
 
 
