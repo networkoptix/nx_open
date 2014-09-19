@@ -1,4 +1,4 @@
-#include "join_system_tool.h"
+#include "merge_systems_tool.h"
 
 #include <QtCore/QTimer>
 #include <QtNetwork/QHostInfo>
@@ -32,21 +32,21 @@ namespace {
 
 } // anonymous namespace
 
-QnJoinSystemTool::QnJoinSystemTool(QObject *parent) :
+QnMergeSystemsTool::QnMergeSystemsTool(QObject *parent) :
     QObject(parent),
     m_running(false),
     m_timer(new QTimer(this))
 {
     m_timer->setInterval(checkTimeout);
     m_timer->setSingleShot(true);
-    connect(m_timer, &QTimer::timeout, this, &QnJoinSystemTool::at_timer_timeout);
+    connect(m_timer, &QTimer::timeout, this, &QnMergeSystemsTool::at_timer_timeout);
 }
 
-bool QnJoinSystemTool::isRunning() const {
+bool QnMergeSystemsTool::isRunning() const {
     return m_running;
 }
 
-void QnJoinSystemTool::start(const QUrl &url, const QString &password) {
+void QnMergeSystemsTool::start(const QUrl &url, const QString &password) {
     // we need only scheme, hostname and port from the url
     m_targetUrl.setScheme(url.scheme());
     m_targetUrl.setHost(url.host());
@@ -68,7 +68,7 @@ void QnJoinSystemTool::start(const QUrl &url, const QString &password) {
     findResource();
 }
 
-void QnJoinSystemTool::findResource() {
+void QnMergeSystemsTool::findResource() {
     if (m_possibleAddresses.isEmpty()) {
         finish(HostLookupError);
         return;
@@ -108,13 +108,13 @@ void QnJoinSystemTool::findResource() {
     connection2()->getUserManager()->save(adminUser, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
     /* If there is no such server in the resource pool, try to discover it over the our network. */
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnJoinSystemTool::at_resource_added);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnMergeSystemsTool::at_resource_added);
 
     connection2()->getDiscoveryManager()->discoverPeer(m_targetUrl, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     m_timer->start();
 }
 
-void QnJoinSystemTool::joinResource() {
+void QnMergeSystemsTool::joinResource() {
     if (!isCompatible(m_targetServer->getVersion(), qnCommon->engineVersion())) {
         finish(VersionError);
         return;
@@ -140,7 +140,7 @@ void QnJoinSystemTool::joinResource() {
                                                     this, SLOT(at_targetServer_configured(int,int)));
 }
 
-void QnJoinSystemTool::rediscoverPeer() {
+void QnMergeSystemsTool::rediscoverPeer() {
     if (m_targetServer->getStatus() == Qn::Online) {
         updateDiscoveryInformation();
         return;
@@ -148,11 +148,11 @@ void QnJoinSystemTool::rediscoverPeer() {
 
     connection2()->getDiscoveryManager()->discoverPeer(m_targetUrl, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
-    connect(qnResPool, &QnResourcePool::statusChanged, this, &QnJoinSystemTool::at_resource_statusChanged);
+    connect(qnResPool, &QnResourcePool::statusChanged, this, &QnMergeSystemsTool::at_resource_statusChanged);
     m_timer->start();
 }
 
-void QnJoinSystemTool::updateDiscoveryInformation() {
+void QnMergeSystemsTool::updateDiscoveryInformation() {
     QHostAddress address(m_targetUrl.host());
     // there is no need to add manual address if it's already in the database
     if (!address.isNull() && m_targetServer->getNetAddrList().contains(address)) {
@@ -164,7 +164,7 @@ void QnJoinSystemTool::updateDiscoveryInformation() {
     finish(NoError);
 }
 
-void QnJoinSystemTool::finish(int errorCode) {
+void QnMergeSystemsTool::finish(int errorCode) {
     m_running = false;
     m_targetServer.clear();
     m_targetId = QUuid();
@@ -174,7 +174,7 @@ void QnJoinSystemTool::finish(int errorCode) {
     emit finished(errorCode);
 }
 
-void QnJoinSystemTool::at_resource_added(const QnResourcePtr &resource) {
+void QnMergeSystemsTool::at_resource_added(const QnResourcePtr &resource) {
     if (!m_running)
         return;
 
@@ -199,7 +199,7 @@ void QnJoinSystemTool::at_resource_added(const QnResourcePtr &resource) {
     joinResource();
 }
 
-void QnJoinSystemTool::at_resource_statusChanged(const QnResourcePtr &resource) {
+void QnMergeSystemsTool::at_resource_statusChanged(const QnResourcePtr &resource) {
     if (m_targetId.isNull() || resource->getId() != m_targetId)
         return;
 
@@ -213,20 +213,20 @@ void QnJoinSystemTool::at_resource_statusChanged(const QnResourcePtr &resource) 
     }
 }
 
-void QnJoinSystemTool::at_timer_timeout() {
+void QnMergeSystemsTool::at_timer_timeout() {
     if (!m_running)
         return;
 
     if (m_targetServer) {
-        disconnect(qnResPool, &QnResourcePool::statusChanged, this, &QnJoinSystemTool::at_resource_statusChanged);
+        disconnect(qnResPool, &QnResourcePool::statusChanged, this, &QnMergeSystemsTool::at_resource_statusChanged);
         finish(JoinError);
     } else {
-        disconnect(qnResPool, &QnResourcePool::resourceAdded, this, &QnJoinSystemTool::at_resource_added);
+        disconnect(qnResPool, &QnResourcePool::resourceAdded, this, &QnMergeSystemsTool::at_resource_added);
         finish(Timeout);
     }
 }
 
-void QnJoinSystemTool::at_hostLookedUp(const QHostInfo &hostInfo) {
+void QnMergeSystemsTool::at_hostLookedUp(const QHostInfo &hostInfo) {
     if (hostInfo.error() != QHostInfo::NoError) {
         finish(HostLookupError);
         return;
@@ -235,7 +235,7 @@ void QnJoinSystemTool::at_hostLookedUp(const QHostInfo &hostInfo) {
     m_possibleAddresses = QSet<QHostAddress>::fromList(hostInfo.addresses());
 }
 
-void QnJoinSystemTool::at_targetServer_configured(int status, int handle) {
+void QnMergeSystemsTool::at_targetServer_configured(int status, int handle) {
     Q_UNUSED(handle)
 
     m_targetServer->apiConnection()->setUrl(m_oldApiUrl);

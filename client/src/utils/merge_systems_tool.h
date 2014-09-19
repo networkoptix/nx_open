@@ -1,5 +1,5 @@
-#ifndef JOIN_SYSTEM_TOOL_H
-#define JOIN_SYSTEM_TOOL_H
+#ifndef MERGE_SYSTEMS_TOOL_H
+#define MERGE_SYSTEMS_TOOL_H
 
 #include <QtCore/QObject>
 #include <QtNetwork/QHostAddress>
@@ -9,7 +9,7 @@
 class QTimer;
 class QHostInfo;
 
-class QnJoinSystemTool : public QObject {
+class QnMergeSystemsTool : public QObject {
     Q_OBJECT
 public:
     enum ErrorCode {
@@ -22,7 +22,7 @@ public:
         JoinError
     };
 
-    explicit QnJoinSystemTool(QObject *parent = 0);
+    explicit QnMergeSystemsTool(QObject *parent = 0);
 
     bool isRunning() const;
 
@@ -58,4 +58,4 @@ private:
     QTimer *m_timer;
 };
 
-#endif // JOIN_SYSTEM_TOOL_H
+#endif // MERGE_SYSTEMS_TOOL_H
