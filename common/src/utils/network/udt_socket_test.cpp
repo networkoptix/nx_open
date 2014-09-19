@@ -97,8 +97,7 @@ public:
             std::cout<<"Broken or error socket:"<<broken_or_error_conn_<<"\n";
             std::cout<<"Closed connection:"<<closed_conn_<<"\n";
             std::cout<<"Total received bytes:"<<total_recv_bytes_<<"\n";
-            std::cout<<"=========================================\n";
-            std::cout.flush();
+            std::cout<<"========================================="<<std::endl;
             std::this_thread::sleep_for(
                 std::chrono::milliseconds(1000));
         }
@@ -283,7 +282,6 @@ private:
         std::cout<<"Closed connection:"<<closed_conn_socket_size_<<"\n";
         std::cout<<"Failed connection:"<<failed_connection_size_<<"\n";
         std::cout<<"===================================================="<<std::endl;
-        std::cout.flush();
     }
     void ScheduleWrite( Connection* ptr ) {
         // We can write data to the user
