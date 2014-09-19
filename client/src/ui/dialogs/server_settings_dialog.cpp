@@ -116,8 +116,9 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
     ui->storagesTable->resizeColumnsToContents();
     ui->storagesTable->horizontalHeader()->setSectionsClickable(false);
+    ui->storagesTable->horizontalHeader()->setStretchLastSection(false);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(CheckBoxColumn, QHeaderView::Fixed);
-    ui->storagesTable->horizontalHeader()->setSectionResizeMode(PathColumn, QHeaderView::ResizeToContents);
+    ui->storagesTable->horizontalHeader()->setSectionResizeMode(PathColumn, QHeaderView::Stretch);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(CapacityColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(LoginColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(PasswordColumn, QHeaderView::ResizeToContents);
