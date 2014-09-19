@@ -10,13 +10,13 @@
 
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
-#include <api/model/statistics_reply.h>
 #include <api/model/camera_diagnostics_reply.h>
 #include <api/model/manual_camera_seach_reply.h>
 #include <api/model/servers_reply.h>
 #include <api/model/kvpair.h>
 #include <api/model/connection_info.h>
 #include <api/model/time_reply.h>
+#include <api/model/statistics_reply.h>
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/test_email_settings_reply.h>
 #include <api/model/configure_reply.h>

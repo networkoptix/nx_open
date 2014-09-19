@@ -84,11 +84,11 @@ private:
 
     void addOverlays();
 
-    LegendButtonBar buttonBarByDeviceType(const QnStatisticsDeviceType deviceType) const;
+    LegendButtonBar buttonBarByDeviceType(const Qn::StatisticsDeviceType deviceType) const;
 
     void updateLegend();
 
-    QColor getColor(QnStatisticsDeviceType deviceType, int index);
+    QColor getColor(Qn::StatisticsDeviceType deviceType, int index);
 
     void updateCheckedHealthMonitoringButtons();
 private:
