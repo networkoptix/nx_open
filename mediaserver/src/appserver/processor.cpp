@@ -82,7 +82,8 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
 void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr& cameraResource)
 {
-    if (!ec2::QnDistributedMutexManager::instance())
+    bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferedServerId() == qnCommon->moduleGUID(); // return camera back without mutex
+    if (!ec2::QnDistributedMutexManager::instance() || isOwnChangeParentId)
     {
         addNewCameraInternal(cameraResource);
         return;
@@ -131,31 +132,8 @@ void QnAppserverResourceProcessor::at_mutexLocked()
     mutex->deleteLater();
 }
 
-bool QnAppserverResourceProcessor::canTakeForeignCamera(const QnSecurityCamResourcePtr& newCamera)
-{
-#ifdef EDGE_SERVER
-    return true;
-#endif
-
-    QnSecurityCamResourcePtr camera = qnResPool->getResourceById(newCamera->getId()).dynamicCast<QnSecurityCamResource>();
-    if (!camera)
-        return false; // just deleted. do not updated
-
-    QnResourcePtr mServer = qnResPool->getResourceById(camera->getParentId());
-    if (!mServer)
-        return false;
-    if (newCamera->preferedServerId() == qnCommon->moduleGUID())
-        return true;
-    else if (mServer->getStatus() == Qn::Online)
-        return false; // camera's server already UP, or camera has been taken, do not take camera
-
-    return true;
-}
-
 void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource)
 {
-    if (cameraResource->hasFlags(Qn::parent_change) && !canTakeForeignCamera(cameraResource))
-        return; // camera already taken
     cameraResource->setFlags(cameraResource->flags() & ~Qn::parent_change);
     Q_ASSERT(!cameraResource->getId().isNull());
     QnVirtualCameraResourceList cameras;

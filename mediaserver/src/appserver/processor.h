@@ -43,7 +43,6 @@ private:
 private:
     void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
     void addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource);
-    bool canTakeForeignCamera(const QnSecurityCamResourcePtr& newCamera);
 
     //void requestFinished(const QnHTTPRawResponse& response, int handle);
 

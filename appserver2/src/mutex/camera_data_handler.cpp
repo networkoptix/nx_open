@@ -3,7 +3,7 @@
 #include "utils/network/nettools.h" /* For MAC_ADDR_LEN and getMacFromPrimaryIF. */
 
 #include "core/resource_management/resource_pool.h"
-#include "core/resource/network_resource.h"
+#include "core/resource/camera_resource.h"
 
 #include "common/common_module.h"
 
@@ -21,20 +21,22 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
     char* host = 0;
     getMacFromPrimaryIF(mac, &host);
 
-    if (name.startsWith("CAM_INS_PREFIX") || name.startsWith("CAM_UPD_PREFIX"))
+    if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX))
         return qnCommon->moduleGUID().toRfc4122(); // block edge camera discovered from other PC
 #endif
 
-    if (name.startsWith("CAM_INS_PREFIX"))
+    if (name.startsWith(CAM_INS_PREFIX))
     {
         QnNetworkResourcePtr camRes = qnResPool->getNetResourceByPhysicalId(name);
         if (camRes)
             return qnCommon->moduleGUID().toRfc4122(); // block
     }
-    else if (name.startsWith("CAM_UPD_PREFIX"))
+    else if (name.startsWith(CAM_UPD_PREFIX))
     {
-        QnNetworkResourcePtr camRes = qnResPool->getNetResourceByPhysicalId(name);
+        QnSecurityCamResourcePtr camRes = qnResPool->getNetResourceByPhysicalId(name).dynamicCast<QnSecurityCamResource>();
         if (camRes) {
+            if (camRes->preferedServerId() == qnCommon->moduleGUID())
+                return qnCommon->moduleGUID().toRfc4122(); // block
             QnResourcePtr mServer = qnResPool->getResourceById(camRes->getParentId());
             if (mServer && mServer->getStatus() == Qn::Online)
                 return qnCommon->moduleGUID().toRfc4122(); // block
@@ -46,7 +48,7 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
 
 bool QnMutexCameraDataHandler::checkUserData(const QString& name, const QByteArray& data)
 {
-    if (name.startsWith("CAM_INS_PREFIX") || name.startsWith("CAM_UPD_PREFIX")) {
+    if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX)) {
         return data.isEmpty() || data == qnCommon->moduleGUID().toRfc4122();
     }
     return true;
