@@ -27,13 +27,13 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
 
     if (name.startsWith(CAM_INS_PREFIX))
     {
-        QnNetworkResourcePtr camRes = qnResPool->getNetResourceByPhysicalId(name);
+        QnNetworkResourcePtr camRes = qnResPool->getNetResourceByPhysicalId(name.mid(CAM_INS_PREFIX.length()));
         if (camRes)
             return qnCommon->moduleGUID().toRfc4122(); // block
     }
     else if (name.startsWith(CAM_UPD_PREFIX))
     {
-        QnSecurityCamResourcePtr camRes = qnResPool->getNetResourceByPhysicalId(name).dynamicCast<QnSecurityCamResource>();
+        QnSecurityCamResourcePtr camRes = qnResPool->getNetResourceByPhysicalId(name.mid(CAM_UPD_PREFIX.length())).dynamicCast<QnSecurityCamResource>();
         if (camRes) {
             if (camRes->preferedServerId() == qnCommon->moduleGUID())
                 return qnCommon->moduleGUID().toRfc4122(); // block
