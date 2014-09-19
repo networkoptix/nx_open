@@ -137,6 +137,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
 
 void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_canceled() {
     progressDialog()->close();
+    delete m_connectTool;
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_joinSystemTool_finished(int errorCode) {
