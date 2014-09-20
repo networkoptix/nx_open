@@ -126,32 +126,20 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualC
 
     QnMediaServerResourcePtr currentMediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(camera->getParentId()));
 
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera);
-    if (!history)
-        return 0;
-    QnServerHistoryMap mediaServerList = history->getOnlineTimePeriods();
-    QSet<QnMediaServerResourcePtr> checkServers;
-    foreach (const QUuid &serverId, mediaServerList.values()) {
-        QnMediaServerResourcePtr otherMediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverId));
-        if (!otherMediaServer || otherMediaServer == currentMediaServer)
-            continue;
-        checkServers << otherMediaServer;
-    }
-
     qint64 minTime = DATETIME_NOW;
-    foreach(const QnMediaServerResourcePtr &server, checkServers) {
+    QnMediaServerResourcePtr otherMediaServer = QnCameraHistoryPool::instance()->getMediaServerOnTime(camera, 0, false); // get oldest server
+    if (otherMediaServer && otherMediaServer->getId() != m_server->getId())
+    {
         RTPSession otherRtspSession;
-        if (server->getStatus() == Qn::Offline)
-            continue;
-
-        setupRtspSession(camera, server,  &otherRtspSession, false);
-        if (otherRtspSession.open(getUrl(camera, server)).errorCode != CameraDiagnostics::ErrorCode::noError) 
-            continue;
+        setupRtspSession(camera, otherMediaServer,  &otherRtspSession, false);
+        if (otherRtspSession.open(getUrl(camera, otherMediaServer)).errorCode != CameraDiagnostics::ErrorCode::noError) 
+            return 0;
 
         qint64 startTime = otherRtspSession.startTime();
         if ((quint64)startTime != AV_NOPTS_VALUE && startTime != DATETIME_NOW)
-            minTime = qMin(minTime, startTime);
+            minTime = startTime;
     }
+
     qint64 currentTime = m_rtspSession.startTime();
     if (minTime != DATETIME_NOW && (minTime < currentTime || currentTime == AV_NOPTS_VALUE))
         return minTime;

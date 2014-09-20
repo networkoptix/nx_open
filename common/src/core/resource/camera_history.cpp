@@ -256,10 +256,10 @@ QnMediaServerResourceList QnCameraHistoryPool::getAllCameraServers(const QnNetwo
     return history ? history->getAllCameraServers() : getCurrentServer(camera);
 }
 
-QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnNetworkResourcePtr &camera, qint64 timestamp) const
+QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnNetworkResourcePtr &camera, qint64 timestamp, bool allowOfflineServers) const
 {
     QnCameraHistoryPtr history = getCameraHistory(camera);
-    return history ? history->getMediaServerOnTime(timestamp, true) : QnMediaServerResourcePtr();
+    return history ? history->getMediaServerOnTime(timestamp, allowOfflineServers) : QnMediaServerResourcePtr();
 }
 
 QnMediaServerResourceList QnCameraHistoryPool::getAllCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod) const
