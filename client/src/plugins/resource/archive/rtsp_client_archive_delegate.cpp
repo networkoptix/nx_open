@@ -102,7 +102,7 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera);
     if (!history)
         return QnMediaServerResourcePtr();
-    return history->getNextMediaServerAndPeriodOnTime(time, m_rtspSession.getScale() >= 0, m_serverTimePeriod);
+    return history->getNextMediaServerAndPeriodOnTime(time, m_serverTimePeriod, m_rtspSession.getScale() >= 0);
 }
 
 QString QnRtspClientArchiveDelegate::getUrl(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &_server) const {
@@ -129,10 +129,10 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualC
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera);
     if (!history)
         return 0;
-    QnCameraTimePeriodList mediaServerList = history->getOnlineTimePeriods();
+    QnServerHistoryMap mediaServerList = history->getOnlineTimePeriods();
     QSet<QnMediaServerResourcePtr> checkServers;
-    foreach (const QnCameraTimePeriod &period, mediaServerList) {
-        QnMediaServerResourcePtr otherMediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(period.mediaServerGuid));
+    foreach (const QUuid &serverId, mediaServerList.values()) {
+        QnMediaServerResourcePtr otherMediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverId));
         if (!otherMediaServer || otherMediaServer == currentMediaServer)
             continue;
         checkServers << otherMediaServer;
@@ -171,7 +171,7 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 tim
     if (!history)
         return currentServer;
 
-    QnMediaServerResourcePtr mediaServer = history->getMediaServerAndPeriodOnTime(time, m_rtspSession.getScale() >= 0, m_serverTimePeriod, false);
+    QnMediaServerResourcePtr mediaServer = history->getMediaServerAndPeriodOnTime(time, m_serverTimePeriod, false);
     if (!mediaServer)
         return currentServer;
     

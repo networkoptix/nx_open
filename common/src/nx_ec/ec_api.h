@@ -329,6 +329,7 @@ namespace ec2
     signals:
         void cameraAddedOrUpdated( QnVirtualCameraResourcePtr camera );
         void cameraHistoryChanged( QnCameraHistoryItemPtr cameraHistory );
+        void cameraHistoryRemoved( QnCameraHistoryItemPtr cameraHistory );
         void cameraRemoved( QUuid id );
 
         void cameraBookmarkTagsAdded(const QnCameraBookmarkTags &tags);

@@ -66,6 +66,7 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     auto cameraManager = connection->getCameraManager();
     connect(cameraManager, &ec2::AbstractCameraManager::cameraAddedOrUpdated,       this, [this](const QnVirtualCameraResourcePtr &camera){updateResource(camera);});
     connect(cameraManager, &ec2::AbstractCameraManager::cameraHistoryChanged,       this, &QnCommonMessageProcessor::on_cameraHistoryChanged );
+    connect(cameraManager, &ec2::AbstractCameraManager::cameraHistoryRemoved,       this, &QnCommonMessageProcessor::on_cameraHistoryRemoved );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraRemoved,              this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraBookmarkTagsAdded,    this, &QnCommonMessageProcessor::cameraBookmarkTagsAdded );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraBookmarkTagsRemoved,  this, &QnCommonMessageProcessor::cameraBookmarkTagsRemoved );
@@ -244,6 +245,10 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QUuid& resourceId )
 
 void QnCommonMessageProcessor::on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory) {
     QnCameraHistoryPool::instance()->addCameraHistoryItem(*cameraHistory.data());
+}
+
+void QnCommonMessageProcessor::on_cameraHistoryRemoved(const QnCameraHistoryItemPtr &cameraHistory) {
+    QnCameraHistoryPool::instance()->removeCameraHistoryItem(*cameraHistory.data());
 }
 
 void QnCommonMessageProcessor::on_licenseChanged(const QnLicensePtr &license) {

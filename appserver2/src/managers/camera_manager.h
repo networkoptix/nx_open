@@ -58,7 +58,10 @@ namespace ec2
                 tran.params.cameraUniqueId,
                 tran.params.timestamp,
                 tran.params.serverId ) );
-            emit cameraHistoryChanged( cameraHistoryItem );
+            if (tran.command == ApiCommand::addCameraHistoryItem)
+                emit cameraHistoryChanged( cameraHistoryItem );
+            else
+                emit cameraHistoryRemoved( cameraHistoryItem );
         }
 
         void triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList>& tran )

@@ -269,7 +269,8 @@ void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &
     dst.timestamp = src.timestamp;
 }
 
-void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) {
+void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) 
+{
     /* CameraUniqueId -> (Timestamp -> ServerGuid). */
     QMap<QString, QMap<qint64, QByteArray> > history;
 
@@ -291,13 +292,7 @@ void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHisto
         while (camit.hasNext())
         {
             camit.next();
-
-            if (camit.hasNext())
-                duration = camit.peekNext().key() - camit.key();
-            else
-                duration = -1;
-
-            cameraHistory->addTimePeriod(QnCameraTimePeriod(camit.key(), duration, camit.value()));
+            cameraHistory->addTimePeriod(camit.key(), camit.value());
         }
 
         dst.append(cameraHistory);
