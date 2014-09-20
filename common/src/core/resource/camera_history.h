@@ -26,12 +26,12 @@ typedef QSharedPointer<QnCameraHistoryItem> QnCameraHistoryItemPtr;
 struct QnCameraTimePeriod: QnTimePeriod
 {
     QnCameraTimePeriod(qint64 startTimeMs, qint64 durationMs, const QUuid& mediaServerGuid):
-        QnTimePeriod(startTimeMs, durationMs),
-        mediaServerGuid(mediaServerGuid) {}
+                       QnTimePeriod(startTimeMs, durationMs),
+                       mediaServerGuid(mediaServerGuid) {}
     QUuid mediaServerGuid;
 };
 
-typedef QList<QnCameraTimePeriod> QnCameraTimePeriodList;
+typedef QMap<qint64, QnCameraTimePeriod> QnCameraTimePeriodList;
 
 class QnCameraHistory
 {
@@ -96,7 +96,7 @@ public:
     QnMediaServerResourceList getAllCameraServers(const QnNetworkResourcePtr &camera) const;
     QnMediaServerResourceList getAllCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod) const;
     QnMediaServerResourceList getOnlineCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod) const;
-    QnMediaServerResourcePtr getLastMediaServer(const QnNetworkResourcePtr &camera) const;
+    QnMediaServerResourcePtr getMediaServerOnTime(const QnNetworkResourcePtr &camera, qint64 timestamp) const;
     qint64 getMinTime(const QnNetworkResourcePtr &camera);
 
 signals:

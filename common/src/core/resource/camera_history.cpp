@@ -32,7 +32,7 @@ QnCameraTimePeriodList QnCameraHistory::getOnlineTimePeriods() const
     {
         QnResourcePtr resource = qnResPool->getResourceById(itr->mediaServerGuid);
         if (resource && resource->getStatus() == Qn::Online)
-            result << *itr;        
+            result.insert(itr.key(), itr.value());        
     }
     return result;
 }
@@ -42,7 +42,7 @@ QnCameraTimePeriodList::const_iterator QnCameraHistory::getMediaServerOnTimeItr(
 
     if (timePeriods.isEmpty())
         return timePeriods.constEnd();
-    QnCameraTimePeriodList::const_iterator itr = qUpperBound(timePeriods.constBegin(), timePeriods.constEnd(), timestamp);
+    QnCameraTimePeriodList::const_iterator itr = timePeriods.upperBound(timestamp);
     if (itr != timePeriods.constBegin())
         --itr;
     if (searchForward && timestamp > itr->endTimeMs())
@@ -164,7 +164,7 @@ void QnCameraHistory::addTimePeriod(const QnCameraTimePeriod& period)
 
     }
 
-    m_fullTimePeriods << period;
+    m_fullTimePeriods.insert(period.startTimeMs, period);
     //qSort(m_timePeriods.begin(), m_timePeriods.end());
 }
 
@@ -187,7 +187,7 @@ QnMediaServerResourceList QnCameraHistory::getAllCameraServersInternal(const QnT
     if (itrEnd != cameraHistory.constEnd())
         itrEnd++;
 
-    for (QnCameraTimePeriodList::const_iterator itr = itrStart; itr < itrEnd; ++itr)
+    for (QnCameraTimePeriodList::const_iterator itr = itrStart; itr != itrEnd; ++itr)
     {
         QnMediaServerResourcePtr mServer = qnResPool->getResourceById(itr->mediaServerGuid).dynamicCast<QnMediaServerResource>();
         if (mServer)
@@ -247,10 +247,10 @@ QnMediaServerResourceList QnCameraHistoryPool::getAllCameraServers(const QnNetwo
     return history ? history->getAllCameraServers() : getCurrentServer(camera);
 }
 
-QnMediaServerResourcePtr QnCameraHistoryPool::getLastMediaServer(const QnNetworkResourcePtr &camera) const
+QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnNetworkResourcePtr &camera, qint64 timestamp) const
 {
     QnCameraHistoryPtr history = getCameraHistory(camera);
-    return history ? history->getLastMediaServer() : QnMediaServerResourcePtr();
+    return history ? history->getMediaServerOnTime(timestamp, true, true) : QnMediaServerResourcePtr();
 }
 
 QnMediaServerResourceList QnCameraHistoryPool::getAllCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod) const
