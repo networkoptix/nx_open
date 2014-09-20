@@ -585,6 +585,11 @@ void QnStorageManager::clearCameraHistory()
     minTimeByCamera(m_devFileCatalog[QnServer::HiQualityCatalog], minTimes);
     minTimeByCamera(m_devFileCatalog[QnServer::LowQualityCatalog], minTimes);
 
+    for(auto itr = minTimes.begin(); itr != minTimes.end(); ++itr) {
+        if (itr.value() == AV_NOPTS_VALUE)
+            itr.value() == DATETIME_NOW; // delete all history if catalog is empty
+    }
+
     QList<QnCameraHistoryItem> itemsToRemove = QnCameraHistoryPool::instance()->getUnusedItems(minTimes, qnCommon->moduleGUID());
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     foreach(const QnCameraHistoryItem& item, itemsToRemove) {
