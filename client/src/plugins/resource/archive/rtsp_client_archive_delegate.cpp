@@ -152,7 +152,8 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualC
         if ((quint64)startTime != AV_NOPTS_VALUE && startTime != DATETIME_NOW)
             minTime = qMin(minTime, startTime);
     }
-    if (minTime != DATETIME_NOW && minTime < m_rtspSession.startTime())
+    qint64 currentTime = m_rtspSession.startTime();
+    if (minTime != DATETIME_NOW && (minTime < currentTime || currentTime == AV_NOPTS_VALUE))
         return minTime;
     else
         return 0;
@@ -237,16 +238,16 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     m_opened = m_rtspSession.isOpened();
     m_sendedCSec = m_rtspSession.lastSendedCSeq();
 
-    qint64 globalMinTime = checkMinTimeFromOtherServer(m_camera);
-    if ((quint64)globalMinTime !=AV_NOPTS_VALUE)
-        m_globalMinArchiveTime = globalMinTime;
-    else if (globalTimeBlocked)
-        m_globalMinArchiveTime = 0; // unblock min time value. So, get value from current server (left point can be changed because of server delete some files)
-
-    QList<QByteArray> audioSDP = m_rtspSession.getSdpByType(RTPSession::TT_AUDIO);
-    parseAudioSDP(audioSDP);
-
     if (m_opened) {
+        qint64 globalMinTime = checkMinTimeFromOtherServer(m_camera);
+        if ((quint64)globalMinTime !=AV_NOPTS_VALUE)
+            m_globalMinArchiveTime = globalMinTime;
+        else if (globalTimeBlocked)
+            m_globalMinArchiveTime = 0; // unblock min time value. So, get value from current server (left point can be changed because of server delete some files)
+
+        QList<QByteArray> audioSDP = m_rtspSession.getSdpByType(RTPSession::TT_AUDIO);
+        parseAudioSDP(audioSDP);
+
         QString vLayout = m_rtspSession.getVideoLayout();
         if (!vLayout.isEmpty()) {
             m_customVideoLayout = QnCustomResourceVideoLayout::fromString(vLayout);
