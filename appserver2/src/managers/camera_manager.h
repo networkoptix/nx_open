@@ -100,6 +100,8 @@ namespace ec2
         virtual int addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::addCameraHistoryItem
         virtual int addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler ) override;
+        //!Implementation of AbstractCameraManager::removeCameraHistoryItem
+        virtual int removeCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::getCameras
         virtual int getCameras( const QUuid& mediaServerId, impl::GetCamerasHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::getCameraHistoryList

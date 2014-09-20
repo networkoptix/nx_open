@@ -43,6 +43,7 @@ public:
 
     QnMediaServerResourcePtr getMediaServerOnTime(qint64 timestamp, bool searchForward, bool allowOfflineServers) const;
     QnMediaServerResourcePtr getNextMediaServerOnTime(qint64 timestamp, bool searchForward) const;
+    QnMediaServerResourcePtr getLastMediaServer() const;
 
     QnMediaServerResourcePtr getMediaServerAndPeriodOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod, bool allowOfflineServers);
     QnMediaServerResourcePtr getNextMediaServerAndPeriodOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod);
@@ -59,7 +60,6 @@ public:
     qint64 getMinTime() const;
 
     QnCameraTimePeriodList getOnlineTimePeriods() const;
-
 private:
     QnCameraTimePeriodList::const_iterator getMediaServerOnTimeItr(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, bool searchForward) const;
     QnMediaServerResourcePtr getNextMediaServerFromTime(const QnCameraTimePeriodList& timePeriods, qint64 timestamp) const;
@@ -96,6 +96,7 @@ public:
     QnMediaServerResourceList getAllCameraServers(const QnNetworkResourcePtr &camera) const;
     QnMediaServerResourceList getAllCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod) const;
     QnMediaServerResourceList getOnlineCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod) const;
+    QnMediaServerResourcePtr getLastMediaServer(const QnNetworkResourcePtr &camera) const;
     qint64 getMinTime(const QnNetworkResourcePtr &camera);
 
 signals:

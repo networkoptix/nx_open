@@ -61,6 +61,7 @@ namespace ec2
             addCameraBookmarkTags       = 306,  /*< ApiCameraBookmarkTagDataList */
             getCameraBookmarkTags       = 307,  /*< ApiCameraBookmarkTagDataList */
             removeCameraBookmarkTags    = 308,
+            removeCameraHistoryItem     = 309,  /*< ApiCameraServerItemData */
             
           
             /* MediaServer resource */

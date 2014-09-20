@@ -58,6 +58,17 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
+    int QnCameraManager<QueryProcessorType>::removeCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        ApiCommand::Value command = ApiCommand::removeCameraHistoryItem;
+        auto tran = prepareTransaction( command, cameraHistoryItem );
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        return reqID;
+    }
+
+    template<class QueryProcessorType>
     int QnCameraManager<QueryProcessorType>::getCameras( const QUuid& mediaServerId, impl::GetCamerasHandlerPtr handler )
     {
         const int reqID = generateRequestID();

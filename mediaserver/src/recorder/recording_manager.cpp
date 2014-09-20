@@ -166,9 +166,13 @@ bool QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
 
     const QnResourcePtr& serverRes = qnResPool->getResourceById(res->getParentId());
     const QnMediaServerResource* server = dynamic_cast<const QnMediaServerResource*>(serverRes.data());
-    Q_ASSERT(server);
+    Q_ASSERT(server && server->getId() == qnCommon->moduleGUID());
     if (!server)
         return false;
+
+    QnResourcePtr latestServer = QnCameraHistoryPool::instance()->getLastMediaServer(netRes);
+    if (latestServer && latestServer->getId() == qnCommon->moduleGUID())
+        return true; // camera history already inserted. skip
 
     QnCameraHistoryItem cameraHistoryItem(netRes->getUniqueId(), currentTime, server->getId());
 

@@ -96,7 +96,6 @@ namespace ec2
         unauthorized,
         //!Response parse error
         badResponse,
-        skipped,
         //!Error executing DB request
         dbError,
         containsBecauseTimestamp, // transaction already in database
