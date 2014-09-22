@@ -27,6 +27,7 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     buttonGroup->addButton(ui->remoteSystemRadioButton);
 
     connect(ui->urlComboBox,            SIGNAL(activated(int)),             this,   SLOT(at_urlComboBox_activated(int)));
+    connect(ui->passwordEdit,           &QLineEdit::returnPressed,          this,   &QnMergeSystemsDialog::at_testConnectionButton_clicked);
     connect(ui->testConnectionButton,   &QPushButton::clicked,              this,   &QnMergeSystemsDialog::at_testConnectionButton_clicked);
     connect(m_mergeButton,              &QPushButton::clicked,              this,   &QnMergeSystemsDialog::at_mergeButton_clicked);
 
@@ -84,6 +85,8 @@ void QnMergeSystemsDialog::updateConfigurationBlock() {
     bool found = !m_discoverer.isNull();
     ui->configurationWidget->setEnabled(found);
     m_mergeButton->setEnabled(found);
+    if (found)
+        m_mergeButton->setFocus();
 }
 
 void QnMergeSystemsDialog::at_urlComboBox_activated(int index) {
@@ -91,6 +94,7 @@ void QnMergeSystemsDialog::at_urlComboBox_activated(int index) {
         return;
 
     ui->urlComboBox->setCurrentText(ui->urlComboBox->itemData(index).toString());
+    ui->passwordEdit->setFocus();
 }
 
 void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
@@ -152,7 +156,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
         updateErrorLabel(tr("The found system %1 has an incompatible version %2.").arg(moduleInformation.systemName).arg(moduleInformation.version.toString()));
         break;
     default:
-        updateErrorLabel(tr("The system is not found."));
+        updateErrorLabel(tr("The system was not found."));
         break;
     }
 
