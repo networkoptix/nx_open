@@ -58,7 +58,10 @@ namespace ec2
                 tran.params.cameraUniqueId,
                 tran.params.timestamp,
                 tran.params.serverId ) );
-            emit cameraHistoryChanged( cameraHistoryItem );
+            if (tran.command == ApiCommand::addCameraHistoryItem)
+                emit cameraHistoryChanged( cameraHistoryItem );
+            else
+                emit cameraHistoryRemoved( cameraHistoryItem );
         }
 
         void triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList>& tran )
@@ -100,6 +103,8 @@ namespace ec2
         virtual int addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::addCameraHistoryItem
         virtual int addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler ) override;
+        //!Implementation of AbstractCameraManager::removeCameraHistoryItem
+        virtual int removeCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::getCameras
         virtual int getCameras( const QUuid& mediaServerId, impl::GetCamerasHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::getCameraHistoryList

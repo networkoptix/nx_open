@@ -1574,28 +1574,42 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourc
     return insertAddParams(tran.params.params, internalId);
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraServerItemData>& tran)
+ErrorCode QnDbManager::addCameraHistory(const ApiCameraServerItemData& params)
 {
-    QSqlQuery lastHistory(m_sdb);
-    lastHistory.prepare("SELECT server_guid, max(timestamp) FROM vms_cameraserveritem WHERE physical_id = ? AND timestamp < ?");
-    lastHistory.addBindValue(tran.params.cameraUniqueId);
-    lastHistory.addBindValue(tran.params.timestamp);
-    if (!lastHistory.exec()) {
-        qWarning() << Q_FUNC_INFO << lastHistory.lastError().text();
-        return ErrorCode::dbError;
-    }
-    if (lastHistory.next() && lastHistory.value(0).toByteArray() == tran.params.serverId)
-        return ErrorCode::skipped;
-
     QSqlQuery query(m_sdb);
     query.prepare("INSERT INTO vms_cameraserveritem (server_guid, timestamp, physical_id) VALUES(:serverId, :timestamp, :cameraUniqueId)");
-    QnSql::bind(tran.params, &query);
+    QnSql::bind(params, &query);
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
     }
 
     return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::removeCameraHistory(const ApiCameraServerItemData& params)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare("DELETE FROM vms_cameraserveritem WHERE server_guid = :serverId AND timestamp = :timestamp AND physical_id = :cameraUniqueId");
+    QnSql::bind(params, &query);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
+    }
+
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraServerItemData>& tran)
+{
+    if (tran.command == ApiCommand::addCameraHistoryItem)
+        return addCameraHistory(tran.params);
+    else if (tran.command == ApiCommand::removeCameraHistoryItem)
+        return removeCameraHistory(tran.params);
+    else {
+        Q_ASSERT(1);
+        return ErrorCode::unsupported;
+    }
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiPanicModeData>& tran)
