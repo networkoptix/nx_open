@@ -70,7 +70,7 @@ public:
 
         foreach (const QUuid& peer, header.dstPeers) {
             Q_ASSERT(!peer.isNull());
-            Q_ASSERT(peer != qnCommon->moduleGUID());
+            //Q_ASSERT(peer != qnCommon->moduleGUID());
         }
 #endif
 
