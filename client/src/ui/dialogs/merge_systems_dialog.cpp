@@ -21,6 +21,7 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     m_mergeButton = ui->buttonBox->addButton(QString(), QDialogButtonBox::ActionRole);
     setWarningStyle(ui->errorLabel);
     m_mergeButton->hide();
+    ui->buttonBox->button(QDialogButtonBox::Close)->hide();
 
     QButtonGroup *buttonGroup = new QButtonGroup(this);
     buttonGroup->addButton(ui->currentSystemRadioButton);
@@ -128,6 +129,9 @@ void QnMergeSystemsDialog::at_mergeButton_clicked() {
         return;
 
     bool ownSettings = ui->currentSystemRadioButton->isChecked();
+    ui->credentialsGroupBox->setEnabled(false);
+    ui->configurationWidget->setEnabled(false);
+    m_mergeButton->setEnabled(false);
 
     m_discoverer->apiConnection()->mergeSystemAsync(m_url, m_password, ownSettings, this, SLOT(at_mergeTool_mergeFinished(int)));
     ui->buttonBox->showProgress(tr("merging systems..."));
@@ -165,10 +169,15 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
 
 void QnMergeSystemsDialog::at_mergeTool_mergeFinished(int errorCode) {
     ui->buttonBox->hideProgress();
+    ui->credentialsGroupBox->setEnabled(true);
 
-    switch (errorCode) {
-    case QnMergeSystemsTool::NoError:
-        break;
-
+    if (errorCode == QnMergeSystemsTool::NoError) {
+        m_mergeButton->hide();
+        ui->buttonBox->button(QDialogButtonBox::Cancel)->hide();
+        ui->buttonBox->button(QDialogButtonBox::Close)->show();
+        ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
+        ui->stackedWidget->setCurrentIndex(1);
+    } else {
+        updateConfigurationBlock();
     }
 }
