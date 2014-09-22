@@ -511,7 +511,7 @@ void QnStorageManager::clearSpace()
         sdb->afterDelete();
 
     clearUnusedMotion();
-    clearCameraHistory();
+    //clearCameraHistory();
 }
 
 QnStorageManager::StorageMap QnStorageManager::getAllStorages() const 
@@ -578,6 +578,7 @@ void QnStorageManager::clearUnusedMotion()
         QnMotionHelper::instance()->deleteUnusedFiles(usedMonths[catalog->cameraUniqueId()].toList(), catalog->cameraUniqueId());
 }
 
+/*
 void QnStorageManager::clearCameraHistory()
 {
     QMutexLocker lock(&m_mutexCatalog);
@@ -618,6 +619,7 @@ void QnStorageManager::minTimeByCamera(const FileCatalogMap &catalogMap, QMap<QS
         }
     }
 }
+*/
 
 void QnStorageManager::updateRecordedMonths(const FileCatalogMap &catalogMap, UsedMonthsMap& usedMonths)
 {

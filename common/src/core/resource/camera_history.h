@@ -106,7 +106,7 @@ public:
     QnMediaServerResourcePtr getMediaServerOnTime(const QnNetworkResourcePtr &camera, qint64 timestamp, bool allowOfflineServers) const;
     qint64 getMinTime(const QnNetworkResourcePtr &camera);
 
-    QList<QnCameraHistoryItem> getUnusedItems(const QMap<QString, qint64>& archiveMinTimes, const QUuid& serverId);
+    //QList<QnCameraHistoryItem> getUnusedItems(const QMap<QString, qint64>& archiveMinTimes, const QUuid& serverId);
 private:
     QnMediaServerResourceList getCurrentServer(const QnNetworkResourcePtr &camera) const;
 private:

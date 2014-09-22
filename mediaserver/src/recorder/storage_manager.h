@@ -144,8 +144,8 @@ private:
     QMap<QString, QSet<int>> deserializeStorageFile();
     QnStorageResourcePtr findStorageByOldIndex(int oldIndex, QMap<QString, QSet<int>> oldIndexes);
     void clearUnusedMotion();
-    void clearCameraHistory();
-    void minTimeByCamera(const FileCatalogMap &catalogMap, QMap<QString, qint64>& minTimes);
+    //void clearCameraHistory();
+    //void minTimeByCamera(const FileCatalogMap &catalogMap, QMap<QString, qint64>& minTimes);
     void updateRecordedMonths(const FileCatalogMap &catalogMap, UsedMonthsMap& usedMonths);
     void findTotalMinTime(const bool useMinArchiveDays, const FileCatalogMap& catalogMap, qint64& minTime, DeviceFileCatalogPtr& catalog);
 private:

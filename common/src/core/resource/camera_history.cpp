@@ -316,6 +316,7 @@ void QnCameraHistoryPool::removeCameraHistoryItem(const QnCameraHistoryItem& his
         history->removeTimePeriod(historyItem.timestamp);
 }
 
+/*
 QList<QnCameraHistoryItem> QnCameraHistoryPool::getUnusedItems(const QMap<QString, qint64>& archiveMinTimes, const QUuid& serverId)
 {
     QMutexLocker lock(&m_mutex);
@@ -329,3 +330,4 @@ QList<QnCameraHistoryItem> QnCameraHistoryPool::getUnusedItems(const QMap<QStrin
     }
     return result;
 }
+*/
