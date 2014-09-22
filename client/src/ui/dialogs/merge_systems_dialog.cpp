@@ -18,9 +18,7 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->urlComboBox->lineEdit()->setPlaceholderText(tr("http(s)://host:port"));
-    ui->directionWidget->setEnabled(false);
-    ui->remoteSystemLabel->setEnabled(false);
-    m_mergeButton = ui->buttonBox->addButton(QString(), QDialogButtonBox::AcceptRole);
+    m_mergeButton = ui->buttonBox->addButton(QString(), QDialogButtonBox::ActionRole);
     setWarningStyle(ui->errorLabel);
     m_mergeButton->hide();
 
@@ -30,10 +28,12 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
 
     connect(ui->urlComboBox,            SIGNAL(activated(int)),             this,   SLOT(at_urlComboBox_activated(int)));
     connect(ui->testConnectionButton,   &QPushButton::clicked,              this,   &QnMergeSystemsDialog::at_testConnectionButton_clicked);
+    connect(m_mergeButton,              &QPushButton::clicked,              this,   &QnMergeSystemsDialog::at_mergeButton_clicked);
 
     connect(m_mergeTool,                &QnMergeSystemsTool::systemFound,   this,   &QnMergeSystemsDialog::at_mergeTool_systemFound);
 
     updateKnownSystems();
+    updateConfigurationBlock();
 }
 
 QnMergeSystemsDialog::~QnMergeSystemsDialog() {}
@@ -82,15 +82,8 @@ void QnMergeSystemsDialog::updateErrorLabel(const QString &error) {
 
 void QnMergeSystemsDialog::updateConfigurationBlock() {
     bool found = !m_discoverer.isNull();
-    ui->remoteSystemLabel->setEnabled(found);
-    ui->directionWidget->setEnabled(found);
-    ui->currentSystemRadioButton->setEnabled(found);
-    ui->remoteSystemRadioButton->setEnabled(found);
+    ui->configurationWidget->setEnabled(found);
     m_mergeButton->setEnabled(found);
-}
-
-void QnMergeSystemsDialog::accept() {
-
 }
 
 void QnMergeSystemsDialog::at_urlComboBox_activated(int index) {
@@ -126,6 +119,16 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     ui->buttonBox->showProgress(tr("testing..."));
 }
 
+void QnMergeSystemsDialog::at_mergeButton_clicked() {
+    if (!m_discoverer)
+        return;
+
+    bool ownSettings = ui->currentSystemRadioButton->isChecked();
+
+    m_discoverer->apiConnection()->mergeSystemAsync(m_url, m_password, ownSettings, this, SLOT(at_mergeTool_mergeFinished(int)));
+    ui->buttonBox->showProgress(tr("merging systems..."));
+}
+
 void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &moduleInformation, const QnMediaServerResourcePtr &discoverer, int errorCode) {
     ui->buttonBox->hideProgress();
 
@@ -154,4 +157,14 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
     }
 
     updateConfigurationBlock();
+}
+
+void QnMergeSystemsDialog::at_mergeTool_mergeFinished(int errorCode) {
+    ui->buttonBox->hideProgress();
+
+    switch (errorCode) {
+    case QnMergeSystemsTool::NoError:
+        break;
+
+    }
 }

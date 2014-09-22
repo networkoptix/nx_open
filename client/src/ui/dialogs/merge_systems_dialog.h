@@ -22,13 +22,13 @@ public:
     QUrl url() const;
     QString password() const;
 
-    virtual void accept() override;
-
 private slots:
     void at_urlComboBox_activated(int index);
     void at_testConnectionButton_clicked();
+    void at_mergeButton_clicked();
 
     void at_mergeTool_systemFound(const QnModuleInformation &moduleInformation, const QnMediaServerResourcePtr &discoverer, int errorCode);
+    void at_mergeTool_mergeFinished(int errorCode);
 
 private:
     void updateKnownSystems();
