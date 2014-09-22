@@ -121,7 +121,7 @@ public:
             if( config.tcp ) {
                 server_socket_.reset( SocketFactory::createStreamServerSocket(false,SocketFactory::nttDisabled) );
             } else {
-                server_socket_.reset( SocketFactory::createStreamServerSocket(false,SocketFactory::nttDisabled) );
+                server_socket_.reset( SocketFactory::createStreamServerSocket(false,SocketFactory::nttEnabled) );
             }
     }
     virtual bool run() {
