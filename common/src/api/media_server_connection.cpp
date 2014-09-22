@@ -83,6 +83,7 @@ namespace {
         (Restart,                  "restart")
         (ConfigureObject,          "configure")
         (PingSystemObject,         "pingSystem")
+        (MergeSystemsObject,       "mergeSystems")
         (TestEmailSettingsObject,  "testEmailSettings")
     );
 
@@ -334,6 +335,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         processJsonReply<QnConfigureReply>(this, response, handle);
         break;
     case PingSystemObject:
+        processJsonReply<QnModuleInformation>(this, response, handle);
+        break;
+    case MergeSystemsObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
         break;
     default:
@@ -854,4 +858,13 @@ int QnMediaServerConnection::pingSystemAsync(const QUrl &url, const QString &pas
     params << QnRequestParam("password", password);
 
     return sendAsyncGetRequest(PingSystemObject, params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
+}
+
+int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &password, bool ownSettings, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("url", url.toString());
+    params << QnRequestParam("password", password);
+    params << QnRequestParam("takeRemoteSettings", !ownSettings);
+
+    return sendAsyncGetRequest(MergeSystemsObject, params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
 }
