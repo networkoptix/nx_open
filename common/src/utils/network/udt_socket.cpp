@@ -902,7 +902,7 @@ UdtPollSetConstIteratorImplPtr::~UdtPollSetConstIteratorImplPtr(){}
 
 class UdtPollSetImpl {
 public:
-    UdtPollSetImpl():epoll_fd_(-1),size_(0){}
+    UdtPollSetImpl():size_(0),epoll_fd_(-1){}
     int Poll( int milliseconds );
     bool Add( UdtSocket* socket , UdtSocketImpl* imp , aio::EventType event , void* data );
     void* GetUserData( UdtSocketImpl* imp , aio::EventType eventType ) const ;

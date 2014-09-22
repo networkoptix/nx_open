@@ -193,7 +193,6 @@ private:
             ++broken_or_error_conn_;
             conn->socket->cancelAsyncIO( aio::EventType::etRead );
             conn->socket->close();
-            ++broken_or_error_conn_;
             --current_conn_size_;
         } else {
             if( bytes_transferred == 0 ) {
