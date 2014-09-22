@@ -83,7 +83,9 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr& cameraResource)
 {
     bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferedServerId() == qnCommon->moduleGUID(); // return camera back without mutex
+#ifndef EDGE_SERVER
     if (!ec2::QnDistributedMutexManager::instance() || isOwnChangeParentId)
+#endif
     {
         addNewCameraInternal(cameraResource);
         return;
