@@ -75,6 +75,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     /* if we've got it successfully we know system name and admin password */
     QByteArray data;
     client.readAll(data);
+    client.close();
 
     QnJsonRestResult json;
     QJson::deserialize(data, &json);
@@ -105,14 +106,14 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
             return CODE_OK;
         }
 
-        QString request = lit("api/configure?systemName=%1&passwordHash=%2&passwordDigest=%3")
+        QString request = lit("api/configure?systemName=%1&wholeSystem=true&passwordHash=%2&passwordDigest=%3")
                           .arg(qnCommon->localSystemName())
                           .arg(QString::fromLatin1(admin->getHash()))
                           .arg(QString::fromLatin1(admin->getDigest()));
 
         status = client.doGET(request);
         if (status != CL_HTTP_SUCCESS) {
-            result.setError(QnJsonRestResult::CantProcessRequest, lit("Cannot configure remote server."));
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return CODE_OK;
         }
     }
@@ -125,6 +126,8 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         }
         QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
     }
+
+    result.setReply(moduleInformation);
 
     return CODE_OK;
 }
