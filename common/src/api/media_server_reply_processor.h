@@ -32,31 +32,31 @@ public:
     virtual void processReply(const QnHTTPRawResponse &response, int handle) override;
 
 signals:
-    void finished(int status, const QnRebuildArchiveReply &reply, int handle);
-    void finished(int status, const QnCameraListReply &reply, int handle);
-    void finished(int status, const QnStorageStatusReply &reply, int handle);
-    void finished(int status, const QnStorageSpaceReply &reply, int handle);
-    void finished(int status, const QnTimePeriodList &reply, int handle);
-    void finished(int status, const QnStatisticsReply &reply, int handle);
-    void finished(int status, const QVector3D &reply, int handle);
-    void finished(int status, const QnStringVariantPairList &reply, int handle);
-    void finished(int status, const QnStringBoolPairList &reply, int handle);
-    void finished(int status, const QnTimeReply &reply, int handle);
-    void finished(int status, const QnTestEmailSettingsReply &reply, int handle);
-    void finished(int status, const QnCameraDiagnosticsReply &reply, int handle);
-    void finished(int status, const QnManualCameraSearchReply &reply, int handle);
-    void finished(int status, const QnBusinessActionDataListPtr &reply, int handle);
-    void finished(int status, const QImage &reply, int handle);
-    void finished(int status, const QString &reply, int handle);
-    void finished(int status, const QnPtzPresetList &reply, int handle);
-    void finished(int status, const QnPtzTourList &reply, int handle);
-    void finished(int status, const QnPtzObject &reply, int handle);
-    void finished(int status, const QnPtzAuxilaryTraitList &reply, int handle);
-    void finished(int status, const QnPtzData &reply, int handle);
-    void finished(int status, const QnCameraBookmark &reply, int handle);
-    void finished(int status, const QnCameraBookmarkList &reply, int handle);
-    void finished(int status, const QnConfigureReply &reply, int handle);
-    void finished(int status, const QnModuleInformation &reply, int handle);
+    void finished(int status, const QnRebuildArchiveReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnCameraListReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnStorageStatusReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnStorageSpaceReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnTimePeriodList &reply, int handle, const QString &errorString);
+    void finished(int status, const QnStatisticsReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QVector3D &reply, int handle, const QString &errorString);
+    void finished(int status, const QnStringVariantPairList &reply, int handle, const QString &errorString);
+    void finished(int status, const QnStringBoolPairList &reply, int handle, const QString &errorString);
+    void finished(int status, const QnTimeReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnTestEmailSettingsReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnCameraDiagnosticsReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnManualCameraSearchReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnBusinessActionDataListPtr &reply, int handle, const QString &errorString);
+    void finished(int status, const QImage &reply, int handle, const QString &errorString);
+    void finished(int status, const QString &reply, int handle, const QString &errorString);
+    void finished(int status, const QnPtzPresetList &reply, int handle, const QString &errorString);
+    void finished(int status, const QnPtzTourList &reply, int handle, const QString &errorString);
+    void finished(int status, const QnPtzObject &reply, int handle, const QString &errorString);
+    void finished(int status, const QnPtzAuxilaryTraitList &reply, int handle, const QString &errorString);
+    void finished(int status, const QnPtzData &reply, int handle, const QString &errorString);
+    void finished(int status, const QnCameraBookmark &reply, int handle, const QString &errorString);
+    void finished(int status, const QnCameraBookmarkList &reply, int handle, const QString &errorString);
+    void finished(int status, const QnConfigureReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnModuleInformation &reply, int handle, const QString &errorString);
 
 private:
     friend class QnAbstractReplyProcessor;
