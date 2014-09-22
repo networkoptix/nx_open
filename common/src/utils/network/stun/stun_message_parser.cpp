@@ -251,10 +251,10 @@ Attribute* MessageParser::parseUnknownAttribute() {
 
 Attribute* MessageParser::parseValue() {
     switch( attribute_.type ) {
-    case attr::AttributeType::xorMappedAddress: return parseXORMappedAddress();
-    case attr::AttributeType::errorCode: return parseErrorCode();
-    case attr::AttributeType::messageIntegrity: return parseMessageIntegrity();
-    case attr::AttributeType::fingerprint: return parseFingerprint();
+    case static_cast<int>(attr::AttributeType::xorMappedAddress) : return parseXORMappedAddress();
+    case static_cast<int>(attr::AttributeType::errorCode) : return parseErrorCode();
+    case static_cast<int>(attr::AttributeType::messageIntegrity) : return parseMessageIntegrity();
+    case static_cast<int>(attr::AttributeType::fingerprint) : return parseFingerprint();
     default: return parseUnknownAttribute();
     }
 }
