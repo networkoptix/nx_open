@@ -2,6 +2,7 @@
 #include "transaction_message_bus.h"
 
 #include <QtCore/QTimer>
+#include <QTextStream>
 
 #include "remote_ec_connection.h"
 #include "utils/common/systemerror.h"
@@ -270,7 +271,7 @@ void QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
         gotFromPeer = transport->remotePeer().id;
 
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-    qDebug() << "received peerAlive transaction" << aliveData.peer.id << aliveData.peer.peerType;
+    NX_LOG( lit("received peerAlive transaction %1 %2").arg(aliveData.peer.id.toString()).arg(aliveData.peer.peerType), cl_logDEBUG1);
 #endif
     if (aliveData.peer.id == m_localPeer.id)
         return; // ignore himself
@@ -435,8 +436,8 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     int transportSeq = m_lastTransportSeq[transportHeader.sender];
     if (transportSeq >= transportHeader.sequence) {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "Ignore transaction " << toString(tran.command) << "from peer"  << tran.peerID << "received via" 
-            << transportHeader.sender << "because of transport sequence: " << transportHeader.sequence << "<=" << transportSeq;
+        NX_LOG( lit("Ignore transaction %1 from peer %2 received via %3 because of transport sequence: %4 <= %5").
+            arg(toString(tran.command)).arg(tran.peerID.toString()).arg(transportHeader.sender.toString()).arg(transportHeader.sequence).arg(transportSeq), cl_logDEBUG1 );
 #endif
         return false; // already processed
     }
@@ -451,7 +452,9 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
 
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
     if (!transport->isSyncDone() && transport->isReadSync(ApiCommand::NotDefined) && transportHeader.sender != transport->remotePeer().id) 
-        qWarning() << "Got transcaction from peer" << transportHeader.sender << "while sync with peer" << transport->remotePeer().id << "in progress";
+    {
+        NX_LOG( lit("Got transcaction from peer %1 while sync with peer %2 in progress").arg(transportHeader.sender.toString()).arg(transport->remotePeer().id.toString()), cl_logWARNING );
+    }
 #endif
 
     if (persistentSeq && tran.persistentInfo.sequence > persistentSeq + 1) 
@@ -460,7 +463,8 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
         {
         // gap in persistent data detect, do resync
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-            qDebug() << "GAP in persistent data detected! for peer" << tran.peerID << "Expected seq=" << persistentSeq + 1 <<", but got seq=" << tran.persistentInfo.sequence;
+            NX_LOG( lit("GAP in persistent data detected! for peer %1 Expected seq=%2, but got seq=%3").
+                arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence), cl_logDEBUG1 );
 #endif
 
             if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
@@ -471,7 +475,8 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
         }
         else {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-            qDebug() << "GAP in persistent data, but sync in progress" << tran.peerID << "Expected seq=" << persistentSeq + 1 <<", but got seq=" << tran.persistentInfo.sequence;
+            NX_LOG( lit("GAP in persistent data, but sync in progress %1. Expected seq=%2, but got seq=%3").
+                arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence), cl_logDEBUG1 );
 #endif
         }
     }
@@ -511,8 +516,9 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 
     if (!sender->isReadSync(tran.command)) {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "reject transaction " << ApiCommand::toString(tran.command) << "from" << tran.peerID << "tt seq=" << transportHeader.sequence 
-            << "time=" << tran.persistentInfo.timestamp << "db seq=" << tran.persistentInfo.sequence << "via" << sender->remotePeer().id;
+        NX_LOG( lit("reject transaction %1 from %2 tt seq=%3 time=%4 db seq=%5 via %6").
+            arg(ApiCommand::toString(tran.command)).arg(tran.peerID.toString()).arg(transportHeader.sequence).
+            arg(tran.persistentInfo.timestamp).arg(tran.persistentInfo.sequence).arg(sender->remotePeer().id.toString()), cl_logDEBUG1);
 #endif
         return;
     }
@@ -520,8 +526,8 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "from" << tran.peerID << "tt seq=" << transportHeader.sequence 
-                 << "time=" << tran.persistentInfo.timestamp << "db seq=" << tran.persistentInfo.sequence << "via" << sender->remotePeer().id;
+        NX_LOG( lit("got transaction %1 from %2 tt seq=%3 time=%4 db seq=%5 via %6").arg(ApiCommand::toString(tran.command)).arg(tran.peerID.toString()).
+            arg(transportHeader.sequence).arg(tran.persistentInfo.timestamp).arg(tran.persistentInfo.sequence).arg(sender->remotePeer().id.toString()), cl_logDEBUG1);
 #endif
         // process system transactions
         switch(tran.command) {
@@ -591,7 +597,13 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     }
     else {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "skip transaction " << ApiCommand::toString(tran.command) << "for peers" << transportHeader.dstPeers;
+        if( cl_log.logLevel() >= cl_logDEBUG1 )
+        {
+            QString dstPeersStr;
+            for( const QUuid& peer: transportHeader.dstPeers )
+                dstPeersStr += peer.toString();
+            NX_LOG( lit("skip transaction %1 for peers %2").arg(ApiCommand::toString(tran.command)).arg(dstPeersStr), cl_logDEBUG1);
+        }
 #endif
     }
 
@@ -631,7 +643,15 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
 
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
     if (!proxyList.isEmpty())
-        qDebug() << "proxy transaction " << ApiCommand::toString(tran.command) << " to " << proxyList;
+    {
+        if( cl_log.logLevel() >= cl_logDEBUG1 )
+        {
+            QString proxyListStr;
+            for( const QUuid& peer: proxyList )
+                proxyListStr += " " + peer.toString();
+            NX_LOG( lit("proxy transaction %1 to (%2)").arg(ApiCommand::toString(tran.command)).arg(proxyListStr), cl_logDEBUG1);
+        }
+    }
 #endif
 
     emit transactionProcessed(tran);
@@ -662,9 +682,9 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     if (errorCode == ErrorCode::ok) 
     {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "got sync request from peer" << sender->remotePeer().id << ". Need transactions after:";
+        NX_LOG( lit("got sync request from peer %1. Need transactions after:").arg(sender->remotePeer().id.toString()), cl_logDEBUG1);
         printTranState(tran.params.persistentState);
-        qDebug() << "exist " << serializedTransactions.size() << "new transactions";
+        NX_LOG( lit("exist %1 new transactions").arg(serializedTransactions.size()), cl_logDEBUG1);
 #endif
         QnTransaction<QnTranStateResponse> tranSyncResponse(ApiCommand::tranSyncResponse);
         tranSyncResponse.params.result = 0;
@@ -840,7 +860,7 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
         }
         sendTransaction(tran);
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "sending peerAlive info" << peer.id << peer.peerType;
+        NX_LOG( lit("sending peerAlive info %1 %2").arg(peer.id.toString()).arg(peer.peerType), cl_logDEBUG1);
 #endif
     }
 
@@ -1027,7 +1047,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
         m_aliveSendTimer.restart();
         handlePeerAliveChanged(m_localPeer, true, true);
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-    qDebug() << "Current transaction state:";
+    NX_LOG( "Current transaction state:", cl_logDEBUG1 );
     if (transactionLog)
         printTranState(transactionLog->getTransactionsState());
 #endif
