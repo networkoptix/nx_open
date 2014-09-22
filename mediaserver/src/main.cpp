@@ -137,6 +137,7 @@
 #include <utils/network/router.h>
 #include <utils/common/ssl_gen_cert.h>
 
+#include <media_server/mserver_status_watcher.h>
 #include <media_server/server_message_processor.h>
 #include <media_server/settings.h>
 #include <media_server/serverutil.h>
@@ -1264,6 +1265,8 @@ void QnMain::run()
     runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
     runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
+
+    MediaServerStatusWatcher mediaServerStatusWatcher;
 
     ec2::ResourceContext resCtx(
         QnResourceDiscoveryManager::instance(),

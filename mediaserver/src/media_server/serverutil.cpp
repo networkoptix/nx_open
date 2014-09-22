@@ -48,9 +48,6 @@ QString getDataDirectory()
 
 
 bool backupDatabase() {
-    // TODO: #dklychkov dumpDatabaseAsync has not been implemented yet. Let this function work when dumpDatabaseAsync is ready.
-    return true;
-
     QString dir = getDataDirectory() + lit("/");
     QString fileName;
     for (int i = -1; ; i++) {
