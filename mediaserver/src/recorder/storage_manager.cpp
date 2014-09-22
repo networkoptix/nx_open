@@ -180,8 +180,7 @@ bool QnStorageManager::loadFullFileCatalog(const QnStorageResourcePtr &storage, 
         foreach(DeviceFileCatalogPtr c, sdb->loadFullFileCatalog())
         {
             DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->cameraUniqueId(), c->getCatalog());
-            if (fileCatalog->m_chunks.empty())
-                fileCatalog->addChunks(correctChunksFromMediaData(fileCatalog, storage, c->m_chunks));
+            fileCatalog->addChunks(correctChunksFromMediaData(fileCatalog, storage, c->m_chunks));
         }
     }
     else {

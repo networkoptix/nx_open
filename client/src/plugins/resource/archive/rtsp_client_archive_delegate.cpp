@@ -123,11 +123,11 @@ QString QnRtspClientArchiveDelegate::getUrl(const QnVirtualCameraResourcePtr &ca
 qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera) const 
 {
     if (!camera)
-        return 0;
+        return AV_NOPTS_VALUE;
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera);
     if (!history)
-        return 0;
+        return AV_NOPTS_VALUE;
     QnServerHistoryMap mediaServerList = history->getOnlineTimePeriods();
     QSet<QnMediaServerResourcePtr> checkServers;
     foreach (const QUuid &serverId, mediaServerList.values()) 
@@ -205,9 +205,8 @@ bool QnRtspClientArchiveDelegate::openInternal() {
 
     m_customVideoLayout.reset();
    
-    if (m_server == 0 || m_server->getStatus() == Qn::Offline) {
-        if (!m_fixedServer) 
-            m_server = getServerOnTime(m_position/1000); // try to update server
+    if (!m_fixedServer) {
+        m_server = getServerOnTime(m_position/1000); // try to update server
         if (m_server == 0 || m_server->getStatus() == Qn::Offline)
             return false;
     }
