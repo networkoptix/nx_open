@@ -7,7 +7,6 @@
 #include <utils/common/connective.h>
 
 class QnConnectToCurrentSystemTool;
-class QnMergeSystemsTool;
 class QnProgressDialog;
 
 class QnWorkbenchIncompatibleServersActionHandler : public Connective<QObject>, public QnWorkbenchContextAware {
@@ -19,10 +18,9 @@ public:
 
 protected slots:
     void at_connectToCurrentSystemAction_triggered();
-    void at_joinOtherSystemAction_triggered();
+    void at_mergeSystemsAction_triggered();
 
 private:
-    QnMergeSystemsTool *joinSystemTool();
     QnProgressDialog *progressDialog();
 
     void connectToCurrentSystem(const QSet<QUuid> &targets);
@@ -34,7 +32,6 @@ private slots:
 
 private:
     QPointer<QnConnectToCurrentSystemTool> m_connectTool;
-    QnMergeSystemsTool *m_joinSystemTool;
     QPointer<QnProgressDialog> m_progressDialog;
 };
 

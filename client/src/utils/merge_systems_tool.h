@@ -6,8 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-class QTimer;
-class QHostInfo;
+class QnModuleInformation;
 
 class QnMergeSystemsTool : public QObject {
     Q_OBJECT
@@ -15,47 +14,28 @@ public:
     enum ErrorCode {
         InternalError = -1,
         NoError,
-        Timeout,
-        HostLookupError,
         VersionError,
         AuthentificationError,
-        JoinError
+        BackupError,
+        JoinError,
+        NotFoundError
     };
 
     explicit QnMergeSystemsTool(QObject *parent = 0);
 
-    bool isRunning() const;
-
-    void start(const QUrl &url, const QString &password);
+    void pingSystem(const QUrl &url, const QString &password);
+    void mergeSystem(const QUrl &url, const QString &password, bool ownSettings);
 
 signals:
-    void finished(int errorCode);
-
-private:
-    void findResource();
-    void joinResource();
-    void rediscoverPeer();
-    void updateDiscoveryInformation();
-    void finish(int errorCode);
+    void systemFound(const QnModuleInformation &moduleInformation, const QnMediaServerResourcePtr &discoverer, int errorCode);
+    void mergeFinished(int errorCode);
 
 private slots:
-    void at_resource_added(const QnResourcePtr &resource);
-    void at_resource_statusChanged(const QnResourcePtr &resource);
-    void at_timer_timeout();
-    void at_hostLookedUp(const QHostInfo &hostInfo);
-    void at_targetServer_configured(int status, int handle);
+    void at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString);
+    void at_mergeSystem_finished(int status, int handle);
 
 private:
-    bool m_running;
-
-    QUrl m_targetUrl;
-    QUrl m_oldApiUrl;
-    QString m_password;
-    QSet<QHostAddress> m_possibleAddresses;
-    QnMediaServerResourcePtr m_targetServer;
-    QUuid m_targetId;
-
-    QTimer *m_timer;
+    QHash<int, QnMediaServerResourcePtr> m_serverByRequestHandle;
 };
 
 #endif // MERGE_SYSTEMS_TOOL_H

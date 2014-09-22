@@ -18,11 +18,10 @@ QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActio
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_connectTool(NULL),
-    m_joinSystemTool(NULL),
     m_progressDialog(NULL)
 {
     connect(action(Qn::ConnectToCurrentSystem),         SIGNAL(triggered()),    this,   SLOT(at_connectToCurrentSystemAction_triggered()));
-    connect(action(Qn::JoinOtherSystem),                SIGNAL(triggered()),    this,   SLOT(at_joinOtherSystemAction_triggered()));
+    connect(action(Qn::MergeSystems),                   SIGNAL(triggered()),    this,   SLOT(at_mergeSystemsAction_triggered()));
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemAction_triggered() {
@@ -61,44 +60,9 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(const Q
     m_connectTool->start(targets, password);
 }
 
-void QnWorkbenchIncompatibleServersActionHandler::at_joinOtherSystemAction_triggered() {
-    QnMergeSystemsTool *tool = joinSystemTool();
-
-    if (tool->isRunning()) {
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("Please, wait before the previously requested servers will be added to your system."));
-        return;
-    }
-
+void QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggered() {
     QScopedPointer<QnMergeSystemsDialog> dialog(new QnMergeSystemsDialog(mainWindow()));
-    if (dialog->exec() == QDialog::Rejected)
-        return;
-
-    QUrl url = dialog->url();
-    QString password = dialog->password();
-
-    if ((url.scheme() != lit("http") && url.scheme() != lit("https")) || url.host().isEmpty()) {
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("You have entered an invalid url."));
-        return;
-    }
-
-    if (password.isEmpty()) {
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("The password cannot be empty."));
-        return;
-    }
-
-    progressDialog()->setLabelText(tr("Joining system..."));
-    progressDialog()->setInfiniteProgress();
-    progressDialog()->show();
-
-    tool->start(url, password);
-}
-
-QnMergeSystemsTool *QnWorkbenchIncompatibleServersActionHandler::joinSystemTool() {
-    if (!m_joinSystemTool) {
-        m_joinSystemTool = new QnMergeSystemsTool(this);
-        connect(m_joinSystemTool, &QnMergeSystemsTool::finished, this, &QnWorkbenchIncompatibleServersActionHandler::at_joinSystemTool_finished);
-    }
-    return m_joinSystemTool;
+    dialog->exec();
 }
 
 QnProgressDialog *QnWorkbenchIncompatibleServersActionHandler::progressDialog() {
@@ -144,12 +108,6 @@ void QnWorkbenchIncompatibleServersActionHandler::at_joinSystemTool_finished(int
     switch (errorCode) {
     case QnMergeSystemsTool::NoError:
         QMessageBox::information(progressDialog(), tr("Information"), tr("The selected system has been joined to your system successfully."));
-        break;
-    case QnMergeSystemsTool::Timeout:
-        QMessageBox::critical(progressDialog(), tr("Error"), tr("Connection timed out."));
-        break;
-    case QnMergeSystemsTool::HostLookupError:
-        QMessageBox::critical(progressDialog(), tr("Error"), tr("The specified host has not been found."));
         break;
     case QnMergeSystemsTool::VersionError:
         QMessageBox::critical(progressDialog(), tr("Error"), tr("The target system has the different version.\nYou must update that system before joining."));

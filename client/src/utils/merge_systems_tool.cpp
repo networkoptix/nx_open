@@ -14,239 +14,66 @@
 
 namespace {
 
-    const int checkTimeout = 60 * 1000;
-    const int defaultRtspPort = 7001;
-
-    ec2::AbstractECConnectionPtr connection2() {
-        return QnAppServerConnectionFactory::getConnection2();
-    }
-
-    QnUserResourcePtr getAdminUser() {
-        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
-            QnUserResourcePtr user = resource.staticCast<QnUserResource>();
-            if (user->getName() == lit("admin"))
-                return user;
-        }
-        return QnUserResourcePtr();
+    QnMergeSystemsTool::ErrorCode errorStringToErrorCode(const QString &str) {
+        if (str.isEmpty())
+            return QnMergeSystemsTool::NoError;
+        if (str == lit("FAIL"))
+            return QnMergeSystemsTool::NotFoundError;
+        else if (str == lit("INCOMPATIBLE"))
+            return QnMergeSystemsTool::VersionError;
+        else if (str == lit("UNAUTHORIZED"))
+            return QnMergeSystemsTool::AuthentificationError;
+        else if (str == lit("BACKUP_ERROR"))
+            return QnMergeSystemsTool::BackupError;
+        else
+            return QnMergeSystemsTool::InternalError;
     }
 
 } // anonymous namespace
 
 QnMergeSystemsTool::QnMergeSystemsTool(QObject *parent) :
-    QObject(parent),
-    m_running(false),
-    m_timer(new QTimer(this))
+    QObject(parent)
 {
-    m_timer->setInterval(checkTimeout);
-    m_timer->setSingleShot(true);
-    connect(m_timer, &QTimer::timeout, this, &QnMergeSystemsTool::at_timer_timeout);
 }
 
-bool QnMergeSystemsTool::isRunning() const {
-    return m_running;
-}
-
-void QnMergeSystemsTool::start(const QUrl &url, const QString &password) {
-    // we need only scheme, hostname and port from the url
-    m_targetUrl.setScheme(url.scheme());
-    m_targetUrl.setHost(url.host());
-    m_targetUrl.setPort(url.port(defaultRtspPort));
-    m_password = password;
-    m_targetServer.clear();
-    m_targetId = QUuid();
-
-    m_running = true;
-
-    QHostAddress address(url.host());
-    if (address.isNull()) {
-        QHostInfo::lookupHost(url.host(), this, SLOT(at_hostLookedUp(QHostInfo)));
-        return;
-    }
-
-    m_possibleAddresses.insert(address);
-
-    findResource();
-}
-
-void QnMergeSystemsTool::findResource() {
-    if (m_possibleAddresses.isEmpty()) {
-        finish(HostLookupError);
-        return;
-    }
-
-    /* For the first try to find it in the resource pool. */
-
-    /* Look up through incompatible servers only. Compatible servers have our system name and don't need to be joined. */
-    foreach (const QnResourcePtr &resource, qnResPool->getAllIncompatibleResources()) {
-        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (!server)
+void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &password) {
+    m_serverByRequestHandle.clear();
+    foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllServers()) {
+        if (server->getStatus() != Qn::Online)
             continue;
 
-        if (QUrl(server->getApiUrl()).port() != m_targetUrl.port())
-            continue;
+        int handle = server->apiConnection()->pingSystemAsync(url, password, this, SLOT(at_pingSystem_finished(int,QnModuleInformation,int,QString)));
+        m_serverByRequestHandle[handle] = server;
+    }
+}
 
-        if (m_possibleAddresses.contains(QSet<QHostAddress>::fromList(server->getNetAddrList()))) {
-            m_targetServer = server;
-            m_targetId = QUuid(m_targetServer->getProperty(lit("guid")));
-            if (m_targetId.isNull())
-                m_targetId = m_targetServer->getId();
-            break;
+void QnMergeSystemsTool::mergeSystem(const QUrl &url, const QString &password, bool ownSettings) {
+
+}
+
+void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {
+    QnMediaServerResourcePtr server = m_serverByRequestHandle.take(handle);
+    if (!server)
+        return;
+
+    ErrorCode errorCode = errorStringToErrorCode(errorString);
+
+    if (!errorString.isEmpty() || status != 0) {
+        if (errorCode == NotFoundError) {
+            if (m_serverByRequestHandle.isEmpty())
+                emit systemFound(QnModuleInformation(), QnMediaServerResourcePtr(), NotFoundError);
         }
-    }
 
-    if (m_targetServer) {
-        joinResource();
+        m_serverByRequestHandle.clear();
+
+        emit systemFound(QnModuleInformation(), QnMediaServerResourcePtr(), errorCode);
         return;
     }
 
-    /* Re-save admin user before discovery. If we don't do it we could get unlogined. */
-    QnUserResourcePtr adminUser = getAdminUser();
-    if (!adminUser) {
-        finish(InternalError);
-        return;
-    }
-    connection2()->getUserManager()->save(adminUser, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-
-    /* If there is no such server in the resource pool, try to discover it over the our network. */
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnMergeSystemsTool::at_resource_added);
-
-    connection2()->getDiscoveryManager()->discoverPeer(m_targetUrl, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-    m_timer->start();
+    m_serverByRequestHandle.clear();
+    emit systemFound(moduleInformation, server, NoError);
 }
 
-void QnMergeSystemsTool::joinResource() {
-    if (!isCompatible(m_targetServer->getVersion(), qnCommon->engineVersion())) {
-        finish(VersionError);
-        return;
-    }
+void QnMergeSystemsTool::at_mergeSystem_finished(int status, int handle) {
 
-    QnUserResourcePtr adminUser = getAdminUser();
-    if (adminUser.isNull()) {
-        finish(InternalError);
-        return;
-    }
-
-    m_oldApiUrl = m_targetServer->apiConnection()->url();
-
-    // temporary add the auth info to the api url
-    QUrl apiUrl = m_oldApiUrl;
-    apiUrl.setScheme(lit("http")); // TODO: #dklychkov Fix a bug in QNetworkAccessManager and use https
-    apiUrl.setUserName(lit("admin"));
-    apiUrl.setPassword(m_password);
-    m_targetServer->apiConnection()->setUrl(apiUrl);
-
-    m_targetServer->apiConnection()->configureAsync(true, qnCommon->localSystemName(), QString(),
-                                                    adminUser->getHash(), adminUser->getDigest(), 0,
-                                                    this, SLOT(at_targetServer_configured(int,int)));
-}
-
-void QnMergeSystemsTool::rediscoverPeer() {
-    if (m_targetServer->getStatus() == Qn::Online) {
-        updateDiscoveryInformation();
-        return;
-    }
-
-    connection2()->getDiscoveryManager()->discoverPeer(m_targetUrl, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-
-    connect(qnResPool, &QnResourcePool::statusChanged, this, &QnMergeSystemsTool::at_resource_statusChanged);
-    m_timer->start();
-}
-
-void QnMergeSystemsTool::updateDiscoveryInformation() {
-    QHostAddress address(m_targetUrl.host());
-    // there is no need to add manual address if it's already in the database
-    if (!address.isNull() && m_targetServer->getNetAddrList().contains(address)) {
-        finish(NoError);
-        return;
-    }
-
-    connection2()->getDiscoveryManager()->addDiscoveryInformation(m_targetServer->getId(), QList<QUrl>() << m_targetUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-    finish(NoError);
-}
-
-void QnMergeSystemsTool::finish(int errorCode) {
-    m_running = false;
-    m_targetServer.clear();
-    m_targetId = QUuid();
-    m_possibleAddresses.clear();
-    m_targetUrl.clear();
-    m_password.clear();
-    emit finished(errorCode);
-}
-
-void QnMergeSystemsTool::at_resource_added(const QnResourcePtr &resource) {
-    if (!m_running)
-        return;
-
-    if (!resource->hasFlags(Qn::server))
-        return;
-
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    Q_ASSERT(server);
-
-    if (QUrl(server->getApiUrl()).port() != m_targetUrl.port())
-        return;
-
-    if (!m_possibleAddresses.contains(QSet<QHostAddress>::fromList(server->getNetAddrList())))
-        return;
-
-    m_targetServer = server;
-    m_targetId = QUuid(m_targetServer->getProperty(lit("guid")));
-    if (m_targetId.isNull())
-        m_targetId = m_targetServer->getId();
-    m_timer->stop();
-
-    joinResource();
-}
-
-void QnMergeSystemsTool::at_resource_statusChanged(const QnResourcePtr &resource) {
-    if (m_targetId.isNull() || resource->getId() != m_targetId)
-        return;
-
-    m_targetServer = resource.dynamicCast<QnMediaServerResource>();
-    Q_ASSERT(m_targetServer);
-
-    if (resource->getStatus() != Qn::Offline) {
-        qnResPool->disconnect(this);
-        m_timer->stop();
-        updateDiscoveryInformation();
-    }
-}
-
-void QnMergeSystemsTool::at_timer_timeout() {
-    if (!m_running)
-        return;
-
-    if (m_targetServer) {
-        disconnect(qnResPool, &QnResourcePool::statusChanged, this, &QnMergeSystemsTool::at_resource_statusChanged);
-        finish(JoinError);
-    } else {
-        disconnect(qnResPool, &QnResourcePool::resourceAdded, this, &QnMergeSystemsTool::at_resource_added);
-        finish(Timeout);
-    }
-}
-
-void QnMergeSystemsTool::at_hostLookedUp(const QHostInfo &hostInfo) {
-    if (hostInfo.error() != QHostInfo::NoError) {
-        finish(HostLookupError);
-        return;
-    }
-
-    m_possibleAddresses = QSet<QHostAddress>::fromList(hostInfo.addresses());
-}
-
-void QnMergeSystemsTool::at_targetServer_configured(int status, int handle) {
-    Q_UNUSED(handle)
-
-    m_targetServer->apiConnection()->setUrl(m_oldApiUrl);
-
-    if (status != 0) {
-        if (status == QNetworkReply::AuthenticationRequiredError)
-            finish(AuthentificationError);
-        else
-            finish(JoinError);
-        return;
-    }
-
-    rediscoverPeer();
 }

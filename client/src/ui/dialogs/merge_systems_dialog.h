@@ -3,9 +3,14 @@
 
 #include <QtWidgets/QDialog>
 
+#include <core/resource/resource_fwd.h>
+
 namespace Ui {
-class QnMergeSystemsDialog;
+    class QnMergeSystemsDialog;
 }
+
+class QnMergeSystemsTool;
+class QnModuleInformation;
 
 class QnMergeSystemsDialog : public QDialog {
     Q_OBJECT
@@ -16,14 +21,29 @@ public:
 
     QUrl url() const;
     QString password() const;
-    void updateKnownSystems();
+
+    virtual void accept() override;
 
 private slots:
     void at_urlComboBox_activated(int index);
     void at_testConnectionButton_clicked();
 
+    void at_mergeTool_systemFound(const QnModuleInformation &moduleInformation, const QnMediaServerResourcePtr &discoverer, int errorCode);
+
+private:
+    void updateKnownSystems();
+    void updateErrorLabel(const QString &error);
+    void updateConfigurationBlock();
+
 private:
     QScopedPointer<Ui::QnMergeSystemsDialog> ui;
+    QPushButton *m_mergeButton;
+
+    QnMergeSystemsTool *m_mergeTool;
+
+    QnMediaServerResourcePtr m_discoverer;
+    QUrl m_url;
+    QString m_password;
 };
 
 #endif // MERGE_SYSTEMS_DIALOG_H
