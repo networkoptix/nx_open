@@ -121,7 +121,7 @@ void QnMediaServerUpdateTool::setTargets(const QSet<QUuid> &targets, bool client
     QSet<QUuid> suitableTargets;
 
     foreach (const QUuid &id, targets) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
         m_targets.append(server);
@@ -247,7 +247,7 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
         return;
 
     if (m_targets.isEmpty())
-        setTargets(actualTargetIds(), defaultDisableClientUpdates);
+        setTargets(target.targets, defaultDisableClientUpdates);
 
     m_updateProcess = new QnUpdateProcess(target);
     connect(m_updateProcess, &QnUpdateProcess::stageChanged,                    this, &QnMediaServerUpdateTool::setStage);
