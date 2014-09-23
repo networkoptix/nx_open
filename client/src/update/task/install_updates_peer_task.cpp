@@ -11,7 +11,7 @@
 
 namespace {
     const int checkTimeout = 10 * 60 * 1000;
-    const int shortTimeout = 5 * 1000;
+    const int shortTimeout = 60 * 1000;
 
     ec2::AbstractECConnectionPtr connection2() {
         return QnAppServerConnectionFactory::getConnection2();
