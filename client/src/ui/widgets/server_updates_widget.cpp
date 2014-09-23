@@ -271,10 +271,6 @@ bool QnServerUpdatesWidget::isUpdating() const {
     return m_updateTool->isUpdating();
 }
 
-void QnServerUpdatesWidget::setTargets(const QSet<QUuid> &targets) {
-    m_updateTool->setTargets(targets);
-}
-
 QnMediaServerUpdateTool *QnServerUpdatesWidget::updateTool() const {
     return m_updateTool;
 }
@@ -365,7 +361,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
 
 void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoStart) {
     if (m_checkingInternet || !m_updateTool->idle())
-        false;
+        return;
     m_checkingInternet = true;
 
     ui->internetUpdateButton->setEnabled(false);
@@ -453,7 +449,7 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoSt
 
 void QnServerUpdatesWidget::checkForUpdatesLocal() {
     if (m_checkingLocal)
-        false;
+        return;
     m_checkingLocal = true;
 
     ui->localUpdateButton->setEnabled(false);
