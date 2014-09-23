@@ -16,7 +16,7 @@
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/module_finder.h"
 #include "utils/network/direct_module_finder.h"
-#include <utils/common/app_info.h>
+#include "utils/common/app_info.h"
 
 namespace {
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
@@ -116,6 +116,11 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return CODE_OK;
         }
+
+        moduleInformation.systemName = qnCommon->localSystemName();
+
+        if (QnServerConnector::instance())
+            QnServerConnector::instance()->addConnection(moduleInformation, url);
     }
 
     if (qnResPool->getResourceById(moduleInformation.id).isNull()) {
