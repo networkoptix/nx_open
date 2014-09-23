@@ -80,8 +80,7 @@ namespace {
 
 QnServerUpdateTool::QnServerUpdateTool() :
     m_length(-1),
-    m_replyTime(0),
-    m_networkAccessManager(new QNetworkAccessManager(this))
+    m_replyTime(0)
 {}
 
 QnServerUpdateTool::~QnServerUpdateTool() {}
@@ -130,9 +129,9 @@ bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray
     return processUpdate(updateId, &buffer);
 }
 
-bool QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset) {
+void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset) {
     if (m_bannedUpdates.contains(updateId))
-        return false;
+        return;
 
     if (m_updateId != updateId) {
         m_chunks.clear();
@@ -146,13 +145,13 @@ bool QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
         if (!m_file->open(QFile::WriteOnly)) {
             NX_LOG(lit("Could not save update to %1").arg(m_file->fileName()), cl_logERROR);
             m_bannedUpdates.insert(updateId);
-            return false;
+            return;
         }
     }
 
     // Closed file means we've already finished downloading. Nothing to do is left.
     if (!m_file->isOpen())
-        return true;
+        return;
 
     if (data.isEmpty()) { // it means we've just got the size of the file
         m_length = offset;
@@ -169,11 +168,7 @@ bool QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
         bool ok = processUpdate(updateId, m_file.data());
 
         sendReply(ok ? ec2::AbstractUpdatesManager::Finished : ec2::AbstractUpdatesManager::Failed);
-
-        return ok;
     }
-
-    return true;
 }
 
 bool QnServerUpdateTool::installUpdate(const QString &updateId) {

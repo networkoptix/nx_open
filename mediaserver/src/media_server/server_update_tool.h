@@ -26,7 +26,7 @@ public:
     ~QnServerUpdateTool();
 
     bool addUpdateFile(const QString &updateId, const QByteArray &data);
-    bool addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset);
+    void addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset);
     bool installUpdate(const QString &updateId);
 
 private:
@@ -48,8 +48,6 @@ private:
     qint64 m_replyTime;
 
     QSet<QString> m_bannedUpdates;
-
-    QNetworkAccessManager *m_networkAccessManager;
 };
 
 #endif // SERVER_UPDATE_UTIL_H

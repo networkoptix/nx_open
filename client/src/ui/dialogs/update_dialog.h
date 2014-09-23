@@ -20,7 +20,6 @@ public:
     ~QnUpdateDialog();
 
     QnMediaServerUpdateTool *updateTool() const;
-    void setTargets(const QSet<QUuid> &targets);
 
 private:
     QScopedPointer<Ui::QnUpdateDialog> ui;

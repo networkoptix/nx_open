@@ -29,8 +29,6 @@ public:
     bool cancelUpdate();
     bool isUpdating() const;
 
-    void setTargets(const QSet<QUuid> &targets);
-
     QnMediaServerUpdateTool *updateTool() const;
 
     virtual void updateFromSettings() override;

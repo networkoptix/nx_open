@@ -18,7 +18,3 @@ QnUpdateDialog::~QnUpdateDialog() {}
 QnMediaServerUpdateTool *QnUpdateDialog::updateTool() const {
     return m_updatesWidget->updateTool();
 }
-
-void QnUpdateDialog::setTargets(const QSet<QUuid> &targets) {
-    m_updatesWidget->setTargets(targets);
-}

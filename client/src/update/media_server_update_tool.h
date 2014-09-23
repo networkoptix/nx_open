@@ -66,8 +66,6 @@ private:
     void setPeerStageProgress(const QUuid &peerId, QnPeerUpdateStage stage, int progress);
 
     void finishUpdate(const QnUpdateResult &result);
-
-    void setAutoUpdateTargetList(bool f);
     
 private slots:
     void updateTargets();
