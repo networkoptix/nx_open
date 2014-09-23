@@ -21,8 +21,13 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
     char* host = 0;
     getMacFromPrimaryIF(mac, &host);
 
-    if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX))
-        return qnCommon->moduleGUID().toRfc4122(); // block edge camera discovered from other PC
+    if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX)) {
+        QString cameraName = name.mid(CAM_INS_PREFIX.length());
+        if (cameraName.toLocal8Bit() == QByteArray(mac))
+            return qnCommon->moduleGUID().toRfc4122(); // block edge camera discovered from other PC
+        else
+            return QByteArray();
+    }
 #endif
 
     if (name.startsWith(CAM_INS_PREFIX))
