@@ -21,6 +21,10 @@ QnZipExtractor::QnZipExtractor(QIODevice *ioDevice, const QDir &targetDir) :
 {
 }
 
+QnZipExtractor::~QnZipExtractor() {
+    stop();
+}
+
 QString QnZipExtractor::errorToString(QnZipExtractor::Error error) {
     switch (error) {
     case BrokenZip:
