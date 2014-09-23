@@ -144,7 +144,7 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
     }
 
     foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllIncompatibleResources().filtered<QnMediaServerResource>()) {
-        if (server->getSystemName() == qnCommon->localSystemName())
+        if (server->getSystemName() == qnCommon->localSystemName() && server->getStatus() == Qn::Incompatible)
             result.append(server);
     }
     return result;
