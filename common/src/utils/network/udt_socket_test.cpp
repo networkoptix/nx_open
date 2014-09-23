@@ -175,6 +175,7 @@ private:
                 std::placeholders::_2,
                 conn.get()))) {
                     ++broken_or_error_conn_;
+                    conn->socket->cancelAsyncIO( aio::etNone );
                     new_conn->close();
             } else {
                 ++current_conn_size_;
@@ -191,7 +192,7 @@ private:
     void OnRead( SystemError::ErrorCode error_code , std::size_t bytes_transferred , Connection* ptr ) {
         std::unique_ptr<Connection> conn(ptr);
         if(error_code) {
-            conn->socket->cancelAsyncIO( aio::EventType::etRead );
+            conn->socket->cancelAsyncIO(aio::etNone );
             conn->socket->close();
             --current_conn_size_;
             ++broken_or_error_conn_;
@@ -199,7 +200,7 @@ private:
             if( bytes_transferred == 0 ) {
                 ++closed_conn_;
                 --current_conn_size_;
-                conn->socket->cancelAsyncIO( aio::EventType::etRead );
+                conn->socket->cancelAsyncIO(aio::etNone );
                 conn->socket->close();
             } else {
                 total_recv_bytes_ += bytes_transferred;
@@ -214,6 +215,7 @@ private:
                     conn.get()))) {
                         ++broken_or_error_conn_;
                         --current_conn_size_;
+                        conn->socket->cancelAsyncIO(aio::etNone );
                         conn->socket->close();
                         return;
                 } else {
@@ -322,9 +324,8 @@ private:
         if(!error_code) {
             ++connected_socket_size_;
             sleep_list_.Enqueue( conn.release() );
-        } else {
-            --active_conn_sockets_size_;
         }
+        --active_conn_sockets_size_;
     }
     void OnWrite( SystemError::ErrorCode error_code , std::size_t bytes_transferred , Connection* ptr ) {
         std::unique_ptr<Connection> conn(ptr);
@@ -333,7 +334,6 @@ private:
             conn->socket->close();
             failed_connection_size_++;
             --connected_socket_size_;
-            --active_conn_sockets_size_;
         } else {
             Q_ASSERT( bytes_transferred == conn->buffer.size() );
             sleep_list_.Enqueue( conn.release() );
@@ -361,7 +361,10 @@ private:
             &UdtSocketProfileClient::OnWrite,
             this,
             std::placeholders::_1,std::placeholders::_2,conn.get()))) {
+                conn->socket->cancelAsyncIO();
                 conn->socket->close();
+                --connected_socket_size_;
+                ++failed_connection_size_;
         } else {
             conn.release();
         }
@@ -376,10 +379,9 @@ private:
             ScheduleWrite( conn.release() );
             return true;
         } else if( random_.Roll(disconnect_rate_) ) {
-            conn->socket->cancelAsyncIO(aio::EventType::etWrite);
+            conn->socket->cancelAsyncIO();
             conn->socket->close();
             --connected_socket_size_;
-            --active_conn_sockets_size_;
             ++closed_conn_socket_size_;
             return true;
         }
@@ -389,10 +391,10 @@ private:
     void ScheduleConnection();
     float GetConnectionProbability() const {
         const int half_max = maximum_allowed_concurrent_connection_/2;
-        if( active_conn_sockets_size_ < half_max )
+        if( connected_socket_size_ < half_max )
             return 1.0f;
         else {
-            int left = maximum_allowed_concurrent_connection_ - active_conn_sockets_size_;
+            int left = maximum_allowed_concurrent_connection_ - connected_socket_size_;
             Q_ASSERT( left>=0 );
             const float lower_bound = 0.7f;
             return lower_bound + (left/half_max)*(1.0f-lower_bound);
@@ -465,6 +467,8 @@ void UdtSocketProfileClient::ScheduleConnection() {
                 this,
                 std::placeholders::_1, conn.get()))) {
                     ++failed_connection_size_;
+                    conn->socket->cancelAsyncIO();
+                    conn->socket->close();
                     continue;
             } else {
                 conn.release();

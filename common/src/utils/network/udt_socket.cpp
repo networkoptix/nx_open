@@ -953,6 +953,7 @@ void UdtPollSetImpl::RemovePhantomSocket( std::set<UDTSOCKET>* set ) {
         std::map<UDTSOCKET,SocketUserData>::iterator ifind = socket_user_data_.find(*ib);
         if( ifind == socket_user_data_.end() ) {
             ib = set->erase(ib);
+            Q_ASSERT(0);
         } else {
             ++ib;
         }
