@@ -6,6 +6,7 @@ include($$ADDITIONAL_QT_INCLUDES/qtservice/src/qtservice.pri)
 
 INCLUDEPATH += ${root.dir}/appserver2/src/
 
+include( ${libdir}/libcreateprocess.pri )
 
 !win32 {
   ext_debug2.target  = $(TARGET).debug
