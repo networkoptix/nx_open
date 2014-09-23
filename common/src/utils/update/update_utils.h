@@ -16,7 +16,5 @@ QString passwordForBuild(unsigned buildNumber);
 QString updateFilePath(const QString &updatesDirPath, const QString &fileName);
 QString makeMd5(const QString &fileName);
 QString makeMd5(QIODevice *device);
-bool extractZipArchive(QuaZip *zip, const QDir &dir);
-bool extractZipArchive(const QString &zipFileName, const QDir &dir);
 
 #endif // UPDATE_UTILS_H

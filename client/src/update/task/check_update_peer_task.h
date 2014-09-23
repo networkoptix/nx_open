@@ -47,6 +47,7 @@ private:
 private slots:
     void at_updateReply_finished(QnAsyncHttpClientReply *reply);
     void at_buildReply_finished(QnAsyncHttpClientReply *reply);
+    void at_zipExtractor_finished(int error);
 
 private:
     QUrl m_updatesUrl;
