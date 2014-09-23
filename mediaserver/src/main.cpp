@@ -113,7 +113,7 @@
 #include <rest/handlers/module_information_rest_handler.h>
 #include <rest/handlers/routing_information_rest_handler.h>
 #include <rest/handlers/configure_rest_handler.h>
-#include <rest/handlers/join_system_rest_handler.h>
+#include <rest/handlers/merge_systems_rest_handler.h>
 #include <rest/handlers/backup_db_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 
@@ -1090,7 +1090,7 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/routingInformation", new QnRoutingInformationRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/joinSystem", new QnJoinSystemRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
 #ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());

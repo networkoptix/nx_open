@@ -771,9 +771,9 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+M")).
         autoRepeat(false);
 
-    factory(Qn::JoinOtherSystem).
+    factory(Qn::MergeSystems).
         flags(Qn::Main | Qn::Tree).
-        text(tr("Join the Other System...")).
+        text(tr("Merge Systems...")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 

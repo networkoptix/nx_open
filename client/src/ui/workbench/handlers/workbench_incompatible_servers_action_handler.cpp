@@ -8,21 +8,20 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/actions/action_parameter_types.h>
-#include <ui/dialogs/join_other_system_dialog.h>
+#include <ui/dialogs/merge_systems_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
 
 #include <update/connect_to_current_system_tool.h>
-#include <update/join_system_tool.h>
+#include <utils/merge_systems_tool.h>
 
 QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActionHandler(QObject *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_connectTool(NULL),
-    m_joinSystemTool(NULL),
     m_progressDialog(NULL)
 {
     connect(action(Qn::ConnectToCurrentSystem),         SIGNAL(triggered()),    this,   SLOT(at_connectToCurrentSystemAction_triggered()));
-    connect(action(Qn::JoinOtherSystem),                SIGNAL(triggered()),    this,   SLOT(at_joinOtherSystemAction_triggered()));
+    connect(action(Qn::MergeSystems),                   SIGNAL(triggered()),    this,   SLOT(at_mergeSystemsAction_triggered()));
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemAction_triggered() {
@@ -61,44 +60,9 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(const Q
     m_connectTool->start(targets, password);
 }
 
-void QnWorkbenchIncompatibleServersActionHandler::at_joinOtherSystemAction_triggered() {
-    QnJoinSystemTool *tool = joinSystemTool();
-
-    if (tool->isRunning()) {
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("Please, wait before the previously requested servers will be added to your system."));
-        return;
-    }
-
-    QScopedPointer<QnJoinOtherSystemDialog> dialog(new QnJoinOtherSystemDialog(mainWindow()));
-    if (dialog->exec() == QDialog::Rejected)
-        return;
-
-    QUrl url = dialog->url();
-    QString password = dialog->password();
-
-    if ((url.scheme() != lit("http") && url.scheme() != lit("https")) || url.host().isEmpty()) {
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("You have entered an invalid url."));
-        return;
-    }
-
-    if (password.isEmpty()) {
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("The password cannot be empty."));
-        return;
-    }
-
-    progressDialog()->setLabelText(tr("Joining system..."));
-    progressDialog()->setInfiniteProgress();
-    progressDialog()->show();
-
-    tool->start(url, password);
-}
-
-QnJoinSystemTool *QnWorkbenchIncompatibleServersActionHandler::joinSystemTool() {
-    if (!m_joinSystemTool) {
-        m_joinSystemTool = new QnJoinSystemTool(this);
-        connect(m_joinSystemTool, &QnJoinSystemTool::finished, this, &QnWorkbenchIncompatibleServersActionHandler::at_joinSystemTool_finished);
-    }
-    return m_joinSystemTool;
+void QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggered() {
+    QScopedPointer<QnMergeSystemsDialog> dialog(new QnMergeSystemsDialog(mainWindow()));
+    dialog->exec();
 }
 
 QnProgressDialog *QnWorkbenchIncompatibleServersActionHandler::progressDialog() {
@@ -142,19 +106,13 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_
 
 void QnWorkbenchIncompatibleServersActionHandler::at_joinSystemTool_finished(int errorCode) {
     switch (errorCode) {
-    case QnJoinSystemTool::NoError:
+    case QnMergeSystemsTool::NoError:
         QMessageBox::information(progressDialog(), tr("Information"), tr("The selected system has been joined to your system successfully."));
         break;
-    case QnJoinSystemTool::Timeout:
-        QMessageBox::critical(progressDialog(), tr("Error"), tr("Connection timed out."));
-        break;
-    case QnJoinSystemTool::HostLookupError:
-        QMessageBox::critical(progressDialog(), tr("Error"), tr("The specified host has not been found."));
-        break;
-    case QnJoinSystemTool::VersionError:
+    case QnMergeSystemsTool::VersionError:
         QMessageBox::critical(progressDialog(), tr("Error"), tr("The target system has the different version.\nYou must update that system before joining."));
         break;
-    case QnJoinSystemTool::AuthentificationError:
+    case QnMergeSystemsTool::AuthentificationError:
         QMessageBox::critical(progressDialog(), tr("Error"), tr("Authentification failed.\nPlease, check the password you have entered."));
         break;
     default:
