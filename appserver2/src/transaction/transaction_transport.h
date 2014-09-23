@@ -14,6 +14,7 @@
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/transaction_transport_header.h>
 
+#include <utils/common/log.h>
 #include <utils/network/abstract_socket.h>
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/common/id.h"
@@ -70,13 +71,13 @@ public:
 
         foreach (const QUuid& peer, header.dstPeers) {
             Q_ASSERT(!peer.isNull());
-            Q_ASSERT(peer != qnCommon->moduleGUID());
+            //Q_ASSERT(peer != qnCommon->moduleGUID());
         }
 #endif
 
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "send transaction to peer " << remotePeer().id << "command=" << ApiCommand::toString(transaction.command) 
-                 << "tt seq=" << header.sequence << "db seq=" << transaction.persistentInfo.sequence << "timestamp=" << transaction.persistentInfo.timestamp;
+        NX_LOG( lit("send transaction to peer %1 command=%2 tt seq=%3 db seq=%4 timestamp=%5").arg(remotePeer().id.toString()).
+            arg(ApiCommand::toString(transaction.command)).arg(header.sequence).arg(transaction.persistentInfo.sequence).arg(transaction.persistentInfo.timestamp), cl_logDEBUG1);
 #endif
 
         switch (m_remotePeer.dataFormat) {

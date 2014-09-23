@@ -415,7 +415,8 @@ namespace ec2
 
         bool beforeInstallUpdate(const QString& updateName);
         bool afterInstallUpdate(const QString& updateName);
-
+        ErrorCode addCameraHistory(const ApiCameraServerItemData& params);
+        ErrorCode removeCameraHistory(const ApiCameraServerItemData& params);
     private:
         QnResourceFactory* m_resourceFactory;
         QUuid m_storageTypeId;

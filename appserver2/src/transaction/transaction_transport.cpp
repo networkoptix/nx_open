@@ -669,8 +669,8 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
         QnAbstractTransaction abtractTran;
         QnUbjsonReader<QByteArray> stream(&serializedTran);
         QnUbjson::deserialize(&stream, &abtractTran);
-        qDebug() << "send direct transaction to peer " << remotePeer().id << "command=" << ApiCommand::toString(abtractTran.command) 
-            << "tt seq=" << header.sequence << "db seq=" << abtractTran.persistentInfo.sequence << "timestamp=" << abtractTran.persistentInfo.timestamp;
+        NX_LOG( lit("send direct transaction to peer %1 command=%2 tt seq=%3 db seq=%4 timestamp=%5").arg(remotePeer().id.toString()).
+            arg(ApiCommand::toString(abtractTran.command)).arg(header.sequence).arg(abtractTran.persistentInfo.sequence).arg(abtractTran.persistentInfo.timestamp), cl_logDEBUG1 );
 #endif
 
         addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));

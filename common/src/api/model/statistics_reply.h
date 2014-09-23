@@ -6,22 +6,12 @@
 #include <QtCore/QHash>
 #include <QtCore/QLinkedList>
 
-// TODO: 
-// #MSAPI global enum without suffixes. Rename and move to some namespace (Qn probably).
-// Note that it will be used in api.
-
-enum QnStatisticsDeviceType {
-    CPU,                /**< CPU load in percents. */
-    RAM,                /**< RAM load in percents. */
-    HDD,                /**< HDD load in percents. */
-    NETWORK             /**< Network load in percent. */
-};
 
 struct QnStatisticsDataItem {
     QnStatisticsDataItem() {}
     QnStatisticsDataItem(const QString &description,
                          qreal value,
-                         QnStatisticsDeviceType deviceType,
+                         Qn::StatisticsDeviceType deviceType,
                          int deviceFlags = 0):
         description(description),
         value(value),
@@ -30,14 +20,20 @@ struct QnStatisticsDataItem {
 
     QString description;
     qreal value;
-    QnStatisticsDeviceType deviceType;
+    Qn::StatisticsDeviceType deviceType;
     int deviceFlags;
 };
+
+#define QnStatisticsDataItem_Fields (description)(value)(deviceType)(deviceFlags)
+
+QN_FUSION_DECLARE_FUNCTIONS(QnStatisticsDataItem, (json)(metatype))
+
 
 typedef QList<QnStatisticsDataItem> QnStatisticsDataList;
 
 struct QnStatisticsReply {
     QnStatisticsReply(): updatePeriod(0), uptimeMs(0) {}
+    
     QnStatisticsDataList statistics;
     qint64 updatePeriod;
     qint64 uptimeMs;
@@ -48,13 +44,18 @@ struct QnStatisticsReply {
 
 struct QnStatisticsData {
     QString description;
-    QnStatisticsDeviceType deviceType;
+    Qn::StatisticsDeviceType deviceType;
     QLinkedList<qreal> values;
 };
 
 typedef QHash<QString, QnStatisticsData> QnStatisticsHistory;
 
-Q_DECLARE_METATYPE(QnStatisticsReply)
 Q_DECLARE_METATYPE(QnStatisticsData)
+
+#define QnStatisticsReply_Fields (statistics)(updatePeriod)(uptimeMs)
+
+QN_FUSION_DECLARE_FUNCTIONS(QnStatisticsReply, (json)(metatype))
+
+
 
 #endif // QN_STATISTICS_REPLY_H

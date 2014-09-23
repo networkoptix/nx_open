@@ -53,6 +53,11 @@ namespace ec2
             REGISTER_COMMAND(getCameraHistoryItems),
             REGISTER_COMMAND(addCameraHistoryItem),
 
+            REGISTER_COMMAND(addCameraBookmarkTags),
+            REGISTER_COMMAND(getCameraBookmarkTags),
+            REGISTER_COMMAND(removeCameraBookmarkTags),
+            REGISTER_COMMAND(removeCameraHistoryItem),
+
             REGISTER_COMMAND(getMediaServers),
             REGISTER_COMMAND(saveMediaServer),
             REGISTER_COMMAND(removeMediaServer),
@@ -165,6 +170,7 @@ namespace ec2
                 val == saveCameras ||
                 val == removeCamera ||
                 val == addCameraHistoryItem ||
+                val == removeCameraHistoryItem ||
                 val == addCameraBookmarkTags ||
                 val == removeCameraBookmarkTags ||
                 val == saveMediaServer ||

@@ -17,7 +17,7 @@ void QnMediaServerStatisticsManager::registerConsumer(const QnMediaServerResourc
     QUuid id = resource->getId();
     if (!m_statistics.contains(id)) {
         m_statistics[id] = new QnMediaServerStatisticsStorage(resource, pointsLimit(), this);
-        foreach (QnStatisticsDeviceType key, m_flagsFilter.keys())
+        foreach (Qn::StatisticsDeviceType key, m_flagsFilter.keys())
             m_statistics[id]->setFlagsFilter(key, m_flagsFilter[key]);
     }
     m_statistics[id]->registerConsumer(target, slot);
@@ -62,7 +62,7 @@ int QnMediaServerStatisticsManager::pointsLimit() const {
     return defaultPointsLimit;
 }
 
-void QnMediaServerStatisticsManager::setFlagsFilter(QnStatisticsDeviceType deviceType, int flags) {
+void QnMediaServerStatisticsManager::setFlagsFilter(Qn::StatisticsDeviceType deviceType, int flags) {
     m_flagsFilter[deviceType] = flags;
     foreach(QnMediaServerStatisticsStorage* storage, m_statistics)
         storage->setFlagsFilter(deviceType, flags);

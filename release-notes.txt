@@ -1,21 +1,33 @@
 ----------------------------------------------2.3.0.xxxx-------------------------------------------
 Features:
 
-Video Wall. Allows users to control unlimited number of monitors in the realtime mode. Requires Video Wall Licenses. To activate the feature it is necessary to have 5 licenses. Each license allows controlling 1 display.
-No Single Point of Failure. Previous versions the database was stored on Enterprise Controller. In case of EC failure the whole system was down. Now database is being replicated to each server, so there are no central component. If a server is down, the system continues working. 
+Video Wall. Allows users to control unlimited number of monitors in the realtime mode. Requires Video Wall Licenses. To activate the feature it is necessary to have 5 licenses. Each license allows one operator to cotrol VW.
+
+No Single Point of Failure. Previous versions the database was stored on Enterprise Controller. In case of EC failure the whole system was down. Now database is being replicated to each server, so there are no central component. If a server is down, the system continues working. Servers seamlessly synchronizing with each other.
+
 Failover. In case of server failure the cameras will be transferred to other servers (793 Automatic cameras move to reserve servers)
+
 Server API & SDK. SDK provides an easy way to easily integrate various devices into VMS and API allows integrating third-party application with Server. API and SDK are available on the web page of Server.
+
 Edge (SWARM). Due to decent architectural changes Server can be run on potentially any ARM device, including cameras that support EDGE technology. This allows running Server on a small low-cost boxes, or even without any dedicated server!
-Universal Fisheye Dewarping. Now almost all type of fish-eye lenses are supported.
+
+Universal Fisheye Dewarping. Now all type of fish-eye lenses are supported.
+
 Max/Min Recording Time per Camera. Ability to specify the minimum and maximum amount of footage according to recording policies. This setting is per-camera. For instance, one camera can store only 3 days of storage and another-one at least 5 days.
-One-Click System-Wide Upgrades. It is possible to upgrade the whole system to a newer version or to a specific build from a single machine Client is rinning on (Administrative privilege required). If the system is in a isolated network, then the special file is created. If run this file, it will download the upgrade package to a jumpdrive. This jumpdrive should pe plugged in the computer Client is running on. After that the system can be updated in one click.
+
+One-Click System-Wide Upgrades. It is possible to upgrade the whole system(all servers even on different paltforms) to a newer version or to a specific build from a single machine Client is rinning on (Administrative privilege required). If the system is in a isolated network, then the special file is created. If run this file, it will download the upgrade package to a jumpdrive. This jumpdrive should pe plugged in the computer Client is running on. After that the system can be updated in one click.
+
 Web Based Camera Settings. Ability to display camera's web page inside VMS to be able to fully control cameras. 
 remove Paxton ACS Integration Plug-In. 
 Camera Groups via Views - ????????????
+
 Web Client Removal. Redesigned web client will be introduced in the upcoming version. Mobile clients are still included.
-#3738 Joining Systems and server to system (Other systems in resource tree). Now it is possible to join different systems. In this case the licenses will be combined (3246). Ability to view and operate several systems from a single client (other systems are displayed in Resource Tree)
+
+#3738 Joining Systems and server to system (Other systems in resource tree). Now it is possible to join different systems. In this case the licenses will be combined (3246).  In order to joing/merge servers/systems into one system - there is no need to go to each server separately. Servers/system could be merged with few clicks form the client or web admin interface.             (Ability to view and operate several systems from a single client (other systems are displayed in Resource Tree)  <= I do not think so ).
+
 #3839 Simplified and flexible network setup between servers (Routing management). It is possible to specify IP addresses that can be used for accessing Servers (like public/internal IP addresses, domain names etc)
 Server web page introduced. Unlike traytool, it allows users to manage server from a remote computer. Moreover it provides additional functionality to control Server: start/stop, change System ID, port, login and password, join to other systems, configure storages, gain server information, 
+
 3593 System Administration - All system-related settings are combined in te single form to simplify setup and user experience.
 
 Improvements:

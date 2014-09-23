@@ -238,8 +238,6 @@ void QnRtspConnectionProcessor::parseRequest()
             if (resource == 0) 
                 resource = qnResPool->getResourceByMacAddress(resId);
         }
-        if (resource && resource->hasFlags(Qn::foreigner))
-            resource.clear();
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
     }
 

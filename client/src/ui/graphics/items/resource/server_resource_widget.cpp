@@ -179,10 +179,9 @@ namespace {
 
         return path;
     }
-
     /** Backward sorting because buttonBar inserts buttons in reversed order */
     bool statisticsDataLess(const QnStatisticsData &first, const QnStatisticsData &second) {
-        if (first.deviceType == NETWORK && second.deviceType == NETWORK)
+        if (first.deviceType == Qn::StatisticsNETWORK && second.deviceType == Qn::StatisticsNETWORK)
             return first.description.toLower() > second.description.toLower();
 
         if (first.deviceType != second.deviceType)
@@ -474,8 +473,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     m_resource = base_type::resource().dynamicCast<QnMediaServerResource>();
     if(!m_resource)
         qnCritical("Server resource widget was created with a non-server resource.");
-
-    m_manager->setFlagsFilter(NETWORK, qnSettings->statisticsNetworkFilter());
+    m_manager->setFlagsFilter(Qn::StatisticsNETWORK, qnSettings->statisticsNetworkFilter());
     m_pointsLimit = m_manager->pointsLimit();
     m_manager->registerConsumer(m_resource, this, SLOT(at_statistics_received()));
     m_updatePeriod = m_manager->updatePeriod(m_resource);
@@ -551,15 +549,15 @@ void QnServerResourceWidget::setCheckedHealthMonitoringButtons(const QnServerRes
     updateGraphVisibility();
 }
 
-QColor QnServerResourceWidget::getColor(QnStatisticsDeviceType deviceType, int index) {
+QColor QnServerResourceWidget::getColor(Qn::StatisticsDeviceType deviceType, int index) {
     switch (deviceType) {
-    case CPU:
+    case Qn::StatisticsCPU:
         return m_colors.cpu;
-    case RAM:
+    case Qn::StatisticsRAM:
         return m_colors.ram;
-    case HDD:
+    case Qn::StatisticsHDD:
         return m_colors.hdds[qMod(index, m_colors.hdds.size())];
-    case NETWORK:
+    case Qn::StatisticsNETWORK:
         return m_colors.network[qMod(index, m_colors.network.size())];
     default:
         return QColor(Qt::white);
@@ -613,8 +611,8 @@ void QnServerResourceWidget::addOverlays() {
     addOverlayWidget(mainOverlayWidget, UserVisible, true);
 }
 
-QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDeviceType(const QnStatisticsDeviceType deviceType) const {
-    if(deviceType == NETWORK) {
+QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDeviceType(const Qn::StatisticsDeviceType deviceType) const {
+    if(deviceType == Qn::StatisticsNETWORK) {
         return NetworkButtonBar;
     } else {
         return CommonButtonBar;
@@ -624,7 +622,7 @@ QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDevic
 void QnServerResourceWidget::updateLegend() {
     HealthMonitoringButtons checkedData = item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>();
 
-    QHash<QnStatisticsDeviceType, int> indexes;
+    QHash<Qn::StatisticsDeviceType, int> indexes;
 
     foreach (const QString &key, m_sortedKeys) {
         QnStatisticsData &stats = m_history[key];
@@ -694,7 +692,7 @@ void QnServerResourceWidget::updateInfoOpacity() {
 }
 
 void QnServerResourceWidget::updateColors() {
-    QHash<QnStatisticsDeviceType, int> indexes;
+    QHash<Qn::StatisticsDeviceType, int> indexes;
 
     foreach (QString key, m_sortedKeys) {
         QnStatisticsData &stats = m_history[key];

@@ -32,7 +32,7 @@ namespace Qn
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace CameraDataType
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
-            StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat PeerType)
+            StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType)
     Q_FLAGS(Borders Corners
             ResourceFlags
             CameraCapabilities 
@@ -504,6 +504,15 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SecondStreamQuality)
 
+    enum StatisticsDeviceType {
+        StatisticsCPU = 0,                /**< CPU load in percents. */
+        StatisticsRAM = 1,                /**< RAM load in percents. */
+        StatisticsHDD = 2,                /**< HDD load in percents. */
+        StatisticsNETWORK = 3             /**< Network load in percent. */
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StatisticsDeviceType)
+
+
     enum CameraStatusFlag {
         CSF_NoFlags = 0x0,
         CSF_HasIssuesFlag = 0x1
@@ -625,7 +634,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
-        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
+        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType), 
     (metatype)(lexical)

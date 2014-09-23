@@ -261,7 +261,10 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     printInLogNetResources(resources);
 
     if (resources.isEmpty())
+    {
+        resources << extraResources;
         return true;
+    }
 
 
 

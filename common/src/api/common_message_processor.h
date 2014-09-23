@@ -90,6 +90,7 @@ private slots:
     void on_resourceRemoved(const QUuid& resourceId );
 
     void on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory);
+    void on_cameraHistoryRemoved(const QnCameraHistoryItemPtr &cameraHistory);
 
     void on_businessEventRemoved(const QUuid &id);
     void on_businessActionBroadcasted(const QnAbstractBusinessActionPtr &businessAction);

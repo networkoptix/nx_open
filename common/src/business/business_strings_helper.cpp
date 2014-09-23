@@ -431,7 +431,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res);
     if (history) {
-        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, true, false);
+        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, false);
         if (newServer)
             mserverRes = newServer;
     }

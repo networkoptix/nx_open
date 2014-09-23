@@ -7,6 +7,7 @@
 #include "common/common_module.h"
 #include "database/db_manager.h"
 #include "transaction.h"
+#include "utils/common/log.h"
 #include "utils/common/synctime.h"
 #include "utils/common/model_functions.h"
 #include "nx_ec/data/api_discovery_data.h"
@@ -186,8 +187,8 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QU
         return ErrorCode::ok; // local transactions just changes DB without logging
 
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-    qDebug() << "add transaction to log " << tran.peerID << "command=" << ApiCommand::toString(tran.command) 
-        << "db seq=" << tran.persistentInfo.sequence << "timestamp=" << tran.persistentInfo.timestamp;
+    NX_LOG( lit("add transaction to log %1 command=%2 db seq=%3 timestamp=%4").arg(tran.peerID.toString()).arg(ApiCommand::toString(tran.command)).
+        arg(tran.persistentInfo.sequence).arg(tran.persistentInfo.timestamp), cl_logDEBUG1 );
 #endif
 
     Q_ASSERT_X(!tran.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
