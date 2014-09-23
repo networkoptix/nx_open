@@ -23,6 +23,7 @@ public:
 
     QnZipExtractor(const QString &fileName, const QDir &targetDir);
     QnZipExtractor(QIODevice *ioDevice, const QDir &targetDir);
+    ~QnZipExtractor();
 
     static QString errorToString(Error error);
 
