@@ -14,6 +14,7 @@
 #include <media_server/serverutil.h>
 #include <utils/common/log.h>
 #include <utils/update/update_utils.h>
+#include <utils/update/zip_utils.h>
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
 #include <media_server/serverutil.h>
@@ -79,54 +80,44 @@ namespace {
 } // anonymous namespace
 
 QnServerUpdateTool::QnServerUpdateTool() :
-    m_length(-1),
-    m_replyTime(0)
+    m_mutex(QMutex::Recursive),
+    m_length(-1)
 {}
 
 QnServerUpdateTool::~QnServerUpdateTool() {}
 
-bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDevice) {
-    QuaZip zip(ioDevice);
-    if (!zip.open(QuaZip::mdUnzip)) {
-        NX_LOG("Could not open update package.", cl_logWARNING);
-        return false;
+bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync) {
+    m_zipExtractor.reset(new QnZipExtractor(ioDevice, getUpdateDir(updateId).absolutePath()));
+
+    if (sync) {
+        m_zipExtractor->extractZip();
+        bool ok = m_zipExtractor->error() == QnZipExtractor::Ok;
+        if (ok) {
+            NX_LOG(lit("Update package has been extracted to %1").arg(getUpdateDir(m_updateId).path()), cl_logINFO);
+        } else {
+            NX_LOG(lit("Could not extract update package. Error message: %1").arg(QnZipExtractor::errorToString(static_cast<QnZipExtractor::Error>(m_zipExtractor->error()))), cl_logWARNING);
+        }
+        m_zipExtractor.reset();
+        return ok;
+    } else {
+        connect(m_zipExtractor.data(), &QnZipExtractor::finished, this, &QnServerUpdateTool::at_zipExtractor_extractionFinished);
+        m_zipExtractor->start();
     }
-
-    QDir updateDir = getUpdateDir(updateId);
-
-    bool ok = extractZipArchive(&zip, updateDir);
-
-    zip.close();
-
-    if (ok)
-    {
-        NX_LOG(lit("Update package has been extracted to %1").arg(updateDir.path()), cl_logINFO);
-    }
-    else
-    {
-        NX_LOG(lit("Could not extract update package to %1").arg(updateDir.path()), cl_logWARNING);
-    }
-
-    return ok;
+    return true;
 }
 
 void QnServerUpdateTool::sendReply(int code) {
-    if (code == 0) {
-        qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-        if (currentTime - m_replyTime < replyDelay)
-            return;
-
-        m_replyTime = currentTime;
-    }
-
     connection2()->getUpdatesManager()->sendUpdateUploadResponce(m_updateId, qnCommon->moduleGUID(), code == 0 ? m_chunks.size() : code,
                                                                  this, [this](int, ec2::ErrorCode) {});
 }
 
 bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray &data) {
+    if (m_zipExtractor)
+        m_zipExtractor->stop();
+
     clearUpdatesLocation();
     QBuffer buffer(const_cast<QByteArray*>(&data)); // we're goint to read data, so const_cast is ok here
-    return processUpdate(updateId, &buffer);
+    return processUpdate(updateId, &buffer, true);
 }
 
 void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset) {
@@ -136,6 +127,10 @@ void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
     if (m_updateId != updateId) {
         m_chunks.clear();
         m_file.reset();
+        if (m_zipExtractor) {
+            m_zipExtractor->stop();
+            m_zipExtractor.reset();
+        }
         clearUpdatesLocation();
         m_updateId = updateId;
     }
@@ -164,10 +159,7 @@ void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
 
     if (isComplete()) {
         m_file->close();
-
-        bool ok = processUpdate(updateId, m_file.data());
-
-        sendReply(ok ? ec2::AbstractUpdatesManager::Finished : ec2::AbstractUpdatesManager::Failed);
+        processUpdate(updateId, m_file.data());
     }
 }
 
@@ -273,12 +265,20 @@ void QnServerUpdateTool::clearUpdatesLocation() {
     getUpdatesDir().removeRecursively();
 }
 
-void QnServerUpdateTool::at_uploadFinished() {
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    if (!reply)
+void QnServerUpdateTool::at_zipExtractor_extractionFinished(int error) {
+    QnZipExtractor *zipExtractor = qobject_cast<QnZipExtractor*>(sender());
+    if (!zipExtractor)
         return;
 
-    reply->deleteLater();
+    zipExtractor->deleteLater();
 
-    // TODO: #dklychkov error handling
+    bool ok = (error == QnZipExtractor::Ok);
+
+    if (ok) {
+        NX_LOG(lit("Update package has been extracted to %1").arg(zipExtractor->dir().absolutePath()), cl_logINFO);
+    } else {
+        NX_LOG(lit("Could not extract update package. Error message: %1").arg(QnZipExtractor::errorToString(static_cast<QnZipExtractor::Error>(error))), cl_logWARNING);
+    }
+
+    sendReply(ok ? ec2::AbstractUpdatesManager::Finished : ec2::AbstractUpdatesManager::Failed);
 }

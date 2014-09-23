@@ -4,10 +4,12 @@
 #include <QtCore/QTimer>
 
 #include <api/app_server_connection.h>
+#include <nx_ec/dummy_handler.h>
+#include <nx_ec/ec_api.h>
 
 namespace {
     const int chunkSize = 1024 * 1024;
-    const int chunkDelay = 10; // short delay between sendUpdateChunk commands
+    const int chunkTimeout = 5 * 60 * 1000;
 
     ec2::AbstractECConnectionPtr connection2() {
         return QnAppServerConnectionFactory::getConnection2();
@@ -16,8 +18,12 @@ namespace {
 
 QnUpdateUploader::QnUpdateUploader(QObject *parent) :
     QObject(parent),
-    m_chunkSize(chunkSize)
+    m_chunkSize(chunkSize),
+    m_chunkTimer(new QTimer(this))
 {
+    m_chunkTimer->setInterval(chunkTimeout);
+    m_chunkTimer->setSingleShot(true);
+    connect(m_chunkTimer, &QTimer::timeout, this, &QnUpdateUploader::at_chunkTimer_timeout);
 }
 
 QString QnUpdateUploader::updateId() const {
@@ -45,6 +51,7 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
     m_updateId = updateId;
     m_peers = peers;
     m_chunkCount = (m_updateFile->size() + m_chunkSize - 1) / m_chunkSize;
+    m_finalized = false;
 
     m_progressById.clear();
     foreach (const QUuid &peerId, peers)
@@ -62,31 +69,12 @@ void QnUpdateUploader::sendNextChunk() {
     qint64 offset = m_updateFile->pos();
     QByteArray data = m_updateFile->read(m_chunkSize);
 
-    connection2()->getUpdatesManager()->sendUpdatePackageChunk(m_updateId, data, offset, m_peers,
-                                                               this, &QnUpdateUploader::chunkUploaded);
+    m_pendingPeers = m_peers;
+    m_finalized = data.isEmpty();
 
-    if (data.size() > 0 && m_updateFile->atEnd()) {
-        // send tailing request just after the last chunk
+    connection2()->getUpdatesManager()->sendUpdatePackageChunk(m_updateId, data, offset, m_peers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
-        connection2()->getUpdatesManager()->sendUpdatePackageChunk(m_updateId, QByteArray(), m_updateFile->size(), m_peers,
-                                                                   this, &QnUpdateUploader::chunkUploaded);
-    }
-}
-
-void QnUpdateUploader::chunkUploaded(int reqId, ec2::ErrorCode errorCode) {
-    Q_UNUSED(reqId)
-
-    if (m_updateFile.isNull())
-        return;
-
-    if (errorCode != ec2::ErrorCode::ok) {
-        cleanUp();
-        emit failed();
-        return;
-    }
-
-    if (!m_updateFile->atEnd())
-        QTimer::singleShot(chunkDelay, this, SLOT(sendNextChunk()));
+    m_chunkTimer->start();
 }
 
 void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &updateId, const QUuid &peerId, int chunks) {
@@ -127,10 +115,22 @@ void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &upda
         cleanUp();
         emit finished();
     }
+
+    m_pendingPeers.remove(peerId);
+    if (m_pendingPeers.isEmpty() && !m_finalized) {
+        m_chunkTimer->stop();
+        sendNextChunk();
+    }
+}
+
+void QnUpdateUploader::at_chunkTimer_timeout() {
+    cleanUp();
+    emit failed();
 }
 
 void QnUpdateUploader::cleanUp() {
     m_updateFile.reset();
     m_updateId.clear();
+    m_chunkTimer->stop();
     connection2()->getUpdatesManager()->disconnect(this);
 }

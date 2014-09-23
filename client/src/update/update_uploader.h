@@ -4,10 +4,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
-#include <nx_ec/ec_api.h>
-#include <utils/common/id.h>
-
 class QFile;
+class QTimer;
 
 class QnUpdateUploader : public QObject {
     Q_OBJECT
@@ -31,9 +29,9 @@ signals:
 private slots:
     void sendNextChunk();
     void at_updateManager_updateUploadProgress(const QString &updateId, const QUuid &peerId, int chunks);
+    void at_chunkTimer_timeout();
 
 private:
-    void chunkUploaded(int reqId, ec2::ErrorCode errorCode);
     void cleanUp();
 
 private:
@@ -42,8 +40,11 @@ private:
     QScopedPointer<QFile> m_updateFile;
     int m_chunkSize;
     int m_chunkCount;
+    bool m_finalized;
+    QSet<QUuid> m_pendingPeers;
 
     QHash<QUuid, int> m_progressById;
+    QTimer *m_chunkTimer;
 };
 
 #endif // UPDATE_UPLOADER_H
