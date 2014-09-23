@@ -67,9 +67,6 @@ private:
 
     void finishUpdate(const QnUpdateResult &result);
     
-private slots:
-    void updateTargets();
-
 private:
     QnFullUpdateStage m_stage;
     
