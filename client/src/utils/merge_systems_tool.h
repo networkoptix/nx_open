@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-class QnModuleInformation;
+struct QnModuleInformation;
 
 class QnMergeSystemsTool : public QObject {
     Q_OBJECT

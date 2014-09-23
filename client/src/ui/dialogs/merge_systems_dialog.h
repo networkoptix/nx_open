@@ -10,7 +10,7 @@ namespace Ui {
 }
 
 class QnMergeSystemsTool;
-class QnModuleInformation;
+struct QnModuleInformation;
 
 class QnMergeSystemsDialog : public QDialog {
     Q_OBJECT
