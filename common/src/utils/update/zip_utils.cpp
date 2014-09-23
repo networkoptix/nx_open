@@ -49,15 +49,17 @@ QDir QnZipExtractor::dir() const {
 }
 
 void QnZipExtractor::run() {
-    if (!m_dir.exists()) {
-        finish(WrongDir);
-        return;
-    }
+    Error error = extractZip();
+    m_lastError = error;
+    emit finished(error);
+}
 
-    if (!m_zip->open(QuaZip::mdUnzip)) {
-        finish(BrokenZip);
-        return;
-    }
+QnZipExtractor::Error QnZipExtractor::extractZip() {
+    if (!m_dir.exists())
+        return WrongDir;
+
+    if (!m_zip->open(QuaZip::mdUnzip))
+        return BrokenZip;
 
     QuaZipFile file(m_zip);
     for (bool more = m_zip->goToFirstFile(); more && !m_needStop; more = m_zip->goToNextFile()) {
@@ -67,30 +69,23 @@ void QnZipExtractor::run() {
         QFileInfo fileInfo(info.name);
         QString path = fileInfo.path();
 
-        if (!path.isEmpty() && !m_dir.exists(path) && !m_dir.mkpath(path)) {
-            finish(OtherError);
-            return;
-        }
+        if (!path.isEmpty() && !m_dir.exists(path) && !m_dir.mkpath(path))
+            return OtherError;
 
         if (!info.name.endsWith(lit("/"))) {
             QFile destFile(m_dir.absoluteFilePath(info.name));
-            if (!destFile.open(QFile::WriteOnly)) {
-                finish(CantOpenFile);
-                return;
-            }
+            if (!destFile.open(QFile::WriteOnly))
+                return CantOpenFile;
 
-            if (!file.open(QuaZipFile::ReadOnly)) {
-                finish(BrokenZip);
-                return;
-            }
+            if (!file.open(QuaZipFile::ReadOnly))
+                return BrokenZip;
 
             QByteArray buf(readBufferSize, 0);
             while (file.bytesAvailable() && !m_needStop) {
                 qint64 read = file.read(buf.data(), readBufferSize);
                 if (read != destFile.write(buf.data(), read)) {
                     file.close();
-                    finish(NoFreeSpace);
-                    return;
+                    return NoFreeSpace;
                 }
             }
             destFile.close();
@@ -100,15 +95,8 @@ void QnZipExtractor::run() {
         }
     }
 
-    if (m_needStop) {
-        finish(Stopped);
-        return;
-    }
+    if (m_needStop)
+        return Stopped;
 
-    finish(m_zip->getZipError() == UNZ_OK ? Ok : BrokenZip);
-}
-
-void QnZipExtractor::finish(QnZipExtractor::Error error) {
-    m_lastError = error;
-    emit finished(error);
+    return m_zip->getZipError() == UNZ_OK ? Ok : BrokenZip;
 }

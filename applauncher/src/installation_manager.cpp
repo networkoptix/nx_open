@@ -10,7 +10,7 @@
 #include <QtCore/QRegExp>
 
 #include <utils/common/log.h>
-#include <utils/update/update_utils.h>
+#include <utils/update/zip_utils.h>
 
 #include <utils/common/app_info.h>
 
@@ -278,7 +278,8 @@ bool InstallationManager::installZip(const QnSoftwareVersion &version, const QSt
     if (!QDir().mkdir(targetDir.absolutePath()))
         return false;
 
-    if (!extractZipArchive(fileName, targetDir))
+    QnZipExtractor extractor(fileName, targetDir);
+    if (extractor.extractZip() != QnZipExtractor::Ok)
         return false;
 
     installation = QnClientInstallation::installationForPath(targetDir.absolutePath());

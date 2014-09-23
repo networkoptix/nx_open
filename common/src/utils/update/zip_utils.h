@@ -29,14 +29,13 @@ public:
     Error error() const;
     QDir dir() const;
 
+    Error extractZip();
+
 signals:
     void finished(int error);
 
 protected:
     virtual void run() override;
-
-private:
-    void finish(Error error);
 
 private:
     QDir m_dir;

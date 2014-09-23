@@ -88,10 +88,9 @@ QnServerUpdateTool::~QnServerUpdateTool() {}
 
 bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync) {
     m_zipExtractor.reset(new QnZipExtractor(ioDevice, getUpdateDir(updateId).absolutePath()));
-    m_zipExtractor->start();
 
     if (sync) {
-        m_zipExtractor->wait();
+        m_zipExtractor->extractZip();
         bool ok = m_zipExtractor->error() == QnZipExtractor::Ok;
         if (ok) {
             NX_LOG(lit("Update package has been extracted to %1").arg(getUpdateDir(m_updateId).path()), cl_logINFO);
@@ -102,6 +101,7 @@ bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDev
         return ok;
     } else {
         connect(m_zipExtractor.data(), &QnZipExtractor::finished, this, &QnServerUpdateTool::at_zipExtractor_extractionFinished);
+        m_zipExtractor->start();
     }
     return true;
 }
