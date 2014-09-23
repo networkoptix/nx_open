@@ -9,6 +9,7 @@
 
 namespace {
     const int chunkSize = 1024 * 1024;
+    const int chunkTimeout = 5 * 60 * 1000;
 
     ec2::AbstractECConnectionPtr connection2() {
         return QnAppServerConnectionFactory::getConnection2();
@@ -17,8 +18,12 @@ namespace {
 
 QnUpdateUploader::QnUpdateUploader(QObject *parent) :
     QObject(parent),
-    m_chunkSize(chunkSize)
+    m_chunkSize(chunkSize),
+    m_chunkTimer(new QTimer(this))
 {
+    m_chunkTimer->setInterval(chunkTimeout);
+    m_chunkTimer->setSingleShot(true);
+    connect(m_chunkTimer, &QTimer::timeout, this, &QnUpdateUploader::at_chunkTimer_timeout);
 }
 
 QString QnUpdateUploader::updateId() const {
@@ -65,10 +70,11 @@ void QnUpdateUploader::sendNextChunk() {
     QByteArray data = m_updateFile->read(m_chunkSize);
 
     m_pendingPeers = m_peers;
+    m_finalized = data.isEmpty();
 
     connection2()->getUpdatesManager()->sendUpdatePackageChunk(m_updateId, data, offset, m_peers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
-    m_finalized = data.isEmpty();
+    m_chunkTimer->start();
 }
 
 void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &updateId, const QUuid &peerId, int chunks) {
@@ -111,12 +117,20 @@ void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &upda
     }
 
     m_pendingPeers.remove(peerId);
-    if (m_pendingPeers.isEmpty() && !m_finalized)
+    if (m_pendingPeers.isEmpty() && !m_finalized) {
+        m_chunkTimer->stop();
         sendNextChunk();
+    }
+}
+
+void QnUpdateUploader::at_chunkTimer_timeout() {
+    cleanUp();
+    emit failed();
 }
 
 void QnUpdateUploader::cleanUp() {
     m_updateFile.reset();
     m_updateId.clear();
+    m_chunkTimer->stop();
     connection2()->getUpdatesManager()->disconnect(this);
 }

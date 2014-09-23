@@ -5,6 +5,7 @@
 #include <QtCore/QSet>
 
 class QFile;
+class QTimer;
 
 class QnUpdateUploader : public QObject {
     Q_OBJECT
@@ -28,6 +29,7 @@ signals:
 private slots:
     void sendNextChunk();
     void at_updateManager_updateUploadProgress(const QString &updateId, const QUuid &peerId, int chunks);
+    void at_chunkTimer_timeout();
 
 private:
     void cleanUp();
@@ -42,6 +44,7 @@ private:
     QSet<QUuid> m_pendingPeers;
 
     QHash<QUuid, int> m_progressById;
+    QTimer *m_chunkTimer;
 };
 
 #endif // UPDATE_UPLOADER_H
