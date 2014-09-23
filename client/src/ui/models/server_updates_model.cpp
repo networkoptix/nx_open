@@ -88,11 +88,14 @@ QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObjec
     connect(qnResPool,  &QnResourcePool::statusChanged,     this,   &QnServerUpdatesModel::at_resourceChanged);
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged,  this, &QnServerUpdatesModel::updateVersionColumn);
 
-    setTargets(m_updateTool->actualTargetIds());
+    setTargets(QSet<QUuid>());
 }
 
 void QnServerUpdatesModel::setTargets(const QSet<QUuid> &targets) {
-    m_targets = targets;
+    if (targets.isEmpty())
+        m_targets = m_updateTool->actualTargetIds();
+    else
+        m_targets = targets;
     resetResourses();
 }
 
