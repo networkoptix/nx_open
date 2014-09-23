@@ -29,9 +29,8 @@ void QnPerformanceTest::detectLightMode() {
 
 #ifdef Q_OS_LINUX
     QString cpuName = QnPerformance::cpuName();
-    QRegExp atomCpuRegExp(lit("Intel\\(R\\) Atom\\(TM\\) CPU .*"));
-    if (atomCpuRegExp.exactMatch(cpuName))
-        poorCpu = true;
+    QRegExp poorCpuRegExp(lit("Intel\\(R\\) (Atom\\(TM\\)|Celeron\\(R\\)) CPU .*"));
+    poorCpu = poorCpuRegExp.exactMatch(cpuName);
 
     // Create OpenGL context and check GL_RENDERER
     if (Display *display = QX11Info::display()) {
@@ -41,9 +40,8 @@ void QnPerformanceTest::detectLightMode() {
                 glXMakeCurrent(display, DefaultRootWindow(display), context);
 
                 QString renderer = QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)));
-                QRegExp slowRendererRegExp(lit("Gallium .* on llvmpipe .*"));
-                if (slowRendererRegExp.exactMatch(renderer))
-                    poorGpu = true;
+                QRegExp poorRendererRegExp(lit("Gallium .* on llvmpipe .*|Mesa DRI Intel\\(R\\) Bay Trail"));
+                poorGpu = poorRendererRegExp.exactMatch(renderer);
 
                 glXDestroyContext(display, context);
             }
