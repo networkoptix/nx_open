@@ -491,9 +491,8 @@
 				<toolchain.version>codesourcery-2013.11</toolchain.version>
 				<compiler>2011.09</compiler>
 				<openssl.version>1.0.0j-SNAPSHOT</openssl.version>
-				<additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines>
-				<!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines> -->
-                <modification>isd</modification>
+				<additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
+				<modification>isd</modification>
 			</properties>
 			<modules>
 				<module>plugins/isd_native_plugin</module>
@@ -519,8 +518,8 @@
 				<toolchain.version>linaro-multilib-2013.09</toolchain.version>
 				<compiler>${toolchain.version}</compiler>
 				<openssl.version>1.0.1f-SNAPSHOT</openssl.version>
-				<additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines>
-                <modification>isd_s2</modification>
+				<additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
+				<modification>isd_s2</modification>
 			</properties>
 			<modules>
 				<module>plugins/isd_native_plugin</module>
