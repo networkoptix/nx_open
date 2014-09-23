@@ -10,7 +10,7 @@
 #include <client/client_message_processor.h>
 
 namespace {
-    const int checkTimeout = 10 * 60 * 1000;
+    const int checkTimeout = 15 * 60 * 1000;
     const int shortTimeout = 60 * 1000;
 
     ec2::AbstractECConnectionPtr connection2() {
