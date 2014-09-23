@@ -175,24 +175,14 @@ void QnServerUpdatesModel::resetResourses() {
 
     m_items.clear();
 
-    if (m_targets.isEmpty()) {
-        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::server)) {
-            QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-            if (existingItems.contains(server))
-                m_items.append(existingItems.take(server));
-            else
-                m_items.append(new Item(server));
-        }
-    } else {
-        foreach (const QUuid &id, m_targets) {
-            QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
-            if (!server)
-                continue;
-            if (existingItems.contains(server))
-                m_items.append(existingItems.take(server));
-            else
-                m_items.append(new Item(server));
-        }
+    foreach (const QUuid &id, m_targets) {
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+        if (existingItems.contains(server))
+            m_items.append(existingItems.take(server));
+        else
+            m_items.append(new Item(server));
     }
     qDeleteAll(existingItems.values());
 
