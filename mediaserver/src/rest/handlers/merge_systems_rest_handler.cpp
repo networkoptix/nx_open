@@ -35,7 +35,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
 
     QUrl url = params.value(lit("url"));
     QString password = params.value(lit("password"));
-    bool takeRemoteSettings = params.value(lit("takeRemoteSettings")) == lit("true");
+    bool takeRemoteSettings = params.value(lit("takeRemoteSettings"), lit("false")) != lit("false");
 
     if (url.isEmpty()) {
         result.setError(QnJsonRestResult::MissingParameter);

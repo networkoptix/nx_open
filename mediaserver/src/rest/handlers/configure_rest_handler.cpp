@@ -28,7 +28,7 @@ namespace {
 int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
     Q_UNUSED(path)
 
-    bool wholeSystem = params.value(lit("wholeSystem"), lit("false")) == lit("true");
+    bool wholeSystem = params.value(lit("wholeSystem"), lit("false")) != lit("false");
     QString systemName = params.value(lit("systemName"));
     QString password = params.value(lit("password"));
     QString oldPassword = params.value(lit("oldPassword"));
