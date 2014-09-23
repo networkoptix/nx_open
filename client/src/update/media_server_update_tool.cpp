@@ -53,6 +53,7 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
         emit targetsChanged(actualTargetIds());
     };
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   targetsWatcher);
+    connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   targetsWatcher);
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   targetsWatcher);
 }
 
