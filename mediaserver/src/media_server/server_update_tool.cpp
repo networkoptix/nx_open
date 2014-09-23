@@ -81,8 +81,7 @@ namespace {
 
 QnServerUpdateTool::QnServerUpdateTool() :
     m_mutex(QMutex::Recursive),
-    m_length(-1),
-    m_replyTime(0)
+    m_length(-1)
 {}
 
 QnServerUpdateTool::~QnServerUpdateTool() {}
@@ -108,14 +107,6 @@ bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDev
 }
 
 void QnServerUpdateTool::sendReply(int code) {
-    if (code == 0) {
-        qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-        if (currentTime - m_replyTime < replyDelay)
-            return;
-
-        m_replyTime = currentTime;
-    }
-
     connection2()->getUpdatesManager()->sendUpdateUploadResponce(m_updateId, qnCommon->moduleGUID(), code == 0 ? m_chunks.size() : code,
                                                                  this, [this](int, ec2::ErrorCode) {});
 }
