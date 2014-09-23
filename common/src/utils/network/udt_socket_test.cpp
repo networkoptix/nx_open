@@ -158,6 +158,9 @@ private:
         Connection() {
             buffer.reserve(1024);
         }
+        ~Connection() {
+            delete socket;
+        }
     };
     void OnAccept( SystemError::ErrorCode error_code , AbstractStreamSocket* new_conn ) {
         if( !error_code ) {
@@ -172,9 +175,7 @@ private:
                 std::placeholders::_2,
                 conn.get()))) {
                     ++broken_or_error_conn_;
-                    --current_conn_size_;
                     new_conn->close();
-                    delete new_conn;
             } else {
                 ++current_conn_size_;
                 conn.release();
@@ -190,10 +191,10 @@ private:
     void OnRead( SystemError::ErrorCode error_code , std::size_t bytes_transferred , Connection* ptr ) {
         std::unique_ptr<Connection> conn(ptr);
         if(error_code) {
-            ++broken_or_error_conn_;
             conn->socket->cancelAsyncIO( aio::EventType::etRead );
             conn->socket->close();
             --current_conn_size_;
+            ++broken_or_error_conn_;
         } else {
             if( bytes_transferred == 0 ) {
                 ++closed_conn_;
@@ -285,6 +286,7 @@ public:
         maximum_allowed_content_(config.content_max_size),
         minimum_allowed_content_(config.content_min_size),
         maximum_allowed_concurrent_connection_(config.maximum_connection_size),
+        connected_socket_size_(0),
         active_conn_sockets_size_(0),
         failed_connection_size_(0),
         closed_conn_socket_size_(0),
@@ -318,7 +320,10 @@ private:
     void OnConnect( SystemError::ErrorCode error_code , Connection* ptr ) {
         std::unique_ptr<Connection> conn(ptr);
         if(!error_code) {
+            ++connected_socket_size_;
             sleep_list_.Enqueue( conn.release() );
+        } else {
+            --active_conn_sockets_size_;
         }
     }
     void OnWrite( SystemError::ErrorCode error_code , std::size_t bytes_transferred , Connection* ptr ) {
@@ -327,6 +332,8 @@ private:
             conn->socket->cancelAsyncIO(aio::EventType::etWrite);
             conn->socket->close();
             failed_connection_size_++;
+            --connected_socket_size_;
+            --active_conn_sockets_size_;
         } else {
             Q_ASSERT( bytes_transferred == conn->buffer.size() );
             sleep_list_.Enqueue( conn.release() );
@@ -336,7 +343,7 @@ private:
 
     void PrintStatistic() {
         std::cout<<"====================================================\n";
-        std::cout<<"Active connection:"<<active_conn_sockets_size_<<"\n";
+        std::cout<<"Active connection:"<<connected_socket_size_<<"\n";
         std::cout<<"Closed connection:"<<closed_conn_socket_size_<<"\n";
         std::cout<<"Failed connection:"<<failed_connection_size_<<"\n";
         std::cout<<"===================================================="<<std::endl;
@@ -371,6 +378,7 @@ private:
         } else if( random_.Roll(disconnect_rate_) ) {
             conn->socket->cancelAsyncIO(aio::EventType::etWrite);
             conn->socket->close();
+            --connected_socket_size_;
             --active_conn_sockets_size_;
             ++closed_conn_socket_size_;
             return true;
@@ -405,6 +413,7 @@ private:
     int maximum_allowed_content_;
     int minimum_allowed_content_;
     int maximum_allowed_concurrent_connection_;
+    int connected_socket_size_;
     int active_conn_sockets_size_;
     int failed_connection_size_;
     int closed_conn_socket_size_;

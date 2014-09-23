@@ -428,6 +428,13 @@ int UdtSocketImpl::Recv( void* buffer, unsigned int bufferLen, int flags ) {
         int error_code = UDT::getlasterror().getErrorCode();
         if( error_code == CUDTException::ECONNLOST ) {
             return 0;
+        } else if( error_code == CUDTException::EINVSOCK ) {
+            // This is another very ugly hack since after our patch for UDT.
+            // UDT cannot distinguish a clean close or a crash. And I cannot
+            // come up with perfect way to patch the code and make it work.
+            // So we just hack here. When we encounter an error Invalid socket,
+            // it should be a clean close when we use a epoll.
+            return 0;
         } else {
             DEBUG_(TRACE_("UDT::recv",handler_));
         }
@@ -925,6 +932,8 @@ private:
         }
     }
     void ReclaimSocket();
+    // Right now UDT can give socket that is not supposed to be watched 
+    void RemovePhantomSocket( std::set<UDTSOCKET>* set );
 private:
     std::set<UDTSOCKET> udt_read_set_;
     std::set<UDTSOCKET> udt_write_set_;
@@ -937,6 +946,18 @@ private:
     std::list<socket_iterator> reclaim_list_;
     friend class UdtPollSetConstIteratorImpl;
 };
+
+void UdtPollSetImpl::RemovePhantomSocket( std::set<UDTSOCKET>* set ) {
+    std::set<UDTSOCKET>::iterator ib = set->begin();
+    while( ib != set->end() ) {
+        std::map<UDTSOCKET,SocketUserData>::iterator ifind = socket_user_data_.find(*ib);
+        if( ifind == socket_user_data_.end() ) {
+            ib = set->erase(ib);
+        } else {
+            ++ib;
+        }
+    }
+}
 
 void UdtPollSetImpl::RemoveFromEpoll( UDTSOCKET udt_handler , int event_type ) {
     // UDT will remove all the related event type related to a certain UDT handler, so if a udt
@@ -1072,6 +1093,9 @@ int UdtPollSetImpl::Poll( int milliseconds ) {
             interrupt_socket_.recv(buffer,kInterruptionBufferLength,0);
             --ret;
         }
+        // Remove the phantom sockets
+        RemovePhantomSocket(&udt_read_set_);
+        RemovePhantomSocket(&udt_write_set_);
         return ret;
     }
 }
