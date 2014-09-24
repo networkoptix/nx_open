@@ -170,6 +170,10 @@ QString QnMediaResource::rtpTransportKey() {
     return lit("rtpTransport");
 }
 
+QString QnMediaResource::dynamicVideoLayoutKey() {
+    return lit("dynamicVideoLayout");
+}
+
 QString QnMediaResource::motionStreamKey() {
     return lit("motionStream");
 }

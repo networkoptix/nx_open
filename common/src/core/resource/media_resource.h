@@ -59,6 +59,7 @@ public:
     static QString dontRecordPrimaryStreamKey();
     static QString dontRecordSecondaryStreamKey();
     static QString rtpTransportKey();
+    static QString dynamicVideoLayoutKey();
     static QString motionStreamKey();
 protected:
     void initMediaResource();

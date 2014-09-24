@@ -731,25 +731,3 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
 
     return result;
 }
-
-QnConstResourceVideoLayoutPtr QnSecurityCamResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
-{
-    if (dataProvider) {
-        QnConstResourceVideoLayoutPtr providerLayout = dataProvider->getVideoLayout();
-        if (providerLayout)
-            return providerLayout;
-    }
-
-    QnSecurityCamResourcePtr camRes = toSharedPointer().dynamicCast<QnSecurityCamResource>();
-    QnResourceData data = qnCommon->dataPool()->data(camRes);
-    QString strVal = data.value<QString>(lit("videoLayout")); // new holder for video layout
-    if (strVal.isEmpty())
-    {
-        return QnMediaResource::getVideoLayout(dataProvider);
-    }
-    else {
-        if (!m_customVideoLayout)
-            m_customVideoLayout = QnCustomResourceVideoLayout::fromString(strVal);
-        return m_customVideoLayout;
-    }
-}

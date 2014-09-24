@@ -196,7 +196,6 @@ public:
     // in some cases I just want to update couple of field from just discovered resource
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source);
 
-    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const;
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();

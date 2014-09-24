@@ -22,6 +22,7 @@
 #include "aac_rtp_parser.h"
 #include "simpleaudio_rtp_parser.h"
 #include "mjpeg_rtp_parser.h"
+#include "api/app_server_connection.h"
 
 
 static const int RTSP_RETRY_COUNT = 6;
@@ -523,10 +524,23 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         QMutexLocker lock(&m_layoutMutex);
         m_customVideoLayout.clear();
         m_gotKeyData.resize(m_numberOfVideoChannels);
+        QString newVideoLayout;
         if (m_numberOfVideoChannels > 1) {
             m_customVideoLayout = QnCustomResourceVideoLayoutPtr(new QnCustomResourceVideoLayout(QSize(m_numberOfVideoChannels, 1)));
             for (int i = 0; i < m_numberOfVideoChannels; ++i)
                 m_customVideoLayout->setChannel(i, 0, i); // arrange multi video layout from left to right
+            newVideoLayout = m_customVideoLayout->toString();
+        }
+
+        QnVirtualCameraResourcePtr camRes = m_resource.dynamicCast<QnVirtualCameraResource>();
+        if (camRes && m_role == Qn::CR_LiveVideo) {
+            QVariant val;
+            camRes->getParam(lit("VideoLayout"), val, QnDomainMemory);
+            QString oldVideoLayout = val.toString();
+            if (newVideoLayout != oldVideoLayout) {
+                camRes->setParam(lit("VideoLayout"), newVideoLayout, QnDomainDatabase);
+                camRes->saveParams();
+            }
         }
     }
     
