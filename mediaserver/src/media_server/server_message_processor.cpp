@@ -170,11 +170,11 @@ void QnServerMessageProcessor::at_systemNameChangeRequested(const QString &syste
     if (!server) {
         NX_LOG("Cannot find self server resource!", cl_logERROR);
         return;
-
-        MSSettings::roSettings()->setValue("systemName", systemName);
-        server->setSystemName(systemName);
-        m_connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
+
+    MSSettings::roSettings()->setValue("systemName", systemName);
+    server->setSystemName(systemName);
+    m_connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnServerMessageProcessor::at_remotePeerUnauthorized(const QUuid& id)
