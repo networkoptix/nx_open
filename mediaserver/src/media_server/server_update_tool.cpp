@@ -116,6 +116,7 @@ bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray
     m_zipExtractor.reset();
     clearUpdatesLocation();
     QBuffer buffer(const_cast<QByteArray*>(&data)); // we're goint to read data, so const_cast is ok here
+    buffer.open(QBuffer::ReadOnly);
     return processUpdate(updateId, &buffer, true);
 }
 
@@ -141,7 +142,7 @@ void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
     }
 
     // Closed file means we've already finished downloading. Nothing to do is left.
-    if (!m_file->isOpen())
+    if (!m_file->isOpen() || !m_file->openMode().testFlag(QFile::WriteOnly))
         return;
 
     if (data.isEmpty()) { // it means we've just got the size of the file
@@ -155,6 +156,7 @@ void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
 
     if (isComplete()) {
         m_file->close();
+        m_file->open(QFile::ReadOnly);
         processUpdate(updateId, m_file.data());
     }
 }
@@ -302,6 +304,8 @@ void QnServerUpdateTool::clearUpdatesLocation() {
 void QnServerUpdateTool::at_zipExtractor_extractionFinished(int error) {
     if (sender() != m_zipExtractor.data())
         return;
+
+    m_file->close();
 
     bool ok = (error == QnZipExtractor::Ok);
 
