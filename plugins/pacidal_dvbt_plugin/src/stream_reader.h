@@ -1,6 +1,8 @@
 #ifndef PACIDAL_STREAM_READER_H
 #define PACIDAL_STREAM_READER_H
 
+#include <atomic>
+
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
@@ -17,13 +19,15 @@ namespace pacidal
         DEF_REF_COUNTER
 
     public:
-        StreamReader( CameraManager* cameraManager, int encoderNumber );
+        StreamReader(nxpt::CommonRefManager* refManager, CameraManager* cameraManager, int encoderNumber);
         virtual ~StreamReader();
 
-        //!Implementation nxcip::StreamReader::getNextData
+        // nxcip::StreamReader
+
         virtual int getNextData( nxcip::MediaDataPacket** packet ) override;
-        //!Implementation nxcip::StreamReader::interrupt
         virtual void interrupt() override;
+
+        //
 
     private:
         CameraManager* m_cameraManager;

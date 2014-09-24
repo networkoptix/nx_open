@@ -8,11 +8,9 @@ namespace pacidal
 {
     DEFAULT_REF_COUNTER(MediaEncoder)
 
-    MediaEncoder::MediaEncoder(
-        CameraManager* const cameraManager,
-        int encoderNumber )
+    MediaEncoder::MediaEncoder(CameraManager* const cameraManager, int encoderNumber)
     :
-        m_refManager( DiscoveryManager::refManager() ),
+        m_refManager( this ),
         m_cameraManager( cameraManager ),
         m_encoderNumber( encoderNumber )
     {
@@ -24,17 +22,17 @@ namespace pacidal
 
     void* MediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
-        if( interfaceID == nxcip::IID_CameraMediaEncoder2 )
+        if (interfaceID == nxcip::IID_CameraMediaEncoder2)
         {
             addRef();
             return static_cast<nxcip::CameraMediaEncoder2*>(this);
         }
-        if( interfaceID == nxcip::IID_CameraMediaEncoder )
+        if (interfaceID == nxcip::IID_CameraMediaEncoder)
         {
             addRef();
             return static_cast<nxcip::CameraMediaEncoder*>(this);
         }
-        if( interfaceID == nxpl::IID_PluginInterface )
+        if (interfaceID == nxpl::IID_PluginInterface)
         {
             addRef();
             return static_cast<nxpl::PluginInterface*>(this);
@@ -50,7 +48,7 @@ namespace pacidal
 
     int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoListCount ) const
     {
-        m_cameraManager->resolution(m_encoderNumber, infoList[0]);
+        infoList[0] = m_resolution;
         *infoListCount = 1;
 
         return nxcip::NX_NO_ERROR;
@@ -62,13 +60,16 @@ namespace pacidal
         return nxcip::NX_NO_ERROR;
     }
 
-    int MediaEncoder::setResolution( const nxcip::Resolution& /*resolution*/ )
+    int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
     {
+        if (resolution.height != m_resolution.resolution.height || resolution.width != m_resolution.resolution.width)
+            return nxcip::NX_UNSUPPORTED_RESOLUTION;
         return nxcip::NX_NO_ERROR;
     }
 
-    int MediaEncoder::setFps( const float& /*fps*/, float* /*selectedFps*/ )
+    int MediaEncoder::setFps( const float& /*fps*/, float* selectedFps )
     {
+        *selectedFps = m_resolution.maxFps;
         return nxcip::NX_NO_ERROR;
     }
 
@@ -79,8 +80,8 @@ namespace pacidal
 
     nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
     {
-        if( !m_streamReader.get() )
-            m_streamReader.reset( new StreamReader( m_cameraManager, m_encoderNumber ) );
+        if (!m_streamReader.get())
+            m_streamReader.reset( new StreamReader( &m_refManager, m_cameraManager, m_encoderNumber ) );
 
         m_streamReader->addRef();
         return m_streamReader.get();

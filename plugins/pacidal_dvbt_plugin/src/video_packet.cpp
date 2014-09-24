@@ -39,20 +39,19 @@ namespace pacidal
     {
     }
 
-    //!Implementation of nxpl::PluginInterface::queryInterface
     void* VideoPacket::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
-        if( interfaceID == nxcip::IID_VideoDataPacket )
+        if (interfaceID == nxcip::IID_VideoDataPacket)
         {
             addRef();
             return this;
         }
-        if( interfaceID == nxcip::IID_MediaDataPacket )
+        if (interfaceID == nxcip::IID_MediaDataPacket)
         {
             addRef();
             return static_cast<nxcip::MediaDataPacket*>(this);
         }
-        if( interfaceID == nxpl::IID_PluginInterface )
+        if (interfaceID == nxpl::IID_PluginInterface)
         {
             addRef();
             return static_cast<nxpl::PluginInterface*>(this);
@@ -60,37 +59,31 @@ namespace pacidal
         return NULL;
     }
 
-    //!Implementation of nxpl::MediaDataPacket::isKeyFrame
     nxcip::UsecUTCTimestamp VideoPacket::timestamp() const
     {
         return m_time;
     }
 
-    //!Implementation of nxpl::MediaDataPacket::type
     nxcip::DataPacketType VideoPacket::type() const
     {
         return nxcip::dptVideo;
     }
 
-    //!Implementation of nxpl::MediaDataPacket::data
     const void* VideoPacket::data() const
     {
         return m_data.get();
     }
 
-    //!Implementation of nxpl::MediaDataPacket::dataSize
     unsigned int VideoPacket::dataSize() const
     {
         return m_size;
     }
 
-    //!Implementation of nxpl::MediaDataPacket::channelNumber
     unsigned int VideoPacket::channelNumber() const
     {
         return 0;
     }
 
-    //!Implementation of nxpl::MediaDataPacket::codecType
     nxcip::CompressionType VideoPacket::codecType() const
     {
         return nxcip::CODEC_ID_H264;
@@ -106,7 +99,6 @@ namespace pacidal
         return 0;
     }
 
-    //!Implementation of nxpl::VideoDataPacket::getMotionData
     nxcip::Picture* VideoPacket::getMotionData() const
     {
         return nullptr;

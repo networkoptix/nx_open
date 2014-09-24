@@ -8,35 +8,54 @@ extern "C"
 #include <libavutil/avutil.h>
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
+
+#if 0
+static int interruptFindInputFormat(void* opaque)
+{
+    static const unsigned MAX_INTERRUPTS = 1000;
+
+    unsigned * const pCounter = reinterpret_cast<unsigned * const>(opaque);
+    if( *pCounter >= MAX_INTERRUPTS)
+        return 1;
+
+    ++(*pCounter);
+    return 0;
+}
+#endif
 }
 
 namespace pacidal
 {
+    constexpr static const char * EXPECTED_IFORMAT = "mpegts";
+    static AVInputFormat * sExpectedFormat = av_find_input_format( EXPECTED_IFORMAT );
+
     //!
     class LibAV
     {
     public:
         typedef int (*FuncT)(void* opaque, uint8_t* buf, int bufSize);
 
-        LibAV(void * opaque, FuncT func, unsigned frameSize = 32*1024)
+        LibAV(void * opaque, FuncT readFunc, unsigned frameSize = 32*1024)
         :
             m_avIO(nullptr),
             m_avContext(avformat_alloc_context())
+            //m_interruptCounter(0)
         {
             m_avIO = avio_alloc_context(
-                (uint8_t*)av_malloc(frameSize), frameSize, 0, opaque, func, nullptr, nullptr);
+                (uint8_t*)av_malloc(frameSize), frameSize, 0, opaque, readFunc, nullptr, nullptr);
 
             m_avIO->seekable = 0;
             m_avContext->pb = m_avIO;
-            m_avContext->iformat = av_find_input_format("mpegts");
+            //m_avContext->interrupt_callback.callback = interruptFindInputFormat;
+            //m_avContext->interrupt_callback.opaque = &m_interruptCounter;
+            m_avContext->iformat = sExpectedFormat;
 
-            func(opaque, m_avIO->buffer, frameSize);
+            readFunc( opaque, m_avIO->buffer, frameSize );
 
-            if (avformat_open_input(&m_avContext, "x.ts", nullptr, nullptr) < 0 ||
-                avformat_find_stream_info(m_avContext, nullptr) < 0)
-            {
-                free();
-            }
+            if( avformat_open_input(&m_avContext, "", nullptr, nullptr) < 0 ) // free inside
+                return;
+
+            avformat_find_stream_info(m_avContext, nullptr);
         }
 
         ~LibAV()
@@ -74,22 +93,32 @@ namespace pacidal
             }
         }
 
-        void freePacket(AVPacket * pkt)
+        double secTimeBase(unsigned streamNum) const
+        {
+            AVStream * s = stream( streamNum );
+            if( s )
+                return av_q2d( s->time_base );
+
+            static AVRational def = { 1, 90000 };
+            return av_q2d( def );
+        }
+
+        static void freePacket(AVPacket * pkt)
         {
             if (pkt)
-            {
-                if (m_avContext->flags & AVFMT_FLAG_DISCARD_CORRUPT && pkt->flags & AV_PKT_FLAG_CORRUPT)
-                {
-                    // do nothing
-                }
-                else
-                    av_free_packet(pkt);
-            }
+                av_free_packet(pkt);
         }
+
+        bool isOK() const { return m_avContext && m_avIO; }
+        bool discardCorrupt() const { return m_avContext->flags & AVFMT_FLAG_DISCARD_CORRUPT; }
+
+        std::mutex& mutex() { return m_mutex; }
 
     private:
         AVIOContext* m_avIO;
         AVFormatContext* m_avContext;
+        std::mutex m_mutex;
+        //unsigned m_interruptCounter;
 
         void free()
         {

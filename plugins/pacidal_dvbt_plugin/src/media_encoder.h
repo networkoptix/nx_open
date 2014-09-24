@@ -11,8 +11,6 @@
 
 namespace pacidal
 {
-    class LibAV;
-
     /*!
         \note Delegates reference counting to \a AxisCameraManager instance
     */
@@ -26,28 +24,31 @@ namespace pacidal
         MediaEncoder( CameraManager* cameraManager, int encoderNumber );
         virtual ~MediaEncoder();
 
-        //!Implementation of nxcip::CameraMediaEncoder::getMediaUrl
+        // nxcip::CameraMediaEncoder
+
         virtual int getMediaUrl( char* urlBuf ) const override;
-        //!Implementation of nxcip::CameraMediaEncoder::getResolutionList
         virtual int getResolutionList( nxcip::ResolutionInfo* infoList, int* infoListCount ) const override;
-        //!Implementation of nxcip::CameraMediaEncoder::getMaxBitrate
         virtual int getMaxBitrate( int* maxBitrate ) const override;
-        //!Implementation of nxcip::CameraMediaEncoder::setResolution
         virtual int setResolution( const nxcip::Resolution& resolution ) override;
-        //!Implementation of nxcip::CameraMediaEncoder::setFps
-        virtual int setFps(const float&, float* selectedFps ) override;
-        //!Implementation of nxcip::CameraMediaEncoder::setBitrate
+        virtual int setFps( const float&, float* selectedFps ) override;
         virtual int setBitrate( int bitrateKbps, int* selectedBitrateKbps ) override;
 
-        //!Implementation of nxcip::CameraMediaEncoder2::getLiveStreamReader
+        // nxcip::CameraMediaEncoder2
+
         virtual nxcip::StreamReader* getLiveStreamReader() override;
-        //!Implementation of nxcip::CameraMediaEncoder2::getAudioFormat
         virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
+
+        //
+
+        static void fakeFree(MediaEncoder * ) {}
+
+        nxcip::ResolutionInfo& resolution() { return m_resolution; }
 
     private:
         CameraManager* m_cameraManager;
         std::unique_ptr<StreamReader> m_streamReader;
         int m_encoderNumber;
+        nxcip::ResolutionInfo m_resolution;
     };
 }
 

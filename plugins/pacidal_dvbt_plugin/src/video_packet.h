@@ -29,27 +29,21 @@ namespace pacidal
         VideoPacket(const uint8_t* data, unsigned size);
         virtual ~VideoPacket();
 
-        //!Implementation of nxpl::MediaDataPacket::isKeyFrame
-        virtual nxcip::UsecUTCTimestamp timestamp() const override;
-        //!Implementation of nxpl::MediaDataPacket::type
-        virtual nxcip::DataPacketType type() const override;
-        //!Implementation of nxpl::MediaDataPacket::data
-        virtual const void* data() const override;
-        //!Implementation of nxpl::MediaDataPacket::dataSize
-        virtual unsigned int dataSize() const override;
-        //!Implementation of nxpl::MediaDataPacket::channelNumber
-        virtual unsigned int channelNumber() const override;
-        //!Implementation of nxpl::MediaDataPacket::codecType
-        virtual nxcip::CompressionType codecType() const override;
-        //!Implementation of nxpl::MediaDataPacket::flags
-        virtual unsigned int flags() const override;
-        //!Implementation of nxpl::MediaDataPacket::cSeq
-        virtual unsigned int cSeq() const override;
+        // nxpl::MediaDataPacket
 
-        //!Implementation of nxpl::VideoDataPacket::getMotionData
+        virtual nxcip::UsecUTCTimestamp timestamp() const override;
+        virtual nxcip::DataPacketType type() const override;
+        virtual const void* data() const override;
+        virtual unsigned int dataSize() const override;
+        virtual unsigned int channelNumber() const override;
+        virtual nxcip::CompressionType codecType() const override;
+        virtual unsigned int flags() const override;
+        virtual unsigned int cSeq() const override;
         virtual nxcip::Picture* getMotionData() const override;
 
-        void setTime(unsigned ts) { m_time = ts; }
+        //
+
+        void setTime(uint64_t ts) { m_time = ts; }
         void setKeyFlag() { m_flags |= MediaDataPacket::fKeyPacket; }
         void setLowQualityFlag() { m_flags |= MediaDataPacket::fLowQuality; }
 

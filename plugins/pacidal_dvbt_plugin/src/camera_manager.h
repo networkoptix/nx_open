@@ -4,8 +4,9 @@
 #include <vector>
 #include <deque>
 #include <memory>
-#include <thread>
 #include <mutex>
+#include <thread>
+#include <atomic>
 
 #include <plugins/camera_plugin.h>
 
@@ -20,6 +21,7 @@ namespace pacidal
 
     struct LibAV;
     class DevReader;
+    class ReadThread;
 
     typedef std::shared_ptr<VideoPacket> VideoPacketPtr;
 
@@ -29,16 +31,29 @@ namespace pacidal
     public:
         typedef std::deque<VideoPacketPtr> QueueT;
 
+        VideoPacketQueue()
+        :
+            m_packetsLost( 0 ),
+            m_isLowQ( false )
+        {}
+
         void push_back(VideoPacketPtr p) { m_deque.push_back( p ); }
         void pop_front() { m_deque.pop_front(); }
+        void incLost() { ++m_packetsLost; }
 
         VideoPacketPtr front() { return m_deque.front(); }
         size_t size() const { return m_deque.size(); }
+        bool empty() const { return m_deque.empty(); }
         std::mutex& mutex() { return m_mutex; }
+
+        bool isLowQuality() const { return m_isLowQ; }
+        void setLowQuality(bool value = true) { m_isLowQ = value; }
 
     private:
         mutable std::mutex m_mutex;
         QueueT m_deque;
+        unsigned m_packetsLost;
+        bool m_isLowQ;
     };
 
     //!
@@ -51,66 +66,83 @@ namespace pacidal
     public:
         constexpr static const char* DEVICE_PATTERN = "usb-it930x";
 
-        CameraManager( const nxcip::CameraInfo& info, bool testOnly = false );
+        CameraManager(const nxcip::CameraInfo& info, bool init = true);
         virtual ~CameraManager();
 
-        //!Implementation of nxcip::BaseCameraManager::getEncoderCount
+        // nxcip::BaseCameraManager
+
         virtual int getEncoderCount( int* encoderCount ) const override;
-        //!Implementation of nxcip::BaseCameraManager::getEncoder
         virtual int getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr ) override;
-        //!Implementation of nxcip::BaseCameraManager::getCameraInfo
         virtual int getCameraInfo( nxcip::CameraInfo* info ) const override;
-        //!Implementation of nxcip::BaseCameraManager::getCameraCapabilities
         virtual int getCameraCapabilities( unsigned int* capabilitiesMask ) const override;
-        //!Implementation of nxcip::BaseCameraManager::setCredentials
         virtual void setCredentials( const char* username, const char* password ) override;
-        //!Implementation of nxcip::BaseCameraManager::setAudioEnabled
         virtual int setAudioEnabled( int audioEnabled ) override;
-        //!Implementation of nxcip::BaseCameraManager::getPTZManager
         virtual nxcip::CameraPtzManager* getPtzManager() const override;
-        //!Implementation of nxcip::BaseCameraManager::getCameraMotionDataProvider
         virtual nxcip::CameraMotionDataProvider* getCameraMotionDataProvider() const override;
-        //!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
         virtual nxcip::CameraRelayIOManager* getCameraRelayIOManager() const override;
-        //!Implementation of nxcip::BaseCameraManager::getLastErrorString
         virtual void getLastErrorString( char* errorString ) const override;
 
-        //!Implementation of nxcip::BaseCameraManager2::createDtsArchiveReader
+        // nxcip::BaseCameraManager2
+
         virtual int createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const override;
-        //!Implementation of nxcip::BaseCameraManager2::find
         virtual int find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::TimePeriods** timePeriods ) const override;
-        //!Implementation of nxcip::BaseCameraManager2::setMotionMask
         virtual int setMotionMask( nxcip::Picture* motionMask ) override;
 
+        //
+
         const nxcip::CameraInfo& info() const { return m_info; }
-        void resolution( unsigned encoderNum, nxcip::ResolutionInfo& out ) const;
         VideoPacket* nextPacket( unsigned encoderNumber );
 
         static unsigned cameraId( const nxcip::CameraInfo& info );
 
-        bool devInitialised() const { return devInited_; }
         void fillInfo(nxcip::CameraInfo& info) const;
 
-        std::shared_ptr<VideoPacketQueue> queue(unsigned num) { return m_encQueues[num]; }
+        std::shared_ptr<VideoPacketQueue> queue(unsigned num) const;
+
+        void reload();
+
+        bool hasEncoders() const { return m_hasThread; }
+
+        void setThreadObj(ReadThread * ptr)
+        {
+            m_threadObject = ptr;
+            m_hasThread = (ptr != nullptr);
+        }
+
+        DevReader * devReader() { return m_devReader.get(); }
 
     private:
-        nxcip::CameraInfo m_info;
+        mutable std::mutex m_encMutex;
+        mutable std::mutex m_reloadMutex;
+        std::vector<std::shared_ptr<MediaEncoder>> m_encoders;
+        std::vector<std::shared_ptr<VideoPacketQueue>> m_encQueues;
 
         std::unique_ptr<PacidalIt930x> m_device;
         std::unique_ptr<PacidalStream> m_devStream;
-        std::unique_ptr<LibAV> m_libAV; // pimpl
         std::unique_ptr<DevReader> m_devReader;
+        std::unique_ptr<LibAV> m_libAV;
+        ReadThread * m_threadObject;
         std::thread m_readThread;
+        std::atomic_bool m_hasThread;
+        bool m_threadJoined;
 
-        std::vector<std::shared_ptr<MediaEncoder>> m_encoders;
-        std::vector<std::shared_ptr<VideoPacketQueue>> m_encQueues;
-        const char * m_errorStr;
-        bool devInited_;
-        bool encInited_;
+        mutable const char * m_errorStr;
+        nxcip::CameraInfo m_info;
 
-        void initDevice();
+        bool initDevice(unsigned id);
+        void stopDevice();
+        bool devStats() const;
+
+        bool initDevStream();
+        void stopDevStream();
+        bool hasDevStream() const { return m_devStream.get(); }
+
+        bool initDevReader();
+        void stopDevReader();
+        bool hasDevReader() const { return m_devReader.get(); }
+
         void initEncoders();
-        void readDeviceStream();
+        void stopEncoders();
 
         std::unique_ptr<VideoPacket> nextDevPacket(unsigned& streamNum);
         void driverInfo(std::string& driverVersion, std::string& fwVersion, std::string& company, std::string& model) const;

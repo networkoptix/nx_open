@@ -104,7 +104,14 @@ namespace pacidal
                 throw "DTV_IsLocked";
         }
 
-        void statistic(bool& locked, bool& presented, uint8_t& quality, uint8_t& strength) const
+        bool isLocked() const
+        {
+            Bool locked = False;
+            unsigned result = DTV_IsLocked(handle_, &locked);
+            return !result && (locked == True);
+        }
+
+        void statistic(bool& locked, bool& presented, uint8_t& strength, uint8_t& abortCount, float& ber) const
         {
             DTVStatistic statisic;
 
@@ -114,8 +121,11 @@ namespace pacidal
 
             locked = statisic.signalLocked;
             presented = statisic.signalPresented;
-            quality = statisic.signalQuality;
             strength = statisic.signalStrength;
+            abortCount = statisic.abortCount;
+            ber = statisic.postVitErrorCount;
+            if( statisic.postVitBitCount )
+                ber /= statisic.postVitBitCount;
         }
 
         void info(char* verDriver, char* verAPI, char* verFWLink, char* verFWOFDM, char* company, char* model)
