@@ -27,6 +27,8 @@ unsigned int QnAuthMethodRestrictionList::getAllowedAuthMethods( const nx_http::
     QString path = request.requestLine.url.path();
     while (path.startsWith(lit("//")))
         path = path.mid(1);
+    while (path.endsWith(L'/'))
+        path.chop(1);
     unsigned int allowed = AuthMethod::cookie | AuthMethod::http | AuthMethod::videowall;   //by default
     for( std::pair<QString, unsigned int> allowRule: m_allowed )
     {
