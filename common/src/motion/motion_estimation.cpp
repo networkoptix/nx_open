@@ -594,7 +594,7 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
 }
 
 
-QnMotionEstimation::QnMotionEstimation()
+QnMotionEstimation::QnMotionEstimation(): m_channelNum(0)
 {
     m_decoder = 0;
     //m_outFrame.setUseExternalData(false);
@@ -1163,7 +1163,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     //rez->timestamp = m_firstFrameTime == AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_firstFrameTime;
     //rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     rez->timestamp = m_lastFrameTime == (qint64)AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_lastFrameTime;
-
+    rez->channelNumber = m_channelNum;
     rez->m_duration = 1000*1000*1000; // 1000 sec ;
     if (m_decoder == 0)
         return rez;
@@ -1262,6 +1262,11 @@ void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)
         }
     }
     m_lastImgWidth = m_lastImgHeight = 0;
+}
+
+void QnMotionEstimation::setChannelNum(int value)
+{
+    m_channelNum = value;
 }
 
 #endif //ENABLE_SOFTWARE_MOTION_DETECTION
