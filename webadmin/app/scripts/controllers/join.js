@@ -63,6 +63,4 @@ angular.module('webadminApp')
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
-
-        $scope.systemFound = false;
     });
