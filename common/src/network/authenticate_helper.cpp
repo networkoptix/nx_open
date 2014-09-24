@@ -25,6 +25,7 @@ QnAuthMethodRestrictionList::QnAuthMethodRestrictionList()
 unsigned int QnAuthMethodRestrictionList::getAllowedAuthMethods( const nx_http::Request& request ) const
 {
     QString path = request.requestLine.url.path();
+    //TODO #ak replace mid and chop with single midRef call
     while (path.startsWith(lit("//")))
         path = path.mid(1);
     while (path.endsWith(L'/'))
