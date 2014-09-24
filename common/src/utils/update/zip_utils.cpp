@@ -102,5 +102,18 @@ QnZipExtractor::Error QnZipExtractor::extractZip() {
     if (m_needStop)
         return Stopped;
 
+    m_zip->close();
+
     return m_zip->getZipError() == UNZ_OK ? Ok : BrokenZip;
+}
+
+QStringList QnZipExtractor::fileList() {
+    if (!m_zip->open(QuaZip::mdUnzip))
+        return QStringList();
+
+    QStringList result = m_zip->getFileNameList();
+
+    m_zip->close();
+
+    return result;
 }

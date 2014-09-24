@@ -18,7 +18,6 @@ public:
 
     explicit QnDownloadUpdatesPeerTask(QObject *parent = 0);
 
-    void setTargetDir(const QString &path);
     void setTargets(const QHash<QUrl, QString> &resultingFiles);
     void setHashes(const QHash<QUrl, QString> &hashByUrl);
     void setFileSizes(const QHash<QUrl, qint64> &fileSizeByUrl);
@@ -39,7 +38,6 @@ private slots:
     void at_downloadReply_readyRead();
 
 private:
-    QString m_targetDirPath;
     QHash<QUrl, QString> m_targets;
     QHash<QUrl, QString> m_hashByUrl;
     QMultiHash<QUrl, QUuid> m_peersByUrl;

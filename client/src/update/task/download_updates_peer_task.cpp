@@ -31,10 +31,6 @@ QnDownloadUpdatesPeerTask::QnDownloadUpdatesPeerTask(QObject *parent) :
 {
 }
 
-void QnDownloadUpdatesPeerTask::setTargetDir(const QString &path) {
-    m_targetDirPath = path;
-}
-
 void QnDownloadUpdatesPeerTask::setTargets(const QHash<QUrl, QString> &targets) {
     m_targets = targets;
 }
@@ -76,7 +72,7 @@ void QnDownloadUpdatesPeerTask::downloadNextUpdate() {
     QUrl url = m_pendingDownloads.first();
     m_currentPeers = QSet<QUuid>::fromList(m_peersByUrl.values(url));
 
-    QString fileName = updateFilePath(m_targetDirPath, m_targets[url]);
+    QString fileName = updateFilePath(m_targets[url]);
     m_resultingFiles.insert(url, fileName);
 
     m_file.reset(new QFile(fileName));

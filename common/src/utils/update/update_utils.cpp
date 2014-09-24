@@ -7,12 +7,15 @@
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
+#include <utils/common/app_info.h>
+
 namespace {
 
 const QString infoEntryName = lit("update.json");
 const char passwordChars[] = "abcdefghijklmnopqrstuvwxyz0123456789";
 const int passwordLength = 6;
 const int readBufferSize = 1024 * 16;
+const QString updatesCacheDirName = QnAppInfo::productNameShort() + lit("_updates");
 
 bool verifyUpdatePackageInternal(QuaZipFile *infoFile, QnSoftwareVersion *version = 0, QnSystemInformation *sysInfo = 0, bool *isClient = 0) {
     if (!infoFile->open(QuaZipFile::ReadOnly))
@@ -63,14 +66,17 @@ bool verifyUpdatePackage(QIODevice *device, QnSoftwareVersion *version, QnSystem
     return verifyUpdatePackageInternal(&infoFile, version, sysInfo, isClient);
 }
 
-QString updateFilePath(const QString &updatesDirPath, const QString &fileName) {
+QDir updatesCacheDir() {
     QDir dir = QDir::temp();
-    if (!dir.exists(updatesDirPath))
-        dir.mkdir(updatesDirPath);
-    dir.cd(updatesDirPath);
-    return dir.absoluteFilePath(fileName);
+    if (!dir.exists(updatesCacheDirName))
+        dir.mkdir(updatesCacheDirName);
+    dir.cd(updatesCacheDirName);
+    return dir;
 }
 
+QString updateFilePath(const QString &fileName) {
+    return updatesCacheDir().absoluteFilePath(fileName);
+}
 
 QString makeMd5(const QString &fileName) {
     QFile file(fileName);
@@ -109,4 +115,16 @@ QString passwordForBuild(unsigned buildNumber) {
         seed /= charsCount;
     }
     return password;
+}
+
+void clearUpdatesCache(const QnSoftwareVersion &versionToKeep) {
+    QDir dir = updatesCacheDir();
+    QStringList entries = dir.entryList(QDir::Files);
+    foreach (const QString &fileName, entries) {
+        QnSoftwareVersion version;
+        if (verifyUpdatePackage(dir.absoluteFilePath(fileName), &version) && version == versionToKeep)
+            continue;
+
+        dir.remove(fileName);
+    }
 }

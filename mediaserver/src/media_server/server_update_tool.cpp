@@ -4,6 +4,7 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QProcess>
+#include <QtCore/QElapsedTimer>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
@@ -115,6 +116,7 @@ bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray
     m_zipExtractor.reset();
     clearUpdatesLocation();
     QBuffer buffer(const_cast<QByteArray*>(&data)); // we're goint to read data, so const_cast is ok here
+    buffer.open(QBuffer::ReadOnly);
     return processUpdate(updateId, &buffer, true);
 }
 
@@ -140,7 +142,7 @@ void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
     }
 
     // Closed file means we've already finished downloading. Nothing to do is left.
-    if (!m_file->isOpen())
+    if (!m_file->isOpen() || !m_file->openMode().testFlag(QFile::WriteOnly))
         return;
 
     if (data.isEmpty()) { // it means we've just got the size of the file
@@ -154,9 +156,14 @@ void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
 
     if (isComplete()) {
         m_file->close();
+        m_file->open(QFile::ReadOnly);
         processUpdate(updateId, m_file.data());
     }
 }
+
+#ifdef LIBCREATEPROCESS
+#include <libcp/create_process.h>
+#endif
 
 bool QnServerUpdateTool::installUpdate(const QString &updateId) {
     NX_LOG(lit("Starting update to %1").arg(updateId), cl_logINFO);
@@ -229,8 +236,42 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
         NX_LOG(lit("The specified executable doesn't have an execute permission: %1").arg(executable), cl_logWARNING);
         executableFile.setPermissions(executableFile.permissions() | QFile::ExeOwner);
     }
+    if( cl_log.logLevel() >= cl_logDEBUG1 )
+    {
+        QString argumentsStr;
+        for( const QString& arg: arguments )
+            argumentsStr += lit(" ") + arg;
+        NX_LOG( lit("Launching %1 %2").arg(executable).arg(argumentsStr), cl_logDEBUG1 );
+    }
 
-    if (QProcess::startDetached(updateDir.absoluteFilePath(executable), arguments)) {
+#ifdef LIBCREATEPROCESS
+    int childPid = 0;
+    {
+        char** argv = new char*[arguments.size()+1+1+1];  //once for "bin/bash", one for script name, one for null
+        const QString& executableAbsolutePath = updateDir.absoluteFilePath(executable);
+        int argIndex = 0;
+        argv[argIndex] = new char[sizeof("bin/bash")+1];
+        strcpy( argv[argIndex], "bin/bash" );
+        ++argIndex;
+        argv[argIndex] = new char[executableAbsolutePath.size()+1];
+        strcpy( argv[argIndex], executableAbsolutePath.toLatin1().constData() );
+        ++argIndex;
+        for( const QString& arg: arguments )
+        {
+            argv[argIndex] = new char[arg.size()+1];
+            strcpy( argv[argIndex], arg.toLatin1().constData() );
+            ++argIndex;
+        }
+        argv[argIndex] = NULL;
+
+        childPid = nx_startProcessDetached( "/bin/bash", argv );
+        NX_LOG( lit("Started update process with pid %1").arg(childPid), cl_logINFO );
+    }
+    if( childPid != -1 )
+#else
+    if (QProcess::startDetached(updateDir.absoluteFilePath(executable), arguments))
+#endif
+    {
         NX_LOG("Update has been started.", cl_logINFO);
     } else {
         NX_LOG( lit("Update failed. See update log for details: %1").arg(logFileName), cl_logERROR);
@@ -263,6 +304,8 @@ void QnServerUpdateTool::clearUpdatesLocation() {
 void QnServerUpdateTool::at_zipExtractor_extractionFinished(int error) {
     if (sender() != m_zipExtractor.data())
         return;
+
+    m_file->close();
 
     bool ok = (error == QnZipExtractor::Ok);
 

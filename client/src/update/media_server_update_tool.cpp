@@ -105,13 +105,6 @@ void QnMediaServerUpdateTool::finishUpdate(const QnUpdateResult &result) {
     setStage(QnFullUpdateStage::Init);
 }
 
-void QnMediaServerUpdateTool::updateTargets() {
-    if (!m_targets.isEmpty())
-        return;
-
-    emit targetsChanged(actualTargetIds());
-}
-
 QnMediaServerResourceList QnMediaServerUpdateTool::targets() const {
     return m_targets;
 }

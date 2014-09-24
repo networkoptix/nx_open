@@ -423,6 +423,13 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>      
+                <dependency>
+                    <groupId>com.networkoptix</groupId>
+                    <artifactId>libcreateprocess</artifactId>
+                    <version>0.1-SNAPSHOT</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>      
             </dependencies>             
         </profile>
 

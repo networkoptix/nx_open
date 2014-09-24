@@ -31,6 +31,7 @@ public:
     QDir dir() const;
 
     Error extractZip();
+    QStringList fileList();
 
 signals:
     void finished(int error);
