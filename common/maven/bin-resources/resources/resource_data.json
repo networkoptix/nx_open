@@ -35,7 +35,14 @@
                 "VISTA|*VRD", "VISTA|VK2-2MPBX(DN)",
                 "ZXDZHZ|vimicro","DW|DWC-MF21M4TIR","ACTI|TCM4201","Sony|SNC-CH120","Sony|SNC-CH280",
                 "Sony|SNC-DH210","Sony|SNC-DH120T","VITEK|VT-20VN-M","Etrovision Technology|EV8180U-XL","VIVOTEK|FE8174V",
-                "AVTECH|AVM542B"
+                "AVTECH|AVM542B",
+				"DW|DWC-MPA20M","WIN4NET|Clebo-MD20","DW|DWC-MC421D","WIN4NET|Clebo-BX20",
+				"DW|DWC-MB721M4TIR","WIN4NET|Clebo-MB721M4TIR",
+				"DW|DWC-MB721M8TIR","WIN4NET|Clebo-MB721M8TIR",
+				"DW|DWC-MF21M4TIR","WIN4NET|Clebo-MF21M4TIR",
+				"DW|DWC-MF21M8TIR","WIN4NET|Clebo-MF21M8TIR",
+				"DW|DWC-MF21M4FM","WIN4NET|Clebo-MF21M4FM",
+				"DW|DWC-MF21M8FM","WIN4NET|Clebo-MF21M8FM"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
@@ -56,7 +63,9 @@
         },
         {
             "keys": [
-                "VISTA|*PTW"
+                "VISTA|*PTW",
+				"DW|DWC-MPT","WIN4NET|Clebo-MPT",
+				"DW|DWC-MPTFM","WIN4NET|Clebo-MPTFM"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability",
             "ptzTraits": "FourWayPtz"
@@ -93,6 +102,21 @@
                 "VISTA|VK2-1080VRDIR3V9F"
             ],
             "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
+        },
+		{
+            "keys": [
+                "DW|DWC-MD421D","WIN4NET|Clebo-FD20"
+            ],
+            "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
+        },
+		{
+            "keys": [
+                "DW|DWC-MPTZ20X","WIN4NET|Clebo-PD20","WIN4NET|Clebo-PM20SV2",
+				"DW|DWC-MPTZ20XFM","WIN4NET|Clebo-MPTZ20XFM",
+				"DW|DWC-MPTZ5X","WIN4NET|Clebo-MPTZ5X",
+				"DW|DWC-MPTZ5XFM","WIN4NET|Clebo-MPTZ5XFM"
+            ],
+            "ptzCapabilities": "ContinuousZoomCapability"
         },
         {
             "keys": [
