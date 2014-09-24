@@ -146,13 +146,10 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
         qnSettings->setAutoLogin(state == Qt::Checked);
     });
 
-    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleUrlFound,    this,   &QnLoginDialog::at_moduleFinder_moduleUrlFound);
-    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleUrlLost,     this,   &QnLoginDialog::at_moduleFinder_moduleUrlLost);
+    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleChanged, this, &QnLoginDialog::at_moduleFinder_moduleChanged);
 
-    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules()) {
-        if (!moduleInformation.remoteAddresses.isEmpty())
-            at_moduleFinder_moduleUrlFound(moduleInformation, QUrl(lit("http://%1:%2").arg(*moduleInformation.remoteAddresses.begin()).arg(moduleInformation.port)));
-    }
+    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules())
+        at_moduleFinder_moduleChanged(moduleInformation);
 }
 
 QnLoginDialog::~QnLoginDialog() {}
@@ -500,37 +497,27 @@ void QnLoginDialog::at_deleteButton_clicked() {
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &foundUrl) {
+void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
     if (moduleInformation.type != nxMediaServerId)
         return;
 
-    QUrl url = foundUrl;
-    if (moduleInformation.isLocal())
-        url.setHost(lit("127.0.0.1"));
+    m_foundEcs.remove(moduleInformation.id);
 
     QnEcData data;
     data.id = moduleInformation.id;
-    data.url = url;
     data.version = moduleInformation.version.toString();
     data.systemName = moduleInformation.systemName;
-    QString key = data.systemName + url.toString();
-    if (m_foundEcs.value(key) == data)
-        return;
 
-    m_foundEcs.insert(key, data);
-    resetAutoFoundConnectionsModel();
-}
+    QUrl url;
+    url.setScheme(lit("http"));
+    url.setPort(moduleInformation.port);
 
-void QnLoginDialog::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &lostUrl) {
-    if (moduleInformation.type != nxMediaServerId)
-        return;
+    foreach (const QString &address, moduleInformation.remoteAddresses) {
+        data.url = url;
+        data.url.setHost(address);
 
-    QUrl url = lostUrl;
-    if (moduleInformation.isLocal())
-        url.setHost(lit("127.0.0.1"));
-
-    QString key = moduleInformation.systemName + url.toString();
-    m_foundEcs.remove(key);
+        m_foundEcs.insert(moduleInformation.id, data);
+    }
 
     resetAutoFoundConnectionsModel();
 }

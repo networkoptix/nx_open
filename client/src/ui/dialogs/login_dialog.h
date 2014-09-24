@@ -69,8 +69,7 @@ private slots:
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
 
-    void at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
-    void at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation);
 
 private:
     QUrl currentUrl() const;
@@ -101,7 +100,7 @@ private:
     };
 
     /** Hash list of automatically found Servers based on seed as key. */
-    QMap<QString, QnEcData> m_foundEcs;
+    QMultiHash<QUuid, QnEcData> m_foundEcs;
 };
 
 #endif // LOGINDIALOG_H
