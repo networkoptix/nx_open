@@ -162,7 +162,7 @@ void QnCheckForUpdatesPeerTask::checkLocalUpdates() {
         return;
     }
 
-    QnZipExtractor *extractor(new QnZipExtractor(m_target.fileName, updatesDir()));
+    QnZipExtractor *extractor(new QnZipExtractor(m_target.fileName, updatesCacheDir()));
     connect(extractor, &QnZipExtractor::finished, this, &QnCheckForUpdatesPeerTask::at_zipExtractor_finished);
     extractor->start();
 }

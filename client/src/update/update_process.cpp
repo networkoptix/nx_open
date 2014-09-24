@@ -250,6 +250,8 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
         emit peerStageChanged(peerId, info.stage);
     }
 
+    clearUpdatesCache(m_target.version);
+
     downloadUpdates();
 }
 
