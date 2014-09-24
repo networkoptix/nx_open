@@ -215,6 +215,7 @@ public:
     TransportType getTransport() const { return m_transport; }
     QString getTrackFormatByRtpChannelNum(int channelNum);
     TrackType getTrackTypeByRtpChannelNum(int channelNum);
+    int getChannelNum(int rtpChannelNum);
 
     qint64 startTime() const;
     qint64 endTime() const;
@@ -247,10 +248,11 @@ public:
     /*
     * Find track by type ('video', 'audio' e t.c.) and returns track IO device. Returns 0 if track not found.
     */
-    RTPIODevice* getTrackIoByType(TrackType trackType);
+    RTPIODevice* getTrackIoByType(TrackType trackType, int channelNum);
 
-    QString getCodecNameByType(TrackType trackType);
-    QList<QByteArray> getSdpByType(TrackType trackType) const;
+    QString getCodecNameByType(TrackType trackType, int channelNum);
+    QList<QByteArray> getSdpByType(TrackType trackType, int channelNum) const;
+    int getTrackCount(TrackType trackType) const;
 
     int getLastResponseCode() const;
 

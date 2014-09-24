@@ -7,6 +7,7 @@
 #include <utils/serialization/lexical.h>
 
 #include "resource_media_layout.h"
+#include "core/dataprovider/abstract_streamdataprovider.h"
 
 class QnStreamQualityStrings {
     Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
@@ -85,12 +86,21 @@ QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::Stream
 static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
 QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
+    if (dataProvider) {
+        QnConstResourceVideoLayoutPtr providerLayout = dataProvider->getVideoLayout();
+        if (providerLayout)
+            return providerLayout;
+    }
+
     QVariant val;
     toResource()->getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
     QString strVal = val.toString();
     if (strVal.isEmpty())
     {
-        return defaultVideoLayout;
+        if (m_customVideoLayout)
+            return m_customVideoLayout;
+        else
+            return defaultVideoLayout;
     }
     else {
         if (!m_customVideoLayout)
