@@ -1,6 +1,8 @@
 #ifndef __FFMPEG_AUDIO_TRANSCODER_H__
 #define __FFMPEG_AUDIO_TRANSCODER_H__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QCoreApplication>
 
 #include "transcoder.h"
@@ -13,9 +15,9 @@ public:
     QnFfmpegAudioTranscoder(CodecID codecId);
     ~QnFfmpegAudioTranscoder();
 
-    virtual int transcodePacket(QnConstAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result) override;
-    virtual bool open(QnConstCompressedAudioDataPtr audio) override;
-    bool open(QnMediaContextPtr codecCtx);
+    virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
+    virtual bool open(const QnConstCompressedAudioDataPtr& audio) override;
+    bool open(const QnMediaContextPtr& codecCtx);
     AVCodecContext* getCodecContext();
     virtual bool existMoreData() const override;
 private:
@@ -37,4 +39,7 @@ private:
 
 typedef QSharedPointer<QnFfmpegAudioTranscoder> QnFfmpegAudioTranscoderPtr;
 
+#endif // ENABLE_DATA_PROVIDERS
+
 #endif // __FFMPEG_AUDIO_TRANSCODER_H__
+

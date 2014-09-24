@@ -7,13 +7,14 @@ class QnReasonedBusinessEvent : public QnInstantBusinessEvent
 {
     typedef QnInstantBusinessEvent base_type;
 public:
-    explicit QnReasonedBusinessEvent(const BusinessEventType::Value eventType,
+    explicit QnReasonedBusinessEvent(const QnBusiness::EventType eventType,
                                      const QnResourcePtr& resource,
                                      const qint64 timeStamp,
                                      const QnBusiness::EventReason reasonCode,
                                      const QString& reasonParamsEncoded = QString());
 
     virtual QnBusinessEventParameters getRuntimeParams() const override;
+
 protected:
     QnBusiness::EventReason m_reasonCode;
     QString m_reasonParamsEncoded;

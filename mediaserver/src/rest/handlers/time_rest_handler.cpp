@@ -14,7 +14,3 @@ int QnTimeRestHandler::executeGet(const QString &, const QnRequestParams &, QnJs
     result.setReply(reply);
     return CODE_OK;
 }
-
-QString QnTimeRestHandler::description() const {
-    return "Returns server UTC time and time zone";
-}

@@ -11,15 +11,20 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
 
+#include <api/app_server_connection.h>
+#include <api/session_manager.h>
+#include <api/model/connection_info.h>
+
 #include <client/client_connection_data.h>
+#include <client/client_settings.h>
+
+#include <common/common_module.h>
 
 #include <core/resource/resource.h>
 
-#include <api/app_server_connection.h>
-#include <api/session_manager.h>
-
+#include <ui/actions/action_manager.h>
 #include <ui/dialogs/message_box.h>
-#include <ui/dialogs/preferences_dialog.h>
+#include <ui/dialogs/connection_name_dialog.h>
 #include <ui/widgets/rendering_widget.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
@@ -28,20 +33,23 @@
 #include <ui/workaround/gl_widget_factory.h>
 
 #include <utils/applauncher_utils.h>
+#include <utils/network/module_finder.h>
+#include <utils/network/networkoptixmodulerevealcommon.h>
+#include <utils/common/url.h>
 
-#include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "plugins/resources/archive/abstract_archive_stream_reader.h"
-#include "plugins/resources/archive/filetypesupport.h"
-
-#include <client/client_settings.h>
+#include "plugins/resource/avi/avi_resource.h"
+#include "plugins/resource/archive/abstract_archive_stream_reader.h"
+#include "plugins/resource/avi/filetypesupport.h"
 
 #include "connection_testing_dialog.h"
 
-#include <api/model/connection_info.h>
-#include "compatibility_version_installation_dialog.h"
-#include "version.h"
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 
+#include <utils/connection_diagnostics_helper.h>
+
+
+#include "compatibility.h"
+#include <utils/common/app_info.h>
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
@@ -67,17 +75,23 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::LoginDialog),
     m_requestHandle(-1),
-    m_renderingWidget(NULL),
-    m_moduleFinder(NULL),
-    m_restartPending(false),
-    m_autoConnectPending(false)
+    m_renderingWidget(NULL)
 {
     ui->setupUi(this);
 
+    setWindowTitle(tr("Connect to Server..."));
     setHelpTopic(this, Qn::Login_Help);
 
-    /* Don't allow to save passwords, at least for now. */
-    //ui->savePasswordCheckBox->hide();
+    QHBoxLayout* bbLayout = dynamic_cast<QHBoxLayout*>(ui->buttonBox->layout());
+    Q_ASSERT(bbLayout);
+    if (bbLayout) {
+        QLabel* versionLabel = new QLabel(ui->buttonBox);
+        versionLabel->setText(tr("Version %1").arg(QnAppInfo::applicationVersion()));
+        QFont font = versionLabel->font();
+        font.setPointSize(7);
+        versionLabel->setFont(font);
+        bbLayout->insertWidget(0, versionLabel);
+    }
 
     static const char *introNames[] = { "intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg", NULL };
     QString introPath;
@@ -89,7 +103,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 
     QnAviResourcePtr resource = QnAviResourcePtr(new QnAviResource(lit("qtfile://") + introPath));
     if (FileTypeSupport::isImageFileExt(introPath))
-        resource->addFlags(QnResource::still_image);
+        resource->addFlags(Qn::still_image);
 
     m_renderingWidget = QnGlWidgetFactory::create<QnRenderingWidget>();
     m_renderingWidget->setResource(resource);
@@ -106,7 +120,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     m_lastUsedItem = NULL;
     m_savedSessionsItem = new QStandardItem(tr("Saved Sessions"));
     m_savedSessionsItem->setFlags(Qt::ItemIsEnabled);
-    m_autoFoundItem = new QStandardItem(tr("Auto-Discovered ECs"));
+    m_autoFoundItem = new QStandardItem(tr("Auto-Discovered Servers"));
     m_autoFoundItem->setFlags(Qt::ItemIsEnabled);
 
     m_connectionsModel->appendRow(m_savedSessionsItem);
@@ -126,46 +140,33 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     resetConnectionsModel();
     updateFocus();
 
-    m_moduleFinder = new NetworkOptixModuleFinder();
-    if (qnSettings->isDevMode())
-        m_moduleFinder->setCompatibilityMode(true);
-    connect(m_moduleFinder,    SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
-            this,               SLOT(at_moduleFinder_moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)));
-    connect(m_moduleFinder,    SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
-            this,               SLOT(at_moduleFinder_moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)));
-    m_moduleFinder->start();
+    /* Should be done after model resetting to avoid state loss. */
+    ui->autoLoginCheckBox->setChecked(qnSettings->autoLogin());
+    connect(ui->autoLoginCheckBox, &QCheckBox::stateChanged,    this, [this](int state) {
+        qnSettings->setAutoLogin(state == Qt::Checked);
+    });
+
+    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleChanged, this, &QnLoginDialog::at_moduleFinder_moduleChanged);
+
+    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules())
+        at_moduleFinder_moduleChanged(moduleInformation);
 }
 
-QnLoginDialog::~QnLoginDialog() {
-    delete m_moduleFinder;
-    return;
-}
+QnLoginDialog::~QnLoginDialog() {}
 
-void QnLoginDialog::updateFocus() 
-{
+void QnLoginDialog::updateFocus() {
     ui->passwordLineEdit->setFocus();
+    ui->passwordLineEdit->selectAll();
 }
 
 QUrl QnLoginDialog::currentUrl() const {
     QUrl url;
-    url.setScheme(QLatin1String("https"));
+    url.setScheme(lit("http"));
     url.setHost(ui->hostnameLineEdit->text().trimmed());
     url.setPort(ui->portSpinBox->value());
     url.setUserName(ui->loginLineEdit->text().trimmed());
     url.setPassword(ui->passwordLineEdit->text());
     return url;
-}
-
-QString QnLoginDialog::currentName() const {
-    return ui->connectionsComboBox->currentText();
-}
-
-QnConnectionInfoPtr QnLoginDialog::currentInfo() const {
-    return m_connectInfo;
-}
-
-bool QnLoginDialog::restartPending() const {
-    return m_restartPending;
 }
 
 void QnLoginDialog::accept() {
@@ -175,18 +176,35 @@ void QnLoginDialog::accept() {
         return;
     }
 
-    QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url);
-    m_requestHandle = connection->connectAsync(this, SLOT(at_connectFinished(int, QnConnectionInfoPtr, int)));
+    QString name = ui->connectionsComboBox->currentText();
 
+    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
+        url,
+        this,
+        [this, url, name](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
+    {
+        if (m_requestHandle != handle)
+            return; //connect was cancelled
+
+        m_requestHandle = -1;
+        updateUsability();
+
+        QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
+        switch (status) {
+        case QnConnectionDiagnosticsHelper::Result::Failure:
+            return;
+        case QnConnectionDiagnosticsHelper::Result::Restart:
+            menu()->trigger(Qn::ExitActionDelayed);
+            break; // to avoid cycle
+        default:    //success
+            menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
+            updateStoredConnections(url, name);
+            break;
+        }
+
+        base_type::accept();
+    });
     updateUsability();
-}
-
-bool QnLoginDialog::rememberPassword() const {
-    return ui->rememberPasswordCheckBox->isChecked();
-}
-
-void QnLoginDialog::setAutoConnect(bool value) {
-    m_autoConnectPending = value;
 }
 
 void QnLoginDialog::reject() {
@@ -214,11 +232,9 @@ void QnLoginDialog::changeEvent(QEvent *event) {
 void QnLoginDialog::showEvent(QShowEvent *event) {
     base_type::showEvent(event);
 
-    if (m_autoConnectPending && ui->rememberPasswordCheckBox->isChecked() && !ui->passwordLineEdit->text().isEmpty() && currentUrl().isValid()) {
-        accept();
-    } else {
-        resetConnectionsModel();
-    }
+    bool autoLogin = qnSettings->autoLogin();
+    resetConnectionsModel();
+    ui->autoLoginCheckBox->setChecked(autoLogin);
 
 #ifdef Q_OS_MAC
     if (focusWidget())
@@ -254,10 +270,6 @@ void QnLoginDialog::resetConnectionsModel() {
         selectedIndex = m_connectionsModel->index(0, 0, m_savedSessionsItem->index());
     ui->connectionsComboBox->setCurrentIndex(selectedIndex);
     at_connectionsComboBox_currentIndexChanged(selectedIndex);
-
-    QString password = qnSettings->storedPassword();
-    ui->passwordLineEdit->setText(password);
-    ui->rememberPasswordCheckBox->setChecked(!password.isEmpty());
 }
 
 void QnLoginDialog::resetSavedSessionsModel() {
@@ -275,8 +287,6 @@ void QnLoginDialog::resetSavedSessionsModel() {
 
 void QnLoginDialog::resetAutoFoundConnectionsModel() {
     QnCompatibilityChecker checker(localCompatibilityItems());
-    QnSoftwareVersion clientVersion(QN_ENGINE_VERSION);
-
 
     m_autoFoundItem->removeRows(0, m_autoFoundItem->rowCount());
     if (m_foundEcs.size() == 0) {
@@ -284,19 +294,22 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
         noLocalEcs->setFlags(Qt::ItemIsEnabled);
         m_autoFoundItem->appendRow(noLocalEcs);
     } else {
-        foreach (QnEcData data, m_foundEcs) {
+        foreach (const QnEcData& data, m_foundEcs) {
             QUrl url = data.url;
 
             QnSoftwareVersion ecVersion(data.version);
-            bool isCompatible = checker.isCompatible(QLatin1String("Client"), clientVersion,
+            bool isCompatible = checker.isCompatible(QLatin1String("Client"), qnCommon->engineVersion(),
                                                      QLatin1String("ECS"),    ecVersion);
 
 
             QString title;
-            if (isCompatible)
-                title = lit("%1:%2").arg(url.host()).arg(url.port());
+            if (!data.systemName.isEmpty())
+                title = lit("%1 - (%2:%3)").arg(data.systemName).arg(url.host()).arg(url.port());
             else
-                title = lit("%1:%2 (v%3)").arg(url.host()).arg(url.port()).arg(ecVersion.toString(QnSoftwareVersion::MinorFormat));
+                title = lit("%1:%2").arg(url.host()).arg(url.port());
+            if (!isCompatible)
+                title += lit(" (v%3)").arg(ecVersion.toString(QnSoftwareVersion::MinorFormat));
+
             QStandardItem* item = new QStandardItem(title);
             item->setData(url, Qn::UrlRole);
 
@@ -326,6 +339,7 @@ void QnLoginDialog::updateUsability() {
         ui->buttonBox->button(QDialogButtonBox::Cancel)->unsetCursor();
 
         updateAcceptibility();
+        updateFocus();
     } else {
         ::setEnabled(children(), ui->buttonBox, false);
         ::setEnabled(ui->buttonBox->children(), ui->buttonBox->button(QDialogButtonBox::Cancel), false);
@@ -334,238 +348,47 @@ void QnLoginDialog::updateUsability() {
     }
 }
 
+void QnLoginDialog::updateStoredConnections(const QUrl &url, const QString &name) {
+    QnConnectionDataList connections = qnSettings->customConnections();
+
+    QUrl urlToSave(url);
+    if (!ui->autoLoginCheckBox->isChecked())
+        urlToSave.setPassword(QString());
+
+    QnConnectionData connectionData(name, urlToSave);
+    qnSettings->setLastUsedConnection(connectionData);
+
+    // remove previous "Last used connection"
+    connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
+
+    QnConnectionData selected = connections.getByName(name);
+    if (qnUrlEqual(selected.url, url)) {
+        connections.removeOne(selected.name);
+        connections.prepend(selected);    /* Reorder. */
+    } else {
+        // save "Last used connection"
+        QnConnectionData last(connectionData);
+        last.name = QnConnectionDataList::defaultLastUsedNameKey();
+        connections.prepend(last);
+    }
+    qnSettings->setCustomConnections(connections);
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectionInfo, int requestHandle) {
-    if(m_requestHandle != requestHandle) 
-        return;
-    m_requestHandle = -1;
-
-    updateUsability();
-
-    bool compatibleProduct = qnSettings->isDevMode() || connectionInfo->brand.isEmpty()
-            || connectionInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
-    bool success = (status == 0) && compatibleProduct;
-
-    QString detail;
-
-    if (status == 202) {
-        detail = tr("Login or password you have entered are incorrect, please try again.");
-    } else if (status != 0) {
-        detail = tr("Connection to the Enterprise Controller could not be established.\n"
-                               "Connection details that you have entered are incorrect, please try again.\n\n"
-                               "If this error persists, please contact your VMS administrator.");
-    } else {
-        detail = tr("You are trying to connect to incompatible Enterprise Controller.");
-    }
-
-    if(!success) {
-        QnMessageBox::warning(
-            this,
-            Qn::Login_Help,
-            tr("Could not connect to Enterprise Controller"),
-            detail
-        );
-        updateFocus();
-        return;
-    }
-
-    QnCompatibilityChecker remoteChecker(connectionInfo->compatibilityItems);
-    QnCompatibilityChecker localChecker(localCompatibilityItems());
-
-    QnCompatibilityChecker *compatibilityChecker;
-    if (remoteChecker.size() > localChecker.size()) {
-        compatibilityChecker = &remoteChecker;
-    } else {
-        compatibilityChecker = &localChecker;
-    }
-
-    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo->version)) {
-        QnSoftwareVersion minSupportedVersion("1.4"); 
-
-        m_restartPending = true;
-        if (connectionInfo->version < minSupportedVersion) {
-            QnMessageBox::warning(
-                this,
-                Qn::VersionMismatch_Help,
-                tr("Could not connect to Enterprise Controller"),
-                tr("You are about to connect to Enterprise Controller which has a different version:\n"
-                    " - Client version: %1.\n"
-                    " - EC version: %2.\n"
-                    "Compatibility mode for versions lower than %3 is not supported."
-                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()).arg(minSupportedVersion.toString()),
-                QMessageBox::Ok
-            );
-            m_restartPending = false;
-        }
-
-        if (connectionInfo->version > QnSoftwareVersion(QN_ENGINE_VERSION)) {
-#ifndef Q_OS_MACX
-            QnMessageBox::warning(
-                this,
-                Qn::VersionMismatch_Help,
-                tr("Could not connect to Enterprise Controller"),
-                tr("Selected Enterprise controller has a different version:\n"
-                    " - Client version: %1.\n"
-                    " - EC version: %2.\n"
-                    "An error has occurred while trying to restart in compatibility mode."
-                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
-                QMessageBox::Ok
-            );
-#else
-            QnMessageBox::warning(
-                this,
-                Qn::VersionMismatch_Help,
-                tr("Could not connect to Enterprise Controller"),
-                tr("Selected Enterprise controller has a different version:\n"
-                    " - Client version: %1.\n"
-                    " - EC version: %2.\n"
-                    "The other version of client is needed in order to establish the connection to this server."
-                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
-                QMessageBox::Ok
-            );
-#endif
-            m_restartPending = false;
-        }
-
-        if(m_restartPending) {
-            for (;;) {
-                bool isInstalled = false;
-                if (applauncher::isVersionInstalled(connectionInfo->version, &isInstalled) != applauncher::api::ResultType::ok)
-                {
-#ifndef Q_OS_MACX
-                    QnMessageBox::warning(
-                        this,
-                        Qn::VersionMismatch_Help,
-                        tr("Could not connect to Enterprise Controller"),
-                        tr("Selected Enterprise controller has a different version:\n"
-                            " - Client version: %1.\n"
-                            " - EC version: %2.\n"
-                            "An error has occurred while trying to restart in compatibility mode."
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
-                        QMessageBox::Ok
-                    );
-#else
-                    QnMessageBox::warning(
-                        this,
-                        Qn::VersionMismatch_Help,
-                        tr("Could not connect to Enterprise Controller"),
-                        tr("Selected Enterprise controller has a different version:\n"
-                            " - Client version: %1.\n"
-                            " - EC version: %2.\n"
-                            "The other version of client is needed in order to establish the connection to this server."
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
-                        QMessageBox::Ok
-                    );
-#endif
-                    m_restartPending = false;
-                }
-                else if(isInstalled) {
-                    int button = QnMessageBox::warning(
-                        this,
-                        Qn::VersionMismatch_Help,
-                        tr("Could not connect to Enterprise Controller"),
-                        tr("You are about to connect to Enterprise Controller which has a different version:\n"
-                            " - Client version: %1.\n"
-                            " - EC version: %2.\n"
-                            "Would you like to restart in compatibility mode?"
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
-                        QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel), 
-                        QMessageBox::Cancel
-                    );
-                    if(button == QMessageBox::Ok) {
-                        switch( applauncher::restartClient(connectionInfo->version, currentUrl().toEncoded()) )
-                        {
-                            case applauncher::api::ResultType::ok:
-                                break;
-
-                            case applauncher::api::ResultType::connectError:
-                                QMessageBox::critical(
-                                    this,
-                                    tr("Launcher process is not found"),
-                                    tr("Cannot restart the client in compatibility mode.\n"
-                                        "Please close the application and start it again using the shortcut in the start menu.")
-                                );
-                                break;
-
-                            default:
-                            {
-                                //trying to restore installation
-                                int selectedButton = QnMessageBox::warning(
-                                    this,
-                                    Qn::VersionMismatch_Help,
-                                    tr("Failure"),
-                                    tr("Failed to launch compatiblity version %1\n"
-                                       "Try to restore version %1?").
-                                       arg(connectionInfo->version.toString(QnSoftwareVersion::MinorFormat)),
-                                    QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
-                                    QMessageBox::Cancel
-                                );
-                                if( selectedButton == QMessageBox::Ok ) {
-                                    //starting installation
-                                    if( !m_installationDialog.get() )
-                                        m_installationDialog.reset( new CompatibilityVersionInstallationDialog( this ) );
-                                    m_installationDialog->setVersionToInstall( connectionInfo->version );
-                                    m_installationDialog->exec();
-                                    if( m_installationDialog->installationSucceeded() )
-                                        continue;   //offering to start newly-installed compatibility version
-                                }
-                                m_restartPending = false;
-                                break;
-                            }
-                        }
-                    } else {
-                        m_restartPending = false;
-                    }
-                } else {    //not installed
-                    int selectedButton = QnMessageBox::warning(
-                        this,
-                        Qn::VersionMismatch_Help,
-                        tr("Could not connect to Enterprise Controller"),
-                        tr("You are about to connect to Enterprise Controller which has a different version:\n"
-                            " - Client version: %1.\n"
-                            " - EC version: %2.\n"
-                            "Client version %3 is required to connect to this Enterprise Controller.\n"
-                            "Download version %3?"
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()).arg(connectionInfo->version.toString(QnSoftwareVersion::MinorFormat)),
-                        QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
-                        QMessageBox::Cancel
-                    );
-                    if( selectedButton == QMessageBox::Ok ) {
-                        //starting installation
-                        if( !m_installationDialog.get() )
-                            m_installationDialog.reset( new CompatibilityVersionInstallationDialog( this ) );
-                        m_installationDialog->setVersionToInstall( connectionInfo->version );
-                        m_installationDialog->exec();
-                        if( m_installationDialog->installationSucceeded() )
-                            continue;   //offering to start newly-installed compatibility version
-                    }
-                    m_restartPending = false;
-                }
-                break;
-            }
-        }
-        
-        if (!m_restartPending) {
-            updateFocus();
-            return;
-        }
-    }
-
-    m_connectInfo = connectionInfo;
-    base_type::accept();
-}
 
 void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex &index) {
     QStandardItem* item = m_connectionsModel->itemFromIndex(index);
     QUrl url = item == NULL ? QUrl() : item->data(Qn::UrlRole).toUrl();
     ui->hostnameLineEdit->setText(url.host());
     ui->portSpinBox->setValue(url.port());
-    ui->loginLineEdit->setText(url.userName());
-    ui->passwordLineEdit->clear();
-    ui->rememberPasswordCheckBox->setChecked(false);
+    ui->loginLineEdit->setText(url.userName().isEmpty() 
+        ? lit("admin")  // 99% of users have only one login - admin
+        : url.userName());
+    ui->passwordLineEdit->setText(url.password());
+    ui->deleteButton->setEnabled(qnSettings->customConnections().contains(ui->connectionsComboBox->currentText()));
+    ui->autoLoginCheckBox->setChecked(false);
     updateFocus();
 }
 
@@ -601,15 +424,25 @@ void QnLoginDialog::at_saveButton_clicked() {
 
     QnConnectionDataList connections = qnSettings->customConnections();
 
-    bool ok = false;
-
     QString name = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
-    name = QInputDialog::getText(this, tr("Save connection as..."), tr("Enter name:"), QLineEdit::Normal, name, &ok);
-    if (!ok)
-        return;
+    bool savePassword = !ui->passwordLineEdit->text().isEmpty();
+    {
+        QScopedPointer<QnConnectionNameDialog> dialog(new QnConnectionNameDialog(this));
+        dialog->setName(name);
+        dialog->setSavePasswordEnabled(savePassword);
+        dialog->setSavePassword(savePassword);
+
+        if (!dialog->exec())
+            return;
+
+        name = dialog->name();
+        savePassword &= dialog->savePassword();
+    }
+
 
     // save here because of the 'connections' field modifying
     QString password = ui->passwordLineEdit->text();
+    bool autoLogin = qnSettings->autoLogin();
 
     if (connections.contains(name)){
         QMessageBox::StandardButton button = QMessageBox::warning(this, tr("Connection already exists"),
@@ -631,7 +464,8 @@ void QnLoginDialog::at_saveButton_clicked() {
     }
 
     QnConnectionData connectionData(name, currentUrl());
-    connectionData.url.setPassword(QString());
+    if (!savePassword)
+        connectionData.url.setPassword(QString());
     connections.prepend(connectionData);
     qnSettings->setCustomConnections(connections);
 
@@ -641,61 +475,49 @@ void QnLoginDialog::at_saveButton_clicked() {
     ui->connectionsComboBox->setCurrentIndex(idx);
     at_connectionsComboBox_currentIndexChanged(idx); // call directly in case index change will not work
     ui->passwordLineEdit->setText(password);         // password is cleared on index change
+    ui->autoLoginCheckBox->setChecked(autoLogin);
 
 }
 
 void QnLoginDialog::at_deleteButton_clicked() {
-    QString name = currentName();
+    QnConnectionDataList connections = qnSettings->customConnections();
+
+    QString name = ui->connectionsComboBox->currentText();
+    if (!connections.contains(name))
+        return;
 
     if (QMessageBox::warning(this, tr("Delete connections"),
                                    tr("Are you sure you want to delete the connection\n%1?").arg(name),
                              QMessageBox::Yes, QMessageBox::No) == QMessageBox::No)
         return;
 
-    QnConnectionDataList connections = qnSettings->customConnections();
+    
     connections.removeOne(name);
     qnSettings->setCustomConnections(connections);
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed) {
-    Q_UNUSED(localInterfaceAddress)
-
-    QString portId = QLatin1String("port");
-
-    if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
+void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
+    if (moduleInformation.type != nxMediaServerId)
         return;
 
-    QString host = isLocal ? QLatin1String("127.0.0.1") : remoteHostAddress;
-    QUrl url;
-    url.setHost(host);
-
-    QString port = moduleParameters[portId];
-    url.setPort(port.toInt());
-
-    QMultiHash<QString, QnEcData>::iterator i = m_foundEcs.find(seed);
-    while (i != m_foundEcs.end() && i.key() == seed) {
-        QUrl found = i.value().url;
-        if (found.host() == url.host() && found.port() == url.port())
-            return; // found the same host, e.g. two interfaces on local controller
-        ++i;
-    }
+    m_foundEcs.remove(moduleInformation.id);
 
     QnEcData data;
-    data.url = url;
-    data.version = moduleVersion;
-    m_foundEcs.insert(seed, data);
-    resetAutoFoundConnectionsModel();
-}
+    data.id = moduleInformation.id;
+    data.version = moduleInformation.version.toString();
+    data.systemName = moduleInformation.systemName;
 
-void QnLoginDialog::at_moduleFinder_moduleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed) {
-    Q_UNUSED(moduleParameters)
-    Q_UNUSED(remoteHostAddress)
-    Q_UNUSED(isLocal)
+    QUrl url;
+    url.setScheme(lit("http"));
+    url.setPort(moduleInformation.port);
 
-    if( moduleID != nxEntControllerId )
-        return;
-    m_foundEcs.remove(seed);
+    foreach (const QString &address, moduleInformation.remoteAddresses) {
+        data.url = url;
+        data.url.setHost(address);
+
+        m_foundEcs.insert(moduleInformation.id, data);
+    }
 
     resetAutoFoundConnectionsModel();
 }

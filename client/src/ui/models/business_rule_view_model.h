@@ -69,13 +69,13 @@ public:
     bool isValid(int column) const;
     bool isValid() const; //checks validity for all row
 
-    int id() const;
+    QUuid id() const;
 
     bool isModified() const;
     void setModified(bool value);
 
-    BusinessEventType::Value eventType() const;
-    void setEventType(const BusinessEventType::Value value);
+    QnBusiness::EventType eventType() const;
+    void setEventType(const QnBusiness::EventType value);
 
     QnResourceList eventResources() const;
     void setEventResources(const QnResourceList &value);
@@ -83,11 +83,11 @@ public:
     QnBusinessEventParameters eventParams() const;
     void setEventParams(const QnBusinessEventParameters& params);
 
-    Qn::ToggleState eventState() const;
-    void setEventState(Qn::ToggleState state);
+    QnBusiness::EventState eventState() const;
+    void setEventState(QnBusiness::EventState state);
 
-    BusinessActionType::Value actionType() const;
-    void setActionType(const BusinessActionType::Value value);
+    QnBusiness::ActionType actionType() const;
+    void setActionType(const QnBusiness::ActionType value);
 
     QnResourceList actionResources() const;
     void setActionResources(const QnResourceList &value);
@@ -134,19 +134,19 @@ private:
 
     QString getAggregationText() const;
 
-    static QString toggleStateToModelString(Qn::ToggleState value);
-    static QString toggleStateToString(Qn::ToggleState state);
-    static QString eventTypeString(BusinessEventType::Value eventType, Qn::ToggleState eventState, BusinessActionType::Value actionType);
+    static QString toggleStateToModelString(QnBusiness::EventState value);
+    static QString toggleStateToString(QnBusiness::EventState state);
+    static QString eventTypeString(QnBusiness::EventType eventType, QnBusiness::EventState eventState, QnBusiness::ActionType actionType);
 private:
-    int m_id;
+    QUuid m_id;
     bool m_modified;
 
-    BusinessEventType::Value m_eventType;
+    QnBusiness::EventType m_eventType;
     QnResourceList m_eventResources;
     QnBusinessEventParameters m_eventParams;
-    Qn::ToggleState m_eventState;
+    QnBusiness::EventState m_eventState;
 
-    BusinessActionType::Value m_actionType;
+    QnBusiness::ActionType m_actionType;
     QnResourceList m_actionResources;
     QnBusinessActionParameters m_actionParams;
 

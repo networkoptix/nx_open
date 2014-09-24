@@ -36,8 +36,9 @@ void QnPtzPresetDialog::loadData(const QnPtzData &data) {
         return;
 
     QList<int> hotkeys;
-    for(int i = 0; i < 10; i++)
+    for(int i = 1; i < 10; i++)
         hotkeys.push_back(i);
+    hotkeys.push_back(0);
 
     QnPtzHotkeyHash usedHotkeys = m_hotkeysDelegate->hotkeys();
     foreach (const QnPtzPreset &preset, data.presets) {
@@ -61,7 +62,7 @@ void QnPtzPresetDialog::loadData(const QnPtzData &data) {
 }
 
 void QnPtzPresetDialog::saveData() {
-    //TODO: #GDM PTZ ask to replace if there is a preset with the same name?
+    //TODO: #GDM #PTZ ask to replace if there is a preset with the same name?
     QString presetId = QUuid::createUuid().toString();
     createPreset(QnPtzPreset(presetId, ui->nameEdit->text()));
 

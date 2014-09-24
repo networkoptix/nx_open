@@ -2,13 +2,15 @@
 
 #include <utils/common/checked_cast.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 
 #include <ui/style/resource_icon_cache.h>
 #include <client/client_globals.h>
 
 QnResourceListModel::QnResourceListModel(QObject *parent): 
     QAbstractListModel(parent),
-    m_readOnly(true) // TODO: #Elric change to false, makes more sense.
+    m_readOnly(true), // TODO: #Elric change to false, makes more sense.
+    m_showIp(false)
 {}
 
 QnResourceListModel::~QnResourceListModel() {
@@ -89,6 +91,10 @@ void QnResourceListModel::submitToResources() {
     m_names.clear();
 }
 
+void QnResourceListModel::setShowIp(bool showIp) {
+    m_showIp = showIp;
+}
+
 int QnResourceListModel::rowCount(const QModelIndex &parent) const {
     if(!parent.isValid())
         return m_resources.size();
@@ -124,21 +130,28 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const {
         return QVariant();
 
     switch(role) {
-    case Qt::EditRole:
     case Qt::DisplayRole:
+    case Qt::EditRole:
     case Qt::ToolTipRole:
     case Qt::StatusTipRole:
     case Qt::WhatsThisRole:
     case Qt::AccessibleTextRole:
-    case Qt::AccessibleDescriptionRole:
+    case Qt::AccessibleDescriptionRole: {
+        QString name;
         if(m_names.size() > index.row() && !m_names[index.row()].isNull()) {
-            return m_names[index.row()];
+            name = m_names[index.row()];
         } else {
-            return resource->getName();
+            name = resource->getName();
         }
+
+        if (m_showIp && role != Qt::EditRole)
+            return lit("%1 (%2)").arg(name, extractHost(resource->getUrl()));
+        else
+            return name;
+    }
     case Qt::DecorationRole:
         if (index.column() == 0)
-            return qnResIconCache->icon(resource->flags(), resource->getStatus());
+            return qnResIconCache->icon(resource);
         break;
     case Qn::ResourceRole:
         return QVariant::fromValue<QnResourcePtr>(resource);

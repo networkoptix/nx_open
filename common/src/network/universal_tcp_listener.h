@@ -7,6 +7,8 @@
 
 #include "utils/network/tcp_listener.h"
 #include "utils/network/tcp_connection_processor.h"
+#include "utils/network/http/httptypes.h"
+
 
 template <class T>
 QnTCPConnectionProcessor* handlerInstance(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner)
@@ -18,16 +20,21 @@ class QnUniversalTcpListener: public QnTcpListener
 {
 private:
 public:
+    typedef QnTCPConnectionProcessor* (*InstanceFunc)(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     struct HandlerInfo
     {
         QByteArray protocol;
         QString path;
-        QnTCPConnectionProcessor* (*instanceFunc)(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+        InstanceFunc instanceFunc;
     };
 
     static const int DEFAULT_RTSP_PORT = 554;
 
-    explicit QnUniversalTcpListener(const QHostAddress& address = QHostAddress::Any, int port = DEFAULT_RTSP_PORT, int maxConnections = 1000);
+    explicit QnUniversalTcpListener(
+        const QHostAddress& address = QHostAddress::Any,
+        int port = DEFAULT_RTSP_PORT,
+        int maxConnections = QnTcpListener::DEFAULT_MAX_CONNECTIONS,
+        bool useSsl = false );
     virtual ~QnUniversalTcpListener();
     
     template <class T> 
@@ -40,7 +47,22 @@ public:
         m_handlers.append(handler);
     }
 
-    QnTCPConnectionProcessor* createNativeProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, const QByteArray& protocol, const QString& path);
+    typedef std::function<bool(const nx_http::Request&)> ProxyCond;
+    struct ProxyInfo
+    {
+        ProxyInfo(): proxyHandler(0) {}
+        InstanceFunc proxyHandler;
+        ProxyCond proxyCond;
+    };
+
+    template <class T>
+    void setProxyHandler( const ProxyCond& cond )
+    {
+        m_proxyInfo.proxyHandler = handlerInstance<T>;
+        m_proxyInfo.proxyCond = cond;
+    }
+
+    QnTCPConnectionProcessor* createNativeProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, const QByteArray& protocol, const nx_http::Request& request);
 
     /* proxy support functions */
 
@@ -52,6 +74,8 @@ public:
     void setProxyPoolSize(int value);
 
     void disableAuth();
+
+    bool isProxy(const nx_http::Request& request);
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner) override;
     virtual void doPeriodicTasks() override;
@@ -66,6 +90,7 @@ private:
     };
 
     QList<HandlerInfo> m_handlers;
+    ProxyInfo m_proxyInfo;
     QUrl m_proxyServerUrl;
     QString m_selfIdForProxy;
     QMutex m_proxyMutex;

@@ -5,6 +5,8 @@
 
 #include "camera_diagnostics_rest_handler.h"
 
+#include <server/server_globals.h>
+
 #include <api/model/camera_diagnostics_reply.h>
 #include <core/dataprovider/spush_media_stream_provider.h>
 #include <core/resource_management/resource_pool.h>
@@ -22,11 +24,11 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     const QnRequestParams &params,
     QnJsonRestResult& result )
 {
-    QString resID = params.value("res_id");
+    QUuid resID = QUuid(params.value("res_id"));
     CameraDiagnostics::Step::Value diagnosticsType = CameraDiagnostics::Step::fromString(params.value("type"));
-    if( resID.isEmpty() || diagnosticsType == CameraDiagnostics::Step::none )
+    if( resID.isNull() || diagnosticsType == CameraDiagnostics::Step::none )
         return nx_http::StatusCode::badRequest;
-
+    
     //retrieving resource
     QnResourcePtr resource = QnResourcePool::instance()->getResourceById( resID );
     if( !resource )
@@ -67,23 +69,6 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     return nx_http::StatusCode::ok;
 }
 
-QString QnCameraDiagnosticsRestHandler::description() const
-{
-    QString diagnosticsTypeStrList;
-    for( int i = CameraDiagnostics::Step::none+1; i < CameraDiagnostics::Step::end; ++i )
-    {
-        if( !diagnosticsTypeStrList.isEmpty() )
-            diagnosticsTypeStrList += QLatin1String(", ");
-        diagnosticsTypeStrList += CameraDiagnostics::Step::toString(static_cast<CameraDiagnostics::Step::Value>(i));
-    }
-
-    return lit(
-        "Performs camera diagnostics\
-        <BR>Param <b>%1</b> - Required. ID of camera\
-        <BR>Param <b>%2</b> - Diagnostics to perform (%3)"
-    ).arg(resIDParamName).arg(diagnosticsTypeParamName).arg(diagnosticsTypeStrList);
-}
-
 CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraAvailability( const QnSecurityCamResourcePtr& cameraRes )
 {
     if( !cameraRes->ping() )
@@ -100,14 +85,14 @@ CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::tryAcquireCameraMediaS
     QnVideoCamera* videoCamera )
 {
     Q_UNUSED(cameraRes)
-    QnAbstractMediaStreamDataProviderPtr streamReader = videoCamera->getLiveReader( QnResource::Role_LiveVideo );
+    QnAbstractMediaStreamDataProviderPtr streamReader = videoCamera->getLiveReader(QnServer::HiQualityCatalog);
     if( !streamReader )
         return CameraDiagnostics::Result( CameraDiagnostics::ErrorCode::unknown, "no stream reader" ); //NOTE we should never get here 
 
     return streamReader->diagnoseMediaStreamConnection();
 }
 
-CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraMediaStreamForErrors( QnResourcePtr res )
+CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraMediaStreamForErrors( const QnResourcePtr& res )
 {
     return res->getLastMediaIssue();
 }

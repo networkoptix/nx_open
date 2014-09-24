@@ -2,7 +2,9 @@
 #define cl_ffmpeg_h2026
 
 #include <QtGui/QImage>
+
 #include "abstractdecoder.h"
+#include "core/datapacket/video_data_packet.h"
 
 #ifdef _USE_DXVA
 #include "dxva/dxva.h"
@@ -25,9 +27,9 @@ public:
     /*!
         \param swDecoderCount Atomically incremented in constructor and atommically decremented in destructor
     */
-    CLFFmpegVideoDecoder(CodecID codec, const QnConstCompressedVideoDataPtr data, bool mtDecoding, QAtomicInt* const swDecoderCount = NULL);
+    CLFFmpegVideoDecoder(CodecID codec, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount = NULL);
     ~CLFFmpegVideoDecoder();
-    bool decode( const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
+    bool decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 
     void showMotion(bool show);
 
@@ -50,9 +52,9 @@ public:
     virtual PixelFormat getFormat() const { return m_context->pix_fmt; }
     virtual void flush();
     virtual const AVFrame* lastFrame() const { return m_frame; }
-    void determineOptimalThreadType(const QnConstCompressedVideoDataPtr data);
+    void determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data);
     virtual void setMTDecoding(bool value);
-    virtual void resetDecoder(QnConstCompressedVideoDataPtr data);
+    virtual void resetDecoder(const QnConstCompressedVideoDataPtr& data);
     virtual void setOutPictureSize( const QSize& outSize );
     //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
     /*!
@@ -60,15 +62,15 @@ public:
     */
     virtual unsigned int getDecoderCaps() const;
     virtual void setSpeed( float newValue ) override;
-
+    void forceMtDecoding(bool value);
 private:
     static AVCodec* findCodec(CodecID codecId);
 
-    void openDecoder(const QnConstCompressedVideoDataPtr data);
+    void openDecoder(const QnConstCompressedVideoDataPtr& data);
     void closeDecoder();
     int findMotionInfo(qint64 pkt_dts);
     void reallocateDeinterlacedFrame();
-    void processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr data, int width, int height);
+    void processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr& data, int width, int height);
 private:
     AVCodecContext *m_passedContext;
 
@@ -110,6 +112,8 @@ private:
     MotionMap m_motionMap; 
     QAtomicInt* const m_swDecoderCount;
     mutable double m_prevSampleAspectRatio;
+    bool m_forcedMtDecoding;
+    qint64 m_prevTimestamp;
 };
 
 #endif //cl_ffmpeg_h

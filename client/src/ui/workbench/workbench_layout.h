@@ -63,7 +63,13 @@ public:
     /**
      * \returns                         Layout associated with the given resource, if any.
      */
-    static QnWorkbenchLayout *instance(const QnLayoutResourcePtr &resource);
+    static QnWorkbenchLayout *instance(const QnLayoutResourcePtr &layout);
+
+
+    /**
+     * \returns                         Layout associated with the given resource, if any.
+     */
+    static QnWorkbenchLayout *instance(const QnVideoWallResourcePtr &videowall);
 
     /**
      * Virtual destructor.
@@ -90,6 +96,11 @@ public:
      * \param[out] layoutData           Resource to submit layout to.
      */
     void submit(const QnLayoutResourcePtr &resource) const;
+
+    /** 
+     * Notify all subscribers that layout title should be updated.
+     */
+    void notifyTitleChanged();
 
     /**
      * \param item                      Item to check.
@@ -337,6 +348,11 @@ signals:
      * This signal is emitted whenever name of this layout changes.
      */
     void nameChanged();
+
+    /**
+     * This signal is emitted whenever title of this layout changes.
+     */
+    void titleChanged();
 
     /**
      * This signal is emitted whenever cell aspect ratio of this layout changes.

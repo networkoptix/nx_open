@@ -9,6 +9,8 @@
 
 #include <utils/common/connective.h>
 
+class QnWorkbenchPermissionsNotifier;
+
 /**
  * This class can be used for watching the resource pool for a user resource
  * that has a specific name.
@@ -49,7 +51,7 @@ private slots:
     void at_resource_nameChanged(const QnResourcePtr &resource);
 
     void at_user_resourceChanged(const QnResourcePtr &resource);
-    void at_user_permissionsChanged(const QnUserResourcePtr &user);
+    void at_user_permissionsChanged(const QnResourcePtr &user);
 private:
     void setCurrentUser(const QnUserResourcePtr &currentUser);
     bool reconnectRequired(const QnUserResourcePtr &user);
@@ -58,7 +60,9 @@ private:
     QnUserResourceList m_users;
     QString m_userName;
     QString m_userPassword;
-    QString m_userPasswordHash;
+    QByteArray m_userPasswordHash;
+    Qn::Permissions m_userPermissions;
+    QPointer<QnWorkbenchPermissionsNotifier> m_permissionsNotifier;
     QnUserResourcePtr m_user;
 };
 

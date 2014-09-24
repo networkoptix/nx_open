@@ -167,6 +167,9 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             while( !m_videoPacket.get() && !localHttpClientPtr->eof() )
                 m_multipartContentParser.processData( localHttpClientPtr->fetchMessageBodyBuffer() );
             break;
+
+        default:
+            break;
     }
 
     if( m_videoPacket.get() )
@@ -207,6 +210,7 @@ void StreamReader::gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame )
     //creating video packet
 
     m_videoPacket.reset( new ILPVideoPacket(
+        &m_allocator,
         0,
         QDateTime::currentMSecsSinceEpoch() * USEC_IN_MS,
         nxcip::MediaDataPacket::fKeyPacket,

@@ -2,10 +2,12 @@
 
 #include <limits>
 
+#include <client/client_settings.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <utils/common/warnings.h>
-#include <utils/common/range.h>
 #include <ui/common/geometry.h>
 #include <ui/style/globals.h>
 
@@ -26,7 +28,7 @@ namespace {
 
         for (int r = region.top(); r <= region.bottom(); r++)
             for (int c = region.left(); c <= region.right(); c++)
-                qnInsert(*points, points->end(), QPoint(c, r));
+                QnCollection::insert(*points, points->end(), QPoint(c, r));
     }
 
 } // anonymous namespace
@@ -74,12 +76,20 @@ QnLayoutResourcePtr QnWorkbenchLayout::resource() const {
     return synchronizer->resource();
 }
 
-QnWorkbenchLayout *QnWorkbenchLayout::instance(const QnLayoutResourcePtr &resource) {
-    QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource);
+QnWorkbenchLayout *QnWorkbenchLayout::instance(const QnLayoutResourcePtr &layout) {
+    QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(layout);
     if(synchronizer == NULL)
         return NULL;
 
     return synchronizer->layout();
+}
+
+QnWorkbenchLayout *QnWorkbenchLayout::instance(const QnVideoWallResourcePtr &videoWall) {
+    foreach (const QnLayoutResourcePtr &layout, qnResPool->getResources<QnLayoutResource>()) {
+        if (layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>() == videoWall)
+            return QnWorkbenchLayout::instance(layout);
+    }
+    return NULL;
 }
 
 const QString &QnWorkbenchLayout::name() const {
@@ -105,8 +115,11 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
     // TODO: #Elric note that we keep items that are not present in resource's data.
     // This is not correct, but we currently need it.
     const QHash<int, QVariant> data = resource->data();
-    for(QHash<int, QVariant>::const_iterator i = data.begin(); i != data.end(); i++)
+    for(QHash<int, QVariant>::const_iterator i = data.begin(); i != data.end(); i++) {
+        if (i.key() == Qn::VideoWallItemGuidRole)
+            continue;
         setData(i.key(), i.value());
+    }
 
     bool result = true;
 
@@ -164,6 +177,10 @@ void QnWorkbenchLayout::submit(const QnLayoutResourcePtr &resource) const {
     }
 
     resource->setItems(datas);
+}
+
+void QnWorkbenchLayout::notifyTitleChanged() {
+    emit titleChanged();
 }
 
 void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
@@ -323,6 +340,9 @@ bool QnWorkbenchLayout::canMoveItem(QnWorkbenchItem *item, const QRect &geometry
         qnWarning("Cannot move an item that does not belong to this layout.");
         return false;
     }
+
+    if (qnSettings->isVideoWallMode())
+        return true;
 
     if(item->isPinned()) {
         return m_itemMap.isOccupiedBy(

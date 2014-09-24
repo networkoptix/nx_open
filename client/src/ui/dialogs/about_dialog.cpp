@@ -12,7 +12,9 @@
 #include <QtGui/QClipboard>
 #include <QtGui/QTextDocumentFragment>
 
-#include "api/app_server_connection.h"
+#include <api/app_server_connection.h>
+#include <api/global_settings.h>
+
 #include "core/resource/resource_type.h"
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/media_server_resource.h>
@@ -22,13 +24,17 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
+#include <ui/style/globals.h>
+
+#include <utils/common/email.h>
 
 #include "openal/qtvaudiodevice.h"
-#include "version.h"
+#include <utils/common/app_info.h>
 
 namespace {
-    QString versionString(const char *version) {
-        QString result = QLatin1String(version);
+    QString versionString(const QString &version) {
+        QString result = version;
         result.replace(lit("-SNAPSHOT"), QString());
         return result;
     }
@@ -37,7 +43,6 @@ namespace {
 
 QnAboutDialog::QnAboutDialog(QWidget *parent): 
     base_type(parent, Qt::MSWindowsFixedSizeDialogHint),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::AboutDialog())
 {
     ui->setupUi(this);
@@ -47,15 +52,17 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
     if(menu()->canTrigger(Qn::ShowcaseAction)) {
         QPushButton* showcaseButton = new QPushButton(this);
         showcaseButton->setText(action(Qn::ShowcaseAction)->text());
-        connect(showcaseButton, SIGNAL(clicked()), action(Qn::ShowcaseAction), SLOT(trigger()));
+        connect(showcaseButton, &QPushButton::clicked, action(Qn::ShowcaseAction), &QAction::trigger);
         ui->buttonBox->addButton(showcaseButton, QDialogButtonBox::HelpRole);
     }
 
     m_copyButton = new QPushButton(this);
     ui->buttonBox->addButton(m_copyButton, QDialogButtonBox::HelpRole);
 
-    connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    connect(m_copyButton, SIGNAL(clicked()), this, SLOT(at_copyButton_clicked()));
+    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QnAboutDialog::reject);
+    connect(m_copyButton, &QPushButton::clicked, this, &QnAboutDialog::at_copyButton_clicked);
+    connect(QnGlobalSettings::instance(), &QnGlobalSettings::emailSettingsChanged, this, &QnAboutDialog::retranslateUi);
+    connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged, this, &QnAboutDialog::retranslateUi);
 
     retranslateUi();
 }
@@ -72,6 +79,42 @@ void QnAboutDialog::changeEvent(QEvent *event)
         retranslateUi();
 }
 
+
+QString QnAboutDialog::connectedServers() const {
+    QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
+
+    QnSoftwareVersion latestVersion = watcher->latestVersion();
+    QnSoftwareVersion latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
+
+    // if some component is newer than the newest mediaserver, focus on its version
+    if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
+        latestMsVersion = latestVersion;
+
+    QString servers;
+    foreach(const QnAppInfoMismatchData &data, watcher->mismatchData()) {
+        if (data.component != Qn::ServerComponent)
+            continue;
+
+        QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
+        if(!resource) 
+            continue;
+                      
+        QString server = tr("Server v%1 at %2<br/>").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
+
+        bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
+
+        if (updateRequested)
+            server = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(server);
+
+        servers += server;
+    }
+
+    return servers;
+}
+
+
+
+
 void QnAboutDialog::retranslateUi()
 {
     ui->retranslateUi(this);
@@ -83,57 +126,37 @@ void QnAboutDialog::retranslateUi()
             "<b>%1</b> version %2 (%3).<br/>\n"
             "Built for %5-%6 with %7.<br/>\n"
         ).
-        arg(QLatin1String(QN_APPLICATION_NAME)).
-        arg(QLatin1String(QN_APPLICATION_VERSION)).
-        arg(QLatin1String(QN_APPLICATION_REVISION)).
-        arg(QLatin1String(QN_APPLICATION_PLATFORM)).
-        arg(QLatin1String(QN_APPLICATION_ARCH)).
-        arg(QLatin1String(QN_APPLICATION_COMPILER));
+        arg(qApp->applicationName()).
+        arg(QApplication::applicationVersion()).
+        arg(QnAppInfo::applicationRevision()).
+        arg(QnAppInfo::applicationPlatform()).
+        arg(QnAppInfo::applicationArch()).
+        arg(QnAppInfo::applicationCompiler());
 
-    QnSoftwareVersion ecsVersion = QnAppServerConnectionFactory::currentVersion();
-    QUrl ecsUrl = QnAppServerConnectionFactory::defaultUrl();
-    QString servers;
-
-    if (ecsVersion.isNull()) {
-        servers = tr("<b>Enterprise controller</b> is not connected.<br>\n");
-    } else {
-        servers = tr("<b>Enterprise controller</b> version %1 at %2:%3.<br>\n").
-            arg(ecsVersion.toString()).
-            arg(ecsUrl.host()).
-            arg(ecsUrl.port());
-    }
-
-    QStringList serverVersions;
-    foreach (QnMediaServerResourcePtr server, qnResPool->getResources().filtered<QnMediaServerResource>()) {
-        if (server->getStatus() != QnResource::Online)
-            continue;
-
-        serverVersions.append(tr("<b>Media Server</b> version %2 at %3.").arg(server->getVersion().toString()).arg(QUrl(server->getUrl()).host()));
-    }
+//    QnSoftwareVersion ecsVersion = QnAppServerConnectionFactory::currentVersion();
+    QString servers = connectedServers();
+    if (servers.isEmpty())
+        servers = tr("<b>Client</b> is not connected to <b>Server</b>.<br>");
     
-    if (!ecsVersion.isNull() && !serverVersions.isEmpty())
-        servers += serverVersions.join(QLatin1String("<br>\n"));
-
     QString credits = 
         tr(
             "<b>%1 %2</b> uses the following external libraries:<br/>\n"
             "<br />\n"
             "<b>Qt v.%3</b> - Copyright (c) 2012 Nokia Corporation.<br/>\n"
             "<b>FFMpeg %4</b> - Copyright (c) 2000-2012 FFmpeg developers.<br/>\n"
-            "<b>Color Picker v2.6 Qt Solution</b> - Copyright (c) 2009 Nokia Corporation.<br/>\n"
             "<b>LAME 3.99.0</b> - Copyright (c) 1998-2012 LAME developers.<br/>\n"
             "<b>OpenAL %5</b> - Copyright (c) 2000-2006 %6.<br/>\n"
             "<b>SIGAR %7</b> - Copyright (c) 2004-2011 VMware Inc.<br/>\n"
             "<b>Boost %8</b> - Copyright (c) 2000-2012 Boost developers.<br/>\n"
         ).
-        arg(QLatin1String(QN_ORGANIZATION_NAME) + QLatin1String("(tm)")).
-        arg(QLatin1String(QN_APPLICATION_NAME)).
+        arg(QnAppInfo::organizationName() + lit("(tm)")).
+        arg(qApp->applicationName()).
         arg(QLatin1String(QT_VERSION_STR)).
-        arg(versionString(QN_FFMPEG_VERSION)).
+        arg(versionString(QnAppInfo::ffmpegVersion())).
         arg(QtvAudioDevice::instance()->versionString()).
         arg(QtvAudioDevice::instance()->company()).
-        arg(versionString(QN_SIGAR_VERSION)).
-        arg(versionString(QN_BOOST_VERSION));
+        arg(versionString(QnAppInfo::sigarVersion())).
+        arg(versionString(QnAppInfo::boostVersion()));
 
 #ifndef Q_OS_DARWIN
     credits += tr("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.<br/>");
@@ -158,6 +181,14 @@ void QnAboutDialog::retranslateUi()
     ui->creditsLabel->setText(credits);
     ui->gpuLabel->setText(gpu);
     ui->serversLabel->setText(servers);
+
+    QString supportAddress = QnGlobalSettings::instance()->emailSettings().supportEmail;
+    QString supportLink = supportAddress;
+    if (QnEmail::isValid(supportAddress))
+        supportLink = lit("<a href=mailto:%1>%1</a>").arg(supportAddress);
+    else if (!supportAddress.isEmpty())
+        supportLink = lit("<a href=%1>%1</a>").arg(supportAddress);
+    ui->supportEmailLabel->setText(tr("<b>Support</b>: %1").arg(supportLink));
 }
 
 // -------------------------------------------------------------------------- //
@@ -174,8 +205,6 @@ void QnAboutDialog::at_copyButton_clicked() {
          QTextDocumentFragment::fromHtml(ui->serversLabel->text()).toPlainText()
     );
 }
-
-
 
 
 

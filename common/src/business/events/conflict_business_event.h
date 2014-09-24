@@ -8,7 +8,7 @@ class QnConflictBusinessEvent : public QnInstantBusinessEvent
 {
     typedef QnInstantBusinessEvent base_type;
 public:
-    explicit QnConflictBusinessEvent(const BusinessEventType::Value eventType,
+    explicit QnConflictBusinessEvent(const QnBusiness::EventType eventType,
                                      const QnResourcePtr& resource,
                                      const qint64 timeStamp,
                                      const QString& source = QString(),

@@ -64,7 +64,7 @@ int QnRestGUIRequestHandler::executeGet(const QString& path, const QnRequestPara
     return d->code;
 }
 
-int QnRestGUIRequestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnRestGUIRequestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
 {
     Q_D(QnRestGUIRequestHandler);
     d->params = params;

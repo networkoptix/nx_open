@@ -22,6 +22,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/layout_item_index.h>
+#include <core/resource/videowall_item_index.h>
+#include <core/resource/videowall_matrix_index.h>
+#include <core/resource/resource_property.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -111,11 +116,11 @@ void QnResourceBrowserToolTipWidget::setThumbnailVisible(bool visible) {
         layout->removeItem(m_thumbnailLabel);
 }
 
-void QnResourceBrowserToolTipWidget::setResourceId(int id) {
+void QnResourceBrowserToolTipWidget::setResourceId(const QUuid& id) {
     m_resourceId = id;
 }
 
-int QnResourceBrowserToolTipWidget::resourceId() const {
+QUuid QnResourceBrowserToolTipWidget::resourceId() const {
     return m_resourceId;
 }
 
@@ -145,13 +150,6 @@ void QnResourceBrowserToolTipWidget::pointTo(const QPointF &pos) {
     updateTailPos();
 }
 
-void QnResourceBrowserToolTipWidget::at_provider_imageChanged(const QImage &image) {
-    if (!m_thumbnailLabel)
-        return;
-    m_thumbnailLabel->setPixmap(QPixmap::fromImage(image));
-}
-
-
 // -------------------------------------------------------------------------- //
 // QnResourceBrowserWidget
 // -------------------------------------------------------------------------- //
@@ -163,19 +161,19 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     m_filterTimerId(0),
     m_tooltipWidget(NULL),
     m_hoverProcessor(NULL),
-    m_thumbnailManager(new QnCameraThumbnailManager(this))
+    m_thumbnailManager(context->instance<QnCameraThumbnailManager>())
 {
     ui->setupUi(this);
 
     ui->typeComboBox->addItem(tr("Any Type"), 0);
-    ui->typeComboBox->addItem(tr("Video Files"), static_cast<int>(QnResource::local | QnResource::video));
-    ui->typeComboBox->addItem(tr("Image Files"), static_cast<int>(QnResource::still_image));
-    ui->typeComboBox->addItem(tr("Live Cameras"), static_cast<int>(QnResource::live));
+    ui->typeComboBox->addItem(tr("Video Files"), static_cast<int>(Qn::local | Qn::video));
+    ui->typeComboBox->addItem(tr("Image Files"), static_cast<int>(Qn::still_image));
+    ui->typeComboBox->addItem(tr("Live Cameras"), static_cast<int>(Qn::live));
 
     ui->clearFilterButton->setIcon(qnSkin->icon("tree/clear.png"));
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
-    m_resourceModel = new QnResourcePoolModel(Qn::RootNode, false, this);
+    m_resourceModel = new QnResourcePoolModel(QnResourcePoolModel::FullScope, this);
     ui->resourceTreeWidget->setModel(m_resourceModel);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BackgroundOpacity | Qn::BypassGraphicsProxy);
@@ -204,7 +202,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     connect(ui->tabWidget,          SIGNAL(currentChanged(int)),        this,               SLOT(at_tabWidget_currentChanged(int)));
     connect(ui->resourceTreeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()));
 
-    connect(m_thumbnailManager,     SIGNAL(thumbnailReady(int,QPixmap)), this,              SLOT(at_thumbnailReady(int,QPixmap)));
+    connect(m_thumbnailManager,     SIGNAL(thumbnailReady(QUuid,QPixmap)), this,              SLOT(at_thumbnailReady(QUuid,QPixmap)));
 
     /* Connect to context. */
     ui->resourceTreeWidget->setWorkbench(workbench());
@@ -264,8 +262,8 @@ QnResourceSearchProxyModel *QnResourceBrowserWidget::layoutModel(QnWorkbenchLayo
         result->setSourceModel(m_resourceModel);
         layout->setProperty(qn_searchModelPropertyName, QVariant::fromValue<QnResourceSearchProxyModel *>(result));
 
-        /* Always accept servers. */
-        result->addCriterion(QnResourceCriterion(QnResource::server)); 
+        //initial filter setup
+        setupInitialModelCriteria(result);
     }
     return result;
 }
@@ -302,13 +300,15 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
         qnWarning("Requesting context menu for a tree widget while no menu manager instance is available.");
         return;
     }
+
+    if (qnSettings->isVideoWallMode())
+        return;
+
     QnActionManager *manager = context()->menu();
 
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, mainWindow(), ignoreSelection ? QnActionParameters() : currentParameters(Qn::TreeScope)));
-
-    /* Add tree-local actions to the menu. */
-    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()) || ignoreSelection)
-        manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */ // TODO: #Elric implement with action parameters
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, mainWindow(), ignoreSelection 
+        ? QnActionParameters().withArgument(Qn::NodeTypeRole, Qn::RootNode)
+        : currentParameters(Qn::TreeScope)));
 
     if(currentTreeWidget() == ui->searchTreeWidget) {
         /* Disable rename action for search view. */
@@ -352,7 +352,7 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const {
     QnResourceList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
-        int nodeType = index.data(Qn::NodeTypeRole).toInt();
+        Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
         switch (nodeType) {
         case Qn::RecorderNode: {
@@ -364,19 +364,30 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const {
                 }
             }
             break;
-        case Qn::ResourceNode: {
+        case Qn::ResourceNode:
+        case Qn::EdgeNode:
+            {
                 QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
                 if(resource && !result.contains(resource))
                     result.append(resource);
             }
             break;
+//         case Qn::EdgeNode: {
+//             QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+//             if (resource && !result.contains(resource))
+//                 result.append(resource);
+//             QnResourcePtr server = resource->getParentResource();
+//             if (server && !result.contains(server))
+//                 result.append(server);
+//             }
+//             break;
         case Qn::LocalNode:
         case Qn::ServersNode:
         case Qn::UsersNode:
         case Qn::ItemNode:
         case Qn::BastardNode:
         case Qn::RootNode:
-            continue;
+            break;
         default:
             break;
         }
@@ -403,6 +414,37 @@ QnLayoutItemIndexList QnResourceBrowserWidget::selectedLayoutItems() const {
     return result;
 }
 
+QnVideoWallItemIndexList QnResourceBrowserWidget::selectedVideoWallItems() const {
+    QnVideoWallItemIndexList result;
+
+    foreach (const QModelIndex &modelIndex, currentSelectionModel()->selectedRows()) {
+        QUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QUuid>();
+        if(uuid.isNull())
+            continue;
+        QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(uuid);
+        if (!index.isNull())
+            result.push_back(index);
+    }
+
+    return result;
+}
+
+QnVideoWallMatrixIndexList QnResourceBrowserWidget::selectedVideoWallMatrices() const {
+    QnVideoWallMatrixIndexList result;
+
+    foreach (const QModelIndex &modelIndex, currentSelectionModel()->selectedRows()) {
+        QUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QUuid>();
+        if(uuid.isNull())
+            continue;
+
+        QnVideoWallMatrixIndex index = qnResPool->getVideoWallMatrixByUuid(uuid);
+        if (!index.isNull())
+            result.push_back(index);
+    }
+
+    return result;
+}
+
 Qn::ActionScope QnResourceBrowserWidget::currentScope() const {
     return Qn::TreeScope;
 }
@@ -413,11 +455,17 @@ QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
 
     QItemSelectionModel *selectionModel = currentSelectionModel();
 
-    if(!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QUuid>().isNull()) { /* If it's a layout item. */
+    Qn::NodeType nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    if(nodeType == Qn::VideoWallItemNode)
+        return QVariant::fromValue(selectedVideoWallItems());
+
+    if (nodeType == Qn::VideoWallMatrixNode)
+        return QVariant::fromValue(selectedVideoWallMatrices());
+
+    if(!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QUuid>().isNull()) /* If it's a layout item. */
         return QVariant::fromValue(selectedLayoutItems());
-    } else {
-        return QVariant::fromValue(selectedResources());
-    }
+
+    return QVariant::fromValue(selectedResources());
 }
 
 QString QnResourceBrowserWidget::toolTipAt(const QPointF &pos) const {
@@ -446,11 +494,11 @@ bool QnResourceBrowserWidget::showOwnTooltip(const QPointF &pos) {
         m_tooltipWidget->pointTo(QPointF(geometry().right(), pos.y()));
 
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if (resource && (resource->flags() & QnResource::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
+        if (resource && (resource->flags() & Qn::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
             m_tooltipWidget->setResourceId(resource->getId());
             m_thumbnailManager->selectResource(resource);
         } else {
-            m_tooltipWidget->setResourceId(0);
+            m_tooltipWidget->setResourceId(QUuid());
             m_tooltipWidget->setPixmap(QPixmap());
         }
 
@@ -487,8 +535,8 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget *widget) {
 
 QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const {
     QItemSelectionModel *selectionModel = currentSelectionModel();
-    int nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).toInt();
-    return QnActionParameters(currentTarget(scope)).withArgument(Qn::NodeTypeRole, nodeType); // TODO: #Elric just pass all the data through?
+    QVariant data = selectionModel->currentIndex().data(Qn::NodeTypeRole);
+    return QnActionParameters(currentTarget(scope)).withArgument(Qn::NodeTypeRole, data); // TODO: #Elric just pass all the data through?
 }
 
 void QnResourceBrowserWidget::updateFilter(bool force) {
@@ -616,7 +664,7 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent *event) {
             QnResourceSearchProxyModel *model = layoutModel(layout, true);
             
             QString filter = ui->filterLineEdit->text();
-            QnResource::Flags flags = static_cast<QnResource::Flags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
+            Qn::ResourceFlags flags = static_cast<Qn::ResourceFlags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
 
             model->clearCriteria();
             if (filter.isEmpty()) {
@@ -624,12 +672,13 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent *event) {
             }
             else {
                 model->addCriterion(QnResourceCriterionGroup(filter));
-                model->addCriterion(QnResourceCriterion(QnResource::user));
-                model->addCriterion(QnResourceCriterion(QnResource::layout));
+                model->addCriterion(QnResourceCriterion(Qn::user));
+                model->addCriterion(QnResourceCriterion(Qn::layout));
             }
             if(flags != 0)
                 model->addCriterion(QnResourceCriterion(flags, QnResourceProperty::flags, QnResourceCriterion::Next, QnResourceCriterion::Reject));
-            model->addCriterion(QnResourceCriterion(QnResource::server));
+
+            setupInitialModelCriteria(model);
         }
     }
 
@@ -689,6 +738,8 @@ void QnResourceBrowserWidget::at_layout_itemRemoved(QnWorkbenchItem *) {
 void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index) {
     if(index == SearchTab) {
         QnWorkbenchLayout *layout = workbench()->currentLayout();
+        if (!layout || !layout->resource())
+            return;
 
         layoutSynchronizer(layout, true); /* Just initialize the synchronizer. */
         QnResourceSearchProxyModel *model = layoutModel(layout, true);
@@ -710,7 +761,7 @@ void QnResourceBrowserWidget::at_showUrlsInTree_changed() {
     m_resourceModel->setUrlsShown(urlsShown);
 }
 
-void QnResourceBrowserWidget::at_thumbnailReady(int resourceId, const QPixmap &pixmap) {
+void QnResourceBrowserWidget::at_thumbnailReady(QUuid resourceId, const QPixmap &pixmap) {
     if (m_tooltipWidget && m_tooltipWidget->resourceId() != resourceId)
         return;
     m_tooltipWidget->setPixmap(pixmap);
@@ -723,6 +774,19 @@ void QnResourceBrowserWidget::at_thumbnailClicked() {
     if (!resource)
         return;
     menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(resource));
+}
+
+void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyModel *model) const {
+    /* Always accept servers for administrator users. */
+    if (accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission)) {
+        model->addCriterion(QnResourceCriterion(Qn::server)); 
+    }
+    else {
+        /* Always skip servers for common users, but always show user and layouts */
+        model->addCriterion(QnResourceCriterion(Qn::server, QnResourceProperty::flags, QnResourceCriterion::Reject, QnResourceCriterion::Next)); 
+        model->addCriterion(QnResourceCriterion(Qn::user));
+        model->addCriterion(QnResourceCriterion(Qn::layout));
+    }
 }
 
 

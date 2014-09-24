@@ -7,14 +7,13 @@
 
 #include "utils/common/id.h"
 #include "core/dataprovider/media_streamdataprovider.h"
-#include "schedule_recording_type.h"
 
 class QnScheduleTask
 {
 public:
     struct Data
     {
-        Data(int dayOfWeek = 1, int startTime = 0, int endTime = 0, Qn::RecordingType recordType = Qn::RecordingType_Never,
+        Data(int dayOfWeek = 1, int startTime = 0, int endTime = 0, Qn::RecordingType recordType = Qn::RT_Never,
              int beforeThreshold = 0, int afterThreshold = 0, Qn::StreamQuality streamQuality = Qn::QualityHighest, int fps = 10, bool doRecordAudio = false)
             : m_dayOfWeek(dayOfWeek),
               m_startTime(startTime),
@@ -49,17 +48,22 @@ public:
     };
 
     QnScheduleTask()
-        : m_id(0), m_resourceId(0)
+        : m_resourceId() //, m_id(0)
     {}
+
+    QnScheduleTask(QUuid resourceId)
+        : m_resourceId(resourceId)
+    {}
+
     QnScheduleTask(const Data& data)
-        : m_id(0), m_resourceId(0), m_data(data)
+        : m_resourceId(), m_data(data) // m_id(0)
     {
     }
 
-    QnScheduleTask(QnId id, QnId resourceId, int dayOfWeek, int startTime, int endTime,
-                   Qn::RecordingType recordType =  Qn::RecordingType_Never, int beforeThreshold = 0, int afterThreshold = 0,
+    QnScheduleTask(QUuid resourceId, int dayOfWeek, int startTime, int endTime,
+                   Qn::RecordingType recordType =  Qn::RT_Never, int beforeThreshold = 0, int afterThreshold = 0,
                    Qn::StreamQuality streamQuality = Qn::QualityHighest, int fps = 10, bool doRecordAudio = false)
-        : m_id(id), m_resourceId(resourceId),
+        : m_resourceId(resourceId),
           m_data(dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio)
     {}
 
@@ -68,8 +72,7 @@ public:
     const Data& getData() const { return m_data; }
     void setData(const Data& data) { m_data = data; }
 
-    QnId getId() const { return m_id; }
-    QnId getResourceId() const { return m_resourceId; }
+    QUuid getResourceId() const { return m_resourceId; }
     int getDayOfWeek() const { return m_data.m_dayOfWeek; }
     int getStartTime() const { return m_data.m_startTime; }
     int getHour() const;
@@ -107,8 +110,8 @@ public:
     bool containTimeMs(int weekTimeMs) const;
 
 private:
-    QnId m_id;
-    QnId m_resourceId;
+    //QUuid m_id;
+    QUuid m_resourceId;
 
     Data m_data;
 
@@ -142,16 +145,16 @@ inline QTextStream& operator<<(QTextStream& stream, const QnScheduleTask& data)
 {
     QString recordingTypeString;
     switch(data.getRecordingType()) {
-    case Qn::RecordingType_Run:
+    case Qn::RT_Always:
         recordingTypeString = QLatin1String("Always");
         break;
-    case Qn::RecordingType_MotionOnly:
+    case Qn::RT_MotionOnly:
         recordingTypeString = QLatin1String("Motion");
         break;
-    case Qn::RecordingType_Never:
+    case Qn::RT_Never:
         recordingTypeString = QLatin1String("Never");
         break;
-    case Qn::RecordingType_MotionPlusLQ:
+    case Qn::RT_MotionAndLowQuality:
         recordingTypeString = QLatin1String("MotionAndLQ");
         break;
     default:
@@ -186,7 +189,7 @@ inline QTextStream& operator<<(QTextStream& stream, const QnScheduleTask& data)
     }
 
     stream << "type=" << recordingTypeString << " fps=" << data.getFps() << " quality=" << qualityString;
-    if (data.getRecordingType() == Qn::RecordingType_MotionOnly)
+    if (data.getRecordingType() == Qn::RT_MotionOnly)
         stream << " pre-motion=" << data.getBeforeThreshold() << "post-motion=" << data.getAfterThreshold();
     return stream;
 }

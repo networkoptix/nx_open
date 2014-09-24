@@ -6,6 +6,8 @@
 #ifndef FILE_TRANSCODER_H
 #define FILE_TRANSCODER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <memory>
 
 #include <QtCore/QIODevice>
@@ -18,7 +20,7 @@ extern "C"
 }
 
 #include <core/resource/media_resource.h>
-#include <plugins/resources/archive/avi_files/avi_archive_delegate.h>
+#include <plugins/resource/avi/avi_archive_delegate.h>
 #include <transcoding/ffmpeg_transcoder.h>
 #include <utils/common/long_runnable.h>
 
@@ -107,7 +109,7 @@ public slots:
     virtual void pleaseStop() override;
     //!Start transcoding
     /*!
-        This method returns immediately. On transcoding end \a done signal is emmitted
+        This method returns immediately. On transcoding end \a done signal is emitted
     */
     bool startAsync();
     //!Do transcoding in sync mode
@@ -121,6 +123,7 @@ protected:
     virtual void run() override;
 
 private:
+    // TODO: #Elric #enum
     enum State
     {
         sInit,
@@ -130,7 +133,7 @@ private:
 
     mutable QMutex m_mutex;
     QWaitCondition m_cond;
-    std::auto_ptr<QnAviArchiveDelegate> m_mediaFileReader;
+    std::unique_ptr<QnAviArchiveDelegate> m_mediaFileReader;
     QnFfmpegTranscoder m_transcoder;
     int m_resultCode;
     State m_state;
@@ -152,5 +155,7 @@ private:
     bool openFiles();
     void closeFiles();
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //FILE_TRANSCODER_H

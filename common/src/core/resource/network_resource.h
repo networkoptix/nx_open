@@ -5,7 +5,8 @@
 #include <QtNetwork/QHostAddress>
 #include "utils/network/mac_address.h"
 #include "resource.h"
-#include "recording/time_period_list.h"
+
+class QnTimePeriodList;
 
 class QN_EXPORT QnNetworkResource : public QnResource
 {
@@ -15,16 +16,14 @@ class QN_EXPORT QnNetworkResource : public QnResource
     //Q_PROPERTY(QAuthenticator auth READ getAuth WRITE setAuth)
 
 public:
-    enum QnNetworkStatus
-    {
+    enum NetworkStatusFlag {
         BadHostAddr = 0x01,
         Ready = 0x04
     };
+    Q_DECLARE_FLAGS(NetworkStatus, NetworkStatusFlag)
 
     QnNetworkResource();
     virtual ~QnNetworkResource();
-
-    virtual void deserialize(const QnResourceParameters& parameters) override;
 
     virtual QString getUniqueId() const;
 
@@ -64,16 +63,11 @@ public:
     QString toSearchString() const;
 
 
-    void addNetworkStatus(QnNetworkStatus status);
-    void removeNetworkStatus(QnNetworkStatus status);
-    bool checkNetworkStatus(QnNetworkStatus status) const;
-    void setNetworkStatus(QnNetworkStatus status);
+    void addNetworkStatus(NetworkStatus status);
+    void removeNetworkStatus(NetworkStatus status);
+    bool checkNetworkStatus(NetworkStatus status) const;
+    void setNetworkStatus(NetworkStatus status);
 
-
-    // return true if device conflicting with something else ( IP conflict )
-    // this function makes sense to call only for resources in the same lan
-    // it does some physical job
-    virtual bool conflicting();
 
     // all data readers and any sockets will use this number as timeout value in ms
     void setNetworkTimeout(unsigned int timeout);
@@ -92,9 +86,7 @@ public:
     // we need to get mac anyway to differentiate one device from another
     virtual bool updateMACAddress() { return true; }
 
-    virtual void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) override;
-
-    virtual bool shoudResolveConflicts() const;
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
     // in some cases I just want to update couple of field from just discovered resource
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source);
@@ -104,11 +96,7 @@ public:
     /*
     * Return time periods from resource based archive (direct to storage)
     */
-    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {
-        Q_UNUSED(startTimeMs)
-        Q_UNUSED(endTimeMs)
-        Q_UNUSED(detailLevel)
-        return QnTimePeriodList(); }
+    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel);
 
     //!Returns true if camera is accessible
     /*!
@@ -116,6 +104,8 @@ public:
     */
     virtual bool ping();
 
+    static QUuid uniqueIdToId(const QString& uniqId);
+    virtual bool isAbstractResource() const { return false; }
 private:
     QAuthenticator m_auth;
     bool m_authenticated;
@@ -126,7 +116,7 @@ private:
 
     QHostAddress m_localAddress; // address used to discover this resource ( in case if machine has more than one NIC/address
 
-    unsigned long m_networkStatus;
+    NetworkStatus m_networkStatus;
 
     unsigned int m_networkTimeout;
     int m_httpPort;
@@ -134,5 +124,7 @@ private:
 
     bool m_probablyNeedToUpdateStatus;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnNetworkResource::NetworkStatus)
 
 #endif // QN_NETWORK_RESOURCE_H

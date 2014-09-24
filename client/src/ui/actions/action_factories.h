@@ -23,6 +23,13 @@ public:
 
         return QList<QAction *>();
     }
+
+    virtual QMenu* newMenu(const QnActionParameters &parameters, QWidget *parentWidget) {
+        Q_UNUSED(parameters);
+        Q_UNUSED(parentWidget);
+
+        return NULL;
+    }
 };
 
 
@@ -47,6 +54,13 @@ public:
 
 private slots:
     void at_action_triggered();
+};
+
+class QnEdgeNodeActionFactory: public QnActionFactory {
+    Q_OBJECT
+public:
+    QnEdgeNodeActionFactory(QObject *parent = NULL): QnActionFactory(parent) {}
+    virtual QMenu* newMenu(const QnActionParameters &parameters,  QWidget *parentWidget) override;
 };
 
 #endif // QN_ACTION_FACTORIES_H

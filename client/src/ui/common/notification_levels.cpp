@@ -4,21 +4,33 @@
 
 #include <ui/style/globals.h>
 
-Qn::NotificationLevel QnNotificationLevels::notificationLevel(BusinessEventType::Value eventType) {
-    switch(eventType) {
-    case BusinessEventType::Camera_Motion:          return Qn::CommonNotification;
-    case BusinessEventType::Camera_Input:           return Qn::CommonNotification;      
-    case BusinessEventType::Camera_Disconnect:      return Qn::ImportantNotification;
-    case BusinessEventType::Storage_Failure:        return Qn::ImportantNotification;
-    case BusinessEventType::Network_Issue:          return Qn::ImportantNotification;
-    case BusinessEventType::Camera_Ip_Conflict:     return Qn::CriticalNotification;
-    case BusinessEventType::MediaServer_Failure:    return Qn::CriticalNotification;
-    case BusinessEventType::MediaServer_Conflict:   return Qn::CriticalNotification;
-    case BusinessEventType::MediaServer_Started:    return Qn::CommonNotification;
-    case BusinessEventType::SystemHealthMessage:    return Qn::SystemNotification;
+Qn::NotificationLevel QnNotificationLevels::notificationLevel(QnBusiness::EventType eventType) {
+    switch (eventType) {
+    case QnBusiness::CameraMotionEvent:
+    case QnBusiness::CameraInputEvent:
+    case QnBusiness::ServerStartEvent:
+        return Qn::CommonNotification;      
+    case QnBusiness::CameraDisconnectEvent:
+    case QnBusiness::StorageFailureEvent:
+    case QnBusiness::NetworkIssueEvent:
+        return Qn::ImportantNotification;
+    case QnBusiness::CameraIpConflictEvent:
+    case QnBusiness::ServerFailureEvent:
+    case QnBusiness::ServerConflictEvent:
+    case QnBusiness::LicenseIssueEvent:
+        return Qn::CriticalNotification;
     default:                                        
         qnWarning("Invalid business event type '%1'.", static_cast<int>(eventType));
         return Qn::NoNotification;
+    }
+}
+
+Qn::NotificationLevel QnNotificationLevels::notificationLevel(QnSystemHealth::MessageType messageType) {
+    switch (messageType) {
+    case QnSystemHealth::ArchiveRebuildFinished:
+        return Qn::CommonNotification;
+    default:
+        return Qn::SystemNotification;
     }
 }
 
@@ -30,7 +42,6 @@ QColor QnNotificationLevels::notificationColor(Qn::NotificationLevel level) {
     case Qn::ImportantNotification: return qnGlobals->notificationColorImportant();
     case Qn::CriticalNotification:  return qnGlobals->notificationColorCritical();
     case Qn::SystemNotification:    return qnGlobals->notificationColorSystem();
-    case Qn::SoundNotification:     return qnGlobals->notificationColorCommon(); //TODO: #GDM add special color
     default:
         qnWarning("Invalid notification level '%1'.", static_cast<int>(level));
         return QColor();

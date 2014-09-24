@@ -11,7 +11,7 @@
 #include <QtCore/QMutexLocker>
 
 #include <core/resource/resource.h>
-#include <plugins/resources/archive/avi_files/avi_archive_delegate.h>
+#include <plugins/resource/avi/avi_archive_delegate.h>
 #include <utils/common/util.h>
 #include <text_to_wav.h>
 
@@ -304,7 +304,7 @@ bool AudioPlayer::openNonSafe( QIODevice* dataSource )
 
     QnResourcePtr res( new LocalAudioFileResource() );
     res->setUrl( temporaryResUrl );
-    res->setStatus( QnResource::Online );
+    res->setStatus( Qn::Online );
     if( !mediaFileReader->open( res ) )
     {
         m_storage->removeFile( temporaryFilePath );

@@ -19,7 +19,7 @@ void QnTimePeriodStorage::setPeriods(Qn::TimePeriodContent type, const QnTimePer
 void QnTimePeriodStorage::updateAggregated(Qn::TimePeriodContent type)
 {
     if (m_aggregationMSecs)
-        m_aggregatedPeriods[type] = QnTimePeriod::aggregateTimePeriods(m_normalPeriods[type], m_aggregationMSecs);
+        m_aggregatedPeriods[type] = QnTimePeriodList::aggregateTimePeriods(m_normalPeriods[type], m_aggregationMSecs);
 }
 
 void QnTimePeriodStorage::setAggregationMSecs(int value )

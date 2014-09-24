@@ -1,17 +1,19 @@
 #include "workbench_layout_synchronizer.h"
+
 #include <cassert>
+
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
+
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
+
 #include "workbench.h"
 #include "workbench_layout.h"
 #include "workbench_item.h"
-#include "ui/style/globals.h"
-
-#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 namespace {
     const char *layoutSynchronizerPropertyName = "_qn_layoutSynchronizer";
@@ -98,7 +100,7 @@ void QnWorkbenchLayoutSynchronizer::initialize() {
     connect(m_layout,   &QnWorkbenchLayout::cellAspectRatioChanged, this, &QnWorkbenchLayoutSynchronizer::at_layout_cellAspectRatioChanged);
     connect(m_layout,   &QnWorkbenchLayout::cellSpacingChanged,     this, &QnWorkbenchLayoutSynchronizer::at_layout_cellSpacingChanged);
     connect(m_layout,   &QnWorkbenchLayout::aboutToBeDestroyed,     this, &QnWorkbenchLayoutSynchronizer::at_layout_aboutToBeDestroyed);
-    connect(m_resource, &QnLayoutResource::resourceChanged,         this, &QnWorkbenchLayoutSynchronizer::at_resource_resourceChanged);
+    connect(m_resource, &QnLayoutResource::resourceChanged,         this, &QnWorkbenchLayoutSynchronizer::at_resource_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
     connect(m_resource, &QnLayoutResource::nameChanged,             this, &QnWorkbenchLayoutSynchronizer::at_resource_nameChanged);
     connect(m_resource, &QnLayoutResource::cellAspectRatioChanged,  this, &QnWorkbenchLayoutSynchronizer::at_resource_cellAspectRatioChanged);
     connect(m_resource, &QnLayoutResource::cellSpacingChanged,      this, &QnWorkbenchLayoutSynchronizer::at_resource_cellSpacingChanged);

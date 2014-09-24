@@ -3,9 +3,6 @@
 
 #include <atomic>
 
-#ifdef _WIN32
-#include <D3D9.h>
-#endif
 #include <QtCore/QAtomicInt>
 
 extern "C"
@@ -47,6 +44,7 @@ public:
         std::atomic<int> usageCounter;
     };
 
+    // TODO: #Elric #enum
     enum PicStorageType
     {
         //!Picture data is stored in memory
@@ -101,6 +99,8 @@ public:
 };
 
 #ifdef _WIN32
+struct IDirect3DSurface9;
+
 //!Holds picture as DXVA surface
 class D3DPictureData
 :

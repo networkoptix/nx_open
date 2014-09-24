@@ -1,15 +1,19 @@
 #include "kvpair.h"
 
-QnKvPair::QnKvPair(const QString &name, const QString &value):
-    m_name(name), m_value(value) 
+QnKvPair::QnKvPair():
+    m_isPredefinedParam(false)
 {}
 
-QnKvPair::QnKvPair(const QString& name, const int value):
-    m_name(name), m_value(QString::number(value))
+QnKvPair::QnKvPair(const QString &name, const QString &value, bool _isPredefinedParam):
+    m_name(name), m_value(value), m_isPredefinedParam(_isPredefinedParam)
 {}
 
-QnKvPair::QnKvPair(const QString& name, const bool value):
-    m_name(name), m_value(value ? QLatin1String("True") : QLatin1String("False"))
+QnKvPair::QnKvPair(const QString& name, const int value, bool _isPredefinedParam):
+    m_name(name), m_value(QString::number(value)), m_isPredefinedParam(_isPredefinedParam)
+{}
+
+QnKvPair::QnKvPair(const QString& name, const bool value, bool _isPredefinedParam):
+    m_name(name), m_value(value ? lit("True") : lit("False")), m_isPredefinedParam(_isPredefinedParam)
 {}
 
 void QnKvPair::setName(const QString &name)
@@ -32,3 +36,7 @@ const QString &QnKvPair::value() const
     return m_value;
 }
 
+bool QnKvPair::isPredefinedParam() const
+{
+    return m_isPredefinedParam;
+}

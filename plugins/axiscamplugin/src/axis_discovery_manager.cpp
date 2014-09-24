@@ -94,7 +94,7 @@ int AxisCameraDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, co
         host,
         port,
         credentials );
-    if( http.get( QLatin1String("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version,root.Network.eth0.MACAddress,root.Network.Bonjour.FriendlyName") ) != QNetworkReply::NoError )
+    if( http.get( QLatin1String("/axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version,root.Network.eth0.MACAddress,root.Brand.ProdShortName") ) != QNetworkReply::NoError )
         return nxcip::NX_NETWORK_ERROR;
     if( http.statusCode() != SyncHttpClient::HTTP_OK )
         return http.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
@@ -115,12 +115,20 @@ int AxisCameraDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, co
         const QByteArray& paramName = line.mid(0, paramValueSepPos).trimmed();
         const QByteArray& paramValue = line.mid(paramValueSepPos+1).trimmed();
 
-        if( paramName == "root.Network.Bonjour.FriendlyName" )  //has format: <product name> - <serialnumber>
-            modelName = paramValue.mid(0, paramValue.indexOf('-')).trimmed();
+        if( paramName == "root.Brand.ProdShortName" )
+        {
+            modelName = paramValue;
+            modelName.replace( QByteArray(" "), QByteArray() );
+            modelName.replace( QByteArray("-"), QByteArray() );
+        }
         else if( paramName == "root.Network.eth0.MACAddress" )
+        {
             mac = paramValue;
+        }
         else if( paramName == "root.Properties.Firmware.Version" )
+        {
             firmware = paramValue;
+        }
     }
 
     if( modelName.isEmpty() || mac.isEmpty() )

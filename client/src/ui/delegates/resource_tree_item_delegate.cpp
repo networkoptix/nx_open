@@ -5,6 +5,7 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 
 #include <client/client_meta_types.h>
 
@@ -41,11 +42,14 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
     QnResourcePtr currentLayoutResource = workbench() ? workbench()->currentLayout()->resource() : QnLayoutResourcePtr();
     QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
     QUuid uuid = index.data(Qn::ItemUuidRole).value<QUuid>();
+    bool videoWallControlMode = workbench() ? !workbench()->currentLayout()->data(Qn::VideoWallItemGuidRole).isNull() : false;
 
     /* Bold items of current layout in tree. */
     if(!resource.isNull() && !currentLayoutResource.isNull()) {
         bool bold = false;
         if(resource == currentLayoutResource) {
+            bold = videoWallControlMode != uuid.isNull(); /* Bold current layout if we are not in control mode
+                                                            and bold current videowall - if in. */
             bold = true; /* Bold current layout. */
         } else if(parentResource == currentLayoutResource) {
             bold = true; /* Bold items of the current layout. */
@@ -76,17 +80,8 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
     decorationRect.moveLeft(decorationRect.left() - decorationRect.width());
     bool recording = false, scheduled = false;
     if(resource) {
-        if(!resource->isDisabled()) {
-            if(resource->getStatus() == QnResource::Recording && resource.dynamicCast<QnVirtualCameraResource>())
-                recording = true;
-        } else if(QnNetworkResourcePtr camera = resource.dynamicCast<QnNetworkResource>()) {
-            foreach(const QnNetworkResourcePtr &otherCamera, QnCameraHistoryPool::instance()->getAllCamerasWithSamePhysicalId(camera)) {
-                if(!otherCamera->isDisabled() && otherCamera->getStatus() == QnResource::Recording) {
-                    recording = true;
-                    break;
-                }
-            }
-        }
+        if(resource->getStatus() == Qn::Recording && resource.dynamicCast<QnVirtualCameraResource>())
+            recording = true;
 
         if(!recording)
             if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
@@ -98,7 +93,7 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
     /* Draw 'problems' icon. */
     decorationRect.moveLeft(decorationRect.left() - decorationRect.width());
     if(QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>())
-        if(camera->statusFlags() & QnSecurityCamResource::HasIssuesFlag)
+        if(camera->statusFlags() & Qn::CSF_HasIssuesFlag)
             m_buggyIcon.paint(painter, decorationRect);
 
     /* Draw item. */

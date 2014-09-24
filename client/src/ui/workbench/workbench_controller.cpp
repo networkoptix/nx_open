@@ -21,6 +21,7 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/toggle.h>
+#include <utils/common/log.h>
 #include <utils/math/color_transformations.h>
 #include <utils/resource_property_adaptors.h>
 
@@ -30,6 +31,9 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/file_processor.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_item.h>
+#include <core/resource/videowall_item_index.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -139,6 +143,8 @@ namespace {
     /** Opacity of video items when they are dragged / resized. */
     const qreal widgetManipulationOpacity = 0.3;
 
+    /** Countdown value before screen recording starts. */
+    const int recordingCountdownMs = 3000;
 } // anonymous namespace
 
 
@@ -179,7 +185,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_resizedWidget(NULL),
     m_dragDelta(invalidDragDelta()),
     m_screenRecorder(NULL),
-    m_countdownCanceled(false),
     m_recordingCountdownLabel(NULL),
     m_tourModeHintLabel(NULL),
     m_menuEnabled(true)
@@ -286,7 +291,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(ptzInstrument);
     m_manager->installInstrument(zoomWindowInstrument);
 
-    display()->setLayer(m_dropInstrument->surface(), Qn::UiLayer);
+    display()->setLayer(m_dropInstrument->surface(), Qn::BackLayer);
 
     connect(m_itemLeftClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_itemLeftClickInstrument,  SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
@@ -497,7 +502,7 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
 
 void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display) {
     foreach(QnResourceWidget *widget, widgets) {
-        if(!widget->resource()->hasFlags(QnResource::motion))
+        if(!widget->resource()->hasFlags(Qn::motion))
             continue;
         if (!widget->zoomRect().isNull())
             continue;
@@ -585,53 +590,36 @@ void QnWorkbenchController::startRecording() {
 
     action(Qn::ToggleScreenRecordingAction)->setChecked(true);
 
-    m_countdownCanceled = false;
-    m_recordingCountdownLabel = QnGraphicsMessageBox::information(tr("Recording in..."));
-    connect(m_recordingCountdownLabel, SIGNAL(finished()), this, SLOT(at_recordingAnimation_finished()));
-    connect(m_recordingCountdownLabel, SIGNAL(tick(int)), this, SLOT(at_recordingAnimation_tick(int)));
+    m_recordingCountdownLabel = QnGraphicsMessageBox::informationTicking(tr("Recording in...%1"), recordingCountdownMs);
+    connect(m_recordingCountdownLabel, &QnGraphicsMessageBox::finished, this, &QnWorkbenchController::at_recordingAnimation_finished);
 }
 
 void QnWorkbenchController::stopRecording() {
-    if (!m_screenRecorder)
-        return;
+    if (m_recordingCountdownLabel) {
+        disconnect(m_recordingCountdownLabel, NULL, this, NULL);
+        m_recordingCountdownLabel->hideImmideately();
+        m_recordingCountdownLabel = NULL;
+    }
 
     action(Qn::ToggleScreenRecordingAction)->setChecked(false);
 
-    if (!m_screenRecorder->isRecording()) {
-        m_countdownCanceled = true;
-        return;
-    }
-
-    m_screenRecorder->stopRecording();
+    if (m_screenRecorder)
+        m_screenRecorder->stopRecording();
 }
 
 void QnWorkbenchController::at_recordingAnimation_finished() {
     if (m_recordingCountdownLabel)
         m_recordingCountdownLabel->setOpacity(0.0);
     m_recordingCountdownLabel = NULL;
-    if (!m_countdownCanceled) {
-        if (m_screenRecorder) // just in case =)
-            m_screenRecorder->startRecording();
-    }
-    m_countdownCanceled = false;
+    if (m_screenRecorder) // just in case =)
+        m_screenRecorder->startRecording();
 }
 
-void QnWorkbenchController::at_recordingAnimation_tick(int tick) {
-    if (!m_recordingCountdownLabel)
-        return;
-
-    if (m_countdownCanceled) {
-        m_recordingCountdownLabel->setText(tr("Canceled"));
-        return;
-    }
-    int left = m_recordingCountdownLabel->timeout() - tick;
-    int n = qMax(1, (left + 500) / 1000);
-
-    m_recordingCountdownLabel->setText(tr("Recording in...") + QString::number(n));
-}
 
 void QnWorkbenchController::at_screenRecorder_recordingStarted() {
-    return;
+    if (!m_recordingCountdownLabel)
+        return;
+    m_recordingCountdownLabel->setOpacity(0.0);
 }
 
 void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage) {
@@ -666,7 +654,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
             if (!QFile::rename(recordedFileName, filePath)) {
                 QString message = tr("Could not overwrite file '%1'. Please try another name.").arg(filePath);
                 CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
-                QMessageBox::warning(display()->view(), QObject::tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
+                QMessageBox::warning(display()->view(), tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
                 continue;
             }
 
@@ -1056,27 +1044,17 @@ void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, co
 
 void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget) {
     QnLayoutItemData data = widget->item()->data();
+    delete widget;
+
     data.uuid = QUuid::createUuid();
-    data.resource.id = zoomTargetWidget->resource()->toResource()->getId().toInt();
+    data.resource.id = zoomTargetWidget->resource()->toResource()->getId();
     data.resource.path = zoomTargetWidget->resource()->toResource()->getUniqueId();
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
     data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
     data.dewarpingParams.panoFactor = 1; // zoom target must always be dewarped by 90 degrees
-    
-    QnResourceWidget::Buttons buttons = widget->checkedButtons();
-    // TODO: #Elric Strange magic with enabled flag in ItemDewarpingParams and MediaDewarpingParams.
-    // Maybe we should do this less hacky...
-    // 
-    // WTF! Dewarping params should be enabled or disabled another way.
-    // Now it is done with side-effect from checking invisible button and it is a HELL! --gdm
-    if (zoomTargetWidget->dewarpingParams().enabled)
-        buttons |= QnMediaResourceWidget::FishEyeButton;
-    else
-        buttons &= ~QnMediaResourceWidget::FishEyeButton;  // Bug #3270
-
-    delete widget;
+    data.dewarpingParams.enabled = zoomTargetWidget->resource()->getDewarpingParams().enabled;  // zoom items on fisheye cameras must always be dewarped
 
     int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
             ? 1
@@ -1086,7 +1064,6 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     if (layout->getItems().size() >= maxItems)
         return;
     layout->addItem(data);
-    display()->widget(data.uuid)->setCheckedButtons(buttons);
 }
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
@@ -1315,7 +1292,7 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
     if (widgets.isEmpty())
         return;
     QnResourceWidget *widget = widgets.at(0);
-    if(widget->resource()->flags() & QnResource::network)
+    if(widget->resource()->flags() & Qn::network)
         return;
     QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource(), mainWindow()));
     dialog->setModal(true);
@@ -1326,7 +1303,7 @@ void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
 
     foreach(QnResourceWidget *widget, widgets) {
-        if (!widget->resource()->hasFlags(QnResource::motion))
+        if (!widget->resource()->hasFlags(Qn::motion))
             continue;
 
         if (!widget->zoomRect().isNull())

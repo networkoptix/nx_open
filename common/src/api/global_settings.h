@@ -1,12 +1,16 @@
 #ifndef QN_GLOBAL_SETTINGS_H
 #define QN_GLOBAL_SETTINGS_H
 
+#include <QtCore/QMutex>
 #include <QtCore/QObject>
 
 #include <utils/common/singleton.h>
 #include <utils/common/connective.h>
+#include <utils/common/email.h>
 
 #include <core/resource/resource_fwd.h>
+
+class QnAbstractResourcePropertyAdaptor;
 
 template<class T>
 class QnResourcePropertyAdaptor;
@@ -19,6 +23,8 @@ public:
     QnGlobalSettings(QObject *parent = NULL);
     virtual ~QnGlobalSettings();
 
+    QnKvPairList allSettings() const;
+
     QSet<QString> disabledVendorsSet() const;
     QString disabledVendors() const;
     void setDisabledVendors(QString disabledVendors);
@@ -26,9 +32,15 @@ public:
     bool isCameraSettingsOptimizationEnabled() const;
     void setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled);
 
+    QnEmail::Settings emailSettings() const;
+    void setEmailSettings(const QnEmail::Settings &settings);
+
+    void synchronizeNow();
+    QnUserResourcePtr getAdminUser();
 signals:
     void disabledVendorsChanged();
     void cameraSettingsOptimizationChanged();
+    void emailSettingsChanged();
 
 private:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
@@ -37,6 +49,20 @@ private:
 private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
+
+    // set of email settings adaptors
+    QnResourcePropertyAdaptor<QString> *m_serverAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_userAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_passwordAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_signatureAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_supportEmailAdaptor;
+    QnResourcePropertyAdaptor<QnEmail::ConnectionType> *m_connectionTypeAdaptor;
+    QnResourcePropertyAdaptor<int> *m_portAdaptor;
+    QnResourcePropertyAdaptor<int> *m_timeoutAdaptor;
+    /** Flag that we are using simple smtp settings set */
+    QnResourcePropertyAdaptor<bool> *m_simpleAdaptor;   //TODO: #GDM #Common think where else we can store it
+
+    QList<QnAbstractResourcePropertyAdaptor*> m_allAdaptors;
 
     mutable QMutex m_mutex;
     QnUserResourcePtr m_admin;

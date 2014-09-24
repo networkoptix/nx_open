@@ -1,38 +1,29 @@
 #ifndef QN_RESOURCE_COMMAND_PROCESSOR
 #define QN_RESOURCE_COMMAND_PROCESSOR
 
-#include "core/dataconsumer/abstract_data_consumer.h"
-#include "core/datapacket/abstract_data_packet.h"
+#ifdef ENABLE_DATA_PROVIDERS
 
-#include "resource.h"
-#include "resource_consumer.h"
+#include "resource_fwd.h"
 
-class QnResourceCommand;
-typedef QSharedPointer<QnResourceCommand> QnResourceCommandPtr;
-
-class QN_EXPORT QnResourceCommand : public QnAbstractDataPacket, public QnResourceConsumer
-{
-public:
-    QnResourceCommand(QnResourcePtr res);
-    virtual ~QnResourceCommand();
-    virtual bool execute() = 0;
-    virtual void beforeDisconnectFromResource();
-};
+#include <core/dataconsumer/abstract_data_consumer.h>
+#include <core/datapacket/abstract_data_packet.h>
 
 
 class QN_EXPORT QnResourceCommandProcessor : public QnAbstractDataConsumer
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     QnResourceCommandProcessor();
     ~QnResourceCommandProcessor();
 
-    virtual void putData(QnAbstractDataPacketPtr data);
+    virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
 protected:
-    virtual bool processData(QnAbstractDataPacketPtr data);
+    virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //QN_RESOURCE_COMMAND_PROCESSOR

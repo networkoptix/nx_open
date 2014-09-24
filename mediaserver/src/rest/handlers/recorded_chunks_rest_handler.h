@@ -9,14 +9,19 @@ class QnRecordedChunksRestHandler: public QnRestRequestHandler
 {
     Q_OBJECT
 public:
-	enum ChunkFormat {ChunkFormat_Unknown, ChunkFormat_Binary, ChunkFormat_XML, ChunkFormat_Json, ChunkFormat_Text}; // TODO: Json, not Jason
 
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
-    virtual QString description() const override;
-
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, QByteArray& contentType);
 private:
-    QRect deserializeMotionRect(const QString& rectStr);
+    // TODO: #Elric #enum
+    enum ChunkFormat {
+        ChunkFormat_Unknown, 
+        ChunkFormat_Binary, 
+        ChunkFormat_BinaryIntersected,
+        ChunkFormat_XML, 
+        ChunkFormat_Json, 
+        ChunkFormat_Text
+    }; 
 };
 
 

@@ -119,37 +119,37 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     case QnBusiness::SourceColumn:
     {
         QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
-        //TODO: #GDM server selection dialog?
+        //TODO: #GDM #Business server selection dialog?
         connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-        BusinessEventType::Value eventType = (BusinessEventType::Value)index.data(Qn::EventTypeRole).toInt();
-        if (eventType == BusinessEventType::Camera_Motion)
+        QnBusiness::EventType eventType = (QnBusiness::EventType)index.data(Qn::EventTypeRole).toInt();
+        if (eventType == QnBusiness::CameraMotionEvent)
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(btn));
-        else if (eventType == BusinessEventType::Camera_Input)
+        else if (eventType == QnBusiness::CameraInputEvent)
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputPolicy>(btn));
 
         return btn;
     }
     case QnBusiness::TargetColumn:
     {
-        BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(Qn::ActionTypeRole).toInt();
+        QnBusiness::ActionType actionType = (QnBusiness::ActionType)index.data(Qn::ActionTypeRole).toInt();
 
         switch (actionType) {
-        case BusinessActionType::ShowPopup:
+        case QnBusiness::ShowPopupAction:
         {
             QComboBox* comboBox = new QComboBox(parent);
             comboBox->addItem(tr("For All Users"), QnBusinessActionParameters::EveryOne);
             comboBox->addItem(tr("For Administrators Only"), QnBusinessActionParameters::AdminOnly);
             return comboBox;
         }
-        case BusinessActionType::PlaySound:
-        case BusinessActionType::PlaySoundRepeated:
+        case QnBusiness::PlaySoundAction:
+        case QnBusiness::PlaySoundOnceAction:
         {
             QComboBox* comboBox = new QComboBox(parent);
             comboBox->setModel(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel());
             return comboBox;
         }
-        case BusinessActionType::SayText:
+        case QnBusiness::SayTextAction:
             return base_type::createEditor(parent, option, index);
         default:
             break;
@@ -158,13 +158,13 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
         connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-        if (actionType == BusinessActionType::CameraRecording) {
+        if (actionType == QnBusiness::CameraRecordingAction) {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(btn));
         }
-        else if (actionType == BusinessActionType::CameraOutput || actionType == BusinessActionType::CameraOutputInstant) {
+        else if (actionType == QnBusiness::CameraOutputAction || actionType == QnBusiness::CameraOutputOnceAction) {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(btn));
         }
-        else if (actionType == BusinessActionType::SendMail) {
+        else if (actionType == QnBusiness::SendMailAction) {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnUserEmailPolicy>(btn));
             btn->setSelectionTarget(QnResourceSelectionDialog::UserResourceTarget);
         }
@@ -173,8 +173,8 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     case QnBusiness::EventColumn:
     {
         QComboBox* comboBox = new QComboBox(parent);
-        for (int i = 0; i < BusinessEventType::Count; i++) {
-            BusinessEventType::Value val = (BusinessEventType::Value)i;
+        for (int i = 1; i < QnBusiness::EventCount; i++) {
+            QnBusiness::EventType val = (QnBusiness::EventType) i;
             comboBox->addItem(QnBusinessStringsHelper::eventName(val), val);
         }
         return comboBox;
@@ -183,9 +183,11 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     {
         bool instant = index.data(Qn::ActionIsInstantRole).toBool();
         QComboBox* comboBox = new QComboBox(parent);
-        for (int i = 0; i < BusinessActionType::Count; i++) {
-            BusinessActionType::Value val = (BusinessActionType::Value)i;
-            if (instant && BusinessActionType::hasToggleState(val))
+        for (int i = 1; i < QnBusiness::ActionCount; i++) {
+            QnBusiness::ActionType val = (QnBusiness::ActionType)i;
+            if (instant && QnBusiness::hasToggleState(val))
+                continue;
+            if (!QnBusiness::isImplemented(val))
                 continue;
             comboBox->addItem(QnBusinessStringsHelper::actionName(val), val);
         }
@@ -218,10 +220,10 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
     }
     case QnBusiness::TargetColumn:
     {
-        BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(Qn::ActionTypeRole).toInt();
+        QnBusiness::ActionType actionType = (QnBusiness::ActionType)index.data(Qn::ActionTypeRole).toInt();
 
         switch (actionType) {
-        case BusinessActionType::ShowPopup:
+        case QnBusiness::ShowPopupAction:
         {
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                 comboBox->setCurrentIndex(comboBox->findData(index.data(Qt::EditRole)));
@@ -229,8 +231,8 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
             }
             return;
         }
-        case BusinessActionType::PlaySound:
-        case BusinessActionType::PlaySoundRepeated:
+        case QnBusiness::PlaySoundAction:
+        case QnBusiness::PlaySoundOnceAction:
         {
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                 QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
@@ -239,7 +241,7 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
             }
             return;
         }
-        case BusinessActionType::SayText:
+        case QnBusiness::SayTextAction:
         {
            base_type::setEditorData(editor, index);
            return;
@@ -293,18 +295,18 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
     }
     case QnBusiness::TargetColumn:
     {
-        BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(Qn::ActionTypeRole).toInt();
+        QnBusiness::ActionType actionType = (QnBusiness::ActionType)index.data(Qn::ActionTypeRole).toInt();
 
         switch (actionType) {
-        case BusinessActionType::ShowPopup:
+        case QnBusiness::ShowPopupAction:
         {
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                 model->setData(index, comboBox->itemData(comboBox->currentIndex()));
             }
             return;
         }
-        case BusinessActionType::PlaySound:
-        case BusinessActionType::PlaySoundRepeated:
+        case QnBusiness::PlaySoundAction:
+        case QnBusiness::PlaySoundOnceAction:
         {
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                 QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
@@ -315,7 +317,7 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
             }
             return;
         }
-        case BusinessActionType::SayText:
+        case QnBusiness::SayTextAction:
         {
             base_type::setModelData(editor, model, index);
             return;

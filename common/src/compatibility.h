@@ -6,34 +6,14 @@
 #include <QtCore/QList>
 
 #include <utils/common/software_version.h>
+#include <utils/common/model_functions_fwd.h>
+#include <api/model/compatibility_item.h>
 
-// Presense of an entry in global table means
+// TODO: #Elric move and rename file.
+
+// Presence of an entry in global table means
 // that component of ver1 is compatible (or has compatibility mode)
 // with EVERY component of ver2
-
-QString stripVersion(const QString& version);
-
-struct QnCompatibilityItem
-{
-    QnCompatibilityItem(QString v1, QString c1, QString v2)
-        : ver1(v1), comp1(c1), ver2(v2)
-    {
-    }
-
-    bool operator==(const QnCompatibilityItem& other) const
-    {
-        return ver1 == other.ver1 && comp1 == other.comp1 && ver2 == other.ver2;
-    }
-
-    QString ver1;
-    QString comp1;
-    QString ver2;
-};
-
-inline uint qHash(const QnCompatibilityItem &item)
-{
-    return qHash(item.ver1) + 7 * qHash(item.comp1) + 11 * qHash(item.ver2);
-}
 
 class QnCompatibilityChecker
 {
@@ -46,9 +26,11 @@ public:
     int size() const;
 
 private:
-    typedef QSet<QnCompatibilityItem> QnCompatibilityMatrixType;
-    QnCompatibilityMatrixType m_compatibilityMatrix;
+    QSet<QnCompatibilityItem> m_compatibilityMatrix;
 };
+
+
+QString stripVersion(const QString& version);
 
 // This functions is defined in generated compatibility_info.cpp file.
 QList<QnCompatibilityItem> localCompatibilityItems();

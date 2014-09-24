@@ -148,7 +148,7 @@ void QnAppServerNotificationCache::at_fileAdded(const QString &filename, bool ok
     if (!ok)
         return;
 
-    //TODO: #GDM think about getTagValueAsync
+    //TODO: #GDM #Business think about getTagValueAsync
     QString title = AudioPlayer::getTagValue(getFullPath(filename), titleTag);
     if (!title.isEmpty())
         m_model->updateTitle(filename, title);

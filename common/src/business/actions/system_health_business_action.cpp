@@ -6,11 +6,11 @@
 #include <utils/common/synctime.h>
 
 
-QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::MessageType message, int eventResourceId):
-    base_type(BusinessActionType::ShowPopup, QnBusinessEventParameters())
+QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::MessageType message, const QUuid& eventResourceId):
+    base_type(QnBusiness::ShowPopupAction, QnBusinessEventParameters())
 {
     QnBusinessEventParameters runtimeParams;
-    runtimeParams.setEventType(BusinessEventType::Value(BusinessEventType::SystemHealthMessage + message));
+    runtimeParams.setEventType(QnBusiness::EventType(QnBusiness::SystemHealthEvent + message));
     runtimeParams.setEventTimestamp(qnSyncTime->currentUSecsSinceEpoch());
     runtimeParams.setEventResourceId(eventResourceId);
     setRuntimeParams(runtimeParams);

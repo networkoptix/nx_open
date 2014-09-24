@@ -13,10 +13,10 @@
 
 #include <business/business_event_rule.h>
 
-#include <ui/dialogs/button_box_dialog.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
+
 #include <ui/models/business_rules_actual_model.h>
 #include <ui/widgets/business/business_rule_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/request_param.h>
 
@@ -24,11 +24,11 @@ namespace Ui {
     class BusinessRulesDialog;
 }
 
-class QnBusinessRulesDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware
+class QnBusinessRulesDialog : public QnWorkbenchStateDependentButtonBoxDialog
 {
     Q_OBJECT
 
-    typedef QnButtonBoxDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
     explicit QnBusinessRulesDialog(QWidget *parent = 0);
@@ -37,11 +37,12 @@ public:
     void setFilter(const QString &filter);
 
     /**
-     * @brief canClose      Checks if the dialog can be closed safely. If there are unsaved rules the user will be asked
+     * @brief tryClose      Checks if the dialog can be closed safely. If there are unsaved rules the user will be asked
      *                      and they will be saved or dropped.
+     * @param force         If set to true, changes will be silently dropped and the dialog will be hidden.
      * @return              False if the user press Cancel, true otherwise.
      */
-    bool canClose();
+    virtual bool tryClose(bool force) override;
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
@@ -51,10 +52,9 @@ public Q_SLOTS:
     virtual void reject() override;
 
 private slots:
-    void at_message_ruleDeleted(int id);
+    void at_message_ruleDeleted(const QUuid &id);
 
     void at_newRuleButton_clicked();
-    void at_saveAllButton_clicked();
     void at_deleteButton_clicked();
     void at_resetDefaultsButton_clicked();
     void at_clearFilterButton_clicked();
@@ -62,7 +62,7 @@ private slots:
     void at_beforeModelChanged();
     void at_afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);
 
-    void at_resources_deleted(const QnHTTPRawResponse& response, int handle);
+    void at_resources_deleted( int handle, ec2::ErrorCode errorCode );
 
     void at_tableView_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
     void at_tableViewport_resizeEvent();
@@ -90,12 +90,12 @@ private:
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
     QnBusinessRulesActualModel* m_rulesViewModel;
-    QList<int> m_pendingDeleteRules;
+    QList<QUuid> m_pendingDeleteRules;
 
     QnBusinessRuleWidget* m_currentDetailsWidget;
 
 
-    QMap<int, int> m_deleting;
+    QMap<int, QUuid> m_deleting;
 
     QMenu* m_popupMenu;
 

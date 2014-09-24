@@ -7,11 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>550</width>
-    <height>538</height>
+    <height>540</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string comment="Window Title">Connect to Enterprise Controller</string>
+  <property name="minimumSize">
+   <size>
+    <width>550</width>
+    <height>540</height>
+   </size>
   </property>
   <property name="modal">
    <bool>false</bool>
@@ -62,7 +65,7 @@
         </sizepolicy>
        </property>
        <property name="title">
-        <string comment="Groupbox Title">Connect to Enterprise Controller</string>
+        <string comment="Groupbox Title">Connect to Server</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0">
         <item>
@@ -259,7 +262,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QCheckBox" name="rememberPasswordCheckBox">
+         <widget class="QCheckBox" name="autoLoginCheckBox">
           <property name="text">
            <string>&amp;Auto-Login</string>
           </property>
@@ -322,7 +325,7 @@
   <tabstop>loginLineEdit</tabstop>
   <tabstop>passwordLineEdit</tabstop>
   <tabstop>testButton</tabstop>
-  <tabstop>rememberPasswordCheckBox</tabstop>
+  <tabstop>autoLoginCheckBox</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>

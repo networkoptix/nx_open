@@ -11,16 +11,17 @@ class QnAutoTester: public QObject {
     Q_ENUMS(State);
 
 public:
+    // TODO: #Elric #enum
     enum Test {
-        RESOURCE_SUBSTRING = 0x1 /**< Test for the presence of a substring in resource names. */
+        ResourceSubstring = 0x1 /**< Test for the presence of a substring in resource names. */
     };
     Q_DECLARE_FLAGS(Tests, Test);
 
     enum State {
-        INITIAL,    /**< Ready for testing. */
-        INVALID,    /**< There was an error in command line arguments. Error description was printed to STDERR. */
-        RUNNING,    /**< Testing. */
-        FINISHED    /**< Testing finished, results available. */
+        Initial,    /**< Ready for testing. */
+        Invalid,    /**< There was an error in command line arguments. Error description was printed to STDERR. */
+        Running,    /**< Testing. */
+        Finished    /**< Testing finished, results available. */
     };
 
     QnAutoTester(int &argc, char **argv, QObject *parent = NULL);

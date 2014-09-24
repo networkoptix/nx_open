@@ -115,7 +115,7 @@ int AxisRelayIOManager::setRelayOutputState(
     if( it == m_outputPortNameToIndex.end() )
         return nxcip::NX_UNKNOWN_PORT_NAME;
 
-    QString cmd = QString::fromLatin1("axis-cgi/io/port.cgi?action=%1:%2").arg(it->second+1).arg(QLatin1String(activate ? "/" : "\\"));
+    QString cmd = QString::fromLatin1("/axis-cgi/io/port.cgi?action=%1:%2").arg(it->second+1).arg(QLatin1String(activate ? "/" : "\\"));
     if( autoResetTimeoutMS > 0 )
     {
         //adding auto-reset

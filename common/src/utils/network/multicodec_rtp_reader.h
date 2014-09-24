@@ -1,12 +1,16 @@
 #ifndef __MULTI_CODEC_RTP_READER__
 #define __MULTI_CODEC_RTP_READER__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <vector>
 
+#include "core/dataprovider/abstract_media_stream_provider.h"
 #include "core/resource/resource_consumer.h"
 #include "core/resource/resource_media_layout.h"
 #include "core/datapacket/media_data_packet.h"
 #include "utils/camera/camera_diagnostics.h"
+#include "utils/common/stoppable.h"
 #include "utils/network/rtpsession.h"
 
 #include <business/business_fwd.h>
@@ -27,31 +31,45 @@ class QnRtpAudioStreamParser;
 class QnRtpVideoStreamParser;
 class QnResourceAudioLayout;
 
-class QnMulticodecRtpReader : public QObject, public QnResourceConsumer
+class QnMulticodecRtpReader
+:
+    public QObject,
+    public QnResourceConsumer,
+    public QnAbstractMediaStreamProvider,
+    public QnStoppable
 {
     Q_OBJECT
+
 private:
     enum {BLOCK_SIZE = 1460};
+
 public:
-    QnMulticodecRtpReader( QnResourcePtr res );
+    QnMulticodecRtpReader( const QnResourcePtr& res );
     virtual ~QnMulticodecRtpReader();
 
-    QnAbstractMediaDataPtr getNextData();
+    //!Implementation of QnAbstractMediaStreamProvider::getNextData
+    virtual QnAbstractMediaDataPtr getNextData() override;
+    //!Implementation of QnAbstractMediaStreamProvider::openStream
+    virtual CameraDiagnostics::Result openStream() override;
+    //!Implementation of QnAbstractMediaStreamProvider::closeStream
+    virtual void closeStream() override;
+    //!Implementation of QnAbstractMediaStreamProvider::isStreamOpened
+    virtual bool isStreamOpened() const override;
+    //!Implementation of QnAbstractMediaStreamProvider::getLastResponseCode
+    virtual int getLastResponseCode() const override;
+    //!Implementation of QnAbstractMediaStreamProvider::getAudioLayout
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout() const override;
+    //!Implementation of QnStoppable::pleaseStop
+    virtual void pleaseStop() override;
+
     void setRequest(const QString& request);
-    /*!
-        \return true, if successfully opened stream or stream is already opened. false, if failed. For more detail, call \a getLastResponseCode()
-    */
-    CameraDiagnostics::Result openStream();
-    void closeStream() ;
-    bool isStreamOpened() const;
-    QnConstResourceAudioLayoutPtr getAudioLayout() const;
-    int getLastResponseCode() const;
-    void pleaseStop();
+    void setRole(Qn::ConnectionRole role);
 
     static void setDefaultTransport( const RtpTransport::Value& defaultTransportToUse );
-    void setRole(QnResource::ConnectionRole role);
+
 signals:
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
+
 private:
     QnRtpStreamParser* createParser(const QString& codecName);
     void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, RTPSession::TrackType mediaType);
@@ -61,10 +79,11 @@ private:
     QnAbstractMediaDataPtr getNextDataTCP();
     void processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity);
     void buildClientRTCPReport(quint8 chNumber);
+
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
+    void at_propertyChanged(const QnResourcePtr & res, const QString & key);
 private:
-    
     RTPSession m_RtpSession;
     RTPIODevice* m_videoIO;
     RTPIODevice* m_audioIO;
@@ -82,7 +101,9 @@ private:
     bool m_pleaseStop;
     QElapsedTimer m_rtcpReportTimer;
     bool m_gotSomeFrame;
-    QnResource::ConnectionRole m_role;
+    Qn::ConnectionRole m_role;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //__MULTI_CODEC_RTP_READER__

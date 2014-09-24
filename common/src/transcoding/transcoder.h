@@ -1,6 +1,8 @@
 #ifndef __TRANSCODER_H
 #define __TRANSCODER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QString>
 #include <QSharedPointer>
 
@@ -9,10 +11,12 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 
-#include "core/datapacket/media_data_packet.h"
+#include "core/datapacket/audio_data_packet.h"
+#include "core/datapacket/video_data_packet.h"
 #include "core/resource/media_resource.h"
-#include "filters/abstract_filter.h"
 
+class QnAbstractImageFilter;
+class CLVideoDecoderOutput;
 
 /*!
     \note All constants (except \a quality) in this namespace refer to libavcodec CodecContex field names
@@ -65,7 +69,7 @@ public:
         \param result Coded picture of the output stream. If NULL, only decoding is done
         \return return Return error code or 0 if no error
     */
-    virtual int transcodePacket(QnConstAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result) = 0;
+    virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) = 0;
     QString getLastError() const;
     virtual void setQuality( Qn::StreamQuality quality );
     void setSrcRect(const QRectF& srcRect);
@@ -81,6 +85,7 @@ protected:
     QRectF m_srcRectF;
 };
 typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
+
 
 //!Base class for all video transcoders
 class QnVideoTranscoder: public QnCodecTranscoder
@@ -100,14 +105,16 @@ public:
     QSize getResolution() const;
     void setVideoLayout(QnConstResourceVideoLayoutPtr layout);
 
-    virtual bool open(QnConstCompressedVideoDataPtr video);
+    virtual bool open(const QnConstCompressedVideoDataPtr& video);
 
     virtual void addFilter(QnAbstractImageFilter* filter);
+
 protected:
     static const int WIDTH_ALIGN = 32;
     static const int HEIGHT_ALIGN = 2;
         
-    void processFilterChain(CLVideoDecoderOutput* decodedFrame, const QRectF& updateRect);
+    void processFilterChain(CLVideoDecoderOutput* decodedFrame, const QRectF& updateRect, qreal ar);
+
 protected:
     QSize m_resolution;
     QnConstResourceVideoLayoutPtr m_layout;
@@ -115,14 +122,16 @@ protected:
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 
+
 //!Base class for all audio transcoders
 class QnAudioTranscoder: public QnCodecTranscoder
 {
 public:
     QnAudioTranscoder(CodecID codecId): QnCodecTranscoder(codecId) {}
-    virtual bool open(QnConstCompressedAudioDataPtr video) { Q_UNUSED(video) return true; }
+    virtual bool open(const QnConstCompressedAudioDataPtr& video) { Q_UNUSED(video) return true; }
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
+
 
 //!Multiplexes one or more raw media streams into container format. Can apply transcoding to input media streams
 /*
@@ -172,14 +181,14 @@ public:
     * @param bitrate Bitrate after transcode. By default bitrate is autodetected
     * @param addition codec params. Not used if directStreamCopy = true
     */
-    virtual bool setAudioCodec(CodecID codec, TranscodeMethod method);
+    virtual int setAudioCodec(CodecID codec, TranscodeMethod method);
 
     /*
     * Transcode media data and write it to specified QnByteArray
     * @param result transcoded data block. If NULL, only decoding is done
     * @return Returns 0 if no error or error code
     */
-    int transcodePacket(QnConstAbstractMediaDataPtr media, QnByteArray* const result);
+    int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result);
     //!Adds tag to the file. Maximum langth of tags and allowed names are format dependent
     /*!
         This implementation always returns \a false
@@ -216,9 +225,9 @@ protected:
     * Destionation codecs MUST be used from source data codecs. If 'direct stream copy' is false, video or audio may be empty
     * @return true if successfull opened
     */
-    virtual int open(QnConstCompressedVideoDataPtr video, QnConstCompressedAudioDataPtr audio) = 0;
+    virtual int open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio) = 0;
 
-    virtual int transcodePacketInternal(QnConstAbstractMediaDataPtr media, QnByteArray* const result) = 0;
+    virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result) = 0;
 
     QnVideoTranscoderPtr m_vTranscoder;
     QnAudioTranscoderPtr m_aTranscoder;
@@ -240,5 +249,9 @@ private:
     int m_eofCounter;
     bool m_packetizedMode;
 };
+
+typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  // __TRANSCODER_H

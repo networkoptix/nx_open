@@ -5,7 +5,7 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QImage>
 
-#include <core/datapacket/media_data_packet.h>
+#include <core/datapacket/video_data_packet.h>
 
 #include <ui/common/geometry.h>
 

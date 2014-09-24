@@ -16,8 +16,8 @@
 #include <utils/common/stoppable.h>
 #include <utils/common/joinable.h>
 #include <utils/network/http/asynchttpclient.h>
-#include <plugins/videodecoders/stree/node.h>
-#include <plugins/videodecoders/stree/resourcenameset.h>
+#include <plugins/videodecoder/stree/node.h>
+#include <plugins/videodecoder/stree/resourcenameset.h>
 
 #include "rdir_syncher.h"
 #include "rns_product_parameters.h"
@@ -42,7 +42,7 @@ public:
     InstallationProcess(
         const QString& productName,
         const QString& customization,
-        const QString& version,
+        const QnSoftwareVersion& version,
         const QString& module,
         const QString& installationDirectory,
         bool autoStartNeeded );
@@ -50,8 +50,8 @@ public:
 
     //!Implementation of QnStoppable::pleaseStop()
     virtual void pleaseStop() override;
-    //!Implementation of QnJoinable::wait()
-    virtual void wait() override;
+    //!Implementation of QnJoinable::join()
+    virtual void join() override;
 
     bool start( const QString& mirrorListUrl );
 
@@ -62,7 +62,7 @@ public:
 
     QString errorText() const;
 
-    QString getVersion() const;
+    QnSoftwareVersion getVersion() const;
 
     void cancel();
 
@@ -81,7 +81,7 @@ private:
     const ProductResourcesNameset m_rns;
     const QString m_productName;
     const QString m_customization;
-    const QString m_version;
+    const QnSoftwareVersion m_version;
     const QString m_module;
     const QString m_installationDirectory;
     State m_state;

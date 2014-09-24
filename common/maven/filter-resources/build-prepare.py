@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.join('..'))
 from filetypes import all_filetypes, video_filetypes, image_filetypes
 
 def gen_filetypes_h():
-    filetypes_h = open('${project.build.sourceDirectory}/plugins/resources/archive/filetypes.h', 'w')
+    filetypes_h = open('${project.build.sourceDirectory}/plugins/resource/avi/filetypes.h', 'w')
     print >> filetypes_h, '#ifndef UNICLIENT_FILETYPES_H_'
     print >> filetypes_h, '#define UNICLIENT_FILETYPES_H_'
     print >> filetypes_h, '// This file is generated. Edit filetypes.py instead.'

@@ -24,9 +24,13 @@ public:
     virtual void updateFromSettings() override;
 
     virtual bool confirm() override;
-
+    virtual bool discard() override;
 private:
     void initTranslations();
+
+    QColor defaultBackgroundColor() const;
+    QColor backgroundColor() const;
+    void updateBackgroundColor();
 
 private slots:
     void at_browseMainMediaFolderButton_clicked();
@@ -34,17 +38,19 @@ private slots:
     void at_removeExtraMediaFolderButton_clicked();
     void at_extraMediaFoldersList_selectionChanged();
     void at_timeModeComboBox_activated();
-    void at_downmixAudioCheckBox_toggled(bool checked);
-    void at_languageComboBox_currentIndexChanged(int index);
-    void at_skinComboBox_currentIndexChanged(int index);
+
     void at_browseLogsButton_clicked();
 
 private:
     QScopedPointer<Ui::GeneralPreferencesWidget> ui;
+    QScopedPointer<QColorDialog> m_colorDialog;
+    bool m_updating;
 
     bool m_oldDownmix;
+    bool m_oldDoubleBuffering;
     int m_oldLanguage;
     int m_oldSkin;
+    QColor m_oldBackgroundColor;
 };
 
 #endif // GENERAL_PREFERENCES_WIDGET_H

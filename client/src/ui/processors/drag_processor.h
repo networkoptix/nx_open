@@ -53,7 +53,7 @@ public:
         /** By default, drag processor will compress consecutive drag operations 
          * if scene and view mouse coordinates didn't change between them. 
          * This flag disables the compression. */
-        DONT_COMPRESS = 0x1,
+        DontCompress = 0x1, // TODO: #Elric #enum
     };
     Q_DECLARE_FLAGS(Flags, Flag);
 

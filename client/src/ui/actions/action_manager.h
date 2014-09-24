@@ -85,6 +85,16 @@ public:
      */
     void trigger(Qn::ActionId id, const QnActionParameters &parameters = QnActionParameters());
 
+
+    /**
+     * Triggers the action with the given id if possible
+     * 
+     * \param id                        Id of the action to trigger.
+     * \param parameters                Parameters to pass to action handler.
+     * \returns                         Was action triggered or not.
+     */
+    bool triggerIfPossible(Qn::ActionId id, const QnActionParameters &parameters = QnActionParameters());
+
     /**
      * \param scope                     Scope of the menu to create.
      * \param parameters                Action parameters for menu creation.
@@ -136,6 +146,7 @@ public:
      */
     void redirectAction(QMenu *menu, Qn::ActionId sourceId, QAction *targetAction);
 
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
 protected:
     friend class QnAction;
 
@@ -145,9 +156,10 @@ protected:
 
     bool redirectActionRecursive(QMenu *menu, Qn::ActionId targetId, QAction *targetAction);
 
+    /** Setup proper connections between menu and the manager. */
+    QMenu* integrateMenu(QMenu *menu, const QnActionParameters &parameters);
 private slots:
     void at_menu_destroyed(QObject *menu);
-    void at_menu_aboutToShow();
 
 private:
     /** Root action. Also contained in the maps. */
@@ -172,8 +184,8 @@ private:
     /** Currently active action that was activated via a shortcut. */
     QnAction *m_shortcutAction;
 
-    /** Last menu that was shown to the user. */
-    QObject *m_lastShownMenu;
+    /** Last menu that was clicked by the user. */
+    QObject *m_lastClickedMenu;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnActionManager::CreationOptions)

@@ -1,6 +1,8 @@
 #ifndef QN_INSTANCE_STORAGE_H
 #define QN_INSTANCE_STORAGE_H
 
+#include <type_traits>
+
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
 #include <QtCore/QPointer>
@@ -22,8 +24,7 @@ public:
             m_thisInitialized = true;
         }
 
-        QByteArray key(typeid(T).name());
-        QObject *&result = m_instanceByTypeName[key];
+        QObject *&result = m_instanceByMetaObject[&T::staticMetaObject];
         if(!result) {
             result = new T(m_this.data());
             m_instances.push_back(result);
@@ -32,12 +33,23 @@ public:
     }
 
 protected:
+    template<class T, class I>
+    void store(I *instance) {
+        static_assert(std::is_convertible<I *, T *>::value, "Provided value must be convertible to the specified instance type T.");
+
+        assert(!m_instanceByMetaObject.contains(&T::staticMetaObject));
+
+        m_instanceByMetaObject.insert(&T::staticMetaObject, instance);
+        m_instances.push_back(instance);
+    }
+
+protected:
     void clear() {
         /* Destroy typed subobjects in reverse order to how they were constructed. */
         while(!m_instances.empty()) {
             QObject *instance = m_instances.back();
             m_instances.pop_back();
-            m_instanceByTypeName.remove(typeid(*instance).name());
+            m_instanceByMetaObject.remove(instance->metaObject());
             delete instance;
         }
     }
@@ -48,7 +60,7 @@ private:
     bool m_thisInitialized;
     QPointer<QObject> m_this;
     
-    QHash<QByteArray, QObject *> m_instanceByTypeName; // TODO: #Elric use std::type_index
+    QHash<const QMetaObject *, QObject *> m_instanceByMetaObject;
     QList<QObject *> m_instances;
 };
 

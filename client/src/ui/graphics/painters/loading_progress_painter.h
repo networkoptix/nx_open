@@ -7,7 +7,7 @@
 
 class QGLContext;
 
-class QnColorShaderProgram;
+//class QnColorShaderProgram;
 
 class QnLoadingProgressPainter: protected QOpenGLFunctions {
 public:
@@ -33,7 +33,7 @@ private:
     GLuint m_buffer;
     int m_vertexOffset, m_colorOffset, m_vertexCount;
     int m_sectorCount;
-    QSharedPointer<QnColorShaderProgram> m_shader;
+    //QSharedPointer<QnColorShaderProgram> m_shader;
 };
 
 #endif // QN_LOADING_PROGRESS_PAINTER_H

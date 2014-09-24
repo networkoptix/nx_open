@@ -7,13 +7,19 @@
 #define ABSTRACT_SOCKET_H
 
 #include <cstdint> /* For std::uintptr_t. */
-
-#include <QByteArray>
+#include <functional>
+#include <memory>
 
 #include <utils/common/byte_array.h>
 
+#include "aio/pollset.h"
+#include "buffer.h"
 #include "nettools.h"
 #include "socket_common.h"
+#include "utils/common/systemerror.h"
+
+
+//todo: #ak cancel asynchoronous operations
 
 //!Base interface for sockets. Provides methods to set different socket configuration parameters
 class AbstractSocket
@@ -126,6 +132,11 @@ public:
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getSendTimeout( unsigned int* millis ) = 0;
+    //!Get socket's last error code. Needed in case of \a aio::etError
+    /*!
+        \return \a true if read error code successfully, \a false otherwise
+    */
+    virtual bool getLastError( SystemError::ErrorCode* errorCode ) = 0;
     //!Returns system-specific socket handle
     /*!
         TODO: #ak remove this method after complete move to the new socket
@@ -136,7 +147,7 @@ public:
 //!Interface for writing to/reading from socket
 class AbstractCommunicatingSocket
 :
-    virtual public AbstractSocket
+    public AbstractSocket
 {
 public:
     virtual ~AbstractCommunicatingSocket() {}
@@ -181,18 +192,97 @@ public:
         \return foreign address
         \note If \a AbstractCommunicatingSocket::connect() has not been called yet, empty address is returned
     */
-    virtual const SocketAddress getForeignAddress() = 0;
+    virtual SocketAddress getForeignAddress() const = 0;
     //!Returns \a true, if connection has been established, \a false otherwise
     /*!
         TODO/IMPL give up this method, since it's unreliable
     */
     virtual bool isConnected() const = 0;
+
+    /*!
+        \note uses sendTimeout
+    */
+    template<class HandlerType>
+        bool connectAsync( const SocketAddress& addr, HandlerType handler )
+        {
+            return connectAsyncImpl( addr, std::function<void( SystemError::ErrorCode )>( std::move( handler ) ) );
+        }
+
+    //!Reads bytes from socket asynchronously
+    /*!
+        \param dst Buffer to read to. Maximum \a dst->capacity() bytes read to this buffer. If buffer already contains some data, 
+            newly-read data will be appended to it. Buffer is resized after reading to its actual size
+        \param handler functor with following signature:
+            \code{.cpp}
+                ( SystemError::ErrorCode errorCode, size_t bytesRead )
+            \endcode
+            \a bytesRead is undefined, if errorCode is not SystemError::noError.
+            \a bytesRead is 0, if connection has been closed
+        \return true, if asynchronous read has been issued
+        \warning If \a dst->capacity() == 0, \a false is returned and no bytes read
+        \warning Multiple concurrent asynchronous write operations result in undefined behavour
+    */
+    template<class HandlerType>
+        bool readSomeAsync( nx::Buffer* const dst, HandlerType handler )
+        {
+            return recvAsyncImpl( dst, std::function<void( SystemError::ErrorCode, size_t )>( std::move( handler ) ) );
+        }
+
+    //!Asynchnouosly writes all bytes from input buffer
+    /*!
+        \param handler functor with following parameters:
+            \code{.cpp}
+                ( SystemError::ErrorCode errorCode, size_t bytesWritten )
+            \endcode
+            \a bytesWritten differ from \a src size only if errorCode is not SystemError::noError
+    */
+    template<class HandlerType>
+        bool sendAsync( const nx::Buffer& src, HandlerType handler )
+        {
+            return sendAsyncImpl( src, std::function<void( SystemError::ErrorCode, size_t )>( std::move( handler ) ) );
+        }
+
+    //!Register timer on this socket
+    /*!
+        \param handler functor with no parameters
+    */
+    template<class HandlerType>
+        bool registerTimer( unsigned int timeoutMs, HandlerType handler )
+        {
+            return registerTimerImpl( timeoutMs, std::function<void()>( std::move( handler ) ) );
+        }
+
+    //!
+    /*!
+        It is garanteed that after return of this method no async handler will be called
+        \param eventType Possible values: \a aio::etRead, \a aio::etWrite, \a aio::etTimedOut or \a aio::etNone to cancel all async aio
+        \param waitForRunningHandlerCompletion If \a true, it is garanteed that after return of this method no async handler is running
+    */
+    virtual void cancelAsyncIO( aio::EventType eventType = aio::etNone, bool waitForRunningHandlerCompletion = true ) = 0;
+
+protected:
+    virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) = 0;
+    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
+    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
+    virtual bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) = 0;
+};
+
+struct StreamSocketInfo
+{
+    //!round-trip time smoothed variation, millis
+    unsigned int rttVar;
+
+    StreamSocketInfo()
+    :
+        rttVar( 0 )
+    {
+    }
 };
 
 //!Interface for connection-orientied sockets
 class AbstractStreamSocket
 :
-    virtual public AbstractCommunicatingSocket
+    public AbstractCommunicatingSocket
 {
 public:
     virtual ~AbstractStreamSocket() {}
@@ -212,6 +302,40 @@ public:
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getNoDelay( bool* value ) = 0;
+    //!Enable collection of socket statistics
+    /*!
+        \param val \a true - enable, \a false - diable
+        \note This method MUST be called only after establishing connection. After reconnecting socket, it MUST be called again!
+        \note On win32 only process with admin rights can enable statistics collection, on linux it is enabled by default for every socket
+    */
+    virtual bool toggleStatisticsCollection( bool val ) = 0;
+    //!Reads extended stream socket information
+    /*!
+        \note \a AbstractStreamSocket::toggleStatisticsCollection MUST be called prior to this method
+        \note on win32 for tcp protocol this function is pretty slow, so it is not recommended to call it too often
+    */
+    virtual bool getConnectionStatistics( StreamSocketInfo* info ) = 0;
+};
+
+//!Stream socket with encryption
+/*!
+    In most cases, \a AbstractStreamSocket interface is enough. This one is needed for SMTP/TLS, for example
+*/
+class AbstractEncryptedStreamSocket
+:
+    public AbstractStreamSocket
+{
+public:
+    //!Connect to remote host without performing SSL handshake
+    /*!
+        \a AbstractCommunicatingSocket::connect connects and performs handshake. This method is required for SMTP/TLS, for example
+    */
+    virtual bool connectWithoutEncryption(
+        const QString& foreignAddress,
+        unsigned short foreignPort,
+        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) = 0;
+    //!Do SSL handshake and use encryption on succeeding data exchange
+    virtual bool enableClientEncryption() = 0;
 };
 
 //!Interface for server socket, accepting stream connections
@@ -220,7 +344,7 @@ public:
 */
 class AbstractStreamServerSocket
 :
-    virtual public AbstractSocket
+    public AbstractSocket
 {
 public:
     virtual ~AbstractStreamServerSocket() {}
@@ -239,6 +363,23 @@ public:
         \note Uses read timeout
     */
     virtual AbstractStreamSocket* accept() = 0;
+    //!Starts async accept operation
+    /*!
+        \param handler functor with following signature:
+            \code{.cpp}
+                ( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection )
+                //\a newConnection is \a nullptr in case of error
+            \endcode
+            \a newConnection is NULL, if errorCode is not SystemError::noError
+    */
+    template<class HandlerType>
+        bool acceptAsync( HandlerType handler )
+        {
+            return acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>( std::move(handler) ) );
+        }
+
+protected:
+    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) = 0;
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));
@@ -249,7 +390,7 @@ static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));
 */
 class AbstractDatagramSocket
 :
-    virtual public AbstractCommunicatingSocket
+    public AbstractCommunicatingSocket
 {
 public:
     static const int UDP_HEADER_SIZE = 8;
@@ -273,19 +414,22 @@ public:
         \return true if whole data has been sent
         \note Remebers new destination address (as if \a AbstractDatagramSocket::setDestAddr( \a foreignAddress, \a foreignPort ) has been called)
     */
-    virtual bool sendTo(
+    bool sendTo(
         const void* buffer,
         unsigned int bufferLen,
         const QString& foreignAddress,
-        unsigned short foreignPort ) = 0;
+        unsigned short foreignPort )
+    {
+        return sendTo( buffer, bufferLen, SocketAddress( foreignAddress, foreignPort ) );
+    }
     //!Send the given \a buffer as a datagram to the specified address/port
     /*!
         Same as previous method
     */
-    bool sendTo(
+    virtual bool sendTo(
         const void* buffer,
         unsigned int bufferLen,
-        const SocketAddress& foreignAddress ) { return sendTo( buffer, bufferLen, foreignAddress.address.toString(), foreignAddress.port ); }
+        const SocketAddress& foreignAddress ) = 0;
     //!Read read up to \a bufferLen bytes data from this socket. The given \a buffer is where the data will be placed
     /*!
         \param buffer buffer to receive data
@@ -296,9 +440,11 @@ public:
     */
     virtual int recvFrom(
         void* buffer,
-        int bufferLen,
+        unsigned int bufferLen,
         QString& sourceAddress,
         unsigned short& sourcePort ) = 0;
+    //!Returns address of previous datagram read with \a AbstractCommunicatingSocket::recv or \a AbstractDatagramSocket::recvFrom
+    virtual SocketAddress lastDatagramSourceAddress() const = 0;
     //!Checks, whether data is available for reading in non-blocking mode. Does not block for timeout, returns immediately
     /*!
         TODO: #ak remove this method, since it requires use of \a select(), which is heavy, use \a MSG_DONTWAIT instead
@@ -309,6 +455,20 @@ public:
         \param multicastIF multicast interface for sending packets
     */
     virtual bool setMulticastIF( const QString& multicastIF ) = 0;
+
+    /**
+    *   Join the specified multicast group
+    *   @param multicastGroup multicast group address to join
+    */
+    virtual bool joinGroup( const QString &multicastGroup ) = 0;
+    virtual bool joinGroup( const QString &multicastGroup, const QString& multicastIF ) = 0;
+
+    /**
+    *   Leave the specified multicast group
+    *   @param multicastGroup multicast group address to leave
+    */
+    virtual bool leaveGroup( const QString &multicastGroup ) = 0;
+    virtual bool leaveGroup( const QString &multicastGroup, const QString& multicastIF ) = 0;
 };
 
 #endif  //ABSTRACT_SOCKET_H

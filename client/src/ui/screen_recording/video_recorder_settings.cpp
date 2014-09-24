@@ -7,9 +7,9 @@
 
 #ifdef Q_OS_WIN
 #   include <d3d9.h>
-#   include <device_plugins/desktop_win/screen_grabber.h>
-#   include <device_plugins/desktop_win/desktop_file_encoder.h>
-#   include <device_plugins/desktop_win/win_audio_device_info.h>
+#   include <plugins/resource/desktop_win/screen_grabber.h>
+#   include <plugins/resource/desktop_win/desktop_file_encoder.h>
+#   include <plugins/resource/desktop_win/win_audio_device_info.h>
 #endif
 
 #include <utils/common/warnings.h>
@@ -191,21 +191,15 @@ void QnVideoRecorderSettings::setDecoderQuality(Qn::DecoderQuality decoderQualit
     settings.setValue(QLatin1String("decoderQuality"), decoderQuality);
 }
 
-Qn::Resolution QnVideoRecorderSettings::resolution() const
-{
+Qn::Resolution QnVideoRecorderSettings::resolution() const {
     Qn::Resolution rez = Qn::QuaterNativeResolution;
-    if (settings.contains(QLatin1String("resolution")))
-        rez = (Qn::Resolution) settings.value(QLatin1String("resolution")).toInt();
-#ifdef CL_TRIAL_MODE
-    if ( rez < Qn::Exact640x480Resolution)
-        rez = Qn::Exact640x480Resolution;
-#endif
+    if (settings.contains(lit("resolution")))
+        rez = (Qn::Resolution) settings.value(lit("resolution")).toInt();
     return rez;
 }
 
-void QnVideoRecorderSettings::setResolution(Qn::Resolution resolution)
-{
-    settings.setValue(QLatin1String("resolution"), resolution);
+void QnVideoRecorderSettings::setResolution(Qn::Resolution resolution) {
+    settings.setValue(lit("resolution"), resolution);
 }
 
 int QnVideoRecorderSettings::screen() const

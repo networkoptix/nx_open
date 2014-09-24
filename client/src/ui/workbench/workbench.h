@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 
-#include <core/resource/layout_resource.h>
+#include <core/resource/resource_fwd.h>
 
 #include <client/client_globals.h>
 #include <client/client_model_types.h>

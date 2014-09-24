@@ -21,26 +21,28 @@ public:
 
     QString getUniqueId() const;
 
-    int id() const;
-    void setId(int value);
+    QUuid id() const;
+    void setId(const QUuid& value);
 
-    BusinessEventType::Value eventType() const;
-    void setEventType(const BusinessEventType::Value value);
+    QnBusiness::EventType eventType() const;
+    void setEventType(QnBusiness::EventType eventType);
 
-    QnResourceList eventResources() const;
-    void setEventResources(const QnResourceList &value);
+    QVector<QUuid> eventResources() const;
+    void setEventResources(const QVector<QUuid> &value);
+    QnResourceList eventResourceObjects() const;
 
     QnBusinessEventParameters eventParams() const;
     void setEventParams(const QnBusinessEventParameters& params);
 
-    Qn::ToggleState eventState() const;
-    void setEventState(Qn::ToggleState state);
+    QnBusiness::EventState eventState() const;
+    void setEventState(QnBusiness::EventState state);
 
-    BusinessActionType::Value actionType() const;
-    void setActionType(const BusinessActionType::Value value);
+    QnBusiness::ActionType actionType() const;
+    void setActionType(QnBusiness::ActionType actionType);
 
-    QnResourceList actionResources() const;
-    void setActionResources(const QnResourceList &value);
+    QVector<QUuid> actionResources() const;
+    QnResourceList actionResourceObjects() const;
+    void setActionResources(const QVector<QUuid> &value);
 
     QnBusinessActionParameters actionParams() const;
     void setActionParams(const QnBusinessActionParameters& params);
@@ -49,30 +51,39 @@ public:
     int aggregationPeriod() const;
     void setAggregationPeriod(int secs);
 
-    bool disabled() const;
-    void setDisabled(bool value);
+    bool isDisabled() const;
+    void setDisabled(bool disabled);
 
     QString schedule() const;
-    void setSchedule(const QString value);
+    void setSchedule(const QString &schedule);
 
-    QString comments() const;
-    void setComments(const QString value);
+    QString comment() const;
+    void setComment(const QString &comment);
 
-    bool system() const;
-    void setSystem(bool value);
+    bool isSystem() const;
+    void setSystem(bool system);
 
     /* Check if current time allowed in schedule */
     bool isScheduleMatchTime(const QDateTime& datetime) const;
+
+    static QnBusinessEventRuleList getDefaultRules();
+
+    QnBusinessEventRule* clone();
+    void removeResource(const QUuid& resId);
+
 private:
-    int m_id;
+    QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem,
+        QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType, const QnResourcePtr& actionRes= QnResourcePtr());
 
-    BusinessEventType::Value m_eventType;
-    QnResourceList m_eventResources;
+    QUuid m_id;
+
+    QnBusiness::EventType m_eventType;
+    QVector<QUuid> m_eventResources;
     QnBusinessEventParameters m_eventParams;
-    Qn::ToggleState m_eventState;
+    QnBusiness::EventState m_eventState;
 
-    BusinessActionType::Value m_actionType;
-    QnResourceList m_actionResources;
+    QnBusiness::ActionType m_actionType;
+    QVector<QUuid> m_actionResources;
     QnBusinessActionParameters m_actionParams;
 
     int m_aggregationPeriod;
@@ -80,7 +91,7 @@ private:
 
     QString m_schedule;
     QByteArray m_binSchedule;
-    QString m_comments;
+    QString m_comment;
 
     bool m_system;
 };

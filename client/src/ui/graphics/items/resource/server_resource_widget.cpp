@@ -30,6 +30,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 
+#include <utils/license_usage_helper.h>
+
 namespace {
     /** Convert angle from radians to degrees */
     qreal radiansToDegrees(qreal radian) {
@@ -177,10 +179,9 @@ namespace {
 
         return path;
     }
-
     /** Backward sorting because buttonBar inserts buttons in reversed order */
     bool statisticsDataLess(const QnStatisticsData &first, const QnStatisticsData &second) {
-        if (first.deviceType == NETWORK && second.deviceType == NETWORK)
+        if (first.deviceType == Qn::StatisticsNETWORK && second.deviceType == Qn::StatisticsNETWORK)
             return first.description.toLower() > second.description.toLower();
 
         if (first.deviceType != second.deviceType)
@@ -268,7 +269,7 @@ protected:
     }
 
     qreal stateOpacity(StateFlags stateFlags) {
-        return (stateFlags & HOVERED) ? 1.0 : 0.5;
+        return (stateFlags & Hovered) ? 1.0 : 0.5;
     }
 
     virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
@@ -279,7 +280,7 @@ protected:
         int textOffset = legendImageSize + itemSpacing;
         QRectF textRect = rect.adjusted(textOffset, 0, 0, 0);
         {
-            //TODO: #GDM Text drawing is very slow. #Elric says it is fast in Qt5
+            //TODO: #GDM #Common Text drawing is very slow. Replace with cached textures where possible
             QnScopedPainterPenRollback penRollback(painter, QPen(Qt::black, 2));
             QnScopedPainterBrushRollback brushRollback(painter);
 
@@ -472,8 +473,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     m_resource = base_type::resource().dynamicCast<QnMediaServerResource>();
     if(!m_resource)
         qnCritical("Server resource widget was created with a non-server resource.");
-
-    m_manager->setFlagsFilter(NETWORK, qnSettings->statisticsNetworkFilter());
+    m_manager->setFlagsFilter(Qn::StatisticsNETWORK, qnSettings->statisticsNetworkFilter());
     m_pointsLimit = m_manager->pointsLimit();
     m_manager->registerConsumer(m_resource, this, SLOT(at_statistics_received()));
     m_updatePeriod = m_manager->updatePeriod(m_resource);
@@ -485,14 +485,6 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     addOverlays();
 
     /* Setup buttons */
-    /*QnImageButtonWidget *pingButton = new QnImageButtonWidget();
-    pingButton->setIcon(qnSkin->icon("item/ping.png"));
-    pingButton->setCheckable(false);
-    pingButton->setProperty(Qn::NoBlockMotionSelection, true);
-    pingButton->setToolTip(tr("Ping"));
-    connect(pingButton, SIGNAL(clicked()), this, SLOT(at_pingButton_clicked()));
-    buttonBar()->addButton(PingButton, pingButton);*/
-
     QnImageButtonWidget *showLogButton = new QnImageButtonWidget();
     showLogButton->setIcon(qnSkin->icon("item/log.png"));
     showLogButton->setCheckable(false);
@@ -557,15 +549,15 @@ void QnServerResourceWidget::setCheckedHealthMonitoringButtons(const QnServerRes
     updateGraphVisibility();
 }
 
-QColor QnServerResourceWidget::getColor(QnStatisticsDeviceType deviceType, int index) {
+QColor QnServerResourceWidget::getColor(Qn::StatisticsDeviceType deviceType, int index) {
     switch (deviceType) {
-    case CPU:
+    case Qn::StatisticsCPU:
         return m_colors.cpu;
-    case RAM:
+    case Qn::StatisticsRAM:
         return m_colors.ram;
-    case HDD:
+    case Qn::StatisticsHDD:
         return m_colors.hdds[qMod(index, m_colors.hdds.size())];
-    case NETWORK:
+    case Qn::StatisticsNETWORK:
         return m_colors.network[qMod(index, m_colors.network.size())];
     default:
         return QColor(Qt::white);
@@ -619,8 +611,8 @@ void QnServerResourceWidget::addOverlays() {
     addOverlayWidget(mainOverlayWidget, UserVisible, true);
 }
 
-QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDeviceType(const QnStatisticsDeviceType deviceType) const {
-    if(deviceType == NETWORK) {
+QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDeviceType(const Qn::StatisticsDeviceType deviceType) const {
+    if(deviceType == Qn::StatisticsNETWORK) {
         return NetworkButtonBar;
     } else {
         return CommonButtonBar;
@@ -630,7 +622,7 @@ QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDevic
 void QnServerResourceWidget::updateLegend() {
     HealthMonitoringButtons checkedData = item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>();
 
-    QHash<QnStatisticsDeviceType, int> indexes;
+    QHash<Qn::StatisticsDeviceType, int> indexes;
 
     foreach (const QString &key, m_sortedKeys) {
         QnStatisticsData &stats = m_history[key];
@@ -700,7 +692,7 @@ void QnServerResourceWidget::updateInfoOpacity() {
 }
 
 void QnServerResourceWidget::updateColors() {
-    QHash<QnStatisticsDeviceType, int> indexes;
+    QHash<Qn::StatisticsDeviceType, int> indexes;
 
     foreach (QString key, m_sortedKeys) {
         QnStatisticsData &stats = m_history[key];
@@ -767,12 +759,13 @@ QString QnServerResourceWidget::calculateTitleText() const {
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility();
     result &= (CloseButton | RotateButton | InfoButton);
-    result |= PingButton | ShowLogButton | CheckIssuesButton;
+    if (!qnSettings->isVideoWallMode())
+        result |= PingButton | ShowLogButton | CheckIssuesButton;
     return result;
 }
 
 Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const {
-    if (m_resource->getStatus() == QnResource::Offline)
+    if (m_resource->getStatus() == Qn::Offline)
         return Qn::ServerOfflineOverlay;
     return base_type::calculateStatusOverlay();
 }
@@ -797,7 +790,7 @@ void QnServerResourceWidget::at_statistics_received() {
         return;
     }
 
-    if (id == m_lastHistoryId) {
+    if (id == m_lastHistoryId || m_resource->getStatus() != Qn::Online) {
         m_renderStatus = Qn::OldFrameRendered;
         return;
     }

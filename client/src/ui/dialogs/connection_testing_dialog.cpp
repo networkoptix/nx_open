@@ -17,6 +17,8 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
 
+#include <common/common_module.h>
+
 #include <client/client_settings.h>
 
 #include <ui/help/help_topics.h>
@@ -24,11 +26,8 @@
 
 #include <utils/common/warnings.h>
 
-#ifdef Q_OS_MACX
-    #include <utils/network/icmp_mac.h>
-#endif
-
-#include "version.h"
+#include <utils/common/app_info.h>
+#include "compatibility.h"
 
 QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) :
     QnButtonBoxDialog(parent),
@@ -45,8 +44,6 @@ QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) :
     connect(m_timeoutTimer, &QTimer::timeout, this, &QnConnectionTestingDialog::tick);
     m_timeoutTimer->setInterval(100);
     m_timeoutTimer->setSingleShot(false);
-
-    connect(this, &QnConnectionTestingDialog::resourceChecked, this, &QnConnectionTestingDialog::at_resource_result, Qt::QueuedConnection); //thread synch
 }
 
 void QnConnectionTestingDialog::testEnterpriseController(const QUrl &url) {
@@ -56,46 +53,10 @@ void QnConnectionTestingDialog::testEnterpriseController(const QUrl &url) {
 
     setHelpTopic(this, Qn::Login_Help);
 
-    QnAppServerConnectionFactory::createConnection(url)->testConnectionAsync(this, SLOT(at_ecConnection_result(int, QnConnectionInfoPtr, int)));
-
-    m_timeoutTimer->start();
-}
-
-static void pingResourceAsync(const QString &host, QPointer<QnConnectionTestingDialog> dialog) {
-    bool success = false;
-    if (!dialog)
-        return;
-
-#ifdef Q_OS_MACX
-    success = Icmp::ping(host, 10000);
-#else
-    QScopedPointer<QTcpSocket> socket(new QTcpSocket());
-    socket->connectToHost(host, 80, QAbstractSocket::ReadOnly);
-    if(socket->waitForConnected()) {
-        socket->disconnectFromHost();
-        success = true;
-    }
-#endif
-
-    if(!dialog)
-        return;
-
-    emit dialog.data()->resourceChecked(success);
-
-}
-
-void QnConnectionTestingDialog::testResource(const QnResourcePtr &resource) {
-    if (!resource)
-        return;
-
-    QUrl url = QUrl::fromUserInput(resource->getUrl());
-
-    qnDebug("Testing connectivity for URL '%1'.", url.host());
-
-    ui->groupBox->setTitle(tr("Testing connection to %1").arg(getFullResourceName(resource, true)));
-
-    QPointer<QnConnectionTestingDialog> owner(this);
-    QtConcurrent::run(&pingResourceAsync, url.host(), owner);
+    QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
+        url,
+        this,
+        &QnConnectionTestingDialog::at_ecConnection_result );
 
     m_timeoutTimer->start();
 }
@@ -112,15 +73,15 @@ void QnConnectionTestingDialog::tick() {
     updateUi(false, tr("Request timed out."));
 }
 
-void QnConnectionTestingDialog::at_ecConnection_result(int status, QnConnectionInfoPtr connectionInfo, int requestHandle) {
-    Q_UNUSED(requestHandle)
+void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode errorCode, QnConnectionInfo connectionInfo) {
+    Q_UNUSED(reqID)
 
     if (!m_timeoutTimer->isActive())
         return;
     m_timeoutTimer->stop();
     ui->progressBar->setValue(ui->progressBar->maximum());
 
-    QnCompatibilityChecker remoteChecker(connectionInfo->compatibilityItems);
+    QnCompatibilityChecker remoteChecker(connectionInfo.compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
 
     QnCompatibilityChecker* compatibilityChecker;
@@ -134,57 +95,48 @@ void QnConnectionTestingDialog::at_ecConnection_result(int status, QnConnectionI
     QString detail;
     int helpTopicId = -1;
 
-    bool compatibleProduct = qnSettings->isDevMode() || connectionInfo->brand.isEmpty()
-            || connectionInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+    bool compatibleProduct = qnSettings->isDevMode() || connectionInfo.brand.isEmpty()
+            || connectionInfo.brand == QnAppInfo::productNameShort();
 
-    if (status == 202) {
+    if (errorCode == ec2::ErrorCode::unauthorized) {
         success = false;
         detail = tr("Login or password you have entered are incorrect, please try again.");
         helpTopicId = Qn::Login_Help;
-    } else if (status != 0) {
+    } else if (errorCode != ec2::ErrorCode::ok) {
         success = false;
-        detail = tr("Connection to the Enterprise Controller could not be established.\n"\
+        detail = tr("Connection to the Server could not be established.\n"\
                     "Connection details that you have entered are incorrect, please try again.\n\n"\
                     "If this error persists, please contact your VMS administrator.");
         helpTopicId = Qn::Login_Help;
     } else if (!compatibleProduct) {
         success = false;
-        detail = tr("You are trying to connect to incompatible Enterprise Controller.");
+        detail = tr("You are trying to connect to incompatible Server.");
         helpTopicId = Qn::Login_Help;
-    } else if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo->version)) {
+    } else if (!compatibilityChecker->isCompatible(QLatin1String("Client"), qnCommon->engineVersion(), QLatin1String("ECS"), connectionInfo.version)) {
         QnSoftwareVersion minSupportedVersion("1.4");
 
-        if (connectionInfo->version < minSupportedVersion) {
-            detail = tr("Enterprise Controller has a different version:\n"\
+        if (connectionInfo.version < minSupportedVersion) {
+            detail = tr("Server has a different version:\n"\
                         " - Client version: %1.\n"\
-                        " - EC version: %2.\n"\
+                        " - Server version: %2.\n"\
                         "Compatibility mode for versions lower than %3 is not supported.")
-                    .arg(QLatin1String(QN_ENGINE_VERSION))
-                    .arg(connectionInfo->version.toString())
+                    .arg(qnCommon->engineVersion().toString())
+                    .arg(connectionInfo.version.toString())
                     .arg(minSupportedVersion.toString());
             success = false;
             helpTopicId = Qn::VersionMismatch_Help;
         } else {
-            detail = tr("Enterprise Controller has a different version:\n"\
+            detail = tr("Server has a different version:\n"\
                         " - Client version: %1.\n"\
-                        " - EC version: %2.\n"\
+                        " - Server version: %2.\n"\
                         "You will be asked to restart the client in compatibility mode.")
-                    .arg(QLatin1String(QN_ENGINE_VERSION))
-                    .arg(connectionInfo->version.toString());
+                    .arg(qnCommon->engineVersion().toString())
+                    .arg(connectionInfo.version.toString());
             helpTopicId = Qn::VersionMismatch_Help;
         }
     }
 
     updateUi(success, detail, helpTopicId);
-}
-
-void QnConnectionTestingDialog::at_resource_result(bool success) {
-    if (!m_timeoutTimer->isActive())
-        return;
-    m_timeoutTimer->stop();
-    ui->progressBar->setValue(ui->progressBar->maximum());
-
-    updateUi(success);
 }
 
 void QnConnectionTestingDialog::updateUi(bool success, const QString &details, int helpTopicId) {

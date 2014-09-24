@@ -17,7 +17,8 @@ namespace SystemError
 #ifdef _WIN32
         return GetLastError();
 #else
-        return errno;
+        //EAGAIN and EWOULDBLOCK are usually same, but not always
+        return errno == EAGAIN ? EWOULDBLOCK : errno;
 #endif
     }
 
@@ -57,5 +58,14 @@ namespace SystemError
     QString getLastOSErrorText()
     {
         return toString(getLastOSErrorCode());
+    }
+
+    void setLastErrorCode( ErrorCode errorCode )
+    {
+#ifdef _WIN32
+        SetLastError( errorCode );
+#else
+        errno = errorCode;
+#endif
     }
 }

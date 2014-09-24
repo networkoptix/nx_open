@@ -5,8 +5,13 @@
 #include <QtCore/QUrl>
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
+#include <QtCore/QTimer>
+
+#include <QtNetwork/QNetworkCookie>
+#include <QtNetwork/QSslError>
 
 #include "utils/common/request_param.h"
+
 
 class QNetworkReply;
 class QNetworkAccessManager;
@@ -82,11 +87,12 @@ private slots:
     void at_sslErrors(QNetworkReply* reply, const QList<QSslError> &errors);
     void at_replyReceived(QNetworkReply * reply);
     void at_SyncRequestFinished(const QnHTTPRawResponse& response, int handle);
+
 signals:
     void aboutToBeStopped();
     void aboutToBeStarted();
     void asyncRequestQueued(int operation, AsyncRequestInfo reqInfo, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data);
-    //void requestFinished(const QnHTTPRawResponse& response, int handle);
+
 private:
     QNetworkAccessManager *m_accessManager;
     mutable QMutex m_accessManagerMutex;

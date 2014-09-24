@@ -30,6 +30,7 @@ typedef QSharedPointer<AbstractStreamSocket> TCPSocketPtr;
 
 class CLSimpleHTTPClient
 {
+    // TODO: #Elric #enum
     enum { Basic, Digestaccess };
 
 public:
@@ -46,10 +47,10 @@ public:
     ~CLSimpleHTTPClient();
 
     CLHttpStatus doGET(const QString& request, bool recursive = true);
-    CLHttpStatus doPOST(const QString& request, const QString& body);
+    CLHttpStatus doPOST(const QString& request, const QString& body, bool recursive = true);
 
     CLHttpStatus doGET(const QByteArray& request, bool recursive = true);
-    CLHttpStatus doPOST(const QByteArray& request, const QString& body);
+    CLHttpStatus doPOST(const QByteArray& request, const QString& body, bool recursive = true);
 
     void addHeader(const QByteArray& key, const QByteArray& value);
 
@@ -76,7 +77,10 @@ public:
     }
 
     static QByteArray basicAuth(const QAuthenticator& auth);
-    static QString digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url);
+    /*!
+        \param isProxy If \a true, this method adds header Proxy-Authorization, otherwise Authorization
+    */
+    static QString digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url, bool isProxy = false);
     QByteArray getHeaderValue(const QByteArray& key);
 
     const QString& localAddress() const;
@@ -92,12 +96,12 @@ public:
     QAuthenticator auth() const { return m_auth; }
 
 private:
-    void initSocket();
+    void initSocket( bool ssl = false );
 
     void getAuthInfo();
 
     QByteArray basicAuth() const;
-    QString digestAccess(const QString&) const;
+    QString digestAccess(const QString& method, const QString& url) const;
 
     int readHeaders();
     void addExtraHeaders(QByteArray& request);

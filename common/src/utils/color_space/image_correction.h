@@ -9,6 +9,9 @@
 #include <QtCore/QRectF>
 #include <QtCore/QMetaType>
 
+#include <utils/common/model_functions_fwd.h>
+
+
 struct ImageCorrectionParams
 {
     bool operator== (const ImageCorrectionParams& other) const;
@@ -39,14 +42,13 @@ struct ImageCorrectionParams
                append(QByteArray::number(gamma)).append(';').append(enabled ? '1' : '0').append((char)0);
     }
 
-    float blackLevel;
-    float whiteLevel;
-    float gamma;
+    qreal blackLevel;
+    qreal whiteLevel;
+    qreal gamma;
     bool enabled;
 };
 
-Q_DECLARE_METATYPE(ImageCorrectionParams);
-
+QN_FUSION_DECLARE_FUNCTIONS(ImageCorrectionParams, (json)(metatype))
 
 struct ImageCorrectionResult
 {

@@ -1,4 +1,6 @@
+
 #include "param.h"
+
 
 /*
 QnParamType::QnParamType(const QString& name, const QVariant &val)
@@ -13,7 +15,7 @@ QnParamType::QnParamType(const QString& name, const QVariant &val)
 */
 
 QnParamType::QnParamType()
-    : type(None),
+    : type(Qn::PDT_None),
       min_val(0.0), max_val(0.0), step(0.0),
       ui(false), isReadOnly(false), isPhysical(true)
 {
@@ -23,15 +25,15 @@ bool QnParamType::setDefVal(const QVariant &val) // safe way to set value
 {
     switch (type)
     {
-    case None:
+    case Qn::PDT_None:
         return false;
 
-    case MinMaxStep:
+    case Qn::PDT_MinMaxStep:
         if (val.toDouble() < min_val || val.toDouble() > max_val)
             return false;
         break;
 
-    case Enumeration:
+    case Qn::PDT_Enumeration:
         if (!possible_values.contains(val))
             return false;
         break;
@@ -146,15 +148,15 @@ bool QnParam::setValue(const QVariant &val) // safe way to set value
 {
     switch(m_paramType->type)
     {
-    case QnParamType::None:
+    case Qn::PDT_None:
         return true;
 
-    case QnParamType::MinMaxStep:
+    case Qn::PDT_MinMaxStep:
         if (val.toDouble() < m_paramType->min_val || val.toDouble() > m_paramType->max_val)
             return false;
         break;
 
-    case QnParamType::Enumeration:
+    case Qn::PDT_Enumeration:
         if (!m_paramType->possible_values.contains(val))
             return false;
         break;

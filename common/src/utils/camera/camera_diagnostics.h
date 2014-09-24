@@ -15,10 +15,11 @@ namespace CameraDiagnostics
 {
     namespace Step
     {
+        // TODO: #Elric #enum
         enum Value
         {
             none = 0,
-            //!checking media server availability
+            //!checking server availability
             mediaServerAvailability,
             //!checking that camera responses on base API requests
             cameraAvailability,
@@ -36,6 +37,7 @@ namespace CameraDiagnostics
     //!Contains error codes
     namespace ErrorCode
     {
+        // TODO: #Elric #enum
         enum Value
         {
             noError = 0,

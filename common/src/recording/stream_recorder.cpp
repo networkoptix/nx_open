@@ -1,22 +1,28 @@
 #include "stream_recorder.h"
 
-#include "core/resource/resource_consumer.h"
-#include "core/datapacket/abstract_data_packet.h"
-#include "core/datapacket/media_data_packet.h"
-#include "core/dataprovider/media_streamdataprovider.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
-#include "utils/common/util.h"
-#include "decoders/video/ffmpeg.h"
-#include "export/sign_helper.h"
-#include <plugins/resources/archive/avi_files/avi_archive_delegate.h>
-#include <plugins/resources/archive/avi_files/avi_archive_custom_data.h>
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include <utils/common/util.h>
+#include <utils/common/log.h>
+#include <utils/common/model_functions.h>
+
+#include <core/resource/resource_consumer.h>
+#include <core/datapacket/abstract_data_packet.h>
+#include <core/datapacket/media_data_packet.h>
+#include <core/dataprovider/media_streamdataprovider.h>
+
+#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <plugins/resource/avi/avi_archive_custom_data.h>
+#include <plugins/resource/archive/archive_stream_reader.h>
+
 #include "transcoding/ffmpeg_audio_transcoder.h"
 #include "transcoding/ffmpeg_video_transcoder.h"
 #include "transcoding/filters/contrast_image_filter.h"
 #include "transcoding/filters/time_image_filter.h"
 #include "transcoding/filters/fisheye_image_filter.h"
 
-#include <utils/common/json.h>
+#include "decoders/video/ffmpeg.h"
+#include "export/sign_helper.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
@@ -36,7 +42,7 @@ QString QnStreamRecorder::errorString(int errCode) {
     }
 }
 
-QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
+QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
     m_device(dev),
     m_firstTime(true),
@@ -68,12 +74,12 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_dstAudioCodec(CODEC_ID_NONE),
     m_dstVideoCodec(CODEC_ID_NONE),
     m_onscreenDateOffset(0),
-    m_role(Role_ServerRecording),
     m_timestampCorner(Qn::NoCorner),
     m_serverTimeZoneMs(Qn::InvalidUtcOffset),
     m_nextIFrameTime(AV_NOPTS_VALUE),
     m_truncateIntervalEps(0),
-    m_recordingFinished(false)
+    m_recordingFinished(false),
+    m_role(Role_ServerRecording)
 {
     srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
@@ -183,24 +189,22 @@ qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
 {
     for (int i = 0; i < m_prebuffer.size(); ++i)
     {
-        QnConstAbstractMediaDataPtr media = m_prebuffer.at(i);
+        const QnConstAbstractMediaDataPtr& media = m_prebuffer.at(i);
         if (media->dataType == QnAbstractMediaData::VIDEO && media->timestamp > baseTime && (media->flags & AV_PKT_FLAG_KEY))
             return media->timestamp;
     }
     return AV_NOPTS_VALUE;
 }
 
-bool QnStreamRecorder::processData(QnAbstractDataPacketPtr nonConstData)
+bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 {
-    QnConstAbstractDataPacketPtr data = nonConstData;
-
     if (m_needReopen)
     {
         m_needReopen = false;
         close();
     }
 
-    QnConstAbstractMediaDataPtr md = qSharedPointerDynamicCast<const QnAbstractMediaData>(data);
+    QnConstAbstractMediaDataPtr md = qSharedPointerDynamicCast<const QnAbstractMediaData>(nonConstData);
     if (!md)
         return true; // skip unknown data
 
@@ -283,7 +287,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr nonConstData)
     return true;
 }
 
-bool QnStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
+bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 {
     if (md->dataType == QnAbstractMediaData::META_V1)
         return saveMotion(md.dynamicCast<const QnMetaDataV1>());
@@ -307,7 +311,7 @@ bool QnStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
 
     if (md->dataType == QnAbstractMediaData::AUDIO && m_truncateInterval > 0)
     {
-        QnConstCompressedAudioDataPtr ad = qSharedPointerDynamicCast<const QnCompressedAudioData>(md);
+        const QnCompressedAudioData* ad = dynamic_cast<const QnCompressedAudioData*>(md.data());
         assert( ad->context );
         QnCodecAudioFormat audioFormat(ad->context);
         if (!m_firstTime && audioFormat != m_prevAudioFormat) {
@@ -373,18 +377,19 @@ bool QnStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
     if (md->dataType == QnAbstractMediaData::AUDIO && m_audioTranscoder)
     {
         QnAbstractMediaDataPtr result;
+        bool inputDataDepleted = false;
         do {
-            m_audioTranscoder->transcodePacket(md, &result);
-            if (result && result->data.size() > 0)
+            m_audioTranscoder->transcodePacket(inputDataDepleted ? QnConstAbstractMediaDataPtr() : md, &result);
+            if (result && result->dataSize() > 0)
                 writeData(result, streamIndex);
-            md.clear();
+            inputDataDepleted = true;
         } while (result);
     }
     else if (md->dataType == QnAbstractMediaData::VIDEO && m_videoTranscoder)
     {
         QnAbstractMediaDataPtr result;
         m_videoTranscoder->transcodePacket(md, &result);
-        if (result && result->data.size() > 0)
+        if (result && result->dataSize() > 0)
             writeData(result, streamIndex);
     }
     else {
@@ -394,7 +399,7 @@ bool QnStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
     return true;
 }
 
-void QnStreamRecorder::writeData(QnConstAbstractMediaDataPtr md, int streamIndex)
+void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex)
 {
     AVRational srcRate = {1, 1000000};
     AVStream* stream = m_formatCtx->streams[streamIndex];
@@ -410,7 +415,7 @@ void QnStreamRecorder::writeData(QnConstAbstractMediaDataPtr md, int streamIndex
         avPkt.dts = qMax((qint64)stream->cur_dts+1, dts);
     else
         avPkt.dts = dts;
-    QnConstCompressedVideoDataPtr video = md.dynamicCast<const QnCompressedVideoData>();
+    const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(md.data());
     if (video && (quint64)video->pts != AV_NOPTS_VALUE)
         avPkt.pts = av_rescale_q(video->pts-m_startDateTime, srcRate, stream->time_base) + (avPkt.dts-dts);
     else
@@ -418,12 +423,14 @@ void QnStreamRecorder::writeData(QnConstAbstractMediaDataPtr md, int streamIndex
 
     if(md->flags & AV_PKT_FLAG_KEY)
         avPkt.flags |= AV_PKT_FLAG_KEY;
-    avPkt.data = (quint8*) md->data.data();
-    avPkt.size = md->data.size();
+    avPkt.data = const_cast<quint8*>((const quint8*)md->data());    //const_cast is here because av_write_frame accepts non-const pointer, but does not modify object
+    avPkt.size = md->dataSize();
     avPkt.stream_index= streamIndex;
 
     if (av_write_frame(m_formatCtx, &avPkt) < 0) 
-        cl_log.log(QLatin1String("AV packet write error"), cl_logWARNING);
+    {
+        NX_LOG(QLatin1String("AV packet write error"), cl_logWARNING);
+    }
     else {
         m_packetWrited = true;
         if (m_needCalcSignature) 
@@ -442,7 +449,7 @@ void QnStreamRecorder::endOfRun()
     close();
 }
 
-bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaData)
+bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& mediaData)
 {
     m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
     Q_ASSERT(m_mediaProvider);
@@ -456,7 +463,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
     if (outputCtx == 0)
     {
         m_lastError = ContainerNotFoundError;
-        cl_log.log(lit("No %1 container in FFMPEG library.").arg(m_container), cl_logERROR);
+        NX_LOG(lit("No %1 container in FFMPEG library.").arg(m_container), cl_logERROR);
         return false;
     }
 
@@ -475,12 +482,12 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
 
     if (err < 0) {
         m_lastError = FileCreateError;
-        cl_log.log(lit("Can't create output file '%1' for video recording.").arg(m_fileName), cl_logERROR);
+        NX_LOG(lit("Can't create output file '%1' for video recording.").arg(m_fileName), cl_logERROR);
         msleep(500); // avoid createFile flood
         return false;
     }
 
-    QnMediaResourcePtr mediaDev = qSharedPointerDynamicCast<QnMediaResource>(m_device);
+    const QnMediaResource* mediaDev = dynamic_cast<const QnMediaResource*>(m_device.data());
 
     // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
     // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
@@ -490,26 +497,26 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
         m_contrastParams.enabled ||
         m_itemDewarpingParams.enabled;
 
-    QnConstResourceVideoLayoutPtr layout = mediaDev->getVideoLayout(m_mediaProvider);
-    QString layoutStr = QnArchiveStreamReader::serializeLayout(layout.get());
+    const QnConstResourceVideoLayoutPtr& layout = mediaDev->getVideoLayout(m_mediaProvider);
+    QString layoutStr = QnArchiveStreamReader::serializeLayout(layout.data());
     {
         if (!isTranscode)
-            av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_LayoutInfo, fileExt), layoutStr.toLatin1().data(), 0);
+            av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::LayoutInfoTag, fileExt), layoutStr.toLatin1().data(), 0);
         qint64 startTime = m_startOffset+mediaData->timestamp/1000;
-        av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_startTime, fileExt), QString::number(startTime).toLatin1().data(), 0);
-        av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Software, fileExt), "Network Optix", 0);
+        av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::StartTimeTag, fileExt), QString::number(startTime).toLatin1().data(), 0);
+        av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::SoftwareTag, fileExt), "Network Optix", 0);
         QnMediaDewarpingParams mediaDewarpingParams = mediaDev->getDewarpingParams();
         if (mediaDewarpingParams.enabled && !m_itemDewarpingParams.enabled) {
             // dewarping exists in resource and not activated now. Allow dewarping for saved file
             av_dict_set(&m_formatCtx->metadata,
-                        QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Dewarping, fileExt),
+                        QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::DewarpingTag, fileExt),
                         QJson::serialized<QnMediaDewarpingParams>(mediaDewarpingParams), 0);
         }
 
         QnAviArchiveCustomData customData;
         customData.overridenAr = m_device->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
         av_dict_set(&m_formatCtx->metadata,
-            QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Custom, fileExt),
+            QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::CustomTag, fileExt),
             QJson::serialized<QnAviArchiveCustomData>(customData), 0);
         
 
@@ -521,7 +528,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
             while (signPattern.size() < QnSignHelper::getMaxSignSize())
                 signPattern.append(" ");
             signPattern = signPattern.mid(0, QnSignHelper::getMaxSignSize());
-            av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Signature, fileExt), signPattern.data(), 0);
+            av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::SignatureTag, fileExt), signPattern.data(), 0);
         }
 #endif
 
@@ -536,7 +543,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
             AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);
             if (videoStream == 0) {
                 m_lastError = VideoStreamAllocationError;
-                cl_log.log(lit("Can't allocate output stream for recording."), cl_logERROR);
+                NX_LOG(lit("Can't allocate output stream for recording."), cl_logERROR);
                 return false;
             }
 
@@ -625,7 +632,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
             AVStream* audioStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID+i);
             if (!audioStream) {
                 m_lastError = AudioStreamAllocationError;
-                cl_log.log(lit("Can't allocate output audio stream."), cl_logERROR);
+                NX_LOG(lit("Can't allocate output audio stream."), cl_logERROR);
                 return false;
             }
 
@@ -633,7 +640,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
             QnMediaContextPtr mediaContext = audioLayout->getAudioTrackInfo(i).codecContext.dynamicCast<QnMediaContext>();
             if (!mediaContext) {
                 m_lastError = InvalidAudioCodecError;
-                cl_log.log(lit("Invalid audio codec information."), cl_logERROR);
+                NX_LOG(lit("Invalid audio codec information."), cl_logERROR);
                 return false;
             }
 
@@ -662,7 +669,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
         {
             avformat_close_input(&m_formatCtx);
             m_lastError = FileCreateError;
-            cl_log.log(lit("Can't create output file '%1'.").arg(url), cl_logERROR);
+            NX_LOG(lit("Can't create output file '%1'.").arg(url), cl_logERROR);
             msleep(500); // avoid createFile flood
             return false;
         }
@@ -675,7 +682,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
             m_formatCtx->pb = 0;
             avformat_close_input(&m_formatCtx);
             m_lastError = IncompatibleCodecError;
-            cl_log.log(lit("Video or audio codec is incompatible with %1 format. Try another format.").arg(m_container), cl_logERROR);
+            NX_LOG(lit("Video or audio codec is incompatible with %1 format. Try another format.").arg(m_container), cl_logERROR);
             return false;
         }
     }
@@ -723,13 +730,13 @@ int QnStreamRecorder::getPrebufferingUsec() const
 }
 
 
-bool QnStreamRecorder::needSaveData(QnConstAbstractMediaDataPtr media)
+bool QnStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)
 {
     Q_UNUSED(media)
     return true;
 }
 
-bool QnStreamRecorder::saveMotion(QnConstMetaDataV1Ptr motion)
+bool QnStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
 {
     if (motion && !motion->isEmpty() && m_motionFileList[motion->channelNumber])
         motion->serialize(m_motionFileList[motion->channelNumber].data());
@@ -825,7 +832,7 @@ void QnStreamRecorder::setSignLogo(const QImage& logo)
 }
 #endif
 
-void QnStreamRecorder::setStorage(QnStorageResourcePtr storage)
+void QnStreamRecorder::setStorage(const QnStorageResourcePtr& storage)
 {
     m_storage = storage;
 }
@@ -877,3 +884,6 @@ void QnStreamRecorder::setItemDewarpingParams(const QnItemDewarpingParams& param
 {
     m_itemDewarpingParams = params;
 }
+
+#endif // ENABLE_DATA_PROVIDERS
+

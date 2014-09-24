@@ -3,13 +3,15 @@
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
 
+#include <core/resource/media_resource.h>
+
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/common/geometry.h>
 
-#include <plugins/resources/archive/abstract_archive_stream_reader.h>
+#include <plugins/resource/archive/abstract_archive_stream_reader.h>
 
 #include "ui/graphics/opengl/gl_shortcuts.h"
-
+#include "opengl_renderer.h"
 
 QnRenderingWidget::QnRenderingWidget(const QGLFormat &format, QWidget *parent, QGLWidget *shareWidget, Qt::WindowFlags f):
     QnGLWidget(format, parent, shareWidget, f),
@@ -101,6 +103,7 @@ void QnRenderingWidget::ensureDisplay() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnRenderingWidget::initializeGL() {
+    QnGLWidget::initializeGL();
     invalidateDisplay(); /* OpenGL context may have changed. */
 
     glClearColor(0, 0, 0, 0);
@@ -111,11 +114,12 @@ void QnRenderingWidget::initializeGL() {
 void QnRenderingWidget::resizeGL(int width, int height) {
     glViewport(0, 0, width, height);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glTranslated(-1.0, 1.0, 0.0);
-    glScaled(2.0 / width, -2.0 / height, 1.0);
-    glMatrixMode(GL_MODELVIEW);
+    auto renderer = QnOpenGLRendererManager::instance(context());
+
+    QMatrix4x4 matrix;
+    matrix.translate(-1.0, 1.0, 0.0);
+    matrix.scale(2.0 / width, -2.0 / height, 1.0);
+    renderer->setProjectionMatrix(matrix);
 }
 
 void QnRenderingWidget::paintGL() {
@@ -130,7 +134,7 @@ void QnRenderingWidget::paintGL() {
         if(sourceSize.isEmpty())
             sourceSize = size();
 
-        glLoadIdentity();
+   //     glLoadIdentity();
         m_renderer->paint(
             0,
             QRectF(0.0, 0.0, 1.0, 1.0),

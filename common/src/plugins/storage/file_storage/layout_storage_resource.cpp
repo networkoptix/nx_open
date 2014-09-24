@@ -1,11 +1,16 @@
 #include "layout_storage_resource.h"
 
+#ifdef ENABLE_ARCHIVE
+
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 
-#include "utils/common/util.h"
+#include <utils/common/util.h>
 #include <utils/fs/file.h>
-#include "plugins/resources/archive/filetypesupport.h"
+
+#include <recording/time_period_list.h>
+
+#include <plugins/resource/avi/filetypesupport.h>
 
 
 class QnLayoutFile: public QIODevice
@@ -243,12 +248,12 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
     for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
     {
         QnLayoutFileStorageResource* storage = *itr;
-        QString storageUrl = removeProtocolPrefix(storage->getUrl());
+        QString storageUrl = storage->getPath();
         if (storageUrl == removeProtocolPrefix(newName) || storageUrl == removeProtocolPrefix(oldName))
             storage->closeOpenedFiles();
     }
 
-    bool rez;
+    bool rez = true;
     if (dataInOldFile) {
         QFile::remove(removeProtocolPrefix(newName));
         rez = QFile::rename(removeProtocolPrefix(oldName), removeProtocolPrefix(newName));
@@ -260,7 +265,7 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
     for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
     {
         QnLayoutFileStorageResource* storage = *itr;
-        QString storageUrl = removeProtocolPrefix(storage->getUrl());
+        QString storageUrl = storage->getPath();
         if (storageUrl == removeProtocolPrefix(newName)) {
             storage->setUrl(newName); // update binary offsetvalue
             storage->restoreOpenedFiles();
@@ -325,7 +330,7 @@ qint64 QnLayoutFileStorageResource::getFileSize(const QString& url) const
 
 bool QnLayoutFileStorageResource::isStorageAvailable()
 {
-    QString tmpDir = closeDirPath(removeProtocolPrefix(getUrl())) + QLatin1String("tmp") + QString::number(qrand());
+    QString tmpDir = closeDirPath(getPath()) + QLatin1String("tmp") + QString::number(qrand());
     QDir dir(tmpDir);
     if (dir.exists()) {
         dir.remove(tmpDir);
@@ -402,8 +407,10 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
     if (m_index.entryCount >= (quint32)MAX_FILES_AT_LAYOUT)
         return false;
 
+#ifdef _DEBUG
     qint64 testPos = 0;
     Q_ASSERT_X(getFileOffset(srcFileName, &testPos) == -1, Q_FUNC_INFO, "Duplicate file name");
+#endif
 
     m_index.entries[m_index.entryCount++] = QnLayoutFileIndexEntry(fileSize - m_novFileOffset, qt4Hash(fileName));
 
@@ -492,9 +499,9 @@ void QnLayoutFileStorageResource::addBinaryPostfix(QFile& file)
     file.write((char*) &magic, sizeof(qint64));
 }
 
-QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(QnResourcePtr res)
+QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(const QnResourcePtr &resource)
 {
-    QString url = res->getUrl();
+    QString url = resource->getUrl();
     url = url.mid(url.lastIndexOf(L'?')+1);
     QIODevice* chunkData = open(QString(QLatin1String("chunk_%1.bin")).arg(QnFile::baseName(url)), QIODevice::ReadOnly);
     if (!chunkData)
@@ -519,3 +526,5 @@ QString QnLayoutFileStorageResource::layoutPrefix() {
     static QLatin1String prefix("layout://");
     return prefix;
 }
+
+#endif // ENABLE_ARCHIVE

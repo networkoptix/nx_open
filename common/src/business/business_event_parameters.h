@@ -9,40 +9,39 @@
 class QnBusinessEventParameters
 {
 public:
-
-    enum Params 
+    enum Param 
     {
         // base for any event type
-        eventTypeParam,
-        eventTimestampParam,
-        eventResourceParam,
-        actionResourceParam,
+        EventTypeParam,
+        EventTimestampParam,
+        EventResourceParam,
+        ActionResourceParam,
         
         // event specific params.
-        inputPortIdParam,
+        InputPortIdParam,
 
-        reasonCodeParam,
-        reasonParamsEncodedParam,
+        ReasonCodeParam,
+        ReasonParamsEncodedParam,
         
-        sourceParam,
-        conflictsParam,
+        SourceParam,
+        ConflictsParam,
 
-        CountParam
+        ParamCount
     };
 
     QnBusinessEventParameters();
 
-    BusinessEventType::Value getEventType() const;
-    void setEventType(BusinessEventType::Value value);
+    QnBusiness::EventType getEventType() const;
+    void setEventType(QnBusiness::EventType value);
 
     qint64 getEventTimestamp() const;
     void setEventTimestamp(qint64 value);
 
-    int getEventResourceId() const;
-    void setEventResourceId(int value);
+    QUuid getEventResourceId() const;
+    void setEventResourceId(const QUuid& value);
 
-    int getActionResourceId() const;
-    void setActionResourceId(int value);
+    QUuid getActionResourceId() const;
+    void setActionResourceId(const QUuid& value);
 
     QnBusiness::EventReason getReasonCode() const;
     void setReasonCode(QnBusiness::EventReason value);
@@ -78,10 +77,10 @@ private:
     static int getParamIndex(const QString& key);
 
 private:
-    BusinessEventType::Value m_eventType;
+    QnBusiness::EventType m_eventType;
     qint64 m_timestamp;
-    QnId m_resourceId;
-    QnId m_actionResourceId;
+    QUuid m_resourceId;
+    QUuid m_actionResourceId;
 
     QString m_inputPort;
     QnBusiness::EventReason m_reasonCode;

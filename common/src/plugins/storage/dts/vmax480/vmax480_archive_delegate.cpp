@@ -7,12 +7,13 @@
 #include "core/resource/resource_media_layout.h"
 #include "vmax480_tcp_server.h"
 #include "utils/common/sleep.h"
+#include "utils/common/util.h"
 
 static const QByteArray FIXED_GROUP_ID("{6A7E6407-73A9-4042-B599-0B82CD726CF4}");
 
 static const int EMPTY_PACKET_REPEAT_INTERVAL = 100;
 
-QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
+QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(const QnResourcePtr& res):
     QnAbstractArchiveDelegate(),
     m_maxStream(NULL),
     m_needStop(false),
@@ -39,7 +40,7 @@ QnVMax480ArchiveDelegate::~QnVMax480ArchiveDelegate()
     close();
 }
 
-bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
+bool QnVMax480ArchiveDelegate::open(const QnResourcePtr &resource)
 {
     Q_UNUSED(resource)
 
@@ -207,13 +208,13 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
     return result;
 }
 
-static std::shared_ptr<QnDefaultResourceVideoLayout> videoLayout( new QnDefaultResourceVideoLayout() );
+static QSharedPointer<QnDefaultResourceVideoLayout> videoLayout( new QnDefaultResourceVideoLayout() );
 QnResourceVideoLayoutPtr QnVMax480ArchiveDelegate::getVideoLayout()
 {
     return videoLayout;
 }
 
-static std::shared_ptr<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
+static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
 QnResourceAudioLayoutPtr QnVMax480ArchiveDelegate::getAudioLayout()
 {
     return audioLayout;

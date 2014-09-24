@@ -59,8 +59,8 @@ void CLNetState::updateNetState()
     /*
     if (net_state_changed)
     {
-        cl_log.log(QLatin1String("Network interface list:"), cl_logINFO);
-        cl_log.log(toString(), cl_logINFO);
+        NX_LOG(QLatin1String("Network interface list:"), cl_logINFO);
+        NX_LOG(toString(), cl_logINFO);
     }
     */
 }

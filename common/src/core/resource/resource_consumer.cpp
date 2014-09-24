@@ -1,8 +1,8 @@
 #include "resource_consumer.h"
 
-#include "resource.h"
+#include <core/resource/resource.h>
 
-QnResourceConsumer::QnResourceConsumer(QnResourcePtr resource):
+QnResourceConsumer::QnResourceConsumer(const QnResourcePtr& resource):
     m_resource(resource)
 {
     m_resource->addConsumer(this);

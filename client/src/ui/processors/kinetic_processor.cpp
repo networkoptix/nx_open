@@ -60,7 +60,7 @@ void KineticProcessor::shift(const QVariant &dv) {
         /* New motion has started. */
         mShifts.clear();
         shift.dt = mMaxShiftInterval;
-    } else if(mFlags & IGNORE_DELTA_TIME) {
+    } else if(mFlags & IgnoreDeltaTime) {
         shift.dt = mMaxShiftInterval;
     }
     mShifts.append(shift);

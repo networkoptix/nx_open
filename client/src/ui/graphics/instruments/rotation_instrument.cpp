@@ -228,7 +228,7 @@ RotationInstrument::RotationInstrument(QObject *parent):
     base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
 {
     /* We want to get drags on all paint events. */
-    dragProcessor()->setFlags(DragProcessor::DONT_COMPRESS);
+    dragProcessor()->setFlags(DragProcessor::DontCompress);
 }
 
 RotationInstrument::~RotationInstrument() {

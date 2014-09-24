@@ -3,9 +3,11 @@
 
 #include <QtCore/QObject>
 
+#include <nx_ec/ec_api.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_resource.h>
-#include <api/app_server_connection.h>
+#include <api/abstract_reply_processor.h>
 
 #include <client/client_globals.h>
 
@@ -26,10 +28,10 @@ public:
     {}
 
 public slots:
-    void processReply(int status, const QnResourceList &resources, int handle);
+    void processReply( int reqID, ec2::ErrorCode errorCode );
 
 signals:
-    void finished(int status, const QnResourceList &resources, int handle);
+    void finished(int status, const QnResourceList &resources, int handle, const QString &errorString);
 
 private:
     friend class QnAbstractReplyProcessor;
@@ -53,14 +55,16 @@ public:
     QnWorkbenchLayoutSnapshotManager(QObject *parent = NULL);
     virtual ~QnWorkbenchLayoutSnapshotManager();
 
-    void save(const QnLayoutResourcePtr &resource, QObject *object, const char *slot);
-    void save(const QnLayoutResourceList &resources, QObject *object, const char *slot);
+    int save(const QnLayoutResourcePtr &resource, QObject *object, const char *slot);
+    int save(const QnLayoutResourceList &resources, QObject *object, const char *slot);
+    int save(const QnLayoutResourceList &resources, QnWorkbenchLayoutReplyProcessor *replyProcessor);
 
     void store(const QnLayoutResourcePtr &resource);
     void restore(const QnLayoutResourcePtr &resource);
 
     Qn::ResourceSavingFlags flags(const QnLayoutResourcePtr &resource) const;
     Qn::ResourceSavingFlags flags(QnWorkbenchLayout *layout) const;
+    void setFlags(const QnLayoutResourcePtr &resource, Qn::ResourceSavingFlags flags);
 
     bool isChanged(const QnLayoutResourcePtr &resource) const {
         return flags(resource) & Qn::ResourceIsChanged;
@@ -96,14 +100,12 @@ signals:
     void flagsChanged(const QnLayoutResourcePtr &resource);
 
 protected:
-    void setFlags(const QnLayoutResourcePtr &resource, Qn::ResourceSavingFlags flags);
-
     void connectTo(const QnLayoutResourcePtr &resource);
     void disconnectFrom(const QnLayoutResourcePtr &resource);
 
     Qn::ResourceSavingFlags defaultFlags(const QnLayoutResourcePtr &resource) const;
 
-    QnAppServerConnectionPtr connection() const;
+    ec2::AbstractECConnectionPtr connection2() const;
 
 protected slots:
     void processReply(int status, const QnLayoutResourceList &resources, int handle);

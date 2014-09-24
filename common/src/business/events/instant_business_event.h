@@ -7,11 +7,11 @@ class QnInstantBusinessEvent: public QnAbstractBusinessEvent
 {
     typedef QnAbstractBusinessEvent base_type;
 protected:
-    explicit QnInstantBusinessEvent(BusinessEventType::Value eventType,
+    explicit QnInstantBusinessEvent(QnBusiness::EventType eventType,
                                     const QnResourcePtr& resource,
                                     qint64 timeStamp);
 public:
-    virtual bool checkCondition(Qn::ToggleState state, const QnBusinessEventParameters &params) const override;
+    virtual bool checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params) const override;
 };
 
 #endif // INSTANT_BUSINESS_EVENT_H

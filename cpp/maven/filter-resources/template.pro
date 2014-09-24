@@ -36,6 +36,19 @@ else {
   win* {
     LIBS = ${windows.oslibs.release}
   }
+
+  !win32 {
+      contains( DEFINES, debug_in_release ) {
+         QMAKE_CXXFLAGS += -ggdb3
+         QMAKE_CFLAGS += -ggdb3
+         QMAKE_LFLAGS += -ggdb3
+      }
+      contains( DEFINES, enable_gprof ) {
+         QMAKE_CXXFLAGS += -pg
+         QMAKE_CFLAGS += -pg
+         QMAKE_LFLAGS += -pg
+      }
+  }
 }
 
 win* {
@@ -69,11 +82,15 @@ OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION
 MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
-LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib 
+LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib
+!win*:!mac {
+    LIBS += -Wl,-rpath-link,${qt.dir}/lib
+}
 LIBS += ${global.libs}
 
 INCLUDEPATH +=  ${qt.dir}/include \
                 ${qt.dir}/include/QtCore \
+                ${qt.dir}/include/QtZlib \
                 ${project.build.sourceDirectory} \
                 ${project.build.directory} \
                 ${root.dir}/common/src \
@@ -98,8 +115,10 @@ win* {
   ICON = ${customization.dir}/icons/hdw_logo.ico	
   LIBS += ${windows.oslibs}
   DEFINES += ${windows.defines}  
+  DEFINES += ${global.windows.defines}  
   win32-msvc* {
-    QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
+    # Note on /bigobj: http://stackoverflow.com/questions/15110580/penalty-of-the-msvs-linker-flag-bigobj
+    QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR /bigobj
 	# /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.
 	QMAKE_CXXFLAGS_RELEASE += /Zi /wd4250
 	QMAKE_LFLAGS_RELEASE += /DEBUG /OPT:NOREF 
@@ -120,8 +139,9 @@ win* {
 unix: {
   DEFINES += override=
   DEFINES += QN_EXPORT=  
+  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Wuninitialized
   arm {
-    QMAKE_CXXFLAGS += -std=c++0x
+    QMAKE_CXXFLAGS += -std=c++0x 
   } else {
     QMAKE_CXXFLAGS += -std=c++11
   }
@@ -129,12 +149,13 @@ unix: {
 
 ## LINUX
 unix:!mac {
-  LIBS += ${linux.oslibs}
   !arm {
+    LIBS += ${linux.oslibs}
     QMAKE_CXXFLAGS += -msse2
     QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedefs
   } else {
     LIBS -= -lssl
+    LIBS += ${linux.arm.oslibs}
   } 
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}

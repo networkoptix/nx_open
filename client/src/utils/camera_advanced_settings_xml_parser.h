@@ -6,8 +6,11 @@
 #include <QtCore/QSet>
 #include <QtWidgets/QTreeWidgetItem>
 #include <QtWidgets/QStackedLayout>
+#ifdef QT_WEBKITWIDGETS_LIB
+#include <QtWebKitWidgets/QtWebKitWidgets>
+#endif
 
-#include "plugins/resources/camera_settings/camera_settings.h"
+#include "plugins/resource/camera_settings/camera_settings.h"
 
 typedef QSharedPointer<CameraSetting> CameraSettingPtr;
 typedef QHash<QString, CameraSettingPtr> CameraSettings;
@@ -90,7 +93,7 @@ public:
     typedef QHash<QString, WidgetAndParent*> EmptyGroupsById;
 
     CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj, QTreeWidget& rootWidget, QStackedLayout& rootLayout,
-        TreeWidgetItemsById& widgetsById, LayoutIndById& layoutIndById, SettingsWidgetsById& settingsWidgetsById, EmptyGroupsById& emptyGroupsById, QObject* handler);
+        TreeWidgetItemsById& widgetsById, LayoutIndById& layoutIndById, SettingsWidgetsById& settingsWidgetsById, EmptyGroupsById& emptyGroupsById);
 
     virtual ~CameraSettingsWidgetsCreator();
 
@@ -111,11 +114,9 @@ protected slots:
 
 signals:
     void refreshAdvancedSettings();
+    void advancedParamChanged(const CameraSetting &param);
 
 private:
-
-    CameraSettingsWidgetsCreator();
-
     void removeLayoutItems();
     QTreeWidgetItem* findParentForParam(const QString& parentId);
     bool isEnabledByOtherSettings(const QString& id, const QString& parentId);
@@ -128,7 +129,6 @@ private:
     LayoutIndById& m_layoutIndById;
     SettingsWidgetsById& m_settingsWidgetsById;
     EmptyGroupsById& m_emptyGroupsById;
-    QObject* m_handler;
     QWidget* m_owner;
 };
 
@@ -193,20 +193,24 @@ public:
 // class CameraSettingsWidgetsCreator
 //
 
-class CameraSettingsWidgetsTreeCreator: public CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>
+class CameraSettingsWidgetsTreeCreator: public QObject, public CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>
 {
+    Q_OBJECT
+
     typedef CameraSettingsWidgetsCreator::TreeWidgetItemsById TreeWidgetItemsById;
     typedef CameraSettingsWidgetsCreator::LayoutIndById LayoutIndById;
     typedef CameraSettingsWidgetsCreator::SettingsWidgetsById SettingsWidgetsById;
     typedef CameraSettingsWidgetsCreator::EmptyGroupsById EmptyGroupsById;
 
+#ifdef QT_WEBKITWIDGETS_LIB
+    QWebView* m_webView;
+#endif
     QTreeWidget& m_rootWidget;
     QStackedLayout& m_rootLayout;
     TreeWidgetItemsById m_treeWidgetsById;
     LayoutIndById m_layoutIndById;
     SettingsWidgetsById m_settingsWidgetsById;
     EmptyGroupsById m_emptyGroupsById;
-    QObject* m_handler;
     CameraSettings* m_settings;
     QString m_id;
     QString m_cameraId;
@@ -219,7 +223,15 @@ private:
 
 public:
 
-    CameraSettingsWidgetsTreeCreator(const QString& cameraId, const QString& id, QTreeWidget& rootWidget, QStackedLayout& rootLayout, QObject* handler);
+    CameraSettingsWidgetsTreeCreator(
+        const QString& cameraId,
+        const QString& id,
+#ifdef QT_WEBKITWIDGETS_LIB
+        QWebView* webView,
+#endif
+        QTreeWidget& rootWidget,
+        QStackedLayout& rootLayout
+        );
     ~CameraSettingsWidgetsTreeCreator();
 
     CameraSettingsWidgetsCreator* createElement(const QString& id) override;
@@ -230,6 +242,13 @@ public:
     QString getCameraId() const;
     QTreeWidget* getRootWidget();
     QStackedLayout* getRootLayout();
+#ifdef QT_WEBKITWIDGETS_LIB
+    QWebView* getWebView();
+#endif
+
+signals:
+    void advancedParamChanged(const CameraSetting &param);
+    void refreshAdvancedSettings();
 };
 
 #endif //camera_advanced_settings_xml_parser_h_1819

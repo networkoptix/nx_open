@@ -4,44 +4,55 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
 
-#include "core/resource_management/resource_pool.h"
-#include "plugins/resources/archive/avi_files/avi_dvd_resource.h"
-#include "plugins/resources/archive/avi_files/avi_bluray_resource.h"
-#include "plugins/resources/archive/filetypesupport.h"
-#include "core/resource/layout_resource.h"
-#include "plugins/storage/file_storage/layout_storage_resource.h"
-#include "api/serializer/pb_serializer.h"
-#include "client/client_globals.h"
-
+#include <utils/common/model_functions.h>
+#include <utils/serialization/proto_message.h>
+#include <utils/common/log.h>
 #include <utils/common/warnings.h>
 #include <utils/local_file_cache.h>
 
+#include "utils/serialization/binary_functions.h"
+
+#include "plugins/resource/avi/avi_dvd_resource.h"
+#include "plugins/resource/avi/avi_bluray_resource.h"
+#include "plugins/resource/avi/filetypesupport.h"
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/layout_resource.h>
+
+#include <nx_ec/data/api_layout_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
+
+#include <client/client_globals.h>
+
+#include <plugins/storage/file_storage/layout_storage_resource.h>
+
+#include <ui/workaround/layout_proto.h>
+
+
 namespace {
     const int maxResourceCount = 1024;
+
 }
 
 QnResourceDirectoryBrowser::QnResourceDirectoryBrowser() {
     m_resourceReady = false;
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createResource(QnId resourceTypeId, const QnResourceParameters &parameters) {
+QnResourcePtr QnResourceDirectoryBrowser::createResource(const QUuid &resourceTypeId, const QnResourceParams& params) {
     QnResourcePtr result;
 
     if (!isResourceTypeSupported(resourceTypeId)) {
         return result;
     }
 
-    if (parameters.contains(QLatin1String("file"))) {
-        result = createArchiveResource(parameters[QLatin1String("file")]);
-        result->setTypeId(resourceTypeId);
-        result->deserialize(parameters);
-    }
+    result = createArchiveResource(params.url);
+    result->setTypeId(resourceTypeId);
 
     return result;
 }
 
 QString QnResourceDirectoryBrowser::manufacture() const {
-    return QLatin1String("DirectoryBrowser");
+    return lit("DirectoryBrowser");
 }
 
 QnResourceDirectoryBrowser &QnResourceDirectoryBrowser::instance() {
@@ -116,57 +127,68 @@ void QnResourceDirectoryBrowser::findResources(const QString& directory, QnResou
                 findResources(absoluteFilePath, result);
         } else {
             QnResourcePtr res = createArchiveResource(absoluteFilePath);
-            if (res)
+            if (res) {
+                if (res->getId().isNull() && !res->getUniqueId().isEmpty())
+                    res->setId(guidFromArbitraryData(res->getUniqueId().toUtf8())); //create same IDs for the same files
                 result->append(res);
+            }
         }
     }
 }
 
 QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xfile) {
-    QnLayoutResourcePtr layout;
     QnLayoutFileStorageResource layoutStorage;
     layoutStorage.setUrl(xfile);
-    QIODevice* layoutFile = layoutStorage.open(QLatin1String("layout.pb"), QIODevice::ReadOnly);
-    if (layoutFile == 0)
-        return layout;
+    QScopedPointer<QIODevice> layoutFile(layoutStorage.open(lit("layout.pb"), QIODevice::ReadOnly));
+    if(!layoutFile)
+        return QnLayoutResourcePtr();
     QByteArray layoutData = layoutFile->readAll();
-    delete layoutFile;
-    QnApiPbSerializer serializer;
-    QList<QnLayoutItemDataList> orderedItems;
-    try {
-        serializer.deserializeLayout(layout, layoutData, &orderedItems);
-        if (layout == 0)
-            return layout;
-    } catch(...) {
-        return layout;
+    layoutFile.reset();
+    
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    ec2::ApiLayoutData apiLayout;
+    if (!QJson::deserialize(layoutData, &apiLayout)) {
+        QnProto::Message<ec2::ApiLayoutData> apiLayoutMessage;
+        if(!QnProto::deserialize(layoutData, &apiLayoutMessage)) {
+            return QnLayoutResourcePtr();
+        } else {
+            apiLayout = apiLayoutMessage.data;
+        }
+    }
+        
+    fromApiToResource(apiLayout, layout);
+
+    QnLayoutItemDataList orderedItems;
+    foreach(const ec2::ApiLayoutItemData& item, apiLayout.items) {
+        orderedItems << QnLayoutItemData();
+        fromApiToResource(item, orderedItems.last());
     }
 
-    QIODevice *uuidFile = layoutStorage.open(QLatin1String("uuid.bin"), QIODevice::ReadOnly);
+    QScopedPointer<QIODevice> uuidFile(layoutStorage.open(lit("uuid.bin"), QIODevice::ReadOnly));
     if (uuidFile) {
         QByteArray data = uuidFile->readAll();
-        delete uuidFile;
-        layout->setGuid(QUuid(data.data()).toString());
-        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByGuid(layout->getGuid()).dynamicCast<QnLayoutResource>();
+        layout->setId(QUuid(data.data()));
+        QnLayoutResourcePtr existingLayout = qnResPool->getResourceById(layout->getId()).dynamicCast<QnLayoutResource>();
         if (existingLayout)
             return existingLayout;
+
+        uuidFile.reset();
     } else {
-        layout->setGuid(QUuid::createUuid().toString());
+        layout->setId(QUuid::createUuid());
     }
 
-    QIODevice* rangeFile = layoutStorage.open(QLatin1String("range.bin"), QIODevice::ReadOnly);
+    QScopedPointer<QIODevice> rangeFile(layoutStorage.open(lit("range.bin"), QIODevice::ReadOnly));
     if (rangeFile) {
         QByteArray data = rangeFile->readAll();
-        delete rangeFile;
         layout->setLocalRange(QnTimePeriod().deserialize(data));
+        rangeFile.reset();
     }
 
-    QIODevice* miscFile = layoutStorage.open(QLatin1String("misc.bin"), QIODevice::ReadOnly);
+    QScopedPointer<QIODevice> miscFile(layoutStorage.open(lit("misc.bin"), QIODevice::ReadOnly));
     bool layoutWithCameras = false;
     if (miscFile) {
         QByteArray data = miscFile->readAll();
-        delete miscFile;
-        if (data.size() >= (int)sizeof(quint32))
-        {
+        if (data.size() >= (int)sizeof(quint32)) {
             quint32 flags = *((quint32*) data.data());
             if (flags & QnLayoutFileStorageResource::ReadOnly) {
                 Qn::Permissions permissions = Qn::ReadPermission | Qn::RemovePermission;
@@ -175,98 +197,101 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
             if (flags & QnLayoutFileStorageResource::ContainsCameras)
                 layoutWithCameras = true;
         }
+
+        miscFile.reset();
     }
 
     if (!layout->backgroundImageFilename().isEmpty()) {
-        QIODevice* backgroundFile = layoutStorage.open(layout->backgroundImageFilename(), QIODevice::ReadOnly);
+        QScopedPointer<QIODevice> backgroundFile(layoutStorage.open(layout->backgroundImageFilename(), QIODevice::ReadOnly));
         if (backgroundFile) {
             QByteArray data = backgroundFile->readAll();
-            delete backgroundFile;
-
             QnLocalFileCache cache;
             cache.storeImage(layout->backgroundImageFilename(), data);
+
+            backgroundFile.reset();
         }
     }
 
 
-    layout->setParentId(0);
-    layout->setId(QnId::generateSpecialId());
+    layout->setParentId(QUuid());
+    layout->setId(QUuid::createUuid());
     layout->setName(QFileInfo(xfile).fileName());
+    // No need to do so, at end of this function the author do it again. ---- DPENG
+    //layout->addFlags(Qn::local);
 
-    layout->addFlags(QnResource::url);
+    layout->addFlags(Qn::url);
     layout->setUrl(xfile);
 
     //QnLayoutItemDataMap items = layout->getItems();
     QnLayoutItemDataMap updatedItems;
 
-    QIODevice *itemNamesIO = layoutStorage.open(QLatin1String("item_names.txt"), QIODevice::ReadOnly);
-    QTextStream itemNames(itemNamesIO);
-    QIODevice *itemTimeZonesIO = layoutStorage.open(QLatin1String("item_timezones.txt"), QIODevice::ReadOnly);
-    QTextStream itemTimeZones(itemTimeZonesIO);
+    QScopedPointer<QIODevice> itemNamesIO(layoutStorage.open(lit("item_names.txt"), QIODevice::ReadOnly));
+    QTextStream itemNames(itemNamesIO.data());
+    
+    QScopedPointer<QIODevice> itemTimeZonesIO(layoutStorage.open(lit("item_timezones.txt"), QIODevice::ReadOnly));
+    QTextStream itemTimeZones(itemTimeZonesIO.data());
 
-    if (!orderedItems.isEmpty()) {
-        // TODO: #Elric here is bad place to add resources to pool. need refactor
-        QnLayoutItemDataList& items = orderedItems[0];
-        for (int i = 0; i < items.size(); ++i)
-        {
-            QnLayoutItemData& item = items[i];
-            QString path = item.resource.path;
-            item.uuid = QUuid::createUuid();
-            if (!path.endsWith(QLatin1String(".mkv")))
-                item.resource.path += QLatin1String(".mkv");
-            item.resource.path = QnLayoutFileStorageResource::updateNovParent(xfile,item.resource.path);
+    // TODO: #Elric here is bad place to add resources to pool. need refactor
+    QnLayoutItemDataList& items = orderedItems;
+    for (int i = 0; i < items.size(); ++i) {
+        QnLayoutItemData& item = items[i];
+        QString path = item.resource.path;
+        item.uuid = QUuid::createUuid();
+        if (!path.endsWith(lit(".mkv")))
+            item.resource.path += lit(".mkv");
+        item.resource.path = QnLayoutFileStorageResource::updateNovParent(xfile,item.resource.path);
 
-            QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
-            storage->setUrl(xfile);
+        QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
+        storage->setUrl(xfile);
 
-            QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
-            if (layoutWithCameras)
-                aviResource->addFlags(QnResource::utc | QnResource::sync | QnResource::periods | QnResource::motion);
-            aviResource->setStorage(storage);
-            aviResource->setParentId(layout->getId());
-            QString itemName(itemNames.readLine());
-            if (!itemName.isEmpty())
-                aviResource->setName(itemName);
-            qint64 timeZoneOffset = itemTimeZones.readLine().toLongLong();
-            if (timeZoneOffset != Qn::InvalidUtcOffset)
-                aviResource->setTimeZoneOffset(timeZoneOffset);
+        QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
+        if (layoutWithCameras)
+            aviResource->addFlags(Qn::utc | Qn::sync | Qn::periods | Qn::motion);
+        aviResource->setStorage(storage);
+        aviResource->setParentId(layout->getId());
+        QString itemName(itemNames.readLine());
+        if (!itemName.isEmpty())
+            aviResource->setName(itemName);
+        qint64 timeZoneOffset = itemTimeZones.readLine().toLongLong();
+        if (timeZoneOffset != Qn::InvalidUtcOffset)
+            aviResource->setTimeZoneOffset(timeZoneOffset);
 
-            qnResPool->addResource(aviResource);
-            aviResource = qnResPool->getResourceByUniqId(aviResource->getUniqueId()).dynamicCast<QnAviResource>(); // It may have already been in the pool!
-            if(!aviResource) {
-                qnWarning("ACHTUNG! Total mess up in exported layout loading!");
-                continue;
-            }
-            item.resource.id = aviResource->getId();
-
-            for (int channel = 0; channel < CL_MAX_CHANNELS; ++channel) {
-                QString normMotionName = path.mid(path.lastIndexOf(L'?')+1);
-                QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(QFileInfo(normMotionName).completeBaseName()), QIODevice::ReadOnly);
-                if (motionIO) {
-                    Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
-                    QnMetaDataLightVector motionData;
-                    int motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
-                    if (motionDataSize > 0) {
-                        motionData.resize(motionDataSize);
-                        motionIO->read((char*) &motionData[0], motionIO->size());
-                    }
-                    delete motionIO;
-                    for (uint i = 0; i < motionData.size(); ++i)
-                        motionData[i].doMarshalling();
-                    if (!motionData.empty())
-                        aviResource->setMotionBuffer(motionData, channel);
-                }
-                else
-                    break;
-            }
-
-            updatedItems.insert(item.uuid, item);
+        qnResPool->addResource(aviResource);
+        aviResource = qnResPool->getResourceByUniqId(aviResource->getUniqueId()).dynamicCast<QnAviResource>(); // It may have already been in the pool!
+        if(!aviResource) {
+            qnWarning("ACHTUNG! Total mess up in exported layout loading!");
+            continue;
         }
+        item.resource.id = aviResource->getId();
+
+        for (int channel = 0; channel < CL_MAX_CHANNELS; ++channel) {
+            QString normMotionName = path.mid(path.lastIndexOf(L'?')+1);
+            QScopedPointer<QIODevice> motionIO(layoutStorage.open(lit("motion%1_%2.bin").arg(channel).arg(QFileInfo(normMotionName).completeBaseName()), QIODevice::ReadOnly));
+            if (motionIO) {
+                Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
+                QnMetaDataLightVector motionData;
+                int motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
+                if (motionDataSize > 0) {
+                    motionData.resize(motionDataSize);
+                    motionIO->read((char*) &motionData[0], motionIO->size());
+                }
+                for (uint i = 0; i < motionData.size(); ++i)
+                    motionData[i].doMarshalling();
+                if (!motionData.empty())
+                    aviResource->setMotionBuffer(motionData, channel);
+
+                motionIO.reset();
+            } else {
+                break;
+            }
+        }
+
+        updatedItems.insert(item.uuid, item);
     }
-    delete itemNamesIO;
-    delete itemTimeZonesIO;
+
     layout->setItems(updatedItems);
-    layout->addFlags(QnResource::local);
+
+    layout->addFlags(Qn::local);
     return layout;
 }
 
@@ -283,8 +308,8 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& x
 
     if (FileTypeSupport::isImageFileExt(xfile)) {
         QnResourcePtr rez = QnResourcePtr(new QnAviResource(xfile));
-        rez->addFlags(QnResource::still_image);
-        rez->removeFlags(QnResource::video | QnResource::audio);
+        rez->addFlags(Qn::still_image);
+        rez->removeFlags(Qn::video | Qn::audio);
         return rez;
     }
 

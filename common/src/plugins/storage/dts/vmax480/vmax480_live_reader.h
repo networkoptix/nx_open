@@ -16,7 +16,7 @@ class VMaxStreamFetcher;
 class QnVMax480LiveProvider: public CLServerPushStreamReader, public QnVmax480DataConsumer
 {
 public:
-    QnVMax480LiveProvider(QnResourcePtr dev );
+    QnVMax480LiveProvider(const QnResourcePtr& dev );
     virtual ~QnVMax480LiveProvider();
 
     virtual int getChannel() const override;

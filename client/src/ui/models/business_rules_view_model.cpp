@@ -113,25 +113,25 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
             flags |= Qt::ItemIsEditable;
             break;
         case QnBusiness::SourceColumn:
-            if (BusinessEventType::isResourceRequired(m_rules[index.row()]->eventType()))
+            if (QnBusiness::isResourceRequired(m_rules[index.row()]->eventType()))
                 flags |= Qt::ItemIsEditable;
             break;
         case QnBusiness::TargetColumn:
             {
-                BusinessActionType::Value actionType = m_rules[index.row()]->actionType();
-                if (BusinessActionType::requiresCameraResource(actionType)
-                        || BusinessActionType::requiresUserResource(actionType)
-                        || actionType == BusinessActionType::ShowPopup
-                        || actionType == BusinessActionType::PlaySound
-                        || actionType == BusinessActionType::PlaySoundRepeated
-                        || actionType == BusinessActionType::SayText)
+                QnBusiness::ActionType actionType = m_rules[index.row()]->actionType();
+                if (QnBusiness::requiresCameraResource(actionType)
+                        || QnBusiness::requiresUserResource(actionType)
+                        || actionType == QnBusiness::ShowPopupAction
+                        || actionType == QnBusiness::PlaySoundAction
+                        || actionType == QnBusiness::PlaySoundOnceAction
+                        || actionType == QnBusiness::SayTextAction)
                     flags |= Qt::ItemIsEditable;
             }
             break;
         case QnBusiness::AggregationColumn:
             {
-                BusinessActionType::Value actionType = m_rules[index.row()]->actionType();
-                if (!BusinessActionType::hasToggleState(actionType))
+                QnBusiness::ActionType actionType = m_rules[index.row()]->actionType();
+                if (!QnBusiness::hasToggleState(actionType))
                     flags |= Qt::ItemIsEditable;
             }
         default:
@@ -191,11 +191,11 @@ void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
     m_rules.removeAt(row);
     endRemoveRows();
 
-    //TODO: #GDM check if dataChanged is required, check row
+    //TODO: #GDM #Business check if dataChanged is required, check row
     //emit dataChanged(index(row, 0), index(row, QnBusiness::ColumnCount - 1));
 }
 
-void QnBusinessRulesViewModel::deleteRule(int id) {
+void QnBusinessRulesViewModel::deleteRule(const QUuid& id) {
     deleteRule(ruleModelById(id));
 }
 
@@ -205,7 +205,7 @@ QnBusinessRuleViewModel* QnBusinessRulesViewModel::getRuleModel(int row) {
     return m_rules[row];
 }
 
-QnBusinessRuleViewModel* QnBusinessRulesViewModel::ruleModelById(int id) {
+QnBusinessRuleViewModel* QnBusinessRulesViewModel::ruleModelById(const QUuid& id) {
     foreach (QnBusinessRuleViewModel* rule, m_rules) {
         if (rule->id() == id) {
             return rule;
@@ -240,8 +240,8 @@ void QnBusinessRulesViewModel::at_rule_dataChanged(QnBusinessRuleViewModel *sour
 
 void QnBusinessRulesViewModel::at_soundModel_listChanged() {
     for (int i = 0; i < m_rules.size(); i++) {
-        if (m_rules[i]->actionType() != BusinessActionType::PlaySound &&
-                m_rules[i]->actionType() != BusinessActionType::PlaySoundRepeated)
+        if (m_rules[i]->actionType() != QnBusiness::PlaySoundAction &&
+                m_rules[i]->actionType() != QnBusiness::PlaySoundOnceAction)
             continue;
         QModelIndex index = this->index(i, QnBusiness::TargetColumn, QModelIndex());
         emit dataChanged(index, index);
@@ -250,8 +250,8 @@ void QnBusinessRulesViewModel::at_soundModel_listChanged() {
 
 void QnBusinessRulesViewModel::at_soundModel_itemChanged(const QString &filename) {
     for (int i = 0; i < m_rules.size(); i++) {
-        if (m_rules[i]->actionType() != BusinessActionType::PlaySound &&
-                m_rules[i]->actionType() != BusinessActionType::PlaySoundRepeated)
+        if (m_rules[i]->actionType() != QnBusiness::PlaySoundAction &&
+                m_rules[i]->actionType() != QnBusiness::PlaySoundOnceAction)
             continue;
         if (m_rules[i]->actionParams().getSoundUrl() != filename)
             continue;

@@ -19,6 +19,10 @@ public:
     QnImageButtonBar(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0, Qt::Orientation orientation = Qt::Horizontal);
     virtual ~QnImageButtonBar();
 
+    void addButton(QnImageButtonWidget *button) {
+        addButton(unusedMask(), button);
+    }
+
     void addButton(int mask, QnImageButtonWidget *button);
     void removeButton(QnImageButtonWidget *button);
     QnImageButtonWidget *button(int mask) const;

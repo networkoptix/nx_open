@@ -40,7 +40,11 @@ namespace nx_http
             Returns on receiving response
         */
         bool doGet( const QUrl& url );
-        const HttpResponse* response() const;
+        bool doPost(
+            const QUrl& url,
+            const nx_http::StringType& contentType,
+            const nx_http::StringType& messageBody );
+        const Response* response() const;
         //!
         bool eof() const;
         //!

@@ -1,5 +1,6 @@
 #include "statistics.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
 
 QnStatistics::QnStatistics()
 {
@@ -219,7 +220,7 @@ void QnStatistics::onLostConnection()
     m_connectionLostTime = QDateTime::currentDateTime();
 }
 
-bool QnStatistics::isConnectioLost() const
+bool QnStatistics::isConnectionLost() const
 {
     return m_connectionLost;
 }
@@ -230,3 +231,6 @@ int QnStatistics::connectionLostSec() const
     QDateTime current = QDateTime::currentDateTime();
     return m_connectionLostTime.secsTo(current); 
 }
+
+#endif // ENABLE_DATA_PROVIDERS
+

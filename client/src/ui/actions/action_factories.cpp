@@ -12,6 +12,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/actions/action_manager.h>
@@ -21,7 +23,7 @@
 #include <ui/workbench/workbench_layout.h>
 
 QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnActionParameters &, QObject *parent) {
-    QnLayoutResourceList layouts = resourcePool()->getResourcesWithParentId(QnId()).filtered<QnLayoutResource>(); /* Multi-videos will go here. */
+    QnLayoutResourceList layouts = resourcePool()->getResourcesWithParentId(QUuid()).filtered<QnLayoutResource>(); /* Multi-videos will go here. */
     if(context()->user())
         layouts.append(resourcePool()->getResourcesWithParentId(context()->user()->getId()).filtered<QnLayoutResource>());
     
@@ -148,4 +150,13 @@ void QnPtzPresetsToursActionFactory::at_action_triggered() {
     Qn::ActionId actionId = static_cast<Qn::ActionId>(parameters.argument<int>(Qn::ActionIdRole, Qn::NoAction));
 
     context()->menu()->trigger(actionId, parameters);
+}
+
+
+QMenu* QnEdgeNodeActionFactory::newMenu(const QnActionParameters &parameters, QWidget *parentWidget) {
+    QnVirtualCameraResourcePtr edgeCamera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    if (!edgeCamera || !QnMediaServerResource::isEdgeServer(edgeCamera->getParentResource()))
+        return NULL;
+
+    return menu()->newMenu(Qn::NoAction, Qn::TreeScope, parentWidget, QnActionParameters(edgeCamera->getParentResource()));
 }

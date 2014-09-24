@@ -28,11 +28,11 @@ public:
                 break;
             case mediaServerUnavailable:
                 requiredParamCount = 1;
-                errorMessage = tr("Media server %1 is not available.\n Check that media server is up and running.");
+                errorMessage = tr("Server %1 is not available.\n Check that Server is up and running.");
                 break;
             case mediaServerBadResponse:
                 requiredParamCount = 2;
-                errorMessage = tr("Received bad response from media server %1: \"%2\".\n Check if Media Server is up and has the proper version.");
+                errorMessage = tr("Received bad response from Server %1: \"%2\".\n Check if Server is up and has the proper version.");
                 break;
             case cannotEstablishConnection:
                 requiredParamCount = 1;

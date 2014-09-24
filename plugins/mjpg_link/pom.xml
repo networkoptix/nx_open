@@ -10,12 +10,12 @@
 	<parent>
 		<artifactId>plugins</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.2.1-SNAPSHOT</version>
+		<version>2.3.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.2.1-SNAPSHOT</version>
+	<version>2.3.0-SNAPSHOT</version>
 	<artifactId>mjpg_link</artifactId>
 	<packaging>pom</packaging>
 	<name>HD Witness HTTP Stream Plugin</name>	
@@ -26,7 +26,7 @@
 		<qt.libs>core</qt.libs>
 		<global.libs>-lcommon</global.libs>
 		<!--Specific os libs used-->
-		<windows.oslibs>Ws2_32.lib Dbghelp.lib common.lib -lssleay32 -llibeay32</windows.oslibs>
+		<windows.oslibs>Ws2_32.lib Iphlpapi.lib Dbghelp.lib common.lib -lssleay32 -llibeay32</windows.oslibs>
 		<windows.oslibs.release></windows.oslibs.release>
 		<windows.oslibs.debug></windows.oslibs.debug>        
 		<!--Global defines-->

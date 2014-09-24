@@ -6,10 +6,10 @@ QnImageButtonWidget::StateFlags findValidState(QnImageButtonWidget::StateFlags f
     /* Some compilers don't allow expressions in case labels, so we have to
         * precalculate them. */
     enum LocalStateFlag {
-        CHECKED = QnImageButtonWidget::CHECKED,
-        HOVERED = QnImageButtonWidget::HOVERED,
-        DISABLED = QnImageButtonWidget::DISABLED,
-        PRESSED = QnImageButtonWidget::PRESSED
+        CHECKED = QnImageButtonWidget::Checked,
+        HOVERED = QnImageButtonWidget::Hovered,
+        DISABLED = QnImageButtonWidget::Disabled,
+        PRESSED = QnImageButtonWidget::Pressed
     };
 
     const LocalStateFlag

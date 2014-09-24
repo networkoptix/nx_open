@@ -1,196 +1,203 @@
 #include "server_message_processor.h"
 
-#include <QtCore/QTimer>
-#include <QtCore/QDebug>
-#include <qglobal.h>
-
-#include <api/message_source.h>
-#include <api/app_server_connection.h>
-
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/resource_discovery_manager.h>
-#include <core/resource_management/resource_pool.h>
+#include <core/resource/videowall_resource.h>
 
-#include <recorder/recording_manager.h>
-
-#include <media_server/serverutil.h>
+#include <media_server/server_update_tool.h>
 #include <media_server/settings.h>
+#include <nx_ec/dummy_handler.h>
+#include <utils/common/log.h>
 
-#include "business/actions/system_health_business_action.h"
-#include "business/business_rule_processor.h"
+#include "serverutil.h"
+#include "transaction/transaction_message_bus.h"
+#include "business/business_message_bus.h"
+#include "settings.h"
+#include "nx_ec/data/api_connection_data.h"
+#include "api/app_server_connection.h"
+#include "utils/network/router.h"
 
-#include "utils/network/simple_http_client.h"
+#include <utils/common/app_info.h>
 
-QnServerMessageProcessor::QnServerMessageProcessor():
+QnServerMessageProcessor::QnServerMessageProcessor()
+:
     base_type(),
-    m_thread(new QThread()),
-    m_paused(false) {
-
-    connect(this, SIGNAL(aboutToBeStarted()), this, SLOT(at_aboutToBeStarted()));
-    connect(this, SIGNAL(aboutToBePaused()), this, SLOT(at_aboutToBePaused()));
-    m_thread->setObjectName( QLatin1String("QnServerMessageProcessor") ); /* Name will be shown in debugger. */
-    this->moveToThread(m_thread.data());
-
-    m_thread->start();
+    m_serverPort( MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt() )
+{
 }
 
-void QnServerMessageProcessor::run() {
-    emit aboutToBeStarted();
-}
+void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) 
+{
+    QnCommonMessageProcessor::updateResource(resource);
+    QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>();
 
-// Should be called from this object's thread
-void QnServerMessageProcessor::pause() {
-    QMutexLocker _lock(&m_mutex);
+    const bool isServer = dynamic_cast<const QnMediaServerResource*>(resource.data()) != nullptr;
+    const bool isCamera = dynamic_cast<const QnVirtualCameraResource*>(resource.data()) != nullptr;
+    const bool isUser = dynamic_cast<const QnUserResource*>(resource.data()) != nullptr;
+    const bool isVideowall = dynamic_cast<const QnVideoWallResource*>(resource.data()) != nullptr;
 
-    m_paused = true;
-    while (m_paused) {
-        m_cond.wait(&m_mutex);
-    }
-}
-
-// Should be called from other thread
-void QnServerMessageProcessor::resume() {
-    QMutexLocker _lock(&m_mutex);
-    m_paused = false;
-    m_cond.wakeOne();
-}
-
-void QnServerMessageProcessor::at_aboutToBeStarted() {
-    assert(QThread::currentThread() == this->thread());
-
-    // We need to be responsive
-    m_thread->setPriority(QThread::HighestPriority);
-
-    base_type::run();
-
-    // We start in paused state. Server's responsibility to call resume()
-    pause();
-}
-
-void QnServerMessageProcessor::handleConnectionOpened(const QnMessage &message) {
-    foreach (QnResourcePtr resource, message.resources) {
-        updateResource(resource);
-    }
-
-    base_type::handleConnectionOpened(message);
-}
-
-void QnServerMessageProcessor::handleConnectionClosed(const QString &errorString) {
-    base_type::handleConnectionClosed(errorString);
-}
-
-void QnServerMessageProcessor::loadRuntimeInfo(const QnMessage &message) {
-    base_type::loadRuntimeInfo(message);
-}
-
-void QnServerMessageProcessor::updateResource(const QnResourcePtr& resource) {
-    QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>();
-
-    bool isServer = resource.dynamicCast<QnMediaServerResource>();
-    bool isCamera = resource.dynamicCast<QnVirtualCameraResource>();
-    bool isUser = resource.dynamicCast<QnUserResource>();
-
-    if (!isServer && !isCamera && !isUser)
+    if (!isServer && !isCamera && !isUser && !isVideowall)
         return;
 
     //storing all servers' cameras too
     // If camera from other server - marking it
-    if (isCamera && resource->getParentId() != ownMediaServer->getId())
-        resource->addFlags( QnResource::foreigner );
+    
+    if (isCamera) 
+    {
+        if (resource->getParentId() != ownMediaServer->getId())
+            resource->addFlags( Qn::foreigner );
+    }
 
-    if (isServer && resource->getId() != ownMediaServer->getId())
-        resource->addFlags( QnResource::foreigner );
+    if (isServer) 
+    {
+        if (resource->getId() != ownMediaServer->getId())
+            resource->addFlags( Qn::foreigner );
+    }
 
-    bool needUpdateServer = false;
     // We are always online
-    if (isServer && resource->getGuid() == serverGuid()) {
-        if (resource->getStatus() != QnResource::Online) {
-            qWarning() << "XYZ1: Received message that our status is " << resource->getStatus();
-            resource->setStatus(QnResource::Online);
-            needUpdateServer = true;
+    if (isServer && resource->getId() == serverGuid()) 
+    {
+        if (resource->getStatus() != Qn::Online && resource->getStatus() != Qn::NotDefined) {
+            qWarning() << "ServerMessageProcessor: Received message that our status is " << resource->getStatus() << ". change to online";
+            resource->setStatus(Qn::Online);
         }
     }
 
-    if (QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId(), QnResourcePool::AllResources))
+    if (QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId()))
         ownResource->update(resource);
     else
         qnResPool->addResource(resource);
 
-    const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
-    if (needUpdateServer)
-        appServerConnection->saveAsync(resource.dynamicCast<QnMediaServerResource>(), this, SLOT(at_serverSaved(int, const QnResourceList&, int)));
-    if (isServer && resource->getGuid() == serverGuid())
-        syncStoragesToSettings(ownMediaServer);
 }
 
-void QnServerMessageProcessor::at_serverSaved(int status, const QnResourceList &, int)
+void QnServerMessageProcessor::afterRemovingResource(const QUuid& id)
 {
-    if (status != 0)
-        qWarning() << "QnServerMessageProcessor::at_serverSaved(): Error saving server. Status: " << status;
+    QnCommonMessageProcessor::afterRemovingResource(id);
 }
 
-void QnServerMessageProcessor::handleMessage(const QnMessage &message) {
-    base_type::handleMessage(message);
+void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
+{
+    connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateChunkReceived,
+            this, &QnServerMessageProcessor::at_updateChunkReceived);
+    connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
+            this, &QnServerMessageProcessor::at_updateInstallationRequested);
+    connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
+            this, &QnServerMessageProcessor::at_systemNameChangeRequested);
 
-    NX_LOG( lit("Received message %1, resourceId %2, resource %3").
-            arg(Qn::toString(message.messageType)).arg(message.resourceId.toString()).arg(message.resource ? message.resource->getName() : QString("NULL")), cl_logDEBUG1 );
+    connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
 
-    switch (message.messageType) {
-    case Qn::Message_Type_Command: {
-        switch (message.command) {
-            case QnMessage::Command::Reboot: {
-                exit(0);
-            }
+    QnCommonMessageProcessor::init(connection);
+}
+
+void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) 
+{
+    if (resource->getId() == qnCommon->moduleGUID() && status != Qn::Online)
+    {
+        // it's own server. change status to online
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(resource->getId(), Qn::Online);
+        resource->setStatus(Qn::Online, true);
+    }
+    else {
+        resource->setStatus(status, true);
+    }
+}
+
+bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
+{
+    if (addr == "localhost" || addr == "127.0.0.1")
+        return true;
+    if( !m_mServer )
+        m_mServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (m_mServer) 
+    {
+        QHostAddress hostAddr(addr);
+        foreach(const QHostAddress& serverAddr, m_mServer->getNetAddrList())
+        {
+            if (hostAddr == serverAddr)
+                return true;
         }
-        break;
     }
-    case Qn::Message_Type_License: {
-        // New license added. LicensePool verifies it.
-        qnLicensePool->addLicense(message.license);
-        break;
-    }
-    case Qn::Message_Type_CameraServerItem: {
-        QnCameraHistoryPool::instance()->addCameraHistoryItem(*message.cameraServerItem);
-        break;
-    }
-    case Qn::Message_Type_ResourceChange: {
-        updateResource(message.resource);
+    return false;
+}
 
-        break;
-    }
-    case Qn::Message_Type_ResourceDisabledChange: {
-        //ignoring messages for foreign resources
-        if (QnResourcePtr resource = qnResPool->getResourceById(message.resourceId)) {
-            resource->setDisabled(message.resourceDisabled);
-            if (message.resourceDisabled) // we always ignore status changes
-                resource->setStatus(QnResource::Offline);
-        }
-        break;
-    }
-    case Qn::Message_Type_ResourceDelete: {
-        if (QnResourcePtr resource = qnResPool->getResourceById(message.resourceId, QnResourcePool::AllResources))
-            qnResPool->removeResource(resource);
-        break;
+bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
+{
+    nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( "x-server-guid" );
+    if( xServerGuidIter != request.headers.end() )
+    {
+        const nx_http::BufferType& desiredServerGuid = xServerGuidIter->second;
+        const QByteArray& localServerGUID = qnCommon->moduleGUID().toByteArray();
+        return desiredServerGuid != localServerGUID;
     }
 
-    case Qn::Message_Type_KvPairChange: {
-        updateKvPairs(message.kvPairs);
-        break;
+    nx_http::BufferType desiredCameraGuid;
+    nx_http::HttpHeaders::const_iterator xCameraGuidIter = request.headers.find( "x-camera-guid" );
+    if( xCameraGuidIter != request.headers.end() )
+    {
+        desiredCameraGuid = xCameraGuidIter->second;
+    }
+    else {
+        desiredCameraGuid = request.getCookieValue("x-camera-guid");
+    }
+    if (!desiredCameraGuid.isEmpty()) {
+        QnResourcePtr camera = qnResPool->getResourceById(desiredCameraGuid);
+        return camera != 0;
     }
 
-    case Qn::Message_Type_EmailFailure: {
-        QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
+    return false;
+}
 
-        qnBusinessRuleProcessor->broadcastBusinessAction(action);
+void QnServerMessageProcessor::execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) {
+    qnBusinessMessageBus->at_actionReceived(action);
+}
 
-        break;
+void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset) {
+    QnServerUpdateTool::instance()->addUpdateFileChunk(updateId, data, offset);
+}
+
+void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
+    QnServerUpdateTool::instance()->installUpdate(updateId);
+}
+
+void QnServerMessageProcessor::at_systemNameChangeRequested(const QString &systemName) {
+    if (qnCommon->localSystemName() == systemName)
+        return;
+
+    qnCommon->setLocalSystemName(systemName);
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (!server) {
+        NX_LOG("Cannot find self server resource!", cl_logERROR);
+        return;
     }
 
-    default:
-        break;
+    MSSettings::roSettings()->setValue("systemName", systemName);
+    server->setSystemName(systemName);
+    m_connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+}
+
+void QnServerMessageProcessor::at_remotePeerUnauthorized(const QUuid& id)
+{
+    QnResourcePtr mServer = qnResPool->getResourceById(id);
+    if (mServer)
+        mServer->setStatus(Qn::Unauthorized);
+}
+
+bool QnServerMessageProcessor::canRemoveResource(const QUuid& resourceId) 
+{ 
+    QnResourcePtr res = qnResPool->getResourceById(resourceId);
+    bool isOwnServer = (res && res->getId() == qnCommon->moduleGUID());
+    return !isOwnServer;
+}
+
+void QnServerMessageProcessor::removeResourceIgnored(const QUuid& resourceId) 
+{
+    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(resourceId).dynamicCast<QnMediaServerResource>();
+    bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());
+    if (isOwnServer) {
+        QnMediaServerResourcePtr savedServer;
+        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(mServer, &savedServer);
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(mServer->getId(), Qn::Online);
     }
-
-
 }

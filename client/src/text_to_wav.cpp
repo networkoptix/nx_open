@@ -6,7 +6,7 @@
 
 #include <festival.h>
 
-#include <version.h>
+#include <utils/common/app_info.h>
 #include <EST_wave_aux.h>
 
 #include "text_to_wav.h"

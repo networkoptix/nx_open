@@ -1,6 +1,6 @@
 #include "reasoned_business_event.h"
 
-QnReasonedBusinessEvent::QnReasonedBusinessEvent(const BusinessEventType::Value eventType,
+QnReasonedBusinessEvent::QnReasonedBusinessEvent(const QnBusiness::EventType eventType,
                                                  const QnResourcePtr &resource,
                                                  const qint64 timeStamp,
                                                  const QnBusiness::EventReason reasonCode,

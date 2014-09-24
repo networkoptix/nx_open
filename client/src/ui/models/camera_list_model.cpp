@@ -65,9 +65,9 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
         case RecordingColumn: 
             return QnRecordingStatusHelper::icon(QnRecordingStatusHelper::currentRecordingMode(context(), camera));
         case NameColumn: 
-            return qnResIconCache->icon(camera->flags(), camera->getStatus());
+            return qnResIconCache->icon(camera);
         case ServerColumn:
-            return server ? qnResIconCache->icon(server->flags(), server->getStatus()) : QVariant();
+            return qnResIconCache->icon(server);
         default:
             break;
         }
@@ -146,7 +146,7 @@ void QnCameraListModel::setServer(const QnMediaServerResourcePtr & server) {
     while (!m_cameras.isEmpty())
         removeCamera(m_cameras.first());
     
-    QnResourceList resources = resourcePool()->getAllEnabledCameras(m_server); 
+    QnResourceList resources = resourcePool()->getAllCameras(m_server, true); 
     foreach(const QnResourcePtr &resource, resources)
         addCamera(resource);
 
@@ -172,7 +172,7 @@ void QnCameraListModel::addCamera(const QnResourcePtr &resource) {
         return;
 
     connect(camera, &QnResource::parentIdChanged, this, &QnCameraListModel::at_resource_parentIdChanged);
-    connect(camera, &QnResource::resourceChanged, this, &QnCameraListModel::at_resource_resourceChanged);
+    connect(camera, &QnResource::resourceChanged, this, &QnCameraListModel::at_resource_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
 
     int row = m_cameras.size();
     beginInsertRows(QModelIndex(), row, row);
@@ -225,7 +225,6 @@ void QnCameraListModel::at_resource_resourceChanged(const QnResourcePtr &resourc
 
 bool QnCameraListModel::cameraFits(const QnVirtualCameraResourcePtr &camera) const {
     return camera 
-        && !camera-> isDisabled() 
-        && !camera->hasFlags(QnResource::foreigner)
+        && !camera->hasFlags(Qn::foreigner)
         && (!m_server  || camera->getParentId() == m_server->getId());
 }

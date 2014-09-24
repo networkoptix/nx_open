@@ -1,19 +1,24 @@
 #include <QtCore/QList>
 
 #include <utils/math/math.h>
+#include <utils/common/log.h>
+
+#include "api/app_server_connection.h"
+
+#include "core/resource_management/resource_pool.h"
+#include <core/resource/resource.h>
+#include "core/resource/media_server_resource.h"
+#include "core/resource/camera_resource.h"
+#include "core/resource/security_cam_resource.h"
 
 #include "business/actions/panic_business_action.h"
-#include "mserver_business_rule_processor.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource/security_cam_resource.h"
 #include "recorder/recording_manager.h"
-#include <media_server/serverutil.h>
-#include "api/app_server_connection.h"
-#include "core/resource_management/resource_pool.h"
-
-#include "core/resource/camera_resource.h"
 #include "camera/camera_pool.h"
 #include "decoders/video/ffmpeg.h"
+
+#include <media_server/serverutil.h>
+
+#include "mserver_business_rule_processor.h"
 
 QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor(): QnBusinessRuleProcessor()
 {
@@ -30,23 +35,23 @@ void QnMServerBusinessRuleProcessor::onRemoveResource(const QnResourcePtr &resou
     QnEventsDB::instance()->removeLogForRes(resource->getId());
 }
 
-bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res)
+bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
     bool result = QnBusinessRuleProcessor::executeActionInternal(action, res);
     if (!result) {
         switch(action->actionType())
         {
-        case BusinessActionType::Bookmark:
+        case QnBusiness::BookmarkAction:
             // TODO: implement me
             break;
-        case BusinessActionType::CameraOutput:
-        case BusinessActionType::CameraOutputInstant:
+        case QnBusiness::CameraOutputAction:
+        case QnBusiness::CameraOutputOnceAction:
             result = triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
             break;
-        case BusinessActionType::CameraRecording:
+        case QnBusiness::CameraRecordingAction:
             result = executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
             break;
-        case BusinessActionType::PanicRecording:
+        case QnBusiness::PanicRecordingAction:
             result = executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
             break;
         default:
@@ -60,24 +65,25 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
     return result;
 }
 
-bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr action)
+bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessActionPtr& action)
 {
-    QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceByGuid(serverGuid()));
+    const QnResourcePtr& mediaServerRes = qnResPool->getResourceById(serverGuid());
+    QnMediaServerResource* mediaServer = dynamic_cast<QnMediaServerResource*> (mediaServerRes.data());
     if (!mediaServer)
         return false;
-    if (mediaServer->getPanicMode() == QnMediaServerResource::PM_User)
+    if (mediaServer->getPanicMode() == Qn::PM_User)
         return true; // ignore panic business action if panic mode turn on by user
-
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    QnMediaServerResource::PanicMode val = QnMediaServerResource::PM_None;
-    if (action->getToggleState() == Qn::OnState)
-        val =  QnMediaServerResource::PM_BusinessEvents;
-    conn->setPanicMode(val);
+    
+    Qn::PanicMode val = Qn::PM_None;
+    if (action->getToggleState() == QnBusiness::ActiveState)
+        val =  Qn::PM_BusinessEvents;
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    conn->setPanicModeSync(val);
     mediaServer->setPanicMode(val);
     return true;
 }
 
-bool QnMServerBusinessRuleProcessor::executeRecordingAction(QnRecordingBusinessActionPtr action, QnResourcePtr res)
+bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBusinessActionPtr& action, const QnResourcePtr& res)
 {
     Q_ASSERT(action);
     QnSecurityCamResourcePtr camera = res.dynamicCast<QnSecurityCamResource>();
@@ -85,7 +91,7 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(QnRecordingBusinessA
     bool rez = false;
     if (camera) {
         // todo: if camera is offline function return false. Need some tries on timer event
-        if (action->getToggleState() == Qn::OnState)
+        if (action->getToggleState() == QnBusiness::ActiveState)
             rez = qnRecordingManager->startForcedRecording(camera, action->getStreamQuality(), action->getFps(), 
                                                             action->getRecordBefore(), action->getRecordAfter(), 
                                                             action->getRecordDuration());
@@ -95,40 +101,39 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(QnRecordingBusinessA
     return rez;
 }
 
-QString QnMServerBusinessRuleProcessor::getGuid() const
-{
+QUuid QnMServerBusinessRuleProcessor::getGuid() const {
     return serverGuid();
 }
 
-bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource )
+bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, const QnResourcePtr& resource )
 {
     if( !resource )
     {
-        cl_log.log( lit("Received BA_CameraOutput with no resource reference. Ignoring..."), cl_logWARNING );
+        NX_LOG( lit("Received BA_CameraOutput with no resource reference. Ignoring..."), cl_logWARNING );
         return false;
     }
-    QnSecurityCamResourcePtr securityCam = resource.dynamicCast<QnSecurityCamResource>();
+    QnSecurityCamResource* securityCam = dynamic_cast<QnSecurityCamResource*>(resource.data());
     if( !securityCam )
     {
-        cl_log.log( lit("Received BA_CameraOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
-            arg(resource->getId()), cl_logWARNING );
+        NX_LOG( lit("Received BA_CameraOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
+            arg(resource->getId().toString()), cl_logWARNING );
         return false;
     }
     QString relayOutputId = action->getRelayOutputId();
     //if( relayOutputId.isEmpty() )
     //{
-    //    cl_log.log( lit("Received BA_CameraOutput action without required parameter relayOutputID. Ignoring..."), cl_logWARNING );
+    //    NX_LOG( lit("Received BA_CameraOutput action without required parameter relayOutputID. Ignoring..."), cl_logWARNING );
     //    return false;
     //}
 
-    bool instant = action->actionType() == BusinessActionType::CameraOutputInstant;
+    bool instant = action->actionType() == QnBusiness::CameraOutputOnceAction;
 
     int autoResetTimeout = instant
             ? 30*1000
             : qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
     bool on = instant
             ? true
-            : action->getToggleState() == Qn::OnState;
+            : action->getToggleState() == QnBusiness::ActiveState;
 
     return securityCam->setRelayOutputState(
                 relayOutputId,
@@ -142,11 +147,12 @@ QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventP
     QImage result;
 
     // By now only motion screenshot is supported
-    if (params.getEventType() != BusinessEventType::Camera_Motion)
+    if (params.getEventType() != QnBusiness::CameraMotionEvent)
         return result;
 
-    QnVirtualCameraResourcePtr res = qSharedPointerDynamicCast<QnVirtualCameraResource> (QnResourcePool::instance()->getResourceById(params.getEventResourceId()));
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
+    const QnResourcePtr& cameraRes = QnResourcePool::instance()->getResourceById(params.getEventResourceId());
+    QnVideoCamera* camera = qnCameraPool->getVideoCamera(cameraRes);
+    const QnVirtualCameraResource* res = dynamic_cast<const QnVirtualCameraResource*>(cameraRes.data());
 
     if (!camera)
         return result;
@@ -161,7 +167,7 @@ QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventP
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
 
     QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
-    bool gotFrame = (res->getStatus() == QnResource::Online || res->getStatus() == QnResource::Recording) && decoder.decode(video, &outFrame);
+    bool gotFrame = (res->getStatus() == Qn::Online || res->getStatus() == Qn::Recording) && decoder.decode(video, &outFrame);
     if (!gotFrame)
         return result;
 

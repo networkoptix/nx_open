@@ -16,19 +16,19 @@
 
 namespace detail {
     inline void debugInternal(const char *functionName, const QString &s) {
-        qDebug("%s: %s", functionName, qPrintable(s));
+        qDebug("%s: %s", functionName, s.toLatin1().constData());
     }
 
     inline void warningInternal(const char *functionName, const QString &s) {
-        qWarning("%s: %s", functionName, qPrintable(s));
+        qWarning("%s: %s", functionName, s.toLatin1().constData());
     }
 
     inline void criticalInternal(const char *functionName, const QString &s) {
-        qCritical("%s: %s", functionName, qPrintable(s));
+        qCritical("%s: %s", functionName, s.toLatin1().constData());
     }
 
     inline void fatalInternal(const char *functionName, const QString &s) {
-        qFatal("%s: %s", functionName, qPrintable(s));
+        qFatal("%s: %s", functionName, s.toLatin1().constData());
     }
 
     typedef void (*WarningHandler)(const char *, const QString &);

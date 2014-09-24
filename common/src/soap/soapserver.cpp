@@ -10,29 +10,30 @@
 #include <sstream>
 
 #include <utils/common/log.h>
+#include <utils/common/systemerror.h>
 
 
-QnSoapServer::QnSoapServer()
-:
-    m_port( 0 ),
-    m_terminated( false ),
-    m_initialized( false )
-{
-    setObjectName( QLatin1String("QnSoapServer") );
-}
+static const unsigned int ERROR_SKIP_TIMEOUT_MS = 500;
+static const int SOAP_CONNECTION_ACCEPT_TIMEOUT = 1;    //one second
+
+static QnSoapServer* QnSoapServer_instance = nullptr;
 
 QnSoapServer::QnSoapServer( unsigned int port, const char* path )
 :
-    m_port( 0 ),
+    m_port( port ),
+    m_path( path ),
     m_terminated( false ),
     m_initialized( false )
 {
-    initialize( port, path );
-    setObjectName( QLatin1String("QnSoapServer") );
+    setObjectName(QLatin1String("QnSoapServer"));
+
+    assert( QnSoapServer_instance == nullptr );
+    QnSoapServer_instance = this;
 }
 
 QnSoapServer::~QnSoapServer()
 {
+    QnSoapServer_instance = nullptr;
     stop();
     m_service.soap_force_close_socket();
 }
@@ -42,11 +43,38 @@ void QnSoapServer::pleaseStop()
     m_terminated = true;
 }
 
-void QnSoapServer::initialize( unsigned int port, const char* path )
+bool QnSoapServer::bind()
 {
-    m_port = port;
-    m_path = path;
+    strcpy(m_service.soap->endpoint, m_path.c_str());
+    strcpy(m_service.soap->path, m_path.c_str());
+
+    m_service.soap->accept_timeout = SOAP_CONNECTION_ACCEPT_TIMEOUT;
+    m_service.soap->imode |= SOAP_XML_IGNORENS;
+
+    int m = soap_bind( m_service.soap, NULL, m_port, 100 );
+    if (m < 0)
+    {
+        std::ostringstream ss;
+        soap_stream_fault(m_service.soap, ss);
+        NX_LOG(lit("Error binding soap server to local port. %1").arg(QString::fromStdString(ss.str())), cl_logWARNING);
+        return false;
+    }
+
+    sockaddr_in addr;
+    const unsigned int addr_len = sizeof(addr);
+    if (getsockname(m_service.soap->master, (sockaddr *)&addr, (socklen_t *)&addr_len) < 0)
+    {
+        NX_LOG(lit("Error reading soap server port %1").arg(SystemError::getLastOSErrorText()), cl_logWARNING);
+        soap_destroy(m_service.soap);
+        soap_end(m_service.soap);
+        soap_done(m_service.soap);
+        return false;
+    }
+    m_port = ntohs(addr.sin_port);
     m_initialized = true;
+
+    NX_LOG(lit("Successfully bound soap server to local port %1").arg(m_port), cl_logDEBUG1);
+    return true;
 }
 
 bool QnSoapServer::initialized() const
@@ -74,39 +102,17 @@ const OnvifNotificationConsumer* QnSoapServer::getService() const
     return &m_service;
 }
 
-static QnSoapServer* globalInstance = NULL;
-
-void QnSoapServer::initStaticInstance( QnSoapServer* inst )
-{
-    globalInstance = inst;
-}
-
 QnSoapServer* QnSoapServer::instance()
 {
-    return globalInstance;
+    return QnSoapServer_instance;
 }
-
-static const unsigned int ERROR_SKIP_TIMEOUT_MS = 500;
-
-static const int SOAP_CONNECTION_ACCEPT_TIMEOUT = 1;    //one second
 
 void QnSoapServer::run()
 {
     initSystemThreadId();
-    strcpy( m_service.soap->endpoint, m_path.c_str() );
-    strcpy( m_service.soap->path, m_path.c_str() );
 
-    m_service.soap->accept_timeout = SOAP_CONNECTION_ACCEPT_TIMEOUT;
-    m_service.soap->imode |= SOAP_XML_IGNORENS;
-
-    int m = soap_bind( m_service.soap, NULL, m_port, 100 ); 
-    if( m < 0 )
-    {
-        std::ostringstream ss;
-        soap_stream_fault( m_service.soap, ss );
-        NX_LOG( lit("Error binding soap server to port %1. %2").arg(m_port).arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
+    if( !m_initialized && !bind() )
         return;
-    }
 
     while( !m_terminated )
     {

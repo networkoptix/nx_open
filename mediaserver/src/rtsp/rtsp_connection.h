@@ -73,7 +73,7 @@ protected:
     QString getRangeStr();
 
 private slots:
-    void at_camera_disabledChanged();
+    void at_camera_parentIdChanged();
     void at_camera_resourceChanged();
 
 private:

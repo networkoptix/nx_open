@@ -48,6 +48,7 @@ public:
     //!Constructs new \a QByteArray object by calling \a QByteArray::mid
     operator QByteArray() const;
 
+    //!Constructs QByteArray using \a QByteArray::fromRawData(), so returned buffer is usually NOT NULL-terminated!
     QByteArray toByteArrayWithRawData() const;
 
 private:

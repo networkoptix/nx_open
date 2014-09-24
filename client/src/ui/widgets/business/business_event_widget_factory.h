@@ -10,7 +10,7 @@
 
 class QnBusinessEventWidgetFactory {
 public:
-    static QnAbstractBusinessParamsWidget* createWidget(BusinessEventType::Value eventType,
+    static QnAbstractBusinessParamsWidget* createWidget(QnBusiness::EventType eventType,
                                                         QWidget* parent = 0,
                                                         QnWorkbenchContext *context = NULL);
 };

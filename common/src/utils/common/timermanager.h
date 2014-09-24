@@ -6,6 +6,8 @@
 #ifndef TIMERMANAGER_H
 #define TIMERMANAGER_H
 
+#include <functional>
+
 #include <QtCore/QThread>
 
 
@@ -49,6 +51,10 @@ public:
     */
     quint64 addTimer(
         TimerEventHandler* const taskHandler,
+        const unsigned int delay );
+    //!Same as above but accepts handler of \a std::function type
+    quint64 addTimer(
+        std::function<void(quint64)> taskHandler,
         const unsigned int delay );
     /*!
         If task is already running, it can be still running after method return

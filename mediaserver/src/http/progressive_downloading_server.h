@@ -8,15 +8,6 @@
 
 class QnFfmpegTranscoder;
 
-class QnProgressiveDownloadingServer : public QnTcpListener
-{
-public:
-    explicit QnProgressiveDownloadingServer(const QHostAddress& address, int port);
-    virtual ~QnProgressiveDownloadingServer();
-protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner) override;
-};
-
 class QnProgressiveDownloadingConsumerPrivate;
 
 class QnProgressiveDownloadingConsumer: virtual public QnTCPConnectionProcessor, public TimerEventHandler

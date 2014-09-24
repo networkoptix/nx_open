@@ -2,7 +2,6 @@
 
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/misc/schedule_recording_type.h>
 
 #include <ui/style/skin.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
@@ -13,10 +12,10 @@
 int QnRecordingStatusHelper::currentRecordingMode(QnWorkbenchContext *context, QnVirtualCameraResourcePtr camera)
 {
     if(!camera)
-        return Qn::RecordingType_Never;
+        return Qn::RT_Never;
 
     if (camera->isScheduleDisabled())
-        return Qn::RecordingType_Never;
+        return Qn::RT_Never;
 
     // TODO: #Elric this should be a resource parameter that is updated from the server.
     QnMediaResourcePtr mediaRes = camera;
@@ -28,19 +27,19 @@ int QnRecordingStatusHelper::currentRecordingMode(QnWorkbenchContext *context, Q
         if(task.getDayOfWeek() == dayOfWeek && task.getStartTime() <= seconds && seconds <= task.getEndTime())
             return task.getRecordingType();
 
-    return Qn::RecordingType_Never;
+    return Qn::RT_Never;
 }
 
 QString QnRecordingStatusHelper::tooltip(int recordingMode)
 {
     switch(recordingMode) {
-    case Qn::RecordingType_Never:
+    case Qn::RT_Never:
         return tr("Not recording");
-    case Qn::RecordingType_Run:
+    case Qn::RT_Always:
         return tr("Recording everything");
-    case Qn::RecordingType_MotionOnly:
+    case Qn::RT_MotionOnly:
         return tr("Recording motion only");
-    case Qn::RecordingType_MotionPlusLQ:
+    case Qn::RT_MotionAndLowQuality:
         return tr("Recording motion and low quality");
     default:
         return QString();
@@ -51,13 +50,13 @@ QString QnRecordingStatusHelper::tooltip(int recordingMode)
 QString QnRecordingStatusHelper::shortTooltip(int recordingMode)
 {
     switch(recordingMode) {
-    case Qn::RecordingType_Never:
+    case Qn::RT_Never:
         return tr("Not recording");
-    case Qn::RecordingType_Run:
+    case Qn::RT_Always:
         return tr("Continuous");
-    case Qn::RecordingType_MotionOnly:
+    case Qn::RT_MotionOnly:
         return tr("Motion only");
-    case Qn::RecordingType_MotionPlusLQ:
+    case Qn::RT_MotionAndLowQuality:
         return tr("Motion + Lo-Res");
     default:
         return QString();
@@ -68,13 +67,13 @@ QString QnRecordingStatusHelper::shortTooltip(int recordingMode)
 QIcon QnRecordingStatusHelper::icon(int recordingMode)
 {
     switch(recordingMode) {
-    case Qn::RecordingType_Never:
+    case Qn::RT_Never:
         return qnSkin->icon("item/recording_off.png");
-    case Qn::RecordingType_Run:
+    case Qn::RT_Always:
         return qnSkin->icon("item/recording.png");
-    case Qn::RecordingType_MotionOnly:
+    case Qn::RT_MotionOnly:
         return qnSkin->icon("item/recording_motion.png");
-    case Qn::RecordingType_MotionPlusLQ:
+    case Qn::RT_MotionAndLowQuality:
         return qnSkin->icon("item/recording_motion_lq.png");
     default:
         return QIcon();

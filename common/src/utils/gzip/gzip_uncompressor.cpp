@@ -78,7 +78,7 @@ void GZipUncompressor::processData( const QnByteArrayConstRef& data )
                         }
                         else    //m_zStream.avail_out > 0 && m_zStream.avail_in > 0
                         {
-                            if( m_zStream.avail_out < m_outputBuffer.size() )
+                            if( m_zStream.avail_out < (unsigned int)m_outputBuffer.size() )
                             {
                                 m_nextFilter->processData( QnByteArrayConstRef(m_outputBuffer, 0, m_outputBuffer.size()-m_zStream.avail_out) );
                                 m_zStream.next_out = (Bytef*)m_outputBuffer.data();
@@ -100,7 +100,7 @@ void GZipUncompressor::processData( const QnByteArrayConstRef& data )
                         if( m_zStream.avail_in > 0 )
                         {
                             //may be some more out buf is required?
-                            if( m_zStream.avail_out < m_outputBuffer.size() )
+                            if( m_zStream.avail_out < (unsigned int)m_outputBuffer.size() )
                             {
                                 m_nextFilter->processData( QnByteArrayConstRef(m_outputBuffer, 0, m_outputBuffer.size()-m_zStream.avail_out) );
                                 m_zStream.next_out = (Bytef*)m_outputBuffer.data();
@@ -152,7 +152,7 @@ size_t GZipUncompressor::flush()
     m_zStream.avail_out = (uInt)m_outputBuffer.size();
 
     int zResult = inflate(&m_zStream, Z_SYNC_FLUSH);
-    if( (zResult == Z_OK || zResult == Z_STREAM_END) && (m_outputBuffer.size() > m_zStream.avail_out) )
+    if( (zResult == Z_OK || zResult == Z_STREAM_END) && ((unsigned int)m_outputBuffer.size() > m_zStream.avail_out) )
     {
         m_nextFilter->processData( QnByteArrayConstRef(m_outputBuffer, 0, m_outputBuffer.size()-m_zStream.avail_out) );
         return m_outputBuffer.size() - m_zStream.avail_out;

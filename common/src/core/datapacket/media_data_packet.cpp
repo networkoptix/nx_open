@@ -1,24 +1,26 @@
 #include "media_data_packet.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 extern "C"
 {
-    #include <libavformat/avformat.h>
+#include <libavformat/avformat.h>
 }
 
-#include "utils/media/bitStream.h"
-#include "utils/media/ffmpeg_helper.h"
-#include "utils/media/sse_helper.h"
-#include "utils/common/synctime.h"
-
 #include <QtGui/QRegion>
+
+#include <utils/media/bitStream.h>
+#include <utils/media/ffmpeg_helper.h>
+#include <utils/media/sse_helper.h>
+#include <utils/common/synctime.h>
+#include <utils/math/math.h>
+
+#include <plugins/camera_plugin.h>
 
 #ifdef Q_OS_MAC
 #include <smmintrin.h>
 #endif
 
-#include <utils/math/math.h>
-
-#include "utils/media/sse_helper.h"
 
 
 QnMediaContext::QnMediaContext(AVCodecContext* ctx)
@@ -32,8 +34,20 @@ QnMediaContext::QnMediaContext(CodecID codecId)
     if (codecId != CODEC_ID_NONE)
     {
         AVCodec* codec = avcodec_find_decoder(codecId);
-        m_ctx = avcodec_alloc_context3(codec);
-        avcodec_open2(m_ctx, codec, NULL);
+        if( codec && codec->id == codecId )
+        {
+            m_ctx = avcodec_alloc_context3(codec);
+            avcodec_open2(m_ctx, codec, NULL);
+        }
+        else
+        {
+            AVCodec* codec = (AVCodec*)av_malloc(sizeof(AVCodec));
+            memset( codec, 0, sizeof(*codec) );
+            codec->id = codecId;
+            codec->type = AVMEDIA_TYPE_VIDEO;
+            m_ctx = avcodec_alloc_context3(codec);
+            m_ctx->codec_id = codecId;
+        }
     } else {
         m_ctx = 0;
     }
@@ -88,12 +102,25 @@ bool QnMediaContext::equalTo(QnMediaContext *other) const
 }
 
 
+QnAbstractMediaData::QnAbstractMediaData( DataType _dataType )
+: 
+    dataType(_dataType),
+    compressionType(CODEC_ID_NONE),
+    flags(MediaFlags_None),
+    channelNumber(0),
+    context(0),
+    opaque(0)
+{
+}
+
+QnAbstractMediaData::~QnAbstractMediaData()
+{
+}
+
 void QnAbstractMediaData::assign(const QnAbstractMediaData* other)
 {
     dataProvider = other->dataProvider;
     timestamp = other->timestamp;
-    data.clear();
-    data.write(other->data.data(), other->data.size());
     dataType = other->dataType;
     compressionType = other->compressionType;
     flags = other->flags;
@@ -104,34 +131,27 @@ void QnAbstractMediaData::assign(const QnAbstractMediaData* other)
 
 // ----------------------------------- QnAbstractMediaData -----------------------------------------
 
-QnAbstractMediaData* QnAbstractMediaData::clone() const
+//QnAbstractMediaData* QnAbstractMediaData::clone() const
+//{
+//    QnAbstractMediaData* rez = new QnAbstractMediaData(m_data.getAlignment(), m_data.size());
+//    rez->assign(this);
+//    return rez;
+//}
+
+QnEmptyMediaData* QnEmptyMediaData::clone( QnAbstractAllocator* allocator ) const
 {
-    QnAbstractMediaData* rez = new QnAbstractMediaData(data.getAlignment(), data.size());
+    QnEmptyMediaData* rez = new QnEmptyMediaData( allocator );
     rez->assign(this);
+    rez->m_data.write(m_data.constData(), m_data.size());
     return rez;
 }
 
-// ----------------------------------- QnCompressedVideoData -----------------------------------------
-void QnCompressedVideoData::assign(const QnCompressedVideoData* other)
-{
-    QnAbstractMediaData::assign(other);
-    width = other->width;
-    height = other->height;
-    motion = other->motion;
-    pts = other->pts;
-}
-
-QnCompressedVideoData* QnCompressedVideoData::clone() const
-{
-    QnCompressedVideoData* rez = new QnCompressedVideoData(data.getAlignment(), data.size());
-    rez->assign(this);
-    return rez;
-}
 
 // ----------------------------------- QnMetaDataV1 -----------------------------------------
 
-QnMetaDataV1::QnMetaDataV1(int initialValue):
-    QnAbstractMediaData(CL_MEDIA_ALIGNMENT, MD_WIDTH*MD_HEIGHT/8)
+QnMetaDataV1::QnMetaDataV1(int initialValue)
+:   //TODO #ak delegate constructor
+    m_data(CL_MEDIA_ALIGNMENT, MD_WIDTH*MD_HEIGHT/8)
 {
     dataType = META_V1;
     //useTwice = false;
@@ -142,9 +162,29 @@ QnMetaDataV1::QnMetaDataV1(int initialValue):
     m_firstTimestamp = AV_NOPTS_VALUE;
     timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     if (initialValue)
-        data.writeFiller(0xff, data.capacity());
+        m_data.writeFiller(0xff, m_data.capacity());
     else
-        data.writeFiller(0, data.capacity());
+        m_data.writeFiller(0, m_data.capacity());
+}
+
+QnMetaDataV1::QnMetaDataV1(
+    QnAbstractAllocator* allocator,
+    int initialValue)
+:
+    m_data(allocator, CL_MEDIA_ALIGNMENT, MD_WIDTH*MD_HEIGHT/8)
+{
+    dataType = META_V1;
+    //useTwice = false;
+
+    flags = 0;
+    m_input = 0;
+    m_duration = 0;
+    m_firstTimestamp = AV_NOPTS_VALUE;
+    timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
+    if (initialValue)
+        m_data.writeFiller(0xff, m_data.capacity());
+    else
+        m_data.writeFiller(0, m_data.capacity());
 }
 
 QnMetaDataV1Ptr QnMetaDataV1::fromLightData(const QnMetaDataV1Light& lightData)
@@ -154,7 +194,7 @@ QnMetaDataV1Ptr QnMetaDataV1::fromLightData(const QnMetaDataV1Light& lightData)
     result->m_duration = lightData.durationMs*1000;
     result->channelNumber = lightData.channel;
     result->m_input = lightData.input;
-    memcpy(result->data.data(), lightData.data, result->data.size());
+    memcpy(result->m_data.data(), lightData.data, result->m_data.size());
     return result;
 }
 
@@ -198,7 +238,7 @@ inline bool mathImage_cpu(const simd128i* data, const simd128i* mask, int maskSt
     return false;
 }
 
-bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
+bool QnMetaDataV1::matchImage(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
 {
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
     if (useSSE41())
@@ -217,32 +257,33 @@ bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int mas
 void QnMetaDataV1::assign(const QnMetaDataV1* other)
 {
     QnAbstractMediaData::assign(other);
+    m_data = other->m_data;
     m_input = other->m_input;
     m_duration = other->m_duration;
     m_firstTimestamp = other->m_firstTimestamp;
 }
 
-QnMetaDataV1* QnMetaDataV1::clone() const
+QnMetaDataV1* QnMetaDataV1::clone( QnAbstractAllocator* allocator ) const
 {
-    QnMetaDataV1* rez = new QnMetaDataV1();
+    QnMetaDataV1* rez = new QnMetaDataV1( allocator );
     rez->assign(this);
     return rez;
 }
 
 void QnMetaDataV1::addMotion(QnConstMetaDataV1Ptr data)
 {
-    addMotion((const quint8*) data->data.data(), data->timestamp);
+    addMotion((const quint8*) data->m_data.data(), data->timestamp);
 }
 
 void QnMetaDataV1::addMotion(QnMetaDataV1Ptr data)
 {
-    addMotion((const quint8*) data->data.data(), data->timestamp);
+    addMotion((const quint8*) data->m_data.data(), data->timestamp);
 }
 
 void QnMetaDataV1::removeMotion(const simd128i* image, int startIndex, int endIndex)
 {
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
-    __m128i* dst = (__m128i*) data.data();
+    __m128i* dst = (__m128i*) m_data.data();
     __m128i* src = (__m128i*) image;
     for (int i = startIndex; i <= endIndex; ++i)
     {
@@ -253,7 +294,7 @@ void QnMetaDataV1::removeMotion(const simd128i* image, int startIndex, int endIn
     }
 #else
     // remove without SIMD
-    int64_t* dst = (int64_t*) data.data();
+    int64_t* dst = (int64_t*) m_data.data();
     int64_t* src = (int64_t*) image;
     for (int i = startIndex; i <= endIndex; ++i)
     {
@@ -290,7 +331,7 @@ inline bool sse4_attribute metadataIsEmpty_sse41(__m128i* src)
 inline bool metadataIsEmpty_cpu(const char* data)
 {
     const quint32* curPtr = (const quint32*) data;
-    for (int i = 0; i < MD_WIDTH*MD_HEIGHT/sizeof(quint32)/CHAR_BIT; ++i)
+    for (size_t i = 0; i < MD_WIDTH*MD_HEIGHT/sizeof(quint32)/CHAR_BIT; ++i)
     {
         if (*curPtr++)
             return false;
@@ -302,13 +343,13 @@ bool QnMetaDataV1::isEmpty() const
 {
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
     if (useSSE41())
-        return metadataIsEmpty_sse41((__m128i*) data.data());
+        return metadataIsEmpty_sse41((__m128i*) m_data.data());
     else 
-        return metadataIsEmpty_sse2((__m128i*) data.data());
+        return metadataIsEmpty_sse2((__m128i*) m_data.data());
 #elif __arm__ && __ARM_NEON__
-    return metadataIsEmpty_cpu(data.data());
+    return metadataIsEmpty_cpu(m_data.data());
 #else
-    return metadataIsEmpty_cpu(data.data());
+    return metadataIsEmpty_cpu(m_data.data());
 #endif
 }
 
@@ -317,33 +358,12 @@ void QnMetaDataV1::assign( const nxcip::Picture& motionPicture, qint64 timestamp
     if( motionPicture.pixelFormat() != nxcip::PIX_FMT_MONOBLACK )
         return;
 
-#if 1
     assert( motionPicture.width() == MD_HEIGHT && motionPicture.height() == MD_WIDTH );
 
     if( motionPicture.xStride(0)*CHAR_BIT == motionPicture.width() )
-        memcpy( data.data(), motionPicture.data(), MD_WIDTH*MD_HEIGHT/CHAR_BIT );
+        memcpy( m_data.data(), motionPicture.data(), MD_WIDTH*MD_HEIGHT/CHAR_BIT );
     else
         assert( false );
-#else
-    memset( data.data(), 0, data.size() );
-
-    //TODO/IMPL some optimization would be appropriate, but is difficult, 
-        //since data has following format:
-            //column1
-            //column2
-            //.. columnN
-
-    for( int y = 0; y < std::min<int>(motionPicture.height(), MD_HEIGHT); ++y )
-    {
-        const quint8* srcMotionDataLine = (quint8*)motionPicture.scanLine( 0, y );
-        for( int x = 0; x < std::min<int>(motionPicture.width(), MD_WIDTH); ++x )
-        {
-            int pixel = *(srcMotionDataLine + x/CHAR_BIT) & (1 << (x%CHAR_BIT));
-            if( pixel )
-                setMotionAt( x, y );
-        }
-    }
-#endif
 
     m_firstTimestamp = timestamp;
     m_duration = duration;
@@ -357,7 +377,7 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
         m_duration = qMax(m_duration, timestamp - m_firstTimestamp);
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
-    __m128i* dst = (__m128i*) data.data();
+    __m128i* dst = (__m128i*) m_data.data();
     __m128i* src = (__m128i*) image;
     for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
     {
@@ -368,13 +388,14 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
     }
 #else
     // remove without SIMD
-    int64_t* dst = (int64_t*) data.data();
-    int64_t* src = (int64_t*) image;
-    for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
-    {
-        *dst++ |= *src++;
-        *dst++ |= *src++;
-    }
+    memcpy( m_data.data(), image, MD_WIDTH*MD_HEIGHT/CHAR_BIT );
+    //int64_t* dst = (int64_t*) m_data.data();
+    //int64_t* src = (int64_t*) image;
+    //for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
+    //{
+    //    *dst++ |= *src++;
+    //    *dst++ |= *src++;
+    //}
 #endif
 }
 
@@ -394,7 +415,7 @@ bool QnMetaDataV1::isMotionAt(int x, int y) const
     Q_ASSERT(y<MD_HEIGHT);
 
     int shift = x*MD_HEIGHT + y;
-    unsigned char b = *((unsigned char*)data.data() + shift/8 );
+    unsigned char b = *((unsigned char*)m_data.data() + shift/8 );
     return b & (128 >> (shift&7));
 }
 
@@ -404,7 +425,7 @@ void QnMetaDataV1::setMotionAt(int x, int y)
     Q_ASSERT(y<MD_HEIGHT);
 
     int shift = x*MD_HEIGHT + y;
-    quint8* b = (quint8*)data.data() + shift/8;
+    quint8* b = (quint8*)m_data.data() + shift/8;
     *b |= (128 >> (shift&7));
 }
 
@@ -496,7 +517,7 @@ void QnMetaDataV1::serialize(QIODevice* ioDevice) const
     ioDevice->write((const char*) &m_input, 1);
     quint16 reserved  = 0;
     ioDevice->write((const char*) &reserved, 2);
-    ioDevice->write(data.data(), data.size());
+    ioDevice->write(m_data.data(), m_data.size());
 }
 
 /*
@@ -508,7 +529,7 @@ void QnMetaDataV1::deserialize(QIODevice* ioDevice)
     ioDevice->read((char*) &timeMs, sizeof(timeMs));
     ioDevice->read((char*) &durationMs, 3);
     ioDevice->read((char*) &m_input, 1);
-    ioDevice->read(data.data(), data.size());
+    ioDevice->read(m_data.data(), m_data.size());
 
     timeMs = ntohll(timeMs);
     durationMs = ntohl(durationMs);
@@ -525,65 +546,5 @@ bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data)
     return timeMs < data.startTimeMs;
 }
 
-// ----------------------------------- QnCompressedAudioData -----------------------------------------
+#endif // ENABLE_DATA_PROVIDERS
 
-void QnCompressedAudioData::assign(const QnCompressedAudioData* other)
-{
-    QnAbstractMediaData::assign(other);
-    duration = other->duration;
-}
-
-QnCompressedAudioData* QnCompressedAudioData::clone() const
-{
-    QnCompressedAudioData* rez = new QnCompressedAudioData(data.getAlignment(), data.size());
-    rez->assign(this);
-    return rez;
-}
-
-void QnCodecAudioFormat::fromAvStream(AVCodecContext* c)
-{
-    if (c->sample_rate)
-        setSampleRate(c->sample_rate);
-
-    if (c->channels) 
-        setChannelCount(c->channels);
-
-    //setCodec("audio/pcm");
-    setByteOrder(QnAudioFormat::LittleEndian);
-
-    switch(c->sample_fmt)
-    {
-    case AV_SAMPLE_FMT_U8: ///< unsigned 8 bits
-        setSampleSize(8);
-        setSampleType(QnAudioFormat::UnSignedInt);
-        break;
-
-    case AV_SAMPLE_FMT_S16: ///< signed 16 bits
-        setSampleSize(16);
-        setSampleType(QnAudioFormat::SignedInt);
-        break;
-
-    case AV_SAMPLE_FMT_S32:///< signed 32 bits
-        setSampleSize(32);
-        setSampleType(QnAudioFormat::SignedInt);
-        break;
-
-    case AV_SAMPLE_FMT_FLT:
-        setSampleSize(32);
-        setSampleType(QnAudioFormat::Float);
-        break;
-
-    default:
-        break;
-    }
-
-    if (c->extradata_size > 0)
-    {
-        extraData.resize(c->extradata_size);
-        memcpy(&extraData[0], c->extradata, c->extradata_size);
-    }
-    bitrate = c->bit_rate;
-    channel_layout = c->channel_layout;
-    block_align = c->block_align;
-    m_bitsPerSample = c->bits_per_coded_sample;
-}

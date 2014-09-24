@@ -1,11 +1,10 @@
 #ifndef QN_FLAT_STORAGE_H
 #define QN_FLAT_STORAGE_H
 
-#include <QtCore/QSet>
-#include <QtCore/QtAlgorithms> /* For qDeleteAll. */
+#include <type_traits> /* For std::is_pointer. */
 
-#ifndef Q_MOC_RUN
-#include <boost/type_traits/is_pointer.hpp>
+#ifndef QN_NO_QT
+#   include <QtCore/QSet>
 #endif
 
 #include "flat_map.h"
@@ -18,21 +17,22 @@ template<class Key, class T>
 class QnFlatStorage: private QnFlatMap<Key, T> {
     typedef QnFlatMap<Key, T> base_type;
 
-    static_assert(boost::is_pointer<T>::value, "Stored type must be a pointer.");
+    static_assert(std::is_pointer<T>::value, "Stored type must be a pointer.");
 
 public:
     QnFlatStorage() {}
 
     ~QnFlatStorage() {
-        qDeleteAll(m_owned);
+        for(T value: m_owned)
+            delete value;
     }
 
     using base_type::empty;
     using base_type::clear;
     using base_type::value;
 
-    QList<T> values() const {
-        return m_owned.toList();
+    const QSet<T> &values() const {
+        return m_owned;
     }
 
     void insert(const Key &key, T value, bool claimOwnership = true) {

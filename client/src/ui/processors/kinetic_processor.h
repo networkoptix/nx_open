@@ -44,7 +44,7 @@ public:
         /** When this flag is set, delta time between events is ignored and
          * all events are treated as being separated by a constant amount of 
          * time determined by <tt>maxShiftInterval</tt>. */
-        IGNORE_DELTA_TIME = 0x1
+        IgnoreDeltaTime = 0x1 // TODO: #Elric #enum
     };
 
     Q_DECLARE_FLAGS(Flags, Flag);
@@ -57,7 +57,7 @@ public:
         Running    /**< Performing kinetic motion. */
     };
 
-    enum {
+    enum { // TODO: #Elric #enum
         DEFAULT_MAX_SHIFT_COUNT = 10,
         DEFAULT_MAX_SHIFT_INTERVAL_MSEC = 200
     };

@@ -1,19 +1,18 @@
 #include "ptz_mapper.h"
 
-#include <utils/common/json.h>
-#include <utils/common/enum_name_mapper.h>
+#include <cassert>
+
 #include <utils/math/math.h>
+#include <utils/common/model_functions.h>
 
 #include "ptz_math.h"
 
-QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, ExtrapolationMode)
-QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::ExtrapolationMode)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ExtrapolationMode)
 
-QN_DEFINE_NAME_MAPPED_ENUM(AngleSpace,
-    ((DegreesSpace,     "Degrees"))
-    ((Mm35EquivSpace,   "35MmEquiv"))
+QN_DEFINE_LEXICAL_ENUM(AngleSpace,
+    (DegreesSpace,     "Degrees")
+    (Mm35EquivSpace,   "35MmEquiv")
 )
-QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(AngleSpace)
 
 typedef boost::array<QnSpaceMapperPtr<qreal>, 3> PtzMapperPart;
 
@@ -163,4 +162,8 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnPtzMapperPtr *ta
         QnSpaceMapperPtr<QVector3D>(new QnSeparableVectorSpaceMapper(output[0], output[1], output[2]))
     ));
     return true;
+}
+
+void serialize(QnJsonContext *, const QnPtzMapperPtr &, QJsonValue *) {
+    assert(false); /* Not supported for now. */
 }

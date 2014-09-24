@@ -1,4 +1,7 @@
 #include "coldstore_storage.h"
+
+#ifdef ENABLE_COLDSTORE
+
 #include "coldstore_io_buffer.h"
 #include "utils/common/sleep.h"
 
@@ -241,7 +244,7 @@ int QnPlColdStoreStorage::getChunkLen() const
 bool QnPlColdStoreStorage::isStorageAvailable() 
 {
     Veracity::SFSClient csConnection;
-    QByteArray ipba = coldstoreAddr().toLocal8Bit();
+    QByteArray ipba = coldstoreAddr().toLatin1();
     char* ip = ipba.data();
 
     if (csConnection.Connect(ip) != Veracity::ISFS::STATUS_SUCCESS)
@@ -538,3 +541,4 @@ QString QnPlColdStoreStorage::fileName2csFileName(const QString& fn) const
 
 }
 
+#endif // ENABLE_COLDSTORE

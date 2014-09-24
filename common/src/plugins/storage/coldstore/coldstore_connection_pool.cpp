@@ -1,15 +1,18 @@
 #include "coldstore_connection_pool.h"
+
+#ifdef ENABLE_COLDSTORE
+
 #include "coldstore_storage.h"
 #include "utils/common/sleep.h"
 
 
 QnColdStoreConnection::QnColdStoreConnection(const QString& addr):
-m_opened(false),
-m_mutex(QMutex::Recursive)
+    m_opened(false),
+    m_mutex(QMutex::Recursive)
 {
     QMutexLocker lock(&m_mutex);
 
-    QByteArray ipba = addr.toLocal8Bit();
+    QByteArray ipba = addr.toLatin1();
     char* ip = ipba.data();
 
     m_isConnected = false;
@@ -387,3 +390,6 @@ void QnColdStoreConnectionPool::checkIfSomeConnectionsNeedToBeClosed()
     }
     
 }
+
+#endif // ENABLE_COLDSTORE
+

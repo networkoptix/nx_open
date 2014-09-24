@@ -11,8 +11,6 @@ public:
     QnStorageSpaceRestHandler();
 
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
-    virtual QString description() const override;
-
 private:
     QnPlatformMonitor *m_monitor;
 };

@@ -1,28 +1,29 @@
 #include "user_resource.h"
+#include "network/authenticate_helper.h"
 
 QnUserResource::QnUserResource():
     m_permissions(0),
     m_isAdmin(false)
 {
-    setStatus(Online, true);
-    addFlags(QnResource::user | QnResource::remote);
+    setStatus(Qn::Online, true);
+    addFlags(Qn::user | Qn::remote);
 }
 
-QString QnUserResource::getUniqueId() const
-{
-    return getGuid();
-}
-
-QString QnUserResource::getHash() const
+QByteArray QnUserResource::getHash() const
 {
     QMutexLocker locker(&m_mutex);
     return m_hash;
 }
 
-void QnUserResource::setHash(const QString& hash)
+void QnUserResource::setHash(const QByteArray& hash)
 {
-    QMutexLocker locker(&m_mutex);
-    m_hash = hash;
+    {
+        QMutexLocker locker(&m_mutex);
+        if (m_hash == hash)
+            return;
+        m_hash = hash;
+    }
+    emit hashChanged(::toSharedPointer(this));
 }
 
 QString QnUserResource::getPassword() const
@@ -33,17 +34,57 @@ QString QnUserResource::getPassword() const
 
 void QnUserResource::setPassword(const QString& password)
 {
-    QMutexLocker locker(&m_mutex);
-    m_password = password;
+    {
+        QMutexLocker locker(&m_mutex);
+        if (m_password == password)
+            return;
+        m_password = password;
+    }
+    emit passwordChanged(::toSharedPointer(this));
 }
 
-void QnUserResource::setDigest(const QString& digest)
+void QnUserResource::generateHash() {
+    QString password = getPassword();
+
+    QByteArray salt = QByteArray::number(rand(), 16);
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    md5.addData(salt);
+    md5.addData(password.toUtf8());
+    QByteArray hash = "md5$";
+    hash.append(salt);
+    hash.append("$");
+    hash.append(md5.result().toHex());
+
+    QByteArray digest = QnAuthHelper::createUserPasswordDigest(getName(), password);
+
+    setHash(hash);
+    setDigest(digest);
+}
+
+bool QnUserResource::checkPassword(const QString &password) {
+    QList<QByteArray> values =  getHash().split(L'$');
+    if (values.size() != 3)
+        return false;
+
+    QByteArray salt = values[1];
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    md5.addData(salt);
+    md5.addData(password.toUtf8());
+    return md5.result().toHex() == values[2];
+}
+
+void QnUserResource::setDigest(const QByteArray& digest)
 {
-    QMutexLocker locker(&m_mutex);
-    m_digest = digest;
+    {
+        QMutexLocker locker(&m_mutex);
+        if (m_digest == digest)
+            return;
+        m_digest = digest;
+    }
+    emit digestChanged(::toSharedPointer(this));
 }
 
-QString QnUserResource::getDigest() const
+QByteArray QnUserResource::getDigest() const
 {
     QMutexLocker locker(&m_mutex);
     return m_digest;
@@ -73,8 +114,13 @@ bool QnUserResource::isAdmin() const
 
 void QnUserResource::setAdmin(bool isAdmin)
 {
-    QMutexLocker locker(&m_mutex);
-    m_isAdmin = isAdmin;
+    {
+        QMutexLocker locker(&m_mutex);
+        if (m_isAdmin == isAdmin)
+            return;
+        m_isAdmin = isAdmin;
+    }
+    emit adminChanged(::toSharedPointer(this));
 }
 
 QString QnUserResource::getEmail() const
@@ -94,17 +140,40 @@ void QnUserResource::setEmail(const QString& email)
     emit emailChanged(::toSharedPointer(this));
 }
 
-void QnUserResource::updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields)
+void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
     base_type::updateInner(other, modifiedFields);
 
     QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
     if(localOther) {
-        setPassword(localOther->getPassword());
-        setHash(localOther->getHash());
-        setDigest(localOther->getDigest());
-        setPermissions(localOther->getPermissions());
-        setAdmin(localOther->isAdmin());
-        setEmail(localOther->getEmail());
+        if (m_password != localOther->m_password) {
+            m_password = localOther->m_password;
+            modifiedFields << "passwordChanged";
+        }
+
+        if (m_hash != localOther->m_hash) {
+            m_hash = localOther->m_hash;
+            modifiedFields << "hashChanged";
+        }
+
+        if (m_digest != localOther->m_digest) {
+            m_digest = localOther->m_digest;
+            modifiedFields << "digestChanged";
+        }
+
+        if (m_permissions != localOther->m_permissions) {
+            m_permissions = localOther->m_permissions;
+            modifiedFields << "permissionsChanged";
+        }
+
+        if (m_isAdmin != localOther->m_isAdmin) {
+            m_isAdmin = localOther->m_isAdmin;
+            modifiedFields << "adminChanged";
+        }
+
+        if (m_email != localOther->m_email) {
+            m_email = localOther->m_email;
+            modifiedFields << "emailChanged";
+        }
     }
 }

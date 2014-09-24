@@ -17,12 +17,11 @@ class QIcon;
 class QGLWidget;
 
 class VariantAnimator;
-class QnTextureTransitionShaderProgram;
 
 /**
  * A lightweight button widget that does not use styles for painting.
  */
-class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> >, protected QOpenGLFunctions {
+class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> > {
     Q_OBJECT
     Q_FLAGS(StateFlags StateFlag)
     Q_PROPERTY(bool checkable READ isCheckable WRITE setCheckable)
@@ -35,32 +34,28 @@ class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> >, protecte
 
 public:
     enum StateFlag {
-        DEFAULT = 0,        /**< Default button state. */
-        CHECKED = 0x1,      /**< Button is checkable and is checked. */
-        PRESSED = 0x2,      /**< Button is pressed. This is the state that the button enters when a mouse button is pressed over it, and leaves when the mouse button is released. */
-        HOVERED = 0x4,      /**< Button is hovered over. */
-        DISABLED = 0x8,     /**< Button is disabled. */
-        FLAGS_MAX = 0xF // TODO: #Elric rename, use CamelCase like in Qt
+        Default = 0,        /**< Default button state. */
+        Checked = 0x1,      /**< Button is checkable and is checked. */
+        Pressed = 0x2,      /**< Button is pressed. This is the state that the button enters when a mouse button is pressed over it, and leaves when the mouse button is released. */
+        Hovered = 0x4,      /**< Button is hovered over. */
+        Disabled = 0x8,     /**< Button is disabled. */
+        MaxState = 0xF 
     };
     Q_DECLARE_FLAGS(StateFlags, StateFlag)
 
     QnImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnImageButtonWidget();
-
-    // TODO: #Elric get rid of these, leave only icon.
-    const QPixmap &pixmap(StateFlags flags) const;
-    void setPixmap(StateFlags flags, const QPixmap &pixmap);
-    
-    const QIcon &icon() const;
+  
+    QIcon icon() const;
     void setIcon(const QIcon &icon);
 
     bool isCheckable() const { return m_checkable; }
     Q_SLOT void setCheckable(bool checkable);
 
     StateFlags state() const { return m_state; }
-    bool isHovered() const { return state() & HOVERED; }
-    bool isChecked() const { return state() & CHECKED; }
-    bool isPressed() const { return state() & PRESSED; }
+    bool isHovered() const { return state() & Hovered; }
+    bool isChecked() const { return state() & Checked; }
+    bool isPressed() const { return state() & Pressed; }
     bool isDisabled() const { return !isEnabled(); }
     Q_SLOT void setChecked(bool checked = true);
     Q_SLOT void setPressed(bool pressed = true);
@@ -81,6 +76,13 @@ public:
     void setFixedSize(qreal width, qreal height);
     void setFixedSize(const QSizeF &size);
 
+    /** If the button size can be changed in runtime. */
+    bool isDynamic() const;
+    /**
+     * Allow or forbid dynamic size changes in runtime.
+     * Must be set before first paint because used in the VAO generation. 
+     */
+    void setDynamic(bool value);
 public slots:
     void toggle() { setChecked(!isChecked()); }
     void click();
@@ -118,25 +120,30 @@ protected:
     void invalidatePixmapCache();
     StateFlags validPixmapState(StateFlags flags) const;
 
+    void initializeVao(const QRectF &rect);
+    void updateVao(const QRectF &rect);
+
     bool skipHoverEvent(QGraphicsSceneHoverEvent *event);
-    bool skipMenuEvent(QGraphicsSceneMouseEvent *event);
 
     void clickInternal(QGraphicsSceneMouseEvent *event);
+
+    // TODO: #Elric get rid of these, leave only icon.
+    const QPixmap &pixmap(StateFlags flags) const;
+    void setPixmap(StateFlags flags, const QPixmap &pixmap);
 
 private:
     friend class QnImageButtonHoverProgressAccessor;
 
-    boost::array<QPixmap, FLAGS_MAX + 1> m_pixmaps;
-    mutable boost::array<QPixmap, FLAGS_MAX + 1> m_pixmapCache;
+    boost::array<QPixmap, MaxState + 1> m_pixmaps;
+    mutable boost::array<QPixmap, MaxState + 1> m_pixmapCache;
     mutable bool m_pixmapCacheValid;
 
     StateFlags m_state;
     bool m_checkable;
     bool m_cached;
+    bool m_dynamic;
     int m_skipNextHoverEvents;
     QPoint m_nextHoverEventPos;
-    int m_skipNextMenuEvents;
-    QPoint m_nextMenuEventPos;
 
     VariantAnimator *m_animator;
     qreal m_hoverProgress;
@@ -144,7 +151,13 @@ private:
     QAction *m_action;
     bool m_actionIconOverridden;
 
-    QSharedPointer<QnTextureTransitionShaderProgram> m_shader;
+    bool m_initialized;
+    QOpenGLVertexArrayObject m_verticesStatic;
+    QOpenGLVertexArrayObject m_verticesTransition;
+    QOpenGLBuffer m_positionBufferStatic;
+    QOpenGLBuffer m_positionBufferTransition;
+    QOpenGLBuffer m_textureBufferStatic;
+    QOpenGLBuffer m_textureBufferTransition;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)

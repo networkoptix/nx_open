@@ -1,12 +1,18 @@
 #ifndef live_strem_provider_h_1508
 #define live_strem_provider_h_1508
 
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
-#include "../resource/media_resource.h"
+
 #include "motion/motion_estimation.h"
 #include "../resource/motion_window.h"
+#include "core/datapacket/video_data_packet.h"
 #include "core/resource/resource_fwd.h"
 #include "media_streamdataprovider.h"
+#include <core/resource/resource_media_layout.h>
+
 
 static const int  META_DATA_DURATION_MS = 300;
 static const int MIN_SECOND_STREAM_FPS = 2;
@@ -18,11 +24,11 @@ static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 720 * 576;
 class QnLiveStreamProvider: public QnAbstractMediaStreamDataProvider
 {
 public:
-    QnLiveStreamProvider(QnResourcePtr res);
+    QnLiveStreamProvider(const QnResourcePtr& res);
     virtual ~QnLiveStreamProvider();
 
-    virtual void setRole(QnResource::ConnectionRole role) override;
-    QnResource::ConnectionRole getRole() const;
+    virtual void setRole(Qn::ConnectionRole role) override;
+    Qn::ConnectionRole getRole() const;
 
 
     void setSecondaryQuality(Qn::SecondStreamQuality  quality);
@@ -40,7 +46,7 @@ public:
     // I assume this function is called once per video frame 
     bool needMetaData(); 
 
-    virtual void onGotVideoFrame(QnCompressedVideoDataPtr videoData);
+    virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData);
 
     void setUseSoftwareMotion(bool value);
 
@@ -49,7 +55,7 @@ public:
 
     virtual bool secondaryResolutionIsLarge() const { return false; }
 
-    static bool hasRunningLiveProvider(QnNetworkResourcePtr netRes);
+    static bool hasRunningLiveProvider(QnNetworkResource* netRes);
 
     /*!
         Start provider if not running yet.
@@ -58,7 +64,8 @@ public:
     void startIfNotRunning();
 
     bool isCameraControlDisabled() const;
-    void filterMotionByMask(QnMetaDataV1Ptr motion);
+    void filterMotionByMask(const QnMetaDataV1Ptr& motion);
+    void updateSoftwareMotionStreamNum();
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
@@ -66,7 +73,7 @@ protected:
 
     QnMetaDataV1Ptr getMetaData();
     virtual QnMetaDataV1Ptr getCameraMetadata();
-    virtual QnResource::ConnectionRole roleForMotionEstimation();
+    virtual Qn::ConnectionRole roleForMotionEstimation();
     /*!
         \param picSize video size in pixels
     */
@@ -86,7 +93,9 @@ private:
     unsigned int m_framesSinceLastMetaData; // used only for live providers
     QTime m_timeSinceLastMetaData; //used only for live providers
 
-    QnResource::ConnectionRole m_softMotionRole;
+    QMutex m_motionRoleMtx;
+    Qn::ConnectionRole m_softMotionRole;
+    QString m_forcedMotionStream;
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
 #endif
@@ -97,8 +106,14 @@ private:
     bool m_isPhysicalResource;
     Qn::SecondStreamQuality  m_secondaryQuality;
     simd128i *m_motionMaskBinData[CL_MAX_CHANNELS];
+    QElapsedTimer m_resolutionCheckTimer;
+
+    void updateStreamResolution( int channelNumber, const QSize& newResolution );
+    void extractCodedPictureResolution( const QnCompressedVideoDataPtr& videoData, QSize* const newResolution );
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //live_strem_provider_h_1508

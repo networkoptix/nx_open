@@ -1,6 +1,8 @@
 #ifndef coldstore_dts_searcher_h_1807
 #define coldstore_dts_searcher_h_1807
 
+#ifdef ENABLE_COLDSTORE
+
 #include "../abstract_dts_reader_factory.h"
 #include "../abstract_dts_searcher.h"
 
@@ -35,5 +37,7 @@ private:
     QByteArray *m_request;
 
 };
+
+#endif // ENABLE_COLDSTORE
 
 #endif // coldstore_dts_searcher_h_1807

@@ -6,6 +6,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
+
 namespace Ui {
     class LayoutSettingsDialog;
 }
@@ -13,11 +15,11 @@ namespace Ui {
 class QnAppServerImageCache;
 class QnLayoutSettingsDialogPrivate;
 
-class QnLayoutSettingsDialog : public QDialog
+class QnLayoutSettingsDialog : public QnWorkbenchStateDependentButtonBoxDialog
 {
     Q_OBJECT
-    typedef QDialog base_type;
 
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 public:
     explicit QnLayoutSettingsDialog(QWidget *parent = 0);
     ~QnLayoutSettingsDialog();
@@ -25,12 +27,13 @@ public:
     void readFromResource(const QnLayoutResourcePtr &layout);
     bool submitToResource(const QnLayoutResourcePtr &layout);
 
+    virtual void accept() override;
+
 protected:
     virtual bool eventFilter(QObject *target, QEvent *event) override;
 
 private slots:
     void at_clearButton_clicked();
-    void at_accepted();
     void at_opacitySpinBox_valueChanged(int value);
     void at_widthSpinBox_valueChanged(int value);
     void at_heightSpinBox_valueChanged(int value);

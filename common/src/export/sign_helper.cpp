@@ -3,8 +3,9 @@
 #include <QtCore/QProcess>
 #include <QtCore/QTemporaryFile>
 
-#include "utils/common/util.h"
+#include "core/datapacket/video_data_packet.h"
 #include "licensing/license.h"
+#include "utils/common/util.h"
 #include "utils/common/scoped_painter_rollback.h"
 #include "utils/math/math.h"
 
@@ -60,16 +61,16 @@ QnSignHelper::QnSignHelper():
     m_opacity = 1.0;
     m_signBackground = Qt::white;
 
-    m_versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
+    m_versionStr = qApp->applicationName().append(QLatin1String(" v")).append(QCoreApplication::applicationVersion());
     m_hwIdStr = QLatin1String(qnLicensePool->currentHardwareId());
     if (m_hwIdStr.isEmpty())
         m_hwIdStr = tr("Unknown");
 
     QList<QnLicensePtr> list = qnLicensePool->getLicenses();
-    m_licensedToStr = tr("FREE license");
+    m_licensedToStr = tr("Trial license");
     foreach (QnLicensePtr license, list)
     {
-        if (license->type() != QnLicense::FreeLicense)
+        if (license->type() != Qn::LC_Trial)
             m_licensedToStr = license->name();
     }
 }
@@ -403,7 +404,7 @@ QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData,
     QString profile;
     extractSpsPpsFromPrivData((quint8*)srcCodecExtraData.data(), srcCodecExtraData.size(), sps, pps, spsReady, ppsReady);
     if ((!spsReady || !ppsReady) && iFrame)
-        extractSpsPpsFromPrivData((quint8*)iFrame->data.data(), iFrame->data.size(), sps, pps, spsReady, ppsReady);
+        extractSpsPpsFromPrivData((quint8*)iFrame->data(), iFrame->dataSize(), sps, pps, spsReady, ppsReady);
     if (spsReady && ppsReady)
     {
         if (sps.profile_idc >= 100)
@@ -439,7 +440,7 @@ int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, QnCo
 
     extractSpsPpsFromPrivData((quint8*)srcCodecExtraData.data(), srcCodecExtraData.size(), oldSps, oldPps, spsReady, ppsReady);
     if ((!spsReady || !ppsReady) && iFrame)
-        extractSpsPpsFromPrivData((quint8*)iFrame->data.data(), iFrame->data.size(), oldSps, oldPps, spsReady, ppsReady);
+        extractSpsPpsFromPrivData((quint8*)iFrame->data(), iFrame->dataSize(), oldSps, oldPps, spsReady, ppsReady);
 
     if (!spsReady || !ppsReady)
         return out_size;
@@ -591,7 +592,7 @@ int QnSignHelper::removeH264SeiMessage(quint8* buffer, int size)
 
 QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCodec, QnCompressedVideoDataPtr iFrame)
 {
-    QnCompressedVideoDataPtr generatedFrame;
+    QnWritableCompressedVideoDataPtr generatedFrame;
     QByteArray srcCodecExtraData((const char*) srcCodec->extradata, srcCodec->extradata_size);
 
     AVCodecContext* videoCodecCtx = avcodec_alloc_context3(srcCodec->codec); //m_formatCtx->streams[0]->codec;
@@ -659,9 +660,9 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
         out_size = correctNalPrefix(srcCodecExtraData, videoBuf, out_size, videoBufSize); 
     }
 
-    generatedFrame = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
+    generatedFrame = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
     generatedFrame->compressionType = videoCodecCtx->codec_id;
-    generatedFrame->data.write((const char*) videoBuf, out_size);
+    generatedFrame->m_data.write((const char*) videoBuf, out_size);
     generatedFrame->flags = QnAbstractMediaData::MediaFlags_AVKey;
     generatedFrame->channelNumber = 0; 
 error_label:
@@ -704,7 +705,7 @@ QByteArray QnSignHelper::getSignPattern()
     result.append(INITIAL_SIGNATURE_MAGIC);
     result.append(SIGN_TEXT_DELIMITER);
 
-    result.append(qApp->applicationName().toUtf8()).append(" v").append(qApp->applicationVersion().toUtf8()).append(SIGN_TEXT_DELIMITER);
+    result.append(qApp->applicationName().toUtf8()).append(" v").append(QCoreApplication::applicationVersion().toUtf8()).append(SIGN_TEXT_DELIMITER);
 
     QString hid = QLatin1String(qnLicensePool->currentHardwareId());
     if (hid.isEmpty())

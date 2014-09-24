@@ -84,6 +84,8 @@ void SyncHttpClientDelegate::getPriv( const QNetworkRequest& request )
 {
     QMutexLocker lk( &m_mutex );
 
+    QUrl reqUrl = request.url();
+
     if( m_reply )
         m_reply->deleteLater();
     m_reply = m_networkAccessManager->get( request );

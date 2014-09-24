@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>Camera Schedule Editor</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,1,0">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
@@ -46,13 +46,6 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="requiredLicensesLabel">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="licensesButton">
        <property name="text">
         <string>Get More Licenses...</string>
@@ -62,33 +55,16 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="digitalLicensesLabel">
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="analogLicensesLabel">
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
+    <widget class="QnLicensesUsageWidget" name="licensesUsageWidget" native="true"/>
    </item>
    <item>
     <widget class="QGroupBox" name="scheduleGridGroupBox">
      <property name="title">
       <string>Schedule Grid</string>
      </property>
-     <property name="flat">
-      <bool>true</bool>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,1">
-      <property name="leftMargin">
-       <number>9</number>
-      </property>
+     <layout class="QVBoxLayout" name="scheduleGridLayout" stretch="0,0,1">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,0,0">
         <property name="spacing">
          <number>0</number>
         </property>
@@ -103,46 +79,7 @@
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_7">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>12</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="displayFpsCheckBox">
-          <property name="text">
-           <string>Display FPS on Grid</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_3">
+         <widget class="QLabel" name="panicModeTitleLabel">
           <property name="text">
            <string>Panic Mode: </string>
           </property>
@@ -158,14 +95,28 @@
        </layout>
       </item>
       <item>
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Note: Recording Schedule is based on Server Time</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="1,0">
+        <item>
+         <widget class="QCheckBox" name="displayFpsCheckBox">
+          <property name="text">
+           <string>Display FPS on Grid</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Note: Recording Schedule is based on Server Time</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QnScheduleGridWidget" name="gridWidget" native="true">
@@ -178,18 +129,18 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
      <item>
-      <widget class="QGroupBox" name="settingsGroupBox">
-       <property name="title">
-        <string>Schedule Settings</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,1,0">
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <layout class="QVBoxLayout" name="verticalLayout_8">
+       <item>
+        <widget class="QGroupBox" name="settingsGroupBox">
+         <property name="title">
+          <string>Schedule Settings</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,0,0,0">
+          <property name="bottomMargin">
+           <number>9</number>
+          </property>
           <item>
            <layout class="QFormLayout" name="formLayout">
             <property name="fieldGrowthPolicy">
@@ -234,36 +185,6 @@
             </item>
            </layout>
           </item>
-          <item>
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>10</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_9">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>
@@ -500,22 +421,110 @@
            </layout>
           </item>
          </layout>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="archiveGroupBox">
+         <property name="title">
+          <string>Fixed Archive Length</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_2">
+          <item row="0" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <item>
+             <widget class="QSpinBox" name="spinBoxMinDays">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>1000</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBoxMinArchive">
+              <property name="text">
+               <string>Auto</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="minArchiveDaysWarningLabel">
+              <property name="text">
+               <string>Warning! High value may prevent other cameras from recording!</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <item>
+             <widget class="QSpinBox" name="spinBoxMaxDays">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>9999</number>
+              </property>
+              <property name="value">
+               <number>30</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBoxMaxArchive">
+              <property name="text">
+               <string>Auto</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Min days:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Max days:</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -637,7 +646,27 @@
    <extends>QToolButton</extends>
    <header>ui/widgets/checked_button.h</header>
   </customwidget>
+  <customwidget>
+   <class>QnLicensesUsageWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/licenses_usage_widget.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>enableRecordingCheckBox</tabstop>
+  <tabstop>licensesButton</tabstop>
+  <tabstop>displayQualityCheckBox</tabstop>
+  <tabstop>fpsSpinBox</tabstop>
+  <tabstop>qualityComboBox</tabstop>
+  <tabstop>recordAlwaysButton</tabstop>
+  <tabstop>recordMotionButton</tabstop>
+  <tabstop>recordMotionPlusLQButton</tabstop>
+  <tabstop>noRecordButton</tabstop>
+  <tabstop>recordBeforeSpinBox</tabstop>
+  <tabstop>recordAfterSpinBox</tabstop>
+  <tabstop>exportScheduleButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <slots>

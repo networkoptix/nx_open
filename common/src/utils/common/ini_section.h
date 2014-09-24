@@ -5,7 +5,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QTextStream>
 
-#include <utils/common/lexical.h>
+#include <utils/serialization/lexical_functions.h>
 
 /**
  * Abstraction over a section of an INI file. Much easier to use than <tt>QSettings</tt>,

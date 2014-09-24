@@ -33,7 +33,7 @@ bool CLPing::ping(const QString& ip, int retry, int /*timeoutPerRetry*/, int pac
     return process.exitCode() == 0;
 #else
     QString cmd = QLatin1String("/bin/ping %1 -c %2 -s %3");
-    int rez = system(cmd.arg(ip).arg(retry).arg(packetSize).toLocal8Bit().data());
+    int rez = system(cmd.arg(ip).arg(retry).arg(packetSize).toLatin1().data());
     return WEXITSTATUS(rez) == 0;
 #endif 
     //TODO: #ivan MacOS ping?

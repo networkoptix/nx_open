@@ -61,7 +61,7 @@ void QnStoragePluginFactory::registerStoragePlugin(const QString &protocol, cons
 
 QnStorageResource *QnStoragePluginFactory::createStorage(const QString &url, bool useDefaultForUnknownPrefix)
 {
-    int index = url.indexOf(QLatin1String("://"));
+    int index = url.indexOf(lit("://"));
     if (index == -1) 
         return m_defaultFactory ? m_defaultFactory() : NULL;
     

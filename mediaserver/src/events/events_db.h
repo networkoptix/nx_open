@@ -4,33 +4,35 @@
 #include <QtSql/QtSql>
 #include "business/actions/abstract_business_action.h"
 #include "business/events/abstract_business_event.h"
-#include "recording/time_period.h"
+#include "utils/db/db_helper.h"
+
+class QnTimePeriod;
 
 namespace pb {
     class BusinessActionList;
 }
 
-class QnEventsDB
+class QnEventsDB: public QnDbHelper
 {
 public:
     void setEventLogPeriod(qint64 periodUsec);
-    bool saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePtr actionRes);
-    bool removeLogForRes(QnId resId);
+    bool saveActionToDB(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& actionRes);
+    bool removeLogForRes(QUuid resId);
 
     QList<QnAbstractBusinessActionPtr> getActions(
         const QnTimePeriod& period,
         const QnResourceList& resList,
-        const BusinessEventType::Value& eventType = BusinessEventType::NotDefined, 
-        const BusinessActionType::Value& actionType = BusinessActionType::NotDefined,
-        const QnId& businessRuleId = QnId()) const;
+        const QnBusiness::EventType& eventType = QnBusiness::UndefinedEvent, 
+        const QnBusiness::ActionType& actionType = QnBusiness::UndefinedAction,
+        const QUuid& businessRuleId = QUuid()) const;
 
     void getAndSerializeActions(
         QByteArray& result,
         const QnTimePeriod& period,
         const QnResourceList& resList,
-        const BusinessEventType::Value& eventType, 
-        const BusinessActionType::Value& actionType,
-        const QnId& businessRuleId) const;
+        const QnBusiness::EventType& eventType, 
+        const QnBusiness::ActionType& actionType,
+        const QUuid& businessRuleId) const;
 
 
     static QnEventsDB* instance();
@@ -46,15 +48,12 @@ private:
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,
         const QnResourceList& resList,
-        const BusinessEventType::Value& eventType, 
-        const BusinessActionType::Value& actionType,
-        const QnId& businessRuleId) const;
-    bool isObjectExists(const QString& objectType, const QString& objectName);
+        const QnBusiness::EventType& eventType, 
+        const QnBusiness::ActionType& actionType,
+        const QUuid& businessRuleId) const;
 private:
-    QSqlDatabase m_sdb;
     qint64 m_lastCleanuptime;
     qint64 m_eventKeepPeriod;
-    mutable QMutex m_mutex;
     static QnEventsDB* m_instance;
 };
 

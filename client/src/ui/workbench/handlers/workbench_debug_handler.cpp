@@ -8,6 +8,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/widgets/palette_widget.h>
 #include <ui/dialogs/resource_list_dialog.h>
+#include <ui/workaround/qtbug_workaround.h>
 
 // -------------------------------------------------------------------------- //
 // QnDebugControlDialog
@@ -57,14 +58,38 @@ void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered() {
 
 void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
+    qDebug() << qnSettings->debugCounter();
 
-    QnPaletteWidget *w = new QnPaletteWidget();
-    w->setPalette(qApp->palette());
-    w->show();
+    auto showPalette = [this] {
+        QnPaletteWidget *w = new QnPaletteWidget();
+        w->setPalette(qApp->palette());
+        w->show();
+    };
+
+    auto startMenuBlinking = [this] {
+        QTimer *timer = new QTimer(this);
+        timer->setInterval(100);
+        timer->setSingleShot(false);
+        connect(timer, &QTimer::timeout, this, [this, timer] {
+            if (qnSettings->debugCounter() != 1) {
+                timer->stop();
+                timer->deleteLater();
+                return;
+            }
+            QMenu* m = action(Qn::MainMenuAction)->menu();
+            if (m && m->isVisible()) {
+                m->hide();
+            } else {
+                QCoreApplication::postEvent(mainWindow(), new QEvent(QnEvent::WinSystemMenu));
+            }
+        });
+        timer->start();
+    };
 }
 
 void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() - 1);
+    qDebug() << qnSettings->debugCounter();
 }
 
 void QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered() {

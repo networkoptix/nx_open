@@ -66,7 +66,7 @@ QString QnWeekTimeScheduleDialog::scheduleTasks() const
                 const QPoint cell(col, row);
 
                 Qn::RecordingType recordType = ui->gridWidget->cellRecordingType(cell);
-                writer.putBit(recordType != Qn::RecordingType_Never);
+                writer.putBit(recordType != Qn::RT_Never);
             }
         }
         writer.flushBits();
@@ -86,7 +86,7 @@ void QnWeekTimeScheduleDialog::setScheduleTasks(const QString& value)
         for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
         {
             for (int col = 0; col < ui->gridWidget->columnCount(); ++col)
-                ui->gridWidget->setCellRecordingType(QPoint(col, row), Qn::RecordingType_Run);
+                ui->gridWidget->setCellRecordingType(QPoint(col, row), Qn::RT_Always);
         }
     }
     else {
@@ -97,7 +97,7 @@ void QnWeekTimeScheduleDialog::setScheduleTasks(const QString& value)
             {
                 for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
                     const QPoint cell(col, row);
-                    ui->gridWidget->setCellRecordingType(cell, reader.getBit() ? Qn::RecordingType_Run : Qn::RecordingType_Never);
+                    ui->gridWidget->setCellRecordingType(cell, reader.getBit() ? Qn::RT_Always : Qn::RT_Never);
                 }
             }
         } catch(...) {
@@ -119,11 +119,11 @@ void QnWeekTimeScheduleDialog::updateGridParams(bool fromUserInput)
     if (m_disableUpdateGridParams)
         return;
 
-    Qn::RecordingType recordType = Qn::RecordingType_Never;
+    Qn::RecordingType recordType = Qn::RT_Never;
     if (ui->valueOnButton->isChecked())
-        recordType = Qn::RecordingType_Run;
+        recordType = Qn::RT_Always;
     else if (ui->valueOffButton->isChecked())
-        recordType = Qn::RecordingType_Never;
+        recordType = Qn::RT_Never;
     else
         qWarning() << "QnWeekTimeScheduleDialog::No record type is selected!";
 
@@ -144,7 +144,7 @@ void QnWeekTimeScheduleDialog::at_gridWidget_cellActivated(const QPoint &cell)
     Qn::RecordingType recordType = ui->gridWidget->cellRecordingType(cell);
 
     switch (recordType) {
-        case Qn::RecordingType_Run:
+        case Qn::RT_Always:
             ui->valueOnButton->setChecked(true);
             break;
         default:

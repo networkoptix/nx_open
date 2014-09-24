@@ -197,6 +197,23 @@ int AxisCameraManager::updateCameraInfo() const
     m_cameraCapabilities |= nxcip::BaseCameraManager::audioCapability | nxcip::BaseCameraManager::sharePixelsCapability;
 
     std::auto_ptr<SyncHttpClient> httpClient;
+    if( std::strlen(m_info.modelName) == 0 )
+    {
+        if( !httpClient.get() )
+            httpClient.reset( new SyncHttpClient(
+                AxisCameraPlugin::instance()->networkAccessManager(),
+                m_info.url,
+                DEFAULT_AXIS_API_PORT,
+                m_credentials ) );
+        QByteArray prodShortName;
+        const int status = readAxisParameter( httpClient.get(), "root.Brand.ProdShortName", &prodShortName );
+        if( status != SyncHttpClient::HTTP_OK )
+            return status == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
+        prodShortName.replace( QByteArray(" "), QByteArray() );
+        prodShortName.replace( QByteArray("-"), QByteArray() );
+        strncpy( m_info.modelName, prodShortName.constData(), sizeof(m_info.modelName)/sizeof(*m_info.modelName)-1 );
+    }
+
     if( std::strlen(m_info.firmware) == 0 )
     {
         //reading firmware, since it is unavailable via MDNS
@@ -250,7 +267,7 @@ int AxisCameraManager::readAxisParameter(
     const QByteArray& paramName,
     QVariant* paramValue )
 {
-    if( httpClient->get( QString::fromLatin1("axis-cgi/param.cgi?action=list&group=%1").arg(QLatin1String(paramName)).toLatin1() ) != QNetworkReply::NoError )
+    if( httpClient->get( QString::fromLatin1("/axis-cgi/param.cgi?action=list&group=%1").arg(QLatin1String(paramName)).toLatin1() ) != QNetworkReply::NoError )
         return nxcip::NX_NETWORK_ERROR;
 
     if( httpClient->statusCode() == SyncHttpClient::HTTP_OK )
@@ -303,5 +320,16 @@ int AxisCameraManager::readAxisParameter(
     QVariant val;
     int status = readAxisParameter( httpClient, paramName, &val );
     *paramValue = val.toUInt();
+    return status;
+}
+
+int AxisCameraManager::readAxisParameter(
+    SyncHttpClient* const httpClient,
+    const QByteArray& paramName,
+    int* paramValue )
+{
+    QVariant val;
+    int status = readAxisParameter( httpClient, paramName, &val );
+    *paramValue = val.toInt();
     return status;
 }

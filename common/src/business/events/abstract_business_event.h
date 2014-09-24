@@ -10,21 +10,21 @@
 #include <business/business_event_parameters.h>
 
 
-namespace BusinessEventType
+namespace QnBusiness
 {
-    bool hasChild(Value value);
+    bool hasChild(EventType eventType);
 
-    QList<Value> childEvents(Value value);
+    QList<EventType> childEvents(EventType eventType);
 
-    Value parentEvent(Value value);
+    EventType parentEvent(EventType eventType);
 
-    bool isResourceRequired(Value val);
+    bool isResourceRequired(EventType eventType);
 
-    bool hasToggleState(Value val);
+    bool hasToggleState(EventType eventType);
 
-    bool requiresCameraResource(Value val);
+    bool requiresCameraResource(EventType eventType);
 
-    bool requiresServerResource(Value val);
+    bool requiresServerResource(EventType eventType);
 }
 
 /**
@@ -45,7 +45,7 @@ protected:
      * @param toggleState       On/off state of the event if it is toggleable.
      * @param timeStamp         Event date and time in usec from UTC.
      */
-    QnAbstractBusinessEvent(BusinessEventType::Value eventType, const QnResourcePtr& resource, Qn::ToggleState toggleState, qint64 timeStamp);
+    QnAbstractBusinessEvent(QnBusiness::EventType eventType, const QnResourcePtr& resource, QnBusiness::EventState toggleState, qint64 timeStamp);
 
 public:
     virtual ~QnAbstractBusinessEvent();
@@ -57,30 +57,30 @@ public:
     const QnResourcePtr& getResource() const { return m_resource; }
 
     /**
-     * @brief getEventType      Get type of event. See BusinessEventType::Value.
+     * @brief getEventType      Get type of event. See QnBusiness::EventType.
      * @return                  Enumeration value on the event.
      */
-    BusinessEventType::Value getEventType() const { return m_eventType; }
+    QnBusiness::EventType getEventType() const { return m_eventType; }
 
     /**
      * @return                  On/off state of the event.
      */
-    Qn::ToggleState getToggleState()     const { return m_toggleState; }
+    QnBusiness::EventState getToggleState()     const { return m_toggleState; }
 
     /**
      * @brief checkCondition    Checks event parameters. 
      * @param params            Parameters of an event that are selected in rule.
      * @return                  True if event should be handled, false otherwise.
      */
-    virtual bool checkCondition(Qn::ToggleState state, const QnBusinessEventParameters& params) const = 0;
+    virtual bool checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters& params) const = 0;
 
     virtual QnBusinessEventParameters getRuntimeParams() const;
 
 private:
     /**
-     * @brief m_eventType       Type of event. See BusinessEventType::Value.
+     * @brief m_eventType       Type of event. See QnBusiness::EventType.
      */
-    const BusinessEventType::Value m_eventType;
+    const QnBusiness::EventType m_eventType;
 
     /**
      * @brief m_timeStamp       Event date and time in usec from UTC.
@@ -95,10 +95,9 @@ private:
     /**
      * @brief m_toggleState     State on/off for togglable events.
      */
-    const Qn::ToggleState m_toggleState;
+    const QnBusiness::EventState m_toggleState;
 };
 
-Q_DECLARE_METATYPE(BusinessEventType::Value)
 Q_DECLARE_METATYPE(QnAbstractBusinessEventPtr)
 
 

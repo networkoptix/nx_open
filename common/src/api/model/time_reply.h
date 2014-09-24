@@ -3,7 +3,7 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/common/json_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 struct QnTimeReply {
     /** Utc time in msecs since epoch. */
@@ -13,7 +13,8 @@ struct QnTimeReply {
     qint64 timeZoneOffset;
 };
 
-Q_DECLARE_METATYPE(QnTimeReply)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnTimeReply)
+#define QnTimeReply_Fields (utcTime)(timeZoneOffset)
+
+QN_FUSION_DECLARE_FUNCTIONS(QnTimeReply, (json)(metatype))
 
 #endif // QN_TIME_REPLY_H

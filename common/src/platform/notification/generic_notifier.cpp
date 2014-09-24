@@ -17,8 +17,14 @@ namespace {
 } // anonymous namespace
 
 QnGenericNotifier::QnGenericNotifier(QObject *parent): 
-    base_type(parent) 
+    base_type(parent),
+    m_lastUtcTime( 0 ),
+    m_lastLocalTime( 0 ),
+    m_lastElapsedTime( 0 ),
+    m_lastTimeZoneOffset( std::numeric_limits<qint64>::max() )
 {
+    //default values ensure that first call updateTimes(true) will emit all signals
+
     m_checkTimer.start(CheckPeriodMSecs, this);
     m_restartTimer.start(RestartPeriodMSecs, this);
     m_elapsedTimer.start();

@@ -9,6 +9,7 @@
 #include "core/resource/network_resource.h"
 #include "vmax480_resource.h"
 #include "utils/common/synctime.h"
+#include "utils/common/util.h"
 
 static const int PROCESS_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 150;
@@ -58,7 +59,7 @@ void VMaxStreamFetcher::updatePlaybackMask()
     QVector<QnTimePeriodList> allChunks;
     for (ConsumersMap::const_iterator itr = m_dataConsumers.begin(); itr != m_dataConsumers.end(); ++itr)
         allChunks << itr.key()->chunks();
-    m_playbackMaskHelper.setPlaybackMask(QnTimePeriod::mergeTimePeriods(allChunks));
+    m_playbackMaskHelper.setPlaybackMask(QnTimePeriodList::mergeTimePeriods(allChunks));
 }
 
 qint64 VMaxStreamFetcher::findRoundTime(qint64 timeUsec, bool* dataFound) const

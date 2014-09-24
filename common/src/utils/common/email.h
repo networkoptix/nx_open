@@ -1,5 +1,5 @@
-#ifndef EMAIL_H
-#define EMAIL_H
+#ifndef QN_EMAIL_H
+#define QN_EMAIL_H
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
@@ -7,24 +7,26 @@
 
 #include <api/model/kvpair.h>
 
-#include <utils/common/json.h>
+#include <boost/operators.hpp>
+
+#include <utils/common/model_functions_fwd.h>
 
 class QnEmail {
     Q_GADGET
     Q_ENUMS(ConnectionType)
 
 public:
+    // TODO: #Elric #EC2 move out, rename?
     enum ConnectionType {
-        Unsecure,
-        Ssl,
-        Tls,
+        Unsecure = 0,
+        Ssl = 1,
+        Tls = 2,
         ConnectionTypeCount
     };
 
     struct SmtpServerPreset {
-        SmtpServerPreset() {}
-        SmtpServerPreset(const QString &server, ConnectionType connectionType = Tls, int port = 0):
-            server(server), connectionType(connectionType), port(port) {}
+        SmtpServerPreset();
+        SmtpServerPreset(const QString &server, ConnectionType connectionType = Tls, int port = 0);
 
         bool isNull() const {
             return server.isEmpty();
@@ -35,27 +37,26 @@ public:
         int port;
     };
 
-    struct Settings {
+    struct Settings: public boost::equality_comparable1<Settings> {
         Settings();
-        Settings(const QnKvPairList &values);
-        ~Settings();
 
         bool isNull() const;
         bool isValid() const;
-
-        QnKvPairList serialized() const;
 
         QString server;
         QString user;
         QString password;
         QString signature;
+        QString supportEmail;
         ConnectionType connectionType;
         int port;
         int timeout;
 
-        //TODO: #GDM think where else we can store it
+        //TODO: #GDM #Common think where else we can store it
         /** Flag that we are using simple view */
         bool simple;
+
+        friend bool operator==(const Settings &l, const Settings &r);
     };
 
 
@@ -63,6 +64,7 @@ public:
 
     static bool isValid(const QString &email);
     static int defaultPort(ConnectionType connectionType);
+    static int defaultTimeoutSec();
 
     bool isValid() const;
 
@@ -86,19 +88,8 @@ private:
     QString m_email;
 };
 
-inline void serialize(const QnEmail::ConnectionType &value, QJsonValue *target) {
-    QJson::serialize(static_cast<int>(value), target);
-}
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnEmail::ConnectionType)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::SmtpServerPreset)(QnEmail::ConnectionType), (metatype)(lexical))
 
-inline bool deserialize(const QJsonValue &value, QnEmail::ConnectionType *target) {
-    int tmp;
-    if(!QJson::deserialize(value, &tmp))
-        return false;
-    
-    *target = static_cast<QnEmail::ConnectionType>(tmp);
-    return true;
-}
+#endif // QN_EMAIL_H
 
-QN_DECLARE_FUNCTIONS(QnEmail::SmtpServerPreset, (json))
-
-#endif // EMAIL_H

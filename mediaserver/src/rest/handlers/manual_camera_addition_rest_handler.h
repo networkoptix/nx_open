@@ -7,8 +7,9 @@
 #include <QtNetwork/QHostInfo>
 
 #include <core/resource_management/manual_camera_searcher.h>
-
 #include <rest/server/json_rest_handler.h>
+#include <utils/common/concurrent.h>
+
 
 class QnManualCameraAdditionRestHandler: public QnJsonRestHandler {
     Q_OBJECT
@@ -17,7 +18,6 @@ public:
     ~QnManualCameraAdditionRestHandler();
 
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
-    virtual QString description() const;
 
 private:
     int searchStartAction(const QnRequestParams &params, QnJsonRestResult &result);
@@ -44,7 +44,7 @@ private:
     QMutex m_searchProcessMutex;
 
     QHash<QUuid, QnManualCameraSearcher*> m_searchProcesses;
-    QHash<QUuid, QFuture<void> > m_searchProcessRuns;
+    QHash<QUuid, QnConcurrent::QnFuture<bool> > m_searchProcessRuns;
 };
 
 #endif // QN_MANUAL_CAMERA_ADDITION_REST_HANDLER_H

@@ -29,11 +29,19 @@ namespace SystemError
     static const ErrorCode inProgress = WSAEWOULDBLOCK;
     static const ErrorCode timedOut = WSAETIMEDOUT;
     static const ErrorCode fileNotFound = ERROR_FILE_NOT_FOUND;
+    static const ErrorCode connectionReset = WSAECONNRESET;
+    static const ErrorCode notConnected = WSAENOTCONN;
+    static const ErrorCode interrupted = WSAEINTR;
+    static const ErrorCode again = EAGAIN;
 #else
     static const ErrorCode wouldBlock = EWOULDBLOCK;
     static const ErrorCode inProgress = EINPROGRESS;
     static const ErrorCode timedOut = ETIMEDOUT;
     static const ErrorCode fileNotFound = ENOENT;
+    static const ErrorCode connectionReset = ECONNRESET;
+    static const ErrorCode notConnected = ENOTCONN;
+    static const ErrorCode interrupted = EINTR;
+    static const ErrorCode again = EAGAIN;
 #endif
 
     //!Returns error code of previous system call
@@ -42,6 +50,7 @@ namespace SystemError
     QString toString( ErrorCode errorCode );
     //!Same as toString(getLastOSErrorCode())
     QString getLastOSErrorText();
+    void setLastErrorCode( ErrorCode errorCode );
 }
 
 #endif  //SYSTEMERROR_H

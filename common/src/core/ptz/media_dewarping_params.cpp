@@ -1,28 +1,21 @@
 #include "media_dewarping_params.h"
 
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 #include <utils/common/model_functions.h>
-#include <utils/common/json.h>
 
-QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnMediaDewarpingParams::ViewMode, static)
-QN_DEFINE_STRUCT_FUNCTIONS(QnMediaDewarpingParams,      (json)(eq)(debug),    (enabled)(viewMode)(fovRot)(xCenter)(yCenter)(radius))
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnMediaDewarpingParams, ViewMode)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnMediaDewarpingParams,      (json)(eq)(debug),    (enabled)(viewMode)(fovRot)(xCenter)(yCenter)(radius)(hStretch))
+
+
 
 namespace {
-
     static const int panoLow      = 1;
     static const int panoNormal   = 2;
     static const int panoWide     = 4;
 
-    static const QList<int> horizontalPano(QList<int>()
-                                           << panoLow
-                                           << panoNormal
-                                           );
-
-    static const QList<int> verticalPano(QList<int>()
-                                         << panoLow
-                                         << panoNormal
-                                         << panoWide
-                                         );
+    static const QList<int> horizontalPano(QList<int>() << panoLow << panoNormal);
+    static const QList<int> verticalPano(QList<int>() << panoLow << panoNormal << panoWide);
 }
 
 QnMediaDewarpingParams QnMediaDewarpingParams::deserialized(const QByteArray &data) {

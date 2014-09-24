@@ -1,11 +1,15 @@
 #include "time_image_filter.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QDateTime>
 #include <QtGui/QFontMetrics>
 #include <QtGui/QImage>
 #include <QtGui/QPainter>
 
+#include <utils/common/util.h> /* For UTC_TIME_DETECTION_THRESHOLD. */
 #include <utils/math/math.h>
+#include <utils/media/frame_info.h>
 #include <utils/color_space/yuvconvert.h>
 
 
@@ -73,7 +77,7 @@ void QnTimeImageFilter::initTimeDrawing(CLVideoDecoderOutput* frame, const QStri
     m_timeImg = new QImage(m_imageBuffer, drawWidth, drawHeight, drawWidth*4, QImage::Format_ARGB32_Premultiplied);
 }
 
-void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect)
+void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar)
 {
     switch(m_dateTextPos)
     {
@@ -130,3 +134,5 @@ void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& u
         frame->linesize[0], frame->linesize[1], 
         m_timeImg->width(), m_timeImg->height(), false);
 }
+
+#endif // ENABLE_DATA_PROVIDERS

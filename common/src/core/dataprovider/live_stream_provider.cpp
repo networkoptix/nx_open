@@ -1,15 +1,19 @@
 #include "live_stream_provider.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "core/resource/camera_resource.h"
+#include "utils/media/jpeg_utils.h"
 
 
-QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
+QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     QnAbstractMediaStreamDataProvider(res),
     m_livemutex(QMutex::Recursive),
     m_quality(Qn::QualityNormal),
     m_qualityUpdatedAtLeastOnce(false),
     m_fps(-1.0),
     m_framesSinceLastMetaData(0),
-    m_softMotionRole(QnResource::Role_Default),
+    m_softMotionRole(Qn::CR_Default),
     m_softMotionLastChannel(0),
     m_secondaryQuality(Qn::SSQualityNotDefined)
 {
@@ -18,14 +22,15 @@ QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
         memset(m_motionMaskBinData[i], 0, MD_WIDTH * MD_HEIGHT/8);
     }
 
-    m_role = QnResource::Role_LiveVideo;
+    m_role = Qn::CR_LiveVideo;
     m_timeSinceLastMetaData.restart();
-    m_layout = 0;
+    m_layout = QnConstResourceVideoLayoutPtr();
     m_cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
     Q_ASSERT(m_cameraRes);
     m_prevCameraControlDisabled = m_cameraRes->isCameraControlDisabled();
     m_layout = m_cameraRes->getVideoLayout();
     m_isPhysicalResource = res.dynamicCast<QnPhysicalCameraResource>();
+    m_resolutionCheckTimer.invalidate();
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
@@ -34,7 +39,7 @@ QnLiveStreamProvider::~QnLiveStreamProvider()
         qFreeAligned(m_motionMaskBinData[i]);
 }
 
-void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
+void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 {
     bool needUpdate = false;
     QnAbstractMediaStreamDataProvider::setRole(role);
@@ -42,7 +47,7 @@ void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
         QMutexLocker mtx(&m_livemutex);
         updateSoftwareMotion();
 
-        if (role == QnResource::Role_SecondaryLiveVideo)
+        if (role == Qn::CR_SecondaryLiveVideo)
         {
             Qn::StreamQuality newQuality = m_cameraRes->getSecondaryStreamQuality();
             if (newQuality != m_quality)
@@ -69,7 +74,7 @@ void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
         updateStreamParamsBasedOnQuality();
 }
 
-QnResource::ConnectionRole QnLiveStreamProvider::getRole() const
+Qn::ConnectionRole QnLiveStreamProvider::getRole() const
 {
     QMutexLocker mtx(&m_livemutex);
     return m_role;
@@ -93,14 +98,14 @@ void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
             return;
     }
 
-    if (getRole() != QnResource::Role_SecondaryLiveVideo)
+    if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
         m_cameraRes->lockConsumers();
         foreach(QnResourceConsumer* consumer, m_cameraRes->getAllConsumers())
         {
             QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
-            if (lp && lp->getRole() == QnResource::Role_SecondaryLiveVideo) {
+            if (lp && lp->getRole() == Qn::CR_SecondaryLiveVideo) {
                 lp->setQuality(m_cameraRes->getSecondaryStreamQuality());
                 lp->onPrimaryFpsUpdated(m_fps);
             }
@@ -133,13 +138,23 @@ Qn::StreamQuality QnLiveStreamProvider::getQuality() const
     return m_quality;
 }
 
-QnResource::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
+Qn::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
 {
-    if (m_softMotionRole == QnResource::Role_Default) {
-        if (m_cameraRes && !m_cameraRes->hasDualStreaming2() && (m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
-            m_softMotionRole = QnResource::Role_LiveVideo;
-        else
-            m_softMotionRole = QnResource::Role_SecondaryLiveVideo;
+    QMutexLocker lock(&m_motionRoleMtx);
+
+    if (m_softMotionRole == Qn::CR_Default) 
+    {
+        m_forcedMotionStream = m_cameraRes->getProperty(QnMediaResource::motionStreamKey()).toLower();
+        if (m_forcedMotionStream == lit("primary"))
+            m_softMotionRole = Qn::CR_LiveVideo;
+        else if (m_forcedMotionStream == lit("secondary"))
+            m_softMotionRole = Qn::CR_SecondaryLiveVideo;
+        else {
+            if (m_cameraRes && !m_cameraRes->hasDualStreaming2() && (m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
+                m_softMotionRole = Qn::CR_LiveVideo;
+            else
+                m_softMotionRole = Qn::CR_SecondaryLiveVideo;
+		}
     }
     return m_softMotionRole;
 }
@@ -166,7 +181,7 @@ void QnLiveStreamProvider::updateSoftwareMotion()
 
 bool QnLiveStreamProvider::canChangeStatus() const
 {
-    return m_role == QnResource::Role_LiveVideo && m_isPhysicalResource;
+    return m_role == Qn::CR_LiveVideo && m_isPhysicalResource;
 }
 
 // for live providers only
@@ -184,14 +199,14 @@ void QnLiveStreamProvider::setFps(float f)
 
     }
     
-    if (getRole() != QnResource::Role_SecondaryLiveVideo)
+    if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
         m_cameraRes->lockConsumers();
         foreach(QnResourceConsumer* consumer, m_cameraRes->getAllConsumers())
         {
             QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
-            if (lp && lp->getRole() == QnResource::Role_SecondaryLiveVideo)
+            if (lp && lp->getRole() == Qn::CR_SecondaryLiveVideo)
                 lp->onPrimaryFpsUpdated(f);
         }
         m_cameraRes->unlockConsumers();
@@ -240,7 +255,7 @@ bool QnLiveStreamProvider::needMetaData()
 #endif
         return false;
     }
-    else if (getRole() == QnResource::Role_LiveVideo && (m_cameraRes->getMotionType() == Qn::MT_HardwareGrid || m_cameraRes->getMotionType() == Qn::MT_MotionWindow))
+    else if (getRole() == Qn::CR_LiveVideo && (m_cameraRes->getMotionType() == Qn::MT_HardwareGrid || m_cameraRes->getMotionType() == Qn::MT_MotionWindow))
     {
         bool result = (m_framesSinceLastMetaData > 10 ||
                        (m_framesSinceLastMetaData > 0 && m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS));
@@ -255,27 +270,40 @@ bool QnLiveStreamProvider::needMetaData()
     return false; // not motion configured
 }
 
-void QnLiveStreamProvider::onGotVideoFrame(QnCompressedVideoDataPtr videoData)
+static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10*1000;
+
+void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& videoData)
 {
     m_framesSinceLastMetaData++;
 
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
-    if (m_role == roleForMotionEstimation() && m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
+
+    int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
+    bool resoulutionOK =  videoData->width * videoData->height <= maxSquare || !m_forcedMotionStream.isEmpty();
+
+    if (m_role == roleForMotionEstimation() && m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid && resoulutionOK)
+    {
         if( m_motionEstimation[videoData->channelNumber].analizeFrame(videoData) )
+            updateStreamResolution( videoData->channelNumber, m_motionEstimation[videoData->channelNumber].videoResolution() );
+    }
+    else if( !m_cameraRes->hasDualStreaming2() &&
+             (m_role == Qn::CR_LiveVideo) &&                         //two conditions mean no motion at all
+             (!m_resolutionCheckTimer.isValid() || m_resolutionCheckTimer.elapsed() > PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS) )    //from time to time checking primary stream resolution
+    {
+        QSize newResolution;
+        extractCodedPictureResolution( videoData, &newResolution );
+        if( newResolution.isValid() )
         {
-            const QSize& newResolution = m_motionEstimation[videoData->channelNumber].videoResolution();
-            if( newResolution != m_videoResolutionByChannelNumber[videoData->channelNumber] )
-            {
-                m_videoResolutionByChannelNumber[videoData->channelNumber] = newResolution;
-                onStreamResolutionChanged( videoData->channelNumber, newResolution );
-            }
+            updateStreamResolution( videoData->channelNumber, newResolution );
+            m_resolutionCheckTimer.restart();
         }
+    }
 #endif
 }
 
 void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 {
-    Q_ASSERT(getRole() == QnResource::Role_SecondaryLiveVideo);
+    Q_ASSERT(getRole() == Qn::CR_SecondaryLiveVideo);
     // now primary has newFps
     // this is secondary stream
     // need to adjust fps 
@@ -287,14 +315,14 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
     if (secondaryResolutionIsLarge())
         newSecFps = MIN_SECOND_STREAM_FPS;
-    else if (sharingMethod == Qn::sharePixels)
+    else if (sharingMethod == Qn::PixelsFpsSharing)
     {
         newSecFps = qMin(m_cameraRes->desiredSecondStreamFps(), maxFps); //minimum between DESIRED_SECOND_STREAM_FPS and what is left;
         if (maxFps - newFps < 2 )
             newSecFps = qMin(m_cameraRes->desiredSecondStreamFps()/2,MIN_SECOND_STREAM_FPS);
 
     }
-    else if (sharingMethod == Qn::shareFps)
+    else if (sharingMethod == Qn::BasicFpsSharing)
         newSecFps = qMin(m_cameraRes->desiredSecondStreamFps(), maxFps - newFps); //ss; minimum between 5 and what is left;
     else// noSharing
         newSecFps = qMin(m_cameraRes->desiredSecondStreamFps(), maxFps);
@@ -324,7 +352,7 @@ QnMetaDataV1Ptr QnLiveStreamProvider::getCameraMetadata()
     return result;
 }
 
-bool QnLiveStreamProvider::hasRunningLiveProvider(QnNetworkResourcePtr netRes)
+bool QnLiveStreamProvider::hasRunningLiveProvider(QnNetworkResource* netRes)
 {
     bool rez = false;
     netRes->lockConsumers();
@@ -354,15 +382,77 @@ void QnLiveStreamProvider::startIfNotRunning()
     }
 }
 
-
 bool QnLiveStreamProvider::isCameraControlDisabled() const
 {
-    QnVirtualCameraResourcePtr camRes = m_resource.dynamicCast<QnVirtualCameraResource>();
+    const QnVirtualCameraResource* camRes = dynamic_cast<const QnVirtualCameraResource*>(m_resource.data());
     return camRes && camRes->isCameraControlDisabled();
 }
 
-
-void QnLiveStreamProvider::filterMotionByMask(QnMetaDataV1Ptr motion)
+void QnLiveStreamProvider::filterMotionByMask(const QnMetaDataV1Ptr& motion)
 {
     motion->removeMotion(m_motionMaskBinData[motion->channelNumber]);
 }
+
+void QnLiveStreamProvider::updateStreamResolution( int channelNumber, const QSize& newResolution )
+{
+    if( newResolution == m_videoResolutionByChannelNumber[channelNumber] )
+        return;
+
+    m_videoResolutionByChannelNumber[channelNumber] = newResolution;
+    onStreamResolutionChanged( channelNumber, newResolution );
+
+    if( getRole() == Qn::CR_SecondaryLiveVideo ||
+        m_cameraRes->hasCameraCapabilities( Qn::PrimaryStreamSoftMotionCapability ) || 
+        m_cameraRes->hasDualStreaming2() )
+    {
+        return;
+    }
+
+    //no secondary stream and no motion, may be primary stream is now OK for motion?
+    bool newValue = newResolution.width()*newResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION;
+    bool cameraValue = m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability;
+    if (newValue != cameraValue) 
+    {
+        if( newValue)
+            m_cameraRes->setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
+        else
+            m_cameraRes->setCameraCapabilities( m_cameraRes->getCameraCapabilities() & ~Qn::PrimaryStreamSoftMotionCapability );
+        m_cameraRes->saveParams();
+    }
+
+    m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
+}
+
+void QnLiveStreamProvider::updateSoftwareMotionStreamNum()
+{
+    QMutexLocker lock(&m_motionRoleMtx);
+    m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
+}
+
+void QnLiveStreamProvider::extractCodedPictureResolution( const QnCompressedVideoDataPtr& videoData, QSize* const newResolution )
+{
+    switch( videoData->compressionType )
+    {
+        case CODEC_ID_H264:
+        case CODEC_ID_MPEG2VIDEO:
+            if( videoData->width > 0 && videoData->height > 0 )
+                *newResolution = QSize( videoData->width, videoData->height );
+            //TODO #ak it is very possible that videoData->width and videoData->height do not change when stream resolution changes and there is no SPS also
+            break;
+
+        case CODEC_ID_MJPEG:
+        {
+            nx_jpg::ImageInfo imgInfo;
+            if( !nx_jpg::readJpegImageInfo( (const quint8*)videoData->data(), videoData->dataSize(), &imgInfo ) )
+                return;
+            *newResolution = QSize( imgInfo.width, imgInfo.height );
+            break;
+        }
+        default:
+            if( videoData->width > 0 && videoData->height > 0 )
+                *newResolution = QSize( videoData->width, videoData->height );
+            break;
+    }
+}
+
+#endif // ENABLE_DATA_PROVIDERS

@@ -1,8 +1,10 @@
 #ifndef QN_USER_RESOURCE_H
 #define QN_USER_RESOURCE_H
 
-#include "resource.h"
-#include "layout_resource.h"
+#include <QtCore/QUuid>
+
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource.h>
 
 class QnUserResource : public QnResource
 {
@@ -13,16 +15,17 @@ class QnUserResource : public QnResource
 public:
     QnUserResource();
 
-    virtual QString getUniqueId() const override;
-
-    QString getHash() const;
-    void setHash(const QString &hash);
+    QByteArray getHash() const;
+    void setHash(const QByteArray&hash);
 
     QString getPassword() const;
     void setPassword(const QString &password);
 
-    QString getDigest() const;
-    void setDigest(const QString& digest);
+    void generateHash();
+    bool checkPassword(const QString &password);
+
+    QByteArray getDigest() const;
+    void setDigest(const QByteArray& digest);
 
     quint64 getPermissions() const;
     void setPermissions(quint64 permissions);
@@ -32,18 +35,20 @@ public:
 
     QString getEmail() const;
     void setEmail(const QString &email);
-
 signals:
-    void emailChanged(const QnUserResourcePtr &user);
-    void permissionsChanged(const QnUserResourcePtr &user);
-
+    void hashChanged(const QnResourcePtr &resource);
+    void passwordChanged(const QnResourcePtr &resource);
+    void digestChanged(const QnResourcePtr &resource);
+    void permissionsChanged(const QnResourcePtr &user);
+    void adminChanged(const QnResourcePtr &resource);
+    void emailChanged(const QnResourcePtr &user);
 protected:
-    virtual void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) override;
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
 private:
     QString m_password;
-    QString m_hash;
-    QString m_digest;
+    QByteArray m_hash;
+    QByteArray m_digest;
     quint64 m_permissions;
     bool m_isAdmin;
     QString m_email;

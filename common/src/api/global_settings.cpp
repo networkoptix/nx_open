@@ -7,6 +7,8 @@
 
 #include "resource_property_adaptor.h"
 
+#include <utils/common/app_info.h>
+
 namespace {
     QSet<QString> parseDisabledVendors(QString disabledVendors) {
         QStringList disabledVendorList;
@@ -24,6 +26,20 @@ namespace {
 
         return updatedVendorList.toSet();
     }
+
+    const QString nameDisabledVendors(lit("disabledVendors"));
+    const QString nameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
+    const QString nameHost(lit("smtpHost"));
+    const QString namePort(lit("smtpPort"));
+    const QString nameUser(lit("smtpUser"));
+    const QString namePassword(lit("smptPassword"));
+    const QString nameConnectionType(lit("smtpConnectionType"));
+    const QString nameSimple(lit("smtpSimple"));
+    const QString nameTimeout(lit("smtpTimeout"));
+    const QString nameFrom(lit("emailFrom"));
+    const QString nameSignature(lit("emailSignature"));
+    const QString nameSupportEmail(lit("emailSupportEmail"));
+    
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent): 
@@ -31,10 +47,42 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
 {
     assert(qnResPool);
     
-    m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(lit("disabledVendors"), QString(), this);
-    m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(lit("cameraSettingsOptimization"), true, this);
+    m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameDisabledVendors, QString(), this);
+    m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameCameraSettingsOptimization, true, this);
+    m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameHost, QString(), this);
+    m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameUser, QString(), this);
+    m_passwordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(namePassword, QString(), this);
+    m_signatureAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSignature, QString(), this);
+    m_supportEmailAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSupportEmail, QnAppInfo::supportAddress()), this;
+    m_connectionTypeAdaptor = new  QnLexicalResourcePropertyAdaptor<QnEmail::ConnectionType>(nameConnectionType, QnEmail::Unsecure, this);
+    m_portAdaptor = new QnLexicalResourcePropertyAdaptor<int>(namePort, 0, this);
+    m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(nameTimeout, QnEmail::defaultTimeoutSec(), this);
+    m_simpleAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameSimple, true, this);
+
+    QList<QnAbstractResourcePropertyAdaptor*> emailAdaptors;
+    emailAdaptors
+        << m_serverAdaptor
+        << m_userAdaptor
+        << m_passwordAdaptor
+        << m_signatureAdaptor
+        << m_supportEmailAdaptor
+        << m_connectionTypeAdaptor
+        << m_portAdaptor
+        << m_timeoutAdaptor
+        << m_simpleAdaptor
+        ;
+
+    m_allAdaptors 
+        << m_disabledVendorsAdaptor
+        << m_cameraSettingsOptimizationAdaptor
+        << emailAdaptors
+        ;
+
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
+
+    foreach(QnAbstractResourcePropertyAdaptor* adaptor, emailAdaptors)
+        connect(adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::emailSettingsChanged, Qt::QueuedConnection);
 
     connect(qnResPool,                              &QnResourcePool::resourceAdded,                     this,   &QnGlobalSettings::at_resourcePool_resourceAdded);
     connect(qnResPool,                              &QnResourcePool::resourceRemoved,                   this,   &QnGlobalSettings::at_resourcePool_resourceRemoved);
@@ -79,17 +127,63 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     if(!user->isAdmin())
         return;
 
+    QMutexLocker locker(&m_mutex);
+
     m_admin = user;
-    m_disabledVendorsAdaptor->setResource(user);;
-    m_cameraSettingsOptimizationAdaptor->setResource(user);;
+    foreach (QnAbstractResourcePropertyAdaptor* adaptor, m_allAdaptors)
+        adaptor->setResource(user);
 }
 
 void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
-    if(resource == m_admin) {
-        QMutexLocker locker(&m_mutex);
+    if (!m_admin || resource != m_admin)
+        return;
 
-        m_admin.reset();
-        m_disabledVendorsAdaptor->setResource(QnResourcePtr());
-        m_cameraSettingsOptimizationAdaptor->setResource(QnResourcePtr());
-    }
+    QMutexLocker locker(&m_mutex);
+    m_admin.reset();
+
+    foreach (QnAbstractResourcePropertyAdaptor* adaptor, m_allAdaptors)
+        adaptor->setResource(QnResourcePtr());
+}
+
+QnKvPairList QnGlobalSettings::allSettings() const {
+    if (!m_admin)
+        return QnKvPairList();
+
+    return m_admin->getProperties();
+}
+
+QnEmail::Settings QnGlobalSettings::emailSettings() const {
+    QnEmail::Settings result;
+    result.server = m_serverAdaptor->value();
+    result.port = m_portAdaptor->value();
+    result.user = m_userAdaptor->value();
+    result.password = m_passwordAdaptor->value();
+    result.connectionType = m_connectionTypeAdaptor->value();
+    result.signature = m_signatureAdaptor->value();
+    result.supportEmail = m_supportEmailAdaptor->value();
+    result.simple = m_simpleAdaptor->value();
+    result.timeout = m_timeoutAdaptor->value();
+    return result;
+}
+
+void QnGlobalSettings::setEmailSettings(const QnEmail::Settings &settings) {
+    m_serverAdaptor->setValue(settings.server);
+    m_portAdaptor->setValue(settings.port == QnEmail::defaultPort(settings.connectionType) ? 0 : settings.port);
+    m_userAdaptor->setValue(settings.user);
+    m_passwordAdaptor->setValue(settings.isValid() ? settings.password : QString());
+    m_connectionTypeAdaptor->setValue(settings.connectionType);
+    m_signatureAdaptor->setValue(settings.signature);
+    m_supportEmailAdaptor->setValue(settings.supportEmail);
+    m_simpleAdaptor->setValue(settings.simple);
+    m_timeoutAdaptor->setValue(settings.timeout);   
+}
+
+void QnGlobalSettings::synchronizeNow() {
+    foreach (QnAbstractResourcePropertyAdaptor* adaptor, m_allAdaptors)
+        adaptor->synchronizeNow();
+}
+
+QnUserResourcePtr QnGlobalSettings::getAdminUser()
+{
+    return m_admin;
 }

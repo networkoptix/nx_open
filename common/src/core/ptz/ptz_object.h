@@ -16,6 +16,7 @@ struct QnPtzObject: public boost::equality_comparable1<QnPtzObject> {
     Qn::PtzObjectType type;
     QString id;
 };
+#define QnPtzObject_Fields (type)(id)
 
 Q_DECLARE_METATYPE(QnPtzObject)
 

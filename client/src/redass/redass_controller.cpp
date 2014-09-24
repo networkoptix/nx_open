@@ -1,6 +1,6 @@
 #include "redass_controller.h"
 #include "camera/cam_display.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 #include "core/resource/camera_resource.h"
 
 Q_GLOBAL_STATIC(QnRedAssController, inst);
@@ -43,7 +43,7 @@ QnCamDisplay* QnRedAssController::getDisplayByReader(QnArchiveStreamReader* read
 
 bool QnRedAssController::isSupportedDisplay(QnCamDisplay* display) const
 {
-    if (!display)
+    if (!display || !display->getArchiveReader())
         return false;
     QnSecurityCamResourcePtr cam = display->getArchiveReader()->getResource().dynamicCast<QnSecurityCamResource>();
     return cam && cam->hasDualStreaming();
@@ -91,6 +91,11 @@ QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality fi
     return 0;
 }
 
+bool QnRedAssController::isForcedHQDisplay(QnCamDisplay* display, QnArchiveStreamReader* reader) const
+{
+    return display->isFullScreen() || display->isZoomWindow() || display->isFisheyeEnabled(); 
+}
+
 void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
 {
     QMutexLocker lock(&m_mutex);
@@ -112,8 +117,8 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
         return;
     }
     
-    if (display->isFullScreen() || display->isZoomWindow())
-        return; // do not go to LQ for full screen items (except of FF/REW play)
+    if (isForcedHQDisplay(display, reader))
+        return;
 
     if (reader->getQuality() == MEDIA_Quality_Low)
         return; // reader already at LQ
@@ -209,9 +214,10 @@ bool QnRedAssController::isSmallItem2(QnCamDisplay* display)
     return sz.height() <= TO_LOWQ_SCREEN_SIZE.height() * LQ_HQ_THRESHOLD;
 }
 
-bool QnRedAssController::isNotSmallItem(QnCamDisplay* display)
+bool QnRedAssController::itemCanBeOptimized(QnCamDisplay* display)
 {
-    return !isSmallItem(display);
+    QnArchiveStreamReader* reader = display->getArchiveReader();
+    return !isSmallItem(display) && !isForcedHQDisplay(display, reader);
 }
 
 bool QnRedAssController::isNotSmallItem2(QnCamDisplay* display)
@@ -266,28 +272,32 @@ void QnRedAssController::onTimer()
     for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
     {
         if (qnSyncTime->currentMSecsSinceEpoch() - itr.value().initialTime < 1000)
-            continue; // do not hanlde recently added items, some start animation can be in progress
+            continue; // do not handle recently added items, some start animation can be in progress
 
         QnCamDisplay* display = itr.key();
 
         if (!isSupportedDisplay(display))
-            continue; // ommit cameras without dual streaming, offline and non-authorized cameras
+            continue; // omit cameras without dual streaming, offline and non-authorized cameras
 
         // switch HQ->LQ if visual item size is small
         QnArchiveStreamReader* reader = display->getArchiveReader();
 
-        if ((display->isFullScreen() || display->isZoomWindow()) && !isFFSpeed(display))
-            reader->setQuality(MEDIA_Quality_High, true); // todo: remove quality control from workbench display. Set quality here again to prevent race condition
-
-        if (itr.value().awaitingLQTime && qnSyncTime->currentMSecsSinceEpoch() - itr.value().awaitingLQTime > QUALITY_SWITCH_INTERVAL)
+        if (isForcedHQDisplay(display, reader) && !isFFSpeed(display))
+            reader->setQuality(MEDIA_Quality_High, true);
+        else if (itr.value().awaitingLQTime && qnSyncTime->currentMSecsSinceEpoch() - itr.value().awaitingLQTime > QUALITY_SWITCH_INTERVAL)
             gotoLowQuality(display, display->queueSize() < 3 ? Reason_Network : Reason_CPU);
-
-        if (reader->getQuality() == MEDIA_Quality_High && isSmallItem(display))
-        {
-            gotoLowQuality(display, Reason_Small);
-            addHQTry();
+        else {
+            if (reader->getQuality() == MEDIA_Quality_High && isSmallItem(display) && !reader->isMediaPaused())
+            {
+                if (++itr.value().smallSizeCnt > 1) {
+                    gotoLowQuality(display, Reason_Small);
+                    addHQTry();
+                }
+            }
+            else {
+                itr.value().smallSizeCnt = 0;
+            }
         }
-
         // switch LQ->HQ for LIVE here
         if (display->isRealTimeSource() && display->getArchiveReader()->getQuality() == MEDIA_Quality_Low &&   // LQ live stream
             qnSyncTime->currentMSecsSinceEpoch() - m_redAssInfo[display].lqTime > QUALITY_SWITCH_INTERVAL &&  // no drop report several last seconds
@@ -307,7 +317,7 @@ void QnRedAssController::optimizeItemsQualityBySize()
     // rearrange items quality: put small items to LQ state, large to HQ
  
     if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
-        return; // do not optimize quality if recently switch occured
+        return; // do not optimize quality if recently switch occurred
 
     for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
     {
@@ -318,8 +328,8 @@ void QnRedAssController::optimizeItemsQualityBySize()
 
     int largeSize = 0;
     int smallSize = 0;
-    QnCamDisplay* largeDisplay = findDisplay(Find_Biggest, MEDIA_Quality_Low, &QnRedAssController::isNotSmallItem, &largeSize);
-    QnCamDisplay* smallDisplay = findDisplay(Find_Least, MEDIA_Quality_High, &QnRedAssController::isNotSmallItem, &smallSize);
+    QnCamDisplay* largeDisplay = findDisplay(Find_Biggest, MEDIA_Quality_Low, &QnRedAssController::itemCanBeOptimized, &largeSize);
+    QnCamDisplay* smallDisplay = findDisplay(Find_Least, MEDIA_Quality_High, &QnRedAssController::itemCanBeOptimized, &smallSize);
     if (largeDisplay && smallDisplay && largeSize >= smallSize*2)
     {
         // swap items quality
@@ -338,13 +348,16 @@ int QnRedAssController::counsumerCount() const
 void QnRedAssController::registerConsumer(QnCamDisplay* display)
 {
     QMutexLocker lock(&m_mutex);
+    QnArchiveStreamReader* reader = display->getArchiveReader();
     if (display->getArchiveReader()) 
     {
         if (isSupportedDisplay(display))
         {
             switch (m_mode) 
             {
-                case Qn::AutoResolution:
+            case Qn::AutoResolution:
+                if (!isForcedHQDisplay(display, reader))
+                {
                     if (m_redAssInfo.size() >= 16) {
                         gotoLowQuality(display, Reason_Network);
                     }
@@ -355,16 +368,17 @@ void QnRedAssController::registerConsumer(QnCamDisplay* display)
                                 gotoLowQuality(display, itr.value().lqReason);
                         }
                     }
-                    break;
+                }
+                break;
 
-                case Qn::HighResolution:
-                    display->getArchiveReader()->setQuality(MEDIA_Quality_High, true);
-                    break;
-                case Qn::LowResolution:
-                    display->getArchiveReader()->setQuality(MEDIA_Quality_Low, true);
-                    break;
-                default:
-                    break;
+            case Qn::HighResolution:
+                display->getArchiveReader()->setQuality(MEDIA_Quality_High, true);
+                break;
+            case Qn::LowResolution:
+                display->getArchiveReader()->setQuality(MEDIA_Quality_Low, true);
+                break;
+            default:
+                break;
             }
         }
         m_redAssInfo.insert(display, RedAssInfo());
@@ -386,6 +400,8 @@ void QnRedAssController::gotoLowQuality(QnCamDisplay* display, LQReason reason, 
 void QnRedAssController::unregisterConsumer(QnCamDisplay* display)
 {
     QMutexLocker lock(&m_mutex);
+    if (!m_redAssInfo.contains(display))
+        return;
     m_redAssInfo.remove(display);
     addHQTry();
 }

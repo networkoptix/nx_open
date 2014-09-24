@@ -1,4 +1,7 @@
 #include "coldstore_storage_helper.h"
+
+#ifdef ENABLE_COLDSTORE
+
 #include "coldstore_connection_pool.h"
 #include "coldstore_storage.h"
 
@@ -272,4 +275,5 @@ QString QnCsTimeunitConnectionHelper::getCsFileName() const
 {
     return m_csFileName;
 }
-//=======================================================
+
+#endif // ENABLE_COLDSTORE

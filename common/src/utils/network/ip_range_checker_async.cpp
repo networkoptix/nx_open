@@ -1,3 +1,7 @@
+/**********************************************************
+* 28 oct 2013
+* akolesnikov@networkoptix.com
+***********************************************************/
 
 #include "ip_range_checker_async.h"
 
@@ -8,11 +12,13 @@
 #include "socket.h"
 
 
-static const int PORT_TO_SCAN = 80;
+static const int MAX_HOSTS_CHECKED_SIMULTANEOUSLY = 256;
 
 QnIpRangeCheckerAsync::QnIpRangeCheckerAsync()
 :
+    m_terminated( false ),
     m_portToScan( 0 ),
+    m_startIpv4( 0 ),
     m_endIpv4( 0 ),
     m_nextIPToCheck( 0 )
 {
@@ -21,72 +27,79 @@ QnIpRangeCheckerAsync::QnIpRangeCheckerAsync()
 QnIpRangeCheckerAsync::~QnIpRangeCheckerAsync()
 {
     pleaseStop();
-    waitForScanToFinish();
+    join();
 }
 
 void QnIpRangeCheckerAsync::pleaseStop()
 {
-    //TODO/IMPL
+    {
+        QMutexLocker lk( &m_mutex );
+        m_terminated = true;
+    }
 }
 
-//static const int SOCKET_CONNECT_TIMEOUT_MILLIS = 2000;
-static const int MAX_HOSTS_CHECKED_SIMULTANEOUSLY = 256;
+void QnIpRangeCheckerAsync::join()
+{
+    //waiting for scan to finish
+    QMutexLocker lk( &m_mutex );
+    while( !m_socketsBeingScanned.empty() )
+        m_cond.wait( lk.mutex() );
+}
 
 QStringList QnIpRangeCheckerAsync::onlineHosts( const QHostAddress& startAddr, const QHostAddress& endAddr, int portToScan )
 {
-    m_openedIPs.clear();
-
-    m_portToScan = portToScan;
-    const quint32 startIpv4 = startAddr.toIPv4Address();
-    m_endIpv4 = endAddr.toIPv4Address();
-
-    if( m_endIpv4 < startIpv4 )
-        return QList<QString>();
-
-    //for( quint32 ip = startIpv4; ip <= endIpv4; ++ip )
-    m_nextIPToCheck = startIpv4;
-    for( int i = 0; i < MAX_HOSTS_CHECKED_SIMULTANEOUSLY; ++i )
     {
         QMutexLocker lk( &m_mutex );
-        if( !launchHostCheck() )
-            break;
+        m_openedIPs.clear();
+
+        m_portToScan = portToScan;
+        m_startIpv4 = startAddr.toIPv4Address();
+        m_endIpv4 = endAddr.toIPv4Address();
+
+        if( m_endIpv4 < m_startIpv4 )
+            return QList<QString>();
+
+        m_nextIPToCheck = m_startIpv4;
+        for( int i = 0; i < MAX_HOSTS_CHECKED_SIMULTANEOUSLY; ++i )
+        {
+            if( !launchHostCheck() )
+                break;
+        }
     }
 
-    waitForScanToFinish();
+    join();
 
     return m_openedIPs;
 }
 
-//void QnIpRangeCheckerAsync::eventTriggered( Socket* sock, PollSet::EventType eventType ) throw()
-//{
-//    QMutexLocker lk( &m_mutex );
-//
-//    if( eventType == PollSet::etWrite )
-//        m_openedIPs.push_back( static_cast<CommunicatingSocket*>(sock)->getForeignAddress() );
-//
-//    std::map<Socket*, QSharedPointer<Socket> >::iterator it = m_socketsBeingScanned.find( sock );
-//    assert( it != m_socketsBeingScanned.end() );
-//    aio::AIOService::instance()->removeFromWatch( it->second, PollSet::etWrite );
-//    m_socketsBeingScanned.erase( it );
-//
-//    if( m_socketsBeingScanned.empty() )
-//        m_cond.wakeAll();
-//}
+size_t QnIpRangeCheckerAsync::hostsChecked() const
+{
+    QMutexLocker lk( &m_mutex );
+    return (m_nextIPToCheck - m_startIpv4) - m_socketsBeingScanned.size();
+}
+
+int QnIpRangeCheckerAsync::maxHostsCheckedSimultaneously()
+{
+    return MAX_HOSTS_CHECKED_SIMULTANEOUSLY;
+}
 
 bool QnIpRangeCheckerAsync::launchHostCheck()
 {
-    quint32 ipToCheck = m_nextIPToCheck++;
-    if( ipToCheck > m_endIpv4 )
-        return false;  //all ip addresses are being scanned at the moment
+    if( m_terminated )
+        return false;
 
-    std::shared_ptr<nx_http::AsyncHttpClient> httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    if( m_nextIPToCheck > m_endIpv4 )
+        return false;  //all ip addresses are being scanned at the moment
+    quint32 ipToCheck = m_nextIPToCheck++;
+
+    nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     connect(
-        httpClient.get(), SIGNAL(responseReceived( nx_http::AsyncHttpClientPtr )),
-        this, SLOT(onDone( nx_http::AsyncHttpClientPtr )),
+        httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
+        this, &QnIpRangeCheckerAsync::onDone,
         Qt::DirectConnection );
     connect(
-        httpClient.get(), SIGNAL(done( nx_http::AsyncHttpClientPtr )),
-        this, SLOT(onDone( nx_http::AsyncHttpClientPtr )),
+        httpClient.get(), &nx_http::AsyncHttpClient::done,
+        this, &QnIpRangeCheckerAsync::onDone,
         Qt::DirectConnection );
     if( !httpClient->doGet( QUrl( lit("http://%1:%2/").arg(QHostAddress(ipToCheck).toString()).arg(m_portToScan) ) ) )
         return true;
@@ -96,23 +109,16 @@ bool QnIpRangeCheckerAsync::launchHostCheck()
     return true;
 }
 
-void QnIpRangeCheckerAsync::waitForScanToFinish()
-{
-    //waiting for scan to finish
-    QMutexLocker lk( &m_mutex );
-    while( !m_socketsBeingScanned.empty() )
-        m_cond.wait( lk.mutex() );
-}
-
 void QnIpRangeCheckerAsync::onDone( nx_http::AsyncHttpClientPtr httpClient )
 {
     QMutexLocker lk( &m_mutex );
 
-    std::set<std::shared_ptr<nx_http::AsyncHttpClient> >::iterator it = m_socketsBeingScanned.find( httpClient );
+    std::set<nx_http::AsyncHttpClientPtr>::iterator it = m_socketsBeingScanned.find( httpClient );
     Q_ASSERT( it != m_socketsBeingScanned.end() );
     if( httpClient->totalBytesRead() > 0 )
         m_openedIPs.push_back( httpClient->url().host() );
 
+    httpClient->terminate();
     m_socketsBeingScanned.erase( it );
 
     launchHostCheck();

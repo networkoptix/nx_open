@@ -3,9 +3,19 @@
 #include <QtCore/QUrl>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
+
 #include "utils/common/delete_later.h"
 #include "api/session_manager.h"
+#include <api/app_server_connection.h>
+#include <api/model/ping_reply.h>
+#include <api/network_proxy_factory.h>
+#include <rest/server/json_rest_result.h>
 #include "utils/common/sleep.h"
+#include "utils/network/networkoptixmodulerevealcommon.h"
+#include <utils/common/app_info.h>
+
+
+const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
 
 class QnMediaServerResourceGuard: public QObject {
 public:
@@ -15,17 +25,23 @@ private:
     QnMediaServerResourcePtr m_resource;
 };
 
-QnMediaServerResource::QnMediaServerResource():
-    QnResource(),
-    m_panicMode(PM_None),
-    m_guard(NULL)
+QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePool):
+    m_primaryIFSelected(false),
+    m_serverFlags(Qn::SF_None),
+    m_panicMode(Qn::PM_None),
+    m_guard(NULL),
+    m_maxCameras(0),
+    m_redundancy(false)
 {
-    setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
-    addFlags(QnResource::server | QnResource::remote);
-    removeFlags(QnResource::media); // TODO: #Elric is this call needed here?
+    setTypeId(resTypePool->getFixedResourceTypeId(lit("Server")));
+    addFlags(Qn::server | Qn::remote);
+    removeFlags(Qn::media); // TODO: #Elric is this call needed here?
+
+    //TODO: #GDM #EDGE in case of EDGE servers getName should return name of its camera. Possibly name just should be synced on Server.
     setName(tr("Server"));
 
     m_primaryIFSelected = false;
+    m_statusTimer.restart();
 }
 
 QnMediaServerResource::~QnMediaServerResource()
@@ -35,10 +51,7 @@ QnMediaServerResource::~QnMediaServerResource()
 
 QString QnMediaServerResource::getUniqueId() const
 {
-    QMutexLocker mutexLocker(&m_mutex); // needed here !!!
-    QnMediaServerResource* nonConstThis = const_cast<QnMediaServerResource*> (this);
-    if (!getId().isValid())
-        nonConstThis->setId(QnId::generateSpecialId());
+    assert(!getId().isNull());
     return QLatin1String("Server ") + getId().toString();
 }
 
@@ -58,28 +71,42 @@ QString QnMediaServerResource::getApiUrl() const
     return m_apiUrl;
 }
 
-void QnMediaServerResource::setStreamingUrl(const QString& value)
-{
-    QMutexLocker lock(&m_mutex);
-    m_streamingUrl = value;
-}
-
-QString QnMediaServerResource::getStreamingUrl() const
-{
-    QMutexLocker lock(&m_mutex);
-    return m_streamingUrl;
-}
-
 void QnMediaServerResource::setNetAddrList(const QList<QHostAddress>& netAddrList)
 {
     QMutexLocker lock(&m_mutex);
     m_netAddrList = netAddrList;
 }
 
-QList<QHostAddress> QnMediaServerResource::getNetAddrList()
+const QList<QHostAddress>& QnMediaServerResource::getNetAddrList() const
 {
     QMutexLocker lock(&m_mutex);
     return m_netAddrList;
+}
+
+void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
+{
+    QMutexLocker lock(&m_mutex);
+    m_additionalUrls = urls;
+    emit auxUrlsChanged(::toSharedPointer(this));
+}
+
+QList<QUrl> QnMediaServerResource::getAdditionalUrls() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_additionalUrls;
+}
+
+void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
+{
+    QMutexLocker lock(&m_mutex);
+    m_ignoredUrls = urls;
+    emit auxUrlsChanged(::toSharedPointer(this));
+}
+
+QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_ignoredUrls;
 }
 
 QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
@@ -89,17 +116,17 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     /* We want the video server connection to be deleted in its associated thread, 
      * no matter where the reference count reached zero. Hence the custom deleter. */
     if (!m_restConnection && !m_apiUrl.isEmpty())
-        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(this), &qnDeleteLater);
+        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(this, QnAppServerConnectionFactory::videowallGuid()), &qnDeleteLater);
 
     return m_restConnection;
 }
 
-QnResourcePtr QnMediaServerResourceFactory::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnMediaServerResourceFactory::createResource(const QUuid& resourceTypeId, const QnResourceParams& /*params*/)
 {
     Q_UNUSED(resourceTypeId)
 
-    QnResourcePtr result(new QnMediaServerResource());
-    result->deserialize(parameters);
+    QnResourcePtr result(new QnMediaServerResource(qnResTypePool));
+    //result->deserialize(parameters);
 
     return result;
 }
@@ -143,19 +170,19 @@ void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int resp
 {
     QMutexLocker lock(&m_mutex);
 
-    QString urlStr = m_runningIfRequests.value(responseNum);
-    QByteArray guid = getGuid().toUtf8();
-    if (response.data.contains("Requested method is absent") 
-        || response.data.contains(guid) 
-        || response.data.contains("<time><clock>")
-        || response.data.contains("timeZoneOffset")
-        )
+    const QString& urlStr = m_runningIfRequests.value(responseNum);
+    if( response.status == QNetworkReply::NoError )
     {
-        // server OK
-        if (urlStr == QLatin1String("proxy"))
-            setPrimaryIF(urlStr);
-        else
-            setPrimaryIF(QUrl(urlStr).host());
+        QnPingReply reply;
+        QnJsonRestResult result;
+        if( QJson::deserialize(response.data, &result) && QJson::deserialize(result.reply(), &reply) && (reply.moduleGuid == getId()) )
+        {
+            // server OK
+            if (urlStr == QnMediaServerResource::USE_PROXY)
+                setPrimaryIF(urlStr);
+            else
+                setPrimaryIF(QUrl(urlStr).host());
+        }
     }
 
     m_runningIfRequests.remove(responseNum);
@@ -168,25 +195,26 @@ void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int resp
 
 void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
 {
-    QMutexLocker lock(&m_mutex);
-    if (m_primaryIFSelected)
-        return;
-    m_primaryIFSelected = true;
-    
     QUrl origApiUrl = getApiUrl();
-
-    if (primaryIF != QLatin1String("proxy"))
     {
-        QUrl apiUrl(getApiUrl());
-        apiUrl.setHost(primaryIF);
-        setApiUrl(apiUrl.toString());
+        QMutexLocker lock(&m_mutex);
+        if (m_primaryIFSelected)
+            return;
+        m_primaryIFSelected = true;
+    
+        if (primaryIF != USE_PROXY)
+        {
+            QUrl apiUrl(getApiUrl());
+            apiUrl.setHost(primaryIF);
+            setApiUrl(apiUrl.toString());
 
-        QUrl url(getUrl());
-        url.setHost(primaryIF);
-        setUrl(url.toString());
+            QUrl url(getUrl());
+            url.setHost(primaryIF);
+            setUrl(url.toString());
+        }
+
+        m_primaryIf = primaryIF;
     }
-
-    m_primaryIf = primaryIF;
     emit serverIfFound(::toSharedPointer(this), primaryIF, origApiUrl.toString());
 }
 
@@ -197,34 +225,38 @@ QString QnMediaServerResource::getPrimaryIF() const
     return m_primaryIf;
 }
 
-void QnMediaServerResource::setReserve(bool reserve)
-{
-    m_reserve = reserve;
-}
-
-bool QnMediaServerResource::getReserve() const
-{
-    return m_reserve;
-}
-
-QnMediaServerResource::PanicMode QnMediaServerResource::getPanicMode() const {
+Qn::PanicMode QnMediaServerResource::getPanicMode() const {
     return m_panicMode;
 }
 
-void QnMediaServerResource::setPanicMode(PanicMode panicMode) {
-    if(m_panicMode == panicMode)
-        return;
-
-    m_panicMode = panicMode;
-
-    emit panicModeChanged(::toSharedPointer(this)); // TODO: #Elric emit it AFTER mutex unlock.
+void QnMediaServerResource::setPanicMode(Qn::PanicMode panicMode) {
+    {
+        QMutexLocker lock(&m_mutex);
+        if(m_panicMode == panicMode)
+            return;
+        m_panicMode = panicMode;
+    }
+    emit panicModeChanged(::toSharedPointer(this));
 }
+
+Qn::ServerFlags QnMediaServerResource::getServerFlags() const
+{
+    return m_serverFlags;
+}
+
+void QnMediaServerResource::setServerFlags(Qn::ServerFlags flags)
+{
+    m_serverFlags = flags;
+}
+
 
 void QnMediaServerResource::determineOptimalNetIF()
 {
     QMutexLocker lock(&m_mutex);
-    //if (m_prevNetAddrList == m_netAddrList)
-    //    return;
+    
+    //using proxy before we able to establish direct connection
+    setPrimaryIF( QnMediaServerResource::USE_PROXY );
+
     m_prevNetAddrList = m_netAddrList;
     m_primaryIFSelected = false;
 
@@ -232,21 +264,9 @@ void QnMediaServerResource::determineOptimalNetIF()
     {
         QUrl url(m_apiUrl);
         url.setHost(m_netAddrList[i].toString());
-        //TestConnectionTask *task = new TestConnectionTask(::toSharedPointer(this), url);
-        //QThreadPool::globalInstance()->start(task);
         int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(url, QLatin1String("ping"), this, "at_pingResponse", Qt::DirectConnection);
         m_runningIfRequests.insert(requestNum, url.toString());
     }
-
-    // send request via proxy (ping request always send directly, other request are sent via proxy here)
-    QTimer *timer = new QTimer();
-    timer->setSingleShot(true);
-    connect(timer, SIGNAL(timeout()), this, SLOT(determineOptimalNetIF_testProxy()), Qt::DirectConnection);
-    connect(timer, SIGNAL(timeout()), timer, SLOT(deleteLater()));
-    timer->start(5); // send request slighty later to preffer direct connect // TODO: #Elric still bad, implement properly
-    timer->moveToThread(qApp->thread());
-
-    m_runningIfRequests.insert(-1, QString());
 
     if(!m_guard) {
         m_guard = new QnMediaServerResourceGuard(::toSharedPointer(this));
@@ -254,36 +274,32 @@ void QnMediaServerResource::determineOptimalNetIF()
     }
 }
 
-void QnMediaServerResource::determineOptimalNetIF_testProxy() {
-    QMutexLocker lock(&m_mutex);
-    m_runningIfRequests.remove(-1);
-    int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(QUrl(m_apiUrl), QLatin1String("gettime"), this, "at_pingResponse", Qt::DirectConnection);
-    m_runningIfRequests.insert(requestNum, QLatin1String("proxy"));
-}
-
-void QnMediaServerResource::updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) 
-{
-    QMutexLocker lock(&m_mutex);
-
+void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
     QString oldUrl = m_url;
     QnResource::updateInner(other, modifiedFields);
     bool netAddrListChanged = false;
 
-    QnMediaServerResourcePtr localOther = other.dynamicCast<QnMediaServerResource>();
+    QnMediaServerResource* localOther = dynamic_cast<QnMediaServerResource*>(other.data());
     if(localOther) {
         if (m_panicMode != localOther->m_panicMode)
             modifiedFields << "panicModeChanged";
+        if (m_version != localOther->m_version)
+            modifiedFields << "versionChanged";
+
         m_panicMode = localOther->m_panicMode;
 
-        m_reserve = localOther->m_reserve;
+        m_serverFlags = localOther->m_serverFlags;
         netAddrListChanged = m_netAddrList != localOther->m_netAddrList;
         m_netAddrList = localOther->m_netAddrList;
-        m_streamingUrl = localOther->getStreamingUrl();
-        m_version = localOther->getVersion();
+        m_version = localOther->m_version;
+        m_systemInfo = localOther->m_systemInfo;
+        m_systemName = localOther->m_systemName;
+        m_redundancy = localOther->m_redundancy;
+        m_maxCameras = localOther->m_maxCameras;
 
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         
-        /* Keep indices unchanged (EC does not provide this info). */
+        /* Keep indices unchanged (Server does not provide this info). */
         foreach(const QnAbstractStorageResourcePtr &storage, m_storages)
         {
             foreach(const QnAbstractStorageResourcePtr &otherStorage, otherStorages)
@@ -305,19 +321,6 @@ void QnMediaServerResource::updateInner(QnResourcePtr other, QSet<QByteArray>& m
     }
 }
 
-
-QString QnMediaServerResource::getProxyHost()
-{
-    QnMediaServerConnectionPtr connection = apiConnection();
-    return connection ? connection->getProxyHost() : QString();
-}
-
-int QnMediaServerResource::getProxyPort()
-{
-    QnMediaServerConnectionPtr connection = apiConnection();
-    return connection ? connection->getProxyPort() : 0;
-}
-
 QnSoftwareVersion QnMediaServerResource::getVersion() const
 {
     QMutexLocker lock(&m_mutex);
@@ -325,9 +328,116 @@ QnSoftwareVersion QnMediaServerResource::getVersion() const
     return m_version;
 }
 
-void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
+int QnMediaServerResource::getMaxCameras() const
 {
     QMutexLocker lock(&m_mutex);
+    return m_maxCameras;
+}
 
-    m_version = version;
+void QnMediaServerResource::setRedundancy(bool value)
+{
+    QMutexLocker lock(&m_mutex);
+    m_redundancy = value;
+}
+
+int QnMediaServerResource::isRedundancy() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_redundancy;
+}
+
+void QnMediaServerResource::setMaxCameras(int value)
+{
+    QMutexLocker lock(&m_mutex);
+    m_maxCameras = value;
+}
+
+void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
+{
+    {
+        QMutexLocker lock(&m_mutex);
+        if (m_version == version)
+            return;
+        m_version = version;
+    }
+    emit versionChanged(::toSharedPointer(this));
+}
+
+QnSystemInformation QnMediaServerResource::getSystemInfo() const {
+    QMutexLocker lock(&m_mutex);
+
+    return m_systemInfo;
+}
+
+void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo) {
+    QMutexLocker lock(&m_mutex);
+
+    m_systemInfo = systemInfo;
+}
+
+QString QnMediaServerResource::getSystemName() const {
+    QMutexLocker lock(&m_mutex);
+
+    return m_systemName;
+}
+
+void QnMediaServerResource::setSystemName(const QString &systemName) {
+    {
+        QMutexLocker lock(&m_mutex);
+
+        if (m_systemName == systemName)
+            return;
+
+        m_systemName = systemName;
+    }
+    emit systemNameChanged(toSharedPointer(this));
+}
+
+QnModuleInformation QnMediaServerResource::getModuleInformation() const {
+    QMutexLocker lock(&m_mutex);
+
+    QnModuleInformation moduleInformation;
+    moduleInformation.type = nxMediaServerId;
+    moduleInformation.customization = QnAppInfo::customizationName();
+    moduleInformation.version = m_version;
+    moduleInformation.systemInformation = m_systemInfo;
+    moduleInformation.systemName = m_systemName;
+    moduleInformation.name = getName();
+    moduleInformation.port = QUrl(m_apiUrl).port();
+    foreach (const QHostAddress &address, m_netAddrList)
+        moduleInformation.remoteAddresses.insert(address.toString());
+    moduleInformation.id = getId();
+    moduleInformation.sslAllowed = false;
+    return moduleInformation;
+}
+
+bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
+    if (QnMediaServerResource* server = dynamic_cast<QnMediaServerResource*>(resource.data())) 
+        return (server->getServerFlags() & Qn::SF_Edge);
+    return false;
+}
+
+void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
+{
+    if (getStatus() != newStatus) {
+        QMutexLocker lock(&m_mutex);
+        m_statusTimer.restart();
+    }
+    QnResource::setStatus(newStatus, silenceMode);
+}
+
+qint64 QnMediaServerResource::currentStatusTime() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_statusTimer.elapsed();
+}
+
+QString QnMediaServerResource::getAuthKey() const
+{
+    return m_authKey;
+}
+
+void QnMediaServerResource::setAuthKey(const QString& authKey)
+{
+    m_authKey = authKey;
 }

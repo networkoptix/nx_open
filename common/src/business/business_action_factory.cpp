@@ -6,10 +6,10 @@
 #include <business/actions/sendmail_business_action.h>
 #include <business/actions/common_business_action.h>
 
-QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, Qn::ToggleState state) {
-    if (BusinessActionType::requiresCameraResource(rule->actionType()) && rule->actionResources().isEmpty())
+QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, QnBusiness::EventState state) {
+    if (QnBusiness::requiresCameraResource(rule->actionType()) && rule->actionResources().isEmpty())
         return QnAbstractBusinessActionPtr(); //camera is not exists anymore
-    //TODO: #GDM check resource type?
+    //TODO: #GDM #Business check resource type?
 
     QnBusinessEventParameters runtimeParams = event->getRuntimeParams();
 
@@ -18,8 +18,8 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnB
     result->setParams(rule->actionParams());
     result->setResources(rule->actionResources());
 
-    if (BusinessEventType::hasToggleState(event->getEventType()) && BusinessActionType::hasToggleState(rule->actionType())) {
-        Qn::ToggleState value = state != Qn::UndefinedState ? state : event->getToggleState();
+    if (QnBusiness::hasToggleState(event->getEventType()) && QnBusiness::hasToggleState(rule->actionType())) {
+        QnBusiness::EventState value = state != QnBusiness::UndefinedState ? state : event->getToggleState();
         result->setToggleState(value);
     }
     result->setBusinessRuleId(rule->id());
@@ -31,6 +31,8 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnB
                                                                        const QnAbstractBusinessEventPtr &event,
                                                                        const QnBusinessAggregationInfo &aggregationInfo) {
     QnAbstractBusinessActionPtr result = instantiateAction(rule, event);
+    if (!result)
+        return result;
     result->setAggregationCount(aggregationInfo.totalCount());
 
     if (QnSendMailBusinessActionPtr sendMailAction = result.dynamicCast<QnSendMailBusinessAction>()) {
@@ -40,23 +42,23 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnB
     return result;
 }
 
-QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters &runtimeParams) {
+QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusiness::ActionType actionType, const QnBusinessEventParameters &runtimeParams) {
     switch(actionType)
     {
-        case BusinessActionType::NotDefined:
-        case BusinessActionType::Bookmark:
-        case BusinessActionType::Diagnostics:
-        case BusinessActionType::ShowPopup:
-        case BusinessActionType::PlaySound:
-        case BusinessActionType::PlaySoundRepeated:
-        case BusinessActionType::SayText:
+        case QnBusiness::UndefinedAction:
+        case QnBusiness::BookmarkAction:
+        case QnBusiness::DiagnosticsAction:
+        case QnBusiness::ShowPopupAction:
+        case QnBusiness::PlaySoundOnceAction:
+        case QnBusiness::PlaySoundAction:
+        case QnBusiness::SayTextAction:
             return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
 
-        case BusinessActionType::CameraOutput:       return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(false, runtimeParams));
-        case BusinessActionType::CameraOutputInstant:return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(true, runtimeParams));
-        case BusinessActionType::CameraRecording:    return QnAbstractBusinessActionPtr(new QnRecordingBusinessAction(runtimeParams));
-        case BusinessActionType::PanicRecording:     return QnAbstractBusinessActionPtr(new QnPanicBusinessAction(runtimeParams));
-        case BusinessActionType::SendMail:           return QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(runtimeParams));
+        case QnBusiness::CameraOutputAction:       return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(false, runtimeParams));
+        case QnBusiness::CameraOutputOnceAction:return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(true, runtimeParams));
+        case QnBusiness::CameraRecordingAction:    return QnAbstractBusinessActionPtr(new QnRecordingBusinessAction(runtimeParams));
+        case QnBusiness::PanicRecordingAction:     return QnAbstractBusinessActionPtr(new QnPanicBusinessAction(runtimeParams));
+        case QnBusiness::SendMailAction:           return QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(runtimeParams));
+        default: return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
     }
-    return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
 }

@@ -4,11 +4,11 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include "plugins/resources/archive/avi_files/avi_resource.h"
+#include "plugins/resource/avi/avi_resource.h"
 
 #include <api/media_server_connection.h>
 #include "core/resource/resource_fwd.h"
-#include "device_plugins/desktop_win/device/desktop_resource.h"
+#include "plugins/resource/desktop_win/desktop_resource.h"
 
 enum {
     ServerTimeUpdatePeriod = 1000 * 60 * 2, /* 2 minutes. */
@@ -47,7 +47,11 @@ void QnWorkbenchDesktopCameraWatcher::at_resourcePool_resourceAdded(const QnReso
     {
         connect(server.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), this, SLOT(at_server_serverIfFound(const QnMediaServerResourcePtr &)));
         connect(server.data(), SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
-        if (server->getStatus() == QnResource::Online) {
+        if (!server->getPrimaryIF().isEmpty()) {
+            m_serverList << server;
+            processServer(server);
+        }
+        else if (server->getStatus() == Qn::Online) {
             m_serverList << server;
             processServer(server);
         }
@@ -69,7 +73,7 @@ void QnWorkbenchDesktopCameraWatcher::at_resourcePool_resourceRemoved(const QnRe
         m_serverList.remove(server);
         disconnect(server.data(), NULL, this, NULL);
 
-        QnDesktopResourcePtr desktop = qnResPool->getResourceByGuid(QnDesktopResource::getDesktopResourceUuid().toString()).dynamicCast<QnDesktopResource>();
+        QnDesktopResourcePtr desktop = qnResPool->getResourceById(QnDesktopResource::getDesktopResourceUuid()).dynamicCast<QnDesktopResource>();
         if (desktop)
             desktop->removeConnection(server);
     }
@@ -94,10 +98,10 @@ void QnWorkbenchDesktopCameraWatcher::at_resource_statusChanged(const QnResource
 
 void QnWorkbenchDesktopCameraWatcher::processServer(QnMediaServerResourcePtr server)
 {
-    QnDesktopResourcePtr desktop = qnResPool->getResourceByGuid(QnDesktopResource::getDesktopResourceUuid().toString()).dynamicCast<QnDesktopResource>();
+    QnDesktopResourcePtr desktop = qnResPool->getResourceById(QnDesktopResource::getDesktopResourceUuid()).dynamicCast<QnDesktopResource>();
     if (desktop && m_serverList.contains(server)) 
     {
-        if (server->getStatus() == QnResource::Online)
+        if (server->getStatus() == Qn::Online)
             desktop->addConnection(server);
         else
             desktop->removeConnection(server);
@@ -106,7 +110,7 @@ void QnWorkbenchDesktopCameraWatcher::processServer(QnMediaServerResourcePtr ser
 
 void QnWorkbenchDesktopCameraWatcher::at_recordingSettingsChanged()
 {
-    QnDesktopResourcePtr desktop = qnResPool->getResourceByGuid(QnDesktopResource::getDesktopResourceUuid().toString()).dynamicCast<QnDesktopResource>();
+    QnDesktopResourcePtr desktop = qnResPool->getResourceById(QnDesktopResource::getDesktopResourceUuid()).dynamicCast<QnDesktopResource>();
     if (!desktop)
         return;
 

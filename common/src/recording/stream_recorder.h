@@ -1,6 +1,8 @@
 #ifndef _STREAM_RECORDER_H__
 #define _STREAM_RECORDER_H__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
 
@@ -14,7 +16,8 @@ extern "C"
 #include <core/ptz/item_dewarping_params.h>
 
 #include <core/dataconsumer/abstract_data_consumer.h>
-#include <core/datapacket/media_data_packet.h>
+#include <core/datapacket/audio_data_packet.h>
+#include <core/datapacket/video_data_packet.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/storage_resource.h>
@@ -30,7 +33,9 @@ class QnStreamRecorder : public QnAbstractDataConsumer
     Q_ENUMS(StreamRecorderError)
     Q_ENUMS(Role)
 public:
+    // TODO: #Elric #enum
     enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithEmptyContext};
+
     enum StreamRecorderError {
         NoError = 0,
         ContainerNotFoundError,
@@ -45,7 +50,7 @@ public:
 
     static QString errorString(int errCode);
 
-    QnStreamRecorder(QnResourcePtr dev);
+    QnStreamRecorder(const QnResourcePtr& dev);
     virtual ~QnStreamRecorder();
 
     /*
@@ -65,7 +70,7 @@ public:
     
     qint64 duration() const  { return m_endDateTime - m_startDateTime; }
     
-    virtual bool processData(QnAbstractDataPacketPtr data) override;
+    virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
     void setStartOffset(qint64 value);
 
@@ -91,7 +96,7 @@ public:
     void setRole(Role role);
     void setTimestampCorner(Qn::Corner pos);
 
-    void setStorage(QnStorageResourcePtr storage);
+    void setStorage(const QnStorageResourcePtr& storage);
 
     void setContainer(const QString& container);
     void setNeedReopen();
@@ -123,14 +128,14 @@ signals:
     void recordingFinished(int status, const QString &fileName);
 protected:
     virtual void endOfRun();
-    bool initFfmpegContainer(QnConstCompressedVideoDataPtr mediaData);
+    bool initFfmpegContainer(const QnConstCompressedVideoDataPtr& mediaData);
 
     void setPrebufferingUsec(int value);
     void flushPrebuffer();
     int getPrebufferingUsec() const;
-    virtual bool needSaveData(QnConstAbstractMediaDataPtr media);
+    virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media);
 
-    virtual bool saveMotion(QnConstMetaDataV1Ptr media);
+    virtual bool saveMotion(const QnConstMetaDataV1Ptr& media);
 
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider *provider, qint64 fileSize) {
         Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
@@ -142,8 +147,8 @@ protected:
 
     bool addSignatureFrame();
     void markNeedKeyData();
-    virtual bool saveData(QnConstAbstractMediaDataPtr md);
-    virtual void writeData(QnConstAbstractMediaDataPtr md, int streamIndex);
+    virtual bool saveData(const QnConstAbstractMediaDataPtr& md);
+    virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex);
 private:
     void updateSignatureAttr();
     qint64 findNextIFrame(qint64 baseTime);
@@ -195,7 +200,6 @@ private:
     CodecID m_dstAudioCodec;
     CodecID m_dstVideoCodec;
     qint64 m_onscreenDateOffset;
-    Role m_role;
     Qn::Corner m_timestampCorner;
     qint64 m_serverTimeZoneMs;
 
@@ -207,6 +211,9 @@ private:
 
     /** If true method close() will emit signal recordingFinished() at the end. */
     bool m_recordingFinished;
+    Role m_role;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // _STREAM_RECORDER_H__

@@ -3,7 +3,7 @@
 #include <business/business_action_parameters.h>
 
 QnRecordingBusinessAction::QnRecordingBusinessAction(const QnBusinessEventParameters &runtimeParams):
-    base_type(BusinessActionType::CameraRecording, runtimeParams)
+    base_type(QnBusiness::CameraRecordingAction, runtimeParams)
 {
 }
 

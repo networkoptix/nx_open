@@ -58,4 +58,7 @@ QN_EXPORT QHostAddress resolveAddress(const QString& addr);
 QN_EXPORT int strEqualAmount(const char* str1, const char* str2);
 QN_EXPORT bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress);
 
+static const int MAC_ADDR_LEN = 18;
+QN_EXPORT void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host);
+
 #endif //cl_net_tools_1232

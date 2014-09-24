@@ -1,0 +1,18 @@
+<div class="content">
+    <div class="callout">
+        <h4>Date(s) when the motion is detected:</h4>
+        {{#aggregated}}
+        <table class="details">
+            <tr>
+                <td><i>{{timestamp}}</i></td>
+            </tr>
+        </table>
+        {{/aggregated}}
+    </div>
+{{#screenshot}}
+    <div>
+        <img alt="Screenshot" src="{{screenshot}}"/>
+    </div>
+{{/screenshot}}
+</div>
+

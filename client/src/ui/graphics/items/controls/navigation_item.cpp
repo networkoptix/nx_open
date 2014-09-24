@@ -7,7 +7,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QGraphicsProxyWidget>
 
-#include <plugins/resources/archive/abstract_archive_stream_reader.h>
+#include <plugins/resource/archive/abstract_archive_stream_reader.h>
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -260,6 +260,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     addAction(action(Qn::ToggleMuteAction));
     addAction(action(Qn::ToggleSyncAction));
     addAction(action(Qn::ToggleCalendarAction));
+
+#ifdef QN_ENABLE_BOOKMARKS
+    addAction(action(Qn::ToggleBookmarksSearchAction));
+#endif
 
     //connect(speedDownAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepBackward())); // TODO
     //connect(speedUpAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepForward())); // TODO

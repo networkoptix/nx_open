@@ -1,10 +1,16 @@
-#ifndef abstract_data_processor_h_2111
-#define abstract_data_processor_h_2111
+#ifndef abstract_data_consumer_h_2111
+#define abstract_data_consumer_h_2111
 
-#include "core/datapacket/abstract_data_packet.h"
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include "abstract_data_receptor.h"
 #include "utils/common/long_runnable.h"
+#include "../datapacket/data_queue.h"
 
-class QN_EXPORT QnAbstractDataConsumer : public QnLongRunnable
+class QN_EXPORT QnAbstractDataConsumer
+:
+    public QnLongRunnable,
+    public QnAbstractDataReceptor
 {
     Q_OBJECT
 
@@ -15,8 +21,8 @@ public:
     /**
       * @return true is there is any space in the queue, false otherwise
       */
-    virtual bool canAcceptData() const;
-    virtual void putData(QnAbstractDataPacketPtr data);
+    virtual bool canAcceptData() const override;
+    virtual void putData( const QnAbstractDataPacketPtr& data ) override;
     virtual void clearUnprocessedData();
     int queueSize() const;
     virtual void setSingleShotMode(bool /*single*/) {}
@@ -27,11 +33,13 @@ public:
 
 protected:
     void run();
-    virtual bool processData(QnAbstractDataPacketPtr /*data*/)=0;
+    virtual bool processData(const QnAbstractDataPacketPtr& data) = 0;
     virtual void endOfRun();
 
 protected:
     CLDataQueue m_dataQueue;
 };
 
-#endif // abstract_data_processor_h_2111
+#endif // ENABLE_DATA_PROVIDERS
+
+#endif // abstract_data_consumer_h_2111

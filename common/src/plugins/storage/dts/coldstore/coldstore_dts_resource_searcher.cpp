@@ -1,3 +1,6 @@
+#include "coldstore_dts_reader_factory.h"
+
+#ifdef ENABLE_COLDSTORE
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
@@ -9,7 +12,6 @@
 #include "../../coldstore/coldstore_api/ISFS.h"
 #include "utils/common/log.h"
 #include "../../coldstore/coldstore_api/sfs-client.h"
-#include "coldstore_dts_reader_factory.h"
 #include "utils/network/socket.h"
 #include "utils/network/system_socket.h"
 
@@ -21,7 +23,7 @@ QString macFromString(QString str)
     str = str.toUpper();
 
     
-    QByteArray ba = str.toLocal8Bit();
+    QByteArray ba = str.toLatin1();
     const char* cstr = ba.data();
 
     int count = 0;
@@ -106,13 +108,13 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
 
         UDPSocket sendSocket, recvSocket;
 
-        bool bindSucceeded = sendSocket.setLocalAddressAndPort(localAddress.toString(), 0);
+        bool bindSucceeded = sendSocket.bind(SocketAddress(localAddress.toString(), 0));
 
         if (!bindSucceeded)
             continue;
 
         recvSocket.setReuseAddrFlag(true);
-        bindSucceeded = recvSocket.setLocalPort(coldStoreRecvPort);
+        bindSucceeded = recvSocket.bind( SocketAddress(HostAddress::anyHost, coldStoreRecvPort) );
         if (!bindSucceeded)
             continue;
 
@@ -120,7 +122,7 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
             continue;
 
 
-        sendSocket.sendTo(m_request->data(), m_request->size(), groupAddress.toString(), coldStoreSendPort);
+        sendSocket.sendTo(m_request->data(), m_request->size(), SocketAddress(groupAddress.toString(), coldStoreSendPort));
 
 
         QElapsedTimer time;
@@ -163,7 +165,7 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
 
         foreach(const QHostAddress& srv, server_list)
         {
-//			cl_log.log(QLatin1String("Found CS = "), srv.name, cl_logALWAYS);
+//			NX_LOG(QLatin1String("Found CS = "), srv.name, cl_logALWAYS);
 
             if (!m_factoryList.contains(srv.toString()))
                 m_factoryList[srv.toString()] =  new QnColdstoreDTSreaderFactory(srv.toString());
@@ -185,10 +187,10 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
 {
     Veracity::ISFS* sfs_client = new Veracity::SFSClient();
 
-    QByteArray ipba = addr.toString().toLocal8Bit();
+    QByteArray ipba = addr.toString().toLatin1();
     const char* ip = ipba.data();
     
-//	cl_log.log(QLatin1String("CS checking for files"), cl_logALWAYS);
+//	NX_LOG(QLatin1String("CS checking for files"), cl_logALWAYS);
 
     if (sfs_client->Connect(ip) != Veracity::ISFS::STATUS_SUCCESS)
     {
@@ -220,7 +222,7 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
     &return_results_sizeI, &return_results_countI);
     Q_UNUSED(status)
 
-//	cl_log.log(QLatin1String("CS checking for files, returned: "), (int)return_results_countI, cl_logALWAYS);
+//	NX_LOG(QLatin1String("CS checking for files, returned: "), (int)return_results_countI, cl_logALWAYS);
 
     char *data = resultBA.data();
     const char* endpoint = data + return_results_sizeI;
@@ -254,3 +256,5 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
     delete sfs_client;
     
 }
+
+#endif // ENABLE_COLDSTORE

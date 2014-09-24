@@ -69,13 +69,13 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QUrl& url, unsigned int timeout, co
     m_dataRestLen(0),
     m_localPort(0)
 {
-    initSocket();
+    initSocket(url.scheme() == lit("https"));
 }
 
 
-void CLSimpleHTTPClient::initSocket()
+void CLSimpleHTTPClient::initSocket(bool ssl)
 {
-    m_sock = TCPSocketPtr( SocketFactory::createStreamSocket() );
+    m_sock = TCPSocketPtr(SocketFactory::createStreamSocket(ssl));
 
     if( !m_sock->setRecvTimeout(m_timeout) || !m_sock->setSendTimeout(m_timeout) )
     {
@@ -98,12 +98,12 @@ void CLSimpleHTTPClient::addHeader(const QByteArray& key, const QByteArray& valu
     m_additionHeaders[key] = value;
 }
 
-CLHttpStatus CLSimpleHTTPClient::doPOST(const QString& requestStr, const QString& body)
+CLHttpStatus CLSimpleHTTPClient::doPOST(const QString& requestStr, const QString& body, bool recursive)
 {
-    return doPOST(requestStr.toUtf8(), body);
+    return doPOST(requestStr.toUtf8(), body, recursive);
 }
 
-CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QString& body)
+CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QString& body, bool recursive)
 {
     if (!m_sock)
         return CL_TRANSPORT_ERROR;
@@ -119,7 +119,9 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
         }
 
         QByteArray request;
-        request.append("POST /");
+        request.append("POST ");
+        if( !requestStr.startsWith('/') )
+            request.append('/');
         request.append(requestStr);
         request.append(" HTTP/1.1\r\n");
         request.append("Host: ");
@@ -139,7 +141,7 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
         }
         else if (m_auth.password().length()>0 && !mNonce.isEmpty())
         {
-            request.append(digestAccess(QLatin1String(request)));
+            request.append(digestAccess(lit("POST"), QLatin1String(requestStr)));
         }
 
         request.append("Content-Length: ");
@@ -178,7 +180,10 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
             case CL_HTTP_AUTH_REQUIRED:
             {
                 getAuthInfo();
-                return CL_HTTP_AUTH_REQUIRED;
+                if (recursive)
+                    return doPOST(requestStr, body, false);
+                else
+                    return CL_HTTP_AUTH_REQUIRED;
             }
 
             default:
@@ -314,7 +319,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
         }
         else if (m_auth.password().length()>0 && !mNonce.isEmpty())
         {
-            request.append(digestAccess(QLatin1String(requestStr)));
+            request.append(digestAccess(lit("GET"), QLatin1String(requestStr)));
         }
 
         request.append("\r\n");
@@ -359,7 +364,6 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
             {
                 return CL_HTTP_NOT_ALLOWED;
             }
-            //else if (m_responseLine.contains("302 moved")) // TODO: #MERGE was "302 moved" || "302 found"
             else if( statusLine.statusCode == nx_http::StatusCode::moved )
             {
                 return CL_HTTP_REDIRECT;
@@ -398,12 +402,17 @@ void CLSimpleHTTPClient::readAll(QByteArray& data)
         m_dataRestLen = 0;
     }
 
+    if (m_contentLen && m_contentLen == data.size())
+        return;
+
     static const unsigned long BUFSIZE = 1024;
     int nRead;
     char buf[BUFSIZE];
     while ((nRead = read(buf, BUFSIZE)) > 0)
     {
         data.append(buf, nRead);
+        if (m_contentLen && m_contentLen == data.size())
+            return;
     }
 }
 
@@ -490,7 +499,7 @@ QByteArray CLSimpleHTTPClient::basicAuth() const
     return basicAuth(m_auth);
 }
 
-QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url)
+QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url, bool isProxy)
 {
     QString HA1= auth.user() + QLatin1Char(':') + realm + QLatin1Char(':') + auth.password();
     HA1 = QString::fromLatin1(QCryptographicHash::hash(HA1.toLatin1(), QCryptographicHash::Md5).toHex().constData());
@@ -506,16 +515,17 @@ QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QStri
     QString result;
     QTextStream str(&result);
 
-    str << "Authorization: Digest username=\"" << auth.user() << "\", realm=\"" << realm << 
-                             "\", nonce=\"" << nonce << "\", uri=\"" << url << "\", response=\"" << response << "\"\r\n";
+    str << (isProxy ? "Proxy-Authorization" : "Authorization") <<
+        ": Digest username=\"" << auth.user() << "\", realm=\"" << realm << 
+        "\", nonce=\"" << nonce << "\", uri=\"" << url << "\", response=\"" << response << "\"\r\n";
 
     return result;
 
 }
 
-QString CLSimpleHTTPClient::digestAccess(const QString& request) const
+QString CLSimpleHTTPClient::digestAccess(const QString& method, const QString& url) const
 {
-    return digestAccess(m_auth, mRealm, mNonce, QLatin1String("GET"), QLatin1Char('/') + request);
+    return digestAccess(m_auth, mRealm, mNonce, method, url);
 }
 
 void CLSimpleHTTPClient::addExtraHeaders(QByteArray& request)

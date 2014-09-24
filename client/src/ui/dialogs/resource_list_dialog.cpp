@@ -10,7 +10,7 @@
 #include "ui_resource_list_dialog.h"
 
 QnResourceListDialog::QnResourceListDialog(QWidget *parent):
-    QnButtonBoxDialog(parent),
+    base_type(parent),
     ui(new Ui::ResourceListDialog())
 {
     ui->setupUi(this);
@@ -20,6 +20,7 @@ QnResourceListDialog::QnResourceListDialog(QWidget *parent):
     ui->treeView->setModel(m_model);
     ui->topLabel->hide();
     ui->bottomLabel->hide();
+    ui->doNotAskAgainCheckBox->hide();
 }
 
 QnResourceListDialog::~QnResourceListDialog() {
@@ -53,6 +54,15 @@ void QnResourceListDialog::setBottomText(const QString &bottomText) {
 QString QnResourceListDialog::bottomText() const {
     return ui->bottomLabel->text();
 }
+
+void QnResourceListDialog::showIgnoreCheckbox() {
+    ui->doNotAskAgainCheckBox->show();
+}
+
+bool QnResourceListDialog::isIgnoreCheckboxChecked() const {
+    return ui->doNotAskAgainCheckBox->isChecked();
+}
+
 
 void QnResourceListDialog::setStandardButtons(QDialogButtonBox::StandardButtons standardButtons) {
     ui->buttonBox->setStandardButtons(standardButtons);
@@ -101,5 +111,4 @@ QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, con
 QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, const QnResourceList &resources, int helpTopicId, const QString &title, const QString &text, QDialogButtonBox::StandardButtons buttons, bool readOnly) {
     return exec(parent, resources, helpTopicId, title, text, QString(), buttons, readOnly);
 }
-
 

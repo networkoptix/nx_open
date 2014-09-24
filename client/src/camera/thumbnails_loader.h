@@ -9,14 +9,15 @@
 #include <utils/common/long_runnable.h>
 #include <core/resource/resource_fwd.h>
 
-#include "recording/time_period.h"
 #include "thumbnail.h"
 
-#include "plugins/resources/archive/abstract_archive_delegate.h"
+#include "plugins/resource/archive/abstract_archive_delegate.h"
 
 class CLVideoDecoderOutput;
 class QnRtspClientArchiveDelegate;
 class QnThumbnailsLoaderHelper;
+class QnTimePeriod;
+
 struct SwsContext;
 
 

@@ -63,7 +63,7 @@ namespace nxcip
         char firmware[256];
         //!Camera's unique identifier. MAC address can be used
         char uid[256];
-        //!Camera management url
+        //!Camera management url. Can contain just address. MUST NOT be empty
         char url[MAX_TEXT_LEN];
         //!Any data in implementation defined format (for internal plugin usage)
         char auxiliaryData[256];
@@ -134,6 +134,7 @@ namespace nxcip
             \param[in] login Login to access \a address. If NULL, default login should be used
             \param[in] password Password to access \a address. If NULL, default password should be used
             \return > 0 - number of found cameras, < 0 - on error. 0 - nothing found
+            \note This method MUST fill CameraInfo::url with value of \a address
         */
         virtual int checkHostAddress( CameraInfo* cameras, const char* address, const char* login, const char* password ) = 0;
         //!MDNS camera search method
@@ -170,10 +171,13 @@ namespace nxcip
         */
         virtual BaseCameraManager* createCameraManager( const CameraInfo& info ) = 0;
 
-        //!Get model model names, reserved by the plugin
+        //!Get model names, reserved by the plugin
         /*!
-             \param[out] modelList        Array of \a char* buffers of size \a MAX_MODEL_NAME_SIZE where camera model names will be written. May be NULL.
-             \param[in, out] count        A pointer to a variable that specifies the size of array pointed to by the \a modelList parameter. 
+            For example, let camera support ONVIF, and plugin uses native API. In this case, plugin MUST implement this function and reserve model name, 
+            provided by onvif implementation. Also, CameraDiscoveryManager::getVendorName MUST be same as ONVIF vendor anem
+
+            \param[out] modelList        Array of \a char* buffers of size \a MAX_MODEL_NAME_SIZE where camera model names will be written. May be NULL.
+            \param[in, out] count        A pointer to a variable that specifies the size of array pointed to by the \a modelList parameter. 
                                           When the function returns, this variable contains the number of model names copied to \a modelList.
                                           If the buffer specified by \a modelList parameter is not large enough to hold the data, 
                                           the function returns NX_MORE_DATA and stores the required buffer size in the variable pointed to by \a count. 
@@ -498,20 +502,11 @@ namespace nxcip
     };
 
 
-    // {B0F07EAF-A59E-41fc-8F9E-86C323218554}
-    static const nxpl::NX_GUID IID_Iteratable = { { 0xb0, 0xf0, 0x7e, 0xaf, 0xa5, 0x9e, 0x41, 0xfc, 0x8f, 0x9e, 0x86, 0xc3, 0x23, 0x21, 0x85, 0x54 } };
+    // {8006CC9F-7BDD-4a4c-8920-AC5546D4924A}
+    static const nxpl::NX_GUID IID_TimePeriods = { { 0x80, 0x06, 0xcc, 0x9f, 0x7b, 0xdd, 0x4a, 0x4c, 0x89, 0x20, 0xac, 0x55, 0x46, 0xd4, 0x92, 0x4a } };
 
-    //!Interface for class-container with element iterating support
-    /*!
-        \code{.cpp}
-        Iteratable* it;
-        for( it->goToBeginning(); !it->atEnd(); it->next() )
-        {
-            //processing data ...
-        }
-        \endcode
-    */
-    class Iteratable
+    //!Array of time periods
+    class TimePeriods
     :
         public nxpl::PluginInterface
     {
@@ -523,24 +518,12 @@ namespace nxcip
         */
         virtual bool next() = 0;
         /*!
-            \return false, if cursor is already at end
+            \return true, if cursor is already at end
         */
         virtual bool atEnd() const = 0;
-    };
-
-
-    // {8006CC9F-7BDD-4a4c-8920-AC5546D4924A}
-    static const nxpl::NX_GUID IID_TimePeriods = { { 0x80, 0x06, 0xcc, 0x9f, 0x7b, 0xdd, 0x4a, 0x4c, 0x89, 0x20, 0xac, 0x55, 0x46, 0xd4, 0x92, 0x4a } };
-
-    //!Array of time periods
-    class TimePeriods
-    :
-        public Iteratable
-    {
-    public:
         /*!
-            \param[out] start Start of time period (usec since 1970-01-01, UTC)
-            \param[out] end End of time period (usec since 1970-01-01, UTC)
+            \param[out] start Start of time period (usec (microseconds) since 1970-01-01, UTC)
+            \param[out] end End of time period (usec (microseconds) since 1970-01-01, UTC)
             \return \a true, if data present (cursor is on valid position)
         */
         virtual bool get( UsecUTCTimestamp* start, UsecUTCTimestamp* end ) const = 0;
@@ -802,8 +785,14 @@ namespace nxcip
     static const nxpl::NX_GUID IID_MediaDataPacket = { { 0x76, 0x3c, 0x93, 0xdc, 0xa7, 0x7d, 0x41, 0xff, 0x80, 0x71, 0xb6, 0x4c, 0x4d, 0x3a, 0xfc, 0xff } };
     //!Required alignment of \a MediaDataPacket::data() buffer
     static const unsigned int MEDIA_DATA_BUFFER_ALIGNMENT = 32;
+    //!Required padding after media data (see \a MediaDataPacket::data() description)
+    static const unsigned int MEDIA_PACKET_BUFFER_PADDING_SIZE = 32;
 
     //!Portion of media data
+    /*!
+        \warning Buffer returned by \a MediaDataPacket::data() MUST be \a MEDIA_PACKET_BUFFER_PADDING_SIZE larger than \a MediaDataPacket::dataSize() returns 
+            and this padding MUST be filled with zeros. This is required by decoder, since this buffer may (and will!) be used as decoder input
+    */
     class MediaDataPacket
     :
         public nxpl::PluginInterface
@@ -826,7 +815,7 @@ namespace nxcip
             fStreamReset        = 0x10
         };
 
-        //!Packet's timestamp (usec since 1970-01-01, UTC)
+        //!Packet's timestamp (usec (microseconds) since 1970-01-01, UTC)
         virtual UsecUTCTimestamp timestamp() const = 0;
         //!Packet type
         virtual DataPacketType type() const = 0;
@@ -839,9 +828,15 @@ namespace nxcip
                 - aac (\a nxcip::CODEC_ID_AAC): ADTS stream
             \return Media data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
                 \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
+            \warning Actual buffer size MUST be \a MEDIA_PACKET_BUFFER_PADDING_SIZE larger than \a MediaDataPacket::dataSize() returns 
+                and this padding MUST be filled with zeros. This is required by decoder, since this buffer may (and will!) be used as decoder input
         */
         virtual const void* data() const = 0;
         //!Returns size (in bytes) of packet's data
+        /*!
+            \warning Actual buffer size MUST be \a MEDIA_PACKET_BUFFER_PADDING_SIZE larger than this method returns 
+                and this padding MUST be filled with zeros. This is required by decoder, since this buffer may (and will!) be used as decoder input
+        */
         virtual unsigned int dataSize() const = 0;
         /*!
             For video packet data contains number of camera sensor starting with 0 (e.g., panoramic camera has multiple sensors).\n
@@ -961,7 +956,7 @@ namespace nxcip
         {
             //!Signals that reverse playback by GOP (group of picture) reordering is supported
             /*!
-                Plugin MAY support backward playback by GOP (group of picture) reordering. If this is not supported, reverse playback is emulated by media server.\n
+                Plugin MAY support backward playback by GOP (group of picture) reordering. If this is not supported, reverse playback is emulated by server.\n
                 This capability is not required but can increase performance.\n
 
                 Reverse gop playback is organized in following way:\n
@@ -1023,12 +1018,12 @@ namespace nxcip
             \a DtsArchiveReader instance holds reference to returned \a StreamReader instance
         */
         virtual StreamReader* getStreamReader() = 0;
-        //!Returns timestamp (usec since 1970-01-01, UTC) of oldest data, present in the archive
+        //!Returns timestamp (usec (microseconds) since 1970-01-01, UTC) of oldest data, present in the archive
         /*!
             This value can be changed at any time (if record is ongoing)
         */
         virtual UsecUTCTimestamp startTime() const = 0;
-        //!Returns timestamp (usec since 1970-01-01, UTC) of newest data, present in the archive
+        //!Returns timestamp (usec (microseconds) since 1970-01-01, UTC) of newest data, present in the archive
         /*!
             This value can be changed at any time (if record is ongoing)
         */
@@ -1092,7 +1087,7 @@ namespace nxcip
             bool waitForKeyFrame ) = 0;
         //!Play time range [start; end) skipping frames
         /*!
-            Tells to skip media packets for inter-packet timestamp gap to be at least \a step usec.
+            Tells to skip media packets for inter-packet timestamp gap to be at least \a step usec (microseconds).
             When frame skipping is implied, audio packets SHOULD not be reported
             \param[in] cSeq New value of command sequence counter
             \param start Position to seek to

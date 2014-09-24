@@ -23,5 +23,5 @@ void QnDefaultTcpConnectionProcessor::run()
     d->responseBody.append("</body>\n");
     d->responseBody.append("</html>\n");
 
-    sendResponse("HTTP", CODE_NOT_FOUND, "text/html");
+    sendResponse(CODE_NOT_FOUND, "text/html");
 }

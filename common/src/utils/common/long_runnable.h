@@ -8,12 +8,18 @@
 
 #include "singleton.h"
 #include "semaphore.h"
+#include "utils/common/stoppable.h"
+
 
 class QnLongRunnablePoolPrivate;
 
-
-class QN_EXPORT QnLongRunnable: public QThread {
+class QN_EXPORT QnLongRunnable
+:
+    public QThread,
+    public QnStoppable  //QnLongRunnable::pleaseStop moved to separate interface QnStoppable since not only threads need to be stopped
+{
     Q_OBJECT
+
 public:
     QnLongRunnable();
     virtual ~QnLongRunnable();
@@ -27,11 +33,19 @@ public:
 
     void smartSleep(int ms);
 
+    //!Returns thread id, corresponding to this object
+    /*!
+        This id is remembered in \a QnLongRunnable::initSystemThreadId
+    */
     std::uintptr_t systemThreadId() const;
+
+    //!Returns thread id of current thread. On unix uses \a gettid function instead of pthread_self. It allows to find thread in gdb
+    static std::uintptr_t currentThreadSystemId();
 
 public slots:
     virtual void start(Priority priority = InheritPriority);
-    virtual void pleaseStop();
+    //!Implementation of QnStoppable::pleaseStop()
+    virtual void pleaseStop() override;
     virtual void stop();
 
 protected:

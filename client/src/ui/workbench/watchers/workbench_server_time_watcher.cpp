@@ -4,7 +4,8 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include "plugins/resources/archive/avi_files/avi_resource.h"
+
+#include <plugins/resource/avi/avi_resource.h>
 
 #include <api/media_server_connection.h>
 
@@ -74,7 +75,7 @@ qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaResourcePtr &resou
 }
 
 void QnWorkbenchServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &server) {
-    if(server->getStatus() == QnResource::Offline)
+    if(server->getStatus() == Qn::Offline)
         return;
 
     int handle = server->apiConnection()->getTimeAsync(this, SLOT(at_replyReceived(int, const QnTimeReply &, int)));
@@ -87,7 +88,7 @@ void QnWorkbenchServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &s
 // -------------------------------------------------------------------------- //
 void QnWorkbenchServerTimeWatcher::timerEvent(QTimerEvent *event) {
     if(event->timerId() == m_timer.timerId()) {
-        foreach(const QnMediaServerResourcePtr &server, resourcePool()->getResources().filtered<QnMediaServerResource>())
+        foreach(const QnMediaServerResourcePtr &server, resourcePool()->getResources<QnMediaServerResource>())
             sendRequest(server);
     } else {
         base_type::timerEvent(event);

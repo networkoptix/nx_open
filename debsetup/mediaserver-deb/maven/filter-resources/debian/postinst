@@ -10,15 +10,22 @@ ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 
 BASE_DIR="/opt/$COMPANY_NAME/mediaserver"
+EC_DIR="/opt/$COMPANY_NAME/entcontroller"
 
 ETC_DIR="$BASE_DIR/etc"
+EC_CONFIG_FILE="$EC_DIR/etc/entcontroller.conf"
 CONFIG_FILE="$ETC_DIR/mediaserver.conf"
 
-BIN_DIR="$BASE_DIR/bin"
-CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
+OLD_DB_PATH="$EC_DIR/var/db/ecs.db"
+DB_PATH="$BASE_DIR/var/ecs.sqlite"
 
-ECS_CONFIG_FILE="/opt/$COMPANY_NAME/entcontroller/etc/entcontroller.conf"
-ECS_CFG_HELPER="$BIN_DIR/config_helper.py $ECS_CONFIG_FILE"
+BIN_DIR="$BASE_DIR/bin"
+
+CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
+EC_CFG_HELPER="$BIN_DIR/config_helper.py $EC_CONFIG_FILE"
+
+DBSYNC="$BASE_DIR/share/dbsync-2.2/bin/dbsync"
+CERTGEN="$BASE_DIR/share/dbsync-2.2/bin/certgen"
 
 # This is necessary because changed configuration options should take effect 
 # immediately.
@@ -26,18 +33,25 @@ if status $COMPANY_NAME-mediaserver | grep "start/running" > /dev/null; then
   stop $COMPANY_NAME-mediaserver
 fi
 
-# Default ECS connection parameters
-ECS_HOST_DEFAULT="localhost"
-if [ -f "$ECS_CONFIG_FILE" ]; then
-    ECS_PORT_DEFAULT=$($ECS_CFG_HELPER port)
-else
-    ECS_PORT_DEFAULT="7001"
-fi
-ECS_LOGIN_DEFAULT="admin"
-
 # Default MS parameters
+PORT_DEFAULT="7001"
 TRANSPORT_DEAULT="auto"
 PUBLIC_IP_ENABLED_DEFAULT="auto"
+SYSTEM_NAME_DEFAULT=$COMPANY_NAME
+ALLOW_CAMERA_CHANGES_DEFAULT=true
+
+function is_local_addr {
+    local hostname=$1;
+    local addr=$(gethostip -d $hostname)
+
+    if [ $? -ne 0 ]; then
+	addr=$hostname
+    fi
+
+    [[ "$addr" =~ ^127.[0-9]+.[0-9]+.[0-9]+$ ]] && return 0
+
+    ip -4 -o addr | awk '{gsub("/", " "); print $4;}' | grep "^$addr$" > /dev/null 2>&1
+}
 
 function to_int {
     local -i num="10#${1}"
@@ -109,31 +123,53 @@ function validate_storage {
 }
 
 case "$1" in
-  configure)
-      ECS_HOST="$($CFG_HELPER appserverHost)"
-      [ -z "$ECS_HOST" ] && ECS_HOST=$ECS_HOST_DEFAULT
-      ECS_HOST=$(ask_for_value appserverHost "$ECS_HOST")
-      $CFG_HELPER appserverHost "$ECS_HOST"
+    configure)
+        ECS_HOST="$($CFG_HELPER appserverHost)"
+        if [ -n "$ECS_HOST" ]; then
+            if is_local_addr "$ECS_HOST"; then
+                $CFG_HELPER -d appserverHost
+                $CFG_HELPER -d appserverPort
+                $CFG_HELPER -d appserverLogin
+                $CFG_HELPER -d appserverPassword
+            else
+                $CFG_HELPER pendingSwitchToClusterMode "yes"
+                $CFG_HELPER -d appserverPassword
+            fi
+        fi
 
-      ECS_PORT="$($CFG_HELPER appserverPort)"
-      [ -z "$ECS_PORT" ] && ECS_PORT=$ECS_PORT_DEFAULT
-      ECS_PORT=$(ask_for_value appserverPort "$ECS_PORT")
-      $CFG_HELPER appserverPort "$ECS_PORT"
+        PORT="$($CFG_HELPER port)"
+        [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
+        [ -z "$PORT" ] && PORT=$PORT_DEFAULT        
+        PORT=$(ask_for_value port "$PORT")
+        $CFG_HELPER port "$PORT"
 
-      ECS_LOGIN="$($CFG_HELPER appserverLogin)"
-      [ -z "$ECS_LOGIN" ] && ECS_LOGIN=$ECS_LOGIN_DEFAULT
-      ECS_LOGIN=$(ask_for_value appserverLogin "$ECS_LOGIN")
-      $CFG_HELPER appserverLogin "$ECS_LOGIN"
+        if [ ! -f $DB_PATH -a ! -f $OLD_DB_PATH ]; then
+            APPSERVER_PASSWORD=$(ask_for_value appserverPassword "$APPSERVER_PASSWORD")
+            $CFG_HELPER appserverPassword "$APPSERVER_PASSWORD"
+        fi
 
-      ECS_PASSWORD="$($CFG_HELPER appserverPassword)"
-      [ -z "$ECS_PASSWORD" ] && ECS_PASSWORD=$ECS_PASSWORD_DEFAULT
-      ECS_PASSWORD=$(ask_for_value appserverPassword "$ECS_PASSWORD")
-      $CFG_HELPER appserverPassword "$ECS_PASSWORD"
+        TRANSPORT="$($CFG_HELPER rtspTransport)"
+        [ -z "$TRANSPORT" ] && TRANSPORT=$TRANSPORT_DEFAULT
+        $CFG_HELPER rtspTransport "$TRANSPORT"
 
-      TRANSPORT="$($CFG_HELPER transport)"
-      [ -z "$ECS_TRANSPORT" ] && TRANSPORT=$TRANSPORT_DEFAULT
-      TRANSPORT=$(ask_for_value transport "$TRANSPORT")
-      $CFG_HELPER transport "$TRANSPORT"
+        SYSTEM_NAME="$($CFG_HELPER systemName)"
+        [ -z "$SYSTEM_NAME" ] && SYSTEM_NAME=$SYSTEM_NAME_DEFAULT
+        SYSTEM_NAME=$(ask_for_value systemName "$SYSTEM_NAME")
+        $CFG_HELPER systemName "$SYSTEM_NAME"
+
+        ALLOW_CAMERA_CHANGES="$($CFG_HELPER allowCameraChanges)"
+        [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$($EC_CFG_HELPER allowCameraChanges)
+        [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$ALLOW_CAMERA_CHANGES_DEFAULT
+        ALLOW_CAMERA_CHANGES=$(ask_for_value allowCameraChanges "$ALLOW_CAMERA_CHANGES")
+        $CFG_HELPER allowCameraChanges "$ALLOW_CAMERA_CHANGES"
+
+        "$CERTGEN" -i
+
+        if [ -f "$OLD_DB_PATH" -a ! -f "$DB_PATH" ]; then
+            [ -d $BASE_DIR/var ] || mkdir $BASE_DIR/var
+            cp "$OLD_DB_PATH" "$DB_PATH"
+            $DBSYNC
+        fi
   ;;
 
   abort-upgrade|abort-remove|abort-configure)
@@ -144,8 +180,6 @@ case "$1" in
     exit 1
   ;;
 esac
-
-[ -d $VARDIR ] || mkdir $VARDIR
 
 if [ -e "/etc/init/$COMPANY_NAME-mediaserver.conf" ]; then
 	invoke-rc.d $COMPANY_NAME-mediaserver start || exit $?

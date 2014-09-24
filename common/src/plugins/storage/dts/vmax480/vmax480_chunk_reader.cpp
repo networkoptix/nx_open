@@ -11,7 +11,7 @@ static const QDate MAX_ARCHIVE_DATE(2200, 1, 1);
 
 static const QByteArray GROUP_ID("{C30B7CCB-D64E-4f72-9417-A7F3CA133F69}");
 
-QnVMax480ChunkReader::QnVMax480ChunkReader(QnResourcePtr res):
+QnVMax480ChunkReader::QnVMax480ChunkReader(const QnResourcePtr& res):
     QnLongRunnable(),
     m_waitingAnswer(false),
     m_state(State_Started),
@@ -38,12 +38,12 @@ void QnVMax480ChunkReader::run()
 
     while (!needToStop())
     {
-        QnResource::Status status = m_res->getStatus();
+        Qn::ResourceStatus status = m_res->getStatus();
 
-        if (m_res->isDisabled())
+        if (m_res->hasFlags(Qn::foreigner))
             break;
 
-        if (status == QnResource::Offline || status == QnResource::Unauthorized)
+        if (status == Qn::Offline || status == Qn::Unauthorized)
         {
             msleep(100);
             continue;
@@ -238,7 +238,7 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
             QVector<QnTimePeriodList> allPeriods;
             allPeriods << m_chunks[ch];
             allPeriods << dayPeriods;
-            m_chunks[ch] = QnTimePeriod::mergeTimePeriods(allPeriods);
+            m_chunks[ch] = QnTimePeriodList::mergeTimePeriods(allPeriods);
         }
     }
 

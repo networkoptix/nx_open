@@ -13,17 +13,57 @@
  * but don't need the definitions of the actual resource classes.
  */
 
+// TODO: #Elric move out?
+// <--
+class QnScheduleTask; 
+
+struct QnCameraHistoryItem;
+
+class QnCameraHistory;
+typedef QSharedPointer<QnCameraHistory> QnCameraHistoryPtr;
+typedef QList<QnCameraHistoryPtr> QnCameraHistoryList;
+
+class QnLicense;
+typedef QSharedPointer<QnLicense> QnLicensePtr;
+typedef QList<QnLicensePtr> QnLicenseList;
+
+struct QnParamType;
+typedef QSharedPointer<QnParamType> QnParamTypePtr;
+
+class QnVideoWallItem;
+class QnVideoWallControlMessage;
+
+class QnLayoutItemData;
+
+class QnResourceCommand;
+typedef QSharedPointer<QnResourceCommand> QnResourceCommandPtr;
+
+// -->
+
+
+class QnResourceFactory;
+class QnResourcePool;
+
 class QnResource;
 typedef QnSharedResourcePointer<QnResource> QnResourcePtr;
 typedef QnSharedResourcePointerList<QnResource> QnResourceList;
 
+class QnResourceType;
+typedef QSharedPointer<QnResourceType> QnResourceTypePtr;
+typedef QList<QnResourceTypePtr> QnResourceTypeList;
+
 class QnVirtualCameraResource;
 typedef QnSharedResourcePointer<QnVirtualCameraResource> QnVirtualCameraResourcePtr;
 typedef QnSharedResourcePointerList<QnVirtualCameraResource> QnVirtualCameraResourceList;
+typedef QSharedPointer<QnVirtualCameraResourceList> QnVirtualCameraResourceListPtr; // TODO: #Elric remove?
 
 class QnPhysicalCameraResource;
 typedef QnSharedResourcePointer<QnPhysicalCameraResource> QnPhysicalCameraResourcePtr;
 typedef QnSharedResourcePointerList<QnPhysicalCameraResource> QnPhysicalCameraResourceList;
+
+class QnDesktopCameraResource;
+typedef QnSharedResourcePointer<QnDesktopCameraResource> QnDesktopCameraResourcePtr;
+typedef QnSharedResourcePointerList<QnDesktopCameraResource> QnDesktopCameraResourceList;
 
 class QnLayoutResource;
 typedef QnSharedResourcePointer<QnLayoutResource> QnLayoutResourcePtr;
@@ -89,25 +129,36 @@ typedef QnSharedResourcePointer<QnPlIsdResource> QnPlIsdResourcePtr;
 typedef QnSharedResourcePointerList<QnPlIsdResource> QnPlIsdResourceList;
 
 class QnPlPulseResource;
-typedef QSharedPointer<QnPlPulseResource> QnPlPulseResourcePtr;
+typedef QnSharedResourcePointer<QnPlPulseResource> QnPlPulseResourcePtr;
 typedef QnSharedResourcePointerList<QnPlPulseResource> QnPlPulseResourceList;
 
 class QnPlIqResource;
-typedef QSharedPointer<QnPlIqResource> QnPlIqResourcePtr;
+typedef QnSharedResourcePointer<QnPlIqResource> QnPlIqResourcePtr;
 typedef QnSharedResourcePointerList<QnPlIqResource> QnPlIqResourceList;
 
 class QnPlWatchDogResource;
-typedef QSharedPointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;
+typedef QnSharedResourcePointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;
 typedef QnSharedResourcePointerList<QnPlWatchDogResource> QnPlWatchDogResourceList;
 
 class QnVistaResource;
 typedef QnSharedResourcePointer<QnVistaResource> QnVistaResourcePtr;
 
 class QnDesktopResource;
-typedef QSharedPointer<QnDesktopResource> QnDesktopResourcePtr;
+typedef QnSharedResourcePointer<QnDesktopResource> QnDesktopResourcePtr;
 
 class QnThirdPartyResource;
-typedef QSharedPointer<QnThirdPartyResource> QnThirdPartyResourcePtr;
+typedef QnSharedResourcePointer<QnThirdPartyResource> QnThirdPartyResourcePtr;
+
+class QnVideoWallResource;
+typedef QnSharedResourcePointer<QnVideoWallResource> QnVideoWallResourcePtr;
+typedef QnSharedResourcePointerList<QnVideoWallResource> QnVideoWallResourceList;
+
+class QnVideoWallItemIndex;
+typedef QList<QnVideoWallItemIndex> QnVideoWallItemIndexList;
+
+class QnVideoWallMatrixIndex;
+typedef QList<QnVideoWallMatrixIndex> QnVideoWallMatrixIndexList;
+
 
 
 #endif // QN_RESOURCE_FWD_H

@@ -41,14 +41,14 @@
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
-    QString toggleStateToString(Qn::ToggleState value, bool prolonged) {
+    QString toggleStateToString(QnBusiness::EventState value, bool prolonged) {
         switch( value )
         {
-            case Qn::OffState:
+            case QnBusiness::InactiveState:
                 return QObject::tr("Stops");
-            case Qn::OnState:
+            case QnBusiness::ActiveState:
                 return QObject::tr("Starts");
-            case Qn::UndefinedState:
+            case QnBusiness::UndefinedState:
             if (prolonged)
                 return QObject::tr("Starts/Stops");
             else
@@ -108,7 +108,7 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
 /*        ui->eventTypeComboBox->setModel(NULL);
         ui->eventStatesComboBox->setModel(NULL);
         ui->actionTypeComboBox->setModel(NULL);*/
-        //TODO: #GDM clear model? dummy?
+        //TODO: #GDM #Business clear model? dummy?
         return;
     }
 
@@ -137,7 +137,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
                     m_model->eventTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->eventType(), 1, Qt::MatchExactly);
         ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
 
-        bool isResourceRequired = BusinessEventType::isResourceRequired(m_model->eventType());
+        bool isResourceRequired = QnBusiness::isResourceRequired(m_model->eventType());
         ui->eventResourcesWidget->setVisible(isResourceRequired);
 
         initEventParameters();
@@ -158,20 +158,20 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         QModelIndexList actionTypeIdx = m_model->actionTypesModel()->match(m_model->actionTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->actionType(), 1, Qt::MatchExactly);
         ui->actionTypeComboBox->setCurrentIndex(actionTypeIdx.isEmpty() ? 0 : actionTypeIdx.first().row());
 
-        bool isResourceRequired = BusinessActionType::requiresCameraResource(m_model->actionType())
-                || BusinessActionType::requiresUserResource(m_model->actionType());
+        bool isResourceRequired = QnBusiness::requiresCameraResource(m_model->actionType())
+                || QnBusiness::requiresUserResource(m_model->actionType());
         ui->actionResourcesWidget->setVisible(isResourceRequired);
 
-        ui->actionAtLabel->setText(m_model->actionType() == BusinessActionType::SendMail ? tr("to") : tr("at"));
+        ui->actionAtLabel->setText(m_model->actionType() == QnBusiness::SendMailAction ? tr("to") : tr("at"));
 
-        bool actionIsInstant = !BusinessActionType::hasToggleState(m_model->actionType());
+        bool actionIsInstant = !QnBusiness::hasToggleState(m_model->actionType());
         ui->aggregationWidget->setVisible(actionIsInstant);
 
         initActionParameters();
     }
 
     if (fields & (QnBusiness::EventTypeField | QnBusiness::ActionTypeField)) {
-        bool prolonged = BusinessEventType::hasToggleState(m_model->eventType()) && !BusinessActionType::hasToggleState(m_model->actionType());
+        bool prolonged = QnBusiness::hasToggleState(m_model->eventType()) && !QnBusiness::hasToggleState(m_model->actionType());
         ui->eventStatesComboBox->setVisible(prolonged);
     }
 
@@ -301,7 +301,7 @@ void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
         return;
 
     int typeIdx = m_model->eventTypesModel()->item(index)->data().toInt();
-    BusinessEventType::Value val = (BusinessEventType::Value)typeIdx;
+    QnBusiness::EventType val = (QnBusiness::EventType)typeIdx;
     m_model->setEventType(val);
 }
 
@@ -309,12 +309,12 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
     if (!m_model || m_updating)
         return;
 
-    bool prolonged = BusinessEventType::hasToggleState(m_model->eventType()) && !BusinessActionType::hasToggleState(m_model->actionType());
+    bool prolonged = QnBusiness::hasToggleState(m_model->eventType()) && !QnBusiness::hasToggleState(m_model->actionType());
     if (!prolonged)
         return;
 
     int typeIdx = m_model->eventStatesModel()->item(index)->data().toInt();
-    Qn::ToggleState val = (Qn::ToggleState) typeIdx;
+    QnBusiness::EventState val = (QnBusiness::EventState) typeIdx;
     m_model->setEventState(val);
 }
 
@@ -323,7 +323,7 @@ void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) 
         return;
 
     int typeIdx = m_model->actionTypesModel()->item(index)->data().toInt();
-    BusinessActionType::Value val = (BusinessActionType::Value)typeIdx;
+    QnBusiness::ActionType val = (QnBusiness::ActionType)typeIdx;
     m_model->setActionType(val);
 }
 
@@ -338,12 +338,12 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
     if (!m_model)
         return;
 
-    QnResourceSelectionDialog dialog(this); //TODO: #GDM or servers?
+    QnResourceSelectionDialog dialog(this); //TODO: #GDM #Business or servers?
 
-    BusinessEventType::Value eventType = m_model->eventType();
-    if (eventType == BusinessEventType::Camera_Motion)
+    QnBusiness::EventType eventType = m_model->eventType();
+    if (eventType == QnBusiness::CameraMotionEvent)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(this));
-    else if (eventType == BusinessEventType::Camera_Input)
+    else if (eventType == QnBusiness::CameraInputEvent)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputPolicy>(this));
     dialog.setSelectedResources(m_model->eventResources());
 
@@ -357,21 +357,21 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
         return;
 
     QnResourceSelectionDialog::SelectionTarget target;
-    if (BusinessActionType::requiresCameraResource(m_model->actionType()))
+    if (QnBusiness::requiresCameraResource(m_model->actionType()))
         target = QnResourceSelectionDialog::CameraResourceTarget;
-    else if (BusinessActionType::requiresUserResource(m_model->actionType()))
+    else if (QnBusiness::requiresUserResource(m_model->actionType()))
         target = QnResourceSelectionDialog::UserResourceTarget;
     else
         return;
 
     QnResourceSelectionDialog dialog(target, this);
 
-    BusinessActionType::Value actionType = m_model->actionType();
-    if (actionType == BusinessActionType::CameraRecording)
+    QnBusiness::ActionType actionType = m_model->actionType();
+    if (actionType == QnBusiness::CameraRecordingAction)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(this));
-    else if (actionType == BusinessActionType::CameraOutput || actionType == BusinessActionType::CameraOutputInstant)
+    else if (actionType == QnBusiness::CameraOutputAction || actionType == QnBusiness::CameraOutputOnceAction)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(this));
-    else if (actionType == BusinessActionType::SendMail)
+    else if (actionType == QnBusiness::SendMailAction)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnUserEmailPolicy>(this));
     dialog.setSelectedResources(m_model->actionResources());
 
@@ -386,7 +386,7 @@ void QnBusinessRuleWidget::at_scheduleButton_clicked() {
 
     QScopedPointer<QnWeekTimeScheduleDialog> dialog(new QnWeekTimeScheduleDialog(this));
     dialog->setScheduleTasks(m_model->schedule());
-    if (dialog->exec() != QDialog::Accepted)
+    if (!dialog->exec())
         return;
     m_model->setSchedule(dialog->scheduleTasks());
 }

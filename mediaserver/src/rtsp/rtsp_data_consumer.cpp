@@ -1,4 +1,5 @@
 #include <QtCore/QMap>
+
 #include "rtsp_data_consumer.h"
 #include "core/datapacket/media_data_packet.h"
 #include "rtsp_connection.h"
@@ -11,6 +12,8 @@
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "utils/common/synctime.h"
 #include "core/resource/security_cam_resource.h"
+
+static_assert(AV_NOPTS_VALUE == DATETIME_INVALID, "DATETIME_INVALID must be equal to AV_NOPTS_VALUE.");
 
 static const int MAX_QUEUE_SIZE = 12;
 static const qint64 TO_LOWQ_SWITCH_MIN_QUEUE_DURATION = 2000ll * 1000ll; // 2 seconds
@@ -168,17 +171,19 @@ qint64 QnRtspDataConsumer::dataQueueDuration()
     //return m_dataQueue.mediaLength();
 }
 
-void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr nonConstData)
-{
-    QnConstAbstractDataPacketPtr data = nonConstData;
+static const int MAX_DATA_QUEUE_SIZE = 120;
 
-//    cl_log.log("queueSize=", m_dataQueue.size(), cl_logALWAYS);
+void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
+{
+    //QnConstAbstractDataPacketPtr data = nonConstData;
+
+//    NX_LOG("queueSize=", m_dataQueue.size(), cl_logALWAYS);
 //    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-//    cl_log.log(QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
+//    NX_LOG(QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
 
     QMutexLocker lock(&m_dataQueueMtx);
     m_dataQueue.push(nonConstData);
-    QnConstAbstractMediaDataPtr media = qSharedPointerDynamicCast<const QnAbstractMediaData>(data);
+    //QnConstAbstractMediaDataPtr media = qSharedPointerDynamicCast<const QnAbstractMediaData>(data);
     //if (m_dataQueue.size() > m_dataQueue.maxSize()*1.5) // additional space for archiveData (when archive->live switch occured, archive ordinary using all dataQueue size)
 
     // quality control
@@ -192,7 +197,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr nonConstData)
         bool somethingDeleted = false;
         for (int i = m_dataQueue.size()-1; i >=0; --i)
         {
-            QnConstAbstractMediaDataPtr media = qSharedPointerDynamicCast<const QnAbstractMediaData> (m_dataQueue.at(i));
+            const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.at(i).data() );
             if (media->flags & AV_PKT_FLAG_KEY) 
             {
                 bool isHiQ = !(media->flags & QnAbstractMediaData::MediaFlags_LowQuality);
@@ -210,7 +215,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr nonConstData)
         {
             for (int i = m_dataQueue.size()-1; i >=0; --i)
             {
-                QnConstAbstractMediaDataPtr media = qSharedPointerDynamicCast<const QnAbstractMediaData> (m_dataQueue.at(i));
+                const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.at(i).data() );
                 if (media->flags & AV_PKT_FLAG_KEY)
                 {
                     m_dataQueue.removeFirst(i);
@@ -230,7 +235,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr nonConstData)
         m_dataQueue.unlock();
     }
 
-    while(m_dataQueue.size() > 120) // queue to large
+    while(m_dataQueue.size() > MAX_DATA_QUEUE_SIZE) // queue to large
     {
         QnAbstractDataPacketPtr tmp;
         m_dataQueue.pop(tmp);
@@ -431,7 +436,7 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
     }
 }
 
-bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr nonConstData)
+bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QnConstAbstractDataPacketPtr data = nonConstData;
 
@@ -444,8 +449,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr nonConstData)
     if (!media)
         return true;
 
-    QnConstMetaDataV1Ptr metadata = qSharedPointerDynamicCast<const QnMetaDataV1>(data);
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
+    const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(data.data());
     if (metadata == 0)
     {
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
@@ -518,7 +523,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr nonConstData)
         }
     }
 
-    QnRtspFfmpegEncoderPtr ffmpegEncoder = qSharedPointerDynamicCast<QnRtspFfmpegEncoder>(codecEncoder);
+    QnRtspFfmpegEncoder* ffmpegEncoder = dynamic_cast<QnRtspFfmpegEncoder*>(codecEncoder.data());
     if (ffmpegEncoder)
     {
         ffmpegEncoder->setAdditionFlags(0);
@@ -604,7 +609,7 @@ void QnRtspDataConsumer::unlockDataQueue()
     m_dataQueueMtx.unlock();
 }
 
-void QnRtspDataConsumer::addData(QnAbstractMediaDataPtr data)
+void QnRtspDataConsumer::addData(const QnAbstractMediaDataPtr& data)
 {
     m_dataQueue.push(data);
 }
@@ -620,7 +625,7 @@ int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skip
         camera = qnCameraPool->getVideoCamera(res);
     }
     int copySize = 0;
-    //if (camera && !res->hasFlags(QnResource::no_last_gop))
+    //if (camera && !res->hasFlags(Qn::no_last_gop))
         copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, cseq);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;
@@ -643,7 +648,7 @@ qint64 QnRtspDataConsumer::lastQueuedTime()
     if (m_dataQueue.size() == 0)
         return m_lastMediaTime;
     else {
-        QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.last());
+        const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.last().data() );
         if (media)
             return media->timestamp;
         else

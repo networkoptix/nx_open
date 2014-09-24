@@ -1,6 +1,8 @@
 #ifndef __FFMPEG_RTP_PARSER_H
 #define __FFMPEG_RTP_PARSER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QByteArray>
 #include <QMap>
 
@@ -23,8 +25,11 @@ public:
 private:
     QnMediaContextPtr m_context;
     QnAbstractMediaDataPtr m_nextDataPacket;
+    QnByteArray* m_nextDataPacketBuffer;
     qint64 m_position;
 };
 typedef QSharedPointer<QnFfmpegRtpParser> QnFfmpegRtpParserPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // __FFMPEG_RTP_PARSER_H

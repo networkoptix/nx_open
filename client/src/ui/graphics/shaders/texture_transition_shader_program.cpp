@@ -2,31 +2,43 @@
 
 #include "shader_source.h"
 
-QnTextureTransitionShaderProgram::QnTextureTransitionShaderProgram(const QGLContext *context, QObject *parent):
-    QGLShaderProgram(context, parent)
+QnTextureTransitionShaderProgram::QnTextureTransitionShaderProgram(QObject *parent)
+    : QnTextureGLShaderProgram(parent)
 {
-    addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
-        void main() {
-            gl_FrontColor = gl_Color;
-            gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-            gl_TexCoord[0] = gl_MultiTexCoord0;
-        }
-    ));
-    addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(
-        uniform sampler2D texture0;
-        uniform sampler2D texture1;
-        uniform float progress;
-        
-        void main() {
-            vec4 color0 = texture2D(texture0, gl_TexCoord[0].st);
-            vec4 color1 = texture2D(texture1, gl_TexCoord[0].st);
-            gl_FragColor = gl_Color * (color0 * (1.0 - progress) + color1 * progress);
-        }
-    ));
-    link();
+}
 
-    m_texture0Location = uniformLocation("texture0");
-    m_texture1Location = uniformLocation("texture1");
-    m_progressLocation = uniformLocation("progress");
+bool QnTextureTransitionShaderProgram::compile()
+{
+    addShaderFromSourceCode(QOpenGLShader::Vertex, QN_SHADER_SOURCE(
+    uniform mat4 uModelViewProjectionMatrix;
+    attribute vec2 aTexCoord;
+    attribute vec4 aPosition;
+    varying vec2 vTexColor;
+    void main() {
+        gl_Position = uModelViewProjectionMatrix * aPosition;
+        vTexColor = aTexCoord;
+    }
+    ));
+
+    QByteArray shader(QN_SHADER_SOURCE(
+    varying vec2 vTexColor;
+    uniform vec4 uColor;
+    uniform sampler2D uTexture;
+    uniform sampler2D uTexture1;
+    uniform float aProgress;
+    void main() {
+        vec4 texColor = texture2D(uTexture, vTexColor);
+        vec4 texColor1 = texture2D(uTexture1, vTexColor);
+        gl_FragColor = uColor * (texColor * (1.0 - aProgress) + texColor1 * aProgress);
+    }
+    ));
+
+#ifdef QT_OPENGL_ES_2
+    shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
+#endif
+
+    addShaderFromSourceCode(QOpenGLShader::Fragment, shader);
+
+    return link();
 }
 

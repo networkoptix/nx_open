@@ -78,15 +78,7 @@ int QnLogRestHandler::executeGet(const QString& path, const QnRequestParamList& 
     return CODE_OK;
 }
 
-int QnLogRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnLogRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
 {
-    Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
-}
-
-QString QnLogRestHandler::description() const
-{
-    return 
-        "Returns tail of the server log file"
-        "<BR>Param <b>lines</b> - Optional. Display last N log lines.";
 }

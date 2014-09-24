@@ -4,15 +4,15 @@
 #include "core/resource/resource.h"
 
 
-namespace BusinessEventType
+namespace QnBusiness
 {
 
-    bool hasChild(Value value)
+    bool hasChild(EventType eventType)
     {
-        switch (value) {
-        case AnyCameraIssue:
+        switch (eventType) {
+        case AnyCameraEvent:
             return true;
-        case AnyServerIssue:
+        case AnyServerEvent:
             return true;
         case AnyBusinessEvent:
             return true;
@@ -22,43 +22,44 @@ namespace BusinessEventType
         return false;
     }
 
-    Value parentEvent(Value value)
+    EventType parentEvent(EventType eventType)
     {
-        switch (value) {
-        case Camera_Disconnect:
-        case Network_Issue:
-        case Camera_Ip_Conflict:
-            return AnyCameraIssue;
+        switch (eventType) {
+        case CameraDisconnectEvent:
+        case NetworkIssueEvent:
+        case CameraIpConflictEvent:
+            return AnyCameraEvent;
 
-        case Storage_Failure:
-        case MediaServer_Failure:
-        case MediaServer_Conflict:
-        case MediaServer_Started:
-            return AnyServerIssue;
+        case StorageFailureEvent:
+        case ServerFailureEvent:
+        case ServerConflictEvent:
+        case ServerStartEvent:
+        case LicenseIssueEvent:
+            return AnyServerEvent;
 
         case AnyBusinessEvent:
-            return NotDefined;
+            return UndefinedEvent;
 
         default:
             return AnyBusinessEvent;
         }
-        return NotDefined;
+        return UndefinedEvent;
     }
 
-    QList<Value> childEvents(Value value)
+    QList<EventType> childEvents(EventType eventType)
     {
-        QList<Value> result;
+        QList<EventType> result;
 
-        switch (value) {
-        case AnyCameraIssue:
-            result << BusinessEventType::Camera_Disconnect << BusinessEventType::Network_Issue << BusinessEventType::Camera_Ip_Conflict;
+        switch (eventType) {
+        case AnyCameraEvent:
+            result << CameraDisconnectEvent << NetworkIssueEvent << CameraIpConflictEvent;
             break;
-        case AnyServerIssue:
-            result << BusinessEventType::Storage_Failure << BusinessEventType::MediaServer_Failure << BusinessEventType::MediaServer_Conflict << BusinessEventType::MediaServer_Started;
+        case AnyServerEvent:
+            result << StorageFailureEvent << ServerFailureEvent << ServerConflictEvent << ServerStartEvent << LicenseIssueEvent;
             break;
         case AnyBusinessEvent:
-            result << BusinessEventType::Camera_Motion << BusinessEventType::Camera_Input <<
-                      BusinessEventType::AnyCameraIssue << BusinessEventType::AnyServerIssue;
+            result << CameraMotionEvent << CameraInputEvent <<
+                      AnyCameraEvent << AnyServerEvent;
             break;
         default:
             break;
@@ -67,39 +68,39 @@ namespace BusinessEventType
         return result;
     }
 
-    bool isResourceRequired(Value val) {
-        return requiresCameraResource(val) || requiresServerResource(val);
+    bool isResourceRequired(EventType eventType) {
+        return requiresCameraResource(eventType) || requiresServerResource(eventType);
     }
 
-    bool hasToggleState(Value val) {
-        switch( val )
+    bool hasToggleState(EventType eventType) {
+        switch( eventType )
         {
         case AnyBusinessEvent:
-        case Camera_Motion:
-        case Camera_Input:
+        case CameraMotionEvent:
+        case CameraInputEvent:
             return true;
         default:
             return false;
         }
     }
 
-    bool requiresCameraResource(Value val) {
-        switch( val )
+    bool requiresCameraResource(EventType eventType) {
+        switch( eventType )
         {
-        case Camera_Motion:
-        case Camera_Input:
-        case Camera_Disconnect:
+        case CameraMotionEvent:
+        case CameraInputEvent:
+        case CameraDisconnectEvent:
             return true;
         default:
             return false;
         }
     }
 
-    bool requiresServerResource(Value val) {
-        switch( val )
+    bool requiresServerResource(EventType eventType) {
+        switch( eventType )
         {
-        case Storage_Failure:
-            return false; //TODO: #GDM restore when will work fine
+        case StorageFailureEvent:
+            return false; //TODO: #GDM #Business restore when will work fine
         default:
             return false;
         }
@@ -107,7 +108,7 @@ namespace BusinessEventType
     }
 }
 
-QnAbstractBusinessEvent::QnAbstractBusinessEvent(BusinessEventType::Value eventType, const QnResourcePtr& resource, Qn::ToggleState toggleState, qint64 timeStamp):
+QnAbstractBusinessEvent::QnAbstractBusinessEvent(QnBusiness::EventType eventType, const QnResourcePtr& resource, QnBusiness::EventState toggleState, qint64 timeStamp):
     m_eventType(eventType),
     m_timeStamp(timeStamp),
     m_resource(resource),
@@ -123,7 +124,7 @@ QnBusinessEventParameters QnAbstractBusinessEvent::getRuntimeParams() const {
     QnBusinessEventParameters params;
     params.setEventType(m_eventType);
     params.setEventTimestamp(m_timeStamp);
-    params.setEventResourceId(m_resource ? m_resource->getId().toInt() : 0);
+    params.setEventResourceId(m_resource ? m_resource->getId() : QUuid());
 
     return params;
 }

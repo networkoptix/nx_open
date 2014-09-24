@@ -78,11 +78,11 @@ def gentext(file, path, extensions, text):
                     continue
                 
                 cond = ''
-                if n.endswith('_win'):
+                if n.endswith('_win') or parent.endswith('_win'):
                     cond = 'win*:'
-                elif n.endswith('_mac'):
+                elif n.endswith('_mac') or parent.endswith('_mac'):
                     cond = 'mac:'
-                elif n.endswith('_linux'):
+                elif n.endswith('_linux') or parent.endswith('_linux'):
                     cond = 'linux*:'
                 elif n.endswith('_unix'):
                     cond = 'unix:'
@@ -149,6 +149,7 @@ if __name__ == '__main__':
             os.environ["path"] += os.pathsep + vc_path
             os.system('echo %PATH%')
             p = subprocess.Popen(r'qmake.bat %s' % output_pro_file, shell=True, stdout=PIPE)
+            p = subprocess.Popen(r'${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile %s' % output_pro_file, shell=True, stdout=PIPE)
             out, err = p.communicate()
             print out
             p.wait()

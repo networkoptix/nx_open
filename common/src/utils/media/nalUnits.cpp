@@ -736,8 +736,14 @@ void SPSUnit::hrd_parameters()
 	bit_rate_scale = bitReader.getBits(4);
 	cpb_size_scale = bitReader.getBits(4);
 
+    if( bit_rate_value_minus1 )
+        delete[] bit_rate_value_minus1;
 	bit_rate_value_minus1 = new int[cpb_cnt_minus1 + 1];
+    if( cpb_size_value_minus1 )
+        delete[] cpb_size_value_minus1;
 	cpb_size_value_minus1 = new int[cpb_cnt_minus1 + 1];
+    if( cbr_flag )
+        delete[] cbr_flag;
 	cbr_flag = new quint8[cpb_cnt_minus1 + 1];
 
 	for( int SchedSelIdx = 0; SchedSelIdx <= cpb_cnt_minus1; SchedSelIdx++) 
@@ -851,7 +857,19 @@ int SliceUnit::deserialize(quint8* buffer, quint8* end,
 							const QMap<quint32, const SPSUnit*>& spsMap,
 							const QMap<quint32, const PPSUnit*>& ppsMap)
 {
-	if (end - buffer < 2)
+	m_ref_pic_vect.clear();
+	m_ref_pic_vect2.clear();
+	dec_ref_pic_vector.clear();
+	luma_weight_l0.clear();
+	luma_offset_l0.clear();
+	chroma_weight_l0.clear();
+	chroma_offset_l0.clear();
+	luma_weight_l1.clear();
+	luma_offset_l1.clear();
+	chroma_weight_l1.clear();
+	chroma_offset_l1.clear();
+
+    if (end - buffer < 2)
 		return NOT_ENOUGHT_BUFFER;
 
 	int rez = NALUnit::deserialize(buffer, end);

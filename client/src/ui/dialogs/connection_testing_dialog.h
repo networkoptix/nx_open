@@ -5,10 +5,10 @@
 #include <QtCore/QTimer>
 
 #include <api/model/connection_info.h>
-
 #include <core/resource/resource_fwd.h>
-
+#include <nx_ec/ec_api.h>
 #include <ui/dialogs/button_box_dialog.h>
+
 
 class QDataWidgetMapper;
 class QStandardItemModel;
@@ -25,16 +25,14 @@ public:
     virtual ~QnConnectionTestingDialog();
 
     void testEnterpriseController(const QUrl &url);
-    void testResource(const QnResourcePtr &resource);
 
 signals:
     void resourceChecked(bool success);
 
-private:
-    Q_SLOT void tick();
+private slots:
+    void tick();
 
-    Q_SLOT void at_ecConnection_result(int status, QnConnectionInfoPtr connectionInfo, int requestHandle);
-    Q_SLOT void at_resource_result(bool success);
+    void at_ecConnection_result(int reqID, ec2::ErrorCode errorCode, QnConnectionInfo connectionInfo);
 
     /**
      * Updates ui elements depending of the test result

@@ -1,6 +1,8 @@
 #ifndef __FFMPEG_VIDEO_TRANSCODER_H__
 #define __FFMPEG_VIDEO_TRANSCODER_H__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QCoreApplication>
 
 #include "transcoder.h"
@@ -20,8 +22,8 @@ public:
     QnFfmpegVideoTranscoder(CodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
-    virtual int transcodePacket(QnConstAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result) override;
-    virtual bool open(QnConstCompressedVideoDataPtr video) override;
+    virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
+    virtual bool open(const QnConstCompressedVideoDataPtr& video) override;
     void close();
     AVCodecContext* getCodecContext();
 
@@ -50,5 +52,7 @@ private:
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // __FFMPEG_VIDEO_TRANSCODER_H__

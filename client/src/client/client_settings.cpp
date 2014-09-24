@@ -10,7 +10,7 @@
 #include <QtCore/QJsonDocument>
 
 #include <utils/common/util.h>
-#include <utils/common/json.h>
+#include <utils/serialization/json_functions.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/variant.h>
 #include <utils/common/string.h>
@@ -19,17 +19,23 @@
 
 #include <client/client_meta_types.h>
 
-#include <version.h>
+#include <utils/common/app_info.h>
 
 
 namespace {
+    const QString xorKey = lit("ItIsAGoodDayToDie");
+
     QnConnectionData readConnectionData(QSettings *settings)
     {
         QnConnectionData connection;
-        connection.name = settings->value(QLatin1String("name")).toString();
-        connection.url = settings->value(QLatin1String("url")).toString();
+        connection.name = settings->value(lit("name")).toString();
+        connection.url = settings->value(lit("url")).toString();
         connection.url.setScheme(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http"));
-        connection.readOnly = (settings->value(QLatin1String("readOnly")).toString() == QLatin1String("true"));
+        connection.readOnly = (settings->value(lit("readOnly")).toString() == lit("true"));
+
+        QString password = settings->value(lit("pwd")).toString();
+        if (!password.isEmpty())
+            connection.url.setPassword(xorDecrypt(password, xorKey));
 
         return connection;
     }
@@ -37,14 +43,17 @@ namespace {
     void writeConnectionData(QSettings *settings, const QnConnectionData &connection)
     {
         QUrl url = connection.url;
-        url.setPassword(QString()); /* Don't store password. */
+        QString password = url.password().isEmpty()
+            ? QString()
+            : xorEncrypt(url.password(), xorKey);
 
-        settings->setValue(QLatin1String("name"), connection.name);
-        settings->setValue(QLatin1String("url"), url.toString());
-        settings->setValue(QLatin1String("readOnly"), connection.readOnly);
+        url.setPassword(QString()); /* Don't store password in plain text. */
+
+        settings->setValue(lit("name"), connection.name);
+        settings->setValue(lit("pwd"), password);
+        settings->setValue(lit("url"), url.toString());
+        settings->setValue(lit("readOnly"), connection.readOnly);
     }
-
-    const QString xorKey = QLatin1String("ItIsAGoodDayToDie");
 
 } // anonymous namespace
 
@@ -66,8 +75,8 @@ QnClientSettings::QnClientSettings(QObject *parent):
 #ifdef Q_OS_DARWIN
     setAudioDownmixed(true); /* Mac version uses SPDIF by default for multichannel audio. */
 #endif
-    setShowcaseUrl(QUrl(lit(QN_SHOWCASE_URL)));
-    setSettingsUrl(QUrl(lit(QN_SETTINGS_URL)));
+    setShowcaseUrl(QUrl(QnAppInfo::showcaseUrl()));
+    setSettingsUrl(QUrl(QnAppInfo::settingsUrl()));
 
     /* Set names. */
     setName(MEDIA_FOLDER,           lit("mediaRoot"));
@@ -81,7 +90,6 @@ QnClientSettings::QnClientSettings(QObject *parent):
     addArgumentName(SOFTWARE_YUV,           "--soft-yuv");
     addArgumentName(OPEN_LAYOUTS_ON_LOGIN,  "--open-layouts-on-login");
     addArgumentName(MAX_SCENE_VIDEO_ITEMS,  "--max-video-items");
-    addArgumentName(UPDATES_ENABLED,        "--updates-enabled");
     addArgumentName(RAINBOW_MODE,           "--rainbow");
 
     /* Load from internal resource. */
@@ -164,12 +172,10 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
         } else {
             return defaultValue;
         }
-    case STORED_PASSWORD: {
-            QString result = xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), xorKey);
-            return result;
-        }
     case DEBUG_COUNTER:
     case DEV_MODE:
+    case VIDEO_WALL_MODE:
+    case DEFAULT_BACKGROUND_COLOR:
         return defaultValue; /* Not to be read from settings. */
     default:
         return base_type::readValueFromSettings(settings, id, defaultValue);
@@ -178,6 +184,9 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
 }
 
 void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const QVariant &value) const {
+    if (isVideoWallMode())
+        return;
+
     switch(id) {
     case LAST_USED_CONNECTION:
         settings->beginGroup(QLatin1String("AppServerConnections"));
@@ -212,22 +221,22 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         settings->endGroup();
         break;
     }
-    case STORED_PASSWORD: {
-            base_type::writeValueToSettings(settings, id, xorEncrypt(value.toString(), xorKey));
-            break;
-        }
     case DEBUG_COUNTER:
     case UPDATE_FEED_URL:
     //case SHOWCASE_URL:
     //case SHOWCASE_ENABLED:
     case SETTINGS_URL:
     case DEV_MODE:
-    case UPDATES_ENABLED:
     case AUTO_CHECK_FOR_UPDATES:
     case GL_VSYNC:
     case LIGHT_MODE:
     case LIGHT_MODE_OVERRIDE:
     case PTZ_PRESET_IN_USE_WARNING_DISABLED:
+    case VIDEO_WALL_MODE:
+    case SOFTWARE_YUV:
+    case RAINBOW_MODE:
+    case NO_CLIENT_UPDATE:
+    case DEFAULT_BACKGROUND_COLOR:
         break; /* Not to be saved to settings. */
     default:
         base_type::writeValueToSettings(settings, id, value);

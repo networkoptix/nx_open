@@ -1,7 +1,11 @@
 #include "h264_rtp_parser.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
 #include "utils/common/synctime.h"
+#include "utils/common/log.h"
 
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
 static const char H264_NAL_SHORT_PREFIX[3] = {0x00, 0x00, 0x01};
@@ -10,6 +14,7 @@ static const int MAX_ALLOWED_FRAME_SIZE = 1024*1024*10;
 
 CLH264RtpParser::CLH264RtpParser():
         QnRtpVideoStreamParser(),
+        m_spsInitialized(false),
         m_frequency(90000), // default value
         m_rtpChannel(98),
         m_prevSequenceNum(-1),
@@ -17,8 +22,6 @@ CLH264RtpParser::CLH264RtpParser():
         m_builtinPpsFound(false),
         m_keyDataExists(false),
         m_frameExists(false),
-        m_timeCycles(0),
-        m_lastTimeStamp(0),
         m_firstSeqNum(0),
         m_packetPerNal(0),
         m_videoFrameSize(0)
@@ -99,7 +102,8 @@ void CLH264RtpParser::setSDPInfo(QList<QByteArray> lines)
                                 else if (nal.startsWith(startCodeShort))
                                     nal.remove(0,3);
                             }
-
+                            if( nal.size() > 0 && (nal[0] & 0x1f) == nuSPS )
+                                decodeSpsInfo( nal );
                             
                             m_sdpSpsPps << QByteArray(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX)).append(nal);
                         }
@@ -141,8 +145,9 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
 {
     try
     {
-        m_sps.decodeBuffer( (const quint8*) data.data() + sizeof(H264_NAL_PREFIX), (const quint8*) data.data() + data.size());
+        m_sps.decodeBuffer( (const quint8*) data.constData(), (const quint8*) data.constData() + data.size());
         m_sps.deserialize();
+        m_spsInitialized = true;
 
     } catch(BitStreamException& e)
     {
@@ -157,22 +162,34 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffe
     if (m_keyDataExists && (!m_builtinSpsFound || !m_builtinPpsFound))
         addheaderSize = getSpsPpsSize();
 
-    QnCompressedVideoDataPtr result = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, m_videoFrameSize + addheaderSize));
+    QnWritableCompressedVideoDataPtr result = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_videoFrameSize + addheaderSize));
     result->compressionType = CODEC_ID_H264;
-    result->width = m_sps.getWidth();
-    result->height = m_sps.getHeight();
+    result->width = m_spsInitialized ? m_sps.getWidth() : -1;
+    result->height = m_spsInitialized ? m_sps.getHeight() : -1;
     if (m_keyDataExists) {
         result->flags = QnAbstractMediaData::MediaFlags_AVKey;
         if (!m_builtinSpsFound || !m_builtinPpsFound)
-            serializeSpsPps(result->data);
+            serializeSpsPps(result->m_data);
     }
     //result->data.write(m_videoBuffer);
+    size_t spsNaluStartOffset = (size_t)-1;
+    size_t spsNaluSize = 0;
     for (uint i = 0; i < m_chunks.size(); ++i)
     {
         if (m_chunks[i].nalStart)
-            result->data.uncheckedWrite(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-        result->data.uncheckedWrite((const char*) rtpBuffer + m_chunks[i].bufferOffset, m_chunks[i].len);
+        {
+            if( (spsNaluStartOffset != (size_t)-1) && (spsNaluSize == 0) )
+                spsNaluSize = result->m_data.size() - spsNaluStartOffset;
+            result->m_data.uncheckedWrite(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+            if( (m_chunks[i].len > 0) && ((*((const char*)rtpBuffer + m_chunks[i].bufferOffset) & 0x1f) == nuSPS) )
+                spsNaluStartOffset = result->m_data.size();
+        }
+        result->m_data.uncheckedWrite((const char*) rtpBuffer + m_chunks[i].bufferOffset, m_chunks[i].len);
     }
+
+    if( (spsNaluStartOffset != (size_t)-1) )
+        //decoding sps to detect stream resolution change
+        decodeSpsInfo( QByteArray::fromRawData( result->m_data.constData() + spsNaluStartOffset, spsNaluSize ) );
 
     if (m_timeHelper) {
         result->timestamp = m_timeHelper->getUsecTime(rtpTime, statistics, m_frequency);
@@ -365,3 +382,5 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         result = createVideoData(rtpBufferBase, ntohl(rtpHeader->timestamp), statistics); // last packet
     return true;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

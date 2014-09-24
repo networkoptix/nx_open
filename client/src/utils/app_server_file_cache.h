@@ -4,6 +4,9 @@
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 
+#include <nx_ec/ec_api.h>
+
+
 class QnAppServerFileCache : public QObject
 {
     Q_OBJECT
@@ -48,10 +51,10 @@ signals:
 
     void fileListReceived(const QStringList& filenames, bool ok);
 private slots:
-    void at_fileLoaded(int status, const QByteArray& data, int handle);
-    void at_fileUploaded(int status, int handle);
-    void at_fileDeleted(int status, int handle);
-    void at_fileListReceived(int status, const QStringList& filenames, int handle);
+    void at_fileLoaded( int handle, ec2::ErrorCode errorCode, const QByteArray& data );
+    void at_fileUploaded(int handle, ec2::ErrorCode errorCode);
+    void at_fileDeleted(int handle, ec2::ErrorCode errorCode);
+    void at_fileListReceived(int handle, ec2::ErrorCode errorCode, const QStringList& filenames);
 private:
     QHash<int, QString> m_loading;
     QHash<int, QString> m_uploading;

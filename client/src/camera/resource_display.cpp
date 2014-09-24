@@ -4,7 +4,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <plugins/resources/archive/abstract_archive_stream_reader.h>
+#include <plugins/resource/archive/abstract_archive_stream_reader.h>
 #include <camera/cam_display.h>
 #include <camera/client_video_camera.h>
 #include <camera/abstract_renderer.h>
@@ -26,7 +26,7 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
     m_mediaResource = resource.dynamicCast<QnMediaResource>();
 
-    m_dataProvider = resource->createDataProvider(QnResource::Role_Default);
+    m_dataProvider = resource->createDataProvider(Qn::CR_Default);
 
     if(m_dataProvider != NULL) {
         m_archiveReader = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider);
@@ -71,6 +71,14 @@ QnResourceDisplay::~QnResourceDisplay()
 
 void QnResourceDisplay::beforeDestroy()
 {
+}
+
+const QnResourcePtr &QnResourceDisplay::resource() const {
+    return getResource();
+}
+
+const QnMediaResourcePtr &QnResourceDisplay::mediaResource() const {
+    return m_mediaResource;
 }
 
 void QnResourceDisplay::cleanUp(QnLongRunnable *runnable) const {
@@ -123,10 +131,10 @@ void QnResourceDisplay::disconnectFromResource() {
 
 QnConstResourceVideoLayoutPtr QnResourceDisplay::videoLayout() const {
     if(m_mediaProvider == NULL)
-        return NULL;
+        return QnConstResourceVideoLayoutPtr();
 
     if(m_mediaResource == NULL)
-        return NULL;
+        return QnConstResourceVideoLayoutPtr();
 
     return m_mediaResource->getVideoLayout(m_mediaProvider);
 }
@@ -186,7 +194,7 @@ bool QnResourceDisplay::isPaused() {
 }
 
 bool QnResourceDisplay::isStillImage() const {
-    return m_resource->flags() & QnResource::still_image;
+    return m_resource->flags() & Qn::still_image;
 }
 
 void QnResourceDisplay::addRenderer(QnAbstractRenderer *renderer) {

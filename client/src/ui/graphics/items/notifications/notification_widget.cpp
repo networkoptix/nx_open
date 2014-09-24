@@ -218,7 +218,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem *parent, Qt::WindowFlag
 }
 
 QnNotificationWidget::~QnNotificationWidget() {
-    //TODO: #GDM if our sound is playing at the moment - stop it
+    //TODO: #GDM #Business if our sound is playing at the moment - stop it
     return;
 }
 
@@ -311,7 +311,7 @@ void QnNotificationWidget::paint(QPainter *painter, const QStyleOptionGraphicsIt
     painter->setBrush(QBrush(toTransparent(m_color, 0.5)));
     painter->drawRect(QnGeometry::aligned(colorSignSize, rect(), Qt::AlignLeft | Qt::AlignVCenter));
 
-    //TODO: #GDM draw corresponding image
+    //TODO: #GDM #Business draw corresponding image
 }
 
 void QnNotificationWidget::hideToolTip() {

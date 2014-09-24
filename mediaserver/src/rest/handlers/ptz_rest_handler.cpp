@@ -1,7 +1,7 @@
 #include "ptz_rest_handler.h"
 
-#include <utils/common/json.h>
-#include <utils/common/lexical.h>
+#include <utils/serialization/json_functions.h>
+#include <utils/serialization/lexical.h>
 #include <utils/network/tcp_connection_priv.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -77,7 +77,7 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
+int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
     QString sequenceId;
     int sequenceNumber = -1;
     Qn::PtzCommand command;
@@ -99,7 +99,7 @@ int QnPtzRestHandler::executePost(const QString &path, const QnRequestParams &pa
         return CODE_INVALID_PARAMETER;
     }
 
-    if (camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
+    if (camera->getStatus() == Qn::Offline || camera->getStatus() == Qn::Unauthorized) {
         result.setError(QnJsonRestResult::InvalidParameter, lit("Camera resource '%1' is not ready yet.").arg(resourceId));
         return CODE_INVALID_PARAMETER;
     }
@@ -278,10 +278,12 @@ int QnPtzRestHandler::executeGetPresets(const QnPtzControllerPtr &controller, co
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeCreateTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeCreateTour(const QnPtzControllerPtr &controller, const QnRequestParams &, const QByteArray &body, QnJsonRestResult& /*result*/) {
     QnPtzTour tour;
     if(!QJson::deserialize(body, &tour))
         return CODE_INVALID_PARAMETER;
+
+    // TODO: #Elric use result.
 
     if(!controller->createTour(tour))
         return CODE_INTERNAL_ERROR;
@@ -320,7 +322,7 @@ int QnPtzRestHandler::executeGetTours(const QnPtzControllerPtr &controller, cons
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeGetActiveObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeGetActiveObject(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result) {
     QnPtzObject activeObject;
     if(!controller->getActiveObject(&activeObject))
         return CODE_INTERNAL_ERROR;
@@ -341,7 +343,7 @@ int QnPtzRestHandler::executeUpdateHomeObject(const QnPtzControllerPtr &controll
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeGetHomeObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeGetHomeObject(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result) {
     QnPtzObject homeObject;
     if(!controller->getHomeObject(&homeObject))
         return CODE_INTERNAL_ERROR;
@@ -388,32 +390,4 @@ int QnPtzRestHandler::executeGetData(const QnPtzControllerPtr &controller, const
     return CODE_OK;
 }
 
-QString QnPtzRestHandler::description() const
-{
     // TODO: #Elric not valid anymore
-    return "\
-        There are several ptz commands: <BR>\
-        <b>api/ptz/move</b> - start camera moving.<BR>\
-        <b>api/ptz/moveTo</b> - go to absolute position.<BR>\
-        <b>api/ptz/stop</b> - stop camera moving.<BR>\
-        <b>api/ptz/getPosition</b> - return current camera position.<BR>\
-        <b>api/ptz/getSpaceMapper</b> - return JSON-serialized PTZ space mapper for the given camera, if any.<BR>\
-        <b>api/ptz/calibrate</b> - calibrate moving speed (addition speed coeff).<BR>\
-        <b>api/ptz/getCalibrate</b> - read current calibration settings.<BR>\
-        <BR>\
-        Param <b>res_id</b> - camera physicalID.<BR>\
-        <BR>\
-        Arguments for 'move' and 'calibrate' commands:<BR>\
-        Param <b>xSpeed</b> - rotation X velocity in range [-1..+1].<BR>\
-        Param <b>ySpeed</b> - rotation Y velocity in range [-1..+1].<BR>\
-        Param <b>zoomSpeed</b> - zoom velocity in range [-1..+1].<BR>\
-        <BR>\
-        Arguments for 'moveTo' commands:<BR>\
-        Param <b>xPos</b> - go to absolute X position in range [-1..+1].<BR>\
-        Param <b>yPos</b> - go to absolute Y position in range [-1..+1].<BR>\
-        Param <b>zoomPos</b> - Optional. Go to absolute zoom position in range [0..+1].<BR>\
-        <BR>\
-        If PTZ command do not return data, function return simple 'OK' message on success or error message if command fail. \
-        For 'getCalibrate' command returns XML with coeffecients. For 'getPosition' command returns XML with current position.\
-    ";
-}

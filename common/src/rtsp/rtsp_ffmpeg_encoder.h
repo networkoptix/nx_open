@@ -1,8 +1,10 @@
 #ifndef __RTSP_FFMPEG_ENCODER_H__
 #define __RTSP_FFMPEG_ENCODER_H__
 
-#include "common/common_globals.h"
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QMap>
+
 #include "rtsp_encoder.h"
 
 static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
@@ -47,5 +49,7 @@ private:
 };
 
 typedef QSharedPointer<QnRtspFfmpegEncoder> QnRtspFfmpegEncoderPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // __RTSP_FFMPEG_ENCODER_H__

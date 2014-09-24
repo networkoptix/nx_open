@@ -7,7 +7,6 @@
 #include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/layout_item_index.h>
 
 #include "actions.h"
 
@@ -27,6 +26,10 @@ public:
     static QnResourceList resources(const QVariant &items);
 
     static QnLayoutItemIndexList layoutItems(const QVariant &items);
+
+    static QnVideoWallItemIndexList videoWallItems(const QVariant &items);
+
+    static QnVideoWallMatrixIndexList videoWallMatrices(const QVariant &items);
 
     static QnWorkbenchLayoutList layouts(const QVariant &items);
 

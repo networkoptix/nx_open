@@ -32,6 +32,7 @@ class AudioPlayer
     Q_OBJECT
 
 public:
+    // TODO: #Elric #enum
     enum ResultCode
     {
         rcNoError,
@@ -120,6 +121,7 @@ signals:
     void done();
 
 private:
+    // TODO: #Elric #enum
     enum State
     {
         sInit,

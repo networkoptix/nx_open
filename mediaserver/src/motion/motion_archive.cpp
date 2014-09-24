@@ -4,6 +4,11 @@
 #include "utils/common/util.h"
 #include "motion_helper.h"
 
+#include <core/resource/security_cam_resource.h>
+
+#include <recording/time_period.h>
+#include <recording/time_period_list.h>
+
 #ifdef Q_OS_MAC
 #include <smmintrin.h>
 #endif
@@ -91,9 +96,9 @@ QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
 
 
     m_lastResult = QnMetaDataV1Ptr(new QnMetaDataV1());
-    m_lastResult->data.clear();
+    m_lastResult->m_data.clear();
     int motionIndex = indexOffset - m_motionLoadedStart;
-    m_lastResult->data.write((const char*) m_motionBuffer + motionIndex*MOTION_DATA_RECORD_SIZE, MOTION_DATA_RECORD_SIZE);
+    m_lastResult->m_data.write((const char*) m_motionBuffer + motionIndex*MOTION_DATA_RECORD_SIZE, MOTION_DATA_RECORD_SIZE);
     m_lastResult->timestamp = foundStartTime*1000;
     m_lastResult->m_duration = m_indexItr->duration*1000;
     m_lastResult->channelNumber = m_owner->getChannel();
@@ -129,7 +134,7 @@ void QnMotionArchive::loadRecordedRange()
     m_minMotionTime = AV_NOPTS_VALUE;
     m_maxMotionTime = AV_NOPTS_VALUE;
     m_lastRecordedTime = AV_NOPTS_VALUE;
-    QList<QDate> existsRecords = QnMotionHelper::instance()->recordedMonth(m_resource->getPhysicalId());
+    QList<QDate> existsRecords = QnMotionHelper::instance()->recordedMonth(m_resource->getUniqueId());
     if (existsRecords.isEmpty())
         return;
 
@@ -146,7 +151,7 @@ void QnMotionArchive::loadRecordedRange()
 
 QString QnMotionArchive::getFilePrefix(const QDate& datetime)
 {
-    return QnMotionHelper::instance()->getMotionDir(datetime, m_resource->getPhysicalId());
+    return QnMotionHelper::instance()->getMotionDir(datetime, m_resource->getUniqueId());
 }
 
 QString QnMotionArchive::getChannelPrefix()
@@ -167,7 +172,7 @@ void QnMotionArchive::fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile*
     dir.mkpath(fileName);
 }
 
-QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msStartTime, qint64 msEndTime, int detailLevel)
+QnTimePeriodList QnMotionArchive::matchPeriod(const QRegion& region, qint64 msStartTime, qint64 msEndTime, int detailLevel)
 {
     if (minTime() != (qint64)AV_NOPTS_VALUE)
         msStartTime = qMax(minTime(), msStartTime);
@@ -223,7 +228,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
             quint8* curData = buffer;
             while (i < endItr && curData < dataEnd)
             {
-                if (QnMetaDataV1::mathImage((simd128i*) curData, mask, maskStart, maskEnd))
+                if (QnMetaDataV1::matchImage((simd128i*) curData, mask, maskStart, maskEnd))
                 {
                     qint64 fullStartTime = i->start + indexHeader.startTime;
                     if (fullStartTime > msEndTime) {
@@ -270,20 +275,22 @@ bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& in
 
 bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, QFile& indexFile)
 {
+    static const size_t READ_BUF_SIZE = 128*1024;
+
     index.clear();
     indexFile.seek(0);
     indexFile.read((char*) &indexHeader, MOTION_INDEX_HEADER_SIZE);
 
-    quint8 tmpBuffer[1024*128];
+    std::unique_ptr<quint8> tmpBuffer( new quint8[READ_BUF_SIZE] );
     while(1)
     {
-        int readed = indexFile.read((char*) tmpBuffer, sizeof(tmpBuffer));
+        int readed = indexFile.read((char*) tmpBuffer.get(), READ_BUF_SIZE);
         if (readed < 1)
             break;
         int records = readed / MOTION_INDEX_RECORD_SIZE;
         int oldVectorSize = index.size();
         index.resize(oldVectorSize + records);
-        memcpy(&index[oldVectorSize], tmpBuffer, records * MOTION_INDEX_RECORD_SIZE);
+        memcpy(&index[oldVectorSize], tmpBuffer.get(), records * MOTION_INDEX_RECORD_SIZE);
     }
 
     return true;
@@ -390,7 +397,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnConstMetaDataV1Ptr data)
         qWarning() << "Failed to write index file for camera" << m_resource->getUniqueId();
     }
 
-    if (m_detailedMotionFile.write(data->data.constData(), data->data.capacity()) != data->data.capacity())
+    if (m_detailedMotionFile.write(data->data(), data->dataSize()) != data->dataSize())
     {
         qWarning() << "Failed to write index file for camera" << m_resource->getUniqueId();
     }

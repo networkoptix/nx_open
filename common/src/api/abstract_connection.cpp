@@ -1,12 +1,17 @@
 #include "abstract_connection.h"
 
+#include <QtCore/QUrlQuery>
+
 #include <cstring> /* For std::strstr. */
 
-#include <utils/common/enum_name_mapper.h>
+#include <api/network_proxy_factory.h>
+#include <core/resource/resource.h>
+#include <utils/serialization/lexical_enum.h>
 
 #include "session_manager.h"
+#include "abstract_reply_processor.h"
 
-Q_GLOBAL_STATIC(QnEnumNameMapper, qn_abstractConnection_emptyNameMapper);
+Q_GLOBAL_STATIC(QnEnumLexicalSerializer<int>, qn_abstractConnection_emptySerializer);
 
 void QnAbstractReplyProcessor::processReply(const QnHTTPRawResponse &response, int handle) {
     Q_UNUSED(response);
@@ -15,14 +20,15 @@ void QnAbstractReplyProcessor::processReply(const QnHTTPRawResponse &response, i
 
 bool QnAbstractReplyProcessor::connect(const char *signal, QObject *receiver, const char *method, Qt::ConnectionType type) {
     if(method && std::strstr(method, "QVariant")) {
-        return connect(this, SIGNAL(finished(int, const QVariant &, int)), receiver, method, type);
+        return connect(this, SIGNAL(finished(int, const QVariant &, int, const QString &)), receiver, method, type);
     } else {
         return connect(this, signal, receiver, method, type);
     }
 }
 
-QnAbstractConnection::QnAbstractConnection(QObject *parent): 
-    base_type(parent)
+QnAbstractConnection::QnAbstractConnection(QObject *parent, QnResource* targetRes): 
+    base_type(parent),
+    m_targetRes(targetRes)
 {}
 
 QnAbstractConnection::~QnAbstractConnection() {
@@ -37,6 +43,14 @@ void QnAbstractConnection::setExtraHeaders(const QnRequestHeaderList& extraHeade
     m_extraHeaders = extraHeaders;
 }
 
+const QnRequestParamList &QnAbstractConnection::extraQueryParameters() const {
+    return m_extraQueryParameters;
+}
+
+void QnAbstractConnection::setExtraQueryParameters(const QnRequestParamList &extraQueryParameters) {
+    m_extraQueryParameters = extraQueryParameters;
+}
+
 QUrl QnAbstractConnection::url() const {
     return m_url;
 }
@@ -45,12 +59,20 @@ void QnAbstractConnection::setUrl(const QUrl &url) {
     m_url = url;
 }
 
-QnEnumNameMapper *QnAbstractConnection::nameMapper() const {
-    return m_nameMapper.data() ? m_nameMapper.data() : qn_abstractConnection_emptyNameMapper();
+QnLexicalSerializer *QnAbstractConnection::serializer() const {
+    return m_serializer.data() ? m_serializer.data() : qn_abstractConnection_emptySerializer();
 }
 
-void QnAbstractConnection::setNameMapper(QnEnumNameMapper *nameMapper) {
-    m_nameMapper.reset(nameMapper);
+void QnAbstractConnection::setSerializer(QnLexicalSerializer *serializer) {
+    assert(serializer->type() == QMetaType::Int);
+
+    m_serializer.reset(serializer);
+}
+
+QString QnAbstractConnection::objectName(int object) const {
+    QString result;    
+    serializer()->serialize(object, &result);
+    return result;
 }
 
 int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot) {
@@ -61,7 +83,7 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
         if(replyTypeName == NULL) {
             signal = SIGNAL(finished(int, int));
         } else {
-            signal = lit("%1finished(int, const %2 &, int)").arg(QSIGNAL_CODE).arg(QLatin1String(replyTypeName)).toLatin1();
+            signal = lit("%1finished(int, const %2 &, int, const QString &)").arg(QSIGNAL_CODE).arg(QLatin1String(replyTypeName)).toLatin1();
         }
         processor->connect(signal.constData(), target, slot, Qt::QueuedConnection);
     }
@@ -70,10 +92,16 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
     if(!m_extraHeaders.isEmpty())
         actualHeaders.append(m_extraHeaders);
 
+    QUrlQuery urlQuery(m_url);
+    for (auto it = m_extraQueryParameters.begin(); it != m_extraQueryParameters.end(); ++it)
+        urlQuery.addQueryItem(it->first, it->second);
+    QUrl url = m_url;
+    url.setQuery(urlQuery);
+
     return QnSessionManager::instance()->sendAsyncRequest(
         operation,
-        m_url, 
-        nameMapper()->name(processor->object()), 
+        url,
+        objectName(processor->object()), 
         actualHeaders, 
         params, 
         data,
@@ -107,7 +135,7 @@ int QnAbstractConnection::sendSyncRequest(int operation, int object, const QnReq
     int status = QnSessionManager::instance()->sendSyncRequest(
         operation,
         m_url,
-        nameMapper()->name(object),
+        objectName(object),
         actualHeaders,
         params,
         data,

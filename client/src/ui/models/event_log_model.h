@@ -2,7 +2,14 @@
 #define QN_EVENT_LOG_MODEL_H
 
 #include <QtCore/QAbstractItemModel>
-#include "business/actions/abstract_business_action.h"
+
+#include <utils/common/id.h>
+
+#include <core/resource/resource_fwd.h>
+
+#include <business/business_fwd.h>
+#include <business/business_action_parameters.h>
+
 
 class QnEventLogModel: public QAbstractItemModel {
     Q_OBJECT
@@ -38,7 +45,7 @@ public:
 
     bool hasMotionUrl(const QModelIndex &index) const;
 
-    BusinessEventType::Value eventType(int row) const;
+    QnBusiness::EventType eventType(int row) const;
     QnResourcePtr eventResource(int row) const;
     qint64 eventTimestamp(int row) const;
 
@@ -59,18 +66,18 @@ private:
 
     static QString motionUrl(Column column, const QnBusinessActionData& action);
     static QString formatUrl(const QString& url);
-    static QnResourcePtr getResourceById(const QnId& id);
-    static QString getResourceNameString(QnId id);
+    static QnResourcePtr getResourceById(const QUuid& id);
+    static QString getResourceNameString(QUuid id);
     static QString getUserGroupString(QnBusinessActionParameters::UserGroup value);
 
-    Q_SLOT void at_resource_removed(const QnResourcePtr &resource);
+    void at_resource_removed(const QnResourcePtr &resource);
 
 private:
     QList<Column> m_columns;
     QBrush m_linkBrush;
     QFont m_linkFont;
     DataIndex* m_index;
-    static QHash<QnId, QnResourcePtr> m_resourcesHash;
+    static QHash<QUuid, QnResourcePtr> m_resourcesHash;
 };
 
 #endif // QN_EVENT_LOG_MODEL_H

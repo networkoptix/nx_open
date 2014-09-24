@@ -4,43 +4,59 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QMetaType>
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
+#include <QTimer>
 
-class QnLicense;
-typedef QSharedPointer<QnLicense> QnLicensePtr;
+#include "core/resource/resource_fwd.h"
+#include "utils/common/latin1_array.h"
+#include "utils/common/id.h"
+#include "nx_ec/data/api_fwd.h"
 
+#ifdef __APPLE__
+#undef verify
+#endif
 
 class QnLicense {
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
 public:
-    enum Type {
-        FreeLicense,
-        TrialLicense,
-        AnalogLicense,
-        ProfessionalLicense,
-        TypeCount
+
+    enum ErrorCode {
+        NoError,
+        InvalidSignature,           /**< License digital signature is not match */
+        InvalidHardwareID,          /**< Invalid hardware ID */
+        InvalidBrand,               /**< License belong to other customization */
+        Expired,                    /**< Expired */
+        InvalidType,                /**< Such license type isn't allowed for that device. */
+        TooManyLicensesPerDevice    /**< Too many licenses of this type per device */
     };
 
+    enum ValidationMode {
+        VM_Regular,
+        VM_CheckInfo,
+        VM_JustCreated
+    };
+
+    QnLicense();
     QnLicense(const QByteArray& licenseBlock);
+
+    void loadLicenseBlock( const QByteArray& licenseBlock );
 
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(const QList<QByteArray>& hardwareIds, const QString& brand) const;
+    bool isValid(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
 
-    /**
-     * @returns                         Whether this license is for analog cameras.
-     */
-    bool isAnalog() const;
+    static QString errorMessage(ErrorCode errCode);
 
     const QString &name() const;
     const QByteArray &key() const;
+    void setKey(const QByteArray& value);
     qint32 cameraCount() const;
     const QByteArray &hardwareId() const;
     const QByteArray &signature() const;
@@ -59,11 +75,16 @@ public:
      *                                  or -1 if this license never expires.
      */
     qint64 expirationTime() const;
-    Type type() const;
-    QString typeName() const;
+    Qn::LicenseType type() const; 
+
+    bool isInfoMode() const;
 
     static QnLicensePtr readFromStream(QTextStream &stream);
 
+    QString displayName() const;
+    static QString displayName(Qn::LicenseType licenseType);
+    QString longDisplayName() const;
+    static QString longDisplayName(Qn::LicenseType licenseType);
 private:
     QByteArray m_rawLicense;
 
@@ -84,9 +105,22 @@ private:
 
     // Is full license valid (signature2 is used)
     bool m_isValid2;
+
+    void parseLicenseBlock(
+        const QByteArray& licenseBlock,
+        QByteArray* const v1LicenseBlock,
+        QByteArray* const v2LicenseBlock );
+    void licenseBlockFromData(
+        QByteArray* const v1LicenseBlock,
+        QByteArray* const v2LicenseBlock );
+    void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
+
+    QUuid findRuntimeDataByLicense() const;
+    bool gotError(ErrorCode* errCode, ErrorCode errorCode) const;
 };
 
-typedef QList<QnLicensePtr> QnLicenseList;
+Q_DECLARE_METATYPE(QnLicensePtr)
+
 typedef QMap<QByteArray, QnLicensePtr> QnLicenseDict;
 
 class QnLicenseListHelper
@@ -94,26 +128,14 @@ class QnLicenseListHelper
 public:
     QnLicenseListHelper(const QnLicenseList& licenseList);
 
+    void update(const QnLicenseList& licenseList);
+
     QList<QByteArray> allLicenseKeys() const;
     bool haveLicenseKey(const QByteArray& key) const;
     QnLicensePtr getLicenseByKey(const QByteArray& key) const;
-
-    /**
-     * \returns                         Total number of digital cameras allowed.
-     */
-    int totalDigital() const {
-        return totalCamerasByClass(false);
-    }
-
-    /**
-     * \returns                         Total number of analog cameras allowed.
-     */
-    int totalAnalog() const {
-        return totalCamerasByClass(true);
-    }
+    int totalLicenseByType(Qn::LicenseType licenseType) const;
 
 private:
-    int totalCamerasByClass(bool analog) const;
 
 private:
     QnLicenseDict m_licenseDict;
@@ -123,7 +145,7 @@ Q_DECLARE_METATYPE(QnLicenseList)
 
 
 /**
- * License storage which is associated with instance of Enterprise Controller (i.e. should be reloaded when switching appserver).
+ * License storage which is associated with instance of Server (i.e. should be reloaded when switching appserver).
  */
 class QnLicensePool : public QObject
 {
@@ -137,34 +159,30 @@ public:
     void addLicense(const QnLicensePtr &license);
     void addLicenses(const QnLicenseList &licenses);
     void replaceLicenses(const QnLicenseList &licenses);
+    void removeLicense(const QnLicensePtr &license);
 
     void reset();
     bool isEmpty() const;
 
-    void setMainHardwareIds(const QList<QByteArray>& hardwareIds);
     QList<QByteArray> mainHardwareIds() const;
-
-    void setCompatibleHardwareIds(const QList<QByteArray>& hardwareIds);
     QList<QByteArray> compatibleHardwareIds() const;
-
-    QList<QByteArray> allHardwareIds() const;
     QByteArray currentHardwareId() const;
+    bool isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode = 0) const;
 signals:
     void licensesChanged();
 
 protected:
     QnLicensePool();
-
+private slots:
+    void at_timer();
 private:
     bool isLicenseMatchesCurrentSystem(const QnLicensePtr &license);
     bool addLicense_i(const QnLicensePtr &license);
     bool addLicenses_i(const QnLicenseList &licenses);
-
 private:
-    QList<QByteArray> m_mainHardwareIds;
-    QList<QByteArray> m_compatibleHardwareIds;
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QMutex m_mutex;
+    QTimer m_timer;
 };
 
 #define qnLicensePool QnLicensePool::instance()

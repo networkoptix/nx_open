@@ -1,4 +1,6 @@
+
 #include "universal_tcp_listener.h"
+
 #include "utils/network/tcp_connection_priv.h"
 #include <QtCore/QUrl>
 #include "universal_request_processor.h"
@@ -10,28 +12,54 @@ static const int PROXY_KEEP_ALIVE_INTERVAL = 40 * 1000;
 
 // -------------------------------- QnUniversalListener ---------------------------------
 
-QnUniversalTcpListener::QnUniversalTcpListener(const QHostAddress& address, int port, int maxConnections):
-    QnTcpListener(address, port, maxConnections),
-    m_proxyPoolSize(0),
-    m_needAuth(true)
+QnUniversalTcpListener::QnUniversalTcpListener(
+    const QHostAddress& address,
+    int port,
+    int maxConnections,
+    bool useSsl )
+:
+    QnTcpListener( address, port, maxConnections, useSsl ),
+    m_proxyPoolSize( 0 ),
+    m_needAuth( true )
 {
-
 }
 
 QnUniversalTcpListener::~QnUniversalTcpListener()
 {
     stop();
 }
-
-QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, const QByteArray& protocol, const QString& path)
+bool QnUniversalTcpListener::isProxy(const nx_http::Request& request)
 {
-    QString normPath = path.startsWith(L'/') ? path.mid(1) : path;
+    return (m_proxyInfo.proxyHandler && m_proxyInfo.proxyCond(request));
+};
+QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(
+    QSharedPointer<AbstractStreamSocket> clientSocket,
+    const QByteArray& protocol,
+    const nx_http::Request& request)
+{
+    if (isProxy(request))
+        return m_proxyInfo.proxyHandler(clientSocket, this);
+
+    QString normPath = request.requestLine.url.path();
+    while (normPath.startsWith(L'/'))
+        normPath = normPath.mid(1);
+
+    int bestPathLen = -1;
+    int bestIdx = -1;
     for (int i = 0; i < m_handlers.size(); ++i)
     {
         HandlerInfo h = m_handlers[i];
-        if (m_handlers[i].protocol == protocol && normPath.startsWith(m_handlers[i].path))
-            return m_handlers[i].instanceFunc(clientSocket, this);
+        if ((m_handlers[i].protocol == "*" || m_handlers[i].protocol == protocol) && normPath.startsWith(m_handlers[i].path))
+        {
+            int pathLen = m_handlers[i].path.length();
+            if (pathLen > bestPathLen) {
+                bestIdx = i;
+                bestPathLen = pathLen;
+            }
+        }
     }
+    if (bestIdx >= 0)
+        return m_handlers[bestIdx].instanceFunc(clientSocket, this);
 
     // check default '*' path handler
     for (int i = 0; i < m_handlers.size(); ++i)

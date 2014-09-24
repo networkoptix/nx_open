@@ -4,9 +4,9 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <recording/time_period.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+class QnTimePeriod;
 
 /**
  * @brief The QnWorkbenchExportHandler class            Handler for video and layout export related actions.

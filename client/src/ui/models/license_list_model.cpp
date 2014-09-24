@@ -4,6 +4,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
+#include "utils/math/math.h"
 
 QnLicenseListModel::QnLicenseListModel(QObject *parent):
     base_type(parent)
@@ -20,9 +21,6 @@ const QList<QnLicensePtr> &QnLicenseListModel::licenses() const {
 }
 
 void QnLicenseListModel::setLicenses(const QList<QnLicensePtr> &licenses) {
-    if(m_licenses == licenses)
-        return;
-
     m_licenses = licenses;
 
     rebuild();
@@ -61,10 +59,10 @@ void QnLicenseListModel::setColors(const QnLicensesListModelColors &colors) {
 QString QnLicenseListModel::columnTitle(Column column) {
     switch(column) {
     case TypeColumn:            return tr("Type");
-    case CameraCountColumn:     return tr("Cameras");
+    case CameraCountColumn:     return tr("Amount");
     case LicenseKeyColumn:      return tr("License Key");
     case ExpirationDateColumn:  return tr("Expiration Date");
-    case ExpiresInColumn:       return tr("Expires in");
+    case LicenseStatusColumn:   return tr("Status");
     default:
         assert(false);
         return QString();
@@ -77,7 +75,7 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
 
     switch(column) {
     case TypeColumn:
-        item->setText(license->typeName());
+        item->setText(license->displayName());
         break;
     case CameraCountColumn:
         item->setText(QString::number(license->cameraCount()));
@@ -86,36 +84,52 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
         item->setText(QLatin1String(license->key()));
         break;
     case ExpirationDateColumn:
-        item->setText(license->expirationTime() < 0 ? tr("Never") : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString());
+        item->setText(license->expirationTime() < 0 ? tr("Never") : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString(Qt::SystemLocaleShortDate));
         break;
-    case ExpiresInColumn: {
-        qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-        qint64 expirationTime = license->expirationTime();
+    case LicenseStatusColumn: 
+        {
+            QnLicense::ErrorCode errCode;
+            if (qnLicensePool->isLicenseValid(license, &errCode))
+            {
+                qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+                qint64 expirationTime = license->expirationTime();
 
-        qint64 day = 1000ll * 60ll * 60ll * 24ll;
-        qint64 timeLeft = expirationTime - currentTime;
-        if(timeLeft < 0) {
-            item->setText(tr("Expired"));
-            item->setData(QBrush(colors.expired), Qt::ForegroundRole);
-        } else {
-            if(timeLeft < 5 * day)
-                item->setData(QBrush(colors.warning), Qt::ForegroundRole);
-
-            int daysLeft = QDateTime::fromMSecsSinceEpoch(currentTime).date().daysTo(QDateTime::fromMSecsSinceEpoch(expirationTime).date());
-            if(daysLeft == 0) {
-                item->setText(tr("Today"));
-            } else if(daysLeft == 1) {
-                item->setText(tr("Tomorrow"));
-            } else {
-                item->setText(tr("In %n days", 0, daysLeft));
+                qint64 day = 1000ll * 60ll * 60ll * 24ll;
+                qint64 timeLeft = expirationTime - currentTime;
+                if(expirationTime > 0 && timeLeft < 0) {
+                    item->setText(tr("Expired"));
+                    item->setData(QBrush(colors.expired), Qt::ForegroundRole);
+                } 
+                else if(expirationTime > 0 && timeLeft < 15 * day) 
+                {
+                        item->setData(QBrush(colors.warning), Qt::ForegroundRole);
+                        int daysLeft = QDateTime::fromMSecsSinceEpoch(currentTime).date().daysTo(QDateTime::fromMSecsSinceEpoch(expirationTime).date());
+                        if(daysLeft == 0) {
+                            item->setText(tr("Today"));
+                        } else if(daysLeft == 1) {
+                            item->setText(tr("Tomorrow"));
+                        } else {
+                            item->setText(tr("In %n days", 0, daysLeft));
+                        }
+                }
+                else {
+                    item->setText(tr("OK"));
+                }
             }
+            else {
+                item->setText(license->errorMessage(errCode));
+                item->setData(QBrush(colors.expired), Qt::ForegroundRole);
+            }
+            break;
         }
-        break;
-    }
     default:
         assert(false);
     }
 
+    if (!qnLicensePool->isLicenseValid(license))
+        item->setData(QBrush(colors.expired), Qt::ForegroundRole);
+
+    item->setData(Qt::AlignCenter, Qt::TextAlignmentRole);
     return item;
 }
 

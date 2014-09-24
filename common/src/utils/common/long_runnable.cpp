@@ -54,7 +54,7 @@ public:
     void finishedNotify(QnLongRunnable *runnable) {
         QMutexLocker locker(&m_mutex);
 
-        assert(runnable && m_running.contains(runnable));
+        assert(runnable); //  && m_running.contains(runnable)
 
         m_running.remove(runnable);
         if(m_running.isEmpty())
@@ -103,6 +103,12 @@ void QnLongRunnablePool::waitAll() {
 }
 
 
+//!Thread stack size reduced (from default 8MB on linux) to save memory on edge devices. If this is not enough consider using heap
+/*!
+    This value is not platform-dependent to be able to catch stack overflow error on every platform
+*/
+static const size_t DEFAULT_THREAD_STACK_SIZE = 128*1024;
+
 // -------------------------------------------------------------------------- //
 // QnLongRunnable
 // -------------------------------------------------------------------------- //
@@ -122,6 +128,8 @@ QnLongRunnable::QnLongRunnable():
 
     connect(this, SIGNAL(started()),    this, SLOT(at_started()), Qt::DirectConnection);
     connect(this, SIGNAL(finished()),   this, SLOT(at_finished()), Qt::DirectConnection);
+
+    setStackSize( DEFAULT_THREAD_STACK_SIZE );
 }
 
 QnLongRunnable::~QnLongRunnable() {
@@ -163,13 +171,18 @@ void QnLongRunnable::initSystemThreadId() {
     if(m_systemThreadId)
         return;
 
+    m_systemThreadId = currentThreadSystemId();
+}
+
+std::uintptr_t QnLongRunnable::currentThreadSystemId()
+{
 #if defined(Q_OS_LINUX)
-    /* This one is purely for debugging purposes. 
-     * QThread::currentThreadId is implemented via pthread_self, 
-     * which is not an identifier you see in GDB. */
-    m_systemThreadId = gettid();
+    /* This one is purely for debugging purposes.
+    * QThread::currentThreadId is implemented via pthread_self,
+    * which is not an identifier you see in GDB. */
+    return gettid();
 #else
-    m_systemThreadId = reinterpret_cast<std::uintptr_t>(QThread::currentThreadId());
+    return reinterpret_cast<std::uintptr_t>(QThread::currentThreadId());
 #endif
 }
 

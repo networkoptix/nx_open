@@ -3,19 +3,24 @@
 
 #include <QtCore/QTime>
 
-#include "decoders/video/abstractdecoder.h"
+#include <utils/common/adaptive_sleep.h>
+#include <utils/media/externaltimesource.h>
+
+#include <core/resource/resource_fwd.h>
+#include <core/dataconsumer/abstract_data_consumer.h>
+#include <core/datapacket/audio_data_packet.h>
+#include <core/resource/resource_media_layout.h>
+
+#include <decoders/video/abstractdecoder.h>
+
 #include "video_stream_display.h"
-#include "core/dataconsumer/abstract_data_consumer.h"
-#include "core/resource/resource_media_layout.h"
-#include "utils/common/adaptive_sleep.h"
-#include "utils/media/externaltimesource.h"
-#include "core/resource/resource_fwd.h"
 
 class QnAbstractRenderer;
 class QnVideoStreamDisplay;
 class QnAudioStreamDisplay;
-struct QnCompressedVideoData;
+class QnCompressedVideoData;
 class QnArchiveStreamReader;
+class QnlTimeSource;
 
 /* 
 * This class is not duplicate statistics from Reader. If not enough CPU/network this class still show full (correct) stream fps
@@ -48,7 +53,7 @@ public:
     void addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bool canDownscale);
     void removeVideoRenderer(QnAbstractRenderer* vw);
 
-    virtual bool processData(QnAbstractDataPacketPtr data);
+    virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     virtual void pleaseStop() override;
 
@@ -92,17 +97,25 @@ public:
     bool isLongWaiting() const;
     bool isEOFReached() const;
     bool isStillImage() const;
-    virtual void putData(QnAbstractDataPacketPtr data) override;
+    virtual void putData(const QnAbstractDataPacketPtr& data) override;
     QSize getMaxScreenSize() const;
     QnArchiveStreamReader* getArchiveReader() const;
     bool isFullScreen() const;
     bool isZoomWindow() const;
     void setFullScreen(bool fullScreen);
+
+    bool isFisheyeEnabled() const;
+    void setFisheyeEnabled(bool fisheyeEnabled);
+
     int getAvarageFps() const;
     virtual bool isBuffering() const override;
 
     qreal overridenAspectRatio() const;
     void setOverridenAspectRatio(qreal aspectRatio);
+
+    const QSize& getRawDataSize() const {
+        return m_display[0]->getRawDataSize();
+    }
 
 public slots:
     void onBeforeJump(qint64 time);
@@ -237,6 +250,7 @@ protected:
     bool m_doNotChangeDisplayTime;
     bool m_firstLivePacket;
     bool m_multiView;
+    bool m_fisheyeEnabled;
 };
 
 #endif //QN_CAM_DISPLAY_H

@@ -253,3 +253,32 @@ QSizeF QnProxyLabel::sizeHint(Qt::SizeHint which, const QSizeF &constraint) cons
 
     return result;
 }
+
+void QnDebugProxyLabel::init() {
+    m_messagesLimit = 20;
+    connect(this, &QnDebugProxyLabel::textAppended, this, &QnDebugProxyLabel::appendText, Qt::QueuedConnection);
+}
+
+void QnDebugProxyLabel::setMessagesLimit(int limit) {
+    if (m_messagesLimit == limit)
+        return;
+    m_messagesLimit = limit;
+    QStringList msgs = this->text().split(L'\n');
+    while (msgs.size() > m_messagesLimit)
+        msgs.removeFirst();
+    setText(msgs.join(L'\n'));
+    resize(effectiveSizeHint(Qt::PreferredSize));
+}
+
+void QnDebugProxyLabel::appendTextQueued(const QString &text) {
+    emit textAppended(text);
+}
+
+void QnDebugProxyLabel::appendText(const QString &text) {
+    QStringList msgs = this->text().split(L'\n');
+    msgs.append(text);
+    while (msgs.size() > m_messagesLimit)
+        msgs.removeFirst();
+    setText(msgs.join(L'\n'));
+    resize(effectiveSizeHint(Qt::PreferredSize));
+}

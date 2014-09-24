@@ -5,23 +5,32 @@
 #define ${project.artifactId}_VERSION_H
 
 /* 
- * Some defines from the build system. Feel free to use these.
+ * Some defines from the build system. Using them directly strongly not recommended.
+ * 
+ * DO NOT USE THEM IN YOUR CODE. 
+ * DO NOT ADD NEW CONSTANTS HERE.
+ *
+ * All projects that are depend on "common" should use <utils/common/app_info.h> instead.
+ * The QN_APPLICATION_NAME should be read from QCoreApplication::applicationName().
+ *
+ * No new variables should be added here. The major part of the file will be wiped out asap.
  */
 #define QN_BETA                         "${beta}"
 #define QN_ORGANIZATION_NAME            "${company.name}"
 #define QN_APPLICATION_NAME             "${product.title}"
-#define QN_APPLICATION_VERSION          "${release.version}.${buildNumber}"
+#define QN_APPLICATION_VERSION          "${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${buildNumber}"
 #ifdef _WIN32
 #   define QN_PRODUCT_NAME              "${product.name}"
 #else
 #   define QN_PRODUCT_NAME              "${namespace.additional}"
 #endif
 #define QN_PRODUCT_NAME_SHORT           "${product.name.short}"
-#define QN_ENGINE_VERSION               "${release.version}.${buildNumber}"
+#define QN_ENGINE_VERSION               "${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${buildNumber}"
 #define QN_APPLICATION_REVISION         "${changeSet}"
 #define QN_APPLICATION_PLATFORM         "${platform}"
 #define QN_APPLICATION_ARCH             "${arch}"
 #define QN_APPLICATION_COMPILER         "${additional.compiler}"
+#define QN_APPLICATION_MODIFICATION     "${modification}"
 #define QN_FFMPEG_VERSION               "${ffmpeg.version}"
 #define QN_SIGAR_VERSION                "${sigar.version}"
 #define QN_BOOST_VERSION                "${boost.version}"
@@ -46,6 +55,10 @@
 #define QN_BUILDENV_PATH                "${environment.dir}"
 #define QN_MIRRORLIST_URL               "${mirrorListUrl}"
 #define QN_HELP_URL                     "${helpUrl}/${customization}/${parsedVersion.majorVersion}/${parsedVersion.minorVersion}/url"
+#define QN_ARM_BOX                      "${box}"
+#define QN_IOS_PLAYBUTTON_TINT          "${ios.playButton.tint}"
+
+
 /* 
  * These constants are here for windows resource file.
  *
@@ -66,6 +79,6 @@
 #define VER_ORIGINALFILENAME_STR        "${project.artifactId}.exe"
 #define VER_PRODUCTNAME_STR             "${project.artifactId}"
 #define VER_COMPANYDOMAIN_STR           "${company.url}"
-/* BORIS, a note personally to you. If you continue adding defines to this block, I'll rip you a new asshole. You will not enjoy it. */
+/* Dear Developer. Please add new constants to the code block above (QN_* definitions). Thank you. */
 
 #endif // ${project.artifactId}_VERSION_H

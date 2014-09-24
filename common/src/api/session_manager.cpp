@@ -89,13 +89,14 @@ QnSessionManager::~QnSessionManager() {
 void QnSessionManager::at_replyReceived(QNetworkReply * reply) 
 {
     QString errorString = reply->errorString();
-    // Common EC error looks like:
+    // Common Server error looks like:
     // "Error downloading https://user:password@host:port/path - server replied: INTERNAL SERVER ERROR"
     // displaying plain-text password is unsecure and strongly not recommended
     if (errorString.indexOf(QLatin1String("@")) > 0 && errorString.indexOf(QLatin1String(":")) > 0) {
         int n = errorString.lastIndexOf(QLatin1String(":"));
         errorString = errorString.mid(n + 1).trimmed();
     }
+
     AsyncRequestInfo reqInfo = m_handleInProgress.value(reply);
     m_handleInProgress.remove(reply);
     //emit requestFinished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toLatin1()), handle);
@@ -215,6 +216,7 @@ int QnSessionManager::sendAsyncRequest(int operation, const QUrl& url, const QSt
     reqInfo.object = target;
     reqInfo.slot = slot;
     reqInfo.connectionType = connectionType;
+    qDebug() << "send async request to" << url << data << params;
     emit asyncRequestQueued(operation, reqInfo, url, objectName, headers, params, data);
     return reqInfo.handle;
 }
@@ -284,26 +286,27 @@ void QnSessionManager::at_aboutToBeStopped() {
     m_accessManager = 0;
 }
 
-void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * )
+void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & reply, QAuthenticator* authenticator)
 {
-    // not used
+    QString user = QnAppServerConnectionFactory::url().userName();
+    QString password = QnAppServerConnectionFactory::url().password();
+    authenticator->setUser(user);
+    authenticator->setPassword(password);
 }
-
-
 
 void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator)
 {
     // QnSessionManager instance can be used with different instances of QnAppServerConnection simultaneously
-    // so we first checking the reply url for login and password - they are present in case of EC connections
+    // so we first checking the reply url for login and password - they are present in case of Server connections
     // otherwise - mediaserver connections do not include login and password in the url, but we can have
-    // mediaserver connections only within one EC session so we can use defaultUrl() method
+    // mediaserver connections only within one Server session so we can use defaultUrl() method
 
     bool useDefaultValues = reply->url().userName().isEmpty();
     QString user = useDefaultValues
-            ? QnAppServerConnectionFactory::defaultUrl().userName()
+            ? QnAppServerConnectionFactory::url().userName()
             :reply->url().userName();
     QString password = useDefaultValues
-            ? QnAppServerConnectionFactory::defaultUrl().password()
+            ? QnAppServerConnectionFactory::url().password()
             : reply->url().password();
 
     // if current values are already present in authenticator, do not send them again -
@@ -330,6 +333,8 @@ void QnSessionManager::at_asyncRequestQueued(int operation, AsyncRequestInfo req
 
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
+
+    qDebug() << "api url" << request.url();
 
     bool skipContentType = false;
     foreach (QnRequestHeader header, headers) {
@@ -366,4 +371,3 @@ void QnSessionManager::at_sslErrors(QNetworkReply* reply, const QList<QSslError>
 {
     reply->ignoreSslErrors();
 }
-

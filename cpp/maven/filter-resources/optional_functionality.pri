@@ -40,6 +40,22 @@
   }
 }
 
+!contains( DEFINES, DISABLE_MDNS) {
+  DEFINES += ENABLE_MDNS
+}
+
+!contains( DEFINES, DISABLE_COLDSTORE) {
+  DEFINES += ENABLE_COLDSTORE
+}
+
+!contains( DEFINES, DISABLE_ARCHIVE ) {
+  DEFINES += ENABLE_ARCHIVE
+}
+
+!contains( DEFINES, DISABLE_THIRD_PARTY ) {
+  DEFINES += ENABLE_THIRD_PARTY
+}
+
 !contains( DEFINES, DISABLE_SOFTWARE_MOTION_DETECTION ) {
   DEFINES += ENABLE_SOFTWARE_MOTION_DETECTION
 }
@@ -48,12 +64,20 @@
   DEFINES += ENABLE_DESKTOP_CAMERA
 }
 
-contains(NAME, mediaserver) || contains(NAME, common) {
-  IS_VMAX_ENABLED=${vmax}
-  contains( IS_VMAX_ENABLED, true ) {
-    DEFINES += ENABLE_VMAX
-  }
+!contains( DEFINES, DISABLE_DATA_PROVIDERS) {
+  DEFINES += ENABLE_DATA_PROVIDERS
 }
+
+!contains( DEFINES, DISABLE_SSL) {
+  DEFINES += ENABLE_SSL
+}
+
+#contains(NAME, mediaserver) || contains(NAME, common) {
+#  IS_VMAX_ENABLED=${vmax}
+#  contains( IS_VMAX_ENABLED, true ) {
+#    DEFINES += ENABLE_VMAX
+#  }
+#}
 
 contains(NAME, client) {
   IS_DYNAMIC_CUSTOMIZATION_ENABLED=${dynamic.customization}

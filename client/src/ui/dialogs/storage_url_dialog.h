@@ -9,16 +9,18 @@
 
 #include "api/model/storage_status_reply.h"
 
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
+
 struct QnStorageStatusReply;
 
 namespace Ui {
     class StorageUrlDialog;
 }
 
-class QnStorageUrlDialog: public QDialog {
+class QnStorageUrlDialog: public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
 
-    typedef QDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
     QnStorageUrlDialog(const QnMediaServerResourcePtr &server, QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
@@ -31,12 +33,13 @@ public:
 
 protected:
     virtual void accept() override;
-
+private:
+    QString makeUrl(const QString& path, const QString& login, const QString& password);
 private slots:
     void updateComboBox();
 
     void at_protocolComboBox_currentIndexChanged();
-
+    QString normalizePath(QString path);
 private:
     QScopedPointer<Ui::StorageUrlDialog> ui;
     QnMediaServerResourcePtr m_server;

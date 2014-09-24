@@ -1,5 +1,7 @@
 #include "workbench_ptz_dialog_watcher.h"
 
+#include <core/resource/resource.h>
+
 #include <ui/dialogs/ptz_manage_dialog.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -37,5 +39,5 @@ void QnWorkbenchPtzDialogWatcher::closePtzManageDialog(QnWorkbenchItem *item) {
     if (item && item->resourceUid() != dialog->resource()->getUniqueId())
         return;
 
-    dialog->closeWithoutCancel();
+    dialog->tryClose(true);
 }

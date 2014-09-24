@@ -1,5 +1,8 @@
 #include "rtsp_encoder.h"
-#include "utils/network/rtp_stream_parser.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include <utils/network/rtp_stream_parser.h>
 
 QnRtspEncoder::QnRtspEncoder()
 {
@@ -25,3 +28,4 @@ void QnRtspEncoder::buildRTPHeader(char* buffer, quint32 ssrc, int markerBit, qu
     rtp->ssrc = htonl(ssrc); // source ID
 }
 
+#endif // ENABLE_DATA_PROVIDERS

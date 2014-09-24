@@ -14,12 +14,17 @@
 
 namespace aio
 {
+    template<class SocketType>
     class AIOEventHandler
     {
     public:
         virtual ~AIOEventHandler() {}
 
-        virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw() = 0;
+        //!Receives socket state change event
+        /*!
+            Implementation MUST NOT block otherwise it will result poor performance
+        */
+        virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() = 0;
     };
 }
 

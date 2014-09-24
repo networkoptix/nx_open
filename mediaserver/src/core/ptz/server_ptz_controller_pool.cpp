@@ -35,7 +35,7 @@ void QnServerPtzControllerPool::unregisterResource(const QnResourcePtr &resource
 }
 
 QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourcePtr &resource) const {
-    if(resource->flags() & QnResource::foreigner)
+    if(resource->flags() & Qn::foreigner)
         return QnPtzControllerPtr(); /* That's not our resource! */
 
     if(!resource->isInitialized())
@@ -48,14 +48,11 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
     QnPtzControllerPtr controller(camera->createPtzController());
     if(controller) {
         if(QnMappedPtzController::extends(controller->getCapabilities()))
-            if(QnPtzMapperPtr mapper = qnCommon->dataPool()->data(camera).ptzMapper())
+            if(QnPtzMapperPtr mapper = qnCommon->dataPool()->data(camera).value<QnPtzMapperPtr>(lit("ptzMapper")))
                 controller.reset(new QnMappedPtzController(mapper, controller));
 
         if(QnViewportPtzController::extends(controller->getCapabilities()))
             controller.reset(new QnViewportPtzController(controller));
-
-    if(QnWorkaroundPtzController::extends(controller->getCapabilities()))
-        controller.reset(new QnWorkaroundPtzController(controller));
 
         if(QnPresetPtzController::extends(controller->getCapabilities()))
             controller.reset(new QnPresetPtzController(controller));
@@ -73,8 +70,15 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
             controller.reset(new QnWorkaroundPtzController(controller));
     }
 
-    camera->setPtzCapabilities(controller ? controller->getCapabilities() : Qn::NoPtzCapabilities);
-    QnAppServerConnectionFactory::createConnection()->saveAsync(camera, NULL, NULL);
-    
+    Qn::PtzCapabilities caps = controller ? controller->getCapabilities() : Qn::NoPtzCapabilities;
+    if (camera->getPtzCapabilities() != caps) {
+        camera->setPtzCapabilities(caps);
+        camera->saveParamsAsync();
+    }
     return controller;
+}
+
+void QnServerPtzControllerPool::at_addCameraDone(int, ec2::ErrorCode, const QnVirtualCameraResourceList &)
+{
+
 }

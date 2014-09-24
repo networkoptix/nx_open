@@ -3,6 +3,7 @@
 
 #include <memory> // for auto_ptr
 
+#include <QtCore/QMutex>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
 #include <QtNetwork/QAuthenticator>
@@ -13,7 +14,9 @@
 
 #include <api/model/manual_camera_seach_reply.h>
 
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource_factory.h>
+#include <core/resource/resource_processor.h>
 
 class QnAbstractResourceSearcher;
 class QnAbstractDTSSearcher;
@@ -65,8 +68,8 @@ class QnResourceDiscoveryManager : public QnLongRunnable, public QnResourceFacto
 public:
     enum State
     {
-        initialSearch,
-        periodicSearch
+        InitialSearch,
+        PeriodicSearch
     };
 
 
@@ -83,14 +86,15 @@ public:
     void addDTSServer(QnAbstractDTSSearcher* serv);
     void setResourceProcessor(QnResourceProcessor* processor);
 
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams& params) override;
 
     virtual void pleaseStop();
 
     void setReady(bool ready);
 
     bool registerManualCameras(const QnManualCameraInfoMap& cameras);
-    bool containManualCamera(const QString& uniqId);
+    bool containManualCamera(const QString& url);
+    void fillManualCamInfo(QnManualCameraInfoMap& cameras, const QnSecurityCamResourcePtr& camera);
 
     ResourceSearcherList plugins() const;
 
@@ -99,7 +103,9 @@ public:
 
     static void init(QnResourceDiscoveryManager* instance);
     State state() const;
-
+    
+    void setLastDiscoveredResources(const QnResourceList& resources);
+    QnResourceList lastDiscoveredResources() const;
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 
@@ -116,10 +122,10 @@ signals:
     void localInterfacesChanged();
     void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
 
-private slots:
-    void onInitAsyncFinished(QnResourcePtr res, bool initialized);
+protected slots:
+    void onInitAsyncFinished(const QnResourcePtr& res, bool initialized);
     void at_resourceDeleted(const QnResourcePtr& resource);
-
+    void at_resourceChanged(const QnResourcePtr& resource);
 private:
     void updateLocalNetworkInterfaces();
 
@@ -152,6 +158,10 @@ private:
 
     QHash<QUuid, QnManualCameraSearchStatus> m_searchProcessStatuses;
     QHash<QUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
+
+    mutable QMutex m_resListMutex;
+    QnResourceList m_lastDiscoveredResources[4];
+    int m_discoveryUpdateIdx;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

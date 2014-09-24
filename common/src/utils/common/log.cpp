@@ -1,9 +1,17 @@
 #include "log.h"
+#include <iomanip>
 #include <sstream>
 #include <QtCore/QTextStream>
 #include <QtCore/QThread>
 #include <QtCore/QDateTime>
 #include <QtCore/QLocale>
+
+#ifdef Q_OS_LINUX
+#   include <sys/types.h>
+#   include <linux/unistd.h>
+static pid_t gettid(void) { return syscall(__NR_gettid); }
+#endif
+
 
 const char *qn_logLevelNames[] = {"UNKNOWN", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
 const char UTF8_BOM[] = "\xEF\xBB\xBF";
@@ -66,6 +74,9 @@ public:
         std::ostringstream ostr;
         ostr << QLocale::c().toString(QDateTime::currentDateTime(), QLatin1String("ddd MMM d yy  hh:mm:ss.zzz")).toUtf8().data()
             << " Thread " << QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).data()
+#ifdef Q_OS_LINUX
+            << " ("<<std::setw(5)<<gettid()<<")"
+#endif
             << " (" << qn_logLevelNames[logLevel] << "): " << msg.toUtf8().data() << "\r\n";
         ostr.flush();
 
@@ -169,31 +180,54 @@ private:
     mutable QMutex m_mutex;
 };
 
-Q_GLOBAL_STATIC(QnLogPrivate, qn_logPrivateInstance);
-
 
 // -------------------------------------------------------------------------- //
 // QnLog
 // -------------------------------------------------------------------------- //
-static QAtomicPointer<QnLog> qnLogInstance;
-//static QGlobalStatic<QnLog> qnLogInstance = { Q_BASIC_ATOMIC_INITIALIZER(0), false };
-//Q_GLOBAL_STATIC_WITH_ARGS( QnLog, qnLogInstance, qn_logPrivateInstance() );
 
-QnLog::QnLog(QnLogPrivate *d): d(d) {}
-
-QnLog* QnLog::instance()
+QnLog::QnLog()
+:
+    d( new QnLogPrivate() )
 {
-    //return QnLog(qn_logPrivateInstance());
+}
 
-    if( !qnLogInstance.load() )
+class QnLogs
+{
+public:
+    ~QnLogs()
     {
-        QnLog* newInstance = new QnLog( qn_logPrivateInstance() );
-        if( !qnLogInstance.testAndSetOrdered( NULL, newInstance ) )
-            delete newInstance;
-        //else
-        //    static QGlobalStaticDeleter<QnLog> cleanup(qnLogInstance);
+        //no one calls get() anymore
+        for( auto val: m_logs )
+            delete val.second;
+        m_logs.clear();
     }
-    return qnLogInstance.load();
+
+    QnLog* get( int logID )
+    {
+        QMutexLocker lk( &m_mutex );
+        QnLog*& log = m_logs[logID];
+        if( !log )
+            log = new QnLog();
+        return log;
+    }
+
+    bool put( int logID, QnLog* log )
+    {
+        QMutexLocker lk( &m_mutex );
+        return m_logs.insert( std::make_pair( logID, log ) ).second;
+    }
+
+private:
+    std::map<int, QnLog*> m_logs;
+    QMutex m_mutex;
+};
+
+Q_GLOBAL_STATIC(QnLogs, qn_logsInstance);
+
+
+QnLog* QnLog::instance( int logID )
+{
+    return qn_logsInstance()->get(logID);
 }
 
 bool QnLog::create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) {
@@ -243,11 +277,11 @@ void QnLog::log(QnLogLevel logLevel, const char* format, ...) {
     vsnprintf(buffer, MAX_MESSAGE_SIZE, format, args);
 #endif
 
-    d->log(QString::fromLocal8Bit(buffer), logLevel);
+    d->log(QString::fromLatin1(buffer), logLevel);
     va_end(args);
 }
 
-void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg) {
+void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& /*ctx*/, const QString& msg) {
     //TODO: #Elric use ctx
 
     QnLogLevel logLevel;
@@ -267,15 +301,15 @@ void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QStrin
         break;
     }
 
-    cl_log.log(msg, logLevel);
+    NX_LOG(msg, logLevel);
 }
 
-QString QnLog::logFileName()
+QString QnLog::logFileName( int logID )
 {
-    return instance()->d->syncCurrFileName();
+    return instance(logID)->d->syncCurrFileName();
 }
 
-void QnLog::initLog(const QString& logLevelStr) {
+void QnLog::initLog(const QString& logLevelStr, int logID) {
     bool needWarnLogLevel = false;
     QnLogLevel logLevel = cl_logDEBUG1;
 #ifndef _DEBUG
@@ -289,17 +323,16 @@ void QnLog::initLog(const QString& logLevelStr) {
         else
             needWarnLogLevel = true;
     }
-    cl_log.setLogLevel(logLevel);
+    QnLog::instance(logID)->setLogLevel(logLevel);
 
     if (needWarnLogLevel) {
-        cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
-        cl_log.log("Unknown log level specified. Using level ", QnLog::logLevelToString(logLevel), cl_logALWAYS);
+        NX_LOG(QLatin1String("================================================================================="), cl_logALWAYS);
+        NX_LOG(lit("Unknown log level specified. Using level %1").arg(QnLog::logLevelToString(logLevel)), cl_logALWAYS);
     }
 
 }
 
-void QnLog::initLog( QnLog* externalInstance )
+bool QnLog::initLog( QnLog* externalInstance, int logID )
 {
-    //Q_ASSERT( !qnLogInstance );
-    qnLogInstance = externalInstance;
+    return qn_logsInstance()->put( logID, externalInstance );
 }

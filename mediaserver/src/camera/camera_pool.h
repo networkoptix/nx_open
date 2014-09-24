@@ -21,8 +21,8 @@ public:
     /*!
         \return Object belongs to this pool
     */
-    QnVideoCamera* getVideoCamera(QnResourcePtr res);
-    void removeVideoCamera(QnResourcePtr res);
+    QnVideoCamera* getVideoCamera(const QnResourcePtr& res);
+    void removeVideoCamera(const QnResourcePtr& res);
 
 private:
     typedef QMap<QnResourcePtr, QnVideoCamera*> CameraMap;

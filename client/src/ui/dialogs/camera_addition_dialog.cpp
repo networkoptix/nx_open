@@ -13,6 +13,7 @@
 #include <ui/style/warning_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace {
     enum Column {
@@ -103,7 +104,6 @@ void QnCheckBoxedHeaderView::at_sectionClicked(int logicalIndex) {
         setCheckState(Qt::Unchecked);
 }
 
-
 // -------------------------------------------------------------------------- //
 // QnCameraAdditionDialog
 // -------------------------------------------------------------------------- //
@@ -135,14 +135,12 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     connect(ui->camerasTable,       SIGNAL(cellChanged(int,int)),                   this,   SLOT(at_camerasTable_cellChanged(int, int)));
     connect(ui->camerasTable,       SIGNAL(cellClicked(int,int)),                   this,   SLOT(at_camerasTable_cellClicked(int, int)));
     connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),                          this,   SLOT(at_subnetCheckbox_toggled(bool)));
-    connect(ui->closeButton,        SIGNAL(clicked()),                              this,   SLOT(at_closeButton_clicked()));
     connect(ui->scanButton,         SIGNAL(clicked()),                              this,   SLOT(at_scanButton_clicked()));
     connect(ui->stopScanButton,     SIGNAL(clicked()),                              this,   SLOT(at_stopScanButton_clicked()));
     connect(ui->addButton,          SIGNAL(clicked()),                              this,   SLOT(at_addButton_clicked()));
     connect(ui->backToScanButton,   SIGNAL(clicked()),                              this,   SLOT(at_backToScanButton_clicked()));
     connect(m_header,               SIGNAL(checkStateChanged(Qt::CheckState)),      this,   SLOT(at_header_checkStateChanged(Qt::CheckState)));
     connect(ui->portAutoCheckBox,   SIGNAL(toggled(bool)),                          this,   SLOT(at_portAutoCheckBox_toggled(bool)));
-    connect(qnResPool,              SIGNAL(resourceChanged(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceChanged(const QnResourcePtr &)));
     connect(qnResPool,              SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceRemoved(const QnResourcePtr &)));
 
     setWarningStyle(ui->validateLabelSearch);
@@ -156,7 +154,8 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     resize(width(), 1); // set widget height to minimal possible
 }
 
-QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
+QnCameraAdditionDialog::~QnCameraAdditionDialog(){
+}
 
 QnMediaServerResourcePtr QnCameraAdditionDialog::server() const {
     return m_server;
@@ -166,18 +165,28 @@ void QnCameraAdditionDialog::setServer(const QnMediaServerResourcePtr &server) {
     if (m_server == server)
         return;
 
+    if (m_server)
+        disconnect(m_server, NULL, this, NULL);
+
     m_server = server;
     if (server) {
-        setWindowTitle(tr("Add cameras to %1").arg(getResourceName(server)));
-        ui->serverNameLabel->setText(getResourceName(server));
-        setState(server->getStatus() == QnResource::Offline
+        setState(server->getStatus() == Qn::Offline
                  ? InitialOffline
                  : Initial);
+
+        connect(m_server, &QnResource::statusChanged, this, &QnCameraAdditionDialog::at_server_statusChanged);
+        connect(m_server, &QnResource::nameChanged,  this, &QnCameraAdditionDialog::updateTitle);
+        connect(m_server, &QnResource::urlChanged,  this, &QnCameraAdditionDialog::updateTitle);
     } else {
-        setWindowTitle(tr("Add cameras..."));
-        ui->serverNameLabel->setText(tr("select target mediaserver in the tree"));
         setState(NoServer);
     }
+    updateTitle();
+}
+
+void QnCameraAdditionDialog::reject() {
+    if (!tryClose(false))
+        return;
+    base_type::reject();
 }
 
 QnCameraAdditionDialog::State QnCameraAdditionDialog::state() const {
@@ -198,7 +207,7 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         ui->stageStackedWidget->setEnabled(false);
         ui->actionButtonsStackedWidget->setCurrentWidget(ui->scanButtonPage);
         ui->actionButtonsStackedWidget->setEnabled(false);
-        ui->closeButton->setFocus();
+        ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
         clearTable();
         break;
     case Initial:
@@ -208,6 +217,7 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         ui->actionButtonsStackedWidget->setEnabled(true);
         ui->scanButton->setFocus();
         ui->scanButton->setDefault(true);
+        ui->scanButton->setEnabled(true);
         clearTable();
         break;
     case InitialOffline:
@@ -215,7 +225,8 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         ui->stageStackedWidget->setEnabled(false);
         ui->actionButtonsStackedWidget->setCurrentWidget(ui->scanButtonPage);
         ui->actionButtonsStackedWidget->setEnabled(false);
-        ui->closeButton->setFocus();
+        ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
+        ui->scanButton->setEnabled(false);
         clearTable();
         break;
     case Searching:
@@ -228,12 +239,12 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         ui->actionButtonsStackedWidget->setEnabled(false);
         ui->stopScanButton->setEnabled(false);
         ui->camerasTable->setEnabled(false);
-        ui->closeButton->setFocus();
+        ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
         clearTable();
         break;
     case Stopping:
         ui->stopScanButton->setEnabled(false);
-        ui->closeButton->setFocus();
+        ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
         break;
     case CamerasFound:
     {
@@ -244,8 +255,9 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
 
         bool camerasFound = ui->camerasTable->rowCount() > 0;
         ui->camerasTable->setEnabled(camerasFound);
-        ui->addButton->setEnabled(camerasFound);
-        if (camerasFound)
+        bool canAdd = addingAllowed();
+        ui->addButton->setEnabled(canAdd);
+        if (canAdd)
             ui->addButton->setFocus();
         else
             ui->backToScanButton->setFocus();
@@ -256,14 +268,14 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         ui->stageStackedWidget->setEnabled(true);
         ui->actionButtonsStackedWidget->setCurrentWidget(ui->addButtonPage);
         ui->actionButtonsStackedWidget->setEnabled(false);
-        ui->closeButton->setFocus();
+        ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
         break;
     case Adding:
         ui->stageStackedWidget->setCurrentWidget(ui->discoveredCamerasPage);
         ui->stageStackedWidget->setEnabled(false);
         ui->actionButtonsStackedWidget->setCurrentWidget(ui->addButtonPage);
         ui->actionButtonsStackedWidget->setEnabled(false);
-        ui->closeButton->setFocus();
+        ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
         break;
     default:
         break;
@@ -361,7 +373,7 @@ void QnCameraAdditionDialog::updateSubnetMode() {
 }
 
 bool QnCameraAdditionDialog::serverOnline() const {
-    return m_server && m_server->getStatus() != QnResource::Offline;
+    return m_server && m_server->getStatus() != Qn::Offline;
 }
 
 bool QnCameraAdditionDialog::ensureServerOnline() {
@@ -375,6 +387,17 @@ bool QnCameraAdditionDialog::ensureServerOnline() {
     return false;
 }
 
+bool QnCameraAdditionDialog::addingAllowed() const {
+    int rowCount = ui->camerasTable->rowCount();
+    for (int row = 0; row < rowCount; ++row) {
+        QTableWidgetItem* item = ui->camerasTable->item(row, CheckBoxColumn);
+        if (!(item->flags() & Qt::ItemIsEnabled))
+            continue;
+        if (item->checkState() == Qt::Checked)
+            return true;
+    }
+    return false;
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -497,17 +520,6 @@ void QnCameraAdditionDialog::at_header_checkStateChanged(Qt::CheckState state) {
     m_inCheckStateChange = false;
 }
 
-void QnCameraAdditionDialog::at_closeButton_clicked() {
-    if (m_state == Searching && m_processUuid.isNull()) {
-        return; //TODO: #GDM do something
-    }
-
-    if (m_state == Searching )
-        m_server->apiConnection()->searchCameraAsyncStop(m_processUuid);    //aborting
-    setState(Initial);
-    accept();
-}
-
 void QnCameraAdditionDialog::at_scanButton_clicked() {
     if (!ensureServerOnline())
         return;
@@ -562,7 +574,7 @@ void QnCameraAdditionDialog::at_stopScanButton_clicked() {
 
     // init stage, cannot stop the process
     if (m_processUuid.isNull())
-        return; //TODO: #GDM do something
+        return; //TODO: #GDM #CameraAddition do something
 
     m_server->apiConnection()->searchCameraAsyncStop(m_processUuid, this, SLOT(at_searchRequestReply(int, const QVariant &, int)));
     ui->progressBar->setFormat(tr("Finishing search..."));
@@ -599,11 +611,11 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     setState(Adding);
 
     QEventLoop loop;
-    connect(&result,            SIGNAL(replyProcessed()),   &loop, SLOT(quit()));
-    connect(ui->closeButton,    SIGNAL(clicked()),          &loop, SLOT(quit()));
+    connect(&result,            &QnConnectionRequestResult::replyProcessed, &loop, &QEventLoop::quit);
+    connect(ui->buttonBox,      &QDialogButtonBox::rejected,                &loop, &QEventLoop::quit);
     loop.exec();
 
-    ui->addButton->setEnabled(true);
+    ui->addButton->setEnabled(addingAllowed());
     ui->scanButton->setEnabled(m_server);
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
 
@@ -633,7 +645,7 @@ void QnCameraAdditionDialog::at_backToScanButton_clicked() {
         return;
     }
 
-    setState(m_server->getStatus() == QnResource::Offline
+    setState(m_server->getStatus() == Qn::Offline
              ? InitialOffline
              : Initial);
 }
@@ -650,11 +662,11 @@ void QnCameraAdditionDialog::at_portAutoCheckBox_toggled(bool toggled) {
     ui->portStackedWidget->setCurrentWidget(toggled ? ui->pageAuto : ui->pagePort);
 }
 
-void QnCameraAdditionDialog::at_resPool_resourceChanged(const QnResourcePtr &resource) {
+void QnCameraAdditionDialog::at_server_statusChanged(const QnResourcePtr &resource) {
     if (resource != m_server)
         return;
 
-    if (resource->getStatus() == QnResource::Offline) {
+    if (resource->getStatus() == Qn::Offline) {
         switch (m_state) {
         case Initial:
             setState(InitialOffline);
@@ -777,4 +789,24 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
 void QnCameraAdditionDialog::updateStatus() {
     if (m_state == Searching)
         m_server->apiConnection()->searchCameraAsyncStatus(m_processUuid, this, SLOT(at_searchRequestReply(int, const QVariant &, int)));
+}
+
+bool QnCameraAdditionDialog::tryClose(bool force) {
+    if (m_server && !m_processUuid.isNull())
+        m_server->apiConnection()->searchCameraAsyncStop(m_processUuid, NULL, NULL);
+    setState(Initial);
+    if (force)
+        hide();
+    return true;
+}
+
+void QnCameraAdditionDialog::updateTitle() {
+    if (m_server) {
+        QString name = getResourceName(m_server);
+        setWindowTitle(tr("Add cameras to %1").arg(name));
+        ui->serverNameLabel->setText(name);
+    } else {
+        setWindowTitle(tr("Add cameras..."));
+        ui->serverNameLabel->setText(tr("Select target server..."));
+    }
 }

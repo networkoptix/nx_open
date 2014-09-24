@@ -5,12 +5,13 @@
 
 #include <utils/math/math.h>
 #include <utils/common/util.h>
-#include <utils/common/json.h>
+#include <utils/serialization/json_functions.h>
+#include <utils/fusion/fusion_adaptor.h>
 
-#include "time_period_list.h"
+QN_FUSION_ADAPT_STRUCT(QnTimePeriod, (startTimeMs)(durationMs))
 
 namespace detail {
-    QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnTimePeriod, (startTimeMs)(durationMs), static)
+    QN_FUSION_DEFINE_FUNCTIONS(QnTimePeriod, (json), static)
 }
 
 
@@ -99,86 +100,6 @@ bool QnTimePeriod::intersects(const QnTimePeriod &other) const
     return !intersected(other).isEmpty();
 }
 
-QnTimePeriodList QnTimePeriod::aggregateTimePeriods(const QnTimePeriodList &periods, int detailLevelMs)
-{
-    QnTimePeriodList result;
-    if (periods.isEmpty())
-        return result;
-    result << periods[0];
-
-    for (int i = 1; i < periods.size(); ++i)
-    {
-        QnTimePeriod& last = result.last();
-        if(last.durationMs == -1)
-            break;
-
-        if (last.startTimeMs + last.durationMs + detailLevelMs > periods[i].startTimeMs) {
-            if(periods[i].durationMs == -1) {
-                last.durationMs = -1;
-            } else {
-                last.durationMs = qMax(last.durationMs, periods[i].startTimeMs + periods[i].durationMs - last.startTimeMs);
-            }
-        } else {
-            result << periods[i];
-        }
-    }
-
-    return result;
-}
-
-QnTimePeriodList QnTimePeriod::mergeTimePeriods(const QVector<QnTimePeriodList>& periods)
-{
-    if(periods.size() == 1)
-        return periods[0];
-
-    QVector<int> minIndexes;
-    minIndexes.resize(periods.size());
-    QnTimePeriodList result;
-    int minIndex = 0;
-    while (minIndex != -1)
-    {
-        qint64 minStartTime = 0x7fffffffffffffffll;
-        minIndex = -1;
-        for (int i = 0; i < periods.size(); ++i) 
-        {
-            int startIdx = minIndexes[i];
-            if (startIdx < periods[i].size() && periods[i][startIdx].startTimeMs < minStartTime) {
-                minIndex = i;
-                minStartTime = periods[i][startIdx].startTimeMs;
-            }
-        }
-
-        if (minIndex >= 0)
-        {
-            int& startIdx = minIndexes[minIndex];
-            // add chunk to merged data
-            if (result.isEmpty()) {
-                result << periods[minIndex][startIdx];
-            }
-            else {
-                QnTimePeriod& last = result.last();
-                if (periods[minIndex][startIdx].durationMs == -1) 
-                {
-                    if (last.durationMs == -1)
-                        last.startTimeMs = qMin(last.startTimeMs, periods[minIndex][startIdx].startTimeMs);
-                    else if (periods[minIndex][startIdx].startTimeMs > last.startTimeMs+last.durationMs)
-                        result << periods[minIndex][startIdx];
-                    else 
-                        last.durationMs = -1;
-                    break;
-                }
-                else if (last.startTimeMs <= minStartTime && last.startTimeMs+last.durationMs >= minStartTime)
-                    last.durationMs = qMax(last.durationMs, minStartTime + periods[minIndex][startIdx].durationMs - last.startTimeMs);
-                else {
-                    result << periods[minIndex][startIdx];
-                }
-            } 
-            startIdx++;
-        }
-    }
-    return result;
-}
-
 QByteArray QnTimePeriod::serialize() const
 {
     QByteArray rez;
@@ -206,11 +127,12 @@ bool QnTimePeriod::operator==(const QnTimePeriod &other) const
 }
 
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {
+    const QString fmt = lit("dd.MM.yy - hh:mm:ss:zzz");
     if (period.durationMs >= 0)
-        dbg.nospace() << "QnTimePeriod(" << QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("dd hh:mm"))
-                      << " - " << QDateTime::fromMSecsSinceEpoch(period.startTimeMs + period.durationMs).toString(lit("dd hh:mm")) << ')';
+        dbg.nospace() << "QnTimePeriod(" << QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(fmt)
+                      << " - " << QDateTime::fromMSecsSinceEpoch(period.startTimeMs + period.durationMs).toString(fmt) << ')';
     else
-        dbg.nospace() << "QnTimePeriod(" << QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("dd hh:mm"))
+        dbg.nospace() << "QnTimePeriod(" << QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(fmt)
                       << " - Now)";
     return dbg.space();
 }

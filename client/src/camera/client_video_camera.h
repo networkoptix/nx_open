@@ -2,14 +2,14 @@
 #define QN_CLIENT_VIDEO_CAMERA_H
 
 #include "cam_display.h"
-#include <recording/stream_recorder.h>
-#include "decoders/video/abstractdecoder.h"
-#include "core/resource/media_resource.h"
-#include "core/dataprovider/statistics.h"
-#include "utils/media/externaltimesource.h"
 
+#include <core/resource/resource_fwd.h>
 #include <core/ptz/item_dewarping_params.h>
 
+#include <recording/stream_recorder.h>
+
+class QnlTimeSource;
+class QnStatistics;
 class QnResource;
 class QnAbstractArchiveReader;
 
@@ -29,7 +29,7 @@ public:
 
     static QString errorString(int errCode);
 
-    QnClientVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamDataProvider* reader = 0);
+    QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader = 0);
     virtual ~QnClientVideoCamera();
 
     QnMediaResourcePtr resource();

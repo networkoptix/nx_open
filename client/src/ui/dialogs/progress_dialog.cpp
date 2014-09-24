@@ -65,6 +65,7 @@
 
 #include <ui/widgets/elided_label.h>
 #include <ui/widgets/dialog_button_box.h>
+#include <ui/widgets/progress_widget.h>
 
 
 // If the operation is expected to take this long (as predicted by
@@ -415,7 +416,8 @@ void QnProgressDialog::setLabelText(const QString &text)
 void QnProgressDialog::setCancelButton(QPushButton *cancelButton)
 {
     Q_D(QnProgressDialog);
-    delete d->cancel;
+    if (d->cancel)
+        delete d->cancel;
     d->cancel = cancelButton;
     if (cancelButton) {
         cancelButton->setParent(this, 0);

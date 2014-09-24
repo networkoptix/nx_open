@@ -1,6 +1,8 @@
 #ifndef QN_COMMON_GLOBALS_H
 #define QN_COMMON_GLOBALS_H
 
+#include <cassert>
+
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
@@ -27,14 +29,22 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent ToggleState SystemComponent ItemDataRole PtzRestriction)
-    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes PtzTraits)
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace CameraDataType
+            PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
+            ConnectionRole ResourceStatus
+            StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType)
+    Q_FLAGS(Borders Corners
+            ResourceFlags
+            CameraCapabilities 
+            PtzDataFields PtzCapabilities PtzTraits 
+            MotionTypes TimePeriodTypes 
+            ServerFlags CameraStatusFlags)
 public:
 #else
     Q_NAMESPACE
 #endif
 
-    // TODO: #Elric #5.0 use Qt::Edge
+    // TODO: #Elric #5.0 use Qt::Edge ?
     /**
      * Generic enumeration describing borders of a rectangle.
      */
@@ -77,8 +87,8 @@ public:
         RelayOutputCapability               = 0x010,
         ShareIpCapability                   = 0x020 
     };
-    Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities);
+    Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
 
     enum PtzCommand {
         ContinuousMovePtzCommand,
@@ -131,6 +141,8 @@ public:
         NoPtzFields             = 0x000,
         AllPtzFields            = 0xFFF
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PtzDataField)
+
     Q_DECLARE_FLAGS(PtzDataFields, PtzDataField)
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)
 
@@ -177,16 +189,21 @@ public:
 
         AuxilaryPtzCapability               = 0x01000000,
 
-        builtinPresetControl                = 0x02000000,
-
         /* Shortcuts */
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
-        nativePresetsPtzCapability          = PresetsPtzCapability | builtinPresetControl,
     };
-    Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PtzCapability)
+
+    Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities)
+
+
+    enum Projection {
+        RectilinearProjection,
+        EquirectangularProjection
+    };
 
 
     enum PtzTrait {
@@ -200,19 +217,116 @@ public:
 
 
     enum StreamFpsSharingMethod {
-        shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
-        sharePixels, //if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
-        noSharing // second stream does not subtract first stream fps 
+        /** If second stream is running whatever fps it has, first stream can get maximumFps - secondstreamFps. */
+        BasicFpsSharing, 
+
+        /** If second stream is running whatever megapixel it has, first stream can get maxMegapixels - secondstreamPixels. */
+        PixelsFpsSharing, 
+
+        /** Second stream does not affect first stream's fps. */
+        NoFpsSharing 
     };
 
+
     enum MotionType {
-        MT_Default = 0, 
-        MT_HardwareGrid = 1, 
-        MT_SoftwareGrid = 2, 
-        MT_MotionWindow = 4, 
-        MT_NoMotion = 8
+        MT_Default      = 0x0, 
+        MT_HardwareGrid = 0x1, 
+        MT_SoftwareGrid = 0x2, 
+        MT_MotionWindow = 0x4, 
+        MT_NoMotion     = 0x8
     };
-    Q_DECLARE_FLAGS(MotionTypes, MotionType);
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MotionType)
+
+    Q_DECLARE_FLAGS(MotionTypes, MotionType)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(MotionTypes)
+
+
+    enum PanicMode {
+        PM_None = 0, 
+        PM_BusinessEvents = 1, 
+        PM_User = 2
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PanicMode)
+
+    enum ConnectionRole {
+        CR_Default,
+        CR_LiveVideo,
+        CR_SecondaryLiveVideo,
+        CR_Archive 
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
+
+    enum ResourceFlag {
+        network = 0x01,         /**< Has ip and mac. */
+        url = 0x02,             /**< Has url, e.g. file name. */
+        streamprovider = 0x04,
+        media = 0x08,
+
+        playback = 0x10,        /**< Something playable (not real time and not a single shot). */
+        video = 0x20,
+        audio = 0x40,
+        live = 0x80,
+
+        still_image = 0x100,    /**< Still image device. */
+
+        local = 0x200,          /**< Local client resource. */
+        server = 0x400,         /**< Server resource. */
+        remote = 0x800,         /**< Remote (on-server) resource. */
+
+        layout = 0x1000,        /**< Layout resource. */
+        user = 0x2000,          /**< User resource. */
+
+        utc = 0x4000,           /**< Resource uses UTC-based timing. */
+        periods = 0x8000,       /**< Resource has recorded periods. */
+
+        motion = 0x10000,       /**< Resource has motion */
+        sync = 0x20000,         /**< Resource can be used in sync playback mode. */
+
+        foreigner = 0x40000,    /**< Resource belongs to other entity. E.g., camera on another server */
+        no_last_gop = 0x80000,  /**< Do not use last GOP for this when stream is opened */
+        deprecated = 0x100000,  /**< Resource absent in Server but still used in memory for some reason */
+
+        videowall = 0x200000,           /**< Videowall resource */
+        desktop_camera = 0x400000,      /**< Desktop Camera resource */
+
+        parent_change = 0x800000,       /**< Camera discovery internal purpose */
+
+        local_media = local | media,
+        local_layout = local | layout,
+
+        local_server = local | server,
+        remote_server = remote | server,
+        live_cam = utc | sync | live | media | video | streamprovider, // don't set w/o `local` or `remote` flag
+        local_live_cam = live_cam | local | network,
+        server_live_cam = live_cam | remote,// | network,
+        server_archive = remote | media | video | audio | streamprovider,
+        ARCHIVE = url | local | media | video | audio | streamprovider,     /**< Local media file. */
+        SINGLE_SHOT = url | local | media | still_image | streamprovider    /**< Local still image file. */
+    };
+    Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFlags)
+
+    enum ResourceStatus {
+        Offline,
+        Unauthorized,
+        Online,
+        Recording,
+        NotDefined,
+        Incompatible
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)
+
+    // TODO: #Elric #EC2 talk to Roma, write comments
+    enum ServerFlag { 
+        SF_None         = 0x0, 
+        SF_Edge         = 0x1,
+        SF_RemoteEC     = 0x2,
+        SF_HasPublicIP  = 0x4
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
+
+    Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags);
 
 
     enum TimePeriodType {
@@ -220,30 +334,30 @@ public:
         EmptyTimePeriod     = 0x2,  /**< Period of zero length. */
         NormalTimePeriod    = 0x4,  /**< Normal period with non-zero length. */
     };
-    Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes);
+
+    Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes)
 
 
     enum TimePeriodContent {
         RecordingContent,
         MotionContent,
+        BookmarksContent,
         TimePeriodContentCount
     };
 
+    enum CameraDataType {
+        RecordedTimePeriod,
+        MotionTimePeriod,
+        BookmarkTimePeriod,
+        BookmarkData,
 
-    enum ToggleState {
-        OffState,
-        OnState,
-        UndefinedState /**< Also used in event rule to associate non-toggle action with event with any toggle state. */
+        CameraDataTypeCount
     };
 
-
     enum SystemComponent {
-        EnterpriseControllerComponent,
-        MediaServerComponent,
+        ServerComponent,
         ClientComponent,
-        MediaProxyComponent,
-
         AnyComponent
     };
 
@@ -262,11 +376,17 @@ public:
         UserResourceRole,                           /**< Role for QnUserResourcePtr. */
         LayoutResourceRole,                         /**< Role for QnLayoutResourcePtr. */
         MediaServerResourceRole,                    /**< Role for QnMediaServerResourcePtr. */
+        VideoWallResourceRole,                      /**< Role for QnVideoWallResourcePtr */
+
         ResourceNameRole,                           /**< Role for resource name. Value of type QString. */
-        ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (QnResource::Flags). */
+        ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (Qn::ResourceFlags). */
         ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
-        ResourceStatusRole,                         /**< Role for resource status. Value of type int (QnResource::Status). */
+        ResourceStatusRole,                         /**< Role for resource status. Value of type int (Qn::ResourceStatus). */
         ResourceUidRole,                            /**< Role for resource unique id. Value of type QString. */
+
+        VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QUuid. */
+        VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QUuid. */
+        VideoWallItemIndicesRole,                   /**< Role for videowall item indices list. Value of type QnVideoWallItemIndexList. */
 
         /* Layout-based. */
         LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type QSizeF. */
@@ -294,6 +414,7 @@ public:
         ItemAspectRatioRole,                        /**< Role for item's aspect ratio. Value of type qreal. */
 
         ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
+        ItemThumbnailTimestampRole,                 /**< Role for item's loaded thumbnail timestamp, in milliseconds. Used in thumbnails search. Value of type qint64. */
         ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
         ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
         ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
@@ -301,7 +422,7 @@ public:
         ItemCheckedButtonsRole,                     /**< Role for buttons that are checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
-
+        ItemVideowallReviewButtonsRole,             /**< Role for buttons that are checked on each sub-item of the videowall screen widget. Value of type QnVideowallScreenWidget::ReviewButtons. */
 
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
@@ -324,12 +445,14 @@ public:
         TimePeriodRole,
         TimePeriodsRole,
         MergedTimePeriodsRole,
-        AutoConnectRole,
         FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
         TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
-        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
+        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and ConnectAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction */
+        CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
+        UuidRole,                                   /**< Role for target uuid. Used in LoadVideowallMatrixAction. */
+        KeyboardModifiersRole,                      /**< Role for keyboard modifiers. Used in some Drop actions. */
 
         /* Others. */
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
@@ -344,16 +467,126 @@ public:
         ValidRole,                                  /**< Role for valid state. Value of type bool. */
         ActionIsInstantRole,                        /**< Role for instant state for business rule actions. Value of type bool. */
         ShortTextRole,                              /**< Role for short text. Value of type QString. */
+        PriorityRole,                               /**< Role for priority value. Value of type quint64. */
 
-        EventTypeRole,                              /**< Role for business event type. Value of type BusinessEventType::Value. */
+        EventTypeRole,                              /**< Role for business event type. Value of type QnBusiness::EventType. */
         EventResourcesRole,                         /**< Role for business event resources list. Value of type QnResourceList. */
-        ActionTypeRole,                             /**< Role for business action type. Value of type BusinessActionType::Value. */
+        ActionTypeRole,                             /**< Role for business action type. Value of type QnBusiness::ActionType. */
         ActionResourcesRole,                        /**< Role for business action resources list. Value of type QnResourceList. */
 
         SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
 
+        LastItemDataRole
     };
 
+    // TODO: #Elric #EC2 rename
+    enum StreamQuality {
+        QualityLowest = 0,
+        QualityLow = 1,
+        QualityNormal = 2,
+        QualityHigh = 3,
+        QualityHighest = 4,
+        QualityPreSet = 5,
+        QualityNotDefined = 6,
+
+        StreamQualityCount
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamQuality)
+
+
+    // TODO: #Elric #EC2 rename
+    enum SecondStreamQuality { 
+        SSQualityLow = 0, 
+        SSQualityMedium = 1, 
+        SSQualityHigh = 2, 
+        SSQualityNotDefined = 3,
+        SSQualityDontUse = 4
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SecondStreamQuality)
+
+    enum StatisticsDeviceType {
+        StatisticsCPU = 0,                /**< CPU load in percents. */
+        StatisticsRAM = 1,                /**< RAM load in percents. */
+        StatisticsHDD = 2,                /**< HDD load in percents. */
+        StatisticsNETWORK = 3             /**< Network load in percent. */
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StatisticsDeviceType)
+
+
+    enum CameraStatusFlag {
+        CSF_NoFlags = 0x0,
+        CSF_HasIssuesFlag = 0x1
+    };
+    Q_DECLARE_FLAGS(CameraStatusFlags, CameraStatusFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraStatusFlags)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraStatusFlag)
+
+    // TODO: #Elric #EC2 rename
+    enum RecordingType {
+        /** Record always. */
+        RT_Always = 0,
+
+        /** Record only when motion was detected. */
+        RT_MotionOnly = 1,
+
+        /** Don't record. */
+        RT_Never = 2,
+
+        /** Record LQ stream always and HQ stream only on motion. */
+        RT_MotionAndLowQuality = 3,
+
+        RT_Count
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingType)
+
+    enum PeerType {
+        PT_Server = 0,
+        PT_DesktopClient = 1,
+        PT_VideowallClient = 2,
+        PT_MobileClient = 3,
+
+        PT_Count
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
+
+    enum PropertyDataType { 
+        PDT_None        = 0, 
+        PDT_Value       = 1, 
+        PDT_OnOff       = 2, 
+        PDT_Boolen      = 3, 
+        PDT_MinMaxStep  = 4, 
+        PDT_Enumeration = 5, 
+        PDT_Button      = 6 
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PropertyDataType)
+
+
+    enum SerializationFormat {
+        JsonFormat          = 0,
+        UbjsonFormat        = 1,
+        BnsFormat           = 2,
+        CsvFormat           = 3,
+        XmlFormat           = 4,
+
+        UnsupportedFormat   = -1
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SerializationFormat)
+
+    const char* serializationFormatToHttpContentType(SerializationFormat format);
+    SerializationFormat serializationFormatFromHttpContentType(const QByteArray& httpContentType);
+
+    enum LicenseType 
+    {
+        LC_Trial,          
+        LC_Analog,
+        LC_Professional,
+        LC_Edge,
+        LC_VMAX,
+        LC_AnalogEncoder,
+        LC_VideoWall,
+
+        LC_Count
+    };
 
     /**
      * Invalid value for a timezone UTC offset.
@@ -370,6 +603,18 @@ public:
 } // namespace Qn
 
 
+// TODO: #Elric #enum
+
+enum {MD_WIDTH = 44, MD_HEIGHT = 32};
+
+
+/** Time value for 'now'. */
+#define DATETIME_NOW        INT64_MAX 
+
+/** Time value for 'unknown' / 'invalid'. Same as AV_NOPTS_VALUE. Checked in ffmpeg.cpp. */
+#define DATETIME_INVALID    INT64_MIN
+
+
 /** 
  * \def lit
  * Helper macro to mark strings that are not to be translated. 
@@ -382,7 +627,27 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #   define lit(s) QLatin1String(s)
 #endif
 
-QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner), (metatype))
-QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities)(Qn::PtzTrait), (metatype)(lexical)(json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::TimePeriodContent)(Qn::Corner)(Qn::CameraDataType), 
+    (metatype)
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
+        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
+        (Qn::ConnectionRole)(Qn::ResourceStatus)
+        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType), 
+    (metatype)(lexical)
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::PtzCapabilities),
+    (metatype)(numeric)(lexical)
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::ServerFlags)(Qn::PtzDataFields)(Qn::CameraStatusFlags),
+    (metatype)(numeric)
+)
 
 #endif // QN_COMMON_GLOBALS_H

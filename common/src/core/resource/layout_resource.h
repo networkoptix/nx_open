@@ -8,7 +8,6 @@
 
 #include "resource.h"
 #include "layout_item_data.h"
-#include "recording/time_period.h"
 
 class QnLayoutResource: public QnResource {
     Q_OBJECT
@@ -16,9 +15,9 @@ class QnLayoutResource: public QnResource {
     typedef QnResource base_type;
 
 public:
-    QnLayoutResource();
+    QnLayoutResource(const QnResourceTypePool* resTypePool);
 
-    virtual QString getUniqueId() const override;
+    QnLayoutResourcePtr clone() const;
 
     void setItems(const QnLayoutItemDataList &items);
 
@@ -68,7 +67,7 @@ public:
     QSize backgroundSize() const;
     void setBackgroundSize(QSize size);
 
-    /** Filename of background image on EC */
+    /** Filename of background image on Server */
     QString backgroundImageFilename() const;
     void setBackgroundImageFilename(const QString &filename);
 
@@ -94,9 +93,11 @@ signals:
     void backgroundOpacityChanged(const QnLayoutResourcePtr &resource);
     void lockedChanged(const QnLayoutResourcePtr &resource);
 protected:
-    virtual void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) override;
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
 private:
+    void setItemsUnderLock(const QnLayoutItemDataMap &items);
+
     void addItemUnderLock(const QnLayoutItemData &item);
     void updateItemUnderLock(const QUuid &itemUuid, const QnLayoutItemData &item);
     void removeItemUnderLock(const QUuid &itemUuid);

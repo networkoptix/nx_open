@@ -215,21 +215,25 @@ void QnResourceSearchSynchronizer::at_model_rowsInserted(const QModelIndex &pare
     if(!m_update)
         return;
 
-    if (!parent.isValid())
-        return;
-
     QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
 
     for (int row = start; row <= end; ++row) {
-        const QModelIndex index = parent.child(row, 0);
-        if (!index.model())
+        if (!m_model->hasIndex(row, 0, parent))
             continue;
+        const QModelIndex index = m_model->index(row, 0, parent);
 
-        if (index.model()->hasChildren(index))
-            at_model_rowsInserted(index, 0, index.model()->rowCount(index) - 1);
+        if (m_model->hasChildren(index))
+            at_model_rowsInserted(index, 0, m_model->rowCount(index) - 1);
 
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         if(resource.isNull())
+            continue;
+
+        // server widgets can be present in the tree but should not be present on the scene
+        if (resource->hasFlags(Qn::server))
+            continue;
+        // layouts can be present in the tree but should not be present on the scene
+        if (resource->hasFlags(Qn::layout))
             continue;
 
         addModelResource(resource);
@@ -240,18 +244,16 @@ void QnResourceSearchSynchronizer::at_model_rowsAboutToBeRemoved(const QModelInd
     if (!m_update)
         return;
 
-    if (!parent.isValid())
-        return;
-
     QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
 
     for (int row = start; row <= end; ++row) {
-        const QModelIndex index = parent.child(row, 0);
-        if (!index.model())
+        if (!m_model->hasIndex(row, 0, parent))
             continue;
 
-        if (index.model()->hasChildren(index))
-            at_model_rowsAboutToBeRemoved(index, 0, index.model()->rowCount(index) - 1);
+        const QModelIndex index = m_model->index(row, 0, parent);
+
+        if (m_model->hasChildren(index))
+            at_model_rowsAboutToBeRemoved(index, 0, m_model->rowCount(index) - 1);
 
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         if(resource.isNull())

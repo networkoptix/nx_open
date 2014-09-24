@@ -8,7 +8,7 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 
-#undef PlaySound // TODO: #Elric who includes windows.h?
+#include <utils/common/model_functions_fwd.h>
 
 class QnAbstractBusinessEvent;
 typedef QSharedPointer<QnAbstractBusinessEvent> QnAbstractBusinessEventPtr;
@@ -32,123 +32,158 @@ class QnBusinessEventRule;
 typedef QSharedPointer<QnBusinessEventRule> QnBusinessEventRulePtr;
 typedef QList<QnBusinessEventRulePtr> QnBusinessEventRuleList;
 
-namespace QnBusiness {
+struct QnCameraConflictList;
+
+#ifdef Q_MOC_RUN
+class QnBusiness
+#else
+namespace QnBusiness
+#endif
+{
+#ifdef Q_MOC_RUN
+    Q_GADGET
+    Q_ENUMS(EventReason EventState EventType ActionType)
+public:
+#else
+    Q_NAMESPACE
+#endif
+
     enum EventReason {
-        NoReason,
-        NetworkIssueNoFrame,
-        NetworkIssueConnectionClosed,
-        NetworkIssueRtpPacketLoss,
-        MServerIssueTerminated,
-        MServerIssueStarted,
-        StorageIssueIoError,
-        StorageIssueNotEnoughSpeed,
-        StorageIssueNotEnoughSpace
+        NoReason = 0,
+        NetworkNoFrameReason,
+        NetworkConnectionClosedReason,
+        NetworkRtpPacketLossReason,
+        ServerTerminatedReason,
+        ServerStartedReason,
+        StorageIoErrorReason,
+        StorageTooSlowReason,
+        StorageFullReason,
+        LicenseRemoved
     };
-}
-Q_DECLARE_METATYPE(QnBusiness::EventReason)
 
-namespace BusinessEventType {
-    enum Value {
+    enum EventState {
+        InactiveState = 0,
+        ActiveState = 1,
+
+        /** Also used in event rule to associate non-toggle action with event with any toggle state. */
+        UndefinedState = 2
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventState)
+
+    enum EventType {
+        /** Event type is not defined. Used in rules. */
+        UndefinedEvent = 0,
+
         /** Motion has occured on a camera. */
-        Camera_Motion,
-
-        /** Camera was disconnected. */
-        Camera_Disconnect,
-
-        /** Storage read error has occured. */
-        Storage_Failure,
-
-        /** Network issue: packet lost, RTP timeout, etc. */
-        Network_Issue,
-
-        /** Found some cameras with same IP address. */
-        Camera_Ip_Conflict,
+        CameraMotionEvent = 1,
 
         /** Camera input signal is received. */
-        Camera_Input,
+        CameraInputEvent = 2,
+
+        /** Camera was disconnected. */
+        CameraDisconnectEvent = 3,
+
+        /** Storage read error has occurred. */
+        StorageFailureEvent = 4,
+
+        /** Network issue: packet lost, RTP timeout, etc. */
+        NetworkIssueEvent = 5,
+
+        /** Found some cameras with same IP address. */
+        CameraIpConflictEvent = 6,
 
         /** Connection to mediaserver lost. */
-        MediaServer_Failure,
+        ServerFailureEvent = 7,
 
         /** Two or more mediaservers are running. */
-        MediaServer_Conflict,
+        ServerConflictEvent = 8,
 
-        /** Media server started */
-        MediaServer_Started,
-
-        /** Event type is not defined. Used in rules. */
-        NotDefined,
+        /** Server started */
+        ServerStartEvent = 9,
+        
+        /** Not enough licenses */
+        LicenseIssueEvent = 10,
 
         /**
          * Used when enumerating to build GUI lists, this and followed actions
          * should not be displayed.
          */
-        Count = NotDefined,
+        EventCount, // TODO: #Elric remove
 
         /** System health message. */
-        SystemHealthMessage = 500,
+        SystemHealthEvent = 500,
 
         /** Event group. */
-        AnyCameraIssue = 600,
-        AnyServerIssue = 601,
+        AnyCameraEvent = 600,
+        AnyServerEvent = 601,
         AnyBusinessEvent = 602,
 
         /** Base index for the user defined events. */
-        UserDefined = 1000
+        UserEvent = 1000
     };
-}
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventType)
 
-namespace BusinessActionType {
-    enum Value {
-        CameraRecording,    // start camera recording
-        PanicRecording,     // activate panic recording mode
-        // these actions can be executed from any endpoint. actually these actions call specified function at ec
-        /*!
-            parameters:\n
-                - emailAddress (string, required)
-        */
-        SendMail,
+    enum ActionType {
+        UndefinedAction = 0,
 
-        ShowPopup,
+        /** 
+         * Change camera output state.
+         *
+         * Parameters:
+         * - relayOutputID (string, required)          - id of output to trigger.
+         * - relayAutoResetTimeout (uint, optional)    - timeout (in milliseconds) to reset camera state back.
+         */
+        CameraOutputAction = 1,
 
-        //!change camera output state
-        /*!
-            parameters:\n
-                - relayOutputID (string, required)          - id of output to trigger
-                - relayAutoResetTimeout (uint, optional)    - timeout (in milliseconds) to reset camera state back
-        */
-        CameraOutput,
-        CameraOutputInstant,
+        CameraOutputOnceAction = 2,
 
-        /*!
-            parameters:\n
-                - soundUrl (string, required)               - url of sound, contains path to sound on the EC
-        */
-        PlaySound,
-        PlaySoundRepeated,
+        BookmarkAction = 3,
 
-        /*!
-            parameters:\n
-                - sayText (string, required)                - text that will be provided to TTS engine
-        */
-        SayText,
+        /** Start camera recording. */
+        CameraRecordingAction = 4,
+
+        /** Activate panic recording mode. */
+        PanicRecordingAction = 5,
+
+        /** 
+         * Send an email. This action can be executed from any endpoint. 
+         *
+         * Parameters:
+         * - emailAddress (string, required)
+         */
+        SendMailAction = 6,
+
+        /** Write a record to the server's log. */
+        DiagnosticsAction = 7,
+
+        ShowPopupAction = 8,
 
         /**
-         *  Write a record to the server's log
+         * Parameters:
+         * - soundUrl (string, required)               - url of sound, contains path to sound on the Server.
          */
-        Diagnostics,
+        PlaySoundAction = 9,
 
-        Bookmark,           // mark part of camera archive as undeleted
+        PlaySoundOnceAction = 10,
 
-        // media server based actions
-        NotDefined,
+        /**
+         * Parameters:
+         * - sayText (string, required)                - text that will be provided to TTS engine.
+         */
+        SayTextAction = 11,
 
         /**
          * Used when enumerating to build GUI lists, this and followed actions
          * should not be displayed.
          */
-        Count = Bookmark
+        ActionCount // TODO: #Elric remove
     };
-}
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
+
+    bool isImplemented(ActionType actionType);
+
+} // namespace QnBusiness
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnBusiness::EventReason)(QnBusiness::EventState)(QnBusiness::EventType)(QnBusiness::ActionType), (metatype)(lexical))
 
 #endif // QN_BUSINESS_FWD_H

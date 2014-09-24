@@ -1,12 +1,12 @@
 #include "prolonged_business_event.h"
 
-QnProlongedBusinessEvent::QnProlongedBusinessEvent(BusinessEventType::Value eventType, const QnResourcePtr& resource, Qn::ToggleState toggleState, qint64 timeStamp):
+QnProlongedBusinessEvent::QnProlongedBusinessEvent(QnBusiness::EventType eventType, const QnResourcePtr& resource, QnBusiness::EventState toggleState, qint64 timeStamp):
     base_type(eventType, resource, toggleState, timeStamp)
 {
-    Q_ASSERT(BusinessEventType::hasToggleState(eventType));
+    Q_ASSERT(QnBusiness::hasToggleState(eventType));
 }
 
-bool QnProlongedBusinessEvent::checkCondition(Qn::ToggleState state, const QnBusinessEventParameters &params) const {
+bool QnProlongedBusinessEvent::checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params) const {
     Q_UNUSED(params)
-    return state == Qn::UndefinedState || state == getToggleState();
+    return state == QnBusiness::UndefinedState || state == getToggleState();
 }

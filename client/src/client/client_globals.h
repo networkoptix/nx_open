@@ -3,7 +3,8 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/common/model_functions.h>
+#include <common/user_permissions.h>
+#include <utils/common/model_functions_fwd.h>
 
 namespace Qn {
 
@@ -11,14 +12,24 @@ namespace Qn {
      * Type of a node in resource tree displayed to the user.
      */
     enum NodeType {
-        RootNode,
-        LocalNode,
-        ServersNode,
-        UsersNode,
-        ResourceNode,   /**< Node that represents a resource. */
-        ItemNode,       /**< Node that represents a layout item. */
-        BastardNode,    /**< Node that contains hidden resources. */
-        RecorderNode,   /**< Node that represents a recorder (VMAX, etc). */
+        RootNode,               /**< Root node for the tree. */
+        LocalNode,              /**< Root node for local resources. */
+        ServersNode,            /**< Root node for remote resources. */
+        OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
+        UsersNode,              /**< Root node for user resources. */
+
+        BastardNode,            /**< Root node for hidden resources. */
+
+        ResourceNode,           /**< Node that represents a resource. Has only resource. */
+        ItemNode,               /**< Node that represents a layout item. Has both guid and resource. */
+        RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
+        EdgeNode,               /**< Node that represents an EDGE server with a camera. Has only resource - server's only camera. */
+
+        VideoWallItemNode,      /**< Node that represents a videowall item. Has a guid and can have resource. */
+        VideoWallMatrixNode,    /**< Node that represents a videowall saved matrix. Has a guid. */
+
+        SystemNode,             /**< Node that represents systems but the current. */
+
         NodeTypeCount
     };
 
@@ -95,13 +106,13 @@ namespace Qn {
 
     /**
      * Flags describing the differences between instances of the same resource
-     * on the client and on the enterprise controller.
+     * on the client and on the Server.
      */
     enum ResourceSavingFlag {
-        /** Resource is local and has never been saved to EC. */
+        /** Resource is local and has never been saved to Server. */
         ResourceIsLocal = 0x1,
 
-        /** Resource is currently being saved to EC. */
+        /** Resource is currently being saved to Server. */
         ResourceIsBeingSaved = 0x2,
 
         /** Unsaved changes are present in the resource. */
@@ -111,10 +122,8 @@ namespace Qn {
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceSavingFlags)
 
 
-    #include "user_permissions.h"
     Q_DECLARE_FLAGS(Permissions, Permission)
     Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
-
 
     /**
      * \param permissions               Permission flags containing some deprecated values.
@@ -207,8 +216,6 @@ namespace Qn {
         ImportantNotification,
         CriticalNotification,
         SystemNotification,
-        SoundNotification,
-
         LevelCount
     };
 
@@ -237,6 +244,7 @@ namespace Qn {
         LightModeNoLayoutBackground = 0x0200,           /**< Disable layout background. */
         LightModeNoZoomWindows      = 0x0400,           /**< Disable zoom windows. */
 
+        LightModeVideoWall          = LightModeNoSceneBackground | LightModeNoNotifications | LightModeNoShadows /*| LightModeNoAnimation*/,
         LightModeFull               = 0xFFFFFFFF
 
     };
@@ -255,7 +263,8 @@ namespace Qn {
 Q_DECLARE_METATYPE(Qn::ItemRole)
 Q_DECLARE_METATYPE(Qn::TimeMode)
 Q_DECLARE_METATYPE(Qn::ClientSkin)
+Q_DECLARE_METATYPE(Qn::NodeType)
 
-QN_DECLARE_FUNCTIONS(Qn::ClientSkin, (json))
+QN_FUSION_DECLARE_FUNCTIONS(Qn::ClientSkin, (lexical))
 
 #endif // QN_CLIENT_GLOBALS_H

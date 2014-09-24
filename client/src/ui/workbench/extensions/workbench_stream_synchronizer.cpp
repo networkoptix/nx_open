@@ -8,7 +8,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/security_cam_resource.h>
 
-#include <plugins/resources/archive/syncplay_wrapper.h>
+#include <plugins/resource/archive/syncplay_wrapper.h>
 
 #include <camera/resource_display.h>
 #include <camera/client_video_camera.h>
@@ -22,6 +22,10 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include <ui/workbench/watchers/workbench_render_watcher.h>
+
+#include <utils/common/model_functions.h>
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStreamSynchronizationState, (json), (started)(time)(speed))
 
 QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     QObject(parent),
@@ -84,7 +88,7 @@ QnStreamSynchronizationState QnWorkbenchStreamSynchronizer::state() const {
     
     result.started = m_syncPlay->isEnabled();
     if(result.started) {
-        result.speed = 1.0; // TODO: #Elric need getSpeed() here.
+        result.speed = m_syncPlay->getSpeed();
         result.time = m_syncPlay->getCurrentTime();
     }
     
@@ -118,7 +122,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
 
     connect(mediaWidget->resource()->toResource(), SIGNAL(flagsChanged(const QnResourcePtr &)), this, SLOT(at_resource_flagsChanged(const QnResourcePtr &)));
 
-    if(!mediaWidget->resource()->toResource()->hasFlags(QnResource::sync)) {
+    if(!mediaWidget->resource()->toResource()->hasFlags(Qn::sync)) {
         m_queuedWidgets.insert(mediaWidget);
         return;
     }
@@ -148,7 +152,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
 
     m_queuedWidgets.remove(mediaWidget);
 
-    if(!mediaWidget->resource()->toResource()->hasFlags(QnResource::sync))
+    if(!mediaWidget->resource()->toResource()->hasFlags(Qn::sync))
         return;
 
     if(mediaWidget->display()->archiveReader() == NULL) 
@@ -171,7 +175,7 @@ void QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged() {
 }
 
 void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged(const QnResourcePtr &resource) {
-    if(!(resource->flags() & QnResource::sync))
+    if(!(resource->flags() & Qn::sync))
         return; // TODO: #Elric implement reverse handling?
 
     foreach(QnMediaResourceWidget *widget, m_queuedWidgets) {

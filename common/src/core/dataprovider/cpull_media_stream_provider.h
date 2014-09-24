@@ -1,6 +1,7 @@
 #ifndef client_pull_stream_reader_h1226
 #define client_pull_stream_reader_h1226
 
+#ifdef ENABLE_DATA_PROVIDERS
 
 #include "media_streamdataprovider.h"
 #include "utils/common/adaptive_sleep.h"
@@ -13,7 +14,7 @@ class QnClientPullMediaStreamProvider : public QnLiveStreamProvider
     Q_OBJECT;
 
 public:
-    QnClientPullMediaStreamProvider(QnResourcePtr dev);
+    QnClientPullMediaStreamProvider(const QnResourcePtr& dev);
     virtual ~QnClientPullMediaStreamProvider() {stop();}
 
 protected:
@@ -26,5 +27,7 @@ private:
 
     QnAdaptiveSleep m_fpsSleep;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // client_pull_stream_reader_h1226

@@ -105,8 +105,8 @@ public:
         setRelativeFrameWidth(1.0 / 16.0);
         
         setStateOpacity(0, 0.4);
-        setStateOpacity(HOVERED, 0.7);
-        setStateOpacity(PRESSED, 1.0);
+        setStateOpacity(Hovered, 0.7);
+        setStateOpacity(Pressed, 1.0);
 
         QFont font = this->font();
         font.setPixelSize(50);

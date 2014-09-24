@@ -4,11 +4,13 @@
 #include <QtCore/QAtomicInt>
 
 #include <utils/common/connective.h>
-#include <utils/common/json.h>
-#include <utils/common/lexical.h>
+
+#include <utils/serialization/json_functions.h>
+#include <utils/serialization/lexical_functions.h>
 
 #include <core/resource/resource_fwd.h>
 
+#include <nx_ec/impl/ec_api_impl.h>
 
 // TODO: #Elric create meta_functions and move json_serializer, lexical_serializer, linear_combinator & magnitude_calculator there
 
@@ -16,6 +18,7 @@
 
 class QnAbstractResourcePropertyHandler {
 public:
+    QnAbstractResourcePropertyHandler() {}
     virtual ~QnAbstractResourcePropertyHandler() {}
 
     virtual bool serialize(const QVariant &value, QString *target) const = 0;
@@ -111,8 +114,12 @@ public:
     void setValue(const QVariant &value);
     bool testAndSetValue(const QVariant &expectedValue, const QVariant &newValue);
 
+    void synchronizeNow();
 signals:
     void valueChanged();
+
+protected:
+    virtual QString defaultSerializedValue() const;
 
 private:
     void loadValue(const QString &serializedValue);
@@ -126,6 +133,7 @@ private:
     void setResourceInternal(const QnResourcePtr &resource, bool notify);
 
     Q_SLOT void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
+    Q_SLOT void at_connection_propertiesSaved(int, ec2::ErrorCode);
 
 private:
     const QString m_key;
@@ -147,7 +155,10 @@ public:
         QnAbstractResourcePropertyAdaptor(key, handler, parent),
         m_type(qMetaTypeId<T>()),
         m_defaultValue(defaultValue)
-    {}
+    {
+        if (handler)
+            handler->serialize(qVariantFromValue(defaultValue), &m_defaultSerializedValue);
+    }
 
     T value() const {
         QVariant baseValue = base_type::value();
@@ -166,9 +177,15 @@ public:
         return base_type::testAndSetValue(QVariant::fromValue(expectedValue), QVariant::fromValue(newValue));
     }
 
+protected:
+    virtual QString defaultSerializedValue() const override {
+        return m_defaultSerializedValue;
+    }
+
 private:
     const int m_type;
     const T m_defaultValue;
+    QString m_defaultSerializedValue;
 };
 
 

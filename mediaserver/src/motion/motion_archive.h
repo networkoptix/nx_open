@@ -4,11 +4,10 @@
 #include <QtGui/QRegion>
 #include <QtCore/QFile>
 #include <QSharedPointer>
-#include "core/resource/network_resource.h"
 #include "core/datapacket/media_data_packet.h"
 #include "utils/media/sse_helper.h"
 #include "recorder/device_file_catalog.h"
-#include "core/resource/security_cam_resource.h"
+#include <core/resource/resource_fwd.h>
 #include "motion/abstract_motion_archive.h"
 
 static const int MOTION_INDEX_HEADER_SIZE = 16;
@@ -68,7 +67,7 @@ public:
     QnMotionArchive(QnNetworkResourcePtr resource, int channel);
     virtual ~QnMotionArchive();
     bool saveToArchive(QnConstMetaDataV1Ptr data);
-    QnTimePeriodList mathPeriod(const QRegion& region, qint64 startTime, qint64 endTime, int detailLevel);
+    QnTimePeriodList matchPeriod(const QRegion& region, qint64 startTime, qint64 endTime, int detailLevel);
     QnMotionArchiveConnectionPtr createConnection();
 
     qint64 minTime() const;

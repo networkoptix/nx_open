@@ -6,12 +6,19 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 
+// TODO: #Elric #enum
 enum QnLogLevel { cl_logUNKNOWN, cl_logALWAYS, cl_logERROR, cl_logWARNING, cl_logINFO, cl_logDEBUG1, cl_logDEBUG2 };
 
 class QnLogPrivate;
 
 class QN_EXPORT QnLog {
 public:
+    static const int MAIN_LOG_ID = 0;
+    static const int CUSTOM_LOG_BASE_ID = 1;
+    static const int HTTP_LOG_INDEX = CUSTOM_LOG_BASE_ID + 1;
+
+    QnLog();
+
     bool create(const QString &baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel);
 
     void setLogLevel(QnLogLevel logLevel);
@@ -50,14 +57,14 @@ public:
     }
 #undef QN_LOG_BODY
     
-    static void initLog(const QString &logLevelStr);
+    static void initLog(const QString &logLevelStr, int logID = MAIN_LOG_ID);
     //!Initializes log with external instance \a externalInstance
     /*!
-        Introduced to allow logging in dynamically loaded plugins
+        Introduced to allow logging in dynamically loaded plugins. Required since common is a static library
     */
-    static void initLog(QnLog *externalInstance);
-    static QString logFileName();
-    static QnLog *instance();
+    static bool initLog(QnLog *externalInstance, int logID = MAIN_LOG_ID);
+    static QString logFileName( int logID = MAIN_LOG_ID );
+    static QnLog *instance( int logID = MAIN_LOG_ID );
     
     static QnLogLevel logLevelFromString(const QString &value);
     static QString logLevelToString(QnLogLevel value);
@@ -74,13 +81,26 @@ private:
     QnLogPrivate *d;
 };
 
-#define CL_LOG(level)                                                           \
-    if (level > cl_log.logLevel()) {} else                                      \
+#define CL_LOG(level)                                           \
+    if (level > cl_log.logLevel()) {} else                      \
 
-#define NX_LOG(msg, level)                \
-    {                                     \
-        if( level <= cl_log.logLevel() )  \
-            cl_log.log( msg, level );     \
+
+#define NX_LOG_MSVC_EXPAND(x) x
+#define GET_NX_LOG_MACRO(_1, _2, _3, NAME, ...) NAME
+#define NX_LOG(...) NX_LOG_MSVC_EXPAND(GET_NX_LOG_MACRO(__VA_ARGS__, NX_LOG_3, NX_LOG_2)(__VA_ARGS__))
+
+#define NX_LOG_2(msg, level)                                        \
+    {                                                               \
+        QnLog* logInstance = QnLog::instance(QnLog::MAIN_LOG_ID);   \
+        if( level <= logInstance->logLevel() )                      \
+            logInstance->log( msg, level );                         \
+    }
+
+#define NX_LOG_3(logID, msg, level)                             \
+    {                                                           \
+        QnLog* logInstance = QnLog::instance(logID);            \
+        if( level <= logInstance->logLevel() )                  \
+            logInstance->log( msg, level );                     \
     }
 
 #define cl_log (*QnLog::instance())

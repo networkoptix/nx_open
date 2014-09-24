@@ -1,6 +1,8 @@
 #ifndef __LIGHT_MOTION_ARCHIVE_CONNECTION_H__
 #define __LIGHT_MOTION_ARCHIVE_CONNECTION_H__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "abstract_motion_archive.h"
 
 class QnLightMotionArchiveConnection: public QnAbstractMotionArchiveConnection
@@ -13,5 +15,7 @@ private:
     int m_channel;
     QnMetaDataV1Ptr m_lastResult;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // __LIGHT_MOTION_ARCHIVE_CONNECTION_H__

@@ -9,6 +9,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QUuid>
 
+#include "utils/common/log.h"
 #include "utils/common/util.h"
 #include "utils/common/systemerror.h"
 #include "utils/network/http/httptypes.h"
@@ -18,6 +19,7 @@
 #include "utils/media/bitStream.h"
 #include "../common/synctime.h"
 #include "tcp_connection_priv.h"
+#include <network/authenticate_helper.h>
 
 
 #define DEFAULT_RTP_PORT 554
@@ -290,7 +292,7 @@ void QnRtspTimeHelper::printTime(double jitter)
         if (m_jitPackets > 0) {
             QString message(QLatin1String("camera %1. minJit=%2 ms. maxJit=%3 ms. avgJit=%4 ms"));
             message = message.arg(m_resId).arg(int(m_minJitter*1000+0.5)).arg(int(m_maxJitter*1000+0.5)).arg(int(m_jitterSum/m_jitPackets*1000+0.5));
-            cl_log.log(message, cl_logINFO);
+            NX_LOG(message, cl_logINFO);
         }
         m_statsTimer.restart();
         m_minJitter = INT_MAX;
@@ -310,7 +312,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         double resultInSecs = cameraTimeToLocalTime(statistics.nptTime + rtpTimeDiff / double(frequency));
         double localTimeInSecs = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
         // If data is delayed for some reason > than jitter, but not lost, some next data can have timing less then previous data (after reinit).
-        // Such data can not be recorded to archive. I ofter got that situation if media server under debug
+        // Such data can not be recorded to archive. I ofter got that situation if server under debug
         // So, I've increased jitter threshold just in case (very slow mediaServer work e.t.c)
         // In any way, valid threshold behaviour if camera time is changed.
         //if (qAbs(localTimeInSecs - resultInSecs) < 15 || !recursiveAllowed) 
@@ -586,15 +588,12 @@ void RTPSession::parseRangeHeader(const QString& rangeStr)
 void RTPSession::updateResponseStatus(const QByteArray& response)
 {
     int firstLineEnd = response.indexOf('\n');
-    if (firstLineEnd >= 0) {
-        QList<QByteArray> params = response.left(firstLineEnd).split(' ');
-        if (params.size() >= 2) {
-            m_responseCode = params[1].trimmed().toInt();
-
-            nx_http::StatusLine statusLine; //TODO: #ak use statusLine one line above after release 1.6
-            statusLine.parse( nx_http::ConstBufferRefType(response, 0, firstLineEnd) );
-            m_reasonPhrase = QLatin1String(statusLine.reasonPhrase);
-        }
+    if (firstLineEnd >= 0)
+    {
+        nx_http::StatusLine statusLine;
+        statusLine.parse( nx_http::ConstBufferRefType(response, 0, firstLineEnd) );
+        m_responseCode = statusLine.statusCode;
+        m_reasonPhrase = QLatin1String(statusLine.reasonPhrase);
     }
 }
 
@@ -602,10 +601,15 @@ void RTPSession::updateResponseStatus(const QByteArray& response)
 bool RTPSession::isDigestAuthRequired(const QByteArray& response)
 {
     updateResponseStatus(response);
-    if (m_responseCode != 401)
+    if (m_responseCode != nx_http::StatusCode::unauthorized && 
+        m_responseCode != nx_http::StatusCode::proxyAuthenticationRequired)
+    {
         return false;
+    }
 
-    QString wwwAuth = extractRTSPParam(QLatin1String(response), QLatin1String("WWW-Authenticate:"));
+    QString wwwAuth = extractRTSPParam(
+        QLatin1String(response),
+        m_responseCode == nx_http::StatusCode::unauthorized ? lit("WWW-Authenticate:") : lit("Proxy-Authenticate:"));
 
     if (wwwAuth.toLower().contains(QLatin1String("digest")))
     {
@@ -681,31 +685,13 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
         return CameraDiagnostics::NoErrorResult();
     }
 
-    if (!sendDescribe()) {
-        m_tcpSock->close();
-        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, destinationPort);
-    }
-
     QByteArray response;
-
-    if (!readTextResponce(response)) {
+    const QByteArray& request = createDescribeRequest();
+    if( !sendRequestAndReceiveResponse( request, response ) )
+    {
         m_tcpSock->close();
         return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, destinationPort);
     }
-
-
-    // if digest authentication is needed need to resend describe 
-    if (isDigestAuthRequired(response))
-    {
-        m_useDigestAuth = true;
-        response.clear();
-        if (!sendDescribe() || !readTextResponce(response)) 
-        {
-            m_tcpSock->close();
-            return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, destinationPort);
-        }
-    }
-
 
     QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
     if (!tmp.isEmpty())
@@ -723,6 +709,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
         case CL_HTTP_SUCCESS:
             break;
         case CL_HTTP_AUTH_REQUIRED:
+        case nx_http::StatusCode::proxyAuthenticationRequired:
             m_tcpSock->close();
             return CameraDiagnostics::NotAuthorisedResult( url );
         default:
@@ -807,7 +794,9 @@ void RTPSession::addAuth(QByteArray& request)
             QString uri = QLatin1String(methodAndUri[1]);
             if (uri.startsWith(lit("rtsp://")))
                 uri = QUrl(uri).path();
-            request.append(CLSimpleHTTPClient::digestAccess(m_auth, m_realm, m_nonce, QLatin1String(methodAndUri[0]), uri ));
+            request.append( CLSimpleHTTPClient::digestAccess(
+                m_auth, m_realm, m_nonce, QLatin1String(methodAndUri[0]),
+                uri, m_responseCode == nx_http::StatusCode::proxyAuthenticationRequired ));
         }
     }
     else {
@@ -816,8 +805,7 @@ void RTPSession::addAuth(QByteArray& request)
     }
 }   
 
-
-bool RTPSession::sendDescribe()
+QByteArray RTPSession::createDescribeRequest()
 {
     m_sdpTracks.clear();
     QByteArray request;
@@ -832,15 +820,17 @@ bool RTPSession::sendDescribe()
         addRangeHeader(request, m_startTime, AV_NOPTS_VALUE);
     request += USER_AGENT_STR;
     request += "Accept: application/sdp\r\n\r\n";
+    return request;
+}
 
-    //qDebug() << request;
-
+bool RTPSession::sendDescribe()
+{
+    const QByteArray& request = createDescribeRequest();
     return m_tcpSock->send(request.data(), request.size()) > 0;
 }
 
 bool RTPSession::sendOptions()
 {
-
     QByteArray request;
     request += "OPTIONS ";
     request += mUrl.toString();
@@ -988,14 +978,9 @@ bool RTPSession::sendSetup()
 
         //qDebug() << request;
 
-        if( m_tcpSock->send(request.data(), request.size()) <= 0 )
-            return false;
-
         QByteArray responce;
-
-        if (!readTextResponce(responce))
+        if( !sendRequestAndReceiveResponse( request, responce ) )
             return false;
-
 
         if (!responce.startsWith("RTSP/1.0 200"))
         {
@@ -1160,7 +1145,7 @@ QByteArray RTPSession::getGuid()
     return m_guid;
 }
 
-bool RTPSession::sendPlayInternal(qint64 startPos, qint64 endPos)
+QByteArray RTPSession::createPlayRequest( qint64 startPos, qint64 endPos )
 {
     QByteArray request;
 
@@ -1187,6 +1172,13 @@ bool RTPSession::sendPlayInternal(qint64 startPos, qint64 endPos)
 
     request += QLatin1String("\r\n");
 
+    return request;
+}
+
+bool RTPSession::sendPlayInternal(qint64 startPos, qint64 endPos)
+{
+    QByteArray request = createPlayRequest( startPos, endPos );
+
     if (m_tcpSock->send(request.data(), request.size()) <= 0)
         return false;
     return true;
@@ -1198,19 +1190,11 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
 
     m_scale = scale;
 
-    if (!sendPlayInternal(startPos, endPos) || !readTextResponce(response))
-        return false;
-
-    // if digest authentication is nedded need to resend describe 
-    if (isDigestAuthRequired(response))
+    const QByteArray& request = createPlayRequest( startPos, endPos );
+    if( !sendRequestAndReceiveResponse( request, response ) )
     {
-        m_useDigestAuth = true;
-        response.clear();
-        if (!sendPlayInternal(startPos, endPos) || !readTextResponce(response) || isDigestAuthRequired(response))
-        {
-            m_tcpSock->close();
-            return false;
-        }
+        m_tcpSock->close();
+        return false;
     }
 
     while (1)
@@ -1221,7 +1205,6 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
         else if (!readTextResponce(response))
             return false; // try next response
     }    
-
 
     QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
     if (!tmp.isEmpty())
@@ -1511,7 +1494,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 
 quint8* RTPSession::prepareDemuxedData(std::vector<QnByteArray*>& demuxedData, int channel, int reserve)
 {
-    if (demuxedData.size() <= channel)
+    if (channel >= 0 && demuxedData.size() <= (size_t)channel)
         demuxedData.resize(channel+1);
     if (demuxedData[channel] == 0)
         demuxedData[channel] = new QnByteArray(16, 32);
@@ -1980,4 +1963,54 @@ int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readS
                 ? m_additionalReadBufferSize    //if could not read anything returning error
                 : bufSizeBak - bufSize;
     }
+}
+
+bool RTPSession::sendRequestAndReceiveResponse( const QByteArray& requestBuf, QByteArray& responseBuf )
+{
+    std::unique_ptr<nx_http::Request> request;
+    int prevStatusCode = nx_http::StatusCode::ok;
+    QByteArray localRequestBuf;
+
+    for( int i = 0; i < 3; ++i )    //needed to avoid infinite loop in case of incorrect server behavour
+    {
+        const QByteArray* requestBufToSend = i > 0 ? &localRequestBuf : &requestBuf;
+        if( m_tcpSock->send(requestBufToSend->constData(), requestBufToSend->size()) <= 0 )
+            return false;
+
+        if( !readTextResponce(responseBuf) )
+            return false;
+
+        nx_http::Response response;
+        if( !response.parse( responseBuf ) )
+            return false;
+        m_responseCode = response.statusLine.statusCode;
+
+        switch( response.statusLine.statusCode )
+        {
+            case nx_http::StatusCode::unauthorized:
+            case nx_http::StatusCode::proxyAuthenticationRequired:
+                if( prevStatusCode == response.statusLine.statusCode )
+                    return false;   //already tried authentication and has been rejected
+                prevStatusCode = response.statusLine.statusCode;
+                break;
+
+            default:
+                return true;
+        }
+
+        if( !request.get() )
+        {
+            request.reset( new nx_http::Request() );
+            request->parse( requestBuf );
+        }
+
+        //TODO #ak fill m_realm, m_nonce
+
+        if( !qnAuthHelper->authenticate( m_auth, response, request.get() ) )
+            return false;
+        localRequestBuf.clear();
+        request->serialize( &localRequestBuf );
+    }
+
+    return false;
 }

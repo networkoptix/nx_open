@@ -7,10 +7,17 @@
 
 /* Windows headers. */
 #ifdef _WIN32
+#   define FD_SETSIZE 2048
+
 #   include <winsock2.h>
 #   include <windows.h> /* You HAVE to include winsock2.h BEFORE windows.h */
 #   include <ws2tcpip.h>
 #   include <iphlpapi.h>
+
+#   if _MSC_VER < 1800
+#       define noexcept
+#   endif
+
 
 /* DXVA headers (should be included before ffmpeg headers). */
 #   ifdef _USE_DXVA
@@ -23,6 +30,8 @@
 #       include <shlwapi.h>
 #       include <Strsafe.h>
 #   endif
+#else
+#    include <arpa/inet.h>
 #endif
 
 
@@ -79,9 +88,6 @@ extern "C" {
 #include <QtGui/QFont>
 #include <QtGui/QFontMetrics>
 #include <QtNetwork/QHostAddress>
-#ifndef USE_NX_HTTP
-#include <QHttp>
-#endif
 #include <QtCore/QIODevice>
 #include <QtGui/QKeyEvent>
 #include <QtCore/QList>
@@ -127,5 +133,6 @@ extern "C" {
 #include <QtGui/QResizeEvent>
 #include <QFileSystemWatcher>
 #include <QtCore/QUrlQuery>
+#include <QtCore/QUuid>
 
 #endif

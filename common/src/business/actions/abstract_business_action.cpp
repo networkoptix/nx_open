@@ -7,74 +7,84 @@
 
 #include <business/business_strings_helper.h>
 
-namespace BusinessActionType {
-    bool requiresCameraResource(Value val) {
-        switch(val) {
-        case NotDefined:
-        case PanicRecording:
-        case SendMail:
-        case Diagnostics:
-        case ShowPopup:
-        case PlaySound:
-        case PlaySoundRepeated:
-        case SayText:
+namespace QnBusiness {
+    bool requiresCameraResource(ActionType actionType) {
+        switch(actionType) {
+        case UndefinedAction:
+        case PanicRecordingAction:
+        case SendMailAction:
+        case DiagnosticsAction:
+        case ShowPopupAction:
+        case PlaySoundOnceAction:
+        case PlaySoundAction:
+        case SayTextAction:
             return false;
 
-        case CameraOutput:
-        case CameraOutputInstant:
-        case Bookmark:
-        case CameraRecording:
+        case CameraOutputAction:
+        case CameraOutputOnceAction:
+        case BookmarkAction:
+        case CameraRecordingAction:
             return true;
+
+        default:
+            return false;
         }
-        return false;
     }
 
-    bool requiresUserResource(Value val) {
-        switch(val) {
-        case NotDefined:
-        case PanicRecording:
-        case CameraOutput:
-        case CameraOutputInstant:
-        case Bookmark:
-        case CameraRecording:
-        case Diagnostics:
-        case ShowPopup:
-        case PlaySound:
-        case PlaySoundRepeated:
-        case SayText:
+    bool requiresUserResource(ActionType actionType) {
+        switch(actionType) {
+        case UndefinedAction:
+        case PanicRecordingAction:
+        case CameraOutputAction:
+        case CameraOutputOnceAction:
+        case BookmarkAction:
+        case CameraRecordingAction:
+        case DiagnosticsAction:
+        case ShowPopupAction:
+        case PlaySoundOnceAction:
+        case PlaySoundAction:
+        case SayTextAction:
             return false;
 
-        case SendMail:
+        case SendMailAction:
             return true;
+
+        default:
+            return false;
         }
-        return false;
     }
 
-    bool hasToggleState(Value val) {
-        switch(val) {
-        case NotDefined:
-        case CameraOutputInstant:
-        case Bookmark:
-        case SendMail:
-        case Diagnostics:
-        case ShowPopup:
-        case PlaySound:
-        case SayText:
+    bool hasToggleState(ActionType actionType) {
+        switch(actionType) {
+        case UndefinedAction:
+        case CameraOutputOnceAction:
+        case BookmarkAction:
+        case SendMailAction:
+        case DiagnosticsAction:
+        case ShowPopupAction:
+        case PlaySoundOnceAction:
+        case SayTextAction:
             return false;
 
-        case CameraOutput:
-        case CameraRecording:
-        case PanicRecording:
-        case PlaySoundRepeated:
+        case CameraOutputAction:
+        case CameraRecordingAction:
+        case PanicRecordingAction:
+        case PlaySoundAction:
             return true;
+
+        default:
+            return false;
         }
-        return false;
+    }
+
+    bool isImplemented(ActionType actionType) { 
+        return actionType != BookmarkAction; 
     }
 }
 
-QnAbstractBusinessAction::QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters& runtimeParams):
+QnAbstractBusinessAction::QnAbstractBusinessAction(const QnBusiness::ActionType actionType, const QnBusinessEventParameters& runtimeParams):
     m_actionType(actionType),
-    m_toggleState(Qn::UndefinedState), 
+    m_toggleState(QnBusiness::UndefinedState), 
     m_receivedFromRemoteHost(false),
     m_runtimeParams(runtimeParams),
     m_aggregationCount(1)
@@ -85,12 +95,24 @@ QnAbstractBusinessAction::~QnAbstractBusinessAction()
 {
 }
 
-void QnAbstractBusinessAction::setResources(const QnResourceList& resources) {
+void QnAbstractBusinessAction::setResources(const QVector<QUuid>& resources) {
     m_resources = resources;
 }
 
-const QnResourceList& QnAbstractBusinessAction::getResources() const {
+const QVector<QUuid>& QnAbstractBusinessAction::getResources() const {
     return m_resources;
+}
+
+QnResourceList QnAbstractBusinessAction::getResourceObjects() const
+{
+    QnResourceList result;
+    foreach(const QUuid& id, m_resources)
+    {
+        QnResourcePtr res = qnResPool->getResourceById(id);
+        if (res)
+            result << res;
+    }
+    return result;
 }
 
 void QnAbstractBusinessAction::setParams(const QnBusinessActionParameters& params) {
@@ -113,19 +135,19 @@ const QnBusinessEventParameters& QnAbstractBusinessAction::getRuntimeParams() co
     return m_runtimeParams;
 }
 
-void QnAbstractBusinessAction::setBusinessRuleId(const QnId& value) {
+void QnAbstractBusinessAction::setBusinessRuleId(const QUuid& value) {
     m_businessRuleId = value;
 }
 
-QnId QnAbstractBusinessAction::getBusinessRuleId() const {
+QUuid QnAbstractBusinessAction::getBusinessRuleId() const {
     return m_businessRuleId;
 }
 
-void QnAbstractBusinessAction::setToggleState(Qn::ToggleState value) {
+void QnAbstractBusinessAction::setToggleState(QnBusiness::EventState value) {
     m_toggleState = value;
 }
 
-Qn::ToggleState QnAbstractBusinessAction::getToggleState() const {
+QnBusiness::EventState QnAbstractBusinessAction::getToggleState() const {
     return m_toggleState;
 }
 

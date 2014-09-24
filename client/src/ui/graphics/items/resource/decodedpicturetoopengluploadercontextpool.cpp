@@ -7,6 +7,8 @@
 
 #include <memory>
 
+#include <utils/common/log.h>
+
 #include <ui/graphics/opengl/gl_context.h>
 
 #include "decodedpicturetoopengluploader.h"

@@ -17,7 +17,8 @@
 QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     QWidget(parent),
     ui(new Ui::AdvancedSettingsWidget),
-    m_updating(false)
+    m_updating(false),
+    m_qualityEditable(false)
 {
     ui->setupUi(this);
 
@@ -52,7 +53,9 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     connect(ui->settingsDisableControlCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dataChanged()));
     connect(ui->qualityOverrideCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->qualitySlider, SIGNAL(valueChanged(int)), this, SLOT(at_dataChanged()));
+    connect(ui->checkBoxPrimaryRecorder, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->checkBoxSecondaryRecorder, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
+    connect(ui->comboBoxTransport, SIGNAL(currentIndexChanged(int)), this, SLOT(at_dataChanged()));
 
     setHelpTopic(ui->qualityGroupBox, Qn::CameraSettings_SecondStream_Help);
     setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
@@ -80,10 +83,20 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
     bool isFirstQuality = true;
     bool isFirstControl = true;
     
+    int primaryRecorderDisabled = -1;
     int secondaryRecorderDisabled = -1;
+    bool samePrimaryRec = true;
     bool sameSecRec = true;
 
-    foreach(const QnVirtualCameraResourcePtr &camera, cameras) {
+    bool sameRtpTransport = true;
+    QString rtpTransport;
+
+    bool sameMotionStream = true;
+    QString motionStream;
+
+    int camCnt = 0;
+    foreach(const QnVirtualCameraResourcePtr &camera, cameras) 
+    {
         if (isArecontCamera(camera))
             arecontCamerasCount++;
         anyHasDualStreaming |= camera->hasDualStreaming();
@@ -111,8 +124,27 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
             secondaryRecorderDisabled = secRecDisabled;
         else if (secondaryRecorderDisabled != secRecDisabled)
             sameSecRec = false;
+
+        int primaryRecDisabled = camera->getProperty(QnMediaResource::dontRecordPrimaryStreamKey()).toInt();
+        if (primaryRecorderDisabled == -1)
+            primaryRecorderDisabled = primaryRecDisabled;
+        else if (primaryRecorderDisabled != primaryRecDisabled)
+            samePrimaryRec = false;
+
+        QString camRtpTransport = camera->getProperty(QnMediaResource::rtpTransportKey());
+        if (camRtpTransport != rtpTransport && camCnt > 0)
+            sameRtpTransport = false;
+        rtpTransport = camRtpTransport;
+
+        QString camMotionStream = camera->getProperty(QnMediaResource::motionStreamKey());
+        if (camMotionStream != motionStream && camCnt > 0)
+            sameMotionStream = false;
+        motionStream = camMotionStream;
+
+        camCnt++;
     }
 
+    m_qualityEditable = anyHasDualStreaming;
     ui->qualityGroupBox->setVisible(anyHasDualStreaming);
     if (sameQuality && quality != Qn::SSQualityNotDefined) {
         ui->qualityOverrideCheckBox->setChecked(true);
@@ -125,6 +157,11 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
         ui->qualitySlider->setValue(qualityToSliderPos(Qn::SSQualityMedium));
     }
 
+    if (samePrimaryRec)
+        ui->checkBoxPrimaryRecorder->setChecked(primaryRecorderDisabled);
+    else
+        ui->checkBoxPrimaryRecorder->setCheckState(Qt::PartiallyChecked);
+
     ui->checkBoxSecondaryRecorder->setEnabled(anyHasDualStreaming);
     if (anyHasDualStreaming) {
         if (sameSecRec)
@@ -136,6 +173,13 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
         ui->checkBoxSecondaryRecorder->setChecked(false);
     }
 
+    if (rtpTransport.isEmpty())
+        ui->comboBoxTransport->setCurrentIndex(0);
+    else if (sameRtpTransport)
+        ui->comboBoxTransport->setCurrentText(rtpTransport);
+    else
+        ui->comboBoxTransport->setCurrentIndex(-1);
+
     ui->settingsGroupBox->setVisible(arecontCamerasCount != cameras.size());
     ui->settingsDisableControlCheckBox->setTristate(!sameControlState);
     if (sameControlState)
@@ -145,7 +189,9 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
 
     bool defaultValues = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked
             && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium
-            && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked;
+            && ui->checkBoxPrimaryRecorder->checkState() == Qt::Unchecked
+            && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked
+            && ui->comboBoxTransport->currentIndex() == 0;
 
     ui->assureCheckBox->setEnabled(!cameras.isEmpty() && defaultValues);
     ui->assureCheckBox->setChecked(!defaultValues);
@@ -172,8 +218,18 @@ void QnAdvancedSettingsWidget::submitToResources(const QnVirtualCameraResourceLi
         if (enableControls && ui->qualityOverrideCheckBox->isChecked() && camera->hasDualStreaming())
             camera->setSecondaryStreamQuality(quality);
 
+        if (ui->checkBoxPrimaryRecorder->checkState() != Qt::PartiallyChecked)
+            camera->setProperty(QnMediaResource::dontRecordPrimaryStreamKey(), ui->checkBoxPrimaryRecorder->isChecked() ? lit("1") : lit("0"));
         if (ui->checkBoxSecondaryRecorder->checkState() != Qt::PartiallyChecked && camera->hasDualStreaming())
             camera->setProperty(QnMediaResource::dontRecordSecondaryStreamKey(), ui->checkBoxSecondaryRecorder->isChecked() ? lit("1") : lit("0"));
+
+        if (ui->comboBoxTransport->currentIndex() >= 0) {
+            QString txt = ui->comboBoxTransport->currentText();
+            if (txt.toLower() == lit("auto"))
+                txt.clear();
+            camera->setProperty(QnMediaResource::rtpTransportKey(), txt);
+        }
+
     }
 }
 
@@ -194,7 +250,9 @@ void QnAdvancedSettingsWidget::at_restoreDefaultsButton_clicked()
     ui->settingsDisableControlCheckBox->setCheckState(Qt::Unchecked);
     ui->qualityOverrideCheckBox->setChecked(true);
     ui->qualitySlider->setValue(qualityToSliderPos(Qn::SSQualityMedium));
+    ui->checkBoxPrimaryRecorder->setChecked(false);
     ui->checkBoxSecondaryRecorder->setChecked(false);
+    ui->comboBoxTransport->setCurrentIndex(0);
 }
 
 void QnAdvancedSettingsWidget::at_qualitySlider_valueChanged(int value) {
@@ -203,8 +261,7 @@ void QnAdvancedSettingsWidget::at_qualitySlider_valueChanged(int value) {
     ui->highQualityWarningLabel->setVisible(quality == Qn::SSQualityHigh);
 }
 
-Qn::SecondStreamQuality QnAdvancedSettingsWidget::sliderPosToQuality(int pos)
-{
+Qn::SecondStreamQuality QnAdvancedSettingsWidget::sliderPosToQuality(int pos) const {
     if (pos == 0)
         return Qn::SSQualityDontUse;
     else
@@ -217,4 +274,38 @@ int QnAdvancedSettingsWidget::qualityToSliderPos(Qn::SecondStreamQuality quality
         return 0;
     else
         return int(quality) + 1;
+}
+
+bool QnAdvancedSettingsWidget::isSecondStreamEnabled() const {
+    if (!m_qualityEditable)
+        return true;
+
+    if (ui->settingsDisableControlCheckBox->checkState() != Qt::Unchecked)
+        return true;
+
+    if (!ui->qualityGroupBox->isEnabled())
+        return true;
+
+    if (!ui->qualityOverrideCheckBox->isChecked())
+        return true;
+
+    Qn::SecondStreamQuality quality = (Qn::SecondStreamQuality) sliderPosToQuality(ui->qualitySlider->value());
+    return quality != Qn::SSQualityDontUse;
+}
+
+void QnAdvancedSettingsWidget::setSecondStreamEnabled(bool value /*= true*/) {
+    if (!m_qualityEditable)
+        return;
+
+    if (ui->settingsDisableControlCheckBox->checkState() != Qt::Unchecked)
+        return;
+
+    if (!ui->qualityGroupBox->isEnabled())
+        return;
+
+    if (value) {
+        ui->qualitySlider->setValue(qualityToSliderPos(Qn::SSQualityMedium));
+    } else {
+        ui->qualitySlider->setValue(qualityToSliderPos(Qn::SSQualityDontUse));
+    }
 }

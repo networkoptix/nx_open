@@ -3,8 +3,38 @@
 
 #include <QtCore/QMetaType>
 #include <QtCore/QMultiMap>
+#include <QtCore/QMutex>
 #include <QtGui/QRegion>
 #include <QtGui/QPainterPath>
+
+
+/*!
+    Copy-constructor and assingment operator perform deep-copy of object 
+    Problem with QRegion is that cannot be used with object's shallow copies safely in multiple threads simultaneously 
+    because \a QRegion::rects() const method is not thread-safe (due to call to \a QRegionPrivate::vectorize function)
+*/
+class QnRegion
+:
+    public QRegion
+{
+public:
+    QnRegion();
+    //!makes deep copy of QRegion
+    QnRegion(const QnRegion& right);
+    QnRegion(int x, int y, int w, int h, RegionType t = Rectangle);
+    QnRegion(const QPolygon & a, Qt::FillRule fillRule = Qt::OddEvenFill);
+    QnRegion(const QRegion & r);
+    QnRegion(const QBitmap & bm);
+    QnRegion(const QRect & r, RegionType t = Rectangle);
+
+    QnRegion& operator=( const QnRegion& r );
+
+    QVector<QRect> rects() const;
+
+private:
+    mutable QMutex m_mutex;
+};
+
 
 /*
 struct QnMotionWindow
@@ -25,9 +55,13 @@ struct QnMotionWindow
 class QnMotionRegion
 {
 public:
+    // TODO: #Elric #enum btw, associated API is also totally evil
     enum RegionValid{VALID, WINDOWS, MASKS, SENS};
 
     QnMotionRegion();
+    QnMotionRegion( const QnMotionRegion& );
+
+    QnMotionRegion& operator=( const QnMotionRegion& );
 
     static const int MIN_SENSITIVITY = 0; // equal motion mask
     static const int DEFAULT_SENSITIVITY = 5;
@@ -46,20 +80,20 @@ public:
     bool isEmpty() const;
 
     void addRect(int sensitivity, const QRect& rect);
-    QRegion getMotionMask() const; // return info with zero sensitivity only
-    QRegion getRegionBySens(int value) const;
+    QnRegion getMotionMask() const; // return info with zero sensitivity only
+    QnRegion getRegionBySens(int value) const;
     QMultiMap<int, QRect> getAllMotionRects() const;
 
     /**
      * Returns painter path for the motion mask region.
      */
-    QPainterPath getMotionMaskPath() const;
+    QPainterPath getMotionMaskPath();
 
     /**
      * Returns painter path for the given sensitivity region.
      * \param value                 Target sensitivity level.
      */
-    QPainterPath getRegionBySensPath(int value) const;
+    QPainterPath getRegionBySensPath(int value);
 
     /**
      * Returns simplified version of region's rects
@@ -76,8 +110,9 @@ public:
 private:
     void updatePathCache();
 private:
-    QRegion m_data[MAX_SENSITIVITY - MIN_SENSITIVITY + 1];
+    QnRegion m_data[MAX_SENSITIVITY - MIN_SENSITIVITY + 1];
     QPainterPath m_pathCache[MAX_SENSITIVITY - MIN_SENSITIVITY + 1];
+    bool m_dirty;
 };
 
 Q_DECLARE_METATYPE(QnMotionRegion);

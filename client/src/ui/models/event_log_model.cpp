@@ -14,13 +14,13 @@
 #include "business/business_strings_helper.h"
 #include "client/client_globals.h"
 #include <utils/math/math.h>
-#include "device_plugins/server_camera/server_camera.h"
+#include <plugins/resource/server_camera/server_camera.h>
 #include "client/client_settings.h"
 #include <ui/common/ui_resource_name.h>
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
-QHash<QnId, QnResourcePtr> QnEventLogModel::m_resourcesHash;
+QHash<QUuid, QnResourcePtr> QnEventLogModel::m_resourcesHash;
 
 // -------------------------------------------------------------------------- //
 // QnEventLogModel::DataIndex
@@ -42,7 +42,7 @@ public:
         // event types to lex order
         QMap<QString, int> events;
         for (int i = 0; i < 256; ++i) {
-            events.insert(QnBusinessStringsHelper::eventName(BusinessEventType::Value(i)), i);
+            events.insert(QnBusinessStringsHelper::eventName(QnBusiness::EventType(i)), i);
             m_eventTypeToLexOrder[i] = 255; // put undefined events to the end of the list
         }
         int count = 0;
@@ -52,7 +52,7 @@ public:
         // action types to lex order
         QMap<QString, int> actions;
         for (int i = 0; i < 256; ++i) {
-            actions.insert(QnBusinessStringsHelper::actionName(BusinessActionType::Value(i)), i);
+            actions.insert(QnBusinessStringsHelper::actionName(QnBusiness::ActionType(i)), i);
             m_actionTypeToLexOrder[i] = 255; // put undefined actions to the end of the list
         }
         count = 0;
@@ -101,7 +101,7 @@ public:
     /*
      * Reorder event types to lexicographical order (for sorting)
      */
-    static int toLexEventType(BusinessEventType::Value eventType)
+    static int toLexEventType(QnBusiness::EventType eventType)
     {
         return m_eventTypeToLexOrder[((int) eventType) & 0xff];
     }
@@ -109,7 +109,7 @@ public:
     /*
      * Reorder actions types to lexicographical order (for sorting)
      */
-    static int toLexActionType(BusinessActionType::Value actionType)
+    static int toLexActionType(QnBusiness::ActionType actionType)
     {
         return m_actionTypeToLexOrder[((int) actionType) & 0xff];
     }
@@ -273,8 +273,8 @@ QModelIndex QnEventLogModel::parent(const QModelIndex &) const {
 
 QVariant QnEventLogModel::fontData(const Column& column, const QnBusinessActionData &action) const {
     if (column == DescriptionColumn) {
-        BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
-        if (eventType == BusinessEventType::Camera_Motion)
+        QnBusiness::EventType eventType = action.getRuntimeParams().getEventType();
+        if (eventType == QnBusiness::CameraMotionEvent)
             return m_linkFont;
     }
 
@@ -283,8 +283,8 @@ QVariant QnEventLogModel::fontData(const Column& column, const QnBusinessActionD
 
 QVariant QnEventLogModel::foregroundData(const Column& column, const QnBusinessActionData &action) const {
     if (column == DescriptionColumn) {
-        BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
-        if (eventType == BusinessEventType::Camera_Motion)
+        QnBusiness::EventType eventType = action.getRuntimeParams().getEventType();
+        if (eventType == QnBusiness::CameraMotionEvent)
             return m_linkBrush;
     }
 
@@ -293,8 +293,8 @@ QVariant QnEventLogModel::foregroundData(const Column& column, const QnBusinessA
 
 QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnBusinessActionData &action) {
     if (column == DescriptionColumn && action.hasFlags(QnBusinessActionData::MotionExists)) {
-        BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
-        if (eventType == BusinessEventType::Camera_Motion)
+        QnBusiness::EventType eventType = action.getRuntimeParams().getEventType();
+        if (eventType == QnBusiness::CameraMotionEvent)
             return QVariant::fromValue<int>(Qt::PointingHandCursor);
     }
 
@@ -313,8 +313,8 @@ QnResourcePtr QnEventLogModel::getResource(const Column &column, const QnBusines
     return QnResourcePtr();
 }
 
-QnResourcePtr QnEventLogModel::getResourceById(const QnId &id) {
-    if (!id.isValid())
+QnResourcePtr QnEventLogModel::getResourceById(const QUuid &id) {
+    if (id.isNull())
         return QnResourcePtr();
 
     QnResourcePtr resource = m_resourcesHash.value(id);
@@ -322,14 +322,6 @@ QnResourcePtr QnEventLogModel::getResourceById(const QnId &id) {
         return resource;
 
     resource = qnResPool->getResourceById(id);
-    if (resource && resource->isDisabled()) {
-        QnServerCameraPtr localCam = resource.dynamicCast<QnServerCamera>();
-        if (localCam) {
-            localCam = localCam->findEnabledSibling();
-            if (localCam)
-                resource = localCam;
-        }
-    }
     if (resource)
         m_resourcesHash.insert(id, resource);
 
@@ -337,15 +329,15 @@ QnResourcePtr QnEventLogModel::getResourceById(const QnId &id) {
 }
 
 QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionData &action) {
-    QnId resId;
+    QUuid resId;
     switch(column) {
     case EventCameraColumn: 
         resId = action.getRuntimeParams().getEventResourceId();
         break;
     case ActionCameraColumn: 
         {
-            BusinessActionType::Value actionType = action.actionType();
-            if (actionType == BusinessActionType::SendMail) {
+            QnBusiness::ActionType actionType = action.actionType();
+            if (actionType == QnBusiness::SendMailAction) {
                 if (!action.getParams().getEmailAddress().isEmpty()) {
                     if (action.getParams().getEmailAddress().count(L'@') > 1)
                         return qnResIconCache->icon(QnResourceIconCache::Users);
@@ -356,7 +348,7 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
                     return QVariant();
                 }
             }
-            else if (actionType == BusinessActionType::ShowPopup) {
+            else if (actionType == QnBusiness::ShowPopupAction) {
                 if (action.getParams().getUserGroup() == QnBusinessActionParameters::AdminOnly)
                     return qnResIconCache->icon(QnResourceIconCache::User);
                 else
@@ -368,14 +360,10 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
         break;
     }
 
-    QnResourcePtr res = getResourceById(resId);
-    if (res)
-        return qnResIconCache->icon(res->flags(), res->getStatus());
-    else
-        return QVariant();
+    return qnResIconCache->icon(getResourceById(resId));
 }
 
-QString QnEventLogModel::getResourceNameString(QnId id) {
+QString QnEventLogModel::getResourceNameString(QUuid id) {
     return getResourceName(getResourceById(id));
 }
 
@@ -405,19 +393,19 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
     case ActionColumn:
         return QnBusinessStringsHelper::actionName(action.actionType());
     case ActionCameraColumn: {
-        BusinessActionType::Value actionType = action.actionType();
-        if (actionType == BusinessActionType::SendMail)
+        QnBusiness::ActionType actionType = action.actionType();
+        if (actionType == QnBusiness::SendMailAction)
             return action.getParams().getEmailAddress();
-        else if (actionType == BusinessActionType::ShowPopup)
+        else if (actionType == QnBusiness::ShowPopupAction)
             return getUserGroupString(action.getParams().getUserGroup());
         else
             return getResourceNameString(action.getRuntimeParams().getActionResourceId());
     }
     case DescriptionColumn: {
-        BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
+        QnBusiness::EventType eventType = action.getRuntimeParams().getEventType();
         QString result;
 
-        if (eventType == BusinessEventType::Camera_Motion) {
+        if (eventType == QnBusiness::CameraMotionEvent) {
             if (action.hasFlags(QnBusinessActionData::MotionExists))
                 result = tr("Motion video");
         }
@@ -425,7 +413,7 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
             result = QnBusinessStringsHelper::eventDetails(action.getRuntimeParams(), 1, tr("\n"));
         }
 
-        if (!BusinessEventType::hasToggleState(eventType)) {
+        if (!QnBusiness::hasToggleState(eventType)) {
             int count = action.getAggregationCount();
             if (count > 1)
                 result += tr(" (%1 times)").arg(count); // TODO: #Elric #TR this will probably look bad 
@@ -458,7 +446,7 @@ QString QnEventLogModel::motionUrl(Column column, const QnBusinessActionData& ac
     if (column != DescriptionColumn || !action.hasFlags(QnBusinessActionData::MotionExists))
         return QString();
 
-    if (action.getRuntimeParams().getEventType() != BusinessEventType::Camera_Motion)
+    if (action.getRuntimeParams().getEventType() != QnBusiness::CameraMotionEvent)
         return QString();
 
     return QnBusinessStringsHelper::motionUrl(action.getRuntimeParams(), true);
@@ -471,7 +459,7 @@ bool QnEventLogModel::hasMotionUrl(const QModelIndex &index) const {
     const QnBusinessActionData &action = m_index->at(index.row());
     if (!action.hasFlags(QnBusinessActionData::MotionExists))
         return false;
-    if (!action.getRuntimeParams().getEventResourceId())
+    if (action.getRuntimeParams().getEventResourceId().isNull())
         return false;
 
     return true;
@@ -547,12 +535,12 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
     return QVariant();
 }
 
-BusinessEventType::Value QnEventLogModel::eventType(int row) const {
+QnBusiness::EventType QnEventLogModel::eventType(int row) const {
     if (row >= 0) {
         const QnBusinessActionData& action = m_index->at(row);
         return action.getRuntimeParams().getEventType();
     } 
-    return BusinessEventType::NotDefined;
+    return QnBusiness::UndefinedEvent;
 }
 
 QnResourcePtr QnEventLogModel::eventResource(int row) const {

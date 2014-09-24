@@ -73,8 +73,6 @@ public:
     explicit QnCustomFileDialog(QWidget *parent = 0, const QString &caption = QString(), const QString &directory = QString(), const QString &filter = QString());
     ~QnCustomFileDialog();
 
-    // TODO: #GDM what is the ownership semantics for delegate here? I believe it must be owned by this dialog when passed in a call.
-
     /**
      * @brief addCheckbox               Adds a checkbox to this file dialog.
      * 
@@ -85,12 +83,13 @@ public:
      *                                  It is the callee's responsibility to make sure
      *                                  that pointed-to value still exists at that point.
      * @param delegate                  Delegate that will control state of the checkbox.
+     *                                  Dialog does not take the ownership of the delegate, it must be freed by the callee.
      */ 
     void addCheckBox(const QString &text, bool *value, QnAbstractWidgetControlDelegate* delegate = NULL);
 
     /**
      * @brief addSpinBox                Adds a spinbox to this file dialog.
-     * @param text                      Text that will be displaed on a label before spinbox.
+     * @param text                      Text that will be displayed on a label before spinbox.
      *                                  If %n is used within the text, spinbox will be placed in the
      *                                  middle of the text (in the position of %n).
      * @param minValue                  Minimum value
@@ -108,6 +107,8 @@ public:
     /**
      * @brief addWidget                 Adds custom widget to this file dialog.
      * @param widget                    Pointer to the widget.
+     * @param delegate                  Delegate that will control state of the widget.
+     *                                  Dialog does not take the ownership of the delegate, it must be freed by the callee.
      */
     void addWidget(const QString &label, QWidget *widget, QnAbstractWidgetControlDelegate *delegate = NULL);
 

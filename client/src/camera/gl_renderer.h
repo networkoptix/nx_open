@@ -12,8 +12,11 @@
 #include <client/client_globals.h>
 
 #include <ui/graphics/opengl/gl_functions.h>
+
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/nv12_to_rgb_shader_program.h>
+
+
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 
 class CLVideoDecoderOutput;
@@ -24,7 +27,7 @@ class QnFisheyePtzController;
 class QnGlRendererShaders: public QObject {
     Q_OBJECT;
 public:
-    QnGlRendererShaders(const QGLContext *context, QObject *parent = NULL);
+    QnGlRendererShaders(QObject *parent = NULL);
     virtual ~QnGlRendererShaders();
 
     QnYv12ToRgbShaderProgram *yv12ToRgb;
@@ -155,10 +158,16 @@ private:
      * \param v_array
      * \param tx_array texture vertexes array
      */
-    void drawBindedTexture( const float* v_array, const float* tx_array );
+    void drawBindedTexture( QnGLShaderProgram* shader , const float* v_array, const float* tx_array );
     void updateTexture( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     bool isYuvFormat() const;
     int glRGBFormat() const;
+
+private:
+    bool m_initialized;
+    QOpenGLVertexArrayObject m_vertices;
+    QOpenGLBuffer m_positionBuffer;
+    QOpenGLBuffer m_textureBuffer;
 };
 
 #endif //QN_GL_RENDERER_H

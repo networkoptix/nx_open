@@ -26,20 +26,21 @@ public:
 
     void setUsedForWriting(bool isUsedForWriting);
     bool isUsedForWriting() const;
-
+    QString getPath() const;
+    static QString urlToPath(const QString& url);
+#ifdef ENABLE_DATA_PROVIDERS
     virtual float bitrate() const;
     virtual float getStorageBitrateCoeff() const { return 1.0; }
 
     void addBitrate(QnAbstractMediaStreamDataProvider* provider);
     void releaseBitrate(QnAbstractMediaStreamDataProvider* provider);
+#endif
 
     /*
      * Short and uniq storage ID. It is addition related ID field, and used for memory usage optimization
      */
     void setIndex(quint16 value);
     quint16 getIndex() const;
-
-    virtual void deserialize(const QnResourceParameters& parameters) override;
 
     /*
      * Returns storage usage in range [0..1]

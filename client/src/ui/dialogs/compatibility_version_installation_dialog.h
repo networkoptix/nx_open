@@ -51,6 +51,7 @@ protected:
     virtual void hideEvent(QHideEvent *event) override;
 
 private:
+    // TODO: #Elric #enum
     enum class State
     {
         init,

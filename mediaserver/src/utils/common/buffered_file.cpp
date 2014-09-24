@@ -8,7 +8,7 @@ extern "C"
 #include "buffered_file.h"
 #include <QSharedPointer>
 #include "utils/common/util.h"
-#include "core/resource/resource_fwd.h"
+#include <core/resource/storage_resource.h>
 #include "recorder/storage_manager.h"
 
 #ifdef Q_OS_WIN
@@ -16,6 +16,7 @@ extern "C"
 #endif
 #include "utils/math/math.h"
 
+//TODO #ak make it system-dependent (it can depend on OS, FS type, FS settings)
 static const int SECTOR_SIZE = 32768;
 static const qint64 AVG_USAGE_AGGREGATE_TIME = 15 * 1000000ll; // aggregation time in usecs
 
@@ -54,8 +55,19 @@ void QueueFileWriter::removeOldWritingStatistics(qint64 currentTime)
     }
 }
 
+//#define MEASURE_WRITE_TIME
+
 void QueueFileWriter::run()
 {
+#ifdef MEASURE_WRITE_TIME
+    QAtomicInt totalMillisSpentWriting;
+    QElapsedTimer writeTimeCalculationTimer;
+    QElapsedTimer totalTimeCalculationTimer;
+    totalTimeCalculationTimer.invalidate();
+    int millisPassed = 0;
+    size_t bytesWrittenInPeriod = 0;
+#endif
+
     FileBlockInfo* fileBlock;
     while (!m_needStop)
     {
@@ -64,7 +76,18 @@ void QueueFileWriter::run()
             qint64 currentTime = getUsecTimer();
             {
                 QMutexLocker lock(&fileBlock->mutex);
+#ifdef MEASURE_WRITE_TIME
+                writeTimeCalculationTimer.restart();
+                if( !totalTimeCalculationTimer.isValid() )
+                    totalTimeCalculationTimer.restart();
+                //std::cout<<"Writing "<<fileBlock->len<<" bytes"<<std::endl;
+#endif
                 fileBlock->result = fileBlock->file->writeUnbuffered(fileBlock->data, fileBlock->len);
+#ifdef MEASURE_WRITE_TIME
+                bytesWrittenInPeriod += fileBlock->result;
+                //std::cout<<"Written "<<fileBlock->result<<" bytes"<<std::endl;
+                totalMillisSpentWriting.fetchAndAddOrdered( writeTimeCalculationTimer.elapsed() );
+#endif
                 fileBlock->condition.wakeAll();
             }
             qint64 now = getUsecTimer();
@@ -74,6 +97,17 @@ void QueueFileWriter::run()
             m_writeTime += now - currentTime;
             m_writeTimings << WriteTimingInfo(currentTime, now - currentTime);
         }
+
+#ifdef MEASURE_WRITE_TIME
+        if( totalTimeCalculationTimer.elapsed() - millisPassed > 10*1000 )
+        {
+            std::cout<<"Total writing time "<<totalMillisSpentWriting.load()<<" ms, "
+                "total time "<<totalTimeCalculationTimer.elapsed()<<" ms, "<<
+                "write rate "<<(bytesWrittenInPeriod/((totalTimeCalculationTimer.elapsed() - millisPassed)/1000))/1024<<" KBps "<<std::endl;
+            bytesWrittenInPeriod = 0;
+            millisPassed = totalTimeCalculationTimer.elapsed();
+        }
+#endif
     }
 
     while (m_dataQueue.pop(fileBlock, 1))
@@ -106,7 +140,7 @@ QueueFileWriter* QnWriterPool::getWriter(const QString& fileName)
     QString drive = fileName.left(fileName.indexOf('/'));
     QnStorageResourcePtr storage = qnStorageMan->getStorageByUrl(fileName);
     if (storage)
-        drive = storage->getUrl();
+        drive = storage->getPath();
     if (drive.endsWith('/'))
         drive = drive.left(drive.length()-1);
 
@@ -307,6 +341,7 @@ qint64 QBufferedFile::writeData ( const char * data, qint64 len )
             m_filePos += writed;
             m_bufferLen -= writed;
             m_bufferPos -= writed;
+            //TODO #ak get rid of this memmove. It is most heavy memory operation
             memmove(m_buffer, m_buffer + writed, m_bufferLen);
         }
         len -= toWrite;

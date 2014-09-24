@@ -118,7 +118,7 @@
             "selectionMarker": "selection.lighter",
             
             "pastBackground": "QColor(255, 255, 255, 24)",
-            "futureBackground": "QColor(0, 0, 0, 0)",
+            "futureBackground": "QColor(0, 0, 0, 64)",
             
             "pastRecording": "QColor(64, 255, 64, 128)",
             "futureRecording": "QColor(64, 255, 64, 64)",
@@ -196,6 +196,14 @@
             "network": ["#ff3434", "#f0ff34", "#8484ff", "#34ff84"]
         },    
         "palette": { "default": { "window": "black" } }
+    },
+    
+    "QnVideowallScreenWidget": {
+        "palette": { "default": { "window": "#000000ff" } }
+    },
+    
+    "QnVideowallItemWidget": {
+        "palette": { "default": { "window": "#000000ff" } }
     },
     
     "ZoomWindowInstrument": {
@@ -327,6 +335,12 @@
             "normal": "#f0f0f0",
             "warning": "#ffff00",
             "expired": "#ff0000"
+        }
+    },
+
+    "QnServerAddressesModel": {
+        "colors": {
+            "readOnly": "#c0c0c0"
         }
     },
     

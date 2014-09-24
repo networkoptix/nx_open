@@ -21,7 +21,7 @@ public:
     {}
 
     struct {
-        QnId id;
+        QUuid id;
         QString path;
     } resource;
 
@@ -41,7 +41,7 @@ public:
             !qFuzzyEquals(l.zoomRect, r.zoomRect) || !qFuzzyEquals(l.rotation, r.rotation) || !(l.contrastParams == r.contrastParams) || !(l.dewarpingParams == r.dewarpingParams))
             return false;
 
-        if(l.resource.path == r.resource.path && (l.resource.id == r.resource.id || !l.resource.id.isValid() || !r.resource.id.isValid()))
+        if(l.resource.path == r.resource.path && (l.resource.id == r.resource.id || l.resource.id.isNull() || r.resource.id.isNull()))
             return true;
 
         if(l.resource.id == r.resource.id && (l.resource.path == r.resource.path || l.resource.path.isEmpty() || r.resource.path.isEmpty()))

@@ -11,24 +11,12 @@
 #include <utils/common/id.h>
 
 #include <api/api_fwd.h>
-#include <api/model/camera_diagnostics_reply.h>
-#include <api/model/storage_space_reply.h>
-#include <api/model/storage_status_reply.h>
-#include <api/model/statistics_reply.h>
-#include <api/model/time_reply.h>
-#include <api/model/rebuild_archive_reply.h>
-#include <api/model/manual_camera_seach_reply.h>
-
-#include <core/ptz/ptz_preset.h>
-#include <core/ptz/ptz_tour.h>
-#include <core/ptz/ptz_data.h>
+#include <core/ptz/ptz_fwd.h>
+#include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
-#include <recording/time_period_list.h>
 
 #include "abstract_connection.h"
-
-class QnMediaServerResource;
 
 typedef QList<QPair<QString, bool> > QnStringBoolPairList;
 typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
@@ -37,40 +25,13 @@ Q_DECLARE_METATYPE(QnStringBoolPairList);
 Q_DECLARE_METATYPE(QnStringVariantPairList);
 
 
-class QnMediaServerReplyProcessor: public QnAbstractReplyProcessor {
-    Q_OBJECT
-
-public:
-    QnMediaServerReplyProcessor(int object): QnAbstractReplyProcessor(object) {}
-
-    virtual void processReply(const QnHTTPRawResponse &response, int handle) override;
-
-signals:
-    void finished(int status, const QnRebuildArchiveReply &reply, int handle);
-    void finished(int status, const QnStorageStatusReply &reply, int handle);
-    void finished(int status, const QnStorageSpaceReply &reply, int handle);
-    void finished(int status, const QnTimePeriodList &reply, int handle);
-    void finished(int status, const QnStatisticsReply &reply, int handle);
-    void finished(int status, const QVector3D &reply, int handle);
-    void finished(int status, const QnStringVariantPairList &reply, int handle);
-    void finished(int status, const QnStringBoolPairList &reply, int handle);
-    void finished(int status, const QnTimeReply &reply, int handle);
-    void finished(int status, const QnCameraDiagnosticsReply &reply, int handle);
-    void finished(int status, const QnManualCameraSearchReply &reply, int handle);
-    void finished(int status, const QnBusinessActionDataListPtr &reply, int handle);
-    void finished(int status, const QImage &reply, int handle);
-    void finished(int status, const QString &reply, int handle);
-    void finished(int status, const QnPtzPresetList &reply, int handle);
-    void finished(int status, const QnPtzTourList &reply, int handle);
-    void finished(int status, const QnPtzObject &reply, int handle);
-    void finished(int status, const QnPtzAuxilaryTraitList &reply, int handle);
-    void finished(int status, const QnPtzData &reply, int handle);
-
-private:
-    friend class QnAbstractReplyProcessor;
-};
-
-
+// TODO: #MSAPI move to api/model or even to common_globals, 
+// add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
+// 
+// Check serialization/deserialization in QnMediaServerConnection::doRebuildArchiveAsync
+// and in handler.
+// 
+// And name them sanely =)
 enum RebuildAction
 {
     RebuildAction_ShowProgress,
@@ -83,17 +44,26 @@ class QnMediaServerConnection: public QnAbstractConnection {
     typedef QnAbstractConnection base_type;
 
 public:
-    QnMediaServerConnection(QnMediaServerResource* mserver, QObject *parent = NULL);
+    QnMediaServerConnection(QnMediaServerResource* mserver, const QUuid& videowallGuid = QUuid(), QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
 
-    void setProxyAddr(const QUrl &apiUrl, const QString &addr, int port);
-    int getProxyPort() { return m_proxyPort; }
-    QString getProxyHost() { return m_proxyAddr; }
+    int getTimePeriodsAsync(
+        const QnNetworkResourceList &list,
+        qint64 startTimeMs, 
+        qint64 endTimeMs, 
+        qint64 detail, 
+        Qn::TimePeriodContent periodsType,
+        const QString &filter,
+        QObject *target, 
+        const char *slot);
 
-    int getTimePeriodsAsync(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot);
-
-
+    // TODO: #MSAPI 
+    // move to api/model or even to common_globals, 
+    // add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
+    // 
+    // And name them sanely =)
     enum RoundMethod { IFrameBeforeTime, Precise, IFrameAfterTime };
+
     /** 
      * Get \a camera thumbnail for specified time. 
      * 
@@ -111,6 +81,20 @@ public:
      * \returns                         Request handle.
      */
     int getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot);
+
+    /** 
+     * Check \a list of cameras for discovery. Return new list with contains only accessible cameras.
+     * 
+     * Returns immediately. On request completion \a slot of object \a target 
+     * is called with signature <tt>(int status, QImage reply, int handle)</tt>.
+     * Status is 0 in case of success, in other cases it holds error code.
+     * 
+     * \param cameras
+     * \param target
+     * \param slot
+     * \returns                         Request handle.
+     */
+    int checkCameraList(const QnNetworkResourceList &cameras, QObject *target, const char *slot);
 
     /** 
      * Get \a camera params. 
@@ -141,9 +125,9 @@ public:
         qint64 dateFrom, 
         qint64 dateTo, 
         QnResourceList cameras,
-        BusinessEventType::Value eventType, 
-        BusinessActionType::Value actionType,
-        QnId businessRuleId, 
+        QnBusiness::EventType eventType, 
+        QnBusiness::ActionType actionType,
+        QUuid businessRuleId, 
         QObject *target, 
         const char *slot);
 
@@ -211,13 +195,18 @@ public:
 
     int getTimeAsync(QObject *target, const char *slot);
 
+    //!Requests name of system, mediaserver is currently connected to
+    /*!
+        \param slot Slot MUST have signature (int, QString, int)
+    */
+    int getSystemNameAsync( QObject* target, const char* slot );
     //!Request server to run camera \a cameraID diagnostics step following \a previousStep
     /*!
         \param slot Slot MUST have signature (int, QnCameraDiagnosticsReply, int)
         \returns Request handle
     */
     int doCameraDiagnosticsStepAsync(
-        const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
+        const QUuid& cameraID, CameraDiagnostics::Step::Value previousStep,
         QObject* target, const char* slot );
 
     /**
@@ -226,10 +215,24 @@ public:
      */
     int doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot);
 
+    int addBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int updateBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int deleteBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot);
+
+    int installUpdate(const QString &updateId, const QByteArray &data, QObject *target, const char *slot);
+
+    int restart(QObject *target, const char *slot);
+
+    int configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, int port, QObject *target, const char *slot);
+
+    int pingSystemAsync(const QUrl &url, const QString &password, QObject *target, const char *slot);
+    int mergeSystemAsync(const QUrl &url, const QString &password, bool ownSettings, QObject *target, const char *slot);
+
+    int testEmailSettingsAsync(const QnEmail::Settings &settings, QObject *target, const char *slot);
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
 
-    static QnRequestParamList createTimePeriodsRequest(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion> &motionRegions);
     static QnRequestParamList createGetParamsRequest(const QnNetworkResourcePtr &camera, const QStringList &params);
     static QnRequestParamList createSetParamsRequest(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params);
 

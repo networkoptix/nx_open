@@ -1,8 +1,6 @@
 #ifndef QN_RESOURCE_LAYOUT_H
 #define QN_RESOURCE_LAYOUT_H
 
-#define CL_MAX_CHANNELS 4 // TODO: #Elric get rid of this definition
-
 #include <memory>
 
 #include <QtCore/QVector>
@@ -10,7 +8,8 @@
 #include <QtCore/QPoint>
 #include <QtCore/QSize>
 
-#include <core/datapacket/abstract_data_packet.h>
+#include <core/datapacket/abstract_media_context.h>
+
 #include <common/common_globals.h>
 
 class QnResourceLayout {
@@ -41,8 +40,8 @@ public:
     virtual AudioTrack getAudioTrackInfo(int index) const = 0;
 };
 
-typedef std::shared_ptr<QnResourceAudioLayout> QnResourceAudioLayoutPtr;
-typedef std::shared_ptr<const QnResourceAudioLayout> QnConstResourceAudioLayoutPtr;
+typedef QSharedPointer<QnResourceAudioLayout> QnResourceAudioLayoutPtr;
+typedef QSharedPointer<const QnResourceAudioLayout> QnConstResourceAudioLayoutPtr;
 
 
 class QnEmptyResourceAudioLayout: public QnResourceAudioLayout {
@@ -67,8 +66,8 @@ private:
     QVector<AudioTrack> m_audioTracks;
 };
 
-typedef std::shared_ptr<QnResourceCustomAudioLayout> QnResourceCustomAudioLayoutPtr;
-typedef std::shared_ptr<const QnResourceCustomAudioLayout> QnConstResourceCustomAudioLayoutPtr;
+typedef QSharedPointer<QnResourceCustomAudioLayout> QnResourceCustomAudioLayoutPtr;
+typedef QSharedPointer<const QnResourceCustomAudioLayout> QnConstResourceCustomAudioLayoutPtr;
 
 
 class QnResourceVideoLayout: public QnResourceLayout {
@@ -88,8 +87,8 @@ public:
     virtual QString toString() const { return QString(); }
 };
 
-typedef std::shared_ptr<QnResourceVideoLayout> QnResourceVideoLayoutPtr;
-typedef std::shared_ptr<const QnResourceVideoLayout> QnConstResourceVideoLayoutPtr;
+typedef QSharedPointer<QnResourceVideoLayout> QnResourceVideoLayoutPtr;
+typedef QSharedPointer<const QnResourceVideoLayout> QnConstResourceVideoLayoutPtr;
 
 
 /**
@@ -115,8 +114,8 @@ public:
 
 class QnCustomResourceVideoLayout;
 
-typedef std::shared_ptr<QnCustomResourceVideoLayout> QnCustomResourceVideoLayoutPtr;
-typedef std::shared_ptr<const QnCustomResourceVideoLayout> QnConstCustomResourceVideoLayoutPtr;
+typedef QSharedPointer<QnCustomResourceVideoLayout> QnCustomResourceVideoLayoutPtr;
+typedef QSharedPointer<const QnCustomResourceVideoLayout> QnConstCustomResourceVideoLayoutPtr;
 
 class QnCustomResourceVideoLayout : public QnResourceVideoLayout {
 public:

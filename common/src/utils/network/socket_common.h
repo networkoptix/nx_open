@@ -6,7 +6,7 @@
 #ifndef SOCKET_COMMON_H
 #define SOCKET_COMMON_H
 
-#ifdef Q_OS_WIN
+#ifdef _WIN32
 #   include <winsock2.h>
 #else
 #   include <sys/socket.h>
@@ -38,6 +38,8 @@ public:
     uint32_t ipv4() const;
     QString toString() const;
 
+    struct in_addr inAddr() const;
+
     static const HostAddress localhost;
     static const HostAddress anyHost;
 
@@ -46,16 +48,42 @@ private:
     struct in_addr m_sinAddr;
 };
 
-//!Pair "host address":port
+//!Represents host and port (e.g. 127.0.0.1:1234)
 class SocketAddress
 {
 public:
     HostAddress address;
-    unsigned short port;
+    int port;
 
-    SocketAddress( const HostAddress& _address = HostAddress(), unsigned short _port = 0 );
+    SocketAddress( const HostAddress& _address = HostAddress(), unsigned short _port = 0 )
+    :
+        address( _address ),
+        port( _port )
+    {
+    }
 
-    QString toString() const;
+    SocketAddress( const QString& str )
+    :
+        port( 0 )
+    {
+        int sepPos = str.indexOf(QLatin1Char(':'));
+        if( sepPos == -1 )
+        {
+            address = HostAddress(str);
+        }
+        else
+        {
+            address = HostAddress(str.mid( 0, sepPos ));
+            port = str.mid( sepPos+1 ).toInt();
+        }
+    }
+
+    QString toString() const
+    {
+        return
+            address.toString() +
+            (port > 0 ? QString::fromLatin1(":%1").arg(port) : QString());
+    }
 };
 
 #endif  //SOCKET_COMMON_H

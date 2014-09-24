@@ -93,13 +93,13 @@ int GenericRTSPCameraManager::getCameraCapabilities( unsigned int* capabilitiesM
 }
 
 //!Implementation of nxcip::BaseCameraManager::setCredentials
-void GenericRTSPCameraManager::setCredentials( const char* username, const char* password )
+void GenericRTSPCameraManager::setCredentials( const char* /*username*/, const char* /*password*/ )
 {
     //TODO/IMPL
 }
 
 //!Implementation of nxcip::BaseCameraManager::setAudioEnabled
-int GenericRTSPCameraManager::setAudioEnabled( int audioEnabled )
+int GenericRTSPCameraManager::setAudioEnabled( int /*audioEnabled*/ )
 {
     //TODO/IMPL
     return 0;

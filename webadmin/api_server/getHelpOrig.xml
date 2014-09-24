@@ -1,0 +1,1273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reply>
+    <groups>
+        <element>
+            <groupName>api</groupName>
+            <groupDescription>This group contains functions related to single media
+                server</groupDescription>
+            <methods>
+                <element>
+                    <name>execAction</name>
+                    <description>Execute business action. Action data should bin in a internal
+                        binary format. This method is going to be refactor at next
+                        version.</description>
+                    <isGetter>false</isGetter>
+                    <params/>
+                    <result>Return XML with 'OK' message or error code</result>
+                </element>
+                <element>
+                    <name>events</name>
+                    <description>Returns event log</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>from</name>
+                            <description>Start of time period at ms since 1.1.1970 (UTC
+                                format).</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>to</name>
+                            <description>End of time period at ms since 1.1.1970 (UTC
+                                format).</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>event</name>
+                            <description>Event type.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>action</name>
+                            <description>Action type.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>brule_id</name>
+                            <description>Business rule id.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Return media server event log in proprietary binary format</result>
+                </element>
+                <element>
+                    <name>doCameraDiagnosticsStep</name>
+                    <description>Performs camera diagnostics.</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>res_id</name>
+                            <description>camera id</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>type</name>
+                            <description>Diagnostics to perform.</description>
+                            <optional>false</optional>
+                            <values>
+                                <element>
+                                    <name>mediaServerAvailability</name>
+                                    <description>Checks media server availability</description>
+                                </element>
+                                <element>
+                                    <name>cameraAvailability</name>
+                                    <description>Checks if camera is accessible from media
+                                        server</description>
+                                </element>
+                                <element>
+                                    <name>mediaStreamAvailability</name>
+                                    <description>Checks if camera media stream can be
+                                        opened</description>
+                                </element>
+                                <element>
+                                    <name>mediaStreamIntegrity</name>
+                                    <description>Checks additional media stream
+                                        parameters</description>
+                                </element>
+                            </values>
+                        </element>
+                    </params>
+                    <result>Return XML with parameter value</result>
+                </element>
+                <element>
+                    <name>setCameraParam</name>
+                    <description>Sets values of several camera parameters. This parameters are used
+                        on a advanced Tab in camera settings. For instance: brigthness, contrast
+                        e.t.c.</description>
+                    <isGetter>false</isGetter>
+                    <params>
+                        <element>
+                            <name>res_id</name>
+                            <description>camera unique id</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>&lt;any name&gt;</name>
+                            <description>Parameter for camera to set. Request can contains one or
+                                more parameters to set.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Returns OK if all parameters have been set, otherwise returns error 500
+                        (Internal server error) and result of setting for every param.</result>
+                </element>
+                <element>
+                    <name>getCameraParam</name>
+                    <description>Read camera parameters. For instance: brigthness, contrast e.t.c.
+                        Parameters to read should be specified.</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>res_id</name>
+                            <description>camera unique id</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>&lt;any name&gt;</name>
+                            <description>Parameter name to read. Request can contains one or more
+                                parameters.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Returns required parameter values in form of paramName=paramValue, each
+                        param on new line</result>
+                </element>
+                <element>
+                    <name>image</name>
+                    <description>Return image from camera</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>physicalId</name>
+                            <description>camera unique id</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>time</name>
+                            <description>required image time. Microseconds since 1970 UTC or string
+                                in format 'YYYY-MM-DDThh24:mi:ss.zzz'. Date format is auto detected.
+                                Also, addition special values are allowed.</description>
+                            <optional>false</optional>
+                            <values>
+                                <element>
+                                    <name>YYYY-MM-DDThh24:mi:ss.zzz</name>
+                                    <description>Human readable date format</description>
+                                </element>
+                                <element>
+                                    <name>[0..9]*</name>
+                                    <description>Microseconds since 1970 UTC</description>
+                                </element>
+                                <element>
+                                    <name>NOW</name>
+                                    <description>Live position (no frame is returned if camera is
+                                        offline</description>
+                                </element>
+                                <element>
+                                    <name>LATEST</name>
+                                    <description>last frame from camera (return live position or
+                                        last frame from archive if camera is offline)</description>
+                                </element>
+                            </values>
+                        </element>
+                        <element>
+                            <name>format</name>
+                            <description>Image format. Default value 'jpeg'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>jpeg</name>
+                                    <description>JPEG image format</description>
+                                </element>
+                                <element>
+                                    <name>png</name>
+                                    <description>PNG image format</description>
+                                </element>
+                                <element>
+                                    <name>bmp</name>
+                                    <description>BMP image format</description>
+                                </element>
+                                <element>
+                                    <name>tiff</name>
+                                    <description>TIFF image format</description>
+                                </element>
+                            </values>
+                        </element>
+                        <element>
+                            <name>method</name>
+                            <description>Parameter defines method to search frame inside GOP
+                                structure. Default value 'before'. Parameter not used for Motion
+                                jpeg video codec.</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>before</name>
+                                    <description>Returns nearest I-frame before specified
+                                        time.</description>
+                                </element>
+                                <element>
+                                    <name>after</name>
+                                    <description>Returns nearest I-frame after specified
+                                        time.</description>
+                                </element>
+                                <element>
+                                    <name>exact</name>
+                                    <description>Get image for exact time position. It required more
+                                        CPU.</description>
+                                </element>
+                            </values>
+                        </element>
+                        <element>
+                            <name>height</name>
+                            <description>Required image height. By default image have same size as
+                                source video stream.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>width</name>
+                            <description>Required image width. By default image have same size as
+                                source video stream. If only width or height is specified other
+                                parameter is auto detected. Video aspect ratio is not
+                                changed.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Returns image.</result>
+                </element>
+                <element>
+                    <name>showLog</name>
+                    <description>Returns tail of the server log file</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>lines</name>
+                            <description>Display last N log lines.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Tail of the server log file in text format</result>
+                </element>
+                <element>
+                    <name>manualCamera/search</name>
+                    <description>Search cameras in manual mode</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>start_ip</name>
+                            <description>First ip address in range to scan.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>end_ip</name>
+                            <description>Last ip address in range to scan.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>port</name>
+                            <description>Camera(s) port to chek. Port is autodetected if parameter
+                                is absent.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>user</name>
+                            <description>Username for the cameras</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>password</name>
+                            <description>Password for the cameras</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>XML with camera names, manufacturers and urls.</result>
+                </element>
+                <element>
+                    <name>manualCamera/status</name>
+                    <description>Get manual addition progress.</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>uuid</name>
+                            <description>Process uuid.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>XML with progress value.</result>
+                </element>
+                <element>
+                    <name>manualCamera/stop</name>
+                    <description>Stop manual addition progress.</description>
+                    <isGetter>false</isGetter>
+                    <params>
+                        <element>
+                            <name>uuid</name>
+                            <description>Process uuid.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>XML with OK message or error code.</result>
+                </element>
+                <element>
+                    <name>manualCamera/add</name>
+                    <description>Manual add camera(s). If several cameras are added, parameters
+                        'url' and 'manufacturer' must be defined several times.</description>
+                    <isGetter>false</isGetter>
+                    <params>
+                        <element>
+                            <name>url</name>
+                            <description>Camera url returned by scan request.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>manufacturer</name>
+                            <description>Camera manufacturer.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>user</name>
+                            <description>Username for the cameras</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>password</name>
+                            <description>Password for the cameras</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>XML with OK message or error code.</result>
+                </element>
+                <element>
+                    <name>ping</name>
+                    <description>Ping the server</description>
+                    <isGetter>true</isGetter>
+                    <params/>
+                    <result>XML with PONG message.</result>
+                </element>
+                <element>
+                    <name>ptz/move</name>
+                    <description>Start camera moving.</description>
+                    <isGetter>false</isGetter>
+                    <params>
+                        <element>
+                            <name>res_id</name>
+                            <description>Camera unique ID</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>xSpeed</name>
+                            <description>rotation X velocity in range [-1..+1]</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>ySpeed</name>
+                            <description>rotation Y velocity in range [-1..+1]</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>zoomSpeed</name>
+                            <description>zoom velocity in range [-1..+1]</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>XML with OK message or error code.</result>
+                </element>
+                <element>
+                    <name>ptz/stop</name>
+                    <description>Stop camera moving.</description>
+                    <isGetter>false</isGetter>
+                    <params>
+                        <element>
+                            <name>res_id</name>
+                            <description>Camera unique ID</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>XML with OK message or error code.</result>
+                </element>
+                <element>
+                    <name>ptz/moveTo</name>
+                    <description>Go to absolute position</description>
+                    <isGetter>false</isGetter>
+                    <params>
+                        <element>
+                            <name>res_id</name>
+                            <description>Camera unique ID</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>xPos</name>
+                            <description>Go to absolute X position in range [-1..+1]</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>yPos</name>
+                            <description>Go to absolute Y position in range [-1..+1]</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>zoomPos</name>
+                            <description>Go to absolute zoom position in range
+                                [-1..+1]</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>XML with OK message or error code.</result>
+                </element>
+                <element>
+                    <name>ptz/getPosition</name>
+                    <description>Return current camera position.</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>res_id</name>
+                            <description>Camera unique ID</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>XML with camera position or error code.</result>
+                </element>
+                <element>
+                    <name>ptz/calibrate</name>
+                    <description>calibrate moving speed (addition speed coeff)</description>
+                    <isGetter>false</isGetter>
+                    <params>
+                        <element>
+                            <name>res_id</name>
+                            <description>Camera unique ID</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>xSpeed</name>
+                            <description>rotation X velocity in range [-1..+1]</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>ySpeed</name>
+                            <description>rotation Y velocity in range [-1..+1]</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>zoomSpeed</name>
+                            <description>zoom velocity in range [-1..+1]</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>XML with OK message or error code.</result>
+                </element>
+                <element>
+                    <name>ptz/getCalibrate</name>
+                    <description>Read current calibration settings</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>res_id</name>
+                            <description>Camera unique ID</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>XML with calibration coeffecients.</result>
+                </element>
+                <element>
+                    <name>ptz/getSpaceMapper</name>
+                    <description>return JSON-serialized PTZ space mapper. This information contains
+                        curves for camera FOV and zoom position and camera moving ranges. This
+                        information used in advanced PTZ mode.</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>res_id</name>
+                            <description>Camera unique ID</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>return JSON-serialized PTZ space mapper.</result>
+                </element>
+                <element>
+                    <name>rebuildArchive</name>
+                    <description>Start or stop rebuilding of media server archive.</description>
+                    <isGetter>false</isGetter>
+                    <params>
+                        <element>
+                            <name>rebuild</name>
+                            <description>'start' or 'stop' value.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Rebuild progress if no input param specified or XML with OK message or
+                        error code.</result>
+                </element>
+                <element>
+                    <name>RecordedTimePeriods</name>
+                    <description>Recorded chunk info by specified cameras.</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>physicalId</name>
+                            <description>Camera unique ID. Parameter can be used several times to
+                                define a list of cameras.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>startTime</name>
+                            <description>Start time of a time interval. Microseconds since 1970 UTC
+                                or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto
+                                detected.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>endTime</name>
+                            <description>End time of a time interval. Microseconds since 1970 UTC or
+                                string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto
+                                detected.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>motionRegions</name>
+                            <description>Match motion on a video by specified rect. Parameter can be
+                                used several times.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Allowed values: 'json', 'xml', 'txt', 'bin'.
+                                Default value 'json'</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                        <element>
+                            <name>detail</name>
+                            <description>Chunk detail level, in microseconds. Time periods/chunks
+                                that are shorter than the detail level are discarded. You can use
+                                detail level as amount of microseconds per screen
+                                pixel.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Chunks data in requested format. Chunks are merged for all requested
+                        cameras. Time and duration defined in UTC milliseconds.</result>
+                </element>
+                <element>
+                    <name>statistics</name>
+                    <description>Returns server info: CPU usage, HDD usage e.t.c.</description>
+                    <isGetter>true</isGetter>
+                    <params/>
+                    <result>XML data with statistics.</result>
+                </element>
+                <element>
+                    <name>storageSpace</name>
+                    <description>Returns a list of all server storages.</description>
+                    <isGetter>true</isGetter>
+                    <params/>
+                    <result>XML with server's storages.</result>
+                </element>
+                <element>
+                    <name>storageStatus</name>
+                    <description>Check if specified folder can be used as media server
+                        storage.</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>path</name>
+                            <description>Folder to check.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>JSON data. 'OK' if specified folder may be used for writing on
+                        mediaServer. Otherwise returns 'FAIL' </result>
+                </element>
+                <element>
+                    <name>gettime</name>
+                    <description>Returns server UTC time and time zone</description>
+                    <isGetter>true</isGetter>
+                    <params/>
+                    <result>JSON data.</result>
+                </element>
+                <element>
+                    <name>installUpdate</name>
+                    <description>Updates server by the package contained in POST body</description>
+                    <isGetter>false</isGetter>
+                    <params/>
+                    <result/>
+                </element>
+                <element>
+                    <name>version</name>
+                    <description>Return server version.</description>
+                    <isGetter>true</isGetter>
+                    <params/>
+                    <result>XML data with server version.</result>
+                </element>
+                <element>
+                    <name>onEvent</name>
+                    <description>Process business event from external system. Reserved for future
+                        use.</description>
+                    <isGetter>false</isGetter>
+                    <params/>
+                    <result/>
+                </element>
+            </methods>
+        </element>
+        <element>
+            <groupName>ec2</groupName>
+            <groupDescription>This group contains functions related to whole system (all media
+                servers).</groupDescription>
+            <methods>
+                <element>
+                    <name>getResourceTypes</name>
+                    <description>Read all resource types. Resource type contain object type such as
+                        'Server', 'Camera' e.t.c. Also, reosource types contain addition information
+                        for cameras such as maximum fps, resolution e.t.c</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>getResourceParams</name>
+                    <description>Read resource (camera, user or server) addition parameters (camera
+                        firmware version e.t.c). List of parameters depends of resource
+                        type.</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                        <element>
+                            <name>id</name>
+                            <description>Resource guid</description>
+                            <optional>false</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>getMediaServerList</name>
+                    <description>Return media server list</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>getCameras</name>
+                    <description>Read camera list</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                        <element>
+                            <name>id</name>
+                            <description>Media server guid</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>getCameraHistoryList</name>
+                    <description>Read information about which server hold camera in some time
+                        period. This information is used for archive play if camera was moved from
+                        one media server to another.</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>getCameraBookmarkTags</name>
+                    <description>Reserved for future use</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>getBusinessRuleList</name>
+                    <description>Return business rules</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>getUserList</name>
+                    <description>Return users registered in the system. User's password contain MD5
+                        hash data with salt</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>getVideowallList</name>
+                    <description>Return list of video walls</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>getLayoutList</name>
+                    <description>Return list of user layout</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>listDirectory</name>
+                    <description>Return list of folders and files in a virtual FS stored inside
+                        database. This function is used to add files (such audio for nitifications)
+                        to database.</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                        <element>
+                            <name>folder</name>
+                            <description>Folder name in a virtual FS</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>getStoredFile</name>
+                    <description>Read file data from a virtual FS</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                        <element>
+                            <name>folder</name>
+                            <description>File name</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>getStoredFile</name>
+                    <description>Read file data from a virtual FS</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                        <element>
+                            <name>folder</name>
+                            <description>File name</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>getSettings</name>
+                    <description>Read general system settings such as email address
+                        e.t.c</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                        <element>
+                            <name>folder</name>
+                            <description>File name</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>getCurrentTime</name>
+                    <description>Read current time</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                        <element>
+                            <name>folder</name>
+                            <description>File name</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>getAllDataList</name>
+                    <description>Read all data such as all media servers, cameras, users
+                        e.t.c</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                        <element>
+                            <name>folder</name>
+                            <description>File name</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+                <element>
+                    <name>getLicenses</name>
+                    <description>Read license list</description>
+                    <isGetter>true</isGetter>
+                    <params>
+                        <element>
+                            <name>format</name>
+                            <description>Data format. Default value: 'binary'</description>
+                            <optional>true</optional>
+                            <values>
+                                <element>
+                                    <name>binary</name>
+                                    <description>binary data format</description>
+                                </element>
+                                <element>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </element>
+                                <element>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </element>
+                                <element>
+                                    <name>csv</name>
+                                    <description>CVS data format. In case of hierarchical data only
+                                        top level data will be provided</description>
+                                </element>
+                            </values>
+                        </element>
+                        <element>
+                            <name>folder</name>
+                            <description>File name</description>
+                            <optional>true</optional>
+                            <values/>
+                        </element>
+                    </params>
+                    <result>Return object in requested format</result>
+                </element>
+            </methods>
+        </element>
+    </groups>
+</reply>

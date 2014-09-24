@@ -42,7 +42,6 @@ message Message {
         KvPairDelete            = 17;
 
         Command                 = 18;
-        EmailFailure            = 19;
     }
 
     required Type type = 1;
@@ -181,12 +180,4 @@ message CommandMessage {
     }
 
     required Command command = 1;
-}
-
-message EmailFailureMessage {
-    extend Message {
-        required EmailFailureMessage message = 114;
-    }
-
-    optional string cause = 1;
 }

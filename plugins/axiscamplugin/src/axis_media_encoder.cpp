@@ -26,7 +26,8 @@ AxisMediaEncoder::AxisMediaEncoder( AxisCameraManager* const cameraManager )
     m_cameraManager( cameraManager ),
     m_currentFps( 15 ),
     m_currentBitrateKbps( 0 ),
-    m_maxAllowedFps( 0 )
+    m_maxAllowedFps( 0 ),
+    m_rtspPort( -1 )
 {
     m_maxAllowedFps = MIN_AXIS_CAMERA_FPS;
 
@@ -69,6 +70,18 @@ unsigned int AxisMediaEncoder::releaseRef()
 
 int AxisMediaEncoder::getMediaUrl( char* urlBuf ) const
 {
+    if( m_rtspPort == -1 )
+    {
+        SyncHttpClient http(
+            AxisCameraPlugin::instance()->networkAccessManager(),
+            m_cameraManager->cameraInfo().url,
+            DEFAULT_AXIS_API_PORT,
+            m_cameraManager->credentials() );
+        const int httpStatusCode = m_cameraManager->readAxisParameter( &http, "Network.RTSP.Port", &m_rtspPort );
+        if( httpStatusCode != SyncHttpClient::HTTP_OK )
+            return httpStatusCode == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
+    }
+
     QByteArray paramsStr;
     paramsStr.append("videocodec=h264");
     if( m_currentResolutionInfo.resolution.width * m_currentResolutionInfo.resolution.height > 0 )
@@ -82,7 +95,7 @@ int AxisMediaEncoder::getMediaUrl( char* urlBuf ) const
     paramsStr.append("&audio=").append( m_cameraManager->isAudioEnabled() ? "1" : "0");
 
     //m_cameraManager->cameraInfo().url stores only host name
-    sprintf( urlBuf, "rtsp://%s/axis-media/media.amp?%s", m_cameraManager->cameraInfo().url, paramsStr.data() );
+    sprintf( urlBuf, "rtsp://%s:%d/axis-media/media.amp?%s", QByteArray(m_cameraManager->cameraInfo().url).split(':').at(0).constData(), m_rtspPort, paramsStr.data() );
     return nxcip::NX_NO_ERROR;
 }
 
@@ -167,7 +180,7 @@ int AxisMediaEncoder::fetchCameraResolutionList() const
         m_cameraManager->cameraInfo().url,
         DEFAULT_AXIS_API_PORT,
         m_cameraManager->credentials() );
-    if( http.get( QLatin1String("axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution") ) != QNetworkReply::NoError )
+    if( http.get( QLatin1String("/axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution") ) != QNetworkReply::NoError )
         return nxcip::NX_NETWORK_ERROR;
     if( http.statusCode() != SyncHttpClient::HTTP_OK )
         return http.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;

@@ -42,6 +42,9 @@
     \a res_id - unique id of camera
     If failed to set just one param, response status code is set to 500 (Internal Server Error), in other case - 200 (OK)
 */
+
+struct AwaitedParameters;
+
 class QnCameraSettingsRestHandler
 :
     public QnRestRequestHandler
@@ -52,21 +55,11 @@ public:
     //!Implementation of QnRestRequestHandler::executeGet
     virtual int executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType);
     //!Implementation of QnRestRequestHandler::executePost
-    virtual int executePost( const QString& path, const QnRequestParamList& params, const QByteArray& requestBody, QByteArray& responseMessageBody, QByteArray& contentType );
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& requestBody, const QByteArray& srcBodyContentType, QByteArray& responseMessageBody, QByteArray& contentType);
     //!Implementation of QnRestRequestHandler::description
     //virtual QString description(TCPSocket* tcpSocket) const;
 
 private:
-    struct AwaitedParameters
-    {
-        QnResourcePtr resource;
-
-        //!Parameters which values we are waiting for
-        std::set<QString> paramsToWaitFor;
-        //!New parameter values are stored here
-        std::map<QString, std::pair<QVariant, bool> > paramValues;
-    };
-
     QMutex m_mutex;
     QWaitCondition m_cond;
     std::set<AwaitedParameters*> m_awaitedParamsSets;
@@ -86,8 +79,6 @@ class QnSetCameraParamRestHandler
 {
     Q_OBJECT
 public:
-    //!Implementation of QnRestRequestHandler::description
-    virtual QString description() const override;
 };
 
 //!Handles setCameraParam request
@@ -101,7 +92,6 @@ class QnGetCameraParamRestHandler
     Q_OBJECT
 public:
     //!Implementation of QnRestRequestHandler::description
-    virtual QString description() const override;
 };
 
 #endif  //QN_CAMERA_SETTINGS_HANDLER_H

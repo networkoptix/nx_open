@@ -4,9 +4,6 @@ import argparse
 import contextlib
 from os.path import dirname, join
     
-#class Config:
-#    pass
-
 @contextlib.contextmanager
 def cd(xdir):
     olddir = os.getcwd()
@@ -44,7 +41,7 @@ def get_environment_variable(variable):
             return os.getenv(variable)
         else:
             try:
-                with open(join(dirname(os.path.abspath(__file__)),'configure_settings_tmp.py')): from configure_settings_tmp import customization, configuration, build_arch
+                with open(join(dirname(os.path.abspath(__file__)),'configure_settings_tmp.py')): from configure_settings_tmp import customization, configuration, build_arch, box
             except IOError:
                 print 'Please run configure.py first'
                 sys.exit(1)            

@@ -20,7 +20,7 @@ struct QnPtzPresetData {
     QVector3D position;
     Qn::PtzCoordinateSpace space;
 };
-QN_DEFINE_STRUCT_FUNCTIONS(QnPtzPresetData, (json)(eq), (position)(space))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzPresetData, (json)(eq), (position)(space))
 
 struct QnPtzPresetRecord {
     QnPtzPresetRecord() {}
@@ -29,7 +29,7 @@ struct QnPtzPresetRecord {
     QnPtzPreset preset;
     QnPtzPresetData data;
 };
-QN_DEFINE_STRUCT_FUNCTIONS(QnPtzPresetRecord, (json)(eq), (preset)(data))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzPresetRecord, (json)(eq), (preset)(data))
 
 Q_DECLARE_METATYPE(QnPtzPresetRecordHash)
 
@@ -52,14 +52,10 @@ QnPresetPtzController::~QnPresetPtzController() {
 }
 
 bool QnPresetPtzController::extends(Qn::PtzCapabilities capabilities) {
-
-    if (capabilities & Qn::builtinPresetControl)
-        return false;
-    else
-        return 
-            ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
-            (capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
-            !(capabilities & Qn::PresetsPtzCapability);
+    return 
+        ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
+        (capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
+        !(capabilities & Qn::PresetsPtzCapability);
 }
 
 Qn::PtzCapabilities QnPresetPtzController::getCapabilities() {

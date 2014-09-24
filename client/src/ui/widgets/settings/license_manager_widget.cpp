@@ -1,6 +1,6 @@
 #include "license_manager_widget.h"
 #include "ui_license_manager_widget.h"
-#include "version.h"
+#include <utils/common/app_info.h>
 
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
@@ -14,50 +14,63 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
-#include <client/client_translation_manager.h>
-
+#include <common/common_module.h>
+#include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <common/common_module.h>
-
 #include <mustache/mustache.h>
+
+#include <client/client_translation_manager.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/warning_style.h>
 #include <ui/models/license_list_model.h>
-#include <utils/license_usage_helper.h>
-#include <utils/common/json.h>
-#include <utils/common/product_features.h>
+#include <ui/dialogs/license_details_dialog.h>
 
-#define QN_LICENSE_URL "http://networkoptix.com/nolicensed_vms/activate.php"
+#include <utils/license_usage_helper.h>
+#include <utils/serialization/json_functions.h>
+#include <utils/common/product_features.h>
+#include "api/runtime_info_manager.h"
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::LicenseManagerWidget),
+    m_camerasUsageHelper(new QnCamLicenseUsageHelper()),
+    m_videowallUsageHelper(new QnVideoWallLicenseUsageHelper()),
     m_httpClient(NULL)
 {
     ui->setupUi(this);
 
     QList<QnLicenseListModel::Column> columns;
-    columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn << QnLicenseListModel::ExpirationDateColumn;
+    columns 
+        << QnLicenseListModel::TypeColumn 
+        << QnLicenseListModel::CameraCountColumn 
+        << QnLicenseListModel::LicenseKeyColumn 
+        << QnLicenseListModel::ExpirationDateColumn
+        << QnLicenseListModel::LicenseStatusColumn
+        ;
 
     m_model = new QnLicenseListModel(this);
     m_model->setColumns(columns);
+
     ui->gridLicenses->setModel(m_model);
     ui->gridLicenses->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->gridLicenses->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     setHelpTopic(this, Qn::SystemSettings_Licenses_Help);
 
     connect(ui->detailsButton,                  SIGNAL(clicked()),                                                  this,   SLOT(at_licenseDetailsButton_clicked()));
+    connect(ui->removeButton,                   SIGNAL(clicked()),                                                  this,   SLOT(at_removeButton_clicked()));
     connect(qnLicensePool,                      SIGNAL(licensesChanged()),                                          this,   SLOT(updateLicenses()));
     connect(ui->gridLicenses->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),   this,   SLOT(updateDetailsButtonEnabled()));
     connect(ui->gridLicenses,                   SIGNAL(doubleClicked(const QModelIndex &)),                         this,   SLOT(at_gridLicenses_doubleClicked(const QModelIndex &)));
     connect(ui->licenseWidget,                  SIGNAL(stateChanged()),                                             this,   SLOT(at_licenseWidget_stateChanged()));
     connect(this,                               SIGNAL(showMessageLater(QString,QString,bool)),                     this,   SLOT(showMessage(QString,QString,bool)), Qt::QueuedConnection);
+    connect(m_camerasUsageHelper,               &QnLicenseUsageHelper::licensesChanged,                             this,   &QnLicenseManagerWidget::updateLicenses);
+    connect(m_videowallUsageHelper,             &QnLicenseUsageHelper::licensesChanged,                             this,   &QnLicenseManagerWidget::updateLicenses);
 
     updateLicenses();
-    updateDetailsButtonEnabled();
 }
 
 QnLicenseManagerWidget::~QnLicenseManagerWidget()
@@ -65,15 +78,19 @@ QnLicenseManagerWidget::~QnLicenseManagerWidget()
 }
 
 void QnLicenseManagerWidget::updateLicenses() {
-    // do not re-read licences if we are activating one now
+    // do not re-read licenses if we are activating one now
     if (!m_handleKeyMap.isEmpty())
         return;
 
-    if (qnLicensePool->currentHardwareId().isEmpty()) {
-        setEnabled(false);
-    } else {
-        setEnabled(true);
+    bool connected = false;
+    foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems()) {
+        if (info.data.peer.peerType != Qn::PT_Server)
+            continue;
+        connected = true;
+        break;
     }
+
+    setEnabled(connected);
 
     m_licenses = qnLicensePool->getLicenses();
 
@@ -90,51 +107,48 @@ void QnLicenseManagerWidget::updateLicenses() {
     bool useRedLabel = false;
 
     if (!m_licenses.isEmpty()) {
-        QnLicenseUsageHelper helper;
+        // TODO: #Elric #TR total mess with numerous forms, and no idea how to fix it in a sane way
 
-        // TODO: #Elric #TR total mess with numerus forms, and no idea how to fix it in a sane way
+        QString msg(tr("The software is licensed to: "));
 
-        if (!helper.isValid()) {
-            useRedLabel = true;
-            if (helper.totalAnalog() > 0) {
-                ui->infoLabel->setText(
-                    tr("The software is licensed to %1 cameras and %2 analog cameras.\nAt least %3 licenses are required.")
-                        .arg(helper.totalDigital())
-                        .arg(helper.totalAnalog())
-                        .arg(helper.required())
-                );
-            } else {
-                ui->infoLabel->setText(
-                    tr("The software is licensed to %1 cameras.\nAt least %3 licenses are required.")
-                        .arg(helper.totalDigital())
-                        .arg(helper.required())
-                );
-            }
-        } else {
-            if (helper.totalAnalog() > 0) {
-                ui->infoLabel->setText(
-                    tr("The software is licensed to %1 cameras and %2 analog cameras.\n%3 licenses and %4 analog licenses are currently in use.")
-                        .arg(helper.totalDigital())
-                        .arg(helper.totalAnalog())
-                        .arg(helper.usedDigital())
-                        .arg(helper.usedAnalog())
-                );
-            } else {
-                ui->infoLabel->setText(
-                    tr("The software is licensed to %1 cameras.\n%2 licenses are currently in use.")
-                        .arg(helper.totalDigital())
-                        .arg(helper.usedDigital())
-                );
+        QList<QnLicenseUsageHelper*> helpers;
+        helpers 
+            << m_camerasUsageHelper.data()
+            << m_videowallUsageHelper.data()
+            ;
+
+        foreach (QnLicenseUsageHelper* helper, helpers) {
+            foreach (Qn::LicenseType lt, helper->licenseTypes()) {
+                if (helper->totalLicense(lt) > 0)
+                    msg += tr("\n%1 %2").arg(helper->totalLicense(lt)).arg(QnLicense::longDisplayName(lt));
             }
         }
+
+        foreach (QnLicenseUsageHelper *helper, helpers) {
+            if (!helper->isValid()) 
+            {
+                useRedLabel = true;
+                foreach (Qn::LicenseType lt, helper->licenseTypes()) {
+                    if (helper->usedLicense(lt) > 0)
+                        msg += tr("\nAt least %n %2 are required", "", helper->usedLicense(lt)).arg(QnLicense::longDisplayName(lt));
+                }
+            }
+            else {
+                foreach (Qn::LicenseType lt, helper->licenseTypes()) {
+                    if (helper->usedLicense(lt) > 0)
+                        msg += tr("\n%n %2 are currently in use", "", helper->usedLicense(lt)).arg(QnLicense::longDisplayName(lt));
+                }
+            }
+        }
+        ui->infoLabel->setText(msg);
     } else {
         if (qnLicensePool->currentHardwareId().isEmpty()) {
-            ui->infoLabel->setText(tr("Obtaining licenses from Enterprise Controller..."));
+            ui->infoLabel->setText(tr("Obtaining licenses from Server..."));
             useRedLabel = false;
         } else {
             QString text = (qnProductFeatures().freeLicenseCount > 0) ?
-                tr("You do not have a valid license installed. Please activate your commercial or trial license.") :
-                tr("You do not have a valid license installed. Please activate your commercial license.");
+                tr("You do not have a valid license installed.\nPlease activate your commercial or trial license.") :
+                tr("You do not have a valid license installed.\nPlease activate your commercial license.");
             ui->infoLabel->setText(text);
             useRedLabel = true;
         }
@@ -144,6 +158,8 @@ void QnLicenseManagerWidget::updateLicenses() {
     if(useRedLabel)
         setWarningStyle(&palette);
     ui->infoLabel->setPalette(palette);
+
+    updateDetailsButtonEnabled();
 }
 
 void QnLicenseManagerWidget::showMessage(const QString &title, const QString &message, bool warning) {
@@ -153,13 +169,25 @@ void QnLicenseManagerWidget::showMessage(const QString &title, const QString &me
         QMessageBox::information(this, title, message);
 }
 
-void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, const QList<QByteArray> &mainHardwareIds, const QList<QByteArray> &compatibleHardwareIds) {
+void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool infoMode) 
+{
+    const QList<QByteArray> mainHardwareIds = qnLicensePool->mainHardwareIds();
+    const QList<QByteArray> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
+
+    if (!QnRuntimeInfoManager::instance()->items()->hasItem(qnCommon->remoteGUID())) {
+        emit showMessageLater(tr("License Activation"),
+            tr("Network error has occurred during automatic license activation.\nTry to activate your license manually."),
+            true);
+        ui->licenseWidget->setOnline(false);
+        ui->licenseWidget->setState(QnLicenseWidget::Normal);
+    }
+
     if (!m_httpClient)
         m_httpClient = new QNetworkAccessManager(this);
 
-    QUrl url(QLatin1String(QN_LICENSE_URL));
+    QUrl url(QN_LICENSE_URL);
     QNetworkRequest request;
-    request.setUrl(url);
+    request.setUrl(url.toString());
 
     QUrlQuery params;
     params.addQueryItem(QLatin1String("license_key"), QLatin1String(licenseKey));
@@ -184,6 +212,8 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
 
         hw++;
     }
+    if (infoMode)
+        params.addQueryItem(lit("mode"), lit("info"));
 
     hw = 1;
     foreach (const QByteArray& hwid, compatibleHardwareIds) {
@@ -192,8 +222,11 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
         hw++;
     }
 
-    params.addQueryItem(QLatin1String("brand"), QLatin1String(QN_PRODUCT_NAME_SHORT));
-    params.addQueryItem(QLatin1String("version"), QLatin1String(QN_ENGINE_VERSION));
+    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->items()->getItem(qnCommon->remoteGUID()).data;
+
+    params.addQueryItem(QLatin1String("box"), runtimeData.box);
+    params.addQueryItem(QLatin1String("brand"), runtimeData.brand);
+    params.addQueryItem(QLatin1String("version"), qnCommon->engineVersion().toString());
     params.addQueryItem(QLatin1String("lang"), qnCommon->instance<QnClientTranslationManager>()->getCurrentLanguage());
 
     QNetworkReply *reply = m_httpClient->post(request, params.query(QUrl::FullyEncoded).toUtf8());
@@ -221,15 +254,21 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
     }
 
     if (!licensesToUpdate.isEmpty()) {
-        QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection();
-        int handle = connection->addLicensesAsync(licensesToUpdate, this, SLOT(at_licensesReceived(int,QnLicenseList,int)));
+        auto addLisencesHandler = [this, licensesToUpdate]( int reqID, ec2::ErrorCode errorCode ){
+            at_licensesReceived( reqID, errorCode, licensesToUpdate );
+        };
+        int handle = QnAppServerConnectionFactory::getConnection2()->getLicenseManager()->addLicenses(
+            licensesToUpdate, this, addLisencesHandler );
         m_handleKeyMap[handle] = licenseKey;
     }
 
+    /* There is an issue when we are trying to activate and Edge license on the PC. 
+     * In this case activation server will return no error but local check will fail.  */
     if (!keyLicense) {
         /* QNetworkReply slots should not start event loop. */
         emit showMessageLater(tr("License Activation"),
-                              tr("Invalid License. Please contact our support team to get a valid license."),
+            tr("You are trying to activate an incompatible license with your software. "
+                "Please contact support team to get a valid license key."),
                               true);
     } else if (licenseListHelper.getLicenseByKey(licenseKey)) {
         emit showMessageLater(tr("License Activation"),
@@ -238,30 +277,27 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
     }
 }
 
-void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
-    QString details = tr("<b>Generic:</b><br />\n"
-        "License Type: %1<br />\n"
-        "License Key: %2<br />\n"
-        "Locked to Hardware ID: %3<br />\n"
-        "<br />\n"
-        "<b>Features:</b><br />\n"
-        "Archive Streams Allowed: %4")
-        .arg(license->typeName())
-        .arg(QLatin1String(license->key()))
-        .arg(QLatin1String(qnLicensePool->currentHardwareId()))
-        .arg(license->cameraCount());
-    QMessageBox::information(this, tr("License Details"), details);
+void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license) {
+    if (!license)
+        return;
+
+    QScopedPointer<QnLicenseDetailsDialog> dialog(new QnLicenseDetailsDialog(license, this));
+    dialog->exec();
 }
 
-void QnLicenseManagerWidget::updateDetailsButtonEnabled() {
-    ui->detailsButton->setEnabled(ui->gridLicenses->selectionModel()->currentIndex().isValid());
+void QnLicenseManagerWidget::updateDetailsButtonEnabled() 
+{
+    QModelIndex idx = ui->gridLicenses->selectionModel()->currentIndex();
+    ui->detailsButton->setEnabled(idx.isValid());
+    QnLicensePtr license = m_model->license(idx);
+    ui->removeButton->setEnabled(license && !license->isValid());
 }
 
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnLicenseManagerWidget::at_licensesReceived(int status, QnLicenseList licenses, int handle)
+void QnLicenseManagerWidget::at_licensesReceived(int handle, ec2::ErrorCode errorCode, QnLicenseList licenses)
 {
     if (!m_handleKeyMap.contains(handle))
         return;
@@ -273,8 +309,8 @@ void QnLicenseManagerWidget::at_licensesReceived(int status, QnLicenseList licen
     QnLicensePtr license = licenseListHelper.getLicenseByKey(licenseKey);
         
     QString message;
-    if (!license || status)
-        message = tr("There was a problem activating your license.");
+    if (!license || (errorCode != ec2::ErrorCode::ok))
+        message = tr("There was a problem activating your license key. Network error has occurred.");
     else if (license)
         message = tr("License was successfully activated.");
 
@@ -293,14 +329,15 @@ void QnLicenseManagerWidget::at_licensesReceived(int status, QnLicenseList licen
 
 void QnLicenseManagerWidget::at_downloadError() {
     if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender())) {
-        disconnect(reply, 0, this, 0); //avoid double "onError" handling
+        disconnect(reply, NULL, this, NULL); //avoid double "onError" handling
         m_replyKeyMap.remove(reply);
         reply->deleteLater();
 
         /* QNetworkReply slots should not start eventLoop */
-        emit showMessageLater(tr("License Activation"),
-                              tr("Network error has occurred during automatic license activation.\nTry to activate your license manually."),
-                              true);
+        emit showMessageLater(tr("License Activation ") + reply->errorString(),
+            tr("Network error has occurred during automatic license activation. "
+               "Please contact support team to activate your license key manually."),
+            true);
 
         ui->licenseWidget->setOnline(false);
     }
@@ -316,52 +353,50 @@ void QnLicenseManagerWidget::at_downloadFinished() {
         // TODO: #Elric use JSON mapping here.
         // If we can deserialize JSON it means there is an error.
         QJsonObject errorMessage;
-        if (QJson::deserialize(replyData, &errorMessage)) {
-//            QString error = errorMessage.value(lit("error")).toString();
-            QString messageId = errorMessage.value(lit("messageId")).toString();
-            QString message = errorMessage.value(lit("message")).toString();
-            QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
-
-            if(messageId == lit("DatabaseError")) {
-                message = tr("Database error has occurred.");
-            } else if(messageId == lit("InvalidData")) {
-                message = tr("Invalid data was received.");
-            } else if(messageId == lit("InvalidKey")) {
-                message = tr("The license key is invalid.");
-            } else if(messageId == lit("InvalidBrand")) {
-                message = tr("You are trying to activate an incompatible license with your software.");
-            } else if(messageId == lit("AlreadyActivated")) {
-                message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}.");
-            }
-
-            message = Mustache::renderTemplate(message, arguments);
-
+        if (QJson::deserialize(replyData, &errorMessage)) 
+        {
+            QString message = QnLicenseUsageHelper::activationMessage(errorMessage);
             /* QNetworkReply slots should not start eventLoop */
             emit showMessageLater(tr("License Activation"),
-                                  tr("There was a problem activating your license.") + lit(" ") + message,
+                                  message,
                                   true);
             ui->licenseWidget->setState(QnLicenseWidget::Normal);
-
             return;
         }
 
         QTextStream is(&replyData);
         is.setCodec("UTF-8");
+        QByteArray licenseKey = m_replyKeyMap[reply];
+        m_replyKeyMap.remove(reply);
+        reply->deleteLater();
 
         while (!is.atEnd()) {
             QnLicensePtr license = QnLicense::readFromStream(is);
             if (!license )
                 break;
 
-            if (license->isValid(qnLicensePool->allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT)))
-                licenses.append(license);
+            QnLicense::ErrorCode errCode = QnLicense::NoError;
+
+            if (license->isInfoMode()) {
+                if (!license->isValid(&errCode, QnLicense::VM_CheckInfo) && errCode != QnLicense::Expired) {
+                    emit showMessageLater(tr("License activation"), tr("Can't activate license:  %1").arg(QnLicense::errorMessage(errCode)), true);
+                    ui->licenseWidget->setState(QnLicenseWidget::Normal);
+                }
+                else {
+                    updateFromServer(license->key(), false);
+                }
+
+                return;
+            }
+            else {
+                if (license->isValid(&errCode, QnLicense::VM_JustCreated))
+                    licenses.append(license);
+                else if (errCode == QnLicense::Expired)
+                    licenses.append(license); // ignore expired error code
+            }
         }
 
-        validateLicenses(m_replyKeyMap[reply], licenses);
-
-        m_replyKeyMap.remove(reply);
-
-        reply->deleteLater();
+        validateLicenses(licenseKey, licenses);
     }
 
     ui->licenseWidget->setState(QnLicenseWidget::Normal);
@@ -376,24 +411,69 @@ void QnLicenseManagerWidget::at_licenseDetailsButton_clicked() {
     showLicenseDetails(m_model->license(index));
 }
 
+void QnLicenseManagerWidget::at_removeButton_clicked() 
+{
+    QModelIndex index = ui->gridLicenses->selectionModel()->currentIndex();
+    QnLicensePtr license = m_model->license(index);
+    if (!license)
+        return;
+
+    auto removeLisencesHandler = [this, license]( int reqID, ec2::ErrorCode errorCode ) {
+        at_licenseRemoved( reqID, errorCode, license );
+    };
+
+    int handle = QnAppServerConnectionFactory::getConnection2()->getLicenseManager()->removeLicense(license, this,  removeLisencesHandler);
+}
+
+void QnLicenseManagerWidget::at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license)
+{
+    if (errorCode == ec2::ErrorCode::ok) {
+        QModelIndex index = ui->gridLicenses->selectionModel()->currentIndex();
+        ui->gridLicenses->model()->removeRow(index.row());
+    }
+    else {
+        emit showMessageLater(tr("Remove license"), tr("Can't remove license from server:  %1").arg(ec2::toString(errorCode)), true);
+    }
+    updateLicenses();
+}
+
 void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
     if(ui->licenseWidget->state() != QnLicenseWidget::Waiting)
         return;
 
     if (ui->licenseWidget->isOnline()) {
-        updateFromServer(ui->licenseWidget->serialKey().toLatin1(), qnLicensePool->mainHardwareIds(), qnLicensePool->compatibleHardwareIds());
+        updateFromServer(ui->licenseWidget->serialKey().toLatin1(), true);
     } else {
-        QList<QnLicensePtr> licenseList;
         QnLicensePtr license(new QnLicense(ui->licenseWidget->activationKey()));
-        if (license->isValid(qnLicensePool->allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT)))
-            licenseList.append(license);
 
-        validateLicenses(license ? license->key() : "", licenseList);
+        QnLicense::ErrorCode errCode = QnLicense::NoError;
+        if (license->isValid(&errCode, QnLicense::VM_JustCreated) || errCode == QnLicense::Expired) {
+            validateLicenses(license->key(), QList<QnLicensePtr>() << license);
+        }
+        else {
+            QString message;
+            switch (errCode) {
+            case QnLicense::InvalidSignature:
+                message = tr("The manual activation key file you have selected is invalid. Select correct manual activation key file. "
+                             "If problem continues, please contact support team.");
+                break;
+            case QnLicense::InvalidHardwareID:
+                message = tr("This license key has been previously activated to hardware id %1. Please contact support team to get a valid license key.")
+                    .arg(QString::fromUtf8(license->hardwareId()));
+                break;
+            case QnLicense::InvalidBrand:
+            case QnLicense::InvalidType:
+                message = tr("You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.");
+                break;
+            default:
+                break;
+            }
+
+            if (!message.isEmpty())
+                emit showMessageLater(tr("License Activation"), message, true);
+        }
+
+        
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
     }
 }
-
-
-
-
-

@@ -1,8 +1,11 @@
 #include "aac_rtp_parser.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 
+#include <core/datapacket/audio_data_packet.h>
 #include <core/datapacket/media_data_packet.h>
 
 #include "rtp_stream_parser.h"
@@ -184,7 +187,7 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
         if (auIndex.size() > i)
             rtpTimeOffset = auIndex[i];
 
-        QnCompressedAudioDataPtr audioData = QnCompressedAudioDataPtr(new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, unitSize));
+        QnWritableCompressedAudioDataPtr audioData = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, unitSize));
         audioData->compressionType = CODEC_ID_AAC;
         audioData->context = m_context;
         if (m_timeHelper)
@@ -196,7 +199,7 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
         //quint8 adtsHeaderBuff[AAC_HEADER_LEN];
         //m_aacHelper.buildADTSHeader(adtsHeaderBuff, unitSize);
         //audioData->data.write((const char*) adtsHeaderBuff, AAC_HEADER_LEN);
-        audioData->data.write((const char*)curPtr, unitSize);
+        audioData->m_data.write((const char*)curPtr, unitSize);
         result << audioData;
 
         curPtr += unitSize;
@@ -209,3 +212,5 @@ QnResourceAudioLayoutPtr QnAacRtpParser::getAudioLayout()
 {
     return m_audioLayout;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

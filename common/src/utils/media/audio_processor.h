@@ -2,7 +2,7 @@
 #define __AUDIO_PROCESSOR_H_
 
 #include "utils/common/byte_array.h"
-#include "core/datapacket/media_data_packet.h"
+#include "core/datapacket/audio_data_packet.h"
 
 class QnAudioProcessor
 {

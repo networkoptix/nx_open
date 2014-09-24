@@ -3,6 +3,9 @@
 
 #include "business_rules_view_model.h"
 
+#include <nx_ec/ec_api.h>
+
+// TODO: #GDM #Business move out from global namespace.
 enum QnBusinessRulesActualModelChange {
     RulesLoaded,
     RuleSaved
@@ -19,33 +22,23 @@ class QnBusinessRulesActualModel: public QnBusinessRulesViewModel
 public:
     QnBusinessRulesActualModel(QObject *parent = 0);
 
-    bool isLoaded() const;
-
+    void reset();
 signals:
     void beforeModelChanged();
     void afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);
     
-    void businessRuleChanged(int id);
-    void businessRuleDeleted(int id);
+    void businessRuleChanged(const QUuid &id);
+    void businessRuleDeleted(const QUuid &id);
 public slots:
-    /*
-    * Load data from DB
-    */
-    void reloadData();
-
     void saveRule(int row);
 private slots:
-    void at_resources_received(int status, const QnBusinessEventRuleList &rules, int handle);
-    void at_resources_saved(int status, const QnBusinessEventRuleList &rules, int handle);
+    void at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnBusinessEventRulePtr &rule );
 
     void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);
-    void at_message_ruleDeleted(int id);
-    void at_message_ruleReset(QnBusinessEventRuleList rules);
+    void at_message_ruleDeleted(const QUuid &id);
+    void at_message_ruleReset(const QnBusinessEventRuleList &rules);
 
 private:
-    int m_loadingHandle;
-    bool m_isDataLoaded; // data sync with DB
-
     QMap<int, QnBusinessRuleViewModel*> m_savingRules;
 };
 

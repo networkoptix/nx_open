@@ -40,10 +40,11 @@ private:
     QnCamDisplay* getDisplayByReader(QnArchiveStreamReader* reader);
     bool isSmallItem(QnCamDisplay* display);
     bool isSmallItem2(QnCamDisplay* display);
-    bool isNotSmallItem(QnCamDisplay* display);
+    bool itemCanBeOptimized(QnCamDisplay* display);
     bool isNotSmallItem2(QnCamDisplay* display);
 
     bool isSupportedDisplay(QnCamDisplay* display) const;
+    bool isForcedHQDisplay(QnCamDisplay* display, QnArchiveStreamReader* reader) const;
 
     /** try LQ->HQ once more */
     void addHQTry(); 
@@ -51,16 +52,18 @@ private:
     bool isFFSpeed(double speed) const;
     bool existstBufferingDisplay() const;
 private:
+    // TODO: #Elric #enum
     enum FindMethod {Find_Biggest, Find_Least};
     enum LQReason {Reason_None, Reason_Small, Reason_Network, Reason_CPU, Reson_FF};
     struct RedAssInfo
     {
-        RedAssInfo(): lqTime(0), toLQSpeed(0.0), lqReason(Reason_None), initialTime(qnSyncTime->currentMSecsSinceEpoch()), awaitingLQTime(0) {}
+        RedAssInfo(): lqTime(0), toLQSpeed(0.0), lqReason(Reason_None), initialTime(qnSyncTime->currentMSecsSinceEpoch()), awaitingLQTime(0), smallSizeCnt(0) {}
         qint64 lqTime;
         float toLQSpeed;
         LQReason lqReason;
         qint64 initialTime;
         qint64 awaitingLQTime;
+        int smallSizeCnt;
     };
 
     typedef bool (QnRedAssController::*SearchCondition)(QnCamDisplay*);

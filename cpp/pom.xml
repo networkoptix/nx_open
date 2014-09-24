@@ -1,201 +1,207 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<parent>
-		<artifactId>hdwitness</artifactId>
-		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.2.1-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
+    <parent>
+        <artifactId>hdwitness</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.3.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
 
-	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.2.1-SNAPSHOT</version>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>cpp</artifactId>
-	<packaging>pom</packaging>
-	<name>Common POM for cpp projects</name>
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.3.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>cpp</artifactId>
+    <packaging>pom</packaging>
+    <name>Common POM for cpp projects</name>
 
-	<properties>
-		<!-- Change it to point relatively to the root-->
-		<root.dir>${basedir}/..</root.dir>
-		<buildLib/>
-		<libtype/>
-		<!--<product.title>${project.name}</product.title>		-->
-		<postfix.libs/>
-	</properties>
+    <properties>
+        <!-- Change it to point relatively to the root-->
+        <root.dir>${basedir}/..</root.dir>
+        <buildLib/>
+        <libtype/>
+        <!--<product.title>${project.name}</product.title>      -->
+        <postfix.libs/>
+        <linux.arm.oslibs>${linux.oslibs}</linux.arm.oslibs>
+    </properties>
 
-	<build>
-		<directory>${arch}</directory>
-		<outputDirectory>${arch}</outputDirectory>
-		<sourceDirectory>${basedir}/src</sourceDirectory> 
-		<defaultGoal>compile</defaultGoal>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<phase>initialize</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<tasks>
-								<delete>
-									<fileset dir="${project.build.outputDirectory}/resources" />
-								</delete>
-							</tasks>
-							<failOnError>false</failOnError>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
-				<executions>
-					<execution>
-						<id>copy-common-resources</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}</outputDirectory>
-							<resources>          
-								<resource>
-									<directory>${root.dir}/cpp/maven/filter-resources</directory>
-									<filtering>true</filtering>
-								</resource>	                               
-								<resource>
-									<directory>${root.dir}/cpp/maven/bin-resources</directory>
-									<filtering>false</filtering>
-								</resource>                                
-							</resources>              
-							<encoding>UTF-8</encoding>
-						</configuration>            
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.1.1</version>
-				<executions>
-					<execution>
-						<id>gen-qrc</id>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>${python.dir}/python</executable>
-							<arguments>
-								<argument>${project.build.directory}/gen_resources.py</argument>
-							</arguments>
-							<workingDirectory>${project.build.directory}</workingDirectory>		
-						</configuration>
-					</execution>
-					<execution>
-						<id>additional-build-steps</id>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>${python.dir}/python</executable>
-							<arguments>
-								<argument>build-prepare.py</argument>
-							</arguments>
-							<workingDirectory>${project.build.directory}</workingDirectory>		
-						</configuration>
-					</execution>
-					<execution>
-						<id>default-cli</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>${python.dir}/python</executable>
-							<arguments>
-								<argument>${project.build.directory}/build.py</argument>
-							</arguments>                                    
-							<workingDirectory>${project.build.directory}</workingDirectory>		
-						</configuration>
-					</execution>                    
-				</executions>
-			</plugin>					
-		</plugins>		
-	</build>
-	<profiles>
-		<profile>
-			<id>windows</id>
-			<activation>
-				<os>
-					<family>Windows</family>
-				</os>
-			</activation>
-			<properties>
-				<platform>windows</platform>
-				<exclude_platform>unix</exclude_platform>
-			</properties>
-			<build>
-				<plugins>					
-					<plugin>
-						<groupId>com.google.code.maven-replacer-plugin</groupId>
-						<artifactId>replacer</artifactId>
-						<version>1.5.2</version>
-						<executions>
-							<execution>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>replace</goal>
-								</goals>
-								<configuration>
-									<encoding>utf-8</encoding>
-									<file>${project.build.sourceDirectory}/${project.artifactId}-x64.vcxproj</file>
-									<!-- <excludes>
-										<exclude>**/vmaxproxy-x64.vcproj</exclude>
-									</excludes> -->	
-									<ignoreMissingFile>true</ignoreMissingFile>                                    
-									<replacements>
-										<replacement>
-											<token>Win32</token>
-											<value>${arch}</value>
-										</replacement>         
-										<replacement>
-											<token>Name="VCLibrarianTool"</token>
-											<value>Name="VCLibrarianTool" \n				AdditionalOptions="/MACHINE:${arch}"</value>
-										</replacement>         
-									</replacements>
-									<skip>${force_x86}</skip>
-								</configuration>								
-							</execution>
+    <build>
+        <directory>${arch}</directory>
+        <outputDirectory>${arch}</outputDirectory>
+        <sourceDirectory>${basedir}/src</sourceDirectory> 
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <delete>
+                                    <fileset dir="${project.build.outputDirectory}/resources" />
+                                </delete>
+                            </tasks>
+                            <failOnError>false</failOnError>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>copy-common-resources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <resources>          
+                                <resource>
+                                    <directory>${root.dir}/cpp/maven/filter-resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>                                
+                                <resource>
+                                    <directory>${root.dir}/cpp/maven/bin-resources</directory>
+                                    <filtering>false</filtering>
+                                </resource>                                
+                            </resources>              
+                            <encoding>UTF-8</encoding>
+                        </configuration>            
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <id>gen-qrc</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${python.dir}/python</executable>
+                            <arguments>
+                                <argument>${project.build.directory}/gen_resources.py</argument>
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>     
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>additional-build-steps</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${python.dir}/python</executable>
+                            <arguments>
+                                <argument>build-prepare.py</argument>
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>     
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-cli</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${python.dir}/python</executable>
+                            <arguments>
+                                <argument>${project.build.directory}/build.py</argument>
+                            </arguments>                                    
+                            <workingDirectory>${project.build.directory}</workingDirectory>     
+                        </configuration>
+                    </execution>                    
+                </executions>
+            </plugin>                   
+        </plugins>      
+    </build>
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <platform>windows</platform>
+                <exclude_platform>unix</exclude_platform>
+            </properties>
+            <build>
+                <plugins>                   
+                    <plugin>
+                        <groupId>com.google.code.maven-replacer-plugin</groupId>
+                        <artifactId>replacer</artifactId>
+                        <version>1.5.2</version>
+                        <executions>
+                            <execution>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                                <configuration>
+                                    <encoding>utf-8</encoding>
+                                    <file>${project.build.sourceDirectory}/${project.artifactId}-x64.vcxproj</file>
+                                    <!-- <excludes>
+                                        <exclude>**/vmaxproxy-x64.vcproj</exclude>
+                                    </excludes> --> 
+                                    <ignoreMissingFile>true</ignoreMissingFile>                                    
+                                    <replacements>
+                                        <replacement>
+                                            <token>Win32</token>
+                                            <value>${arch}</value>
+                                        </replacement>         
+                                        <replacement>
+                                            <token>Name="VCLibrarianTool"</token>
+                                            <value>Name="VCLibrarianTool" \n                AdditionalOptions="/MACHINE:${arch}"</value>
+                                        </replacement>         
+                                    </replacements>
+                                    <skip>${force_x86}</skip>
+                                </configuration>                                
+                            </execution>
 
-							<!-- Fixing qmake-generated msvc2012 project files. Sometimes this step will be unneccessary (when qmake is fixed) -->
-							<execution>
-								<id>fix-vcxproj-QMAKE-SUCKS!!!!!!!!!!</id>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>replace</goal>
-								</goals>
-								<configuration>
-									<encoding>utf-8</encoding>
-									<unescape>no</unescape>
-									<ignoreErrors>true</ignoreErrors>
-									<file>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</file>
-									<replacements>
-										<!-- Adding custom build steps since qmake cannot do that for msvc2012 project file -->
-										<!--<replacement>
+                            <!-- Fixing qmake-generated msvc2012 project files. Sometimes this step will be unneccessary (when qmake is fixed) -->
+                            <execution>
+                                <id>fix-vcxproj-QMAKE-SUCKS!!!!!!!!!!</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                                <configuration>
+                                    <encoding>utf-8</encoding>
+                                    <unescape>no</unescape>
+                                    <ignoreErrors>true</ignoreErrors>
+                                    <file>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</file>
+                                    <replacements>
+                                        <!-- Adding custom build steps since qmake cannot do that for msvc2012 project file -->
+                                        <!--<replacement>
                                             <token>
                                                 <![CDATA[<RootNamespace>${project.artifactId}</RootNamespace>]]></token>
                                             <value>
                                                 <![CDATA[<RootNamespace>${project.artifactId}</RootNamespace><LocalDebuggerWorkingDirectory>$(OutputDirectory)</LocalDebuggerWorkingDirectory>]]></value>
                                         </replacement> -->
 
-										<replacement>
+                                        <!-- Disabling optimization for debug builds -->
+                                        <replacement>
+                                            <xpath>//Project/ItemDefinitionGroup[contains(@Condition,'Debug')]</xpath>
+                                            <token><![CDATA[<WarningLevel>Level3</WarningLevel>]]></token>
+                                            <value><![CDATA[<WarningLevel>Level3</WarningLevel><Optimization>Disabled</Optimization>]]></value>
+                                        </replacement>
+                                        <replacement>
                                             <token>
                                                 <![CDATA[</RootNamespace>]]></token>
                                             <value>
@@ -208,39 +214,39 @@
                                             <value>
                                                 <![CDATA[<PlatformToolSet>${PlatformToolSet}</PlatformToolSet>]]></value>
                                         </replacement>         
-										<replacement>
-											<token>
-												<![CDATA[<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">]]></token>
-											<value>
-												<![CDATA[<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+                                        <replacement>
+                                            <token>
+                                                <![CDATA[<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">]]></token>
+                                            <value>
+                                                <![CDATA[<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemDefinitionGroup>
     <Link>
       <SubSystem Condition="'%(Link.SubSystem)'=='' Or '%(Link.SubSystem)'=='NotSet'">Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>]]></value>
-										</replacement> 
-										<replacement>
-											<token>
-												<![CDATA[release</ProgramDataBaseFileName>]]></token>
-											<value>
-												<![CDATA[release.pdb</ProgramDataBaseFileName>]]></value>
-										</replacement>
-										<replacement>
-											<token>
-												<![CDATA[debug</ProgramDataBaseFileName>]]></token>
-											<value>
-												<![CDATA[debug.pdb</ProgramDataBaseFileName>]]></value>
-										</replacement>
-										<replacement>
-											<token>${project.artifactId}${parsedVersion.majorVersion}</token>
-											<value>${project.artifactId}</value>
-										</replacement>         
-										<replacement>
-											<xpath>//Project/ItemGroup/None[contains(@Include,'.proto')]</xpath>
-											<token>
-												<![CDATA[<None\s*Include=\"(.*)[\\/]{1}([\w\d_\-]+)\.([\w\d_\-]+)\".*/>]]></token>
-											<value>
-												<![CDATA[
+                                        </replacement> 
+                                        <replacement>
+                                            <token>
+                                                <![CDATA[release</ProgramDataBaseFileName>]]></token>
+                                            <value>
+                                                <![CDATA[release.pdb</ProgramDataBaseFileName>]]></value>
+                                        </replacement>
+                                        <replacement>
+                                            <token>
+                                                <![CDATA[debug</ProgramDataBaseFileName>]]></token>
+                                            <value>
+                                                <![CDATA[debug.pdb</ProgramDataBaseFileName>]]></value>
+                                        </replacement>
+                                        <replacement>
+                                            <token>${project.artifactId}${parsedVersion.majorVersion}</token>
+                                            <value>${project.artifactId}</value>
+                                        </replacement>         
+                                        <replacement>
+                                            <xpath>//Project/ItemGroup/None[contains(@Include,'.proto')]</xpath>
+                                            <token>
+                                                <![CDATA[<None\s*Include=\"(.*)[\\/]{1}([\w\d_\-]+)\.([\w\d_\-]+)\".*/>]]></token>
+                                            <value>
+                                                <![CDATA[
     <CustomBuild Include="$1/$2.$3">
       <AdditionalInputs>\$(OutputDirectory)../../../bin/protoc.exe;$1/$2.$3</AdditionalInputs>
       <Command>\$(OutputDirectory)\..\\..\\..\\bin\\protoc.exe --proto_path=./api/pb --cpp_out=../${arch}/build/\$(Configuration)/generated/ ./$1/$2.$3</Command>
@@ -248,83 +254,129 @@
       <Outputs>../${arch}/build/\$(Configuration)/generated/$2.pb.cc</Outputs>
     </CustomBuild>
 ]]></value>
-										</replacement>
+                                        </replacement>
 
-										<!-- Fixing compiling of *.pb.cc files -->
-										<replacement>
-											<xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.pb.cc')]</xpath>
-											<token>CustomBuild</token>
-											<value>ClCompile</value>
-										</replacement>
+                                        <!-- Fixing compiling of *.pb.cc files -->
+                                        <replacement>
+                                            <xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.pb.cc')]</xpath>
+                                            <token>CustomBuild</token>
+                                            <value>ClCompile</value>
+                                        </replacement>
 
-										<!-- Disabling compile of .res file (otherwise we come into duplicate resource error during linkage) -->
-										<replacement>
-											<xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.res')]</xpath>
-											<token>CustomBuild</token>
-											<value>None</value>
-										</replacement>
+                                        <!-- Disabling compile of .res file (otherwise we come into duplicate resource error during linkage) -->
+                                        <replacement>
+                                            <xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.res')]</xpath>
+                                            <token>CustomBuild</token>
+                                            <value>None</value>
+                                        </replacement>
 
-										<!-- Enabling SEH exceptions for crash stack dump -->
-										<replacement>
-											<token>
-												<![CDATA[<ExceptionHandling>Sync</ExceptionHandling>]]></token>
-											<value>
-												<![CDATA[<ExceptionHandling>Async</ExceptionHandling>]]></value>
-										</replacement>
+                                        <!-- Enabling SEH exceptions for crash stack dump -->
+                                        <replacement>
+                                            <token>
+                                                <![CDATA[<ExceptionHandling>Sync</ExceptionHandling>]]></token>
+                                            <value>
+                                                <![CDATA[<ExceptionHandling>Async</ExceptionHandling>]]></value>
+                                        </replacement>
 
-										<!-- Adding "Create precompiled header option" to StdAfx.cpp compile options -->
-										<!-- <replacement>
-											<xpath>//Project/ItemGroup/ClCompile[contains(@Include,'StdAfx.cpp')]</xpath>
- 											<token>CustomBuild</token>
-											<value>None</value>
-										</replacement>
-										<replacement>
- 											<token><![CDATA[<ClCompile Include="StdAfx.cpp"/>]]></token>
-											<value><![CDATA[<None Include="StdAfx.cpp"/>]]></value>
-										</replacement> -->
+                                        <!-- Adding "Create precompiled header option" to StdAfx.cpp compile options -->
+                                        <!-- <replacement>
+                                            <xpath>//Project/ItemGroup/ClCompile[contains(@Include,'StdAfx.cpp')]</xpath>
+                                            <token>CustomBuild</token>
+                                            <value>None</value>
+                                        </replacement>
+                                        <replacement>
+                                            <token><![CDATA[<ClCompile Include="StdAfx.cpp"/>]]></token>
+                                            <value><![CDATA[<None Include="StdAfx.cpp"/>]]></value>
+                                        </replacement> -->
 
-									</replacements>
-									<skip>${replace.skip}</skip>
-								</configuration>								
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+                                    </replacements>
+                                    <skip>${replace.skip}</skip>
+                                </configuration>                                
+                            </execution>
+                            <execution>
+                                <id>fix-makefile-QMAKE-SUCKS!!!!!!!!!!</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                                <configuration>
+                                    <encoding>utf-8</encoding>
+                                    <unescape>no</unescape>
+                                    <ignoreErrors>true</ignoreErrors>
+                                    <file>${project.build.directory}/Makefile.${build.configuration}</file>
+                                    <replacements>
+                                        <replacement>
+                                            <token><![CDATA[@echo compiling \$< && cl]]></token>
+                                            <value>cl</value>
+                                        </replacement>
+                                        <replacement>
+                                            <token><![CDATA[@echo linking \$@ && link]]></token>
+                                            <value>link</value>
+                                        </replacement>
+                                        <replacement>
+                                            <token>${project.artifactId}${parsedVersion.majorVersion}</token>
+                                            <value>${project.artifactId}</value>
+                                        </replacement>                                      
+                                    </replacements>
+                                    <skip>${replace.skip}</skip>
+                                </configuration>                                
+                            </execution>                            
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-		<profile>
-			<id>unix</id>
-			<activation>
-				<os>
-					<family>unix</family>
-				</os> 
-			</activation>            
-			<properties>
-				<rename-skip>false</rename-skip>
-			</properties>
-			<build>	
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<version>1.1.1</version>
-						<executions>
-							<execution>
-								<id>process-with-make</id>
-								<phase>process-classes</phase>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-								<configuration>
-									<executable>${project.build.directory}/build.sh</executable>
-									<workingDirectory>${project.build.directory}</workingDirectory>		
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>	
-			</build>			
-		</profile>	
-	</profiles>	
+        <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os> 
+            </activation>            
+            <properties>
+                <rename-skip>false</rename-skip>
+            </properties>
+            <build> 
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.1.1</version>
+                        <executions>
+                            <execution>
+                                <id>process-with-make</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${project.build.directory}/build.sh</executable>
+                                    <workingDirectory>${project.build.directory}</workingDirectory>     
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>  
+            </build>            
+        </profile>  
+        
+        <profile>
+            <id>linux-arm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os> 
+                <property>
+                    <name>arch</name>
+                    <value>arm</value>
+                </property>
+            </activation>
+            <build>
+                <directory>${arch}-${box}</directory>
+            </build>
+        </profile>      
+    </profiles> 
 </project>

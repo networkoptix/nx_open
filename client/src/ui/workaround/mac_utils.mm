@@ -193,7 +193,7 @@ QStringList mac_getOpenFileNames(const QString &caption, const QString &dir, con
 
     if (ok) {
         QStringList urls;
-        for (int i = 0; i < panel.URLs.count; ++i)
+        for (size_t i = 0; i < panel.URLs.count; ++i)
             urls.append(toQString([[[panel URLs] objectAtIndex:i] path]));
 
         if (sandboxed)

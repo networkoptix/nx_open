@@ -14,7 +14,7 @@ public:
     virtual ~QnDualStreamingHelper();
 
     qint64 getLastMotionTime();
-    void onMotion(QnConstMetaDataV1Ptr motion);
+    void onMotion(const QnMetaDataV1* motion);
 private:
     QMutex m_mutex;
     qint64 m_lastMotionTime;

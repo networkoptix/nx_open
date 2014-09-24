@@ -2,15 +2,40 @@
 
 #include <cassert>
 
-#include <utils/common/json_functions.h>
-#include <utils/common/enum_name_mapper.h>
+#include <utils/common/model_functions.h>
 
-QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qt, PenStyle, static)
-QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qt, PenCapStyle, static)
-QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qt, PenJoinStyle, static)
-QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::PenStyle, static)
-QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::PenCapStyle, static)
-QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::PenJoinStyle, static)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, PenStyle, static)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, PenCapStyle, static)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, PenJoinStyle, static)
+
+QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
+    (Qt::PenStyle)(Qt::PenCapStyle)(Qt::PenJoinStyle),
+    (json_lexical)
+)
+
+
+namespace QnPenDataDetail {
+    template<QnPenData::Field field>
+    struct Check {
+        bool operator()(const QnPenData &data) const {
+            return data.fields() & field;
+        }
+    };
+}
+
+QN_FUSION_ADAPT_CLASS_GSNC(
+    QnPenData,
+    ((&QnPenData::brush,        &QnPenData::setBrush,       "brush",        QnPenDataDetail::Check<QnPenData::Brush>()))
+    ((&QnPenData::width,        &QnPenData::setWidth,       "width",        QnPenDataDetail::Check<QnPenData::Width>()))
+    ((&QnPenData::style,        &QnPenData::setStyle,       "style",        QnPenDataDetail::Check<QnPenData::Style>()))
+    ((&QnPenData::capStyle,     &QnPenData::setCapStyle,    "capStyle",     QnPenDataDetail::Check<QnPenData::CapStyle>()))
+    ((&QnPenData::joinStyle,    &QnPenData::setJoinStyle,   "joinStyle",    QnPenDataDetail::Check<QnPenData::JoinStyle>())),
+    (optional, true)
+)
+
+namespace QnPenDataDetail {
+    QN_FUSION_DEFINE_FUNCTIONS(QnPenData, (json), inline)
+}
 
 QnPenData::QnPenData(): 
     m_fields(0), 
@@ -37,25 +62,6 @@ void QnPenData::applyTo(QPen *pen) const {
     if(m_fields & Style)        pen->setStyle(m_style);
     if(m_fields & CapStyle)     pen->setCapStyle(m_capStyle);
     if(m_fields & JoinStyle)    pen->setJoinStyle(m_joinStyle);
-}
-
-namespace QnPenDataDetail {
-    template<QnPenData::Field field>
-    struct Check {
-        bool operator()(const QnPenData &data) const {
-            return data.fields() & field;
-        }
-    };
-
-    QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS_EX(
-        QnPenData,
-        ((&QnPenData::brush,        &QnPenData::setBrush,       "brush",        Check<QnPenData::Brush>()))
-        ((&QnPenData::width,        &QnPenData::setWidth,       "width",        Check<QnPenData::Width>()))
-        ((&QnPenData::style,        &QnPenData::setStyle,       "style",        Check<QnPenData::Style>()))
-        ((&QnPenData::capStyle,     &QnPenData::setCapStyle,    "capStyle",     Check<QnPenData::CapStyle>()))
-        ((&QnPenData::joinStyle,    &QnPenData::setJoinStyle,   "joinStyle",    Check<QnPenData::JoinStyle>())),
-        QJson::Optional
-    )
 }
 
 void serialize(QnJsonContext *ctx, const QnPenData &value, QJsonValue *target) {

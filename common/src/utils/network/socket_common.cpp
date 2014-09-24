@@ -45,15 +45,7 @@ QString HostAddress::toString() const
     return m_addrStr.get();
 }
 
-
-SocketAddress::SocketAddress( const HostAddress& _address, unsigned short _port )
-:
-    address( _address ),
-    port( _port )
+struct in_addr HostAddress::inAddr() const
 {
-}
-
-QString SocketAddress::toString() const
-{
-    return lit("%1:%2").arg(address.toString()).arg(port);
+    return m_sinAddr;
 }

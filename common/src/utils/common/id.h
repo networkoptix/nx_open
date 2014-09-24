@@ -1,45 +1,40 @@
 #ifndef QN_ID_H
 #define QN_ID_H
 
+#include <QCryptographicHash>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
+#include <QtCore/QUuid>
+#include <QtCore/QtEndian>
+#include <QCryptographicHash>
 
-class QnId {
-public:
-    QnId() : m_id(0) {}
-    QnId(const int value) : m_id(value) {}
-    QnId(const QString &other) : m_id(other.toInt()) {}
-    QnId(const char *other) : m_id(QByteArray(other).toInt()) {}
-    void markUnloaded() { if (m_id > 0) m_id = -m_id; }
-    void markLoaded() { if (m_id < 0) m_id = -m_id; }
-    bool isLoaded() const { return m_id > 0; }
-    QnId asLoaded() const { return QnId(qAbs(m_id)); }
-    bool isValid() const { return m_id != 0; }
-    bool isSpecial() const; // local generated ID. Id still unique
-    operator uint() const { return uint(m_id); }
-    QString toString() const { return QString::number(m_id); }
-    int toInt() const { return m_id; }
+#include <common/common_globals.h>
 
-    /**
-     * Generates a new unassigned id.
-     *
-     * \returns                         Newly generated id.
-     * 
-     * \note                            This function is thread-safe.
-     */
-    static QnId generateSpecialId();
+inline QUuid intToGuid(qint32 value, const QByteArray& postfix)
+{
+    QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+    value = qToBigEndian(value);
+    md5Hash.addData((const char*) &value, sizeof(value));
+    md5Hash.addData(postfix);
+    QByteArray ha2 = md5Hash.result();
+    return QUuid::fromRfc4122(ha2);
+}
 
-    QnId &operator=(const QnId &other)
-    {
-        m_id = other.m_id;
-        return *this;
-    }
+inline QString guidToSqlString(const QUuid& guid)
+{
+    QByteArray data = guid.toRfc4122().toHex();
+    return QString(lit("x'%1'")).arg(QString::fromLatin1(data));
+}
 
-private:
-    int m_id;
-};
-
-Q_DECLARE_TYPEINFO(QnId, Q_PRIMITIVE_TYPE);
-Q_DECLARE_METATYPE(QnId);
+/** 
+ * Create fixed QUuid from any data. As a value of uuid the MD5 hash is taken so created uuids 
+ * will be equal for equal strings given. Also there is a collision possibility. 
+ */ 
+inline QUuid guidFromArbitraryData(const QByteArray &data) {
+    QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+    md5Hash.addData(data);
+    QByteArray bytes = md5Hash.result();
+    return QUuid::fromRfc4122(bytes);
+}
 
 #endif // QN_ID_H

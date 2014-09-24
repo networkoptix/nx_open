@@ -6,13 +6,13 @@
 #include <QtWidgets/QDialog>
 
 #include <api/model/connection_info.h>
-#include <utils/network/networkoptixmodulefinder.h>
-#include <utils/network/foundenterprisecontrollersmodel.h>
+#include <nx_ec/ec_api.h>
 
 #include <client/client_settings.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "compatibility_version_installation_dialog.h"
+
 
 class QStandardItemModel;
 class QStandardItem;
@@ -34,16 +34,6 @@ class QnLoginDialog : public QDialog, public QnWorkbenchContextAware {
 public:
     explicit QnLoginDialog(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
     virtual ~QnLoginDialog();
-
-    QUrl currentUrl() const;
-    QString currentName() const;
-    QnConnectionInfoPtr currentInfo() const;
-
-    bool restartPending() const;
-
-    bool rememberPassword() const;
-
-    void setAutoConnect(bool value = true);
 
 public slots:
     virtual void accept() override;
@@ -78,11 +68,15 @@ private slots:
     void at_saveButton_clicked();
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
-    void at_connectFinished(int status, QnConnectionInfoPtr connectionInfo, int requestHandle);
 
-    void at_moduleFinder_moduleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed);
-    void at_moduleFinder_moduleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed );
+    void at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation);
 
+private:
+    QUrl currentUrl() const;
+    QString currentName() const;
+
+    /** Save current connection credentials. */
+    void updateStoredConnections(const QUrl &url, const QString &name);
 private:
     QScopedPointer<Ui::LoginDialog> ui;
     QStandardItemModel *m_connectionsModel;
@@ -91,22 +85,22 @@ private:
     QStandardItem* m_autoFoundItem;
 
     int m_requestHandle;
-    QnConnectionInfoPtr m_connectInfo;
 
     QnRenderingWidget *m_renderingWidget;
-    NetworkOptixModuleFinder *m_moduleFinder;
 
     struct QnEcData {
+        QUuid id;
         QUrl url;
         QString version;
+        QString systemName;
+
+        bool operator==(const QnEcData& other) const  {
+            return id == other.id && url == other.url && version == other.version && systemName == other.systemName;
+        }
     };
 
-    /** Hash list of automatically found Enterprise Controllers based on seed as key. */
-    QMultiHash<QString, QnEcData> m_foundEcs;
-    std::unique_ptr<CompatibilityVersionInstallationDialog> m_installationDialog;
-
-    bool m_restartPending;
-    bool m_autoConnectPending;
+    /** Hash list of automatically found Servers based on seed as key. */
+    QMultiHash<QUuid, QnEcData> m_foundEcs;
 };
 
 #endif // LOGINDIALOG_H

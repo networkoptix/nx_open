@@ -10,8 +10,8 @@
 #include "ui/style/skin.h"
 #include "video_recorder_settings.h"
 #include "utils/common/log.h"
-#include "device_plugins/desktop_win/desktop_file_encoder.h"
-#include "device_plugins/desktop_win/device/desktop_resource.h"
+#include "plugins/resource/desktop_win/desktop_file_encoder.h"
+#include "plugins/resource/desktop_win/desktop_resource.h"
 #include "recording/stream_recorder.h"
 #include "core/resource_management/resource_pool.h"
 
@@ -62,13 +62,13 @@ void QnScreenRecorder::startRecording() {
         secondAudioDevice = QnAudioDeviceInfo();
     }
 
-    QnDesktopResourcePtr res = qnResPool->getResourceByGuid(QnDesktopResource::getDesktopResourceUuid().toString()).dynamicCast<QnDesktopResource>();
+    QnDesktopResourcePtr res = qnResPool->getResourceById(QnDesktopResource::getDesktopResourceUuid()).dynamicCast<QnDesktopResource>();
     if (!res) {
         emit error(tr("Screen capturing subsystem is not initialized yet. Please try again later."));
         return;
     }
 
-    m_dataProvider = dynamic_cast<QnDesktopDataProviderWrapper*> (res->createDataProvider(QnResource::Role_Default));
+    m_dataProvider = dynamic_cast<QnDesktopDataProviderWrapper*> (res->createDataProvider(Qn::CR_Default));
     m_recorder = new QnStreamRecorder(res->toResourcePtr());
     m_dataProvider->addDataProcessor(m_recorder);
     m_recorder->setFileName(filePath);

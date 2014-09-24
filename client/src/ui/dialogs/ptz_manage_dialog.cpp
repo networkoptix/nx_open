@@ -27,12 +27,12 @@
 #include <ui/widgets/ptz_tour_widget.h>
 #include <ui/dialogs/checkable_message_box.h>
 #include <ui/dialogs/message_box.h>
-#include <ui/workbench/workbench_display.h>
-#include <ui/workbench/workbench_item.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_item.h>
 
 class QnPtzToursDialogItemDelegate: public QStyledItemDelegate {
     typedef QStyledItemDelegate base_type;
@@ -150,7 +150,7 @@ void QnPtzManageDialog::keyPressEvent(QKeyEvent *event) {
 }
 
 void QnPtzManageDialog::reject() {
-    if (!checkForUnsavedChanges())
+    if (!tryClose(false))
         return;
 
     clear();
@@ -162,12 +162,6 @@ void QnPtzManageDialog::accept() {
 
     clear();
     QDialog::accept(); // here we skip QnAbstractPtzDialog::accept because we don't want call synchronize()
-}
-
-void QnPtzManageDialog::closeWithoutCancel() {
-    checkForUnsavedChanges(true);
-    clear();
-    base_type::reject();
 }
 
 void QnPtzManageDialog::loadData(const QnPtzData &data) {
@@ -278,6 +272,7 @@ void QnPtzManageDialog::clear() {
     m_model->setTours(QnPtzTourList());
     ui->tourEditWidget->setSpots(QnPtzTourSpotList());
     ui->tourEditWidget->setPresets(QnPtzPresetList());
+    ui->tourStackedWidget->setCurrentIndex(ui->tourStackedWidget->indexOf(ui->noTourPage));
 }
 
 void QnPtzManageDialog::saveData() {
@@ -373,7 +368,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked() {
     if (!m_resource || !controller())
         return;
 
-    if(m_resource->getStatus() == QnResource::Offline || m_resource->getStatus() == QnResource::Unauthorized) {
+    if(m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized) {
         QMessageBox::critical(
             this,
             tr("Could not get position from camera"),
@@ -395,7 +390,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked() {
     if (!m_resource || !controller())
         return;
 
-    if(m_resource->getStatus() == QnResource::Offline || m_resource->getStatus() == QnResource::Unauthorized) {
+    if(m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized) {
         QMessageBox::critical(
             this,
             tr("Could not set position for camera"),
@@ -436,7 +431,7 @@ void QnPtzManageDialog::at_startTourButton_clicked() {
     if (!m_resource || !controller())
         return;
 
-    if(m_resource->getStatus() == QnResource::Offline || m_resource->getStatus() == QnResource::Unauthorized) {
+    if(m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized) {
         QMessageBox::critical(
             this,
             tr("Could not set position for camera"),
@@ -640,28 +635,6 @@ bool QnPtzManageDialog::isModified() const {
     return !m_model->synchronized();
 }
 
-bool QnPtzManageDialog::checkForUnsavedChanges(bool dontShowCancel) {
-    if (!isModified())
-        return true;
-
-    QnMessageBox::StandardButtons buttons = QnMessageBox::Yes | QnMessageBox::No;
-    if (!dontShowCancel)
-        buttons |= QnMessageBox::Cancel;
-
-    show();
-    QnMessageBox::StandardButton button = QnMessageBox::question(this, 0, tr("PTZ configuration is not saved"), tr("Changes are not saved. Do you want to save them?"),
-                                                                 buttons, QnMessageBox::Yes);
-    switch (button) {
-    case QnMessageBox::Yes:
-        saveChanges();
-        return true;
-    case QnMessageBox::Cancel:
-        return false;
-    default:
-        return true;
-    }
-}
-
 void QnPtzManageDialog::updateUi() {
     ui->addTourButton->setEnabled(!m_model->presetModels().isEmpty());
 
@@ -685,4 +658,31 @@ void QnPtzManageDialog::updateUi() {
 
 void QnPtzManageDialog::updateHotkeys() {
     m_model->setHotkeys(m_adaptor->value());
+}
+
+bool QnPtzManageDialog::tryClose(bool force) {
+    if (!isModified() || force || isHidden()) {
+        if (force)
+            hide();
+        return true;
+    }
+
+    show();
+    QnMessageBox::StandardButton button = QnMessageBox::question(
+        this, 
+        0,
+        tr("PTZ configuration is not saved"),
+        tr("Changes are not saved. Do you want to save them?"),
+        QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel, 
+        QnMessageBox::Yes);
+
+    switch (button) {
+    case QnMessageBox::Yes:
+        saveChanges();
+        return true;
+    case QnMessageBox::Cancel:
+        return false;
+    default:
+        return true;
+    }
 }

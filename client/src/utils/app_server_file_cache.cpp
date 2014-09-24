@@ -6,6 +6,8 @@
 #include <QtCore/QTimer>
 #include <QtCore/QStandardPaths>
 
+#include <utils/common/util.h> /* For removeDir. */
+
 #include <api/app_server_connection.h>
 
 
@@ -25,7 +27,7 @@ QnAppServerFileCache::~QnAppServerFileCache(){}
 
 QString QnAppServerFileCache::getFullPath(const QString &filename) const {
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    QUrl url = QnAppServerConnectionFactory::defaultUrl();
+    QUrl url = QnAppServerConnectionFactory::url();
     return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/%2_%3/%4/%5"))
                                     .arg(path)
                                     .arg(url.host(QUrl::FullyEncoded))
@@ -54,18 +56,23 @@ void QnAppServerFileCache::clearLocalCache() {
 // -------------- File List loading methods -----
 
 void QnAppServerFileCache::getFileList() {
-    m_fileListHandle = QnAppServerConnectionFactory::createConnection()->requestDirectoryListingAsync(
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection) {
+        m_fileListHandle = -1;
+        return;
+    }
+
+    m_fileListHandle = connection->getStoredFileManager()->listDirectory(
                 m_folderName,
                 this,
-                SLOT(at_fileListReceived(int, const QStringList &, int))
-                );
+                &QnAppServerFileCache::at_fileListReceived );
 }
 
-void QnAppServerFileCache::at_fileListReceived(int status, const QStringList &filenames, int handle) {
+void QnAppServerFileCache::at_fileListReceived(int handle, ec2::ErrorCode errorCode, const QStringList& filenames) {
     if (handle != m_fileListHandle)
         return;
 
-    emit fileListReceived(filenames, status == 0);
+    emit fileListReceived(filenames, errorCode == ec2::ErrorCode::ok);
 }
 
 // -------------- Download File methods ----------
@@ -90,22 +97,21 @@ void QnAppServerFileCache::downloadFile(const QString &filename) {
     if (m_loading.values().contains(filename))
       return;
 
-    int handle = QnAppServerConnectionFactory::createConnection()->requestStoredFileAsync(
+    int handle = QnAppServerConnectionFactory::getConnection2()->getStoredFileManager()->getStoredFile(
                 m_folderName + QLatin1Char('/') + filename,
                 this,
-                SLOT(at_fileLoaded(int, const QByteArray&, int))
-                );
+                &QnAppServerFileCache::at_fileLoaded );
     m_loading.insert(handle, filename);
 }
 
-void QnAppServerFileCache::at_fileLoaded(int status, const QByteArray& data, int handle) {
+void QnAppServerFileCache::at_fileLoaded( int handle, ec2::ErrorCode errorCode, const QByteArray& data ) {
     if (!m_loading.contains(handle))
         return;
 
     QString filename = m_loading[handle];
     m_loading.remove(handle);
 
-    if (status != 0) {
+    if (errorCode != ec2::ErrorCode::ok) {
         emit fileDownloaded(filename, false);
         return;
     }
@@ -140,23 +146,22 @@ void QnAppServerFileCache::uploadFile(const QString &filename) {
     QByteArray data = file.readAll();
     file.close();
 
-    int handle = QnAppServerConnectionFactory::createConnection()->addStoredFileAsync(
+    int handle = QnAppServerConnectionFactory::getConnection2()->getStoredFileManager()->addStoredFile(
                 m_folderName + QLatin1Char('/') +filename,
                 data,
                 this,
-                SLOT(at_fileUploaded(int, int))
-                );
+                &QnAppServerFileCache::at_fileUploaded );
     m_uploading.insert(handle, filename);
 }
 
 
-void QnAppServerFileCache::at_fileUploaded(int status, int handle) {
+void QnAppServerFileCache::at_fileUploaded( int handle, ec2::ErrorCode errorCode ) {
     if (!m_uploading.contains(handle))
         return;
 
     QString filename = m_uploading[handle];
     m_uploading.remove(handle);
-    bool ok = status == 0;
+    const bool ok = errorCode == ec2::ErrorCode::ok;
     if (!ok)
         QFile::remove(getFullPath(filename));
     emit fileUploaded(filename, ok);
@@ -183,22 +188,21 @@ void QnAppServerFileCache::deleteFile(const QString &filename) {
     if (m_deleting.values().contains(filename))
       return;
 
-    int handle = QnAppServerConnectionFactory::createConnection()->deleteStoredFileAsync(
+    int handle = QnAppServerConnectionFactory::getConnection2()->getStoredFileManager()->deleteStoredFile(
                     m_folderName + QLatin1Char('/') +filename,
                     this,
-                    SLOT(at_fileDeleted(int, int))
-                    );
+                    &QnAppServerFileCache::at_fileDeleted );
 
     m_deleting.insert(handle, filename);
 }
 
-void QnAppServerFileCache::at_fileDeleted(int status, int handle) {
+void QnAppServerFileCache::at_fileDeleted( int handle, ec2::ErrorCode errorCode ) {
     if (!m_deleting.contains(handle))
         return;
 
     QString filename = m_deleting[handle];
     m_deleting.remove(handle);
-    bool ok = status == 0;
+    const bool ok = errorCode == ec2::ErrorCode::ok;
     if (ok)
         QFile::remove(getFullPath(filename));
     emit fileDeleted(filename, ok);

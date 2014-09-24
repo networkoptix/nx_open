@@ -1,18 +1,38 @@
+
 #include "manual_camera_addition_rest_handler.h"
 
+#include <boost/bind.hpp>
+#include <thread>
+
+#include <QtCore/QThreadPool>
 #include <QtNetwork/QAuthenticator>
-#include <QtConcurrent/QtConcurrentRun>
 
 #include <api/model/manual_camera_seach_reply.h>
 #include <core/resource_management/resource_discovery_manager.h>
 
-#include <utils/common/json.h>
+#include <utils/common/scoped_thread_rollback.h>
 #include <utils/network/tcp_connection_priv.h>
+#include <utils/serialization/json_functions.h>
 
 
-namespace {
-    static const int searchThreadCount = 4;
-}
+class ManualSearchThreadPoolHolder
+{
+public:
+    QThreadPool pool;
+
+    ManualSearchThreadPoolHolder()
+    {
+        pool.setMaxThreadCount(
+#ifdef __arm__
+            8
+#else
+            32
+#endif
+            );
+    }
+};
+
+static ManualSearchThreadPoolHolder manualSearchThreadPoolHolder;
 
 QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler()
 {
@@ -23,10 +43,6 @@ QnManualCameraAdditionRestHandler::~QnManualCameraAdditionRestHandler() {
         process->cancel();
         delete process;
     }
-}
-
-static void searchResourcesAsync(QnManualCameraSearcher* searcher, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port) {
-    searcher->run(startAddr, endAddr, auth, port);
 }
 
 int QnManualCameraAdditionRestHandler::searchStartAction(const QnRequestParams &params,  QnJsonRestResult &result)
@@ -54,7 +70,13 @@ int QnManualCameraAdditionRestHandler::searchStartAction(const QnRequestParams &
         m_searchProcesses.insert(processUuid, searcher);
     }
 
-    m_searchProcessRuns.insert(processUuid, QtConcurrent::run(&searchResourcesAsync, searcher, addr1, addr2, auth, port));
+    //TODO #ak better not to use concurrent here, since calling QtConcurrent::run from running task looks unreliable in some extreme case
+        //consider using async fsm here (this one should be quite simple)
+    //NOTE boost::bind is here temporarily: till QnConcurrent::run supports any number of arguments
+    m_searchProcessRuns.insert( processUuid,
+        QnConcurrent::run( 
+            &manualSearchThreadPoolHolder.pool,
+            boost::bind( &QnManualCameraSearcher::run, searcher, &manualSearchThreadPoolHolder.pool, addr1, addr2, auth, port) ) );
 
     QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);
@@ -118,12 +140,20 @@ int QnManualCameraAdditionRestHandler::addCamerasAction(const QnRequestParams &p
 
     QnManualCameraInfoMap infos;
     for(int i = 0, skipped = 0; skipped < 5; i++) {
-        QString url = params.value("url" + QString::number(i));
+        QString urlStr = params.value("url" + QString::number(i));
         QString manufacturer = params.value("manufacturer" + QString::number(i));
 
-        if(url.isEmpty() || manufacturer.isEmpty()) {
+        if(urlStr.isEmpty() || manufacturer.isEmpty()) {
             skipped++;
             continue;
+        }
+
+        QUrl url( urlStr );
+        if( url.host().isEmpty() && !url.path().isEmpty() )
+        {
+            //urlStr is just an ip address or a hostname, QUrl parsed it as path, restoring justice...
+            url.setHost( url.path() );
+            url.setPath( QByteArray() );
         }
 
         QnManualCameraInfo info(url, auth, manufacturer);
@@ -132,7 +162,7 @@ int QnManualCameraAdditionRestHandler::addCamerasAction(const QnRequestParams &p
             return CODE_INVALID_PARAMETER;
         }
 
-        infos.insert(url, info);
+        infos.insert(urlStr, info);
     }
 
     bool registered = QnResourceDiscoveryManager::instance()->registerManualCameras(infos);
@@ -168,28 +198,3 @@ bool QnManualCameraAdditionRestHandler::isSearchActive(const QUuid &searchProces
     return m_searchProcesses.contains(searchProcessUuid);
 }
 
-QString QnManualCameraAdditionRestHandler::description() const
-{
-    return 
-            "Search or manual add cameras found in the specified range.<BR>\n"
-            "<BR><b>api/manualCamera/search</b> - start camera searching"
-            "<BR>Param <b>start_ip</b> - first ip address in range."
-            "<BR>Param <b>end_ip</b> - end ip address in range. Can be omitted - only start ip address will be used"
-            "<BR>Param <b>port</b> - Port to scan. Can be omitted"
-            "<BR>Param <b>user</b> - username for the cameras. Can be omitted.</i>"
-            "<BR>Param <b>password</b> - password for the cameras. Can be omitted."
-            "<BR><b>Return</b> XML with camera names, manufacturer and urls"
-            "<BR>"
-            "<BR><b>api/manualCamera/status</b> - get manual addition progress."
-            "<BR>Param <b>uuid</b> - process uuid."
-            "<BR>"
-            "<BR><b>api/manualCamera/stop</b> - stop manual addition progress."
-            "<BR>Param <b>uuid</b> - process uuid."
-            "<BR>"
-            "<BR><b>api/manualCamera/add</b> - manual add camera(s). If several cameras are added, parameters 'url' and 'manufacturer' must be defined several times"
-            "<BR>Param <b>url</b> - camera url returned by scan request."
-            "<BR>Param <b>manufacturer</b> - camera manufacturer.</i>"
-            "<BR>Param <b>user</b> - username for the cameras. Can be omitted.</i>"
-            "<BR>Param <b>password</b> - password for the cameras. Can be omitted."
-            ;
-}

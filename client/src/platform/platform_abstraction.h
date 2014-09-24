@@ -5,7 +5,8 @@
 
 #include <platform/core_platform_abstraction.h>
 
-#include "images/platform_images.h"
+#include <platform/images/platform_images.h>
+#include <platform/shortcuts/platform_shortcuts.h>
 
 class QnPlatformAbstraction: public QnCorePlatformAbstraction {
     Q_OBJECT
@@ -19,8 +20,13 @@ public:
         return m_images;
     }
 
+    QnPlatformShortcuts *shortcuts() const {
+        return m_shortcuts;
+    }
+
 private:
     QnPlatformImages *m_images;
+    QnPlatformShortcuts *m_shortcuts;
 };
 
 #undef  qnPlatform

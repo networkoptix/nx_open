@@ -102,14 +102,16 @@ namespace nxpt
 
     //!Allocate \a size bytes of data, aligned to \a alignment boundary
     /*!
+        \param mallocFunc Function with signature \a void*(size_t) which is called to allocate memory
         \note Allocated memory MUST be freed with \a freeAligned call
         \note Function is as safe as \a ::malloc is
     */
-    static void* mallocAligned( size_t size, size_t alignment )
+    template<class MallocFunc>
+    void* mallocAligned( size_t size, size_t alignment, MallocFunc mallocFunc )
     {
         if( alignment == 0 )
             return 0;
-        void* ptr = ::malloc( size + alignment + sizeof(alignment) );
+        void* ptr = mallocFunc( size + alignment + sizeof(alignment) );
         if( !ptr )   //allocation error
             return ptr;
 
@@ -119,21 +121,35 @@ namespace nxpt
         return (char*)aligned_ptr + unalignment;
     }
 
+    //!Calls above function passing \a ::malloc as third argument
+    static void* mallocAligned( size_t size, size_t alignment )
+    {
+        return mallocAligned<>( size, alignment, ::malloc );
+    }
+
     //!free \a ptr allocated with a call to \a mallocAligned with \a alignment
     /*!
+        \param freeFunc Function with signature \a void(void*) which is called to free allocated memory
         \note Function is as safe as \a ::free is
     */
-    static void freeAligned( void* ptr )
+    template<class FreeFunc>
+    void freeAligned( void* ptr, FreeFunc freeFunc )
     {
         if( !ptr )
-            return ::free( ptr );
+            return freeFunc( ptr );
 
         ptr = (char*)ptr - sizeof(size_t);
         size_t unalignment = 0;
         memcpy( &unalignment, ptr, sizeof(unalignment) );
         ptr = (char*)ptr - unalignment;
 
-        ::free( ptr );
+        freeFunc( ptr );
+    }
+
+    //!Calls above function passing \a ::free as second argument
+    static void freeAligned( void* ptr )
+    {
+        return freeAligned<>( ptr, ::free );
     }
 
     namespace atomic

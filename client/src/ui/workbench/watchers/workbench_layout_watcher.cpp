@@ -3,7 +3,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include "plugins/resources/archive/avi_files/avi_resource.h"
+#include "plugins/resource/avi/avi_resource.h"
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -28,7 +28,7 @@ void QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
 
     foreach(QnLayoutItemData data, layoutResource->getItems())
     {
-        if(!data.resource.id.isValid()) {
+        if(data.resource.id.isNull()) {
             QnResourcePtr resource = qnResPool->getResourceByUniqId(data.resource.path);
             if(!resource) {
                 if(data.resource.path.isEmpty()) {

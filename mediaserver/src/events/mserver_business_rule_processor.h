@@ -5,6 +5,8 @@
 #include <business/actions/recording_business_action.h>
 #include "events_db.h"
 
+#include <core/resource/resource_fwd.h>
+
 /*
 * QnMServerBusinessRuleProcessor can execute business actions
 */
@@ -16,7 +18,7 @@ public:
     QnMServerBusinessRuleProcessor();
     virtual ~QnMServerBusinessRuleProcessor();
 
-    virtual QString getGuid() const override;
+    virtual QUuid getGuid() const override;
     
     /*
     * How long to keep event log in usecs
@@ -27,13 +29,13 @@ protected:
     QImage getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const override;
 
 protected slots:
-    virtual bool executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res) override;
+    virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res) override;
     void onRemoveResource(const QnResourcePtr &resource);
 
 private:
-    bool executeRecordingAction(QnRecordingBusinessActionPtr action, QnResourcePtr res);
-    bool executePanicAction(QnPanicBusinessActionPtr action);
-    bool triggerCameraOutput(const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource);
+    bool executeRecordingAction(const QnRecordingBusinessActionPtr& action, const QnResourcePtr& res);
+    bool executePanicAction(const QnPanicBusinessActionPtr& action);
+    bool triggerCameraOutput(const QnCameraOutputBusinessActionPtr& action, const QnResourcePtr& resource);
 };
 
 #endif // __MSERVER_BUSINESS_RULE_PROCESSOR_H_

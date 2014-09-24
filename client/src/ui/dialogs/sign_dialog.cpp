@@ -1,8 +1,8 @@
 #include "sign_dialog.h"
 #include "ui_sign_dialog.h"
 
-#include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "plugins/resources/archive/abstract_archive_stream_reader.h"
+#include "plugins/resource/avi/avi_resource.h"
+#include "plugins/resource/archive/abstract_archive_stream_reader.h"
 
 #include "camera/gl_renderer.h"
 #include "camera/cam_display.h"
@@ -57,7 +57,7 @@ public:
     virtual void paintEvent(QPaintEvent *) override
     {
         QPainter painter(this);
-        QnGlNativePainting::begin(&painter);
+        QnGlNativePainting::begin(QGLContext::currentContext(),&painter);
         if (m_renderer)
             m_renderer->paint(0, QRectF(0.0, 0.0, 1.0, 1.0), m_videoRect, 1.0);
         QnGlNativePainting::end(&painter);
@@ -74,7 +74,7 @@ private:
 // ------------------------------------
 
 SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
-    QDialog(parent),
+    base_type(parent),
     ui(new Ui::SignDialog),
     m_camDispay(NULL),
     m_reader(NULL),
@@ -99,7 +99,7 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
     m_srcVideoInfo = new QnSignInfo();
 
     m_resource = QnAviResourcePtr(new QnAviResource(checkResource->getUrl()));
-    m_reader = static_cast<QnAbstractArchiveReader*> (m_resource->createDataProvider(QnResource::Role_Default));
+    m_reader = static_cast<QnAbstractArchiveReader*> (m_resource->createDataProvider(Qn::CR_Default));
     m_reader->setCycleMode(false);
     m_camDispay = new QnSignDialogDisplay(m_resource);
 

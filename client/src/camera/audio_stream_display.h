@@ -4,10 +4,10 @@
 #include "decoders/audio/audio_struct.h"
 #include "openal/qtvsound.h"
 #include "openal/qtvaudiodevice.h"
-#include "core/datapacket/media_data_packet.h"
+#include "core/datapacket/audio_data_packet.h"
 
 class CLAbstractAudioDecoder;
-struct QnCompressedAudioData;
+class QnCompressedAudioData;
 
 /*!
     \note On source data end \a playCurrentBuffer method MUST be called to avoid media data loss
@@ -56,6 +56,7 @@ private:
     bool initFormatConvertRule(QnAudioFormat format);
 
 private:
+    // TODO: #Elric #enum
     enum SampleConvertMethod {SampleConvert_None, SampleConvert_Float2Int32, SampleConvert_Float2Int16, SampleConvert_Int32ToInt16};
 
     QMutex m_guiSync;

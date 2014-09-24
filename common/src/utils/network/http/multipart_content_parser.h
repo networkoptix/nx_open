@@ -29,6 +29,7 @@ namespace nx_http
         void setBoundary( const StringType& boundary );
 
     private:
+        // TODO: #Elric #enum
         enum ParsingState
         {
             waitingBoundary,

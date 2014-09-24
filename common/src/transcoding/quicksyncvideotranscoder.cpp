@@ -52,7 +52,7 @@ void QnQuickSyncVideoTranscoder::setResolution( const QSize& value )
 }
 
 //!Implementation of QnCodecTranscoder::transcodePacket
-int QnQuickSyncVideoTranscoder::transcodePacket( QnAbstractMediaDataPtr inputAU, QnAbstractMediaDataPtr& outputAU )
+int QnQuickSyncVideoTranscoder::transcodePacket( const QnAbstractMediaDataPtr& inputAU, QnAbstractMediaDataPtr& outputAU )
 {
     if( !m_transcoderInitialized )
     {
@@ -106,6 +106,7 @@ int QnQuickSyncVideoTranscoder::transcodePacket( QnAbstractMediaDataPtr inputAU,
         break;
     }
 
+    // TODO: #Elric #enum
     enum State
     {
         decoding,

@@ -5,6 +5,7 @@
 #include <utils/common/util.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/layout_resource.h>
 
 #include <ui/style/globals.h>
 
@@ -131,7 +132,7 @@ void QnWorkbench::moveLayout(QnWorkbenchLayout *layout, int index) {
     }
 
     /* Silently fix index. */
-    index = qBound(0, index, m_layouts.size());
+    index = qBound(0, index, m_layouts.size() - 1);
 
     int currentIndex = m_layouts.indexOf(layout);
     if(currentIndex == index)
@@ -272,7 +273,7 @@ void QnWorkbench::update(const QnWorkbenchState &state) {
     clear();
 
     for(int i = 0; i < state.layoutUuids.size(); i++) {
-        QnLayoutResourcePtr resource = resourcePool()->getResourceByGuid(state.layoutUuids[i]).dynamicCast<QnLayoutResource>();
+        QnLayoutResourcePtr resource = resourcePool()->getResourceById(state.layoutUuids[i]).dynamicCast<QnLayoutResource>();
         if(!resource)
             continue;
 
@@ -292,7 +293,7 @@ void QnWorkbench::submit(QnWorkbenchState &state) {
     state.currentLayoutIndex = currentLayoutIndex();
     foreach(QnWorkbenchLayout *layout, m_layouts)
         if(layout->resource())
-            state.layoutUuids.push_back(layout->resource()->getGuid());
+            state.layoutUuids.push_back(layout->resource()->getId());
 }
 
 

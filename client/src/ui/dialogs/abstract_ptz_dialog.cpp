@@ -12,11 +12,9 @@
 #include <core/ptz/ptz_data.h>
 
 #include <ui/widgets/dialog_button_box.h>
-#include "utils/common/lexical.h"
 
 QnAbstractPtzDialog::QnAbstractPtzDialog(QWidget *parent, Qt::WindowFlags windowFlags) :
     base_type(parent, windowFlags),
-    QnWorkbenchContextAware(parent),
     m_loaded(false)
 {
     connect(this, &QnAbstractPtzDialog::synchronizeLater, this, &QnAbstractPtzDialog::synchronize, Qt::QueuedConnection);
@@ -180,7 +178,7 @@ void QnAbstractPtzDialog::at_controller_finished(Qn::PtzCommand command, const Q
     if (m_commands.isEmpty())
         return;
 
-    //TODO: #GDM PTZ check against validity of data, show error message later if not valid.
+    //TODO: #GDM #PTZ check against validity of data, show error message later if not valid.
     auto pos = m_commands.find(command);
     if (pos == m_commands.end())
         return;

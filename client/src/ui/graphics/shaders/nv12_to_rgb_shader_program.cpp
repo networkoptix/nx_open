@@ -9,31 +9,31 @@ namespace {
      * This is a matrix from Wikipedia, http://en.wikipedia.org/wiki/Yuv. 
      */
     float yuv_coef_ebu[4][4] = {
-        { 1.0,      1.0,     1.0,     0.0 },
-        { 0.0,     -0.3960,  2.029,   0.0 },
-        { 1.140,   -0.581,   0.0,     0.0 },
-        { 0.0,      0.0,     0.0,     1.0 }
+        { 1.0f,      1.0f,     1.0f,     0.0f },
+        { 0.0f,     -0.3960f,  2.029f,   0.0f },
+        { 1.140f,   -0.581f,   0.0f,     0.0f },
+        { 0.0f,      0.0f,     0.0f,     1.0f }
     };
 
     float yuv_coef_bt601[4][4] = {
-        { 1.0,      1.0,     1.0,     0.0 },
-        { 0.0,     -0.344,   1.773,   0.0 },
-        { 1.403,   -0.714,   0.0,     0.0 },
-        { 0.0,      0.0,     0.0,     1.0 } 
+        { 1.0f,      1.0f,     1.0f,     0.0f },
+        { 0.0f,     -0.344f,   1.773f,   0.0f },
+        { 1.403f,   -0.714f,   0.0f,     0.0f },
+        { 0.0f,      0.0f,     0.0f,     1.0f } 
     };
 
     float yuv_coef_bt709[4][4] = {
-        { 1.0,      1.0,     1.0,     0.0 },
-        { 0.0,     -0.1870,  1.8556,  0.0 },
-        { 1.5701,  -0.4664,  0.0,     0.0 },
-        { 0.0,      0.0,     0.0,     1.0 }
+        { 1.0f,      1.0f,     1.0f,     0.0f },
+        { 0.0f,     -0.1870f,  1.8556f,  0.0f },
+        { 1.5701f,  -0.4664f,  0.0f,     0.0f },
+        { 0.0f,      0.0f,     0.0f,     1.0f }
     };
 
     float yuv_coef_smtp240m[4][4] = {
-        { 1.0,      1.0,     1.0,     0.0 },
-        { 0.0,     -0.2253,  1.8270,  0.0 },
-        { 1.5756,  -0.5000,  0.0,     0.0 },
-        { 0.0,      0.0,     0.0,     1.0 }
+        { 1.0f,      1.0f,     1.0f,     0.0f },
+        { 0.0f,     -0.2253f,  1.8270f,  0.0f },
+        { 1.5756f,  -0.5000f,  0.0f,     0.0f },
+        { 0.0f,      0.0f,     0.0f,     1.0f }
     };
 
     float (&rawColorTransform(QnNv12ToRgbShaderProgram::Colorspace colorspace))[4][4] {
@@ -51,37 +51,48 @@ namespace {
 } // anonymous namespace
 
 
-QnNv12ToRgbShaderProgram::QnNv12ToRgbShaderProgram(const QGLContext *context, QObject *parent):
-    QGLShaderProgram(context, parent) 
+QnNv12ToRgbShaderProgram::QnNv12ToRgbShaderProgram(QObject *parent):
+    QnGLShaderProgram(parent),
+    m_wasLinked(false)
 {
-    addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
+    addShaderFromSourceCode(QOpenGLShader::Vertex, QN_SHADER_SOURCE(
+        attribute vec4 aPosition;
+        attribute vec2 aTexCoord;
+        uniform mat4 uModelViewProjectionMatrix;
+        varying vec2 vTexCoord;
+
         void main() {
-            gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-            gl_TexCoord[0] = gl_MultiTexCoord0;
-            gl_TexCoord[1] = gl_MultiTexCoord1;
+            gl_Position = uModelViewProjectionMatrix * aPosition;
+            vTexCoord = aTexCoord;
         }
     ));
-    addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(
-        uniform sampler2D yTexture;
-        uniform sampler2D uvTexture;
-        uniform mat4 colorTransform;
-        uniform float opacity;
-                                                                                
-        void main() {
-            vec4 yuv, rgb;
-            yuv.rgba = vec4(
-                texture2D(yTexture, gl_TexCoord[0].st).r,
-                texture2D(uvTexture, gl_TexCoord[1].st).r,
-                texture2D(uvTexture, gl_TexCoord[1].st).a,
-                1.0
+    QByteArray shader(QN_SHADER_SOURCE(
+    uniform sampler2D yTexture;
+    uniform sampler2D uvTexture;
+    uniform mat4 colorTransform;
+    uniform float opacity;
+    varying vec2 vTexCoord;
+
+    void main() {
+        vec4 yuv, rgb;
+        yuv.rgba = vec4(
+            texture2D(yTexture, vTexCoord.st).r,
+            texture2D(uvTexture, vTexCoord.st).r,
+            texture2D(uvTexture, vTexCoord.st).a,
+            1.0
             );
-              
-            rgb = colorTransform * yuv;
-            rgb.a = opacity;
-            gl_FragColor = rgb;
-        }
+
+        rgb = colorTransform * yuv;
+        rgb.a = opacity;
+        gl_FragColor = rgb;
+    }
     ));
-    link();
+#ifdef QT_OPENGL_ES_2
+    shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
+#endif
+
+    addShaderFromSourceCode(QOpenGLShader::Fragment, shader);
+    m_wasLinked = link();
 
     m_yTextureLocation = uniformLocation("yTexture");
     m_uvTextureLocation = uniformLocation("uvTexture");

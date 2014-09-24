@@ -2,8 +2,9 @@
 
 #include <cassert>
 
-#include <QtCore/QVector>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QHash>
+#include <QtCore/QVector>
 
 #include <utils/common/warnings.h>
 
@@ -22,19 +23,24 @@ namespace {
             return false;
 
         LPCWSTR pos = wcschr(description, L' ');
-        if(!pos)
-            return false;
-        while(*pos == L' ')
-            pos++;
-        if(*pos == L'\0')
-            return false;
+        bool hasName = (pos != NULL);
+        if (hasName) {
+            while(*pos == L' ')
+                pos++;
+            if(*pos == L'\0')
+                return false;
+        }
 
         int localId = _wtoi(description);
         if(localId == 0 && description[0] != L'0')
             return false;
         
-        if(partitions)
-            *partitions = pos;
+        if(partitions) {
+            if (hasName)
+                *partitions = pos;
+            else
+                *partitions = description;
+        }
         if(id)
             *id = localId;
         return true;
@@ -71,11 +77,13 @@ public:
         pdhLibrary(0), 
         query(0),
         diskCounter(0),
-        lastCollectTimeMSec(0)
+        lastCollectTimeMSec(0),
+        m_networkStatCalcCounter()
     {
         pdhLibrary = LoadLibraryW(L"pdh.dll");
         if(!pdhLibrary)
             checkError("LoadLibrary", GetLastError());
+        m_networkStatTimer.restart();
     }
 
     virtual ~QnWindowsMonitorPrivate() {
@@ -201,9 +209,15 @@ public:
             int id;
             LPCWSTR partitions;
             if(!parseDiskDescription(item[i].szName, &id, &partitions))
-                continue; /* A '_Total' entry, disk without partitions, or simply something unexpected. */
+                continue; /* A '_Total' entry or something unexpected. */
 
-            (*items)[id] = HddItem(Hdd(id, QLatin1String("HDD") + QString::number(id), QString::fromWCharArray(partitions)), item[i].RawValue);
+            Hdd hdd(id, QLatin1String("HDD") + QString::number(id), QString::fromWCharArray(partitions));
+
+            /* Fix partitions name for the mounted-into-folder drives. */
+            if (!hdd.partitions.contains(L':'))
+                hdd.partitions = hdd.name;
+
+            (*items)[id] = HddItem(hdd,  item[i].RawValue);
         }
     }
 
@@ -221,10 +235,96 @@ public:
         return result.doubleValue / 100.0;
     }
 
+    void recalcNetworkStatistics()
+    {
+        static const size_t MS_PER_SEC = 1000;
+
+        MIB_IF_TABLE2* networkInterfaceTable = NULL;
+        if( GetIfTable2( &networkInterfaceTable ) != NO_ERROR )
+            return;
+
+        ++m_networkStatCalcCounter;
+
+        const qint64 currentClock = m_networkStatTimer.elapsed();
+        for( size_t i = 0; i < networkInterfaceTable->NumEntries; ++i )
+        {
+            const MIB_IF_ROW2& ifInfo = networkInterfaceTable->Table[i];
+            if( ifInfo.PhysicalAddressLength == 0 )
+                continue;
+            if( !(ifInfo.Type & IF_TYPE_ETHERNET_CSMACD) )
+                continue;
+            if( ifInfo.InterfaceAndOperStatusFlags.NotMediaConnected || ! ifInfo.InterfaceAndOperStatusFlags.ConnectorPresent )
+                continue;
+            if( ifInfo.OperStatus == IfOperStatusDown )
+                continue;
+
+            std::pair<std::map<ULONG64, NetworkInterfaceStatData>::iterator, bool>
+                p = m_interfaceLoadByGUID.emplace( ifInfo.InterfaceLuid.Value, NetworkInterfaceStatData() );
+            if( p.second )
+            {
+                p.first->second.load.interfaceName = QString::fromWCharArray( ifInfo.Alias );
+                p.first->second.load.macAddress = QnMacAddress( QByteArray(reinterpret_cast<const char*>(ifInfo.PhysicalAddress), ifInfo.PhysicalAddressLength) );
+                p.first->second.load.type = QnPlatformMonitor::PhysicalInterface;
+                p.first->second.load.bytesPerSecMax = (ifInfo.TransmitLinkSpeed + ifInfo.ReceiveLinkSpeed) / 2 / CHAR_BIT;
+                p.first->second.prevMeasureClock = currentClock;
+                p.first->second.inOctets = ifInfo.InOctets;
+                p.first->second.outOctets = ifInfo.OutOctets;
+            }
+            NetworkInterfaceStatData& intfLoad = m_interfaceLoadByGUID[ifInfo.InterfaceLuid.Value];
+            intfLoad.networkStatCalcCounter = m_networkStatCalcCounter;
+            if( intfLoad.prevMeasureClock == currentClock )
+                continue;   //not calculating load
+            const qint64 msPassed = currentClock - intfLoad.prevMeasureClock;
+            intfLoad.load.bytesPerSecIn = p.first->second.load.bytesPerSecIn * 0.3 + ((ifInfo.InOctets - p.first->second.inOctets) * MS_PER_SEC / msPassed) * 0.7;
+            intfLoad.load.bytesPerSecOut = p.first->second.load.bytesPerSecOut * 0.3 + ((ifInfo.OutOctets - p.first->second.outOctets) * MS_PER_SEC / msPassed) * 0.7;
+
+            p.first->second.inOctets = ifInfo.InOctets;
+            p.first->second.outOctets = ifInfo.OutOctets;
+            p.first->second.prevMeasureClock = currentClock;
+        }
+
+        //removing disabled interface
+        for( auto it = m_interfaceLoadByGUID.begin(); it != m_interfaceLoadByGUID.end(); )
+        {
+            if( it->second.networkStatCalcCounter < m_networkStatCalcCounter )
+                it = m_interfaceLoadByGUID.erase(it);
+            else
+                ++it;
+        }
+
+        FreeMibTable( networkInterfaceTable );
+    }
+
+    QList<QnPlatformMonitor::NetworkLoad> networkInterfacelLoadData()
+    {
+        QList<QnPlatformMonitor::NetworkLoad> loadData;
+        for( const std::pair<ULONG64, NetworkInterfaceStatData>& ifStatData: m_interfaceLoadByGUID )
+            loadData.push_back( ifStatData.second.load );
+        return loadData;
+    }
+
 private:
     const QnWindowsMonitorPrivate *d_func() const { return this; } /* For INVOKE to work. */
     
 private:
+    struct NetworkInterfaceStatData
+    {
+        QnPlatformMonitor::NetworkLoad load;
+        ULONG64 inOctets;
+        ULONG64 outOctets;
+        qint64 prevMeasureClock;
+        size_t networkStatCalcCounter;
+
+        NetworkInterfaceStatData()
+        :
+            inOctets(0),
+            outOctets(0),
+            prevMeasureClock(-1),
+            networkStatCalcCounter(0)
+        {
+        }
+    };
+
     /** Handle to PHD dll. Used to query error messages via <tt>FormatMessage</tt>. */
     HMODULE pdhLibrary;
 
@@ -245,6 +345,10 @@ private:
     /** Data collected from the disk time counter during the last collect 
      * operation. */
     QHash<int, HddItem> lastItemByDiskId;
+
+    std::map<ULONG64, NetworkInterfaceStatData> m_interfaceLoadByGUID;
+    QElapsedTimer m_networkStatTimer;
+    size_t m_networkStatCalcCounter;
 
 private:
     Q_DECLARE_PUBLIC(QnWindowsMonitor);
@@ -280,4 +384,13 @@ QList<QnPlatformMonitor::HddLoad> QnWindowsMonitor::totalHddLoad() {
         result.push_back(HddLoad(item.hdd, load));
     }
     return result;
+}
+
+QList<QnPlatformMonitor::NetworkLoad> QnWindowsMonitor::totalNetworkLoad()
+{
+    Q_D(QnWindowsMonitor);
+
+    d->recalcNetworkStatistics();
+
+    return d->networkInterfacelLoadData();
 }

@@ -10,9 +10,11 @@
 #include <cstdlib>
 
 #include <plugins/plugin_tools.h>
+#include <utils/memory/cyclic_allocator.h>
 
 
 ILPVideoPacket::ILPVideoPacket(
+    CyclicAllocator* const allocator,
     int channelNumber,
     nxcip::UsecUTCTimestamp _timestamp,
     unsigned int flags,
@@ -20,6 +22,7 @@ ILPVideoPacket::ILPVideoPacket(
     nxcip::CompressionType codec)
 :
     m_refManager( this ),
+    m_allocator( allocator ),
     m_channelNumber( channelNumber ),
     m_timestamp( _timestamp ),
     m_buffer( NULL ),
@@ -35,7 +38,8 @@ ILPVideoPacket::~ILPVideoPacket()
 {
     if( m_buffer )
     {
-        nxpt::freeAligned( m_buffer );
+        using namespace std::placeholders;
+        nxpt::freeAligned( m_buffer, std::bind( &CyclicAllocator::release, m_allocator, _1 ) );
         m_buffer = NULL;
         m_bufSize = 0;
     }
@@ -142,13 +146,17 @@ void ILPVideoPacket::resizeBuffer( size_t bufSize )
         return;
     }
 
-    void* newBuffer = nxpt::mallocAligned( bufSize, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT );
+    using namespace std::placeholders;
+    void* newBuffer = nxpt::mallocAligned(
+        bufSize + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE,
+        nxcip::MEDIA_DATA_BUFFER_ALIGNMENT,
+        std::bind( &CyclicAllocator::alloc, m_allocator, _1 ) );
 
     if( m_bufSize > 0 )
     {
         if( newBuffer )
             memcpy( newBuffer, m_buffer, std::min<>(m_bufSize, bufSize) );
-        nxpt::freeAligned( m_buffer );
+        nxpt::freeAligned( m_buffer, std::bind( &CyclicAllocator::release, m_allocator, _1 ) );
         m_buffer = NULL;
         m_bufSize = 0;
     }

@@ -194,7 +194,6 @@ protected slots:
     void at_screenRecorder_recordingStarted();
     void at_screenRecorder_recordingFinished(const QString &recordedFileName);
 
-    void at_recordingAnimation_tick(int tick);
     void at_recordingAnimation_finished();
 
     void at_zoomedToggle_activated();
@@ -298,9 +297,6 @@ private:
 
     /** Screen recorder object. */
     QnScreenRecorder *m_screenRecorder;
-
-    /** Whether recorder countdown is canceled. */
-    bool m_countdownCanceled;
 
     /** Screen recording countdown label. */
     QnGraphicsMessageBox *m_recordingCountdownLabel;

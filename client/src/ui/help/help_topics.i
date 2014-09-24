@@ -144,6 +144,7 @@ QN_HELP_TOPIC(EventsActions_CameraInput_Help,					"input_signal_on_camera.htm")
 QN_HELP_TOPIC(EventsActions_MediaServerFailure_Help,			"media_server_failure.htm")
 QN_HELP_TOPIC(EventsActions_MediaServerConflict_Help,			"media_servers_conflict.htm")
 QN_HELP_TOPIC(EventsActions_MediaServerStarted_Help,			"media_server_started.htm")
+QN_HELP_TOPIC(EventsActions_LicenseIssue_Help,			        "license_issue.htm")
 
 QN_HELP_TOPIC(LayoutSettings_Locking_Help,						"locking_layouts.htm")
 QN_HELP_TOPIC(LayoutSettings_EMapping_Help,						"e-mapping.htm")
@@ -167,5 +168,7 @@ QN_HELP_TOPIC(RemoveItems_Help,									"removing_item(s)_from_layouts.htm")
 QN_HELP_TOPIC(SaveLayout_Help,									"saving_layouts_(admin_only).htm")
 
 QN_HELP_TOPIC(Upgrade_Help,										"upgrading_product_name.htm")
+
+QN_HELP_TOPIC(PrimaryTimeServerSelection_Help,                  "selecting_time_server.htm")
 
 #undef QN_HELP_TOPIC

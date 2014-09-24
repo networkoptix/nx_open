@@ -34,7 +34,7 @@ void QnNotificationSoundModel::addDownloading(const QString &filename, bool sile
     QList<QStandardItem *> row;
     row << new QStandardItem(tr("<Downloading sound...>"))
         << new QStandardItem(filename);
-    //TODO: #GDM append columns: duration, date added (?)
+    //TODO: #GDM #Business append columns: duration, date added (?)
     appendRow(row);
     if (!silent)
         emit itemAdded(filename);
@@ -44,7 +44,7 @@ void QnNotificationSoundModel::addUploading(const QString &filename) {
     QList<QStandardItem *> row;
     row << new QStandardItem(tr("<Uploading sound...>"))
         << new QStandardItem(filename);
-    //TODO: #GDM append columns: duration, date added (?)
+    //TODO: #GDM #Business append columns: duration, date added (?)
     appendRow(row);
     emit itemAdded(filename);
 }

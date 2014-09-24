@@ -6,7 +6,7 @@
 
 #include <api/app_server_connection.h>
 
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 #include <utils/resource_property_adaptors.h>
 
 #include <common/common_globals.h>
@@ -50,7 +50,7 @@ public:
     }
 
 private:
-    int m_resourceId;
+    QUuid m_resourceId;
     QScopedPointer<QnPtzHotkeysResourcePropertyAdaptor> m_adaptor;
 };
 
@@ -101,8 +101,8 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
         return;
     QnResourcePtr resource = widget->resource()->toResourcePtr();
 
-    //TODO: #GDM PTZ fix the text
-    if(resource->getStatus() == QnResource::Offline || resource->getStatus() == QnResource::Unauthorized) {
+    //TODO: #GDM #PTZ fix the text
+    if(resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not get position from camera"),
@@ -130,7 +130,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
     QnResourcePtr resource = widget->resource()->toResourcePtr();
 
     if (!widget->ptzController()->hasCapabilities(Qn::PresetsPtzCapability)) {
-        //TODO: #GDM PTZ show appropriate error message?
+        //TODO: #GDM #PTZ show appropriate error message?
         return;
     }
 
@@ -144,7 +144,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
         if (!widget->dewarpingParams().enabled) // do not jump to live if this is a fisheye camera
             action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
     } else {
-        if(resource->getStatus() == QnResource::Offline || resource->getStatus() == QnResource::Unauthorized) {
+        if(resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized) {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Could not set position for camera"),
@@ -153,7 +153,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
             );
             return;
         }
-        //TODO: #GDM PTZ check other cases
+        //TODO: #GDM #PTZ check other cases
     }
 }
 
@@ -178,7 +178,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered() {
         if (!widget->dewarpingParams().enabled) // do not jump to live if this is a fisheye camera
             action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
     } else {
-        if(resource->getStatus() == QnResource::Offline || resource->getStatus() == QnResource::Unauthorized) {
+        if(resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized) {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Could not set position to camera"),
@@ -187,7 +187,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered() {
             );
             return;
         }
-        //TODO: #GDM PTZ check other cases
+        //TODO: #GDM #PTZ check other cases
     }
 }
 
@@ -224,7 +224,7 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
     QnPtzManageDialog* dialog = QnPtzManageDialog::instance();
     assert(dialog);
 
-    if (dialog->isVisible() && !dialog->checkForUnsavedChanges())
+    if (dialog->isVisible() && !dialog->tryClose(false))
         return;
 
     dialog->setController(widget->ptzController());
@@ -261,7 +261,7 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered() {
         getDevicePosition(controller, &cameraPosition);
         qDebug() << "SENT POSITION" << position << "GOT POSITION" << cameraPosition;
 
-        menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(position.z(), 0, 'f', 3)));
+        menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(position.z(), 0, 'f', 4)));
     }
 }
 

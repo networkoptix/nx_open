@@ -7,6 +7,8 @@
 #include "utils/math/math.h"
 #include "utils/common/long_runnable.h"
 #include "utils/common/adaptive_sleep.h"
+#include <utils/common/log.h>
+
 #include "abstract_renderer.h"
 #include "gl_renderer.h"
 #include "buffered_frame_displayer.h"
@@ -41,6 +43,7 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale, int channelNumber)
     m_timeChangeEnabled(true),
     m_bufferedFrameDisplayer(0),
     m_canUseBufferedFrameDisplayer(true),
+    m_rawDataSize(0,0),
     m_speed(1.0),
     m_queueWasFilled(false),
     m_needResetDecoder(false),
@@ -324,7 +327,7 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
 
     m_mtx.lock();
 
-    QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1,0));
+    QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1,0));
     while (dec->decode(emptyData, &tmpFrame)) 
     {
         calcSampleAR(outFrame, dec);
@@ -519,7 +522,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     if ((data->flags & AV_REVERSE_BLOCK_START) && m_decodeMode != QnAbstractVideoDecoder::DecodeMode_Fastest)
     {
-        QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1,0));
+        QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1,0));
         QSharedPointer<CLVideoDecoderOutput> tmpOutFrame( new CLVideoDecoderOutput() );
         while (dec->decode(emptyData, &tmpOutFrame)) 
         {
@@ -570,6 +573,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
             return Status_Skipped;
     }
     m_mtx.unlock();
+    m_rawDataSize = QSize(decodeToFrame->width,decodeToFrame->height);
     if (decodeToFrame->width) {
         if (qFuzzyIsNull(m_overridenAspectRatio)) {
             //qreal sampleAr = decodeToFrame->height > 0 ? (qreal)decodeToFrame->width / (qreal)decodeToFrame->height : 1.0;
@@ -1032,6 +1036,8 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
     if (!anyQuality && (m_lastDisplayedFrame->flags & QnAbstractMediaData::MediaFlags_LowQuality))
         return QImage();    //screenshot will be received from the server
 
+    qreal ar = dec->getWidth() * (qreal) dec->getSampleAspectRatio() / (qreal) dec->getHeight();
+
     // copy image
     QScopedPointer<CLVideoDecoderOutput> srcFrame(new CLVideoDecoderOutput());
     srcFrame->setUseExternalData(false);
@@ -1059,12 +1065,12 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
 
     if (params.enabled) {
         QnContrastImageFilter filter(params);
-        filter.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+        filter.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0), ar);
     }
 
     if (mediaDewarping.enabled && itemDewarping.enabled) {
         QnFisheyeImageFilter filter2(mediaDewarping, itemDewarping);
-        filter2.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+        filter2.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0), ar);
     }
 
     // convert colorSpace

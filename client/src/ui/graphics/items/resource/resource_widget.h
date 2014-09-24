@@ -19,6 +19,7 @@
 #include <ui/common/frame_section_queryable.h>
 #include <ui/common/help_topic_queryable.h>
 #include <ui/animation/animated.h>
+#include <ui/graphics/items/overlays/overlayed.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/instruments/instrumented.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
@@ -35,7 +36,7 @@ class QnImageButtonBar;
 
 class GraphicsLabel;
 
-class QnResourceWidget: public Shaded<Animated<Instrumented<Connective<GraphicsWidget>>>>, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
+class QnResourceWidget: public Overlayed<Shaded<Animated<Instrumented<Connective<GraphicsWidget>>>>>, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
@@ -47,7 +48,7 @@ class QnResourceWidget: public Shaded<Animated<Instrumented<Connective<GraphicsW
     Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
     Q_FLAGS(Options Option)
 
-    typedef Shaded<Animated<Instrumented<Connective<GraphicsWidget>>>> base_type;
+    typedef Overlayed<Shaded<Animated<Instrumented<Connective<GraphicsWidget>>>>> base_type;
 
 public:
     enum Option {
@@ -74,14 +75,6 @@ public:
     };
     Q_DECLARE_FLAGS(Buttons, Button)
 
-    // TODO: #Elric Refactoring needed.
-    enum OverlayVisibility {
-        Invisible,
-        Visible,
-        AutoVisible,
-        UserVisible,
-    };
-
     /**
      * Constructor.
      *
@@ -99,7 +92,7 @@ public:
     /**
      * \returns                         Resource associated with this widget.
      */
-    QnResourcePtr resource() const;
+    const QnResourcePtr &resource() const;
 
     /**
      * \returns                         Workbench item associated with this widget. Never returns NULL.
@@ -148,8 +141,6 @@ public:
 
     const QnResourceWidgetFrameColors &frameColors() const;
     void setFrameColors(const QnResourceWidgetFrameColors &frameColors);
-
-    virtual void setGeometry(const QRectF &geometry) override;
 
     /**
      * \returns                         Aspect ratio of this widget.
@@ -270,13 +261,6 @@ public:
     bool isLocalActive() const;
     void setLocalActive(bool localActive);
 
-    bool isOverlayVisible() const;
-    Q_SLOT void setOverlayVisible(bool visible = true, bool animate = true);
-
-    void addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility = UserVisible, bool autoRotate = false, bool bindToViewport = false, bool placeOverControls = false);
-    void removeOverlayWidget(QGraphicsWidget *widget);
-    OverlayVisibility overlayWidgetVisibility(QGraphicsWidget *widget) const;
-    void setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility);
 
     using base_type::mapRectToScene;
 
@@ -300,7 +284,6 @@ protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
-    virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -330,10 +313,6 @@ protected:
 
     virtual QCursor calculateCursor() const;
     Q_SLOT void updateCursor();
-
-    int overlayWidgetIndex(QGraphicsWidget *widget) const;
-    void updateOverlayWidgetsGeometry();
-    void updateOverlayWidgetsVisibility(bool animate = true);
 
     void updateInfoVisiblity(bool animate = true);
 
@@ -374,16 +353,12 @@ private:
     void setTitleTextInternal(const QString &titleText);
     void setInfoTextInternal(const QString &infoText);
 
+    Q_SLOT void updateCheckedButtons();
+
     Q_SLOT void at_iconButton_visibleChanged();
     Q_SLOT void at_infoButton_toggled(bool toggled);
 
-    struct OverlayWidget {
-        OverlayVisibility visibility;
-        QGraphicsWidget *widget;
-        QGraphicsWidget *childWidget;
-        QnViewportBoundWidget *boundWidget;
-        QnFixedRotationTransform *rotationTransform;
-    };
+    Q_SLOT void at_buttonBar_checkedButtonsChanged();
 
 private:
     friend class QnWorkbenchDisplay;
@@ -426,10 +401,6 @@ private:
     QString m_titleTextFormat, m_infoTextFormat;
     bool m_titleTextFormatHasPlaceholder, m_infoTextFormatHasPlaceholder;
 
-    /** List of overlay widgets. */
-    QList<OverlayWidget> m_overlayWidgets;
-    bool m_overlayVisible;
-
     /* Widgets for overlaid stuff. */
     QnViewportBoundWidget *m_headerOverlayWidget;
     QGraphicsLinearLayout *m_headerLayout;
@@ -452,9 +423,6 @@ private:
 
     /** Whether mouse cursor is in widget. Usable to show/hide decorations. */
     bool m_mouseInWidget;
-
-    /** Fixed rotation angle in degrees. Used to rotate static text and images. */
-    Qn::FixedRotation m_overlayRotation;
 
     QRectF m_zoomRect;
 

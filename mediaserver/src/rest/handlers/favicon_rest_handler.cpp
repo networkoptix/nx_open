@@ -28,13 +28,7 @@ int QnFavIconRestHandler::executeGet(const QString& path, const QnRequestParamLi
     }
 }
 
-int QnFavIconRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnFavIconRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
 {
-    Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
-}
-
-QString QnFavIconRestHandler::description() const
-{
-    return "Returns favico";
 }

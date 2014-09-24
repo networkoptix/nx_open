@@ -89,4 +89,23 @@ private:
 };
 
 
+class QnDebugProxyLabel: public QnProxyLabel {
+    Q_OBJECT
+public:
+    explicit QnDebugProxyLabel(const QString &text, QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
+        QnProxyLabel(text, parent, windowFlags) {init();}
+    explicit QnDebugProxyLabel(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
+        QnProxyLabel(parent, windowFlags) {init();}
+    void setMessagesLimit(int limit);
+    void appendTextQueued(const QString &text);
+    void appendText(const QString &text);
+signals:
+    void textAppended(const QString &text);
+private:
+    void init();
+
+private:
+    int m_messagesLimit;
+};
+
 #endif // QN_PROXY_LABEL_H

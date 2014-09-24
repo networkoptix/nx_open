@@ -2,4 +2,4 @@
 
 #include <utils/common/model_functions.h>
 
-QN_DEFINE_STRUCT_FUNCTIONS(QnItemDewarpingParams,      (json)(eq),    (enabled)(xAngle)(yAngle)(fov)(panoFactor))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnItemDewarpingParams,      (json)(eq),    (enabled)(xAngle)(yAngle)(fov)(panoFactor))

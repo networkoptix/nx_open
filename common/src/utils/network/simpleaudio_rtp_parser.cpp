@@ -1,19 +1,22 @@
+
 #include "simpleaudio_rtp_parser.h"
+
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
 #include "utils/common/synctime.h"
 #include "core/datapacket/media_data_packet.h"
+#include "core/datapacket/audio_data_packet.h"
+
 
 QnSimpleAudioRtpParser::QnSimpleAudioRtpParser():
-    QnRtpAudioStreamParser()
+    QnRtpAudioStreamParser(),
+    m_audioLayout( new QnRtspAudioLayout() )
 {
     m_frequency = 8000;
     m_channels = 1;
     m_codecId = CODEC_ID_PCM_MULAW;
     m_sampleFormat = AV_SAMPLE_FMT_U8;
     m_bits_per_coded_sample = 8;
-
-    m_audioLayout.reset( new QnRtspAudioLayout() );
 }
 
 QnSimpleAudioRtpParser::~QnSimpleAudioRtpParser()
@@ -89,7 +92,7 @@ bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset
         return false;
 
 
-    QnCompressedAudioDataPtr audioData = QnCompressedAudioDataPtr(new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, end - curPtr));
+    QnWritableCompressedAudioDataPtr audioData = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, end - curPtr));
     audioData->compressionType = m_context->ctx()->codec_id;
     audioData->context = m_context;
     if (m_timeHelper) {
@@ -99,7 +102,7 @@ bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset
     else
         audioData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 
-    audioData->data.write((const char*)curPtr, end - curPtr);
+    audioData->m_data.write((const char*)curPtr, end - curPtr);
     result << audioData;
 
     return true;

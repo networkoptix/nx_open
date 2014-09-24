@@ -10,6 +10,14 @@ public:
     QMutex mutex;
     QnTcpListener* owner;
     bool needAuth;
+
+    QnUniversalRequestProcessorPrivate()
+    :
+        processor( nullptr ),
+        owner( nullptr ),
+        needAuth( false )
+    {
+    }
 };
 
 #endif // __UNIVERSAL_REQUEST_PROCESSOR_P_H__

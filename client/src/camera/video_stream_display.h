@@ -13,7 +13,7 @@ extern "C"
 
 
 class QnAbstractVideoDecoder;
-struct QnCompressedVideoData;
+class QnCompressedVideoData;
 class QnAbstractRenderer;
 class QnBufferedFrameDisplayer;
 
@@ -28,6 +28,7 @@ class QnVideoStreamDisplay
     public QnStoppable, public ScreenshotInterface
 {
 public:
+    // TODO: #Elric #enum
     enum FrameDisplayStatus {Status_Displayed, Status_Skipped, Status_Buffered};
 
     QnVideoStreamDisplay(bool can_downscale, int channelNumber);
@@ -89,6 +90,9 @@ private:
     void onNoVideo();
 
     void updateRenderList();
+    const QSize& getRawDataSize() const {
+        return m_rawDataSize;
+    }
 private:
     mutable QMutex m_mtx;
     QMap<CodecID, QnAbstractVideoDecoder*> m_decoder;
@@ -126,7 +130,7 @@ private:
     bool m_timeChangeEnabled;
     QnBufferedFrameDisplayer* m_bufferedFrameDisplayer;
     bool m_canUseBufferedFrameDisplayer;
-
+    QSize m_rawDataSize;
 private:
     float m_speed;
     bool m_queueWasFilled;

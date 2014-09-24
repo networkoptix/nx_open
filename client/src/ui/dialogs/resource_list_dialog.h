@@ -5,7 +5,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include "button_box_dialog.h"
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 class QnResourceListModel;
 
@@ -13,8 +13,10 @@ namespace Ui {
     class ResourceListDialog;
 }
 
-class QnResourceListDialog: public QnButtonBoxDialog {
+class QnResourceListDialog: public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT;
+
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 public:
     QnResourceListDialog(QWidget *parent = NULL);
     virtual ~QnResourceListDialog();
@@ -33,6 +35,9 @@ public:
 
     const QnResourceList &resources() const;
     void setResources(const QnResourceList &resources);
+
+    void showIgnoreCheckbox();
+    bool isIgnoreCheckboxChecked() const;
 
     using QnButtonBoxDialog::exec;
 

@@ -7,7 +7,6 @@ class QnTimeRestHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
-    virtual QString description() const override;
 };
 
 #endif // QN_TIME_REST_HANDLER_H

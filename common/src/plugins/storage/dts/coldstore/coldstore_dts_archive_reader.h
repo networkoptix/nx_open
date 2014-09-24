@@ -1,6 +1,9 @@
 #ifndef coldstore_stream_reader_h1059
 #define coldstore_stream_reader_h1059
-#include "plugins/resources/archive/abstract_archive_delegate.h"
+
+#ifdef ENABLE_COLDSTORE
+
+#include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "../../coldstore/coldstore_api/ISFS.h"
 
 
@@ -37,7 +40,7 @@ public:
     QnColdStoreDelegate(QHostAddress csAddr);
     virtual ~QnColdStoreDelegate();
 
-    virtual bool open(QnResourcePtr resource);
+    virtual bool open(const QnResourcePtr &resource);
     virtual void close();
     virtual qint64 startTime();
     virtual qint64 endTime();
@@ -91,6 +94,6 @@ private:
 };
 
 
-//=======================================================================
+#endif // ENABLE_COLDSTORE
 
 #endif //coldstore_stream_reader_h1059

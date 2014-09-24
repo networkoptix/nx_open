@@ -55,7 +55,7 @@ public:
     virtual void setResolution( const QSize& value );
 
     //!Implementation of QnCodecTranscoder::transcodePacket
-    virtual int transcodePacket( QnAbstractMediaDataPtr inputAU, QnAbstractMediaDataPtr& outputAU );
+    virtual int transcodePacket( const QnAbstractMediaDataPtr& inputAU, QnAbstractMediaDataPtr& outputAU );
 
 private:
     bool m_transcoderInitialized;

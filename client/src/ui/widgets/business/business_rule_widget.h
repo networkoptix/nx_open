@@ -64,8 +64,8 @@ private:
     QnAbstractBusinessParamsWidget *m_eventParameters;
     QnAbstractBusinessParamsWidget *m_actionParameters;
 
-    QMap<BusinessEventType::Value, QnAbstractBusinessParamsWidget*> m_eventWidgetsByType;
-    QMap<BusinessActionType::Value, QnAbstractBusinessParamsWidget*> m_actionWidgetsByType;
+    QMap<QnBusiness::EventType, QnAbstractBusinessParamsWidget*> m_eventWidgetsByType;
+    QMap<QnBusiness::ActionType, QnAbstractBusinessParamsWidget*> m_actionWidgetsByType;
 
     QnResourceList m_dropResources;
 

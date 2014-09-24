@@ -3,7 +3,7 @@
 #include <QtCore/QMetaObject>
 #include <QtCore/QMutexLocker>
 
-#include <utils/common/json.h>
+#include <utils/serialization/json_functions.h>
 #include <utils/common/long_runnable.h>
 
 #include <api/resource_property_adaptor.h>
@@ -34,14 +34,11 @@ QnTourPtzController::~QnTourPtzController() {
 }
 
 bool QnTourPtzController::extends(Qn::PtzCapabilities capabilities) {
-    if (capabilities & Qn::builtinPresetControl)
-        return false;
-    else
-        return 
-            (capabilities & Qn::PresetsPtzCapability) &&
-            ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
-            (capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
-            !(capabilities & Qn::ToursPtzCapability);
+    return 
+        (capabilities & Qn::PresetsPtzCapability) &&
+        ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
+        (capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
+        !(capabilities & Qn::ToursPtzCapability);
 }
 
 Qn::PtzCapabilities QnTourPtzController::getCapabilities() {

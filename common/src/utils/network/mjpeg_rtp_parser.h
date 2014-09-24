@@ -4,9 +4,10 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
 
+#include "core/datapacket/video_data_packet.h"
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
-#include "plugins/resources/arecontvision/tools/AVJpegHeader.h"
+#include "plugins/resource/arecontvision/tools/AVJpegHeader.h"
 
 
 class QnMjpegRtpParser: public QnRtpVideoStreamParser
@@ -21,7 +22,7 @@ private:
     int makeHeaders(quint8 *p, int type, int w, int h, const quint8 *lqt, const quint8 *cqt, u_short dri);
     void updateHeaderTables(const quint8* lummaTable, const quint8* chromaTable);
 private:
-    QnCompressedVideoDataPtr m_videoData;
+    QnWritableCompressedVideoDataPtr m_videoData;
     int m_frequency;
     QnMediaContextPtr m_context;
     //AVJpeg::Header m_jpegHeader;
@@ -30,8 +31,6 @@ private:
     int m_sdpWidth;
     int m_sdpHeight;
 
-    quint8* m_lumaQTPtr;
-    quint8* m_chromaQTPtr;
     int m_lastJpegQ;
 
     int m_hdrQ;

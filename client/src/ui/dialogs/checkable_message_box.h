@@ -12,6 +12,7 @@ class QnCheckableMessageBoxPrivate;
  *
  * Emulates the QDialogButtonBox API with static conveniences. 
  * The message label can open external URLs.
+ * If user cancel the dialog (e.g. with "Esc" button) cancelButton will be returned as a result.
  */
 class QnCheckableMessageBox: public QDialog {
     Q_OBJECT
@@ -34,7 +35,8 @@ public:
         const QString &checkBoxText,
         bool *checkBoxSetting,
         QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Yes | QDialogButtonBox::No,
-        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::No);
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::No,
+        QDialogButtonBox::StandardButton cancelButton = QDialogButtonBox::No);
 
     static QDialogButtonBox::StandardButton
     question(QWidget *parent,
@@ -43,7 +45,8 @@ public:
         const QString &checkBoxText,
         bool *checkBoxSetting,
         QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Yes | QDialogButtonBox::No,
-        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::No);
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::No,
+        QDialogButtonBox::StandardButton cancelButton = QDialogButtonBox::No);
 
     static QDialogButtonBox::StandardButton
     warning(QWidget *parent,
@@ -53,7 +56,8 @@ public:
         const QString &checkBoxText,
         bool *checkBoxSetting,
         QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::Ok);
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::Ok,
+        QDialogButtonBox::StandardButton cancelButton = QDialogButtonBox::Cancel);
 
     static QDialogButtonBox::StandardButton
     warning(QWidget *parent,
@@ -62,10 +66,12 @@ public:
         const QString &checkBoxText,
         bool *checkBoxSetting,
         QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::Ok);
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::Ok,
+        QDialogButtonBox::StandardButton cancelButton = QDialogButtonBox::Cancel);
 
     QString text() const;
     void setText(const QString &);
+    void setRichText(const QString &);
 
     bool isChecked() const;
     void setChecked(bool s);
@@ -88,7 +94,7 @@ public:
     void setIconPixmap(const QPixmap &p);
 
     QAbstractButton *clickedButton() const;
-    QDialogButtonBox::StandardButton clickedStandardButton() const;
+    QDialogButtonBox::StandardButton clickedStandardButton(QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton) const;
 
 private slots:
     void at_buttonBox_clicked(QAbstractButton *b);

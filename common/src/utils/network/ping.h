@@ -14,10 +14,6 @@ class QN_EXPORT CLPing
 public:
     CLPing();
     bool ping(const QString& ip, int retry, int timeoutPerRetry, int packetSize = 32);
-
-private:
-    char m_icmpData[CL_MAX_PING_PACKET];
-    char m_receiveBuffer[CL_MAX_PING_PACKET];
 };
 
 #endif //ping_1750

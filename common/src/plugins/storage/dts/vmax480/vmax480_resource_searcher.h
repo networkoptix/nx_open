@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_VMAX
 
-#include "plugins/resources/upnp/upnp_resource_searcher.h"
+#include "plugins/resource/upnp/upnp_resource_searcher.h"
 
 class CLSimpleHTTPClient;
 
@@ -29,7 +29,7 @@ public:
 protected:
     // return the manufacture of the server
     virtual QString manufacture() const;
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters) override;
+    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams& params) override;
 private:
     QMap<int, QByteArray> getCamNames(const QByteArray& answer);
     bool vmaxAuthenticate(CLSimpleHTTPClient& client, const QAuthenticator& auth);

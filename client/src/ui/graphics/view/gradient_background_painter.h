@@ -5,7 +5,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QScopedPointer>
 
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 
 #include <client/client_color_types.h>
 
@@ -67,7 +67,7 @@ public:
      * \param cycleIntervalSecs         Background animation cycle, in seconds.
      * \param parent                    Context-aware parent.
      */
-    QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent = NULL);
+    QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent = NULL, QnWorkbenchContext *context = NULL);
 
     virtual ~QnGradientBackgroundPainter();
 

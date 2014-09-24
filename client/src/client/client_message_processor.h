@@ -6,7 +6,7 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/resource_fwd.h>
 
-#include <licensing/license.h>
+class QnIncompatibleServerWatcher;
 
 class QnClientMessageProcessor : public QnCommonMessageProcessor
 {
@@ -15,28 +15,28 @@ class QnClientMessageProcessor : public QnCommonMessageProcessor
     typedef QnCommonMessageProcessor base_type;
 public:
     QnClientMessageProcessor();
+    virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
 
-    virtual void run() override;
+    void setHoldConnection(bool holdConnection);
+
 protected:
-    virtual void loadRuntimeInfo(const QnMessage &message) override;
-    virtual void handleConnectionOpened(const QnMessage &message) override;
-    virtual void handleMessage(const QnMessage &message) override;
+    virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) override;
+    virtual void updateResource(const QnResourcePtr &resource) override;
+    virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) override;
+    virtual void processResources(const QnResourceList& resources) override;
 
 private slots:
-
-    void at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url, const QString& origApiUrl);
+    void at_remotePeerFound(ec2::ApiPeerAliveData data);
+    void at_remotePeerLost(ec2::ApiPeerAliveData data);
+    void at_systemNameChangeRequested(const QString &systemName);
+private:
+    void updateServerTmpStatus(const QUuid& id, Qn::ResourceStatus status);
+    void checkForTmpStatus(const QnResourcePtr& resource);
 
 private:
-    void init();
-    void determineOptimalIF(const QnMediaServerResourcePtr &resource);
-    bool updateResource(QnResourcePtr resource, bool insert, bool updateLayouts);
-    void processResources(const QnResourceList& resources);
-    void processLicenses(const QnLicenseList& licenses);
-    void processCameraServerItems(const QnCameraHistoryList& cameraHistoryList);
-    void updateHardwareIds(const QnMessage& message);
-
-private:
-    quint32 m_seqNumber;
+    QSharedPointer<QnIncompatibleServerWatcher> m_incompatibleServerWatcher;
+    bool m_connected;
+    bool m_holdConnection;
 };
 
 #endif // _client_event_manager_h

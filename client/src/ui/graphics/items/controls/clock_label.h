@@ -2,20 +2,28 @@
 #define QN_CLOCK_LABEL_H
 
 #include <QtCore/QObject>
+#include <QtWidgets/QMenu>
 
 #include <ui/graphics/items/standard/graphics_label.h>
 
 class QnClockDataProvider : public QObject {
     Q_OBJECT
 public:
+    enum ClockType
+    {
+        serverClock,
+        localSystemClock
+    };
+
     explicit QnClockDataProvider(const QString fixedFormat = QString(), QObject *parent = 0);
     ~QnClockDataProvider();
+
+    void setClockType( ClockType clockType );
 
 signals:
     void timeChanged(const QString &timeString);
 
 private slots:
-    void at_timer_timeout();
     void updateFormatString();
 
 private:
@@ -30,6 +38,7 @@ private:
     bool m_showDateAndMonth;
     bool m_showSeconds;
     QString m_formatString;
+    ClockType m_clockType;
 };
 
 
@@ -42,8 +51,15 @@ public:
     QnClockLabel(const QString &format, QGraphicsItem *parent = NULL);
     virtual ~QnClockLabel();
 
+protected:
+    virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event ) override;
+
 private:
-    void init(const QString &format);
+    QAction* m_serverTimeAction;
+    QAction* m_localTimeAction;
+    QnClockDataProvider* m_provider;
+
+    void init(const QString& format);
 };
 
 #endif // QN_CLOCK_LABEL_H

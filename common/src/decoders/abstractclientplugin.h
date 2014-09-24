@@ -5,8 +5,7 @@
 #ifndef ABSTRACTCLIENTPLUGIN_H
 #define ABSTRACTCLIENTPLUGIN_H
 
-#include "../utils/common/log.h"
-
+class QnLog;
 
 //!Base class for all dynamically-linked plugins to client
 class QnAbstractClientPlugin

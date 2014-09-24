@@ -31,6 +31,12 @@
 
 #include <winsock2.h>
 #include <Ws2tcpip.h>
+#include <iphlpapi.h>
 #include <Aclapi.h>
+
+#include <set>
+#include <vector>
+#include <algorithm>
+#include <iterator>
 
 // TODO: reference additional headers your program requires here

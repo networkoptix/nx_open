@@ -1,9 +1,13 @@
 #ifndef QN_RESOURCE_SEARCHER_H
 #define QN_RESOURCE_SEARCHER_H
 
-#include <QtNetwork/QHostAddress>
-#include "core/resource/resource.h"
+#include <QtCore/QMutex>
+#include <QtCore/QStringList>
 
+#include <core/resource/resource_factory.h>
+
+class QUrl;
+class QAuthenticator;
 
 /**
  * Interface for resource searcher plugins.
@@ -49,7 +53,7 @@ public:
      * \param resourceTypeId            Identifier of the type to check.
      * \returns                         Whether this factory can be used to create resources of the given type.
      */
-    virtual bool isResourceTypeSupported(QnId resourceTypeId) const;
+    virtual bool isResourceTypeSupported(QUuid resourceTypeId) const;
 
     /**
      * \returns                         Name of the manufacturer for the resources this searcher adds. 

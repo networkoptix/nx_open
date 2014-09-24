@@ -14,7 +14,7 @@ class QnPlVmax480Resource : public QnPhysicalCameraResource
     Q_OBJECT
 
 public:
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     QnPlVmax480Resource();
     virtual ~QnPlVmax480Resource();
@@ -25,7 +25,6 @@ public:
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
 
     virtual bool setHostAddress(const QString &ip, QnDomain domain) override;
-    virtual bool shoudResolveConflicts() const override;
 
     int channelNum() const;
     int videoPort() const;
@@ -41,12 +40,11 @@ public:
 
     void setArchiveRange(qint64 startTimeUsec, qint64 endTimeUsec, bool recursive = true);
 
-    virtual void setStatus(Status newStatus, bool silenceMode = false);
-
     virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     QnTimePeriodList getChunks();
+    virtual Qn::LicenseType licenseType() const override;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 

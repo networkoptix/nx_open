@@ -1,33 +1,32 @@
 
-Template: ${deb.customization.company.name}-mediaserver/appserverHost
-Type: string
-Default:
-Description: Enterprise Controller host:
-
-Template: ${deb.customization.company.name}-mediaserver/appserverPort
-Type: string
-Default:
-Description: Enterprise Controller port:
-
-Template: ${deb.customization.company.name}-mediaserver/appserverPort_invalid
-Type: error
-Description: Enterprise Controller port is invalid. Please try again.
-
-Template: ${deb.customization.company.name}-mediaserver/appserverLogin
-Type: string
-Default:
-Description: Enterprise Controller login:
-
 Template: ${deb.customization.company.name}-mediaserver/appserverPassword
 Type: string
 Default: 
-Description: Enterprise Controller password:
+Description: Admin's password:
 
 Template: ${deb.customization.company.name}-mediaserver/appserverPassword_invalid
 Type: error
-Description: Enterprise Controller can't be empty
+Description: Password can't be empty
 
-Template: ${deb.customization.company.name}-mediaserver/transport
+Template: ${deb.customization.company.name}-mediaserver/port
+Type: string
+Default: 
+Description: Port:
+
+Template: ${deb.customization.company.name}-mediaserver/port_invalid
+Type: error
+Description: Port is invalid
+
+Template: ${deb.customization.company.name}-mediaserver/systemName
+Type: string
+Default:
+Description: System name:
+
+Template: ${deb.customization.company.name}-mediaserver/removeDatabase
 Type: select
-Choices: auto, tcp, udp
-Description: Select preferred transport. If unsure leave default value.
+Choices: ${choices}
+Description: Keep the database, remove or revert to previous version (if any)
+
+Template: ${deb.customization.company.name}-mediaserver/allowCameraChanges
+Type: boolean
+Description: Allow system to optimize cameras settings (Recommended)

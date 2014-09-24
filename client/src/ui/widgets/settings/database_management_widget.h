@@ -4,9 +4,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <utils/common/request_param.h> /* For QnHTTPRawResponse */
-#include <utils/common/connective.h>
-
+#include <ui/widgets/settings/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 struct QnHTTPRawResponse;
@@ -15,37 +13,13 @@ namespace Ui {
     class DatabaseManagementWidget;
 }
 
-// TODO: #Elric #qt5 replace with proper functor
-class QnDatabaseManagementWidgetReplyProcessor: public QObject {
-    Q_OBJECT
-public:
-    QnDatabaseManagementWidgetReplyProcessor(QObject *parent = NULL): QObject(parent), handle(-1) {}
-
-    QnHTTPRawResponse response;
-    int handle;
-
-signals:
-    void activated();
-    void activated(const QnHTTPRawResponse &response, int handle);
-
-public slots:
-    void activate(const QnHTTPRawResponse &response, int handle) {
-        this->response = response;
-        this->handle = handle;
-
-        emit activated();
-        emit activated(response, handle);
-    }
-};
-
-
-class QnDatabaseManagementWidget: public Connective<QWidget>, public QnWorkbenchContextAware {
+class QnDatabaseManagementWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware {
     Q_OBJECT
 
-    typedef Connective<QWidget> base_type;
+    typedef QnAbstractPreferencesWidget base_type;
 
 public:
-    QnDatabaseManagementWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnDatabaseManagementWidget(QWidget *parent = NULL);
     virtual ~QnDatabaseManagementWidget();
 
 private slots:

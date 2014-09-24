@@ -8,6 +8,8 @@
 #include "motion_window.h"
 #include "core/misc/schedule_task.h"
 #include "network_resource.h"
+#include "common/common_globals.h"
+#include "business/business_fwd.h"
 
 class QnAbstractArchiveDelegate;
 
@@ -15,7 +17,7 @@ class QnDataProviderFactory {
 public:
     virtual ~QnDataProviderFactory() {}
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role) = 0;
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role) = 0;
 };
 
 
@@ -24,11 +26,6 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     Q_OBJECT
 
 public:
-    enum StatusFlag {
-        HasIssuesFlag = 0x1
-    };
-    Q_DECLARE_FLAGS(StatusFlags, StatusFlag)
-
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
     Qn::MotionType getCameraBasedMotionType() const;
@@ -38,6 +35,7 @@ public:
     int motionSensWindowCount() const;
 
 
+    bool hasMotion();
     Qn::MotionType getMotionType();
     void setMotionType(Qn::MotionType value);
 
@@ -82,7 +80,20 @@ public:
     /** Returns true if it is a analog camera */
     bool isAnalog() const;
 
+    /** Returns true if it is a analog encoder (described in resource_data.json) */
+    bool isAnalogEncoder() const;
+
+
+    /** Returns true if it is a edge camera */
+    bool isEdge() const;
+
+    /** Returns edge, analog or digital class */
+    virtual Qn::LicenseType licenseType() const;
+
+
+
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
+    void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
 
     virtual QStringList getRelayOutputList() const;
     virtual QStringList getInputPortList() const;
@@ -152,13 +163,22 @@ public:
     int desiredSecondStreamFps() const;
     Qn::StreamQuality getSecondaryStreamQuality() const;
 
-    StatusFlags statusFlags() const;
-    bool hasStatusFlags(StatusFlags value) const;
-    void setStatusFlags(StatusFlags value);
-    void addStatusFlags(StatusFlags value);
-    void removeStatusFlags(StatusFlags value);
+    Qn::CameraStatusFlags statusFlags() const;
+    bool hasStatusFlags(Qn::CameraStatusFlag value) const;
+    void setStatusFlags(Qn::CameraStatusFlags value);
+    void addStatusFlags(Qn::CameraStatusFlag value);
+    void removeStatusFlags(Qn::CameraStatusFlag value);
 
     bool needCheckIpConflicts() const;
+
+    void setMaxDays(int value);
+    int maxDays() const;
+
+    void setMinDays(int value);
+    int minDays() const;
+
+    void setPreferedServerId(const QUuid& value);
+    QUuid preferedServerId() const;
 
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
@@ -188,6 +208,8 @@ signals:
     void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
     void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
     void groupNameChanged(const QnSecurityCamResourcePtr &resource);
+    void motionRegionChanged(const QnResourcePtr &resource);
+    void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 
     //!Emitted on camera input port state has been changed
     /*!
@@ -197,31 +219,32 @@ signals:
         \param timestamp MSecs since epoch, UTC
     */
     void cameraInput(
-        QnResourcePtr resource,
+        const QnResourcePtr& resource,
         const QString& inputPortID,
         bool value,
         qint64 timestamp );
 
 protected slots:
-    virtual void at_disabledChanged();
+    virtual void at_parentIdChanged();
 
 protected:
-    void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) override;
+    void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role) override;
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role) override;
     virtual void initializationDone() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
 
     virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
-    //!MUST be overridden for camera with input port. Default implementation does noting
+    //!MUST be overridden for camera with input port. Default implementation does nothing
     /*!
-        Excess calls of this method is legal and MUST be correctly handled in implementation
+        \warning Excess calls of this method is legal and MUST be correctly handled in implementation
+        \return true, if started input port monitoring
     */
     virtual bool startInputPortMonitoring();
-    //!MUST be overridden for camera with input port. Default implementation does noting
+    //!MUST be overridden for camera with input port. Default implementation does nothing
     /*!
-        Excess calls of this method is legal and MUST be correctly handled in implementation
+        \warning Excess calls of this method is legal and MUST be correctly handled in implementation
     */
     virtual void stopInputPortMonitoring();
     virtual bool isInputPortMonitored() const;
@@ -241,14 +264,16 @@ private:
     QString m_groupId;
     Qn::SecondStreamQuality  m_secondaryQuality;
     bool m_cameraControlDisabled;
-    StatusFlags m_statusFlags;
+    Qn::CameraStatusFlags m_statusFlags;
     bool m_scheduleDisabled;
     bool m_audioEnabled;
     bool m_advancedWorking;
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
-    QString m_firmware;
+    int m_minDays;
+    int m_maxDays;
+    QUuid m_preferedServerId;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

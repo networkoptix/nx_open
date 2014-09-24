@@ -164,6 +164,8 @@ public:
 
 #ifdef Q_OS_WIN
             // TODO: #Elric totally evil workaround for windows, flaw in GetIfTable.
+            // The right way to fix it would be to reimplement this part in windows-specific
+            // monitor to use 64-bit functions.
             if(bytesIn < 0) /* Integer overflow. */
                 bytesIn = bytesIn + std::numeric_limits<unsigned int>::max();
             if(bytesOut < 0) /* Integer overflow. */
@@ -322,7 +324,13 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
         sigar_net_interface_config_t config;
         if (INVOKE(sigar_net_interface_config_get(d->sigar, interfaceName.toLatin1().constData(), &config) != SIGAR_OK))
             continue;
-        if ((config.flags & (SIGAR_IFF_UP | SIGAR_IFF_RUNNING) ) == 0)
+       
+        /* Interface is down. */
+        if ((config.flags & (SIGAR_IFF_UP | SIGAR_IFF_RUNNING) ) != (SIGAR_IFF_UP | SIGAR_IFF_RUNNING) )
+            continue;
+
+        /* Interface has no address (QoS Scheduler or WAN Miniport)  */
+        if (!config.address.addr.in)
             continue;
 
         NetworkLoad load = d->networkLoad(interfaceName);
@@ -334,7 +342,7 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
                 continue; /* Skip entries with duplicate macs. */
 
             /* Detect virtual interfaces. */ 
-            for(int i = 0; i < arraysize(virtualMacs); i++) {
+            for(size_t i = 0; i < arraysize(virtualMacs); i++) {
                 if(memcmp(load.macAddress.bytes(), virtualMacs[i], 3) == 0) {
                     load.type = VirtualInterface;
                     break;

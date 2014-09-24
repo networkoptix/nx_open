@@ -36,12 +36,12 @@ bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     if(target == NULL)
         return false;
 
+    /* Default drag is disabled for videowall items. */
+    if (target->resource()->hasFlags(Qn::videowall))
+        return false;
+
     /* If a user ctrl-drags an item that is not selected, we should select it when dragging starts. */
-    if (event->modifiers() & Qt::ControlModifier) {
-        m_itemToSelect = target;
-    } else {
-        m_itemToSelect.clear();
-    }
+    m_itemToSelect = target;
 
     dragProcessor()->mousePressEvent(viewport, event);
 
@@ -54,6 +54,7 @@ void DragInstrument::startDragProcess(DragInfo *info) {
 }
 
 void DragInstrument::startDrag(DragInfo *info) {
+    qDebug() << "defaultDragInstrument startDrag";
     if(!m_itemToSelect.isNull()) {
         m_itemToSelect.data()->setSelected(true);
         m_itemToSelect.clear();

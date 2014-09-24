@@ -14,6 +14,7 @@ public:
     virtual ~QnWindowsMonitor();
 
     virtual QList<HddLoad> totalHddLoad() override;
+    virtual QList<NetworkLoad> totalNetworkLoad() override;
 
 private:
     Q_DECLARE_PRIVATE(QnWindowsMonitor);

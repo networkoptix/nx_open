@@ -14,8 +14,9 @@
 #include <QtCore/QUrl>
 #include <QSharedPointer>
 
+#include "utils/network/abstract_socket.h"
+
 #include "httpstreamreader.h"
-#include "../aio/aioeventhandler.h"
 
 
 namespace nx_http
@@ -23,7 +24,7 @@ namespace nx_http
     class AsyncHttpClient;
     typedef std::shared_ptr<AsyncHttpClient> AsyncHttpClientPtr;
 
-    //!Http client. All operations are done asynchronously using aio::AIOService
+    //!Http client. All operations are done asynchronously
     /*!
         It is strongly recommended to connect to signals using Qt::DirectConnection and slot should not use blocking calls.
         
@@ -41,12 +42,18 @@ namespace nx_http
     class AsyncHttpClient
     :
         public QObject,
-        public aio::AIOEventHandler,
         public std::enable_shared_from_this<AsyncHttpClient>
     {
         Q_OBJECT
 
     public:
+        // TODO: #Elric #enum
+        enum AuthType {
+            authBasicAndDigest,
+            authDigest,
+            authDigestWithPasswordHash
+        };
+
         enum State
         {
             sInit,
@@ -73,17 +80,26 @@ namespace nx_http
         State state() const;
         //!Returns true, if \a AsyncHttpClient::state() == \a AsyncHttpClient::sFailed
         bool failed() const;
-        //!Start request to \a url
+        //!Start GET request to \a url
         /*!
             \return true, if socket is created and async connect is started. false otherwise
             To get error description use SystemError::getLastOSErrorCode()
         */
         bool doGet( const QUrl& url );
+        //!Start POST request to \a url
+        /*!
+            \todo Infinite POST message body support
+            \return true, if socket is created and async connect is started. false otherwise
+        */
+        bool doPost(
+            const QUrl& url,
+            const nx_http::StringType& contentType,
+            const nx_http::StringType& messageBody );
         /*!
             Response is valid only after signal \a responseReceived() has been emitted
             \return Can be NULL if no response has been received yet
         */
-        const HttpResponse* response() const;
+        const Response* response() const;
         StringType contentType() const;
         //!Returns current message body buffer, clearing it
         /*!
@@ -101,7 +117,17 @@ namespace nx_http
         void setUserAgent( const QString& userAgent );
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
+        void setResponseReadTimeoutMs( int _responseReadTimeoutMs );
+        /*!
+            By default \a true.
+            \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
+        */
+        void setDecodeChunkedMessageBody( bool val );
 
+        QSharedPointer<AbstractStreamSocket> takeSocket();
+
+        void addRequestHeader(const StringType& key, const StringType& value);
+        void setAuthType(AuthType value);
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
         //!Emitted when response headers has been read
@@ -114,7 +140,7 @@ namespace nx_http
         */
         void someMessageBodyAvailable( nx_http::AsyncHttpClientPtr );
         /*!
-            Emmitted when http request is done with any result (successfully executed request and received message body, 
+            Emitted when http request is done with any result (successfully executed request and received message body, 
             received response with error code, connection terminated unexpectedly).
             To get result code use method \a response()
             \note Some message body can still be stored in internal buffer. To read it, call \a AsyncHttpClient::fetchMessageBodyBuffer
@@ -123,13 +149,9 @@ namespace nx_http
         //!Connection to server has been restored after a sudden disconnect
         void reconnected( nx_http::AsyncHttpClientPtr );
 
-    protected:
-        //!Implementation of aio::AIOEventHandler::eventTriggered
-        virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw() override;
-
     private:
         State m_state;
-        HttpRequest m_request;
+        Request m_request;
         QSharedPointer<AbstractStreamSocket> m_socket;
         BufferType m_requestBuffer;
         size_t m_requestBytesSent;
@@ -140,33 +162,31 @@ namespace nx_http
         QString m_userName;
         QString m_userPassword;
         bool m_authorizationTried;
-        std::map<BufferType, BufferType> m_customHeaders;
         bool m_terminated;
         mutable QMutex m_mutex;
         quint64 m_totalBytesRead;
         bool m_contentEncodingUsed;
+        int m_responseReadTimeoutMs;
+        AuthType m_authType;
 
-        bool doGetPrivate( const QUrl& url );
+        void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode );
+        void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten );
+        void onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead );
+
+        void resetDataBeforeNewRequest();
+        bool initiateHttpMessageDelivery( const QUrl& url );
         /*!
             \return Number of bytes, read from socket. -1 in case of read error
         */
-        int readAndParseHttp();
-        void composeRequest();
+        size_t readAndParseHttp( size_t bytesRead );
+        void composeRequest( const nx_http::StringType& httpMethod );
         void serializeRequest();
-        //!Sends request through \a m_socket
-        /*!
-            This method performs exactly one non-blocking send call and updates m_requestBytesSent by sent bytes.
-            Whole request is sent if \a m_requestBytesSent == \a m_requestBuffer.size()
-            \return false in case of send error
-        */
-        bool sendRequest();
         /*!
             \return true, if connected
         */
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
-        bool resendRequestWithAuthorization( const nx_http::HttpResponse& response );
-        void eventTriggeredPrivate( AbstractSocket* sock, PollSet::EventType eventType );
+        bool resendRequestWithAuthorization( const nx_http::Response& response );
 
         static const char* toString( State state );
     };

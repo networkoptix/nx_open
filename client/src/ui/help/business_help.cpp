@@ -2,53 +2,55 @@
 
 #include <ui/help/help_topics.h>
 
-int QnBusiness::eventHelpId(BusinessEventType::Value type) {
+int QnBusiness::eventHelpId(QnBusiness::EventType type) {
     switch (type) {
-    case BusinessEventType::Camera_Motion:
+    case CameraMotionEvent:
         return Qn::EventsActions_CameraMotion_Help;
-    case BusinessEventType::Camera_Input:
+    case CameraInputEvent:
         return Qn::EventsActions_CameraInput_Help;
-    case BusinessEventType::Camera_Disconnect:
+    case CameraDisconnectEvent:
         return Qn::EventsActions_CameraDisconnected_Help;
-    case BusinessEventType::Storage_Failure:
+    case StorageFailureEvent:
         return Qn::EventsActions_StorageFailure_Help;
-    case BusinessEventType::Network_Issue:
+    case NetworkIssueEvent:
         return Qn::EventsActions_NetworkIssue_Help;
-    case BusinessEventType::Camera_Ip_Conflict:
+    case CameraIpConflictEvent:
         return Qn::EventsActions_CameraIpConflict_Help;
-    case BusinessEventType::MediaServer_Failure:
+    case ServerFailureEvent:
         return Qn::EventsActions_MediaServerFailure_Help;
-    case BusinessEventType::MediaServer_Conflict:
+    case ServerConflictEvent:
         return Qn::EventsActions_MediaServerConflict_Help;
-    case BusinessEventType::MediaServer_Started:
+    case ServerStartEvent:
         return Qn::EventsActions_MediaServerStarted_Help;
+    case LicenseIssueEvent:
+        return Qn::EventsActions_LicenseIssue_Help;
     default:
         return -1;
     }
 }
 
-int QnBusiness::actionHelpId(BusinessActionType::Value type) {
+int QnBusiness::actionHelpId(QnBusiness::ActionType type) {
     switch (type) {
-    case BusinessActionType::CameraOutput:
-    case BusinessActionType::CameraOutputInstant:
+    case CameraOutputAction:
+    case CameraOutputOnceAction:
         return Qn::EventsActions_CameraOutput_Help;
-    case BusinessActionType::CameraRecording:
+    case CameraRecordingAction:
         return Qn::EventsActions_StartRecording_Help;
-    case BusinessActionType::PanicRecording:
+    case PanicRecordingAction:
         return Qn::EventsActions_StartPanicRecording_Help;
-    case BusinessActionType::SendMail:
+    case SendMailAction:
         return Qn::EventsActions_SendMail_Help;
-    case BusinessActionType::ShowPopup:
+    case ShowPopupAction:
         return Qn::EventsActions_ShowNotification_Help;
-    case BusinessActionType::PlaySound:
+    case PlaySoundOnceAction:
         return Qn::EventsActions_PlaySound_Help;
-    case BusinessActionType::PlaySoundRepeated:
+    case PlaySoundAction:
         return Qn::EventsActions_PlaySoundRepeated_Help;
-    case BusinessActionType::SayText:
+    case SayTextAction:
         return Qn::EventsActions_Speech_Help;
-    case BusinessActionType::Diagnostics:
+    case DiagnosticsAction:
         return Qn::EventsActions_Diagnostics_Help;
-    case BusinessActionType::Bookmark:
+    case BookmarkAction:
         return -1;
     default:
         return -1;

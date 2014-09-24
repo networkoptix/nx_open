@@ -5,6 +5,7 @@
 #include <QtCore/QStandardPaths>
 #include <QtGui/QDesktopServices>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QColorDialog>
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>
@@ -26,13 +27,25 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workaround/mac_utils.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
-#include <utils/network/nettools.h>
+#include <utils/common/scoped_value_rollback.h>
+#include <utils/math/color_transformations.h>
+
+namespace {
+    const int defaultAlpha = 40;
+}
 
 QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::GeneralPreferencesWidget)
+    ui(new Ui::GeneralPreferencesWidget),
+    m_colorDialog(new QColorDialog()),
+    m_updating(false),
+    m_oldDownmix(false),
+    m_oldDoubleBuffering(false),
+    m_oldLanguage(0),
+    m_oldSkin(0)
 {
     ui->setupUi(this);
 
@@ -51,7 +64,6 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
     setHelpTopic(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
     setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
-    setHelpTopic(ui->networkInterfacesGroupBox,                               Qn::SystemSettings_General_NetworkInterfaces_Help);
     setHelpTopic(ui->lookAndFeelGroupBox,                                     Qn::SystemSettings_General_Customizing_Help);
     setHelpTopic(ui->browseLogsButton,                                        Qn::SystemSettings_General_Logs_Help);
     setHelpTopic(ui->pauseOnInactivityLabel,  ui->pauseOnInactivityCheckBox,  Qn::SystemSettings_General_AutoPause_Help);
@@ -62,24 +74,48 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     setWarningStyle(ui->downmixWarningLabel);
     setWarningStyle(ui->languageWarningLabel);
     setWarningStyle(ui->skinWarningLabel);
+    setWarningStyle(ui->doubleBufferWarningLabel);
+    setWarningStyle(ui->doubleBufferRestartLabel);
     ui->languageWarningLabel->setVisible(false);
     ui->downmixWarningLabel->setVisible(false);
     ui->skinWarningLabel->setVisible(false);
     ui->idleTimeoutWidget->setEnabled(false);
+    ui->doubleBufferRestartLabel->setVisible(false);
 
-    connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
-    connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this,   SLOT(at_addExtraMediaFolderButton_clicked()));
-    connect(ui->removeExtraMediaFolderButton,           SIGNAL(clicked()),                                          this,   SLOT(at_removeExtraMediaFolderButton_clicked()));
-    connect(ui->extraMediaFoldersList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),   this,   SLOT(at_extraMediaFoldersList_selectionChanged()));
+    m_colorDialog->setCurrentColor(defaultBackgroundColor());
 
-    connect(ui->timeModeComboBox,                       SIGNAL(activated(int)),                                     this,   SLOT(at_timeModeComboBox_activated()));
-    connect(ui->clearCacheButton,                       SIGNAL(clicked()),                                          action(Qn::ClearCacheAction), SLOT(trigger()));
-    connect(ui->browseLogsButton,                       SIGNAL(clicked()),                                          this,   SLOT(at_browseLogsButton_clicked()));
+    connect(ui->browseMainMediaFolderButton,            &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_browseMainMediaFolderButton_clicked);
+    connect(ui->addExtraMediaFolderButton,              &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked);
+    connect(ui->removeExtraMediaFolderButton,           &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_removeExtraMediaFolderButton_clicked);
+    connect(ui->extraMediaFoldersList->selectionModel(),&QItemSelectionModel::selectionChanged,                                         
+                                                                                        this,   &QnGeneralPreferencesWidget::at_extraMediaFoldersList_selectionChanged);
+    connect(ui->timeModeComboBox,                       QnComboboxActivated,            this,   &QnGeneralPreferencesWidget::at_timeModeComboBox_activated);
+    connect(ui->browseLogsButton,                       &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_browseLogsButton_clicked);
+    connect(ui->clearCacheButton,                       &QPushButton::clicked,          action(Qn::ClearCacheAction),   &QAction::trigger);
+    connect(ui->pauseOnInactivityCheckBox,              &QCheckBox::toggled,            ui->idleTimeoutWidget,          &QWidget::setEnabled);
+    connect(ui->downmixAudioCheckBox,                   &QCheckBox::toggled,            this,   [this](bool toggled) {
+        ui->downmixWarningLabel->setVisible(m_oldDownmix != toggled);
+    });
+    connect(ui->languageComboBox,                       QnComboboxCurrentIndexChanged,  this,   [this](int index) {
+        ui->languageWarningLabel->setVisible(m_oldLanguage != index);
+    });
+    connect(ui->skinComboBox,                           QnComboboxCurrentIndexChanged,  this,   [this](int index) {
+        ui->skinWarningLabel->setVisible(m_oldSkin != index);
+    });
+    connect(ui->doubleBufferCheckbox,                   &QCheckBox::toggled,            this,   [this](bool toggled) {
+        ui->doubleBufferWarningLabel->setVisible(!toggled);
+        ui->doubleBufferRestartLabel->setVisible(toggled != m_oldDoubleBuffering);
+    });
 
-    connect(ui->downmixAudioCheckBox,                   SIGNAL(toggled(bool)),                                      this,   SLOT(at_downmixAudioCheckBox_toggled(bool)));
-    connect(ui->languageComboBox,                       SIGNAL(currentIndexChanged(int)),                           this,   SLOT(at_languageComboBox_currentIndexChanged(int)));
-    connect(ui->skinComboBox,                           SIGNAL(currentIndexChanged(int)),                           this,   SLOT(at_skinComboBox_currentIndexChanged(int)));
-    connect(ui->pauseOnInactivityCheckBox,              SIGNAL(toggled(bool)),                                      ui->idleTimeoutWidget, SLOT(setEnabled(bool)));
+    connect(ui->selectColorButton,                      &QPushButton::clicked,          this,   [this] {
+        if (m_colorDialog->exec())
+            updateBackgroundColor();
+    });
+
+    connect(ui->defaultBackgroundCheckBox,  &QCheckBox::stateChanged,   this, [this](int state) {
+        ui->selectColorButton->setEnabled(state != Qt::Checked);
+        updateBackgroundColor();
+    });
 }
 
 QnGeneralPreferencesWidget::~QnGeneralPreferencesWidget()
@@ -95,6 +131,7 @@ void QnGeneralPreferencesWidget::submitToSettings() {
     qnSettings->setAutoStart(ui->autoStartCheckBox->isChecked());
     qnSettings->setUserIdleTimeoutMSecs(ui->pauseOnInactivityCheckBox->isChecked() ? ui->idleTimeoutSpinBox->value() * 60 * 1000 : 0);
     qnSettings->setClientSkin(static_cast<Qn::ClientSkin>(ui->skinComboBox->itemData(ui->skinComboBox->currentIndex()).toInt()));
+    qnSettings->setGLDoubleBuffer(ui->doubleBufferCheckbox->isChecked());
 
     QStringList extraMediaFolders;
     for(int i = 0; i < ui->extraMediaFoldersList->count(); i++)
@@ -113,13 +150,23 @@ void QnGeneralPreferencesWidget::submitToSettings() {
                 qnSettings->setTranslationPath(translation.filePaths()[0]);
         }
     }
+
+    if (ui->defaultBackgroundCheckBox->isChecked())
+        qnSettings->setBackgroundColor(QColor());
+    else
+        qnSettings->setBackgroundColor(backgroundColor());
 }
 
 void QnGeneralPreferencesWidget::updateFromSettings() {
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
     ui->mainMediaFolderLabel->setText(QDir::toNativeSeparators(qnSettings->mediaFolder()));
 
     m_oldDownmix = qnSettings->isAudioDownmixed();
     ui->downmixAudioCheckBox->setChecked(m_oldDownmix);
+
+    m_oldDoubleBuffering = qnSettings->isGlDoubleBuffer();
+    ui->doubleBufferCheckbox->setChecked(m_oldDoubleBuffering);
 
     m_oldSkin = ui->skinComboBox->findData(qnSettings->clientSkin());
     ui->skinComboBox->setCurrentIndex(m_oldSkin);
@@ -138,10 +185,6 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     foreach (const QString &extraMediaFolder, qnSettings->extraMediaFolders())
         ui->extraMediaFoldersList->addItem(QDir::toNativeSeparators(extraMediaFolder));
 
-    ui->networkInterfacesList->clear();
-    foreach (const QNetworkAddressEntry &entry, getAllIPv4AddressEntries())
-        ui->networkInterfacesList->addItem(tr("IP Address: %1, Network Mask: %2").arg(entry.ip().toString()).arg(entry.netmask().toString()));
-
     m_oldLanguage = 0;
     QString translationPath = qnSettings->translationPath();
     for(int i = 0; i < ui->languageComboBox->count(); i++) {
@@ -152,6 +195,13 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
         }
     }
     ui->languageComboBox->setCurrentIndex(m_oldLanguage);
+
+    m_oldBackgroundColor = qnSettings->backgroundColor();
+    ui->defaultBackgroundCheckBox->setChecked(!qnSettings->backgroundColor().isValid());
+    m_colorDialog->setCurrentColor(qnSettings->backgroundColor().isValid() 
+        ? withAlpha(qnSettings->backgroundColor(), 255)
+        : defaultBackgroundColor());
+    updateBackgroundColor();
 }
 
 bool QnGeneralPreferencesWidget::confirm() {
@@ -161,6 +211,7 @@ bool QnGeneralPreferencesWidget::confirm() {
 #endif
 
     if (m_oldDownmix != ui->downmixAudioCheckBox->isChecked() ||
+        m_oldDoubleBuffering != ui->doubleBufferCheckbox->isChecked() ||
         m_oldLanguage != ui->languageComboBox->currentIndex() ||
         m_oldSkin != ui->skinComboBox->currentIndex())
     {
@@ -184,11 +235,40 @@ bool QnGeneralPreferencesWidget::confirm() {
     return true;
 }
 
+bool QnGeneralPreferencesWidget::discard() {
+    qnSettings->setBackgroundColor(m_oldBackgroundColor);
+    return true;
+}
+
+
 void QnGeneralPreferencesWidget::initTranslations() {
     QnTranslationListModel *model = new QnTranslationListModel(this);
     model->setTranslations(qnCommon->instance<QnClientTranslationManager>()->loadTranslations());
     ui->languageComboBox->setModel(model);
 }
+
+QColor QnGeneralPreferencesWidget::defaultBackgroundColor() const {
+    return qnSettings->defaultBackgroundColor();
+}
+
+QColor QnGeneralPreferencesWidget::backgroundColor() const {
+    if (ui->defaultBackgroundCheckBox->isChecked())
+        return defaultBackgroundColor();
+    QColor opaque = m_colorDialog->currentColor();
+    return withAlpha(opaque, defaultBackgroundColor().isValid() 
+        ? defaultBackgroundColor().alpha()
+        : defaultAlpha);
+}
+
+void QnGeneralPreferencesWidget::updateBackgroundColor() {
+    QPixmap pixmap(16, 16);
+    pixmap.fill(withAlpha(backgroundColor(), 255));
+    ui->selectColorButton->setIcon(pixmap);
+
+    if (!m_updating)
+        qnSettings->setBackgroundColor(backgroundColor());
+}
+
 
 #include "ui/workaround/mac_utils.h"
 // -------------------------------------------------------------------------- //
@@ -236,18 +316,6 @@ void QnGeneralPreferencesWidget::at_timeModeComboBox_activated() {
     if(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex(), Qt::UserRole).toInt() == Qn::ClientTimeMode) {
         QMessageBox::warning(this, tr("Warning"), tr("This option will not affect Recording Schedule. \nRecording Schedule is always based on Server Time."));
     }
-}
-
-void QnGeneralPreferencesWidget::at_downmixAudioCheckBox_toggled(bool checked) {
-    ui->downmixWarningLabel->setVisible(m_oldDownmix != checked);
-}
-
-void QnGeneralPreferencesWidget::at_languageComboBox_currentIndexChanged(int index) {
-    ui->languageWarningLabel->setVisible(m_oldLanguage != index);
-}
-
-void QnGeneralPreferencesWidget::at_skinComboBox_currentIndexChanged(int index) {
-    ui->skinWarningLabel->setVisible(m_oldSkin != index);
 }
 
 void QnGeneralPreferencesWidget::at_browseLogsButton_clicked() {

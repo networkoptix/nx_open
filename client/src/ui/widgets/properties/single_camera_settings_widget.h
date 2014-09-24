@@ -2,12 +2,22 @@
 #define CAMERA_SETTINGS_DIALOG_H
 
 #include <QtWidgets/QWidget>
-#include "api/media_server_connection.h"
-#include <core/resource/resource_fwd.h>
-#include "camera_settings_tab.h"
+#include <QtNetwork/QNetworkReply>
+
+#ifdef QT_WEBKITWIDGETS_LIB
+#include <QtWebKitWidgets/QtWebKitWidgets>
+#endif
+
 #include "utils/camera_advanced_settings_xml_parser.h"
-#include "ui/workbench/workbench_context_aware.h"
 #include "utils/common/connective.h"
+
+#include <core/resource/resource_fwd.h>
+
+#include "api/media_server_connection.h"
+
+#include "ui/workbench/workbench_context_aware.h"
+
+#include "camera_settings_tab.h"
 
 namespace Ui {
     class SingleCameraSettingsWidget;
@@ -17,6 +27,10 @@ class QVBoxLayout;
 class QnCameraMotionMaskWidget;
 class QnCameraSettingsWidgetPrivate;
 class QnImageProvider;
+
+#ifdef QT_WEBKITWIDGETS_LIB
+class CameraAdvancedSettingsWebPage;
+#endif
 
 class QnSingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -87,10 +101,13 @@ public:
     /** Check if motion region is valid */
     bool isValidMotionRegion();
 
+    /** Check if second stream is enabled if there are Motion+LQ tasks in schedule. */
+    bool isValidSecondStream();
+
     void setExportScheduleButtonEnabled(bool enabled);
 
 public slots:
-    void setAdvancedParam(const CameraSetting& val);
+    void at_advancedParamChanged(const CameraSetting& val);
     void refreshAdvancedSettings();
 
 signals:
@@ -145,16 +162,22 @@ private:
     void disconnectFromMotionWidget();
     void connectToMotionWidget();
 
-    void initAdvancedTab();
+    bool initAdvancedTab();
     void loadAdvancedSettings();
 
     void cleanAdvancedSettings();
+#ifdef QT_WEBKITWIDGETS_LIB
+    void updateWebPage(QStackedLayout* stackedLayout , QWebView* advancedWebView);
+#endif
+    Q_SLOT void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
+    Q_SLOT void at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator);
 
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
+    QMutex m_cameraMutex;
     QnVirtualCameraResourcePtr m_camera;
     bool m_cameraSupportsMotion;
 
@@ -186,7 +209,11 @@ private:
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
     mutable QnMediaServerConnectionPtr m_serverConnection;
 
-    QHash<int, QnImageProvider*> m_imageProvidersByResourceId;
+    QHash<QUuid, QnImageProvider*> m_imageProvidersByResourceId;
+	QUrl m_lastCameraPageUrl;
+#ifdef QT_WEBKITWIDGETS_LIB
+    CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
+#endif
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

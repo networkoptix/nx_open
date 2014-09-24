@@ -14,7 +14,7 @@ public:
      * @brief checkCondition
      * @params params 'camera' - optional camera unique ID
      */
-    bool checkCondition(Qn::ToggleState state, const QnBusinessEventParameters& params) const override;
+    bool checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters& params) const override;
 };
 
 typedef QSharedPointer<QnCameraDisconnectedBusinessEvent> QnCameraDisconnectedBusinessEventPtr;

@@ -1,9 +1,13 @@
 #include "coldstore_writer.h"
+
+#ifdef ENABLE_COLDSTORE
+
+#include "coldstore_storage_helper.h"
 #include "coldstore_storage.h"
 #include "utils/common/sleep.h"
 
 
-QnColdStoreWriter::QnColdStoreWriter(QnResourcePtr res):
+QnColdStoreWriter::QnColdStoreWriter(const QnResourcePtr& res):
 QnResourceConsumer(res)
 {
     
@@ -73,3 +77,5 @@ QnPlColdStoreStoragePtr QnColdStoreWriter::storage() const
 {
     return getResource().dynamicCast<QnPlColdStoreStorage>();
 }
+
+#endif // ENABLE_COLDSTORE

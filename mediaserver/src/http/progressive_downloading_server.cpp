@@ -1,45 +1,40 @@
+#include "progressive_downloading_server.h"
 
 #include <memory>
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QSettings>
 #include <QtCore/QUrlQuery>
-#include "progressive_downloading_server.h"
+
+#include <server/server_globals.h>
+
+#include <utils/common/log.h>
+#include "utils/common/util.h"
+#include "utils/common/model_functions.h"
 #include <utils/fs/file.h>
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
+
+#include "core/resource_management/resource_pool.h"
+#include "core/dataconsumer/abstract_data_consumer.h"
+#include "core/resource/camera_resource.h"
+
+#include "plugins/resource/archive/archive_stream_reader.h"
+#include "plugins/resource/server_archive/server_archive_delegate.h"
+
 #include "transcoding/transcoder.h"
 #include "transcoding/ffmpeg_transcoder.h"
 #include "camera/video_camera.h"
-#include "core/resource_management/resource_pool.h"
 #include "camera/camera_pool.h"
-#include "core/dataconsumer/abstract_data_consumer.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
-#include "device_plugins/server_archive/server_archive_delegate.h"
-#include "utils/common/util.h"
-#include "core/resource/camera_resource.h"
-#include "cached_output_stream.h"
 #include "network/authenticate_helper.h"
+
 #include <media_server/settings.h>
+
+#include "cached_output_stream.h"
+
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
-
-QnProgressiveDownloadingServer::QnProgressiveDownloadingServer(const QHostAddress& address, int port):
-    QnTcpListener(address, port)
-{
-
-}
-
-QnProgressiveDownloadingServer::~QnProgressiveDownloadingServer()
-{
-
-}
-
-QnTCPConnectionProcessor* QnProgressiveDownloadingServer::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner)
-{
-    return new QnProgressiveDownloadingConsumer(clientSocket, owner);
-}
 
 // -------------------------- QnProgressiveDownloadingDataConsumer ---------------------
 
@@ -117,7 +112,7 @@ protected:
             return QnAbstractDataConsumer::canAcceptData();
     }
 
-    void putData(QnAbstractDataPacketPtr data) override
+    void putData(const QnAbstractDataPacketPtr& data) override
     {
         if (m_liveMode)
         {
@@ -127,7 +122,7 @@ protected:
                 return;
             }
         }
-        QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+        const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>(data.data());
         if (m_needKeyData && media)
         {
             if (!(media->flags & AV_PKT_FLAG_KEY))
@@ -139,13 +134,13 @@ protected:
     }
 
 
-    virtual bool processData(QnAbstractDataPacketPtr data) override
+    virtual bool processData(const QnAbstractDataPacketPtr& data) override
     {
         if( m_standFrameDuration )
             doRealtimeDelay( data );
 
 
-        QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+        const QnAbstractMediaDataPtr& media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
 
         if (media->dataType == QnAbstractMediaData::EMPTY_DATA) {
             if (media->timestamp == DATETIME_NOW)
@@ -316,10 +311,8 @@ public:
 };
 
 static QAtomicInt QnProgressiveDownloadingConsumer_count = 0;
-static const QLatin1String PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME("progressiveDownloading/sessionLiveTimeSec");
 static const QLatin1String DROP_LATE_FRAMES_PARAM_NAME( "dlf" );
 static const QLatin1String STAND_FRAME_DURATION_PARAM_NAME( "sfd" );
-static const int DEFAULT_MAX_CONNECTION_LIVE_TIME = 30*60;    //30 minutes
 static const int MS_PER_SEC = 1000;
 
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
@@ -338,7 +331,9 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointe
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 
-    const int sessionLiveTimeoutSec = MSSettings::roSettings()->value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME ).toUInt();
+    const int sessionLiveTimeoutSec = MSSettings::roSettings()->value(
+        nx_ms_conf::PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME,
+        nx_ms_conf::DEFAULT_PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME ).toUInt();
     if( sessionLiveTimeoutSec > 0 )
         d->killTimerID = TimerManager::instance()->addTimer(
             this,
@@ -379,6 +374,10 @@ QByteArray QnProgressiveDownloadingConsumer::getMimeType(const QByteArray& strea
         return "video/3gp";
     else if (streamingFormat == "rtp")
         return "video/3gp";
+    else if (streamingFormat == "flv")
+        return "video/x-flv";
+    else if (streamingFormat == "f4v")
+        return "video/x-f4v";
     else if (streamingFormat == "mpjpeg")
         return "multipart/x-mixed-replace;boundary=--ffserver";
     else 
@@ -401,6 +400,10 @@ void QnProgressiveDownloadingConsumer::updateCodecByFormat(const QByteArray& str
         d->videoCodec = CODEC_ID_MPEG4;
     else if (streamingFormat == "mpjpeg")
         d->videoCodec = CODEC_ID_MJPEG;
+    else if (streamingFormat == "flv")
+        d->videoCodec = CODEC_ID_H264;  //TODO #ak need to use "copy"
+    else if (streamingFormat == "f4v")
+        d->videoCodec = CODEC_ID_H264;  //TODO #ak need to use "copy"
 }
 
 void QnProgressiveDownloadingConsumer::run()
@@ -427,12 +430,12 @@ void QnProgressiveDownloadingConsumer::run()
         const QString& requestedResourcePath = QnFile::fileName(getDecodedUrl().path());
         const int nameFormatSepPos = requestedResourcePath.lastIndexOf( QLatin1Char('.') );
         const QString& resUniqueID = requestedResourcePath.mid(0, nameFormatSepPos);
-        d->streamingFormat = nameFormatSepPos == -1 ? QByteArray() : requestedResourcePath.mid( nameFormatSepPos+1 ).toLocal8Bit();
+        d->streamingFormat = nameFormatSepPos == -1 ? QByteArray() : requestedResourcePath.mid( nameFormatSepPos+1 ).toLatin1();
         QByteArray mimeType = getMimeType(d->streamingFormat);
         if (mimeType.isEmpty())
         {
             d->responseBody = QByteArray("Unsupported streaming format ") + mimeType;
-            sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
+            sendResponse(CODE_NOT_FOUND, "text/plain");
             return;
         }
         updateCodecByFormat(d->streamingFormat);
@@ -440,7 +443,7 @@ void QnProgressiveDownloadingConsumer::run()
         const QUrlQuery decodedUrlQuery( getDecodedUrl() );
 
         QSize videoSize(640,480);
-        QByteArray resolutionStr = decodedUrlQuery.queryItemValue("resolution").toLocal8Bit().toLower();
+        QByteArray resolutionStr = decodedUrlQuery.queryItemValue("resolution").toLatin1().toLower();
         if (resolutionStr.endsWith('p'))
             resolutionStr = resolutionStr.left(resolutionStr.length()-1);
         QList<QByteArray> resolution = resolutionStr.split('x');
@@ -458,7 +461,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         Qn::StreamQuality quality = Qn::QualityNormal;
         if( decodedUrlQuery.hasQueryItem(QnCodecParams::quality) )
-            quality = Qn::fromString<Qn::StreamQuality>(decodedUrlQuery.queryItemValue(QnCodecParams::quality));
+            quality = QnLexical::deserialized<Qn::StreamQuality>(decodedUrlQuery.queryItemValue(QnCodecParams::quality), Qn::QualityNotDefined);
 
         QnCodecParams::Value codecParams;
         QList<QPair<QString, QString> > queryItems = decodedUrlQuery.queryItems();
@@ -473,8 +476,8 @@ void QnProgressiveDownloadingConsumer::run()
         QnResourcePtr resource = qnResPool->getResourceByUniqId(resUniqueID);
         if (resource == 0)
         {
-            d->responseBody = QByteArray("Resource with unicId ") + QByteArray(resUniqueID.toLocal8Bit()) + QByteArray(" not found ");
-            sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
+            d->responseBody = QByteArray("Resource with unicId ") + QByteArray(resUniqueID.toLatin1()) + QByteArray(" not found ");
+            sendResponse(CODE_NOT_FOUND, "text/plain");
             return;
         }
 
@@ -484,17 +487,17 @@ void QnProgressiveDownloadingConsumer::run()
 
         if (d->transcoder.setVideoCodec(
                 d->videoCodec,
-                QnTranscoder::TM_FfmpegTranscode,
+                d->videoCodec == CODEC_ID_H264 ? QnTranscoder::TM_DirectStreamCopy : QnTranscoder::TM_FfmpegTranscode,
                 quality,
                 videoSize,
                 -1,
                 codecParams ) != 0 )
         {
             QByteArray msg;
-            msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder.getLastErrorMessage().toLocal8Bit();
+            msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder.getLastErrorMessage().toLatin1();
             qWarning() << msg;
             d->responseBody = msg;
-            sendResponse("HTTP", CODE_INTERNAL_ERROR, "plain/text");
+            sendResponse(CODE_INTERNAL_ERROR, "plain/text");
             return;
         }
 
@@ -510,7 +513,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
 
-        QByteArray position = decodedUrlQuery.queryItemValue("pos").toLocal8Bit();
+        QByteArray position = decodedUrlQuery.queryItemValue("pos").toLatin1();
         bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
 
@@ -528,26 +531,21 @@ void QnProgressiveDownloadingConsumer::run()
 
         if (isLive)
         {
-            if (resource->getStatus() != QnResource::Online && resource->getStatus() != QnResource::Recording)
-            {
-                d->responseBody = "Video camera is not ready yet";
-                sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
-                return;
-            }
+            //if camera is offline trying to put it online
 
             if (isUTCRequest)
             {
                 d->responseBody = "now";
-                sendResponse("HTTP", CODE_OK, "text/plain");
+                sendResponse(CODE_OK, "text/plain");
                 return;
             }
 
             if (!camera) {
-                d->responseBody = "Media not found";
-                sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
+                d->responseBody = "Media not found\r\n";
+                sendResponse(CODE_NOT_FOUND, "text/plain");
                 return;
             }
-            QnLiveStreamProviderPtr liveReader = camera->getLiveReader(QnResource::Role_LiveVideo);
+            QnLiveStreamProviderPtr liveReader = camera->getLiveReader(QnServer::HiQualityCatalog);
             dataProvider = liveReader;
             if (liveReader) {
                 dataConsumer.copyLastGopFromCamera(camera);
@@ -579,7 +577,7 @@ void QnProgressiveDownloadingConsumer::run()
                     int counter = 0;
                     while (counter < 20)
                     {
-                        QnAbstractMediaDataPtr data = archive->getNextData();
+                        const QnAbstractMediaDataPtr& data = archive->getNextData();
                         if (data)
                         {
                             if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO) 
@@ -597,26 +595,26 @@ void QnProgressiveDownloadingConsumer::run()
                     }
 
                     QByteArray ts("\"now\"");
-                    QByteArray callback = decodedUrlQuery.queryItemValue("callback").toLocal8Bit();
+                    QByteArray callback = decodedUrlQuery.queryItemValue("callback").toLatin1();
                     if (timestamp != (qint64)AV_NOPTS_VALUE)
                     {
                         if (utcFormatOK)
                             ts = QByteArray::number(timestamp/1000);
                         else
-                            ts = QByteArray("\"") + QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLocal8Bit() + QByteArray("\"");
+                            ts = QByteArray("\"") + QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLatin1() + QByteArray("\"");
                     }
                     d->responseBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});"); 
-                    sendResponse("HTTP", CODE_OK, "application/json");
+                    sendResponse(CODE_OK, "application/json");
                 }
                 else {
-                    sendResponse("HTTP", CODE_INTERNAL_ERROR, "application/json");
+                    sendResponse(CODE_INTERNAL_ERROR, "application/json");
 
                 }
                 delete archive;
                 return;
             }
 
-            d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (resource->createDataProvider(QnResource::Role_Archive)));
+            d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (resource->createDataProvider(Qn::CR_Archive)));
             d->archiveDP->open();
             d->archiveDP->jumpTo(timeMs, timeMs);
             d->archiveDP->start();
@@ -625,29 +623,25 @@ void QnProgressiveDownloadingConsumer::run()
         
         if (dataProvider == 0)
         {
-            d->responseBody = "Video camera is not ready yet";
-            sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
+            d->responseBody = "Video camera is not ready yet\r\n";
+            sendResponse(CODE_NOT_FOUND, "text/plain");
             return;
         }
 
         if (d->transcoder.setContainer(d->streamingFormat) != 0)
         {
             QByteArray msg;
-            msg = QByteArray("Transcoding error. Can not setup output format:") + d->transcoder.getLastErrorMessage().toLocal8Bit();
+            msg = QByteArray("Transcoding error. Can not setup output format:") + d->transcoder.getLastErrorMessage().toLatin1();
             qWarning() << msg;
             d->responseBody = msg;
-            sendResponse("HTTP", CODE_INTERNAL_ERROR, "plain/text");
+            sendResponse(CODE_INTERNAL_ERROR, "plain/text");
             return;
         }
 
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;
-#ifdef USE_NX_HTTP
-        d->response.headers["Cache-Control"] = "no-cache";
-#else
-        d->responseHeaders.setValue("Cache-Control", "no-cache");
-#endif
-        sendResponse("HTTP", CODE_OK, mimeType);
+        d->response.headers.insert( std::make_pair("Cache-Control", "no-cache") );
+        sendResponse(CODE_OK, mimeType);
 
         //dataConsumer.sendResponse();
         dataConsumer.start();

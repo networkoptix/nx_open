@@ -1,10 +1,14 @@
 #ifndef QN_SERVER_MESSAGE_PROCESSOR_H
 #define QN_SERVER_MESSAGE_PROCESSOR_H
 
-#include <QtCore/QWaitCondition>
 #include <api/common_message_processor.h>
 
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
+#include "nx_ec/impl/ec_api_impl.h"
+#include "nx_ec/data/api_server_alive_data.h"
+#include <utils/network/http/httptypes.h>
+
+class QHostAddress;
 
 class QnServerMessageProcessor : public QnCommonMessageProcessor
 {
@@ -14,33 +18,27 @@ class QnServerMessageProcessor : public QnCommonMessageProcessor
 public:
     QnServerMessageProcessor();
 
-    void run();
-
-    void resume();
-
+    virtual void updateResource(const QnResourcePtr &resource) override;
+    bool isProxy(const nx_http::Request& request) const;
 protected:
-    virtual void loadRuntimeInfo(const QnMessage &message) override;
-    virtual void handleConnectionOpened(const QnMessage &message) override;
-    virtual void handleConnectionClosed(const QString &errorString) override;
-    virtual void handleMessage(const QnMessage &message) override;
-
-private:
-    void pause();
-    void updateResource(const QnResourcePtr& resource);
+    virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus ) override;
+    virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
+    virtual void afterRemovingResource(const QUuid& id) override;
+    void execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) override;
+    bool isLocalAddress(const QString& addr) const;
+    virtual bool canRemoveResource(const QUuid& resourceId) override;
+    virtual void removeResourceIgnored(const QUuid& resourceId) override;
 
 private slots:
-    void at_aboutToBeStarted();
-    void at_serverSaved(int status, const QnResourceList &, int);
+    void at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
+    void at_updateInstallationRequested(const QString &updateId);
 
-signals:
-    void aboutToBeStarted();
-
+    void at_systemNameChangeRequested(const QString &systemName);
+    void at_remotePeerUnauthorized(const QUuid& id);
 private:
-    QScopedPointer<QThread> m_thread;
-
-    bool m_paused;
-    QMutex m_mutex;
-    QWaitCondition m_cond;
+    mutable QMutex m_mutexAddrList;
+    const int m_serverPort;
+    mutable QnMediaServerResourcePtr m_mServer;
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H

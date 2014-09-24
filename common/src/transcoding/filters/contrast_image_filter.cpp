@@ -1,5 +1,8 @@
 #include "contrast_image_filter.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include <utils/media/frame_info.h>
 #include <utils/math/math.h>
 
 QnContrastImageFilter::QnContrastImageFilter(const ImageCorrectionParams& params):
@@ -22,7 +25,7 @@ static const __m128i  sse_0000_intrs  = _mm_setr_epi32(0x00000000, 0x00000000, 0
     //TODO: C fallback routine
 #endif
 
-void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect)
+void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar)
 {
     static const float GAMMA_EPS = 0.01f;
 
@@ -125,3 +128,5 @@ void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRect
     //TODO: C fallback routine
 #endif
 }
+
+#endif // ENABLE_DATA_PROVIDERS

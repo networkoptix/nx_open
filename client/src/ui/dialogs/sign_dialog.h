@@ -4,7 +4,9 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QVBoxLayout>
 
-#include "plugins/resources/archive/avi_files/avi_resource.h"
+#include <core/resource/resource_fwd.h>
+
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 class QDataWidgetMapper;
 class QStandardItemModel;
@@ -17,13 +19,16 @@ class QnSignDialogGlWidget;
 class QnCamDisplay;
 class QnSignInfo;
 
+class QnAviResource;
+
 namespace Ui {
     class SignDialog;
 }
 
-class SignDialog : public QDialog {
+class SignDialog : public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT;
 
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 public:
     explicit SignDialog(QnResourcePtr resource, QWidget *parent = 0);
     virtual ~SignDialog();
@@ -45,7 +50,7 @@ private:
 
     QScopedPointer<Ui::SignDialog> ui;
     
-    QnAviResourcePtr m_resource;
+    QnSharedResourcePointer<QnAviResource> m_resource;
 
     QnCamDisplay *m_camDispay;
     QnAbstractArchiveReader *m_reader;

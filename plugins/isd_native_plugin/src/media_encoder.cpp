@@ -17,9 +17,10 @@
 
 static const QLatin1String localhost( "127.0.0.1" );
 static const int DEFAULT_ISD_PORT = 80;
-static const int ISD_HTTP_REQUEST_TIMEOUT = 3000;
+static const int ISD_HTTP_REQUEST_TIMEOUT = 6000;
 static const int PRIMARY_ENCODER_NUMBER = 0;
 static const int SECONDARY_ENCODER_NUMBER = 1;
+static const int MAX_FPS = 30;
 
 static QStringList getValues(const QString& line)
 {
@@ -35,11 +36,6 @@ static QStringList getValues(const QString& line)
     return values.split(QLatin1Char(','));
 }
 
-static bool sizeCompare(const QSize &s1, const QSize &s2)
-{
-    return s1.width() > s2.width();
-}
-
 
 MediaEncoder::MediaEncoder(
     CameraManager* const cameraManager,
@@ -48,10 +44,15 @@ MediaEncoder::MediaEncoder(
     m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),
     m_encoderNum( encoderNum ),
+    m_motionMask( nullptr ),
     m_fpsListRead( false ),
     m_resolutionListRead( false ),
-    m_motionMask( 0 ),
     m_audioEnabled( false )
+#ifdef BITRATE_IS_PER_GOP
+    , m_currentFps( MAX_FPS )
+    , m_desiredStreamBitrateKbps( 0 )
+    , m_fpsUsedToCalcBitrate( 0.0 )
+#endif
 {
 }
 
@@ -121,12 +122,23 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
     return result;
 }
 
+static const int FULL_HD_LINES = 1080;
+static const int _4K_MAX_BITRATE_KBPS = 20*1024;
+static const int FULL_HD_MAX_BITRATE = 8*1024;
+
 int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
 {
+    if( !m_resolutionListRead )
+    {
+        int result = getSupportedResolution();
+        if( result != nxcip::NX_NO_ERROR )
+            return result;
+    }
+
     if( m_encoderNum == PRIMARY_ENCODER_NUMBER )
-        *maxBitrate = 6*1024;
+        *maxBitrate = m_maxResolution.height > FULL_HD_LINES ? _4K_MAX_BITRATE_KBPS : FULL_HD_MAX_BITRATE;
     else if( m_encoderNum == SECONDARY_ENCODER_NUMBER )
-        *maxBitrate = 1*1024;
+        *maxBitrate = (m_maxResolution.height > FULL_HD_LINES ? _4K_MAX_BITRATE_KBPS : FULL_HD_MAX_BITRATE) / 8;
     else
         *maxBitrate = 0;
     return nxcip::NX_NO_ERROR;
@@ -139,8 +151,27 @@ int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
 
 int MediaEncoder::setFps( const float& fps, float* selectedFps )
 {
+    //std::cout<<"MediaEncoder::setFps. "<<fps<<std::endl;
     *selectedFps = fps;
-    return setCameraParam( QString::fromLatin1("VideoInput.1.h264.%1.FrameRate=%2\r\n").arg(m_encoderNum+1).arg(fps) );
+    int result = setCameraParam( QString::fromLatin1("VideoInput.1.h264.%1.FrameRate=%2\r\n").arg(m_encoderNum+1).arg(fps) );
+    if( result )
+        return result;
+#ifdef BITRATE_IS_PER_GOP
+    m_currentFps = *selectedFps;
+    //if bitrate has been set previously, updating it, since fps changed
+    if( m_desiredStreamBitrateKbps > 0      //bitrate has been set previously
+        && *selectedFps > 0
+        && m_fpsUsedToCalcBitrate != *selectedFps )
+    {
+        m_fpsUsedToCalcBitrate = *selectedFps;
+        int bitrateKbps = (int64_t)m_desiredStreamBitrateKbps * MAX_FPS / m_fpsUsedToCalcBitrate;
+        //std::cout<<"MediaEncoder::setFps. setting bitrate to "<<bitrateKbps<<" Kbps"<<std::endl;
+        return setCameraParam( QString::fromLatin1("VideoInput.1.h264.%1.BitRate=%2\r\n").arg(m_encoderNum+1).arg(bitrateKbps) );
+    }
+    return result;
+#else
+    return result;
+#endif
 }
 
 int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
@@ -150,6 +181,16 @@ int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
     if( bitrateKbps > maxBitrate )
         bitrateKbps = maxBitrate;
     *selectedBitrateKbps = bitrateKbps;
+#ifdef BITRATE_IS_PER_GOP
+    if( m_currentFps >= 1.0 )
+    {
+        //on jaguar bitrate we set with setCameraParam is per 30fps, so have to adjust that
+        m_desiredStreamBitrateKbps = bitrateKbps;
+        m_fpsUsedToCalcBitrate = m_currentFps;
+        bitrateKbps = (int64_t)bitrateKbps * MAX_FPS / m_currentFps;
+    }
+#endif
+    //std::cout<<"MediaEncoder::setBitrate "<<bitrateKbps<<" Kbps"<<std::endl;
     return setCameraParam( QString::fromLatin1("VideoInput.1.h264.%1.BitRate=%2\r\n").arg(m_encoderNum+1).arg(bitrateKbps) );
 }
 
@@ -157,8 +198,9 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
 {
     if( !m_streamReader.get() ) {
         m_streamReader.reset( new StreamReader(
-        &m_refManager,
-        m_encoderNum) );
+            &m_refManager,
+            m_encoderNum,
+            m_cameraManager->info().uid ) );
         if (m_motionMask)
             m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
         m_streamReader->setAudioEnabled( m_audioEnabled );
@@ -172,7 +214,8 @@ int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
     if( !m_streamReader.get() ) {
         m_streamReader.reset( new StreamReader(
             &m_refManager,
-            m_encoderNum) );
+            m_encoderNum,
+            m_cameraManager->info().uid ) );
         if (m_motionMask)
             m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
         m_streamReader->setAudioEnabled( m_audioEnabled );
@@ -266,7 +309,6 @@ int MediaEncoder::getSupportedResolution() const
         return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_NETWORK_ERROR;
 
     const QStringList& vals = getValues( QLatin1String(reslst) );
-    int resIndex = 0;
     m_supportedResolutions.reserve( vals.size() );
     for( QStringList::const_iterator it = vals.begin(); it != vals.end(); ++it )
     {
@@ -277,6 +319,8 @@ int MediaEncoder::getSupportedResolution() const
         m_supportedResolutions.back().resolution.width = wh_s.at(0).toInt();
         m_supportedResolutions.back().resolution.height = wh_s.at(1).toInt();
         m_supportedResolutions.back().maxFps = m_supportedFpsList.empty() ? 0 : m_supportedFpsList[0];
+        if( m_maxResolution.height < m_supportedResolutions.back().resolution.height )
+            m_maxResolution = m_supportedResolutions.back().resolution;
     }
 
     m_resolutionListRead = true;

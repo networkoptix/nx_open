@@ -15,9 +15,25 @@ namespace Qn {
         /* Actions that are not assigned to any menu. */
 
         /**
-         * Opens connection setting dialog.
+         * Opens login dialog.
          */
-        ConnectToServerAction,
+        OpenLoginDialogAction,
+
+        /**
+         * Connects to server.
+         */
+        ConnectAction,
+
+        /**
+         * Disconnects from server.
+         */
+        DisconnectAction,
+
+        /**
+         * Forcefully disconnects from the current server (if any).
+         * Connects to the server using the last used URL set in <tt>QnSettings</tt>.
+         */
+        ReconnectAction,
 
         /**
          * Opens licenses preferences tab.
@@ -25,9 +41,9 @@ namespace Qn {
         PreferencesLicensesTabAction,
 
         /**
-         * Opens server settings preferences tab.
+         * Opens smtp settings preferences tab.
          */
-        PreferencesServerTabAction,
+        PreferencesSmtpTabAction,
 
         /**
          * Opens notifications settings preferences tab.
@@ -35,25 +51,14 @@ namespace Qn {
         PreferencesNotificationTabAction,
 
         /**
-         * Reconnects to the Enterprise Controller using the last used URL
-         * set in <tt>QnSettings</tt>.
-         *
-         * Parameters.
-         * <tt>QnConnectInfoPtr ConnectionInfoRole</tt> --- a connection info
-         * to use. If not provided, action handler will try to send a connect
-         * request first.
-         */
-        ReconnectAction,
-
-        /**
-         * Disconnects from the Enterprise Controller
-         */
-        DisconnectAction,
-
-        /**
          * Shows / hides FPS display.
          */
         ShowFpsAction,
+
+        /** 
+         * Shows / hides debug overlay.
+         */
+        ShowDebugOverlayAction,
 
         /**
          * Drops provided resources on the workbench.
@@ -68,7 +73,7 @@ namespace Qn {
 
         /**
          * Drops provided serialized resources on the current layout after
-         * connection to Enterprise Controller was established.
+         * connection to Server was established.
          *
          * Parameters:
          *
@@ -166,7 +171,7 @@ namespace Qn {
          * Opens the Business Events Log dialog.
          * Supports cameras list in the resources field as a cameras filter.
          * Parameters:
-         * <tt>BusinessEventType::Value EventTypeRole</tt> --- filter by event type.
+         * <tt>QnBusiness::EventType EventTypeRole</tt> --- filter by event type.
          */
         OpenBusinessLogAction,
 
@@ -176,6 +181,30 @@ namespace Qn {
          */
         OpenBusinessRulesAction,
 
+        /**
+         * Opens videowall control layouts for all items in the provided QnVideoWallItemIndexList.
+         */
+        StartVideoWallControlAction,
+
+        /**
+         * Sets up desktop camera as a layout for all items in the provided QnVideoWallItemIndexList.
+         */
+        PushMyScreenToVideowallAction,
+
+        /**
+         * Saves videowall review layout.
+         */
+        SaveVideoWallReviewAction,
+
+        /**
+         * Saves current videowall review layout.
+         */
+        SaveCurrentVideoWallReviewAction,
+
+        /**
+         * Handles resources drop on the selected videowall item.
+         */
+        DropOnVideoWallItemAction,
 
         /**
          * Tries to restart the application as soon as all modal dialogs are closed.
@@ -186,6 +215,11 @@ namespace Qn {
          *                                                      If not provided, current connection info will be used.
          */
         QueueAppRestartAction,
+
+        /**
+         * Offers user to select server in cluster for other servers to synchronize time with
+         */
+        SelectTimeServerAction,
 
 
         /* Main menu actions. */
@@ -281,11 +315,6 @@ namespace Qn {
         AboutAction,
 
         /**
-         * Checks for updates.
-         */
-        CheckForUpdatesAction,
-
-        /**
          * Open Showcase page in default browser
          */
         ShowcaseAction,
@@ -295,6 +324,15 @@ namespace Qn {
          */
         ExitAction,
 
+        /** 
+         * Closes the client asynchronously.
+         */
+        ExitActionDelayed,
+
+        /** 
+         * Notifies all modules about client closing.
+         */
+        BeforeExitAction,
 
         /* Tree Root Nodes actions */
 
@@ -318,8 +356,15 @@ namespace Qn {
          */
         CameraListAction,
 
-        //ShowMediaServerLogs,
+        /**
+         * System administration dialog.
+         */
+        SystemAdministrationAction,
 
+        /**
+         * System administration dialog - updates page.
+         */
+        SystemUpdateAction,
 
         /* Tab bar actions. */
 
@@ -381,6 +426,11 @@ namespace Qn {
          * Opens given layouts.
          */
         OpenAnyNumberOfLayoutsAction,
+
+        /**
+         * Opens given videowalls in review mode.
+         */
+        OpenVideoWallsReviewAction,
 
         /**
          * Menu containing all layouts belonging to the current user.
@@ -490,6 +540,11 @@ namespace Qn {
         PictureSettingsAction,
 
         /**
+         * Opens videowall settings dialog.
+         */
+        VideowallSettingsAction,
+
+        /**
          * Opens event log dialog with filter for current camera(s) issues
          */
         CameraIssuesAction,
@@ -521,11 +576,6 @@ namespace Qn {
         OpenInCameraSettingsDialogAction,
 
         /**
-         * Clears the resource that is currently open in camera settings dialog.
-         */
-        ClearCameraSettingsAction,
-
-        /**
          * Opens server settings dialog.
          */
         ServerSettingsAction,
@@ -551,14 +601,9 @@ namespace Qn {
         ServerAddCameraManuallyAction,
 
         /**
-         * Opens camera list by media server
+         * Opens camera list by server
          */
         CameraListByServerAction,
-
-        /**
-         * Opens a YouTube upload dialog.
-         */
-        YouTubeUploadAction,
 
         /**
          * Opens a folder that contains the file resource.
@@ -625,6 +670,16 @@ namespace Qn {
          */
         ToggleRadassAction,
 
+        /**
+         * Connect incompatible server to current system
+         */
+        ConnectToCurrentSystem,
+
+        /**
+         * Merge the other system with the current system
+         */
+        MergeSystems,
+
         /* PTZ Actions */
 
         /**
@@ -690,7 +745,7 @@ namespace Qn {
         RemoveLayoutItemAction,
 
         /**
-         * Removes a resource from Enterprise Controller.
+         * Removes a resource from Server.
          */
         RemoveFromServerAction,
 
@@ -708,6 +763,66 @@ namespace Qn {
          * Opens a user creation dialog.
          */
         NewUserAction,
+
+        /**
+         * Opens a videowall creation dialog.
+         */
+        NewVideoWallAction,
+
+        /**
+         * Attaches current client window to the selected videowall.
+         */
+        AttachToVideoWallAction,
+
+        /**
+         * Detaches selected layout(s) from the videowall.
+         */
+        DetachFromVideoWallAction,
+
+        /**
+         * Update selected videowall item(s) with the current layout.
+         */
+        ResetVideoWallLayoutAction,
+
+        /**
+         * Deletes selected videowall item(s).
+         */
+        DeleteVideoWallItemAction,
+
+        /**
+         * Start another client instance in the videowall master mode.
+         */
+        StartVideoWallAction,
+
+        /**
+         * Stop all client instances running this videowall.
+         */
+        StopVideoWallAction,
+
+        /**
+         * Display identification messages on the videowall screens.
+         */
+        IdentifyVideoWallAction,
+
+        /** 
+         * Save current videowall matrix. 
+         */
+        SaveVideowallMatrixAction,
+
+        /**
+         * Load previously saved videowall matrix.
+         */
+        LoadVideowallMatrixAction,
+
+        /**
+         * Delete saved videowall matrix.
+         */
+        DeleteVideowallMatrixAction,
+
+        /**
+         * Open target videowall item after user logged in.
+         */
+        DelayedOpenVideoWallItemAction,
 
         /**
          * Opens a layout creation dialog.
@@ -786,6 +901,21 @@ namespace Qn {
          */
         ExportLayoutAction,
 
+        /** 
+         * Bookmark selected range.
+         */
+        AddCameraBookmarkAction,
+
+        /**
+         * Edit selected bookmark.
+         */
+        EditCameraBookmarkAction,
+
+        /**
+         * Remove selected bookmark.
+         */
+        RemoveCameraBookmarkAction,
+
         /**
          * Opens new layout for Quick Search.
          *
@@ -825,6 +955,10 @@ namespace Qn {
          */
         ToggleSliderAction,
 
+        /** 
+         * Shows/hides bookmarks search panel.
+         */
+        ToggleBookmarksSearchAction,
 
         PinNotificationsAction,
 
@@ -842,6 +976,10 @@ namespace Qn {
         JumpToLiveAction,
         ToggleSyncAction,
 
+        /**
+         * Toggle the background animation.
+         */
+        ToggleBackgroundAnimationAction,
 
         /* Debug actions. */
 
@@ -907,7 +1045,9 @@ namespace Qn {
         LayoutItemType          = 0x00000200,           /**< Layout item, <tt>QnLayoutItemIndex</tt>. Convertible to resource. */
         WidgetType              = 0x00000400,           /**< Resource widget, <tt>QnResourceWidget *</tt>. Convertible to layout item and resource. */
         LayoutType              = 0x00000800,           /**< Workbench layout, <tt>QnWorkbenchLayout *</tt>. Convertible to resource. */
-        OtherType               = 0x00001000,           /**< Some other type. */
+        VideoWallItemType       = 0x00001000,           /**< Videowall item, <tt>QnVideoWallItemIndex</tt>. Convertible to resource. */
+        VideoWallMatrixType     = 0x00002000,           /**< Videowall matrix, <tt>QnVideoWallMatrixIndex</tt>. */
+        OtherType               = 0x00004000,           /**< Some other type. */
         TargetTypeMask          = 0x0000FF00
     };
     Q_DECLARE_FLAGS(ActionParameterTypes, ActionParameterType)
@@ -934,6 +1074,11 @@ namespace Qn {
         /** Action accepts workbench layouts as target. */
         LayoutTarget            = LayoutType,
 
+        /** Action accepts videowall items as target. */
+        VideoWallItemTarget     = VideoWallItemType,
+
+        /** Action accepts videowall matrices as target. */
+        VideoWallMatrixTarget   = VideoWallMatrixType,
 
         /** Action has a hotkey that is intentionally ambiguous.
          * It is up to the user to ensure that proper action conditions make it
@@ -968,6 +1113,9 @@ namespace Qn {
 
         /** Action can appear in scene context menu. */
         Scene                   = SceneScope | WidgetTarget,
+
+        /** Action can appear in scene context menu in videowall review mode (target elements are not resource widgets). */
+        VideoWallReviewScene    = SceneScope,
 
         /** Action can appear in tree context menu. */
         Tree                    = TreeScope,

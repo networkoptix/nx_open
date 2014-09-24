@@ -7,17 +7,11 @@
 #include <utils/common/systemerror.h>
 
 
-// ------------------------ QnRtspListenerPrivate ---------------------------
+// ------------------------ QnTcpListenerPrivate ---------------------------
 
 class QnTcpListenerPrivate
 {
 public:
-    QnTcpListenerPrivate() {
-        serverSocket = 0;
-        newPort = 0;
-        localPort = 0;
-        useSSL = false;
-    }
     AbstractStreamServerSocket* serverSocket;
     QList<QnLongRunnable*> connections;
     QByteArray authDigest;
@@ -29,12 +23,22 @@ public:
     bool useSSL;
     int maxConnections;
     bool ddosWarned;
+
+    QnTcpListenerPrivate()
+    :
+        serverSocket(nullptr),
+        newPort(0),
+        localPort(0),
+        useSSL(false),
+        maxConnections(0),
+        ddosWarned(false)
+    {
+    }
 };
 
-// ------------------------ QnRtspListener ---------------------------
+// ------------------------ QnTcpListener ---------------------------
 
-#ifdef USE_NX_HTTP
-bool QnTcpListener::authenticate(const nx_http::HttpRequest& request, nx_http::HttpResponse& response) const
+bool QnTcpListener::authenticate(const nx_http::Request& request, nx_http::Response& response) const
 {
     Q_D(const QnTcpListener);
     if (d->authDigest.isEmpty())
@@ -48,25 +52,9 @@ bool QnTcpListener::authenticate(const nx_http::HttpRequest& request, nx_http::H
     if (data[0].toLower() == "basic" && data.size() > 1)
         rez = data[1] == d->authDigest;
     if (!rez)
-        response.headers["WWW-Authenticate"] = "Basic realm=\"Secure Area\"";
+        nx_http::insertOrReplaceHeader( &response.headers, std::make_pair("WWW-Authenticate", "Basic realm=\"Secure Area\"") );
     return rez;
 }
-#else
-bool QnTcpListener::authenticate(const QHttpRequestHeader& headers, QHttpResponseHeader& responseHeaders) const
-{
-    Q_D(const QnTcpListener);
-    if (d->authDigest.isEmpty())
-        return true;
-    QList<QByteArray> data = headers.value(QLatin1String("Authorization")).toUtf8().split(' ');
-    bool rez = false;
-    if (data[0].toLower() == "basic" && data.size() > 1)
-        rez = data[1] == d->authDigest;
-    if (!rez) {
-        responseHeaders.addValue(QLatin1String("WWW-Authenticate"), QLatin1String("Basic realm=\"Secure Area\""));
-    }
-    return rez;
-}
-#endif
 
 void QnTcpListener::setAuth(const QByteArray& userName, const QByteArray& password)
 {
@@ -75,7 +63,8 @@ void QnTcpListener::setAuth(const QByteArray& userName, const QByteArray& passwo
     d->authDigest = digest.toBase64();
 }
 
-QnTcpListener::QnTcpListener(const QHostAddress& address, int port, int maxConnections):
+QnTcpListener::QnTcpListener( const QHostAddress& address, int port, int maxConnections, bool useSSL )
+:
     d_ptr(new QnTcpListenerPrivate())
 {
     Q_D(QnTcpListener);
@@ -83,6 +72,7 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port, int maxConne
     d->localPort = port;
     d->serverSocket = 0;
     d->maxConnections = maxConnections;
+    d->useSSL = useSSL;
 }
 
 QnTcpListener::~QnTcpListener()
@@ -93,6 +83,27 @@ QnTcpListener::~QnTcpListener()
     d->serverSocket->close();
     delete d->serverSocket;
     delete d_ptr;
+}
+
+bool QnTcpListener::bindToLocalAddress()
+{
+    Q_D(QnTcpListener);
+
+    d->serverSocket = SocketFactory::createStreamServerSocket(true/*d->useSSL*/);
+    if( !d->serverSocket->setReuseAddrFlag( true ) ||
+        !d->serverSocket->bind( SocketAddress( d->serverAddress.toString(), d->localPort ) ) ||
+        !d->serverSocket->listen() )
+    {
+        const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+        NX_LOG(lit("TCPListener (%1:%2). Initial bind failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
+            arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING);
+        qCritical() << "Can't start TCP listener at address" << d->serverAddress << ":" << d->localPort << ". "
+            "Reason: " << SystemError::toString(prevErrorCode) << "(" << prevErrorCode << ")";
+        return false;
+    }
+
+    NX_LOG(lit("Server started at %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logINFO);
+    return true;
 }
 
 void QnTcpListener::doPeriodicTasks()
@@ -145,6 +156,11 @@ void QnTcpListener::addOwnership(QnLongRunnable* processor)
     d->connections << processor;
 }
 
+bool QnTcpListener::isSslEnabled() const
+{
+    Q_D(const QnTcpListener);
+    return d->useSSL;
+}
 
 void QnTcpListener::pleaseStop()
 {
@@ -186,37 +202,15 @@ void QnTcpListener::updatePort(int newPort)
     d->newPort = newPort;
 }
 
-void QnTcpListener::enableSSLMode()
-{
-    Q_D(QnTcpListener);
-    d->useSSL = true;
-}
-
 void QnTcpListener::run()
 {
     Q_D(QnTcpListener);
 
     initSystemThreadId();
 
-    d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
-    //d->serverSocket = new TCPServerSocket(address.toString(), port, 5, true);
     d->ddosWarned = false;
-    if( !d->serverSocket->setReuseAddrFlag(true) ||
-        !d->serverSocket->bind(SocketAddress(d->serverAddress.toString(), d->localPort)) ||
-        !d->serverSocket->listen() )
-        //if( d->serverSocket->failed() )
-    {
-        const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-
-        NX_LOG( lit("TCPListener (%1:%2). Initial bind failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
-            arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING );
-        qCritical() << "Can't start TCP listener at address" << d->serverAddress << ":" << d->localPort << ". "
-            "Reason: " << SystemError::toString(prevErrorCode) << "("<<prevErrorCode<<")";
-    }
-    else {
-        cl_log.log("Server started at ", d->serverAddress.toString() + QLatin1String(":") + QString::number(d->localPort), cl_logINFO);
-    }
-
+    if( !d->serverSocket )
+        bindToLocalAddress();
 
     NX_LOG( lit("Entered QnTcpListener::run. %1:%2, system thread id %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(systemThreadId()), cl_logWARNING );
     try
@@ -231,16 +225,8 @@ void QnTcpListener::run()
                 NX_LOG( lit("TCPListener (%1:%2). Switching port to: %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(d->newPort), cl_logWARNING );
                 removeAllConnections();
                 delete d->serverSocket;
-                //d->serverSocket = new TCPServerSocket(d->serverAddress.toString(), d->newPort);
-                //if( d->serverSocket->failed() )
-                d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
-                if( !d->serverSocket->setReuseAddrFlag(true) ||
-                    !d->serverSocket->bind(SocketAddress(d->serverAddress.toString(), d->newPort)) ||
-                    !d->serverSocket->listen() )
+                if( !bindToLocalAddress() )
                 {
-                    const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                    NX_LOG( lit("TCPListener (%1:%2). Bind failed: %3").arg(d->serverAddress.toString()).arg(d->localPort).
-                        arg(SystemError::toString(prevErrorCode)), cl_logWARNING );
                     QThread::msleep(1000);
                     continue;
                 }
@@ -251,8 +237,6 @@ void QnTcpListener::run()
             }
 
             AbstractStreamSocket* clientSocket = d->serverSocket->accept();
-//            delete clientSocket;
-//            clientSocket = NULL;
             if( clientSocket )
             {
                 if (d->connections.size() > d->maxConnections)
@@ -277,7 +261,10 @@ void QnTcpListener::run()
             else
             {
                 const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                if( prevErrorCode != SystemError::timedOut ) {
+                if( prevErrorCode != SystemError::timedOut &&
+                    prevErrorCode != SystemError::again &&
+                    prevErrorCode != SystemError::interrupted )
+                {
                     NX_LOG( lit("TCPListener (%1:%2). Accept failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
                         arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING );
                     QThread::msleep(1000);
@@ -304,4 +291,16 @@ int QnTcpListener::getPort() const
     if (!d->serverSocket)
         return -1;
     return d->serverSocket->getLocalAddress().port;
+}
+
+static QByteArray m_defaultPage;
+
+void QnTcpListener::setDefaultPage(const QByteArray& path)
+{
+    m_defaultPage = path;
+}
+
+QByteArray QnTcpListener::defaultPage()
+{
+    return m_defaultPage;
 }

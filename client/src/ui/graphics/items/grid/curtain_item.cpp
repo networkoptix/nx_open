@@ -4,6 +4,8 @@
 
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
+#include <utils/common/warnings.h>
+#include <opengl_renderer.h>
 
 QnCurtainItem::QnCurtainItem(QGraphicsItem *parent):
     QGraphicsObject(parent)
@@ -24,21 +26,21 @@ void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
     QRectF viewportRect = painter->transform().inverted().mapRect(QRectF(widget->rect()));
     painter->fillRect(viewportRect, m_color);
 #else
-    QnGlNativePainting::begin(painter);
-    glPushMatrix();
-    glLoadIdentity();
+    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
 
-    glEnable(GL_BLEND); 
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->pushModelViewMatrix();
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setModelViewMatrix(QMatrix4x4());
+
+    glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
-    glBegin(GL_QUADS);
-    glColor(m_color);
-    glVertices(widget->geometry());
-    glEnd();
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(m_color);
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawColoredQuad(widget->geometry());
 
     glDisable(GL_BLEND); 
 
-    glPopMatrix();
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->popModelViewMatrix();
+
     QnGlNativePainting::end(painter);
 #endif //  Q_OS_WIN
 }

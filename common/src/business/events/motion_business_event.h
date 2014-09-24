@@ -10,7 +10,7 @@ class QnMotionBusinessEvent: public QnProlongedBusinessEvent
 {
     typedef QnProlongedBusinessEvent base_type;
 public:
-    QnMotionBusinessEvent(const QnResourcePtr& resource, Qn::ToggleState toggleState, qint64 timeStamp, QnConstAbstractDataPacketPtr metadata);
+    QnMotionBusinessEvent(const QnResourcePtr& resource, QnBusiness::EventState toggleState, qint64 timeStamp, QnConstAbstractDataPacketPtr metadata);
 private:
     QnConstAbstractDataPacketPtr m_metadata;
 };

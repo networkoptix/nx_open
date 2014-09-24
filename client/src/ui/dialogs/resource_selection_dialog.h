@@ -11,6 +11,9 @@
 
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include "utils/common/id.h"
+
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 namespace Ui {
     class ResourceSelectionDialog;
@@ -19,9 +22,9 @@ namespace Ui {
 class QnResourcePoolModel;
 class QnCameraThumbnailManager;
 
-class QnResourceSelectionDialog : public QDialog, public QnWorkbenchContextAware {
+class QnResourceSelectionDialog : public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
-    typedef QDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
     enum SelectionTarget {
@@ -41,27 +44,25 @@ public:
 
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
-    virtual bool event(QEvent *event) override;
 
     QnResourceList selectedResourcesInner(const QModelIndex &parent = QModelIndex()) const;
     int setSelectedResourcesInner(const QnResourceList &selected, const QModelIndex &parent = QModelIndex());
 
 private slots:
     void at_resourceModel_dataChanged();
-    void at_thumbnailReady(int resourceId, const QPixmap &thumbnail);
+    void at_thumbnailReady(QUuid resourceId, const QPixmap &thumbnail);
 
     QModelIndex itemIndexAt(const QPoint &pos) const;
     void updateThumbnail(const QModelIndex &index);
 private:
-    void init(SelectionTarget target);
-
+    void init();
 private:
     QScopedPointer<Ui::ResourceSelectionDialog> ui;
     QnResourcePoolModel *m_resourceModel;
     QnResourceSelectionDialogDelegate* m_delegate;
     QnCameraThumbnailManager *m_thumbnailManager;
     SelectionTarget m_target;
-    int m_tooltipResourceId;
+    QUuid m_tooltipResourceId;
 
     int m_screenshotIndex;
 

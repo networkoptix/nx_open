@@ -3,15 +3,22 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/opengl/gl_buffer_stream.h>
+#include <ui/graphics/shaders/color_shader_program.h>
+
 #include <ui/common/geometry.h>
 #include <ui/workaround/gl_native_painting.h>
+
+#include "opengl_renderer.h"
 
 QnShadowItem::QnShadowItem(QGraphicsItem *parent):
     base_type(parent),
     m_color(QColor(0, 0, 0, 128)),
     m_shapeProvider(NULL),
     m_shapeValid(false),
-    m_parametersValid(false)
+    m_parametersValid(false),
+    m_vaoInitialized(false),
+    m_positionBuffer(QOpenGLBuffer::VertexBuffer)
 {
     setAcceptedMouseButtons(0);
     
@@ -56,6 +63,7 @@ void QnShadowItem::setColor(const QColor &color) {
 void QnShadowItem::invalidateShadowShape() {
     m_shapeValid = false;
     m_parametersValid = false;
+    m_vaoInitialized = false;
 }
 
 void QnShadowItem::ensureShadowShape() const {
@@ -67,14 +75,59 @@ void QnShadowItem::ensureShadowShape() const {
     } else {
         m_shadowShape = QPolygonF();
     }
-    m_shapeValid = true;
+    m_shapeValid = m_shadowShape.size() > 0;
 }
+
+void QnShadowItem::initializeVao() {
+    if (!m_shapeValid) 
+        return;
+
+    /* Generate vertex data. */
+    QByteArray data;
+    QnGlBufferStream<GLfloat> vertexStream(&data);
+    for ( int i = 0 ; i < m_shadowShape.size() ; i++)
+        vertexStream << m_shadowShape[i].x() << m_shadowShape[i].y();
+
+    if (m_vertices.isCreated())
+        m_vertices.destroy();
+
+    if (m_positionBuffer.isCreated())
+        m_positionBuffer.destroy();
+
+    m_vertices.create();
+    m_vertices.bind();
+
+    const int VERTEX_POS_SIZE = 2; // x, y
+    const int VERTEX_POS_INDX = 0;
+
+    auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getColorShader();
+
+    m_positionBuffer.create();
+    m_positionBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_positionBuffer.bind();
+    m_positionBuffer.allocate( data.data(), data.size() );
+    shader->enableAttributeArray( VERTEX_POS_INDX );
+    shader->setAttributeBuffer( VERTEX_POS_INDX, GL_FLOAT, 0, VERTEX_POS_SIZE );
+
+    if (!shader->initialized()) {
+        shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
+        shader->markInitialized();
+    };
+
+    m_positionBuffer.release();
+    m_vertices.release();
+
+    m_vaoInitialized = true;
+}
+
 
 void QnShadowItem::ensureShadowParameters() const {
     if(m_parametersValid)
         return;
 
     ensureShadowShape();
+    if (!m_shapeValid)
+        return;
 
     m_painterPath = QPainterPath();
     m_painterPath.addPolygon(m_shadowShape);
@@ -84,44 +137,40 @@ void QnShadowItem::ensureShadowParameters() const {
 
 QRectF QnShadowItem::boundingRect() const {
     ensureShadowParameters();
-
-    return m_boundingRect;
+    if (m_shapeValid)
+        return m_boundingRect;
+    return QRect();
 }
 
 QPainterPath QnShadowItem::shape() const {
     ensureShadowParameters();
-
-    return m_painterPath;
+    if (m_shapeValid)
+        return m_painterPath;
+    return QPainterPath();
 }
 
 void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     ensureShadowShape();
 
-#if 0
-    QN_SCOPED_PAINTER_BRUSH_ROLLBACK(painter, m_color);
-    QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, Qt::NoPen);
-    painter->drawPolygon(m_shadowShape);
-#else
-    /* This code actually works faster. 
-     * On a scene with 64 simple items I get 20-30% FPS increase. */
+    if (!m_shapeValid)
+        return;
+
+    if (!m_vaoInitialized)
+        initializeVao();
 
     /* Color for drawing the shadow. */
     QColor color = m_color;
     color.setAlpha(color.alpha() * effectiveOpacity());
-
-    QnGlNativePainting::begin(painter);
-    //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
+    
+    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
     glEnable(GL_BLEND); 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
-
+   
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(color);
+    auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getColorShader();
     /* Draw shadowed rect. */
-    glBegin(GL_TRIANGLE_FAN);
-    glColor(color);
-    glVertices(m_shadowShape);
-    glEnd();
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawArraysVao(&m_vertices, GL_TRIANGLE_FAN, m_shadowShape.size(), shader);
 
     glDisable(GL_BLEND); 
-    //glPopAttrib();
     QnGlNativePainting::end(painter);
-#endif
 }

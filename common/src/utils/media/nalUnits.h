@@ -303,8 +303,11 @@ public:
     }
 	virtual ~SPSUnit() {
 		delete [] bit_rate_value_minus1;
+        bit_rate_value_minus1 = 0;
 		delete [] cpb_size_value_minus1;
+        cpb_size_value_minus1 = 0;
 		delete [] cbr_flag;
+        cbr_flag = 0;
 	}
 	bool isReady() {return m_ready;}
 	int deserialize();

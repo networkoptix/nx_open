@@ -1,27 +1,45 @@
 #ifndef QN_CONNECTION_INFO_H
 #define QN_CONNECTION_INFO_H
 
-#include <QtCore/QSharedPointer>
+#ifndef QN_NO_QT
 #include <QtCore/QMetaType>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QUrl>
+#endif
 
+#ifndef QN_NO_BASE
 #include <utils/common/software_version.h>
+#include <utils/common/model_functions_fwd.h>
 
-#include "compatibility.h"
+#include "compatibility_item.h"
+
+typedef QnSoftwareVersion SoftwareVersionType; // TODO: #Elric #ec2 remove
+#endif
+
 
 struct QnConnectionInfo {
-    QnConnectionInfo() {}
+    QnConnectionInfo()
+    :
+        allowSslConnections( false )
+    {}
 
-    QnSoftwareVersion version;
+    QUrl ecUrl;
+    SoftwareVersionType version;
     QList<QnCompatibilityItem> compatibilityItems;
-    int proxyPort;
-    QString ecsGuid;
-    QString publicIp;
+    QString systemName;
+    QString ecsGuid;    //TODO: #GDM make QUuid
     QString brand;
+    QString box;
+    bool allowSslConnections;
 };
 
-// TODO: #Elric remove shared pointer?
-typedef QSharedPointer<QnConnectionInfo> QnConnectionInfoPtr;
+#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)(box)(allowSslConnections)
 
-Q_DECLARE_METATYPE(QnConnectionInfoPtr);
+#ifndef QN_NO_QT
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (QnCompatibilityItem)(QnConnectionInfo), 
+    (ubjson)(metatype)(xml)(json)(csv_record)
+)
+#endif
 
 #endif // QN_CONNECTION_INFO_H

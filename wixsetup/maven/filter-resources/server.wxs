@@ -1,0 +1,227 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+    <Fragment Id='FragmentServer'>
+        <?include BuildVars.wxi ?>
+
+        <DirectoryRef Id="INSTALLDIR">
+            <Directory Id="${customization}MediaServerDir" Name="MediaServer">
+                <Directory Id="${customization}DbSync22Dir" Name="dbsync-2.2">
+                    <Component Id="dbsync221versionpy">
+                        <File Id="version221.py" Name="version.py" Source="${libdir}/version.py" KeyPath="yes"/>
+                    </Component>
+                </Directory>
+
+                <Directory Id="ServerImageFormats" Name="imageformats"></Directory>
+
+                <Component Id="ServerExecutable">
+                    <File Id="ServerExe" Name="mediaserver.exe" Source="$(var.SourceDir)/mediaserver.exe" KeyPath="yes">
+                        <fire:FirewallException Id="FirewallExceptionMediaServer" Name="${mediaserver.name}" Scope="any" IgnoreFailure="yes"/>
+                    </File>
+
+                    <ServiceInstall Id="${customization}MediaServerService"
+                                                Name="${customization}MediaServer"
+                                                DisplayName="${mediaserver.name}"
+                                                Type="ownProcess"
+                                                Start="auto"
+                                                ErrorControl="normal"
+                                                Description="${mediaserver.name}">
+                        <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
+                    </ServiceInstall>
+
+                    <ServiceControl Id="Start${customization}ServerService" Name="${customization}MediaServer" Start="install" Wait="no" />
+                    <ServiceControl Id="Stop${customization}ServerService" Name="${customization}MediaServer" Stop="both" Wait="yes" Remove="uninstall" />
+                </Component>
+
+                <Component Id="ServerConfiguration">
+                    <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
+                        <RegistryValue Type="string" Name="systemName" Value="[SYSTEM_NAME]"/>
+                        <RegistryValue Type="string" Name="port" Value="[SERVER_PORT]"/>
+                    </RegistryKey>
+                </Component>
+
+                <Component Id="ServerConfigurationPassword">
+                    <Condition>SERVER_PASSWORD</Condition>
+
+                    <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
+                        <RegistryValue Type="string" Name="appserverPassword" Value="[SERVER_PASSWORD]"/>
+                    </RegistryKey>
+                </Component>
+
+                <Directory Id="ServerPlugins" Name="plugins">
+                    <Component Id="ServerRtspPlugin">
+                        <File Id="ServerRtspPluginDll" Name="genericrtspplugin.dll" Source="$(var.PluginsDir)\genericrtspplugin.dll" />
+                    </Component>                    
+                    <Component Id="ServerHttpPlugin">
+                        <File Id="ServerHttpPluginDll" Name="mjpg_link.dll" Source="$(var.PluginsDir)\mjpg_link.dll" />
+                    </Component>                                              
+                </Directory>
+
+                <Component Id="ServerSigar">
+                    <File Id="ServerSigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll"/>
+                </Component>
+
+                <?if $(var.vmax) = true?>
+                <Directory Id="${customization}VmaxDir" Name="VmaxProxy">
+                    <Component Id="vmaxproxy.exe">
+                        <File Id="vmaxproxy.exe" Name="vmaxproxy.exe" Source="$(var.SourceDir)/vmaxproxy/vmaxproxy.exe" KeyPath="yes">
+                            <fire:FirewallException Id="FirewallException${customization}VmaxProxy" Name="VMS Vmax Proxy" Scope="any" IgnoreFailure="yes"/>
+                        </File>
+                    </Component>
+
+                    <Component Id="VmaxProxyQTLibraries">
+                        <File Id="VmaxProxyQt5Core$(var.suffix).dll" Name="qtcore$(var.suffix)4.dll" Source="$(var.SourceDir)/vmaxproxy/qtcore$(var.suffix)4.dll"  />
+                    </Component>
+                </Directory>
+                <?endif?>
+
+            </Directory>
+        </DirectoryRef>
+
+        <!-- Component groups -->
+        <ComponentGroup Id="ServerFFmpegLibraries" Directory="${customization}MediaServerDir">
+            <Component>
+                <File Id="ServerAvcodecDll" Name="avcodec-54.dll" Source="$(var.SourceDir)/avcodec-54.dll"/>
+            </Component>
+            <Component>
+                <File Id="ServerAvdeviceDll" Name="avdevice-54.dll" Source="$(var.SourceDir)/avdevice-54.dll"/>
+            </Component>
+            <Component>
+                <File Id="ServerAvfilterDll" Name="avfilter-2.dll" Source="$(var.SourceDir)/avfilter-2.dll"/>
+            </Component>
+            <Component>
+                <File Id="ServerAvformatDll" Name="avformat-54.dll" Source="$(var.SourceDir)/avformat-54.dll"/>
+            </Component>
+            <Component>
+                <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="$(var.SourceDir)/avutil-51.dll"/>
+            </Component>
+            <Component>
+                <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="$(var.SourceDir)/swscale-2.dll"/>
+            </Component>
+            <Component>
+                <File Id="ServerOggDll" Name="libogg-0.dll" Source="$(var.SourceDir)/libogg-0.dll"/>
+            </Component>
+            <Component>
+                <File Id="ServerVorbisDll" Name="libvorbis-0.dll" Source="$(var.SourceDir)/libvorbis-0.dll"/>
+            </Component>
+            <Component>
+                <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="$(var.SourceDir)/libmp3lame-0.dll"/>
+            </Component>
+            <Component>
+                <File Id="ServerVorbisEncDll" Name="libvorbisenc-2.dll" Source="$(var.SourceDir)/libvorbisenc-2.dll"/>
+            </Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="ServerQTLibraries" Directory="${customization}MediaServerDir">
+            <Component>
+                <File Id="ServerQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll" />
+            </Component>
+            <Component>
+                <File Id="ServerQt5Gui$(var.suffix).dll" Name="Qt5Gui$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Gui$(var.suffix).dll" />
+            </Component>
+            <Component>
+                <File Id="ServerQt5Concurrent$(var.suffix).dll" Name="Qt5Concurrent$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Concurrent$(var.suffix).dll"  />                
+            </Component>              
+            <Component>
+                <File Id="ServerQt5Multimedia$(var.suffix).dll" Name="Qt5Multimedia$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Multimedia$(var.suffix).dll" />
+            </Component>
+            <Component>
+                <File Id="ServerQt5Network$(var.suffix).dll" Name="Qt5Network$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Network$(var.suffix).dll" />
+            </Component>
+            <Component>
+                <File Id="ServerQt5Xml$(var.suffix).dll" Name="Qt5Xml$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Xml$(var.suffix).dll" />
+            </Component>
+            <Component>
+                <File Id="ServerQt5Sql$(var.suffix).dll" Name="Qt5Sql$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Sql$(var.suffix).dll" />
+            </Component>
+            <?if ${webkit} = true ?>
+            <Component>
+                <File Id="Servericudt53.dll" Name="icudt53.dll" Source="$(var.SourceDir)\icudt53.dll"  />                
+            </Component>                 
+            <Component>
+                <File Id="Servericuin53.dll" Name="icuin53.dll" Source="$(var.SourceDir)\icuin53.dll"  />                
+            </Component>                 
+            <Component>
+                <File Id="Servericuuc5.dll" Name="icuuc53.dll" Source="$(var.SourceDir)\icuuc53.dll"  />                
+            </Component>                 
+            <?endif?>  
+            <?if ${angle} = true ?>                     
+            <Component>
+                <File Id="ServerlibGLESv2$(var.suffix).dll" Name="libGLESv2$(var.suffix).dll" Source="$(var.SourceDir)\libGLESv2$(var.suffix).dll"  />                
+            </Component>                         
+            <?endif?>  
+            <Component>
+                <File Id="Serverquazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll"  />                
+            </Component>
+            <Component>
+                <File Id="Serverzlibwapi.dll" Name="zlibwapi.dll" Source="$(var.SourceDir)\zlibwapi.dll"  />                
+            </Component>             
+        </ComponentGroup>
+
+        <ComponentGroup Id="ServerImageFormats" Directory="ServerImageFormats">
+            <Component>
+                <File Id="Serverqgif$(var.suffix).dll" Name="qgif4.dll" Source="$(var.SourceDir)\imageformats\qgif$(var.suffix).dll" />
+            </Component>
+            <Component>
+                <File Id="Serverqjpeg$(var.suffix).dll" Name="qjpeg4.dll" Source="$(var.SourceDir)\imageformats\qjpeg$(var.suffix).dll" />
+            </Component>
+            <Component>
+                <File Id="Serverqtiff$(var.suffix).dll" Name="qtiff4.dll" Source="$(var.SourceDir)\imageformats\qtiff$(var.suffix).dll" />
+            </Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="ServerOpenSSL" Directory="${customization}MediaServerDir">
+            <Component>
+                <File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll"/>
+            </Component>
+            <Component>
+                <File Id="Serverssleay32.dll" Name="ssleay32.dll" Source="$(var.SourceDir)\ssleay32.dll"/>
+            </Component>
+        </ComponentGroup>
+
+        <?if $(var.vmax) = true?>
+        <ComponentGroup Id="VmaxProxySDK" Directory="${customization}VmaxDir">
+            <Component>
+                <File Id="VmaxProxyacsstreamsourcemr.dll" Name="acs_stream_source_mr.dll" Source="$(var.SourceDir)/vmaxproxy/acs_stream_source_m$(var.vmaxsuffix).dll"/>
+            </Component>
+            <Component>
+                <File Id="VmaxProxyPid.dat" Name="pid.dat" Source="$(var.SourceDir)/vmaxproxy/pid.dat"/>
+            </Component>
+        </ComponentGroup>                            
+        <?endif?>
+
+        <Feature Id="ServerFeature" Title="${product.name} Media Server" Level="1"
+                 ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
+            <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
+
+            <ComponentGroupRef Id="DbSync22FilesComponent" />
+
+            <ComponentRef Id="dbsync221versionpy"/>
+            <ComponentRef Id='ServerConfiguration'/>
+            <ComponentRef Id='ServerConfigurationPassword'/>
+
+            <ComponentRef Id="ServerExecutable" />
+            <ComponentGroupRef Id="ServerFFmpegLibraries"/>
+            <ComponentRef Id="ServerRtspPlugin"/>
+            <ComponentRef Id="ServerHttpPlugin"/>
+            <ComponentGroupRef Id="ServerQTLibraries" />
+            <ComponentGroupRef Id="ServerOpenSSL"/>
+            <ComponentGroupRef Id="ServerImageFormats"/>
+            <ComponentRef Id="ServerSigar"/>
+            <ComponentRef Id="sysfomediaservercomponent"/>
+
+            <?if $(var.vmax) = true?>   
+            <ComponentRef Id="vmaxproxy.exe"/>
+            <ComponentRef Id="VmaxProxyQTLibraries"/>
+            <ComponentGroupRef Id="VmaxProxySDK"/>
+            <?endif?>       
+
+            <ComponentRef Id="traytool.exe"/>
+            <ComponentGroupRef Id="TrayToolQTLibraries"/>
+            <ComponentGroupRef Id="TraytoolPlatforms" />
+
+        </Feature>
+
+    </Fragment>
+</Wix>

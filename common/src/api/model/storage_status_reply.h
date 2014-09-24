@@ -3,11 +3,12 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/common/json_fwd.h>
+#include <utils/common/model_functions_fwd.h>
+#include <utils/common/id.h>
 
 struct QnStorageSpaceData {
-    QString path;
-    int storageId;
+    QString url;
+    QUuid storageId;
     qint64 totalSpace;
     qint64 freeSpace;
     qint64 reservedSpace;
@@ -16,13 +17,15 @@ struct QnStorageSpaceData {
     bool isUsedForWriting;
 };
 
+#define QnStorageSpaceData_Fields (url)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting)
+
 struct QnStorageStatusReply {
     bool pluginExists;
     QnStorageSpaceData storage;
 };
 
-Q_DECLARE_METATYPE(QnStorageStatusReply)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnStorageSpaceData)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnStorageStatusReply)
+#define QnStorageStatusReply_Fields (pluginExists)(storage)
+
+QN_FUSION_DECLARE_FUNCTIONS(QnStorageStatusReply, (json)(metatype))
 
 #endif // QN_CHECK_STORAGE_REPLY_H

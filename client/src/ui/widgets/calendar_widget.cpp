@@ -7,6 +7,8 @@
 #include <QtGui/QWheelEvent>
 #include <QtGui/QMouseEvent>
 
+#include <recording/time_period_list.h>
+
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>

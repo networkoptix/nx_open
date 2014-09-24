@@ -11,8 +11,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/button_box_dialog.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 class QnEventLogModel;
 class QnBusinessRuleViewModel;
@@ -21,22 +20,22 @@ namespace Ui {
     class EventLogDialog;
 }
 
-class QnEventLogDialog: public QnButtonBoxDialog, public QnWorkbenchContextAware
+class QnEventLogDialog: public QnWorkbenchStateDependentButtonBoxDialog
 {
     Q_OBJECT
 
-    typedef QnButtonBoxDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
-    explicit QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context);
+    explicit QnEventLogDialog(QWidget *parent);
     virtual ~QnEventLogDialog();
 
     void disableUpdateData();
     void enableUpdateData();
     void setDateRange(const QDate& from, const QDate& to);
     void setCameraList(const QnResourceList &cameras);
-    void setActionType(BusinessActionType::Value value);
-    void setEventType(BusinessEventType::Value value);
+    void setActionType(QnBusiness::ActionType value);
+    void setEventType(QnBusiness::EventType value);
 
 protected:
     void setVisible(bool value) override;
@@ -56,7 +55,7 @@ private slots:
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
     QString getTextForNCameras(int n) const;
-    QStandardItem* createEventTree(QStandardItem* rootItem, BusinessEventType::Value value);
+    QStandardItem* createEventTree(QStandardItem* rootItem, QnBusiness::EventType value);
 
     void updateHeaderWidth();
     bool isFilterExist() const;
@@ -65,12 +64,12 @@ private:
     void updateActionList(bool instantOnly);
 
     /**
-     * Get data from media server
+     * Get data from server
      * 
      * \param fromMsec start date. UTC msecs
      * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
      */
-    void query(qint64 fromMsec, qint64 toMsec, BusinessEventType::Value eventType, BusinessActionType::Value actionType);
+    void query(qint64 fromMsec, qint64 toMsec, QnBusiness::EventType eventType, QnBusiness::ActionType actionType);
 
 private:
     QScopedPointer<Ui::EventLogDialog> ui;

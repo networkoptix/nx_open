@@ -8,6 +8,8 @@
 
 #include <plugins/camera_plugin.h>
 
+#include <QtCore/QByteArray>
+
 #include <plugins/plugin_tools.h>
 
 
@@ -50,6 +52,8 @@ public:
 
 private:
     nxpt::CommonRefManager m_refManager;
+    QByteArray m_firmwareVersion;
+    QByteArray m_modelName;
 };
 
 #endif  //ILP_DISCOVERY_MANAGER_H

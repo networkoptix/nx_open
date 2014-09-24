@@ -5,7 +5,7 @@ class QPainter;
 
 class QnGlNativePainting {
 public:
-    static void begin(QPainter *painter);
+    static void begin(const QGLContext* context,QPainter *painter);
     static void end(QPainter *painter);
 };
 

@@ -1,6 +1,8 @@
 #ifndef QN_STATISTICS_H
 #define QN_STATISTICS_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QDateTime>
 #include <QtCore/QMutex>
 
@@ -8,6 +10,7 @@
 #define CL_STATISTICS_UPDATE_PERIOD_MS 700
 #define CL_STATS_NUM  (CL_STATISTICS_WINDOW_MS/CL_STATISTICS_UPDATE_PERIOD_MS + 1)
 
+// TODO: #Elric #enum
 enum QnStatisticsEvent
 {
     CL_STAT_DATA,
@@ -50,7 +53,7 @@ public:
     bool badSensor() const;
 
     void onLostConnection();
-    bool isConnectioLost() const;
+    bool isConnectionLost() const;
     int connectionLostSec() const;
 
     void onEvent(QnStatisticsEvent event);
@@ -84,5 +87,7 @@ private:
 
     bool m_runing;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //log_h_109

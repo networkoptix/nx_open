@@ -4,7 +4,7 @@
 
 #include "common_business_action.h"
 
-QnCommonBusinessAction::QnCommonBusinessAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters &runtimeParams ):
+QnCommonBusinessAction::QnCommonBusinessAction(const QnBusiness::ActionType actionType, const QnBusinessEventParameters &runtimeParams ):
     base_type(actionType, runtimeParams)
 {
 }

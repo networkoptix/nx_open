@@ -13,6 +13,7 @@
 
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/from_this_to_shared.h>
+#include <utils/common/model_functions_fwd.h>
 #include <utils/common/id.h>
 
 #include <core/datapacket/abstract_data_packet.h>
@@ -24,6 +25,7 @@
 #include "resource_fwd.h"
 #include "resource_type.h"
 #include "param.h"
+#include "resource_command_processor.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
@@ -32,133 +34,50 @@ class QnResourcePool;
 class QnInitResPool: public QThreadPool
 {
 public:
-    QnInitResPool() : QThreadPool() 
-    {
-        setMaxThreadCount(64);
-    }
-};
-
-class QnResourceParameters: public QMap<QString, QString> {
-    typedef QMap<QString, QString> base_type;
-
-public:
-    using base_type::operator[];
-
-    QString &operator[](const char *key) {
-        return base_type::operator[](QLatin1String(key));
-    }
 };
 
 class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
-    Q_FLAGS(Flags Flag Qn::PtzCapabilities)
-    Q_ENUMS(ConnectionRole Status)
-    Q_PROPERTY(QnId id READ getId WRITE setId)
-    Q_PROPERTY(QnId typeId READ getTypeId WRITE setTypeId)
+    Q_FLAGS(Qn::PtzCapabilities)
+    Q_PROPERTY(QUuid id READ getId WRITE setId)
+    Q_PROPERTY(QUuid typeId READ getTypeId WRITE setTypeId)
     Q_PROPERTY(QString uniqueId READ getUniqueId)
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString searchString READ toSearchString)
-    Q_PROPERTY(QnId parentId READ getParentId WRITE setParentId)
-    Q_PROPERTY(Status status READ getStatus WRITE setStatus)
-    Q_PROPERTY(bool disabled READ isDisabled WRITE setDisabled)
-    Q_PROPERTY(Flags flags READ flags WRITE setFlags)
+    Q_PROPERTY(QUuid parentId READ getParentId WRITE setParentId)
+    Q_PROPERTY(Qn::ResourceStatus status READ getStatus WRITE setStatus)
+    Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
     Q_PROPERTY(QStringList tags READ getTags WRITE setTags)
     Q_PROPERTY(Qn::PtzCapabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
-
-
 public:
-    enum ConnectionRole { Role_Default, Role_LiveVideo, Role_SecondaryLiveVideo, Role_Archive };
-
-    enum Status {
-        Offline,
-        Unauthorized,
-        Online,
-        Recording,
-
-        /** Locked status used in layouts only */
-        Locked = Recording
-    };
-
-    enum Flag {
-        network = 0x01,         /**< Has ip and mac. */
-        url = 0x02,             /**< Has url, e.g. file name. */
-        streamprovider = 0x04,
-        media = 0x08,
-
-        playback = 0x10,        /**< Something playable (not real time and not a single shot). */
-        video = 0x20,
-        audio = 0x40,
-        live = 0x80,
-
-        still_image = 0x100,    /**< Still image device. */
-
-        local = 0x200,          /**< Local client resource. */
-        server = 0x400,         /**< Server resource. */
-        remote = 0x800,         /**< Remote (on-server) resource. */
-
-        layout = 0x1000,        /**< Layout resource. */
-        user = 0x2000,          /**< User resource. */
-
-        utc = 0x4000,           /**< Resource uses UTC-based timing. */
-        periods = 0x8000,       /**< Resource has recorded periods. */
-
-        motion = 0x10000,       /**< Resource has motion */
-        sync = 0x20000,         /**< Resource can be used in sync playback mode. */
-
-        foreigner = 0x40000,    /**< Resource belongs to other entity. E.g., camera on another server */
-        no_last_gop = 0x80000,  /**< Do not use last GOP for this when stream is opened */
-        deprecated = 0x100000,   /**< Resource absent in EC but still used in memory for some reason */
-
-        local_media = local | media,
-        local_layout = local | layout,
-
-        local_server = local | server,
-        remote_server = remote | server,
-        live_cam = utc | sync | live | media | video | streamprovider, // don't set w/o `local` or `remote` flag
-        local_live_cam = live_cam | local | network,
-        server_live_cam = live_cam | remote,// | network,
-        server_archive = remote | media | video | audio | streamprovider,
-        ARCHIVE = url | local | media | video | audio | streamprovider,     /**< Local media file. */
-        SINGLE_SHOT = url | local | media | still_image | streamprovider    /**< Local still image file. */
-    };
-    Q_DECLARE_FLAGS(Flags, Flag)
-
     QnResource();
-    QnResource(const QnResourceParameters &params);
     virtual ~QnResource();
 
-    virtual void deserialize(const QnResourceParameters& parameters);
+    QUuid getId() const;
+    void setId(const QUuid& id);
 
-    QnId getId() const;
-    void setId(QnId id);
-
-    QnId getParentId() const;
-    void setParentId(QnId parent);
-
-    void setGuid(const QString& guid); // TODO: #Elric UUID!
-    QString getGuid() const;
+    QUuid getParentId() const;
+    void setParentId(QUuid parent);
 
     // device unique identifier
-    virtual QString getUniqueId() const = 0;
+    virtual QString getUniqueId() const { return getId().toString(); };
     virtual void setUniqId(const QString& value);
 
 
     // TypeId unique string id for resource with SUCH list of params and CLASS
     // in other words TypeId can be used instantiate the right resource
-    QnId getTypeId() const;
-    void setTypeId(QnId id);
+    QUuid getTypeId() const;
+    void setTypeId(const QUuid &id);
+    void setTypeByName(const QString& resTypeName);
 
-    bool isDisabled() const;
-    void setDisabled(bool disabled = true);
-
-    Status getStatus() const;
-    virtual void setStatus(Status newStatus, bool silenceMode = false);
+    virtual Qn::ResourceStatus getStatus() const;
+    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false);
     QDateTime getLastStatusUpdateTime() const;
 
-    //!this function is called if resourse changes state from offline to online or so 
+    //!this function is called if resource changes state from offline to online or so 
     /*!
         \note If \a QnResource::init is already running in another thread, this method exits immediately and returns false
         \return true, if initialization attempt is done (with success or failure). false, if \a QnResource::init is already running in other thread
@@ -174,15 +93,15 @@ public:
     void blockingInit();
     void initAsync(bool optional);
     CameraDiagnostics::Result prevInitializationResult() const;
-    //!Returns counter of resiource initialization attempts (every attempt: successfull or not)
+    //!Returns counter of resource initialization attempts (every attempt: successful or not)
     int initializationAttemptCount() const;
     
     // flags like network media and so on
-    Flags flags() const;
-    inline bool hasFlags(Flags flags) const { return (this->flags() & flags) == flags; }
-    void setFlags(Flags flags);
-    void addFlags(Flags flags);
-    void removeFlags(Flags flags);
+    Qn::ResourceFlags flags() const;
+    inline bool hasFlags(Qn::ResourceFlags flags) const { return (this->flags() & flags) == flags; }
+    void setFlags(Qn::ResourceFlags flags);
+    void addFlags(Qn::ResourceFlags flags);
+    void removeFlags(Qn::ResourceFlags flags);
 
 
     //just a simple resource name
@@ -215,19 +134,21 @@ public:
     // return true if no error
     bool getParam(const QString &name, QVariant &val, QnDomain domain) const;
 
+#ifdef ENABLE_DATA_PROVIDERS
     // same as getParam is invoked in separate thread.
     // as soon as param changed parameterValueChanged() signal is emitted
     void getParamAsync(const QString &name, QnDomain domain);
+#endif 
 
 
     // return true if no error
     virtual bool setParam(const QString &name, const QVariant &val, QnDomain domain);
 
+#ifdef ENABLE_DATA_PROVIDERS
     // same as setParam but but returns immediately;
     // this function leads setParam invoke in separate thread. so no need to make it virtual
     void setParamAsync(const QString &name, const QVariant &val, QnDomain domain);
-
-    // ==============================================================================
+#endif 
 
     // some time we can find resource, but cannot request additional information from it ( resource has bad ip for example )
     // in this case we need to request additional information later.
@@ -236,9 +157,10 @@ public:
 
     // updateResource requests the additional  information and returns resource with same params but additional info; unknownResource() for returned resource must return false
     virtual QnResourcePtr updateResource() { return QnResourcePtr(0); }
-    //=============
 
-    QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
+#ifdef ENABLE_DATA_PROVIDERS
+    QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role);
+#endif
 
     QString getUrl() const;
     virtual void setUrl(const QString &url);
@@ -250,10 +172,14 @@ public:
     QStringList getTags() const;
 
     bool hasConsumer(QnResourceConsumer *consumer) const;
+#ifdef ENABLE_DATA_PROVIDERS
     bool hasUnprocessedCommands() const;
+#endif
+
     bool isInitialized() const;
 
     static void stopAsyncTasks();
+    static void pleaseStopAsyncTasks();
 
     /**
         Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
@@ -273,10 +199,11 @@ public:
     void setProperty(const QString &key, const QString &value);
     QnKvPairList getProperties() const;
 
+    static QnInitResPool* initAsyncPoolInstance();
+
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param) const;
     void statusChanged(const QnResourcePtr &resource);
-    void disabledChanged(const QnResourcePtr &resource);
     void nameChanged(const QnResourcePtr &resource);
     void parentIdChanged(const QnResourcePtr &resource);
     void flagsChanged(const QnResourcePtr &resource);
@@ -291,14 +218,14 @@ signals:
     //!Emitted on completion of every async get started with getParamAsync
     /*!
         \param paramValue in case \a result == false, this value cannot be relied on
-        \param result true, if param succesfully read, false otherwises
+        \param result true, if param successfully read, false otherwise
     */
     void asyncParamGetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result) const;
     
     //!Emitted on completion of every async set started with setParamAsync
     /*!
         \param paramValue in case \a result == false, this value cannot be relied on
-        \param result true, if param succesfully set, false otherwises
+        \param result true, if param successfully set, false otherwise
     */
     void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
 
@@ -306,13 +233,15 @@ signals:
 
 
 public:
+#ifdef ENABLE_DATA_PROVIDERS
     // this is thread to process commands like setparam
     static void startCommandProc();
     static void stopCommandProc();
-    static void addCommandToProc(QnAbstractDataPacketPtr data);
+    static void addCommandToProc(const QnResourceCommandPtr &command);
     static int commandProcQueueSize();
+#endif
 
-    void update(QnResourcePtr other, bool silenceMode = false);
+    void update(const QnResourcePtr& other, bool silenceMode = false);
 
     // Need use lock/unlock consumers before this call!
     QSet<QnResourceConsumer *> getAllConsumers() const { return m_consumers; }
@@ -322,7 +251,7 @@ public:
     QnResourcePtr toSharedPointer() const;
 
 protected:
-    virtual void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields);
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
 
     // should just do physical job ( network or so ) do not care about memory domain
     virtual bool getParamPhysical(const QnParam &param, QVariant &val);
@@ -330,7 +259,10 @@ protected:
 
     virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain);
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+#ifdef ENABLE_DATA_PROVIDERS
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
+#endif
+
     virtual QnAbstractPtzController *createPtzControllerInternal(); // TODO: #Elric does not belong here
 
     virtual CameraDiagnostics::Result initInternal() {return CameraDiagnostics::NoErrorResult();};
@@ -341,7 +273,6 @@ protected:
     virtual void initializationDone();
 
     virtual void parameterValueChangedNotify(const QnParam &param);
-
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */
@@ -373,6 +304,12 @@ protected:
 
     static bool m_appStopping;
 
+    /** Identifier of the parent resource. Use resource pool to retrieve the actual parent resource. */
+    QUuid m_parentId;
+
+    /** Name of this resource. */
+    QString m_name;
+
     /** Url of this resource, if any. */
     QString m_url; 
 private:
@@ -380,28 +317,17 @@ private:
     QnResourcePool *m_resourcePool;
 
     /** Identifier of this resource. */
-    QnId m_id;
-
-    /** Globally unique identifier ot this resource. */
-    QString m_guid;
-
-    /** Identifier of the parent resource. Use resource pool to retrieve the actual parent resource. */
-    QnId m_parentId;
+    QUuid m_id;
 
     /** Identifier of the type of this resource. */
-    QnId m_typeId;
+    QUuid m_typeId;
 
     /** Flags of this resource that determine its type. */
-    Flags m_flags;
+    Qn::ResourceFlags m_flags;
     
-    /** Name of this resource. */
-    QString m_name;
-
-    /** Disable flag of the resource. */
-    bool m_disabled;
 
     /** Status of this resource. */
-    Status m_status;
+    Qn::ResourceStatus m_status;
 
     QDateTime m_lastDiscoveredTime;
     QDateTime m_lastStatusUpdateTime;
@@ -421,8 +347,6 @@ private:
     QAtomicInt m_initializationAttemptCount;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);
-
 template<class Resource>
 QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
     if(resource == NULL) {
@@ -438,32 +362,6 @@ QnSharedResourcePointer<Resource> QnResource::toSharedPointer(Resource *resource
     return toSharedPointer(resource);
 }
 
-
-class QnResourceFactory
-{
-public:
-    virtual ~QnResourceFactory() {}
-
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters) = 0;
-};
-
-
-class QnResourceProcessor
-{
-public:
-    virtual ~QnResourceProcessor() {}
-
-    virtual void processResources(const QnResourceList &resources) = 0;
-};
-
-
-// for future use
-class QnRecorder : public QnResource
-{
-};
-
-
-Q_DECLARE_METATYPE(QnResource::Status);
 Q_DECLARE_METATYPE(QnResourcePtr);
 Q_DECLARE_METATYPE(QnResourceList);
 

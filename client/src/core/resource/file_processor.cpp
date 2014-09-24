@@ -9,11 +9,11 @@
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource_management/resource_pool.h>
-#include <plugins/resources/archive/avi_files/avi_dvd_resource.h>
-#include <plugins/resources/archive/avi_files/avi_bluray_resource.h>
-#include <plugins/resources/archive/avi_files/avi_dvd_archive_delegate.h>
-#include <plugins/resources/archive/filetypesupport.h>
-#include "plugins/storage/file_storage/layout_storage_resource.h"
+#include <plugins/resource/avi/avi_dvd_resource.h>
+#include <plugins/resource/avi/avi_bluray_resource.h>
+#include <plugins/resource/avi/avi_dvd_archive_delegate.h>
+#include <plugins/resource/avi/filetypesupport.h>
+#include <plugins/storage/file_storage/layout_storage_resource.h>
 
 QStringList QnFileProcessor::findAcceptedFiles(const QStringList &files)
 {
@@ -94,7 +94,7 @@ void QnFileProcessor::deleteLocalResources(const QnResourceList &resources_)
 {
     QnResourceList resources;
     foreach (const QnResourcePtr &resource, resources_)
-        if (resource->hasFlags(QnResource::url | QnResource::local))
+        if (resource->hasFlags(Qn::url | Qn::local))
             resources.append(resource);
     if (resources.isEmpty())
         return;

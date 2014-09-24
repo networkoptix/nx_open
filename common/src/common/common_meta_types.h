@@ -6,6 +6,7 @@
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QAuthenticator>
 
+
 // TODO: #Elric move to model functions?
 /**
  * Convenience macro for generating stream operators of enumerations.
@@ -27,10 +28,9 @@ inline QDataStream &operator>>(QDataStream &stream, ENUM &value) {              
  */
 class QnCommonMetaTypes {
 public:
-    static void initilize();
+    static void initialize();
 };
 
-Q_DECLARE_METATYPE(QUuid);
 Q_DECLARE_METATYPE(QHostAddress);
 Q_DECLARE_METATYPE(QAuthenticator);
 Q_DECLARE_METATYPE(Qt::ConnectionType);

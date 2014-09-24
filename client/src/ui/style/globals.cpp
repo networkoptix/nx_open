@@ -11,7 +11,7 @@
 #include <QtGui/QFont>
 #include <QtGui/QColor>
 
-#include <utils/common/json.h>
+#include <utils/serialization/lexical_functions.h>
 
 namespace {
     QColor parseColor(const QVariant &value, const QColor &defaultValue) {

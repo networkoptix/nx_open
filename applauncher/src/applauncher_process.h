@@ -80,7 +80,7 @@ private:
     QString m_devModeKey;
 
     bool sendTaskToRunningLauncherInstance();
-    bool getVersionToLaunch( QString* const versionToLaunch, QString* const appArgs );
+    bool getVersionToLaunch( QnSoftwareVersion* const versionToLaunch, QString* const appArgs );
     bool addTaskToThePipe( const QByteArray& serializedTask );
     bool startApplication(
         const std::shared_ptr<applauncher::api::StartApplicationTask>& task,
@@ -88,19 +88,25 @@ private:
     bool startInstallation(
         const std::shared_ptr<applauncher::api::StartInstallationTask>& task,
         applauncher::api::StartInstallationResponse* const response );
+    bool installZip(
+        const std::shared_ptr<applauncher::api::InstallZipTask>& request,
+        applauncher::api::Response* const response );
     bool getInstallationStatus(
         const std::shared_ptr<applauncher::api::GetInstallationStatusRequest>& request,
         applauncher::api::InstallationStatusResponse* const response );
     bool isVersionInstalled(
         const std::shared_ptr<applauncher::api::IsVersionInstalledRequest>& request,
         applauncher::api::IsVersionInstalledResponse* const response );
+    bool getInstalledVersions(
+        const std::shared_ptr<applauncher::api::GetInstalledVersionsRequest>& request,
+        applauncher::api::GetInstalledVersionsResponse* const response );
     bool cancelInstallation(
         const std::shared_ptr<applauncher::api::CancelInstallationRequest>& request,
         applauncher::api::CancelInstallationResponse* const response );
     bool addProcessKillTimer(
         const std::shared_ptr<applauncher::api::AddProcessKillTimerRequest>& request,
         applauncher::api::AddProcessKillTimerResponse* const response );
-    bool blockingRestoreVersion( const QString& versionToLaunch );
+    bool blockingRestoreVersion( const QnSoftwareVersion& versionToLaunch );
 
     virtual void onTimer( const quint64& timerID ) override;
 

@@ -5,12 +5,11 @@
 
 #include <utils/common/warnings.h>
 #include "plugins/storage/file_storage/layout_storage_resource.h"
-#include "api/serializer/pb_serializer.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
+#include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_pool.h"
 
 
-QnLayoutResource::QnLayoutResource(): 
+QnLayoutResource::QnLayoutResource(const QnResourceTypePool* resTypePool): 
     base_type(),
     m_cellAspectRatio(-1.0),
     m_cellSpacing(-1.0, -1.0),
@@ -19,8 +18,37 @@ QnLayoutResource::QnLayoutResource():
     m_backgroundOpacity(0.7),
     m_locked(false)
 {
-    setStatus(Online, true);
-    addFlags(QnResource::layout);
+    setStatus(Qn::Online, true);
+    addFlags(Qn::layout);
+    setTypeId(resTypePool->getFixedResourceTypeId(lit("Layout")));
+}
+
+QnLayoutResourcePtr QnLayoutResource::clone() const {
+    QMutexLocker locker(&m_mutex);
+
+    QnLayoutResourcePtr result(new QnLayoutResource(qnResTypePool));
+    result->setId(QUuid::createUuid());
+    result->setName(m_name);
+    result->setParentId(m_parentId);
+    result->setCellSpacing(m_cellSpacing);
+    result->setCellAspectRatio(m_cellAspectRatio);
+    result->setBackgroundImageFilename(m_backgroundImageFilename);
+    result->setBackgroundOpacity(m_backgroundOpacity);
+    result->setBackgroundSize(m_backgroundSize);
+    result->setUserCanEdit(m_userCanEdit);
+
+    QnLayoutItemDataList items = m_itemByUuid.values();
+    QHash<QUuid, QUuid> newUuidByOldUuid;
+    for(int i = 0; i < items.size(); i++) {
+        QUuid newUuid = QUuid::createUuid();
+        newUuidByOldUuid[items[i].uuid] = newUuid;
+        items[i].uuid = newUuid;
+    }
+    for(int i = 0; i < items.size(); i++)
+        items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QUuid());
+    result->setItems(items);
+
+    return result;
 }
 
 void QnLayoutResource::setItems(const QnLayoutItemDataList& items) {
@@ -32,7 +60,10 @@ void QnLayoutResource::setItems(const QnLayoutItemDataList& items) {
 
 void QnLayoutResource::setItems(const QnLayoutItemDataMap &items) {
     QMutexLocker locker(&m_mutex);
+    setItemsUnderLock(items);
+}
 
+void QnLayoutResource::setItemsUnderLock(const QnLayoutItemDataMap &items) {
     foreach(const QnLayoutItemData &item, m_itemByUuid)
         if(!items.contains(item.uuid))
             removeItemUnderLock(item.uuid);
@@ -63,6 +94,8 @@ void QnLayoutResource::setUrl(const QString& value)
     QString oldValue = removeProtocolPrefix(getUrl());
     QnResource::setUrl(value);
     QString newValue = removeProtocolPrefix(getUrl());
+
+#ifdef ENABLE_ARCHIVE
     if (!oldValue.isEmpty() && oldValue != newValue)
     {
         // Local layout renamed
@@ -72,6 +105,7 @@ void QnLayoutResource::setUrl(const QString& value)
             item.resource.path = QnLayoutFileStorageResource::updateNovParent(value, item.resource.path);
         }
     }
+#endif
 }
 
 QnLayoutItemData QnLayoutResource::getItem(const QUuid &itemUuid) const {
@@ -80,24 +114,19 @@ QnLayoutItemData QnLayoutResource::getItem(const QUuid &itemUuid) const {
     return m_itemByUuid.value(itemUuid);
 }
 
-QString QnLayoutResource::getUniqueId() const
-{
-    return getGuid();
-}
-
-void QnLayoutResource::updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) {
+void QnLayoutResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
     base_type::updateInner(other, modifiedFields);
 
     QnLayoutResourcePtr localOther = other.dynamicCast<QnLayoutResource>();
     if(localOther) {
-        setItems(localOther->getItems());
-        setCellAspectRatio(localOther->cellAspectRatio());
-        setCellSpacing(localOther->cellSpacing());
-        setUserCanEdit(localOther->userCanEdit());
-        setBackgroundImageFilename(localOther->backgroundImageFilename());
-        setBackgroundSize(localOther->backgroundSize());
-        setBackgroundOpacity(localOther->backgroundOpacity());
-        setLocked(localOther->locked());
+        setItemsUnderLock(localOther->m_itemByUuid);
+        m_cellAspectRatio = localOther->m_cellAspectRatio;
+        m_cellSpacing = localOther->m_cellSpacing;
+        m_userCanEdit = localOther->m_userCanEdit;
+        m_backgroundImageFilename = localOther->m_backgroundImageFilename;
+        m_backgroundSize = localOther->m_backgroundSize;
+        m_backgroundOpacity = localOther->m_backgroundOpacity;
+        m_locked = localOther->m_locked;
     }
 }
 
@@ -336,12 +365,6 @@ void QnLayoutResource::setLocked(bool value) {
         if (m_locked == value)
             return;
         m_locked = value;
-
-        if (value)
-            setStatus(QnResource::Locked, true);
-        else
-            setStatus(QnResource::Online, true);
     }
     emit lockedChanged(::toSharedPointer(this));
 }
-

@@ -5,6 +5,9 @@
 #include <client/client_settings.h>
 
 #include <ui/common/palette.h>
+#include <utils/common/synctime.h>
+
+
 
 QnClockDataProvider::QnClockDataProvider(const QString fixedFormat, QObject *parent) :
     QObject(parent),
@@ -13,7 +16,8 @@ QnClockDataProvider::QnClockDataProvider(const QString fixedFormat, QObject *par
     m_showWeekDay(qnSettings->isClockWeekdayOn()),
     m_showDateAndMonth(qnSettings->isClockDateOn()),
     m_showSeconds(qnSettings->isClockSecondsOn()),
-    m_formatString(fixedFormat)
+    m_formatString(fixedFormat),
+    m_clockType(localSystemClock)
 {
     if (m_formatString.isEmpty()) {
         connect(qnSettings->notifier(QnClientSettings::CLOCK_24HOUR),     SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
@@ -24,20 +28,26 @@ QnClockDataProvider::QnClockDataProvider(const QString fixedFormat, QObject *par
         updateFormatString();
     }
 
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
-    m_timer->start(1000);
+    connect(m_timer, &QTimer::timeout, this, [this](){
+        emit timeChanged(
+            m_clockType == serverClock
+            ? QDateTime::fromMSecsSinceEpoch( qnSyncTime->currentMSecsSinceEpoch() ).toString( m_formatString )
+            : QDateTime::currentDateTime().toString(m_formatString) );
+    });
+    m_timer->start(100);
 }
 
 QnClockDataProvider::~QnClockDataProvider() {
     return;
 }
 
-void QnClockDataProvider::at_timer_timeout() {
-    emit timeChanged(QDateTime::currentDateTime().toString(m_formatString));
+void QnClockDataProvider::setClockType( ClockType clockType )
+{
+    m_clockType = clockType;
 }
 
 void QnClockDataProvider::updateFormatString() {
-    // TODO: #GDM field values are not updated from settings.
+    // TODO: #GDM #Common field values are not updated from settings.
     // We probably don't need this complexity anyway.
 
     m_formatString = QString();
@@ -75,6 +85,23 @@ void QnClockLabel::init(const QString &format) {
 
     setPaletteColor(this, QPalette::WindowText, QColor(64, 130, 180, 128));
 
-    QnClockDataProvider *provider = new QnClockDataProvider(format, this);
-    connect(provider, &QnClockDataProvider::timeChanged, this, &GraphicsLabel::setText);
+    m_provider = new QnClockDataProvider(format, this);
+    connect( m_provider, &QnClockDataProvider::timeChanged, this, &GraphicsLabel::setText );
+
+
+    m_serverTimeAction = new QAction( tr( "Server time" ), this );
+    addAction( m_serverTimeAction );
+    m_localTimeAction = new QAction( tr( "Local system time" ), this );
+    addAction( m_localTimeAction );
+}
+
+void QnClockLabel::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
+{
+    QMenu menu;
+    menu.addActions( actions() );
+    QAction* selectedAction = menu.exec( event->screenPos() );
+    if( selectedAction == m_serverTimeAction )
+        m_provider->setClockType( QnClockDataProvider::serverClock );
+    else if( selectedAction == m_localTimeAction )
+        m_provider->setClockType( QnClockDataProvider::localSystemClock );
 }

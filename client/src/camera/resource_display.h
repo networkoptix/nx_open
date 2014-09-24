@@ -3,7 +3,8 @@
 
 #include <QtCore/QObject>
 #include <core/resource/resource_consumer.h>
-#include <core/resource/media_resource.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource_media_layout.h>
 
 class QnAbstractArchiveReader;
 class QnAbstractMediaStreamDataProvider;
@@ -39,16 +40,12 @@ public:
     /**
      * \returns                         Resource associated with this display.
      */
-    const QnResourcePtr &resource() const {
-        return getResource();
-    }
+    const QnResourcePtr &resource() const;
 
     /**
      * \returns                         Media resource associated with this display, if any.
      */
-    const QnMediaResourcePtr &mediaResource() const {
-        return m_mediaResource;
-    }
+    const QnMediaResourcePtr &mediaResource() const;
 
     /**
      * \returns                         Data provider associated with this display.

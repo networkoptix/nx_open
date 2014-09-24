@@ -1,13 +1,16 @@
-
 #include "spush_media_stream_provider.h"
 
-#include "utils/common/sleep.h"
-#include "utils/common/util.h"
-#include "utils/network/simple_http_client.h"
-#include "../resource/camera_resource.h"
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include <utils/common/sleep.h>
+#include <utils/common/util.h>
+#include <utils/common/log.h>
+#include <utils/network/simple_http_client.h>
+
+#include <core/resource/camera_resource.h>
 
 
-CLServerPushStreamReader::CLServerPushStreamReader(QnResourcePtr dev ):
+CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
     QnLiveStreamProvider(dev),
     m_needReopen(false),
     m_cameraAudioEnabled(false),
@@ -15,7 +18,7 @@ CLServerPushStreamReader::CLServerPushStreamReader(QnResourcePtr dev ):
     m_openStreamCounter(0),
     m_FrameCnt(0)
 {
-    QnPhysicalCameraResourcePtr camera = getResource().dynamicCast<QnPhysicalCameraResource>();
+    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(dev.data());
     if (camera) 
         m_cameraAudioEnabled = camera->isAudioEnabled();
 }
@@ -77,8 +80,8 @@ void CLServerPushStreamReader::run()
 
                 if (mFramesLost >= MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
                 {
-                    if (canChangeStatus() && getResource()->getStatus() != QnResource::Unauthorized) // avoid offline->unauthorized->offline loop
-                        getResource()->setStatus( getLastResponseCode() == CL_HTTP_AUTH_REQUIRED ? QnResource::Unauthorized : QnResource::Offline);
+                    if (canChangeStatus() && getResource()->getStatus() != Qn::Unauthorized) // avoid offline->unauthorized->offline loop
+                        getResource()->setStatus( getLastResponseCode() == CL_HTTP_AUTH_REQUIRED ? Qn::Unauthorized : Qn::Offline);
                     m_stat[0].onLostConnection();
                     mFramesLost = 0;
                 }
@@ -93,7 +96,7 @@ void CLServerPushStreamReader::run()
             closeStream();
         }
 
-        QnAbstractMediaDataPtr data = getNextData();
+        const QnAbstractMediaDataPtr& data = getNextData();
 
 
         if (data==0)
@@ -106,7 +109,7 @@ void CLServerPushStreamReader::run()
             if (mFramesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
             {
                 if (canChangeStatus())
-                    getResource()->setStatus(QnResource::Offline);
+                    getResource()->setStatus(Qn::Offline);
                 if (m_FrameCnt > 0)
                     m_resource->setLastMediaIssue(CameraDiagnostics::BadMediaStreamResult());
                 else
@@ -118,15 +121,15 @@ void CLServerPushStreamReader::run()
         }
         m_FrameCnt++;
 
-        if (getResource()->hasFlags(QnResource::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag; 
+        if (getResource()->hasFlags(Qn::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag; 
             data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
 
         checkTime(data);
 
         if (canChangeStatus())
         {
-            if (getResource()->getStatus() == QnResource::Unauthorized || getResource()->getStatus() == QnResource::Offline)
-                getResource()->setStatus(QnResource::Online);
+            if (getResource()->getStatus() == Qn::Unauthorized || getResource()->getStatus() == Qn::Offline)
+                getResource()->setStatus(Qn::Online);
         }
 
         QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
@@ -167,18 +170,18 @@ void CLServerPushStreamReader::run()
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this);
         if (videoData)
         {
-            m_stat[videoData->channelNumber].onData(data->data.size());
+            m_stat[videoData->channelNumber].onData(data->dataSize());
             if (lp)
                 lp->onGotVideoFrame(videoData);
         }
-        if (data && lp && lp->getRole() == QnResource::Role_SecondaryLiveVideo)
+        if (data && lp && lp->getRole() == Qn::CR_SecondaryLiveVideo)
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 
         //qDebug() << "fps = " << m_stat[0].getFrameRate();
 
         // check queue sizes
         if (dataCanBeAccepted())
-            putData(data);
+            putData(std::move(data));
         else
             setNeedKeyData();
 
@@ -207,10 +210,12 @@ void CLServerPushStreamReader::pleaseReOpen()
 
 void CLServerPushStreamReader::afterUpdate() 
 {
-    QnPhysicalCameraResourcePtr camera = getResource().dynamicCast<QnPhysicalCameraResource>();
+    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(getResource().data());
     if (camera) {
         if (m_cameraAudioEnabled != camera->isAudioEnabled())
             pleaseReOpen();
         m_cameraAudioEnabled = camera->isAudioEnabled();
     }
 }
+
+#endif // ENABLE_DATA_PROVIDERS

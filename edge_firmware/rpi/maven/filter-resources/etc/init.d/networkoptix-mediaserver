@@ -1,0 +1,81 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          networkoptix-mediaserver
+# Required-Start:    networking
+# Required-Stop:    
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: NetworkOptix HD Witness Media Server
+### END INIT INFO
+
+# NetworkOptix Media Server
+
+KILL_TIMEOUT_SEC=1
+KILL_CHECK_TRIES=30
+APPLICATION_NAME="NetworkOptix mediaserver"
+CUSTOMIZATION=networkoptix
+MODULE_NAME=mediaserver
+INSTALL_ROOT=/opt/$CUSTOMIZATION/$MODULE_NAME/
+BIN_PATH=$INSTALL_ROOT/bin/$MODULE_NAME
+RUN_ARGS=-e
+export LD_LIBRARY_PATH=$INSTALL_ROOT/lib/
+export VMS_PLUGIN_DIR=$INSTALL_ROOT/bin/plugins/
+
+RUNNING_APP_PID="`pidof $MODULE_NAME`"
+
+case "$1" in
+    start)
+        if [ ! -z "$RUNNING_APP_PID" ]; then
+            echo "$APPLICATION_NAME is already running with pid $RUNNING_APP_PID"
+            exit 0
+        fi
+
+        ulimit -n 3072
+        ulimit -c unlimited
+        echo -n "Starting $APPLICATION_NAME ...         "
+        $BIN_PATH $RUN_ARGS 1>/dev/null 2>&1 &
+        sleep 1
+        RUNNING_APP_PID="`pidof $MODULE_NAME`"
+        if [ ! -z "$RUNNING_APP_PID" ]; then
+            echo "OK"
+        else
+            echo "FAILURE"
+        fi
+        ;;
+
+    stop)
+        if [ -z "$RUNNING_APP_PID" ]; then
+            echo "$APPLICATION_NAME is not running"
+            exit 0
+        fi
+
+        echo -n "Stopping $APPLICATION_NAME running with pid $RUNNING_APP_PID ...        "
+        kill "$RUNNING_APP_PID"
+        for i in {1..$KILL_CHECK_TRIES}
+        do
+            sleep $KILL_TIMEOUT_SEC
+            RUNNING_APP_PID="`pidof $MODULE_NAME`"
+            if [ -z "$RUNNING_APP_PID" ]; then
+                echo "OK"
+                exit 0
+            fi
+        done
+
+        echo "OK"
+        kill -9 "$RUNNING_APP_PID"
+        ;;
+
+    status)
+        if [ ! -z "$RUNNING_APP_PID" ]; then
+            echo "$APPLICATION_NAME is running with pid $RUNNING_APP_PID"
+        else
+            echo "$APPLICATION_NAME is not running"
+        fi
+        ;;
+
+    restart)
+        $0 stop
+        sleep 1
+        $0 start
+        ;;
+esac

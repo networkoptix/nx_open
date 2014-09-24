@@ -11,8 +11,7 @@ public:
     enum RoundMethod { IFrameBeforeTime, Precise, IFrameAfterTime };
 
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
-    virtual QString description() const;
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, QByteArray& contentType);
 
 private:
     int noVideoError(QByteArray& result, qint64 time);

@@ -15,7 +15,7 @@
 
 #include <common/common_globals.h>
 #include <utils/mac_utils.h>
-#include "version.h"
+#include <utils/common/app_info.h>
 
 
 bool removeDir(const QString &dirName)
@@ -56,10 +56,10 @@ QString getMoviesDirectory()
 {
 #ifdef Q_OS_MACX
     QString moviesDir = mac_getMoviesDir();
-    return moviesDir.isEmpty() ? QString() : moviesDir + QLatin1String("/") + QLatin1String(QN_MEDIA_FOLDER_NAME);
+    return moviesDir.isEmpty() ? QString() : moviesDir + QLatin1String("/") + QnAppInfo::mediaFolderName();
 #else
     const QStringList& moviesDirs = QStandardPaths::standardLocations(QStandardPaths::MoviesLocation);
-    return moviesDirs.isEmpty() ? QString() : (moviesDirs[0] + QLatin1String("/") + QLatin1String(QN_MEDIA_FOLDER_NAME) );
+    return moviesDirs.isEmpty() ? QString() : (moviesDirs[0] + QLatin1String("/") + QnAppInfo::mediaFolderName()) ;
 #endif
 }
 
@@ -67,9 +67,9 @@ QString getBackgroundsDirectory() {
     const QStringList& pictureFolderList = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
     QString baseDir = pictureFolderList.isEmpty() ? QString(): pictureFolderList[0];
 #ifdef Q_OS_WIN
-    QString productDir = baseDir + QDir::toNativeSeparators(QString(lit("/%1 Backgrounds")).arg(lit(QN_PRODUCT_NAME_LONG)));
+    QString productDir = baseDir + QDir::toNativeSeparators(QString(lit("/%1 Backgrounds")).arg(QnAppInfo::productNameLong()));
 #else
-    QString productDir = QDir::toNativeSeparators(QString(lit("/opt/%1/client/share/pictures/sample-backgrounds")).arg(lit(VER_LINUX_ORGANIZATION_NAME)));
+    QString productDir = QDir::toNativeSeparators(QString(lit("/opt/%1/client/share/pictures/sample-backgrounds")).arg(QnAppInfo::linuxOrganizationName()));
 #endif
 
     return QDir(productDir).exists()
@@ -112,19 +112,36 @@ QString strPadLeft(const QString &str, int len, char ch)
     return str;
 }
 
+QString getPathSeparator(const QString& path)
+{
+    return path.contains(lit("\\")) ? lit("\\") : lit("/");
+}
+
 QString closeDirPath(const QString& value)
 {
-    QString tmp = value;
-    for (int i = 0; i < tmp.size(); ++i) {
-        if (tmp[i] == QLatin1Char('\\'))
-            tmp[i] = QLatin1Char('/');
-    }
-    if (tmp.endsWith(QLatin1Char('/')))
-        return tmp;
+    QString separator = getPathSeparator(value);
+    if (value.endsWith(separator))
+        return value;
     else
-        return tmp + QLatin1Char('/');
+        return value + separator;
 }
+
 #ifdef Q_OS_WIN32
+
+bool isLocalPath(const QString& folder)
+{
+    return folder.length() >= 2 && folder[1] == L':';
+}
+
+QString getParentFolder(const QString& root)
+{
+    QString newRoot = QDir::toNativeSeparators(root);
+    if (newRoot.endsWith(QDir::separator()))
+        newRoot.chop(1);
+    return newRoot.left(newRoot.lastIndexOf(QDir::separator())+1);
+}
+
+
 qint64 getDiskFreeSpace(const QString& root)
 {
     quint64 freeBytesAvailableToCaller = -1;
@@ -136,7 +153,11 @@ qint64 getDiskFreeSpace(const QString& root)
         (PULARGE_INTEGER) &totalNumberOfBytes, // receives the number of bytes on disk
         (PULARGE_INTEGER) &totalNumberOfFreeBytes // receives the free bytes on disk
     );
-    Q_UNUSED(status);
+    if (!status && isLocalPath(root)) {
+        QString newRoot = getParentFolder(root);
+        if (!newRoot.isEmpty())
+            return getDiskFreeSpace(newRoot); // try parent folder
+    }
     return totalNumberOfFreeBytes;
 };
 
@@ -151,7 +172,11 @@ qint64 getDiskTotalSpace(const QString& root)
         (PULARGE_INTEGER) &totalNumberOfBytes, // receives the number of bytes on disk
         (PULARGE_INTEGER) &totalNumberOfFreeBytes // receives the free bytes on disk
         );
-    Q_UNUSED(status);
+    if (!status && isLocalPath(root)) {
+        QString newRoot = getParentFolder(root);
+        if (!newRoot.isEmpty())
+            return getDiskTotalSpace(newRoot); // try parent folder
+    }
     return totalNumberOfBytes;
 };
 
@@ -161,6 +186,7 @@ qint64 getDiskFreeSpace(const QString& root) {
     if (statvfs(root.toUtf8().data(), &buf) == 0)
     {
         //qint64 disk_size = buf.f_blocks * (qint64) buf.f_bsize;
+        //TODO #ak if we run under root, MUST use buf.f_bfree, else buf.f_bavail
         qint64 free = buf.f_bavail * (qint64) buf.f_bsize;
         //qint64 used = disk_size - free;
 
@@ -175,7 +201,7 @@ qint64 getDiskTotalSpace(const QString& root) {
     struct statvfs buf;
     if (statvfs(root.toUtf8().data(), &buf) == 0)
     {
-        qint64 disk_size = buf.f_blocks * (qint64) buf.f_bsize;
+        qint64 disk_size = buf.f_blocks * (qint64) buf.f_frsize;
         //qint64 free = buf.f_bavail * (qint64) buf.f_bsize;
         //qint64 used = disk_size - free;
 
@@ -259,3 +285,10 @@ uint qt4Hash(const QString &key)
 {
     return hash(key.unicode(), key.size());
 }
+
+#ifdef _DEBUG
+QString debugTime(qint64 timeMSec, const QString &fmt) {
+    QString format = fmt.isEmpty() ? lit("hh:mm:ss") : fmt;
+    return QDateTime::fromMSecsSinceEpoch(timeMSec).toString(format);
+}
+#endif

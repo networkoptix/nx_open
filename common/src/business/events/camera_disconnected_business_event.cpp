@@ -4,13 +4,13 @@
 QnCameraDisconnectedBusinessEvent::QnCameraDisconnectedBusinessEvent(
         const QnResourcePtr& cameraResource,
         qint64 timeStamp):
-    base_type(BusinessEventType::Camera_Disconnect,
+    base_type(QnBusiness::CameraDisconnectEvent,
                             cameraResource,
                             timeStamp)
 {
 }
 
-bool QnCameraDisconnectedBusinessEvent::checkCondition(Qn::ToggleState state, const QnBusinessEventParameters& params) const
+bool QnCameraDisconnectedBusinessEvent::checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters& params) const
 {
     if (!base_type::checkCondition(state, params))
         return false;

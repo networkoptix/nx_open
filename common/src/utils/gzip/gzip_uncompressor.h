@@ -30,6 +30,7 @@ public:
     virtual size_t flush() override;
 
 private:
+    // TODO: #Elric #enum
     enum class State
     {
         init,

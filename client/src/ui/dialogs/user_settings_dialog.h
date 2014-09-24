@@ -6,9 +6,12 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QString>
 
+#include <array>
+
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 class QnWorkbenchContext;
 class QCheckBox;
@@ -17,8 +20,11 @@ namespace Ui {
     class UserSettingsDialog;
 }
 
-class QnUserSettingsDialog: public QDialog, public QnWorkbenchContextAware {
+class QnUserSettingsDialog: public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
+
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+
 public:
     enum Element {
         Login,
@@ -38,7 +44,7 @@ public:
     QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent = NULL);
     virtual ~QnUserSettingsDialog();
 
-    const QnUserResourcePtr &user() const;
+    QnUserResourcePtr user() const;
     void setUser(const QnUserResourcePtr &user);
 
     void updateFromResource();
@@ -48,8 +54,6 @@ public:
     ElementFlags elementFlags(Element element) const;
 
     void setFocusedElement(QString element);
-
-    void setEditorPermissions(quint64 rights);
 
     bool hasChanges() const {
         return m_hasChanges;
@@ -103,12 +107,11 @@ private:
     QString m_currentPassword;
     QHash<QString, QnResourcePtr> m_userByLogin;
     QnUserResourcePtr m_user;
-    bool m_valid[ElementCount];
-    QString m_hints[ElementCount];
-    ElementFlags m_flags[ElementCount];
+    std::array<bool, ElementCount> m_valid;
+    std::array<QString, ElementCount> m_hints;
+    std::array<ElementFlags, ElementCount> m_flags;
     bool m_hasChanges;
     QHash<quint64, QCheckBox*> m_advancedRights;
-    quint64 m_editorRights;
 
     /** Status variable to avoid unneeded checks. */
     bool m_inUpdateDependensies;

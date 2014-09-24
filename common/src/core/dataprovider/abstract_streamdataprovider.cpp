@@ -1,11 +1,13 @@
 #include "abstract_streamdataprovider.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "../resource/resource.h"
 
-QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResourcePtr resource):
+QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(const QnResourcePtr& resource):
     QnResourceConsumer(resource),
     m_mutex(QMutex::Recursive),
-    m_role(QnResource::Role_Default)
+    m_role(Qn::CR_Default)
 {
 }
 
@@ -20,7 +22,7 @@ bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
     QMutexLocker mutex(&m_mutex);
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
-        QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
+        QnAbstractDataReceptor* dp = m_dataprocessors.at(i);
         if (!dp->canAcceptData())
             return false;
     }
@@ -33,7 +35,7 @@ int QnAbstractStreamDataProvider::processorsCount() const
     return m_dataprocessors.size();
 }
 
-void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataConsumer* dp)
+void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataReceptor* dp)
 {
     QMutexLocker mutex(&m_mutex);
 
@@ -45,13 +47,13 @@ void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataConsumer* dp)
     }
 }
 
-void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractDataConsumer* dp)
+void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractDataReceptor* dp)
 {
     QMutexLocker mutex(&m_mutex);
     m_dataprocessors.removeOne(dp);
 }
 
-void QnAbstractStreamDataProvider::putData(QnAbstractDataPacketPtr data)
+void QnAbstractStreamDataProvider::putData(const QnAbstractDataPacketPtr& data)
 {
     if (!data)
         return;
@@ -59,7 +61,7 @@ void QnAbstractStreamDataProvider::putData(QnAbstractDataPacketPtr data)
     QMutexLocker mutex(&m_mutex);
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
-        QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
+        QnAbstractDataReceptor* dp = m_dataprocessors.at(i);
         dp->putData(data);
     }
 }
@@ -81,7 +83,9 @@ void QnAbstractStreamDataProvider::beforeDisconnectFromResource()
     pleaseStop();
 }
 
-void QnAbstractStreamDataProvider::setRole(QnResource::ConnectionRole role)
+void QnAbstractStreamDataProvider::setRole(Qn::ConnectionRole role)
 {
     m_role = role;
 }
+
+#endif // ENABLE_DATA_PROVIDERS
