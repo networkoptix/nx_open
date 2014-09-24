@@ -28,7 +28,7 @@ angular.module('webadminApp')
 
             modalInstance.result.then(function (settings) {
                 $log.info(settings);
-                mediaserver.joinSystem(settings.url,settings.password).then(function(r){
+                mediaserver.mergeSystems(settings.url,settings.password,settings.keepMySystem).then(function(r){
                     if(r.data.error!=0){
                         var errorToShow = r.data.errorString;
                         switch(errorToShow){
@@ -36,15 +36,20 @@ angular.module('webadminApp')
                                 errorToShow = "System is unreachable or doesn't exist.";
                                 break;
                             case 'UNAUTHORIZED':
+                            case 'password':
                                 errorToShow = "Wrong password.";
                                 break;
                             case 'INCOMPATIBLE':
                                 errorToShow = "Found system has incompatible version.";
                                 break;
+                            case 'url':
+                                errorToShow = "Wrong url.";
+                                break;
                         }
-                        alert("Connection failed. " + errorToShow);
+                        alert("Merge failed: " + errorToShow);
                     }else {
-                        alert("Connection succeed.");
+                        alert("Merge succeed.");
+                        window.location.reload();
                     }
                 });
             });
