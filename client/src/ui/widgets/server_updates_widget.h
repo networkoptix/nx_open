@@ -3,12 +3,18 @@
 
 #include <QtWidgets/QWidget>
 
+#include <array>
+
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 #include <ui_server_updates_widget.h>
+
 #include <utils/common/id.h>
+#include <utils/common/software_version.h>
+
+#include <update/updates_common.h>
 
 class QnServerUpdatesModel;
 class QnMediaServerUpdateTool;
@@ -23,36 +29,45 @@ public:
     bool cancelUpdate();
     bool isUpdating() const;
 
-    void setTargets(const QSet<QUuid> &targets);
-
     QnMediaServerUpdateTool *updateTool() const;
-
-    bool isMinimalMode() const;
-    void setMinimalMode(bool minimalMode);
 
     virtual void updateFromSettings() override;
     virtual bool confirm() override;
     virtual bool discard() override;
 
 private slots:
-    void at_checkForUpdatesButton_clicked();
-    void at_installSpecificBuildButton_clicked();
-    void at_updateFromLocalSourceButton_clicked();
-    void at_updateButton_clicked();
-    void at_updateTool_peerChanged(const QUuid &peerId);
-    void at_extraMessageTimer_timeout();
+    void at_updateFinished(const QnUpdateResult &result);
 
-    void updateUi();
+    void at_tool_stageChanged(QnFullUpdateStage stage);
+    void at_tool_stageProgressChanged(QnFullUpdateStage stage, int progress);
+private:
+    void initSourceMenu();
+    void initLinkButtons();
+    void initBuildSelectionButtons();
+
+    void checkForUpdatesInternet(bool autoSwitch = false, bool autoStart = false);
+    void checkForUpdatesLocal();
 
 private:
+    enum UpdateSource {
+        InternetSource,
+        LocalSource,
+
+        UpdateSourceCount
+    };
+
     QScopedPointer<Ui::QnServerUpdatesWidget> ui;
-    bool m_minimalMode;
 
     QnServerUpdatesModel *m_updatesModel;
     QnMediaServerUpdateTool *m_updateTool;
-    int m_previousToolState;
+    std::array<QAction*, UpdateSourceCount> m_updateSourceActions;
+  
+    QnSoftwareVersion m_targetVersion;
+    QnSoftwareVersion m_latestVersion;
+    bool m_checkingInternet;
+    bool m_checkingLocal;
 
-    QTimer *m_extraMessageTimer;
+    QUrl m_releaseNotesUrl;
 };
 
 #endif // SERVER_UPDATES_WIDGET_H

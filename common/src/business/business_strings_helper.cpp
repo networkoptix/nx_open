@@ -1,5 +1,5 @@
 #include "business_strings_helper.h"
-#include "version.h"
+#include <utils/common/app_info.h>
 
 #include <api/app_server_connection.h>
 
@@ -158,7 +158,7 @@ QVariantHash QnBusinessStringsHelper::eventDescriptionMap(const QnAbstractBusine
 
     QVariantHash contextMap;
 
-    contextMap[tpProductName] = lit(QN_PRODUCT_NAME_LONG);
+    contextMap[tpProductName] = QnAppInfo::productNameLong();
     contextMap[tpEvent] = eventName(eventType);
     contextMap[tpSource] = eventSource(params, useIp);
     if (eventType == QnBusiness::CameraMotionEvent) {
@@ -431,7 +431,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res);
     if (history) {
-        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, true, false);
+        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, false);
         if (newServer)
             mserverRes = newServer;
     }

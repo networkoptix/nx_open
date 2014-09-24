@@ -2,8 +2,10 @@
 #define ROUTER_H
 
 #include <QtCore/QObject>
+#include <QtCore/QMutex>
 
-#include <nx_ec/ec_api.h>
+#include <api/abstract_connection.h>
+#include <api/runtime_info_manager.h>
 #include <utils/common/singleton.h>
 #include <utils/network/route.h>
 
@@ -23,11 +25,8 @@ public:
         bool operator ==(const Endpoint &other) const { return id == other.id && host == other.host && port == other.port; }
     };
 
-    explicit QnRouter(QObject *parent = 0);
+    explicit QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent = 0);
     ~QnRouter();
-
-    void setConnection(const ec2::AbstractECConnectionPtr &connection);
-    void setModuleFinder(QnModuleFinder *moduleFinder);
 
     QMultiHash<QUuid, Endpoint> connections() const;
     QHash<QUuid, QnRouteList> routes() const;
@@ -37,20 +36,28 @@ public:
 
     QUuid whoIs(const QString &host, quint16 port) const;
 
+signals:
+    void connectionAdded(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
+    void connectionRemoved(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
+
 private slots:
-    void at_connectionAdded(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
-    void at_connectionRemoved(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port);
-    void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation);
-    void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
+    void at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
+
+    void at_runtimeInfoManager_runtimeInfoAdded(const QnPeerRuntimeInfo &data);
+    void at_runtimeInfoManager_runtimeInfoChanged(const QnPeerRuntimeInfo &data);
+    void at_runtimeInfoManager_runtimeInfoRemoved(const QnPeerRuntimeInfo &data);
 
 private:
-    void makeConsistent();
+    bool addConnection(const QUuid &id, const Endpoint &endpoint);
+    bool removeConnection(const QUuid &id, const Endpoint &endpoint);
 
 private:
+    mutable QMutex m_mutex;
     std::weak_ptr<ec2::AbstractECConnection> m_connection;
-    QnModuleFinder *m_moduleFinder;
     QScopedPointer<QnRouteBuilder> m_routeBuilder;
     QMultiHash<QUuid, Endpoint> m_connections;
+    bool m_passive;
 };
 
 #endif // ROUTER_H

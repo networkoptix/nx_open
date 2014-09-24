@@ -169,11 +169,11 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="48"/>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation>保留摄像机视频流&apos; 及 profiles&apos; 设置</translation>
+        <translation>保留摄像机视频流及原始配置</translation>
     </message>
     <message>
         <source>Warning! FPS/Quality settings in Recording Schedule will not work!</source>
-        <translation type="obsolete">警告！录影排程中的每秒帧数/画质设置将无法正常运作!</translation>
+        <translation type="obsolete">警告 ! 录像计划中的美秒针数/画质设置改变将无法生效 !</translation>
     </message>
     <message>
         <source>Warning! Low quality may result in low resolution image. High quality may result in Media Server’s CPU overload and network connection errors.</source>
@@ -627,12 +627,12 @@
     <message>
         <location filename="../src/ui/widgets/settings/camera_management_widget.ui" line="20"/>
         <source>Enable camera auto discovery</source>
-        <translation>启用相机自动发现</translation>
+        <translation>启动自动发现摄像机</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/camera_management_widget.ui" line="30"/>
         <source>Enable automatic camera settings optimization</source>
-        <translation>启用相机自动发现設定</translation>
+        <translation>启动自动发现并设定摄像机</translation>
     </message>
 </context>
 <context>
@@ -1089,7 +1089,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="125"/>
         <source>Look and Feel</source>
-        <translation>看和感觉</translation>
+        <translation>显示设置</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="153"/>
@@ -1104,7 +1104,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="162"/>
         <source>Show IP in tree:</source>
-        <translation>在树狀表中显示IP:</translation>
+        <translation>在树狀中显示IP:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="179"/>
@@ -1119,7 +1119,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="292"/>
         <source>Misc</source>
-        <translation>杂项</translation>
+        <translation>其他设置</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="272"/>
@@ -1141,7 +1141,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="357"/>
         <source>Auto pause video</source>
-        <translation>自動停止视频</translation>
+        <translation>自动暂停视频</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="388"/>
@@ -1161,12 +1161,12 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="448"/>
         <source>Browse logs</source>
-        <translation>浏览紀錄</translation>
+        <translation>浏览记录</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="461"/>
         <source>Clear local cache</source>
-        <translation>清除本地快取</translation>
+        <translation>浏览记录</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="499"/>
@@ -1949,7 +1949,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Misc</source>
-        <translation type="obsolete">杂项</translation>
+        <translation type="obsolete">其他设置</translation>
     </message>
     <message>
         <source>Downmix the Audio from 5.1 to 2.1 channels (restart required)</source>
@@ -2009,7 +2009,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Clear local cache</source>
-        <translation type="obsolete">清除本地快取</translation>
+        <translation type="obsolete">清除本地快照</translation>
     </message>
     <message>
         <source>Use Hardware Acceleration:</source>
@@ -4596,7 +4596,7 @@ Make sure the server is available and try again.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="754"/>
         <source>All cameras are already in the resource tree.</source>
-        <translation>所有摄像机都已经在资源树狀表中。</translation>
+        <translation>摄像机已经添加到资源树状表中。</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="757"/>
@@ -6092,7 +6092,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>Misc</source>
-        <translation type="obsolete">杂项</translation>
+        <translation type="obsolete">其他设置</translation>
     </message>
     <message>
         <source>Language:</source>
@@ -6120,7 +6120,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>Clear local cache</source>
-        <translation type="obsolete">清除本地快取</translation>
+        <translation type="obsolete">清除本地快照</translation>
     </message>
     <message>
         <source>Network Interfaces</source>
@@ -6149,7 +6149,7 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="143"/>
         <source>IP Address: %1, Network Mask: %2</source>
-        <translation>IP地址：%1，网络遮罩：%2</translation>
+        <translation>IP地址：%1，子网掩码：%2</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="237"/>
@@ -6204,7 +6204,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="35"/>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="unfinished">我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照&lt;a href=http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+        <translation type="unfinished">正确翻译为：我们检测到您的视频卡渠道可能没有安装或者已经过时。安装和更新宁的视频驱动可以大大提高您预览视频时的系统性能。关于如何安装或者更新您的显卡驱动程序，请登陆以下链接：&lt;a href=http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="38"/>
@@ -6496,7 +6496,7 @@ Recording Schedule is always based on Server Time.</source>
     </message>
     <message>
         <source>Invalid License. Contact our support team to get a valid License.</source>
-        <translation type="obsolete">无效许可。联系我们的技术支持团队取得有效许可。</translation>
+        <translation type="obsolete">无效许可。请联系我们的技术支持团队取的有效许可。</translation>
     </message>
     <message>
         <source>&lt;b&gt;Generic:&lt;/b&gt;&lt;br /&gt;
@@ -6651,7 +6651,7 @@ At least %3 licenses are required.</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="232"/>
         <source>Invalid License. Please contact our support team to get a valid license.</source>
-        <translation>无效许可。請联系我们的技术支持团队取得有效许可。</translation>
+        <translation>无效许可。请联系我们的技术支持团队取得有效许可。</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="302"/>
@@ -8685,7 +8685,7 @@ You have only %2Gb left for video archive.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="509"/>
         <source>Do not record motion</source>
-        <translation>不录像移动视频</translation>
+        <translation>选择在摄像机上启用移动侦测</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="846"/>
@@ -9327,7 +9327,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="446"/>
         <source>Viewer</source>
-        <translation>浏览者</translation>
+        <translation>操作员</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="443"/>
@@ -9388,12 +9388,12 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="445"/>
         <source>Advanced Viewer</source>
-        <translation>进阶浏览者</translation>
+        <translation>高级操作员</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="447"/>
         <source>Live Viewer</source>
-        <translation>实时浏览者</translation>
+        <translation>实时操作员</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="449"/>
@@ -10088,7 +10088,7 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source> Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation type="obsolete">您的录像修改尚未保存。請选择录像方式，FPS和质量并将此修改标记在日程中。</translation>
+        <translation type="obsolete">您的录像修改尚未保存。请选择录像方式，FPS和质量并将此修改标记在日程中。</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="492"/>
@@ -10210,7 +10210,7 @@ and you do not have the rights to overwrite it.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="483"/>
         <source> Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation>您的录像修改尚未保存。請选择录像方式，FPS和画质并将此修改标记在日程中。</translation>
+        <translation>您的录像修改尚未保存。请选择录像方式，FPS和画质并将此修改标记在日程中。</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="520"/>
@@ -11487,7 +11487,7 @@ Please wait for the camera to go online.</source>
     </message>
     <message>
         <source>Software (On media server, max fps may be slightly decreased)</source>
-        <translation type="obsolete">软件（在媒体服务器，最大每秒帧数可能会稍微降低）</translation>
+        <translation type="obsolete">选择在流媒体软件上启用移动侦测</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="455"/>
@@ -11522,7 +11522,7 @@ Please wait for the camera to go online.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="625"/>
         <source>Advanced</source>
-        <translation>进阶</translation>
+        <translation>权限配置</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="45"/>
@@ -11575,7 +11575,7 @@ Please wait for the camera to go online.</source>
     </message>
     <message>
         <source>Software (Max fps may be slightly decreased on media server)</source>
-        <translation type="obsolete">软件（在媒体服务器，最大每秒帧数可能会稍微降低）</translation>
+        <translation type="obsolete">选择在流媒体软件上启用移动侦测</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="73"/>
@@ -11585,7 +11585,7 @@ Please wait for the camera to go online.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="443"/>
         <source>Software (Max FPS may be slightly decreased on media server)</source>
-        <translation>软件（在媒体服务器，最大每秒帧数可能会稍微降低）</translation>
+        <translation>选择在流媒体软件上启用移动侦测</translation>
     </message>
 </context>
 <context>
@@ -11810,7 +11810,7 @@ Please wait for the camera to go online.</source>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.ui" line="62"/>
         <source>Advanced...</source>
-        <translation>进阶...</translation>
+        <translation>权限配置...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.ui" line="75"/>

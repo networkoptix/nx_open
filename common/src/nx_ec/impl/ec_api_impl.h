@@ -96,9 +96,10 @@ namespace ec2
         unauthorized,
         //!Response parse error
         badResponse,
-        skipped,
         //!Error executing DB request
         dbError,
+        containsBecauseTimestamp, // transaction already in database
+        containsBecauseSequence,  // transaction already in database
         //!Method is not implemented yet
         notImplemented
     };

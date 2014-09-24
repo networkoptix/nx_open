@@ -379,7 +379,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
         }
         else 
         {
-            QString fileName = fi.absoluteFilePath();
+            QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
             if (!filter.isEmpty() && fileName <= filteredChunkFile)
                 continue;
 

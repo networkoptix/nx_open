@@ -21,7 +21,6 @@
 
 #include "utils/common/log.h"
 #include "aio/async_socket_helper.h"
-#include "system_socket_impl.h"
 
 
 #ifdef Q_OS_WIN
@@ -852,6 +851,11 @@ bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<vo
     return m_aioHelper->sendAsyncImpl( buf, std::move( handler ) );
 }
 
+bool CommunicatingSocket::registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
+{
+    return m_aioHelper->registerTimerImpl( timeoutMs, std::move( handler ) );
+}
+
 
 //////////////////////////////////////////////////////////
 ///////// class TCPSocket
@@ -984,9 +988,12 @@ bool TCPSocket::toggleStatisticsCollection( bool val )
         return false;
     }
     return true;
-#else
+#elif defined(__linux__)
     Q_UNUSED(val);
     return true;
+#else
+    Q_UNUSED(val);
+    return false;
 #endif
 }
 
@@ -1003,7 +1010,7 @@ bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
         return false;
     }
     return readTcpStat( &d->win32TcpTableRow, info ) == ERROR_SUCCESS;
-#else
+#elif defined(__linux__)
     struct tcp_info tcpinfo;
     memset( &tcpinfo, 0, sizeof(tcpinfo) );
     socklen_t tcp_info_length = sizeof(tcpinfo);
@@ -1011,6 +1018,9 @@ bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
         return false;
     info->rttVar = tcpinfo.tcpi_rttvar / USEC_PER_MSEC;
     return true;
+#else
+    Q_UNUSED(info);
+    return false;
 #endif
 }
 

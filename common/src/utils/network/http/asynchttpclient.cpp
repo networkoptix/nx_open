@@ -35,7 +35,8 @@ namespace nx_http
         m_terminated( false ),
         m_totalBytesRead( 0 ),
         m_contentEncodingUsed( true ),
-        m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT )
+        m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT ),
+        m_authType(authBasicAndDigest)
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
     }
@@ -587,13 +588,20 @@ namespace nx_http
             m_request.headers.insert( std::make_pair("Host", m_url.host().toLatin1()) );
         }
         //adding user credentials
-        if( !m_userName.isEmpty() || !m_userPassword.isEmpty() )
+
+        if (m_authType == authBasicAndDigest)
         {
-            nx_http::insertOrReplaceHeader(
-                &m_request.headers,
-                nx_http::HttpHeader(
-                    Header::Authorization::NAME,
-                    Header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
+            if( !m_userName.isEmpty() || !m_userPassword.isEmpty() )
+            {
+                nx_http::insertOrReplaceHeader(
+                    &m_request.headers,
+                    nx_http::HttpHeader(
+                        header::Authorization::NAME,
+                        header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
+            }
+        }
+        else {
+            nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
         }
     }
 
@@ -632,10 +640,10 @@ namespace nx_http
     //    const QString& userName,
     //    const QString& userPassword,
     //    const QUrl& url,
-    //    const Header::WWWAuthenticate& wwwAuthenticateHeader,
-    //    Header::DigestAuthorization* const digestAuthorizationHeader )
+    //    const header::WWWAuthenticate& wwwAuthenticateHeader,
+    //    header::DigestAuthorization* const digestAuthorizationHeader )
     //{
-    //    if( wwwAuthenticateHeader.authScheme != Header::AuthScheme::digest )
+    //    if( wwwAuthenticateHeader.authScheme != header::AuthScheme::digest )
     //        return false;
 
     //    //reading params
@@ -697,11 +705,11 @@ namespace nx_http
     //}
 
 
-//    nx_http::Header::WWWAuthenticate wwwAuthenticateHeader;
-//    wwwAuthenticateHeader.authScheme = nx_http::Header::AuthScheme::digest;
+//    nx_http::header::WWWAuthenticate wwwAuthenticateHeader;
+//    wwwAuthenticateHeader.authScheme = nx_http::header::AuthScheme::digest;
 //    wwwAuthenticateHeader.params["realm"] = "Surveillance Server";
 //    wwwAuthenticateHeader.params["nonce"] = "06737538";
-//    nx_http::Header::DigestAuthorization digestAuthorizationHeader;
+//    nx_http::header::DigestAuthorization digestAuthorizationHeader;
 //
 //    bool res = nx_http::calcDigestResponse(
 //        lit("DESCRIBE"),
@@ -720,9 +728,9 @@ namespace nx_http
         if( wwwAuthenticateIter == response.headers.end() )
             return false;
 
-        Header::WWWAuthenticate wwwAuthenticateHeader;
+        header::WWWAuthenticate wwwAuthenticateHeader;
         wwwAuthenticateHeader.parse( wwwAuthenticateIter->second );
-        if( wwwAuthenticateHeader.authScheme != Header::AuthScheme::digest )
+        if( wwwAuthenticateHeader.authScheme != header::AuthScheme::digest )
             return false;
 
         //reading params
@@ -736,15 +744,20 @@ namespace nx_http
         if( qop.indexOf("auth-int") != -1 ) //TODO #ak qop can have value "auth,auth-int". That should be supported
             return false;   //qop=auth-int is not supported
 
+        BufferType ha1;
         QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
-
-        //HA1
-        md5HashCalc.addData( m_userName.toLatin1() );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( realm );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( m_userPassword.toLatin1() );
-        const BufferType& ha1 = md5HashCalc.result().toHex();
+        if (m_authType == authDigestWithPasswordHash) {
+            ha1 = m_userPassword.toUtf8();
+        }
+        else {
+            //HA1
+            md5HashCalc.addData( m_userName.toLatin1() );
+            md5HashCalc.addData( ":" );
+            md5HashCalc.addData( realm );
+            md5HashCalc.addData( ":" );
+            md5HashCalc.addData( m_userPassword.toLatin1() );
+            ha1 = md5HashCalc.result().toHex();
+        }
         //HA2, qop=auth-int is not supported
         md5HashCalc.reset();
         md5HashCalc.addData( m_request.requestLine.method );
@@ -752,7 +765,7 @@ namespace nx_http
         md5HashCalc.addData( m_url.path().toLatin1() );
         const BufferType& ha2 = md5HashCalc.result().toHex();
         //response
-        Header::DigestAuthorization digestAuthorizationHeader;
+        header::DigestAuthorization digestAuthorizationHeader;
         digestAuthorizationHeader.addParam( "username", m_userName.toLatin1() );
         digestAuthorizationHeader.addParam( "realm", realm );
         digestAuthorizationHeader.addParam( "nonce", nonce );
@@ -786,7 +799,7 @@ namespace nx_http
 
         nx_http::insertOrReplaceHeader(
             &m_request.headers,
-            nx_http::HttpHeader( Header::Authorization::NAME, authorizationStr ) );
+            nx_http::HttpHeader( header::Authorization::NAME, authorizationStr ) );
 
         m_authorizationTried = true;
         return initiateHttpMessageDelivery( m_url );
@@ -815,5 +828,10 @@ namespace nx_http
             default:
                 return "unknown";
         }
+    }
+
+    void AsyncHttpClient::setAuthType(AuthType value)
+    {
+        m_authType = value;
     }
 }

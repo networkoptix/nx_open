@@ -7,7 +7,7 @@ class QnColorPerVertexGLShaderProgram : public QnColorGLShaderProgram
 {
     Q_OBJECT
 public:
-    QnColorPerVertexGLShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+    QnColorPerVertexGLShaderProgram(QObject *parent = NULL);
 
     virtual bool compile();
 };

@@ -53,7 +53,7 @@ public:
     bool badSensor() const;
 
     void onLostConnection();
-    bool isConnectioLost() const;
+    bool isConnectionLost() const;
     int connectionLostSec() const;
 
     void onEvent(QnStatisticsEvent event);

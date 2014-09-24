@@ -70,7 +70,7 @@ public:
     // TypeId unique string id for resource with SUCH list of params and CLASS
     // in other words TypeId can be used instantiate the right resource
     QUuid getTypeId() const;
-    void setTypeId(QUuid id);
+    void setTypeId(const QUuid &id);
     void setTypeByName(const QString& resTypeName);
 
     virtual Qn::ResourceStatus getStatus() const;
@@ -179,6 +179,7 @@ public:
     bool isInitialized() const;
 
     static void stopAsyncTasks();
+    static void pleaseStopAsyncTasks();
 
     /**
         Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
@@ -272,7 +273,6 @@ protected:
     virtual void initializationDone();
 
     virtual void parameterValueChangedNotify(const QnParam &param);
-
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */

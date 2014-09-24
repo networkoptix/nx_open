@@ -25,8 +25,6 @@
 #include "mutex/camera_data_handler.h"
 #include "mutex/distributed_mutex_manager.h"
 #include "common/common_module.h"
-#include "transaction/transaction_log.h"
-#include "database/db_manager.h"
 #include "api/runtime_info_manager.h"
 #include "utils/license_usage_helper.h"
 
@@ -154,25 +152,13 @@ bool QnRecordingManager::isResourceDisabled(const QnResourcePtr& res) const
 bool QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
 {
     const QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
+
+    QnMediaServerResourcePtr currentServer = QnCameraHistoryPool::instance()->getMediaServerOnTime(netRes, qnSyncTime->currentMSecsSinceEpoch(), true);
+    if (currentServer && currentServer->getId() == qnCommon->moduleGUID())
+        return true; // camera history already inserted. skip
+
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    if (QnCameraHistoryPool::instance()->getMinTime(netRes) == (qint64)AV_NOPTS_VALUE)
-    {
-        // it is first record for camera
-        DeviceFileCatalogPtr catalogHi = qnStorageMan->getFileCatalog(res->getUniqueId(), QnServer::HiQualityCatalog);
-        if (!catalogHi)
-            return false;
-        qint64 archiveMinTime = catalogHi->minTime();
-        if (archiveMinTime != (qint64)AV_NOPTS_VALUE)
-            currentTime = qMin(currentTime,  archiveMinTime);
-    }
-
-    const QnResourcePtr& serverRes = qnResPool->getResourceById(res->getParentId());
-    const QnMediaServerResource* server = dynamic_cast<const QnMediaServerResource*>(serverRes.data());
-    Q_ASSERT(server);
-    if (!server)
-        return false;
-
-    QnCameraHistoryItem cameraHistoryItem(netRes->getUniqueId(), currentTime, server->getId());
+    QnCameraHistoryItem cameraHistoryItem(netRes->getUniqueId(), currentTime, qnCommon->moduleGUID());
 
     const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
     ec2::ErrorCode errCode = appServerConnection->getCameraManager()->addCameraHistoryItemSync(cameraHistoryItem);
@@ -180,6 +166,7 @@ bool QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
         qCritical() << "ECS server error during execute method addCameraHistoryItem: " << ec2::toString(errCode);
         return false;
     }
+    QnCameraHistoryPool::instance()->addCameraHistoryItem(cameraHistoryItem);
     return true;
 }
 
@@ -265,8 +252,6 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
         {
             if (recorderHiRes) {
                 if (!recorderHiRes->isRunning()) {
-                    if (!updateCameraHistory(res))
-                        return someRecordingIsPresent;
                     NX_LOG(QString(lit("Recording started for camera %1")).arg(res->getUniqueId()), cl_logINFO);
                 }
                 recorderHiRes->start();
@@ -297,6 +282,8 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
                 camera->updateActivity();
             }
         }
+        if (recorderHiRes || recorderLowRes)
+            updateCameraHistory(res);
     }
     else 
     {
@@ -553,9 +540,9 @@ void QnRecordingManager::onTimer()
 QnResourceList QnRecordingManager::getLocalControlledCameras()
 {
     // return own cameras + cameras from servers without DB (remote connected servers)
-    const QnResourceList& cameras = qnResPool->getAllCameras(QnResourcePtr());
+    QnResourceList cameras = qnResPool->getAllCameras(QnResourcePtr());
     QnResourceList result;
-    foreach(QnResourcePtr camRes, cameras)
+    foreach(const QnResourcePtr &camRes, cameras)
     {
         const QnResourcePtr& parentRes = camRes->getParentResource();
         const QnMediaServerResource* mServer = dynamic_cast<const QnMediaServerResource*>(parentRes.data());
@@ -569,7 +556,7 @@ QnResourceList QnRecordingManager::getLocalControlledCameras()
 
 void QnRecordingManager::at_checkLicenses()
 {
-    if (!ec2::QnTransactionLog::instance() || m_licenseMutex)
+    if (m_licenseMutex)
         return;
 
     QnCamLicenseUsageHelper helper;
@@ -580,10 +567,14 @@ void QnRecordingManager::at_checkLicenses()
             return; // do not report license problem immediately. Server should wait several minutes, probably other servers will be available soon
 
 
-        ec2::QnDbManager::instance()->markLicenseOverflow(true, qnSyncTime->currentMSecsSinceEpoch());
         qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->localInfo().data.prematureLicenseExperationDate;
-        if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < LICENSE_RECORDING_STOP_TIME)
+        if (licenseOverflowTime == 0) {
+            licenseOverflowTime = qnSyncTime->currentMSecsSinceEpoch();
+            QnAppServerConnectionFactory::getConnection2()->getMiscManager()->markLicenseOverflowSync(true, licenseOverflowTime);
+        }
+        if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < LICENSE_RECORDING_STOP_TIME) {
             return; // not enough license, but timeout not reached yet
+        }
 
         // Too many licenses. check if server has own recording cameras and force to disable recording
         QnResourceList ownCameras = getLocalControlledCameras();
@@ -603,7 +594,9 @@ void QnRecordingManager::at_checkLicenses()
         }
     }
     else {
-        ec2::QnDbManager::instance()->markLicenseOverflow(false, 0);
+        qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->localInfo().data.prematureLicenseExperationDate;
+        if (licenseOverflowTime)
+            QnAppServerConnectionFactory::getConnection2()->getMiscManager()->markLicenseOverflowSync(false, 0);
         m_tooManyRecordingCnt = 0;
     }
 }

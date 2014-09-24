@@ -27,6 +27,7 @@
 #include "managers/updates_manager.h"
 #include "managers/misc_manager.h"
 #include "managers/discovery_manager.h"
+#include "managers/time_manager_api.h"
 
 
 namespace ec2
@@ -55,15 +56,13 @@ namespace ec2
         virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
         virtual AbstractMiscManagerPtr getMiscManager() override;
         virtual AbstractDiscoveryManagerPtr getDiscoveryManager() override;
+        virtual AbstractTimeManagerPtr getTimeManager() override;
 
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
-        virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) override;
-        //!Set peer identified by \a serverGuid to be primary time server (every other peer synchronizes time with server \a serverGuid)
-        virtual int forcePrimaryTimeServer( const QUuid& serverGuid, impl::SimpleHandlerPtr handler ) override;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) override;
 
-        virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) override;
+        virtual void addRemotePeer(const QUrl& url) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
 
@@ -85,6 +84,7 @@ namespace ec2
         std::shared_ptr<QnUpdatesManager<QueryProcessorType>> m_updatesManager;
         std::shared_ptr<QnMiscManager<QueryProcessorType>> m_miscManager;
         std::shared_ptr<QnDiscoveryManager<QueryProcessorType>> m_discoveryManager;
+        std::shared_ptr<QnTimeManager<QueryProcessorType>> m_timeManager;
         std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
 
     private:

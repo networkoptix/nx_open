@@ -13,29 +13,26 @@ class QnModuleFinder;
 class QnGlobalModuleFinder : public QObject, public Singleton<QnGlobalModuleFinder> {
     Q_OBJECT
 public:
-    QnGlobalModuleFinder(QObject *parent = 0);
+    QnGlobalModuleFinder(QnModuleFinder *moduleFinder = 0, QObject *parent = 0);
 
     void setConnection(const ec2::AbstractECConnectionPtr &connection);
-    void setModuleFinder(QnModuleFinder *moduleFinder);
 
     static void fillApiModuleData(const QnModuleInformation &moduleInformation, ec2::ApiModuleData *data);
     static void fillFromApiModuleData(const ec2::ApiModuleData &data, QnModuleInformation *moduleInformation);
 
     QList<QnModuleInformation> foundModules() const;
 
-    QList<QUuid> discoverers(const QUuid &moduleId);
-    QMultiHash<QUuid, QUuid> discoverers() const;
+    QSet<QUuid> discoverers(const QUuid &moduleId);
 
     QnModuleInformation moduleInformation(const QUuid &id) const;
 
 signals:
-    void peerFound(const QnModuleInformation &moduleInformation);
     void peerChanged(const QnModuleInformation &moduleInformation);
     void peerLost(const QnModuleInformation &moduleInformation);
 
 private slots:
     void at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer);
-    void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation);
+    void at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation);
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
     void at_resourcePool_statusChanged(const QnResourcePtr &resource);
@@ -46,12 +43,14 @@ private:
     void removeModule(const QnModuleInformation &moduleInformation, const QUuid &discoverer);
 
     void removeAllModulesDiscoveredBy(const QUuid &discoverer);
+    QSet<QString> getModuleAddresses(const QUuid &id) const;
 
 private:
     std::weak_ptr<ec2::AbstractECConnection> m_connection;  // just to know from where to disconnect
     QPointer<QnModuleFinder> m_moduleFinder;
     QHash<QUuid, QnModuleInformation> m_moduleInformationById;
-    QMultiHash<QUuid, QUuid> m_discovererIdByServerId;
+    QHash<QUuid, QSet<QUuid>> m_discovererIdByServerId;
+    QHash<QUuid, QHash<QUuid, QSet<QString>>> m_discoveredAddresses;
 };
 
 #endif // GLOBAL_MODULE_FINDER_H

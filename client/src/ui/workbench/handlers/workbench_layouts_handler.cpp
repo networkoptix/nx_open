@@ -3,6 +3,7 @@
 #include <api/app_server_connection.h>
 
 #include <client/client_globals.h>
+#include <client/client_settings.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
@@ -219,9 +220,8 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
 
     QnLayoutResourcePtr newLayout;
 
-    newLayout = QnLayoutResourcePtr(new QnLayoutResource());
+    newLayout = QnLayoutResourcePtr(new QnLayoutResource(qnResTypePool));
     newLayout->setId(QUuid::createUuid());
-    newLayout->setTypeByName(lit("Layout"));
     newLayout->setName(name);
     newLayout->setParentId(user->getId());
     newLayout->setCellSpacing(layout->cellSpacing());
@@ -326,6 +326,7 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
         return true;
 
     bool needToAsk = false;
+    bool ignoreAll = qnSettings->ignoreUnsavedLayouts();
     QnLayoutResourceList saveableResources, rollbackResources;
     if (!force) {
         foreach(const QnLayoutResourcePtr &resource, resources) {
@@ -348,15 +349,16 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
 
     bool closeAll = true;
     bool saveAll = false;
-    if(needToAsk) {
-        QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-            mainWindow(),
-            QnResourceList(saveableResources),
-            tr("Close Layouts"),
-            tr("The following %n layout(s) are not saved. Do you want to save them?", "", saveableResources.size()),
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-            false
-        );
+    if(needToAsk && !ignoreAll) {
+        QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(mainWindow()));
+        dialog->setResources(saveableResources);
+        dialog->setWindowTitle(tr("Close Layouts"));
+        dialog->setText(tr("The following %n layout(s) are not saved. Do you want to save them?", "", saveableResources.size()));
+        dialog->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel);
+        dialog->setReadOnly(false);
+        dialog->showIgnoreCheckbox();
+        dialog->exec();
+        QDialogButtonBox::StandardButton button = dialog->clickedButton();
 
         switch (button) {
         case QDialogButtonBox::NoButton:
@@ -367,10 +369,12 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
         case QDialogButtonBox::No:
             closeAll = true;
             saveAll = false;
+            qnSettings->setIgnoreUnsavedLayouts(dialog->isIgnoreCheckboxChecked());
             break;
-        default:
+        default: /* QDialogButtonBox::Yes */
             closeAll = true;
             saveAll = true;
+            qnSettings->setIgnoreUnsavedLayouts(dialog->isIgnoreCheckboxChecked());
             break;
         }
     }
@@ -478,7 +482,7 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
 }
 
 bool QnWorkbenchLayoutsHandler::closeAllLayouts(bool waitForReply, bool force) {
-    return closeLayouts(resourcePool()->getResources().filtered<QnLayoutResource>(), waitForReply, force);
+    return closeLayouts(resourcePool()->getResources<QnLayoutResource>(), waitForReply, force);
 }
 
 // -------------------------------------------------------------------------- //
@@ -531,9 +535,8 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
         }
     } while (button != QMessageBox::Yes);
 
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
     layout->setId(QUuid::createUuid());
-    layout->setTypeByName(lit("Layout"));
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
     layout->setUserCanEdit(context()->user() == user);

@@ -4,9 +4,9 @@
 
 #include <utils/common/model_functions.h>
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnSystemInformation, (json)(binary)(datastream)(eq)(hash), QnSystemInformation_Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnSystemInformation, (json)(datastream)(eq)(hash), QnSystemInformation_Fields, (optional, true))
 
 QnSystemInformation::QnSystemInformation(const QString &platform, const QString &arch, const QString &modification) :
     arch(arch),
@@ -35,9 +35,5 @@ bool QnSystemInformation::isValid() const {
 }
 
 QnSystemInformation QnSystemInformation::currentSystemInformation() {
-    QString arch(lit(QN_APPLICATION_ARCH));
-    QString mod;
-    if (arch == lit("arm"))
-        mod = lit(QN_ARM_BOX);
-    return QnSystemInformation(lit(QN_APPLICATION_PLATFORM), arch, mod);
+    return QnSystemInformation(QnAppInfo::applicationPlatform(), QnAppInfo::applicationArch(), QnAppInfo::applicationPlatformModification());
 }

@@ -28,7 +28,6 @@
         <directory>${arch}</directory>
         <outputDirectory>${arch}</outputDirectory>
         <sourceDirectory>${basedir}/src</sourceDirectory> 
-        <defaultGoal>compile</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

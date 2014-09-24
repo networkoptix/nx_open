@@ -1,6 +1,8 @@
 TEMPLATE = lib
 QT += core gui network xml sql concurrent multimedia
 
+include( ${libdir}/libcreateprocess.pri )
+
 mac {
   OBJECTIVE_SOURCES += ${basedir}/src/utils/mac_utils.mm
   LIBS += -lobjc -framework Foundation -framework AppKit
@@ -32,3 +34,5 @@ TRANSLATIONS += ${basedir}/translations/common_en.ts \
 
   QMAKE_EXTRA_TARGETS += ext_debug ext_debug2
 }
+
+SOURCES += ${project.build.directory}/app_info_impl.cpp

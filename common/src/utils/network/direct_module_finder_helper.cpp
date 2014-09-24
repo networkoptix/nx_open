@@ -66,13 +66,13 @@ void QnModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource) {
             if (!address.isNull())
                 continue;
 
-            m_multicastModuleFinder->addIgnoredModule(address, url.port(), serverId);
+            m_multicastModuleFinder->addIgnoredModule(QnNetworkAddress(address, url.port()), serverId);
         }
     }
 
     if (m_directModuleFinder) {
         foreach (const QHostAddress &address, addresses)
-            m_directModuleFinder->addAddress(address, port, serverId);
+            m_directModuleFinder->addUrl(QnNetworkAddress(address, port).toUrl(), serverId);
 
         foreach (const QUrl &url, server->getAdditionalUrls())
             m_directModuleFinder->addUrl(url, serverId);
@@ -106,22 +106,24 @@ void QnModuleFinderHelper::at_resourceChanged(const QnResourcePtr &resource) {
 
     if (m_multicastModuleFinder) {
         if (oldPort != newPort) {
-            QList<QUrl> ignoredUrls = m_multicastModuleFinder->ignoredModules().keys(serverId);
+            QList<QnNetworkAddress> ignoredAddresses = m_multicastModuleFinder->ignoredModules().keys(serverId);
 
-            foreach (const QUrl &url, ignoredUrls)
-                m_multicastModuleFinder->removeIgnoredModule(QHostAddress(url.host()), oldPort, serverId);
+            foreach (const QnNetworkAddress &address, ignoredAddresses)
+                m_multicastModuleFinder->removeIgnoredModule(address, serverId);
 
-            foreach (const QUrl &url, ignoredUrls)
-                m_directModuleFinder->addIgnoredModule(QHostAddress(url.host()), newPort, serverId);
+            foreach (const QnNetworkAddress &address, ignoredAddresses)
+                m_multicastModuleFinder->addIgnoredModule(QnNetworkAddress(address.host(), newPort), serverId);
         }
     }
 
     if (m_directModuleFinder) {
-        foreach (const QHostAddress &address, oldAddresses - commonAddresses)
-            m_directModuleFinder->removeAddress(address, oldPort, serverId);
+        QnHostAddressSet addressesToRemove = (newPort == oldPort) ? oldAddresses - commonAddresses : oldAddresses;
+        foreach (const QHostAddress &address, addressesToRemove)
+            m_directModuleFinder->removeUrl(QnNetworkAddress(address, oldPort).toUrl(), serverId);
 
-        foreach (const QHostAddress &address, newAddresses - commonAddresses)
-            m_directModuleFinder->addAddress(address, newPort, serverId);
+        QnHostAddressSet addressesToAdd = (newPort == oldPort) ? newAddresses - commonAddresses : newAddresses;
+        foreach (const QHostAddress &address, addressesToAdd)
+            m_directModuleFinder->addUrl(QnNetworkAddress(address, newPort).toUrl(), serverId);
 
         if (oldPort != newPort) {
             foreach (const QUrl &url, server->getAdditionalUrls())
@@ -157,16 +159,18 @@ void QnModuleFinderHelper::at_resourceAuxUrlsChanged(const QnResourcePtr &resour
     QnUrlSet newIgnoredUrls = QnUrlSet::fromList(server->getIgnoredUrls());
 
     if (m_multicastModuleFinder) {
-        QnUrlSet oldIgnoredUrls = QnUrlSet::fromList(m_multicastModuleFinder->ignoredModules().keys(serverId));
+        QnUrlSet oldIgnoredUrls;
+        foreach (const QnNetworkAddress &address, m_multicastModuleFinder->ignoredModules().keys(serverId))
+            oldIgnoredUrls.insert(address.toUrl());
 
         if (oldIgnoredUrls != newIgnoredUrls) {
             QnUrlSet commonIgnnoredUrls = oldIgnoredUrls & newIgnoredUrls;
 
             foreach (const QUrl &url, oldIgnoredUrls - commonIgnnoredUrls)
-                m_multicastModuleFinder->removeIgnoredModule(QHostAddress(url.host()), url.port(), serverId);
+                m_multicastModuleFinder->removeIgnoredModule(QnNetworkAddress(url), serverId);
 
             foreach (const QUrl &url, newIgnoredUrls - commonIgnnoredUrls)
-                m_multicastModuleFinder->addIgnoredModule(QHostAddress(url.host()), url.port(), serverId);
+                m_multicastModuleFinder->addIgnoredModule(QnNetworkAddress(url), serverId);
         }
     }
 
@@ -210,17 +214,17 @@ void QnModuleFinderHelper::at_resourceRemoved(const QnResourcePtr &resource) {
 
     if (m_multicastModuleFinder) {
         foreach (const QUrl &url, server->getIgnoredUrls()) {
-            QHostAddress address(url.host());
-            if (!address.isNull())
+            QnNetworkAddress address(url);
+            if (!address.isValid())
                 continue;
 
-            m_multicastModuleFinder->removeIgnoredModule(address, url.port(), serverId);
+            m_multicastModuleFinder->removeIgnoredModule(address, serverId);
         }
     }
 
     if (m_directModuleFinder) {
         foreach (const QHostAddress &address, addresses)
-            m_directModuleFinder->removeAddress(address, port, serverId);
+            m_directModuleFinder->removeUrl(QnNetworkAddress(address, port).toUrl(), serverId);
 
         foreach (const QUrl &url, server->getAdditionalUrls())
             m_directModuleFinder->removeUrl(url, serverId);

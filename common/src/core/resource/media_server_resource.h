@@ -61,9 +61,6 @@ public:
 
     //virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
 
-    QString getProxyHost();
-    int getProxyPort();
-
     int getMaxCameras() const;
     void setMaxCameras(int value);
 
@@ -79,6 +76,8 @@ public:
     QString getSystemName() const;
     void setSystemName(const QString &systemName);
 
+    QnModuleInformation getModuleInformation() const;
+
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
 
@@ -87,13 +86,14 @@ public:
     qint64 currentStatusTime() const;
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
-    void determineOptimalNetIF_testProxy();
 
 signals:
     void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
     void panicModeChanged(const QnResourcePtr &resource);
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
     void auxUrlsChanged(const QnResourcePtr &resource);
+    void versionChanged(const QnResourcePtr &resource);
+    void systemNameChanged(const QnResourcePtr &resource);
 
 private:
     QnMediaServerConnectionPtr m_restConnection;
@@ -121,7 +121,7 @@ private:
 class QnMediaServerResourceFactory : public QnResourceFactory
 {
 public:
-    QnResourcePtr createResource(QUuid resourceTypeId, const QnResourceParams& params);
+    virtual QnResourcePtr createResource(const QUuid& resourceTypeId, const QnResourceParams& params) override;
 };
 
 Q_DECLARE_METATYPE(QnMediaServerResourcePtr);

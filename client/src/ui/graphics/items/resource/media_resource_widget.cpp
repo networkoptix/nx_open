@@ -507,7 +507,6 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
         m_display->addRenderer(m_renderer);
         m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
         updateCustomAspectRatio();
-        updateRotation();
     } else {
         setChannelLayout(QnConstResourceVideoLayoutPtr(new QnDefaultResourceVideoLayout()));
         m_renderer->setChannelCount(0);
@@ -855,6 +854,8 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 
     for(int i = 0; i < channelCount(); i++) {
         const QnStatistics *statistics = m_display->mediaProvider()->getStatistics(i);
+        if (statistics->isConnectionLost()) //TODO: #GDM check does not work, case #3993
+            continue;
         fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));
         mbps += statistics->getBitrate();
     }
@@ -975,9 +976,6 @@ QCursor QnMediaResourceWidget::calculateCursor() const {
 }
 
 Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const {
-    if (qnSettings->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
-        return Qn::VideowallWithoutLicenseOverlay;
-
     QnResourcePtr resource = m_display->resource();
 
     if (resource->hasFlags(Qn::SINGLE_SHOT)) {
@@ -1026,8 +1024,6 @@ void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &res
     Q_UNUSED(resource);
     if (key == QnMediaResource::customAspectRatioKey())
         updateCustomAspectRatio();
-    else if(key == QnMediaResource::rotationKey())
-        updateRotation();
 }
 
 void QnMediaResourceWidget::updateAspectRatio() {
@@ -1217,19 +1213,4 @@ void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
 
 void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
     setImageEnhancement(item()->imageEnhancement());
-}
-
-void QnMediaResourceWidget::updateRotation() {
-    if(!m_display)
-        return;
-    QString par = m_resource->toResource()->getProperty(QnMediaResource::rotationKey());
-    if( par.isEmpty() ) {
-        item()->setRotation(0);
-        return;
-    }
-    bool ok;
-    int degree = par.toInt(&ok);
-    Q_ASSERT(ok);
-    if( item()->rotation() != degree )
-        item()->setRotation(degree);
 }

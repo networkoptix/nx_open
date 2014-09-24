@@ -6,7 +6,7 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/resource_fwd.h>
 
-class QnIncompatibleServerAdder;
+class QnIncompatibleServerWatcher;
 
 class QnClientMessageProcessor : public QnCommonMessageProcessor
 {
@@ -29,14 +29,12 @@ private slots:
     void at_remotePeerFound(ec2::ApiPeerAliveData data);
     void at_remotePeerLost(ec2::ApiPeerAliveData data);
     void at_systemNameChangeRequested(const QString &systemName);
-
 private:
-    void determineOptimalIF(const QnMediaServerResourcePtr &resource);
     void updateServerTmpStatus(const QUuid& id, Qn::ResourceStatus status);
     void checkForTmpStatus(const QnResourcePtr& resource);
 
 private:
-    QnIncompatibleServerAdder *m_incompatibleServerAdder;
+    QSharedPointer<QnIncompatibleServerWatcher> m_incompatibleServerWatcher;
     bool m_connected;
     bool m_holdConnection;
 };

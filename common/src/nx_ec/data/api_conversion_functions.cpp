@@ -188,6 +188,7 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     dst->setVendor(src.vendor);
     dst->setMinDays(src.minArchiveDays);
     dst->setMaxDays(src.maxArchiveDays);
+    dst->setPreferedServerId(src.preferedServerId);
     Q_ASSERT(dst->getId() == QnVirtualCameraResource::uniqueIdToId(dst->getUniqueId()));
 
 }
@@ -224,6 +225,7 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.vendor = src->getVendor();
     dst.minArchiveDays = src->minDays();
     dst.maxArchiveDays = src->maxDays();
+    dst.preferedServerId = src->preferedServerId();
 }
 
 template<class List> 
@@ -267,7 +269,8 @@ void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &
     dst.timestamp = src.timestamp;
 }
 
-void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) {
+void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) 
+{
     /* CameraUniqueId -> (Timestamp -> ServerGuid). */
     QMap<QString, QMap<qint64, QByteArray> > history;
 
@@ -289,13 +292,7 @@ void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHisto
         while (camit.hasNext())
         {
             camit.next();
-
-            if (camit.hasNext())
-                duration = camit.peekNext().key() - camit.key();
-            else
-                duration = -1;
-
-            cameraHistory->addTimePeriod(QnCameraTimePeriod(camit.key(), duration, camit.value()));
+            cameraHistory->addTimePeriod(camit.key(), camit.value());
         }
 
         dst.append(cameraHistory);
@@ -328,7 +325,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.servers, dst.resources, ctx);
     fromApiToResourceList(src.cameras, dst.resources, ctx.resFactory);
     fromApiToResourceList(src.users, dst.resources);
-    fromApiToResourceList(src.layouts, dst.resources);
+    fromApiToResourceList(src.layouts, dst.resources, ctx);
     fromApiToResourceList(src.videowalls, dst.resources);
     fromApiToResourceList(src.licenses, dst.licenses);
     fromApiToResourceList(src.rules, dst.bRules, ctx.pool);
@@ -412,21 +409,21 @@ void fromResourceToApi(const QnLayoutResourcePtr &src, ApiLayoutData &dst) {
 }
 
 template<class List>
-void fromApiToResourceList(const ApiLayoutDataList &src, List &dst, const overload_tag &) {
+void fromApiToResourceList(const ApiLayoutDataList &src, List &dst, const ResourceContext &ctx, const overload_tag &) {
     dst.reserve(dst.size() + (int)src.size());
     for(const ApiLayoutData &srcLayout: src) {
-        QnLayoutResourcePtr dstLayout(new QnLayoutResource());
+        QnLayoutResourcePtr dstLayout(new QnLayoutResource(ctx.resTypePool));
         fromApiToResource(srcLayout, dstLayout);
         dst.push_back(dstLayout);
     }
 }
 
-void fromApiToResourceList(const ApiLayoutDataList &src, QnResourceList &dst) {
-    fromApiToResourceList(src, dst, overload_tag());
+void fromApiToResourceList(const ApiLayoutDataList &src, QnResourceList &dst, const ResourceContext &ctx) {
+    fromApiToResourceList(src, dst, ctx, overload_tag());
 }
 
-void fromApiToResourceList(const ApiLayoutDataList &src, QnLayoutResourceList &dst) {
-    fromApiToResourceList(src, dst, overload_tag());
+void fromApiToResourceList(const ApiLayoutDataList &src, QnLayoutResourceList &dst, const ResourceContext &ctx) {
+    fromApiToResourceList(src, dst, ctx, overload_tag());
 }
 
 void fromResourceListToApi(const QnLayoutResourceList &src, ApiLayoutDataList &dst) {
@@ -602,9 +599,9 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
 void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
     dst->setId(src.id);
     //dst->setGuid(guid);
+    dst->setName(src.name);
     dst->setTypeId(src.typeId);
     dst->setParentId(src.parentId);
-    dst->setName(src.name);
     dst->setUrl(src.url);
     dst->setStatus(src.status, true);
 
@@ -700,28 +697,8 @@ void fromApiToResource(const ApiUserData &src, QnUserResourcePtr &dst) {
 
 void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
     fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
-
-    QString password = src->getPassword();
-
-    if (!password.isEmpty()) {
-        QByteArray salt = QByteArray::number(rand(), 16);
-        QCryptographicHash md5(QCryptographicHash::Md5);
-        md5.addData(salt);
-        md5.addData(password.toUtf8());
-        dst.hash = "md5$";
-        dst.hash.append(salt);
-        dst.hash.append("$");
-        dst.hash.append(md5.result().toHex());
-
-        dst.digest = QnAuthHelper::createUserPasswordDigest( src->getName(), password );
-    }
-    else
-    {
-        //hash and digest already calculated?
-        dst.hash = src->getHash();
-        dst.digest = src->getDigest();
-    }
-
+    dst.hash = src->getHash();
+    dst.digest = src->getDigest();
     dst.isAdmin = src->isAdmin();
     dst.permissions = src->getPermissions();
     dst.email = src->getEmail();

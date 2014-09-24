@@ -9,14 +9,18 @@
 
 #include <business/business_fwd.h>
 
-#include <utils/common/singleton.h>
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_server_alive_data.h"
 #include "nx_ec/data/api_runtime_data.h"
 
-class QnCommonMessageProcessor: public QObject, public Singleton<QnCommonMessageProcessor>
+#include <utils/common/singleton.h>
+#include <utils/common/connective.h>
+
+class QnCommonMessageProcessor: public Connective<QObject>, public Singleton<QnCommonMessageProcessor>
 {
     Q_OBJECT
+
+    typedef Connective<QObject> base_type;
 public:
     explicit QnCommonMessageProcessor(QObject *parent = 0);
     virtual ~QnCommonMessageProcessor() {}
@@ -30,6 +34,8 @@ signals:
     void connectionOpened();
     void connectionClosed();
     void connectionReset( QnCommonMessageProcessor* );
+
+    void initialResourcesReceived();
 
     void fileAdded(const QString &filename);
     void fileUpdated(const QString &filename);
@@ -50,6 +56,9 @@ signals:
     void remotePeerFound(const ec2::ApiPeerAliveData &data);
     void remotePeerLost(const ec2::ApiPeerAliveData &data);
 
+    void syncTimeChanged(qint64 syncTime);
+    void peerTimeChanged(const QUuid &peerId, qint64 syncTime, qint64 peerTime);
+    void timeServerSelectionRequired();
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) = 0;
@@ -81,6 +90,7 @@ private slots:
     void on_resourceRemoved(const QUuid& resourceId );
 
     void on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory);
+    void on_cameraHistoryRemoved(const QnCameraHistoryItemPtr &cameraHistory);
 
     void on_businessEventRemoved(const QUuid &id);
     void on_businessActionBroadcasted(const QnAbstractBusinessActionPtr &businessAction);

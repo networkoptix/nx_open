@@ -52,11 +52,11 @@ public:
     int pointsLimit() const;
 
     /** Filter statistics items of some deviceType by flags (ignore all replies that do not contain flags provided). */
-    void setFlagsFilter(QnStatisticsDeviceType deviceType, int flags);
+    void setFlagsFilter(Qn::StatisticsDeviceType deviceType, int flags);
 
 private:
     QHash<QUuid, QnMediaServerStatisticsStorage *> m_statistics;
-    QHash<QnStatisticsDeviceType, int> m_flagsFilter;
+    QHash<Qn::StatisticsDeviceType, int> m_flagsFilter;
 };
 
 #endif // QN_STATISTICS_MANAGER

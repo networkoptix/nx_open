@@ -739,12 +739,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -775,12 +775,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -815,12 +815,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -849,12 +849,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -921,12 +921,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -955,12 +955,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -989,12 +989,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1024,12 +1024,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1058,12 +1058,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1092,12 +1092,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1128,12 +1128,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1168,12 +1168,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1209,12 +1209,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1249,12 +1249,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1290,12 +1290,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1330,12 +1330,12 @@
                     <params>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
+                            <description>Data format. Default value: 'json'</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
+                                    <name>ubjson</name>
+                                    <description>binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>

@@ -11,12 +11,13 @@
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/log.h>
+#include <utils/common/app_info.h>
+#include "version.h"
 
 #include "applauncher_process.h"
 #include "installation_process.h"
 #include "rdir_syncher.h"
 #include "process_utils.h"
-#include "version.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -31,7 +32,7 @@ static BOOL WINAPI stopServer_WIN(DWORD /*dwCtrlType*/)
 }
 #endif
 
-static QString SERVICE_NAME = QString::fromLatin1("%1%2").arg(QLatin1String(QN_CUSTOMIZATION_NAME)).arg(QLatin1String("AppLauncher"));
+static QString SERVICE_NAME = QString::fromLatin1("%1%2").arg(QnAppInfo::customizationName()).arg(QLatin1String("AppLauncher"));
 
 static void printHelp()
 {
@@ -51,8 +52,8 @@ static void printHelp()
         "  Installation mode (installs requested version)\n"
         "    --install Run in installation mode (install version specified by following parameters)\n"
         "    --version= Mandatory in installation mode\n"
-        "    --product-name= Optional. By default, \""<<QN_PRODUCT_NAME_SHORT<<"\"\n"
-        "    --customization= Optional. By default, \""<<QN_CUSTOMIZATION_NAME<<"\"\n"
+        "    --product-name= Optional. By default, \""<<QnAppInfo::productNameShort().toUtf8().data()<<"\"\n"
+        "    --customization= Optional. By default, \""<<QnAppInfo::customizationName().toUtf8().data()<<"\"\n"
         "    --module= Optional. By default, \"client\"\n"
         "    --install-path= Optional. By default, " << InstallationManager::defaultDirectoryForInstallations().toStdString() << "/{version}\n"
         "\n"
@@ -66,7 +67,7 @@ int doInstallation(
     const QString& mirrorListUrl,
     const QString& productName,
     const QString& customization,
-    const QString& version,
+    const QnSoftwareVersion &version,
     const QString& module,
     const QString& installationPath );
 
@@ -79,7 +80,10 @@ int main( int argc, char* argv[] )
     QnLongRunnablePool runnablePool;
 
     QString logLevel = "WARN";
-    QString logFilePath = InstallationManager::defaultDirectoryForInstallations() + "/applauncher";
+    QString installationsDir = InstallationManager::defaultDirectoryForInstallations();
+    if (!QDir(installationsDir).exists())
+        QDir().mkpath(installationsDir);
+    QString logFilePath = installationsDir + "/applauncher";
     QString mirrorListUrl;
     bool quitMode = false;
     bool displayHelp = false;
@@ -89,8 +93,8 @@ int main( int argc, char* argv[] )
     QString remoteUrl;
     bool installMode = false;
     QString versionToInstall;
-    QString productNameToInstall( QString::fromUtf8(QN_PRODUCT_NAME_SHORT) );
-    QString customizationToInstall( QString::fromUtf8(QN_CUSTOMIZATION_NAME) );
+    QString productNameToInstall( QnAppInfo::productNameShort() );
+    QString customizationToInstall( QnAppInfo::customizationName() );
     QString moduleToInstall( QString::fromLatin1("client") );
     QString installationPath;
     QString devModeKey;
@@ -121,11 +125,13 @@ int main( int argc, char* argv[] )
     QtSingleCoreApplication app( SERVICE_NAME, argc, argv );
     QDir::setCurrent( QCoreApplication::applicationDirPath() );
 
-    QSettings globalSettings( QSettings::SystemScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
-    QSettings userSettings( QSettings::UserScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
+    QString appName = QStringLiteral(QN_APPLICATION_NAME);  //TODO: #GDM implement the common way
+    
+    QSettings globalSettings( QSettings::SystemScope, QnAppInfo::organizationName(), appName );
+    QSettings userSettings( QSettings::UserScope, QnAppInfo::organizationName(), appName );
 
     if( mirrorListUrl.isEmpty() )
-        mirrorListUrl = globalSettings.value( "mirrorListUrl", QN_MIRRORLIST_URL ).toString();
+        mirrorListUrl = globalSettings.value( "mirrorListUrl", QnAppInfo::mirrorListUrl() ).toString();
 
     if (mirrorListUrl.isEmpty())
         NX_LOG( "MirrorListUrl is empty", cl_logWARNING );
@@ -143,9 +149,9 @@ int main( int argc, char* argv[] )
         QnLog::initLog( logLevel );
     }
 
-    NX_LOG( QN_APPLICATION_NAME " started", cl_logALWAYS );
-    NX_LOG( "Software version: " QN_APPLICATION_VERSION, cl_logALWAYS );
-    NX_LOG( "Software revision: " QN_APPLICATION_REVISION, cl_logALWAYS );
+    NX_LOG( appName + " started", cl_logALWAYS );
+    NX_LOG( "Software version: " + QnAppInfo::applicationVersion(), cl_logALWAYS );
+    NX_LOG( "Software revision: " + QnAppInfo::applicationRevision(), cl_logALWAYS );
 
     InstallationManager installationManager;
 
@@ -159,7 +165,7 @@ int main( int argc, char* argv[] )
             mirrorListUrl,
             productNameToInstall,
             customizationToInstall,
-            versionToInstall,
+            QnSoftwareVersion(versionToInstall),
             moduleToInstall,
             installationPath );
 
@@ -246,24 +252,19 @@ int doInstallation(
     const QString& mirrorListUrl,
     const QString& productName,
     const QString& customization,
-    const QString& version,
+    const QnSoftwareVersion& version,
     const QString& module,
     const QString& installationPath )
 {
-    if( version.isEmpty() )
+    if( version.isNull() )
     {
         std::cerr<<"FAILURE. Missing required parameter \"version\""<<std::endl;
         return 1;
     }
 
-    if( !installationManager.isValidVersionName(version) )
-    {
-        std::cerr<<"FAILURE. "<<version.toStdString()<<" is not a valid version to install"<<std::endl;
-        return 1; 
-    }
     QString effectiveInstallationPath = installationPath;
     if( effectiveInstallationPath.isEmpty() )
-        effectiveInstallationPath = installationManager.getInstallDirForVersion(version);
+        effectiveInstallationPath = installationManager.installationDirForVersion(version);
 
     InstallationProcess installationProcess(
         productName,

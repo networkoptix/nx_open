@@ -48,6 +48,12 @@ namespace nx_http
 
     public:
         // TODO: #Elric #enum
+        enum AuthType {
+            authBasicAndDigest,
+            authDigest,
+            authDigestWithPasswordHash
+        };
+
         enum State
         {
             sInit,
@@ -121,7 +127,7 @@ namespace nx_http
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
         void addRequestHeader(const StringType& key, const StringType& value);
-
+        void setAuthType(AuthType value);
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
         //!Emitted when response headers has been read
@@ -161,6 +167,7 @@ namespace nx_http
         quint64 m_totalBytesRead;
         bool m_contentEncodingUsed;
         int m_responseReadTimeoutMs;
+        AuthType m_authType;
 
         void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode );
         void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten );

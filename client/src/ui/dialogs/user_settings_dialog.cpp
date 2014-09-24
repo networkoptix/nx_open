@@ -39,11 +39,9 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     foreach(const QnResourcePtr &user, context->resourcePool()->getResourcesWithFlag(Qn::user))
         m_userByLogin[user->getName().toLower()] = user;
 
-    for(int i = 0; i < ElementCount; i++) {
-        m_valid[i] = true;
-        m_flags[i] = Editable | Visible;
-    }
-
+    std::fill(m_valid.begin(), m_valid.end(), true);
+    std::fill(m_flags.begin(), m_flags.end(), Editable | Visible);
+    
     ui->setupUi(this);
 
     setHelpTopic(ui->accessRightsLabel, ui->accessRightsComboBox,   Qn::UserSettings_UserRoles_Help);
@@ -156,7 +154,7 @@ QnUserSettingsDialog::ElementFlags QnUserSettingsDialog::elementFlags(Element el
     return m_flags[element];
 }
 
-const QnUserResourcePtr &QnUserSettingsDialog::user() const {
+QnUserResourcePtr QnUserSettingsDialog::user() const {
     return m_user;
 }
 
@@ -223,8 +221,10 @@ void QnUserSettingsDialog::submitToResource() {
     if (permissions & Qn::WriteNamePermission)
         m_user->setName(ui->loginEdit->text().trimmed());
 
-    if (permissions & Qn::WritePasswordPermission)
+    if (permissions & Qn::WritePasswordPermission) {
         m_user->setPassword(ui->passwordEdit->text()); //empty text means 'no change'
+        m_user->generateHash();
+    }
 
     /* User cannot change it's own rights */
     if (permissions & Qn::WriteAccessRightsPermission) {
@@ -244,12 +244,9 @@ void QnUserSettingsDialog::setHint(Element element, const QString &hint) {
 
     m_hints[element] = hint;
 
-    int i;
-    for(i = 0; i < ElementCount; i++)
-        if(!m_hints[i].isEmpty())
-            break;
+    auto iter = std::find_if(m_hints.cbegin(), m_hints.cend(), [](const QString &value){return !value.isEmpty();});
 
-    QString actualHint = i == ElementCount ? QString() : m_hints[i];
+    QString actualHint = iter == m_hints.cend() ? QString() : *iter;
     ui->hintLabel->setText(actualHint);
 }
 
@@ -284,7 +281,7 @@ void QnUserSettingsDialog::setValid(Element element, bool valid) {
         break;
     }
 
-    bool allValid = m_valid[Login] && m_valid[Password] && m_valid[AccessRights] && m_valid[Email];
+    bool allValid = std::all_of(m_valid.cbegin(), m_valid.cend(), [](bool value){return value;});
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(allValid);
 }
 

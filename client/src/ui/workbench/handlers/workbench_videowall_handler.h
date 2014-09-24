@@ -58,6 +58,7 @@ private:
     void openVideoWallItem(const QnVideoWallResourcePtr &videoWall);
     void closeInstanceDelayed();
 
+    bool canStartControlMode() const;
     void setControlMode(bool active);
     void updateMode();
 
@@ -75,6 +76,7 @@ private:
     static QString shortcutPath();
     bool shortcutExists(const QnVideoWallResourcePtr &videowall) const;
     bool createShortcut(const QnVideoWallResourcePtr &videowall);
+    bool deleteShortcut(const QnVideoWallResourcePtr &videowall);
 
     void setItemOnline(const QUuid &instanceGuid, bool online);
     void updateMainWindowGeometry(const QnScreenSnaps &screenSnaps);

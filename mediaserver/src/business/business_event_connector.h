@@ -49,6 +49,9 @@ public slots:
     */
     void at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStamp);
 
+    /*!
+        \param timeStamp microseconds from 1970-01-01 (UTC)
+    */
     void at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
 
     void at_mserverStarted(const QnResourcePtr &resource, qint64 timeStamp);

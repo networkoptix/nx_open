@@ -29,9 +29,13 @@ MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
 BOX_NAME=${box}
-
-PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$VERSION-$BOX_NAME-beta
-PACKAGE_NAME=$PACKAGE.tar.gz
+BETA=""
+if [[ "${beta}" == "true" ]]; then 
+  BETA="-beta" 
+fi 
+PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
+PACKAGE_NAME=$PACKAGE$BETA.tar.gz
+UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
 
 BUILD_DIR=/tmp/hdw_$BOX_NAME_build.tmp
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
@@ -61,6 +65,7 @@ libavfilter.so.2.77.100 \
 libavformat.so.54.6.100 \
 libavutil.so.51.54.100 \
 libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libcreateprocess.so \
 libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libpostproc.so.52.0.100 \
 libQt5Concurrent.so.5.2.1 \
@@ -147,7 +152,7 @@ mv $PACKAGE_NAME ./zip
 mv update.* ./zip
 mv install.sh ./zip
 cd zip
-zip ./$PACKAGE.zip ./*
+zip ./$UPDATE_NAME.zip ./*
 mv ./* ../
 cd ..
 rm -Rf zip

@@ -42,7 +42,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 
-#include <ui/workaround/qt5_combobox_workaround.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/license_usage_helper.h>
@@ -52,6 +52,7 @@
 #include "api/app_server_connection.h"
 #include "api/network_proxy_factory.h"
 #include "client/client_settings.h"
+#include "camera_advanced_settings_web_page.h"
 
 
 namespace {
@@ -78,6 +79,9 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_inUpdateMaxFps(false),
     m_widgetsRecreator(0),
     m_serverConnection(0)
+#ifdef QT_WEBKITWIDGETS_LIB
+    ,m_cameraAdvancedSettingsWebPage(0)
+#endif
 {
     ui->setupUi(this);
 
@@ -213,21 +217,21 @@ void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout ,
 {
     if (!m_camera)
         return;
+    if (m_cameraAdvancedSettingsWebPage)
+        m_cameraAdvancedSettingsWebPage->setCamera(m_camera);
     if ( qnCommon )
     {
         QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
         bool showUrl = resourceData.value<bool>(lit("showUrl"), false);
         if ( showUrl && m_camera->getStatus() != Qn::Offline )
         {
-            QnNetworkProxyFactory::instance()->removeFromProxyList(m_lastCameraPageUrl.host());
-            
             m_lastCameraPageUrl = QString(QLatin1String("http://%1:%2/%3")).
                 arg(m_camera->getHostAddress()).arg(m_camera->httpPort()).
                 arg(resourceData.value<QString>(lit("urlLocalePath"), QString()));
             m_lastCameraPageUrl.setUserName( m_camera->getAuth().user() );
             m_lastCameraPageUrl.setPassword( m_camera->getAuth().password() );
+            m_cameraAdvancedSettingsWebPage->networkAccessManager()->setProxy(QnNetworkProxyFactory::instance()->proxyToResource(m_camera));
 
-            QnNetworkProxyFactory::instance()->bindHostToResource( m_lastCameraPageUrl.host(), m_camera );
             advancedWebView->reload();
             advancedWebView->load( QNetworkRequest(m_lastCameraPageUrl) );
             advancedWebView->show();
@@ -299,6 +303,8 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
             advancedSplitter->setSizes(sizes);
 #ifdef QT_WEBKITWIDGETS_LIB
             advancedWebView = new QWebView(ui->advancedTab);
+            m_cameraAdvancedSettingsWebPage = new CameraAdvancedSettingsWebPage( advancedWebView );
+            advancedWebView->setPage(m_cameraAdvancedSettingsWebPage);
 
             QStyle* style = QStyleFactory().create(lit("fusion"));
             advancedWebView->setStyle(style);

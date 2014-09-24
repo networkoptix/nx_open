@@ -10,7 +10,7 @@
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include <utils/common/log.h>
-#include "version.h"
+#include <utils/common/app_info.h>
 
 static QnMediaServerResourcePtr m_server;
 
@@ -37,7 +37,7 @@ QString getDataDirectory()
         return dataDirFromSettings;
 
 #ifdef Q_OS_LINUX
-    QString defVarDirName = QString("/opt/%1/mediaserver/var").arg(VER_LINUX_ORGANIZATION_NAME);
+    QString defVarDirName = QString("/opt/%1/mediaserver/var").arg(QnAppInfo::linuxOrganizationName());
     QString varDirName = MSSettings::roSettings()->value("varDir", defVarDirName).toString();
     return varDirName;
 #else
@@ -48,9 +48,6 @@ QString getDataDirectory()
 
 
 bool backupDatabase() {
-    // TODO: #dklychkov dumpDatabaseAsync has not been implemented yet. Let this function work when dumpDatabaseAsync is ready.
-    return true;
-
     QString dir = getDataDirectory() + lit("/");
     QString fileName;
     for (int i = -1; ; i++) {

@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <business/business_fwd.h>
+#include <nx_ec/ec_api_fwd.h>
 
 namespace ec2 {
 
@@ -40,8 +41,8 @@ namespace ec2 {
 
     void fromApiToResource(const ApiLayoutData &src, QnLayoutResourcePtr &dst);
     void fromResourceToApi(const QnLayoutResourcePtr &src, ApiLayoutData &dst);
-    void fromApiToResourceList(const ApiLayoutDataList &src, QnResourceList &dst);
-    void fromApiToResourceList(const ApiLayoutDataList &src, QnLayoutResourceList &dst);
+    void fromApiToResourceList(const ApiLayoutDataList &src, QnResourceList &dst, const ResourceContext &ctx);
+    void fromApiToResourceList(const ApiLayoutDataList &src, QnLayoutResourceList &dst, const ResourceContext &ctx);
     void fromResourceListToApi(const QnLayoutResourceList &src, ApiLayoutDataList &dst);
 
     void fromResourceToApi(const QnLicensePtr &src, ApiLicenseData &dst);

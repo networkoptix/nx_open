@@ -169,7 +169,7 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
                 if (QnUserResourcePtr user = context()->user())
                     resources.push_back(user);
             } else if(key == Qn::CurrentMediaServerResourcesRole) {
-                resources = context()->resourcePool()->getResources().filtered<QnMediaServerResource>();
+                resources = context()->resourcePool()->getResources<QnMediaServerResource>();
             } else if(key == Qn::CurrentLayoutMediaItemsRole) {
                 const QnResourceList& resList = QnActionParameterTypes::resources(context()->display()->widgets());
                 foreach( QnResourcePtr res, resList )
@@ -179,6 +179,8 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
                 }
             }
 
+            if (resources.isEmpty() && required > 0)
+                return Qn::InvisibleAction;
             if((accessController()->permissions(resources) & required) != required)
                 return Qn::InvisibleAction;
             if((accessController()->permissions(resources) & forbidden) != 0)

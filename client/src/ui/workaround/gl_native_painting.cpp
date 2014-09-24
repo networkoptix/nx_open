@@ -17,9 +17,10 @@ void QnGlNativePainting::begin(const QGLContext* context,QPainter *painter) {
          * twice will not result in any problems, so we don't do any
          * additional checks. */
         const QSize sz = QSize(painter->device()->width(), painter->device()->height());
-        QnOpenGLRendererManager::instance(context)->getProjectionMatrix().setToIdentity();
-        QnOpenGLRendererManager::instance(context)->getProjectionMatrix().ortho(0, sz.width(), sz.height(), 0, -999999, 999999);
-        QnOpenGLRendererManager::instance(context)->getModelViewMatrix() = QMatrix4x4(painter->deviceTransform());
+        QMatrix4x4 m;
+        m.ortho(0, sz.width(), sz.height(), 0, -999999, 999999);
+        QnOpenGLRendererManager::instance(context)->setProjectionMatrix(m);
+        QnOpenGLRendererManager::instance(context)->setModelViewMatrix(QMatrix4x4(painter->deviceTransform()));
     }
 }
 

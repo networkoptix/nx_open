@@ -7,6 +7,7 @@
 #include <utils/math/math.h>
 
 #include <api/app_server_connection.h>
+#include "nx_ec/dummy_handler.h"
 
 
 static const float MAX_EPS = 0.01f;
@@ -130,23 +131,34 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
     static const char* CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = "mediaStreams";
 
     CameraMediaStreams fullStreamList( supportedNativeStreams );
-    for( CameraMediaStreamInfo& streamInfo: fullStreamList.streams )
+    for( std::vector<CameraMediaStreamInfo>::iterator
+        it = fullStreamList.streams.begin();
+        it != fullStreamList.streams.end();
+         )
     {
-        switch( streamInfo.codec )
+        if( it->resolution.isEmpty() || it->resolution == lit("0x0") )
+        {
+            it = fullStreamList.streams.erase( it );
+            continue;
+        }
+
+        switch( it->codec )
         {
             case CODEC_ID_H264:
-                streamInfo.transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
-                streamInfo.transports.push_back( QLatin1String(HLS_TRANSPORT_NAME) );
+                it->transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
+                it->transports.push_back( QLatin1String(HLS_TRANSPORT_NAME) );
                 break;
             case CODEC_ID_MPEG4:
-                streamInfo.transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
+                it->transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
                 break;
             case CODEC_ID_MJPEG:
-                streamInfo.transports.push_back( QLatin1String(MJPEG_TRANSPORT_NAME) );
+                it->transports.push_back( QLatin1String(MJPEG_TRANSPORT_NAME) );
                 break;
             default:
                 break;
         }
+
+        ++it;
     }
 
 #if !defined(EDGE_SERVER) && !defined(__arm__)
@@ -238,6 +250,17 @@ void QnVirtualCameraResource::saveParams()
         qCritical() << Q_FUNC_INFO << ": can't save resource params to Server. Resource physicalId: "
             << getPhysicalId() << ". Description: " << ec2::toString(rez);
     }
+}
+
+void QnVirtualCameraResource::saveParamsAsync()
+{
+    QnKvPairList params;
+    foreach(const QnParam& param, getResourceParamList().list())
+    {
+        if (param.domain() == QnDomainDatabase)
+            params << QnKvPair(param.name(), param.value().toString());
+    }
+    QnAppServerConnectionFactory::getConnection2()->getResourceManager()->save(getId(), params, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 QString QnVirtualCameraResource::toSearchString() const

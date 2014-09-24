@@ -52,9 +52,8 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
     m_stopped(false),
     m_currentCamera(0)
 {
-    m_layout.reset(new QnLayoutResource());
+    m_layout.reset(new QnLayoutResource(qnResTypePool));
     m_layout->setId(layout->getId()); //before update() uuid's must be the same
-    m_layout->setTypeId(layout->getTypeId());
     m_layout->update(layout);
 
     // If exporting layout, create new guid. If layout just renamed, keep guid
@@ -90,6 +89,12 @@ bool QnLayoutExportTool::start() {
     m_storage->setUrl(fullName);
 
     QScopedPointer<QIODevice> itemNamesIO(m_storage->open(lit("item_names.txt"), QIODevice::WriteOnly));
+    if (itemNamesIO.isNull()) {
+        m_errorMessage = tr("Could not create output file %1").arg(m_targetFilename);
+        emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required
+        return false;
+    }
+
     QTextStream itemNames(itemNamesIO.data());
 
     QList<qint64> itemTimeZones;

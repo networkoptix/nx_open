@@ -4,6 +4,7 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QProcess>
+#include <QtCore/QElapsedTimer>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
@@ -13,7 +14,9 @@
 #include <media_server/settings.h>
 #include <media_server/serverutil.h>
 #include <utils/common/log.h>
+#include <utils/common/process.h>
 #include <utils/update/update_utils.h>
+#include <utils/update/zip_utils.h>
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
 #include <media_server/serverutil.h>
@@ -26,7 +29,8 @@ namespace {
     const int replyDelay = 200;
 
     QDir getUpdatesDir() {
-        QDir dir = QDir::temp();
+        const QString& dataDir = MSSettings::roSettings()->value( "dataDir" ).toString();
+        QDir dir = dataDir.isEmpty() ? QDir::temp() : dataDir;
         if (!dir.exists(updatesDirSuffix))
             dir.mkpath(updatesDirSuffix);
         dir.cd(updatesDirSuffix);
@@ -78,64 +82,53 @@ namespace {
 } // anonymous namespace
 
 QnServerUpdateTool::QnServerUpdateTool() :
-    m_length(-1),
-    m_replyTime(0),
-    m_networkAccessManager(new QNetworkAccessManager(this))
+    m_mutex(QMutex::Recursive),
+    m_length(-1)
 {}
 
 QnServerUpdateTool::~QnServerUpdateTool() {}
 
-bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDevice) {
-    QuaZip zip(ioDevice);
-    if (!zip.open(QuaZip::mdUnzip)) {
-        NX_LOG("Could not open update package.", cl_logWARNING);
-        return false;
+bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync) {
+    m_zipExtractor.reset(new QnZipExtractor(ioDevice, getUpdateDir(updateId).absolutePath()));
+
+    if (sync) {
+        m_zipExtractor->extractZip();
+        bool ok = m_zipExtractor->error() == QnZipExtractor::Ok;
+        if (ok) {
+            NX_LOG(lit("Update package has been extracted to %1").arg(getUpdateDir(m_updateId).path()), cl_logINFO);
+        } else {
+            NX_LOG(lit("Could not extract update package. Error message: %1").arg(QnZipExtractor::errorToString(static_cast<QnZipExtractor::Error>(m_zipExtractor->error()))), cl_logWARNING);
+        }
+        m_zipExtractor.reset();
+        return ok;
+    } else {
+        connect(m_zipExtractor.data(), &QnZipExtractor::finished, this, &QnServerUpdateTool::at_zipExtractor_extractionFinished);
+        m_zipExtractor->start();
     }
-
-    QDir updateDir = getUpdateDir(updateId);
-
-    bool ok = extractZipArchive(&zip, updateDir);
-
-    zip.close();
-
-    if (ok)
-    {
-        NX_LOG(lit("Update package has been extracted to %1").arg(updateDir.path()), cl_logINFO);
-    }
-    else
-    {
-        NX_LOG(lit("Could not extract update package to %1").arg(updateDir.path()), cl_logWARNING);
-    }
-
-    return ok;
+    return true;
 }
 
 void QnServerUpdateTool::sendReply(int code) {
-    if (code == 0) {
-        qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-        if (currentTime - m_replyTime < replyDelay)
-            return;
-
-        m_replyTime = currentTime;
-    }
-
     connection2()->getUpdatesManager()->sendUpdateUploadResponce(m_updateId, qnCommon->moduleGUID(), code == 0 ? m_chunks.size() : code,
                                                                  this, [this](int, ec2::ErrorCode) {});
 }
 
 bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray &data) {
+    m_zipExtractor.reset();
     clearUpdatesLocation();
     QBuffer buffer(const_cast<QByteArray*>(&data)); // we're goint to read data, so const_cast is ok here
-    return processUpdate(updateId, &buffer);
+    buffer.open(QBuffer::ReadOnly);
+    return processUpdate(updateId, &buffer, true);
 }
 
-bool QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset) {
+void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset) {
     if (m_bannedUpdates.contains(updateId))
-        return false;
+        return;
 
     if (m_updateId != updateId) {
         m_chunks.clear();
         m_file.reset();
+        m_zipExtractor.reset();
         clearUpdatesLocation();
         m_updateId = updateId;
     }
@@ -145,13 +138,13 @@ bool QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
         if (!m_file->open(QFile::WriteOnly)) {
             NX_LOG(lit("Could not save update to %1").arg(m_file->fileName()), cl_logERROR);
             m_bannedUpdates.insert(updateId);
-            return false;
+            return;
         }
     }
 
     // Closed file means we've already finished downloading. Nothing to do is left.
-    if (!m_file->isOpen())
-        return true;
+    if (!m_file->isOpen() || !m_file->openMode().testFlag(QFile::WriteOnly))
+        return;
 
     if (data.isEmpty()) { // it means we've just got the size of the file
         m_length = offset;
@@ -164,15 +157,9 @@ bool QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
 
     if (isComplete()) {
         m_file->close();
-
-        bool ok = processUpdate(updateId, m_file.data());
-
-        sendReply(ok ? ec2::AbstractUpdatesManager::Finished : ec2::AbstractUpdatesManager::Failed);
-
-        return ok;
+        m_file->open(QFile::ReadOnly);
+        processUpdate(updateId, m_file.data());
     }
-
-    return true;
 }
 
 bool QnServerUpdateTool::installUpdate(const QString &updateId) {
@@ -246,11 +233,19 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
         NX_LOG(lit("The specified executable doesn't have an execute permission: %1").arg(executable), cl_logWARNING);
         executableFile.setPermissions(executableFile.permissions() | QFile::ExeOwner);
     }
+    if( cl_log.logLevel() >= cl_logDEBUG1 )
+    {
+        QString argumentsStr;
+        for( const QString& arg: arguments )
+            argumentsStr += lit(" ") + arg;
+        NX_LOG( lit("Launching %1 %2").arg(executable).arg(argumentsStr), cl_logDEBUG1 );
+    }
 
-    if (QProcess::startDetached(updateDir.absoluteFilePath(executable), arguments)) {
+    const SystemError::ErrorCode processStartErrorCode = nx::startProcessDetached( updateDir.absoluteFilePath(executable), arguments );
+    if( processStartErrorCode == SystemError::noError ) {
         NX_LOG("Update has been started.", cl_logINFO);
     } else {
-        NX_LOG( lit("Update failed. See update log for details: %1").arg(logFileName), cl_logERROR);
+        NX_LOG( lit("Cannot launch update script. %1").arg(SystemError::toString(processStartErrorCode)), cl_logERROR);
     }
 
     QDir::setCurrent(currentDir);
@@ -277,12 +272,20 @@ void QnServerUpdateTool::clearUpdatesLocation() {
     getUpdatesDir().removeRecursively();
 }
 
-void QnServerUpdateTool::at_uploadFinished() {
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    if (!reply)
+void QnServerUpdateTool::at_zipExtractor_extractionFinished(int error) {
+    if (sender() != m_zipExtractor.data())
         return;
 
-    reply->deleteLater();
+    m_file->close();
 
-    // TODO: #dklychkov error handling
+    bool ok = (error == QnZipExtractor::Ok);
+
+    if (ok) {
+        NX_LOG(lit("Update package has been extracted to %1").arg(m_zipExtractor->dir().absolutePath()), cl_logINFO);
+    } else {
+        NX_LOG(lit("Could not extract update package. Error message: %1").arg(QnZipExtractor::errorToString(static_cast<QnZipExtractor::Error>(error))), cl_logWARNING);
+    }
+
+    m_zipExtractor.reset();
+    sendReply(ok ? ec2::AbstractUpdatesManager::Finished : ec2::AbstractUpdatesManager::Failed);
 }

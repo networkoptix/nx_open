@@ -255,6 +255,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::OpenNewWindowAction));
     addAction(action(Qn::CloseLayoutAction));
     addAction(action(Qn::MainMenuAction));
+    addAction(action(Qn::OpenLoginDialogAction));
     addAction(action(Qn::OpenInFolderAction));
     addAction(action(Qn::RemoveLayoutItemAction));
     addAction(action(Qn::RemoveFromServerAction));
@@ -481,12 +482,15 @@ void QnMainWindow::toggleTitleVisibility() {
     setTitleVisible(!isTitleVisible());
 }
 
-void QnMainWindow::handleMessage(const QString &message) {
+bool QnMainWindow::handleMessage(const QString &message) {
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
     
     QnResourceList resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files));
-    if (!resources.isEmpty())
-        menu()->trigger(Qn::DropResourcesAction, resources);
+    if (resources.isEmpty())
+        return false;
+
+    menu()->trigger(Qn::DropResourcesAction, resources);
+    return true;
 }
 
 QnMainWindow::Options QnMainWindow::options() const {

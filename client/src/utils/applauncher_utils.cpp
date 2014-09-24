@@ -3,7 +3,8 @@
 
 #include <QtWidgets/QApplication>
 
-#include "version.h"
+#include <common/common_module.h>
+
 
 #include <api/applauncher_api.h>
 #include <api/ipc_pipe_names.h>
@@ -54,10 +55,10 @@ namespace applauncher
     api::ResultType::Value isVersionInstalled( QnSoftwareVersion version, bool* const installed )
     {
         if (version.isNull())
-            version = QnSoftwareVersion(QN_ENGINE_VERSION);
+            version = qnCommon->engineVersion();
 
         api::IsVersionInstalledRequest request;
-        request.version = version.toString(QnSoftwareVersion::MinorFormat);
+        request.version = version;
         api::IsVersionInstalledResponse response;
         api::ResultType::Value result = sendCommandToLauncher( request, &response );
         if( result != api::ResultType::ok )
@@ -70,13 +71,13 @@ namespace applauncher
 
     //bool canRestart(QnSoftwareVersion version) {
     //    if (version.isNull())
-    //        version = QnSoftwareVersion(QN_ENGINE_VERSION);
+    //        version = QnSoftwareVersion(qnCommon->engineVersion());
     //    return QFile::exists(qApp->applicationDirPath() + QLatin1String("/../") + version.toString(QnSoftwareVersion::MinorFormat));
     //}
 
     api::ResultType::Value restartClient(QnSoftwareVersion version, const QByteArray &auth) {
         if (version.isNull())
-            version = QnSoftwareVersion(QN_ENGINE_VERSION);
+            version = QnSoftwareVersion(qnCommon->engineVersion());
 
         QStringList arguments;
         arguments << QLatin1String("--no-single-application");
@@ -91,10 +92,8 @@ namespace applauncher
 
         //return sendCommandToLauncher(version, arguments);
         const api::ResultType::Value result = sendCommandToLauncher(
-            applauncher::api::StartApplicationTask(
-                version.toString(QnSoftwareVersion::MinorFormat),
-                arguments ),
-            &response );
+            applauncher::api::StartApplicationTask(version, arguments),
+            &response);
         return result != api::ResultType::ok ? result : response.result;
     }
 
@@ -103,7 +102,7 @@ namespace applauncher
         unsigned int* installationID )
     {
         api::StartInstallationTask request;
-        request.version = version.toString(QnSoftwareVersion::MinorFormat);
+        request.version = version;
         api::StartInstallationResponse response;
         api::ResultType::Value result = sendCommandToLauncher( request, &response );
         if( result != api::ResultType::ok )
@@ -132,6 +131,22 @@ namespace applauncher
         return response.result;
     }
 
+    api::ResultType::Value installZip(
+        const QnSoftwareVersion &version,
+        const QString &zipFileName )
+    {
+        api::InstallZipTask request;
+        request.version = version;
+        request.zipFileName = zipFileName;
+        api::Response response;
+        api::ResultType::Value result = sendCommandToLauncher( request, &response );
+        if( result != api::ResultType::ok )
+            return result;
+        if( response.result != api::ResultType::ok )
+            return response.result;
+        return response.result;
+    }
+
     api::ResultType::Value cancelInstallation( unsigned int installationID )
     {
         api::CancelInstallationRequest request;
@@ -154,4 +169,16 @@ namespace applauncher
             return result;
         return response.result;
     }
+
+    api::ResultType::Value getInstalledVersions(QList<QnSoftwareVersion> *versions)
+    {
+        api::GetInstalledVersionsRequest request;
+        api::GetInstalledVersionsResponse response;
+        api::ResultType::Value result = sendCommandToLauncher( request, &response );
+        if( result != api::ResultType::ok )
+            return result;
+        *versions = response.versions;
+        return response.result;
+    }
+
 }

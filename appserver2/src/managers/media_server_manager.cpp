@@ -25,7 +25,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnMediaServerManager<T>::getServers( impl::GetServersHandlerPtr handler )
+    int QnMediaServerManager<T>::getServers( const QUuid& mediaServerId,  impl::GetServersHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
@@ -35,8 +35,8 @@ namespace ec2
                 fromApiToResourceList(servers, outData, m_resCtx);
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiMediaServerDataList, decltype(queryDoneHandler)> (
-            ApiCommand::getMediaServers, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<QUuid, ApiMediaServerDataList, decltype(queryDoneHandler)> (
+            ApiCommand::getMediaServers, mediaServerId, queryDoneHandler);
         return reqID;
     }
 

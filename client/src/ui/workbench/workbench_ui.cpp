@@ -308,7 +308,12 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityStopped,   this,     &QnWorkbenchUi::at_activityStopped);
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityResumed,   this,     &QnWorkbenchUi::at_activityStarted);
     connect(m_fpsCountingInstrument,    &FpsCountingInstrument::fpsChanged,               this,     [this](qreal fps) {
+#ifdef QN_SHOW_FPS_MS
+        QString fmt = lit("%1 (%2ms)");
+        m_fpsItem->setText(fmt.arg(QString::number(fps, 'g', 4)).arg(QString::number(1000 / fps, 'g', 4)));
+#else
         m_fpsItem->setText(QString::number(fps, 'g', 4));
+#endif
         m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
     });
 

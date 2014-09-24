@@ -46,7 +46,7 @@ public:
      */
     int updatePeriod() const;
 
-    void setFlagsFilter(QnStatisticsDeviceType deviceType, int flags);
+    void setFlagsFilter(Qn::StatisticsDeviceType deviceType, int flags);
 
     qint64 uptimeMs() const;
 
@@ -84,7 +84,7 @@ private:
     QnMediaServerResourcePtr m_server;
     QnStatisticsHistory m_history;
     QTimer *m_timer;
-    QHash<QnStatisticsDeviceType, int> m_flagsFilter;
+    QHash<Qn::StatisticsDeviceType, int> m_flagsFilter;
 };
 
 #endif // QN_MEDIA_SERVER_STATISTICS_STORAGE

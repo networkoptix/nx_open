@@ -33,9 +33,10 @@ void QnRadialGradientPainter::paint(const QColor &colorMultiplier) {
     if (!m_initialized)
         initialize();
 
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(colorMultiplier);
-    auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getColorPerVertexShader();
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawArraysVao(&m_vertices, GL_TRIANGLE_FAN, m_sectorCount + 2, shader);
+    auto renderer = QnOpenGLRendererManager::instance(QGLContext::currentContext());
+    renderer->setColor(colorMultiplier);
+    auto shader = renderer->getColorPerVertexShader();
+    renderer->drawArraysVao(&m_vertices, GL_TRIANGLE_FAN, m_sectorCount + 2, shader);
 }
 
 void QnRadialGradientPainter::paint() {

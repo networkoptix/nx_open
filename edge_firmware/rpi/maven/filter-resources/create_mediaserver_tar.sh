@@ -29,9 +29,13 @@ MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
 BOX_NAME=${box}
-
-PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$VERSION-$BOX_NAME-beta
-PACKAGE_NAME=$PACKAGE.tar.gz
+BETA=""
+if [[ "${beta}" == "true" ]]; then 
+  BETA="-beta" 
+fi 
+PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
+PACKAGE_NAME=$PACKAGE$BETA.tar.gz
+UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
 
 BUILD_DIR=/tmp/hdw_$BOX_NAME_build.tmp
 PREFIX_DIR=/opt/$CUSTOMIZATION
@@ -107,13 +111,19 @@ popd
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 cp $BUILD_OUTPUT_DIR/bin/release/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 
+#copying plugins
+if [ -e "$BUILD_OUTPUT_DIR/bin/release/plugins" ]; then
+  mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins
+  cp $BUILD_OUTPUT_DIR/bin/release/plugins/*.* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
+fi
+
 #conf
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
 cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc
 
 #start script
 mkdir -p $BUILD_DIR/etc/init.d/
-install -m 755 ./etc/init.d/$CUSTOMIZATION-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUSTOMIZATION-$MODULE_NAME
+install -m 755 ./etc/init.d/networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUSTOMIZATION-$MODULE_NAME
 
 
 #building package
@@ -138,7 +148,7 @@ mv $PACKAGE_NAME ./zip
 mv update.* ./zip
 mv install.sh ./zip
 cd zip
-zip ./$PACKAGE.zip ./*
+zip ./$UPDATE_NAME.zip ./*
 mv ./* ../
 cd ..
 rm -Rf zip

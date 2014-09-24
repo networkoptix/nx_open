@@ -15,8 +15,11 @@
 #include <ui/common/palette.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/file_dialog.h>
+#include <ui/style/warning_style.h>
 
 #include <licensing/license.h>
+
+#include <utils/common/app_info.h>
 
 namespace {
     bool isValidSerialKey(const QString &key) {
@@ -29,26 +32,53 @@ namespace {
 QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     QWidget(parent),
     ui(new Ui::LicenseWidget),
-    m_state(Normal)
+    m_state(Normal),
+    m_freeLicenseAvailable(true)
 {
     ui->setupUi(this);
 
-    ui->serialKeyEdit->setInputMask(QLatin1String(">NNNN-NNNN-NNNN-NNNN"));
-    ui->serialKeyEdit->setFocus();
+    ui->onlineKeyEdit->setFocus();
     ui->activateFreeLicenseButton->setText(qnProductFeatures().freeLicenseIsTrial ? tr("Activate Trial License") : tr("Activate Free License"));
+    setWarningStyle(ui->fileLineEdit);
 
+    ui->manualActivationTextWidget->resize(this->width(), ui->manualActivationTextWidget->height());
     ui->manualActivationTextWidget->setText(tr(
          "Please send email with the Serial Key and the Hardware ID provided to <a href=\"mailto:%1\">%1</a>. "
-         "Then we'll send you an Activation Key which should be filled in the field below."
-     ).arg(QLatin1String(QN_LICENSING_MAIL_ADDRESS))); // TODO: #Elric move to product features?
+         "Then we'll send you an Activation Key file."
+     ).arg(QnAppInfo::licensingEmailAddress())); // TODO: #Elric move to product features?
 
-    connect(ui->serialKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
+    setWarningStyle(ui->licenseKeyWarningLabel);
+    ui->licenseKeyWarningLabel->setVisible(false);
+
+    connect(ui->onlineKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
     connect(ui->activationTypeComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_activationTypeComboBox_currentIndexChanged()));
     connect(ui->browseLicenseFileButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseLicenseFileButton_clicked()));
-    connect(ui->activateLicenseButton,      SIGNAL(clicked()),                  this,   SLOT(at_activateLicenseButton_clicked()));
-    connect(ui->activateFreeLicenseButton,  SIGNAL(clicked()),                  this,   SLOT(at_activateFreeLicenseButton_clicked()));
 
-    at_activationTypeComboBox_currentIndexChanged();
+    connect(ui->activateLicenseButton,      &QPushButton::clicked,              this,   [this] {
+        setState(Waiting);
+    });
+
+    connect(ui->activateFreeLicenseButton,  &QPushButton::clicked,              this,   [this] {
+        setSerialKey(qnProductFeatures().freeLicenseKey);
+        setState(Waiting);
+    });
+
+    connect(ui->copyHwidButton, &QPushButton::clicked,  this, [this] {
+        qApp->clipboard()->setText(ui->hardwareIdEdit->text());
+        QMessageBox::information(this, tr("Success"), tr("Hardware ID copied to clipboard."));
+    });
+
+    connect(ui->pasteKeyButton, &QPushButton::clicked,  this, [this] {
+        ui->onlineKeyEdit->setText(qApp->clipboard()->text());
+    });
+
+    connect(ui->onlineKeyEdit, &QLineEdit::textChanged, this, [this] (const QString &text) {
+        const int minLength = 3;    // for the fixed input mask ">NNNN-NNNN-NNNN-NNNN" method ::text() returns at least "---"
+        ui->licenseKeyWarningLabel->setVisible(text.length() > minLength 
+            && text.length() != ui->onlineKeyEdit->maxLength());
+    });
+
+    updateControls();
 }
 
 QnLicenseWidget::~QnLicenseWidget() {
@@ -79,44 +109,38 @@ void QnLicenseWidget::setOnline(bool online) {
 }
 
 bool QnLicenseWidget::isFreeLicenseAvailable() const {
-    return ui->activateFreeLicenseButton->isVisible();
+    return m_freeLicenseAvailable;
 }
 
 void QnLicenseWidget::setFreeLicenseAvailable(bool available) {
-    ui->activateFreeLicenseButton->setVisible(available);
+    m_freeLicenseAvailable = available;
+    ui->activateFreeLicenseButton->setVisible(m_freeLicenseAvailable && isOnline());
 }
 
 void QnLicenseWidget::setHardwareId(const QByteArray& hardwareId) {
     ui->hardwareIdEdit->setText(QLatin1String(hardwareId));
+    ui->copyHwidButton->setEnabled(!hardwareId.isEmpty());
 }
 
 QString QnLicenseWidget::serialKey() const {
-    return ui->serialKeyEdit->text();
+    return ui->onlineKeyEdit->text();
 }
 
 void QnLicenseWidget::setSerialKey(const QString &serialKey) {
-    ui->serialKeyEdit->setText(serialKey);
+    ui->onlineKeyEdit->setText(serialKey);
 }
 
 QByteArray QnLicenseWidget::activationKey() const {
-    QStringList lines = ui->activationKeyTextEdit->toPlainText().split(QLatin1Char('\n'));
-    QStringList filtered_lines;
-    foreach(QString line, lines) {
-        line = line.trimmed();
-        if (!line.isEmpty()) {
-            filtered_lines.append(line);
-        }
-    }
-
-    return filtered_lines.join(QLatin1Char('\n')).toLatin1();
+    return m_activationKey;
 }
 
 void QnLicenseWidget::updateControls() {
-    ui->activateLicenseButton->setEnabled(isValidSerialKey(ui->serialKeyEdit->text()));
-
     if(m_state == Normal) {
         ui->activateLicenseButton->setText(tr("Activate License"));
-        ui->activateLicenseButton->setEnabled(true);
+        bool canActivate = isOnline()
+            ? isValidSerialKey(serialKey())
+            : !m_activationKey.isEmpty();
+        ui->activateLicenseButton->setEnabled(canActivate);
     } else {
         ui->activateLicenseButton->setText(tr("Activating..."));
         ui->activateLicenseButton->setEnabled(false);
@@ -137,14 +161,8 @@ void QnLicenseWidget::changeEvent(QEvent *event) {
 void QnLicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
     bool isOnline = this->isOnline();
 
-    ui->manualActivationTextWidget->setVisible(!isOnline);
-    ui->hardwareIdLabel->setVisible(!isOnline);
-    ui->hardwareIdEdit->setVisible(!isOnline);
-    ui->activationKeyLabel->setVisible(!isOnline);
-    ui->activationKeyTextEdit->setVisible(!isOnline);
-    ui->activationKeyFileLabel->setVisible(!isOnline);
-    ui->licenseFileLabel->setVisible(!isOnline);
-    ui->browseLicenseFileButton->setVisible(!isOnline);
+    ui->stackedWidget->setCurrentWidget(isOnline ? ui->onlinePage : ui->manualPage);
+    ui->activateFreeLicenseButton->setVisible(m_freeLicenseAvailable && isOnline);
 
     updateControls();
 }
@@ -160,20 +178,27 @@ void QnLicenseWidget::at_browseLicenseFileButton_clicked() {
         return;
 
     QFile file(fileName);
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        ui->activationKeyTextEdit->setPlainText(QLatin1String(file.readAll()));
-        ui->licenseFileLabel->setText(file.fileName());
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, tr("Error"), tr("Could not open the file %1").arg(fileName));
+        return;
+    }
+
+    ui->fileLineEdit->setText(file.fileName());
+    ui->fileLineEdit->setPalette(this->palette());
+
+    QString source = QString::fromLatin1(file.readAll());
+    file.close();
+
+    QStringList lines = source.split(L'\n');
+    QStringList filtered_lines;
+    foreach(QString line, lines) {
+        line = line.trimmed();
+        if (!line.isEmpty()) {
+            filtered_lines.append(line);
+        }
+    }
+    m_activationKey = filtered_lines.join(L'\n').toLatin1();
+    if (m_activationKey.isEmpty()) {
+        setWarningStyle(ui->fileLineEdit);
     }
 }
-
-void QnLicenseWidget::at_activateFreeLicenseButton_clicked() {
-    ui->serialKeyEdit->setText(qnProductFeatures().freeLicenseKey);
-    at_activateLicenseButton_clicked();
-}
-
-void QnLicenseWidget::at_activateLicenseButton_clicked() {
-    setState(Waiting);
-}
-
-
-

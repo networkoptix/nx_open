@@ -81,26 +81,10 @@ void QnResourcePool::addResources(const QnResourceList &resources)
     foreach (const QnResourcePtr &resource, resources)
     {
         assert(resource->toSharedPointer()); /* Getting an assert here? Did you forget to use QnSharedResourcePointer? */
+        assert(!resource->getId().isNull());
 
         if(resource->resourcePool() != NULL)
             qnWarning("Given resource '%1' is already in the pool.", resource->metaObject()->className());
-            
-        if (resource->getId().isNull())
-        {
-            // must be just found local resource; => shold not be in the pool already
-
-            if (QnResourcePtr existing = getResourceByUniqId(resource->getUniqueId()))
-            {
-                // qnWarning("Resource with UID '%1' is already in the pool. Expect troubles.", resource->getUniqueId()); // TODO
-
-                resource->setId(existing->getId());
-            }
-            else
-            {
-                resource->setId(QUuid::createUuid());
-            }
-        }
-
         resource->setResourcePool(this);
     }
 
@@ -118,7 +102,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         }
 
         if (!incompatible)
-            m_incompatibleResources.remove(resource->getUniqueId());
+            m_incompatibleResources.remove(resource->getId());
     }
 
     m_resourcesMtx.unlock();
@@ -161,22 +145,22 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
 namespace
 {
-    class MatchResourceByID
+    class MatchResourceByUniqueID
     {
     public:
-        MatchResourceByID( const QUuid& _idToFind )
+        MatchResourceByUniqueID( const QString& _uniqueIdToFind )
         :
-            idToFind( _idToFind )
+            uniqueIdToFind( _uniqueIdToFind )
         {
         }
 
         bool operator()( const QnResourcePtr& res ) const
         {
-            return res->getId() == idToFind;
+            return res->getUniqueId() == uniqueIdToFind;
         }
 
     private:
-        QUuid idToFind;
+        QString uniqueIdToFind;
     };
 }
 
@@ -199,7 +183,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         //    removedResources.append(resource);
         
         //have to remove by id, since uniqueId can be MAC and, as a result, not unique among friend and foreign resources
-        QHash<QString, QnResourcePtr>::iterator resIter = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByID(resource->getId()) );
+        QHash<QUuid, QnResourcePtr>::iterator resIter = m_resources.find(resource->getId());
         if( resIter != m_resources.end() )
         {
             m_resources.erase( resIter );
@@ -207,7 +191,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         }
         else
         {
-            resIter = std::find_if(m_incompatibleResources.begin(), m_incompatibleResources.end(), MatchResourceByID(resource->getId()));
+            resIter = m_incompatibleResources.find(resource->getId());
             if (resIter != m_incompatibleResources.end())
             {
                 m_incompatibleResources.erase(resIter);
@@ -224,13 +208,13 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
     foreach (const QnResourcePtr &resource, removedResources) {
         disconnect(resource.data(), NULL, this, NULL);
 
-        foreach(const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
+        foreach(const QnLayoutResourcePtr &layoutResource, getResources<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
             foreach(const QnLayoutItemData &data, layoutResource->getItems())
                 if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
                     layoutResource->removeItem(data);
 
         if (resource.dynamicCast<QnLayoutResource>()) {
-            foreach (const QnVideoWallResourcePtr &videowall, getResources().filtered<QnVideoWallResource>()) { // TODO: #Elric this is way beyond what one may call 'suboptimal'.
+            foreach (const QnVideoWallResourcePtr &videowall, getResources<QnVideoWallResource>()) { // TODO: #Elric this is way beyond what one may call 'suboptimal'.
                 foreach (QnVideoWallItem item, videowall->items()->getItems()) {
                     if (item.layout != resource->getId())
                         continue;
@@ -260,7 +244,7 @@ QnResourceList QnResourcePool::getResources() const
 QnResourcePtr QnResourcePool::getResourceById(const QUuid &id) const {
     QMutexLocker locker(&m_resourcesMtx);
 
-    QHash<QString, QnResourcePtr>::const_iterator resIter = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByID(id) );
+    QHash<QUuid, QnResourcePtr>::const_iterator resIter = m_resources.find(id);
     if( resIter != m_resources.end() )
         return resIter.value();
 
@@ -317,13 +301,16 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac)
     return QnNetworkResourcePtr(0);
 }
 
-QnResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer) const 
+QnResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras) const 
 {
     QUuid parentId = mServer ? mServer->getId() : QUuid();
     QnResourceList result;
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) 
     {
+        if (ignoreDesktopCameras && resource->hasFlags(Qn::desktop_camera))
+            continue;
+
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if (camResource && (parentId.isNull() || camResource->getParentId() == parentId))
             result << camResource;
@@ -405,21 +392,17 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QStri
     return result;
 }
 
-QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const
+QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &uniqueID) const
 {
     QMutexLocker locker(&m_resourcesMtx);
-    QHash<QString, QnResourcePtr>::const_iterator itr = m_resources.find(id);
+    auto itr = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByUniqueID(uniqueID));
     return itr != m_resources.end() ? itr.value() : QnResourcePtr(0);
 }
 
 void QnResourcePool::updateUniqId(const QnResourcePtr& res, const QString &newUniqId)
 {
     QMutexLocker locker(&m_resourcesMtx);
-    QHash<QString, QnResourcePtr>::iterator itr = m_resources.find(res->getUniqueId());
-    if (itr != m_resources.end())
-        m_resources.erase(itr);
     res->setUniqId(newUniqId);
-    m_resources.insert(newUniqId, res);
 }
 
 bool QnResourcePool::hasSuchResource(const QString &uniqid) const
@@ -513,28 +496,26 @@ void QnResourcePool::clear()
     m_resources.clear();
 }
 
-bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHash<QString, QnResourcePtr>* const resourcePool )
+bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHash<QUuid, QnResourcePtr>* const resourcePool )
 {
-    const QString& uniqueId = resource->getUniqueId();
-
-    if (resourcePool->contains(uniqueId))
-    {
-        // if we already have such resource in the pool
-        (*resourcePool)[uniqueId]->update(resource);
-        return false;
-    }
-    else
-    {
+    const QUuid& id = resource->getId();
+    auto itr = resourcePool->find(id);
+    if (itr == resourcePool->end()) {
         // new resource
-        (*resourcePool)[uniqueId] = resource;
+        resourcePool->insert(id, resource);
         return true;
+    }
+    else {
+        // if we already have such resource in the pool
+        itr.value()->update(resource);
+        return false;
     }
 }
 
 QnResourcePtr QnResourcePool::getIncompatibleResourceById(const QUuid &id, bool useCompatible) const {
     QMutexLocker locker(&m_resourcesMtx);
 
-    auto it = std::find_if(m_incompatibleResources.begin(), m_incompatibleResources.end(), MatchResourceByID(id));
+    auto it = m_incompatibleResources.find(id);
     if (it != m_incompatibleResources.end())
         return it.value();
 
@@ -552,32 +533,6 @@ QnResourcePtr QnResourcePool::getIncompatibleResourceByUniqueId(const QString &u
 QnResourceList QnResourcePool::getAllIncompatibleResources() const {
     QMutexLocker locker(&m_resourcesMtx);
     return m_incompatibleResources.values();
-}
-
-void QnResourcePool::updateIncompatibility(const QnResourcePtr &resource) {
-    QMutexLocker locker(&m_resourcesMtx);
-    Qn::ResourceStatus status = resource->getStatus();
-
-    if (status == Qn::Incompatible) {
-        auto it = m_resources.find(resource->getUniqueId());
-        if (it == m_resources.end() || it.value() != resource)
-            return;
-
-        m_resources.erase(it);
-        insertOrUpdateResource(resource, &m_incompatibleResources);
-    } else {
-        auto it = m_incompatibleResources.find(resource->getUniqueId());
-        if (it == m_incompatibleResources.end() || it.value() != resource)
-            return;
-
-        m_incompatibleResources.erase(it);
-        insertOrUpdateResource(resource, &m_resources);
-    }
-}
-
-void QnResourcePool::clearIncompatibleResources() {
-    QMutexLocker locker(&m_resourcesMtx);
-    m_incompatibleResources.clear();
 }
 
 QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QUuid &uuid) const {

@@ -4,6 +4,7 @@
 #include "utils/network/router.h"
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
+#include "nx_ec/data/api_license_overflow_data.h"
 
 namespace ec2 {
 
@@ -26,21 +27,6 @@ void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModul
 void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiSystemNameData> &transaction) {
     emit systemNameChangeRequested(transaction.params.systemName);
 }
-
-void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiConnectionData> &transaction) {
-    Q_ASSERT_X(transaction.command == ApiCommand::addConnection || transaction.command == ApiCommand::removeConnection, "transaction isn't supported in this function", Q_FUNC_INFO);
-
-    if (transaction.command == ApiCommand::addConnection)
-        emit connectionAdded(transaction.params.discovererId, transaction.params.peerId, transaction.params.host, transaction.params.port);
-    else
-        emit connectionRemoved(transaction.params.discovererId, transaction.params.peerId, transaction.params.host, transaction.params.port);
-}
-
-void QnMiscNotificationManager::triggerNotification(const ApiConnectionDataList &connections) {
-    foreach (const ApiConnectionData &connection, connections)
-        emit connectionAdded(connection.discovererId, connection.peerId, connection.host, connection.port);
-}
-
 
 template<class QueryProcessorType>
 QnMiscManager<QueryProcessorType>::QnMiscManager(QueryProcessorType * const queryProcessor) :
@@ -85,39 +71,6 @@ int QnMiscManager<QueryProcessorType>::changeSystemName(const QString &systemNam
 }
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::addConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) {
-    const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(ApiCommand::addConnection, discovererId, peerId, host, port);
-
-    using namespace std::placeholders;
-    m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
-
-    return reqId;
-}
-
-template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::removeConnection(const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) {
-    const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(ApiCommand::removeConnection, discovererId, peerId, host, port);
-
-    using namespace std::placeholders;
-    m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
-
-    return reqId;
-}
-
-template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::sendAvailableConnections(impl::SimpleHandlerPtr handler) {
-    const int reqId = generateRequestID();
-    auto transaction = prepareAvailableConnectionsTransaction();
-
-    using namespace std::placeholders;
-    m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
-
-    return reqId;
-}
-
-template<class QueryProcessorType>
 QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer) const {
     QnTransaction<ApiModuleData> transaction(ApiCommand::moduleInfo);
     QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &transaction.params);
@@ -151,32 +104,19 @@ QnTransaction<ApiSystemNameData> QnMiscManager<QueryProcessorType>::prepareTrans
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiConnectionData> QnMiscManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const QUuid &discovererId, const QUuid &peerId, const QString &host, quint16 port) const {
-    QnTransaction<ApiConnectionData> transaction(command);
-    transaction.params.discovererId = discovererId;
-    transaction.params.peerId = peerId;
-    transaction.params.host = host;
-    transaction.params.port = port;
+int QnMiscManager<QueryProcessorType>::markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) {
+    const int reqId = generateRequestID();
+    QnTransaction<ApiLicenseOverflowData> transaction(ApiCommand::markLicenseOverflow);
+    transaction.params.value = value;
+    transaction.params.time = time;
+    transaction.isLocal = true;
 
-    return transaction;
+    using namespace std::placeholders;
+    m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
+
+    return reqId;
 }
 
-template<class QueryProcessorType>
-QnTransaction<ApiConnectionDataList> QnMiscManager<QueryProcessorType>::prepareAvailableConnectionsTransaction() const {
-    QnTransaction<ApiConnectionDataList> transaction(ApiCommand::availableConnections);
-
-    QMultiHash<QUuid, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
-    for (auto it = connections.begin(); it != connections.end(); ++it) {
-        ApiConnectionData connection;
-        connection.discovererId = it.key();
-        connection.peerId = it->id;
-        connection.host = it->host;
-        connection.port = it->port;
-        transaction.params.push_back(connection);
-    }
-
-    return transaction;
-}
 
 template class QnMiscManager<ServerQueryProcessor>;
 template class QnMiscManager<FixedUrlClientQueryProcessor>;

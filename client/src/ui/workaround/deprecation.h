@@ -34,7 +34,7 @@ namespace boost {
 #include <QtCore/QMapIterator>
 #define QListIterator           qt_java_style_iterators_are_forbidden
 #define QLinkedListIterator     qt_java_style_iterators_are_forbidden
-#define QHashIterator           qt_java_style_iterators_are_forbidden
+//#define QHashIterator           qt_java_style_iterators_are_forbidden
 #define QMutableHashIterator    qt_java_style_iterators_are_forbidden
 #define QVectorIterator         qt_java_style_iterators_are_forbidden
 //#define QMapIterator            qt_java_style_iterators_are_forbidden // TODO: #Elric

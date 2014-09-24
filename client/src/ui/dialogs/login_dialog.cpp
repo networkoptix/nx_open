@@ -24,7 +24,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/message_box.h>
-#include <ui/dialogs/preferences_dialog.h>
+#include <ui/dialogs/connection_name_dialog.h>
 #include <ui/widgets/rendering_widget.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
@@ -34,6 +34,8 @@
 
 #include <utils/applauncher_utils.h>
 #include <utils/network/module_finder.h>
+#include <utils/network/networkoptixmodulerevealcommon.h>
+#include <utils/common/url.h>
 
 #include "plugins/resource/avi/avi_resource.h"
 #include "plugins/resource/archive/abstract_archive_stream_reader.h"
@@ -47,7 +49,7 @@
 
 
 #include "compatibility.h"
-#include "version.h"
+#include <utils/common/app_info.h>
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
@@ -84,7 +86,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     Q_ASSERT(bbLayout);
     if (bbLayout) {
         QLabel* versionLabel = new QLabel(ui->buttonBox);
-        versionLabel->setText(tr("Version %1").arg(lit(QN_APPLICATION_VERSION)));
+        versionLabel->setText(tr("Version %1").arg(QnAppInfo::applicationVersion()));
         QFont font = versionLabel->font();
         font.setPointSize(7);
         versionLabel->setFont(font);
@@ -138,22 +140,31 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     resetConnectionsModel();
     updateFocus();
 
-    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleFound,     this,   &QnLoginDialog::at_moduleFinder_moduleFound);
-    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleLost,      this,   &QnLoginDialog::at_moduleFinder_moduleLost);
+    /* Should be done after model resetting to avoid state loss. */
+    ui->autoLoginCheckBox->setChecked(qnSettings->autoLogin());
+    connect(ui->autoLoginCheckBox, &QCheckBox::stateChanged,    this, [this](int state) {
+        qnSettings->setAutoLogin(state == Qt::Checked);
+    });
 
-    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules())
-        at_moduleFinder_moduleFound(moduleInformation, *moduleInformation.remoteAddresses.begin());
+    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleUrlFound,    this,   &QnLoginDialog::at_moduleFinder_moduleUrlFound);
+    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleUrlLost,     this,   &QnLoginDialog::at_moduleFinder_moduleUrlLost);
+
+    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules()) {
+        if (!moduleInformation.remoteAddresses.isEmpty())
+            at_moduleFinder_moduleUrlFound(moduleInformation, QUrl(lit("http://%1:%2").arg(*moduleInformation.remoteAddresses.begin()).arg(moduleInformation.port)));
+    }
 }
 
 QnLoginDialog::~QnLoginDialog() {}
 
 void QnLoginDialog::updateFocus() {
     ui->passwordLineEdit->setFocus();
+    ui->passwordLineEdit->selectAll();
 }
 
 QUrl QnLoginDialog::currentUrl() const {
     QUrl url;
-    url.setScheme(lit("https"));
+    url.setScheme(lit("http"));
     url.setHost(ui->hostnameLineEdit->text().trimmed());
     url.setPort(ui->portSpinBox->value());
     url.setUserName(ui->loginLineEdit->text().trimmed());
@@ -224,7 +235,9 @@ void QnLoginDialog::changeEvent(QEvent *event) {
 void QnLoginDialog::showEvent(QShowEvent *event) {
     base_type::showEvent(event);
 
+    bool autoLogin = qnSettings->autoLogin();
     resetConnectionsModel();
+    ui->autoLoginCheckBox->setChecked(autoLogin);
 
 #ifdef Q_OS_MAC
     if (focusWidget())
@@ -260,10 +273,6 @@ void QnLoginDialog::resetConnectionsModel() {
         selectedIndex = m_connectionsModel->index(0, 0, m_savedSessionsItem->index());
     ui->connectionsComboBox->setCurrentIndex(selectedIndex);
     at_connectionsComboBox_currentIndexChanged(selectedIndex);
-
-    QString password = qnSettings->storedPassword();
-    ui->passwordLineEdit->setText(password);
-    ui->rememberPasswordCheckBox->setChecked(!password.isEmpty());
 }
 
 void QnLoginDialog::resetSavedSessionsModel() {
@@ -333,6 +342,7 @@ void QnLoginDialog::updateUsability() {
         ui->buttonBox->button(QDialogButtonBox::Cancel)->unsetCursor();
 
         updateAcceptibility();
+        updateFocus();
     } else {
         ::setEnabled(children(), ui->buttonBox, false);
         ::setEnabled(ui->buttonBox->children(), ui->buttonBox->button(QDialogButtonBox::Cancel), false);
@@ -344,28 +354,24 @@ void QnLoginDialog::updateUsability() {
 void QnLoginDialog::updateStoredConnections(const QUrl &url, const QString &name) {
     QnConnectionDataList connections = qnSettings->customConnections();
 
-    QnConnectionData connectionData(QString(), url);
-    qnSettings->setLastUsedConnection(connectionData);
+    QUrl urlToSave(url);
+    if (!ui->autoLoginCheckBox->isChecked())
+        urlToSave.setPassword(QString());
 
-    qnSettings->setStoredPassword(ui->rememberPasswordCheckBox->isChecked()
-        ? url.password()
-        : QString()
-        );
+    QnConnectionData connectionData(name, urlToSave);
+    qnSettings->setLastUsedConnection(connectionData);
 
     // remove previous "Last used connection"
     connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
 
-    QUrl cleanUrl(connectionData.url);
-    cleanUrl.setPassword(QString());
     QnConnectionData selected = connections.getByName(name);
-    if (selected.url == cleanUrl){
+    if (qnUrlEqual(selected.url, url)) {
         connections.removeOne(selected.name);
-        connections.prepend(selected);
+        connections.prepend(selected);    /* Reorder. */
     } else {
         // save "Last used connection"
         QnConnectionData last(connectionData);
         last.name = QnConnectionDataList::defaultLastUsedNameKey();
-        last.url.setPassword(QString());
         connections.prepend(last);
     }
     qnSettings->setCustomConnections(connections);
@@ -383,9 +389,9 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
     ui->loginLineEdit->setText(url.userName().isEmpty() 
         ? lit("admin")  // 99% of users have only one login - admin
         : url.userName());
-    ui->passwordLineEdit->clear();
-    ui->rememberPasswordCheckBox->setChecked(false);
+    ui->passwordLineEdit->setText(url.password());
     ui->deleteButton->setEnabled(qnSettings->customConnections().contains(ui->connectionsComboBox->currentText()));
+    ui->autoLoginCheckBox->setChecked(false);
     updateFocus();
 }
 
@@ -421,15 +427,25 @@ void QnLoginDialog::at_saveButton_clicked() {
 
     QnConnectionDataList connections = qnSettings->customConnections();
 
-    bool ok = false;
-
     QString name = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
-    name = QInputDialog::getText(this, tr("Save connection as..."), tr("Enter name:"), QLineEdit::Normal, name, &ok);
-    if (!ok)
-        return;
+    bool savePassword = !ui->passwordLineEdit->text().isEmpty();
+    {
+        QScopedPointer<QnConnectionNameDialog> dialog(new QnConnectionNameDialog(this));
+        dialog->setName(name);
+        dialog->setSavePasswordEnabled(savePassword);
+        dialog->setSavePassword(savePassword);
+
+        if (!dialog->exec())
+            return;
+
+        name = dialog->name();
+        savePassword &= dialog->savePassword();
+    }
+
 
     // save here because of the 'connections' field modifying
     QString password = ui->passwordLineEdit->text();
+    bool autoLogin = qnSettings->autoLogin();
 
     if (connections.contains(name)){
         QMessageBox::StandardButton button = QMessageBox::warning(this, tr("Connection already exists"),
@@ -451,7 +467,8 @@ void QnLoginDialog::at_saveButton_clicked() {
     }
 
     QnConnectionData connectionData(name, currentUrl());
-    connectionData.url.setPassword(QString());
+    if (!savePassword)
+        connectionData.url.setPassword(QString());
     connections.prepend(connectionData);
     qnSettings->setCustomConnections(connections);
 
@@ -461,6 +478,7 @@ void QnLoginDialog::at_saveButton_clicked() {
     ui->connectionsComboBox->setCurrentIndex(idx);
     at_connectionsComboBox_currentIndexChanged(idx); // call directly in case index change will not work
     ui->passwordLineEdit->setText(password);         // password is cleared on index change
+    ui->autoLoginCheckBox->setChecked(autoLogin);
 
 }
 
@@ -482,14 +500,13 @@ void QnLoginDialog::at_deleteButton_clicked() {
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
-    //if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
-    //    return;
+void QnLoginDialog::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &foundUrl) {
+    if (moduleInformation.type != nxMediaServerId)
+        return;
 
-    QString host = moduleInformation.isLocal ? QLatin1String("127.0.0.1") : remoteAddress;
-    QUrl url;
-    url.setHost(host);
-    url.setPort(moduleInformation.port);
+    QUrl url = foundUrl;
+    if (moduleInformation.isLocal())
+        url.setHost(lit("127.0.0.1"));
 
     QnEcData data;
     data.id = moduleInformation.id;
@@ -504,16 +521,16 @@ void QnLoginDialog::at_moduleFinder_moduleFound(const QnModuleInformation &modul
     resetAutoFoundConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
+void QnLoginDialog::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &lostUrl) {
     if (moduleInformation.type != nxMediaServerId)
         return;
 
-    for(auto itr = m_foundEcs.begin(); itr != m_foundEcs.end(); ++itr)
-    {
-        if (itr.value().id == moduleInformation.id) {
-            m_foundEcs.erase(itr);
-            break;
-        }
-    }
+    QUrl url = lostUrl;
+    if (moduleInformation.isLocal())
+        url.setHost(lit("127.0.0.1"));
+
+    QString key = moduleInformation.systemName + url.toString();
+    m_foundEcs.remove(key);
+
     resetAutoFoundConnectionsModel();
 }

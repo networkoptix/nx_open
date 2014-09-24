@@ -6,128 +6,512 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>481</width>
-    <height>449</height>
+    <width>605</width>
+    <height>635</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,0,0,1">
    <item>
-    <widget class="QWidget" name="topButtonBar" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <widget class="QPushButton" name="updateFromLocalSourceButton">
-        <property name="text">
-         <string>Update from local source</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="installSpecificBuildButton">
-        <property name="text">
-         <string>Install specific build</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="checkForUpdatesButton">
-        <property name="text">
-         <string>Check for updates</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+    <widget class="QLabel" name="dayWarningLabel">
+     <property name="text">
+      <string>As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item>
-    <widget class="QTableView" name="tableView"/>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QPushButton" name="sourceButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="text">
+        <string notr="true">&lt;Select update source&gt;</string>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="connectionProblemLabel">
+       <property name="text">
+        <string>Cannot check updates via the internet.</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QWidget" name="updateStateWidget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
-        <item>
-         <widget class="QLabel" name="updateStateLabel">
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
+    <widget class="QStackedWidget" name="sourceWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="internetPage">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QFrame" name="internetFrame">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <property name="leftMargin">
+           <number>0</number>
           </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QWidget" name="progressIndicator" native="true">
-          <layout class="QHBoxLayout" name="horizontalLayout">
-           <item>
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QnProgressWidget" name="indicator" native="true"/>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QProgressBar" name="updateProgessBar"/>
-        </item>
-        <item>
-         <widget class="QPushButton" name="cancelButton">
-          <property name="text">
-           <string>Cancel</string>
+          <property name="topMargin">
+           <number>0</number>
           </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QLabel" name="extraMessageLabel">
-        <property name="text">
-         <string>It looks like the update process is taking more time than usual. Please keep waiting.</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,1,0,0">
+            <item>
+             <widget class="QStackedWidget" name="internetRefreshWidget">
+              <property name="maximumSize">
+               <size>
+                <width>24</width>
+                <height>24</height>
+               </size>
+              </property>
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <widget class="QWidget" name="internetRefreshPage">
+               <property name="maximumSize">
+                <size>
+                 <width>24</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_7">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QPushButton" name="refreshButton">
+                  <property name="minimumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::NoFocus</enum>
+                  </property>
+                  <property name="flat">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="internetProgressPage">
+               <property name="maximumSize">
+                <size>
+                 <width>24</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_8">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QnProgressWidget" name="internetInfiniteProgress" native="true">
+                  <property name="minimumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="versionTitleLabel">
+              <property name="text">
+               <string>Available version:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="latestVersionLabel">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Unknown</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="internetUpdateButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Update</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="releaseNotesLabel">
+              <property name="text">
+               <string>&lt;a href='notes'&gt;release notes&lt;/a&gt;</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="internetDetailLabel">
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>5</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="localPage">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QFrame" name="localFrame">
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="linkTitleLabel">
+            <property name="text">
+             <string>To update manually, download an archive with the following link:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLineEdit" name="linkLineEdit">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="copyLinkButton">
+              <property name="text">
+               <string>Copy to Clipboard</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="saveLinkButton">
+              <property name="text">
+               <string>Save link to File</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,0">
+            <item>
+             <widget class="QLabel" name="fileTitleLabel">
+              <property name="text">
+               <string>Update from file:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="filenameLineEdit">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QStackedWidget" name="localRefreshWidget">
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <widget class="QWidget" name="localBrowsePage">
+               <layout class="QHBoxLayout" name="horizontalLayout_10">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QPushButton" name="browseFileButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="localProgressPage">
+               <layout class="QHBoxLayout" name="horizontalLayout_9">
+                <item>
+                 <widget class="QnProgressWidget" name="localInfiniteProgress" native="true">
+                  <property name="minimumSize">
+                   <size>
+                    <width>16</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="localUpdateButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Update</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="localDetailLabel">
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
-    <widget class="QnProgressWidget" name="progressWidget" native="true"/>
+    <widget class="QStackedWidget" name="progressStatusWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="updateTargetPage">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>379</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="specificBuildLabel">
+         <property name="text">
+          <string>&lt;a href='spec'&gt;I want specific build&lt;/a&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="latestBuildLabel">
+         <property name="text">
+          <string>&lt;a href='latest'&gt;I want latest version&lt;/a&gt;</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="updateRunningPage">
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QnProgressBar" name="updateProgessBar"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="cancelButton">
+         <property name="text">
+          <string>Cancel</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableView" name="tableView">
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <attribute name="horizontalHeaderHighlightSections">
+      <bool>false</bool>
+     </attribute>
+    </widget>
    </item>
   </layout>
  </widget>
@@ -139,12 +523,22 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnProgressWidget</class>
-   <extends>QWidget</extends>
-   <header>ui/widgets/dialog_button_box.h</header>
-   <container>1</container>
+   <class>QnProgressBar</class>
+   <extends>QProgressBar</extends>
+   <header location="global">ui/widgets/progress_bar.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>refreshButton</tabstop>
+  <tabstop>internetUpdateButton</tabstop>
+  <tabstop>linkLineEdit</tabstop>
+  <tabstop>copyLinkButton</tabstop>
+  <tabstop>saveLinkButton</tabstop>
+  <tabstop>filenameLineEdit</tabstop>
+  <tabstop>browseFileButton</tabstop>
+  <tabstop>localUpdateButton</tabstop>
+  <tabstop>tableView</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

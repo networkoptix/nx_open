@@ -31,7 +31,7 @@ public slots:
     void processReply( int reqID, ec2::ErrorCode errorCode );
 
 signals:
-    void finished(int status, const QnResourceList &resources, int handle);
+    void finished(int status, const QnResourceList &resources, int handle, const QString &errorString);
 
 private:
     friend class QnAbstractReplyProcessor;

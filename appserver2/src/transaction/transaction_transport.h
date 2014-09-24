@@ -6,6 +6,7 @@
 #include <QUuid>
 #include <QByteArray>
 #include <QSet>
+#include <QTime>
 
 #include <transaction/transaction.h>
 #include <transaction/binary_transaction_serializer.h>
@@ -13,6 +14,7 @@
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/transaction_transport_header.h>
 
+#include <utils/common/log.h>
 #include <utils/network/abstract_socket.h>
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/common/id.h"
@@ -49,13 +51,14 @@ public:
     static QString toString( State state );
 
     QnTransactionTransport(const ApiPeerData &localPeer,
-        const ApiPeerData &remotePeer = ApiPeerData(QUuid(), Qn::PT_Server),
         const QSharedPointer<AbstractStreamSocket>& socket = QSharedPointer<AbstractStreamSocket>());
     ~QnTransactionTransport();
 
 signals:
     void gotTransaction(const QByteArray &data, const QnTransactionTransportHeader &transportHeader);
     void stateChanged(State state);
+    void remotePeerUnauthorized(const QUuid& id);
+    void peerIdDiscovered(const QUrl& url, const QUuid& id);
 public:
 
     template<class T> 
@@ -63,28 +66,27 @@ public:
     {
         QnTransactionTransportHeader header(_header);
         assert(header.processedPeers.contains(m_localPeer.id));
-        if(header.sequence == 0) 
-            header.fillSequence();
+        header.fillSequence();
 #ifdef _DEBUG
 
         foreach (const QUuid& peer, header.dstPeers) {
             Q_ASSERT(!peer.isNull());
-            Q_ASSERT(peer != qnCommon->moduleGUID());
+            //Q_ASSERT(peer != qnCommon->moduleGUID());
         }
 #endif
 
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "send transaction to peer " << remotePeer().id << "command=" << ApiCommand::toString(transaction.command) 
-                 << "transport seq=" << header.sequence << "db seq=" << transaction.persistentInfo.sequence << "timestamp=" << transaction.persistentInfo.timestamp;
+        NX_LOG( lit("send transaction to peer %1 command=%2 tt seq=%3 db seq=%4 timestamp=%5").arg(remotePeer().id.toString()).
+            arg(ApiCommand::toString(transaction.command)).arg(header.sequence).arg(transaction.persistentInfo.sequence).arg(transaction.persistentInfo.timestamp), cl_logDEBUG1);
 #endif
 
         switch (m_remotePeer.dataFormat) {
         case Qn::JsonFormat:
             addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
-        case Qn::BnsFormat:
-            addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
-            break;
+        //case Qn::BnsFormat:
+        //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+        //    break;
         case Qn::UbjsonFormat:
             addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
@@ -107,6 +109,10 @@ public:
     void setReadSync(bool value)  {m_readSync = value;}
     bool isReadyToSend(ApiCommand::Value command) const;
     void setWriteSync(bool value) { m_writeSync = value; }
+
+    bool isSyncDone() const { return m_syncDone; }
+    void setSyncDone(bool value)  {m_syncDone = value;} // end of sync marker received
+
     QUrl remoteAddr() const       { return m_remoteAddr; }
 
     ApiPeerData remotePeer() const { return m_remotePeer; }
@@ -135,6 +141,11 @@ public:
     static void connectingCanceled(const QUuid& id, bool isOriginator);
     static void connectDone(const QUuid& id);
 
+    void processExtraData();
+    void startListening();
+    void setRemotePeer(const ApiPeerData& value) { m_remotePeer = value; }
+    bool isHttpKeepAliveTimeout() const;
+    bool hasUnsendData() const;
 private:
     struct DataToSend
     {
@@ -152,6 +163,7 @@ private:
 
     bool m_readSync;
     bool m_writeSync;
+    bool m_syncDone;
 
     mutable QMutex m_mutex;
     QSharedPointer<AbstractStreamSocket> m_socket;
@@ -176,8 +188,12 @@ private:
     static QMutex m_staticMutex;
 
     QByteArray m_extraData;
-
+    bool m_authByKey;
+    QTime m_lastReceiveTimer;
+    QTime m_sendTimer;
+    QByteArray m_emptyChunkData;
 private:
+    void sendHttpKeepAlive();
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
     void addData(QByteArray &&data);
@@ -196,7 +212,7 @@ private:
     void serializeAndSendNextDataBuffer();
     void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
     void setExtraDataBuffer(const QByteArray& data);
-
+    void fillAuthInfo();
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
     void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );

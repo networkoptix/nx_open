@@ -18,7 +18,6 @@ class QnServerMessageProcessor : public QnCommonMessageProcessor
 public:
     QnServerMessageProcessor();
 
-    bool isKnownAddr(const QString& addr) const;
     virtual void updateResource(const QnResourcePtr &resource) override;
     bool isProxy(const nx_http::Request& request) const;
 protected:
@@ -35,17 +34,9 @@ private slots:
     void at_updateInstallationRequested(const QString &updateId);
 
     void at_systemNameChangeRequested(const QString &systemName);
-
-private:
-    void updateAllIPList(const QUuid& id, const QList<QHostAddress>& addrList);
-    void updateAllIPList(const QUuid& id, const QList<QString>& addr);
-    void updateAllIPList(const QUuid& id, const QString& addr);
-    void removeIPList(const QUuid& id);
-
+    void at_remotePeerUnauthorized(const QUuid& id);
 private:
     mutable QMutex m_mutexAddrList;
-    QHash<QString, int> m_allIPAddress;
-    QHash<QUuid, QList<QString> > m_addrById;
     const int m_serverPort;
     mutable QnMediaServerResourcePtr m_mServer;
 };

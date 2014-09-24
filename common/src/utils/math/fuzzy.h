@@ -8,7 +8,7 @@
 #include <QtGui/QVector2D>
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>
-
+#include <QtGui/QMatrix4x4>
 
 // TODO: #Elric #5.3 remove
 quint32 qFloatDistance(float a, float b);
@@ -83,6 +83,15 @@ inline bool qFuzzyEquals(const QVector4D &l, const QVector4D &r) {
     return qFuzzyEquals(l.x(), r.x()) && qFuzzyEquals(l.y(), r.y()) && qFuzzyEquals(l.w(), r.w());
 }
 
+inline bool qFuzzyEquals(const QMatrix4x4 &l, const QMatrix4x4 &r) {
+    auto lm = l.constData();
+    auto rm = r.constData();
+    for (int i = 0; i < 3; ++i)
+        for (int j = 0; j < 3; ++j)
+            if (!qFuzzyEquals(lm[i*4 +j], rm[i*4 +j]))
+                return false;
+    return true;
+}
 
 // -------------------------------------------------------------------------- //
 // Fuzzy border functions

@@ -102,8 +102,6 @@ public:
 
     QnVideoWallMatrixIndexList selectedVideoWallMatrices() const;
 
-    QnResourceList selectedIncompatibleServers() const;
-
     virtual Qn::ActionScope currentScope() const override;
 
     QComboBox *typeComboBox() const;

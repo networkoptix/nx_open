@@ -7,11 +7,13 @@
 #include "common/common_module.h"
 #include "media_server/settings.h"
 #include "media_server/serverutil.h"
+#include "media_server/server_connector.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/media_server_resource.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/module_finder.h"
+#include "api/model/configure_reply.h"
 
 namespace {
     enum Result {
@@ -26,17 +28,20 @@ namespace {
 int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
     Q_UNUSED(path)
 
-    bool wholeSystem = params.value(lit("wholeSystem"), lit("false")) == lit("true");
+    bool wholeSystem = params.value(lit("wholeSystem"), lit("false")) != lit("false");
     QString systemName = params.value(lit("systemName"));
     QString password = params.value(lit("password"));
+    QString oldPassword = params.value(lit("oldPassword"));
     QByteArray passwordHash = params.value(lit("passwordHash")).toLatin1();
     QByteArray passwordDigest = params.value(lit("passwordDigest")).toLatin1();
     int port = params.value(lit("port")).toInt();
 
     /* set system name */
     int changeSystemNameResult = changeSystemName(systemName, wholeSystem);
-    if (changeSystemNameResult == ResultFail)
+    if (changeSystemNameResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
+        result.setErrorString(lit("Can't change system name."));
+    }
 
     /* reset connections if systemName is changed */
     if (changeSystemNameResult == ResultOk && !wholeSystem)
@@ -44,18 +49,22 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
 
     /* set port */
     int changePortResult = changePort(port);
-    if (changePortResult == ResultFail)
+    if (changePortResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
+        result.setErrorString(lit("Can't change port."));
+    }
 
     /* set password */
-    int changeAdminPasswordResult = changeAdminPassword(password, passwordHash, passwordDigest);
-    if (changeAdminPasswordResult == ResultFail)
+    int changeAdminPasswordResult = changeAdminPassword(password, passwordHash, passwordDigest, oldPassword);
+    if (changeAdminPasswordResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
+        result.setErrorString(lit("Can't change admin password."));
+    }
 
-    QJsonObject res;
-    res.insert(lit("restartNeeded"), changePortResult == ResultOk);
-    result.setReply(QJsonValue(res));
-    return result.error() == QnJsonRestResult::NoError ? CODE_OK : CODE_INTERNAL_ERROR;
+    QnConfigureReply reply;
+    reply.restartNeeded = changePortResult == ResultOk;
+    result.setReply(reply);
+    return CODE_OK;
 }
 
 int QnConfigureRestHandler::changeSystemName(const QString &systemName, bool wholeSystem) {
@@ -80,28 +89,35 @@ int QnConfigureRestHandler::changeSystemName(const QString &systemName, bool who
     return ResultOk;
 }
 
-int QnConfigureRestHandler::changeAdminPassword(const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest) {
-    if (!password.isEmpty() || (!passwordHash.isEmpty() && !passwordDigest.isEmpty())) {
-        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
-            QnUserResourcePtr user = resource.staticCast<QnUserResource>();
-            if (user->getName() == lit("admin")) {
-                if (!password.isEmpty()) {
-                    user->setPassword(password);
-                    QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(user, this, [](int, ec2::ErrorCode) { return; });
-                    user->setPassword(QString());
-                } else {
-                    if (user->getHash() != passwordHash || user->getDigest() != passwordDigest) {
-                        user->setHash(passwordHash);
-                        user->setDigest(passwordDigest);
-                        QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(user, this, [](int, ec2::ErrorCode) { return; });
-                    }
-                }
-                return ResultOk;
+int QnConfigureRestHandler::changeAdminPassword(const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, const QString &oldPassword) {
+    if (password.isEmpty() && (passwordHash.isEmpty() || passwordDigest.isEmpty()))
+        return ResultSkip;
+
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
+        QnUserResourcePtr user = resource.staticCast<QnUserResource>();
+        if (user->getName() != lit("admin"))
+            continue;
+
+        if (!password.isEmpty()) {
+            /* check old password */
+            if (!user->checkPassword(oldPassword))
+                return ResultFail;
+
+            /* set new password */
+            user->setPassword(password);
+            user->generateHash();
+            QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(user, this, [](int, ec2::ErrorCode) { return; });
+            user->setPassword(QString());
+        } else {
+            if (user->getHash() != passwordHash || user->getDigest() != passwordDigest) {
+                user->setHash(passwordHash);
+                user->setDigest(passwordDigest);
+                QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(user, this, [](int, ec2::ErrorCode) { return; });
             }
         }
-        return ResultFail;
+        return ResultOk;
     }
-    return ResultSkip;
+    return ResultFail;
 }
 
 int QnConfigureRestHandler::changePort(int port) {
@@ -125,6 +141,6 @@ void QnConfigureRestHandler::resetConnections() {
         qnTransactionBus->dropConnections();
     }
 
-    if (QnModuleFinder::instance())
-        QnModuleFinder::instance()->makeModulesReappear();
+    if (QnServerConnector::instance())
+        QnServerConnector::instance()->reconnect();
 }

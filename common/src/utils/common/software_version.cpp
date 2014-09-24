@@ -7,11 +7,38 @@
 
 #include <utils/common/model_functions.h>
 
+QnSoftwareVersion::QnSoftwareVersion(const QString &versionString) {
+    deserialize(versionString, this);
+}
+
+QnSoftwareVersion::QnSoftwareVersion(const char *versionString) {
+    deserialize(QLatin1String(versionString), this);
+}
+
+QnSoftwareVersion::QnSoftwareVersion(const QByteArray &versionString) {
+    deserialize(QLatin1String(versionString), this);
+}
+
+QnSoftwareVersion::QnSoftwareVersion() {
+    std::fill(m_data.begin(), m_data.end(), 0);
+}
+
+QnSoftwareVersion::QnSoftwareVersion(int major, int minor, int bugfix /*= 0*/, int build /*= 0*/) {
+    m_data[0] = major;
+    m_data[1] = minor;
+    m_data[2] = bugfix;
+    m_data[3] = build;
+}
+
 QString QnSoftwareVersion::toString(QnSoftwareVersion::Format format) const {
     QString result = QString::number(m_data[0]);
     for(int i = 1; i < format; i++)
         result += QLatin1Char('.') + QString::number(m_data[i]);
     return result;
+}
+
+bool QnSoftwareVersion::isNull() const {
+    return m_data[0] == 0 && m_data[1] == 0 && m_data[2] == 0 && m_data[3] == 0;
 }
 
 bool operator<(const QnSoftwareVersion &l, const QnSoftwareVersion &r) {
@@ -61,14 +88,6 @@ QDataStream &operator>>(QDataStream &stream, QnSoftwareVersion &version) {
 }
 
 QN_FUSION_DEFINE_FUNCTIONS(QnSoftwareVersion, (json_lexical)(xml_lexical))
-
-void serialize(const QnSoftwareVersion &value, QnOutputBinaryStream<QByteArray> *stream) {
-    QnBinary::serialize(value.m_data, stream);
-}
-
-bool deserialize(QnInputBinaryStream<QByteArray> *stream, QnSoftwareVersion *target) {
-    return QnBinary::deserialize(stream, &target->m_data);
-}
 
 void serialize(const QnSoftwareVersion &value, QnUbjsonWriter<QByteArray> *stream) {
     QnUbjson::serialize(value.m_data, stream);

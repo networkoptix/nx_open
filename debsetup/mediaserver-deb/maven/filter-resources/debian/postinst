@@ -110,7 +110,7 @@ function ask_for_value {
     echo $RESULT
 }
 
-function validate_adminPassword {
+function validate_appserverPassword {
     [ -n "$1" ]
 }
 
@@ -144,8 +144,8 @@ case "$1" in
         $CFG_HELPER port "$PORT"
 
         if [ ! -f $DB_PATH -a ! -f $OLD_DB_PATH ]; then
-            ADMIN_PASSWORD=$(ask_for_value adminPassword "$ADMIN_PASSWORD")
-            $CFG_HELPER adminPassword "$ADMIN_PASSWORD"
+            APPSERVER_PASSWORD=$(ask_for_value appserverPassword "$APPSERVER_PASSWORD")
+            $CFG_HELPER appserverPassword "$APPSERVER_PASSWORD"
         fi
 
         TRANSPORT="$($CFG_HELPER rtspTransport)"

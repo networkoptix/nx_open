@@ -40,6 +40,7 @@
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/synctime.h>
 #include <utils/network/global_module_finder.h>
+#include <utils/network/router.h>
 
 namespace {
     const int videowallReconnectTimeoutMSec = 5000;
@@ -97,7 +98,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
     });
 
 
-    connect( QnAppServerConnectionFactory::getConnection2().get(), &ec2::AbstractECConnection::timeChanged,
+    connect( QnAppServerConnectionFactory::getConnection2()->getTimeManager().get(), &ec2::AbstractTimeManager::timeChanged,
         QnSyncTime::instance(), static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime) );
 
     //connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
@@ -137,10 +138,10 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     /* Remove all remote resources. */
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
     resourcePool()->removeResources(remoteResources);
-    resourcePool()->clearIncompatibleResources();
+    resourcePool()->removeResources(resourcePool()->getAllIncompatibleResources());
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
-    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>()) {
+    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources<QnLayoutResource>()) {
         bool isLocal = snapshotManager()->isLocal(layout);
         bool isFile = snapshotManager()->isFile(layout);
         if(isLocal && isFile)  //do not remove exported layouts
@@ -198,8 +199,10 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
             url = qnSettings->defaultConnection().url;
 
         /* Try to connect with saved password. */
-        if (url.isValid() && !qnSettings->storedPassword().isEmpty()) {
-            url.setPassword(qnSettings->storedPassword());
+        if (qnSettings->autoLogin() 
+            && url.isValid() 
+            && !url.password().isEmpty()) 
+        {
             if (!connectToServer(url))
                 showLoginDialog();
         } else 
@@ -291,14 +294,14 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
         return false;
 
     if (!force) {
-        qnSettings->setStoredPassword(QString());
         QnGlobalSettings::instance()->synchronizeNow();
+        qnSettings->setLastUsedConnection(QnConnectionData());
     }
 
     hideMessageBox();
 
+    QnGlobalModuleFinder::instance()->setConnection(NULL);
     QnClientMessageProcessor::instance()->init(NULL);
-
     QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());

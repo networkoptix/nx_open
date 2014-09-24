@@ -4,19 +4,21 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFile>
+#include <QtCore/QCryptographicHash>
 
 #include <api/session_manager.h>
 #include <common/common_meta_types.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
 #include <utils/common/product_features.h>
 
 
 QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(common);
     m_cloudMode = false;
-    m_engineVersion = QnSoftwareVersion(QN_ENGINE_VERSION);
+    m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
 
     QnCommonMetaTypes::initialize();
     
@@ -29,6 +31,7 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
 
     /* Init members. */
     m_sessionManager = new QnSessionManager(); //instance<QnSessionManager>();
+    m_runUuid = QUuid::createUuid();
 }
 
 QnCommonModule::~QnCommonModule() {
@@ -63,30 +66,49 @@ void QnCommonModule::setEngineVersion(const QnSoftwareVersion &version) {
     m_engineVersion = version;
 }
 
-void QnCommonModule::setModuleInformation(const QnModuleInformation& moduleInformation)
-{
+void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInformation) {
     QMutexLocker lk(&m_mutex);
     m_moduleInformation = moduleInformation;
 }
 
-QnModuleInformation QnCommonModule::moduleInformation() const
+QnModuleInformation QnCommonModule::moduleInformation() const 
 {
-    QMutexLocker lk(&m_mutex);
-
-    QnModuleInformation moduleInformationCopy(m_moduleInformation);
-    //filling dynamic fields
-    if( qnResPool )
+    QnModuleInformation moduleInformationCopy;
     {
-        const QnMediaServerResource* server = dynamic_cast<const QnMediaServerResource*>(qnResPool->getResourceById(qnCommon->moduleGUID()).data());
-        moduleInformationCopy.isLocal = false;
-        if( server )
-        {
-            foreach(const QHostAddress &address, server->getNetAddrList())
-                moduleInformationCopy.remoteAddresses.insert(address.toString());
+        QMutexLocker lk(&m_mutex);
+        moduleInformationCopy = m_moduleInformation;
+        moduleInformationCopy.systemName = m_localSystemName;
+    }
+    //filling dynamic fields
+    if (qnResPool) {
+        moduleInformationCopy.remoteAddresses.clear();
+        const QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+        if (server) {
+            QSet<QString> ignoredHosts;
+            foreach (const QUrl &url, server->getIgnoredUrls())
+                ignoredHosts.insert(url.host());
+
+            foreach(const QHostAddress &address, server->getNetAddrList()) {
+                QString addressString = address.toString();
+                if (!ignoredHosts.contains(addressString))
+                    moduleInformationCopy.remoteAddresses.insert(addressString);
+            }
+            foreach(const QUrl &url, server->getAdditionalUrls()) {
+                if (!ignoredHosts.contains(url.host()))
+                    moduleInformationCopy.remoteAddresses.insert(url.host());
+            }
+        }
+
+        foreach (const QnUserResourcePtr &user, qnResPool->getResourcesWithFlag(Qn::user).filtered<QnUserResource>()) {
+            if (user->getName() == lit("admin")) {
+                QCryptographicHash md5(QCryptographicHash::Md5);
+                md5.addData(user->getHash());
+                md5.addData(moduleInformationCopy.id.toByteArray());
+                moduleInformationCopy.authHash = md5.result();
+            }
         }
     }
 
-    moduleInformationCopy.systemName = m_localSystemName;
     return moduleInformationCopy;
 }
 

@@ -10,7 +10,7 @@
 #   include <unistd.h>
 #endif
 
-#include "version.h"
+#include <utils/common/app_info.h>
 #include "ui/widgets/main_window.h"
 #include "client/client_settings.h"
 #include <api/global_settings.h>
@@ -114,7 +114,9 @@ extern "C"
 #include <nx_ec/dummy_handler.h>
 #include <utils/network/module_finder.h>
 #include <utils/network/global_module_finder.h>
+#include <utils/network/router.h>
 #include <api/network_proxy_factory.h>
+#include <utils/server_interface_watcher.h>
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
@@ -327,6 +329,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QString sVideoWallGuid;
     QString sVideoWallItemGuid;
     QString engineVersion;
+    bool noClientUpdate = false;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -350,6 +353,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&sVideoWallGuid,         "--videowall",                  NULL,   QString());
     commandLineParser.addParameter(&sVideoWallItemGuid,     "--videowall-instance",         NULL,   QString());
     commandLineParser.addParameter(&engineVersion,          "--override-version",           NULL,   QString());
+    commandLineParser.addParameter(&noClientUpdate,         "--no-client-update",           NULL,   QString());
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
@@ -406,6 +410,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     qnSettings->setVSyncEnabled(!noVSync);
 
+    qnSettings->setClientUpdateDisabled(noClientUpdate);
+
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 
     QnCustomization customization;
@@ -429,6 +435,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
+    QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
+    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();
@@ -473,17 +481,24 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 	ec2ConnectionFactory->setContext( resCtx );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
-    QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
-    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
+    QObject::connect( qnResPool, &QnResourcePool::resourceAdded, application, []( const QnResourcePtr& resource ){
+        if( resource->hasFlags(Qn::foreigner) )
+            return;
+        QnMediaServerResource* mediaServerRes = dynamic_cast<QnMediaServerResource*>(resource.data());
+        ec2::AbstractECConnectionPtr ecConnection = QnAppServerConnectionFactory::getConnection2();
+        if( mediaServerRes && ecConnection && (mediaServerRes->getSystemName() == ecConnection->connectionInfo().systemName) )
+            mediaServerRes->determineOptimalNetIF();
+    } );
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
+    runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
     runtimeData.peer.peerType = videowallInstanceGuid.isNull()
         ? Qn::PT_DesktopClient
         : Qn::PT_VideowallClient;
-    runtimeData.brand = lit(QN_PRODUCT_NAME_SHORT);
+    runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.videoWallInstanceGuid = videowallInstanceGuid;
-    QnRuntimeInfoManager::instance()->items()->addItem(runtimeData);    // initializing localInfo
+    QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
     qnSettings->save();
     if (!QDir(qnSettings->mediaFolder()).exists())
@@ -500,7 +515,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnHelpHandler helpHandler;
     qApp->installEventFilter(&helpHandler);
 
-    cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
+    cl_log.log(qApp->applicationName(), " started", cl_logALWAYS);
     cl_log.log("Software version: ", QApplication::applicationVersion(), cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
@@ -516,6 +531,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     moduleFinder->start();
 
     QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
+
+    QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data(), true));
+
+    QScopedPointer<QnServerInterfaceWatcher> serverInterfaceWatcher(new QnServerInterfaceWatcher(router.data()));
 
     //===========================================================================
 
@@ -582,8 +601,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     //PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
 
     /* Process input files. */
+    bool haveInputFiles = false;
     for (int i = 1; i < argc; ++i)
-        mainWindow->handleMessage(QFile::decodeName(argv[i]));
+        haveInputFiles |= mainWindow->handleMessage(QFile::decodeName(argv[i]));
     if(!noSingleApplication)
         QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
 
@@ -602,17 +622,18 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // show beta version warning message for the main instance only
     if (!noSingleApplication &&
         !qnSettings->isDevMode() &&
-        QLatin1String(QN_BETA) == lit("true"))
+        QnAppInfo::beta())
         context->action(Qn::BetaVersionMessageAction)->trigger();
 
     /* If no input files were supplied --- open connection settings dialog. */
     
     /* 
-     * Do not try to connect in the only case: we were not connected and clicked "Open in new window".
+     * Do not try to connect in the following cases:
+     * * we were not connected and clicked "Open in new window"
+     * * we have opened exported exe-file 
      * Otherwise we should try to connect or show Login Dialog.
      */    
-    if (instantDrop.isEmpty()) {
-
+    if (instantDrop.isEmpty() && !haveInputFiles) {
         /* Set authentication parameters from command line. */
         QUrl appServerUrl = QUrl::fromUserInput(authenticationString);
         if (!videowallGuid.isNull()) {

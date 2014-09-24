@@ -12,6 +12,7 @@
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_user_data.h"
 #include "nx_ec/data/api_resource_data.h"
+#include "nx_ec/data/api_tran_state_data.h"
 #include "nx_ec/data/api_layout_data.h"
 #include "nx_ec/data/api_videowall_data.h"
 #include "nx_ec/data/api_camera_server_item_data.h"
@@ -24,6 +25,7 @@
 #include "nx_ec/data/api_routing_data.h"
 #include "nx_ec/data/api_system_name_data.h"
 #include "nx_ec/data/api_runtime_data.h"
+#include "nx_ec/data/api_license_overflow_data.h"
 #include "nx_ec/data/api_peer_system_time_data.h"
 #include "utils/db/db_helper.h"
 #include "binary_transaction_serializer.h"
@@ -35,41 +37,17 @@ namespace ec2
 
     class QnDbManager;
 
-    struct QnTranStateKey {
-        QnTranStateKey() {}
-        QnTranStateKey(QUuid peerID, QUuid dbID): peerID(peerID), dbID(dbID) {}
-        QUuid peerID;
-        QUuid dbID;
-
-        bool operator<(const QnTranStateKey& other) const {
-            if (peerID != other.peerID)
-                return peerID < other.peerID;
-            return dbID < other.dbID;
-        }
-        bool operator>(const QnTranStateKey& other) const {
-            if (peerID != other.peerID)
-                return peerID > other.peerID;
-            return dbID > other.dbID;
-        }
-    };
-    #define QnTranStateKey_Fields (peerID)(dbID)
-
-    struct QnTranState {
-         QMap<QnTranStateKey, qint32> values;
-    };
-    #define QnTranState_Fields (values)
-
-    struct QnTranStateResponse
-    {
-        int result;
-    };
-    #define QnTranStateResponse_Fields (result)
-  
-    QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnTranStateKey)(QnTranState)(QnTranStateResponse), (binary)(json)(ubjson))
 
     class QnTransactionLog
     {
     public:
+
+        enum ContainsReason {
+            Reason_None,
+            Reason_Sequence,
+            Reason_Timestamp
+        };
+
         QnTransactionLog(QnDbManager* db);
 
         static QnTransactionLog* instance();
@@ -79,7 +57,8 @@ namespace ec2
         QnTranState getTransactionsState();
         
         template <class T>
-        bool contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.params)); }
+        ContainsReason contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.params)); }
+        bool contains(const QnTranState& state) const;
 
         template <class T>
         ErrorCode saveTransaction(const QnTransaction<T>& tran) 
@@ -94,6 +73,11 @@ namespace ec2
         }
 
         ErrorCode saveTransaction(const QnTransaction<ApiFullInfoData>& , const QByteArray&) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode saveTransaction(const QnTransaction<ApiLicenseOverflowData>& , const QByteArray&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -138,17 +122,12 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode saveTransaction(const QnTransaction<ApiConnectionData>& , const QByteArray&) {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
-            return ErrorCode::notImplemented;
-        }
-
-        ErrorCode saveTransaction(const QnTransaction<ApiConnectionDataList>& , const QByteArray&) {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
-            return ErrorCode::notImplemented;
-        }
-
         ErrorCode saveTransaction(const QnTransaction<ApiSystemNameData>& , const QByteArray&) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode saveTransaction(const QnTransaction<ApiSyncRequestData>& , const QByteArray&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -156,7 +135,8 @@ namespace ec2
         qint64 getTimeStamp();
         void init();
 
-        bool contains(const QnAbstractTransaction& tran, const QUuid& hash) const;
+        ContainsReason contains(const QnAbstractTransaction& tran, const QUuid& hash) const;
+        int getLatestSequence(const QnTranStateKey& key) const;
         QUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray()) const;
         QUuid makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) const;
         QUuid makeHash(const QString &extraData, const ApiDiscoveryDataList &data) const;
@@ -175,7 +155,7 @@ namespace ec2
         QUuid transactionHash(const ApiVideowallData& params) const              { return params.id; }
         QUuid transactionHash(const ApiBusinessRuleData& params) const           { return params.id; }
         QUuid transactionHash(const ApiIdData& params) const                     { return params.id; }
-        QUuid transactionHash(const ApiCameraServerItemData&) const              { return QUuid::createUuid() ; }
+        QUuid transactionHash(const ApiCameraServerItemData& params) const       { return makeHash(params.cameraUniqueId.toUtf8(), QByteArray::number(params.timestamp)); }
         QUuid transactionHash(const ApiSetResourceStatusData& params) const      { return makeHash(params.id.toRfc4122(), "status"); }
         QUuid transactionHash(const ApiPanicModeData&) const                     { return makeHash("panic_mode", ADD_HASH_DATA) ; }
         QUuid transactionHash(const ApiResourceParamsData& params) const;
@@ -203,22 +183,25 @@ namespace ec2
         QUuid transactionHash(const ApiModuleData& ) const                     { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiModuleDataList& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiDiscoverPeerData& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
-        QUuid transactionHash(const ApiConnectionData& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
-        QUuid transactionHash(const ApiConnectionDataList& ) const             { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiSystemNameData& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
         QUuid transactionHash(const ApiLockData& ) const                       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiPeerAliveData& ) const                  { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
-        QUuid transactionHash(const QnTranState& ) const                       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const ApiSyncRequestData& ) const                { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTranStateResponse& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiRuntimeData& ) const                    { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiPeerSystemTimeData& ) const             { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const ApiPeerSystemTimeDataList& ) const         { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiDatabaseDumpData& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiResourceData& ) const                   { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const ApiUpdateSequenceData& ) const             { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const ApiTranSyncDoneData& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const ApiLicenseOverflowData& ) const            { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
-
+        ErrorCode updateSequence(const ApiUpdateSequenceData& data);
     private:
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QUuid& hash, const QByteArray& data);
+        ErrorCode updateSequenceNoLock(const QUuid& peerID, const QUuid& dbID, int sequence);
     private:
         QnDbManager* m_dbManager;
         QnTranState m_state;
@@ -236,6 +219,7 @@ namespace ec2
         QElapsedTimer m_relativeTimer;
         qint64 m_currentTime;
         qint64 m_lastTimestamp;
+        //QMap<QnTranStateKey, QnAbstractTransaction::PersistentInfo> m_fillerInfo;
     };
 };
 

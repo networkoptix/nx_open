@@ -4,7 +4,7 @@
 #include "utils/network/module_information.h"
 #include "utils/network/simple_http_client.h"
 #include "utils/network/tcp_connection_priv.h"
-#include "version.h"
+#include <utils/common/app_info.h>
 
 int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
     Q_UNUSED(path)
@@ -12,14 +12,22 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
     QUrl url = params.value(lit("url"));
     QString password = params.value(lit("password"));
 
+    if (url.isEmpty()) {
+        result.setError(QnJsonRestResult::MissingParameter);
+        result.setErrorString(lit("url"));
+        return CODE_OK;
+    }
+
     if (!url.isValid()) {
         result.setError(QnJsonRestResult::InvalidParameter);
-        return CODE_INVALID_PARAMETER;
+        result.setErrorString(lit("url"));
+        return CODE_OK;
     }
 
     if (password.isEmpty()) {
         result.setError(QnJsonRestResult::MissingParameter);
-        return CODE_INVALID_PARAMETER;
+        result.setErrorString(lit("password"));
+        return CODE_OK;
     }
 
     QAuthenticator auth;
@@ -30,7 +38,10 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
     CLHttpStatus status = client.doGET(lit("api/moduleInformationAuthenticated"));
 
     if (status != CL_HTTP_SUCCESS) {
-        result.setErrorString(lit("FAIL"));
+        if (status == CL_HTTP_AUTH_REQUIRED)
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("UNAUTHORIZED"));
+        else
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
         return CODE_OK;
     }
 
@@ -44,12 +55,14 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
 
     if (moduleInformation.systemName.isEmpty()) {
         /* Hmm there's no system name. It would be wrong system. Reject it. */
-        result.setErrorString(lit("FAIL"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
         return CODE_OK;
     }
 
-    if (moduleInformation.version != qnCommon->engineVersion() || moduleInformation.customization != lit(QN_CUSTOMIZATION_NAME)) {
-        result.setErrorString(lit("INCOMPATIBLE"));
+    result.setReply(moduleInformation);
+
+    if (!isCompatible(qnCommon->engineVersion(), moduleInformation.version) || moduleInformation.customization != QnAppInfo::customizationName()) {
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return CODE_OK;
     }
 

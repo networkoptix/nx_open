@@ -32,7 +32,7 @@ namespace Qn
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace CameraDataType
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
-            StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat PeerType)
+            StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType)
     Q_FLAGS(Borders Corners
             ResourceFlags
             CameraCapabilities 
@@ -289,6 +289,8 @@ public:
         videowall = 0x200000,           /**< Videowall resource */
         desktop_camera = 0x400000,      /**< Desktop Camera resource */
 
+        parent_change = 0x800000,       /**< Camera discovery internal purpose */
+
         local_media = local | media,
         local_layout = local | layout,
 
@@ -465,6 +467,7 @@ public:
         ValidRole,                                  /**< Role for valid state. Value of type bool. */
         ActionIsInstantRole,                        /**< Role for instant state for business rule actions. Value of type bool. */
         ShortTextRole,                              /**< Role for short text. Value of type QString. */
+        PriorityRole,                               /**< Role for priority value. Value of type quint64. */
 
         EventTypeRole,                              /**< Role for business event type. Value of type QnBusiness::EventType. */
         EventResourcesRole,                         /**< Role for business event resources list. Value of type QnResourceList. */
@@ -473,8 +476,7 @@ public:
 
         SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
 
-        LocalSystemTimeRole,                        /**< Used with action SelectTimeServerAction. type qint64 */
-        PeersToChooseTimeServerFromRole             /**< Used with action SelectTimeServerAction. type QList<QPair<QnId, qint64> */
+        LastItemDataRole
     };
 
     // TODO: #Elric #EC2 rename
@@ -501,6 +503,15 @@ public:
         SSQualityDontUse = 4
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SecondStreamQuality)
+
+    enum StatisticsDeviceType {
+        StatisticsCPU = 0,                /**< CPU load in percents. */
+        StatisticsRAM = 1,                /**< RAM load in percents. */
+        StatisticsHDD = 2,                /**< HDD load in percents. */
+        StatisticsNETWORK = 3             /**< Network load in percent. */
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StatisticsDeviceType)
+
 
     enum CameraStatusFlag {
         CSF_NoFlags = 0x0,
@@ -623,7 +634,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
-        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
+        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType), 
     (metatype)(lexical)

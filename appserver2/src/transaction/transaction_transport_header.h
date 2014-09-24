@@ -10,20 +10,21 @@ namespace ec2 {
     struct QnTransactionTransportHeader
     {
         QnTransactionTransportHeader(): sequence(0) {}
-        QnTransactionTransportHeader(QnPeerSet processedPeers, QnPeerSet dstPeers = QnPeerSet(), int sequence = 0):
+        QnTransactionTransportHeader(QnPeerSet processedPeers, QnPeerSet dstPeers = QnPeerSet()):
             processedPeers(processedPeers), 
             dstPeers(dstPeers), 
-            sequence(sequence) {}
+            sequence(0) {}
 
         void fillSequence();
 
         QnPeerSet processedPeers;
         QnPeerSet dstPeers;
         int sequence;
+        QUuid sender;
     };
-#define QnTransactionTransportHeader_Fields (processedPeers)(dstPeers)(sequence)
+#define QnTransactionTransportHeader_Fields (processedPeers)(dstPeers)(sequence)(sender)
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnTransactionTransportHeader, (binary)(json)(ubjson))
+    QN_FUSION_DECLARE_FUNCTIONS(QnTransactionTransportHeader, (json)(ubjson))
 
 } // namespace ec2
 

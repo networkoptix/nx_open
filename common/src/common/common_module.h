@@ -40,6 +40,8 @@ public:
     void setModuleGUID(const QUuid& guid) { m_uuid = guid; }
     QUuid moduleGUID() const{ return m_uuid; }
 
+    QUuid runningInstanceGUID() const{ return m_runUuid; }
+
     void setObsoleteServerGuid(const QUuid& guid) { m_obsoleteUuid = guid; }
     QUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
     
@@ -57,7 +59,6 @@ public:
 
     void setLocalSystemName(const QString& value);
     QString localSystemName() const;
-    QByteArray getSystemPassword() const { return "{61D85D22-E7AA-44EC-B5EC-1BEAC9FE19C5}"; }
 
     void setDefaultAdminPassword(const QString& password) { m_defaultAdminPassword = password; }
     QString defaultAdminPassword() const { return m_defaultAdminPassword; }
@@ -68,7 +69,7 @@ public:
     QnSoftwareVersion engineVersion() const;
     void setEngineVersion(const QnSoftwareVersion &version);
 
-    void setModuleInformation( const QnModuleInformation& moduleInformation );
+    void setModuleInformation(const QnModuleInformation &moduleInformation);
     QnModuleInformation moduleInformation() const;
 
 signals:
@@ -83,6 +84,7 @@ private:
     QString m_localSystemName;
     QString m_defaultAdminPassword;
     QUuid m_uuid;
+    QUuid m_runUuid;
     QUuid m_obsoleteUuid;
     QUuid m_remoteUuid;
     QUrl m_url;

@@ -45,7 +45,7 @@
                     <Condition>SERVER_PASSWORD</Condition>
 
                     <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
-                        <RegistryValue Type="string" Name="adminPassword" Value="[SERVER_PASSWORD]"/>
+                        <RegistryValue Type="string" Name="appserverPassword" Value="[SERVER_PASSWORD]"/>
                     </RegistryKey>
                 </Component>
 
@@ -217,9 +217,9 @@
             <ComponentGroupRef Id="VmaxProxySDK"/>
             <?endif?>       
 
-<!--            <ComponentRef Id="traytool.exe"/>
+            <ComponentRef Id="traytool.exe"/>
             <ComponentGroupRef Id="TrayToolQTLibraries"/>
-            <ComponentGroupRef Id="TraytoolPlatforms" />            -->
+            <ComponentGroupRef Id="TraytoolPlatforms" />
 
         </Feature>
 

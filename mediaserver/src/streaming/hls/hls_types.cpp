@@ -69,7 +69,10 @@ namespace nx_hls
                         : ("-" + QTime( 0, 0, 0 ).addSecs( -tzOffset ).toString( lit( "hh:mm" ) ))) +
                     "\r\n";
             playlistStr += "#EXTINF:"+QByteArray::number(chunks[i].duration, 'f', 3)+",\r\n";
-            playlistStr += chunks[i].url.toString().toLatin1()+"\r\n";
+            playlistStr += chunks[i].url.host().isEmpty()
+                ? chunks[i].url.path().toLatin1()+"?"+chunks[i].url.query().toLatin1()    //reporting only path if host not specified
+                : chunks[i].url.toString().toLatin1();
+            playlistStr += "\r\n";
         }
 
         if( closed )
@@ -92,7 +95,9 @@ namespace nx_hls
             if( playlists[i].bandwidth )
                 str += "BANDWIDTH="+QByteArray::number(playlists[i].bandwidth.get());
             str += "\r\n";
-            str += playlists[i].url.toString().toLatin1();
+            str += playlists[i].url.host().isEmpty()
+                ? playlists[i].url.path().toLatin1()+"?"+playlists[i].url.query().toLatin1()    //reporting only path if host not specified
+                : playlists[i].url.toString().toLatin1();
             str += "\r\n";
         }
 

@@ -26,7 +26,7 @@
 #include <utils/common/email.h>
 #include <utils/common/log.h>
 #include "business/business_strings_helper.h"
-#include "version.h"
+#include <utils/common/app_info.h>
 
 #include "nx_ec/data/api_email_data.h"
 #include "common/common_module.h"
@@ -502,8 +502,8 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(partialInfo.eventLogoFilename, lit(":/skin/email_attachments/") + partialInfo.eventLogoFilename, tpImageMimeType)));
     contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
     contextMap[tpEventLogoFilename] = lit("cid:") + partialInfo.eventLogoFilename;
-    contextMap[tpCompanyName] = lit(QN_ORGANIZATION_NAME);
-    contextMap[tpCompanyUrl] = lit(QN_COMPANY_URL);
+    contextMap[tpCompanyName] = QnAppInfo::organizationName();
+    contextMap[tpCompanyUrl] = QnAppInfo::companyUrl();
     contextMap[tpSupportEmail] = emailSettings.supportEmail;
     contextMap[tpSystemName] = emailSettings.signature;
     attachments.append(partialInfo.attachments);
@@ -659,7 +659,7 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( const QnBus
             QnResourceList resList = businessRule->eventResourceObjects();
             if (resList.isEmpty()) {
                 const QnResourcePtr& mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-                resList = qnResPool->getAllCameras(mServer);
+                resList = qnResPool->getAllCameras(mServer, true);
             }
 
             for( QnResourceList::const_iterator it = resList.constBegin(); it != resList.constEnd(); ++it )

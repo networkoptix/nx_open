@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TimeServerSelectionWidget</class>
+ <widget class="QWidget" name="TimeServerSelectionWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+     <item>
+      <widget class="QLabel" name="timeDescLabel">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Current system time:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="timeLabel">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Synchronizing...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="descriptionLabel">
+     <property name="text">
+      <string>Choose the server which is going to be used as a time server if the system has no internet access:</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableView" name="serversTable"/>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

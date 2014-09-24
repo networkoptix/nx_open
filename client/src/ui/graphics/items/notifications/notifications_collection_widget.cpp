@@ -154,48 +154,34 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
 
     qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
-    QnImageButtonWidget *settingsButton = new QnImageButtonWidget(m_headerWidget);
-    settingsButton->setIcon(qnSkin->icon("events/settings.png"));
-    settingsButton->setToolTip(tr("Settings..."));
-    settingsButton->setFixedSize(buttonSize);
-    settingsButton->setCached(true);
-    connect(settingsButton, &QnImageButtonWidget::clicked, this->context()->action(Qn::BusinessEventsAction), &QAction::triggered); // TODO: #Elric #GDM I think we should call QAction::trigger, not triggered.
-
-    QnImageButtonWidget *filterButton = new QnImageButtonWidget(m_headerWidget);
-    filterButton->setIcon(qnSkin->icon("events/filter.png"));
-    filterButton->setToolTip(tr("Filter..."));
-    filterButton->setFixedSize(buttonSize);
-    filterButton->setCached(true);
-    connect(filterButton,   &QnImageButtonWidget::clicked, this->context()->action(Qn::PreferencesNotificationTabAction), &QAction::triggered); // TODO: #Elric #GDM same here ^
-
-    QnImageButtonWidget *eventLogButton = new QnImageButtonWidget(m_headerWidget);
-    eventLogButton->setIcon(qnSkin->icon("events/log.png"));
-    eventLogButton->setToolTip(tr("Event Log"));
-    eventLogButton->setFixedSize(buttonSize);
-    eventLogButton->setCached(true);
-    setHelpTopic(eventLogButton, Qn::MainWindow_Notifications_EventLog_Help);
-    connect(eventLogButton,   &QnImageButtonWidget::clicked, this->context()->action(Qn::BusinessEventsLogAction), &QAction::triggered); // TODO: #Elric #GDM same here ^
-
-    QnImageButtonWidget *debugButton = NULL;
-    if(qnSettings->isDevMode()) {
-        debugButton = new QnImageButtonWidget(m_headerWidget);
-        debugButton->setIcon(qnSkin->icon("item/search.png"));
-        debugButton->setToolTip(tr("DEBUG"));
-        debugButton->setFixedSize(buttonSize);
-        debugButton->setCached(true);
-        connect(debugButton, &QnImageButtonWidget::clicked, this, &QnNotificationsCollectionWidget::at_debugButton_clicked);
-    }
+    auto newButton = [this, buttonSize](Qn::ActionId actionId, int helpTopicId) {
+        QnImageButtonWidget *button = new QnImageButtonWidget(m_headerWidget);
+        button->setDefaultAction(action(actionId));
+        button->setFixedSize(buttonSize);
+        button->setCached(true);
+        if (helpTopicId >= 0)
+            setHelpTopic(button, helpTopicId);
+        return button;
+    };
 
     qreal margin = (widgetHeight - buttonSize) / 2.0;
     QGraphicsLinearLayout *controlsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     controlsLayout->setSpacing(2.0);
     controlsLayout->setContentsMargins(2.0, margin, 2.0, margin);
     controlsLayout->addStretch();
-    if(debugButton)
+    if(qnSettings->isDevMode()) {
+        QnImageButtonWidget *debugButton = new QnImageButtonWidget(m_headerWidget);
+        debugButton->setIcon(qnSkin->icon("item/search.png"));
+        debugButton->setToolTip(tr("DEBUG"));
+        debugButton->setFixedSize(buttonSize);
+        debugButton->setCached(true);
+        connect(debugButton, &QnImageButtonWidget::clicked, this, &QnNotificationsCollectionWidget::at_debugButton_clicked);
         controlsLayout->addItem(debugButton);
-    controlsLayout->addItem(eventLogButton);
-    controlsLayout->addItem(settingsButton);
-    controlsLayout->addItem(filterButton);
+    }
+        
+    controlsLayout->addItem(newButton(Qn::BusinessEventsLogAction, Qn::MainWindow_Notifications_EventLog_Help));
+    controlsLayout->addItem(newButton(Qn::BusinessEventsAction, -1));
+    controlsLayout->addItem(newButton(Qn::PreferencesNotificationTabAction, -1));
     m_headerWidget->setLayout(controlsLayout);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
@@ -552,23 +538,11 @@ void QnNotificationsCollectionWidget::updateBlinker() {
     blinker()->setColor(QnNotificationLevels::notificationColor(m_list->notificationLevel()));
 }
 
-void QnNotificationsCollectionWidget::at_settingsButton_clicked() {
-    menu()->trigger(Qn::BusinessEventsAction);
-}
-
-void QnNotificationsCollectionWidget::at_filterButton_clicked() {
-    menu()->trigger(Qn::PreferencesNotificationTabAction);
-}
-
-void QnNotificationsCollectionWidget::at_eventLogButton_clicked() {
-    menu()->trigger(Qn::BusinessEventsLogAction);
-}
-
 void QnNotificationsCollectionWidget::at_debugButton_clicked() {
-    QnResourceList servers = qnResPool->getResources().filtered<QnMediaServerResource>();
+    QnResourceList servers = qnResPool->getResources<QnMediaServerResource>();
     QnResourcePtr sampleServer = servers.isEmpty() ? QnResourcePtr() : servers.first();
 
-    QnResourceList cameras = qnResPool->getResources().filtered<QnVirtualCameraResource>();
+    QnResourceList cameras = qnResPool->getResources<QnVirtualCameraResource>();
     QnResourcePtr sampleCamera = cameras.isEmpty() ? QnResourcePtr() : cameras.first();
 
     //TODO: #GDM #Business REMOVE DEBUG
@@ -580,7 +554,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
             resource = context()->user();
             break;
         case QnSystemHealth::UsersEmailIsEmpty:
-            resource = qnResPool->getResources().filtered<QnUserResource>().last();
+            resource = qnResPool->getResources<QnUserResource>().last();
             break;
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::StoragesAreFull:

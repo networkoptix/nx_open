@@ -4,6 +4,7 @@
 
 #include <common/common_meta_types.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/common/geometry.h>
@@ -18,7 +19,18 @@ QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, 
     m_uuid(uuid),
     m_flags(0),
     m_rotation(0.0)
-{}
+{
+    if(resourceUid.isEmpty())
+        return;
+
+    QnResourcePtr resource = qnResPool->getResourceByUniqId(resourceUid);
+    if(!resource)
+        return;
+
+    QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
+    if (!forcedRotation.isEmpty()) 
+        m_rotation = forcedRotation.toInt();
+}
 
 QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     QObject(parent),

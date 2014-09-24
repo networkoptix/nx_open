@@ -1,6 +1,6 @@
 #include "db_manager.h"
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 #include <QtSql/QtSql>
 
@@ -178,7 +178,6 @@ QUuid QnDbManager::getType(const QString& typeName)
 QnDbManager::QnDbManager()
 :
     m_licenseOverflowMarked(false),
-    m_licenseOverflowTime(0),
     m_initialized(false),
     m_tranStatic(m_sdbStatic, m_mutexStatic),
     m_needResyncLog(false)
@@ -270,14 +269,14 @@ bool QnDbManager::init(
     QSqlQuery insVersionQuery( m_sdb );
     insVersionQuery.prepare( "INSERT OR REPLACE INTO misc_data (key, data) values (?,?)" );
     insVersionQuery.addBindValue( "VERSION" );
-    insVersionQuery.addBindValue( QN_APPLICATION_VERSION );
+    insVersionQuery.addBindValue( QnAppInfo::applicationVersion() );
     if( !insVersionQuery.exec() )
     {
         qWarning() << "can't initialize sqlLite database!" << insVersionQuery.lastError().text();
         return false;
     }
     insVersionQuery.addBindValue( "BUILD" );
-    insVersionQuery.addBindValue( QN_APPLICATION_REVISION );
+    insVersionQuery.addBindValue( QnAppInfo::applicationRevision() );
     if( !insVersionQuery.exec() )
     {
         qWarning() << "can't initialize sqlLite database!" << insVersionQuery.lastError().text();
@@ -318,17 +317,18 @@ bool QnDbManager::init(
     QSqlQuery query( m_sdb );
     query.prepare( "SELECT data from misc_data where key = ?" );
     query.addBindValue( LICENSE_EXPIRED_TIME_KEY );
+    qint64 licenseOverflowTime = 0;
     if( query.exec() && query.next() )
     {
-        m_licenseOverflowTime = query.value( 0 ).toByteArray().toLongLong();
-        m_licenseOverflowMarked = m_licenseOverflowTime > 0;
+        licenseOverflowTime = query.value( 0 ).toByteArray().toLongLong();
+        m_licenseOverflowMarked = licenseOverflowTime > 0;
     }
 
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-    if( localInfo.data.prematureLicenseExperationDate != m_licenseOverflowTime )
+    if( localInfo.data.prematureLicenseExperationDate != licenseOverflowTime )
     {
-        localInfo.data.prematureLicenseExperationDate = m_licenseOverflowTime;
-        QnRuntimeInfoManager::instance()->items()->updateItem( localInfo.uuid, localInfo );
+        localInfo.data.prematureLicenseExperationDate = licenseOverflowTime;
+        QnRuntimeInfoManager::instance()->updateLocalItem( localInfo );
     }
 
     query.addBindValue( DB_INSTANCE_KEY );
@@ -369,11 +369,17 @@ bool QnDbManager::init(
         return false;
     }
 
-    if( !qnCommon->defaultAdminPassword().isEmpty() )
+    QString defaultAdminPassword = qnCommon->defaultAdminPassword();
+    if( users[0].hash.isEmpty() && defaultAdminPassword.isEmpty() ) {
+        defaultAdminPassword = lit("123");
+    }
+
+    if( !defaultAdminPassword.isEmpty() )
     {
         QnUserResourcePtr userResource( new QnUserResource() );
         fromApiToResource( users[0], userResource );
-        userResource->setPassword( qnCommon->defaultAdminPassword() );
+        userResource->setPassword( defaultAdminPassword );
+        userResource->generateHash();
 
         QnTransaction<ApiUserData> userTransaction( ApiCommand::saveUser );
         userTransaction.fillPersistentInfo();
@@ -697,6 +703,62 @@ bool QnDbManager::migrateBusinessEvents()
     return true;
 }
 
+bool QnDbManager::applyUpdates()
+{
+    QSqlQuery existsUpdatesQuery(m_sdb);
+    existsUpdatesQuery.prepare("SELECT migration from south_migrationhistory");
+    if (!existsUpdatesQuery.exec())
+        return false;
+    QStringList existUpdates;
+    while (existsUpdatesQuery.next())
+        existUpdates << existsUpdatesQuery.value(0).toString();
+
+
+    QDir dir(":/updates");
+    foreach(const QFileInfo& entry, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name))
+    {
+        QString fileName = entry.absoluteFilePath();
+        if (!existUpdates.contains(fileName)) 
+        {
+            if (!beforeInstallUpdate(fileName))
+                return false;
+            if (!execSQLFile(fileName, m_sdb))
+                return false;
+            if (!afterInstallUpdate(fileName))
+                return false;
+
+            QSqlQuery insQuery(m_sdb);
+            insQuery.prepare("INSERT INTO south_migrationhistory (app_name, migration, applied) values(?, ?, ?)");
+            insQuery.addBindValue(qApp->applicationName());
+            insQuery.addBindValue(fileName);
+            insQuery.addBindValue(QDateTime::currentDateTime());
+            if (!insQuery.exec()) {
+                qWarning() << Q_FUNC_INFO << __LINE__ << insQuery.lastError();
+                return false;
+                }
+        }
+    }
+
+    return true;
+}
+
+bool QnDbManager::beforeInstallUpdate(const QString& updateName)
+{
+    return true;
+}
+
+bool QnDbManager::afterInstallUpdate(const QString& updateName)
+{
+    if (updateName == lit(":/updates/07_videowall.sql")) 
+    {
+        QMap<int, QUuid> guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'Videowall'", CM_MakeHash);
+        if (!updateTableGuids("vms_resourcetype", "guid", guids))
+            return false;
+    }
+
+    return true;
+}
+
 bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
 {
     QnDbTransactionLocker lock(&m_tran);
@@ -720,10 +782,6 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         if (!execSQLFile(lit(":/02_insert_all_vendors.sql"), m_sdb))
             return false;
         //#endif
-
-
-
-
     }
 
     if (!isObjectExists(lit("table"), lit("transaction_log"), m_sdb))
@@ -743,33 +801,13 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
             return false;
         if (!execSQLFile(lit(":/04_update_2.2_stage2.sql"), m_sdb))
             return false;
-
-        { //Videowall-related scripts
-            if (!execSQLFile(lit(":/05_videowall.sql"), m_sdb))
-                return false;
-            QMap<int, QUuid> guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'Videowall'", CM_MakeHash);
-            if (!updateTableGuids("vms_resourcetype", "guid", guids))
-                return false;
-        }
-
-        if (!execSQLFile(lit(":/06_bookmarks.sql"), m_sdb))
-            return false;
-
-        if (!execSQLFile(lit(":/07_refactor_firmware.sql"), m_sdb))
-            return false;
-
-        if (!execSQLFile(lit(":/08_min_max_archive.sql"), m_sdb))
-            return false;
-
-        if (!execSQLFile(lit(":/08_discovery.sql"), m_sdb))
-            return false;
     }
 
     QnDbTransactionLocker lockStatic(&m_tranStatic);
 
     if (!isObjectExists(lit("table"), lit("vms_license"), m_sdbStatic))
     {
-        if (!execSQLFile(lit(":/09_staticdb_add_license_table.sql"), m_sdbStatic))
+        if (!execSQLFile(lit(":/05_staticdb_add_license_table.sql"), m_sdbStatic))
             return false;
 
         // move license table to static DB
@@ -791,8 +829,11 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         }
         //if (!execSQLQuery("drop table vms_license", m_sdb))
         //    return false;
-
     }
+
+    if (!applyUpdates())
+        return false;
+
     lockStatic.commit();
     lock.commit();
 #ifdef DB_DEBUG
@@ -896,7 +937,7 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
 {
     *internalId = getResourceInternalId(data.id);
 
-    Q_ASSERT_X(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
+    //Q_ASSERT_X(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
 
     QSqlQuery query(m_sdb);
     if (*internalId) {
@@ -1001,9 +1042,9 @@ ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 i
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO vms_camera (audio_enabled, control_enabled, vendor, manually_added, resource_ptr_id, region, schedule_enabled, motion_type, group_name, group_id,\
-                     mac, model, secondary_quality, status_flags, physical_id, password, login, dewarping_params, resource_ptr_id, min_archive_days, max_archive_days) VALUES\
+                     mac, model, secondary_quality, status_flags, physical_id, password, login, dewarping_params, resource_ptr_id, min_archive_days, max_archive_days, prefered_server_id) VALUES\
                      (:audioEnabled, :controlEnabled, :vendor, :manuallyAdded, :id, :motionMask, :scheduleEnabled, :motionType, :groupName, :groupId,\
-                     :mac, :model, :secondaryStreamQuality, :statusFlags, :physicalId, :password, :login, :dewarpingParams, :internalId, :minArchiveDays, :maxArchiveDays)");
+                     :mac, :model, :secondaryStreamQuality, :statusFlags, :physicalId, :password, :login, :dewarpingParams, :internalId, :minArchiveDays, :maxArchiveDays, :preferedServerId)");
     QnSql::bind(data, &insQuery);
     insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec()) {
@@ -1533,28 +1574,42 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourc
     return insertAddParams(tran.params.params, internalId);
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraServerItemData>& tran)
+ErrorCode QnDbManager::addCameraHistory(const ApiCameraServerItemData& params)
 {
-    QSqlQuery lastHistory(m_sdb);
-    lastHistory.prepare("SELECT server_guid, max(timestamp) FROM vms_cameraserveritem WHERE physical_id = ? AND timestamp < ?");
-    lastHistory.addBindValue(tran.params.cameraUniqueId);
-    lastHistory.addBindValue(tran.params.timestamp);
-    if (!lastHistory.exec()) {
-        qWarning() << Q_FUNC_INFO << lastHistory.lastError().text();
-        return ErrorCode::dbError;
-    }
-    if (lastHistory.next() && lastHistory.value(0).toByteArray() == tran.params.serverId)
-        return ErrorCode::skipped;
-
     QSqlQuery query(m_sdb);
     query.prepare("INSERT INTO vms_cameraserveritem (server_guid, timestamp, physical_id) VALUES(:serverId, :timestamp, :cameraUniqueId)");
-    QnSql::bind(tran.params, &query);
+    QnSql::bind(params, &query);
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
     }
 
     return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::removeCameraHistory(const ApiCameraServerItemData& params)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare("DELETE FROM vms_cameraserveritem WHERE server_guid = :serverId AND timestamp = :timestamp AND physical_id = :cameraUniqueId");
+    QnSql::bind(params, &query);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
+    }
+
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraServerItemData>& tran)
+{
+    if (tran.command == ApiCommand::addCameraHistoryItem)
+        return addCameraHistory(tran.params);
+    else if (tran.command == ApiCommand::removeCameraHistoryItem)
+        return removeCameraHistory(tran.params);
+    else {
+        Q_ASSERT(1);
+        return ErrorCode::unsupported;
+    }
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiPanicModeData>& tran)
@@ -1879,7 +1934,7 @@ bool QnDbManager::saveMiscParam( const QByteArray& name, const QByteArray& value
     QnDbManager::Locker locker( this );
 
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT INTO misc_data (key, data) values (?,?)");
+    insQuery.prepare("INSERT OR REPLACE INTO misc_data (key, data) values (?,?)");
     insQuery.addBindValue( name );
     insQuery.addBindValue( value );
     if( !insQuery.exec() )
@@ -1925,11 +1980,11 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>
 ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
 {
     ErrorCode result;
-    
+/*    
     ApiObjectInfoList nestedList = getNestedObjects(apiObject);
     foreach(const ApiObjectInfo& nestedObject, nestedList)
         removeObject(nestedObject);
-
+*/
     switch (apiObject.type)
     {
     case ApiObject_Camera:
@@ -2079,7 +2134,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QUuid& mServerId, ApiCameraDataList& 
         c.region as motionMask, c.schedule_enabled as scheduleEnabled, c.motion_type as motionType, \
         c.group_name as groupName, c.group_id as groupId, c.mac, c. model, c.secondary_quality as secondaryStreamQuality, \
 		c.status_flags as statusFlags, c.physical_id as physicalId, c.password, login, c.dewarping_params as dewarpingParams, \
-        c.min_archive_days as minArchiveDays, c.max_archive_days as maxArchiveDays \
+        c.min_archive_days as minArchiveDays, c.max_archive_days as maxArchiveDays, c.prefered_server_id as preferedServerId \
         FROM vms_resource r \
         JOIN vms_camera c on c.resource_ptr_id = r.id %1 ORDER BY r.guid").arg(filterStr));
 
@@ -2135,15 +2190,20 @@ ErrorCode QnDbManager::doQueryNoLock(const QUuid& mServerId, ApiCameraDataList& 
 // ----------- getServers --------------------
 
 
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList)
+ErrorCode QnDbManager::doQueryNoLock(const QUuid& mServerId, ApiMediaServerDataList& serverList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
+    QString filterStr;
+    if (!mServerId.isNull()) {
+        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(mServerId));
+    }
+
     query.prepare(QString("select r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, r.status, \
                           s.api_url as apiUrl, s.auth_key as authKey, s.version, s.net_addr_list as networkAddresses, s.system_info as systemInfo, \
                           s.flags, s.panic_mode as panicMode, s.max_cameras as maxCameras, s.redundancy as allowAutoRedundancy, s.system_name as systemName \
                           from vms_resource r \
-                          join vms_server s on s.resource_ptr_id = r.id order by r.guid"));
+                          join vms_server s on s.resource_ptr_id = r.id %1 order by r.guid").arg(filterStr));
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -2912,29 +2972,28 @@ ErrorCode QnDbManager::removeLayoutFromVideowallItems(const QUuid &layout_id) {
     return ErrorCode::dbError;
 }
 
-bool QnDbManager::markLicenseOverflow(bool value, qint64 time)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseOverflowData>& tran)
 {
-    if (m_licenseOverflowMarked == value)
-        return true;
-    m_licenseOverflowMarked = value;
-    m_licenseOverflowTime = value ? time : 0;
+    if (m_licenseOverflowMarked == tran.params.value)
+        return ErrorCode::ok;
+    m_licenseOverflowMarked = tran.params.value;
 
     QSqlQuery query(m_sdb);
     query.prepare("INSERT OR REPLACE into misc_data (key, data) values(?, ?) ");
     query.addBindValue(LICENSE_EXPIRED_TIME_KEY);
-    query.addBindValue(QByteArray::number(m_licenseOverflowTime));
+    query.addBindValue(QByteArray::number(tran.params.time));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return false;
+        return ErrorCode::failure;
     }
 
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-    if (localInfo.data.prematureLicenseExperationDate != m_licenseOverflowTime) {
-        localInfo.data.prematureLicenseExperationDate = m_licenseOverflowTime;
-        QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
+    if (localInfo.data.prematureLicenseExperationDate != tran.params.time) {
+        localInfo.data.prematureLicenseExperationDate = tran.params.time;
+        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
     }
     
-    return true;
+    return ErrorCode::ok;
 }
 
 QUuid QnDbManager::getID() const

@@ -173,7 +173,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     ui->clearFilterButton->setIcon(qnSkin->icon("tree/clear.png"));
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
-    m_resourceModel = new QnResourcePoolModel(Qn::RootNode, this);
+    m_resourceModel = new QnResourcePoolModel(QnResourcePoolModel::FullScope, this);
     ui->resourceTreeWidget->setModel(m_resourceModel);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BackgroundOpacity | Qn::BypassGraphicsProxy);
@@ -306,7 +306,9 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
 
     QnActionManager *manager = context()->menu();
 
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, mainWindow(), ignoreSelection ? QnActionParameters() : currentParameters(Qn::TreeScope)));
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, mainWindow(), ignoreSelection 
+        ? QnActionParameters().withArgument(Qn::NodeTypeRole, Qn::RootNode)
+        : currentParameters(Qn::TreeScope)));
 
     if(currentTreeWidget() == ui->searchTreeWidget) {
         /* Disable rename action for search view. */
@@ -438,19 +440,6 @@ QnVideoWallMatrixIndexList QnResourceBrowserWidget::selectedVideoWallMatrices() 
         QnVideoWallMatrixIndex index = qnResPool->getVideoWallMatrixByUuid(uuid);
         if (!index.isNull())
             result.push_back(index);
-    }
-
-    return result;
-}
-
-QnResourceList QnResourceBrowserWidget::selectedIncompatibleServers() const {
-    QnResourceList result;
-
-    foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
-        if (index.data(Qn::ResourceStatusRole).value<Qn::ResourceStatus>() != Qn::Incompatible)
-            continue;
-
-        result.append(index.data(Qn::ResourceRole).value<QnResourcePtr>());
     }
 
     return result;

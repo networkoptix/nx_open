@@ -44,12 +44,14 @@ class QnRuntimeInfoManager: public QObject,
 public:
     QnRuntimeInfoManager(QObject* parent = NULL);
 
-    QnThreadsafeItemStorage<QnPeerRuntimeInfo> *items() const;
+    const QnThreadsafeItemStorage<QnPeerRuntimeInfo> *items() const;
 
     QnPeerRuntimeInfo localInfo() const;
     QnPeerRuntimeInfo remoteInfo() const;
     bool hasItem(const QUuid& id);
     QnPeerRuntimeInfo item(const QUuid& id) const;
+
+    void updateLocalItem(const QnPeerRuntimeInfo& value);
 signals:
     void runtimeInfoAdded(const QnPeerRuntimeInfo &data);
     void runtimeInfoChanged(const QnPeerRuntimeInfo &data);
@@ -61,6 +63,7 @@ private:
 private:
     /** Mutex that is to be used when accessing items. */
     mutable QMutex m_mutex;
+    mutable QMutex m_updateMutex;
     QScopedPointer<QnThreadsafeItemStorage<QnPeerRuntimeInfo> > m_items;
 };
 

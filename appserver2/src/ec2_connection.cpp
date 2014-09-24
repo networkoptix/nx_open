@@ -8,8 +8,6 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QUrlQuery>
 
-#include "mutex/distributed_mutex.h"
-#include "mutex/distributed_mutex_manager.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "transaction/transaction_message_bus.h"
 
@@ -23,12 +21,9 @@ namespace ec2
         const QUrl& dbUrl)
     :
         BaseEc2Connection<ServerQueryProcessor>( queryProcessor, resCtx ),
-        m_auxManager( new QnAuxManager() ),
         m_transactionLog( new QnTransactionLog(QnDbManager::instance()) ),
         m_connectionInfo( connectionInfo )
     {
-        ec2::QnDistributedMutexManager::initStaticInstance( new ec2::QnDistributedMutexManager() );
-
         QnDbManager::instance()->init(
             resCtx.resFactory,
             dbUrl.toLocalFile(),
@@ -38,14 +33,13 @@ namespace ec2
         QnDbManager::instance()->doQueryNoLock(nullptr, paramList);
 
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
-        QnTransactionMessageBus::instance()->setLocalPeer(ApiPeerData(qnCommon->moduleGUID(), Qn::PT_Server));
+        QnTransactionMessageBus::instance()->setLocalPeer(ApiPeerData(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), Qn::PT_Server));
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()
     {
         if (QnTransactionMessageBus::instance())
             QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
-        ec2::QnDistributedMutexManager::initStaticInstance(0);
     }
 
     QnConnectionInfo Ec2DirectConnection::connectionInfo() const

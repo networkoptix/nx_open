@@ -38,6 +38,7 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(Layout | Locked,         qnSkin->icon("tree/layout_locked.png"));
 
     m_cache.insert(Offline,                 qnSkin->icon("tree/offline.png"));
+    m_cache.insert(Unauthorized,            qnSkin->icon("tree/unauthorized.png"));
 }
 
 QnResourceIconCache::~QnResourceIconCache() {

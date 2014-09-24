@@ -97,6 +97,10 @@ protected:
     void changeInternal();
 
 private:
+    /** Recalculated 'bastard' state for the node. */
+    bool calculateBastard() const;
+
+private:
     //TODO: #GDM #Common need complete recorder nodes structure refactor to get rid of this shit
     friend class QnResourcePoolModel;
 

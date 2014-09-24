@@ -173,6 +173,7 @@ namespace ec2
         QnFullResourceData fullResData;
         fromApiToResourceList(tran.params, fullResData, m_resCtx);
         emit m_ecConnection->initNotification(fullResData);
+        m_discoveryManager->triggerNotification(tran.params.discoveryData);
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPanicModeData>& tran ) {
@@ -210,6 +211,10 @@ namespace ec2
         //#ak no notification needed in this case
     }
 
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPeerSystemTimeDataList>& /*tran*/ ) {
+        //#ak no notification needed in this case
+    }
+
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiModuleData> &tran) {
         m_miscManager->triggerNotification(tran);
     }
@@ -224,14 +229,6 @@ namespace ec2
 
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoverPeerData> &tran) {
         m_discoveryManager->triggerNotification(tran);
-    }
-
-    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiConnectionData> &tran) {
-        m_miscManager->triggerNotification(tran);
-    }
-
-    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiConnectionDataList> &tran) {
-        m_miscManager->triggerNotification(tran.params);
     }
 
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiSystemNameData> &tran) {

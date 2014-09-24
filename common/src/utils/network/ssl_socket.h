@@ -100,6 +100,8 @@ protected:
     virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
     //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
     virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
+    //!Implementation of AbstractCommunicatingSocket::registerTimerImpl
+    virtual bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) override;
 
 private:
     // Async version
@@ -134,6 +136,8 @@ protected:
     virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
     //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
     virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
+    //!Implementation of AbstractCommunicatingSocket::registerTimerImpl
+    virtual bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) override;
 
 private:
     Q_DECLARE_PRIVATE(QnMixedSSLSocket);

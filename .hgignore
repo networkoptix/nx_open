@@ -28,6 +28,7 @@ ecs.db-wal
 !launcher*.vcproj
 compatibility_info.cpp
 *_tmp.py*
+donotrebuild
 
 .DS_Store
 Debug
@@ -38,10 +39,12 @@ x64
 arm-isd
 arm-isd_s2
 arm-rpi
+arm-bpi
 target
 target-isd
 target-isd_s2
 target-rpi
+target-bpi
 
 build_environment/python/build_packages/*/build
 build_environment/python/packages/llutil/llutil.egg-info
@@ -155,6 +158,8 @@ debsetup/client-deb/x64
 debsetup/appserver-deb/package
 debsetup/appserver-deb/x86
 debsetup/appserver-deb/x64
+deploy/x64
+deploy/x86
 
 genericrtspplugin/x86
 genericrtspplugin/x64

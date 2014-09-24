@@ -33,6 +33,8 @@
 #include "session_manager.h"
 #include "media_server_reply_processor.h"
 #include "nx_ec/data/api_conversion_functions.h"
+#include "model/camera_list_reply.h"
+#include "model/configure_reply.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
@@ -69,6 +71,7 @@ namespace {
         (CameraAddObject,          "manualCamera/add")
         (EventLogObject,           "events")
         (ImageObject,              "image")
+        (checkCamerasObject,       "checkDiscovery")
         (CameraDiagnosticsObject,  "doCameraDiagnosticsStep")
         (GetSystemNameObject,      "getSystemName")
         (RebuildArchiveObject,     "rebuildArchive")
@@ -79,6 +82,8 @@ namespace {
         (InstallUpdateObject,      "installUpdate")
         (Restart,                  "restart")
         (ConfigureObject,          "configure")
+        (PingSystemObject,         "pingSystem")
+        (MergeSystemsObject,       "mergeSystems")
         (TestEmailSettingsObject,  "testEmailSettings")
     );
 
@@ -132,65 +137,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     }
     case StatisticsObject: {
-        const QByteArray &data = response.data;
-        int status = response.status;
-        QnStatisticsReply reply;
-
-        if(status == 0) {
-            QByteArray cpuBlock = extractXmlBody(data, "cpuinfo");
-            reply.statistics.append(QnStatisticsDataItem(
-                QLatin1String("CPU"),
-                extractXmlBody(cpuBlock, "load").toDouble(),
-                CPU
-            ));
-
-            QByteArray memoryBlock = extractXmlBody(data, "memory");
-            reply.statistics.append(QnStatisticsDataItem(
-                QLatin1String("RAM"),
-                extractXmlBody(memoryBlock, "usage").toDouble(),
-                RAM
-            ));
-
-            QByteArray miscBlock = extractXmlBody(data, "misc");
-            reply.uptimeMs = extractXmlBody(miscBlock, "uptimeMs").toLongLong();
-
-            QByteArray storagesBlock = extractXmlBody(data, "storages"), storageBlock; {
-                int from = 0;
-                do {
-                    storageBlock = extractXmlBody(storagesBlock, "storage", &from);
-                    if (storageBlock.length() == 0)
-                        break;
-                    reply.statistics.append(QnStatisticsDataItem(
-                        QLatin1String(extractXmlBody(storageBlock, "url")),
-                        extractXmlBody(storageBlock, "usage").toDouble(),
-                        HDD
-                    ));
-                } while (storageBlock.length() > 0);
-            }
-
-            QByteArray networkBlock = extractXmlBody(data, "network"), interfaceBlock; {
-                int from = 0;
-                do {
-                    interfaceBlock = extractXmlBody(networkBlock, "interface", &from);
-                    if (interfaceBlock.length() == 0)
-                        break;
-
-                    QString interfaceName = QLatin1String(extractXmlBody(interfaceBlock, "name"));
-                    int interfaceType = extractXmlBody(interfaceBlock, "type").toInt();
-                    qint64 bytesIn = extractXmlBody(interfaceBlock, "in").toLongLong();
-                    qint64 bytesOut = extractXmlBody(interfaceBlock, "out").toLongLong();
-                    qint64 bytesMax = extractXmlBody(interfaceBlock, "max").toLongLong();
-
-                    if(bytesMax != 0)
-                        reply.statistics.push_back(QnStatisticsDataItem(interfaceName, static_cast<qreal>(qMax(bytesIn, bytesOut)) / bytesMax, NETWORK, interfaceType));
-                } while (networkBlock.length() > 0);
-            }
-
-            QByteArray paramsBlock = extractXmlBody(data, "params");
-            reply.updatePeriod = extractXmlBody(paramsBlock, "updatePeriod").toInt();
-        }
-
-        emitFinished(this, status, reply, handle);
+        processJsonReply<QnStatisticsReply>(this, response, handle);
         break;
     }
     case GetParamsObject: {
@@ -296,6 +243,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, image, handle);
         break;
     }
+    case checkCamerasObject:
+        processJsonReply<QnCameraListReply>(this, response, handle);
+        break;
     case CameraDiagnosticsObject:
         processJsonReply<QnCameraDiagnosticsReply>(this, response, handle);
         break;
@@ -324,7 +274,13 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, handle);
         break;
     case ConfigureObject:
-        emitFinished(this, response.status, handle);
+        processJsonReply<QnConfigureReply>(this, response, handle);
+        break;
+    case PingSystemObject:
+        processJsonReply<QnModuleInformation>(this, response, handle);
+        break;
+    case MergeSystemsObject:
+        processJsonReply<QnModuleInformation>(this, response, handle);
         break;
     default:
         assert(false); /* We should never get here. */
@@ -339,14 +295,19 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 // QnMediaServerConnection
 // -------------------------------------------------------------------------- //
 QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, const QUuid &videowallGuid, QObject *parent):
-    base_type(parent),
+    base_type(parent, mserver),
     m_proxyPort(0)
 {
     setUrl(mserver->getApiUrl());
     setSerializer(QnLexical::newEnumSerializer<RequestObject, int>());
 
+    QString guid = mserver->getProperty(lit("guid"));
+
     QnRequestHeaderList extraHeaders;
-    extraHeaders.insert(lit("x-server-guid"), mserver->getId().toString());
+    extraHeaders.insert(lit("x-server-guid"), guid.isEmpty() ? mserver->getId().toString() : guid);
+
+    setExtraQueryParameters(extraHeaders);
+
     if (!videowallGuid.isNull())
         extraHeaders.insert(lit("X-NetworkOptix-VideoWall"), videowallGuid.toString());
     setExtraHeaders(extraHeaders);
@@ -358,17 +319,6 @@ QnMediaServerConnection::~QnMediaServerConnection() {
 
 QnAbstractReplyProcessor *QnMediaServerConnection::newReplyProcessor(int object) {
     return new QnMediaServerReplyProcessor(object);
-}
-
-void QnMediaServerConnection::setProxyAddr(const QUrl &apiUrl, const QString &addr, int port) {
-    m_proxyAddr = addr;
-    m_proxyPort = port;
-
-    if (port) {
-        QnNetworkProxyFactory::instance()->addToProxyList(apiUrl.host(), addr, port);
-    } else {
-        QnNetworkProxyFactory::instance()->removeFromProxyList(apiUrl.host());
-    }
 }
 
 int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const
@@ -390,6 +340,18 @@ int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camer
         methodStr = lit("after");
     params << QnRequestParam("method", methodStr);
     return sendAsyncGetRequest(ImageObject, params, QN_STRINGIZE_TYPE(QImage), target, slot);
+}
+
+int QnMediaServerConnection::checkCameraList(const QnNetworkResourceList &cameras, QObject *target, const char *slot)
+{
+    QnCameraListReply camList;
+    foreach(const QnResourcePtr& c, cameras)
+        camList.uniqueIdList << c->getUniqueId();
+
+    QnRequestHeaderList headers;
+    headers << QnRequestParam("content-type",   "application/json");
+
+    return sendAsyncPostRequest(checkCamerasObject, headers, QnRequestParamList(), QJson::serialized(camList), QN_STRINGIZE_TYPE(QnCameraListReply), target, slot);
 }
 
 int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &list, 
@@ -822,12 +784,29 @@ int QnMediaServerConnection::restart(QObject *target, const char *slot) {
 
 int QnMediaServerConnection::configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, int port, QObject *target, const char *slot) {
     QnRequestParamList params;
-    params << QnRequestParam("wholeSystem", wholeSystem);
+    params << QnRequestParam("wholeSystem", wholeSystem ? lit("true") : lit("false"));
     params << QnRequestParam("systemName", systemName);
     params << QnRequestParam("password", password);
     params << QnRequestParam("passwordHash", QString::fromLatin1(passwordHash));
     params << QnRequestParam("passwordDigest", QString::fromLatin1(passwordDigest));
     params << QnRequestParam("port", port);
 
-    return sendAsyncGetRequest(ConfigureObject, params, NULL, target, slot);
+    return sendAsyncGetRequest(ConfigureObject, params, QN_STRINGIZE_TYPE(QnConfigureReply), target, slot);
+}
+
+int QnMediaServerConnection::pingSystemAsync(const QUrl &url, const QString &password, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("url", url.toString());
+    params << QnRequestParam("password", password);
+
+    return sendAsyncGetRequest(PingSystemObject, params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
+}
+
+int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &password, bool ownSettings, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("url", url.toString());
+    params << QnRequestParam("password", password);
+    params << QnRequestParam("takeRemoteSettings", !ownSettings ? lit("true") : lit("false"));
+
+    return sendAsyncGetRequest(MergeSystemsObject, params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
 }

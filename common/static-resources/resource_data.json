@@ -42,6 +42,13 @@
         },
         {
             "keys": [
+                "vista|*"
+            ],
+            "showUrl": true,
+            "urlLocalePath": "basic/basic.php"
+        },
+        {
+            "keys": [
                 "VIVOTEK|*"
             ],
             "onvifPtzStopBroken": true

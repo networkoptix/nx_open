@@ -4,18 +4,17 @@
 #include "core/resource/media_server_resource.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
+#include <core/resource_management/incompatible_server_watcher.h>
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
 #include "plugins/resource/server_camera/server_camera.h"
-#include "utils/incompatible_server_adder.h"
 #include "utils/network/global_module_finder.h"
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 
 QnClientMessageProcessor::QnClientMessageProcessor():
     base_type(),
-    m_incompatibleServerAdder(NULL),
     m_connected(false),
     m_holdConnection(false)
 {
@@ -28,9 +27,9 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
         assert(!m_connected);
         assert(qnCommon->remoteGUID().isNull());
         qnCommon->setRemoteGUID(QUuid(connection->connectionInfo().ecsGuid));
-        connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
-        connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
-        connect( connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
+        connect( connection, &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
+        connect( connection, &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
+        connect( connection->getMiscManager(), &ec2::AbstractMiscManager::systemNameChangeRequested,
                  this, &QnClientMessageProcessor::at_systemNameChangeRequested );
     } else if (m_connected) { // double init by null is allowed
         assert(!qnCommon->remoteGUID().isNull());
@@ -72,41 +71,22 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 
     QnCommonMessageProcessor::updateResource(resource);
 
-    QnResourcePtr ownResource;
-
-    ownResource = qnResPool->getIncompatibleResourceById(resource->getId(), true);
-
-    // Use discovery information to update offline servers. They may be just incompatible.
-    if (resource->getStatus() == Qn::Offline) {
-        QnModuleInformation moduleInformation = QnGlobalModuleFinder::instance()->moduleInformation(resource->getId());
-        if (!moduleInformation.id.isNull() && !moduleInformation.isCompatibleToCurrentSystem()) {
-            if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) {
-                mediaServer->setVersion(moduleInformation.version);
-                mediaServer->setSystemInfo(moduleInformation.systemInformation);
-                mediaServer->setSystemName(moduleInformation.systemName);
-                mediaServer->setStatus(Qn::Incompatible);
-            }
-        }
-    }
+    QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
 
     if (ownResource.isNull()) {
         qnResPool->addResource(resource);
-        if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
-            determineOptimalIF(mediaServer);
-    }
-    else {
-        bool mserverStatusChanged = false;
-        QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>();
-        if (mediaServer)
-            mserverStatusChanged = ownResource->getStatus() != resource->getStatus();
-
+    } else {
         ownResource->update(resource);
 
-        if (ownResource)
-            qnResPool->updateIncompatibility(ownResource);
-
-        if (mserverStatusChanged && mediaServer)
-            determineOptimalIF(mediaServer);
+        if (QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>()) {
+            /* Handling a case when an incompatible server is changing its systemName at runtime and becoming compatible. */
+            if (resource->getStatus() == Qn::NotDefined && mediaServer->getStatus() == Qn::Incompatible) {
+                if (QnMediaServerResourcePtr updatedServer = resource.dynamicCast<QnMediaServerResource>()) {
+                    if (isCompatible(qnCommon->engineVersion(), updatedServer->getVersion()))
+                        mediaServer->setStatus(Qn::Online);
+                }
+            }
+        }
     }
 
     // TODO: #Elric #2.3 don't update layout if we're re-reading resources, 
@@ -115,7 +95,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
     if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();
 
-    checkForTmpStatus(resource);
+    checkForTmpStatus(ownResource);
 }
 
 void QnClientMessageProcessor::processResources(const QnResourceList& resources)
@@ -128,9 +108,12 @@ void QnClientMessageProcessor::processResources(const QnResourceList& resources)
 void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
 {
     // process tmp status
+    
     if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) 
     {
-        if (mediaServer->getStatus() == Qn::Offline)
+        if (mediaServer->getStatus() == Qn::NotDefined)
+            return;
+        else if (mediaServer->getStatus() == Qn::Offline)
             updateServerTmpStatus(mediaServer->getId(), Qn::Offline);
         else
             updateServerTmpStatus(mediaServer->getId(), Qn::NotDefined);
@@ -145,18 +128,6 @@ void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
                 serverCamera->setTmpStatus(Qn::NotDefined);
         }
     }
-}
-
-void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr &resource)
-{
-    // set proxy. If some servers IF will be found, proxy address will be cleared
-    const QString& proxyAddr = QnAppServerConnectionFactory::url().host();
-    resource->apiConnection()->setProxyAddr(
-        resource->getApiUrl(),
-        proxyAddr,
-        QnAppServerConnectionFactory::url().port() );    //starting with 2.3 proxy embedded to Server
-    disconnect(resource.data(), NULL, this, NULL);
-    resource->determineOptimalNetIF();
 }
 
 void QnClientMessageProcessor::updateServerTmpStatus(const QUuid& id, Qn::ResourceStatus status)
@@ -219,11 +190,6 @@ void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &syste
 
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
-    if (m_incompatibleServerAdder) {
-        delete m_incompatibleServerAdder;
-        m_incompatibleServerAdder = 0;
-    }
-
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
-    m_incompatibleServerAdder = new QnIncompatibleServerAdder(this);
+    m_incompatibleServerWatcher.reset(new QnIncompatibleServerWatcher(this));
 }

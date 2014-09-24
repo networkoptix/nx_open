@@ -4,6 +4,7 @@
 #include <QUrl>
 #include <QUrlQuery>
 
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <utils/common/log.h>
@@ -180,8 +181,12 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
         dstUrl = QUrl(lit("%1://%2:%3").arg(protocol).arg(hostAndPort[0]).arg(port));
     }
     else {
-        int defaultPort = getDefaultPortByProtocol(url.scheme());
-        dstUrl = QUrl(lit("%1://%2:%3").arg(url.scheme()).arg(url.host()).arg(url.port(defaultPort)));
+        QString scheme = url.scheme();
+        if (scheme.isEmpty())
+            scheme = lit("http");
+
+        int defaultPort = getDefaultPortByProtocol(scheme);
+        dstUrl = QUrl(lit("%1://%2:%3").arg(scheme).arg(url.host()).arg(url.port(defaultPort)));
     }
 
     if (urlPath.isEmpty())
@@ -209,10 +214,25 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
 
     if (route.isValid()) {
         if (route.points.size() > 1) {
+            nx_http::StringType ttlString = nx_http::getHeaderValue(d->request.headers, "x-proxy-ttl");
+            bool ok;
+            int ttl = ttlString.toInt(&ok);
+            if (!ok)
+                ttl = route.points.size();
+            --ttl;
+
+            if (ttl <= 0)
+                return false;
+
+            nx_http::insertOrReplaceHeader(&d->request.headers, nx_http::HttpHeader("x-proxy-ttl", QByteArray::number(ttl)));
+
             QString path = urlPath;
             if (!path.startsWith(QLatin1Char('/')))
                 path.prepend(QLatin1Char('/'));
-            path.prepend(QString(lit("/proxy/%1/%2:%3")).arg(dstUrl.scheme()).arg(dstUrl.host()).arg(dstUrl.port()));
+            if (xServerGUID.isEmpty())
+                path.prepend(QString(lit("/proxy/%1/%2:%3")).arg(dstUrl.scheme()).arg(dstUrl.host()).arg(dstUrl.port()));
+            else
+                path.prepend(QString(lit("/proxy/%1/%2")).arg(dstUrl.scheme()).arg(xServerGUID));
             d->request.requestLine.url = path;
 
             dstUrl.setHost(route.points.first().host);
@@ -239,6 +259,17 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
                 dstUrl.setPort( route.points.front().port );
             }
         }
+
+        //adding entry corresponding to current server to Via header
+        nx_http::header::Via via;
+        nx_http::header::Via::ProxyEntry proxyEntry;
+        proxyEntry.protoVersion = d->request.requestLine.version.version;
+        proxyEntry.receivedBy = qnCommon->moduleGUID().toByteArray();
+        via.entries.push_back( proxyEntry );
+        nx_http::StringType viaHeaderStr = nx_http::getHeaderValue( d->request.headers, "Via" );
+        nx_http::insertOrReplaceHeader(
+            &d->request.headers,
+            nx_http::HttpHeader( "Via", (viaHeaderStr.isEmpty() ? nx_http::StringType() : ", ") + via.toString() ) );
     }
 
     d->clientRequest.clear();

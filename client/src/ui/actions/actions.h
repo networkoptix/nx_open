@@ -361,8 +361,10 @@ namespace Qn {
          */
         SystemAdministrationAction,
 
-        //ShowMediaServerLogs,
-
+        /**
+         * System administration dialog - updates page.
+         */
+        SystemUpdateAction,
 
         /* Tab bar actions. */
 
@@ -674,9 +676,9 @@ namespace Qn {
         ConnectToCurrentSystem,
 
         /**
-         * Joing the other system to the current system
+         * Merge the other system with the current system
          */
-        JoinOtherSystem,
+        MergeSystems,
 
         /* PTZ Actions */
 

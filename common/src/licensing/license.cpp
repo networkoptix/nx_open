@@ -12,7 +12,7 @@
 #include <openssl/bio.h>
 #include <openssl/err.h>
 
-#include "version.h"
+#include <utils/common/app_info.h>
 #include <common/common_globals.h>
 #include <utils/common/synctime.h>
 #include <utils/common/product_features.h>

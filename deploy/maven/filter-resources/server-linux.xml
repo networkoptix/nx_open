@@ -1,0 +1,24 @@
+ <assembly>
+    <id>${platform}-${arch}-${release.version}.${buildNumber}</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>${root.dir}/debsetup/mediaserver-deb/${arch}/deb</directory>
+            <outputDirectory>..</outputDirectory>
+            <includes>
+                <include>${server.finalName}.deb</include>
+            </includes>		
+        </fileSet>	
+        <fileSet>
+            <directory>${project.build.directory}/server</directory>
+            <outputDirectory>..</outputDirectory>
+            <includes>
+                <include>update.json</include>
+                <include>install.sh</include>
+            </includes>		
+        </fileSet>				
+    </fileSets>
+</assembly>

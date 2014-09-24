@@ -22,9 +22,10 @@ struct QnRoute {
     QnRoute() : weight(0) {}
 
     bool isValid() const;
+    bool isEqual(const QnRoute &other) const;
 
     bool addPoint(const QnRoutePoint &point, int weight);
-    bool containsConnection(const QUuid &from, const QnRoutePoint &point) const;
+    bool containsConnection(const QUuid &first, const QUuid &from, const QnRoutePoint &point) const;
 
     bool operator <(const QnRoute &other) const;
 };

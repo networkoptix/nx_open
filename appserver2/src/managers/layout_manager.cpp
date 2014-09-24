@@ -22,10 +22,10 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiLayoutDataList& layouts) {
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiLayoutDataList& layouts) {
             QnLayoutResourceList outData;
             if( errorCode == ErrorCode::ok )
-                fromApiToResourceList(layouts, outData);
+                fromApiToResourceList(layouts, outData, m_resCtx);
             handler->done( reqID, errorCode, outData);
         };
         m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiLayoutDataList, decltype(queryDoneHandler)>

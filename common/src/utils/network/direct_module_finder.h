@@ -5,12 +5,11 @@
 #include <QtCore/QQueue>
 #include <QtNetwork/QHostAddress>
 
-#include <utils/common/id.h>
 #include <utils/network/module_information.h>
+#include <utils/network/network_address.h>
 
-class QNetworkAccessManager;
-class QNetworkReply;
 class QTimer;
+class QnAsyncHttpClientReply;
 
 class QnDirectModuleFinder : public QObject {
     Q_OBJECT
@@ -21,23 +20,18 @@ public:
 
     void addUrl(const QUrl &url, const QUuid &id);
     void removeUrl(const QUrl &url, const QUuid &id);
-    void addAddress(const QHostAddress &address, quint16 port, const QUuid &id);
-    void removeAddress(const QHostAddress &address, quint16 port, const QUuid &id);
 
     void addIgnoredModule(const QUrl &url, const QUuid &id);
     void removeIgnoredModule(const QUrl &url, const QUuid &id);
-    void addIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id);
-    void removeIgnoredModule(const QHostAddress &address, quint16 port, const QUuid &id);
 
     void addIgnoredUrl(const QUrl &url);
     void removeIgnoredUrl(const QUrl &url);
-    void addIgnoredAddress(const QHostAddress &address, quint16 port);
-    void removeIgnoredAddress(const QHostAddress &address, quint16 port);
 
     void checkUrl(const QUrl &url);
 
     void start();
     void stop();
+    void pleaseStop();
 
     QList<QnModuleInformation> foundModules() const;
     QnModuleInformation moduleInformation(const QUuid &id) const;
@@ -50,23 +44,19 @@ public:
     QSet<QUrl> ignoredUrls() const;
 
 signals:
-    //!Emitted when new enterprise controller has been found
-    void moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QUrl &url);
-
-    //!Emmited when previously found module did not respond to request in predefined timeout
-    void moduleLost(const QnModuleInformation &moduleInformation);
+    void moduleChanged(const QnModuleInformation &moduleInformation);
+    void moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
 
 private:
     void enqueRequest(const QUrl &url);
 
-    void dropModule(const QUuid &id, bool emitSignal = true);
-    void dropModule(const QUrl &url, bool emitSignal = true);
-
 private slots:
     void activateRequests();
 
-    void at_reply_finished(QNetworkReply *reply);
-    void at_periodicalCheckTimer_timeout();
+    void at_reply_finished(QnAsyncHttpClientReply *reply);
+    void at_discoveryCheckTimer_timeout();
+    void at_aliveCheckTimer_timeout();
 
 private:
     QMultiHash<QUrl, QUuid> m_urls;
@@ -78,13 +68,13 @@ private:
     QSet<QUrl> m_activeRequests;
 
     QHash<QUuid, QnModuleInformation> m_foundModules;
-    QHash<QUuid, qint64> m_lastPingById;
+    QHash<QUrl, qint64> m_lastPingByUrl;
     QHash<QUrl, QUuid> m_moduleByUrl;
 
     bool m_compatibilityMode;
 
-    QNetworkAccessManager *m_networkAccessManager;
-    QTimer *m_periodicalCheckTimer;
+    QTimer *m_discoveryCheckTimer;
+    QTimer *m_aliveCheckTimer;
 };
 
 #endif // DIRECT_MODULE_FINDER_H

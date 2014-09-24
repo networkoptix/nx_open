@@ -7,7 +7,9 @@
 
 #include <QtCore/QSettings>
 
-#include "version.h"
+#include <QtCore/QCoreApplication>
+
+#include <utils/common/app_info.h>
 
 
 static std::mutex settingsMutex;
@@ -43,7 +45,7 @@ static QSettings* getSettingsInstance(
 #ifndef _WIN32
     settingsInstance = new QSettings( defaultConfigFileName, QSettings::IniFormat );
 #else
-    settingsInstance = new QSettings( QSettings::SystemScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
+    settingsInstance = new QSettings( QSettings::SystemScope, QnAppInfo::organizationName(), QCoreApplication::applicationName() );
 #endif
 
     return settingsInstance;
@@ -52,8 +54,8 @@ static QSettings* getSettingsInstance(
 
 
 #ifndef _WIN32
-static QString defaultConfigFileName = QString("/opt/%1/mediaserver/etc/mediaserver.conf").arg(VER_LINUX_ORGANIZATION_NAME);
-static QString defaultConfigFileNameRunTime = QString("/opt/%1/mediaserver/etc/running_time.conf").arg(VER_LINUX_ORGANIZATION_NAME);
+static QString defaultConfigFileName = QString("/opt/%1/mediaserver/etc/mediaserver.conf").arg(QnAppInfo::linuxOrganizationName());
+static QString defaultConfigFileNameRunTime = QString("/opt/%1/mediaserver/etc/running_time.conf").arg(QnAppInfo::linuxOrganizationName());
 #endif
 
 static QSettings* roSettingsInstance = NULL;

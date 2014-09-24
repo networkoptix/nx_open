@@ -17,6 +17,7 @@
 #include "compatibility/old_ec_connection.h"
 #include "ec2_connection.h"
 #include "ec2_thread_pool.h"
+#include "nx_ec/data/api_resource_type_data.h"
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
@@ -24,8 +25,9 @@
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
 #include "http/ec2_transaction_tcp_listener.h"
-#include "version.h"
-
+#include <utils/common/app_info.h>
+#include "mutex/distributed_mutex_manager.h"
+#include "transaction/runtime_transaction_log.h"
 
 namespace ec2
 {
@@ -41,22 +43,18 @@ namespace ec2
         srand( ::time(NULL) );
 
         //registering ec2 types with Qt meta types system
-        qRegisterMetaType<ErrorCode>( "ErrorCode" );
-        qRegisterMetaType<AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
-        qRegisterMetaType<QnFullResourceData>( "QnFullResourceData" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
         qRegisterMetaType<QnTransactionTransportHeader>( "QnTransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<ApiPeerAliveData>( "ApiPeerAliveData" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<ApiRuntimeData>( "ApiRuntimeData" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<ApiLockData>( "ApiLockData" ); // TODO: #Elric #EC2 register in a proper place!
+
+        ec2::QnDistributedMutexManager::initStaticInstance( new ec2::QnDistributedMutexManager() );
+        m_runtimeTransactionLog.reset(new QnRuntimeTransactionLog());
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
     {
         pleaseStop();
         join();
+
+        ec2::QnDistributedMutexManager::initStaticInstance(0);
     }
 
     void Ec2DirectConnectionFactory::pleaseStop()
@@ -122,7 +120,7 @@ namespace ec2
 
 
         //AbstractMediaServerManager::getServers
-        registerGetFuncHandler<std::nullptr_t, ApiMediaServerDataList>( restProcessorPool, ApiCommand::getMediaServers );
+        registerGetFuncHandler<QUuid, ApiMediaServerDataList>( restProcessorPool, ApiCommand::getMediaServers );
         //AbstractMediaServerManager::save
         registerUpdateFuncHandler<ApiMediaServerData>( restProcessorPool, ApiCommand::saveMediaServer );
         //AbstractMediaServerManager::remove
@@ -137,6 +135,8 @@ namespace ec2
         registerGetFuncHandler<QUuid, ApiCameraDataList>( restProcessorPool, ApiCommand::getCameras );
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
+        //AbstractCameraManager::removeCameraHistoryItem
+        registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::removeCameraHistoryItem );
         //AbstractCameraManager::getCameraHistoryItems
         registerGetFuncHandler<std::nullptr_t, ApiCameraServerItemDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
         //AbstractCameraManager::getBookmarkTags
@@ -214,22 +214,17 @@ namespace ec2
         //AbstractMiscManager::changeSystemName
         registerUpdateFuncHandler<ApiSystemNameData>(restProcessorPool, ApiCommand::changeSystemName);
 
-        //AbstractMiscManager::addConnection
-        registerUpdateFuncHandler<ApiConnectionData>(restProcessorPool, ApiCommand::addConnection);
-        //AbstractMiscManager::removeConnection
-        registerUpdateFuncHandler<ApiConnectionData>(restProcessorPool, ApiCommand::removeConnection);
-        //AbstractMiscManager::availableConnections
-        registerUpdateFuncHandler<ApiConnectionDataList>(restProcessorPool, ApiCommand::availableConnections);
-
        //AbstractECConnection
-        registerUpdateFuncHandler<ApiDatabaseDumpData>( restProcessorPool, ApiCommand::resotreDatabase );
+        registerUpdateFuncHandler<ApiDatabaseDumpData>( restProcessorPool, ApiCommand::restoreDatabase );
 
-        //AbstractECConnection
+        //AbstractTimeManager::getCurrentTimeImpl
         registerGetFuncHandler<std::nullptr_t, ApiTimeData>( restProcessorPool, ApiCommand::getCurrentTime );
+        //AbstractTimeManager::forcePrimaryTimeServer
         registerUpdateFuncHandler<ApiIdData>(
             restProcessorPool,
             ApiCommand::forcePrimaryTimeServer,
             std::bind( &TimeSynchronizationManager::primaryTimeServerChanged, m_timeSynchronizationManager.get(), _1 ) );
+        //TODO #ak register AbstractTimeManager::getPeerTimeInfoList
 
 
         registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>( restProcessorPool, ApiCommand::getFullInfo );
@@ -330,10 +325,13 @@ namespace ec2
     template<class Handler>
     void Ec2DirectConnectionFactory::connectToOldEC( const QUrl& ecURL, Handler completionFunc )
     {
+        QUrl httpsEcUrl = ecURL;    //old EC supports only https
+        httpsEcUrl.setScheme( lit("https") );
+
         QAuthenticator auth;
-        auth.setUser(ecURL.userName());
-        auth.setPassword(ecURL.password());
-        CLSimpleHTTPClient simpleHttpClient(ecURL, 3000, auth);
+        auth.setUser(httpsEcUrl.userName());
+        auth.setPassword(httpsEcUrl.password());
+        CLSimpleHTTPClient simpleHttpClient(httpsEcUrl, 3000, auth);
         const CLHttpStatus statusCode = simpleHttpClient.doGET(QByteArray::fromRawData(oldEcConnectPath, sizeof(oldEcConnectPath)));
         switch( statusCode )
         {
@@ -343,7 +341,7 @@ namespace ec2
                 QByteArray oldECResponse;
                 simpleHttpClient.readAll(oldECResponse);
                 QnConnectionInfo oldECConnectionInfo;
-                oldECConnectionInfo.ecUrl = ecURL;
+                oldECConnectionInfo.ecUrl = httpsEcUrl;
                 if( parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo) )
                     completionFunc(ErrorCode::ok, oldECConnectionInfo);
                 else
@@ -371,6 +369,8 @@ namespace ec2
         const QUrl& ecURL,
         impl::ConnectHandlerPtr handler)
     {
+        //TODO #ak async ssl is working now, make async request to old ec here
+
         if( errorCode != ErrorCode::ok )
         {
             //checking for old EC
@@ -382,7 +382,16 @@ namespace ec2
                     return connectToOldEC(
                         ecURL,
                         [reqID, handler](ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo) {
-                            handler->done(reqID, errorCode, std::make_shared<OldEcConnection>(oldECConnectionInfo));
+                            if( errorCode == ErrorCode::ok && oldECConnectionInfo.version >= SoftwareVersionType( 2, 3, 0 ) )
+                                handler->done(  //somehow, connected to 2.3 server ith old ec connection. Returning error, since could not connect to ec 2.3 during normal connect
+                                    reqID,
+                                    ErrorCode::ioError,
+                                    AbstractECConnectionPtr() );
+                            else
+                                handler->done(
+                                    reqID,
+                                    errorCode,
+                                    errorCode == ErrorCode::ok ? std::make_shared<OldEcConnection>(oldECConnectionInfo) : AbstractECConnectionPtr() );
                         }
                     );
                 }
@@ -394,7 +403,7 @@ namespace ec2
         connectionInfoCopy.ecUrl.setScheme( connectionInfoCopy.allowSslConnections ? lit("https") : lit("http") );
 
         AbstractECConnectionPtr connection(new RemoteEC2Connection(
-            std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
+            std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, connectionInfoCopy.ecUrl),
             m_resCtx,
             connectionInfoCopy));
         handler->done(
@@ -437,11 +446,10 @@ namespace ec2
         QnConnectionInfo* const connectionInfo )
     {
         connectionInfo->version = qnCommon->engineVersion();
-        connectionInfo->brand = isCompatibilityMode() ? QString() : lit(QN_PRODUCT_NAME_SHORT);
+        connectionInfo->brand = isCompatibilityMode() ? QString() : QnAppInfo::productNameShort();
         connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
-        connectionInfo->systemName = qnCommon->localSystemName();
-        connectionInfo->box = lit(QN_ARM_BOX);
+        connectionInfo->box = QnAppInfo::armBox();
         connectionInfo->allowSslConnections = m_sslEnabled;
         return ErrorCode::ok;
     }

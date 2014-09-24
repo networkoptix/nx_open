@@ -539,8 +539,13 @@ QUuid QnResource::getTypeId() const
     return m_typeId;
 }
 
-void QnResource::setTypeId(QUuid id)
+void QnResource::setTypeId(const QUuid &id)
 {
+    if (id.isNull()) {
+        qWarning() << "NULL typeId is set to resource" << getName();
+        return;
+    }
+
     QMutexLocker mutexLocker(&m_mutex);
     m_typeId = id;
 }
@@ -924,6 +929,10 @@ void QnResource::stopAsyncTasks()
     m_initAsyncPool.waitForDone();
 }
 
+void QnResource::pleaseStopAsyncTasks()
+{
+    m_appStopping = true;
+}
 
 void QnResource::initAsync(bool optional)
 {

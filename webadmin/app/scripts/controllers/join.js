@@ -2,34 +2,62 @@
 
 angular.module('webadminApp')
     .controller('JoinCtrl', function ($scope, $modalInstance, $interval, mediaserver) {
-        $scope.url = '';
-        $scope.password = '';
-
-        $scope.testProgressBarVisible = false;
-        $scope.testProgress = 0;
+        $scope.settings = {
+            url :'',
+            password :'',
+            keepMySystem:true
+        };
+        $scope.systems = {
+            joinSystemName : "NOT FOUND",
+            systemName: "SYSTEMNAME",
+            systemFound: false
+        }
 
         $scope.test = function () {
-            $scope.testProgress = 0;
 
-            mediaserver.ping.get();
-            var progress = $interval(function () {
-                if ($scope.testProgress >= 100) {
-                    $scope.testProgressBarVisible = false;
-                    $interval.cancel(progress);
-                    console.log('done');
-                    return;
+            /*if (!$('#mergeSystemForm').valid()) {
+                return;
+            }*/
+
+
+            mediaserver.pingSystem($scope.settings.url, $scope.settings.password).then(function(r){
+                console.log("pingSystem",r);
+                if(r.data.error!=0){
+                    var errorToShow = r.data.errorString;
+                    switch(errorToShow){
+                        case 'FAIL':
+                            errorToShow = "System is unreachable or doesn't exist.";
+                            break;
+                        case 'UNAUTHORIZED':
+                            errorToShow = "Wrong password.";
+                            break;
+                        case 'INCOMPATIBLE':
+                            errorToShow = "Found system has incompatible version.";
+                            break;
+                        case 'url':
+                            errorToShow = "Wrong url.";
+                            break;
+                    }
+                    alert("Connection failed. " + errorToShow);
+                }else {
+                    $scope.systems.systemFound = true;
+                    $scope.systems.joinSystemName = "EXTERNAL";
+                    alert("Connection succeed.");
                 }
-
-                $scope.testProgressBarVisible = true;
-                $scope.testProgress++;
-            }, 100);
+            });
         };
 
         $scope.join = function () {
-            $modalInstance.close({url: $scope.url, password: $scope.password});
+
+            /*if (!$('#mergeSustemForm').valid()) {
+                return;
+            }*/
+            $modalInstance.close({url: $scope.settings.url, password: $scope.settings.password, keepMySystem:$scope.settings.keepMySystem});
         };
 
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
+
+        $scope.systemFound = false;
     });
