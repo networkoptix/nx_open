@@ -86,6 +86,8 @@ QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::Stream
 static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
 QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
+    QMutexLocker lock(&m_layoutMutex);
+
     if (dataProvider) {
         QnConstResourceVideoLayoutPtr providerLayout = dataProvider->getVideoLayout();
         if (providerLayout)
@@ -97,23 +99,20 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractSt
     QString strVal = val.toString();
     if (strVal.isEmpty())
     {
-        if (m_customVideoLayout)
-            return m_customVideoLayout;
-        else
-            return defaultVideoLayout;
+        return defaultVideoLayout;
     }
     else {
-        if (!m_customVideoLayout)
+        if (m_cachedLayout != strVal) {
             m_customVideoLayout = QnCustomResourceVideoLayout::fromString(strVal);
+            m_cachedLayout = strVal;
+        }
         return m_customVideoLayout;
     }
 }
 
 void QnMediaResource::setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLayout)
 {
-    //if (!m_customVideoLayout)
-        //m_customVideoLayout.reset( new QnCustomResourceVideoLayout(newLayout->size()) );
-
+    QMutexLocker lock(&m_layoutMutex);
     m_customVideoLayout = newLayout;
     toResource()->setParam(QLatin1String("VideoLayout"), newLayout->toString(), QnDomainMemory);
 }
