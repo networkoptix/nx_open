@@ -153,7 +153,6 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
             break; // error
         RTPSession::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(rtpChannelNum);
         int channelNum = m_RtpSession.getChannelNum(rtpChannelNum);
-        qWarning() << channelNum;
         int rtpBufferOffset = m_demuxedData[rtpChannelNum]->size() - readed;
 
         if (format == RTPSession::TT_VIDEO && m_videoParsers[channelNum]) 
