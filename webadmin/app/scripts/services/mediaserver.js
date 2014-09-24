@@ -6,7 +6,7 @@ angular.module('webadminApp')
             getSettings: function() { return $http.get('/api/moduleInformation'); },
             saveSettings: function(systemName,port) { return $http.post('/api/configure?systemName=' + systemName + '&port=' + port); },
             changePassword: function(password,oldPassword) { return $http.post('/api/configure?password=' + password  + '&oldPassword=' + oldPassword); },
-            joinSystem: function(url,password){return $http.post('/api/joinSystem?password=' + password  + '&url=' + encodeURIComponent(url)); },
+            mergeSystems: function(url,password,keepMySystem){return $http.post('/api/mergeSystems?password=' + password  + '&url=' + encodeURIComponent(url) + "&takeRemoteSettings=" + (!keepMySystem)); },
             pingSystem: function(url,password){return $http.post('/api/pingSystem?password=' + password  + '&url=' + encodeURIComponent(url)); },
             restart: function() { return $http.post('/api/restart'); },
             getStorages: function(){ return $http.get('/api/storageSpace'); },
