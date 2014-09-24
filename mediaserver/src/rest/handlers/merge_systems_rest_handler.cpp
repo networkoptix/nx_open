@@ -141,16 +141,16 @@ bool QnMergeSystemsRestHandler::changeSystemName(const QString &systemName) {
     if (!backupDatabase())
         return false;
 
-    if (systemName != qnCommon->localSystemName()) {
-        MSSettings::roSettings()->setValue("systemName", systemName);
-        qnCommon->setLocalSystemName(systemName);
+    if (systemName == qnCommon->localSystemName())
+        return true;
 
-        server->setSystemName(systemName);
-        ec2Connection()->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-    }
+    MSSettings::roSettings()->setValue("systemName", systemName);
+    qnCommon->setLocalSystemName(systemName);
 
-    if (QnServerConnector::instance())
-        QnServerConnector::instance()->reconnect();
+    server->setSystemName(systemName);
+    ec2Connection()->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+
+    QnAppServerConnectionFactory::getConnection2()->getMiscManager()->changeSystemName(systemName, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
     return true;
 }
