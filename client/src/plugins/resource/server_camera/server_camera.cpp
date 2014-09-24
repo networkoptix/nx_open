@@ -40,7 +40,7 @@ QnConstResourceVideoLayoutPtr QnServerCamera::getVideoLayout(const QnAbstractStr
 {
     Q_UNUSED(dataProvider)
     // todo: layout must be loaded in resourceParams
-    return QnMediaResource::getVideoLayout();
+    return QnVirtualCameraResource::getVideoLayout();
 }
 
 QnConstResourceAudioLayoutPtr QnServerCamera::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const

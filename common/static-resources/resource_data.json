@@ -34,6 +34,12 @@
         },
         {
             "keys": [
+                "ISD|XMS-AF-3M"
+            ],
+            "videoLayout": "width=4;height=1;sensors=0,1,2,3"
+        },
+        {
+            "keys": [
                 "ISD_EDGE|*"
             ],
             "showUrl": true,

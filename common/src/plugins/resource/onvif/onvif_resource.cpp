@@ -3176,4 +3176,5 @@ CameraDiagnostics::Result QnPlOnvifResource::getFullUrlInfo()
     return CameraDiagnostics::NoErrorResult();
 }
 
+
 #endif //ENABLE_ONVIF
