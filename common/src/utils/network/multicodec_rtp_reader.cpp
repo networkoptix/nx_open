@@ -276,10 +276,11 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
     while (m_RtpSession.isOpened() && !m_pleaseStop && !m_lastVideoData && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
     {
         int nfds = 0;
-        int channelNum = 0; // todo: add channel num here
-        if(m_videoIOs[channelNum]) {
-            mediaSockPollArray[nfds].fd = m_videoIOs[channelNum]->getMediaSocket()->handle();
-            mediaSockPollArray[nfds++].events = POLLIN;
+        for (int channelNum = 0; channelNum < CL_MAX_CHANNELS; ++channelNum) {
+            if(m_videoIOs[channelNum]) {
+                mediaSockPollArray[nfds].fd = m_videoIOs[channelNum]->getMediaSocket()->handle();
+                mediaSockPollArray[nfds++].events = POLLIN;
+            }
         }
         if(m_audioIO) {
             mediaSockPollArray[nfds].fd = m_audioIO->getMediaSocket()->handle();
@@ -291,32 +292,36 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
             continue;
         for( int i = 0; i < rez; ++i )
         {
-            if( m_videoIOs[channelNum] && mediaSockPollArray[i].fd == m_videoIOs[channelNum]->getMediaSocket()->handle() )
+            for (int channelNum = 0; channelNum < CL_MAX_CHANNELS; ++channelNum)
             {
-                quint8* rtpBuffer = RTPSession::prepareDemuxedData(m_demuxedData, RTPSession::TT_VIDEO, MAX_RTP_PACKET_SIZE); // todo: update here
-                readed = m_videoIOs[0]->read( (char*) rtpBuffer, MAX_RTP_PACKET_SIZE);
-                if (readed < 1)
-                    break;
-                m_demuxedData[RTPSession::TT_VIDEO]->finishWriting(readed);
-                quint8* bufferBase = (quint8*) m_demuxedData[RTPSession::TT_VIDEO]->data();
-                if (!m_videoParsers[channelNum]->processData(bufferBase, rtpBuffer-bufferBase, readed, m_videoIOs[channelNum]->getStatistic(), m_lastVideoData)) 
+                if( m_videoIOs[channelNum] && mediaSockPollArray[i].fd == m_videoIOs[channelNum]->getMediaSocket()->handle() )
                 {
-                    setNeedKeyData();
-                    m_demuxedData[RTPSession::TT_VIDEO]->clear();
-                    if (++videoRetryCount > RTSP_RETRY_COUNT) {
-                        qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
-                        closeStream();
-                        return QnAbstractMediaDataPtr(0);
+                    quint8* rtpBuffer = RTPSession::prepareDemuxedData(m_demuxedData, RTPSession::TT_VIDEO, MAX_RTP_PACKET_SIZE); // todo: update here
+                    readed = m_videoIOs[0]->read( (char*) rtpBuffer, MAX_RTP_PACKET_SIZE);
+                    if (readed < 1)
+                        break;
+                    m_demuxedData[RTPSession::TT_VIDEO]->finishWriting(readed);
+                    quint8* bufferBase = (quint8*) m_demuxedData[RTPSession::TT_VIDEO]->data();
+                    if (!m_videoParsers[channelNum]->processData(bufferBase, rtpBuffer-bufferBase, readed, m_videoIOs[channelNum]->getStatistic(), m_lastVideoData)) 
+                    {
+                        setNeedKeyData();
+                        m_demuxedData[RTPSession::TT_VIDEO]->clear();
+                        if (++videoRetryCount > RTSP_RETRY_COUNT) {
+                            qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
+                            closeStream();
+                            return QnAbstractMediaDataPtr(0);
+                        }
+                    }
+                    else if (m_lastVideoData) 
+                    {
+                        m_lastVideoData->channelNumber = channelNum;
+                        checkIfNeedKeyData();
+                        if (!m_lastVideoData)
+                            m_demuxedData[RTPSession::TT_VIDEO]->clear();
                     }
                 }
-                else if (m_lastVideoData) 
-                {
-                    checkIfNeedKeyData();
-                    if (!m_lastVideoData)
-                        m_demuxedData[RTPSession::TT_VIDEO]->clear();
-                }
             }
-            else if( m_audioIO && mediaSockPollArray[i].fd == m_audioIO->getMediaSocket()->handle() )
+            if( m_audioIO && mediaSockPollArray[i].fd == m_audioIO->getMediaSocket()->handle() )
             {
                 quint8* rtpBuffer = RTPSession::prepareDemuxedData(m_demuxedData, RTPSession::TT_AUDIO, MAX_RTP_PACKET_SIZE); // todo: update here
                 readed = m_audioIO->read( (char*) rtpBuffer, MAX_RTP_PACKET_SIZE);
