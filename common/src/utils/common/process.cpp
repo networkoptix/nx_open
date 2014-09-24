@@ -53,13 +53,12 @@ namespace nx
 
         qint64 childPid = 0;
         char** argv = new char*[arguments.size()+1+1+1];  //one for "bin/bash", one for script name, one for null
-        const QString& executableAbsolutePath = updateDir.absoluteFilePath(executablePath);
         int argIndex = 0;
         argv[argIndex] = new char[sizeof("bin/bash")+1];
         strcpy( argv[argIndex], "bin/bash" );
         ++argIndex;
-        argv[argIndex] = new char[executableAbsolutePath.size()+1];
-        strcpy( argv[argIndex], executableAbsolutePath.toLatin1().constData() );
+        argv[argIndex] = new char[executablePath.size()+1];
+        strcpy( argv[argIndex], executablePath.toLatin1().constData() );
         ++argIndex;
         for( const QString& arg: arguments )
         {
