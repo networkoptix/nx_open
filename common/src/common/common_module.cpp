@@ -84,8 +84,19 @@ QnModuleInformation QnCommonModule::moduleInformation() const
         moduleInformationCopy.remoteAddresses.clear();
         const QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
         if (server) {
-            foreach(const QHostAddress &address, server->getNetAddrList())
-                moduleInformationCopy.remoteAddresses.insert(address.toString());
+            QSet<QString> ignoredHosts;
+            foreach (const QUrl &url, server->getIgnoredUrls())
+                ignoredHosts.insert(url.host());
+
+            foreach(const QHostAddress &address, server->getNetAddrList()) {
+                QString addressString = address.toString();
+                if (!ignoredHosts.contains(addressString))
+                    moduleInformationCopy.remoteAddresses.insert(addressString);
+            }
+            foreach(const QUrl &url, server->getAdditionalUrls()) {
+                if (!ignoredHosts.contains(url.host()))
+                    moduleInformationCopy.remoteAddresses.insert(url.host());
+            }
         }
 
         foreach (const QnUserResourcePtr &user, qnResPool->getResourcesWithFlag(Qn::user).filtered<QnUserResource>()) {
