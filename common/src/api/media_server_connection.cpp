@@ -784,7 +784,7 @@ int QnMediaServerConnection::restart(QObject *target, const char *slot) {
 
 int QnMediaServerConnection::configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, int port, QObject *target, const char *slot) {
     QnRequestParamList params;
-    params << QnRequestParam("wholeSystem", wholeSystem);
+    params << QnRequestParam("wholeSystem", wholeSystem ? lit("true") : lit("false"));
     params << QnRequestParam("systemName", systemName);
     params << QnRequestParam("password", password);
     params << QnRequestParam("passwordHash", QString::fromLatin1(passwordHash));
@@ -806,7 +806,7 @@ int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &pa
     QnRequestParamList params;
     params << QnRequestParam("url", url.toString());
     params << QnRequestParam("password", password);
-    params << QnRequestParam("takeRemoteSettings", !ownSettings);
+    params << QnRequestParam("takeRemoteSettings", !ownSettings ? lit("true") : lit("false"));
 
     return sendAsyncGetRequest(MergeSystemsObject, params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
 }
