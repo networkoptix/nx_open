@@ -11,7 +11,12 @@ angular.module('webadminApp')
             joinSystemName : "NOT FOUND",
             systemName: "SYSTEMNAME",
             systemFound: false
-        }
+        };
+
+        mediaserver.getSettings().success(function (r) {
+            $scope.systems.systemName =  r.reply.systemName;
+        });
+
 
         $scope.test = function () {
 
@@ -29,6 +34,7 @@ angular.module('webadminApp')
                             errorToShow = "System is unreachable or doesn't exist.";
                             break;
                         case 'UNAUTHORIZED':
+                        case 'password':
                             errorToShow = "Wrong password.";
                             break;
                         case 'INCOMPATIBLE':
@@ -38,11 +44,10 @@ angular.module('webadminApp')
                             errorToShow = "Wrong url.";
                             break;
                     }
-                    alert("Connection failed. " + errorToShow);
+                    alert("Connection failed: " + errorToShow);
                 }else {
                     $scope.systems.systemFound = true;
-                    $scope.systems.joinSystemName = "EXTERNAL";
-                    alert("Connection succeed.");
+                    $scope.systems.joinSystemName = r.data.reply.systemName;
                 }
             });
         };

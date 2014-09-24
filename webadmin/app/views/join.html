@@ -28,15 +28,12 @@
 
 
     <div class="modal-body" class="col-sm-12" ng-class="{hidden:!systems.systemFound}">
-
         <p>You are about yo merge the current system {{systems.systemName}} with the system {{systems.joinSystemName}}</p>
-
         <p>
             The new system will have password and name from the system:<br/>
-            <label><input type="radio" name="keepMySystem" ng-value="true" ng-model="settings.keepMySystem" /> {{systems.systemName}}</label> <br/>
+            <label><input type="radio" name="keepMySystem" ng-value="true" ng-model="settings.keepMySystem" /> {{systems.systemName}} (current)</label> <br/>
             <label><input type="radio" name="keepMySystem" ng-value="false"  ng-model="settings.keepMySystem"/> {{systems.joinSystemName}}</label>
         </p>
-        {{settings.keepMySystem}}
     </div>
 
     <div class="modal-footer" ng-class="{hidden:!systems.systemFound}">
