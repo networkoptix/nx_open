@@ -86,7 +86,6 @@ private:
     void unlockMutex();
     void clearUpdateFlag();
 
-    void removeTemporaryDir();
 private:
     void at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* task, const QnCheckForUpdateResult &result);
     void at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, int errorCode);
@@ -105,7 +104,6 @@ private:
     QPointer<QnNetworkPeerTask> m_currentTask;
     QnFullUpdateStage m_stage;
     ec2::QnDistributedMutex *m_distributedMutex;
-    QString m_localTemporaryDir;
     QSet<QUuid> m_incompatiblePeerIds;
     QSet<QUuid> m_targetPeerIds;
     bool m_clientRequiresInstaller;

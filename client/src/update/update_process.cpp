@@ -28,7 +28,6 @@
 
 namespace {
 
-    const QString updatesDirName = QnAppInfo::productNameShort() + lit("_updates");
     const QString mutexName = lit("auto_update");
 
     bool verifyFile(const QString &fileName, qint64 size, const QString &md5) {
@@ -92,7 +91,6 @@ void QnUpdateProcess::run() {
 
     unlockMutex();
     clearUpdateFlag();
-    removeTemporaryDir();
 
     QnUpdateResult result(m_updateResult);
     result.targetVersion = m_target.version;
@@ -115,7 +113,7 @@ void QnUpdateProcess::downloadUpdates() {
 
         QString fileName = it.value()->fileName;
         if (fileName.isEmpty())
-            fileName = updateFilePath(updatesDirName, it.value()->baseFileName);
+            fileName = updateFilePath(it.value()->baseFileName);
 
         if (!fileName.isEmpty() && verifyFile(fileName, it.value()->fileSize, it.value()->md5)) {
             it.value()->fileName = fileName;
@@ -137,7 +135,7 @@ void QnUpdateProcess::downloadUpdates() {
     if (!m_clientRequiresInstaller) {
         QString fileName = m_clientUpdateFile->fileName;
         if (fileName.isEmpty())
-            fileName = updateFilePath(updatesDirName, m_clientUpdateFile->baseFileName);
+            fileName = updateFilePath(m_clientUpdateFile->baseFileName);
 
         if (!fileName.isEmpty() && verifyFile(fileName, m_clientUpdateFile->fileSize, m_clientUpdateFile->md5)) {
             m_clientUpdateFile->fileName = fileName;
@@ -163,7 +161,6 @@ void QnUpdateProcess::downloadUpdates() {
     });
     connect(downloadUpdatesPeerTask,  &QnNetworkPeerTask::finished,             downloadUpdatesPeerTask, &QObject::deleteLater);
 
-    downloadUpdatesPeerTask->setTargetDir(updatesDirName);
     downloadUpdatesPeerTask->setTargets(downloadTargets);
     downloadUpdatesPeerTask->setHashes(hashByUrl);
     downloadUpdatesPeerTask->setFileSizes(fileSizeByUrl);
@@ -213,7 +210,6 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
 
     m_target.version = result.latestVersion; /* Version can be updated if loading from local file or seeking for latest version. */
     m_clientRequiresInstaller = result.clientInstallerRequired;
-    m_localTemporaryDir = task->temporaryDir();
     m_updateFiles = task->updateFiles();
     m_clientUpdateFile = task->clientUpdateFile();
 
@@ -503,12 +499,3 @@ void QnUpdateProcess::at_installTask_finished(int errorCode) {
 
     finishUpdate(QnUpdateResult::Successful);
 }
-
-void QnUpdateProcess::removeTemporaryDir() {
-    if (m_localTemporaryDir.isEmpty())
-        return;
-
-    QDir(m_localTemporaryDir).removeRecursively();
-    m_localTemporaryDir = QString();
-}
-

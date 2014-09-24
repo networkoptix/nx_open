@@ -7,12 +7,15 @@
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
+#include <utils/common/app_info.h>
+
 namespace {
 
 const QString infoEntryName = lit("update.json");
 const char passwordChars[] = "abcdefghijklmnopqrstuvwxyz0123456789";
 const int passwordLength = 6;
 const int readBufferSize = 1024 * 16;
+const QString updatesCacheDir = QnAppInfo::productNameShort() + lit("_updates");
 
 bool verifyUpdatePackageInternal(QuaZipFile *infoFile, QnSoftwareVersion *version = 0, QnSystemInformation *sysInfo = 0, bool *isClient = 0) {
     if (!infoFile->open(QuaZipFile::ReadOnly))
@@ -63,14 +66,17 @@ bool verifyUpdatePackage(QIODevice *device, QnSoftwareVersion *version, QnSystem
     return verifyUpdatePackageInternal(&infoFile, version, sysInfo, isClient);
 }
 
-QString updateFilePath(const QString &updatesDirPath, const QString &fileName) {
+QDir updatesDir() {
     QDir dir = QDir::temp();
-    if (!dir.exists(updatesDirPath))
-        dir.mkdir(updatesDirPath);
-    dir.cd(updatesDirPath);
-    return dir.absoluteFilePath(fileName);
+    if (!dir.exists(updatesCacheDir))
+        dir.mkdir(updatesCacheDir);
+    dir.cd(updatesCacheDir);
+    return dir;
 }
 
+QString updateFilePath(const QString &fileName) {
+    return updatesDir().absoluteFilePath(fileName);
+}
 
 QString makeMd5(const QString &fileName) {
     QFile file(fileName);

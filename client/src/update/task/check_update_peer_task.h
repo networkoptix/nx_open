@@ -21,11 +21,11 @@ public:
 
     QHash<QnSystemInformation, QnUpdateFileInformationPtr> updateFiles() const;
     QnUpdateFileInformationPtr clientUpdateFile() const;
-    QString temporaryDir() const;
 
     void start();
 
     QnUpdateTarget target() const;
+
 signals:
     void checkFinished(const QnCheckForUpdateResult &result);
 
@@ -52,8 +52,6 @@ private slots:
 private:
     QUrl m_updatesUrl;
     QnUpdateTarget m_target;
-
-    QString m_temporaryUpdateDir;
 
     QString m_updateLocationPrefix;
     bool m_targetMustBeNewer;
