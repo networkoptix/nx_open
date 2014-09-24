@@ -48,7 +48,7 @@ void QnRouteBuilder::removeConnection(const QUuid &from, const QUuid &to, const 
     // remove all routes containing the given connection
     for (auto rtIt = m_routes.begin(); rtIt != m_routes.end(); ++rtIt) {
         for (auto it = rtIt.value().begin(); it != rtIt.value().end(); ) {
-            if (it->containsConnection(from, point))
+            if (it->containsConnection(m_startId, from, point))
                 it = rtIt.value().erase(it);
             else
                 ++it;

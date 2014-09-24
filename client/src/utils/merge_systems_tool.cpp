@@ -66,7 +66,7 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
 
         m_serverByRequestHandle.clear();
 
-        emit systemFound(QnModuleInformation(), QnMediaServerResourcePtr(), errorCode);
+        emit systemFound(moduleInformation, QnMediaServerResourcePtr(), errorCode);
         return;
     }
 
