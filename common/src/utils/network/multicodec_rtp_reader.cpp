@@ -499,13 +499,11 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         delete m_videoParsers[i];
         m_videoParsers[i] = 0;
-        delete m_videoIOs[i];
         m_videoIOs[i] = 0;
     }
 
     delete m_audioParser;
     m_audioParser = 0;
-    
     m_audioIO = 0;
 
     const CameraDiagnostics::Result result = m_RtpSession.open(url);
