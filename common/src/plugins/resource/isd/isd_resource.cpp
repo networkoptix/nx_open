@@ -55,7 +55,8 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
     CLHttpStatus status;
-    QByteArray reslst = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.ResolutionList"),  getHostAddress(), 80, 3000, getAuth());
+    int port = QUrl(getUrl()).port(80);
+    QByteArray reslst = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.ResolutionList"),  getHostAddress(), port, 3000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
@@ -140,7 +141,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
 
     /*
-    QByteArray reslst2 = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.2.ResolutionList",  getHostAddress(), 80, 3000, getAuth());
+    QByteArray reslst2 = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.2.ResolutionList",  getHostAddress(), port, 3000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
@@ -150,14 +151,14 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     */
 
 
-    QByteArray fpses = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.FrameRateList"),  getHostAddress(), 80, 3000, getAuth());
+    QByteArray fpses = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.FrameRateList"),  getHostAddress(), port, 3000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         setStatus(Qn::Unauthorized);
         QUrl requestedUrl;
         requestedUrl.setHost( getHostAddress() );
-        requestedUrl.setPort( 80 );
+        requestedUrl.setPort( port );
         requestedUrl.setScheme( QLatin1String("http") );
         requestedUrl.setPath( QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.FrameRateList") );
         return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );

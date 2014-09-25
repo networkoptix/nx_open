@@ -78,9 +78,6 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStream()
 
     QString streamUrl;
     CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl( &streamUrl );
-    QUrl ggg(streamUrl);
-    ggg.setPort(8554);
-    streamUrl = ggg.toString();
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
     {
 #ifdef PL_ONVIF_DEBUG
