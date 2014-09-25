@@ -133,6 +133,6 @@ extern "C" {
 #include <QtGui/QResizeEvent>
 #include <QFileSystemWatcher>
 #include <QtCore/QUrlQuery>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #endif

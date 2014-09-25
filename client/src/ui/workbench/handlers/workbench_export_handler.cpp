@@ -389,7 +389,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
         QnLayoutResourcePtr newLayout(new QnLayoutResource(qnResTypePool));
 
-        itemData.uuid = QUuid::createUuid();
+        itemData.uuid = QnUuid::createUuid();
         newLayout->addItem(itemData);
         saveLayoutToLocalFile(newLayout, period, fileName, Qn::LayoutExport, false, true);
         return;

@@ -34,7 +34,7 @@ namespace ec2
             Q_FUNC_INFO,
             "You must fill camera ID as md5 hash of unique id" );
         if( resource->getId().isNull() )
-            resource->setId(QUuid::createUuid());
+            resource->setId(QnUuid::createUuid());
         cameraList.push_back( resource );
 
         //performing request
@@ -69,7 +69,7 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::getCameras( const QUuid& mediaServerId, impl::GetCamerasHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::getCameras( const QnUuid& mediaServerId, impl::GetCamerasHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
@@ -79,7 +79,7 @@ namespace ec2
                 fromApiToResourceList(cameras, outData, m_resCtx.resFactory);
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<QUuid, ApiCameraDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->template processQueryAsync<QnUuid, ApiCameraDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getCameras, mediaServerId, queryDoneHandler );
         return reqID;
     }
@@ -126,7 +126,7 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::remove( const QUuid& id, impl::SimpleHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::removeCamera, id );
@@ -204,7 +204,7 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiIdData> QnCameraManager<T>::prepareTransaction( ApiCommand::Value command, const QUuid& id )
+    QnTransaction<ApiIdData> QnCameraManager<T>::prepareTransaction( ApiCommand::Value command, const QnUuid& id )
     {
         QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;

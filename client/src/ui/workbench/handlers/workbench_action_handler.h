@@ -116,7 +116,7 @@ protected:
         bool usePosition;
         QPointF position;
         QRectF zoomWindow;
-        QUuid zoomUuid;
+        QnUuid zoomUuid;
         qint64 time;
         QColor frameDistinctionColor;
         qreal rotation;
@@ -126,7 +126,7 @@ protected:
         AddToLayoutParams():
             usePosition(false),
             position(QPointF()),
-            zoomUuid(QUuid()),
+            zoomUuid(QnUuid()),
             time(-1),
             rotation(0)
         {}

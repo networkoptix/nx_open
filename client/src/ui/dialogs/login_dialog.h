@@ -89,7 +89,7 @@ private:
     QnRenderingWidget *m_renderingWidget;
 
     struct QnEcData {
-        QUuid id;
+        QnUuid id;
         QUrl url;
         QString version;
         QString systemName;
@@ -100,7 +100,7 @@ private:
     };
 
     /** Hash list of automatically found Servers based on seed as key. */
-    QMultiHash<QUuid, QnEcData> m_foundEcs;
+    QMultiHash<QnUuid, QnEcData> m_foundEcs;
 };
 
 #endif // LOGINDIALOG_H

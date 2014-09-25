@@ -57,8 +57,8 @@ public:
 
     void setThumbnailVisible(bool visible);
 
-    void setResourceId(const QUuid& id);
-    QUuid resourceId() const;
+    void setResourceId(const QnUuid& id);
+    QnUuid resourceId() const;
 
     //reimp
     void pointTo(const QPointF &pos);
@@ -72,7 +72,7 @@ private:
     QnClickableProxyLabel* m_thumbnailLabel;
     QPointF m_pointTo;
     bool m_thumbnailVisible;
-    QUuid m_resourceId;
+    QnUuid m_resourceId;
 };
 
 
@@ -162,7 +162,7 @@ private slots:
 
     void at_showUrlsInTree_changed();
 
-    void at_thumbnailReady(QUuid resourceId, const QPixmap &pixmap);
+    void at_thumbnailReady(QnUuid resourceId, const QPixmap &pixmap);
     void at_thumbnailClicked();
 private:
     QScopedPointer<Ui::ResourceBrowserWidget> ui;

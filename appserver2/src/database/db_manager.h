@@ -28,10 +28,10 @@ namespace ec2
     struct ApiObjectInfo
     {
         ApiObjectInfo() {}
-        ApiObjectInfo(const ApiOjectType& type, const QUuid& id): type(type), id(id) {}
+        ApiObjectInfo(const ApiOjectType& type, const QnUuid& id): type(type), id(id) {}
 
         ApiOjectType type;
-        QUuid id;
+        QnUuid id;
     };
     class ApiObjectInfoList: public std::vector<ApiObjectInfo>
     {
@@ -140,10 +140,10 @@ namespace ec2
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
         //getCameras
-        ErrorCode doQueryNoLock(const QUuid& mServerId, ApiCameraDataList& cameraList);
+        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiCameraDataList& cameraList);
 
         //getServers
-        ErrorCode doQueryNoLock(const QUuid& mServerId, ApiMediaServerDataList& serverList);
+        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataList& serverList);
 
         //getCameraServerItems
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
@@ -164,7 +164,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
 
         //getResourceParams
-        ErrorCode doQueryNoLock(const QUuid& resourceId, ApiResourceParamsData& params);
+        ErrorCode doQueryNoLock(const QnUuid& resourceId, ApiResourceParamsData& params);
 
         // ApiFullInfo
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiFullInfoData& data);
@@ -179,9 +179,9 @@ namespace ec2
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiDiscoveryDataList& data);
 
 		// --------- misc -----------------------------
-        QUuid getID() const;
+        QnUuid getID() const;
 
-        ApiOjectType getObjectType(const QUuid& objectId);
+        ApiOjectType getObjectType(const QnUuid& objectId);
         ApiObjectInfoList getNestedObjects(const ApiObjectInfo& parentObject);
 
         bool saveMiscParam( const QByteArray& name, const QByteArray& value );
@@ -328,7 +328,7 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode deleteTableRecord(const QUuid& id, const QString& tableName, const QString& fieldName);
+        ErrorCode deleteTableRecord(const QnUuid& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
         ErrorCode updateResource(const ApiResourceData& data, qint32 internalId);
@@ -345,40 +345,40 @@ namespace ec2
         ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
         ErrorCode updateCameraSchedule(const ApiCameraData& data, qint32 internalId);
         ErrorCode removeCameraSchedule(qint32 internalId);
-        ErrorCode removeCamera(const QUuid& guid);
+        ErrorCode removeCamera(const QnUuid& guid);
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
         ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
         ErrorCode updateStorages(const ApiMediaServerData&);
-        ErrorCode removeServer(const QUuid& guid);
-        ErrorCode removeStoragesByServer(const QUuid& serverGUID);
+        ErrorCode removeServer(const QnUuid& guid);
+        ErrorCode removeStoragesByServer(const QnUuid& serverGUID);
 
-        ErrorCode removeLayout(const QUuid& id);
-        ErrorCode removeLayoutInternal(const QUuid& id, const qint32 &internalId);
+        ErrorCode removeLayout(const QnUuid& id);
+        ErrorCode removeLayoutInternal(const QnUuid& id, const qint32 &internalId);
         ErrorCode saveLayout(const ApiLayoutData& params);
         ErrorCode insertOrReplaceLayout(const ApiLayoutData& data, qint32 internalId);
         ErrorCode updateLayoutItems(const ApiLayoutData& data, qint32 internalLayoutId);
         ErrorCode removeLayoutItems(qint32 id);
 
         ErrorCode deleteUserProfileTable(const qint32 id);
-        ErrorCode removeUser( const QUuid& guid );
+        ErrorCode removeUser( const QnUuid& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
         ErrorCode checkExistingUser(const QString &name, qint32 internalId);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);
-        ErrorCode removeVideowall(const QUuid& id);
+        ErrorCode removeVideowall(const QnUuid& id);
         ErrorCode insertOrReplaceVideowall(const ApiVideowallData& data, qint32 internalId);
-        ErrorCode deleteVideowallPcs(const QUuid &videowall_guid);
-        ErrorCode deleteVideowallItems(const QUuid &videowall_guid);
+        ErrorCode deleteVideowallPcs(const QnUuid &videowall_guid);
+        ErrorCode deleteVideowallItems(const QnUuid &videowall_guid);
         ErrorCode updateVideowallItems(const ApiVideowallData& data);
         ErrorCode updateVideowallScreens(const ApiVideowallData& data);
-        ErrorCode removeLayoutFromVideowallItems(const QUuid &layout_id);
-        ErrorCode deleteVideowallMatrices(const QUuid &videowall_guid);
+        ErrorCode removeLayoutFromVideowallItems(const QnUuid &layout_id);
+        ErrorCode deleteVideowallMatrices(const QnUuid &videowall_guid);
         ErrorCode updateVideowallMatrices(const ApiVideowallData &data);
 
         ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule);
-        ErrorCode insertBRuleResource(const QString& tableName, const QUuid& ruleGuid, const QUuid& resourceGuid);
-        ErrorCode removeBusinessRule( const QUuid& id );
+        ErrorCode insertBRuleResource(const QString& tableName, const QnUuid& ruleGuid, const QnUuid& resourceGuid);
+        ErrorCode removeBusinessRule( const QnUuid& id );
         ErrorCode updateBusinessRule(const ApiBusinessRuleData& rule);
 
         ErrorCode saveLicense(const ApiLicenseData& license);
@@ -391,9 +391,9 @@ namespace ec2
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
         
-        qint32 getResourceInternalId( const QUuid& guid );
-        QUuid getResourceGuid(const qint32 &internalId);
-        qint32 getBusinessRuleInternalId( const QUuid& guid );
+        qint32 getResourceInternalId( const QnUuid& guid );
+        QnUuid getResourceGuid(const qint32 &internalId);
+        qint32 getBusinessRuleInternalId( const QnUuid& guid );
 
         //void beginTran();
         //void commit();
@@ -401,11 +401,11 @@ namespace ec2
     private:
         enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_INT};
 
-        QMap<int, QUuid> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
+        QMap<int, QnUuid> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
 
-        bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QUuid>& guids);
+        bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnUuid>& guids);
         bool updateGuids();
-        QUuid getType(const QString& typeName);
+        QnUuid getType(const QString& typeName);
         bool resyncTransactionLog();
 
         template <class ObjectType, class ObjectListType> 
@@ -419,14 +419,14 @@ namespace ec2
         ErrorCode removeCameraHistory(const ApiCameraServerItemData& params);
     private:
         QnResourceFactory* m_resourceFactory;
-        QUuid m_storageTypeId;
-        QUuid m_serverTypeId;
-        QUuid m_cameraTypeId;
-        QUuid m_adminUserID;
+        QnUuid m_storageTypeId;
+        QnUuid m_serverTypeId;
+        QnUuid m_cameraTypeId;
+        QnUuid m_adminUserID;
         int m_adminUserInternalID;
         ApiResourceTypeDataList m_cachedResTypes;
         bool m_licenseOverflowMarked;
-        QUuid m_dbInstanceId;
+        QnUuid m_dbInstanceId;
         bool m_initialized;
         /*
         * Database for static or very rare modified data. Be carefull! It's not supported DB transactions for static DB

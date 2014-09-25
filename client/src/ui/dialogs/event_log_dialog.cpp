@@ -272,7 +272,7 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
                 m_filterCameraList,
                 eventType,
                 actionType,
-                QUuid(),
+                QnUuid(),
                 this, SLOT(at_gotEvents(int, const QnBusinessActionDataListPtr&, int)));
         }
     }

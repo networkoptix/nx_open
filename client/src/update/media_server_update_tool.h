@@ -28,10 +28,10 @@ public:
     bool idle() const;
 
     QnMediaServerResourceList targets() const;
-    void setTargets(const QSet<QUuid> &targets, bool client = false);
+    void setTargets(const QSet<QnUuid> &targets, bool client = false);
 
     QnMediaServerResourceList actualTargets() const;
-    QSet<QUuid> actualTargetIds() const;
+    QSet<QnUuid> actualTargetIds() const;
 
     /** Generate url for download update file, depending on actual targets list. */
     QUrl generateUpdatePackageUrl(const QnSoftwareVersion &targetVersion) const;
@@ -47,10 +47,10 @@ public:
 signals:
     void stageChanged(QnFullUpdateStage stage);
     void stageProgressChanged(QnFullUpdateStage stage, int progress);
-    void peerStageChanged(const QUuid &peerId, QnPeerUpdateStage stage);
-    void peerStageProgressChanged(const QUuid &peerId, QnPeerUpdateStage stage, int progress);
+    void peerStageChanged(const QnUuid &peerId, QnPeerUpdateStage stage);
+    void peerStageProgressChanged(const QnUuid &peerId, QnPeerUpdateStage stage, int progress);
 
-    void targetsChanged(const QSet<QUuid> &targets);
+    void targetsChanged(const QSet<QnUuid> &targets);
 
     void checkForUpdatesFinished(const QnCheckForUpdateResult &result);
     void updateFinished(QnUpdateResult result);
@@ -62,8 +62,8 @@ private:
     void setStage(QnFullUpdateStage stage);
     void setStageProgress(int progress);
 
-    void setPeerStage(const QUuid &peerId, QnPeerUpdateStage stage);
-    void setPeerStageProgress(const QUuid &peerId, QnPeerUpdateStage stage, int progress);
+    void setPeerStage(const QnUuid &peerId, QnPeerUpdateStage stage);
+    void setPeerStageProgress(const QnUuid &peerId, QnPeerUpdateStage stage, int progress);
 
     void finishUpdate(const QnUpdateResult &result);
     

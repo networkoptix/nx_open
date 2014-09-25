@@ -41,7 +41,7 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     QnResourcePtr currentLayoutResource = workbench() ? workbench()->currentLayout()->resource() : QnLayoutResourcePtr();
     QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
-    QUuid uuid = index.data(Qn::ItemUuidRole).value<QUuid>();
+    QnUuid uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
     bool videoWallControlMode = workbench() ? !workbench()->currentLayout()->data(Qn::VideoWallItemGuidRole).isNull() : false;
 
     /* Bold items of current layout in tree. */

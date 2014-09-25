@@ -49,7 +49,7 @@ void QnRestUpdatePeerTask::doStart() {
     m_currentServers.clear();
     m_serverBySystemInformation.clear();
 
-    foreach (const QUuid &id, peers()) {
+    foreach (const QnUuid &id, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
         Q_ASSERT_X(server, "An incompatible server resource is expected here.", Q_FUNC_INFO);
 
@@ -88,7 +88,7 @@ void QnRestUpdatePeerTask::installNextUpdate() {
     }
 
     QnMediaServerResourcePtr server = m_currentServers.first();
-    m_targetId = QUuid(server->getProperty(lit("guid")));
+    m_targetId = QnUuid(server->getProperty(lit("guid")));
     Q_ASSERT_X(!m_targetId.isNull(), "Each incompatible server resource should has 'guid' property!", Q_FUNC_INFO);
     server->apiConnection()->installUpdate(m_updateId, m_currentData, this, SLOT(at_updateInstalled(int,int)));
 }
@@ -97,7 +97,7 @@ void QnRestUpdatePeerTask::finishPeer() {
     qnResPool->disconnect(this);
     QnMediaServerResourcePtr server = m_currentServers.takeFirst();
     emit peerFinished(server->getId());
-    emit peerUpdateFinished(server->getId(), QUuid(server->getProperty(lit("guid"))));
+    emit peerUpdateFinished(server->getId(), QnUuid(server->getProperty(lit("guid"))));
     if (m_currentServers.isEmpty())
         m_serverBySystemInformation.erase(m_serverBySystemInformation.begin());
     installNextUpdate();

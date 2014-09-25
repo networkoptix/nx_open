@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QStringList>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtGui/QColor>
 
 #include <utils/common/property_storage.h>
@@ -249,7 +249,7 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         lightMode,              setLightMode,               LIGHT_MODE,                 0)  //int because of intended flags system
         QN_DECLARE_RW_PROPERTY(int,                         lightModeOverride,      setLightModeOverride,       LIGHT_MODE_OVERRIDE,        0)
         QN_DECLARE_RW_PROPERTY(Qn::ClientSkin,              clientSkin,             setClientSkin,              CLIENT_SKIN,                Qn::DarkSkin)
-        QN_DECLARE_RW_PROPERTY(QUuid,                       pcUuid,                 setPcUuid,                  PC_UUID,                    QUuid())
+        QN_DECLARE_RW_PROPERTY(QnUuid,                       pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
         QN_DECLARE_RW_PROPERTY(bool,                        isVideoWallMode,        setVideoWallMode,           VIDEO_WALL_MODE,            false)
         QN_DECLARE_RW_PROPERTY(QColor,                      defaultBackgroundColor, setDefaultBackgroundColor,  DEFAULT_BACKGROUND_COLOR,   QColor())
         QN_DECLARE_RW_PROPERTY(QColor,                      backgroundColor,        setBackgroundColor,         BACKGROUND_COLOR,           QColor())

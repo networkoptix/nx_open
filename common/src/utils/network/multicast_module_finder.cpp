@@ -82,7 +82,7 @@ void QnMulticastModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
 }
 
-QnModuleInformation QnMulticastModuleFinder::moduleInformation(const QUuid &moduleId) const {
+QnModuleInformation QnMulticastModuleFinder::moduleInformation(const QnUuid &moduleId) const {
     QMutexLocker lk(&m_mutex);
     return m_foundModules[moduleId];
 }
@@ -92,18 +92,18 @@ QList<QnModuleInformation> QnMulticastModuleFinder::foundModules() const {
     return m_foundModules.values();
 }
 
-void QnMulticastModuleFinder::addIgnoredModule(const QnNetworkAddress &address, const QUuid &id) {
+void QnMulticastModuleFinder::addIgnoredModule(const QnNetworkAddress &address, const QnUuid &id) {
     QMutexLocker lk(&m_mutex);
     if (!m_ignoredModules.contains(address, id))
         m_ignoredModules.insert(address, id);
 }
 
-void QnMulticastModuleFinder::removeIgnoredModule(const QnNetworkAddress &address, const QUuid &id) {
+void QnMulticastModuleFinder::removeIgnoredModule(const QnNetworkAddress &address, const QnUuid &id) {
     QMutexLocker lk(&m_mutex);
     m_ignoredModules.remove(address, id);
 }
 
-QMultiHash<QnNetworkAddress, QUuid> QnMulticastModuleFinder::ignoredModules() const {
+QMultiHash<QnNetworkAddress, QnUuid> QnMulticastModuleFinder::ignoredModules() const {
     QMutexLocker lk(&m_mutex);
     return m_ignoredModules;
 }

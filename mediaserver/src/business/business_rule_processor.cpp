@@ -239,7 +239,7 @@ void QnBusinessRuleProcessor::processBusinessEvent(const QnAbstractBusinessEvent
     }
 }
 
-bool QnBusinessRuleProcessor::containResource(const QnResourceList& resList, const QUuid& resId) const
+bool QnBusinessRuleProcessor::containResource(const QnResourceList& resList, const QnUuid& resId) const
 {
     for (int i = 0; i < resList.size(); ++i)
     {
@@ -294,7 +294,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(const Q
 
     bool isActionRunning = action && action->getToggleState() == QnBusiness::ActiveState;
     if (isActionRunning)
-        runtimeRule.isActionRunning.insert(QUuid());
+        runtimeRule.isActionRunning.insert(QnUuid());
     else
         runtimeRule.isActionRunning.clear();
 
@@ -309,7 +309,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(const 
     {
         // instant action connected to continue event. update stats to prevent multiple action for repeation 'on' event state
         RunningRuleInfo& runtimeRule = itr.value();
-        QUuid resId = bEvent->getResource() ? bEvent->getResource()->getId() : QUuid();
+        QnUuid resId = bEvent->getResource() ? bEvent->getResource()->getId() : QnUuid();
 
         if (condOK && bEvent->getToggleState() == QnBusiness::ActiveState) {
             if (runtimeRule.isActionRunning.contains(resId))
@@ -387,7 +387,7 @@ bool QnBusinessRuleProcessor::checkEventCondition(const QnAbstractBusinessEventP
         return true;
     
     // for continue event put information to m_eventsInProgress
-    QUuid resId = bEvent->getResource() ? bEvent->getResource()->getId() : QUuid();
+    QnUuid resId = bEvent->getResource() ? bEvent->getResource()->getId() : QnUuid();
     RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
     if (bEvent->getToggleState() == QnBusiness::ActiveState)
         runtimeRule.resources[resId] = bEvent;
@@ -606,7 +606,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(const QnBusinessEventRulePtr&
     bool isToggledAction = QnBusiness::hasToggleState(rule->actionType()); // We decided to terminate continues actions only if rule is changed
     if (!runtimeRule.isActionRunning.isEmpty() && !runtimeRule.resources.isEmpty() && isToggledAction)
     {
-        foreach(const QUuid& resId, runtimeRule.isActionRunning)
+        foreach(const QnUuid& resId, runtimeRule.isActionRunning)
         {
             // terminate all actions. If instant action, terminate all resources on which it was started
             QnAbstractBusinessEventPtr bEvent;
@@ -633,7 +633,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(const QnBusinessEventRulePtr&
     }
 }
 
-void QnBusinessRuleProcessor::at_businessRuleDeleted(QUuid id)
+void QnBusinessRuleProcessor::at_businessRuleDeleted(QnUuid id)
 {
     QMutexLocker lock(&m_mutex);
 

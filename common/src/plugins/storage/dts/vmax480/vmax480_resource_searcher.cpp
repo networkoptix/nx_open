@@ -67,7 +67,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
     QAuthenticator auth;
     auth.setUser(QLatin1String("admin"));
 
-    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (rt.isNull())
         return;
 
@@ -131,7 +131,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
     }
 }
 
-QnResourcePtr QnPlVmax480ResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnPlVmax480ResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -349,7 +349,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
 
     QString baseName = QString(QLatin1String("DW-VF")) + QString::number(channels);
 
-    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), baseName);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), baseName);
     if (rt.isNull())
         return result;
 

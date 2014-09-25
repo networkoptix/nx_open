@@ -4,8 +4,10 @@
 #include <QtCore/QAbstractTableModel>
 
 #include <utils/common/connective.h>
+#include <utils/common/uuid.h>
 
 #include <ui/workbench/workbench_context_aware.h>
+
 
 struct QnPeerRuntimeInfo;
 
@@ -34,8 +36,8 @@ public:
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    QUuid selectedServer() const;
-    void setSelectedServer(const QUuid &serverId);
+    QnUuid selectedServer() const;
+    void setSelectedServer(const QnUuid &serverId);
 
     static bool isSelected(quint64 priority);
     static QString formattedOffset(qint64 offsetMSec);
@@ -48,14 +50,14 @@ private:
     bool calculateSameTimezone() const;
 private:
     struct Item {
-        QUuid peerId;
+        QnUuid peerId;
         qint64 offset;
         quint64 priority;
         bool ready;
     };
 
     QList<Item> m_items;
-    QUuid m_selectedServer;
+    QnUuid m_selectedServer;
 
     mutable bool m_sameTimezone;
     mutable bool m_sameTimezoneValid;

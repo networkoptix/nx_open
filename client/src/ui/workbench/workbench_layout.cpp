@@ -139,7 +139,7 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
 
     /* Some items may have been removed. */
     if(items().size() > resource->getItems().size()) {
-        QSet<QUuid> removed;
+        QSet<QnUuid> removed;
 
         foreach(QnWorkbenchItem *item, items())
             removed.insert(item->uuid());
@@ -147,7 +147,7 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
         foreach(const QnLayoutItemData &itemData, resource->getItems())
             removed.remove(itemData.uuid);
 
-        foreach(const QUuid &uuid, removed)
+        foreach(const QnUuid &uuid, removed)
             delete item(uuid);
     }
 
@@ -521,7 +521,7 @@ QnWorkbenchItem *QnWorkbenchLayout::item(const QPoint &position) const {
     return m_itemMap.value(position, NULL);
 }
 
-QnWorkbenchItem *QnWorkbenchLayout::item(const QUuid &uuid) const {
+QnWorkbenchItem *QnWorkbenchLayout::item(const QnUuid &uuid) const {
     return m_itemByUuid.value(uuid, NULL);
 }
 
@@ -529,9 +529,9 @@ QnWorkbenchItem *QnWorkbenchLayout::zoomTargetItem(QnWorkbenchItem *item) const 
     return m_zoomTargetItemByItem.value(item, NULL);
 }
 
-QUuid QnWorkbenchLayout::zoomTargetUuidInternal(QnWorkbenchItem *item) const {
+QnUuid QnWorkbenchLayout::zoomTargetUuidInternal(QnWorkbenchItem *item) const {
     QnWorkbenchItem *zoomTargetItem = this->zoomTargetItem(item);
-    return zoomTargetItem ? zoomTargetItem->uuid() : QUuid();
+    return zoomTargetItem ? zoomTargetItem->uuid() : QnUuid();
 }
 
 QList<QnWorkbenchItem *> QnWorkbenchLayout::zoomItems(QnWorkbenchItem *zoomTargetItem) const {

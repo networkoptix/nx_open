@@ -130,6 +130,8 @@ public:
         assert( buf.size() > 0 );
 
 #ifdef _DEBUG
+        if( m_asyncSendIssued )
+            *((int*)nullptr) = 12;
         assert( !m_asyncSendIssued );
         m_asyncSendIssued = true;
 #endif

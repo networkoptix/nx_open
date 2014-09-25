@@ -91,7 +91,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
 
         QnStorageSpaceData data;
         data.url = partition.path + QnAppInfo::mediaFolderName();
-        data.storageId = QUuid();
+        data.storageId = QnUuid();
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
         data.reservedSpace = defaultStorageSpaceLimit;

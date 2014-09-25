@@ -4,6 +4,7 @@
 
 #include <utils/network/mac_address.h>
 #include <utils/common/request_param.h>
+#include <utils/common/uuid.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/network/multicast_module_finder.h>
 #include <utils/math/space_mapper.h>
@@ -74,8 +75,8 @@ void QnCommonMetaTypes::initialize() {
     if(qn_commonMetaTypes_initialized)
         return;
 
-    qRegisterMetaType<QUuid>();
-    qRegisterMetaType<QSet<QUuid>>("QSet<QUuid>");
+    qRegisterMetaType<QnUuid>();
+    qRegisterMetaType<QSet<QnUuid>>("QSet<QnUuid>");
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();
     qRegisterMetaType<Qt::ConnectionType>();
@@ -212,6 +213,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" ); 
     qRegisterMetaType<ec2::ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); 
     qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" ); 
+
+    qRegisterMetaType<QnUuid>( "QnUuid" );
+    qRegisterMetaTypeStreamOperators<QnUuid>( "QnUuid" );
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();

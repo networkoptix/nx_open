@@ -47,7 +47,7 @@ namespace ec2
     }
     
     template<class QueryProcessorType>
-    int QnTimeManager<QueryProcessorType>::forcePrimaryTimeServerImpl( const QUuid& serverGuid, impl::SimpleHandlerPtr handler )
+    int QnTimeManager<QueryProcessorType>::forcePrimaryTimeServerImpl( const QnUuid& serverGuid, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 

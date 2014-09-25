@@ -24,7 +24,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     const QnRequestParams &params,
     QnJsonRestResult& result )
 {
-    QUuid resID = QUuid(params.value("res_id"));
+    QnUuid resID = QnUuid(params.value("res_id"));
     CameraDiagnostics::Step::Value diagnosticsType = CameraDiagnostics::Step::fromString(params.value("type"));
     if( resID.isNull() || diagnosticsType == CameraDiagnostics::Step::none )
         return nx_http::StatusCode::badRequest;

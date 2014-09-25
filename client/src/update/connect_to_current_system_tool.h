@@ -19,22 +19,22 @@ public:
         NoError,
         AuthentificationFailed,
         ConfigurationFailed,
-        UpdateFailed
+        UpdateFailed,
+        Canceled
     };
 
     explicit QnConnectToCurrentSystemTool(QnWorkbenchContext *context, QObject *parent = 0);
     ~QnConnectToCurrentSystemTool();
 
-    void start(const QSet<QUuid> &targets, const QString &password);
+    void start(const QSet<QnUuid> &targets, const QString &password);
 
-    QSet<QUuid> targets() const;
+    QSet<QnUuid> targets() const;
 
 public slots:
     void cancel();
 
 signals:
     void finished(int errorCode);
-    void canceled();
     void progressChanged(int progress);
     void stateChanged(const QString &stateText);
 
@@ -46,19 +46,19 @@ private:
     void revertApiUrls();
 
 private slots:
-    void at_configureTask_finished(int errorCode, const QSet<QUuid> &failedPeers);
+    void at_configureTask_finished(int errorCode, const QSet<QnUuid> &failedPeers);
     void at_waitTask_finished(int errorCode);
     void at_updateTool_finished(const QnUpdateResult &result);
     void at_updateTool_progressChanged(int progress);
 
 private:
-    QSet<QUuid> m_targets;
+    QSet<QnUuid> m_targets;
     QString m_password;
 
-    QSet<QUuid> m_restartTargets;
-    QSet<QUuid> m_updateTargets;
-    QHash<QUuid, QUrl> m_oldUrls;
-    QHash<QUuid, QUuid> m_waitTargets;
+    QSet<QnUuid> m_restartTargets;
+    QSet<QnUuid> m_updateTargets;
+    QHash<QnUuid, QUrl> m_oldUrls;
+    QHash<QnUuid, QnUuid> m_waitTargets;
     QnNetworkPeerTask *m_currentTask;
     QnMediaServerUpdateTool *m_updateTool;
     bool m_restartAllPeers;

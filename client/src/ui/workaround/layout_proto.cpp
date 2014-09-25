@@ -88,11 +88,11 @@ namespace QnLayoutProto {
         return true;
     }
 
-    bool deserialize(const QnProtoValue &value, QUuid *target) {
+    bool deserialize(const QnProtoValue &value, QnUuid *target) {
         if(value.type() != QnProtoValue::Bytes)
             return false;
 
-        *target = QUuid(value.toBytes()); /* We don't check for error here because we don't care. */
+        *target = QnUuid(value.toBytes()); /* We don't check for error here because we don't care. */
         return true;
     }
 

@@ -91,12 +91,12 @@ void QnMediaServerUpdateTool::setStageProgress(int progress) {
 }
 
 
-void QnMediaServerUpdateTool::setPeerStage(const QUuid &peerId, QnPeerUpdateStage stage) {
+void QnMediaServerUpdateTool::setPeerStage(const QnUuid &peerId, QnPeerUpdateStage stage) {
     emit peerStageChanged(peerId, stage);
     setPeerStageProgress(peerId, stage, 0);
 }
 
-void QnMediaServerUpdateTool::setPeerStageProgress(const QUuid &peerId, QnPeerUpdateStage stage, int progress) {
+void QnMediaServerUpdateTool::setPeerStageProgress(const QnUuid &peerId, QnPeerUpdateStage stage, int progress) {
     emit peerStageProgressChanged(peerId, stage, progress);
 }
 
@@ -109,12 +109,12 @@ QnMediaServerResourceList QnMediaServerUpdateTool::targets() const {
     return m_targets;
 }
 
-void QnMediaServerUpdateTool::setTargets(const QSet<QUuid> &targets, bool client) {
+void QnMediaServerUpdateTool::setTargets(const QSet<QnUuid> &targets, bool client) {
     m_targets.clear();
 
-    QSet<QUuid> suitableTargets;
+    QSet<QnUuid> suitableTargets;
 
-    foreach (const QUuid &id, targets) {
+    foreach (const QnUuid &id, targets) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
@@ -144,8 +144,8 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
     return result;
 }
 
-QSet<QUuid> QnMediaServerUpdateTool::actualTargetIds() const {
-    QSet<QUuid> targets;        
+QSet<QnUuid> QnMediaServerUpdateTool::actualTargetIds() const {
+    QSet<QnUuid> targets;        
     foreach (const QnMediaServerResourcePtr &server, actualTargets())
         targets.insert(server->getId());
     return targets;
@@ -217,7 +217,7 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
     if (m_stage == QnFullUpdateStage::Servers)
         return false;
 
-    setTargets(QSet<QUuid>(), defaultDisableClientUpdates);
+    setTargets(QSet<QnUuid>(), defaultDisableClientUpdates);
     m_updateProcess->pleaseStop();
     return true;
 }
@@ -253,7 +253,7 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
     connect(m_updateProcess, &QThread::finished, this, [this]{
         m_updateProcess->deleteLater();
         m_updateProcess = NULL;
-        setTargets(QSet<QUuid>(), defaultDisableClientUpdates);
+        setTargets(QSet<QnUuid>(), defaultDisableClientUpdates);
     });
 
     m_updateProcess->start();

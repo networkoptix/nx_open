@@ -221,7 +221,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     QnLayoutResourcePtr newLayout;
 
     newLayout = QnLayoutResourcePtr(new QnLayoutResource(qnResTypePool));
-    newLayout->setId(QUuid::createUuid());
+    newLayout->setId(QnUuid::createUuid());
     newLayout->setName(name);
     newLayout->setParentId(user->getId());
     newLayout->setCellSpacing(layout->cellSpacing());
@@ -233,14 +233,14 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     context()->resourcePool()->addResource(newLayout);
 
     QnLayoutItemDataList items = layout->getItems().values();
-    QHash<QUuid, QUuid> newUuidByOldUuid;
+    QHash<QnUuid, QnUuid> newUuidByOldUuid;
     for(int i = 0; i < items.size(); i++) {
-        QUuid newUuid = QUuid::createUuid();
+        QnUuid newUuid = QnUuid::createUuid();
         newUuidByOldUuid[items[i].uuid] = newUuid;
         items[i].uuid = newUuid;
     }
     for(int i = 0; i < items.size(); i++)
-        items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QUuid());
+        items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QnUuid());
     newLayout->setItems(items);
 
     const bool isCurrent = (layout == workbench()->currentLayout()->resource());
@@ -536,7 +536,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
     } while (button != QMessageBox::Yes);
 
     QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QUuid::createUuid());
+    layout->setId(QnUuid::createUuid());
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
     layout->setUserCanEdit(context()->user() == user);

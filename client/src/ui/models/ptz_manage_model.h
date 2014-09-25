@@ -2,7 +2,7 @@
 #define QN_PTZ_MANAGE_MODEL_H
 
 #include <QtCore/QAbstractTableModel>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <core/ptz/ptz_tour.h>
 #include <core/ptz/ptz_preset.h>
@@ -22,7 +22,7 @@ struct QnPtzTourItemModel {
     {}
 
     QnPtzTourItemModel(const QString &name):
-        tour(QUuid::createUuid().toString(), name, QnPtzTourSpotList()),
+        tour(QnUuid::createUuid().toString(), name, QnPtzTourSpotList()),
         modified(true),
         local(true)
     {}
@@ -46,7 +46,7 @@ struct QnPtzPresetItemModel {
     {}
 
     QnPtzPresetItemModel(const QString &name):
-        preset(QUuid::createUuid().toString(), name),
+        preset(QnUuid::createUuid().toString(), name),
         modified(true),
         local(true)
     {}

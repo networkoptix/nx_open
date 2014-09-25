@@ -814,7 +814,7 @@ Qn::ActionVisibility QnRunningVideowallActionCondition::check(const QnResourceLi
 
 
 Qn::ActionVisibility QnStartVideowallActionCondition::check(const QnResourceList &resources) {
-    QUuid pcUuid = qnSettings->pcUuid();
+    QnUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull()) 
         return Qn::InvisibleAction;
 

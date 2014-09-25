@@ -14,7 +14,7 @@
 #include <QtCore/QRectF>
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QUrl>
 #include <QtCore/QtNumeric>
 #include <QtCore/QJsonArray>
@@ -368,7 +368,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, T *target, typenam
 }
 
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QByteArray)(QnLatin1Array)(QColor)(QBrush)(QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QRegion)(QVector2D)(QVector3D)(QVector4D)(QUuid)(QUrl)(QFont), (json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QByteArray)(QnLatin1Array)(QColor)(QBrush)(QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QRegion)(QVector2D)(QVector3D)(QVector4D)(QnUuid)(QUrl)(QFont), (json))
 
 void qnJsonFunctionsUnitTest();
 

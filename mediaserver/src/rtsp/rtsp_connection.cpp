@@ -1,7 +1,7 @@
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QUrlQuery>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
@@ -942,7 +942,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 
     if (!d->thumbnailsDP && d->liveMode == Mode_ThumbNails) {
         d->thumbnailsDP = QSharedPointer<QnThumbnailsStreamReader>(new QnThumbnailsStreamReader(d->mediaRes->toResourcePtr()));
-        d->thumbnailsDP->setGroupId(QUuid::createUuid().toString().toUtf8());
+        d->thumbnailsDP->setGroupId(QnUuid::createUuid().toString().toUtf8());
     }
 }
 

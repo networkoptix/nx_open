@@ -23,7 +23,7 @@ public:
     void setVersion(const QnSoftwareVersion &version);
 
 signals:
-    void peerUpdateFinished(const QUuid &incompatibleId, const QUuid &id);
+    void peerUpdateFinished(const QnUuid &incompatibleId, const QnUuid &id);
 
 protected:
     virtual void doCancel() override;
@@ -47,7 +47,7 @@ private:
 
     QByteArray m_currentData;
     QList<QnMediaServerResourcePtr> m_currentServers;
-    QUuid m_targetId;
+    QnUuid m_targetId;
     QTimer *m_timer;
 };
 

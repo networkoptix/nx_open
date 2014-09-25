@@ -4,7 +4,7 @@
 
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QSettings>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QStringList>
 
 #include <openssl/rsa.h>
@@ -230,7 +230,7 @@ const QByteArray& QnLicense::rawLicense() const
     return m_rawLicense;
 }
 
-QUuid QnLicense::findRuntimeDataByLicense() const
+QnUuid QnLicense::findRuntimeDataByLicense() const
 {
     foreach(const QnPeerRuntimeInfo& info, QnRuntimeInfoManager::instance()->items()->getItems())
     {
@@ -242,7 +242,7 @@ QUuid QnLicense::findRuntimeDataByLicense() const
         if (hwKeyOK && brandOK)
             return info.uuid;
     }
-    return QUuid();
+    return QnUuid();
 }
 
 bool QnLicense::gotError(ErrorCode* errCode, ErrorCode errorCode) const

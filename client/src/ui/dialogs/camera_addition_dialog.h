@@ -119,7 +119,7 @@ private:
     bool m_inCheckStateChange;
 
     /** Uuid of the currently running process (if any). */
-    QUuid m_processUuid;
+    QnUuid m_processUuid;
 };
 
 #endif // CAMERA_ADDITION_DIALOG_H

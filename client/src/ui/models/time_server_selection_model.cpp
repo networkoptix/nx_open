@@ -43,7 +43,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
     auto processor = QnCommonMessageProcessor::instance();
 
     /* Handle peer time updates. */
-    connect(processor, &QnCommonMessageProcessor::peerTimeChanged, this, [this](const QUuid &peerId, qint64 syncTime, qint64 peerTime) {
+    connect(processor, &QnCommonMessageProcessor::peerTimeChanged, this, [this](const QnUuid &peerId, qint64 syncTime, qint64 peerTime) {
         int idx = qnIndexOf(m_items, [peerId](const Item &item) {return item.peerId == peerId; });
         if (idx < 0)
             return;
@@ -70,7 +70,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
         if (isSelected(info.data.serverTimePriority))
             setSelectedServer(info.uuid);
         else if (info.uuid == m_selectedServer)
-            setSelectedServer(QUuid());
+            setSelectedServer(QnUuid());
     });
     
     /* Handle removing online server peers. */
@@ -92,7 +92,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
         if (!resource.dynamicCast<QnMediaServerResource>())
             return;
 
-        QUuid id = resource->getId();
+        QnUuid id = resource->getId();
         int idx = qnIndexOf(m_items, [id](const Item &item){return item.peerId == id; });
         if (idx < 0)
             return;
@@ -119,7 +119,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
     });
 
     /* Requesting initial time. */
-    QHash<QUuid, qint64> timeByPeer;
+    QHash<QnUuid, qint64> timeByPeer;
     if (auto connection = QnAppServerConnectionFactory::getConnection2()) {
         auto timeManager = connection->getTimeManager();
         foreach(const ec2::QnPeerTimeInfo &info, timeManager->getPeerTimeInfoList())
@@ -296,11 +296,11 @@ void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo &info, qint64 t
     m_sameTimezoneValid = false;
 }
 
-QUuid QnTimeServerSelectionModel::selectedServer() const {
+QnUuid QnTimeServerSelectionModel::selectedServer() const {
     return m_selectedServer;
 }
 
-void QnTimeServerSelectionModel::setSelectedServer(const QUuid &serverId) {
+void QnTimeServerSelectionModel::setSelectedServer(const QnUuid &serverId) {
     if (m_selectedServer == serverId)
         return;
 

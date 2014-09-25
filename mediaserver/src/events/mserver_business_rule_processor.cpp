@@ -101,7 +101,7 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
     return rez;
 }
 
-QUuid QnMServerBusinessRuleProcessor::getGuid() const {
+QnUuid QnMServerBusinessRuleProcessor::getGuid() const {
     return serverGuid();
 }
 

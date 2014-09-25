@@ -45,7 +45,7 @@ public:
     QString name;
     QString moduleName;
     //!random string, unique for particular module instance
-    QUuid seed;
+    QnUuid seed;
     quint16 port;
     bool sslAllowed;
     QStringList remoteAddresses;

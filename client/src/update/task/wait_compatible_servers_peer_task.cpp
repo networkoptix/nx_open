@@ -24,7 +24,7 @@ QnWaitCompatibleServersPeerTask::QnWaitCompatibleServersPeerTask(QObject *parent
 void QnWaitCompatibleServersPeerTask::doStart() {
     m_targets = peers();
 
-    foreach (const QUuid &id, m_targets) {
+    foreach (const QnUuid &id, m_targets) {
         QnResourcePtr resource = qnResPool->getResourceById(id);
         if (resource && resource->getStatus() != Qn::Offline)
             m_targets.remove(id);
@@ -41,7 +41,7 @@ void QnWaitCompatibleServersPeerTask::doStart() {
 }
 
 void QnWaitCompatibleServersPeerTask::at_resourcePool_resourceChanged(const QnResourcePtr &resource) {
-    QUuid id = resource->getId();
+    QnUuid id = resource->getId();
 
     if (m_targets.contains(id) && resource->getStatus() != Qn::Offline)
         m_targets.remove(id);

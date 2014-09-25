@@ -1,7 +1,7 @@
 #ifndef QN_COMMON_META_TYPES_H
 #define QN_COMMON_META_TYPES_H
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QMetaType>
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QAuthenticator>

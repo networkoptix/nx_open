@@ -32,7 +32,7 @@ void QnRuntimeTransactionLog::clearOldRuntimeData(const QnTranStateKey& key)
 {
     QMutexLocker lock(&m_mutex);
     Q_ASSERT(!key.dbID.isNull());
-    auto itr = m_state.values.lowerBound(QnTranStateKey(key.peerID, QUuid()));
+    auto itr = m_state.values.lowerBound(QnTranStateKey(key.peerID, QnUuid()));
     bool newPeerFound = false;
     bool oldPeerFound = false;
     while (itr != m_state.values.end() && itr.key().peerID == key.peerID) 
@@ -54,10 +54,10 @@ void QnRuntimeTransactionLog::clearOldRuntimeData(const QnTranStateKey& key)
     }
 }
 
-void QnRuntimeTransactionLog::clearRuntimeData(const QUuid& id)
+void QnRuntimeTransactionLog::clearRuntimeData(const QnUuid& id)
 {
     QMutexLocker lock(&m_mutex);
-    auto itr = m_state.values.lowerBound(QnTranStateKey(id, QUuid()));
+    auto itr = m_state.values.lowerBound(QnTranStateKey(id, QnUuid()));
     while (itr != m_state.values.end() && itr.key().peerID == id)  {
         m_data.remove(itr.key());
         itr = m_state.values.erase(itr);

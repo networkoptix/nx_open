@@ -116,11 +116,11 @@ void QnResourceBrowserToolTipWidget::setThumbnailVisible(bool visible) {
         layout->removeItem(m_thumbnailLabel);
 }
 
-void QnResourceBrowserToolTipWidget::setResourceId(const QUuid& id) {
+void QnResourceBrowserToolTipWidget::setResourceId(const QnUuid& id) {
     m_resourceId = id;
 }
 
-QUuid QnResourceBrowserToolTipWidget::resourceId() const {
+QnUuid QnResourceBrowserToolTipWidget::resourceId() const {
     return m_resourceId;
 }
 
@@ -202,7 +202,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     connect(ui->tabWidget,          SIGNAL(currentChanged(int)),        this,               SLOT(at_tabWidget_currentChanged(int)));
     connect(ui->resourceTreeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()));
 
-    connect(m_thumbnailManager,     SIGNAL(thumbnailReady(QUuid,QPixmap)), this,              SLOT(at_thumbnailReady(QUuid,QPixmap)));
+    connect(m_thumbnailManager,     SIGNAL(thumbnailReady(QnUuid,QPixmap)), this,              SLOT(at_thumbnailReady(QnUuid,QPixmap)));
 
     /* Connect to context. */
     ui->resourceTreeWidget->setWorkbench(workbench());
@@ -400,7 +400,7 @@ QnLayoutItemIndexList QnResourceBrowserWidget::selectedLayoutItems() const {
     QnLayoutItemIndexList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
-        QUuid uuid = index.data(Qn::ItemUuidRole).value<QUuid>();
+        QnUuid uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
         if(uuid.isNull())
             continue;
 
@@ -418,7 +418,7 @@ QnVideoWallItemIndexList QnResourceBrowserWidget::selectedVideoWallItems() const
     QnVideoWallItemIndexList result;
 
     foreach (const QModelIndex &modelIndex, currentSelectionModel()->selectedRows()) {
-        QUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QUuid>();
+        QnUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QnUuid>();
         if(uuid.isNull())
             continue;
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(uuid);
@@ -433,7 +433,7 @@ QnVideoWallMatrixIndexList QnResourceBrowserWidget::selectedVideoWallMatrices() 
     QnVideoWallMatrixIndexList result;
 
     foreach (const QModelIndex &modelIndex, currentSelectionModel()->selectedRows()) {
-        QUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QUuid>();
+        QnUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QnUuid>();
         if(uuid.isNull())
             continue;
 
@@ -462,7 +462,7 @@ QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
     if (nodeType == Qn::VideoWallMatrixNode)
         return QVariant::fromValue(selectedVideoWallMatrices());
 
-    if(!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QUuid>().isNull()) /* If it's a layout item. */
+    if(!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QnUuid>().isNull()) /* If it's a layout item. */
         return QVariant::fromValue(selectedLayoutItems());
 
     return QVariant::fromValue(selectedResources());
@@ -498,7 +498,7 @@ bool QnResourceBrowserWidget::showOwnTooltip(const QPointF &pos) {
             m_tooltipWidget->setResourceId(resource->getId());
             m_thumbnailManager->selectResource(resource);
         } else {
-            m_tooltipWidget->setResourceId(QUuid());
+            m_tooltipWidget->setResourceId(QnUuid());
             m_tooltipWidget->setPixmap(QPixmap());
         }
 
@@ -761,7 +761,7 @@ void QnResourceBrowserWidget::at_showUrlsInTree_changed() {
     m_resourceModel->setUrlsShown(urlsShown);
 }
 
-void QnResourceBrowserWidget::at_thumbnailReady(QUuid resourceId, const QPixmap &pixmap) {
+void QnResourceBrowserWidget::at_thumbnailReady(QnUuid resourceId, const QPixmap &pixmap) {
     if (m_tooltipWidget && m_tooltipWidget->resourceId() != resourceId)
         return;
     m_tooltipWidget->setPixmap(pixmap);
