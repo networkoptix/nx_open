@@ -35,7 +35,8 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
     QnPlIsdResourcePtr res = getResource().dynamicCast<QnPlIsdResource>();
     CLHttpStatus status;
 
-    CLSimpleHTTPClient http (res->getHostAddress(), 80, 3000, res->getAuth());
+    int port = QUrl(res->getUrl()).port(80);
+    CLSimpleHTTPClient http (res->getHostAddress(), port, 3000, res->getAuth());
 
     if (!isCameraControlDisabled())
     {
@@ -67,13 +68,13 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
         ? QLatin1String("api/param.cgi?req=VideoInput.1.h264.2.Rtsp.AbsolutePath")
         : QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.Rtsp.AbsolutePath");
 
-    QByteArray reslst = downloadFile(status, urlrequest,  res->getHostAddress(), 80, 3000, res->getAuth());
+    QByteArray reslst = downloadFile(status, urlrequest,  res->getHostAddress(), port, 3000, res->getAuth());
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         res->setStatus(Qn::Unauthorized);
         QUrl requestedUrl;
         requestedUrl.setHost( res->getHostAddress() );
-        requestedUrl.setPort( 80 );
+        requestedUrl.setPort( port );
         requestedUrl.setScheme( QLatin1String("http") );
         requestedUrl.setPath( urlrequest );
         return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
@@ -86,7 +87,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
     {
         QUrl requestedUrl;
         requestedUrl.setHost( res->getHostAddress() );
-        requestedUrl.setPort( 80 );
+        requestedUrl.setPort( port );
         requestedUrl.setScheme( QLatin1String("http") );
         requestedUrl.setPath( urlrequest );
         return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
@@ -99,13 +100,15 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
     {
         QUrl requestedUrl;
         requestedUrl.setHost( res->getHostAddress() );
-        requestedUrl.setPort( 80 );
+        requestedUrl.setPort( port );
         requestedUrl.setScheme( QLatin1String("http") );
         requestedUrl.setPath( urlrequest );
         return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
     }
 
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(url).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
+
+    //m_resource.dynamicCast<QnNetworkResource>()->setMediaPort(8554);
 
     m_rtpStreamParser.setRequest(url);
     return m_rtpStreamParser.openStream();

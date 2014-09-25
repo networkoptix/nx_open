@@ -404,6 +404,7 @@ namespace ec2
         QMap<int, QUuid> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
 
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QUuid>& guids);
+        bool updateResourceTypeGuids();
         bool updateGuids();
         QUuid getType(const QString& typeName);
         bool resyncTransactionLog();

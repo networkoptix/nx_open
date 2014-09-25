@@ -1822,6 +1822,3 @@ INSERT INTO "vms_propertytype" VALUES(437,652,'cameraCapabilities',1,NULL,NULL,N
 INSERT INTO "vms_propertytype" VALUES(438,652,'ptzCapabilities',1,NULL,NULL,NULL,'','','0','','','','',0,0);
 INSERT INTO "vms_propertytype" VALUES(439,652,'MaxFPS',1,NULL,NULL,NULL,'','','8','','','','',0,0);
 INSERT INTO "vms_propertytype" VALUES(440,652,'analog',1,NULL,NULL,NULL,'','','0','','','','',0,0);
-
-INSERT INTO "vms_resourcetype" VALUES(1634,'XMS-AF-3M',NULL,10);
-INSERT INTO vms_resourcetype_parents (from_resourcetype_id, to_resourcetype_id) VALUES(1634,635);
