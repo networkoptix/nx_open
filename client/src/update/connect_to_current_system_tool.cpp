@@ -78,7 +78,7 @@ void QnConnectToCurrentSystemTool::cancel() {
     if (m_updateTool)
         m_updateTool->cancelUpdate();
 
-    emit canceled();
+    emit finished(Canceled);
 }
 
 void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode) {

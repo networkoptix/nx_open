@@ -47,8 +47,8 @@ void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &password) {
     }
 }
 
-void QnMergeSystemsTool::mergeSystem(const QUrl &url, const QString &password, bool ownSettings) {
-
+void QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &password, bool ownSettings) {
+    proxy->apiConnection()->mergeSystemAsync(url, password, ownSettings, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
 }
 
 void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {
@@ -74,6 +74,11 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
     emit systemFound(moduleInformation, server, NoError);
 }
 
-void QnMergeSystemsTool::at_mergeSystem_finished(int status, int handle) {
+void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {
+    Q_UNUSED(handle)
 
+    if (status != 0)
+        emit mergeFinished(InternalError, moduleInformation);
+    else
+        emit mergeFinished(errorStringToErrorCode(errorString), moduleInformation);
 }

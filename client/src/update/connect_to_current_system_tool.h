@@ -19,7 +19,8 @@ public:
         NoError,
         AuthentificationFailed,
         ConfigurationFailed,
-        UpdateFailed
+        UpdateFailed,
+        Canceled
     };
 
     explicit QnConnectToCurrentSystemTool(QnWorkbenchContext *context, QObject *parent = 0);
@@ -34,7 +35,6 @@ public slots:
 
 signals:
     void finished(int errorCode);
-    void canceled();
     void progressChanged(int progress);
     void stateChanged(const QString &stateText);
 
