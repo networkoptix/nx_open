@@ -178,7 +178,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         else if (format == RTPSession::TT_VIDEO_RTCP && m_videoParsers[channelNum])
         {
             processTcpRtcp(m_videoIOs[channelNum], (quint8*) m_demuxedData[rtpChannelNum]->data(), readed, m_demuxedData[rtpChannelNum]->capacity());
-            m_demuxedData[channelNum]->clear();
+            m_demuxedData[rtpChannelNum]->clear();
         }
         else if (format == RTPSession::TT_AUDIO && m_audioParser) 
         {
