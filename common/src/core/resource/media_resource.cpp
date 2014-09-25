@@ -102,7 +102,7 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractSt
         return defaultVideoLayout;
     }
     else {
-        if (m_cachedLayout != strVal) {
+        if (m_cachedLayout != strVal || !m_customVideoLayout) {
             m_customVideoLayout = QnCustomResourceVideoLayout::fromString(strVal);
             m_cachedLayout = strVal;
         }
@@ -149,7 +149,6 @@ void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&m
             m_dewarpingParams = other_casted->m_dewarpingParams;
             modifiedFields << "mediaDewarpingParamsChanged";
         }
-        m_customVideoLayout = other_casted->m_customVideoLayout;
     }
 }
 
