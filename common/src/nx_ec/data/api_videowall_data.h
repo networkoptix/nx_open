@@ -8,9 +8,9 @@
 namespace ec2
 {
     struct ApiVideowallItemData: ApiData {
-        QUuid guid;
-        QUuid pcGuid;
-        QUuid layoutGuid;
+        QnUuid guid;
+        QnUuid pcGuid;
+        QnUuid layoutGuid;
         QString name;
         int snapLeft;
         int snapTop;
@@ -21,7 +21,7 @@ namespace ec2
 
 
     struct ApiVideowallScreenData: ApiData {
-        QUuid pcGuid;
+        QnUuid pcGuid;
         int pcIndex;
         int desktopLeft;
         int desktopTop;
@@ -36,8 +36,8 @@ namespace ec2
 
 
     struct ApiVideowallMatrixItemData: ApiData {
-        QUuid itemGuid;
-        QUuid layoutGuid;
+        QnUuid itemGuid;
+        QnUuid layoutGuid;
     };
 #define ApiVideowallMatrixItemData_Fields (itemGuid)(layoutGuid)
 
@@ -64,32 +64,32 @@ namespace ec2
 
     struct ApiVideowallControlMessageData: ApiData {
         int operation;
-        QUuid videowallGuid;
-        QUuid instanceGuid;
+        QnUuid videowallGuid;
+        QnUuid instanceGuid;
         std::map<QString, QString> params;
     };
 #define ApiVideowallControlMessageData_Fields (operation)(videowallGuid)(instanceGuid)(params)
 
     struct ApiVideowallItemWithRefData: public ApiVideowallItemData {
-        QUuid videowallGuid;
+        QnUuid videowallGuid;
     };
 #define ApiVideowallItemWithRefData_Fields ApiVideowallItemData_Fields (videowallGuid)
 
 
     struct ApiVideowallScreenWithRefData: public ApiVideowallScreenData {
-        QUuid videowallGuid;
+        QnUuid videowallGuid;
     };
 #define ApiVideowallScreenWithRefData_Fields ApiVideowallScreenData_Fields (videowallGuid)
 
 
     struct ApiVideowallMatrixItemWithRefData: public ApiVideowallMatrixItemData {
-        QUuid matrixGuid;
+        QnUuid matrixGuid;
     };
 #define ApiVideowallMatrixItemWithRefData_Fields ApiVideowallMatrixItemData_Fields (matrixGuid)
 
 
     struct ApiVideowallMatrixWithRefData: public ApiVideowallMatrixData {
-        QUuid videowallGuid;
+        QnUuid videowallGuid;
     };
 #define ApiVideowallMatrixWithRefData_Fields ApiVideowallMatrixData_Fields (videowallGuid)
 

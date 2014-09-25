@@ -4,16 +4,16 @@
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 class QnVideoWallMatrix
 {
 public:
     QnVideoWallMatrix() {}
 
-    QUuid uuid;
+    QnUuid uuid;
     QString name;
-    QHash<QUuid, QUuid> layoutByItem;
+    QHash<QnUuid, QnUuid> layoutByItem;
 
     friend bool operator==(const QnVideoWallMatrix &l, const QnVideoWallMatrix &r) {
         return (l.uuid == r.uuid &&
@@ -26,7 +26,7 @@ Q_DECLARE_METATYPE(QnVideoWallMatrix)
 Q_DECLARE_TYPEINFO(QnVideoWallMatrix, Q_MOVABLE_TYPE);
 
 typedef QList<QnVideoWallMatrix> QnVideoWallMatrixList;
-typedef QHash<QUuid, QnVideoWallMatrix> QnVideoWallMatrixMap;
+typedef QHash<QnUuid, QnVideoWallMatrix> QnVideoWallMatrixMap;
 
 Q_DECLARE_METATYPE(QnVideoWallMatrixList)
 Q_DECLARE_METATYPE(QnVideoWallMatrixMap)

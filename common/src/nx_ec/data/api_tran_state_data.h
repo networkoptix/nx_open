@@ -11,9 +11,9 @@ namespace ec2
 
 struct QnTranStateKey {
     QnTranStateKey() {}
-    QnTranStateKey(QUuid peerID, QUuid dbID): peerID(peerID), dbID(dbID) {}
-    QUuid peerID;
-    QUuid dbID;
+    QnTranStateKey(QnUuid peerID, QnUuid dbID): peerID(peerID), dbID(dbID) {}
+    QnUuid peerID;
+    QnUuid dbID;
 
     bool operator<(const QnTranStateKey& other) const {
         if (peerID != other.peerID)

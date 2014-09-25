@@ -35,7 +35,7 @@ int QnBusinessMessageBus::deliveryBusinessEvent(QnAbstractBusinessEventPtr bEven
 }
 */
 
-int QnBusinessMessageBus::deliveryBusinessAction(const QnAbstractBusinessActionPtr &bAction, const QUuid& dstPeer)
+int QnBusinessMessageBus::deliveryBusinessAction(const QnAbstractBusinessActionPtr &bAction, const QnUuid& dstPeer)
 {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     int handle = ec2Connection->getBusinessEventManager()->sendBusinessAction(bAction, dstPeer, this, &QnBusinessMessageBus::at_DeliveryBusinessActionFinished);

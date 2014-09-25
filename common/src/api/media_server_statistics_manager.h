@@ -55,7 +55,7 @@ public:
     void setFlagsFilter(Qn::StatisticsDeviceType deviceType, int flags);
 
 private:
-    QHash<QUuid, QnMediaServerStatisticsStorage *> m_statistics;
+    QHash<QnUuid, QnMediaServerStatisticsStorage *> m_statistics;
     QHash<Qn::StatisticsDeviceType, int> m_flagsFilter;
 };
 

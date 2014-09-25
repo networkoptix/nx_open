@@ -8,7 +8,7 @@
 
 struct QnStorageSpaceData {
     QString url;
-    QUuid storageId;
+    QnUuid storageId;
     qint64 totalSpace;
     qint64 freeSpace;
     qint64 reservedSpace;

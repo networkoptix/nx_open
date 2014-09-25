@@ -121,7 +121,7 @@ private:
 class QnMediaServerResourceFactory : public QnResourceFactory
 {
 public:
-    virtual QnResourcePtr createResource(const QUuid& resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QnUuid& resourceTypeId, const QnResourceParams& params) override;
 };
 
 Q_DECLARE_METATYPE(QnMediaServerResourcePtr);

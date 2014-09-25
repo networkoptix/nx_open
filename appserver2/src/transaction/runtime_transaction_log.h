@@ -26,7 +26,7 @@ namespace ec2
 
 
         void clearOldRuntimeData(const QnTranStateKey& key);
-        void clearRuntimeData(const QUuid& id);
+        void clearRuntimeData(const QnUuid& id);
         bool contains(const QnTranState& state) const;
         bool contains(const QnTransaction<ApiRuntimeData>& tran) const;
 

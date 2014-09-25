@@ -30,7 +30,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
         return;
     }
 
-    QSet<QUuid> targets;
+    QSet<QnUuid> targets;
     foreach (const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
         if (resource->hasFlags(Qn::remote_server) && (resource->getStatus() == Qn::Incompatible || resource->getStatus() == Qn::Unauthorized))
             targets.insert(resource->getId());
@@ -39,7 +39,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
     connectToCurrentSystem(targets);
 }
 
-void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(const QSet<QUuid> &targets) {
+void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(const QSet<QnUuid> &targets) {
     if (targets.isEmpty())
         return;
 

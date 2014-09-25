@@ -18,7 +18,7 @@ class QnResourceFactory {
 public:
     virtual ~QnResourceFactory() {}
 
-    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams &params) = 0;
+    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams &params) = 0;
 };
 
 #endif // QN_RESOURCE_FACTORY_H

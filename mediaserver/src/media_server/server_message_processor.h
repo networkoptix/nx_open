@@ -23,18 +23,18 @@ public:
 protected:
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus ) override;
     virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
-    virtual void afterRemovingResource(const QUuid& id) override;
+    virtual void afterRemovingResource(const QnUuid& id) override;
     void execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) override;
     bool isLocalAddress(const QString& addr) const;
-    virtual bool canRemoveResource(const QUuid& resourceId) override;
-    virtual void removeResourceIgnored(const QUuid& resourceId) override;
+    virtual bool canRemoveResource(const QnUuid& resourceId) override;
+    virtual void removeResourceIgnored(const QnUuid& resourceId) override;
 
 private slots:
     void at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
     void at_updateInstallationRequested(const QString &updateId);
 
     void at_systemNameChangeRequested(const QString &systemName);
-    void at_remotePeerUnauthorized(const QUuid& id);
+    void at_remotePeerUnauthorized(const QnUuid& id);
 private:
     mutable QMutex m_mutexAddrList;
     const int m_serverPort;

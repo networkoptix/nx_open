@@ -20,8 +20,8 @@ bool QnRoute::addPoint(const QnRoutePoint &point, int weight) {
     return true;
 }
 
-bool QnRoute::containsConnection(const QUuid &first, const QUuid &from, const QnRoutePoint &point) const {
-    QUuid prevId = first;
+bool QnRoute::containsConnection(const QnUuid &first, const QnUuid &from, const QnRoutePoint &point) const {
+    QnUuid prevId = first;
     for (auto it = points.begin(); it != points.end(); ++it) {
         if (prevId == from)
             return *it == point;

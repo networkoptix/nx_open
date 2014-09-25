@@ -104,7 +104,7 @@ public:
     */
     virtual bool ping();
 
-    static QUuid uniqueIdToId(const QString& uniqId);
+    static QnUuid uniqueIdToId(const QString& uniqId);
     virtual bool isAbstractResource() const { return false; }
 private:
     QAuthenticator m_auth;

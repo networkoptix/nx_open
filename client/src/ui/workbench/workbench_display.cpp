@@ -558,7 +558,7 @@ QnResourceWidget *QnWorkbenchDisplay::widget(Qn::ItemRole role) const {
     return m_widgetByRole[role];
 }
 
-QnResourceWidget *QnWorkbenchDisplay::widget(const QUuid &uuid) const {
+QnResourceWidget *QnWorkbenchDisplay::widget(const QnUuid &uuid) const {
     return widget(workbench()->currentLayout()->item(uuid));
 }
 
@@ -1591,11 +1591,11 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(streamSynchronizer->state()));
 
-    QVector<QUuid> selectedUuids;
+    QVector<QnUuid> selectedUuids;
     foreach(QnResourceWidget *widget, widgets())
         if(widget->isSelected())
             selectedUuids.push_back(widget->item()->uuid());
-    layout->setData(Qn::LayoutSelectionRole, QVariant::fromValue<QVector<QUuid> >(selectedUuids));
+    layout->setData(Qn::LayoutSelectionRole, QVariant::fromValue<QVector<QnUuid> >(selectedUuids));
 
     foreach(QnResourceWidget *widget, widgets()) {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
@@ -1705,8 +1705,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             widget->item()->setData(Qn::ItemDisabledButtonsRole, static_cast<int>(QnMediaResourceWidget::PtzButton));
     }
 
-    QVector<QUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QUuid> >();
-    foreach(const QUuid &selectedUuid, selectedUuids)
+    QVector<QnUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QnUuid> >();
+    foreach(const QnUuid &selectedUuid, selectedUuids)
         if(QnResourceWidget *widget = this->widget(selectedUuid))
             widget->setSelected(true);
 

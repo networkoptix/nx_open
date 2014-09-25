@@ -5,6 +5,8 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
+#include <utils/common/uuid.h>
+
 
 class QnConnectToCurrentSystemTool;
 class QnProgressDialog;
@@ -22,7 +24,7 @@ protected slots:
     void at_mergeSystemsAction_triggered();
 
 private:
-    void connectToCurrentSystem(const QSet<QUuid> &targets);
+    void connectToCurrentSystem(const QSet<QnUuid> &targets);
 
 private slots:
     void at_connectTool_finished(int errorCode);

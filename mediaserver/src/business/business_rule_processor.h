@@ -103,7 +103,7 @@ public:
     * Return module GUID. if destination action intended for current module, no route through message bus is required
     */
 
-    virtual QUuid getGuid() const { return QUuid(); }
+    virtual QnUuid getGuid() const { return QnUuid(); }
 
     bool broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
 public slots:
@@ -134,7 +134,7 @@ private slots:
     void at_actionDeliveryFailed(const QnAbstractBusinessActionPtr& action);
 
     void at_businessRuleChanged(const QnBusinessEventRulePtr& bRule);
-    void at_businessRuleDeleted(QUuid id);
+    void at_businessRuleDeleted(QnUuid id);
     void at_businessRuleReset(const QnBusinessEventRuleList& rules);
 
     void at_timer();
@@ -143,7 +143,7 @@ private slots:
 protected:
     virtual QImage getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const;
     
-    bool containResource(const QnResourceList& resList, const QUuid& resId) const;
+    bool containResource(const QnResourceList& resList, const QnUuid& resId) const;
     QnAbstractBusinessActionList matchActions(const QnAbstractBusinessEventPtr& bEvent);
     //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
 
@@ -174,8 +174,8 @@ private:
     struct RunningRuleInfo
     {
         RunningRuleInfo() {}
-        QMap<QUuid, QnAbstractBusinessEventPtr> resources; 
-        QSet<QUuid> isActionRunning; // actions that has been started by resource. Continues action starts only onces for all event resources.
+        QMap<QnUuid, QnAbstractBusinessEventPtr> resources; 
+        QSet<QnUuid> isActionRunning; // actions that has been started by resource. Continues action starts only onces for all event resources.
     };
     typedef QMap<QString, RunningRuleInfo> RunningRuleMap;
 

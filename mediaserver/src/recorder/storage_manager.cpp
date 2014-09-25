@@ -384,7 +384,7 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
     }
 }
 
-bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& storages, const QUuid &id) const
+bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& storages, const QnUuid &id) const
 {
     foreach(const QnAbstractStorageResourcePtr& storage, storages)
     {

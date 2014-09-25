@@ -58,12 +58,12 @@ public:
     //! \param compatibilityMode         New compatibility mode state.
     void setCompatibilityMode(bool compatibilityMode);
 
-    QnModuleInformation moduleInformation(const QUuid &moduleId) const;
+    QnModuleInformation moduleInformation(const QnUuid &moduleId) const;
     QList<QnModuleInformation> foundModules() const;
 
-    void addIgnoredModule(const QnNetworkAddress &address, const QUuid &id);
-    void removeIgnoredModule(const QnNetworkAddress &address, const QUuid &id);
-    QMultiHash<QnNetworkAddress, QUuid> ignoredModules() const;
+    void addIgnoredModule(const QnNetworkAddress &address, const QnUuid &id);
+    void removeIgnoredModule(const QnNetworkAddress &address, const QnUuid &id);
+    QMultiHash<QnNetworkAddress, QnUuid> ignoredModules() const;
 
 public slots:
     virtual void pleaseStop() override;
@@ -83,7 +83,7 @@ private:
 private:
     struct ModuleContext {
         quint64 prevResponseReceiveClock;
-        QUuid moduleId;
+        QnUuid moduleId;
 
         ModuleContext(const RevealResponse &response);
     };
@@ -97,8 +97,8 @@ private:
     quint64 m_prevPingClock;
     bool m_compatibilityMode;
     QHash<QnNetworkAddress, ModuleContext> m_foundAddresses;
-    QHash<QUuid, QnModuleInformation> m_foundModules;
-    QMultiHash<QnNetworkAddress, QUuid> m_ignoredModules;
+    QHash<QnUuid, QnModuleInformation> m_foundModules;
+    QMultiHash<QnNetworkAddress, QnUuid> m_ignoredModules;
 };
 
 #endif // MULTICAST_MODULE_FINDER_H

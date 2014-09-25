@@ -84,7 +84,7 @@ void QnVideoWallResource::storedItemRemoved(const QnVideoWallItem &item) {
             m_matrices->updateItem(matrix.uuid, matrix);
     }
 
-    QUuid pcUuid = item.pcUuid;
+    QnUuid pcUuid = item.pcUuid;
     foreach(const QnVideoWallItem &item, m_items->getItems())
         if (item.pcUuid == pcUuid)
             return;
@@ -121,8 +121,8 @@ void QnVideoWallResource::storedItemChanged(const QnVideoWallMatrix &item) {
     emit matrixChanged(::toSharedPointer(this), item);
 }
 
-QList<QUuid> QnVideoWallResource::onlineItems() const {
-    QList<QUuid> result;
+QList<QnUuid> QnVideoWallResource::onlineItems() const {
+    QList<QnUuid> result;
     foreach (const QnVideoWallItem &item, m_items->getItems()) {
         if (!item.online)
             continue;

@@ -43,7 +43,7 @@ namespace ec2
         for( QnLayoutResourcePtr layout: layouts )
         {
             if( layout->getId().isNull() )
-			    layout->setId( QUuid::createUuid() );
+			    layout->setId( QnUuid::createUuid() );
         }
 
         //performing request
@@ -56,7 +56,7 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    int QnLayoutManager<QueryProcessorType>::remove( const QUuid& id, impl::SimpleHandlerPtr handler )
+    int QnLayoutManager<QueryProcessorType>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::removeLayout, id );
@@ -66,7 +66,7 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiIdData> QnLayoutManager<T>::prepareTransaction( ApiCommand::Value command, const QUuid& id )
+    QnTransaction<ApiIdData> QnLayoutManager<T>::prepareTransaction( ApiCommand::Value command, const QnUuid& id )
     {
         QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;

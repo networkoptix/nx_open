@@ -27,7 +27,7 @@ private:
     void finishTask(int errorCode);
 
 private:
-    QSet<QUuid> m_targets;
+    QSet<QnUuid> m_targets;
 
     QTimer *m_timer;
 };

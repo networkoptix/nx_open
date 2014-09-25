@@ -156,7 +156,7 @@ void QnBusinessRulesDialog::at_beforeModelChanged() {
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_message_ruleDeleted(const QUuid &id) {
+void QnBusinessRulesDialog::at_message_ruleDeleted(const QnUuid &id) {
     m_pendingDeleteRules.removeOne(id); //TODO: #GDM #Business ask user
 }
 
@@ -318,7 +318,7 @@ bool QnBusinessRulesDialog::saveAll() {
     }
 
     //TODO: #GDM #Business replace with QnAppServerReplyProcessor
-    foreach (const QUuid& id, m_pendingDeleteRules) {
+    foreach (const QnUuid& id, m_pendingDeleteRules) {
         int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->deleteRule(
             id, this, &QnBusinessRulesDialog::at_resources_deleted );
         m_deleting[handle] = id;

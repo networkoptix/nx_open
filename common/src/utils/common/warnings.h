@@ -12,7 +12,7 @@
 #include <QtCore/QVariant>
 #include <QtCore/QJsonValue>
 #include <QtCore/QUrl>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 namespace detail {
     inline void debugInternal(const char *functionName, const QString &s) {
@@ -40,7 +40,7 @@ namespace detail {
             return s.arg(arg);
         }
 
-        inline QString operator<<(const QString &s, const QUuid &arg) {
+        inline QString operator<<(const QString &s, const QnUuid &arg) {
             return s.arg(arg.toString());
         }
 

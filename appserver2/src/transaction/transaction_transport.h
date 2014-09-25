@@ -3,7 +3,6 @@
 
 #include <deque>
 
-#include <QUuid>
 #include <QByteArray>
 #include <QSet>
 #include <QTime>
@@ -15,6 +14,7 @@
 #include <transaction/transaction_transport_header.h>
 
 #include <utils/common/log.h>
+#include <utils/common/uuid.h>
 #include <utils/network/abstract_socket.h>
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/common/id.h"
@@ -57,8 +57,8 @@ public:
 signals:
     void gotTransaction(const QByteArray &data, const QnTransactionTransportHeader &transportHeader);
     void stateChanged(State state);
-    void remotePeerUnauthorized(const QUuid& id);
-    void peerIdDiscovered(const QUrl& url, const QUuid& id);
+    void remotePeerUnauthorized(const QnUuid& id);
+    void peerIdDiscovered(const QUrl& url, const QnUuid& id);
 public:
 
     template<class T> 
@@ -69,7 +69,7 @@ public:
         header.fillSequence();
 #ifdef _DEBUG
 
-        foreach (const QUuid& peer, header.dstPeers) {
+        foreach (const QnUuid& peer, header.dstPeers) {
             Q_ASSERT(!peer.isNull());
             //Q_ASSERT(peer != qnCommon->moduleGUID());
         }
@@ -136,10 +136,10 @@ public:
 
     AbstractStreamSocket* getSocket() const;
 
-    static bool tryAcquireConnecting(const QUuid& remoteGuid, bool isOriginator);
-    static bool tryAcquireConnected(const QUuid& remoteGuid, bool isOriginator);
-    static void connectingCanceled(const QUuid& id, bool isOriginator);
-    static void connectDone(const QUuid& id);
+    static bool tryAcquireConnecting(const QnUuid& remoteGuid, bool isOriginator);
+    static bool tryAcquireConnected(const QnUuid& remoteGuid, bool isOriginator);
+    static void connectingCanceled(const QnUuid& id, bool isOriginator);
+    static void connectDone(const QnUuid& id);
 
     void processExtraData();
     void startListening();
@@ -182,8 +182,8 @@ private:
     std::map<int, BeforeSendingChunkHandler> m_beforeSendingChunkHandlers;
     int m_prevGivenHandlerID;
 
-    static QSet<QUuid> m_existConn;
-    typedef QMap<QUuid, QPair<bool, bool>> ConnectingInfoMap;
+    static QSet<QnUuid> m_existConn;
+    typedef QMap<QnUuid, QPair<bool, bool>> ConnectingInfoMap;
     static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
     static QMutex m_staticMutex;
 
@@ -205,7 +205,7 @@ private:
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();
-    static void connectingCanceledNoLock(const QUuid& remoteGuid, bool isOriginator);
+    static void connectingCanceledNoLock(const QnUuid& remoteGuid, bool isOriginator);
     void addHttpChunkExtensions( std::vector<nx_http::ChunkExtension>* const chunkExtensions );
     void processChunkExtensions( const nx_http::ChunkHeader& httpChunkHeader );
     void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead );

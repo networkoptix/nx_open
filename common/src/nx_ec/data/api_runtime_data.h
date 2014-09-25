@@ -50,10 +50,10 @@ namespace ec2
         qint64 prematureLicenseExperationDate;
 
         /** Guid of the videowall instance for the running videowall clients. */
-        QUuid videoWallInstanceGuid;
+        QnUuid videoWallInstanceGuid;
 
         /** Videowall item id, governed by the current client instance's control session. */
-        QUuid videoWallControlSession;
+        QnUuid videoWallControlSession;
 
         /** Priority of this peer as the time synchronization server. */
         quint64 serverTimePriority;

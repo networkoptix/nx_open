@@ -34,7 +34,7 @@ void QnWorkbenchUserLayoutCountWatcher::updateLayoutCount() {
 }
 
 void QnWorkbenchUserLayoutCountWatcher::at_context_userChanged() {
-    m_currentUserId = context()->user() ? context()->user()->getId() : QUuid();
+    m_currentUserId = context()->user() ? context()->user()->getId() : QnUuid();
 
     m_layouts.clear();
     foreach(const QnResourcePtr &resource, resourcePool()->getResources())

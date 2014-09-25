@@ -98,7 +98,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
                 // in any case let's HTTP do it's job at very end of discovery
                 QnStardotResourcePtr resource( new QnStardotResource() );
                 //resource->setName("AVUNKNOWN");
-                QUuid typeId = qnResTypePool->getResourceTypeId(QnStardotResource::MANUFACTURE, lit("STARDOT_COMMON"));
+                QnUuid typeId = qnResTypePool->getResourceTypeId(QnStardotResource::MANUFACTURE, lit("STARDOT_COMMON"));
                 if (typeId.isNull())
                     continue;
                 resource->setTypeId(typeId);
@@ -151,7 +151,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
 
 }
 
-QnResourcePtr QnStardotResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnStardotResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -223,7 +223,7 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
     if (model.isEmpty())
         return QList<QnResourcePtr>();
 
-    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), model);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), model);
     if (rt.isNull())
         return QList<QnResourcePtr>();
 

@@ -46,7 +46,7 @@ QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *c
 
 QnConnectToCurrentSystemTool::~QnConnectToCurrentSystemTool() {}
 
-void QnConnectToCurrentSystemTool::start(const QSet<QUuid> &targets, const QString &password) {
+void QnConnectToCurrentSystemTool::start(const QSet<QnUuid> &targets, const QString &password) {
     if (targets.isEmpty()) {
         finish(NoError);
         return;
@@ -58,7 +58,7 @@ void QnConnectToCurrentSystemTool::start(const QSet<QUuid> &targets, const QStri
     m_updateTargets.clear();
     m_waitTargets.clear();
 
-    foreach (const QUuid &id, m_targets) {
+    foreach (const QnUuid &id, m_targets) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             m_targets.remove(id);
@@ -67,7 +67,7 @@ void QnConnectToCurrentSystemTool::start(const QSet<QUuid> &targets, const QStri
     configureServer();
 }
 
-QSet<QUuid> QnConnectToCurrentSystemTool::targets() const {
+QSet<QnUuid> QnConnectToCurrentSystemTool::targets() const {
     return m_targets;
 }
 
@@ -96,7 +96,7 @@ void QnConnectToCurrentSystemTool::configureServer() {
         return;
     }
 
-    foreach (const QUuid &id, m_targets) {
+    foreach (const QnUuid &id, m_targets) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
@@ -123,7 +123,7 @@ void QnConnectToCurrentSystemTool::waitPeers() {
     m_currentTask = task;
 
     connect(task, &QnNetworkPeerTask::finished, this, &QnConnectToCurrentSystemTool::at_waitTask_finished);
-    task->start(QSet<QUuid>::fromList(m_waitTargets.values()));
+    task->start(QSet<QnUuid>::fromList(m_waitTargets.values()));
 
     emit progressChanged(configureProgress);
 }
@@ -155,7 +155,7 @@ void QnConnectToCurrentSystemTool::revertApiUrls() {
     m_oldUrls.clear();
 }
 
-void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, const QSet<QUuid> &failedPeers) {
+void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, const QSet<QnUuid> &failedPeers) {
     m_currentTask = 0;
     revertApiUrls();
 
@@ -167,7 +167,7 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
         return;
     }
 
-    foreach (const QUuid &id, m_targets - failedPeers) {
+    foreach (const QnUuid &id, m_targets - failedPeers) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
@@ -175,7 +175,7 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
         if (!isCompatible(server->getVersion(), qnCommon->engineVersion()))
             m_updateTargets.insert(server->getId());
         else
-            m_waitTargets.insert(server->getId(), QUuid(server->getProperty(lit("guid"))));
+            m_waitTargets.insert(server->getId(), QnUuid(server->getProperty(lit("guid"))));
     }
 
     waitPeers();

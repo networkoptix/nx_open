@@ -12,7 +12,7 @@ class QnServerCamera: public QnVirtualCameraResource {
     Q_OBJECT
 
 public:
-    QnServerCamera(const QUuid& resourceTypeId);
+    QnServerCamera(const QnUuid& resourceTypeId);
 
     virtual bool isResourceAccessible() override;
     virtual bool updateMACAddress() override;

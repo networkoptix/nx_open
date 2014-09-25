@@ -1,7 +1,7 @@
 #ifndef QN_SERIALIZATION_LEXICAL_FUNCTIONS_H
 #define QN_SERIALIZATION_LEXICAL_FUNCTIONS_H
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QUrl>
 #include <QtGui/QColor>
 
@@ -135,6 +135,6 @@ bool deserialize(const QString &value, T *target, typename std::enable_if<QnLexi
 }
 
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((bool)(QUuid)(QUrl)(QColor), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((bool)(QnUuid)(QUrl)(QColor), (lexical))
 
 #endif // QN_SERIALIZATION_LEXICAL_FUNCTIONS_H

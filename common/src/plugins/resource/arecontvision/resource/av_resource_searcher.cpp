@@ -157,7 +157,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 
 }
 
-QnResourcePtr QnPlArecontResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlArecontResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -238,7 +238,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
         return QList<QnResourcePtr>();
 
 
-    QUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), model);
+    QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), model);
     if (rt.isNull())
         return QList<QnResourcePtr>();
 

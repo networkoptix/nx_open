@@ -1,7 +1,7 @@
 #ifndef QN_MANUAL_CAMERA_ADDITION_REST_HANDLER_H
 #define QN_MANUAL_CAMERA_ADDITION_REST_HANDLER_H
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QHostInfo>
@@ -30,21 +30,21 @@ private:
      * @param searchProcessUuid             Uuid of the process.
      * @return                              Status of the process.
      */
-    QnManualCameraSearchProcessStatus getSearchStatus(const QUuid &searchProcessUuid);
+    QnManualCameraSearchProcessStatus getSearchStatus(const QnUuid &searchProcessUuid);
 
     /**
      * @brief isSearchActive                Check if there is running manual camera search process with the uuid provided.
      * @param searchProcessUuid             Uuid of the process.
      * @return                              True if process is running, false otherwise.
      */
-    bool isSearchActive(const QUuid &searchProcessUuid);
+    bool isSearchActive(const QnUuid &searchProcessUuid);
 
 private:
     /** Mutex that is used to synchronize access to manual camera addition progress. */
     QMutex m_searchProcessMutex;
 
-    QHash<QUuid, QnManualCameraSearcher*> m_searchProcesses;
-    QHash<QUuid, QnConcurrent::QnFuture<bool> > m_searchProcessRuns;
+    QHash<QnUuid, QnManualCameraSearcher*> m_searchProcesses;
+    QHash<QnUuid, QnConcurrent::QnFuture<bool> > m_searchProcessRuns;
 };
 
 #endif // QN_MANUAL_CAMERA_ADDITION_REST_HANDLER_H

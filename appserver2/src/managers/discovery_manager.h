@@ -22,13 +22,13 @@ namespace ec2 {
 
     protected:
         virtual int discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler) override;
-        virtual int addDiscoveryInformation(const QUuid &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) override;
-        virtual int removeDiscoveryInformation(const QUuid &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) override;
+        virtual int addDiscoveryInformation(const QnUuid &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) override;
+        virtual int removeDiscoveryInformation(const QnUuid &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
 
-        QnTransaction<ApiDiscoveryDataList> prepareTransaction(ApiCommand::Value command, const QUuid &id, const QList<QUrl> &urls, bool ignore) const;
+        QnTransaction<ApiDiscoveryDataList> prepareTransaction(ApiCommand::Value command, const QnUuid &id, const QList<QUrl> &urls, bool ignore) const;
         QnTransaction<ApiDiscoverPeerData> prepareTransaction(const QUrl &url) const;
     };
 

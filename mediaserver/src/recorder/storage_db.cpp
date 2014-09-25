@@ -368,10 +368,10 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
     int guidFieldIdx = queryInfo.indexOf("guid");
     int tagNameFieldIdx = queryInfo.indexOf("tagName");
 
-    QUuid prevGuid;
+    QnUuid prevGuid;
 
     while (query.next()) {
-        QUuid guid = QUuid::fromRfc4122(query.value(guidFieldIdx).toByteArray());
+        QnUuid guid = QnUuid::fromRfc4122(query.value(guidFieldIdx).toByteArray());
         if (guid != prevGuid) {
             prevGuid = guid;
             result.push_back(QnCameraBookmark());

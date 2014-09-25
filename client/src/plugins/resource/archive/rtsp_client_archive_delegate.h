@@ -1,7 +1,7 @@
 #ifndef __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 #define __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 
-
+#include <utils/common/uuid.h>
 #include <utils/network/rtpsession.h>
 #include <utils/network/ffmpeg_rtp_parser.h>
 
@@ -116,7 +116,7 @@ private:
     struct {
         QString username;
         QString password;
-        QUuid videowall;
+        QnUuid videowall;
     } m_auth;
 };
 

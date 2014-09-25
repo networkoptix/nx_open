@@ -3,7 +3,7 @@
 #include <cstring> /* For std::strstr. */
 
 #include <QtCore/QSharedPointer>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QtGui/QImage>
@@ -294,7 +294,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 // -------------------------------------------------------------------------- //
 // QnMediaServerConnection
 // -------------------------------------------------------------------------- //
-QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, const QUuid &videowallGuid, QObject *parent):
+QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, const QnUuid &videowallGuid, QObject *parent):
     base_type(parent, mserver),
     m_proxyPort(0)
 {
@@ -426,13 +426,13 @@ int QnMediaServerConnection::searchCameraAsyncStart(const QString &startAddr, co
     return sendAsyncGetRequest(CameraSearchStartObject, params, QN_STRINGIZE_TYPE(QnManualCameraSearchReply), target, slot);
 }
 
-int QnMediaServerConnection::searchCameraAsyncStatus(const QUuid &processUuid, QObject *target, const char *slot) {
+int QnMediaServerConnection::searchCameraAsyncStatus(const QnUuid &processUuid, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("uuid", processUuid.toString());
     return sendAsyncGetRequest(CameraSearchStatusObject, params, QN_STRINGIZE_TYPE(QnManualCameraSearchReply), target, slot);
 }
 
-int QnMediaServerConnection::searchCameraAsyncStop(const QUuid &processUuid, QObject *target, const char *slot) {
+int QnMediaServerConnection::searchCameraAsyncStop(const QnUuid &processUuid, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("uuid", processUuid.toString());
     return sendAsyncGetRequest(CameraSearchStopObject, params, QN_STRINGIZE_TYPE(QnManualCameraSearchReply), target, slot);
@@ -450,7 +450,7 @@ int QnMediaServerConnection::addCameraAsync(const QStringList &urls, const QStri
     return sendAsyncGetRequest(CameraAddObject, params, NULL, target, slot);
 }
 
-int QnMediaServerConnection::ptzContinuousMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
+int QnMediaServerConnection::ptzContinuousMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QnUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("command",         QnLexical::serialized(Qn::ContinuousMovePtzCommand));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
@@ -472,7 +472,7 @@ int QnMediaServerConnection::ptzContinuousFocusAsync(const QnNetworkResourcePtr 
     return sendAsyncGetRequest(PtzContinuousFocusObject, params, NULL, target, slot);
 }
 
-int QnMediaServerConnection::ptzAbsoluteMoveAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
+int QnMediaServerConnection::ptzAbsoluteMoveAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed, const QnUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("command",         QnLexical::serialized(space == Qn::DevicePtzCoordinateSpace ? Qn::AbsoluteDeviceMovePtzCommand : Qn::AbsoluteLogicalMovePtzCommand));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
@@ -486,7 +486,7 @@ int QnMediaServerConnection::ptzAbsoluteMoveAsync(const QnNetworkResourcePtr &ca
     return sendAsyncGetRequest(PtzAbsoluteMoveObject, params, NULL, target, slot);
 }
 
-int QnMediaServerConnection::ptzViewportMoveAsync(const QnNetworkResourcePtr &camera, qreal aspectRatio, const QRectF &viewport, qreal speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
+int QnMediaServerConnection::ptzViewportMoveAsync(const QnNetworkResourcePtr &camera, qreal aspectRatio, const QRectF &viewport, qreal speed, const QnUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("command",         QnLexical::serialized(Qn::ViewportMovePtzCommand));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
@@ -666,7 +666,7 @@ int QnMediaServerConnection::testEmailSettingsAsync(const QnEmail::Settings &set
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
-    const QUuid& cameraID, CameraDiagnostics::Step::Value previousStep,
+    const QnUuid& cameraID, CameraDiagnostics::Step::Value previousStep,
     QObject* target, const char* slot )
 {
     QnRequestParamList params;
@@ -705,7 +705,7 @@ int QnMediaServerConnection::getEventLogAsync(
                   QnResourceList camList,
                   QnBusiness::EventType eventType,
                   QnBusiness::ActionType actionType,
-                  QUuid businessRuleId,
+                  QnUuid businessRuleId,
                   QObject *target, const char *slot)
 {
     QnRequestParamList params;

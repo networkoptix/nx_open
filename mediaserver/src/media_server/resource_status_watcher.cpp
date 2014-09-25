@@ -37,7 +37,7 @@ void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr &res
     QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatus(resource->getId(), resource->getStatus(), this, &QnResourceStatusWatcher::requestFinished2);
 }
 
-void QnResourceStatusWatcher::requestFinished2(int /*reqID*/, ec2::ErrorCode errCode, const QUuid& id)
+void QnResourceStatusWatcher::requestFinished2(int /*reqID*/, ec2::ErrorCode errCode, const QnUuid& id)
 {
     if (errCode != ec2::ErrorCode::ok)
         qCritical() << "Failed to update resource status" << id.toString();

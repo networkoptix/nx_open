@@ -5,7 +5,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QRect>
 #include <QtCore/QScopedPointer>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QVariant>
 
 #include <client/client_globals.h>
@@ -21,7 +21,7 @@ class QnLayoutItemData;
 class QnWorkbenchItem : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString resourceUid READ resourceUid);
-    Q_PROPERTY(QUuid uuid READ uuid);
+    Q_PROPERTY(QnUuid uuid READ uuid);
     Q_PROPERTY(qreal rotation READ rotation WRITE setRotation);
 
 public:
@@ -32,7 +32,7 @@ public:
      * \param uuid                      Universally unique identifier of this item.
      * \param parent                    Parent of this object.
      */
-    QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, QObject *parent = NULL);
+    QnWorkbenchItem(const QString &resourceUid, const QnUuid &uuid, QObject *parent = NULL);
 
     /**
      * Constructor.
@@ -85,7 +85,7 @@ public:
     /**
      * \returns                         Universally unique identifier of this item. 
      */
-    const QUuid &uuid() const {
+    const QnUuid &uuid() const {
         return m_uuid;
     }
 
@@ -320,7 +320,7 @@ private:
     QString m_resourceUid;
 
     /** Universal unique identifier of this item. */
-    QUuid m_uuid;
+    QnUuid m_uuid;
 
     /** Grid-relative geometry of an item, in grid cells. */
     QRect m_geometry;

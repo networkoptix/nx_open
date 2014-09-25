@@ -274,7 +274,7 @@ int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType license
     return result;
 }
 
-void QnVideoWallLicenseUsageHelper::propose(const QnVideoWallResourcePtr &videowall, const QUuid &pcUuid, int itemsCount) {
+void QnVideoWallLicenseUsageHelper::propose(const QnVideoWallResourcePtr &videowall, const QnUuid &pcUuid, int itemsCount) {
     int used = 0;
     if (!pcUuid.isNull()) {
         foreach(const QnVideoWallItem &item, videowall->items()->getItems()) {

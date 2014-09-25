@@ -12,7 +12,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QThreadPool>
 
 #include <QtNetwork/QUdpSocket>
@@ -528,7 +528,7 @@ QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Conn
 
     while (servers.isEmpty() && !needToStop())
     {
-        ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->getServersSync(QUuid(), &servers);
+        ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->getServersSync(QnUuid(), &servers);
         if( rez == ec2::ErrorCode::ok )
             break;
 
@@ -720,14 +720,14 @@ void initAppServerConnection(QSettings &settings)
         QByteArray prefix("SK_");
         if (!authKey.startsWith(prefix))
         {
-            QByteArray authKeyBin = QUuid(authKey).toRfc4122();
+            QByteArray authKeyBin = QnUuid(authKey).toRfc4122();
             QByteArray authKeyEncoded = QnAuthHelper::symmetricalEncode(authKeyBin).toHex();
             settings.setValue(lit("authKey"), prefix + authKeyEncoded); // encode and update in settings
         }
         else {
             QByteArray authKeyEncoded = QByteArray::fromHex(authKey.mid(prefix.length()));
             QByteArray authKeyDecoded = QnAuthHelper::symmetricalEncode(authKeyEncoded);
-            authKey = QUuid::fromRfc4122(authKeyDecoded).toByteArray();
+            authKey = QnUuid::fromRfc4122(authKeyDecoded).toByteArray();
         }
 
         userName = serverGuid().toString();
@@ -853,7 +853,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
     {
         //reading servers list
         QnMediaServerResourceList mediaServerList;
-        while( ec2Connection->getMediaServerManager()->getServersSync(QUuid(), &mediaServerList) != ec2::ErrorCode::ok )
+        while( ec2Connection->getMediaServerManager()->getServersSync(QnUuid(), &mediaServerList) != ec2::ErrorCode::ok )
         {
             NX_LOG( lit("QnMain::run(). Can't get servers."), cl_logERROR );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -868,7 +868,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
     {
         // read camera list
         QnVirtualCameraResourceList cameras;
-        while ((rez = ec2Connection->getCameraManager()->getCamerasSync(QUuid(), &cameras)) != ec2::ErrorCode::ok)
+        while ((rez = ec2Connection->getCameraManager()->getCamerasSync(QnUuid(), &cameras)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get cameras. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1298,7 +1298,7 @@ void QnMain::run()
         QnSleep::msleep(3000);
     }
     connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &QnMain::at_restartServerRequired);
-    qnCommon->setRemoteGUID(QUuid(connectInfo.ecsGuid));
+    qnCommon->setRemoteGUID(QnUuid(connectInfo.ecsGuid));
     MSSettings::roSettings()->sync();
     if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
@@ -1483,7 +1483,7 @@ void QnMain::run()
             isModified = true;
         }
         if (needUpdateAuthKey) {
-            server->setAuthKey(QUuid::createUuid().toString());
+            server->setAuthKey(QnUuid::createUuid().toString());
             isModified = true;
         }
 
@@ -1527,7 +1527,7 @@ void QnMain::run()
         if (usedPathList.contains(path))
             continue;
         QnStorageResourcePtr newStorage = QnStorageResourcePtr(new QnFileStorageResource());
-        newStorage->setId(QUuid::createUuid());
+        newStorage->setId(QnUuid::createUuid());
         newStorage->setUrl(path);
         newStorage->setSpaceLimit( settings->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
         newStorage->setUsedForWriting(false);
@@ -1568,9 +1568,9 @@ void QnMain::run()
         ec2ConnectionFactory->setCompatibilityMode(true);
     }
     if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
-        QList<QUuid> allowedPeers;
+        QList<QnUuid> allowedPeers;
         foreach (const QString &peer, cmdLineArguments.allowedDiscoveryPeers.split(";")) {
-            QUuid peerId(peer);
+            QnUuid peerId(peer);
             if (!peerId.isNull())
                 allowedPeers << peerId;
         }
@@ -1901,7 +1901,7 @@ protected:
 
         updateGuidIfNeeded();
 
-        QUuid guid = serverGuid();
+        QnUuid guid = serverGuid();
         if (guid.isNull())
         {
             qDebug() << "Can't save guid. Run once as administrator.";
@@ -1928,17 +1928,17 @@ protected:
     }
 
 private:
-    QUuid hardwareIdToUuid(const QByteArray& hardwareId) {
+    QnUuid hardwareIdToUuid(const QByteArray& hardwareId) {
         if (hardwareId.length() != 34)
-            return QUuid();
+            return QnUuid();
 
         QString hwid(hardwareId);
         QString uuidForm = QString("%1-%2-%3-%4-%5").arg(hwid.mid(2, 8)).arg(hwid.mid(10, 4)).arg(hwid.mid(14, 4)).arg(hwid.mid(18, 4)).arg(hwid.mid(22, 12));
-        return QUuid(uuidForm);
+        return QnUuid(uuidForm);
     }
 
     QString hardwareIdAsGuid() {
-        const QString& hwID = hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
+        QString hwID = hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
         std::cout << "Got hwID \"" << hwID.toStdString() << "\"" << std::endl;
         return hwID;
     }
@@ -1982,7 +1982,7 @@ private:
             }
         }
 
-        QUuid obsoleteGuid = QUuid(MSSettings::roSettings()->value(OBSOLETE_SERVER_GUID).toString());
+        QnUuid obsoleteGuid = QnUuid(MSSettings::roSettings()->value(OBSOLETE_SERVER_GUID).toString());
         if (!obsoleteGuid.isNull()) {
             qnCommon->setObsoleteServerGuid(obsoleteGuid);
         }
