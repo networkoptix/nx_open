@@ -412,7 +412,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>JSON with error code and error string.
+                        <caption>JSON with error code, error string and module information in case of successfull ping.
                             Error string could be
                             empty in case of successful ping,
                             "FAIL" if the specified system is unrechable or there is no any system,
@@ -870,8 +870,8 @@
                     </result>
                 </function>
                 <function>
-                    <name>joinSystem</name>
-                    <description>Join the system.</description>
+                    <name>mergeSystems</name>
+                    <description>Merge two systems.</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -885,6 +885,21 @@
                             <description>Admin password of the target system.</description>
                             <optional>false</optional>
                             <values/>
+                        </param>
+                        <param>
+                            <name>takeRemoteSettings</name>
+                            <description>Sime kind of merge direction.</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>true</name>
+                                    <description>The current system will get system name and admin password of the target system.</description>
+                                </value>
+                                <value>
+                                    <name>false</name>
+                                    <description>The target system will get system name and admin password of the current system.</description>
+                                </value>
+                            </values>
                         </param>
                     </params>
                     <result>
