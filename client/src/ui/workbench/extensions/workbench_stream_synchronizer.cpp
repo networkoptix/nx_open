@@ -24,6 +24,7 @@
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 
 #include <utils/common/model_functions.h>
+#include <ui/workbench/workbench_item.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStreamSynchronizationState, (json), (started)(time)(speed))
 
@@ -132,8 +133,11 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
     
     QnClientVideoCamera *camera = mediaWidget->display()->camera();
     m_syncPlay->addArchiveReader(mediaWidget->display()->archiveReader(), camera->getCamDisplay());
-    camera->setExternalTimeSource(m_syncPlay);
-    camera->getCamDisplay()->setExternalTimeSource(m_syncPlay); // TODO: #Elric two setExternalTimeSource calls, WTF?
+
+    if (!widget->item()->isPinned()) {
+        camera->setExternalTimeSource(m_syncPlay);
+        camera->getCamDisplay()->setExternalTimeSource(m_syncPlay); // TODO: #Elric two setExternalTimeSource calls, WTF?
+    }
 
     m_counter->increment();
     connect(mediaWidget->display()->archiveReader(), SIGNAL(destroyed()), m_counter, SLOT(decrement()));
