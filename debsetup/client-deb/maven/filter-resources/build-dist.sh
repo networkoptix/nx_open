@@ -83,6 +83,9 @@ cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/imageformats
 cp -r $CLIENT_VOX_PATH $BINSTAGE
 cp -r $CLIENT_PLATFORMS_PATH $BINSTAGE
 
+#'libstdc++.so.6 is needed on some machines
+cp /usr/lib/*-linux-gnu/libstdc++.so.6* $LIBSTAGE
+
 find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
 find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
 

@@ -117,10 +117,12 @@ void QnModuleFinderHelper::at_resourceChanged(const QnResourcePtr &resource) {
     }
 
     if (m_directModuleFinder) {
-        foreach (const QHostAddress &address, oldAddresses - commonAddresses)
+        QnHostAddressSet addressesToRemove = (newPort == oldPort) ? oldAddresses - commonAddresses : oldAddresses;
+        foreach (const QHostAddress &address, addressesToRemove)
             m_directModuleFinder->removeUrl(QnNetworkAddress(address, oldPort).toUrl(), serverId);
 
-        foreach (const QHostAddress &address, newAddresses - commonAddresses)
+        QnHostAddressSet addressesToAdd = (newPort == oldPort) ? newAddresses - commonAddresses : newAddresses;
+        foreach (const QHostAddress &address, addressesToAdd)
             m_directModuleFinder->addUrl(QnNetworkAddress(address, newPort).toUrl(), serverId);
 
         if (oldPort != newPort) {

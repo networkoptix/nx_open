@@ -115,6 +115,7 @@
 #include <rest/handlers/configure_rest_handler.h>
 #include <rest/handlers/merge_systems_rest_handler.h>
 #include <rest/handlers/backup_db_rest_handler.h>
+#include <rest/handlers/discovered_peers_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 
 #include <streaming/hls/hls_server.h>
@@ -215,6 +216,13 @@ public:
 
     CmdLineArguments()
     :
+        logLevel(
+#ifdef _DEBUG
+            lit("DEBUG")
+#else
+            lit("WARNING")
+#endif
+        ),
         msgLogLevel( lit("none") )
     {
     }
@@ -586,7 +594,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 void initLog(const QString& _logLevel) 
 {
     QString logLevel = _logLevel;
-    const QString& configLogLevel = MSSettings::roSettings()->value( "log-level").toString();
+    const QString& configLogLevel = MSSettings::roSettings()->value("log-level").toString();
     if (!configLogLevel.isEmpty())
         logLevel = configLogLevel;
 
@@ -603,7 +611,7 @@ void initLog(const QString& _logLevel)
             logFileName,
             MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
             MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
-            cl_logDEBUG1))
+            QnLog::logLevelFromString(logLevel)))
         NX_LOG(lit("Could not create log file") + logFileName, cl_logALWAYS);
     MSSettings::roSettings()->setValue("logFile", logFileName);
     NX_LOG(QLatin1String("================================================================================="), cl_logALWAYS);
@@ -1092,6 +1100,7 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
 #ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #endif
