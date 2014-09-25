@@ -117,7 +117,18 @@ namespace nx_http
         void setUserAgent( const QString& userAgent );
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
-        void setResponseReadTimeoutMs( int _responseReadTimeoutMs );
+        /*!
+            \param responseReadTimeoutMs 0 means infinity
+            By default, 3000 ms.
+            If timeout has been met, connection is closed, state set to \a failed and \a AsyncHttpClient::done emitted
+        */
+        void setResponseReadTimeoutMs( unsigned int responseReadTimeoutMs );
+        /*!
+            \param messageBodyReadTimeoutMs 0 means infinity
+            By default there is no timeout.
+            If timeout has been met, connection is closed, state set to \a failed and \a AsyncHttpClient::done emitted
+        */
+        void setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs );
         /*!
             By default \a true.
             \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
@@ -128,6 +139,7 @@ namespace nx_http
 
         void addRequestHeader(const StringType& key, const StringType& value);
         void setAuthType(AuthType value);
+
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
         //!Emitted when response headers has been read
@@ -166,7 +178,8 @@ namespace nx_http
         mutable QMutex m_mutex;
         quint64 m_totalBytesRead;
         bool m_contentEncodingUsed;
-        int m_responseReadTimeoutMs;
+        unsigned int m_responseReadTimeoutMs;
+        unsigned int m_msgBodyReadTimeoutMs;
         AuthType m_authType;
 
         void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode );
