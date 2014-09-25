@@ -96,7 +96,7 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
 
 
 def main(app_path, bindir, libdir, helpdir):
-    qlibdir = libdir
+    qlibdir = os.path.dirname(libdir)
 
     appdir = os.path.basename(app_path)
     app, _ = os.path.splitext(appdir)
