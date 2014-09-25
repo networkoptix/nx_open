@@ -722,6 +722,13 @@
                     <params/>
                     <result/>
                 </function>
+                <function>
+                    <name>discoveredPeers</name>
+                    <description>Returns a list of the discovered peers.</description>
+                    <method>GET</method>
+                    <params/>
+                    <result>JSON with a list of the discovered peers</result>
+                </function>
             </functions>
         </group>
         <group>
