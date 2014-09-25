@@ -62,6 +62,7 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
         if (errorCode == NotFoundError) {
             if (m_serverByRequestHandle.isEmpty())
                 emit systemFound(QnModuleInformation(), QnMediaServerResourcePtr(), NotFoundError);
+            return;
         }
 
         m_serverByRequestHandle.clear();
