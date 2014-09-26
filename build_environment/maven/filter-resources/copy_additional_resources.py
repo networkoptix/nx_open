@@ -137,7 +137,7 @@ if __name__ == '__main__':
                 if qtlib != '': 
                     for file in os.listdir(lib_source_dir):            
                         for config in ('debug', 'release'):
-                            if fnmatch.fnmatch(file, 'libQt5%s.so.*' % qtlib):
+                            if fnmatch.fnmatch(file, 'libQt5%s.so.*' % qtlib) or fnmatch.fnmatch(file, 'libicu*.so*'):
                                 print (join(lib_source_dir, file))
                                 srcname = join(lib_source_dir, file)
                                 dstname = join(lib_target_dir, config, file)
