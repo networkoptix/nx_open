@@ -49,23 +49,31 @@ void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &con
 
 void QnGlobalModuleFinder::fillApiModuleData(const QnModuleInformation &moduleInformation, ec2::ApiModuleData *data) {
     data->type = moduleInformation.type;
+    data->customization = moduleInformation.customization;
     data->id = moduleInformation.id;
     data->systemName = moduleInformation.systemName;
     data->version = moduleInformation.version.toString();
     data->systemInformation = moduleInformation.systemInformation.toString();
     data->addresses = moduleInformation.remoteAddresses.toList();
     data->port = moduleInformation.port;
+    data->name = moduleInformation.name;
+    data->authHash = moduleInformation.authHash;
+    data->sslAllowed = moduleInformation.sslAllowed;
     data->isAlive = true;
 }
 
 void QnGlobalModuleFinder::fillFromApiModuleData(const ec2::ApiModuleData &data, QnModuleInformation *moduleInformation) {
     moduleInformation->type = data.type;
+    moduleInformation->customization = data.customization;
     moduleInformation->id = data.id;
     moduleInformation->systemName = data.systemName;
     moduleInformation->version = QnSoftwareVersion(data.version);
     moduleInformation->systemInformation = QnSystemInformation(data.systemInformation);
     moduleInformation->remoteAddresses = QSet<QString>::fromList(data.addresses);
     moduleInformation->port = data.port;
+    moduleInformation->name = data.name;
+    moduleInformation->authHash = data.authHash;
+    moduleInformation->sslAllowed = data.sslAllowed;
 }
 
 QList<QnModuleInformation> QnGlobalModuleFinder::foundModules() const {

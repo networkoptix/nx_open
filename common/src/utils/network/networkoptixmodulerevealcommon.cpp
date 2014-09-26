@@ -53,6 +53,7 @@ RevealResponse::RevealResponse(const QnModuleInformation &moduleInformation) {
 QnModuleInformation RevealResponse::toModuleInformation() const {
     QnModuleInformation moduleInformation;
     moduleInformation.type = type;
+    moduleInformation.customization = customization;
     moduleInformation.version = QnSoftwareVersion(version);
     moduleInformation.systemInformation = QnSystemInformation(systemInformation);
     moduleInformation.systemName = name;
