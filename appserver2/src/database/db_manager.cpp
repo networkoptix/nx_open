@@ -776,13 +776,8 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         if (!execSQLFile(lit(":/01_createdb.sql"), m_sdb))
             return false;
 
-        //#ifdef EDGE_SERVER
-        //        if (!execSQLFile(lit(":/02_insert_3thparty_vendor.sql")))
-        //            return false;
-        //#else
         if (!execSQLFile(lit(":/02_insert_all_vendors.sql"), m_sdb))
             return false;
-        //#endif
     }
 
     if (!isObjectExists(lit("table"), lit("transaction_log"), m_sdb))

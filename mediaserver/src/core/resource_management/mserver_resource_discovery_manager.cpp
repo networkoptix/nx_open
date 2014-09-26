@@ -71,19 +71,22 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCam
     if (!camera)
         return false;
 
-#ifdef EDGE_SERVER
-    // return own camera back for edge server
-    char  mac[MAC_ADDR_LEN];
-    char* host = 0;
-    getMacFromPrimaryIF(mac, &host);
-    return (camera->getUniqueId().toLocal8Bit() == QByteArray(mac));
-#endif
-
     QnUuid ownGuid = qnCommon->moduleGUID();
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(ownGuid).dynamicCast<QnMediaServerResource>();
     if (!mServer || !ownServer)
         return false;
+
+#ifdef EDGE_SERVER
+    if (!ownServer->isRedundancy()) 
+    {
+        // return own camera back for edge server
+        char  mac[MAC_ADDR_LEN];
+        char* host = 0;
+        getMacFromPrimaryIF(mac, &host);
+        return (camera->getUniqueId().toLocal8Bit() == QByteArray(mac));
+    }
+#endif
     if (mServer->getServerFlags() & Qn::SF_Edge)
         return false; // do not transfer cameras from edge server
 

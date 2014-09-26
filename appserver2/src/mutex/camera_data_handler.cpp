@@ -4,6 +4,7 @@
 
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/camera_resource.h"
+#include "core/resource/media_server_resource.h"
 
 #include "common/common_module.h"
 
@@ -21,12 +22,16 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
     char* host = 0;
     getMacFromPrimaryIF(mac, &host);
 
-    if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX)) {
-        QString cameraName = name.mid(CAM_INS_PREFIX.length());
-        if (cameraName.toLocal8Bit() == QByteArray(mac))
-            return qnCommon->moduleGUID().toRfc4122(); // block edge camera discovered from other PC
-        else
-            return QByteArray();
+    if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX)) 
+    {
+        QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+        if (ownServer && !ownServer->isRedundancy()) {
+            QString cameraName = name.mid(CAM_INS_PREFIX.length());
+            if (cameraName.toLocal8Bit() == QByteArray(mac))
+                return qnCommon->moduleGUID().toRfc4122(); // block edge camera discovered from other PC
+            else
+                return QByteArray();
+        }
     }
 #endif
 
