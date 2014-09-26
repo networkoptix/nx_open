@@ -9,6 +9,7 @@
 #include <utils/common/log.h>
 #include <utils/network/http/asynchttpclient.h>
 #include <utils/network/http/async_http_client_reply.h>
+#include <utils/network/networkoptixmodulerevealcommon.h>
 #include <rest/server/json_rest_result.h>
 #include <common/common_module.h>
 
@@ -190,6 +191,9 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
         QJson::deserialize(result.reply(), &moduleInformation);
 
         if (moduleInformation.id.isNull())
+            return;
+
+        if (moduleInformation.type != nxMediaServerId)
             return;
 
         if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())

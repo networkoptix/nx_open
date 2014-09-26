@@ -90,7 +90,7 @@
             "keys": [
                 "ACTI|KCM3311","ACTI|KCM7211","ACTI|KCM5611","ACTI|KCM5311","Sony|SNC-EM600","Sony|SNC-CX600","Sony|SNC-DH120T",
                 "Sony|SNC-XM636",
-                "DW|DWC-MB421TIR",
+                "DW|DWC-MB421TIR","WIN4NET|Clebo-BL20",
 		        "VISTA|VK2-1080VRDIR3V9F",
 		        "VISTA|VK2-1080VFD3V9F",
 		        "VISTA|VK2-1080BIR3V9F",
@@ -144,15 +144,6 @@
             ],
             "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
         },
-		{
-            "keys": [
-                "DW|DWC-MPTZ20X","WIN4NET|Clebo-PD20","WIN4NET|Clebo-PM20SV2",
-				"DW|DWC-MPTZ20XFM","WIN4NET|Clebo-MPTZ20XFM",
-				"DW|DWC-MPTZ5X","WIN4NET|Clebo-MPTZ5X",
-				"DW|DWC-MPTZ5XFM","WIN4NET|Clebo-MPTZ5XFM"
-            ],
-            "ptzCapabilities": "ContinuousZoomCapability"
-        },
         {
             "keys": [
                 "AXIS|AXISM7016Group1", "AXIS|AXISM7016Group2", "AXIS|AXISM7016Group3", "AXIS|AXISM7016Group4"
@@ -188,7 +179,11 @@
         },
         {
             "keys": [
-                "DW|DWC-MPTZ20X|unknown_beta"
+                "DW|DWC-MPTZ20X|unknown_beta",
+				"WIN4NET|Clebo-PD20",
+				"WIN4NET|Clebo-PM20SV2",
+				"DW|DWC-MPTZ20XFM",
+				"WIN4NET|Clebo-MPTZ20XFM"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -214,7 +209,9 @@
         },
         {
             "keys": [
-                "DW|DWC-MPTZ5X|2.1.0.3", "DW|DWC-MPTZ5X"
+                "DW|DWC-MPTZ5X|2.1.0.3", "DW|DWC-MPTZ5X" ,
+				"WIN4NET|Clebo-MPTZ5X",
+				"DW|DWC-MPTZ5XFM","WIN4NET|Clebo-MPTZ5XFM"
             ],
             "ptzMapper": {
                 "fromCamera": {

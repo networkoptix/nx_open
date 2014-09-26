@@ -99,16 +99,6 @@
                                                 <include>buildenv</include>
                                             </includes>
                                         </fileset>   
-                                        <fileset>
-                                            <directory>${project.build.directory}/x86/python</directory>
-                                            <followSymlinks>false</followSymlinks>
-                                            <useDefaultExcludes>true</useDefaultExcludes>
-                                        </fileset>
-                                        <fileset>
-                                            <directory>${project.build.directory}/x64/python</directory>
-                                            <followSymlinks>false</followSymlinks>
-                                            <useDefaultExcludes>true</useDefaultExcludes>
-                                        </fileset>                                
                                     </filesets>
                                     <skip>${clean-skip}</skip>							
                                 </configuration>
@@ -151,7 +141,6 @@
                                             <arg line="up -C"/> 
                                         </exec>                                
                                         <chmod file="${environment.dir}/${buildenv.script}" perm="755"/>    
-                                        <chmod file="${libdir}/virtualenv.sh" perm="755"/>    
                                         <exec dir="${environment.dir}" executable="${environment.dir}/${buildenv.script}" failifexecutionfails="true">
                                             <arg line="${arch} ${toolchain.version} noqt4 noqt5"/> 
                                         </exec>
@@ -166,7 +155,7 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>1.1.1</version>
                         <executions>        
-                            <execution>
+                            <!-- <execution>
                                 <id>virtualenv-win</id>
                                 <phase>generate-sources</phase>
                                 <goals>
@@ -190,7 +179,7 @@
                                     <workingDirectory>${project.build.directory}</workingDirectory>     
                                     <skip>${windows}</skip>
                                 </configuration>
-                            </execution>                      
+                            </execution>                      -->
                             <execution>
                                 <id>copy-additional-resources</id>
                                 <phase>process-sources</phase>
@@ -198,7 +187,7 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>${python.dir}/python</executable>
+                                    <executable>${init.python.dir}/python</executable>
                                     <arguments>
                                         <argument>copy_additional_resources.py</argument>
                                     </arguments>
