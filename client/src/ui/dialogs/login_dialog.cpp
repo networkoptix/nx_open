@@ -147,6 +147,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     });
 
     connect(QnModuleFinder::instance(), &QnModuleFinder::moduleChanged, this, &QnLoginDialog::at_moduleFinder_moduleChanged);
+    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleLost,    this, &QnLoginDialog::at_moduleFinder_moduleLost);
 
     foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules())
         at_moduleFinder_moduleChanged(moduleInformation);
@@ -498,23 +499,36 @@ void QnLoginDialog::at_deleteButton_clicked() {
 }
 
 void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
-    m_foundEcs.remove(moduleInformation.id);
-
     QnEcData data;
     data.id = moduleInformation.id;
     data.version = moduleInformation.version.toString();
     data.systemName = moduleInformation.systemName;
 
-    QUrl url;
-    url.setScheme(lit("http"));
-    url.setPort(moduleInformation.port);
+    /* prefer localhost */
+    QHostAddress address(QHostAddress::LocalHost);
+    if (!moduleInformation.remoteAddresses.contains(address.toString()))
+        address = *moduleInformation.remoteAddresses.begin();
 
-    foreach (const QString &address, moduleInformation.remoteAddresses) {
-        data.url = url;
-        data.url.setHost(address);
+    data.url.setScheme(lit("http"));
+    data.url.setHost(address.toString());
+    data.url.setPort(moduleInformation.port);
 
-        m_foundEcs.insert(moduleInformation.id, data);
+    QnEcData &oldData = m_foundEcs[moduleInformation.id];
+    if (!oldData.id.isNull()) {
+        if (!address.isLoopback() && moduleInformation.remoteAddresses.contains(oldData.url.host()))
+            data.url.setHost(oldData.url.host());
+
+        if (oldData != data) {
+            oldData = data;
+            resetAutoFoundConnectionsModel();
+        }
+    } else {
+        oldData = data;
+        resetAutoFoundConnectionsModel();
     }
+}
 
-    resetAutoFoundConnectionsModel();
+void QnLoginDialog::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
+    if (m_foundEcs.remove(moduleInformation.id))
+        resetAutoFoundConnectionsModel();
 }
