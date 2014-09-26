@@ -120,7 +120,7 @@ void QnPlAxisResource::stopInputPortMonitoring()
 bool QnPlAxisResource::isInputPortMonitored() const
 {
     QMutexLocker lk( &m_inputPortMutex );
-    return m_inputPortHttpMonitor;
+    return m_inputPortHttpMonitor.get() != nullptr;
 }
 
 bool QnPlAxisResource::isInitialized() const
