@@ -12,7 +12,7 @@
 #include "mutex/camera_data_handler.h"
 #include "mutex/distributed_mutex_manager.h"
 
-QnAppserverResourceProcessor::QnAppserverResourceProcessor(QUuid serverId)
+QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnUuid serverId)
     : m_serverId(serverId)
 {
     m_cameraDataHandler = new ec2::QnMutexCameraDataHandler();

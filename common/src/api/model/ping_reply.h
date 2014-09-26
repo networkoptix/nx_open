@@ -6,7 +6,7 @@
 #ifndef NX_PING_RESPONSE_H
 #define NX_PING_RESPONSE_H
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <utils/common/model_functions_fwd.h>
 
@@ -15,7 +15,7 @@
 class QnPingReply
 {
 public:
-    QUuid moduleGuid;
+    QnUuid moduleGuid;
 };
 
 #define QnPingReply_Fields (moduleGuid)

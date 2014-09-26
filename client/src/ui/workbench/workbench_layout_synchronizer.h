@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QMetaType>
 #include <QtCore/QSet>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <utils/common/connective.h>
 
@@ -128,7 +128,7 @@ private:
      *
      * It is needed to prevent races when two concurrent changes to the same
      * item are synchronized there-and-back many times until finally converging. */
-    QSet<QUuid> m_pendingItems;
+    QSet<QnUuid> m_pendingItems;
 };
 
 Q_DECLARE_METATYPE(QnWorkbenchLayoutSynchronizer *);

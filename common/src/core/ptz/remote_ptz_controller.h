@@ -1,7 +1,7 @@
 #ifndef QN_REMOTE_PTZ_CONTROLLER_H
 #define QN_REMOTE_PTZ_CONTROLLER_H
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QAtomicInt>
 
 #include "abstract_ptz_controller.h"
@@ -64,7 +64,7 @@ private:
 
     QnNetworkResourcePtr m_resource;
     QnMediaServerResourcePtr m_server;
-    QUuid m_sequenceId;
+    QnUuid m_sequenceId;
     QAtomicInt m_sequenceNumber;
 
     QMutex m_mutex;

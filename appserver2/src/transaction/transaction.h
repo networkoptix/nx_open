@@ -166,13 +166,13 @@ namespace ec2
             PersistentInfo(): sequence(0), timestamp(0) {}
             bool isNull() const { return dbID.isNull(); }
 
-            QUuid dbID;
+            QnUuid dbID;
             qint32 sequence;
             qint64 timestamp;
 
 #ifndef QN_NO_QT
             friend uint qHash(const ec2::QnAbstractTransaction::PersistentInfo &id) {
-                return ::qHash(id.dbID.toRfc4122().append((const char*)&id.timestamp, sizeof(id.timestamp)), id.sequence);
+                return ::qHash(QByteArray(id.dbID.toRfc4122()).append((const char*)&id.timestamp, sizeof(id.timestamp)), id.sequence);
             }
 #endif
 
@@ -182,7 +182,7 @@ namespace ec2
         };
 
         ApiCommand::Value command;
-        QUuid peerID;
+        QnUuid peerID;
         PersistentInfo persistentInfo;
         
         bool isLocal; // do not propagate transactions to other server peers

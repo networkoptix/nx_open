@@ -47,8 +47,8 @@ private:
     QByteArray m_passwordDigest;
     int m_error;
 
-    QHash<int, QUuid> m_pendingPeers;
-    QSet<QUuid> m_failedPeers;
+    QHash<int, QnUuid> m_pendingPeers;
+    QSet<QnUuid> m_failedPeers;
 };
 
 #endif // CONFIGURE_PEER_TASK_H

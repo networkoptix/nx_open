@@ -6,7 +6,7 @@
 #include "api/app_server_connection.h"
 
 
-QnServerCamera::QnServerCamera(const QUuid& resourceTypeId): QnVirtualCameraResource()
+QnServerCamera::QnServerCamera(const QnUuid& resourceTypeId): QnVirtualCameraResource()
 {
     setTypeId(resourceTypeId);
     addFlags(Qn::server_live_cam);

@@ -1,7 +1,7 @@
 #ifndef QN_USER_RESOURCE_H
 #define QN_USER_RESOURCE_H
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>

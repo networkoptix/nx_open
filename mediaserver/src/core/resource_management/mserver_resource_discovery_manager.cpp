@@ -41,7 +41,7 @@ QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
     stop();
 }
 
-QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QUuid &resourceTypeId, const QnResourceParams &params)
+QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QnUuid &resourceTypeId, const QnResourceParams &params)
 {
     QnResourcePtr res = QnResourceDiscoveryManager::createResource( resourceTypeId, params );
     if( res )
@@ -79,7 +79,7 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCam
     return (camera->getUniqueId().toLocal8Bit() == QByteArray(mac));
 #endif
 
-    QUuid ownGuid = qnCommon->moduleGUID();
+    QnUuid ownGuid = qnCommon->moduleGUID();
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(ownGuid).dynamicCast<QnMediaServerResource>();
     if (!mServer || !ownServer)
@@ -167,7 +167,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             if (existCamRes)
             {
                 if (isForeign) {
-                    QUuid newTypeId = newNetRes->getTypeId();
+                    QnUuid newTypeId = newNetRes->getTypeId();
                     bool updateTypeId = existCamRes->getTypeId() != newNetRes->getTypeId() && !newNetRes->isAbstractResource();
                     newNetRes->update(existCamRes);
                     newNetRes->setParentId(qnCommon->moduleGUID());
@@ -197,7 +197,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             if (existCamRes)
             {
                 if (existCamRes->getTypeId() != newNetRes->getTypeId() && !newNetRes->isAbstractResource()) {
-                    QUuid newTypeId = newNetRes->getTypeId();
+                    QnUuid newTypeId = newNetRes->getTypeId();
                     newNetRes->update(existCamRes);
                     newNetRes->setParentId(qnCommon->moduleGUID());
                     newNetRes->setFlags(existCamRes->flags() & ~Qn::foreigner);

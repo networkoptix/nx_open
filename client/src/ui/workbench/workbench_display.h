@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtOpenGL/QGLWidget>
 
 #include <utils/common/connective.h>
@@ -188,7 +188,7 @@ public:
 
     QnResourceWidget *widget(Qn::ItemRole role) const;
 
-    QnResourceWidget *widget(const QUuid &uuid) const;
+    QnResourceWidget *widget(const QnUuid &uuid) const;
 
     QList<QnResourceWidget *> widgets(const QnResourcePtr &resource) const;
 

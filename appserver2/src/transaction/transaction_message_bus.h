@@ -70,21 +70,21 @@ namespace ec2
         }
 
         template <class T>
-        void sendTransaction(const QnTransaction<T>& tran, const QUuid& dstPeerId)
+        void sendTransaction(const QnTransaction<T>& tran, const QnUuid& dstPeerId)
         {
             dstPeerId.isNull() ? sendTransaction(tran) : sendTransaction(tran, QnPeerSet() << dstPeerId);
         }
 
         struct AlivePeerInfo
         {
-            AlivePeerInfo(): peer(QUuid(), QUuid(), Qn::PT_Server), directAccess(false) { lastActivity.restart(); }
+            AlivePeerInfo(): peer(QnUuid(), QnUuid(), Qn::PT_Server), directAccess(false) { lastActivity.restart(); }
             AlivePeerInfo(const ApiPeerData &peer): peer(peer), directAccess(false) { lastActivity.restart(); }
             ApiPeerData peer;
-            QSet<QUuid> proxyVia;
+            QSet<QnUuid> proxyVia;
             QElapsedTimer lastActivity;
             bool directAccess;
         };
-        typedef QMap<QUuid, AlivePeerInfo> AlivePeersMap;
+        typedef QMap<QnUuid, AlivePeerInfo> AlivePeersMap;
 
         /*
         * Return all alive peers
@@ -108,16 +108,16 @@ namespace ec2
         void gotLockResponse(ApiLockData);
 
         void transactionProcessed(const QnAbstractTransaction &transaction);
-        void remotePeerUnauthorized(const QUuid& id);
+        void remotePeerUnauthorized(const QnUuid& id);
     private:
         friend class QnTransactionTransport;
         friend struct GotTransactionFuction;
         friend struct SendTransactionToTransportFuction;
 
-        bool isExists(const QUuid& removeGuid) const;
-        bool isConnecting(const QUuid& removeGuid) const;
+        bool isExists(const QnUuid& removeGuid) const;
+        bool isConnecting(const QnUuid& removeGuid) const;
 
-        typedef QMap<QUuid, QnTransactionTransportPtr> QnConnectionMap;
+        typedef QMap<QnUuid, QnTransactionTransportPtr> QnConnectionMap;
 
     private:
         template<class T>
@@ -182,8 +182,8 @@ namespace ec2
 
         void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState);
 
-        void addAlivePeerInfo(ApiPeerData peerData, const QUuid& gotFromPeer = QUuid());
-        void removeAlivePeer(const QUuid& id, bool sendTran, bool isRecursive = false);
+        void addAlivePeerInfo(ApiPeerData peerData, const QnUuid& gotFromPeer = QnUuid());
+        void removeAlivePeer(const QnUuid& id, bool sendTran, bool isRecursive = false);
         bool sendInitialData(QnTransactionTransport* transport);
         void printTranState(const QnTranState& tranState);
         template <class T> void proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader);
@@ -195,7 +195,7 @@ namespace ec2
         void at_gotTransaction(const QByteArray &serializedTran, const QnTransactionTransportHeader &transportHeader);
         void doPeriodicTasks();
         bool checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport);
-        void at_peerIdDiscovered(const QUrl& url, const QUuid& id);
+        void at_peerIdDiscovered(const QUrl& url, const QnUuid& id);
         void at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
     private:
         /** Info about us. Should be set before start(). */
@@ -208,7 +208,7 @@ namespace ec2
         struct RemoteUrlConnectInfo {
             RemoteUrlConnectInfo()  { lastConnectedTime.invalidate(); }
             QElapsedTimer lastConnectedTime;
-            QUuid discoveredPeer;
+            QnUuid discoveredPeer;
             QElapsedTimer discoveredTimeout;
         };
 
@@ -222,7 +222,7 @@ namespace ec2
         AlivePeersMap m_alivePeers;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
 
-        QMap<QUuid, int> m_lastTransportSeq;
+        QMap<QnUuid, int> m_lastTransportSeq;
 
         // alive control
         QElapsedTimer m_aliveSendTimer;

@@ -24,7 +24,7 @@ static const int DEFAULT_READ_BUFFER_SIZE = 4 * 1024;
 static const int SOCKET_TIMEOUT = 1000 * 1000;
 static const int TCP_KEEPALIVE_TIMEOUT = 1000 * 5;
 
-QSet<QUuid> QnTransactionTransport::m_existConn;
+QSet<QnUuid> QnTransactionTransport::m_existConn;
 QnTransactionTransport::ConnectingInfoMap QnTransactionTransport::m_connectingConn;
 QMutex QnTransactionTransport::m_staticMutex;
 
@@ -237,7 +237,7 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     }
 }
 
-bool QnTransactionTransport::tryAcquireConnecting(const QUuid& remoteGuid, bool isOriginator)
+bool QnTransactionTransport::tryAcquireConnecting(const QnUuid& remoteGuid, bool isOriginator)
 {
     QMutexLocker lock(&m_staticMutex);
 
@@ -257,13 +257,13 @@ bool QnTransactionTransport::tryAcquireConnecting(const QUuid& remoteGuid, bool 
 }
 
 
-void QnTransactionTransport::connectingCanceled(const QUuid& remoteGuid, bool isOriginator)
+void QnTransactionTransport::connectingCanceled(const QnUuid& remoteGuid, bool isOriginator)
 {
     QMutexLocker lock(&m_staticMutex);
     connectingCanceledNoLock(remoteGuid, isOriginator);
 }
 
-void QnTransactionTransport::connectingCanceledNoLock(const QUuid& remoteGuid, bool isOriginator)
+void QnTransactionTransport::connectingCanceledNoLock(const QnUuid& remoteGuid, bool isOriginator)
 {
     ConnectingInfoMap::iterator itr = m_connectingConn.find(remoteGuid);
     if (itr != m_connectingConn.end()) {
@@ -276,7 +276,7 @@ void QnTransactionTransport::connectingCanceledNoLock(const QUuid& remoteGuid, b
     }
 }
 
-bool QnTransactionTransport::tryAcquireConnected(const QUuid& remoteGuid, bool isOriginator)
+bool QnTransactionTransport::tryAcquireConnected(const QnUuid& remoteGuid, bool isOriginator)
 {
     QMutexLocker lock(&m_staticMutex);
     bool isExist = m_existConn.contains(remoteGuid);
@@ -289,7 +289,7 @@ bool QnTransactionTransport::tryAcquireConnected(const QUuid& remoteGuid, bool i
     return !fail;    
 }
 
-void QnTransactionTransport::connectDone(const QUuid& id)
+void QnTransactionTransport::connectDone(const QnUuid& id)
 {
     QMutexLocker lock(&m_staticMutex);
     m_existConn.remove(id);
@@ -459,7 +459,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             QTimer::singleShot(0, this, SLOT(repeatDoGet()));
         }
         else {
-            QUuid guid(nx_http::getHeaderValue( client->response()->headers, "x-server-guid" ));
+            QnUuid guid(nx_http::getHeaderValue( client->response()->headers, "x-server-guid" ));
             if (!guid.isNull()) {
                 emit peerIdDiscovered(m_remoteAddr, guid);
                 emit remotePeerUnauthorized(guid);
@@ -479,9 +479,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         return;
     }
 
-    m_remotePeer.id = QUuid(itrGuid->second);
+    m_remotePeer.id = QnUuid(itrGuid->second);
     if (itrRuntimeGuid != client->response()->headers.end())
-        m_remotePeer.instanceId = QUuid(itrRuntimeGuid->second);
+        m_remotePeer.instanceId = QnUuid(itrRuntimeGuid->second);
     Q_ASSERT(!m_remotePeer.instanceId.isNull());
     m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server peers only
     emit peerIdDiscovered(m_remoteAddr, m_remotePeer.id);

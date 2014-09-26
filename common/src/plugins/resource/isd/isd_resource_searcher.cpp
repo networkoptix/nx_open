@@ -12,7 +12,7 @@ QnPlISDResourceSearcher::QnPlISDResourceSearcher()
 {
 }
 
-QnResourcePtr QnPlISDResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlISDResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -114,7 +114,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
 
 
 
-    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (rt.isNull()) {
         rt = qnResTypePool->getResourceTypeId(manufacture(), lit("ISDcam"));
         if (rt.isNull())
@@ -217,7 +217,7 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
 
-    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (rt.isNull())
     {
         rt = qnResTypePool->getResourceTypeId(manufacture(), lit("ISDcam"));

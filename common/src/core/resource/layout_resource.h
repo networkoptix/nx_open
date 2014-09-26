@@ -2,7 +2,7 @@
 #define QN_LAYOUT_RESOURCE_H
 
 #include <QtCore/QRectF>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <recording/time_period.h>
 
@@ -25,15 +25,15 @@ public:
 
     QnLayoutItemDataMap getItems() const;
 
-    QnLayoutItemData getItem(const QUuid &itemUuid) const;
+    QnLayoutItemData getItem(const QnUuid &itemUuid) const;
 
     void addItem(const QnLayoutItemData &item);
 
     void removeItem(const QnLayoutItemData &item);
 
-    void removeItem(const QUuid &itemUuid);
+    void removeItem(const QnUuid &itemUuid);
 
-    void updateItem(const QUuid &itemUuid, const QnLayoutItemData &item);
+    void updateItem(const QnUuid &itemUuid, const QnLayoutItemData &item);
 
     qreal cellAspectRatio() const;
 
@@ -99,8 +99,8 @@ private:
     void setItemsUnderLock(const QnLayoutItemDataMap &items);
 
     void addItemUnderLock(const QnLayoutItemData &item);
-    void updateItemUnderLock(const QUuid &itemUuid, const QnLayoutItemData &item);
-    void removeItemUnderLock(const QUuid &itemUuid);
+    void updateItemUnderLock(const QnUuid &itemUuid, const QnLayoutItemData &item);
+    void removeItemUnderLock(const QnUuid &itemUuid);
 
 private:
     QnLayoutItemDataMap m_itemByUuid;

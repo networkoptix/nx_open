@@ -105,7 +105,7 @@ bool QnBookmarkCameraData::contains(const QnAbstractCameraDataPtr &other) const 
     if (!other_casted)
         return false;
 
-    QSet<QUuid> lookedUp;
+    QSet<QnUuid> lookedUp;
     foreach (const QnCameraBookmark &bookmark, other_casted->m_data)
         lookedUp.insert(bookmark.guid);
 

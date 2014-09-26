@@ -104,26 +104,26 @@ void QnAppServerConnectionFactory::setDefaultFactory(QnResourceFactory* resource
     }
 }
 
-QUuid QnAppServerConnectionFactory::videowallGuid() {
+QnUuid QnAppServerConnectionFactory::videowallGuid() {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
         return factory->m_videowallGuid;
-    return QUuid();
+    return QnUuid();
 }
 
-void QnAppServerConnectionFactory::setVideowallGuid(const QUuid &uuid)
+void QnAppServerConnectionFactory::setVideowallGuid(const QnUuid &uuid)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_videowallGuid = uuid;
     }
 }
 
-QUuid QnAppServerConnectionFactory::instanceGuid() {
+QnUuid QnAppServerConnectionFactory::instanceGuid() {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
         return factory->m_instanceGuid;
-    return QUuid();
+    return QnUuid();
 }
 
-void QnAppServerConnectionFactory::setInstanceGuid(const QUuid &uuid)
+void QnAppServerConnectionFactory::setInstanceGuid(const QnUuid &uuid)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_instanceGuid = uuid;

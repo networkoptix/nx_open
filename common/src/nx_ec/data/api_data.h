@@ -11,7 +11,7 @@ namespace ec2 {
     #define ApiData_Fields ()
 
     struct ApiIdData: ApiData {
-        QUuid id;
+        QnUuid id;
     };
 #define ApiIdData_Fields (id)
 
@@ -30,8 +30,8 @@ struct ApiDatabaseDumpData: public ApiData {
 struct ApiSyncMarkerRecord: public ApiData
 {
     ApiSyncMarkerRecord(): sequence(0) {}
-    QUuid peerID;
-    QUuid dbID;
+    QnUuid peerID;
+    QnUuid dbID;
     int sequence;
 };
 #define ApiSyncMarkerRecord_Fields (peerID)(dbID)(sequence)

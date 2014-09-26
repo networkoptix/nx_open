@@ -200,7 +200,7 @@ public:
         registerSerializer<QVector2D>();
         registerSerializer<QVector3D>();
         registerSerializer<QVector4D>();
-        registerSerializer<QUuid>();
+        registerSerializer<QnUuid>();
         registerSerializer<QUrl>();
         registerSerializer<QFont>();
 

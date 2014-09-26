@@ -3,14 +3,14 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QMutex>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include "recording/time_period.h"
 #include "resource_fwd.h"
 
 struct QnCameraHistoryItem
 {
-    QnCameraHistoryItem(const QString& cameraUniqueId, qint64 timestamp, const QUuid& mediaServerGuid)
+    QnCameraHistoryItem(const QString& cameraUniqueId, qint64 timestamp, const QnUuid& mediaServerGuid)
         : cameraUniqueId(cameraUniqueId),
           timestamp(timestamp),
           mediaServerGuid(mediaServerGuid)
@@ -19,22 +19,22 @@ struct QnCameraHistoryItem
 
     QString cameraUniqueId;
     qint64 timestamp;
-    QUuid mediaServerGuid;
+    QnUuid mediaServerGuid;
 };
 typedef QSharedPointer<QnCameraHistoryItem> QnCameraHistoryItemPtr;
 
 /*
 struct QnCameraTimePeriod
 {
-    QnCameraTimePeriod(qint64 startTimeMs, qint64 durationMs, const QUuid& mediaServerGuid):
+    QnCameraTimePeriod(qint64 startTimeMs, qint64 durationMs, const QnUuid& mediaServerGuid):
                        QnTimePeriod(startTimeMs, durationMs),
                        mediaServerGuid(mediaServerGuid) {}
-    QUuid mediaServerGuid;
+    QnUuid mediaServerGuid;
 };
 */
 
 //typedef QMap<qint64, QnCameraTimePeriod> QnCameraTimePeriodList;
-typedef QMap<qint64, QUuid> QnServerHistoryMap; // key: timestamp, value: server ID
+typedef QMap<qint64, QnUuid> QnServerHistoryMap; // key: timestamp, value: server ID
 
 class QnCameraHistory
 {
@@ -58,12 +58,12 @@ public:
      */
     QnMediaServerResourceList getOnlineCameraServers(const QnTimePeriod& timePeriod) const;
 
-    void addTimePeriod(qint64 timestamp, const QUuid& serverId);
+    void addTimePeriod(qint64 timestamp, const QnUuid& serverId);
     void removeTimePeriod(const qint64 timestamp);
     qint64 getMinTime() const;
 
     QnServerHistoryMap getOnlineTimePeriods() const;
-    void getItemsBefore(qint64 timestamp, const QUuid& serverId, QList<QnCameraHistoryItem>& result);
+    void getItemsBefore(qint64 timestamp, const QnUuid& serverId, QList<QnCameraHistoryItem>& result);
 private:
     QnServerHistoryMap::const_iterator getMediaServerOnTimeItr(const QnServerHistoryMap& timePeriods, qint64 timestamp) const;
     QnMediaServerResourcePtr getNextMediaServerFromTime(const QnServerHistoryMap& timePeriods, qint64 timestamp) const;
@@ -106,7 +106,7 @@ public:
     QnMediaServerResourcePtr getMediaServerOnTime(const QnNetworkResourcePtr &camera, qint64 timestamp, bool allowOfflineServers) const;
     qint64 getMinTime(const QnNetworkResourcePtr &camera);
 
-    //QList<QnCameraHistoryItem> getUnusedItems(const QMap<QString, qint64>& archiveMinTimes, const QUuid& serverId);
+    //QList<QnCameraHistoryItem> getUnusedItems(const QMap<QString, qint64>& archiveMinTimes, const QnUuid& serverId);
 private:
     QnMediaServerResourceList getCurrentServer(const QnNetworkResourcePtr &camera) const;
 private:

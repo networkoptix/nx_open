@@ -18,7 +18,7 @@ struct QnModuleInformation {
     QString name;
     quint16 port;
     QSet<QString> remoteAddresses;
-    QUuid id;
+    QnUuid id;
     bool sslAllowed;
     QByteArray authHash;
 

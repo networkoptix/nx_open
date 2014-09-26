@@ -12,7 +12,7 @@ QnServerInterfaceWatcher::QnServerInterfaceWatcher(QnRouter *router, QObject *pa
     connect(qnResPool,  &QnResourcePool::statusChanged, this,   &QnServerInterfaceWatcher::at_resourcePool_statusChanged);
 }
 
-void QnServerInterfaceWatcher::at_connectionChanged(const QUuid &discovererId, const QUuid &peerId) {
+void QnServerInterfaceWatcher::at_connectionChanged(const QnUuid &discovererId, const QnUuid &peerId) {
     Q_UNUSED(discovererId);
 
     QnRouter *router = QnRouter::instance();

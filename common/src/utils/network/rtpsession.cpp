@@ -7,7 +7,7 @@
 #include "rtp_stream_parser.h"
 
 #include <QtCore/QFile>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include "utils/common/log.h"
 #include "utils/common/util.h"
@@ -1154,7 +1154,7 @@ QByteArray RTPSession::getGuid()
 {
     QMutexLocker lock(&m_guidMutex);
     if (m_guid.isEmpty())
-        m_guid = QUuid::createUuid().toString().toUtf8();
+        m_guid = QnUuid::createUuid().toString().toUtf8();
     return m_guid;
 }
 

@@ -44,7 +44,7 @@ namespace ec2
         // in remote mode we are always working as a client
         ApiPeerData localPeer(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), Qn::PT_DesktopClient);
 
-        QUuid videowallGuid = QnAppServerConnectionFactory::videowallGuid();
+        QnUuid videowallGuid = QnAppServerConnectionFactory::videowallGuid();
         if (!videowallGuid.isNull())
             localPeer.peerType = Qn::PT_VideowallClient;
         

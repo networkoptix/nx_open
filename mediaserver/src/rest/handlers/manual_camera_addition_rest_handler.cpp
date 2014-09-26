@@ -62,7 +62,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(const QnRequestParams &
     if (addr2 == addr1)
         addr2.clear();
 
-    QUuid processUuid = QUuid::createUuid();
+    QnUuid processUuid = QnUuid::createUuid();
 
     QnManualCameraSearcher* searcher = new QnManualCameraSearcher();
     {
@@ -85,7 +85,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(const QnRequestParams &
 }
 
 int QnManualCameraAdditionRestHandler::searchStatusAction(const QnRequestParams &params, QnJsonRestResult &result) {
-    QUuid processUuid = QUuid(params.value("uuid"));
+    QnUuid processUuid = QnUuid(params.value("uuid"));
 
     if (processUuid.isNull())
         return CODE_INVALID_PARAMETER;
@@ -101,7 +101,7 @@ int QnManualCameraAdditionRestHandler::searchStatusAction(const QnRequestParams 
 
 
 int QnManualCameraAdditionRestHandler::searchStopAction(const QnRequestParams &params, QnJsonRestResult &result) {
-    QUuid processUuid = QUuid(params.value("uuid"));
+    QnUuid processUuid = QnUuid(params.value("uuid"));
 
     if (processUuid.isNull())
         return CODE_INVALID_PARAMETER;
@@ -184,7 +184,7 @@ int QnManualCameraAdditionRestHandler::executeGet(const QString &path, const QnR
         return CODE_NOT_FOUND;
 }
 
-QnManualCameraSearchProcessStatus QnManualCameraAdditionRestHandler::getSearchStatus(const QUuid &searchProcessUuid) {
+QnManualCameraSearchProcessStatus QnManualCameraAdditionRestHandler::getSearchStatus(const QnUuid &searchProcessUuid) {
     QMutexLocker lock(&m_searchProcessMutex);
 
     if (!m_searchProcesses.contains(searchProcessUuid))
@@ -193,7 +193,7 @@ QnManualCameraSearchProcessStatus QnManualCameraAdditionRestHandler::getSearchSt
     return m_searchProcesses[searchProcessUuid]->status();
 }
 
-bool QnManualCameraAdditionRestHandler::isSearchActive(const QUuid &searchProcessUuid) {
+bool QnManualCameraAdditionRestHandler::isSearchActive(const QnUuid &searchProcessUuid) {
     QMutexLocker lock(&m_searchProcessMutex);
     return m_searchProcesses.contains(searchProcessUuid);
 }

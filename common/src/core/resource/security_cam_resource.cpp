@@ -560,12 +560,12 @@ int QnSecurityCamResource::maxDays() const
     SAFE(return m_maxDays);
 }
 
-void QnSecurityCamResource::setPreferedServerId(const QUuid& value)
+void QnSecurityCamResource::setPreferedServerId(const QnUuid& value)
 {
     SAFE(m_preferedServerId = value)
 }
 
-QUuid QnSecurityCamResource::preferedServerId() const
+QnUuid QnSecurityCamResource::preferedServerId() const
 {
     SAFE(return m_preferedServerId);
 }

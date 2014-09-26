@@ -30,7 +30,7 @@ private slots:
     void at_remotePeerLost(ec2::ApiPeerAliveData data);
     void at_systemNameChangeRequested(const QString &systemName);
 private:
-    void updateServerTmpStatus(const QUuid& id, Qn::ResourceStatus status);
+    void updateServerTmpStatus(const QnUuid& id, Qn::ResourceStatus status);
     void checkForTmpStatus(const QnResourcePtr& resource);
 
 private:

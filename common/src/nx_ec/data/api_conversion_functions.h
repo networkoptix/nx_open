@@ -19,7 +19,7 @@ namespace ec2 {
     void fromApiToResource(const ApiBusinessActionData &src, QnAbstractBusinessActionPtr &dst, QnResourcePool *resourcePool);
 
     void fromResourceToApi(const QnScheduleTask &src, ApiScheduleTaskData &dst);
-    void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QUuid &resourceId);
+    void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QnUuid &resourceId);
 
     void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst);
     void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst);

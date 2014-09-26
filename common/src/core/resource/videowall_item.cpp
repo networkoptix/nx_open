@@ -14,7 +14,7 @@ QString QnVideoWallItem::mimeType() {
     return mimeTypeId;
 }
 
-void QnVideoWallItem::serializeUuids(const QList<QUuid> &uuids, QMimeData *mimeData) {
+void QnVideoWallItem::serializeUuids(const QList<QnUuid> &uuids, QMimeData *mimeData) {
     if (uuids.isEmpty())
         return;
 
@@ -25,8 +25,8 @@ void QnVideoWallItem::serializeUuids(const QList<QUuid> &uuids, QMimeData *mimeD
     mimeData->setData(mimeTypeId, result);
 }
 
-QList<QUuid> QnVideoWallItem::deserializeUuids(const QMimeData *mimeData) {
-    QList<QUuid> result;
+QList<QnUuid> QnVideoWallItem::deserializeUuids(const QMimeData *mimeData) {
+    QList<QnUuid> result;
     if (!mimeData->hasFormat(mimeTypeId))
         return result;
 

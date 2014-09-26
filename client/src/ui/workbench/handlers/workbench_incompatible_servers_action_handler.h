@@ -5,9 +5,12 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
+#include <utils/common/uuid.h>
+
 
 class QnConnectToCurrentSystemTool;
 class QnProgressDialog;
+class QnMergeSystemsDialog;
 
 class QnWorkbenchIncompatibleServersActionHandler : public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -21,18 +24,15 @@ protected slots:
     void at_mergeSystemsAction_triggered();
 
 private:
-    QnProgressDialog *progressDialog();
-
-    void connectToCurrentSystem(const QSet<QUuid> &targets);
+    void connectToCurrentSystem(const QSet<QnUuid> &targets);
 
 private slots:
     void at_connectTool_finished(int errorCode);
-    void at_connectToCurrentSystemTool_canceled();
-    void at_joinSystemTool_finished(int errorCode);
 
 private:
     QPointer<QnConnectToCurrentSystemTool> m_connectTool;
-    QPointer<QnProgressDialog> m_progressDialog;
+    QPointer<QnProgressDialog> m_connectProgressDialog;
+    QPointer<QnMergeSystemsDialog> m_mergeDialog;
 };
 
 #endif // WORKBENCH_INCOMPATIBLE_SERVERS_ACTION_HANDLER_H

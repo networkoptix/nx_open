@@ -38,7 +38,7 @@ public:
     virtual ~ThirdPartyResourceSearcher();
 
     //!Implementation of QnResourceFactory::createResource
-    virtual QnResourcePtr createResource( const QUuid &resourceTypeId, const QnResourceParams &params ) override;
+    virtual QnResourcePtr createResource( const QnUuid &resourceTypeId, const QnResourceParams &params ) override;
     // return the manufacture of the server
     virtual QString manufacture() const override;
     //!Implementation of QnAbstractNetworkResourceSearcher::checkHostAddr

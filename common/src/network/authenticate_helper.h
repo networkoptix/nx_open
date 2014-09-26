@@ -110,8 +110,8 @@ private:
     mutable QMutex m_mutex;
     static QnAuthHelper* m_instance;
     //QMap<QByteArray, QElapsedTimer> m_nonces;
-    QMap<QUuid, QnUserResourcePtr> m_users;
-    QMap<QUuid, QnMediaServerResourcePtr> m_servers;
+    QMap<QnUuid, QnUserResourcePtr> m_users;
+    QMap<QnUuid, QnMediaServerResourcePtr> m_servers;
     QnAuthMethodRestrictionList m_authMethodRestrictionList;
 
     QByteArray m_sessionKey;

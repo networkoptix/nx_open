@@ -64,7 +64,7 @@ QnPeerRuntimeInfo QnRuntimeInfoManager::localInfo() const {
     return m_items->getItem(qnCommon->moduleGUID());
 }
 
-QnPeerRuntimeInfo QnRuntimeInfoManager::item(const QUuid& id) const {
+QnPeerRuntimeInfo QnRuntimeInfoManager::item(const QnUuid& id) const {
     return m_items->getItem(id);
 }
 
@@ -74,7 +74,7 @@ QnPeerRuntimeInfo QnRuntimeInfoManager::remoteInfo() const {
     return m_items->getItem(qnCommon->remoteGUID());
 }
 
-bool QnRuntimeInfoManager::hasItem(const QUuid& id)
+bool QnRuntimeInfoManager::hasItem(const QnUuid& id)
 {
     return m_items->hasItem(id);
 }

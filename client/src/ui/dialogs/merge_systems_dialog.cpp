@@ -3,6 +3,7 @@
 
 #include <QtCore/QUrl>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QMessageBox>
 
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
@@ -33,6 +34,7 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     connect(m_mergeButton,              &QPushButton::clicked,              this,   &QnMergeSystemsDialog::at_mergeButton_clicked);
 
     connect(m_mergeTool,                &QnMergeSystemsTool::systemFound,   this,   &QnMergeSystemsDialog::at_mergeTool_systemFound);
+    connect(m_mergeTool,                &QnMergeSystemsTool::mergeFinished, this,   &QnMergeSystemsDialog::at_mergeTool_mergeFinished);
 
     updateKnownSystems();
     updateConfigurationBlock();
@@ -78,7 +80,6 @@ void QnMergeSystemsDialog::updateKnownSystems() {
 }
 
 void QnMergeSystemsDialog::updateErrorLabel(const QString &error) {
-//    ui->errorLabel->setVisible(!error.isEmpty());
     ui->errorLabel->setText(error);
 }
 
@@ -133,7 +134,7 @@ void QnMergeSystemsDialog::at_mergeButton_clicked() {
     ui->configurationWidget->setEnabled(false);
     m_mergeButton->setEnabled(false);
 
-    m_discoverer->apiConnection()->mergeSystemAsync(m_url, m_password, ownSettings, this, SLOT(at_mergeTool_mergeFinished(int)));
+    m_mergeTool->mergeSystem(m_discoverer, m_url, m_password, ownSettings);
     ui->buttonBox->showProgress(tr("merging systems..."));
 }
 
@@ -167,7 +168,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
     updateConfigurationBlock();
 }
 
-void QnMergeSystemsDialog::at_mergeTool_mergeFinished(int errorCode) {
+void QnMergeSystemsDialog::at_mergeTool_mergeFinished(int errorCode, const QnModuleInformation &moduleInformation) {
     ui->buttonBox->hideProgress();
     ui->credentialsGroupBox->setEnabled(true);
 
@@ -178,6 +179,30 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(int errorCode) {
         ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
         ui->stackedWidget->setCurrentIndex(1);
     } else {
+        QString message;
+
+        switch (errorCode) {
+        case QnMergeSystemsTool::AuthentificationError:
+            message = tr("The password is invalid.");
+            break;
+        case QnMergeSystemsTool::VersionError:
+            updateErrorLabel(tr("The found system %1 has an incompatible version %2.").arg(moduleInformation.systemName).arg(moduleInformation.version.toString()));
+            break;
+        case QnMergeSystemsTool::BackupError:
+            message = tr("Could not create a backup of the server database.");
+            break;
+        case QnMergeSystemsTool::NotFoundError:
+            message = tr("System was not found.");
+            break;
+        default:
+            break;
+        }
+
+        if (!message.isEmpty())
+            message.prepend(lit("\n"));
+
+        QMessageBox::critical(this, tr("Error"), tr("Cannot merge systems.") + message);
+
         updateConfigurationBlock();
     }
 }

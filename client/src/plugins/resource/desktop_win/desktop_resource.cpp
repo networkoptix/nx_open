@@ -8,7 +8,7 @@
 #include "plugins/resource/desktop_camera/desktop_camera_connection.h"
 
 namespace {
-    const QUuid desktopResourceUuid(lit("{B3B2235F-D279-4d28-9012-00DE1002A61D}"));
+    const QnUuid desktopResourceUuid(lit("{B3B2235F-D279-4d28-9012-00DE1002A61D}"));
 }
 
 //static QnDesktopResource* instance = 0;
@@ -122,7 +122,7 @@ QnConstResourceAudioLayoutPtr QnDesktopResource::getAudioLayout(const QnAbstract
     return m_desktopDataProvider->getAudioLayout();
 }
 
-QUuid QnDesktopResource::getDesktopResourceUuid() {
+QnUuid QnDesktopResource::getDesktopResourceUuid() {
     return desktopResourceUuid;
 }
 

@@ -3,6 +3,8 @@
 
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
+#include <utils/common/uuid.h>
+
 
 struct QnCheckForUpdateResult {
     enum Value {
@@ -99,21 +101,21 @@ typedef QSharedPointer<QnUpdateFileInformation> QnUpdateFileInformationPtr;
 
 struct QnUpdateTarget {
 
-    QnUpdateTarget(QSet<QUuid> targets, const QnSoftwareVersion &version, bool denyClientUpdates = false, bool denyMajorUpdates = false) :
+    QnUpdateTarget(QSet<QnUuid> targets, const QnSoftwareVersion &version, bool denyClientUpdates = false, bool denyMajorUpdates = false) :
         targets(targets),
         version(version),
         denyClientUpdates(denyClientUpdates),
         denyMajorUpdates(denyMajorUpdates)
     {}
 
-    QnUpdateTarget(QSet<QUuid> targets, const QString &fileName, bool denyClientUpdates = false, bool denyMajorUpdates = false) :
+    QnUpdateTarget(QSet<QnUuid> targets, const QString &fileName, bool denyClientUpdates = false, bool denyMajorUpdates = false) :
         targets(targets),
         fileName(fileName),
         denyClientUpdates(denyClientUpdates),
         denyMajorUpdates(denyMajorUpdates)
     {}
 
-    QSet<QUuid> targets;
+    QSet<QnUuid> targets;
     QnSoftwareVersion version;
     QString fileName;
     bool denyClientUpdates;

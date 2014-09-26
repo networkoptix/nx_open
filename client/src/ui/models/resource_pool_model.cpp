@@ -147,7 +147,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
     return *pos;
 }
 
-QnResourcePoolModelNode *QnResourcePoolModel::node(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource) {
+QnResourcePoolModelNode *QnResourcePoolModel::node(Qn::NodeType nodeType, const QnUuid &uuid, const QnResourcePtr &resource) {
     NodeKey key(resource, uuid);
     if (!m_nodes[nodeType].contains(key)) {
         QnResourcePoolModelNode* node = new QnResourcePoolModelNode(this, uuid, nodeType);
@@ -158,8 +158,8 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(Qn::NodeType nodeType, const 
     return m_nodes[nodeType][key];
 }
 
-QnResourcePoolModelNode *QnResourcePoolModel::node(const QUuid &uuid) {
-    QHash<QUuid, QnResourcePoolModelNode *>::iterator pos = m_itemNodeByUuid.find(uuid);
+QnResourcePoolModelNode *QnResourcePoolModel::node(const QnUuid &uuid) {
+    QHash<QnUuid, QnResourcePoolModelNode *>::iterator pos = m_itemNodeByUuid.find(uuid);
     if(pos == m_itemNodeByUuid.end()) {
         pos = m_itemNodeByUuid.insert(uuid, new QnResourcePoolModelNode(this, uuid));
         m_allNodes.append(*pos);
@@ -230,7 +230,7 @@ void QnResourcePoolModel::removeNode(QnResourcePoolModelNode *node) {
     deleteNode(node);
 }
 
-void QnResourcePoolModel::removeNode(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource) {
+void QnResourcePoolModel::removeNode(Qn::NodeType nodeType, const QnUuid &uuid, const QnResourcePtr &resource) {
     NodeKey key(resource, uuid);
     if (!m_nodes[nodeType].contains(key))
         return;
@@ -448,7 +448,7 @@ QMimeData *QnResourcePoolModel::mimeData(const QModelIndexList &indexes) const {
         }
 
         if (types.contains(QnVideoWallItem::mimeType())) {
-            QSet<QUuid> uuids;
+            QSet<QnUuid> uuids;
             foreach (const QModelIndex &index, indexes) {
                 QnResourcePoolModelNode *node = this->node(index);
 

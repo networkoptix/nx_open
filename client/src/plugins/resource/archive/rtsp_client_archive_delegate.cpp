@@ -130,7 +130,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualC
         return AV_NOPTS_VALUE;
     QnServerHistoryMap mediaServerList = history->getOnlineTimePeriods();
     QSet<QnMediaServerResourcePtr> checkServers;
-    foreach (const QUuid &serverId, mediaServerList.values()) 
+    foreach (const QnUuid &serverId, mediaServerList.values()) 
     {
         QnMediaServerResourcePtr otherMediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverId));
         if (!otherMediaServer || otherMediaServer == m_server)
