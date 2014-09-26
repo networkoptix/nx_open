@@ -406,6 +406,7 @@
 			</properties>
 			<modules>
 				<!--<module>plugins/xvbadecoder</module>-->
+                                <module>plugins/pacidal_dvbt_plugin</module>
 			</modules>            
 		</profile>  
 		<profile>
