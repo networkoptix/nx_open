@@ -299,11 +299,13 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
             resource->setCameraCapability( Qn::ShareIpCapability, true );
     }
 
+    /*
     if (!vendorIsRtsp) { //Bug #3276: Remove group element for generic rtsp/http links
         QString groupName = QString(lit("%1-%2")).arg(vendor).arg(resource->getHostAddress());
         resource->setGroupName(groupName);
         resource->setGroupId(groupName.toLower().trimmed());
     }
+    */
     return resource;
 }
 

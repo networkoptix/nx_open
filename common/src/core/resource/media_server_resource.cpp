@@ -411,9 +411,9 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     return moduleInformation;
 }
 
-bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
+bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
     if (QnMediaServerResource* server = dynamic_cast<QnMediaServerResource*>(resource.data())) 
-        return (server->getServerFlags() & Qn::SF_Edge);
+        return (server->getServerFlags() & Qn::SF_Edge) && !server->isRedundancy();
     return false;
 }
 

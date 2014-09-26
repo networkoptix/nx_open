@@ -305,13 +305,16 @@ void QnServerSettingsDialog::updateFromResources()
     setTableItems(QList<QnStorageSpaceData>());
     setBottomLabelText(tr("Loading..."));
 
-    bool edge = QnMediaServerResource::isEdgeServer(m_server);
+    //bool edge = QnMediaServerResource::isEdgeServer(m_server);
     ui->nameLineEdit->setText(m_server->getName());
-    ui->nameLineEdit->setEnabled(!edge);
+    //ui->nameLineEdit->setEnabled(!edge);
     ui->maxCamerasSpinBox->setValue(m_server->getMaxCameras());
     ui->failoverCheckBox->setChecked(m_server->isRedundancy());
-    ui->failoverCheckBox->setEnabled(!edge);
-    ui->maxCamerasWidget->setEnabled(!edge && m_server->isRedundancy());
+    //ui->failoverCheckBox->setEnabled(!edge);
+    ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());
+
+    int maxCameras = (m_server->getServerFlags() & Qn::SF_Edge) ? 1 : 128;
+    ui->maxCamerasSpinBox->setMaximum(maxCameras);
 
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
@@ -352,12 +355,9 @@ void QnServerSettingsDialog::submitToResources() {
         qnSettings->setServerStorageStates(serverStorageStates);
     }
 
-    bool edge = QnMediaServerResource::isEdgeServer(m_server);
-    if (!edge) {
-        m_server->setName(ui->nameLineEdit->text());
-        m_server->setMaxCameras(ui->maxCamerasSpinBox->value());
-        m_server->setRedundancy(ui->failoverCheckBox->isChecked());
-    }
+    m_server->setName(ui->nameLineEdit->text());
+    m_server->setMaxCameras(ui->maxCamerasSpinBox->value());
+    m_server->setRedundancy(ui->failoverCheckBox->isChecked());
 }
 
 void QnServerSettingsDialog::setBottomLabelText(const QString &text) {

@@ -325,7 +325,7 @@ bool QnResourcePoolModelNode::calculateBastard() const {
                 return true;
             
             /* Hide edge servers, camera will be displayed instead. */
-            if (QnMediaServerResource::isEdgeServer(m_resource))
+            if (QnMediaServerResource::isHiddenServer(m_resource))
                 return true;
         }
         return false;

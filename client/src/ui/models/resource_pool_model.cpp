@@ -138,7 +138,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
     QHash<QnResourcePtr, QnResourcePoolModelNode *>::iterator pos = m_resourceNodeByResource.find(resource);
     if(pos == m_resourceNodeByResource.end()) {
         Qn::NodeType nodeType = Qn::ResourceNode;
-        if (QnMediaServerResource::isEdgeServer(resource->getParentResource()))
+        if (QnMediaServerResource::isHiddenServer(resource->getParentResource()))
             nodeType = Qn::EdgeNode;
 
         pos = m_resourceNodeByResource.insert(resource, new QnResourcePoolModelNode(this, resource, nodeType));
