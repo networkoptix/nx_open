@@ -237,6 +237,9 @@ namespace aio
                         userData = nullptr;
                         break;
                     }
+
+                    default:
+                        assert( false );
                 }
                 if( task.taskCompletionEvent )
                     task.taskCompletionEvent->store( 1, std::memory_order_relaxed );
@@ -530,7 +533,7 @@ namespace aio
         SocketType* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler<SocketType>* const eventHandler,
-        unsigned int timeoutMs = 0 )
+        unsigned int timeoutMs )
     {
         //TODO #ak looks like copy-paste of previous method. Remove copy-paste!!!
 
