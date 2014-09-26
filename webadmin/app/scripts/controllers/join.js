@@ -14,7 +14,7 @@ angular.module('webadminApp')
         };
 
         mediaserver.discoveredPeers().success(function (r) {
-            var systems = _.map(r.reply.modules, function(module)
+            var systems = _.map(r.reply, function(module)
             {
                 return {
                     url: "http://" + module.remoteAddresses[0] + ":" + module.port,
