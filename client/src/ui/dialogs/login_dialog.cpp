@@ -498,9 +498,6 @@ void QnLoginDialog::at_deleteButton_clicked() {
 }
 
 void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
-    if (moduleInformation.type != nxMediaServerId)
-        return;
-
     m_foundEcs.remove(moduleInformation.id);
 
     QnEcData data;
