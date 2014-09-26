@@ -332,7 +332,7 @@ bool QnDbManager::init(
     }
 
     query.addBindValue( DB_INSTANCE_KEY );
-    if( query.exec() && query.next() )
+    if(!m_needResyncLog && query.exec() && query.next())
     {
         m_dbInstanceId = QnUuid::fromRfc4122( query.value( 0 ).toByteArray() );
     }
@@ -340,7 +340,7 @@ bool QnDbManager::init(
     {
         m_dbInstanceId = QnUuid::createUuid();
         QSqlQuery insQuery( m_sdb );
-        insQuery.prepare( "INSERT INTO misc_data (key, data) values (?,?)" );
+        insQuery.prepare( "INSERT OR REPLACE INTO misc_data (key, data) values (?,?)" );
         insQuery.addBindValue( DB_INSTANCE_KEY );
         insQuery.addBindValue( m_dbInstanceId.toRfc4122() );
         if( !insQuery.exec() )
@@ -382,7 +382,8 @@ bool QnDbManager::init(
         userResource->generateHash();
 
         QnTransaction<ApiUserData> userTransaction( ApiCommand::saveUser );
-        userTransaction.fillPersistentInfo();
+
+        transactionLog->fillPersistentInfo(userTransaction);
         fromResourceToApi( userResource, userTransaction.params );
         executeTransactionNoLock( userTransaction, QnUbjson::serialized( userTransaction ) );
     }
@@ -405,7 +406,7 @@ bool QnDbManager::init(
     while( queryCameras.next() )
     {
         QnTransaction<ApiSetResourceStatusData> tran( ApiCommand::setResourceStatus );
-        tran.fillPersistentInfo();
+        transactionLog->fillPersistentInfo(tran);
         tran.params.id = QnUuid::fromRfc4122(queryCameras.value(0).toByteArray());
         tran.params.status = Qn::Offline;
         executeTransactionNoLock( tran, QnUbjson::serialized( tran ) );
@@ -428,7 +429,7 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
     foreach(const ObjectType& object, objects)
     {
         QnTransaction<ObjectType> transaction(command);
-        transaction.fillPersistentInfo();
+        transactionLog->fillPersistentInfo(transaction);
         transaction.params = object;
         if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
             return false;
@@ -444,7 +445,7 @@ bool QnDbManager::addTransactionForGeneralSettings()
         return false;
 
     QnTransaction<ApiResourceParamsData> transaction(ApiCommand::setResourceParams);
-    transaction.fillPersistentInfo();
+    transactionLog->fillPersistentInfo(transaction);
     transaction.params = object;
     if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
         return false;

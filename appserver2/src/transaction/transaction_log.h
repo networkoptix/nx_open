@@ -56,8 +56,6 @@ namespace ec2
         ErrorCode getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result);
         QnTranState getTransactionsState();
         
-        template <class T>
-        ContainsReason contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.params)); }
         bool contains(const QnTranState& state) const;
 
         template <class T>
@@ -135,7 +133,6 @@ namespace ec2
         qint64 getTimeStamp();
         void init();
 
-        ContainsReason contains(const QnAbstractTransaction& tran, const QnUuid& hash) const;
         int getLatestSequence(const QnTranStateKey& key) const;
         QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray()) const;
         QnUuid makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) const;
@@ -199,7 +196,16 @@ namespace ec2
         QnUuid transactionHash(const ApiLicenseOverflowData& ) const            { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
 
         ErrorCode updateSequence(const ApiUpdateSequenceData& data);
+        void fillPersistentInfo(QnAbstractTransaction& tran);
     private:
+        friend class QnDbManager;
+
+        template <class T>
+        ContainsReason contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.params)); }
+        ContainsReason contains(const QnAbstractTransaction& tran, const QnUuid& hash) const;
+
+        int currentSequenceNoLock() const;
+
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QnUuid& hash, const QByteArray& data);
         ErrorCode updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence);
     private:
