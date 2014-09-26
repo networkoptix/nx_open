@@ -285,6 +285,8 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
             modifiedFields << "panicModeChanged";
         if (m_version != localOther->m_version)
             modifiedFields << "versionChanged";
+        if (m_redundancy != localOther->m_redundancy)
+            modifiedFields << "redundancyChanged";
 
         m_panicMode = localOther->m_panicMode;
 
