@@ -11,7 +11,7 @@ namespace ec2
             return false;
 
 #ifdef _DEBUG
-        foreach (const QUuid& peer, transportHeader.dstPeers)
+        foreach (const QnUuid& peer, transportHeader.dstPeers)
             assert(!peer.isNull());
 #endif
 

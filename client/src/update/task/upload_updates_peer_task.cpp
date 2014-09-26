@@ -32,7 +32,7 @@ void QnUploadUpdatesPeerTask::doStart() {
     m_peersBySystemInformation.clear();
     m_finishedPeers.clear();
 
-    foreach (const QUuid &id, peers()) {
+    foreach (const QnUuid &id, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
@@ -60,7 +60,7 @@ void QnUploadUpdatesPeerTask::uploadNextUpdate() {
 
     if (!m_uploader->uploadUpdate(m_updateId,
                                   m_fileBySystemInformation[systemInformation],
-                                  QSet<QUuid>::fromList(m_peersBySystemInformation.values(systemInformation))))
+                                  QSet<QnUuid>::fromList(m_peersBySystemInformation.values(systemInformation))))
     {
         finish(UploadError);
         return;
@@ -68,7 +68,7 @@ void QnUploadUpdatesPeerTask::uploadNextUpdate() {
 }
 
 void QnUploadUpdatesPeerTask::at_uploader_finished() {
-    foreach (const QUuid &id, m_uploader->peers()) {
+    foreach (const QnUuid &id, m_uploader->peers()) {
         emit peerFinished(id);
         m_finishedPeers.insert(id);
     }

@@ -6,7 +6,7 @@
 namespace ec2 {
 
     struct ApiConnectionData : ApiData {
-        QUuid peerId;
+        QnUuid peerId;
         QString host;
         int port;
 

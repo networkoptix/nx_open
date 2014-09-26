@@ -384,8 +384,8 @@ public:
         ResourceStatusRole,                         /**< Role for resource status. Value of type int (Qn::ResourceStatus). */
         ResourceUidRole,                            /**< Role for resource unique id. Value of type QString. */
 
-        VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QUuid. */
-        VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QUuid. */
+        VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QnUuid. */
+        VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QnUuid. */
         VideoWallItemIndicesRole,                   /**< Role for videowall item indices list. Value of type QnVideoWallItemIndexList. */
 
         /* Layout-based. */
@@ -396,10 +396,10 @@ public:
         LayoutSearchStateRole,                      /**< */
         LayoutTimeLabelsRole,                       /**< Role for layout's time label diplay. Value of type bool. */ 
         LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */ 
-        LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QUuid>. */
+        LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QnUuid>. */
 
         /* Item-based. */
-        ItemUuidRole,                               /**< Role for item's UUID. Value of type QUuid. */
+        ItemUuidRole,                               /**< Role for item's UUID. Value of type QnUuid. */
         ItemGeometryRole,                           /**< Role for item's integer geometry. Value of type QRect. */
         ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. Value of type QRectF. */
         ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */

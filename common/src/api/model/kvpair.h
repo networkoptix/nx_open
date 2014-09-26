@@ -7,6 +7,7 @@
 #include <QtCore/QMetaType>
 
 #include <api/api_fwd.h>
+#include <utils/common/uuid.h>
 
 class QnKvPair {
 public:

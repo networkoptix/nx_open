@@ -20,7 +20,7 @@ namespace ec2 {
         QnPeerSet processedPeers;
         QnPeerSet dstPeers;
         int sequence;
-        QUuid sender;
+        QnUuid sender;
     };
 #define QnTransactionTransportHeader_Fields (processedPeers)(dstPeers)(sequence)(sender)
 

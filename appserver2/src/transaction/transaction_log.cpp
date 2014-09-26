@@ -30,6 +30,10 @@ QnTransactionLog::QnTransactionLog(QnDbManager* db): m_dbManager(db)
 
 void QnTransactionLog::init()
 {
+    QSqlQuery delQuery(m_dbManager->getDB());
+    delQuery.prepare("DELETE FROM transaction_sequence WHERE not exists(select 1 from transaction_log tl where tl.peer_guid = transaction_sequence.peer_guid and tl.db_guid = transaction_sequence.db_guid)");
+    delQuery.exec();
+
     QSqlQuery query(m_dbManager->getDB());
     bool seqFound = false;
     query.prepare("SELECT peer_guid, db_guid, sequence FROM transaction_sequence");
@@ -37,7 +41,7 @@ void QnTransactionLog::init()
         while (query.next()) 
         {
             seqFound = true;
-            QnTranStateKey key(QUuid::fromRfc4122(query.value(0).toByteArray()), QUuid::fromRfc4122(query.value(1).toByteArray()));
+            QnTranStateKey key(QnUuid::fromRfc4122(query.value(0).toByteArray()), QnUuid::fromRfc4122(query.value(1).toByteArray()));
             m_state.values.insert(key, query.value(2).toInt());
         }
     }
@@ -49,8 +53,8 @@ void QnTransactionLog::init()
         if (query.exec()) {
             while (query.next()) 
             {
-                QUuid peerID = QUuid::fromRfc4122(query.value(0).toByteArray());
-                QUuid dbID = QUuid::fromRfc4122(query.value(1).toByteArray());
+                QnUuid peerID = QnUuid::fromRfc4122(query.value(0).toByteArray());
+                QnUuid dbID = QnUuid::fromRfc4122(query.value(1).toByteArray());
                 int sequence = query.value(2).toInt();
                 QnTranStateKey key(peerID, dbID);
                 updateSequenceNoLock(peerID, dbID, sequence);
@@ -62,10 +66,10 @@ void QnTransactionLog::init()
     query2.prepare("SELECT tran_guid, timestamp, peer_guid, db_guid FROM transaction_log"); 
     if (query2.exec()) {
         while (query2.next()) {
-            QUuid hash = QUuid::fromRfc4122(query2.value("tran_guid").toByteArray());
+            QnUuid hash = QnUuid::fromRfc4122(query2.value("tran_guid").toByteArray());
             qint64 timestamp = query2.value("timestamp").toLongLong();
-            QUuid peerID = QUuid::fromRfc4122(query2.value("peer_guid").toByteArray());
-            QUuid dbID = QUuid::fromRfc4122(query2.value("db_guid").toByteArray());
+            QnUuid peerID = QnUuid::fromRfc4122(query2.value("peer_guid").toByteArray());
+            QnUuid dbID = QnUuid::fromRfc4122(query2.value("db_guid").toByteArray());
             m_updateHistory.insert(hash, UpdateHistoryData(QnTranStateKey(peerID, dbID), timestamp));
         }     
     }
@@ -78,16 +82,6 @@ void QnTransactionLog::init()
     }
     m_lastTimestamp = m_currentTime;
     m_relativeTimer.start();
-
-    QSqlQuery querySequence(m_dbManager->getDB());
-    int startSequence = 1;
-    querySequence.prepare("SELECT sequence FROM transaction_sequence where peer_guid = ? and db_guid = ?");
-    querySequence.addBindValue(qnCommon->moduleGUID().toRfc4122());
-    querySequence.addBindValue(m_dbManager->getID().toRfc4122());
-    if (querySequence.exec() && querySequence.next())
-        startSequence = querySequence.value(0).toInt() + 1;
-    QnAbstractTransaction::setStartSequence(startSequence);
-
 }
 
 qint64 QnTransactionLog::getTimeStamp()
@@ -102,21 +96,27 @@ qint64 QnTransactionLog::getTimeStamp()
     return timestamp;
 }
 
+int QnTransactionLog::currentSequenceNoLock() const
+{
+    QnTranStateKey key (qnCommon->moduleGUID(), m_dbManager->getID());
+    return m_state.values.value(key);
+}
+
 QnTransactionLog* QnTransactionLog::instance()
 {
     return globalInstance;
 }
 
-QUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data2) const
+QnUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data2) const
 {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(data1);
     if (!data2.isEmpty())
         hash.addData(data2);
-    return QUuid::fromRfc4122(hash.result());
+    return QnUuid::fromRfc4122(hash.result());
 }
 
-QUuid QnTransactionLog::transactionHash(const ApiResourceParamsData& params) const
+QnUuid QnTransactionLog::transactionHash(const ApiResourceParamsData& params) const
 {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData("res_params");
@@ -126,25 +126,25 @@ QUuid QnTransactionLog::transactionHash(const ApiResourceParamsData& params) con
         if (param.predefinedParam)
             hash.addData("1");
     }
-    return QUuid::fromRfc4122(hash.result());
+    return QnUuid::fromRfc4122(hash.result());
 }
 
-QUuid QnTransactionLog::makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) const {
+QnUuid QnTransactionLog::makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) const {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(extraData.toUtf8());
     for(const ApiCameraBookmarkTagData tag: data)
         hash.addData(tag.name.toUtf8());
-    return QUuid::fromRfc4122(hash.result());
+    return QnUuid::fromRfc4122(hash.result());
 }
 
-QUuid QnTransactionLog::makeHash(const QString &extraData, const ApiDiscoveryDataList &data) const {
+QnUuid QnTransactionLog::makeHash(const QString &extraData, const ApiDiscoveryDataList &data) const {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(extraData.toUtf8());
     foreach (const ApiDiscoveryData &item, data) {
         hash.addData(item.url.toUtf8());
         hash.addData(item.id.toString().toUtf8());
     }
-    return QUuid::fromRfc4122(hash.result());
+    return QnUuid::fromRfc4122(hash.result());
 }
 
 ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
@@ -160,7 +160,7 @@ ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
     return ErrorCode::ok;
 }
 
-ErrorCode QnTransactionLog::updateSequenceNoLock(const QUuid& peerID, const QUuid& dbID, int sequence)
+ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence)
 {
     QnTranStateKey key(peerID, dbID);
     if (m_state.values[key] >= sequence)
@@ -181,7 +181,7 @@ ErrorCode QnTransactionLog::updateSequenceNoLock(const QUuid& peerID, const QUui
     return ErrorCode::ok;
 }
 
-ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QUuid& hash, const QByteArray& data)
+ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QnUuid& hash, const QByteArray& data)
 {
     if (tran.isLocal)
         return ErrorCode::ok; // local transactions just changes DB without logging
@@ -250,7 +250,7 @@ int QnTransactionLog::getLatestSequence(const QnTranStateKey& key) const
     return m_state.values.value(key);
 }
 
-QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& hash) const
+QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTransaction& tran, const QnUuid& hash) const
 {
 
     QnTranStateKey key (tran.peerID, tran.persistentInfo.dbID);
@@ -316,7 +316,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     QnTransaction<ApiUpdateSequenceData> syncMarkersTran(ApiCommand::updatePersistentSequence);
     while (query.next()) 
     {
-        QnTranStateKey key(QUuid::fromRfc4122(query.value(0).toByteArray()), QUuid::fromRfc4122(query.value(1).toByteArray()));
+        QnTranStateKey key(QnUuid::fromRfc4122(query.value(0).toByteArray()), QnUuid::fromRfc4122(query.value(1).toByteArray()));
         int latestSequence =  query.value(2).toInt();
         if (latestSequence > tranLogSequence[key]) {
             // add filler transaction with latest sequence
@@ -331,5 +331,16 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     
     return ErrorCode::ok;
 }
+
+void QnTransactionLog::fillPersistentInfo(QnAbstractTransaction& tran)
+{
+    if (tran.persistentInfo.isNull()) {
+        if (!tran.isLocal)
+            tran.persistentInfo.sequence = currentSequenceNoLock() + 1;
+        tran.persistentInfo.dbID = m_dbManager->getID();
+        tran.persistentInfo.timestamp = getTimeStamp();
+    }
+}
+
 
 } // namespace ec2

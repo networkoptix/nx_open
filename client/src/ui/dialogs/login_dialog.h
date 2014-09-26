@@ -69,8 +69,8 @@ private slots:
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
 
-    void at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
-    void at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation);
+    void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
 private:
     QUrl currentUrl() const;
@@ -90,7 +90,7 @@ private:
     QnRenderingWidget *m_renderingWidget;
 
     struct QnEcData {
-        QUuid id;
+        QnUuid id;
         QUrl url;
         QString version;
         QString systemName;
@@ -98,10 +98,13 @@ private:
         bool operator==(const QnEcData& other) const  {
             return id == other.id && url == other.url && version == other.version && systemName == other.systemName;
         }
+        bool operator!=(const QnEcData& other) const  {
+            return !(*this == other);
+        }
     };
 
     /** Hash list of automatically found Servers based on seed as key. */
-    QMap<QString, QnEcData> m_foundEcs;
+    QHash<QnUuid, QnEcData> m_foundEcs;
 };
 
 #endif // LOGINDIALOG_H

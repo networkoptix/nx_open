@@ -3,7 +3,7 @@
 
 #include "action_fwd.h"
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>

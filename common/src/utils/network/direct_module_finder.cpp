@@ -9,6 +9,7 @@
 #include <utils/common/log.h>
 #include <utils/network/http/asynchttpclient.h>
 #include <utils/network/http/async_http_client_reply.h>
+#include <utils/network/networkoptixmodulerevealcommon.h>
 #include <rest/server/json_rest_result.h>
 #include <common/common_module.h>
 
@@ -54,7 +55,7 @@ void QnDirectModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
 }
 
-void QnDirectModuleFinder::addUrl(const QUrl &url, const QUuid &id) {
+void QnDirectModuleFinder::addUrl(const QUrl &url, const QnUuid &id) {
     Q_ASSERT(id != qnCommon->moduleGUID());
 
     QUrl locUrl = trimmedUrl(url);
@@ -64,18 +65,18 @@ void QnDirectModuleFinder::addUrl(const QUrl &url, const QUuid &id) {
     }
 }
 
-void QnDirectModuleFinder::removeUrl(const QUrl &url, const QUuid &id) {
+void QnDirectModuleFinder::removeUrl(const QUrl &url, const QnUuid &id) {
     QUrl locUrl = trimmedUrl(url);
     if (m_urls.remove(locUrl, id)) {
         if (m_lastPingByUrl.take(locUrl) != 0) {
-            QUuid id = m_moduleByUrl.take(locUrl);
+            QnUuid id = m_moduleByUrl.take(locUrl);
             NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is removed.").arg(id.toString()).arg(locUrl.toString()), cl_logDEBUG1);
             emit moduleUrlLost(m_foundModules.value(id), locUrl);
         }
     }
 }
 
-void QnDirectModuleFinder::addIgnoredModule(const QUrl &url, const QUuid &id) {
+void QnDirectModuleFinder::addIgnoredModule(const QUrl &url, const QnUuid &id) {
     QUrl locUrl = trimmedUrl(url);
     if (!m_ignoredModules.contains(locUrl, id)) {
         m_ignoredModules.insert(locUrl, id);
@@ -89,7 +90,7 @@ void QnDirectModuleFinder::addIgnoredModule(const QUrl &url, const QUuid &id) {
     }
 }
 
-void QnDirectModuleFinder::removeIgnoredModule(const QUrl &url, const QUuid &id) {
+void QnDirectModuleFinder::removeIgnoredModule(const QUrl &url, const QnUuid &id) {
     m_ignoredModules.remove(trimmedUrl(url), id);
 }
 
@@ -97,7 +98,7 @@ void QnDirectModuleFinder::addIgnoredUrl(const QUrl &url) {
     QUrl locUrl = trimmedUrl(url);
     m_ignoredUrls.insert(locUrl);
     if (m_lastPingByUrl.take(locUrl) != 0) {
-        QUuid id = m_moduleByUrl.take(locUrl);
+        QnUuid id = m_moduleByUrl.take(locUrl);
         NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is removed.").arg(id.toString()).arg(locUrl.toString()), cl_logDEBUG1);
         emit moduleUrlLost(m_foundModules.value(id), locUrl);
     }
@@ -132,15 +133,15 @@ QList<QnModuleInformation> QnDirectModuleFinder::foundModules() const {
     return m_foundModules.values();
 }
 
-QnModuleInformation QnDirectModuleFinder::moduleInformation(const QUuid &id) const {
+QnModuleInformation QnDirectModuleFinder::moduleInformation(const QnUuid &id) const {
     return m_foundModules[id];
 }
 
-QMultiHash<QUrl, QUuid> QnDirectModuleFinder::urls() const {
+QMultiHash<QUrl, QnUuid> QnDirectModuleFinder::urls() const {
     return m_urls;
 }
 
-QMultiHash<QUrl, QUuid> QnDirectModuleFinder::ignoredModules() const {
+QMultiHash<QUrl, QnUuid> QnDirectModuleFinder::ignoredModules() const {
     return m_ignoredModules;
 }
 
@@ -192,6 +193,9 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
         if (moduleInformation.id.isNull())
             return;
 
+        if (moduleInformation.type != nxMediaServerId)
+            return;
+
         if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())
             return;
 
@@ -201,13 +205,13 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
         if (m_ignoredUrls.contains(url))
             return;
 
-        QSet<QUuid> expectedIds = QSet<QUuid>::fromList(m_urls.values(url));
+        QSet<QnUuid> expectedIds = QSet<QnUuid>::fromList(m_urls.values(url));
         if (!expectedIds.isEmpty() && !expectedIds.contains(moduleInformation.id))
             return;
 
         QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
         qint64 &lastPing = m_lastPingByUrl[url];
-        QUuid &moduleId = m_moduleByUrl[url];
+        QnUuid &moduleId = m_moduleByUrl[url];
 
         moduleInformation.remoteAddresses.clear();
         moduleInformation.remoteAddresses.insert(url.host());
@@ -235,7 +239,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
 
         lastPing = QDateTime::currentMSecsSinceEpoch();
     } else {
-        QUuid id = m_moduleByUrl.value(url);
+        QnUuid id = m_moduleByUrl.value(url);
         if (id.isNull())
             return;
 

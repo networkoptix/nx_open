@@ -31,7 +31,7 @@ public:
     QnModuleFinderHelper *directModuleFinderHelper() const;
 
     //! \param peerList Discovery peer if and only if peer exist in peerList
-    void setAllowedPeers(const QList<QUuid> &peerList);
+    void setAllowedPeers(const QList<QnUuid> &peerList);
 
 public slots:
     void start();
@@ -56,10 +56,10 @@ private:
     QnDirectModuleFinder *m_directModuleFinder;
     QnModuleFinderHelper *m_directModuleFinderHelper;
 
-    QHash<QUuid, QnModuleInformation> m_foundModules;
-    QMultiHash<QUuid, QUrl> m_multicastFoundUrls;
-    QMultiHash<QUuid, QUrl> m_directFoundUrls;
-    QList<QUuid> m_allowedPeers;
+    QHash<QnUuid, QnModuleInformation> m_foundModules;
+    QMultiHash<QnUuid, QUrl> m_multicastFoundUrls;
+    QMultiHash<QnUuid, QUrl> m_directFoundUrls;
+    QList<QnUuid> m_allowedPeers;
 };
 
 #endif  //NETWORKOPTIXMODULEFINDER_H

@@ -14,7 +14,7 @@
 #   include <QtCore/QString>
 #   include <QtCore/QByteArray>
 #   include <QtCore/QUrl>
-#   include <QtCore/QUuid>
+#   include <utils/common/uuid.h>
 #endif
 
 #include <utils/common/collection.h>
@@ -258,16 +258,16 @@ bool deserialize(QnUbjsonReader<T> *stream, QUrl *target) {
 
 
 template <class Output>
-void serialize(const QUuid &value, QnUbjsonWriter<Output> *stream) {
+void serialize(const QnUuid &value, QnUbjsonWriter<Output> *stream) {
     QnUbjson::serialize(value.toRfc4122(), stream);
 }
 
 template <class Input>
-bool deserialize(QnUbjsonReader<Input> *stream, QUuid *target) {
+bool deserialize(QnUbjsonReader<Input> *stream, QnUuid *target) {
     QByteArray tmp;
     if(!QnUbjson::deserialize(stream, &tmp) || tmp.size() != 16)
         return false;
-    *target = QUuid::fromRfc4122(tmp);
+    *target = QnUuid::fromRfc4122(tmp);
     return true;
 }
 

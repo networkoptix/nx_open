@@ -240,7 +240,7 @@ void QnResourceSelectionDialog::at_resourceModel_dataChanged() {
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_delegate || m_delegate->validate(selectedResources()));
 }
 
-void QnResourceSelectionDialog::at_thumbnailReady(QUuid resourceId, const QPixmap &thumbnail) {
+void QnResourceSelectionDialog::at_thumbnailReady(QnUuid resourceId, const QPixmap &thumbnail) {
     if (m_tooltipResourceId != resourceId)
         return;
     m_screenshotIndex = 1 - m_screenshotIndex;

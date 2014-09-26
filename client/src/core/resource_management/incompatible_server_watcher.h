@@ -3,6 +3,8 @@
 
 #include <QtCore/QObject>
 #include <core/resource/resource_fwd.h>
+#include <utils/common/uuid.h>
+
 
 struct QnModuleInformation;
 
@@ -18,11 +20,11 @@ private slots:
     void at_resourcePool_resourceChanged(const QnResourcePtr &resource);
 
 private:
-    void removeResource(const QUuid &id);
+    void removeResource(const QnUuid &id);
 
 private:
-    QHash<QUuid, QUuid> m_fakeUuidByServerUuid;
-    QHash<QUuid, QUuid> m_serverUuidByFakeUuid;
+    QHash<QnUuid, QnUuid> m_fakeUuidByServerUuid;
+    QHash<QnUuid, QnUuid> m_serverUuidByFakeUuid;
 };
 
 #endif // INCOMPATIBLE_SERVER_WATCHER_H

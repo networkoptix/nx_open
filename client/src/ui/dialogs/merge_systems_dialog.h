@@ -28,7 +28,7 @@ private slots:
     void at_mergeButton_clicked();
 
     void at_mergeTool_systemFound(const QnModuleInformation &moduleInformation, const QnMediaServerResourcePtr &discoverer, int errorCode);
-    void at_mergeTool_mergeFinished(int errorCode);
+    void at_mergeTool_mergeFinished(int errorCode, const QnModuleInformation &moduleInformation);
 
 private:
     void updateKnownSystems();

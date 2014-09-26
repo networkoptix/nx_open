@@ -55,7 +55,7 @@ void QnBusinessRulesActualModel::at_message_ruleChanged(const QnBusinessEventRul
     emit businessRuleChanged(rule->id());
 }
 
-void QnBusinessRulesActualModel::at_message_ruleDeleted(const QUuid &id) {
+void QnBusinessRulesActualModel::at_message_ruleDeleted(const QnUuid &id) {
     deleteRule(id);  //TODO: #GDM #Business ask user
     emit businessRuleDeleted(id);
 }

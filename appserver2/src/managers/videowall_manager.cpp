@@ -42,7 +42,7 @@ namespace ec2
         //preparing output data
         QnVideoWallResourceList videowalls;
         if (resource->getId().isNull()) {
-            resource->setId(QUuid::createUuid());
+            resource->setId(QnUuid::createUuid());
         }
         videowalls.push_back( resource );
 
@@ -54,7 +54,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnVideowallManager<T>::remove( const QUuid& id, impl::SimpleHandlerPtr handler )
+    int QnVideowallManager<T>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::removeVideowall, id );
@@ -82,7 +82,7 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiIdData> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QUuid &id)
+    QnTransaction<ApiIdData> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnUuid &id)
     {
         QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;

@@ -69,4 +69,9 @@ int QnAbstractDataConsumer::queueSize() const
     return m_dataQueue.size();
 }
 
+int QnAbstractDataConsumer::maxQueueSize() const
+{
+    return m_dataQueue.maxSize();
+}
+
 #endif // ENABLE_DATA_PROVIDERS

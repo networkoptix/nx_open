@@ -66,8 +66,8 @@ private:
 
     static QString motionUrl(Column column, const QnBusinessActionData& action);
     static QString formatUrl(const QString& url);
-    static QnResourcePtr getResourceById(const QUuid& id);
-    static QString getResourceNameString(QUuid id);
+    static QnResourcePtr getResourceById(const QnUuid& id);
+    static QString getResourceNameString(QnUuid id);
     static QString getUserGroupString(QnBusinessActionParameters::UserGroup value);
 
     void at_resource_removed(const QnResourcePtr &resource);
@@ -77,7 +77,7 @@ private:
     QBrush m_linkBrush;
     QFont m_linkFont;
     DataIndex* m_index;
-    static QHash<QUuid, QnResourcePtr> m_resourcesHash;
+    static QHash<QnUuid, QnResourcePtr> m_resourcesHash;
 };
 
 #endif // QN_EVENT_LOG_MODEL_H

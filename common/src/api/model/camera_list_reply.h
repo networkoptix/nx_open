@@ -6,7 +6,7 @@
 #ifndef QN_CAMERA_LIST_REPLY_H
 #define QN_CAMERA_LIST_REPLY_H
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <utils/common/model_functions_fwd.h>
 

@@ -2,7 +2,7 @@
 #define QN_LAYOUT_ITEM_INDEX_H
 
 #include <QtCore/QMetaType>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QList>
 #include "resource_fwd.h"
 
@@ -13,7 +13,7 @@ class QnLayoutItemIndex {
 public:
     QnLayoutItemIndex() {}
 
-    QnLayoutItemIndex(const QnLayoutResourcePtr &layout, const QUuid &uuid):
+    QnLayoutItemIndex(const QnLayoutResourcePtr &layout, const QnUuid &uuid):
         m_layout(layout), m_uuid(uuid) 
     {}
 
@@ -25,11 +25,11 @@ public:
         m_layout = layout;
     }
 
-    const QUuid &uuid() const {
+    const QnUuid &uuid() const {
         return m_uuid;
     }
 
-    void setUuid(const QUuid &uuid) {
+    void setUuid(const QnUuid &uuid) {
         m_uuid = uuid;
     }
 
@@ -39,7 +39,7 @@ public:
 
 private:
     QnLayoutResourcePtr m_layout;
-    QUuid m_uuid;
+    QnUuid m_uuid;
 };
 
 Q_DECLARE_METATYPE(QnLayoutItemIndex);

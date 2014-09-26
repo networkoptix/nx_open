@@ -146,13 +146,11 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
         qnSettings->setAutoLogin(state == Qt::Checked);
     });
 
-    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleUrlFound,    this,   &QnLoginDialog::at_moduleFinder_moduleUrlFound);
-    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleUrlLost,     this,   &QnLoginDialog::at_moduleFinder_moduleUrlLost);
+    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleChanged, this, &QnLoginDialog::at_moduleFinder_moduleChanged);
+    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleLost,    this, &QnLoginDialog::at_moduleFinder_moduleLost);
 
-    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules()) {
-        if (!moduleInformation.remoteAddresses.isEmpty())
-            at_moduleFinder_moduleUrlFound(moduleInformation, QUrl(lit("http://%1:%2").arg(*moduleInformation.remoteAddresses.begin()).arg(moduleInformation.port)));
-    }
+    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules())
+        at_moduleFinder_moduleChanged(moduleInformation);
 }
 
 QnLoginDialog::~QnLoginDialog() {}
@@ -500,37 +498,37 @@ void QnLoginDialog::at_deleteButton_clicked() {
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &foundUrl) {
-    if (moduleInformation.type != nxMediaServerId)
-        return;
-
-    QUrl url = foundUrl;
-    if (moduleInformation.isLocal())
-        url.setHost(lit("127.0.0.1"));
-
+void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
     QnEcData data;
     data.id = moduleInformation.id;
-    data.url = url;
     data.version = moduleInformation.version.toString();
     data.systemName = moduleInformation.systemName;
-    QString key = data.systemName + url.toString();
-    if (m_foundEcs.value(key) == data)
-        return;
 
-    m_foundEcs.insert(key, data);
-    resetAutoFoundConnectionsModel();
+    /* prefer localhost */
+    QHostAddress address(QHostAddress::LocalHost);
+    if (!moduleInformation.remoteAddresses.contains(address.toString()))
+        address = *moduleInformation.remoteAddresses.begin();
+
+    data.url.setScheme(lit("http"));
+    data.url.setHost(address.toString());
+    data.url.setPort(moduleInformation.port);
+
+    QnEcData &oldData = m_foundEcs[moduleInformation.id];
+    if (!oldData.id.isNull()) {
+        if (!address.isLoopback() && moduleInformation.remoteAddresses.contains(oldData.url.host()))
+            data.url.setHost(oldData.url.host());
+
+        if (oldData != data) {
+            oldData = data;
+            resetAutoFoundConnectionsModel();
+        }
+    } else {
+        oldData = data;
+        resetAutoFoundConnectionsModel();
+    }
 }
 
-void QnLoginDialog::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &lostUrl) {
-    if (moduleInformation.type != nxMediaServerId)
-        return;
-
-    QUrl url = lostUrl;
-    if (moduleInformation.isLocal())
-        url.setHost(lit("127.0.0.1"));
-
-    QString key = moduleInformation.systemName + url.toString();
-    m_foundEcs.remove(key);
-
-    resetAutoFoundConnectionsModel();
+void QnLoginDialog::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
+    if (m_foundEcs.remove(moduleInformation.id))
+        resetAutoFoundConnectionsModel();
 }

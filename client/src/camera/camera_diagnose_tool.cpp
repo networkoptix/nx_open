@@ -16,7 +16,7 @@
 
 namespace CameraDiagnostics
 {
-    DiagnoseTool::DiagnoseTool( const QUuid& cameraID, QObject *parent )
+    DiagnoseTool::DiagnoseTool( const QnUuid& cameraID, QObject *parent )
     :
         QObject(parent),
         m_cameraID( cameraID ),

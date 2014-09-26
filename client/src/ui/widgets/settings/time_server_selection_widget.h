@@ -3,9 +3,11 @@
 
 #include <QtWidgets/QWidget>
 
-#include <ui/widgets/settings/abstract_preferences_widget.h>
+#include <utils/common/uuid.h>
 
+#include <ui/widgets/settings/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
+
 
 namespace Ui {
     class TimeServerSelectionWidget;
@@ -27,7 +29,7 @@ public:
 private:
     void updateTime();
 
-    QUuid selectedServer() const;
+    QnUuid selectedServer() const;
 
 private:
     QScopedPointer<Ui::TimeServerSelectionWidget> ui;

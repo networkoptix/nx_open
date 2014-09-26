@@ -10,7 +10,7 @@
 #include <boost/range/mutable_iterator.hpp>
 #include <boost/preprocessor/tuple/enum.hpp>
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QUrl>
 
 #include <utils/common/latin1_array.h>
@@ -53,7 +53,7 @@ void serialize(const QString &value, QnCsvStreamWriter<Output> *stream) {
 }
 
 template<class Output>
-void serialize(const QUuid &value, QnCsvStreamWriter<Output> *stream) {
+void serialize(const QnUuid &value, QnCsvStreamWriter<Output> *stream) {
     stream->writeUtf8Field(value.toByteArray());
 }
 

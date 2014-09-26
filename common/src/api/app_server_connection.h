@@ -37,12 +37,12 @@ public:
     static void setCurrentVersion(const QnSoftwareVersion &version);
     
     /** If the client is started in videowall mode, videowall's guid is stored here. */ 
-    static QUuid videowallGuid();
-    static void setVideowallGuid(const QUuid &uuid);
+    static QnUuid videowallGuid();
+    static void setVideowallGuid(const QnUuid &uuid);
 
     /** If the client is started in videowall mode, instance's guid is stored here. */ 
-    static QUuid instanceGuid();
-    static void setInstanceGuid(const QUuid &uuid);
+    static QnUuid instanceGuid();
+    static void setInstanceGuid(const QnUuid &uuid);
 
     //static QnAppServerConnectionPtr createConnection();
     //static QnAppServerConnectionPtr createConnection(const QUrl &url);
@@ -58,8 +58,8 @@ private:
     QUrl m_url;
 
     /** Videowall-related fields */
-    QUuid m_videowallGuid;
-    QUuid m_instanceGuid;
+    QnUuid m_videowallGuid;
+    QnUuid m_instanceGuid;
 
     QnSoftwareVersion m_currentVersion;
     QnResourceFactory *m_resourceFactory;

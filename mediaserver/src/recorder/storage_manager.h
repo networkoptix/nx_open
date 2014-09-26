@@ -125,7 +125,7 @@ private:
     //void loadFullFileCatalogInternal(QnServer::ChunksCatalog catalog, bool rebuildMode);
     QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& uniqueId, QString& quality);
     void getTimePeriodInternal(QVector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog);
-    bool existsStorageWithID(const QnAbstractStorageResourceList& storages, const QUuid &id) const;
+    bool existsStorageWithID(const QnAbstractStorageResourceList& storages, const QnUuid &id) const;
     void updateStorageStatistics();
     void testOfflineStorages();
     void rebuildCatalogIndexInternal();
@@ -168,7 +168,7 @@ private:
     QTime m_lastTestTime;
     QElapsedTimer m_storageWarnTimer;
     static TestStorageThread* m_testStorageThread;
-    QMap<QUuid, bool> m_diskFullWarned;
+    QMap<QnUuid, bool> m_diskFullWarned;
     RebuildState m_rebuildState;
     double m_rebuildProgress;
     bool m_rebuildCancelled;

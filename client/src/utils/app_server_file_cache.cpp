@@ -2,7 +2,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QTimer>
 #include <QtCore/QStandardPaths>
 

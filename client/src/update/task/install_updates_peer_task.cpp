@@ -64,7 +64,7 @@ void QnInstallUpdatesPeerTask::doStart() {
         /* Count finished peers. */
         int totalProgress = (peersSize - m_pendingPeers.size()) * 100;
 
-        foreach (const QUuid &peerId, m_pendingPeers) {
+        foreach (const QnUuid &peerId, m_pendingPeers) {
             int peerProgress = progress;
             /* Peer already restarted. */
             if (!m_restartingPeers.contains(peerId))
@@ -85,7 +85,7 @@ void QnInstallUpdatesPeerTask::doStart() {
 }
 
 void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource) {
-    QUuid peerId = resource->getId();
+    QnUuid peerId = resource->getId();
 
     if (!m_pendingPeers.contains(peerId))
         return;
@@ -117,7 +117,7 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
 }
 
 void QnInstallUpdatesPeerTask::at_checkTimeout() {
-    foreach (const QUuid &id, m_pendingPeers) {
+    foreach (const QnUuid &id, m_pendingPeers) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (server->getVersion() == m_version) {
             m_pendingPeers.remove(id);

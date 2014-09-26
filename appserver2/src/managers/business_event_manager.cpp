@@ -46,7 +46,7 @@ int QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::S
     const int reqID = generateRequestID();
 
     if (rule->id().isNull())
-        rule->setId(QUuid::createUuid());
+        rule->setId(QnUuid::createUuid());
 
     auto tran = prepareTransaction( ApiCommand::saveBusinessRule, rule );
 
@@ -57,7 +57,7 @@ int QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::S
 }
 
 template<class T>
-int QnBusinessEventManager<T>::deleteRule( QUuid ruleId, impl::SimpleHandlerPtr handler )
+int QnBusinessEventManager<T>::deleteRule( QnUuid ruleId, impl::SimpleHandlerPtr handler )
 {
     const int reqID = generateRequestID();
     auto tran = prepareTransaction( ApiCommand::removeBusinessRule, ruleId );
@@ -78,7 +78,7 @@ int QnBusinessEventManager<T>::broadcastBusinessAction( const QnAbstractBusiness
 }
 
 template<class T>
-int QnBusinessEventManager<T>::sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QUuid& dstPeer, impl::SimpleHandlerPtr handler )
+int QnBusinessEventManager<T>::sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnUuid& dstPeer, impl::SimpleHandlerPtr handler )
 {
     const int reqID = generateRequestID();
     auto tran = prepareTransaction( ApiCommand::execBusinessAction, businessAction );
@@ -119,7 +119,7 @@ QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction
 }
 
 template<class T>
-QnTransaction<ApiIdData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QUuid& id )
+QnTransaction<ApiIdData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnUuid& id )
 {
     QnTransaction<ApiIdData> tran(command);
     tran.params.id = id;

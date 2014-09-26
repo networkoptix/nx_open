@@ -219,7 +219,7 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
     delete m_timer;
 }
 
-void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QUuid& gotFromPeer)
+void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QnUuid& gotFromPeer)
 {
     AlivePeersMap::iterator itr = m_alivePeers.find(peerData.id);
     if (itr == m_alivePeers.end()) 
@@ -231,7 +231,7 @@ void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QUuid
         currentValue.proxyVia << gotFromPeer;
 }
 
-void QnTransactionMessageBus::removeAlivePeer(const QUuid& id, bool sendTran, bool isRecursive)
+void QnTransactionMessageBus::removeAlivePeer(const QnUuid& id, bool sendTran, bool isRecursive)
 {
     // 1. remove peer from alivePeers map
 
@@ -249,7 +249,7 @@ void QnTransactionMessageBus::removeAlivePeer(const QUuid& id, bool sendTran, bo
     // 2. remove peers proxy via current peer
     if (isRecursive)
         return;
-    QSet<QUuid> morePeersToRemove;
+    QSet<QnUuid> morePeersToRemove;
     for (auto itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
         AlivePeerInfo& otherPeer = itr.value();
@@ -260,13 +260,13 @@ void QnTransactionMessageBus::removeAlivePeer(const QUuid& id, bool sendTran, bo
             }
         }
     }
-    foreach(const QUuid& p, morePeersToRemove)
+    foreach(const QnUuid& p, morePeersToRemove)
         removeAlivePeer(p, true, true);
 }
 
 void QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport)
 {
-    QUuid gotFromPeer;
+    QnUuid gotFromPeer;
     if (transport)
         gotFromPeer = transport->remotePeer().id;
 
@@ -602,7 +602,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         if( cl_log.logLevel() >= cl_logDEBUG1 )
         {
             QString dstPeersStr;
-            for( const QUuid& peer: transportHeader.dstPeers )
+            for( const QnUuid& peer: transportHeader.dstPeers )
                 dstPeersStr += peer.toString();
             NX_LOG( lit("skip transaction %1 for peers %2").arg(ApiCommand::toString(tran.command)).arg(dstPeersStr), cl_logDEBUG1);
         }
@@ -628,7 +628,7 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
     newHeader.sender = transportHeader.sender;
 
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-    QSet<QUuid> proxyList;
+    QSet<QnUuid> proxyList;
 #endif
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) 
     {
@@ -649,7 +649,7 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
         if( cl_log.logLevel() >= cl_logDEBUG1 )
         {
             QString proxyListStr;
-            for( const QUuid& peer: proxyList )
+            for( const QnUuid& peer: proxyList )
                 proxyListStr += " " + peer.toString();
             NX_LOG( lit("proxy transaction %1 to (%2)").arg(ApiCommand::toString(tran.command)).arg(proxyListStr), cl_logDEBUG1);
         }
@@ -771,7 +771,7 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         }
 
         ec2::ApiCameraDataList cameras;
-        if (dbManager->doQuery(QUuid(), cameras) != ErrorCode::ok) {
+        if (dbManager->doQuery(QnUuid(), cameras) != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
         }
@@ -781,7 +781,7 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
 
         // filter out desktop cameras
         auto desktopCameraResourceType = qnResTypePool->desktopCameraResourceType();
-        QUuid desktopCameraTypeId = desktopCameraResourceType ? desktopCameraResourceType->getId() : QUuid();
+        QnUuid desktopCameraTypeId = desktopCameraResourceType ? desktopCameraResourceType->getId() : QnUuid();
         if (desktopCameraTypeId.isNull()) {
             tranCameras.params = cameras;
         } else {
@@ -984,7 +984,7 @@ void QnTransactionMessageBus::at_timer()
     doPeriodicTasks();
 }
 
-void QnTransactionMessageBus::at_peerIdDiscovered(const QUrl& url, const QUuid& id)
+void QnTransactionMessageBus::at_peerIdDiscovered(const QUrl& url, const QnUuid& id)
 {
     QMutexLocker lock(&m_mutex);
     auto itr = m_remoteUrls.find(url);
@@ -1024,7 +1024,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
             if (!connectInfo.discoveredPeer.isNull() ) 
             {
                 if (connectInfo.discoveredTimeout.elapsed() > DISCOVERED_PEER_TIMEOUT) {
-                    connectInfo.discoveredPeer = QUuid();
+                    connectInfo.discoveredPeer = QnUuid();
                     connectInfo.discoveredTimeout.restart();
                 }
                 else if (m_connections.contains(connectInfo.discoveredPeer))

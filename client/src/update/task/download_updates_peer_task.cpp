@@ -47,7 +47,7 @@ QHash<QUrl, QString> QnDownloadUpdatesPeerTask::resultingFiles() const {
     return m_resultingFiles;
 }
 
-void QnDownloadUpdatesPeerTask::setPeerAssociations(const QMultiHash<QUrl, QUuid> &peersByUrl) {
+void QnDownloadUpdatesPeerTask::setPeerAssociations(const QMultiHash<QUrl, QnUuid> &peersByUrl) {
     m_peersByUrl = peersByUrl;
 }
 
@@ -70,7 +70,7 @@ void QnDownloadUpdatesPeerTask::downloadNextUpdate() {
     }
 
     QUrl url = m_pendingDownloads.first();
-    m_currentPeers = QSet<QUuid>::fromList(m_peersByUrl.values(url));
+    m_currentPeers = QSet<QnUuid>::fromList(m_peersByUrl.values(url));
 
     QString fileName = updateFilePath(m_targets[url]);
     m_resultingFiles.insert(url, fileName);
@@ -153,7 +153,7 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
         return;
     }
 
-    foreach (const QUuid &peerId, m_currentPeers)
+    foreach (const QnUuid &peerId, m_currentPeers)
         emit peerFinished(peerId);
 
     m_pendingDownloads.removeFirst();
@@ -188,7 +188,7 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_downloadProgress(qint64 bytesRe
         return;
     }
 
-    foreach (const QUuid &peerId, m_currentPeers)
+    foreach (const QnUuid &peerId, m_currentPeers)
         emit peerProgressChanged(peerId, bytesReceived * 100 / bytesTotal);
 
     int finished = m_targets.size() - m_pendingDownloads.size();

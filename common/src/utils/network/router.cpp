@@ -25,34 +25,34 @@ QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) 
 
 QnRouter::~QnRouter() {}
 
-QMultiHash<QUuid, QnRouter::Endpoint> QnRouter::connections() const {
+QMultiHash<QnUuid, QnRouter::Endpoint> QnRouter::connections() const {
     QMutexLocker lk(&m_mutex);
     return m_connections;
 }
 
-QHash<QUuid, QnRouteList> QnRouter::routes() const {
+QHash<QnUuid, QnRouteList> QnRouter::routes() const {
     QMutexLocker lk(&m_mutex);
     return m_routeBuilder->routes();
 }
 
-QnRoute QnRouter::routeTo(const QUuid &id) const {
+QnRoute QnRouter::routeTo(const QnUuid &id) const {
     QMutexLocker lk(&m_mutex);
     return m_routeBuilder->routeTo(id);
 }
 
 QnRoute QnRouter::routeTo(const QString &host, quint16 port) const {
-    QUuid id = whoIs(host, port);
+    QnUuid id = whoIs(host, port);
     return id.isNull() ? QnRoute() : routeTo(id);
 }
 
-QUuid QnRouter::whoIs(const QString &host, quint16 port) const {
+QnUuid QnRouter::whoIs(const QString &host, quint16 port) const {
     QMutexLocker lk(&m_mutex);
 
     for (auto it = m_connections.begin(); it != m_connections.end(); ++it) {
         if (it->host == host && it->port == port)
             return it->id;
     }
-    return QUuid();
+    return QnUuid();
 }
 
 void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
@@ -128,7 +128,7 @@ void QnRouter::at_runtimeInfoManager_runtimeInfoRemoved(const QnPeerRuntimeInfo 
         removeConnection(data.uuid, Endpoint(connection.peerId, connection.host, connection.port));
 }
 
-bool QnRouter::addConnection(const QUuid &id, const QnRouter::Endpoint &endpoint) {
+bool QnRouter::addConnection(const QnUuid &id, const QnRouter::Endpoint &endpoint) {
     QMutexLocker lk(&m_mutex);
 
     if (m_connections.contains(id, endpoint))
@@ -145,7 +145,7 @@ bool QnRouter::addConnection(const QUuid &id, const QnRouter::Endpoint &endpoint
     return true;
 }
 
-bool QnRouter::removeConnection(const QUuid &id, const QnRouter::Endpoint &endpoint) {
+bool QnRouter::removeConnection(const QnUuid &id, const QnRouter::Endpoint &endpoint) {
     QMutexLocker lk(&m_mutex);
 
     if (!m_connections.remove(id, endpoint))

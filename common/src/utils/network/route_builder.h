@@ -5,16 +5,16 @@
 
 class QnRouteBuilder {
 public:
-    explicit QnRouteBuilder(const QUuid &startId);
+    explicit QnRouteBuilder(const QnUuid &startId);
 
-    void addConnection(const QUuid &from, const QUuid &to, const QString &host, quint16 port, int weight = 5);
-    void removeConnection(const QUuid &from, const QUuid &to, const QString &host, quint16 port);
+    void addConnection(const QnUuid &from, const QnUuid &to, const QString &host, quint16 port, int weight = 5);
+    void removeConnection(const QnUuid &from, const QnUuid &to, const QString &host, quint16 port);
 
     void clear();
 
-    QnRoute routeTo(const QUuid &peerId) const;
+    QnRoute routeTo(const QnUuid &peerId) const;
 
-    QHash<QUuid, QnRouteList> routes() const;
+    QHash<QnUuid, QnRouteList> routes() const;
 
 private:
     typedef QPair<QnRoutePoint, int> WeightedPoint;
@@ -22,12 +22,12 @@ private:
 private:
     bool insertRoute(const QnRoute &route);
     void buildRoutes(const QList<QnRoute> &initialRoutes);
-    QMultiHash<QUuid, WeightedPoint>::iterator findConnection(const QUuid &from, const QnRoutePoint &point);
+    QMultiHash<QnUuid, WeightedPoint>::iterator findConnection(const QnUuid &from, const QnRoutePoint &point);
 
 private:
-    QUuid m_startId;
-    QHash<QUuid, QnRouteList> m_routes;
-    QMultiHash<QUuid, WeightedPoint> m_connections;
+    QnUuid m_startId;
+    QHash<QnUuid, QnRouteList> m_routes;
+    QMultiHash<QnUuid, WeightedPoint> m_connections;
 };
 
 #endif // ROUTE_BUILDER_H

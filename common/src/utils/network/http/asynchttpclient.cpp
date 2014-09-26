@@ -36,6 +36,7 @@ namespace nx_http
         m_totalBytesRead( 0 ),
         m_contentEncodingUsed( true ),
         m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT ),
+        m_msgBodyReadTimeoutMs( 0 ),
         m_authType(authBasicAndDigest)
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
@@ -291,7 +292,8 @@ namespace nx_http
                 {
                     //reading more data
                     m_responseBuffer.resize( 0 );
-                    if( !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
+                    if( !m_socket->setRecvTimeout( m_msgBodyReadTimeoutMs ) ||
+                        !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
                     {
                         NX_LOG( lit( "Failed to read (1) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
                         m_state = sFailed;
@@ -459,9 +461,14 @@ namespace nx_http
         m_userPassword = userPassword;
     }
 
-    void AsyncHttpClient::setResponseReadTimeoutMs( int _responseReadTimeoutMs )
+    void AsyncHttpClient::setResponseReadTimeoutMs( unsigned int _responseReadTimeoutMs )
     {
         m_responseReadTimeoutMs = _responseReadTimeoutMs;
+    }
+
+    void AsyncHttpClient::setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs )
+    {
+        m_msgBodyReadTimeoutMs = messageBodyReadTimeoutMs;
     }
 
     void AsyncHttpClient::setDecodeChunkedMessageBody( bool val )

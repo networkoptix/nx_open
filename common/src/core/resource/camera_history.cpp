@@ -150,7 +150,7 @@ QnMediaServerResourcePtr QnCameraHistory::getNextMediaServerAndPeriodOnTime(qint
     return searchForward ? getNextMediaServerAndPeriodFromTime(timePeriods, timestamp, currentPeriod) : getPrevMediaServerAndPeriodFromTime(timePeriods, timestamp, currentPeriod);
 }
 
-void QnCameraHistory::addTimePeriod(qint64 timestamp, const QUuid& serverId)
+void QnCameraHistory::addTimePeriod(qint64 timestamp, const QnUuid& serverId)
 {
     QMutexLocker lock(&m_mutex);
     m_fullTimePeriods.insert(timestamp, serverId);
@@ -203,7 +203,7 @@ QnMediaServerResourceList QnCameraHistory::getAllCameraServers() const {
     return getAllCameraServers(QnTimePeriod(getMinTime(), -1));
 }
 
-void QnCameraHistory::getItemsBefore(qint64 timestamp,  const QUuid& serverId, QList<QnCameraHistoryItem>& result)
+void QnCameraHistory::getItemsBefore(qint64 timestamp,  const QnUuid& serverId, QList<QnCameraHistoryItem>& result)
 {
     QMutexLocker lock (&m_mutex);
     for (auto itr = m_fullTimePeriods.begin(); itr != m_fullTimePeriods.end() && itr.key() < timestamp; ++itr)
@@ -317,7 +317,7 @@ void QnCameraHistoryPool::removeCameraHistoryItem(const QnCameraHistoryItem& his
 }
 
 /*
-QList<QnCameraHistoryItem> QnCameraHistoryPool::getUnusedItems(const QMap<QString, qint64>& archiveMinTimes, const QUuid& serverId)
+QList<QnCameraHistoryItem> QnCameraHistoryPool::getUnusedItems(const QMap<QString, qint64>& archiveMinTimes, const QnUuid& serverId)
 {
     QMutexLocker lock(&m_mutex);
 

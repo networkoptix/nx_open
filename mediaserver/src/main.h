@@ -67,7 +67,7 @@ private:
     QnModuleFinder* m_moduleFinder;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
-    QSet<QUuid> m_updateUserRequests;
+    QSet<QnUuid> m_updateUserRequests;
     QHostAddress m_publicAddress;
     std::unique_ptr<QnPublicIPDiscovery> m_ipDiscovery;
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;

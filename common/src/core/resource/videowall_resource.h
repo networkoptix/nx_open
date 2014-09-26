@@ -2,7 +2,7 @@
 #define VIDEOWALL_RESOURCE_H
 
 #include <QtCore/QRectF>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/videowall_item.h>
@@ -30,7 +30,7 @@ public:
     void setAutorun(bool value);
 
     /** Utility method to get IDs of all online items.  */
-    QList<QUuid> onlineItems() const;
+    QList<QnUuid> onlineItems() const;
 signals:
     void itemAdded(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
     void itemRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);

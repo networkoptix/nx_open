@@ -77,7 +77,7 @@ bool QnTimeServerSelectionWidget::hasChanges() const {
     return m_model->selectedServer() != selectedServer();
 }
 
-QUuid QnTimeServerSelectionWidget::selectedServer() const {
+QnUuid QnTimeServerSelectionWidget::selectedServer() const {
     foreach (const QnPeerRuntimeInfo &runtimeInfo, QnRuntimeInfoManager::instance()->items()->getItems()) {
         if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
             continue;
@@ -87,7 +87,7 @@ QUuid QnTimeServerSelectionWidget::selectedServer() const {
 
         return runtimeInfo.uuid;
     }
-    return QUuid();
+    return QnUuid();
 }
 
 void QnTimeServerSelectionWidget::updateTime() {

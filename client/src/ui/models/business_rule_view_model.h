@@ -69,7 +69,7 @@ public:
     bool isValid(int column) const;
     bool isValid() const; //checks validity for all row
 
-    QUuid id() const;
+    QnUuid id() const;
 
     bool isModified() const;
     void setModified(bool value);
@@ -138,7 +138,7 @@ private:
     static QString toggleStateToString(QnBusiness::EventState state);
     static QString eventTypeString(QnBusiness::EventType eventType, QnBusiness::EventState eventState, QnBusiness::ActionType actionType);
 private:
-    QUuid m_id;
+    QnUuid m_id;
     bool m_modified;
 
     QnBusiness::EventType m_eventType;

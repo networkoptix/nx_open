@@ -3,7 +3,7 @@
 
 #include <functional>
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QDir>
 #include <QtWidgets/QMessageBox>
 #include <QtGui/QStandardItemModel>
@@ -199,7 +199,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
         flags |= Qt::ItemIsEnabled;
     checkBoxItem->setFlags(flags);
     checkBoxItem->setCheckState(item.isUsedForWriting ? Qt::Checked : Qt::Unchecked);
-    checkBoxItem->setData(StorageIdRole, item.storageId);
+    checkBoxItem->setData(StorageIdRole, QVariant::fromValue<QnUuid>(item.storageId));
     checkBoxItem->setData(ExternalRole, item.isExternal);
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
@@ -266,7 +266,7 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
 
     result.isWritable = checkBoxItem->flags() & Qt::ItemIsEnabled;
     result.isUsedForWriting = checkBoxItem->checkState() == Qt::Checked;
-    result.storageId = checkBoxItem->data(StorageIdRole).value<QUuid>();
+    result.storageId = checkBoxItem->data(StorageIdRole).value<QnUuid>();
     result.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
 
     QString login = ui->storagesTable->item(row, LoginColumn)->text();
@@ -339,7 +339,7 @@ void QnServerSettingsDialog::submitToResources() {
             QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
             if (resType)
                 storage->setTypeId(resType->getId());
-            storage->setName(QUuid::createUuid().toString());
+            storage->setName(QnUuid::createUuid().toString());
             storage->setParentId(m_server->getId());
             storage->setUrl(item.url);
             storage->setSpaceLimit(item.reservedSpace); //client does not change space limit anymore

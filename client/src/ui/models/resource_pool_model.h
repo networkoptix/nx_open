@@ -3,7 +3,7 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QScopedPointer>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <utils/common/id.h>
 #include <core/resource/resource_fwd.h>
@@ -61,9 +61,9 @@ public:
     void setUrlsShown(bool urlsShown);
 private:
     QnResourcePoolModelNode *node(const QnResourcePtr &resource);
-    QnResourcePoolModelNode *node(const QUuid &uuid);
+    QnResourcePoolModelNode *node(const QnUuid &uuid);
     QnResourcePoolModelNode *node(const QModelIndex &index) const;
-    QnResourcePoolModelNode *node(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource);
+    QnResourcePoolModelNode *node(Qn::NodeType nodeType, const QnUuid &uuid, const QnResourcePtr &resource);
     QnResourcePoolModelNode *node(const QnResourcePtr &resource, const QString &groupId, const QString &groupName);
     QnResourcePoolModelNode *systemNode(const QString &systemName);
     QnResourcePoolModelNode *expectedParent(QnResourcePoolModelNode *node);
@@ -71,7 +71,7 @@ private:
 
     void removeNode(QnResourcePoolModelNode *node);
 
-    void removeNode(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource);
+    void removeNode(Qn::NodeType nodeType, const QnUuid &uuid, const QnResourcePtr &resource);
 
     /** Some nodes can have deleting node set as parent, but this node will not
      ** have them as children because of their 'bastard' flag.*/
@@ -104,7 +104,7 @@ private slots:
 private:
     friend class QnResourcePoolModelNode;
 
-    typedef QPair<QnResourcePtr, QUuid> NodeKey;
+    typedef QPair<QnResourcePtr, QnUuid> NodeKey;
 
     typedef QHash<QString, QnResourcePoolModelNode *> RecorderHash;
 
@@ -124,7 +124,7 @@ private:
     QHash<QnResourcePtr, RecorderHash> m_recorderHashByResource;
 
     /** Mapping for item nodes, by item id. */
-    QHash<QUuid, QnResourcePoolModelNode *> m_itemNodeByUuid;
+    QHash<QnUuid, QnResourcePoolModelNode *> m_itemNodeByUuid;
 
     /** Mapping for item nodes, by resource id. Is managed by nodes. */
     QHash<QnResourcePtr, QList<QnResourcePoolModelNode *> > m_itemNodesByResource;

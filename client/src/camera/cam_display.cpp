@@ -412,8 +412,8 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         }
     }
     else {
-        m_totalFrames = 0;
         if (m_useMTRealTimeDecode) {
+            m_totalFrames = 0;
             m_useMTRealTimeDecode = false;
             setMTDecoding(false); 
         }

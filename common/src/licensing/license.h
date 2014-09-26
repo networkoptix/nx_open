@@ -115,7 +115,7 @@ private:
         QByteArray* const v2LicenseBlock );
     void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
 
-    QUuid findRuntimeDataByLicense() const;
+    QnUuid findRuntimeDataByLicense() const;
     bool gotError(ErrorCode* errCode, ErrorCode errorCode) const;
 };
 

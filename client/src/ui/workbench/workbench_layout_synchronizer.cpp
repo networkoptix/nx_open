@@ -176,7 +176,7 @@ void QnWorkbenchLayoutSynchronizer::submitPendingItems() {
 
     QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
 
-    foreach(const QUuid &uuid, m_pendingItems) {
+    foreach(const QnUuid &uuid, m_pendingItems) {
         QnWorkbenchItem *item = m_layout->item(uuid);
         if(item == NULL)
             continue;

@@ -8,7 +8,6 @@ angular.module('webadminApp')
         var statisticUrl = window.location.protocol + "//" + window.location.hostname + ":"
             + data.port;
 
-        console.log($scope.url);
         var oldUptime = 0;
         var serverWasDown = false;
 

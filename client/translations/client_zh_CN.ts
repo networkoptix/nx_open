@@ -155,6 +155,15 @@
         <translation>高画质</translation>
     </message>
     <message>
+        <source>Archive control</source>
+        <translation>存儲控制</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="228"/>
+        <source>Do not archive secondary stream</source>
+        <translation>不允许储存使用子码流</translation>
+    </message>
+    <message>
         <source>Warning! Low quality may result in crappy picture, high stream may overload Media Server&apos;s CPU or network connection</source>
         <translation type="obsolete">警告！低画质可能会导致糟糕的影像，高码流則可能超载媒体服务器的CPU或网络连接</translation>
     </message>

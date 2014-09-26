@@ -30,7 +30,7 @@ QString QnUpdateUploader::updateId() const {
     return m_updateId;
 }
 
-QSet<QUuid> QnUpdateUploader::peers() const {
+QSet<QnUuid> QnUpdateUploader::peers() const {
     return m_peers;
 }
 
@@ -38,7 +38,7 @@ void QnUpdateUploader::cancel() {
     cleanUp();
 }
 
-bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &fileName, const QSet<QUuid> &peers) {
+bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &fileName, const QSet<QnUuid> &peers) {
     if (m_updateFile)
         return false;
 
@@ -54,7 +54,7 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
     m_finalized = false;
 
     m_progressById.clear();
-    foreach (const QUuid &peerId, peers)
+    foreach (const QnUuid &peerId, peers)
         m_progressById[peerId] = 0;
 
     connect(connection2()->getUpdatesManager().get(),   &ec2::AbstractUpdatesManager::updateUploadProgress,   this,   &QnUpdateUploader::at_updateManager_updateUploadProgress);
@@ -77,7 +77,7 @@ void QnUpdateUploader::sendNextChunk() {
     m_chunkTimer->start();
 }
 
-void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &updateId, const QUuid &peerId, int chunks) {
+void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &updateId, const QnUuid &peerId, int chunks) {
     if (updateId != m_updateId)
         return;
 
