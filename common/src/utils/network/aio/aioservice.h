@@ -181,6 +181,8 @@ namespace aio
                     }
                 }
                 assert( false );    //we MUST use same thread for polleding all events on single socket
+                SystemError::setLastErrorCode( SystemError::connectionAbort );
+                return false;
             }
 
 #ifdef _DEBUG
