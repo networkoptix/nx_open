@@ -8,6 +8,7 @@
 #include <openssl/err.h>
 
 #include <utils/common/log.h>
+#include <queue>
 
 #ifdef max
 #undef max
@@ -334,17 +335,43 @@ private:
     // using this function to issue an async read , it accepts 
     // an ssl_perform entry routine and do the job once the task
     // finished there .
-    void do_recv( buffer_t buf , std::function<void(SystemError::ErrorCode,std::size_t)>&& op ) {
-        socket_->readSomeAsync(buf.write_buffer,op);
-    }
     void do_recv( buffer_t buf , const std::function<void(SystemError::ErrorCode,std::size_t)>& op ) {
-        socket_->readSomeAsync(buf.write_buffer,op);
+        auto recv_callback = [this,buf,op](SystemError::ErrorCode ec,std::size_t transferred_bytes) {
+            // Invoke user's operation without locking , so no recursive lock 
+            op(ec,transferred_bytes);
+            // Remove _THIS_ from the queue and check whether we need to go on
+            {
+                std::lock_guard<std::mutex> lock(recv_mutex_);
+                recv_queue_.pop();
+                if( !recv_queue_.empty() ) {
+                    socket_->readSomeAsync(buf.write_buffer,std::move(recv_queue_.front()));
+                }
+            }
+        };
+        std::lock_guard<std::mutex> lock(recv_mutex_);
+        if( recv_queue_.empty() ) {
+            socket_->readSomeAsync(buf.write_buffer,recv_callback);
+        }
+        recv_queue_.push( std::move(recv_callback) );
     }
-    void do_send( buffer_t buf , std::function<void(SystemError::ErrorCode,std::size_t)>&& op ) {
-        socket_->sendAsync(*buf.read_buffer,op);
-    }
+
     void do_send( buffer_t buf , const std::function<void(SystemError::ErrorCode,std::size_t)>& op ) {
-        socket_->sendAsync(*buf.read_buffer,op);
+        auto send_callback = [this,buf,op](SystemError::ErrorCode ec,std::size_t transferred_bytes) {
+            op(ec,transferred_bytes);
+            {
+                std::lock_guard<std::mutex> lock(send_mutex_);
+                send_queue_.pop();
+                if( !send_queue_.empty() ) {
+                    // Fire one appending operation in the queue
+                    socket_->sendAsync(*buf.read_buffer,std::move(send_queue_.front()));
+                }
+            }
+        };
+        std::lock_guard<std::mutex> lock(send_mutex_);
+        if( send_queue_.empty() ) {
+            socket_->sendAsync(*buf.read_buffer,send_callback);
+        }
+        send_queue_.push( std::move(send_callback) );
     }
 
     // the main entry for our async routine 
@@ -525,6 +552,17 @@ private:
     std::unique_ptr<ssl_async_recv_op> recv_op_;
     std::unique_ptr<ssl_async_send_op> send_op_;
     std::unique_ptr<ssl_async_handshake_op> handshake_op_;
+
+    // The following 2 queues are used to synchronize the outstanding
+    // recv/send operation. All the recv/send operations will be enqueued
+    // first, and only when the queue is empty then it will fire such 
+    // operation directly , otherwise the operation will be queued and 
+    // until the previous recv/send finish and then fire that operations.
+    std::queue< std::function<void(SystemError::ErrorCode,std::size_t)> > send_queue_;
+    std::mutex send_mutex_;
+
+    std::queue< std::function<void(SystemError::ErrorCode,std::size_t)> > recv_queue_;
+    std::mutex recv_mutex_;
 };
 
 // read operation 
