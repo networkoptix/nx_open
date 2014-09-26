@@ -157,10 +157,6 @@ namespace ec2
 		QnAbstractTransaction(): command(ApiCommand::NotDefined), isLocal(false) { peerID = qnCommon->moduleGUID(); }
         QnAbstractTransaction(ApiCommand::Value value): command(value), isLocal(false) { peerID = qnCommon->moduleGUID(); }
         
-        static void setStartSequence(int value);
-        void fillPersistentInfo();
-        void cancel();
-
         struct PersistentInfo
         {
             PersistentInfo(): sequence(0), timestamp(0) {}

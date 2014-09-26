@@ -55,7 +55,7 @@ namespace ec2
             std::unique_ptr<QnDbManager::Locker> locker;
             if (ApiCommand::isPersistent(tran.command)) {
                 locker.reset(new QnDbManager::Locker(dbManager));
-                tran.fillPersistentInfo();
+                transactionLog->fillPersistentInfo(tran);
             }
 
             auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
@@ -71,10 +71,7 @@ namespace ec2
                 errorCode = dbManager->executeTransactionNoLock( tran, serializedTran );
                 assert(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
                 if( errorCode != ErrorCode::ok )
-                {
-                    tran.cancel(); // it's possible for single thread processing mode only. for MT mode transaction should be modified to filler transaction instead of reverting sequence
                     return;
-                }
 
                 locker->commit();
             }
@@ -180,32 +177,28 @@ namespace ec2
             {
                 QnTransaction<SubDataType> tran(command);
                 tran.params = data;
-                tran.fillPersistentInfo();
                 tran.isLocal = multiTran.isLocal;
+                transactionLog->fillPersistentInfo(tran);
 
                 QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
                 errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
                 assert(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
-                if (errorCode != ErrorCode::ok) {
-                    tran.cancel(); // it's possible for single thread processing mode only. for MT mode transaction should be modified to filler transaction instead of reverting sequence
+                if (errorCode != ErrorCode::ok)
                     return;
-                }
                 processedTransactions << tran;
             }
             
             // delete master object if need (server->cameras required to delete master object, layoutList->layout doesn't)
             if (isParentObjectTran) 
             {
-                multiTran.fillPersistentInfo();
+                transactionLog->fillPersistentInfo(multiTran);
 
                 errorCode = ErrorCode::ok;
                 QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(multiTran);
                 errorCode = dbManager->executeTransactionNoLock(multiTran, serializedTran);
                 assert(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
-                if (errorCode != ErrorCode::ok) {
-                    multiTran.cancel(); // it's possible for single thread processing mode only. for MT mode transaction should be modified to filler transaction instead of reverting sequence
+                if (errorCode != ErrorCode::ok)
                     return;
-                }
                 processMultiTran = (errorCode == ErrorCode::ok);
             }
 

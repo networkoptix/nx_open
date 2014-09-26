@@ -30,6 +30,10 @@ QnTransactionLog::QnTransactionLog(QnDbManager* db): m_dbManager(db)
 
 void QnTransactionLog::init()
 {
+    QSqlQuery delQuery(m_dbManager->getDB());
+    delQuery.prepare("DELETE FROM transaction_sequence WHERE not exists(select 1 from transaction_log tl where tl.peer_guid = transaction_sequence.peer_guid and tl.db_guid = transaction_sequence.db_guid)");
+    delQuery.exec();
+
     QSqlQuery query(m_dbManager->getDB());
     bool seqFound = false;
     query.prepare("SELECT peer_guid, db_guid, sequence FROM transaction_sequence");
@@ -78,16 +82,6 @@ void QnTransactionLog::init()
     }
     m_lastTimestamp = m_currentTime;
     m_relativeTimer.start();
-
-    QSqlQuery querySequence(m_dbManager->getDB());
-    int startSequence = 1;
-    querySequence.prepare("SELECT sequence FROM transaction_sequence where peer_guid = ? and db_guid = ?");
-    querySequence.addBindValue(qnCommon->moduleGUID().toRfc4122());
-    querySequence.addBindValue(m_dbManager->getID().toRfc4122());
-    if (querySequence.exec() && querySequence.next())
-        startSequence = querySequence.value(0).toInt() + 1;
-    QnAbstractTransaction::setStartSequence(startSequence);
-
 }
 
 qint64 QnTransactionLog::getTimeStamp()
@@ -100,6 +94,12 @@ qint64 QnTransactionLog::getTimeStamp()
     }
     m_lastTimestamp = timestamp;
     return timestamp;
+}
+
+int QnTransactionLog::currentSequenceNoLock() const
+{
+    QnTranStateKey key (qnCommon->moduleGUID(), m_dbManager->getID());
+    return m_state.values.value(key);
 }
 
 QnTransactionLog* QnTransactionLog::instance()
@@ -331,5 +331,16 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     
     return ErrorCode::ok;
 }
+
+void QnTransactionLog::fillPersistentInfo(QnAbstractTransaction& tran)
+{
+    if (tran.persistentInfo.isNull()) {
+        if (!tran.isLocal)
+            tran.persistentInfo.sequence = currentSequenceNoLock() + 1;
+        tran.persistentInfo.dbID = m_dbManager->getID();
+        tran.persistentInfo.timestamp = getTimeStamp();
+    }
+}
+
 
 } // namespace ec2
