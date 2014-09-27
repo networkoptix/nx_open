@@ -22,6 +22,7 @@
 #include "aac_rtp_parser.h"
 #include "simpleaudio_rtp_parser.h"
 #include "mjpeg_rtp_parser.h"
+#include "api/app_server_connection.h"
 
 
 static const int RTSP_RETRY_COUNT = 6;
@@ -31,23 +32,23 @@ static RtpTransport::Value defaultTransportToUse( RtpTransport::_auto );
 
 QnMulticodecRtpReader::QnMulticodecRtpReader(const QnResourcePtr& res):
     QnResourceConsumer(res),
-    m_videoIO(0),
     m_audioIO(0),
-    m_videoParser(0),
     m_audioParser(0),
     m_timeHelper(res->getUniqueId()),
     m_pleaseStop(false),
     m_gotSomeFrame(false),
     m_role(Qn::CR_Default)
 {
+    memset(m_videoParsers, 0, sizeof(m_videoParsers));
+    memset(m_videoIOs, 0, sizeof(m_videoIOs));
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
         m_RtpSession.setTCPTimeout(netRes->getNetworkTimeout());
     else
         m_RtpSession.setTCPTimeout(1000 * 10);
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
-    m_numberOfVideoChannels = mr->getVideoLayout()->channelCount();
-    m_gotKeyData.resize(m_numberOfVideoChannels);
+    m_numberOfVideoChannels = 1;
+    m_customVideoLayout.clear();
 
     QnSecurityCamResourcePtr camRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
     if (camRes)
@@ -57,7 +58,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(const QnResourcePtr& res):
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
 {
-    delete m_videoParser;
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        delete m_videoParsers[i];
     delete m_audioParser;
     for (unsigned int i = 0; i < m_demuxedData.size(); ++i)
         delete m_demuxedData[i];
@@ -139,26 +141,27 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     // int readed;
     int audioRetryCount = 0;
     int videoRetryCount = 0;
-    int channelNum = -1;
+    int rtpChannelNum = -1;
 
     QElapsedTimer dataTimer;
     dataTimer.restart();
 
     while (m_RtpSession.isOpened() && !m_pleaseStop && !m_lastVideoData && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
     {
-        int readed = m_RtpSession.readBinaryResponce(m_demuxedData, channelNum);
+        int readed = m_RtpSession.readBinaryResponce(m_demuxedData, rtpChannelNum);
         m_RtpSession.sendKeepAliveIfNeeded();
         if (readed < 1)
             break; // error
-        RTPSession::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(channelNum);
-        int rtpBufferOffset = m_demuxedData[channelNum]->size() - readed;
+        RTPSession::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(rtpChannelNum);
+        int channelNum = m_RtpSession.getChannelNum(rtpChannelNum);
+        int rtpBufferOffset = m_demuxedData[rtpChannelNum]->size() - readed;
 
-        if (format == RTPSession::TT_VIDEO && m_videoParser) 
+        if (format == RTPSession::TT_VIDEO && m_videoParsers[channelNum]) 
         {
-            if (!m_videoParser->processData((quint8*)m_demuxedData[channelNum]->data(), rtpBufferOffset+4, readed-4, m_videoIO->getStatistic(), m_lastVideoData)) 
+            if (!m_videoParsers[channelNum]->processData((quint8*)m_demuxedData[rtpChannelNum]->data(), rtpBufferOffset+4, readed-4, m_videoIOs[channelNum]->getStatistic(), m_lastVideoData)) 
             {
                 setNeedKeyData();
-                m_demuxedData[channelNum]->clear();
+                m_demuxedData[rtpChannelNum]->clear();
                 if (++videoRetryCount > RTSP_RETRY_COUNT) {
                     qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
                     closeStream();
@@ -166,21 +169,22 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
                 }
             }
             else if (m_lastVideoData) {
+                m_lastVideoData->channelNumber = channelNum;
                 checkIfNeedKeyData();
                 if (!m_lastVideoData)
-                    m_demuxedData[channelNum]->clear();
+                    m_demuxedData[rtpChannelNum]->clear();
             }
         }
-        else if (format == RTPSession::TT_VIDEO_RTCP && m_videoParser)
+        else if (format == RTPSession::TT_VIDEO_RTCP && m_videoParsers[channelNum])
         {
-            processTcpRtcp(m_videoIO, (quint8*) m_demuxedData[channelNum]->data(), readed, m_demuxedData[channelNum]->capacity());
-            m_demuxedData[channelNum]->clear();
+            processTcpRtcp(m_videoIOs[channelNum], (quint8*) m_demuxedData[rtpChannelNum]->data(), readed, m_demuxedData[rtpChannelNum]->capacity());
+            m_demuxedData[rtpChannelNum]->clear();
         }
         else if (format == RTPSession::TT_AUDIO && m_audioParser) 
         {
-            if (!m_audioParser->processData((quint8*)m_demuxedData[channelNum]->data(), rtpBufferOffset+4, readed-4, m_audioIO->getStatistic(), m_lastAudioData)) 
+            if (!m_audioParser->processData((quint8*)m_demuxedData[rtpChannelNum]->data(), rtpBufferOffset+4, readed-4, m_audioIO->getStatistic(), m_lastAudioData)) 
             {
-                m_demuxedData[channelNum]->clear();
+                m_demuxedData[rtpChannelNum]->clear();
                 if (++audioRetryCount > RTSP_RETRY_COUNT) {
                     closeStream();
                     return QnAbstractMediaDataPtr(0);
@@ -189,16 +193,16 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         }
         else if (format == RTPSession::TT_AUDIO_RTCP && m_audioParser)
         {
-            processTcpRtcp(m_audioIO, (quint8*)m_demuxedData[channelNum]->data(), readed, m_demuxedData[channelNum]->capacity());
-            m_demuxedData[channelNum]->clear();
+            processTcpRtcp(m_audioIO, (quint8*)m_demuxedData[rtpChannelNum]->data(), readed, m_demuxedData[rtpChannelNum]->capacity());
+            m_demuxedData[rtpChannelNum]->clear();
         }
         else {
-            m_demuxedData[channelNum]->clear();
+            m_demuxedData[rtpChannelNum]->clear();
         }
 
         if (m_rtcpReportTimer.elapsed() >= RTCP_REPORT_TIMEOUT) {
-            if (m_videoIO)
-                buildClientRTCPReport(m_videoIO->getRtcpTrackNum());
+            if (m_videoIOs[channelNum])
+                buildClientRTCPReport(m_videoIOs[channelNum]->getRtcpTrackNum());
             if (m_audioIO)
                 buildClientRTCPReport(m_audioIO->getRtcpTrackNum());
             m_rtcpReportTimer.restart();
@@ -210,8 +214,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     {
         result = m_lastVideoData;
         m_lastVideoData.clear();
-        if (channelNum >= 0)
-            m_demuxedData[channelNum]->clear();
+        if (rtpChannelNum >= 0)
+            m_demuxedData[rtpChannelNum]->clear();
         m_gotSomeFrame = true;
         return result;
     }
@@ -219,8 +223,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     {
         result = m_lastAudioData[0];
         m_lastAudioData.removeAt(0);
-        if (channelNum >= 0)
-            m_demuxedData[channelNum]->clear();
+        if (rtpChannelNum >= 0)
+            m_demuxedData[rtpChannelNum]->clear();
         result->channelNumber += m_numberOfVideoChannels;
 
         m_gotSomeFrame = true;
@@ -272,9 +276,11 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
     while (m_RtpSession.isOpened() && !m_pleaseStop && !m_lastVideoData && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
     {
         int nfds = 0;
-        if(m_videoIO) {
-            mediaSockPollArray[nfds].fd = m_videoIO->getMediaSocket()->handle();
-            mediaSockPollArray[nfds++].events = POLLIN;
+        for (int channelNum = 0; channelNum < CL_MAX_CHANNELS; ++channelNum) {
+            if(m_videoIOs[channelNum]) {
+                mediaSockPollArray[nfds].fd = m_videoIOs[channelNum]->getMediaSocket()->handle();
+                mediaSockPollArray[nfds++].events = POLLIN;
+            }
         }
         if(m_audioIO) {
             mediaSockPollArray[nfds].fd = m_audioIO->getMediaSocket()->handle();
@@ -286,32 +292,36 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
             continue;
         for( int i = 0; i < rez; ++i )
         {
-            if( m_videoIO && mediaSockPollArray[i].fd == m_videoIO->getMediaSocket()->handle() )
+            for (int channelNum = 0; channelNum < CL_MAX_CHANNELS; ++channelNum)
             {
-                quint8* rtpBuffer = RTPSession::prepareDemuxedData(m_demuxedData, RTPSession::TT_VIDEO, MAX_RTP_PACKET_SIZE); // todo: update here
-                readed = m_videoIO->read( (char*) rtpBuffer, MAX_RTP_PACKET_SIZE);
-                if (readed < 1)
-                    break;
-                m_demuxedData[RTPSession::TT_VIDEO]->finishWriting(readed);
-                quint8* bufferBase = (quint8*) m_demuxedData[RTPSession::TT_VIDEO]->data();
-                if (!m_videoParser->processData(bufferBase, rtpBuffer-bufferBase, readed, m_videoIO->getStatistic(), m_lastVideoData)) 
+                if( m_videoIOs[channelNum] && mediaSockPollArray[i].fd == m_videoIOs[channelNum]->getMediaSocket()->handle() )
                 {
-                    setNeedKeyData();
-                    m_demuxedData[RTPSession::TT_VIDEO]->clear();
-                    if (++videoRetryCount > RTSP_RETRY_COUNT) {
-                        qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
-                        closeStream();
-                        return QnAbstractMediaDataPtr(0);
+                    quint8* rtpBuffer = RTPSession::prepareDemuxedData(m_demuxedData, RTPSession::TT_VIDEO, MAX_RTP_PACKET_SIZE); // todo: update here
+                    readed = m_videoIOs[0]->read( (char*) rtpBuffer, MAX_RTP_PACKET_SIZE);
+                    if (readed < 1)
+                        break;
+                    m_demuxedData[RTPSession::TT_VIDEO]->finishWriting(readed);
+                    quint8* bufferBase = (quint8*) m_demuxedData[RTPSession::TT_VIDEO]->data();
+                    if (!m_videoParsers[channelNum]->processData(bufferBase, rtpBuffer-bufferBase, readed, m_videoIOs[channelNum]->getStatistic(), m_lastVideoData)) 
+                    {
+                        setNeedKeyData();
+                        m_demuxedData[RTPSession::TT_VIDEO]->clear();
+                        if (++videoRetryCount > RTSP_RETRY_COUNT) {
+                            qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
+                            closeStream();
+                            return QnAbstractMediaDataPtr(0);
+                        }
+                    }
+                    else if (m_lastVideoData) 
+                    {
+                        m_lastVideoData->channelNumber = channelNum;
+                        checkIfNeedKeyData();
+                        if (!m_lastVideoData)
+                            m_demuxedData[RTPSession::TT_VIDEO]->clear();
                     }
                 }
-                else if (m_lastVideoData) 
-                {
-                    checkIfNeedKeyData();
-                    if (!m_lastVideoData)
-                        m_demuxedData[RTPSession::TT_VIDEO]->clear();
-                }
             }
-            else if( m_audioIO && mediaSockPollArray[i].fd == m_audioIO->getMediaSocket()->handle() )
+            if( m_audioIO && mediaSockPollArray[i].fd == m_audioIO->getMediaSocket()->handle() )
             {
                 quint8* rtpBuffer = RTPSession::prepareDemuxedData(m_demuxedData, RTPSession::TT_AUDIO, MAX_RTP_PACKET_SIZE); // todo: update here
                 readed = m_audioIO->read( (char*) rtpBuffer, MAX_RTP_PACKET_SIZE);
@@ -358,7 +368,9 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
 {
     QnRtpStreamParser* result = 0;
 
-    if (codecName == QLatin1String("H264"))
+    if (codecName.isEmpty())
+        return 0;
+    else if (codecName == QLatin1String("H264"))
         result = new CLH264RtpParser;
     else if (codecName == QLatin1String("JPEG"))
         result = new QnMjpegRtpParser;
@@ -419,18 +431,20 @@ void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
 }
 
 
-void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, const RTPSession::TrackType mediaType)
+void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, const RTPSession::TrackType mediaType, int channelNum)
 {
     *ioDevice = 0;
     if (parser)
     {
-        *ioDevice = m_RtpSession.getTrackIoByType(mediaType);
-        parser->setSDPInfo(m_RtpSession.getSdpByType(mediaType));
+        *ioDevice = m_RtpSession.getTrackIoByType(mediaType, channelNum);
+        parser->setSDPInfo(m_RtpSession.getSdpByType(mediaType, channelNum));
     }
+    /*
     else {
         if (!m_RtpSession.getCodecNameByType(mediaType).isEmpty())
             qWarning() << "Unsupported RTSP " << m_RtpSession.mediaTypeToStr(mediaType) << " codec" << m_RtpSession.getCodecNameByType(mediaType);
     }
+    */
 }
 
 static int TCP_READ_BUFFER_SIZE = 512*1024;
@@ -482,12 +496,16 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         QTextStream( &url ) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
 
     m_RtpSession.setAuth(nres->getAuth(), RTPSession::authBasic);
+    
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
+        delete m_videoParsers[i];
+        m_videoParsers[i] = 0;
+        m_videoIOs[i] = 0;
+    }
 
-    delete m_videoParser;
-    m_videoParser = 0;
     delete m_audioParser;
     m_audioParser = 0;
-    m_videoIO = m_audioIO = 0;
+    m_audioIO = 0;
 
     const CameraDiagnostics::Result result = m_RtpSession.open(url);
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
@@ -498,16 +516,46 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         m_RtpSession.setAudioEnabled(camera->isAudioEnabled());
 
     m_RtpSession.play(AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0);
+
+    m_numberOfVideoChannels = m_RtpSession.getTrackCount(RTPSession::TT_VIDEO);
+    m_gotKeyData.resize(m_numberOfVideoChannels);
+
+    {
+        QMutexLocker lock(&m_layoutMutex);
+        m_customVideoLayout.clear();
+        m_gotKeyData.resize(m_numberOfVideoChannels);
+        QString newVideoLayout;
+        if (m_numberOfVideoChannels > 1) {
+            m_customVideoLayout = QnCustomResourceVideoLayoutPtr(new QnCustomResourceVideoLayout(QSize(m_numberOfVideoChannels, 1)));
+            for (int i = 0; i < m_numberOfVideoChannels; ++i)
+                m_customVideoLayout->setChannel(i, 0, i); // arrange multi video layout from left to right
+            newVideoLayout = m_customVideoLayout->toString();
+        }
+
+        QnVirtualCameraResourcePtr camRes = m_resource.dynamicCast<QnVirtualCameraResource>();
+        if (camRes && m_role == Qn::CR_LiveVideo) {
+            QVariant val;
+            camRes->getParam(lit("VideoLayout"), val, QnDomainMemory);
+            QString oldVideoLayout = val.toString();
+            if (newVideoLayout != oldVideoLayout) {
+                camRes->setParam(lit("VideoLayout"), newVideoLayout, QnDomainDatabase);
+                camRes->saveParams();
+            }
+        }
+    }
     
-    m_videoParser = dynamic_cast<QnRtpVideoStreamParser*> (createParser(m_RtpSession.getCodecNameByType(RTPSession::TT_VIDEO).toUpper()));
-    if (m_videoParser)
-        m_videoParser->setTimeHelper(&m_timeHelper);
-    m_audioParser = dynamic_cast<QnRtpAudioStreamParser*> (createParser(m_RtpSession.getCodecNameByType(RTPSession::TT_AUDIO).toUpper()));
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
+        m_videoParsers[i] = dynamic_cast<QnRtpVideoStreamParser*> (createParser(m_RtpSession.getCodecNameByType(RTPSession::TT_VIDEO, i).toUpper()));
+        if (m_videoParsers[i]) {
+            m_videoParsers[i]->setTimeHelper(&m_timeHelper);
+            initIO(&m_videoIOs[i], m_videoParsers[i], RTPSession::TT_VIDEO, i);
+        }
+    }
+    m_audioParser = dynamic_cast<QnRtpAudioStreamParser*> (createParser(m_RtpSession.getCodecNameByType(RTPSession::TT_AUDIO, 0).toUpper()));
     if (m_audioParser)
         m_audioParser->setTimeHelper(&m_timeHelper);
 
-    initIO(&m_videoIO, m_videoParser, RTPSession::TT_VIDEO);
-    initIO(&m_audioIO, m_audioParser, RTPSession::TT_AUDIO);
+    initIO(&m_audioIO, m_audioParser, RTPSession::TT_AUDIO, 0);
 
     if (m_role == Qn::CR_LiveVideo)
     {
@@ -520,10 +568,10 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         }
     }
 
-    if (!m_videoIO && !m_audioIO)
+    if (!m_videoIOs[0] && !m_audioIO)
         m_RtpSession.stop();
     m_rtcpReportTimer.restart();
-    if( m_videoIO || m_audioIO )
+    if( m_videoIOs[0] || m_audioIO )
         return CameraDiagnostics::NoErrorResult();
     else
         return CameraDiagnostics::NoMediaTrackResult( url );
@@ -570,6 +618,12 @@ void QnMulticodecRtpReader::setDefaultTransport( const RtpTransport::Value& _def
 void QnMulticodecRtpReader::setRole(Qn::ConnectionRole role)
 {
     m_role = role;
+}
+
+QnConstResourceVideoLayoutPtr QnMulticodecRtpReader::getVideoLayout() const
+{
+    QMutexLocker lock(&m_layoutMutex);
+    return m_customVideoLayout;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

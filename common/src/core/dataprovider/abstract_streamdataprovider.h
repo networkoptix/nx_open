@@ -8,6 +8,7 @@
 #include "../datapacket/abstract_data_packet.h"
 #include "../resource/param.h"
 #include "../dataconsumer/abstract_data_consumer.h"
+#include "../resource/resource_media_layout.h"
 
 class QnAbstractStreamDataProvider;
 class QnResource;
@@ -43,6 +44,8 @@ public:
 
     /* One resource may have several providers used with different roles*/
     virtual void setRole(Qn::ConnectionRole role);
+
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout() const { return QnConstResourceVideoLayoutPtr(); }
 signals:
     void videoParamsChanged(AVCodecContext * codec);
     void slowSourceHint();
