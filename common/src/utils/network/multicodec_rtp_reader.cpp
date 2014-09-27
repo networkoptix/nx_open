@@ -294,18 +294,20 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
         {
             for (int channelNum = 0; channelNum < CL_MAX_CHANNELS; ++channelNum)
             {
-                if( m_videoIOs[channelNum] && mediaSockPollArray[i].fd == m_videoIOs[channelNum]->getMediaSocket()->handle() )
+                if( m_videoIOs[channelNum] && mediaSockPollArray[i].fd == m_videoIOs[channelNum]->getMediaSocket()->handle())
                 {
-                    quint8* rtpBuffer = RTPSession::prepareDemuxedData(m_demuxedData, RTPSession::TT_VIDEO, MAX_RTP_PACKET_SIZE); // todo: update here
+                    int rtpChannelNum = channelNum;
+
+                    quint8* rtpBuffer = RTPSession::prepareDemuxedData(m_demuxedData, rtpChannelNum, MAX_RTP_PACKET_SIZE); // todo: update here
                     readed = m_videoIOs[0]->read( (char*) rtpBuffer, MAX_RTP_PACKET_SIZE);
                     if (readed < 1)
                         break;
-                    m_demuxedData[RTPSession::TT_VIDEO]->finishWriting(readed);
-                    quint8* bufferBase = (quint8*) m_demuxedData[RTPSession::TT_VIDEO]->data();
+                    m_demuxedData[rtpChannelNum]->finishWriting(readed);
+                    quint8* bufferBase = (quint8*) m_demuxedData[rtpChannelNum]->data();
                     if (!m_videoParsers[channelNum]->processData(bufferBase, rtpBuffer-bufferBase, readed, m_videoIOs[channelNum]->getStatistic(), m_lastVideoData)) 
                     {
                         setNeedKeyData();
-                        m_demuxedData[RTPSession::TT_VIDEO]->clear();
+                        m_demuxedData[rtpChannelNum]->clear();
                         if (++videoRetryCount > RTSP_RETRY_COUNT) {
                             qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
                             closeStream();
@@ -317,21 +319,23 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                         m_lastVideoData->channelNumber = channelNum;
                         checkIfNeedKeyData();
                         if (!m_lastVideoData)
-                            m_demuxedData[RTPSession::TT_VIDEO]->clear();
+                            m_demuxedData[rtpChannelNum]->clear();
                     }
                 }
             }
             if( m_audioIO && mediaSockPollArray[i].fd == m_audioIO->getMediaSocket()->handle() )
             {
-                quint8* rtpBuffer = RTPSession::prepareDemuxedData(m_demuxedData, RTPSession::TT_AUDIO, MAX_RTP_PACKET_SIZE); // todo: update here
+                int rtpChannelNum = m_numberOfVideoChannels;
+
+                quint8* rtpBuffer = RTPSession::prepareDemuxedData(m_demuxedData, rtpChannelNum, MAX_RTP_PACKET_SIZE); // todo: update here
                 readed = m_audioIO->read( (char*) rtpBuffer, MAX_RTP_PACKET_SIZE);
                 if (readed < 1)
                     break;
-                m_demuxedData[RTPSession::TT_AUDIO]->finishWriting(readed);
-                quint8* bufferBase = (quint8*) m_demuxedData[RTPSession::TT_AUDIO]->data();
+                m_demuxedData[rtpChannelNum]->finishWriting(readed);
+                quint8* bufferBase = (quint8*) m_demuxedData[rtpChannelNum]->data();
                 if (!m_audioParser->processData(bufferBase, rtpBuffer-bufferBase, readed, m_audioIO->getStatistic(), m_lastAudioData)) 
                 {
-                    m_demuxedData[RTPSession::TT_AUDIO]->clear();
+                    m_demuxedData[rtpChannelNum]->clear();
                     if (++audioRetryCount > RTSP_RETRY_COUNT) {
                         closeStream();
                         return QnAbstractMediaDataPtr(0);
@@ -347,15 +351,15 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
     {
         result = m_lastVideoData;
         m_lastVideoData.clear();
-        m_demuxedData[RTPSession::TT_VIDEO]->clear();
+        m_demuxedData[result->channelNumber]->clear();
         return result;
     }
     if (!m_lastAudioData.isEmpty())
     {
         result = m_lastAudioData[0];
         m_lastAudioData.removeAt(0);
-        m_demuxedData[RTPSession::TT_AUDIO]->clear();
         result->channelNumber += m_numberOfVideoChannels;
+        m_demuxedData[result->channelNumber]->clear();
 
         return result;
     }
