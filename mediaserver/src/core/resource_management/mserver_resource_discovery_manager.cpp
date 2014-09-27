@@ -87,7 +87,7 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCam
         return (camera->getUniqueId().toLocal8Bit() == QByteArray(mac));
     }
 #endif
-    if (mServer->getServerFlags() & Qn::SF_Edge)
+    if ((mServer->getServerFlags() & Qn::SF_Edge) && !mServer->isRedundancy())
         return false; // do not transfer cameras from edge server
 
     if (camera->preferedServerId() == ownGuid)
