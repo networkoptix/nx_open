@@ -15,7 +15,8 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, QGLContext* 
 :
     QnAbstractRenderer( parent ),
     m_glContext( context ),
-    m_screenshotInterface(0)
+    m_screenshotInterface(0),
+    m_panoFactor(1)
 {
     Q_ASSERT( context != NULL );
 
@@ -55,6 +56,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
         delete m_channelRenderers[i].renderer;
         delete m_channelRenderers[i].uploader;
     }
+    m_panoFactor = channelCount;
 
     m_channelRenderers.resize( channelCount );
     m_renderingEnabled.resize( channelCount, true );
@@ -301,15 +303,7 @@ bool QnResourceWidgetRenderer::constantDownscaleFactor() const {
 QSize QnResourceWidgetRenderer::sourceSize() const {
     QMutexLocker locker(&m_mutex);
 
-    return m_sourceSize;
-
-    /*
-    int panoFactor = 1;
-    if (!m_channelRenderers.empty() && m_channelRenderers[0].renderer)
-        panoFactor = m_channelRenderers[0].renderer->panoFactor();
-
-    return QSize(m_sourceSize.width() * panoFactor, m_sourceSize.height());
-    */
+    return QSize(m_sourceSize.width() * m_panoFactor, m_sourceSize.height());
 }
 
 const QGLContext* QnResourceWidgetRenderer::glContext() const
