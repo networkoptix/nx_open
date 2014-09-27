@@ -49,7 +49,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
         if (resource->getParentId() != ownMediaServer->getId())
             resource->addFlags( Qn::foreigner );
         else {
-#ifdef EDGE_SERVER
+#if 0
             QnResourceTypePtr thirdPartyType = qnResTypePool->getResourceTypeByName("THIRD_PARTY Camera");
             QnResourceTypePtr desktopCameraType = qnResTypePool->getResourceTypeByName("SERVER_DESKTOP_CAMERA");
             if (thirdPartyType && desktopCameraType && 
