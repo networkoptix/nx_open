@@ -86,7 +86,7 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
     bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferedServerId() == qnCommon->moduleGUID(); // return camera back without mutex
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
     bool takeCameraWithoutLock = ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy();
-    if (!ec2::QnDistributedMutexManager::instance() || takeCameraWithoutLock)
+    if (!ec2::QnDistributedMutexManager::instance() || takeCameraWithoutLock || isOwnChangeParentId)
     {
         addNewCameraInternal(cameraResource);
         return;
