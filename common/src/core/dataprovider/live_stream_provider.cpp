@@ -20,7 +20,9 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         m_motionMaskBinData[i] = (simd128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
         memset(m_motionMaskBinData[i], 0, MD_WIDTH * MD_HEIGHT/8);
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         m_motionEstimation[i].setChannelNum(i);
+#endif
     }
 
     m_role = Qn::CR_LiveVideo;
