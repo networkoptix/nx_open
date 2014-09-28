@@ -481,10 +481,10 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
         recorders = itr.value();
         m_recordMap.remove(resource);
     }
-    qnCameraPool->removeVideoCamera(resource);
-
     beforeDeleteRecorder(recorders);
     deleteRecorder(recorders, resource);
+
+    qnCameraPool->removeVideoCamera(resource);
 
     m_onlineCameras.remove(resource);
 }

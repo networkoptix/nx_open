@@ -40,7 +40,7 @@ public:
 
     double getSpeed() const;
 
-    void disconnectFromResource();
+    virtual void disconnectFromResource() override;
 
     /* One resource may have several providers used with different roles*/
     virtual void setRole(Qn::ConnectionRole role);
