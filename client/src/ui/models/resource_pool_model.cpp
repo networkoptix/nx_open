@@ -196,7 +196,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::systemNode(const QString &systemNa
 
     node = new QnResourcePoolModelNode(this, Qn::SystemNode, systemName);
     if (m_scope == FullScope)
-    node->setParent(m_rootNodes[Qn::OtherSystemsNode]);
+        node->setParent(m_rootNodes[Qn::OtherSystemsNode]);
     else
         node->setParent(m_rootNodes[Qn::BastardNode]);
     m_systemNodeBySystemName[systemName] = node;
@@ -578,9 +578,13 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     }
 
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (server && server->getStatus() == Qn::Incompatible) {
-        connect(server,     &QnMediaServerResource::systemNameChanged,  this,   &QnResourcePoolModel::at_server_systemNameChanged);
-        m_rootNodes[Qn::OtherSystemsNode]->update();
+    if (server) {
+        connect(server,     &QnMediaServerResource::redundancyChanged,  this,   &QnResourcePoolModel::at_resource_resourceChanged);
+
+        if (server->getStatus() == Qn::Incompatible) {
+            connect(server, &QnMediaServerResource::systemNameChanged,  this,   &QnResourcePoolModel::at_server_systemNameChanged);
+            m_rootNodes[Qn::OtherSystemsNode]->update();
+        }
     }
 
     QnResourcePoolModelNode *node = this->node(resource);
@@ -646,6 +650,23 @@ void QnResourcePoolModel::at_accessController_permissionsChanged(const QnResourc
 
 void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resource) {
     QnResourcePoolModelNode *node = this->node(resource);
+
+    /* update edge resource */
+    if (resource.dynamicCast<QnVirtualCameraResource>()) {
+        bool wasEdge = (node->type() == Qn::EdgeNode);
+        bool mustBeEdge = QnMediaServerResource::isHiddenServer(resource->getParentResource());
+        if (wasEdge != mustBeEdge) {
+            QnResourcePoolModelNode *parent = node->parent();
+
+            m_resourceNodeByResource.remove(resource);
+            deleteNode(node);
+
+            if (parent)
+                parent->update();
+
+            node = this->node(resource);
+        }
+    }
 
     node->setParent(expectedParent(node));
 }

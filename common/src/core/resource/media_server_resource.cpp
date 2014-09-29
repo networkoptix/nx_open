@@ -338,8 +338,13 @@ int QnMediaServerResource::getMaxCameras() const
 
 void QnMediaServerResource::setRedundancy(bool value)
 {
-    QMutexLocker lock(&m_mutex);
-    m_redundancy = value;
+    {
+        QMutexLocker lock(&m_mutex);
+        if (m_redundancy == value)
+            return;
+        m_redundancy = value;
+    }
+    emit redundancyChanged(::toSharedPointer(this));
 }
 
 int QnMediaServerResource::isRedundancy() const
