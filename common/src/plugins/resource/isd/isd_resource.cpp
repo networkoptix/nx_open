@@ -188,6 +188,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
         mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution2, CODEC_ID_H264 ) );
     saveResolutionList( mediaStreams );
 
+    setMotionType( Qn::MT_SoftwareGrid );
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
