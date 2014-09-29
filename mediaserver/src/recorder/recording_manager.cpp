@@ -65,6 +65,14 @@ void QnRecordingManager::beforeDeleteRecorder(const Recorders& recorders)
         recorders.recorderLowRes->pleaseStop();
 }
 
+void QnRecordingManager::stopRecorder(const Recorders& recorders)
+{
+    if( recorders.recorderHiRes )
+        recorders.recorderHiRes->stop();
+    if (recorders.recorderLowRes)
+        recorders.recorderLowRes->stop();
+}
+
 void QnRecordingManager::deleteRecorder(const Recorders& recorders, const QnResourcePtr& /*resource*/)
 {
 	QnVideoCamera* camera = 0;
@@ -481,9 +489,10 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
         recorders = itr.value();
         m_recordMap.remove(resource);
     }
-    qnCameraPool->removeVideoCamera(resource);
 
     beforeDeleteRecorder(recorders);
+    stopRecorder(recorders);
+    qnCameraPool->removeVideoCamera(resource);
     deleteRecorder(recorders, resource);
 
     m_onlineCameras.remove(resource);

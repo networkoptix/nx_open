@@ -24,6 +24,7 @@ public:
     * As motion data, motion mask is rotated to 90 degree.
     */
     void setMotionMask(const QnMotionRegion& region);
+    void setChannelNum(int value);
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     //void analizeFrame(const CLVideoDecoderOutput* frame);
     /*!
@@ -77,6 +78,7 @@ private:
 	//int m_numFrame;
 	int m_scaleXStep;
     int m_scaleYStep;
+    int m_channelNum;
 };
 
 #endif  //ENABLE_SOFTWARE_MOTION_DETECTION

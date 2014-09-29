@@ -48,6 +48,21 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
     {
         if (resource->getParentId() != ownMediaServer->getId())
             resource->addFlags( Qn::foreigner );
+        else {
+#if 0
+            QnResourceTypePtr thirdPartyType = qnResTypePool->getResourceTypeByName("THIRD_PARTY Camera");
+            QnResourceTypePtr desktopCameraType = qnResTypePool->getResourceTypeByName("SERVER_DESKTOP_CAMERA");
+            if (thirdPartyType && desktopCameraType && 
+                resource->getTypeId() != desktopCameraType->getId() && resource->getTypeId() != thirdPartyType->getId()) 
+            {
+                resource->setTypeId(thirdPartyType->getId());
+                QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+                QnVirtualCameraResourceList cameras;
+                cameras << camera;
+                m_connection->getCameraManager()->save(cameras, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            }
+#endif
+        }
     }
 
     if (isServer) 

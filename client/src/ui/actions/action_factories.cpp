@@ -155,7 +155,7 @@ void QnPtzPresetsToursActionFactory::at_action_triggered() {
 
 QMenu* QnEdgeNodeActionFactory::newMenu(const QnActionParameters &parameters, QWidget *parentWidget) {
     QnVirtualCameraResourcePtr edgeCamera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    if (!edgeCamera || !QnMediaServerResource::isEdgeServer(edgeCamera->getParentResource()))
+    if (!edgeCamera || !QnMediaServerResource::isHiddenServer(edgeCamera->getParentResource()))
         return NULL;
 
     return menu()->newMenu(Qn::NoAction, Qn::TreeScope, parentWidget, QnActionParameters(edgeCamera->getParentResource()));

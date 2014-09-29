@@ -512,7 +512,8 @@ void RTPSession::parseSDP()
             if (mapNum >= 0) {
                 if (codecName.isEmpty())
                     codecName = findCodecById(mapNum);
-                m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
+                QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
+                m_sdpTracks << sdpTrack;
                 setupURL.clear();
             }
             QList<QByteArray> trackParams = lineLower.mid(2).split(' ');
@@ -546,7 +547,8 @@ void RTPSession::parseSDP()
             codecName = findCodecById(mapNum);
         //if (codecName == QLatin1String("ffmpeg-metadata"))
         //    trackNumber = METADATA_TRACK_NUM;
-        m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
+        QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
+        m_sdpTracks << sdpTrack;
     }
     updateTrackNum();
 }
@@ -845,27 +847,38 @@ bool RTPSession::sendOptions()
     return m_tcpSock->send(request.data(), request.size()) > 0;
 }
 
-RTPIODevice* RTPSession::getTrackIoByType(TrackType trackType)
+RTPIODevice* RTPSession::getTrackIoByType(TrackType trackType, int channelNum)
 {
     for (int i = 0; i < m_sdpTracks.size(); ++i)
     {
-        if (m_sdpTracks[i]->trackType == trackType)
+        if (m_sdpTracks[i]->trackType == trackType && m_sdpTracks[i]->trackNum == channelNum)
             return m_sdpTracks[i]->ioDevice;
     }
     return 0;
 }
 
-QString RTPSession::getCodecNameByType(TrackType trackType)
+QString RTPSession::getCodecNameByType(TrackType trackType, int channelNum)
 {
     for (int i = 0; i < m_sdpTracks.size(); ++i)
     {
-        if (m_sdpTracks[i]->trackType == trackType)
+        if (m_sdpTracks[i]->trackType == trackType && channelNum == m_sdpTracks[i]->trackNum)
             return m_sdpTracks[i]->codecName;
     }
     return QString();
 }
 
-QList<QByteArray> RTPSession::getSdpByType(TrackType trackType) const
+int RTPSession::getTrackCount(TrackType trackType) const
+{
+    int result = 0;
+    for (int i = 0; i < m_sdpTracks.size(); ++i)
+    {
+        if (m_sdpTracks[i]->trackType == trackType)
+            ++result;
+    }
+    return result;
+}
+
+QList<QByteArray> RTPSession::getSdpByType(TrackType trackType, int channelNum) const
 {
     QList<QByteArray> rez;
     QList<QByteArray> tmp = m_sdp.split('\n');
@@ -873,7 +886,7 @@ QList<QByteArray> RTPSession::getSdpByType(TrackType trackType) const
     int mapNum = -1;
     for (int i = 0; i < m_sdpTracks.size(); ++i)
     {
-        if (m_sdpTracks[i]->trackType == trackType)
+        if (m_sdpTracks[i]->trackType == trackType && channelNum == m_sdpTracks[i]->trackNum)
             mapNum = m_sdpTracks[i]->mapNum;
     }
     if (mapNum == -1)
@@ -1825,6 +1838,17 @@ RTPSession::TrackType RTPSession::getTrackTypeByRtpChannelNum(int channelNum)
     if (channelNum % SDP_TRACK_STEP)
         rez = RTPSession::TrackType(int(rez)+1);
     return rez;
+}
+
+int RTPSession::getChannelNum(int rtpChannelNum)
+{
+    rtpChannelNum = rtpChannelNum & ~1;
+    if (rtpChannelNum < m_rtpToTrack.size()) {
+        QSharedPointer<SDPTrackInfo> track = m_rtpToTrack[rtpChannelNum];
+        if (track)
+            return track->trackNum;
+    }
+    return 0;
 }
 
 RTPSession::TrackType RTPSession::getTrackType(int trackNum) const

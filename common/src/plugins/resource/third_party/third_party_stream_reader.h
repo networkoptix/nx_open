@@ -36,7 +36,7 @@ public:
     virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData) override;
     //!Overrides QnLiveStreamProvider::updateSoftwareMotion()
     virtual void updateSoftwareMotion() override;
-
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual CameraDiagnostics::Result openStream() override;

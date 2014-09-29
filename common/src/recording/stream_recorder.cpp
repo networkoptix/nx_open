@@ -44,6 +44,7 @@ QString QnStreamRecorder::errorString(int errCode) {
 
 QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
+    QnResourceConsumer(dev),
     m_device(dev),
     m_firstTime(true),
     m_truncateInterval(0),
@@ -883,6 +884,12 @@ void QnStreamRecorder::setContrastParams(const ImageCorrectionParams& params)
 void QnStreamRecorder::setItemDewarpingParams(const QnItemDewarpingParams& params)
 {
     m_itemDewarpingParams = params;
+}
+
+void QnStreamRecorder::disconnectFromResource()
+{
+    stop();
+    QnResourceConsumer::disconnectFromResource();
 }
 
 #endif // ENABLE_DATA_PROVIDERS

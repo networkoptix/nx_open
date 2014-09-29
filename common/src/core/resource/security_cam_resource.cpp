@@ -149,7 +149,8 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
             return 0;
 
         QnAbstractStreamDataProvider* result = createLiveDataProvider();
-        result->setRole(role);
+        if (result)
+            result->setRole(role);
         return result;
 
     }

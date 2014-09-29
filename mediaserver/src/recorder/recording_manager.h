@@ -67,6 +67,7 @@ private:
     QnResourceList getLocalControlledCameras();
 
     void beforeDeleteRecorder(const Recorders& recorders);
+    void stopRecorder(const Recorders& recorders);
     void deleteRecorder(const Recorders& recorders, const QnResourcePtr& resource);
     bool updateCameraHistory(const QnResourcePtr& res);
 

@@ -565,4 +565,9 @@ void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& a
     m_audioLayout->addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()) );
 }
 
+QnConstResourceVideoLayoutPtr ThirdPartyStreamReader::getVideoLayout() const
+{
+    return m_builtinStreamReader ? m_builtinStreamReader->getVideoLayout() : QnConstResourceVideoLayoutPtr();
+}
+
 #endif // ENABLE_THIRD_PARTY

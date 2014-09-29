@@ -227,7 +227,7 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
           break;
       case Qt::DecorationRole:
           if (column == Columns::NameColumn){
-              if (QnMediaServerResource::isEdgeServer(server))
+              if (QnMediaServerResource::isHiddenServer(server))
                   return qnResIconCache->icon(QnResourceIconCache::Camera);
               return qnResIconCache->icon(QnResourceIconCache::Server);
           }

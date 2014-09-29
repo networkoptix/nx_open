@@ -549,6 +549,13 @@ bool QnDbManager::updateTableGuids(const QString& tableName, const QString& fiel
     return true;
 }
 
+bool QnDbManager::updateResourceTypeGuids()
+{
+    QMap<int, QnUuid> guids = 
+        getGuidList("SELECT rt.id, rt.name || coalesce(m.name,'-') as guid from vms_resourcetype rt LEFT JOIN vms_manufacture m on m.id = rt.manufacture_id WHERE rt.guid is null", CM_MakeHash);
+    return updateTableGuids("vms_resourcetype", "guid", guids);
+}
+
 bool QnDbManager::updateGuids()
 {
     QMap<int, QnUuid> guids = getGuidList("SELECT id, guid from vms_resource_tmp order by id", CM_Default, QnUuid::createUuid().toByteArray());
@@ -563,8 +570,7 @@ bool QnDbManager::updateGuids()
     if (!updateTableGuids("vms_layoutitem", "resource_guid", guids))
         return false;
 
-    guids = getGuidList("SELECT rt.id, rt.name || coalesce(m.name,'-') as guid from vms_resourcetype rt LEFT JOIN vms_manufacture m on m.id = rt.manufacture_id", CM_MakeHash);
-    if (!updateTableGuids("vms_resourcetype", "guid", guids))
+    if (!updateResourceTypeGuids())
         return false;
 
     guids = getGuidList("SELECT r.id, r2.guid from vms_resource_tmp r JOIN vms_resource r2 on r2.id = r.parent_id order by r.id", CM_Binary);
@@ -756,6 +762,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         if (!updateTableGuids("vms_resourcetype", "guid", guids))
             return false;
     }
+    else if (updateName == lit(":/updates/17_add_isd_cam.sql")) {
+        updateResourceTypeGuids();
+    }
 
     return true;
 }
@@ -776,13 +785,8 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         if (!execSQLFile(lit(":/01_createdb.sql"), m_sdb))
             return false;
 
-        //#ifdef EDGE_SERVER
-        //        if (!execSQLFile(lit(":/02_insert_3thparty_vendor.sql")))
-        //            return false;
-        //#else
         if (!execSQLFile(lit(":/02_insert_all_vendors.sql"), m_sdb))
             return false;
-        //#endif
     }
 
     if (!isObjectExists(lit("table"), lit("transaction_log"), m_sdb))

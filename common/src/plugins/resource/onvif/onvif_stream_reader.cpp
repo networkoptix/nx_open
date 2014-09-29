@@ -844,4 +844,9 @@ bool QnOnvifStreamReader::secondaryResolutionIsLarge() const
     return m_onvifRes->secondaryResolutionIsLarge();
 }
 
+QnConstResourceVideoLayoutPtr QnOnvifStreamReader::getVideoLayout() const
+{
+    return m_multiCodec.getVideoLayout();
+}
+
 #endif //ENABLE_ONVIF
