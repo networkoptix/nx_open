@@ -8,7 +8,7 @@
 #include <openssl/err.h>
 
 #include <utils/common/log.h>
-#include <queue>
+#include <list>
 
 #ifdef max
 #undef max
@@ -342,17 +342,20 @@ private:
             // Remove _THIS_ from the queue and check whether we need to go on
             {
                 std::lock_guard<std::mutex> lock(recv_mutex_);
-                recv_queue_.pop();
+                recv_queue_.pop_back();
                 if( !recv_queue_.empty() ) {
                     socket_->readSomeAsync(buf.write_buffer,std::move(recv_queue_.front()));
                 }
             }
         };
-        std::lock_guard<std::mutex> lock(recv_mutex_);
-        if( recv_queue_.empty() ) {
-            socket_->readSomeAsync(buf.write_buffer,recv_callback);
+        std::list< std::function<void(SystemError::ErrorCode,std::size_t)> > element(1,std::move(recv_callback));
+        {
+            std::lock_guard<std::mutex> lock(recv_mutex_);
+            if( recv_queue_.empty() ) {
+                socket_->readSomeAsync(buf.write_buffer,recv_callback);
+            }
+            recv_queue_.splice(recv_queue_.end(),std::move(element));
         }
-        recv_queue_.push( std::move(recv_callback) );
     }
 
     void do_send( buffer_t buf , const std::function<void(SystemError::ErrorCode,std::size_t)>& op ) {
@@ -360,18 +363,21 @@ private:
             op(ec,transferred_bytes);
             {
                 std::lock_guard<std::mutex> lock(send_mutex_);
-                send_queue_.pop();
+                send_queue_.pop_back();
                 if( !send_queue_.empty() ) {
                     // Fire one appending operation in the queue
                     socket_->sendAsync(*buf.read_buffer,std::move(send_queue_.front()));
                 }
             }
         };
-        std::lock_guard<std::mutex> lock(send_mutex_);
-        if( send_queue_.empty() ) {
-            socket_->sendAsync(*buf.read_buffer,send_callback);
+        std::list< std::function<void(SystemError::ErrorCode,std::size_t)> > element(1,std::move(send_callback));
+        {
+            std::lock_guard<std::mutex> lock(send_mutex_);
+            if( send_queue_.empty() ) {
+                socket_->sendAsync(*buf.read_buffer,send_callback);
+            }
+            send_queue_.splice(send_queue_.end(),std::move(element));
         }
-        send_queue_.push( std::move(send_callback) );
     }
 
     // the main entry for our async routine 
@@ -558,10 +564,10 @@ private:
     // first, and only when the queue is empty then it will fire such 
     // operation directly , otherwise the operation will be queued and 
     // until the previous recv/send finish and then fire that operations.
-    std::queue< std::function<void(SystemError::ErrorCode,std::size_t)> > send_queue_;
+    std::list< std::function<void(SystemError::ErrorCode,std::size_t)> > send_queue_;
     std::mutex send_mutex_;
 
-    std::queue< std::function<void(SystemError::ErrorCode,std::size_t)> > recv_queue_;
+    std::list< std::function<void(SystemError::ErrorCode,std::size_t)> > recv_queue_;
     std::mutex recv_mutex_;
 };
 
