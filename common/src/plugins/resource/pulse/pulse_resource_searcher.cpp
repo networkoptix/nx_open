@@ -45,7 +45,7 @@ QnResourceList QnPlPulseSearcher::findResources()
     return result;
 }
 
-QnResourcePtr QnPlPulseSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlPulseSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -94,7 +94,7 @@ QnNetworkResourcePtr QnPlPulseSearcher::createResource(const QString& manufactur
 
     QnNetworkResourcePtr result = QnNetworkResourcePtr(0);
 
-    QUuid rt = qnResTypePool->getResourceTypeId(manufacture, name);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture, name);
     if (rt.isNull())
         return result;
 

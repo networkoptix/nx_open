@@ -366,7 +366,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     QnLayoutItemData data;
     data.resource.id = resource->getId();
     data.resource.path = resource->getUniqueId();
-    data.uuid = QUuid::createUuid();
+    data.uuid = QnUuid::createUuid();
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomRect = params.zoomWindow;
     data.zoomTargetUuid = params.zoomUuid;
@@ -583,7 +583,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         workbench()->update(state);
 
         /* Delete orphaned layouts. */
-        foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(QUuid()).filtered<QnLayoutResource>())
+        foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(QnUuid()).filtered<QnLayoutResource>())
             if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
                 resourcePool()->removeResource(layout);
     }
@@ -697,18 +697,18 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
     QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
-        QHash<QUuid, QnLayoutItemData> itemDataByUuid;
+        QHash<QnUuid, QnLayoutItemData> itemDataByUuid;
         foreach(const QnResourceWidget *widget, widgets) {
             QnLayoutItemData data = widget->item()->data();
             itemDataByUuid[data.uuid] = data;
         }
 
         /* Generate new UUIDs. */
-        for(QHash<QUuid, QnLayoutItemData>::iterator pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
-            pos->uuid = QUuid::createUuid();
+        for(QHash<QnUuid, QnLayoutItemData>::iterator pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
+            pos->uuid = QnUuid::createUuid();
 
         /* Update cross-references. */
-        for(QHash<QUuid, QnLayoutItemData>::iterator pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
+        for(QHash<QnUuid, QnLayoutItemData>::iterator pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
             if(!pos->zoomTargetUuid.isNull())
                 pos->zoomTargetUuid = itemDataByUuid[pos->zoomTargetUuid].uuid;
 
@@ -814,7 +814,7 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
             workbench()->addLayout(layout);
         }
         /* Explicit set that we do not control videowall through this layout */
-        layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QUuid()));
+        layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QnUuid()));
 
         workbench()->setCurrentLayout(layout);
     }
@@ -1388,7 +1388,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QUuid::createUuid());
+    layout->setId(QnUuid::createUuid());
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
     if(context()->user())
         layout->setParentId(context()->user()->getId());
@@ -1403,7 +1403,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
         QnLayoutItemData item;
         item.flags = Qn::Pinned;
-        item.uuid = QUuid::createUuid();
+        item.uuid = QnUuid::createUuid();
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.resource.id = resource->getId();
         item.resource.path = resource->getUniqueId();
@@ -1628,7 +1628,7 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
             return;
     }
 
-    QList<QUuid> orphanedUuids;
+    QList<QnUuid> orphanedUuids;
     foreach(const QnLayoutItemIndex &index, items) {
         if(index.layout()) {
             index.layout()->removeItem(index.uuid());
@@ -1641,7 +1641,7 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
     if(!orphanedUuids.isEmpty()) {
         QList<QnWorkbenchLayout *> layouts;
         layouts.push_front(workbench()->currentLayout());
-        foreach(const QUuid &uuid, orphanedUuids) {
+        foreach(const QnUuid &uuid, orphanedUuids) {
             foreach(QnWorkbenchLayout *layout, layouts) {
                 if(QnWorkbenchItem *item = layout->item(uuid)) {
                     qnDeleteLater(item);
@@ -1769,22 +1769,29 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         // I've removed command "saveResource" because it cause sync issue in p2p mode. The problem because of we have transactions with different hash:
         // for instance saveServer and saveResource. But result data will depend of transactions order.
 
-        QnMediaServerResourcePtr mServer = resource.dynamicCast<QnMediaServerResource>();
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
         QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
         QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
+        QnMediaServerResourcePtr mServer = resource.dynamicCast<QnMediaServerResource>();
+        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        
+        if (camera && nodeType == Qn::EdgeNode) {
+            if (mServer = resource->getParentResource().dynamicCast<QnMediaServerResource>())
+                mServer->setName(name);
+        }
+
         auto callback = [this, resource, oldName]( int reqID, ec2::ErrorCode errorCode ) {
             at_resources_saved( reqID, errorCode, QnResourceList() << resource );
             if (errorCode != ec2::ErrorCode::ok)
                 resource->setName(oldName);
         };
+
         if (mServer)
             connection2()->getMediaServerManager()->save(mServer, this, callback);
-        else if (camera)
+        if (camera)
             connection2()->getCameraManager()->save( QnVirtualCameraResourceList() << camera, this, callback);
-        else if (user) 
+        if (user) 
             connection2()->getUserManager()->save( user, this, callback );
-        else if (layout)
+        if (layout)
             connection2()->getLayoutManager()->save( QnLayoutResourceList() << layout, this, callback);
     }
 }
@@ -1814,10 +1821,10 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         }
 
         // if we are deleting an edge camera, also delete its server
-        QUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() && //check for camera to avoid unnecessary parent lookup
-            QnMediaServerResource::isEdgeServer(resource->getParentResource())
+        QnUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() && //check for camera to avoid unnecessary parent lookup
+            QnMediaServerResource::isHiddenServer(resource->getParentResource())
             ? resource->getParentId()
-            : QUuid();
+            : QnUuid();
 
         connection2()->getResourceManager()->remove( resource->getId(), this, &QnWorkbenchActionHandler::at_resource_deleted );
         if (!parentToDelete.isNull())
@@ -1898,7 +1905,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
         dialog->submitToResource();
     } while (!validateResourceName(user, user->getName())); 
 
-    user->setId(QUuid::createUuid());
+    user->setId(QnUuid::createUuid());
     user->setTypeByName(lit("User"));
 
     connection2()->getUserManager()->save(

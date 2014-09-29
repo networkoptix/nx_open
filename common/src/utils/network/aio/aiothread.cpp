@@ -31,6 +31,7 @@ namespace aio
     enum class TaskType
     {
         tAdding,
+        tChangingTimeout,
         tRemoving,
         tAll
     };
@@ -43,7 +44,8 @@ namespace aio
         aio::EventType eventType;
         AIOEventHandler<SocketType>* eventHandler;
         TaskType type;
-        int timeout;
+        //!0 means no timeout
+        unsigned int timeout;
         std::atomic<int>* taskCompletionEvent;
         std::function<void()> taskCompletionHandler;
 
@@ -55,7 +57,7 @@ namespace aio
             aio::EventType _eventType,
             AIOEventHandler<SocketType>* const _eventHandler,
             TaskType _type,
-            int _timeout = 0,
+            unsigned int _timeout = 0,
             std::atomic<int>* const _taskCompletionEvent = nullptr,
             std::function<void()> _taskCompletionHandler = std::function<void()>() )
         :
@@ -78,7 +80,8 @@ namespace aio
         QAtomicInt beingProcessed;
         QAtomicInt markedForRemoval;
         AIOEventHandler<SocketType>* eventHandler;
-        int timeout;
+        //!0 means no timeout
+        unsigned int timeout;
         qint64 updatedPeriodicTaskClock;
 
         AIOEventHandlingData( AIOEventHandler<SocketType>* _eventHandler )
@@ -188,28 +191,60 @@ namespace aio
                     continue;
                 }
 
-                if( task.type == TaskType::tAdding )
-                { 
-                    if( task.eventType == aio::etRead )
-                        --newReadMonitorTaskCount;
-                    else if( task.eventType == aio::etWrite )
-                        --newWriteMonitorTaskCount;
-                    addSockToPollset( task.socket, task.eventType, task.timeout, task.eventHandler );
-                }
-                else    //task.type == TaskType::tRemoving
+                switch( task.type )
                 {
-                    //if( task.eventType == aio::etRead || task.eventType == aio::etWrite )
-                    //{
-                    //    void* userData = pollSet.remove( task.socket, task.eventType );
-                    //    if( userData )
-                    //        delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
-                    //}
-                    if( task.eventType == aio::etRead || task.eventType == aio::etWrite )
-                        pollSet.remove( task.socket, task.eventType );
-                    void*& userData = task.socket->impl()->getUserData(task.eventType);
-                    if( userData )
-                        delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
-                    userData = nullptr;
+                    case TaskType::tAdding:
+                    { 
+                        if( task.eventType == aio::etRead )
+                            --newReadMonitorTaskCount;
+                        else if( task.eventType == aio::etWrite )
+                            --newWriteMonitorTaskCount;
+                        addSockToPollset( task.socket, task.eventType, task.timeout, task.eventHandler );
+                        break;
+                    }
+
+                    case TaskType::tChangingTimeout:
+                    {
+                        void* userData = task.socket->impl()->getUserData(task.eventType);
+                        AIOEventHandlingDataHolder<SocketType>* handlingData = reinterpret_cast<AIOEventHandlingDataHolder<SocketType>*>( userData );
+                        //NOTE we are in aio thread currently
+                        if( task.timeout > 0 )
+                        {
+                            //adding/updating periodic task
+                            if( handlingData->data->timeout > 0 )
+                                handlingData->data->updatedPeriodicTaskClock = getSystemTimerVal() + task.timeout;  //updating existing task
+                            else
+                                addPeriodicTask(
+                                    getSystemTimerVal() + task.timeout,
+                                    handlingData->data,
+                                    task.socket,
+                                    task.eventType );
+                        }
+                        else if( handlingData->data->timeout > 0 )  //&& timeout == 0
+                            handlingData->data->updatedPeriodicTaskClock = -1;  //cancelling existing periodic task (there must be one)
+                        handlingData->data->timeout = task.timeout;
+                        break;
+                    }
+
+                    case TaskType::tRemoving:
+                    {
+                        //if( task.eventType == aio::etRead || task.eventType == aio::etWrite )
+                        //{
+                        //    void* userData = pollSet.remove( task.socket, task.eventType );
+                        //    if( userData )
+                        //        delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
+                        //}
+                        if( task.eventType == aio::etRead || task.eventType == aio::etWrite )
+                            pollSet.remove( task.socket, task.eventType );
+                        void*& userData = task.socket->impl()->getUserData(task.eventType);
+                        if( userData )
+                            delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
+                        userData = nullptr;
+                        break;
+                    }
+
+                    default:
+                        assert( false );
                 }
                 if( task.taskCompletionEvent )
                     task.taskCompletionEvent->store( 1, std::memory_order_relaxed );
@@ -255,12 +290,16 @@ namespace aio
             processPollSetModificationQueue( TaskType::tRemoving );
         }
 
+        /*!
+            This method introduced for optimization: if we fast call watchSocket then removeSocket (socket has not been added to pollset yet),
+            than removeSocket can just cancel watchSocket task. And vice versa
+        */
         bool removeReverseTask(
             SocketType* const sock,
             aio::EventType eventType,
             TaskType taskType,
             AIOEventHandler<SocketType>* const eventHandler,
-            int /*newTimeoutMS*/ )
+            unsigned int /*newTimeoutMS*/ )
         {
             Q_UNUSED(eventHandler)
 
@@ -269,21 +308,40 @@ namespace aio
                 it != pollSetModificationQueue.end();
                 ++it )
             {
-                if( it->socket == sock && it->eventType == eventType && it->type != taskType )
+                if( it->socket == sock && it->eventType == eventType && taskType != it->type )
                 {
-                    //TODO #ak if we changing socket timeout MUST NOT remove task
-                    if( it->type == TaskType::tRemoving )
+                    if( taskType == TaskType::tAdding && it->type == TaskType::tRemoving )
                     {
+                        //cancelling removing socket
                         if( eventHandler != it->eventHandler )
                             continue;   //event handler changed, cannot ignore task
                         //cancelling remove task
-                        //void* userData = pollSet.getUserData( sock, eventType );
                         void* userData = sock->impl()->getUserData(eventType);
                         Q_ASSERT( userData );
                         static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->markedForRemoval.store( 0 );
+
+                        pollSetModificationQueue.erase( it );
+                        return true;
                     }
-                    pollSetModificationQueue.erase( it );
-                    return true;
+                    else if( taskType == TaskType::tRemoving && it->type == TaskType::tAdding )
+                    {
+                        //cancelling adding socket
+                        pollSetModificationQueue.erase( it++ );
+                        //removing futher tChangingTimeout tasks
+                        for( ;
+                            it != pollSetModificationQueue.end();
+                            ++it )
+                        {
+                            if( it->socket == sock && it->eventType == eventType && it->type == TaskType::tChangingTimeout )
+                                pollSetModificationQueue.erase( it++ );
+                        }
+
+                        return true;
+                    }
+                    else
+                    {
+                        continue;
+                    }
                 }
             }
 
@@ -338,6 +396,7 @@ namespace aio
                 std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = periodicTaskData.data;
                 QMutexLocker lk( &processEventsMutex );
                 handlingData->beingProcessed.ref();
+                //TODO #ak add some auto pointer for handlingData->beingProcessed
                 if( handlingData->markedForRemoval.load() > 0 ) //task has been removed from watch
                 {
                     handlingData->beingProcessed.deref();
@@ -362,6 +421,13 @@ namespace aio
 
                     handlingData->updatedPeriodicTaskClock = 0;
                     //updated task has to be executed now
+                }
+                else if( handlingData->updatedPeriodicTaskClock == -1 )
+                {
+                    //cancelling periodic task
+                    handlingData->updatedPeriodicTaskClock = 0;
+                    handlingData->beingProcessed.deref();
+                    continue;
                 }
 
                 if( periodicTaskData.socket )    //periodic event, associated with socket (e.g., socket operation timeout)
@@ -436,7 +502,7 @@ namespace aio
         SocketType* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler<SocketType>* const eventHandler,
-        int timeoutMs,
+        unsigned int timeoutMs,
         std::function<void()> socketAddedToPollHandler )
     {
         //NOTE m_impl->mutex is locked up the stack
@@ -466,6 +532,44 @@ namespace aio
             ++m_impl->newReadMonitorTaskCount;
         else if( eventToWatch == aio::etWrite )
             ++m_impl->newWriteMonitorTaskCount;
+        if( currentThreadSystemId() != systemThreadId() )  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
+            m_impl->pollSet.interrupt();
+
+        return true;
+    }
+
+    template<class SocketType>
+    bool AIOThread<SocketType>::changeSocketTimeout(
+        SocketType* const sock,
+        aio::EventType eventToWatch,
+        AIOEventHandler<SocketType>* const eventHandler,
+        unsigned int timeoutMs,
+        std::function<void()> socketAddedToPollHandler )
+    {
+        //TODO #ak looks like copy-paste of previous method. Remove copy-paste!!!
+
+        //NOTE m_impl->mutex is locked up the stack
+        if( !canAcceptSocket( sock ) )
+            return false;
+
+        //checking queue for reverse task for \a sock
+        if( m_impl->removeReverseTask( sock, eventToWatch, TaskType::tAdding, eventHandler, timeoutMs ) )
+            return true;    //ignoring task
+
+        //if( currentThreadSystemId() == systemThreadId() )
+        //{
+        //    //adding socket to pollset right away
+        //    return m_impl->addSockToPollset( sock, eventToWatch, timeoutMs, eventHandler );
+        //}
+
+        m_impl->pollSetModificationQueue.push_back( typename AIOThreadImplType::SocketAddRemoveTaskType(
+            sock,
+            eventToWatch,
+            eventHandler,
+            TaskType::tChangingTimeout,
+            timeoutMs,
+            nullptr,
+            socketAddedToPollHandler ) );
         if( currentThreadSystemId() != systemThreadId() )  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
             m_impl->pollSet.interrupt();
 

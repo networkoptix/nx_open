@@ -4,7 +4,7 @@
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
 #include <QtCore/QStringList>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include "camera_bookmark_fwd.h"
 
@@ -13,7 +13,7 @@
  */
 struct QnCameraBookmark {
     /** Unique id. */
-    QUuid guid;
+    QnUuid guid;
 
     /** Name of the bookmark.*/
     QString name;

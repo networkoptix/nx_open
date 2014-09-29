@@ -180,8 +180,7 @@ bool QnStorageManager::loadFullFileCatalog(const QnStorageResourcePtr &storage, 
         foreach(DeviceFileCatalogPtr c, sdb->loadFullFileCatalog())
         {
             DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->cameraUniqueId(), c->getCatalog());
-            if (fileCatalog->m_chunks.empty())
-                fileCatalog->addChunks(correctChunksFromMediaData(fileCatalog, storage, c->m_chunks));
+            fileCatalog->addChunks(correctChunksFromMediaData(fileCatalog, storage, c->m_chunks));
         }
     }
     else {
@@ -385,7 +384,7 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
     }
 }
 
-bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& storages, const QUuid &id) const
+bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& storages, const QnUuid &id) const
 {
     foreach(const QnAbstractStorageResourcePtr& storage, storages)
     {
@@ -511,6 +510,7 @@ void QnStorageManager::clearSpace()
         sdb->afterDelete();
 
     clearUnusedMotion();
+    //clearCameraHistory();
 }
 
 QnStorageManager::StorageMap QnStorageManager::getAllStorages() const 
@@ -576,6 +576,49 @@ void QnStorageManager::clearUnusedMotion()
     foreach(const DeviceFileCatalogPtr catalog, m_devFileCatalog[QnServer::HiQualityCatalog].values())
         QnMotionHelper::instance()->deleteUnusedFiles(usedMonths[catalog->cameraUniqueId()].toList(), catalog->cameraUniqueId());
 }
+
+/*
+void QnStorageManager::clearCameraHistory()
+{
+    QMutexLocker lock(&m_mutexCatalog);
+    QMap<QString, qint64> minTimes; // min archive time by camera unique ID
+    minTimeByCamera(m_devFileCatalog[QnServer::HiQualityCatalog], minTimes);
+    minTimeByCamera(m_devFileCatalog[QnServer::LowQualityCatalog], minTimes);
+
+    for(auto itr = minTimes.begin(); itr != minTimes.end(); ++itr) {
+        if (itr.value() == AV_NOPTS_VALUE)
+            itr.value() == DATETIME_NOW; // delete all history if catalog is empty
+    }
+
+    QList<QnCameraHistoryItem> itemsToRemove = QnCameraHistoryPool::instance()->getUnusedItems(minTimes, qnCommon->moduleGUID());
+    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    foreach(const QnCameraHistoryItem& item, itemsToRemove) {
+        ec2::ErrorCode errCode = ec2Connection->getCameraManager()->removeCameraHistoryItemSync(item);
+        if (errCode == ec2::ErrorCode::ok)
+            QnCameraHistoryPool::instance()->removeCameraHistoryItem(item);
+    }
+}
+
+void QnStorageManager::minTimeByCamera(const FileCatalogMap &catalogMap, QMap<QString, qint64>& minTimes)
+{
+    for (FileCatalogMap::const_iterator itr = catalogMap.constBegin(); itr != catalogMap.constEnd(); ++itr)
+    {
+        DeviceFileCatalogPtr curCatalog = itr.value();
+
+        auto resultItr = minTimes.find(curCatalog->cameraUniqueId());
+        if (resultItr == minTimes.end())
+            resultItr = minTimes.insert(curCatalog->cameraUniqueId(), AV_NOPTS_VALUE);
+
+        qint64 archiveTime = curCatalog->firstTime();
+        if (archiveTime != AV_NOPTS_VALUE) {
+            if (resultItr.value() == AV_NOPTS_VALUE)
+                resultItr.value() = archiveTime;
+            else if (archiveTime < resultItr.value())
+                resultItr.value() = archiveTime;
+        }
+    }
+}
+*/
 
 void QnStorageManager::updateRecordedMonths(const FileCatalogMap &catalogMap, UsedMonthsMap& usedMonths)
 {

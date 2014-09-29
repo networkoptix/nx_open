@@ -29,7 +29,7 @@ void updateServer(const QnMediaServerResourcePtr &server, const QnModuleInformat
 QnMediaServerResourcePtr makeResource(const QnModuleInformation &moduleInformation, Qn::ResourceStatus initialStatus) {
     QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
 
-    server->setId(QUuid::createUuid());
+    server->setId(QnUuid::createUuid());
     server->setStatus(initialStatus, true);
     server->setProperty(lit("guid"), moduleInformation.id.toString());
 
@@ -58,7 +58,7 @@ QnIncompatibleServerWatcher::QnIncompatibleServerWatcher(QObject *parent) :
 }
 
 QnIncompatibleServerWatcher::~QnIncompatibleServerWatcher() {
-    foreach (const QUuid &id, m_fakeUuidByServerUuid) {
+    foreach (const QnUuid &id, m_fakeUuidByServerUuid) {
         QnResourcePtr resource = qnResPool->getIncompatibleResourceById(id, true);
         if (resource)
             qnResPool->removeResource(resource);
@@ -74,7 +74,7 @@ void QnIncompatibleServerWatcher::at_peerChanged(const QnModuleInformation &modu
         return;
     }
 
-    QUuid id = m_fakeUuidByServerUuid.value(moduleInformation.id);
+    QnUuid id = m_fakeUuidByServerUuid.value(moduleInformation.id);
     if (id.isNull()) {
         // add a resource
         if (!isSuitable(moduleInformation))
@@ -101,7 +101,7 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
     if (!server)
         return;
 
-    QUuid id = server->getId();
+    QnUuid id = server->getId();
 
     if (m_serverUuidByFakeUuid.contains(id))
         return;
@@ -111,11 +111,11 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
         removeResource(m_fakeUuidByServerUuid.value(id));
 }
 
-void QnIncompatibleServerWatcher::removeResource(const QUuid &id) {
+void QnIncompatibleServerWatcher::removeResource(const QnUuid &id) {
     if (id.isNull())
         return;
 
-    QUuid serverId = m_serverUuidByFakeUuid.take(id);
+    QnUuid serverId = m_serverUuidByFakeUuid.take(id);
     if (serverId.isNull())
         return;
 

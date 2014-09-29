@@ -4,7 +4,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QRect>
 
 class QnVideoWallPcData
@@ -35,7 +35,7 @@ public:
 
     QnVideoWallPcData() {}
 
-    QUuid uuid;
+    QnUuid uuid;
     QList<PcScreen> screens;
 
     friend bool operator==(const QnVideoWallPcData &l, const QnVideoWallPcData &r) {
@@ -51,7 +51,7 @@ Q_DECLARE_METATYPE(QnVideoWallPcData)
 Q_DECLARE_TYPEINFO(QnVideoWallPcData, Q_MOVABLE_TYPE);
 
 typedef QList<QnVideoWallPcData> QnVideoWallPcDataList;
-typedef QHash<QUuid, QnVideoWallPcData> QnVideoWallPcDataMap;
+typedef QHash<QnUuid, QnVideoWallPcData> QnVideoWallPcDataMap;
 
 Q_DECLARE_METATYPE(QnVideoWallPcDataList)
 Q_DECLARE_METATYPE(QnVideoWallPcDataMap)

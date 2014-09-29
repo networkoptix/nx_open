@@ -43,11 +43,6 @@ void QnServerConnector::at_moduleFinder_moduleUrlFound(const QnModuleInformation
         return;
     }
 
-    if (m_usedUrls.contains(trimmed)) {
-        NX_LOG(lit("QnServerConnector: Url %1 is already used.").arg(trimmed.toString()), cl_logINFO);
-        return;
-    }
-
     addConnection(moduleInformation, url);
 }
 
@@ -69,6 +64,11 @@ void QnServerConnector::at_moduleFinder_moduleChanged(const QnModuleInformation 
 
 void QnServerConnector::addConnection(const QnModuleInformation &moduleInformation, const QUrl &url) {
     QUrl trimmed = trimmedUrl(url);
+
+    if (m_usedUrls.contains(trimmed)) {
+        NX_LOG(lit("QnServerConnector: Url %1 is already used.").arg(trimmed.toString()), cl_logINFO);
+        return;
+    }
 
     QUrl moduleUrl = trimmed;
     moduleUrl.setScheme(moduleInformation.sslAllowed ? lit("https") : lit("http"));

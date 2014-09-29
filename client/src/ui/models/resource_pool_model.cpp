@@ -138,7 +138,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
     QHash<QnResourcePtr, QnResourcePoolModelNode *>::iterator pos = m_resourceNodeByResource.find(resource);
     if(pos == m_resourceNodeByResource.end()) {
         Qn::NodeType nodeType = Qn::ResourceNode;
-        if (QnMediaServerResource::isEdgeServer(resource->getParentResource()))
+        if (QnMediaServerResource::isHiddenServer(resource->getParentResource()))
             nodeType = Qn::EdgeNode;
 
         pos = m_resourceNodeByResource.insert(resource, new QnResourcePoolModelNode(this, resource, nodeType));
@@ -147,7 +147,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
     return *pos;
 }
 
-QnResourcePoolModelNode *QnResourcePoolModel::node(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource) {
+QnResourcePoolModelNode *QnResourcePoolModel::node(Qn::NodeType nodeType, const QnUuid &uuid, const QnResourcePtr &resource) {
     NodeKey key(resource, uuid);
     if (!m_nodes[nodeType].contains(key)) {
         QnResourcePoolModelNode* node = new QnResourcePoolModelNode(this, uuid, nodeType);
@@ -158,8 +158,8 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(Qn::NodeType nodeType, const 
     return m_nodes[nodeType][key];
 }
 
-QnResourcePoolModelNode *QnResourcePoolModel::node(const QUuid &uuid) {
-    QHash<QUuid, QnResourcePoolModelNode *>::iterator pos = m_itemNodeByUuid.find(uuid);
+QnResourcePoolModelNode *QnResourcePoolModel::node(const QnUuid &uuid) {
+    QHash<QnUuid, QnResourcePoolModelNode *>::iterator pos = m_itemNodeByUuid.find(uuid);
     if(pos == m_itemNodeByUuid.end()) {
         pos = m_itemNodeByUuid.insert(uuid, new QnResourcePoolModelNode(this, uuid));
         m_allNodes.append(*pos);
@@ -196,7 +196,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::systemNode(const QString &systemNa
 
     node = new QnResourcePoolModelNode(this, Qn::SystemNode, systemName);
     if (m_scope == FullScope)
-    node->setParent(m_rootNodes[Qn::OtherSystemsNode]);
+        node->setParent(m_rootNodes[Qn::OtherSystemsNode]);
     else
         node->setParent(m_rootNodes[Qn::BastardNode]);
     m_systemNodeBySystemName[systemName] = node;
@@ -230,7 +230,7 @@ void QnResourcePoolModel::removeNode(QnResourcePoolModelNode *node) {
     deleteNode(node);
 }
 
-void QnResourcePoolModel::removeNode(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource) {
+void QnResourcePoolModel::removeNode(Qn::NodeType nodeType, const QnUuid &uuid, const QnResourcePtr &resource) {
     NodeKey key(resource, uuid);
     if (!m_nodes[nodeType].contains(key))
         return;
@@ -448,7 +448,7 @@ QMimeData *QnResourcePoolModel::mimeData(const QModelIndexList &indexes) const {
         }
 
         if (types.contains(QnVideoWallItem::mimeType())) {
-            QSet<QUuid> uuids;
+            QSet<QnUuid> uuids;
             foreach (const QModelIndex &index, indexes) {
                 QnResourcePoolModelNode *node = this->node(index);
 
@@ -578,9 +578,13 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     }
 
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (server && server->getStatus() == Qn::Incompatible) {
-        connect(server,     &QnMediaServerResource::systemNameChanged,  this,   &QnResourcePoolModel::at_server_systemNameChanged);
-        m_rootNodes[Qn::OtherSystemsNode]->update();
+    if (server) {
+        connect(server,     &QnMediaServerResource::redundancyChanged,  this,   &QnResourcePoolModel::at_resource_resourceChanged);
+
+        if (server->getStatus() == Qn::Incompatible) {
+            connect(server, &QnMediaServerResource::systemNameChanged,  this,   &QnResourcePoolModel::at_server_systemNameChanged);
+            m_rootNodes[Qn::OtherSystemsNode]->update();
+        }
     }
 
     QnResourcePoolModelNode *node = this->node(resource);
@@ -646,6 +650,23 @@ void QnResourcePoolModel::at_accessController_permissionsChanged(const QnResourc
 
 void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resource) {
     QnResourcePoolModelNode *node = this->node(resource);
+
+    /* update edge resource */
+    if (resource.dynamicCast<QnVirtualCameraResource>()) {
+        bool wasEdge = (node->type() == Qn::EdgeNode);
+        bool mustBeEdge = QnMediaServerResource::isHiddenServer(resource->getParentResource());
+        if (wasEdge != mustBeEdge) {
+            QnResourcePoolModelNode *parent = node->parent();
+
+            m_resourceNodeByResource.remove(resource);
+            deleteNode(node);
+
+            if (parent)
+                parent->update();
+
+            node = this->node(resource);
+        }
+    }
 
     node->setParent(expectedParent(node));
 }

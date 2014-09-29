@@ -29,7 +29,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
             assert( tran.command == ApiCommand::removeUser );
-            emit removed( QUuid(tran.params.id) );
+            emit removed( QnUuid(tran.params.id) );
         }
 
     protected:
@@ -47,13 +47,13 @@ namespace ec2
 
         virtual int getUsers( impl::GetUsersHandlerPtr handler ) override;
         virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) override;
-        virtual int remove( const QUuid& id, impl::SimpleHandlerPtr handler ) override;
+        virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
 
         QnTransaction<ApiUserData> prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource );
-        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QUuid& resource );
+        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnUuid& resource );
     };
 }
 

@@ -27,7 +27,7 @@ namespace ec2
 
     struct ApiScheduleTaskWithRefData: ApiScheduleTaskData
     {
-        QUuid sourceId;
+        QnUuid sourceId;
     };
 #define ApiScheduleTaskWithRefData_Fields ApiScheduleTaskData_Fields (sourceId)
 
@@ -57,7 +57,7 @@ namespace ec2
         QString             vendor;
         int                 minArchiveDays;
         int                 maxArchiveDays;
-        QUuid               preferedServerId;
+        QnUuid               preferedServerId;
     };
 #define ApiCameraData_Fields ApiResourceData_Fields (scheduleEnabled)(motionType)(motionMask)(mac)(login)(password)(scheduleTasks)(audioEnabled)(physicalId)(manuallyAdded)(model) \
                             (groupId)(groupName)(secondaryStreamQuality)(controlEnabled)(statusFlags)(dewarpingParams)(vendor)(minArchiveDays)(maxArchiveDays)(preferedServerId)

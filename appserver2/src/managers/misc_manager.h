@@ -22,15 +22,15 @@ namespace ec2 {
         virtual ~QnMiscManager();
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) override;
     protected:
-        virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer, impl::SimpleHandlerPtr handler) override;
-        virtual int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QUuid, QUuid> &discoverersByPeer, impl::SimpleHandlerPtr handler) override;
+        virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QnUuid &discoverer, impl::SimpleHandlerPtr handler) override;
+        virtual int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnUuid, QnUuid> &discoverersByPeer, impl::SimpleHandlerPtr handler) override;
         virtual int changeSystemName(const QString &systemName, impl::SimpleHandlerPtr handler) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
 
-        QnTransaction<ApiModuleData> prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer) const;
-        QnTransaction<ApiModuleDataList> prepareTransaction(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QUuid, QUuid> &discoverersByPeer) const;
+        QnTransaction<ApiModuleData> prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive, const QnUuid &discoverer) const;
+        QnTransaction<ApiModuleDataList> prepareTransaction(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnUuid, QnUuid> &discoverersByPeer) const;
         QnTransaction<ApiSystemNameData> prepareTransaction(const QString &systemName) const;
     };
 

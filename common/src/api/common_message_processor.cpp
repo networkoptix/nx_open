@@ -66,6 +66,7 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     auto cameraManager = connection->getCameraManager();
     connect(cameraManager, &ec2::AbstractCameraManager::cameraAddedOrUpdated,       this, [this](const QnVirtualCameraResourcePtr &camera){updateResource(camera);});
     connect(cameraManager, &ec2::AbstractCameraManager::cameraHistoryChanged,       this, &QnCommonMessageProcessor::on_cameraHistoryChanged );
+    connect(cameraManager, &ec2::AbstractCameraManager::cameraHistoryRemoved,       this, &QnCommonMessageProcessor::on_cameraHistoryRemoved );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraRemoved,              this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraBookmarkTagsAdded,    this, &QnCommonMessageProcessor::cameraBookmarkTagsAdded );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraBookmarkTagsRemoved,  this, &QnCommonMessageProcessor::cameraBookmarkTagsRemoved );
@@ -146,8 +147,8 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResour
 
 void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryDataList &discoveryData, bool addInformation)
 {
-    QMultiHash<QUuid, QUrl> m_additionalUrls;
-    QMultiHash<QUuid, QUrl> m_ignoredUrls;
+    QMultiHash<QnUuid, QUrl> m_additionalUrls;
+    QMultiHash<QnUuid, QUrl> m_ignoredUrls;
 
     foreach (const ec2::ApiDiscoveryData &data, discoveryData) {
         QUrl url(data.url);
@@ -161,7 +162,7 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryDataLi
         }
     }
 
-    foreach (const QUuid &id, m_additionalUrls.uniqueKeys()) {
+    foreach (const QnUuid &id, m_additionalUrls.uniqueKeys()) {
         QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
@@ -180,7 +181,7 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryDataLi
         server->setAdditionalUrls(additionalUrls);
     }
 
-    foreach (const QUuid &id, m_ignoredUrls.uniqueKeys()) {
+    foreach (const QnUuid &id, m_ignoredUrls.uniqueKeys()) {
         QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
@@ -202,14 +203,14 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryDataLi
     }
 }
 
-void QnCommonMessageProcessor::on_resourceStatusChanged( const QUuid& resourceId, Qn::ResourceStatus status )
+void QnCommonMessageProcessor::on_resourceStatusChanged( const QnUuid& resourceId, Qn::ResourceStatus status )
 {
     QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (resource)
         onResourceStatusChanged(resource, status);
 }
 
-void QnCommonMessageProcessor::on_resourceParamsChanged( const QUuid& resourceId, const QnKvPairList& kvPairs )
+void QnCommonMessageProcessor::on_resourceParamsChanged( const QnUuid& resourceId, const QnKvPairList& kvPairs )
 {
     QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (!resource)
@@ -222,7 +223,7 @@ void QnCommonMessageProcessor::on_resourceParamsChanged( const QUuid& resourceId
             resource->setProperty(pair.name(), pair.value());
 }
 
-void QnCommonMessageProcessor::on_resourceRemoved( const QUuid& resourceId )
+void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
 {
     if (canRemoveResource(resourceId))
     {
@@ -246,6 +247,10 @@ void QnCommonMessageProcessor::on_cameraHistoryChanged(const QnCameraHistoryItem
     QnCameraHistoryPool::instance()->addCameraHistoryItem(*cameraHistory.data());
 }
 
+void QnCommonMessageProcessor::on_cameraHistoryRemoved(const QnCameraHistoryItemPtr &cameraHistory) {
+    QnCameraHistoryPool::instance()->removeCameraHistoryItem(*cameraHistory.data());
+}
+
 void QnCommonMessageProcessor::on_licenseChanged(const QnLicensePtr &license) {
     qnLicensePool->addLicense(license);
 }
@@ -259,7 +264,7 @@ void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const QnBusinessEv
     emit businessRuleChanged(businessRule);
 }
 
-void QnCommonMessageProcessor::on_businessEventRemoved(const QUuid &id) {
+void QnCommonMessageProcessor::on_businessEventRemoved(const QnUuid &id) {
     m_rules.remove(id);
     emit businessRuleDeleted(id);
 }
@@ -298,7 +303,7 @@ void QnCommonMessageProcessor::on_panicModeChanged(Qn::PanicMode mode) {
 }
 
 // todo: ec2 relate logic. remove from this class
-void QnCommonMessageProcessor::afterRemovingResource(const QUuid& id) {
+void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id) {
     foreach(QnBusinessEventRulePtr bRule, m_rules.values())
     {
         if (bRule->eventResources().contains(id) || bRule->actionResources().contains(id))
@@ -330,12 +335,12 @@ void QnCommonMessageProcessor::processCameraServerItems(const QnCameraHistoryLis
         QnCameraHistoryPool::instance()->addCameraHistory(history);
 }
 
-bool QnCommonMessageProcessor::canRemoveResource(const QUuid &) 
+bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &) 
 { 
     return true; 
 }
 
-void QnCommonMessageProcessor::removeResourceIgnored(const QUuid &) 
+void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &) 
 {
 }
 
@@ -374,7 +379,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     emit initialResourcesReceived();
 }
 
-QMap<QUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() const {
+QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() const {
     return m_rules;
 }
 

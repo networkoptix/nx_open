@@ -676,9 +676,9 @@ namespace Qn {
         ConnectToCurrentSystem,
 
         /**
-         * Joing the other system to the current system
+         * Merge the other system with the current system
          */
-        JoinOtherSystem,
+        MergeSystems,
 
         /* PTZ Actions */
 

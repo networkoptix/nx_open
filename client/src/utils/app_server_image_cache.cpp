@@ -1,7 +1,7 @@
 #include "app_server_image_cache.h"
 
 #include <QtCore/QFileInfo>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <ui/graphics/opengl/gl_functions.h>
 
@@ -26,7 +26,7 @@ QSize QnAppServerImageCache::getMaxImageSize() const {
 }
 
 void QnAppServerImageCache::storeImage(const QString &filePath, const qreal targetAspectRatio) {
-    QString uuid = QUuid::createUuid().toString();
+    QString uuid = QnUuid::createUuid().toString();
     QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".png");
 
     ensureCacheFolder();

@@ -2,7 +2,7 @@
 
 #include <openssl/evp.h>
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include "utils/network/nettools.h"
 #include "utils/common/string.h"
@@ -63,25 +63,25 @@ namespace
     }
 
     static const char STATIC_DISCOVERY_MESSAGE[] = "\
-    <s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">\
-    <s:Header>\
-    <a:Action s:mustUnderstand=\"1\">\
-    http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe\
-    </a:Action>\
-    <a:MessageID>%1</a:MessageID>\
-    <a:ReplyTo>\
-    <a:Address>\
-    http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
-    </a:Address>\
-    </a:ReplyTo>\
-    <a:To s:mustUnderstand=\"1\">urn:schemas-xmlsoap-org:ws:2005:04:discovery</a:To>\
-    </s:Header>\
-    <s:Body>\
-    <Probe xmlns=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\">\
-    <d:Types xmlns:d=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\" xmlns:dp0=\"http://www.onvif.org/ver10/network/wsdl\">dp0:NetworkVideoTransmitter</d:Types>\
-    </Probe>\
-    </s:Body>\
-    </s:Envelope>";
+<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">\
+<s:Header>\
+<a:Action s:mustUnderstand=\"1\">\
+http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe\
+</a:Action>\
+<a:MessageID>%1</a:MessageID>\
+<a:ReplyTo>\
+<a:Address>\
+http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
+</a:Address>\
+</a:ReplyTo>\
+<a:To s:mustUnderstand=\"1\">urn:schemas-xmlsoap-org:ws:2005:04:discovery</a:To>\
+</s:Header>\
+<s:Body>\
+<Probe xmlns=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\">\
+<d:Types xmlns:d=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\" xmlns:dp0=\"http://www.onvif.org/ver10/network/wsdl\">dp0:NetworkVideoTransmitter</d:Types>\
+</Probe>\
+</s:Body>\
+</s:Envelope>";
 
 
     // avoid SOAP select call
@@ -106,7 +106,7 @@ namespace
         QString msgId;
         AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
 
-        QString guid = QUuid::createUuid().toString();
+        QString guid = QnUuid::createUuid().toString();
         guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
         QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLatin1();
 
@@ -126,7 +126,7 @@ namespace
         QString msgId;
         AbstractDatagramSocket* socket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
 
-        QString guid = QUuid::createUuid().toString();
+        QString guid = QnUuid::createUuid().toString();
         guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
         QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLatin1();
 

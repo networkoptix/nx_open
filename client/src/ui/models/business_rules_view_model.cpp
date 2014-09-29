@@ -195,7 +195,7 @@ void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
     //emit dataChanged(index(row, 0), index(row, QnBusiness::ColumnCount - 1));
 }
 
-void QnBusinessRulesViewModel::deleteRule(const QUuid& id) {
+void QnBusinessRulesViewModel::deleteRule(const QnUuid& id) {
     deleteRule(ruleModelById(id));
 }
 
@@ -205,7 +205,7 @@ QnBusinessRuleViewModel* QnBusinessRulesViewModel::getRuleModel(int row) {
     return m_rules[row];
 }
 
-QnBusinessRuleViewModel* QnBusinessRulesViewModel::ruleModelById(const QUuid& id) {
+QnBusinessRuleViewModel* QnBusinessRulesViewModel::ruleModelById(const QnUuid& id) {
     foreach (QnBusinessRuleViewModel* rule, m_rules) {
         if (rule->id() == id) {
             return rule;

@@ -19,19 +19,15 @@
 #ifndef EMAILADDRESS_H
 #define EMAILADDRESS_H
 
-#include <QObject>
 
-class EmailAddress : public QObject
+class EmailAddress
 {
-    Q_OBJECT
 public:
 
     /* [1] Constructors and Destructors */
 
     EmailAddress();
     EmailAddress(const QString & address, const QString & name=lit(""));
-
-    ~EmailAddress();
 
     /* [1] --- */
 

@@ -549,7 +549,7 @@ void ApplauncherProcess::onTimer( const quint64& timerID )
     }
 
     //stopping process if needed
-    killProcessByPid( task.processID );
+    nx::killProcessByPid( task.processID );
 }
 
 void ApplauncherProcess::onInstallationDone( InstallationProcess* installationProcess )

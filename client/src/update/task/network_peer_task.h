@@ -11,25 +11,25 @@ public:
     explicit QnNetworkPeerTask(QObject *parent = 0);
     ~QnNetworkPeerTask();
 
-    QSet<QUuid> peers() const;
+    QSet<QnUuid> peers() const;
 
-    void start(const QSet<QUuid> &peers);
+    void start(const QSet<QnUuid> &peers);
     void cancel();
 
 signals:
-    void finished(int errorCode, const QSet<QUuid> &failedPeers);
-    void peerFinished(const QUuid &peerId);
-    void peerProgressChanged(const QUuid &peerId, int progress);
+    void finished(int errorCode, const QSet<QnUuid> &failedPeers);
+    void peerFinished(const QnUuid &peerId);
+    void peerProgressChanged(const QnUuid &peerId, int progress);
     void progressChanged(int progress);
 
 protected:
-    void finish(int errorCode, const QSet<QUuid> &failedPeers = QSet<QUuid>());
+    void finish(int errorCode, const QSet<QnUuid> &failedPeers = QSet<QnUuid>());
 
     virtual void doStart() = 0;
     virtual void doCancel() {}
 
 private:
-    QSet<QUuid> m_peers;
+    QSet<QnUuid> m_peers;
 };
 
 #endif // NETWORK_PEER_TASK_H

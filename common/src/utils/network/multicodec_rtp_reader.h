@@ -67,12 +67,13 @@ public:
 
     static void setDefaultTransport( const RtpTransport::Value& defaultTransportToUse );
 
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
 signals:
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 
 private:
     QnRtpStreamParser* createParser(const QString& codecName);
-    void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, RTPSession::TrackType mediaType);
+    void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, RTPSession::TrackType mediaType, int channelNum);
     void setNeedKeyData();
     void checkIfNeedKeyData();
     QnAbstractMediaDataPtr getNextDataUDP();
@@ -85,9 +86,9 @@ private slots:
     void at_propertyChanged(const QnResourcePtr & res, const QString & key);
 private:
     RTPSession m_RtpSession;
-    RTPIODevice* m_videoIO;
+    RTPIODevice* m_videoIOs[CL_MAX_CHANNELS];
     RTPIODevice* m_audioIO;
-    QnRtpVideoStreamParser* m_videoParser;
+    QnRtpVideoStreamParser* m_videoParsers[CL_MAX_CHANNELS];
     QnRtpAudioStreamParser* m_audioParser;
 
     QString m_request;
@@ -102,6 +103,9 @@ private:
     QElapsedTimer m_rtcpReportTimer;
     bool m_gotSomeFrame;
     Qn::ConnectionRole m_role;
+
+    QnCustomResourceVideoLayoutPtr m_customVideoLayout;
+    mutable QMutex m_layoutMutex;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

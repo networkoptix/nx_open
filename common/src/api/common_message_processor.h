@@ -29,7 +29,7 @@ public:
 
     virtual void updateResource(const QnResourcePtr &resource);
 
-    QMap<QUuid, QnBusinessEventRulePtr> businessRules() const;
+    QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
 signals:
     void connectionOpened();
     void connectionClosed();
@@ -42,7 +42,7 @@ signals:
     void fileRemoved(const QString &filename);
 
     void businessRuleChanged(const QnBusinessEventRulePtr &rule);
-    void businessRuleDeleted(const QUuid &id);
+    void businessRuleDeleted(const QnUuid &id);
     void businessRuleReset(const QnBusinessEventRuleList &rules);
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);
     void execBusinessAction(const QnAbstractBusinessActionPtr& action);
@@ -57,21 +57,21 @@ signals:
     void remotePeerLost(const ec2::ApiPeerAliveData &data);
 
     void syncTimeChanged(qint64 syncTime);
-    void peerTimeChanged(const QUuid &peerId, qint64 syncTime, qint64 peerTime);
+    void peerTimeChanged(const QnUuid &peerId, qint64 syncTime, qint64 peerTime);
     void timeServerSelectionRequired();
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) = 0;
     virtual void execBusinessActionInternal(const QnAbstractBusinessActionPtr& /*action*/) {}
     
-    virtual void afterRemovingResource(const QUuid &id);
+    virtual void afterRemovingResource(const QnUuid &id);
 
     virtual void processResources(const QnResourceList &resources);
     void processLicenses(const QnLicenseList &licenses);
     void processCameraServerItems(const QnCameraHistoryList &cameraHistoryList);
     
-    virtual bool canRemoveResource(const QUuid& resourceId);
-    virtual void removeResourceIgnored(const QUuid& resourceId);
+    virtual bool canRemoveResource(const QnUuid& resourceId);
+    virtual void removeResourceIgnored(const QnUuid& resourceId);
 
 public slots:
     void on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &rule);
@@ -85,13 +85,14 @@ private slots:
     void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
     void on_gotDiscoveryData(const ec2::ApiDiscoveryDataList &discoveryData, bool addInformation);
 
-    void on_resourceStatusChanged(const QUuid &resourceId, Qn::ResourceStatus status );
-    void on_resourceParamsChanged(const QUuid& resourceId, const QnKvPairList& kvPairs );
-    void on_resourceRemoved(const QUuid& resourceId );
+    void on_resourceStatusChanged(const QnUuid &resourceId, Qn::ResourceStatus status );
+    void on_resourceParamsChanged(const QnUuid& resourceId, const QnKvPairList& kvPairs );
+    void on_resourceRemoved(const QnUuid& resourceId );
 
     void on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory);
+    void on_cameraHistoryRemoved(const QnCameraHistoryItemPtr &cameraHistory);
 
-    void on_businessEventRemoved(const QUuid &id);
+    void on_businessEventRemoved(const QnUuid &id);
     void on_businessActionBroadcasted(const QnAbstractBusinessActionPtr &businessAction);
     void on_businessRuleReset(const QnBusinessEventRuleList &rules);
     void on_broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
@@ -100,7 +101,7 @@ private slots:
     void on_panicModeChanged(Qn::PanicMode mode);   
 protected:
     ec2::AbstractECConnectionPtr m_connection;
-    QMap<QUuid, QnBusinessEventRulePtr> m_rules;
+    QMap<QnUuid, QnBusinessEventRulePtr> m_rules;
 };
 
 #endif // COMMON_MESSAGE_PROCESSOR_H

@@ -148,18 +148,18 @@ namespace ec2
             \param syncTime Synchronized time (UTC, millis from epoch) corresponding to \a peerLocalTime
             \param peerLocalTime Peer local time (UTC, millis from epoch)
         */
-        void peerTimeChanged(const QUuid &peerId, qint64 syncTime, qint64 peerLocalTime);
+        void peerTimeChanged(const QnUuid &peerId, qint64 syncTime, qint64 peerLocalTime);
 
     private:
         struct RemotePeerTimeInfo
         {
-            QUuid peerID;
+            QnUuid peerID;
             qint64 localMonotonicClock;
             //!synchronized millis from epoch, corresponding to \a monotonicClockValue
             qint64 remotePeerSyncTime;
 
             RemotePeerTimeInfo(
-                const QUuid& _peerID = QUuid(),
+                const QnUuid& _peerID = QnUuid(),
                 qint64 _localMonotonicClock = 0,
                 qint64 _remotePeerSyncTime = 0 )
             :
@@ -185,7 +185,7 @@ namespace ec2
         /*!
             \a TimeSyncInfo::syncTime stores local time on specified server
         */
-        std::map<QUuid, TimeSyncInfo> m_systemTimeByPeer;
+        std::map<QnUuid, TimeSyncInfo> m_systemTimeByPeer;
         const Qn::PeerType m_peerType;
         DaytimeNISTFetcher m_timeSynchronizer;
         size_t m_internetTimeSynchronizationPeriod;
@@ -202,7 +202,7 @@ namespace ec2
         */
         void remotePeerTimeSyncUpdate(
             QMutexLocker* const lock,
-            const QUuid& remotePeerID,
+            const QnUuid& remotePeerID,
             qint64 localMonotonicClock,
             qint64 remotePeerSyncTime,
             const TimePriorityKey& remotePeerTimePriorityKey );

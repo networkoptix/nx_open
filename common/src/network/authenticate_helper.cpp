@@ -1,7 +1,7 @@
 
 #include "authenticate_helper.h"
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QCryptographicHash>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
@@ -25,8 +25,11 @@ QnAuthMethodRestrictionList::QnAuthMethodRestrictionList()
 unsigned int QnAuthMethodRestrictionList::getAllowedAuthMethods( const nx_http::Request& request ) const
 {
     QString path = request.requestLine.url.path();
+    //TODO #ak replace mid and chop with single midRef call
     while (path.startsWith(lit("//")))
         path = path.mid(1);
+    while (path.endsWith(L'/'))
+        path.chop(1);
     unsigned int allowed = AuthMethod::cookie | AuthMethod::http | AuthMethod::videowall;   //by default
     for( std::pair<QString, unsigned int> allowRule: m_allowed )
     {
@@ -114,7 +117,7 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
     {
         const nx_http::StringType& videoWall_auth = nx_http::getHeaderValue( request.headers, "X-NetworkOptix-VideoWall" );
         if (!videoWall_auth.isEmpty())
-            return (!qnResPool->getResourceById(QUuid(videoWall_auth)).dynamicCast<QnVideoWallResource>().isNull());
+            return (!qnResPool->getResourceById(QnUuid(videoWall_auth)).dynamicCast<QnVideoWallResource>().isNull());
     }
 
     if( allowedAuthMethods & AuthMethod::urlQueryParam )
@@ -203,7 +206,7 @@ bool QnAuthHelper::authenticate( const QString& login, const QByteArray& digest 
             return user->getDigest() == digest;
     }
     //checking if it videowall connect
-    return !qnResPool->getResourceById(QUuid(login)).dynamicCast<QnVideoWallResource>().isNull();
+    return !qnResPool->getResourceById(QnUuid(login)).dynamicCast<QnVideoWallResource>().isNull();
 }
 
 QnAuthMethodRestrictionList* QnAuthHelper::restrictionList()

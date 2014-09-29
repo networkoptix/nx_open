@@ -18,11 +18,11 @@ public:
 
     void setCompatibilityMode(bool compatibilityMode);
 
-    void addUrl(const QUrl &url, const QUuid &id);
-    void removeUrl(const QUrl &url, const QUuid &id);
+    void addUrl(const QUrl &url, const QnUuid &id);
+    void removeUrl(const QUrl &url, const QnUuid &id);
 
-    void addIgnoredModule(const QUrl &url, const QUuid &id);
-    void removeIgnoredModule(const QUrl &url, const QUuid &id);
+    void addIgnoredModule(const QUrl &url, const QnUuid &id);
+    void removeIgnoredModule(const QUrl &url, const QnUuid &id);
 
     void addIgnoredUrl(const QUrl &url);
     void removeIgnoredUrl(const QUrl &url);
@@ -34,12 +34,12 @@ public:
     void pleaseStop();
 
     QList<QnModuleInformation> foundModules() const;
-    QnModuleInformation moduleInformation(const QUuid &id) const;
+    QnModuleInformation moduleInformation(const QnUuid &id) const;
 
     //! Urls for periodical check
-    QMultiHash<QUrl, QUuid> urls() const;
+    QMultiHash<QUrl, QnUuid> urls() const;
     //! Modules to be ignored when found
-    QMultiHash<QUrl, QUuid> ignoredModules() const;
+    QMultiHash<QUrl, QnUuid> ignoredModules() const;
     //! Urls which may appear in url check list but must be ignored
     QSet<QUrl> ignoredUrls() const;
 
@@ -59,17 +59,17 @@ private slots:
     void at_aliveCheckTimer_timeout();
 
 private:
-    QMultiHash<QUrl, QUuid> m_urls;
-    QMultiHash<QUrl, QUuid> m_ignoredModules;
+    QMultiHash<QUrl, QnUuid> m_urls;
+    QMultiHash<QUrl, QnUuid> m_ignoredModules;
     QSet<QUrl> m_ignoredUrls;
 
     int m_maxConnections;
     QQueue<QUrl> m_requestQueue;
     QSet<QUrl> m_activeRequests;
 
-    QHash<QUuid, QnModuleInformation> m_foundModules;
+    QHash<QnUuid, QnModuleInformation> m_foundModules;
     QHash<QUrl, qint64> m_lastPingByUrl;
-    QHash<QUrl, QUuid> m_moduleByUrl;
+    QHash<QUrl, QnUuid> m_moduleByUrl;
 
     bool m_compatibilityMode;
 

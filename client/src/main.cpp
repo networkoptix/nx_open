@@ -249,8 +249,8 @@ void addTestData()
 }
 #endif
 
-void initAppServerConnection(const QUuid &videowallGuid, const QUuid &videowallInstanceGuid) {
-    QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
+void initAppServerConnection(const QnUuid &videowallGuid, const QnUuid &videowallInstanceGuid) {
+    QnAppServerConnectionFactory::setClientGuid(QnUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
     if (!videowallGuid.isNull()) {
         QnAppServerConnectionFactory::setVideowallGuid(videowallGuid);
@@ -372,8 +372,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         }
     }
 
-    QUuid videowallGuid(sVideoWallGuid);
-    QUuid videowallInstanceGuid(sVideoWallItemGuid);
+    QnUuid videowallGuid(sVideoWallGuid);
+    QnUuid videowallInstanceGuid(sVideoWallItemGuid);
 
     QString logFileNameSuffix;
     if (!videowallGuid.isNull()) {

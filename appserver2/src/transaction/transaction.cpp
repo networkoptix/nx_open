@@ -12,8 +12,6 @@
 namespace ec2
 {
 
-    QAtomicInt qn_abstractTransaction_sequence(1);
-
     namespace ApiCommand
     {
         struct ApiCommandName
@@ -52,6 +50,11 @@ namespace ec2
             REGISTER_COMMAND(getCameras),
             REGISTER_COMMAND(getCameraHistoryItems),
             REGISTER_COMMAND(addCameraHistoryItem),
+
+            REGISTER_COMMAND(addCameraBookmarkTags),
+            REGISTER_COMMAND(getCameraBookmarkTags),
+            REGISTER_COMMAND(removeCameraBookmarkTags),
+            REGISTER_COMMAND(removeCameraHistoryItem),
 
             REGISTER_COMMAND(getMediaServers),
             REGISTER_COMMAND(saveMediaServer),
@@ -165,6 +168,7 @@ namespace ec2
                 val == saveCameras ||
                 val == removeCamera ||
                 val == addCameraHistoryItem ||
+                val == removeCameraHistoryItem ||
                 val == addCameraBookmarkTags ||
                 val == removeCameraBookmarkTags ||
                 val == saveMediaServer ||
@@ -191,28 +195,6 @@ namespace ec2
                 val == markLicenseOverflow;
         }
 
-    }
-
-
-    void QnAbstractTransaction::setStartSequence(int value)
-    {
-        qn_abstractTransaction_sequence = value;
-    }
-
-    void QnAbstractTransaction::fillPersistentInfo()
-    {
-        if (QnDbManager::instance() && persistentInfo.isNull()) {
-            if (!isLocal)
-                persistentInfo.sequence = qn_abstractTransaction_sequence.fetchAndAddAcquire(1);
-            persistentInfo.dbID = QnDbManager::instance()->getID();
-            persistentInfo.timestamp = QnTransactionLog::instance()->getTimeStamp();
-        }
-    }
-
-    void QnAbstractTransaction::cancel()
-    {
-        if (persistentInfo.sequence)
-            qn_abstractTransaction_sequence.fetchAndAddAcquire(-1);
     }
 
     int generateRequestID()

@@ -61,7 +61,7 @@ QnModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
     return m_directModuleFinderHelper;
 }
 
-void QnModuleFinder::setAllowedPeers(const QList<QUuid> &peerList) {
+void QnModuleFinder::setAllowedPeers(const QList<QnUuid> &peerList) {
     m_allowedPeers = peerList;
 }
 

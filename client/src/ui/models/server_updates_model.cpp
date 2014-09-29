@@ -61,7 +61,7 @@ QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObjec
     m_updateTool(tool),
     m_checkResult(QnCheckForUpdateResult::BadUpdateFile)
 {
-    connect(m_updateTool,  &QnMediaServerUpdateTool::peerStageChanged,  this, [this](const QUuid &peerId, QnPeerUpdateStage stage) {
+    connect(m_updateTool,  &QnMediaServerUpdateTool::peerStageChanged,  this, [this](const QnUuid &peerId, QnPeerUpdateStage stage) {
         QModelIndex idx = index(peerId);
         if (!idx.isValid())
             return;
@@ -69,7 +69,7 @@ QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObjec
         emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
     });
 
-    connect(m_updateTool,  &QnMediaServerUpdateTool::peerStageProgressChanged,  this, [this](const QUuid &peerId, QnPeerUpdateStage stage, int progress) {
+    connect(m_updateTool,  &QnMediaServerUpdateTool::peerStageProgressChanged,  this, [this](const QnUuid &peerId, QnPeerUpdateStage stage, int progress) {
         QModelIndex idx = index(peerId);
         if (!idx.isValid())
             return;
@@ -88,11 +88,14 @@ QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObjec
     connect(qnResPool,  &QnResourcePool::statusChanged,     this,   &QnServerUpdatesModel::at_resourceChanged);
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged,  this, &QnServerUpdatesModel::updateVersionColumn);
 
-    setTargets(m_updateTool->actualTargetIds());
+    setTargets(QSet<QnUuid>());
 }
 
-void QnServerUpdatesModel::setTargets(const QSet<QUuid> &targets) {
-    m_targets = targets;
+void QnServerUpdatesModel::setTargets(const QSet<QnUuid> &targets) {
+    if (targets.isEmpty())
+        m_targets = m_updateTool->actualTargetIds();
+    else
+        m_targets = targets;
     resetResourses();
 }
 
@@ -158,7 +161,7 @@ QModelIndex QnServerUpdatesModel::index(const QnMediaServerResourcePtr &server) 
     return base_type::index(it - m_items.begin(), 0);
 }
 
-QModelIndex QnServerUpdatesModel::index(const QUuid &id) const {
+QModelIndex QnServerUpdatesModel::index(const QnUuid &id) const {
     auto it = std::find_if(m_items.begin(), m_items.end(), [&id](Item *item){ return item->server()->getId() == id; });
     if (it == m_items.end())
         return QModelIndex();
@@ -175,24 +178,14 @@ void QnServerUpdatesModel::resetResourses() {
 
     m_items.clear();
 
-    if (m_targets.isEmpty()) {
-        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::server)) {
-            QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-            if (existingItems.contains(server))
-                m_items.append(existingItems.take(server));
-            else
-                m_items.append(new Item(server));
-        }
-    } else {
-        foreach (const QUuid &id, m_targets) {
-            QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
-            if (!server)
-                continue;
-            if (existingItems.contains(server))
-                m_items.append(existingItems.take(server));
-            else
-                m_items.append(new Item(server));
-        }
+    foreach (const QnUuid &id, m_targets) {
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+        if (existingItems.contains(server))
+            m_items.append(existingItems.take(server));
+        else
+            m_items.append(new Item(server));
     }
     qDeleteAll(existingItems.values());
 

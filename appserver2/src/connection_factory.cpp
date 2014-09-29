@@ -110,7 +110,7 @@ namespace ec2
         //AbstractResourceManager::setResourceStatus
         registerUpdateFuncHandler<ApiSetResourceStatusData>( restProcessorPool, ApiCommand::setResourceStatus );
         //AbstractResourceManager::getKvPairs
-        registerGetFuncHandler<QUuid, ApiResourceParamsData>( restProcessorPool, ApiCommand::getResourceParams );
+        registerGetFuncHandler<QnUuid, ApiResourceParamsData>( restProcessorPool, ApiCommand::getResourceParams );
         //AbstractResourceManager::save
         registerUpdateFuncHandler<ApiResourceParamsData>( restProcessorPool, ApiCommand::setResourceParams );
         //AbstractResourceManager::save
@@ -120,7 +120,7 @@ namespace ec2
 
 
         //AbstractMediaServerManager::getServers
-        registerGetFuncHandler<QUuid, ApiMediaServerDataList>( restProcessorPool, ApiCommand::getMediaServers );
+        registerGetFuncHandler<QnUuid, ApiMediaServerDataList>( restProcessorPool, ApiCommand::getMediaServers );
         //AbstractMediaServerManager::save
         registerUpdateFuncHandler<ApiMediaServerData>( restProcessorPool, ApiCommand::saveMediaServer );
         //AbstractMediaServerManager::remove
@@ -132,9 +132,11 @@ namespace ec2
         //AbstractCameraManager::save
         registerUpdateFuncHandler<ApiCameraDataList>( restProcessorPool, ApiCommand::saveCameras );
         //AbstractCameraManager::getCameras
-        registerGetFuncHandler<QUuid, ApiCameraDataList>( restProcessorPool, ApiCommand::getCameras );
+        registerGetFuncHandler<QnUuid, ApiCameraDataList>( restProcessorPool, ApiCommand::getCameras );
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
+        //AbstractCameraManager::removeCameraHistoryItem
+        registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::removeCameraHistoryItem );
         //AbstractCameraManager::getCameraHistoryItems
         registerGetFuncHandler<std::nullptr_t, ApiCameraServerItemDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
         //AbstractCameraManager::getBookmarkTags

@@ -47,14 +47,14 @@ void fromApiToResource(const ApiBusinessRuleData &src, QnBusinessEventRulePtr &d
     dst->setId(src.id);
     dst->setEventType(src.eventType);
 
-    dst->setEventResources(QVector<QUuid>::fromStdVector(src.eventResourceIds));
+    dst->setEventResources(QVector<QnUuid>::fromStdVector(src.eventResourceIds));
 
     dst->setEventParams(QnBusinessEventParameters::fromBusinessParams(deserializeBusinessParams(src.eventCondition)));
 
     dst->setEventState(src.eventState);
     dst->setActionType(src.actionType);
 
-    dst->setActionResources(QVector<QUuid>::fromStdVector(src.actionResourceIds));
+    dst->setActionResources(QVector<QnUuid>::fromStdVector(src.actionResourceIds));
 
     dst->setActionParams(QnBusinessActionParameters::fromBusinessParams(deserializeBusinessParams(src.actionParams)));
 
@@ -119,7 +119,7 @@ void fromApiToResource(const ApiBusinessActionData &src, QnAbstractBusinessActio
     dst->setToggleState(src.toggleState);
     dst->setReceivedFromRemoteHost(src.receivedFromRemoteHost);
 
-    dst->setResources(QVector<QUuid>::fromStdVector(src.resourceIds));
+    dst->setResources(QVector<QnUuid>::fromStdVector(src.resourceIds));
 
     dst->setParams(QnBusinessActionParameters::fromBusinessParams(deserializeBusinessParams(src.params)));
 
@@ -139,7 +139,7 @@ void fromResourceToApi(const QnScheduleTask &src, ApiScheduleTaskData &dst) {
     dst.fps = src.getFps();
 }
 
-void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QUuid &resourceId) {
+void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QnUuid &resourceId) {
     dst = QnScheduleTask(resourceId, src.dayOfWeek, src.startTime, src.endTime, src.recordingType, src.beforeThreshold, src.afterThreshold, src.streamQuality, src.fps, src.recordAudio);
 }
 
@@ -265,11 +265,12 @@ void fromResourceToApi(const QnCameraHistoryItem &src, ApiCameraServerItemData &
 
 void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &dst) {
     dst.cameraUniqueId = src.cameraUniqueId;
-    dst.mediaServerGuid = QUuid(src.serverId);
+    dst.mediaServerGuid = QnUuid(src.serverId);
     dst.timestamp = src.timestamp;
 }
 
-void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) {
+void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) 
+{
     /* CameraUniqueId -> (Timestamp -> ServerGuid). */
     QMap<QString, QMap<qint64, QByteArray> > history;
 
@@ -291,13 +292,7 @@ void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHisto
         while (camit.hasNext())
         {
             camit.next();
-
-            if (camit.hasNext())
-                duration = camit.peekNext().key() - camit.key();
-            else
-                duration = -1;
-
-            cameraHistory->addTimePeriod(QnCameraTimePeriod(camit.key(), duration, camit.value()));
+            cameraHistory->addTimePeriod(camit.key(), camit.value());
         }
 
         dst.append(cameraHistory);

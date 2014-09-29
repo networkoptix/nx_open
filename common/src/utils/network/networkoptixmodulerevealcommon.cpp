@@ -53,6 +53,7 @@ RevealResponse::RevealResponse(const QnModuleInformation &moduleInformation) {
 QnModuleInformation RevealResponse::toModuleInformation() const {
     QnModuleInformation moduleInformation;
     moduleInformation.type = type;
+    moduleInformation.customization = customization;
     moduleInformation.version = QnSoftwareVersion(version);
     moduleInformation.systemInformation = QnSystemInformation(systemInformation);
     moduleInformation.systemName = name;
@@ -100,7 +101,7 @@ bool RevealResponse::deserialize(const quint8 **bufStart, const quint8 *bufEnd) 
     customization = map.take(lit("customization")).toString();
     name = map.take(lit("systemName")).toString();
     moduleName = map.take(lit("name")).toString();
-    seed = QUuid(map.take(lit("seed")).toString());
+    seed = QnUuid(map.take(lit("seed")).toString());
     sslAllowed = map.take( lit( "sslAllowed" ) ).toBool();
     port = static_cast<quint16>(map.take(lit("port")).toUInt());
     remoteAddresses = map.take(lit("remoteAddresses")).toStringList();

@@ -1,5 +1,5 @@
 #include <QtCore/QString>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtGui/QDesktopServices>
 #include <QtCore/QDir>
 #include <QtCore/QEventLoop>
@@ -19,13 +19,13 @@ QString authKey()
     return MSSettings::roSettings()->value("authKey").toString();
 }
 
-QUuid serverGuid() {
-    static QUuid guid;
+QnUuid serverGuid() {
+    static QnUuid guid;
 
     if (!guid.isNull())
         return guid;
 
-    guid = QUuid(MSSettings::roSettings()->value(lit("serverGuid")).toString());
+    guid = QnUuid(MSSettings::roSettings()->value(lit("serverGuid")).toString());
 
     return guid;
 }
@@ -48,9 +48,6 @@ QString getDataDirectory()
 
 
 bool backupDatabase() {
-    // TODO: #dklychkov dumpDatabaseAsync has not been implemented yet. Let this function work when dumpDatabaseAsync is ready.
-    return true;
-
     QString dir = getDataDirectory() + lit("/");
     QString fileName;
     for (int i = -1; ; i++) {

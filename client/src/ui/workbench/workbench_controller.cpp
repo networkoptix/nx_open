@@ -1046,7 +1046,7 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     QnLayoutItemData data = widget->item()->data();
     delete widget;
 
-    data.uuid = QUuid::createUuid();
+    data.uuid = QnUuid::createUuid();
     data.resource.id = zoomTargetWidget->resource()->toResource()->getId();
     data.resource.path = zoomTargetWidget->resource()->toResource()->getUniqueId();
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();

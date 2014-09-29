@@ -4,6 +4,8 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
+#include <utils/common/uuid.h>
+
 
 class QnRouter;
 
@@ -13,7 +15,7 @@ public:
     explicit QnServerInterfaceWatcher(QnRouter *router, QObject *parent = 0);
 
 private slots:
-    void at_connectionChanged(const QUuid &discovererId, const QUuid &peerId);
+    void at_connectionChanged(const QnUuid &discovererId, const QnUuid &peerId);
     void at_resourcePool_statusChanged(const QnResourcePtr &resource);
 
 private:

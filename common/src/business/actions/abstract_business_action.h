@@ -39,9 +39,9 @@ public:
      * see: QnBusiness::requiresCameraResource()
      * see: QnBusiness::requiresUserResource()
      */
-    void setResources(const QVector<QUuid>& resources);
+    void setResources(const QVector<QnUuid>& resources);
 
-    const QVector<QUuid>& getResources() const;
+    const QVector<QnUuid>& getResources() const;
     QnResourceList getResourceObjects() const;
 
     void setParams(const QnBusinessActionParameters& params);
@@ -51,8 +51,8 @@ public:
     void setRuntimeParams(const QnBusinessEventParameters& params);
     const QnBusinessEventParameters& getRuntimeParams() const;
 
-    void setBusinessRuleId(const QUuid& value);
-    QUuid getBusinessRuleId() const;
+    void setBusinessRuleId(const QnUuid& value);
+    QnUuid getBusinessRuleId() const;
 
     void setToggleState(QnBusiness::EventState value);
     QnBusiness::EventState getToggleState() const;
@@ -74,10 +74,10 @@ protected:
     QnBusiness::ActionType m_actionType;
     QnBusiness::EventState m_toggleState;
     bool m_receivedFromRemoteHost;
-    QVector<QUuid> m_resources;
+    QVector<QnUuid> m_resources;
     QnBusinessActionParameters m_params;
     QnBusinessEventParameters m_runtimeParams;
-    QUuid m_businessRuleId; // business rule that generated this action
+    QnUuid m_businessRuleId; // business rule that generated this action
     int m_aggregationCount;
 };
 
@@ -101,8 +101,8 @@ public:
     void setRuntimeParams(const QnBusinessEventParameters& params) {m_runtimeParams = params;}
     const QnBusinessEventParameters& getRuntimeParams() const {return m_runtimeParams; }
 
-    void setBusinessRuleId(const QUuid& value) {m_businessRuleId = value; }
-    QUuid getBusinessRuleId() const { return m_businessRuleId; }
+    void setBusinessRuleId(const QnUuid& value) {m_businessRuleId = value; }
+    QnUuid getBusinessRuleId() const { return m_businessRuleId; }
 
     void setAggregationCount(int value) { m_aggregationCount = value; }
     int getAggregationCount() const { return m_aggregationCount; }
@@ -121,7 +121,7 @@ protected:
     QnBusiness::ActionType m_actionType;
     QnBusinessActionParameters m_params;
     QnBusinessEventParameters m_runtimeParams;
-    QUuid m_businessRuleId; 
+    QnUuid m_businessRuleId; 
     int m_aggregationCount;
     QString m_compareString;
     int m_flags;

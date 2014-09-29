@@ -307,5 +307,6 @@ html
 webadmin/node_modules
 webadmin/dist
 webadmin/.tmp
+webadmin/.idea
 webadmin/.sass-cache
 app/bower_components

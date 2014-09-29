@@ -1,9 +1,9 @@
-#ifndef JOIN_SYSTEM_REST_HANDLER_H
-#define JOIN_SYSTEM_REST_HANDLER_H
+#ifndef MERGE_SYSTEMS_REST_HANDLER_H
+#define MERGE_SYSTEMS_REST_HANDLER_H
 
 #include <rest/server/json_rest_handler.h>
 
-class QnJoinSystemRestHandler : public QnJsonRestHandler {
+class QnMergeSystemsRestHandler : public QnJsonRestHandler {
     Q_OBJECT
 public:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result);
@@ -12,4 +12,4 @@ private:
     bool changeAdminPassword(const QString &password);
 };
 
-#endif // JOIN_SYSTEM_REST_HANDLER_H
+#endif // MERGE_SYSTEMS_REST_HANDLER_H

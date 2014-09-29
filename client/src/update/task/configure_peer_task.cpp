@@ -61,14 +61,15 @@ void QnConfigurePeerTask::setWholeSystem(bool wholeSystem) {
 
 void QnConfigurePeerTask::doStart() {
     m_error = NoError;
-    foreach (const QUuid &id, peers()) {
+    m_pendingPeers.clear();
+    foreach (const QnUuid &id, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server) {
             m_failedPeers.insert(id);
             continue;
         }
 
-        int handle = server->apiConnection()->configureAsync(m_wholeSystem, m_systemName, m_password, m_passwordHash, m_passwordDigest, m_port, this, SLOT(processReply(int,int)));
+        int handle = server->apiConnection()->configureAsync(m_wholeSystem, m_systemName, m_password, m_passwordHash, m_passwordDigest, m_port, this, SLOT(processReply(int,QnConfigureReply,int)));
         m_pendingPeers.insert(handle, id);
     }
 
@@ -77,7 +78,9 @@ void QnConfigurePeerTask::doStart() {
 }
 
 void QnConfigurePeerTask::processReply(int status, const QnConfigureReply &reply, int handle) {
-    QUuid id = m_pendingPeers.take(handle);
+    Q_UNUSED(reply)
+
+    QnUuid id = m_pendingPeers.take(handle);
     if (id.isNull())
         return;
 

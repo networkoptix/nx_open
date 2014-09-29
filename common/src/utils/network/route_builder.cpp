@@ -1,11 +1,11 @@
 #include "route_builder.h"
 
-QnRouteBuilder::QnRouteBuilder(const QUuid &startId) :
+QnRouteBuilder::QnRouteBuilder(const QnUuid &startId) :
     m_startId(startId)
 {
 }
 
-void QnRouteBuilder::addConnection(const QUuid &from, const QUuid &to, const QString &host, quint16 port, int weight) {
+void QnRouteBuilder::addConnection(const QnUuid &from, const QnUuid &to, const QString &host, quint16 port, int weight) {
     Q_ASSERT(from != to);
 
     if (to == m_startId)
@@ -35,7 +35,7 @@ void QnRouteBuilder::addConnection(const QUuid &from, const QUuid &to, const QSt
     buildRoutes(routes);
 }
 
-void QnRouteBuilder::removeConnection(const QUuid &from, const QUuid &to, const QString &host, quint16 port) {
+void QnRouteBuilder::removeConnection(const QnUuid &from, const QnUuid &to, const QString &host, quint16 port) {
     Q_ASSERT(from != to);
 
     QnRoutePoint point(to, host, port);
@@ -48,7 +48,7 @@ void QnRouteBuilder::removeConnection(const QUuid &from, const QUuid &to, const 
     // remove all routes containing the given connection
     for (auto rtIt = m_routes.begin(); rtIt != m_routes.end(); ++rtIt) {
         for (auto it = rtIt.value().begin(); it != rtIt.value().end(); ) {
-            if (it->containsConnection(from, point))
+            if (it->containsConnection(m_startId, from, point))
                 it = rtIt.value().erase(it);
             else
                 ++it;
@@ -60,7 +60,7 @@ void QnRouteBuilder::clear() {
     m_routes.clear();
 }
 
-QnRoute QnRouteBuilder::routeTo(const QUuid &peerId) const {
+QnRoute QnRouteBuilder::routeTo(const QnUuid &peerId) const {
     const QnRouteList &routeList = m_routes[peerId];
     if (routeList.isEmpty())
         return QnRoute();
@@ -68,7 +68,7 @@ QnRoute QnRouteBuilder::routeTo(const QUuid &peerId) const {
         return routeList.first();
 }
 
-QHash<QUuid, QnRouteList> QnRouteBuilder::routes() const {
+QHash<QnUuid, QnRouteList> QnRouteBuilder::routes() const {
     return m_routes;
 }
 
@@ -103,7 +103,7 @@ void QnRouteBuilder::buildRoutes(const QList<QnRoute> &initialRoutes) {
     }
 }
 
-QMultiHash<QUuid, QnRouteBuilder::WeightedPoint>::iterator QnRouteBuilder::findConnection(const QUuid &from, const QnRoutePoint &point) {
+QMultiHash<QnUuid, QnRouteBuilder::WeightedPoint>::iterator QnRouteBuilder::findConnection(const QnUuid &from, const QnRoutePoint &point) {
     auto it = m_connections.begin();
     for (; it != m_connections.end(); ++it) {
         if (it.key() == from && it.value().first == point)

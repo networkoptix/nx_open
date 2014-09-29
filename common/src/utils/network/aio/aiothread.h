@@ -48,7 +48,17 @@ namespace aio
             SocketType* const sock,
             aio::EventType eventToWatch,
             AIOEventHandler<SocketType>* const eventHandler,
-            int timeoutMS = 0,
+            unsigned int timeoutMS = 0,
+            std::function<void()> socketAddedToPollHandler = std::function<void()>() );
+        //!Change timeout of existing polling \a sock for \a eventToWatch to \a timeoutMS. \a eventHandler is changed also
+        /*!
+            \note If \a sock is not polled, undefined behaviour can occur
+        */
+        bool changeSocketTimeout(
+            SocketType* const sock,
+            aio::EventType eventToWatch,
+            AIOEventHandler<SocketType>* const eventHandler,
+            unsigned int timeoutMS = 0,
             std::function<void()> socketAddedToPollHandler = std::function<void()>() );
         //!Do not monitor \a sock for event \a eventType
         /*!

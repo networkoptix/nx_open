@@ -108,7 +108,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
 /**
  * Constructor for item nodes.
  */
-QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, const QUuid &uuid, Qn::NodeType nodeType):
+QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, const QnUuid &uuid, Qn::NodeType nodeType):
     m_model(model),
     m_type(nodeType),
     m_uuid(uuid),
@@ -255,7 +255,7 @@ Qn::ResourceStatus QnResourcePoolModelNode::resourceStatus() const {
     return m_status;
 }
 
-const QUuid& QnResourcePoolModelNode::uuid() const {
+const QnUuid& QnResourcePoolModelNode::uuid() const {
     return m_uuid;
 }
 
@@ -325,7 +325,7 @@ bool QnResourcePoolModelNode::calculateBastard() const {
                 return true;
             
             /* Hide edge servers, camera will be displayed instead. */
-            if (QnMediaServerResource::isEdgeServer(m_resource))
+            if (QnMediaServerResource::isHiddenServer(m_resource))
                 return true;
         }
         return false;
@@ -504,7 +504,7 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
             || m_type == Qn::VideoWallItemNode 
             || m_type == Qn::VideoWallMatrixNode
             )
-            return QVariant::fromValue<QUuid>(m_uuid);
+            return QVariant::fromValue<QnUuid>(m_uuid);
         break;
     case Qn::ResourceSearchStringRole:
         return m_searchString;

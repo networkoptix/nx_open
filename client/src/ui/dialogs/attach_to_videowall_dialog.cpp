@@ -5,7 +5,7 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QRadioButton>
 
-#include <ui/workaround/qt5_combobox_workaround.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 #include <client/client_settings.h>
 
 #include <ui/style/warning_style.h>

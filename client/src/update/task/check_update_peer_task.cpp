@@ -15,6 +15,7 @@
 #include <common/common_module.h>
 
 #include <utils/update/update_utils.h>
+#include <utils/update/zip_utils.h>
 #include <utils/applauncher_utils.h>
 #include <utils/network/http/async_http_client_reply.h>
 
@@ -67,10 +68,6 @@ QnUpdateFileInformationPtr QnCheckForUpdatesPeerTask::clientUpdateFile() const {
     return m_clientUpdateFile;
 }
 
-QString QnCheckForUpdatesPeerTask::temporaryDir() const {
-    return m_temporaryUpdateDir;
-}
-
 void QnCheckForUpdatesPeerTask::doStart() {
     if (!m_target.fileName.isEmpty())
         checkLocalUpdates();
@@ -84,20 +81,18 @@ bool QnCheckForUpdatesPeerTask::needUpdate(const QnSoftwareVersion &version, con
 
 void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
     if (m_updateFiles.isEmpty()) {
-        cleanUp();
         finishTask(QnCheckForUpdateResult::BadUpdateFile);
         return;
     }
 
     bool needUpdate = false;
-    foreach (const QUuid &peerId, peers()) {
+    foreach (const QnUuid &peerId, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(peerId, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 
         QnUpdateFileInformationPtr updateFileInformation = m_updateFiles.value(server->getSystemInfo(), QnUpdateFileInformationPtr());
         if (!updateFileInformation) {
-            cleanUp();
             finishTask(QnCheckForUpdateResult::ServerUpdateImpossible);
             return;
         }
@@ -106,7 +101,6 @@ void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
 
     if (!m_target.denyClientUpdates && !m_clientRequiresInstaller) {
         if (!m_clientUpdateFile) {
-            cleanUp();
             finishTask(QnCheckForUpdateResult::ClientUpdateImpossible);
             return;
         }
@@ -159,8 +153,8 @@ void QnCheckForUpdatesPeerTask::checkOnlineUpdates() {
 
 void QnCheckForUpdatesPeerTask::checkLocalUpdates() {
     m_updateFiles.clear();
+    m_clientUpdateFile.clear();
     m_targetMustBeNewer = false;
-    m_temporaryUpdateDir.clear();
     m_releaseNotesUrl.clear();
 
     if (!QFile::exists(m_target.fileName)) {
@@ -168,78 +162,9 @@ void QnCheckForUpdatesPeerTask::checkLocalUpdates() {
         return;
     }
 
-    QDir dir = QDir::temp();
-    forever {
-        QString dirName = QUuid::createUuid().toString();
-        if (dir.exists(dirName))
-            continue;
-
-        if (!dir.mkdir(dirName)) {
-            finishTask(QnCheckForUpdateResult::BadUpdateFile);
-            return;
-        }
-
-        dir.cd(dirName);
-        m_temporaryUpdateDir = dir.absolutePath();
-        break;
-    }
-
-    if (!extractZipArchive(m_target.fileName, dir)) {
-        cleanUp();
-        finishTask(QnCheckForUpdateResult::BadUpdateFile);
-        return;
-    }
-
-    QStringList entries = dir.entryList(QStringList() << lit("*.zip"), QDir::Files);
-    foreach (const QString &entry, entries) {
-        QString fileName = dir.absoluteFilePath(entry);
-        QnSoftwareVersion version;
-        QnSystemInformation sysInfo;
-        bool isClient;
-
-        if (!verifyUpdatePackage(fileName, &version, &sysInfo, &isClient))
-            continue;
-
-        if (m_updateFiles.contains(sysInfo))
-            continue;
-
-        if (m_target.version.isNull())
-            m_target.version = version;
-
-        if (m_target.version != version) {
-            finishTask(QnCheckForUpdateResult::BadUpdateFile);
-            return;
-        }
-
-        if (isClient) {
-            if (m_target.denyClientUpdates)
-                continue;
-
-            if (sysInfo != QnSystemInformation::currentSystemInformation())
-                continue;
-        }
-
-        QnUpdateFileInformationPtr updateFileInformation(new QnUpdateFileInformation(version, fileName));
-        QFile file(fileName);
-        updateFileInformation->fileSize = file.size();
-        updateFileInformation->md5 = makeMd5(&file);
-        if (isClient) {
-            m_clientUpdateFile = updateFileInformation;
-            QnSoftwareVersion minimalVersion = minimalVersionForUpdatePackage(updateFileInformation->fileName);
-            m_clientRequiresInstaller = !minimalVersion.isNull() && minimalVersion > maximumAvailableVersion();
-        } else {
-            m_updateFiles.insert(sysInfo, updateFileInformation);
-        }
-    }
-
-    checkUpdateCoverage();
-}
-
-void QnCheckForUpdatesPeerTask::cleanUp() {
-    if (!m_temporaryUpdateDir.isEmpty()) {
-        QDir(m_temporaryUpdateDir).removeRecursively();
-        m_temporaryUpdateDir.clear();
-    }
+    QnZipExtractor *extractor(new QnZipExtractor(m_target.fileName, updatesCacheDir()));
+    connect(extractor, &QnZipExtractor::finished, this, &QnCheckForUpdatesPeerTask::at_zipExtractor_finished);
+    extractor->start();
 }
 
 void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *reply) {
@@ -351,6 +276,69 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *r
     checkUpdateCoverage();
 }
 
+void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error) {
+    QnZipExtractor *zipExtractor = qobject_cast<QnZipExtractor*>(sender());
+    if (!zipExtractor)
+        return;
+
+    zipExtractor->deleteLater();
+
+    if (error != QnZipExtractor::Ok) {
+        finishTask(QnCheckForUpdateResult::BadUpdateFile);
+        return;
+    }
+
+    QDir dir = zipExtractor->dir();
+    QStringList entries = zipExtractor->fileList();
+    foreach (const QString &entry, entries) {
+        QString fileName = dir.absoluteFilePath(entry);
+        QnSoftwareVersion version;
+        QnSystemInformation sysInfo;
+        bool isClient;
+
+        if (!verifyUpdatePackage(fileName, &version, &sysInfo, &isClient))
+            continue;
+
+        if (m_updateFiles.contains(sysInfo))
+            continue;
+
+        if (m_target.version.isNull())
+            m_target.version = version;
+
+        if (m_target.version != version) {
+            finishTask(QnCheckForUpdateResult::BadUpdateFile);
+            return;
+        }
+
+        if (isClient) {
+            if (m_target.denyClientUpdates)
+                continue;
+
+            if (sysInfo != QnSystemInformation::currentSystemInformation())
+                continue;
+        }
+
+        QnUpdateFileInformationPtr updateFileInformation(new QnUpdateFileInformation(version, fileName));
+        QFile file(fileName);
+        updateFileInformation->fileSize = file.size();
+        updateFileInformation->md5 = makeMd5(&file);
+        if (isClient) {
+            if (!m_target.denyClientUpdates) {
+                m_clientUpdateFile = updateFileInformation;
+                QnSoftwareVersion minimalVersion = minimalVersionForUpdatePackage(updateFileInformation->fileName);
+                m_clientRequiresInstaller = !minimalVersion.isNull() && minimalVersion > maximumAvailableVersion();
+            }
+        } else {
+            m_updateFiles.insert(sysInfo, updateFileInformation);
+        }
+    }
+
+    if (!m_clientUpdateFile)
+        m_clientRequiresInstaller = true;
+
+    checkUpdateCoverage();
+}
+
 void QnCheckForUpdatesPeerTask::finishTask(QnCheckForUpdateResult::Value value) {
     QnCheckForUpdateResult result(value);
     result.latestVersion = m_target.version;
@@ -369,4 +357,3 @@ void QnCheckForUpdatesPeerTask::start() {
 QnUpdateTarget QnCheckForUpdatesPeerTask::target() const {
     return m_target;
 }
-

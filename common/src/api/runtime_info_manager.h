@@ -16,7 +16,7 @@ struct QnPeerRuntimeInfo {
         uuid(runtimeData.peer.id),
         data(runtimeData){}
 
-    QUuid uuid;
+    QnUuid uuid;
     ec2::ApiRuntimeData data;
 
     bool operator==(const QnPeerRuntimeInfo& other) const {
@@ -30,7 +30,7 @@ Q_DECLARE_METATYPE(QnPeerRuntimeInfo)
 Q_DECLARE_TYPEINFO(QnPeerRuntimeInfo, Q_MOVABLE_TYPE);
 
 typedef QList<QnPeerRuntimeInfo> QnPeerRuntimeInfoList;
-typedef QHash<QUuid, QnPeerRuntimeInfo> QnPeerRuntimeInfoMap;
+typedef QHash<QnUuid, QnPeerRuntimeInfo> QnPeerRuntimeInfoMap;
 
 Q_DECLARE_METATYPE(QnPeerRuntimeInfoList)
 Q_DECLARE_METATYPE(QnPeerRuntimeInfoMap)
@@ -48,8 +48,8 @@ public:
 
     QnPeerRuntimeInfo localInfo() const;
     QnPeerRuntimeInfo remoteInfo() const;
-    bool hasItem(const QUuid& id);
-    QnPeerRuntimeInfo item(const QUuid& id) const;
+    bool hasItem(const QnUuid& id);
+    QnPeerRuntimeInfo item(const QnUuid& id) const;
 
     void updateLocalItem(const QnPeerRuntimeInfo& value);
 signals:

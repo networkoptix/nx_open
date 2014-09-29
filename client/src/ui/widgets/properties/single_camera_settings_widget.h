@@ -209,7 +209,7 @@ private:
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
     mutable QnMediaServerConnectionPtr m_serverConnection;
 
-    QHash<QUuid, QnImageProvider*> m_imageProvidersByResourceId;
+    QHash<QnUuid, QnImageProvider*> m_imageProvidersByResourceId;
 	QUrl m_lastCameraPageUrl;
 #ifdef QT_WEBKITWIDGETS_LIB
     CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;

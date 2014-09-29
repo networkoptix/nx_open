@@ -5,7 +5,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QMutex>
 #include <QtCore/QObject>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtNetwork/QHostAddress>
 
 #include <core/resource/resource_fwd.h>
@@ -71,7 +71,7 @@ public:
         return result;
     }
 
-    QnResourcePtr getResourceById(const QUuid &id) const;
+    QnResourcePtr getResourceById(const QnUuid &id) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
     void updateUniqId(const QnResourcePtr& res, const QString &newUniqId);
@@ -89,17 +89,17 @@ public:
     QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
-    QnResourceList getAllCameras(const QnResourcePtr &mServer) const;
+    QnResourceList getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras = false) const;
     QnMediaServerResourceList getAllServers() const;
-    QnResourceList getResourcesByParentId(const QUuid& parentId) const;
+    QnResourceList getResourcesByParentId(const QnUuid& parentId) const;
 
     // returns list of resources with such flag
     QnResourceList getResourcesWithFlag(Qn::ResourceFlag flag) const;
 
-    QnResourceList getResourcesWithParentId(QUuid id) const;
-    QnResourceList getResourcesWithTypeId(QUuid id) const;
+    QnResourceList getResourcesWithParentId(QnUuid id) const;
+    QnResourceList getResourcesWithTypeId(QnUuid id) const;
 
-    QnResourcePtr getIncompatibleResourceById(const QUuid &id, bool useCompatible = false) const;
+    QnResourcePtr getIncompatibleResourceById(const QnUuid &id, bool useCompatible = false) const;
     QnResourcePtr getIncompatibleResourceByUniqueId(const QString &uid) const;
     QnResourceList getAllIncompatibleResources() const;
 
@@ -110,28 +110,28 @@ public:
      * @param uuid                              Unique id of the item.
      * @return                                  Valid index containing the videowall and item's uuid or null index if such item does not exist.
      */
-    QnVideoWallItemIndex getVideoWallItemByUuid(const QUuid &uuid) const;
+    QnVideoWallItemIndex getVideoWallItemByUuid(const QnUuid &uuid) const;
 
     /**
      * @brief getVideoWallItemsByUuid           Find list of videowall items by their uuids.
      * @param uuids                             Unique ids of the items.
      * @return                                  List of valid indices containing the videowall and items' uuid.
      */
-    QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QUuid> &uuids) const;
+    QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QnUuid> &uuids) const;
     
     /**
      * @brief getVideoWallMatrixByUuid          Find videowall matrix by uuid.
      * @param uuid                              Unique id of the matrix.
      * @return                                  Index containing the videowall and matrix's uuid.
      */
-    QnVideoWallMatrixIndex getVideoWallMatrixByUuid(const QUuid &uuid) const;
+    QnVideoWallMatrixIndex getVideoWallMatrixByUuid(const QnUuid &uuid) const;
 
     /**
      * @brief getVideoWallMatricesByUuid        Find list of videowall matrices by their uuids.
      * @param uuids                             Unique ids of the matrices.
      * @return                                  List of indices containing the videowall and matrices' uuid.
      */
-    QnVideoWallMatrixIndexList getVideoWallMatricesByUuid(const QList<QUuid> &uuids) const;
+    QnVideoWallMatrixIndexList getVideoWallMatricesByUuid(const QList<QnUuid> &uuids) const;
 
     QStringList allTags() const;
 
@@ -152,13 +152,13 @@ private:
     mutable QMutex m_resourcesMtx;
     bool m_tranInProgress;
     QnResourceList m_tmpResources;
-    QHash<QUuid, QnResourcePtr> m_resources;
-    QHash<QUuid, QnResourcePtr> m_incompatibleResources;
+    QHash<QnUuid, QnResourcePtr> m_resources;
+    QHash<QnUuid, QnResourcePtr> m_incompatibleResources;
 
     /*!
         \return true, if \a resource has been inserted. false - if updated existing resource
     */
-    bool insertOrUpdateResource( const QnResourcePtr &resource, QHash<QUuid, QnResourcePtr>* const resourcePool );
+    bool insertOrUpdateResource( const QnResourcePtr &resource, QHash<QnUuid, QnResourcePtr>* const resourcePool );
 };
 
 

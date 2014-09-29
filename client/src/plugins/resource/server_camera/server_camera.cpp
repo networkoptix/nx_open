@@ -6,7 +6,7 @@
 #include "api/app_server_connection.h"
 
 
-QnServerCamera::QnServerCamera(const QUuid& resourceTypeId): QnVirtualCameraResource()
+QnServerCamera::QnServerCamera(const QnUuid& resourceTypeId): QnVirtualCameraResource()
 {
     setTypeId(resourceTypeId);
     addFlags(Qn::server_live_cam);
@@ -40,7 +40,7 @@ QnConstResourceVideoLayoutPtr QnServerCamera::getVideoLayout(const QnAbstractStr
 {
     Q_UNUSED(dataProvider)
     // todo: layout must be loaded in resourceParams
-    return QnMediaResource::getVideoLayout();
+    return QnVirtualCameraResource::getVideoLayout();
 }
 
 QnConstResourceAudioLayoutPtr QnServerCamera::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const

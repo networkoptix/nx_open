@@ -4,7 +4,7 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QList>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <utils/common/model_functions_fwd.h>
 
@@ -75,10 +75,10 @@ struct QnManualCameraSearchReply {
 
     QnManualCameraSearchReply() {}
 
-    QnManualCameraSearchReply(const QUuid &uuid, const QnManualCameraSearchProcessStatus &processStatus):
+    QnManualCameraSearchReply(const QnUuid &uuid, const QnManualCameraSearchProcessStatus &processStatus):
         processUuid(uuid), status(processStatus.status), cameras(processStatus.cameras) {}
 
-    QUuid processUuid;
+    QnUuid processUuid;
     QnManualCameraSearchStatus status;
     QnManualCameraSearchCameraList cameras;
 };

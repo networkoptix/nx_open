@@ -278,11 +278,11 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 }
 */
 
-QUuid QnNetworkResource::uniqueIdToId(const QString& uniqId)
+QnUuid QnNetworkResource::uniqueIdToId(const QString& uniqId)
 {
     Q_ASSERT(!uniqId.isEmpty());
     QCryptographicHash md5(QCryptographicHash::Md5);
     md5.addData(uniqId.toUtf8());
-    QUuid id = QUuid::fromRfc4122(md5.result());
+    QnUuid id = QnUuid::fromRfc4122(md5.result());
     return id;
 }

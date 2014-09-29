@@ -29,7 +29,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
             assert( tran.command == ApiCommand::removeVideowall );
-            emit removed( QUuid(tran.params.id) );
+            emit removed( QnUuid(tran.params.id) );
         }
 
         void triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran) {
@@ -54,7 +54,7 @@ namespace ec2
     protected:
         virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) override;
         virtual int save( const QnVideoWallResourcePtr& resource, impl::AddVideowallHandlerPtr handler ) override;
-        virtual int remove( const QUuid& id, impl::SimpleHandlerPtr handler ) override;
+        virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
 
         virtual int sendControlMessage(const QnVideoWallControlMessage& message, impl::SimpleHandlerPtr handler) override;
 
@@ -62,7 +62,7 @@ namespace ec2
         QueryProcessorType* const m_queryProcessor;
 
         QnTransaction<ApiVideowallData> prepareTransaction(ApiCommand::Value command, const QnVideoWallResourcePtr &resource);
-        QnTransaction<ApiIdData> prepareTransaction(ApiCommand::Value command, const QUuid& id);
+        QnTransaction<ApiIdData> prepareTransaction(ApiCommand::Value command, const QnUuid& id);
         QnTransaction<ApiVideowallControlMessageData> prepareTransaction(ApiCommand::Value command, const QnVideoWallControlMessage &message);
     };
 }

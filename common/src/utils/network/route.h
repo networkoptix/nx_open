@@ -4,11 +4,11 @@
 #include <utils/common/id.h>
 
 struct QnRoutePoint {
-    QUuid peerId;
+    QnUuid peerId;
     QString host;
     quint16 port;
 
-    QnRoutePoint(const QUuid &peerId, const QString &host, quint16 port) :
+    QnRoutePoint(const QnUuid &peerId, const QString &host, quint16 port) :
         peerId(peerId), host(host), port(port)
     {}
 
@@ -25,7 +25,7 @@ struct QnRoute {
     bool isEqual(const QnRoute &other) const;
 
     bool addPoint(const QnRoutePoint &point, int weight);
-    bool containsConnection(const QUuid &from, const QnRoutePoint &point) const;
+    bool containsConnection(const QnUuid &first, const QnUuid &from, const QnRoutePoint &point) const;
 
     bool operator <(const QnRoute &other) const;
 };

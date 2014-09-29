@@ -65,6 +65,14 @@ void QnRecordingManager::beforeDeleteRecorder(const Recorders& recorders)
         recorders.recorderLowRes->pleaseStop();
 }
 
+void QnRecordingManager::stopRecorder(const Recorders& recorders)
+{
+    if( recorders.recorderHiRes )
+        recorders.recorderHiRes->stop();
+    if (recorders.recorderLowRes)
+        recorders.recorderLowRes->stop();
+}
+
 void QnRecordingManager::deleteRecorder(const Recorders& recorders, const QnResourcePtr& /*resource*/)
 {
 	QnVideoCamera* camera = 0;
@@ -152,25 +160,13 @@ bool QnRecordingManager::isResourceDisabled(const QnResourcePtr& res) const
 bool QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
 {
     const QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
+
+    QnMediaServerResourcePtr currentServer = QnCameraHistoryPool::instance()->getMediaServerOnTime(netRes, qnSyncTime->currentMSecsSinceEpoch(), true);
+    if (currentServer && currentServer->getId() == qnCommon->moduleGUID())
+        return true; // camera history already inserted. skip
+
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    if (QnCameraHistoryPool::instance()->getMinTime(netRes) == (qint64)AV_NOPTS_VALUE)
-    {
-        // it is first record for camera
-        DeviceFileCatalogPtr catalogHi = qnStorageMan->getFileCatalog(res->getUniqueId(), QnServer::HiQualityCatalog);
-        if (!catalogHi)
-            return false;
-        qint64 archiveMinTime = catalogHi->minTime();
-        if (archiveMinTime != (qint64)AV_NOPTS_VALUE)
-            currentTime = qMin(currentTime,  archiveMinTime);
-    }
-
-    const QnResourcePtr& serverRes = qnResPool->getResourceById(res->getParentId());
-    const QnMediaServerResource* server = dynamic_cast<const QnMediaServerResource*>(serverRes.data());
-    Q_ASSERT(server);
-    if (!server)
-        return false;
-
-    QnCameraHistoryItem cameraHistoryItem(netRes->getUniqueId(), currentTime, server->getId());
+    QnCameraHistoryItem cameraHistoryItem(netRes->getUniqueId(), currentTime, qnCommon->moduleGUID());
 
     const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
     ec2::ErrorCode errCode = appServerConnection->getCameraManager()->addCameraHistoryItemSync(cameraHistoryItem);
@@ -178,6 +174,7 @@ bool QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
         qCritical() << "ECS server error during execute method addCameraHistoryItem: " << ec2::toString(errCode);
         return false;
     }
+    QnCameraHistoryPool::instance()->addCameraHistoryItem(cameraHistoryItem);
     return true;
 }
 
@@ -263,8 +260,6 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
         {
             if (recorderHiRes) {
                 if (!recorderHiRes->isRunning()) {
-                    if (!updateCameraHistory(res))
-                        return someRecordingIsPresent;
                     NX_LOG(QString(lit("Recording started for camera %1")).arg(res->getUniqueId()), cl_logINFO);
                 }
                 recorderHiRes->start();
@@ -295,6 +290,8 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
                 camera->updateActivity();
             }
         }
+        if (recorderHiRes || recorderLowRes)
+            updateCameraHistory(res);
     }
     else 
     {
@@ -492,9 +489,10 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
         recorders = itr.value();
         m_recordMap.remove(resource);
     }
-    qnCameraPool->removeVideoCamera(resource);
 
     beforeDeleteRecorder(recorders);
+    stopRecorder(recorders);
+    qnCameraPool->removeVideoCamera(resource);
     deleteRecorder(recorders, resource);
 
     m_onlineCameras.remove(resource);
@@ -551,9 +549,9 @@ void QnRecordingManager::onTimer()
 QnResourceList QnRecordingManager::getLocalControlledCameras()
 {
     // return own cameras + cameras from servers without DB (remote connected servers)
-    const QnResourceList& cameras = qnResPool->getAllCameras(QnResourcePtr());
+    QnResourceList cameras = qnResPool->getAllCameras(QnResourcePtr());
     QnResourceList result;
-    foreach(QnResourcePtr camRes, cameras)
+    foreach(const QnResourcePtr &camRes, cameras)
     {
         const QnResourcePtr& parentRes = camRes->getParentResource();
         const QnMediaServerResource* mServer = dynamic_cast<const QnMediaServerResource*>(parentRes.data());

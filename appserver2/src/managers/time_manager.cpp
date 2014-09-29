@@ -218,7 +218,7 @@ namespace ec2
 #ifndef EDGE_SERVER
         m_localTimePriorityKey.flags |= peerIsNotEdgeServer;
 #endif
-        const QByteArray& localGUID = qnCommon->moduleGUID().toByteArray();
+        QByteArray localGUID = qnCommon->moduleGUID().toByteArray();
         m_localTimePriorityKey.seed = crc32(0, (const Bytef*)localGUID.constData(), localGUID.size());
         //TODO #ak use guid to avoid handle priority key duplicates
         if( QElapsedTimer::isMonotonic() )
@@ -472,7 +472,7 @@ namespace ec2
 
     void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
         QMutexLocker* const lock,
-        const QUuid& remotePeerID,
+        const QnUuid& remotePeerID,
         qint64 localMonotonicClock,
         qint64 remotePeerSyncTime,
         const TimePriorityKey& remotePeerTimePriorityKey )
@@ -626,7 +626,7 @@ namespace ec2
             return;
 
         //map<priority flags, m_systemTimeByPeer iterator>
-        std::multimap<unsigned int, std::map<QUuid, TimeSyncInfo>::const_iterator, std::greater<unsigned int>> peersByTimePriorityFlags;
+        std::multimap<unsigned int, std::map<QnUuid, TimeSyncInfo>::const_iterator, std::greater<unsigned int>> peersByTimePriorityFlags;
         for( auto it = m_systemTimeByPeer.cbegin(); it != m_systemTimeByPeer.cend(); ++it )
             peersByTimePriorityFlags.emplace( it->second.timePriorityKey.flags, it );
 

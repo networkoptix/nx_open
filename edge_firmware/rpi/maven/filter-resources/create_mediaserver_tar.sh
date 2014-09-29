@@ -123,7 +123,7 @@ cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$
 
 #start script
 mkdir -p $BUILD_DIR/etc/init.d/
-install -m 755 ./etc/init.d/$CUSTOMIZATION-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUSTOMIZATION-$MODULE_NAME
+install -m 755 ./etc/init.d/networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUSTOMIZATION-$MODULE_NAME
 
 
 #building package

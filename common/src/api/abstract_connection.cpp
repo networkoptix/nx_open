@@ -20,7 +20,7 @@ void QnAbstractReplyProcessor::processReply(const QnHTTPRawResponse &response, i
 
 bool QnAbstractReplyProcessor::connect(const char *signal, QObject *receiver, const char *method, Qt::ConnectionType type) {
     if(method && std::strstr(method, "QVariant")) {
-        return connect(this, SIGNAL(finished(int, const QVariant &, int)), receiver, method, type);
+        return connect(this, SIGNAL(finished(int, const QVariant &, int, const QString &)), receiver, method, type);
     } else {
         return connect(this, signal, receiver, method, type);
     }
@@ -83,7 +83,7 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
         if(replyTypeName == NULL) {
             signal = SIGNAL(finished(int, int));
         } else {
-            signal = lit("%1finished(int, const %2 &, int)").arg(QSIGNAL_CODE).arg(QLatin1String(replyTypeName)).toLatin1();
+            signal = lit("%1finished(int, const %2 &, int, const QString &)").arg(QSIGNAL_CODE).arg(QLatin1String(replyTypeName)).toLatin1();
         }
         processor->connect(signal.constData(), target, slot, Qt::QueuedConnection);
     }

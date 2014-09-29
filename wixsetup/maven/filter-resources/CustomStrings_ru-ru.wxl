@@ -66,7 +66,9 @@
 
     <!-- InstallTypeDlg -->
     <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">Полная (Все компоненты)</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Только клиент(Я хочу смотреть видео, записанное в другом месте)</String>
+    <String Id="InstallTypeDlg_Full"                                Overridable="yes">Полная (Все компоненты)</String>
+    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Только клиент</String>
+    <String Id="InstallTypeDlg_ServerOnly"                          Overridable="yes">Только сервер</String>
     <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Выборочная</String>
     <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">Пожалуйста выберите тип установки</String>
     <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Тип установки</String>       
@@ -85,10 +87,12 @@
     <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">Порт</String>
     <String Id="MediaServerDlg_Login"                               Overridable="yes">Имя пользователя</String>
     <String Id="MediaServerDlg_Password"                            Overridable="yes">Пароль</String>  
+    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">Подтверждение пароля</String>      
     <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">Порт Медиа Сервера</String>
     <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Enterprise Controller</String>
     <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Параметры Медиа Сервера</String>
     <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Медиа Сервер</String>  
+    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">Имя Системы</String>      
 
     <!-- MyExitDialog -->
 

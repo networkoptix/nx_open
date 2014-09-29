@@ -84,7 +84,7 @@ QString QnVideowallScreenWidget::calculateTitleText() const {
     auto pcUuid = m_videowall->pcs()->getItem(m_items.first().pcUuid).uuid;
 
     QStringList pcUuids;
-    foreach (const QUuid &uuid, m_videowall->pcs()->getItems().keys())
+    foreach (const QnUuid &uuid, m_videowall->pcs()->getItems().keys())
         pcUuids.append(uuid.toString());
     pcUuids.sort(Qt::CaseInsensitive);
     int idx = pcUuids.indexOf(pcUuid.toString());
@@ -130,7 +130,7 @@ void QnVideowallScreenWidget::updateLayout(bool force) {
     if (item())
         state = item()->data(Qn::ItemVideowallReviewButtonsRole).value<ReviewButtons>();
 
-    auto createItem = [this, &state](const QUuid &id) {
+    auto createItem = [this, &state](const QnUuid &id) {
         QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, id, this, m_mainOverlayWidget);
         itemWidget->setFrameColors(frameColors());
         if (state.contains(id))
@@ -188,7 +188,7 @@ void QnVideowallScreenWidget::updateLayout(bool force) {
 }
 
 
-void QnVideowallScreenWidget::at_thumbnailReady(const QUuid &resourceId, const QPixmap &thumbnail) {
+void QnVideowallScreenWidget::at_thumbnailReady(const QnUuid &resourceId, const QPixmap &thumbnail) {
     m_thumbs[resourceId] = thumbnail;
     update();
 }

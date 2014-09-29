@@ -28,10 +28,12 @@ namespace ec2
                 return lit( "unauthorized" );
             case ErrorCode::badResponse:
                 return lit( "badResponse" );
-            case ErrorCode::skipped:
-                return lit( "skipped" );
             case ErrorCode::dbError:
                 return lit( "dbError" );
+            case ErrorCode::containsBecauseTimestamp:
+                return lit ("containsBecauseTimestamp");
+            case ErrorCode::containsBecauseSequence:
+                return lit ("containsBecauseSequence");
             case ErrorCode::notImplemented:
                 return lit( "notImplemented" );
             default:

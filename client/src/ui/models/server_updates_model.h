@@ -43,7 +43,7 @@ public:
 
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     QModelIndex index(const QnMediaServerResourcePtr &server) const;
-    QModelIndex index(const QUuid &id) const;
+    QModelIndex index(const QnUuid &id) const;
 
     QnSoftwareVersion latestVersion() const;
     void setLatestVersion(const QnSoftwareVersion &version);
@@ -52,7 +52,7 @@ public:
     void setCheckResult(const QnCheckForUpdateResult &result);
 
 public slots:
-    void setTargets(const QSet<QUuid> &targets);
+    void setTargets(const QSet<QnUuid> &targets);
 
 private:
     void resetResourses();
@@ -81,7 +81,7 @@ private:
 
     QnMediaServerUpdateTool* m_updateTool;
     QList<Item*> m_items;
-    QSet<QUuid> m_targets;
+    QSet<QnUuid> m_targets;
 
     QnSoftwareVersion m_latestVersion;
     QnCheckForUpdateResult m_checkResult;

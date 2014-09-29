@@ -5,6 +5,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QMap>
 #include <QtCore/QSet>
+#include <QtCore/QMutex>
 
 #include <utils/common/system_information.h>
 #include <utils/common/software_version.h>
@@ -13,33 +14,31 @@
 class QFile;
 class QIODevice;
 class QNetworkAccessManager;
+class QnZipExtractor;
 
 class QnServerUpdateTool : public QObject, public Singleton<QnServerUpdateTool> {
     Q_OBJECT
 public:
-    struct UpdateInformation {
-        QnSystemInformation systemInformation;
-        QnSoftwareVersion version;
-    };
-
     QnServerUpdateTool();
     ~QnServerUpdateTool();
 
     bool addUpdateFile(const QString &updateId, const QByteArray &data);
-    bool addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset);
+    void addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset);
     bool installUpdate(const QString &updateId);
 
 private:
-    bool processUpdate(const QString &updateId, QIODevice *ioDevice);
+    bool processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync = false);
     void sendReply(int code = false);
     void addChunk(qint64 offset, int m_length);
     bool isComplete() const;
     void clearUpdatesLocation();
 
 private slots:
-    void at_uploadFinished();
+    void at_zipExtractor_extractionFinished(int error);
 
 private:
+    QMutex m_mutex;
+
     QString m_updateId;
     QScopedPointer<QFile> m_file;
 
@@ -49,7 +48,7 @@ private:
 
     QSet<QString> m_bannedUpdates;
 
-    QNetworkAccessManager *m_networkAccessManager;
+    QScopedPointer<QnZipExtractor> m_zipExtractor;
 };
 
 #endif // SERVER_UPDATE_UTIL_H

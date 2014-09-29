@@ -48,6 +48,21 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
     {
         if (resource->getParentId() != ownMediaServer->getId())
             resource->addFlags( Qn::foreigner );
+        else {
+#if 0
+            QnResourceTypePtr thirdPartyType = qnResTypePool->getResourceTypeByName("THIRD_PARTY Camera");
+            QnResourceTypePtr desktopCameraType = qnResTypePool->getResourceTypeByName("SERVER_DESKTOP_CAMERA");
+            if (thirdPartyType && desktopCameraType && 
+                resource->getTypeId() != desktopCameraType->getId() && resource->getTypeId() != thirdPartyType->getId()) 
+            {
+                resource->setTypeId(thirdPartyType->getId());
+                QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+                QnVirtualCameraResourceList cameras;
+                cameras << camera;
+                m_connection->getCameraManager()->save(cameras, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            }
+#endif
+        }
     }
 
     if (isServer) 
@@ -72,7 +87,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
 
 }
 
-void QnServerMessageProcessor::afterRemovingResource(const QUuid& id)
+void QnServerMessageProcessor::afterRemovingResource(const QnUuid& id)
 {
     QnCommonMessageProcessor::afterRemovingResource(id);
 }
@@ -128,7 +143,7 @@ bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
     if( xServerGuidIter != request.headers.end() )
     {
         const nx_http::BufferType& desiredServerGuid = xServerGuidIter->second;
-        const QByteArray& localServerGUID = qnCommon->moduleGUID().toByteArray();
+        const QByteArray localServerGUID = qnCommon->moduleGUID().toByteArray();
         return desiredServerGuid != localServerGUID;
     }
 
@@ -170,28 +185,28 @@ void QnServerMessageProcessor::at_systemNameChangeRequested(const QString &syste
     if (!server) {
         NX_LOG("Cannot find self server resource!", cl_logERROR);
         return;
-
-        MSSettings::roSettings()->setValue("systemName", systemName);
-        server->setSystemName(systemName);
-        m_connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
+
+    MSSettings::roSettings()->setValue("systemName", systemName);
+    server->setSystemName(systemName);
+    m_connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
-void QnServerMessageProcessor::at_remotePeerUnauthorized(const QUuid& id)
+void QnServerMessageProcessor::at_remotePeerUnauthorized(const QnUuid& id)
 {
     QnResourcePtr mServer = qnResPool->getResourceById(id);
     if (mServer)
         mServer->setStatus(Qn::Unauthorized);
 }
 
-bool QnServerMessageProcessor::canRemoveResource(const QUuid& resourceId) 
+bool QnServerMessageProcessor::canRemoveResource(const QnUuid& resourceId) 
 { 
     QnResourcePtr res = qnResPool->getResourceById(resourceId);
     bool isOwnServer = (res && res->getId() == qnCommon->moduleGUID());
     return !isOwnServer;
 }
 
-void QnServerMessageProcessor::removeResourceIgnored(const QUuid& resourceId) 
+void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId) 
 {
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(resourceId).dynamicCast<QnMediaServerResource>();
     bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());

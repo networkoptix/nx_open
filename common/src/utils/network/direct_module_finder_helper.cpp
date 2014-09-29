@@ -49,7 +49,7 @@ void QnModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource) {
         return;
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-    QUuid serverId = server->getId();
+    QnUuid serverId = server->getId();
 
     QnHostAddressSet addresses = QnHostAddressSet::fromList(server->getNetAddrList());
     quint16 port = QUrl(server->getApiUrl()).port();
@@ -89,7 +89,7 @@ void QnModuleFinderHelper::at_resourceChanged(const QnResourcePtr &resource) {
         return;
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-    QUuid serverId = server->getId();
+    QnUuid serverId = server->getId();
 
     QnHostAddressSet oldAddresses = m_addressesByServer.value(server->getId());
     QnHostAddressSet newAddresses = QnHostAddressSet::fromList(server->getNetAddrList());
@@ -117,10 +117,12 @@ void QnModuleFinderHelper::at_resourceChanged(const QnResourcePtr &resource) {
     }
 
     if (m_directModuleFinder) {
-        foreach (const QHostAddress &address, oldAddresses - commonAddresses)
+        QnHostAddressSet addressesToRemove = (newPort == oldPort) ? oldAddresses - commonAddresses : oldAddresses;
+        foreach (const QHostAddress &address, addressesToRemove)
             m_directModuleFinder->removeUrl(QnNetworkAddress(address, oldPort).toUrl(), serverId);
 
-        foreach (const QHostAddress &address, newAddresses - commonAddresses)
+        QnHostAddressSet addressesToAdd = (newPort == oldPort) ? newAddresses - commonAddresses : newAddresses;
+        foreach (const QHostAddress &address, addressesToAdd)
             m_directModuleFinder->addUrl(QnNetworkAddress(address, newPort).toUrl(), serverId);
 
         if (oldPort != newPort) {
@@ -151,7 +153,7 @@ void QnModuleFinderHelper::at_resourceAuxUrlsChanged(const QnResourcePtr &resour
         return;
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-    QUuid serverId = server->getId();
+    QnUuid serverId = server->getId();
 
     QnUrlSet newAdditionalUrls = QnUrlSet::fromList(server->getAdditionalUrls());
     QnUrlSet newIgnoredUrls = QnUrlSet::fromList(server->getIgnoredUrls());
@@ -203,7 +205,7 @@ void QnModuleFinderHelper::at_resourceRemoved(const QnResourcePtr &resource) {
         return;
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-    QUuid serverId = server->getId();
+    QnUuid serverId = server->getId();
 
     disconnect(server.data(), &QnMediaServerResource::auxUrlsChanged, this, &QnModuleFinderHelper::at_resourceAuxUrlsChanged);
 

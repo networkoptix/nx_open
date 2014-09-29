@@ -143,21 +143,58 @@ namespace aio
 
             //checking, if that socket is already monitored
             const std::pair<SocketType*, aio::EventType>& sockCtx = std::make_pair( sock, eventToWatch );
-            typename std::map<typename std::pair<SocketType*, aio::EventType>, typename SocketAIOContext<SocketType>::AIOThreadType*>::iterator
-                it = aioHandlingContext.sockets.lower_bound( sockCtx );
-            if( it != aioHandlingContext.sockets.end() && it->first == sockCtx )
+            //checking if sock is already polled (even for another event)
+            auto closestSockIter = aioHandlingContext.sockets.lower_bound( std::make_pair( sock, (aio::EventType)0 ) );
+            auto sameSockAndEventIter = closestSockIter;
+            for( ; sameSockAndEventIter != aioHandlingContext.sockets.end(); ++sameSockAndEventIter )
+            {
+                if( sameSockAndEventIter->first.first != sock )
+                {
+                    sameSockAndEventIter = aioHandlingContext.sockets.end();
+                    break;
+                }
+                else if( sameSockAndEventIter->first.second == eventToWatch )
+                {
+                    break;
+                }
+            }
+            if( sameSockAndEventIter != aioHandlingContext.sockets.end() && sameSockAndEventIter->second.second == timeoutMillis )
                 return true;    //socket already monitored for eventToWatch
 
-            if( (it != aioHandlingContext.sockets.end()) && (it->first.first == sockCtx.first) )
+            if( (closestSockIter != aioHandlingContext.sockets.end()) && (closestSockIter->first.first == sockCtx.first) )  //same socket is already polled
             {
-                //socket is already monitored for other event. Trying to use same thread
-                if( it->second->watchSocket( sock, eventToWatch, eventHandler, timeoutMillis.get() ) )
+                if( sameSockAndEventIter != aioHandlingContext.sockets.end() )
                 {
-                    aioHandlingContext.sockets.insert( it, std::make_pair( sockCtx, it->second ) );
-                    return true;
+                    //socket is already polled for this event but with another timeout. Just changing timeout
+                    if( sameSockAndEventIter->second.first->changeSocketTimeout( sock, eventToWatch, eventHandler, timeoutMillis.get() ) )
+                    {
+                        sameSockAndEventIter->second.second = timeoutMillis.get();
+                        return true;
+                    }
                 }
-                assert( false );    //we MUST use same thread for monitoring all events on single socket
+                else
+                {
+                    //socket is already polled for other event. Trying to use same thread
+                    if( closestSockIter->second.first->watchSocket( sock, eventToWatch, eventHandler, timeoutMillis.get() ) )
+                    {
+#ifdef _DEBUG
+                        if( !aioHandlingContext.sockets.insert( std::make_pair( sockCtx, std::make_pair( closestSockIter->second.first, timeoutMillis.get() ) ) ).second )
+                            assert( false );
+#else
+                        aioHandlingContext.sockets.insert( closestSockIter, std::make_pair( sockCtx, std::make_pair( closestSockIter->second.first, timeoutMillis.get() ) ) );
+#endif
+                        return true;
+                    }
+                }
+                assert( false );    //we MUST use same thread for polleding all events on single socket
+                SystemError::setLastErrorCode( SystemError::connectionAbort );
+                return false;
             }
+
+#ifdef _DEBUG
+            auto checkIter = aioHandlingContext.sockets.lower_bound( std::make_pair( sock, (aio::EventType)0 ) );
+            assert( checkIter == aioHandlingContext.sockets.end() || checkIter->first.first != sock );
+#endif
 
             //searching for a least-used thread, which is ready to accept
             typename SocketAIOContext<SocketType>::AIOThreadType* threadToUse = nullptr;
@@ -186,7 +223,8 @@ namespace aio
 
             if( threadToUse->watchSocket( sock, eventToWatch, eventHandler, timeoutMillis.get(), socketAddedToPollHandler ) )
             {
-                aioHandlingContext.sockets.insert( std::make_pair( sockCtx, threadToUse ) );
+                if( !aioHandlingContext.sockets.insert( std::make_pair( sockCtx, std::make_pair( threadToUse, timeoutMillis.get() ) ) ).second )
+                    assert( false );
                 return true;
             }
 
@@ -203,11 +241,10 @@ namespace aio
             SocketAIOContext<SocketType>& aioHandlingContext = getAIOHandlingContext<SocketType>();
 
             const std::pair<SocketType*, aio::EventType>& sockCtx = std::make_pair( sock, eventType );
-            typename std::map<typename std::pair<SocketType*, aio::EventType>, typename SocketAIOContext<SocketType>::AIOThreadType*>::iterator
-                it = aioHandlingContext.sockets.find( sockCtx );
+            auto it = aioHandlingContext.sockets.find( sockCtx );
             if( it != aioHandlingContext.sockets.end() )
             {
-                if( it->second->removeFromWatch( sock, eventType, waitForRunningHandlerCompletion ) )
+                if( it->second.first->removeFromWatch( sock, eventType, waitForRunningHandlerCompletion ) )
                     aioHandlingContext.sockets.erase( it );
             }
         }
@@ -225,7 +262,8 @@ namespace aio
             typedef AIOThread<SocketType> AIOThreadType;
 
             std::list<AIOThreadType*> aioThreadPool;
-            std::map<std::pair<SocketType*, aio::EventType>, AIOThreadType*> sockets;
+            //!map<pair<socket, event_type>, pair<thread, socket timeout>>
+            std::map<std::pair<SocketType*, aio::EventType>, std::pair<AIOThreadType*, unsigned int> > sockets;
         };
 
         SocketAIOContext<Socket> m_systemSocketAIO;

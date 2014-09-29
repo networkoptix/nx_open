@@ -4,19 +4,20 @@
 
 #include <utils/network/mac_address.h>
 #include <utils/common/request_param.h>
+#include <utils/common/uuid.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/network/multicast_module_finder.h>
 #include <utils/math/space_mapper.h>
 
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
-#include <api/model/statistics_reply.h>
 #include <api/model/camera_diagnostics_reply.h>
 #include <api/model/manual_camera_seach_reply.h>
 #include <api/model/servers_reply.h>
 #include <api/model/kvpair.h>
 #include <api/model/connection_info.h>
 #include <api/model/time_reply.h>
+#include <api/model/statistics_reply.h>
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/test_email_settings_reply.h>
 #include <api/model/configure_reply.h>
@@ -74,8 +75,8 @@ void QnCommonMetaTypes::initialize() {
     if(qn_commonMetaTypes_initialized)
         return;
 
-    qRegisterMetaType<QUuid>();
-    qRegisterMetaType<QSet<QUuid>>("QSet<QUuid>");
+    qRegisterMetaType<QnUuid>();
+    qRegisterMetaType<QSet<QnUuid>>("QSet<QnUuid>");
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();
     qRegisterMetaType<Qt::ConnectionType>();
@@ -212,6 +213,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" ); 
     qRegisterMetaType<ec2::ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); 
     qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" ); 
+
+    qRegisterMetaType<QnUuid>( "QnUuid" );
+    qRegisterMetaTypeStreamOperators<QnUuid>( "QnUuid" );
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();

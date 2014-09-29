@@ -26,7 +26,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     if (connection) {
         assert(!m_connected);
         assert(qnCommon->remoteGUID().isNull());
-        qnCommon->setRemoteGUID(QUuid(connection->connectionInfo().ecsGuid));
+        qnCommon->setRemoteGUID(QnUuid(connection->connectionInfo().ecsGuid));
         connect( connection, &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
         connect( connection, &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
         connect( connection->getMiscManager(), &ec2::AbstractMiscManager::systemNameChangeRequested,
@@ -35,11 +35,11 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
         assert(!qnCommon->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;
         data.peer.id = qnCommon->remoteGUID();
-        qnCommon->setRemoteGUID(QUuid());
+        qnCommon->setRemoteGUID(QnUuid());
         m_connected = false;
         emit connectionClosed();
     } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
-        qnCommon->setRemoteGUID(QUuid());
+        qnCommon->setRemoteGUID(QnUuid());
     }
 }
 
@@ -130,7 +130,7 @@ void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
     }
 }
 
-void QnClientMessageProcessor::updateServerTmpStatus(const QUuid& id, Qn::ResourceStatus status)
+void QnClientMessageProcessor::updateServerTmpStatus(const QnUuid& id, Qn::ResourceStatus status)
 {
     QnResourcePtr server = qnResPool->getResourceById(id);
     if (!server)

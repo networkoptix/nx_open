@@ -1,6 +1,7 @@
 #ifndef __BUSINESS_RULE_PROCESSOR_H_
 #define __BUSINESS_RULE_PROCESSOR_H_
 
+#include <QtCore/QMutex>
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
 #include <QtCore/QMultiMap>
@@ -103,7 +104,7 @@ public:
     * Return module GUID. if destination action intended for current module, no route through message bus is required
     */
 
-    virtual QUuid getGuid() const { return QUuid(); }
+    virtual QnUuid getGuid() const { return QnUuid(); }
 
     bool broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
 public slots:
@@ -134,7 +135,7 @@ private slots:
     void at_actionDeliveryFailed(const QnAbstractBusinessActionPtr& action);
 
     void at_businessRuleChanged(const QnBusinessEventRulePtr& bRule);
-    void at_businessRuleDeleted(QUuid id);
+    void at_businessRuleDeleted(QnUuid id);
     void at_businessRuleReset(const QnBusinessEventRuleList& rules);
 
     void at_timer();
@@ -143,7 +144,7 @@ private slots:
 protected:
     virtual QImage getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const;
     
-    bool containResource(const QnResourceList& resList, const QUuid& resId) const;
+    bool containResource(const QnResourceList& resList, const QnUuid& resId) const;
     QnAbstractBusinessActionList matchActions(const QnAbstractBusinessEventPtr& bEvent);
     //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
 
@@ -166,7 +167,49 @@ private:
     bool needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
     void doProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
     void executeAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
+
 private:
+    class SendEmailAggregationKey
+    {
+    public:
+        QnBusiness::EventType eventType;
+        QString recipients;
+
+        SendEmailAggregationKey()
+        :
+            eventType( QnBusiness::UndefinedEvent )
+        {
+        }
+
+        SendEmailAggregationKey(
+            QnBusiness::EventType _eventType,
+            QString _recipients )
+        :
+            eventType( _eventType ),
+            recipients( _recipients )
+        {
+        }
+
+        bool operator<( const SendEmailAggregationKey& right ) const
+        {
+            if( eventType < right.eventType )
+                return true;
+            if( right.eventType < eventType )
+                return false;
+            return recipients < right.recipients;
+        }
+    };
+
+    class SendEmailAggregationData
+    {
+    public:
+        QnSendMailBusinessActionPtr action;
+        quint64 periodicTaskID;
+        int eventCount;
+
+        SendEmailAggregationData() : periodicTaskID(0), eventCount(0) {}
+    };
+
     QList<QnBusinessEventRulePtr> m_rules;
     //QnBusinessMessageBus m_messageBus;
     static QnBusinessRuleProcessor* m_instance;
@@ -174,8 +217,8 @@ private:
     struct RunningRuleInfo
     {
         RunningRuleInfo() {}
-        QMap<QUuid, QnAbstractBusinessEventPtr> resources; 
-        QSet<QUuid> isActionRunning; // actions that has been started by resource. Continues action starts only onces for all event resources.
+        QMap<QnUuid, QnAbstractBusinessEventPtr> resources; 
+        QSet<QnUuid> isActionRunning; // actions that has been started by resource. Continues action starts only onces for all event resources.
     };
     typedef QMap<QString, RunningRuleInfo> RunningRuleMap;
 
@@ -195,11 +238,14 @@ private:
     QMap<QString, int> m_actionInProgress;              // remove duplicates for long actions
     mutable QMutex m_mutex;
     QTimer m_timer;
+    QMap<SendEmailAggregationKey, SendEmailAggregationData> m_aggregatedEmails;
 
     /*!
         \param isRuleAdded \a true - rule added, \a false - removed
     */
     void notifyResourcesAboutEventIfNeccessary( const QnBusinessEventRulePtr& businessRule, bool isRuleAdded );
+    void sendAggregationEmail( const SendEmailAggregationKey& aggregationKey );
+    bool sendMailInternal(const QnSendMailBusinessActionPtr& action, int aggregatedResCount );
     void sendEmailAsync(const ec2::ApiEmailData& data);
 };
 

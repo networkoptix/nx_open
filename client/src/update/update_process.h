@@ -57,18 +57,18 @@ protected:
 
 signals:
     void stageChanged(QnFullUpdateStage stage);
-    void peerStageChanged(const QUuid &peerId, QnPeerUpdateStage stage);
+    void peerStageChanged(const QnUuid &peerId, QnPeerUpdateStage stage);
 
     void progressChanged(int progress);
-    void peerStageProgressChanged(const QUuid &peerId, QnPeerUpdateStage stage, int progress);
+    void peerStageProgressChanged(const QnUuid &peerId, QnPeerUpdateStage stage, int progress);
 
-    void targetsChanged(const QSet<QUuid> &targets);
+    void targetsChanged(const QSet<QnUuid> &targets);
 
     void updateFinished(const QnUpdateResult &result);
 private:
     void setStage(QnFullUpdateStage stage);
 
-    void setPeerStage(const QUuid &peerId, QnPeerUpdateStage stage);
+    void setPeerStage(const QnUuid &peerId, QnPeerUpdateStage stage);
     void setAllPeersStage(QnPeerUpdateStage stage);
     void setCompatiblePeersStage(QnPeerUpdateStage stage);
     void setIncompatiblePeersStage(QnPeerUpdateStage stage);
@@ -86,7 +86,6 @@ private:
     void unlockMutex();
     void clearUpdateFlag();
 
-    void removeTemporaryDir();
 private:
     void at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* task, const QnCheckForUpdateResult &result);
     void at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, int errorCode);
@@ -94,25 +93,24 @@ private:
     void at_uploadTask_finished(int errorCode);
     void at_installTask_finished(int errorCode);
 
-    void at_restUpdateTask_peerUpdateFinished(const QUuid &incompatibleId, const QUuid &id);
+    void at_restUpdateTask_peerUpdateFinished(const QnUuid &incompatibleId, const QnUuid &id);
     void at_clientUpdateInstalled();
 
     void at_mutexLocked();
     void at_mutexTimeout();
 private:
-    const QUuid m_id;
+    const QnUuid m_id;
     QnUpdateTarget m_target;
     QPointer<QnNetworkPeerTask> m_currentTask;
     QnFullUpdateStage m_stage;
     ec2::QnDistributedMutex *m_distributedMutex;
-    QString m_localTemporaryDir;
-    QSet<QUuid> m_incompatiblePeerIds;
-    QSet<QUuid> m_targetPeerIds;
+    QSet<QnUuid> m_incompatiblePeerIds;
+    QSet<QnUuid> m_targetPeerIds;
     bool m_clientRequiresInstaller;
     QHash<QnSystemInformation, QnUpdateFileInformationPtr> m_updateFiles;
     QnUpdateFileInformationPtr m_clientUpdateFile;
-    QHash<QUuid, QnPeerUpdateInformation> m_updateInformationById;
-    QMultiHash<QnSystemInformation, QUuid> m_idBySystemInformation;
+    QHash<QnUuid, QnPeerUpdateInformation> m_updateInformationById;
+    QMultiHash<QnSystemInformation, QnUuid> m_idBySystemInformation;
     QnUpdateResult::Value m_updateResult;
 };
 

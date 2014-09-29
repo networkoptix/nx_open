@@ -45,12 +45,12 @@ namespace ec2
     }
 
 
-    bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, QUuid *id) {
+    bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, QnUuid *id) {
         Q_UNUSED(command);
         return deserialize(params, lit("id"), id);
     }
 
-    void toUrlParams(const QUuid &id, QUrlQuery *query) {
+    void toUrlParams(const QnUuid &id, QUrlQuery *query) {
         serialize(id, lit("id"), query);
     }
 

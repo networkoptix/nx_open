@@ -27,7 +27,7 @@ struct QnConnectionInfo {
     SoftwareVersionType version;
     QList<QnCompatibilityItem> compatibilityItems;
     QString systemName;
-    QString ecsGuid;    //TODO: #GDM make QUuid
+    QString ecsGuid;    //TODO: #GDM make QnUuid
     QString brand;
     QString box;
     bool allowSslConnections;

@@ -116,7 +116,7 @@ void QnResourceSearchSynchronizer::update() {
     QSet<QnResourcePtr> added = searchResult - m_searchResult;
     QSet<QnResourcePtr> removed = m_searchResult - searchResult;
     foreach(const QnResourcePtr &resource, added) {
-        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
+        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QnUuid::createUuid());
 
         m_resourceByLayoutItem[item] = resource;
         m_layoutItemByResource[resource] = item;

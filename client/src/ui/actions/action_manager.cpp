@@ -771,9 +771,9 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+M")).
         autoRepeat(false);
 
-    factory(Qn::JoinOtherSystem).
+    factory(Qn::MergeSystems).
         flags(Qn::Main | Qn::Tree).
-        text(tr("Join the Other System...")).
+        text(tr("Merge Systems...")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
@@ -1337,7 +1337,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ConnectToCurrentSystem).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-        text(tr("Connect to the Current System")).
+        text(tr("Connect to the Current System...")).
         condition(new QnDisjunctionActionCondition(
                       new QnResourceStatusActionCondition(Qn::Incompatible, false, this),
                       new QnResourceStatusActionCondition(Qn::Unauthorized, false, this),

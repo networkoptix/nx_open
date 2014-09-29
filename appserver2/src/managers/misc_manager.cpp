@@ -11,7 +11,7 @@ namespace ec2 {
 void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModuleData> &transaction) {
     QnModuleInformation moduleInformation;
     QnGlobalModuleFinder::fillFromApiModuleData(transaction.params, &moduleInformation);
-    foreach (const QUuid &discovererId, transaction.params.discoverers)
+    foreach (const QnUuid &discovererId, transaction.params.discoverers)
         emit moduleChanged(moduleInformation, transaction.params.isAlive, discovererId);
 }
 
@@ -19,7 +19,7 @@ void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModul
     foreach (const ApiModuleData &data, transaction.params) {
         QnModuleInformation moduleInformation;
         QnGlobalModuleFinder::fillFromApiModuleData(data, &moduleInformation);
-        foreach (const QUuid &discovererId, data.discoverers)
+        foreach (const QnUuid &discovererId, data.discoverers)
             emit moduleChanged(moduleInformation, data.isAlive, discovererId);
     }
 }
@@ -38,7 +38,7 @@ template<class QueryProcessorType>
 QnMiscManager<QueryProcessorType>::~QnMiscManager() {}
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer, impl::SimpleHandlerPtr handler) {
+int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QnUuid &discoverer, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(moduleInformation, isAlive, discoverer);
 
@@ -49,7 +49,7 @@ int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInfor
 }
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QUuid, QUuid> &discoverersByPeer, impl::SimpleHandlerPtr handler) {
+int QnMiscManager<QueryProcessorType>::sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnUuid, QnUuid> &discoverersByPeer, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(moduleInformationList, discoverersByPeer);
 
@@ -71,7 +71,7 @@ int QnMiscManager<QueryProcessorType>::changeSystemName(const QString &systemNam
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer) const {
+QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive, const QnUuid &discoverer) const {
     QnTransaction<ApiModuleData> transaction(ApiCommand::moduleInfo);
     QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &transaction.params);
     transaction.params.isAlive = isAlive;
@@ -81,7 +81,7 @@ QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransacti
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiModuleDataList> QnMiscManager<QueryProcessorType>::prepareTransaction(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QUuid, QUuid> &discoverersByPeer) const {
+QnTransaction<ApiModuleDataList> QnMiscManager<QueryProcessorType>::prepareTransaction(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnUuid, QnUuid> &discoverersByPeer) const {
     QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList);
 
     foreach (const QnModuleInformation &moduleInformation, moduleInformationList) {

@@ -126,11 +126,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     m_connectionsModel->appendRow(m_savedSessionsItem);
     m_connectionsModel->appendRow(m_autoFoundItem);
 
-    ui->autoLoginCheckBox->setCheckState(qnSettings->autoLogin() ? Qt::Checked : Qt::Unchecked);
-    connect(ui->autoLoginCheckBox, &QCheckBox::stateChanged,    this, [this](int state) {
-        qnSettings->setAutoLogin(state == Qt::Checked);
-    });
-
     connect(ui->connectionsComboBox,        SIGNAL(currentIndexChanged(QModelIndex)), this,   SLOT(at_connectionsComboBox_currentIndexChanged(QModelIndex)));
     connect(ui->testButton,                 SIGNAL(clicked()),                      this,   SLOT(at_testButton_clicked()));
     connect(ui->saveButton,                 SIGNAL(clicked()),                      this,   SLOT(at_saveButton_clicked()));
@@ -145,13 +140,17 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     resetConnectionsModel();
     updateFocus();
 
-    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleUrlFound,    this,   &QnLoginDialog::at_moduleFinder_moduleUrlFound);
-    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleUrlLost,     this,   &QnLoginDialog::at_moduleFinder_moduleUrlLost);
+    /* Should be done after model resetting to avoid state loss. */
+    ui->autoLoginCheckBox->setChecked(qnSettings->autoLogin());
+    connect(ui->autoLoginCheckBox, &QCheckBox::stateChanged,    this, [this](int state) {
+        qnSettings->setAutoLogin(state == Qt::Checked);
+    });
 
-    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules()) {
-        if (!moduleInformation.remoteAddresses.isEmpty())
-            at_moduleFinder_moduleUrlFound(moduleInformation, QUrl(lit("http://%1:%2").arg(*moduleInformation.remoteAddresses.begin()).arg(moduleInformation.port)));
-    }
+    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleChanged, this, &QnLoginDialog::at_moduleFinder_moduleChanged);
+    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleLost,    this, &QnLoginDialog::at_moduleFinder_moduleLost);
+
+    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules())
+        at_moduleFinder_moduleChanged(moduleInformation);
 }
 
 QnLoginDialog::~QnLoginDialog() {}
@@ -234,7 +233,9 @@ void QnLoginDialog::changeEvent(QEvent *event) {
 void QnLoginDialog::showEvent(QShowEvent *event) {
     base_type::showEvent(event);
 
+    bool autoLogin = qnSettings->autoLogin();
     resetConnectionsModel();
+    ui->autoLoginCheckBox->setChecked(autoLogin);
 
 #ifdef Q_OS_MAC
     if (focusWidget())
@@ -388,6 +389,7 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
         : url.userName());
     ui->passwordLineEdit->setText(url.password());
     ui->deleteButton->setEnabled(qnSettings->customConnections().contains(ui->connectionsComboBox->currentText()));
+    ui->autoLoginCheckBox->setChecked(false);
     updateFocus();
 }
 
@@ -441,6 +443,7 @@ void QnLoginDialog::at_saveButton_clicked() {
 
     // save here because of the 'connections' field modifying
     QString password = ui->passwordLineEdit->text();
+    bool autoLogin = qnSettings->autoLogin();
 
     if (connections.contains(name)){
         QMessageBox::StandardButton button = QMessageBox::warning(this, tr("Connection already exists"),
@@ -473,6 +476,7 @@ void QnLoginDialog::at_saveButton_clicked() {
     ui->connectionsComboBox->setCurrentIndex(idx);
     at_connectionsComboBox_currentIndexChanged(idx); // call directly in case index change will not work
     ui->passwordLineEdit->setText(password);         // password is cleared on index change
+    ui->autoLoginCheckBox->setChecked(autoLogin);
 
 }
 
@@ -494,37 +498,37 @@ void QnLoginDialog::at_deleteButton_clicked() {
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &foundUrl) {
-    if (moduleInformation.type != nxMediaServerId)
-        return;
-
-    QUrl url = foundUrl;
-    if (moduleInformation.isLocal())
-        url.setHost(lit("127.0.0.1"));
-
+void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
     QnEcData data;
     data.id = moduleInformation.id;
-    data.url = url;
     data.version = moduleInformation.version.toString();
     data.systemName = moduleInformation.systemName;
-    QString key = data.systemName + url.toString();
-    if (m_foundEcs.value(key) == data)
-        return;
 
-    m_foundEcs.insert(key, data);
-    resetAutoFoundConnectionsModel();
+    /* prefer localhost */
+    QHostAddress address(QHostAddress::LocalHost);
+    if (!moduleInformation.remoteAddresses.contains(address.toString()))
+        address = *moduleInformation.remoteAddresses.begin();
+
+    data.url.setScheme(lit("http"));
+    data.url.setHost(address.toString());
+    data.url.setPort(moduleInformation.port);
+
+    QnEcData &oldData = m_foundEcs[moduleInformation.id];
+    if (!oldData.id.isNull()) {
+        if (!address.isLoopback() && moduleInformation.remoteAddresses.contains(oldData.url.host()))
+            data.url.setHost(oldData.url.host());
+
+        if (oldData != data) {
+            oldData = data;
+            resetAutoFoundConnectionsModel();
+        }
+    } else {
+        oldData = data;
+        resetAutoFoundConnectionsModel();
+    }
 }
 
-void QnLoginDialog::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &lostUrl) {
-    if (moduleInformation.type != nxMediaServerId)
-        return;
-
-    QUrl url = lostUrl;
-    if (moduleInformation.isLocal())
-        url.setHost(lit("127.0.0.1"));
-
-    QString key = moduleInformation.systemName + url.toString();
-    m_foundEcs.remove(key);
-
-    resetAutoFoundConnectionsModel();
+void QnLoginDialog::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
+    if (m_foundEcs.remove(moduleInformation.id))
+        resetAutoFoundConnectionsModel();
 }

@@ -68,10 +68,8 @@ angular.module('webadminApp')
 
                     mediaserver.saveMediaServer(info).error(function(saveMediaServerReply){
                         alert("Error: Couldn't save settings");
-                        console.log("saveMediaServerError", saveMediaServerReply);
                     }).then(function(saveMediaServerReply){
                         alert("Settings saved");
-                        console.log("saveMediaServerReply", saveMediaServerReply);
                     });
                 });
             });

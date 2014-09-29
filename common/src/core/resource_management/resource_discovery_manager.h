@@ -86,7 +86,7 @@ public:
     void addDTSServer(QnAbstractDTSSearcher* serv);
     void setResourceProcessor(QnResourceProcessor* processor);
 
-    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
     virtual void pleaseStop();
 
@@ -156,8 +156,8 @@ private:
     State m_state;
     QSet<QString> m_recentlyDeleted;
 
-    QHash<QUuid, QnManualCameraSearchStatus> m_searchProcessStatuses;
-    QHash<QUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
+    QHash<QnUuid, QnManualCameraSearchStatus> m_searchProcessStatuses;
+    QHash<QnUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
 
     mutable QMutex m_resListMutex;
     QnResourceList m_lastDiscoveredResources[4];

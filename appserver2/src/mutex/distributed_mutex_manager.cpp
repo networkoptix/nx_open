@@ -50,6 +50,7 @@ QnDistributedMutex* QnDistributedMutexManager::createMutex(const QString& name)
 
 void QnDistributedMutexManager::releaseMutex(const QString& name)
 {
+    QMutexLocker lock(&m_mutex);
     m_mutexList.remove(name);
 }
 

@@ -31,13 +31,13 @@ void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &con
     if (oldConnection) {
         oldConnection->getMiscManager()->disconnect(this);
 
-        QSet<QUuid> discoverers;
-        foreach (const QSet<QUuid> &moduleDiscoverer, m_discovererIdByServerId)
+        QSet<QnUuid> discoverers;
+        foreach (const QSet<QnUuid> &moduleDiscoverer, m_discovererIdByServerId)
             discoverers.unite(moduleDiscoverer);
 
         discoverers.remove(qnCommon->moduleGUID());
 
-        foreach (const QUuid &id, discoverers)
+        foreach (const QnUuid &id, discoverers)
             removeAllModulesDiscoveredBy(id);
     }
 
@@ -49,38 +49,46 @@ void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &con
 
 void QnGlobalModuleFinder::fillApiModuleData(const QnModuleInformation &moduleInformation, ec2::ApiModuleData *data) {
     data->type = moduleInformation.type;
+    data->customization = moduleInformation.customization;
     data->id = moduleInformation.id;
     data->systemName = moduleInformation.systemName;
     data->version = moduleInformation.version.toString();
     data->systemInformation = moduleInformation.systemInformation.toString();
     data->addresses = moduleInformation.remoteAddresses.toList();
     data->port = moduleInformation.port;
+    data->name = moduleInformation.name;
+    data->authHash = moduleInformation.authHash;
+    data->sslAllowed = moduleInformation.sslAllowed;
     data->isAlive = true;
 }
 
 void QnGlobalModuleFinder::fillFromApiModuleData(const ec2::ApiModuleData &data, QnModuleInformation *moduleInformation) {
     moduleInformation->type = data.type;
+    moduleInformation->customization = data.customization;
     moduleInformation->id = data.id;
     moduleInformation->systemName = data.systemName;
     moduleInformation->version = QnSoftwareVersion(data.version);
     moduleInformation->systemInformation = QnSystemInformation(data.systemInformation);
     moduleInformation->remoteAddresses = QSet<QString>::fromList(data.addresses);
     moduleInformation->port = data.port;
+    moduleInformation->name = data.name;
+    moduleInformation->authHash = data.authHash;
+    moduleInformation->sslAllowed = data.sslAllowed;
 }
 
 QList<QnModuleInformation> QnGlobalModuleFinder::foundModules() const {
     return m_moduleInformationById.values();
 }
 
-QSet<QUuid> QnGlobalModuleFinder::discoverers(const QUuid &moduleId) {
+QSet<QnUuid> QnGlobalModuleFinder::discoverers(const QnUuid &moduleId) {
     return m_discovererIdByServerId.value(moduleId);
 }
 
-QnModuleInformation QnGlobalModuleFinder::moduleInformation(const QUuid &id) const {
+QnModuleInformation QnGlobalModuleFinder::moduleInformation(const QnUuid &id) const {
     return m_moduleInformationById[id];
 }
 
-void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QUuid &discoverer) {
+void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QnUuid &discoverer) {
     if (moduleInformation.id == qnCommon->moduleGUID() || discoverer == qnCommon->moduleGUID())
         return;
 
@@ -93,13 +101,13 @@ void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInf
 void QnGlobalModuleFinder::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
     addModule(moduleInformation, qnCommon->moduleGUID());
     if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
-        connection->getMiscManager()->sendModuleInformation(moduleInformation, true, QUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        connection->getMiscManager()->sendModuleInformation(moduleInformation, true, QnUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
     removeModule(moduleInformation, qnCommon->moduleGUID());
     if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
-        connection->getMiscManager()->sendModuleInformation(moduleInformation, false, QUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        connection->getMiscManager()->sendModuleInformation(moduleInformation, false, QnUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::at_resourcePool_statusChanged(const QnResourcePtr &resource) {
@@ -117,7 +125,7 @@ void QnGlobalModuleFinder::at_resourcePool_resourceRemoved(const QnResourcePtr &
     removeAllModulesDiscoveredBy(resource->getId());
 }
 
-void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformation, const QUuid &discoverer) {
+void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformation, const QnUuid &discoverer) {
     if (moduleInformation.id == qnCommon->moduleGUID())
         return;
 
@@ -138,11 +146,11 @@ void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformatio
     }
 }
 
-void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInformation, const QUuid &discoverer) {
+void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInformation, const QnUuid &discoverer) {
     if (moduleInformation.id == qnCommon->moduleGUID())
         return;
 
-    QSet<QUuid> &discoverers = m_discovererIdByServerId[moduleInformation.id];
+    QSet<QnUuid> &discoverers = m_discovererIdByServerId[moduleInformation.id];
     if (!discoverers.remove(discoverer))
         return;
 
@@ -164,14 +172,14 @@ void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInforma
     }
 }
 
-void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QUuid &discoverer) {
+void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QnUuid &discoverer) {
     if (discoverer == qnCommon->moduleGUID()) {
         qWarning() << "Trying to remove our own modules";
         return;
     }
 
     for (auto it = m_moduleInformationById.begin(); it != m_moduleInformationById.end(); /* no inc */) {
-        QSet<QUuid> &discoverers = m_discovererIdByServerId[it.key()];
+        QSet<QnUuid> &discoverers = m_discovererIdByServerId[it.key()];
         if (discoverers.remove(discoverer)) {
             if (discoverers.isEmpty()) {
                 NX_LOG(lit("QnGlobalModuleFinder. Module %1 is lost.").arg(it.value().id.toString()), cl_logDEBUG1);
@@ -192,7 +200,7 @@ void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QUuid &discoverer)
     }
 }
 
-QSet<QString> QnGlobalModuleFinder::getModuleAddresses(const QUuid &id) const {
+QSet<QString> QnGlobalModuleFinder::getModuleAddresses(const QnUuid &id) const {
     QSet<QString> result;
 
     foreach (const QSet<QString> &addresses, m_discoveredAddresses.value(id))

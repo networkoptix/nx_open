@@ -39,7 +39,7 @@ void QnClientMetaTypes::initialize() {
     QnCommonMetaTypes::initialize();
 
     qRegisterMetaType<Qt::KeyboardModifiers>();
-    qRegisterMetaType<QVector<QUuid> >();
+    qRegisterMetaType<QVector<QnUuid> >();
     qRegisterMetaType<QVector<QColor> >();
 
     qRegisterMetaTypeStreamOperators<QList<QUrl>>();
@@ -112,7 +112,7 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnPaletteData>();
     QnJsonSerializer::registerSerializer<QnPenData>();
     QnJsonSerializer::registerSerializer<QVector<QColor> >(); // TODO: #Elric integrate with QVariant iteration?
-    QnJsonSerializer::registerSerializer<QVector<QUuid> >();
+    QnJsonSerializer::registerSerializer<QVector<QnUuid> >();
 
     qn_clientMetaTypes_initialized = true;
 }

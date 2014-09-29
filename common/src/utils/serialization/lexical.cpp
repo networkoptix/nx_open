@@ -22,7 +22,7 @@ public:
         registerSerializer<QString>();
 
         registerSerializer<QColor>();
-        registerSerializer<QUuid>();
+        registerSerializer<QnUuid>();
         registerSerializer<QUrl>();
 
         registerSerializer<QnLatin1Array>();

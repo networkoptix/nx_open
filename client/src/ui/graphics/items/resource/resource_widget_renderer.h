@@ -141,7 +141,7 @@ private:
 
     std::vector<bool> m_renderingEnabled;
     ScreenshotInterface* m_screenshotInterface;
-
+    int m_panoFactor;
 #ifdef TEST_FISHEYE_CALIBRATOR
     bool m_isCircleDetected;
 #endif

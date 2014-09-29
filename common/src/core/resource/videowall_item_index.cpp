@@ -2,7 +2,7 @@
 
 #include <core/resource/videowall_resource.h>
 
-QnVideoWallItemIndex::QnVideoWallItemIndex(const QnVideoWallResourcePtr &videowall, const QUuid &uuid) :
+QnVideoWallItemIndex::QnVideoWallItemIndex(const QnVideoWallResourcePtr &videowall, const QnUuid &uuid) :
     m_videowall(videowall), m_uuid(uuid)
 {
 }
@@ -11,7 +11,7 @@ QnVideoWallResourcePtr QnVideoWallItemIndex::videowall() const {
     return m_videowall;
 }
 
-QUuid QnVideoWallItemIndex::uuid() const {
+QnUuid QnVideoWallItemIndex::uuid() const {
     return m_uuid;
 }
 

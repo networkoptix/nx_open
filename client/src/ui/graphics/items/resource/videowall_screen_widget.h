@@ -28,7 +28,7 @@ public:
      */
     const QnVideoWallResourcePtr &videowall() const;
 
-    typedef QHash<QUuid, quint64> ReviewButtons;
+    typedef QHash<QnUuid, quint64> ReviewButtons;
 protected:
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
 
@@ -40,7 +40,7 @@ private:
     void updateItems();
     void updateLayout(bool force = false);
 private slots:
-    void at_thumbnailReady(const QUuid &resourceId, const QPixmap &thumbnail);
+    void at_thumbnailReady(const QnUuid &resourceId, const QPixmap &thumbnail);
 
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 private:
@@ -55,7 +55,7 @@ private:
     bool m_layoutUpdateRequired;
 
     QnCameraThumbnailManager *m_thumbnailManager;
-    QHash<QUuid, QPixmap> m_thumbs;
+    QHash<QnUuid, QPixmap> m_thumbs;
 };
 
 #endif // VIDEOWALL_RESOURCE_SCREEN_WIDGET_H

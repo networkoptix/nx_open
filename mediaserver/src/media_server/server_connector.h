@@ -12,16 +12,14 @@ class QnServerConnector : public QObject, public Singleton<QnServerConnector> {
 public:
     explicit QnServerConnector(QnModuleFinder *moduleFinder, QObject *parent = 0);
 
+    void addConnection(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void removeConnection(const QnModuleInformation &moduleInformation, const QUrl &url);
     void reconnect();
 
 private slots:
     void at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
     void at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
     void at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation);
-
-private:
-    void addConnection(const QnModuleInformation &moduleInformation, const QUrl &url);
-    void removeConnection(const QnModuleInformation &moduleInformation, const QUrl &url);
 
 private:
     QnModuleFinder *m_moduleFinder;

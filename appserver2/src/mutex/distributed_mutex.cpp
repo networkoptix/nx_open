@@ -35,7 +35,7 @@ QnDistributedMutex::~QnDistributedMutex()
 
 bool QnDistributedMutex::isAllPeersReady() const
 {
-    foreach(const QUuid& peer, qnTransactionBus->aliveServerPeers().keys())
+    foreach(const QnUuid& peer, qnTransactionBus->aliveServerPeers().keys())
     {
         if (!m_proccesedPeers.contains(peer))
             return false;
@@ -43,7 +43,7 @@ bool QnDistributedMutex::isAllPeersReady() const
     return true;
 }
 
-void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QUuid& dstPeer)
+void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QnUuid& dstPeer)
 {
     QnTransaction<ApiLockData> tran(command);
     tran.params.name = m_name;
@@ -85,10 +85,12 @@ void QnDistributedMutex::at_peerLost(ec2::ApiPeerAliveData data)
 
 void QnDistributedMutex::at_timeout()
 {
-    QMutexLocker lock(&m_mutex);
-    if (m_locked)
-        return;
-    unlockInternal();
+    {
+        QMutexLocker lock(&m_mutex);
+        if (m_locked)
+            return;
+    }
+    unlock();
     emit lockTimeout();
 }
 
@@ -98,7 +100,7 @@ void QnDistributedMutex::lockAsync(int timeoutMs)
     m_selfLock = LockRuntimeInfo(qnCommon->moduleGUID(), m_owner->newTimestamp(), m_name);
     if (m_owner->m_userDataHandler)
         m_selfLock.userData = m_owner->m_userDataHandler->getUserData(m_name);
-    sendTransaction(m_selfLock, ApiCommand::lockRequest, QUuid()); // send broadcast
+    sendTransaction(m_selfLock, ApiCommand::lockRequest, QnUuid()); // send broadcast
     m_timer->start(timeoutMs);
     m_peerLockInfo.insert(m_selfLock, 0);
     checkForLocked();
@@ -106,6 +108,7 @@ void QnDistributedMutex::lockAsync(int timeoutMs)
 
 void QnDistributedMutex::unlock()
 {
+    m_owner->releaseMutex(m_name);
     QMutexLocker lock(&m_mutex);
     unlockInternal();
 }
@@ -125,7 +128,7 @@ void QnDistributedMutex::unlockInternal()
     */
 
     foreach(ApiLockData lockData, m_delayedResponse) {
-        QUuid srcPeer = lockData.peer;
+        QnUuid srcPeer = lockData.peer;
         lockData.peer = qnCommon->moduleGUID();
         sendTransaction(lockData, ApiCommand::lockResponse, srcPeer);
     }
@@ -138,7 +141,6 @@ void QnDistributedMutex::unlockInternal()
     m_locked = false;
     m_proccesedPeers.clear();
     m_peerLockInfo.clear();
-    m_owner->releaseMutex(m_name);
 }
 
 void QnDistributedMutex::at_gotLockResponse(ApiLockData lockData)

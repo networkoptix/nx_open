@@ -36,6 +36,7 @@ namespace nx_http
         m_totalBytesRead( 0 ),
         m_contentEncodingUsed( true ),
         m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT ),
+        m_msgBodyReadTimeoutMs( 0 ),
         m_authType(authBasicAndDigest)
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
@@ -163,7 +164,7 @@ namespace nx_http
         NX_LOG( lit( "Http request has been successfully sent to %1" ).arg( m_url.toString() ), cl_logDEBUG2 );
         m_state = sReceivingResponse;
         m_responseBuffer.resize( 0 );
-        if( !m_socket->setRecvTimeout( DEFAULT_RESPONSE_READ_TIMEOUT ) ||
+        if( !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) ||
             !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
         {
             NX_LOG( lit( "Error reading (1) http response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
@@ -291,7 +292,8 @@ namespace nx_http
                 {
                     //reading more data
                     m_responseBuffer.resize( 0 );
-                    if( !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
+                    if( !m_socket->setRecvTimeout( m_msgBodyReadTimeoutMs ) ||
+                        !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
                     {
                         NX_LOG( lit( "Failed to read (1) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
                         m_state = sFailed;
@@ -459,9 +461,14 @@ namespace nx_http
         m_userPassword = userPassword;
     }
 
-    void AsyncHttpClient::setResponseReadTimeoutMs( int _responseReadTimeoutMs )
+    void AsyncHttpClient::setResponseReadTimeoutMs( unsigned int _responseReadTimeoutMs )
     {
         m_responseReadTimeoutMs = _responseReadTimeoutMs;
+    }
+
+    void AsyncHttpClient::setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs )
+    {
+        m_msgBodyReadTimeoutMs = messageBodyReadTimeoutMs;
     }
 
     void AsyncHttpClient::setDecodeChunkedMessageBody( bool val )
@@ -503,7 +510,8 @@ namespace nx_http
 
             m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(url.scheme() == lit("https")));
             if( !m_socket->setNonBlockingMode( true ) ||
-                !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) )
+                !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) ||
+                !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )
             {
                 NX_LOG( lit("Failed to put socket to non blocking mode. %1").
                     arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );

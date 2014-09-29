@@ -50,7 +50,7 @@ public:
     }
 
 private:
-    QUuid m_resourceId;
+    QnUuid m_resourceId;
     QScopedPointer<QnPtzHotkeysResourcePropertyAdaptor> m_adaptor;
 };
 

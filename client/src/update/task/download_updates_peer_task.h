@@ -18,12 +18,11 @@ public:
 
     explicit QnDownloadUpdatesPeerTask(QObject *parent = 0);
 
-    void setTargetDir(const QString &path);
     void setTargets(const QHash<QUrl, QString> &resultingFiles);
     void setHashes(const QHash<QUrl, QString> &hashByUrl);
     void setFileSizes(const QHash<QUrl, qint64> &fileSizeByUrl);
     QHash<QUrl, QString> resultingFiles() const;
-    void setPeerAssociations(const QMultiHash<QUrl, QUuid> &peersByUrl);
+    void setPeerAssociations(const QMultiHash<QUrl, QnUuid> &peersByUrl);
 
 protected:
     virtual void doStart() override;
@@ -39,15 +38,14 @@ private slots:
     void at_downloadReply_readyRead();
 
 private:
-    QString m_targetDirPath;
     QHash<QUrl, QString> m_targets;
     QHash<QUrl, QString> m_hashByUrl;
-    QMultiHash<QUrl, QUuid> m_peersByUrl;
+    QMultiHash<QUrl, QnUuid> m_peersByUrl;
     QHash<QUrl, QString> m_resultingFiles;
     QHash<QUrl, qint64> m_fileSizeByUrl;
 
     QList<QUrl> m_pendingDownloads;
-    QSet<QUuid> m_currentPeers;
+    QSet<QnUuid> m_currentPeers;
     int m_triesCount;
 
     QScopedPointer<QFile> m_file;
