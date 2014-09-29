@@ -172,10 +172,13 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
         if (!server)
             continue;
 
-        if (!isCompatible(server->getVersion(), qnCommon->engineVersion()))
+        if (!isCompatible(server->getVersion(), qnCommon->engineVersion())) {
             m_updateTargets.insert(server->getId());
-        else
-            m_waitTargets.insert(server->getId(), QnUuid(server->getProperty(lit("guid"))));
+        } else {
+            QnUuid originalId = QnUuid(server->getProperty(lit("guid")));
+            if (!originalId.isNull())
+                m_waitTargets.insert(server->getId(), originalId);
+        }
     }
 
     waitPeers();
