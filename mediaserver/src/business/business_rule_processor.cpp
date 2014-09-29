@@ -27,6 +27,7 @@
 #include <utils/common/log.h>
 #include "business/business_strings_helper.h"
 #include <utils/common/app_info.h>
+#include <utils/common/timermanager.h>
 
 #include "nx_ec/data/api_email_data.h"
 #include "common/common_module.h"
@@ -75,6 +76,17 @@ QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 {
     quit();
     wait();
+
+    QMutexLocker lk( &m_mutex );
+    while( !m_aggregatedEmails.isEmpty() )
+    {
+        const quint64 taskID = m_aggregatedEmails.begin()->periodicTaskID;
+        lk.unlock();
+        TimerManager::instance()->joinAndDeleteTimer( taskID );
+        lk.relock();
+        if( m_aggregatedEmails.begin()->periodicTaskID == taskID )  //task has not been removed in sendAggregationEmail while we were waiting
+            m_aggregatedEmails.erase( m_aggregatedEmails.begin() );
+    }
 }
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
@@ -445,17 +457,65 @@ QImage QnBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventParamete
     return QImage();
 }
 
-void QnBusinessRuleProcessor::sendEmailAsync(const ec2::ApiEmailData& data)
-{
-    if (!m_emailManager->sendEmail(data))
-    {
-        QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
-        broadcastBusinessAction(action);
-        NX_LOG(lit("Error processing action SendMail."), cl_logWARNING);
-    }
-};
+static const unsigned int MS_PER_SEC = 1000;
+static const unsigned int emailAggregationPeriodMS = 30 * MS_PER_SEC;
 
 bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action )
+{
+    //QMutexLocker lk( &m_mutex );  m_mutex is locked down the stack
+
+    //aggregating by recipients and eventtype
+    if( action->getRuntimeParams().getEventType() != QnBusiness::CameraDisconnectEvent &&
+        action->getRuntimeParams().getEventType() != QnBusiness::NetworkIssueEvent )
+    {
+        return sendMailInternal( action, 1 );  //currently, aggregating only cameraDisconnected and networkIssue events
+    }
+
+    QStringList recipients;
+    foreach (const QnUserResourcePtr &user, action->getResourceObjects().filtered<QnUserResource>()) {
+        QString email = user->getEmail();
+        if (!email.isEmpty() && QnEmail::isValid(email))
+            recipients << email;
+    }
+
+    SendEmailAggregationKey aggregationKey( action->getRuntimeParams().getEventType(), recipients.join(';') );
+    SendEmailAggregationData& aggregatedData = m_aggregatedEmails[aggregationKey];
+    if( !aggregatedData.action )
+    {
+        aggregatedData.action = QnSendMailBusinessActionPtr( new QnSendMailBusinessAction( *action ) );
+        using namespace std::placeholders;
+        aggregatedData.periodicTaskID = TimerManager::instance()->addTimer(
+            std::bind(&QnBusinessRuleProcessor::sendAggregationEmail, this, aggregationKey),
+            emailAggregationPeriodMS );
+    }
+
+    ++aggregatedData.eventCount;
+
+    //adding event source (camera) to the aggregation info
+    QnBusinessAggregationInfo aggregationInfo = aggregatedData.action->aggregationInfo();
+    aggregationInfo.append( action->getRuntimeParams(), action->aggregationInfo() );
+    aggregatedData.action->setAggregationInfo( aggregationInfo );
+
+    return true;
+}
+
+void QnBusinessRuleProcessor::sendAggregationEmail( const SendEmailAggregationKey& aggregationKey )
+{
+    QMutexLocker lk( &m_mutex );
+
+    auto aggregatedActionIter = m_aggregatedEmails.find(aggregationKey);
+    if( aggregatedActionIter == m_aggregatedEmails.end() )
+        return;
+
+    if( !sendMailInternal( aggregatedActionIter->action, aggregatedActionIter->eventCount ) )
+    {
+        NX_LOG( lit("Failed to send aggregated email"), cl_logDEBUG1 );
+    }
+
+    m_aggregatedEmails.erase( aggregatedActionIter );
+}
+
+bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPtr& action, int aggregatedResCount )
 {
     Q_ASSERT( action );
 
@@ -522,7 +582,9 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
 
     ec2::ApiEmailData data(
         recipients,
-        QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
+        aggregatedResCount > 1
+            ? QnBusinessStringsHelper::eventAtResources(action->getRuntimeParams(), aggregatedResCount)
+            : QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
         messageBody,
         emailSettings.timeout,
         attachments
@@ -537,6 +599,16 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     action->getParams().setEmailAddress(formatEmailList(recipients));
     return true;
 }
+
+void QnBusinessRuleProcessor::sendEmailAsync(const ec2::ApiEmailData& data)
+{
+    if (!m_emailManager->sendEmail(data))
+    {
+        QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
+        broadcastBusinessAction(action);
+        NX_LOG(lit("Error processing action SendMail."), cl_logWARNING);
+    }
+};
 
 void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished( int handle, ec2::ErrorCode errorCode )
 {
