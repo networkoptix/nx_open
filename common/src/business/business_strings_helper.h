@@ -20,6 +20,8 @@ public:
 
     /** Event <event> occured on the <resource> */
     static QString eventAtResource(const QnBusinessEventParameters &params, bool useIp);
+    /** Multiple <event> events occured */
+    static QString eventAtResources(const QnBusinessEventParameters &params, int resourceCount);
 
     /**
      * @brief eventDescription      Form full event description, splitted to lines.
@@ -44,7 +46,11 @@ public:
 
     static QString eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
     static QString eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
-    static QVariantHash eventDetailsMap(const QnBusinessEventParameters &params, int aggregationCount);
+    static QVariantHash eventDetailsMap(
+        const QnAbstractBusinessActionPtr& action,
+        const QnInfoDetail& aggregationData,
+        bool useIp,
+        bool addSubAggregationData = true );
 
     static QString renderEventDetailsText(QVariantHash contextMap);
 
@@ -56,7 +62,12 @@ private:
                                               const QnBusinessAggregationInfo& aggregationInfo,
                                               const QString& delimiter);
     static QVariantList aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
-                                const QnBusinessAggregationInfo& aggregationInfo);
+                                const QnBusinessAggregationInfo& aggregationInfo,
+                                bool useIp);
+    static QVariantList aggregatedEventDetailsMap(
+        const QnAbstractBusinessActionPtr& action,
+        const QList<QnInfoDetail>& aggregationDetailList,
+        bool useIp );
 
     static QString eventSource(const QnBusinessEventParameters &params, bool useIp);
 

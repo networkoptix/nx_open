@@ -6,6 +6,7 @@
 #include <business/business_fwd.h>
 #include <utils/common/id.h>
 
+
 class QnBusinessEventParameters
 {
 public:
