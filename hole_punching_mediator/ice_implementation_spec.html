@@ -4,20 +4,25 @@
 <head>
     <meta charset="utf-8" />
     <title>NX ICE implementation spec</title>
+
+    <style>
+        h2 {margin-bottom: 0; padding-bottom: 0;}
+        h3 {margin-bottom: 0; padding-bottom: 0;}
+        h4 {margin-bottom: 0; padding-bottom: 0;}
+    </style>
+
 </head>
 <body>
-    <h2>Abstract</h2>
     <pre>
+
+
+    <h2>Abstract</h2>
     Contains description of technique to allow HDW peer (server or client) to connect to another peer without requiring any specific network configuration 
     (static public IP or port forwarding)
-
-    </pre>
 
 
 
     <h2>Introduction</h2>
-
-    <pre>
     To simplify usage of HDW in public networks some NAT traversal functionality has to be added
     Implementation of following techniques expected to deliver that:
 
@@ -36,13 +41,9 @@
 
     Usage of UDP hole punching requires introducing of some helper service which will be called <b>mediator</b> further.
 
-    </pre>
-
 
 
     <h2>1. Type of client <-> server connections</h2>
-
-    <pre>
     - <b>Direct TCP connection</b>
       If both peers are in same local network, they connect by establishing direct tcp connection
       If one peer has public address and the other one does not, the latter one should establishes tcp connection to the public one. 
@@ -52,17 +53,13 @@
       If both peers do not have public IP but have access to the Internet (each one is behind its own NAT), 
       then TCP/UDP hole punching technique is used to establish direct connection between peers. This case also requires some mediator service
 
-    - <b>Proxying data via mediator</b>
-      If both peers behind different NAT but hole punching is not possible (due to NAT/firewall restrictions) than proxying data via mediator can be done. 
-      Due to possible high load on mediator it should be possible to proxy not all traffic, but, for example, only non-media data (if it still makes sense, of course)
-
-    </pre>
+    - <b>Proxying data via TURN server (mediator?)</b>
+      If both peers behind different NAT but hole punching is not possible (due to NAT/firewall restrictions) than proxying data can be used. 
+      Due to possible high load on proxy it should be possible to proxy not all traffic, but, for example, only non-media data (if it still makes sense, of course)
 
 
 
     <h3>1.1 Cross-NAT connection (backward connection or hole punching)</h3>
-
-    <pre>
     If desired server is behind NAT and no port forwarding present than NAT traversal is used.
     This requires usage of mediator service which is always publicly available
 
@@ -78,13 +75,9 @@
       - on receiving another peer address, server and client initiate rendezvous connection by sending corresponding UDT-packets to each other’s address
       - NOTE: NAT can change external port when peer sends data to another address. But, sometimes port is just increased by 1, so sometimes it is possible to guess that address
 
-    </pre>
-
 
 
     <h2>2. Mediator</h2>
-
-    <pre>
     <b>mediator</b> is a public network service with following primary functions:
       - help two peers behind NAT to establish direct connection using UDP hole punching
       - if UDP hole punching is not possible, mediator can be used to proxy traffic between server and client
@@ -93,23 +86,15 @@
       - if connection request specifies system name only (no server guid) than mediator SHOULD select server nearest to the client 
         (for beginning, random server is enough, later we can use IP address database to find server nearest to client)
 
-    </pre>
-
 
 
     <h3>2.1. Mediator’s external API</h3>
-
-    <pre>
       - implements STUN (http://tools.ietf.org/html/rfc5389) protocol (over UDT) for primary functionality 
         (binding server, establishing cross-NAT connection) and HTTP over TCP for statistics and debugging
-
-    </pre>
 
 
 
     <h3>2.2. HTTP interface</h3>
-    
-    <pre>
     Each requests should be verified so that only our modules can connect.
       - <b>register</b>. Registers system name in mediator
         Request contains following data:
@@ -128,13 +113,9 @@
           - <b>authorization key</b>, returned by register request
       - TODO some statistics/debugging requests can be introduced in the future
 
-    </pre>
-
 
 
     <h3>2.3. STUN interface</h3>
-
-    <pre>
     Each requests should be verified so that only our modules can connect.
     Following requests are required:
       - <b>bind</b>
@@ -173,20 +154,76 @@
         It is sent to client and/or server to notify about UDT connection from
           - unique connection id (integer number)
           - (optional) peer UDT endpoint
-    </pre>
 
 
 
     <h2>3. Establishing cross-NAT connection</h2>
+    <h3>3.1. Shotly about NAT</h3>
+    <h3>3.1.1. NAT types</h3>
 
-    <pre>
-    - both client and server have TCP connection to mediator
+    <b>Full-cone NAT</b>, also known as one-to-one NAT
+    - Once an internal address (iAddr:iPort) is mapped to an external address (eAddr:ePort), any packets from iAddr:iPort are sent through eAddr:ePort.
+    - Any external host can send packets to iAddr:iPort by sending packets to eAddr:ePort.
+
+    <b>(Address)-restricted-cone NAT</b>
+    - Once an internal address (iAddr:iPort) is mapped to an external address (eAddr:ePort), any packets from iAddr:iPort are sent through eAddr:ePort.
+    - An external host (hAddr:any) can send packets to iAddr:iPort by sending packets to eAddr:ePort only if iAddr:iPort has previously sent a packet to hAddr:any. 
+        "Any" means the port number doesn't matter.
+
+    <b>Port-restricted cone NAT</b>
+    - Like an address restricted cone NAT, but the restriction includes port numbers.
+    - Once an internal address (iAddr:iPort) is mapped to an external address (eAddr:ePort), any packets from iAddr:iPort are sent through eAddr:ePort.
+    - An external host (hAddr:hPort) can send packets to iAddr:iPort by sending packets to eAddr:ePort only if iAddr:iPort has previously sent a packet to hAddr:hPort.
+
+    <b>Symmetric NAT</b>
+    - Each request from the same internal IP address and port to a specific destination IP address and port is mapped to a unique external source IP address and port; 
+        if the same internal host sends a packet even with the same source address and port but to a different destination, a different mapping is used.
+    - Only an external host that receives a packet from an internal host can send a packet back.
+    
+
+
+    <h3>3.1.2. NAT port allocation schemes</h3>
+
+    Possible port allocation schemes:
+    - the NAT uses same public endpoint for all connection originating at same internal endpoint (this is true for any cone NAT, the rest options apply to symmetric NATs)
+    - the NAT tries to give sequential public ports to each outgoing connection originating at the same internal host.
+        If there are many outgoing connections from different internal hosts NAT may not be able to give sequential public port
+    - the NAT simply gives sequential port to each outgoing connection from any host. 
+        If we minimize delay between connection to mediator and connection to remote peer, we may get sequential ports
+    - the NAT assigns random ports to outgoing connection.
+        There is nothing we can do in this case. Relaying is the only option
+
+
+
+    <h3>3.2. Port prediction</h3>
+    This is required happens if one side (or both) are behind symmetric NAT.
+
+    - we can predict port only if NAT uses +1 port allocation scheme
+    - delay between connection to mediator and to other peer must be minimized
+
+    In case of UDP we can send UDP packets to the remote peer port reported by mediator and next N ports.
+    In case of TCP we can try to connect to known remote peer endpoint and subsequent endpoint. Trying N subsequent ports makes no sense since TCP connection 
+        to mediator is persistent and, if NAT uses global +1 scheme, next port is too far away
+
+    <b>TODO</b> aggregate port prediction for TCP and UDP
+    <b>TODO</b> it makes sense to gather some statistics about traversing NAT's and use it to increase performance. 
+        E.g., 
+        1. if TCP hole punching is not available though that NAT, than there is no sense in trying it constantly
+        2. In reverse, if TCP hole punching is available, no need to try UDP one
+        3. if direct connection to the server (or client) is possible, no sense to imply hole punching technique
+    NATs can probably be distinguished by external IP addresses.
+    Should allow for some changes NAT to occur. E.g., if method we used to traversed that only NAT does not work anymore, must try different traversal method.
+
+
+
+    <h3>3.3. Implementation notes</h3>
+    - both client and server have permanent TCP connection to mediator (client - for minimizing connect delay)
     - when client requests connection to server, TCP hole punching is tried first
       - both client and server try to establish TCP connection to each others' tcp endpoint (address:port)
       - if at least one has been successfull, than random connection (client-to-server or server-to-client) is selected as tunnel. done
       - NOTE: both peers MUST use same port for listening and connecting to mediator!
     - in parallel with TCP hole punching, UDP one is tried:
-      - both peers establish UDT connection to mediator, providing unique connection ID (generated by mediator on receving connect request from client)
+      - both peers establish UDT connection to mediator, providing unique connection ID (generated by mediator on receiving connect request from client)
       - mediator responds to each side with either side's endpoint address
       - both peers try to establish rendezvous UDT connection
       - NOTE: TCP connection is preferred over UDT
@@ -196,15 +233,12 @@
     2. some networks can have UDP fully disabled (but, if they have such secure network, there is a great possibility that incoming TCP connections will be forbidden either)
     3. if TCP hole punching is available, TCP connection delay will be less than UDT, since TCP connection to mediator is already established
 
-    TODO Peers can try UDP hole punching some time after trying TCP to save mediator's resources in case if TCP hole punching is possible or client has public address
-
-    </pre>
-
+    <b>TODO</b> Peers can try UDP hole punching some time after trying TCP to save mediator's resources in case if TCP hole punching is possible or client has public address
+    <b>TODO</b> maybe use UDP, not UDT to talk to mediator?
 
 
-    <h3>3.1. Server-side behaviour</h3>
 
-    <pre>
+    <h4>3.3.1. Server-side behaviour</h4>
     - server binds to local port and (if possible) establishes TCP-connection to the nearest mediator and reports its system name and server guid. 
       Guid is required to distinguish different servers inside single system
     - mediator can respond to the server that its system name is not registered
@@ -214,13 +248,9 @@
       - if client has public address (how do we know that?) server establishes TCP-connection to client address
       - if client is not public, server initiates rendezvous UDT-connection to reported client address
 
-    </pre>
 
 
-
-    <h3>3.2. Client behaviour</h3>
-
-    <pre>
+    <h4>3.3.2. Client behaviour</h4>
     - If server with required system name was found in local network, client establishes direct TCP-connection
     - If direct connection could not be established client connects to mediator and asks for connection to server with required system name and (optionally) server guid
     - If (system name, guid) not found, connection failed
@@ -230,13 +260,9 @@
       - If client already has at least one connection to the server, client uses UDT to connect directly to the server address (same address we already connected to)
       - If client does not have opened connection, starts with step 1
 
-    </pre>
 
 
-
-    <h3>3.3. Mediator behaviour</h3>
-
-    <pre>
+    <h4>3.3.3. Mediator behaviour</h4>
     Mediator allows certain number of simultaneous persistent UDT connections to be established.
     If UDT connection number is too high, than the oldest used connection is killed
 
@@ -249,9 +275,26 @@
       - <b>connection_requested</b> indication is sent to the server
     - at this point both server and client are allowed to setup UDT connection to the mediator
     - upon receiving UDT connection with given connection id, <b>connection_update</b> indication with UDT endpoint is sent to the opposing side
+    
+
+
+    <h2>4. Port Control Protocol</h2>
+    <a href="http://en.wikipedia.org/wiki/Port_Control_Protocol">http://en.wikipedia.org/wiki/Port_Control_Protocol</a>
+    <b>TODO</b> We should support it
+    
+
+
+    <h2>5. TURN</h2>
+    <a href="http://tools.ietf.org/html/rfc5766">http://tools.ietf.org/html/rfc5766</a>
+    As a last resort, when direct connection and hole punching is not available, we can proxy data via some public server
+
+
+
+    <h2>References</h2>
+    <a href="https://tools.ietf.org/html/rfc5128#section-3.3">https://tools.ietf.org/html/rfc5128#section-3.3</a>
+    <a href="http://tools.ietf.org/html/rfc5766">http://tools.ietf.org/html/rfc5766</a> TURN - protocol for forwarding data via public TURN server when hole punching is no available
+
 
     </pre>
-
-
 </body>
 </html>
