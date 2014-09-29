@@ -17,10 +17,15 @@
 */
 
 #include "mimemultipart.h"
-#include <QTime>
-#include <QCryptographicHash>
 
-const QString MULTI_PART_NAMES[] = {
+#include <algorithm>
+#include <memory>
+
+#include <QCryptographicHash>
+#include <QTime>
+
+
+static const QString MULTI_PART_NAMES[] = {
     QString(QLatin1String("multipart/mixed")),         //    Mixed
     QString(QLatin1String("multipart/digest")),        //    Digest
     QString(QLatin1String("multipart/alternative")),   //    Alternative
@@ -42,22 +47,19 @@ MimeMultiPart::MimeMultiPart(MultiPartType type)
 }
 
 MimeMultiPart::~MimeMultiPart() {
-
+    std::for_each( m_parts.cbegin(), m_parts.cend(), std::default_delete<MimePart>() );
+    m_parts.clear();
 }
 
-void MimeMultiPart::addPart(MimePart *part) {
-    parts.append(part);
-}
-
-const QList<MimePart*> & MimeMultiPart::getParts() const {
-    return parts;
+void MimeMultiPart::addPart(MimePart *part) noexcept {
+    m_parts.append(part);
 }
 
 void MimeMultiPart::prepare() {
     QList<MimePart*>::iterator it;
 
     content = "";
-    for (it = parts.begin(); it != parts.end(); it++) {
+    for (it = m_parts.begin(); it != m_parts.end(); it++) {
         content += lit("--") + cBoundary + lit("\r\n");
         (*it)->prepare();
         content += (*it)->toString();
