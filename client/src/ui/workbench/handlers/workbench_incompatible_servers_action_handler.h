@@ -18,6 +18,7 @@ class QnWorkbenchIncompatibleServersActionHandler : public Connective<QObject>, 
 
 public:
     explicit QnWorkbenchIncompatibleServersActionHandler(QObject *parent = 0);
+    ~QnWorkbenchIncompatibleServersActionHandler();
 
 protected slots:
     void at_connectToCurrentSystemAction_triggered();
@@ -31,7 +32,6 @@ private slots:
 
 private:
     QPointer<QnConnectToCurrentSystemTool> m_connectTool;
-    QPointer<QnProgressDialog> m_connectProgressDialog;
     QPointer<QnMergeSystemsDialog> m_mergeDialog;
 };
 

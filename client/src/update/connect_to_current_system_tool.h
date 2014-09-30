@@ -59,8 +59,8 @@ private:
     QSet<QnUuid> m_updateTargets;
     QHash<QnUuid, QUrl> m_oldUrls;
     QHash<QnUuid, QnUuid> m_waitTargets;
-    QnNetworkPeerTask *m_currentTask;
-    QnMediaServerUpdateTool *m_updateTool;
+    QPointer<QnNetworkPeerTask> m_currentTask;
+    QPointer<QnMediaServerUpdateTool> m_updateTool;
     bool m_restartAllPeers;
 };
 

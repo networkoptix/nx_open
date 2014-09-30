@@ -507,6 +507,10 @@ Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &p
     if (isImage)
         return Qn::InvisibleAction;
 
+    bool isPanoramic = media->getVideoLayout(0)->channelCount() > 1;
+    if (isPanoramic)
+        return Qn::InvisibleAction;
+
     if (context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole))
         return Qn::EnabledAction;
 

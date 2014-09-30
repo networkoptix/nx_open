@@ -293,13 +293,14 @@ namespace aio
         /*!
             This method introduced for optimization: if we fast call watchSocket then removeSocket (socket has not been added to pollset yet),
             than removeSocket can just cancel watchSocket task. And vice versa
+            \return \a true if reverse task has been cancelled and socket is already in desired state, no futher processing is needed
         */
         bool removeReverseTask(
             SocketType* const sock,
             aio::EventType eventType,
             TaskType taskType,
             AIOEventHandler<SocketType>* const eventHandler,
-            unsigned int /*newTimeoutMS*/ )
+            unsigned int newTimeoutMS )
         {
             Q_UNUSED(eventHandler)
 
@@ -308,41 +309,50 @@ namespace aio
                 it != pollSetModificationQueue.end();
                 ++it )
             {
-                if( it->socket == sock && it->eventType == eventType && taskType != it->type )
+                if( !(it->socket == sock && it->eventType == eventType && taskType != it->type) )
+                    continue;
+
+                //removing reverse task (if any)
+                if( taskType == TaskType::tAdding && it->type == TaskType::tRemoving )
                 {
-                    if( taskType == TaskType::tAdding && it->type == TaskType::tRemoving )
-                    {
-                        //cancelling removing socket
-                        if( eventHandler != it->eventHandler )
-                            continue;   //event handler changed, cannot ignore task
-                        //cancelling remove task
-                        void* userData = sock->impl()->getUserData(eventType);
-                        Q_ASSERT( userData );
-                        static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->markedForRemoval.store( 0 );
+                    //cancelling removing socket
+                    if( eventHandler != it->eventHandler )
+                        continue;   //event handler changed, cannot ignore task
+                    //cancelling remove task
+                    void* userData = sock->impl()->getUserData(eventType);
+                    Q_ASSERT( userData );
+                    static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->timeout = newTimeoutMS;
+                    static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->markedForRemoval.store( 0 );
 
-                        pollSetModificationQueue.erase( it );
-                        return true;
-                    }
-                    else if( taskType == TaskType::tRemoving && it->type == TaskType::tAdding )
-                    {
-                        //cancelling adding socket
-                        pollSetModificationQueue.erase( it++ );
-                        //removing futher tChangingTimeout tasks
-                        for( ;
-                            it != pollSetModificationQueue.end();
-                            ++it )
-                        {
-                            if( it->socket == sock && it->eventType == eventType && it->type == TaskType::tChangingTimeout )
-                                pollSetModificationQueue.erase( it++ );
-                        }
-
-                        return true;
-                    }
-                    else
-                    {
-                        continue;
-                    }
+                    pollSetModificationQueue.erase( it );
+                    return true;
                 }
+                else if( taskType == TaskType::tRemoving && (it->type == TaskType::tAdding || it->type == TaskType::tChangingTimeout) )
+                {
+                    //if( it->type == TaskType::tChangingTimeout ) cancelling scheduled tasks, since socket removal from poll is requested
+                    const TaskType foundTaskType = it->type;
+
+                    //cancelling adding socket
+                    it = pollSetModificationQueue.erase( it );
+                    //removing futher tChangingTimeout tasks
+                    for( ;
+                        it != pollSetModificationQueue.end();
+                        ++it )
+                    {
+                        if( it->socket == sock && it->eventType == eventType )
+                        {
+                            assert( it->type == TaskType::tChangingTimeout );
+                            it = pollSetModificationQueue.erase( it );
+                        }
+                    }
+
+                    if( foundTaskType == TaskType::tAdding )
+                        return true;
+                    else
+                        return false;   //foundTaskEventType == TaskType::tChangingTimeout
+                }
+
+                continue;
             }
 
             return false;

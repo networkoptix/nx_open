@@ -188,6 +188,8 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
         mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution2, CODEC_ID_H264 ) );
     saveResolutionList( mediaStreams );
 
+    setParam(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1, QnDomainDatabase );
+    setMotionType( Qn::MT_SoftwareGrid );
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
