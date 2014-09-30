@@ -31,7 +31,11 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     ui(new Ui::UserSettingsDialog()),
     m_user(0),
     m_hasChanges(false),
-    m_inUpdateDependensies(false)
+    m_inUpdateDependensies(false),
+    m_userNameModified(false),
+    m_passwordModified(false),
+    m_emailModified(false),
+    m_accessRightsModified(false)
 {
     if(context == NULL) 
         qnNullWarning(context);
@@ -56,11 +60,12 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     connect(ui->emailEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(updateEmail()));
     connect(ui->accessRightsComboBox,   SIGNAL(currentIndexChanged(int)),       this,   SLOT(updateAccessRights()));
 
-    connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(setHasChanges()));
-    connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(setHasChanges()));
-    connect(ui->confirmPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(setHasChanges()));
-    connect(ui->emailEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(setHasChanges()));
-    connect(ui->accessRightsComboBox,   SIGNAL(currentIndexChanged(int)),       this,   SLOT(setHasChanges()));
+    connect(ui->loginEdit,              &QLineEdit::textChanged, this,   [this](){ setHasChanges(); m_userNameModified = true; } );
+    connect(ui->passwordEdit,           &QLineEdit::textChanged, this,   [this](){ setHasChanges(); m_passwordModified = true; } );
+    connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged, this,   [this](){ setHasChanges(); } );
+    connect(ui->emailEdit,              &QLineEdit::textChanged, this,   [this](){ setHasChanges(); m_emailModified = true; } );
+    connect(ui->accessRightsComboBox,   static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        this,   [this](){ setHasChanges(); m_accessRightsModified = true; } );
 
     //connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  ui->accessRightsGroupbox,   SLOT(setVisible(bool)));
     connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  this,   SLOT(at_advancedButton_toggled()));
@@ -80,6 +85,13 @@ void QnUserSettingsDialog::setHasChanges(bool hasChanges) {
         return;
 
     m_hasChanges = hasChanges;
+    if( !hasChanges )
+    {
+        m_userNameModified = false;
+        m_passwordModified = false;
+        m_emailModified = false;
+        m_accessRightsModified = false;
+    }
 
     emit hasChangesChanged();
 }
@@ -218,22 +230,23 @@ void QnUserSettingsDialog::submitToResource() {
 
     Qn::Permissions permissions = accessController()->permissions(m_user);
 
-    if (permissions & Qn::WriteNamePermission)
+    if (m_userNameModified && (permissions & Qn::WriteNamePermission))
         m_user->setName(ui->loginEdit->text().trimmed());
 
-    if (permissions & Qn::WritePasswordPermission) {
+    if (m_passwordModified && (permissions & Qn::WritePasswordPermission)) {
         m_user->setPassword(ui->passwordEdit->text()); //empty text means 'no change'
         m_user->generateHash();
     }
 
     /* User cannot change it's own rights */
-    if (permissions & Qn::WriteAccessRightsPermission) {
+    if (m_accessRightsModified && (permissions & Qn::WriteAccessRightsPermission)) {
         quint64 rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toULongLong();
         if (rights == CUSTOM_RIGHTS)
             rights = readAccessRightsAdvanced();
         m_user->setPermissions(rights);
     }
-    m_user->setEmail(ui->emailEdit->text());
+    if( m_emailModified )
+        m_user->setEmail(ui->emailEdit->text());
 
     setHasChanges(false);
 }
