@@ -246,6 +246,7 @@ public:
     void setProxyAddr(const QString& addr, int port);
 
     QList<QByteArray> getSdpByTrackNum(int trackNum) const;
+    QList<QByteArray> getSdpByType(TrackType trackType) const;
     int getTrackCount(TrackType trackType) const;
 
     int getLastResponseCode() const;

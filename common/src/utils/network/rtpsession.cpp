@@ -858,6 +858,16 @@ int RTPSession::getTrackCount(TrackType trackType) const
     return result;
 }
 
+QList<QByteArray> RTPSession::getSdpByType(TrackType trackType) const
+{
+    for (int i = 0; i < m_sdpTracks.size(); ++i)
+    {
+        if (m_sdpTracks[i]->trackType == trackType)
+            return getSdpByTrackNum(i);
+    }
+    return QList<QByteArray>();
+}
+
 QList<QByteArray> RTPSession::getSdpByTrackNum(int trackNum) const
 {
     QList<QByteArray> rez;
