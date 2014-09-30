@@ -21,10 +21,7 @@ GenericRTSPCameraManager::GenericRTSPCameraManager( const nxcip::CameraInfo& inf
     m_capabilities( 0 )
 {
     //checking, whether nxcip::audioCapability is supported
-    QString auxiliaryData = QString::fromLatin1(m_info.auxiliaryData);
-    const QStringList& valList = auxiliaryData.split( QLatin1Char('='), QString::SkipEmptyParts );
-    if( !valList.isEmpty() && valList[0] == QLatin1String("audio") )
-        m_capabilities |= nxcip::BaseCameraManager::audioCapability;
+    m_capabilities |= nxcip::BaseCameraManager::audioCapability;
     m_capabilities |= nxcip::BaseCameraManager::shareIpCapability | nxcip::BaseCameraManager::primaryStreamSoftMotionCapability;
 }
 
