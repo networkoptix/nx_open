@@ -555,11 +555,11 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
             initIO(&m_videoIOs[i], m_videoParsers[i], RTPSession::TT_VIDEO, i);
         }
     }
-    m_audioParser = dynamic_cast<QnRtpAudioStreamParser*> (createParser(m_RtpSession.getCodecNameByType(RTPSession::TT_AUDIO, 0).toUpper()));
+    m_audioParser = dynamic_cast<QnRtpAudioStreamParser*> (createParser(m_RtpSession.getCodecNameByType(RTPSession::TT_AUDIO, m_numberOfVideoChannels).toUpper()));
     if (m_audioParser)
         m_audioParser->setTimeHelper(&m_timeHelper);
 
-    initIO(&m_audioIO, m_audioParser, RTPSession::TT_AUDIO, 0);
+    initIO(&m_audioIO, m_audioParser, RTPSession::TT_AUDIO, m_numberOfVideoChannels);
 
     if (m_role == Qn::CR_LiveVideo)
     {
