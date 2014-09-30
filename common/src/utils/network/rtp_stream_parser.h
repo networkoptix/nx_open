@@ -53,10 +53,14 @@ public:
 
     virtual QnAbstractMediaDataPtr nextData() = 0;
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics) = 0;
+
+    int logicalChannelNum() const { return m_logicalChannelNum; }
+    void setLogicalChannelNum(int value) { m_logicalChannelNum = value; }
 signals:
     void packetLostDetected(quint32 prev, quint32 next);
 protected:
     QnRtspTimeHelper* m_timeHelper;
+    int m_logicalChannelNum;
 };
 
 class QnRtspAudioLayout: public QnResourceAudioLayout

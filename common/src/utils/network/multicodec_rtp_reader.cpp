@@ -128,6 +128,21 @@ void QnMulticodecRtpReader::buildClientRTCPReport(quint8 chNumber)
     }
 }
 
+QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataInternal()
+{
+    foreach(const TrackInfo& track, tracks) 
+    {
+        if (track.parser) {
+            QnAbstractMediaDataPtr result = track.parser->nextData();
+            if (result) {
+                result->channelNumber = track.parser->logicalChannelNum();
+                return result;
+            }
+        }
+    }
+    return QnAbstractMediaDataPtr();
+}
+
 QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 {
     // int readed;
@@ -449,11 +464,13 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     tracks.resize(trackInfo.size());
     bool videoExist = false;
     bool audioExist = false;
+    int logicalVideoNum = 0;
     for (int i = 0; i < trackInfo.size(); ++i)
     {
-        videoExist |= trackInfo[i]->trackType == RTPSession::TT_VIDEO;
-        audioExist |= trackInfo[i]->trackType == RTPSession::TT_AUDIO;
-        if (trackInfo[i]->trackType == RTPSession::TT_VIDEO || trackInfo[i]->trackType == RTPSession::TT_AUDIO) 
+        RTPSession::TrackType trackType = trackInfo[i]->trackType;
+        videoExist |= trackType == RTPSession::TT_VIDEO;
+        audioExist |= trackType == RTPSession::TT_AUDIO;
+        if (trackType == RTPSession::TT_VIDEO || trackType == RTPSession::TT_AUDIO) 
         {
             tracks[i].parser = createParser(trackInfo[i]->codecName.toUpper());
             if (tracks[i].parser) {
@@ -464,6 +481,9 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
                 QnRtpAudioStreamParser* audioParser = dynamic_cast<QnRtpAudioStreamParser*> (tracks[i].parser);
                 if (audioParser)
                     m_audioLayout = audioParser->getAudioLayout();
+
+                if (trackType == RTPSession::TT_VIDEO)
+                    tracks[i].parser->setLogicalChannelNum(logicalVideoNum++);
             }
         }
     }

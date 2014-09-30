@@ -7,7 +7,8 @@ QnRtpVideoStreamParser::QnRtpVideoStreamParser()
 }
 
 QnRtpStreamParser::QnRtpStreamParser():
-m_timeHelper(0)
+    m_timeHelper(0),
+    m_logicalChannelNum(0)
 {
 }
 
