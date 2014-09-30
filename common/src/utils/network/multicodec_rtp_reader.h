@@ -73,9 +73,18 @@ signals:
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 
 private:
+
+    struct TrackInfo
+    {
+        TrackInfo(): ioDevice(0), parser(0), gotKeyData(false) {}
+        ~TrackInfo() { delete parser; }
+        RTPIODevice* ioDevice; // external reference. do not delete
+        QnRtpStreamParser* parser;
+        bool gotKeyData;
+    };
+
     QnRtpStreamParser* createParser(const QString& codecName);
-    void setNeedKeyData();
-    bool checkIfNeedKeyData(const QnAbstractMediaDataPtr& mediaData);
+    bool gotKeyData(TrackInfo& track, const QnAbstractMediaDataPtr& mediaData);
     QnAbstractMediaDataPtr getNextDataUDP();
     QnAbstractMediaDataPtr getNextDataTCP();
     void processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity);
@@ -95,13 +104,6 @@ private:
     QnAbstractMediaDataPtr m_lastVideoData;
     QList<QnAbstractMediaDataPtr> m_lastAudioData;
     */
-    struct TrackInfo
-    {
-        TrackInfo(): ioDevice(0), parser(0) {}
-        ~TrackInfo() { delete parser; }
-        RTPIODevice* ioDevice; // external reference. do not delete
-        QnRtpStreamParser* parser;
-    };
     QVector<TrackInfo> tracks;
 
     QString m_request;
@@ -109,7 +111,6 @@ private:
     std::vector<QnByteArray*> m_demuxedData;
     int m_numberOfVideoChannels;
     QnRtspTimeHelper m_timeHelper;
-    QVector<int> m_gotKeyData;
     bool m_pleaseStop;
     QElapsedTimer m_rtcpReportTimer;
     bool m_gotSomeFrame;

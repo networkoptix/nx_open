@@ -64,23 +64,13 @@ void QnMulticodecRtpReader::setRequest(const QString& request)
     m_request = request;
 }
 
-void QnMulticodecRtpReader::setNeedKeyData()
-{
-    for (int i = 0; i < m_gotKeyData.size(); ++i)
-        m_gotKeyData[i] = false;
-}
-
-bool QnMulticodecRtpReader::checkIfNeedKeyData(const QnAbstractMediaDataPtr& mediaData)
+bool QnMulticodecRtpReader::gotKeyData(TrackInfo& track, const QnAbstractMediaDataPtr& mediaData)
 {
     if (mediaData->dataType == QnAbstractMediaData::VIDEO)
     {
-        Q_ASSERT_X(mediaData->channelNumber < (quint32)m_gotKeyData.size(), Q_FUNC_INFO, "Invalid channel number");
-        if (mediaData->channelNumber < (quint32)m_gotKeyData.size())
-        {
-            if (mediaData->flags & AV_PKT_FLAG_KEY)
-                m_gotKeyData[mediaData->channelNumber] = true;
-             return m_gotKeyData[mediaData->channelNumber];
-        }
+        if (mediaData->flags & AV_PKT_FLAG_KEY)
+            track.gotKeyData = true;
+        return track.gotKeyData;
     }
     return true;
 }
@@ -131,13 +121,16 @@ void QnMulticodecRtpReader::buildClientRTCPReport(quint8 chNumber)
 
 QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataInternal()
 {
-    foreach(const TrackInfo& track, tracks) 
+    int size = tracks.size();
+    for (int i = 0; i < size; ++i)
     {
-        if (track.parser) {
-            QnAbstractMediaDataPtr result = track.parser->nextData();
+        if (tracks[i].parser) {
+            QnAbstractMediaDataPtr result = tracks[i].parser->nextData();
             if (result) {
-                result->channelNumber = track.parser->logicalChannelNum();
-                return result;
+                if (gotKeyData(tracks[i], result)) {
+                    result->channelNumber = tracks[i].parser->logicalChannelNum();
+                    return result;
+                }
             }
         }
     }
@@ -159,13 +152,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         {
             m_gotSomeFrame = true;
             QnAbstractMediaDataPtr data = getNextDataInternal();
-            if (data) {
-                if (checkIfNeedKeyData(data))
-                    return data;
-            }
-            else {
+            if (data)
+                return data;
+            else
                 m_gotData = false;
-            }
         }
 
         int readed = m_RtpSession.readBinaryResponce(m_demuxedData, rtpChannelNum);
@@ -186,7 +176,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         {
             if (!parser->processData((quint8*)m_demuxedData[rtpChannelNum]->data(), rtpBufferOffset+4, readed-4, ioDevice->getStatistic(), m_gotData))
             {
-                setNeedKeyData();
+                tracks[channelNum].gotKeyData = false;
                 m_demuxedData[rtpChannelNum]->clear();
                 if (++errorRetryCnt > RTSP_RETRY_COUNT) {
                     qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
@@ -262,13 +252,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
         {
             m_gotSomeFrame = true;
             QnAbstractMediaDataPtr data = getNextDataInternal();
-            if (data) {
-                if (checkIfNeedKeyData(data))
-                    return data;
-            }
-            else {
+            if (data)
+                return data;
+            else
                 m_gotData = false;
-            }
         }
 
         int nfds = 0;
@@ -284,12 +271,12 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
             continue;
         for( int i = 0; i < rez; ++i )
         {
-            int rtpChannelNum = 0;
-            foreach(const TrackInfo& track, tracks)
+            int tracksSize = tracks.size();
+            for (int rtpChannelNum = 0; rtpChannelNum < tracksSize; ++rtpChannelNum)
             {
-                if( track.ioDevice && mediaSockPollArray[i].fd == track.ioDevice->getMediaSocket()->handle())
+                if( tracks[rtpChannelNum].ioDevice && mediaSockPollArray[i].fd == tracks[rtpChannelNum].ioDevice->getMediaSocket()->handle())
                 {
-                    //int rtpChannelNum = channelNum;
+                    TrackInfo& track = tracks[rtpChannelNum];
 
                     quint8* rtpBuffer = RTPSession::prepareDemuxedData(m_demuxedData, rtpChannelNum, MAX_RTP_PACKET_SIZE); // todo: update here
                     readed = track.ioDevice->read( (char*) rtpBuffer, MAX_RTP_PACKET_SIZE);
@@ -297,9 +284,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                         break;
                     m_demuxedData[rtpChannelNum]->finishWriting(readed);
                     quint8* bufferBase = (quint8*) m_demuxedData[rtpChannelNum]->data();
-                    if (!track.parser->processData(bufferBase, rtpBuffer-bufferBase, readed, track.ioDevice->getStatistic(), m_gotData)) 
+                    bool gotData = false;
+                    if (!track.parser->processData(bufferBase, rtpBuffer-bufferBase, readed, track.ioDevice->getStatistic(), gotData)) 
                     {
-                        setNeedKeyData();
+                        track.gotKeyData = false;
                         m_demuxedData[rtpChannelNum]->clear();
                         if (++errorRetryCount > RTSP_RETRY_COUNT) {
                             qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
@@ -307,8 +295,9 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                             return QnAbstractMediaDataPtr(0);
                         }
                     }
+                    if (gotData)
+                        m_gotData = true;
                 }
-                ++rtpChannelNum;
             }
         }
         if (readed < 1)
@@ -447,12 +436,9 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_RtpSession.play(AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0);
 
     m_numberOfVideoChannels = m_RtpSession.getTrackCount(RTPSession::TT_VIDEO);
-    m_gotKeyData.resize(m_numberOfVideoChannels);
-
     {
         QMutexLocker lock(&m_layoutMutex);
         m_customVideoLayout.clear();
-        m_gotKeyData.resize(m_numberOfVideoChannels);
         QString newVideoLayout;
         if (m_numberOfVideoChannels > 1) {
             m_customVideoLayout = QnCustomResourceVideoLayoutPtr(new QnCustomResourceVideoLayout(QSize(m_numberOfVideoChannels, 1)));
