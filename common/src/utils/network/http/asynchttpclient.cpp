@@ -164,7 +164,7 @@ namespace nx_http
         NX_LOG( lit( "Http request has been successfully sent to %1" ).arg( m_url.toString() ), cl_logDEBUG2 );
         m_state = sReceivingResponse;
         m_responseBuffer.resize( 0 );
-        if( !m_socket->setRecvTimeout( DEFAULT_RESPONSE_READ_TIMEOUT ) ||
+        if( !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) ||
             !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
         {
             NX_LOG( lit( "Error reading (1) http response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
@@ -510,7 +510,8 @@ namespace nx_http
 
             m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/));
             if( !m_socket->setNonBlockingMode( true ) ||
-                !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) )
+                !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) ||
+                !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )
             {
                 NX_LOG( lit("Failed to put socket to non blocking mode. %1").
                     arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );

@@ -422,11 +422,17 @@ QString QnBusinessEventParameters::getParamsKey() const
             if (getReasonCode() == QnBusiness::StorageIoErrorReason || getReasonCode() == QnBusiness::StorageTooSlowReason || getReasonCode() == QnBusiness::StorageFullReason || getReasonCode() == QnBusiness::LicenseRemoved)
                 paramKey += QLatin1String("_") + getReasonParamsEncoded();
             break;
+
         case QnBusiness::CameraInputEvent:
             paramKey += QLatin1String("_") + getInputPortId();
             break;
-    default:
-        break;
+
+        case QnBusiness::CameraDisconnectEvent:
+            paramKey += QLatin1String("_") + getEventResourceId().toString();
+            break;
+
+        default:
+            break;
     }
 
     return paramKey;

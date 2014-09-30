@@ -115,7 +115,7 @@ public:
     bool login();
     bool login(const QString &user, const QString &password, AuthMethod method = AuthLogin);
 
-    bool sendMail(MimeMessage& email);
+    bool sendMail(const MimeMessage& email);
 
     void quit();
 

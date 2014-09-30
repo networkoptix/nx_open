@@ -19,13 +19,15 @@
 #ifndef MIMEMESSAGE_H
 #define MIMEMESSAGE_H
 
+#include <memory>
+
 #include "mimepart.h"
 #include "mimemultipart.h"
 #include "emailaddress.h"
 #include <QList>
 #include <QtCore/QSharedPointer>
 
-class MimeMessage : public QObject
+class MimeMessage
 {
 public:
 
@@ -37,49 +39,55 @@ public:
 
     /* [1] Constructors and Destructors */
 
-    MimeMessage(bool createAutoMimeConent = true);
-    ~MimeMessage();
+    MimeMessage();
 
     /* [1] --- */
 
 
     /* [2] Getters and Setters */
 
-    void setSender(EmailAddress* e);
-    void addRecipient(EmailAddress* rcpt, RecipientType type = To);
-    void addTo(EmailAddress* rcpt);
-    void addCc(EmailAddress* rcpt);
-    void addBcc(EmailAddress* rcpt);
+    /*!
+        \param e ownership of object is passed to this class
+    */
+    void setSender(EmailAddress&& e);
+    void addRecipient(EmailAddress&& rcpt, RecipientType type = To);
+    void addTo(EmailAddress&& rcpt);
+    void addCc(EmailAddress&& rcpt);
+    void addBcc(EmailAddress&& rcpt);
     void setSubject(const QString & subject);
-    void addPart(MimePart* part);
+    /*!
+        \param rcpt ownership of object is passed to this class
+    */
+    void addPart(MimePart* part) noexcept;
 
     void setHeaderEncoding(MimePart::Encoding);
 
     const EmailAddress & getSender() const;
-    const QList<EmailAddress*> & getRecipients(RecipientType type = To) const;
+    const QList<EmailAddress> & getRecipients(RecipientType type = To) const;
     const QString & getSubject() const;
-    const QList<MimePart*> & getParts() const;
 
     MimePart& getContent();
-    void setContent(MimePart *content);
+    /*!
+        \param _content ownership of object is passed to this class
+    */
+    void setContent(MimePart* _content);
     /* [2] --- */
 
 
     /* [3] Public methods */
 
-    virtual QString toString();
+    virtual QString toString() const;
 
     /* [3] --- */
 
-protected:
+private:
 
     /* [4] Protected members */
 
-    EmailAddress* sender;
-    QList<EmailAddress*> recipientsTo, recipientsCc, recipientsBcc;
+    EmailAddress m_sender;
+    QList<EmailAddress> m_recipientsTo, m_recipientsCc, m_recipientsBcc;
     QString subject;
-    MimePart *content;
-    bool autoMimeContentCreated;
+    std::unique_ptr<MimePart> m_content;
     
     MimePart::Encoding hEncoding;
 
