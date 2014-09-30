@@ -16,13 +16,13 @@
 
 QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActionHandler(QObject *parent) :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
-    m_connectTool(NULL),
-    m_connectProgressDialog(NULL)
+    QnWorkbenchContextAware(parent)
 {
     connect(action(Qn::ConnectToCurrentSystem),         SIGNAL(triggered()),    this,   SLOT(at_connectToCurrentSystemAction_triggered()));
     connect(action(Qn::MergeSystems),                   SIGNAL(triggered()),    this,   SLOT(at_mergeSystemsAction_triggered()));
 }
+
+QnWorkbenchIncompatibleServersActionHandler::~QnWorkbenchIncompatibleServersActionHandler() {}
 
 void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemAction_triggered() {
     if (m_connectTool) {
@@ -40,6 +40,9 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(const QSet<QnUuid> &targets) {
+    if (m_connectTool)
+        return;
+
     if (targets.isEmpty())
         return;
 
@@ -49,17 +52,17 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(const Q
 
     m_connectTool = new QnConnectToCurrentSystemTool(context(), this);
 
-    m_connectProgressDialog = new QnProgressDialog(mainWindow());
-    m_connectProgressDialog->setAttribute(Qt::WA_DeleteOnClose);
-    m_connectProgressDialog->setCancelButton(NULL);
-    m_connectProgressDialog->setWindowTitle(tr("Connecting to the current system..."));
-    m_connectProgressDialog->show();
+    QnProgressDialog *progressDialog = new QnProgressDialog(mainWindow());
+    progressDialog->setAttribute(Qt::WA_DeleteOnClose);
+    progressDialog->setCancelButton(NULL);
+    progressDialog->setWindowTitle(tr("Connecting to the current system..."));
+    progressDialog->show();
 
-    connect(m_connectTool,      &QnConnectToCurrentSystemTool::finished,        this,                           &QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished);
-    connect(m_connectTool,      &QnConnectToCurrentSystemTool::finished,        m_connectProgressDialog,        &QnProgressDialog::close);
-    connect(m_connectTool,      &QnConnectToCurrentSystemTool::progressChanged, m_connectProgressDialog,        &QnProgressDialog::setValue);
-    connect(m_connectTool,      &QnConnectToCurrentSystemTool::stateChanged,    m_connectProgressDialog,        &QnProgressDialog::setLabelText);
-    connect(m_connectProgressDialog,    &QnProgressDialog::canceled,            m_connectTool,                  &QnConnectToCurrentSystemTool::cancel);
+    connect(m_connectTool,      &QnConnectToCurrentSystemTool::finished,        progressDialog,        &QnProgressDialog::close);
+    connect(m_connectTool,      &QnConnectToCurrentSystemTool::finished,        this,                  &QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished);
+    connect(m_connectTool,      &QnConnectToCurrentSystemTool::progressChanged, progressDialog,        &QnProgressDialog::setValue);
+    connect(m_connectTool,      &QnConnectToCurrentSystemTool::stateChanged,    progressDialog,        &QnProgressDialog::setLabelText);
+    connect(progressDialog,     &QnProgressDialog::canceled,                    m_connectTool,         &QnConnectToCurrentSystemTool::cancel);
 
     m_connectTool->start(targets, password);
 }
@@ -76,23 +79,24 @@ void QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggere
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int errorCode) {
+    m_connectTool->deleteLater();
+    m_connectTool->QObject::disconnect(this);
+
     switch (errorCode) {
     case QnConnectToCurrentSystemTool::NoError:
-        QMessageBox::information(m_connectProgressDialog, tr("Information"), tr("The selected servers has been successfully connected to your system!"));
+        QMessageBox::information(mainWindow(), tr("Information"), tr("The selected servers has been successfully connected to your system!"));
         break;
     case QnConnectToCurrentSystemTool::AuthentificationFailed:
-        QMessageBox::critical(m_connectProgressDialog, tr("Error"), tr("Authentification failed.\nPlease, check the password you have entered."));
+        QMessageBox::critical(mainWindow(), tr("Error"), tr("Authentification failed.\nPlease, check the password you have entered."));
         connectToCurrentSystem(m_connectTool->targets());
         break;
     case QnConnectToCurrentSystemTool::ConfigurationFailed:
-        QMessageBox::critical(m_connectProgressDialog, tr("Error"), tr("Could not configure the selected servers."));
+        QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not configure the selected servers."));
         break;
     case QnConnectToCurrentSystemTool::UpdateFailed:
-        QMessageBox::critical(m_connectProgressDialog, tr("Error"), tr("Could not update the selected servers.\nYou can try to update the servers again in the System Administration."));
+        QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not update the selected servers.\nYou can try to update the servers again in the System Administration."));
         break;
     default:
         break;
     }
-
-    delete m_connectTool;
 }

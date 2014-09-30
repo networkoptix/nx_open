@@ -708,8 +708,9 @@ namespace ec2
         Q_OBJECT
     public:
         enum ReplyCode {
-            Finished = -1,
-            Failed = -2
+            NoError = -1,
+            UnknownError = -2,
+            NoFreeSpace = -3
         };
 
         virtual ~AbstractUpdatesManager() {}
