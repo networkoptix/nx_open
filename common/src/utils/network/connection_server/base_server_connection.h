@@ -67,11 +67,16 @@ public:
         m_streamSocket->close();
     }
 
-    void sendBufAsync( const nx::Buffer& buf )
+    /*!
+        \return \a true, if started async send operation
+    */
+    bool sendBufAsync( const nx::Buffer& buf )
     {
         using namespace std::placeholders;
-        m_streamSocket->sendAsync( buf, std::bind( &SelfType::onBytesSent, this, _1, _2 ) );
+        if( !m_streamSocket->sendAsync( buf, std::bind( &SelfType::onBytesSent, this, _1, _2 ) ) )
+            return false;
         m_bytesToSend = buf.size();
+        return true;
     }
 
     void closeConnection()
@@ -107,7 +112,8 @@ private:
         assert( m_readBuffer.size() == bytesRead );
         static_cast<CustomConnectionType*>(this)->bytesReceived( m_readBuffer ); 
         m_readBuffer.resize( 0 );
-        m_streamSocket->readSomeAsync( &m_readBuffer, std::bind( &SelfType::onBytesRead, this, _1, _2 ) );
+        if( !m_streamSocket->readSomeAsync( &m_readBuffer, std::bind( &SelfType::onBytesRead, this, _1, _2 ) ) )
+            return handleSocketError( SystemError::getLastOSErrorCode() );
     }
 
     void onBytesSent( SystemError::ErrorCode errorCode, size_t count )
@@ -117,9 +123,6 @@ private:
 
         assert( count == m_bytesToSend );
 
-        //m_writeBuffer.pop_front(count);
-        //if( !m_writeBuffer.empty() )
-        //    return sendBufAsync( m_writeBuffer );
         static_cast<CustomConnectionType*>(this)->readyToSendData();
     }
 

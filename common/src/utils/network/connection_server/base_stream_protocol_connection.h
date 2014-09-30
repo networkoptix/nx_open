@@ -112,9 +112,9 @@ namespace nx_api
                 m_isSendingMessage = 0;
                 if( m_sendCompletionHandler )
                 {
-                    //completion handler is allowed to remove this connection
+                    //completion handler is allowed to remove this connection, so moving handler to local variable
                     auto sendCompletionHandlerBak = std::move( m_sendCompletionHandler );
-                    sendCompletionHandlerBak();
+                    sendCompletionHandlerBak( SystemError::noError );
                 }
                 return;
             }
@@ -126,14 +126,18 @@ namespace nx_api
                 assert( false );
             }
             //assuming that all bytes will be written or none
-            sendBufAsync( m_writeBuffer );
+            if( !sendBufAsync( m_writeBuffer ) )
+            {
+                auto sendCompletionHandlerBak = std::move( m_sendCompletionHandler );
+                sendCompletionHandlerBak( SystemError::getLastOSErrorCode() );
+            }
         }
 
         /*!
             Initiates asynchoronous message send
         */
         template<class Handler>
-        bool sendMessage( MessageType&& msg, Handler handler = std::function<void()>() )
+        bool sendMessage( MessageType&& msg, Handler handler = std::function<void(SystemError::ErrorCode)>() )
         {
             if( m_isSendingMessage > 0 )
                 return false;   //TODO: #ak interleaving is not supported yet
@@ -150,7 +154,7 @@ namespace nx_api
         SerializerState::Type m_serializerState;
         nx::Buffer m_writeBuffer;
         std::atomic<int> m_isSendingMessage;
-        std::function<void()> m_sendCompletionHandler;
+        std::function<void(SystemError::ErrorCode)> m_sendCompletionHandler;
 
         void sendResponseMessage( MessageType&& msg )
         {
