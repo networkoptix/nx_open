@@ -28,7 +28,7 @@ public:
 
 private:
     bool processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync = false);
-    void sendReply(int code = false);
+    void sendReply(int code);
     void addChunk(qint64 offset, int m_length);
     bool isComplete() const;
     void clearUpdatesLocation();

@@ -13,6 +13,12 @@ class QTimer;
 class QnUpdateUploader : public QObject {
     Q_OBJECT
 public:
+    enum ErrorCode {
+        NoError,
+        NoFreeSpace,
+        UnknownError
+    };
+
     QnUpdateUploader(QObject *parent = 0);
 
     bool uploadUpdate(const QString &updateId, const QString &fileName, const QSet<QnUuid> &peers);
@@ -26,8 +32,7 @@ public:
 signals:
     void peerProgressChanged(const QnUuid &peerId, int progress);
     void progressChanged(int progress);
-    void finished();
-    void failed();
+    void finished(int errorCode);
 
 private slots:
     void sendNextChunk();

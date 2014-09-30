@@ -11,7 +11,7 @@ namespace {
 
     const int maxDownloadTries = 20;
 
-    void readAllData(QIODevice *inDevice, QIODevice *outDevice) {
+    bool readAllData(QIODevice *inDevice, QIODevice *outDevice) {
         const int bufferSize = 512 * 1024;
         QByteArray buffer;
         buffer.reserve(bufferSize);
@@ -19,8 +19,10 @@ namespace {
         while (inDevice->bytesAvailable()) {
             int read = inDevice->read(buffer.data(), bufferSize);
             if (read > 0)
-                outDevice->write(buffer.data(), read);
+                return outDevice->write(buffer.data(), read) == read;
         }
+
+        return true;
     }
 
 } // anonymous namespace
@@ -140,7 +142,11 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
         return;
     }
 
-    readAllData(reply, m_file.data());
+    if (!readAllData(reply, m_file.data())) {
+        doCancel();
+        finish(NoFreeSpaceError);
+        return;
+    }
 
     m_file->close();
 
@@ -210,5 +216,8 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_readyRead() {
         return;
     }
 
-    readAllData(reply, m_file.data());
+    if (!readAllData(reply, m_file.data())) {
+        doCancel();
+        finish(NoFreeSpaceError);
+    }
 }
