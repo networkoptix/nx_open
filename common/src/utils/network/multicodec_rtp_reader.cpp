@@ -64,13 +64,21 @@ void QnMulticodecRtpReader::setRequest(const QString& request)
     m_request = request;
 }
 
-bool QnMulticodecRtpReader::gotKeyData(TrackInfo& track, const QnAbstractMediaDataPtr& mediaData)
+void QnMulticodecRtpReader::clearKeyData(int channelNum)
 {
+    if (m_gotKeyDataInfo.size() > channelNum)
+        m_gotKeyDataInfo[channelNum] = false;
+}
+
+bool QnMulticodecRtpReader::gotKeyData(const QnAbstractMediaDataPtr& mediaData)
+{
+    if (m_gotKeyDataInfo.size() <= mediaData->channelNumber)
+        m_gotKeyDataInfo.resize(mediaData->channelNumber + 1);
     if (mediaData->dataType == QnAbstractMediaData::VIDEO)
     {
         if (mediaData->flags & AV_PKT_FLAG_KEY)
-            track.gotKeyData = true;
-        return track.gotKeyData;
+            m_gotKeyDataInfo[mediaData->channelNumber] = true;
+        return m_gotKeyDataInfo[mediaData->channelNumber];
     }
     return true;
 }
@@ -80,10 +88,15 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if (m_RtpSession.getTransport() == RTPSession::TRANSPORT_UDP)
-        return getNextDataUDP();
-    else
-        return getNextDataTCP();
+    QnAbstractMediaDataPtr result;
+    do {
+        if (m_RtpSession.getTransport() == RTPSession::TRANSPORT_UDP)
+            result = getNextDataUDP();
+        else
+            result = getNextDataTCP();
+
+    } while(result && !gotKeyData(result));
+    return result;
 }
 
 void QnMulticodecRtpReader::processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity)
@@ -127,10 +140,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataInternal()
         if (tracks[i].parser) {
             QnAbstractMediaDataPtr result = tracks[i].parser->nextData();
             if (result) {
-                if (gotKeyData(tracks[i], result)) {
-                    result->channelNumber = tracks[i].parser->logicalChannelNum();
-                    return result;
-                }
+                result->channelNumber = tracks[i].parser->logicalChannelNum();
+                return result;
             }
         }
     }
@@ -176,13 +187,16 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         {
             if (!parser->processData((quint8*)m_demuxedData[rtpChannelNum]->data(), rtpBufferOffset+4, readed-4, ioDevice->getStatistic(), m_gotData))
             {
-                tracks[channelNum].gotKeyData = false;
+                clearKeyData(parser->logicalChannelNum());
                 m_demuxedData[rtpChannelNum]->clear();
                 if (++errorRetryCnt > RTSP_RETRY_COUNT) {
                     qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
                     closeStream();
                     return QnAbstractMediaDataPtr(0);
                 }
+            }
+            else if (m_gotData) {
+                m_demuxedData[rtpChannelNum]->clear();
             }
         }
         else if (format == RTPSession::TT_VIDEO_RTCP || format == RTPSession::TT_AUDIO_RTCP)
@@ -287,7 +301,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                     bool gotData = false;
                     if (!track.parser->processData(bufferBase, rtpBuffer-bufferBase, readed, track.ioDevice->getStatistic(), gotData)) 
                     {
-                        track.gotKeyData = false;
+                        clearKeyData(track.parser->logicalChannelNum());
                         m_demuxedData[rtpChannelNum]->clear();
                         if (++errorRetryCount > RTSP_RETRY_COUNT) {
                             qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
@@ -295,8 +309,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                             return QnAbstractMediaDataPtr(0);
                         }
                     }
-                    if (gotData)
+                    if (gotData) {
                         m_gotData = true;
+                        m_demuxedData[rtpChannelNum]->clear();
+                    }
                 }
             }
         }
@@ -424,6 +440,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 
     m_RtpSession.setAuth(nres->getAuth(), RTPSession::authBasic);
     tracks.clear();
+    m_gotKeyDataInfo.clear();
 
     const CameraDiagnostics::Result result = m_RtpSession.open(url);
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )

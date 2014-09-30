@@ -76,15 +76,15 @@ private:
 
     struct TrackInfo
     {
-        TrackInfo(): ioDevice(0), parser(0), gotKeyData(false) {}
+        TrackInfo(): ioDevice(0), parser(0) {}
         ~TrackInfo() { delete parser; }
         RTPIODevice* ioDevice; // external reference. do not delete
         QnRtpStreamParser* parser;
-        bool gotKeyData;
     };
 
     QnRtpStreamParser* createParser(const QString& codecName);
-    bool gotKeyData(TrackInfo& track, const QnAbstractMediaDataPtr& mediaData);
+    bool gotKeyData(const QnAbstractMediaDataPtr& mediaData);
+    void clearKeyData(int channelNum);
     QnAbstractMediaDataPtr getNextDataUDP();
     QnAbstractMediaDataPtr getNextDataTCP();
     void processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity);
@@ -95,7 +95,7 @@ private slots:
     void at_propertyChanged(const QnResourcePtr & res, const QString & key);
 private:
     RTPSession m_RtpSession;
-
+    QVector<bool> m_gotKeyDataInfo;
     /*
     RTPIODevice* m_videoIOs[CL_MAX_CHANNELS];
     RTPIODevice* m_audioIO;
