@@ -259,6 +259,17 @@ public:
     const nx::Buffer& bio_input_buffer() const {
         return bio_in_buffer_;
     }
+
+    void clear() {
+        {
+            std::lock_guard<std::mutex> lock(recv_mutex_);
+            recv_queue_.clear();
+        }
+        {
+            std::lock_guard<std::mutex> lock(send_mutex_);
+            send_queue_.clear();
+        }
+    }
     
 protected:
 
@@ -342,6 +353,8 @@ private:
             // Remove _THIS_ from the queue and check whether we need to go on
             {
                 std::lock_guard<std::mutex> lock(recv_mutex_);
+                if(recv_queue_.empty())
+                    return;
                 recv_queue_.pop_back();
                 if( !recv_queue_.empty() ) {
                     socket_->readSomeAsync(buf.write_buffer,std::move(recv_queue_.front()));
@@ -363,6 +376,8 @@ private:
             op(ec,transferred_bytes);
             {
                 std::lock_guard<std::mutex> lock(send_mutex_);
+                if(send_queue_.empty())
+                    return;
                 send_queue_.pop_back();
                 if( !send_queue_.empty() ) {
                     // Fire one appending operation in the queue
@@ -1155,6 +1170,10 @@ QnSSLSocket::~QnSSLSocket()
 
     if (d->ssl)
         SSL_free(d->ssl);
+    if(d->mode == ASYNC ) {
+        d->async_ssl_ptr->clear();
+        d->wrappedSocket->cancelAsyncIO();
+    }
     delete d->wrappedSocket;
     delete d_ptr;
 }
