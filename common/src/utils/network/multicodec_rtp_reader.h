@@ -96,15 +96,7 @@ private slots:
 private:
     RTPSession m_RtpSession;
     QVector<bool> m_gotKeyDataInfo;
-    /*
-    RTPIODevice* m_videoIOs[CL_MAX_CHANNELS];
-    RTPIODevice* m_audioIO;
-    QnRtpVideoStreamParser* m_videoParsers[CL_MAX_CHANNELS];
-    QnRtpAudioStreamParser* m_audioParser;
-    QnAbstractMediaDataPtr m_lastVideoData;
-    QList<QnAbstractMediaDataPtr> m_lastAudioData;
-    */
-    QVector<TrackInfo> tracks;
+    QVector<TrackInfo> m_tracks;
 
     QString m_request;
 
@@ -120,6 +112,7 @@ private:
     mutable QMutex m_layoutMutex;
     QnConstResourceAudioLayoutPtr m_audioLayout;
     bool m_gotData;
+    QElapsedTimer m_dataTimer;
 };
 
 #endif // ENABLE_DATA_PROVIDERS
