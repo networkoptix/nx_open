@@ -210,7 +210,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
         int rtpBufferOffset = m_demuxedData[rtpChannelNum]->size() - readed;
 
-        if ((format == RTPSession::TT_VIDEO || format == RTPSession::TT_AUDIO)) 
+        if (format == RTPSession::TT_VIDEO || format == RTPSession::TT_AUDIO) 
         {
             if (!parser->processData((quint8*)m_demuxedData[rtpChannelNum]->data(), rtpBufferOffset+4, readed-4, ioDevice->getStatistic(), m_gotData))
             {
@@ -248,7 +248,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     return  QnAbstractMediaDataPtr();
 }
 
-static const int MAX_MEDIA_SOCKET_COUNT = 2;
+static const int MAX_MEDIA_SOCKET_COUNT = 5;
 static const int MEDIA_DATA_READ_TIMEOUT_MS = 100;
 
 QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
