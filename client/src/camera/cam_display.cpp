@@ -131,7 +131,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_doNotChangeDisplayTime(false),
     m_firstLivePacket(true),
     m_multiView(false),
-    m_fisheyeEnabled(false)
+    m_fisheyeEnabled(false),
+    m_channelsCount(0)
 {
 
     if (resource && resource->toResource()->hasFlags(Qn::live_cam))
@@ -215,11 +216,18 @@ void QnCamDisplay::addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bo
     
     for(int i = 0; i < channelCount; i++)
     {
-        if (!m_display[i])
+        if (!m_display[i]) {
             m_display[i] = new QnVideoStreamDisplay(canDownscale, i);
+            m_channelsCount++;
+        }
         int rendersCount = m_display[i]->addRenderer(vw);
         m_multiView = rendersCount > 1;
     }
+}
+
+int QnCamDisplay::channelsCount() const
+{
+    return m_channelsCount;
 }
 
 void QnCamDisplay::removeVideoRenderer(QnAbstractRenderer* vw)

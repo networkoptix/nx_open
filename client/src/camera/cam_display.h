@@ -52,6 +52,7 @@ public:
 
     void addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bool canDownscale);
     void removeVideoRenderer(QnAbstractRenderer* vw);
+    int channelsCount() const;
 
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 
@@ -251,6 +252,7 @@ protected:
     bool m_firstLivePacket;
     bool m_multiView;
     bool m_fisheyeEnabled;
+    int m_channelsCount;
 };
 
 #endif //QN_CAM_DISPLAY_H
