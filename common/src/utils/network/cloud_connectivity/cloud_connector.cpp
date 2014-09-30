@@ -8,7 +8,7 @@
 
 namespace nx_cc
 {
-    bool CloudConnector::requestCloudConnection(
+    bool CloudConnector::setupCloudConnection(
         const HostAddress& hostname,
         std::function<void(nx_cc::ErrorDescription, AbstractStreamSocket*)>&& completionHandler )
     {

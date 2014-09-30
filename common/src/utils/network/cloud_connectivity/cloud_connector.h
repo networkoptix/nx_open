@@ -27,12 +27,12 @@ namespace nx_cc
         //!Implementation of QnStoppableAsync::pleaseStop
         virtual void pleaseStop( std::function<void()>&& completionHandler ) override;
 
-        //!Connects to the specified host whether via existing UDT tunnel o via mediator request
+        //!Connects to the specified host whether via existing UDT tunnel or via mediator request
         /*!
             \param completionHandler connection is not \a nullptr only if \a nx_cc::ErrorDescription::resultCode is \a nx_cc::ResultCode::ok
             \return \a true if async connection establishing successfully started
         */
-        bool requestCloudConnection(
+        bool setupCloudConnection(
             const HostAddress& targetHost,
             std::function<void(nx_cc::ErrorDescription, AbstractStreamSocket*)>&& completionHandler );
 

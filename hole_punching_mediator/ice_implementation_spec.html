@@ -158,7 +158,7 @@
 
 
     <h2>3. Establishing cross-NAT connection</h2>
-    <h3>3.1. Shotly about NAT</h3>
+    <h3>3.1. Shortly about NAT</h3>
     <h3>3.1.1. NAT types</h3>
 
     <b>Full-cone NAT</b>, also known as one-to-one NAT
@@ -196,7 +196,7 @@
 
 
     <h3>3.2. Port prediction</h3>
-    This is required happens if one side (or both) are behind symmetric NAT.
+    This is required if one side (or both) are behind symmetric NAT.
 
     - we can predict port only if NAT uses +1 port allocation scheme
     - delay between connection to mediator and to other peer must be minimized
@@ -205,7 +205,6 @@
     In case of TCP we can try to connect to known remote peer endpoint and subsequent endpoint. Trying N subsequent ports makes no sense since TCP connection 
         to mediator is persistent and, if NAT uses global +1 scheme, next port is too far away
 
-    <b>TODO</b> aggregate port prediction for TCP and UDP
     <b>TODO</b> it makes sense to gather some statistics about traversing NAT's and use it to increase performance. 
         E.g., 
         1. if TCP hole punching is not available though that NAT, than there is no sense in trying it constantly
@@ -233,7 +232,6 @@
     2. some networks can have UDP fully disabled (but, if they have such secure network, there is a great possibility that incoming TCP connections will be forbidden either)
     3. if TCP hole punching is available, TCP connection delay will be less than UDT, since TCP connection to mediator is already established
 
-    <b>TODO</b> Peers can try UDP hole punching some time after trying TCP to save mediator's resources in case if TCP hole punching is possible or client has public address
     <b>TODO</b> maybe use UDP, not UDT to talk to mediator?
 
 

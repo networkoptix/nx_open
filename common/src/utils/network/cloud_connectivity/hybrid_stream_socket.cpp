@@ -54,7 +54,7 @@ namespace nx_cc
             {
                 //establishing cloud connect
                 using namespace std::placeholders;
-                return CloudConnector::instance()->requestCloudConnection(
+                return CloudConnector::instance()->setupCloudConnection(
                     dnsEntry.address,
                     std::bind(&HybridStreamSocket::cloudConnectDone, this, _1, _2) );
             }
@@ -94,7 +94,7 @@ namespace nx_cc
             {
                 //establishing cloud connect
                 using namespace std::placeholders;
-                if( !CloudConnector::instance()->requestCloudConnection(
+                if( !CloudConnector::instance()->setupCloudConnection(
                         dnsEntry.address,
                         std::bind(&HybridStreamSocket::cloudConnectDone, this, _1, _2) ) )
                     m_connectHandler( SystemError::getLastOSErrorCode() );

@@ -127,7 +127,8 @@ int HolePuncherProcess::executeApplication()
             return listeningPeerPool.processConnectRequest( connection, std::move(message) );
         } );
 
-    m_multiAddressStunServer.reset( new MultiAddressServer<StunStreamSocketServer>( addrToListenList, true, SocketFactory::nttEnabled ) );
+    //accepting STUN requests by both tcp and udt
+    m_multiAddressStunServer.reset( new MultiAddressServer<StunStreamSocketServer>( addrToListenList, true, SocketFactory::nttAuto ) );
     m_multiAddressHttpServer.reset( new MultiAddressServer<nx_http::HttpStreamSocketServer>( addrToListenList, true, SocketFactory::nttDisabled ) );
 
     if( !m_multiAddressStunServer->bind() )

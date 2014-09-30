@@ -26,8 +26,6 @@ namespace nx_api
             //!Called after sending message (e.g. response)
             void messageSent();
         \endcode
-
-        \todo This class contains no STUN-specific logic, so it MUST be protocol-independent (it may be used for HTTP later)
     */
     template<
         class CustomConnectionType,
@@ -55,7 +53,7 @@ namespace nx_api
             SerializerType> SelfType;
         //typedef BaseStreamProtocolConnection<CustomConnectionType, CustomSocketServerType> SelfType;
         typedef BaseServerConnection<SelfType, CustomSocketServerType> BaseType;
-        //!Type of messages used by this connetion class. Request/response/indication is sub-class of message, so no difference at this level
+        //!Type of messages used by this connection class. Request/response/indication is sub-class of message, so no difference at this level
         typedef MessageType message_type;
 
         BaseStreamProtocolConnection(
