@@ -158,7 +158,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
         if (format == RTPSession::TT_VIDEO && m_videoParsers[channelNum]) 
         {
-            if (!m_videoParsers[channelNum]->processData((quint8*)m_demuxedData[rtpChannelNum]->data(), rtpBufferOffset+4, readed-4, m_videoIOs[channelNum]->getStatistic(), m_lastVideoData)) 
+            if (!m_videoParsers[channelNum]->processData((quint8*)m_demuxedData[rtpChannelNum]->data(), rtpBufferOffset+4, readed-4, m_videoIOs[channelNum]->getStatistic())) 
             {
                 setNeedKeyData();
                 m_demuxedData[rtpChannelNum]->clear();
@@ -168,7 +168,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
                     return QnAbstractMediaDataPtr(0);
                 }
             }
-            else if (m_lastVideoData) {
+            m_lastVideoData = m_videoParsers[channelNum]->nextData();
+            if (m_lastVideoData) {
                 m_lastVideoData->channelNumber = channelNum;
                 checkIfNeedKeyData();
                 if (!m_lastVideoData)
@@ -182,13 +183,15 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         }
         else if (format == RTPSession::TT_AUDIO && m_audioParser) 
         {
-            if (!m_audioParser->processData((quint8*)m_demuxedData[rtpChannelNum]->data(), rtpBufferOffset+4, readed-4, m_audioIO->getStatistic(), m_lastAudioData)) 
+            if (!m_audioParser->processData((quint8*)m_demuxedData[rtpChannelNum]->data(), rtpBufferOffset+4, readed-4, m_audioIO->getStatistic())) 
             {
                 m_demuxedData[rtpChannelNum]->clear();
                 if (++audioRetryCount > RTSP_RETRY_COUNT) {
                     closeStream();
                     return QnAbstractMediaDataPtr(0);
                 }
+            }
+            else {
             }
         }
         else if (format == RTPSession::TT_AUDIO_RTCP && m_audioParser)
@@ -304,7 +307,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                         break;
                     m_demuxedData[rtpChannelNum]->finishWriting(readed);
                     quint8* bufferBase = (quint8*) m_demuxedData[rtpChannelNum]->data();
-                    if (!m_videoParsers[channelNum]->processData(bufferBase, rtpBuffer-bufferBase, readed, m_videoIOs[channelNum]->getStatistic(), m_lastVideoData)) 
+                    if (!m_videoParsers[channelNum]->processData(bufferBase, rtpBuffer-bufferBase, readed, m_videoIOs[channelNum]->getStatistic())) 
                     {
                         setNeedKeyData();
                         m_demuxedData[rtpChannelNum]->clear();
@@ -314,7 +317,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                             return QnAbstractMediaDataPtr(0);
                         }
                     }
-                    else if (m_lastVideoData) 
+                    m_lastVideoData = m_videoParsers[channelNum]->nextData();
+                    if (m_lastVideoData) 
                     {
                         m_lastVideoData->channelNumber = channelNum;
                         checkIfNeedKeyData();
@@ -333,7 +337,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                     break;
                 m_demuxedData[rtpChannelNum]->finishWriting(readed);
                 quint8* bufferBase = (quint8*) m_demuxedData[rtpChannelNum]->data();
-                if (!m_audioParser->processData(bufferBase, rtpBuffer-bufferBase, readed, m_audioIO->getStatistic(), m_lastAudioData)) 
+                if (!m_audioParser->processData(bufferBase, rtpBuffer-bufferBase, readed, m_audioIO->getStatistic())) 
                 {
                     m_demuxedData[rtpChannelNum]->clear();
                     if (++audioRetryCount > RTSP_RETRY_COUNT) {

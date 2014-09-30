@@ -52,3 +52,26 @@ void QnRtpAudioStreamParser::processStringParam(const QByteArray& checkName, QBy
     if (paramName.toLower() == checkName.toLower())
         setValue = paramValue;
 }
+
+QnAbstractMediaDataPtr QnRtpVideoStreamParser::nextData()
+{
+    if (m_mediaData) {
+        QnAbstractMediaDataPtr result = m_mediaData;
+        m_mediaData.clear();
+        return result;
+    }
+    else {
+        return QnAbstractMediaDataPtr();
+    }
+}
+
+QnAbstractMediaDataPtr QnRtpAudioStreamParser::nextData()
+{
+    if (m_audioData.empty())
+        return QnAbstractMediaDataPtr();
+    else {
+        QnAbstractMediaDataPtr result = m_audioData.front();
+        m_audioData.pop_front();
+        return result;
+    }
+}

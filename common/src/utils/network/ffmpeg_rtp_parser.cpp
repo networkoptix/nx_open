@@ -28,7 +28,7 @@ void QnFfmpegRtpParser::setSDPInfo(QList<QByteArray>)
 
 }
 
-bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, const RtspStatistic&, QnAbstractMediaDataPtr& result)
+bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, const RtspStatistic&)
 {
     if (dataSize < RtpHeader::RTP_HEADER_SIZE)
     {
@@ -87,7 +87,7 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
                     return false;
                 }
                 if (dataSize < RTSP_FFMPEG_METADATA_HEADER_SIZE)
-                    return result;
+                    return false;
 
                 QnMetaDataV1 *metadata = new QnMetaDataV1(); 
                 metadata->m_data.clear();
@@ -170,7 +170,7 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
                 else
                     m_position = m_nextDataPacket->timestamp;
             }
-            result = m_nextDataPacket;
+            m_mediaData = m_nextDataPacket;
             m_nextDataPacket.clear(); // EOF video frame reached
             m_nextDataPacketBuffer = nullptr;
         }

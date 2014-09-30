@@ -231,7 +231,7 @@ void CLH264RtpParser::updateNalFlags(int nalUnitType)
     }
 }
 
-bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result)
+bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics)
 {
     quint8* rtpBuffer = rtpBufferBase + bufferOffset;
     int nalUnitLen;
@@ -379,7 +379,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         return clearInternalBuffer();
 
     if (rtpHeader->marker && m_frameExists)
-        result = createVideoData(rtpBufferBase, ntohl(rtpHeader->timestamp), statistics); // last packet
+        m_mediaData = createVideoData(rtpBufferBase, ntohl(rtpHeader->timestamp), statistics); // last packet
     return true;
 }
 

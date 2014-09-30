@@ -12,7 +12,7 @@ public:
     virtual ~QnSimpleAudioRtpParser();
     virtual void setSDPInfo(QList<QByteArray> sdpInfo) override;
 
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result) override;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics) override;
     virtual QnResourceAudioLayoutPtr getAudioLayout() override;
     void setCodecId(CodecID codecId);
     void setBitsPerSample(int value);

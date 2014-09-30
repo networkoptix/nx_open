@@ -354,14 +354,13 @@ void QnMjpegRtpParser::setSDPInfo(QList<QByteArray> lines)
     }
 }
 
-bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result)
+bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics)
 {
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
 
     static quint8 jpeg_end[2] = {0xff, 0xd9};
 
     if (readed < RtpHeader::RTP_HEADER_SIZE + 1) {
-        m_videoData.clear();
         return false;
     }
     
@@ -372,7 +371,6 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     if (rtpHeader->extension)
     {
         if (readed < RtpHeader::RTP_HEADER_SIZE + 4) {
-            m_videoData.clear();
             return false;
         }
 
@@ -503,31 +501,29 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         //    m_frameData.write((const char*) jpeg_end, sizeof(jpeg_end));
         bool needAddMarker = m_frameSize < 2 || EOI_marker[0] != jpeg_end[0] || EOI_marker[1] != jpeg_end[1];
 
-        m_videoData = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_headerLen + m_frameSize + (needAddMarker ? 2 : 0)));
-        m_videoData->m_data.uncheckedWrite((const char*)m_hdrBuffer, m_headerLen);
+        QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_headerLen + m_frameSize + (needAddMarker ? 2 : 0)));
+        m_mediaData = videoData;
+        videoData->m_data.uncheckedWrite((const char*)m_hdrBuffer, m_headerLen);
         //m_videoData->data.write(m_frameData);
         for (uint i = 0; i < m_chunks.size(); ++i)
-            m_videoData->m_data.uncheckedWrite((const char*) rtpBufferBase + m_chunks[i].bufferOffset, m_chunks[i].len);
+            videoData->m_data.uncheckedWrite((const char*) rtpBufferBase + m_chunks[i].bufferOffset, m_chunks[i].len);
         if (needAddMarker)
-            m_videoData->m_data.uncheckedWrite((const char*) jpeg_end, sizeof(jpeg_end));
+            videoData->m_data.uncheckedWrite((const char*) jpeg_end, sizeof(jpeg_end));
 
         m_chunks.clear();
         m_frameSize = 0;
 
-        m_videoData->channelNumber = 0;
-        m_videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
-        m_videoData->compressionType = CODEC_ID_MJPEG;
+        videoData->channelNumber = 0;
+        videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
+        videoData->compressionType = CODEC_ID_MJPEG;
         //m_videoData->context = m_context;
-        m_videoData->width = width*8;
-        m_videoData->height = height*8;
+        videoData->width = width*8;
+        videoData->height = height*8;
         
         if (m_timeHelper) 
-            m_videoData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
+            videoData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
         else
-            m_videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
-
-        result = m_videoData;
-        m_videoData.clear();
+            videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
     }
     return true;
 }
