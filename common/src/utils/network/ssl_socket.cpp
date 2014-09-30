@@ -9,6 +9,7 @@
 
 #include <utils/common/log.h>
 #include <list>
+#include <memory>
 
 #ifdef max
 #undef max
@@ -219,7 +220,7 @@ static const std::size_t bio_output_buffer_reserve= 2048;
 static const std::size_t async_buffer_default_size= 1024;
 static const SystemError::ErrorCode ssl_internal_error = 100;
 
-class async_ssl {
+class async_ssl : public std::enable_shared_from_this<async_ssl> {
 public:
     async_ssl( SSL* ssl , bool server , AbstractStreamSocket* socket ) ;
 
@@ -347,49 +348,56 @@ private:
     // an ssl_perform entry routine and do the job once the task
     // finished there .
     void do_recv( buffer_t buf , const std::function<void(SystemError::ErrorCode,std::size_t)>& op ) {
-        auto recv_callback = [this,buf,op](SystemError::ErrorCode ec,std::size_t transferred_bytes) {
+        std::weak_ptr<async_ssl> self(shared_from_this());
+        auto recv_callback = [this,buf,op,self](SystemError::ErrorCode ec,std::size_t transferred_bytes) {
             // Invoke user's operation without locking , so no recursive lock 
             op(ec,transferred_bytes);
-            // Remove _THIS_ from the queue and check whether we need to go on
-            {
-                std::lock_guard<std::mutex> lock(recv_mutex_);
-                if(recv_queue_.empty())
+            std::shared_ptr<async_ssl> ptr(self.lock());
+            if(!ptr) {
+                return;
+            } else {
+                std::lock_guard<std::mutex> lock(ptr->recv_mutex_);
+                if(ptr->recv_queue_.empty())
                     return;
-                recv_queue_.pop_back();
-                if( !recv_queue_.empty() ) {
-                    socket_->readSomeAsync(buf.write_buffer,std::move(recv_queue_.front()));
+                ptr->recv_queue_.pop_back();
+                if( !ptr->recv_queue_.empty() ) {
+                    ptr->socket_->readSomeAsync(buf.write_buffer,ptr->recv_queue_.front());
                 }
             }
         };
-        std::list< std::function<void(SystemError::ErrorCode,std::size_t)> > element(1,std::move(recv_callback));
+        std::list< std::function<void(SystemError::ErrorCode,std::size_t)> > element(1,recv_callback);
         {
             std::lock_guard<std::mutex> lock(recv_mutex_);
             if( recv_queue_.empty() ) {
-                socket_->readSomeAsync(buf.write_buffer,recv_callback);
+                socket_->readSomeAsync(buf.write_buffer,std::move(recv_callback));
             }
             recv_queue_.splice(recv_queue_.end(),std::move(element));
         }
     }
 
     void do_send( buffer_t buf , const std::function<void(SystemError::ErrorCode,std::size_t)>& op ) {
-        auto send_callback = [this,buf,op](SystemError::ErrorCode ec,std::size_t transferred_bytes) {
+        std::weak_ptr<async_ssl> self(shared_from_this());
+        auto send_callback = [this,buf,op,self](SystemError::ErrorCode ec,std::size_t transferred_bytes) {
             op(ec,transferred_bytes);
-            {
-                std::lock_guard<std::mutex> lock(send_mutex_);
-                if(send_queue_.empty())
+            std::shared_ptr<async_ssl> ptr(self.lock());
+            if(!ptr) {
+                return;
+            } else {
+                std::lock_guard<std::mutex> lock(ptr->send_mutex_);
+                if(ptr->send_queue_.empty())
                     return;
-                send_queue_.pop_back();
-                if( !send_queue_.empty() ) {
+                ptr->send_queue_.pop_back();
+                if( !ptr->send_queue_.empty() ) {
                     // Fire one appending operation in the queue
-                    socket_->sendAsync(*buf.read_buffer,std::move(send_queue_.front()));
+                    ptr->socket_->sendAsync(*buf.read_buffer,ptr->send_queue_.front());
                 }
             }
         };
-        std::list< std::function<void(SystemError::ErrorCode,std::size_t)> > element(1,std::move(send_callback));
+        std::list< std::function<void(SystemError::ErrorCode,std::size_t)> > element(1,send_callback);
         {
             std::lock_guard<std::mutex> lock(send_mutex_);
             if( send_queue_.empty() ) {
-                socket_->sendAsync(*buf.read_buffer,send_callback);
+                socket_->sendAsync(*buf.read_buffer,std::move(send_callback));
             }
             send_queue_.splice(send_queue_.end(),std::move(element));
         }
@@ -1106,7 +1114,7 @@ public:
     // the call for sync is undefined. This is for purpose since it heavily reduce
     // the pain of 
     int mode;
-    std::unique_ptr<async_ssl> async_ssl_ptr;
+    std::shared_ptr<async_ssl> async_ssl_ptr;
 
     QnSSLSocketPrivate()
     :
@@ -1171,7 +1179,8 @@ QnSSLSocket::~QnSSLSocket()
     if (d->ssl)
         SSL_free(d->ssl);
     if(d->mode == ASYNC ) {
-        d->async_ssl_ptr->clear();
+        if(d->async_ssl_ptr)
+            d->async_ssl_ptr->clear();
         d->wrappedSocket->cancelAsyncIO();
     }
     delete d->wrappedSocket;
@@ -1471,7 +1480,7 @@ bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const buffer , std::function<void( 
 {
     Q_D(QnSSLSocket);
     d->mode = QnSSLSocket::ASYNC;
-    if(d->async_ssl_ptr == NULL)
+    if(!(d->async_ssl_ptr))
         d->async_ssl_ptr.reset( new async_ssl(d->ssl,d->isServerSide,d->wrappedSocket) );
     d->async_ssl_ptr->async_recv( buffer, handler );
     return true;
@@ -1481,7 +1490,7 @@ bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& buffer , std::function<void( 
 {
     Q_D(QnSSLSocket);
     d->mode = QnSSLSocket::ASYNC;
-    if(d->async_ssl_ptr == NULL)
+    if(!(d->async_ssl_ptr))
         d->async_ssl_ptr.reset( new async_ssl(d->ssl,d->isServerSide,d->wrappedSocket) );
     d->async_ssl_ptr->async_send( buffer, handler );
     return true;
