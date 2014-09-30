@@ -483,6 +483,8 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 
                 if (trackType == RTPSession::TT_VIDEO)
                     tracks[i].parser->setLogicalChannelNum(logicalVideoNum++);
+                else
+                    tracks[i].parser->setLogicalChannelNum(m_numberOfVideoChannels);
             }
         }
     }
