@@ -69,6 +69,8 @@ QnUpdateProcess::QnUpdateProcess(const QnUpdateTarget &target):
 void QnUpdateProcess::pleaseStop() {
     base_type::pleaseStop();
     quit();
+    setAllPeersStage(QnPeerUpdateStage::Init);
+    setStage(QnFullUpdateStage::Init);
 }
 
 void QnUpdateProcess::run() {
