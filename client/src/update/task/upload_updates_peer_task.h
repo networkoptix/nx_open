@@ -12,7 +12,8 @@ public:
     enum ErrorCode {
         NoError = 0,
         ConsistencyError,
-        UploadError
+        UploadError,
+        NoFreeSpaceError
     };
 
     explicit QnUploadUpdatesPeerTask(QObject *parent = 0);
@@ -28,8 +29,7 @@ private:
     void uploadNextUpdate();
 
 private slots:
-    void at_uploader_finished();
-    void at_uploader_failed();
+    void at_uploader_finished(int errorCode);
     void at_uploader_progressChanged(int progress);
 
 private:

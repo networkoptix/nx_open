@@ -69,6 +69,8 @@ QnUpdateProcess::QnUpdateProcess(const QnUpdateTarget &target):
 void QnUpdateProcess::pleaseStop() {
     base_type::pleaseStop();
     quit();
+    setAllPeersStage(QnPeerUpdateStage::Init);
+    setStage(QnFullUpdateStage::Init);
 }
 
 void QnUpdateProcess::run() {
@@ -259,7 +261,7 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
 void QnUpdateProcess::at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, int errorCode) {
     if (errorCode != 0) {
         setAllPeersStage(QnPeerUpdateStage::Init);
-        finishUpdate(QnUpdateResult::DownloadingFailed);
+        finishUpdate(errorCode == QnDownloadUpdatesPeerTask::NoFreeSpaceError ? QnUpdateResult::DownloadingFailed_NoFreeSpace : QnUpdateResult::DownloadingFailed);
         return;
     }
 
@@ -484,7 +486,7 @@ void QnUpdateProcess::installUpdatesToServers() {
 void QnUpdateProcess::at_uploadTask_finished(int errorCode) {
     if (errorCode != 0) {
         setAllPeersStage(QnPeerUpdateStage::Init);
-        finishUpdate(QnUpdateResult::UploadingFailed);
+        finishUpdate(errorCode == QnUploadUpdatesPeerTask::NoFreeSpaceError ? QnUpdateResult::UploadingFailed_NoFreeSpace : QnUpdateResult::UploadingFailed);
         return;
     }
 

@@ -115,6 +115,11 @@ private:
 
     /** Status variable to avoid unneeded checks. */
     bool m_inUpdateDependensies;
+
+    bool m_userNameModified;
+    bool m_passwordModified;
+    bool m_emailModified;
+    bool m_accessRightsModified;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnUserSettingsDialog::ElementFlags)
