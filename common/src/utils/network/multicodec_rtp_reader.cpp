@@ -35,7 +35,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(const QnResourcePtr& res):
     m_timeHelper(res->getUniqueId()),
     m_pleaseStop(false),
     m_gotSomeFrame(false),
-    m_role(Qn::CR_Default)
+    m_role(Qn::CR_Default),
+    m_gotData(false)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
@@ -154,11 +155,17 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
     while (m_RtpSession.isOpened() && !m_pleaseStop && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
     {
-        QnAbstractMediaDataPtr data = getNextDataInternal();
-        if (data) {
+        while (m_gotData) 
+        {
             m_gotSomeFrame = true;
-            if (checkIfNeedKeyData(data))
-                return data;
+            QnAbstractMediaDataPtr data = getNextDataInternal();
+            if (data) {
+                if (checkIfNeedKeyData(data))
+                    return data;
+            }
+            else {
+                m_gotData = false;
+            }
         }
 
         int readed = m_RtpSession.readBinaryResponce(m_demuxedData, rtpChannelNum);
@@ -177,7 +184,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
         if ((format == RTPSession::TT_VIDEO || format == RTPSession::TT_AUDIO)) 
         {
-            if (!parser->processData((quint8*)m_demuxedData[rtpChannelNum]->data(), rtpBufferOffset+4, readed-4, ioDevice->getStatistic())) 
+            if (!parser->processData((quint8*)m_demuxedData[rtpChannelNum]->data(), rtpBufferOffset+4, readed-4, ioDevice->getStatistic(), m_gotData))
             {
                 setNeedKeyData();
                 m_demuxedData[rtpChannelNum]->clear();
@@ -251,11 +258,17 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
 
     while (m_RtpSession.isOpened() && !m_pleaseStop && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
     {
-        QnAbstractMediaDataPtr data = getNextDataInternal();
-        if (data) {
+        while (m_gotData) 
+        {
             m_gotSomeFrame = true;
-            if (checkIfNeedKeyData(data))
-                return data;
+            QnAbstractMediaDataPtr data = getNextDataInternal();
+            if (data) {
+                if (checkIfNeedKeyData(data))
+                    return data;
+            }
+            else {
+                m_gotData = false;
+            }
         }
 
         int nfds = 0;
@@ -284,7 +297,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                         break;
                     m_demuxedData[rtpChannelNum]->finishWriting(readed);
                     quint8* bufferBase = (quint8*) m_demuxedData[rtpChannelNum]->data();
-                    if (!track.parser->processData(bufferBase, rtpBuffer-bufferBase, readed, track.ioDevice->getStatistic())) 
+                    if (!track.parser->processData(bufferBase, rtpBuffer-bufferBase, readed, track.ioDevice->getStatistic(), m_gotData)) 
                     {
                         setNeedKeyData();
                         m_demuxedData[rtpChannelNum]->clear();

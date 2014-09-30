@@ -67,8 +67,9 @@ void QnSimpleAudioRtpParser::setSDPInfo(QList<QByteArray> lines)
     m_audioLayout->setAudioTrackInfo(track);
 }
 
-bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics)
+bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics, bool& gotData)
 {
+    gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
@@ -103,7 +104,7 @@ bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset
 
     audioData->m_data.write((const char*)curPtr, end - curPtr);
     m_audioData.push_back(audioData);
-
+    gotData = true;
     return true;
 }
 

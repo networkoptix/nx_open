@@ -28,8 +28,9 @@ void QnFfmpegRtpParser::setSDPInfo(QList<QByteArray>)
 
 }
 
-bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, const RtspStatistic&)
+bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, const RtspStatistic&, bool& gotData)
 {
+    gotData = false;
     if (dataSize < RtpHeader::RTP_HEADER_SIZE)
     {
         qWarning() << Q_FUNC_INFO << __LINE__ << "strange RTP packet. len < RTP header size. Ignored";
@@ -173,6 +174,7 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
             m_mediaData = m_nextDataPacket;
             m_nextDataPacket.clear(); // EOF video frame reached
             m_nextDataPacketBuffer = nullptr;
+            gotData = true;
         }
     }
     return true;

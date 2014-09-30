@@ -18,7 +18,7 @@ public:
     virtual ~QnFfmpegRtpParser();
 
     virtual void setSDPInfo(QList<QByteArray> sdpInfo) override;
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics) override;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData) override;
 
     qint64 position() const { return m_position; }
     QnMediaContextPtr mediaContext() const { return m_context; }

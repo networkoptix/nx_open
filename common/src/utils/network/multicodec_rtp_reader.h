@@ -118,6 +118,7 @@ private:
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
     mutable QMutex m_layoutMutex;
     QnConstResourceAudioLayoutPtr m_audioLayout;
+    bool m_gotData;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

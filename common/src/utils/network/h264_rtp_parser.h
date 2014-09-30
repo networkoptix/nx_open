@@ -21,7 +21,7 @@ public:
     virtual ~CLH264RtpParser();
     virtual void setSDPInfo(QList<QByteArray> lines) override;
 
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics) override;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData) override;
 
 private:
     QMap <int, QByteArray> m_allNonSliceNal;

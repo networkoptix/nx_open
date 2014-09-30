@@ -52,7 +52,7 @@ public:
     void setTimeHelper(QnRtspTimeHelper* timeHelper);
 
     virtual QnAbstractMediaDataPtr nextData() = 0;
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics) = 0;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData) = 0;
 
     int logicalChannelNum() const { return m_logicalChannelNum; }
     void setLogicalChannelNum(int value) { m_logicalChannelNum = value; }

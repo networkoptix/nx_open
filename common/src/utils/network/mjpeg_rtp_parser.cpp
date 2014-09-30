@@ -354,8 +354,9 @@ void QnMjpegRtpParser::setSDPInfo(QList<QByteArray> lines)
     }
 }
 
-bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics)
+bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData)
 {
+    gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
 
     static quint8 jpeg_end[2] = {0xff, 0xd9};
@@ -524,6 +525,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
             videoData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
         else
             videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
+        gotData = true;
     }
     return true;
 }
