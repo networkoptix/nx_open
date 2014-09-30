@@ -847,26 +847,6 @@ bool RTPSession::sendOptions()
     return m_tcpSock->send(request.data(), request.size()) > 0;
 }
 
-RTPIODevice* RTPSession::getTrackIoByType(TrackType trackType, int channelNum)
-{
-    for (int i = 0; i < m_sdpTracks.size(); ++i)
-    {
-        if (m_sdpTracks[i]->trackType == trackType && m_sdpTracks[i]->trackNum == channelNum)
-            return m_sdpTracks[i]->ioDevice;
-    }
-    return 0;
-}
-
-QString RTPSession::getCodecNameByType(TrackType trackType, int channelNum)
-{
-    for (int i = 0; i < m_sdpTracks.size(); ++i)
-    {
-        if (m_sdpTracks[i]->trackType == trackType && channelNum == m_sdpTracks[i]->trackNum)
-            return m_sdpTracks[i]->codecName;
-    }
-    return QString();
-}
-
 int RTPSession::getTrackCount(TrackType trackType) const
 {
     int result = 0;
@@ -878,7 +858,17 @@ int RTPSession::getTrackCount(TrackType trackType) const
     return result;
 }
 
-QList<QByteArray> RTPSession::getSdpByType(TrackType trackType, int channelNum) const
+QList<QByteArray> RTPSession::getSdpByType(TrackType trackType) const
+{
+    for (int i = 0; i < m_sdpTracks.size(); ++i)
+    {
+        if (m_sdpTracks[i]->trackType == trackType)
+            return getSdpByTrackNum(i);
+    }
+    return QList<QByteArray>();
+}
+
+QList<QByteArray> RTPSession::getSdpByTrackNum(int trackNum) const
 {
     QList<QByteArray> rez;
     QList<QByteArray> tmp = m_sdp.split('\n');
@@ -886,7 +876,7 @@ QList<QByteArray> RTPSession::getSdpByType(TrackType trackType, int channelNum) 
     int mapNum = -1;
     for (int i = 0; i < m_sdpTracks.size(); ++i)
     {
-        if (m_sdpTracks[i]->trackType == trackType && channelNum == m_sdpTracks[i]->trackNum)
+        if (trackNum == m_sdpTracks[i]->trackNum)
             mapNum = m_sdpTracks[i]->mapNum;
     }
     if (mapNum == -1)
@@ -2037,4 +2027,9 @@ bool RTPSession::sendRequestAndReceiveResponse( const QByteArray& requestBuf, QB
     }
 
     return false;
+}
+
+RTPSession::TrackMap RTPSession::getTrackInfo() const
+{
+    return m_sdpTracks;
 }
