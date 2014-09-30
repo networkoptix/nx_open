@@ -50,7 +50,7 @@ namespace nx_stun
         //TODO #ak
     }
 
-    void StunClientConnection::connectionTerminated( const std::shared_ptr<StunClientConnection>& )
+    void StunClientConnection::closeConnection( StunClientConnection* connection )
     {
         //TODO #ak
     }

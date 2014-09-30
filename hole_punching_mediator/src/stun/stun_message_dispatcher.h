@@ -26,14 +26,14 @@ class STUNMessageDispatcher
         MessageDispatcher<
             StunServerConnection,
             nx_stun::Message,
-            typename std::unordered_map<int, typename std::function<bool(const std::weak_ptr<StunServerConnection>&, nx_stun::Message&&)> > >
+            typename std::unordered_map<int, typename std::function<bool(StunServerConnection*, nx_stun::Message&&)> > >
 
 {
     typedef
         MessageDispatcher<
             StunServerConnection,
             nx_stun::Message,
-            typename std::unordered_map<int, typename std::function<bool(const std::weak_ptr<StunServerConnection>&, nx_stun::Message&&)> > > base_type;
+            typename std::unordered_map<int, typename std::function<bool(StunServerConnection*, nx_stun::Message&&)> > > base_type;
 public:
     STUNMessageDispatcher();
     virtual ~STUNMessageDispatcher();
@@ -42,7 +42,7 @@ public:
     /*!
         \return \a true if request processing passed to corresponding processor and async processing has been started, \a false otherwise
     */
-    bool dispatchRequest( const std::weak_ptr<StunServerConnection>& conn, nx_stun::Message&& message )
+    bool dispatchRequest( StunServerConnection* conn, nx_stun::Message&& message )
     {
         return base_type::dispatchRequest( conn, message.header.method, std::move(message) );
     }

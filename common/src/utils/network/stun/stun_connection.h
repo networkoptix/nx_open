@@ -32,8 +32,7 @@ namespace nx_stun
             nx_stun::Message,
             nx_stun::MessageParser,
             nx_stun::MessageSerializer>,
-        public QnStoppableAsync,
-        protected std::enable_shared_from_this<StunClientConnection>
+        public QnStoppableAsync
     {
         typedef BaseStreamProtocolConnection<
             StunClientConnection,
@@ -88,7 +87,7 @@ namespace nx_stun
         /*!
             \note Required by \a nx_api::BaseServerConnection
         */
-        void connectionTerminated( const std::shared_ptr<StunClientConnection>& );
+        void closeConnection( StunClientConnection* );
     };
 }
 

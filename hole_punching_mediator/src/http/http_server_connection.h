@@ -41,9 +41,6 @@ public:
     ~HttpServerConnection();
 
     void processMessage( nx_http::Message&& request );
-
-private:
-    void responseSent();
 };
 
 #endif  //HTTP_SERVER_CONNECTION_H

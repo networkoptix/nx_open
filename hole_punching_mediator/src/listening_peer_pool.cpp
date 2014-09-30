@@ -18,7 +18,7 @@ ListeningPeerPool::~ListeningPeerPool()
     ListeningPeerPool_instance.store( nullptr, std::memory_order_relaxed );
 }
 
-bool ListeningPeerPool::processBindRequest( const std::weak_ptr<StunServerConnection>& connection, nx_stun::Message&& message )
+bool ListeningPeerPool::processBindRequest( StunServerConnection* connection, nx_stun::Message&& message )
 {
     //retrieving requests parameters:
         //address to bind to. This address MUST have following format: {server_guid}.{system_name}
@@ -34,7 +34,7 @@ bool ListeningPeerPool::processBindRequest( const std::weak_ptr<StunServerConnec
     return false;
 }
 
-bool ListeningPeerPool::processConnectRequest( const std::weak_ptr<StunServerConnection>& connection, nx_stun::Message&& message )
+bool ListeningPeerPool::processConnectRequest( StunServerConnection* connection, nx_stun::Message&& message )
 {
     //retrieving requests parameters:
         //address to connect to. This address has following format: {server_guid}.{system_name} or just {system_name}. 

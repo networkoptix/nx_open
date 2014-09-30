@@ -6,8 +6,6 @@
 #ifndef LISTENING_PEER_POOL_H
 #define LISTENING_PEER_POOL_H
 
-#include <memory>
-
 #include "db/registered_systems_data_manager.h"
 #include "stun/stun_server_connection.h"
 
@@ -26,11 +24,11 @@ public:
     /*!
         \note Follows \a STUNMessageDispatcher::MessageProcessorType signature
     */
-    bool processBindRequest( const std::weak_ptr<StunServerConnection>& connection, nx_stun::Message&& message );
+    bool processBindRequest( StunServerConnection* connection, nx_stun::Message&& message );
     /*!
         \note Follows \a STUNMessageDispatcher::MessageProcessorType signature
     */
-    bool processConnectRequest( const std::weak_ptr<StunServerConnection>& connection, nx_stun::Message&& message );
+    bool processConnectRequest( StunServerConnection* connection, nx_stun::Message&& message );
 
     static ListeningPeerPool* instance();
 };

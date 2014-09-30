@@ -25,7 +25,6 @@ template<class CustomServerType, class ConnectionType>
 {
 public:
     typedef typename StreamSocketServer<CustomServerType, ConnectionType> SelfType;
-    typedef typename std::shared_ptr<ConnectionType> ConnectionPtr;
 
     //!Initialization
     StreamSocketServer( bool sslRequired, SocketFactory::NatTraversalType natTraversalRequired )
@@ -50,8 +49,6 @@ public:
     }
 
     //!Calls \a AbstractStreamServerSocket::listen
-    //template<class HandlerType>
-    //    bool listen( const HandlerType& handler )
     bool listen()
     {
         using namespace std::placeholders;
@@ -74,17 +71,18 @@ public:
 
         if( newConnection )
         {
-            auto conn = std::make_shared<ConnectionType>( static_cast<CustomServerType*>(this), newConnection );
+            std::unique_ptr<ConnectionType> conn( new ConnectionType( static_cast<CustomServerType*>(this), newConnection ) );
             if( conn->startReadingConnection() )
             {
                 std::unique_lock<std::mutex> lk( m_mutex );
-                m_connections.insert( conn );
+                ConnectionType* connectionPtr = conn.get();
+                m_connections.emplace( connectionPtr, std::move(conn) );
             }
         }
         m_socket->acceptAsync( std::bind( &SelfType::newConnectionAccepted, this, _1, _2 ) );
     }
 
-    void connectionTerminated( const ConnectionPtr& connection )
+    void closeConnection( ConnectionType* connection )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
         m_connections.erase( connection );
@@ -93,7 +91,7 @@ public:
 private:
     std::shared_ptr<AbstractStreamServerSocket> m_socket;
     std::mutex m_mutex;
-    std::set<ConnectionPtr> m_connections;
+    std::map<ConnectionType*, std::unique_ptr<ConnectionType>> m_connections;
 };
 
 #endif  //STREAM_SOCKET_SERVER_H

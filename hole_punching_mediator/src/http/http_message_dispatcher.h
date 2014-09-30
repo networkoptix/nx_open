@@ -20,14 +20,14 @@ namespace nx_http
             ::MessageDispatcher<
                 HttpServerConnection,
                 nx_http::Message,
-                typename std::map<QString, typename std::function<bool(const std::weak_ptr<HttpServerConnection>&, nx_http::Message&&)> > >
+                typename std::map<QString, typename std::function<bool(HttpServerConnection*, nx_http::Message&&)> > >
 
     {
         typedef
             ::MessageDispatcher<
                 HttpServerConnection,
                 nx_http::Message,
-                typename std::map<QString, typename std::function<bool(const std::weak_ptr<HttpServerConnection>&, nx_http::Message&&)> > > base_type;
+                typename std::map<QString, typename std::function<bool(HttpServerConnection*, nx_http::Message&&)> > > base_type;
     public:
         MessageDispatcher();
         virtual ~MessageDispatcher();
@@ -36,7 +36,7 @@ namespace nx_http
         /*!
             \return \a true if request processing passed to corresponding processor and async processing has been started, \a false otherwise
         */
-        bool dispatchRequest( const std::weak_ptr<HttpServerConnection>& conn, nx_http::Message&& message )
+        bool dispatchRequest( HttpServerConnection* conn, nx_http::Message&& message )
         {
             assert( message.type == nx_http::MessageType::request );
             return base_type::dispatchRequest( conn, message.request->requestLine.url.path(), std::move(message) );

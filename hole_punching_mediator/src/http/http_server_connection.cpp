@@ -25,18 +25,13 @@ HttpServerConnection::~HttpServerConnection()
 
 void HttpServerConnection::processMessage( nx_http::Message&& request )
 {
-    if( !nx_http::MessageDispatcher::instance()->dispatchRequest( std::static_pointer_cast<HttpServerConnection>(shared_from_this()), std::move(request) ) )
+    if( !nx_http::MessageDispatcher::instance()->dispatchRequest( this, std::move(request) ) )
     {
         //creating and sending error response
         nx_http::Message response( nx_http::MessageType::response );
         response.response->statusLine.version = request.request->requestLine.version;
         response.response->statusLine.statusCode = nx_http::StatusCode::notFound;
         response.response->statusLine.reasonPhrase = nx_http::StatusCode::toString( response.response->statusLine.statusCode );
-        sendMessage( std::move( response ), std::bind( &HttpServerConnection::responseSent, this ) );
+        sendMessage( std::move( response ), std::bind( &HttpServerConnection::closeConnection, this ) );
     }
-}
-
-void HttpServerConnection::responseSent()
-{
-    closeConnection();
 }

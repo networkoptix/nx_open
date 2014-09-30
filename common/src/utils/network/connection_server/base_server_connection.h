@@ -37,21 +37,18 @@ namespace nx_api
         and method(s):
         \code {*.cpp}
             //!This connection is passed here just after socket has been terminated
-            connectionTerminated( std::shared_ptr<CustomConnectionManagerType::ConnectionType> )
+            closeConnection( std::shared_ptr<CustomConnectionManagerType::ConnectionType> )
         \endcode
 
         \todo support message interleaving
         \note This class is not thread-safe. All methods are expected to be executed in aio thread, undelying socket is bound to. 
             In other case, it is caller's responsibility to syunchronize access to the connection object.
         \note Despite absence of thread-safety simultaneous read/write operations are allowed in different threads
-        \note Instance of this class MUST be handled with \a std::shared_ptr
     */
     template<
         class CustomConnectionType,
         class CustomConnectionManagerType
     > class BaseServerConnection
-    :
-        protected std::enable_shared_from_this<BaseServerConnection<CustomConnectionType, CustomConnectionManagerType> >
     {
     public:
         typedef BaseServerConnection<CustomConnectionType, CustomConnectionManagerType> SelfType;
@@ -101,7 +98,7 @@ namespace nx_api
 
         void closeConnection()
         {
-            m_connectionManager->connectionTerminated( std::static_pointer_cast<CustomConnectionManagerType::ConnectionType>(shared_from_this()) );
+            m_connectionManager->closeConnection( static_cast<CustomConnectionManagerType::ConnectionType*>(this) );
         }
 
         //!Register handler to be executed when connection just about to be destroyed
@@ -127,7 +124,7 @@ namespace nx_api
             if( errorCode != SystemError::noError )
                 return handleSocketError( errorCode );
             if( bytesRead == 0 )    //connection closed by remote peer
-                return m_connectionManager->connectionTerminated( std::static_pointer_cast<CustomConnectionManagerType::ConnectionType>(shared_from_this()) );
+                return m_connectionManager->closeConnection( static_cast<CustomConnectionManagerType::ConnectionType*>(this) );
 
             assert( m_readBuffer.size() == bytesRead );
             static_cast<CustomConnectionType*>(this)->bytesReceived( m_readBuffer ); 
@@ -156,11 +153,11 @@ namespace nx_api
 
                 case SystemError::connectionReset:
                 case SystemError::notConnected:
-                    return m_connectionManager->connectionTerminated( std::static_pointer_cast<CustomConnectionManagerType::ConnectionType>(shared_from_this()) );
+                    return m_connectionManager->closeConnection( static_cast<CustomConnectionManagerType::ConnectionType*>(this) );
 
                 default:
                     //TODO #ak process error code
-                    return m_connectionManager->connectionTerminated( std::static_pointer_cast<CustomConnectionManagerType::ConnectionType>(shared_from_this()) );
+                    return m_connectionManager->closeConnection( static_cast<CustomConnectionManagerType::ConnectionType*>(this) );
             }
         }
     };

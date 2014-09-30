@@ -40,7 +40,7 @@ public:
             If handler has to save connection for later use (e.g., handler uses some async fsm) than it is strongly recommended to save weak pointer to connection, 
             not strong one! And register connection closure handler with \a BaseServerConnection::registerCloseHandler
     */
-    typedef std::function<bool(const std::weak_ptr<connection_type>&, message_type&&)> MessageProcessorType;
+    typedef std::function<bool(connection_type*, message_type&&)> MessageProcessorType;
 
     //!Implementation of \a QnStoppableAsync::pleaseStop
     /*!
@@ -67,7 +67,7 @@ public:
         \return \a true if request processing passed to corresponding processor and async processing has been started, \a false otherwise
     */
     bool dispatchRequest(
-        const std::weak_ptr<connection_type>& conn,
+        connection_type* conn,
         typename ProcessorDictionaryType::key_type method,
         message_type&& message )
     {

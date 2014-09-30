@@ -19,10 +19,7 @@ class RegisterSystemHttpHandler
 public:
     static const QString HANDLER_PATH;
 
-    bool processRequest( const std::weak_ptr<HttpServerConnection>& connection, nx_http::Message&& message );
-
-private:
-    void responseSent( const std::weak_ptr<HttpServerConnection>& connection );
+    bool processRequest( HttpServerConnection* connection, nx_http::Message&& message );
 };
 
 #endif  //NX_REGISTER_HTTP_HANDLER_H

@@ -42,7 +42,8 @@ void HolePuncherProcess::pleaseStop()
 int HolePuncherProcess::executeApplication()
 {
     static const QLatin1String DEFAULT_LOG_LEVEL( "ERROR" );
-    static const QLatin1String DEFAULT_ADDRESS_TO_LISTEN( ":3345" );
+    static const QLatin1String DEFAULT_STUN_ADDRESS_TO_LISTEN( ":3345" );
+    static const QLatin1String DEFAULT_HTTP_ADDRESS_TO_LISTEN( ":3346" );
 
 
     //reading settings
@@ -83,16 +84,29 @@ int HolePuncherProcess::executeApplication()
         NX_LOG( lit( "Software revision: %1" ).arg( QN_APPLICATION_REVISION ), cl_logALWAYS );
     }
 
-    const QStringList& addrToListenStrList = m_settings->value("addressToListen", DEFAULT_ADDRESS_TO_LISTEN).toString().split(',');
-    std::list<SocketAddress> addrToListenList;
+    const QStringList& stunAddrToListenStrList = m_settings->value("stunListenOn", DEFAULT_STUN_ADDRESS_TO_LISTEN).toString().split(',');
+    const QStringList& httpAddrToListenStrList = m_settings->value("httpListenOn", DEFAULT_HTTP_ADDRESS_TO_LISTEN).toString().split(',');
+    std::list<SocketAddress> stunAddrToListenList;
     std::transform(
-        addrToListenStrList.begin(),
-        addrToListenStrList.end(),
-        std::back_inserter(addrToListenList),
+        stunAddrToListenStrList.begin(),
+        stunAddrToListenStrList.end(),
+        std::back_inserter(stunAddrToListenList),
         [] (const QString& str) { return SocketAddress(str); } );
-    if( addrToListenList.empty() )
+    if( stunAddrToListenList.empty() )
     {
-        NX_LOG( "No address to listen", cl_logALWAYS );
+        NX_LOG( "No STUN address to listen", cl_logALWAYS );
+        return 1;
+    }
+
+    std::list<SocketAddress> httpAddrToListenList;
+    std::transform(
+        httpAddrToListenStrList.begin(),
+        httpAddrToListenStrList.end(),
+        std::back_inserter(httpAddrToListenList),
+        [] (const QString& str) { return SocketAddress(str); } );
+    if( httpAddrToListenList.empty() )
+    {
+        NX_LOG( "No HTTP address to listen", cl_logALWAYS );
         return 1;
     }
 
@@ -105,7 +119,7 @@ int HolePuncherProcess::executeApplication()
     nx_http::MessageDispatcher httpMessageDispatcher;
     httpMessageDispatcher.registerRequestProcessor(
         RegisterSystemHttpHandler::HANDLER_PATH,
-        [&registerHttpHandler](const std::weak_ptr<HttpServerConnection>& connection, nx_http::Message&& message) -> bool {
+        [&registerHttpHandler](HttpServerConnection* connection, nx_http::Message&& message) -> bool {
             return registerHttpHandler.processRequest( connection, std::move(message) );
         }
     );
@@ -118,18 +132,18 @@ int HolePuncherProcess::executeApplication()
     STUNMessageDispatcher stunMessageDispatcher;
     stunMessageDispatcher.registerRequestProcessor(
         nx_hpm::StunMethods::bind,
-        [&listeningPeerPool](const std::weak_ptr<StunServerConnection>& connection, nx_stun::Message&& message) -> bool {
+        [&listeningPeerPool](StunServerConnection* connection, nx_stun::Message&& message) -> bool {
             return listeningPeerPool.processBindRequest( connection, std::move(message) );
         } );
     stunMessageDispatcher.registerRequestProcessor(
         nx_hpm::StunMethods::connect,
-        [&listeningPeerPool](const std::weak_ptr<StunServerConnection>& connection, nx_stun::Message&& message) -> bool {
+        [&listeningPeerPool](StunServerConnection* connection, nx_stun::Message&& message) -> bool {
             return listeningPeerPool.processConnectRequest( connection, std::move(message) );
         } );
 
     //accepting STUN requests by both tcp and udt
-    m_multiAddressStunServer.reset( new MultiAddressServer<StunStreamSocketServer>( addrToListenList, true, SocketFactory::nttAuto ) );
-    m_multiAddressHttpServer.reset( new MultiAddressServer<nx_http::HttpStreamSocketServer>( addrToListenList, true, SocketFactory::nttDisabled ) );
+    m_multiAddressStunServer.reset( new MultiAddressServer<StunStreamSocketServer>( stunAddrToListenList, true, SocketFactory::nttAuto ) );
+    m_multiAddressHttpServer.reset( new MultiAddressServer<nx_http::HttpStreamSocketServer>( httpAddrToListenList, true, SocketFactory::nttDisabled ) );
 
     if( !m_multiAddressStunServer->bind() )
         return 2;

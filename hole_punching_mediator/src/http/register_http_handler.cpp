@@ -10,7 +10,7 @@
 
 const QString RegisterSystemHttpHandler::HANDLER_PATH = QLatin1String("/register");
 
-bool RegisterSystemHttpHandler::processRequest( const std::weak_ptr<HttpServerConnection>& connection, nx_http::Message&& message )
+bool RegisterSystemHttpHandler::processRequest( HttpServerConnection* connection, nx_http::Message&& message )
 {
     //RegisteredSystemsDataManager::saveRegistrationDataAsync
 
@@ -27,13 +27,5 @@ bool RegisterSystemHttpHandler::processRequest( const std::weak_ptr<HttpServerCo
     response.response->headers.insert( nx_http::HttpHeader( "Content-Type", "text/html" ) );
     response.response->headers.insert( nx_http::HttpHeader( "Content-Size", QByteArray::number( response.response->messageBody.size() ) ) );
 
-    return connection.lock()->sendMessage( std::move( response ), std::bind( &RegisterSystemHttpHandler::responseSent, this, connection ) );
-}
-
-void RegisterSystemHttpHandler::responseSent( const std::weak_ptr<HttpServerConnection>& connection )
-{
-    const std::shared_ptr<HttpServerConnection>& strongConnectionRef = connection.lock();
-    if( !strongConnectionRef )
-        return;
-    strongConnectionRef->closeConnection();
+    return connection->sendMessage( std::move( response ), std::bind( &HttpServerConnection::closeConnection, connection ) );
 }
