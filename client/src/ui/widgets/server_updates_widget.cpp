@@ -340,8 +340,14 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
     case QnUpdateResult::DownloadingFailed:
         QMessageBox::critical(this, tr("Update failed"), tr("Could not download updates."));
         break;
+    case QnUpdateResult::DownloadingFailed_NoFreeSpace:
+        QMessageBox::critical(this, tr("Update failed"), tr("Could not download updates.") + lit("\n") + tr("No free space left on the disk."));
+        break;
     case QnUpdateResult::UploadingFailed:
         QMessageBox::critical(this, tr("Update failed"), tr("Could not push updates to servers."));
+        break;
+    case QnUpdateResult::UploadingFailed_NoFreeSpace:
+        QMessageBox::critical(this, tr("Update failed"), tr("Could not push updates to servers.") + lit("\n") + tr("No free space left on the server."));
         break;
     case QnUpdateResult::ClientInstallationFailed:
         QMessageBox::critical(this, tr("Update failed"), tr("Could not install an update to the client."));

@@ -38,7 +38,9 @@ struct QnUpdateResult {
         Cancelled,
         LockFailed,
         DownloadingFailed,
+        DownloadingFailed_NoFreeSpace,
         UploadingFailed,
+        UploadingFailed_NoFreeSpace,
         ClientInstallationFailed,
         InstallationFailed,
         RestInstallationFailed

@@ -114,7 +114,7 @@ void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
 }
 
 void QnCheckForUpdatesPeerTask::checkBuildOnline() {
-    QUrl url(m_updateLocationPrefix + QString::number(m_target.version.build()) + lit("/") + buildInformationSuffix);
+    QUrl url(m_updateLocationPrefix + lit("/") + QString::number(m_target.version.build()) + lit("/") + buildInformationSuffix);
 
     nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
@@ -226,7 +226,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *r
         return;
     }
 
-    QString urlPrefix = m_updateLocationPrefix + QString::number(m_target.version.build()) + lit("/");
+    QString urlPrefix = m_updateLocationPrefix + lit("/") + QString::number(m_target.version.build()) + lit("/");
 
     QVariantMap packages = map.value(lit("packages")).toMap();
     for (auto platform = packages.begin(); platform != packages.end(); ++platform) {
