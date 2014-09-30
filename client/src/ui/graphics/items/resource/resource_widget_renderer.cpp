@@ -303,7 +303,8 @@ bool QnResourceWidgetRenderer::constantDownscaleFactor() const {
 QSize QnResourceWidgetRenderer::sourceSize() const {
     QMutexLocker locker(&m_mutex);
 
-    return QSize(m_sourceSize.width() * m_panoFactor, m_sourceSize.height());
+    //return QSize(m_sourceSize.width() * m_panoFactor, m_sourceSize.height());
+    return QSize(m_sourceSize.width(), m_sourceSize.height());
 }
 
 const QGLContext* QnResourceWidgetRenderer::glContext() const

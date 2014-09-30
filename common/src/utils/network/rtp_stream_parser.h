@@ -6,6 +6,8 @@
 #include "core/resource/resource_media_layout.h"
 #include "rtpsession.h"
 
+#include <deque>
+
 class RTPIODevice;
 class RtspStatistic;
 
@@ -48,10 +50,17 @@ public:
 
     // used for sync audio/video streams
     void setTimeHelper(QnRtspTimeHelper* timeHelper);
+
+    virtual QnAbstractMediaDataPtr nextData() = 0;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData) = 0;
+
+    int logicalChannelNum() const { return m_logicalChannelNum; }
+    void setLogicalChannelNum(int value) { m_logicalChannelNum = value; }
 signals:
     void packetLostDetected(quint32 prev, quint32 next);
 protected:
     QnRtspTimeHelper* m_timeHelper;
+    int m_logicalChannelNum;
 };
 
 class QnRtspAudioLayout: public QnResourceAudioLayout
@@ -70,7 +79,9 @@ class QnRtpVideoStreamParser: public QnRtpStreamParser
 public:
     QnRtpVideoStreamParser();
 
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result) = 0;
+    virtual QnAbstractMediaDataPtr nextData() override;
+protected:
+    QnAbstractMediaDataPtr m_mediaData;
 protected:
     struct Chunk
     {
@@ -87,9 +98,12 @@ protected:
 class QnRtpAudioStreamParser: public QnRtpStreamParser
 {
 public:
-    virtual QnResourceAudioLayoutPtr getAudioLayout() = 0;
+    QnRtpAudioStreamParser() {}
 
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result) = 0;
+    virtual QnResourceAudioLayoutPtr getAudioLayout() = 0;
+    virtual QnAbstractMediaDataPtr nextData() override;
+protected:
+    std::deque<QnAbstractMediaDataPtr> m_audioData;
 protected:
     void processIntParam(const QByteArray& checkName, int& setValue, const QByteArray& param);
     void processHexParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param);
