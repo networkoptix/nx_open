@@ -22,14 +22,12 @@ namespace nx_api
         \a CustomConnectionType MUST provide following methods:
         \code {*.cpp}
             //!Called for every received message 
-            void processMessage( const Message& request );
-            //!Called after sending message (e.g. response)
-            void messageSent();
+            void processMessage( Message&& request );
         \endcode
     */
     template<
         class CustomConnectionType,
-        class CustomSocketServerType,
+        class CustomConnectionManagerType,
         class MessageType,
         class ParserType,
         class SerializerType
@@ -38,29 +36,29 @@ namespace nx_api
         public BaseServerConnection<
             BaseStreamProtocolConnection<
                 CustomConnectionType,
-                CustomSocketServerType,
+                CustomConnectionManagerType,
                 MessageType,
                 ParserType,
                 SerializerType>,
-            CustomSocketServerType>
+            CustomConnectionManagerType>
     {
     public:
         typedef BaseStreamProtocolConnection<
             CustomConnectionType,
-            CustomSocketServerType,
+            CustomConnectionManagerType,
             MessageType,
             ParserType,
             SerializerType> SelfType;
-        //typedef BaseStreamProtocolConnection<CustomConnectionType, CustomSocketServerType> SelfType;
-        typedef BaseServerConnection<SelfType, CustomSocketServerType> BaseType;
+        //typedef BaseStreamProtocolConnection<CustomConnectionType, CustomConnectionManagerType> SelfType;
+        typedef BaseServerConnection<SelfType, CustomConnectionManagerType> BaseType;
         //!Type of messages used by this connection class. Request/response/indication is sub-class of message, so no difference at this level
         typedef MessageType message_type;
 
         BaseStreamProtocolConnection(
-            CustomSocketServerType* streamServer,
+            CustomConnectionManagerType* connectionManager,
             AbstractCommunicatingSocket* streamSocket )
         :
-            BaseType( streamServer, streamSocket ),
+            BaseType( connectionManager, streamSocket ),
             m_serializerState( SerializerState::done ),
             m_isSendingMessage( 0 )
         {
@@ -143,7 +141,7 @@ namespace nx_api
                 return false;   //TODO: #ak interleaving is not supported yet
 
             m_sendCompletionHandler = std::move(handler);
-            sendResponseMessage( std::move(msg) );
+            sendMessageInternal( std::move(msg) );
             return true;
         }
 
@@ -156,7 +154,7 @@ namespace nx_api
         std::atomic<int> m_isSendingMessage;
         std::function<void(SystemError::ErrorCode)> m_sendCompletionHandler;
 
-        void sendResponseMessage( MessageType&& msg )
+        void sendMessageInternal( MessageType&& msg )
         {
             //serializing message
             m_serializer.setMessage( std::move(msg) );

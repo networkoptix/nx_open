@@ -30,7 +30,6 @@ bool RegisterSystemHttpHandler::processRequest( const std::weak_ptr<HttpServerCo
     return connection.lock()->sendMessage( std::move( response ), std::bind( &RegisterSystemHttpHandler::responseSent, this, connection ) );
 }
 
-
 void RegisterSystemHttpHandler::responseSent( const std::weak_ptr<HttpServerConnection>& connection )
 {
     const std::shared_ptr<HttpServerConnection>& strongConnectionRef = connection.lock();

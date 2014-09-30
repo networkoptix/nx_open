@@ -1,34 +1,95 @@
 /**********************************************************
-* 29 aug 2014
+* 30 sep 2014
 * a.kolesnikov
 ***********************************************************/
 
 #ifndef NX_STUN_CONNECTION_H
 #define NX_STUN_CONNECTION_H
 
-#if 0
-
 #include <functional>
+#include <memory>
+
+#include <utils/network/connection_server/base_stream_protocol_connection.h>
+#include <utils/common/stoppable.h>
 
 #include "stun_message.h"
+#include "stun_message_parser.h"
+#include "stun_message_serializer.h"
 
 
 namespace nx_stun
 {
-    //!Connection to STUN server (client-side)
-    class ClientConnection
+    //!Connects to STUN server, sends requests, receives responses and indications
+    /*!
+        \note Methods of this class are not thread-safe
+        \todo restore interrupted connection ?
+    */
+    class StunClientConnection
+    :
+        public nx_api::BaseStreamProtocolConnection<
+            StunClientConnection,
+            StunClientConnection,
+            nx_stun::Message,
+            nx_stun::MessageParser,
+            nx_stun::MessageSerializer>,
+        public QnStoppableAsync,
+        protected std::enable_shared_from_this<StunClientConnection>
     {
+        typedef BaseStreamProtocolConnection<
+            StunClientConnection,
+            StunClientConnection,
+            nx_stun::Message,
+            nx_stun::MessageParser,
+            nx_stun::MessageSerializer
+        > BaseConnectionType;
+
     public:
-        void registerIndicationHandler( std::function<void(const nx_stun::Message&)>&& eventReceiver );
+        //!As required by \a nx_api::BaseServerConnection
+        typedef StunClientConnection ConnectionType;
+
+        StunClientConnection(
+            const SocketAddress& stunServerEndpoint,
+            SocketFactory::NatTraversalType natTraversalType = SocketFactory::nttAuto );
+        virtual ~StunClientConnection();
+
+        //!Implementation of QnStoppableAsync::pleaseStop
         /*!
-            \return \a true if async request has been started, \a false otherwise
+            Cancels ongoing request (if any)
         */
-        bool sendRequestAsync(
-            const StunMessage& request,
-            std::function<void(nx_stun::attr::ErrorCode, const nx_stun::Message&)>&& completionHandler );
+        virtual void pleaseStop( std::function<void()>&& completionHandler ) override;
+
+        //!Asynchronously openes connection to the server, specified during initialization
+        /*!
+            \return \a false, if could not start asynchronous send (this can happen due to lack of resources on host machine)
+            \note It is valid to call \a StunClientConnection::sendRequest when connection has not completed yet
+        */
+        bool openConnection( std::function<void(SystemError::ErrorCode)>&& completionHandler );
+        //!Register handler to be invoked on receiving indication
+        /*!
+            \note \a indicationHandler will be invoked in aio thread
+        */
+        void registerIndicationHandler( std::function<void(nx_stun::Message&&)>&& indicationHandler );
+        //!Sends message asynchronously
+        /*!
+            \param completionHandler Triggered after response has been received or error has occured. 
+                \a Message attribute is valid only if first attribute value is \a SystemError::noError
+            \return \a false, if could not start asynchronous send (this can happen due to lack of resources on host machine)
+            \note If connection to server has not been opened yet then opens one
+            \note It is valid to call this method after If \a StunClientConnection::openConnection has been called and not completed yet
+        */
+        bool sendRequest(
+            nx_stun::Message&& request,
+            std::function<void(SystemError::ErrorCode, nx_stun::Message&&)>&& completionHandler );
+
+        /*!
+            \note Required by \a nx_api::BaseStreamProtocolConnection
+        */
+        void processMessage( nx_stun::Message&& msg );
+        /*!
+            \note Required by \a nx_api::BaseServerConnection
+        */
+        void connectionTerminated( const std::shared_ptr<StunClientConnection>& );
     };
 }
-
-#endif
 
 #endif  //NX_STUN_CONNECTION_H

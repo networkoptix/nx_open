@@ -58,7 +58,7 @@ public:
 
         if( !m_socket->listen() )
             return false;
-        return m_socket->acceptAsync( std::bind( std::mem_fn(&SelfType::newConnectionAccepted), this, _1, _2 ) );
+        return m_socket->acceptAsync( std::bind( &SelfType::newConnectionAccepted, this, _1, _2 ) );
     }
 
     SocketAddress address() const
@@ -75,10 +75,13 @@ public:
         if( newConnection )
         {
             auto conn = std::make_shared<ConnectionType>( static_cast<CustomServerType*>(this), newConnection );
-            std::unique_lock<std::mutex> lk( m_mutex );
-            m_connections.insert( conn );
+            if( conn->startReadingConnection() )
+            {
+                std::unique_lock<std::mutex> lk( m_mutex );
+                m_connections.insert( conn );
+            }
         }
-        m_socket->acceptAsync( std::bind( std::mem_fn(&SelfType::newConnectionAccepted), this, _1, _2 ) );
+        m_socket->acceptAsync( std::bind( &SelfType::newConnectionAccepted, this, _1, _2 ) );
     }
 
     void connectionTerminated( const ConnectionPtr& connection )

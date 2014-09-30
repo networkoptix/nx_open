@@ -6,6 +6,7 @@
 #ifndef STUN_SERVER_CONNECTION_H
 #define STUN_SERVER_CONNECTION_H
 
+#include <utils/common/stoppable.h>
 #include <utils/network/stun/stun_message.h>
 #include <utils/network/stun/stun_message_parser.h>
 #include <utils/network/stun/stun_message_parse_handler.h>
