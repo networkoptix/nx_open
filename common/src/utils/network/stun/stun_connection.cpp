@@ -10,48 +10,62 @@ namespace nx_stun
 {
     StunClientConnection::StunClientConnection(
         const SocketAddress& stunServerEndpoint,
+        bool useSsl,
         SocketFactory::NatTraversalType natTraversalType )
     :
-        BaseConnectionType( this, nullptr )
+    //    BaseConnectionType( this, nullptr )
+        m_stunServerEndpoint( stunServerEndpoint )
     {
+        //TODO creating connection
+
+        m_socket.reset( SocketFactory::createStreamSocket( useSsl, natTraversalType ) );
+        m_baseConnection.reset( new BaseConnectionType( this, m_socket.get() ) );
+        using namespace std::placeholders;
+        m_baseConnection->setMessageHandler( [this]( nx_stun::Message&& msg ) { processMessage( std::move(msg) ); } );
     }
 
     StunClientConnection::~StunClientConnection()
     {
-        //TODO #ak
+        //TODO
     }
 
     void StunClientConnection::pleaseStop( std::function<void()>&& completionHandler )
     {
-        //TODO #ak
+        //TODO
     }
 
     bool StunClientConnection::openConnection( std::function<void(SystemError::ErrorCode)>&& completionHandler )
     {
-        //TODO #ak
+        //m_socket->connectAsync( m_stunServerEndpoint, std::bind(&StunClientConnection::onConnectionDone) );
+
+        //TODO
         return false;
     }
 
     void StunClientConnection::registerIndicationHandler( std::function<void(nx_stun::Message&&)>&& indicationHandler )
     {
-        //TODO #ak
+        //TODO
     }
 
     bool StunClientConnection::sendRequest(
         nx_stun::Message&& request,
         std::function<void(SystemError::ErrorCode, nx_stun::Message&&)>&& completionHandler )
     {
-        //TODO #ak
-        return false;
-    }
+        //if( !m_connected )
+        //    return m_socket->connectAsync( m_stunServerEndpoint, std::bind(&StunClientConnection::onConnectionDone) );
 
-    void StunClientConnection::processMessage( nx_stun::Message&& msg )
-    {
-        //TODO #ak
+        //TODO
+
+        return false;
     }
 
     void StunClientConnection::closeConnection( StunClientConnection* connection )
     {
-        //TODO #ak
+        //TODO
+    }
+
+    void StunClientConnection::processMessage( nx_stun::Message&& msg )
+    {
+        //TODO
     }
 }

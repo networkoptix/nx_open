@@ -163,6 +163,75 @@ namespace nx_api
             readyToSendData();
         }
     };
+
+    /*!
+        Inherits \a BaseStreamProtocolConnection and delegates \a processMessage to functor set with \a BaseStreamProtocolConnectionEmbeddable::setMessageHandler
+        \todo Remove this class or get rid of virtual call (in function)
+    */
+    template<
+        class CustomConnectionManagerType,
+        class MessageType,
+        class ParserType,
+        class SerializerType
+    > class BaseStreamProtocolConnectionEmbeddable
+    :
+        public BaseStreamProtocolConnection<
+            BaseStreamProtocolConnectionEmbeddable<
+                CustomConnectionManagerType,
+                MessageType,
+                ParserType,
+                SerializerType>,
+            CustomConnectionManagerType,
+            MessageType,
+            ParserType,
+            SerializerType>
+    {
+        typedef BaseStreamProtocolConnectionEmbeddable<
+            CustomConnectionManagerType,
+            MessageType,
+            ParserType,
+            SerializerType
+        > self_type;
+        typedef BaseStreamProtocolConnection<
+            self_type,
+            CustomConnectionManagerType,
+            MessageType,
+            ParserType,
+            SerializerType
+        > base_type;
+
+    public:
+        BaseStreamProtocolConnectionEmbeddable(
+            CustomConnectionManagerType* connectionManager,
+            AbstractCommunicatingSocket* streamSocket )
+        :
+            base_type(
+                connectionManager,
+                streamSocket )
+        {
+        }
+
+        template<class T>
+        void setMessageHandler( T handler )
+        {
+            m_handler = handler;
+        }
+
+        //template<class T>
+        //void setMessageHandler( T&& handler )
+        //{
+        //    m_handler = std::move(handler);
+        //}
+
+        void processMessage( MessageType&& msg )
+        {
+            if( m_handler )
+                m_handler( std::move(msg) );
+        }
+
+    private:
+        std::function<void(MessageType&&)> m_handler;
+    };
 }
 
 #endif   //BASE_STREAM_PROTOCOL_CONNECTION_H

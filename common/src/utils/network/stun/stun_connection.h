@@ -26,28 +26,15 @@ namespace nx_stun
     */
     class StunClientConnection
     :
-        public nx_api::BaseStreamProtocolConnection<
-            StunClientConnection,
-            StunClientConnection,
-            nx_stun::Message,
-            nx_stun::MessageParser,
-            nx_stun::MessageSerializer>,
         public QnStoppableAsync
     {
-        typedef nx_api::BaseStreamProtocolConnection<
-            StunClientConnection,
-            StunClientConnection,
-            nx_stun::Message,
-            nx_stun::MessageParser,
-            nx_stun::MessageSerializer
-        > BaseConnectionType;
-
     public:
         //!As required by \a nx_api::BaseServerConnection
         typedef StunClientConnection ConnectionType;
 
         StunClientConnection(
             const SocketAddress& stunServerEndpoint,
+            bool useSsl = false,
             SocketFactory::NatTraversalType natTraversalType = SocketFactory::nttAuto );
         virtual ~StunClientConnection();
 
@@ -81,13 +68,26 @@ namespace nx_stun
             std::function<void(SystemError::ErrorCode, nx_stun::Message&&)>&& completionHandler );
 
         /*!
-            \note Required by \a nx_api::BaseStreamProtocolConnection
-        */
-        void processMessage( nx_stun::Message&& msg );
-        /*!
             \note Required by \a nx_api::BaseServerConnection
         */
         void closeConnection( StunClientConnection* );
+
+    private:
+        typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
+                StunClientConnection,
+                nx_stun::Message,
+                nx_stun::MessageParser,
+                nx_stun::MessageSerializer
+            > BaseConnectionType;
+
+        std::unique_ptr<AbstractCommunicatingSocket> m_socket;
+        std::unique_ptr<BaseConnectionType> m_baseConnection;
+        const SocketAddress m_stunServerEndpoint;
+
+        /*!
+            \note Required by \a nx_api::BaseStreamProtocolConnection
+        */
+        void processMessage( nx_stun::Message&& msg );
     };
 }
 
