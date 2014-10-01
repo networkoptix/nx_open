@@ -490,7 +490,11 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::BadUpdateFile:
-            detail = tr("Cannot update from this file");
+            detail = tr("Cannot update from this file.");
+            setWarningStyle(&detailPalette);
+            break;
+        case QnCheckForUpdateResult::NoFreeSpace:
+            detail = tr("Cannot extract the update file.") + lit("\n") + tr("No free space left on the disk.");
             setWarningStyle(&detailPalette);
             break;
         default:
