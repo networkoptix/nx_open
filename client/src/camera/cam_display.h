@@ -234,7 +234,6 @@ protected:
     int m_audioBufferSize;
     qint64 m_minAudioDetectJumpInterval;
     qint64 m_videoQueueDuration;
-    qint64 m_lastQueuedVideoTime;
     bool m_useMTRealTimeDecode; // multi thread decode for live temporary allowed
     bool m_forceMtDecoding; // force multi thread decode in any case
 
@@ -252,6 +251,8 @@ protected:
     bool m_multiView;
     bool m_fisheyeEnabled;
     int m_channelsCount;
+
+    qint64 m_lastQueuedVideoTime;
     int m_liveBufferSize;
     bool m_liveMaxLenReached;
 };
