@@ -19,8 +19,8 @@ namespace nx_stun
     {
         bool parse( const UnknownAttribute& unknownAttr, StringAttributeType* val )
         {
-            //TODO
-            return false;
+            val->assign(unknownAttr.value.constData(),unknownAttr.value.size());
+            return true;
         }
     }
 

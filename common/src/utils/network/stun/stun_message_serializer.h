@@ -43,11 +43,11 @@ namespace nx_stun
         nx_api::SerializerState::Type serializeAttributeTypeAndLength( MessageSerializerBuffer* buffer ,const attr::Attribute* attribute , std::uint16_t** value_pos );
         nx_api::SerializerState::Type serializeAttributeValue( MessageSerializerBuffer* buffer ,const attr::Attribute* attribute , std::size_t* value );
         // value 
-        nx_api::SerializerState::Type serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attr::XorMappedAddress* , std::size_t* value );
-        nx_api::SerializerState::Type serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attr::FingerPrint* , std::size_t* value );
-        nx_api::SerializerState::Type serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attr::ErrorDescription* , std::size_t* value );
-        nx_api::SerializerState::Type serializeAttributeValue_MessageIntegrity( MessageSerializerBuffer* buffer ,const attr::MessageIntegrity* , std::size_t* value );
-        nx_api::SerializerState::Type serializeAttributeValue_UnknownAttribute( MessageSerializerBuffer* buffer ,const attr::UnknownAttribute* , std::size_t* value );
+        nx_api::SerializerState::Type serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attr::XorMappedAddress& , std::size_t* value );
+        nx_api::SerializerState::Type serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attr::FingerPrint& , std::size_t* value );
+        nx_api::SerializerState::Type serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attr::ErrorDescription& , std::size_t* value );
+        nx_api::SerializerState::Type serializeAttributeValue_MessageIntegrity( MessageSerializerBuffer* buffer ,const attr::MessageIntegrity& , std::size_t* value );
+        nx_api::SerializerState::Type serializeAttributeValue_UnknownAttribute( MessageSerializerBuffer* buffer ,const attr::UnknownAttribute& , std::size_t* value );
         // this function will do minimum checking for the message object
         bool checkMessageIntegratiy();
         // This helper function ensure that while we traveling the attributes of a message, the MessageIntegrity and the

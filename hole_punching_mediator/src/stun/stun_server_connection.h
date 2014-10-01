@@ -44,7 +44,17 @@ public:
 private:
     void processGetIPAddressRequest( nx_stun::Message&& request );
     void processProprietaryRequest( nx_stun::Message&& request );
-    void sendErrorReply( nx_stun::ErrorCode::Type errorCode );
+    void sendErrorReply( const nx_stun::TransactionID& transaciton_id , nx_stun::ErrorCode::Type errorCode );
+    void sendSuccessReply( const nx_stun::TransactionID& transaction_id );
+
+    // Verification routine for Bind session
+    bool verifyServerName( const nx_stun::attr::StringAttributeType& name );
+    bool verifyServerId( const nx_stun::attr::StringAttributeType& name );
+    bool verifyAuthroization( const nx_stun::attr::StringAttributeType& name );
+
+private:
+    // I guess I need to cache it to get the peer side address
+    AbstractCommunicatingSocket* socket_;
 };
 
 #endif  //STUN_SERVER_CONNECTION_H

@@ -44,13 +44,14 @@ void StunServerConnection::processMessage( nx_stun::Message&& message )
 void StunServerConnection::processGetIPAddressRequest( nx_stun::Message&& request )
 {
     //TODO get remote host address from socket, create response and send with sendMessage( response )
+    bool system_name_ok = false;
+    bool server_id_ok = false;
+    bool authorization_ok = false;
 
     for( const nx_stun::Message::AttributesMap::value_type& attr: request.attributes )
-    //std::for_each(request.attributes.begin(),request.attributes.end(),
-    //    [this,request]( const std::unique_ptr<nx_stun::attr::Attribute>& attr )
     {
         if(attr.second->type != nx_stun::attr::AttributeType::unknownAttribute ) {
-            sendErrorReply( nx_stun::ErrorCode::badRequest );
+            sendErrorReply( request.header.transactionID , nx_stun::ErrorCode::badRequest );
             return;
         }
         const nx_stun::attr::UnknownAttribute& unknown_attr = static_cast<const nx_stun::attr::UnknownAttribute&>(*attr.second);
@@ -58,35 +59,72 @@ void StunServerConnection::processGetIPAddressRequest( nx_stun::Message&& reques
         case nx_hpm::StunParameters::systemName:
             {
                 nx_stun::attr::StringAttributeType system_name;
-                if( !nx_stun::attr::parse( unknown_attr, &system_name ) )
-                    return sendErrorReply( nx_stun::ErrorCode::badRequest );
-
-                //TODO ...
-                //Actually, we do not need custom attributes to be processed for this STUN method (Binding)
-
-                //nx_hpm::StunParameters::SystemName system_name;
-                //if( !system_name.parse(*unknown_attr) ) {
-                //    sendErrorReply();
-                //    return;
-                //} else {
-                //    // TODO
-                //}
+                if( !nx_stun::attr::parse( unknown_attr, &system_name ) ) {
+                    sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::badRequest );
+                    return;
+                }
+                system_name_ok = verifyServerName(system_name);
+                if(!system_name_ok) {
+                    sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::badRequest );
+                }
                 break;
             }
         case nx_hpm::StunParameters::serverId:
             {
-                // TODO
+                nx_stun::attr::StringAttributeType server_id;
+                if( !nx_stun::attr::parse( unknown_attr, &server_id ) ) {
+                    sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::badRequest );
+                    return;
+                }
+                server_id_ok = verifyServerId(server_id);
+                if(!server_id_ok) {
+                    sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::badRequest );
+                    return;
+                }
                 break;
             }
         case nx_hpm::StunParameters::authorization:
             {
-                // TODO
+                nx_stun::attr::StringAttributeType authorization;
+                if( !nx_stun::attr::parse( unknown_attr, &authorization ) ) {
+                    sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::badRequest );
+                    return;
+                }
+                authorization_ok = verifyAuthroization(authorization);
+                if(!authorization_ok) {
+                    sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::unauthorized );
+                    return;
+                }
                 break;
             }
-        default: Q_ASSERT(0); return;
+        default: 
+            {
+                sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::unknownAttribute );
+                return;
+            }
         }
     }
-    //);
+
+    if( !system_name_ok || !server_id_ok || !authorization_ok ) {
+        return sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::badRequest );
+    }
+    sendSuccessReply( request.header.transactionID );
+}
+
+void StunServerConnection::sendSuccessReply( const nx_stun::TransactionID& transaction_id ) {
+    nx_stun::Message message;
+    message.header.messageClass = nx_stun::MessageClass::successResponse;
+    message.header.method = nx_hpm::StunMethods::bind;
+    message.header.transactionID = transaction_id;
+    std::unique_ptr<nx_stun::attr::XorMappedAddress> addr( new nx_stun::attr::XorMappedAddress() );
+    addr->type = nx_stun::attr::AttributeType::xorMappedAddress;
+    addr->family = nx_stun::attr::XorMappedAddress::IPV4;
+    SocketAddress peer_addr( socket_->getPeerAddress() );
+    addr->address.ipv4 = peer_addr.address.ipv4(); // The endian is in host order 
+    addr->port = peer_addr.port;
+    message.attributes.emplace(std::unique_ptr<nx_stun::attr::Attribute>(addr.release()));
+    bool ret = sendMessage(std::move(message));
+    Q_ASSERT(ret);
 }
 
 void StunServerConnection::processProprietaryRequest( nx_stun::Message&& request )
@@ -97,7 +135,18 @@ void StunServerConnection::processProprietaryRequest( nx_stun::Message&& request
     }
 }
 
-void StunServerConnection::sendErrorReply( nx_stun::ErrorCode::Type /*errorCode*/ )
+void StunServerConnection::sendErrorReply( const nx_stun::TransactionID& transaction_id , nx_stun::ErrorCode::Type errorCode )
 {
-    //TODO
+    // Currently for the reason phase, we just put empty string there
+    nx_stun::Message message;
+    message.header.messageClass = nx_stun::MessageClass::errorResponse;
+    message.header.method = nx_hpm::StunMethods::bind;
+    message.header.transactionID = transaction_id;
+    std::unique_ptr<nx_stun::attr::ErrorDescription> error_code( new nx_stun::attr::ErrorDescription() );
+    error_code->type = nx_stun::attr::AttributeType::errorCode;
+    error_code->_class= errorCode / 100;
+    error_code->code = errorCode;
+    message.attributes.emplace(std::unique_ptr<nx_stun::attr::Attribute>(error_code.release()));
+    bool ret = sendMessage(std::move(message));
+    Q_ASSERT(ret);
 }

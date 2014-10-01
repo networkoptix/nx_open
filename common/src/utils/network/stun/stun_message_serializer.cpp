@@ -188,20 +188,20 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeTypeAndLength
 nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue( MessageSerializerBuffer* buffer ,const attr::Attribute* attribute , std::size_t* value ) {
     switch( attribute->type ) {
     case AttributeType::errorCode:
-        return serializeAttributeValue_ErrorCode( buffer , static_cast<const ErrorDescription*>(attribute) ,value);
+        return serializeAttributeValue_ErrorCode( buffer , *static_cast<const ErrorDescription*>(attribute) ,value);
     case AttributeType::fingerprint:
-        return serializeAttributeValue_Fingerprint( buffer , static_cast<const FingerPrint*>(attribute) ,value);
+        return serializeAttributeValue_Fingerprint( buffer , *static_cast<const FingerPrint*>(attribute) ,value);
     case AttributeType::xorMappedAddress:
-        return serializeAttributeValue_XORMappedAddress( buffer , static_cast<const XorMappedAddress*>(attribute) ,value);
+        return serializeAttributeValue_XORMappedAddress( buffer , *static_cast<const XorMappedAddress*>(attribute) ,value);
     case AttributeType::messageIntegrity:
-        return serializeAttributeValue_MessageIntegrity( buffer , static_cast<const MessageIntegrity*>(attribute) ,value);
+        return serializeAttributeValue_MessageIntegrity( buffer , *static_cast<const MessageIntegrity*>(attribute) ,value);
     case AttributeType::unknownAttribute:
-        return serializeAttributeValue_UnknownAttribute( buffer , static_cast<const UnknownAttribute*>(attribute) ,value);
+        return serializeAttributeValue_UnknownAttribute( buffer , *static_cast<const UnknownAttribute*>(attribute) ,value);
     default: Q_ASSERT(0); return nx_api::SerializerState::done;
     }
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attr::XorMappedAddress* attribute , std::size_t* value ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attr::XorMappedAddress& attribute , std::size_t* value ) {
     Q_ASSERT( attribute->family == XorMappedAddress::IPV4 || attribute->family == XorMappedAddress::IPV6 );
     std::size_t cur_pos = buffer->position();
     if( buffer->WriteUint16(attribute->family) == NULL ) 
@@ -210,17 +210,17 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMapp
     // the high part of the MAGIC COOKIE value and then convert to the network byte order.
     if( buffer->WriteUint16( attribute->port ^ MAGIC_COOKIE_HIGH ) == NULL )
         return nx_api::SerializerState::needMoreBufferSpace;
-    if( attribute->family == XorMappedAddress::IPV4 ) {
-        if( buffer->WriteUint32(attribute->address.ipv4 ^ MAGIC_COOKIE) == NULL )
+    if( attribute.family == XorMappedAddress::IPV4 ) {
+        if( buffer->WriteUint32(attribute.address.ipv4 ^ MAGIC_COOKIE) == NULL )
             return nx_api::SerializerState::needMoreBufferSpace;
     } else {
         std::uint16_t xor_addr[8];
-        xor_addr[0] = attribute->address.ipv6.array[0] ^ MAGIC_COOKIE_LOW;
-        xor_addr[1] = attribute->address.ipv6.array[1] ^ MAGIC_COOKIE_HIGH;
+        xor_addr[0] = attribute.address.ipv6.array[0] ^ MAGIC_COOKIE_LOW;
+        xor_addr[1] = attribute.address.ipv6.array[1] ^ MAGIC_COOKIE_HIGH;
         // XOR for the transaction id
         for( std::size_t i = 2 ; i < 8 ; ++i ) {
-            xor_addr[i] = *reinterpret_cast<std::uint16_t*>(message_.header.transactionID.bytes+(i-2)*2) ^
-                attribute->address.ipv6.array[i];
+            xor_addr[i] = *reinterpret_cast<std::uint16_t*>(
+                message_.header.transactionID.bytes+(i-2)*2) ^ attribute.address.ipv6.array[i];
         }
 
         if( buffer->WriteIPV6Address(xor_addr) == NULL )
@@ -230,7 +230,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMapp
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attr::FingerPrint* attribute , std::size_t* value ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attr::FingerPrint& attribute , std::size_t* value ) {
     Q_ASSERT( buffer->size() >= 24 ); // Header + FingerprintHeader
     // Ignore original FingerPrint message
     Q_UNUSED(attribute);
@@ -257,37 +257,41 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Fingerp
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_MessageIntegrity( MessageSerializerBuffer* ,const attr::MessageIntegrity* , std::size_t* ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_MessageIntegrity( MessageSerializerBuffer* ,const attr::MessageIntegrity& , std::size_t* ) {
     Q_ASSERT(0);
     // Needs username/password to implement this , I don't know how to do it now :(
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_UnknownAttribute( MessageSerializerBuffer* buffer ,const attr::UnknownAttribute* attribute , std::size_t* value ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_UnknownAttribute( MessageSerializerBuffer* buffer ,const attr::UnknownAttribute& attribute , std::size_t* value ) {
     std::size_t cur_pos = buffer->position();
-    if( buffer->WriteBytes( attribute->value.constData() , attribute->value.size() ) == NULL ) 
+    if( buffer->WriteBytes( attribute.value.constData() , attribute.value.size() ) == NULL ) 
         return nx_api::SerializerState::needMoreBufferSpace ;
     // The size of the STUN attributes should be the size before padding bytes
     *value = buffer->position()-cur_pos;
     // Padding the UnknownAttributes to the boundary of 4
-    std::size_t padding_size = calculatePaddingSize(attribute->value.size());
-    for( std::size_t i = attribute->value.size() ; i < padding_size ; ++i ) {
+    std::size_t padding_size = calculatePaddingSize(attribute.value.size());
+    for( std::size_t i = attribute.value.size() ; i < padding_size ; ++i ) {
         if( buffer->WriteByte(0) == NULL )
             return nx_api::SerializerState::needMoreBufferSpace;
     }
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attr::ErrorDescription*  attribute , std::size_t* value ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attr::ErrorDescription&  attribute , std::size_t* value ) {
     std::size_t cur_pos = buffer->position();
-    std::uint32_t error_header = attribute->code % 100;
+    std::uint32_t error_header = attribute.code % 100;
     // We don't use attribute->_class value since we can get what we want from code
     // but we check the validation here for the attribute->_class value
-    error_header |= (attribute->code / 100)<<8;
+    error_header |= (attribute.code / 100)<<8;
     if( buffer->WriteUint32(error_header) == NULL )
         return nx_api::SerializerState::needMoreBufferSpace;
+    if( attribute.reasonPhrase.size() == 0 ) {
+        // This is an empty reason phase 
+        return nx_api::SerializerState::done;
+    }
     // UTF8 string 
-    QByteArray utf8_bytes = QString::fromStdString(attribute->reasonPhrase).toUtf8();
+    QByteArray utf8_bytes = QString::fromStdString(attribute.reasonPhrase).toUtf8();
     if( buffer->WriteBytes( utf8_bytes.constData() , utf8_bytes.size() ) == NULL )
         return nx_api::SerializerState::needMoreBufferSpace;
     *value = buffer->position()-cur_pos;
