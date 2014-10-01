@@ -861,6 +861,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     }
 
     QSize size = m_display->camDisplay()->getRawDataSize();
+    size.setWidth(size.width() * m_display->camDisplay()->channelsCount());
 
     QString codecString;
     if(QnMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext()) {

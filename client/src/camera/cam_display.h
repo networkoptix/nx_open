@@ -52,6 +52,7 @@ public:
 
     void addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bool canDownscale);
     void removeVideoRenderer(QnAbstractRenderer* vw);
+    int channelsCount() const;
 
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 
@@ -191,7 +192,6 @@ protected:
     qint64 m_lastAudioPacketTime;
     qint64 m_syncAudioTime;
     int m_totalFrames;
-    int m_fczFrames;
     int m_iFrames;
     qint64 m_lastVideoPacketTime;
     qint64 m_lastDecodedTime;
@@ -248,9 +248,13 @@ protected:
     QnFpsStatistics m_fpsStat;
     int m_prevLQ;
     bool m_doNotChangeDisplayTime;
-    bool m_firstLivePacket;
     bool m_multiView;
     bool m_fisheyeEnabled;
+    int m_channelsCount;
+
+    qint64 m_lastQueuedVideoTime;
+    int m_liveBufferSize;
+    bool m_liveMaxLenReached;
 };
 
 #endif //QN_CAM_DISPLAY_H
