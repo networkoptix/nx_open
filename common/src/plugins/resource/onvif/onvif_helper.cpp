@@ -348,7 +348,7 @@ NameHelper::NameHelper()
 
     foreach(QnResourceTypePtr rt, typeMap) {
 
-        if (rt->getParentId().isNull())
+        if (rt->getParentId().isNull() || rt->getManufacture() == lit("OnvifDevice"))
             continue;
 
         QString normalizedManufacturer = rt->getManufacture().toLower().replace(UNNEEDED_CHARACTERS, QString());
