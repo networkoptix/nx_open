@@ -9,7 +9,7 @@
 #include "stun/custom_stun.h"
 
 #include "stun_stream_socket_server.h"
-
+#include <functional>
 
 StunServerConnection::StunServerConnection(
     StunStreamSocketServer* socketServer,
@@ -122,8 +122,15 @@ void StunServerConnection::sendSuccessReply( const nx_stun::TransactionID& trans
     SocketAddress peer_addr( socket_->getPeerAddress() );
     addr->address.ipv4 = peer_addr.address.ipv4(); // The endian is in host order 
     addr->port = peer_addr.port;
-    message.attributes.emplace(std::unique_ptr<nx_stun::attr::Attribute>(addr.release()));
-    bool ret = sendMessage(std::move(message));
+    message.attributes.insert(
+        std::make_pair(addr->type,
+        std::unique_ptr<nx_stun::attr::Attribute>(addr.release())));
+    bool ret = sendMessage(std::move(message),
+        std::bind(
+        &StunServerConnection::onSendComplete,
+        this,
+        std::placeholders::_1));
+
     Q_ASSERT(ret);
 }
 
@@ -146,7 +153,12 @@ void StunServerConnection::sendErrorReply( const nx_stun::TransactionID& transac
     error_code->type = nx_stun::attr::AttributeType::errorCode;
     error_code->_class= errorCode / 100;
     error_code->code = errorCode;
-    message.attributes.emplace(std::unique_ptr<nx_stun::attr::Attribute>(error_code.release()));
-    bool ret = sendMessage(std::move(message));
+    message.attributes.insert(std::make_pair(error_code->type,
+        std::unique_ptr<nx_stun::attr::Attribute>(error_code.release())));
+    bool ret = sendMessage(std::move(message),
+        std::bind(
+        &StunServerConnection::onSendComplete,
+        this,
+        std::placeholders::_1));
     Q_ASSERT(ret);
 }

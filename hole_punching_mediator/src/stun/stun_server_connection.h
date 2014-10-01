@@ -12,7 +12,7 @@
 #include <utils/network/stun/stun_message_parse_handler.h>
 #include <utils/network/stun/stun_message_serializer.h>
 #include <utils/network/connection_server/base_stream_protocol_connection.h>
-
+#include <functional>
 
 class StunStreamSocketServer;
 
@@ -51,6 +51,11 @@ private:
     bool verifyServerName( const nx_stun::attr::StringAttributeType& name );
     bool verifyServerId( const nx_stun::attr::StringAttributeType& name );
     bool verifyAuthroization( const nx_stun::attr::StringAttributeType& name );
+
+    void onSendComplete( SystemError::ErrorCode ec ) {
+        Q_UNUSED(ec);
+        // TODO:: Add logic for handling completion
+    }
 
 private:
     // I guess I need to cache it to get the peer side address
