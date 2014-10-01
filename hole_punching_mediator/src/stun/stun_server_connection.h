@@ -40,9 +40,12 @@ public:
 
     void processMessage( nx_stun::Message&& request );
 
+
 private:
     void processGetIPAddressRequest( nx_stun::Message&& request );
     void processProprietaryRequest( nx_stun::Message&& request );
+    void sendErrorReply();
+
 };
 
 #endif  //STUN_SERVER_CONNECTION_H

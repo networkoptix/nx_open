@@ -104,6 +104,7 @@ namespace nx_stun
             alternateServer = 0x8023,
             fingerprint = 0x8028,
 
+            userDefine = 0x9000 , // I guess we need this to identify our private extended stun attr
             unknown = 0xFFFF
         };
 
@@ -176,6 +177,7 @@ namespace nx_stun
 
         struct UnknownAttribute : public Attribute {
             nx::Buffer value;
+            int user_type;
         };
 
         class UnknownAttributes

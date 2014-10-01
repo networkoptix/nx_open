@@ -22,6 +22,23 @@ namespace nx_hpm
     };
 
     //TODO custom stun requests parameters
+    namespace StunParameters 
+    {
+        enum Value 
+        {
+            systemName = static_cast<int>(nx_stun::attr::AttributeType::userDefine),
+            authorization,
+            serverId
+        };
+        // I just assume that we will use UnknownAttribute as our way to extend the 
+        // parser/serializer class pair. Maybe other "factory" based method works ,
+        // but this may be simpler for us.
+        struct SystemName  {
+            bool parse( const nx_stun::attr::UnknownAttribute& );
+            bool serialize( nx_stun::attr::UnknownAttribute* );
+            std::string system_name;
+        };
+    }
 }
 
 #endif  //NX_CUSTOM_STUN_H

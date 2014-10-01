@@ -245,6 +245,7 @@ Attribute* MessageParser::parseUnknownAttribute() {
     std::unique_ptr< UnknownAttribute > attribute( new UnknownAttribute() );
     attribute->length = attribute_.length;
     attribute->type = AttributeType::unknownAttribute;
+    attribute->user_type = attribute_.type;
     attribute->value = attribute_.value;
     return attribute.release();
 }
