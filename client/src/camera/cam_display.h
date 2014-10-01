@@ -192,7 +192,6 @@ protected:
     qint64 m_lastAudioPacketTime;
     qint64 m_syncAudioTime;
     int m_totalFrames;
-    int m_fczFrames;
     int m_iFrames;
     qint64 m_lastVideoPacketTime;
     qint64 m_lastDecodedTime;
@@ -235,6 +234,7 @@ protected:
     int m_audioBufferSize;
     qint64 m_minAudioDetectJumpInterval;
     qint64 m_videoQueueDuration;
+    qint64 m_lastQueuedVideoTime;
     bool m_useMTRealTimeDecode; // multi thread decode for live temporary allowed
     bool m_forceMtDecoding; // force multi thread decode in any case
 
@@ -249,10 +249,11 @@ protected:
     QnFpsStatistics m_fpsStat;
     int m_prevLQ;
     bool m_doNotChangeDisplayTime;
-    bool m_firstLivePacket;
     bool m_multiView;
     bool m_fisheyeEnabled;
     int m_channelsCount;
+    int m_liveBufferSize;
+    bool m_liveMaxLenReached;
 };
 
 #endif //QN_CAM_DISPLAY_H
