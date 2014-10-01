@@ -750,24 +750,24 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int addDiscoveryInformation(const QnUuid &id, const QList<QUrl> &urls, bool ignore, TargetType *target, HandlerType handler) {
-            return addDiscoveryInformation(id, urls, ignore, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int addDiscoveryInformation(const QnUuid &id, const QUrl&url, bool ignore, TargetType *target, HandlerType handler) {
+            return addDiscoveryInformation(id, url, ignore, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int removeDiscoveryInformation(const QnUuid &id, const QList<QUrl> &urls, bool ignore, TargetType *target, HandlerType handler) {
-            return removeDiscoveryInformation(id, urls, ignore, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, TargetType *target, HandlerType handler) {
+            return removeDiscoveryInformation(id, url, ignore, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
     signals:
         void peerDiscoveryRequested(const QUrl &url);
-        void discoveryInformationChanged(const ApiDiscoveryDataList &data, bool addInformation);
+        void discoveryInformationChanged(const ApiDiscoveryData &data, bool addInformation);
 
     protected:
         virtual int discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler) = 0;
-        virtual int addDiscoveryInformation(const QnUuid &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) = 0;
-        virtual int removeDiscoveryInformation(const QnUuid &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) = 0;
+        virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
+        virtual int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractDiscoveryManager> AbstractDiscoveryManagerPtr;
 

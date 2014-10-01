@@ -210,6 +210,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
     qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" ); 
     qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); 
+    qRegisterMetaType<ec2::ApiDiscoveryData>( "ApiDiscoveryData" ); 
     qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" ); 
     qRegisterMetaType<ec2::ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); 
     qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" ); 

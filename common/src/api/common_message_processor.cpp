@@ -145,21 +145,19 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResour
 }
 
 
-void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryDataList &discoveryData, bool addInformation)
+void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &data, bool addInformation)
 {
     QMultiHash<QnUuid, QUrl> m_additionalUrls;
     QMultiHash<QnUuid, QUrl> m_ignoredUrls;
 
-    foreach (const ec2::ApiDiscoveryData &data, discoveryData) {
-        QUrl url(data.url);
-        if (data.ignore) {
-            if (url.port() != -1 && !m_additionalUrls.contains(data.id, url))
-                m_additionalUrls.insert(data.id, url);
-            m_ignoredUrls.insert(data.id, url);
-        } else {
-            if (!m_additionalUrls.contains(data.id, url))
-                m_additionalUrls.insert(data.id, url);
-        }
+    QUrl url(data.url);
+    if (data.ignore) {
+        if (url.port() != -1 && !m_additionalUrls.contains(data.id, url))
+            m_additionalUrls.insert(data.id, url);
+        m_ignoredUrls.insert(data.id, url);
+    } else {
+        if (!m_additionalUrls.contains(data.id, url))
+            m_additionalUrls.insert(data.id, url);
     }
 
     foreach (const QnUuid &id, m_additionalUrls.uniqueKeys()) {

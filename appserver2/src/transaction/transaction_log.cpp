@@ -137,13 +137,11 @@ QnUuid QnTransactionLog::makeHash(const QString& extraData, const ApiCameraBookm
     return QnUuid::fromRfc4122(hash.result());
 }
 
-QnUuid QnTransactionLog::makeHash(const QString &extraData, const ApiDiscoveryDataList &data) const {
+QnUuid QnTransactionLog::makeHash(const QString &extraData, const ApiDiscoveryData &data) const {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(extraData.toUtf8());
-    foreach (const ApiDiscoveryData &item, data) {
-        hash.addData(item.url.toUtf8());
-        hash.addData(item.id.toString().toUtf8());
-    }
+    hash.addData(data.url.toUtf8());
+    hash.addData(data.id.toString().toUtf8());
     return QnUuid::fromRfc4122(hash.result());
 }
 

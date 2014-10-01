@@ -173,7 +173,8 @@ namespace ec2
         QnFullResourceData fullResData;
         fromApiToResourceList(tran.params, fullResData, m_resCtx);
         emit m_ecConnection->initNotification(fullResData);
-        m_discoveryManager->triggerNotification(tran.params.discoveryData);
+        foreach(const ApiDiscoveryData& data, tran.params.discoveryData)
+            m_discoveryManager->triggerNotification(data);
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPanicModeData>& tran ) {
@@ -223,7 +224,7 @@ namespace ec2
         m_miscManager->triggerNotification(tran);
     }
 
-    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran) {
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryData> &tran) {
         m_discoveryManager->triggerNotification(tran);
     }
 
