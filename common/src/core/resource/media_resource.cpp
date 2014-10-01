@@ -84,15 +84,17 @@ QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::Stream
 }
 
 static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
-QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider *) const
+QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider *dataProvider) const
 {
     QMutexLocker lock(&m_layoutMutex);
 
+#ifdef ENABLE_DATA_PROVIDERS
     if (dataProvider) {
         QnConstResourceVideoLayoutPtr providerLayout = dataProvider->getVideoLayout();
         if (providerLayout)
             return providerLayout;
     }
+#endif //ENABLE_DATA_PROVIDERS
 
     QVariant val;
     toResource()->getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);

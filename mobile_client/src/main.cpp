@@ -13,6 +13,7 @@
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/long_runnable.h"
+#include "utils/common/app_info.h"
 #include "plugins/resource/server_camera/server_camera_factory.h"
 
 #include "context/context.h"
@@ -38,7 +39,7 @@ int runApplication(QGuiApplication *application) {
     QnAppServerConnectionFactory::setClientGuid(qnCommon->moduleGUID().toString());
     QnAppServerConnectionFactory::setDefaultFactory(serverCameraFactory.data());
 
-    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
+    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory(Qn::PT_DesktopClient)); // TODO: #dklychkov check connection type
     ec2::ResourceContext resourceContext(
         QnServerCameraFactory::instance(),
         qnResPool,
@@ -51,9 +52,10 @@ int runApplication(QGuiApplication *application) {
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
-    runtimeData.peer.peerType = Qn::PT_MobileClient;
-    runtimeData.brand = lit(QN_PRODUCT_NAME_SHORT);
-    QnRuntimeInfoManager::instance()->items()->addItem(runtimeData);
+    runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
+    runtimeData.peer.peerType = Qn::PT_DesktopClient; // TODO: #dklychkov check connection type
+    runtimeData.brand = QnAppInfo::productNameShort();
+    QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
 
 
     QnContext context;

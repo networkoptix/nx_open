@@ -4,7 +4,7 @@
 #include "common/common_module.h"
 
 QnMobileClientMessageProcessor::QnMobileClientMessageProcessor() :
-    QnCommonMessageProcessor()
+    base_type()
 {
 }
 
@@ -14,27 +14,27 @@ void QnMobileClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &co
         assert(!m_connected);
         assert(qnCommon->remoteGUID().isNull());
         qnCommon->setRemoteGUID(connection->connectionInfo().ecsGuid);
-        connect(connection.get(),   &ec2::AbstractECConnection::remotePeerFound,    this,   &QnMobileClientMessageProcessor::at_remotePeerFound);
-        connect(connection.get(),   &ec2::AbstractECConnection::remotePeerLost,     this,   &QnMobileClientMessageProcessor::at_remotePeerLost);
+        connect(connection,     &ec2::AbstractECConnection::remotePeerFound,    this,   &QnMobileClientMessageProcessor::at_remotePeerFound);
+        connect(connection,     &ec2::AbstractECConnection::remotePeerLost,     this,   &QnMobileClientMessageProcessor::at_remotePeerLost);
     } else if (m_connected) { // double init by null is allowed
         assert(!qnCommon->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;
         data.peer.id = qnCommon->remoteGUID();
-        qnCommon->setRemoteGUID(QUuid());
+        qnCommon->setRemoteGUID(QnUuid());
         m_connected = false;
         emit connectionClosed();
     } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
-        qnCommon->setRemoteGUID(QUuid());
+        qnCommon->setRemoteGUID(QnUuid());
     }
 }
 
 void QnMobileClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
 }
 
-void QnMobileClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
+void QnMobileClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) {
 }
 
-void QnMobileClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy) {
+void QnMobileClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data) {
     if (qnCommon->remoteGUID().isNull()) {
         qWarning() << "at_remotePeerFound received while disconnected";
         return;
@@ -43,14 +43,13 @@ void QnMobileClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData da
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-    assert(!isProxy);
     assert(!m_connected);
 
     m_connected = true;
     emit connectionOpened();
 }
 
-void QnMobileClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy) {
+void QnMobileClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data) {
     if (qnCommon->remoteGUID().isNull()) {
         qWarning() << "at_remotePeerLost received while disconnected";
         return;
@@ -60,7 +59,6 @@ void QnMobileClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData dat
         return;
 
 
-    Q_ASSERT_X(!isProxy, Q_FUNC_INFO, "!isProxy");
     Q_ASSERT_X(m_connected, Q_FUNC_INFO, "m_connected");
 
     m_connected = false;

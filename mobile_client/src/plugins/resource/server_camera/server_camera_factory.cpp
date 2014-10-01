@@ -5,7 +5,7 @@
 
 #include "server_camera.h"
 
-QnResourcePtr QnServerCameraFactory::createResource(const QnId &resourceTypeId, const QnResourceParams &) {
+QnResourcePtr QnServerCameraFactory::createResource(const QnUuid &resourceTypeId, const QnResourceParams &) {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
 
     if (resourceType.isNull())

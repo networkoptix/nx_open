@@ -12,7 +12,7 @@ class QnServerCameraFactory: public QObject, public QnResourceFactory, public Si
 public:
     QnServerCameraFactory(QObject *parent = NULL): QObject(parent) {}
 
-    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams &params) override;
+    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams &params) override;
 };
 
 #endif // QN_SERVER_CAMERA_FACTORY_H

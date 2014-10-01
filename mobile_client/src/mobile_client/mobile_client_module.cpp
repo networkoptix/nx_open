@@ -22,5 +22,5 @@ QnMobileClientModule::QnMobileClientModule(int &argc, char *argv[], QObject *par
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(argc, argv, this);
     common->instance<QnMobileClientSettings>();
-    common->setModuleGUID(QUuid::createUuid());
+    common->setModuleGUID(QnUuid::createUuid());
 }

@@ -3,10 +3,11 @@
 
 #include <api/common_message_processor.h>
 #include <core/resource/resource_fwd.h>
+#include <utils/common/connective.h>
 
-class QnMobileClientMessageProcessor : public QnCommonMessageProcessor {
+class QnMobileClientMessageProcessor : public Connective<QnCommonMessageProcessor> {
     Q_OBJECT
-    typedef QnCommonMessageProcessor base_type;
+    typedef Connective<QnCommonMessageProcessor> base_type;
 
 public:
     QnMobileClientMessageProcessor();
@@ -15,11 +16,11 @@ public:
     virtual void updateResource(const QnResourcePtr &resource) override;
 
 protected:
-    virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) override;
+    virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) override;
 
 private slots:
-    void at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);
-    void at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy);
+    void at_remotePeerFound(ec2::ApiPeerAliveData data);
+    void at_remotePeerLost(ec2::ApiPeerAliveData data);
 
 private:
     bool m_connected;
