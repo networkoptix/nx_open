@@ -21,6 +21,10 @@ public:
 };
 
 
+class QnUserCameraSettings
+{
+};
+
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     typedef QnNetworkResource base_type;
     Q_OBJECT
@@ -65,6 +69,12 @@ public:
     void setMotionRegion(const QnMotionRegion& mask, QnDomain domain, int channel);
 
     QRegion getMotionMask(int channel) const;
+
+    //!Get camera settings, which are generally modified by user
+    /*!
+        E.g., recording schedule, motion type, second stream quality, etc...
+    */
+    QnUserCameraSettings getUserCameraSettings() const;
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
     const QnScheduleTaskList getScheduleTasks() const;
