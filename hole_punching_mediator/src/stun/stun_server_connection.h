@@ -44,8 +44,7 @@ public:
 private:
     void processGetIPAddressRequest( nx_stun::Message&& request );
     void processProprietaryRequest( nx_stun::Message&& request );
-    void sendErrorReply();
-
+    void sendErrorReply( nx_stun::ErrorCode::Type errorCode );
 };
 
 #endif  //STUN_SERVER_CONNECTION_H

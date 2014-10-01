@@ -13,4 +13,15 @@ namespace nx_stun
     {
         attributes.clear();
     }
+
+
+    namespace attr
+    {
+        bool parse( const UnknownAttribute& unknownAttr, StringAttributeType* val )
+        {
+            //TODO
+            return false;
+        }
+    }
+
 }

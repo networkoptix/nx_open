@@ -77,6 +77,8 @@ namespace nx_stun
 
     namespace ErrorCode
     {
+        typedef int Type;
+
         static const int tryAlternate = 300;
         static const int badRequest = 400;
         static const int unauthorized = 401;
@@ -104,7 +106,7 @@ namespace nx_stun
             alternateServer = 0x8023,
             fingerprint = 0x8028,
 
-            userDefine = 0x9000 , // I guess we need this to identify our private extended stun attr
+            userDefine = 0x9000 , //!<we need this to identify our private extended stun attr
             unknown = 0xFFFF
         };
 
@@ -185,6 +187,10 @@ namespace nx_stun
         public:
             std::vector<int> attributeTypes;
         };
+
+
+        typedef std::string StringAttributeType;
+        bool parse( const UnknownAttribute& unknownAttr, StringAttributeType* val );
     }
 
 } // namespace nx_stun
