@@ -34,7 +34,7 @@ namespace nx_hpm
         // parser/serializer class pair. Maybe other "factory" based method works ,
         // but this may be simpler for us.
         struct SystemName  {
-            bool parse( const nx_stun::attr::UnknownAttribute& );
+            bool parse( const nx_stun::attr::UnknownAttribute& ) { return false; }
             bool serialize( nx_stun::attr::UnknownAttribute* );
             std::string system_name;
         };

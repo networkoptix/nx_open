@@ -169,7 +169,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeHeader( MessageSeriali
 
 nx_api::SerializerState::Type MessageSerializer::serializeAttributeTypeAndLength( MessageSerializerBuffer* buffer , const attr::Attribute* attribute  , std::uint16_t** value_pos ) {
     if( attribute->type == attr::AttributeType::unknownAttribute ) {
-        UnknownAttribute* ua = static_cast<UnknownAttribute*>(attribute);
+        const UnknownAttribute* ua = static_cast<const UnknownAttribute*>(attribute);
         if( buffer->WriteUint16(static_cast<std::uint16_t>(ua->user_type)) == NULL ) {
             return nx_api::SerializerState::needMoreBufferSpace;
         }

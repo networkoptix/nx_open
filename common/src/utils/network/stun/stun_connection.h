@@ -34,7 +34,7 @@ namespace nx_stun
             nx_stun::MessageSerializer>,
         public QnStoppableAsync
     {
-        typedef BaseStreamProtocolConnection<
+        typedef nx_api::BaseStreamProtocolConnection<
             StunClientConnection,
             StunClientConnection,
             nx_stun::Message,
@@ -59,7 +59,7 @@ namespace nx_stun
 
         //!Asynchronously openes connection to the server, specified during initialization
         /*!
-            \return \a false, if could not start asynchronous send (this can happen due to lack of resources on host machine)
+            \return \a false, if could not start asynchronous operation (this can happen due to lack of resources on host machine)
             \note It is valid to call \a StunClientConnection::sendRequest when connection has not completed yet
         */
         bool openConnection( std::function<void(SystemError::ErrorCode)>&& completionHandler );
@@ -72,7 +72,7 @@ namespace nx_stun
         /*!
             \param completionHandler Triggered after response has been received or error has occured. 
                 \a Message attribute is valid only if first attribute value is \a SystemError::noError
-            \return \a false, if could not start asynchronous send (this can happen due to lack of resources on host machine)
+            \return \a false, if could not start asynchronous operation (this can happen due to lack of resources on host machine)
             \note If connection to server has not been opened yet then opens one
             \note It is valid to call this method after If \a StunClientConnection::openConnection has been called and not completed yet
         */

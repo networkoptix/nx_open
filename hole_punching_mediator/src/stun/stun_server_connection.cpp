@@ -44,13 +44,15 @@ void StunServerConnection::processMessage( nx_stun::Message&& message )
 void StunServerConnection::processGetIPAddressRequest( nx_stun::Message&& request )
 {
     //TODO get remote host address from socket, create response and send with sendMessage( response )
-    std::for_each(request.attributes.begin(),request.attributes.end(),
-        [this,request]( const std::unique_ptr<nx_stun::attr::Attribute>& attr ) {
-        if(attr->type != nx_stun::attr::AttributeType::unknownAttribute ) {
+    for( const nx_stun::Message::AttributesMap::value_type& attr: request.attributes )
+    //std::for_each(request.attributes.begin(),request.attributes.end(),
+    //    [this,request]( const std::unique_ptr<nx_stun::attr::Attribute>& attr )
+    {
+        if(attr.second->type != nx_stun::attr::AttributeType::unknownAttribute ) {
             sendErrorReply();
             return;
         }
-        nx_stun::attr::UnknownAttribute* unknown_attr = static_cast<nx_stun::attr::UnknownAttribute*>(attr.get());
+        nx_stun::attr::UnknownAttribute* unknown_attr = static_cast<nx_stun::attr::UnknownAttribute*>(attr.second.get());
         switch( unknown_attr->user_type ) {
         case nx_hpm::StunParameters::systemName:
             {
@@ -75,13 +77,19 @@ void StunServerConnection::processGetIPAddressRequest( nx_stun::Message&& reques
             }
         default: Q_ASSERT(0); return;
         }
-    });
+    }
+    //);
 }
 
 void StunServerConnection::processProprietaryRequest( nx_stun::Message&& request )
 {
-    if( !STUNMessageDispatcher::instance()->dispatchRequest( std::static_pointer_cast<StunServerConnection>(shared_from_this()), std::move(request) ) )
+    if( !STUNMessageDispatcher::instance()->dispatchRequest( this, std::move(request) ) )
     {
         //TODO creating and sending error response
     }
+}
+
+void StunServerConnection::sendErrorReply()
+{
+    //TODO
 }
