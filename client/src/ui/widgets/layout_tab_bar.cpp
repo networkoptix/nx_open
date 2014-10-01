@@ -1,7 +1,7 @@
 #include "layout_tab_bar.h"
 
 #include <QtCore/QVariant>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <QtGui/QContextMenuEvent>
 #include <QtWidgets/QStyle>
@@ -124,7 +124,7 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout *layout) const {
         return qnResIconCache->icon(QnResourceIconCache::VideoWall);
 
     // videowall control mode
-    QUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QUuid>();
+    QnUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
     if (!videoWallInstanceGuid.isNull()) {
         QnVideoWallItemIndex idx = qnResPool->getVideoWallItemByUuid(videoWallInstanceGuid);
         bool online = idx.isNull()

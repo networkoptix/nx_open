@@ -1,6 +1,7 @@
 #ifndef QN_FUSION_AUTOMATION_H
 #define QN_FUSION_AUTOMATION_H
 
+#include <utils/common/uuid.h>
 #include <utils/fusion/fusion_adaptor.h>
 #include <utils/serialization/binary_functions.h>
 #include <utils/serialization/data_stream_macros.h>

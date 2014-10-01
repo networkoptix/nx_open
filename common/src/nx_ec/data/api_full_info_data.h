@@ -3,7 +3,6 @@
 
 #include "api_globals.h"
 #include "api_data.h"
-#include "api_server_info_data.h"
 
 namespace ec2 
 {
@@ -17,10 +16,11 @@ namespace ec2
         ApiBusinessRuleDataList rules;
         ApiCameraServerItemDataList cameraHistory;
         ApiLicenseDataList licenses;
-        //ApiServerInfoData serverInfo;
+        ApiDiscoveryDataList discoveryData;
     };
-#define ApiFullInfoData_Fields (resourceTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)
+#define ApiFullInfoData_Fields (resourceTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(discoveryData)
 
 } // namespace ec2
 
 #endif // __EC2_FULL_DATA_H_
+

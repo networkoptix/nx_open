@@ -3,7 +3,7 @@
 
 #include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 #include <QtCore/QString>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <client/client_globals.h>
 
@@ -37,7 +37,7 @@ public:
     /**
      * Constructor for item nodes.
      */
-    QnResourcePoolModelNode(QnResourcePoolModel *model, const QUuid &uuid, Qn::NodeType nodeType = Qn::ItemNode);
+    QnResourcePoolModelNode(QnResourcePoolModel *model, const QnUuid &uuid, Qn::NodeType nodeType = Qn::ItemNode);
 
     ~QnResourcePoolModelNode();
 
@@ -57,7 +57,7 @@ public:
 
     Qn::ResourceStatus resourceStatus() const ;
 
-    const QUuid &uuid() const ;
+    const QnUuid &uuid() const ;
 
     State state() const ;
 
@@ -97,6 +97,10 @@ protected:
     void changeInternal();
 
 private:
+    /** Recalculated 'bastard' state for the node. */
+    bool calculateBastard() const;
+
+private:
     //TODO: #GDM #Common need complete recorder nodes structure refactor to get rid of this shit
     friend class QnResourcePoolModel;
 
@@ -109,7 +113,7 @@ private:
     const Qn::NodeType m_type;
 
     /** Uuid that this node represents. */
-    const QUuid m_uuid;
+    const QnUuid m_uuid;
 
     /** Resource associated with this node. */
     QnResourcePtr m_resource;

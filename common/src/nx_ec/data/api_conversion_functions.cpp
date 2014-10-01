@@ -47,14 +47,14 @@ void fromApiToResource(const ApiBusinessRuleData &src, QnBusinessEventRulePtr &d
     dst->setId(src.id);
     dst->setEventType(src.eventType);
 
-    dst->setEventResources(QVector<QUuid>::fromStdVector(src.eventResourceIds));
+    dst->setEventResources(QVector<QnUuid>::fromStdVector(src.eventResourceIds));
 
     dst->setEventParams(QnBusinessEventParameters::fromBusinessParams(deserializeBusinessParams(src.eventCondition)));
 
     dst->setEventState(src.eventState);
     dst->setActionType(src.actionType);
 
-    dst->setActionResources(QVector<QUuid>::fromStdVector(src.actionResourceIds));
+    dst->setActionResources(QVector<QnUuid>::fromStdVector(src.actionResourceIds));
 
     dst->setActionParams(QnBusinessActionParameters::fromBusinessParams(deserializeBusinessParams(src.actionParams)));
 
@@ -119,7 +119,7 @@ void fromApiToResource(const ApiBusinessActionData &src, QnAbstractBusinessActio
     dst->setToggleState(src.toggleState);
     dst->setReceivedFromRemoteHost(src.receivedFromRemoteHost);
 
-    dst->setResources(QVector<QUuid>::fromStdVector(src.resourceIds));
+    dst->setResources(QVector<QnUuid>::fromStdVector(src.resourceIds));
 
     dst->setParams(QnBusinessActionParameters::fromBusinessParams(deserializeBusinessParams(src.params)));
 
@@ -139,7 +139,7 @@ void fromResourceToApi(const QnScheduleTask &src, ApiScheduleTaskData &dst) {
     dst.fps = src.getFps();
 }
 
-void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QUuid &resourceId) {
+void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QnUuid &resourceId) {
     dst = QnScheduleTask(resourceId, src.dayOfWeek, src.startTime, src.endTime, src.recordingType, src.beforeThreshold, src.afterThreshold, src.streamQuality, src.fps, src.recordAudio);
 }
 
@@ -188,6 +188,7 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     dst->setVendor(src.vendor);
     dst->setMinDays(src.minArchiveDays);
     dst->setMaxDays(src.maxArchiveDays);
+    dst->setPreferedServerId(src.preferedServerId);
     Q_ASSERT(dst->getId() == QnVirtualCameraResource::uniqueIdToId(dst->getUniqueId()));
 
 }
@@ -224,6 +225,7 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.vendor = src->getVendor();
     dst.minArchiveDays = src->minDays();
     dst.maxArchiveDays = src->maxDays();
+    dst.preferedServerId = src->preferedServerId();
 }
 
 template<class List> 
@@ -263,11 +265,12 @@ void fromResourceToApi(const QnCameraHistoryItem &src, ApiCameraServerItemData &
 
 void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &dst) {
     dst.cameraUniqueId = src.cameraUniqueId;
-    dst.mediaServerGuid = QUuid(src.serverId);
+    dst.mediaServerGuid = QnUuid(src.serverId);
     dst.timestamp = src.timestamp;
 }
 
-void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) {
+void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) 
+{
     /* CameraUniqueId -> (Timestamp -> ServerGuid). */
     QMap<QString, QMap<qint64, QByteArray> > history;
 
@@ -289,13 +292,7 @@ void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHisto
         while (camit.hasNext())
         {
             camit.next();
-
-            if (camit.hasNext())
-                duration = camit.peekNext().key() - camit.key();
-            else
-                duration = -1;
-
-            cameraHistory->addTimePeriod(QnCameraTimePeriod(camit.key(), duration, camit.value()));
+            cameraHistory->addTimePeriod(camit.key(), camit.value());
         }
 
         dst.append(cameraHistory);
@@ -328,7 +325,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.servers, dst.resources, ctx);
     fromApiToResourceList(src.cameras, dst.resources, ctx.resFactory);
     fromApiToResourceList(src.users, dst.resources);
-    fromApiToResourceList(src.layouts, dst.resources);
+    fromApiToResourceList(src.layouts, dst.resources, ctx);
     fromApiToResourceList(src.videowalls, dst.resources);
     fromApiToResourceList(src.licenses, dst.licenses);
     fromApiToResourceList(src.rules, dst.bRules, ctx.pool);
@@ -412,21 +409,21 @@ void fromResourceToApi(const QnLayoutResourcePtr &src, ApiLayoutData &dst) {
 }
 
 template<class List>
-void fromApiToResourceList(const ApiLayoutDataList &src, List &dst, const overload_tag &) {
+void fromApiToResourceList(const ApiLayoutDataList &src, List &dst, const ResourceContext &ctx, const overload_tag &) {
     dst.reserve(dst.size() + (int)src.size());
     for(const ApiLayoutData &srcLayout: src) {
-        QnLayoutResourcePtr dstLayout(new QnLayoutResource());
+        QnLayoutResourcePtr dstLayout(new QnLayoutResource(ctx.resTypePool));
         fromApiToResource(srcLayout, dstLayout);
         dst.push_back(dstLayout);
     }
 }
 
-void fromApiToResourceList(const ApiLayoutDataList &src, QnResourceList &dst) {
-    fromApiToResourceList(src, dst, overload_tag());
+void fromApiToResourceList(const ApiLayoutDataList &src, QnResourceList &dst, const ResourceContext &ctx) {
+    fromApiToResourceList(src, dst, ctx, overload_tag());
 }
 
-void fromApiToResourceList(const ApiLayoutDataList &src, QnLayoutResourceList &dst) {
-    fromApiToResourceList(src, dst, overload_tag());
+void fromApiToResourceList(const ApiLayoutDataList &src, QnLayoutResourceList &dst, const ResourceContext &ctx) {
+    fromApiToResourceList(src, dst, ctx, overload_tag());
 }
 
 void fromResourceListToApi(const QnLayoutResourceList &src, ApiLayoutDataList &dst) {
@@ -518,6 +515,7 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &
     dst.maxCameras = src->getMaxCameras();
     dst.authKey = src->getAuthKey();
     dst.allowAutoRedundancy = src->isRedundancy();
+    dst.systemName = src->getSystemName();
 
     QnAbstractStorageResourceList storageList = src->getStorages();
     dst.storages.resize(storageList.size());
@@ -541,6 +539,7 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     dst->setMaxCameras(src.maxCameras);
     dst->setAuthKey(src.authKey);
     dst->setRedundancy(src.allowAutoRedundancy);
+    dst->setSystemName(src.systemName);
 
     QnResourceTypePtr resType = ctx.resTypePool->getResourceTypeByName(lit("Storage"));
     if (!resType)
@@ -600,9 +599,9 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
 void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
     dst->setId(src.id);
     //dst->setGuid(guid);
+    dst->setName(src.name);
     dst->setTypeId(src.typeId);
     dst->setParentId(src.parentId);
-    dst->setName(src.name);
     dst->setUrl(src.url);
     dst->setStatus(src.status, true);
 
@@ -698,28 +697,8 @@ void fromApiToResource(const ApiUserData &src, QnUserResourcePtr &dst) {
 
 void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
     fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
-
-    QString password = src->getPassword();
-
-    if (!password.isEmpty()) {
-        QByteArray salt = QByteArray::number(rand(), 16);
-        QCryptographicHash md5(QCryptographicHash::Md5);
-        md5.addData(salt);
-        md5.addData(password.toUtf8());
-        dst.hash = "md5$";
-        dst.hash.append(salt);
-        dst.hash.append("$");
-        dst.hash.append(md5.result().toHex());
-
-        dst.digest = QnAuthHelper::createUserPasswordDigest( src->getName(), password );
-    }
-    else
-    {
-        //hash and digest already calculated?
-        dst.hash = src->getHash();
-        dst.digest = src->getDigest();
-    }
-
+    dst.hash = src->getHash();
+    dst.digest = src->getDigest();
     dst.isAdmin = src->isAdmin();
     dst.permissions = src->getPermissions();
     dst.email = src->getEmail();

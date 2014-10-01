@@ -80,7 +80,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
 
             QnDroidResourcePtr resource ( new QnDroidResource() );
 
-            QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("DroidLive"));
+            QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("DroidLive"));
             if (rt.isNull())
                 continue;
 
@@ -103,7 +103,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
     return resList;
 }
 
-QnResourcePtr QnPlDroidResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnPlDroidResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 

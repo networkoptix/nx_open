@@ -1,10 +1,10 @@
 
-Template: ${deb.customization.company.name}-mediaserver/adminPassword
+Template: ${deb.customization.company.name}-mediaserver/appserverPassword
 Type: string
 Default: 
 Description: Admin's password:
 
-Template: ${deb.customization.company.name}-mediaserver/adminPassword_invalid
+Template: ${deb.customization.company.name}-mediaserver/appserverPassword_invalid
 Type: error
 Description: Password can't be empty
 
@@ -19,7 +19,7 @@ Description: Port is invalid
 
 Template: ${deb.customization.company.name}-mediaserver/systemName
 Type: string
-Default: ${deb.customization.company.name}
+Default:
 Description: System name:
 
 Template: ${deb.customization.company.name}-mediaserver/removeDatabase

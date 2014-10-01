@@ -7,8 +7,8 @@
 namespace nx_ms_conf
 {
     //!Port, server listen on. All requests (ec2 API, mediaserver API, rtsp) are accepted on this port, so name \a rtspPort does not reflects its purpose
-    static const QLatin1String RTSP_PORT( "port" );
-    static const int DEFAULT_RTSP_PORT = 7001;
+    static const QLatin1String SERVER_PORT( "port" );
+    static const int DEFAULT_SERVER_PORT = 7001;
 
     static const QLatin1String MIN_STORAGE_SPACE( "minStorageSpace" );
 #ifdef __arm__
@@ -60,9 +60,15 @@ namespace nx_ms_conf
     static const int DEFAULT_HLS_INACTIVITY_PERIOD = 150;
 
     static const QLatin1String RESOURCE_INIT_THREADS_COUNT( "resourceInitThreadsCount" );
-    static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = DEFAULT_RESOURCE_INIT_THREADS_COUNT;
+    static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
 
     static const QLatin1String SSL_CERTIFICATE_PATH( "sslCertificatePath" );
+
+    static const QLatin1String PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME( "progressiveDownloadSessionLiveTimeSec" );
+    static const int DEFAULT_PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME = 0;    //no limit
+
+    static const QLatin1String ALLOW_SSL_CONNECTIONS( "allowSslConnections" );
+    static const bool DEFAULT_ALLOW_SSL_CONNECTIONS = true;
 }
 
 /*!

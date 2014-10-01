@@ -5,7 +5,8 @@ angular.module('webadminApp', [
     'ngResource',
     'ngSanitize',
     'ngRoute',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'tc.chartjs'
 ])
     .config(function ($routeProvider) {
         $routeProvider
@@ -19,7 +20,7 @@ angular.module('webadminApp', [
             })
             .when('/info', {
                 templateUrl: 'views/info.html',
-                controller: 'MainCtrl'
+                controller: 'InfoCtrl'
             })
             .when('/developers', {
                 templateUrl: 'views/developers.html',
@@ -36,6 +37,18 @@ angular.module('webadminApp', [
             .when('/login', {
               templateUrl: 'views/login.html',
               controller: 'LoginCtrl'
+            })
+            .when('/advanced', {
+                templateUrl: 'views/advanced.html',
+                controller: 'AdvancedCtrl'
+            })
+            .when('/webclient', {
+                templateUrl: 'views/webclient.html',
+                controller: 'WebclientCtrl'
+            })
+            .when('/sdkeula', {
+                templateUrl: 'views/sdkeula.html',
+                controller: 'SdkeulaCtrl'
             })
             .otherwise({
                 redirectTo: '/settings'

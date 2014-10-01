@@ -6,6 +6,7 @@
 #include <business/business_fwd.h>
 #include <utils/common/id.h>
 
+
 class QnBusinessEventParameters
 {
 public:
@@ -37,11 +38,11 @@ public:
     qint64 getEventTimestamp() const;
     void setEventTimestamp(qint64 value);
 
-    QUuid getEventResourceId() const;
-    void setEventResourceId(const QUuid& value);
+    QnUuid getEventResourceId() const;
+    void setEventResourceId(const QnUuid& value);
 
-    QUuid getActionResourceId() const;
-    void setActionResourceId(const QUuid& value);
+    QnUuid getActionResourceId() const;
+    void setActionResourceId(const QnUuid& value);
 
     QnBusiness::EventReason getReasonCode() const;
     void setReasonCode(QnBusiness::EventReason value);
@@ -79,8 +80,8 @@ private:
 private:
     QnBusiness::EventType m_eventType;
     qint64 m_timestamp;
-    QUuid m_resourceId;
-    QUuid m_actionResourceId;
+    QnUuid m_resourceId;
+    QnUuid m_actionResourceId;
 
     QString m_inputPort;
     QnBusiness::EventReason m_reasonCode;

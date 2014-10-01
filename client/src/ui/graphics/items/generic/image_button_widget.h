@@ -17,12 +17,11 @@ class QIcon;
 class QGLWidget;
 
 class VariantAnimator;
-class QnTextureTransitionShaderProgram;
 
 /**
  * A lightweight button widget that does not use styles for painting.
  */
-class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> >, protected QOpenGLFunctions {
+class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> > {
     Q_OBJECT
     Q_FLAGS(StateFlags StateFlag)
     Q_PROPERTY(bool checkable READ isCheckable WRITE setCheckable)
@@ -46,11 +45,7 @@ public:
 
     QnImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnImageButtonWidget();
-
-    // TODO: #Elric get rid of these, leave only icon.
-    const QPixmap &pixmap(StateFlags flags) const;
-    void setPixmap(StateFlags flags, const QPixmap &pixmap);
-    
+  
     QIcon icon() const;
     void setIcon(const QIcon &icon);
 
@@ -81,6 +76,13 @@ public:
     void setFixedSize(qreal width, qreal height);
     void setFixedSize(const QSizeF &size);
 
+    /** If the button size can be changed in runtime. */
+    bool isDynamic() const;
+    /**
+     * Allow or forbid dynamic size changes in runtime.
+     * Must be set before first paint because used in the VAO generation. 
+     */
+    void setDynamic(bool value);
 public slots:
     void toggle() { setChecked(!isChecked()); }
     void click();
@@ -118,10 +120,16 @@ protected:
     void invalidatePixmapCache();
     StateFlags validPixmapState(StateFlags flags) const;
 
+    void initializeVao(const QRectF &rect);
+    void updateVao(const QRectF &rect);
+
     bool skipHoverEvent(QGraphicsSceneHoverEvent *event);
-    bool skipMenuEvent(QGraphicsSceneMouseEvent *event);
 
     void clickInternal(QGraphicsSceneMouseEvent *event);
+
+    // TODO: #Elric get rid of these, leave only icon.
+    const QPixmap &pixmap(StateFlags flags) const;
+    void setPixmap(StateFlags flags, const QPixmap &pixmap);
 
 private:
     friend class QnImageButtonHoverProgressAccessor;
@@ -133,10 +141,9 @@ private:
     StateFlags m_state;
     bool m_checkable;
     bool m_cached;
+    bool m_dynamic;
     int m_skipNextHoverEvents;
     QPoint m_nextHoverEventPos;
-    int m_skipNextMenuEvents;
-    QPoint m_nextMenuEventPos;
 
     VariantAnimator *m_animator;
     qreal m_hoverProgress;
@@ -144,7 +151,13 @@ private:
     QAction *m_action;
     bool m_actionIconOverridden;
 
-    QSharedPointer<QnTextureTransitionShaderProgram> m_shader;
+    bool m_initialized;
+    QOpenGLVertexArrayObject m_verticesStatic;
+    QOpenGLVertexArrayObject m_verticesTransition;
+    QOpenGLBuffer m_positionBufferStatic;
+    QOpenGLBuffer m_positionBufferTransition;
+    QOpenGLBuffer m_textureBufferStatic;
+    QOpenGLBuffer m_textureBufferTransition;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)

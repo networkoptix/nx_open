@@ -19,11 +19,7 @@
                 <meta name="description" content=""/>
                 <meta name="viewport" content="width=device-width"/>
                 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-                <!-- build:css styles/vendor.css -->
-                <!-- bower:css -->
-                <link rel="stylesheet" href="bower_components/sass-bootstrap/dist/css/bootstrap.css"/>
-                <!-- endbower -->
-                <!-- endbuild -->
+                <link rel="stylesheet" href="styles/29403685.vendor.css"/>
                 <!-- build:css({.tmp,app}) styles/main.css -->
                 <link rel="stylesheet" href="styles/2ffdb355.main.css"/>
             </head>

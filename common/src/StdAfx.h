@@ -7,10 +7,17 @@
 
 /* Windows headers. */
 #ifdef _WIN32
+#   define FD_SETSIZE 2048
+
 #   include <winsock2.h>
 #   include <windows.h> /* You HAVE to include winsock2.h BEFORE windows.h */
 #   include <ws2tcpip.h>
 #   include <iphlpapi.h>
+
+#   if _MSC_VER < 1800
+#       define noexcept
+#   endif
+
 
 /* DXVA headers (should be included before ffmpeg headers). */
 #   ifdef _USE_DXVA
@@ -127,6 +134,6 @@ extern "C" {
 #include <QtGui/QResizeEvent>
 #include <QFileSystemWatcher>
 #include <QtCore/QUrlQuery>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #endif

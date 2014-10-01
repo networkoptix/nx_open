@@ -27,15 +27,15 @@ signals:
     void beforeModelChanged();
     void afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);
     
-    void businessRuleChanged(const QUuid &id);
-    void businessRuleDeleted(const QUuid &id);
+    void businessRuleChanged(const QnUuid &id);
+    void businessRuleDeleted(const QnUuid &id);
 public slots:
     void saveRule(int row);
 private slots:
     void at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnBusinessEventRulePtr &rule );
 
     void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);
-    void at_message_ruleDeleted(const QUuid &id);
+    void at_message_ruleDeleted(const QnUuid &id);
     void at_message_ruleReset(const QnBusinessEventRuleList &rules);
 
 private:

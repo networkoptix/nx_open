@@ -12,10 +12,14 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
     QObject(parent),
     m_items(new QnThreadsafeItemStorage<QnPeerRuntimeInfo>(&m_mutex, this))
 {
-    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::runtimeInfoChanged, this, [this](const ec2::ApiRuntimeData &runtimeData) {
+    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::runtimeInfoChanged, this, [this](const ec2::ApiRuntimeData &runtimeData) 
+    {
+        QMutexLocker lock(&m_updateMutex);
         QnPeerRuntimeInfo info(runtimeData);
-        if (m_items->hasItem(info.uuid))
+        if (m_items->hasItem(info.uuid)) {
+            //if (runtimeData.version > m_items->getItem(runtimeData.peer.id).data.version)
             m_items->updateItem(info.uuid, info);
+        }
         else
             m_items->addItem(info);
     });
@@ -29,7 +33,7 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
     });
 }
 
-QnThreadsafeItemStorage<QnPeerRuntimeInfo> * QnRuntimeInfoManager::items() const {
+const QnThreadsafeItemStorage<QnPeerRuntimeInfo> * QnRuntimeInfoManager::items() const {
     return m_items.data();
 }
 
@@ -60,13 +64,33 @@ QnPeerRuntimeInfo QnRuntimeInfoManager::localInfo() const {
     return m_items->getItem(qnCommon->moduleGUID());
 }
 
+QnPeerRuntimeInfo QnRuntimeInfoManager::item(const QnUuid& id) const {
+    return m_items->getItem(id);
+}
+
 QnPeerRuntimeInfo QnRuntimeInfoManager::remoteInfo() const {
     if (!m_items->hasItem(qnCommon->remoteGUID()))
         return QnPeerRuntimeInfo();
     return m_items->getItem(qnCommon->remoteGUID());
 }
 
-bool QnRuntimeInfoManager::hasItem(const QUuid& id)
+bool QnRuntimeInfoManager::hasItem(const QnUuid& id)
 {
     return m_items->hasItem(id);
+}
+
+void QnRuntimeInfoManager::updateLocalItem(const QnPeerRuntimeInfo& value)
+{
+    QMutexLocker lock(&m_updateMutex);
+    Q_ASSERT(value.uuid == qnCommon->moduleGUID());
+    QnPeerRuntimeInfo modifiedValue = value;
+    if (m_items->hasItem(value.uuid)) {
+        int oldVersion = m_items->getItem(value.uuid).data.version;
+        modifiedValue.data.version = oldVersion + 1;
+        m_items->updateItem(value.uuid, modifiedValue);
+    }
+    else {
+        modifiedValue.data.version = 1;
+        m_items->addItem(modifiedValue);
+    }
 }

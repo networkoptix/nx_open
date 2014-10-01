@@ -1,0 +1,47 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1521" measuredH="664" mockupW="1188" mockupH="614">
+  <controls>
+    <control controlID="12" controlTypeID="__group__" x="333" y="50" w="1188" h="614" measuredW="1188" measuredH="614" zOrder="0" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::BrowserWindow" x="0" y="0" w="1188" h="614" measuredW="450" measuredH="400" zOrder="0" locked="true" isInGroup="12">
+          <controlProperties>
+            <text>Network%20Optix%20Admin%0Ahttp%3A//192.168.0.1</text>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::LinkBar" x="9" y="79" w="-1" h="-1" measuredW="242" measuredH="19" zOrder="1" locked="false" isInGroup="12">
+          <controlProperties>
+            <hrefs>Settings%26bm%3BSettings.bmml%26bm%3BSettings.bmml%26bm%3BSettings.bmml%2CInformation%26bm%3BInformation.bmml%26bm%3BInformation.bmml%26bm%3BInformation.bmml%2CFor%20Developers%26bm%3BFor%20Developers.bmml%26bm%3BFor%20Developers.bmml%26bm%3BFor%20Developers.bmml</hrefs>
+            <map>%3Carea%20shape%3D%22rect%22%20coords%3D%229%2C81%2C60%2C94%22%20href%3D%22Settings.bmml%22%20alt%3D%22Settings%22%20id%3D%221%22/%3E%3Carea%20shape%3D%22rect%22%20coords%3D%2278%2C81%2C144%2C94%22%20href%3D%22Information.bmml%22%20alt%3D%22Information%22%20id%3D%221%22/%3E%3Carea%20shape%3D%22rect%22%20coords%3D%22162%2C81%2C251%2C94%22%20href%3D%22For%2520Developers.bmml%22%20alt%3D%22For%20Developers%22%20id%3D%221%22/%3E</map>
+            <selectedIndex>2</selectedIndex>
+            <text>Settings%2C%20Information%2C%20For%20Developers</text>
+          </controlProperties>
+        </control>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::LinkBar" x="1083" y="79" w="-1" h="-1" measuredW="92" measuredH="19" zOrder="2" locked="false" isInGroup="12">
+          <controlProperties>
+            <hrefs>http%3A//support.networkoptix.com%2CHelp%26bm%3BHelp.bmml%26bm%3BHelp.bmml%26bm%3BHelp.bmml</hrefs>
+            <map>%3Carea%20shape%3D%22rect%22%20coords%3D%221083%2C81%2C1130%2C94%22%20href%3D%22http%3A//support.networkoptix.com%22%20alt%3D%22http%3A//support.networkoptix.com%22%20id%3D%223%22%20target%3D%22_blank%22/%3E%3Carea%20shape%3D%22rect%22%20coords%3D%221148%2C81%2C1175%2C94%22%20href%3D%22Help.bmml%22%20alt%3D%22Help%22%20id%3D%223%22/%3E</map>
+            <text>Support%2C%20Help</text>
+          </controlProperties>
+        </control>
+        <control controlID="4" controlTypeID="com.balsamiq.mockups::Label" x="917" y="552" w="-1" h="-1" measuredW="258" measuredH="21" zOrder="3" locked="false" isInGroup="12">
+          <controlProperties>
+            <text>Copyright%20%28c%29%202011-2014%2C%20Network%20Optix%20Inc</text>
+          </controlProperties>
+        </control>
+        <control controlID="5" controlTypeID="com.balsamiq.mockups::Title" x="431" y="158" w="-1" h="-1" measuredW="376" measuredH="43" zOrder="4" locked="false" isInGroup="12">
+          <controlProperties>
+            <text>Developer%20resources</text>
+          </controlProperties>
+        </control>
+        <control controlID="6" controlTypeID="com.balsamiq.mockups::List" x="237" y="248" w="431" h="119" measuredW="100" measuredH="126" zOrder="5" locked="false" isInGroup="12">
+          <controlProperties>
+            <borderStyle>none</borderStyle>
+            <hrefs>http%3A//192.168.0.1/api</hrefs>
+            <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22237%2C251%2C668%2C276%22%20href%3D%22http%3A//192.168.0.1/api%22%20alt%3D%22http%3A//192.168.0.1/api%22%20id%3D%226%22%20target%3D%22_blank%22/%3E</map>
+            <rowHeight>25</rowHeight>
+            <text>API</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+  </controls>
+</mockup>

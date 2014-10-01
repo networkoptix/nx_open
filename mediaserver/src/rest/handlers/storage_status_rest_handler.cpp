@@ -32,14 +32,23 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
     
     QnStorageStatusReply reply;
     reply.pluginExists = storage;
-    reply.storage.storageId = exists ? storage->getId() : QUuid();
-    reply.storage.path = storageUrl;
+    reply.storage.storageId = exists ? storage->getId() : QnUuid();
+    reply.storage.url = storageUrl;
     reply.storage.freeSpace = storage ? storage->getFreeSpace() : -1;
     reply.storage.reservedSpace = storage ? storage->getSpaceLimit() : -1;
     reply.storage.totalSpace = storage ? storage->getTotalSpace() : -1;
-    reply.storage.isExternal = storageUrl.contains(QLatin1String("://")) || storageUrl.trimmed().startsWith(QLatin1String("\\\\")); // TODO: #Elric not consistent with space_handler
-    reply.storage.isWritable = storage ? storage->isStorageAvailableForWriting() : false;
-    reply.storage.isUsedForWriting = exists ? storage->isUsedForWriting() : false;
+    reply.storage.isExternal = storageUrl.trimmed().startsWith(lit("\\\\")) || QUrl(storageUrl).path().mid(1).startsWith(lit("\\\\"));  // TODO: #Elric not consistent with space_handler
+#ifdef WIN32
+    if (!reply.storage.isExternal) {
+        reply.storage.isWritable = false;
+        reply.storage.isUsedForWriting = false;
+    }
+    else 
+#endif
+    {
+        reply.storage.isWritable = storage ? storage->isStorageAvailableForWriting() : false;
+        reply.storage.isUsedForWriting = exists ? storage->isUsedForWriting() : false;
+    }
         
     // TODO: #Elric remove once UnknownSize is dropped.
     if(reply.storage.totalSpace == QnStorageResource::UnknownSize)

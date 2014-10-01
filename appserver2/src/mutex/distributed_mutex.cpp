@@ -4,102 +4,13 @@
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
 #include "utils/common/delete_later.h"
+#include "distributed_mutex_manager.h"
 
 
 namespace ec2
 {
 
 static const qint64 NO_MUTEX_LOCK = INT64_MAX;
-static QnDistributedMutexManager* m_staticInstance = 0;
-
-QnDistributedMutexManager* QnDistributedMutexManager::instance()
-{
-    return m_staticInstance;
-}
-
-void QnDistributedMutexManager::initStaticInstance(QnDistributedMutexManager* value)
-{
-    if (m_staticInstance)
-        delete m_staticInstance;
-    m_staticInstance = value;
-}
-
-QnDistributedMutexManager::QnDistributedMutexManager():
-    m_timestamp(1),
-    m_userDataHandler(0)
-{
-    connect(qnTransactionBus, &QnTransactionMessageBus::gotLockRequest,    this, &QnDistributedMutexManager::at_gotLockRequest, Qt::DirectConnection);
-    connect(qnTransactionBus, &QnTransactionMessageBus::gotLockResponse,   this, &QnDistributedMutexManager::at_gotLockResponse, Qt::DirectConnection);
-    //connect(qnTransactionBus, &QnTransactionMessageBus::gotUnlockRequest,  this, &QnDistributedMutexManager::at_gotUnlockRequest, Qt::DirectConnection);
-}
-
-void QnDistributedMutexManager::setUserDataHandler(QnMutexUserDataHandler* userDataHandler)
-{
-    m_userDataHandler = userDataHandler;
-}
-
-QnDistributedMutex* QnDistributedMutexManager::createMutex(const QString& name)
-{
-    QMutexLocker lock(&m_mutex);
-
-    Q_ASSERT(!m_mutexList.value(name));
-
-    QnDistributedMutex* netMutex = new QnDistributedMutex(this, name);
-    m_mutexList.insert(name, netMutex);
-
-    return netMutex;
-}
-
-void QnDistributedMutexManager::releaseMutex(const QString& name)
-{
-    m_mutexList.remove(name);
-}
-
-void QnDistributedMutexManager::at_gotLockRequest(ApiLockData lockData)
-{
-    QMutexLocker lock(&m_mutex);
-
-    m_timestamp = qMax(m_timestamp, lockData.timestamp);
-
-    QnDistributedMutex* netMutex = m_mutexList.value(lockData.name);
-    if (netMutex)
-        netMutex->at_gotLockRequest(lockData);
-    else {
-        QnTransaction<ApiLockData> tran(ApiCommand::lockResponse);
-        tran.params.name = lockData.name;
-        tran.params.timestamp = lockData.timestamp;
-        tran.params.peer = qnCommon->moduleGUID();
-        if (m_userDataHandler)
-            tran.params.userData = m_userDataHandler->getUserData(lockData.name);
-        qnTransactionBus->sendTransaction(tran, lockData.peer);
-    }
-}
-
-
-void QnDistributedMutexManager::at_gotLockResponse(ApiLockData lockData)
-{
-    QMutexLocker lock(&m_mutex);
-
-    QnDistributedMutex* netMutex = m_mutexList.value(lockData.name);
-    if (netMutex)
-        netMutex->at_gotLockResponse(lockData);
-}
-
-/*
-void QnDistributedMutexManager::at_gotUnlockRequest(ApiLockData lockData)
-{
-    QMutexLocker lock(&m_mutex);
-
-    QnDistributedMutexPtr netMutex = m_mutexList.value(lockData.name);
-    if (netMutex)
-        netMutex->at_gotUnlockRequest(lockData);
-}
-*/
-
-qint64 QnDistributedMutexManager::newTimestamp()
-{
-    return ++m_timestamp;
-}
 
 // ----------------------------- QnDistributedMutex ----------------------------
 
@@ -110,8 +21,8 @@ QnDistributedMutex::QnDistributedMutex(QnDistributedMutexManager* owner, const Q
     m_locked(false),
     m_owner(owner)
 {
-    connect(qnTransactionBus, &QnTransactionMessageBus::peerFound,         this, &QnDistributedMutex::at_newPeerFound, Qt::DirectConnection);
-    connect(qnTransactionBus, &QnTransactionMessageBus::peerLost,          this, &QnDistributedMutex::at_peerLost, Qt::DirectConnection);
+    connect(m_owner, &QnDistributedMutexManager::peerFound,         this, &QnDistributedMutex::at_newPeerFound, Qt::DirectConnection);
+    connect(m_owner, &QnDistributedMutexManager::peerLost,          this, &QnDistributedMutex::at_peerLost, Qt::DirectConnection);
     m_timer = new QTimer();
     connect(m_timer, &QTimer::timeout, this, &QnDistributedMutex::at_timeout);
     m_timer->setSingleShot(true);
@@ -124,7 +35,7 @@ QnDistributedMutex::~QnDistributedMutex()
 
 bool QnDistributedMutex::isAllPeersReady() const
 {
-    foreach(const QUuid& peer, qnTransactionBus->aliveServerPeers().keys())
+    foreach(const QnUuid& peer, qnTransactionBus->aliveServerPeers().keys())
     {
         if (!m_proccesedPeers.contains(peer))
             return false;
@@ -132,7 +43,7 @@ bool QnDistributedMutex::isAllPeersReady() const
     return true;
 }
 
-void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QUuid& dstPeer)
+void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QnUuid& dstPeer)
 {
     QnTransaction<ApiLockData> tran(command);
     tran.params.name = m_name;
@@ -174,10 +85,12 @@ void QnDistributedMutex::at_peerLost(ec2::ApiPeerAliveData data)
 
 void QnDistributedMutex::at_timeout()
 {
-    QMutexLocker lock(&m_mutex);
-    if (m_locked)
-        return;
-    unlockInternal();
+    {
+        QMutexLocker lock(&m_mutex);
+        if (m_locked)
+            return;
+    }
+    unlock();
     emit lockTimeout();
 }
 
@@ -187,7 +100,7 @@ void QnDistributedMutex::lockAsync(int timeoutMs)
     m_selfLock = LockRuntimeInfo(qnCommon->moduleGUID(), m_owner->newTimestamp(), m_name);
     if (m_owner->m_userDataHandler)
         m_selfLock.userData = m_owner->m_userDataHandler->getUserData(m_name);
-    sendTransaction(m_selfLock, ApiCommand::lockRequest, QUuid()); // send broadcast
+    sendTransaction(m_selfLock, ApiCommand::lockRequest, QnUuid()); // send broadcast
     m_timer->start(timeoutMs);
     m_peerLockInfo.insert(m_selfLock, 0);
     checkForLocked();
@@ -195,6 +108,7 @@ void QnDistributedMutex::lockAsync(int timeoutMs)
 
 void QnDistributedMutex::unlock()
 {
+    m_owner->releaseMutex(m_name);
     QMutexLocker lock(&m_mutex);
     unlockInternal();
 }
@@ -214,7 +128,7 @@ void QnDistributedMutex::unlockInternal()
     */
 
     foreach(ApiLockData lockData, m_delayedResponse) {
-        QUuid srcPeer = lockData.peer;
+        QnUuid srcPeer = lockData.peer;
         lockData.peer = qnCommon->moduleGUID();
         sendTransaction(lockData, ApiCommand::lockResponse, srcPeer);
     }
@@ -227,7 +141,6 @@ void QnDistributedMutex::unlockInternal()
     m_locked = false;
     m_proccesedPeers.clear();
     m_peerLockInfo.clear();
-    m_owner->releaseMutex(m_name);
 }
 
 void QnDistributedMutex::at_gotLockResponse(ApiLockData lockData)

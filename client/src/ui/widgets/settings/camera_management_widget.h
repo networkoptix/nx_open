@@ -9,9 +9,6 @@ namespace Ui {
     class CameraManagementWidget;
 }
 
-template<class T>
-class QnResourcePropertyAdaptor;
-
 class QnCameraManagementWidget: public QnAbstractPreferencesWidget {
     Q_OBJECT
 public:

@@ -37,7 +37,7 @@ fi
 PORT_DEFAULT="7001"
 TRANSPORT_DEAULT="auto"
 PUBLIC_IP_ENABLED_DEFAULT="auto"
-SYSTEM_NAME=$COMPANY_NAME
+SYSTEM_NAME_DEFAULT=$COMPANY_NAME
 ALLOW_CAMERA_CHANGES_DEFAULT=true
 
 function is_local_addr {
@@ -110,7 +110,7 @@ function ask_for_value {
     echo $RESULT
 }
 
-function validate_adminPassword {
+function validate_appserverPassword {
     [ -n "$1" ]
 }
 
@@ -144,8 +144,8 @@ case "$1" in
         $CFG_HELPER port "$PORT"
 
         if [ ! -f $DB_PATH -a ! -f $OLD_DB_PATH ]; then
-            ADMIN_PASSWORD=$(ask_for_value adminPassword "$ADMIN_PASSWORD")
-            $CFG_HELPER adminPassword "$ADMIN_PASSWORD"
+            APPSERVER_PASSWORD=$(ask_for_value appserverPassword "$APPSERVER_PASSWORD")
+            $CFG_HELPER appserverPassword "$APPSERVER_PASSWORD"
         fi
 
         TRANSPORT="$($CFG_HELPER rtspTransport)"
@@ -154,7 +154,7 @@ case "$1" in
 
         SYSTEM_NAME="$($CFG_HELPER systemName)"
         [ -z "$SYSTEM_NAME" ] && SYSTEM_NAME=$SYSTEM_NAME_DEFAULT
-        SYSTEM_NAME=$(ask_for_value systemName "$systemName")
+        SYSTEM_NAME=$(ask_for_value systemName "$SYSTEM_NAME")
         $CFG_HELPER systemName "$SYSTEM_NAME"
 
         ALLOW_CAMERA_CHANGES="$($CFG_HELPER allowCameraChanges)"

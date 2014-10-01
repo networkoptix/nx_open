@@ -14,6 +14,7 @@ QnTextButtonWidget::QnTextButtonWidget(QGraphicsItem *parent, Qt::WindowFlags wi
     m_relativeFrameWidth(-1.0)
 {
     setFrameShape(Qn::NoFrame);
+    setDynamic(true);
     qFill(m_opacities, -1.0);
     m_opacities[0] = 1.0;
 }

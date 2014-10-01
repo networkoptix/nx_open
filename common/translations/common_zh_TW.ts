@@ -78,11 +78,11 @@
     <name>QObject</name>
     <message>
         <source>Camera output</source>
-        <translation>顯示攝影機</translation>
+        <translation>啟動攝影機DO</translation>
     </message>
     <message>
         <source>Camera output for 30 sec</source>
-        <translation>顯示攝影機30秒</translation>
+        <translation>啟動攝影機DO 30秒</translation>
     </message>
     <message>
         <source>Bookmark</source>

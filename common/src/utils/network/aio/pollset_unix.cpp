@@ -15,7 +15,7 @@
 
 #include <map>
 
-#include "../socket.h"
+#include "../system_socket.h"
 
 #ifdef Q_OS_ANDROID
 #   define EPOLLRDHUP 0x2000 /* Android doesn't define EPOLLRDHUP, but it still works if defined properly. */
@@ -71,7 +71,7 @@ namespace aio
         };
 
         //!map<fd, pair<events mask, user data> >
-        typedef std::map<AbstractSocket*, SockData> MonitoredEventMap;
+        typedef std::map<Socket*, SockData> MonitoredEventMap;
 
         int epollSetFD;
         MonitoredEventMap monitoredEvents;
@@ -235,12 +235,12 @@ namespace aio
         return *this;
     }
 
-    const AbstractSocket* PollSet::const_iterator::socket() const
+    const Socket* PollSet::const_iterator::socket() const
     {
         return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->first;
     }
 
-    AbstractSocket* PollSet::const_iterator::socket()
+    Socket* PollSet::const_iterator::socket()
     {
         return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->first;
     }
@@ -331,7 +331,7 @@ namespace aio
     }
 
     //!Add socket to set. Does not take socket ownership
-    bool PollSet::add( AbstractSocket* const sock, EventType eventType, void* userData )
+    bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
     {
         const int epollEventType = eventType == etRead ? EPOLLIN : EPOLLOUT;
 
@@ -378,7 +378,7 @@ namespace aio
     }
 
     //!Remove socket from set
-    void* PollSet::remove( AbstractSocket* const sock, EventType eventType )
+    void* PollSet::remove( Socket* const sock, EventType eventType )
     {
         const int epollEventType = eventType == etRead ? EPOLLIN : EPOLLOUT;
         PollSetImpl::MonitoredEventMap::iterator it = m_impl->monitoredEvents.find( sock );
@@ -419,13 +419,12 @@ namespace aio
         }
     }
 
-    size_t PollSet::size( EventType /*eventType*/ ) const
+    size_t PollSet::size() const
     {
-        //TODO #ak: return only for events eventType
         return m_impl->monitoredEvents.size();
     }
 
-    void* PollSet::getUserData( AbstractSocket* const sock, EventType eventType ) const
+    void* PollSet::getUserData( Socket* const sock, EventType eventType ) const
     {
         const int epollEventType = eventType == etRead ? EPOLLIN : EPOLLOUT;
         PollSetImpl::MonitoredEventMap::iterator it = m_impl->monitoredEvents.find( sock );
@@ -451,6 +450,11 @@ namespace aio
             millisToWait < 0 ? -1 : millisToWait );
         m_impl->signalledSockCount = result < 0 ? 0 : result;
         return result;
+    }
+
+    bool PollSet::canAcceptSocket( Socket* const /*sock*/ ) const
+    {
+        return true;
     }
 
     //!Returns iterator pointing to first socket, which state has been changed in previous \a poll call

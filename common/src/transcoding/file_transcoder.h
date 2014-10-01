@@ -109,7 +109,7 @@ public slots:
     virtual void pleaseStop() override;
     //!Start transcoding
     /*!
-        This method returns immediately. On transcoding end \a done signal is emmitted
+        This method returns immediately. On transcoding end \a done signal is emitted
     */
     bool startAsync();
     //!Do transcoding in sync mode

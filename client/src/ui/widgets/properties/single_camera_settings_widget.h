@@ -28,6 +28,10 @@ class QnCameraMotionMaskWidget;
 class QnCameraSettingsWidgetPrivate;
 class QnImageProvider;
 
+#ifdef QT_WEBKITWIDGETS_LIB
+class CameraAdvancedSettingsWebPage;
+#endif
+
 class QnSingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
@@ -205,8 +209,11 @@ private:
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
     mutable QnMediaServerConnectionPtr m_serverConnection;
 
-    QHash<QUuid, QnImageProvider*> m_imageProvidersByResourceId;
+    QHash<QnUuid, QnImageProvider*> m_imageProvidersByResourceId;
 	QUrl m_lastCameraPageUrl;
+#ifdef QT_WEBKITWIDGETS_LIB
+    CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
+#endif
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

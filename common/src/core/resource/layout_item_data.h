@@ -4,7 +4,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QVariant>
 
 #include <core/ptz/item_dewarping_params.h>
@@ -21,14 +21,14 @@ public:
     {}
 
     struct {
-        QUuid id;
+        QnUuid id;
         QString path;
     } resource;
 
-    QUuid uuid;
+    QnUuid uuid;
     int flags;
     QRectF combinedGeometry;
-    QUuid zoomTargetUuid;
+    QnUuid zoomTargetUuid;
     QRectF zoomRect;
     qreal rotation;
     ImageCorrectionParams contrastParams;
@@ -55,7 +55,7 @@ Q_DECLARE_METATYPE(QnLayoutItemData);
 Q_DECLARE_TYPEINFO(QnLayoutItemData, Q_MOVABLE_TYPE);
 
 typedef QList<QnLayoutItemData> QnLayoutItemDataList;
-typedef QHash<QUuid, QnLayoutItemData> QnLayoutItemDataMap;
+typedef QHash<QnUuid, QnLayoutItemData> QnLayoutItemDataMap;
 
 Q_DECLARE_METATYPE(QnLayoutItemDataList);
 Q_DECLARE_METATYPE(QnLayoutItemDataMap);

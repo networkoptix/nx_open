@@ -1,4 +1,4 @@
-<h1>Server settings</h1>
+<h2>Server settings</h2>
 <ng-include src="views/join.html"></ng-include>
 
 <form novalidate name="form" class="form-horizontal" role="form">
@@ -18,12 +18,35 @@
         </div>
     </div>
 
+
     <div class="form-group">
-        <label for="password" class="col-md-3 control-label">Password</label>
+        <div class="col-md-9 col-md-offset-3">
+            <button type="button" class="btn btn-primary" ng-click="save()">Save</button>
+            <button type="button" class="btn btn-default" ng-click="restart()">Restart</button>
+            <button type="button" class="btn btn-default pull-right" ng-click="openJoinDialog()">Merge Systems</button>
+        </div>
+    </div>
+</form>
+
+<h2>Change system password</h2>
+
+<form novalidate name="form" class="form-horizontal" role="form">
+
+    <div class="form-group">
+        <label for="old-password" class="col-md-3 control-label">Old Password</label>
 
         <div class="col-md-9">
-            <input type="password" class="form-control" id="password" placeholder="Password"
-                   ng-model="settings.password">
+            <input type="password" class="form-control" id="old-password" placeholder="Old Password"
+                   ng-model="oldPassword">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="password" class="col-md-3 control-label">New Password</label>
+
+        <div class="col-md-9">
+            <input type="password" class="form-control" id="password" placeholder="New Password"
+                   ng-model="password">
         </div>
     </div>
     <div class="form-group" ng-class="{'has-error':form.confirmPassword.$error.nxEqualEx}">
@@ -32,8 +55,7 @@
         <div class="col-md-9">
             <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
                    placeholder="Confirm Password"
-                   ng-model="confirmPassword" nx-equal-ex="settings.password"
-                    >
+                   ng-model="confirmPassword" nx-equal-ex="password">
 
             <div class="help-inline">
                 <span id="mustBeEqualSpan" ng-show="!!form.confirmPassword.$error.nxEqualEx">Must be equal!</span>
@@ -45,9 +67,7 @@
 
     <div class="form-group">
         <div class="col-md-9 col-md-offset-3">
-            <button type="button" class="btn btn-primary" ng-click="save()">Save</button>
-            <button type="button" class="btn btn-default" ng-click="restart()">Restart</button>
-            <button type="button" class="btn btn-default pull-right" ng-click="openJoinDialog()">Join Other System</button>
+            <button type="button" class="btn btn-primary" ng-click="changePassword()">Change password</button>
         </div>
     </div>
 </form>

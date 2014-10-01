@@ -1,1 +1,45 @@
-<h1>Server Information</h1>
+
+
+<h2>Storages</h2>
+
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Url
+            </th>
+            <th >
+                Space
+            </th>
+            <th width="54">
+                &nbsp;
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="storage in storages">
+            <td>{{storage.url}}</td>
+            <td>{{formatSpace(storage.totalSpace)}}</td>
+            <td>
+                <icon for="storage.isExternal" on-true="globe" on-false="hdd" title-true="External" title-false="Intrenal" />
+
+                <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"/>
+                <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"/>
+
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Log</h2>
+<blockquote>
+    <iframe class="log-frame" name="log-frame" src="/api/showLog?lines=7"></iframe>
+</blockquote>
+    <a href="/api/showLog?lines=7" target="log-frame" class="btn btn-primary">Refresh</a>
+    <a href="/api/showLog" target="_blank" class="btn btn-default">Open in a new window</a>
+
+<h2>Health monitoring</h2>
+
+        <ng-include src="'views/health.html'"></ng-include>

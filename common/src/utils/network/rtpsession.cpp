@@ -9,7 +9,7 @@
 #include "rtp_stream_parser.h"
 
 #include <QtCore/QFile>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include "utils/common/log.h"
 #include "utils/common/util.h"
@@ -514,7 +514,8 @@ void RTPSession::parseSDP()
             if (mapNum >= 0) {
                 if (codecName.isEmpty())
                     codecName = findCodecById(mapNum);
-                m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
+                QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
+                m_sdpTracks << sdpTrack;
                 setupURL.clear();
             }
             QList<QByteArray> trackParams = lineLower.mid(2).split(' ');
@@ -548,7 +549,8 @@ void RTPSession::parseSDP()
             codecName = findCodecById(mapNum);
         //if (codecName == QLatin1String("ffmpeg-metadata"))
         //    trackNumber = METADATA_TRACK_NUM;
-        m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
+        QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
+        m_sdpTracks << sdpTrack;
     }
     updateTrackNum();
 }
@@ -847,27 +849,28 @@ bool RTPSession::sendOptions()
     return m_tcpSock->send(request.data(), request.size()) > 0;
 }
 
-RTPIODevice* RTPSession::getTrackIoByType(TrackType trackType)
+int RTPSession::getTrackCount(TrackType trackType) const
 {
+    int result = 0;
     for (int i = 0; i < m_sdpTracks.size(); ++i)
     {
         if (m_sdpTracks[i]->trackType == trackType)
-            return m_sdpTracks[i]->ioDevice;
+            ++result;
     }
-    return 0;
-}
-
-QString RTPSession::getCodecNameByType(TrackType trackType)
-{
-    for (int i = 0; i < m_sdpTracks.size(); ++i)
-    {
-        if (m_sdpTracks[i]->trackType == trackType)
-            return m_sdpTracks[i]->codecName;
-    }
-    return QString();
+    return result;
 }
 
 QList<QByteArray> RTPSession::getSdpByType(TrackType trackType) const
+{
+    for (int i = 0; i < m_sdpTracks.size(); ++i)
+    {
+        if (m_sdpTracks[i]->trackType == trackType)
+            return getSdpByTrackNum(i);
+    }
+    return QList<QByteArray>();
+}
+
+QList<QByteArray> RTPSession::getSdpByTrackNum(int trackNum) const
 {
     QList<QByteArray> rez;
     QList<QByteArray> tmp = m_sdp.split('\n');
@@ -875,7 +878,7 @@ QList<QByteArray> RTPSession::getSdpByType(TrackType trackType) const
     int mapNum = -1;
     for (int i = 0; i < m_sdpTracks.size(); ++i)
     {
-        if (m_sdpTracks[i]->trackType == trackType)
+        if (trackNum == m_sdpTracks[i]->trackNum)
             mapNum = m_sdpTracks[i]->mapNum;
     }
     if (mapNum == -1)
@@ -1143,7 +1146,7 @@ QByteArray RTPSession::getGuid()
 {
     QMutexLocker lock(&m_guidMutex);
     if (m_guid.isEmpty())
-        m_guid = QUuid::createUuid().toString().toUtf8();
+        m_guid = QnUuid::createUuid().toString().toUtf8();
     return m_guid;
 }
 
@@ -1829,6 +1832,17 @@ RTPSession::TrackType RTPSession::getTrackTypeByRtpChannelNum(int channelNum)
     return rez;
 }
 
+int RTPSession::getChannelNum(int rtpChannelNum)
+{
+    rtpChannelNum = rtpChannelNum & ~1;
+    if (rtpChannelNum < m_rtpToTrack.size()) {
+        QSharedPointer<SDPTrackInfo> track = m_rtpToTrack[rtpChannelNum];
+        if (track)
+            return track->trackNum;
+    }
+    return 0;
+}
+
 RTPSession::TrackType RTPSession::getTrackType(int trackNum) const
 {
     // client setup all track numbers consequentially, so we can use track num as direct vector index. Expect medata track with fixed num and always last record
@@ -2015,6 +2029,11 @@ bool RTPSession::sendRequestAndReceiveResponse( const QByteArray& requestBuf, QB
     }
 
     return false;
+}
+
+RTPSession::TrackMap RTPSession::getTrackInfo() const
+{
+    return m_sdpTracks;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

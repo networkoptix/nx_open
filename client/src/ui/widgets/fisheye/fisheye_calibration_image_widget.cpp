@@ -29,8 +29,8 @@ QnFisheyeCalibrationImageWidget::QnFisheyeCalibrationImageWidget(QWidget *parent
     m_lineColor(QColor(128, 196, 255)),
     m_center(0.5, 0.5),
     m_radius(0.5),
-    m_lineWidth(4),
-    m_stretch(1.0)
+    m_stretch(1.0),
+    m_lineWidth(4)
 {
     m_dragProcessor->setHandler(this);
     setMouseTracking(true);

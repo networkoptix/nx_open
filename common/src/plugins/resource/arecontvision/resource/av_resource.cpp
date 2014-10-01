@@ -404,7 +404,7 @@ bool QnPlAreconVisionResource::setParamPhysical(const QnParam &param, const QVar
 
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString &name)
 {
-    QUuid rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, name);
+    QnUuid rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, name);
     if (rt.isNull())
     {
         if ( name.left(2).toLower() == lit("av") )
@@ -423,7 +423,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const Q
 
 }
 
-QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QUuid rt)
+QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnUuid rt)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(rt);
 

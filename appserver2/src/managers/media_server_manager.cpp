@@ -25,7 +25,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnMediaServerManager<T>::getServers( impl::GetServersHandlerPtr handler )
+    int QnMediaServerManager<T>::getServers( const QnUuid& mediaServerId,  impl::GetServersHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
@@ -35,8 +35,8 @@ namespace ec2
                 fromApiToResourceList(servers, outData, m_resCtx);
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiMediaServerDataList, decltype(queryDoneHandler)> (
-            ApiCommand::getMediaServers, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<QnUuid, ApiMediaServerDataList, decltype(queryDoneHandler)> (
+            ApiCommand::getMediaServers, mediaServerId, queryDoneHandler);
         return reqID;
     }
 
@@ -46,13 +46,13 @@ namespace ec2
         const int reqID = generateRequestID();
 
         if (resource->getId().isNull())
-            resource->setId( QUuid::createUuid());
+            resource->setId( QnUuid::createUuid());
 
         QnAbstractStorageResourceList storages = resource->getStorages();
         for (int i = 0; i < storages.size(); ++i)
         {
             if (storages[i]->getId().isNull())
-                storages[i]->setId(QUuid::createUuid());
+                storages[i]->setId(QnUuid::createUuid());
         }
         resource->setStorages(storages);
 
@@ -66,7 +66,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnMediaServerManager<T>::remove( const QUuid& id, impl::SimpleHandlerPtr handler )
+    int QnMediaServerManager<T>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::removeMediaServer, id );
@@ -84,7 +84,7 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiIdData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QUuid& id )
+    QnTransaction<ApiIdData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnUuid& id )
     {
         QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;

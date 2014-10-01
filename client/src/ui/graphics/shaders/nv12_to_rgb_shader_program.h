@@ -6,7 +6,7 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include "base_shader_program.h"
 
-class QnNv12ToRgbShaderProgram: public QnAbstractBaseGLShaderProgramm {
+class QnNv12ToRgbShaderProgram: public QnGLShaderProgram {
     Q_OBJECT
 public:
     enum Colorspace {
@@ -16,7 +16,7 @@ public:
         YuvSmtp240m
     };
 
-    QnNv12ToRgbShaderProgram(const QGLContext *context, QObject *parent = NULL);
+    QnNv12ToRgbShaderProgram(QObject *parent = NULL);
 
     /**
      * \param target                    Number of the texture block that Y-plane is loaded to. 

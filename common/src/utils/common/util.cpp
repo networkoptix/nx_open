@@ -15,7 +15,7 @@
 
 #include <common/common_globals.h>
 #include <utils/mac_utils.h>
-#include "version.h"
+#include <utils/common/app_info.h>
 
 
 bool removeDir(const QString &dirName)
@@ -56,10 +56,10 @@ QString getMoviesDirectory()
 {
 #ifdef Q_OS_MACX
     QString moviesDir = mac_getMoviesDir();
-    return moviesDir.isEmpty() ? QString() : moviesDir + QLatin1String("/") + QLatin1String(QN_MEDIA_FOLDER_NAME);
+    return moviesDir.isEmpty() ? QString() : moviesDir + QLatin1String("/") + QnAppInfo::mediaFolderName();
 #else
     const QStringList& moviesDirs = QStandardPaths::standardLocations(QStandardPaths::MoviesLocation);
-    return moviesDirs.isEmpty() ? QString() : (moviesDirs[0] + QLatin1String("/") + QLatin1String(QN_MEDIA_FOLDER_NAME) );
+    return moviesDirs.isEmpty() ? QString() : (moviesDirs[0] + QLatin1String("/") + QnAppInfo::mediaFolderName()) ;
 #endif
 }
 
@@ -67,9 +67,9 @@ QString getBackgroundsDirectory() {
     const QStringList& pictureFolderList = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
     QString baseDir = pictureFolderList.isEmpty() ? QString(): pictureFolderList[0];
 #ifdef Q_OS_WIN
-    QString productDir = baseDir + QDir::toNativeSeparators(QString(lit("/%1 Backgrounds")).arg(lit(QN_PRODUCT_NAME_LONG)));
+    QString productDir = baseDir + QDir::toNativeSeparators(QString(lit("/%1 Backgrounds")).arg(QnAppInfo::productNameLong()));
 #else
-    QString productDir = QDir::toNativeSeparators(QString(lit("/opt/%1/client/share/pictures/sample-backgrounds")).arg(lit(VER_LINUX_ORGANIZATION_NAME)));
+    QString productDir = QDir::toNativeSeparators(QString(lit("/opt/%1/client/share/pictures/sample-backgrounds")).arg(QnAppInfo::linuxOrganizationName()));
 #endif
 
     return QDir(productDir).exists()
@@ -112,17 +112,18 @@ QString strPadLeft(const QString &str, int len, char ch)
     return str;
 }
 
+QString getPathSeparator(const QString& path)
+{
+    return path.contains(lit("\\")) ? lit("\\") : lit("/");
+}
+
 QString closeDirPath(const QString& value)
 {
-    QString tmp = value;
-    for (int i = 0; i < tmp.size(); ++i) {
-        if (tmp[i] == QLatin1Char('\\'))
-            tmp[i] = QLatin1Char('/');
-    }
-    if (tmp.endsWith(QLatin1Char('/')))
-        return tmp;
+    QString separator = getPathSeparator(value);
+    if (value.endsWith(separator))
+        return value;
     else
-        return tmp + QLatin1Char('/');
+        return value + separator;
 }
 
 #ifdef Q_OS_WIN32

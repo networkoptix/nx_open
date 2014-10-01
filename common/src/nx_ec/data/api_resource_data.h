@@ -21,14 +21,14 @@ namespace ec2
 
     struct ApiResourceParamWithRefData: ApiResourceParamData
     {
-        QUuid resourceId;
+        QnUuid resourceId;
     };
 #define ApiResourceParamWithRefData_Fields ApiResourceParamData_Fields (resourceId)
 
 
     struct ApiResourceParamsData: ApiData
     {
-        QUuid id;
+        QnUuid id;
         std::vector<ApiResourceParamData> params;
     };
 #define ApiResourceParamsData_Fields (id)(params)
@@ -37,27 +37,19 @@ namespace ec2
     struct ApiResourceData: ApiData {
         ApiResourceData(): status(Qn::Offline) {}
 
-        QUuid          id;
-        QUuid          parentId;
+        QnUuid          id;
+        QnUuid          parentId;
         Qn::ResourceStatus    status;
         QString       name;
         QString       url;
-        QUuid          typeId;
+        QnUuid          typeId;
         std::vector<ApiResourceParamData> addParams;
     };
 #define ApiResourceData_Fields (id)(parentId)(status)(name)(url)(typeId)(addParams)
 
-/*
-    struct ApiSetResourceDisabledData: ApiData {
-        QUuid id;
-        bool disabled;
-    };
-#define ApiSetResourceDisabledData_Fields (id)(disabled)
-*/
-
     struct ApiSetResourceStatusData: ApiData
     {
-        QUuid id;
+        QnUuid id;
         Qn::ResourceStatus status;
     };
 #define ApiSetResourceStatusData_Fields (id)(status)

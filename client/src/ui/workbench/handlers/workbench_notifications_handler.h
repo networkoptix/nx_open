@@ -10,14 +10,19 @@
 #include <health/system_health.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <nx_ec/ec_api.h>
+
 #include <utils/common/email.h>
+#include <utils/common/connective.h>
 
 class QnWorkbenchUserEmailWatcher;
+class QnActionParameters;
 class QnBusinessEventsFilterResourcePropertyAdaptor;
 
-class QnWorkbenchNotificationsHandler : public QObject, public QnWorkbenchContextAware
+class QnWorkbenchNotificationsHandler : public Connective<QObject>, public QnWorkbenchContextAware
 {
     Q_OBJECT
+
+    typedef Connective<QObject> base_type;
 public:
     explicit QnWorkbenchNotificationsHandler(QObject *parent = 0);
     virtual ~QnWorkbenchNotificationsHandler();
@@ -26,8 +31,8 @@ public:
     void addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr& resource);
 
 signals:
-    void systemHealthEventAdded(QnSystemHealth::MessageType message, const QnResourcePtr& resource);
-    void systemHealthEventRemoved(QnSystemHealth::MessageType message, const QnResourcePtr& resource);
+    void systemHealthEventAdded( QnSystemHealth::MessageType message, const QVariant& params );
+    void systemHealthEventRemoved( QnSystemHealth::MessageType message, const QVariant& params );
 
     void businessActionAdded(const QnAbstractBusinessActionPtr& businessAction);
     void businessActionRemoved(const QnAbstractBusinessActionPtr& businessAction);
@@ -40,6 +45,7 @@ public slots:
 private slots:
     void at_context_userChanged();
     void at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid);
+    void at_timeServerSelectionRequired();
 
     void at_eventManager_connectionOpened();
     void at_eventManager_connectionClosed();
@@ -57,8 +63,10 @@ private:
      */
     bool adminOnlyMessage(QnSystemHealth::MessageType message);
 
-    void setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible);
-    void setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible);
+    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, bool visible );
+    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QnActionParameters& actionParams, bool visible );
+    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible );
+    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QVariant& params, bool visible );
 
     void checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message);
 

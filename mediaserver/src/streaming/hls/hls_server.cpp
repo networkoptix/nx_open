@@ -6,18 +6,20 @@
 
 #include <QtCore/QUrlQuery>
 #include <QtCore/QTimeZone>
+#include <QtCore/QCoreApplication>
 
 #include <algorithm>
 #include <limits>
 #include <map>
 
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/media_stream_cache.h>
-#include <version.h>
+#include <utils/common/app_info.h>
 
 #include "camera/camera_pool.h"
 #include "hls_archive_playlist_manager.h"
@@ -29,6 +31,8 @@
 #include "streaming/streaming_params.h"
 #include "utils/network/tcp_connection_priv.h"
 
+
+//TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
 using std::make_pair;
 using namespace nx_http;
@@ -52,7 +56,8 @@ namespace nx_hls
         QnTCPConnectionProcessor( socket ),
         m_state( sReceiving ),
         m_switchToChunkedTransfer( false ),
-        m_useChunkedTransfer( false )
+        m_useChunkedTransfer( false ),
+        m_bytesSent( 0 )
     {
         m_readBuffer.reserve( READ_BUFFER_SIZE );
         setObjectName( "QnHttpLiveStreamingProcessor" );
@@ -64,10 +69,11 @@ namespace nx_hls
 
         if( m_currentChunk )
         {
-            //disconnecting and waiting for already-emmitted signals from m_currentChunk to be delivered and processed
+            //disconnecting and waiting for already-emitted signals from m_currentChunk to be delivered and processed
             //TODO #ak cancel on-going transcoding. Currently, it just wastes CPU time
             m_currentChunk->disconnectAndJoin( this );
             StreamingChunkCache::instance()->putBackUsedItem( m_currentChunk->params(), m_currentChunk );
+            m_chunkInputStream.reset();
             m_currentChunk.reset();
         }
 
@@ -98,21 +104,28 @@ namespace nx_hls
                     if( m_useChunkedTransfer )
                         bytesSent = sendChunk( m_writeBuffer ) ? m_writeBuffer.size() : -1;
                     else
-                        bytesSent = sendData( m_writeBuffer ) ? m_writeBuffer.size() : -1;;
+                        bytesSent = sendData( m_writeBuffer ) ? m_writeBuffer.size() : -1;
                     if( bytesSent < 0 )
                     {
-                        NX_LOG( QString::fromLatin1("Error sending data to %1 (%2). Terminating connection...").
-                            arg(remoteHostAddress().toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                        NX_LOG( QString::fromLatin1("Error sending data to %1 (%2). Sent %3 bytes total. Terminating connection...").
+                            arg(remoteHostAddress().toString()).arg(SystemError::getLastOSErrorText()).arg(m_bytesSent), cl_logWARNING );
                         m_state = sDone;
                         break;
                     }
-                    m_writeBuffer.remove( 0, bytesSent );
+                    else
+                    {
+                        m_bytesSent += bytesSent;
+                    }
+                    if( bytesSent == m_writeBuffer.size() )
+                        m_writeBuffer.clear();
+                    else
+                        m_writeBuffer.remove( 0, bytesSent );
                     if( !m_writeBuffer.isEmpty() )
                         break;  //continuing sending
                     if( !prepareDataToSend() )
                     {
-                        NX_LOG( QString::fromLatin1("Finished uploading %1 data to %2. Closing connection...").
-                            arg(m_currentFileName).arg(remoteHostAddress().toString()), cl_logDEBUG1 );
+                        NX_LOG( QString::fromLatin1("Finished uploading %1 data to %2. Sent %3 bytes total. Closing connection...").
+                            arg(m_currentFileName).arg(remoteHostAddress().toString()).arg(m_bytesSent), cl_logDEBUG1 );
                         //sending empty chunk to signal EOF
                         if( m_useChunkedTransfer )
                             sendChunk( QByteArray() );
@@ -205,7 +218,7 @@ namespace nx_hls
         response.headers.insert( std::make_pair(
             "Date",
             QLocale(QLocale::English).toString(QDateTime::currentDateTime(), lit("ddd, d MMM yyyy hh:mm:ss t")).toLatin1() ) );
-        response.headers.insert( std::make_pair( "Server", QN_APPLICATION_NAME " " QN_APPLICATION_VERSION ) );
+        response.headers.insert( std::make_pair( "Server", (qApp->applicationName() + lit(" ") + QCoreApplication::applicationVersion()).toLatin1().data()) );
         response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //getRequestedFile can override this
 
         if( request.requestLine.version == nx_http::http_1_1 )
@@ -326,6 +339,7 @@ namespace nx_hls
             m_switchToChunkedTransfer = true;
         m_writeBuffer.clear();
         response.serialize( &m_writeBuffer );
+        m_bytesSent = (size_t)0 - m_writeBuffer.size();
 
         NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
             arg(remoteHostAddress().toString()).
@@ -338,7 +352,7 @@ namespace nx_hls
     {
         Q_ASSERT( m_writeBuffer.isEmpty() );
 
-        if( !m_currentChunk )
+        if( !m_chunkInputStream )
             return false;
 
         if( m_switchToChunkedTransfer )
@@ -351,8 +365,12 @@ namespace nx_hls
         for( ;; )
         {
             //reading chunk data
-            if( m_currentChunk->tryRead( &m_chunkReadCtx, &m_writeBuffer ) )
+            const int sizeBak = m_writeBuffer.size();
+            if( m_chunkInputStream->tryRead( &m_writeBuffer ) )
+            {
+                NX_LOG( lit("Read %1 bytes from streaming chunk %2").arg(m_writeBuffer.size()-sizeBak).arg((size_t)m_currentChunk.get(), 0, 16), cl_logDEBUG1 );
                 return !m_writeBuffer.isEmpty();
+            }
 
             //waiting for data to arrive to chunk
             m_cond.wait( lk.mutex() );
@@ -403,10 +421,17 @@ namespace nx_hls
                     : MEDIA_Quality_Low;
             }
 
-            if( !camResource->hasDualStreaming() && streamQuality == MEDIA_Quality_Low )
+            if( !camResource->hasDualStreaming() )
             {
-                NX_LOG( QString::fromLatin1("Got request to unavailable low quality of camera %2").arg(camResource->getUniqueId()), cl_logDEBUG1 );
-                return nx_http::StatusCode::notFound;
+                if( streamQuality == MEDIA_Quality_Low )
+                {
+                    NX_LOG( QString::fromLatin1("Got request to unavailable low quality of camera %2").arg(camResource->getUniqueId()), cl_logDEBUG1 );
+                    return nx_http::StatusCode::notFound;
+                }
+                else if( streamQuality == MEDIA_Quality_Auto )
+                {
+                    streamQuality = MEDIA_Quality_High;
+                }
             }
 
             const nx_http::StatusCode::Value result = createSession(
@@ -456,6 +481,21 @@ namespace nx_hls
         nx_hls::VariantPlaylistData playlistData;
         playlistData.url = baseUrl;
         playlistData.url.setPath( request.requestLine.url.path() );
+        //if needed, adding proxy information to playlist url
+        nx_http::HttpHeaders::const_iterator viaIter = request.headers.find( "Via" );
+        if( viaIter != request.headers.end() )
+        {
+            nx_http::header::Via via;
+            if( !via.parse( viaIter->second ) )
+                return nx_http::StatusCode::badRequest;
+            if( !via.entries.empty() )
+            {
+                //TODO #ak check that request has been proxied via media server, not regular Http proxy
+                const QString& currentPath = playlistData.url.path();
+                playlistData.url.setPath( lit("/proxy/%1/%2").arg(qnCommon->moduleGUID().toString()).
+                    arg(currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath) );
+            }
+        }
         QList<QPair<QString, QString> > queryItems = QUrlQuery(request.requestLine.url.query()).queryItems();
         //removing SESSION_ID_PARAM_NAME
         for( QList<QPair<QString, QString> >::iterator
@@ -574,6 +614,23 @@ namespace nx_hls
                 baseChunkUrl.setPort( sockAddress.port );
             baseChunkUrl.setScheme( QLatin1String("http") );
         }
+        baseChunkUrl.setPath( HLS_PREFIX + camResource->getUniqueId() );
+
+        //if needed, adding proxy information to playlist url
+        nx_http::HttpHeaders::const_iterator viaIter = request.headers.find( "Via" );
+        if( viaIter != request.headers.end() )
+        {
+            nx_http::header::Via via;
+            if( !via.parse( viaIter->second ) )
+                return nx_http::StatusCode::badRequest;
+            if( !via.entries.empty() )
+            {
+                //TODO #ak check that request has been proxied via media server, not regular Http proxy
+                const QString& currentPath = baseChunkUrl.path();
+                baseChunkUrl.setPath( lit("/proxy/%1/%2").arg(qnCommon->moduleGUID().toString()).
+                    arg(currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath) );
+            }
+        }
 
         for( std::vector<nx_hls::AbstractPlaylistManager::ChunkData>::size_type
             i = 0;
@@ -583,7 +640,6 @@ namespace nx_hls
             nx_hls::Chunk hlsChunk;
             hlsChunk.duration = chunkList[i].duration / (double)USEC_IN_SEC;
             hlsChunk.url = baseChunkUrl;
-            hlsChunk.url.setPath( HLS_PREFIX + camResource->getUniqueId() );
             QUrlQuery hlsChunkUrlQuery( hlsChunk.url.query() );
             foreach( RequestParamsType::value_type param, commonChunkParams )
                 hlsChunkUrlQuery.addQueryItem( param.first, param.second );
@@ -699,7 +755,7 @@ namespace nx_hls
         //streaming chunk
         if( m_currentChunk )
         {
-            //disconnecting and waiting for already-emmitted signals from m_currentChunk to be delivered and processed
+            //disconnecting and waiting for already-emitted signals from m_currentChunk to be delivered and processed
             m_currentChunk->disconnectAndJoin( this );
             StreamingChunkCache::instance()->putBackUsedItem( currentChunkKey, m_currentChunk );
             m_currentChunk.reset();
@@ -710,16 +766,56 @@ namespace nx_hls
             m_currentChunk.get(), &StreamingChunk::newDataIsAvailable,
             this,                 &QnHttpLiveStreamingProcessor::chunkDataAvailable,
             Qt::DirectConnection );
-        m_chunkReadCtx = StreamingChunk::SequentialReadingContext();
+        m_chunkInputStream.reset( new StreamingChunkInputStream( m_currentChunk.get() ) );
+
+        //using this simplified test for accept-encoding since hls client do not use syntax with q= ...
+        nx_http::header::AcceptEncodingHeader acceptEncoding( nx_http::getHeaderValue( request.headers, "Accept-Encoding" ) );
 
         response->headers.insert( make_pair( "Content-Type", m_currentChunk->mimeType().toLatin1() ) );
-        if( m_currentChunk->isClosed() && m_currentChunk->sizeInBytes() > 0 )
-            response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number((qlonglong)m_currentChunk->sizeInBytes()) ) );
-        else
+        if( acceptEncoding.encodingIsAllowed("chunked") )
+        {
             response->headers.insert( make_pair( "Transfer-Encoding", "chunked" ) );
-        response->statusLine.version = nx_http::http_1_1;
+            response->statusLine.version = nx_http::http_1_1;
+            return nx_http::StatusCode::ok;
+        }
+        else if( acceptEncoding.encodingIsAllowed("identity") )
+        {
+            //if client requests identity encoding, MUST return identity
+            m_currentChunk->waitForChunkReady();    //waiting for chunk to be prepared
+            //chunk is ready, using it
+            NX_LOG( lit("Streaming chunk %1 with size %2").arg((size_t)m_currentChunk.get(), 0, 16).arg(m_currentChunk->sizeInBytes()), cl_logDEBUG1 );
 
-        return nx_http::StatusCode::ok;
+            auto rangeIter = request.headers.find( "Range" );
+            if( rangeIter == request.headers.end() )
+            {
+                response->headers.insert( make_pair( "Transfer-Encoding", "identity" ) );
+                response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number((qlonglong)m_currentChunk->sizeInBytes()) ) );
+                response->statusLine.version = request.requestLine.version; //do not require HTTP/1.1 here
+                return nx_http::StatusCode::ok;
+            }
+
+            //partial content request
+            response->statusLine.version = nx_http::http_1_1;   //Range is supported by HTTP/1.1
+            nx_http::header::Range range;
+            if( !range.parse( rangeIter->second ) || !range.validateByContentSize(m_currentChunk->sizeInBytes()) )
+            {
+                response->headers.insert( make_pair( "Content-Range", "*/"+nx_http::StringType::number((quint64)m_currentChunk->sizeInBytes()) ) );
+                m_chunkInputStream.reset();
+                return nx_http::StatusCode::rangeNotSatisfiable;
+            }
+
+            response->headers.insert( make_pair( "Transfer-Encoding", "identity" ) );
+            response->headers.insert( make_pair( "Content-Range", rangeIter->second+"/"+nx_http::StringType::number((quint64)m_currentChunk->sizeInBytes()) ) );
+            response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number(range.totalRangeLength(m_currentChunk->sizeInBytes())) ) );
+
+            static_cast<StreamingChunkInputStream*>(m_chunkInputStream.get())->setByteRange( range );
+            return nx_http::StatusCode::partialContent;
+        }
+        else
+        {
+            m_chunkInputStream.reset();
+            return nx_http::StatusCode::notAcceptable;
+        }
     }
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::createSession(
@@ -737,12 +833,24 @@ namespace nx_hls
         if( streamQuality == MEDIA_Quality_Low || streamQuality == MEDIA_Quality_Auto )
             requiredQualities.push_back( MEDIA_Quality_Low );
 
-        std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(StreamingParams::START_DATETIME_PARAM_NAME);
+        boost::optional<quint64> startTimestamp;
+        std::multimap<QString, QString>::const_iterator startTimestampIter = requestParams.find(StreamingParams::START_TIMESTAMP_PARAM_NAME);
+        if( startTimestampIter != requestParams.end() )
+        {
+            startTimestamp = startTimestampIter->second.toULongLong();
+        }
+        else
+        {
+            std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(StreamingParams::START_DATETIME_PARAM_NAME);
+            if( startDatetimeIter != requestParams.end() )
+                startTimestamp = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate).toMSecsSinceEpoch() * USEC_IN_MSEC;
+        }
+
         std::unique_ptr<HLSSession> newHlsSession(
             new HLSSession(
                 sessionID,
                 MSSettings::roSettings()->value( nx_ms_conf::HLS_TARGET_DURATION_MS, nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt(),
-                startDatetimeIter == requestParams.end(),   //if no start date specified, providing live stream
+                !startTimestamp,   //if no start date specified, providing live stream
                 streamQuality,
                 videoCamera ) );
         if( newHlsSession->isLive() )
@@ -763,14 +871,13 @@ namespace nx_hls
         else
         {
             //converting startDatetime to timestamp
-            const quint64 startTimestamp = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate).toMSecsSinceEpoch() * USEC_IN_MSEC;
             for( const MediaQuality quality: requiredQualities )
             {
                 //generating sliding playlist, holding not more than CHUNK_COUNT_IN_ARCHIVE_PLAYLIST archive chunks
                 nx_hls::ArchivePlaylistManagerPtr archivePlaylistManager = 
                     std::make_shared<ArchivePlaylistManager>(
                         camResource,
-                        startTimestamp,
+                        startTimestamp.get(),
                         CHUNK_COUNT_IN_ARCHIVE_PLAYLIST,
                         newHlsSession->targetDurationMS() * USEC_IN_MSEC,
                         quality );

@@ -1,7 +1,7 @@
 #ifndef QN_CLIENT_MODEL_TYPES_H
 #define QN_CLIENT_MODEL_TYPES_H
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QList>
 #include <QtCore/QHash>
 #include <QtCore/QString>
@@ -22,7 +22,6 @@
 typedef QHash<QString, QWeakPointer<QObject> > QnWeakObjectHash;
 
 Q_DECLARE_METATYPE(QnWeakObjectHash)
-
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchState
@@ -53,7 +52,7 @@ public:
     QnWorkbenchState(): currentLayoutIndex(-1) {}
 
     int currentLayoutIndex;
-    QList<QUuid> layoutUuids;
+    QList<QnUuid> layoutUuids;
 };
 
 /**
@@ -70,9 +69,9 @@ QN_FUSION_DECLARE_FUNCTIONS(QnWorkbenchState, (datastream)(metatype));
 // -------------------------------------------------------------------------- //
 struct QnServerStorageKey {
     QnServerStorageKey() {}
-    QnServerStorageKey(const QUuid &serverUuid, const QString &storagePath): serverUuid(serverUuid), storagePath(storagePath) {}
+    QnServerStorageKey(const QnUuid &serverUuid, const QString &storagePath): serverUuid(serverUuid), storagePath(storagePath) {}
 
-    QUuid serverUuid;
+    QnUuid serverUuid;
     QString storagePath;
 };
 

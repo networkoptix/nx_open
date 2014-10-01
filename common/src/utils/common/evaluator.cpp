@@ -447,8 +447,10 @@ namespace Qee {
 // Evaluator Functions and Constants
 // -------------------------------------------------------------------------- //
     QVariant eval_QColor(const ParameterPack &args) {
-        args.requireSize(3, 4);
+        if (args.size() == 0)
+            return QColor();
 
+        args.requireSize(3, 4);
         int r = args.get<int>(0);
         int g = args.get<int>(1);
         int b = args.get<int>(2);

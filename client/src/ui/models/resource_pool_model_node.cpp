@@ -1,6 +1,7 @@
 #include "resource_pool_model_node.h"
 
 #include <common/common_meta_types.h>
+#include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -31,9 +32,11 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
 {
     assert(type == Qn::LocalNode ||
            type == Qn::ServersNode ||
+           type == Qn::OtherSystemsNode ||
            type == Qn::UsersNode ||
            type == Qn::RootNode ||
            type == Qn::BastardNode ||
+           type == Qn::SystemNode ||
            type == Qn::RecorderNode);
 
     switch(type) {
@@ -48,6 +51,11 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
         m_displayName = m_name = tr("System");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
         break;
+    case Qn::OtherSystemsNode:
+        m_displayName = m_name = tr("Other Systems");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
+        m_bastard = true; /* Invisible by default until has children. */
+        break;
     case Qn::UsersNode:
         m_displayName = m_name = tr("Users");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
@@ -60,6 +68,13 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
         m_displayName = m_name = name;
         m_icon = qnResIconCache->icon(QnResourceIconCache::Recorder);
         m_bastard = true; /* Invisible by default until has children. */
+        m_state = Invalid;
+        break;
+    case Qn::SystemNode:
+        m_displayName = m_name = name;
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
+        m_bastard = true; /* Invisible by default until has children. */
+        m_state = Invalid;
         break;
     default:
         break;
@@ -93,7 +108,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
 /**
  * Constructor for item nodes.
  */
-QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, const QUuid &uuid, Qn::NodeType nodeType):
+QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, const QnUuid &uuid, Qn::NodeType nodeType):
     m_model(model),
     m_type(nodeType),
     m_uuid(uuid),
@@ -114,7 +129,7 @@ QnResourcePoolModelNode::~QnResourcePoolModelNode() {
 
     foreach(QnResourcePoolModelNode *childNode, m_children) {
         childNode->setParent(NULL);
-        m_model->deleteNode(childNode);
+        m_model->removeNode(childNode);
     }
 }
 
@@ -125,7 +140,9 @@ void QnResourcePoolModelNode::clear() {
         m_type == Qn::ResourceNode || 
         m_type == Qn::VideoWallItemNode || 
         m_type == Qn::EdgeNode)
+    {
         setResource(QnResourcePtr());
+    }
 }
 
 void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
@@ -198,64 +215,18 @@ void QnResourcePoolModelNode::update() {
         m_searchString = QString();
         m_flags = 0; 
         m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallMatrix);
-        foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources().filtered<QnVideoWallResource>()) {
+        foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources<QnVideoWallResource>()) {
             if (!videowall->matrices()->hasItem(m_uuid))
                 continue;
             m_displayName = m_name = videowall->matrices()->getItem(m_uuid).name;
             break;
         }
+    } else if (m_type == Qn::ServersNode) {
+        m_displayName = m_name + lit(" (%1)").arg(qnCommon->localSystemName());
     }
+
     /* Update bastard state. */
-    bool bastard = false;
-    switch(m_type) {
-    case Qn::ItemNode:
-        bastard = m_resource.isNull();
-        break;
-    case Qn::VideoWallItemNode:
-    case Qn::VideoWallMatrixNode:
-        bastard = false;
-        break;
-    case Qn::ResourceNode:
-        bastard = !m_resource;  /* Hide resource nodes without resource. */
-        if (!bastard)
-            bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
-        if(!bastard)
-            if(QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>()) {
-                /* Hide local layouts that are not file-based. */ 
-                bastard = m_model->snapshotManager()->isLocal(layout) && !m_model->snapshotManager()->isFile(layout);
-
-                /* Hide "Preview Search" layouts */
-                bastard |= layout->data().contains(Qn::LayoutSearchStateRole);
-            }
-        if(!bastard)
-            bastard = (m_flags & Qn::desktop_camera) == Qn::desktop_camera; /* Hide desktop camera resources from the tree. */
-        if(!bastard)
-            bastard = (m_flags & Qn::local_server) == Qn::local_server; /* Hide local server resource. */
-        if(!bastard)
-            bastard = (m_flags & Qn::local_media) == Qn::local_media && m_resource->getUrl().startsWith(QLatin1String("layout://")); //TODO: #Elric hack hack hack
-        if (!bastard)
-            bastard = QnMediaServerResource::isEdgeServer(m_resource);
-        break;
-    case Qn::EdgeNode:
-        bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
-        break;
-    case Qn::UsersNode:
-        bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
-        break;
-    case Qn::ServersNode:
-        bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditServersPermissions);
-        break;
-    case Qn::BastardNode:
-        bastard = true;
-        break;
-    case Qn::RecorderNode:
-        bastard = m_children.size() == 0;
-        break;
-    default:
-        break;
-    }
-
-    setBastard(bastard);
+    setBastard(calculateBastard());
 
     /* Notify views. */
     changeInternal();
@@ -284,7 +255,7 @@ Qn::ResourceStatus QnResourcePoolModelNode::resourceStatus() const {
     return m_status;
 }
 
-const QUuid& QnResourcePoolModelNode::uuid() const {
+const QnUuid& QnResourcePoolModelNode::uuid() const {
     return m_uuid;
 }
 
@@ -304,6 +275,79 @@ void QnResourcePoolModelNode::setState(State state) {
 
     foreach(QnResourcePoolModelNode *node, m_children)
         node->setState(state);
+}
+
+bool QnResourcePoolModelNode::calculateBastard() const {
+    switch(m_type) {
+    case Qn::ItemNode:
+        return m_resource.isNull();
+
+    case Qn::VideoWallItemNode:
+    case Qn::VideoWallMatrixNode:
+        return false;
+
+    case Qn::BastardNode:
+        return true;
+
+    case Qn::OtherSystemsNode:
+    case Qn::RecorderNode:
+    case Qn::SystemNode:
+        return m_children.isEmpty();
+
+    case Qn::ResourceNode:
+        /* Hide resource nodes without resource. */
+        if (!m_resource)
+            return true; 
+        
+        /* Hide non-readable resources. */
+        if (!(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission))
+            return true; 
+
+        if(QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>()) {
+            /* Hide local layouts that are not file-based. */ 
+            if (m_model->snapshotManager()->isLocal(layout) && !m_model->snapshotManager()->isFile(layout))
+                return true;
+
+            /* Hide "Preview Search" layouts */
+            if (layout->data().contains(Qn::LayoutSearchStateRole))
+                return true;
+        } else {
+            /* Hide desktop camera resources from the tree. */
+            if ((m_flags & Qn::desktop_camera) == Qn::desktop_camera)
+                return true;
+
+            /* Hide local server resource. */
+            if ((m_flags & Qn::local_server) == Qn::local_server)
+                return true;
+
+            //TODO: #Elric hack hack hack
+            if ((m_flags & Qn::local_media) == Qn::local_media && m_resource->getUrl().startsWith(QLatin1String("layout://")))
+                return true;
+            
+            /* Hide edge servers, camera will be displayed instead. */
+            if (QnMediaServerResource::isHiddenServer(m_resource))
+                return true;
+        }
+        return false;
+
+    case Qn::EdgeNode:
+        /* Hide resource nodes without resource. */
+        if (!m_resource)
+            return true; 
+
+        /* Hide non-readable resources. */
+        return !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); 
+
+    case Qn::UsersNode:
+        return !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
+        
+    case Qn::ServersNode:
+        return !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditServersPermissions);
+
+    default:
+        Q_ASSERT("Should never get here");
+        return false;
+    }
 }
 
 bool QnResourcePoolModelNode::isBastard() const {
@@ -460,7 +504,7 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
             || m_type == Qn::VideoWallItemNode 
             || m_type == Qn::VideoWallMatrixNode
             )
-            return QVariant::fromValue<QUuid>(m_uuid);
+            return QVariant::fromValue<QnUuid>(m_uuid);
         break;
     case Qn::ResourceSearchStringRole:
         return m_searchString;
@@ -565,8 +609,16 @@ void QnResourcePoolModelNode::removeChildInternal(QnResourcePoolModelNode *child
     } else {
         m_children.removeOne(child);
     }
-    if (this->type() == Qn::RecorderNode && m_children.size() == 0)
-        setBastard(true);
+
+    switch(m_type) {
+    case Qn::RecorderNode:
+    case Qn::SystemNode:
+        if (m_children.size() == 0)
+            setBastard(true);
+        break;
+    default:
+        break;
+    }
 }
 
 void QnResourcePoolModelNode::addChildInternal(QnResourcePoolModelNode *child) {
@@ -582,8 +634,16 @@ void QnResourcePoolModelNode::addChildInternal(QnResourcePoolModelNode *child) {
     } else {
         m_children.push_back(child);
     }
-    if (this->type() == Qn::RecorderNode && m_children.size() > 0)
-        setBastard(false);
+
+    switch(m_type) {
+    case Qn::RecorderNode:
+    case Qn::SystemNode:
+        if (m_children.size() > 0)
+            setBastard(false);
+        break;
+    default:
+        break;
+    }
 }
 
 void QnResourcePoolModelNode::changeInternal() {
@@ -593,3 +653,5 @@ void QnResourcePoolModelNode::changeInternal() {
     QModelIndex index = this->index(Qn::NameColumn);
     emit m_model->dataChanged(index, index.sibling(index.row(), Qn::ColumnCount - 1));
 }
+
+

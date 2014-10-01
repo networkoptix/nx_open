@@ -4,7 +4,7 @@
 
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QSettings>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QStringList>
 
 #include <openssl/rsa.h>
@@ -12,7 +12,7 @@
 #include <openssl/bio.h>
 #include <openssl/err.h>
 
-#include "version.h"
+#include <utils/common/app_info.h>
 #include <common/common_globals.h>
 #include <utils/common/synctime.h>
 #include <utils/common/product_features.h>
@@ -230,7 +230,7 @@ const QByteArray& QnLicense::rawLicense() const
     return m_rawLicense;
 }
 
-QUuid QnLicense::findRuntimeDataByLicense() const
+QnUuid QnLicense::findRuntimeDataByLicense() const
 {
     foreach(const QnPeerRuntimeInfo& info, QnRuntimeInfoManager::instance()->items()->getItems())
     {
@@ -242,7 +242,7 @@ QUuid QnLicense::findRuntimeDataByLicense() const
         if (hwKeyOK && brandOK)
             return info.uuid;
     }
-    return QUuid();
+    return QnUuid();
 }
 
 bool QnLicense::gotError(ErrorCode* errCode, ErrorCode errorCode) const
@@ -250,6 +250,22 @@ bool QnLicense::gotError(ErrorCode* errCode, ErrorCode errorCode) const
     if (errCode)
         *errCode = errorCode;
     return errorCode == NoError;
+}
+
+bool checkForEdgeBox(const QString& value)
+{
+    const char* EDGE_BOXES[] = {
+        "isd",
+        "isd_s2",
+        "rpi"
+    };
+    QByteArray box = value.toUtf8().toLower().trimmed();
+    for (size_t i = 0; i < sizeof(EDGE_BOXES) / sizeof(char*); ++i)
+    {
+        if (box == EDGE_BOXES[i])
+            return true;
+    }
+    return false;
 }
 
 /* 
@@ -272,7 +288,7 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     if (expirationTime() > 0 && qnSyncTime->currentMSecsSinceEpoch() > expirationTime()) // TODO: #Elric make NEVER an INT64_MAX
         return gotError(errCode, Expired);
     
-    bool isEdgeBox = !info.data.box.trimmed().isEmpty() && info.data.box.trimmed().toLower() != lit("none");
+    bool isEdgeBox = checkForEdgeBox(info.data.box);
     if (isEdgeBox && !licenseTypeInfo[type()].allowedForEdge)
         return gotError(errCode, InvalidType); // strict allowed license type for EDGE devices
 

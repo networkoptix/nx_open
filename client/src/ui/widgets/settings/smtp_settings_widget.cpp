@@ -15,9 +15,9 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/workaround/qt5_combobox_workaround.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
-#include "version.h"
+#include <utils/common/app_info.h>
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 
@@ -94,8 +94,8 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     }
     ui->portComboBox->setValidator(new QnPortNumberValidator(autoPort, this));
 
-    ui->supportEmailLineEdit->setPlaceholderText(lit(QN_SUPPORT_MAIL_ADDRESS));
-    ui->simpleSupportEmailLineEdit->setPlaceholderText(lit(QN_SUPPORT_MAIL_ADDRESS));
+    ui->supportEmailLineEdit->setPlaceholderText(QnAppInfo::supportAddress());
+    ui->simpleSupportEmailLineEdit->setPlaceholderText(QnAppInfo::supportAddress());
 }
 
 QnSmtpSettingsWidget::~QnSmtpSettingsWidget()

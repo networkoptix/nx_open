@@ -27,7 +27,7 @@ public:
 
     QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/);
 
-    static QUuid getDesktopResourceUuid();
+    static QnUuid getDesktopResourceUuid();
 protected:
     virtual QnAbstractStreamDataProvider *createDataProviderInternal(Qn::ConnectionRole role) override;
 private:
@@ -39,7 +39,7 @@ private:
     QGLWidget* m_mainWidget;
     QnDesktopDataProvider* m_desktopDataProvider;
     QMutex m_dpMutex;
-    QMap<QUuid, QnDesktopCameraConnectionPtr> m_connectionPool;
+    QMap<QnUuid, QnDesktopCameraConnectionPtr> m_connectionPool;
 };
 
 #else

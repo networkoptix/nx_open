@@ -7,86 +7,25 @@
 #include <core/resource/videowall_resource.h>
 
 #include <media_server/server_update_tool.h>
+#include <media_server/settings.h>
+#include <nx_ec/dummy_handler.h>
+#include <utils/common/log.h>
 
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"
 #include "business/business_message_bus.h"
 #include "settings.h"
+#include "nx_ec/data/api_connection_data.h"
 #include "api/app_server_connection.h"
+#include "utils/network/router.h"
 
+#include <utils/common/app_info.h>
 
 QnServerMessageProcessor::QnServerMessageProcessor()
 :
     base_type(),
-    m_serverPort( MSSettings::roSettings()->value(nx_ms_conf::RTSP_PORT, nx_ms_conf::DEFAULT_RTSP_PORT).toInt() )
+    m_serverPort( MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt() )
 {
-
-}
-
-void QnServerMessageProcessor::updateAllIPList(const QUuid& id, const QList<QHostAddress>& addrList)
-{
-    QStringList addrListStr;
-    foreach(const QHostAddress& addr, addrList)
-        addrListStr << addr.toString();
-
-    updateAllIPList(id, addrListStr);
-}
-
-void QnServerMessageProcessor::updateAllIPList(const QUuid& id, const QString& addr)
-{
-    updateAllIPList(id, QList<QString>() << addr);
-}
-
-void QnServerMessageProcessor::updateAllIPList(const QUuid& id, const QList<QString>& addrList)
-{
-    QMutexLocker lock(&m_mutexAddrList);
-
-    QHash<QUuid, QList<QString> >::iterator itr = m_addrById.find(id);
-    if (itr != m_addrById.end()) 
-    {
-        foreach(const QString& addr, itr.value()) 
-        {
-            QHash<QString, int>::iterator itrAddr = m_allIPAddress.find(addr);
-            if (itrAddr != m_allIPAddress.end()) {
-                if (--itrAddr.value() < 1)
-                    m_allIPAddress.erase(itrAddr);
-            }
-        }
-    }
-    else {
-        itr = m_addrById.insert(id, QList<QString>());
-    }
-
-    *itr = addrList;
-
-    foreach(const QString& addr, addrList) 
-    {
-        QHash<QString, int>::iterator itrAddr = m_allIPAddress.find(addr);
-        if (itrAddr != m_allIPAddress.end())
-            ++itrAddr.value();
-        else
-            m_allIPAddress.insert(addr, 1);
-    }
-
-}
-
-void QnServerMessageProcessor::removeIPList(const QUuid& id)
-{
-    QMutexLocker lock(&m_mutexAddrList);
-
-    QHash<QUuid, QList<QString> >::iterator itr = m_addrById.find(id);
-    if (itr != m_addrById.end()) 
-    {
-        foreach(const QString& addr, itr.value()) 
-        {
-            QHash<QString, int>::iterator itrAddr = m_allIPAddress.find(addr);
-            if (itrAddr != m_allIPAddress.end()) {
-                if (--itrAddr.value() < 1)
-                    m_allIPAddress.erase(itrAddr);
-            }
-        }
-        m_addrById.erase(itr);
-    }
 }
 
 void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) 
@@ -107,29 +46,29 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
     
     if (isCamera) 
     {
-        bool needProxyToCamera = true;
-        if (resource->getParentId() != ownMediaServer->getId()) {
+        if (resource->getParentId() != ownMediaServer->getId())
             resource->addFlags( Qn::foreigner );
-        }
         else {
-#ifdef EDGE_SERVER
-            needProxyToCamera = false;
+#if 0
+            QnResourceTypePtr thirdPartyType = qnResTypePool->getResourceTypeByName("THIRD_PARTY Camera");
+            QnResourceTypePtr desktopCameraType = qnResTypePool->getResourceTypeByName("SERVER_DESKTOP_CAMERA");
+            if (thirdPartyType && desktopCameraType && 
+                resource->getTypeId() != desktopCameraType->getId() && resource->getTypeId() != thirdPartyType->getId()) 
+            {
+                resource->setTypeId(thirdPartyType->getId());
+                QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+                QnVirtualCameraResourceList cameras;
+                cameras << camera;
+                m_connection->getCameraManager()->save(cameras, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            }
 #endif
-        }
-        // update all known IP list
-        if (needProxyToCamera) {
-            const QnVirtualCameraResource* camRes = dynamic_cast<const QnVirtualCameraResource*>(resource.data());
-            updateAllIPList(camRes->getId(), camRes->getHostAddress());
         }
     }
 
     if (isServer) 
     {
-        if (resource->getId() != ownMediaServer->getId()) {
+        if (resource->getId() != ownMediaServer->getId())
             resource->addFlags( Qn::foreigner );
-            // update all known IP list
-            updateAllIPList(resource->getId(), dynamic_cast<const QnMediaServerResource*>(resource.data())->getNetAddrList());
-        }
     }
 
     // We are always online
@@ -146,46 +85,38 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
     else
         qnResPool->addResource(resource);
 
-    if (isServer && resource->getId() == serverGuid())
-        syncStoragesToSettings(ownMediaServer);
-
 }
 
-void QnServerMessageProcessor::afterRemovingResource(const QUuid& id)
+void QnServerMessageProcessor::afterRemovingResource(const QnUuid& id)
 {
     QnCommonMessageProcessor::afterRemovingResource(id);
-    removeIPList(id);
 }
 
 void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
 {
-    connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateChunkReceived,
-        this, &QnServerMessageProcessor::at_updateChunkReceived );
-    connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
-        this, &QnServerMessageProcessor::at_updateInstallationRequested );
+    connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateChunkReceived,
+            this, &QnServerMessageProcessor::at_updateChunkReceived);
+    connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
+            this, &QnServerMessageProcessor::at_updateInstallationRequested);
+    connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
+            this, &QnServerMessageProcessor::at_systemNameChangeRequested);
+
+    connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
 
     QnCommonMessageProcessor::init(connection);
 }
 
-bool QnServerMessageProcessor::isKnownAddr(const QString& addr) const
-{
-    QMutexLocker lock(&m_mutexAddrList);
-    //return true;
-    return !addr.isEmpty() && m_allIPAddress.contains(addr);
-}
-
 void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) 
 {
-#if 0
-    if (resource->getId() == qnCommon->moduleGUID() && resource->getStatus() != Qn::Online)
+    if (resource->getId() == qnCommon->moduleGUID() && status != Qn::Online)
     {
         // it's own server. change status to online
         QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(resource->getId(), Qn::Online);
+        resource->setStatus(Qn::Online, true);
     }
     else {
         resource->setStatus(status, true);
     }
-#endif
 }
 
 bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
@@ -208,21 +139,29 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
 
 bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
 {
-    const nx_http::BufferType& desiredServerGuid = nx_http::getHeaderValue( request.headers, "x-server-guid" );
     nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( "x-server-guid" );
     if( xServerGuidIter != request.headers.end() )
     {
-        const QByteArray& localServerGUID = qnCommon->moduleGUID().toByteArray();
+        const nx_http::BufferType& desiredServerGuid = xServerGuidIter->second;
+        const QByteArray localServerGUID = qnCommon->moduleGUID().toByteArray();
         return desiredServerGuid != localServerGUID;
     }
 
-    const QString& urlHost = request.requestLine.url.host();
-    const int port = request.requestLine.url.port( nx_http::DEFAULT_HTTP_PORT );
-    const bool _isLocalAddress = isLocalAddress(urlHost);
-    if (_isLocalAddress)
-        return port != m_serverPort; //if false, request addressed to us. If true, proxying to some local service
+    nx_http::BufferType desiredCameraGuid;
+    nx_http::HttpHeaders::const_iterator xCameraGuidIter = request.headers.find( "x-camera-guid" );
+    if( xCameraGuidIter != request.headers.end() )
+    {
+        desiredCameraGuid = xCameraGuidIter->second;
+    }
+    else {
+        desiredCameraGuid = request.getCookieValue("x-camera-guid");
+    }
+    if (!desiredCameraGuid.isEmpty()) {
+        QnResourcePtr camera = qnResPool->getResourceById(desiredCameraGuid);
+        return camera != 0;
+    }
 
-    return isKnownAddr(urlHost); // is it camera or other server address?
+    return false;
 }
 
 void QnServerMessageProcessor::execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) {
@@ -237,14 +176,37 @@ void QnServerMessageProcessor::at_updateInstallationRequested(const QString &upd
     QnServerUpdateTool::instance()->installUpdate(updateId);
 }
 
-bool QnServerMessageProcessor::canRemoveResource(const QUuid& resourceId) 
+void QnServerMessageProcessor::at_systemNameChangeRequested(const QString &systemName) {
+    if (qnCommon->localSystemName() == systemName)
+        return;
+
+    qnCommon->setLocalSystemName(systemName);
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (!server) {
+        NX_LOG("Cannot find self server resource!", cl_logERROR);
+        return;
+    }
+
+    MSSettings::roSettings()->setValue("systemName", systemName);
+    server->setSystemName(systemName);
+    m_connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+}
+
+void QnServerMessageProcessor::at_remotePeerUnauthorized(const QnUuid& id)
+{
+    QnResourcePtr mServer = qnResPool->getResourceById(id);
+    if (mServer)
+        mServer->setStatus(Qn::Unauthorized);
+}
+
+bool QnServerMessageProcessor::canRemoveResource(const QnUuid& resourceId) 
 { 
     QnResourcePtr res = qnResPool->getResourceById(resourceId);
     bool isOwnServer = (res && res->getId() == qnCommon->moduleGUID());
     return !isOwnServer;
 }
 
-void QnServerMessageProcessor::removeResourceIgnored(const QUuid& resourceId) 
+void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId) 
 {
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(resourceId).dynamicCast<QnMediaServerResource>();
     bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());

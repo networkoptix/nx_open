@@ -1,7 +1,7 @@
 
 #include "authenticate_helper.h"
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QCryptographicHash>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
@@ -24,17 +24,23 @@ QnAuthMethodRestrictionList::QnAuthMethodRestrictionList()
 
 unsigned int QnAuthMethodRestrictionList::getAllowedAuthMethods( const nx_http::Request& request ) const
 {
+    QString path = request.requestLine.url.path();
+    //TODO #ak replace mid and chop with single midRef call
+    while (path.startsWith(lit("//")))
+        path = path.mid(1);
+    while (path.endsWith(L'/'))
+        path.chop(1);
     unsigned int allowed = AuthMethod::cookie | AuthMethod::http | AuthMethod::videowall;   //by default
     for( std::pair<QString, unsigned int> allowRule: m_allowed )
     {
-        if( !wildcardMatch( allowRule.first, request.requestLine.url.path() ) )
+        if( !wildcardMatch( allowRule.first, path ) )
             continue;
         allowed |= allowRule.second;
     }
 
     for( std::pair<QString, unsigned int> denyRule: m_denied )
     {
-        if( !wildcardMatch( denyRule.first, request.requestLine.url.path() ) )
+        if( !wildcardMatch( denyRule.first, path ) )
             continue;
         allowed &= ~denyRule.second;
     }
@@ -111,7 +117,7 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
     {
         const nx_http::StringType& videoWall_auth = nx_http::getHeaderValue( request.headers, "X-NetworkOptix-VideoWall" );
         if (!videoWall_auth.isEmpty())
-            return (!qnResPool->getResourceById(QUuid(videoWall_auth)).dynamicCast<QnVideoWallResource>().isNull());
+            return (!qnResPool->getResourceById(QnUuid(videoWall_auth)).dynamicCast<QnVideoWallResource>().isNull());
     }
 
     if( allowedAuthMethods & AuthMethod::urlQueryParam )
@@ -163,12 +169,12 @@ bool QnAuthHelper::authenticate( const QAuthenticator& auth, const nx_http::Resp
     const nx_http::BufferType& authHeaderBuf = nx_http::getHeaderValue(
         response.headers,
         response.statusLine.statusCode == nx_http::StatusCode::proxyAuthenticationRequired ? "Proxy-Authenticate" : "WWW-Authenticate" );
-    nx_http::Header::WWWAuthenticate authenticateHeader;
+    nx_http::header::WWWAuthenticate authenticateHeader;
     if( !authenticateHeader.parse( authHeaderBuf ) )
         return false;
     switch( authenticateHeader.authScheme )
     {
-        case nx_http::Header::AuthScheme::digest:
+        case nx_http::header::AuthScheme::digest:
             nx_http::insertOrReplaceHeader(
                 &request->headers,
                 nx_http::parseHeader( CLSimpleHTTPClient::digestAccess(
@@ -180,7 +186,7 @@ bool QnAuthHelper::authenticate( const QAuthenticator& auth, const nx_http::Resp
                     response.statusLine.statusCode == nx_http::StatusCode::proxyAuthenticationRequired ).toLatin1() ) );
             return true;
 
-        case nx_http::Header::AuthScheme::basic:
+        case nx_http::header::AuthScheme::basic:
             nx_http::insertOrReplaceHeader(
                 &request->headers,
                 nx_http::parseHeader( CLSimpleHTTPClient::basicAuth(auth) ) );
@@ -200,7 +206,7 @@ bool QnAuthHelper::authenticate( const QString& login, const QByteArray& digest 
             return user->getDigest() == digest;
     }
     //checking if it videowall connect
-    return !qnResPool->getResourceById(QUuid(login)).dynamicCast<QnVideoWallResource>().isNull();
+    return !qnResPool->getResourceById(QnUuid(login)).dynamicCast<QnVideoWallResource>().isNull();
 }
 
 QnAuthMethodRestrictionList* QnAuthHelper::restrictionList()
@@ -299,27 +305,6 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
     md5Hash.addData(uri);
     QByteArray ha2 = md5Hash.result().toHex();
 
-    if (userName == "system")
-    {
-        QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-        md5Hash.addData(qnCommon->localSystemName().toUtf8());
-        md5Hash.addData(":NetworkOptix:");
-        md5Hash.addData(qnCommon->getSystemPassword());
-
-        QByteArray dbHash = md5Hash.result().toHex();
-        md5Hash.reset();
-        md5Hash.addData(dbHash);
-        md5Hash.addData(":");
-        md5Hash.addData(nonce);
-        md5Hash.addData(":");
-        md5Hash.addData(ha2);
-        QByteArray calcResponse = md5Hash.result().toHex();
-
-        if (calcResponse == response)
-            return true;
-    }
-
-
     if (isNonceValid(nonce)) 
     {
         QMutexLocker lock(&m_mutex);
@@ -375,26 +360,15 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
     QByteArray userName = digest.left(pos).toLower();
     QByteArray password = digest.mid(pos+1);
 
-    if (userName == "system" && password == qnCommon->getSystemPassword())
-        return true;
-
     foreach(QnUserResourcePtr user, m_users)
     {
         if (user->getName().toUtf8().toLower() == userName)
         {
-            QList<QByteArray> pswdData = user->getHash().split('$');
-            if (pswdData.size() == 3)
+            if (user->checkPassword(QString::fromUtf8(password)))
             {
-                QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-                md5Hash.addData(pswdData[1]);
-                md5Hash.addData(password);
-                QByteArray incomeHash = md5Hash.result().toHex();
-                if (incomeHash == pswdData[2]) 
-                {
-                    if (user->getDigest().isEmpty()) 
-                        emit emptyDigestDetected(user, QString::fromUtf8(userName), QString::fromUtf8(password));
-                    return true;
-                }
+                if (user->getDigest().isEmpty())
+                    emit emptyDigestDetected(user, QString::fromUtf8(userName), QString::fromUtf8(password));
+                return true;
             }
         }
     }

@@ -23,6 +23,7 @@
 #include <ui/dialogs/camera_list_dialog.h>
 
 #include <utils/color_space/image_correction.h>
+#include "api/model/camera_list_reply.h"
 
 class QAction;
 class QMenu;
@@ -115,7 +116,7 @@ protected:
         bool usePosition;
         QPointF position;
         QRectF zoomWindow;
-        QUuid zoomUuid;
+        QnUuid zoomUuid;
         qint64 time;
         QColor frameDistinctionColor;
         qreal rotation;
@@ -125,7 +126,7 @@ protected:
         AddToLayoutParams():
             usePosition(false),
             position(QPointF()),
-            zoomUuid(QUuid()),
+            zoomUuid(QnUuid()),
             time(-1),
             rotation(0)
         {}
@@ -210,6 +211,7 @@ protected slots:
     void at_cameraListAction_triggered();
     void at_webClientAction_triggered();
     void at_systemAdministrationAction_triggered();
+    void at_systemUpdateAction_triggered();
     void at_preferencesGeneralTabAction_triggered();
     void at_preferencesLicensesTabAction_triggered();
     void at_preferencesSmtpTabAction_triggered();
@@ -288,13 +290,15 @@ protected slots:
     void at_browseUrlAction_triggered();
 
     void at_versionMismatchMessageAction_triggered();
-    void at_versionMismatchWatcher_mismatchDataChanged();
 
     void at_betaVersionMessageAction_triggered();
 
     void at_queueAppRestartAction_triggered();
+    void at_selectTimeServerAction_triggered();
+    void at_cameraListChecked(int status, const QnCameraListReply& reply, int handle);
 private:
     void notifyAboutUpdate();
+    void checkVersionMismatches();
 
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
 
@@ -332,6 +336,14 @@ private:
     QnStorageResourcePtr m_exportStorage;
 
     QTimer *m_tourTimer;
+    struct CameraMovingInfo 
+    {
+        CameraMovingInfo() {}
+        CameraMovingInfo(const QnVirtualCameraResourceList& cameras, const QnResourcePtr& dstServer): cameras(cameras), dstServer(dstServer) {}
+        QnVirtualCameraResourceList cameras;
+        QnResourcePtr dstServer;
+    };
+    QMap<int, CameraMovingInfo> m_awaitingMoveCameras;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

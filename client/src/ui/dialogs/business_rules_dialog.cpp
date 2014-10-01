@@ -81,7 +81,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     //TODO: #GDM #Business show description label if no rules are loaded
 
-    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &QnBusinessRulesDialog::at_saveAllButton_clicked);
+    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &QnBusinessRulesDialog::saveAll);
     connect(ui->addRuleButton,                              &QPushButton::clicked, this, &QnBusinessRulesDialog::at_newRuleButton_clicked);
     connect(ui->deleteRuleButton,                           &QPushButton::clicked, this, &QnBusinessRulesDialog::at_deleteButton_clicked);
     connect(ui->advancedButton,                             &QPushButton::clicked, this, &QnBusinessRulesDialog::toggleAdvancedMode);
@@ -96,6 +96,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->clearFilterButton,                          &QToolButton::clicked, this, &QnBusinessRulesDialog::at_clearFilterButton_clicked);
 
     updateFilter();  
+    updateControlButtons();
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog() {
@@ -155,7 +156,7 @@ void QnBusinessRulesDialog::at_beforeModelChanged() {
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_message_ruleDeleted(const QUuid &id) {
+void QnBusinessRulesDialog::at_message_ruleDeleted(const QnUuid &id) {
     m_pendingDeleteRules.removeOne(id); //TODO: #GDM #Business ask user
 }
 
@@ -167,10 +168,6 @@ void QnBusinessRulesDialog::at_newRuleButton_clicked() {
         ui->tableView->horizontalHeader()->setStretchLastSection(true);
         ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
     }
-}
-
-void QnBusinessRulesDialog::at_saveAllButton_clicked() {
-    saveAll();
 }
 
 void QnBusinessRulesDialog::at_deleteButton_clicked() {
@@ -321,7 +318,7 @@ bool QnBusinessRulesDialog::saveAll() {
     }
 
     //TODO: #GDM #Business replace with QnAppServerReplyProcessor
-    foreach (const QUuid& id, m_pendingDeleteRules) {
+    foreach (const QnUuid& id, m_pendingDeleteRules) {
         int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->deleteRule(
             id, this, &QnBusinessRulesDialog::at_resources_deleted );
         m_deleting[handle] = id;
@@ -407,7 +404,7 @@ void QnBusinessRulesDialog::updateFilter() {
 
     filter = filter.trimmed();
     bool anyCameraPassFilter = false;
-    foreach (const QnResourcePtr camera, qnResPool->getAllCameras(QnResourcePtr()))  {
+    foreach (const QnResourcePtr camera, qnResPool->getAllCameras(QnResourcePtr(), true))  {
         anyCameraPassFilter = camera->toSearchString().contains(filter, Qt::CaseInsensitive);
         if (anyCameraPassFilter)
             break;

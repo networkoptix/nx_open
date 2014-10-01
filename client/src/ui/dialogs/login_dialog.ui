@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>550</width>
-    <height>538</height>
+    <height>540</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>550</width>
+    <height>540</height>
+   </size>
   </property>
   <property name="modal">
    <bool>false</bool>
@@ -256,7 +262,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QCheckBox" name="rememberPasswordCheckBox">
+         <widget class="QCheckBox" name="autoLoginCheckBox">
           <property name="text">
            <string>&amp;Auto-Login</string>
           </property>
@@ -319,7 +325,7 @@
   <tabstop>loginLineEdit</tabstop>
   <tabstop>passwordLineEdit</tabstop>
   <tabstop>testButton</tabstop>
-  <tabstop>rememberPasswordCheckBox</tabstop>
+  <tabstop>autoLoginCheckBox</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>

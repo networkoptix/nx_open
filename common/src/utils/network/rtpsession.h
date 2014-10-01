@@ -217,6 +217,7 @@ public:
     TransportType getTransport() const { return m_transport; }
     QString getTrackFormatByRtpChannelNum(int channelNum);
     TrackType getTrackTypeByRtpChannelNum(int channelNum);
+    int getChannelNum(int rtpChannelNum);
 
     qint64 startTime() const;
     qint64 endTime() const;
@@ -246,13 +247,9 @@ public:
 
     void setProxyAddr(const QString& addr, int port);
 
-    /*
-    * Find track by type ('video', 'audio' e t.c.) and returns track IO device. Returns 0 if track not found.
-    */
-    RTPIODevice* getTrackIoByType(TrackType trackType);
-
-    QString getCodecNameByType(TrackType trackType);
+    QList<QByteArray> getSdpByTrackNum(int trackNum) const;
     QList<QByteArray> getSdpByType(TrackType trackType) const;
+    int getTrackCount(TrackType trackType) const;
 
     int getLastResponseCode() const;
 
@@ -287,6 +284,8 @@ public:
     bool setTCPReadBufferSize(int value);
 
     QString getVideoLayout() const;
+    TrackMap getTrackInfo() const;
+
 signals:
     void gotTextResponse(QByteArray text);
 private:

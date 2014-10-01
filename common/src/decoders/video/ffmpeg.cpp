@@ -147,7 +147,7 @@ void CLFFmpegVideoDecoder::closeDecoder()
 
 void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data)
 {
-    if (m_context->thread_count == 1) {
+    if (m_context->thread_count <= 1) {
         m_context->thread_count = qMin(MAX_DECODE_THREAD, QThread::idealThreadCount() + 1);
         if (m_forcedMtDecoding)
             m_context->thread_count = qMin(m_context->thread_count, 3);

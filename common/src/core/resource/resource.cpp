@@ -225,16 +225,16 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode)
         consumer->afterUpdate();
 }
 
-QUuid QnResource::getParentId() const
+QnUuid QnResource::getParentId() const
 {
     QMutexLocker locker(&m_mutex);
     return m_parentId;
 }
 
-void QnResource::setParentId(QUuid parent)
+void QnResource::setParentId(QnUuid parent)
 {
     bool initializedChanged = false;
-    QUuid oldParentId;
+    QnUuid oldParentId;
     {
         QMutexLocker locker(&m_mutex);
         if (m_parentId == parent)
@@ -332,7 +332,7 @@ QString QnResource::toSearchString() const
 
 QnResourcePtr QnResource::getParentResource() const
 {
-    QUuid parentID;
+    QnUuid parentID;
     QnResourcePool* resourcePool = NULL;
     {
         QMutexLocker mutexLocker(&m_mutex);
@@ -353,7 +353,7 @@ QnParamList QnResource::getResourceParamList() const
     
     if (!m_resourceParamList.isEmpty())
         return m_resourceParamList;
-    QUuid resTypeId = m_typeId;
+    QnUuid resTypeId = m_typeId;
     
     QnParamList resourceParamList;
 
@@ -533,14 +533,19 @@ bool QnResource::unknownResource() const
     return getName().isEmpty();
 }
 
-QUuid QnResource::getTypeId() const
+QnUuid QnResource::getTypeId() const
 {
     QMutexLocker mutexLocker(&m_mutex);
     return m_typeId;
 }
 
-void QnResource::setTypeId(QUuid id)
+void QnResource::setTypeId(const QnUuid &id)
 {
+    if (id.isNull()) {
+        qWarning() << "NULL typeId is set to resource" << getName();
+        return;
+    }
+
     QMutexLocker mutexLocker(&m_mutex);
     m_typeId = id;
 }
@@ -626,19 +631,19 @@ void QnResource::setLastDiscoveredTime(const QDateTime &time)
     m_lastDiscoveredTime = time;
 }
 
-QUuid QnResource::getId() const
+QnUuid QnResource::getId() const
 {
     QMutexLocker mutexLocker(&m_mutex);
     return m_id;
 }
 
-void QnResource::setId(const QUuid& id) {
+void QnResource::setId(const QnUuid& id) {
     QMutexLocker mutexLocker(&m_mutex);
 
     if(m_id == id)
         return;
 
-    //QUuid oldId = m_id;
+    //QnUuid oldId = m_id;
     m_id = id;
 }
 
@@ -924,6 +929,10 @@ void QnResource::stopAsyncTasks()
     m_initAsyncPool.waitForDone();
 }
 
+void QnResource::pleaseStopAsyncTasks()
+{
+    m_appStopping = true;
+}
 
 void QnResource::initAsync(bool optional)
 {

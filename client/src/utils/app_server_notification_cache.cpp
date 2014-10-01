@@ -2,7 +2,7 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <client/client_message_processor.h>
 
@@ -41,7 +41,7 @@ QnNotificationSoundModel* QnAppServerNotificationCache::persistentGuiModel() con
 }
 
 bool QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLengthMSecs, const QString &customTitle) {
-    QString uuid = QUuid::createUuid().toString();
+    QString uuid = QnUuid::createUuid().toString();
     QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".mp3");
 
     QString title = customTitle;

@@ -1,6 +1,8 @@
 #ifndef __BINARY_TRANSACTION_SERIALIZER_H_
 #define __BINARY_TRANSACTION_SERIALIZER_H_
 
+#if 0
+
 #include <QtCore/QCache>
 
 #include <transaction/transaction.h>
@@ -40,11 +42,14 @@ namespace ec2
 
         template<class T>
         QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header) {
+            return serializedTransactionWithHeader(serializedTransaction(tran), header);
+        }
+
+        QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header) {
             QByteArray result;
             QnOutputBinaryStream<QByteArray> stream(&result);
             QnBinary::serialize(header, &stream);
 
-            QByteArray serializedTran = serializedTransaction(tran);
             stream.write(serializedTran.data(), serializedTran.size());
             return result;
         }
@@ -57,5 +62,6 @@ namespace ec2
 
 }
 
+#endif
 
 #endif // __BINARY_TRANSACTION_SERIALIZER_H_

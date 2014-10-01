@@ -34,22 +34,18 @@ class QnResourcePool;
 class QnInitResPool: public QThreadPool
 {
 public:
-    QnInitResPool() : QThreadPool() 
-    {
-        setMaxThreadCount( DEFAULT_RESOURCE_INIT_THREADS_COUNT );
-    }
 };
 
 class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
     Q_FLAGS(Qn::PtzCapabilities)
-    Q_PROPERTY(QUuid id READ getId WRITE setId)
-    Q_PROPERTY(QUuid typeId READ getTypeId WRITE setTypeId)
+    Q_PROPERTY(QnUuid id READ getId WRITE setId)
+    Q_PROPERTY(QnUuid typeId READ getTypeId WRITE setTypeId)
     Q_PROPERTY(QString uniqueId READ getUniqueId)
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString searchString READ toSearchString)
-    Q_PROPERTY(QUuid parentId READ getParentId WRITE setParentId)
+    Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId)
     Q_PROPERTY(Qn::ResourceStatus status READ getStatus WRITE setStatus)
     Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
@@ -60,11 +56,11 @@ public:
     QnResource();
     virtual ~QnResource();
 
-    QUuid getId() const;
-    void setId(const QUuid& id);
+    QnUuid getId() const;
+    void setId(const QnUuid& id);
 
-    QUuid getParentId() const;
-    void setParentId(QUuid parent);
+    QnUuid getParentId() const;
+    void setParentId(QnUuid parent);
 
     // device unique identifier
     virtual QString getUniqueId() const { return getId().toString(); };
@@ -73,8 +69,8 @@ public:
 
     // TypeId unique string id for resource with SUCH list of params and CLASS
     // in other words TypeId can be used instantiate the right resource
-    QUuid getTypeId() const;
-    void setTypeId(QUuid id);
+    QnUuid getTypeId() const;
+    void setTypeId(const QnUuid &id);
     void setTypeByName(const QString& resTypeName);
 
     virtual Qn::ResourceStatus getStatus() const;
@@ -183,6 +179,7 @@ public:
     bool isInitialized() const;
 
     static void stopAsyncTasks();
+    static void pleaseStopAsyncTasks();
 
     /**
         Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
@@ -276,7 +273,6 @@ protected:
     virtual void initializationDone();
 
     virtual void parameterValueChangedNotify(const QnParam &param);
-
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */
@@ -309,7 +305,7 @@ protected:
     static bool m_appStopping;
 
     /** Identifier of the parent resource. Use resource pool to retrieve the actual parent resource. */
-    QUuid m_parentId;
+    QnUuid m_parentId;
 
     /** Name of this resource. */
     QString m_name;
@@ -321,10 +317,10 @@ private:
     QnResourcePool *m_resourcePool;
 
     /** Identifier of this resource. */
-    QUuid m_id;
+    QnUuid m_id;
 
     /** Identifier of the type of this resource. */
-    QUuid m_typeId;
+    QnUuid m_typeId;
 
     /** Flags of this resource that determine its type. */
     Qn::ResourceFlags m_flags;

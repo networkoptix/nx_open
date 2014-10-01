@@ -21,6 +21,7 @@
 	<name>HD Witness New Enterprise Controller</name>    
 
     <properties>
+        <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <product.title>${appserver2.name}</product.title>  
         <!--Global libs-->		
         <qt.libs>core network xml sql concurrent</qt.libs>
@@ -30,7 +31,7 @@
         <linux.oslibs>-lssl -lcrypto -lpostproc</linux.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>                
-        <mac.oslibs>-lpostproc -lssl -lcrypto -lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+        <mac.oslibs>-lssl -lcrypto -lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
         <android.oslibs>-lssl -lcrypto</android.oslibs>
         <!--Global defines-->
         <global.defines></global.defines>

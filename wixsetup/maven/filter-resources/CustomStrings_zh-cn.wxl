@@ -46,7 +46,7 @@
     <String Id="AppServerDlg_Network"                               Overridable="yes">网络配置</String>    
     <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">代理端口</String>
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">确认密码</String>   
-    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">额外的参数</String>   
+    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">系统优化设置</String>   
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">允许系统以优化相机设置（推荐）</String>     
 
     <!-- Associations -->
@@ -65,7 +65,9 @@
     <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">警告</String>     
 
     <!-- InstallTypeDlg -->
+    <String Id="InstallTypeDlg_Full"                                Overridable="yes">快速全部安装 (安装所有组件)</String>    
     <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">快速全部安装 (安装所有组件)</String>
+    <String Id="InstallTypeDlg_ServerOnly"                          Overridable="yes">服务器</String>    
     <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">安装客户端(可以使用客户端访问视频和录像)</String>
     <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">高级安装</String>
     <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">请选择安装方式</String>
@@ -85,10 +87,12 @@
     <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">端口</String>
     <String Id="MediaServerDlg_Login"                               Overridable="yes">用户名</String>
     <String Id="MediaServerDlg_Password"                            Overridable="yes">密码</String>  
+    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">确认密码</String>          
     <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">媒体服务器端口</String>
     <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">系统控制器</String>
     <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">媒体服务器配置</String>
     <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">媒体服务器</String>  
+    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">系统名称</String>      
 
     <!-- MyExitDialog -->
 

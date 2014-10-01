@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <api/app_server_connection.h>
 
@@ -48,7 +48,7 @@ private:
     void swapLayouts(const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout);
 
     /** Updates item's layout with provided value. Provided layout should be saved. */
-    void updateItemsLayout(const QnVideoWallItemIndexList &items, const QUuid &layoutId);
+    void updateItemsLayout(const QnVideoWallItemIndexList &items, const QnUuid &layoutId);
 
     bool canStartVideowall(const QnVideoWallResourcePtr &videowall);
 
@@ -58,13 +58,14 @@ private:
     void openVideoWallItem(const QnVideoWallResourcePtr &videoWall);
     void closeInstanceDelayed();
 
+    bool canStartControlMode() const;
     void setControlMode(bool active);
     void updateMode();
 
     void sendMessage(QnVideoWallControlMessage message, bool cached = false);
-    void handleMessage(const QnVideoWallControlMessage &message, const QUuid &controllerUuid = QUuid(), qint64 sequence = -1 );
-    void storeMessage(const QnVideoWallControlMessage &message, const QUuid &controllerUuid, qint64 sequence);
-    void restoreMessages(const QUuid &controllerUuid, qint64 sequence);
+    void handleMessage(const QnVideoWallControlMessage &message, const QnUuid &controllerUuid = QnUuid(), qint64 sequence = -1 );
+    void storeMessage(const QnVideoWallControlMessage &message, const QnUuid &controllerUuid, qint64 sequence);
+    void restoreMessages(const QnUuid &controllerUuid, qint64 sequence);
 
     /** Returns list of target videowall items for current layout. */
     QnVideoWallItemIndexList targetList() const;
@@ -75,8 +76,9 @@ private:
     static QString shortcutPath();
     bool shortcutExists(const QnVideoWallResourcePtr &videowall) const;
     bool createShortcut(const QnVideoWallResourcePtr &videowall);
+    bool deleteShortcut(const QnVideoWallResourcePtr &videowall);
 
-    void setItemOnline(const QUuid &instanceGuid, bool online);
+    void setItemOnline(const QnUuid &instanceGuid, bool online);
     void updateMainWindowGeometry(const QnScreenSnaps &screenSnaps);
 
     void updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action);
@@ -159,10 +161,10 @@ private:
         bool active;        /**< Client is run in videowall mode. */
         bool ready;         /**< Resources are loaded. */
         bool opening;       /**< We are currently opening videowall. */
-        QUuid guid;
-        QUuid instanceGuid; /**< Guid of the videowall item we are currently displaying. */
-        QHash<QUuid, qint64> sequenceByPcUuid;
-        QHash<QUuid, StoredMessagesHash> storedMessages;
+        QnUuid guid;
+        QnUuid instanceGuid; /**< Guid of the videowall item we are currently displaying. */
+        QHash<QnUuid, qint64> sequenceByPcUuid;
+        QHash<QnUuid, StoredMessagesHash> storedMessages;
     }  m_videoWallMode;
 
 

@@ -45,8 +45,6 @@ private slots:
     void updateControls();
 
     void at_browseLicenseFileButton_clicked();
-    void at_activateLicenseButton_clicked();
-    void at_activateFreeLicenseButton_clicked();
     void at_activationTypeComboBox_currentIndexChanged();
 
 private:
@@ -54,6 +52,8 @@ private:
 
     QScopedPointer<Ui::LicenseWidget> ui;
     State m_state;
+    QByteArray m_activationKey;
+    bool m_freeLicenseAvailable;
 };
 
 #endif // QN_LICENSE_WIDGET_H

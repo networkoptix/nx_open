@@ -161,7 +161,7 @@ public:
      * must be set. 
      * 
      * If you want to create a new preset, a good idea would be to set its id to 
-     * <tt>QUuid::createUuid().toString()</tt>.
+     * <tt>QnUuid::createUuid().toString()</tt>.
      * 
      * This function is expected to be implemented only if this controller has 
      * <tt>Qn::PresetsPtzCapability<tt>.
@@ -222,7 +222,7 @@ public:
      * Note that id of the provided preset must be set. 
      * 
      * If you want to create a new preset, a good idea would be to set its id to 
-     * <tt>QUuid::createUuid().toString()</tt>.
+     * <tt>QnUuid::createUuid().toString()</tt>.
      * 
      * This function is expected to be implemented only if this controller has 
      * <tt>Qn::ToursPtzCapability<tt>.

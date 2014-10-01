@@ -296,8 +296,11 @@ void QnCameraSettingsDialog::saveAdvancedCameraSettingsAsync(const QnVirtualCame
 
     // TODO: #Elric method called even if nothing has changed
     // TODO: #Elric result slot at_camera_settings_saved() is not called
-    serverConnectionPtr->setParamsAsync(cameraPtr, m_settingsWidget->getModifiedAdvancedParams(),
-        this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
+    QList<QPair<QString, QVariant>> params = m_settingsWidget->getModifiedAdvancedParams();
+    if (params.isEmpty())
+        return;
+
+    serverConnectionPtr->setParamsAsync(cameraPtr, params, this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)));
 }
 
 void QnCameraSettingsDialog::at_openButton_clicked() {

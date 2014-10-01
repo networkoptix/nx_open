@@ -115,6 +115,7 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_vendor = other_casted->m_vendor;
         m_minDays = other_casted->m_minDays;
         m_maxDays = other_casted->m_maxDays;
+        m_preferedServerId = other_casted->m_preferedServerId;
     }
 }
 
@@ -149,7 +150,8 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
             return 0;
 
         QnAbstractStreamDataProvider* result = createLiveDataProvider();
-        result->setRole(role);
+        if (result)
+            result->setRole(role);
         return result;
 
     }
@@ -559,6 +561,16 @@ void QnSecurityCamResource::setMaxDays(int value)
 int QnSecurityCamResource::maxDays() const
 {
     SAFE(return m_maxDays);
+}
+
+void QnSecurityCamResource::setPreferedServerId(const QnUuid& value)
+{
+    SAFE(m_preferedServerId = value)
+}
+
+QnUuid QnSecurityCamResource::preferedServerId() const
+{
+    SAFE(return m_preferedServerId);
 }
 
 void QnSecurityCamResource::setMinDays(int value)

@@ -3,7 +3,7 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QScopedPointer>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <utils/common/id.h>
 #include <core/resource/resource_fwd.h>
@@ -27,7 +27,15 @@ class QnResourcePoolModel : public Connective<QAbstractItemModel>, public QnWork
 
     typedef Connective<QAbstractItemModel> base_type;
 public:
-    explicit QnResourcePoolModel(Qn::NodeType rootNodeType = Qn::RootNode, QObject *parent = NULL);
+    /** Narrowed scope for the minor widgets and dialogs. */
+    enum Scope {
+        FullScope,
+        CamerasScope,
+        UsersScope
+        //TODO: #GDM non-admin-scope?
+    };
+
+    explicit QnResourcePoolModel(Scope scope = FullScope, QObject *parent = NULL);
     virtual ~QnResourcePoolModel();
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
@@ -51,21 +59,23 @@ public:
 
     bool isUrlsShown();
     void setUrlsShown(bool urlsShown);
-
-    Qn::NodeType rootNodeType() const;
 private:
     QnResourcePoolModelNode *node(const QnResourcePtr &resource);
-    QnResourcePoolModelNode *node(const QUuid &uuid);
+    QnResourcePoolModelNode *node(const QnUuid &uuid);
     QnResourcePoolModelNode *node(const QModelIndex &index) const;
-    QnResourcePoolModelNode *node(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource);
+    QnResourcePoolModelNode *node(Qn::NodeType nodeType, const QnUuid &uuid, const QnResourcePtr &resource);
     QnResourcePoolModelNode *node(const QnResourcePtr &resource, const QString &groupId, const QString &groupName);
+    QnResourcePoolModelNode *systemNode(const QString &systemName);
     QnResourcePoolModelNode *expectedParent(QnResourcePoolModelNode *node);
     bool isIgnored(const QnResourcePtr &resource) const;
 
+    void removeNode(QnResourcePoolModelNode *node);
+
+    void removeNode(Qn::NodeType nodeType, const QnUuid &uuid, const QnResourcePtr &resource);
+
+    /** Some nodes can have deleting node set as parent, but this node will not
+     ** have them as children because of their 'bastard' flag.*/
     void deleteNode(QnResourcePoolModelNode *node);
-
-    void deleteNode(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource);
-
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
@@ -87,10 +97,14 @@ private slots:
     void at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
 
     void at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera);
+
+    void at_server_systemNameChanged(const QnResourcePtr &resource);
+    void at_commonModule_systemNameChanged();
+
 private:
     friend class QnResourcePoolModelNode;
 
-    typedef QPair<QnResourcePtr, QUuid> NodeKey;
+    typedef QPair<QnResourcePtr, QnUuid> NodeKey;
 
     typedef QHash<QString, QnResourcePoolModelNode *> RecorderHash;
 
@@ -110,16 +124,22 @@ private:
     QHash<QnResourcePtr, RecorderHash> m_recorderHashByResource;
 
     /** Mapping for item nodes, by item id. */
-    QHash<QUuid, QnResourcePoolModelNode *> m_itemNodeByUuid;
+    QHash<QnUuid, QnResourcePoolModelNode *> m_itemNodeByUuid;
 
     /** Mapping for item nodes, by resource id. Is managed by nodes. */
     QHash<QnResourcePtr, QList<QnResourcePoolModelNode *> > m_itemNodesByResource;
 
+    /** Mapping for system nodes, by system name. */
+    QHash<QString, QnResourcePoolModelNode *> m_systemNodeBySystemName;
+
+    /** Full list of all created nodes. */
+    QList<QnResourcePoolModelNode *> m_allNodes;
+
     /** Whether item urls should be shown. */
     bool m_urlsShown;
 
-    /** Type of root node - for the models with narrowed scopes */
-    Qn::NodeType m_rootNodeType;
+    /** Narrowed scope for displaying the limited set of nodes. */
+    Scope m_scope;
 };
 
 #endif // QN_RESOURCE_POOL_MODEL_H

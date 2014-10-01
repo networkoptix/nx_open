@@ -16,10 +16,10 @@ public:
 private:
     bool isSetStatusInProgress(const QnResourcePtr &resource);
     void updateResourceStatusAsync(const QnResourcePtr &resource);
-    void requestFinished2( int reqID, ec2::ErrorCode errCode, const QUuid& id );
+    void requestFinished2( int reqID, ec2::ErrorCode errCode, const QnUuid& id );
 private:
-    QSet<QUuid> m_awaitingSetStatus;
-    QSet<QUuid> m_setStatusInProgress;
+    QSet<QnUuid> m_awaitingSetStatus;
+    QSet<QnUuid> m_setStatusInProgress;
 };
 
 #endif // __RESOURCE_STATUS_WATCHER_H__

@@ -100,7 +100,7 @@ private:
     };
 
     struct BaseModelItem {
-        BaseModelItem(const QRect &geometry, ItemType itemType, const QUuid &id, QnVideowallManageWidget* q);
+        BaseModelItem(const QRect &geometry, ItemType itemType, const QnUuid &id, QnVideowallManageWidget* q);
         virtual ~BaseModelItem();
 
         virtual bool free() const = 0;
@@ -122,7 +122,7 @@ private:
         bool hasFlag(StateFlags flag) const;
         bool isPartOfScreen() const;
 
-        QUuid id;
+        QnUuid id;
         ItemType itemType;
 
         QRect geometry;
@@ -143,7 +143,7 @@ private:
     struct ModelItem: BaseModelItem {
         typedef BaseModelItem base_type;
 
-        ModelItem(ItemType itemType, const QUuid &id, QnVideowallManageWidget* q);
+        ModelItem(ItemType itemType, const QnUuid &id, QnVideowallManageWidget* q);
 
         virtual bool free() const override;
         virtual void setFree(bool value) override;

@@ -299,7 +299,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     QGraphicsLayout::setInstantInvalidatePropagation(true);
 
     /* Install and configure instruments. */
-    m_fpsCountingInstrument = new FpsCountingInstrument(333, this);
+    m_fpsCountingInstrument = new FpsCountingInstrument(1000, this);
     m_controlsActivityInstrument = new ActivityListenerInstrument(true, hideConstrolsTimeoutMSec, this);
 
     m_instrumentManager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
@@ -308,7 +308,12 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityStopped,   this,     &QnWorkbenchUi::at_activityStopped);
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityResumed,   this,     &QnWorkbenchUi::at_activityStarted);
     connect(m_fpsCountingInstrument,    &FpsCountingInstrument::fpsChanged,               this,     [this](qreal fps) {
+#ifdef QN_SHOW_FPS_MS
+        QString fmt = lit("%1 (%2ms)");
+        m_fpsItem->setText(fmt.arg(QString::number(fps, 'g', 4)).arg(QString::number(1000 / fps, 'g', 4)));
+#else
         m_fpsItem->setText(QString::number(fps, 'g', 4));
+#endif
         m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
     });
 
@@ -1362,6 +1367,8 @@ void QnWorkbenchUi::createTitleWidget() {
     connect(m_titleOpacityProcessor,    &HoverFocusProcessor::hoverLeft,        this,   &QnWorkbenchUi::updateControlsVisibilityAnimated);
     connect(m_titleItem,                &QGraphicsWidget::geometryChanged,      this,   &QnWorkbenchUi::at_titleItem_geometryChanged);
 #ifndef Q_OS_MACX
+    connect(m_tabBarWidget,             &QnLayoutTabBar::tabCloseRequested,     m_titleItem,    &QnClickableWidget::skipDoubleClick);
+    connect(m_tabBarWidget,             &QnLayoutTabBar::currentChanged,        m_titleItem,    &QnClickableWidget::skipDoubleClick);
     connect(m_titleItem,                &QnClickableWidget::doubleClicked,      action(Qn::EffectiveMaximizeAction), &QAction::toggle);
 #endif
     connect(titleMenuSignalizer,        &QnAbstractEventSignalizer::activated,  this,   &QnWorkbenchUi::at_titleItem_contextMenuRequested);

@@ -9,7 +9,7 @@
 #include "core/resource_management/resource_pool.h"
 
 
-QnLayoutResource::QnLayoutResource(): 
+QnLayoutResource::QnLayoutResource(const QnResourceTypePool* resTypePool): 
     base_type(),
     m_cellAspectRatio(-1.0),
     m_cellSpacing(-1.0, -1.0),
@@ -20,14 +20,14 @@ QnLayoutResource::QnLayoutResource():
 {
     setStatus(Qn::Online, true);
     addFlags(Qn::layout);
+    setTypeId(resTypePool->getFixedResourceTypeId(lit("Layout")));
 }
 
 QnLayoutResourcePtr QnLayoutResource::clone() const {
     QMutexLocker locker(&m_mutex);
 
-    QnLayoutResourcePtr result(new QnLayoutResource());
-    result->setId(QUuid::createUuid());
-    result->setTypeId(getTypeId());
+    QnLayoutResourcePtr result(new QnLayoutResource(qnResTypePool));
+    result->setId(QnUuid::createUuid());
     result->setName(m_name);
     result->setParentId(m_parentId);
     result->setCellSpacing(m_cellSpacing);
@@ -38,14 +38,14 @@ QnLayoutResourcePtr QnLayoutResource::clone() const {
     result->setUserCanEdit(m_userCanEdit);
 
     QnLayoutItemDataList items = m_itemByUuid.values();
-    QHash<QUuid, QUuid> newUuidByOldUuid;
+    QHash<QnUuid, QnUuid> newUuidByOldUuid;
     for(int i = 0; i < items.size(); i++) {
-        QUuid newUuid = QUuid::createUuid();
+        QnUuid newUuid = QnUuid::createUuid();
         newUuidByOldUuid[items[i].uuid] = newUuid;
         items[i].uuid = newUuid;
     }
     for(int i = 0; i < items.size(); i++)
-        items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QUuid());
+        items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QnUuid());
     result->setItems(items);
 
     return result;
@@ -108,7 +108,7 @@ void QnLayoutResource::setUrl(const QString& value)
 #endif
 }
 
-QnLayoutItemData QnLayoutResource::getItem(const QUuid &itemUuid) const {
+QnLayoutItemData QnLayoutResource::getItem(const QnUuid &itemUuid) const {
     QMutexLocker locker(&m_mutex);
 
     return m_itemByUuid.value(itemUuid);
@@ -139,12 +139,12 @@ void QnLayoutResource::removeItem(const QnLayoutItemData &item) {
     removeItem(item.uuid);
 }
 
-void QnLayoutResource::removeItem(const QUuid &itemUuid) {
+void QnLayoutResource::removeItem(const QnUuid &itemUuid) {
     QMutexLocker locker(&m_mutex);
     removeItemUnderLock(itemUuid);
 }
 
-void QnLayoutResource::updateItem(const QUuid &itemUuid, const QnLayoutItemData &item) {
+void QnLayoutResource::updateItem(const QnUuid &itemUuid, const QnLayoutItemData &item) {
     QMutexLocker locker(&m_mutex);
     updateItemUnderLock(itemUuid, item);
 }
@@ -162,7 +162,7 @@ void QnLayoutResource::addItemUnderLock(const QnLayoutItemData &item) {
     m_mutex.lock();
 }
 
-void QnLayoutResource::updateItemUnderLock(const QUuid &itemUuid, const QnLayoutItemData &item) {
+void QnLayoutResource::updateItemUnderLock(const QnUuid &itemUuid, const QnLayoutItemData &item) {
     QnLayoutItemDataMap::iterator pos = m_itemByUuid.find(itemUuid);
     if(pos == m_itemByUuid.end()) {
         qnWarning("There is no item with UUID %1 in this layout.", itemUuid.toString());
@@ -185,7 +185,7 @@ void QnLayoutResource::updateItemUnderLock(const QUuid &itemUuid, const QnLayout
     m_mutex.lock();
 }
 
-void QnLayoutResource::removeItemUnderLock(const QUuid &itemUuid) {
+void QnLayoutResource::removeItemUnderLock(const QnUuid &itemUuid) {
     QnLayoutItemDataMap::iterator pos = m_itemByUuid.find(itemUuid);
     if(pos == m_itemByUuid.end())
         return;
@@ -368,4 +368,3 @@ void QnLayoutResource::setLocked(bool value) {
     }
     emit lockedChanged(::toSharedPointer(this));
 }
-

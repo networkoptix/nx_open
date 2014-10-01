@@ -24,10 +24,7 @@
    <item>
     <widget class="QCheckBox" name="shortcutCheckbox">
      <property name="text">
-      <string>Create shortcut on the desktop</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
+      <string>Shortcut on the desktop</string>
      </property>
     </widget>
    </item>

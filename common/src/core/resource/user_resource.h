@@ -1,7 +1,7 @@
 #ifndef QN_USER_RESOURCE_H
 #define QN_USER_RESOURCE_H
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
@@ -20,6 +20,9 @@ public:
 
     QString getPassword() const;
     void setPassword(const QString &password);
+
+    void generateHash();
+    bool checkPassword(const QString &password);
 
     QByteArray getDigest() const;
     void setDigest(const QByteArray& digest);

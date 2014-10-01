@@ -139,8 +139,6 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), QString(), QString(), 0);
 
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
-    if (!existResource)
-        existResource = qnResPool->getResourceByParam(QnPlOnvifResource::ONVIF_ID_PARAM_NAME, info.uniqId).dynamicCast<QnVirtualCameraResource>();
 
     if (existResource) {
         soapWrapper.setLogin(existResource->getAuth().user());
@@ -164,7 +162,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             mac = existResource->getMAC().toString();
     }
 
-    if (model.isEmpty() || manufacturer.isEmpty() || mac.isEmpty())
+    if (model.isEmpty() || manufacturer.isEmpty()  || QnMacAddress(mac).isNull())
     {
         OnvifResExtInfo extInfo;
         QAuthenticator auth;
@@ -243,9 +241,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     }
 }
 
-QUuid OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manufacturer, const QString&  model) const
+QnUuid OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manufacturer, const QString&  model) const
 {
-    QUuid rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false); // try to find child resource type, use real manufacturer name as camera model in onvif XML
+    QnUuid rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false); // try to find child resource type, use real manufacturer name as camera model in onvif XML
     if (!rt.isNull())
         return rt;
     else if (isAnalogOnvifResource(manufacturer, model) && !onvifAnalogTypeId.isNull())
@@ -273,11 +271,11 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
         resource->setName(model); 
     else
         resource->setName(manufacturer + model); 
-    resource->setMAC(QnMacAddress(mac));
+    QnMacAddress macAddr(mac);
+    resource->setMAC(macAddr);
     resource->setFirmware(firmware);
 
-    if (mac.isEmpty())
-        resource->setPhysicalId(uniqId);
+	resource->setPhysicalId(uniqId);
 
     resource->setDeviceOnvifUrl(deviceUrl);
 

@@ -71,9 +71,11 @@ void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
 QnResourceDiscoveryManager::QnResourceDiscoveryManager()
 :
     m_ready( false ),
-    m_state( InitialSearch )
+    m_state( InitialSearch ),
+    m_discoveryUpdateIdx(0)
 {
     connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)), Qt::DirectConnection);
+    connect(QnResourcePool::instance(), SIGNAL(resourceChanged(const QnResourcePtr&)), this, SLOT(at_resourceChanged(const QnResourcePtr&)), Qt::DirectConnection);
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::disabledVendorsChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
 }
 
@@ -125,7 +127,7 @@ void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* proce
     m_resourceProcessor = processor;
 }
 
-QnResourcePtr QnResourceDiscoveryManager::createResource(const QUuid &resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
 {
     QnResourcePtr result;
 
@@ -237,6 +239,26 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
     m_timer->start( GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS );
 }
 
+void QnResourceDiscoveryManager::setLastDiscoveredResources(const QnResourceList& resources)
+{
+    QMutexLocker lock(&m_resListMutex);
+    m_lastDiscoveredResources[m_discoveryUpdateIdx] = resources;
+    int sz = sizeof(m_lastDiscoveredResources) / sizeof(QnResourceList);
+    m_discoveryUpdateIdx = (m_discoveryUpdateIdx + 1) % sz;
+}
+
+QnResourceList QnResourceDiscoveryManager::lastDiscoveredResources() const
+{
+    QMutexLocker lock(&m_resListMutex);
+    int sz = sizeof(m_lastDiscoveredResources) / sizeof(QnResourceList);
+    QSet<QnResourcePtr> allResources;
+    for (int i = 0; i < sz; ++i) {
+        foreach(const QnResourcePtr& res, m_lastDiscoveredResources[i])
+            allResources << res;
+    }
+    return allResources.toList();
+}
+
 void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
 {
     QList<QHostAddress> localAddresses = allLocalAddresses();
@@ -251,15 +273,19 @@ void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
     }
 }
 
-static QnResourceList ChecHostAddrAsync(const QnManualCameraInfo& input) { return input.checkHostAddr(); }
+static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input) { return input.checkHostAddr(); }
 
 void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList& resources)
 {
-    m_searchersListMutex.lock();
-    QnManualCameraInfoMap cameras = m_manualCameraMap;
-    m_searchersListMutex.unlock();
+    QnManualCameraInfoMap cameras;
+    {
+        QMutexLocker locker(&m_searchersListMutex);
+        cameras = m_manualCameraMap;
+        if (cameras.isEmpty())
+            return;
+    }
 
-    QFuture<QnResourceList> results = QtConcurrent::mapped(cameras, &ChecHostAddrAsync);
+    QFuture<QnResourceList> results = QtConcurrent::mapped(cameras, &CheckHostAddrAsync);
     results.waitForFinished();
     for (QFuture<QnResourceList>::const_iterator itr = results.constBegin(); itr != results.constEnd(); ++itr)
     {
@@ -288,7 +314,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             QnResourceList lst = searcher->search();
 
             // resources can be searched by client in or server.
-            // if this client in stand alone => lets add QnResource::local 
+            // if this client in stand alone => lets add Qn::local
             // server does not care about flags 
             for( QnResourceList::iterator
                 it = lst.begin();
@@ -326,6 +352,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     }
 
     appendManualDiscoveredResources(resources);
+    setLastDiscoveredResources(resources);
 
     {
         QMutexLocker lock(&m_searchersListMutex);
@@ -375,6 +402,16 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
     return !resources.isEmpty();
 }
 
+void QnResourceDiscoveryManager::fillManualCamInfo(QnManualCameraInfoMap& cameras, const QnSecurityCamResourcePtr& camera)
+{
+    QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
+    auto inserted = cameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
+    for (int i = 0; i < m_searchersList.size(); ++i) {
+        if (m_searchersList[i]->isResourceTypeSupported(resType->getId()))
+            inserted.value().searcher = m_searchersList[i];
+    }
+}
+
 bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoMap& cameras)
 {
     QMutexLocker lock(&m_searchersListMutex);
@@ -407,15 +444,39 @@ void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resourc
 {
     QMutexLocker lock(&m_searchersListMutex);
     QnManualCameraInfoMap::Iterator itr = m_manualCameraMap.find(resource->getUrl());
-    if (itr != m_manualCameraMap.end() && itr.value().resType->getId() == resource->getTypeId())
+    if (itr != m_manualCameraMap.end())
         m_manualCameraMap.erase(itr);
-    m_recentlyDeleted << resource->getUniqueId();
+    m_recentlyDeleted << resource->getUrl();
 }
 
-bool QnResourceDiscoveryManager::containManualCamera(const QString& uniqId)
+void QnResourceDiscoveryManager::at_resourceChanged(const QnResourcePtr& resource)
+{
+    QnManualCameraInfoMap newManualCameras;
+    {
+        QMutexLocker lock(&m_searchersListMutex);
+        if (resource->hasFlags(Qn::foreigner)) {
+            QnManualCameraInfoMap::Iterator itr = m_manualCameraMap.find(resource->getUrl());
+            if (itr != m_manualCameraMap.end())
+                m_manualCameraMap.erase(itr);
+        }
+        else {
+            const QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
+            if (!camera || !camera->isManuallyAdded())
+                return;
+            if (!m_manualCameraMap.contains(camera->getUrl())) {
+                QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
+                newManualCameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
+            }
+        }
+    }
+    if (!newManualCameras.isEmpty())
+        registerManualCameras(newManualCameras);
+}
+
+bool QnResourceDiscoveryManager::containManualCamera(const QString& url)
 {
     QMutexLocker lock(&m_searchersListMutex);
-    return m_manualCameraMap.contains(uniqId);
+    return m_manualCameraMap.contains(url);
 }
 
 QnResourceDiscoveryManager::ResourceSearcherList QnResourceDiscoveryManager::plugins() const {

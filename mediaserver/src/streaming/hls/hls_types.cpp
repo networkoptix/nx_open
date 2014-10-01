@@ -59,14 +59,20 @@ namespace nx_hls
             if( chunks[i].discontinuity )
                 playlistStr += "#EXT-X-DISCONTINUITY\r\n";
             //generating string 2010-02-19T14:54:23.031+08:00, since QDateTime::setTimeSpec() and QDateTime::toString(Qt::ISODate) do not provide expected result
+            const int tzOffset = chunks[i].programDateTime.get().timeZone().offsetFromUtc( chunks[i].programDateTime.get() );
             if( chunks[i].programDateTime )
                 playlistStr += "#EXT-X-PROGRAM-DATE-TIME:"+
                     chunks[i].programDateTime.get().toString(Qt::ISODate)+"."+                      // data/time
                     QString::number((chunks[i].programDateTime.get().toMSecsSinceEpoch() % 1000))+  //millis
-                    "+"+QTime(0,0,0).addSecs(chunks[i].programDateTime.get().timeZone().offsetFromUtc(chunks[i].programDateTime.get())).toString(lit("hh:mm"))+ //timezone
+                    (tzOffset >= 0                                                                    //timezone
+                        ? ("+" + QTime( 0, 0, 0 ).addSecs( tzOffset ).toString( lit( "hh:mm" ) ))
+                        : ("-" + QTime( 0, 0, 0 ).addSecs( -tzOffset ).toString( lit( "hh:mm" ) ))) +
                     "\r\n";
             playlistStr += "#EXTINF:"+QByteArray::number(chunks[i].duration, 'f', 3)+",\r\n";
-            playlistStr += chunks[i].url.toString().toLatin1()+"\r\n";
+            playlistStr += chunks[i].url.host().isEmpty()
+                ? chunks[i].url.path().toLatin1()+"?"+chunks[i].url.query().toLatin1()    //reporting only path if host not specified
+                : chunks[i].url.toString().toLatin1();
+            playlistStr += "\r\n";
         }
 
         if( closed )
@@ -89,7 +95,9 @@ namespace nx_hls
             if( playlists[i].bandwidth )
                 str += "BANDWIDTH="+QByteArray::number(playlists[i].bandwidth.get());
             str += "\r\n";
-            str += playlists[i].url.toString().toLatin1();
+            str += playlists[i].url.host().isEmpty()
+                ? playlists[i].url.path().toLatin1()+"?"+playlists[i].url.query().toLatin1()    //reporting only path if host not specified
+                : playlists[i].url.toString().toLatin1();
             str += "\r\n";
         }
 

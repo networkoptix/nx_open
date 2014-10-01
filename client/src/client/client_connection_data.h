@@ -59,14 +59,6 @@ public:
     bool removeOne(const QString &name);
 
     /**
-     * @brief reorderByUrl                      Find the first occurrence of a connection with the url provided (w/o password)
-     *                                          and places it in the head of the list.
-     * @param url                               Url of the connection
-     * @return                                  True if connection was found, false otherwise.
-     */
-    bool reorderByUrl(const QUrl &url);
-
-    /**
      * @brief generateUniqueName                Generate the unique name with the provided name as the base,
      *                                          appending number to the end of the string.
      * @param base                              Base name of the connection.

@@ -161,3 +161,79 @@ body {
 .bs-docs-sidebar .nav>.active>ul.nav {
   display: block;
 }
+
+/* Iframe with logs on info page */
+.log-frame{
+  border: none;
+  width: 100%;
+  height:300px;
+  border-radius:5px;
+}
+
+/* inactive icon for settings */
+.icon-inactive{
+  color:silver;
+}
+
+/*inplace edit styles*/
+.inplace-edit{
+  display:inline-block;
+  margin-top:-3px;
+}
+
+.read-container{
+  padding-top:7px;
+  padding-left:13px;
+  padding-bottom:7px;
+  display:inline-block;
+}
+
+.inplace-btn{
+  cursor:pointer;
+}
+
+/* show label for free storage*/
+.progress{
+  position:relative;
+  margin-bottom:0px;
+}
+.progress .progress-label{
+  position:absolute;
+  z-index:100;
+  width:100%;
+  text-align: center;
+}
+
+.progress .progress-overlay{
+  position:absolute;
+  z-index:100;
+  opacity: 0.7;
+}
+/*Column for url in storages table*/
+.url-column{
+  max-width: 200px;
+  overflow:hidden;
+  text-overflow: ellipsis;
+}
+
+
+.tc-chart-js-legend {
+  list-style-type: none;
+  padding-left: 0px;
+}
+.tc-chart-js-legend li {
+  display: block;
+  float: left;
+  clear:both;
+  padding:10px;
+}
+.tc-chart-js-legend li:first-child{
+  display: none;
+}
+.tc-chart-js-legend li span {
+  width:16px;
+  height:16px;
+  display:block;
+  float:left;
+  margin-right:10px;
+}

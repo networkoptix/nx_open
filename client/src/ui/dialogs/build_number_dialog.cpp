@@ -4,28 +4,15 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QPushButton>
 
+#include "utils/update/update_utils.h"
+
 namespace {
-    const char passwordChars[] = "abcdefghijklmnopqrstuvwxyz0123456789";
-    const int passwordLength = 6;
-
-    QString getPasswordForBuild(unsigned buildNumber) {
-        unsigned seed1 = buildNumber;
-        unsigned seed2 = (buildNumber + 13) * 179;
-        unsigned seed3 = buildNumber << 16;
-        unsigned seed4 = ((buildNumber + 179) * 13) << 16;
-        unsigned seed = seed1 ^ seed2 ^ seed3 ^ seed4;
-
-        QString password;
-        const int charsCount = sizeof(passwordChars) - 1;
-        for (int i = 0; i < passwordLength; i++) {
-            password += QChar::fromLatin1(passwordChars[seed % charsCount]);
-            seed /= charsCount;
-        }
-        return password;
-    }
-
     bool checkPassword(int buildNumber, const QString &password) {
-        return getPasswordForBuild((unsigned)buildNumber) == password;
+#ifdef _DEBUG
+        return true;
+#else
+        return passwordForBuild((unsigned)buildNumber) == password;
+#endif
     }
 }
 

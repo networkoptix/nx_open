@@ -25,6 +25,8 @@ public:
     void updateFromResources();
     void submitToResources();
 
+    void setShowIp(bool showIp);
+
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
     virtual QVariant data(const QModelIndex &index, int role) const override;
@@ -35,6 +37,7 @@ private slots:
 
 protected:
     bool m_readOnly;
+    bool m_showIp;
     QnResourceList m_resources;
     QStringList m_names;
 };

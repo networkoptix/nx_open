@@ -17,6 +17,8 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
 
+#include <common/common_module.h>
+
 #include <client/client_settings.h>
 
 #include <ui/help/help_topics.h>
@@ -24,7 +26,7 @@
 
 #include <utils/common/warnings.h>
 
-#include "version.h"
+#include <utils/common/app_info.h>
 #include "compatibility.h"
 
 QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) :
@@ -94,7 +96,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
     int helpTopicId = -1;
 
     bool compatibleProduct = qnSettings->isDevMode() || connectionInfo.brand.isEmpty()
-            || connectionInfo.brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+            || connectionInfo.brand == QnAppInfo::productNameShort();
 
     if (errorCode == ec2::ErrorCode::unauthorized) {
         success = false;
@@ -110,7 +112,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
         success = false;
         detail = tr("You are trying to connect to incompatible Server.");
         helpTopicId = Qn::Login_Help;
-    } else if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo.version)) {
+    } else if (!compatibilityChecker->isCompatible(QLatin1String("Client"), qnCommon->engineVersion(), QLatin1String("ECS"), connectionInfo.version)) {
         QnSoftwareVersion minSupportedVersion("1.4");
 
         if (connectionInfo.version < minSupportedVersion) {
@@ -118,7 +120,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
                         " - Client version: %1.\n"\
                         " - Server version: %2.\n"\
                         "Compatibility mode for versions lower than %3 is not supported.")
-                    .arg(QLatin1String(QN_ENGINE_VERSION))
+                    .arg(qnCommon->engineVersion().toString())
                     .arg(connectionInfo.version.toString())
                     .arg(minSupportedVersion.toString());
             success = false;
@@ -128,7 +130,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
                         " - Client version: %1.\n"\
                         " - Server version: %2.\n"\
                         "You will be asked to restart the client in compatibility mode.")
-                    .arg(QLatin1String(QN_ENGINE_VERSION))
+                    .arg(qnCommon->engineVersion().toString())
                     .arg(connectionInfo.version.toString());
             helpTopicId = Qn::VersionMismatch_Help;
         }

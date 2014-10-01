@@ -4,24 +4,24 @@
 
 #include <utils/network/mac_address.h>
 #include <utils/common/request_param.h>
+#include <utils/common/uuid.h>
 #include <utils/serialization/json_functions.h>
-#include <utils/appcast/update_info.h>
-#include <utils/network/modulefinder.h>
+#include <utils/network/multicast_module_finder.h>
 #include <utils/math/space_mapper.h>
 
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
-#include <api/model/statistics_reply.h>
 #include <api/model/camera_diagnostics_reply.h>
 #include <api/model/manual_camera_seach_reply.h>
 #include <api/model/servers_reply.h>
 #include <api/model/kvpair.h>
 #include <api/model/connection_info.h>
 #include <api/model/time_reply.h>
+#include <api/model/statistics_reply.h>
 #include <api/model/rebuild_archive_reply.h>
+#include <api/model/test_email_settings_reply.h>
+#include <api/model/configure_reply.h>
 #include <api/runtime_info_manager.h>
-
-#include <recording/time_period_list.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
@@ -44,6 +44,7 @@
 #include <core/resource/videowall_matrix.h>
 
 #include <recording/time_period.h>
+#include <recording/time_period_list.h>
 
 #include <core/misc/schedule_task.h>
 #include <core/ptz/ptz_mapper.h>
@@ -57,8 +58,10 @@
 #include <business/business_fwd.h>
 
 #include <licensing/license.h>
-#include "api/model/test_email_settings_reply.h"
 
+#include <nx_ec/ec_api.h>
+#include <nx_ec/data/api_lock_data.h>
+#include <nx_ec/data/api_discovery_data.h>
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -72,8 +75,8 @@ void QnCommonMetaTypes::initialize() {
     if(qn_commonMetaTypes_initialized)
         return;
 
-    qRegisterMetaType<QUuid>();
-    qRegisterMetaType<QUuid>("QUuid");
+    qRegisterMetaType<QnUuid>();
+    qRegisterMetaType<QSet<QnUuid>>("QSet<QnUuid>");
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();
     qRegisterMetaType<Qt::ConnectionType>();
@@ -138,8 +141,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnSoftwareVersion>();
     qRegisterMetaType<QnSystemInformation>();
     qRegisterMetaTypeStreamOperators<QnSystemInformation>();
-    qRegisterMetaType<QnUpdateInfoItem>();
-    qRegisterMetaType<QnUpdateInfoItemList>();
 
     qRegisterMetaType<TypeSpecificParamMap>();
     qRegisterMetaType<QnStringBoolPairList>("QnStringBoolPairList");
@@ -198,6 +199,23 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<Qn::CameraDataType>();
 
+    qRegisterMetaType<QnNetworkAddress>();
+
+    qRegisterMetaType<QnConfigureReply>();
+
+    qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
+    qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
+    qRegisterMetaType<ec2::QnFullResourceData>( "QnFullResourceData" );
+    qRegisterMetaType<ec2::QnPeerTimeInfo>( "QnPeerTimeInfo" );
+    qRegisterMetaType<ec2::QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
+    qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" ); 
+    qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); 
+    qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" ); 
+    qRegisterMetaType<ec2::ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); 
+    qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" ); 
+
+    qRegisterMetaType<QnUuid>( "QnUuid" );
+    qRegisterMetaTypeStreamOperators<QnUuid>( "QnUuid" );
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();

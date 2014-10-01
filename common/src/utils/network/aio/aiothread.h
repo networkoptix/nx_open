@@ -6,6 +6,8 @@
 #ifndef AIOTHREAD_H
 #define AIOTHREAD_H
 
+#include <memory>
+
 #include <QtCore/QMutex>
 
 #include "aioeventhandler.h"
@@ -15,13 +17,14 @@
 
 namespace aio
 {
-    class AIOThreadImpl;
+    template<class SocketType> class AIOThreadImpl;
 
     /*!
         This class is intended for use only with aio::AIOService
         \todo make it nested in aio::AIOService?
         \note All methods, except for \a pleaseStop(), must be called with \a mutex locked
     */
+    template<class SocketType>
     class AIOThread
     :
         public QnLongRunnable
@@ -42,10 +45,19 @@ namespace aio
             \note MUST be called with \a mutex locked
         */
         bool watchSocket(
-            const QSharedPointer<AbstractSocket>& sock,
+            SocketType* const sock,
             aio::EventType eventToWatch,
-            AIOEventHandler* const eventHandler,
-            int timeoutMS = 0 );
+            AIOEventHandler<SocketType>* const eventHandler,
+            unsigned int timeoutMS = 0 );
+        //!Change timeout of existing polling \a sock for \a eventToWatch to \a timeoutMS. \a eventHandler is changed also
+        /*!
+            \note If \a sock is not polled, undefined behaviour can occur
+        */
+        bool changeSocketTimeout(
+            SocketType* const sock,
+            aio::EventType eventToWatch,
+            AIOEventHandler<SocketType>* const eventHandler,
+            unsigned int timeoutMS = 0 );
         //!Do not monitor \a sock for event \a eventType
         /*!
             Garantees that no \a eventTriggered will be called after return of this method.
@@ -56,20 +68,25 @@ namespace aio
             \note MUST be called with \a mutex locked
         */
         bool removeFromWatch(
-            const QSharedPointer<AbstractSocket>& sock,
+            SocketType* const sock,
             aio::EventType eventType,
             bool waitForRunningHandlerCompletion );
-        //!Returns number of sockets monitored for \a eventToWatch event
-        size_t size( aio::EventType eventToWatch ) const;
-        //!Returns true, if can monitor one more socket for \a eventToWatch
-        bool canAcceptSocket( aio::EventType eventToWatch ) const;
+        //!Returns number of sockets handled by this object
+        size_t socketsHandled() const;
+        //!Returns true, if can accept socket \a sock for monitoring
+        /*!
+            \note This method is required only because \a select is used on win32. On linux and mac this method always returns \a true
+            \todo remove this method after moving windows implementation to IO Completion Ports
+        */
+        bool canAcceptSocket( SocketType* const sock ) const;
 
     protected:
         //!Implementation of QThread::run
         virtual void run() override;
 
     private:
-        AIOThreadImpl* m_impl;
+        typedef AIOThreadImpl<SocketType> AIOThreadImplType;
+        AIOThreadImplType* m_impl;
     };
 }
 

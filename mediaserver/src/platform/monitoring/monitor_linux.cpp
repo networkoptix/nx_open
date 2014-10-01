@@ -4,6 +4,8 @@
 #include <map>
 #include <set>
 
+#include <boost/optional.hpp>
+
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QFile>
 #include <QtCore/QDir>
@@ -83,9 +85,14 @@ public:
     //!Disk usage is evaluated as average on \a APPROXIMATION_VALUES_NUMBER prev values
     static const unsigned int APPROXIMATION_VALUES_NUMBER = 3;
 
+    int64_t prevCPUTimeTotal;
+    int64_t prevCPUTimeIdle;
+
 
     QnLinuxMonitorPrivate()
     :
+        prevCPUTimeTotal(-1),
+        prevCPUTimeIdle(-1),
         lastPartitionsUpdateTime(0)
     {
         memset(&lastDiskUsageUpdateTime, 0, sizeof(lastDiskUsageUpdateTime));
@@ -366,6 +373,98 @@ QnLinuxMonitor::QnLinuxMonitor(QObject *parent):
 
 QnLinuxMonitor::~QnLinuxMonitor() {
     return;
+}
+
+qreal QnLinuxMonitor::totalCpuUsage()
+{
+    FILE *file = fopen("/proc/stat", "r");
+    if(!file)
+        return 0;
+
+    int64_t cpuTimeTotal = 0;
+    int64_t cpuTimeIdle = d_ptr->prevCPUTimeIdle;
+    char line[MAX_LINE_LENGTH];
+    for( int i = 0; fgets(line, MAX_LINE_LENGTH, file) != NULL; ++i )
+    {
+        QByteArray lineStr( line );
+        const QList<QByteArray>& tokens = lineStr.split( ' ' );
+        if( tokens.isEmpty() )
+            continue;
+        if( tokens[0] != "cpu" )
+            continue;
+        //skipping empty tokens due to multiple spaces
+        int firstNonEmptyTokenIndex = 1;
+        for( ; firstNonEmptyTokenIndex < tokens.size(); ++firstNonEmptyTokenIndex )
+            if( !tokens[firstNonEmptyTokenIndex].isEmpty() )
+                break;
+        //calculating total CPU time
+        for( int i = firstNonEmptyTokenIndex; i < tokens.size(); ++i )
+            cpuTimeTotal += tokens[i].toLongLong();
+
+        static const int IDLE_FIELD_POS = 3;
+        if( tokens.size() < firstNonEmptyTokenIndex+IDLE_FIELD_POS+1 )
+            break;
+        cpuTimeIdle = tokens[firstNonEmptyTokenIndex+IDLE_FIELD_POS].toLongLong();
+
+    }
+
+    fclose( file );
+
+    if( d_ptr->prevCPUTimeTotal == -1 )
+        d_ptr->prevCPUTimeTotal = cpuTimeTotal;
+    if( d_ptr->prevCPUTimeIdle == -1 )
+        d_ptr->prevCPUTimeIdle = cpuTimeIdle;
+
+    //calculating CPU load
+    const int64_t cpuTimeTotalDiff = cpuTimeTotal - d_ptr->prevCPUTimeTotal;
+    const int64_t cpuTimeIdleDiff = cpuTimeIdle - d_ptr->prevCPUTimeIdle;
+    d_ptr->prevCPUTimeIdle = cpuTimeIdle;
+    d_ptr->prevCPUTimeTotal = cpuTimeTotal;
+    if( cpuTimeTotalDiff <= 0 )
+        return 0;
+    return 1.0 - cpuTimeIdleDiff / (qreal)cpuTimeTotalDiff;
+}
+
+qreal QnLinuxMonitor::totalRamUsage()
+{
+    FILE *file = fopen("/proc/meminfo", "r");
+    if(!file)
+        return 0;
+
+    char line[MAX_LINE_LENGTH];
+    boost::optional<uint64_t> memTotalKB;
+    boost::optional<uint64_t> memFreeKB;
+    boost::optional<uint64_t> memCachedKB;
+    for( int i = 0; fgets(line, MAX_LINE_LENGTH, file) != NULL; ++i )
+    {
+        const size_t length = strlen(line);
+        
+        char* sepPos = strchr( line, ':' );
+        if( sepPos == NULL )
+            continue;
+        char* valStart = std::find_if( sepPos+1, line+length, [](char ch){ return ch != ' '; } );
+        if( valStart == line+length )
+           continue;    //could not find value
+        char* valEnd = strchr( valStart, ' ' );
+        if( valEnd )
+            *valEnd = '\0';
+        if( strncmp( line, "MemTotal", sepPos-line ) == 0 )
+            memTotalKB = atoll( valStart );
+        else if( strncmp( line, "MemFree", sepPos-line ) == 0 )
+            memFreeKB = atoll( valStart );
+        else if( strncmp( line, "Cached", sepPos-line ) == 0 )
+            memCachedKB = atoll( valStart );
+
+        if( memTotalKB && memFreeKB && memCachedKB )
+            break;
+    }
+
+    if( !memTotalKB || !memFreeKB || !memCachedKB )
+        return 0;
+
+    fclose( file );
+    file = nullptr;
+    return 1.0 - ((memFreeKB.get()+memCachedKB.get()) / (qreal)(memTotalKB.get() == 0 ? ((memFreeKB.get() + memCachedKB.get())+1) : memTotalKB.get()));   //protecting from zero-memory-size error in /proc/meminfo. This situation is not possible in real life, so don't worry
 }
 
 QList<QnPlatformMonitor::HddLoad> QnLinuxMonitor::totalHddLoad()

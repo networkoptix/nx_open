@@ -7,6 +7,7 @@
 #define SERVER_QUERY_PROCESSOR_H
 
 #include <QtCore/QDateTime>
+#include <QtCore/QDebug>
 
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/common/model_functions.h>
@@ -14,7 +15,6 @@
 
 #include "ec2_thread_pool.h"
 #include "database/db_manager.h"
-#include "managers/aux_manager.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
 #include "transaction/transaction_message_bus.h"
@@ -44,42 +44,37 @@ namespace ec2
             \param handler Functor ( ErrorCode )
         */
         template<class QueryDataType, class HandlerType>
-            void processUpdateAsync(QnTransaction<QueryDataType>& tran, HandlerType handler, void* /*dummy*/ = 0 )
+            void processUpdateAsync( QnTransaction<QueryDataType>& tran, HandlerType handler, void* /*dummy*/ = 0 )
         {
+            QMutexLocker lock(&m_updateDataMutex);
+
             //TODO #ak this method must be asynchronous
             ErrorCode errorCode = ErrorCode::ok;
 
-            if (ApiCommand::isPersistent(tran.command))
-                tran.fillPersistentInfo();
 
-            QnDbManager::Locker locker(dbManager);
-            if (!tran.persistentInfo.isNull())
-                locker.beginTran();
+            std::unique_ptr<QnDbManager::Locker> locker;
+            if (ApiCommand::isPersistent(tran.command)) {
+                locker.reset(new QnDbManager::Locker(dbManager));
+                transactionLog->fillPersistentInfo(tran);
+            }
 
             auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
                 QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
                 QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, errorCode ) );
             };
-            std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
+            std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)>
+                SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
-            QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-
-            errorCode = auxManager->executeTransaction(tran);
-            if( errorCode != ErrorCode::ok ) {
-                return;
-            }
-
-            if (!tran.persistentInfo.isNull()) {
-                errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
-                if( errorCode != ErrorCode::ok ) {
-                    if (errorCode == ErrorCode::skipped)
-                        errorCode = ErrorCode::ok;
+            if( !tran.persistentInfo.isNull() )
+            {
+                const QByteArray& serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction( tran );
+                errorCode = dbManager->executeTransactionNoLock( tran, serializedTran );
+                assert(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
+                if( errorCode != ErrorCode::ok )
                     return;
-                }
-            }
 
-            if (!tran.persistentInfo.isNull())
-                locker.commit();
+                locker->commit();
+            }
 
             // delivering transaction to remote peers
             if (!tran.isLocal)
@@ -87,7 +82,7 @@ namespace ec2
         }
 
         template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiIdData>& tran, HandlerType handler )
+        void processUpdateAsync( QnTransaction<ApiIdData>& tran, HandlerType handler )
         {
             switch (tran.command)
             {
@@ -160,6 +155,8 @@ namespace ec2
         void processMultiUpdateAsync(QnTransaction<QueryDataType>& multiTran, HandlerType handler, ApiCommand::Value command, const std::vector<SubDataType>& nestedList, bool isParentObjectTran)
         {
 
+            QMutexLocker lock(&m_updateDataMutex);
+
             Q_ASSERT(ApiCommand::isPersistent(multiTran.command));
 
             ErrorCode errorCode = ErrorCode::ok;
@@ -175,24 +172,18 @@ namespace ec2
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
             QnDbManager::Locker locker(dbManager);
-            locker.beginTran();
 
             foreach(const SubDataType& data, nestedList)
             {
                 QnTransaction<SubDataType> tran(command);
                 tran.params = data;
-                tran.fillPersistentInfo();
                 tran.isLocal = multiTran.isLocal;
-
-                errorCode = auxManager->executeTransaction(tran);
-                if( errorCode != ErrorCode::ok )
-                    return;
+                transactionLog->fillPersistentInfo(tran);
 
                 QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
                 errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
-				if (errorCode == ErrorCode::skipped)
-					continue;
-                if( errorCode != ErrorCode::ok )
+                assert(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
+                if (errorCode != ErrorCode::ok)
                     return;
                 processedTransactions << tran;
             }
@@ -200,12 +191,13 @@ namespace ec2
             // delete master object if need (server->cameras required to delete master object, layoutList->layout doesn't)
             if (isParentObjectTran) 
             {
-                multiTran.fillPersistentInfo();
+                transactionLog->fillPersistentInfo(multiTran);
 
                 errorCode = ErrorCode::ok;
                 QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(multiTran);
                 errorCode = dbManager->executeTransactionNoLock(multiTran, serializedTran);
-                if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
+                assert(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
+                if (errorCode != ErrorCode::ok)
                     return;
                 processMultiTran = (errorCode == ErrorCode::ok);
             }
@@ -255,6 +247,8 @@ namespace ec2
                 handler( errorCode, output );
             } );
         }
+        private:
+            static QMutex m_updateDataMutex;
     };
 }
 

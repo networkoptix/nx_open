@@ -49,7 +49,7 @@ void QnAbstractResourceSearcher::setLocal(bool l)
     m_localResources = l;
 }
 
-bool QnAbstractResourceSearcher::isResourceTypeSupported(QUuid resourceTypeId) const
+bool QnAbstractResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) const
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
     if (resourceType.isNull())

@@ -52,14 +52,13 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
     m_stopped(false),
     m_currentCamera(0)
 {
-    m_layout.reset(new QnLayoutResource());
+    m_layout.reset(new QnLayoutResource(qnResTypePool));
     m_layout->setId(layout->getId()); //before update() uuid's must be the same
-    m_layout->setTypeId(layout->getTypeId());
     m_layout->update(layout);
 
     // If exporting layout, create new guid. If layout just renamed, keep guid
     if (mode == Qn::LayoutExport)
-        m_layout->setId(QUuid::createUuid());
+        m_layout->setId(QnUuid::createUuid());
 }
 
 bool QnLayoutExportTool::start() {
@@ -90,6 +89,12 @@ bool QnLayoutExportTool::start() {
     m_storage->setUrl(fullName);
 
     QScopedPointer<QIODevice> itemNamesIO(m_storage->open(lit("item_names.txt"), QIODevice::WriteOnly));
+    if (itemNamesIO.isNull()) {
+        m_errorMessage = tr("Could not create output file %1").arg(m_targetFilename);
+        emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required
+        return false;
+    }
+
     QTextStream itemNames(itemNamesIO.data());
 
     QList<qint64> itemTimeZones;
@@ -293,11 +298,12 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
         m_currentCamera->setMotionIODevice(motionFileBuffer, i);
     }
 
-    QUuid id = resource->toResource()->getId();
+    QString uniqId = resource->toResource()->getUniqueId();
+    uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
     QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
     if (resource->toResource()->hasFlags(Qn::utc))
         role = QnStreamRecorder::Role_FileExportWithEmptyContext;
-    QnLayoutItemData itemData = m_layout->getItem(id);
+    QnLayoutItemData itemData = m_layout->getItem(resource->toResource()->getId());
 
     int timeOffset = 0;
     if(qnSettings->timeMode() == Qn::ServerTimeMode) {
@@ -308,7 +314,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
 
     m_currentCamera->exportMediaPeriodToFile(m_period.startTimeMs * 1000ll,
                                     (m_period.startTimeMs + m_period.durationMs) * 1000ll,
-                                    id.toString(),
+                                    uniqId,
                                     lit("mkv"),
                                     m_storage,
                                     role,

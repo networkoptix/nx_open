@@ -21,10 +21,7 @@ GenericRTSPCameraManager::GenericRTSPCameraManager( const nxcip::CameraInfo& inf
     m_capabilities( 0 )
 {
     //checking, whether nxcip::audioCapability is supported
-    QString auxiliaryData = QString::fromLatin1(m_info.auxiliaryData);
-    const QStringList& valList = auxiliaryData.split( QLatin1Char('='), QString::SkipEmptyParts );
-    if( !valList.isEmpty() && valList[0] == QLatin1String("audio") )
-        m_capabilities |= nxcip::BaseCameraManager::audioCapability;
+    m_capabilities |= nxcip::BaseCameraManager::audioCapability;
     m_capabilities |= nxcip::BaseCameraManager::shareIpCapability | nxcip::BaseCameraManager::primaryStreamSoftMotionCapability;
 }
 
@@ -93,13 +90,13 @@ int GenericRTSPCameraManager::getCameraCapabilities( unsigned int* capabilitiesM
 }
 
 //!Implementation of nxcip::BaseCameraManager::setCredentials
-void GenericRTSPCameraManager::setCredentials( const char* username, const char* password )
+void GenericRTSPCameraManager::setCredentials( const char* /*username*/, const char* /*password*/ )
 {
     //TODO/IMPL
 }
 
 //!Implementation of nxcip::BaseCameraManager::setAudioEnabled
-int GenericRTSPCameraManager::setAudioEnabled( int audioEnabled )
+int GenericRTSPCameraManager::setAudioEnabled( int /*audioEnabled*/ )
 {
     //TODO/IMPL
     return 0;

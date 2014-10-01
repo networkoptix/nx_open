@@ -37,6 +37,7 @@
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
 #include "utils/common/timermanager.h"
+#include "gsoap_async_call_wrapper.h"
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
@@ -1393,6 +1394,9 @@ int QnPlOnvifResource::getSecondaryIndex(const QList<VideoOptionsLocal>& optList
 
 bool QnPlOnvifResource::registerNotificationConsumer()
 {
+    if (m_appStopping)
+        return false;
+
     QMutexLocker lk( &m_subscriptionMutex );
 
     //determining local address, accessible by onvif device
@@ -1445,6 +1449,8 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         NX_LOG( lit("Failed to subscribe in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logWARNING );
         return false;
     }
+    if (m_appStopping)
+        return false;
 
     //TODO: #ak if this variable is unused following code may be deleted as well
     time_t utcTerminationTime; //= ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
@@ -1493,6 +1499,9 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
             ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
             : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
+
+    if (m_appStopping)
+        return false;
 
     /* Note that we don't pass shared pointer here as this would create a 
      * cyclic reference and onvif resource will never be deleted. */
@@ -1551,6 +1560,10 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurations"), soapWrapper.getLastError());
     }
 
+    if(m_appStopping)
+        return CameraDiagnostics::ServerTerminatedResult();
+
+
     QString login = soapWrapper.getLogin();
     QString password = soapWrapper.getPassword();
     std::string endpoint = soapWrapper.getEndpointUrl().toStdString();
@@ -1583,6 +1596,9 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
 
         for (;soapRes != SOAP_OK && retryCount >= 0; --retryCount)
         {
+            if(m_appStopping)
+                return CameraDiagnostics::ServerTerminatedResult();
+
             VideoOptionsReq optRequest;
             VideoOptionsResp optResp;
             optRequest.ConfigurationToken = &configuration->token;
@@ -1623,6 +1639,9 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
         return CameraDiagnostics::RequestFailedResult(QLatin1String("fetchAndSetVideoEncoderOptions"), QLatin1String("no video options"));
     }
 
+    if(m_appStopping)
+        return CameraDiagnostics::ServerTerminatedResult();
+
     CameraDiagnostics::Result result = updateVEncoderUsage(optionsList);
     if (!result)
         return result;
@@ -1647,6 +1666,9 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     setVideoEncoderOptions(optionsList[0]);
     if (m_maxChannels == 1 && !isCameraControlDisabled())
         checkMaxFps(confResponse, optionsList[0].id);
+
+    if(m_appStopping)
+        return CameraDiagnostics::ServerTerminatedResult();
 
     m_mutex.lock();
     m_primaryVideoEncoderId = optionsList[0].id;
@@ -2427,8 +2449,10 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
     int currentFps = rangeHi;
     int prevFpsValue = -1;
 
+    m_mutex.lock();
     vEncoder->Resolution->Width = m_resolutionList[0].width();
     vEncoder->Resolution->Height = m_resolutionList[0].height();
+    m_mutex.unlock();
     
     while (currentFps != prevFpsValue)
     {
@@ -2437,6 +2461,9 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
         bool invalidFpsDetected = false;
         for (int i = 0; i < getMaxOnvifRequestTries(); ++i)
         {
+            if(m_appStopping)
+                return;
+
             vEncoder->RateControl->FrameRateLimit = currentFps;
             CameraDiagnostics::Result result = sendVideoEncoderToCamera(*vEncoder);
             if (result.errorCode == CameraDiagnostics::ErrorCode::noError) 
@@ -3148,5 +3175,6 @@ CameraDiagnostics::Result QnPlOnvifResource::getFullUrlInfo()
 
     return CameraDiagnostics::NoErrorResult();
 }
+
 
 #endif //ENABLE_ONVIF

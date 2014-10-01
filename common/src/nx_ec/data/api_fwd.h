@@ -8,9 +8,7 @@
 class QString;
 
 namespace ec2 {
-    struct ResourceContext;
-    struct QnFullResourceData; // TODO: #Elric move these out?
-
+    struct ResourceContext; // TODO: #Elric move this out?
 
     struct ApiData;
 
@@ -20,7 +18,9 @@ namespace ec2 {
     struct ApiCameraServerItemData;
     struct ApiEmailData;
     struct ApiEmailSettingsData;
-    struct ApiFullInfoData;
+	struct ApiFullInfoData;
+    struct ApiSyncMarkerRecord;
+    struct ApiUpdateSequenceData;
     struct ApiIdData;
     struct ApiLayoutItemData;
     struct ApiLayoutItemWithRefData;
@@ -39,6 +39,11 @@ namespace ec2 {
     struct ApiResourceTypeData;
     struct ApiScheduleTaskData;
     struct ApiScheduleTaskWithRefData;
+    struct QnTranStateKey;
+    struct QnTranState;
+    struct QnTranStateResponse;
+    struct ApiSyncRequestData;
+    struct ApiTranSyncDoneData;
     struct ApiPeerAliveData;
     struct ApiSetResourceStatusData;
     struct ApiStorageData;
@@ -59,14 +64,22 @@ namespace ec2 {
     struct ApiUpdateUploadResponceData;
     struct ApiUpdateInstallData;
     struct ApiCameraBookmarkTagData;
+    struct ApiModuleData;
     struct ApiLoginData;
+    struct ApiDiscoveryData;
+    struct ApiDiscoverPeerData;
+    struct ApiConnectionData;
+    struct ApiSystemNameData;
 
     struct ApiTimeData;
+    struct ApiPeerSystemTimeData;
+    typedef std::vector<ApiPeerSystemTimeData> ApiPeerSystemTimeDataList;
 
     struct ApiPeerData;
     struct ApiRuntimeData;
 
     struct ApiDatabaseDumpData;
+    struct ApiLicenseOverflowData;
 
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
@@ -82,6 +95,8 @@ namespace ec2 {
     typedef std::vector<ApiUserData> ApiUserDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
     typedef std::vector<ApiCameraBookmarkTagData> ApiCameraBookmarkTagDataList;
+    typedef std::vector<ApiModuleData> ApiModuleDataList;
+    typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
 
 #define QN_EC2_API_DATA_TYPES \
@@ -93,6 +108,8 @@ namespace ec2 {
     (ApiEmailSettingsData)\
     (ApiFullInfoData)\
     (ApiIdData)\
+    (ApiSyncMarkerRecord)\
+    (ApiUpdateSequenceData)\
     (ApiLayoutItemData)\
     (ApiLayoutItemWithRefData)\
     (ApiLayoutData)\
@@ -101,6 +118,7 @@ namespace ec2 {
     (ApiLockData)\
     (ApiMediaServerData)\
     (ApiPanicModeData)\
+    (ApiPeerSystemTimeData)\
     (ApiPropertyTypeData)\
     (ApiResetBusinessRuleData)\
     (ApiResourceData)\
@@ -110,6 +128,11 @@ namespace ec2 {
     (ApiResourceTypeData)\
     (ApiScheduleTaskData)\
     (ApiScheduleTaskWithRefData)\
+    (QnTranStateKey)\
+    (QnTranState)\
+    (ApiSyncRequestData)\
+    (QnTranStateResponse)\
+    (ApiTranSyncDoneData)\
     (ApiPeerAliveData)\
     (ApiSetResourceStatusData)\
     (ApiStoredFilePath)\
@@ -130,16 +153,22 @@ namespace ec2 {
     (ApiUpdateUploadData)\
     (ApiUpdateUploadResponceData)\
     (ApiCameraBookmarkTagData)\
+    (ApiModuleData)\
     (ApiLoginData)\
+    (ApiDiscoveryData)\
+    (ApiDiscoverPeerData)\
+    (ApiConnectionData)\
+    (ApiSystemNameData)\
     (ApiTimeData)\
     (ApiPeerData)\
     (ApiRuntimeData)\
     (ApiDatabaseDumpData)\
+    (ApiLicenseOverflowData)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         QN_EC2_API_DATA_TYPES,
-        (ubjson)(xml)(binary)(json)(sql_record)(csv_record)
+        (ubjson)(xml)(json)(sql_record)(csv_record)
     );
 #endif
     

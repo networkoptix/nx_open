@@ -12,6 +12,8 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         return tr("Some users have not set their email addresses");
     case QnSystemHealth::ConnectionLost:
         return tr("Connection to server lost");
+    case QnSystemHealth::NoPrimaryTimeServer:
+        return tr("Select server for others to synchronise time with");
     case QnSystemHealth::EmailSendError:
         return tr("Error while sending email");
     case QnSystemHealth::StoragesAreFull:
@@ -45,6 +47,8 @@ QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageT
         return tr("Email server is not set.\nYou cannot receive system notifications via email.");
     case QnSystemHealth::UsersEmailIsEmpty:
         return tr("Some users have not set their email addresses.\nThey cannot receive system notifications via email.");
+    case QnSystemHealth::NoPrimaryTimeServer:
+        return tr( "Multiple servers have different time and correct time could not be detected automatically." );
     case QnSystemHealth::StoragesAreFull:
         return tr("Storages are full on the following Server:\n%1.").arg(resourceName);
     case QnSystemHealth::StoragesNotConfigured:
