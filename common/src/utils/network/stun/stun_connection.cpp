@@ -71,8 +71,14 @@ namespace nx_stun
     }
 
     void StunClientConnection::onRequestSend( SystemError::ErrorCode ec ) {
-        if(ec) {
+        if( ec ) {
             m_outstandingRequest->completion_handler(ec,nx_stun::Message());
+            resetOutstandingRequest();
+        }
+        // Start reading response from the message queue
+        if(!m_baseConnection->startReadingConnection()) {
+            m_outstandingRequest->completion_handler(
+                SystemError::getLastOSErrorCode(),nx_stun::Message());
             resetOutstandingRequest();
         }
     }
@@ -88,7 +94,7 @@ namespace nx_stun
         }
         // Dequeue the request from the pending request queue
         bool ret = m_baseConnection->sendMessage( 
-            std::move(m_outstandingRequest->request_message) ,
+            nx_stun::Message(m_outstandingRequest->request_message),
             std::bind(
             &StunClientConnection::onRequestSend,
             this,
@@ -148,8 +154,8 @@ namespace nx_stun
                 }
                 return false;
             }
+        default: Q_ASSERT(0); return false;
         }
-        return false;
     }
 
     void StunClientConnection::closeConnection( StunClientConnection* connection )
