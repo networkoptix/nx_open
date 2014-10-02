@@ -819,7 +819,7 @@ QByteArray RTPSession::createDescribeRequest()
     request += "\r\n";
     addAuth(request);
     if ((quint64)m_openedTime != AV_NOPTS_VALUE)
-        addRangeHeader(request, m_startTime, AV_NOPTS_VALUE);
+        addRangeHeader(request, m_openedTime, AV_NOPTS_VALUE);
     request += USER_AGENT_STR;
     request += "Accept: application/sdp\r\n\r\n";
     return request;
