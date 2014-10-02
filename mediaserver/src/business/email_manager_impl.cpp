@@ -90,6 +90,7 @@ bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
         smtp.quit();
         return false;
     }
+    smtp.quit();
 
     return true;
 }

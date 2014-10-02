@@ -579,7 +579,7 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (server) {
-        connect(server,     &QnMediaServerResource::redundancyChanged,  this,   &QnResourcePoolModel::at_resource_resourceChanged);
+        connect(server,     &QnMediaServerResource::redundancyChanged,  this,   &QnResourcePoolModel::at_server_redundancyChanged);
 
         if (server->getStatus() == Qn::Incompatible) {
             connect(server, &QnMediaServerResource::systemNameChanged,  this,   &QnResourcePoolModel::at_server_systemNameChanged);
@@ -752,6 +752,21 @@ void QnResourcePoolModel::at_server_systemNameChanged(const QnResourcePtr &resou
 
     QnResourcePoolModelNode *node = this->node(resource);
     node->setParent(expectedParent(node));
+}
+
+void QnResourcePoolModel::at_server_redundancyChanged(const QnResourcePtr &resource) {
+    QnResourcePoolModelNode *node = this->node(resource);
+    bool isHidden = QnMediaServerResource::isHiddenServer(resource);
+    QnResourcePoolModelNode *camerasParentNode = isHidden ? m_rootNodes[Qn::ServersNode] : node;
+
+    foreach (const QnResourcePtr &cameraResource, qnResPool->getAllCameras(resource, true)) {
+        if (!cameraResource.dynamicCast<QnVirtualCameraResource>())
+            continue;
+
+        this->node(cameraResource)->setParent(camerasParentNode);
+    }
+
+    node->update();
 }
 
 void QnResourcePoolModel::at_commonModule_systemNameChanged() {

@@ -52,8 +52,7 @@ SmtpClient::SmtpClient(const QString & host, int port, ConnectionType connection
     connectionTimeout(5000),
     responseTimeout(5000),
     sendMessageTimeout(60000),
-    responseCode(0),
-    m_connected(false)
+    responseCode(0)
 {
     setConnectionType(connectionType);
 
