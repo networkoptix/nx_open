@@ -13,3 +13,10 @@ DEFINES += CL_FORCE_LOGO
 INCLUDEPATH +=  ${root.dir}/appserver2/src/
 
 QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
+
+android {
+# TODO: #dklychkov make this not hardcoded
+    PRE_TARGETDEPS += \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libcommon.a \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libappserver2.a
+}

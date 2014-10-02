@@ -21,15 +21,24 @@ Window {
             anchors.fill: parent
             onClicked: Qt.quit()
         }
-        Button {
+        Column {
             anchors.bottom: parent.bottom
-            text: qsTr("Connect")
-            onClicked: connectionManager.connect("http://admin:123@127.0.0.1:7001")
+
+            TextField {
+                id: urlField
+                text: "http://admin:123@10.0.2.2:7001"
+            }
+
+            Button {
+                text: qsTr("Connect")
+                onClicked: connectionManager.connect(urlField.text)
+            }
         }
     }
 
     Connections {
         target: connectionManager
         onConnected: label.text = "Connected!!!"
+        onConnectionFailed: label.text = "Failed! Reason = " + status
     }
 }

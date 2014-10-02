@@ -12,7 +12,7 @@ class QnContext: public QObject, public QnInstanceStorage {
     Q_OBJECT
     typedef QObject base_type;
 
-    Q_PROPERTY(QnConnectionManager* connectionManager READ connectionManager)
+    Q_PROPERTY(QnConnectionManager* connectionManager READ connectionManager NOTIFY connectionManagerChanged)
 public:
     QnContext(QObject *parent = NULL);
     virtual ~QnContext();
@@ -20,6 +20,10 @@ public:
     QnConnectionManager *connectionManager() const {
         return m_connectionManager;
     }
+
+signals:
+    /* Dummy signals to prevent non-NOTIFYable warnings */
+    void connectionManagerChanged(QnConnectionManager *connectionManager);
 
 private:
     QnConnectionManager *m_connectionManager;

@@ -129,7 +129,9 @@ QnLongRunnable::QnLongRunnable():
     connect(this, SIGNAL(started()),    this, SLOT(at_started()), Qt::DirectConnection);
     connect(this, SIGNAL(finished()),   this, SLOT(at_finished()), Qt::DirectConnection);
 
+#ifndef Q_OS_ANDROID // not supported on Android
     setStackSize( DEFAULT_THREAD_STACK_SIZE );
+#endif
 }
 
 QnLongRunnable::~QnLongRunnable() {
