@@ -88,6 +88,65 @@ namespace nx_stun
             \note Required by \a nx_api::BaseStreamProtocolConnection
         */
         void processMessage( nx_stun::Message&& msg );
+        
+        void onConnectionComplete( SystemError::ErrorCode , const std::function<void(SystemError::ErrorCode)>& );
+
+        void onDataReceive( SystemError::ErrorCode , std::size_t );
+
+        void onRequestSend( SystemError::ErrorCode , std::size_t );
+        
+        void dispatchPendingRequest();
+
+        void processResponse( nx_stun::Message&& msg );
+
+        void shrinkBufferFor( nx::Buffer* buf , std::size_t size ) {
+            if( size >= buf->size )
+                buf->clear();
+            else {
+                nx::Buffer buffer(buf->constData()+size,buf->size()-size);
+                buf->swap(buffer);
+            }
+        }
+
+        void serializeOutstandingRequest();
+
+        // AbstractCommunicationSocket comments says isConnected is not reliable
+        // so I just add a flag to indicate whether we have connected or not
+        enum {
+            NOT_CONNECTED,
+            CONNECTING,
+            CONNECTED
+        };
+        // Not thread safe
+        int m_state;
+
+        // Set up a pending request list for send request operations.
+        // Since 1) sendRequest needs to wait for openConnection completion
+        // 2) RFC says we can have multiple outstanding request per STUN client.
+        struct PendingRequest {
+            nx_stun::Message request_message;
+            std::function<void(SystemError::ErrorCode, nx_stun::Message&&)> completion_handler;
+        };
+        std::list< std::unique_ptr<PendingRequest> > m_pendingRequest;
+        nx_stun::MessageParser m_messageParser;
+        nx_stun::MessageSerializer m_messageSerializer;
+        // Using this context to represent the current outstanding request 
+        struct RequestContenxt {
+            nx::Buffer recv_buffer;
+            nx::Buffer send_buffer;
+            nx_stun::Message response_message;
+            std::unique_ptr<PendingRequest> pending_request;
+            void invokeHandler( SystemError::ErrorCode ec , nx_stun::Message&& msg ) {
+                pending_request->completion_handler(ec,std::move(msg));
+            }
+            void init( std::unique_ptr<PendingRequest>&& request ) {
+                recv_buffer.clear();
+                send_buffer.clear();
+                response_message.clear();
+                pending_request = std::move(request);
+            }
+        };
+        RequestContenxt m_outstandingRequest;
     };
 }
 

@@ -48,6 +48,9 @@ private:
     void sendSuccessReply( const nx_stun::TransactionID& transaction_id );
 
     // Verification routine for Bind session
+    // TODO:: Once these steps clear, we can add verification function for each
+    // attributes. 
+
     bool verifyServerName( const nx_stun::attr::StringAttributeType& name );
     bool verifyServerId( const nx_stun::attr::StringAttributeType& name );
     bool verifyAuthroization( const nx_stun::attr::StringAttributeType& name );
