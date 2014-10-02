@@ -8,6 +8,8 @@
 
 #include <functional>
 #include <memory>
+#include <mutex>
+#include <atomic>
 
 #include <utils/network/connection_server/base_stream_protocol_connection.h>
 #include <utils/common/stoppable.h>
@@ -72,6 +74,12 @@ namespace nx_stun
         */
         void closeConnection( StunClientConnection* );
 
+        // Those error code needs to define in order to make user's callback function know the specific error related 
+        // to our STUN connection process
+
+        static const SystemError::ErrorCode STUN_REQUEST_FAIL = 1;
+        static const SystemError::ErrorCode STUN_REPLY_PACKAGE_BROKEN = 2;
+
     private:
         typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
                 StunClientConnection,
@@ -110,6 +118,17 @@ namespace nx_stun
 
         void serializeOutstandingRequest();
 
+        bool hasErrorAttribute( const nx_stun::Message& msg );
+
+        bool dequeuePendingRequest();
+
+        void enqueuePendingRequest( nx_stun::Message&& , std::function<void(SystemError::ErrorCode,nx_stun::Message&&)>&& );
+
+        void resetOutstandingRequest() {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_outstandingRequest.clear();
+        }
+
         // AbstractCommunicationSocket comments says isConnected is not reliable
         // so I just add a flag to indicate whether we have connected or not
         enum {
@@ -118,35 +137,52 @@ namespace nx_stun
             CONNECTED
         };
         // Not thread safe
-        int m_state;
+        std::atomic<int> m_state;
 
         // Set up a pending request list for send request operations.
-        // Since 1) sendRequest needs to wait for openConnection completion
+        // Because of the following reason:
+        // 1) sendRequest needs to wait for openConnection completion
         // 2) RFC says we can have multiple outstanding request per STUN client.
         struct PendingRequest {
             nx_stun::Message request_message;
             std::function<void(SystemError::ErrorCode, nx_stun::Message&&)> completion_handler;
+            PendingRequest( nx_stun::Message&& msg , std::function<void(SystemError::ErrorCode,nx_stun::Message&&)>&& func ):
+                request_message(std::move(msg)),
+                completion_handler(std::move(func)){}
         };
-        std::list< std::unique_ptr<PendingRequest> > m_pendingRequest;
-        nx_stun::MessageParser m_messageParser;
-        nx_stun::MessageSerializer m_messageSerializer;
+
         // Using this context to represent the current outstanding request 
-        struct RequestContenxt {
+        struct RequestContext {
             nx::Buffer recv_buffer;
             nx::Buffer send_buffer;
             nx_stun::Message response_message;
             std::unique_ptr<PendingRequest> pending_request;
             void invokeHandler( SystemError::ErrorCode ec , nx_stun::Message&& msg ) {
+                if(isEmpty())
+                    return;
                 pending_request->completion_handler(ec,std::move(msg));
             }
             void init( std::unique_ptr<PendingRequest>&& request ) {
+                Q_ASSERT(recv_buffer.isEmpty() && send_buffer.isEmpty());
+                pending_request = std::move(request);
+            }
+            void clear() {
                 recv_buffer.clear();
                 send_buffer.clear();
                 response_message.clear();
-                pending_request = std::move(request);
+                pending_request.reset();
+            }
+            bool isEmpty() {
+                return pending_request;
             }
         };
-        RequestContenxt m_outstandingRequest;
+        RequestContext m_outstandingRequest;
+
+        std::mutex m_mutex;
+        std::list<std::unique_ptr<PendingRequest> > m_pendingRequestQueue;
+
+        nx_stun::MessageParser m_messageParser;
+        nx_stun::MessageSerializer m_messageSerializer;
     };
 }
 
