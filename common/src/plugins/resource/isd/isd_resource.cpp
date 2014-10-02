@@ -189,7 +189,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     saveResolutionList( mediaStreams );
 
     setParam(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1, QnDomainDatabase );
-    setMotionType( Qn::MT_SoftwareGrid );
+    //setMotionType( Qn::MT_SoftwareGrid );
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();

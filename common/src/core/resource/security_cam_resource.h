@@ -20,11 +20,6 @@ public:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role) = 0;
 };
 
-
-class QnUserCameraSettings
-{
-};
-
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     typedef QnNetworkResource base_type;
     Q_OBJECT
@@ -39,8 +34,8 @@ public:
     int motionSensWindowCount() const;
 
 
-    bool hasMotion();
-    Qn::MotionType getMotionType();
+    bool hasMotion() const;
+    Qn::MotionType getMotionType() const;
     void setMotionType(Qn::MotionType value);
 
     QnSecurityCamResource();
@@ -70,14 +65,14 @@ public:
 
     QRegion getMotionMask(int channel) const;
 
-    //!Get camera settings, which are generally modified by user
-    /*!
-        E.g., recording schedule, motion type, second stream quality, etc...
-    */
-    QnUserCameraSettings getUserCameraSettings() const;
+    ////!Get camera settings, which are generally modified by user
+    ///*!
+    //    E.g., recording schedule, motion type, second stream quality, etc...
+    //*/
+    //QnUserCameraSettings getUserCameraSettings() const;
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
-    const QnScheduleTaskList getScheduleTasks() const;
+    QnScheduleTaskList getScheduleTasks() const;
 
     virtual bool hasDualStreaming() const;
 
@@ -261,22 +256,20 @@ protected:
 
     virtual void parameterValueChangedNotify(const QnParam &param) override;
 
-protected:
-    QList<QnMotionRegion> m_motionMaskList;
-
 private:
+    //QList<QnMotionRegion> m_motionMaskList;
     QnDataProviderFactory *m_dpFactory;
-    QnScheduleTaskList m_scheduleTasks;
-    Qn::MotionType m_motionType;
+    //QnScheduleTaskList m_scheduleTasks;
+    //mutable Qn::MotionType m_motionType;
     QAtomicInt m_inputPortListenerCount;
     int m_recActionCnt;
     QString m_groupName;
     QString m_groupId;
     Qn::SecondStreamQuality  m_secondaryQuality;
-    bool m_cameraControlDisabled;
+    //bool m_cameraControlDisabled;
     Qn::CameraStatusFlags m_statusFlags;
-    bool m_scheduleDisabled;
-    bool m_audioEnabled;
+    //bool m_scheduleDisabled;
+    //bool m_audioEnabled;
     bool m_advancedWorking;
     bool m_manuallyAdded;
     QString m_model;
@@ -284,6 +277,8 @@ private:
     int m_minDays;
     int m_maxDays;
     QnUuid m_preferedServerId;
+
+    //QnMotionRegion getMotionRegionNonSafe(int channel) const;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

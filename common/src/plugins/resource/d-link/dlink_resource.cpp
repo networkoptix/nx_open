@@ -371,7 +371,7 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
     };
 
     int sensitivity = 50;
-    QnMotionRegion region = m_motionMaskList[0];
+    QnMotionRegion region = getMotionRegion(0);
     for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
 

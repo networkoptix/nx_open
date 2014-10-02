@@ -222,7 +222,7 @@ void QnStardotResource::setMotionMaskPhysical(int channel)
     if (channel != 0)
         return;
 
-    QnMotionRegion region = m_motionMaskList[0];
+    QnMotionRegion region = getMotionRegion(0);
     for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
 

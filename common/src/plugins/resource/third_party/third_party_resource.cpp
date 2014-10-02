@@ -446,7 +446,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability )
     {
-        setMotionType( Qn::MT_HardwareGrid );
+        //setMotionType( Qn::MT_HardwareGrid );
         setParam( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100, QnDomainDatabase );
         setParam( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100, QnDomainDatabase );
         setParam( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100, QnDomainDatabase );
@@ -454,7 +454,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     }
     else
     {
-        setMotionType( Qn::MT_SoftwareGrid );
+        //setMotionType( Qn::MT_SoftwareGrid );
         setParam( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid"), QnDomainDatabase );
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )

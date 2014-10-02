@@ -13,10 +13,12 @@
 #include "common/common_module.h"
 
 #include <recording/time_period_list.h>
+#include "camera_user_attribute_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "resource_data.h"
 
 #define SAFE(expr) {QMutexLocker lock(&m_mutex); expr;}
+
 
 namespace {
     static const int defaultMaxFps = 15;
@@ -31,24 +33,24 @@ namespace {
 
 QnSecurityCamResource::QnSecurityCamResource(): 
     m_dpFactory(0),
-    m_motionType(Qn::MT_Default),
+    //m_motionType(Qn::MT_Default),
     m_recActionCnt(0),
     m_secondaryQuality(Qn::SSQualityMedium),
-    m_cameraControlDisabled(false),
+    //m_cameraControlDisabled(false),
     m_statusFlags(Qn::CSF_NoFlags),
-    m_scheduleDisabled(true),
-    m_audioEnabled(false),
+    //m_scheduleDisabled(true),
+    //m_audioEnabled(false),
     m_advancedWorking(false),
     m_manuallyAdded(false),
     m_minDays(0),
     m_maxDays(0)
 {
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_motionMaskList << QnMotionRegion();
+    //for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+    //    m_motionMaskList << QnMotionRegion();
 
     addFlags(Qn::live_cam);
 
-    m_cameraControlDisabled = !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
+    //m_cameraControlDisabled = !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
 
     connect(this, &QnResource::parentIdChanged, this, &QnSecurityCamResource::at_parentIdChanged, Qt::DirectConnection);
 
@@ -88,28 +90,28 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
     if (other_casted)
     {
         QnConstResourceVideoLayoutPtr layout = getVideoLayout();
-        int numChannels = layout->channelCount();
 
-        m_motionType = other_casted->m_motionType;
+        //m_motionType = other_casted->m_motionType;                //moved to QnCameraUserAttributePool
         
-        bool motionRegionChanged = false;
-        for (int i = 0; i < numChannels; ++i) {
-            if (m_motionMaskList[i] == other_casted->m_motionMaskList[i])
-                continue;
-            setMotionRegion(other_casted->m_motionMaskList[i], QnDomainPhysical, i);
-            motionRegionChanged = true;
-        }
-        if (motionRegionChanged)
-            modifiedFields << "motionRegionChanged";
+        //bool motionRegionChanged = false;
+        //int numChannels = layout->channelCount();
+        //for (int i = 0; i < numChannels; ++i) {
+        //    if (m_motionMaskList[i] == other_casted->m_motionMaskList[i])
+        //        continue;
+        //    setMotionRegion(other_casted->m_motionMaskList[i], QnDomainPhysical, i);
+        //    motionRegionChanged = true;
+        //}
+        //if (motionRegionChanged)
+        //    modifiedFields << "motionRegionChanged";
 
-        m_scheduleTasks = other_casted->m_scheduleTasks;
+        //m_scheduleTasks = other_casted->m_scheduleTasks;          //moved to QnCameraUserAttributePool
         m_groupId = other_casted->m_groupId;
         m_groupName = other_casted->m_groupName;
         m_secondaryQuality = other_casted->m_secondaryQuality;
-        m_cameraControlDisabled = other_casted->m_cameraControlDisabled;
+        //m_cameraControlDisabled = other_casted->m_cameraControlDisabled;  //moved to QnCameraUserAttributePool
         m_statusFlags = other_casted->m_statusFlags;
-        m_scheduleDisabled = other_casted->m_scheduleDisabled;
-        m_audioEnabled = other_casted->m_audioEnabled;
+        //m_scheduleDisabled = other_casted->m_scheduleDisabled;    //moved to QnCameraUserAttributePool
+        //m_audioEnabled = other_casted->m_audioEnabled;            //moved to QnCameraUserAttributePool
         m_manuallyAdded = other_casted->m_manuallyAdded;
         m_model = other_casted->m_model;
         m_vendor = other_casted->m_vendor;
@@ -186,54 +188,63 @@ void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFact
 }
 
 QList<QnMotionRegion> QnSecurityCamResource::getMotionRegionList() const {
-    SAFE(return m_motionMaskList)
+    QnCameraUserAttributePool::ScopedLock settingsLock( QnCameraUserAttributePool::instance(), getId() );
+    return settingsLock->motionRegions;
 }
 
 QRegion QnSecurityCamResource::getMotionMask(int channel) const {
-    SAFE(return m_motionMaskList[channel].getMotionMask())
+    return getMotionRegion(channel).getMotionMask();
 }
 
 QnMotionRegion QnSecurityCamResource::getMotionRegion(int channel) const {
-    SAFE(return m_motionMaskList[channel])
+    QnCameraUserAttributePool::ScopedLock settingsLock( QnCameraUserAttributePool::instance(), getId() );
+    return settingsLock->motionRegions[channel];
 }
 
 void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, QnDomain domain, int channel) {
+    Qn::MotionType motionType = Qn::MT_Default;
     {
-        QMutexLocker mutexLocker(&m_mutex);
-        if (m_motionMaskList[channel] == mask)
+        QnCameraUserAttributePool::ScopedLock settingsLock( QnCameraUserAttributePool::instance(), getId() );
+
+        if (settingsLock->motionRegions[channel] == mask)
             return;
-        m_motionMaskList[channel] = mask;
+        settingsLock->motionRegions[channel] = mask;
+        motionType = settingsLock->motionType;
     }
 
-    if (domain == QnDomainPhysical && m_motionType != Qn::MT_SoftwareGrid)
+    if (domain == QnDomainPhysical && motionType != Qn::MT_SoftwareGrid)
         setMotionMaskPhysical(channel);
 }
 
 void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& maskList, QnDomain domain) {
+    Qn::MotionType motionType = Qn::MT_Default;
     {
-        QMutexLocker mutexLocker(&m_mutex);
-        bool sameMask = maskList.size() == m_motionMaskList.size();
-        if(sameMask)
-            for (int i = 0; i < maskList.size(); ++i) 
-                sameMask &= m_motionMaskList[i] == maskList[i];
-        if (sameMask)
+        QnCameraUserAttributePool::ScopedLock settingsLock( QnCameraUserAttributePool::instance(), getId() );
+
+        if( settingsLock->motionRegions == maskList )
             return;
-        m_motionMaskList = maskList;
+        settingsLock->motionRegions = maskList;
+        motionType = settingsLock->motionType;
     }
 
-    if (domain == QnDomainPhysical && m_motionType != Qn::MT_SoftwareGrid) {
+    if (domain == QnDomainPhysical && motionType != Qn::MT_SoftwareGrid) {
         for (int i = 0; i < getVideoLayout()->channelCount(); ++i)
             setMotionMaskPhysical(i);
     }
 }
 
-void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList &scheduleTasks) {
-    SAFE(m_scheduleTasks = scheduleTasks)
+void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList& scheduleTasks) {
+    {
+        QnCameraUserAttributePool::ScopedLock settingsLock( QnCameraUserAttributePool::instance(), getId() );
+        settingsLock->scheduleTasks = scheduleTasks;
+    }
+    //SAFE(m_scheduleTasks = scheduleTasks)
     emit scheduleTasksChanged(::toSharedPointer(this));
 }
 
-const QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const {
-    SAFE(return m_scheduleTasks)
+QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const {
+    QnCameraUserAttributePool::ScopedLock settingsLock( QnCameraUserAttributePool::instance(), getId() );
+    return settingsLock->scheduleTasks;
 }
 
 bool QnSecurityCamResource::hasDualStreaming2() const {
@@ -439,7 +450,7 @@ Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const {
     return result;
 }
 
-bool QnSecurityCamResource::hasMotion() {
+bool QnSecurityCamResource::hasMotion() const {
     Qn::MotionType motionType = getMotionType();
     if (motionType == Qn::MT_SoftwareGrid)
         return hasDualStreaming2() || (getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability);
@@ -447,14 +458,16 @@ bool QnSecurityCamResource::hasMotion() {
         return motionType != Qn::MT_NoMotion;
 }
 
-Qn::MotionType QnSecurityCamResource::getMotionType() {
-    if (m_motionType == Qn::MT_Default)
-        m_motionType = getDefaultMotionType();
-    return m_motionType;
+Qn::MotionType QnSecurityCamResource::getMotionType() const {
+    QnCameraUserAttributePool::ScopedLock settingsLock( QnCameraUserAttributePool::instance(), getId() );
+    if (settingsLock->motionType == Qn::MT_Default)
+        settingsLock->motionType = getDefaultMotionType();
+    return settingsLock->motionType;
 }
 
 void QnSecurityCamResource::setMotionType(Qn::MotionType value) {
-    m_motionType = value;
+    QnCameraUserAttributePool::ScopedLock settingsLock( QnCameraUserAttributePool::instance(), getId() );
+    settingsLock->motionType = value;
 }
 
 Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const {
@@ -583,25 +596,28 @@ int QnSecurityCamResource::minDays() const
 
 void QnSecurityCamResource::setScheduleDisabled(bool value) {
     {
-        QMutexLocker locker(&m_mutex);
-        if(m_scheduleDisabled == value)
+        QnCameraUserAttributePool::ScopedLock settingsLock( QnCameraUserAttributePool::instance(), getId() );
+        if (settingsLock->scheduleDisabled == value)
             return;
-        m_scheduleDisabled = value;
+        settingsLock->scheduleDisabled = value;
     }
 
     emit scheduleDisabledChanged(::toSharedPointer(this));
 }
 
 bool QnSecurityCamResource::isScheduleDisabled() const {
-    return m_scheduleDisabled;
+    QnCameraUserAttributePool::ScopedLock settingsLock( QnCameraUserAttributePool::instance(), getId() );
+    return settingsLock->scheduleDisabled;
 }
 
 void QnSecurityCamResource::setAudioEnabled(bool enabled) {
-    m_audioEnabled = enabled;
+    QnCameraUserAttributePool::ScopedLock settingsLock( QnCameraUserAttributePool::instance(), getId() );
+    settingsLock->audioEnabled = enabled;
 }
 
 bool QnSecurityCamResource::isAudioEnabled() const {
-    return m_audioEnabled;
+    QnCameraUserAttributePool::ScopedLock settingsLock( QnCameraUserAttributePool::instance(), getId() );
+    return settingsLock->audioEnabled;
 }
 
 bool QnSecurityCamResource::isAdvancedWorking() const {
@@ -629,11 +645,13 @@ Qn::SecondStreamQuality QnSecurityCamResource::secondaryStreamQuality() const {
 }
 
 void QnSecurityCamResource::setCameraControlDisabled(bool value) {
-    m_cameraControlDisabled = value;
+    QnCameraUserAttributePool::ScopedLock settingsLock( QnCameraUserAttributePool::instance(), getId() );
+    settingsLock->cameraControlDisabled = value;
 }
 
 bool QnSecurityCamResource::isCameraControlDisabled() const {
-    return m_cameraControlDisabled;
+    QnCameraUserAttributePool::ScopedLock settingsLock( QnCameraUserAttributePool::instance(), getId() );
+    return settingsLock->cameraControlDisabled;
 }
 
 int QnSecurityCamResource::desiredSecondStreamFps() const {
@@ -732,3 +750,8 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
 
     return result;
 }
+
+//QnMotionRegion QnSecurityCamResource::getMotionRegionNonSafe(int channel) const
+//{
+//    return m_motionMaskList[channel];
+//}
