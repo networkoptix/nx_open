@@ -162,3 +162,19 @@ void StunServerConnection::sendErrorReply( const nx_stun::TransactionID& transac
         std::placeholders::_1));
     Q_ASSERT(ret);
 }
+
+bool StunServerConnection::verifyAuthroization( const nx_stun::attr::StringAttributeType& name ) {
+    Q_UNUSED(name);
+    return false;
+}
+
+bool StunServerConnection::verifyServerId( const nx_stun::attr::StringAttributeType& name ) {
+    Q_UNUSED(name);
+    return false;
+}
+
+bool StunServerConnection::verifyServerName( const nx_stun::attr::StringAttributeType& name ) {
+    Q_UNUSED(name);
+    return false;
+}
+

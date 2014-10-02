@@ -38,6 +38,7 @@ namespace nx_stun
             if( m_state.load(std::memory_order_acquire) != CONNECTED ) {
                 m_state = NOT_CONNECTED;
             }
+            completionHandler();
         }
     }
 
@@ -78,6 +79,7 @@ namespace nx_stun
     }
 
     void StunClientConnection::onRequestSend( SystemError::ErrorCode ec , std::size_t bytes_transferred ) {
+        Q_UNUSED(bytes_transferred);
         if( ec ) {
             m_outstandingRequest.invokeHandler(ec,nx_stun::Message());
             dispatchPendingRequest();
@@ -143,7 +145,7 @@ namespace nx_stun
         int state;
         size_t capacity = kInitialSerializationBufferSize;
         do {
-            m_outstandingRequest.send_buffer.reserve(capacity);
+            m_outstandingRequest.send_buffer.reserve(static_cast<int>(capacity));
             size_t bytes_write;
             state = m_messageSerializer.serialize(
                 &(m_outstandingRequest.send_buffer),&bytes_write);
