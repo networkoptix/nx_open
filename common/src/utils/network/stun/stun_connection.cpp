@@ -34,6 +34,7 @@ namespace nx_stun
         // Cancel the Pending IO operations
         if( m_state != NOT_CONNECTED ) {
             m_socket->cancelAsyncIO();
+            m_baseConnection->closeConnection();
             m_outstandingRequest.reset();
             if( m_state.load(std::memory_order_acquire) != CONNECTED ) {
                 m_state = NOT_CONNECTED;
@@ -160,7 +161,7 @@ namespace nx_stun
 
     void StunClientConnection::closeConnection( StunClientConnection* connection )
     {
-        //TODO
+        connection->m_socket->close();
     }
 
     void StunClientConnection::processMessage( nx_stun::Message&& msg )
