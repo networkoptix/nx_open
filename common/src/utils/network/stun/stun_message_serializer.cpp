@@ -202,13 +202,13 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue( Messag
 }
 
 nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attr::XorMappedAddress& attribute , std::size_t* value ) {
-    Q_ASSERT( attribute->family == XorMappedAddress::IPV4 || attribute->family == XorMappedAddress::IPV6 );
+    Q_ASSERT( attribute.family == XorMappedAddress::IPV4 || attribute.family == XorMappedAddress::IPV6 );
     std::size_t cur_pos = buffer->position();
-    if( buffer->WriteUint16(attribute->family) == NULL ) 
+    if( buffer->WriteUint16(attribute.family) == NULL ) 
         return nx_api::SerializerState::needMoreBufferSpace;
     // Writing the port to the output stream. Based on RFC , the port value needs to be XOR with
     // the high part of the MAGIC COOKIE value and then convert to the network byte order.
-    if( buffer->WriteUint16( attribute->port ^ MAGIC_COOKIE_HIGH ) == NULL )
+    if( buffer->WriteUint16( attribute.port ^ MAGIC_COOKIE_HIGH ) == NULL )
         return nx_api::SerializerState::needMoreBufferSpace;
     if( attribute.family == XorMappedAddress::IPV4 ) {
         if( buffer->WriteUint32(attribute.address.ipv4 ^ MAGIC_COOKIE) == NULL )

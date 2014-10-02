@@ -100,7 +100,7 @@ namespace nx_stun
         void processResponse( nx_stun::Message&& msg );
 
         void shrinkBufferFor( nx::Buffer* buf , std::size_t size ) {
-            if( size >= buf->size )
+            if( size >= buf->size() )
                 buf->clear();
             else {
                 nx::Buffer buffer(buf->constData()+size,buf->size()-size);

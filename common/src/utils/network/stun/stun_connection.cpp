@@ -140,7 +140,7 @@ namespace nx_stun
         return m_socket->connectAsync(
             m_stunServerEndpoint,
             std::bind(
-            StunClientConnection::onConnectionComplete,
+            &StunClientConnection::onConnectionComplete,
             this,
             std::placeholders::_1,std::move(completionHandler)));
     }
