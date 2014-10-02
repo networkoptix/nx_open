@@ -52,8 +52,8 @@ namespace nx_stun
     }
 
     void StunClientConnection::enqueuePendingRequest( nx_stun::Message&& msg , std::function<void(SystemError::ErrorCode,nx_stun::Message&&)>&& func ) {
-        std::list<std::unique_ptr<PendingRequest>> element(1,
-            std::unique_ptr<PendingRequest>( new PendingRequest(std::move(msg),std::move(func))));
+        std::list<std::unique_ptr<PendingRequest>> element;
+        element.push_back(std::unique_ptr<PendingRequest>( new PendingRequest(std::move(msg),std::move(func))));
         {
             std::lock_guard<std::mutex> lock(m_mutex);
             m_pendingRequestQueue.splice(m_pendingRequestQueue.end(),std::move(element));
@@ -212,7 +212,8 @@ namespace nx_stun
                     std::bind(
                     &StunClientConnection::onConnectionComplete,
                     this,
-                    std::placeholders::_1));
+                    std::placeholders::_1,
+                    std::function<void(SystemError::ErrorCode)>()));
             }
         case CONNECTING:
             {

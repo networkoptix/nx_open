@@ -97,7 +97,7 @@ namespace nx_stun
         */
         void processMessage( nx_stun::Message&& msg );
         
-        void onConnectionComplete( SystemError::ErrorCode , const std::function<void(SystemError::ErrorCode)>& );
+        void onConnectionComplete( SystemError::ErrorCode , const std::function<void(SystemError::ErrorCode)>& func );
 
         void onDataReceive( SystemError::ErrorCode , std::size_t );
 
@@ -179,10 +179,12 @@ namespace nx_stun
         RequestContext m_outstandingRequest;
 
         std::mutex m_mutex;
-        std::list<std::unique_ptr<PendingRequest> > m_pendingRequestQueue;
+        std::list<std::unique_ptr<PendingRequest>> m_pendingRequestQueue;
 
         nx_stun::MessageParser m_messageParser;
         nx_stun::MessageSerializer m_messageSerializer;
+
+        Q_DISABLE_COPY(StunClientConnection)
     };
 }
 
