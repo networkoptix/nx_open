@@ -22,7 +22,8 @@ QnInfoDetail::QnInfoDetail( const QnInfoDetail& right )
 QnInfoDetail::QnInfoDetail( const QnBusinessEventParameters& _runtimeParams, int _count )
 :
     m_runtimeParams( _runtimeParams ),
-    m_count( _count )
+    m_count( _count ),
+    m_subAggregationData( nullptr )
 {
 }
 

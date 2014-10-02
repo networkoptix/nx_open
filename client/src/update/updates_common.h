@@ -14,7 +14,8 @@ struct QnCheckForUpdateResult {
         NoSuchBuild,
         ServerUpdateImpossible,
         ClientUpdateImpossible,
-        BadUpdateFile
+        BadUpdateFile,
+        NoFreeSpace
     };
 
     QnCheckForUpdateResult():

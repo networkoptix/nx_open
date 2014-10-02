@@ -542,7 +542,7 @@ int StreamReader::getAudioPacket( nxcip::MediaDataPacket** lpPacket )
     }
 
     std::unique_ptr<ISDAudioPacket> audioPacket( new ISDAudioPacket(
-        0,  //channel number
+        1,  //channel number
         m_lastVideoTime,
         m_audioCodec ) );
     audioPacket->reserve( audioBytesAvailable );

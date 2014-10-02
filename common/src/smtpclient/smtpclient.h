@@ -57,6 +57,8 @@ public:
         TlsConnection       // STARTTLS
     };
 
+    static QString toString( ConnectionType connectionType );
+
     /* [0] --- */
 
 

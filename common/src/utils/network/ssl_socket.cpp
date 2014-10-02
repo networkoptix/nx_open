@@ -970,9 +970,20 @@ private:
              data.ssl_cb(ec,0);
              return;
          } else {
-             Q_ASSERT( bytes_transferred == sniffer_header_length );
-             // No idea whether that socket implementation set this length
-             sniffer_buffer_.resize(sniffer_header_length); 
+             if( bytes_transferred == 0 ) {
+                 data.ssl_cb(ec,0);
+                 return;
+             } else if( sniffer_buffer_.size() < 2 ) {
+                 socket()->readSomeAsync(
+                     &sniffer_buffer_,
+                     std::bind(
+                     &mixed_async_ssl::sniffer,
+                     this,
+                     std::placeholders::_1,
+                     std::placeholders::_2,
+                     data));
+                 return;
+             }
              // Fix for the bug that always false in terms of comparison of 0x80
              const unsigned char* buf = reinterpret_cast<unsigned char*>(sniffer_buffer_.data());
              if( buf[0] == 0x80 || (buf[0] == 0x16 && buf[1] == 0x03) ) {

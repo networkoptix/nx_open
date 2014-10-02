@@ -284,7 +284,7 @@ void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error) {
     zipExtractor->deleteLater();
 
     if (error != QnZipExtractor::Ok) {
-        finishTask(QnCheckForUpdateResult::BadUpdateFile);
+        finishTask(error == QnZipExtractor::NoFreeSpace ? QnCheckForUpdateResult::NoFreeSpace : QnCheckForUpdateResult::BadUpdateFile);
         return;
     }
 
