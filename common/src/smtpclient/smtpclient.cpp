@@ -26,6 +26,24 @@
 
 /* [1] Constructors and destructors */
 
+QString SmtpClient::toString( ConnectionType connectionType )
+{
+    switch( connectionType )
+    {
+        case TcpConnection:
+            return lit("TcpConnection");
+        case SslConnection:
+            return lit("SslConnection");
+        case TlsConnection:
+            return lit("TlsConnection");
+        default:
+            assert(false);
+            return lit("unknown");
+    }
+}
+
+
+
 SmtpClient::SmtpClient(const QString & host, int port, ConnectionType connectionType)
 :
     m_socket(nullptr),
@@ -33,7 +51,8 @@ SmtpClient::SmtpClient(const QString & host, int port, ConnectionType connection
     authMethod(AuthPlain),
     connectionTimeout(5000),
     responseTimeout(5000),
-    sendMessageTimeout(60000)
+    sendMessageTimeout(60000),
+    responseCode(0)
 {
     setConnectionType(connectionType);
 
