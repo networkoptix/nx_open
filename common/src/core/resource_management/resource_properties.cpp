@@ -18,7 +18,7 @@ void QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
 
     ec2::ApiResourceParamListWithIdData outData;
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    ec2::ErrorCode rez = conn->getResourceManager()->saveSync(resourceId, params, true, &outData);
+    ec2::ErrorCode rez = conn->getResourceManager()->saveSync(resourceId, params, &outData);
 
     if (rez != ec2::ErrorCode::ok) 
     {
@@ -44,7 +44,7 @@ void QnResourcePropertyDictionary::saveParamsAsync(const QnUuid& resourceId)
     m_modifiedItems.erase(itr);
 
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    int requestId = conn->getResourceManager()->save(resourceId, data.params, true, this, &QnResourcePropertyDictionary::onRequestDone);
+    int requestId = conn->getResourceManager()->save(resourceId, data.params, this, &QnResourcePropertyDictionary::onRequestDone);
     m_requestInProgress.insert(requestId, data);
 }
 

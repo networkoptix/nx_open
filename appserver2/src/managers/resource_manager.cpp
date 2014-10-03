@@ -81,11 +81,11 @@ namespace ec2
 
 
     template<class T>
-    int QnResourceManager<T>::save( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, bool isPredefinedParams, impl::SaveKvPairsHandlerPtr handler )
+    int QnResourceManager<T>::save( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         ApiCommand::Value command = ApiCommand::setResourceParams;
-        auto tran = prepareTransaction( command, resourceId, kvPairs, isPredefinedParams );
+        auto tran = prepareTransaction( command, resourceId, kvPairs);
         ApiResourceParamListWithIdData outData;
         outData.id = resourceId;
         outData.params = kvPairs;
@@ -119,7 +119,7 @@ namespace ec2
     template<class QueryProcessorType>
     QnTransaction<ApiResourceParamListWithIdData> QnResourceManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value command,
-        const QnUuid& id, const ec2::ApiResourceParamDataList& kvPairs, bool isPredefinedParams)
+        const QnUuid& id, const ec2::ApiResourceParamDataList& kvPairs)
     {
         QnTransaction<ApiResourceParamListWithIdData> tran(command);
         tran.params.id = id;

@@ -124,14 +124,14 @@ namespace ec2
             \param handler Functor with params: (ErrorCode, const ApiResourceParamListWithIdData&)
         */
         template<class TargetType, class HandlerType> 
-        int save( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, bool isPredefinedParams, TargetType* target, HandlerType handler ) {
-            return save(resourceId, kvPairs,  isPredefinedParams, std::static_pointer_cast<impl::SaveKvPairsHandler>(std::make_shared<impl::CustomSaveKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
+        int save( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, TargetType* target, HandlerType handler ) {
+            return save(resourceId, kvPairs, std::static_pointer_cast<impl::SaveKvPairsHandler>(std::make_shared<impl::CustomSaveKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode saveSync( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, bool isPredefinedParams, ApiResourceParamListWithIdData* const outData) {
+        ErrorCode saveSync( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, ApiResourceParamListWithIdData* const outData) {
             return impl::doSyncCall<impl::SaveKvPairsHandler>( 
                 [=](const impl::SaveKvPairsHandlerPtr &handler) {
-                    return this->save(resourceId, kvPairs, isPredefinedParams, handler);
+                    return this->save(resourceId, kvPairs, handler);
             },
                 outData 
                 );
@@ -160,7 +160,7 @@ namespace ec2
         //virtual int setResourceDisabled( const QnUuid& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) = 0;
         virtual int getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
         //virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) = 0;
-        virtual int save( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, bool isPredefinedParams, impl::SaveKvPairsHandlerPtr handler ) = 0;
+        virtual int save( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
 

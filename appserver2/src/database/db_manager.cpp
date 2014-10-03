@@ -871,7 +871,6 @@ ErrorCode QnDbManager::insertAddParams(const std::vector<ApiResourceParamData>& 
 
         insQuery.bindValue(1, QnSql::serialized_field(param.name));
         insQuery.bindValue(2, QnSql::serialized_field(param.value));
-        insQuery.bindValue(3, QnSql::serialized_field(param.predefinedParam));
         if (!insQuery.exec()) {
             qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
             return ErrorCode::dbError;
@@ -2148,7 +2147,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiCameraDataList&
     QString filterStr2;
     if (!mServerId.isNull())
         filterStr2 = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(mServerId));
-    queryParams.prepare(QString("SELECT r.guid as resourceId, kv.value, kv.name, kv.isResTypeParam as predefinedParam\
+    queryParams.prepare(QString("SELECT r.guid as resourceId, kv.value, kv.name \
                                  FROM vms_kvpair kv \
                                  JOIN vms_camera c on c.resource_ptr_id = kv.resource_id \
                                  JOIN vms_resource r on r.id = kv.resource_id \
@@ -2275,7 +2274,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList
 
     QSqlQuery queryParams(m_sdb);
     queryParams.setForwardOnly(true);
-    queryParams.prepare(QString("SELECT r.guid as resourceId, kv.value, kv.name, kv.isResTypeParam as predefinedParam\
+    queryParams.prepare(QString("SELECT r.guid as resourceId, kv.value, kv.name\
                                 FROM vms_kvpair kv \
                                 JOIN auth_user u on u.id = kv.resource_id \
                                 JOIN vms_resource r on r.id = kv.resource_id \
@@ -2428,7 +2427,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ApiResourceParamL
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(QString("SELECT kv.value, kv.name, kv.isResTypeParam as predefinedParam\
+    query.prepare(QString("SELECT kv.value, kv.name \
                                 FROM vms_kvpair kv \
                                 JOIN vms_resource r on r.id = kv.resource_id WHERE r.guid = :guid"));
     query.bindValue(QLatin1String(":guid"), resourceId.toRfc4122());
@@ -2500,7 +2499,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     std::vector<ApiResourceParamWithRefData> kvPairs;
     QSqlQuery queryParams(m_sdb);
     queryParams.setForwardOnly(true);
-    queryParams.prepare(QString("SELECT r.guid as resourceId, kv.value, kv.name, kv.isResTypeParam as predefinedParam\
+    queryParams.prepare(QString("SELECT r.guid as resourceId, kv.value, kv.name \
                                 FROM vms_kvpair kv \
                                 JOIN vms_resource r on r.id = kv.resource_id \
                                 ORDER BY r.guid"));
