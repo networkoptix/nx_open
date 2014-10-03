@@ -220,7 +220,7 @@ static const std::size_t bio_output_buffer_reserve= 2048;
 static const std::size_t async_buffer_default_size= 1024;
 static const SystemError::ErrorCode ssl_internal_error = 100;
 
-class async_ssl : public std::enable_shared_from_this<async_ssl> {
+class async_ssl {
 public:
     async_ssl( SSL* ssl , bool server , AbstractStreamSocket* socket ) ;
 
