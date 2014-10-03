@@ -22,7 +22,7 @@ angular.module('webadminApp')
 
         function pingServer(){
             mediaserver.statistics(statisticUrl).success(function(result){
-                var newUptime  = result.data.reply.uptimeMs;
+                var newUptime  = result.reply.uptimeMs;
 
                 if(newUptime < oldUptime || serverWasDown)
                 {
@@ -43,14 +43,17 @@ angular.module('webadminApp')
         }
 
         //1. Request uptime
-        mediaserver.statistics().then(function(result){
-
-            if(typeof(result.data)!="undefined")
-                oldUptime = result.data.reply.uptimeMs;
+        mediaserver.statistics().success(function(result) {
+            oldUptime = result.reply.uptimeMs;
 
             //2. call restart function
-            mediaserver.restart().then(function(){
-                pingServer();  //3. ping every second
-            });
+            mediaserver.restart().then(function () {
+                    pingServer();  //3. ping every second
+                }
+            )
+        }).error(function(){
+            $scope.state = "server is offline";
+            setTimeout(pingServer,1000);
+            return false;
         });
     });
