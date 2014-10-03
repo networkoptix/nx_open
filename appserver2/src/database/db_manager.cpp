@@ -2057,8 +2057,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
 
     QSqlQuery queryProperty(m_sdb);
     queryProperty.setForwardOnly(true);
-    queryProperty.prepare("SELECT rt.guid as resourceTypeId, pt.name, pt.type, pt.min, pt.max, pt.step, pt.[values], pt.ui_values as uiValues, pt.default_value as defaultValue, \
-                          pt.netHelper as internalData, pt.[group], pt.sub_group as subGroup, pt.description, pt.ui, pt.readonly as readOnly \
+    queryProperty.prepare("SELECT rt.guid as resourceTypeId, pt.name, pt.default_value as defaultValue, \
                           FROM vms_propertytype pt \
                           JOIN vms_resourcetype rt on rt.id = pt.resource_type_id ORDER BY rt.guid");
     if (!queryProperty.exec()) {
