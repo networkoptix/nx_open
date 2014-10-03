@@ -13,11 +13,6 @@ QnPlIqResource::QnPlIqResource()
     setAuth(lit("root"), lit("system"));
 }
 
-bool QnPlIqResource::isResourceAccessible()
-{
-    return updateMACAddress();
-}
-
 QString QnPlIqResource::getDriverName() const
 {
     return MANUFACTURE;

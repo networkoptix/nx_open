@@ -12,11 +12,6 @@ QnPlDriodIpWebCamResource::QnPlDriodIpWebCamResource()
     setAuth(QString(), QString());
 }
 
-bool QnPlDriodIpWebCamResource::isResourceAccessible()
-{
-    return updateMACAddress();
-}
-
 QString QnPlDriodIpWebCamResource::getDriverName() const
 {
     return MANUFACTURE;

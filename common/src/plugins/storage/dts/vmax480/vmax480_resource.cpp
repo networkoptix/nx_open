@@ -37,11 +37,6 @@ int QnPlVmax480Resource::getMaxFps() const
     return 30;
 }
 
-bool QnPlVmax480Resource::isResourceAccessible() 
-{
-    return true;
-}
-
 QString QnPlVmax480Resource::getDriverName() const 
 {
     return MANUFACTURE;

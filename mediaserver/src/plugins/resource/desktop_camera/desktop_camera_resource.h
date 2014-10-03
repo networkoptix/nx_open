@@ -35,8 +35,6 @@ public:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
-    virtual bool isResourceAccessible() override;
-
     QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider);
 
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;

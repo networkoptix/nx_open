@@ -279,9 +279,7 @@ QnResourcePtr QnResourcePool::getResourceByParam(const QString &key, const QStri
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) 
     {
-        QVariant result;
-        resource->getParam(key, result, QnDomainMemory);
-        if (result.toString() == value)
+        if (resource->getProperty(key) == value)
             return resource;
     }
 

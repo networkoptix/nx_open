@@ -669,11 +669,6 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
     //dst.status = src->getStatus();
     dst.status = Qn::NotDefined; // status field MUST be modified via setStatus call only
 
-    QnParamList params = src->getResourceParamList();
-    for(const QnParam &srcParam: src->getResourceParamList().values())
-        if (srcParam.domain() == QnDomainDatabase)
-            dst.addParams.push_back(ApiResourceParamData(srcParam.name(), srcParam.value().toString(), true));
-
     for(const ec2::ApiResourceParamData &srcParam: src->getProperties())
         dst.addParams.push_back(srcParam);
 }
@@ -687,12 +682,8 @@ void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
     dst->setUrl(src.url);
     dst->setStatus(src.status, true);
 
-    for(const ApiResourceParamData &srcParam: src.addParams) {
-        if (srcParam.predefinedParam)
-            dst->setParam(srcParam.name, srcParam.value, QnDomainDatabase);
-        else
-            dst->setProperty(srcParam.name, srcParam.value);
-    }
+    for(const ApiResourceParamData &srcParam: src.addParams)
+        dst->setProperty(srcParam.name, srcParam.value);
 }
 
 void fromApiToResourceList(const ApiResourceDataList &src, QnResourceList &dst, QnResourceFactory *factory) {
@@ -715,23 +706,8 @@ void fromApiToResourceList(const ApiResourceParamDataList &src, ec2::ApiResource
 void fromApiToResource(const ApiPropertyTypeData &src, QnParamTypePtr &dst) {
     //resource->id = id;
     dst->name = src.name;
-    dst->type = src.type;
-    dst->min_val = src.min;
-    dst->max_val = src.max;
-    dst->step = src.step;
-    foreach(const QString &val, src.values.split(QLatin1Char(',')))
-        dst->possible_values << val.trimmed();
-    foreach(const QString &val, src.uiValues.split(QLatin1Char(',')))
-        dst->ui_possible_values << val.trimmed();
     dst->default_value = src.defaultValue;
-    dst->group = src.group;
-    dst->subgroup = src.subGroup;
-    dst->description = src.description;
-    dst->ui = src.ui;
-    dst->isReadOnly = src.readOnly;
-    dst->paramNetHelper = src.internalData;
 }
-
 
 void fromApiToResource(const ApiResourceTypeData &src, QnResourceTypePtr &dst) {
     dst->setId(src.id);

@@ -121,12 +121,6 @@ QnPlDlinkResource::QnPlDlinkResource()
     setAuth(QLatin1String("admin"), QLatin1String(""));
 }
 
-
-bool QnPlDlinkResource::isResourceAccessible()
-{
-    return true;
-}
-
 QString QnPlDlinkResource::getDriverName() const
 {
     return MANUFACTURE;

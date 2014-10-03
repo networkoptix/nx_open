@@ -37,8 +37,6 @@ public:
 
     //!Implementation of QnResource::getPtzController
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
-    //!Implementation of QnNetworkResource::isResourceAccessible
-    virtual bool isResourceAccessible() override;
     //!Implementation of QnNetworkResource::ping
     /*!
         At the moment always returns \a true

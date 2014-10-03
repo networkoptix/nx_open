@@ -15,11 +15,6 @@ int QnTestCameraResource::getMaxFps() const
     return 30;
 }
 
-bool QnTestCameraResource::isResourceAccessible()
-{
-    return true;
-}
-
 QString QnTestCameraResource::getDriverName() const
 {
     return MANUFACTURE;

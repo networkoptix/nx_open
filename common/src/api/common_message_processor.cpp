@@ -219,10 +219,7 @@ void QnCommonMessageProcessor::on_resourceParamsChanged( const QnUuid& resourceI
         return;
 
     foreach (const ec2::ApiResourceParamData &pair, kvPairs)
-        if( pair.predefinedParam )
-            resource->setParam(pair.name, pair.value, QnDomainMemory);
-        else
-            resource->setProperty(pair.name, pair.value);
+        resource->setProperty(pair.name, pair.value);
 }
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )

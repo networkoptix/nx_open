@@ -70,7 +70,7 @@ namespace ec2
         //!Implementation of AbstractResourceManager::save
         //virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::save
-        virtual int save( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, bool isPredefinedParams, impl::SaveKvPairsHandlerPtr handler ) override;
+        virtual int save( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::remove
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
 
@@ -79,7 +79,7 @@ namespace ec2
 
         QnTransaction<ApiSetResourceStatusData> prepareTransaction( ApiCommand::Value cmd, const QnUuid& id, Qn::ResourceStatus status);
         //QnTransaction<ApiSetResourceDisabledData> prepareTransaction( ApiCommand::Value command, const QnUuid& id, bool disabled );
-        QnTransaction<ApiResourceParamListWithIdData> prepareTransaction(ApiCommand::Value cmd, const QnUuid& id, const ec2::ApiResourceParamDataList& kvPairs, bool isPredefinedParams);
+        QnTransaction<ApiResourceParamListWithIdData> prepareTransaction(ApiCommand::Value cmd, const QnUuid& id, const ec2::ApiResourceParamDataList& kvPairs);
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value cmd, const QnUuid& id);
         QnTransaction<ApiResourceData> prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource );
     };

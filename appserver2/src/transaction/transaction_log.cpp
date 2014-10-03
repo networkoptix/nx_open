@@ -123,8 +123,6 @@ QnUuid QnTransactionLog::transactionHash(const ApiResourceParamListWithIdData& p
     hash.addData(params.id.toRfc4122());
     foreach(const ApiResourceParamData& param, params.params) {
         hash.addData(param.name.toUtf8());
-        if (param.predefinedParam)
-            hash.addData("1");
     }
     return QnUuid::fromRfc4122(hash.result());
 }

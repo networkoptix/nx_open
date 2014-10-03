@@ -84,10 +84,21 @@ QList<QnUuid> QnResourceType::allParentList() const
 void QnResourceType::addParamType(QnParamTypePtr param)
 {
     QMutexLocker _lock(&m_allParamTypeListCacheMutex); // in case of connect to anther app server 
-    m_paramTypeList.append(param);
+    m_paramTypeList.insert(param->name, param);
 }
 
-const QList<QnParamTypePtr>& QnResourceType::paramTypeList() const
+bool QnResourceType::hasParam(const QString& name) const
+{
+    return paramTypeList().contains(name);
+}
+
+QString QnResourceType::defaultValue(const QString& key) const
+{
+    QnParamTypePtr paramPtr = paramTypeList().value(key);
+    return paramPtr.isNull() ? QString() : paramPtr->default_value;
+}
+
+const ParamTypeMap& QnResourceType::paramTypeList() const
 {
     if (m_allParamTypeListCache.isNull())
     {
@@ -96,35 +107,23 @@ const QList<QnParamTypePtr>& QnResourceType::paramTypeList() const
         if (!m_allParamTypeListCache.isNull())
             return *(m_allParamTypeListCache.data());
 
-        QSharedPointer<ParamTypeList> allParamTypeListCache(new ParamTypeList());
-
-        ParamTypeList paramTypeList = ParamTypeList();
-
-        paramTypeList += m_paramTypeList;
+        QSharedPointer<ParamTypeMap> allParamTypeListCache(new ParamTypeMap());
+        *allParamTypeListCache = m_paramTypeList;
 
         foreach (QnUuid parentId, allParentList()) {
             if (parentId.isNull()) {
                 continue;
             }
 
-            if (QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId)) {
-                paramTypeList += parent->paramTypeList();
+            if (QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId)) 
+            {
+                ParamTypeMap parentData = parent->paramTypeList();
+                for(auto itr = parentData.begin(); itr != parentData.end(); ++itr) {
+                    if (!allParamTypeListCache->contains(itr.key()))
+                        allParamTypeListCache->insert(itr.key(), itr.value());
+                }
             } else {
                 qWarning() << "parentId is" << parentId.toString() << "but there is no such parent in database";
-            }
-        }
-
-        QSet<QString> paramTypeNames;
-
-        QList<QnParamTypePtr>::iterator it = paramTypeList.begin();
-        for (; it != paramTypeList.end(); ++it)
-        {
-            const QnParamTypePtr& paramType = *it;
-
-            if (!paramTypeNames.contains(paramType->name))
-            {
-                allParamTypeListCache->append(paramType);
-                paramTypeNames.insert(paramType->name);
             }
         }
 
@@ -161,14 +160,7 @@ QnResourceTypePtr QnResourceTypePool::getResourceType(QnUuid id) const
     return itr != m_resourceTypeMap.end() ? itr.value() : QnResourceTypePtr();
 }
 
-void QnResourceTypePool::addResourceTypeList(const QList<QnResourceTypePtr>& resourceTypeList)
-{
-    QMutexLocker lock(&m_mutex);
-    foreach(const QnResourceTypePtr& resourceType, resourceTypeList)
-        m_resourceTypeMap.insert(resourceType->getId(), resourceType);
-}
-
-void QnResourceTypePool::replaceResourceTypeList(const QList<QnResourceTypePtr> &resourceTypeList)
+void QnResourceTypePool::replaceResourceTypeList(const QnResourceTypeList &resourceTypeList)
 {
     QMutexLocker lock(&m_mutex);
 

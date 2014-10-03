@@ -10,13 +10,12 @@ namespace ec2
     struct ApiResourceParamData: ApiData
     {
         ApiResourceParamData() {}
-        ApiResourceParamData(const QString& name, const QString& value, bool predefinedParam = false): value(value), name(name), predefinedParam(predefinedParam) {}
+        ApiResourceParamData(const QString& name, const QString& value): value(value), name(name) {}
 
         QString value;
         QString name;
-        bool predefinedParam;
     };
-#define ApiResourceParamData_Fields (value)(name)(predefinedParam)
+#define ApiResourceParamData_Fields (value)(name)
 
 
     struct ApiResourceParamWithRefData: ApiResourceParamData

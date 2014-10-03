@@ -87,7 +87,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnMacAddress>();
     qRegisterMetaType<QnPeerRuntimeInfo>();
 
-    qRegisterMetaType<QnParam>();
+    //qRegisterMetaType<QnParam>();
     
     qRegisterMetaType<QnResourceTypeList>();
     qRegisterMetaType<QnResourcePtr>();

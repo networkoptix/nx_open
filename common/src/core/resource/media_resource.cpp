@@ -96,9 +96,7 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractSt
             return providerLayout;
     }
 
-    QVariant val;
-    toResource()->getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
-    QString strVal = val.toString();
+    QString strVal = toResource()->getProperty(lit("VideoLayout"));
     if (strVal.isEmpty())
     {
         return defaultVideoLayout;
@@ -116,7 +114,7 @@ void QnMediaResource::setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLay
 {
     QMutexLocker lock(&m_layoutMutex);
     m_customVideoLayout = newLayout;
-    toResource()->setParam(QLatin1String("VideoLayout"), newLayout->toString(), QnDomainMemory);
+    toResource()->setProperty(lit("VideoLayout"), newLayout->toString());
 }
 
 static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );

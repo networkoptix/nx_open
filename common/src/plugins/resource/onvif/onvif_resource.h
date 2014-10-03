@@ -124,12 +124,9 @@ public:
     virtual bool setHostAddress(const QString &ip, QnDomain domain = QnDomainMemory) override;
 
 
-    virtual bool isResourceAccessible() override;
     virtual QString getDriverName() const override;
 
-    virtual int getMaxFps() const override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
-    virtual bool hasDualStreaming() const override;
 
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
@@ -245,8 +242,8 @@ protected:
 
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 
-    virtual bool getParamPhysical(const QnParam &param, QVariant &val);
-    virtual bool setParamPhysical(const QnParam &param, const QVariant& val);
+    virtual bool getParamPhysical(const QString &param, QVariant &val);
+    virtual bool setParamPhysical(const QString &param, const QVariant& val);
 
     virtual void fetchAndSetCameraSettings();
 

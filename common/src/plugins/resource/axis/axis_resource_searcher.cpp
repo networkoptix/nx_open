@@ -234,8 +234,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
     int channels = 1;
     if (firstResource->hasParam(QLatin1String("channelsAmount")))
     {
-        QVariant val;
-        firstResource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
+        QString val = firstResource->getProperty(QLatin1String("channelsAmount"));
         channels = val.toUInt();
     }
     if (channels > 1)
