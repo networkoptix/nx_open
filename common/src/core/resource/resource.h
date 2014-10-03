@@ -327,9 +327,6 @@ private:
 
     QStringList m_tags;
 
-    /** Additional values aka kvPairs. */
-    QHash<QString, QString> m_propertyByKey;
-
     bool m_initialized;    
     QMutex m_initAsyncMutex;
 

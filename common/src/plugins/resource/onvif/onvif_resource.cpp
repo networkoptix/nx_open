@@ -566,9 +566,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     {
         qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
         setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ar));
-        ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-        ec2::ApiResourceParamListWithIdData  outData;
-        conn->getResourceManager()->saveSync(getId(), getProperties(), false, &outData);
+        saveParams();
     }
 
     return CameraDiagnostics::NoErrorResult();

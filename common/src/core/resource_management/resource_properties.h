@@ -19,6 +19,9 @@ public:
     void saveParamsAsync(const QnUuid& resourceId);
     
     QString value(const QnUuid& resourceId, const QString& key) const;
+    bool setValue(const QnUuid& resourceId, const QString& key, const QString& value);
+    bool hasProperty(const QnUuid& resourceId, const QString& key) const;
+    ec2::ApiResourceParamDataList allProperties(const QnUuid& resourceId) const;
 private:
     void addToUnsavedParams(const QnUuid& resourceId, const ec2::ApiResourceParamDataList& params);
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );

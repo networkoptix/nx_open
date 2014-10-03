@@ -80,3 +80,45 @@ QString QnResourcePropertyDictionary::value(const QnUuid& resourceId, const QStr
     auto itr = m_items.find(resourceId);
     return itr != m_items.end() ? itr.value().value(key) : QString();
 }
+
+bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QString& key, const QString& value)
+{
+    QMutexLocker lock(&m_mutex);
+    auto itr = m_items.find(resourceId);
+    if (itr == m_items.end())
+        itr = m_items.insert(resourceId, QnResourcePropertyList());
+    
+    QnResourcePropertyList& properties = itr.value();
+    auto itrValue = properties.find(key);
+    if (itrValue == properties.end())
+        properties.insert(key, value);
+    else if (itrValue.value() != value)
+        itrValue.value() = value;
+    else
+        return false; // nothing to change
+
+    m_modifiedItems[resourceId][key] = value;
+    return true;
+}
+
+bool QnResourcePropertyDictionary::hasProperty(const QnUuid& resourceId, const QString& key) const
+{
+    QMutexLocker lock(&m_mutex);
+    auto itr = m_items.find(resourceId);
+    return itr != m_items.end() && itr.value().contains(key);
+}
+
+ec2::ApiResourceParamDataList QnResourcePropertyDictionary::allProperties(const QnUuid& resourceId) const
+{
+    ec2::ApiResourceParamDataList result;
+
+    QMutexLocker lock(&m_mutex);
+    auto itr = m_items.find(resourceId);
+    if (itr == m_items.end())
+        return result;
+    const QnResourcePropertyList& properties = itr.value();
+    for (auto itr = properties.begin(); itr != properties.end(); ++itr)
+        result.push_back(ec2::ApiResourceParamData(itr.key(), itr.value()));
+
+    return result;
+}

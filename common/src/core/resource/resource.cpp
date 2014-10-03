@@ -646,8 +646,7 @@ void QnResource::initializationDone()
 }
 
 bool QnResource::hasProperty(const QString &key) const {
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_propertyByKey.contains(key);
+    return propertyDictionay->hasProperty(getId(), key);
 }
 
 QString QnResource::getProperty(const QString &key, const QString &defaultValue) const {
@@ -663,20 +662,18 @@ QString QnResource::getProperty(const QString &key, const QString &defaultValue)
     return value.isNull() ? defaultValue : value;
 }
 
-void QnResource::setProperty(const QString &key, const QString &value) {
+void QnResource::setProperty(const QString &key, const QString &value) 
+{
+    bool isModified = propertyDictionay->setValue(getId(), key, value);
+    if (isModified)
     {
-        QMutexLocker mutexLocker(&m_mutex);
-        if (m_propertyByKey.contains(key) && m_propertyByKey.value(key) == value)
-            return;
-        m_propertyByKey[key] = value;
+        if(key == lit("ptzCapabilities"))
+            emit ptzCapabilitiesChanged(::toSharedPointer(this));
+        else if(key == lit("VideoLayout"))
+            emit videoLayoutChanged(::toSharedPointer(this));
+
+        emit propertyChanged(toSharedPointer(this), key);
     }
-
-    if(key == lit("ptzCapabilities"))
-        emit ptzCapabilitiesChanged(::toSharedPointer(this));
-    else if(key == lit("VideoLayout"))
-        emit videoLayoutChanged(::toSharedPointer(this));
-
-    emit propertyChanged(toSharedPointer(this), key);
 }
 
 void QnResource::setProperty(const QString &key, const QVariant& value)
@@ -685,12 +682,7 @@ void QnResource::setProperty(const QString &key, const QVariant& value)
 }
 
 ec2::ApiResourceParamDataList QnResource::getProperties() const {
-    QMutexLocker mutexLocker(&m_mutex);
-    
-    ec2::ApiResourceParamDataList result;
-    for(auto pos = m_propertyByKey.begin(); pos != m_propertyByKey.end(); pos++)
-        result.push_back(ec2::ApiResourceParamData(pos.key(), pos.value()));
-    return result;
+    return propertyDictionay->allProperties(getId());
 }
 
 QnInitResPool* QnResource::initAsyncPoolInstance()
