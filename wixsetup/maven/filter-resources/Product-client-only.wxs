@@ -29,11 +29,9 @@
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
 
         <Property Id="INSTALL_CLIENT" Secure="yes"/>
-
         <SetProperty Id="INSTALL_CLIENT" Value="1" After="ResetPreselected" Sequence="ui">
             <![CDATA[ $(var.VmsInstalling) OR &ClientFeature = 3 OR !ClientFeature = 3 ]]>
         </SetProperty>
-
 
         <SetProperty Id="CLIENT_DIRECTORY_REG" Value="[CLIENT_DIRECTORY_REG32]" After="AppSearch">
             <![CDATA[ CLIENT_DIRECTORY_REG = "" ]]>
@@ -52,7 +50,6 @@
         <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
 
         <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
-        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Secure="yes" Value="$(var.LaunchClientChecBoxText)"/>
 
         <!-- Properties -->
         <Property Id="WelcomeDlg_Title" Value="${product.name} Installer Setup" />
@@ -243,6 +240,8 @@
 
             <Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
+
+            <Publish Dialog="VerifyReadyDlg" Control="Install" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)">1</Publish>
 
             <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="ChangeButton" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
