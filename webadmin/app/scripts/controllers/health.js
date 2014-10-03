@@ -4,6 +4,7 @@ angular.module('webadminApp')
     .controller('HealthCtrl', function ($scope, $modal, $log, mediaserver) {
         $scope.healthLength = 100;//сколько точек сохраняем
         $scope.interval = 1000;// 1 секунда
+        $scope.serverIsOnline = true;
 
         $scope.data = {
             labels: Array.apply(null, new Array( $scope.healthLength)).map(String.prototype.valueOf,''),
@@ -166,12 +167,16 @@ angular.module('webadminApp')
                     // Подготовить легенды
                     prepaireDataSets(r.data.reply.statistics);
                 }
+                $scope.serverIsOnline = true;
+
                 updateStatisticsDataSets((r.status==200 && r.data.error == 0) ? r.data.reply.statistics:[]);
                 statisticInterval = setTimeout(updateStatistics,$scope.interval);
                 return false;
             },function(r){
                 //some connection error
                 updateStatisticsDataSets([]);
+                $scope.serverIsOnline = false;
+
                 //show message "server is offline"
                 statisticInterval = setTimeout(updateStatistics,$scope.interval);
             });
