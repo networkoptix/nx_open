@@ -38,6 +38,7 @@ namespace ec2
             REGISTER_COMMAND(getResourceTypes),
             REGISTER_COMMAND(setResourceStatus),
             REGISTER_COMMAND(setResourceParams),
+            REGISTER_COMMAND(setResourceParam),
             REGISTER_COMMAND(getResourceParams),
             REGISTER_COMMAND(saveResource),
             REGISTER_COMMAND(removeResource),

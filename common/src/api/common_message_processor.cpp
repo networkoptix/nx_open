@@ -16,8 +16,8 @@
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
 #include "runtime_info_manager.h"
-
 #include <utils/common/app_info.h>
+#include "nx_ec/data/api_resource_data.h"
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     base_type(parent)
@@ -208,17 +208,17 @@ void QnCommonMessageProcessor::on_resourceStatusChanged( const QnUuid& resourceI
         onResourceStatusChanged(resource, status);
 }
 
-void QnCommonMessageProcessor::on_resourceParamsChanged( const QnUuid& resourceId, const QnKvPairList& kvPairs )
+void QnCommonMessageProcessor::on_resourceParamsChanged( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs )
 {
     QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (!resource)
         return;
 
-    foreach (const QnKvPair &pair, kvPairs)
-        if( pair.isPredefinedParam() )
-            resource->setParam(pair.name(), pair.value(), QnDomainMemory);
+    foreach (const ec2::ApiResourceParamData &pair, kvPairs)
+        if( pair.predefinedParam )
+            resource->setParam(pair.name, pair.value, QnDomainMemory);
         else
-            resource->setProperty(pair.name(), pair.value());
+            resource->setProperty(pair.name, pair.value);
 }
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )

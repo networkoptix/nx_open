@@ -588,12 +588,12 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
     dst.status = Qn::NotDefined; // status field MUST be modified via setStatus call only
 
     QnParamList params = src->getResourceParamList();
-    for(const QnParam &srcParam: src->getResourceParamList().list())
+    for(const QnParam &srcParam: src->getResourceParamList().values())
         if (srcParam.domain() == QnDomainDatabase)
             dst.addParams.push_back(ApiResourceParamData(srcParam.name(), srcParam.value().toString(), true));
 
-    for(const QnKvPair &srcParam: src->getProperties())
-        dst.addParams.push_back(ApiResourceParamData(srcParam.name(), srcParam.value(), false));
+    for(const ec2::ApiResourceParamData &srcParam: src->getProperties())
+        dst.addParams.push_back(srcParam);
 }
 
 void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
@@ -621,17 +621,12 @@ void fromApiToResourceList(const ApiResourceDataList &src, QnResourceList &dst, 
     }
 }
 
-void fromResourceListToApi(const QnKvPairList &src, ApiResourceParamDataList &dst) {
-    dst.reserve(dst.size() + src.size());
-    for (const QnKvPair &srcParam: src)
-        dst.push_back(ApiResourceParamData(srcParam.name(), srcParam.value(), false));
+void fromResourceListToApi(const ec2::ApiResourceParamDataList &src, ApiResourceParamDataList &dst) {
+    dst = src;
 }
 
-void fromApiToResourceList(const ApiResourceParamDataList &src, QnKvPairList &dst) {
-    dst.reserve(dst.size() + (int)src.size());
-
-    for(const ApiResourceParamData &srcParam: src)
-        dst.push_back(QnKvPair(srcParam.name, srcParam.value));
+void fromApiToResourceList(const ApiResourceParamDataList &src, ec2::ApiResourceParamDataList &dst) {
+    dst = src;
 }
 
 

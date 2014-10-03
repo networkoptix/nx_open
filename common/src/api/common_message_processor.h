@@ -86,7 +86,7 @@ private slots:
     void on_gotDiscoveryData(const ec2::ApiDiscoveryData &discoveryData, bool addInformation);
 
     void on_resourceStatusChanged(const QnUuid &resourceId, Qn::ResourceStatus status );
-    void on_resourceParamsChanged(const QnUuid& resourceId, const QnKvPairList& kvPairs );
+    void on_resourceParamsChanged(const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs );
     void on_resourceRemoved(const QnUuid& resourceId );
 
     void on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory);

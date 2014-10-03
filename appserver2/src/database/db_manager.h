@@ -164,7 +164,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
 
         //getResourceParams
-        ErrorCode doQueryNoLock(const QnUuid& resourceId, ApiResourceParamsData& params);
+        ErrorCode doQueryNoLock(const QnUuid& resourceId, ApiResourceParamListWithIdData& params);
 
         // ApiFullInfo
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiFullInfoData& data);
@@ -204,7 +204,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiSetResourceStatusData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamsData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamListWithIdData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraServerItemData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiPanicModeData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran);
