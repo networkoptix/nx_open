@@ -57,6 +57,8 @@ public:
         TlsConnection       // STARTTLS
     };
 
+    static QString toString( ConnectionType connectionType );
+
     /* [0] --- */
 
 
@@ -146,6 +148,7 @@ protected:
     int responseCode;
 
     nx_http::LineSplitter m_lineSpliter;
+    bool m_connected;
     
     class ResponseTimeoutException {};
     class SendMessageTimeoutException {};

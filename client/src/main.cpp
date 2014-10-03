@@ -56,6 +56,7 @@ extern "C"
 
 #define TEST_RTSP_SERVER
 
+#include <core/resource/camera_user_attribute_pool.h>
 #include "core/resource/media_server_resource.h"
 #include "core/resource/storage_resource.h"
 
@@ -759,6 +760,7 @@ int main(int argc, char **argv)
     QnClientModule client(argc, argv);
 
     QnSessionManager::instance();
+    std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     QnResourcePool::initStaticInstance( new QnResourcePool() );
 
 #ifdef Q_OS_MAC
