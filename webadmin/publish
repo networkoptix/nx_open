@@ -1,7 +1,11 @@
 hg pull
 hg up
 grunt build
+echo "==== build finished ===="
 rm -rf ../mediaserver/maven/bin-resources/resources/static/*
+echo "==== removed ===="
 cp -rf dist/* ../mediaserver/maven/bin-resources/resources/static/
+echo "==== copied ===="
 hg addremove
+echo "==== hg ready ===="
 hg stat
