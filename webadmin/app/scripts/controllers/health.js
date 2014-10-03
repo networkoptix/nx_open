@@ -164,11 +164,16 @@ angular.module('webadminApp')
             mediaserver.statistics().then(function (r) {
                 if(statisticInterval == 0){
                     // Подготовить легенды
-                    prepaireDataSets(r.data.reply.statistics)
+                    prepaireDataSets(r.data.reply.statistics);
                 }
                 updateStatisticsDataSets((r.status==200 && r.data.error == 0) ? r.data.reply.statistics:[]);
                 statisticInterval = setTimeout(updateStatistics,$scope.interval);
                 return false;
+            },function(r){
+                //some connection error
+                updateStatisticsDataSets([]);
+                //show message "server is offline"
+                statisticInterval = setTimeout(updateStatistics,$scope.interval);
             });
         }
 
