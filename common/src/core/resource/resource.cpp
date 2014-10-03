@@ -383,7 +383,10 @@ QnParamList QnResource::getResourceParamList() const
 
 bool QnResource::hasParam(const QString &name) const
 {
-    return getResourceParamList().contains(name);
+    QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId); 
+    if (!resType)
+        return false;
+    return resType->hasParam(name);
 }
 
 bool QnResource::getParamPhysical(const QnParam &/*param*/, QVariant &/*val*/)

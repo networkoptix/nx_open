@@ -9,6 +9,8 @@
 #include "param.h"
 #include "utils/common/id.h"
 
+typedef QMap<QString, QnParamTypePtr> ParamTypeMap;
+
 class QN_EXPORT QnResourceType
 {
 public:
@@ -34,8 +36,9 @@ public:
     QList<QnUuid> allParentList() const;
 
     void addParamType(QnParamTypePtr param);
+    bool hasParam(const QString& name) const;
 
-    const QList<QnParamTypePtr>& paramTypeList() const;
+    const ParamTypeMap& paramTypeList() const;
 
 private:
     QnUuid m_id;
@@ -44,11 +47,10 @@ private:
     QString m_manufacture;
     QList<QnUuid> m_additionalParentList;
 
-    typedef QList<QnParamTypePtr> ParamTypeList;
-    ParamTypeList m_paramTypeList;
+    ParamTypeMap m_paramTypeList;
 
     mutable QMutex m_allParamTypeListCacheMutex;
-    mutable QSharedPointer<ParamTypeList> m_allParamTypeListCache;
+    mutable QSharedPointer<ParamTypeMap> m_allParamTypeListCache;
 
     mutable bool m_isCamera;
     mutable bool m_isCameraSet;
@@ -66,8 +68,7 @@ public:
     QnResourceTypePtr getResourceTypeByName(const QString& name) const;
     QnResourceTypePtr getResourceType(QnUuid id) const;
     void addResourceType(QnResourceTypePtr resourceType);
-    void addResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
-    void replaceResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
+    void replaceResourceTypeList(const QnResourceTypeList& resourceType);
 
     /* exact match name */
     QnUuid getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning = true) const;
