@@ -31,7 +31,7 @@ Window {
 
             Button {
                 text: qsTr("Connect")
-                onClicked: connectionManager.connect(urlField.text)
+                onClicked: connectionManager.connectToServer(urlField.text)
             }
         }
     }

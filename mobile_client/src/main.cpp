@@ -14,6 +14,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/long_runnable.h"
 #include "utils/common/app_info.h"
+#include "utils/common/synctime.h"
 #include "plugins/resource/server_camera/server_camera_factory.h"
 
 #include "context/context.h"
@@ -26,6 +27,8 @@ int runApplication(QGuiApplication *application) {
     // these functions should be called in every thread that wants to use rand() and qrand()
     srand(time(NULL));
     qsrand(time(NULL));
+
+    QnSyncTime syncTime;
 
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());

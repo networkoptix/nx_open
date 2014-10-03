@@ -487,7 +487,11 @@ bool Socket::fillAddr(const QString &address, unsigned short port,
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_INET;    /* Allow only IPv4 */
     hints.ai_socktype = 0; /* Any socket */
+#ifndef ANDROID
     hints.ai_flags = AI_ALL;    /* For wildcard IP address */
+#else
+    hints.ai_flags = AI_ADDRCONFIG;    /* AI_ALL isn't supported in getaddrinfo in adnroid */
+#endif
     hints.ai_protocol = 0;          /* Any protocol */
     hints.ai_canonname = NULL;
     hints.ai_addr = NULL;

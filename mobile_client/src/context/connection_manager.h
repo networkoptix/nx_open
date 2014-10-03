@@ -19,7 +19,7 @@ public:
 
     explicit QnConnectionManager(QObject *parent = 0);
 
-    bool connected() const;
+    bool isConnected() const;
 
 signals:
     void connected(const QUrl &url);
@@ -27,12 +27,10 @@ signals:
     void disconnected();
 
 public slots:
-    void connect(const QUrl &url);
-    void disconnect(bool force);
-
-private:
     bool connectToServer(const QUrl &url);
     bool disconnectFromServer(bool force);
+
+private:
 
 private:
     bool m_connected;

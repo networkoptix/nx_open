@@ -7,12 +7,12 @@
 #include "api/session_manager.h"
 #include "api/model/connection_info.h"
 #include "api/global_settings.h"
+#include "api/runtime_info_manager.h"
 #include "mobile_client/mobile_client_message_processor.h"
 #include "utils/common/app_info.h"
+#include "utils/common/synctime.h"
 #include "mobile_client/mobile_client_settings.h"
-
-#include "utils/network/simple_http_client.h"
-
+#include "common/common_module.h"
 
 QnConnectionManager::QnConnectionManager(QObject *parent) :
     QObject(parent),
@@ -21,40 +21,16 @@ QnConnectionManager::QnConnectionManager(QObject *parent) :
 {
 }
 
-bool QnConnectionManager::connected() const {
+bool QnConnectionManager::isConnected() const {
     return m_connected;
 }
 
-void QnConnectionManager::connect(const QUrl &url) {
-    if (!url.isValid()) {
-        return;
-    }
-
-    connectToServer(url);
-}
-
-void QnConnectionManager::disconnect(bool force) {    
-    disconnectFromServer(force);
-}
-
 bool QnConnectionManager::connectToServer(const QUrl &url) {
-    qDebug() << "requested connection to " << url << " user = " << url.userName() << " pass = " << url.password();
-
-    QAuthenticator auth;
-    auth.setUser(url.userName());
-    auth.setPassword(url.password());
-    CLSimpleHTTPClient client(url, 3000, auth);
-    CLHttpStatus st = client.doGET(url.path());
-    qDebug() << "================= made GET: " << st;
-    if (st == CL_HTTP_SUCCESS) {
-        QByteArray data;
-        client.readAll(data);
-        qDebug() << data;
+    if (!url.isValid()) {
+        return true;
     }
 
-    return false;
-
-    if (connected() && !disconnectFromServer(false))
+    if (isConnected() && !disconnectFromServer(false))
         return true;
 
     QnEc2ConnectionRequestResult result;
@@ -88,16 +64,28 @@ bool QnConnectionManager::connectToServer(const QUrl &url) {
         return false;
     }
 
+    ec2::AbstractECConnectionPtr ec2Connection = result.connection();
+
     QnAppServerConnectionFactory::setUrl(url);
-    QnAppServerConnectionFactory::setEc2Connection(result.connection());
+    QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
 
-    QnMobileClientMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
+    QnMobileClientMessageProcessor::instance()->init(ec2Connection);
 
     QnSessionManager::instance()->start();
 //    QnResource::startCommandProc();
 
-    emit connected();
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, [this, ec2Connection](const QnPeerRuntimeInfo &info) {
+        if (info.uuid != qnCommon->moduleGUID())
+            return;
+        ec2Connection->sendRuntimeData(info.data);
+    });
+
+    connect(ec2Connection->getTimeManager().get(), &ec2::AbstractTimeManager::timeChanged, QnSyncTime::instance(), static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
+
+    qnCommon->setLocalSystemName(connectionInfo.systemName);
+
+    emit connected(url);
 //    context()->setUserName(appServerUrl.userName());
     return true;
 }
@@ -117,6 +105,7 @@ bool QnConnectionManager::disconnectFromServer(bool force) {
 //    QnResource::stopCommandProc();
 
 //    context()->setUserName(QString());
+    m_connected = false;
     emit disconnected();
     return true;
 }

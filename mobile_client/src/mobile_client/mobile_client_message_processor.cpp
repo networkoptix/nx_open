@@ -4,7 +4,8 @@
 #include "common/common_module.h"
 
 QnMobileClientMessageProcessor::QnMobileClientMessageProcessor() :
-    base_type()
+    base_type(),
+    m_connected(false)
 {
 }
 

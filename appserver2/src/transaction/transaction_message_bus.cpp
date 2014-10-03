@@ -1088,7 +1088,8 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
     runtimeTransactionLog->getTransactionsAfter(runtimeState, result);
     foreach (const QnTransaction<ApiRuntimeData> &tran, result)
         transport->sendTransaction(tran, transportHeader);
-    transport->sendTransaction(prepareModulesDataTransaction(), transportHeader);
+    if (m_localPeer.peerType == Qn::PT_Server)
+        transport->sendTransaction(prepareModulesDataTransaction(), transportHeader);
 }
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer)
