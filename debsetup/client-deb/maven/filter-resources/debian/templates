@@ -1,0 +1,18 @@
+Template: ${deb.customization.company.name}-client/present-client-eula
+Type: note
+Description: ${license.text}
+
+Template: ${deb.customization.company.name}-client/accepted-client-eula
+Type: boolean
+Default: false
+Description: Do you accept the EULA license terms?
+ In order to install this package, you must accept the license terms. Not accepting will cancel the
+ installation.
+
+Template: ${deb.customization.company.name}-client/error-client-eula
+Type: error
+Description: Declined EULA
+ If you do not agree to the EULA license
+ terms you cannot install this software.
+ .
+ The installation of this package will be canceled.
