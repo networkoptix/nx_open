@@ -6,7 +6,9 @@ angular.module('webadminApp')
         $scope.storages = mediaserver.getStorages();
 
         $scope.storages.then(function (r) {
-            $scope.storages = r.data.reply.storages;
+            $scope.storages =  $scope.storages = _.sortBy(r.data.reply.storages,function(storage){
+                return storage.url;
+            });
         });
 
         $scope.formatSpace = function(bytes){

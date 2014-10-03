@@ -6,8 +6,10 @@ angular.module('webadminApp')
         $scope.storages = mediaserver.getStorages();
 
         $scope.storages.then(function (r) {
+            $scope.storages = _.sortBy(r.data.reply.storages,function(storage){
+                return storage.url;
+            });
 
-            $scope.storages = r.data.reply.storages;
             for(var i in $scope.storages){
                 $scope.storages[i].reservedSpaceGb = Math.round(1.*$scope.storages[i].reservedSpace / (1024*1024*1024));
             }

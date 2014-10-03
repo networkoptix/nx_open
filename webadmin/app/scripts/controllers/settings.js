@@ -63,23 +63,35 @@ angular.module('webadminApp')
             });
         }
 
-        function successHandler (r){
-            if(r.data.reply.restartNeeded){
-                if(confirm("Changes will be applied after restart. Do you want to restart server now?")){
+        function errorHandler(r){
+            alert ("Connection error")
+            return false;
+        }
+        function resultHandler (r){
+            if(r.data.error!=0) {
+                var errorToShow = r.data.errorString;
+                switch (errorToShow) {
+                    case 'UNAUTHORIZED':
+                    case 'password':
+                        errorToShow = "Wrong password.";
+                }
+                alert("Error: " + errorToShow);
+            }else if (r.data.reply.restartNeeded) {
+                if (confirm("Changes will be applied after restart. Do you want to restart server now?")) {
                     restartServer();
                 }
-            }else{
+            } else {
                 alert("Settings saved");
             }
         }
 
         $scope.save = function () {
-            mediaserver.saveSettings($scope.settings.systemName,$scope.settings.port).then(successHandler);
+            mediaserver.saveSettings($scope.settings.systemName,$scope.settings.port).success(resultHandler).error(errorHandler);
         };
 
         $scope.changePassword = function () {
             if($scope.password == $scope.confirmPassword)
-                mediaserver.changePassword($scope.password,$scope.oldPassword).then(successHandler);
+                mediaserver.changePassword($scope.password,$scope.oldPassword).success(resultHandler).error(errorHandler);
         };
 
         $scope.restart = function () {

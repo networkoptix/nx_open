@@ -5,6 +5,7 @@ angular.module('webadminApp')
         $scope.url = window.location.protocol + "//" + window.location.hostname + ":"
             + data.port + window.location.pathname + window.location.search;
 
+        $scope.state = '';
         var statisticUrl = window.location.protocol + "//" + window.location.hostname + ":"
             + data.port;
 
@@ -21,14 +22,19 @@ angular.module('webadminApp')
 
         function pingServer(){
             mediaserver.statistics(statisticUrl).success(function(result){
-                var newUptime  = result.data.reply.uptimeMs;//
+                var newUptime  = result.data.reply.uptimeMs;
+
                 if(newUptime < oldUptime || serverWasDown)
                 {
+                    $scope.state = "server is starting";
                     return reload();
                 }
+
+                $scope.state = "server is restarting";
                 oldUptime = newUptime;
                 setTimeout(pingServer,1000);
             }).error(function(){
+                $scope.state = "server is offline";
                 serverWasDown = true; // server was down once - next success should restart server
                 setTimeout(pingServer,1000);
                 return false;
