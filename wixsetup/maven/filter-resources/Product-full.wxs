@@ -60,6 +60,16 @@
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
 
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_DEFAULT" Id="ALLOW_CAMERA_CHANGES" Value="1" After="AppSearch" Sequence="ui">
+            <![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]>
+        </SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_BEFORE_UI" Id="ALLOW_CAMERA_CHANGES" Value="{}" After="SetALLOW_CAMERA_CHANGES_DEFAULT" Sequence="ui">
+            <![CDATA[ ALLOW_CAMERA_CHANGES = "0" ]]>
+        </SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_AFTER_UI" Id="ALLOW_CAMERA_CHANGES" Value="0" Before="ExecuteAction" Sequence="ui">
+            <![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]>
+        </SetProperty>
+
         <SetProperty Action="SetServerPort1" Id="SERVER_PORT" Value="[SERVER_PORT_EC]" Before="SetServerPort2">NOT SERVER_PORT</SetProperty>
         <SetProperty Action="SetServerPort2" Id="SERVER_PORT" Value="7001" Before="CostInitialize">NOT SERVER_PORT</SetProperty>
 
@@ -114,11 +124,15 @@
             <RegistrySearch Id="ServerEcsPortReg" Root="HKLM" Key="$(var.ECRegPath)" Name="port" Type="raw" Win64="yes"/>
         </Property>
 
+        <Property Id="ALLOW_CAMERA_CHANGES" Secure="yes">
+            <RegistrySearch Id="AllowCameraChangesReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="allowCameraChanges" Type="raw" Win64="yes"/>
+        </Property>
 
         <Property Id="SERVER_LOGIN" Value="admin"/>
         <Property Id="SERVER_PASSWORD" Secure="yes"/>
         <Property Id="SERVER_PASSWORD_CONFIRM" Secure="yes"/>
 
+        <Property Id="ALLOW_CAMERA_CHANGES_REF" Value="ALLOW_CAMERA_CHANGES"/>
 
         <!-- Client properties-->
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">

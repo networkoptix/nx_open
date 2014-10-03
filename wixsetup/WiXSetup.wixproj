@@ -40,6 +40,84 @@
     <Compile Include="FileAssociations.wxs" />
     <Compile Include="InstallTypeDlg.wxs" />
     <Compile Include="InvalidPasswordDlg.wxs" />
+    <Compile Include="maven\bin-resources\AllFieldsAreMandatoryDlg.wxs">
+      <Link>AllFieldsAreMandatoryDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\AppServerDlg.wxs">
+      <Link>AppServerDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\ClientDlg.wxs">
+      <Link>ClientDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\DowngradeWarningDlg.wxs">
+      <Link>DowngradeWarningDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\EmptyPasswordDlg.wxs">
+      <Link>EmptyPasswordDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\InstallTypeDlg.wxs">
+      <Link>InstallTypeDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\InvalidPasswordDlg.wxs">
+      <Link>InvalidPasswordDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\MediaDirDlg.wxs">
+      <Link>MediaDirDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\MediaServerDlg.wxs">
+      <Link>MediaServerDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\MyExitDialog.wxs">
+      <Link>MyExitDialog.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\MyFeaturesDlg.wxs">
+      <Link>MyFeaturesDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\PasswordDlg.wxs">
+      <Link>PasswordDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\PasswordShouldMatchDlg.wxs">
+      <Link>PasswordShouldMatchDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\PortDuplicateDlg.wxs">
+      <Link>PortDuplicateDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\PortIsBusyDlg.wxs">
+      <Link>PortIsBusyDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\SelectionWarning.wxs">
+      <Link>SelectionWarning.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\UninstallOptionsDlg.wxs">
+      <Link>UninstallOptionsDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\bin-resources\UpgradeDlg.wxs">
+      <Link>UpgradeDlg.wxs</Link>
+    </Compile>
+    <Compile Include="maven\filter-resources\Associations.wxs">
+      <Link>Associations.wxs</Link>
+    </Compile>
+    <Compile Include="maven\filter-resources\BuildVars.wxi">
+      <Link>BuildVars.wxi</Link>
+    </Compile>
+    <Compile Include="maven\filter-resources\Client.wxs">
+      <Link>Client.wxs</Link>
+    </Compile>
+    <Compile Include="maven\filter-resources\ControlPanel.wxi">
+      <Link>ControlPanel.wxi</Link>
+    </Compile>
+    <Compile Include="maven\filter-resources\Product-client-only.wxs">
+      <Link>Product-client-only.wxs</Link>
+    </Compile>
+    <Compile Include="maven\filter-resources\Product-full.wxs">
+      <Link>Product-full.wxs</Link>
+    </Compile>
+    <Compile Include="maven\filter-resources\server.wxs">
+      <Link>server.wxs</Link>
+    </Compile>
+    <Compile Include="maven\filter-resources\traytool.wxs">
+      <Link>traytool.wxs</Link>
+    </Compile>
     <Compile Include="MyFeaturesDlg.wxs" />
     <Compile Include="MediaServerDlg.wxs" />
     <Compile Include="PasswordDlg.wxs" />
