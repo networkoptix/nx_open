@@ -149,6 +149,7 @@
         <CustomAction Id="DeleteOldMediaserverSettings" BinaryKey="CustomActions.dll" DllEntry="DeleteOldMediaserverSettings" Execute="deferred" Impersonate="no"/>
         
         <!-- Assign default values for Quick installation -->
+        <CustomAction Id="AssignServerPort" Property="SERVER_PORT" Value="[FREEPORT1]"/>
         <CustomAction Id="AssignClientPort" Property="CLIENT_PORT" Value="[SERVER_PORT]"/>
 
         <CustomAction Id="CertGenAction_Cmd" Property="CertGenAction"
@@ -202,7 +203,8 @@
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
-            <Custom Action="FindFreePorts" Before="AssignClientPort"/>
+            <Custom Action="FindFreePorts" Before="AssignServerPort"/>
+            <Custom Action="AssignServerPort" Before="AssignClientPort">NOT SERVER_PORT</Custom>
             <Custom Action="AssignClientPort" Before="FindConfiguredStorages">1</Custom>
             <Custom Action="FindConfiguredStorages" Before="CostInitialize"/> 
         </InstallUISequence>
