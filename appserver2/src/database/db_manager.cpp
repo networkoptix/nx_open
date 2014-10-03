@@ -2330,28 +2330,6 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributes
     return ErrorCode::ok;
 }
 
-//ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesData& cameraUserAttributes)
-//{
-//    //TODO #ak throw away this method
-//
-//    assert( !cameraId.isNull() );
-//    if( cameraId.isNull() )
-//        return ErrorCode::serverError;
-//
-//    ApiCameraAttributesDataList cameraAttrList;
-//    const ErrorCode result = doQueryNoLock( cameraId, cameraAttrList );
-//    if( result != ErrorCode::ok )
-//        return result;
-//
-//    assert( cameraAttrList.size() <= 1 );
-//    if( cameraId.isNull() )
-//        return ErrorCode::serverError;
-//    if( cameraAttrList.size() == 1 )
-//        cameraUserAttributes = std::move(cameraAttrList[0]);
-//
-//    return ErrorCode::ok;
-//}
-
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiCameraDataExList& cameraList)
 {
     //if cameraId empty, returning all records

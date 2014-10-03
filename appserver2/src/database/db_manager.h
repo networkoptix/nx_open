@@ -144,7 +144,6 @@ namespace ec2
 
         //getCameraUserAttributes
         ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList);
-        ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesData& cameraUserAttributes);
 
         //getFullCameraDataList
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiCameraDataExList& cameraList);
@@ -237,13 +236,13 @@ namespace ec2
         /* Add or remove camera bookmark tags */
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraBookmarkTagDataList>& tran);
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamDataList>& tran)
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamDataList>& /*tran*/)
         {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefDataList>& tran)
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefDataList>& /*tran*/)
         {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
