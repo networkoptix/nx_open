@@ -54,13 +54,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         
-        auto queryDoneHandler = [reqID, handler, resourceId]( ErrorCode errorCode, const ApiResourceParamListWithIdData& params) {
-            ApiResourceParamListWithIdData outData;
+        auto queryDoneHandler = [reqID, handler, resourceId]( ErrorCode errorCode, const ApiResourceParamWithRefDataList& params) {
+            ApiResourceParamWithRefDataList outData;
             if( errorCode == ErrorCode::ok )
                 outData = params;
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<QnUuid, ApiResourceParamListWithIdData, decltype(queryDoneHandler)>
+        m_queryProcessor->template processQueryAsync<QnUuid, ApiResourceParamWithRefDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getResourceParams, resourceId, queryDoneHandler );
         return reqID;
     }
@@ -81,14 +81,13 @@ namespace ec2
 
 
     template<class T>
-    int QnResourceManager<T>::save( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler )
+    int QnResourceManager<T>::save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         ApiCommand::Value command = ApiCommand::setResourceParams;
-        auto tran = prepareTransaction( command, resourceId, kvPairs);
-        ApiResourceParamListWithIdData outData;
-        outData.id = resourceId;
-        outData.params = kvPairs;
+        auto tran = prepareTransaction( command, kvPairs);
+        ApiResourceParamWithRefDataList outData;
+        outData = kvPairs;
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveKvPairsHandler::done ), handler, reqID, _1, outData) );
 
@@ -117,13 +116,12 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    QnTransaction<ApiResourceParamListWithIdData> QnResourceManager<QueryProcessorType>::prepareTransaction(
+    QnTransaction<ApiResourceParamWithRefDataList> QnResourceManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value command,
-        const QnUuid& id, const ec2::ApiResourceParamDataList& kvPairs)
+        const ec2::ApiResourceParamWithRefDataList& kvPairs)
     {
-        QnTransaction<ApiResourceParamListWithIdData> tran(command);
-        tran.params.id = id;
-        tran.params.params = kvPairs;
+        QnTransaction<ApiResourceParamWithRefDataList> tran(command);
+        tran.params = kvPairs;
         return tran;
     }
 

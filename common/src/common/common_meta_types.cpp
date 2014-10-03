@@ -219,7 +219,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamData");
     qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamDataList");
-    qRegisterMetaType<ec2::ApiResourceParamListWithIdData>("ApiResourceParamListWithIdData");
+    qRegisterMetaType<ec2::ApiResourceParamWithRefDataList>("ApiResourceParamWithRefDataList");
 
 
     qRegisterMetaType<QnUuid>( "QnUuid" );

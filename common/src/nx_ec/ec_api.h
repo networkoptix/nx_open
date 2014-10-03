@@ -108,7 +108,7 @@ namespace ec2
         }
 
         /*!
-            \param handler Functor with params: (ErrorCode, const ApiResourceParamListWithIdData&)
+            \param handler Functor with params: (ErrorCode, const ApiResourceParamWithRefDataList&)
         */
         template<class TargetType, class HandlerType> 
         int getKvPairs( const QnUuid& resourceId, TargetType* target, HandlerType handler ) {
@@ -123,17 +123,17 @@ namespace ec2
 
        
         /*!
-            \param handler Functor with params: (ErrorCode, const ApiResourceParamListWithIdData&)
+            \param handler Functor with params: (ErrorCode, const ApiResourceParamWithRefDataList&)
         */
         template<class TargetType, class HandlerType> 
-        int save( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, TargetType* target, HandlerType handler ) {
-            return save(resourceId, kvPairs, std::static_pointer_cast<impl::SaveKvPairsHandler>(std::make_shared<impl::CustomSaveKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
+        int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, TargetType* target, HandlerType handler ) {
+            return save(kvPairs, std::static_pointer_cast<impl::SaveKvPairsHandler>(std::make_shared<impl::CustomSaveKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode saveSync( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, ApiResourceParamListWithIdData* const outData) {
+        ErrorCode saveSync(const ec2::ApiResourceParamWithRefDataList& kvPairs, ApiResourceParamWithRefDataList* const outData) {
             return impl::doSyncCall<impl::SaveKvPairsHandler>( 
                 [=](const impl::SaveKvPairsHandlerPtr &handler) {
-                    return this->save(resourceId, kvPairs, handler);
+                    return this->save(kvPairs, handler);
             },
                 outData 
                 );
@@ -153,7 +153,7 @@ namespace ec2
         void statusChanged( const QnUuid& resourceId, Qn::ResourceStatus status );
         //void disabledChanged( const QnUuid& resourceId, bool disabled );
         void resourceChanged( const QnResourcePtr& resource );
-        void resourceParamsChanged( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs );
+        void resourceParamChanged(const ec2::ApiResourceParamWithRefData& param );
         void resourceRemoved( const QnUuid& resourceId );
 
     protected:
@@ -162,7 +162,7 @@ namespace ec2
         //virtual int setResourceDisabled( const QnUuid& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) = 0;
         virtual int getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
         //virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) = 0;
-        virtual int save( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
+        virtual int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
 

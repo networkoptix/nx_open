@@ -4,7 +4,7 @@
 namespace ec2 {
     struct ApiResourceParamData;
     struct ApiResourceParamWithRefData;
-    struct ApiResourceParamListWithIdData;
     typedef std::vector<ApiResourceParamData> ApiResourceParamDataList;
+    typedef std::vector<ApiResourceParamWithRefData> ApiResourceParamWithRefDataList;
 };
 #endif

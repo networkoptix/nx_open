@@ -37,7 +37,6 @@ namespace ec2 {
     struct ApiResourceData;
     struct ApiResourceParamData;
     struct ApiResourceParamWithRefData;
-    struct ApiResourceParamListWithIdData;
     struct ApiResourceTypeData;
     struct ApiScheduleTaskData;
     struct ApiScheduleTaskWithRefData;
@@ -102,6 +101,7 @@ namespace ec2 {
     typedef std::vector<ApiModuleData> ApiModuleDataList;
     typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
+    typedef std::vector<ApiResourceParamWithRefData> ApiResourceParamWithRefDataList;    
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
@@ -130,7 +130,6 @@ namespace ec2 {
     (ApiResourceData)\
     (ApiResourceParamData)\
     (ApiResourceParamWithRefData)\
-    (ApiResourceParamListWithIdData)\
     (ApiResourceTypeData)\
     (ApiScheduleTaskData)\
     (ApiScheduleTaskWithRefData)\

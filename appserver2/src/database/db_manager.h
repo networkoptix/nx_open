@@ -171,7 +171,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
 
         //getResourceParams
-        ErrorCode doQueryNoLock(const QnUuid& resourceId, ApiResourceParamListWithIdData& params);
+        ErrorCode doQueryNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& params);
 
         // ApiFullInfo
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiFullInfoData& data);
@@ -213,7 +213,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiSetResourceStatusData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamListWithIdData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraServerItemData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiPanicModeData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran);
@@ -222,7 +222,6 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamDataList>& tran); // save settings
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran);
@@ -237,6 +236,18 @@ namespace ec2
 
         /* Add or remove camera bookmark tags */
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraBookmarkTagDataList>& tran);
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamDataList>& tran)
+        {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefDataList>& tran)
+        {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiEmailSettingsData>&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
@@ -347,8 +358,8 @@ namespace ec2
         ErrorCode deleteRecordFromResourceTable(const qint32 id);
         ErrorCode removeObject(const ApiObjectInfo& apiObject);
 
-        ErrorCode insertAddParams(const std::vector<ApiResourceParamData>& params, qint32 internalId);
-        ErrorCode deleteAddParams(qint32 resourceId);
+        ErrorCode insertAddParam(const ApiResourceParamWithRefData& param);
+        //ErrorCode deleteAddParams(qint32 resourceId);
 
         ErrorCode saveCamera(const ApiCameraData& params);
         ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);

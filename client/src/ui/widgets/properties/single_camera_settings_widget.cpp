@@ -247,7 +247,7 @@ void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout ,
 
 bool QnSingleCameraSettingsWidget::initAdvancedTab()
 {
-    QVariant id;
+    QString id;
     QTreeWidget* advancedTreeWidget = 0;
     QStackedLayout* advancedLayout = 0;
 #ifdef QT_WEBKITWIDGETS_LIB
@@ -259,7 +259,7 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
     
     if ( m_camera )
     {
-        m_camera->getParam(lit("cameraSettingsId"), id, QnDomainDatabase);
+        id = m_camera->getProperty(lit("cameraSettingsId"));
         isCameraSettingsId = !id.isNull();
         
         if ( qnCommon && qnCommon->dataPool() )
@@ -390,7 +390,7 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
             cleanAdvancedSettings();
         }
 
-        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id.toString(), 
+        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id, 
 #ifdef QT_WEBKITWIDGETS_LIB
             advancedWebView,
 #endif
@@ -434,15 +434,17 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
 	bool showOldSettings = initAdvancedTab();
     if ( showOldSettings )
     {
-        QVariant id;
-        if (m_camera && m_camera->getParam(lit("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
+        if (!m_camera)
+            return;
+        QString id = m_camera->getProperty(lit("cameraSettingsId"));
+        if (!id.isNull())
         {
             QnMediaServerConnectionPtr serverConnection = getServerConnection();
             if (serverConnection.isNull()) {
                 return;
             }
 
-            CameraSettingsTreeLister lister(id.toString());
+            CameraSettingsTreeLister lister(id);
             QStringList settings = lister.proceed();
 
 #if 0

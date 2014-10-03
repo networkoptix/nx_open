@@ -23,12 +23,12 @@ public:
     bool hasProperty(const QnUuid& resourceId, const QString& key) const;
     ec2::ApiResourceParamDataList allProperties(const QnUuid& resourceId) const;
 private:
-    void addToUnsavedParams(const QnUuid& resourceId, const ec2::ApiResourceParamDataList& params);
+    void addToUnsavedParams(const ec2::ApiResourceParamWithRefDataList& params);
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 private:
     QMap<QnUuid, QnResourcePropertyList> m_items;
     QMap<QnUuid, QnResourcePropertyList> m_modifiedItems;
-    QMap<int, ec2::ApiResourceParamListWithIdData> m_requestInProgress;
+    QMap<int, ec2::ApiResourceParamWithRefDataList> m_requestInProgress;
     mutable QMutex m_mutex;
 };
 
