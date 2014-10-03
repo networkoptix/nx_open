@@ -10,7 +10,7 @@
                         <input id="legend-checkbox{{$index}}" type="checkbox" ng-model="dataset.show" ng-change="updateVisibleDatasets()"/>
                         <label for="legend-checkbox{{$index}}" style="background-color:{{dataset.strokeColor}}" ></label>
                     </span>
-                    {{dataset.label}}
+                    {{dataset.label}} ({{(dataset.data[dataset.data.length-1] ).toFixed(0)}}%)
                 </label>
             </li>
         </ul>

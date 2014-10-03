@@ -77,7 +77,7 @@ angular.module('webadminApp')
                 }
                 alert("Error: " + errorToShow);
             }else if (r.data.reply.restartNeeded) {
-                if (confirm("Changes will be applied after restart. Do you want to restart server now?")) {
+                if (confirm("All changes saved. New settings will be applied after restart. \n Do you want to restart server now?")) {
                     restartServer();
                 }
             } else {
