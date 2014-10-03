@@ -471,12 +471,12 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
 
 bool QnDbManager::addTransactionForGeneralSettings()
 {
-    ApiResourceParamsData object;
+    ApiResourceParamListWithIdData object;
     ErrorCode errCode = doQueryNoLock(m_adminUserID, object);
     if (errCode != ErrorCode::ok)
         return false;
 
-    QnTransaction<ApiResourceParamsData> transaction(ApiCommand::setResourceParams);
+    QnTransaction<ApiResourceParamListWithIdData> transaction(ApiCommand::setResourceParams);
     transactionLog->fillPersistentInfo(transaction);
     transaction.params = object;
     if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
@@ -997,18 +997,14 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
     if (*internalId == 0)
         *internalId = query.lastInsertId().toInt();
 
+#if 0
     if (!data.addParams.empty()) 
     {
-        /*
-        ErrorCode result = deleteAddParams(*internalId);
-        if (result != ErrorCode::ok)
-            return result;
-        */
         ErrorCode result = insertAddParams(data.addParams, *internalId);
         if (result != ErrorCode::ok)
             return result;
     }
-
+#endif
     return ErrorCode::ok;
 }
 
@@ -1030,17 +1026,14 @@ ErrorCode QnDbManager::updateResource(const ApiResourceData& data, qint32 intern
         return ErrorCode::dbError;
     }
 
+#if 0
     if (!data.addParams.empty()) 
     {
-        /*
-        ErrorCode result = deleteAddParams(internalId);
-        if (result != ErrorCode::ok)
-            return result;
-        */
         result = insertAddParams(data.addParams, internalId);
         if (result != ErrorCode::ok)
             return result;
     }
+#endif
     return ErrorCode::ok;
 }
 
@@ -1664,7 +1657,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUpdateU
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourceParamsData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourceParamListWithIdData>& tran)
 {
     qint32 internalId = getResourceInternalId(tran.params.id);
     /*
@@ -2616,7 +2609,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRule
 }
 
 // getKVPairs
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ApiResourceParamsData& params)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ApiResourceParamListWithIdData& params)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -2716,7 +2709,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
 //getParams
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data)
 {
-    ApiResourceParamsData params;
+    ApiResourceParamListWithIdData params;
     ErrorCode rez = doQueryNoLock(m_adminUserID, params);
     if (rez == ErrorCode::ok)
         data = params.params;

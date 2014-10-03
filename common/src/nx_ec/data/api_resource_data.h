@@ -10,7 +10,7 @@ namespace ec2
     struct ApiResourceParamData: ApiData
     {
         ApiResourceParamData() {}
-        ApiResourceParamData(const QString& name, const QString& value, bool predefinedParam): value(value), name(name), predefinedParam(predefinedParam) {}
+        ApiResourceParamData(const QString& name, const QString& value, bool predefinedParam = false): value(value), name(name), predefinedParam(predefinedParam) {}
 
         QString value;
         QString name;
@@ -26,12 +26,12 @@ namespace ec2
 #define ApiResourceParamWithRefData_Fields ApiResourceParamData_Fields (resourceId)
 
 
-    struct ApiResourceParamsData: ApiData
+    struct ApiResourceParamListWithIdData: ApiData
     {
         QnUuid id;
         std::vector<ApiResourceParamData> params;
     };
-#define ApiResourceParamsData_Fields (id)(params)
+#define ApiResourceParamListWithIdData_Fields (id)(params)
 
 
     struct ApiResourceData: ApiData {

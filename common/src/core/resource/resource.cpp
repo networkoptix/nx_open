@@ -24,6 +24,7 @@
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include "resource_command.h"
+#include "nx_ec/data/api_resource_data.h"
 
 bool QnResource::m_appStopping = false;
 QnInitResPool QnResource::m_initAsyncPool;
@@ -208,7 +209,7 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode)
     afterUpdateInner(modifiedFields);
 
     QnParamList paramList = other->getResourceParamList();
-    foreach(QnParam param, paramList.list())
+    foreach(QnParam param, paramList.values())
     {
         if (param.domain() == QnDomainDatabase)
         {
@@ -217,8 +218,8 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode)
     }
 
     //silently ignoring missing properties because of removeProperty method lack
-    for (const QnKvPair &param: other->getProperties()) {
-        setProperty(param.name(), param.value());   //here "propertyChanged" will be called
+    for (const ec2::ApiResourceParamData &param: other->getProperties()) {
+        setProperty(param.name, param.value);   //here "propertyChanged" will be called
     }
 
     foreach (QnResourceConsumer *consumer, m_consumers)
@@ -367,7 +368,7 @@ QnParamList QnResource::getResourceParamList() const
         for (int i = 0; i < params.size(); ++i)
         {
             QnParam newParam(params[i], params[i]->default_value);
-            resourceParamList.append(newParam);
+            resourceParamList.insert(newParam.name(), newParam);
         }
     }
 
@@ -807,12 +808,12 @@ void QnResource::setProperty(const QString &key, const QString &value) {
     emit propertyChanged(toSharedPointer(this), key);
 }
 
-QnKvPairList QnResource::getProperties() const {
+ec2::ApiResourceParamDataList QnResource::getProperties() const {
     QMutexLocker mutexLocker(&m_mutex);
     
-    QnKvPairList result;
+    ec2::ApiResourceParamDataList result;
     for(auto pos = m_propertyByKey.begin(); pos != m_propertyByKey.end(); pos++)
-        result.push_back(QnKvPair(pos.key(), pos.value()));
+        result.push_back(ec2::ApiResourceParamData(pos.key(), pos.value()));
     return result;
 }
 

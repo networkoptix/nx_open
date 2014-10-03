@@ -18,8 +18,9 @@ namespace ec2
         ApiCameraServerItemDataList cameraHistory;
         ApiLicenseDataList licenses;
         ApiDiscoveryDataList discoveryData;
+        ApiResourceParamDataList allResParams;
     };
-#define ApiFullInfoData_Fields (resourceTypes)(servers)(cameras)(cameraUserAttributesList)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(discoveryData)
+#define ApiFullInfoData_Fields (resourceTypes)(servers)(cameras)(cameraUserAttributesList)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(discoveryData)(allResParams)
 
 } // namespace ec2
 

@@ -96,7 +96,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     switch (transaction.command) {
     case ApiCommand::getFullInfo:           return handleTransactionParams<ApiFullInfoData>         (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::setResourceStatus:     return handleTransactionParams<ApiSetResourceStatusData>(serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::setResourceParams:     return handleTransactionParams<ApiResourceParamsData>   (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::setResourceParams:     return handleTransactionParams<ApiResourceParamListWithIdData>   (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::saveResource:          return handleTransactionParams<ApiResourceData>         (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::removeResource:        return handleTransactionParams<ApiIdData>               (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::setPanicMode:          return handleTransactionParams<ApiPanicModeData>        (serializedTransaction, &stream, transaction, function, fastFunction);

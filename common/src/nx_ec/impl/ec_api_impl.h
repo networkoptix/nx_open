@@ -158,8 +158,8 @@ namespace ec2
             //void emitSetResourceDisabledDone( int reqID, const ErrorCode p1, const QnUuid& p2 ) { emit onSetResourceDisabledDone( reqID, p1, p2 ); }
             void emitGetResourcesDone( int reqID, const ErrorCode p1, const QnResourceList& p2 ) { emit onGetResourcesDone( reqID, p1, p2 ); }
             void emitGetResourceDone( int reqID, const ErrorCode p1, const QnResourcePtr& p2 ) { emit onGetResourceDone( reqID, p1, p2 ); }
-            void emitGetKvPairsDone( int reqID, const ErrorCode p1, const QnKvPairListsById& p2 ) { emit onGetKvPairsDone( reqID, p1, p2 ); }
-            void emitSaveKvPairsDone( int reqID, const ErrorCode p1, const QnKvPairListsById& p2 ) { emit onSaveKvPairsDone( reqID, p1, p2 ); }
+            void emitGetKvPairsDone( int reqID, const ErrorCode p1, const ApiResourceParamListWithIdData& p2 ) { emit onGetKvPairsDone( reqID, p1, p2 ); }
+            void emitSaveKvPairsDone( int reqID, const ErrorCode p1, const ApiResourceParamListWithIdData& p2 ) { emit onSaveKvPairsDone( reqID, p1, p2 ); }
             void emitSaveServerDone( int reqID, const ErrorCode p1, const QnMediaServerResourcePtr& p2) { emit onSaveServerDone( reqID, p1, p2 ); }
             void emitSaveBusinessRuleDone( int reqID, const ErrorCode p1, const QnBusinessEventRulePtr& p2) { emit onSaveBusinessRuleDone( reqID, p1, p2 ); }
             void emitGetServersDone( int reqID, const ErrorCode p1, const QnMediaServerResourceList& p2 ) { emit onGetServersDone( reqID, p1, p2 ); }
@@ -190,8 +190,8 @@ namespace ec2
             //void onSetResourceDisabledDone( int reqID, const ErrorCode, const QnUuid& );
             void onGetResourcesDone( int reqID, const ErrorCode, const QnResourceList& );
             void onGetResourceDone( int reqID, const ErrorCode, const QnResourcePtr& );
-            void onGetKvPairsDone( int reqID, const ErrorCode, const QnKvPairListsById& );
-            void onSaveKvPairsDone( int reqID, const ErrorCode, const QnKvPairListsById& );
+            void onGetKvPairsDone( int reqID, const ErrorCode, const ApiResourceParamListWithIdData& );
+            void onSaveKvPairsDone( int reqID, const ErrorCode, const ApiResourceParamListWithIdData& );
             void onSaveServerDone( int reqID, const ErrorCode, const QnMediaServerResourcePtr&);
             void onSaveBusinessRuleDone( int reqID, const ErrorCode, const QnBusinessEventRulePtr&);
             void onGetServersDone( int reqID, const ErrorCode, const QnMediaServerResourceList& );
@@ -232,8 +232,8 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER( GetResourceTypes, ErrorCode, QnResourceTypeList )
         DEFINE_TWO_ARG_HANDLER( GetResources, ErrorCode, QnResourceList )
         DEFINE_TWO_ARG_HANDLER( GetResource, ErrorCode, QnResourcePtr )
-        DEFINE_TWO_ARG_HANDLER( GetKvPairs, ErrorCode, QnKvPairListsById )
-        DEFINE_TWO_ARG_HANDLER( SaveKvPairs, ErrorCode, QnKvPairListsById )
+        DEFINE_TWO_ARG_HANDLER( GetKvPairs, ErrorCode, ApiResourceParamListWithIdData )
+        DEFINE_TWO_ARG_HANDLER( SaveKvPairs, ErrorCode, ApiResourceParamListWithIdData )
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractMediaServerManager

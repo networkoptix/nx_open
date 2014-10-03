@@ -54,17 +54,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         
-        auto queryDoneHandler = [reqID, handler, resourceId]( ErrorCode errorCode, const ApiResourceParamsData& params) {
-            QnKvPairListsById outData;
-            outData.insert(resourceId, QnKvPairList());
-            if( errorCode == ErrorCode::ok ) {
-                QnKvPairList& outParams = outData.begin().value();
-                foreach(const ApiResourceParamData& param, params.params)
-                    outParams << QnKvPair(param.name, param.value);
-            }
+        auto queryDoneHandler = [reqID, handler, resourceId]( ErrorCode errorCode, const ApiResourceParamListWithIdData& params) {
+            ApiResourceParamListWithIdData outData;
+            if( errorCode == ErrorCode::ok )
+                outData = params;
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<QnUuid, ApiResourceParamsData, decltype(queryDoneHandler)>
+        m_queryProcessor->template processQueryAsync<QnUuid, ApiResourceParamListWithIdData, decltype(queryDoneHandler)>
             ( ApiCommand::getResourceParams, resourceId, queryDoneHandler );
         return reqID;
     }
@@ -85,13 +81,14 @@ namespace ec2
 
 
     template<class T>
-    int QnResourceManager<T>::save( const QnUuid& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, impl::SaveKvPairsHandlerPtr handler )
+    int QnResourceManager<T>::save( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, bool isPredefinedParams, impl::SaveKvPairsHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         ApiCommand::Value command = ApiCommand::setResourceParams;
         auto tran = prepareTransaction( command, resourceId, kvPairs, isPredefinedParams );
-        QnKvPairListsById outData;
-        outData.insert(resourceId, kvPairs);
+        ApiResourceParamListWithIdData outData;
+        outData.id = resourceId;
+        outData.params = kvPairs;
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveKvPairsHandler::done ), handler, reqID, _1, outData) );
 
@@ -120,15 +117,13 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    QnTransaction<ApiResourceParamsData> QnResourceManager<QueryProcessorType>::prepareTransaction(
+    QnTransaction<ApiResourceParamListWithIdData> QnResourceManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value command,
-        const QnUuid& id, const QnKvPairList& kvPairs, bool isPredefinedParams)
+        const QnUuid& id, const ec2::ApiResourceParamDataList& kvPairs, bool isPredefinedParams)
     {
-        QnTransaction<ApiResourceParamsData> tran(command);
-        tran.params.params.reserve(kvPairs.size());
-        foreach(const QnKvPair& pair, kvPairs)
-            tran.params.params.push_back(ApiResourceParamData(pair.name(), pair.value(), isPredefinedParams));
+        QnTransaction<ApiResourceParamListWithIdData> tran(command);
         tran.params.id = id;
+        tran.params.params = kvPairs;
         return tran;
     }
 

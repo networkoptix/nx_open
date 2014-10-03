@@ -63,6 +63,7 @@
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_lock_data.h>
 #include <nx_ec/data/api_discovery_data.h>
+#include <nx_ec/data/api_resource_data.h>
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -88,10 +89,6 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnParam>();
     
-    qRegisterMetaType<QnKvPair>();
-    qRegisterMetaType<QnKvPairList>();
-    qRegisterMetaType<QnKvPairListsById>();
-
     qRegisterMetaType<QnResourceTypeList>();
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
@@ -219,6 +216,11 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" ); 
     qRegisterMetaType<ec2::ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); 
     qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" ); 
+
+    qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamData");
+    qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamDataList");
+    qRegisterMetaType<ec2::ApiResourceParamListWithIdData>("ApiResourceParamListWithIdData");
+
 
     qRegisterMetaType<QnUuid>( "QnUuid" );
     qRegisterMetaTypeStreamOperators<QnUuid>( "QnUuid" );

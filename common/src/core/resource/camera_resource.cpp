@@ -8,7 +8,7 @@
 
 #include <api/app_server_connection.h>
 #include "nx_ec/dummy_handler.h"
-
+#include "nx_ec/data/api_resource_data.h"
 
 static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
@@ -235,15 +235,15 @@ void QnVirtualCameraResource::forceDisableAudio()
 void QnVirtualCameraResource::saveParams()
 {
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    QnKvPairList params;
+    ec2::ApiResourceParamDataList params;
 
-    foreach(const QnParam& param, getResourceParamList().list())
+    foreach(const QnParam& param, getResourceParamList().values())
     {
         if (param.domain() == QnDomainDatabase)
-            params << QnKvPair(param.name(), param.value().toString());
+            params.push_back(ec2::ApiResourceParamData(param.name(), param.value().toString()));
     }
 
-    QnKvPairListsById  outData;
+    ec2::ApiResourceParamListWithIdData outData;
     ec2::ErrorCode rez = conn->getResourceManager()->saveSync(getId(), params, true, &outData);
 
     if (rez != ec2::ErrorCode::ok) {
@@ -254,11 +254,11 @@ void QnVirtualCameraResource::saveParams()
 
 void QnVirtualCameraResource::saveParamsAsync()
 {
-    QnKvPairList params;
-    foreach(const QnParam& param, getResourceParamList().list())
+    ec2::ApiResourceParamDataList params;
+    foreach(const QnParam& param, getResourceParamList().values())
     {
         if (param.domain() == QnDomainDatabase)
-            params << QnKvPair(param.name(), param.value().toString());
+            params.push_back(ec2::ApiResourceParamData(param.name(), param.value().toString()));
     }
     QnAppServerConnectionFactory::getConnection2()->getResourceManager()->save(getId(), params, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }

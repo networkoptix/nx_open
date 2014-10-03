@@ -144,7 +144,7 @@ namespace ec2
     }
     */
 
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceParamsData>& tran ) {
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceParamListWithIdData>& tran ) {
         m_resourceManager->triggerNotification( tran );
     }
 

@@ -37,7 +37,7 @@ namespace ec2 {
     struct ApiResourceData;
     struct ApiResourceParamData;
     struct ApiResourceParamWithRefData;
-    struct ApiResourceParamsData;
+    struct ApiResourceParamListWithIdData;
     struct ApiResourceTypeData;
     struct ApiScheduleTaskData;
     struct ApiScheduleTaskWithRefData;
@@ -93,7 +93,7 @@ namespace ec2 {
     typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
     typedef std::vector<ApiPropertyTypeData> ApiPropertyTypeDataList;
     typedef std::vector<ApiResourceData> ApiResourceDataList;
-    typedef std::vector<ApiResourceParamData> ApiResourceParamDataList; // TODO: 
+    typedef std::vector<ApiResourceParamData> ApiResourceParamDataList;
     typedef std::vector<ApiResourceTypeData> ApiResourceTypeDataList;
     typedef std::vector<ApiStorageData> ApiStorageDataList;
     typedef std::vector<ApiUserData> ApiUserDataList;
@@ -130,7 +130,7 @@ namespace ec2 {
     (ApiResourceData)\
     (ApiResourceParamData)\
     (ApiResourceParamWithRefData)\
-    (ApiResourceParamsData)\
+    (ApiResourceParamListWithIdData)\
     (ApiResourceTypeData)\
     (ApiScheduleTaskData)\
     (ApiScheduleTaskWithRefData)\

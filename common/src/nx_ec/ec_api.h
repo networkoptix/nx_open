@@ -22,6 +22,7 @@
 
 #include <nx_ec/impl/ec_api_impl.h>
 #include <nx_ec/impl/sync_handler.h>
+#include <nx_ec/data/api_resource_data.h>
 #include <nx_ec/data/api_email_data.h>
 #include <nx_ec/data/api_server_alive_data.h>
 #include <nx_ec/data/api_time_data.h>
@@ -107,7 +108,7 @@ namespace ec2
         }
 
         /*!
-            \param handler Functor with params: (ErrorCode, const QnKvPairListsById&)
+            \param handler Functor with params: (ErrorCode, const ApiResourceParamListWithIdData&)
         */
         template<class TargetType, class HandlerType> 
         int getKvPairs( const QnUuid& resourceId, TargetType* target, HandlerType handler ) {
@@ -122,14 +123,14 @@ namespace ec2
 
        
         /*!
-            \param handler Functor with params: (ErrorCode, const QnKvPairListsById&)
+            \param handler Functor with params: (ErrorCode, const ApiResourceParamListWithIdData&)
         */
         template<class TargetType, class HandlerType> 
-        int save( const QnUuid& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, TargetType* target, HandlerType handler ) {
+        int save( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, bool isPredefinedParams, TargetType* target, HandlerType handler ) {
             return save(resourceId, kvPairs,  isPredefinedParams, std::static_pointer_cast<impl::SaveKvPairsHandler>(std::make_shared<impl::CustomSaveKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode saveSync( const QnUuid& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, QnKvPairListsById* const outData) {
+        ErrorCode saveSync( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, bool isPredefinedParams, ApiResourceParamListWithIdData* const outData) {
             return impl::doSyncCall<impl::SaveKvPairsHandler>( 
                 [=](const impl::SaveKvPairsHandlerPtr &handler) {
                     return this->save(resourceId, kvPairs, isPredefinedParams, handler);
@@ -152,7 +153,7 @@ namespace ec2
         void statusChanged( const QnUuid& resourceId, Qn::ResourceStatus status );
         //void disabledChanged( const QnUuid& resourceId, bool disabled );
         void resourceChanged( const QnResourcePtr& resource );
-        void resourceParamsChanged( const QnUuid& resourceId, const QnKvPairList& kvPairs );
+        void resourceParamsChanged( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs );
         void resourceRemoved( const QnUuid& resourceId );
 
     protected:
@@ -161,7 +162,7 @@ namespace ec2
         //virtual int setResourceDisabled( const QnUuid& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) = 0;
         virtual int getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
         //virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) = 0;
-        virtual int save( const QnUuid& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, impl::SaveKvPairsHandlerPtr handler ) = 0;
+        virtual int save( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs, bool isPredefinedParams, impl::SaveKvPairsHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
 
@@ -987,7 +988,7 @@ namespace ec2
         void remotePeerLost(ApiPeerAliveData data);
         void remotePeerUnauthorized(const QnUuid& id);
 
-        void settingsChanged(QnKvPairList settings);
+        void settingsChanged(ec2::ApiResourceParamDataList settings);
         void panicModeChanged(Qn::PanicMode mode);
 
         void databaseDumped();

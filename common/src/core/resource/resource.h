@@ -16,16 +16,14 @@
 #include <utils/common/model_functions_fwd.h>
 #include <utils/common/id.h>
 
-#include <core/datapacket/abstract_data_packet.h>
 #include <core/ptz/ptz_fwd.h>
 
 #include <common/common_globals.h>
-
+#include "resource_command_processor.h"
 #include "shared_resource_pointer.h"
 #include "resource_fwd.h"
 #include "resource_type.h"
 #include "param.h"
-#include "resource_command_processor.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
@@ -197,7 +195,7 @@ public:
     bool hasProperty(const QString &key) const;
     QString getProperty(const QString &key, const QString &defaultValue = QString()) const;
     void setProperty(const QString &key, const QString &value);
-    QnKvPairList getProperties() const;
+    ec2::ApiResourceParamDataList getProperties() const;
 
     static QnInitResPool* initAsyncPoolInstance();
 
@@ -237,7 +235,7 @@ public:
     // this is thread to process commands like setparam
     static void startCommandProc();
     static void stopCommandProc();
-    static void addCommandToProc(const QnResourceCommandPtr &command);
+    static void addCommandToProc(const QSharedPointer<QnResourceCommand> &command);
     static int commandProcQueueSize();
 #endif
 
