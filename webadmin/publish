@@ -1,0 +1,7 @@
+hg pull
+hg up
+grunt build
+rm -rf ../mediaserver/maven/bin-resources/resources/static/*
+cp -rf dist/* ../mediaserver/maven/bin-resources/resources/static/
+hg addremove
+hg stat
