@@ -39,23 +39,10 @@ QnAbstractStreamDataProvider* QnArecontPanoramicResource::createLiveDataProvider
 bool QnArecontPanoramicResource::getParamPhysical(int channel, const QString& name, QVariant &val)
 {
     m_mutex.lock();
-    if (!m_resourceParamList.contains(name))
-    {
-        m_mutex.unlock();
-        return false;
-    }
-
-    QnParam param = m_resourceParamList[name];
     m_mutex.unlock();
 
-    if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
-        return false;
-
     CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
-
-    
-
-    QString request = QLatin1String("get") + QString::number(channel) + QLatin1String("?") + param.netHelper();
+    QString request = QLatin1String("get") + QString::number(channel) + QLatin1String("?") + name;
 
     CLHttpStatus status = connection.doGET(request);
     if (status == CL_HTTP_AUTH_REQUIRED)

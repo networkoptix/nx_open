@@ -352,38 +352,6 @@ QnResourcePtr QnResource::getParentResource() const
         return QnResourcePtr();
 }
 
-/*
-QnParamList QnResource::getResourceParamList() const
-{
-    QMutexLocker mutexLocker(&m_mutex);
-    
-    if (!m_resourceParamList.isEmpty())
-        return m_resourceParamList;
-    QnUuid resTypeId = m_typeId;
-    
-    QnParamList resourceParamList;
-
-    // 2. read AppServer params 
-    if (QnResourceTypePtr resType = qnResTypePool->getResourceType(resTypeId)) 
-    {
-        Q_ASSERT(resType);
-
-        const QList<QnParamTypePtr>& params = resType->paramTypeList();
-        //Q_ASSERT(params.size() != 0);
-        for (int i = 0; i < params.size(); ++i)
-        {
-            QnParam newParam(params[i], params[i]->default_value);
-            resourceParamList.insert(newParam.name(), newParam);
-        }
-    }
-
-    if (m_resourceParamList.isEmpty())
-        m_resourceParamList = resourceParamList;
-
-    return m_resourceParamList;
-}
-*/
-
 bool QnResource::hasParam(const QString &name) const
 {
     QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId); 
@@ -417,136 +385,6 @@ void QnResource::getParamPhysicalAsync(const QString& name)
 }
 
 #endif
-
-void QnResource::parameterValueChangedNotify(const QnParam &param) {
-    if(param.name() == lit("ptzCapabilities"))
-        emit ptzCapabilitiesChanged(::toSharedPointer(this));
-    else if(param.name() == lit("VideoLayout"))
-        emit videoLayoutChanged(::toSharedPointer(this));
-
-    emit parameterValueChanged(::toSharedPointer(this), param);
-}
-
-/*
-
-bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain) const
-{
-    const QnParamList& resourceParamList = getResourceParamList();
-    QnParamList::const_iterator paramIter = resourceParamList.find( name );
-    if ( paramIter == resourceParamList.cend() )
-    {
-        emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, QVariant(), false);
-        return false;
-    }
-
-    const QnParam& param = paramIter.value();
-    val = param.value();
-
-    if (domain == QnDomainMemory)
-    {
-        emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, val, true);
-        return true;
-    }
-    else if (domain == QnDomainPhysical)
-    {
-        QVariant newValue;
-        if (param.isPhysical() && const_cast<QnResource*>(this)->getParamPhysical(param, newValue)) {
-            if (val != newValue) {
-                val = newValue;
-                m_mutex.lock();
-                //param.setValue(newValue);
-                m_resourceParamList[name].setValue(newValue);
-                m_mutex.unlock();
-                const_cast<QnResource *>(this)->parameterValueChangedNotify(param); // TODO: wtf???
-            }
-            emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, newValue, true);
-            return true;
-        }
-    }
-    else if (domain == QnDomainDatabase)
-    {
-        if (param.isPhysical())
-        {
-            emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, val, true);
-            return true;
-        }
-    }
-
-    emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, QVariant(), false);
-    return false;
-}
-
-bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain domain)
-{
-    if (setSpecialParam(name, val, domain))
-    {
-        emit asyncParamSetDone(toSharedPointer(this), name, val, true);
-        return true;
-    }
-
-    const QnParamList& resourceParamList = getResourceParamList(); // paramList loaded once. No more changes, instead of param value. So, use mutex for value only
-    if (!resourceParamList.contains(name))
-    {
-        qWarning() << "Can't set parameter. Parameter" << name << "does not exists for resource" << getName();
-        emit asyncParamSetDone(toSharedPointer(this), name, val, false);
-        return false;
-    }
-
-
-    m_mutex.lock();
-    QnParam param = m_resourceParamList[name];
-    if (param.isReadOnly())
-    {
-        NX_LOG("setParam: cannot set readonly param!", cl_logWARNING);
-        m_mutex.unlock();
-        emit asyncParamSetDone(toSharedPointer(this), name, val, false);
-        return false;
-    }
-    param.setDomain(domain);
-
-    QVariant oldValue = param.value();
-    m_mutex.unlock();
-
-    if (domain == QnDomainPhysical)
-    {
-        if (!param.isPhysical() || !setParamPhysical(param, val))
-        {
-            emit asyncParamSetDone(toSharedPointer(this), name, val, false);
-            return false;
-        }
-    }
-
-    //QnDomainMemory should be changed anyway
-    {
-        QMutexLocker locker(&m_mutex); // block paramList changing
-        QnParam& param = m_resourceParamList[name];
-        param.setDomain(domain);
-        if (!param.setValue(val))
-        {
-            locker.unlock();
-            NX_LOG( lit("cannot set such param %1!").arg(name), cl_logWARNING );
-            emit asyncParamSetDone(toSharedPointer(this), name, val, false);
-            return false;
-        }
-    }
-
-    if (oldValue != val)
-        parameterValueChangedNotify(param);
-
-    emit asyncParamSetDone(toSharedPointer(this), name, val, true);
-    return true;
-}
-
-#ifdef ENABLE_DATA_PROVIDERS
-void QnResource::getParamAsync(const QString &name, QnDomain domain)
-{
-    QnResourceGetParamCommandPtr command(new QnResourceGetParamCommand(toSharedPointer(this), name, domain));
-    addCommandToProc(command);
-}
-
-#endif // ENABLE_DATA_PROVIDERS
-*/
-
 
 bool QnResource::unknownResource() const
 {
@@ -832,6 +670,12 @@ void QnResource::setProperty(const QString &key, const QString &value) {
             return;
         m_propertyByKey[key] = value;
     }
+
+    if(key == lit("ptzCapabilities"))
+        emit ptzCapabilitiesChanged(::toSharedPointer(this));
+    else if(key == lit("VideoLayout"))
+        emit videoLayoutChanged(::toSharedPointer(this));
+
     emit propertyChanged(toSharedPointer(this), key);
 }
 

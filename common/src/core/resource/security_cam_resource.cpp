@@ -461,13 +461,6 @@ void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability,
     setCameraCapabilities(value ? (getCameraCapabilities() | capability) : (getCameraCapabilities() & ~capability));
 }
 
-void QnSecurityCamResource::parameterValueChangedNotify(const QnParam &param) {
-    if (param.name() == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
-        emit cameraCapabilitiesChanged(::toSharedPointer(this));
-
-    base_type::parameterValueChangedNotify(param);
-}
-
 bool QnSecurityCamResource::isRecordingEventAttached() const {
     return m_recActionCnt > 0;
 }

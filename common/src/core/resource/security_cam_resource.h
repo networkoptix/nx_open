@@ -209,7 +209,6 @@ public slots:
 signals:
     void scheduleDisabledChanged(const QnSecurityCamResourcePtr &resource);
     void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
-    void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
     void groupNameChanged(const QnSecurityCamResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
@@ -251,8 +250,6 @@ protected:
     */
     virtual void stopInputPortMonitoring();
     virtual bool isInputPortMonitored() const;
-
-    virtual void parameterValueChangedNotify(const QnParam &param) override;
 
 private:
     //QList<QnMotionRegion> m_motionMaskList;

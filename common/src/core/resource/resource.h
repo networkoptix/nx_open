@@ -200,7 +200,7 @@ public:
     static QnInitResPool* initAsyncPoolInstance();
 
 signals:
-    void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param) const;
+    void parameterValueChanged(const QnResourcePtr &resource, const QString &param) const;
     void statusChanged(const QnResourcePtr &resource);
     void nameChanged(const QnResourcePtr &resource);
     void parentIdChanged(const QnResourcePtr &resource);
@@ -268,8 +268,6 @@ protected:
         Inherited class implementation MUST call base class method first
     */
     virtual void initializationDone();
-
-    virtual void parameterValueChangedNotify(const QnParam &param);
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */
@@ -296,8 +294,6 @@ protected:
     /** Mutex that is to be used when accessing resource fields. */
     mutable QMutex m_mutex;
     QMutex m_initMutex;
-
-    mutable QnParamList m_resourceParamList;
 
     static bool m_appStopping;
 

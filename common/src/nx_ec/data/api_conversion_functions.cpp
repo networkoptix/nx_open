@@ -624,23 +624,8 @@ void fromApiToResourceList(const ApiResourceParamDataList &src, ec2::ApiResource
 void fromApiToResource(const ApiPropertyTypeData &src, QnParamTypePtr &dst) {
     //resource->id = id;
     dst->name = src.name;
-    dst->type = src.type;
-    dst->min_val = src.min;
-    dst->max_val = src.max;
-    dst->step = src.step;
-    foreach(const QString &val, src.values.split(QLatin1Char(',')))
-        dst->possible_values << val.trimmed();
-    foreach(const QString &val, src.uiValues.split(QLatin1Char(',')))
-        dst->ui_possible_values << val.trimmed();
     dst->default_value = src.defaultValue;
-    dst->group = src.group;
-    dst->subgroup = src.subGroup;
-    dst->description = src.description;
-    dst->ui = src.ui;
-    dst->isReadOnly = src.readOnly;
-    dst->paramNetHelper = src.internalData;
 }
-
 
 void fromApiToResource(const ApiResourceTypeData &src, QnResourceTypePtr &dst) {
     dst->setId(src.id);
