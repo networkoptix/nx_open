@@ -243,7 +243,7 @@ void QnVirtualCameraResource::saveParams()
             params.push_back(ec2::ApiResourceParamData(param.name(), param.value().toString()));
     }
 
-    ec2::ApiResourceParamListWithIdData outData;
+    ec2::ApiResourceParamWithRefDataList outData;
     ec2::ErrorCode rez = conn->getResourceManager()->saveSync(getId(), params, true, &outData);
 
     if (rez != ec2::ErrorCode::ok) {

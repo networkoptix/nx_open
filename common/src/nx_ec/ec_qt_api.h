@@ -37,7 +37,7 @@ namespace ec2
             void emitGetResourceTypesDone( const ErrorCode p1, const QnResourceTypeList& p2 ) { emit onGetResourceTypesDone( p1, p2 ); }
             void emitGetResourcesDone( const ErrorCode p1, const QnResourceList& p2 ) { emit onGetResourcesDone( p1, p2 ); }
             void emitGetResourceDone( const ErrorCode p1, const QnResourcePtr& p2 ) { emit onGetResourceDone( p1, p2 ); }
-            void emitGetKvPairsDone( const ErrorCode p1, const ApiResourceParamListWithIdData& p2 ) { emit onGetKvPairsDone( p1, p2 ); }
+            void emitGetKvPairsDone( const ErrorCode p1, const ApiResourceParamWithRefDataList& p2 ) { emit onGetKvPairsDone( p1, p2 ); }
             void emitSaveServerDone( const ErrorCode p1, const QnMediaServerResourceList& p2) { emit onSaveServerDone( p1, p2); }
             void emitGetServersDone( const ErrorCode p1, const QnMediaServerResourceList& p2 ) { emit onGetServersDone( p1, p2 ); }
             void emitAddCameraDone( const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( p1, p2 ); }
@@ -59,7 +59,7 @@ namespace ec2
             void onGetResourceTypesDone( const ErrorCode, const QnResourceTypeList& );
             void onGetResourcesDone( const ErrorCode, const QnResourceList& );
             void onGetResourceDone( const ErrorCode, const QnResourcePtr& );
-            void onGetKvPairsDone( const ErrorCode, const ApiResourceParamListWithIdData& );
+            void onGetKvPairsDone( const ErrorCode, const ApiResourceParamWithRefDataList& );
             void onSaveServerDone( const ErrorCode, const QnMediaServerResourceList&);
             void onGetServersDone( const ErrorCode, const QnMediaServerResourceList& );
             void onAddCameraDone( const ErrorCode, const QnVirtualCameraResourceList& );

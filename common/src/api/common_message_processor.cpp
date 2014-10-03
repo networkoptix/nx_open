@@ -56,7 +56,7 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     auto resourceManager = connection->getResourceManager();
     connect(resourceManager, &ec2::AbstractResourceManager::resourceChanged,        this, [this](const QnResourcePtr &resource){updateResource(resource);});
     connect(resourceManager, &ec2::AbstractResourceManager::statusChanged,          this, &QnCommonMessageProcessor::on_resourceStatusChanged );
-    connect(resourceManager, &ec2::AbstractResourceManager::resourceParamsChanged,  this, &QnCommonMessageProcessor::on_resourceParamsChanged );
+    connect(resourceManager, &ec2::AbstractResourceManager::resourceParamChanged,   this, &QnCommonMessageProcessor::on_resourceParamChanged );
     connect(resourceManager, &ec2::AbstractResourceManager::resourceRemoved,        this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto mediaServerManager = connection->getMediaServerManager();
@@ -208,14 +208,13 @@ void QnCommonMessageProcessor::on_resourceStatusChanged( const QnUuid& resourceI
         onResourceStatusChanged(resource, status);
 }
 
-void QnCommonMessageProcessor::on_resourceParamsChanged( const QnUuid& resourceId, const ec2::ApiResourceParamDataList& kvPairs )
+void QnCommonMessageProcessor::on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param )
 {
-    QnResourcePtr resource = qnResPool->getResourceById(resourceId);
+    QnResourcePtr resource = qnResPool->getResourceById(param.resourceId);
     if (!resource)
         return;
 
-    foreach (const ec2::ApiResourceParamData &pair, kvPairs)
-        resource->setProperty(pair.name, pair.value);
+    resource->setProperty(param.name, param.value);
 }
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )

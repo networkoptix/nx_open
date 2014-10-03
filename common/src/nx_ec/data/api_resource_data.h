@@ -20,17 +20,11 @@ namespace ec2
 
     struct ApiResourceParamWithRefData: ApiResourceParamData
     {
+        ApiResourceParamWithRefData() {}
+        ApiResourceParamWithRefData(const QnUuid& resourceId, const QString& name, const QString& value): resourceId(resourceId), ApiResourceParamData(name, value) {}
         QnUuid resourceId;
     };
 #define ApiResourceParamWithRefData_Fields ApiResourceParamData_Fields (resourceId)
-
-
-    struct ApiResourceParamListWithIdData: ApiData
-    {
-        QnUuid id;
-        std::vector<ApiResourceParamData> params;
-    };
-#define ApiResourceParamListWithIdData_Fields (id)(params)
 
 
     struct ApiResourceData: ApiData {

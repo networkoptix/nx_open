@@ -439,12 +439,12 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
 
 bool QnDbManager::addTransactionForGeneralSettings()
 {
-    ApiResourceParamListWithIdData object;
+    ApiResourceParamWithRefDataList object;
     ErrorCode errCode = doQueryNoLock(m_adminUserID, object);
     if (errCode != ErrorCode::ok)
         return false;
 
-    QnTransaction<ApiResourceParamListWithIdData> transaction(ApiCommand::setResourceParams);
+    QnTransaction<ApiResourceParamWithRefDataList> transaction(ApiCommand::setResourceParams);
     transactionLog->fillPersistentInfo(transaction);
     transaction.params = object;
     if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
@@ -858,27 +858,26 @@ QnDbManager* QnDbManager::instance()
     return globalInstance;
 }
 
-ErrorCode QnDbManager::insertAddParams(const std::vector<ApiResourceParamData>& params, qint32 internalId)
+ErrorCode QnDbManager::insertAddParam(const ApiResourceParamWithRefData& param)
 {
+    qint32 internalId = getResourceInternalId(param.resourceId);
+
     QSqlQuery insQuery(m_sdb);
-    //insQuery.prepare("INSERT INTO vms_kvpair (resource_id, name, value) VALUES(:resourceId, :name, :value)");
-    //insQuery.prepare("INSERT OR REPLACE INTO vms_kvpair VALUES(?, NULL, ?, ?, ?)");
-    insQuery.prepare("INSERT OR REPLACE INTO vms_kvpair(resource_id, name, value, isResTypeParam) VALUES(?, ?, ?, ?)");
+    insQuery.prepare("INSERT OR REPLACE INTO vms_kvpair(resource_id, name, value) VALUES(?, ?, ?)");
 
     insQuery.bindValue(0, internalId);
-    foreach(const ApiResourceParamData& param, params) {
-        assert(!param.name.isEmpty());
+    assert(!param.name.isEmpty());
 
-        insQuery.bindValue(1, QnSql::serialized_field(param.name));
-        insQuery.bindValue(2, QnSql::serialized_field(param.value));
-        if (!insQuery.exec()) {
-            qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-            return ErrorCode::dbError;
-        }        
-    }
+    insQuery.bindValue(1, QnSql::serialized_field(param.name));
+    insQuery.bindValue(2, QnSql::serialized_field(param.value));
+    if (!insQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return ErrorCode::dbError;
+    }        
     return ErrorCode::ok;
 }
 
+/*
 ErrorCode QnDbManager::deleteAddParams(qint32 resourceId)
 {
     QSqlQuery insQuery(m_sdb);
@@ -892,6 +891,7 @@ ErrorCode QnDbManager::deleteAddParams(qint32 resourceId)
         return ErrorCode::dbError;
     }
 }
+*/
 
 ErrorCode QnDbManager::insertResource(const ApiResourceData& data, qint32* internalId)
 {
@@ -914,7 +914,7 @@ ErrorCode QnDbManager::insertResource(const ApiResourceData& data, qint32* inter
     }
     *internalId = insQuery.lastInsertId().toInt();
 
-    return insertAddParams(data.addParams, *internalId);
+    return ErrorCode::ok;
 }
 
 qint32 QnDbManager::getResourceInternalId( const QnUuid& guid ) {
@@ -1428,9 +1428,9 @@ ErrorCode QnDbManager::removeUser( const QnUuid& guid )
 
     ErrorCode err = ErrorCode::ok;
 
-    err = deleteAddParams(internalId);
-    if (err != ErrorCode::ok)
-        return err;
+    //err = deleteAddParams(internalId);
+    //if (err != ErrorCode::ok)
+    //    return err;
 
     err = deleteUserProfileTable(internalId);
     if (err != ErrorCode::ok)
@@ -1558,15 +1558,9 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUpdateU
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourceParamListWithIdData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefData>& tran)
 {
-    qint32 internalId = getResourceInternalId(tran.params.id);
-    /*
-    ErrorCode result = deleteAddParams(internalId);
-    if (result != ErrorCode::ok)
-        return result;
-    */
-    return insertAddParams(tran.params.params, internalId);
+    return insertAddParam(tran.params);
 }
 
 ErrorCode QnDbManager::addCameraHistory(const ApiCameraServerItemData& params)
@@ -1700,11 +1694,11 @@ ErrorCode QnDbManager::removeCamera(const QnUuid& guid)
 {
     qint32 id = getResourceInternalId(guid);
 
-    ErrorCode err = deleteAddParams(id);
-    if (err != ErrorCode::ok)
-        return err;
+    //ErrorCode err = deleteAddParams(id);
+    //if (err != ErrorCode::ok)
+    //    return err;
 
-    err = removeCameraSchedule(id);
+    ErrorCode err = removeCameraSchedule(id);
     if (err != ErrorCode::ok)
         return err;
 
@@ -1740,9 +1734,9 @@ ErrorCode QnDbManager::removeServer(const QnUuid& guid)
     ErrorCode err;
     qint32 id = getResourceInternalId(guid);
 
-    err = deleteAddParams(id);
-    if (err != ErrorCode::ok)
-        return err;
+    //err = deleteAddParams(id);
+    //if (err != ErrorCode::ok)
+    //    return err;
 
     err = removeStoragesByServer(guid);
     if (err != ErrorCode::ok)
@@ -1768,12 +1762,13 @@ ErrorCode QnDbManager::removeLayout(const QnUuid& id)
     return removeLayoutInternal(id, getResourceInternalId(id));
 }
 
-ErrorCode QnDbManager::removeLayoutInternal(const QnUuid& id, const qint32 &internalId) {
-    ErrorCode err = deleteAddParams(internalId);
-    if (err != ErrorCode::ok)
-        return err;
+ErrorCode QnDbManager::removeLayoutInternal(const QnUuid& id, const qint32 &internalId) 
+{
+    //ErrorCode err = deleteAddParams(internalId);
+    //if (err != ErrorCode::ok)
+    //    return err;
 
-    err = removeLayoutItems(internalId);
+    ErrorCode err = removeLayoutItems(internalId);
     if (err != ErrorCode::ok)
         return err;
 
@@ -2423,11 +2418,11 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRule
 }
 
 // getKVPairs
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ApiResourceParamListWithIdData& params)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& params)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(QString("SELECT kv.value, kv.name \
+    query.prepare(QString("SELECT r.id as resourceId, kv.value, kv.name \
                                 FROM vms_kvpair kv \
                                 JOIN vms_resource r on r.id = kv.resource_id WHERE r.guid = :guid"));
     query.bindValue(QLatin1String(":guid"), resourceId.toRfc4122());
@@ -2436,9 +2431,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ApiResourceParamL
         return ErrorCode::dbError;
     }
 
-    QnSql::fetch_many(query, &params.params);
+    QnSql::fetch_many(query, &params);
 
-    params.id = resourceId;
     return ErrorCode::ok;
 }
 
@@ -2520,10 +2514,12 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
 //getParams
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data)
 {
-    ApiResourceParamListWithIdData params;
+    ApiResourceParamWithRefDataList params;
     ErrorCode rez = doQueryNoLock(m_adminUserID, params);
-    if (rez == ErrorCode::ok)
-        data = params.params;
+    if (rez == ErrorCode::ok) {
+        foreach(const ec2::ApiResourceParamWithRefData& param, params)
+            data.push_back(ApiResourceParamData(param.name, param.value));
+    }
     return rez;
 }
 
@@ -2562,18 +2558,6 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResetBu
 
     return ErrorCode::ok;
 }
-
-// save settings
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourceParamDataList>& tran)
-{
-    /*
-    ErrorCode result = deleteAddParams(m_adminUserInternalID);
-    if (result != ErrorCode::ok)
-        return result;
-    */
-    return insertAddParams(tran.params, m_adminUserInternalID);
-}
-
 
 ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license) {
     QSqlQuery insQuery(m_sdbStatic);
@@ -2912,11 +2896,11 @@ ErrorCode QnDbManager::deleteVideowallMatrices(const QnUuid &videowall_guid) {
 ErrorCode QnDbManager::removeVideowall(const QnUuid& guid) {
     qint32 id = getResourceInternalId(guid);
 
-    ErrorCode err = deleteAddParams(id);
-    if (err != ErrorCode::ok)
-        return err;
+    //ErrorCode err = deleteAddParams(id);
+    //if (err != ErrorCode::ok)
+    //    return err;
 
-    err = deleteVideowallMatrices(guid);
+    ErrorCode err = deleteVideowallMatrices(guid);
     if (err != ErrorCode::ok)
         return err;
 

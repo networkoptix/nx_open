@@ -46,11 +46,11 @@ namespace ec2
             removeResource              = 201,  /*< ApiIdData */
             setResourceStatus           = 202,  /*< ApiSetResourceStatusData */
             getResourceParams           = 203,  /*< ApiResourceParamDataList */
-            setResourceParams           = 204,  /*< ApiResourceParamListWithIdData */
+            setResourceParams           = 204,  /*< ApiResourceParamWithRefDataList */
             getResourceTypes            = 205,  /*< ApiResourceTypeDataList*/
             getFullInfo                 = 206,  /*< ApiFullInfoData */
             setPanicMode                = 207,  /*< ApiPanicModeData */
-            setResourceParam           = 208,   /*< ApiResourceParamListWithIdData */
+            setResourceParam           = 208,   /*< ApiResourceParamWithRefDataList */
 
             /* Camera resource */
             getCameras                  = 300,  /*< ApiCameraDataList */
