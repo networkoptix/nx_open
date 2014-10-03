@@ -69,7 +69,7 @@ angular.module('webadminApp')
         }
         function resultHandler (r){
             if(r.error!=0) {
-                var errorToShow = r.data.errorString;
+                var errorToShow = r.errorString;
                 switch (errorToShow) {
                     case 'UNAUTHORIZED':
                     case 'password':
