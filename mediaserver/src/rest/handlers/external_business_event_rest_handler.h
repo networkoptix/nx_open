@@ -1,9 +1,9 @@
 #ifndef QN_EXTERNAL_BUSINESS_EVENT_REST_HANDLER_H
 #define QN_EXTERNAL_BUSINESS_EVENT_REST_HANDLER_H
 
+#include <core/resource/resource_fwd.h>
 #include "rest/server/request_handler.h"
 #include <business/events/reasoned_business_event.h>
-#include "core/resource/resource.h"
 
 class QnExternalBusinessEventRestHandler: public QnRestRequestHandler
 {

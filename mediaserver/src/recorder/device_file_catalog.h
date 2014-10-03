@@ -6,12 +6,10 @@
 #include <QtCore/QVector>
 #include <QtCore/QMap>
 #include <deque>
+#include <QtCore/QFileInfo>
 
 #include <server/server_globals.h>
-
-#include "core/resource/resource.h"
-#include "core/resource/network_resource.h"
-#include <QtCore/QFileInfo>
+#include "core/resource/resource_fwd.h"
 
 class QnTimePeriodList;
 class QnTimePeriod;

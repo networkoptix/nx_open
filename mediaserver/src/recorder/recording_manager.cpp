@@ -32,6 +32,13 @@
 static const qint64 LICENSE_RECORDING_STOP_TIME = 1000 * 3600 * 24 * 7;
 static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
+class QnServerDataProviderFactory: public QnDataProviderFactory
+{
+public:
+    static QnServerDataProviderFactory* instance();
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role) override;
+};
+
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
     m_tooManyRecordingCnt = 0;

@@ -5,15 +5,16 @@
 #include <QtCore/QObject>
 #include <QtCore/QMap>
 
-#include <server/server_globals.h>
-
-#include "core/resource/security_cam_resource.h"
-#include "core/misc/schedule_task.h"
-#include "mutex/distributed_mutex.h"
+#include "core/resource/resource_fwd.h"
 #include "business/business_fwd.h"
+#include <server/server_globals.h>
+#include "core/misc/schedule_task.h"
 
 class QnServerStreamRecorder;
 class QnVideoCamera;
+namespace ec2 {
+    class QnDistributedMutex;
+}
 
 struct Recorders
 {
@@ -82,13 +83,6 @@ private:
     QMap<QnSecurityCamResourcePtr, qint64> m_delayedStop;
     ec2::QnDistributedMutex* m_licenseMutex;
     int m_tooManyRecordingCnt;
-};
-
-class QnServerDataProviderFactory: public QnDataProviderFactory
-{
-public:
-    static QnServerDataProviderFactory* instance();
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role) override;
 };
 
 #define qnRecordingManager QnRecordingManager::instance()
