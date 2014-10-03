@@ -167,6 +167,7 @@
 #include "nx_ec/dummy_handler.h"
 
 #include "version.h"
+#include "core/resource_management/resource_properties.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -1363,6 +1364,7 @@ void QnMain::run()
 
     QnCompatibilityChecker remoteChecker(connectInfo.compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
+    QnResourcePropertyDictionary dictionary;
 
     QnCompatibilityChecker* compatibilityChecker;
     if (remoteChecker.size() > localChecker.size())
@@ -1553,7 +1555,6 @@ void QnMain::run()
 
 
     qnStorageMan->doMigrateCSVCatalog();
-
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);

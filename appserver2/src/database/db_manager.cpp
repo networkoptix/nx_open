@@ -2149,7 +2149,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
 
     QSqlQuery queryProperty(m_sdb);
     queryProperty.setForwardOnly(true);
-    queryProperty.prepare("SELECT rt.guid as resourceTypeId, pt.name, pt.default_value as defaultValue, \
+    queryProperty.prepare("SELECT rt.guid as resourceTypeId, pt.name, pt.default_value as defaultValue \
                           FROM vms_propertytype pt \
                           JOIN vms_resourcetype rt on rt.id = pt.resource_type_id ORDER BY rt.guid");
     if (!queryProperty.exec()) {
