@@ -208,6 +208,7 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode)
     setStatus(other->m_status, silenceMode);
     afterUpdateInner(modifiedFields);
 
+    /*
     QnParamList paramList = other->getResourceParamList();
     foreach(QnParam param, paramList.values())
     {
@@ -216,6 +217,7 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode)
             setParam(param.name(), param.value(), QnDomainDatabase);
         }
     }
+    */
 
     //silently ignoring missing properties because of removeProperty method lack
     for (const ec2::ApiResourceParamData &param: other->getProperties()) {
@@ -347,7 +349,7 @@ QnResourcePtr QnResource::getParentResource() const
         return QnResourcePtr();
 }
 
-
+/*
 QnParamList QnResource::getResourceParamList() const
 {
     QMutexLocker mutexLocker(&m_mutex);
@@ -377,6 +379,7 @@ QnParamList QnResource::getResourceParamList() const
 
     return m_resourceParamList;
 }
+*/
 
 bool QnResource::hasParam(const QString &name) const
 {

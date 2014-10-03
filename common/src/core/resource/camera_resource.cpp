@@ -9,6 +9,7 @@
 #include <api/app_server_connection.h>
 #include "nx_ec/dummy_handler.h"
 #include "nx_ec/data/api_resource_data.h"
+#include "../resource_management/resource_properties.h"
 
 static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
@@ -234,6 +235,8 @@ void QnVirtualCameraResource::forceDisableAudio()
 
 void QnVirtualCameraResource::saveParams()
 {
+    propertyDictionay->saveParams(getId());
+    /*
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     ec2::ApiResourceParamDataList params;
 
@@ -250,17 +253,12 @@ void QnVirtualCameraResource::saveParams()
         qCritical() << Q_FUNC_INFO << ": can't save resource params to Server. Resource physicalId: "
             << getPhysicalId() << ". Description: " << ec2::toString(rez);
     }
+    */
 }
 
 void QnVirtualCameraResource::saveParamsAsync()
 {
-    ec2::ApiResourceParamDataList params;
-    foreach(const QnParam& param, getResourceParamList().values())
-    {
-        if (param.domain() == QnDomainDatabase)
-            params.push_back(ec2::ApiResourceParamData(param.name(), param.value().toString()));
-    }
-    QnAppServerConnectionFactory::getConnection2()->getResourceManager()->save(getId(), params, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    propertyDictionay->saveParamsAsync(getId());
 }
 
 QString QnVirtualCameraResource::toSearchString() const

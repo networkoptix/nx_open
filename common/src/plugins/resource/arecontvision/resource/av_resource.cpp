@@ -227,10 +227,11 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
         setParamAsync(lit("sensorheight"), maxSensorHeight, QnDomainPhysical);
     }
 
-    QVariant val;
-    if (!getParam(lit("Firmware version"), val, QnDomainPhysical))
+    QVariant firmwareVersion;
+    if (!getParam(lit("Firmware version"), firmwareVersion, QnDomainPhysical))
         return CameraDiagnostics::RequestFailedResult(lit("Firmware version"), lit("unknown"));
 
+    QVariant val;
     if (!getParam(lit("Image engine"), val, QnDomainPhysical ))
         return CameraDiagnostics::RequestFailedResult(lit("Image engine"), lit("unknown"));
 
@@ -277,8 +278,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
         mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(maxSensorWidth.toInt()/2, maxSensorHeight.toInt()/2), streamCodec ) );
     saveResolutionList( mediaStreams );
 
-    const QString firmware = getResourceParamList().value(lit("Firmware version")).value().toString();
-    setFirmware(firmware);
+    setFirmware(firmwareVersion.toString());
     saveParams();
 
     setParam(lit("Zone size"), zone_size, QnDomainPhysical);

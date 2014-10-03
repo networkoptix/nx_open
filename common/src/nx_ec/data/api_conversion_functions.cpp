@@ -587,11 +587,6 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
     //dst.status = src->getStatus();
     dst.status = Qn::NotDefined; // status field MUST be modified via setStatus call only
 
-    QnParamList params = src->getResourceParamList();
-    for(const QnParam &srcParam: src->getResourceParamList().values())
-        if (srcParam.domain() == QnDomainDatabase)
-            dst.addParams.push_back(ApiResourceParamData(srcParam.name(), srcParam.value().toString(), true));
-
     for(const ec2::ApiResourceParamData &srcParam: src->getProperties())
         dst.addParams.push_back(srcParam);
 }
@@ -605,12 +600,8 @@ void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
     dst->setUrl(src.url);
     dst->setStatus(src.status, true);
 
-    for(const ApiResourceParamData &srcParam: src.addParams) {
-        if (srcParam.predefinedParam)
-            dst->setParam(srcParam.name, srcParam.value, QnDomainDatabase);
-        else
-            dst->setProperty(srcParam.name, srcParam.value);
-    }
+    for(const ApiResourceParamData &srcParam: src.addParams)
+        dst->setProperty(srcParam.name, srcParam.value);
 }
 
 void fromApiToResourceList(const ApiResourceDataList &src, QnResourceList &dst, QnResourceFactory *factory) {
