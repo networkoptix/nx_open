@@ -312,4 +312,7 @@ webadmin/.sass-cache
 app/bower_components
 
 
-mobile_client\build-*
+mobile_client/build-*
+mobile_client/x86
+mobile_client/x64
+mobile_client/arm
