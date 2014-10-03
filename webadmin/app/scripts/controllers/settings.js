@@ -68,7 +68,7 @@ angular.module('webadminApp')
             return false;
         }
         function resultHandler (r){
-            if(r.data.error!=0) {
+            if(r.error!=0) {
                 var errorToShow = r.data.errorString;
                 switch (errorToShow) {
                     case 'UNAUTHORIZED':
@@ -76,7 +76,7 @@ angular.module('webadminApp')
                         errorToShow = "Wrong password.";
                 }
                 alert("Error: " + errorToShow);
-            }else if (r.data.reply.restartNeeded) {
+            }else if (r.reply.restartNeeded) {
                 if (confirm("All changes saved. New settings will be applied after restart. \n Do you want to restart server now?")) {
                     restartServer();
                 }
