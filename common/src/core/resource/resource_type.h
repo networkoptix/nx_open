@@ -40,6 +40,7 @@ public:
 
     const ParamTypeMap& paramTypeList() const;
 
+    QString defaultValue(const QString& key) const;
 private:
     QnUuid m_id;
     QnUuid m_parentId;

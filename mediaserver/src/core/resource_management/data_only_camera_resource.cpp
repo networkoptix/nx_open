@@ -10,11 +10,6 @@ DataOnlyCameraResource::DataOnlyCameraResource( const QnUuid& resourceTypeId )
     setTypeId( resourceTypeId );
 }
 
-bool DataOnlyCameraResource::isResourceAccessible()
-{
-    return false;
-}
-
 QString DataOnlyCameraResource::getDriverName() const
 {
     return lit("DATA_ONLY");

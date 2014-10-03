@@ -29,6 +29,8 @@ namespace Qn
     //!possible values: softwaregrid,hardwaregrid
     static const QString SUPPORTED_MOTION_PARAM_NAME = lit("supportedMotion");
     static const QString CAMERA_CAPABILITIES_PARAM_NAME = lit("cameraCapabilities");
+    static const QString CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = lit("mediaStreams");
+
 }
 
 // TODO: #Elric #enum
@@ -49,7 +51,7 @@ struct QN_EXPORT QnParamType
 
     //QnUuid id;
     QString name;
-    QVariant default_value;
+    QString default_value;
 
     double min_val;
     double max_val;
@@ -66,8 +68,6 @@ struct QN_EXPORT QnParamType
     bool ui;
     bool isReadOnly;
     bool isPhysical;
-
-    bool setDefVal(const QVariant &val); // safe way to set value
 };
 
 
@@ -85,7 +85,7 @@ struct QN_EXPORT QnParam
     const QVariant &value() const { return m_value; }
     QnDomain domain() const { return m_domain; }
     void setDomain(QnDomain domain) { m_domain = domain; }
-    const QVariant &defaultValue() const { return m_paramType->default_value; }
+    const QString &defaultValue() const { return m_paramType->default_value; }
     const QString &name() const { return m_paramType->name; }
     const QString &group() const { return m_paramType->group; }
     const QString &subGroup() const { return m_paramType->subgroup; }

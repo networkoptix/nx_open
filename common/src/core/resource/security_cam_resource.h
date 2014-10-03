@@ -51,8 +51,6 @@ public:
 
     virtual int reservedSecondStreamFps() const;
 
-    virtual QSize getMaxSensorSize() const;
-
     virtual void setIframeDistance(int frames, int timems) = 0; // sets the distance between I frames
 
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);

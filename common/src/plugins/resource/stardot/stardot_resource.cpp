@@ -155,7 +155,7 @@ CameraDiagnostics::Result QnStardotResource::initInternal()
     }
 
     //setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
-    setParam(MAX_FPS_PARAM_NAME, m_maxFps, QnDomainDatabase);
+    setProperty(MAX_FPS_PARAM_NAME, m_maxFps);
     //setParam(DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0, QnDomainDatabase);
 
     //detecting and saving selected resolutions
@@ -167,11 +167,6 @@ CameraDiagnostics::Result QnStardotResource::initInternal()
 
     setMotionMaskPhysical(0);
     return CameraDiagnostics::NoErrorResult();
-}
-
-bool QnStardotResource::isResourceAccessible()
-{
-    return updateMACAddress();
 }
 
 QnConstResourceAudioLayoutPtr QnStardotResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const

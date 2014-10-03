@@ -85,42 +85,26 @@ bool QnArecontPanoramicResource::getParamPhysical(int channel, const QString& na
     return true;
 }
 
-bool QnArecontPanoramicResource::setParamPhysical(const QnParam &param, const QVariant& val )
+bool QnArecontPanoramicResource::setParamPhysical(const QString &param, const QVariant& val )
 {
-    if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
-        return false;
+    if (setSpecialParam(param, val))
+        return true;
 
-    if (param.type()==Qn::PDT_None || param.type()==Qn::PDT_Button)
+    for (int i = 1; i <=4 ; ++i)
     {
         CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
 
-        QString request = QLatin1String("set?") + param.netHelper();
+        QString request = QLatin1String("set") + QString::number(i) + QLatin1Char('?') + param + QLatin1Char('=') + val.toString();
 
         if (connection.doGET(request)!=CL_HTTP_SUCCESS)
             if (connection.doGET(request)!=CL_HTTP_SUCCESS) // try twice.
                 return false;
     }
-    else
-    {
-        for (int i = 1; i <=4 ; ++i)
-        {
-            CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
-
-            QString request = QLatin1String("set") + QString::number(i) + QLatin1Char('?') + param.netHelper() + QLatin1Char('=') + val.toString();
-
-            if (connection.doGET(request)!=CL_HTTP_SUCCESS)
-                if (connection.doGET(request)!=CL_HTTP_SUCCESS) // try twice.
-                    return false;
-        }
-    }
-
     return true;
 }
 
-bool QnArecontPanoramicResource::setSpecialParam(const QString& name, const QVariant& val, QnDomain domain)
+bool QnArecontPanoramicResource::setSpecialParam(const QString& name, const QVariant& val)
 {
-    Q_UNUSED(domain);
-
     if (name == QLatin1String("resolution"))
     {
         if (val.toString() == QLatin1String("half"))
@@ -147,7 +131,7 @@ CameraDiagnostics::Result QnArecontPanoramicResource::initInternal()
 
     setRegister(3, 100, 10); // sets I frame frequency to 10
 
-    setParam(QLatin1String("CnannelEnable"), 15, QnDomainPhysical); // to enable all channels
+    setParamPhysical(QLatin1String("CnannelEnable"), 15); // to enable all channels
 
     updateFlipState();
 

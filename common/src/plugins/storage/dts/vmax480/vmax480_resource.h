@@ -20,7 +20,6 @@ public:
     virtual ~QnPlVmax480Resource();
 
     virtual int getMaxFps() const override;
-    virtual bool isResourceAccessible() override;
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
 

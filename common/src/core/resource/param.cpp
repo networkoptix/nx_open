@@ -21,31 +21,6 @@ QnParamType::QnParamType()
 {
 }
 
-bool QnParamType::setDefVal(const QVariant &val) // safe way to set value
-{
-    switch (type)
-    {
-    case Qn::PDT_None:
-        return false;
-
-    case Qn::PDT_MinMaxStep:
-        if (val.toDouble() < min_val || val.toDouble() > max_val)
-            return false;
-        break;
-
-    case Qn::PDT_Enumeration:
-        if (!possible_values.contains(val))
-            return false;
-        break;
-
-    default:
-        break;
-    }
-
-    default_value = val;
-    return true;
-}
-
 //===================================================================================
 
 // ===========================================

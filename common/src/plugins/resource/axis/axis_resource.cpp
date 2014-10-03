@@ -35,11 +35,6 @@ QnPlAxisResource::~QnPlAxisResource()
     stopInputPortMonitoring();
 }
 
-bool QnPlAxisResource::isResourceAccessible()
-{
-    return updateMACAddress();
-}
-
 QString QnPlAxisResource::getDriverName() const
 {
     return MANUFACTURE;

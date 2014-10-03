@@ -66,11 +66,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
 
     int channels = 1;
     if (res->hasParam(QLatin1String("channelsAmount")))
-    {
-        QVariant val;
-        res->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
-        channels = val.toUInt();
-    }
+        channels = res->getProperty(lit("channelsAmount")).toUInt();
 
 
     QByteArray profileNumber("S");

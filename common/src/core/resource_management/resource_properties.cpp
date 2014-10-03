@@ -73,3 +73,10 @@ void QnResourcePropertyDictionary::addToUnsavedParams(const QnUuid& resourceId, 
             data.insert(param.name, param.value);
     }
 }
+
+QString QnResourcePropertyDictionary::value(const QnUuid& resourceId, const QString& key) const
+{
+    QMutexLocker lock(&m_mutex);
+    auto itr = m_items.find(resourceId);
+    return itr != m_items.end() ? itr.value().value(key) : QString();
+}

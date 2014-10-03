@@ -92,6 +92,12 @@ bool QnResourceType::hasParam(const QString& name) const
     return paramTypeList().contains(name);
 }
 
+QString QnResourceType::defaultValue(const QString& key) const
+{
+    QnParamTypePtr paramPtr = paramTypeList().value(key);
+    return paramPtr.isNull() ? QString() : paramPtr->default_value;
+}
+
 const ParamTypeMap& QnResourceType::paramTypeList() const
 {
     if (m_allParamTypeListCache.isNull())

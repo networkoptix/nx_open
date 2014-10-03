@@ -311,9 +311,9 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     QScopedPointer<QnAbstractPtzController> ptzController(createPtzControllerInternal());
     setPtzCapabilities(ptzController->getCapabilities());
 
-    setParam(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
-    setParam(Qn::MAX_FPS_PARAM_NAME, getMaxFps(), QnDomainDatabase);
-    setParam(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0, QnDomainDatabase);
+    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0);
+    setProperty(Qn::MAX_FPS_PARAM_NAME, getMaxFps());
+    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0);
 
     //detecting and saving selected resolutions
     CameraMediaStreams mediaStreams;
@@ -325,11 +325,6 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
-}
-
-bool QnActiResource::isResourceAccessible()
-{
-    return updateMACAddress();
 }
 
 bool QnActiResource::startInputPortMonitoring()
@@ -533,10 +528,7 @@ bool QnActiResource::isAudioSupported() const
 
 bool QnActiResource::hasDualStreaming() const
 {
-    QVariant mediaVariant;
-    QnActiResource* this_casted = const_cast<QnActiResource*>(this);
-    this_casted->getParam(Qn::HAS_DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toBool();
+    return getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME).toInt() > 0;
 }
 
 QnAbstractPtzController *QnActiResource::createPtzControllerInternal()

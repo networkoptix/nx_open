@@ -130,22 +130,21 @@ public:
     bool hasParam(const QString &name) const;
 
     // return true if no error
-    bool getParam(const QString &name, QVariant &val, QnDomain domain) const;
+    //bool getParam(const QString &name, QVariant &val, QnDomain domain) const;
 
 #ifdef ENABLE_DATA_PROVIDERS
     // same as getParam is invoked in separate thread.
     // as soon as param changed parameterValueChanged() signal is emitted
-    void getParamAsync(const QString &name, QnDomain domain);
 #endif 
 
 
     // return true if no error
-    virtual bool setParam(const QString &name, const QVariant &val, QnDomain domain);
+    //virtual bool setParam(const QString &name, const QVariant &val, QnDomain domain);
 
 #ifdef ENABLE_DATA_PROVIDERS
     // same as setParam but but returns immediately;
     // this function leads setParam invoke in separate thread. so no need to make it virtual
-    void setParamAsync(const QString &name, const QVariant &val, QnDomain domain);
+    //void setParamAsync(const QString &name, const QVariant &val, QnDomain domain);
 #endif 
 
     // some time we can find resource, but cannot request additional information from it ( resource has bad ip for example )
@@ -195,6 +194,7 @@ public:
     bool hasProperty(const QString &key) const;
     QString getProperty(const QString &key, const QString &defaultValue = QString()) const;
     void setProperty(const QString &key, const QString &value);
+    void setProperty(const QString &key, const QVariant& value);
     ec2::ApiResourceParamDataList getProperties() const;
 
     static QnInitResPool* initAsyncPoolInstance();
@@ -248,14 +248,13 @@ public:
 
     QnResourcePtr toSharedPointer() const;
 
+    virtual bool getParamPhysical(const QString &name, QVariant &val);
+    virtual bool setParamPhysical(const QString& name, const QVariant& value);
+    // should just do physical job ( network or so ) do not care about memory domain
+    void setParamPhysicalAsync(const QString &name, const QVariant &val);
+    void getParamPhysicalAsync(const QString &name);
 protected:
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
-
-    // should just do physical job ( network or so ) do not care about memory domain
-    virtual bool getParamPhysical(const QnParam &param, QVariant &val);
-    virtual bool setParamPhysical(const QnParam &param, const QVariant &val);
-
-    virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain);
 
 #ifdef ENABLE_DATA_PROVIDERS
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);

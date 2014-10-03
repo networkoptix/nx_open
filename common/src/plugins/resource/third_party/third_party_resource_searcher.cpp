@@ -289,7 +289,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
         const QnResourceData& resourceData = qnCommon->dataPool()->data(resource);
         const float maxFps = resourceData.value<float>( lit("MaxFPS"), 0.0 );
         if( maxFps > 0.0 )
-            resource->setParam( lit("MaxFPS"), maxFps, QnDomainDatabase );
+            resource->setProperty( lit("MaxFPS"), maxFps);
     }
     
     unsigned int caps;

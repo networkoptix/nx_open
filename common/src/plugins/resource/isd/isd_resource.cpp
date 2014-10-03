@@ -37,11 +37,6 @@ QnPlIsdResource::QnPlIsdResource()
     setAuth(QLatin1String("root"), QLatin1String("admin"));
 }
 
-bool QnPlIsdResource::isResourceAccessible()
-{
-    return updateMACAddress();
-}
-
 QString QnPlIsdResource::getDriverName() const
 {
     return MANUFACTURE;
@@ -188,7 +183,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
         mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution2, CODEC_ID_H264 ) );
     saveResolutionList( mediaStreams );
 
-    setParam(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1, QnDomainDatabase );
+    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
     //setMotionType( Qn::MT_SoftwareGrid );
     saveParams();
 
@@ -233,21 +228,7 @@ QnConstResourceAudioLayoutPtr QnPlIsdResource::getAudioLayout(const QnAbstractSt
 
 void QnPlIsdResource::setMaxFps(int f)
 {
-    setParam(MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
-}
-
-int QnPlIsdResource::getMaxFps() const
-{
-    QVariant mediaVariant;
-    QnSecurityCamResource* this_casted = const_cast<QnPlIsdResource*>(this);
-
-    if (!hasParam(MAX_FPS_PARAM_NAME))
-    {
-        return QnPhysicalCameraResource::getMaxFps();
-    }
-
-    this_casted->getParam(MAX_FPS_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toInt();
+    setProperty(MAX_FPS_PARAM_NAME, f);
 }
 
 #endif // #ifdef ENABLE_ISD

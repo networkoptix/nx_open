@@ -56,11 +56,6 @@ QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
     return new QnThirdPartyPtzController( toSharedPointer().staticCast<QnThirdPartyResource>(), ptzManager );
 }
 
-bool QnThirdPartyResource::isResourceAccessible()
-{
-    return updateMACAddress();
-}
-
 bool QnThirdPartyResource::ping()
 {
     //TODO: should check if camera supports http and, if supports, check http port
@@ -385,7 +380,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     //we support only two streams from camera
     m_encoderCount = m_encoderCount > 2 ? 2 : m_encoderCount;
 
-    setParam( Qn::HAS_DUAL_STREAMING_PARAM_NAME, (m_encoderCount > 1) ? 1 : 0, QnDomainDatabase );
+    setProperty( Qn::HAS_DUAL_STREAMING_PARAM_NAME, (m_encoderCount > 1) ? 1 : 0);
 
     //setting camera capabilities
     unsigned int cameraCapabilities = 0;
@@ -435,27 +430,26 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         }
         ptzManager->releaseRef();
     }
-    setParam(
+    setProperty(
         Qn::IS_AUDIO_SUPPORTED_PARAM_NAME,
-        (cameraCapabilities & nxcip::BaseCameraManager::audioCapability) ? 1 : 0,
-        QnDomainDatabase );
+        (cameraCapabilities & nxcip::BaseCameraManager::audioCapability) ? 1 : 0);
     if( cameraCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability )
     {
-        setParam( Qn::DTS_PARAM_NAME, 1, QnDomainDatabase );
-        setParam( Qn::ANALOG_PARAM_NAME, 1, QnDomainDatabase );
+        setProperty( Qn::DTS_PARAM_NAME, 1);
+        setProperty( Qn::ANALOG_PARAM_NAME, 1);
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability )
     {
         //setMotionType( Qn::MT_HardwareGrid );
-        setParam( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100, QnDomainDatabase );
-        setParam( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100, QnDomainDatabase );
-        setParam( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100, QnDomainDatabase );
-        setParam( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid,hardwaregrid"), QnDomainDatabase );
+        setProperty( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100);
+        setProperty( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100);
+        setProperty( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100);
+        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid,hardwaregrid"));
     }
     else
     {
         //setMotionType( Qn::MT_SoftwareGrid );
-        setParam( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid"), QnDomainDatabase );
+        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid"));
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
 		setStreamFpsSharingMethod(Qn::BasicFpsSharing);
@@ -507,12 +501,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     if( !maxFps )
         maxFps = DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN;
 
-    if( !setParam( MAX_FPS_PARAM_NAME, maxFps, QnDomainDatabase ) )
-    {
-        NX_LOG( lit("Failed to set %1 parameter to %2 for third-party camera %3:%4 (url %5)").
-            arg(MAX_FPS_PARAM_NAME).arg(maxFps).arg(m_discoveryManager.getVendorName()).
-            arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logDEBUG1 );
-    }
+    setProperty( MAX_FPS_PARAM_NAME, maxFps);
 
     if( (cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability) ||
         (cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability) )

@@ -73,19 +73,6 @@ public:
     void setNetworkTimeout(unsigned int timeout);
     virtual unsigned int getNetworkTimeout() const;
 
-
-    // sometimes resource is not in your lan, and it might be not pingable from one hand
-    // but from other hand it's still might replay to standard requests
-    // so this is the way to find out do we have to change ip address
-    virtual bool isResourceAccessible()  = 0;
-
-
-    // is some cases( like  device behind the router) the only possible way to discover the device is to check every ip address
-    // and no broad cast and multi cast is accessible. so you can not get MAC of device with standard methods
-    // the only way is to request it from device through http or so
-    // we need to get mac anyway to differentiate one device from another
-    virtual bool updateMACAddress() { return true; }
-
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
     // in some cases I just want to update couple of field from just discovered resource

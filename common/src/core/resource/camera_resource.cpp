@@ -10,6 +10,7 @@
 #include "nx_ec/dummy_handler.h"
 #include "nx_ec/data/api_resource_data.h"
 #include "../resource_management/resource_properties.h"
+#include "param.h"
 
 static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
@@ -129,8 +130,6 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
     static const char* HLS_TRANSPORT_NAME = "hls";
     static const char* MJPEG_TRANSPORT_NAME = "mjpeg";
 
-    static const char* CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = "mediaStreams";
-
     CameraMediaStreams fullStreamList( supportedNativeStreams );
     for( std::vector<CameraMediaStreamInfo>::iterator
         it = fullStreamList.streams.begin();
@@ -178,8 +177,8 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
 #endif
 
     //saving fullStreamList;
-    const QByteArray& serializedStreams = QJson::serialized( fullStreamList );
-    setParam( QLatin1String(CAMERA_MEDIA_STREAM_LIST_PARAM_NAME), QLatin1String(serializedStreams), QnDomainDatabase );
+    QByteArray serializedStreams = QJson::serialized( fullStreamList );
+    setProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME, QString::fromUtf8(serializedStreams));
 }
 
 // --------------- QnVirtualCameraResource ----------------------
@@ -211,9 +210,7 @@ QString QnVirtualCameraResource::getUniqueId() const
 }
 
 bool QnVirtualCameraResource::isForcedAudioSupported() const {
-    QVariant val;
-    if (!getParam(lit("forcedIsAudioSupported"), val, QnDomainMemory))
-        return false;
+    QString val = getProperty(lit("forcedIsAudioSupported"));
     return val.toUInt() > 0;
 }
 
@@ -221,7 +218,7 @@ void QnVirtualCameraResource::forceEnableAudio()
 { 
 	if (isForcedAudioSupported())
         return;
-    setParam(lit("forcedIsAudioSupported"), 1, QnDomainDatabase); 
+    setProperty(lit("forcedIsAudioSupported"), 1);
     saveParams(); 
 }
 
@@ -229,7 +226,7 @@ void QnVirtualCameraResource::forceDisableAudio()
 { 
     if (!isForcedAudioSupported())
         return;
-    setParam(lit("forcedIsAudioSupported"), 0, QnDomainDatabase); 
+    setProperty(lit("forcedIsAudioSupported"), QString(lit("0")));
     saveParams(); 
 }
 

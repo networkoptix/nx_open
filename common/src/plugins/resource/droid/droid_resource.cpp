@@ -16,11 +16,6 @@ int QnDroidResource::getMaxFps() const
     return 30;
 }
 
-bool QnDroidResource::isResourceAccessible()
-{
-    return true;
-}
-
 QString QnDroidResource::getDriverName() const
 {
     return MANUFACTURE;
