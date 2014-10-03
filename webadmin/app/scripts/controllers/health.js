@@ -7,7 +7,17 @@ angular.module('webadminApp')
 
         $scope.data = {
             labels: Array.apply(null, new Array( $scope.healthLength)).map(String.prototype.valueOf,''),
-            datasets: []
+            datasets: [{
+                label: '',
+                fillColor: nocolor,
+                strokeColor: nocolor,
+                pointColor: nocolor,
+                pointStrokeColor: nocolor,
+                pointHighlightFill: nocolor,
+                pointHighlightStroke: nocolor,
+                show:true,
+                data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,100)
+            }]
         };
 
         $scope.legend = '';
@@ -90,6 +100,7 @@ angular.module('webadminApp')
                 pointStrokeColor: nocolor,
                 pointHighlightFill: nocolor,
                 pointHighlightStroke: nocolor,
+                show:true,
                 data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,100)
             }];
             for(var i=0;i<statistics.length;i++){
@@ -104,14 +115,22 @@ angular.module('webadminApp')
                     pointStrokeColor: color,
                     pointHighlightFill: color,
                     pointHighlightStroke: color,
+                    show: true,
                     data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,0)
                 });
             }
-            $scope.data.datasets = datasets;
+            $scope.datasets = datasets;
+            $scope.updateVisibleDatasets();
         }
 
+        $scope.updateVisibleDatasets = function(){
+            $scope.data.datasets = _.filter($scope.datasets,function(dataset){return dataset.show});
+        }
+
+
+
         function updateStatisticsDataSets(statistics){
-            var datasets = $scope.data.datasets;
+            var datasets = $scope.datasets;
 
             for(var i=0; i < datasets.length;i++){
                 var dataset = datasets[i];
