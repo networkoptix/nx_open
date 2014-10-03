@@ -18,6 +18,7 @@
 #include "ec2_connection.h"
 #include "ec2_thread_pool.h"
 #include "nx_ec/data/api_resource_type_data.h"
+#include "nx_ec/data/api_camera_data_ex.h"
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
@@ -133,6 +134,10 @@ namespace ec2
         registerUpdateFuncHandler<ApiCameraDataList>( restProcessorPool, ApiCommand::saveCameras );
         //AbstractCameraManager::getCameras
         registerGetFuncHandler<QnUuid, ApiCameraDataList>( restProcessorPool, ApiCommand::getCameras );
+        //AbstractCameraManager::saveUserAttributes
+        registerUpdateFuncHandler<ApiCameraAttributesDataList>( restProcessorPool, ApiCommand::saveCameraUserAttributesList );
+        //AbstractCameraManager::getUserAttributes
+        registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>( restProcessorPool, ApiCommand::getCameraUserAttributes );
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
         //AbstractCameraManager::removeCameraHistoryItem
@@ -141,6 +146,8 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiCameraServerItemDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
         //AbstractCameraManager::getBookmarkTags
         registerGetFuncHandler<std::nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
+        //AbstractCameraManager::getFullCameraDataList
+        registerGetFuncHandler<QnUuid, ApiCameraDataExList>( restProcessorPool, ApiCommand::getFullCameraDataList );
 
         //AbstractCameraManager::getBookmarkTags
 

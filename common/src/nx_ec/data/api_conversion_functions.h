@@ -18,14 +18,23 @@ namespace ec2 {
     void fromResourceToApi(const QnAbstractBusinessActionPtr &src, ApiBusinessActionData &dst);
     void fromApiToResource(const ApiBusinessActionData &src, QnAbstractBusinessActionPtr &dst, QnResourcePool *resourcePool);
 
-    void fromResourceToApi(const QnScheduleTask &src, ApiScheduleTaskData &dst);
-    void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QnUuid &resourceId);
-
     void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst);
     void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst);
     void fromApiToResourceList(const ApiCameraDataList &src, QnResourceList &dst, QnResourceFactory *factory);
     void fromApiToResourceList(const ApiCameraDataList &src, QnVirtualCameraResourceList &dst, QnResourceFactory *factory);
     void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraDataList &dst);
+
+    void fromResourceToApi(const QnScheduleTask &src, ApiScheduleTaskData &dst);
+    void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QnUuid &resourceId);
+
+    void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAttributesPtr& dst);
+    void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributesData& dst);
+    void fromApiToResourceList(const ApiCameraAttributesDataList &src, QnCameraUserAttributesList& dst);
+    void fromResourceListToApi(const QnCameraUserAttributesList& src, ApiCameraAttributesDataList& dst);
+
+    void fromApiToResource(const ApiCameraDataEx &src, QnVirtualCameraResourcePtr &dst);
+    void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraDataEx &dst);
+    void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraDataExList &dst);
 
     void fromResourceToApi(const QnCameraHistoryItem &src, ApiCameraServerItemData &dst);
     void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &dst);

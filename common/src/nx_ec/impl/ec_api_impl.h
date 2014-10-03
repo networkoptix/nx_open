@@ -21,7 +21,7 @@
 #include <licensing/license.h>
 
 
-//!Defining multiple handler macro because vs2012 does not support variadic templates. Will move to single variadic template after move to vs2013
+//TODO #ak Defining multiple handler macro because vs2012 does not support variadic templates. Will move to single variadic template after move to vs2013
 
 #define DEFINE_ONE_ARG_HANDLER( REQUEST_NAME, FIRST_ARG_TYPE )                          \
     typedef OneParamHandler<FIRST_ARG_TYPE> REQUEST_NAME##Handler;                      \
@@ -166,6 +166,7 @@ namespace ec2
             void emitAddCameraDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( reqID, p1, p2 ); }
             void emitAddUserDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onAddUserDone( reqID, p1, p2 ); }
             void emitGetCamerasDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( reqID, p1, p2 ); }
+            void emitGetCameraUserAttributesDone( int reqID, const ErrorCode p1, const QnCameraUserAttributesList& p2 ) { emit onGetCameraUserAttributesDone( reqID, p1, p2 ); }
             void emitGetCamerasHistoryDone( int reqID, const ErrorCode p1, const QnCameraHistoryList& p2 ) { emit onGetCamerasHistoryDone( reqID, p1, p2 ); }
             void emitGetCameraBookmarkTagsDone( int reqID, const ErrorCode p1, const QnCameraBookmarkTags& p2 ) { emit onGetCameraBookmarkTagsDone( reqID, p1, p2 ); }
             void emitGetUsersDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onGetUsersDone( reqID, p1, p2 ); }
@@ -197,6 +198,7 @@ namespace ec2
             void onAddCameraDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
             void onAddUserDone( int reqID, const ErrorCode, const QnUserResourceList& );
             void onGetCamerasDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
+            void onGetCameraUserAttributesDone( int reqID, const ErrorCode, const QnCameraUserAttributesList& );
             void onGetCamerasHistoryDone( int reqID, const ErrorCode, const QnCameraHistoryList& );
             void onGetCameraBookmarkTagsDone(int reqID, const ErrorCode, const QnCameraBookmarkTags& );
             void onGetUsersDone( int reqID, const ErrorCode, const QnUserResourceList& );
@@ -246,8 +248,10 @@ namespace ec2
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER( AddCamera, ErrorCode, QnVirtualCameraResourceList )
         DEFINE_TWO_ARG_HANDLER( GetCameras, ErrorCode, QnVirtualCameraResourceList )
+        DEFINE_TWO_ARG_HANDLER( GetCameraUserAttributes, ErrorCode, QnCameraUserAttributesList )
         DEFINE_TWO_ARG_HANDLER( GetCamerasHistory, ErrorCode, QnCameraHistoryList )
         DEFINE_TWO_ARG_HANDLER( GetCameraBookmarkTags, ErrorCode, QnCameraBookmarkTags )
+
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractUserManager

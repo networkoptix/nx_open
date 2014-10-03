@@ -25,6 +25,24 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     Q_OBJECT
 
 public:
+    QnSecurityCamResource();
+    virtual ~QnSecurityCamResource();
+
+    //!Overrides \a QnResource::getName. Returns camera name (from \a QnCameraUserAttributes) of
+    virtual QString getName() const override;
+    //!Overrides \a QnResource::setName. Just calls \a QnSecurityCamResource::setCameraName
+    /*!
+        TODO get rid of this override, since mediaserver and client must call different methods (setName and setCameraName respectively)
+    */
+    virtual void setName( const QString& name ) override;
+    //!Set camera name (the one is show to the user in client)
+    /*!
+        This name is set by user.
+        Resource name is generally set automatically (e.g., by server)
+        Can differ from resource name
+    */
+    void setCameraName( const QString& newCameraName );
+
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
     Qn::MotionType getCameraBasedMotionType() const;
@@ -37,9 +55,6 @@ public:
     bool hasMotion() const;
     Qn::MotionType getMotionType() const;
     void setMotionType(Qn::MotionType value);
-
-    QnSecurityCamResource();
-    virtual ~QnSecurityCamResource();
 
     //!Returns driver (built-in or external) name, used to manage camera
     /*!
@@ -69,7 +84,7 @@ public:
     ///*!
     //    E.g., recording schedule, motion type, second stream quality, etc...
     //*/
-    //QnUserCameraSettings getUserCameraSettings() const;
+    //QnCameraUserAttributes getUserCameraSettings() const;
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
     QnScheduleTaskList getScheduleTasks() const;
@@ -265,7 +280,7 @@ private:
     int m_recActionCnt;
     QString m_groupName;
     QString m_groupId;
-    Qn::SecondStreamQuality  m_secondaryQuality;
+    //Qn::SecondStreamQuality m_secondaryQuality;
     //bool m_cameraControlDisabled;
     Qn::CameraStatusFlags m_statusFlags;
     //bool m_scheduleDisabled;
@@ -274,9 +289,9 @@ private:
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
-    int m_minDays;
-    int m_maxDays;
-    QnUuid m_preferedServerId;
+    //int m_minDays;
+    //int m_maxDays;
+    //QnUuid m_preferedServerId;
 
     //QnMotionRegion getMotionRegionNonSafe(int channel) const;
 };

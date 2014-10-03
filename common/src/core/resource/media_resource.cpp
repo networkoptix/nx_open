@@ -6,8 +6,10 @@
 #include <utils/common/warnings.h>
 #include <utils/serialization/lexical.h>
 
+#include "camera_user_attribute_pool.h"
 #include "resource_media_layout.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
+
 
 class QnStreamQualityStrings {
     Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
@@ -129,15 +131,17 @@ void QnMediaResource::initMediaResource()
 }
 
 QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const {
-    return m_dewarpingParams;
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), toResource()->getId() );
+    return (*userAttributesLock)->dewarpingParams;
 }
 
 
 void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
-    if (m_dewarpingParams == params)
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), toResource()->getId() );
+    if ((*userAttributesLock)->dewarpingParams == params)
         return;
 
-    m_dewarpingParams = params;
+    (*userAttributesLock)->dewarpingParams = params;
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
@@ -145,10 +149,10 @@ void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&m
 {
     QnMediaResourcePtr other_casted = qSharedPointerDynamicCast<QnMediaResource>(other);
     if (other_casted) {
-        if (m_dewarpingParams != other_casted->m_dewarpingParams) {
-            m_dewarpingParams = other_casted->m_dewarpingParams;
-            modifiedFields << "mediaDewarpingParamsChanged";
-        }
+        //if (m_dewarpingParams != other_casted->m_dewarpingParams) {   //moved to QnCameraUserAttributePool
+        //    m_dewarpingParams = other_casted->m_dewarpingParams;
+        //    modifiedFields << "mediaDewarpingParamsChanged";
+        //}
     }
 }
 

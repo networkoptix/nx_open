@@ -74,6 +74,14 @@ namespace ec2
         m_cameraManager->triggerNotification( tran );
     }
 
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiCameraAttributesData>& tran ) {
+        m_cameraManager->triggerNotification( tran );
+    }
+
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiCameraAttributesDataList>& tran ) {
+        m_cameraManager->triggerNotification( tran );
+    }
+
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiBusinessActionData>& tran ) {
         m_businessEventManager->triggerNotification( tran );
     }

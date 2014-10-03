@@ -28,6 +28,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
@@ -894,8 +895,8 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     if(!modifiedResources.empty()) {
         detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources);
 
-        connection2()->getCameraManager()->save(
-            modifiedResources, 
+        connection2()->getCameraManager()->saveUserAttributes(
+            QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(modifiedResources)),
             processor,
             [processor, modifiedResources](int reqID, ec2::ErrorCode errorCode) {
                 processor->at_replyReceived(reqID, errorCode, modifiedResources);
@@ -1750,7 +1751,9 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
             cam->setGroupName(name);
             modified << cam;
         }
-        connection2()->getCameraManager()->save(modified, this, 
+        connection2()->getCameraManager()->saveUserAttributes(
+            QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(modified)),
+            this, 
             [this, modified, oldName]( int reqID, ec2::ErrorCode errorCode ) {
                 at_resources_saved( reqID, errorCode, modified );
                 if (errorCode != ec2::ErrorCode::ok)
@@ -1788,7 +1791,10 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         if (mServer)
             connection2()->getMediaServerManager()->save(mServer, this, callback);
         if (camera)
-            connection2()->getCameraManager()->save( QnVirtualCameraResourceList() << camera, this, callback);
+            connection2()->getCameraManager()->saveUserAttributes(
+                QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(QnVirtualCameraResourceList() << camera)),
+                this,
+                callback);
         if (user) 
             connection2()->getUserManager()->save( user, this, callback );
         if (layout)

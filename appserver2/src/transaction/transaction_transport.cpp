@@ -430,7 +430,9 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
     }
 
     using namespace std::placeholders;
-    m_socket->sendAsync( dataCtx.encodedSourceData, std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) );
+    assert( !dataCtx.encodedSourceData.isEmpty() );
+    if( !m_socket->sendAsync( dataCtx.encodedSourceData, std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) ) )
+        return setStateNoLock( State::Error );
 }
 
 void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent )

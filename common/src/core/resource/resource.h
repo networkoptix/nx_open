@@ -106,7 +106,7 @@ public:
 
     //just a simple resource name
     virtual QString getName() const;
-    void setName(const QString& name);
+    virtual void setName(const QString& name);
 
 
     // this value is updated by discovery process

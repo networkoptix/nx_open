@@ -148,7 +148,6 @@ protected:
     int responseCode;
 
     nx_http::LineSplitter m_lineSpliter;
-    bool m_connected;
     
     class ResponseTimeoutException {};
     class SendMessageTimeoutException {};

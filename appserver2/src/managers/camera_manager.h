@@ -6,6 +6,7 @@
 
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_camera_data.h"
+#include "nx_ec/data/api_camera_attributes_data.h"
 #include "transaction/transaction.h"
 #include "nx_ec/data/api_camera_server_item_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
@@ -43,6 +44,23 @@ namespace ec2
                     QnResourceParams(camera.url, camera.vendor) ).dynamicCast<QnVirtualCameraResource>();
                 fromApiToResource(camera, cameraRes);
                 emit cameraAddedOrUpdated( cameraRes );
+            }
+        }
+
+        void triggerNotification( const QnTransaction<ApiCameraAttributesData>& tran ) {
+            assert( tran.command == ApiCommand::saveCameraUserAttributes );
+            QnCameraUserAttributesPtr cameraAttrs( new QnCameraUserAttributes() );
+            fromApiToResource( tran.params, cameraAttrs );
+            emit userAttributesChanged( cameraAttrs );
+        }
+
+        void triggerNotification( const QnTransaction<ApiCameraAttributesDataList>& tran ) {
+            assert( tran.command == ApiCommand::saveCameraUserAttributesList );
+            foreach(const ApiCameraAttributesData& attrs, tran.params) 
+            {
+                QnCameraUserAttributesPtr cameraAttrs( new QnCameraUserAttributes() );
+                fromApiToResource( attrs, cameraAttrs );
+                emit userAttributesChanged( cameraAttrs );
             }
         }
 
@@ -111,6 +129,10 @@ namespace ec2
         virtual int getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::save
         virtual int save( const QnVirtualCameraResourceList& cameras, impl::AddCameraHandlerPtr handler ) override;
+        //!Implementation of AbstractCameraManager::saveUserAttributes
+        virtual int saveUserAttributes( const QnCameraUserAttributesList& cameraAttributes, impl::SimpleHandlerPtr handler ) override;
+        //!Implementation of AbstractCameraManager::getUserAttributes
+        virtual int getUserAttributes( const QnUuid& cameraId, impl::GetCameraUserAttributesHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::remove
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
 
@@ -126,6 +148,7 @@ namespace ec2
 
         QnTransaction<ApiCameraData> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourcePtr& resource );
         QnTransaction<ApiCameraDataList> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourceList& cameras );
+        QnTransaction<ApiCameraAttributesDataList> prepareTransaction( ApiCommand::Value cmd, const QnCameraUserAttributesList& cameraAttributesList );
         QnTransaction<ApiCameraServerItemData> prepareTransaction( ApiCommand::Value cmd, const QnCameraHistoryItem& historyItem );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnUuid& id );
         QnTransaction<ApiCameraBookmarkTagDataList> prepareTransaction( ApiCommand::Value command, const QnCameraBookmarkTags& tags );

@@ -12,6 +12,7 @@
 
 #include <core/misc/schedule_task.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -25,6 +26,8 @@
 
 #include "api_business_rule_data.h"
 #include "api_camera_data.h"
+#include "api_camera_attributes_data.h"
+#include "api_camera_data_ex.h"
 #include "api_camera_bookmark_data.h"
 #include "api_camera_server_item_data.h"
 #include "api_email_data.h"
@@ -127,21 +130,10 @@ void fromApiToResource(const ApiBusinessActionData &src, QnAbstractBusinessActio
     dst->setAggregationCount(src.aggregationCount);
 }
 
-void fromResourceToApi(const QnScheduleTask &src, ApiScheduleTaskData &dst) {
-    dst.startTime = src.getStartTime();
-    dst.endTime = src.getEndTime();
-    dst.recordAudio = src.getDoRecordAudio();
-    dst.recordingType = src.getRecordingType();
-    dst.dayOfWeek = src.getDayOfWeek();
-    dst.beforeThreshold = src.getBeforeThreshold();
-    dst.afterThreshold = src.getAfterThreshold();
-    dst.streamQuality = src.getStreamQuality();
-    dst.fps = src.getFps();
-}
 
-void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QnUuid &resourceId) {
-    dst = QnScheduleTask(resourceId, src.dayOfWeek, src.startTime, src.endTime, src.recordingType, src.beforeThreshold, src.afterThreshold, src.streamQuality, src.fps, src.recordAudio);
-}
+////////////////////////////////////////////////////////////
+//// ApiCameraData
+////////////////////////////////////////////////////////////
 
 void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst) {
     QnResourcePtr tmp = dst;
@@ -153,79 +145,38 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
             dst->addFlags(Qn::desktop_camera);
     }
 
-    dst->setScheduleDisabled(!src.scheduleEnabled);
-    dst->setMotionType(src.motionType);
-
-    QList<QnMotionRegion> regions;
-    parseMotionRegionList(regions, src.motionMask);
-    dst->setMotionRegionList(regions, QnDomainMemory);
-
     dst->setMAC(QnMacAddress(src.mac));
     QAuthenticator auth;
     auth.setUser(src.login);
     auth.setPassword(src.password);
     dst->setAuth(auth);
 
-    QnScheduleTaskList tasks;
-    tasks.reserve((int)src.scheduleTasks.size());
-    for(const ApiScheduleTaskData &srcTask: src.scheduleTasks) {
-        tasks.push_back(QnScheduleTask());
-        fromApiToResource(srcTask, tasks.back(), src.id);
-    }
-    dst->setScheduleTasks(tasks);
-
-    dst->setAudioEnabled(src.audioEnabled);
     dst->setPhysicalId(src.physicalId);
     dst->setManuallyAdded(src.manuallyAdded);
     dst->setModel(src.model);
     dst->setGroupId(src.groupId);
     dst->setGroupName(src.groupName);
-    dst->setSecondaryStreamQuality(src.secondaryStreamQuality);
-    dst->setCameraControlDisabled(!src.controlEnabled);
     dst->setStatusFlags(src.statusFlags);
 
-    dst->setDewarpingParams(QJson::deserialized<QnMediaDewarpingParams>(src.dewarpingParams));
     dst->setVendor(src.vendor);
-    dst->setMinDays(src.minArchiveDays);
-    dst->setMaxDays(src.maxArchiveDays);
-    dst->setPreferedServerId(src.preferedServerId);
     Q_ASSERT(dst->getId() == QnVirtualCameraResource::uniqueIdToId(dst->getUniqueId()));
-
 }
 
 
 void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst) {
     fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
 
-    dst.scheduleEnabled = !src->isScheduleDisabled();
-    dst.motionType = src->getMotionType();
-
-    QList<QnMotionRegion> regions;
-    dst.motionMask = serializeMotionRegionList(src->getMotionRegionList()).toLatin1();
     dst.mac = src->getMAC().toString().toLatin1();
     dst.login = src->getAuth().user();
     dst.password = src->getAuth().password();
     
-    dst.scheduleTasks.clear();
-    for(const QnScheduleTask &srcTask: src->getScheduleTasks()) {
-        dst.scheduleTasks.push_back(ApiScheduleTaskData());
-        fromResourceToApi(srcTask, dst.scheduleTasks.back());
-    }
-
-    dst.audioEnabled = src->isAudioEnabled();
     dst.physicalId = src->getPhysicalId();
     dst.manuallyAdded = src->isManuallyAdded();
     dst.model = src->getModel();
     dst.groupId = src->getGroupId();
     dst.groupName = src->getGroupName();
-    dst.secondaryStreamQuality = src->secondaryStreamQuality();
-    dst.controlEnabled = !src->isCameraControlDisabled();
     dst.statusFlags = src->statusFlags();
-    dst.dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(src->getDewarpingParams());
     dst.vendor = src->getVendor();
-    dst.minArchiveDays = src->minDays();
-    dst.maxArchiveDays = src->maxDays();
-    dst.preferedServerId = src->preferedServerId();
 }
 
 template<class List> 
@@ -256,6 +207,136 @@ void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraData
     }
 }
 
+
+////////////////////////////////////////////////////////////
+//// ApiCameraAttributesData
+////////////////////////////////////////////////////////////
+
+void fromResourceToApi(const QnScheduleTask &src, ApiScheduleTaskData &dst) {
+    dst.startTime = src.getStartTime();
+    dst.endTime = src.getEndTime();
+    dst.recordAudio = src.getDoRecordAudio();
+    dst.recordingType = src.getRecordingType();
+    dst.dayOfWeek = src.getDayOfWeek();
+    dst.beforeThreshold = src.getBeforeThreshold();
+    dst.afterThreshold = src.getAfterThreshold();
+    dst.streamQuality = src.getStreamQuality();
+    dst.fps = src.getFps();
+}
+
+void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QnUuid &resourceId) {
+    dst = QnScheduleTask(resourceId, src.dayOfWeek, src.startTime, src.endTime, src.recordingType, 
+                         src.beforeThreshold, src.afterThreshold, src.streamQuality, src.fps, src.recordAudio);
+}
+
+void fromApiToResource(const ApiCameraAttributesData &src, const QnCameraUserAttributesPtr& dst)
+{
+    dst->cameraID = src.cameraID;
+    dst->name = src.cameraName;
+    dst->scheduleDisabled = !src.scheduleEnabled;
+    dst->motionType = src.motionType;
+
+    QList<QnMotionRegion> regions;
+    parseMotionRegionList(regions, src.motionMask);
+    dst->motionRegions = regions;
+
+    QnScheduleTaskList tasks;
+    tasks.reserve((int)src.scheduleTasks.size());
+    for(const ApiScheduleTaskData &srcTask: src.scheduleTasks) {
+        tasks.push_back(QnScheduleTask());
+        fromApiToResource(srcTask, tasks.back(), src.cameraID);
+    }
+    dst->scheduleTasks = tasks;
+
+    dst->audioEnabled = src.audioEnabled;
+
+    dst->secondaryQuality = src.secondaryStreamQuality;
+    dst->cameraControlDisabled = !src.controlEnabled;
+    dst->dewarpingParams = QJson::deserialized<QnMediaDewarpingParams>(src.dewarpingParams);
+    dst->minDays = src.minArchiveDays;
+    dst->maxDays = src.maxArchiveDays;
+    dst->preferedServerId = src.preferedServerId;
+}
+
+void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributesData& dst)
+{
+    dst.cameraID = src->cameraID;
+    dst.cameraName = src->name;
+    dst.scheduleEnabled = !src->scheduleDisabled;
+    dst.motionType = src->motionType;
+
+    QList<QnMotionRegion> regions;
+    dst.motionMask = serializeMotionRegionList(src->motionRegions).toLatin1();
+    
+    dst.scheduleTasks.clear();
+    for(const QnScheduleTask &srcTask: src->scheduleTasks) {
+        dst.scheduleTasks.push_back(ApiScheduleTaskData());
+        fromResourceToApi(srcTask, dst.scheduleTasks.back());
+    }
+
+    dst.audioEnabled = src->audioEnabled;
+    dst.secondaryStreamQuality = src->secondaryQuality;
+    dst.controlEnabled = !src->cameraControlDisabled;
+    dst.dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(src->dewarpingParams);
+    dst.minArchiveDays = src->minDays;
+    dst.maxArchiveDays = src->maxDays;
+    dst.preferedServerId = src->preferedServerId;
+}
+
+void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserAttributesList& dst)
+{
+    dst.reserve( dst.size()+src.size() );
+    for( const ApiCameraAttributesData& cameraAttrs: src )
+    {
+        QnCameraUserAttributesPtr dstElement( new QnCameraUserAttributes() );
+        fromApiToResource( cameraAttrs, dstElement );
+        dst.push_back( std::move(dstElement) );
+    }
+}
+
+void fromResourceListToApi(const QnCameraUserAttributesList& src, ApiCameraAttributesDataList& dst)
+{
+    dst.reserve(dst.size() + src.size());
+    for(const QnCameraUserAttributesPtr& camerAttrs: src) {
+        dst.push_back(ApiCameraAttributesData());
+        fromResourceToApi(camerAttrs, dst.back());
+    }
+}
+
+
+////////////////////////////////////////////////////////////
+//// ApiCameraDataEx
+////////////////////////////////////////////////////////////
+
+void fromApiToResource(const ApiCameraDataEx& src, QnVirtualCameraResourcePtr& dst)
+{
+    fromApiToResource( static_cast<const ApiCameraData&>(src), dst );
+    //TODO #ak using QnCameraUserAttributePool here is not good
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), dst->getId() );
+    fromApiToResource( static_cast<const ApiCameraAttributesData&>(src), *userAttributesLock );
+}
+
+void fromResourceToApi(const QnVirtualCameraResourcePtr& src, ApiCameraDataEx& dst)
+{
+    fromResourceToApi( src, static_cast<ApiCameraData&>(dst) );
+    //TODO #ak using QnCameraUserAttributePool here is not good
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), src->getId() );
+    fromResourceToApi( *userAttributesLock, static_cast<ApiCameraAttributesData&>(dst) );
+}
+
+void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraDataExList &dst)
+{
+    dst.reserve(dst.size() + src.size());
+    for(const QnVirtualCameraResourcePtr &srcCamera: src) {
+        dst.push_back(ApiCameraDataEx());
+        fromResourceToApi(srcCamera, dst.back());
+    }
+}
+
+
+////////////////////////////////////////////////////////////
+//// QnCameraHistoryItem
+////////////////////////////////////////////////////////////
 
 void fromResourceToApi(const QnCameraHistoryItem &src, ApiCameraServerItemData &dst) {
     dst.cameraUniqueId = src.cameraUniqueId;
@@ -324,6 +405,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
 
     fromApiToResourceList(src.servers, dst.resources, ctx);
     fromApiToResourceList(src.cameras, dst.resources, ctx.resFactory);
+    fromApiToResourceList(src.cameraUserAttributesList, dst.cameraUserAttributesList);
     fromApiToResourceList(src.users, dst.resources);
     fromApiToResourceList(src.layouts, dst.resources, ctx);
     fromApiToResourceList(src.videowalls, dst.resources);

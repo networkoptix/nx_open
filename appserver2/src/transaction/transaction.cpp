@@ -50,6 +50,10 @@ namespace ec2
             REGISTER_COMMAND(getCameras),
             REGISTER_COMMAND(getCameraHistoryItems),
             REGISTER_COMMAND(addCameraHistoryItem),
+            REGISTER_COMMAND(saveCameraUserAttributes),
+            REGISTER_COMMAND(saveCameraUserAttributesList),
+            REGISTER_COMMAND(getCameraUserAttributes),
+            REGISTER_COMMAND(getFullCameraDataList),
 
             REGISTER_COMMAND(addCameraBookmarkTags),
             REGISTER_COMMAND(getCameraBookmarkTags),
@@ -165,6 +169,8 @@ namespace ec2
                 val == setResourceParams ||
                 val == setPanicMode ||
                 val == saveCamera ||
+                val == saveCameraUserAttributes ||
+                val == saveCameraUserAttributesList ||
                 val == saveCameras ||
                 val == removeCamera ||
                 val == addCameraHistoryItem ||

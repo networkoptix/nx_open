@@ -10,31 +10,13 @@
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 #include <QtCore/QWaitCondition>
+#include <QtCore/QSharedPointer>
 
-#include <core/misc/schedule_task.h>
-
-#include "motion_window.h"
-
-
-//!Contains camera settings usually modified by user
-/*!
-    E.g., recording schedule, motion type, second stream quality, etc...
-*/
-class QnUserCameraSettings
-{
-public:
-    Qn::MotionType motionType;
-    QList<QnMotionRegion> motionRegions;
-    bool scheduleDisabled;
-    bool audioEnabled;
-    bool cameraControlDisabled;
-    QnScheduleTaskList scheduleTasks;
-
-    QnUserCameraSettings();
-};
+#include "camera_user_attributes.h"
+#include "resource_fwd.h"
 
 
-//!Pool of \a QnUserCameraSettings
+//!Pool of \a QnCameraUserAttributes
 /*!
     Example of adding element to pool and setting some values:
     \code {*.cpp}
@@ -78,6 +60,18 @@ public:
         MappedType* m_lockedElement;
     };
 
+    template<class T>
+    void setElementInitializer( T handler )
+    {
+        m_customInitializer = std::move(handler);
+    }
+
+    MappedType get( const KeyType& key )
+    {
+        ScopedLock lk( this, key );
+        return *lk;
+    }
+
 private:
     class DataCtx
     {
@@ -95,6 +89,7 @@ private:
     std::map<KeyType, std::unique_ptr<DataCtx>> m_elements;
     QMutex m_mutex;
     QWaitCondition m_cond;
+    std::function<void(const KeyType&, MappedType&)> m_customInitializer;
 
     //!If element already locked, blocks till element has been unlocked
     /*!
@@ -105,7 +100,11 @@ private:
         QMutexLocker lk( &m_mutex );
         auto p = m_elements.emplace( std::make_pair( key, nullptr ) );
         if( p.second )
+        {
             p.first->second.reset( new DataCtx() );
+            if( m_customInitializer )
+                m_customInitializer( key, p.first->second->mapped );
+        }
         while( p.first->second->locked )
             m_cond.wait( lk.mutex() );
         p.first->second->locked = true;
@@ -123,13 +122,25 @@ private:
     }
 };
 
+template<class ResourcePtrType>
+QList<QnUuid> idListFromResList( const QList<ResourcePtrType>& resList )
+{
+    QList<QnUuid> idList;
+    idList.reserve( resList.size() );
+    for( const ResourcePtrType& resPtr: resList )
+        idList.push_back( resPtr->getId() );
+    return idList;
+}
+
 class QnCameraUserAttributePool
 :
-    public QnGeneralAttributePool<QnUuid, QnUserCameraSettings>
+    public QnGeneralAttributePool<QnUuid, QnCameraUserAttributesPtr>
 {
 public:
     QnCameraUserAttributePool();
     virtual ~QnCameraUserAttributePool();
+
+    QnCameraUserAttributesList getAttributesList( const QList<QnUuid>& idList );
 
     static QnCameraUserAttributePool* instance();
 };

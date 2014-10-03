@@ -26,6 +26,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_user_attributes.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/motion_window.h>
@@ -108,6 +109,10 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnUserResourceList>();
     qRegisterMetaType<QnVideoWallResourceList>();
+
+    qRegisterMetaType<QnCameraUserAttributes>();
+    qRegisterMetaType<QnCameraUserAttributesPtr>();
+    qRegisterMetaType<QnCameraUserAttributesList>();
 
     qRegisterMetaType<QnCameraHistoryList>();
     qRegisterMetaType<QnCameraHistoryItemPtr>();

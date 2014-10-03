@@ -141,6 +141,38 @@ void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subD
     }
 }
 
+//!Same as above but does not require field "id" of type QnUuid
+/**
+ * Function merges two sorted lists. First of them (data) contains placeholder 
+ * field for the data, that is contained in the second (subData). 
+ * Data elements MUST be sorted by \a idField.
+ * SubData elements should be sorted by parentIdField.
+ */
+template <class MainData, class SubData, class MainSubData, class MainOrParentType, class IdType, class SubOrParentType>
+void mergeObjectListData(
+    std::vector<MainData>& data,
+    std::vector<SubData>& subDataList,
+    std::vector<MainSubData> MainOrParentType::*subDataListField,
+    IdType MainOrParentType::*idField,
+    IdType SubOrParentType::*parentIdField )
+{
+    assertSorted(data, idField);
+    assertSorted(subDataList, parentIdField);
+
+    size_t i = 0;
+    size_t j = 0;
+    while (i < data.size() && j < subDataList.size()) {
+        if (subDataList[j].*parentIdField == data[i].*idField) {
+            (data[i].*subDataListField).push_back(subDataList[j]);
+            ++j;
+        } else if ((subDataList[j].*parentIdField) > data[i].*idField) {
+            ++i;
+        } else {
+            ++j;
+        }
+    }
+}
+
 QnDbManager::Locker::Locker(QnDbManager* db)
 : 
     m_db(db),
@@ -459,6 +491,8 @@ bool QnDbManager::resyncTransactionLog()
     if (!fillTransactionLogInternal<ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
         return false;
     if (!fillTransactionLogInternal<ApiCameraData, ApiCameraDataList>(ApiCommand::saveCamera))
+        return false;
+    if (!fillTransactionLogInternal<ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
         return false;
     if (!fillTransactionLogInternal<ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
         return false;
@@ -1046,10 +1080,10 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
 ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT OR REPLACE INTO vms_camera (audio_enabled, control_enabled, vendor, manually_added, resource_ptr_id, region, schedule_enabled, motion_type, group_name, group_id,\
-                     mac, model, secondary_quality, status_flags, physical_id, password, login, dewarping_params, resource_ptr_id, min_archive_days, max_archive_days, prefered_server_id) VALUES\
-                     (:audioEnabled, :controlEnabled, :vendor, :manuallyAdded, :id, :motionMask, :scheduleEnabled, :motionType, :groupName, :groupId,\
-                     :mac, :model, :secondaryStreamQuality, :statusFlags, :physicalId, :password, :login, :dewarpingParams, :internalId, :minArchiveDays, :maxArchiveDays, :preferedServerId)");
+    insQuery.prepare("INSERT OR REPLACE INTO vms_camera (vendor, manually_added, resource_ptr_id, group_name, group_id,\
+                     mac, model, status_flags, physical_id, password, login, resource_ptr_id) VALUES\
+                     (:vendor, :manuallyAdded, :id, :groupName, :groupId,\
+                     :mac, :model, :statusFlags, :physicalId, :password, :login, :internalId)");
     QnSql::bind(data, &insQuery);
     insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec()) {
@@ -1059,6 +1093,51 @@ ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 i
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
         return ErrorCode::dbError;
     }
+}
+
+ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributesData& data, qint32* const internalId)
+{
+    //TODO #ak if record already exists have to find id first?
+
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("\
+        INSERT OR REPLACE INTO vms_camera_user_attributes ( \
+            camera_guid,                    \
+            camera_name,                    \
+            audio_enabled,                  \
+            control_enabled,                \
+            region,                         \
+            schedule_enabled,               \
+            motion_type,                    \
+            secondary_quality,              \
+            dewarping_params,               \
+            min_archive_days,               \
+            max_archive_days,               \
+            prefered_server_id )            \
+         VALUES (                           \
+            :cameraID,                      \
+            :cameraName,                    \
+            :audioEnabled,                  \
+            :controlEnabled,                \
+            :motionMask,                    \
+            :scheduleEnabled,               \
+            :motionType,                    \
+            :secondaryStreamQuality,        \
+            :dewarpingParams,               \
+            :minArchiveDays,                \
+            :maxArchiveDays,                \
+            :preferedServerId )             \
+        ");
+    QnSql::bind(data, &insQuery);
+    if( !insQuery.exec() )
+    {
+        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(insQuery.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+
+    *internalId = insQuery.lastInsertId().toInt();
+
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId)
@@ -1164,7 +1243,7 @@ ErrorCode QnDbManager::updateStorages(const ApiMediaServerData& data)
 ErrorCode QnDbManager::removeCameraSchedule(qint32 internalId)
 {
     QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM vms_scheduletask where source_id = ?");
+    delQuery.prepare("DELETE FROM vms_scheduletask where camera_attrs_id = ?");
     delQuery.addBindValue(internalId);
     if (!delQuery.exec()) {
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
@@ -1173,19 +1252,17 @@ ErrorCode QnDbManager::removeCameraSchedule(qint32 internalId)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data, qint32 internalId)
+ErrorCode QnDbManager::updateCameraSchedule(const std::vector<ApiScheduleTaskData>& scheduleTasks, qint32 internalId)
 {
     ErrorCode errCode = removeCameraSchedule(internalId);
     if (errCode != ErrorCode::ok)
         return errCode;
 
     QSqlQuery insQuery(m_sdb);
-    //insQuery.prepare("INSERT INTO vms_scheduletask (source_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) 
-    //                  VALUES :sourceId, :startTime, :endTime, :doRecordAudio, :recordType, :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps)");
-    insQuery.prepare("INSERT INTO vms_scheduletask(source_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) VALUES (?,?,?,?,?,?,?,?,?,?)");
+    insQuery.prepare("INSERT INTO vms_scheduletask(camera_attrs_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) VALUES (?,?,?,?,?,?,?,?,?,?)");
 
     insQuery.bindValue(0, internalId);
-    foreach(const ApiScheduleTaskData& task, data.scheduleTasks) 
+    foreach(const ApiScheduleTaskData& task, scheduleTasks) 
     {
         insQuery.bindValue(1, QnSql::serialized_field(task.startTime));
         insQuery.bindValue(2, QnSql::serialized_field(task.endTime));
@@ -1261,12 +1338,7 @@ ErrorCode QnDbManager::saveCamera(const ApiCameraData& params)
     if (result != ErrorCode::ok)
         return result;
 
-    result = insertOrReplaceCamera(params, internalId);
-    if (result != ErrorCode::ok)
-        return result;
-
-    result = updateCameraSchedule(params, internalId);
-    return result;
+    return insertOrReplaceCamera(params, internalId);
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraData>& tran)
@@ -1283,6 +1355,32 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraD
             return result;
     }
     return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraAttributesData>& tran)
+{
+    return saveCameraUserAttributes(tran.params);
+}
+
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraAttributesDataList>& tran)
+{
+    foreach(const ApiCameraAttributesData& attrs, tran.params)
+    {
+        const ErrorCode result = saveCameraUserAttributes(attrs);
+        if (result != ErrorCode::ok)
+            return result;
+    }
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::saveCameraUserAttributes( const ApiCameraAttributesData& attrs )
+{
+    qint32 internalId = 0;
+    ErrorCode result = insertOrReplaceCameraAttributes(attrs, &internalId);
+    if (result != ErrorCode::ok)
+        return result;
+
+    return updateCameraSchedule(attrs.scheduleTasks, internalId);
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourceData>& tran)
@@ -2133,23 +2231,12 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiCameraDataList&
     }
     queryCameras.setForwardOnly(true);
     queryCameras.prepare(QString("SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, r.status, \
-        c.audio_enabled as audioEnabled, c.control_enabled as controlEnabled, c.vendor, c.manually_added as manuallyAdded, \
-        c.region as motionMask, c.schedule_enabled as scheduleEnabled, c.motion_type as motionType, \
-        c.group_name as groupName, c.group_id as groupId, c.mac, c. model, c.secondary_quality as secondaryStreamQuality, \
-		c.status_flags as statusFlags, c.physical_id as physicalId, c.password, login, c.dewarping_params as dewarpingParams, \
-        c.min_archive_days as minArchiveDays, c.max_archive_days as maxArchiveDays, c.prefered_server_id as preferedServerId \
+        c.vendor, c.manually_added as manuallyAdded, \
+        c.group_name as groupName, c.group_id as groupId, c.mac, c.model, \
+		c.status_flags as statusFlags, c.physical_id as physicalId, c.password, login \
         FROM vms_resource r \
         JOIN vms_camera c on c.resource_ptr_id = r.id %1 ORDER BY r.guid").arg(filterStr));
 
-
-    QSqlQuery queryScheduleTask(m_sdb);
-    
-    queryScheduleTask.setForwardOnly(true);
-    queryScheduleTask.prepare(QString("SELECT r.guid as sourceId, st.start_time as startTime, st.end_time as endTime, st.do_record_audio as recordAudio, \
-                                       st.record_type as recordingType, st.day_of_week as dayOfWeek, st.before_threshold as beforeThreshold, st.after_threshold as afterThreshold, \
-                                       st.stream_quality as streamQuality, st.fps \
-                                       FROM vms_scheduletask st \
-                                       JOIN vms_resource r on r.id = st.source_id %1 ORDER BY r.guid").arg(filterStr));
 
     QSqlQuery queryParams(m_sdb);
     queryParams.setForwardOnly(true);
@@ -2167,10 +2254,6 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiCameraDataList&
         qWarning() << Q_FUNC_INFO << queryCameras.lastError().text();
         return ErrorCode::dbError;
     }
-    if (!queryScheduleTask.exec()) {
-        qWarning() << Q_FUNC_INFO << queryScheduleTask.lastError().text();
-        return ErrorCode::dbError;
-    }
 
     if (!queryParams.exec()) {
         qWarning() << Q_FUNC_INFO << queryParams.lastError().text();
@@ -2179,16 +2262,117 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiCameraDataList&
 
     QnSql::fetch_many(queryCameras, &cameraList);
 
-    std::vector<ApiScheduleTaskWithRefData> sheduleTaskList;
-    QnSql::fetch_many(queryScheduleTask, &sheduleTaskList);
-    mergeObjectListData(cameraList, sheduleTaskList, &ApiCameraData::scheduleTasks, &ApiScheduleTaskWithRefData::sourceId);
-
     std::vector<ApiResourceParamWithRefData> params;
     QnSql::fetch_many(queryParams, &params);
     mergeObjectListData<ApiCameraData>(cameraList, params, &ApiCameraData::addParams, &ApiResourceParamWithRefData::resourceId);
 
     return ErrorCode::ok;
 }
+
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList)
+{
+    //fetching camera user attributes
+    QSqlQuery queryCameras(m_sdb);
+    QString filterStr;
+    if( !cameraId.isNull() )
+        filterStr = QString("WHERE camera_guid = %1").arg(guidToSqlString(cameraId));
+    queryCameras.setForwardOnly(true);
+
+    queryCameras.prepare(lit("\
+        SELECT                                              \
+            camera_guid as cameraID,                        \
+            camera_name as cameraName,                      \
+            audio_enabled as audioEnabled,                  \
+            control_enabled as controlEnabled,              \
+            region as motionMask,                           \
+            schedule_enabled as scheduleEnabled,            \
+            motion_type as motionType,                      \
+            secondary_quality as secondaryStreamQuality,    \
+            dewarping_params as dewarpingParams,            \
+            min_archive_days as minArchiveDays,             \
+            max_archive_days as maxArchiveDays,             \
+            prefered_server_id as preferedServerId          \
+         FROM vms_camera_user_attributes                    \
+         %1                                                 \
+         ORDER BY camera_guid                               \
+        ").arg(filterStr) );
+
+    if (!queryCameras.exec()) {
+        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+     
+    QnSql::fetch_many(queryCameras, &cameraUserAttributesList);
+
+    //fetching recording schedule
+    QSqlQuery queryScheduleTask(m_sdb);
+    queryScheduleTask.setForwardOnly(true);
+    queryScheduleTask.prepare(QString("\
+        SELECT                                                          \
+            r.camera_guid as sourceId,                                  \
+            st.start_time as startTime,                                 \
+            st.end_time as endTime,                                     \
+            st.do_record_audio as recordAudio,                          \
+            st.record_type as recordingType,                            \
+            st.day_of_week as dayOfWeek,                                \
+            st.before_threshold as beforeThreshold,                     \
+            st.after_threshold as afterThreshold,                       \
+            st.stream_quality as streamQuality,                         \
+            st.fps                                                      \
+        FROM vms_scheduletask st                                        \
+        JOIN vms_camera_user_attributes r on r.id = st.camera_attrs_id  \
+        %1                                                              \
+        ORDER BY r.camera_guid                                          \
+        ").arg(filterStr));
+
+    if (!queryScheduleTask.exec()) {
+        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryScheduleTask.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+
+    std::vector<ApiScheduleTaskWithRefData> scheduleTaskList;
+    QnSql::fetch_many(queryScheduleTask, &scheduleTaskList);
+
+    //merging data
+    mergeObjectListData(
+        cameraUserAttributesList,
+        scheduleTaskList,
+        &ApiCameraAttributesData::scheduleTasks,
+        &ApiCameraAttributesData::cameraID,
+        &ApiScheduleTaskWithRefData::sourceId );
+
+    return ErrorCode::ok;
+}
+
+//ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesData& cameraUserAttributes)
+//{
+//    //TODO #ak throw away this method
+//
+//    assert( !cameraId.isNull() );
+//    if( cameraId.isNull() )
+//        return ErrorCode::serverError;
+//
+//    ApiCameraAttributesDataList cameraAttrList;
+//    const ErrorCode result = doQueryNoLock( cameraId, cameraAttrList );
+//    if( result != ErrorCode::ok )
+//        return result;
+//
+//    assert( cameraAttrList.size() <= 1 );
+//    if( cameraId.isNull() )
+//        return ErrorCode::serverError;
+//    if( cameraAttrList.size() == 1 )
+//        cameraUserAttributes = std::move(cameraAttrList[0]);
+//
+//    return ErrorCode::ok;
+//}
+
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiCameraDataExList& cameraList)
+{
+    //if cameraId empty, returning all records
+    //TODO #ak
+    return ErrorCode::dbError;
+}
+
 
 // ----------- getServers --------------------
 
@@ -2482,6 +2666,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
         return err;
 
     if ((err = doQueryNoLock(QnUuid(), data.cameras)) != ErrorCode::ok)
+        return err;
+
+    if ((err = doQueryNoLock(QnUuid(), data.cameraUserAttributesList)) != ErrorCode::ok)
         return err;
 
     if ((err = doQueryNoLock(dummy, data.users)) != ErrorCode::ok)

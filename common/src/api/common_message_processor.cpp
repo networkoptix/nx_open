@@ -13,11 +13,13 @@
 #include <business/business_event_rule.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_user_attribute_pool.h>
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
 #include "runtime_info_manager.h"
 
 #include <utils/common/app_info.h>
+
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     base_type(parent)
@@ -65,6 +67,8 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
     auto cameraManager = connection->getCameraManager();
     connect(cameraManager, &ec2::AbstractCameraManager::cameraAddedOrUpdated,       this, [this](const QnVirtualCameraResourcePtr &camera){updateResource(camera);});
+    connect(cameraManager, &ec2::AbstractCameraManager::userAttributesChanged,      this, &QnCommonMessageProcessor::on_cameraUserAttributesChanged );
+    connect(cameraManager, &ec2::AbstractCameraManager::userAttributesRemoved,      this, &QnCommonMessageProcessor::on_cameraUserAttributesRemoved );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraHistoryChanged,       this, &QnCommonMessageProcessor::on_cameraHistoryChanged );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraHistoryRemoved,       this, &QnCommonMessageProcessor::on_cameraHistoryRemoved );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraRemoved,              this, &QnCommonMessageProcessor::on_resourceRemoved );
@@ -241,6 +245,30 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
         removeResourceIgnored(resourceId);
 }
 
+void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const QnCameraUserAttributesPtr& userAttributes)
+{
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttributes->cameraID );
+        *(*userAttributesLock) = *userAttributes;
+    }
+    const QnResourcePtr& res = qnResPool->getResourceById(userAttributes->cameraID);
+    if( res )   //it is OK if resource is missing
+        emit res->resourceChanged(res);
+}
+
+void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& cameraID)
+{
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraID );
+        //TODO #ak for now, never removing this structure, just resetting to empty value
+        *(*userAttributesLock) = QnCameraUserAttributes();
+        (*userAttributesLock)->cameraID = cameraID;
+    }
+    const QnResourcePtr& res = qnResPool->getResourceById(cameraID);
+    if( res )
+        emit res->resourceChanged(res);
+}
+
 void QnCommonMessageProcessor::on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory) {
     QnCameraHistoryPool::instance()->addCameraHistoryItem(*cameraHistory.data());
 }
@@ -342,11 +370,21 @@ void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &)
 {
 }
 
+void QnCommonMessageProcessor::processCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList )
+{
+    for( const QnCameraUserAttributesPtr& cameraAttrs: cameraUserAttributesList )
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraAttrs->cameraID );
+        *(*userAttributesLock) = *cameraAttrs;
+    }
+}
+
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
     //QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
 
     processResources(fullData.resources);
+    processCameraUserAttributesList( fullData.cameraUserAttributesList );
     processLicenses(fullData.licenses);
     processCameraServerItems(fullData.cameraHistory);
     //on_runtimeInfoChanged(fullData.serverInfo);

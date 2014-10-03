@@ -21,6 +21,7 @@
 #include "nx_ec/data/api_server_alive_data.h"
 #include "ec_connection_notification_manager.h"
 #include "nx_ec/data/api_camera_data.h"
+#include "nx_ec/data/api_camera_data_ex.h"
 #include "nx_ec/data/api_resource_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
 #include "managers/time_manager.h"
@@ -101,6 +102,10 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::setPanicMode:          return handleTransactionParams<ApiPanicModeData>        (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::saveCamera:            return handleTransactionParams<ApiCameraData>           (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::saveCameras:           return handleTransactionParams<ApiCameraDataList>       (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::saveCameraUserAttributes:
+        return handleTransactionParams<ApiCameraAttributesData> (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::saveCameraUserAttributesList:
+        return handleTransactionParams<ApiCameraAttributesDataList> (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::removeCamera:          return handleTransactionParams<ApiIdData>               (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::removeCameraHistoryItem:
     case ApiCommand::addCameraHistoryItem:  return handleTransactionParams<ApiCameraServerItemData> (serializedTransaction, &stream, transaction, function, fastFunction);
@@ -485,7 +490,7 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     return true;
 }
 
-void QnTransactionMessageBus::updatePersistentMarker(const QnTransaction<ApiUpdateSequenceData>& tran, QnTransactionTransport* transport)
+void QnTransactionMessageBus::updatePersistentMarker(const QnTransaction<ApiUpdateSequenceData>& tran, QnTransactionTransport* /*transport*/)
 {
     if (transactionLog)
         transactionLog->updateSequence(tran.params);
@@ -770,13 +775,13 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
             return false;
         }
 
-        ec2::ApiCameraDataList cameras;
+        ec2::ApiCameraDataExList cameras;
         if (dbManager->doQuery(QnUuid(), cameras) != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
         }
-        QnTransaction<ApiCameraDataList> tranCameras;
-        tranCameras.command = ApiCommand::getCameras;
+        QnTransaction<ApiCameraDataExList> tranCameras;
+        tranCameras.command = ApiCommand::getFullCameraDataList;
         tranCameras.peerID = m_localPeer.id;
 
         // filter out desktop cameras

@@ -871,11 +871,23 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         QnVirtualCameraResourceList cameras;
         while ((rez = ec2Connection->getCameraManager()->getCamerasSync(QnUuid(), &cameras)) != ec2::ErrorCode::ok)
         {
-            qDebug() << "QnMain::run(): Can't get cameras. Reason: " << ec2::toString(rez);
+            NX_LOG( lit("QnMain::run(): Can't get cameras. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
         }
+
+        //reading camera attributes
+        QnCameraUserAttributesList cameraUserAttributesList;
+        while ((rez = ec2Connection->getCameraManager()->getUserAttributesSync(QnUuid(), &cameraUserAttributesList)) != ec2::ErrorCode::ok)
+        {
+            NX_LOG( lit("QnMain::run(): Can't get camera user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+        messageProcessor->processCameraUserAttributesList( cameraUserAttributesList );
+
 
         QnManualCameraInfoMap manualCameras;
         foreach(const QnSecurityCamResourcePtr &camera, cameras) {

@@ -127,6 +127,13 @@ public:
 
     bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
     {
+#ifdef _DEBUG
+        if( !(buf.size() > 0) )
+        {
+            int* x = nullptr;
+            *x = 1;
+        }
+#endif
         assert( buf.size() > 0 );
 
 #ifdef _DEBUG

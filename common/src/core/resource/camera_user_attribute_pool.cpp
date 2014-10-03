@@ -5,21 +5,6 @@
 
 #include "camera_user_attribute_pool.h"
 
-#include <api/global_settings.h>
-
-
-QnUserCameraSettings::QnUserCameraSettings()
-:
-    motionType(Qn::MT_Default),
-    scheduleDisabled(true),
-    audioEnabled(false),
-    cameraControlDisabled( !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled() )
-{
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        motionRegions << QnMotionRegion();
-}
-
-
 
 ////////////////////////////////////////////////////////////
 //// QnCameraUserAttributePool
@@ -30,12 +15,25 @@ static QnCameraUserAttributePool* QnCameraUserAttributePool_instance = nullptr;
 QnCameraUserAttributePool::QnCameraUserAttributePool()
 {
     QnCameraUserAttributePool_instance = this;
+    setElementInitializer( []( const QnUuid& cameraID, QnCameraUserAttributesPtr& userAttributes ){
+        userAttributes = QnCameraUserAttributesPtr( new QnCameraUserAttributes() );
+        userAttributes->cameraID = cameraID;
+    } );
 }
 
 QnCameraUserAttributePool::~QnCameraUserAttributePool()
 {
     assert( QnCameraUserAttributePool_instance == this );
     QnCameraUserAttributePool_instance = nullptr;
+}
+
+QnCameraUserAttributesList QnCameraUserAttributePool::getAttributesList( const QList<QnUuid>& idList )
+{
+    QnCameraUserAttributesList valList;
+    valList.reserve( idList.size() );
+    for( const QnUuid id: idList )
+        valList.push_back( get(id) );
+    return valList;
 }
 
 QnCameraUserAttributePool* QnCameraUserAttributePool::instance()

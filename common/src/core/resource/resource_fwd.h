@@ -88,6 +88,10 @@ class QnSecurityCamResource;
 typedef QnSharedResourcePointer<QnSecurityCamResource> QnSecurityCamResourcePtr;
 typedef QnSharedResourcePointerList<QnSecurityCamResource> QnSecurityCamResourceList;
 
+class QnCameraUserAttributes;
+typedef QSharedPointer<QnCameraUserAttributes> QnCameraUserAttributesPtr;
+typedef QList<QnCameraUserAttributesPtr> QnCameraUserAttributesList;
+
 class QnStorageResource;
 typedef QnSharedResourcePointer<QnStorageResource> QnStorageResourcePtr;
 typedef QnSharedResourcePointerList<QnStorageResource> QnStorageResourceList;

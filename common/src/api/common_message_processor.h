@@ -30,6 +30,9 @@ public:
     virtual void updateResource(const QnResourcePtr &resource);
 
     QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
+
+    void processCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList );
+
 signals:
     void connectionOpened();
     void connectionClosed();
@@ -89,6 +92,8 @@ private slots:
     void on_resourceParamsChanged(const QnUuid& resourceId, const QnKvPairList& kvPairs );
     void on_resourceRemoved(const QnUuid& resourceId );
 
+    void on_cameraUserAttributesChanged(const QnCameraUserAttributesPtr& userAttributes);
+    void on_cameraUserAttributesRemoved(const QnUuid& cameraID);
     void on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory);
     void on_cameraHistoryRemoved(const QnCameraHistoryItemPtr &cameraHistory);
 

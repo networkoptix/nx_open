@@ -142,6 +142,13 @@ namespace ec2
         //getCameras
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiCameraDataList& cameraList);
 
+        //getCameraUserAttributes
+        ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList);
+        ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesData& cameraUserAttributes);
+
+        //getFullCameraDataList
+        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiCameraDataExList& cameraList);
+
         //getServers
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataList& serverList);
 
@@ -200,6 +207,8 @@ namespace ec2
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraAttributesData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraAttributesDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
@@ -343,7 +352,9 @@ namespace ec2
 
         ErrorCode saveCamera(const ApiCameraData& params);
         ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
-        ErrorCode updateCameraSchedule(const ApiCameraData& data, qint32 internalId);
+        ErrorCode saveCameraUserAttributes( const ApiCameraAttributesData& attrs );
+        ErrorCode insertOrReplaceCameraAttributes(const ApiCameraAttributesData& data, qint32* const internalId);
+        ErrorCode updateCameraSchedule(const std::vector<ApiScheduleTaskData>& scheduleTasks, qint32 internalId);
         ErrorCode removeCameraSchedule(qint32 internalId);
         ErrorCode removeCamera(const QnUuid& guid);
         ErrorCode deleteCameraServerItemTable(qint32 id);
