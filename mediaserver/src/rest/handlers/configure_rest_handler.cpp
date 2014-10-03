@@ -124,6 +124,9 @@ int QnConfigureRestHandler::changePort(int port) {
     if (port == 0 || port == MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT).toInt())
         return ResultSkip;
 
+    if (port < 0)
+        return ResultFail;
+
     QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
     if (!server)
         return ResultFail;

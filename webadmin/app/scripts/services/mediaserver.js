@@ -13,7 +13,6 @@ angular.module('webadminApp')
 
             discoveredPeers:function(){return $http.get('/api/discoveredPeers'); },
 
-            
             getMediaServer: function(id){return $http.get('/ec2/getMediaServers?id=' + id); },
             saveMediaServer: function(info){return $http.post('/ec2/saveMediaServer',info); },
 

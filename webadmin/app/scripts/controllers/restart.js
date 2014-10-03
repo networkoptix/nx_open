@@ -5,10 +5,11 @@ angular.module('webadminApp')
         $scope.url = window.location.protocol + "//" + window.location.hostname + ":"
             + data.port + window.location.pathname + window.location.search;
 
+        $scope.state = '';
         var statisticUrl = window.location.protocol + "//" + window.location.hostname + ":"
             + data.port;
 
-        var oldUptime = 0;
+        var oldUptime = Number.MAX_VALUE;
         var serverWasDown = false;
 
         function reload(){
@@ -21,14 +22,19 @@ angular.module('webadminApp')
 
         function pingServer(){
             mediaserver.statistics(statisticUrl).success(function(result){
-                var newUptime  = result.data.reply.uptimeMs;//
+                var newUptime  = result.reply.uptimeMs;
+
                 if(newUptime < oldUptime || serverWasDown)
                 {
+                    $scope.state = "server is starting";
                     return reload();
                 }
+
+                $scope.state = "server is restarting";
                 oldUptime = newUptime;
                 setTimeout(pingServer,1000);
             }).error(function(){
+                $scope.state = "server is offline";
                 serverWasDown = true; // server was down once - next success should restart server
                 setTimeout(pingServer,1000);
                 return false;
@@ -37,13 +43,17 @@ angular.module('webadminApp')
         }
 
         //1. Request uptime
-        mediaserver.statistics().then(function(result){
-
-            oldUptime = result.data.reply.uptimeMs;
+        mediaserver.statistics().success(function(result) {
+            oldUptime = result.reply.uptimeMs;
 
             //2. call restart function
-            mediaserver.restart().then(function(){
-                pingServer();  //3. ping every second
-            });
+            mediaserver.restart().then(function () {
+                    pingServer();  //3. ping every second
+                }
+            )
+        }).error(function(){
+            $scope.state = "server is offline";
+            setTimeout(pingServer,1000);
+            return false;
         });
     });
