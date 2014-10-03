@@ -41,12 +41,11 @@ QString QnTestCameraResource::getHostAddress() const
         return QString();
 }
 
-bool QnTestCameraResource::setHostAddress(const QString &ip, QnDomain /*domain*/)
+void QnTestCameraResource::setHostAddress(const QString &ip)
 {
     QUrl url(getUrl());
     url.setHost(ip);
     setUrl(url.toString());
-    return true;
 }
 
 #endif // #ifdef ENABLE_TEST_CAMERA

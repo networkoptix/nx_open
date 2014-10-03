@@ -22,7 +22,7 @@ public:
 
 
     virtual QString getHostAddress() const override;
-    virtual bool setHostAddress(const QString &ip, QnDomain domain) override;
+    virtual void setHostAddress(const QString &ip) override;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 

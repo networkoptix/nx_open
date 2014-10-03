@@ -264,7 +264,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
 
     resource->setTypeId(getOnvifResourceType(manufacturer, model));
 
-    resource->setHostAddress(QHostAddress(sender).toString(), QnDomainMemory);
+    resource->setHostAddress(QHostAddress(sender).toString());
     resource->setDiscoveryAddr(discoveryIp);
     resource->setModel(model);
     if (isModelContainVendor(manufacturer, model))

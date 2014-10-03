@@ -8,10 +8,11 @@
 
 #include "param.h"
 #include "utils/common/id.h"
+#include "core/resource/resource_fwd.h"
 
-typedef QMap<QString, QnParamTypePtr> ParamTypeMap;
+typedef QMap<QString, QString> ParamTypeMap;
 
-class QN_EXPORT QnResourceType
+class QnResourceType
 {
 public:
     QnResourceType();
@@ -35,7 +36,7 @@ public:
     void addAdditionalParent(QnUuid parent);
     QList<QnUuid> allParentList() const;
 
-    void addParamType(QnParamTypePtr param);
+    void addParamType(const QString& name, const QString& defaultValue);
     bool hasParam(const QString& name) const;
 
     const ParamTypeMap& paramTypeList() const;

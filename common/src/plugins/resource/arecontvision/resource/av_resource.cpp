@@ -119,49 +119,9 @@ CLHttpStatus QnPlAreconVisionResource::setRegister_asynch(int page, int num, int
 
 }
 
-bool QnPlAreconVisionResource::setHostAddress(const QString& hostAddr, QnDomain domain)
+void QnPlAreconVisionResource::setHostAddress(const QString& hostAddr)
 {
-    // this will work only in local networks ( camera must be able ti get broadcat from this ip);
-    QHostAddress ip = resolveAddress(hostAddr);
-    if (domain == QnDomainPhysical)
-    {
-        return false; // never change ip 
-
-        std::unique_ptr<AbstractDatagramSocket> sock( SocketFactory::createDatagramSocket() );
-
-        sock->bind(getDiscoveryAddr().toString() , 0); // address usesd to find cam
-        QString m_local_adssr_srt = getDiscoveryAddr().toString(); // debug only
-        QString new_ip_srt = ip.toString(); // debug only
-
-        QByteArray basic_str = "Arecont_Vision-AV2000\2";
-
-        char data[256];
-
-        int shift = 22;
-        memcpy(data,basic_str.data(),shift);
-
-        memcpy(data + shift, getMAC().bytes(), 6);//     MACsToByte(m_mac, (unsigned char*)data + shift); //memcpy(data + shift, mac, 6);
-
-        quint32 new_ip = htonl(ip.toIPv4Address());
-        memcpy(data + shift + 6, &new_ip,4);
-
-        sock->sendTo(data, shift + 10, BROADCAST_ADDRESS, 69);
-        sock->sendTo(data, shift + 10, BROADCAST_ADDRESS, 69);
-
-        removeARPrecord(ip);
-        removeARPrecord(resolveAddress(getHostAddress()));
-
-        //
-        CLPing ping;
-
-        QString oldIp = getHostAddress();
-
-        if (!ping.ping(ip.toString(), 2, ping_timeout)) // check if ip really changed
-            return false;
-
-    }
-
-    return QnNetworkResource::setHostAddress(hostAddr, QnDomainMemory);
+    QnNetworkResource::setHostAddress(hostAddr);
 }
 
 bool QnPlAreconVisionResource::unknownResource() const
@@ -196,7 +156,7 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     if (result)
     {
         result->setName(model.toString());
-        result->setHostAddress(getHostAddress(), QnDomainMemory);
+        result->setHostAddress(getHostAddress());
         (result.dynamicCast<QnPlAreconVisionResource>())->setModel(model.toString());
         result->setMAC(getMAC());
         result->setId(getId());
@@ -418,7 +378,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnUui
 
 bool QnPlAreconVisionResource::isPanoramic(QnResourceTypePtr resType)
 {
-    QString layoutStr = resType->defaultValue(lit("VideoLayout"));
+    QString layoutStr = resType->defaultValue(Qn::VIDEO_LAYOUT_PARAM_NAME);
     return !layoutStr.isEmpty() && QnCustomResourceVideoLayout::fromString(layoutStr)->channelCount() > 1;
 };
 

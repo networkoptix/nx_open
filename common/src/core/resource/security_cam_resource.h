@@ -71,10 +71,10 @@ public:
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
 
     QList<QnMotionRegion> getMotionRegionList() const;
-    void setMotionRegionList(const QList<QnMotionRegion>& maskList, QnDomain domain);
+    void setMotionRegionList(const QList<QnMotionRegion>& maskList);
 
     QnMotionRegion getMotionRegion(int channel) const;
-    void setMotionRegion(const QnMotionRegion& mask, QnDomain domain, int channel);
+    void setMotionRegion(const QnMotionRegion& mask, int channel);
 
     QRegion getMotionMask(int channel) const;
 

@@ -219,7 +219,7 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const Q
     resource->setName(nameStr);
     resource->setModel(nameStr);
     resource->setMAC(macAddr);
-    resource->setHostAddress(peerAddress.toString(), QnDomainMemory);
+    resource->setHostAddress(peerAddress.toString());
     resource->setDiscoveryAddr(discoveryAddress);
 
     result.push_back(resource);

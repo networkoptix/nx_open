@@ -233,24 +233,6 @@ void QnVirtualCameraResource::forceDisableAudio()
 void QnVirtualCameraResource::saveParams()
 {
     propertyDictionay->saveParams(getId());
-    /*
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    ec2::ApiResourceParamDataList params;
-
-    foreach(const QnParam& param, getResourceParamList().values())
-    {
-        if (param.domain() == QnDomainDatabase)
-            params.push_back(ec2::ApiResourceParamData(param.name(), param.value().toString()));
-    }
-
-    ec2::ApiResourceParamWithRefDataList outData;
-    ec2::ErrorCode rez = conn->getResourceManager()->saveSync(getId(), params, true, &outData);
-
-    if (rez != ec2::ErrorCode::ok) {
-        qCritical() << Q_FUNC_INFO << ": can't save resource params to Server. Resource physicalId: "
-            << getPhysicalId() << ". Description: " << ec2::toString(rez);
-    }
-    */
 }
 
 void QnVirtualCameraResource::saveParamsAsync()

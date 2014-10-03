@@ -702,13 +702,6 @@ void fromApiToResourceList(const ApiResourceParamDataList &src, ec2::ApiResource
     dst = src;
 }
 
-
-void fromApiToResource(const ApiPropertyTypeData &src, QnParamTypePtr &dst) {
-    //resource->id = id;
-    dst->name = src.name;
-    dst->default_value = src.defaultValue;
-}
-
 void fromApiToResource(const ApiResourceTypeData &src, QnResourceTypePtr &dst) {
     dst->setId(src.id);
     dst->setName(src.name);
@@ -719,11 +712,8 @@ void fromApiToResource(const ApiResourceTypeData &src, QnResourceTypePtr &dst) {
     for (size_t i = 1; i < src.parentId.size(); ++i)
         dst->addAdditionalParent(src.parentId[i]);
 
-    for(const ApiPropertyTypeData &p: src.propertyTypes) {
-        QnParamTypePtr param(new QnParamType());
-        fromApiToResource(p, param);
-        dst->addParamType(param);
-    }
+    for(const ApiPropertyTypeData &p: src.propertyTypes)
+        dst->addParamType(p.name, p.defaultValue);
 }
 
 void fromApiToResourceList(const ApiResourceTypeDataList &src, QnResourceTypeList &dst) {

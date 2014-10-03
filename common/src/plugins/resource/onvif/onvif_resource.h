@@ -121,7 +121,7 @@ public:
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);
 
-    virtual bool setHostAddress(const QString &ip, QnDomain domain = QnDomainMemory) override;
+    virtual void setHostAddress(const QString &ip) override;
 
 
     virtual QString getDriverName() const override;

@@ -42,9 +42,8 @@ QString QnDroidResource::getHostAddress() const
         return QString();
 }
 
-bool QnDroidResource::setHostAddress(const QString &/*ip*/, QnDomain /*domain*/)
+void QnDroidResource::setHostAddress(const QString &/*ip*/)
 {
-    return false;
 }
 
 #endif //#ifdef ENABLE_DROID

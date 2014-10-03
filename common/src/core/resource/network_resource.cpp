@@ -53,7 +53,7 @@ QString QnNetworkResource::getHostAddress() const
         return QUrl(url).host();
 }
 
-bool QnNetworkResource::setHostAddress(const QString &ip, QnDomain domain)
+void QnNetworkResource::setHostAddress(const QString &ip)
 {
     //QMutexLocker mutex(&m_mutex);
     //m_hostAddr = ip;
@@ -65,7 +65,6 @@ bool QnNetworkResource::setHostAddress(const QString &ip, QnDomain domain)
         currentValue.setHost(ip);
         setUrl(currentValue.toString());
     }
-    return (domain == QnDomainMemory);
 }
 
 QnMacAddress QnNetworkResource::getMAC() const

@@ -343,7 +343,7 @@ const QString QnPlOnvifResource::fetchMacAddress(
     return someMacAddress.toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
 }
 
-bool QnPlOnvifResource::setHostAddress(const QString &ip, QnDomain domain)
+void QnPlOnvifResource::setHostAddress(const QString &ip)
 {
     //QnPhysicalCameraResource::se
     {
@@ -366,7 +366,7 @@ bool QnPlOnvifResource::setHostAddress(const QString &ip, QnDomain domain)
         }
     }
 
-    return QnPhysicalCameraResource::setHostAddress(ip, domain);
+    QnPhysicalCameraResource::setHostAddress(ip);
 }
 
 const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress) {
