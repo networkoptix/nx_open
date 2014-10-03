@@ -9,7 +9,7 @@ angular.module('webadminApp')
         var statisticUrl = window.location.protocol + "//" + window.location.hostname + ":"
             + data.port;
 
-        var oldUptime = 0;
+        var oldUptime = Number.MAX_VALUE;
         var serverWasDown = false;
 
         function reload(){
@@ -45,7 +45,8 @@ angular.module('webadminApp')
         //1. Request uptime
         mediaserver.statistics().then(function(result){
 
-            oldUptime = result.data.reply.uptimeMs;
+            if(typeof(result.data)!="undefined")
+                oldUptime = result.data.reply.uptimeMs;
 
             //2. call restart function
             mediaserver.restart().then(function(){
