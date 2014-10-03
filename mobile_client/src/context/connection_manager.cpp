@@ -85,6 +85,7 @@ bool QnConnectionManager::connectToServer(const QUrl &url) {
 
     qnCommon->setLocalSystemName(connectionInfo.systemName);
 
+    m_connected = true;
     emit connected(url);
 //    context()->setUserName(appServerUrl.userName());
     return true;

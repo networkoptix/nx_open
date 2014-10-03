@@ -21,6 +21,7 @@ protected:
 private slots:
     void at_remotePeerFound(ec2::ApiPeerAliveData data);
     void at_remotePeerLost(ec2::ApiPeerAliveData data);
+    void at_systemNameChangeRequested(const QString &systemName);
 
 private:
     bool m_connected;

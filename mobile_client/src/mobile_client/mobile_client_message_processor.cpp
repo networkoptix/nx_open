@@ -1,5 +1,6 @@
 #include "mobile_client_message_processor.h"
 
+#include "core/resource/resource.h"
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 
@@ -17,6 +18,8 @@ void QnMobileClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &co
         qnCommon->setRemoteGUID(connection->connectionInfo().ecsGuid);
         connect(connection,     &ec2::AbstractECConnection::remotePeerFound,    this,   &QnMobileClientMessageProcessor::at_remotePeerFound);
         connect(connection,     &ec2::AbstractECConnection::remotePeerLost,     this,   &QnMobileClientMessageProcessor::at_remotePeerLost);
+        connect(connection->getMiscManager(), &ec2::AbstractMiscManager::systemNameChangeRequested,
+                this, &QnMobileClientMessageProcessor::at_systemNameChangeRequested);
     } else if (m_connected) { // double init by null is allowed
         assert(!qnCommon->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;
@@ -30,6 +33,7 @@ void QnMobileClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &co
 }
 
 void QnMobileClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
+    qDebug() << "resource update " << resource->getName() << resource->getUrl();
 }
 
 void QnMobileClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) {
@@ -64,4 +68,8 @@ void QnMobileClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData dat
 
     m_connected = false;
     emit connectionClosed();
+}
+
+void QnMobileClientMessageProcessor::at_systemNameChangeRequested(const QString &systemName) {
+    qnCommon->setLocalSystemName(systemName);
 }
