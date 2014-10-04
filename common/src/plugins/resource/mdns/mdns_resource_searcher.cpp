@@ -39,7 +39,7 @@ QnResourceList QnMdnsResourceSearcher::findResources()
 
         foreach(QnNetworkResourcePtr nresource, nresourceLst)
         {
-            nresource->setHostAddress(remoteAddress, QnDomainMemory);
+            nresource->setHostAddress(remoteAddress);
             nresource->setDiscoveryAddr(QHostAddress(localAddress));
             result.push_back(nresource);
         }

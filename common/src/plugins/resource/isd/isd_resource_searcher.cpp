@@ -128,7 +128,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
     resource->setModel(name);
     resource->setMAC(QnMacAddress(mac));
     if (port == 80)
-        resource->setHostAddress(host, QnDomainMemory);
+        resource->setHostAddress(host);
     else
         resource->setUrl(QString(lit("http://%1:%2")).arg(host).arg(port));
     resource->setAuth(auth);

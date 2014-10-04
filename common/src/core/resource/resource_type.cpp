@@ -81,10 +81,10 @@ QList<QnUuid> QnResourceType::allParentList() const
     return result;
 }
 
-void QnResourceType::addParamType(QnParamTypePtr param)
+void QnResourceType::addParamType(const QString& name, const QString& defaultValue)
 {
     QMutexLocker _lock(&m_allParamTypeListCacheMutex); // in case of connect to anther app server 
-    m_paramTypeList.insert(param->name, param);
+    m_paramTypeList.insert(name, defaultValue);
 }
 
 bool QnResourceType::hasParam(const QString& name) const
@@ -94,8 +94,7 @@ bool QnResourceType::hasParam(const QString& name) const
 
 QString QnResourceType::defaultValue(const QString& key) const
 {
-    QnParamTypePtr paramPtr = paramTypeList().value(key);
-    return paramPtr.isNull() ? QString() : paramPtr->default_value;
+    return paramTypeList().value(key);
 }
 
 const ParamTypeMap& QnResourceType::paramTypeList() const

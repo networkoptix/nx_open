@@ -75,8 +75,6 @@ namespace ec2 {
     void fromResourceListToApi(const ec2::ApiResourceParamDataList &src, ApiResourceParamDataList &dst);
     void fromApiToResourceList(const ApiResourceParamDataList &src, ec2::ApiResourceParamDataList &dst);
 
-    void fromApiToResource(const ApiPropertyTypeData &src, QnParamTypePtr &dst);
-    
     void fromApiToResource(const ApiResourceTypeData &src, QnResourceTypePtr &dst);
     void fromApiToResourceList(const ApiResourceTypeDataList &src, QnResourceTypeList &dst);
 

@@ -12,6 +12,7 @@
 #include "recorder/storage_manager.h"
 #include <recording/time_period.h>
 #include <media_server/settings.h>
+#include "core/resource/network_resource.h"
 
 
 static const qint64 EVENTS_CLEANUP_INTERVAL = 1000000ll * 3600;

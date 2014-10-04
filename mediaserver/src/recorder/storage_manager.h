@@ -7,6 +7,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QMutex>
 #include <QtCore/QTimer>
+#include <QTime>
 
 #include <server/server_globals.h>
 
@@ -18,6 +19,7 @@
 #include "business/business_fwd.h"
 #include "utils/db/db_helper.h"
 #include "storage_db.h"
+#include "utils/common/uuid.h"
 
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;

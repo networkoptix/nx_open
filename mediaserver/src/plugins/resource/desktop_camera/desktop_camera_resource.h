@@ -6,9 +6,7 @@
 #include <QMap>
 #include <QMutex>
 
-#include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
-#include "core/datapacket/media_data_packet.h"
 
 class QnDesktopCameraResource
 :

@@ -154,9 +154,7 @@ CameraDiagnostics::Result QnStardotResource::initInternal()
         return CameraDiagnostics::UnknownErrorResult();
     }
 
-    //setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
     setProperty(MAX_FPS_PARAM_NAME, m_maxFps);
-    //setParam(DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0, QnDomainDatabase);
 
     //detecting and saving selected resolutions
     CameraMediaStreams mediaStreams;

@@ -211,17 +211,6 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode)
     setStatus(other->m_status, silenceMode);
     afterUpdateInner(modifiedFields);
 
-    /*
-    QnParamList paramList = other->getResourceParamList();
-    foreach(QnParam param, paramList.values())
-    {
-        if (param.domain() == QnDomainDatabase)
-        {
-            setParam(param.name(), param.value(), QnDomainDatabase);
-        }
-    }
-    */
-
     //silently ignoring missing properties because of removeProperty method lack
     for (const ec2::ApiResourceParamData &param: other->getProperties()) {
         setProperty(param.name, param.value);   //here "propertyChanged" will be called
@@ -669,7 +658,7 @@ void QnResource::setProperty(const QString &key, const QString &value)
     {
         if(key == lit("ptzCapabilities"))
             emit ptzCapabilitiesChanged(::toSharedPointer(this));
-        else if(key == lit("VideoLayout"))
+        else if(key == Qn::VIDEO_LAYOUT_PARAM_NAME)
             emit videoLayoutChanged(::toSharedPointer(this));
 
         emit propertyChanged(toSharedPointer(this), key);

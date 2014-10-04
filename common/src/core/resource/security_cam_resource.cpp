@@ -118,7 +118,7 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         //for (int i = 0; i < numChannels; ++i) {
         //    if (m_motionMaskList[i] == other_casted->m_motionMaskList[i])
         //        continue;
-        //    setMotionRegion(other_casted->m_motionMaskList[i], QnDomainPhysical, i);
+        //    setMotionRegion(other_casted->m_motionMaskList[i], i);
         //    motionRegionChanged = true;
         //}
         //if (motionRegionChanged)
@@ -209,7 +209,7 @@ QnMotionRegion QnSecurityCamResource::getMotionRegion(int channel) const {
     return (*userAttributesLock)->motionRegions[channel];
 }
 
-void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, QnDomain domain, int channel) {
+void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, int channel) {
     Qn::MotionType motionType = Qn::MT_Default;
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
@@ -220,11 +220,11 @@ void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, QnDomain
         motionType = (*userAttributesLock)->motionType;
     }
 
-    if (domain == QnDomainPhysical && motionType != Qn::MT_SoftwareGrid)
+    if (motionType != Qn::MT_SoftwareGrid)
         setMotionMaskPhysical(channel);
 }
 
-void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& maskList, QnDomain domain) {
+void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& maskList) {
     Qn::MotionType motionType = Qn::MT_Default;
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
@@ -235,7 +235,7 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
         motionType = (*userAttributesLock)->motionType;
     }
 
-    if (domain == QnDomainPhysical && motionType != Qn::MT_SoftwareGrid) {
+    if (motionType != Qn::MT_SoftwareGrid) {
         for (int i = 0; i < getVideoLayout()->channelCount(); ++i)
             setMotionMaskPhysical(i);
     }

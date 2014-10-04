@@ -826,7 +826,7 @@ void QnSingleCameraSettingsWidget::submitMotionWidgetToResource() {
     if(!m_motionWidget || !m_camera)
         return;
 
-    m_camera->setMotionRegionList(m_motionWidget->motionRegionList(), QnDomainMemory);
+    m_camera->setMotionRegionList(m_motionWidget->motionRegionList());
 }
 
 bool QnSingleCameraSettingsWidget::isReadOnly() const {

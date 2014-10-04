@@ -23,7 +23,7 @@ public:
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
 
-    virtual bool setHostAddress(const QString &ip, QnDomain domain) override;
+    virtual void setHostAddress(const QString &ip) override;
 
     int channelNum() const;
     int videoPort() const;

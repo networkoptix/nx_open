@@ -27,9 +27,6 @@ class QnLicense;
 typedef QSharedPointer<QnLicense> QnLicensePtr;
 typedef QList<QnLicensePtr> QnLicenseList;
 
-struct QnParamType;
-typedef QSharedPointer<QnParamType> QnParamTypePtr;
-
 class QnVideoWallItem;
 class QnVideoWallControlMessage;
 
@@ -163,6 +160,8 @@ typedef QList<QnVideoWallItemIndex> QnVideoWallItemIndexList;
 class QnVideoWallMatrixIndex;
 typedef QList<QnVideoWallMatrixIndex> QnVideoWallMatrixIndexList;
 
+class QnAviResource;
+typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;
 
 
 #endif // QN_RESOURCE_FWD_H
