@@ -192,7 +192,7 @@ public:
      * because of threading issues. */
 
     bool hasProperty(const QString &key) const;
-    QString getProperty(const QString &key, const QString &defaultValue = QString()) const;
+    QString getProperty(const QString &key) const;
     void setProperty(const QString &key, const QString &value, bool markDirty = true);
     void setProperty(const QString &key, const QVariant& value);
     ec2::ApiResourceParamDataList getProperties() const;

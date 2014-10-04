@@ -392,11 +392,11 @@ int QnSecurityCamResource::motionSensWindowCount() const
 }
 
 bool QnSecurityCamResource::isAudioSupported() const {
-    QString val = getProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, val);
+    QString val = getProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME);
     if (val.toInt() > 0)
         return true;
 
-    val = getProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, val);
+    val = getProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME);
     return val.toInt() > 0;
 }
 

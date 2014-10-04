@@ -638,7 +638,7 @@ bool QnResource::hasProperty(const QString &key) const {
     return propertyDictionay->hasProperty(getId(), key);
 }
 
-QString QnResource::getProperty(const QString &key, const QString &defaultValue) const {
+QString QnResource::getProperty(const QString &key) const {
     //QMutexLocker mutexLocker(&m_mutex);
     //return m_propertyByKey.value(key, defaultValue);
     QString value = propertyDictionay->value(getId(), key);
@@ -646,9 +646,9 @@ QString QnResource::getProperty(const QString &key, const QString &defaultValue)
         // find default value in resourceType
         QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId); 
         if (resType)
-            value = resType->defaultValue(key);
+            return resType->defaultValue(key);
     }
-    return value.isNull() ? defaultValue : value;
+    return value;
 }
 
 void QnResource::setProperty(const QString &key, const QString &value, bool markDirty) 
