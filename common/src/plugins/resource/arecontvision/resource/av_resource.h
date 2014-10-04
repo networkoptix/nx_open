@@ -28,7 +28,7 @@ public:
 
     bool isPanoramic() const;
     bool isDualSensor() const;
-    virtual bool isAbstractResource() const override { return true; }
+    virtual bool isAbstractResource() const override;
 
     virtual void setHostAddress(const QString& ip) override;
 

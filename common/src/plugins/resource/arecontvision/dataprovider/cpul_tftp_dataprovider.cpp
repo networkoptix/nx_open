@@ -417,7 +417,7 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
 {
     QnMetaDataV1Ptr motion(new QnMetaDataV1());
     QVariant mdresult;
-    if (!getResource()->getParamPhysical(QLatin1String("MdResult"), mdresult))
+    if (!getResource()->getParamPhysical(QLatin1String("mdresult"), mdresult))
         return QnMetaDataV1Ptr(0);
 
     if (mdresult.toString() == QLatin1String("no motion"))

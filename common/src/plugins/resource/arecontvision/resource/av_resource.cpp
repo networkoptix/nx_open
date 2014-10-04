@@ -126,7 +126,7 @@ void QnPlAreconVisionResource::setHostAddress(const QString& hostAddr)
 
 bool QnPlAreconVisionResource::unknownResource() const
 {
-    return (getName() == lit("ArecontVision_Abstract"));
+    return isAbstractResource();
 }
 
 QnResourcePtr QnPlAreconVisionResource::updateResource()
@@ -134,10 +134,10 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     QVariant model;
     QVariant model_relase;
 
-    if (!getParamPhysical(lit("Model"), model))
+    if (!getParamPhysical(lit("model"), model))
         return QnNetworkResourcePtr(0);
 
-    if (!getParamPhysical(lit("ModelRelease"), model_relase))
+    if (!getParamPhysical(lit("model=releasename"), model_relase))
         return QnNetworkResourcePtr(0);
 
     if (model_relase!=model)
@@ -148,7 +148,7 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     else
     {
         //old camera; does not support relase name; but must support fullname
-        if (getParamPhysical(lit("ModelFull"), model_relase))
+        if (getParamPhysical(lit("model=fullname"), model_relase))
             model = model_relase;
     }
 
@@ -188,14 +188,14 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     }
 
     QVariant firmwareVersion;
-    if (!getParamPhysical(lit("Firmware version"), firmwareVersion))
+    if (!getParamPhysical(lit("fwversion"), firmwareVersion))
         return CameraDiagnostics::RequestFailedResult(lit("Firmware version"), lit("unknown"));
 
     QVariant val;
-    if (!getParamPhysical(lit("Image engine"), val))
+    if (!getParamPhysical(lit("procversion"), val))
         return CameraDiagnostics::RequestFailedResult(lit("Image engine"), lit("unknown"));
 
-    if (!getParamPhysical(lit("Net version"), val))
+    if (!getParamPhysical(lit("netversion"), val))
         return CameraDiagnostics::RequestFailedResult(lit("Net version"), lit("unknown"));
 
     //if (!getDescription())
@@ -204,12 +204,12 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     setRegister(3, 21, 20); // sets I frame frequency to 1/20
 
 
-    if (!setParamPhysical(lit("Enable motion detection"), lit("on"))) // enables motion detection;
+    if (!setParamPhysical(lit("motiondetect"), lit("on"))) // enables motion detection;
         return CameraDiagnostics::RequestFailedResult(lit("Enable motion detection"), lit("unknown"));
 
     // check if we've got 1024 zones
-    setParamPhysical(lit("TotalZones"), 1024); // try to set total zones to 64; new cams support it
-    if (!getParamPhysical(lit("TotalZones"), val))
+    setParamPhysical(lit("mdtotalzones"), 1024); // try to set total zones to 64; new cams support it
+    if (!getParamPhysical(lit("mdtotalzones"), val))
         return CameraDiagnostics::RequestFailedResult(lit("TotalZones"), lit("unknown"));
 
     if (val.toInt() == 1024)
@@ -240,7 +240,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     setFirmware(firmwareVersion.toString());
     saveParams();
 
-    setParamPhysical(lit("Zone size"), zone_size);
+    setParamPhysical(lit("mdzonesite"), zone_size);
     setMotionMaskPhysical(0);
 
     return CameraDiagnostics::NoErrorResult();
@@ -413,10 +413,16 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
         
         if (!region.getRegionBySens(sens).isEmpty())
         {
-            setParamPhysicalAsync(lit("Threshold"), sensToLevelThreshold[sens]);
+            setParamPhysicalAsync(lit("mdtotalzones"), sensToLevelThreshold[sens]);
             break; // only 1 sensitivity for all frame is supported
         }
     }
+}
+
+bool QnPlAreconVisionResource::isAbstractResource() const
+{
+    QnUuid baseTypeId = qnResTypePool->getResourceTypeId(QnPlAreconVisionResource::MANUFACTURE, QLatin1String("ArecontVision_Abstract"));
+    return getTypeId() == baseTypeId;
 }
 
 #endif

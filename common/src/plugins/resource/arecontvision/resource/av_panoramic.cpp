@@ -118,7 +118,7 @@ CameraDiagnostics::Result QnArecontPanoramicResource::initInternal()
 
     setRegister(3, 100, 10); // sets I frame frequency to 10
 
-    setParamPhysical(QLatin1String("CnannelEnable"), 15); // to enable all channels
+    setParamPhysical(QLatin1String("cnannelenable"), 15); // to enable all channels
 
     updateFlipState();
 

@@ -64,7 +64,7 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
 
     QnArecontPanoramicResourcePtr res = getResource().dynamicCast<QnArecontPanoramicResource>();
 
-    if (!res->getParamPhysical(m_motionData + 1, QLatin1String("MdResult"), mdresult))
+    if (!res->getParamPhysical(m_motionData + 1, QLatin1String("mdresult"), mdresult))
         return QnMetaDataV1Ptr(0);
 
     if (mdresult.toString() == QLatin1String("no motion"))
