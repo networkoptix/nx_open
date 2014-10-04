@@ -2420,7 +2420,6 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList
                                 FROM vms_kvpair kv \
                                 JOIN auth_user u on u.id = kv.resource_id \
                                 JOIN vms_resource r on r.id = kv.resource_id \
-                                WHERE kv.isResTypeParam = 0 \
                                 ORDER BY r.guid"));
 
     if (!queryParams.exec()) {

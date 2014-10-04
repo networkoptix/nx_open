@@ -1,9 +1,5 @@
-insert into vms_propertytype (resource_type_id, name, type, "values", ui_values, default_value, netHelper, "group", sub_group,description, ui, "readonly")
-       select resource_type_id, "firmware", 1, "", "", "", "", "", "","", "",""
-       from vms_propertytype where name = "hasDualStreaming";
-
-insert into vms_kvpair (resource_id, name, value, isResTypeParam)
-select c.resource_ptr_id, 'firmware', c.firmware, 1
+insert into vms_kvpair (resource_id, name, value)
+select c.resource_ptr_id, 'firmware', c.firmware
   from vms_camera c
  where length(c.firmware) > 0;
 

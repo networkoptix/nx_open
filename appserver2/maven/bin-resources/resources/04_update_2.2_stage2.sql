@@ -47,3 +47,12 @@ ALTER TABLE "vms_license_tmp" RENAME TO "vms_license";
 CREATE TABLE misc_data (key VARCHAR(64) NOT NULL, data BLOB(128));
 CREATE UNIQUE INDEX idx_misc_data_key ON misc_data(key);
 drop table vms_setting;
+
+ALTER TABLE vms_propertytype RENAME TO vms_propertytype_tmp;
+CREATE TABLE "vms_propertytype" (
+    "id" integer NOT NULL PRIMARY KEY,
+    "resource_type_id" integer NOT NULL,
+    "name" varchar(200) NOT NULL,
+    "default_value" varchar(200) NULL);
+insert into vms_propertytype select id,	resource_type_id, name, default_value from vms_propertytype_tmp;
+drop table vms_propertytype_tmp;
