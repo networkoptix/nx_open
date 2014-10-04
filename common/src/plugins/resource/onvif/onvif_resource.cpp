@@ -556,8 +556,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if( m_secondaryResolution.width() > 0 )
         mediaStreams.streams.push_back( CameraMediaStreamInfo( m_secondaryResolution, m_secondaryCodec == H264 ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
     saveResolutionList( mediaStreams );
-
-    saveParams();
     
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
@@ -566,8 +564,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     {
         qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
         setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ar));
-        saveParams();
     }
+    saveParams();
 
     return CameraDiagnostics::NoErrorResult();
 }
