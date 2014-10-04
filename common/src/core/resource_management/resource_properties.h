@@ -16,15 +16,21 @@ public:
     void reset();
 
     void saveParams(const QnUuid& resourceId);
-    void saveParamsAsync(const QnUuid& resourceId);
+    int saveParamsAsync(const QnUuid& resourceId);
+    int saveParamsAsync(const QList<QnUuid>& resourceId);
     
     QString value(const QnUuid& resourceId, const QString& key) const;
-    bool setValue(const QnUuid& resourceId, const QString& key, const QString& value);
+    bool setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty = true);
     bool hasProperty(const QnUuid& resourceId, const QString& key) const;
     ec2::ApiResourceParamDataList allProperties(const QnUuid& resourceId) const;
+    void clear();
+signals:
+    void asyncSaveDone(int recId, ec2::ErrorCode);
 private:
     void addToUnsavedParams(const ec2::ApiResourceParamWithRefDataList& params);
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );
+    void fromModifiedDataToSavedData(const QnUuid& resourceId, ec2::ApiResourceParamWithRefDataList& outData);
+    int saveData(const ec2::ApiResourceParamWithRefDataList& data);
 private:
     QMap<QnUuid, QnResourcePropertyList> m_items;
     QMap<QnUuid, QnResourcePropertyList> m_modifiedItems;

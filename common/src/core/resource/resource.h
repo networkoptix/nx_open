@@ -193,7 +193,7 @@ public:
 
     bool hasProperty(const QString &key) const;
     QString getProperty(const QString &key, const QString &defaultValue = QString()) const;
-    void setProperty(const QString &key, const QString &value);
+    void setProperty(const QString &key, const QString &value, bool markDirty = true);
     void setProperty(const QString &key, const QVariant& value);
     ec2::ApiResourceParamDataList getProperties() const;
 
@@ -281,6 +281,7 @@ private:
     void updateUrlName(const QString &oldUrl, const QString &newUrl);
     bool emitDynamicSignal(const char *signal, void **arguments);
     void afterUpdateInner(QSet<QByteArray>& modifiedFields);
+    void emitPropertyChanged(const QString& key);
 
     friend class InitAsyncTask;
 

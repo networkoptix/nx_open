@@ -24,6 +24,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/license_usage_helper.h>
+#include "core/resource_management/resource_properties.h"
 
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     base_type(parent),
@@ -69,6 +70,8 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     connect(context(),          &QnWorkbenchContext::userChanged,          this,   &QnCameraSettingsDialog::updateReadOnly);
 
     connect(action(Qn::SelectionChangeAction),  &QAction::triggered,    this,   &QnCameraSettingsDialog::at_selectionChangeAction_triggered);
+
+    connect(propertyDictionay, &QnResourcePropertyDictionary::asyncSaveDone, this, &QnCameraSettingsDialog::at_cameras_properties_saved);
 
     at_settingsWidget_hasChangesChanged();
 }
@@ -250,17 +253,24 @@ void QnCameraSettingsDialog::at_cameras_saved(ec2::ErrorCode errorCode, const Qn
         QDialogButtonBox::Ok);
 }
 
+void QnCameraSettingsDialog::at_cameras_properties_saved(int requestId, ec2::ErrorCode errorCode) 
+{
+    if( errorCode == ec2::ErrorCode::ok )
+        return;
+}
+
 void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &cameras) {
     if (cameras.isEmpty())
         return;
-
+    QList<QnUuid> idLIst = idListFromResList(cameras);
     QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributes(
-        QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(cameras)),
+        QnCameraUserAttributePool::instance()->getAttributesList(idLIst),
         this,
         [this, cameras]( int reqID, ec2::ErrorCode errorCode ) {
             Q_UNUSED(reqID);
             at_cameras_saved(errorCode, cameras); 
     } );
+    propertyDictionay->saveParamsAsync(idLIst);
 }
 
 void QnCameraSettingsDialog::saveAdvancedCameraSettingsAsync(const QnVirtualCameraResourceList &cameras) {

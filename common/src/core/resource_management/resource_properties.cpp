@@ -29,22 +29,43 @@ void QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
     }
 }
 
-void QnResourcePropertyDictionary::saveParamsAsync(const QnUuid& resourceId)
+void QnResourcePropertyDictionary::fromModifiedDataToSavedData(const QnUuid& resourceId, ec2::ApiResourceParamWithRefDataList& outData)
 {
-    ec2::ApiResourceParamWithRefDataList data;
-
-    QMutexLocker lock(&m_mutex);
     auto itr = m_modifiedItems.find(resourceId);
-    if (itr == m_modifiedItems.end())
-        return;
-    QnResourcePropertyList& properties = itr.value();
-    for (auto itrParams = properties.begin(); itrParams != properties.end(); ++itrParams)
-        data.push_back(ec2::ApiResourceParamWithRefData(resourceId, itrParams.key(), itrParams.value()));
-    m_modifiedItems.erase(itr);
+    if (itr != m_modifiedItems.end()) {
+        QnResourcePropertyList& properties = itr.value();
+        for (auto itrParams = properties.begin(); itrParams != properties.end(); ++itrParams)
+            outData.push_back(ec2::ApiResourceParamWithRefData(resourceId, itrParams.key(), itrParams.value()));
+        m_modifiedItems.erase(itr);
+    }
+}
 
+int QnResourcePropertyDictionary::saveData(const ec2::ApiResourceParamWithRefDataList& data)
+{
+    if (data.empty())
+        return -1; // nothink to save
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     int requestId = conn->getResourceManager()->save(data, this, &QnResourcePropertyDictionary::onRequestDone);
     m_requestInProgress.insert(requestId, data);
+    return requestId;
+}
+
+int QnResourcePropertyDictionary::saveParamsAsync(const QnUuid& resourceId)
+{
+    ec2::ApiResourceParamWithRefDataList data;
+    QMutexLocker lock(&m_mutex);
+    fromModifiedDataToSavedData(resourceId, data);
+    return saveData(data);
+}
+
+int QnResourcePropertyDictionary::saveParamsAsync(const QList<QnUuid>& idList)
+{
+    ec2::ApiResourceParamWithRefDataList data;
+    QMutexLocker lock(&m_mutex);
+
+    foreach(const QnUuid& resourceId, idList) 
+        fromModifiedDataToSavedData(resourceId, data);
+    return saveData(data);
 }
 
 void QnResourcePropertyDictionary::onRequestDone( int reqID, ec2::ErrorCode errorCode )
@@ -56,6 +77,7 @@ void QnResourcePropertyDictionary::onRequestDone( int reqID, ec2::ErrorCode erro
     if (errorCode != ec2::ErrorCode::ok)
         addToUnsavedParams(itr.value());
     m_requestInProgress.erase(itr);
+    emit asyncSaveDone(reqID, errorCode);
 }
 
 void QnResourcePropertyDictionary::addToUnsavedParams(const ec2::ApiResourceParamWithRefDataList& params)
@@ -79,7 +101,15 @@ QString QnResourcePropertyDictionary::value(const QnUuid& resourceId, const QStr
     return itr != m_items.end() ? itr.value().value(key) : QString();
 }
 
-bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QString& key, const QString& value)
+void QnResourcePropertyDictionary::clear()
+{
+    QMutexLocker lock(&m_mutex);
+    m_items.clear();
+    m_modifiedItems.clear();
+    m_requestInProgress.clear();
+}
+
+bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty)
 {
     QMutexLocker lock(&m_mutex);
     auto itr = m_items.find(resourceId);
@@ -94,8 +124,8 @@ bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QStr
         itrValue.value() = value;
     else
         return false; // nothing to change
-
-    m_modifiedItems[resourceId][key] = value;
+    if (markDirty)
+        m_modifiedItems[resourceId][key] = value;
     return true;
 }
 

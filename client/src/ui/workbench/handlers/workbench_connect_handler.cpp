@@ -41,6 +41,7 @@
 #include <utils/common/synctime.h>
 #include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
+#include "core/resource_management/resource_properties.h"
 
 namespace {
     const int videowallReconnectTimeoutMSec = 5000;
@@ -305,7 +306,7 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
     QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
-
+    propertyDictionay->clear();
     QnSessionManager::instance()->stop();
     QnResource::stopCommandProc();
 

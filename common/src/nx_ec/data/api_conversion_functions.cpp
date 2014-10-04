@@ -683,7 +683,7 @@ void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
     dst->setStatus(src.status, true);
 
     for(const ApiResourceParamData &srcParam: src.addParams)
-        dst->setProperty(srcParam.name, srcParam.value);
+        dst->setProperty(srcParam.name, srcParam.value, false);
 }
 
 void fromApiToResourceList(const ApiResourceDataList &src, QnResourceList &dst, QnResourceFactory *factory) {

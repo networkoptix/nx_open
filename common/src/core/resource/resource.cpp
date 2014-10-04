@@ -164,7 +164,8 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
-void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
+void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) 
+{
     Q_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
     m_typeId = other->m_typeId;
@@ -212,10 +213,9 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode)
     afterUpdateInner(modifiedFields);
 
     //silently ignoring missing properties because of removeProperty method lack
-    for (const ec2::ApiResourceParamData &param: other->getProperties()) {
-        setProperty(param.name, param.value);   //here "propertyChanged" will be called
-    }
-
+    for (const ec2::ApiResourceParamData &param: other->getProperties())
+        emitPropertyChanged(param.name);   //here "propertyChanged" will be called
+    
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->afterUpdate();
 }
@@ -651,18 +651,21 @@ QString QnResource::getProperty(const QString &key, const QString &defaultValue)
     return value.isNull() ? defaultValue : value;
 }
 
-void QnResource::setProperty(const QString &key, const QString &value) 
+void QnResource::setProperty(const QString &key, const QString &value, bool markDirty) 
 {
-    bool isModified = propertyDictionay->setValue(getId(), key, value);
+    bool isModified = propertyDictionay->setValue(getId(), key, value, markDirty);
     if (isModified)
-    {
-        if(key == lit("ptzCapabilities"))
-            emit ptzCapabilitiesChanged(::toSharedPointer(this));
-        else if(key == Qn::VIDEO_LAYOUT_PARAM_NAME)
-            emit videoLayoutChanged(::toSharedPointer(this));
+        emitPropertyChanged(key);
+}
 
-        emit propertyChanged(toSharedPointer(this), key);
-    }
+void QnResource::emitPropertyChanged(const QString& key)
+{
+    if(key == lit("ptzCapabilities"))
+        emit ptzCapabilitiesChanged(::toSharedPointer(this));
+    else if(key == Qn::VIDEO_LAYOUT_PARAM_NAME)
+        emit videoLayoutChanged(::toSharedPointer(this));
+
+    emit propertyChanged(toSharedPointer(this), key);
 }
 
 void QnResource::setProperty(const QString &key, const QVariant& value)
