@@ -216,10 +216,10 @@ void QnCommonMessageProcessor::on_resourceStatusChanged( const QnUuid& resourceI
 void QnCommonMessageProcessor::on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param )
 {
     QnResourcePtr resource = qnResPool->getResourceById(param.resourceId);
-    if (!resource)
-        return;
-
-    resource->setProperty(param.name, param.value, false);
+    if (resource)
+        resource->setProperty(param.name, param.value, false);
+    else
+        propertyDictionay->setValue(param.resourceId, param.name, param.value, false);
 }
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
