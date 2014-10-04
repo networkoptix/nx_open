@@ -489,6 +489,8 @@ void RTPSession::updateTrackNum()
             else
                 m_sdpTracks[i]->trackNum = videoNum + audioNum + curMetadata++;
         }
+        else
+            m_sdpTracks[i]->trackNum = videoNum + audioNum + metadataNum; // unknown track
     }
     qSort(m_sdpTracks.begin(), m_sdpTracks.end(), trackNumLess);
 }
