@@ -653,6 +653,7 @@ QString QnResource::getProperty(const QString &key) const {
 
 void QnResource::setProperty(const QString &key, const QString &value, bool markDirty) 
 {
+    Q_ASSERT(!getId().isNull());
     bool isModified = propertyDictionay->setValue(getId(), key, value, markDirty);
     if (isModified)
         emitPropertyChanged(key);
