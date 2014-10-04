@@ -432,7 +432,6 @@ namespace ec2
 
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
-        bool addTransactionForGeneralSettings();
         bool applyUpdates();
 
         bool beforeInstallUpdate(const QString& updateName);

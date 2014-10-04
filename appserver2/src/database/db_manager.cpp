@@ -469,21 +469,6 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
     return true;
 }
 
-bool QnDbManager::addTransactionForGeneralSettings()
-{
-    ApiResourceParamWithRefDataList object;
-    ErrorCode errCode = doQueryNoLock(m_adminUserID, object);
-    if (errCode != ErrorCode::ok)
-        return false;
-
-    QnTransaction<ApiResourceParamWithRefDataList> transaction(ApiCommand::setResourceParams);
-    transactionLog->fillPersistentInfo(transaction);
-    transaction.params = object;
-    if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
-        return false;
-    return true;
-}
-
 bool QnDbManager::resyncTransactionLog()
 {
     if (!fillTransactionLogInternal<ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
@@ -498,7 +483,7 @@ bool QnDbManager::resyncTransactionLog()
         return false;
     if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
         return false;
-    if (!addTransactionForGeneralSettings())
+    if (!fillTransactionLogInternal<ApiResourceParamWithRefData, ApiResourceParamWithRefDataList>(ApiCommand::setResourceParam))
         return false;
 
     return true;
@@ -2583,11 +2568,12 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRule
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& params)
 {
     QSqlQuery query(m_sdb);
+    QnUuid id = resourceId.isNull() ? m_adminUserID : resourceId; // use admin settings as default resourceID value
     query.setForwardOnly(true);
     query.prepare(QString("SELECT r.id as resourceId, kv.value, kv.name \
                                 FROM vms_kvpair kv \
                                 JOIN vms_resource r on r.id = kv.resource_id WHERE r.guid = :guid"));
-    query.bindValue(QLatin1String(":guid"), resourceId.toRfc4122());
+    query.bindValue(QLatin1String(":guid"), id.toRfc4122());
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text() << query.lastQuery();
         return ErrorCode::dbError;
