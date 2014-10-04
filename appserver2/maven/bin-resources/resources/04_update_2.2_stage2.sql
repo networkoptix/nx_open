@@ -56,3 +56,17 @@ CREATE TABLE "vms_propertytype" (
     "default_value" varchar(200) NULL);
 insert into vms_propertytype select id,	resource_type_id, name, default_value from vms_propertytype_tmp;
 drop table vms_propertytype_tmp;
+
+ALTER TABLE vms_kvpair RENAME TO vms_kvpair_tmp;
+
+CREATE TABLE "vms_kvpair" (
+    "id" integer PRIMARY KEY autoincrement,
+    "resource_guid" BLOB(16) NOT NULL,
+    "name" varchar(200) NOT NULL,
+    "value" varchar(200) NOT NULL);
+insert into vms_kvpair (resource_guid, name, value)
+select r.guid, kv.name, kv.value
+FROM vms_kvpair_tmp kv
+     JOIN vms_resource r on r.id = kv.resource_id;
+CREATE UNIQUE INDEX idx_kvpair_name ON vms_kvpair (resource_guid, name);
+drop table vms_kvpair_tmp;

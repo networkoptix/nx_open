@@ -50,6 +50,7 @@ namespace ec2
         QnBusinessEventRuleList bRules; // TODO: #Elric #EC2 rename
         QnCameraHistoryList cameraHistory;
         QnLicenseList licenses;
+        ec2::ApiResourceParamWithRefDataList allProperties;
     };
 
     struct QnPeerTimeInfo {
@@ -114,6 +115,15 @@ namespace ec2
         template<class TargetType, class HandlerType> 
         int getKvPairs( const QnUuid& resourceId, TargetType* target, HandlerType handler ) {
             return getKvPairs( resourceId, std::static_pointer_cast<impl::GetKvPairsHandler>(std::make_shared<impl::CustomGetKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+        ErrorCode getKvPairsSync(const QnUuid& resourceId, ApiResourceParamWithRefDataList* const outData) {
+            return impl::doSyncCall<impl::GetKvPairsHandler>( 
+                [=](const impl::GetKvPairsHandlerPtr &handler) {
+                    return this->getKvPairs(resourceId, handler);
+            },
+                outData 
+                );
         }
 
         /*!

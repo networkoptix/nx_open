@@ -19,6 +19,7 @@
 #include "runtime_info_manager.h"
 #include <utils/common/app_info.h>
 #include "nx_ec/data/api_resource_data.h"
+#include "core/resource_management/resource_properties.h"
 
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
@@ -218,7 +219,7 @@ void QnCommonMessageProcessor::on_resourceParamChanged(const ec2::ApiResourcePar
     if (!resource)
         return;
 
-    resource->setProperty(param.name, param.value);
+    resource->setProperty(param.name, param.value, false);
 }
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
@@ -375,6 +376,12 @@ void QnCommonMessageProcessor::processCameraUserAttributesList( const QnCameraUs
     }
 }
 
+void QnCommonMessageProcessor::processPropertyList(const ec2::ApiResourceParamWithRefDataList& params)
+{
+    foreach(const ec2::ApiResourceParamWithRefData& param, params)
+        propertyDictionay->setValue(param.resourceId, param.name, param.value, false);
+}
+
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
     //QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
@@ -383,6 +390,8 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     processCameraUserAttributesList( fullData.cameraUserAttributesList );
     processLicenses(fullData.licenses);
     processCameraServerItems(fullData.cameraHistory);
+    processPropertyList(fullData.allProperties);
+
     //on_runtimeInfoChanged(fullData.serverInfo);
     qnSyncTime->reset();   
 

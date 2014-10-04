@@ -32,7 +32,7 @@ public:
     QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
 
     void processCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList );
-
+    void processPropertyList(const ec2::ApiResourceParamWithRefDataList& params);
 signals:
     void connectionOpened();
     void connectionClosed();

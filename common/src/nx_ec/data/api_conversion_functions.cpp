@@ -412,6 +412,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.licenses, dst.licenses);
     fromApiToResourceList(src.rules, dst.bRules, ctx.pool);
     fromApiToResourceList(src.cameraHistory, dst.cameraHistory);
+    dst.allProperties = src.allProperties;
 }
 
 

@@ -1,6 +1,7 @@
-insert into vms_kvpair (resource_id, name, value)
-select c.resource_ptr_id, 'firmware', c.firmware
+insert into vms_kvpair (resource_guid, name, value)
+select r.guid, 'firmware', c.firmware
   from vms_camera c
+  join vms_resource r on r.id = c.resource_ptr_id
  where length(c.firmware) > 0;
 
 ALTER TABLE "vms_camera" RENAME TO "vms_camera_tmp";

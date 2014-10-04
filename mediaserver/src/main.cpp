@@ -889,6 +889,16 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         }
         messageProcessor->processCameraUserAttributesList( cameraUserAttributesList );
 
+        // read properties dictionary
+        ec2::ApiResourceParamWithRefDataList kvPairs;
+        while ((rez = ec2Connection->getResourceManager()->getKvPairsSync(QnUuid(), &kvPairs)) != ec2::ErrorCode::ok)
+        {
+            NX_LOG( lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+        messageProcessor->processPropertyList( kvPairs );
 
         QnManualCameraInfoMap manualCameras;
         foreach(const QnSecurityCamResourcePtr &camera, cameras) {
