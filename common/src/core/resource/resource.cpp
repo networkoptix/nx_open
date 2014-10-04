@@ -53,8 +53,7 @@ public:
         bool rez = false;
         QVariant val;
         if (isConnectedToTheResource()) {
-            rez = true;
-            val = m_resource->getParamPhysical(m_name, val);
+            rez = m_resource->getParamPhysical(m_name, val);
         }
         emit m_resource->asyncParamGetDone(m_resource, m_name, val, rez);
         return rez;
