@@ -53,11 +53,9 @@ void QnResourcePropertyDictionary::onRequestDone( int reqID, ec2::ErrorCode erro
     auto itr = m_requestInProgress.find(reqID);
     if (itr == m_requestInProgress.end())
         return;
-    ec2::ApiResourceParamWithRefDataList data = itr.value();
+    if (errorCode != ec2::ErrorCode::ok)
+        addToUnsavedParams(itr.value());
     m_requestInProgress.erase(itr);
-    if (errorCode != ec2::ErrorCode::ok) {
-        addToUnsavedParams(data);
-    }
 }
 
 void QnResourcePropertyDictionary::addToUnsavedParams(const ec2::ApiResourceParamWithRefDataList& params)
