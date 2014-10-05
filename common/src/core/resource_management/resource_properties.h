@@ -30,7 +30,7 @@ private:
     void addToUnsavedParams(const ec2::ApiResourceParamWithRefDataList& params);
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );
     void fromModifiedDataToSavedData(const QnUuid& resourceId, ec2::ApiResourceParamWithRefDataList& outData);
-    int saveData(const ec2::ApiResourceParamWithRefDataList& data);
+    int saveData(const ec2::ApiResourceParamWithRefDataList data);
 private:
     QMap<QnUuid, QnResourcePropertyList> m_items;
     QMap<QnUuid, QnResourcePropertyList> m_modifiedItems;

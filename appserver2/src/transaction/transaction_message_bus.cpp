@@ -781,7 +781,7 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
             return false;
         }
         QnTransaction<ApiCameraDataExList> tranCameras;
-        tranCameras.command = ApiCommand::getFullCameraDataList;
+        tranCameras.command = ApiCommand::getCamerasEx;
         tranCameras.peerID = m_localPeer.id;
 
         // filter out desktop cameras

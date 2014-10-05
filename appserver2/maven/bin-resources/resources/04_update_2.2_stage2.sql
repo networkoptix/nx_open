@@ -54,7 +54,10 @@ CREATE TABLE "vms_propertytype" (
     "resource_type_id" integer NOT NULL,
     "name" varchar(200) NOT NULL,
     "default_value" varchar(200) NULL);
-insert into vms_propertytype select id,	resource_type_id, name, default_value from vms_propertytype_tmp;
+insert into vms_propertytype 
+select id, resource_type_id, name, default_value 
+ from vms_propertytype_tmp
+where vms_propertytype_tmp.default_value != '';
 drop table vms_propertytype_tmp;
 
 ALTER TABLE vms_kvpair RENAME TO vms_kvpair_tmp;

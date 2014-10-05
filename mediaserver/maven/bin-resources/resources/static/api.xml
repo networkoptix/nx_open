@@ -1043,7 +1043,7 @@
                     </result>
                 </function>
                 <function>
-                    <name>getCameras</name>
+                    <name>getCamerasEx</name>
                     <description>Read camera list</description>
                     <method>GET</method>
                     <params>

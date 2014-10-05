@@ -62,7 +62,7 @@ namespace ec2
             saveCameraUserAttributes    = 310,  /*< ApiCameraAttributesData */
             saveCameraUserAttributesList= 311,  /*< ApiCameraAttributesDataList */
             getCameraUserAttributes     = 312,  /*< ApiCameraAttributesDataList */
-            getFullCameraDataList       = 313,  /*< ApiCameraDataExList */
+            getCamerasEx                = 313,  /*< ApiCameraDataExList */
             
           
             /* MediaServer resource */

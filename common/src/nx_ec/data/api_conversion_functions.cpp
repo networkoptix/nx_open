@@ -314,6 +314,9 @@ void fromApiToResource(const ApiCameraDataEx& src, QnVirtualCameraResourcePtr& d
     //TODO #ak using QnCameraUserAttributePool here is not good
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), dst->getId() );
     fromApiToResource( static_cast<const ApiCameraAttributesData&>(src), *userAttributesLock );
+
+    for(const ApiResourceParamData &srcParam: src.addParams)
+        dst->setProperty(srcParam.name, srcParam.value, false);
 }
 
 void fromResourceToApi(const QnVirtualCameraResourcePtr& src, ApiCameraDataEx& dst)
@@ -322,6 +325,9 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr& src, ApiCameraDataEx& d
     //TODO #ak using QnCameraUserAttributePool here is not good
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), src->getId() );
     fromResourceToApi( *userAttributesLock, static_cast<ApiCameraAttributesData&>(dst) );
+
+    for(const ec2::ApiResourceParamData &srcParam: src->getProperties())
+        dst.addParams.push_back(srcParam);
 }
 
 void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraDataExList &dst)
@@ -670,8 +676,6 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
     //dst.status = src->getStatus();
     dst.status = Qn::NotDefined; // status field MUST be modified via setStatus call only
 
-    for(const ec2::ApiResourceParamData &srcParam: src->getProperties())
-        dst.addParams.push_back(srcParam);
 }
 
 void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
@@ -683,8 +687,6 @@ void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
     dst->setUrl(src.url);
     dst->setStatus(src.status, true);
 
-    for(const ApiResourceParamData &srcParam: src.addParams)
-        dst->setProperty(srcParam.name, srcParam.value, false);
 }
 
 void fromApiToResourceList(const ApiResourceDataList &src, QnResourceList &dst, QnResourceFactory *factory) {

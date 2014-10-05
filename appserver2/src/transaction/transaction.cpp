@@ -54,7 +54,7 @@ namespace ec2
             REGISTER_COMMAND(saveCameraUserAttributes),
             REGISTER_COMMAND(saveCameraUserAttributesList),
             REGISTER_COMMAND(getCameraUserAttributes),
-            REGISTER_COMMAND(getFullCameraDataList),
+            REGISTER_COMMAND(getCamerasEx),
 
             REGISTER_COMMAND(addCameraBookmarkTags),
             REGISTER_COMMAND(getCameraBookmarkTags),

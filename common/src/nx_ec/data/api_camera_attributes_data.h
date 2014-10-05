@@ -56,8 +56,9 @@ namespace ec2
         int                 maxArchiveDays;
         QnUuid              preferedServerId;
     };
-#define ApiCameraAttributesData_Fields (cameraID)(cameraName)(scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(secondaryStreamQuality) \
-                                       (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)
+#define ApiCameraAttributesData_Fields_Short (scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(secondaryStreamQuality) \
+    (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)
+#define ApiCameraAttributesData_Fields (cameraID) (cameraName) ApiCameraAttributesData_Fields_Short
 
 } // namespace ec2
 

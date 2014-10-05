@@ -145,8 +145,8 @@ namespace ec2
         //getCameraUserAttributes
         ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList);
 
-        //getFullCameraDataList
-        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiCameraDataExList& cameraList);
+        //getCamerasEx
+        ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraDataExList& cameraList);
 
         //getServers
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataList& serverList);

@@ -34,6 +34,7 @@
 #include "nx_ec/data/api_conversion_functions.h"
 #include "api/runtime_info_manager.h"
 #include "utils/common/log.h"
+#include "nx_ec/data/api_camera_data_ex.h"
 
 using std::nullptr_t;
 
@@ -2205,33 +2206,11 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiCameraDataList&
         JOIN vms_camera c on c.resource_ptr_id = r.id %1 ORDER BY r.guid").arg(filterStr));
 
 
-    QSqlQuery queryParams(m_sdb);
-    queryParams.setForwardOnly(true);
-    QString filterStr2;
-    if (!mServerId.isNull())
-        filterStr2 = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(mServerId));
-    queryParams.prepare(QString("SELECT kv.resource_guid as resourceId, kv.value, kv.name \
-                                 FROM vms_kvpair kv \
-                                 JOIN vms_resource r on r.guid = kv.resource_guid \
-                                 JOIN vms_camera c on c.resource_ptr_id = r.id \
-                                 %1 \
-                                 ORDER BY r.guid").arg(filterStr2));
-
     if (!queryCameras.exec()) {
         qWarning() << Q_FUNC_INFO << queryCameras.lastError().text();
         return ErrorCode::dbError;
     }
-
-    if (!queryParams.exec()) {
-        qWarning() << Q_FUNC_INFO << queryParams.lastError().text();
-        return ErrorCode::dbError;
-    }
-
     QnSql::fetch_many(queryCameras, &cameraList);
-
-    std::vector<ApiResourceParamWithRefData> params;
-    QnSql::fetch_many(queryParams, &params);
-    mergeObjectListData<ApiCameraData>(cameraList, params, &ApiCameraData::addParams, &ApiResourceParamWithRefData::resourceId);
 
     return ErrorCode::ok;
 }
@@ -2311,11 +2290,66 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributes
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiCameraDataExList& cameraList)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraDataExList& cameraExList)
 {
-    //if cameraId empty, returning all records
-    //TODO #ak
-    return ErrorCode::dbError;
+    QSqlQuery queryCameras( m_sdb );
+    queryCameras.setForwardOnly(true);
+
+    QString filterStr;
+    if (!cameraId.isNull()) {
+        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(cameraId));
+    }
+    
+    queryCameras.prepare(QString("SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, \
+                                 coalesce(cu.camera_name, r.name) as name, r.url, r.status, \
+                                 c.vendor, c.manually_added as manuallyAdded, \
+                                 c.group_name as groupName, c.group_id as groupId, c.mac, c.model, \
+                                 c.status_flags as statusFlags, c.physical_id as physicalId, c.password, c.login, \
+                                 cu.audio_enabled as audioEnabled,                  \
+                                 cu.control_enabled as controlEnabled,              \
+                                 cu.region as motionMask,                           \
+                                 cu.schedule_enabled as scheduleEnabled,            \
+                                 cu.motion_type as motionType,                      \
+                                 cu.secondary_quality as secondaryStreamQuality,    \
+                                 cu.dewarping_params as dewarpingParams,            \
+                                 cu.min_archive_days as minArchiveDays,             \
+                                 cu.max_archive_days as maxArchiveDays,             \
+                                 cu.prefered_server_id as preferedServerId          \
+                                 FROM vms_resource r \
+                                 JOIN vms_camera c on c.resource_ptr_id = r.id \
+                                 LEFT JOIN vms_camera_user_attributes cu on cu.camera_guid = r.guid \
+                                 %1 \
+                                 ORDER BY r.guid \
+                                 ").arg(filterStr));
+
+    if (!queryCameras.exec()) {
+        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+    QnSql::fetch_many(queryCameras, &cameraExList);
+
+    QSqlQuery queryParams(m_sdb);
+    queryParams.setForwardOnly(true);
+    QString filterStr2;
+    if (!cameraId.isNull())
+        filterStr2 = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(cameraId));
+    queryParams.prepare(QString("SELECT kv.resource_guid as resourceId, kv.value, kv.name \
+                                FROM vms_kvpair kv \
+                                JOIN vms_resource r on r.guid = kv.resource_guid \
+                                JOIN vms_camera c on c.resource_ptr_id = r.id \
+                                %1 \
+                                ORDER BY r.guid").arg(filterStr2));
+
+    if (!queryParams.exec()) {
+        qWarning() << Q_FUNC_INFO << queryParams.lastError().text();
+        return ErrorCode::dbError;
+    }
+    ApiResourceParamWithRefDataList params;
+    QnSql::fetch_many(queryParams, &params);
+
+    mergeObjectListData<ApiCameraDataEx>(cameraExList, params, &ApiCameraDataEx::addParams, &ApiResourceParamWithRefData::resourceId);
+
+    return ErrorCode::ok;
 }
 
 
@@ -2410,25 +2444,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList
         return ErrorCode::dbError;
     }
 
-    QSqlQuery queryParams(m_sdb);
-    queryParams.setForwardOnly(true);
-    queryParams.prepare(QString("SELECT kv.resource_guid as resourceId, kv.value, kv.name\
-                                FROM vms_kvpair kv \
-                                JOIN vms_resource r on r.guid = kv.resource_guid \
-                                JOIN auth_user u on u.id = r.id \
-                                ORDER BY r.guid"));
-
-    if (!queryParams.exec()) {
-        qWarning() << Q_FUNC_INFO << queryParams.lastError().text();
-        return ErrorCode::dbError;
-    }
-
     QnSql::fetch_many(query, &userList);
 
-    std::vector<ApiResourceParamWithRefData> params;
-    QnSql::fetch_many(queryParams, &params);
-    mergeObjectListData<ApiUserData>(userList, params, &ApiUserData::addParams, &ApiResourceParamWithRefData::resourceId);
-    
     return ErrorCode::ok;
 }
 

@@ -146,8 +146,8 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiCameraServerItemDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
         //AbstractCameraManager::getBookmarkTags
         registerGetFuncHandler<std::nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
-        //AbstractCameraManager::getFullCameraDataList
-        registerGetFuncHandler<QnUuid, ApiCameraDataExList>( restProcessorPool, ApiCommand::getFullCameraDataList );
+        //AbstractCameraManager::getCamerasEx
+        registerGetFuncHandler<QnUuid, ApiCameraDataExList>( restProcessorPool, ApiCommand::getCamerasEx );
 
         //AbstractCameraManager::getBookmarkTags
 

@@ -36,9 +36,8 @@ namespace ec2
         QString       name;
         QString       url;
         QnUuid          typeId;
-        std::vector<ApiResourceParamData> addParams;
     };
-#define ApiResourceData_Fields (id)(parentId)(status)(name)(url)(typeId)(addParams)
+#define ApiResourceData_Fields (id)(parentId)(status)(name)(url)(typeId)
 
     struct ApiSetResourceStatusData: ApiData
     {

@@ -18,8 +18,9 @@ namespace ec2
         ApiCameraData,
         ApiCameraAttributesData
     {
+        std::vector<ApiResourceParamData> addParams;
     };
-#define ApiCameraDataEx_Fields ApiCameraData_Fields ApiCameraAttributesData_Fields
+#define ApiCameraDataEx_Fields ApiCameraData_Fields ApiCameraAttributesData_Fields_Short (addParams)
 
 } // namespace ec2
 
