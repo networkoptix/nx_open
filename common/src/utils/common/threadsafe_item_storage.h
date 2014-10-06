@@ -81,9 +81,17 @@ public:
         removeItemUnderLock(uuid);
     }
 
-    void updateItem(const QnUuid &uuid, const T &item) {
+    void updateItem(const T &item) {
         QMutexLocker locker(m_mutex);
-        updateItemUnderLock(uuid, item);
+        updateItemUnderLock(item);
+    }
+
+    void addOrUpdateItem(const T &item) {
+        QMutexLocker locker(m_mutex);
+        if (m_itemByUuid.contains(item.uuid))
+            updateItemUnderLock(item);
+        else
+            addItemUnderLock(item);
     }
 
 private:
@@ -92,13 +100,8 @@ private:
             if(!items.contains(item.uuid))
                 removeItemUnderLock(item.uuid);
 
-        foreach(const T &item, items) {
-            if(m_itemByUuid.contains(item.uuid)) {
-                updateItemUnderLock(item.uuid, item);
-            } else {
-                addItemUnderLock(item);
-            }
-        }
+        foreach(const T &item, items)
+            addOrUpdateItem(item);
     }
 
     void addItemUnderLock(const T &item) {
@@ -116,10 +119,10 @@ private:
         m_mutex->lock();
     }
 
-    void updateItemUnderLock(const QnUuid &uuid, const T &item) {
-        typename ItemMap::iterator pos = m_itemByUuid.find(uuid);
+    void updateItemUnderLock(const T &item) {
+        typename ItemMap::iterator pos = m_itemByUuid.find(item.uuid);
         if(pos == m_itemByUuid.end()) {
-            qnWarning("There is no item with UUID %1.", uuid.toString());
+            qnWarning("There is no item with UUID %1.", item.uuid.toString());
             return;
         }
 
