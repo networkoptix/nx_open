@@ -1110,7 +1110,17 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
     }
 
     *internalId = insQuery.lastInsertId().toInt();
-
+#if 0
+    QSqlQuery renameQuery(m_sdb);
+    renameQuery.prepare("UPDATE vms_resource set name = ? WHERE guid = ?");
+    renameQuery.addBindValue(data.cameraName);
+    renameQuery.addBindValue(QnSql::serialized_field(data.cameraID));
+    if( !renameQuery.exec() )
+    {
+        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(renameQuery.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+#endif
     return ErrorCode::ok;
 }
 
