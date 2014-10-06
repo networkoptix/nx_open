@@ -40,7 +40,7 @@ void QnResourcePropertyDictionary::fromModifiedDataToSavedData(const QnUuid& res
     }
 }
 
-int QnResourcePropertyDictionary::saveData(const ec2::ApiResourceParamWithRefDataList data)
+int QnResourcePropertyDictionary::saveData(const ec2::ApiResourceParamWithRefDataList&& data)
 {
     if (data.empty())
         return -1; // nothink to save
