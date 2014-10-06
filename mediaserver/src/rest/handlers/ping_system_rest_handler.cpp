@@ -6,7 +6,8 @@
 #include "utils/network/tcp_connection_priv.h"
 #include <utils/common/app_info.h>
 
-int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+{
     Q_UNUSED(path)
 
     QUrl url = params.value(lit("url"));

@@ -22,7 +22,8 @@ static const QLatin1String diagnosticsTypeParamName("type");
 int QnCameraDiagnosticsRestHandler::executeGet(
     const QString& /*path*/,
     const QnRequestParams &params,
-    QnJsonRestResult& result )
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor*)
 {
     QnUuid resID = QnUuid(params.value("res_id"));
     CameraDiagnostics::Step::Value diagnosticsType = CameraDiagnostics::Step::fromString(params.value("type"));

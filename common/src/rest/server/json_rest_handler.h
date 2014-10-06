@@ -48,12 +48,13 @@ public:
     QnJsonRestHandler();
     virtual ~QnJsonRestHandler();
 
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result);
-    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result);
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*);
+    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*);
 
 protected:
-    virtual int executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType) override;
-    virtual int executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, const QByteArray& srcBodyContentType, QByteArray &result, QByteArray &contentType) override;
+    virtual int executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType, const QnRestConnectionProcessor*) override;
+    virtual int executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, const QByteArray& srcBodyContentType, QByteArray &result, 
+                            QByteArray &contentType, const QnRestConnectionProcessor*) override;
 
     template<class T>
     bool requireParameter(const QnRequestParams &params, const QString &key, QnJsonRestResult &result, T *value, bool optional = false) const {

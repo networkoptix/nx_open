@@ -11,7 +11,8 @@ namespace HttpStatusCode {
     };
 }
 
-int QnRestartRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType) {
+int QnRestartRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType, const QnRestConnectionProcessor*) 
+{
     Q_UNUSED(path)
     Q_UNUSED(contentType)
     Q_UNUSED(result)
@@ -21,9 +22,11 @@ int QnRestartRestHandler::executeGet(const QString &path, const QnRequestParamLi
     return HttpStatusCode::ok;
 }
 
-int QnRestartRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, const QByteArray &srcBodyContentType, QByteArray &result, QByteArray &resultContentType) {
+int QnRestartRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, const QByteArray &srcBodyContentType, QByteArray &result, 
+                                      QByteArray &resultContentType, const QnRestConnectionProcessor* owner) 
+{
     Q_UNUSED(body)
     Q_UNUSED(srcBodyContentType)
 
-    return executeGet(path, params, result, resultContentType);
+    return executeGet(path, params, result, resultContentType, owner);
 }

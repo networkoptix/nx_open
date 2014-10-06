@@ -14,14 +14,8 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
 {
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::runtimeInfoChanged, this, [this](const ec2::ApiRuntimeData &runtimeData) 
     {
-        QMutexLocker lock(&m_updateMutex);
         QnPeerRuntimeInfo info(runtimeData);
-        if (m_items->hasItem(info.uuid)) {
-            //if (runtimeData.version > m_items->getItem(runtimeData.peer.id).data.version)
-            m_items->updateItem(info.uuid, info);
-        }
-        else
-            m_items->addItem(info);
+        m_items->addOrUpdateItem(info);
     });
 
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerLost,     this, [this](const ec2::ApiPeerAliveData &data){
@@ -87,7 +81,7 @@ void QnRuntimeInfoManager::updateLocalItem(const QnPeerRuntimeInfo& value)
     if (m_items->hasItem(value.uuid)) {
         int oldVersion = m_items->getItem(value.uuid).data.version;
         modifiedValue.data.version = oldVersion + 1;
-        m_items->updateItem(value.uuid, modifiedValue);
+        m_items->updateItem(modifiedValue);
     }
     else {
         modifiedValue.data.version = 1;

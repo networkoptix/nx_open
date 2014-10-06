@@ -6,7 +6,8 @@
 
 void restartServer();
 
-int QnChangeSystemNameRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnChangeSystemNameRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+{
     Q_UNUSED(path)
 
     QString systemName = params.value(lit("systemName"));

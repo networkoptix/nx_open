@@ -159,7 +159,7 @@ uchar* rotateImage(AVFrame& pict, int rotate)
     return newBuffer;
 }
 
-int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
 
@@ -467,8 +467,9 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
 
 }
 
-int QnImageRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
+int QnImageRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
+                                    QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
-    return executeGet(path, params, result, contentType);
+    return executeGet(path, params, result, contentType, owner);
 }
 

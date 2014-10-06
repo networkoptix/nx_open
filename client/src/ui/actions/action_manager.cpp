@@ -6,9 +6,14 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsItem>
 
-#include <utils/common/warnings.h>
-#include <utils/common/checked_cast.h>
-#include <utils/common/scoped_value_rollback.h>
+#include "action.h"
+#include "action_factories.h"
+#include "action_conditions.h"
+#include "action_target_provider.h"
+#include "action_parameter_types.h"
+
+#include <client/client_settings.h>
+
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource/resource.h>
 
@@ -18,11 +23,9 @@
 #include <ui/style/globals.h>
 #include <ui/screen_recording/screen_recorder.h>
 
-#include "action.h"
-#include "action_factories.h"
-#include "action_conditions.h"
-#include "action_target_provider.h"
-#include "action_parameter_types.h"
+#include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
+#include <utils/common/scoped_value_rollback.h>
 
 namespace {
     void copyIconPixmap(const QIcon &src, QIcon::Mode mode, QIcon::State state, QIcon *dst) {
@@ -1338,10 +1341,13 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ConnectToCurrentSystem).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
         text(tr("Connect to the Current System...")).
-        condition(new QnDisjunctionActionCondition(
+        condition(new QnConjunctionActionCondition(
+            new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::Any, this),
+            new QnDisjunctionActionCondition(
                       new QnResourceStatusActionCondition(Qn::Incompatible, false, this),
                       new QnResourceStatusActionCondition(Qn::Unauthorized, false, this),
-                      this));
+                      this),
+            this));
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
@@ -1656,7 +1662,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Alt+T")).
         text(tr("Disable Background Animation")).
         toggledText(tr("Enable Background Animation")).
-        checked(true).
+        checked(qnSettings->isBackgroundEnabled()).
         autoRepeat(false);
 
 #ifdef QN_ENABLE_BOOKMARKS

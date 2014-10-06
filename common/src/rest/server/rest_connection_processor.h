@@ -33,7 +33,7 @@ class QnRestConnectionProcessor: public QnTCPConnectionProcessor {
 public:
     QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRestConnectionProcessor();
-
+    QnUuid authUserId() const;
 protected:
     virtual void run() override;
 

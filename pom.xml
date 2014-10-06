@@ -288,6 +288,7 @@
 			</activation>
 			<modules>
 				<!--<module>plugins/axiscamplugin</module>-->
+				<module>nx_sdk</module>  
 				<module>plugins/genericrtspplugin</module>
 				<module>plugins/image_library_plugin</module>
 				<module>plugins/mjpg_link</module>
@@ -326,7 +327,7 @@
 			<modules>     
 				<module>traytool</module>
 				<!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
-				<!--<module>vmaxproxy</module>  -->
+				<!--<module>vmaxproxy</module>  -->                   
 				<module>client</module>                     
 				<module>wixsetup/wixsetup-full</module>
 				<module>wixsetup/wixsetup-client-only</module>
@@ -348,6 +349,7 @@
 				<profile.classifier>${platform}</profile.classifier>                
 				<windows>true</windows>
 				<unix>false</unix>
+                <script.extension>bat</script.extension>
 				<global.windows.defines>ENABLE_VMAX</global.windows.defines>
 			</properties>
 		</profile>
@@ -389,6 +391,7 @@
 				<profile.classifier>${platform}-${arch}</profile.classifier>
 				<unix>true</unix>
 				<windows>false</windows>
+                <script.extension>sh</script.extension>
 			</properties>
 		</profile>        
 		<profile>

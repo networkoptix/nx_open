@@ -178,6 +178,10 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
     d->response.statusLine.version = d->request.requestLine.version;
     d->response.statusLine.statusCode = httpStatusCode;
     d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatusCode);
+
+    // this header required to perform new HTTP requests if server port has been on the fly changed
+    nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Access-Control-Allow-Origin", "*" ) ); 
+
     if (d->chunkedMode)
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Transfer-Encoding", "chunked" ) );
 
@@ -317,6 +321,7 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
     Q_D(const QnTCPConnectionProcessor);
     other.d_ptr->clientRequest = d->clientRequest;
     other.d_ptr->protocol = d->protocol;
+    other.d_ptr->authUserId = d->authUserId;
 }
 
 QUrl QnTCPConnectionProcessor::getDecodedUrl() const

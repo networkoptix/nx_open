@@ -34,7 +34,8 @@ namespace {
 
 
 
-int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType) {
+int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType, const QnRestConnectionProcessor*) 
+{
     contentType = "text/html";
 
     QString command = path;
@@ -124,9 +125,11 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
     return HttpCode::NotFound;
 }
 
-int QnRoutingInformationRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, const QByteArray &srcBodyContentType, QByteArray &result, QByteArray &resultContentType) {
+int QnRoutingInformationRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, const QByteArray &srcBodyContentType, QByteArray &result, 
+                                                 QByteArray &resultContentType, const QnRestConnectionProcessor* owner) 
+{
     Q_UNUSED(body)
     Q_UNUSED(srcBodyContentType)
 
-    return executeGet(path, params, result, resultContentType);
+    return executeGet(path, params, result, resultContentType, owner);
 }
