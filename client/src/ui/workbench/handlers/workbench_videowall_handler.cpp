@@ -12,6 +12,8 @@
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
+#include <common/common_module.h>
+
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
 
@@ -276,11 +278,40 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
             return;
         setItemOnline(info.data.videoWallInstanceGuid, true);
     });
+
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this, [this](const QnPeerRuntimeInfo &info) {
         if (info.data.peer.peerType != Qn::PT_VideowallClient)
             return;
         setItemOnline(info.data.videoWallInstanceGuid, false);
     });
+
+    /* Handle simultaneous control mode enter. */
+    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, [this](const QnPeerRuntimeInfo &info) {
+
+        /* Ignore own info change. */
+        if (info.uuid == qnCommon->moduleGUID())
+            return;
+
+        /* Skip if we are not controlling videowall now. */
+        if (!m_controlMode.active)
+            return;
+
+        /* Check the conflict. */
+        if (info.data.videoWallControlSession.isNull() ||
+            info.data.videoWallControlSession != workbench()->currentLayout()->resource()->getId())
+            return;
+
+        /* Order by guid. */
+        if (info.uuid < qnCommon->moduleGUID()) {
+            setControlMode(false);
+            QMessageBox::warning(mainWindow(),
+                tr("Control session is already running"),
+                tr("Could not start control session.\nAnother user is already controlling this screen."));
+        }
+        
+    });
+
+
     foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems()) {
         if (info.data.peer.peerType != Qn::PT_VideowallClient)
             continue;
@@ -391,11 +422,11 @@ void QnWorkbenchVideoWallHandler::swapLayouts(const QnVideoWallItemIndex firstIn
     auto swap = [this](const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout) {
         QnVideoWallItem firstItem = firstIndex.item();
         firstItem.layout = firstLayout->getId();
-        firstIndex.videowall()->items()->updateItem(firstIndex.uuid(), firstItem);
+        firstIndex.videowall()->items()->updateItem(firstItem);
 
         QnVideoWallItem secondItem = secondIndex.item();
         secondItem.layout = secondLayout->getId();
-        secondIndex.videowall()->items()->updateItem(secondIndex.uuid(), secondItem);
+        secondIndex.videowall()->items()->updateItem(secondItem);
 
         saveVideowalls(QSet<QnVideoWallResourcePtr>() << firstIndex.videowall() << secondIndex.videowall());
     };
@@ -429,7 +460,7 @@ void QnWorkbenchVideoWallHandler::updateItemsLayout(const QnVideoWallItemIndexLi
             continue;
 
         existingItem.layout = layoutId;
-        index.videowall()->items()->updateItem(index.uuid(), existingItem);
+        index.videowall()->items()->updateItem(existingItem);
         videoWalls << index.videowall();
     }
 
@@ -1212,7 +1243,7 @@ void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered() {
 
         QnVideoWallItem existingItem = index.item();
         existingItem.layout = QnUuid();
-        index.videowall()->items()->updateItem(index.uuid(), existingItem);
+        index.videowall()->items()->updateItem(existingItem);
         videoWalls << index.videowall();
     }
 
@@ -1317,7 +1348,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered() {
 
                 QnVideoWallItem existingItem = index.item();
                 existingItem.name = name;
-                index.videowall()->items()->updateItem(index.uuid(), existingItem);
+                index.videowall()->items()->updateItem(existingItem);
                 videoWalls << index.videowall();
             }
         }
@@ -1330,7 +1361,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered() {
 
                 QnVideoWallMatrix existingMatrix = matrix.videowall()->matrices()->getItem(matrix.uuid());
                 existingMatrix.name = name;
-                matrix.videowall()->matrices()->updateItem(matrix.uuid(), existingMatrix);
+                matrix.videowall()->matrices()->updateItem(existingMatrix);
                 videoWalls << matrix.videowall();
             }
         }
@@ -1603,7 +1634,7 @@ void QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered() {
             continue;
 
         item.layout = layoutUuid;
-        videowall->items()->updateItem(item.uuid, item);
+        videowall->items()->updateItem(item);
         hasChanges = true;
     }
 
@@ -1758,7 +1789,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResour
        
         QnVideoWallItem updatedItem(item);
         updatedItem.online = true;
-        videoWall->items()->updateItem(item.uuid, updatedItem);
+        videoWall->items()->updateItem(updatedItem);
         break;
     }
 
@@ -2229,7 +2260,7 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout( QnWorkbenchLayout *layout, s
             continue;
         foreach(int screenIndex, screenIndices)
             pc.screens[screenIndex].layoutGeometry = data.combinedGeometry.toRect();
-        videowall->pcs()->updateItem(item.pcUuid, pc);
+        videowall->pcs()->updateItem(pc);
         videowalls << videowall;
     }
 
@@ -2253,7 +2284,7 @@ void QnWorkbenchVideoWallHandler::setItemOnline(const QnUuid &instanceGuid, bool
 
     QnVideoWallItem item = index.item();
     item.online = online;
-    index.videowall()->items()->updateItem(instanceGuid, item);
+    index.videowall()->items()->updateItem(item);
 }
 
 void QnWorkbenchVideoWallHandler::updateMainWindowGeometry(const QnScreenSnaps &screenSnaps) {

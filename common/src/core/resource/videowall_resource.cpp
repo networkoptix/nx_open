@@ -35,7 +35,7 @@ void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArra
             if(newItems->hasItem(item.uuid)) {
                 QnVideoWallItem newItem = newItems->getItem(item.uuid);
                 newItem.online = item.online;
-                newItems->updateItem(item.uuid, newItem);
+                newItems->updateItem(newItem);
             }
         }
         m_items->setItemsUnderLock(newItems);
@@ -81,7 +81,7 @@ void QnVideoWallResource::storedItemRemoved(const QnVideoWallItem &item) {
         if (matrix.layoutByItem.isEmpty())
             m_matrices->removeItem(matrix.uuid);
         else
-            m_matrices->updateItem(matrix.uuid, matrix);
+            m_matrices->updateItem(matrix);
     }
 
     QnUuid pcUuid = item.pcUuid;
