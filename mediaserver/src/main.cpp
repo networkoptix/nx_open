@@ -675,11 +675,6 @@ int serverMain(int argc, char *argv[])
     return 0;
 }
 
-bool isLocalAppServer(const QString& appserverHostString)
-{
-    return appserverHostString.isEmpty() || appserverHostString == "localhost" || QUrl(appserverHostString).scheme() == "file";
-}
-
 void initAppServerConnection(QSettings &settings)
 {
     QUrl appServerUrl;
