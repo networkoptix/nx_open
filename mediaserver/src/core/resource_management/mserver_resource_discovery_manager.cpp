@@ -18,6 +18,7 @@
 #include "core/resource/storage_resource.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource_management/resource_pool.h"
+#include <core/resource_management/resource_properties.h>
 #include "core/resource_management/resource_searcher.h"
 #include "plugins/storage/dts/abstract_dts_searcher.h"
 #include "common/common_module.h"
@@ -188,6 +189,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( existCamRes, &cameras );
                     if( errorCode != ec2::ErrorCode::ok )
                         NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+                    propertyDictionary->saveParams( existCamRes->getId() );
                 }
             }
         }

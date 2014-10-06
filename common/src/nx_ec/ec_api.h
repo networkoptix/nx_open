@@ -164,7 +164,7 @@ namespace ec2
         void statusChanged( const QnUuid& resourceId, Qn::ResourceStatus status );
         //void disabledChanged( const QnUuid& resourceId, bool disabled );
         void resourceChanged( const QnResourcePtr& resource );
-        void resourceParamChanged(const ec2::ApiResourceParamWithRefData& param );
+        void resourceParamChanged( const ApiResourceParamWithRefData& param );
         void resourceRemoved( const QnUuid& resourceId );
 
     protected:

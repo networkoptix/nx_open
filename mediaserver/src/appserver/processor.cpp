@@ -6,8 +6,9 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
 
 #include "api/common_message_processor.h"
 #include "mutex/camera_data_handler.h"
@@ -142,6 +143,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     QnVirtualCameraResourceList cameras;
     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
     const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
+    propertyDictionary->saveParams( cameraResource->getId() );
     if( errorCode == ec2::ErrorCode::ok ) {
         QnResourcePtr existCamRes = qnResPool->getResourceById(cameraResource->getId());
         if (existCamRes && existCamRes->getTypeId() != cameraResource->getTypeId()) 
