@@ -1,0 +1,13 @@
+ <assembly>
+	<id>sdk</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<fileSets>
+		<fileSet>
+			<directory>nx_sdk</directory>
+			<outputDirectory>../</outputDirectory>
+		</fileSet>			
+	</fileSets>
+</assembly>
