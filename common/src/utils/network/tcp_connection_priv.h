@@ -83,6 +83,7 @@ public:
     bool chunkedMode;
     int clientRequestOffset;
     QDateTime lastModified;
+    QnUuid authUserId;
 };
 
 #endif // __TCP_CONNECTION_PRIV_H__

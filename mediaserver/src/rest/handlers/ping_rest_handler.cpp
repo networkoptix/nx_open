@@ -7,7 +7,7 @@
 #include <utils/network/http/httptypes.h>
 
 
-int QnPingRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result)
+int QnPingRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
     Q_UNUSED(params)

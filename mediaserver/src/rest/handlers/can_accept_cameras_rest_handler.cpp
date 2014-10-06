@@ -16,7 +16,7 @@ static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input) {
     return input.checkHostAddr(); 
 }
 
-int QnCanAcceptCameraRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result)
+int QnCanAcceptCameraRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
     Q_UNUSED(params)

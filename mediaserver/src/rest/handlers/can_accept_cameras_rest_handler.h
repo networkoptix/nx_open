@@ -8,7 +8,7 @@ class QnCanAcceptCameraRestHandler: public QnJsonRestHandler
 {
     Q_OBJECT
 public:
-    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) override;
+    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 };
 
 #endif // QN_CAN_ACCEPT_CAMERA_REST_HANDLER_H

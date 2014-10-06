@@ -106,6 +106,7 @@
 #include <rest/handlers/storage_space_rest_handler.h>
 #include <rest/handlers/storage_status_rest_handler.h>
 #include <rest/handlers/time_rest_handler.h>
+#include <rest/handlers/current_user_rest_handler.h>
 #include <rest/handlers/activate_license_rest_handler.h>
 #include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
@@ -904,7 +905,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
     {
         //loading users
         QnUserResourceList users;
-        while(( rez = ec2Connection->getUserManager()->getUsersSync(&users))  != ec2::ErrorCode::ok)
+        while(( rez = ec2Connection->getUserManager()->getUsersSync(QnUuid(), &users))  != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get users. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1081,6 +1082,7 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/image", new QnImageRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/onEvent", new QnExternalBusinessEventRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/gettime", new QnTimeRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/getCurrentUser", new QnCurrentUserRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testEmailSettings", new QnTestEmailSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
