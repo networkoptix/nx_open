@@ -144,6 +144,9 @@ public:
         /** Flag that client is run in videowall mode. */
         VIDEO_WALL_MODE,
 
+        /** Flag that background circles are enabled. */
+        BACKGROUND_ENABLED,
+
         /** Default color of the background circles (read from customization). */
         DEFAULT_BACKGROUND_COLOR,
 
@@ -249,8 +252,9 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         lightMode,              setLightMode,               LIGHT_MODE,                 0)  //int because of intended flags system
         QN_DECLARE_RW_PROPERTY(int,                         lightModeOverride,      setLightModeOverride,       LIGHT_MODE_OVERRIDE,        0)
         QN_DECLARE_RW_PROPERTY(Qn::ClientSkin,              clientSkin,             setClientSkin,              CLIENT_SKIN,                Qn::DarkSkin)
-        QN_DECLARE_RW_PROPERTY(QnUuid,                       pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
+        QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
         QN_DECLARE_RW_PROPERTY(bool,                        isVideoWallMode,        setVideoWallMode,           VIDEO_WALL_MODE,            false)
+        QN_DECLARE_RW_PROPERTY(bool,                        isBackgroundEnabled,    setBackgroundEnabled,       BACKGROUND_ENABLED,         true)
         QN_DECLARE_RW_PROPERTY(QColor,                      defaultBackgroundColor, setDefaultBackgroundColor,  DEFAULT_BACKGROUND_COLOR,   QColor())
         QN_DECLARE_RW_PROPERTY(QColor,                      backgroundColor,        setBackgroundColor,         BACKGROUND_COLOR,           QColor())
         QN_DECLARE_RW_PROPERTY(bool,                        isRainbowMode,          setRainbowMode,             RAINBOW_MODE,               false)

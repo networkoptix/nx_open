@@ -107,6 +107,12 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
         ui->doubleBufferRestartLabel->setVisible(toggled != m_oldDoubleBuffering);
     });
 
+    connect(ui->enableBackgroundCheckBox,               &QCheckBox::toggled,            this,   [this](bool toggled) {
+        ui->backgroundColorLabel->setEnabled(toggled);
+        ui->backgroundColorWidget->setEnabled(toggled);
+        action(Qn::ToggleBackgroundAnimationAction)->setChecked(toggled);
+    });
+
     connect(ui->selectColorButton,                      &QPushButton::clicked,          this,   [this] {
         if (m_colorDialog->exec())
             updateBackgroundColor();
@@ -149,6 +155,11 @@ void QnGeneralPreferencesWidget::submitToSettings() {
             if(!translation.filePaths().contains(currentTranslationPath))
                 qnSettings->setTranslationPath(translation.filePaths()[0]);
         }
+    }
+
+    bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
+    if (backgroundAllowed) {
+        qnSettings->setBackgroundEnabled(ui->enableBackgroundCheckBox->isChecked());
     }
 
     if (ui->defaultBackgroundCheckBox->isChecked())
@@ -195,6 +206,14 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
         }
     }
     ui->languageComboBox->setCurrentIndex(m_oldLanguage);
+
+    bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
+    ui->backgroundLabel->setEnabled(backgroundAllowed);
+    ui->enableBackgroundCheckBox->setEnabled(backgroundAllowed);
+    if (!backgroundAllowed)
+        ui->enableBackgroundCheckBox->setChecked(false);
+    else
+        ui->enableBackgroundCheckBox->setChecked(qnSettings->isBackgroundEnabled());
 
     m_oldBackgroundColor = qnSettings->backgroundColor();
     ui->defaultBackgroundCheckBox->setChecked(!qnSettings->backgroundColor().isValid());
