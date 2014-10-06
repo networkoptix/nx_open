@@ -12,8 +12,6 @@ namespace ec2
         ApiCameraData(): manuallyAdded(false), statusFlags(0) {}
 
         QnLatin1Array       mac;
-        QString             login;
-        QString             password;
         QString             physicalId;
         bool                manuallyAdded;
         QString             model;
@@ -22,8 +20,7 @@ namespace ec2
         Qn::CameraStatusFlags   statusFlags;
         QString             vendor;
     };
-#define ApiCameraData_Fields ApiResourceData_Fields (mac)(login)(password)(physicalId)(manuallyAdded)(model) \
-                            (groupId)(groupName)(statusFlags)(vendor)
+#define ApiCameraData_Fields ApiResourceData_Fields (mac)(physicalId)(manuallyAdded)(model)(groupId)(groupName)(statusFlags)(vendor)
 
 } // namespace ec2
 

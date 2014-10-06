@@ -26,7 +26,7 @@ namespace ec2
             assert( tran.command == ApiCommand::saveCamera);
             QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
                 tran.params.typeId,
-                QnResourceParams(tran.params.url, tran.params.vendor) ).dynamicCast<QnVirtualCameraResource>();
+                QnResourceParams(tran.params.id, tran.params.url, tran.params.vendor) ).dynamicCast<QnVirtualCameraResource>();
             Q_ASSERT(cameraRes);
             if (cameraRes) {
                 fromApiToResource(tran.params, cameraRes);
@@ -41,7 +41,7 @@ namespace ec2
             {
                 QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
                     camera.typeId,
-                    QnResourceParams(camera.url, camera.vendor) ).dynamicCast<QnVirtualCameraResource>();
+                    QnResourceParams(camera.id, camera.url, camera.vendor) ).dynamicCast<QnVirtualCameraResource>();
                 fromApiToResource(camera, cameraRes);
                 emit cameraAddedOrUpdated( cameraRes );
             }

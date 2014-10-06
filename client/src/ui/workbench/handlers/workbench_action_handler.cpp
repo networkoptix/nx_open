@@ -20,7 +20,6 @@
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
-
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
 
@@ -32,6 +31,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/videowall_resource.h>
@@ -895,13 +895,15 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     if(!modifiedResources.empty()) {
         detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources);
 
+        const QList<QnUuid>& idList = idListFromResList(modifiedResources);
         connection2()->getCameraManager()->saveUserAttributes(
-            QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(modifiedResources)),
+            QnCameraUserAttributePool::instance()->getAttributesList(idList),
             processor,
             [processor, modifiedResources](int reqID, ec2::ErrorCode errorCode) {
                 processor->at_replyReceived(reqID, errorCode, modifiedResources);
-        }
+            }
         );
+        propertyDictionary->saveParamsAsync(idList);    //saving modified properties
     }
 }
 
@@ -1751,8 +1753,9 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
             cam->setGroupName(name);
             modified << cam;
         }
+        const QList<QnUuid>& idList = idListFromResList(modified);
         connection2()->getCameraManager()->saveUserAttributes(
-            QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(modified)),
+            QnCameraUserAttributePool::instance()->getAttributesList(idList),
             this, 
             [this, modified, oldName]( int reqID, ec2::ErrorCode errorCode ) {
                 at_resources_saved( reqID, errorCode, modified );
@@ -1760,9 +1763,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
                     foreach (const QnVirtualCameraResourcePtr &camera, modified)
                         camera->setGroupName(oldName);
             } );
-
-
-
+        propertyDictionary->saveParamsAsync(idList);
     } else {
         if (!validateResourceName(resource, name))
             return;
@@ -1799,6 +1800,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
             connection2()->getUserManager()->save( user, this, callback );
         if (layout)
             connection2()->getLayoutManager()->save( QnLayoutResourceList() << layout, this, callback);
+        propertyDictionary->saveParamsAsync(resource->getId()); //saving modified properties of resouce
     }
 }
 

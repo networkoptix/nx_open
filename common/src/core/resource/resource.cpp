@@ -142,15 +142,9 @@ QnResourcePtr QnResource::toSharedPointer() const
     return QnFromThisToShared<QnResource>::toSharedPointer();
 }
 
-void QnResource::afterUpdateInner(QSet<QByteArray>& modifiedFields)
+void QnResource::afterUpdateInner(const QSet<QByteArray>& modifiedFields)
 {
-    emit resourceChanged(toSharedPointer(this));
-    //modifiedFields << "resourceChanged";
-
-    const QnResourcePtr & _t1 = toSharedPointer(this);
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    foreach(const QByteArray& signalName, modifiedFields)
-        emitDynamicSignal((signalName + QByteArray("(QnResourcePtr)")).data(), _a);
+    emitModificationSignals( modifiedFields );
 }
 
 bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
@@ -491,6 +485,16 @@ void QnResource::setId(const QnUuid& id) {
 
     //QnUuid oldId = m_id;
     m_id = id;
+
+    auto locallySavedProperties = std::move( m_locallySavedProperties );
+    mutexLocker.unlock();
+
+    //<key, <value, isDirty>>
+    for( std::pair<QString, std::pair<QString, bool> > prop: locallySavedProperties )
+    {
+        if( propertyDictionary->setValue(id, prop.first, prop.second.first, prop.second.second) )   //isModified?
+            emitPropertyChanged(prop.first);
+    }
 }
 
 QString QnResource::getUrl() const
@@ -634,13 +638,13 @@ void QnResource::initializationDone()
 }
 
 bool QnResource::hasProperty(const QString &key) const {
-    return propertyDictionay->hasProperty(getId(), key);
+    return propertyDictionary->hasProperty(getId(), key);
 }
 
 QString QnResource::getProperty(const QString &key) const {
     //QMutexLocker mutexLocker(&m_mutex);
     //return m_propertyByKey.value(key, defaultValue);
-    QString value = propertyDictionay->value(getId(), key);
+    QString value = propertyDictionary->value(getId(), key);
     if (value.isNull()) {
         // find default value in resourceType
         QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId); 
@@ -652,8 +656,18 @@ QString QnResource::getProperty(const QString &key) const {
 
 void QnResource::setProperty(const QString &key, const QString &value, bool markDirty) 
 {
+    {
+        QMutexLocker lk( &m_mutex );
+        if( m_id.isNull() )
+        {
+            //saving property to some internal dictionary. Will apply to global dictionary when id is known
+            m_locallySavedProperties[key] = std::make_pair( value, markDirty );
+            return;
+        }
+    }
+
     Q_ASSERT(!getId().isNull());
-    bool isModified = propertyDictionay->setValue(getId(), key, value, markDirty);
+    bool isModified = propertyDictionary->setValue(getId(), key, value, markDirty);
     if (isModified)
         emitPropertyChanged(key);
 }
@@ -674,7 +688,18 @@ void QnResource::setProperty(const QString &key, const QVariant& value)
 }
 
 ec2::ApiResourceParamDataList QnResource::getProperties() const {
-    return propertyDictionay->allProperties(getId());
+    return propertyDictionary->allProperties(getId());
+}
+
+void QnResource::emitModificationSignals( const QSet<QByteArray>& modifiedFields )
+{
+    emit resourceChanged(toSharedPointer(this));
+    //modifiedFields << "resourceChanged";
+
+    const QnResourcePtr & _t1 = toSharedPointer(this);
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    foreach(const QByteArray& signalName, modifiedFields)
+        emitDynamicSignal((signalName + QByteArray("(QnResourcePtr)")).data(), _a);
 }
 
 QnInitResPool* QnResource::initAsyncPoolInstance()

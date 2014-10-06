@@ -38,6 +38,6 @@ private:
     mutable QMutex m_mutex;
 };
 
-#define propertyDictionay QnResourcePropertyDictionary::instance()
+#define propertyDictionary QnResourcePropertyDictionary::instance()
 
 #endif // __RESOURCE_PROPERTY_DICTIONARY_H

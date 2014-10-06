@@ -71,7 +71,7 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
 
     connect(action(Qn::SelectionChangeAction),  &QAction::triggered,    this,   &QnCameraSettingsDialog::at_selectionChangeAction_triggered);
 
-    connect(propertyDictionay, &QnResourcePropertyDictionary::asyncSaveDone, this, &QnCameraSettingsDialog::at_cameras_properties_saved);
+    connect(propertyDictionary, &QnResourcePropertyDictionary::asyncSaveDone, this, &QnCameraSettingsDialog::at_cameras_properties_saved);
 
     at_settingsWidget_hasChangesChanged();
 }
@@ -270,7 +270,7 @@ void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &came
             Q_UNUSED(reqID);
             at_cameras_saved(errorCode, cameras); 
     } );
-    propertyDictionay->saveParamsAsync(idLIst);
+    propertyDictionary->saveParamsAsync(idLIst);
 }
 
 void QnCameraSettingsDialog::saveAdvancedCameraSettingsAsync(const QnVirtualCameraResourceList &cameras) {

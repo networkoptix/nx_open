@@ -146,10 +146,6 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     }
 
     dst->setMAC(QnMacAddress(src.mac));
-    QAuthenticator auth;
-    auth.setUser(src.login);
-    auth.setPassword(src.password);
-    dst->setAuth(auth);
 
     dst->setPhysicalId(src.physicalId);
     dst->setManuallyAdded(src.manuallyAdded);
@@ -167,9 +163,6 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
 
     dst.mac = src->getMAC().toString().toLatin1();
-    dst.login = src->getAuth().user();
-    dst.password = src->getAuth().password();
-    
     dst.physicalId = src->getPhysicalId();
     dst.manuallyAdded = src->isManuallyAdded();
     dst.model = src->getModel();
@@ -183,7 +176,7 @@ template<class List>
 void fromApiToResourceList(const ApiCameraDataList &src, List &dst, QnResourceFactory *factory, const overload_tag &) {
     dst.reserve(dst.size() + (int)src.size());
     for(const ApiCameraData &srcCamera: src) {
-        QnVirtualCameraResourcePtr dstCamera = factory->createResource(srcCamera.typeId, QnResourceParams(srcCamera.url, srcCamera.vendor)).dynamicCast<QnVirtualCameraResource>();
+        QnVirtualCameraResourcePtr dstCamera = factory->createResource(srcCamera.typeId, QnResourceParams(srcCamera.id, srcCamera.url, srcCamera.vendor)).dynamicCast<QnVirtualCameraResource>();
         if (dstCamera) {
             fromApiToResource(srcCamera, dstCamera);
             dst.push_back(dstCamera);
@@ -636,7 +629,7 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
 
     QnAbstractStorageResourceList dstStorages;
     for(const ApiStorageData &srcStorage: src.storages) {
-        QnAbstractStorageResourcePtr dstStorage = ctx.resFactory->createResource(resType->getId(), QnResourceParams(srcStorage.url, QString())).dynamicCast<QnAbstractStorageResource>();
+        QnAbstractStorageResourcePtr dstStorage = ctx.resFactory->createResource(resType->getId(), QnResourceParams(srcStorage.id, srcStorage.url, QString())).dynamicCast<QnAbstractStorageResource>();
 
         fromApiToResource(srcStorage, dstStorage);
         dstStorages.push_back(dstStorage);
@@ -692,7 +685,7 @@ void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
 void fromApiToResourceList(const ApiResourceDataList &src, QnResourceList &dst, QnResourceFactory *factory) {
     dst.reserve(dst.size() + (int)src.size());
     for(const ApiResourceData &srcResource: src) {
-        dst.push_back(factory->createResource(srcResource.typeId, QnResourceParams(srcResource.url, QString())));
+        dst.push_back(factory->createResource(srcResource.typeId, QnResourceParams(srcResource.id, srcResource.url, QString())));
         fromApiToResource(srcResource, dst.back());
     }
 }

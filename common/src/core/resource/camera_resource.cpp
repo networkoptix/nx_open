@@ -232,12 +232,12 @@ void QnVirtualCameraResource::forceDisableAudio()
 
 void QnVirtualCameraResource::saveParams()
 {
-    propertyDictionay->saveParams(getId());
+    propertyDictionary->saveParams(getId());
 }
 
 void QnVirtualCameraResource::saveParamsAsync()
 {
-    propertyDictionay->saveParamsAsync(getId());
+    propertyDictionary->saveParamsAsync(getId());
 }
 
 QString QnVirtualCameraResource::toSearchString() const

@@ -73,7 +73,7 @@ QnMacAddress QnNetworkResource::getMAC() const
     return m_macAddress;
 }
 
-void  QnNetworkResource::setMAC(const QnMacAddress &mac)
+void QnNetworkResource::setMAC(const QnMacAddress &mac)
 {
     QMutexLocker mutexLocker(&m_mutex);
     m_macAddress = mac;
@@ -96,14 +96,18 @@ void QnNetworkResource::setPhysicalId(const QString &physicalId)
 
 void QnNetworkResource::setAuth(const QAuthenticator &auth)
 {
-    QMutexLocker mutexLocker(&m_mutex);
-    m_auth = auth;
+    setProperty( Qn::CAMERA_CREDENTIALS_PARAM_NAME, lit("%1:%2").arg(auth.user()).arg(auth.password()) );
 }
 
 QAuthenticator QnNetworkResource::getAuth() const
 {
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_auth;
+    const QStringList& credentialsList = getProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME).split(lit(":"));
+    QAuthenticator auth;
+    if( credentialsList.size() >= 1 )
+        auth.setUser( credentialsList[0] );
+    if( credentialsList.size() >= 2 )
+        auth.setPassword( credentialsList[1] );
+    return auth;
 }
 
 bool QnNetworkResource::isAuthenticated() const
@@ -206,7 +210,7 @@ void QnNetworkResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>
     QnNetworkResourcePtr other_casted = qSharedPointerDynamicCast<QnNetworkResource>(other);
     if (other_casted)
     {
-        m_auth = other_casted->m_auth;
+        //m_auth = other_casted->m_auth;    //auth moved to resource properties
         m_macAddress = other_casted->m_macAddress;
     }
 }

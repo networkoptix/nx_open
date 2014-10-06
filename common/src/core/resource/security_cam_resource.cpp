@@ -111,33 +111,12 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
     {
         QnConstResourceVideoLayoutPtr layout = getVideoLayout();
 
-        //m_motionType = other_casted->m_motionType;                //moved to QnCameraUserAttributePool
-        
-        //bool motionRegionChanged = false;
-        //int numChannels = layout->channelCount();
-        //for (int i = 0; i < numChannels; ++i) {
-        //    if (m_motionMaskList[i] == other_casted->m_motionMaskList[i])
-        //        continue;
-        //    setMotionRegion(other_casted->m_motionMaskList[i], i);
-        //    motionRegionChanged = true;
-        //}
-        //if (motionRegionChanged)
-        //    modifiedFields << "motionRegionChanged";
-
-        //m_scheduleTasks = other_casted->m_scheduleTasks;          //moved to QnCameraUserAttributePool
         m_groupId = other_casted->m_groupId;
         m_groupName = other_casted->m_groupName;
-        //m_secondaryQuality = other_casted->m_secondaryQuality;        //moved to QnCameraUserAttributePool
-        //m_cameraControlDisabled = other_casted->m_cameraControlDisabled;  //moved to QnCameraUserAttributePool
         m_statusFlags = other_casted->m_statusFlags;
-        //m_scheduleDisabled = other_casted->m_scheduleDisabled;    //moved to QnCameraUserAttributePool
-        //m_audioEnabled = other_casted->m_audioEnabled;            //moved to QnCameraUserAttributePool
         m_manuallyAdded = other_casted->m_manuallyAdded;
         m_model = other_casted->m_model;
         m_vendor = other_casted->m_vendor;
-        //m_minDays = other_casted->m_minDays;                      //moved to QnCameraUserAttributePool
-        //m_maxDays = other_casted->m_maxDays;                      //moved to QnCameraUserAttributePool
-        //m_preferedServerId = other_casted->m_preferedServerId;    //moved to QnCameraUserAttributePool
     }
 }
 
@@ -246,7 +225,6 @@ void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList& scheduleT
         QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
         (*userAttributesLock)->scheduleTasks = scheduleTasks;
     }
-    //SAFE(m_scheduleTasks = scheduleTasks)
     emit scheduleTasksChanged(::toSharedPointer(this));
 }
 

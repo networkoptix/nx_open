@@ -8,9 +8,7 @@ CREATE TABLE "vms_camera" (
     mac                 varchar(200)    NOT NULL,
     model               varchar(200)    NOT NULL DEFAULT '',
     status_flags        integer         NOT NULL DEFAULT '0',
-    physical_id         varchar(200)    NOT NULL DEFAULT '',
-    password            varchar(200)    NOT NULL,
-    login               varchar(200)    NOT NULL
+    physical_id         varchar(200)    NOT NULL DEFAULT ''
 );
 
 

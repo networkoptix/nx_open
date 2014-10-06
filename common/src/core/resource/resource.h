@@ -197,6 +197,9 @@ public:
     void setProperty(const QString &key, const QVariant& value);
     ec2::ApiResourceParamDataList getProperties() const;
 
+    //!Call this with proper field names to emit corresponding *changed signals. Signal can be defined in a derived class
+    void emitModificationSignals( const QSet<QByteArray>& modifiedFields );
+
     static QnInitResPool* initAsyncPoolInstance();
 
 signals:
@@ -280,7 +283,7 @@ private:
 
     void updateUrlName(const QString &oldUrl, const QString &newUrl);
     bool emitDynamicSignal(const char *signal, void **arguments);
-    void afterUpdateInner(QSet<QByteArray>& modifiedFields);
+    void afterUpdateInner(const QSet<QByteArray>& modifiedFields);
     void emitPropertyChanged(const QString& key);
 
     friend class InitAsyncTask;
@@ -336,6 +339,8 @@ private:
     CameraDiagnostics::Result m_prevInitializationResult;
     CameraDiagnostics::Result m_lastMediaIssue;
     QAtomicInt m_initializationAttemptCount;
+    //!map<key, <value, isDirty>>
+    std::map<QString, std::pair<QString, bool> > m_locallySavedProperties;
 };
 
 template<class Resource>

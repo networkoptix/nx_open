@@ -150,7 +150,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
 
         foreach (QnAbstractResourceSearcher *searcher, searchersList)
         {
-            result = searcher->createResource(resourceTypeId, QnResourceParams(params.url, params.vendor));
+            result = searcher->createResource(resourceTypeId, params);
             if (!result.isNull())
                 break;
         }

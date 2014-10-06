@@ -22,3 +22,18 @@ QnCameraUserAttributes::QnCameraUserAttributes()
         motionRegions << QnMotionRegion();
 }
 
+void QnCameraUserAttributes::assign( const QnCameraUserAttributes& right, QSet<QByteArray>* const modifiedFields )
+{
+    if( name != right.name )
+        *modifiedFields << "nameChanged";
+    if( dewarpingParams != right.dewarpingParams )
+        *modifiedFields << "mediaDewarpingParamsChanged";
+    if( scheduleDisabled != right.scheduleDisabled )
+        *modifiedFields << "scheduleDisabledChanged";
+    if( scheduleTasks != right.scheduleTasks )
+        *modifiedFields << "scheduleTasksChanged";
+    if( motionRegions != right.motionRegions )
+        *modifiedFields << "motionRegionChanged";
+
+    *this = right;
+}

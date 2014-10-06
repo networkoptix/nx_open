@@ -1055,9 +1055,9 @@ ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 i
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO vms_camera (vendor, manually_added, resource_ptr_id, group_name, group_id,\
-                     mac, model, status_flags, physical_id, password, login, resource_ptr_id) VALUES\
+                     mac, model, status_flags, physical_id, resource_ptr_id) VALUES\
                      (:vendor, :manuallyAdded, :id, :groupName, :groupId,\
-                     :mac, :model, :statusFlags, :physicalId, :password, :login, :internalId)");
+                     :mac, :model, :statusFlags, :physicalId, :internalId)");
     QnSql::bind(data, &insQuery);
     insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec()) {
@@ -2211,7 +2211,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiCameraDataList&
     queryCameras.prepare(QString("SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, r.status, \
         c.vendor, c.manually_added as manuallyAdded, \
         c.group_name as groupName, c.group_id as groupId, c.mac, c.model, \
-		c.status_flags as statusFlags, c.physical_id as physicalId, c.password, login \
+		c.status_flags as statusFlags, c.physical_id as physicalId \
         FROM vms_resource r \
         JOIN vms_camera c on c.resource_ptr_id = r.id %1 ORDER BY r.guid").arg(filterStr));
 
@@ -2314,7 +2314,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraDataExList
                                  coalesce(cu.camera_name, r.name) as name, r.url, r.status, \
                                  c.vendor, c.manually_added as manuallyAdded, \
                                  c.group_name as groupName, c.group_id as groupId, c.mac, c.model, \
-                                 c.status_flags as statusFlags, c.physical_id as physicalId, c.password, c.login, \
+                                 c.status_flags as statusFlags, c.physical_id as physicalId, \
                                  cu.audio_enabled as audioEnabled,                  \
                                  cu.control_enabled as controlEnabled,              \
                                  cu.region as motionMask,                           \

@@ -222,8 +222,8 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
-    void scheduleDisabledChanged(const QnSecurityCamResourcePtr &resource);
-    void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
+    void scheduleDisabledChanged(const QnResourcePtr &resource);
+    void scheduleTasksChanged(const QnResourcePtr &resource);
     void groupNameChanged(const QnSecurityCamResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);

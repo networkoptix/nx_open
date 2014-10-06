@@ -219,7 +219,7 @@ void QnCommonMessageProcessor::on_resourceParamChanged(const ec2::ApiResourcePar
     if (resource)
         resource->setProperty(param.name, param.value, false);
     else
-        propertyDictionay->setValue(param.resourceId, param.name, param.value, false);
+        propertyDictionary->setValue(param.resourceId, param.name, param.value, false);
 }
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
@@ -244,26 +244,28 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
 
 void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const QnCameraUserAttributesPtr& userAttributes)
 {
+    QSet<QByteArray> modifiedFields;
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttributes->cameraID );
-        *(*userAttributesLock) = *userAttributes;
+        (*userAttributesLock)->assign( *userAttributes, &modifiedFields );
     }
     const QnResourcePtr& res = qnResPool->getResourceById(userAttributes->cameraID);
     if( res )   //it is OK if resource is missing
-        emit res->resourceChanged(res);
+        res->emitModificationSignals( modifiedFields );
 }
 
 void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& cameraID)
 {
+    QSet<QByteArray> modifiedFields;
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraID );
         //TODO #ak for now, never removing this structure, just resetting to empty value
-        *(*userAttributesLock) = QnCameraUserAttributes();
+        (*userAttributesLock)->assign( QnCameraUserAttributes(), &modifiedFields );
         (*userAttributesLock)->cameraID = cameraID;
     }
     const QnResourcePtr& res = qnResPool->getResourceById(cameraID);
     if( res )
-        emit res->resourceChanged(res);
+        res->emitModificationSignals( modifiedFields );
 }
 
 void QnCommonMessageProcessor::on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory) {
@@ -379,7 +381,7 @@ void QnCommonMessageProcessor::processCameraUserAttributesList( const QnCameraUs
 void QnCommonMessageProcessor::processPropertyList(const ec2::ApiResourceParamWithRefDataList& params)
 {
     foreach(const ec2::ApiResourceParamWithRefData& param, params)
-        propertyDictionay->setValue(param.resourceId, param.name, param.value, false);
+        propertyDictionary->setValue(param.resourceId, param.name, param.value, false);
 }
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)

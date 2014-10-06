@@ -6,7 +6,9 @@
 #ifndef CAMERA_USER_ATTRIBUTES_H
 #define CAMERA_USER_ATTRIBUTES_H
 
+#include <QtCore/QByteArray>
 #include <QtCore/QList>
+#include <QtCore/QSet>
 #include <QtCore/QSharedPointer>
 
 #include <core/misc/schedule_task.h>
@@ -38,6 +40,8 @@ public:
     QnMediaDewarpingParams dewarpingParams;
 
     QnCameraUserAttributes();
+
+    void assign( const QnCameraUserAttributes& right, QSet<QByteArray>* const modifiedFields );
 };
 
 Q_DECLARE_METATYPE(QnCameraUserAttributes)

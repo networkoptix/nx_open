@@ -94,7 +94,7 @@ public:
     static QnUuid uniqueIdToId(const QString& uniqId);
     virtual bool isAbstractResource() const { return false; }
 private:
-    QAuthenticator m_auth;
+    //QAuthenticator m_auth;
     bool m_authenticated;
 
     //QHostAddress m_hostAddr;

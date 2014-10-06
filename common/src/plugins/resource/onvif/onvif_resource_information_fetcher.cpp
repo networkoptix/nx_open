@@ -263,7 +263,6 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
         return resource;
 
     resource->setTypeId(getOnvifResourceType(manufacturer, model));
-    resource->setId(resource->uniqueIdToId(uniqId));
 
     resource->setHostAddress(QHostAddress(sender).toString());
     resource->setDiscoveryAddr(discoveryIp);
