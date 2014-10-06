@@ -10,11 +10,20 @@ Item {
     /* backgorund */
     Rectangle {
         anchors.fill: parent
-        color: Qt.white
+        color: colorTheme.color("login_background")
+    }
+
+    Image {
+        id: logo
+        source: "qrc:///logo.png"
+        fillMode: Image.PreserveAspectFit
+        sourceSize.width: parent.width
+        sourceSize.height: parent.width
     }
 
     ColumnLayout {
-        anchors.fill: parent
+        anchors { top: logo.bottom; bottom: parent.bottom }
+        width: parent.width
 
         TextField {
             id: address

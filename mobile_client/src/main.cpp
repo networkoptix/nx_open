@@ -1,6 +1,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QtQml>
+#include <QtQml/QQmlFileSelector>
 
 #include <time.h>
 
@@ -20,6 +21,8 @@
 #include "context/context.h"
 #include "mobile_client/mobile_client_module.h"
 #include "mobile_client/mobile_client_message_processor.h"
+
+#include "ui/color_theme.h"
 
 #include "version.h"
 
@@ -61,9 +64,17 @@ int runApplication(QGuiApplication *application) {
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
 
 
+    QFileSelector fileSelector;
+//    fileSelector.setExtraSelectors(QStringList() << lit("dark"));
+
     QnContext context;
 
+    context.colorTheme()->readFromFile(fileSelector.select(lit(":/color_theme.json")));
+
     QQmlEngine engine;
+    QQmlFileSelector qmlFileSelector(&engine);
+    qmlFileSelector.setSelector(&fileSelector);
+
     engine.rootContext()->setContextObject(&context);
     QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
     QObject *mainWindow = mainComponent.create();
