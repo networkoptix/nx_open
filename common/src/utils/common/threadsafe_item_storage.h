@@ -101,7 +101,10 @@ private:
                 removeItemUnderLock(item.uuid);
 
         foreach(const T &item, items)
-            addOrUpdateItem(item);
+            if (m_itemByUuid.contains(item.uuid))
+                updateItemUnderLock(item);
+            else
+                addItemUnderLock(item);
     }
 
     void addItemUnderLock(const T &item) {
