@@ -32,7 +32,7 @@ private:
     // ping resources from time to time to keep OS ARP table updated; speeds up resource (start) time in case if not recorded
     void pingResources(const QnResourcePtr& res);
     void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
-    bool canTakeForeignCamera(const QnSecurityCamResourcePtr& camera);
+    bool canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt);
 
 private:
     bool m_foundSmth; // minor just to minimize lof output
