@@ -12,6 +12,8 @@
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
+#include <common/common_module.h>
+
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
 
@@ -276,11 +278,40 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
             return;
         setItemOnline(info.data.videoWallInstanceGuid, true);
     });
+
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this, [this](const QnPeerRuntimeInfo &info) {
         if (info.data.peer.peerType != Qn::PT_VideowallClient)
             return;
         setItemOnline(info.data.videoWallInstanceGuid, false);
     });
+
+    /* Handle simultaneous control mode enter. */
+    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, [this](const QnPeerRuntimeInfo &info) {
+
+        /* Ignore own info change. */
+        if (info.uuid == qnCommon->moduleGUID())
+            return;
+
+        /* Skip if we are not controlling videowall now. */
+        if (!m_controlMode.active)
+            return;
+
+        /* Check the conflict. */
+        if (info.data.videoWallControlSession.isNull() ||
+            info.data.videoWallControlSession != workbench()->currentLayout()->resource()->getId())
+            return;
+
+        /* Order by guid. */
+        if (info.uuid < qnCommon->moduleGUID()) {
+            setControlMode(false);
+            QMessageBox::warning(mainWindow(),
+                tr("Control session is already running"),
+                tr("Could not start control session.\nAnother user is already controlling this screen."));
+        }
+        
+    });
+
+
     foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems()) {
         if (info.data.peer.peerType != Qn::PT_VideowallClient)
             continue;
