@@ -30,6 +30,10 @@ QnUuid serverGuid() {
     return guid;
 }
 
+bool isLocalAppServer(const QString &host) {
+    return host.isEmpty() || host == "localhost" || host == "127.0.0.1" || QUrl(host).scheme() == "file";
+}
+
 QString getDataDirectory()
 {
     const QString& dataDirFromSettings = MSSettings::roSettings()->value( "dataDir" ).toString();

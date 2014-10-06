@@ -958,7 +958,7 @@ void QnWorkbenchVideoWallHandler::updateMode() {
     bool control = false;
     if (!itemUuid.isNull()) {
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(itemUuid);
-        if (!index.isNull() && index.item().online)
+        if (!index.isNull() && index.item().online && index.item().layout == layout->resource()->getId())
             control = true;
     }
     setControlMode(control);
@@ -1100,9 +1100,6 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
             addToFiltered(resource);
         }
     }
-    
-    if (filtered.isEmpty())
-        return QnLayoutResourcePtr();
 
     qreal desiredAspectRatio = defaultAr;
     foreach (qreal ar, aspectRatios.keys()) {
@@ -1409,11 +1406,15 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered() {
         if (!index.isValid())
             continue;
         QnVideoWallItem item = index.item();
-        if (item.layout.isNull())
-            continue;
-        QnLayoutResourcePtr layoutResource = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
-        if (!layoutResource)
-            continue;
+
+        QnLayoutResourcePtr layoutResource = item.layout.isNull()
+            ? QnLayoutResourcePtr()
+            : qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
+
+        if (!layoutResource) {
+            layoutResource = constructLayout(QnResourceList());
+            resetLayout(QnVideoWallItemIndexList() << index, layoutResource);
+        }
 
         layout = QnWorkbenchLayout::instance(layoutResource);
         if(!layout) {
