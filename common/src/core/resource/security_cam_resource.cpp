@@ -68,8 +68,8 @@ QString QnSecurityCamResource::getName() const
 
 void QnSecurityCamResource::setName( const QString& name )
 {
-    QnResource::setName( name );
     setCameraName( name );
+    QnResource::setName( name );
 }
 
 void QnSecurityCamResource::setCameraName( const QString& newCameraName )
