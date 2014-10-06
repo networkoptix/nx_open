@@ -1,8 +1,11 @@
 import QtQuick 2.2
 import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
+import QtQuick.Controls.Styles 1.2
 
 import com.networkoptix.qml 1.0
+
+import "../controls"
 
 import "login_dialog_functions.js" as LoginDialogFunctions
 
@@ -15,6 +18,7 @@ Item {
 
     Image {
         id: logo
+        anchors.horizontalCenter: parent.horizontalCenter
         source: "qrc:///logo.png"
         fillMode: Image.PreserveAspectFit
         sourceSize.width: parent.width
@@ -25,7 +29,7 @@ Item {
         anchors { top: logo.bottom; bottom: parent.bottom }
         width: parent.width
 
-        TextField {
+        QnTextField {
             id: address
             placeholderText: qsTr("Server address")
         }
@@ -35,17 +39,17 @@ Item {
             maximumValue: 65535
             value: 7001
         }
-        TextField {
+        QnTextField {
             id: login
             placeholderText: qsTr("User name")
         }
-        TextField {
+        QnTextField {
             id: password
             placeholderText: qsTr("Password")
             echoMode: TextInput.Password
         }
 
-        Button {
+        QnButton {
             text: qsTr("Connect")
             onClicked: connectionManager.connectToServer(LoginDialogFunctions.makeUrl(address.text, port.value, login.text, password.text))
         }

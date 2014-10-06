@@ -97,5 +97,11 @@ void QnColorTheme::readFromFile(const QString &fileName) {
 }
 
 QColor QnColorTheme::color(const QString &key) const {
-    return m_colors.value(key);
+    QColor color = m_colors.value(key);
+    if (!color.isValid()) {
+        qWarning() << "QnColorTheme: requested color does not exist:" << key;
+        return warningColor;
+    }
+
+    return color;
 }

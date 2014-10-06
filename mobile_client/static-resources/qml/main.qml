@@ -10,7 +10,7 @@ Window {
     title: "HD Witness"
     visible: true
 
-    LoginDialog {
+    QnLoginDialog {
         anchors.fill: parent
     }
 }
