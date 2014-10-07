@@ -11,6 +11,7 @@
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
 
+#include <ui/common/palette.h>
 #include <ui/models/sorted_server_updates_model.h>
 #include <ui/dialogs/file_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
@@ -22,8 +23,8 @@
 #include <update/media_server_update_tool.h>
 
 #include <utils/applauncher_utils.h>
-
 #include <utils/common/app_info.h>
+
 
 namespace {
     const int longInstallWarningTimeout = 2 * 60 * 1000; // 2 minutes
@@ -59,6 +60,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::NameColumn, QHeaderView::Stretch);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::VersionColumn, QHeaderView::ResizeToContents);   
     ui->tableView->horizontalHeader()->setSectionsClickable(false);
+    setPaletteColor(ui->tableView, QPalette::Highlight, Qt::transparent);
 
     connect(ui->cancelButton,           &QPushButton::clicked,      m_updateTool, &QnMediaServerUpdateTool::cancelUpdate);
     connect(ui->internetUpdateButton,   &QPushButton::clicked,      this, [this] {
