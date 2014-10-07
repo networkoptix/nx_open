@@ -21,7 +21,7 @@ namespace ec2
     struct ApiResourceParamWithRefData: ApiResourceParamData
     {
         ApiResourceParamWithRefData() {}
-        ApiResourceParamWithRefData(const QnUuid& resourceId, const QString& name, const QString& value): resourceId(resourceId), ApiResourceParamData(name, value) {}
+        ApiResourceParamWithRefData(const QnUuid& resourceId, const QString& name, const QString& value): ApiResourceParamData(name, value), resourceId(resourceId) {}
         QnUuid resourceId;
     };
 #define ApiResourceParamWithRefData_Fields ApiResourceParamData_Fields (resourceId)

@@ -5,6 +5,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QVector>
 #include <QtCore/QMap>
+#include <QtCore/QMutex>
 #include <deque>
 #include <QtCore/QFileInfo>
 
