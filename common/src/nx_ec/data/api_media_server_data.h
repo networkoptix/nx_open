@@ -19,7 +19,7 @@ namespace ec2
 
     struct ApiMediaServerData: ApiResourceData
     {
-        ApiMediaServerData(): flags(Qn::SF_None), panicMode(Qn::PM_None), maxCameras(0), allowAutoRedundancy(false) {}
+        ApiMediaServerData(): flags(Qn::SF_None), panicMode(Qn::PM_None) {}
 
         QString         apiUrl;
         QString         networkAddresses;
@@ -29,11 +29,22 @@ namespace ec2
         QString         systemInfo;
         QString         authKey;
         std::vector<ApiStorageData> storages;
-        int             maxCameras;
-        bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
         QString         systemName; //! < Server system name. It can be invalid sometimes, but it matters only when server is in incompatible state.
     };
-#define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(networkAddresses)(flags)(panicMode)(version)(systemInfo)(authKey)(storages)(maxCameras)(allowAutoRedundancy)(systemName)
+#define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(networkAddresses)(flags)(panicMode)(version)(systemInfo)(authKey)(storages)(systemName)
+
+
+    struct ApiMediaServerUserAttributesData: ApiData
+    {
+        ApiMediaServerUserAttributesData(): maxCameras(0), allowAutoRedundancy(false) {}
+
+        QnUuid          serverID;
+        QString         serverName;
+        int             maxCameras;
+        bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
+    };
+
+#define ApiMediaServerUserAttributesData_Fields (serverID)(serverName)(maxCameras)(allowAutoRedundancy)
 
 
     struct ApiPanicModeData: public ApiData

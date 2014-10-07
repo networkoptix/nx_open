@@ -865,6 +865,17 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         }
         foreach(const QnMediaServerResourcePtr &mediaServer, mediaServerList)
             messageProcessor->updateResource(mediaServer);
+
+        //reading server attributes
+        QnMediaServerUserAttributesList mediaServerUserAttributesList;
+        while ((rez = ec2Connection->getMediaServerManager()->getUserAttributesSync(QnUuid(), &mediaServerUserAttributesList)) != ec2::ErrorCode::ok)
+        {
+            NX_LOG( lit("QnMain::run(): Can't get server user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+        messageProcessor->processServerUserAttributesList( mediaServerUserAttributesList );
     }
 
 

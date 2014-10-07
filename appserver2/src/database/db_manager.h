@@ -151,6 +151,9 @@ namespace ec2
         //getServers
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataList& serverList);
 
+        //getServerUserAttributes
+        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUserAttributesDataList& serverAttrsList);
+
         //getCameraServerItems
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
 
@@ -209,6 +212,8 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraAttributesData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraAttributesDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiSetResourceStatusData>& tran);
@@ -370,8 +375,10 @@ namespace ec2
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
         ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
+        ErrorCode insertOrReplaceMediaServerUserAttributes(const ApiMediaServerUserAttributesData& attrs);
         ErrorCode updateStorages(const ApiMediaServerData&);
         ErrorCode removeServer(const QnUuid& guid);
+        ErrorCode removeMediaServerUserAttributes(const QnUuid& guid);
         ErrorCode removeStoragesByServer(const QnUuid& serverGUID);
 
         ErrorCode removeLayout(const QnUuid& id);

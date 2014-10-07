@@ -29,6 +29,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/media_server_user_attributes.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -1532,9 +1533,11 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         return;
 
     // TODO: #Elric move submitToResources here.
-    connection2()->getMediaServerManager()->save( server, this,
-        [this]( int reqID, ec2::ErrorCode errorCode, QnMediaServerResourcePtr savedServerRes ) {
-            at_resources_saved( reqID, errorCode, QnResourceList() << savedServerRes );
+    connection2()->getMediaServerManager()->saveUserAttributes(
+        QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(server->getId()),
+        this,
+        [this, server]( int reqID, ec2::ErrorCode errorCode ) {
+            at_resources_saved( reqID, errorCode, QnResourceList() << server );
         } );
 }
 
@@ -1790,7 +1793,10 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         };
 
         if (mServer)
-            connection2()->getMediaServerManager()->save(mServer, this, callback);
+            connection2()->getMediaServerManager()->saveUserAttributes(
+                QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(mServer->getId()),
+                this,
+                callback );
         if (camera)
             connection2()->getCameraManager()->saveUserAttributes(
                 QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(QnVirtualCameraResourceList() << camera)),
@@ -2318,7 +2324,9 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             if (checked)
                 val = Qn::PM_User;
             resource->setPanicMode(val);
-            connection2()->getMediaServerManager()->save( resource, this,
+            connection2()->getMediaServerManager()->saveUserAttributes(
+                QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(resource->getId()),
+                this,
                 [this, resource]( int reqID, ec2::ErrorCode errorCode ) {
                     at_resources_saved( reqID, errorCode, QnResourceList() << resource );
                 });

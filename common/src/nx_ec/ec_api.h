@@ -46,6 +46,7 @@ namespace ec2
     {
         QnResourceTypeList resTypes;
         QnResourceList resources;
+        QnMediaServerUserAttributesList serverUserAttributesList;
         QnCameraUserAttributesList cameraUserAttributesList;
         QnBusinessEventRuleList bRules; // TODO: #Elric #EC2 rename
         QnCameraHistoryList cameraHistory;
@@ -232,12 +233,18 @@ namespace ec2
             return saveUserAttributes( serverAttrs, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
-            \param handler Functor with params: (ErrorCode, const QnCameraUserAttributesList& cameraUserAttributesList)
+            \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId. 
+                If NULL, returned list contains data of all known servers
+            \param handler Functor with params: (ErrorCode, const QnMediaServerUserAttributesList& serverUserAttributesList)
         */
         template<class TargetType, class HandlerType> int getUserAttributes( const QnUuid& mediaServerId, TargetType* target, HandlerType handler ) {
             return getUserAttributes( mediaServerId, std::static_pointer_cast<impl::GetServerUserAttributesHandler>(std::make_shared<impl::CustomGetServerUserAttributesHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        /*!
+            \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId. 
+                If NULL, returned list contains data of all known servers
+        */
         ErrorCode getUserAttributesSync(const QnUuid& mediaServerId, QnMediaServerUserAttributesList* const serverAttrsList ) {
             int(AbstractMediaServerManager::*fn)(const QnUuid&, impl::GetServerUserAttributesHandlerPtr) = &AbstractMediaServerManager::getUserAttributes;
             return impl::doSyncCall<impl::GetServerUserAttributesHandler>( std::bind(fn, this, mediaServerId, std::placeholders::_1), serverAttrsList );

@@ -3,6 +3,7 @@
 #define MEDIA_SERVER_MANAGER_H
 
 #include "core/resource/media_server_resource.h"
+#include "core/resource/media_server_user_attributes.h"
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/ec_api.h"
@@ -29,6 +30,25 @@ namespace ec2
         {
             assert( tran.command == ApiCommand::removeMediaServer );
             emit removed( QnUuid(tran.params.id) );
+        }
+
+        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesData>& tran )
+        {
+            assert( tran.command == ApiCommand::saveServerUserAttributes );
+            QnMediaServerUserAttributesPtr serverAttrs( new QnMediaServerUserAttributes() );
+            fromApiToResource( tran.params, serverAttrs );
+            emit userAttributesChanged( serverAttrs );
+        }
+
+        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran )
+        {
+            assert( tran.command == ApiCommand::saveServerUserAttributesList );
+            foreach(const ApiMediaServerUserAttributesData& attrs, tran.params) 
+            {
+                QnMediaServerUserAttributesPtr serverAttrs( new QnMediaServerUserAttributes() );
+                fromApiToResource( attrs, serverAttrs );
+                emit userAttributesChanged( serverAttrs );
+            }
         }
 
     protected:

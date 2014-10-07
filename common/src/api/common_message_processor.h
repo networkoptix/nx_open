@@ -31,6 +31,7 @@ public:
 
     QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
 
+    void processServerUserAttributesList( const QnMediaServerUserAttributesList& serverUserAttributesList );
     void processCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList );
     void processPropertyList(const ec2::ApiResourceParamWithRefDataList& params);
 signals:

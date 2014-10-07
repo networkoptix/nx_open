@@ -43,3 +43,29 @@ CREATE TABLE "vms_scheduletask" (
     fps                 integer     NOT NULL,
     FOREIGN KEY(camera_attrs_id)    REFERENCES vms_camera_user_attributes(id)
 );
+
+
+
+DROP TABLE "vms_server";
+CREATE TABLE "vms_server" (
+    api_url             varchar(200) NOT NULL,
+    auth_key            varchar(1024),
+    version             varchar(1024),
+    net_addr_list       varchar(1024),
+    resource_ptr_id     integer,
+    panic_mode          smallint NOT NULL,
+    flags               number,
+    system_info         varchar(1024),
+    system_name         varchar(1024),
+    PRIMARY KEY(resource_ptr_id)
+);
+
+
+
+CREATE TABLE "vms_server_user_attributes" (
+    id                  integer         PRIMARY KEY AUTOINCREMENT,
+    server_guid         BLOB(16)        NOT NULL UNIQUE,
+    server_name         varchar(200)    NOT NULL DEFAULT '',
+    max_cameras         number,
+    redundancy          bool
+);

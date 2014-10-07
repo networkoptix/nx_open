@@ -25,7 +25,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnMediaServerManager<T>::getServers( const QnUuid& mediaServerId,  impl::GetServersHandlerPtr handler )
+    int QnMediaServerManager<T>::getServers( const QnUuid& mediaServerId, impl::GetServersHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
@@ -60,7 +60,7 @@ namespace ec2
         auto tran = prepareTransaction( ApiCommand::saveMediaServer, resource );
 
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveServerHandler::done ), handler, reqID, _1, resource ) );
+        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SaveServerHandler::done, handler, reqID, _1, resource ) );
 
         return reqID;
     }
@@ -71,7 +71,7 @@ namespace ec2
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::removeMediaServer, id );
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
         return reqID;
     }
 
@@ -79,7 +79,10 @@ namespace ec2
     int QnMediaServerManager<T>::saveUserAttributes( const QnMediaServerUserAttributesList& serverAttrs, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        //TODO #ak
+        //performing request
+        QnTransaction<ApiMediaServerUserAttributesDataList> tran( ApiCommand::saveServerUserAttributesList );
+        fromResourceListToApi(serverAttrs, tran.params);
+        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, std::placeholders::_1 ) );
         return reqID;
     }
 
@@ -87,7 +90,14 @@ namespace ec2
     int QnMediaServerManager<T>::getUserAttributes( const QnUuid& mediaServerId, impl::GetServerUserAttributesHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        //TODO #ak
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiMediaServerUserAttributesDataList& serverUserAttributesList ) {
+            QnMediaServerUserAttributesList outData;
+            if( errorCode == ErrorCode::ok )
+                fromApiToResourceList(serverUserAttributesList, outData);
+            handler->done( reqID, errorCode, outData );
+        };
+        m_queryProcessor->template processQueryAsync<QnUuid, ApiMediaServerUserAttributesDataList, decltype(queryDoneHandler)>
+            ( ApiCommand::getServerUserAttributes, mediaServerId, queryDoneHandler );
         return reqID;
     }
 
