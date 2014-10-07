@@ -1,4 +1,5 @@
 #include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QtQml>
 #include <QtQml/QQmlFileSelector>
@@ -76,6 +77,8 @@ int runApplication(QGuiApplication *application) {
     qmlFileSelector.setSelector(&fileSelector);
 
     engine.rootContext()->setContextObject(&context);
+    engine.rootContext()->setContextProperty(lit("screenPixelDensity"), QGuiApplication::primaryScreen()->physicalDotsPerInch() * QGuiApplication::primaryScreen()->devicePixelRatio());
+
     QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
     QObject *mainWindow = mainComponent.create();
 

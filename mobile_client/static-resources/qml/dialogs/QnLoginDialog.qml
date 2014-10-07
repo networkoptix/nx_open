@@ -18,16 +18,21 @@ Item {
 
     Image {
         id: logo
+
         anchors.horizontalCenter: parent.horizontalCenter
+        y: (parent.height / 2 - height) / 2
+
         source: "qrc:///logo.png"
         fillMode: Image.PreserveAspectFit
-        sourceSize.width: parent.width
-        sourceSize.height: parent.width
+
+        sourceSize.width: Math.min(parent.width, parent.height / 2)
+        sourceSize.height: parent.height / 2
     }
 
-    ColumnLayout {
-        anchors { top: logo.bottom; bottom: parent.bottom }
-        width: parent.width
+    Column {
+        y: parent.height / 2
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width * 2 / 3
 
         QnTextField {
             id: address
@@ -49,8 +54,9 @@ Item {
             echoMode: TextInput.Password
         }
 
-        QnButton {
-            text: qsTr("Connect")
+        QnRoundButton {
+            color: "#0096ff"
+            icon: "qrc:/images/right.png"
             onClicked: connectionManager.connectToServer(LoginDialogFunctions.makeUrl(address.text, port.value, login.text, password.text))
         }
     }

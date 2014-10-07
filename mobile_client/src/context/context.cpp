@@ -11,6 +11,3 @@ QnContext::QnContext(QObject *parent):
 }
 
 QnContext::~QnContext() {}
-
-
-
