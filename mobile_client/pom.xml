@@ -26,6 +26,22 @@
         <global.defines>CL_FORCE_LOGO</global.defines>
         <!--Specific os defines-->
         <android.defines/>
-        <buildLib>sharedlib</buildLib>
+        <linux.defines/>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>mobile</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+    </profiles>
 </project>

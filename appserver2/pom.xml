@@ -59,14 +59,12 @@
         </profile>
 
         <profile>
-            <id>mobile-client</id>
+            <id>mobile-android</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                </os>
                 <property>
                     <name>mobile</name>
+                    <value>android</value>
                 </property>
             </activation>
             <properties>
