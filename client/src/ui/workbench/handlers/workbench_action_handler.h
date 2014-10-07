@@ -252,15 +252,6 @@ protected slots:
 
     void at_createZoomWindowAction_triggered();
 
-    void at_rotate0Action_triggered();
-    void at_rotate90Action_triggered();
-    void at_rotate180Action_triggered();
-    void at_rotate270Action_triggered();
-
-    void at_radassAutoAction_triggered();
-    void at_radassLowAction_triggered();
-    void at_radassHighAction_triggered();
-
     void at_setAsBackgroundAction_triggered();
     void at_backgroundImageStored(const QString &filename, bool success);
 
