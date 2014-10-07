@@ -151,9 +151,6 @@ namespace ec2
         //getServers
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataList& serverList);
 
-        //getServerUserAttributes
-        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUserAttributesDataList& serverAttrsList);
-
         //getCameraServerItems
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
 
@@ -187,6 +184,9 @@ namespace ec2
         // ApiDiscoveryDataList
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiDiscoveryDataList& data);
 
+        //getServerUserAttributes
+        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUserAttributesDataList& serverAttrsList);
+
 		// --------- misc -----------------------------
         QnUuid getID() const;
 
@@ -212,7 +212,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraAttributesDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStorageData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiSetResourceStatusData>& tran);
@@ -239,6 +239,12 @@ namespace ec2
 
         /* Add or remove camera bookmark tags */
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraBookmarkTagDataList>& tran);
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesDataList>& tran)
+        {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraDataList>& tran)
         {

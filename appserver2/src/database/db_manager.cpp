@@ -1469,17 +1469,6 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMediaSe
     return insertOrReplaceMediaServerUserAttributes( tran.params );
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesDataList>& tran)
-{
-    for( const ApiMediaServerUserAttributesData& data: tran.params )
-    {
-        ErrorCode result = insertOrReplaceMediaServerUserAttributes( data );
-        if( result != ErrorCode::ok )
-            return result;
-    }
-    return ErrorCode::ok;
-}
-
 ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const ApiMediaServerUserAttributesData& data)
 {
     QSqlQuery insQuery(m_sdb);

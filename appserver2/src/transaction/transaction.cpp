@@ -186,6 +186,8 @@ namespace ec2
                 val == removeCameraBookmarkTags ||
                 val == saveMediaServer ||
                 val == saveStorage ||
+                val == saveStorages ||
+                val == removeStorage ||
                 val == removeMediaServer ||
                 val == saveUser ||
                 val == removeUser ||
