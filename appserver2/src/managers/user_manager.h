@@ -45,7 +45,7 @@ namespace ec2
     public:
         QnUserManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
 
-        virtual int getUsers( impl::GetUsersHandlerPtr handler ) override;
+        virtual int getUsers(const QnUuid& userId, impl::GetUsersHandlerPtr handler ) override;
         virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) override;
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
 

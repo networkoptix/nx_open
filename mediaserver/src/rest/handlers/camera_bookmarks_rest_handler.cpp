@@ -6,14 +6,16 @@
 #include <utils/network/tcp_connection_priv.h>
 #include <utils/serialization/json_functions.h>
 
-int QnCameraBookmarksRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnCameraBookmarksRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+{
     QString action = extractAction(path);
     if (action == "get")
         return getCameraBookmarksAction(params, result);
     return CODE_NOT_FOUND;
 }
 
-int QnCameraBookmarksRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
+int QnCameraBookmarksRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+{
     QString action = extractAction(path);
     if (action == "add")
         return addCameraBookmarkAction(params, body, result);

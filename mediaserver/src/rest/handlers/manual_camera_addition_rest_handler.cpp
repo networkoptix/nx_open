@@ -170,7 +170,8 @@ int QnManualCameraAdditionRestHandler::addCamerasAction(const QnRequestParams &p
     return registered ? CODE_OK : CODE_INTERNAL_ERROR;
 }
 
-int QnManualCameraAdditionRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnManualCameraAdditionRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+{
     QString action = extractAction(path);
     if (action == "search")
         return searchStartAction(params, result);

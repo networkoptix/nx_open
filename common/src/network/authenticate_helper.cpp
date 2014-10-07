@@ -90,8 +90,11 @@ QnAuthHelper* QnAuthHelper::instance()
     return m_instance;
 }
 
-bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy)
+bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy, QnUuid* authUserId)
 {
+    if (authUserId)
+        *authUserId = QnUuid();
+
     const unsigned int allowedAuthMethods = m_authMethodRestrictionList.getAllowedAuthMethods( request );
     if( allowedAuthMethods == 0 )
         return false;   //NOTE assert?
@@ -154,9 +157,9 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
             authData = authorization.mid(pos+1);
         }
         if (authType == "digest")
-            return doDigestAuth(request.requestLine.method, authData, response, isProxy);
+            return doDigestAuth(request.requestLine.method, authData, response, isProxy, authUserId);
         else if (authType == "basic")
-            return doBasicAuth(authData, response);
+            return doBasicAuth(authData, response, authUserId);
         else
             return false;
     }
@@ -268,7 +271,7 @@ static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter
     return rez;
 }
 
-bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy)
+bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId)
 {
     const QList<QByteArray>& authParams = smartSplit(authData, ',');
 
@@ -322,8 +325,11 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
                 md5Hash.addData(ha2);
                 QByteArray calcResponse = md5Hash.result().toHex();
 
-                if (calcResponse == response)
+                if (calcResponse == response) {
+                    if (authUserId)
+                        *authUserId = user->getId();
                     return true;
+                }
             }
         }
 
@@ -351,7 +357,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
     return false;
 }
 
-bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*response*/)
+bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*response*/, QnUuid* authUserId)
 {
     QByteArray digest = QByteArray::fromBase64(authData);
     int pos = digest.indexOf(':');
@@ -368,6 +374,8 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
             {
                 if (user->getDigest().isEmpty())
                     emit emptyDigestDetected(user, QString::fromUtf8(userName), QString::fromUtf8(password));
+                if (authUserId)
+                    *authUserId = user->getId();
                 return true;
             }
         }

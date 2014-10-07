@@ -321,6 +321,7 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
     Q_D(const QnTCPConnectionProcessor);
     other.d_ptr->clientRequest = d->clientRequest;
     other.d_ptr->protocol = d->protocol;
+    other.d_ptr->authUserId = d->authUserId;
 }
 
 QUrl QnTCPConnectionProcessor::getDecodedUrl() const

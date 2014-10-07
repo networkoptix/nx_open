@@ -13,7 +13,7 @@
 
 #include <media_server/serverutil.h>
 
-int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
     Q_UNUSED(params)
@@ -85,8 +85,9 @@ int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnReque
     return CODE_OK;
 }
 
-int QnBusinessEventLogRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
+int QnBusinessEventLogRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
+                                               QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
-    return executeGet(path, params, result, contentType);
+    return executeGet(path, params, result, contentType, owner);
 }
 
