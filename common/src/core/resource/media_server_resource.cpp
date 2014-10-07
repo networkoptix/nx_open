@@ -38,7 +38,7 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     removeFlags(Qn::media); // TODO: #Elric is this call needed here?
 
     //TODO: #GDM #EDGE in case of EDGE servers getName should return name of its camera. Possibly name just should be synced on Server.
-    setName(tr("Server"));
+    QnResource::setName(tr("Server"));
 
     m_primaryIFSelected = false;
     m_statusTimer.restart();
