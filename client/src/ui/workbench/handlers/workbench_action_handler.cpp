@@ -303,7 +303,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ExitActionDelayed), &QAction::triggered, action(Qn::ExitAction), &QAction::trigger, Qt::QueuedConnection);
     connect(action(Qn::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
 
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   &QnWorkbenchActionHandler::checkVersionMismatches);
 
     /* Run handlers that update state. */
     at_panicWatcher_panicModeChanged();
@@ -1108,10 +1107,6 @@ void QnWorkbenchActionHandler::notifyAboutUpdate() {
     } else {
         qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? version : QnSoftwareVersion());
     }
-}
-
-void QnWorkbenchActionHandler::checkVersionMismatches() {
-    menu()->trigger(Qn::VersionMismatchMessageAction);
 }
 
 void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePtr &layout) {
