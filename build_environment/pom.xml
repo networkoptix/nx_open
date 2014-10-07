@@ -562,35 +562,5 @@
                 </dependency>
             </dependencies>
         </profile>
-        <profile>
-            <id>mobile-android-on-desktop</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                </os>
-                <property>
-                    <name>mobile</name>
-                    <value>android-on-desktop</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.digia</groupId>
-                    <version>5.2.1-SNAPSHOT</version>
-                    <artifactId>qt</artifactId>
-                    <type>tar.gz</type>
-                    <classifier>${qt.classifier}${compile.options}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
-
     </profiles>
 </project>

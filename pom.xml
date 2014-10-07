@@ -709,29 +709,14 @@
                     <name>mobile</name>
                     <value>android</value>
                 </property>
+                <property>
+                    <name>!mobile-desktop</name>
+                </property>
             </activation>
             <properties>
                 <platform>android</platform>
                 <toolchain.version>android</toolchain.version>
                 <qt.spec>android-g++</qt.spec>
-            </properties>
-        </profile>
-        <profile>
-            <id>mobile-android-on-desktop</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                </os>
-                <property>
-                    <name>mobile</name>
-                    <value>android-on-desktop</value>
-                </property>
-            </activation>
-            <properties>
-                <platform>linux</platform>
-                <qt.spec>linux-g++</qt.spec>
-                <qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
             </properties>
         </profile>
     </profiles>
