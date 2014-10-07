@@ -159,6 +159,13 @@ namespace ec2
         }
 
         template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiMediaServerUserAttributesDataList>& tran, HandlerType handler )
+        {
+            Q_ASSERT(tran.command == ApiCommand::saveServerUserAttributesList);
+            return processMultiUpdateAsync<ApiMediaServerUserAttributesDataList, ApiMediaServerUserAttributesData>(tran, handler, ApiCommand::saveServerUserAttributes);
+        }
+
+        template<class HandlerType>
         void processUpdateAsync(QnTransaction<ApiResourceParamWithRefDataList>& tran, HandlerType handler )
         {
             Q_ASSERT(tran.command == ApiCommand::setResourceParams);

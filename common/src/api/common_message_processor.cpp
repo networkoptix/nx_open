@@ -397,6 +397,15 @@ void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &)
 {
 }
 
+void QnCommonMessageProcessor::processServerUserAttributesList( const QnMediaServerUserAttributesList& serverUserAttributesList )
+{
+    for( const QnMediaServerUserAttributesPtr& serverAttrs: serverUserAttributesList )
+    {
+        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( QnMediaServerUserAttributesPool::instance(), serverAttrs->serverID );
+        *(*userAttributesLock) = *serverAttrs;
+    }
+}
+
 void QnCommonMessageProcessor::processCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList )
 {
     for( const QnCameraUserAttributesPtr& cameraAttrs: cameraUserAttributesList )
@@ -417,6 +426,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     //QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
 
     processResources(fullData.resources);
+    processServerUserAttributesList( fullData.serverUserAttributesList );
     processCameraUserAttributesList( fullData.cameraUserAttributesList );
     processLicenses(fullData.licenses);
     processCameraServerItems(fullData.cameraHistory);

@@ -69,9 +69,13 @@ namespace ec2
             getMediaServers             = 400,  /*< ApiMediaServerDataList */
             saveMediaServer             = 401,  /*< ApiMediaServerData */
             removeMediaServer           = 402,  /*< ApiIdData */
-            saveStorage                 = 403,  /*< ApiStorageData */
-            saveStorages                = 404,  /*< ApiStorageDataList */
-            removeStorage               = 405,  /*< ApiIdData */
+            saveServerUserAttributes    = 403,  /*< QnMediaServerUserAttributesList */
+            saveServerUserAttributesList= 404,  /*< QnMediaServerUserAttributesList */
+            getServerUserAttributes     = 405,  /*< ApiIdData, QnMediaServerUserAttributesList */
+            removeServerUserAttributes  = 406,  /*< ApiIdData */
+            saveStorage                 = 407,  /*< ApiStorageData */
+            saveStorages                = 408,  /*< ApiStorageDataList */
+            removeStorage               = 409,  /*< ApiIdData */
 
             /* User resource */
             getUsers                    = 500,  /*< ApiUserDataList */

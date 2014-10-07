@@ -479,6 +479,8 @@ bool QnDbManager::resyncTransactionLog()
         return false;
     if (!fillTransactionLogInternal<ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
         return false;
+    if (!fillTransactionLogInternal<ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveServerUserAttributes))
+        return false;
     if (!fillTransactionLogInternal<ApiCameraData, ApiCameraDataList>(ApiCommand::saveCamera))
         return false;
     if (!fillTransactionLogInternal<ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
@@ -772,7 +774,7 @@ bool QnDbManager::applyUpdates()
     return true;
 }
 
-bool QnDbManager::beforeInstallUpdate(const QString& updateName)
+bool QnDbManager::beforeInstallUpdate(const QString& /*updateName*/)
 {
     return true;
 }
@@ -1130,8 +1132,8 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
 ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT OR REPLACE INTO vms_server (api_url, auth_key, version, net_addr_list, system_info, flags, panic_mode, max_cameras, redundancy, system_name, resource_ptr_id) VALUES\
-                     (:apiUrl, :authKey, :version, :networkAddresses, :systemInfo, :flags, :panicMode, :maxCameras, :allowAutoRedundancy, :systemName, :internalId)");
+    insQuery.prepare("INSERT OR REPLACE INTO vms_server (api_url, auth_key, version, net_addr_list, system_info, flags, panic_mode, system_name, resource_ptr_id) VALUES\
+                     (:apiUrl, :authKey, :version, :networkAddresses, :systemInfo, :flags, :panicMode, :systemName, :internalId)");
     QnSql::bind(data, &insQuery);
 
     if (data.authKey.isEmpty())
@@ -1460,6 +1462,62 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMediaSe
     */
 
     return result;
+}
+
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesData>& tran)
+{
+    return insertOrReplaceMediaServerUserAttributes( tran.params );
+}
+
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesDataList>& tran)
+{
+    for( const ApiMediaServerUserAttributesData& data: tran.params )
+    {
+        ErrorCode result = insertOrReplaceMediaServerUserAttributes( data );
+        if( result != ErrorCode::ok )
+            return result;
+    }
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const ApiMediaServerUserAttributesData& data)
+{
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("\
+        INSERT OR REPLACE INTO vms_server_user_attributes ( \
+            server_guid,                    \
+            server_name,                    \
+            max_cameras,                    \
+            redundancy)                     \
+        VALUES(                             \
+            :serverID,                      \
+            :serverName,                    \
+            :maxCameras,                    \
+            :allowAutoRedundancy)           \
+        ");
+    QnSql::bind(data, &insQuery);
+
+    if( !insQuery.exec() )
+    {
+        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(insQuery.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::removeMediaServerUserAttributes(const QnUuid& guid)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare("DELETE FROM vms_server_user_attributes WHERE server_guid = :guid");
+    query.bindValue(":guid", guid.toRfc4122());
+    if( !query.exec() )
+    {
+        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::removeLayoutItems(qint32 id)
@@ -2060,6 +2118,8 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>
             return removeObject(ApiObjectInfo(ApiObject_Camera, tran.params.id));
         case ApiCommand::removeMediaServer:
             return removeObject(ApiObjectInfo(ApiObject_Server, tran.params.id));
+        case ApiCommand::removeServerUserAttributes:
+            return removeMediaServerUserAttributes(tran.params.id);
         case ApiCommand::removeLayout:
             return removeObject(ApiObjectInfo(ApiObject_Layout, tran.params.id));
         case ApiCommand::removeBusinessRule:
@@ -2419,7 +2479,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
 
     query.prepare(QString("select r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, r.status, \
                           s.api_url as apiUrl, s.auth_key as authKey, s.version, s.net_addr_list as networkAddresses, s.system_info as systemInfo, \
-                          s.flags, s.panic_mode as panicMode, s.max_cameras as maxCameras, s.redundancy as allowAutoRedundancy, s.system_name as systemName \
+                          s.flags, s.panic_mode as panicMode, s.system_name as systemName \
                           from vms_resource r \
                           join vms_server s on s.resource_ptr_id = r.id %1 order by r.guid").arg(filterStr));
 
@@ -2446,6 +2506,34 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
     QnSql::fetch_many(queryStorage, &storageList);
 
     mergeObjectListData<ApiMediaServerData, ApiStorageData>(serverList, storageList, &ApiMediaServerData::storages, &ApiStorageData::parentId);
+
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUserAttributesDataList& serverAttrsList)
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    QString filterStr;
+    if( !mServerId.isNull() )
+        filterStr = QString("WHERE server_guid = %1").arg(guidToSqlString(mServerId));
+
+    query.prepare( lit("\
+        SELECT                                  \
+            server_guid as serverID,            \
+            server_name as serverName,          \
+            max_cameras as maxCameras,          \
+            redundancy as allowAutoRedundancy   \
+        FROM vms_server_user_attributes         \
+        %1                                      \
+        ORDER BY server_guid                    \
+    ").arg(filterStr));
+    if( !query.exec() )
+    {
+        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+    QnSql::fetch_many(query, &serverAttrsList);
 
     return ErrorCode::ok;
 }
@@ -2681,6 +2769,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
         return err;
 
     if ((err = doQueryNoLock(dummy, data.servers)) != ErrorCode::ok)
+        return err;
+
+    if ((err = doQueryNoLock(dummy, data.serversUserAttributesList)) != ErrorCode::ok)
         return err;
 
     if ((err = doQueryNoLock(QnUuid(), data.cameras)) != ErrorCode::ok)

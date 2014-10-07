@@ -16,6 +16,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/media_server_user_attributes.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/camera_bookmark.h>
@@ -403,6 +404,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
         const_cast<QnResourceTypePool*>(ctx.resTypePool)->addResourceType(resType); // TODO: #AK refactor it!
 
     fromApiToResourceList(src.servers, dst.resources, ctx);
+    fromApiToResourceList(src.serversUserAttributesList, dst.serverUserAttributesList);
     fromApiToResourceList(src.cameras, dst.resources, ctx.resFactory);
     fromApiToResourceList(src.cameraUserAttributesList, dst.cameraUserAttributesList);
     fromApiToResourceList(src.users, dst.resources);
@@ -604,9 +606,7 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &
     dst.panicMode = src->getPanicMode();
     dst.version = src->getVersion().toString();
     dst.systemInfo = src->getSystemInfo().toString();
-    dst.maxCameras = src->getMaxCameras();
     dst.authKey = src->getAuthKey();
-    dst.allowAutoRedundancy = src->isRedundancy();
     dst.systemName = src->getSystemName();
 
     QnAbstractStorageResourceList storageList = src->getStorages();
@@ -628,9 +628,7 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     dst->setPanicMode(src.panicMode);
     dst->setVersion(QnSoftwareVersion(src.version));
     dst->setSystemInfo(QnSystemInformation(src.systemInfo));
-    dst->setMaxCameras(src.maxCameras);
     dst->setAuthKey(src.authKey);
-    dst->setRedundancy(src.allowAutoRedundancy);
     dst->setSystemName(src.systemName);
 
     /*
@@ -667,6 +665,48 @@ void fromApiToResourceList(const ApiMediaServerDataList &src, QnMediaServerResou
     fromApiToResourceList(src, dst, ctx, overload_tag());
 }
 
+
+
+////////////////////////////////////////////////////////////
+//// ApiMediaServerUserAttributesData
+////////////////////////////////////////////////////////////
+void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServerUserAttributesData& dst) {
+    dst.serverID = src->serverID;
+    dst.serverName = src->name;
+    dst.maxCameras = src->maxCameras;
+    dst.allowAutoRedundancy = src->isRedundancyEnabled;
+}
+
+void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst) {
+    dst->serverID = src.serverID;
+    dst->name = src.serverName;
+    dst->maxCameras = src.maxCameras;
+    dst->isRedundancyEnabled = src.allowAutoRedundancy;
+}
+
+void fromApiToResourceList(const ApiMediaServerUserAttributesDataList &src, QnMediaServerUserAttributesList& dst) {
+    dst.reserve( dst.size()+src.size() );
+    for( const ApiMediaServerUserAttributesData& serverAttrs: src )
+    {
+        QnMediaServerUserAttributesPtr dstElement( new QnMediaServerUserAttributes() );
+        fromApiToResource( serverAttrs, dstElement );
+        dst.push_back( std::move(dstElement) );
+    }
+}
+
+void fromResourceListToApi(const QnMediaServerUserAttributesList& src, ApiMediaServerUserAttributesDataList& dst) {
+    dst.reserve(dst.size() + src.size());
+    for(const QnMediaServerUserAttributesPtr& camerAttrs: src) {
+        dst.push_back(ApiMediaServerUserAttributesData());
+        fromResourceToApi(camerAttrs, dst.back());
+    }
+}
+
+
+
+////////////////////////////////////////////////////////////
+//// ApiResourceData
+////////////////////////////////////////////////////////////
 
 void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
     Q_ASSERT(!src->getId().isNull());

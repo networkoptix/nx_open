@@ -155,6 +155,7 @@ namespace ec2
         QnUuid transactionHash(const ApiCameraAttributesData& params) const       { return makeHash(params.cameraID.toRfc4122(), "camera_attributes"); }
         QnUuid transactionHash(const ApiMediaServerData& params) const            { return params.id; }
         QnUuid transactionHash(const ApiStorageData& params) const                { return params.id; }
+		QnUuid transactionHash(const ApiMediaServerUserAttributesData& params) const    { return makeHash(params.serverID.toRfc4122(), "server_attributes"); }
         QnUuid transactionHash(const ApiUserData& params) const                   { return params.id; }
         QnUuid transactionHash(const ApiLayoutData& params) const                 { return params.id; }
         QnUuid transactionHash(const ApiVideowallData& params) const              { return params.id; }
@@ -177,6 +178,7 @@ namespace ec2
         QnUuid transactionHash(const ApiCameraDataList& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiStorageDataList& ) const                { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiCameraAttributesDataList& ) const       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
+        QnUuid transactionHash(const ApiMediaServerUserAttributesDataList& ) const       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiLayoutDataList& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiVideowallDataList& ) const              { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiLicenseDataList&) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
