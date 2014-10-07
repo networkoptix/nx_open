@@ -90,8 +90,7 @@
                         <configuration>
                             <descriptors>
                                 <descriptor>${project.basedir}/sdk.xml</descriptor>
-                            </descriptors>	
-                            <outputDirectory>${root.dir}/mediaserver/${arch}/resources/static</outputDirectory>
+                            </descriptors>
                         </configuration>
                     </execution>
                 </executions>				
