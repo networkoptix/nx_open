@@ -51,6 +51,10 @@ namespace ec2
         virtual int save( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::remove
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
+        //!Implementation of QnMediaServerManager::saveUserAttributes
+        virtual int saveUserAttributes( const QnMediaServerUserAttributesList& serverAttrs, impl::SimpleHandlerPtr handler ) override;
+        //!Implementation of QnMediaServerManager::getUserAttributes
+        virtual int getUserAttributes( const QnUuid& mediaServerId, impl::GetServerUserAttributesHandlerPtr handler ) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;

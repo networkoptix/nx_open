@@ -76,6 +76,22 @@ namespace ec2
     }
 
     template<class T>
+    int QnMediaServerManager<T>::saveUserAttributes( const QnMediaServerUserAttributesList& serverAttrs, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        //TODO #ak
+        return reqID;
+    }
+
+    template<class T>
+    int QnMediaServerManager<T>::getUserAttributes( const QnUuid& mediaServerId, impl::GetServerUserAttributesHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        //TODO #ak
+        return reqID;
+    }
+
+    template<class T>
     QnTransaction<ApiMediaServerData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource )
     {
         QnTransaction<ApiMediaServerData> tran(command);
