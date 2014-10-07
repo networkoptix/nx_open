@@ -1200,6 +1200,7 @@ ErrorCode QnDbManager::removeStoragesByServer(const QnUuid& serverGuid)
     return ErrorCode::ok;
 }
 
+/*
 ErrorCode QnDbManager::updateStorages(const ApiMediaServerData& data)
 {
     ErrorCode result = removeStoragesByServer(data.id);
@@ -1224,6 +1225,27 @@ ErrorCode QnDbManager::updateStorages(const ApiMediaServerData& data)
             return ErrorCode::dbError;
         }
     }
+    return ErrorCode::ok;
+}
+*/
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStorageData>& tran)
+{
+    qint32 internalId;
+    ErrorCode result = insertOrReplaceResource(tran.params, &internalId);
+    if (result != ErrorCode::ok)
+        return result;
+
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT OR REPLACE INTO vms_storage (space_limit, used_for_writing, resource_ptr_id) VALUES\
+                        (:spaceLimit, :usedForWriting, :internalId)");
+    QnSql::bind(tran.params, &insQuery);
+    insQuery.bindValue(":internalId", internalId);
+    
+    if (!insQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return ErrorCode::dbError;
+    }
+
     return ErrorCode::ok;
 }
 
@@ -1333,17 +1355,6 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraD
     return saveCamera(tran.params);
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraDataList>& tran)
-{
-    foreach(const ApiCameraData& camera, tran.params)
-    {
-        ErrorCode result = saveCamera(camera);
-        if (result != ErrorCode::ok)
-            return result;
-    }
-    return ErrorCode::ok;
-}
-
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraAttributesData>& tran)
 {
     return saveCameraUserAttributes(tran.params);
@@ -1442,9 +1453,11 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMediaSe
     if (result !=ErrorCode::ok)
         return result;
 
+    /*
     if (result !=ErrorCode::ok)
         return result;
     result = updateStorages(tran.params);
+    */
 
     return result;
 }

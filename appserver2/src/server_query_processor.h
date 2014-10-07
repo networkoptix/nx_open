@@ -145,6 +145,13 @@ namespace ec2
         }
 
         template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiStorageDataList>& tran, HandlerType handler )
+        {
+            Q_ASSERT(tran.command == ApiCommand::saveStorages);
+            return processMultiUpdateAsync<ApiStorageDataList, ApiStorageData>(tran, handler, ApiCommand::saveStorage);
+        }
+
+        template<class HandlerType>
         void processUpdateAsync(QnTransaction<ApiCameraAttributesDataList>& tran, HandlerType handler )
         {
             Q_ASSERT(tran.command == ApiCommand::saveCameraUserAttributesList);

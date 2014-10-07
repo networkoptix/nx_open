@@ -130,6 +130,10 @@ namespace ec2
         m_mediaServerManager->triggerNotification( tran );
     }
 
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiStorageData>& tran ) {
+        m_mediaServerManager->triggerNotification( tran );
+    }
+
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceData>& tran ) {
         m_resourceManager->triggerNotification( tran );
     }

@@ -459,25 +459,6 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
         updateCamera(camera);
         return;
     }
-
-    const QnMediaServerResource* server = dynamic_cast<const QnMediaServerResource*>(resource.data());
-    if (server && server->getId() == serverGuid())
-        connect(server, SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_server_resourceChanged(const QnResourcePtr &)), Qt::QueuedConnection);
-}
-
-void QnRecordingManager::at_server_resourceChanged(const QnResourcePtr &resource)
-{
-    const QnMediaServerResource* server = dynamic_cast<const QnMediaServerResource*>(resource.data());
-    if(!server)
-        return;
-
-    qnStorageMan->removeAbsentStorages(server->getStorages());
-    foreach(QnAbstractStorageResourcePtr storage, server->getStorages())
-    {
-        QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
-        if (physicalStorage)
-            qnStorageMan->addStorage(physicalStorage);
-    }
 }
 
 void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)

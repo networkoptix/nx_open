@@ -69,6 +69,9 @@ namespace ec2
             getMediaServers             = 400,  /*< ApiMediaServerDataList */
             saveMediaServer             = 401,  /*< ApiMediaServerData */
             removeMediaServer           = 402,  /*< ApiIdData */
+            saveStorage                 = 403,  /*< ApiStorageData */
+            saveStorages                = 404,  /*< ApiStorageDataList */
+            removeStorage               = 405,  /*< ApiIdData */
 
             /* User resource */
             getUsers                    = 500,  /*< ApiUserDataList */

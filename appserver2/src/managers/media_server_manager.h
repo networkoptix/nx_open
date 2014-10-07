@@ -25,6 +25,19 @@ namespace ec2
             emit addedOrUpdated( mserverRes );
         }
 
+        void triggerNotification( const QnTransaction<ApiStorageData>& tran ) {
+            assert( tran.command == ApiCommand::saveStorage);
+
+            QnResourceTypePtr resType = m_resCtx.resTypePool->getResourceTypeByName(lit("Storage"));
+            if (!resType)
+                return;
+            
+            QnAbstractStorageResourcePtr storage = m_resCtx.resFactory->createResource(resType->getId(), 
+                QnResourceParams(tran.params.id, tran.params.url, QString())).dynamicCast<QnAbstractStorageResource>();
+            fromApiToResource(tran.params, storage);
+            emit storageChanged( storage );
+        }
+
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
             assert( tran.command == ApiCommand::removeMediaServer );
@@ -53,6 +66,8 @@ namespace ec2
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::saveUserAttributes
         virtual int saveUserAttributes( const QnMediaServerUserAttributesList& serverAttrs, impl::SimpleHandlerPtr handler ) override;
+        //!Implementation of QnMediaServerManager::saveStorages
+        virtual int saveStorages( const QnAbstractStorageResourceList& storages, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::getUserAttributes
         virtual int getUserAttributes( const QnUuid& mediaServerId, impl::GetServerUserAttributesHandlerPtr handler ) override;
 

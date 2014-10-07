@@ -577,6 +577,16 @@ void fromResourceToApi(const QnAbstractStorageResourcePtr &src, ApiStorageData &
     dst.usedForWriting = src->isUsedForWriting();
 }
 
+void fromResourceToApi(const QnAbstractStorageResourceList &src, ApiStorageDataList &dst)
+{
+    foreach(const QnAbstractStorageResourcePtr& storage, src) 
+    {
+        ApiStorageData dstStorage;
+        fromResourceToApi(storage, dstStorage);
+        dst.push_back(std::move(dstStorage));
+    }
+}
+
 void fromApiToResource(const ApiStorageData &src, QnAbstractStorageResourcePtr &dst) {
     QnResourcePtr tmp = dst;
     fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
@@ -623,6 +633,7 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     dst->setRedundancy(src.allowAutoRedundancy);
     dst->setSystemName(src.systemName);
 
+    /*
     QnResourceTypePtr resType = ctx.resTypePool->getResourceTypeByName(lit("Storage"));
     if (!resType)
         return;
@@ -634,8 +645,8 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
         fromApiToResource(srcStorage, dstStorage);
         dstStorages.push_back(dstStorage);
     }
-
     dst->setStorages(dstStorages);
+    */
 }
 
 template<class List> 

@@ -54,7 +54,6 @@ private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
     void onTimer();
-    void at_server_resourceChanged(const QnResourcePtr &resource);
     void at_camera_statusChanged(const QnResourcePtr &resource);
     void at_camera_resourceChanged(const QnResourcePtr &resource);
     void at_camera_initAsyncFinished(const QnResourcePtr &resource, bool state);

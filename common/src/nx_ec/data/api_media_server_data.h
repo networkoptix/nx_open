@@ -28,7 +28,7 @@ namespace ec2
         QString         version; 
         QString         systemInfo;
         QString         authKey;
-        std::vector<ApiStorageData> storages;
+        ApiStorageDataList storages;
         int             maxCameras;
         bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
         QString         systemName; //! < Server system name. It can be invalid sometimes, but it matters only when server is in incompatible state.

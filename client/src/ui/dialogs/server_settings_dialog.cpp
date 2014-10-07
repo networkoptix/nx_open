@@ -350,7 +350,7 @@ void QnServerSettingsDialog::submitToResources() {
 
             storages.push_back(storage);
         }
-        m_server->setStorages(storages);
+        //m_server->setStorages(storages);
 
         qnSettings->setServerStorageStates(serverStorageStates);
     }

@@ -129,3 +129,28 @@ QnAbstractStorageResource::ProtocolDescription QnAbstractStorageResource::protoc
 
     return result;
 }
+
+void QnAbstractStorageResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+{
+    Q_ASSERT(other->getParentId() == getParentId() && other->getUrl() == getUrl());
+    QnResource::updateInner(other, modifiedFields);
+
+    QnAbstractStorageResourcePtr storage = other.dynamicCast<QnAbstractStorageResource>();
+
+    m_spaceLimit = storage->m_spaceLimit;
+    m_maxStoreTime = storage->m_maxStoreTime;
+    m_usedForWriting = storage->m_usedForWriting;
+    m_index = storage->m_index;
+}
+
+void QnAbstractStorageResource::setUrl(const QString& value)
+{
+    QnResource::setUrl(value);
+    if (getId().isNull()) 
+    {
+        Q_ASSERT(!getParentId().isNull());
+        QByteArray data1 = getParentId().toRfc4122();
+        QByteArray data2 = value.toUtf8();
+        setId(guidFromArbitraryData(data1.append(data2)));
+    }
+}

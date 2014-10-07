@@ -205,10 +205,10 @@ namespace ec2
         // ------------ transactions --------------------------------------
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraAttributesData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraAttributesDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiStorageData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiSetResourceStatusData>& tran);
@@ -235,6 +235,18 @@ namespace ec2
 
         /* Add or remove camera bookmark tags */
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraBookmarkTagDataList>& tran);
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraDataList>& tran)
+        {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiStorageDataList>& tran)
+        {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamDataList>& /*tran*/)
         {
@@ -370,7 +382,7 @@ namespace ec2
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
         ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
-        ErrorCode updateStorages(const ApiMediaServerData&);
+        //ErrorCode updateStorages(const ApiMediaServerData&);
         ErrorCode removeServer(const QnUuid& guid);
         ErrorCode removeStoragesByServer(const QnUuid& serverGUID);
 

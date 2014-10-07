@@ -101,7 +101,8 @@ namespace ec2 {
     typedef std::vector<ApiModuleData> ApiModuleDataList;
     typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
-    typedef std::vector<ApiResourceParamWithRefData> ApiResourceParamWithRefDataList;    
+    typedef std::vector<ApiResourceParamWithRefData> ApiResourceParamWithRefDataList;
+    typedef std::vector<ApiStorageData> ApiStorageDataList;
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\

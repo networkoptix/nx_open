@@ -71,6 +71,11 @@ namespace ec2
             return saveToDB(tran, transactionHash(tran.params), serializedTran);
         }
 
+        ErrorCode saveTransaction(const QnTransaction<ApiStorageDataList>& , const QByteArray&) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
         ErrorCode saveTransaction(const QnTransaction<ApiFullInfoData>& , const QByteArray&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
@@ -149,6 +154,7 @@ namespace ec2
         QnUuid transactionHash(const ApiCameraData& params) const                 { return params.id; }
         QnUuid transactionHash(const ApiCameraAttributesData& params) const       { return makeHash(params.cameraID.toRfc4122(), "camera_attributes"); }
         QnUuid transactionHash(const ApiMediaServerData& params) const            { return params.id; }
+        QnUuid transactionHash(const ApiStorageData& params) const                { return params.id; }
         QnUuid transactionHash(const ApiUserData& params) const                   { return params.id; }
         QnUuid transactionHash(const ApiLayoutData& params) const                 { return params.id; }
         QnUuid transactionHash(const ApiVideowallData& params) const              { return params.id; }
@@ -169,6 +175,7 @@ namespace ec2
         QnUuid transactionHash(const ApiResourceParamWithRefDataList& /*tran*/) const  { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiFullInfoData& ) const                   { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiCameraDataList& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
+        QnUuid transactionHash(const ApiStorageDataList& ) const                { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiCameraAttributesDataList& ) const       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiLayoutDataList& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiVideowallDataList& ) const              { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }

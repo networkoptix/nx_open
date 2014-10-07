@@ -14,6 +14,7 @@
 #include "utils/common/sleep.h"
 #include "utils/network/networkoptixmodulerevealcommon.h"
 #include "media_server_user_attributes.h"
+#include "../resource_management/resource_pool.h"
 
 
 const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
@@ -152,13 +153,15 @@ QnResourcePtr QnMediaServerResourceFactory::createResource(const QnUuid& resourc
 
 QnAbstractStorageResourceList QnMediaServerResource::getStorages() const
 {
-    return m_storages;
+    return qnResPool->getResourcesByParentId(getId()).filtered<QnAbstractStorageResource>();
 }
 
+/*
 void QnMediaServerResource::setStorages(const QnAbstractStorageResourceList &storages)
 {
     m_storages = storages;
 }
+*/
 
 // --------------------------------------------------
 
@@ -293,6 +296,15 @@ void QnMediaServerResource::determineOptimalNetIF()
     }
 }
 
+bool QnMediaServerResource::hasStoragePath(const QString& path) const
+{
+   foreach(const QnAbstractStorageResourcePtr& storage, getStorages()) {
+       if (storage->getPath() == path)
+           return true;
+   }
+   return false;
+}
+
 void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
     QString oldUrl = m_url;
     QnResource::updateInner(other, modifiedFields);
@@ -314,9 +326,10 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_systemInfo = localOther->m_systemInfo;
         m_systemName = localOther->m_systemName;
 
+        /*
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         
-        /* Keep indices unchanged (Server does not provide this info). */
+        // Keep indices unchanged (Server does not provide this info).
         foreach(const QnAbstractStorageResourcePtr &storage, m_storages)
         {
             foreach(const QnAbstractStorageResourcePtr &otherStorage, otherStorages)
@@ -329,6 +342,7 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         }
 
         setStorages(otherStorages);
+        */
     }
     if (netAddrListChanged) {
         m_apiUrl = localOther->m_apiUrl;    // do not update autodetected value with side changes

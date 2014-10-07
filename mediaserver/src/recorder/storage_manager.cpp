@@ -93,6 +93,8 @@ QnStorageManager::QnStorageManager():
 
     assert( QnStorageManager_instance == nullptr );
     QnStorageManager_instance = this;
+
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
 }
 
 std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -357,8 +359,18 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
     foreach(const int& value, depracateStorageIndexes)
         m_storageRoots.insert(value, storage);
 
-    connect(storage.data(), SIGNAL(archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), this, SLOT(at_archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
+    connect(storage.data(), SIGNAL(archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), 
+            this, SLOT(at_archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
     loadFullFileCatalog(storage);
+}
+
+void QnStorageManager::onNewResource(const QnResourcePtr &resource)
+{
+    QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
+    if (storage && storage->getParentId() == qnCommon->moduleGUID()) 
+    {
+        addStorage(storage);
+    }
 }
 
 QStringList QnStorageManager::getAllStoragePathes() const

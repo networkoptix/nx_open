@@ -178,6 +178,7 @@ static QString SERVICE_NAME = lit("%1 Server").arg(QnAppInfo::organizationName()
 static const quint64 DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
 static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
 static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
+static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -369,10 +370,11 @@ void ffmpegInit()
 #endif
 }
 
-QnStorageResourcePtr createStorage(const QString& path)
+QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
 {
     QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
+    storage->setParentId(serverId);
     storage->setUrl(path);
     storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
     storage->setUsedForWriting(storage->isStorageAvailableForWriting());
@@ -444,13 +446,16 @@ static QStringList listRecordFolders()
     return folderPaths;
 }
 
-QnAbstractStorageResourceList createStorages()
+QnAbstractStorageResourceList createStorages(const QnMediaServerResourcePtr mServer)
 {
     QnAbstractStorageResourceList storages;
     //bool isBigStorageExist = false;
     qint64 bigStorageThreshold = 0;
-    foreach(QString folderPath, listRecordFolders()) {
-        QnStorageResourcePtr storage = createStorage(folderPath);
+    foreach(QString folderPath, listRecordFolders()) 
+    {
+        if (mServer->hasStoragePath(folderPath))
+            continue;
+        QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
         qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
         bigStorageThreshold = qMax(bigStorageThreshold, available);
         storages.append(storage);
@@ -468,9 +473,9 @@ QnAbstractStorageResourceList createStorages()
     return storages;
 }
 
-bool updateStorages(QnMediaServerResourcePtr mServer)
+QnAbstractStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
 {
-    bool isModified = false;
+    QMap<QnUuid, QnAbstractStorageResourcePtr> result;
     // I've switched all patches to native separator to fix network patches like \\computer\share
     foreach(QnAbstractStorageResourcePtr abstractStorage, mServer->getStorages())
     {
@@ -483,10 +488,9 @@ bool updateStorages(QnMediaServerResourcePtr mServer)
                 updatedURL.chop(1);
             if (storage->getUrl() != updatedURL) {
                 storage->setUrl(updatedURL);
-                isModified = true;
+                result.insert(storage->getId(), storage);
             }
         }
-
     }
 
     qint64 bigStorageThreshold = 0;
@@ -507,12 +511,12 @@ bool updateStorages(QnMediaServerResourcePtr mServer)
         if (available < bigStorageThreshold) {
             if (storage->isUsedForWriting()) {
                 storage->setUsedForWriting(false);
-                isModified = true;
+                result.insert(storage->getId(), storage);
                 qWarning() << "Disable writing to storage" << storage->getPath() << "because of low storage size";
             }
         }
     }
-    return isModified;
+    return result.values();
 }
 
 void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddress, int port)
@@ -571,6 +575,16 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
     */
 
     return savedServer;
+}
+
+void QnMain::saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnAbstractStorageResourceList& storages)
+{
+    ec2::ErrorCode rez;
+    while((rez = ec2Connection->getMediaServerManager()->saveStoragesSync(storages)) != ec2::ErrorCode::ok && !needToStop())
+    {
+        qWarning() << "updateStorages(): Call to change server's storages failed. Reason: " << ec2::toString(rez);
+        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+    }
 }
 
 #ifdef Q_OS_WIN
@@ -815,8 +829,6 @@ void QnMain::stopObjects()
         m_moduleFinder = 0;
     }
 }
-
-static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 
 void QnMain::updateDisabledVendorsIfNeeded()
 {
@@ -1488,15 +1500,10 @@ void QnMain::run()
             server->setNetAddrList(serverIfaceList);
             isModified = true;
         }
-
+        
         QnAbstractStorageResourceList storages = server->getStorages();
-        if (storages.isEmpty()) {
-            server->setStorages(createStorages());
-            isModified = true;
-        }
-        else if (updateStorages(server)) {
-            isModified = true;
-        }
+        QnAbstractStorageResourceList modifiedStorages = createStorages(server);
+        modifiedStorages.append(updateStorages(server));
 
         bool needUpdateAuthKey = server->getAuthKey().isEmpty();
         if (server->getSystemName() != qnCommon->localSystemName())
@@ -1519,6 +1526,10 @@ void QnMain::run()
             m_mediaServer = registerServer(ec2Connection, server);
         else
             m_mediaServer = server;
+        saveStorages(ec2Connection, modifiedStorages);
+        foreach(const QnAbstractStorageResourcePtr &storage, modifiedStorages)
+            messageProcessor->updateResource(storage);
+
 
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
@@ -1536,34 +1547,6 @@ void QnMain::run()
         if (needToStop())
             return;
     } while (ec2Connection->getResourceManager()->setResourceStatusSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
-
-    QStringList usedPathList;
-    foreach (QnAbstractStorageResourcePtr storage, m_mediaServer->getStorages())
-    {
-        qnResPool->addResource(storage);
-        usedPathList << storage->getPath();
-        QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
-        if (physicalStorage)
-            qnStorageMan->addStorage(physicalStorage);
-    }
-
-
-    // check old storages, absent in the DB
-    QStringList allStoragePathList = qnStorageMan->getAllStoragePathes();
-    foreach (const QString& path, allStoragePathList)
-    {
-        if (usedPathList.contains(path))
-            continue;
-        QnStorageResourcePtr newStorage = QnStorageResourcePtr(new QnFileStorageResource());
-        newStorage->setId(QnUuid::createUuid());
-        newStorage->setUrl(path);
-        newStorage->setSpaceLimit( settings->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
-        newStorage->setUsedForWriting(false);
-        newStorage->addFlags(Qn::deprecated);
-
-        qnStorageMan->addStorage(newStorage);
-    }
-
 
 
     qnStorageMan->doMigrateCSVCatalog();

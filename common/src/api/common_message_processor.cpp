@@ -22,7 +22,6 @@
 #include "nx_ec/data/api_resource_data.h"
 #include "core/resource_management/resource_properties.h"
 
-
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     base_type(parent)
 {
@@ -65,6 +64,7 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
     auto mediaServerManager = connection->getMediaServerManager();
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::addedOrUpdated,   this, [this](const QnMediaServerResourcePtr &server){updateResource(server);});
+    connect(mediaServerManager, &ec2::AbstractMediaServerManager::storageChanged,   this, [this](const QnAbstractStorageResourcePtr &storage){updateResource(storage);});
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::removed,          this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::userAttributesChanged, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesChanged );
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::userAttributesRemoved, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved );

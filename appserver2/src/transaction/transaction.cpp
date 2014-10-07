@@ -64,6 +64,9 @@ namespace ec2
             REGISTER_COMMAND(getMediaServers),
             REGISTER_COMMAND(saveMediaServer),
             REGISTER_COMMAND(removeMediaServer),
+            REGISTER_COMMAND(saveStorage),
+            REGISTER_COMMAND(saveStorages),
+            REGISTER_COMMAND(removeStorage),
 
             REGISTER_COMMAND(saveUser),
             REGISTER_COMMAND(getUsers),
@@ -179,6 +182,9 @@ namespace ec2
                 val == addCameraBookmarkTags ||
                 val == removeCameraBookmarkTags ||
                 val == saveMediaServer ||
+                val == saveStorages ||
+                val == saveStorage ||
+                val == removeStorage ||
                 val == removeMediaServer ||
                 val == saveUser ||
                 val == removeUser ||

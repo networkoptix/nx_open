@@ -51,7 +51,8 @@ public:
     QnMediaServerConnectionPtr apiConnection();
 
     QnAbstractStorageResourceList getStorages() const;
-    void setStorages(const QnAbstractStorageResourceList& storages);
+    bool hasStoragePath(const QString& path) const;
+    //void setStorages(const QnAbstractStorageResourceList& storages);
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
@@ -114,7 +115,7 @@ private:
     QList<QHostAddress> m_prevNetAddrList;
     QList<QUrl> m_additionalUrls;
     QList<QUrl> m_ignoredUrls;
-    QnAbstractStorageResourceList m_storages;
+    //QnAbstractStorageResourceList m_storages;
     bool m_primaryIFSelected;
     Qn::ServerFlags m_serverFlags;
     Qn::PanicMode m_panicMode;

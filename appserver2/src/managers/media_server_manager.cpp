@@ -48,6 +48,7 @@ namespace ec2
         if (resource->getId().isNull())
             resource->setId( QnUuid::createUuid());
 
+        /*
         QnAbstractStorageResourceList storages = resource->getStorages();
         for (int i = 0; i < storages.size(); ++i)
         {
@@ -55,6 +56,7 @@ namespace ec2
                 storages[i]->setId(QnUuid::createUuid());
         }
         resource->setStorages(storages);
+        */
 
         //performing request
         auto tran = prepareTransaction( ApiCommand::saveMediaServer, resource );
@@ -80,6 +82,17 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         //TODO #ak
+        return reqID;
+    }
+
+    template<class T>
+    int QnMediaServerManager<T>::saveStorages( const QnAbstractStorageResourceList& storages, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        QnTransaction<ApiStorageDataList> tran(ApiCommand::saveStorages);
+        fromResourceToApi(storages, tran.params);
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
         return reqID;
     }
 

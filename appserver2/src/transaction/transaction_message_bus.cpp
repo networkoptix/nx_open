@@ -110,6 +110,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::removeCameraHistoryItem:
     case ApiCommand::addCameraHistoryItem:  return handleTransactionParams<ApiCameraServerItemData> (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::saveMediaServer:       return handleTransactionParams<ApiMediaServerData>      (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::saveStorage:           return handleTransactionParams<ApiStorageData>          (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::removeMediaServer:     return handleTransactionParams<ApiIdData>               (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::saveUser:              return handleTransactionParams<ApiUserData>             (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::removeUser:            return handleTransactionParams<ApiIdData>               (serializedTransaction, &stream, transaction, function, fastFunction);

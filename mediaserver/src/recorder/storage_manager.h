@@ -119,6 +119,7 @@ signals:
     void rebuildFinished();
 public slots:
     void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
+    void onNewResource(const QnResourcePtr &resource);
 private:
     friend class TestStorageThread;
 
