@@ -114,6 +114,7 @@
 #include <rest/handlers/routing_information_rest_handler.h>
 #include <rest/handlers/configure_rest_handler.h>
 #include <rest/handlers/merge_systems_rest_handler.h>
+#include <rest/handlers/current_user_rest_handler.h>
 #include <rest/handlers/backup_db_rest_handler.h>
 #include <rest/handlers/discovered_peers_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
@@ -1076,7 +1077,7 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/image", new QnImageRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/onEvent", new QnExternalBusinessEventRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/gettime", new QnTimeRestHandler());
-//    QnRestProcessorPool::instance()->registerHandler("api/getCurrentUser", new QnCurrentUserRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/getCurrentUser", new QnCurrentUserRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testEmailSettings", new QnTestEmailSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
