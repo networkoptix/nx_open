@@ -148,13 +148,14 @@ void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subD
  * field for the data, that is contained in the second (subData). 
  * Data elements MUST be sorted by \a idField.
  * SubData elements should be sorted by parentIdField.
+ * Types MainOrParentType1 and MainOrParentType2 are separated to allow \a subDataListField and \a idField to be pointers to fields of related types
  */
-template <class MainData, class SubData, class MainSubData, class MainOrParentType, class IdType, class SubOrParentType>
+template <class MainData, class SubData, class MainSubData, class MainOrParentType1, class MainOrParentType2, class IdType, class SubOrParentType>
 void mergeObjectListData(
     std::vector<MainData>& data,
     std::vector<SubData>& subDataList,
-    std::vector<MainSubData> MainOrParentType::*subDataListField,
-    IdType MainOrParentType::*idField,
+    std::vector<MainSubData> MainOrParentType1::*subDataListField,
+    IdType MainOrParentType2::*idField,
     IdType SubOrParentType::*parentIdField )
 {
     assertSorted(data, idField);
@@ -2440,7 +2441,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraDataExList
         return errCode;
 
     //merging data
-    mergeObjectListData<ApiCameraDataEx, ApiScheduleTaskWithRefData, ApiScheduleTaskData, ApiCameraDataEx>(
+    //mergeObjectListData<ApiCameraDataEx, ApiScheduleTaskWithRefData, ApiScheduleTaskData, ApiCameraDataEx, ApiScheduleTaskWithRefData>(
+    mergeObjectListData(
         cameraExList,
         scheduleTaskList,
         &ApiCameraDataEx::scheduleTasks,

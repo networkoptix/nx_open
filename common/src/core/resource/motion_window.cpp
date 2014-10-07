@@ -16,6 +16,8 @@ QnRegion::QnRegion()
 }
 
 QnRegion::QnRegion(const QnRegion& right)
+:
+    QRegion()
 {
     //making deep copy of right
     const QVector<QRect>& _rects = right.rects();
