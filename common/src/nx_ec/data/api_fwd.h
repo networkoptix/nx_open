@@ -6,6 +6,7 @@
 #include <utils/common/model_functions_fwd.h>
 
 class QString;
+class QnUuid;
 
 namespace ec2 {
     struct ResourceContext; // TODO: #Elric move this out?
@@ -105,6 +106,7 @@ namespace ec2 {
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
     typedef std::vector<ApiResourceParamWithRefData> ApiResourceParamWithRefDataList;
     typedef std::vector<ApiStorageData> ApiStorageDataList;
+    typedef std::vector<ApiIdData> ApiIdDataList;
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\

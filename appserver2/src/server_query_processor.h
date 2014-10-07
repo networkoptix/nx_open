@@ -101,6 +101,9 @@ namespace ec2
                 case ApiObject_Camera:
                     updatedTran.command = ApiCommand::removeCamera;
                     break;
+                case ApiObject_Storage:
+                    updatedTran.command = ApiCommand::removeStorage;
+                    break;
                 case ApiObject_User:
                     updatedTran.command = ApiCommand::removeUser;
                     break;
@@ -142,6 +145,18 @@ namespace ec2
         {
             Q_ASSERT(tran.command == ApiCommand::saveCameras);
             return processMultiUpdateAsync<ApiCameraDataList, ApiCameraData>(tran, handler, ApiCommand::saveCamera);
+        }
+
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiIdDataList>& tran, HandlerType handler )
+        {
+            if (tran.command == ApiCommand::removeStorages) 
+            {
+                return processMultiUpdateAsync<ApiIdDataList, ApiIdData>(tran, handler, ApiCommand::removeStorage);
+            }
+            else {
+                Q_ASSERT_X(0, "Not implemented", Q_FUNC_INFO);
+            }
         }
 
         template<class HandlerType>

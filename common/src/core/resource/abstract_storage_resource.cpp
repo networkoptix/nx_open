@@ -149,8 +149,13 @@ void QnAbstractStorageResource::setUrl(const QString& value)
     if (getId().isNull()) 
     {
         Q_ASSERT(!getParentId().isNull());
-        QByteArray data1 = getParentId().toRfc4122();
-        QByteArray data2 = value.toUtf8();
-        setId(guidFromArbitraryData(data1.append(data2)));
+        setId(fillID(getParentId(), value));
     }
+}
+
+QnUuid QnAbstractStorageResource::fillID(const QnUuid& mserverId, const QString& url)
+{
+    QByteArray data1 = mserverId.toRfc4122();
+    QByteArray data2 = url.toUtf8();
+    return guidFromArbitraryData(data1.append(data2));
 }

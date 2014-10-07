@@ -1181,6 +1181,22 @@ ErrorCode QnDbManager::insertOrReplaceLayout(const ApiLayoutData& data, qint32 i
     }
 }
 
+ErrorCode QnDbManager::removeStorage(const QnUuid& guid)
+{
+    qint32 id = getResourceInternalId(guid);
+
+    ErrorCode err = deleteTableRecord(id, "vms_storage", "resource_ptr_id");
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteRecordFromResourceTable(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    return ErrorCode::ok;
+}
+
+/*
 ErrorCode QnDbManager::removeStoragesByServer(const QnUuid& serverGuid)
 {
     QSqlQuery delQuery(m_sdb);
@@ -1202,6 +1218,7 @@ ErrorCode QnDbManager::removeStoragesByServer(const QnUuid& serverGuid)
     }
     return ErrorCode::ok;
 }
+*/
 
 /*
 ErrorCode QnDbManager::updateStorages(const ApiMediaServerData& data)
@@ -1892,9 +1909,9 @@ ErrorCode QnDbManager::removeServer(const QnUuid& guid)
     //if (err != ErrorCode::ok)
     //    return err;
 
-    err = removeStoragesByServer(guid);
-    if (err != ErrorCode::ok)
-        return err;
+    //err = removeStoragesByServer(guid);
+    //if (err != ErrorCode::ok)
+    //    return err;
 
     err = deleteTableRecord(id, "vms_server", "resource_ptr_id");
     if (err != ErrorCode::ok)
@@ -2021,6 +2038,8 @@ ApiOjectType QnDbManager::getObjectType(const QnUuid& objectId)
     QString objectType = query.value("name").toString();
     if (objectType == "Camera")
         return ApiObject_Camera;
+    else if (objectType == "Storage")
+        return ApiObject_Storage;
     else if (objectType == "Server")
         return ApiObject_Server;
     else if (objectType == "User")
@@ -2106,6 +2125,8 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>
     switch(tran.command) {
         case ApiCommand::removeCamera:
             return removeObject(ApiObjectInfo(ApiObject_Camera, tran.params.id));
+        case ApiCommand::removeStorage:
+            return removeObject(ApiObjectInfo(ApiObject_Storage, tran.params.id));
         case ApiCommand::removeMediaServer:
             return removeObject(ApiObjectInfo(ApiObject_Server, tran.params.id));
         case ApiCommand::removeServerUserAttributes:
@@ -2135,6 +2156,9 @@ ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
     {
     case ApiObject_Camera:
         result = removeCamera(apiObject.id);
+        break;
+    case ApiObject_Storage:
+        result = removeStorage(apiObject.id);
         break;
     case ApiObject_Server:
         result = removeServer(apiObject.id);

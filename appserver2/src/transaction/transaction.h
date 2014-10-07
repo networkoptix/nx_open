@@ -76,6 +76,7 @@ namespace ec2
             saveStorage                 = 407,  /*< ApiStorageData */
             saveStorages                = 408,  /*< ApiStorageDataList */
             removeStorage               = 409,  /*< ApiIdData */
+            removeStorages              = 410,  /*< QList<ApiIdData> */
 
             /* User resource */
             getUsers                    = 500,  /*< ApiUserDataList */

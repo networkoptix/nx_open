@@ -325,34 +325,41 @@ void QnServerSettingsDialog::updateFromResources()
     updateFailoverLabel();
 }
 
-void QnServerSettingsDialog::submitToResources() {
+void QnServerSettingsDialog::submitToResources() 
+{
     if(m_hasStorageChanges) {
-        QnServerStorageStateHash serverStorageStates = qnSettings->serverStorageStates();
-
-        QnAbstractStorageResourceList storages;
-        foreach(const QnStorageSpaceData &item, tableItems()) {
-            if(!item.isUsedForWriting && item.storageId.isNull()) {
-                serverStorageStates.insert(QnServerStorageKey(m_server->getId(), item.url), item.reservedSpace);
-                continue;
+        QnAbstractStorageResourceList newStorages;
+        ec2::ApiIdDataList storagesToRemove;
+        foreach(const QnStorageSpaceData &item, tableItems()) 
+        {
+            if (item.isExternal && !item.isUsedForWriting)
+            {
+                storagesToRemove.push_back(QnAbstractStorageResource::fillID(m_server->getId(), item.url));
             }
-
-            QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
-            if (!item.storageId.isNull())
-                storage->setId(item.storageId);
-            QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
-            if (resType)
-                storage->setTypeId(resType->getId());
-            storage->setName(QnUuid::createUuid().toString());
-            storage->setParentId(m_server->getId());
-            storage->setUrl(item.url);
-            storage->setSpaceLimit(item.reservedSpace); //client does not change space limit anymore
-            storage->setUsedForWriting(item.isUsedForWriting);
-
-            storages.push_back(storage);
+            else {
+                QnAbstractStorageResourcePtr storage = m_server->getStorageByUrl(item.url);
+                if (storage) {
+                    storage->setUsedForWriting(item.isUsedForWriting);
+                    newStorages.push_back(storage); // todo: #rvasilenko: temporarty code line. Need remote it after moving 'usedForWriting' to separate property
+                }
+                else {
+                    // create or remove new storage
+                    QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
+                    if (!item.storageId.isNull())
+                        storage->setId(item.storageId);
+                    QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
+                    if (resType)
+                        storage->setTypeId(resType->getId());
+                    storage->setName(QnUuid::createUuid().toString());
+                    storage->setParentId(m_server->getId());
+                    storage->setUrl(item.url);
+                    storage->setSpaceLimit(item.reservedSpace); //client does not change space limit anymore
+                    storage->setUsedForWriting(item.isUsedForWriting);
+                    newStorages.push_back(storage);
+                }
+            }
         }
-        //m_server->setStorages(storages);
-
-        qnSettings->setServerStorageStates(serverStorageStates);
+        m_server->setStorageDataToUpdate(newStorages, storagesToRemove);
     }
 
     m_server->setName(ui->nameLineEdit->text());
@@ -576,15 +583,7 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceRe
         return;
     }
 
-    QnServerStorageStateHash serverStorageStates = qnSettings->serverStorageStates();
-
     QList<QnStorageSpaceData> items = reply.storages;
-    for(int i = 0; i < items.size(); i++) {
-        QnStorageSpaceData &item = items[i];
-
-        if(item.reservedSpace == -1)
-            item.reservedSpace = serverStorageStates.value(QnServerStorageKey(m_server->getId(), item.url) , -1);
-    }
 
     struct StorageSpaceDataLess {
         bool operator()(const QnStorageSpaceData &l, const QnStorageSpaceData &r) {

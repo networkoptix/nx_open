@@ -57,8 +57,6 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnLicenseWarningStateHash>();
     qRegisterMetaType<QnServerStorageKey>();
     qRegisterMetaTypeStreamOperators<QnServerStorageKey>();
-    qRegisterMetaType<QnServerStorageStateHash>();
-    qRegisterMetaTypeStreamOperators<QnServerStorageStateHash>();
     qRegisterMetaType<Qn::TimeMode>();
     qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
     qRegisterMetaType<Qn::ClientSkin>();

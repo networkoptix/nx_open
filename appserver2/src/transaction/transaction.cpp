@@ -70,6 +70,7 @@ namespace ec2
             REGISTER_COMMAND(saveStorage),
             REGISTER_COMMAND(saveStorages),
             REGISTER_COMMAND(removeStorage),
+            REGISTER_COMMAND(removeStorages),
 
             REGISTER_COMMAND(saveUser),
             REGISTER_COMMAND(getUsers),
@@ -188,6 +189,7 @@ namespace ec2
                 val == saveStorage ||
                 val == saveStorages ||
                 val == removeStorage ||
+                val == removeStorages ||
                 val == removeMediaServer ||
                 val == saveUser ||
                 val == removeUser ||

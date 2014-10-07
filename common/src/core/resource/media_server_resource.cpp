@@ -156,6 +156,26 @@ QnAbstractStorageResourceList QnMediaServerResource::getStorages() const
     return qnResPool->getResourcesByParentId(getId()).filtered<QnAbstractStorageResource>();
 }
 
+void QnMediaServerResource::setStorageDataToUpdate(const QnAbstractStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storagesToRemove)
+{
+    m_storagesToUpdate = storagesToUpdate;
+    m_storagesToRemove = storagesToRemove;
+}
+
+QPair<int, int> QnMediaServerResource::saveUpdatedStorages()
+{
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    int updateHandle = conn->getMediaServerManager()->saveStorages(m_storagesToUpdate, this, &QnMediaServerResource::onRequestDone);
+    int removeHandle = conn->getMediaServerManager()->removeStorages(m_storagesToRemove, this, &QnMediaServerResource::onRequestDone);
+
+    return QPair<int, int>(updateHandle, removeHandle);
+}
+
+void QnMediaServerResource::onRequestDone( int reqID, ec2::ErrorCode errorCode )
+{
+    emit storageSavingDone(reqID, errorCode);
+}
+
 /*
 void QnMediaServerResource::setStorages(const QnAbstractStorageResourceList &storages)
 {
@@ -296,13 +316,13 @@ void QnMediaServerResource::determineOptimalNetIF()
     }
 }
 
-bool QnMediaServerResource::hasStoragePath(const QString& path) const
+QnAbstractStorageResourcePtr QnMediaServerResource::getStorageByUrl(const QString& url) const
 {
    foreach(const QnAbstractStorageResourcePtr& storage, getStorages()) {
-       if (storage->getPath() == path)
-           return true;
+       if (storage->getUrl() == url)
+           return storage;
    }
-   return false;
+   return QnAbstractStorageResourcePtr();
 }
 
 void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {

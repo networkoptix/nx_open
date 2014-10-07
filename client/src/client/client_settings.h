@@ -39,7 +39,6 @@ public:
         OPEN_LAYOUTS_ON_LOGIN,
         SOFTWARE_YUV,
         USER_WORKBENCH_STATES,
-        SERVER_STORAGE_STATES,
         LICENSE_WARNING_STATES,
 
         LAST_DATABASE_BACKUP_DIR,
@@ -202,7 +201,6 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isLayoutsOpenedOnLogin, setLayoutsOpenedOnLogin,    OPEN_LAYOUTS_ON_LOGIN,      false)
         QN_DECLARE_RW_PROPERTY(bool,                        isSoftwareYuv,          setSoftwareYuv,             SOFTWARE_YUV,               false)
         QN_DECLARE_RW_PROPERTY(QnWorkbenchStateHash,        userWorkbenchStates,    setUserWorkbenchStates,     USER_WORKBENCH_STATES,      QnWorkbenchStateHash())
-        QN_DECLARE_RW_PROPERTY(QnServerStorageStateHash,    serverStorageStates,    setServerStorageStates,     SERVER_STORAGE_STATES,      QnServerStorageStateHash())
         QN_DECLARE_RW_PROPERTY(QnLicenseWarningStateHash,   licenseWarningStates,   setLicenseWarningStates,    LICENSE_WARNING_STATES,     QnLicenseWarningStateHash())
         QN_DECLARE_R_PROPERTY (QnConnectionData,            defaultConnection,                                  DEFAULT_CONNECTION,         QnConnectionData())
         QN_DECLARE_RW_PROPERTY(QnConnectionData,            lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData())

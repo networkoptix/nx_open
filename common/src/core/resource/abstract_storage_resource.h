@@ -28,6 +28,8 @@ public:
     bool isUsedForWriting() const;
     QString getPath() const;
     static QString urlToPath(const QString& url);
+
+    static QnUuid fillID(const QnUuid& mserverId, const QString& url);
 #ifdef ENABLE_DATA_PROVIDERS
     virtual float bitrate() const;
     virtual float getStorageBitrateCoeff() const { return 1.0; }

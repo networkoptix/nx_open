@@ -51,7 +51,7 @@ public:
     QnMediaServerConnectionPtr apiConnection();
 
     QnAbstractStorageResourceList getStorages() const;
-    bool hasStoragePath(const QString& path) const;
+    QnAbstractStorageResourcePtr getStorageByUrl(const QString& url) const;
     //void setStorages(const QnAbstractStorageResourceList& storages);
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
@@ -94,10 +94,15 @@ public:
     static bool isHiddenServer(const QnResourcePtr &resource);
     virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
-
+    void setStorageDataToUpdate(const QnAbstractStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storageUrlToRemove);
+    /*
+    * Return pair of handles of saving requests. first: handle for saving storages, second: handle for remove storages
+    */
+    QPair<int, int> saveUpdatedStorages();
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
-
+private:
+    void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 signals:
     void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
     void panicModeChanged(const QnResourcePtr &resource);
@@ -106,7 +111,7 @@ signals:
     void versionChanged(const QnResourcePtr &resource);
     void systemNameChanged(const QnResourcePtr &resource);
     void redundancyChanged(const QnResourcePtr &resource);
-
+    void storageSavingDone(int reqID, ec2::ErrorCode errCode);
 private:
     QnMediaServerConnectionPtr m_restConnection;
     QString m_apiUrl;
@@ -126,6 +131,10 @@ private:
     QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
     QElapsedTimer m_statusTimer;
     QString m_authKey;
+
+    // used for client purpose only. Can be moved to separete class
+    QnAbstractStorageResourceList m_storagesToUpdate;
+    ec2::ApiIdDataList m_storagesToRemove;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory

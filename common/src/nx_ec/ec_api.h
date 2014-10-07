@@ -249,6 +249,13 @@ namespace ec2
         }
 
         /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class TargetType, class HandlerType> int removeStorages( const ApiIdDataList& storages, TargetType* target, HandlerType handler ) {
+            return removeStorages( storages, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+        /*!
             \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId. 
                 If NULL, returned list contains data of all known servers
             \param handler Functor with params: (ErrorCode, const QnMediaServerUserAttributesList& serverUserAttributesList)
@@ -279,6 +286,7 @@ namespace ec2
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
         virtual int saveUserAttributes( const QnMediaServerUserAttributesList& serverAttrs, impl::SimpleHandlerPtr handler ) = 0;
         virtual int saveStorages( const QnAbstractStorageResourceList& storages, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int removeStorages( const ApiIdDataList& storages, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getUserAttributes( const QnUuid& mediaServerId, impl::GetServerUserAttributesHandlerPtr handler ) = 0;
     };
 

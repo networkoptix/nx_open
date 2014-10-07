@@ -453,7 +453,7 @@ QnAbstractStorageResourceList createStorages(const QnMediaServerResourcePtr mSer
     qint64 bigStorageThreshold = 0;
     foreach(QString folderPath, listRecordFolders()) 
     {
-        if (mServer->hasStoragePath(folderPath))
+        if (!mServer->getStorageByUrl(folderPath).isNull())
             continue;
         QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
         qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();

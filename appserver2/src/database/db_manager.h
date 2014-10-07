@@ -23,6 +23,7 @@ namespace ec2
         ApiObject_Layout,
         ApiObject_Videowall,
         ApiObject_BusinessRule,
+        ApiObject_Storage,
         ApiObject_Dummy
     };
     struct ApiObjectInfo
@@ -240,6 +241,12 @@ namespace ec2
         /* Add or remove camera bookmark tags */
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraBookmarkTagDataList>& tran);
 
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiIdDataList>& tran)
+        {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
         ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesDataList>& tran)
         {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
@@ -389,6 +396,7 @@ namespace ec2
         ErrorCode updateCameraSchedule(const std::vector<ApiScheduleTaskData>& scheduleTasks, qint32 internalId);
         ErrorCode removeCameraSchedule(qint32 internalId);
         ErrorCode removeCamera(const QnUuid& guid);
+        ErrorCode removeStorage(const QnUuid& guid);
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
         ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
@@ -396,7 +404,7 @@ namespace ec2
         //ErrorCode updateStorages(const ApiMediaServerData&);
         ErrorCode removeServer(const QnUuid& guid);
         ErrorCode removeMediaServerUserAttributes(const QnUuid& guid);
-        ErrorCode removeStoragesByServer(const QnUuid& serverGUID);
+        //ErrorCode removeStoragesByServer(const QnUuid& serverGUID);
 
         ErrorCode removeLayout(const QnUuid& id);
         ErrorCode removeLayoutInternal(const QnUuid& id, const qint32 &internalId);

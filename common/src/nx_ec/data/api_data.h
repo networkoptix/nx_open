@@ -10,7 +10,10 @@ namespace ec2 {
     };
     #define ApiData_Fields ()
 
-    struct ApiIdData: ApiData {
+    struct ApiIdData: ApiData 
+    {
+        ApiIdData() {}
+        ApiIdData(const QnUuid& id): id(id) {}
         QnUuid id;
     };
 #define ApiIdData_Fields (id)

@@ -100,6 +100,17 @@ namespace ec2
     }
 
     template<class T>
+    int QnMediaServerManager<T>::removeStorages( const ApiIdDataList& storages, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        QnTransaction<ApiIdDataList> tran(ApiCommand::removeStorages);
+        tran.params = storages;
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        return reqID;
+    }
+
+    template<class T>
     int QnMediaServerManager<T>::getUserAttributes( const QnUuid& mediaServerId, impl::GetServerUserAttributesHandlerPtr handler )
     {
         const int reqID = generateRequestID();

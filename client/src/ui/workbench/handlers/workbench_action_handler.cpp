@@ -1792,11 +1792,13 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
                 resource->setName(oldName);
         };
 
-        if (mServer)
+        if (mServer) {
             connection2()->getMediaServerManager()->saveUserAttributes(
                 QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(mServer->getId()),
                 this,
                 callback );
+            mServer->saveUpdatedStorages();
+        }
         if (camera)
             connection2()->getCameraManager()->saveUserAttributes(
                 QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(QnVirtualCameraResourceList() << camera)),
