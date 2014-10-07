@@ -14,6 +14,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_user_attribute_pool.h>
+#include <core/resource/media_server_user_attributes.h>
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
 #include "runtime_info_manager.h"
@@ -65,6 +66,8 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     auto mediaServerManager = connection->getMediaServerManager();
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::addedOrUpdated,   this, [this](const QnMediaServerResourcePtr &server){updateResource(server);});
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::removed,          this, &QnCommonMessageProcessor::on_resourceRemoved );
+    connect(mediaServerManager, &ec2::AbstractMediaServerManager::userAttributesChanged, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesChanged );
+    connect(mediaServerManager, &ec2::AbstractMediaServerManager::userAttributesRemoved, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved );
 
     auto cameraManager = connection->getCameraManager();
     connect(cameraManager, &ec2::AbstractCameraManager::cameraAddedOrUpdated,       this, [this](const QnVirtualCameraResourcePtr &camera){updateResource(camera);});
@@ -265,6 +268,31 @@ void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& came
     }
     const QnResourcePtr& res = qnResPool->getResourceById(cameraID);
     if( res )
+        res->emitModificationSignals( modifiedFields );
+}
+
+void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(const QnMediaServerUserAttributesPtr& userAttributes)
+{
+    QSet<QByteArray> modifiedFields;
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), userAttributes->serverID );
+        (*lk)->assign( *userAttributes, &modifiedFields );
+    }
+    const QnResourcePtr& res = qnResPool->getResourceById(userAttributes->serverID);
+    if( res )   //it is OK if resource is missing
+        res->emitModificationSignals( modifiedFields );
+}
+
+void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid& serverID)
+{
+    QSet<QByteArray> modifiedFields;
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), serverID );
+        //TODO #ak for now, never removing this structure, just resetting to empty value
+        (*lk)->assign( QnMediaServerUserAttributes(), &modifiedFields );
+    }
+    const QnResourcePtr& res = qnResPool->getResourceById(serverID);
+    if( res )   //it is OK if resource is missing
         res->emitModificationSignals( modifiedFields );
 }
 

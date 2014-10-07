@@ -4,6 +4,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
 
+#include <utils/common/app_info.h>
 #include "utils/common/delete_later.h"
 #include "api/session_manager.h"
 #include <api/app_server_connection.h>
@@ -12,7 +13,7 @@
 #include <rest/server/json_rest_result.h>
 #include "utils/common/sleep.h"
 #include "utils/network/networkoptixmodulerevealcommon.h"
-#include <utils/common/app_info.h>
+#include "media_server_user_attributes.h"
 
 
 const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
@@ -29,9 +30,7 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     m_primaryIFSelected(false),
     m_serverFlags(Qn::SF_None),
     m_panicMode(Qn::PM_None),
-    m_guard(NULL),
-    m_maxCameras(0),
-    m_redundancy(false)
+    m_guard(NULL)
 {
     setTypeId(resTypePool->getFixedResourceTypeId(lit("Server")));
     addFlags(Qn::server | Qn::remote);
@@ -53,6 +52,26 @@ QString QnMediaServerResource::getUniqueId() const
 {
     assert(!getId().isNull());
     return QLatin1String("Server ") + getId().toString();
+}
+
+QString QnMediaServerResource::getName() const
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    if( !(*lk)->name.isEmpty() )
+        return (*lk)->name;
+    return QnResource::getName();
+}
+
+void QnMediaServerResource::setName( const QString& name )
+{
+    setServerName( name );
+    QnResource::setName( name );
+}
+
+void QnMediaServerResource::setServerName( const QString& name )
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    (*lk)->name = name;
 }
 
 void QnMediaServerResource::setApiUrl(const QString& restUrl)
@@ -285,8 +304,6 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
             modifiedFields << "panicModeChanged";
         if (m_version != localOther->m_version)
             modifiedFields << "versionChanged";
-        if (m_redundancy != localOther->m_redundancy)
-            modifiedFields << "redundancyChanged";
 
         m_panicMode = localOther->m_panicMode;
 
@@ -296,8 +313,6 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_version = localOther->m_version;
         m_systemInfo = localOther->m_systemInfo;
         m_systemName = localOther->m_systemName;
-        m_redundancy = localOther->m_redundancy;
-        m_maxCameras = localOther->m_maxCameras;
 
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         
@@ -330,33 +345,33 @@ QnSoftwareVersion QnMediaServerResource::getVersion() const
     return m_version;
 }
 
+void QnMediaServerResource::setMaxCameras(int value)
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    (*lk)->maxCameras = value;
+}
+
 int QnMediaServerResource::getMaxCameras() const
 {
-    QMutexLocker lock(&m_mutex);
-    return m_maxCameras;
+    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    return (*lk)->maxCameras;
 }
 
 void QnMediaServerResource::setRedundancy(bool value)
 {
     {
-        QMutexLocker lock(&m_mutex);
-        if (m_redundancy == value)
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        if ((*lk)->isRedundancyEnabled == value)
             return;
-        m_redundancy = value;
+        (*lk)->isRedundancyEnabled = value;
     }
     emit redundancyChanged(::toSharedPointer(this));
 }
 
-int QnMediaServerResource::isRedundancy() const
+bool QnMediaServerResource::isRedundancy() const
 {
-    QMutexLocker lock(&m_mutex);
-    return m_redundancy;
-}
-
-void QnMediaServerResource::setMaxCameras(int value)
-{
-    QMutexLocker lock(&m_mutex);
-    m_maxCameras = value;
+    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    return (*lk)->isRedundancyEnabled;
 }
 
 void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)

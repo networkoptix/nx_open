@@ -33,24 +33,12 @@ namespace {
 
 QnSecurityCamResource::QnSecurityCamResource(): 
     m_dpFactory(0),
-    //m_motionType(Qn::MT_Default),
     m_recActionCnt(0),
-    //m_secondaryQuality(Qn::SSQualityMedium),
-    //m_cameraControlDisabled(false),
     m_statusFlags(Qn::CSF_NoFlags),
-    //m_scheduleDisabled(true),
-    //m_audioEnabled(false),
     m_advancedWorking(false),
     m_manuallyAdded(false)
-    //m_minDays(0),
-    //m_maxDays(0)
 {
-    //for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-    //    m_motionMaskList << QnMotionRegion();
-
     addFlags(Qn::live_cam);
-
-    //m_cameraControlDisabled = !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
 
     connect(this, &QnResource::parentIdChanged, this, &QnSecurityCamResource::at_parentIdChanged, Qt::DirectConnection);
 

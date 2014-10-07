@@ -58,6 +58,7 @@ extern "C"
 
 #include <core/resource/camera_user_attribute_pool.h>
 #include "core/resource/media_server_resource.h"
+#include <core/resource/media_server_user_attributes.h>
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resource/axis/axis_resource_searcher.h"
@@ -763,6 +764,7 @@ int main(int argc, char **argv)
 
     QnSessionManager::instance();
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
+    std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
     QnResourcePool::initStaticInstance( new QnResourcePool() );
 
 #ifdef Q_OS_MAC

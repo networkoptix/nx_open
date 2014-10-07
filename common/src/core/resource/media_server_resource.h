@@ -27,6 +27,15 @@ public:
 
     virtual QString getUniqueId() const;
 
+    //!Overrides \a QnResource::getName. Returns camera name (from \a QnCameraUserAttributes) of
+    virtual QString getName() const override;
+    //!Overrides \a QnResource::setName. Just calls \a QnSecurityCamResource::setCameraName
+    /*!
+        TODO get rid of this override, since mediaserver and client must call different methods (setName and setCameraName respectively)
+    */
+    virtual void setName( const QString& name ) override;
+    void setServerName( const QString& name );
+
     void setApiUrl(const QString& restUrl);
     QString getApiUrl() const;
 
@@ -65,7 +74,7 @@ public:
     void setMaxCameras(int value);
 
     void setRedundancy(bool value);
-    int isRedundancy() const;
+    bool isRedundancy() const;
 
     QnSoftwareVersion getVersion() const;
     void setVersion(const QnSoftwareVersion& version);
@@ -84,6 +93,7 @@ public:
     static bool isHiddenServer(const QnResourcePtr &resource);
     virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
+
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
 
@@ -113,8 +123,6 @@ private:
     QString m_systemName;
     QMap<int, QString> m_runningIfRequests;
     QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
-    int m_maxCameras;
-    bool m_redundancy;
     QElapsedTimer m_statusTimer;
     QString m_authKey;
 };
