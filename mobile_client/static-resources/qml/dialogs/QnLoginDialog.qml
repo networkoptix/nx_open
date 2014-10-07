@@ -22,7 +22,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         y: (parent.height / 2 - height) / 2
 
-        source: "qrc:///logo.png"
+        source: "/images/logo.png"
         fillMode: Image.PreserveAspectFit
 
         sourceSize.width: Math.min(parent.width, parent.height / 2)
@@ -56,7 +56,7 @@ Item {
 
         QnRoundButton {
             color: "#0096ff"
-            icon: "qrc:/images/right.png"
+            icon: "/images/right.png"
             onClicked: connectionManager.connectToServer(LoginDialogFunctions.makeUrl(address.text, port.value, login.text, password.text))
         }
     }

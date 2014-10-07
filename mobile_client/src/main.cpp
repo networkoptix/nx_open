@@ -67,6 +67,7 @@ int runApplication(QGuiApplication *application) {
 
 
     QnResolutionUtil::DensityClass densityClass = QnResolutionUtil::currentDensityClass();
+    qDebug() << "Starting with density class: " << QnResolutionUtil::densityName(densityClass);
 
     QFileSelector fileSelector;
     fileSelector.setExtraSelectors(QStringList() << lit("dark") << QnResolutionUtil::densityName(densityClass));
