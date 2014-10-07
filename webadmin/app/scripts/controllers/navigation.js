@@ -2,7 +2,16 @@
 
 angular.module('webadminApp')
     .controller('NavigationCtrl', function ($scope, $location, mediaserver) {
+        $scope.user = {
+            isAdmin:true
+        };
 
+        mediaserver.getCurrentUser().success(function(result){
+            console.log(result);
+            $scope.user = {
+                isAdmin:result.reply.isAdmin
+            }
+        });
         $scope.settings = mediaserver.getSettings();
 
         $scope.settings.then(function (r) {

@@ -91,14 +91,13 @@ module.exports = function (grunt) {
                  */
 
                 //Sergey Yuldashev
-                /*{
+                {
                     context: '/api/',
                     host: '10.0.2.203',
                     port: 8001,
                     headers: {
-
-                        //"Authorization": "Basic YWRtaW46MTIzNA==" //admin:1234
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
+                        //"Authorization": "Basic dXNlcjoxMjM="//user:123
                     }
                 }, {
                     context: '/ec2/',
@@ -106,8 +105,9 @@ module.exports = function (grunt) {
                     port: 8001,
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
+                        //"Authorization": "Basic dXNlcjoxMjM="//user:123
                     }
-                }*/
+                }
 
 
 
@@ -146,7 +146,7 @@ module.exports = function (grunt) {
                 }*/
 
                 //Roman Vasilenko
-                {
+                /*{
                     context: '/api/',
                     host: '10.0.2.231',
                     port: 7006,//7004,7005,2006
@@ -160,7 +160,7 @@ module.exports = function (grunt) {
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
-                }
+                }*/
 
 
                 //Daria
