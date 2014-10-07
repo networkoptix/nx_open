@@ -129,38 +129,38 @@ module.exports = function (grunt) {
                 }*/
 
                 // Sasha
-                {
-                    context: '/api/',
-                    host: '10.0.2.190',
-                    port: 7001,//7004,7005,2006
-                    headers: {
-                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                    }
-                }, {
-                    context: '/ec2/',
-                    host: '10.0.2.190',
-                    port: 7001,//7004,7005,2006
-                    headers: {
-                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                    }
-                }
-
-                //Roman Vasilenko
                 /*{
                     context: '/api/',
-                    host: '10.0.2.231',
+                    host: '10.0.2.190',
                     port: 7001,//7004,7005,2006
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
                 }, {
                     context: '/ec2/',
-                    host: '10.0.2.231',
+                    host: '10.0.2.190',
                     port: 7001,//7004,7005,2006
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
                 }*/
+
+                //Roman Vasilenko
+                {
+                    context: '/api/',
+                    host: '10.0.2.231',
+                    port: 7006,//7004,7005,2006
+                    headers: {
+                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
+                    }
+                }, {
+                    context: '/ec2/',
+                    host: '10.0.2.231',
+                    port: 7001,//7004,7005,2006
+                    headers: {
+                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
+                    }
+                }
 
 
                 //Daria
