@@ -610,4 +610,9 @@ module.exports = function (grunt) {
         'clean:publish',
         'copy:publish'
     ]);
+
+
+    grunt.registerTask('pub', [
+        'publish'
+    ]);
 };
