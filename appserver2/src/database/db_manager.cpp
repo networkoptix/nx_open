@@ -169,7 +169,7 @@ void mergeObjectListData(
         if (subDataList[j].*parentIdField == data[i].*idField) {
             (data[i].*subDataListField).push_back(subDataList[j]);
             ++j;
-        } else if ((subDataList[j].*parentIdField) > data[i].*idField) {
+        } else if ((subDataList[j].*parentIdField).toRfc4122() > (data[i].*idField).toRfc4122()) {
             ++i;
         } else {
             ++j;
