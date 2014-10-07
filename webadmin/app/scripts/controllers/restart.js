@@ -19,21 +19,19 @@ angular.module('webadminApp')
         }
 
         $scope.refresh = reload;
-
         function pingServer(){
-            mediaserver.statistics(statisticUrl).success(function(result){
-                var newUptime  = result.reply.uptimeMs;
-
-                if(newUptime < oldUptime || serverWasDown)
+            var request = serverWasDown ? mediaserver.getSettings(statisticUrl): mediaserver.statistics(statisticUrl);
+            request.success(function(result){
+                if(serverWasDown || result.reply.uptimeMs < oldUptime )
                 {
                     $scope.state = "server is starting";
                     return reload();
                 }
 
                 $scope.state = "server is restarting";
-                oldUptime = newUptime;
+                oldUptime = result.reply.uptimeMs;;
                 setTimeout(pingServer,1000);
-            }).error(function(){
+            }).error(function(result){
                 $scope.state = "server is offline";
                 serverWasDown = true; // server was down once - next success should restart server
                 setTimeout(pingServer,1000);
