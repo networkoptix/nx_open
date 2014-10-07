@@ -1,12 +1,9 @@
 <div ng-controller="HealthCtrl" class="row">
     <div class="col-sm-8">
-
         <div ng-hide="serverIsOnline" class="alert alert-danger" ><b>Server is offline now!</b></div>
-
         <canvas tc-chartjs-line chart-options="options" chart-data="data" width="600" height="400" chart-legend="legend" ></canvas>
     </div>
     <div class="col-sm-4 tc-chart-js-legend">
-
         <ul>
             <li ng-repeat="dataset in datasets" >
                 <label style="color:{{dataset.strokeColor}}">
@@ -19,5 +16,4 @@
             </li>
         </ul>
     </div>
-
 </div>

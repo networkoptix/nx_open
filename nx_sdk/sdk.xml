@@ -1,5 +1,5 @@
  <assembly>
-	<id>sdk</id>
+	<id>archive</id>
 	<formats>
 		<format>zip</format>
 	</formats>

@@ -1,8 +1,18 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,data) {
+    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location) {
+
+        mediaserver.getCurrentUser().success(function(result){
+            console.log("settings",result);
+            if(!result.reply.isAdmin){
+                $location.path("/info"); //no admin rights - redirect
+                return;
+            }
+        });
+
         $scope.settings = mediaserver.getSettings();
+
 
         $scope.settings.then(function (r) {
             $scope.settings = {
@@ -56,10 +66,14 @@ angular.module('webadminApp')
         };
 
         function restartServer(){
-            data.port = $scope.settings.port;
             $modal.open({
                 templateUrl: 'views/restart.html',
-                controller: 'RestartCtrl'
+                controller: 'RestartCtrl',
+                resolve:{
+                    port:function(){
+                        return $scope.settings.port;
+                    }
+                }
             });
         }
 

@@ -9,16 +9,16 @@
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>2.3.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>wixsetup-client-only</artifactId>
+    <artifactId>wixsetup-server-only</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Client Installer</name>
+    <name>HD Witness Server Installer</name>
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>
-        <install.type>client-only</install.type>
+        <install.type>server-only</install.type>
         <client_name>client.exe</client_name>
         <product_name>${product.name}.exe</product_name>
-        <final.artifact.name>${namespace.additional}-client-only</final.artifact.name>      
+        <final.artifact.name>${namespace.additional}-server-only</final.artifact.name>      
     </properties>
     <build />
 </project>

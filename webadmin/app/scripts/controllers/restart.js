@@ -1,39 +1,37 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('RestartCtrl', function ($scope, $modalInstance, $interval, mediaserver,data) {
-        $scope.url = window.location.protocol + "//" + window.location.hostname + ":"
-            + data.port + window.location.pathname + window.location.search;
+    .controller('RestartCtrl', function ($scope, $modalInstance, $interval, mediaserver,port) {
 
         $scope.state = '';
         var statisticUrl = window.location.protocol + "//" + window.location.hostname + ":"
-            + data.port;
+            + port;
+
+        $scope.url = statisticUrl + window.location.pathname + window.location.search;
+
 
         var oldUptime = Number.MAX_VALUE;
         var serverWasDown = false;
 
         function reload(){
-            window.location.href = $scope.url;
-            window.location.reload($scope.url);
+            window.location.href = statisticUrl;
             return false;
         }
 
         $scope.refresh = reload;
-
         function pingServer(){
-            mediaserver.statistics(statisticUrl).success(function(result){
-                var newUptime  = result.reply.uptimeMs;
-
-                if(newUptime < oldUptime || serverWasDown)
+            var request = serverWasDown ? mediaserver.getSettings(statisticUrl): mediaserver.statistics(statisticUrl);
+            request.success(function(result){
+                if(serverWasDown || result.reply.uptimeMs < oldUptime )
                 {
                     $scope.state = "server is starting";
                     return reload();
                 }
 
                 $scope.state = "server is restarting";
-                oldUptime = newUptime;
+                oldUptime = result.reply.uptimeMs;;
                 setTimeout(pingServer,1000);
-            }).error(function(){
+            }).error(function(result){
                 $scope.state = "server is offline";
                 serverWasDown = true; // server was down once - next success should restart server
                 setTimeout(pingServer,1000);

@@ -122,7 +122,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         //TODO: #GDM #Business server selection dialog?
         connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-        QnBusiness::EventType eventType = (QnBusiness::EventType)index.data(Qn::EventTypeRole).toInt();
+        QnBusiness::EventType eventType = index.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
         if (eventType == QnBusiness::CameraMotionEvent)
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(btn));
         else if (eventType == QnBusiness::CameraInputEvent)
@@ -132,7 +132,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     }
     case QnBusiness::TargetColumn:
     {
-        QnBusiness::ActionType actionType = (QnBusiness::ActionType)index.data(Qn::ActionTypeRole).toInt();
+        QnBusiness::ActionType actionType = index.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
 
         switch (actionType) {
         case QnBusiness::ShowPopupAction:
@@ -220,7 +220,7 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
     }
     case QnBusiness::TargetColumn:
     {
-        QnBusiness::ActionType actionType = (QnBusiness::ActionType)index.data(Qn::ActionTypeRole).toInt();
+        QnBusiness::ActionType actionType = index.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
 
         switch (actionType) {
         case QnBusiness::ShowPopupAction:
@@ -259,13 +259,13 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
     }
     case QnBusiness::EventColumn:
         if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
-            comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::EventTypeRole)));
+            comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::EventTypeRole).value<QnBusiness::EventType>()));
             connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
         }
         return;
     case QnBusiness::ActionColumn:
         if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
-            comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::ActionTypeRole)));
+            comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>()));
             connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
         }
         return;
@@ -295,7 +295,7 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
     }
     case QnBusiness::TargetColumn:
     {
-        QnBusiness::ActionType actionType = (QnBusiness::ActionType)index.data(Qn::ActionTypeRole).toInt();
+        QnBusiness::ActionType actionType = index.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
 
         switch (actionType) {
         case QnBusiness::ShowPopupAction:

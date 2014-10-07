@@ -1782,7 +1782,11 @@ QMenu* QnActionManager::integrateMenu(QMenu *menu, const QnActionParameters &par
     Q_ASSERT(!m_parametersByMenu.contains(menu));
     m_parametersByMenu[menu] = parameters;
     menu->installEventFilter(this);
+
+    connect(menu, &QMenu::aboutToShow,  this, [this, menu] { emit menuAboutToShow(menu); });
+    connect(menu, &QMenu::aboutToHide,  this, [this, menu] { emit menuAboutToHide(menu); });
     connect(menu, &QObject::destroyed, this, &QnActionManager::at_menu_destroyed);
+
     return menu;
 }
 
