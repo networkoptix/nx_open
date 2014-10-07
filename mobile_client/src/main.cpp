@@ -24,6 +24,7 @@
 #include "mobile_client/mobile_client_message_processor.h"
 
 #include "ui/color_theme.h"
+#include "ui/resolution_util.h"
 
 #include "version.h"
 
@@ -65,8 +66,10 @@ int runApplication(QGuiApplication *application) {
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
 
 
+    QnResolutionUtil::DensityClass densityClass = QnResolutionUtil::currentDensityClass();
+
     QFileSelector fileSelector;
-//    fileSelector.setExtraSelectors(QStringList() << lit("dark"));
+    fileSelector.setExtraSelectors(QStringList() << lit("dark") << QnResolutionUtil::densityName(densityClass));
 
     QnContext context;
 
@@ -77,7 +80,7 @@ int runApplication(QGuiApplication *application) {
     qmlFileSelector.setSelector(&fileSelector);
 
     engine.rootContext()->setContextObject(&context);
-    engine.rootContext()->setContextProperty(lit("screenPixelDensity"), QGuiApplication::primaryScreen()->physicalDotsPerInch() * QGuiApplication::primaryScreen()->devicePixelRatio());
+    engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::densityMultiplier(densityClass));
 
     QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
     QObject *mainWindow = mainComponent.create();

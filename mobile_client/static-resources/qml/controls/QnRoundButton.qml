@@ -13,8 +13,8 @@ Button {
     property string icon
     property int iconSize: -1
 
-    width: 64
-    height: 64
+    width: CommonFunctions.dp(64)
+    height: CommonFunctions.dp(64)
 
     style: ButtonStyle {
         background: Item {

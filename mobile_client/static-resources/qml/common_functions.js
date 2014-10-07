@@ -1,3 +1,3 @@
 function dp(dpix) {
-    return Math.round(dp * (screenPixelDensity / 160))
+    return Math.round(dpix * screenPixelMultiplier)
 }

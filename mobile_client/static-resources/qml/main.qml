@@ -10,6 +10,9 @@ Window {
     title: "HD Witness"
     visible: true
 
+    width: 480
+    height: 800
+
     QnLoginDialog {
         anchors.fill: parent
     }
