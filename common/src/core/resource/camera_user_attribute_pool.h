@@ -39,13 +39,13 @@ public:
         :
             m_pool( pool ),
             m_key( key ),
-            m_lockedElement( QnCameraUserAttributePool::instance()->lock( key ) )
+            m_lockedElement( pool->lock( key ) )
         {
         }
         ~ScopedLock()
         {
             m_lockedElement = nullptr;
-            QnCameraUserAttributePool::instance()->unlock( m_key );
+            m_pool->unlock( m_key );
         }
 
         MappedType* operator->() { return m_lockedElement; }

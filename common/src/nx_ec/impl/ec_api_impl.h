@@ -163,6 +163,7 @@ namespace ec2
             void emitSaveServerDone( int reqID, const ErrorCode p1, const QnMediaServerResourcePtr& p2) { emit onSaveServerDone( reqID, p1, p2 ); }
             void emitSaveBusinessRuleDone( int reqID, const ErrorCode p1, const QnBusinessEventRulePtr& p2) { emit onSaveBusinessRuleDone( reqID, p1, p2 ); }
             void emitGetServersDone( int reqID, const ErrorCode p1, const QnMediaServerResourceList& p2 ) { emit onGetServersDone( reqID, p1, p2 ); }
+            void emitGetServerUserAttributesDone( int reqID, const ErrorCode p1, const QnMediaServerUserAttributesList& p2 ) { emit onGetServerUserAttributesDone( reqID, p1, p2 ); }
             void emitAddCameraDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( reqID, p1, p2 ); }
             void emitAddUserDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onAddUserDone( reqID, p1, p2 ); }
             void emitGetCamerasDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( reqID, p1, p2 ); }
@@ -195,6 +196,7 @@ namespace ec2
             void onSaveServerDone( int reqID, const ErrorCode, const QnMediaServerResourcePtr&);
             void onSaveBusinessRuleDone( int reqID, const ErrorCode, const QnBusinessEventRulePtr&);
             void onGetServersDone( int reqID, const ErrorCode, const QnMediaServerResourceList& );
+            void onGetServerUserAttributesDone( int reqID, const ErrorCode, const QnMediaServerUserAttributesList& );
             void onAddCameraDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
             void onAddUserDone( int reqID, const ErrorCode, const QnUserResourceList& );
             void onGetCamerasDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
@@ -241,6 +243,7 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER( SaveServer, ErrorCode, QnMediaServerResourcePtr)
         DEFINE_TWO_ARG_HANDLER( SaveResource, ErrorCode, QnResourcePtr)
         DEFINE_TWO_ARG_HANDLER( GetServers, ErrorCode, QnMediaServerResourceList )
+        DEFINE_TWO_ARG_HANDLER( GetServerUserAttributes, ErrorCode, QnMediaServerUserAttributesList )
 
 
         //////////////////////////////////////////////////////////

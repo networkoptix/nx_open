@@ -61,7 +61,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
         return result;
 
     nxcip::CameraInfo cameraInfo;
-    //todo: #a.kolesnikov Check if only url parameter is enough. Create resource SHOULDN'T use a lot of parameters to create new resource instance
+    //TODO #ak restore all resource cameraInfo fields here
     strcpy( cameraInfo.url, params.url.toLatin1().constData() );
 
     nxcip_qt::CameraDiscoveryManager* discoveryManager = NULL;

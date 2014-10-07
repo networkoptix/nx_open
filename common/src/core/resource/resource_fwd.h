@@ -105,6 +105,10 @@ class QnMediaServerResource;
 typedef QnSharedResourcePointer<QnMediaServerResource> QnMediaServerResourcePtr;
 typedef QnSharedResourcePointerList<QnMediaServerResource> QnMediaServerResourceList;
 
+class QnMediaServerUserAttributes;
+typedef QSharedPointer<QnMediaServerUserAttributes> QnMediaServerUserAttributesPtr;
+typedef QList<QnMediaServerUserAttributesPtr> QnMediaServerUserAttributesList;
+
 class QnPlColdStoreStorage;
 typedef QnSharedResourcePointer<QnPlColdStoreStorage> QnPlColdStoreStoragePtr;
 typedef QnSharedResourcePointerList<QnPlColdStoreStorage> QnPlColdStoreStorageList;

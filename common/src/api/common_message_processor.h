@@ -97,6 +97,9 @@ private slots:
     void on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory);
     void on_cameraHistoryRemoved(const QnCameraHistoryItemPtr &cameraHistory);
 
+    void on_mediaServerUserAttributesChanged(const QnMediaServerUserAttributesPtr& userAttributes);
+    void on_mediaServerUserAttributesRemoved(const QnUuid& serverID);
+
     void on_businessEventRemoved(const QnUuid &id);
     void on_businessActionBroadcasted(const QnAbstractBusinessActionPtr &businessAction);
     void on_businessRuleReset(const QnBusinessEventRuleList &rules);
