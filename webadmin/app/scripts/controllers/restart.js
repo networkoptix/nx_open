@@ -1,13 +1,13 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('RestartCtrl', function ($scope, $modalInstance, $interval, mediaserver,data) {
+    .controller('RestartCtrl', function ($scope, $modalInstance, $interval, mediaserver,port) {
         $scope.url = window.location.protocol + "//" + window.location.hostname + ":"
-            + data.port + window.location.pathname + window.location.search;
+            + port + window.location.pathname + window.location.search;
 
         $scope.state = '';
         var statisticUrl = window.location.protocol + "//" + window.location.hostname + ":"
-            + data.port;
+            + port;
 
         var oldUptime = Number.MAX_VALUE;
         var serverWasDown = false;

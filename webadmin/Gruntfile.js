@@ -278,7 +278,20 @@ module.exports = function (grunt) {
                     }
                 ]
             },
-            server: '.tmp'
+            server: '.tmp',
+
+            publish:{
+                files:[
+                    {
+                        dot: true,
+                        src: '<%= yeoman.dist %>/../../mediaserver/maven/bin-resources/resources/static/*'
+                    }
+                ],
+                options: {
+                    force: true
+                }
+            }
+
         },
 
         // Add vendor prefixed styles
@@ -469,6 +482,13 @@ module.exports = function (grunt) {
                 cwd: '<%= yeoman.app %>/styles',
                 dest: '.tmp/styles/',
                 src: '{,*/}*.css'
+            },
+            publish:{
+                expand: true,
+                nonull:true,
+                cwd: '<%= yeoman.app %>/../dist',
+                dest: '../mediaserver/maven/bin-resources/resources/static/',
+                src: '**'
             }
         },
 
@@ -575,5 +595,12 @@ module.exports = function (grunt) {
         'newer:jshint',
         'test',
         'build'
+    ]);
+
+
+    grunt.registerTask('publish', [
+        'build',
+        'clean:publish',
+        'copy:publish'
     ]);
 };
