@@ -162,7 +162,10 @@ void mergeObjectListData(
 
     size_t i = 0;
     size_t j = 0;
+
     while (i < data.size() && j < subDataList.size()) {
+
+
         if (subDataList[j].*parentIdField == data[i].*idField) {
             (data[i].*subDataListField).push_back(subDataList[j]);
             ++j;
@@ -2225,6 +2228,42 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiCameraDataList&
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::getScheduleTasks(const QnUuid& cameraId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList)
+{
+    QString filterStr;
+    if( !cameraId.isNull() )
+        filterStr = QString("WHERE camera_guid = %1").arg(guidToSqlString(cameraId));
+
+    //fetching recording schedule
+    QSqlQuery queryScheduleTask(m_sdb);
+    queryScheduleTask.setForwardOnly(true);
+    queryScheduleTask.prepare(QString("\
+                                      SELECT                                                          \
+                                      r.camera_guid as sourceId,                                  \
+                                      st.start_time as startTime,                                 \
+                                      st.end_time as endTime,                                     \
+                                      st.do_record_audio as recordAudio,                          \
+                                      st.record_type as recordingType,                            \
+                                      st.day_of_week as dayOfWeek,                                \
+                                      st.before_threshold as beforeThreshold,                     \
+                                      st.after_threshold as afterThreshold,                       \
+                                      st.stream_quality as streamQuality,                         \
+                                      st.fps                                                      \
+                                      FROM vms_scheduletask st                                        \
+                                      JOIN vms_camera_user_attributes r on r.id = st.camera_attrs_id  \
+                                      %1                                                              \
+                                      ORDER BY r.camera_guid                                          \
+                                      ").arg(filterStr));
+
+    if (!queryScheduleTask.exec()) {
+        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryScheduleTask.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+
+    QnSql::fetch_many(queryScheduleTask, &scheduleTaskList);
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList)
 {
     //fetching camera user attributes
@@ -2260,34 +2299,10 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributes
      
     QnSql::fetch_many(queryCameras, &cameraUserAttributesList);
 
-    //fetching recording schedule
-    QSqlQuery queryScheduleTask(m_sdb);
-    queryScheduleTask.setForwardOnly(true);
-    queryScheduleTask.prepare(QString("\
-        SELECT                                                          \
-            r.camera_guid as sourceId,                                  \
-            st.start_time as startTime,                                 \
-            st.end_time as endTime,                                     \
-            st.do_record_audio as recordAudio,                          \
-            st.record_type as recordingType,                            \
-            st.day_of_week as dayOfWeek,                                \
-            st.before_threshold as beforeThreshold,                     \
-            st.after_threshold as afterThreshold,                       \
-            st.stream_quality as streamQuality,                         \
-            st.fps                                                      \
-        FROM vms_scheduletask st                                        \
-        JOIN vms_camera_user_attributes r on r.id = st.camera_attrs_id  \
-        %1                                                              \
-        ORDER BY r.camera_guid                                          \
-        ").arg(filterStr));
-
-    if (!queryScheduleTask.exec()) {
-        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryScheduleTask.lastError().text()), cl_logWARNING );
-        return ErrorCode::dbError;
-    }
-
     std::vector<ApiScheduleTaskWithRefData> scheduleTaskList;
-    QnSql::fetch_many(queryScheduleTask, &scheduleTaskList);
+    ErrorCode errCode = getScheduleTasks(cameraId, scheduleTaskList);
+    if (errCode != ErrorCode::ok)
+        return errCode;
 
     //merging data
     mergeObjectListData(
@@ -2358,6 +2373,20 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraDataExList
     QnSql::fetch_many(queryParams, &params);
 
     mergeObjectListData<ApiCameraDataEx>(cameraExList, params, &ApiCameraDataEx::addParams, &ApiResourceParamWithRefData::resourceId);
+
+    std::vector<ApiScheduleTaskWithRefData> scheduleTaskList;
+    ErrorCode errCode = getScheduleTasks(cameraId, scheduleTaskList);
+    if (errCode != ErrorCode::ok)
+        return errCode;
+
+    //merging data
+    mergeObjectListData<ApiCameraDataEx, ApiScheduleTaskWithRefData, ApiScheduleTaskData, ApiCameraDataEx>(
+        cameraExList,
+        scheduleTaskList,
+        &ApiCameraDataEx::scheduleTasks,
+        &ApiCameraDataEx::id,
+        &ApiScheduleTaskWithRefData::sourceId );
+
 
     return ErrorCode::ok;
 }

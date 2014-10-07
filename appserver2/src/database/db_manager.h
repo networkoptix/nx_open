@@ -438,6 +438,7 @@ namespace ec2
         bool afterInstallUpdate(const QString& updateName);
         ErrorCode addCameraHistory(const ApiCameraServerItemData& params);
         ErrorCode removeCameraHistory(const ApiCameraServerItemData& params);
+        ErrorCode getScheduleTasks(const QnUuid& cameraId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;
