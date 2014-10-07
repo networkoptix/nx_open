@@ -3,6 +3,13 @@
 angular.module('webadminApp')
     .controller('AdvancedCtrl', function ($scope, $modal, $log, mediaserver) {
 
+
+        mediaserver.getCurrentUser().success(function(result){
+            if(!result.reply.isAdmin){
+                $location.path("/info"); //no admin rights - redirect
+            }
+        });
+
         function formatUrl(url){
             return decodeURIComponent(url.replace(/file:\/\/.+?:.+?\//gi,""));
         };
