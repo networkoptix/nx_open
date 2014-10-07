@@ -47,12 +47,12 @@ public:
 
     bool operator<( const QnUuid& other ) const
     {
-        return m_uuid.toRfc4122() < other.m_uuid.toRfc4122();
+        return m_uuid < other.m_uuid;
     }
 
     bool operator>( const QnUuid& other ) const
     {
-        return m_uuid.toRfc4122() > other.m_uuid.toRfc4122();
+        return m_uuid > other.m_uuid;
     }
 
     static QnUuid fromRfc4122( const QByteArray& bytes );
