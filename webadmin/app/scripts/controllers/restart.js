@@ -2,19 +2,19 @@
 
 angular.module('webadminApp')
     .controller('RestartCtrl', function ($scope, $modalInstance, $interval, mediaserver,port) {
-        $scope.url = window.location.protocol + "//" + window.location.hostname + ":"
-            + port + window.location.pathname + window.location.search;
 
         $scope.state = '';
         var statisticUrl = window.location.protocol + "//" + window.location.hostname + ":"
             + port;
 
+        $scope.url = statisticUrl + window.location.pathname + window.location.search;
+
+
         var oldUptime = Number.MAX_VALUE;
         var serverWasDown = false;
 
         function reload(){
-            window.location.href = $scope.url;
-            window.location.reload($scope.url);
+            window.location.href = statisticUrl;
             return false;
         }
 
