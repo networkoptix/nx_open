@@ -33,6 +33,7 @@
 #include <core/resource/layout_item_data.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/media_server_user_attributes.h>
 #include <core/resource/camera_history.h>
 
 #include <core/resource/camera_bookmark_fwd.h>
@@ -110,6 +111,10 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnCameraUserAttributes>();
     qRegisterMetaType<QnCameraUserAttributesPtr>();
     qRegisterMetaType<QnCameraUserAttributesList>();
+
+    qRegisterMetaType<QnMediaServerUserAttributes>();
+    qRegisterMetaType<QnMediaServerUserAttributesPtr>();
+    qRegisterMetaType<QnMediaServerUserAttributesList>();
 
     qRegisterMetaType<QnCameraHistoryList>();
     qRegisterMetaType<QnCameraHistoryItemPtr>();
