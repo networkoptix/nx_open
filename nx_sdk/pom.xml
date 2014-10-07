@@ -38,6 +38,28 @@
                 </executions>
             </plugin>         
             <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>pack</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <failOnError>false</failOnError>
+                            <target>							
+                                <chmod file="${project.basedir}/build_sdk.sh" perm="755"/>
+                                <!-- script.extension is set in base pom.xml in profiles: Windows - "bat", Unix - "sh" -->
+			        <exec dir="${project.basedir}" executable="${project.basedir}/build_sdk.${script.extension}" failifexecutionfails="true" />                                        
+                            </target>
+                        </configuration>
+                    </execution>					
+                </executions>
+            </plugin>
+<!--
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
@@ -49,13 +71,12 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <!-- script.extension is set in base pom.xml in profiles: Windows - "bat", Unix - "sh" -->
                             <executable>${project.basedir}/build_sdk.${script.extension}</executable>
                             <workingDirectory>${project.basedir}</workingDirectory>      
                         </configuration>
                     </execution>        
                 </executions>        
-            </plugin>
+            </plugin> -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.2.2</version>
