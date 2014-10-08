@@ -464,6 +464,7 @@ module.exports = function (grunt) {
                             '*.xml',
                             '*.xsl',
                             'views/{,*/}*.html',
+                            'customization/*',
                             //'bower_components/**/*',
                             'images/{,*/}*.{webp}',
                             'fonts/*'
