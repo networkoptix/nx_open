@@ -4,7 +4,7 @@
 #include "storage_manager.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "core/dataprovider/live_stream_provider.h"
-#include "core/resource/resource_fwd.h"
+#include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
