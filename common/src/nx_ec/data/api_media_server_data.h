@@ -46,6 +46,25 @@ namespace ec2
 #define ApiMediaServerUserAttributesData_Fields (serverID)(serverName)(maxCameras)(allowAutoRedundancy)
 
 
+    struct ApiMediaServerDataEx
+    :
+        ApiMediaServerData,
+        ApiMediaServerUserAttributesData
+    {
+        std::vector<ApiResourceParamData> addParams;
+
+        ApiMediaServerDataEx();
+
+        template<class ApiMediaServerDataRefType>
+        ApiMediaServerDataEx( ApiMediaServerDataRefType&& mediaServerData )
+        :
+            ApiMediaServerData( std::forward<ApiMediaServerDataRefType>(mediaServerData) )
+        {
+        }
+    };
+#define ApiMediaServerDataEx_Fields ApiMediaServerData_Fields ApiMediaServerUserAttributesData_Fields (addParams)
+
+
     struct ApiPanicModeData: public ApiData
     {
         Qn::PanicMode mode;

@@ -74,6 +74,7 @@ namespace ec2
             REGISTER_COMMAND(getStorages),
             REGISTER_COMMAND(removeStorage),
             REGISTER_COMMAND(removeStorages),
+            REGISTER_COMMAND(getMediaServersEx),
 
             REGISTER_COMMAND(saveUser),
             REGISTER_COMMAND(getUsers),
