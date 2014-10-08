@@ -104,12 +104,12 @@
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>platforms</qtplugin2>
         <qtplugin3/>    
-	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <build>
-	<defaultGoal>package</defaultGoal>
+    <defaultGoal>package</defaultGoal>
         <finalName>${finalName}</finalName>
         <plugins>
             <plugin>
@@ -127,7 +127,7 @@
                             <files>
                                 <file>${root.dir}/customization/default-values.properties</file>
                                 <file>${customization.dir}/build.properties</file>
-								<file>${customization.dir}/license.properties</file>
+                                <file>${customization.dir}/license.properties</file>
                                 <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
                             </files>
                         </configuration>
@@ -274,7 +274,7 @@
                 <module>build_variables</module>
                 <module>build_environment</module>
                 <module>common</module>
-                <!-- <module>hole_punching_mediator</module> -->
+                <module>hole_punching_mediator</module>
                 <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
             </modules>
@@ -289,7 +289,7 @@
             </activation>
             <modules>
                 <!--<module>plugins/axiscamplugin</module>-->
-				<module>nx_sdk</module>  
+                <module>nx_sdk</module>  
                 <module>plugins/genericrtspplugin</module>
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
@@ -328,7 +328,7 @@
             <modules>     
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
-		<!--<module>vmaxproxy</module>  -->                   
+        <!--<module>vmaxproxy</module>  -->                   
                 <module>client</module>                     
                 <module>wixsetup/wixsetup-server-only</module>
                 <module>wixsetup/wixsetup-client-only</module>
