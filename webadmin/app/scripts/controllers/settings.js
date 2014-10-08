@@ -99,7 +99,12 @@ angular.module('webadminApp')
         }
 
         $scope.save = function () {
-            mediaserver.saveSettings($scope.settings.systemName,$scope.settings.port).success(resultHandler).error(errorHandler);
+
+            if($scope.settingsForm.$valid) {
+                mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).success(resultHandler).error(errorHandler);
+            }else{
+               alert("form is not valid");
+            }
         };
 
         $scope.changePassword = function () {
