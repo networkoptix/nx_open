@@ -1731,7 +1731,12 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUpdateU
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefData>& tran)
 {
-    return insertAddParam(tran.params);
+    if (tran.command == ApiCommand::setResourceParam)
+        return insertAddParam(tran.params);
+    else if (tran.command == ApiCommand::removeResourceParam)
+        return deleteTableRecord(tran.params.resourceId, "vms_kvpair", "resource_guid");
+    else
+        return ErrorCode::notImplemented;
 }
 
 ErrorCode QnDbManager::addCameraHistory(const ApiCameraServerItemData& params)

@@ -95,6 +95,20 @@ namespace ec2
     }
 
     template<class T>
+    int QnResourceManager<T>::removeParams(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        ApiCommand::Value command = ApiCommand::removeResourceParams;
+        auto tran = prepareTransaction( command, kvPairs);
+        ApiResourceParamWithRefDataList outData;
+        outData = kvPairs;
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveKvPairsHandler::done ), handler, reqID, _1, outData) );
+
+        return reqID;
+    }
+
+    template<class T>
     int QnResourceManager<T>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();

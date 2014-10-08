@@ -183,8 +183,12 @@ namespace ec2
         template<class HandlerType>
         void processUpdateAsync(QnTransaction<ApiResourceParamWithRefDataList>& tran, HandlerType handler )
         {
-            Q_ASSERT(tran.command == ApiCommand::setResourceParams);
-            return processMultiUpdateAsync<ApiResourceParamWithRefDataList, ApiResourceParamWithRefData>(tran, handler, ApiCommand::setResourceParam);
+            if(tran.command == ApiCommand::setResourceParams)
+                return processMultiUpdateAsync<ApiResourceParamWithRefDataList, ApiResourceParamWithRefData>(tran, handler, ApiCommand::setResourceParam);
+            else if(tran.command == ApiCommand::removeResourceParams)
+                return processMultiUpdateAsync<ApiResourceParamWithRefDataList, ApiResourceParamWithRefData>(tran, handler, ApiCommand::removeResourceParam);
+            else
+                Q_ASSERT_X(0, "Not implemented!", Q_FUNC_INFO);
         }
 
         template<class QueryDataType, class SubDataType, class HandlerType>

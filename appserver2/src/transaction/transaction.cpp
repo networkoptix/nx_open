@@ -39,6 +39,8 @@ namespace ec2
             REGISTER_COMMAND(setResourceStatus),
             REGISTER_COMMAND(setResourceParams),
             REGISTER_COMMAND(setResourceParam),
+            REGISTER_COMMAND(removeResourceParam),
+            REGISTER_COMMAND(removeResourceParams),
             REGISTER_COMMAND(getResourceParams),
             REGISTER_COMMAND(saveResource),
             REGISTER_COMMAND(removeResource),
@@ -175,6 +177,9 @@ namespace ec2
                 val == removeResource  ||
                 val == setResourceStatus ||
                 val == setResourceParams ||
+                val == setResourceParam ||
+                val == removeResourceParam ||
+                val == removeResourceParams ||
                 val == setPanicMode ||
                 val == saveCamera ||
                 val == saveCameraUserAttributes ||

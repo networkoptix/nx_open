@@ -76,6 +76,8 @@ namespace ec2
         //virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::save
         virtual int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) override;
+        //!Implementation of AbstractResourceManager::removeParams
+        virtual int removeParams(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::remove
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
 

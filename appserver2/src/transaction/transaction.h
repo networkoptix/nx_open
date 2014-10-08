@@ -46,7 +46,9 @@ namespace ec2
             getResourceTypes            = 205,  /*< ApiResourceTypeDataList*/
             getFullInfo                 = 206,  /*< ApiFullInfoData */
             setPanicMode                = 207,  /*< ApiPanicModeData */
-            setResourceParam           = 208,   /*< ApiResourceParamWithRefDataList */
+            setResourceParam            = 208,   /*< ApiResourceParamWithRefData */
+            removeResourceParam         = 209,   /*< ApiResourceParamWithRefData */
+            removeResourceParams        = 210,   /*< ApiResourceParamWithRefDataList */
 
             /* Camera resource */
             getCameras                  = 300,  /*< ApiCameraDataList */
