@@ -28,7 +28,7 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiStorageData>& tran ) {
             assert( tran.command == ApiCommand::saveStorage);
-
+            
             QnResourceTypePtr resType = m_resCtx.resTypePool->getResourceTypeByName(lit("Storage"));
             if (!resType)
                 return;
@@ -37,6 +37,19 @@ namespace ec2
                 QnResourceParams(tran.params.id, tran.params.url, QString())).dynamicCast<QnAbstractStorageResource>();
             fromApiToResource(tran.params, storage);
             emit storageChanged( storage );
+        }
+
+        void triggerNotification( const QnTransaction<ApiStorageDataList>& tran )
+        {
+            QnResourceTypePtr resType = m_resCtx.resTypePool->getResourceTypeByName(lit("Storage"));
+            if (!resType)
+                return;
+            foreach(const ec2::ApiStorageData& apiStorageData, tran.params) {
+                QnAbstractStorageResourcePtr storage = m_resCtx.resFactory->createResource(resType->getId(), 
+                    QnResourceParams(apiStorageData.id, apiStorageData.url, QString())).dynamicCast<QnAbstractStorageResource>();
+                fromApiToResource(apiStorageData, storage);
+                emit storageChanged( storage );
+            }
         }
 
         void triggerNotification( const QnTransaction<ApiIdData>& tran )

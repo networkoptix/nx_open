@@ -1539,6 +1539,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         [this, server]( int reqID, ec2::ErrorCode errorCode ) {
             at_resources_saved( reqID, errorCode, QnResourceList() << server );
         } );
+    server->saveUpdatedStorages();
 }
 
 void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
@@ -1797,7 +1798,6 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
                 QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(mServer->getId()),
                 this,
                 callback );
-            mServer->saveUpdatedStorages();
         }
         if (camera)
             connection2()->getCameraManager()->saveUserAttributes(

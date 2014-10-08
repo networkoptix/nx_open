@@ -71,6 +71,7 @@ namespace ec2
             REGISTER_COMMAND(getServerUserAttributes),
             REGISTER_COMMAND(saveStorage),
             REGISTER_COMMAND(saveStorages),
+            REGISTER_COMMAND(getStorages),
             REGISTER_COMMAND(removeStorage),
             REGISTER_COMMAND(removeStorages),
 

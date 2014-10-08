@@ -130,7 +130,8 @@ namespace ec2
         registerGetFuncHandler<QnUuid, ApiMediaServerUserAttributesDataList>( restProcessorPool, ApiCommand::getServerUserAttributes );
         //AbstractMediaServerManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeMediaServer );
-
+        registerUpdateFuncHandler<ApiStorageDataList>( restProcessorPool, ApiCommand::saveStorages);
+        registerUpdateFuncHandler<ApiStorageData>( restProcessorPool, ApiCommand::saveStorage);
 
         //AbstractCameraManager::addCamera
         registerUpdateFuncHandler<ApiCameraData>( restProcessorPool, ApiCommand::saveCamera );
@@ -152,6 +153,8 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
         //AbstractCameraManager::getCamerasEx
         registerGetFuncHandler<QnUuid, ApiCameraDataExList>( restProcessorPool, ApiCommand::getCamerasEx );
+
+        registerGetFuncHandler<QnUuid, ApiStorageDataList>( restProcessorPool, ApiCommand::getStorages );
 
         //AbstractCameraManager::getBookmarkTags
 

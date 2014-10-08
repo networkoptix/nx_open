@@ -339,8 +339,10 @@ void QnServerSettingsDialog::submitToResources()
             else {
                 QnAbstractStorageResourcePtr storage = m_server->getStorageByUrl(item.url);
                 if (storage) {
-                    storage->setUsedForWriting(item.isUsedForWriting);
-                    newStorages.push_back(storage); // todo: #rvasilenko: temporarty code line. Need remote it after moving 'usedForWriting' to separate property
+                    if (item.isUsedForWriting != storage->isUsedForWriting()) {
+                        storage->setUsedForWriting(item.isUsedForWriting);
+                        newStorages.push_back(storage); // todo: #rvasilenko: temporarty code line. Need remote it after moving 'usedForWriting' to separate property
+                    }
                 }
                 else {
                     // create or remove new storage
