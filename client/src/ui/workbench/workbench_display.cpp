@@ -444,8 +444,7 @@ void QnWorkbenchDisplay::initSceneView() {
     } else {
         /* Never set QObject* parent in the QScopedPointer-stored objects if not sure in the descruction order. */
         m_backgroundPainter = new QnGradientBackgroundPainter(qnSettings->radialBackgroundCycle(), NULL, context());
-        if (action(Qn::ToggleBackgroundAnimationAction)->isChecked())
-            m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
     }
 
     /* Connect to context. */
@@ -485,10 +484,7 @@ void QnWorkbenchDisplay::toggleBackgroundAnimation(bool enabled) {
     if (!m_scene || !m_view || !m_backgroundPainter)
         return;
 
-    if(enabled) 
-        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
-    else 
-        m_view->uninstallLayerPainter(m_backgroundPainter.data());
+    m_backgroundPainter->setEnabled(enabled);
 }
 
 

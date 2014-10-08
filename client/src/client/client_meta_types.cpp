@@ -29,6 +29,7 @@ namespace {
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientSkin)
+QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientBackground)
 
 void QnClientMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK, 
@@ -63,6 +64,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
     qRegisterMetaType<Qn::ClientSkin>();
     qRegisterMetaTypeStreamOperators<Qn::ClientSkin>();
+    qRegisterMetaType<Qn::ClientBackground>();
+    qRegisterMetaTypeStreamOperators<Qn::ClientBackground>();
     qRegisterMetaType<ImageCorrectionParams>();
     qRegisterMetaType<Qn::ActionId>();
     qRegisterMetaType<QnActionParameters>();
@@ -109,6 +112,7 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnVideowallManageWidgetColors>();
 
     QnJsonSerializer::registerSerializer<Qn::ClientSkin>();
+    QnJsonSerializer::registerSerializer<Qn::ClientBackground>();
     QnJsonSerializer::registerSerializer<QnPaletteData>();
     QnJsonSerializer::registerSerializer<QnPenData>();
     QnJsonSerializer::registerSerializer<QVector<QColor> >(); // TODO: #Elric integrate with QVariant iteration?

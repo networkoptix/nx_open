@@ -133,6 +133,8 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     if (!mainWindow())
         return;
 
+    context()->instance<QnWorkbenchStateManager>()->tryClose(true);
+
     /* Get ready for the next connection. */
     m_readyForConnection = true;
 
@@ -184,7 +186,6 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
         });
     }
 
-    context()->instance<QnWorkbenchStateManager>()->tryClose(true);
     qnCommon->setLocalSystemName(QString());
 }
 
