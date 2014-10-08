@@ -353,6 +353,16 @@ protected:
         return socket_;
     }
 
+    enum {
+        HANDSHAKE_UNINITIALIZE,
+        HANDSHAKE_PENDING,
+        HANDSHAKE_DONE
+    };
+
+    void set_handshake_state( int state ) {
+        handshake_state_ = state;
+    }
+
 private:
     bool allow_bio_in_buffer_;
 
@@ -381,11 +391,6 @@ private:
     // choose correct target queued operations. I have no way to make another buffered
     // IO for underlying read/write callback function since the void* user data has been
     // used for other purpose. 
-    enum {
-        HANDSHAKE_UNINITIALIZE,
-        HANDSHAKE_PENDING,
-        HANDSHAKE_DONE
-    };
     int handshake_state_;
     std::mutex handshake_mutex_;
     struct HandshakeQueuedOp {
@@ -443,18 +448,29 @@ private:
 
 void AsyncSSL::OnHandshakeDone( SystemError::ErrorCode ec ) {
     Q_ASSERT( handshake_state_ == HANDSHAKE_PENDING );
+    std::weak_ptr<AsyncSSL> self(shared_from_this());
     if( ec ) {
-        std::lock_guard<std::mutex> lock(handshake_mutex_);
-        handshake_state_ = HANDSHAKE_UNINITIALIZE;
+        {
+            std::lock_guard<std::mutex> lock(handshake_mutex_);
+            handshake_state_ = HANDSHAKE_UNINITIALIZE;
+        }
         for( auto& op : handshake_queue_ ) {
             op.ssl_op->OnHandshakeFail( ec );
+            if(self.expired()) {
+                return;
+            }
         }
         handshake_queue_.clear();
     } else {
-        std::lock_guard<std::mutex> lock(handshake_mutex_);
-        handshake_state_ = HANDSHAKE_DONE;
+        {
+            std::lock_guard<std::mutex> lock(handshake_mutex_);
+            handshake_state_ = HANDSHAKE_DONE;
+        }
         for( auto& op : handshake_queue_ ) {
             op.callback();
+            if(self.expired()) {
+                return;
+            }
         }
         handshake_queue_.clear();
     }
@@ -973,7 +989,6 @@ public:
         case SUCCESS:
             user_callback_( 0 );
             return;
-            return;
         default:
             Q_ASSERT(0); return;
         }
@@ -1034,6 +1049,7 @@ void AsyncSSL::PerformSSLConn() {
 }
 
 void AsyncSSL::Perform( std::shared_ptr<AsyncSSLOperation> op , bool is_read ) {
+    bool issue_ssl_conn = false;
     if( handshake_state_ != HANDSHAKE_DONE ) {
         std::lock_guard<std::mutex> lock(handshake_mutex_);
         switch(handshake_state_) {
@@ -1042,7 +1058,7 @@ void AsyncSSL::Perform( std::shared_ptr<AsyncSSLOperation> op , bool is_read ) {
         case HANDSHAKE_UNINITIALIZE:
             // Issue the Handshake operations 
             handshake_state_ = HANDSHAKE_PENDING;
-            PerformSSLConn();
+            issue_ssl_conn = true;
             // Fallen through to enqueue this operations
         case HANDSHAKE_PENDING:
             handshake_queue_.push_back(
@@ -1055,15 +1071,19 @@ void AsyncSSL::Perform( std::shared_ptr<AsyncSSLOperation> op , bool is_read ) {
                     }
                 },
                 op));
-                return;
+                break;
         default: Q_ASSERT(0); return;
         }
     }
-    Q_ASSERT(SSL_is_init_finished(ssl_));
-    if( is_read ) {
-        PerformSSLRead(op);
-    } else {
-        PerformSSLWrite(op);
+    if( issue_ssl_conn ) {
+        PerformSSLConn();
+    }
+    if( handshake_state_ == HANDSHAKE_DONE ) {
+        if( is_read ) {
+            PerformSSLRead(op);
+        } else {
+            PerformSSLWrite(op);
+        }
     }
 }
 
@@ -1152,6 +1172,7 @@ public:
     void set_ssl( bool ssl ) {
         is_initialized_ = true;
         is_ssl_ = ssl;
+        AsyncSSL::set_handshake_state(AsyncSSL::HANDSHAKE_DONE);
     }
 
 
