@@ -18,9 +18,10 @@ extern "C"
 #include <core/dataconsumer/abstract_data_consumer.h>
 #include <core/datapacket/audio_data_packet.h>
 #include <core/datapacket/video_data_packet.h>
-#include <core/resource/resource.h>
+
+#include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
-#include <core/resource/storage_resource.h>
+
 #include "utils/color_space/image_correction.h"
 #include "core/resource/resource_consumer.h"
 

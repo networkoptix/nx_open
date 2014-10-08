@@ -12,14 +12,7 @@
 #include "business/business_fwd.h"
 
 class QnAbstractArchiveDelegate;
-
-class QnDataProviderFactory {
-public:
-    virtual ~QnDataProviderFactory() {}
-
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role) = 0;
-};
-
+class QnDataProviderFactory;
 
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     typedef QnNetworkResource base_type;
