@@ -3,7 +3,8 @@
 
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
-#include "core/resource/resource.h"
+
+#include <core/resource/resource_fwd.h>
 #include "camera/video_camera.h"
 
 #define qnCameraPool QnVideoCameraPool::instance()

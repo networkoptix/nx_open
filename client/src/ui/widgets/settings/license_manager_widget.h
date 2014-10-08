@@ -35,7 +35,6 @@ private slots:
     void updateDetailsButtonEnabled();
 
     void at_downloadError();
-    void at_downloadFinished();
     void at_licensesReceived(int handle, ec2::ErrorCode errorCode, QnLicenseList licenses);
     void at_licenseDetailsButton_clicked();
     void at_removeButton_clicked();
@@ -49,7 +48,8 @@ signals:
     void showMessageLater(const QString &title, const QString &message, bool warning);
 
 private:
-    void updateFromServer(const QByteArray &licenseKey, bool infoMode);
+    void updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url);
+    void processReply(QNetworkReply *reply, const QByteArray& licenseKey, const QUrl &url);
     void validateLicenses(const QByteArray& licenseKey, const QList<QnLicensePtr> &licenses);
     void showLicenseDetails(const QnLicensePtr &license);
 
@@ -62,7 +62,6 @@ private:
     QScopedPointer<QnLicenseUsageHelper> m_videowallUsageHelper;
     QNetworkAccessManager *m_httpClient;
     QnLicenseList m_licenses;
-    QMap<QNetworkReply*, QByteArray> m_replyKeyMap;
     QMap<int, QByteArray> m_handleKeyMap;
 };
 

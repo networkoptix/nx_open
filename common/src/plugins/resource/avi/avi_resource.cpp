@@ -26,6 +26,7 @@ QnAviResource::QnAviResource(const QString& file)
     if (FileTypeSupport::isImageFileExt(file)) 
         addFlags(Qn::still_image);
     m_timeZoneOffset = Qn::InvalidUtcOffset;
+    setId(guidFromArbitraryData(getUniqueId().toUtf8()));
 }
 
 QnAviResource::~QnAviResource()
@@ -55,9 +56,6 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Qn::Conn
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
 
     result->setArchiveDelegate(createArchiveDelegate());
-    if (hasFlags(Qn::still_image) || hasFlags(Qn::utc))
-        result->setCycleMode(false);
-
     return result;
 }
 

@@ -1,0 +1,21 @@
+<header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" title="IP: {{settings.remoteAddresses}}" data-toggle="tooltip" data-placement="bottom" >Administration: {{settings.name}}</a>
+        </div>
+        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+
+            <ul class="nav navbar-nav navbar-right">
+
+                <!-- <li class="active"><a ng-href="#">Home</a></li> -->
+                <li ng-hide="!user.isAdmin" ng-class="{active:isActive('/settings')}"><a ng-href="#/settings/">Settings</a></li>
+                <li ng-class="{active:isActive('/info')}"><a ng-href="#/info/">Information</a></li>
+                <li ng-class="{active:isActive('/webclient')}"><a ng-href="#/webclient/">Web client</a></li>
+                <li ng-class="{active:isActive('/developers')}"><a ng-href="#/developers/">For Developers</a></li>
+                <li ng-class="{active:isActive('/help')}"><a ng-href="#/help/">Help</a></li>
+
+
+            </ul>
+        </nav>
+    </div>
+</header>

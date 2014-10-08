@@ -15,8 +15,10 @@
 #include <QtWidgets/QMenu>
 
 #include <core/dataprovider/abstract_streamdataprovider.h>
+
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 
 #include <camera/resource_display.h>
 
@@ -72,6 +74,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/counter.h>
 #include <client/client_settings.h>
 
 #include "watchers/workbench_render_watcher.h"
@@ -299,7 +302,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     QGraphicsLayout::setInstantInvalidatePropagation(true);
 
     /* Install and configure instruments. */
-    m_fpsCountingInstrument = new FpsCountingInstrument(333, this);
+    m_fpsCountingInstrument = new FpsCountingInstrument(1000, this);
     m_controlsActivityInstrument = new ActivityListenerInstrument(true, hideConstrolsTimeoutMSec, this);
 
     m_instrumentManager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
@@ -308,7 +311,12 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityStopped,   this,     &QnWorkbenchUi::at_activityStopped);
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityResumed,   this,     &QnWorkbenchUi::at_activityStarted);
     connect(m_fpsCountingInstrument,    &FpsCountingInstrument::fpsChanged,               this,     [this](qreal fps) {
+#ifdef QN_SHOW_FPS_MS
+        QString fmt = lit("%1 (%2ms)");
+        m_fpsItem->setText(fmt.arg(QString::number(fps, 'g', 4)).arg(QString::number(1000 / fps, 'g', 4)));
+#else
         m_fpsItem->setText(QString::number(fps, 'g', 4));
+#endif
         m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
     });
 
@@ -1111,13 +1119,48 @@ void QnWorkbenchUi::createTreeWidget() {
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeShowButton));
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treePinButton));
 
+
+    {
+        /* Do not auto-hide tree if we have opened context menu. */
+        auto connectTreeHidingProcessor = [this] {
+            connect(m_treeHidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this, [this](){ if(!isTreePinned()) setTreeOpened(false);});
+        };
+
+        QnSingleEventSignalizer *treeMenuSignalizer = new QnSingleEventSignalizer(this);
+        treeMenuSignalizer->setEventType(QEvent::GraphicsSceneContextMenu);
+        m_treeItem->installEventFilter(treeMenuSignalizer);
+        connect(treeMenuSignalizer,         &QnAbstractEventSignalizer::activated,  this,   [this, connectTreeHidingProcessor] {
+            if (isTreePinned() || !isTreeOpened())
+                return;
+
+            disconnect(m_treeHidingProcessor,  &HoverFocusProcessor::hoverFocusLeft, this, NULL);
+
+            QnCounter* counter = new QnCounter(1, this);
+            connect(menu(), &QnActionManager::menuAboutToShow, counter, &QnCounter::increment);
+            connect(menu(), &QnActionManager::menuAboutToHide, counter, &QnCounter::decrement);
+            connect(counter, &QnCounter::reachedZero, this, [this, connectTreeHidingProcessor]{
+                connectTreeHidingProcessor();
+                m_treeHidingProcessor->forceFocusLeave();
+            });
+            connect(counter, &QnCounter::reachedZero, counter, &QObject::deleteLater);
+
+            /* Make sure counter will be triggered even if no menu created. */
+            QTimer* nullMenuTimer = new QTimer(this);
+            nullMenuTimer->setSingleShot(true);
+            nullMenuTimer->setInterval(500);
+            connect(nullMenuTimer, &QTimer::timeout, counter, &QnCounter::decrement);
+            connect(nullMenuTimer, &QTimer::timeout, nullMenuTimer, &QObject::deleteLater);
+            nullMenuTimer->start();
+        });
+        connectTreeHidingProcessor();
+    }
+
     connect(m_treeWidget,               &QnResourceBrowserWidget::selectionChanged, action(Qn::SelectionChangeAction),  &QAction::trigger);
     connect(m_treeWidget,               &QnResourceBrowserWidget::activated,        this,                               &QnWorkbenchUi::at_treeWidget_activated);
     connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverLeft,            this,                               &QnWorkbenchUi::updateTreeOpacityAnimated);
     connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverEntered,         this,                               &QnWorkbenchUi::updateTreeOpacityAnimated);
     connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverEntered,         this,                               &QnWorkbenchUi::updateControlsVisibilityAnimated);
     connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverLeft,            this,                               &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_treeHidingProcessor,      &HoverFocusProcessor::hoverFocusLeft,       this,                               [this](){ if(!isTreePinned()) setTreeOpened(false);});
     connect(m_treeShowingProcessor,     &HoverFocusProcessor::hoverEntered,         this,                               &QnWorkbenchUi::at_treeShowingProcessor_hoverEntered);
     connect(m_treeItem,                 &QnMaskedProxyWidget::paintRectChanged,     this,                               &QnWorkbenchUi::at_treeItem_paintGeometryChanged);
     connect(m_treeItem,                 &QGraphicsWidget::geometryChanged,          this,                               &QnWorkbenchUi::at_treeItem_paintGeometryChanged);
@@ -1362,6 +1405,8 @@ void QnWorkbenchUi::createTitleWidget() {
     connect(m_titleOpacityProcessor,    &HoverFocusProcessor::hoverLeft,        this,   &QnWorkbenchUi::updateControlsVisibilityAnimated);
     connect(m_titleItem,                &QGraphicsWidget::geometryChanged,      this,   &QnWorkbenchUi::at_titleItem_geometryChanged);
 #ifndef Q_OS_MACX
+    connect(m_tabBarWidget,             &QnLayoutTabBar::tabCloseRequested,     m_titleItem,    &QnClickableWidget::skipDoubleClick);
+    connect(m_tabBarWidget,             &QnLayoutTabBar::currentChanged,        m_titleItem,    &QnClickableWidget::skipDoubleClick);
     connect(m_titleItem,                &QnClickableWidget::doubleClicked,      action(Qn::EffectiveMaximizeAction), &QAction::toggle);
 #endif
     connect(titleMenuSignalizer,        &QnAbstractEventSignalizer::activated,  this,   &QnWorkbenchUi::at_titleItem_contextMenuRequested);

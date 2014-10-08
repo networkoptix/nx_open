@@ -2,7 +2,7 @@
 #define __DISTRIBUTED_MUTEX_H_
 
 #include <QtCore/QObject>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QSet>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QTimer>
@@ -17,7 +17,7 @@ namespace ec2
 
     struct LockRuntimeInfo: public ApiLockData
     {
-        LockRuntimeInfo(const QUuid& _peer = QUuid(), qint64 _timestamp = 0, const QString& _name = QString()) {
+        LockRuntimeInfo(const QnUuid& _peer = QnUuid(), qint64 _timestamp = 0, const QString& _name = QString()) {
             peer = _peer;
             timestamp = _timestamp;
             name = _name;
@@ -27,7 +27,7 @@ namespace ec2
         bool operator<(const LockRuntimeInfo& other) const  { return timestamp != other.timestamp ? timestamp < other.timestamp : peer < other.peer; }
         bool operator==(const LockRuntimeInfo& other) const { return timestamp == other.timestamp && peer == other.peer; }
         bool isEmpty() const { return peer.isNull(); }
-        void clear()         { peer = QUuid(); }
+        void clear()         { peer = QnUuid(); }
     };
 
     /*
@@ -66,14 +66,14 @@ namespace ec2
     private:
         bool isAllPeersReady() const;
         void checkForLocked();
-        void sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QUuid& dstPeer);
+        void sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QnUuid& dstPeer);
         void unlockInternal();
     private:
         QString m_name;
         LockRuntimeInfo m_selfLock;
         typedef QMap<LockRuntimeInfo, int> LockedMap;
         LockedMap m_peerLockInfo;
-        QSet<QUuid> m_proccesedPeers;
+        QSet<QnUuid> m_proccesedPeers;
         QTimer* m_timer;
         mutable QMutex m_mutex;
         bool m_locked;
@@ -96,37 +96,6 @@ namespace ec2
         virtual ~QnMutexUserDataHandler() {}
         virtual QByteArray getUserData(const QString& name) = 0;
         virtual bool checkUserData(const QString& name, const QByteArray& data) = 0;
-    };
-
-    class QnDistributedMutexManager: public QObject
-    {
-        Q_OBJECT
-    public:
-        static const int DEFAULT_TIMEOUT = 1000 * 30;
-
-        QnDistributedMutexManager();
-        QnDistributedMutex* createMutex(const QString& name);
-
-        static void initStaticInstance(QnDistributedMutexManager*);
-        static QnDistributedMutexManager* instance();
-
-        void setUserDataHandler(QnMutexUserDataHandler* userDataHandler);
-    private:
-        qint64 newTimestamp();
-    private:
-        friend class QnDistributedMutex;
-
-        void at_gotLockRequest(ApiLockData lockInfo);
-        void at_gotLockResponse(ApiLockData lockInfo);
-        //void at_gotUnlockRequest(ApiLockData lockInfo);
-        void at_newPeerFound(QUuid peer);
-        void at_peerLost(QUuid peer);
-        void releaseMutex(const QString& name);
-    private:
-        QMap<QString, QnDistributedMutex*> m_mutexList;
-        mutable QMutex m_mutex;
-        qint64 m_timestamp;
-        QnMutexUserDataHandler* m_userDataHandler;
     };
 
 }

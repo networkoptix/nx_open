@@ -118,15 +118,7 @@ bool QnWorkbenchUserWatcher::reconnectRequired(const QnUserResourcePtr &user) {
         return m_userPasswordHash != user->getHash();
 
     // password was just changed by the user
-    QList<QByteArray> values =  user->getHash().split(L'$');
-    if (values.size() != 3)
-        return true;
-
-    QByteArray salt = values[1];
-    QCryptographicHash md5(QCryptographicHash::Md5);
-    md5.addData(salt);
-    md5.addData(m_userPassword.toUtf8());
-    if (md5.result().toHex() != values[2])
+    if (!user->checkPassword(m_userPassword))
         return true;
 
     m_userPasswordHash = user->getHash();

@@ -37,11 +37,6 @@ int QnPlVmax480Resource::getMaxFps() const
     return 30;
 }
 
-bool QnPlVmax480Resource::isResourceAccessible() 
-{
-    return true;
-}
-
 QString QnPlVmax480Resource::getDriverName() const 
 {
     return MANUFACTURE;
@@ -53,15 +48,14 @@ void QnPlVmax480Resource::setIframeDistance(int frames, int timems)
     Q_UNUSED(timems)
 }
 
-bool QnPlVmax480Resource::setHostAddress(const QString &ip, QnDomain domain) 
+void QnPlVmax480Resource::setHostAddress(const QString &ip) 
 {
     QString oldHostAddr = getHostAddress();
 
-    Q_UNUSED(domain)
     QUrl url(getUrl());
 
     if (url.host() == ip)
-        return true;
+        return;
 
     url.setHost(ip);
     setUrl(url.toString());
@@ -73,8 +67,6 @@ bool QnPlVmax480Resource::setHostAddress(const QString &ip, QnDomain domain)
             m_chunkReaderMap.insert(getHostAddress(), m_chunkReader);
         }
     }
-
-    return true;
 }
 
 int QnPlVmax480Resource::channelNum() const
@@ -125,8 +117,6 @@ QnAbstractStreamDataProvider* QnPlVmax480Resource::createArchiveDataProvider()
     QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
     QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
     archiveReader->setArchiveDelegate(archiveDelegate);
-    if (hasFlags(still_image) || hasFlags(utc))
-        archiveReader->setCycleMode(false);
     return archiveReader;
 }
 
@@ -201,11 +191,6 @@ void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUs
                 otherRes.dynamicCast<QnPlVmax480Resource>()->setArchiveRange(startTimeUsec, endTimeUsec, false);
         }
     }
-}
-
-void QnPlVmax480Resource::setStatus(Status newStatus, bool silenceMode)
-{
-    QnPhysicalCameraResource::setStatus(newStatus, silenceMode);
 }
 
 QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)

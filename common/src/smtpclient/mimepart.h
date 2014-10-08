@@ -42,7 +42,6 @@ public:
     /* [1] Constructors and Destructors */
 
     MimePart();
-    ~MimePart();
 
     /* [1] --- */
 

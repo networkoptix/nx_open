@@ -16,7 +16,7 @@ protected:
     virtual void run() override;
     virtual void pleaseStop() override;
     bool processRequest();
-    bool authenticate();
+    bool authenticate(QnUuid* userId);
 private:
     Q_DECLARE_PRIVATE(QnUniversalRequestProcessor);
 };

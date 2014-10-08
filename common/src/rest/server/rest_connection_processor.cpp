@@ -19,7 +19,7 @@ void QnRestProcessorPool::registerHandler( const QString& path, QnRestRequestHan
 
 QnRestRequestHandlerPtr QnRestProcessorPool::findHandler( QString path ) const
 {
-    if (path.startsWith(L'/'))
+    while (path.startsWith(L'/'))
         path = path.mid(1);
     if (path.endsWith(L'/'))
         path = path.left(path.length()-1);
@@ -96,10 +96,10 @@ void QnRestConnectionProcessor::run()
     if (handler) 
     {
         if (d->request.requestLine.method.toUpper() == "GET") {
-            rez = handler->executeGet(url.path(), params, d->responseBody, contentType);
+            rez = handler->executeGet(url.path(), params, d->responseBody, contentType, this);
         }
         else if (d->request.requestLine.method.toUpper() == "POST") {
-            rez = handler->executePost(url.path(), params, d->requestBody, nx_http::getHeaderValue(d->request.headers, "Content-Type"), d->responseBody, contentType);
+            rez = handler->executePost(url.path(), params, d->requestBody, nx_http::getHeaderValue(d->request.headers, "Content-Type"), d->responseBody, contentType, this);
         }
         else {
             qWarning() << "Unknown REST method " << d->request.requestLine.method;
@@ -120,4 +120,10 @@ void QnRestConnectionProcessor::run()
         }
     }
     sendResponse(rez, contentType, contentEncoding, false);
+}
+
+QnUuid QnRestConnectionProcessor::authUserId() const
+{
+    Q_D(const QnRestConnectionProcessor);
+    return d->authUserId;
 }

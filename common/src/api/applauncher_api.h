@@ -9,6 +9,7 @@
 #include <QtCore/QStringList>
 
 #include <utils/network/http/qnbytearrayref.h>
+#include <utils/common/software_version.h>
 
 
 namespace applauncher
@@ -22,8 +23,10 @@ namespace applauncher
                 startApplication,
                 quit,
                 install,
+                installZip,
                 getInstallationStatus,
                 isVersionInstalled,
+                getInstalledVersions,
                 cancelInstallation,
                 addProcessKillTimer,
                 invalidTaskType
@@ -54,18 +57,17 @@ namespace applauncher
             public BaseTask
         {
         public:
-            //!Version in format 1.4.3
-            QString version;
+            QnSoftwareVersion version;
             //!Command-line params to pass to application instance
             QString appArgs;
             bool autoRestore;
 
             StartApplicationTask();
             StartApplicationTask(
-                const QString& _version,
+                const QnSoftwareVersion& _version,
                 const QString& _appParams );
             StartApplicationTask(
-                const QString& _version,
+                const QnSoftwareVersion& _version,
                 const QStringList& _appParams );
 
             virtual QByteArray serialize() const override;
@@ -77,14 +79,13 @@ namespace applauncher
             public BaseTask
         {
         public:
-            //!Version in format 1.4
-            QString version;
+            QnSoftwareVersion version;
             //!Module name for install. By default, "client". For future use
             QString module;
             bool autoStart;
 
             StartInstallationTask();
-            StartInstallationTask( const QString& _version, bool _autoStart = false );
+            StartInstallationTask( const QnSoftwareVersion& _version, bool _autoStart = false );
 
             //!Implementation of \a BaseTask::serialize()
             virtual QByteArray serialize() const override;
@@ -104,18 +105,42 @@ namespace applauncher
             virtual bool deserialize( const QnByteArrayConstRef& data ) override;
         };
 
+        class InstallZipTask
+        :
+            public BaseTask
+        {
+        public:
+            QnSoftwareVersion version;
+            QString zipFileName;
+
+            InstallZipTask();
+            InstallZipTask( const QnSoftwareVersion &version, const QString &zipFileName );
+
+            virtual QByteArray serialize() const override;
+            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
+        };
+
         class IsVersionInstalledRequest
         :
             public BaseTask
         {
         public:
-            //!Version in format 1.4
-            QString version;
+            QnSoftwareVersion version;
 
             IsVersionInstalledRequest();
 
             virtual QByteArray serialize() const override;
             virtual bool deserialize( const QnByteArrayConstRef& data ) override;
+        };
+
+        class GetInstalledVersionsRequest
+        :
+            public BaseTask {
+        public:
+            GetInstalledVersionsRequest();
+
+            virtual QByteArray serialize() const override;
+            virtual bool deserialize(const QnByteArrayConstRef &data) override;
         };
 
         namespace ResultType
@@ -220,6 +245,19 @@ namespace applauncher
 
             virtual QByteArray serialize() const override;
             virtual bool deserialize( const QnByteArrayConstRef& data ) override;
+        };
+
+        class GetInstalledVersionsResponse
+        :
+            public Response
+        {
+        public:
+            QList<QnSoftwareVersion> versions;
+
+            GetInstalledVersionsResponse();
+
+            virtual QByteArray serialize() const override;
+            virtual bool deserialize(const QnByteArrayConstRef &data) override;
         };
 
         class CancelInstallationRequest

@@ -75,19 +75,26 @@ namespace ec2
         return AbstractUpdatesManagerPtr();
     }
 
+    AbstractMiscManagerPtr OldEcConnection::getMiscManager()
+    {
+        return AbstractMiscManagerPtr();
+    }
+
+    AbstractDiscoveryManagerPtr OldEcConnection::getDiscoveryManager()
+    {
+        return AbstractDiscoveryManagerPtr();
+    }
+
+    AbstractTimeManagerPtr OldEcConnection::getTimeManager()
+    {
+        return AbstractTimeManagerPtr();
+    }
+
     int OldEcConnection::setPanicMode(Qn::PanicMode /*value*/, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
         QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
         QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented));
-        return reqID;
-    }
-
-    int OldEcConnection::getCurrentTime(impl::CurrentTimeHandlerPtr handler)
-    {
-        const int reqID = generateRequestID();
-        QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
-        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::CurrentTimeHandler::done, handler, reqID, ec2::ErrorCode::notImplemented, 0));
         return reqID;
     }
 
@@ -107,7 +114,7 @@ namespace ec2
         return reqID;
     }
 
-    void OldEcConnection::addRemotePeer(const QUrl& /*url*/, const QUuid& /*peerGuid*/)
+    void OldEcConnection::addRemotePeer(const QUrl& /*url*/)
     {
     }
 

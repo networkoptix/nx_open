@@ -11,7 +11,7 @@
 
 #include "axis_resource.h"
 #include "axis_resource.h"
-#include "version.h"
+#include <utils/common/app_info.h>
 static const char AXIS_SEI_UUID[] = "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa";
 static const int AXIS_SEI_PRODUCT_INFO = 0x0a00;
 static const int AXIS_SEI_TIMESTAMP = 0x0a01;
@@ -66,11 +66,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
 
     int channels = 1;
     if (res->hasParam(QLatin1String("channelsAmount")))
-    {
-        QVariant val;
-        res->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
-        channels = val.toUInt();
-    }
+        channels = res->getProperty(lit("channelsAmount")).toUInt();
 
 
     QByteArray profileNumber("S");
@@ -87,12 +83,12 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
 
     if (role == Qn::CR_LiveVideo)
     {
-        profileName = QString(lit("%1Primary%2")).arg(lit(QN_PRODUCT_NAME_SHORT)).arg(profileSufix).toUtf8();
-        profileDescription = QString(lit("%1 Primary Stream")).arg(lit(QN_PRODUCT_NAME_SHORT)).toUtf8();
+        profileName = lit("%1Primary%2").arg(QnAppInfo::productNameShort()).arg(profileSufix).toUtf8();
+        profileDescription = QString(lit("%1 Primary Stream")).arg(QnAppInfo::productNameShort()).toUtf8();
     }
     else {
-        profileName = QString(lit("%1Secondary%2")).arg(lit(QN_PRODUCT_NAME_SHORT)).arg(profileSufix).toUtf8();
-        profileDescription = QString(lit("%1 Secondary Stream")).arg(lit(QN_PRODUCT_NAME_SHORT)).toUtf8();
+        profileName = lit("%1Secondary%2").arg(QnAppInfo::productNameShort()).arg(profileSufix).toUtf8();
+        profileDescription = QString(lit("%1 Secondary Stream")).arg(QnAppInfo::productNameShort()).toUtf8();
     }
 
 

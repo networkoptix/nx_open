@@ -18,13 +18,14 @@
 #include "core/resource/storage_resource.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource_management/resource_pool.h"
+#include <core/resource_management/resource_properties.h>
 #include "core/resource_management/resource_searcher.h"
 #include "plugins/storage/dts/abstract_dts_searcher.h"
 #include "common/common_module.h"
 #include "data_only_camera_resource.h"
+#include "media_server/settings.h"
 
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
-static const int MSERVER_OFFLINE_TIMEOUT = 1000 * 60 * 5;
 
 QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
 :
@@ -32,6 +33,8 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
 {
     netStateTime.restart();
     connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected, qnBusinessRuleConnector, &QnBusinessEventConnector::at_cameraDisconnected);
+    m_serverOfflineTimeout = MSSettings::roSettings()->value("redundancyTimeout", 20).toInt() * 1000;
+    m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
 }
 
 QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
@@ -39,7 +42,7 @@ QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
     stop();
 }
 
-QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QUuid &resourceTypeId, const QnResourceParams &params)
+QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QnUuid &resourceTypeId, const QnResourceParams &params)
 {
     QnResourcePtr res = QnResourceDiscoveryManager::createResource( resourceTypeId, params );
     if( res )
@@ -64,33 +67,49 @@ static void printInLogNetResources(const QnResourceList& resources)
 
 }
 
-bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnResourcePtr& camera)
+bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt)
 {
-#ifdef EDGE_SERVER
-    // return own camera back for edge server
-    char  mac[MAC_ADDR_LEN];
-    char* host = 0;
-    getMacFromPrimaryIF(mac, &host);
-    if (camera->getUniqueId().toLocal8Bit() == QByteArray(mac))
-        return true;
-#endif
-
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
-    if (!mServer || mServer->getStatus() == Qn::Online)
+    if (!camera)
         return false;
-    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
-    if (!ownServer || !ownServer->isRedundancy())
+
+    QnUuid ownGuid = qnCommon->moduleGUID();
+    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(ownGuid).dynamicCast<QnMediaServerResource>();
+    if (!mServer || !ownServer)
+        return false;
+
+#ifdef EDGE_SERVER
+    if (!ownServer->isRedundancy()) 
+    {
+        // return own camera back for edge server
+        char  mac[MAC_ADDR_LEN];
+        char* host = 0;
+        getMacFromPrimaryIF(mac, &host);
+        return (camera->getUniqueId().toLocal8Bit() == QByteArray(mac));
+    }
+#endif
+    if ((mServer->getServerFlags() & Qn::SF_Edge) && !mServer->isRedundancy())
+        return false; // do not transfer cameras from edge server
+
+    if (camera->preferedServerId() == ownGuid)
+        return true;
+    else if (mServer->getStatus() == Qn::Online)
+        return false;
+
+    if (!ownServer->isRedundancy())
         return false; // redundancy is disabled
 
-    if (qnResPool->getAllCameras(ownServer).count() >= ownServer->getMaxCameras())
+    if (qnResPool->getAllCameras(ownServer, true).size() + awaitingToMoveCameraCnt >= ownServer->getMaxCameras())
         return false;
     
-    return mServer->currentStatusTime() > MSERVER_OFFLINE_TIMEOUT;
+    return mServer->currentStatusTime() > m_serverOfflineTimeout;
 }
 
 bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
 {
     QMutexLocker lock(&m_discoveryMutex);
+
+    QnResourceList extraResources;
 
     if (netStateTime.elapsed() > NETSTATE_UPDATE_TIME) {
         netState.updateNetState();
@@ -129,7 +148,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         if (rpResource->hasFlags(Qn::foreigner))
         {
-            if (!canTakeForeignCamera(rpResource)) 
+            if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size())) 
             {
                 it = resources.erase(it); // do not touch foreign resource
                 continue;
@@ -145,37 +164,34 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 ipsList[ips].insert(newNetRes);
         }
 
-        if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || rpResource->hasFlags(Qn::foreigner))
+        bool isForeign = rpResource->hasFlags(Qn::foreigner);
+        QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
+        if (existCamRes)
         {
-            QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
-            if (existCamRes)
+            QnUuid newTypeId = newNetRes->getTypeId();
+            bool updateTypeId = existCamRes->getTypeId() != newNetRes->getTypeId() && !newNetRes->isAbstractResource();
+            if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || isForeign || updateTypeId)
             {
-                if (existCamRes->getTypeId() != newNetRes->getTypeId() && !newNetRes->isAbstractResource()) {
-                    QUuid newTypeId = newNetRes->getTypeId();
+                if (isForeign || updateTypeId) {
                     newNetRes->update(existCamRes);
                     newNetRes->setParentId(qnCommon->moduleGUID());
                     newNetRes->setFlags(existCamRes->flags() & ~Qn::foreigner);
                     newNetRes->setId(existCamRes->getId());
-                    newNetRes->setTypeId(newTypeId);
-                    qnResPool->removeResource(existCamRes);
-                    qnResPool->addResource(newCamRes);
-                    rpNetRes = existCamRes = newCamRes;
+                    newNetRes->addFlags(Qn::parent_change);
+                    if (updateTypeId)
+                        newNetRes->setTypeId(newTypeId);
+                    extraResources << newNetRes;
                 }
                 else {
-                    existCamRes->setParentId(qnCommon->moduleGUID());
-                    existCamRes->setFlags(existCamRes->flags() & ~Qn::foreigner);
-
+                    QByteArray errorString;
+                    QnVirtualCameraResourceList cameras;
+                    ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
+                    const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( existCamRes, &cameras );
+                    if( errorCode != ec2::ErrorCode::ok )
+                        NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+                    propertyDictionary->saveParams( existCamRes->getId() );
                 }
-                
-                QByteArray errorString;
-                QnVirtualCameraResourceList cameras;
-                ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
-                const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( existCamRes, &cameras );
-                if( errorCode != ec2::ErrorCode::ok )
-                    NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
-                    
             }
-
         }
 
         // seems like resource is in the pool and has OK ip
@@ -214,7 +230,10 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     printInLogNetResources(resources);
 
     if (resources.isEmpty())
+    {
+        resources << extraResources;
         return true;
+    }
 
 
 
@@ -233,6 +252,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         }
     }
     resources = swapList;
+
+    resources << extraResources;
 
     if (resources.size())
     {

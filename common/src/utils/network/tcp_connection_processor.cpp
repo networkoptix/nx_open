@@ -13,7 +13,8 @@
 #   include <netinet/tcp.h>
 #endif
 
-static const int MAX_REQUEST_SIZE = 1024*1024*15;
+// we need enough size for updates
+static const int MAX_REQUEST_SIZE = 1024*1024*100;
 
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket):
@@ -146,10 +147,6 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
         sended = d->socket->send(data, size);
         if( sended <= 0 )
             break;
-
-#ifdef DEBUG_RTSP
-        dumpRtspData(data, sended);
-#endif
         data += sended;
         size -= sended;
     }
@@ -181,6 +178,10 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
     d->response.statusLine.version = d->request.requestLine.version;
     d->response.statusLine.statusCode = httpStatusCode;
     d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatusCode);
+
+    // this header required to perform new HTTP requests if server port has been on the fly changed
+    nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Access-Control-Allow-Origin", "*" ) ); 
+
     if (d->chunkedMode)
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Transfer-Encoding", "chunked" ) );
 
@@ -226,9 +227,7 @@ bool QnTCPConnectionProcessor::sendChunk( const char* data, int size )
     result.append(data, size);  //TODO/IMPL avoid copying by implementing writev in socket
     result.append("\r\n");
 
-    int sended;
-    sended = d->socket->send(result);
-    return sended == result.size();
+    return sendData( result.constData(), result.size() );
 }
 
 QString QnTCPConnectionProcessor::codeToMessage(int code)
@@ -322,6 +321,7 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
     Q_D(const QnTCPConnectionProcessor);
     other.d_ptr->clientRequest = d->clientRequest;
     other.d_ptr->protocol = d->protocol;
+    other.d_ptr->authUserId = d->authUserId;
 }
 
 QUrl QnTCPConnectionProcessor::getDecodedUrl() const

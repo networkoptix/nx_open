@@ -24,6 +24,15 @@ public:
     virtual bool createShortcut(const QString &sourceFile, const QString &destinationPath, const QString &name, const QStringList &arguments) = 0;
 
     /**
+     * This function deletes a target shortcut if it exists.
+     *
+     * \param destinationPath           Path to the shortcut (without filename).
+     * \param name                      Name of the shortcut.
+     * \returns                         True if the shortcut does not exists anymore.
+     */
+    virtual bool deleteShortcut(const QString &destinationPath, const QString &name) const = 0;
+
+    /**
      * This function checks if a target shortcut already exists.
      *
      * \param destinationPath           Path to the shortcut (without filename).

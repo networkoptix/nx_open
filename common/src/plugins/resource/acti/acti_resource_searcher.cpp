@@ -90,7 +90,7 @@ void QnActiResourceSearcher::at_httpConnectionDone(nx_http::AsyncHttpClientPtr r
     m_httpInProgress.remove(host);
 }
 
-QnResourcePtr QnActiResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnActiResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -182,7 +182,7 @@ void QnActiResourceSearcher::processPacket(
     if (!devInfo.manufacturer.toUpper().startsWith(manufacture()))
         return;
 
-    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
     if (rt.isNull())
         return;
 

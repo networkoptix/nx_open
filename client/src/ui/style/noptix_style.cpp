@@ -383,6 +383,11 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
     /* Bespin's progress bar painting is way too ugly, so we do it our way. */
 
     const QStyleOptionProgressBarV2 *pb = qstyleoption_cast<const QStyleOptionProgressBarV2 *>(option);
+    const QnStyleOptionProgressBar *pb3 = qstyleoption_cast<const QnStyleOptionProgressBar *>(option);
+
+    if (pb3)
+        pb = pb3;
+
     if (!pb)
         return false;
 
@@ -441,25 +446,73 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
         }
 
         painter->setBrush(gradient);
-        if (w * progress > 12) {
-            painter->drawRoundedRect(x, y, w * progress, y + h, 6, 6);
+
+        auto paintProgress = [painter, y, h](qreal x, qreal w) {
+            if (w > 12) {
+                painter->drawRoundedRect(x, y, w, h, 6, 6);
+            } else {
+                painter->setClipRegion(QRegion(x, y, 12, h, QRegion::Ellipse));
+                painter->drawRoundedRect(x - 12, y, 12 + w, h, 6, 6);
+                painter->setClipping(false);
+            }
+        };
+
+        if (pb3 && !pb3->separators.isEmpty()) {
+
+            const int stageOffset = 2;
+
+            qreal left = x;
+
+            QList<int> stages = pb3->separators;
+            stages << pb->maximum;
+            /* Painting stages. */
+            foreach (int stage, stages) {
+                qreal stagePoint = (qreal)stage / qreal(pb->maximum - pb->minimum);
+
+                qreal rightPoint = qMin(stagePoint, progress);
+                qreal right = x + rightPoint * w - stageOffset;
+                paintProgress(left, right - left);
+                
+                left = x + stagePoint * w + stageOffset;
+
+                if (stagePoint > progress)
+                    break;
+            }
+
         } else {
-            painter->setClipRegion(QRegion(x, y, 12, y + h, QRegion::Ellipse));
-            painter->drawRoundedRect(x - 12, y, 12 + w * progress, y + h, 6, 6);
-            painter->setClipping(false);
+            paintProgress(x, w * progress);
         }
+
     }
 
     /* Draw groove. */
-    QLinearGradient gradient(x, 0, x, y + h);
-    gradient.setColorAt(0,      toTransparent(pb->palette.color(QPalette::Button).lighter(), 0.5));
-    gradient.setColorAt(0.2,    toTransparent(pb->palette.color(QPalette::Button), 0.5));
-    gradient.setColorAt(0.4,    toTransparent(pb->palette.color(QPalette::Button), 0.5));
-    gradient.setColorAt(0.5,    toTransparent(pb->palette.color(QPalette::Button).darker(), 0.5));
-    gradient.setColorAt(1,      toTransparent(pb->palette.color(QPalette::Button).lighter(), 0.5));
-    painter->setBrush(gradient);
-    painter->setPen(pb->palette.color(QPalette::Window));
-    painter->drawRoundedRect(x, y, w, h, 6, 6);
+    {
+        QLinearGradient gradient(x, y, x, y + h);
+        gradient.setColorAt(0,      toTransparent(pb->palette.color(QPalette::Button).lighter(), 0.5));
+        gradient.setColorAt(0.2,    toTransparent(pb->palette.color(QPalette::Button), 0.5));
+        gradient.setColorAt(0.4,    toTransparent(pb->palette.color(QPalette::Button), 0.5));
+        gradient.setColorAt(0.5,    toTransparent(pb->palette.color(QPalette::Button).darker(), 0.5));
+        gradient.setColorAt(1,      toTransparent(pb->palette.color(QPalette::Button).lighter(), 0.5));
+        painter->setBrush(gradient);
+        painter->setPen(pb->palette.color(QPalette::Window));
+
+        if (pb3 && !pb3->separators.isEmpty()) {
+            const int stageOffset = 2;
+            qreal left = x;
+
+            QList<int> stages = pb3->separators;
+            stages << pb->maximum;
+            /* Painting stages. */
+            foreach (int stage, stages) {
+                qreal stagePoint = (qreal)stage / qreal(pb->maximum - pb->minimum);
+                qreal right = x + stagePoint * w - stageOffset;
+                painter->drawRoundedRect(left, y, right - left, h, 6, 6);
+                left = x + stagePoint * w + stageOffset;
+            }
+        } else {
+            painter->drawRoundedRect(x, y, w, h, 6, 6);
+        }
+    }
 
     /* Draw label. */
     if (pb->textVisible) {

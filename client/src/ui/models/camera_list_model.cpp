@@ -146,7 +146,7 @@ void QnCameraListModel::setServer(const QnMediaServerResourcePtr & server) {
     while (!m_cameras.isEmpty())
         removeCamera(m_cameras.first());
     
-    QnResourceList resources = resourcePool()->getAllCameras(m_server); 
+    QnResourceList resources = resourcePool()->getAllCameras(m_server, true); 
     foreach(const QnResourcePtr &resource, resources)
         addCamera(resource);
 

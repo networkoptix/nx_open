@@ -4,7 +4,6 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-#include "core/resource/media_resource.h"
 
 namespace Ui {
     class AdvancedSettingsWidget;

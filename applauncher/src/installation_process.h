@@ -42,7 +42,7 @@ public:
     InstallationProcess(
         const QString& productName,
         const QString& customization,
-        const QString& version,
+        const QnSoftwareVersion& version,
         const QString& module,
         const QString& installationDirectory,
         bool autoStartNeeded );
@@ -62,7 +62,7 @@ public:
 
     QString errorText() const;
 
-    QString getVersion() const;
+    QnSoftwareVersion getVersion() const;
 
     void cancel();
 
@@ -81,7 +81,7 @@ private:
     const ProductResourcesNameset m_rns;
     const QString m_productName;
     const QString m_customization;
-    const QString m_version;
+    const QnSoftwareVersion m_version;
     const QString m_module;
     const QString m_installationDirectory;
     State m_state;

@@ -34,7 +34,7 @@ QnResourceList QnPlPulseSearcher::findResources()
         if (cameraRes)
             cameraRes->setModel(r.name);
         res->setMAC(QnMacAddress(r.mac));
-        res->setHostAddress(r.ip, QnDomainMemory);
+        res->setHostAddress(r.ip);
         res->setDiscoveryAddr(QHostAddress(r.disc_ip));
 
         result.push_back(res);
@@ -45,7 +45,7 @@ QnResourceList QnPlPulseSearcher::findResources()
     return result;
 }
 
-QnResourcePtr QnPlPulseSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlPulseSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -94,7 +94,7 @@ QnNetworkResourcePtr QnPlPulseSearcher::createResource(const QString& manufactur
 
     QnNetworkResourcePtr result = QnNetworkResourcePtr(0);
 
-    QUuid rt = qnResTypePool->getResourceTypeId(manufacture, name);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture, name);
     if (rt.isNull())
         return result;
 

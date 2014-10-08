@@ -15,7 +15,6 @@
 #include <utils/common/long_runnable.h>
 #include <utils/common/stoppable.h>
 #include <utils/common/timermanager.h>
-#include <utils/network/aio/aioeventhandler.h>
 #include <utils/network/http/httptypes.h>
 #include <utils/network/http/asynchttpclient.h>
 #include <utils/network/nettools.h>
@@ -64,8 +63,7 @@ class UPNPDeviceSearcher
 :
     public QObject,
     public TimerEventHandler,
-    public QnStoppable,
-    public aio::AIOEventHandler
+    public QnStoppable
 {
     Q_OBJECT
 
@@ -130,12 +128,19 @@ private:
         }
     };
 
+    class SocketReadCtx
+    {
+    public:
+        std::shared_ptr<AbstractDatagramSocket> sock;
+        nx::Buffer buf;
+    };
+
     const unsigned int m_discoverTryTimeoutMS;
     mutable QMutex m_mutex;
     quint64 m_timerID;
     std::list<UPNPSearchHandler*> m_handlers;
     //map<local interface ip, socket>
-    std::map<QString, QSharedPointer<AbstractDatagramSocket> > m_socketList;
+    std::map<QString, SocketReadCtx> m_socketList;
     char* m_readBuf;
     HttpClientsDict m_httpClients;
     std::list<DiscoveredDeviceInfo> m_discoveredDevices;
@@ -146,11 +151,14 @@ private:
 
     //!Implementation of \a TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID ) override;
-    //!Implementation of \a aio::AIOEventHandler::eventTriggered
-    virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() override;
+    void onSomeBytesRead(
+        AbstractCommunicatingSocket* sock,
+        SystemError::ErrorCode errorCode,
+        nx::Buffer* readBuffer,
+        size_t bytesRead ) noexcept;
 
     void dispatchDiscoverPackets();
-    QSharedPointer<AbstractDatagramSocket> getSockByIntf( const QnInterfaceAndAddr& iface );
+    std::shared_ptr<AbstractDatagramSocket> getSockByIntf( const QnInterfaceAndAddr& iface );
     void startFetchDeviceXml( const QByteArray& uuidStr, const QUrl& descriptionUrl, const QString& sender );
     void processDeviceXml( const DiscoveredDeviceInfo& devInfo, const QByteArray& foundDeviceDescription );
     //QByteArray getDeviceDescription( const QByteArray& uuidStr, const QUrl& url );

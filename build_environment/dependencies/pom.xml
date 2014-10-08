@@ -22,7 +22,6 @@
 	</dependencies>		
 
 	<build>
-		<defaultGoal>compile</defaultGoal>
 		<directory>${arch}</directory>
 		<outputDirectory>${arch}</outputDirectory>
 		<sourceDirectory>${basedir}/src</sourceDirectory> 	

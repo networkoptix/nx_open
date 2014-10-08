@@ -154,12 +154,16 @@ public:
         if( itemData )
         {
             //reserving space for tajen item in cache
+#ifdef _DEBUG
             const int cacheSizeBak = m_cache.size();
+#endif
             m_cache.setMaxCost( m_cache.maxCost()-itemData->cost );
+#ifdef _DEBUG
             Q_ASSERT_X(
                 cacheSizeBak == m_cache.size(),
                 "ItemCache::takeForUse",
                 QString("cacheSizeBak = %1, m_cache.size() = %2, m_cache.maxCost() = %3").arg(cacheSizeBak).arg(m_cache.size()).arg(m_cache.maxCost()).toLatin1().data() );
+#endif
             *item = itemData->item;
         }
         else

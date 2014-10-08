@@ -7,6 +7,9 @@
 #include <utils/common/model_functions.h>
 
 #include <core/resource/resource_consumer.h>
+#include <core/resource/resource.h>
+#include <core/resource/storage_resource.h>
+
 #include <core/datapacket/abstract_data_packet.h>
 #include <core/datapacket/media_data_packet.h>
 #include <core/dataprovider/media_streamdataprovider.h>
@@ -44,6 +47,7 @@ QString QnStreamRecorder::errorString(int errCode) {
 
 QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
+    QnResourceConsumer(dev),
     m_device(dev),
     m_firstTime(true),
     m_truncateInterval(0),
@@ -883,6 +887,12 @@ void QnStreamRecorder::setContrastParams(const ImageCorrectionParams& params)
 void QnStreamRecorder::setItemDewarpingParams(const QnItemDewarpingParams& params)
 {
     m_itemDewarpingParams = params;
+}
+
+void QnStreamRecorder::disconnectFromResource()
+{
+    stop();
+    QnResourceConsumer::disconnectFromResource();
 }
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -40,7 +40,8 @@ void QnWorkbenchScheduleWatcher::at_resourcePool_resourceAdded(const QnResourceP
     if(!camera)
         return;
 
-    connect(camera.data(), SIGNAL(scheduleDisabledChanged(const QnSecurityCamResourcePtr &)), this, SLOT(at_resource_scheduleDisabledChanged(const QnSecurityCamResourcePtr &)));
+    connect( camera.data(), &QnSecurityCamResource::scheduleDisabledChanged,
+             this, [this]( const QnResourcePtr& res ) { at_resource_scheduleDisabledChanged( res.staticCast<QnSecurityCamResource>() ); } );
 
     if(!camera->isScheduleDisabled())
         m_scheduleEnabledCameras.insert(camera);

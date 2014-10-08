@@ -23,6 +23,7 @@
 #include <common/common_meta_types.h>
 
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/client_video_camera.h>
@@ -444,8 +445,7 @@ void QnWorkbenchDisplay::initSceneView() {
     } else {
         /* Never set QObject* parent in the QScopedPointer-stored objects if not sure in the descruction order. */
         m_backgroundPainter = new QnGradientBackgroundPainter(qnSettings->radialBackgroundCycle(), NULL, context());
-        if (action(Qn::ToggleBackgroundAnimationAction)->isChecked())
-            m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
     }
 
     /* Connect to context. */
@@ -485,10 +485,7 @@ void QnWorkbenchDisplay::toggleBackgroundAnimation(bool enabled) {
     if (!m_scene || !m_view || !m_backgroundPainter)
         return;
 
-    if(enabled) 
-        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
-    else 
-        m_view->uninstallLayerPainter(m_backgroundPainter.data());
+    m_backgroundPainter->setEnabled(enabled);
 }
 
 
@@ -558,7 +555,7 @@ QnResourceWidget *QnWorkbenchDisplay::widget(Qn::ItemRole role) const {
     return m_widgetByRole[role];
 }
 
-QnResourceWidget *QnWorkbenchDisplay::widget(const QUuid &uuid) const {
+QnResourceWidget *QnWorkbenchDisplay::widget(const QnUuid &uuid) const {
     return widget(workbench()->currentLayout()->item(uuid));
 }
 
@@ -1591,11 +1588,11 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(streamSynchronizer->state()));
 
-    QVector<QUuid> selectedUuids;
+    QVector<QnUuid> selectedUuids;
     foreach(QnResourceWidget *widget, widgets())
         if(widget->isSelected())
             selectedUuids.push_back(widget->item()->uuid());
-    layout->setData(Qn::LayoutSelectionRole, QVariant::fromValue<QVector<QUuid> >(selectedUuids));
+    layout->setData(Qn::LayoutSelectionRole, QVariant::fromValue<QVector<QnUuid> >(selectedUuids));
 
     foreach(QnResourceWidget *widget, widgets()) {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
@@ -1705,8 +1702,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             widget->item()->setData(Qn::ItemDisabledButtonsRole, static_cast<int>(QnMediaResourceWidget::PtzButton));
     }
 
-    QVector<QUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QUuid> >();
-    foreach(const QUuid &selectedUuid, selectedUuids)
+    QVector<QnUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QnUuid> >();
+    foreach(const QnUuid &selectedUuid, selectedUuids)
         if(QnResourceWidget *widget = this->widget(selectedUuid))
             widget->setSelected(true);
 

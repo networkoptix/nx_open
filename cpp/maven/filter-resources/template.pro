@@ -115,6 +115,7 @@ win* {
   ICON = ${customization.dir}/icons/hdw_logo.ico	
   LIBS += ${windows.oslibs}
   DEFINES += ${windows.defines}  
+  DEFINES += ${global.windows.defines}  
   win32-msvc* {
     # Note on /bigobj: http://stackoverflow.com/questions/15110580/penalty-of-the-msvs-linker-flag-bigobj
     QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR /bigobj
@@ -138,7 +139,7 @@ win* {
 unix: {
   DEFINES += override=
   DEFINES += QN_EXPORT=  
-  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Wuninitialized
+  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Wuninitialized
   arm {
     QMAKE_CXXFLAGS += -std=c++0x 
   } else {

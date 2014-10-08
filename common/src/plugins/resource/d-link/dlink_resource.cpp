@@ -121,12 +121,6 @@ QnPlDlinkResource::QnPlDlinkResource()
     setAuth(QLatin1String("admin"), QLatin1String(""));
 }
 
-
-bool QnPlDlinkResource::isResourceAccessible()
-{
-    return true;
-}
-
 QString QnPlDlinkResource::getDriverName() const
 {
     return MANUFACTURE;
@@ -195,8 +189,6 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
     if (cam_info_file.size()==0)
         return CameraDiagnostics::UnknownErrorResult();
 
-
-    QMutexLocker mutexLocker(&m_mutex);
 
     QString file_s = QLatin1String(cam_info_file);
     QStringList lines = file_s.split(QLatin1String("\r\n"), QString::SkipEmptyParts);
@@ -373,7 +365,7 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
     };
 
     int sensitivity = 50;
-    QnMotionRegion region = m_motionMaskList[0];
+    QnMotionRegion region = getMotionRegion(0);
     for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
 

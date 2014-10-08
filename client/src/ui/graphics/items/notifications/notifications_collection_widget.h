@@ -90,16 +90,13 @@ signals:
     void notificationLevelChanged();
 
 private:
-    void showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
-    void hideSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
+    void showSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params);
+    void hideSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params);
     void showBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     void hideBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     void hideAll();
     void updateBlinker();
 
-    void at_settingsButton_clicked();
-    void at_filterButton_clicked();
-    void at_eventLogButton_clicked();
     void at_debugButton_clicked();
     void at_list_itemRemoved(QnNotificationWidget *item);
     void at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
@@ -115,7 +112,7 @@ private:
     void loadThumbnailForItem(QnNotificationWidget *item, QnResourcePtr resource, qint64 usecsSinceEpoch = -1);
 
     QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource, bool useResource = true);
-    QnNotificationWidget* findItem(const QUuid& businessRuleId, const QnResourcePtr &resource, bool useResource = true);
+    QnNotificationWidget* findItem(const QnUuid& businessRuleId, const QnResourcePtr &resource, bool useResource = true);
 
 private:
     QnNotificationWidget* findItem(int businessRuleId, const QnResourcePtr &resource);
@@ -124,7 +121,7 @@ private:
 
     QMultiHash<QnSystemHealth::MessageType, QnNotificationWidget*> m_itemsByMessageType;
     QMultiHash<QString, QnNotificationWidget*> m_itemsByLoadingSound;
-    QMultiHash<QUuid, QnNotificationWidget*> m_itemsByBusinessRuleId;
+    QMultiHash<QnUuid, QnNotificationWidget*> m_itemsByBusinessRuleId;
     QPointer<QnBlinkingImageButtonWidget> m_blinker;
 };
 

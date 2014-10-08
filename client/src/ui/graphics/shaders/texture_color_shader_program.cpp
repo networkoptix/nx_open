@@ -1,13 +1,13 @@
 #include "texture_color_shader_program.h"
 #include "ui/graphics/shaders/shader_source.h"
 
-QnTextureColorGLShaderProgramm::QnTextureColorGLShaderProgramm(const QGLContext *context, QObject *parent)
-    : QnColorGLShaderProgramm(context,parent)
+QnTextureGLShaderProgram::QnTextureGLShaderProgram(QObject *parent)
+    : QnColorGLShaderProgram(parent)
 {
 }
-bool QnTextureColorGLShaderProgramm::compile()
+bool QnTextureGLShaderProgram::compile()
 {
-    addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
+    addShaderFromSourceCode(QOpenGLShader::Vertex, QN_SHADER_SOURCE(
         attribute vec2 aTexCoord;
     attribute vec4 aPosition;
     uniform mat4 uModelViewProjectionMatrix;
@@ -33,7 +33,7 @@ bool QnTextureColorGLShaderProgramm::compile()
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
 
-    addShaderFromSourceCode(QGLShader::Fragment, shader);
+    addShaderFromSourceCode(QOpenGLShader::Fragment, shader);
 
 
     return link();

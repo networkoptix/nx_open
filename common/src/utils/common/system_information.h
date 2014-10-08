@@ -17,9 +17,11 @@ public:
     QString arch;
     QString platform;
     QString modification;
+
+    static QnSystemInformation currentSystemInformation();
 };
 #define QnSystemInformation_Fields (arch)(platform)(modification)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnSystemInformation, (json)(binary)(datastream)(eq)(hash)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(QnSystemInformation, (json)(datastream)(eq)(hash)(metatype))
 
 #endif // SYSTEM_INFORMATION_H

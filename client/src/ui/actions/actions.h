@@ -216,6 +216,11 @@ namespace Qn {
          */
         QueueAppRestartAction,
 
+        /**
+         * Offers user to select server in cluster for other servers to synchronize time with
+         */
+        SelectTimeServerAction,
+
 
         /* Main menu actions. */
 
@@ -356,8 +361,10 @@ namespace Qn {
          */
         SystemAdministrationAction,
 
-        //ShowMediaServerLogs,
-
+        /**
+         * System administration dialog - updates page.
+         */
+        SystemUpdateAction,
 
         /* Tab bar actions. */
 
@@ -662,6 +669,16 @@ namespace Qn {
          * Toggles next RADASS state.
          */
         ToggleRadassAction,
+
+        /**
+         * Connect incompatible server to current system
+         */
+        ConnectToCurrentSystem,
+
+        /**
+         * Merge the other system with the current system
+         */
+        MergeSystems,
 
         /* PTZ Actions */
 

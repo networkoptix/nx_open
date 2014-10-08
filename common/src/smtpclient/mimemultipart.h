@@ -21,9 +21,9 @@
 
 #include "mimepart.h"
 
+
 class MimeMultiPart : public MimePart
 {
-    Q_OBJECT
 public:
 
     /* [0] Enums */
@@ -51,20 +51,18 @@ public:
     void setMimeType(const MultiPartType type);
     MultiPartType getMimeType() const;
 
-    const QList<MimePart*> & getParts() const;
-
     /* [2] --- */
 
     /* [3] Public methods */
 
-    void addPart(MimePart *part);
+    void addPart(MimePart *part) noexcept;
 
     virtual void prepare();
 
     /* [3] --- */
 
 protected:
-    QList< MimePart* > parts;
+    QList< MimePart* > m_parts;
 
     MultiPartType type;
     

@@ -20,11 +20,10 @@ public:
     virtual ~QnPlVmax480Resource();
 
     virtual int getMaxFps() const override;
-    virtual bool isResourceAccessible() override;
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
 
-    virtual bool setHostAddress(const QString &ip, QnDomain domain) override;
+    virtual void setHostAddress(const QString &ip) override;
 
     int channelNum() const;
     int videoPort() const;
@@ -39,8 +38,6 @@ public:
     qint64 endTime() const;
 
     void setArchiveRange(qint64 startTimeUsec, qint64 endTimeUsec, bool recursive = true);
-
-    virtual void setStatus(Status newStatus, bool silenceMode = false);
 
     virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;

@@ -6,6 +6,8 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QString>
 
+#include <array>
+
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
@@ -42,7 +44,7 @@ public:
     QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent = NULL);
     virtual ~QnUserSettingsDialog();
 
-    const QnUserResourcePtr &user() const;
+    QnUserResourcePtr user() const;
     void setUser(const QnUserResourcePtr &user);
 
     void updateFromResource();
@@ -105,14 +107,19 @@ private:
     QString m_currentPassword;
     QHash<QString, QnResourcePtr> m_userByLogin;
     QnUserResourcePtr m_user;
-    bool m_valid[ElementCount];
-    QString m_hints[ElementCount];
-    ElementFlags m_flags[ElementCount];
+    std::array<bool, ElementCount> m_valid;
+    std::array<QString, ElementCount> m_hints;
+    std::array<ElementFlags, ElementCount> m_flags;
     bool m_hasChanges;
     QHash<quint64, QCheckBox*> m_advancedRights;
 
     /** Status variable to avoid unneeded checks. */
     bool m_inUpdateDependensies;
+
+    bool m_userNameModified;
+    bool m_passwordModified;
+    bool m_emailModified;
+    bool m_accessRightsModified;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnUserSettingsDialog::ElementFlags)

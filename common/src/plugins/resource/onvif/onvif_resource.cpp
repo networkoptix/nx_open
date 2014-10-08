@@ -37,6 +37,7 @@
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
 #include "utils/common/timermanager.h"
+#include "gsoap_async_call_wrapper.h"
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
@@ -342,7 +343,7 @@ const QString QnPlOnvifResource::fetchMacAddress(
     return someMacAddress.toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
 }
 
-bool QnPlOnvifResource::setHostAddress(const QString &ip, QnDomain domain)
+void QnPlOnvifResource::setHostAddress(const QString &ip)
 {
     //QnPhysicalCameraResource::se
     {
@@ -365,29 +366,16 @@ bool QnPlOnvifResource::setHostAddress(const QString &ip, QnDomain domain)
         }
     }
 
-    return QnPhysicalCameraResource::setHostAddress(ip, domain);
+    QnPhysicalCameraResource::setHostAddress(ip);
 }
 
 const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress) {
     return QLatin1String(ONVIF_PROTOCOL_PREFIX) + ipAddress + QLatin1String(ONVIF_URL_SUFFIX);
 }
 
-bool QnPlOnvifResource::isResourceAccessible()
-{
-    return updateMACAddress();
-}
-
 QString QnPlOnvifResource::getDriverName() const
 {
     return MANUFACTURE;
-}
-
-bool QnPlOnvifResource::hasDualStreaming() const
-{
-    QVariant mediaVariant;
-    QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
-    this_casted->getParam(Qn::HAS_DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toBool();
 }
 
 const QSize QnPlOnvifResource::getVideoSourceSize() const
@@ -519,7 +507,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
         addFlags |= Qn::PrimaryStreamSoftMotionCapability;
     else if (!hasDualStreaming2())
-        setMotionType(Qn::MT_NoMotion);
+    //    setMotionType(Qn::MT_NoMotion);
+        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QString() );   //no motion supported by camera
 
     
     if (addFlags != Qn::NoCapabilities)
@@ -568,8 +557,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if( m_secondaryResolution.width() > 0 )
         mediaStreams.streams.push_back( CameraMediaStreamInfo( m_secondaryResolution, m_secondaryCodec == H264 ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
     saveResolutionList( mediaStreams );
-
-    saveParams();
     
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
@@ -578,10 +565,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     {
         qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
         setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ar));
-        ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-        QnKvPairListsById  outData;
-        conn->getResourceManager()->saveSync(getId(), getProperties(), false, &outData);
     }
+    saveParams();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -710,21 +695,7 @@ int QnPlOnvifResource::getSecondaryH264Profile() const
 
 void QnPlOnvifResource::setMaxFps(int f)
 {
-    setParam(Qn::MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
-}
-
-int QnPlOnvifResource::getMaxFps() const
-{
-    QVariant mediaVariant;
-    QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
-
-    if (!hasParam(Qn::MAX_FPS_PARAM_NAME))
-    {
-        return QnPhysicalCameraResource::getMaxFps();
-    }
-
-    this_casted->getParam(Qn::MAX_FPS_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toInt();
+    setProperty(Qn::MAX_FPS_PARAM_NAME, f);
 }
 
 const QString QnPlOnvifResource::getPrimaryVideoEncoderId() const
@@ -759,15 +730,12 @@ const QString QnPlOnvifResource::getAudioSourceId() const
 
 QString QnPlOnvifResource::getDeviceOnvifUrl() const 
 { 
-    QVariant mediaVariant;
-    QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
-    this_casted->getParam(ONVIF_URL_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toString();
+    return getProperty(ONVIF_URL_PARAM_NAME);
 }
 
 void QnPlOnvifResource::setDeviceOnvifUrl(const QString& src) 
 { 
-    setParam(ONVIF_URL_PARAM_NAME, src, QnDomainDatabase);
+    setProperty(ONVIF_URL_PARAM_NAME, src);
 }
 QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort)
 {
@@ -963,9 +931,9 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
     fetchAndSetDualStreaming(soapWrapper);
 
     if (fetchAndSetAudioEncoder(soapWrapper) && fetchAndSetAudioEncoderOptions(soapWrapper))
-        setParam(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1, QnDomainDatabase);
+        setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
     else
-        setParam(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 0, QnDomainDatabase);
+        setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, QString(lit("0")));
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -1152,15 +1120,12 @@ int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl)
 
 QString QnPlOnvifResource::getMediaUrl() const 
 { 
-    QVariant mediaVariant;
-    QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
-    this_casted->getParam(MEDIA_URL_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toString();
+    return getProperty(MEDIA_URL_PARAM_NAME);
 }
 
 void QnPlOnvifResource::setMediaUrl(const QString& src) 
 {
-    setParam(MEDIA_URL_PARAM_NAME, src, QnDomainDatabase);
+    setProperty(MEDIA_URL_PARAM_NAME, src);
 }
 
 QString QnPlOnvifResource::getImagingUrl() const 
@@ -1393,6 +1358,9 @@ int QnPlOnvifResource::getSecondaryIndex(const QList<VideoOptionsLocal>& optList
 
 bool QnPlOnvifResource::registerNotificationConsumer()
 {
+    if (m_appStopping)
+        return false;
+
     QMutexLocker lk( &m_subscriptionMutex );
 
     //determining local address, accessible by onvif device
@@ -1445,6 +1413,8 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         NX_LOG( lit("Failed to subscribe in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logWARNING );
         return false;
     }
+    if (m_appStopping)
+        return false;
 
     //TODO: #ak if this variable is unused following code may be deleted as well
     time_t utcTerminationTime; //= ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
@@ -1493,6 +1463,9 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
             ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
             : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
+
+    if (m_appStopping)
+        return false;
 
     /* Note that we don't pass shared pointer here as this would create a 
      * cyclic reference and onvif resource will never be deleted. */
@@ -1551,6 +1524,10 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurations"), soapWrapper.getLastError());
     }
 
+    if(m_appStopping)
+        return CameraDiagnostics::ServerTerminatedResult();
+
+
     QString login = soapWrapper.getLogin();
     QString password = soapWrapper.getPassword();
     std::string endpoint = soapWrapper.getEndpointUrl().toStdString();
@@ -1583,6 +1560,9 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
 
         for (;soapRes != SOAP_OK && retryCount >= 0; --retryCount)
         {
+            if(m_appStopping)
+                return CameraDiagnostics::ServerTerminatedResult();
+
             VideoOptionsReq optRequest;
             VideoOptionsResp optResp;
             optRequest.ConfigurationToken = &configuration->token;
@@ -1623,6 +1603,9 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
         return CameraDiagnostics::RequestFailedResult(QLatin1String("fetchAndSetVideoEncoderOptions"), QLatin1String("no video options"));
     }
 
+    if(m_appStopping)
+        return CameraDiagnostics::ServerTerminatedResult();
+
     CameraDiagnostics::Result result = updateVEncoderUsage(optionsList);
     if (!result)
         return result;
@@ -1647,6 +1630,9 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     setVideoEncoderOptions(optionsList[0]);
     if (m_maxChannels == 1 && !isCameraControlDisabled())
         checkMaxFps(confResponse, optionsList[0].id);
+
+    if(m_appStopping)
+        return CameraDiagnostics::ServerTerminatedResult();
 
     m_mutex.lock();
     m_primaryVideoEncoderId = optionsList[0].id;
@@ -1690,7 +1676,7 @@ bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper
         NX_LOG(QString(lit("ONVIF debug: disable dualstreaming for camera %1 reason: %2")).arg(getHostAddress()).arg(reason), cl_logDEBUG1);
     }
 
-    setParam(Qn::HAS_DUAL_STREAMING_PARAM_NAME, dualStreaming ? 1 : 0, QnDomainDatabase);
+    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, dualStreaming ? 1 : 0);
     return true;
 }
 
@@ -2209,7 +2195,7 @@ QnConstResourceAudioLayoutPtr QnPlOnvifResource::getAudioLayout(const QnAbstract
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
 
-bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
+bool QnPlOnvifResource::getParamPhysical(const QString &param, QVariant &val)
 {
     m_prevOnvifResultCode = CameraDiagnostics::NoErrorResult();
 
@@ -2220,7 +2206,7 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
     }
 
     CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
-    CameraSettings::Iterator it = settings.find(param.name());
+    CameraSettings::Iterator it = settings.find(param);
 
     if (it == settings.end()) {
         //This is the case when camera doesn't contain Media Service, but the client doesn't know about it and
@@ -2250,7 +2236,7 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
     return true;
 }
 
-bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& val )
+bool QnPlOnvifResource::setParamPhysical(const QString &param, const QVariant& val )
 {
     QMutexLocker lock(&m_physicalParamsMutex);
     if (!m_onvifAdditionalSettings)
@@ -2260,7 +2246,7 @@ bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& v
     tmp.deserializeFromStr(val.toString());
 
     CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
-    CameraSettings::Iterator it = settings.find(param.name());
+    CameraSettings::Iterator it = settings.find(param);
 
     if (it == settings.end())
     {
@@ -2271,7 +2257,7 @@ bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& v
 
         //For Button - only operation object is required
         QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> >::ConstIterator opIt =
-            OnvifCameraSettingOperationAbstract::operations.find(param.name());
+            OnvifCameraSettingOperationAbstract::operations.find(param);
 
         if (opIt == OnvifCameraSettingOperationAbstract::operations.end()) {
             return false;
@@ -2320,7 +2306,7 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     CameraSettings::ConstIterator it = onvifSettings.begin();
 
     for (; it != onvifSettings.end(); ++it) {
-        setParam(it.key(), it.value().serializeToStr(), QnDomainPhysical);
+        setParamPhysical(it.key(), it.value().serializeToStr());
         if (m_appStopping)
             return;
     }
@@ -2427,8 +2413,10 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
     int currentFps = rangeHi;
     int prevFpsValue = -1;
 
+    m_mutex.lock();
     vEncoder->Resolution->Width = m_resolutionList[0].width();
     vEncoder->Resolution->Height = m_resolutionList[0].height();
+    m_mutex.unlock();
     
     while (currentFps != prevFpsValue)
     {
@@ -2437,6 +2425,9 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
         bool invalidFpsDetected = false;
         for (int i = 0; i < getMaxOnvifRequestTries(); ++i)
         {
+            if(m_appStopping)
+                return;
+
             vEncoder->RateControl->FrameRateLimit = currentFps;
             CameraDiagnostics::Result result = sendVideoEncoderToCamera(*vEncoder);
             if (result.errorCode == CameraDiagnostics::ErrorCode::noError) 
@@ -3148,5 +3139,6 @@ CameraDiagnostics::Result QnPlOnvifResource::getFullUrlInfo()
 
     return CameraDiagnostics::NoErrorResult();
 }
+
 
 #endif //ENABLE_ONVIF

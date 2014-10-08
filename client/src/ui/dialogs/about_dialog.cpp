@@ -27,12 +27,14 @@
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/style/globals.h>
 
+#include <utils/common/email.h>
+
 #include "openal/qtvaudiodevice.h"
-#include "version.h"
+#include <utils/common/app_info.h>
 
 namespace {
-    QString versionString(const char *version) {
-        QString result = QLatin1String(version);
+    QString versionString(const QString &version) {
+        QString result = version;
         result.replace(lit("-SNAPSHOT"), QString());
         return result;
     }
@@ -60,6 +62,7 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QnAboutDialog::reject);
     connect(m_copyButton, &QPushButton::clicked, this, &QnAboutDialog::at_copyButton_clicked);
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::emailSettingsChanged, this, &QnAboutDialog::retranslateUi);
+    connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged, this, &QnAboutDialog::retranslateUi);
 
     retranslateUi();
 }
@@ -88,7 +91,7 @@ QString QnAboutDialog::connectedServers() const {
         latestMsVersion = latestVersion;
 
     QString servers;
-    foreach(const QnVersionMismatchData &data, watcher->mismatchData()) {
+    foreach(const QnAppInfoMismatchData &data, watcher->mismatchData()) {
         if (data.component != Qn::ServerComponent)
             continue;
 
@@ -123,17 +126,17 @@ void QnAboutDialog::retranslateUi()
             "<b>%1</b> version %2 (%3).<br/>\n"
             "Built for %5-%6 with %7.<br/>\n"
         ).
-        arg(QLatin1String(QN_APPLICATION_NAME)).
-        arg(QLatin1String(QN_APPLICATION_VERSION)).
-        arg(QLatin1String(QN_APPLICATION_REVISION)).
-        arg(QLatin1String(QN_APPLICATION_PLATFORM)).
-        arg(QLatin1String(QN_APPLICATION_ARCH)).
-        arg(QLatin1String(QN_APPLICATION_COMPILER));
+        arg(qApp->applicationName()).
+        arg(QApplication::applicationVersion()).
+        arg(QnAppInfo::applicationRevision()).
+        arg(QnAppInfo::applicationPlatform()).
+        arg(QnAppInfo::applicationArch()).
+        arg(QnAppInfo::applicationCompiler());
 
 //    QnSoftwareVersion ecsVersion = QnAppServerConnectionFactory::currentVersion();
     QString servers = connectedServers();
     if (servers.isEmpty())
-        servers = tr("<b>Client</b> does not connected to <b>Server</b>.<br>");
+        servers = tr("<b>Client</b> is not connected to <b>Server</b>.<br>");
     
     QString credits = 
         tr(
@@ -146,14 +149,14 @@ void QnAboutDialog::retranslateUi()
             "<b>SIGAR %7</b> - Copyright (c) 2004-2011 VMware Inc.<br/>\n"
             "<b>Boost %8</b> - Copyright (c) 2000-2012 Boost developers.<br/>\n"
         ).
-        arg(QLatin1String(QN_ORGANIZATION_NAME) + QLatin1String("(tm)")).
-        arg(QLatin1String(QN_APPLICATION_NAME)).
+        arg(QnAppInfo::organizationName() + lit("(tm)")).
+        arg(qApp->applicationName()).
         arg(QLatin1String(QT_VERSION_STR)).
-        arg(versionString(QN_FFMPEG_VERSION)).
+        arg(versionString(QnAppInfo::ffmpegVersion())).
         arg(QtvAudioDevice::instance()->versionString()).
         arg(QtvAudioDevice::instance()->company()).
-        arg(versionString(QN_SIGAR_VERSION)).
-        arg(versionString(QN_BOOST_VERSION));
+        arg(versionString(QnAppInfo::sigarVersion())).
+        arg(versionString(QnAppInfo::boostVersion()));
 
 #ifndef Q_OS_DARWIN
     credits += tr("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.<br/>");
@@ -179,8 +182,13 @@ void QnAboutDialog::retranslateUi()
     ui->gpuLabel->setText(gpu);
     ui->serversLabel->setText(servers);
 
-    QString emailLink = lit("<a href=mailto:%1>%1</a>").arg(QnGlobalSettings::instance()->emailSettings().supportEmail);
-    ui->supportEmailLabel->setText(tr("<b>Email</b>: %1").arg(emailLink));
+    QString supportAddress = QnGlobalSettings::instance()->emailSettings().supportEmail;
+    QString supportLink = supportAddress;
+    if (QnEmail::isValid(supportAddress))
+        supportLink = lit("<a href=mailto:%1>%1</a>").arg(supportAddress);
+    else if (!supportAddress.isEmpty())
+        supportLink = lit("<a href=%1>%1</a>").arg(supportAddress);
+    ui->supportEmailLabel->setText(tr("<b>Support</b>: %1").arg(supportLink));
 }
 
 // -------------------------------------------------------------------------- //

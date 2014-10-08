@@ -3,9 +3,10 @@
 #include "utils/common/util.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "platform/platform_abstraction.h"
+#include "api/model/statistics_reply.h"
 
 
-QnStatisticsRestHandler::QnStatisticsRestHandler() {
+QnStatisticsRestHandler::QnStatisticsRestHandler(): QnJsonRestHandler() {
     m_monitor = qnPlatform->monitor();
 }
 
@@ -13,62 +14,41 @@ QnStatisticsRestHandler::~QnStatisticsRestHandler() {
     return;
 }
 
-int QnStatisticsRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
+int QnStatisticsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(params)
     Q_UNUSED(path)
-    Q_UNUSED(contentType)
 
-    QString result;
-    result.append("<?xml version=\"1.0\"?>\n");
-    result.append("<root>\n");
+    QnStatisticsReply reply;
+    reply.updatePeriod = m_monitor->updatePeriod();
+    reply.uptimeMs = m_monitor->upTimeMs();
+    
+    QnStatisticsDataList cpuInfo;
+    cpuInfo.append(QnStatisticsDataItem(lit("CPU"), m_monitor->totalCpuUsage(), Qn::StatisticsCPU));
+    //cpuInfo.append(QnStatisticsDataItem(lit("CPU-CORES"), QThread::idealThreadCount(), Qn::StatisticsCPU));
+    reply.statistics << cpuInfo;
 
-    result.append("<storages>\n");
+    QnStatisticsDataList memory;
+    memory.append(QnStatisticsDataItem(lit("RAM"), m_monitor->totalRamUsage(), Qn::StatisticsRAM));
+    reply.statistics << memory;
+
+    QnStatisticsDataList storages;
     foreach(const QnPlatformMonitor::HddLoad &hddLoad, m_monitor->totalHddLoad()) {
-        result.append("<storage>\n");
-        result.append(QString("<url>%1</url>\n").arg(hddLoad.hdd.partitions));
-        result.append(QString("<usage>%1</usage>\n").arg(hddLoad.load));
-        result.append("</storage>\n");
+        storages.append(QnStatisticsDataItem(hddLoad.hdd.partitions, hddLoad.load, Qn::StatisticsHDD));
     }
-    result.append("</storages>\n");
+    reply.statistics << storages;
 
-    result.append("<cpuinfo>\n");
-    result.append(QString("<cores>%1</cores>\n").arg(QThread::idealThreadCount()));
-    result.append(QString("<load>%1</load>\n").arg(m_monitor->totalCpuUsage()));
-    result.append("</cpuinfo>\n");
-
-    result.append("<memory>\n");
-    result.append(QString("<usage>%1</usage>\n").arg(m_monitor->totalRamUsage()));
-    result.append("</memory>\n");
-
-    result.append("<network>\n");
-    foreach(const QnPlatformMonitor::NetworkLoad &networkLoad, m_monitor->totalNetworkLoad()) {
-        result.append("<interface>\n");
-        result.append(QString("<name>%1</name>\n").arg(networkLoad.interfaceName));
-        result.append(QString("<type>%1</type>\n").arg(static_cast<int>(networkLoad.type)));
-        result.append(QString("<in>%1</in>\n").arg(networkLoad.bytesPerSecIn));
-        result.append(QString("<out>%1</out>\n").arg(networkLoad.bytesPerSecOut));
-        result.append(QString("<max>%1</max>\n").arg(networkLoad.bytesPerSecMax));
-        result.append("</interface>\n");
+    QnStatisticsDataList network;
+    foreach(const QnPlatformMonitor::NetworkLoad &networkLoad, m_monitor->totalNetworkLoad()) 
+    {
+        qint64 bytesIn = networkLoad.bytesPerSecIn;
+        qint64 bytesOut = networkLoad.bytesPerSecOut;
+        qint64 bytesMax = networkLoad.bytesPerSecMax;
+        network.append(QnStatisticsDataItem(networkLoad.interfaceName, static_cast<qreal>(qMax(bytesIn, bytesOut)) / bytesMax, Qn::StatisticsNETWORK, static_cast<int>(networkLoad.type)));
     }
-    result.append("</network>\n");
+    reply.statistics << network;
 
-    result.append("<misc>\n");
-    result.append(QString("<uptimeMs>%1</uptimeMs>\n").arg(m_monitor->upTimeMs()));
-    result.append("</misc>\n");
-
-    result.append("<params>\n");
-    result.append(QString("<updatePeriod>%1</updatePeriod>\n").arg(m_monitor->updatePeriod()));
-    result.append("</params>\n");
-
-    result.append("</root>\n");
-
-    resultByteArray = result.toUtf8();
+    result.setReply(reply);
 
     return CODE_OK;
-}
-
-int QnStatisticsRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
-{
-    return executeGet(path, params, result, contentType);
 }

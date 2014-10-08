@@ -10,8 +10,8 @@
 
 extern "C"
 {
-    ec2::AbstractECConnectionFactory* getConnectionFactory()
+    ec2::AbstractECConnectionFactory* getConnectionFactory( Qn::PeerType peerType )
     {
-        return new ec2::Ec2DirectConnectionFactory();
+        return new ec2::Ec2DirectConnectionFactory( peerType );
     }
 }

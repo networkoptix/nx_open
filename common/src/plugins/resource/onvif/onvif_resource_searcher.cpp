@@ -5,6 +5,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <utils/common/log.h>
+#include <utils/network/http/httptypes.h>
 
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_pool.h"
@@ -142,7 +143,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         QString fullName = resource->getName();
         int manufacturerPos = fullName.indexOf(QLatin1String("-"));
         QString manufacturer = fullName.mid(0,manufacturerPos).trimmed();
-        QString modelName = fullName.mid(manufacturerPos+1).trimmed().toLower();
+        QString modelName = fullName.mid(manufacturerPos+1).trimmed();
 
         if (NameHelper::instance().isSupported(modelName))
             return resList;
@@ -164,10 +165,10 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         }
 
         OnvifResourceInformationFetcher fetcher;
-        QUuid rt = fetcher.getOnvifResourceType(manufacturer, modelName);
+        QnUuid rt = fetcher.getOnvifResourceType(manufacturer, modelName);
         resource->setVendor( manufacturer );
         resource->setName( modelName );
-        //QUuid rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
+        //QnUuid rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
         if (!rt.isNull())
             resource->setTypeId(rt);
 
@@ -221,7 +222,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     return result;
 }
 
-QnResourcePtr OnvifResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnResourcePtr result;
 

@@ -241,8 +241,7 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
 QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
 :
     m_resource(resource),
-    //m_hlsInactivityPeriodMS( MSSettings::roSettings()->value( nx_ms_conf::HLS_INACTIVITY_PERIOD, nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC )
-    m_hlsInactivityPeriodMS( 10 * MSEC_PER_SEC )
+    m_hlsInactivityPeriodMS( MSSettings::roSettings()->value( nx_ms_conf::HLS_INACTIVITY_PERIOD, nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC )
 {
     m_primaryGopKeeper = 0;
     m_secondaryGopKeeper = 0;
@@ -440,7 +439,7 @@ void QnVideoCamera::stopIfNoActivity()
     if( (m_liveCache[MEDIA_Quality_High] || m_liveCache[MEDIA_Quality_Low])     //has live cache ever been started?
         &&
         (!m_liveCache[MEDIA_Quality_High] ||                                    //has hi quality live cache been started?
-            (m_hlsLivePlaylistManager[MEDIA_Quality_High].unique() &&
+            (m_hlsLivePlaylistManager[MEDIA_Quality_High].unique() &&           //no one uses playlist
              m_hlsLivePlaylistManager[MEDIA_Quality_High]->inactivityPeriod() > m_hlsInactivityPeriodMS &&  //checking inactivity timer
              m_liveCache[MEDIA_Quality_High]->inactivityPeriod() > m_hlsInactivityPeriodMS))
         &&
@@ -535,13 +534,20 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, qint64 t
 
 QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCatalog catalog)
 {
-    if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized()) 
+    if( m_resource->hasFlags(Qn::foreigner) )
+        return QnLiveStreamProviderPtr();
+
+    if( m_resource->isInitialized() )
     {
         if( (catalog == QnServer::HiQualityCatalog && m_primaryReader == 0) ||
             (catalog == QnServer::LowQualityCatalog && m_secondaryReader == 0) )
         {
             createReader(catalog);
         }
+    }
+    else
+    {
+        m_resource->initAsync( true );
     }
 	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
 	if ( cameraResource && !cameraResource->hasDualStreaming2() && catalog == QnServer::LowQualityCatalog )

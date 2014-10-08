@@ -20,7 +20,7 @@ QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher()
 {
 }
 
-QnResourcePtr QnPlDlinkResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlDlinkResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -139,7 +139,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
             QnPlDlinkResourcePtr resource ( new QnPlDlinkResource() );
 
-            QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+            QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
             if (rt.isNull())
                 continue;
 
@@ -147,7 +147,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             resource->setName(name);
             resource->setModel(name);
             resource->setMAC(QnMacAddress(smac));
-            resource->setHostAddress(sender, QnDomainMemory);
+            resource->setHostAddress(sender);
 
             resource->setDiscoveryAddr(iface.address);
 
@@ -212,7 +212,7 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, c
         return QList<QnResourcePtr>();
 
 
-    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (rt.isNull())
         return QList<QnResourcePtr>();
 
@@ -222,7 +222,7 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, c
     resource->setName(name);
     resource->setMAC(QnMacAddress(mac));
     (resource.dynamicCast<QnPlDlinkResource>())->setModel(name);
-    resource->setHostAddress(host, QnDomainMemory);
+    resource->setHostAddress(host);
     resource->setAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);

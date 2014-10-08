@@ -8,7 +8,7 @@
 class QnChangeSystemNameRestHandler : public QnJsonRestHandler {
     Q_OBJECT
 public:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result);
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*);
 };
 
 #endif // CHANGE_SYSTEM_NAME_REST_HANDLER_H

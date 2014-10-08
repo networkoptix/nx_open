@@ -59,6 +59,7 @@ public:
     static QString dontRecordPrimaryStreamKey();
     static QString dontRecordSecondaryStreamKey();
     static QString rtpTransportKey();
+    static QString dynamicVideoLayoutKey();
     static QString motionStreamKey();
 protected:
     void initMediaResource();
@@ -66,7 +67,11 @@ protected:
 
 protected:
     mutable QnCustomResourceVideoLayoutPtr m_customVideoLayout;
-    QnMediaDewarpingParams m_dewarpingParams;
+    //QnMediaDewarpingParams m_dewarpingParams;
+
+private:
+    mutable QString m_cachedLayout;
+    mutable QMutex m_layoutMutex;
 };
 
 #endif // QN_MEDIA_RESOURCE_H

@@ -4,7 +4,7 @@
 #include "storage_manager.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "core/dataprovider/live_stream_provider.h"
-#include "core/resource/resource_fwd.h"
+#include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
@@ -427,7 +427,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 
     m_usedSpecialRecordingMode = m_usedPanicMode = false;
-    QnScheduleTask noRecordTask(QUuid(), 1, 0, 0, Qn::RT_Never, 0, 0);
+    QnScheduleTask noRecordTask(QnUuid(), 1, 0, 0, Qn::RT_Never, 0, 0);
 
     if (!m_schedule.isEmpty())
     {

@@ -16,7 +16,7 @@
 template<class Base, class Derived = void>
 class Clickable: public Base {
 public:
-    QN_FORWARD_CONSTRUCTOR(Clickable, Base, {m_clickableButtons = 0; m_isDoubleClick = false;})
+    QN_FORWARD_CONSTRUCTOR(Clickable, Base, {m_clickableButtons = 0; m_isDoubleClick = false; m_skipDoubleClick = false;})
 
     Qt::MouseButtons clickableButtons() const {
         return m_clickableButtons;
@@ -32,6 +32,11 @@ public:
         m_clickableButtons = clickableButtons;
     }
 
+    /** Set the flag to skip next double-click. Used to workaround invalid double click when
+     *  the first mouse click was handled and changed the widget state. */
+    void skipDoubleClick() {
+        m_skipDoubleClick = true;
+    }
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override {
         if(!(event->button() & m_clickableButtons))
@@ -54,11 +59,12 @@ protected:
 
         event->accept();
 
-        if(m_isDoubleClick) {
+        if(m_isDoubleClick && !m_skipDoubleClick) {
             emitDoubleClicked(static_cast<Derived *>(this), event);
         } else {
             emitClicked(static_cast<Derived *>(this), event);
         }
+        m_skipDoubleClick = false;
 
         clickedNotify(event);
     }
@@ -94,6 +100,7 @@ private:
 private:
     Qt::MouseButtons m_clickableButtons;
     bool m_isDoubleClick;
+    bool m_skipDoubleClick;
 };
 
 #endif // QN_CLICKABLE_H

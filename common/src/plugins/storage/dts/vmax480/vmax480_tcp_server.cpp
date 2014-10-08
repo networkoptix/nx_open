@@ -3,7 +3,7 @@
 #include "vmax480_tcp_server.h"
 
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QString>
 
 #include "core/datapacket/audio_data_packet.h"
@@ -372,7 +372,7 @@ QnVMax480Server::QnVMax480Server(): QnTcpListener(QHostAddress(QLatin1String("12
 QString QnVMax480Server::registerProvider(VMaxStreamFetcher* provider)
 {
     QMutexLocker lock(&m_mutexProvider);
-    QString result = QUuid::createUuid().toString();
+    QString result = QnUuid::createUuid().toString();
     m_providers.insert(result, provider);
     return result;
 }

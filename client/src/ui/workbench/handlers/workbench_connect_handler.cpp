@@ -36,8 +36,14 @@
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
 
+#include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
+
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
+#include <utils/common/synctime.h>
+#include <utils/network/global_module_finder.h>
+#include <utils/network/router.h>
+#include "core/resource_management/resource_properties.h"
 
 namespace {
     const int videowallReconnectTimeoutMSec = 5000;
@@ -51,10 +57,24 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_connectingMessageBox(NULL),
-    m_connectingHandle(0)
+    m_connectingHandle(0),
+    m_readyForConnection(true)
 {
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    this,   &QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened);
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionClosed,    this,   &QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed);
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   [this] {
+        /* We are just reconnected automatically, e.g. after update. */
+        if (!m_readyForConnection)
+            return;
+
+        m_readyForConnection = false;
+
+        QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
+        if(!watcher->hasMismatches())
+            return;
+
+        menu()->trigger(Qn::VersionMismatchMessageAction);
+    });
 
     connect(action(Qn::ConnectAction),              &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_connectAction_triggered);
     connect(action(Qn::ReconnectAction),            &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
@@ -94,13 +114,30 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
         connection2()->sendRuntimeData(info.data);
     });
 
+
+    connect( QnAppServerConnectionFactory::getConnection2()->getTimeManager().get(), &ec2::AbstractTimeManager::timeChanged,
+        QnSyncTime::instance(), static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime) );
+
     //connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
+    qnCommon->setLocalSystemName(connection2()->connectionInfo().systemName);
 }
 
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
+
+    if( QnAppServerConnectionFactory::getConnection2() )
+    {
+        disconnect( QnAppServerConnectionFactory::getConnection2().get(), nullptr, this, nullptr );
+        disconnect( QnAppServerConnectionFactory::getConnection2().get(), nullptr, QnSyncTime::instance(), nullptr );
+    }
+
     /* Don't do anything if we are closing client. */
     if (!mainWindow())
         return;
+
+    context()->instance<QnWorkbenchStateManager>()->tryClose(true);
+
+    /* Get ready for the next connection. */
+    m_readyForConnection = true;
 
     disconnect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, NULL);
 
@@ -123,12 +160,16 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     /* Remove all remote resources. */
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
     resourcePool()->removeResources(remoteResources);
+    resourcePool()->removeResources(resourcePool()->getAllIncompatibleResources());
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
-    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>())
-        if(snapshotManager()->isLocal(layout) 
-            && !snapshotManager()->isFile(layout))  //do not remove exported layouts
-            resourcePool()->removeResource(layout);
+    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources<QnLayoutResource>()) {
+        bool isLocal = snapshotManager()->isLocal(layout);
+        bool isFile = snapshotManager()->isFile(layout);
+        if(isLocal && isFile)  //do not remove exported layouts
+            continue;
+        resourcePool()->removeResource(layout);
+    }
 
     qnLicensePool->reset();
     context()->instance<QnAppServerNotificationCache>()->clear();
@@ -146,7 +187,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
         });
     }
 
-    context()->instance<QnWorkbenchStateManager>()->tryClose(true);
+    qnCommon->setLocalSystemName(QString());
 }
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered() {
@@ -179,8 +220,10 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
             url = qnSettings->defaultConnection().url;
 
         /* Try to connect with saved password. */
-        if (url.isValid() && !qnSettings->storedPassword().isEmpty()) {
-            url.setPassword(qnSettings->storedPassword());
+        if (qnSettings->autoLogin() 
+            && url.isValid() 
+            && !url.password().isEmpty()) 
+        {
             if (!connectToServer(url))
                 showLoginDialog();
         } else 
@@ -192,6 +235,10 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
 }    
 
 void QnWorkbenchConnectHandler::at_reconnectAction_triggered() {
+    /* Reconnect call should not be executed while we are disconnected. */
+    if (!context()->user())
+        return;
+
     QUrl currentUrl = QnAppServerConnectionFactory::url(); 
     if (connected())
         disconnectFromServer(true);
@@ -258,6 +305,8 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl) {
 
     context()->setUserName(appServerUrl.userName());
 
+    QnGlobalModuleFinder::instance()->setConnection(result.connection());
+
     return true;
 }
 
@@ -266,18 +315,18 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
         return false;
 
     if (!force) {
-        qnSettings->setStoredPassword(QString());
         QnGlobalSettings::instance()->synchronizeNow();
+        qnSettings->setLastUsedConnection(QnConnectionData());
     }
 
     hideMessageBox();
 
+    QnGlobalModuleFinder::instance()->setConnection(NULL);
     QnClientMessageProcessor::instance()->init(NULL);
-
     QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
-
+    propertyDictionary->clear();
     QnSessionManager::instance()->stop();
     QnResource::stopCommandProc();
 
@@ -299,6 +348,7 @@ void QnWorkbenchConnectHandler::hideMessageBox() {
 
 void QnWorkbenchConnectHandler::showLoginDialog() {
     QnNonModalDialogConstructor<QnLoginDialog> dialogConstructor(m_loginDialog, mainWindow());
+    dialogConstructor.resetGeometry();
     //just show dialog   
 }
 

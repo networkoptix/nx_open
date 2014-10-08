@@ -10,9 +10,13 @@
 #include <functional>
 #include <map>
 
+#include <boost/optional.hpp>
+
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
 #include <QtCore/QUrl>
+
+#include "utils/network/buffer.h"
 
 #include "qnbytearrayref.h"
 
@@ -40,9 +44,10 @@ namespace nx_http
 
         Using QByteArray or any STL container results in many memory copy/relocation operations which make implementation not effecient
     */
-    typedef QByteArray BufferType;
+    typedef nx::Buffer BufferType;
     typedef QnByteArrayConstRef ConstBufferRefType;
-    typedef QByteArray StringType;
+    //TODO #ak not sure, if nx::Buffer is suitable for string type
+    typedef nx::Buffer StringType;
 
     /*!
         \return < 0, if \a one < \a two. 0 if \a one == \a two. > 0 if \a one > \a two
@@ -78,6 +83,9 @@ namespace nx_http
         \return iterator of added element
     */
     HttpHeaders::iterator insertOrReplaceHeader( HttpHeaders* const headers, const HttpHeader& newHeader );
+
+    void removeHeader( HttpHeaders* const headers, const StringType& headerName );
+
 
 
     static const size_t BufferNpos = size_t(-1);
@@ -208,7 +216,9 @@ namespace nx_http
             forbidden = 403,
             notFound = 404,
             notAllowed = 405,
+            notAcceptable = 406,
             proxyAuthenticationRequired = 407,
+            rangeNotSatisfiable = 416,
             internalServerError = 500,
             notImplemented = 501,
             serviceUnavailable = 503
@@ -281,6 +291,8 @@ namespace nx_http
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
+
+        BufferType getCookieValue(const BufferType& name) const;
     };
 
     class Response
@@ -321,9 +333,13 @@ namespace nx_http
 
         Message( MessageType::Value _type = MessageType::none );
         Message( const Message& right );
+        Message( Message&& right );
         ~Message();
 
-        Message& operator=( const Message& right );
+        Message& operator=(const Message& right);
+        Message& operator=(Message&& right);
+
+        void serialize( BufferType* const dstBuffer ) const;
 
         void clear();
         HttpHeaders& headers() { return type == MessageType::request ? request->headers : response->headers; };
@@ -332,7 +348,7 @@ namespace nx_http
     };
 
     //!Contains http header structures
-    namespace Header
+    namespace header
     {
         //!Http authentication scheme enumeration
         namespace AuthScheme
@@ -380,7 +396,7 @@ namespace nx_http
             void serialize( BufferType* const dstBuffer ) const;
         };
 
-        //!Authorization header (rfc2616, rfc2617)
+        //!Authorization header ([rfc2616, 14.8], rfc2617)
         class Authorization
         {
         public:
@@ -425,6 +441,7 @@ namespace nx_http
             void addParam( const BufferType& name, const BufferType& value );
         };
 
+        //![rfc2616, 14.47]
         class WWWAuthenticate
         {
         public:
@@ -435,7 +452,112 @@ namespace nx_http
 
             bool parse( const BufferType& str );
         };
+
+        //![rfc2616, 14.3]
+        class AcceptEncodingHeader
+        {
+        public:
+            AcceptEncodingHeader( const nx_http::StringType& strValue );
+
+            //!Returns \a true if \a encodingName is present in header and returns corresponding qvalue in \a *q (if not null)
+            bool encodingIsAllowed( const nx_http::StringType& encodingName, float* q = nullptr ) const;
+
+        private:
+            nx_http::StringType m_strValue;
+        };
+
+        //![rfc2616, 14.35]
+        class Range
+        {
+        public:
+            /*!
+                \note Boundaries are inclusive
+            */
+            class RangeSpec
+            {
+            public:
+                quint64 start;
+                boost::optional<quint64> end;
+
+                RangeSpec()
+                :
+                    start( 0 )
+                {
+                }
+            };
+
+
+            Range();
+
+            /*!
+                \note In case of parse error, contents of this object are undefined
+            */
+            bool parse( const nx_http::StringType& strValue );
+
+            //!Returns \a true if range is satisfiable for content of size \a contentSize
+            bool validateByContentSize( size_t contentSize ) const;
+            //!\a true, if empty range (does not include any bytes of content)
+            bool empty() const;
+            //!\a true, if range is full (includes all bytes of content of size \a contentSize)
+            bool full( size_t contentSize ) const;
+            //!Returns range length for content of size \a contentSize
+            quint64 totalRangeLength( size_t contentSize ) const;
+
+            std::vector<RangeSpec> rangeSpecList;
+        };
+
+        //![rfc2616, 14.45]
+        class Via
+        {
+        public:
+            class ProxyEntry
+            {
+            public:
+                boost::optional<StringType> protoName;
+                StringType protoVersion;
+                //!( host [ ":" port ] ) | pseudonym
+                StringType receivedBy;
+                StringType comment;
+            };
+
+            std::vector<ProxyEntry> entries;
+
+            /*!
+                \note In case of parse error, contents of this object are undefined
+            */
+            bool parse( const nx_http::StringType& strValue );
+            StringType toString() const;
+        };
     }
+
+    typedef std::pair<StringType, StringType> ChunkExtension;
+
+    //! chunk-size [ chunk-extension ] CRLF
+    /*!
+        chunk-extension= *( ";" chunk-ext-name [ "=" chunk-ext-val ] )
+        chunk-ext-name = token
+        chunk-ext-val  = token | quoted-string
+    */
+    class ChunkHeader
+    {
+    public:
+        size_t chunkSize;
+        std::vector<ChunkExtension> extensions;
+
+        ChunkHeader();
+
+        void clear();
+
+        /*!
+            \return bytes read from \a buf. -1 in case of parse error
+            \note In case of parse error object state is indefined
+        */
+        int parse( const ConstBufferRefType& buf );
+        /*!
+            \return bytes written to \a dstBuffer. -1 in case of serialize error. In this case contents of \a dstBuffer are undefined
+        */
+        int serialize( BufferType* const dstBuffer ) const;
+    };
 }
 
 #endif  //HTTPTYPES_H

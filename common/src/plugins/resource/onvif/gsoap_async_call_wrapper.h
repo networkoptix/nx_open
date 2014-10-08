@@ -7,6 +7,10 @@
 #define GSOAP_ASYNC_CALL_WRAPPER_H
 
 #include <functional>
+#include <type_traits>
+
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
 
 #include <onvif/stdsoap2.h>
 
@@ -14,7 +18,6 @@
 #include <utils/common/stoppable.h>
 #include <utils/network/socket.h>
 #include <utils/network/http/httptypes.h>
-#include <utils/network/aio/aioservice.h>
 
 #include "soap_wrapper.h"
 
@@ -37,12 +40,12 @@ template<typename SyncWrapper, typename Request, typename Response>
 class GSoapAsyncCallWrapper
 :
     public GSoapAsyncCallWrapperBase,
-    public aio::AIOEventHandler,
     public QnStoppable,
     public QnJoinable
 {
 public:
     static const int SOAP_INTERRUPTED = -1;
+    static const int READ_BUF_SIZE = 32 * 1024;
 
     typedef int(SyncWrapper::*GSoapCallFuncType)(Request&, Response&);
 
@@ -55,11 +58,11 @@ public:
         m_syncWrapper(syncWrapper),
         m_syncFunc(syncFunc),
         m_state(init),
-        m_responseDataSize(0),
         m_responseDataPos(0),
-        m_bytesSent(0)
+        m_bytesSent(0),
+        m_terminatedFlagPtr(nullptr)
     {
-        m_responseBuffer.resize( 64*1024 );
+        m_responseBuffer.reserve( READ_BUF_SIZE );
     }
 
     ~GSoapAsyncCallWrapper()
@@ -73,6 +76,13 @@ public:
         soap_end(m_syncWrapper->getProxy()->soap);
         delete m_syncWrapper;
         m_syncWrapper = nullptr;
+
+        //if we are here, it is garanteed that 
+            //- completion handler is down the stack
+            //- or no completion handler is running and it will never be launched
+
+        if( m_terminatedFlagPtr )
+            *m_terminatedFlagPtr = true;
     }
 
     virtual void pleaseStop() override
@@ -84,12 +94,30 @@ public:
     */
     virtual void join() override
     {
-        if( m_socket )
+        std::unique_ptr<AbstractStreamSocket> socket;
         {
-            aio::AIOService::instance()->removeFromWatch(m_socket, aio::etRead);
-            aio::AIOService::instance()->removeFromWatch(m_socket, aio::etWrite);
-            m_socket.clear();
+            QMutexLocker lk( &m_mutex );
+            socket = std::move(m_socket);
         }
+        if( socket )
+        {
+            socket->cancelAsyncIO(aio::etRead);
+            socket->cancelAsyncIO(aio::etWrite);
+        }
+    }
+
+    template<class GSoapAsyncCallWrapperType>
+    static int custom_soap_fsend( struct soap* soap, const char *s, size_t n )
+    {
+        GSoapAsyncCallWrapperType* pThis = static_cast<GSoapAsyncCallWrapperType*>(soap->user);
+        return pThis->onGsoapSendData( s, n );
+    }
+
+    template<class GSoapAsyncCallWrapperType>
+    static size_t custom_soap_frecv( struct soap* soap, char* data, size_t maxSize )
+    {
+        GSoapAsyncCallWrapperType* pThis = static_cast<GSoapAsyncCallWrapperType*>(soap->user);
+        return pThis->onGsoapRecvData( data, maxSize );
     }
 
     //!Start async call
@@ -101,20 +129,25 @@ public:
     bool callAsync(const Request& request, ResultHandler resultHandler)
     {
         m_state = init;
-        m_resultHandler = resultHandler;
+        m_extCompletionHandler = std::move(resultHandler);
+        m_resultHandler = [this](int resultCode) {
+            bool terminated = false;
+            m_terminatedFlagPtr = &terminated;
+            m_extCompletionHandler(resultCode);
+            if( !terminated )
+            {
+                QMutexLocker lk(&m_mutex);
+                m_socket.reset();
+                m_terminatedFlagPtr = nullptr;
+            }
+        };
 
-        m_socket = QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket());
+        m_socket.reset( SocketFactory::createStreamSocket( false, SocketFactory::nttDisabled ) );
         m_syncWrapper->getProxy()->soap->user = this;
         m_syncWrapper->getProxy()->soap->fconnect = [](struct soap*, const char*, const char*, int) -> int { return SOAP_OK; };
         m_syncWrapper->getProxy()->soap->fdisconnect = [](struct soap*) -> int { return SOAP_OK; };
-        m_syncWrapper->getProxy()->soap->fsend = [](struct soap* soap, const char *s, size_t n) -> int {
-            GSoapAsyncCallWrapperBase* pThis = static_cast<GSoapAsyncCallWrapperBase*>(soap->user);
-            return pThis->onGsoapSendData(s, n);
-        };
-        m_syncWrapper->getProxy()->soap->frecv = [](struct soap* soap, char* data, size_t maxSize) -> size_t {
-            GSoapAsyncCallWrapperBase* pThis = static_cast<GSoapAsyncCallWrapperBase*>(soap->user);
-            return pThis->onGsoapRecvData(data, maxSize);
-        };
+        m_syncWrapper->getProxy()->soap->fsend = &custom_soap_fsend<typename std::remove_reference<decltype(*this)>::type>;
+        m_syncWrapper->getProxy()->soap->frecv = &custom_soap_frecv<typename std::remove_reference<decltype(*this)>::type>;
         m_syncWrapper->getProxy()->soap->fopen = NULL;
         m_syncWrapper->getProxy()->soap->fdisconnect = [](struct soap*) -> int { return SOAP_OK; };
         m_syncWrapper->getProxy()->soap->fclose = [](struct soap*) -> int { return SOAP_OK; };
@@ -125,19 +158,19 @@ public:
 
         //serializing request
         m_request = request;
-        m_state = sendingRequest;
-        (m_syncWrapper->*m_syncFunc)(m_request, m_response);
-        assert(!m_serializedRequest.isEmpty());
-        m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
-        m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
-        soap_destroy(m_syncWrapper->getProxy()->soap);
-        soap_end(m_syncWrapper->getProxy()->soap);
-        //m_serializedRequest full
 
         const QUrl endpoint(QLatin1String(m_syncWrapper->endpoint()));
-        return m_socket->setNonBlockingMode(true)
-            && aio::AIOService::instance()->watchSocket(m_socket, aio::etWrite, this)
-            && m_socket->connect(endpoint.host(), endpoint.port(nx_http::DEFAULT_HTTP_PORT));
+        using namespace std::placeholders;
+        if( !m_socket->setNonBlockingMode( true ) ||
+            !m_socket->connectAsync(
+                SocketAddress( endpoint.host(), endpoint.port( nx_http::DEFAULT_HTTP_PORT ) ),
+                std::bind( &GSoapAsyncCallWrapper::onConnectCompleted, this, _1 ) ) )
+        {
+            m_socket.reset();
+            return false;
+        }
+
+        return true;
     }
 
     SyncWrapper* syncWrapper() const
@@ -171,99 +204,110 @@ private:
         if( m_state < receivingResponse )
             return 0;  //serialized request
 
-        const int bytesToCopy = std::min<int>(m_responseDataSize - m_responseDataPos, (int)maxSize);
+        const int bytesToCopy = std::min<int>( m_responseBuffer.size() - m_responseDataPos, (int)maxSize );
         memcpy(data, m_responseBuffer.constData() + m_responseDataPos, bytesToCopy);
         m_responseDataPos += bytesToCopy;
         return bytesToCopy;
     }
 
-    virtual void eventTriggered(AbstractSocket* sock, aio::EventType eventType) throw()
+    void onConnectCompleted( SystemError::ErrorCode errorCode )
     {
-        assert( sock == m_socket.data() );
-        switch( eventType )
+        if( errorCode )
         {
-            case aio::etWrite:
+            m_state = done;
+            return m_resultHandler( SOAP_FAULT );
+        }
+
+        //serializing request
+        m_state = sendingRequest;
+        (m_syncWrapper->*m_syncFunc)(m_request, m_response);
+        assert( !m_serializedRequest.isEmpty() );
+        m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
+        m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
+        soap_destroy( m_syncWrapper->getProxy()->soap );
+        soap_end(m_syncWrapper->getProxy()->soap);
+
+        {
+            QMutexLocker lk(&m_mutex);
+            //sending request
+            using namespace std::placeholders;
+            if( !m_socket->sendAsync(m_serializedRequest, std::bind(&GSoapAsyncCallWrapper::onRequestSent, this, _1, _2)) )
             {
-                assert(m_state == sendingRequest);
-                const int bytesSent = m_socket->send(QByteArray::fromRawData(m_serializedRequest.constData() + m_bytesSent, m_serializedRequest.size() - m_bytesSent));
-                if( bytesSent == -1 )
-                {
-                    m_state = done;
-                    aio::AIOService::instance()->removeFromWatch(m_socket, aio::etWrite);
-                    m_resultHandler(SOAP_FAULT);
-                    return;
-                }
-
-                m_bytesSent += bytesSent;
-                if( m_bytesSent == m_serializedRequest.size() )
-                {
-                    //request has been sent, receiving response
-                    aio::AIOService::instance()->removeFromWatch(m_socket, aio::etWrite);
-                    m_state = receivingResponse;
-                    m_responseDataSize = 0;
-                    aio::AIOService::instance()->watchSocket(m_socket, aio::etRead, this);
-                }
-                break;
+                m_state = done;
+                lk.unlock();
+                return m_resultHandler(SOAP_FAULT);
             }
-
-            case aio::etRead:
-            {
-                static const int MIN_SOCKET_READ_SIZE = 4096;
-                static const int READ_BUFFER_GROW_STEP = 4096;
-
-                assert(m_state == receivingResponse);
-                if( m_responseBuffer.size() - m_responseDataSize < MIN_SOCKET_READ_SIZE )
-                    m_responseBuffer.resize(m_responseBuffer.size() + READ_BUFFER_GROW_STEP);
-                const int bytesRead = m_socket->recv(m_responseBuffer.data() + m_responseDataSize, m_responseBuffer.size() - m_responseDataSize);
-                if( bytesRead > 0 )
-                {
-                    m_responseDataSize += bytesRead;
-                    break;
-                }
-                //error or connection closed, trying to deserialize what we have
-                aio::AIOService::instance()->removeFromWatch(m_socket, aio::etRead);
-                deserializeResponse();
-                break;
-            }
-
-            case aio::etTimedOut:
-            {
-                if( m_state == sendingRequest )
-                {
-                    aio::AIOService::instance()->removeFromWatch(m_socket, aio::etWrite);
-                    m_resultHandler(SOAP_FAULT);
-                }
-                else if( m_state == receivingResponse )
-                {
-                    aio::AIOService::instance()->removeFromWatch(m_socket, aio::etWrite);
-                    if( m_responseDataSize > 0 )
-                        deserializeResponse();  //deserializing what we have
-                    else
-                        m_resultHandler(SOAP_FAULT);
-                }
-                break;
-            }
-
-            case aio::etError:
-            {
-                aio::AIOService::instance()->removeFromWatch(m_socket, aio::etWrite);
-                m_resultHandler(SOAP_FAULT);
-                break;
-            }
-
-            default:
-                assert( false );
         }
     }
 
-    void deserializeResponse()
+    void onRequestSent( SystemError::ErrorCode errorCode, size_t bytesSent )
+    {
+        if( errorCode )
+        {
+            m_state = done;
+            return m_resultHandler( SOAP_FAULT );
+        }
+
+        assert( bytesSent == m_serializedRequest.size() );
+        m_state = receivingResponse;
+
+        m_responseBuffer.reserve( READ_BUF_SIZE );
+        m_responseBuffer.resize(0);
+        {
+            QMutexLocker lk(&m_mutex);
+            using namespace std::placeholders;
+            if( !m_socket->readSomeAsync(&m_responseBuffer, std::bind(&GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2)) )
+            {
+                m_state = done;
+                lk.unlock();
+                return m_resultHandler(SOAP_FAULT);
+            }
+        }
+    }
+
+    void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
+    {
+        static const int MIN_SOCKET_READ_SIZE = 4096;
+        static const int READ_BUFFER_GROW_STEP = 4096;
+
+        assert( m_state == receivingResponse );
+
+        if( errorCode || bytesRead == 0 )
+        {
+            m_state = done;
+            int resultCode = m_responseBuffer.isEmpty()
+                ? SOAP_FAULT
+                : deserializeResponse();  //error or connection closed, trying to deserialize what we have
+            m_resultHandler( resultCode );
+            return;
+        }
+
+        //reading until connection closure
+        //TODO #ak it is better to parse http response and detect message boundary
+
+        if( m_responseBuffer.capacity() - m_responseBuffer.size() < MIN_SOCKET_READ_SIZE )
+            m_responseBuffer.reserve(m_responseBuffer.capacity() + READ_BUFFER_GROW_STEP);
+
+        {
+            QMutexLocker lk(&m_mutex);
+            using namespace std::placeholders;
+            if( !m_socket->readSomeAsync(&m_responseBuffer, std::bind(&GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2)) )
+            {
+                m_state = done;
+                lk.unlock();
+                return m_resultHandler(SOAP_FAULT);
+            }
+        }
+    }
+
+    int deserializeResponse()
     {
         m_responseDataPos = 0;
         const int resultCode = (m_syncWrapper->*m_syncFunc)(m_request, m_response);
         m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
         m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
         m_state = done;
-        m_resultHandler(resultCode);
+        return resultCode;
     }
 
 private:
@@ -274,11 +318,13 @@ private:
     State m_state;
     QByteArray m_serializedRequest;
     QByteArray m_responseBuffer;
-    int m_responseDataSize;
     int m_responseDataPos;
-    QSharedPointer<AbstractStreamSocket> m_socket;
+    std::unique_ptr<AbstractStreamSocket> m_socket;
     int m_bytesSent;
+    std::function<void(int)> m_extCompletionHandler;
     std::function<void(int)> m_resultHandler;
+    bool* m_terminatedFlagPtr;
+    mutable QMutex m_mutex;
 };
 
 #endif  //GSOAP_ASYNC_CALL_WRAPPER_H

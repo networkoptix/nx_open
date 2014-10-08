@@ -14,7 +14,7 @@
 #   include <QtCore/QString>
 #   include <QtCore/QByteArray>
 #   include <QtCore/QUrl>
-#   include <QtCore/QUuid>
+#   include <utils/common/uuid.h>
 #endif
 
 #include <utils/common/collection.h>
@@ -187,6 +187,7 @@ QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(qint8,         readInt8,       w
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(qint16,        readInt16,      writeInt16)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(qint32,        readInt32,      writeInt32)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(qint64,        readInt64,      writeInt64)
+QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(quint64,       readUInt64,     writeUInt64)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(float,         readFloat,      writeFloat)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(double,        readDouble,     writeDouble)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(QString,       readUtf8String, writeUtf8String)
@@ -257,16 +258,16 @@ bool deserialize(QnUbjsonReader<T> *stream, QUrl *target) {
 
 
 template <class Output>
-void serialize(const QUuid &value, QnUbjsonWriter<Output> *stream) {
+void serialize(const QnUuid &value, QnUbjsonWriter<Output> *stream) {
     QnUbjson::serialize(value.toRfc4122(), stream);
 }
 
 template <class Input>
-bool deserialize(QnUbjsonReader<Input> *stream, QUuid *target) {
+bool deserialize(QnUbjsonReader<Input> *stream, QnUuid *target) {
     QByteArray tmp;
     if(!QnUbjson::deserialize(stream, &tmp) || tmp.size() != 16)
         return false;
-    *target = QUuid::fromRfc4122(tmp);
+    *target = QnUuid::fromRfc4122(tmp);
     return true;
 }
 

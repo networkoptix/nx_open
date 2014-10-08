@@ -14,9 +14,15 @@ SHARETARGET=$TARGET/share
 ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
+BETA=""
+if [[ "${beta}" == "true" ]]; then 
+  BETA="-beta" 
+fi 
+
+FINALNAME=${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}$BETA
 
 STAGEBASE=deb
-STAGE=$STAGEBASE/${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta
+STAGE=$STAGEBASE/$FINALNAME
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
 LIBPLUGINSTAGE=$STAGE$LIBPLUGINTARGET
@@ -91,15 +97,18 @@ mkdir -p $STAGE/DEBIAN
 INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 
 cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/VERSION/$VERSION/g" | sed "s/ARCHITECTURE/$ARCHITECTURE/g" > $STAGE/DEBIAN/control
+install -m 755 debian/preinst $STAGE/DEBIAN
 install -m 755 debian/postinst $STAGE/DEBIAN
 install -m 755 debian/prerm $STAGE/DEBIAN
 install -m 644 debian/templates $STAGE/DEBIAN
 
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
-(cd $STAGEBASE; fakeroot dpkg-deb -b ${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta)
+(cd $STAGEBASE; fakeroot dpkg-deb -b $FINALNAME)
 cp -P $SERVER_LIB_PATH/*.debug ${project.build.directory}
 cp -P $SERVER_BIN_PATH/*.debug ${project.build.directory}
 cp -P $SERVER_LIB_PLUGIN_PATH/*.debug ${project.build.directory}
-tar czf ./${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-debug-symbols.tar.gz ./*.debug
-(cd $STAGEBASE; zip ./${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta.zip ./* -x ./${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta)
+tar czf ./$FINALNAME-debug-symbols.tar.gz ./*.debug
+(cd $STAGEBASE; zip -y ./server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ./* -i *.*)
+mv $STAGEBASE/server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ${project.build.directory}
+echo "server.finalName=$FINALNAME" >> finalname-server.properties

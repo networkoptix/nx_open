@@ -15,6 +15,9 @@
 #include <client/client_settings.h>
 
 #include <core/resource/file_processor.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/media_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <transcoding/filters/contrast_image_filter.h>
 #include <transcoding/filters/fisheye_image_filter.h>
@@ -181,6 +184,11 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScre
 
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
     bool anyQuality = layout->channelCount() > 1;   // screenshots for panoramic cameras will be done locally
+
+    const QnMediaServerResourcePtr server = qnResPool->getResourceById(display->mediaResource()->toResource()->getParentId()).dynamicCast<QnMediaServerResource>();
+    if (!server || (server->getServerFlags() & Qn::SF_Edge))
+        anyQuality = true; // local file or edge cameras will be done locally
+
     for (int i = 0; i < layout->channelCount(); ++i) {
         QImage channelImage = display->camDisplay()->getScreenshot(i, parameters.imageCorrectionParams, parameters.mediaDewarpingParams, parameters.itemDewarpingParams, anyQuality);
         if (channelImage.isNull())
@@ -394,19 +402,20 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         painter->drawImage(QPointF(0, 0), resizedToAr, QnGeometry::cwiseMul(parameters.zoomRect, resizedToAr.size()));
     }
     
+    qreal ar = resized.width() / (qreal) resized.height();
     int panoFactor = (parameters.mediaDewarpingParams.enabled && parameters.itemDewarpingParams.enabled) ? parameters.itemDewarpingParams.panoFactor : 1;
     if (panoFactor > 1)
-        resized = resized.scaled(QnFisheyeImageFilter::getOptimalSize(resized.size(), parameters.itemDewarpingParams));
+		resized = resized.scaled(QnFisheyeImageFilter::getOptimalSize(resized.size(), parameters.itemDewarpingParams));
 
     QScopedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(resized));
     if (parameters.imageCorrectionParams.enabled) {
         QnContrastImageFilter filter(parameters.imageCorrectionParams);
-        filter.updateImage(frame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+        filter.updateImage(frame.data(), QRectF(0.0, 0.0, 1.0, 1.0), ar);
     }
 
     if (parameters.mediaDewarpingParams.enabled && parameters.itemDewarpingParams.enabled) {
         QnFisheyeImageFilter filter(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
-        filter.updateImage(frame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+        filter.updateImage(frame.data(), QRectF(0.0, 0.0, 1.0, 1.0), ar);
     }
 
     QImage timestamped = frame->toImage();

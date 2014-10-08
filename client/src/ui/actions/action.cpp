@@ -6,6 +6,7 @@
 
 #include <utils/common/warnings.h>
 
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -163,11 +164,13 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
             if(parameters.hasArgument(key)) {
                 resources = QnActionParameterTypes::resources(parameters.argument(key));
             } else if(key == Qn::CurrentLayoutResourceRole) {
-                resources.push_back(context()->workbench()->currentLayout()->resource());
+                if (QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource())
+                    resources.push_back(layout);
             } else if(key == Qn::CurrentUserResourceRole) {
-                resources.push_back(context()->user());
+                if (QnUserResourcePtr user = context()->user())
+                    resources.push_back(user);
             } else if(key == Qn::CurrentMediaServerResourcesRole) {
-                resources = context()->resourcePool()->getResources().filtered<QnMediaServerResource>();
+                resources = context()->resourcePool()->getResources<QnMediaServerResource>();
             } else if(key == Qn::CurrentLayoutMediaItemsRole) {
                 const QnResourceList& resList = QnActionParameterTypes::resources(context()->display()->widgets());
                 foreach( QnResourcePtr res, resList )
@@ -175,9 +178,10 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
                     if( res.dynamicCast<QnMediaResource>() )
                         resources.push_back( res );
                 }
-                //resources = QnActionParameterTypes::resources(context()->display()->widgets()).filtered<QnMediaResource>();
             }
 
+            if (resources.isEmpty() && required > 0)
+                return Qn::InvisibleAction;
             if((accessController()->permissions(resources) & required) != required)
                 return Qn::InvisibleAction;
             if((accessController()->permissions(resources) & forbidden) != 0)

@@ -21,13 +21,13 @@ public:
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
-    virtual bool setParamPhysical(const QnParam &param, const QVariant &val) override;
-    virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain);
+    virtual bool setParamPhysical(const QString &param, const QVariant &val) override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 private:
+    bool setSpecialParam(const QString& name, const QVariant& val);
     bool setResolution(bool full);
     bool setCamQuality(int q);
 

@@ -3,13 +3,9 @@
 
 class QnShowDialogHelper {
 public:
-    static void show(QWidget* dialog, const QRect &targetGeometry) {
-        dialog->show();
-        dialog->raise();
-        dialog->activateWindow(); // TODO: #Elric show raise activateWindow? Maybe we should also do grabKeyboard, grabMouse? wtf, really?
-        if (!targetGeometry.isNull())
-            dialog->setGeometry(targetGeometry);
-    }
+    static void show(QWidget* dialog, const QRect &targetGeometry);
+
+    static QPoint calculatePosition(QWidget* dialog);
 };
 
 /** Helper class to show target non-modal dialog as soon as top-level modal dialog is closed. */
@@ -38,6 +34,10 @@ public:
         return QObject::eventFilter(watched, event);
     }
 
+    /** Invalidate stored geometry so dialog will be displayed in the center of the screen. */
+    void resetGeometry() {
+        m_targetGeometry = QRect();
+    }
 
 private:
     QPointer<QWidget> m_targetWidget;
@@ -82,6 +82,12 @@ public:
         /* Or show it immediately if no modal windows are visible. */
         show(m_dialog, m_targetGeometry);
     }
+
+    /** Invalidate stored geometry so dialog will be displayed in the center of the screen. */
+    void resetGeometry() {
+        m_targetGeometry = QRect();
+    }
+
 
 private:
     QRect m_targetGeometry;

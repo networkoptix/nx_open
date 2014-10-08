@@ -6,23 +6,13 @@
 #include "api/app_server_connection.h"
 
 
-QnServerCamera::QnServerCamera(const QUuid& resourceTypeId): QnVirtualCameraResource()
+QnServerCamera::QnServerCamera(const QnUuid& resourceTypeId): QnVirtualCameraResource()
 {
     setTypeId(resourceTypeId);
     addFlags(Qn::server_live_cam);
     if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
         addFlags(Qn::motion);
     m_tmpStatus = Qn::NotDefined;
-}
-
-bool QnServerCamera::isResourceAccessible()
-{
-    return true;
-}
-
-bool QnServerCamera::updateMACAddress()
-{
-    return true;
 }
 
 QString QnServerCamera::getDriverName() const
@@ -40,7 +30,7 @@ QnConstResourceVideoLayoutPtr QnServerCamera::getVideoLayout(const QnAbstractStr
 {
     Q_UNUSED(dataProvider)
     // todo: layout must be loaded in resourceParams
-    return QnMediaResource::getVideoLayout();
+    return QnVirtualCameraResource::getVideoLayout();
 }
 
 QnConstResourceAudioLayoutPtr QnServerCamera::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const

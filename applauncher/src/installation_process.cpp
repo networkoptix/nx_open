@@ -21,7 +21,7 @@
 InstallationProcess::InstallationProcess(
     const QString& productName,
     const QString& customization,
-    const QString& version,
+    const QnSoftwareVersion &version,
     const QString& module,
     const QString& installationDirectory,
     bool autoStartNeeded )
@@ -56,7 +56,7 @@ void InstallationProcess::join()
 }
 
 static const QString MIRROR_LIST_URL_PARAM_NAME( "mirrorListUrl" );
-static const QString INSTALLATION_DATA_FILE( "install.dat" );
+static const QString installationDataFile( "install.dat" );
 
 bool InstallationProcess::start( const QString& mirrorListUrl )
 {
@@ -114,7 +114,7 @@ QString InstallationProcess::errorText() const
     return m_errorText;
 }
 
-QString InstallationProcess::getVersion() const
+QnSoftwareVersion InstallationProcess::getVersion() const
 {
     return m_version;
 }
@@ -198,7 +198,7 @@ void InstallationProcess::failed(
 
 bool InstallationProcess::writeInstallationSummary()
 {
-    QFile file(m_installationDirectory + "/" + INSTALLATION_DATA_FILE);
+    QFile file(m_installationDirectory + "/" + installationDataFile);
     if (!file.open(QFile::WriteOnly))
         return false;
 
@@ -271,7 +271,7 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
     inputData.put( ProductParameters::product, m_productName );
     inputData.put( ProductParameters::customization, m_customization );
     inputData.put( ProductParameters::module, m_module );
-    inputData.put( ProductParameters::version, m_version );
+    inputData.put( ProductParameters::version, m_version.toString(QnSoftwareVersion::MinorFormat) );
 #ifdef _MSC_VER
 #ifdef _WIN64
     inputData.put( ProductParameters::arch, "x64" );

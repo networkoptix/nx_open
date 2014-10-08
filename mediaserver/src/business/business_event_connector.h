@@ -49,6 +49,9 @@ public slots:
     */
     void at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStamp);
 
+    /*!
+        \param timeStamp microseconds from 1970-01-01 (UTC)
+    */
     void at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
 
     void at_mserverStarted(const QnResourcePtr &resource, qint64 timeStamp);
@@ -57,7 +60,7 @@ public slots:
 
     void at_cameraIPConflict(const QnResourcePtr& resource, const QHostAddress& hostAddress, const QStringList& macAddrList, qint64 timeStamp);
 
-    void at_mediaServerConflict(const QnResourcePtr& resource, qint64 timeStamp, const QList<QByteArray>& otherServers);
+    void at_mediaServerConflict(const QnResourcePtr& resource, qint64 timeStamp, const QnCameraConflictList& conflicts);
 
     void at_NoStorages(const QnResourcePtr& resource);
 

@@ -25,6 +25,9 @@
 #include "managers/user_manager.h"
 #include "managers/videowall_manager.h"
 #include "managers/updates_manager.h"
+#include "managers/misc_manager.h"
+#include "managers/discovery_manager.h"
+#include "managers/time_manager_api.h"
 
 
 namespace ec2
@@ -51,13 +54,15 @@ namespace ec2
         virtual AbstractVideowallManagerPtr getVideowallManager() override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
         virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
+        virtual AbstractMiscManagerPtr getMiscManager() override;
+        virtual AbstractDiscoveryManagerPtr getDiscoveryManager() override;
+        virtual AbstractTimeManagerPtr getTimeManager() override;
 
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
-        virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) override;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) override;
 
-        virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) override;
+        virtual void addRemotePeer(const QUrl& url) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
 
@@ -77,6 +82,9 @@ namespace ec2
         std::shared_ptr<QnVideowallManager<QueryProcessorType>> m_videowallManager;
         std::shared_ptr<QnStoredFileManager<QueryProcessorType>> m_storedFileManager;
         std::shared_ptr<QnUpdatesManager<QueryProcessorType>> m_updatesManager;
+        std::shared_ptr<QnMiscManager<QueryProcessorType>> m_miscManager;
+        std::shared_ptr<QnDiscoveryManager<QueryProcessorType>> m_discoveryManager;
+        std::shared_ptr<QnTimeManager<QueryProcessorType>> m_timeManager;
         std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
 
     private:

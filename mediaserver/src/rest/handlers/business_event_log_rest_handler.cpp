@@ -13,7 +13,7 @@
 
 #include <media_server/serverutil.h>
 
-int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
     Q_UNUSED(params)
@@ -24,7 +24,7 @@ int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnReque
     QString errStr;
     QnBusiness::EventType eventType = QnBusiness::UndefinedEvent;
     QnBusiness::ActionType actionType = QnBusiness::UndefinedAction;
-    QUuid businessRuleId;
+    QnUuid businessRuleId;
 
     for (int i = 0; i < params.size(); ++i)
     {
@@ -60,7 +60,7 @@ int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnReque
                     errStr = QString("Invalid action type %1. Valid range is [0..%2]").arg(params[i].second).arg(QnBusiness::ActionCount-1);
             }
             else if (params[i].first == "brule_id") {
-                businessRuleId = QUuid(params[i].second);
+                businessRuleId = QnUuid(params[i].second);
             }
         }
     }
@@ -85,8 +85,9 @@ int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnReque
     return CODE_OK;
 }
 
-int QnBusinessEventLogRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
+int QnBusinessEventLogRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
+                                               QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
-    return executeGet(path, params, result, contentType);
+    return executeGet(path, params, result, contentType, owner);
 }
 

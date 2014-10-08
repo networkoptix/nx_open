@@ -18,16 +18,18 @@ extern "C"
 #include <core/dataconsumer/abstract_data_consumer.h>
 #include <core/datapacket/audio_data_packet.h>
 #include <core/datapacket/video_data_packet.h>
-#include <core/resource/resource.h>
+
+#include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
-#include <core/resource/storage_resource.h>
+
 #include "utils/color_space/image_correction.h"
+#include "core/resource/resource_consumer.h"
 
 class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
 class QnFfmpegVideoTranscoder;
 
-class QnStreamRecorder : public QnAbstractDataConsumer
+class QnStreamRecorder : public QnAbstractDataConsumer, public QnResourceConsumer
 {
     Q_OBJECT
     Q_ENUMS(StreamRecorderError)
@@ -84,6 +86,7 @@ public:
     */
     void setNeedCalcSignature(bool value);
 
+    virtual void disconnectFromResource() override;
 #ifdef SIGN_FRAME_ENABLED
     void setSignLogo(const QImage& logo);
 #endif

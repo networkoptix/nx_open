@@ -16,6 +16,8 @@
 #include <ui/customization/palette_data.h>
 #include <ui/customization/pen_data.h>
 
+#include <update/updates_common.h>
+
 #include "client_globals.h"
 #include "client_model_types.h"
 #include "client_color_types.h"
@@ -27,6 +29,7 @@ namespace {
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientSkin)
+QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientBackground)
 
 void QnClientMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK, 
@@ -37,8 +40,10 @@ void QnClientMetaTypes::initialize() {
     QnCommonMetaTypes::initialize();
 
     qRegisterMetaType<Qt::KeyboardModifiers>();
-    qRegisterMetaType<QVector<QUuid> >();
+    qRegisterMetaType<QVector<QnUuid> >();
     qRegisterMetaType<QVector<QColor> >();
+
+    qRegisterMetaTypeStreamOperators<QList<QUrl>>();
 
     qRegisterMetaType<Qn::NodeType>();
     qRegisterMetaType<Qn::ItemRole>();
@@ -53,12 +58,12 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnLicenseWarningStateHash>();
     qRegisterMetaType<QnServerStorageKey>();
     qRegisterMetaTypeStreamOperators<QnServerStorageKey>();
-    qRegisterMetaType<QnServerStorageStateHash>();
-    qRegisterMetaTypeStreamOperators<QnServerStorageStateHash>();
     qRegisterMetaType<Qn::TimeMode>();
     qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
     qRegisterMetaType<Qn::ClientSkin>();
     qRegisterMetaTypeStreamOperators<Qn::ClientSkin>();
+    qRegisterMetaType<Qn::ClientBackground>();
+    qRegisterMetaTypeStreamOperators<Qn::ClientBackground>();
     qRegisterMetaType<ImageCorrectionParams>();
     qRegisterMetaType<Qn::ActionId>();
     qRegisterMetaType<QnActionParameters>();
@@ -80,9 +85,15 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnResourceWidgetFrameColors>();
     qRegisterMetaType<QnPtzManageModelColors>();
     qRegisterMetaType<QnLicensesListModelColors>();
+    qRegisterMetaType<QnRoutingManagementColors>();
     qRegisterMetaType<QnVideowallManageWidgetColors>();
 
     qRegisterMetaType<QnAbstractCameraDataPtr>();
+
+    qRegisterMetaType<QnPeerUpdateStage>();
+    qRegisterMetaType<QnFullUpdateStage>();
+    qRegisterMetaType<QnUpdateResult>();
+    qRegisterMetaType<QnCheckForUpdateResult>();
 
     QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
     QnJsonSerializer::registerSerializer<QnTimeScrollBarColors>();
@@ -95,13 +106,15 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnResourceWidgetFrameColors>();
     QnJsonSerializer::registerSerializer<QnPtzManageModelColors>();
     QnJsonSerializer::registerSerializer<QnLicensesListModelColors>();
+    QnJsonSerializer::registerSerializer<QnRoutingManagementColors>();
     QnJsonSerializer::registerSerializer<QnVideowallManageWidgetColors>();
 
     QnJsonSerializer::registerSerializer<Qn::ClientSkin>();
+    QnJsonSerializer::registerSerializer<Qn::ClientBackground>();
     QnJsonSerializer::registerSerializer<QnPaletteData>();
     QnJsonSerializer::registerSerializer<QnPenData>();
     QnJsonSerializer::registerSerializer<QVector<QColor> >(); // TODO: #Elric integrate with QVariant iteration?
-    QnJsonSerializer::registerSerializer<QVector<QUuid> >();
+    QnJsonSerializer::registerSerializer<QVector<QnUuid> >();
 
     qn_clientMetaTypes_initialized = true;
 }

@@ -32,7 +32,7 @@ namespace Qn
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace CameraDataType
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
-            StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat PeerType)
+            StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType)
     Q_FLAGS(Borders Corners
             ResourceFlags
             CameraCapabilities 
@@ -289,6 +289,8 @@ public:
         videowall = 0x200000,           /**< Videowall resource */
         desktop_camera = 0x400000,      /**< Desktop Camera resource */
 
+        parent_change = 0x800000,       /**< Camera discovery internal purpose */
+
         local_media = local | media,
         local_layout = local | layout,
 
@@ -309,7 +311,8 @@ public:
         Unauthorized,
         Online,
         Recording,
-        NotDefined
+        NotDefined,
+        Incompatible
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)
 
@@ -381,8 +384,8 @@ public:
         ResourceStatusRole,                         /**< Role for resource status. Value of type int (Qn::ResourceStatus). */
         ResourceUidRole,                            /**< Role for resource unique id. Value of type QString. */
 
-        VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QUuid. */
-        VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QUuid. */
+        VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QnUuid. */
+        VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QnUuid. */
         VideoWallItemIndicesRole,                   /**< Role for videowall item indices list. Value of type QnVideoWallItemIndexList. */
 
         /* Layout-based. */
@@ -393,10 +396,10 @@ public:
         LayoutSearchStateRole,                      /**< */
         LayoutTimeLabelsRole,                       /**< Role for layout's time label diplay. Value of type bool. */ 
         LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */ 
-        LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QUuid>. */
+        LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QnUuid>. */
 
         /* Item-based. */
-        ItemUuidRole,                               /**< Role for item's UUID. Value of type QUuid. */
+        ItemUuidRole,                               /**< Role for item's UUID. Value of type QnUuid. */
         ItemGeometryRole,                           /**< Role for item's integer geometry. Value of type QRect. */
         ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. Value of type QRectF. */
         ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */
@@ -464,6 +467,7 @@ public:
         ValidRole,                                  /**< Role for valid state. Value of type bool. */
         ActionIsInstantRole,                        /**< Role for instant state for business rule actions. Value of type bool. */
         ShortTextRole,                              /**< Role for short text. Value of type QString. */
+        PriorityRole,                               /**< Role for priority value. Value of type quint64. */
 
         EventTypeRole,                              /**< Role for business event type. Value of type QnBusiness::EventType. */
         EventResourcesRole,                         /**< Role for business event resources list. Value of type QnResourceList. */
@@ -472,6 +476,7 @@ public:
 
         SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
 
+        LastItemDataRole
     };
 
     // TODO: #Elric #EC2 rename
@@ -498,6 +503,15 @@ public:
         SSQualityDontUse = 4
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SecondStreamQuality)
+
+    enum StatisticsDeviceType {
+        StatisticsCPU = 0,                /**< CPU load in percents. */
+        StatisticsRAM = 1,                /**< RAM load in percents. */
+        StatisticsHDD = 2,                /**< HDD load in percents. */
+        StatisticsNETWORK = 3             /**< Network load in percent. */
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StatisticsDeviceType)
+
 
     enum CameraStatusFlag {
         CSF_NoFlags = 0x0,
@@ -620,7 +634,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
-        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
+        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType), 
     (metatype)(lexical)

@@ -121,7 +121,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 if (resource==0)
                     continue;
 
-                resource->setHostAddress(sender, QnDomainMemory);
+                resource->setHostAddress(sender);
                 resource->setMAC(QnMacAddress(mac));
                 resource->setDiscoveryAddr(iface.address);
                 resource->setName(QLatin1String("ArecontVision_Abstract"));
@@ -157,7 +157,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 
 }
 
-QnResourcePtr QnPlArecontResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlArecontResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -238,7 +238,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
         return QList<QnResourcePtr>();
 
 
-    QUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), model);
+    QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), model);
     if (rt.isNull())
         return QList<QnResourcePtr>();
 
@@ -261,7 +261,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
     res->setName(model);
     res->setModel(model);
     res->setMAC(QnMacAddress(mac));
-    res->setHostAddress(host, QnDomainMemory);
+    res->setHostAddress(host);
     res->setAuth(auth);
 
     QList<QnResourcePtr> resList;

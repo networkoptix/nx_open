@@ -37,8 +37,6 @@ public:
     QnPlAxisResource();
     ~QnPlAxisResource();
 
-    virtual bool isResourceAccessible();
-
     virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
@@ -108,8 +106,8 @@ private:
     std::map<QString, unsigned int> m_inputPortNameToIndex;
     std::map<QString, unsigned int> m_outputPortNameToIndex;
     mutable QMutex m_inputPortMutex;
-    //!map<input port index (1-based), http client>
-    std::map<unsigned int, std::shared_ptr<nx_http::AsyncHttpClient> > m_inputPortHttpMonitor;
+    //!http client used to monitor input port(s) state
+    std::shared_ptr<nx_http::AsyncHttpClient> m_inputPortHttpMonitor;
     nx_http::MultipartContentParserHelper m_multipartContentParser;
     nx_http::BufferType m_currentMonitorData;
     AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
@@ -129,7 +127,6 @@ private:
         unsigned int* paramValue );
     void initializeIOPorts( CLSimpleHTTPClient* const http );
     void notificationReceived( const nx_http::ConstBufferRefType& notification );
-    void forgetHttpClient( nx_http::AsyncHttpClientPtr httpClient );
 
     friend class QnAxisPtzController;
 };

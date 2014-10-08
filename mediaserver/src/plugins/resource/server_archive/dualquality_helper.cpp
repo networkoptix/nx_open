@@ -1,7 +1,11 @@
 #include "dualquality_helper.h"
 
+#include <core/resource/network_resource.h>
+
 #include <server/server_globals.h>
+
 #include "recorder/storage_manager.h"
+#include "core/resource/network_resource.h"
 
 static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
 static const int FIRST_STREAM_FIND_EPS = 1000 * 15;

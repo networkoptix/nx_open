@@ -24,6 +24,8 @@
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include "resource_command.h"
+#include "nx_ec/data/api_resource_data.h"
+#include "../resource_management/resource_properties.h"
 
 bool QnResource::m_appStopping = false;
 QnInitResPool QnResource::m_initAsyncPool;
@@ -39,26 +41,26 @@ static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 class QnResourceGetParamCommand : public QnResourceCommand
 {
 public:
-    QnResourceGetParamCommand(QnResourcePtr res, const QString& name, QnDomain domain):
+    QnResourceGetParamCommand(QnResourcePtr res, const QString& name):
         QnResourceCommand(res),
-        m_name(name),
-        m_domain(domain)
+        m_name(name)
     {}
 
     virtual void beforeDisconnectFromResource(){}
 
     bool execute()
     {
-        if (!isConnectedToTheResource())
-            return false;
-
+        bool rez = false;
         QVariant val;
-        return m_resource->getParam(m_name, val, m_domain);
+        if (isConnectedToTheResource()) {
+            rez = m_resource->getParamPhysical(m_name, val);
+        }
+        emit m_resource->asyncParamGetDone(m_resource, m_name, val, rez);
+        return rez;
     }
 
 private:
     QString m_name;
-    QnDomain m_domain;
 };
 
 typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
@@ -71,11 +73,10 @@ typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
 class QnResourceSetParamCommand : public QnResourceCommand
 {
 public:
-    QnResourceSetParamCommand(QnResourcePtr res, const QString& name, const QVariant& val, QnDomain domain):
+    QnResourceSetParamCommand(QnResourcePtr res, const QString& name, const QVariant& val):
         QnResourceCommand(res),
         m_name(name),
-        m_val(val),
-        m_domain(domain)
+        m_val(val)
     {}
 
     virtual void beforeDisconnectFromResource(){}
@@ -85,16 +86,18 @@ public:
         if (!isConnectedToTheResource())
             return false;
 
-        return m_resource->setParam(m_name, m_val, m_domain);
+        bool rez = m_resource->setParamPhysical(m_name, m_val);
+        emit m_resource->asyncParamSetDone(m_resource, m_name, m_val, rez);
+        return rez;
     }
 
 private:
     QString m_name;
     QVariant m_val;
-    QnDomain m_domain;
 };
-
 typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
+
+
 #endif // ENABLE_DATA_PROVIDERS
 
 // -------------------------------------------------------------------------- //
@@ -139,15 +142,9 @@ QnResourcePtr QnResource::toSharedPointer() const
     return QnFromThisToShared<QnResource>::toSharedPointer();
 }
 
-void QnResource::afterUpdateInner(QSet<QByteArray>& modifiedFields)
+void QnResource::afterUpdateInner(const QSet<QByteArray>& modifiedFields)
 {
-    emit resourceChanged(toSharedPointer(this));
-    //modifiedFields << "resourceChanged";
-
-    const QnResourcePtr & _t1 = toSharedPointer(this);
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    foreach(const QByteArray& signalName, modifiedFields)
-        emitDynamicSignal((signalName + QByteArray("(QnResourcePtr)")).data(), _a);
+    emitModificationSignals( modifiedFields );
 }
 
 bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
@@ -160,7 +157,8 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
-void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
+void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) 
+{
     Q_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
     m_typeId = other->m_typeId;
@@ -207,34 +205,24 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode)
     setStatus(other->m_status, silenceMode);
     afterUpdateInner(modifiedFields);
 
-    QnParamList paramList = other->getResourceParamList();
-    foreach(QnParam param, paramList.list())
-    {
-        if (param.domain() == QnDomainDatabase)
-        {
-            setParam(param.name(), param.value(), QnDomainDatabase);
-        }
-    }
-
     //silently ignoring missing properties because of removeProperty method lack
-    for (const QnKvPair &param: other->getProperties()) {
-        setProperty(param.name(), param.value());   //here "propertyChanged" will be called
-    }
-
+    for (const ec2::ApiResourceParamData &param: other->getProperties())
+        emitPropertyChanged(param.name);   //here "propertyChanged" will be called
+    
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->afterUpdate();
 }
 
-QUuid QnResource::getParentId() const
+QnUuid QnResource::getParentId() const
 {
     QMutexLocker locker(&m_mutex);
     return m_parentId;
 }
 
-void QnResource::setParentId(QUuid parent)
+void QnResource::setParentId(QnUuid parent)
 {
     bool initializedChanged = false;
-    QUuid oldParentId;
+    QnUuid oldParentId;
     {
         QMutexLocker locker(&m_mutex);
         if (m_parentId == parent)
@@ -332,7 +320,7 @@ QString QnResource::toSearchString() const
 
 QnResourcePtr QnResource::getParentResource() const
 {
-    QUuid parentID;
+    QnUuid parentID;
     QnResourcePool* resourcePool = NULL;
     {
         QMutexLocker mutexLocker(&m_mutex);
@@ -346,201 +334,58 @@ QnResourcePtr QnResource::getParentResource() const
         return QnResourcePtr();
 }
 
-
-QnParamList QnResource::getResourceParamList() const
-{
-    QMutexLocker mutexLocker(&m_mutex);
-    
-    if (!m_resourceParamList.isEmpty())
-        return m_resourceParamList;
-    QUuid resTypeId = m_typeId;
-    
-    QnParamList resourceParamList;
-
-    // 2. read AppServer params 
-    if (QnResourceTypePtr resType = qnResTypePool->getResourceType(resTypeId)) 
-    {
-        Q_ASSERT(resType);
-
-        const QList<QnParamTypePtr>& params = resType->paramTypeList();
-        //Q_ASSERT(params.size() != 0);
-        for (int i = 0; i < params.size(); ++i)
-        {
-            QnParam newParam(params[i], params[i]->default_value);
-            resourceParamList.append(newParam);
-        }
-    }
-
-    if (m_resourceParamList.isEmpty())
-        m_resourceParamList = resourceParamList;
-
-    return m_resourceParamList;
-}
-
 bool QnResource::hasParam(const QString &name) const
 {
-    return getResourceParamList().contains(name);
-}
-
-bool QnResource::getParamPhysical(const QnParam &/*param*/, QVariant &/*val*/)
-{
-    return false;
-}
-
-bool QnResource::setParamPhysical(const QnParam &/*param*/, const QVariant &/*val*/)
-{
-    return false;
-}
-
-bool QnResource::setSpecialParam(const QString& /*name*/, const QVariant& /*val*/, QnDomain /*domain*/)
-{
-    return false;
-}
-
-bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain) const
-{
-    const QnParamList& resourceParamList = getResourceParamList();
-    QnParamList::const_iterator paramIter = resourceParamList.find( name );
-    if ( paramIter == resourceParamList.cend() )
-    {
-        emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, QVariant(), false);
+    QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId); 
+    if (!resType)
         return false;
-    }
+    return resType->hasParam(name);
+}
 
-    const QnParam& param = paramIter.value();
-    val = param.value();
-
-    if (domain == QnDomainMemory)
-    {
-        emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, val, true);
-        return true;
-    }
-    else if (domain == QnDomainPhysical)
-    {
-        QVariant newValue;
-        if (param.isPhysical() && const_cast<QnResource*>(this)->getParamPhysical(param, newValue)) {
-            if (val != newValue) {
-                val = newValue;
-                m_mutex.lock();
-                //param.setValue(newValue);
-                m_resourceParamList[name].setValue(newValue);
-                m_mutex.unlock();
-                const_cast<QnResource *>(this)->parameterValueChangedNotify(param); // TODO: wtf???
-            }
-            emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, newValue, true);
-            return true;
-        }
-    }
-    else if (domain == QnDomainDatabase)
-    {
-        if (param.isPhysical())
-        {
-            emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, val, true);
-            return true;
-        }
-    }
-
-    emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, QVariant(), false);
+bool QnResource::getParamPhysical(const QString&/* name*/, QVariant &/*val*/)
+{
     return false;
 }
 
-void QnResource::parameterValueChangedNotify(const QnParam &param) {
-    if(param.name() == lit("ptzCapabilities"))
-        emit ptzCapabilitiesChanged(::toSharedPointer(this));
-    else if(param.name() == lit("VideoLayout"))
-        emit videoLayoutChanged(::toSharedPointer(this));
-
-    emit parameterValueChanged(::toSharedPointer(this), param);
-}
-
-bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain domain)
+bool QnResource::setParamPhysical(const QString &/*param*/, const QVariant &/*val*/)
 {
-    if (setSpecialParam(name, val, domain))
-    {
-        emit asyncParamSetDone(toSharedPointer(this), name, val, true);
-        return true;
-    }
-
-    const QnParamList& resourceParamList = getResourceParamList(); // paramList loaded once. No more changes, instead of param value. So, use mutex for value only
-    if (!resourceParamList.contains(name))
-    {
-        qWarning() << "Can't set parameter. Parameter" << name << "does not exists for resource" << getName();
-        emit asyncParamSetDone(toSharedPointer(this), name, val, false);
-        return false;
-    }
-
-
-    m_mutex.lock();
-    QnParam param = m_resourceParamList[name];
-    if (param.isReadOnly())
-    {
-        NX_LOG("setParam: cannot set readonly param!", cl_logWARNING);
-        m_mutex.unlock();
-        emit asyncParamSetDone(toSharedPointer(this), name, val, false);
-        return false;
-    }
-    param.setDomain(domain);
-
-    QVariant oldValue = param.value();
-    m_mutex.unlock();
-
-    if (domain == QnDomainPhysical)
-    {
-        if (!param.isPhysical() || !setParamPhysical(param, val))
-        {
-            emit asyncParamSetDone(toSharedPointer(this), name, val, false);
-            return false;
-        }
-    }
-
-    //QnDomainMemory should be changed anyway
-    {
-        QMutexLocker locker(&m_mutex); // block paramList changing
-        QnParam& param = m_resourceParamList[name];
-        param.setDomain(domain);
-        if (!param.setValue(val))
-        {
-            locker.unlock();
-            NX_LOG( lit("cannot set such param %1!").arg(name), cl_logWARNING );
-            emit asyncParamSetDone(toSharedPointer(this), name, val, false);
-            return false;
-        }
-    }
-
-    if (oldValue != val)
-        parameterValueChangedNotify(param);
-
-    emit asyncParamSetDone(toSharedPointer(this), name, val, true);
-    return true;
+    return false;
 }
 
 #ifdef ENABLE_DATA_PROVIDERS
-void QnResource::getParamAsync(const QString &name, QnDomain domain)
+
+void QnResource::setParamPhysicalAsync(const QString& name, const QVariant& val)
 {
-    QnResourceGetParamCommandPtr command(new QnResourceGetParamCommand(toSharedPointer(this), name, domain));
+    QnResourceSetParamCommandPtr command(new QnResourceSetParamCommand(toSharedPointer(this), name, val));
     addCommandToProc(command);
 }
 
-void QnResource::setParamAsync(const QString& name, const QVariant& val, QnDomain domain)
+void QnResource::getParamPhysicalAsync(const QString& name)
 {
-    QnResourceSetParamCommandPtr command(new QnResourceSetParamCommand(toSharedPointer(this), name, val, domain));
+    QnResourceGetParamCommandPtr command(new QnResourceGetParamCommand(toSharedPointer(this), name));
     addCommandToProc(command);
 }
-#endif // ENABLE_DATA_PROVIDERS
+
+#endif
 
 bool QnResource::unknownResource() const
 {
     return getName().isEmpty();
 }
 
-QUuid QnResource::getTypeId() const
+QnUuid QnResource::getTypeId() const
 {
     QMutexLocker mutexLocker(&m_mutex);
     return m_typeId;
 }
 
-void QnResource::setTypeId(QUuid id)
+void QnResource::setTypeId(const QnUuid &id)
 {
+    if (id.isNull()) {
+        qWarning() << "NULL typeId is set to resource" << getName();
+        return;
+    }
+
     QMutexLocker mutexLocker(&m_mutex);
     m_typeId = id;
 }
@@ -626,20 +471,30 @@ void QnResource::setLastDiscoveredTime(const QDateTime &time)
     m_lastDiscoveredTime = time;
 }
 
-QUuid QnResource::getId() const
+QnUuid QnResource::getId() const
 {
     QMutexLocker mutexLocker(&m_mutex);
     return m_id;
 }
 
-void QnResource::setId(const QUuid& id) {
+void QnResource::setId(const QnUuid& id) {
     QMutexLocker mutexLocker(&m_mutex);
 
     if(m_id == id)
         return;
 
-    //QUuid oldId = m_id;
+    //QnUuid oldId = m_id;
     m_id = id;
+
+    auto locallySavedProperties = std::move( m_locallySavedProperties );
+    mutexLocker.unlock();
+
+    //<key, <value, isDirty>>
+    for( std::pair<QString, std::pair<QString, bool> > prop: locallySavedProperties )
+    {
+        if( propertyDictionary->setValue(id, prop.first, prop.second.first, prop.second.second) )   //isModified?
+            emitPropertyChanged(prop.first);
+    }
 }
 
 QString QnResource::getUrl() const
@@ -783,32 +638,68 @@ void QnResource::initializationDone()
 }
 
 bool QnResource::hasProperty(const QString &key) const {
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_propertyByKey.contains(key);
+    return propertyDictionary->hasProperty(getId(), key);
 }
 
-QString QnResource::getProperty(const QString &key, const QString &defaultValue) const {
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_propertyByKey.value(key, defaultValue);
-}
-
-void QnResource::setProperty(const QString &key, const QString &value) {
-    {
-        QMutexLocker mutexLocker(&m_mutex);
-        if (m_propertyByKey.contains(key) && m_propertyByKey.value(key) == value)
-            return;
-        m_propertyByKey[key] = value;
+QString QnResource::getProperty(const QString &key) const {
+    //QMutexLocker mutexLocker(&m_mutex);
+    //return m_propertyByKey.value(key, defaultValue);
+    QString value = propertyDictionary->value(getId(), key);
+    if (value.isNull()) {
+        // find default value in resourceType
+        QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId); 
+        if (resType)
+            return resType->defaultValue(key);
     }
+    return value;
+}
+
+void QnResource::setProperty(const QString &key, const QString &value, bool markDirty) 
+{
+    {
+        QMutexLocker lk( &m_mutex );
+        if( m_id.isNull() )
+        {
+            //saving property to some internal dictionary. Will apply to global dictionary when id is known
+            m_locallySavedProperties[key] = std::make_pair( value, markDirty );
+            return;
+        }
+    }
+
+    Q_ASSERT(!getId().isNull());
+    bool isModified = propertyDictionary->setValue(getId(), key, value, markDirty);
+    if (isModified)
+        emitPropertyChanged(key);
+}
+
+void QnResource::emitPropertyChanged(const QString& key)
+{
+    if(key == lit("ptzCapabilities"))
+        emit ptzCapabilitiesChanged(::toSharedPointer(this));
+    else if(key == Qn::VIDEO_LAYOUT_PARAM_NAME)
+        emit videoLayoutChanged(::toSharedPointer(this));
+
     emit propertyChanged(toSharedPointer(this), key);
 }
 
-QnKvPairList QnResource::getProperties() const {
-    QMutexLocker mutexLocker(&m_mutex);
-    
-    QnKvPairList result;
-    for(auto pos = m_propertyByKey.begin(); pos != m_propertyByKey.end(); pos++)
-        result.push_back(QnKvPair(pos.key(), pos.value()));
-    return result;
+void QnResource::setProperty(const QString &key, const QVariant& value)
+{
+    return setProperty(key, value.toString());
+}
+
+ec2::ApiResourceParamDataList QnResource::getProperties() const {
+    return propertyDictionary->allProperties(getId());
+}
+
+void QnResource::emitModificationSignals( const QSet<QByteArray>& modifiedFields )
+{
+    emit resourceChanged(toSharedPointer(this));
+    //modifiedFields << "resourceChanged";
+
+    const QnResourcePtr & _t1 = toSharedPointer(this);
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    foreach(const QByteArray& signalName, modifiedFields)
+        emitDynamicSignal((signalName + QByteArray("(QnResourcePtr)")).data(), _a);
 }
 
 QnInitResPool* QnResource::initAsyncPoolInstance()
@@ -924,6 +815,10 @@ void QnResource::stopAsyncTasks()
     m_initAsyncPool.waitForDone();
 }
 
+void QnResource::pleaseStopAsyncTasks()
+{
+    m_appStopping = true;
+}
 
 void QnResource::initAsync(bool optional)
 {
@@ -972,10 +867,7 @@ void QnResource::setUniqId(const QString& value)
 
 Qn::PtzCapabilities QnResource::getPtzCapabilities() const
 {
-    QVariant mediaVariant;
-    QnResource* thisCasted = const_cast<QnResource*>(this);
-    thisCasted->getParam(QLatin1String("ptzCapabilities"), mediaVariant, QnDomainMemory);
-    return static_cast<Qn::PtzCapabilities>(mediaVariant.toInt());
+    return Qn::PtzCapabilities(getProperty(lit("ptzCapabilities")).toInt());
 }
 
 bool QnResource::hasPtzCapabilities(Qn::PtzCapabilities capabilities) const
@@ -985,7 +877,7 @@ bool QnResource::hasPtzCapabilities(Qn::PtzCapabilities capabilities) const
 
 void QnResource::setPtzCapabilities(Qn::PtzCapabilities capabilities) {
     if (hasParam(lit("ptzCapabilities")))
-        setParam(lit("ptzCapabilities"), static_cast<int>(capabilities), QnDomainDatabase);
+        setProperty(lit("ptzCapabilities"), static_cast<int>(capabilities));
 }
 
 void QnResource::setPtzCapability(Qn::PtzCapabilities capability, bool value) {

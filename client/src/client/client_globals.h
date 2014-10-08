@@ -15,6 +15,7 @@ namespace Qn {
         RootNode,               /**< Root node for the tree. */
         LocalNode,              /**< Root node for local resources. */
         ServersNode,            /**< Root node for remote resources. */
+        OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
         UsersNode,              /**< Root node for user resources. */
 
         BastardNode,            /**< Root node for hidden resources. */
@@ -26,6 +27,8 @@ namespace Qn {
 
         VideoWallItemNode,      /**< Node that represents a videowall item. Has a guid and can have resource. */
         VideoWallMatrixNode,    /**< Node that represents a videowall saved matrix. Has a guid. */
+
+        SystemNode,             /**< Node that represents systems but the current. */
 
         NodeTypeCount
     };
@@ -174,7 +177,6 @@ namespace Qn {
         UnauthorizedOverlay,
         OfflineOverlay,
         AnalogWithoutLicenseOverlay,
-        VideowallWithoutLicenseOverlay,
         ServerOfflineOverlay,
 
         OverlayCount
@@ -255,14 +257,23 @@ namespace Qn {
         LightSkin
     };
 
+    enum ClientBackground {
+        NoBackground,
+        DefaultBackground,
+        RainbowBackground,
+        CustomBackground
+    };
+
 
 } // namespace Qn
 
 Q_DECLARE_METATYPE(Qn::ItemRole)
 Q_DECLARE_METATYPE(Qn::TimeMode)
 Q_DECLARE_METATYPE(Qn::ClientSkin)
+Q_DECLARE_METATYPE(Qn::ClientBackground)
 Q_DECLARE_METATYPE(Qn::NodeType)
 
 QN_FUSION_DECLARE_FUNCTIONS(Qn::ClientSkin, (lexical))
+QN_FUSION_DECLARE_FUNCTIONS(Qn::ClientBackground, (lexical))
 
 #endif // QN_CLIENT_GLOBALS_H

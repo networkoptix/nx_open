@@ -16,8 +16,9 @@
 
         <!-- Add property to access from custom actions -->
         <Property Id="ARCHITECTURE" Value="$(var.arch)" />
-        
-        <Property Id="REINSTALLMODE" Value="amus"/>
+
+        <Property Id="REINSTALLMODE" Value="dmus"/> 
+
         <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
 
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
@@ -58,6 +59,16 @@
 
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
+
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_DEFAULT" Id="ALLOW_CAMERA_CHANGES" Value="1" After="AppSearch" Sequence="ui">
+            <![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]>
+        </SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_BEFORE_UI" Id="ALLOW_CAMERA_CHANGES" Value="{}" After="SetALLOW_CAMERA_CHANGES_DEFAULT" Sequence="ui">
+            <![CDATA[ ALLOW_CAMERA_CHANGES = "0" ]]>
+        </SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_AFTER_UI" Id="ALLOW_CAMERA_CHANGES" Value="0" Before="ExecuteAction" Sequence="ui">
+            <![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]>
+        </SetProperty>
 
         <SetProperty Action="SetServerPort1" Id="SERVER_PORT" Value="[SERVER_PORT_EC]" Before="SetServerPort2">NOT SERVER_PORT</SetProperty>
         <SetProperty Action="SetServerPort2" Id="SERVER_PORT" Value="7001" Before="CostInitialize">NOT SERVER_PORT</SetProperty>
@@ -113,11 +124,15 @@
             <RegistrySearch Id="ServerEcsPortReg" Root="HKLM" Key="$(var.ECRegPath)" Name="port" Type="raw" Win64="yes"/>
         </Property>
 
+        <Property Id="ALLOW_CAMERA_CHANGES" Secure="yes">
+            <RegistrySearch Id="AllowCameraChangesReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="allowCameraChanges" Type="raw" Win64="yes"/>
+        </Property>
 
         <Property Id="SERVER_LOGIN" Value="admin"/>
         <Property Id="SERVER_PASSWORD" Secure="yes"/>
         <Property Id="SERVER_PASSWORD_CONFIRM" Secure="yes"/>
 
+        <Property Id="ALLOW_CAMERA_CHANGES_REF" Value="ALLOW_CAMERA_CHANGES"/>
 
         <!-- Client properties-->
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
@@ -148,6 +163,7 @@
         <CustomAction Id="DeleteOldMediaserverSettings" BinaryKey="CustomActions.dll" DllEntry="DeleteOldMediaserverSettings" Execute="deferred" Impersonate="no"/>
         
         <!-- Assign default values for Quick installation -->
+        <CustomAction Id="AssignServerPort" Property="SERVER_PORT" Value="[FREEPORT1]"/>
         <CustomAction Id="AssignClientPort" Property="CLIENT_PORT" Value="[SERVER_PORT]"/>
 
         <CustomAction Id="CertGenAction_Cmd" Property="CertGenAction"
@@ -160,9 +176,19 @@
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
+        <CustomAction Id="CloseTrayToolAction2_Cmd" Property="CloseTrayToolAction2"
+                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM traytool.exe' Execute="immediate" />
+        <CustomAction Id="CloseTrayToolAction2" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="ignore" Impersonate="no" />
+
         <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
                       Value="&quot;[${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]$(var.ProductName) Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="ignore" Impersonate="no" />
+
+        <CustomAction Id="CloseAppLauncherAction2_Cmd" Property="CloseAppLauncherAction2"
+                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "$(var.ProductName) Launcher.exe"' Execute="immediate" />
+        <CustomAction Id="CloseAppLauncherAction2" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
         <CustomAction Id="SyncDatabaseAction_Cmd_WithWarning" Property="SyncDatabaseAction"
@@ -175,8 +201,8 @@
         <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="yes"
                       Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\ecs.sqlite"/>
 
-        <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
-        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="applauncher.exe" ExeCommand=""/>
+        <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" Directory="${customization}TrayToolDir" ExeCommand="[${customization}TrayToolDir]traytool.exe"/>
+        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir" ExeCommand="[${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]${product.name} Launcher.exe"/>
 
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
 
@@ -191,7 +217,8 @@
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
-            <Custom Action="FindFreePorts" Before="AssignClientPort"/>
+            <Custom Action="FindFreePorts" Before="AssignServerPort"/>
+            <Custom Action="AssignServerPort" Before="AssignClientPort">NOT SERVER_PORT</Custom>
             <Custom Action="AssignClientPort" Before="FindConfiguredStorages">1</Custom>
             <Custom Action="FindConfiguredStorages" Before="CostInitialize"/> 
         </InstallUISequence>
@@ -206,7 +233,7 @@
             <Custom Action="CopyDatabaseFile_Cmd" After="InstallFiles">
                 <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="CopyDatabaseFile" After="CopyDatabaseFile_Cmd">
-            <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
+                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
 
             <Custom Action="CertGenAction_Cmd" After="CopyDatabaseFile">
                 <![CDATA[ $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
@@ -224,19 +251,17 @@
             <Custom Action="DeleteOldMediaserverSettings_Cmd" After="WriteRegistryValues">$(var.VmsUpgrading)</Custom>
             <Custom Action="DeleteOldMediaserverSettings" After="DeleteOldMediaserverSettings_Cmd">$(var.VmsUpgrading)</Custom>
 
-            <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">
-                <![CDATA[ NOT $(var.VmsInstalling) ]]>
-            </Custom>
-            <Custom Action="CloseTrayToolAction" Before="StopServices">
-                <![CDATA[ NOT $(var.VmsInstalling) ]]>
-            </Custom>
+            <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">NOT $(var.VmsInstalling)</Custom>                                 
+            <Custom Action="CloseTrayToolAction" Before="CloseTrayToolAction2_Cmd">NOT $(var.VmsInstalling)</Custom>
 
-            <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">
-                <![CDATA[ NOT $(var.VmsInstalling) ]]>
-            </Custom>
-            <Custom Action="CloseAppLauncherAction" Before="StopServices">
-                <![CDATA[ NOT $(var.VmsInstalling) ]]>
-            </Custom>
+            <Custom Action="CloseTrayToolAction2_Cmd" Before="CloseTrayToolAction2">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="CloseTrayToolAction2" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
+
+            <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="CloseAppLauncherAction" Before="CloseAppLauncherAction2_Cmd">NOT $(var.VmsInstalling)</Custom>
+
+            <Custom Action="CloseAppLauncherAction2_Cmd" Before="CloseAppLauncherAction2">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="CloseAppLauncherAction2" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
 
             <Custom Action="LaunchTrayTool" After="InstallFinalize">
             <![CDATA[ (!ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom>

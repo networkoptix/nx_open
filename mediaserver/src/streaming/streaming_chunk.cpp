@@ -42,17 +42,17 @@ QString StreamingChunk::mimeType() const
     else
         return QLatin1String("application/octet-stream");
 
-    //TODO/IMPL should find some common place for containerFormat -> MIME_type match
+    //TODO #ak should find some common place for containerFormat -> MIME_type match
 }
 
 //!Returns whole chunk data
-QByteArray StreamingChunk::data() const
+nx::Buffer StreamingChunk::data() const
 {
     QMutexLocker lk( &m_mutex );
     return m_data;
 }
 
-bool StreamingChunk::tryRead( SequentialReadingContext* const ctx, QByteArray* const dataBuffer )
+bool StreamingChunk::tryRead( SequentialReadingContext* const ctx, nx::Buffer* const dataBuffer )
 {
     QMutexLocker lk( &m_mutex );
     if( ctx->m_currentOffset >= m_data.size() ) //all data has been read
@@ -72,7 +72,7 @@ bool StreamingChunk::openForModification()
     return true;
 }
 
-void StreamingChunk::appendData( const QByteArray& data )
+void StreamingChunk::appendData( const nx::Buffer& data )
 {
     static const size_t BUF_INCREASE_STEP = 128*1024;
 
@@ -94,6 +94,7 @@ void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
         QMutexLocker lk( &m_mutex );
         Q_ASSERT( m_isOpenedForModification );
         m_isOpenedForModification = false;
+        m_cond.wakeAll();
     }
 
     QMutexLocker lk( &m_signalEmitMutex );
@@ -112,8 +113,52 @@ size_t StreamingChunk::sizeInBytes() const
     return m_data.size();
 }
 
+void StreamingChunk::waitForChunkReady()
+{
+    QMutexLocker lk( &m_mutex );
+    while( (m_data.size() == 0) || m_isOpenedForModification )
+        m_cond.wait( lk.mutex() );
+}
+
 void StreamingChunk::disconnectAndJoin( QObject* receiver )
 {
     disconnect( this, nullptr, receiver, nullptr );
-    QMutexLocker lk( &m_signalEmitMutex );
+    QMutexLocker lk( &m_signalEmitMutex );  //waiting for signals to be emitted in other threads
+}
+
+
+//////////////////////////////////////////////
+//   StreamingChunkInputStream
+//////////////////////////////////////////////
+
+StreamingChunkInputStream::StreamingChunkInputStream( StreamingChunk* chunk )
+:
+    m_chunk( chunk )
+{
+}
+
+bool StreamingChunkInputStream::tryRead( nx::Buffer* const dataBuffer )
+{
+    if( !m_range || m_range.get().full(m_chunk->sizeInBytes()) )
+        return m_chunk->tryRead( &m_readCtx, dataBuffer );
+
+    assert( m_chunk->isClosed() && m_chunk->sizeInBytes() > 0 );
+    //supporting byte range only on closed chunk
+    if( !(m_chunk->isClosed() && m_chunk->sizeInBytes() > 0) )
+        return false;
+
+    const nx::Buffer& chunkData = m_chunk->data();
+    for( const nx_http::header::Range::RangeSpec& rangeSpec: m_range.get().rangeSpecList )
+    {
+        dataBuffer->append( chunkData.mid(
+            rangeSpec.start,
+            rangeSpec.end ? (rangeSpec.end.get() - rangeSpec.start) : -1 ) );
+    }
+
+    return true;
+}
+
+void StreamingChunkInputStream::setByteRange( const nx_http::header::Range& range )
+{
+    m_range = range;
 }

@@ -42,7 +42,8 @@ QnDesktopResourceSearcher::QnDesktopResourceSearcher(QGLWidget* mainWidget)
 QnDesktopResourceSearcher::~QnDesktopResourceSearcher()
 {
 #ifdef Q_OS_WIN
-    m_pD3D->Release();
+    if (m_pD3D)
+        m_pD3D->Release();
 #endif
 }
 
@@ -74,13 +75,13 @@ QnResourceList QnDesktopResourceSearcher::findResources() {
 #endif
 }
 
-bool QnDesktopResourceSearcher::isResourceTypeSupported(QUuid resourceTypeId) const {
+bool QnDesktopResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) const {
     Q_UNUSED(resourceTypeId)
 
     return false;
 }
 
-QnResourcePtr QnDesktopResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& params) {
+QnResourcePtr QnDesktopResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) {
     Q_UNUSED(resourceTypeId)
     Q_UNUSED(params)
 

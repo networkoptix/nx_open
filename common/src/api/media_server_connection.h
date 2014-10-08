@@ -44,12 +44,8 @@ class QnMediaServerConnection: public QnAbstractConnection {
     typedef QnAbstractConnection base_type;
 
 public:
-    QnMediaServerConnection(QnMediaServerResource* mserver, const QUuid& videowallGuid = QUuid(), QObject *parent = NULL);
+    QnMediaServerConnection(QnMediaServerResource* mserver, const QnUuid& videowallGuid = QnUuid(), QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
-
-    void setProxyAddr(const QUrl &apiUrl, const QString &addr, int port);
-    int getProxyPort() { return m_proxyPort; }
-    QString getProxyHost() { return m_proxyAddr; }
 
     int getTimePeriodsAsync(
         const QnNetworkResourceList &list,
@@ -87,6 +83,20 @@ public:
     int getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot);
 
     /** 
+     * Check \a list of cameras for discovery. Return new list with contains only accessible cameras.
+     * 
+     * Returns immediately. On request completion \a slot of object \a target 
+     * is called with signature <tt>(int status, QImage reply, int handle)</tt>.
+     * Status is 0 in case of success, in other cases it holds error code.
+     * 
+     * \param cameras
+     * \param target
+     * \param slot
+     * \returns                         Request handle.
+     */
+    int checkCameraList(const QnNetworkResourceList &cameras, QObject *target, const char *slot);
+
+    /** 
      * Get \a camera params. 
      * 
      * Returns immediately. On request completion \a slot of object \a target 
@@ -117,7 +127,7 @@ public:
         QnResourceList cameras,
         QnBusiness::EventType eventType, 
         QnBusiness::ActionType actionType,
-        QUuid businessRuleId, 
+        QnUuid businessRuleId, 
         QObject *target, 
         const char *slot);
 
@@ -148,15 +158,15 @@ public:
     int getStatisticsAsync(QObject *target, const char *slot);
 
     int searchCameraAsyncStart(const QString &startAddr, const QString &endAddr, const QString &username, const QString &password, int port, QObject *target, const char *slot);
-    int searchCameraAsyncStatus(const QUuid &processUuid, QObject *target, const char *slot);
-    int searchCameraAsyncStop(const QUuid &processUuid, QObject *target = NULL, const char *slot = NULL);
+    int searchCameraAsyncStatus(const QnUuid &processUuid, QObject *target, const char *slot);
+    int searchCameraAsyncStop(const QnUuid &processUuid, QObject *target = NULL, const char *slot = NULL);
 
     int addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password, QObject *target, const char *slot);
 
-    int ptzContinuousMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int ptzContinuousMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QnUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzContinuousFocusAsync(const QnNetworkResourcePtr &camera, qreal speed, QObject *target, const char *slot);
-    int ptzAbsoluteMoveAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
-    int ptzViewportMoveAsync(const QnNetworkResourcePtr &camera, qreal aspectRatio, const QRectF &viewport, qreal speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int ptzAbsoluteMoveAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed, const QnUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int ptzViewportMoveAsync(const QnNetworkResourcePtr &camera, qreal aspectRatio, const QRectF &viewport, qreal speed, const QnUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzGetPositionAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, QObject *target, const char *slot);
 
     int ptzCreatePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot);
@@ -196,7 +206,7 @@ public:
         \returns Request handle
     */
     int doCameraDiagnosticsStepAsync(
-        const QUuid& cameraID, CameraDiagnostics::Step::Value previousStep,
+        const QnUuid& cameraID, CameraDiagnostics::Step::Value previousStep,
         QObject* target, const char* slot );
 
     /**
@@ -209,6 +219,16 @@ public:
     int updateBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
     int deleteBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
     int getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot);
+
+    int installUpdate(const QString &updateId, const QByteArray &data, QObject *target, const char *slot);
+
+    int restart(QObject *target, const char *slot);
+
+    int configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, int port, QObject *target, const char *slot);
+
+    int pingSystemAsync(const QUrl &url, const QString &password, QObject *target, const char *slot);
+    int mergeSystemAsync(const QUrl &url, const QString &password, bool ownSettings, QObject *target, const char *slot);
+
     int testEmailSettingsAsync(const QnEmail::Settings &settings, QObject *target, const char *slot);
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;

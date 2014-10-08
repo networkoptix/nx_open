@@ -83,6 +83,10 @@ public:
         SyncHttpClient* const httpClient,
         const QByteArray& paramName,
         unsigned int* paramValue );
+    static int readAxisParameter(
+        SyncHttpClient* const httpClient,
+        const QByteArray& paramName,
+        int* paramValue );
 
     nxpt::CommonRefManager* refManager();
 

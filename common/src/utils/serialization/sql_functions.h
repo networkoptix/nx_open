@@ -1,7 +1,7 @@
 #ifndef QN_SERIALIZATION_SQL_FUNCTIONS_H
 #define QN_SERIALIZATION_SQL_FUNCTIONS_H
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include "sql.h"
 #include "sql_macros.h"
@@ -81,12 +81,12 @@ inline void deserialize_field(const QVariant &value, QString *target) {
 }
 
 
-inline void serialize_field(const QUuid &value, QVariant *target) {
+inline void serialize_field(const QnUuid &value, QVariant *target) {
     *target = QVariant::fromValue<QByteArray>(value.toRfc4122());
 }
 
-inline void deserialize_field(const QVariant &value, QUuid *target) { 
-    *target = QUuid::fromRfc4122(value.value<QByteArray>()); 
+inline void deserialize_field(const QVariant &value, QnUuid *target) { 
+    *target = QnUuid::fromRfc4122(value.value<QByteArray>()); 
 }
 
 

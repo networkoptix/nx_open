@@ -40,6 +40,7 @@ namespace ec2
     public:
         virtual ~ClientQueryProcessor()
         {
+            //TODO #ak following assert can be triggered during client stop
             assert( m_runningHttpRequests.empty() );
         }
 
@@ -60,14 +61,14 @@ namespace ec2
                 requestUrl.setPassword(QString());
             }
 
-            requestUrl.setPath( QString::fromLatin1("/ec2/%1").arg(ApiCommand::toString(tran.command)) );
+            requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(tran.command)) );
 
             QByteArray tranBuffer;
             Qn::SerializationFormat format = Qn::UbjsonFormat; /*Qn::JsonFormat*/;
-            if( format == Qn::BnsFormat )
-                tranBuffer = QnBinary::serialized(tran);
-            else if( format == Qn::JsonFormat )
+            if( format == Qn::JsonFormat )
                 tranBuffer = QJson::serialized(tran);
+            //else if( format == Qn::BnsFormat )
+            //    tranBuffer = QnBinary::serialized(tran);
             else if( format == Qn::UbjsonFormat )
                 tranBuffer = QnUbjson::serialized(tran);
             //else if( format == Qn::CsvFormat )
@@ -111,9 +112,10 @@ namespace ec2
             if (!QnAppServerConnectionFactory::videowallGuid().isNull())
                 httpClient->addRequestHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
 
-            requestUrl.setPath( QString::fromLatin1("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
+            requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;
             toUrlParams( input, &query );
+            query.addQueryItem("format", QnLexical::serialized(Qn::UbjsonFormat));
             requestUrl.setQuery( query );
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
@@ -173,9 +175,9 @@ namespace ec2
             bool success = false;
             switch( format )
             {
-            case Qn::BnsFormat:
-                outputData = QnBinary::deserialized<OutputData>(msgBody, OutputData(), &success);
-                break;
+            //case Qn::BnsFormat:
+            //    outputData = QnBinary::deserialized<OutputData>(msgBody, OutputData(), &success);
+            //    break;
             case Qn::JsonFormat:
                 outputData = QJson::deserialized<OutputData>(msgBody, OutputData(), &success);
                 break;

@@ -173,11 +173,11 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
         return getText(column, false);
 
     case Qn::EventTypeRole:
-        return m_eventType;
+        return qVariantFromValue(m_eventType);
     case Qn::EventResourcesRole:
         return QVariant::fromValue<QnResourceList>(m_eventResources);
     case Qn::ActionTypeRole:
-        return m_actionType;
+        return qVariantFromValue(m_actionType);
     case Qn::ActionResourcesRole:
         return QVariant::fromValue<QnResourceList>(m_actionResources);
 
@@ -287,9 +287,9 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
     emit dataChanged(this, QnBusiness::AllFieldsMask);
 }
 
-static QVector<QUuid> toIdList(const QnResourceList& list)
+static QVector<QnUuid> toIdList(const QnResourceList& list)
 {
-    QVector<QUuid> result;
+    QVector<QnUuid> result;
     result.reserve(list.size());
     for (int i = 0; i < list.size(); ++i)
         result << list[i]->getId();
@@ -305,7 +305,7 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
     else if (QnBusiness::requiresServerResource(m_eventType))
         rule->setEventResources(toIdList(m_eventResources.filtered<QnMediaServerResource>()));
     else
-        rule->setEventResources(QVector<QUuid>());
+        rule->setEventResources(QVector<QnUuid>());
     rule->setEventState(m_eventState);   //TODO: #GDM #Business check
     rule->setEventParams(m_eventParams); //TODO: #GDM #Business filtered
     rule->setActionType(m_actionType);
@@ -314,7 +314,7 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
     else if (QnBusiness::requiresUserResource(m_actionType))
         rule->setActionResources(toIdList(m_actionResources.filtered<QnUserResource>()));
     else
-        rule->setActionResources(QVector<QUuid>());
+        rule->setActionResources(QVector<QnUuid>());
     rule->setActionParams(m_actionParams); //TODO: #GDM #Business filtered
     rule->setAggregationPeriod(m_aggregationPeriod);
     rule->setDisabled(m_disabled);
@@ -326,7 +326,7 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
 // setters and getters
 
 
-QUuid QnBusinessRuleViewModel::id() const {
+QnUuid QnBusinessRuleViewModel::id() const {
     return m_id;
 }
 

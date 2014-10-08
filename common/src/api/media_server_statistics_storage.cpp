@@ -68,12 +68,12 @@ qint64 QnMediaServerStatisticsStorage::uptimeMs() const
     return m_uptimeMs;
 }
 
-void QnMediaServerStatisticsStorage::setFlagsFilter(QnStatisticsDeviceType deviceType, int flags) {
+void QnMediaServerStatisticsStorage::setFlagsFilter(Qn::StatisticsDeviceType deviceType, int flags) {
     m_flagsFilter[deviceType] = flags;
 }
 
 void QnMediaServerStatisticsStorage::update() {
-    if (!m_listeners || m_updateRequests > 0) {
+    if (!m_listeners || m_updateRequests > 0 || m_server->getStatus() != Qn::Online) {
         m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
         m_lastId++;
 

@@ -169,4 +169,6 @@ QN_HELP_TOPIC(SaveLayout_Help,									"saving_layouts_(admin_only).htm")
 
 QN_HELP_TOPIC(Upgrade_Help,										"upgrading_product_name.htm")
 
+QN_HELP_TOPIC(PrimaryTimeServerSelection_Help,                  "selecting_time_server.htm")
+
 #undef QN_HELP_TOPIC

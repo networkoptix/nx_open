@@ -20,7 +20,7 @@ private slots:
 private:
     QObject *m_watched;
     QEvent *m_updateEventToPass;
-    bool m_updatePending;
+    QElapsedTimer m_elapsedTimer;
 };
 
 #endif // VSYNC_WORKAROUND_H

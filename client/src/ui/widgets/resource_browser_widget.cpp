@@ -116,11 +116,11 @@ void QnResourceBrowserToolTipWidget::setThumbnailVisible(bool visible) {
         layout->removeItem(m_thumbnailLabel);
 }
 
-void QnResourceBrowserToolTipWidget::setResourceId(const QUuid& id) {
+void QnResourceBrowserToolTipWidget::setResourceId(const QnUuid& id) {
     m_resourceId = id;
 }
 
-QUuid QnResourceBrowserToolTipWidget::resourceId() const {
+QnUuid QnResourceBrowserToolTipWidget::resourceId() const {
     return m_resourceId;
 }
 
@@ -173,7 +173,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     ui->clearFilterButton->setIcon(qnSkin->icon("tree/clear.png"));
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
-    m_resourceModel = new QnResourcePoolModel(Qn::RootNode, this);
+    m_resourceModel = new QnResourcePoolModel(QnResourcePoolModel::FullScope, this);
     ui->resourceTreeWidget->setModel(m_resourceModel);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BackgroundOpacity | Qn::BypassGraphicsProxy);
@@ -202,7 +202,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     connect(ui->tabWidget,          SIGNAL(currentChanged(int)),        this,               SLOT(at_tabWidget_currentChanged(int)));
     connect(ui->resourceTreeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()));
 
-    connect(m_thumbnailManager,     SIGNAL(thumbnailReady(QUuid,QPixmap)), this,              SLOT(at_thumbnailReady(QUuid,QPixmap)));
+    connect(m_thumbnailManager,     SIGNAL(thumbnailReady(QnUuid,QPixmap)), this,              SLOT(at_thumbnailReady(QnUuid,QPixmap)));
 
     /* Connect to context. */
     ui->resourceTreeWidget->setWorkbench(workbench());
@@ -227,6 +227,9 @@ QnResourceBrowserWidget::~QnResourceBrowserWidget() {
 
     ui->searchTreeWidget->setWorkbench(NULL);
     ui->resourceTreeWidget->setWorkbench(NULL);
+
+    /* Workaround against #3797 */
+    ui->typeComboBox->setEnabled(false);
 }
 
 QComboBox *QnResourceBrowserWidget::typeComboBox() const {
@@ -306,7 +309,9 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
 
     QnActionManager *manager = context()->menu();
 
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, mainWindow(), ignoreSelection ? QnActionParameters() : currentParameters(Qn::TreeScope)));
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, mainWindow(), ignoreSelection 
+        ? QnActionParameters().withArgument(Qn::NodeTypeRole, Qn::RootNode)
+        : currentParameters(Qn::TreeScope)));
 
     if(currentTreeWidget() == ui->searchTreeWidget) {
         /* Disable rename action for search view. */
@@ -398,7 +403,7 @@ QnLayoutItemIndexList QnResourceBrowserWidget::selectedLayoutItems() const {
     QnLayoutItemIndexList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
-        QUuid uuid = index.data(Qn::ItemUuidRole).value<QUuid>();
+        QnUuid uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
         if(uuid.isNull())
             continue;
 
@@ -416,7 +421,7 @@ QnVideoWallItemIndexList QnResourceBrowserWidget::selectedVideoWallItems() const
     QnVideoWallItemIndexList result;
 
     foreach (const QModelIndex &modelIndex, currentSelectionModel()->selectedRows()) {
-        QUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QUuid>();
+        QnUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QnUuid>();
         if(uuid.isNull())
             continue;
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(uuid);
@@ -431,9 +436,10 @@ QnVideoWallMatrixIndexList QnResourceBrowserWidget::selectedVideoWallMatrices() 
     QnVideoWallMatrixIndexList result;
 
     foreach (const QModelIndex &modelIndex, currentSelectionModel()->selectedRows()) {
-        QUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QUuid>();
+        QnUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QnUuid>();
         if(uuid.isNull())
             continue;
+
         QnVideoWallMatrixIndex index = qnResPool->getVideoWallMatrixByUuid(uuid);
         if (!index.isNull())
             result.push_back(index);
@@ -459,7 +465,7 @@ QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
     if (nodeType == Qn::VideoWallMatrixNode)
         return QVariant::fromValue(selectedVideoWallMatrices());
 
-    if(!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QUuid>().isNull()) /* If it's a layout item. */
+    if(!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QnUuid>().isNull()) /* If it's a layout item. */
         return QVariant::fromValue(selectedLayoutItems());
 
     return QVariant::fromValue(selectedResources());
@@ -495,7 +501,7 @@ bool QnResourceBrowserWidget::showOwnTooltip(const QPointF &pos) {
             m_tooltipWidget->setResourceId(resource->getId());
             m_thumbnailManager->selectResource(resource);
         } else {
-            m_tooltipWidget->setResourceId(QUuid());
+            m_tooltipWidget->setResourceId(QnUuid());
             m_tooltipWidget->setPixmap(QPixmap());
         }
 
@@ -735,6 +741,8 @@ void QnResourceBrowserWidget::at_layout_itemRemoved(QnWorkbenchItem *) {
 void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index) {
     if(index == SearchTab) {
         QnWorkbenchLayout *layout = workbench()->currentLayout();
+        if (!layout || !layout->resource())
+            return;
 
         layoutSynchronizer(layout, true); /* Just initialize the synchronizer. */
         QnResourceSearchProxyModel *model = layoutModel(layout, true);
@@ -756,7 +764,7 @@ void QnResourceBrowserWidget::at_showUrlsInTree_changed() {
     m_resourceModel->setUrlsShown(urlsShown);
 }
 
-void QnResourceBrowserWidget::at_thumbnailReady(QUuid resourceId, const QPixmap &pixmap) {
+void QnResourceBrowserWidget::at_thumbnailReady(QnUuid resourceId, const QPixmap &pixmap) {
     if (m_tooltipWidget && m_tooltipWidget->resourceId() != resourceId)
         return;
     m_tooltipWidget->setPixmap(pixmap);

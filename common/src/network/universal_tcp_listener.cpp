@@ -1,4 +1,6 @@
+
 #include "universal_tcp_listener.h"
+
 #include "utils/network/tcp_connection_priv.h"
 #include <QtCore/QUrl>
 #include "universal_request_processor.h"
@@ -10,12 +12,16 @@ static const int PROXY_KEEP_ALIVE_INTERVAL = 40 * 1000;
 
 // -------------------------------- QnUniversalListener ---------------------------------
 
-QnUniversalTcpListener::QnUniversalTcpListener(const QHostAddress& address, int port, int maxConnections):
-    QnTcpListener(address, port, maxConnections),
+QnUniversalTcpListener::QnUniversalTcpListener(
+    const QHostAddress& address,
+    int port,
+    int maxConnections,
+    bool useSsl )
+:
+    QnTcpListener( address, port, maxConnections, useSsl ),
     m_proxyPoolSize( 0 ),
     m_needAuth( true )
 {
-
 }
 
 QnUniversalTcpListener::~QnUniversalTcpListener()
@@ -34,8 +40,10 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(
     if (isProxy(request))
         return m_proxyInfo.proxyHandler(clientSocket, this);
 
-    QString path = request.requestLine.url.path();
-    QString normPath = path.startsWith(L'/') ? path.mid(1) : path;
+    QString normPath = request.requestLine.url.path();
+    while (normPath.startsWith(L'/'))
+        normPath = normPath.mid(1);
+
     int bestPathLen = -1;
     int bestIdx = -1;
     for (int i = 0; i < m_handlers.size(); ++i)

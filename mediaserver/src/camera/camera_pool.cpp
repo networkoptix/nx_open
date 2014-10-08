@@ -1,13 +1,15 @@
 #include "camera_pool.h"
 
 #include "video_camera.h"
-#include "core/resource/security_cam_resource.h"
+
+#include <core/resource/resource.h>
+#include <core/resource/security_cam_resource.h>
 
 #ifdef Q_OS_WIN
 #   include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"
 #endif
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 QMutex QnVideoCameraPool::m_staticMtx;
 

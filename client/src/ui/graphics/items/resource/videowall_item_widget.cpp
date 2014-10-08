@@ -58,7 +58,7 @@ class QnVideowallItemWidgetHoverProgressAccessor: public AbstractAccessor {
     }
 };
 
-QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &videowall, const QUuid &itemUuid, QnVideowallScreenWidget *parent, QGraphicsWidget* parentWidget, Qt::WindowFlags windowFlags):
+QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &videowall, const QnUuid &itemUuid, QnVideowallScreenWidget *parent, QGraphicsWidget* parentWidget, Qt::WindowFlags windowFlags):
     base_type(parentWidget, windowFlags),
     QnWorkbenchContextAware(parent),
     m_parentWidget(parentWidget),
@@ -387,7 +387,7 @@ void QnVideowallItemWidget::startDrag(DragInfo *info) {
     QDrag *drag = new QDrag(this);
     QMimeData *mimeData = new QMimeData();
 
-    QnVideoWallItem::serializeUuids(QList<QUuid>() << m_itemUuid, mimeData);
+    QnVideoWallItem::serializeUuids(QList<QnUuid>() << m_itemUuid, mimeData);
     mimeData->setData(Qn::NoSceneDrop, QByteArray());
 
     drag->setMimeData(mimeData);

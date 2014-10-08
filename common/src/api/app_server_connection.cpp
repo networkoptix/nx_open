@@ -70,8 +70,9 @@ QString QnAppServerConnectionFactory::clientGuid()
 
 QUrl QnAppServerConnectionFactory::url() {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        Q_ASSERT_X(factory->m_url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was passed");
+        Q_ASSERT_X(factory->m_url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was requested");
 
+        QMutexLocker locker(&factory->m_mutex);
         return factory->m_url;
     }
 
@@ -91,6 +92,7 @@ void QnAppServerConnectionFactory::setUrl(const QUrl &url) {
         Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
 
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        QMutexLocker locker(&factory->m_mutex);
         factory->m_url = url;
     }
 }
@@ -102,26 +104,26 @@ void QnAppServerConnectionFactory::setDefaultFactory(QnResourceFactory* resource
     }
 }
 
-QUuid QnAppServerConnectionFactory::videowallGuid() {
+QnUuid QnAppServerConnectionFactory::videowallGuid() {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
         return factory->m_videowallGuid;
-    return QUuid();
+    return QnUuid();
 }
 
-void QnAppServerConnectionFactory::setVideowallGuid(const QUuid &uuid)
+void QnAppServerConnectionFactory::setVideowallGuid(const QnUuid &uuid)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_videowallGuid = uuid;
     }
 }
 
-QUuid QnAppServerConnectionFactory::instanceGuid() {
+QnUuid QnAppServerConnectionFactory::instanceGuid() {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
         return factory->m_instanceGuid;
-    return QUuid();
+    return QnUuid();
 }
 
-void QnAppServerConnectionFactory::setInstanceGuid(const QUuid &uuid)
+void QnAppServerConnectionFactory::setInstanceGuid(const QnUuid &uuid)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_instanceGuid = uuid;

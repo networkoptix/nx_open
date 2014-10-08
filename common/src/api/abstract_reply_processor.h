@@ -34,51 +34,58 @@ public slots:
 
 signals:
     void finished(int status, int handle);
-    void finished(int status, const QVariant &reply, int handle);
+    void finished(int status, int handle, const QString &errorString);
+    void finished(int status, const QVariant &reply, int handle, const QString &errorString);
 
 protected:
     template<class T, class Derived>
-    void emitFinished(Derived *derived, int status, const T &reply, int handle) {
+    void emitFinished(Derived *derived, int status, const T &reply, int handle, const QString &errorString = QString()) {
         m_finished = true;
         m_status = status;
         m_handle = handle;
         m_reply = QVariant::fromValue<T>(reply);
+        m_errorString = errorString;
 
-        emit derived->finished(status, reply, handle);
-        emit finished(status, m_reply, handle);
+        emit derived->finished(status, reply, handle, errorString);
+        emit finished(status, m_reply, handle, errorString);
     }
 
     template<class Derived>
-    void emitFinished(Derived *, int status, int handle) {
+    void emitFinished(Derived *, int status, int handle, const QString &errorString = QString()) {
         m_finished = true;
         m_status = status;
         m_handle = handle;
         m_reply = QVariant();
+        m_errorString = errorString;
 
-        emit finished(status, handle);
-        emit finished(status, m_reply, handle);
+        emit finished(status, handle, errorString);
+        emit finished(status, m_reply, handle, errorString);
     }
 
     template<class T, class Derived>
     void processJsonReply(Derived *derived, const QnHTTPRawResponse &response, int handle) {
         int status = response.status;
+        QString errorString = QString::fromUtf8(response.errorString);
 
         T reply;
         if(status == 0) {
             QnJsonRestResult result;
-            if(!QJson::deserialize(response.data, &result) || !QJson::deserialize(result.reply(), &reply)) {
+            bool jsonDeserialized = QJson::deserialize(response.data, &result);
+            if(!jsonDeserialized || !QJson::deserialize(result.reply(), &reply)) {
 #ifdef JSON_REPLY_DEBUG
                 qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
 #endif
                 status = 1;
             }
+            if (jsonDeserialized)
+                errorString = result.errorString();
         } else {
 #ifdef JSON_REPLY_DEBUG
             qnWarning("Error processing request: %1.", response.errorString);
 #endif
         }
 
-        emitFinished(derived, status, reply, handle);
+        emitFinished(derived, status, reply, handle, errorString);
     }
 
 private:
@@ -87,6 +94,7 @@ private:
     int m_status;
     int m_handle;
     QVariant m_reply;
+    QString m_errorString;
 };
 
 #endif // QN_ABSTRACT_REPLY_PROCESSOR_H

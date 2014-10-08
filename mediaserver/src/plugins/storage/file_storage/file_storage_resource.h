@@ -41,11 +41,15 @@ public:
     void setStorageBitrateCoeff(float value);
     virtual float getStorageBitrateCoeff() const override;
 
+    virtual void setUrl(const QString& url) override;
+
 private:
     QString removeProtocolPrefix(const QString& url);
+    bool updatePermissions() const;
 private:
     // used for 'virtual' storage bitrate. If storage has more free space, increase 'virtual' storage bitrate for full storage space filling
     float m_storageBitrateCoeff;
+    mutable bool m_durty;
 
     bool isStorageDirMounted();
 };

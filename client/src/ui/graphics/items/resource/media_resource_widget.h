@@ -5,9 +5,12 @@
 
 #include <QtGui/QStaticText>
 
+#include <core/resource/resource_fwd.h>
+
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */ // TODO: #Elric FWD!
 #include <core/resource/motion_window.h>
-#include <core/resource/media_resource.h>
+
+#include <core/ptz/ptz_fwd.h>
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
 
@@ -186,7 +189,6 @@ private:
     Q_SLOT void updateFisheye();
     Q_SLOT void updateDewarpingParams();
     Q_SLOT void updateCustomAspectRatio();
-    Q_SLOT void updateRotation();
 
 private:
     /** Media resource. */

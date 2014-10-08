@@ -3,7 +3,7 @@
 
 #include <nx_ec/ec_api.h>
 
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
 #include <core/resource/resource_processor.h>
 
 #include "api/app_server_connection.h"
@@ -18,7 +18,7 @@ class QnAppserverResourceProcessor : public QObject, public QnResourceProcessor
     Q_OBJECT
 
 public:
-    QnAppserverResourceProcessor(QUuid serverId);
+    QnAppserverResourceProcessor(QnUuid serverId);
     virtual ~QnAppserverResourceProcessor();
 
     virtual bool isBusy() const override;
@@ -26,7 +26,7 @@ public:
 
 private:
     ec2::AbstractECConnectionPtr m_ec2Connection;
-    QUuid m_serverId;
+    QnUuid m_serverId;
     
     struct LockData 
     {

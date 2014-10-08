@@ -24,6 +24,7 @@
 
 static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 static const float DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN = 30.0;
+const QString QnThirdPartyResource::AUX_DATA_PARAM_NAME = QLatin1String("aux_data");
 
 QnThirdPartyResource::QnThirdPartyResource(
     const nxcip::CameraInfo& camInfo,
@@ -31,7 +32,7 @@ QnThirdPartyResource::QnThirdPartyResource(
     const nxcip_qt::CameraDiscoveryManager& discoveryManager )
 :
     m_camInfo( camInfo ),
-    m_camManager( camManager ),
+    m_camManager( camManager ? new nxcip_qt::BaseCameraManager(camManager) : nullptr ),
     m_discoveryManager( discoveryManager ),
     m_refCounter( 2 ),
     m_encoderCount(0)
@@ -47,15 +48,12 @@ QnThirdPartyResource::~QnThirdPartyResource()
 
 QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
 {
-    nxcip::CameraPtzManager* ptzManager = m_camManager.getPtzManager();
+    if( !m_camManager )
+        return nullptr;
+    nxcip::CameraPtzManager* ptzManager = m_camManager->getPtzManager();
     if( !ptzManager )
         return NULL;
     return new QnThirdPartyPtzController( toSharedPointer().staticCast<QnThirdPartyResource>(), ptzManager );
-}
-
-bool QnThirdPartyResource::isResourceAccessible()
-{
-    return updateMACAddress();
 }
 
 bool QnThirdPartyResource::ping()
@@ -76,8 +74,10 @@ void QnThirdPartyResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 QnAbstractStreamDataProvider* QnThirdPartyResource::createLiveDataProvider()
 {
-    m_camManager.getRef()->addRef();
-    return new ThirdPartyStreamReader( toSharedPointer(), m_camManager.getRef() );
+    if( !m_camManager )
+        return nullptr;
+    m_camManager->getRef()->addRef();
+    return new ThirdPartyStreamReader( toSharedPointer(), m_camManager->getRef() );
 }
 
 void QnThirdPartyResource::setMotionMaskPhysical(int /*channel*/)
@@ -141,21 +141,22 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createArchiveDataProvider()
         return QnPhysicalCameraResource::createArchiveDataProvider();
     QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
     archiveReader->setArchiveDelegate(archiveDelegate);
-    if (hasFlags(Qn::still_image) || hasFlags(Qn::utc))
-        archiveReader->setCycleMode(false);
     return archiveReader;
 }
 
 QnAbstractArchiveDelegate* QnThirdPartyResource::createArchiveDelegate()
 {
+    if( !m_camManager )
+        return nullptr;
+
     unsigned int camCapabilities = 0;
-    if( m_camManager.getCameraCapabilities( &camCapabilities ) != nxcip::NX_NO_ERROR ||
+    if( m_camManager->getCameraCapabilities( &camCapabilities ) != nxcip::NX_NO_ERROR ||
         (camCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability) == 0 )
     {
         return NULL;
     }
 
-    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager.getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
     if( !camManager2 )
         return NULL;
 
@@ -178,7 +179,10 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
     qint64 endTimeMs,
     int detailLevel )
 {
-    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager.getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    if( !m_camManager )
+        return QnTimePeriodList();
+
+    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
     Q_ASSERT( camManager2 );
 
     QnTimePeriodList resultTimePeriods;
@@ -302,15 +306,53 @@ nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder( int enc
 CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
-    m_camManager.setCredentials( getAuth().user(), getAuth().password() );
 
-    int result = m_camManager.getCameraInfo( &m_camInfo );
+    if( !m_camManager )
+    {
+        if( strlen(m_camInfo.uid) == 0 )
+        {
+            memset( m_camInfo.uid, 0, sizeof(m_camInfo.uid) );
+            const QByteArray& physicalId = getPhysicalId().toLatin1();
+            strncpy( m_camInfo.uid, physicalId.constData(), std::min<size_t>(physicalId.size(), sizeof(m_camInfo.uid)-1) );
+        }
+        if( strlen(m_camInfo.modelName) == 0 )
+        {
+            memset( m_camInfo.modelName, 0, sizeof(m_camInfo.modelName) );
+            const QByteArray& model = getModel().toLatin1();
+            strncpy( m_camInfo.modelName, model.constData(), std::min<size_t>(model.size(), sizeof(m_camInfo.modelName)-1) );
+        }
+        if( strlen(m_camInfo.firmware) == 0 )
+        {
+            memset( m_camInfo.firmware, 0, sizeof(m_camInfo.firmware) );
+            const QByteArray& firmware = getFirmware().toLatin1();
+            strncpy( m_camInfo.firmware, firmware.constData(), std::min<size_t>(firmware.size(), sizeof(m_camInfo.firmware)-1) );
+        }
+        if( strlen(m_camInfo.auxiliaryData) == 0 )
+        {
+            const QString& auxDataStr = getProperty( AUX_DATA_PARAM_NAME );
+            if( !auxDataStr.isEmpty() )
+            {
+                memset( m_camInfo.auxiliaryData, 0, sizeof(m_camInfo.auxiliaryData) );
+                const QByteArray& auxData = auxDataStr.toLatin1();
+                strncpy( m_camInfo.auxiliaryData, auxData.constData(), std::min<size_t>(auxData.size(), sizeof(m_camInfo.auxiliaryData)-1) );
+            }
+        }
+
+        nxcip::BaseCameraManager* cameraIntf = m_discoveryManager.createCameraManager( m_camInfo );
+        if( !cameraIntf )
+            return CameraDiagnostics::UnknownErrorResult();
+        m_camManager.reset( new nxcip_qt::BaseCameraManager( cameraIntf ) );
+    }
+
+    m_camManager->setCredentials( getAuth().user(), getAuth().password() );
+
+    int result = m_camManager->getCameraInfo( &m_camInfo );
     if( result != nxcip::NX_NO_ERROR )
     {
         if( false )
         NX_LOG( lit("Error getting camera info from third-party camera %1:%2 (url %3). %4").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
-            arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager.getLastErrorString()), cl_logDEBUG1 );
+            arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager->getLastErrorString()), cl_logDEBUG1 );
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? Qn::Unauthorized : Qn::Offline );
         return CameraDiagnostics::UnknownErrorResult();
     }
@@ -318,12 +360,12 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     setFirmware( QString::fromUtf8(m_camInfo.firmware) );
 
     m_encoderCount = 0;
-    result = m_camManager.getEncoderCount( &m_encoderCount );
+    result = m_camManager->getEncoderCount( &m_encoderCount );
     if( result != nxcip::NX_NO_ERROR )
     {
         NX_LOG( lit("Error getting encoder count from third-party camera %1:%2 (url %3). %4").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
-            arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager.getLastErrorString()), cl_logDEBUG1 );
+            arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager->getLastErrorString()), cl_logDEBUG1 );
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? Qn::Unauthorized : Qn::Offline );
         return CameraDiagnostics::UnknownErrorResult();
     }
@@ -338,16 +380,16 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     //we support only two streams from camera
     m_encoderCount = m_encoderCount > 2 ? 2 : m_encoderCount;
 
-    setParam( Qn::HAS_DUAL_STREAMING_PARAM_NAME, m_encoderCount > 1, QnDomainDatabase );
+    setProperty( Qn::HAS_DUAL_STREAMING_PARAM_NAME, (m_encoderCount > 1) ? 1 : 0);
 
     //setting camera capabilities
     unsigned int cameraCapabilities = 0;
-    result = m_camManager.getCameraCapabilities( &cameraCapabilities );
+    result = m_camManager->getCameraCapabilities( &cameraCapabilities );
     if( result != nxcip::NX_NO_ERROR )
     {
         NX_LOG( lit("Error reading camera capabilities from third-party camera %1:%2 (url %3). %4").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
-            arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager.getLastErrorString()), cl_logDEBUG1 );
+            arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager->getLastErrorString()), cl_logDEBUG1 );
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? Qn::Unauthorized : Qn::Offline );
         return CameraDiagnostics::UnknownErrorResult();
     }
@@ -361,7 +403,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     //    setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
-        nxcip::CameraPtzManager* ptzManager = m_camManager.getPtzManager();
+        nxcip::CameraPtzManager* ptzManager = m_camManager->getPtzManager();
         if( ptzManager )
         {
             const int ptzCapabilities = ptzManager->getCapabilities();
@@ -388,27 +430,26 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         }
         ptzManager->releaseRef();
     }
-    setParam(
+    setProperty(
         Qn::IS_AUDIO_SUPPORTED_PARAM_NAME,
-        (cameraCapabilities & nxcip::BaseCameraManager::audioCapability) ? 1 : 0,
-        QnDomainDatabase );
+        (cameraCapabilities & nxcip::BaseCameraManager::audioCapability) ? 1 : 0);
     if( cameraCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability )
     {
-        setParam( Qn::DTS_PARAM_NAME, 1, QnDomainDatabase );
-        setParam( Qn::ANALOG_PARAM_NAME, 1, QnDomainDatabase );
+        setProperty( Qn::DTS_PARAM_NAME, 1);
+        setProperty( Qn::ANALOG_PARAM_NAME, 1);
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability )
     {
-        setMotionType( Qn::MT_HardwareGrid );
-        setParam( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100, QnDomainDatabase );
-        setParam( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100, QnDomainDatabase );
-        setParam( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100, QnDomainDatabase );
-        setParam( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid,hardwaregrid"), QnDomainDatabase );
+        //setMotionType( Qn::MT_HardwareGrid );
+        setProperty( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100);
+        setProperty( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100);
+        setProperty( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100);
+        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid,hardwaregrid"));
     }
     else
     {
-        setMotionType( Qn::MT_SoftwareGrid );
-        setParam( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid"), QnDomainDatabase );
+        //setMotionType( Qn::MT_SoftwareGrid );
+        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid"));
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
 		setStreamFpsSharingMethod(Qn::BasicFpsSharing);
@@ -426,9 +467,9 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     float maxFps = 0;
     for( int encoderNumber = 0; encoderNumber < m_encoderCount; ++encoderNumber )
     {
-        //const int result = m_camManager.getResolutionList( i, &resolutionInfoList );
+        //const int result = m_camManager->getResolutionList( i, &resolutionInfoList );
         nxcip::CameraMediaEncoder* intf = NULL;
-        int result = m_camManager.getEncoder( encoderNumber, &intf );
+        int result = m_camManager->getEncoder( encoderNumber, &intf );
         if( result == nxcip::NX_NO_ERROR )
         {
             nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
@@ -439,7 +480,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         {
             NX_LOG( lit("Failed to get resolution list of third-party camera %1:%2 encoder %3. %4").
                 arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
-                arg(encoderNumber).arg(m_camManager.getLastErrorString()), cl_logDEBUG1 );
+                arg(encoderNumber).arg(m_camManager->getLastErrorString()), cl_logDEBUG1 );
             if( result == nxcip::NX_NOT_AUTHORIZED )
                 setStatus( Qn::Unauthorized );
             return CameraDiagnostics::CannotConfigureMediaStreamResult(lit("resolution"));
@@ -460,12 +501,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     if( !maxFps )
         maxFps = DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN;
 
-    if( !setParam( MAX_FPS_PARAM_NAME, maxFps, QnDomainDatabase ) )
-    {
-        NX_LOG( lit("Failed to set %1 parameter to %2 for third-party camera %3:%4 (url %5)").
-            arg(MAX_FPS_PARAM_NAME).arg(maxFps).arg(m_discoveryManager.getVendorName()).
-            arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logDEBUG1 );
-    }
+    setProperty( MAX_FPS_PARAM_NAME, maxFps);
 
     if( (cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability) ||
         (cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability) )
@@ -526,7 +562,7 @@ bool QnThirdPartyResource::isInputPortMonitored() const
 bool QnThirdPartyResource::initializeIOPorts()
 {
     //initializing I/O
-    nxcip::CameraRelayIOManager* camIOManager = m_camManager.getCameraRelayIOManager();
+    nxcip::CameraRelayIOManager* camIOManager = m_camManager->getCameraRelayIOManager();
     if( !camIOManager )
     {
         NX_LOG( lit("Failed to get pointer to nxcip::CameraRelayIOManager interface for third-party camera %1:%2 (url %3)").

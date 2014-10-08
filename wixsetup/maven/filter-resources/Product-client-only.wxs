@@ -3,13 +3,13 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
      xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
-    <Product Id="*" Name="${product.name} (Client Only)" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.clientUpgradeCode}">
+    <Product Id="*" Name="${product.name} Client" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.clientUpgradeCode}">
         <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
         <?include BuildVars.wxi ?>
 
-        <Property Id="REINSTALLMODE" Value="amus"/>
+        <Property Id="REINSTALLMODE" Value="dmus"/>
 
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
@@ -29,11 +29,9 @@
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
 
         <Property Id="INSTALL_CLIENT" Secure="yes"/>
-
         <SetProperty Id="INSTALL_CLIENT" Value="1" After="ResetPreselected" Sequence="ui">
             <![CDATA[ $(var.VmsInstalling) OR &ClientFeature = 3 OR !ClientFeature = 3 ]]>
         </SetProperty>
-
 
         <SetProperty Id="CLIENT_DIRECTORY_REG" Value="[CLIENT_DIRECTORY_REG32]" After="AppSearch">
             <![CDATA[ CLIENT_DIRECTORY_REG = "" ]]>
@@ -52,7 +50,6 @@
         <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
 
         <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
-        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Secure="yes" Value="$(var.LaunchClientChecBoxText)"/>
 
         <!-- Properties -->
         <Property Id="WelcomeDlg_Title" Value="${product.name} Installer Setup" />
@@ -135,20 +132,21 @@
         </Directory>
 
         <DirectoryRef Id="TARGETDIR">
-            <Merge Id="VCRedist1" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <!-- <Merge Id="VCRedist2" SourceFile="$(var.commonProgramFiles)Merge Modules\policy_11_0_Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/> -->
+            <Merge Id="VCRedist100" SourceFile="MergeModules\Microsoft_VC100_CRT_${arch}.msm" DiskId="1" Language="0"/>
+            <Merge Id="VCRedist110" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/>
             <?if ${build.configuration} = debug ?>
-            <Merge Id="VCRedist3" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
-            <!-- <Merge Id="VCRedist4" SourceFile="$(var.commonProgramFiles)Merge Modules\policy_11_0_Microsoft_VC110_DebugCRT_${arch}.msm" DiskId="1" Language="0"/> -->
+            <Merge Id="VCRedist110Debug" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
             <?endif?>
         </DirectoryRef>
 
-        <Feature Id="VCRedist" Title="Visual C++ 11.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <MergeRef Id="VCRedist1"/>
-            <!-- <MergeRef Id="VCRedist2"/> -->
+        <Feature Id="VCRedistVS10" Title="Visual C++ 10.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+            <MergeRef Id="VCRedist100"/>
+        </Feature>
+
+        <Feature Id="VCRedistVS11" Title="Visual C++ 11.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+            <MergeRef Id="VCRedist110"/>
             <?if ${build.configuration} = debug ?>
-            <MergeRef Id="VCRedist3"/>
-            <!-- <MergeRef Id="VCRedist4"/> -->
+            <MergeRef Id="VCRedist110Debug"/>
             <?endif?>
         </Feature>
 
@@ -208,16 +206,9 @@
             <Publish Dialog="DowngradeWarningDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
 
             <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-            <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">LicenseAccepted = "1"</Publish>
+            <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="ClientDlg">LicenseAccepted = "1"</Publish>
 
-            <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
-
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="2">1</Publish>
-            <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
-            <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
-
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg" Order="2">1</Publish>
+            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg" Order="2">1</Publish>
             <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
 
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg">1</Publish>
@@ -242,6 +233,8 @@
 
             <Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
+
+            <Publish Dialog="VerifyReadyDlg" Control="Install" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)">1</Publish>
 
             <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="ChangeButton" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>

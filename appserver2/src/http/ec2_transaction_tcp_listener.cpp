@@ -52,10 +52,11 @@ void QnTransactionTcpProcessor::run()
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
     bool isClient = query.hasQueryItem("isClient");
     bool isMobileClient = query.hasQueryItem("isMobile");
-    QUuid remoteGuid  = QUuid(query.queryItemValue("guid"));
+    QnUuid remoteGuid  = QnUuid(query.queryItemValue("guid"));
+    QnUuid remoteRuntimeGuid  = QnUuid(query.queryItemValue("runtime-guid"));
     if (remoteGuid.isNull())
-        remoteGuid = QUuid::createUuid();
-    QUuid videowallGuid = QUuid(query.queryItemValue("videowallGuid"));
+        remoteGuid = QnUuid::createUuid();
+    QnUuid videowallGuid = QnUuid(query.queryItemValue("videowallGuid"));
     bool isVideowall = (!videowallGuid.isNull());
 
     Qn::PeerType peerType = isMobileClient  ? Qn::PT_MobileClient
@@ -67,9 +68,10 @@ void QnTransactionTcpProcessor::run()
     if (query.hasQueryItem("format"))
          QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
 
-    ApiPeerData remotePeer(remoteGuid, peerType, dataFormat);
+    ApiPeerData remotePeer(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
 
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader("runtime-guid", qnCommon->runningInstanceGUID().toByteArray()));
 
     if (remotePeer.peerType == Qn::PT_Server)
     {
@@ -89,6 +91,7 @@ void QnTransactionTcpProcessor::run()
         parseRequest();
 
         d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
+        d->response.headers.insert(nx_http::HttpHeader("runtime-guid", qnCommon->runningInstanceGUID().toByteArray()));
     }
 
     query = QUrlQuery(d->request.requestLine.url.query());

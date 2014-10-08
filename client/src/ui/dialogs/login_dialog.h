@@ -7,7 +7,6 @@
 
 #include <api/model/connection_info.h>
 #include <nx_ec/ec_api.h>
-#include <utils/network/foundenterprisecontrollersmodel.h>
 
 #include <client/client_settings.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -23,7 +22,6 @@ class QnWorkbenchContext;
 class QnAbstractArchiveReader;
 class QnResourceWidgetRenderer;
 class QnRenderingWidget;
-class ModuleInformation;
 
 namespace Ui {
     class LoginDialog;
@@ -71,7 +69,7 @@ private slots:
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
 
-    void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress);
+    void at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation);
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
 private:
@@ -90,10 +88,9 @@ private:
     int m_requestHandle;
 
     QnRenderingWidget *m_renderingWidget;
-    QnModuleFinder *m_moduleFinder;
 
     struct QnEcData {
-        QUuid id;
+        QnUuid id;
         QUrl url;
         QString version;
         QString systemName;
@@ -101,10 +98,13 @@ private:
         bool operator==(const QnEcData& other) const  {
             return id == other.id && url == other.url && version == other.version && systemName == other.systemName;
         }
+        bool operator!=(const QnEcData& other) const  {
+            return !(*this == other);
+        }
     };
 
     /** Hash list of automatically found Servers based on seed as key. */
-    QMap<QString, QnEcData> m_foundEcs;
+    QHash<QnUuid, QnEcData> m_foundEcs;
 };
 
 #endif // LOGINDIALOG_H

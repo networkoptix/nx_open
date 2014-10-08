@@ -14,7 +14,7 @@ QnPlAxisResourceSearcher::QnPlAxisResourceSearcher()
 {
 }
 
-QnResourcePtr QnPlAxisResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlAxisResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -100,7 +100,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
         return QList<QnResourcePtr>();
 
 
-    QUuid typeId = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
+    QnUuid typeId = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
     if (typeId.isNull())
         return QList<QnResourcePtr>();
 
@@ -109,7 +109,6 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     resource->setName(name);
     resource->setModel(name);
     resource->setMAC(QnMacAddress(mac));
-    //resource->setHostAddress(host, QnDomainMemory);
     QUrl finalUrl(url);
     finalUrl.setScheme(QLatin1String("http"));
     finalUrl.setPort(port);
@@ -209,7 +208,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
     QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
-    QUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
     if (rt.isNull())
         return local_results;
 
@@ -234,8 +233,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
     int channels = 1;
     if (firstResource->hasParam(QLatin1String("channelsAmount")))
     {
-        QVariant val;
-        firstResource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
+        QString val = firstResource->getProperty(QLatin1String("channelsAmount"));
         channels = val.toUInt();
     }
     if (channels > 1)
@@ -250,7 +248,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
         {
             QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
-            QUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), firstResource->getName());
+            QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), firstResource->getName());
             if (rt.isNull())
                 return;
 

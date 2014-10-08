@@ -80,15 +80,13 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
 
             QnDroidResourcePtr resource ( new QnDroidResource() );
 
-            QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("DroidLive"));
+            QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("DroidLive"));
             if (rt.isNull())
                 continue;
 
             resource->setTypeId(rt);
-            //resource->setName(QString("Droid device ") + ip);
             resource->setName(QLatin1String("DroidLive"));
             resource->setMAC(QnMacAddress(data[2].replace(QLatin1Char(':'), QLatin1Char('-')).toUpper()));
-            //resource->setHostAddress(hostAddr, QnDomainMemory);
             resource->setDiscoveryAddr(QHostAddress(m_socketList[i]->getLocalAddress().address.toString()));
 
             resource->setUrl(QLatin1String("raw://") + data[1]);
@@ -103,7 +101,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
     return resList;
 }
 
-QnResourcePtr QnPlDroidResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnPlDroidResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 

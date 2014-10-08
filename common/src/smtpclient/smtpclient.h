@@ -20,7 +20,9 @@
 #define SMTPCLIENT_H
 
 #include <QObject>
-#include <QtNetwork/QSslSocket>
+
+#include <utils/network/socket.h>
+#include <utils/network/http/linesplitter.h>
 
 #include "mimemessage.h"
 
@@ -54,6 +56,8 @@ public:
         SslConnection,
         TlsConnection       // STARTTLS
     };
+
+    static QString toString( ConnectionType connectionType );
 
     /* [0] --- */
 
@@ -102,8 +106,6 @@ public:
     int getSendMessageTimeout() const;
     void setSendMessageTimeout(int msec);
 
-    QTcpSocket* getSocket();
-
 
     /* [2] --- */
 
@@ -115,7 +117,7 @@ public:
     bool login();
     bool login(const QString &user, const QString &password, AuthMethod method = AuthLogin);
 
-    bool sendMail(MimeMessage& email);
+    bool sendMail(const MimeMessage& email);
 
     void quit();
 
@@ -126,7 +128,7 @@ protected:
 
     /* [4] Protected members */
 
-    QTcpSocket *socket;
+    AbstractStreamSocket* m_socket;
 
     QString host;
     int port;
@@ -145,7 +147,8 @@ protected:
     QString responseText;
     int responseCode;
 
-
+    nx_http::LineSplitter m_lineSpliter;
+    
     class ResponseTimeoutException {};
     class SendMessageTimeoutException {};
 
@@ -164,9 +167,9 @@ protected slots:
 
     /* [6] Protected slots */
 
-    void socketStateChanged(QAbstractSocket::SocketState state);
-    void socketError(QAbstractSocket::SocketError error);
-    void socketReadyRead();
+    //void socketStateChanged(QAbstractSocket::SocketState state);
+    //void socketError(QAbstractSocket::SocketError error);
+    //void socketReadyRead();
 
     /* [6] --- */
 

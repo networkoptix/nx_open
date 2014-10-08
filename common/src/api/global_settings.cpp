@@ -7,7 +7,9 @@
 
 #include "resource_property_adaptor.h"
 
-#include "version.h"
+#include <utils/common/app_info.h>
+#include <nx_ec/data/api_resource_data.h>
+
 
 namespace {
     QSet<QString> parseDisabledVendors(QString disabledVendors) {
@@ -53,7 +55,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameUser, QString(), this);
     m_passwordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(namePassword, QString(), this);
     m_signatureAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSignature, QString(), this);
-    m_supportEmailAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSupportEmail, lit(QN_SUPPORT_MAIL_ADDRESS), this);
+    m_supportEmailAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSupportEmail, QnAppInfo::supportAddress()), this;
     m_connectionTypeAdaptor = new  QnLexicalResourcePropertyAdaptor<QnEmail::ConnectionType>(nameConnectionType, QnEmail::Unsecure, this);
     m_portAdaptor = new QnLexicalResourcePropertyAdaptor<int>(namePort, 0, this);
     m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(nameTimeout, QnEmail::defaultTimeoutSec(), this);
@@ -145,9 +147,9 @@ void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &reso
         adaptor->setResource(QnResourcePtr());
 }
 
-QnKvPairList QnGlobalSettings::allSettings() const {
+ec2::ApiResourceParamDataList QnGlobalSettings::allSettings() const {
     if (!m_admin)
-        return QnKvPairList();
+        return ec2::ApiResourceParamDataList();
 
     return m_admin->getProperties();
 }
@@ -181,4 +183,9 @@ void QnGlobalSettings::setEmailSettings(const QnEmail::Settings &settings) {
 void QnGlobalSettings::synchronizeNow() {
     foreach (QnAbstractResourcePropertyAdaptor* adaptor, m_allAdaptors)
         adaptor->synchronizeNow();
+}
+
+QnUserResourcePtr QnGlobalSettings::getAdminUser()
+{
+    return m_admin;
 }

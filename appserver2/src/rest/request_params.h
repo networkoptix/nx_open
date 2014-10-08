@@ -20,8 +20,8 @@ namespace ec2
     bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, ApiStoredFilePath *value);
     void toUrlParams(const ApiStoredFilePath &id, QUrlQuery *query);
 
-    bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, QUuid *id);
-    void toUrlParams(const QUuid &id, QUrlQuery *query);
+    bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, QnUuid *id);
+    void toUrlParams(const QnUuid &id, QUrlQuery *query);
 
     bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, Qn::SerializationFormat *format);
     void toUrlParams(const Qn::SerializationFormat& format, QUrlQuery *query);

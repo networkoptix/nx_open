@@ -51,13 +51,14 @@ namespace ec2
             const QString& path,
             const QnRequestParamList& params,
             QByteArray& result,
-            QByteArray& contentType )
+            QByteArray& contentType,
+            const QnRestConnectionProcessor*) override
         {
             InputData inputData;
             QString command = path.split(L'/').last();
             parseHttpRequestParams( command, params, &inputData);
 
-            Qn::SerializationFormat format = Qn::UbjsonFormat;
+            Qn::SerializationFormat format = Qn::JsonFormat;
             parseHttpRequestParams( command, params, &format);
 
             ErrorCode errorCode = ErrorCode::ok;
@@ -67,12 +68,12 @@ namespace ec2
             {
                 if( _errorCode == ErrorCode::ok )
                 {
-                    if(format == Qn::BnsFormat) {
-                        result = QnBinary::serialized(outputData);
+                    if(format == Qn::UbjsonFormat) {
+                        result = QnUbjson::serialized(outputData);
+                    //} else if(format == Qn::BnsFormat) {
+                    //    result = QnBinary::serialized(outputData);
                     } else if(format == Qn::JsonFormat) {
                         result = QJson::serialized(outputData);
-                    } else if(format == Qn::UbjsonFormat) {
-                        result = QnUbjson::serialized(outputData);
                     } else if(format == Qn::CsvFormat) {
                         result = QnCsv::serialized(outputData);
                     } else if(format == Qn::XmlFormat) {
@@ -111,7 +112,8 @@ namespace ec2
             const QByteArray& /*body*/,
             const QByteArray& /*srcBodyContentType*/,
             QByteArray& /*result*/,
-            QByteArray& /*contentType*/ )
+            QByteArray&, /*contentType*/ 
+            const QnRestConnectionProcessor*) override
         {
             return nx_http::StatusCode::badRequest;
         }

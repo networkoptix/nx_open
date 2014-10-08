@@ -31,7 +31,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
             assert( tran.command == ApiCommand::removeBusinessRule );
-            emit removed( QUuid(tran.params.id) );
+            emit removed( QnUuid(tran.params.id) );
         }
 
         void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran )
@@ -69,19 +69,17 @@ namespace ec2
 
 
         virtual int save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) override;
-        virtual int deleteRule( QUuid ruleId, impl::SimpleHandlerPtr handler ) override;
+        virtual int deleteRule( QnUuid ruleId, impl::SimpleHandlerPtr handler ) override;
         virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) override;
-        virtual int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QUuid& dstPeer, impl::SimpleHandlerPtr handler ) override;
+        virtual int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnUuid& dstPeer, impl::SimpleHandlerPtr handler ) override;
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
 
         QnTransaction<ApiBusinessRuleData> prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource );
-        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QUuid& id );
+        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnUuid& id );
         QnTransaction<ApiBusinessActionData> prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource );
-        QnTransaction<ApiEmailSettingsData> prepareTransaction( ApiCommand::Value command, const QnEmail::Settings& resource );
-        QnTransaction<ApiEmailData> prepareTransaction( ApiCommand::Value command, const ApiEmailData& data );
     };
 }
 

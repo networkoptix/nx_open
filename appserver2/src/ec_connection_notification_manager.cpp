@@ -15,12 +15,14 @@
 #include "managers/user_manager.h"
 #include "managers/videowall_manager.h"
 #include "managers/updates_manager.h"
+#include "managers/time_manager.h"
+#include "managers/misc_manager.h"
+#include "managers/discovery_manager.h"
 
 
 namespace ec2
 {
-    ECConnectionNotificationManager::ECConnectionNotificationManager(
-        const ResourceContext& resCtx,
+    ECConnectionNotificationManager::ECConnectionNotificationManager(const ResourceContext& resCtx,
         AbstractECConnection* ecConnection,
         QnLicenseNotificationManager* licenseManager,
         QnResourceNotificationManager* resourceManager,
@@ -31,7 +33,9 @@ namespace ec2
         QnLayoutNotificationManager* layoutManager,
         QnVideowallNotificationManager* videowallManager,
         QnStoredFileNotificationManager* storedFileManager,
-        QnUpdatesNotificationManager* updatesManager )
+        QnUpdatesNotificationManager* updatesManager,
+        QnMiscNotificationManager *miscManager,
+        QnDiscoveryNotificationManager *discoveryManager)
     :
         m_resCtx( resCtx ),
         m_ecConnection( ecConnection ),
@@ -44,7 +48,9 @@ namespace ec2
         m_layoutManager( layoutManager ),
         m_videowallManager( videowallManager ),
         m_storedFileManager( storedFileManager ),
-        m_updatesManager( updatesManager )
+        m_updatesManager( updatesManager ),
+        m_miscManager( miscManager ),
+        m_discoveryManager( discoveryManager )
     {
     }
 
@@ -68,12 +74,30 @@ namespace ec2
         m_cameraManager->triggerNotification( tran );
     }
 
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiCameraAttributesData>& tran ) {
+        m_cameraManager->triggerNotification( tran );
+    }
+
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiCameraAttributesDataList>& tran ) {
+        m_cameraManager->triggerNotification( tran );
+    }
+
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiBusinessActionData>& tran ) {
         m_businessEventManager->triggerNotification( tran );
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiVideowallData>& tran ) {
         m_videowallManager->triggerNotification( tran );
+    }
+
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiIdDataList>& tran ) {
+        switch( tran.command )
+        {
+        case ApiCommand::removeStorages:
+            return m_mediaServerManager->triggerNotification( tran );
+        default:
+            assert( false );
+        }
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiIdData>& tran ) {
@@ -84,6 +108,7 @@ namespace ec2
         case ApiCommand::removeCamera:
             return m_cameraManager->triggerNotification( tran );
         case ApiCommand::removeMediaServer:
+        case ApiCommand::removeStorage:
             return m_mediaServerManager->triggerNotification( tran );
         case ApiCommand::removeUser:
             return m_userManager->triggerNotification( tran );
@@ -93,6 +118,9 @@ namespace ec2
             return m_layoutManager->triggerNotification( tran );
         case ApiCommand::removeVideowall:
             return m_videowallManager->triggerNotification( tran );
+        case ApiCommand::forcePrimaryTimeServer:
+            //#ak no notification needed
+            break;
         default:
             assert( false );
         }
@@ -113,6 +141,22 @@ namespace ec2
         m_mediaServerManager->triggerNotification( tran );
     }
 
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiStorageData>& tran ) {
+        m_mediaServerManager->triggerNotification( tran );
+    }
+
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiStorageDataList>& tran ) {
+        m_mediaServerManager->triggerNotification( tran );
+    }
+
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiMediaServerUserAttributesData>& tran ) {
+        m_mediaServerManager->triggerNotification( tran );
+    }
+
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran ) {
+        m_mediaServerManager->triggerNotification( tran );
+    }
+
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceData>& tran ) {
         m_resourceManager->triggerNotification( tran );
     }
@@ -127,7 +171,11 @@ namespace ec2
     }
     */
 
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceParamsData>& tran ) {
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceParamWithRefData>& tran ) {
+        m_resourceManager->triggerNotification( tran );
+    }
+
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceParamWithRefDataList>& tran ) {
         m_resourceManager->triggerNotification( tran );
     }
 
@@ -164,6 +212,8 @@ namespace ec2
         QnFullResourceData fullResData;
         fromApiToResourceList(tran.params, fullResData, m_resCtx);
         emit m_ecConnection->initNotification(fullResData);
+        foreach(const ApiDiscoveryData& data, tran.params.discoveryData)
+            m_discoveryManager->triggerNotification(data);
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPanicModeData>& tran ) {
@@ -195,5 +245,33 @@ namespace ec2
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList>& tran ) {
         m_cameraManager->triggerNotification(tran);
+    }
+
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPeerSystemTimeData>& /*tran*/ ) {
+        //#ak no notification needed in this case
+    }
+
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPeerSystemTimeDataList>& /*tran*/ ) {
+        //#ak no notification needed in this case
+    }
+
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiModuleData> &tran) {
+        m_miscManager->triggerNotification(tran);
+    }
+
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiModuleDataList> &tran) {
+        m_miscManager->triggerNotification(tran);
+    }
+
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryData> &tran) {
+        m_discoveryManager->triggerNotification(tran);
+    }
+
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoverPeerData> &tran) {
+        m_discoveryManager->triggerNotification(tran);
+    }
+
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiSystemNameData> &tran) {
+        m_miscManager->triggerNotification(tran);
     }
 }

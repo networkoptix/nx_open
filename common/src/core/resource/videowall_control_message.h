@@ -2,7 +2,7 @@
 #define VIDEOWALL_CONTROL_MESSAGE_H
 
 #include <QtCore/QObject>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QHash>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
@@ -36,6 +36,8 @@ public:
         MotionSelectionChanged,
         MediaDewarpingParamsChanged,
 
+        RadassModeChanged,
+
         Count
     };
 
@@ -43,8 +45,8 @@ public:
     QnVideoWallControlMessage(Operation operation):
         operation(operation){}
 
-    QUuid videoWallGuid;
-    QUuid instanceGuid;
+    QnUuid videoWallGuid;
+    QnUuid instanceGuid;
     Operation operation;
     QHash<QString, QString> params;
 

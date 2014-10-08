@@ -10,7 +10,7 @@
 QnRemotePtzController::QnRemotePtzController(const QnNetworkResourcePtr &resource):
     base_type(resource),
     m_resource(resource),
-    m_sequenceId(QUuid::createUuid()),
+    m_sequenceId(QnUuid::createUuid()),
     m_sequenceNumber(1)
 {
     m_server = m_resource->getParentResource().dynamicCast<QnMediaServerResource>();

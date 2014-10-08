@@ -5,6 +5,7 @@
 #include <QtCore/QStandardPaths>
 #include <QtGui/QDesktopServices>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QColorDialog>
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>
@@ -26,18 +27,22 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workaround/mac_utils.h>
-#include <ui/workaround/qt5_combobox_workaround.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
-#include <utils/network/nettools.h>
+#include <utils/common/scoped_value_rollback.h>
+#include <utils/math/color_transformations.h>
 
 QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::GeneralPreferencesWidget),
+    m_colorDialog(new QColorDialog()),
+    m_updating(false),
     m_oldDownmix(false),
     m_oldDoubleBuffering(false),
     m_oldLanguage(0),
-    m_oldSkin(0)
+    m_oldSkin(0),
+    m_oldBackgroundMode(Qn::DefaultBackground)
 {
     ui->setupUi(this);
 
@@ -56,7 +61,6 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
     setHelpTopic(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
     setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
-    setHelpTopic(ui->networkInterfacesGroupBox,                               Qn::SystemSettings_General_NetworkInterfaces_Help);
     setHelpTopic(ui->lookAndFeelGroupBox,                                     Qn::SystemSettings_General_Customizing_Help);
     setHelpTopic(ui->browseLogsButton,                                        Qn::SystemSettings_General_Logs_Help);
     setHelpTopic(ui->pauseOnInactivityLabel,  ui->pauseOnInactivityCheckBox,  Qn::SystemSettings_General_AutoPause_Help);
@@ -98,6 +102,26 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
         ui->doubleBufferRestartLabel->setVisible(toggled != m_oldDoubleBuffering);
     });
 
+    QButtonGroup* buttonGroup = new QButtonGroup(this);
+    buttonGroup->addButton(ui->backgroundEmptyRadioButton,      Qn::NoBackground);
+    buttonGroup->addButton(ui->backgroundDefaultRadioButton,    Qn::DefaultBackground);
+    buttonGroup->addButton(ui->backgroundRainbowRadioButton,    Qn::RainbowBackground);
+    buttonGroup->addButton(ui->backgroundCustomRadioButton,     Qn::CustomBackground);
+
+    connect(buttonGroup,    QnButtonGroupIdToggled, this, [this](int id, bool toggled) {
+        if (!toggled)
+            return;
+
+        action(Qn::ToggleBackgroundAnimationAction)->setChecked(id != Qn::NoBackground);
+        qnSettings->setBackgroundMode(static_cast<Qn::ClientBackground>(id));
+    });
+
+    connect(ui->selectColorButton,                      &QPushButton::clicked,          this,   [this] {
+        if (m_colorDialog->exec())
+            updateBackgroundColor();
+    });
+
+    connect(ui->backgroundOpacitySpinBox,               QnSpinboxIntValueChanged,       this,   &QnGeneralPreferencesWidget::updateBackgroundColor);
 }
 
 QnGeneralPreferencesWidget::~QnGeneralPreferencesWidget()
@@ -132,9 +156,21 @@ void QnGeneralPreferencesWidget::submitToSettings() {
                 qnSettings->setTranslationPath(translation.filePaths()[0]);
         }
     }
+
+//     bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
+//     if (backgroundAllowed) {
+//         qnSettings->setBackgroundMode(!ui->backgroundEmptyRadioButton->isChecked());
+//         qnSettings->setRainbowMode(ui->backgroundRainbowRadioButton->isChecked());
+//         if (ui->backgroundCustomRadioButton->isChecked())
+//             qnSettings->setBackgroundColor(backgroundColor());
+//         else
+//             qnSettings->setBackgroundColor(QColor());            
+//     }
 }
 
 void QnGeneralPreferencesWidget::updateFromSettings() {
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
     ui->mainMediaFolderLabel->setText(QDir::toNativeSeparators(qnSettings->mediaFolder()));
 
     m_oldDownmix = qnSettings->isAudioDownmixed();
@@ -160,10 +196,6 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     foreach (const QString &extraMediaFolder, qnSettings->extraMediaFolders())
         ui->extraMediaFoldersList->addItem(QDir::toNativeSeparators(extraMediaFolder));
 
-    ui->networkInterfacesList->clear();
-    foreach (const QNetworkAddressEntry &entry, getAllIPv4AddressEntries())
-        ui->networkInterfacesList->addItem(tr("IP Address: %1, Network Mask: %2").arg(entry.ip().toString()).arg(entry.netmask().toString()));
-
     m_oldLanguage = 0;
     QString translationPath = qnSettings->translationPath();
     for(int i = 0; i < ui->languageComboBox->count(); i++) {
@@ -174,6 +206,29 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
         }
     }
     ui->languageComboBox->setCurrentIndex(m_oldLanguage);
+
+    bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
+    ui->backgroundGroupBox->setEnabled(backgroundAllowed);
+    m_oldBackgroundMode = qnSettings->backgroundMode();
+    m_oldCustomBackgroundColor = qnSettings->customBackgroundColor();
+
+    if (!backgroundAllowed || qnSettings->backgroundMode() == Qn::NoBackground)
+        ui->backgroundEmptyRadioButton->setChecked(true);
+    else if (qnSettings->backgroundMode() == Qn::RainbowBackground)
+        ui->backgroundRainbowRadioButton->setChecked(true);
+    else if (qnSettings->backgroundMode() == Qn::CustomBackground)
+        ui->backgroundCustomRadioButton->setChecked(true);
+    else
+        ui->backgroundDefaultRadioButton->setChecked(true);
+
+    QColor customColor = qnSettings->customBackgroundColor();
+    if (!customColor.isValid())
+        customColor = withAlpha(Qt::darkBlue, 64);
+
+    m_colorDialog->setCurrentColor(withAlpha(customColor, 255));
+    ui->backgroundOpacitySpinBox->setValue(customColor.alphaF() * 100);
+
+    updateBackgroundColor();
 }
 
 bool QnGeneralPreferencesWidget::confirm() {
@@ -207,11 +262,36 @@ bool QnGeneralPreferencesWidget::confirm() {
     return true;
 }
 
+bool QnGeneralPreferencesWidget::discard() {
+    bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
+    if (backgroundAllowed) {
+        qnSettings->setBackgroundMode(m_oldBackgroundMode);
+        qnSettings->setCustomBackgroundColor(m_oldCustomBackgroundColor);
+    }
+    return true;
+}
+
+
 void QnGeneralPreferencesWidget::initTranslations() {
     QnTranslationListModel *model = new QnTranslationListModel(this);
     model->setTranslations(qnCommon->instance<QnClientTranslationManager>()->loadTranslations());
     ui->languageComboBox->setModel(model);
 }
+
+QColor QnGeneralPreferencesWidget::backgroundColor() const {
+    QColor opaque = m_colorDialog->currentColor();
+    return withAlpha(opaque, ui->backgroundOpacitySpinBox->value() * 255.0 / 100.0);
+}
+
+void QnGeneralPreferencesWidget::updateBackgroundColor() {
+    QPixmap pixmap(16, 16);
+    pixmap.fill(withAlpha(backgroundColor(), 255));
+    ui->selectColorButton->setIcon(pixmap);
+
+    if (!m_updating)
+        qnSettings->setCustomBackgroundColor(backgroundColor());
+}
+
 
 #include "ui/workaround/mac_utils.h"
 // -------------------------------------------------------------------------- //

@@ -89,15 +89,15 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QBrush *target) {
     }
 }
 
-void serialize(QnJsonContext *, const QUuid &value, QJsonValue *target) {
+void serialize(QnJsonContext *, const QnUuid &value, QJsonValue *target) {
     *target = QnLexical::serialized(value);
 }
 
-bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QUuid *target) {
-    /* Support JSON null for QUuid, even though we don't generate it on
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnUuid *target) {
+    /* Support JSON null for QnUuid, even though we don't generate it on
      * serialization. */
     if(value.type() == QJsonValue::Null) {
-        *target = QUuid();
+        *target = QnUuid();
         return true;
     }
 
@@ -152,7 +152,7 @@ TEST_VALUE(QRectF)
 TEST_VALUE(QPoint)
 TEST_VALUE(QPointF)
 TEST_VALUE(QColor)
-TEST_VALUE(QUuid)
+TEST_VALUE(QnUuid)
 
 void testRegion(int len) {
     QRegion region;
@@ -179,6 +179,6 @@ void qnJsonFunctionsUnitTest() {
     testValue(QPoint(15, 27));
     testValue(QPointF(4.6, 0.1234));
     testValue(QColor(Qt::gray));
-    testValue(QUuid::createUuid());
+    testValue(QnUuid::createUuid());
     testRegion(332);
 }

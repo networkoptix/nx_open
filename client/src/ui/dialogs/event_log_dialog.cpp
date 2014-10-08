@@ -33,7 +33,7 @@
 #include <ui/style/warning_style.h>
 
 #include <ui/workbench/workbench_context.h>
-#include <ui/workaround/qt5_combobox_workaround.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
@@ -272,7 +272,7 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
                 m_filterCameraList,
                 eventType,
                 actionType,
-                QUuid(),
+                QnUuid(),
                 this, SLOT(at_gotEvents(int, const QnBusinessActionDataListPtr&, int)));
         }
     }

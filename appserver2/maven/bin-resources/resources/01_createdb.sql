@@ -464,7 +464,6 @@ INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_con
 INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_condition",schedule,system,comments,disabled,"action_type","event_state",id,"event_type" ) VALUES ( '30','{  }','{  }',NULL,'1',NULL,'0','6','2','17','7' );
 INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_condition",schedule,system,comments,disabled,"action_type","event_state",id,"event_type" ) VALUES ( '30','{  }','{  }',NULL,'1',NULL,'0','6','2','18','8' );
 INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_condition",schedule,system,comments,disabled,"action_type","event_state",id,"event_type" ) VALUES ( '0','{  }','{  }',NULL,'1',NULL,'0','6','2','19','9' );
-INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_condition",schedule,system,comments,disabled,"action_type","event_state",id,"event_type" ) VALUES ( '21600','{  }','{  }',NULL,'0',NULL,'0','5','2','20','9' );
 
 INSERT INTO "vms_businessrule_action_resources" ( id,"businessrule_id","resource_id" ) VALUES ( '1','7','1' );
 INSERT INTO "vms_businessrule_action_resources" ( id,"businessrule_id","resource_id" ) VALUES ( '2','8','1' );
@@ -472,7 +471,6 @@ INSERT INTO "vms_businessrule_action_resources" ( id,"businessrule_id","resource
 INSERT INTO "vms_businessrule_action_resources" ( id,"businessrule_id","resource_id" ) VALUES ( '4','10','1' );
 INSERT INTO "vms_businessrule_action_resources" ( id,"businessrule_id","resource_id" ) VALUES ( '5','11','1' );
 INSERT INTO "vms_businessrule_action_resources" ( id,"businessrule_id","resource_id" ) VALUES ( '6','12','1' );
-INSERT INTO "vms_businessrule_action_resources" ( id,"businessrule_id","resource_id" ) VALUES ( '7','20','1' );
 
 
 INSERT INTO "vms_manufacture" ( id,name ) VALUES ( '1','ArecontVision' );
@@ -498,5 +496,3 @@ INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES (
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '4','Storage',NULL,NULL );
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '5','Local',NULL,NULL );
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '6','Camera',NULL,NULL );
-
-INSERT INTO "vms_propertytype" ( id,"resource_type_id",name,type,min,max,step,"values","ui_values","default_value",netHelper,"group","sub_group",description,ui,readonly ) VALUES ( '17238','6','mediaStreams','1',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0' );

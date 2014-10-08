@@ -16,14 +16,19 @@ class QnSyncTime: public QObject {
 
 public:
     QnSyncTime();
+    virtual ~QnSyncTime();
 
-    static QnSyncTime *instance();
+    static QnSyncTime* instance();
 
     qint64 currentMSecsSinceEpoch();
     qint64 currentUSecsSinceEpoch();
     QDateTime currentDateTime();
 
     void reset();
+
+public slots:
+    //!Sets new synchronized time to \a newTime
+    void updateTime(qint64 newTime);
 
 signals:
     /**
@@ -40,6 +45,7 @@ private:
     bool m_syncTimeRequestIssued;
 
 private slots:
+    //!Sets new synchronized time to \a newTime
     void updateTime(int reqID, ec2::ErrorCode errorCode, qint64 newTime);
 };
 

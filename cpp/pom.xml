@@ -28,7 +28,6 @@
         <directory>${arch}</directory>
         <outputDirectory>${arch}</outputDirectory>
         <sourceDirectory>${basedir}/src</sourceDirectory> 
-        <defaultGoal>compile</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -91,7 +90,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${python.dir}/python</executable>
+                            <executable>${init.python.dir}/python</executable>
                             <arguments>
                                 <argument>${project.build.directory}/gen_resources.py</argument>
                             </arguments>
@@ -105,7 +104,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${python.dir}/python</executable>
+                            <executable>${init.python.dir}/python</executable>
                             <arguments>
                                 <argument>build-prepare.py</argument>
                             </arguments>
@@ -119,7 +118,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${python.dir}/python</executable>
+                            <executable>${init.python.dir}/python</executable>
                             <arguments>
                                 <argument>${project.build.directory}/build.py</argument>
                             </arguments>                                    

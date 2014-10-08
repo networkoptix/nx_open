@@ -12,7 +12,7 @@
 #include "motion/motion_helper.h"
 #include "api/serializer/serializer.h"
 
-int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
     qint64 startTime = -1, endTime = 1, detailLevel = -1;
@@ -119,7 +119,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
                 }
             } else {
             //TODO: #GDM #Bookmarks use tags to filter periods?
-                periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog);
+                periods = qnStorageMan->getRecordedPeriods(resList.filtered<QnVirtualCameraResource>(), startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog);
             }
             break;
         }
@@ -181,8 +181,9 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     return CODE_OK;
 }
 
-int QnRecordedChunksRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
+int QnRecordedChunksRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
+                                             QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
-    return executeGet(path, params, result, contentType);
+    return executeGet(path, params, result, contentType, owner);
 }
 

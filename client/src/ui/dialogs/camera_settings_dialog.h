@@ -46,6 +46,7 @@ private slots:
     void at_openButton_clicked();
 
     void at_cameras_saved(ec2::ErrorCode errorCode, const QnVirtualCameraResourceList &cameras);
+    void at_cameras_properties_saved(int requestId, ec2::ErrorCode errorCode);
     void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
 
     void updateCamerasFromSelection();

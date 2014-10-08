@@ -63,7 +63,8 @@ void QnTcpListener::setAuth(const QByteArray& userName, const QByteArray& passwo
     d->authDigest = digest.toBase64();
 }
 
-QnTcpListener::QnTcpListener(const QHostAddress& address, int port, int maxConnections):
+QnTcpListener::QnTcpListener( const QHostAddress& address, int port, int maxConnections, bool useSSL )
+:
     d_ptr(new QnTcpListenerPrivate())
 {
     Q_D(QnTcpListener);
@@ -71,6 +72,7 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port, int maxConne
     d->localPort = port;
     d->serverSocket = 0;
     d->maxConnections = maxConnections;
+    d->useSSL = useSSL;
 }
 
 QnTcpListener::~QnTcpListener()
@@ -87,7 +89,7 @@ bool QnTcpListener::bindToLocalAddress()
 {
     Q_D(QnTcpListener);
 
-    d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
+    d->serverSocket = SocketFactory::createStreamServerSocket(true/*d->useSSL*/);
     if( !d->serverSocket->setReuseAddrFlag( true ) ||
         !d->serverSocket->bind( SocketAddress( d->serverAddress.toString(), d->localPort ) ) ||
         !d->serverSocket->listen() )
@@ -154,6 +156,11 @@ void QnTcpListener::addOwnership(QnLongRunnable* processor)
     d->connections << processor;
 }
 
+bool QnTcpListener::isSslEnabled() const
+{
+    Q_D(const QnTcpListener);
+    return d->useSSL;
+}
 
 void QnTcpListener::pleaseStop()
 {
@@ -193,12 +200,6 @@ void QnTcpListener::updatePort(int newPort)
     Q_D(QnTcpListener);
     QMutexLocker lock(&d->portMutex);
     d->newPort = newPort;
-}
-
-void QnTcpListener::enableSSLMode()
-{
-    Q_D(QnTcpListener);
-    d->useSSL = true;
 }
 
 void QnTcpListener::run()

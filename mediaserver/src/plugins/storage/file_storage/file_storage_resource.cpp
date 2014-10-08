@@ -15,10 +15,14 @@
 #include <media_server/settings.h>
 #include <recorder/storage_manager.h>
 
+#ifdef WIN32
+#pragma comment(lib, "mpr.lib")
+#endif
 
 QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
     QString fileName = removeProtocolPrefix(url);
+
     int ioBlockSize = 0;
     int ffmpegBufferSize = 0;
 
@@ -38,8 +42,39 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
     return rez.release();
 }
 
+bool QnFileStorageResource::updatePermissions() const
+{
+    QMutexLocker lock(&m_mutex);
+    if (m_durty) {
+        m_durty = false;
+        QUrl storageUrl(getUrl());
+        QString path = storageUrl.path().mid((1));
+#ifdef WIN32
+        if (path.startsWith("\\\\") && !storageUrl.userName().isEmpty())
+        {
+            NETRESOURCE netRes;
+            memset(&netRes, 0, sizeof(netRes));
+            netRes.dwType = RESOURCETYPE_DISK;
+            netRes.lpRemoteName = (LPWSTR) path.constData();
+            LPWSTR password = (LPWSTR) storageUrl.password().constData();
+            LPWSTR user = (LPWSTR) storageUrl.userName().constData();
+            WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0);
+        }
+#endif
+    }
+    return true;
+}
+
+void QnFileStorageResource::setUrl(const QString& url)
+{
+    QMutexLocker lock(&m_mutex);
+    QnStorageResource::setUrl(url);
+    m_durty = true;
+}
+
 QnFileStorageResource::QnFileStorageResource():
-    m_storageBitrateCoeff(1.0)
+    m_storageBitrateCoeff(1.0),
+    m_durty(false)
 {
 
 };
@@ -56,6 +91,7 @@ bool QnFileStorageResource::isNeedControlFreeSpace()
 
 bool QnFileStorageResource::removeFile(const QString& url)
 {
+    updatePermissions();
     QFile file(url);
     qnFileDeletor->deleteFile(removeProtocolPrefix(url));
     return true;
@@ -63,18 +99,21 @@ bool QnFileStorageResource::removeFile(const QString& url)
 
 bool QnFileStorageResource::renameFile(const QString& oldName, const QString& newName)
 {
+    updatePermissions();
     return QFile::rename(oldName, newName);
 }
 
 
 bool QnFileStorageResource::removeDir(const QString& url)
 {
+    updatePermissions();
     qnFileDeletor->deleteDir(removeProtocolPrefix(url));
     return true;
 }
 
 bool QnFileStorageResource::isDirExists(const QString& url)
 {
+    updatePermissions();
     QDir d(url);
     return d.exists(removeProtocolPrefix(url));
 }
@@ -86,27 +125,32 @@ bool QnFileStorageResource::isCatalogAccessible()
 
 bool QnFileStorageResource::isFileExists(const QString& url)
 {
+    updatePermissions();
     return QFile::exists(removeProtocolPrefix(url));
 }
 
 qint64 QnFileStorageResource::getFreeSpace()
 {
-    return getDiskFreeSpace(removeProtocolPrefix(getUrl()));
+    updatePermissions();
+    return getDiskFreeSpace(getPath());
 }
 
 qint64 QnFileStorageResource::getTotalSpace()
 {
-    return getDiskTotalSpace(removeProtocolPrefix(getUrl()));
+    updatePermissions();
+    return getDiskTotalSpace(getPath());
 }
 
 QFileInfoList QnFileStorageResource::getFileList(const QString& dirName)
 {
+    updatePermissions();
     QDir dir(dirName);
     return dir.entryInfoList(QDir::Files);
 }
 
 qint64 QnFileStorageResource::getFileSize(const QString& url) const
 {
+    updatePermissions();
     return QnFile::getFileSize(url);
 }
 
@@ -115,20 +159,22 @@ bool QnFileStorageResource::isStorageAvailableForWriting()
     if( !isStorageDirMounted() )
         return false;
 
+    updatePermissions();
+
     if (hasFlags(Qn::deprecated))
         return false;
 
-    QDir dir(getUrl());
+    QDir dir(getPath());
 
     bool needRemoveDir = false;
     if (!dir.exists())
     {
-        if (!dir.mkpath(getUrl()))
+        if (!dir.mkpath(getPath()))
             return false;
         needRemoveDir = true;
     }
 
-    QFile file(closeDirPath(getUrl()) + QString("tmp") + QString::number((unsigned) ((rand() << 16) + rand())));
+    QFile file(closeDirPath(getPath()) + QString("tmp") + QString::number((unsigned) ((rand() << 16) + rand())));
     bool result = file.open(QFile::WriteOnly);
     if (result)
     {
@@ -137,7 +183,7 @@ bool QnFileStorageResource::isStorageAvailableForWriting()
     }
 
     if (needRemoveDir)
-        dir.remove(getUrl());
+        dir.remove(getPath());
 
     return result;
 }
@@ -147,7 +193,9 @@ bool QnFileStorageResource::isStorageAvailable()
     if( !isStorageDirMounted() )
         return false;
 
-    QString tmpDir = closeDirPath(getUrl()) + QString("tmp") + QString::number(rand());
+    updatePermissions();
+
+    QString tmpDir = closeDirPath(getPath()) + QString("tmp") + QString::number(rand());
     QDir dir(tmpDir);
     if (dir.exists()) {
         dir.remove(tmpDir);
@@ -194,13 +242,13 @@ QnStorageResource* QnFileStorageResource::instance()
 
 float QnFileStorageResource::getAvarageWritingUsage() const
 {
-    QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getUrl());
+    QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getPath());
     return writer ? writer->getAvarageUsage() : 0;
 }
 
 void QnFileStorageResource::setStorageBitrateCoeff(float value)
 {
-    qDebug() << "QnFileStorageResource " << getUrl() << "coeff " << value;
+    qDebug() << "QnFileStorageResource " << getPath() << "coeff " << value;
     m_storageBitrateCoeff = value;
 }
 
@@ -249,7 +297,7 @@ static bool readTabFile( const QString& filePath, QStringList* const mountPoints
 bool QnFileStorageResource::isStorageDirMounted()
 {
     //on unix, checking that storage directory is mounted, if it is to be mounted
-    const QString& storagePath = QDir(closeDirPath(getUrl())).canonicalPath();   //following symbolic link
+    const QString& storagePath = QDir(closeDirPath(getPath())).canonicalPath();   //following symbolic link
 
     QStringList mountPoints;
     if( !readTabFile( lit("/etc/fstab"), &mountPoints ) )
@@ -287,3 +335,4 @@ bool QnFileStorageResource::isStorageDirMounted()
     return true;
 }
 #endif    // _WIN32
+

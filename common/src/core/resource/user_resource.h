@@ -1,7 +1,7 @@
 #ifndef QN_USER_RESOURCE_H
 #define QN_USER_RESOURCE_H
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
@@ -21,6 +21,9 @@ public:
     QString getPassword() const;
     void setPassword(const QString &password);
 
+    void generateHash();
+    bool checkPassword(const QString &password);
+
     QByteArray getDigest() const;
     void setDigest(const QByteArray& digest);
 
@@ -33,8 +36,12 @@ public:
     QString getEmail() const;
     void setEmail(const QString &email);
 signals:
-    void emailChanged(const QnUserResourcePtr &user);
-    void permissionsChanged(const QnUserResourcePtr &user);
+    void hashChanged(const QnResourcePtr &resource);
+    void passwordChanged(const QnResourcePtr &resource);
+    void digestChanged(const QnResourcePtr &resource);
+    void permissionsChanged(const QnResourcePtr &user);
+    void adminChanged(const QnResourcePtr &resource);
+    void emailChanged(const QnResourcePtr &user);
 protected:
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 

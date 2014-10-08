@@ -22,7 +22,6 @@
 #include "core/datapacket/media_data_packet.h"
 #include "soap_wrapper.h"
 #include "onvif_resource_settings.h"
-#include "gsoap_async_call_wrapper.h"
 
 
 class onvifXsd__AudioEncoderConfigurationOption;
@@ -43,6 +42,9 @@ class VideoOptionsLocal;
 //first = width, second = height
 
 class QDomElement;
+
+template<typename SyncWrapper, typename Request, typename Response>
+class GSoapAsyncCallWrapper;
 
 /*
 * This structure is used during discovery process. These data are read by getDeviceInformation request and may override data from multicast packet
@@ -119,15 +121,12 @@ public:
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);
 
-    virtual bool setHostAddress(const QString &ip, QnDomain domain = QnDomainMemory) override;
+    virtual void setHostAddress(const QString &ip) override;
 
 
-    virtual bool isResourceAccessible() override;
     virtual QString getDriverName() const override;
 
-    virtual int getMaxFps() const override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
-    virtual bool hasDualStreaming() const override;
 
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
@@ -243,8 +242,8 @@ protected:
 
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 
-    virtual bool getParamPhysical(const QnParam &param, QVariant &val);
-    virtual bool setParamPhysical(const QnParam &param, const QVariant& val);
+    virtual bool getParamPhysical(const QString &param, QVariant &val);
+    virtual bool setParamPhysical(const QString &param, const QVariant& val);
 
     virtual void fetchAndSetCameraSettings();
 

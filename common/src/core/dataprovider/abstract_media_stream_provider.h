@@ -32,6 +32,7 @@ public:
         TODO #ak does not look appropriate here
     */
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() const { return QnConstResourceAudioLayoutPtr(); };
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout() const { return QnConstResourceVideoLayoutPtr(); }
 };
 
 #endif // ENABLE_DATA_PROVIDERS

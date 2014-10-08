@@ -5,14 +5,9 @@
 #include "data_only_camera_resource.h"
 
 
-DataOnlyCameraResource::DataOnlyCameraResource( const QUuid& resourceTypeId )
+DataOnlyCameraResource::DataOnlyCameraResource( const QnUuid& resourceTypeId )
 {
     setTypeId( resourceTypeId );
-}
-
-bool DataOnlyCameraResource::isResourceAccessible()
-{
-    return false;
 }
 
 QString DataOnlyCameraResource::getDriverName() const

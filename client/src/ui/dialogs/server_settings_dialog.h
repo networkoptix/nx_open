@@ -58,6 +58,7 @@ private:
     int dataRowCount() const;
 
     void updateRebuildUi(RebuildState newState, int progress = -1);
+    void updateFailoverLabel();
 
 private slots:
     void at_tableBottomLabel_linkActivated();
@@ -79,6 +80,7 @@ private:
     QAction *m_removeAction;
 
     bool m_hasStorageChanges;
+    bool m_maxCamerasAdjusted;
 
     RebuildState m_rebuildState;
 };

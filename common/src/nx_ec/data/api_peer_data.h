@@ -15,22 +15,30 @@ namespace ec2
             dataFormat( Qn::UbjsonFormat )
         {}
 
-        ApiPeerData(QUuid id, Qn::PeerType peerType, Qn::SerializationFormat dataFormat = Qn::UbjsonFormat):
+        ApiPeerData(const QnUuid& id, const QnUuid& instanceId, Qn::PeerType peerType, Qn::SerializationFormat dataFormat = Qn::UbjsonFormat):
             id(id),
+            instanceId(instanceId),
             peerType(peerType),
             dataFormat(dataFormat) 
         {}
 
         bool operator==(const ApiPeerData& other) const {
-            return id == other.id && peerType == other.peerType && dataFormat == other.dataFormat;
+            return id == other.id && instanceId == other.instanceId && peerType == other.peerType && dataFormat == other.dataFormat;
         }
 
         bool isClient() const {
             return peerType != Qn::PT_Server;
         }
 
+        bool isServer() const {
+            return peerType == Qn::PT_Server;
+        }
+
         /** Unique ID of the peer. */ 
-        QUuid id;
+        QnUuid id;
+
+        /** Unique running instance ID of the peer. */ 
+        QnUuid instanceId;
 
         /** Type of the peer. */
         Qn::PeerType peerType;
@@ -38,9 +46,9 @@ namespace ec2
         /** Preferred client data serialization format */
         Qn::SerializationFormat dataFormat;
     };
-    typedef QSet<QUuid> QnPeerSet;
+    typedef QSet<QnUuid> QnPeerSet;
 
-#define ApiPeerData_Fields (id)(peerType)(dataFormat)
+#define ApiPeerData_Fields (id)(instanceId)(peerType)(dataFormat)
 
 }
 

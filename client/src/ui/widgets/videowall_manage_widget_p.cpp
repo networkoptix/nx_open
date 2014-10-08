@@ -50,7 +50,7 @@ namespace {
 /* BaseModelItem                                                        */
 /************************************************************************/
 
-QnVideowallManageWidgetPrivate::BaseModelItem::BaseModelItem(const QRect &geometry, ItemType itemType, const QUuid &id, QnVideowallManageWidget* q):
+QnVideowallManageWidgetPrivate::BaseModelItem::BaseModelItem(const QRect &geometry, ItemType itemType, const QnUuid &id, QnVideowallManageWidget* q):
     id(id),
     itemType(itemType),
     geometry(geometry),
@@ -291,7 +291,7 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintProposed(QPainter* pain
 /************************************************************************/
 
 QnVideowallManageWidgetPrivate::FreeSpaceItem::FreeSpaceItem(const QRect &rect, ItemType itemType, QnVideowallManageWidget* q):
-    base_type(rect, itemType, QUuid::createUuid(), q)
+    base_type(rect, itemType, QnUuid::createUuid(), q)
 {}
 
 void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(QPainter* painter, const TransformationProcess &process) const {
@@ -410,7 +410,7 @@ void QnVideowallManageWidgetPrivate::ModelScreen::paintProposed(QPainter* painte
 /* ModelItem                                                            */
 /************************************************************************/
 
-QnVideowallManageWidgetPrivate::ModelItem::ModelItem(ItemType itemType, const QUuid &id, QnVideowallManageWidget* q):
+QnVideowallManageWidgetPrivate::ModelItem::ModelItem(ItemType itemType, const QnUuid &id, QnVideowallManageWidget* q):
     BaseModelItem(QRect(), itemType, id, q)
 {
     editable = true;
@@ -522,7 +522,7 @@ void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourceP
     for (int i = 0; i < desktop->screenCount(); ++i)
         screens << desktop->screenGeometry(i);
 
-    QUuid pcUuid = qnSettings->pcUuid();
+    QnUuid pcUuid = qnSettings->pcUuid();
 
     foreach (const QnVideoWallItem &item, videowall->items()->getItems()) {
         if (item.pcUuid != pcUuid)
@@ -539,7 +539,7 @@ void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourceP
 
 void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourcePtr &videowall) {
 
-    QUuid pcUuid = qnSettings->pcUuid();
+    QnUuid pcUuid = qnSettings->pcUuid();
 
     QList<QnVideoWallPcData::PcScreen> localScreens;
     for (int i = 0; i < m_screens.size(); i++) {
@@ -552,13 +552,10 @@ void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourceP
     QnVideoWallPcData pcData;
     pcData.uuid = pcUuid;
     pcData.screens = localScreens;
-    if (!videowall->pcs()->hasItem(pcUuid))
-        videowall->pcs()->addItem(pcData);
-    else
-        videowall->pcs()->updateItem(pcUuid, pcData);
+    videowall->pcs()->addOrUpdateItem(pcData);
 
     /* Form list of items currently attached to this PC. */
-    QSet<QUuid> existingIds;
+    QSet<QnUuid> existingIds;
     foreach (const QnVideoWallItem &item, videowall->items()->getItems())
         if (item.pcUuid == pcUuid)
             existingIds << item.uuid;
@@ -581,15 +578,11 @@ void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourceP
             item = videowall->items()->getItem(modelItem.id);
         }
         item.screenSnaps = modelItem.snaps;
-
-        if (videowall->items()->hasItem(modelItem.id))
-            videowall->items()->updateItem(modelItem.id, item);
-        else
-            videowall->items()->addItem(item);
+        videowall->items()->addOrUpdateItem(item);
     }
 
     /* Delete other items. */ 
-    foreach (const QUuid &toDelete, existingIds)
+    foreach (const QnUuid &toDelete, existingIds)
         videowall->items()->removeItem(toDelete);
 
 }
@@ -720,7 +713,7 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
         if (!item.geometry.contains(pos) || !item.free())
             return;
 
-        ModelItem added(ItemType::Added, QUuid::createUuid(), q_ptr);
+        ModelItem added(ItemType::Added, QnUuid::createUuid(), q_ptr);
         added.name = tr("New Item");
         added.geometry = item.geometry;
         added.snaps = item.snaps;
@@ -741,7 +734,7 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
         if (item->itemType == ItemType::Existing) {
             if (QMessageBox::question(q_ptr, 
                 tr("Delete Screen"),
-                tr("Are you sure you want to delete %1").arg(item->name),
+                tr("Are you sure you want to delete %1?").arg(item->name),
                 QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Cancel)
                 return;
         }

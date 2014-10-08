@@ -15,7 +15,7 @@
 #include "nx_ec/data/api_license_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include <utils/serialization/json_functions.h>
-#include "version.h"
+#include <utils/common/app_info.h>
 
 static const int TCP_TIMEOUT = 1000 * 5;
 
@@ -30,7 +30,8 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     params.addQueryItem(QLatin1String("license_key"), licenseKey);
     params.addQueryItem(QLatin1String("box"), runtimeData.box);
     params.addQueryItem(QLatin1String("brand"), runtimeData.brand);
-    params.addQueryItem(QLatin1String("version"), QLatin1String(QN_ENGINE_VERSION));
+    params.addQueryItem(QLatin1String("version"), QnAppInfo::engineVersion()); //TODO: #GDM replace with qnCommon->engineVersion()? And what if --override-version?
+
     QLocale locale;
     params.addQueryItem(QLatin1String("lang"), QLocale::languageToString(locale.language()));
 
@@ -60,7 +61,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     return result;
 }
 
-int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestParams & requestParams, QnJsonRestResult &result) 
+int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestParams & requestParams, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
 {
     ec2::ApiDetailedLicenseData reply;
 

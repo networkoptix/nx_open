@@ -12,7 +12,7 @@ QnPlISDResourceSearcher::QnPlISDResourceSearcher()
 {
 }
 
-QnResourcePtr QnPlISDResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlISDResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -114,9 +114,12 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
 
 
 
-    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (rt.isNull())
-        return QList<QnResourcePtr>();
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    if (rt.isNull()) {
+        rt = qnResTypePool->getResourceTypeId(manufacture(), lit("ISDcam"));
+        if (rt.isNull())
+            return QList<QnResourcePtr>();
+    }
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
 
@@ -124,7 +127,10 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
     resource->setName(name);
     resource->setModel(name);
     resource->setMAC(QnMacAddress(mac));
-    resource->setHostAddress(host, QnDomainMemory);
+    if (port == 80)
+        resource->setHostAddress(host);
+    else
+        resource->setUrl(QString(lit("http://%1:%2")).arg(host).arg(port));
     resource->setAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);
@@ -211,10 +217,12 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
 
-    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (rt.isNull())
     {
-        return local_result;
+        rt = qnResTypePool->getResourceTypeId(manufacture(), lit("ISDcam"));
+        if (rt.isNull())
+            return local_result;
     }
 
     resource->setTypeId(rt);
