@@ -9,6 +9,7 @@
 
 #include <client/client_settings.h>
 
+#include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource_management/resource_pool.h>

@@ -15,8 +15,10 @@
 #include <QtWidgets/QMenu>
 
 #include <core/dataprovider/abstract_streamdataprovider.h>
+
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 
 #include <camera/resource_display.h>
 
