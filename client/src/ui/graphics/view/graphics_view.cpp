@@ -24,7 +24,11 @@ namespace {
 } // anonymous namespace
 
 
-QnLayerPainter::QnLayerPainter(): m_view(NULL), m_layer(static_cast<QGraphicsScene::SceneLayer>(0)) {}
+QnLayerPainter::QnLayerPainter(): 
+    m_view(NULL),
+    m_layer(static_cast<QGraphicsScene::SceneLayer>(0)),
+    m_enabled(true)
+{}
 
 QnLayerPainter::~QnLayerPainter() {
     ensureUninstalled();
@@ -33,6 +37,14 @@ QnLayerPainter::~QnLayerPainter() {
 void QnLayerPainter::ensureUninstalled() {
     if(m_view != NULL)
         m_view->uninstallLayerPainter(this);
+}
+
+bool QnLayerPainter::isEnabled() const {
+    return m_enabled;
+}
+
+void QnLayerPainter::setEnabled(bool enabled) {
+    m_enabled = enabled;
 }
 
 
