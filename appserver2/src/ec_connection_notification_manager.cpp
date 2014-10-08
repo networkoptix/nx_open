@@ -90,6 +90,16 @@ namespace ec2
         m_videowallManager->triggerNotification( tran );
     }
 
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiIdDataList>& tran ) {
+        switch( tran.command )
+        {
+        case ApiCommand::removeStorages:
+            return m_mediaServerManager->triggerNotification( tran );
+        default:
+            assert( false );
+        }
+    }
+
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiIdData>& tran ) {
         switch( tran.command )
         {
@@ -98,6 +108,7 @@ namespace ec2
         case ApiCommand::removeCamera:
             return m_cameraManager->triggerNotification( tran );
         case ApiCommand::removeMediaServer:
+        case ApiCommand::removeStorage:
             return m_mediaServerManager->triggerNotification( tran );
         case ApiCommand::removeUser:
             return m_userManager->triggerNotification( tran );

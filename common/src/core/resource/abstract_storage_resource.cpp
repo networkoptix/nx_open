@@ -146,11 +146,8 @@ void QnAbstractStorageResource::updateInner(const QnResourcePtr &other, QSet<QBy
 void QnAbstractStorageResource::setUrl(const QString& value)
 {
     QnResource::setUrl(value);
-    if (getId().isNull()) 
-    {
-        Q_ASSERT(!getParentId().isNull());
+    if (getId().isNull() && !getParentId().isNull()) 
         setId(fillID(getParentId(), value));
-    }
 }
 
 QnUuid QnAbstractStorageResource::fillID(const QnUuid& mserverId, const QString& url)

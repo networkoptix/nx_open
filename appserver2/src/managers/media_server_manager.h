@@ -54,8 +54,22 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
-            assert( tran.command == ApiCommand::removeMediaServer );
-            emit removed( QnUuid(tran.params.id) );
+            if( tran.command == ApiCommand::removeMediaServer)
+                emit removed( QnUuid(tran.params.id) );
+            else if( tran.command == ApiCommand::removeStorage)
+                emit storageRemoved( QnUuid(tran.params.id) );
+            else
+                Q_ASSERT_X(0, "Invalid transaction", Q_FUNC_INFO);
+        }
+
+        void triggerNotification( const QnTransaction<ApiIdDataList>& tran )
+        {
+            if( tran.command == ApiCommand::removeStorages) {
+                foreach(const ApiIdData& idData, tran.params)
+                    emit storageRemoved( idData.id );
+            }
+            else
+                Q_ASSERT_X(0, "Invalid transaction", Q_FUNC_INFO);
         }
 
         void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesData>& tran )
@@ -105,6 +119,8 @@ namespace ec2
         virtual int removeStorages( const ApiIdDataList& storages, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::getUserAttributes
         virtual int getUserAttributes( const QnUuid& mediaServerId, impl::GetServerUserAttributesHandlerPtr handler ) override;
+        //!Implementation of QnMediaServerManager::getStorages
+        virtual int getStorages( const QnUuid& mediaServerId, impl::GetStoragesHandlerPtr handler ) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;

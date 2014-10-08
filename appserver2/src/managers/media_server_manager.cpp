@@ -45,9 +45,6 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        if (resource->getId().isNull())
-            resource->setId( QnUuid::createUuid());
-
         /*
         QnAbstractStorageResourceList storages = resource->getStorages();
         for (int i = 0; i < storages.size(); ++i)
@@ -125,6 +122,22 @@ namespace ec2
         return reqID;
     }
 
+    template<class T>
+    int QnMediaServerManager<T>::getStorages( const QnUuid& mediaServerId, impl::GetStoragesHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiStorageDataList& storages ) 
+        {
+            QnResourceList outData;
+            if( errorCode == ErrorCode::ok )
+                fromApiToResourceList(storages, outData, m_resCtx);
+            handler->done( reqID, errorCode, outData );
+        };
+        m_queryProcessor->template processQueryAsync<QnUuid, ApiStorageDataList, decltype(queryDoneHandler)>
+            ( ApiCommand::getStorages, mediaServerId, queryDoneHandler );
+        return reqID;
+    }
+    
     template<class T>
     QnTransaction<ApiMediaServerData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource )
     {

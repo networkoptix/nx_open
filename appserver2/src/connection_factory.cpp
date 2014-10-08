@@ -132,6 +132,8 @@ namespace ec2
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeMediaServer );
         registerUpdateFuncHandler<ApiStorageDataList>( restProcessorPool, ApiCommand::saveStorages);
         registerUpdateFuncHandler<ApiStorageData>( restProcessorPool, ApiCommand::saveStorage);
+        registerUpdateFuncHandler<ApiIdDataList>( restProcessorPool, ApiCommand::removeStorages);
+        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeStorage);
 
         //AbstractCameraManager::addCamera
         registerUpdateFuncHandler<ApiCameraData>( restProcessorPool, ApiCommand::saveCamera );

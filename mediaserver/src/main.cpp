@@ -884,6 +884,18 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
                 return;
         }
         messageProcessor->processServerUserAttributesList( mediaServerUserAttributesList );
+
+        //read server's storages
+        QnResourceList storages;
+        while ((rez = ec2Connection->getMediaServerManager()->getStoragesSync(QnUuid(), &storages)) != ec2::ErrorCode::ok)
+        {
+            NX_LOG( lit("QnMain::run(): Can't get storage list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+        foreach(const QnResourcePtr& storage, storages)
+            messageProcessor->updateResource( storage );
     }
 
 
@@ -1509,10 +1521,6 @@ void QnMain::run()
             isModified = true;
         }
         
-        QnAbstractStorageResourceList storages = server->getStorages();
-        QnAbstractStorageResourceList modifiedStorages = createStorages(server);
-        modifiedStorages.append(updateStorages(server));
-
         bool needUpdateAuthKey = server->getAuthKey().isEmpty();
         if (server->getSystemName() != qnCommon->localSystemName())
         {
@@ -1534,9 +1542,6 @@ void QnMain::run()
             m_mediaServer = registerServer(ec2Connection, server);
         else
             m_mediaServer = server;
-        saveStorages(ec2Connection, modifiedStorages);
-        foreach(const QnAbstractStorageResourcePtr &storage, modifiedStorages)
-            messageProcessor->updateResource(storage);
 
 
         if (m_mediaServer.isNull())
@@ -1711,6 +1716,14 @@ void QnMain::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS(messageProcessor.data());
+
+    QnAbstractStorageResourceList storages = m_mediaServer->getStorages();
+    QnAbstractStorageResourceList modifiedStorages = createStorages(m_mediaServer);
+    modifiedStorages.append(updateStorages(m_mediaServer));
+    saveStorages(ec2Connection, modifiedStorages);
+    foreach(const QnAbstractStorageResourcePtr &storage, modifiedStorages)
+        messageProcessor->updateResource(storage);
+
 #ifndef EDGE_SERVER
     updateDisabledVendorsIfNeeded();
     updateAllowCameraCHangesIfNeed();

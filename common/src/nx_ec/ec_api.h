@@ -274,10 +274,29 @@ namespace ec2
             return impl::doSyncCall<impl::GetServerUserAttributesHandler>( std::bind(fn, this, mediaServerId, std::placeholders::_1), serverAttrsList );
         }
 
+        /*!
+            \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId. 
+                If NULL, returned list contains data of all known servers
+            \param handler Functor with params: (ErrorCode, const QnMediaServerUserAttributesList& serverUserAttributesList)
+        */
+        template<class TargetType, class HandlerType> int getStorages( const QnUuid& mediaServerId, TargetType* target, HandlerType handler ) {
+            return getStorages( mediaServerId, std::static_pointer_cast<impl::GetSStoragesHandler>(std::make_shared<impl::CustomGetStoragesHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+        /*!
+            \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId. 
+                If NULL, returned list contains data of all known servers
+        */
+        ErrorCode getStoragesSync(const QnUuid& mediaServerId, QnResourceList* const storages ) {
+            int(AbstractMediaServerManager::*fn)(const QnUuid&, impl::GetStoragesHandlerPtr) = &AbstractMediaServerManager::getStorages;
+            return impl::doSyncCall<impl::GetStoragesHandler>( std::bind(fn, this, mediaServerId, std::placeholders::_1), storages );
+        }
+
     signals:
         void addedOrUpdated( QnMediaServerResourcePtr camera );
         void storageChanged( QnAbstractStorageResourcePtr camera );
         void removed( QnUuid id );
+        void storageRemoved( QnUuid id );
         void userAttributesChanged( QnMediaServerUserAttributesPtr attributes );
         void userAttributesRemoved( QnUuid id );
 
@@ -289,6 +308,7 @@ namespace ec2
         virtual int saveStorages( const QnAbstractStorageResourceList& storages, impl::SimpleHandlerPtr handler ) = 0;
         virtual int removeStorages( const ApiIdDataList& storages, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getUserAttributes( const QnUuid& mediaServerId, impl::GetServerUserAttributesHandlerPtr handler ) = 0;
+        virtual int getStorages( const QnUuid& mediaServerId, impl::GetStoragesHandlerPtr handler ) = 0;
     };
 
 
