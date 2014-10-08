@@ -11,6 +11,7 @@
 #include <list>
 #include <memory>
 #include <atomic>
+#include <thread>
 
 #ifdef max
 #undef max
@@ -163,6 +164,39 @@ static BIO_METHOD Proxy_server_socket =
 }
 
 namespace {
+
+
+// SSL global lock. This is a must even if the compilation has configured with THREAD for OpenSSL.
+// Based on the documentation of OpenSSL, it internally uses lots of global data structure. Apart
+// from this, I have suffered the wired access violation when not give OpenSSL lock callback. The
+// documentation says 2 types of callback is needed, however the other one, thread id , is not a 
+// must since OpenSSL configured with thread support will give default version. Additionally, the
+// dynamic lock interface is not used in current OpenSSL version. So we don't use it.
+
+static std::mutex* kOpenSSLGlobalLock;
+
+void OpenSSLGlobalLock( int mode , int type , const char* file , int line ) {
+    Q_UNUSED(file);
+    Q_UNUSED(line);
+    Q_ASSERT( kOpenSSLGlobalLock != NULL );
+    if( mode & CRYPTO_LOCK ) {
+        kOpenSSLGlobalLock[type].lock();
+    } else {
+        kOpenSSLGlobalLock[type].unlock();
+    }
+}
+
+static std::once_flag kOpenSSLGlobalLockFlag;
+
+void OpenSSLInitGlobalLock() {
+    Q_ASSERT(kOpenSSLGlobalLock == NULL);
+    // not safe here, new can throw exception 
+    kOpenSSLGlobalLock = new std::mutex[CRYPTO_num_locks()];
+}
+
+void InitOpenSSLGlobalLock() {
+    std::call_once(kOpenSSLGlobalLockFlag,OpenSSLInitGlobalLock);
+}
 
 class AsyncSSL;
 class AsyncSSLOperation;
@@ -915,7 +949,11 @@ void AsyncSSLRead::Perform( int* return_value , int* ssl_error ) {
         written_size_ += ssl_read_sz;
     }
     *return_value = ssl_read_sz;
-    *ssl_error = SSL_get_error(ssl_,ssl_read_sz);
+    if( ssl_read_sz <= 0 ) {
+        *ssl_error = SSL_get_error(ssl_,ssl_read_sz);
+    } else {
+        *ssl_error = SSL_ERROR_NONE;
+    }
 }
 
 class AsyncSSLWrite : public AsyncSSLOperation {
@@ -957,7 +995,11 @@ void AsyncSSLWrite::Perform( int* return_value , int* ssl_error ) {
     // Write the data through SSL_write operations
     Q_ASSERT(!user_buffer_.isEmpty());
     *return_value = SSL_write(ssl_,user_buffer_.constData(),user_buffer_.size());
-    *ssl_error = SSL_get_error(ssl_,*return_value);
+    if( *return_value<=0 ) {
+        *ssl_error = SSL_get_error(ssl_,*return_value);
+    } else {
+        *ssl_error = SSL_ERROR_NONE;
+    }
 }
 
 class AsyncSSLHandshake : public AsyncSSLOperation {
@@ -974,7 +1016,11 @@ public:
 
     virtual void Perform( int* return_value , int* ssl_error ) {
         *return_value = SSL_do_handshake(ssl_);
-        *ssl_error = SSL_get_error(ssl_,*return_value);
+        if( *return_value != 1 ) {
+            *ssl_error = SSL_get_error(ssl_,*return_value);
+        } else {
+            *ssl_error = SSL_ERROR_NONE;
+        }
     }
 
     virtual void InvokeUserFinializeHandler() {
@@ -1089,13 +1135,13 @@ void AsyncSSL::Perform( std::shared_ptr<AsyncSSLOperation>&& op , bool is_read )
 
 bool AsyncSSL::AsyncRecv( nx::Buffer* data, std::function<void(SystemError::ErrorCode,std::size_t)> && callback ) {
     std::shared_ptr<AsyncSSLOperation> op( new AsyncSSLRead(data,std::move(callback),ssl_,this) );
-    Perform(std::move(op),false);
+    Perform(std::move(op),true);
     return true;
 }
 
 bool AsyncSSL::AsyncSend( const nx::Buffer& data, std::function<void(SystemError::ErrorCode,std::size_t)> && callback ) {
     std::shared_ptr<AsyncSSLOperation> op( new AsyncSSLWrite(data,std::move(callback),ssl_,this) );
-    Perform(std::move(op),true);
+    Perform(std::move(op),false);
     return true;
 }
 
@@ -1236,7 +1282,8 @@ private:
 
 };
 
-}// namespace 
+}// namespace
+
 
 // ---------------------------- QnSSLSocket -----------------------------------
 
@@ -1320,6 +1367,8 @@ void QnSSLSocket::initSSLEngine(const QByteArray& certData)
         SSLStaticData::instance()->serverCTX->default_passwd_callback_userdata);
     SSL_CTX_use_PrivateKey(SSLStaticData::instance()->serverCTX, SSLStaticData::instance()->pkey);
     BIO_free(bufio);
+    // Initialize OpenSSL global lock, so server side will initialize it right here
+    InitOpenSSLGlobalLock();
 }
 
 void QnSSLSocket::releaseSSLEngine()
@@ -1382,6 +1431,7 @@ QnSSLSocket::QnSSLSocket(QnSSLSocketPrivate* priv, AbstractStreamSocket* wrapped
     d->extraBufferLen = 0;
 
     init();
+    InitOpenSSLGlobalLock();
 }
 
 void QnSSLSocket::init()
@@ -1402,18 +1452,18 @@ void QnSSLSocket::init()
     SSL_set_verify(d->ssl, SSL_VERIFY_NONE, NULL);
     SSL_set_session_id_context(d->ssl, sid, 4);
     SSL_set_bio(d->ssl, d->read, d->write);
+
 }
 
 QnSSLSocket::~QnSSLSocket()
 {
     Q_D(QnSSLSocket);
-
-    if (d->ssl)
-        SSL_free(d->ssl);
     if(d->mode == ASYNC ) {
         if(d->async_ssl_ptr)
             d->async_ssl_ptr->WaitForAllPendingIOFinish();
-        d->wrappedSocket->cancelAsyncIO();
+    } else {
+        if (d->ssl)
+            SSL_free(d->ssl);
     }
     delete d->wrappedSocket;
     delete d_ptr;
@@ -1907,6 +1957,7 @@ TCPSslServerSocket::TCPSslServerSocket(bool allowNonSecureConnect)
     TCPServerSocket(),
     m_allowNonSecureConnect(allowNonSecureConnect)
 {
+    InitOpenSSLGlobalLock();
 }
 
 AbstractStreamSocket* TCPSslServerSocket::accept()
