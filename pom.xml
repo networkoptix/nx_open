@@ -39,8 +39,6 @@
         <skip.sign>true</skip.sign>
         <box>none</box>
         <modification/>
-        <final.artifact.name>${project.artifactId}</final.artifact.name>
-        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${box}-${arch}-${build.configuration}-beta</finalName>
         <beta>true</beta>
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
@@ -106,10 +104,12 @@
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>platforms</qtplugin2>
         <qtplugin3/>    
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <build>
-        <defaultGoal>package</defaultGoal>
+	<defaultGoal>package</defaultGoal>
         <finalName>${finalName}</finalName>
         <plugins>
             <plugin>
@@ -182,7 +182,7 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <overwrite>true</overwrite>
-                            <encoding>UTF-8</encoding>                            
+                            <encoding>ISO-8859-1</encoding>                            
                             <resources>          
                                 <resource>
                                     <directory>${basedir}/maven/filter-resources</directory>
