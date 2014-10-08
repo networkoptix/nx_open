@@ -87,6 +87,7 @@ namespace ec2 {
     void fromResourceToApi(const QnUserResourcePtr &resource, ApiUserData &data);
     void fromApiToResourceList(const ApiUserDataList &src, QnResourceList &dst);
     void fromApiToResourceList(const ApiUserDataList &src, QnUserResourceList &dst);
+    void fromApiToResourceList(const ApiStorageDataList &src, QnResourceList &dst, const ResourceContext &ctx);
 
     void fromApiToResource(const ApiVideowallData &src, QnVideoWallResourcePtr &dst);
     void fromResourceToApi(const QnVideoWallResourcePtr &src, ApiVideowallData &dst);

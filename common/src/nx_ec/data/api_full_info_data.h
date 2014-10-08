@@ -20,8 +20,10 @@ namespace ec2
         ApiLicenseDataList licenses;
         ApiDiscoveryDataList discoveryData;
         ApiResourceParamWithRefDataList allProperties;
+        ApiStorageDataList storages;
     };
-#define ApiFullInfoData_Fields (resourceTypes)(servers)(serversUserAttributesList)(cameras)(cameraUserAttributesList)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(discoveryData)(allProperties)
+#define ApiFullInfoData_Fields (resourceTypes)(servers)(serversUserAttributesList)(cameras)(cameraUserAttributesList)(users)(layouts)(videowalls)(rules)\
+                               (cameraHistory)(licenses)(discoveryData)(allProperties)(storages)
 
 } // namespace ec2
 

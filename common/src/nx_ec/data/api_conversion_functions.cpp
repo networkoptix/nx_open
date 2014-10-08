@@ -414,6 +414,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.rules, dst.bRules, ctx.pool);
     fromApiToResourceList(src.cameraHistory, dst.cameraHistory);
     dst.allProperties = src.allProperties;
+    fromApiToResourceList(src.storages, dst.resources, ctx);
 }
 
 
@@ -608,11 +609,6 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &
     dst.systemInfo = src->getSystemInfo().toString();
     dst.authKey = src->getAuthKey();
     dst.systemName = src->getSystemName();
-
-    QnAbstractStorageResourceList storageList = src->getStorages();
-    dst.storages.resize(storageList.size());
-    for (int i = 0; i < storageList.size(); ++i)
-        fromResourceToApi(storageList[i], dst.storages[i]);
 }
 
 void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &dst, const ResourceContext &ctx) {
@@ -802,6 +798,18 @@ void fromApiToResourceList(const ApiUserDataList &src, List &dst, const overload
         QnUserResourcePtr dstUser(new QnUserResource());
         fromApiToResource(srcUser, dstUser);
         dst.push_back(std::move(dstUser));
+    }
+}
+
+void fromApiToResourceList(const ApiStorageDataList &src, QnResourceList &dst, const ResourceContext &ctx) {
+    dst.reserve(dst.size() + (int)src.size());
+    auto resType = ctx.resTypePool->getResourceTypeByName(lit("Storage"));
+    for(const ApiStorageData &srcStorage: src) 
+    {
+        QnAbstractStorageResourcePtr dstStorage = ctx.resFactory->createResource(resType->getId(), 
+                                                  QnResourceParams(srcStorage.id, srcStorage.url, QString())).dynamicCast<QnAbstractStorageResource>();
+        fromApiToResource(srcStorage, dstStorage);
+        dst.push_back(std::move(dstStorage));
     }
 }
 
