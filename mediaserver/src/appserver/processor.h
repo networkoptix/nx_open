@@ -3,7 +3,7 @@
 
 #include <nx_ec/ec_api.h>
 
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
 #include <core/resource/resource_processor.h>
 
 #include "api/app_server_connection.h"
