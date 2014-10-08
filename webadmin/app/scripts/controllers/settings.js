@@ -64,13 +64,13 @@ angular.module('webadminApp')
             });
         };
 
-        function restartServer(){
+        function restartServer(passPort){
             $modal.open({
                 templateUrl: 'views/restart.html',
                 controller: 'RestartCtrl',
                 resolve:{
                     port:function(){
-                        return $scope.settings.port;
+                        return passPort?$scope.settings.port:null;
                     }
                 }
             });
@@ -91,7 +91,7 @@ angular.module('webadminApp')
                 alert("Error: " + errorToShow);
             }else if (r.reply.restartNeeded) {
                 if (confirm("All changes saved. New settings will be applied after restart. \n Do you want to restart server now?")) {
-                    restartServer();
+                    restartServer(true);
                 }
             } else {
                 alert("Settings saved");
@@ -114,7 +114,7 @@ angular.module('webadminApp')
 
         $scope.restart = function () {
             if(confirm("Do you want to restart server now?")){
-                restartServer();
+                restartServer(false);
             }
         };
     });
