@@ -753,7 +753,6 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
             return false;
         }
 
-
         transport->setWriteSync(true);
         sendRuntimeInfo(transport, processedPeers, QnTranState());
         transport->sendTransaction(tran, processedPeers);
@@ -771,8 +770,8 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         }
     } else if (transport->remotePeer().peerType == Qn::PT_MobileClient) {
         /** Request all data to be sent to the client peers on the connect. */
-        QnTransaction<ApiMediaServerDataList> tranServers;
-        tranServers.command = ApiCommand::getMediaServers;
+        QnTransaction<ApiMediaServerDataExList> tranServers;
+        tranServers.command = ApiCommand::getMediaServersEx;
         tranServers.peerID = m_localPeer.id;
         if (dbManager->doQuery(nullptr, tranServers.params) != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";

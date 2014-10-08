@@ -74,6 +74,7 @@ namespace ec2
             REGISTER_COMMAND(getStorages),
             REGISTER_COMMAND(removeStorage),
             REGISTER_COMMAND(removeStorages),
+            REGISTER_COMMAND(getMediaServersEx),
 
             REGISTER_COMMAND(saveUser),
             REGISTER_COMMAND(getUsers),
@@ -140,7 +141,7 @@ namespace ec2
 
         QString toString(Value val) 
         {
-            for (int i = 0; i < sizeof(COMMAND_NAMES) / sizeof(ApiCommandName); ++i)
+            for (size_t i = 0; i < sizeof(COMMAND_NAMES) / sizeof(ApiCommandName); ++i)
             {
                 if (COMMAND_NAMES[i].command == val)
                     return QString::fromUtf8(COMMAND_NAMES[i].name);
@@ -151,7 +152,7 @@ namespace ec2
         Value fromString(const QString& val)
         {
             QByteArray data = val.toUtf8();
-            for (int i = 0; i < sizeof(COMMAND_NAMES) / sizeof(ApiCommandName); ++i)
+            for (size_t i = 0; i < sizeof(COMMAND_NAMES) / sizeof(ApiCommandName); ++i)
             {
                 if (COMMAND_NAMES[i].name == data)
                     return COMMAND_NAMES[i].command;

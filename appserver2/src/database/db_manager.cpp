@@ -142,6 +142,32 @@ void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subD
     }
 }
 
+template <class MainData, class SubData, class MainOrParentType, class IdType, class SubOrParentType, class Handler>
+void mergeObjectListData(
+    std::vector<MainData>& data,
+    std::vector<SubData>& subDataList,
+    IdType MainOrParentType::*idField,
+    IdType SubOrParentType::*parentIdField,
+    Handler mergeHandler )
+{
+    assertSorted(data, idField);
+    assertSorted(subDataList, parentIdField);
+
+    size_t i = 0;
+    size_t j = 0;
+
+    while (i < data.size() && j < subDataList.size()) {
+        if (subDataList[j].*parentIdField == data[i].*idField) {
+            mergeHandler( data[i], subDataList[j] );
+            ++j;
+        } else if ((subDataList[j].*parentIdField).toRfc4122() > (data[i].*idField).toRfc4122()) {
+            ++i;
+        } else {
+            ++j;
+        }
+    }
+}
+
 //!Same as above but does not require field "id" of type QnUuid
 /**
  * Function merges two sorted lists. First of them (data) contains placeholder 
@@ -158,24 +184,12 @@ void mergeObjectListData(
     IdType MainOrParentType2::*idField,
     IdType SubOrParentType::*parentIdField )
 {
-    assertSorted(data, idField);
-    assertSorted(subDataList, parentIdField);
-
-    size_t i = 0;
-    size_t j = 0;
-
-    while (i < data.size() && j < subDataList.size()) {
-
-
-        if (subDataList[j].*parentIdField == data[i].*idField) {
-            (data[i].*subDataListField).push_back(subDataList[j]);
-            ++j;
-        } else if ((subDataList[j].*parentIdField).toRfc4122() > (data[i].*idField).toRfc4122()) {
-            ++i;
-        } else {
-            ++j;
-        }
-    }
+    mergeObjectListData(
+        data,
+        subDataList,
+        idField,
+        parentIdField,
+        [subDataListField]( MainData& mergeTo, SubData& mergeWhat ){ (mergeTo.*subDataListField).push_back(mergeWhat); } );
 }
 
 QnDbManager::Locker::Locker(QnDbManager* db)
@@ -2536,6 +2550,62 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
     }
 
     QnSql::fetch_many(query, &serverList);
+
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataExList& serverExList)
+{
+    {
+        //fetching server data
+        ApiMediaServerDataList serverList;
+        ErrorCode result = doQueryNoLock( mServerId, serverList );
+        if( result != ErrorCode::ok )
+            return result;
+
+        //moving server data to dataex
+        serverExList.reserve( serverList.size() );
+        for( ApiMediaServerDataList::size_type i = 0; i < serverList.size(); ++i )
+            serverExList.push_back( ApiMediaServerDataEx(std::move(serverList[i])) );
+    }
+
+    //fetching server attributes
+    ApiMediaServerUserAttributesDataList serverAttrsList;
+    ErrorCode result = doQueryNoLock( mServerId, serverAttrsList );
+    if( result != ErrorCode::ok )
+        return result;
+
+    //merging data & attributes
+    mergeObjectListData(
+        serverExList,
+        serverAttrsList,
+        &ApiMediaServerDataEx::id,
+        &ApiMediaServerUserAttributesData::serverID,
+        []( ApiMediaServerDataEx& server, ApiMediaServerUserAttributesData& serverAttrs ){ ((ApiMediaServerUserAttributesData&)server) = serverAttrs; } );
+
+    //reading data
+    QSqlQuery queryParams(m_sdb);
+    queryParams.setForwardOnly(true);
+    QString filterStr2;
+    if (!mServerId.isNull())
+        filterStr2 = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(mServerId));
+    queryParams.prepare(QString("\
+        SELECT kv.resource_guid as resourceId, kv.value, kv.name    \
+        FROM vms_kvpair kv                                          \
+        JOIN vms_resource r on r.guid = kv.resource_guid            \
+        JOIN vms_server s on s.resource_ptr_id = r.id               \
+        %1                                                          \
+        ORDER BY r.guid                                             \
+    ").arg(filterStr2));
+
+    if( !queryParams.exec() ) {
+        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(queryParams.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+    ApiResourceParamWithRefDataList params;
+    QnSql::fetch_many(queryParams, &params);
+
+    mergeObjectListData<ApiMediaServerDataEx>(serverExList, params, &ApiMediaServerDataEx::addParams, &ApiResourceParamWithRefData::resourceId);
 
     return ErrorCode::ok;
 }

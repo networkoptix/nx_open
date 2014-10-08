@@ -368,7 +368,6 @@ void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHisto
         QMapIterator<qint64, QByteArray> camit(pos.value());
         camit.toFront();
 
-        qint64 duration;
         cameraHistory->setCameraUniqueId(pos.key());
         while (camit.hasNext())
         {
@@ -611,7 +610,7 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &
     dst.systemName = src->getSystemName();
 }
 
-void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &dst, const ResourceContext &ctx) {
+void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &dst, const ResourceContext &/*ctx*/) {
     QnResourcePtr tmp = dst;
     fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
 

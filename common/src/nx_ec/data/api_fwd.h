@@ -33,6 +33,7 @@ namespace ec2 {
     struct ApiLockData;
     struct ApiMediaServerData;
     struct ApiMediaServerUserAttributesData;
+    struct ApiMediaServerDataEx;
     struct ApiPanicModeData;
     struct ApiPropertyTypeData;
     struct ApiResetBusinessRuleData;
@@ -93,6 +94,7 @@ namespace ec2 {
     typedef std::vector<ApiLicenseData> ApiLicenseDataList;
     typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
     typedef std::vector<ApiMediaServerUserAttributesData> ApiMediaServerUserAttributesDataList;
+    typedef std::vector<ApiMediaServerDataEx> ApiMediaServerDataExList;
     typedef std::vector<ApiPropertyTypeData> ApiPropertyTypeDataList;
     typedef std::vector<ApiResourceData> ApiResourceDataList;
     typedef std::vector<ApiResourceParamData> ApiResourceParamDataList;
@@ -129,6 +131,7 @@ namespace ec2 {
     (ApiLockData)\
     (ApiMediaServerData)\
     (ApiMediaServerUserAttributesData)\
+    (ApiMediaServerDataEx)\
     (ApiPanicModeData)\
     (ApiPeerSystemTimeData)\
     (ApiPropertyTypeData)\

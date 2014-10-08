@@ -79,7 +79,8 @@ namespace ec2
             saveStorages                = 408,  /*< ApiStorageDataList */
             removeStorage               = 409,  /*< ApiIdData */
             removeStorages              = 410,  /*< QList<ApiIdData> */
-            getStorages                 = 411,  /*< ApiStorageDataList */
+            getMediaServersEx           = 411,  /*< ApiMediaServerDataExList */
+            getStorages                 = 412,  /*< ApiStorageDataList */
 
             /* User resource */
             getUsers                    = 500,  /*< ApiUserDataList */
