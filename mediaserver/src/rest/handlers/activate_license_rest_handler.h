@@ -8,7 +8,7 @@
 class QnActivateLicenseRestHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 private:
     CLHttpStatus makeRequest(const QString& licenseKey, bool infoMode, QByteArray& response);
 };

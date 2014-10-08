@@ -22,7 +22,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnUserManager<T>::getUsers( impl::GetUsersHandlerPtr handler )
+    int QnUserManager<T>::getUsers(const QnUuid& userId, impl::GetUsersHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
@@ -32,7 +32,7 @@ namespace ec2
                 fromApiToResourceList(users, outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiUserDataList, decltype(queryDoneHandler)> ( ApiCommand::getUsers, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<QnUuid, ApiUserDataList, decltype(queryDoneHandler)> ( ApiCommand::getUsers, userId, queryDoneHandler);
         return reqID;
     }
 

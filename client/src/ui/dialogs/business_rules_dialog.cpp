@@ -29,6 +29,26 @@
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
 
+
+class QnSortedBusinessRulesModel: public QSortFilterProxyModel {
+public:
+    explicit QnSortedBusinessRulesModel(QObject *parent = 0): QSortFilterProxyModel(parent) {}
+
+protected:
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
+
+        QnBusiness::ActionType lAction = left.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
+        QnBusiness::ActionType rAction = right.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
+        if (lAction != rAction)
+            return lAction < rAction;
+
+        QnBusiness::EventType lEvent = left.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
+        QnBusiness::EventType rEvent = right.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
+        return lEvent < rEvent;
+    }
+};
+
+
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::BusinessRulesDialog()),
@@ -50,6 +70,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     createActions();
 
     m_rulesViewModel = new QnBusinessRulesActualModel(this);
+
+//     QnSortedBusinessRulesModel* sortedModel = new QnSortedBusinessRulesModel(this);
+//     sortedModel->setSourceModel(m_rulesViewModel);
+//     sortedModel->sort(0);
 
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
@@ -162,6 +186,7 @@ void QnBusinessRulesDialog::at_message_ruleDeleted(const QnUuid &id) {
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
     m_rulesViewModel->addRule(QnBusinessEventRulePtr());
+
     ui->tableView->setCurrentIndex(m_rulesViewModel->index(m_rulesViewModel->rowCount() - 1, 0));
     if (m_rulesViewModel->rowCount() == 1) {
         ui->tableView->resizeColumnsToContents();

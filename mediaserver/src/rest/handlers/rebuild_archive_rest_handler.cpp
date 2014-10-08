@@ -8,7 +8,7 @@
 #include "recorder/device_file_catalog.h"
 #include "recorder/storage_manager.h"
 
-int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
     Q_UNUSED(params)
@@ -73,7 +73,8 @@ int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequest
     return CODE_OK;
 }
 
-int QnRebuildArchiveRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
+int QnRebuildArchiveRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
+                                             QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
-    return executeGet(path, params, result, contentType);
+    return executeGet(path, params, result, contentType, owner);
 }

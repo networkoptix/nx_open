@@ -5,8 +5,18 @@ angular.module('webadminApp')
     .controller('InfoCtrl', function ($scope, mediaserver) {
         $scope.storages = mediaserver.getStorages();
 
+        function formatUrl(url){
+            return decodeURIComponent(url.replace(/file:\/\/.+?:.+?\//gi,""));
+        }
+
         $scope.storages.then(function (r) {
-            $scope.storages = r.data.reply.storages;
+            $scope.storages = _.sortBy(r.data.reply.storages,function(storage){
+                return formatUrl(storage.url);
+            });
+
+            _.each($scope.storages,function(storage){
+               storage.url = formatUrl(storage.url);
+            });
         });
 
         $scope.formatSpace = function(bytes){

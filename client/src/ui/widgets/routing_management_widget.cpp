@@ -13,6 +13,7 @@
 #include "ui/models/server_addresses_model.h"
 #include "ui/style/warning_style.h"
 #include "common/common_module.h"
+#include "utils/common/string.h"
 
 namespace {
     const int defaultRtspPort = 7001;
@@ -20,6 +21,17 @@ namespace {
     ec2::AbstractECConnectionPtr connection2() {
         return QnAppServerConnectionFactory::getConnection2();
     }
+
+    class SortedServersProxyModel : public QSortFilterProxyModel {
+    public:
+        SortedServersProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
+    protected:
+        bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
+            QString leftString = left.data(sortRole()).toString();
+            QString rightString = right.data(sortRole()).toString();
+            return naturalStringLessThan(leftString, rightString);
+        }
+    };
 }
 
 QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
@@ -31,7 +43,7 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     setWarningStyle(ui->warningLabel);
 
     m_serverListModel = new QnResourceListModel(this);
-    QSortFilterProxyModel *sortedServersModel = new QSortFilterProxyModel(this);
+    SortedServersProxyModel *sortedServersModel = new SortedServersProxyModel(this);
     sortedServersModel->setSourceModel(m_serverListModel);
     sortedServersModel->setDynamicSortFilter(true);
     sortedServersModel->setSortRole(Qt::DisplayRole);

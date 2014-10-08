@@ -61,7 +61,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     return result;
 }
 
-int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestParams & requestParams, QnJsonRestResult &result) 
+int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestParams & requestParams, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
 {
     ec2::ApiDetailedLicenseData reply;
 

@@ -276,13 +276,13 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing30Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing30Action_triggered()));
     connect(action(Qn::CreateZoomWindowAction),                 SIGNAL(triggered()),    this,   SLOT(at_createZoomWindowAction_triggered()));
-    connect(action(Qn::Rotate0Action),                          SIGNAL(triggered()),    this,   SLOT(at_rotate0Action_triggered()));
-    connect(action(Qn::Rotate90Action),                         SIGNAL(triggered()),    this,   SLOT(at_rotate90Action_triggered()));
-    connect(action(Qn::Rotate180Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate180Action_triggered()));
-    connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
-    connect(action(Qn::RadassAutoAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassAutoAction_triggered()));
-    connect(action(Qn::RadassLowAction),                        SIGNAL(triggered()),    this,   SLOT(at_radassLowAction_triggered()));
-    connect(action(Qn::RadassHighAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassHighAction_triggered()));
+    connect(action(Qn::Rotate0Action),                          &QAction::triggered,    this,   [this] { rotateItems(0); });
+    connect(action(Qn::Rotate90Action),                         &QAction::triggered,    this,   [this] { rotateItems(90); });
+    connect(action(Qn::Rotate180Action),                        &QAction::triggered,    this,   [this] { rotateItems(180); });
+    connect(action(Qn::Rotate270Action),                        &QAction::triggered,    this,   [this] { rotateItems(270); });
+    connect(action(Qn::RadassAutoAction),                       &QAction::triggered,    this,   [this] { setResolutionMode(Qn::AutoResolution); });
+    connect(action(Qn::RadassLowAction),                        &QAction::triggered,    this,   [this] { setResolutionMode(Qn::LowResolution); });
+    connect(action(Qn::RadassHighAction),                       &QAction::triggered,    this,   [this] { setResolutionMode(Qn::HighResolution); });
     connect(action(Qn::SetAsBackgroundAction),                  SIGNAL(triggered()),    this,   SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
@@ -303,7 +303,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ExitActionDelayed), &QAction::triggered, action(Qn::ExitAction), &QAction::trigger, Qt::QueuedConnection);
     connect(action(Qn::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
 
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   &QnWorkbenchActionHandler::checkVersionMismatches);
 
     /* Run handlers that update state. */
     at_panicWatcher_panicModeChanged();
@@ -1108,10 +1107,6 @@ void QnWorkbenchActionHandler::notifyAboutUpdate() {
     } else {
         qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? version : QnSoftwareVersion());
     }
-}
-
-void QnWorkbenchActionHandler::checkVersionMismatches() {
-    menu()->trigger(Qn::VersionMismatchMessageAction);
 }
 
 void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePtr &layout) {
@@ -2107,34 +2102,6 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     addParams.rotation = widget->item()->rotation();
 
     addToLayout(workbench()->currentLayout()->resource(), widget->resource()->toResourcePtr(), addParams);
-}
-
-void QnWorkbenchActionHandler::at_rotate0Action_triggered(){
-    rotateItems(0);
-}
-
-void QnWorkbenchActionHandler::at_rotate90Action_triggered(){
-    rotateItems(90);
-}
-
-void QnWorkbenchActionHandler::at_rotate180Action_triggered(){
-    rotateItems(180);
-}
-
-void QnWorkbenchActionHandler::at_rotate270Action_triggered(){
-    rotateItems(270);
-}
-
-void QnWorkbenchActionHandler::at_radassAutoAction_triggered() {
-    setResolutionMode(Qn::AutoResolution);
-}
-
-void QnWorkbenchActionHandler::at_radassLowAction_triggered() {
-    setResolutionMode(Qn::LowResolution);
-}
-
-void QnWorkbenchActionHandler::at_radassHighAction_triggered() {
-    setResolutionMode(Qn::HighResolution);
 }
 
 void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {

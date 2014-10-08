@@ -11,6 +11,7 @@
 #include "utils/common/request_param.h"
 
 class TCPSocket;
+class QnRestConnectionProcessor;
 
 // TODO: #MSAPI header-class naming inconsistency. As all derived classes
 // are named XyzRestHandler I suggest to rename this one to either
@@ -31,11 +32,12 @@ public:
     /*!
         \return http statusCode
     */
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType) = 0;
+    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) = 0;
     /*!
         \return http statusCode
     */
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, QByteArray& resultContentType) = 0;
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, 
+                            QByteArray& resultContentType, const QnRestConnectionProcessor*) = 0;
 
     
     friend class QnRestProcessorPool;
@@ -59,8 +61,9 @@ class QnRestGUIRequestHandler: public QnRestRequestHandler {
 public:
     QnRestGUIRequestHandler();
     virtual ~QnRestGUIRequestHandler();
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, QByteArray& contentType);
+    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) override;
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, 
+                            QByteArray& contentType, const QnRestConnectionProcessor*) override;
 protected:
     virtual int executeGetGUI(const QString& path, const QnRequestParamList& params, QByteArray& result) = 0;
     virtual int executePostGUI(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result) = 0;

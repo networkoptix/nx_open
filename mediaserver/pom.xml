@@ -29,14 +29,110 @@
         <windows.oslibs>Ws2_32.lib DbgHelp.lib sigar.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
         <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis</linux.oslibs>
         <linux.arm.oslibs>-lssl -lcrypto -lsigar</linux.arm.oslibs>
-        <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>                
+        <windows.oslibs.release/>
+        <windows.oslibs.debug/>                
         <mac.oslibs>-lssl -lbz2 -framework IOKit -framework CoreServices -lsigar-universal64-macosx</mac.oslibs>
         <!--Global defines-->
-        <global.defines></global.defines>
+        <global.defines/>
         <!--Specific os defines-->
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <linux.defines/>
         <mac.defines/>      
+
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_sdk</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>archive</classifier>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>  
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>copy-platform-libs</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/resources/static</outputDirectory>
+                            <stripVersion>true</stripVersion>
+                        </configuration>                        
+                    </execution>                            
+                </executions>
+            </plugin>         
+            <!--    <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>auto-clean</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${clean-skip}</skip>
+                            <filesets>
+                                <fileset>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>${project.build.directory}/resources/static</include>
+                                    </includes>
+                                </fileset>   
+                            </filesets>                            
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>         
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>compile-sdk</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <failOnError>false</failOnError>
+                            <target>							
+                                <chmod file="${project.build.directory}/build_sdk.sh" perm="755"/>
+                                <exec dir="${project.build.directory}" executable="${project.build.directory}/build_sdk.${script.extension}" failifexecutionfails="true" />                                        
+                            </target>
+                        </configuration>
+                    </execution>					
+                </executions>
+            </plugin>        
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2.2</version>
+                <executions>
+                    <execution>
+                        <id>pack-sdk</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.build.directory}/sdk.xml</descriptor>
+                            </descriptors>	
+                            <outputDirectory>${project.build.directory}/resources/static</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>				
+            </plugin> 	-->   	
+        </plugins>          
+    </build>
 </project>
