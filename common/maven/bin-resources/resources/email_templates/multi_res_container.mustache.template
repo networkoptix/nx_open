@@ -51,12 +51,22 @@
             </div><!-- /content -->
 
 
-            <table class="content">
-            {{#aggregated}}
+            <div class="content">
+                <table > <!-- bgcolor="#FFFFFF" -->
                     <tr>
                         <td class="small" width="20%" style="vertical-align: top; padding-right:10px;"><img src="{{eventLogoFilename}}"/></td>
                         <td>
-                            <h5>{{event}}: {{source}}</h5>
+                            <h5>{{event}}</h5>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <table class="content">
+            {{#aggregated}}
+                    <tr>
+                        <td>
+                            <h6>{{source}}</h6>
                             {{#urlext}}
                             <a class="btn" href="{{urlext}}">External Link &raquo;</a><a class="btn" href="{{urlint}}">Internal Link &raquo;</a>
                             {{/urlext}}
