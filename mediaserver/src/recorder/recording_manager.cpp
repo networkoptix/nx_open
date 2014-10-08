@@ -1,7 +1,13 @@
 #include "recording_manager.h"
-#include "core/resource_management/resource_pool.h"
 #include <core/resource_management/resource_properties.h>
-#include "core/resource/security_cam_resource.h"
+#include <core/resource/resource.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/camera_history.h>
+#include <core/resource_management/resource_pool.h>
+
 #include "recording/stream_recorder.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "camera/camera_pool.h"
@@ -12,10 +18,6 @@
 #include "server_stream_recorder.h"
 #include <utils/common/log.h>
 #include "utils/common/synctime.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource/resource_fwd.h"
-#include "core/resource/camera_resource.h"
-#include "core/resource/camera_history.h"
 #include "api/app_server_connection.h"
 #include "plugins/storage/dts/abstract_dts_reader_factory.h"
 #include <business/business_event_rule.h>

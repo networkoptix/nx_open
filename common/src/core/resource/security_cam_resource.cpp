@@ -9,6 +9,8 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <core/dataprovider/data_provider_factory.h>
+
 #include "user_resource.h"
 #include "common/common_module.h"
 

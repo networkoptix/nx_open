@@ -8,6 +8,11 @@
 #include "core/resource/resource_fwd.h"
 #include "business/business_fwd.h"
 #include <server/server_globals.h>
+
+#include <core/resource/resource_fwd.h>
+
+#include <core/dataprovider/data_provider_factory.h>
+
 #include "core/misc/schedule_task.h"
 
 class QnServerStreamRecorder;

@@ -5,6 +5,8 @@
 #include "rest/server/request_handler.h"
 #include <business/events/reasoned_business_event.h>
 
+#include <core/resource/resource_fwd.h>
+
 class QnExternalBusinessEventRestHandler: public QnRestRequestHandler
 {
     Q_OBJECT
@@ -16,7 +18,7 @@ public:
                             QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) override;
 
 signals:
-    void mserverFailure(QnResourcePtr resource, qint64 time, QnBusiness::EventReason reason, const QString& reasonText);
+    void mserverFailure(const QnResourcePtr &resource, qint64 time, QnBusiness::EventReason reason, const QString& reasonText);
 };
 
 #endif // QN_FILE_SYSTEM_HANDLER_H

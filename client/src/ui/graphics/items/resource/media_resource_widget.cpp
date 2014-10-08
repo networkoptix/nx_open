@@ -18,6 +18,8 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
+
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/preset_ptz_controller.h>
 #include <core/ptz/tour_ptz_controller.h>

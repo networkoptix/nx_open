@@ -7,7 +7,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QMutex>
 #include <QtCore/QTimer>
-#include <QTime>
+#include <QtCore/QTime>
 
 #include <server/server_globals.h>
 
@@ -24,6 +24,7 @@
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
+class QnUuid;
 
 class QnStorageManager: public QObject
 {

@@ -1,6 +1,9 @@
 #include "dualquality_helper.h"
 
+#include <core/resource/network_resource.h>
+
 #include <server/server_globals.h>
+
 #include "recorder/storage_manager.h"
 #include "core/resource/network_resource.h"
 

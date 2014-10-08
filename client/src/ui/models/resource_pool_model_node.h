@@ -9,9 +9,6 @@
 
 #include <core/resource/resource_fwd.h>
 
-//#TODO: #GDM #Common include resource.h
-#include <core/resource/resource.h>
-
 class QnResourcePoolModel;
 
 class QnResourcePoolModelNode {

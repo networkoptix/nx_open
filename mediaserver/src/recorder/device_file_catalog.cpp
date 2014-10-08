@@ -1,8 +1,13 @@
+#include "device_file_catalog.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QElapsedTimer>
 
-#include "device_file_catalog.h"
+#include <core/resource/resource.h>
+#include <core/resource/network_resource.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource_management/resource_pool.h>
+
 #include "storage_manager.h"
 #include "utils/common/util.h"
 #include <utils/fs/file.h>
@@ -16,9 +21,7 @@
 #include <QtCore/QDebug>
 #include "recording_manager.h"
 #include <media_server/serverutil.h>
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/resource.h"
-#include <core/resource/storage_resource.h>
+
 #include "utils/common/synctime.h"
 
 #include <recording/time_period.h>

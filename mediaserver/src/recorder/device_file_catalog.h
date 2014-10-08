@@ -1,16 +1,19 @@
 #ifndef _DEVICE_FILE_CATALOG_H___
 #define _DEVICE_FILE_CATALOG_H___
 
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
 #include <QtCore/QFile>
 #include <QtCore/QVector>
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
+#include <QtCore/QFileInfo>
+
 #include <deque>
 #include <QtCore/QFileInfo>
 
 #include <server/server_globals.h>
-#include "core/resource/resource_fwd.h"
+
+#include <core/resource/resource_fwd.h>
 
 class QnTimePeriodList;
 class QnTimePeriod;

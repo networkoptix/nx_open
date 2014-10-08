@@ -4,6 +4,7 @@
 
 #include <utils/common/log.h>
 
+#include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>

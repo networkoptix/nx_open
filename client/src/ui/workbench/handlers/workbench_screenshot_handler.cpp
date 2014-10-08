@@ -15,6 +15,9 @@
 #include <client/client_settings.h>
 
 #include <core/resource/file_processor.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/media_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <transcoding/filters/contrast_image_filter.h>
 #include <transcoding/filters/fisheye_image_filter.h>
@@ -34,8 +37,6 @@
 #include <utils/common/environment.h>
 #include <utils/common/warnings.h>
 #include "transcoding/filters/fisheye_image_filter.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/media_server_resource.h"
 
 //#define QN_SCREENSHOT_DEBUG
 #ifdef QN_SCREENSHOT_DEBUG

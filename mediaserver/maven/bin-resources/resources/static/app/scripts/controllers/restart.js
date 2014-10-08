@@ -3,6 +3,7 @@
 angular.module('webadminApp')
     .controller('RestartCtrl', function ($scope, $modalInstance, $interval, mediaserver,port) {
 
+        port = port || window.location.port;
         $scope.state = '';
         var statisticUrl = window.location.protocol + "//" + window.location.hostname + ":"
             + port;
