@@ -95,6 +95,7 @@ QnStorageManager::QnStorageManager():
     QnStorageManager_instance = this;
 
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 }
 
 std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -371,6 +372,13 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     {
         addStorage(storage);
     }
+}
+
+void QnStorageManager::onDelResource(const QnResourcePtr &resource)
+{
+    QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
+    if (storage && storage->getParentId() == qnCommon->moduleGUID()) 
+        removeStorage(storage);
 }
 
 QStringList QnStorageManager::getAllStoragePathes() const
