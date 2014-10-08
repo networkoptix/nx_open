@@ -361,7 +361,7 @@
          <item>
           <widget class="QLabel" name="backgroundOpacityLabel">
            <property name="text">
-            <string>Intencity:</string>
+            <string>Intensity:</string>
            </property>
           </widget>
          </item>
