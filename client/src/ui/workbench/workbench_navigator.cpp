@@ -22,10 +22,11 @@ extern "C"
 #include <client/client_settings.h>
 
 #include <camera/resource_display.h>
+#include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/camera_bookmark.h>
 
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/cam_display.h>
