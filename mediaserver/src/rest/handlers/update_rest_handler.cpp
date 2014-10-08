@@ -9,7 +9,8 @@
 #include <utils/common/log.h>
 #include <common/common_module.h>
 
-int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType) {
+int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType, const QnRestConnectionProcessor*) 
+{
     Q_UNUSED(path)
     Q_UNUSED(params)
     Q_UNUSED(result)
@@ -18,7 +19,8 @@ int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParamLis
     return CODE_NOT_IMPLEMETED;
 }
 
-int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, const QByteArray& srcBodyContentType, QByteArray &result, QByteArray &contentType)
+int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, const QByteArray& srcBodyContentType, QByteArray &result, 
+                                     QByteArray &contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
     Q_UNUSED(result)

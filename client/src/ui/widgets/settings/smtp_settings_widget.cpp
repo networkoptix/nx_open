@@ -5,6 +5,7 @@
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
+#include "api/model/test_email_settings_reply.h"
 
 #include <nx_ec/ec_api.h>
 
@@ -80,6 +81,7 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     connect(ui->simpleEmailLineEdit,        &QLineEdit::textChanged,            this,   &QnSmtpSettingsWidget::validateEmailSimple);
     connect(ui->simpleSupportEmailLineEdit, &QLineEdit::textChanged,            this,   &QnSmtpSettingsWidget::validateEmailSimple);
     connect(ui->supportEmailLineEdit,       &QLineEdit::textChanged,            this,   &QnSmtpSettingsWidget::validateEmailAdvanced);
+    connect(QnGlobalSettings::instance(),   &QnGlobalSettings::emailSettingsChanged, this,  &QnSmtpSettingsWidget::updateFromSettings);
 
     m_timeoutTimer->setSingleShot(false);
 

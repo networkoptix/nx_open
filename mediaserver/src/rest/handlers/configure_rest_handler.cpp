@@ -25,7 +25,8 @@ namespace {
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
 }
 
-int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+{
     Q_UNUSED(path)
 
     bool wholeSystem = params.value(lit("wholeSystem"), lit("false")) != lit("false");
@@ -123,6 +124,9 @@ int QnConfigureRestHandler::changeAdminPassword(const QString &password, const Q
 int QnConfigureRestHandler::changePort(int port) {
     if (port == 0 || port == MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT).toInt())
         return ResultSkip;
+
+    if (port < 0)
+        return ResultFail;
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
     if (!server)

@@ -72,6 +72,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/counter.h>
 #include <client/client_settings.h>
 
 #include "watchers/workbench_render_watcher.h"
@@ -1116,13 +1117,41 @@ void QnWorkbenchUi::createTreeWidget() {
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeShowButton));
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treePinButton));
 
+
+    {
+        /* Do not auto-hide tree if we have opened context menu. */
+        auto connectTreeHidingProcessor = [this] {
+            connect(m_treeHidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this, [this](){ if(!isTreePinned()) setTreeOpened(false);});
+        };
+
+        QnSingleEventSignalizer *treeMenuSignalizer = new QnSingleEventSignalizer(this);
+        treeMenuSignalizer->setEventType(QEvent::GraphicsSceneContextMenu);
+        m_treeItem->installEventFilter(treeMenuSignalizer);
+        connect(treeMenuSignalizer,         &QnAbstractEventSignalizer::activated,  this,   [this, connectTreeHidingProcessor] {
+            if (isTreePinned() || !isTreeOpened())
+                return;
+
+            disconnect(m_treeHidingProcessor,  &HoverFocusProcessor::hoverFocusLeft, this, NULL);
+
+            QnCounter* counter = new QnCounter(0, this);
+            connect(menu(), &QnActionManager::menuAboutToShow, counter, &QnCounter::increment);
+            connect(menu(), &QnActionManager::menuAboutToHide, counter, &QnCounter::decrement);
+            connect(counter, &QnCounter::reachedZero, this, [this, connectTreeHidingProcessor]{
+                connectTreeHidingProcessor();
+                m_treeHidingProcessor->forceFocusLeave();
+            });
+            connect(counter, &QnCounter::reachedZero, counter, &QObject::deleteLater);
+
+        });
+        connectTreeHidingProcessor();
+    }
+
     connect(m_treeWidget,               &QnResourceBrowserWidget::selectionChanged, action(Qn::SelectionChangeAction),  &QAction::trigger);
     connect(m_treeWidget,               &QnResourceBrowserWidget::activated,        this,                               &QnWorkbenchUi::at_treeWidget_activated);
     connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverLeft,            this,                               &QnWorkbenchUi::updateTreeOpacityAnimated);
     connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverEntered,         this,                               &QnWorkbenchUi::updateTreeOpacityAnimated);
     connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverEntered,         this,                               &QnWorkbenchUi::updateControlsVisibilityAnimated);
     connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverLeft,            this,                               &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_treeHidingProcessor,      &HoverFocusProcessor::hoverFocusLeft,       this,                               [this](){ if(!isTreePinned()) setTreeOpened(false);});
     connect(m_treeShowingProcessor,     &HoverFocusProcessor::hoverEntered,         this,                               &QnWorkbenchUi::at_treeShowingProcessor_hoverEntered);
     connect(m_treeItem,                 &QnMaskedProxyWidget::paintRectChanged,     this,                               &QnWorkbenchUi::at_treeItem_paintGeometryChanged);
     connect(m_treeItem,                 &QGraphicsWidget::geometryChanged,          this,                               &QnWorkbenchUi::at_treeItem_paintGeometryChanged);

@@ -3,13 +3,27 @@
 angular.module('webadminApp')
     .controller('AdvancedCtrl', function ($scope, $modal, $log, mediaserver) {
 
+
+        mediaserver.getCurrentUser().success(function(result){
+            if(!result.reply.isAdmin){
+                $location.path("/info"); //no admin rights - redirect
+            }
+        });
+
+        function formatUrl(url){
+            return decodeURIComponent(url.replace(/file:\/\/.+?:.+?\//gi,""));
+        };
         $scope.storages = mediaserver.getStorages();
 
         $scope.storages.then(function (r) {
+            $scope.storages = _.sortBy(r.data.reply.storages,function(storage){
+                return formatUrl(storage.url);
+            });
 
-            $scope.storages = r.data.reply.storages;
             for(var i in $scope.storages){
                 $scope.storages[i].reservedSpaceGb = Math.round(1.*$scope.storages[i].reservedSpace / (1024*1024*1024));
+                $scope.storages[i].url = formatUrl($scope.storages[i].url);
+
             }
 
             $scope.$watch(function(){

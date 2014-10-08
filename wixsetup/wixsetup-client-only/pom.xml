@@ -11,14 +11,14 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wixsetup-client-only</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Client Only Installer</name>
+    <name>HD Witness Client Installer</name>
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>
         <install.type>client-only</install.type>
         <client_name>client.exe</client_name>
         <product_name>${product.name}.exe</product_name>
-		<final.artifact.name>${namespace.additional}-client-only</final.artifact.name>		
+        <final.artifact.name>${namespace.additional}-client-only</final.artifact.name>      
     </properties>
     <build />
 </project>

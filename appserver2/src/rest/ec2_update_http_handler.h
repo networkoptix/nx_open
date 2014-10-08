@@ -46,7 +46,8 @@ namespace ec2
             const QString& /*path*/,
             const QnRequestParamList& /*params*/,
             QByteArray& /*result*/,
-            QByteArray& /*contentType*/ )
+            QByteArray&, /*contentType*/ 
+            const QnRestConnectionProcessor*) override
         {
             return nx_http::StatusCode::badRequest;
         }
@@ -58,7 +59,8 @@ namespace ec2
             const QByteArray& body,
             const QByteArray& srcBodyContentType,
             QByteArray& /*result*/,
-            QByteArray& /*contentType*/ )
+            QByteArray&, /*contentType*/ 
+            const QnRestConnectionProcessor*) override
         {
             QnTransaction<RequestDataType> tran;
             bool success = false;

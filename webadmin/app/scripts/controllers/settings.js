@@ -1,8 +1,17 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,data) {
+    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location) {
+
+        mediaserver.getCurrentUser().success(function(result){
+            if(!result.reply.isAdmin){
+                $location.path("/info"); //no admin rights - redirect
+                return;
+            }
+        });
+
         $scope.settings = mediaserver.getSettings();
+
 
         $scope.settings.then(function (r) {
             $scope.settings = {
@@ -56,30 +65,51 @@ angular.module('webadminApp')
         };
 
         function restartServer(){
-            data.port = $scope.settings.port;
             $modal.open({
                 templateUrl: 'views/restart.html',
-                controller: 'RestartCtrl'
+                controller: 'RestartCtrl',
+                resolve:{
+                    port:function(){
+                        return $scope.settings.port;
+                    }
+                }
             });
         }
 
-        function successHandler (r){
-            if(r.data.reply.restartNeeded){
-                if(confirm("Changes will be applied after restart. Do you want to restart server now?")){
+        function errorHandler(r){
+            alert ("Connection error")
+            return false;
+        }
+        function resultHandler (r){
+            if(r.error!=0) {
+                var errorToShow = r.errorString;
+                switch (errorToShow) {
+                    case 'UNAUTHORIZED':
+                    case 'password':
+                        errorToShow = "Wrong password.";
+                }
+                alert("Error: " + errorToShow);
+            }else if (r.reply.restartNeeded) {
+                if (confirm("All changes saved. New settings will be applied after restart. \n Do you want to restart server now?")) {
                     restartServer();
                 }
-            }else{
+            } else {
                 alert("Settings saved");
             }
         }
 
         $scope.save = function () {
-            mediaserver.saveSettings($scope.settings.systemName,$scope.settings.port).then(successHandler);
+
+            if($scope.settingsForm.$valid) {
+                mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).success(resultHandler).error(errorHandler);
+            }else{
+               alert("form is not valid");
+            }
         };
 
         $scope.changePassword = function () {
             if($scope.password == $scope.confirmPassword)
-                mediaserver.changePassword($scope.password,$scope.oldPassword).then(successHandler);
+                mediaserver.changePassword($scope.password,$scope.oldPassword).success(resultHandler).error(errorHandler);
         };
 
         $scope.restart = function () {

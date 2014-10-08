@@ -151,6 +151,9 @@ private slots:
 
     void submitDelayedItemOpen();
 
+    /** Handle RADASS resolution change if in control mode. */
+    void controlResolutionMode(Qn::ResolutionMode resolutionMode);
+
     void saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout = false);
     void saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls, bool saveLayout = false);
     void saveVideowallAndReviewLayout(const QnVideoWallResourcePtr& videowall, const QnLayoutResourcePtr &layout = QnLayoutResourcePtr());

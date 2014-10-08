@@ -67,7 +67,7 @@ static void printInLogNetResources(const QnResourceList& resources)
 
 }
 
-bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourcePtr& camera)
+bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt)
 {
     if (!camera)
         return false;
@@ -99,7 +99,7 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCam
     if (!ownServer->isRedundancy())
         return false; // redundancy is disabled
 
-    if (qnResPool->getAllCameras(ownServer, true).size() >= ownServer->getMaxCameras())
+    if (qnResPool->getAllCameras(ownServer, true).size() + awaitingToMoveCameraCnt >= ownServer->getMaxCameras())
         return false;
     
     return mServer->currentStatusTime() > m_serverOfflineTimeout;
@@ -148,7 +148,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         if (rpResource->hasFlags(Qn::foreigner))
         {
-            if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>())) 
+            if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size())) 
             {
                 it = resources.erase(it); // do not touch foreign resource
                 continue;
