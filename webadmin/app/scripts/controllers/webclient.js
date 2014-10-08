@@ -1,6 +1,6 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('WebclientCtrl', function ($scope, $modalInstance, $interval, mediaserver) {
+    .controller('WebclientCtrl', function ($scope, mediaserver) {
 
     });

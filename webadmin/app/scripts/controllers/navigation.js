@@ -7,7 +7,6 @@ angular.module('webadminApp')
         };
 
         mediaserver.getCurrentUser().success(function(result){
-            console.log(result);
             $scope.user = {
                 isAdmin:result.reply.isAdmin
             }
