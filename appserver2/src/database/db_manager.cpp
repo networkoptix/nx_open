@@ -2320,6 +2320,33 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiCameraDataList&
     return ErrorCode::ok;
 }
 
+// ----------- getStorages --------------------
+
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList& storageList)
+{
+    QString filterStr;
+    if (!mServerId.isNull())
+        filterStr = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(mServerId));
+
+    QSqlQuery queryStorage(m_sdb);
+    queryStorage.setForwardOnly(true);
+    queryStorage.prepare(QString("select r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, r.status, \
+                                 s.space_limit as spaceLimit, s.used_for_writing as usedForWriting \
+                                 from vms_resource r \
+                                 join vms_storage s on s.resource_ptr_id = r.id \
+                                 %1 \
+                                 order by r.parent_guid").arg(filterStr));
+
+    if (!queryStorage.exec()) {
+        qWarning() << Q_FUNC_INFO << queryStorage.lastError().text();
+        return ErrorCode::dbError;
+    }
+
+    QnSql::fetch_many(queryStorage, &storageList);
+
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::getScheduleTasks(const QnUuid& cameraId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList)
 {
     QString filterStr;
@@ -2508,24 +2535,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
         return ErrorCode::dbError;
     }
 
-    QSqlQuery queryStorage(m_sdb);
-    queryStorage.setForwardOnly(true);
-    queryStorage.prepare(QString("select r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, r.status, \
-                          s.space_limit as spaceLimit, s.used_for_writing as usedForWriting \
-                          from vms_resource r \
-                          join vms_storage s on s.resource_ptr_id = r.id order by r.parent_guid"));
-
-    if (!queryStorage.exec()) {
-        qWarning() << Q_FUNC_INFO << queryStorage.lastError().text();
-        return ErrorCode::dbError;
-    }
-
     QnSql::fetch_many(query, &serverList);
-
-    ApiStorageDataList storageList;
-    QnSql::fetch_many(queryStorage, &storageList);
-
-    mergeObjectListData<ApiMediaServerData, ApiStorageData>(serverList, storageList, &ApiMediaServerData::storages, &ApiStorageData::parentId);
 
     return ErrorCode::ok;
 }
@@ -2829,6 +2839,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     if ((err = doQueryNoLock(dummy, data.allProperties)) != ErrorCode::ok)
         return err;
 	
+    if ((err = doQueryNoLock(dummy, data.storages)) != ErrorCode::ok)
+        return err;
 
     /*
     QSqlQuery queryParams(m_sdb);

@@ -28,7 +28,6 @@ namespace ec2
         QString         version; 
         QString         systemInfo;
         QString         authKey;
-        ApiStorageDataList storages;
         QString         systemName; //! < Server system name. It can be invalid sometimes, but it matters only when server is in incompatible state.
     };
 #define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(networkAddresses)(flags)(panicMode)(version)(systemInfo)(authKey)(systemName)
