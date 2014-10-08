@@ -28,6 +28,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
@@ -35,6 +36,7 @@
 #include <core/resource/file_processor.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
+#include <core/resource/user_resource.h>
 
 #include <nx_ec/dummy_handler.h>
 
