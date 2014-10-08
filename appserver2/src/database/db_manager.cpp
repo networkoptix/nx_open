@@ -2569,21 +2569,31 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
             serverExList.push_back( ApiMediaServerDataEx(std::move(serverList[i])) );
     }
 
-    //fetching server attributes
-    ApiMediaServerUserAttributesDataList serverAttrsList;
-    ErrorCode result = doQueryNoLock( mServerId, serverAttrsList );
+    {
+        //fetching server attributes
+        ApiMediaServerUserAttributesDataList serverAttrsList;
+        ErrorCode result = doQueryNoLock( mServerId, serverAttrsList );
+        if( result != ErrorCode::ok )
+            return result;
+
+        //merging data & attributes
+        mergeObjectListData(
+            serverExList,
+            serverAttrsList,
+            &ApiMediaServerDataEx::id,
+            &ApiMediaServerUserAttributesData::serverID,
+            []( ApiMediaServerDataEx& server, ApiMediaServerUserAttributesData& serverAttrs ){ ((ApiMediaServerUserAttributesData&)server) = std::move(serverAttrs); } );
+    }
+
+    //fetching storages
+    ApiStorageDataList storages;
+    ErrorCode result = doQueryNoLock( mServerId, storages );
     if( result != ErrorCode::ok )
         return result;
+    //merging storages
+    mergeObjectListData( serverExList, storages, &ApiMediaServerDataEx::storages, &ApiMediaServerDataEx::id, &ApiStorageData::parentId );
 
-    //merging data & attributes
-    mergeObjectListData(
-        serverExList,
-        serverAttrsList,
-        &ApiMediaServerDataEx::id,
-        &ApiMediaServerUserAttributesData::serverID,
-        []( ApiMediaServerDataEx& server, ApiMediaServerUserAttributesData& serverAttrs ){ ((ApiMediaServerUserAttributesData&)server) = serverAttrs; } );
-
-    //reading data
+    //reading properties
     QSqlQuery queryParams(m_sdb);
     queryParams.setForwardOnly(true);
     QString filterStr2;

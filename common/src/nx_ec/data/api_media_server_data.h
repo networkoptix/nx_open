@@ -52,6 +52,7 @@ namespace ec2
         ApiMediaServerUserAttributesData
     {
         std::vector<ApiResourceParamData> addParams;
+        ApiStorageDataList storages;
 
         ApiMediaServerDataEx();
 
@@ -62,7 +63,7 @@ namespace ec2
         {
         }
     };
-#define ApiMediaServerDataEx_Fields ApiMediaServerData_Fields ApiMediaServerUserAttributesData_Fields (addParams)
+#define ApiMediaServerDataEx_Fields ApiMediaServerData_Fields ApiMediaServerUserAttributesData_Fields (addParams) (storages)
 
 
     struct ApiPanicModeData: public ApiData
