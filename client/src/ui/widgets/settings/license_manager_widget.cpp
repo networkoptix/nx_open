@@ -169,7 +169,7 @@ void QnLicenseManagerWidget::showMessage(const QString &title, const QString &me
         QMessageBox::information(this, title, message);
 }
 
-void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool infoMode) 
+void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url) 
 {
     const QList<QByteArray> mainHardwareIds = qnLicensePool->mainHardwareIds();
     const QList<QByteArray> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
@@ -185,7 +185,6 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
     if (!m_httpClient)
         m_httpClient = new QNetworkAccessManager(this);
 
-    QUrl url(QN_LICENSE_URL);
     QNetworkRequest request;
     request.setUrl(url.toString());
 
@@ -230,10 +229,16 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
     params.addQueryItem(QLatin1String("lang"), qnCommon->instance<QnClientTranslationManager>()->getCurrentLanguage());
 
     QNetworkReply *reply = m_httpClient->post(request, params.query(QUrl::FullyEncoded).toUtf8());
-    m_replyKeyMap[reply] = licenseKey;
 
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(at_downloadError()));
-    connect(reply, SIGNAL(finished()), this, SLOT(at_downloadFinished()));
+    connect(reply, &QNetworkReply::finished, this, [this, licenseKey, infoMode, url, reply] {
+        QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).value<QUrl>();
+        if (!redirectUrl.isEmpty()) {
+            updateFromServer(licenseKey, infoMode, redirectUrl);
+            return;
+        }
+        processReply(reply, licenseKey, url);
+    });
 }
 
 void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, const QList<QnLicensePtr> &licenses) {
@@ -330,7 +335,6 @@ void QnLicenseManagerWidget::at_licensesReceived(int handle, ec2::ErrorCode erro
 void QnLicenseManagerWidget::at_downloadError() {
     if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender())) {
         disconnect(reply, NULL, this, NULL); //avoid double "onError" handling
-        m_replyKeyMap.remove(reply);
         reply->deleteLater();
 
         /* QNetworkReply slots should not start eventLoop */
@@ -344,60 +348,57 @@ void QnLicenseManagerWidget::at_downloadError() {
     ui->licenseWidget->setState(QnLicenseWidget::Normal);
 }
 
-void QnLicenseManagerWidget::at_downloadFinished() {
-    if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender())) {
-        QList<QnLicensePtr> licenses;
+void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray& licenseKey, const QUrl &url) {
+    QList<QnLicensePtr> licenses;
 
-        QByteArray replyData = reply->readAll();
+    QByteArray replyData = reply->readAll();
 
-        // TODO: #Elric use JSON mapping here.
-        // If we can deserialize JSON it means there is an error.
-        QJsonObject errorMessage;
-        if (QJson::deserialize(replyData, &errorMessage)) 
-        {
-            QString message = QnLicenseUsageHelper::activationMessage(errorMessage);
-            /* QNetworkReply slots should not start eventLoop */
-            emit showMessageLater(tr("License Activation"),
-                                  message,
-                                  true);
-            ui->licenseWidget->setState(QnLicenseWidget::Normal);
-            return;
-        }
+    // TODO: #Elric use JSON mapping here.
+    // If we can deserialize JSON it means there is an error.
+    QJsonObject errorMessage;
+    if (QJson::deserialize(replyData, &errorMessage)) 
+    {
+        QString message = QnLicenseUsageHelper::activationMessage(errorMessage);
+        /* QNetworkReply slots should not start eventLoop */
+        emit showMessageLater(tr("License Activation"),
+            message,
+            true);
+        ui->licenseWidget->setState(QnLicenseWidget::Normal);
+        return;
+    }
 
-        QTextStream is(&replyData);
-        is.setCodec("UTF-8");
-        QByteArray licenseKey = m_replyKeyMap[reply];
-        m_replyKeyMap.remove(reply);
-        reply->deleteLater();
+    QTextStream is(&replyData);
+    is.setCodec("UTF-8");
+    reply->deleteLater();
 
-        while (!is.atEnd()) {
-            QnLicensePtr license = QnLicense::readFromStream(is);
-            if (!license )
-                break;
+    while (!is.atEnd()) {
+        QnLicensePtr license = QnLicense::readFromStream(is);
+        if (!license )
+            break;
 
-            QnLicense::ErrorCode errCode = QnLicense::NoError;
+        QnLicense::ErrorCode errCode = QnLicense::NoError;
 
-            if (license->isInfoMode()) {
-                if (!license->isValid(&errCode, QnLicense::VM_CheckInfo) && errCode != QnLicense::Expired) {
-                    emit showMessageLater(tr("License activation"), tr("Can't activate license:  %1").arg(QnLicense::errorMessage(errCode)), true);
-                    ui->licenseWidget->setState(QnLicenseWidget::Normal);
-                }
-                else {
-                    updateFromServer(license->key(), false);
-                }
-
-                return;
+        if (license->isInfoMode()) {
+            if (!license->isValid(&errCode, QnLicense::VM_CheckInfo) && errCode != QnLicense::Expired) {
+                emit showMessageLater(tr("License activation"), tr("Can't activate license:  %1").arg(QnLicense::errorMessage(errCode)), true);
+                ui->licenseWidget->setState(QnLicenseWidget::Normal);
             }
             else {
-                if (license->isValid(&errCode, QnLicense::VM_JustCreated))
-                    licenses.append(license);
-                else if (errCode == QnLicense::Expired)
-                    licenses.append(license); // ignore expired error code
+                updateFromServer(license->key(), false, url);
             }
-        }
 
-        validateLicenses(licenseKey, licenses);
+            return;
+        }
+        else {
+            if (license->isValid(&errCode, QnLicense::VM_JustCreated))
+                licenses.append(license);
+            else if (errCode == QnLicense::Expired)
+                licenses.append(license); // ignore expired error code
+        }
     }
+
+    validateLicenses(licenseKey, licenses);
+
 
     ui->licenseWidget->setState(QnLicenseWidget::Normal);
 }
@@ -442,7 +443,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
         return;
 
     if (ui->licenseWidget->isOnline()) {
-        updateFromServer(ui->licenseWidget->serialKey().toLatin1(), true);
+        updateFromServer(ui->licenseWidget->serialKey().toLatin1(), true, QUrl(QN_LICENSE_URL));
     } else {
         QnLicensePtr license(new QnLicense(ui->licenseWidget->activationKey()));
 

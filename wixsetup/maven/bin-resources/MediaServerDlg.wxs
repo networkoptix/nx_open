@@ -14,28 +14,29 @@
     <Fragment>
         <UI>
             <Dialog Id="MediaServerDlg" Width="370" Height="270" Title="!(loc.InstallDirDlg_Title)">
-													<Control Id="systemNameLabel" Type="Text" Height="15" Width="108" X="82" Y="83" Text="!(loc.MediaServerDlg_SystemName)" />
-													<Control Id="systemName" Type="Edit" Height="15" Width="111" X="194" Y="81" Property="SYSTEM_NAME" />
-													<Control Type="Text" Id="PortLabel" Width="108" Height="15" X="82" Y="103" Text="!(loc.MediaServerDlg_AppserverPort)" />
-													<Control Type="Edit" Id="Port" Width="111" Height="15" X="194" Y="100" Property="SERVER_PORT" />
-													<Control Type="Text" Id="LoginLabel" Width="108" Height="15" X="82" Y="122" Text="!(loc.MediaServerDlg_Login)" />
-													<Control Type="Edit" Id="Login" X="194" Y="120" Width="111" Height="15" Property="SERVER_LOGIN" />
-													<Control Id="passwordLabel" Type="Text" Height="15" Width="108" X="82" Y="142" Text="!(loc.MediaServerDlg_Password)" />
-													<Control Id="passwordBox" Type="Edit" Height="15" Width="111" X="194" Y="140" Property="SERVER_PASSWORD" Password="yes" />
-													<Control Type="Text" Id="PasswordLabel2" Width="108" Height="15" X="82" Y="161" Text="!(loc.MediaServerDlg_PasswordConfirm)" />
-													<Control Type="Edit" Id="ConfirmPasswordBox" Width="111" Height="15" X="194" Y="159" Property="SERVER_PASSWORD_CONFIRM" Password="yes" />
-													<Control Id="groupBox1" Type="GroupBox" Height="142" Width="345" X="15" Y="49" Text="!(loc.MediaServerDlg_EnterpriseController)" />
-													<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="no" Text="!(loc.WixUINext)" />
-													<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
-													<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="no" Text="!(loc.WixUICancel)">
-														<Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
-													</Control>
-													<Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" />
-													<Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.MediaServerDlg_MediaServerConfig)" />
-													<Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
-													<Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="2" />
-													<Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
-												</Dialog>
+                                                    <Control Id="systemNameLabel" Type="Text" Height="15" Width="108" X="82" Y="83" Text="!(loc.MediaServerDlg_SystemName)" />
+                                                    <Control Id="systemName" Type="Edit" Height="15" Width="111" X="194" Y="81" Property="SYSTEM_NAME" />
+                                                    <Control Type="Text" Id="PortLabel" Width="108" Height="15" X="82" Y="103" Text="!(loc.MediaServerDlg_AppserverPort)" />
+                                                    <Control Type="Edit" Id="Port" Width="111" Height="15" X="194" Y="100" Property="SERVER_PORT" />
+                                                    <Control Type="Text" Id="LoginLabel" Width="108" Height="15" X="82" Y="122" Text="!(loc.MediaServerDlg_Login)" />
+                                                    <Control Type="Edit" Id="Login" X="194" Y="120" Width="111" Height="15" Property="SERVER_LOGIN" />
+                                                    <Control Id="passwordLabel" Type="Text" Height="15" Width="108" X="82" Y="142" Text="!(loc.MediaServerDlg_Password)" />
+                                                    <Control Id="passwordBox" Type="Edit" Height="15" Width="111" X="194" Y="140" Property="SERVER_PASSWORD" Password="yes" />
+                                                    <Control Type="Text" Id="PasswordLabel2" Width="108" Height="15" X="82" Y="161" Text="!(loc.MediaServerDlg_PasswordConfirm)" />
+                                                    <Control Type="Edit" Id="ConfirmPasswordBox" Width="111" Height="15" X="194" Y="159" Property="SERVER_PASSWORD_CONFIRM" Password="yes" />
+                                                    <Control Id="groupBox1" Type="GroupBox" Height="164" Width="345" X="15" Y="49" Text="!(loc.MediaServerDlg_EnterpriseController)" />
+                                                    <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="no" Text="!(loc.WixUINext)" />
+                                                    <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+                                                    <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="no" Text="!(loc.WixUICancel)">
+                                                        <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+                                                    </Control>
+                                                    <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" />
+                                                    <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.MediaServerDlg_MediaServerConfig)" />
+                                                    <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
+                                                    <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="2" />
+                                                    <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
+                                                    <Control Id="checkBox1" Type="CheckBox" Height="18" Width="223" X="82" Y="179" Text="!(loc.AppServerDlg_OptimizeCamerasSettings)" Property="ALLOW_CAMERA_CHANGES_REF" Indirect="yes" />
+                                                </Dialog>
         </UI>
     </Fragment>
 </Wix>

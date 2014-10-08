@@ -90,24 +90,24 @@ module.exports = function (grunt) {
                  }
                  */
 
-                /*//Sergey Yuldashev
+                //Sergey Yuldashev
                 {
                     context: '/api/',
                     host: '10.0.2.203',
-                    port: 7001,
+                    port: 8001,
                     headers: {
-
-                        //"Authorization": "Basic YWRtaW46MTIzNA==" //admin:1234
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
+                        //"Authorization": "Basic dXNlcjoxMjM="//user:123
                     }
                 }, {
                     context: '/ec2/',
                     host: '10.0.2.203',
-                    port: 7001,
+                    port: 8001,
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
+                        //"Authorization": "Basic dXNlcjoxMjM="//user:123
                     }
-                }*/
+                }
 
 
 
@@ -129,27 +129,27 @@ module.exports = function (grunt) {
                 }*/
 
                 // Sasha
-                {
+                /*{
                     context: '/api/',
-                    host: '10.0.2.159',
-                    port: 7041,//7004,7005,2006
+                    host: '10.0.2.190',
+                    port: 7001,//7004,7005,2006
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
                 }, {
                     context: '/ec2/',
-                    host: '10.0.2.159',
-                    port: 7041,//7004,7005,2006
+                    host: '10.0.2.190',
+                    port: 7001,//7004,7005,2006
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
-                }
+                }*/
 
                 //Roman Vasilenko
                 /*{
                     context: '/api/',
                     host: '10.0.2.231',
-                    port: 7001,//7004,7005,2006
+                    port: 7006,//7004,7005,2006
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
@@ -278,7 +278,20 @@ module.exports = function (grunt) {
                     }
                 ]
             },
-            server: '.tmp'
+            server: '.tmp',
+
+            publish:{
+                files:[
+                    {
+                        dot: true,
+                        src: '<%= yeoman.dist %>/../../mediaserver/maven/bin-resources/resources/static/*'
+                    }
+                ],
+                options: {
+                    force: true
+                }
+            }
+
         },
 
         // Add vendor prefixed styles
@@ -449,9 +462,10 @@ module.exports = function (grunt) {
                             '.htaccess',
                             '*.html',
                             '*.xml',
-                            '*.xsl',                                                        
+                            '*.xsl',
                             'views/{,*/}*.html',
-                            'bower_components/**/*',
+                            'customization/*',
+                            //'bower_components/**/*',
                             'images/{,*/}*.{webp}',
                             'fonts/*'
                         ]
@@ -461,6 +475,13 @@ module.exports = function (grunt) {
                         cwd: '.tmp/images',
                         dest: '<%= yeoman.dist %>/images',
                         src: ['generated/*']
+                    },
+                    {
+                        expand: true,
+                        cwd: '<%= yeoman.app %>',
+                        flatten: true,
+                        dest: '<%= yeoman.dist %>/fonts',
+                        src: ['bower_components/sass-bootstrap/fonts/*']
                     }
                 ]
             },
@@ -469,6 +490,13 @@ module.exports = function (grunt) {
                 cwd: '<%= yeoman.app %>/styles',
                 dest: '.tmp/styles/',
                 src: '{,*/}*.css'
+            },
+            publish:{
+                expand: true,
+                nonull:true,
+                cwd: '<%= yeoman.app %>/../dist',
+                dest: '../mediaserver/maven/bin-resources/resources/static/',
+                src: '**'
             }
         },
 
@@ -575,5 +603,17 @@ module.exports = function (grunt) {
         'newer:jshint',
         'test',
         'build'
+    ]);
+
+
+    grunt.registerTask('publish', [
+        'build',
+        'clean:publish',
+        'copy:publish'
+    ]);
+
+
+    grunt.registerTask('pub', [
+        'publish'
     ]);
 };

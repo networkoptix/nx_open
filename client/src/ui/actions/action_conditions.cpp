@@ -907,9 +907,6 @@ Qn::ActionVisibility QnStartVideoWallControlActionCondition::check(const QnActio
         if (!index.isValid())
             continue;
 
-        if (index.item().layout.isNull())
-            continue;
-
         return Qn::EnabledAction;
     }
     return Qn::InvisibleAction;

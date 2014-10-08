@@ -14,7 +14,7 @@ QnStatisticsRestHandler::~QnStatisticsRestHandler() {
     return;
 }
 
-int QnStatisticsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result)
+int QnStatisticsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(params)
     Q_UNUSED(path)

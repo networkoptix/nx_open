@@ -36,6 +36,8 @@
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
 
+#include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
+
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/synctime.h>
@@ -55,10 +57,24 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_connectingMessageBox(NULL),
-    m_connectingHandle(0)
+    m_connectingHandle(0),
+    m_readyForConnection(true)
 {
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    this,   &QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened);
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionClosed,    this,   &QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed);
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   [this] {
+        /* We are just reconnected automatically, e.g. after update. */
+        if (!m_readyForConnection)
+            return;
+
+        m_readyForConnection = false;
+
+        QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
+        if(!watcher->hasMismatches())
+            return;
+
+        menu()->trigger(Qn::VersionMismatchMessageAction);
+    });
 
     connect(action(Qn::ConnectAction),              &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_connectAction_triggered);
     connect(action(Qn::ReconnectAction),            &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
@@ -117,6 +133,9 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     /* Don't do anything if we are closing client. */
     if (!mainWindow())
         return;
+
+    /* Get ready for the next connection. */
+    m_readyForConnection = true;
 
     disconnect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, NULL);
 

@@ -12,7 +12,7 @@ public:
     QnStatisticsRestHandler();
     virtual ~QnStatisticsRestHandler();
 
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 private:
     QnGlobalMonitor *m_monitor;
 };

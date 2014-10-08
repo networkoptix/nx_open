@@ -85,7 +85,7 @@
     <String Id="MediaServerDlg_Host"                                Overridable="yes">Host</String>
     <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">Port</String>
     <String Id="MediaServerDlg_Login"                               Overridable="yes">Login</String>
-    <String Id="MediaServerDlg_Password"                            Overridable="yes">New Password</String>  
+    <String Id="MediaServerDlg_Password"                            Overridable="yes">Password</String>  
     <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">Confirm Password</String>  
     <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">Server Port</String>
     <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Connection Settings</String>

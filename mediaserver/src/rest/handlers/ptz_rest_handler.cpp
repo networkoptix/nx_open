@@ -77,7 +77,7 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
+int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) {
     QString sequenceId;
     int sequenceNumber = -1;
     Qn::PtzCommand command;

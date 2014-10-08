@@ -33,6 +33,10 @@ QnWorkbenchVersionMismatchWatcher::QnWorkbenchVersionMismatchWatcher(QObject *pa
         updateMismatchData();
     });
 
+    foreach(const QnMediaServerResourcePtr &server, resourcePool()->getResources<QnMediaServerResource>()) {
+        connect(server, &QnMediaServerResource::versionChanged, this, &QnWorkbenchVersionMismatchWatcher::updateMismatchData);
+    }
+
     updateMismatchData();
 }
 

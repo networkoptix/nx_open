@@ -12,7 +12,7 @@
 class QnPtzRestHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:
-    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) override;
+    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 private:
     typedef std::function<int ()> AsyncFunc;
 

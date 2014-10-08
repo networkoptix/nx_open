@@ -220,7 +220,7 @@ static const std::size_t bio_output_buffer_reserve= 2048;
 static const std::size_t async_buffer_default_size= 1024;
 static const SystemError::ErrorCode ssl_internal_error = 100;
 
-class async_ssl : public std::enable_shared_from_this<async_ssl> {
+class async_ssl {
 public:
     async_ssl( SSL* ssl , bool server , AbstractStreamSocket* socket ) ;
 
@@ -263,12 +263,8 @@ public:
 
     void clear() {
         {
-            std::lock_guard<std::mutex> lock(recv_mutex_);
-            recv_queue_.clear();
-        }
-        {
-            std::lock_guard<std::mutex> lock(send_mutex_);
-            send_queue_.clear();
+            std::lock_guard<std::mutex> lock(mutex_);
+            op_queue_.clear();
         }
     }
     
@@ -348,59 +344,11 @@ private:
     // an ssl_perform entry routine and do the job once the task
     // finished there .
     void do_recv( buffer_t buf , const std::function<void(SystemError::ErrorCode,std::size_t)>& op ) {
-        std::weak_ptr<async_ssl> self(shared_from_this());
-        auto recv_callback = [this,buf,op,self](SystemError::ErrorCode ec,std::size_t transferred_bytes) {
-            // Invoke user's operation without locking , so no recursive lock 
-            op(ec,transferred_bytes);
-            std::shared_ptr<async_ssl> ptr(self.lock());
-            if(!ptr) {
-                return;
-            } else {
-                std::lock_guard<std::mutex> lock(ptr->recv_mutex_);
-                if(ptr->recv_queue_.empty())
-                    return;
-                ptr->recv_queue_.pop_back();
-                if( !ptr->recv_queue_.empty() ) {
-                    ptr->socket_->readSomeAsync(buf.write_buffer,ptr->recv_queue_.front());
-                }
-            }
-        };
-        std::list< std::function<void(SystemError::ErrorCode,std::size_t)> > element(1,recv_callback);
-        {
-            std::lock_guard<std::mutex> lock(recv_mutex_);
-            if( recv_queue_.empty() ) {
-                socket_->readSomeAsync(buf.write_buffer,std::move(recv_callback));
-            }
-            recv_queue_.splice(recv_queue_.end(),std::move(element));
-        }
+        socket_->readSomeAsync(buf.write_buffer,op);
     }
 
     void do_send( buffer_t buf , const std::function<void(SystemError::ErrorCode,std::size_t)>& op ) {
-        std::weak_ptr<async_ssl> self(shared_from_this());
-        auto send_callback = [this,buf,op,self](SystemError::ErrorCode ec,std::size_t transferred_bytes) {
-            op(ec,transferred_bytes);
-            std::shared_ptr<async_ssl> ptr(self.lock());
-            if(!ptr) {
-                return;
-            } else {
-                std::lock_guard<std::mutex> lock(ptr->send_mutex_);
-                if(ptr->send_queue_.empty())
-                    return;
-                ptr->send_queue_.pop_back();
-                if( !ptr->send_queue_.empty() ) {
-                    // Fire one appending operation in the queue
-                    ptr->socket_->sendAsync(*buf.read_buffer,ptr->send_queue_.front());
-                }
-            }
-        };
-        std::list< std::function<void(SystemError::ErrorCode,std::size_t)> > element(1,send_callback);
-        {
-            std::lock_guard<std::mutex> lock(send_mutex_);
-            if( send_queue_.empty() ) {
-                socket_->sendAsync(*buf.read_buffer,std::move(send_callback));
-            }
-            send_queue_.splice(send_queue_.end(),std::move(element));
-        }
+        socket_->sendAsync(*buf.read_buffer,op);
     }
 
     // the main entry for our async routine 
@@ -443,6 +391,7 @@ private:
             // Call user's callback function and passing a fake ssl_internal_error
             // number to let user get notification that we are in trouble here !
             op->error( ssl_internal_error );
+            dispatchPendingOp();
             return;
         }
     }
@@ -466,6 +415,7 @@ private:
                 do_recv( buffer, [this,buffer,op](SystemError::ErrorCode ec,std::size_t bytes_transferred){
                     if( ec ) {
                         op->error(ec);
+                        dispatchPendingOp();
                         return;
                     }
                     // Checking for EOF 
@@ -494,6 +444,7 @@ private:
                 do_send( buffer, [this,buffer,op](SystemError::ErrorCode ec,std::size_t bytes_transferred){
                     if( ec ) {
                         op->error(ec);
+                        dispatchPendingOp();
                         return;
                     }
                     Q_ASSERT( bytes_transferred == (std::size_t)buffer.read_buffer->size() && 
@@ -512,6 +463,7 @@ private:
         do_send( buffer , [this,buffer,op](SystemError::ErrorCode ec,std::size_t bytes_transferred) {
             if( ec ) {
                 op->error(ec);
+                dispatchPendingOp();
                 return;
             }
             Q_ASSERT( bytes_transferred == (std::size_t)buffer.read_buffer->size() && 
@@ -534,6 +486,7 @@ private:
                 // what we need to do is just calling the callback function
                 if( ec ) {
                     op->error(ec);
+                    dispatchPendingOp();
                     return;
                 }
                 // Clear the buffer here
@@ -546,6 +499,7 @@ private:
                 } else {
                     op->notify(SystemError::noError);
                 }
+                dispatchPendingOp();
             });
         } else {
             if(eof) {
@@ -553,7 +507,27 @@ private:
             } else {
                 op->notify(SystemError::noError);
             }
+            dispatchPendingOp();
         }
+    }
+
+    void dispatchPendingOp() {
+        // The first one is the current one and it could be empty
+        // when the handshake happens
+        std::function<void()> cb;
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            if( op_queue_.empty() )
+                return;
+            else {
+                op_queue_.pop_front();
+                if( !op_queue_.empty() )
+                    cb = op_queue_.front();
+            }
+        }
+        // Start the next operations
+        if(cb) 
+            cb();
     }
 
     buffer_t make_read_write_buffer( std::size_t rcap, std::size_t wcap ) const {
@@ -581,17 +555,8 @@ private:
     std::unique_ptr<ssl_async_recv_op> recv_op_;
     std::unique_ptr<ssl_async_send_op> send_op_;
     std::unique_ptr<ssl_async_handshake_op> handshake_op_;
-
-    // The following 2 queues are used to synchronize the outstanding
-    // recv/send operation. All the recv/send operations will be enqueued
-    // first, and only when the queue is empty then it will fire such 
-    // operation directly , otherwise the operation will be queued and 
-    // until the previous recv/send finish and then fire that operations.
-    std::list< std::function<void(SystemError::ErrorCode,std::size_t)> > send_queue_;
-    std::mutex send_mutex_;
-
-    std::list< std::function<void(SystemError::ErrorCode,std::size_t)> > recv_queue_;
-    std::mutex recv_mutex_;
+    std::list< std::function<void()> > op_queue_;
+    std::mutex mutex_;
 };
 
 // read operation 
@@ -804,12 +769,21 @@ void async_ssl::async_recv(
                     async_recv(buffer,op);
                 });
         } else {
-            recv_op_->init();
-            recv_op_->set_user_buffer(buffer);
-            recv_op_->set_callback(op);
-            ssl_perform(SystemError::noError,0,recv_op_.get(),
-                make_read_write_buffer(async_buffer_default_size,
-                buffer->capacity()));
+            std::lock_guard<std::mutex> lock(mutex_);
+            if( op_queue_.empty() ) {
+                recv_op_->init();
+                recv_op_->set_user_buffer(buffer);
+                recv_op_->set_callback(op);
+                ssl_perform(SystemError::noError,0,recv_op_.get(),
+                    make_read_write_buffer(async_buffer_default_size,
+                    buffer->capacity()));
+            } 
+            op_queue_.push_back(
+                std::bind(
+                &async_ssl::async_recv,
+                this,
+                buffer,
+                op));
         }
 }
 
@@ -834,15 +808,24 @@ void async_ssl::async_send(
                     async_send(buffer,op);
             });
         }  else {
-            send_op_->init();
-            // For sending operation, we need to issue SSL operation at first
-            send_op_->set_user_buffer(&buffer);
-            send_op_->set_callback(op);
-            buffer_t buf = make_read_write_buffer(async_buffer_default_size,buffer.size());
-            // Perform the SSL operation here. The ssl_perform will issue
-            // SSL operation first and based on the result to perform the
-            // task. So it is safe to call this function here .
-            ssl_perform(SystemError::noError,0,send_op_.get(),buf);
+            std::lock_guard<std::mutex> lock(mutex_);
+            if( op_queue_.empty() ) {
+                send_op_->init();
+                // For sending operation, we need to issue SSL operation at first
+                send_op_->set_user_buffer(&buffer);
+                send_op_->set_callback(op);
+                buffer_t buf = make_read_write_buffer(async_buffer_default_size,buffer.size());
+                // Perform the SSL operation here. The ssl_perform will issue
+                // SSL operation first and based on the result to perform the
+                // task. So it is safe to call this function here .
+                ssl_perform(SystemError::noError,0,send_op_.get(),buf);
+            }
+            op_queue_.push_back(
+                std::bind(
+                &async_ssl::async_send,
+                this,
+                buffer,
+                op));
         }
 }
 

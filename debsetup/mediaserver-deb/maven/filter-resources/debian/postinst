@@ -122,6 +122,22 @@ function validate_storage {
   [[ "$1" == /* ]]
 }
 
+function find_free_port {
+    local port=$1
+
+    while :
+    do
+        netstat -nl4t | awk '{print $4;}' | grep ":$port" > /dev/null 2>&1
+        if [ $? -ne 0 ] 
+        then
+            echo $port
+            return
+        else
+            port=$((port+10))
+        fi
+    done
+}
+
 case "$1" in
     configure)
         ECS_HOST="$($CFG_HELPER appserverHost)"
@@ -139,7 +155,7 @@ case "$1" in
 
         PORT="$($CFG_HELPER port)"
         [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
-        [ -z "$PORT" ] && PORT=$PORT_DEFAULT        
+        [ -z "$PORT" ] && PORT=`find_free_port $PORT_DEFAULT`
         PORT=$(ask_for_value port "$PORT")
         $CFG_HELPER port "$PORT"
 

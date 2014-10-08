@@ -219,7 +219,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
                     if (item.layout != resource->getId())
                         continue;
                     item.layout = QnUuid();
-                    videowall->items()->updateItem(item.uuid, item);
+                    videowall->items()->updateItem(item);
                 }
             }
         }

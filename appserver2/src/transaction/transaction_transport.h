@@ -23,8 +23,6 @@
 #include <common/common_module.h>
 #endif
 
-#define TRANSACTION_MESSAGE_BUS_DEBUG
-
 namespace ec2
 {
 
