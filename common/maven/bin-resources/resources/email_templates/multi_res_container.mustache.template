@@ -51,11 +51,8 @@
             </div><!-- /content -->
 
 
-            <table>
+            <table class="content">
             {{#aggregated}}
-            <tr><td>
-            <div class="content">
-                <table > <!-- bgcolor="#FFFFFF" -->
                     <tr>
                         <td class="small" width="20%" style="vertical-align: top; padding-right:10px;"><img src="{{eventLogoFilename}}"/></td>
                         <td>
@@ -64,13 +61,8 @@
                             <a class="btn" href="{{urlext}}">External Link &raquo;</a><a class="btn" href="{{urlint}}">Internal Link &raquo;</a>
                             {{/urlext}}
                         </td>
+            			{{>body}}
                     </tr>
-                </table>
-            </div>
-
-            {{>body}}
-
-            </td></tr>
             {{/aggregated}}
             </table>
 
