@@ -244,25 +244,25 @@ namespace ec2
         /* Add or remove camera bookmark tags */
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraBookmarkTagDataList>& tran);
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiIdDataList>& tran)
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiIdDataList>& /*tran*/)
         {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesDataList>& tran)
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesDataList>& /*tran*/)
         {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraDataList>& tran)
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraDataList>& /*tran*/)
         {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiStorageDataList>& tran)
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiStorageDataList>& /*tran*/)
         {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;

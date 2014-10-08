@@ -721,7 +721,7 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
 void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
     dst->setId(src.id);
     //dst->setGuid(guid);
-    dst->setName(src.name);
+    dst->QnResource::setName(src.name); //setting resource name, but not camera name or server name
     dst->setTypeId(src.typeId);
     dst->setParentId(src.parentId);
     dst->setUrl(src.url);
