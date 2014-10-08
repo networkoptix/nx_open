@@ -1,0 +1,1 @@
+This plugin adds support of Raspberry Pi camera.
