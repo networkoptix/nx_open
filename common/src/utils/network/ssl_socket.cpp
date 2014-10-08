@@ -933,8 +933,10 @@ protected:
     virtual void InvokeUserFinializeHandler() {
         switch(status()) {
         case FAIL:
-        case END_OF_STREAM:
             user_callback_( system_error_ , std::numeric_limits<std::size_t>::max() );
+            return;
+        case END_OF_STREAM:
+            user_callback_( kSSLInternalErrorCode , std::numeric_limits<std::size_t>::max() );
             return;
         case SUCCESS:
             user_callback_( 0 , static_cast<std::size_t>(user_buffer_.size()) );
@@ -1186,47 +1188,47 @@ public:
 
 private:
     void Sniffer( SystemError::ErrorCode ec , std::size_t bytes_transferred , SnifferData data ) {
-            // We have the data in our buffer right now
-            if(ec) {
+        // We have the data in our buffer right now
+        if(ec) {
+            data.ssl_cb(ec,0);
+            return;
+        } else {
+            if( bytes_transferred == 0 ) {
                 data.ssl_cb(ec,0);
                 return;
-            } else {
-                if( bytes_transferred == 0 ) {
-                    data.ssl_cb(ec,0);
-                    return;
-                } else if( sniffer_buffer_.size() < 2 ) {
-                    socket()->readSomeAsync(
-                        &sniffer_buffer_,
-                        std::bind(
-                        &MixedAsyncSSL::Sniffer,
-                        this,
-                        std::placeholders::_1,
-                        std::placeholders::_2,
-                        data));
-                    return;
-                }
-                // Fix for the bug that always false in terms of comparison of 0x80
-                const unsigned char* buf = reinterpret_cast<unsigned char*>(sniffer_buffer_.data());
-                if( buf[0] == 0x80 || (buf[0] == 0x16 && buf[1] == 0x03) ) {
-                    is_ssl_ = true;
-                    is_initialized_ = true;
-                } else {
-                    is_ssl_ = false;
-                    is_initialized_ = true;
-                }
-                // If we are SSL , we need to push the data into the buffer
-                AsyncSSL::InjectSnifferData( sniffer_buffer_ );
-                // If it is an SSL we still need to continue our async operation
-                // otherwise we call the failed callback for the upper usage class
-                // it should be QnMixedSSLSocket class
-                if( is_ssl_ ) {
-                    // request a SSL async recv
-                    AsyncSSL::AsyncRecv(data.buffer,std::move(data.ssl_cb));
-                } else {
-                    // request a common async recv
-                    socket()->readSomeAsync(data.buffer,data.other_cb);
-                }
+            } else if( sniffer_buffer_.size() < 2 ) {
+                socket()->readSomeAsync(
+                    &sniffer_buffer_,
+                    std::bind(
+                    &MixedAsyncSSL::Sniffer,
+                    this,
+                    std::placeholders::_1,
+                    std::placeholders::_2,
+                    data));
+                return;
             }
+            // Fix for the bug that always false in terms of comparison of 0x80
+            const unsigned char* buf = reinterpret_cast<unsigned char*>(sniffer_buffer_.data());
+            if( buf[0] == 0x80 || (buf[0] == 0x16 && buf[1] == 0x03) ) {
+                is_ssl_ = true;
+                is_initialized_ = true;
+            } else {
+                is_ssl_ = false;
+                is_initialized_ = true;
+            }
+            // If we are SSL , we need to push the data into the buffer
+            AsyncSSL::InjectSnifferData( sniffer_buffer_ );
+            // If it is an SSL we still need to continue our async operation
+            // otherwise we call the failed callback for the upper usage class
+            // it should be QnMixedSSLSocket class
+            if( is_ssl_ ) {
+                // request a SSL async recv
+                AsyncSSL::AsyncRecv(data.buffer,std::move(data.ssl_cb));
+            } else {
+                // request a common async recv
+                socket()->readSomeAsync(data.buffer,data.other_cb);
+            }
+        }
     }
 
 private:
