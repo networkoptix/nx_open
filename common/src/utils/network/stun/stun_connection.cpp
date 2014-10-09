@@ -46,6 +46,8 @@ namespace nx_stun
     }
 
     void StunClientConnection::resetOutstandingRequest() {
+        if( !m_outstandingRequest )
+            return;
         std::lock_guard<std::mutex> lock(m_mutex);
         m_outstandingRequest.reset();
     }
@@ -89,7 +91,7 @@ namespace nx_stun
         {
             std::lock_guard<std::mutex> lock(m_mutex);
             if( !m_outstandingRequest || m_outstandingRequest->execute )
-                return;
+                return false;
             m_outstandingRequest->execute = true;
         }
         if( ec ) {
