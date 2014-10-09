@@ -4,7 +4,6 @@ angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location) {
 
         mediaserver.getCurrentUser().success(function(result){
-            console.log("settings",result);
             if(!result.reply.isAdmin){
                 $location.path("/info"); //no admin rights - redirect
                 return;
@@ -65,13 +64,13 @@ angular.module('webadminApp')
             });
         };
 
-        function restartServer(){
+        function restartServer(passPort){
             $modal.open({
                 templateUrl: 'views/restart.html',
                 controller: 'RestartCtrl',
                 resolve:{
                     port:function(){
-                        return $scope.settings.port;
+                        return passPort?$scope.settings.port:null;
                     }
                 }
             });
@@ -92,7 +91,7 @@ angular.module('webadminApp')
                 alert("Error: " + errorToShow);
             }else if (r.reply.restartNeeded) {
                 if (confirm("All changes saved. New settings will be applied after restart. \n Do you want to restart server now?")) {
-                    restartServer();
+                    restartServer(true);
                 }
             } else {
                 alert("Settings saved");
@@ -100,7 +99,12 @@ angular.module('webadminApp')
         }
 
         $scope.save = function () {
-            mediaserver.saveSettings($scope.settings.systemName,$scope.settings.port).success(resultHandler).error(errorHandler);
+
+            if($scope.settingsForm.$valid) {
+                mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).success(resultHandler).error(errorHandler);
+            }else{
+               alert("form is not valid");
+            }
         };
 
         $scope.changePassword = function () {
@@ -110,7 +114,7 @@ angular.module('webadminApp')
 
         $scope.restart = function () {
             if(confirm("Do you want to restart server now?")){
-                restartServer();
+                restartServer(false);
             }
         };
     });

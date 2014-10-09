@@ -11,6 +11,11 @@
         </li>
 
 
+        <li ng-repeat="(key, link) in config.helpLinks">
+            <a ng-href="{{link.url}}" target="{{link.target=='new'?'_blank':'_top'}}">{{link.title}}</a>
+        </li>
+
+
     </ul>
     <div class="col-xs-8">
         <h3><a name="help1"></a>topic topic 1</h3>
