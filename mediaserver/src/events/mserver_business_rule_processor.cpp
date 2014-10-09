@@ -1,24 +1,28 @@
-#include <QtCore/QList>
+#include "mserver_business_rule_processor.h"
 
-#include <utils/math/math.h>
-#include <utils/common/log.h>
+#include <QtCore/QList>
 
 #include "api/app_server_connection.h"
 
-#include "core/resource_management/resource_pool.h"
-#include <core/resource/resource.h>
-#include "core/resource/media_server_resource.h"
-#include "core/resource/camera_resource.h"
-#include "core/resource/security_cam_resource.h"
-
 #include "business/actions/panic_business_action.h"
-#include "recorder/recording_manager.h"
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/camera_bookmark.h>
+#include <core/resource/security_cam_resource.h>
+
 #include "camera/camera_pool.h"
 #include "decoders/video/ffmpeg.h"
 
+#include <recorder/recording_manager.h>
+#include <recorder/storage_manager.h>
+
 #include <media_server/serverutil.h>
 
-#include "mserver_business_rule_processor.h"
+#include <utils/math/math.h>
+#include <utils/common/log.h>
 
 QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor(): QnBusinessRuleProcessor()
 {
@@ -42,7 +46,7 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         switch(action->actionType())
         {
         case QnBusiness::BookmarkAction:
-            // TODO: implement me
+            result = executeBookmarkAction(action, res);
             break;
         case QnBusiness::CameraOutputAction:
         case QnBusiness::CameraOutputOnceAction:
@@ -100,6 +104,40 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
     }
     return rez;
 }
+
+bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusinessActionPtr &action, const QnResourcePtr &resource) {
+    Q_ASSERT(action);
+    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return false;
+
+    QnUuid ruleId = action->getBusinessRuleId();
+
+    if (action->getToggleState() == QnBusiness::ActiveState) {
+        m_runningBookmarkActions[ruleId] = QDateTime::currentMSecsSinceEpoch();
+        return true;
+    }
+
+    if (!m_runningBookmarkActions.contains(ruleId))
+        return false;
+
+    qint64 startTime = m_runningBookmarkActions.take(ruleId);
+    qint64 endTime = QDateTime::currentMSecsSinceEpoch();
+
+    QnCameraBookmark bookmark;
+    bookmark.guid = QnUuid::createUuid();
+    bookmark.startTimeMs = startTime;
+    bookmark.durationMs = endTime - startTime;
+
+    bookmark.name = "Auto-Generated Bookmark";
+    bookmark.description = QString("Rule %1\nFrom %2 to %3")
+        .arg(ruleId.toString())
+        .arg(QDateTime::fromMSecsSinceEpoch(startTime).toString())
+        .arg(QDateTime::fromMSecsSinceEpoch(endTime).toString());
+
+    return qnStorageMan->addBookmark(camera->getUniqueId().toUtf8(), bookmark);
+}
+
 
 QnUuid QnMServerBusinessRuleProcessor::getGuid() const {
     return serverGuid();

@@ -58,7 +58,6 @@ namespace QnBusiness {
         switch(actionType) {
         case UndefinedAction:
         case CameraOutputOnceAction:
-        case BookmarkAction:
         case SendMailAction:
         case DiagnosticsAction:
         case ShowPopupAction:
@@ -70,6 +69,7 @@ namespace QnBusiness {
         case CameraRecordingAction:
         case PanicRecordingAction:
         case PlaySoundAction:
+        case BookmarkAction:
             return true;
 
         default:
@@ -78,7 +78,7 @@ namespace QnBusiness {
     }
 
     bool isImplemented(ActionType actionType) { 
-        return actionType != BookmarkAction; 
+        return true; 
     }
 }
 
