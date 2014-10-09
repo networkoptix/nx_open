@@ -62,7 +62,7 @@
                 </table>
             </div>
             
-            <table class="content">
+            <table width="100%" class="content">
             {{#aggregated}}
                     <tr>
                         <td width="50%">
