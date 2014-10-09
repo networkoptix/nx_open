@@ -58,6 +58,8 @@ cp ${libdir}/version.py $SHARESTAGE/dbsync-2.2/bin
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
 cp -r $SERVER_IMAGEFORMATS_PATH/*.* $BINSTAGE/imageformats
 cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
+rm -f $LIBSTAGE/*.debug
+
 #cp -r $SERVER_SQLDRIVERS_PATH $BINSTAGE
 
 # Strip and remove rpath
