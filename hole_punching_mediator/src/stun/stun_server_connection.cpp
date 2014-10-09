@@ -17,6 +17,9 @@ StunServerConnection::StunServerConnection(
 :
     BaseType( socketServer, sock )
 {
+    // No way to detect error here
+    bool ret = startReadingConnection();
+    Q_ASSERT(ret);
 }
 
 void StunServerConnection::processMessage( nx_stun::Message&& message )
@@ -43,7 +46,6 @@ void StunServerConnection::processMessage( nx_stun::Message&& message )
 
 void StunServerConnection::processGetIPAddressRequest( nx_stun::Message&& request )
 {
-    //TODO get remote host address from socket, create response and send with sendMessage( response )
     bool system_name_ok = false;
     bool server_id_ok = false;
     bool authorization_ok = false;

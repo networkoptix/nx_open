@@ -38,7 +38,10 @@ namespace nx_stun
             const SocketAddress& stunServerEndpoint,
             bool useSsl = false,
             SocketFactory::NatTraversalType natTraversalType = SocketFactory::nttAuto );
-        virtual ~StunClientConnection();
+
+        virtual ~StunClientConnection() {
+            pleaseStop( std::function<void()>() );
+        }
 
         //!Implementation of QnStoppableAsync::pleaseStop
         /*!
@@ -79,6 +82,7 @@ namespace nx_stun
 
         static const SystemError::ErrorCode STUN_REQUEST_FAIL = 1;
         static const SystemError::ErrorCode STUN_REPLY_PACKAGE_BROKEN = 2;
+        static const SystemError::ErrorCode STUN_CONN_CANNOT_READ = 3;
 
     private:
         typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
@@ -96,16 +100,20 @@ namespace nx_stun
             \note Required by \a nx_api::BaseStreamProtocolConnection
         */
         void processMessage( nx_stun::Message&& msg );
+
+        void onRequestMessageRecv( nx_stun::Message& msg );
+
+        void onIndicationMessageRecv( nx_stun::Message& msg );
         
         void onConnectionComplete( SystemError::ErrorCode , const std::function<void(SystemError::ErrorCode)>& func );
 
         void onRequestSend( SystemError::ErrorCode );
-        
-        void dispatchPendingRequest();
+
+        bool dispatchPendingRequest( SystemError::ErrorCode ec );
 
         bool hasErrorAttribute( const nx_stun::Message& msg );
 
-        bool enqueuePendingRequest( nx_stun::Message&& , std::function<void(SystemError::ErrorCode,nx_stun::Message&&)>&& );
+        void enqueuePendingRequest( nx_stun::Message&& , std::function<void(SystemError::ErrorCode,nx_stun::Message&&)>&& );
 
         void resetOutstandingRequest();
 
@@ -122,6 +130,7 @@ namespace nx_stun
         // Set up a pending request list for send request operations.
         // Because of the following reason:
         // sendRequest needs to wait for openConnection completion
+
         struct PendingRequest {
             bool execute;
             nx_stun::Message request_message;
@@ -134,9 +143,11 @@ namespace nx_stun
         };
 
         // Using this context to represent the current outstanding request 
-        
         std::unique_ptr<PendingRequest> m_outstandingRequest;
         std::mutex m_mutex;
+
+        // Indication handler 
+        std::function<void(nx_stun::Message&&)> m_indicationHandler;
 
         nx_stun::MessageParser m_messageParser;
         nx_stun::MessageSerializer m_messageSerializer;

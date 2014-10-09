@@ -40,7 +40,6 @@ public:
 
     void processMessage( nx_stun::Message&& request );
 
-
 private:
     void processGetIPAddressRequest( nx_stun::Message&& request );
     void processProprietaryRequest( nx_stun::Message&& request );
@@ -57,7 +56,9 @@ private:
 
     void onSendComplete( SystemError::ErrorCode ec ) {
         Q_UNUSED(ec);
-        // TODO:: Add logic for handling completion
+        // After sending the request, then we start to read the response
+        bool ret = BaseType::startReadingConnection();
+        Q_ASSERT(ret);
     }
 
 private:
