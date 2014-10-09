@@ -110,7 +110,7 @@ public:
     */
     QStringList getAllStoragePathes() const;
 
-    bool addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
+    bool addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark, bool forced = false);
     bool updateBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
     bool deleteBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
     bool getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);

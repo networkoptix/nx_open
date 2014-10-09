@@ -135,7 +135,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
         .arg(QDateTime::fromMSecsSinceEpoch(startTime).toString())
         .arg(QDateTime::fromMSecsSinceEpoch(endTime).toString());
 
-    return qnStorageMan->addBookmark(camera->getUniqueId().toUtf8(), bookmark);
+    return qnStorageMan->addBookmark(camera->getUniqueId().toUtf8(), bookmark, true);
 }
 
 

@@ -8,7 +8,7 @@
 
 QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, QnBusiness::EventState state) {
     if (QnBusiness::requiresCameraResource(rule->actionType()) && rule->actionResources().isEmpty())
-        return QnAbstractBusinessActionPtr(); //camera is not exists anymore
+        return QnAbstractBusinessActionPtr(); //camera does not exist anymore
     //TODO: #GDM #Business check resource type?
 
     QnBusinessEventParameters runtimeParams = event->getRuntimeParams();
