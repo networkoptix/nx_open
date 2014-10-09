@@ -28,7 +28,6 @@ public:
 private:
     void initTranslations();
 
-    QColor defaultBackgroundColor() const;
     QColor backgroundColor() const;
     void updateBackgroundColor();
 
@@ -50,7 +49,9 @@ private:
     bool m_oldDoubleBuffering;
     int m_oldLanguage;
     int m_oldSkin;
-    QColor m_oldBackgroundColor;
+
+    Qn::ClientBackground m_oldBackgroundMode;
+    QColor m_oldCustomBackgroundColor;
 };
 
 #endif // GENERAL_PREFERENCES_WIDGET_H

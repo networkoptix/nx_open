@@ -138,9 +138,10 @@ QList<QnGenericTabbedDialog::Page> QnGenericTabbedDialog::modifiedPages() const 
 }
 
 bool QnGenericTabbedDialog::tryClose(bool force) {
+    if (!discard())
+        return false;   //TODO: #dklychkov and what then? see QnWorkbenchConnectHandler
+
     if (force) {
-        if (!discard())
-            return false;   //TODO: #dklychkov and what then? see QnWorkbenchConnectHandler
         loadData();
         hide();
         return true;

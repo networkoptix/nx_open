@@ -3,6 +3,8 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QtEndian>
 
+#include <core/resource/network_resource.h>
+
 #include "business/events/abstract_business_event.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"

@@ -1662,7 +1662,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Alt+T")).
         text(tr("Disable Background Animation")).
         toggledText(tr("Enable Background Animation")).
-        checked(qnSettings->isBackgroundEnabled()).
+        checked(true).
         autoRepeat(false);
 
 #ifdef QN_ENABLE_BOOKMARKS

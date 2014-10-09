@@ -21,6 +21,9 @@ public:
 
     virtual void drawLayer(QPainter *painter, const QRectF &rect) = 0;
 
+    bool isEnabled() const;
+    void setEnabled(bool enabled);
+
 protected:
     virtual void installedNotify() {}
 
@@ -44,6 +47,9 @@ private:
 
     /** Scene layer that this painter draws. */
     QGraphicsScene::SceneLayer m_layer;
+
+    /** Flag that painter is enabled. */
+    bool m_enabled;
 };
 
 
