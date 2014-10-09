@@ -415,7 +415,9 @@ private:
         std::shared_ptr<AsyncSSLOperation> operation;
         nx::Buffer data;
         PendingWriteIO( nx::Buffer&& buffer , const std::shared_ptr<AsyncSSLOperation>& op ) :
-            data(std::move(buffer)),operation(op){}
+            operation(op),
+            data(std::move(buffer))
+        {}
     };
 
     std::list<std::unique_ptr<PendingWriteIO> > pending_write_io_list_;
@@ -897,11 +899,12 @@ void AsyncSSL::HandleSSLError( int ssl_error ) {
 class AsyncSSLRead : public AsyncSSLOperation {
 public:
     AsyncSSLRead( nx::Buffer* user_buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& callback ,
-        SSL* ssl , AsyncSSL* async_ssl ) :
-        user_buffer_(user_buffer),
+                  SSL* ssl , AsyncSSL* async_ssl ) :
+        AsyncSSLOperation(ssl,async_ssl),
         user_callback_(std::move(callback)),
-        written_size_(0),
-        AsyncSSLOperation(ssl,async_ssl) {}
+        user_buffer_(user_buffer),
+        written_size_(0)
+    {}
 
 protected:
     virtual void InvokeUserFinializeHandler() {
@@ -959,10 +962,11 @@ void AsyncSSLRead::Perform( int* return_value , int* ssl_error ) {
 class AsyncSSLWrite : public AsyncSSLOperation {
 public:
     AsyncSSLWrite( const nx::Buffer& user_buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& user_callback ,
-        SSL* ssl, AsyncSSL* async_ssl ) :
-    user_buffer_(user_buffer),
+                   SSL* ssl, AsyncSSL* async_ssl ) :
+        AsyncSSLOperation(ssl,async_ssl),
         user_callback_(std::move(user_callback)),
-        AsyncSSLOperation(ssl,async_ssl){}
+        user_buffer_(user_buffer)
+    {}
 
 protected:
     virtual void InvokeUserFinializeHandler() {
@@ -1005,14 +1009,15 @@ void AsyncSSLWrite::Perform( int* return_value , int* ssl_error ) {
 class AsyncSSLHandshake : public AsyncSSLOperation {
 public:
     AsyncSSLHandshake( bool server , std::function<void(SystemError::ErrorCode)>&& user_callback ,
-        SSL* ssl, AsyncSSL* async_ssl ) :
-        user_callback_(std::move(user_callback)),
-        AsyncSSLOperation(ssl,async_ssl) {
-            if(server)
-                SSL_set_accept_state(ssl_);
-            else
-                SSL_set_connect_state(ssl_);
-        }
+                       SSL* ssl, AsyncSSL* async_ssl ) :
+        AsyncSSLOperation(ssl,async_ssl),
+        user_callback_(std::move(user_callback))
+    {
+        if(server)
+            SSL_set_accept_state(ssl_);
+        else
+            SSL_set_connect_state(ssl_);
+    }
 
     virtual void Perform( int* return_value , int* ssl_error ) {
         *return_value = SSL_do_handshake(ssl_);
