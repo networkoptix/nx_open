@@ -28,8 +28,9 @@ public:
     int motionSensWindowCount() const;
 
 
-    bool hasMotion();
-    Qn::MotionType getMotionType();
+    bool hasMotion() const;
+    Qn::MotionType getMotionType() const;
+    Qn::MotionType getMotionTypeRaw() const;
     void setMotionType(Qn::MotionType value);
 
     QnSecurityCamResource();

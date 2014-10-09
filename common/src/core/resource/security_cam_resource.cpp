@@ -441,7 +441,7 @@ Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const {
     return result;
 }
 
-bool QnSecurityCamResource::hasMotion() {
+bool QnSecurityCamResource::hasMotion() const {
     Qn::MotionType motionType = getMotionType();
     if (motionType == Qn::MT_SoftwareGrid)
         return hasDualStreaming2() || (getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability);
@@ -449,14 +449,14 @@ bool QnSecurityCamResource::hasMotion() {
         return motionType != Qn::MT_NoMotion;
 }
 
-Qn::MotionType QnSecurityCamResource::getMotionType() {
-    if (m_motionType == Qn::MT_Default)
-        m_motionType = getDefaultMotionType();
+Qn::MotionType QnSecurityCamResource::getMotionType() const {
+    if (m_motionType == Qn::MT_Default || !(supportedMotionType() & m_motionType))
+        return getDefaultMotionType();
+    else
+        return m_motionType;
+}
 
-    // filter motion type in case if supported motion type has been changed
-    if ((supportedMotionType() & m_motionType) == 0)
-        m_motionType = getDefaultMotionType();
-
+Qn::MotionType QnSecurityCamResource::getMotionTypeRaw() const {
     return m_motionType;
 }
 
