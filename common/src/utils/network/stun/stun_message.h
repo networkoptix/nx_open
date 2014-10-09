@@ -196,24 +196,24 @@ namespace nx_stun
 } // namespace nx_stun
 
 
-namespace std {
-    // We need this hash function to make the code work with standard compatible
-    // compiler like GCC/CLANG. The C++ 11 doesn't provide hash function for enum.
-    template<> struct hash< nx_stun::attr::AttributeType > {
-        std::size_t operator()(const nx_stun::attr::AttributeType& k) const {
-            return static_cast<std::size_t>(k);
-        }
-    };
-
-}// namespace std
-
 namespace nx_stun {
+
+    namespace {
+        // A specialized hash class for C++11 since it doesn't comes with built-in enum hash
+        // function. Not a specialized template for hash class in namespace std .
+        template< typename T > struct StunHash {};
+        template<> struct StunHash<attr::AttributeType> {
+            std::size_t operator () ( const attr::AttributeType& a ) {
+                return static_cast<std::size_t>(a);
+            }
+        };
+    }
 
     class Message
     {
     public:
         Header header;
-        typedef std::unordered_multimap<attr::AttributeType, std::unique_ptr<attr::Attribute> > AttributesMap;
+        typedef std::unordered_multimap<attr::AttributeType, std::unique_ptr<attr::Attribute> , StunHash<attr::AttributeType> > AttributesMap;
         AttributesMap attributes;
         Message( Message&& message ) :
             header( std::move(message.header) ),

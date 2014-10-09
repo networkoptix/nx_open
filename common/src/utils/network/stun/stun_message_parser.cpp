@@ -6,9 +6,6 @@
 #include <QtEndian>
 #include <QString>
 
-
-
-
 namespace nx_stun{
 using namespace attr;
 
