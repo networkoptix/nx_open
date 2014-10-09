@@ -228,6 +228,7 @@ bool QnStorageDb::removeCameraBookmarks(const QString& cameraUniqueId) {
     if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM storage_bookmark)", m_sdb))
         return false;
 
+    flushRecords();
     return true;
 }
 
@@ -289,6 +290,7 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
         }
     }
 
+    flushRecords();
     return true;
 }
 
@@ -312,6 +314,7 @@ bool QnStorageDb::deleteCameraBookmark(const QnCameraBookmark &bookmark) {
     if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM storage_bookmark)", m_sdb))
         return false;
 
+    flushRecords();
     return true;
 }
 
