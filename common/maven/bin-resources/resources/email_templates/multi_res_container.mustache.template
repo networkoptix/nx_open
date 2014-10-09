@@ -65,8 +65,8 @@
             <table class="content">
             {{#aggregated}}
                     <tr>
-                        <td>
-                            <h6>{{source}}</h6>
+                        <td width="50%">
+                            <h6 class="no-margin">{{source}}</h6>
                             {{#urlext}}
                             <a class="btn" href="{{urlext}}">External Link &raquo;</a><a class="btn" href="{{urlint}}">Internal Link &raquo;</a>
                             {{/urlext}}
