@@ -7,6 +7,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
 #include <QtCore/QFileInfo>
+#include <QtCore/QMutex>
 
 #include <deque>
 #include <QtCore/QFileInfo>
