@@ -452,6 +452,11 @@ bool QnSecurityCamResource::hasMotion() {
 Qn::MotionType QnSecurityCamResource::getMotionType() {
     if (m_motionType == Qn::MT_Default)
         m_motionType = getDefaultMotionType();
+
+    // filter motion type in case if supported motion type has been changed
+    if ((supportedMotionType() & m_motionType) == 0)
+        m_motionType = getDefaultMotionType();
+
     return m_motionType;
 }
 

@@ -1,0 +1,403 @@
+changeset:   31071:ef4958ce5681
+branch:      emailNotifications
+parent:      31046:f9268a05771b
+parent:      31070:e7dc4e253d80
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Thu Oct 09 12:16:53 2014 +0400
+summary:     merge with default
+
+changeset:   31048:fad4bee2dff2
+parent:      31047:66f73c4bb42a
+parent:      31043:8ed04beffce5
+user:        Ivan Vigasin <ivigasin@networkoptix.com>
+date:        Wed Oct 08 21:51:29 2014 +0400
+summary:     merge
+
+changeset:   31044:030b44258078
+branch:      split_tran
+parent:      31034:50bb3c00e596
+parent:      31043:8ed04beffce5
+user:        Andrey Kolesnikov <akolesnikov@networkoptix.com>
+date:        Wed Oct 08 20:54:49 2014 +0400
+summary:     Merge with default
+
+changeset:   31041:80a6753b89b7
+parent:      31040:212879bea392
+parent:      31035:94e9a41ce03e
+user:        dianpeng <dpeng@networkoptix.com>
+date:        Wed Oct 08 09:39:16 2014 -0700
+summary:     merge
+
+changeset:   31039:48337a865a40
+parent:      31038:2bcc9b5d01cd
+parent:      30971:c55da841ac5f
+user:        dianpeng <dpeng@networkoptix.com>
+date:        Tue Oct 07 16:38:36 2014 -0700
+summary:     merge
+
+changeset:   31033:0e7b9601658c
+parent:      31032:f2da391f5af1
+parent:      31029:604623ae501a
+user:        Sergey Ivanov <sivanov@networkoptix.com>
+date:        Wed Oct 08 20:16:12 2014 +0400
+summary:     Merge
+
+changeset:   31028:a422598baf8d
+parent:      31013:4a2ddc70d069
+user:        Boris Biruchkov <b.biruchkov@gmail.com>
+date:        Wed Oct 08 08:58:06 2014 -0700
+summary:     webadmin integrated into ms
+
+changeset:   31019:744f9ab850ef
+branch:      nat_traversal
+parent:      30851:2205bc2afe95
+parent:      31013:4a2ddc70d069
+user:        Andrey Kolesnikov <akolesnikov@networkoptix.com>
+date:        Wed Oct 08 18:49:13 2014 +0400
+summary:     Merge with default
+
+changeset:   31004:dd6e69d54c96
+branch:      split_tran
+parent:      31003:72b8470419e8
+parent:      31002:3a572ab34526
+user:        Roman Vasilenko <r.vasilenko@gmail.com>
+date:        Wed Oct 08 16:07:25 2014 +0400
+summary:     Merge
+
+changeset:   31001:3f14777aa8e5
+branch:      split_tran
+parent:      30998:3f47fdc84c48
+parent:      30992:9c22a10cf251
+user:        Andrey Kolesnikov <akolesnikov@networkoptix.com>
+date:        Wed Oct 08 15:36:13 2014 +0400
+summary:     Merge with default
+
+changeset:   30996:646489b4342d
+parent:      30992:9c22a10cf251
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Wed Oct 08 17:21:43 2014 +0400
+summary:     restart without saving port
+
+changeset:   30992:9c22a10cf251
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Wed Oct 08 15:30:42 2014 +0400
+summary:     WA: require port
+
+changeset:   30990:7833b7aeaafc
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Wed Oct 08 14:46:22 2014 +0400
+summary:     WA: settings validation
+
+changeset:   30988:0aff9e4de930
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Wed Oct 08 13:28:26 2014 +0400
+summary:     WA: SDK link, link fixes
+
+changeset:   30985:b053a0bb0f36
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Wed Oct 08 13:08:24 2014 +0400
+summary:     WA: add hwcalk link to customization
+
+changeset:   30982:fff6dbe610be
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Wed Oct 08 12:24:25 2014 +0400
+summary:     WA: add customization to build, publish
+
+changeset:   30981:ca4f213d0feb
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Wed Oct 08 12:19:50 2014 +0400
+summary:     WA: customization - btn colors
+
+changeset:   30979:174aba60b9d4
+parent:      30977:40ddf257cb22
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Wed Oct 08 11:33:42 2014 +0400
+summary:     WA: SDK link
+
+changeset:   30955:0676c02bd4bc
+parent:      30954:963f77f16a3d
+parent:      30951:bf5301129dc7
+user:        Sergey Ivanov <sivanov@networkoptix.com>
+date:        Tue Oct 07 18:37:08 2014 +0400
+summary:     Merge
+
+changeset:   30951:bf5301129dc7
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Tue Oct 07 18:26:13 2014 +0400
+summary:     WA: publish, customization update
+
+changeset:   30941:75ecabbb24ba
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Tue Oct 07 18:23:25 2014 +0400
+summary:     WA: customizable header, non-admin user
+
+changeset:   30939:f678e06180fa
+parent:      30933:135eb045de5b
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Tue Oct 07 15:58:48 2014 +0400
+summary:     WA: customization
+
+changeset:   30924:0679d65df3b9
+parent:      30923:7709dfb90b9f
+parent:      30922:a691d0cbe848
+user:        Roman Vasilenko <r.vasilenko@gmail.com>
+date:        Tue Oct 07 13:59:35 2014 +0400
+summary:     Merge
+
+changeset:   30916:168da5868aa5
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Tue Oct 07 14:27:51 2014 +0400
+summary:     WA:customization
+
+changeset:   30915:0b6ea03f2df5
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Tue Oct 07 12:29:17 2014 +0400
+summary:     WA: publish
+
+changeset:   30914:3495b76ec10b
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Tue Oct 07 12:27:48 2014 +0400
+summary:     WA: change port - bugfix
+
+changeset:   30913:cbbdd862c0f3
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Tue Oct 07 12:18:47 2014 +0400
+summary:     WA: don't publish bower
+
+changeset:   30911:e6c8eb5d8d08
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Tue Oct 07 12:16:38 2014 +0400
+summary:     WA: publish fonts for icons
+
+changeset:   30909:a646f13a94b3
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Tue Oct 07 12:01:17 2014 +0400
+summary:     WA: server restart process
+
+changeset:   30895:69eaa4b8f60f
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Tue Oct 07 11:47:41 2014 +0400
+summary:     WA: grunt publish task
+
+changeset:   30828:b86fb936ac66
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Oct 03 18:17:43 2014 +0400
+summary:     WA: monitoring while offline - message
+
+changeset:   30827:2e0d4b1803e4
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Oct 03 18:10:15 2014 +0400
+summary:     WA: monitoring while offline
+
+changeset:   30826:1b653ecad1fe
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Oct 03 17:34:30 2014 +0400
+summary:     WA: debug restarting process
+
+changeset:   30824:85eaecf6241d
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Oct 03 17:25:38 2014 +0400
+summary:     WA: debug restarting process
+
+changeset:   30823:fd543eded725
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Oct 03 17:15:43 2014 +0400
+summary:     WA: debug restarting process
+
+changeset:   30822:2a05e4aadb59
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Oct 03 17:02:41 2014 +0400
+summary:     WA: debug restarting process
+
+changeset:   30821:878dcebbf66c
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Oct 03 16:26:59 2014 +0400
+summary:     WA: publish
+
+changeset:   30820:9cca17bf2c56
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Oct 03 16:02:40 2014 +0400
+summary:     WA: log 10000 lines in new window
+
+changeset:   30819:c4fd2f2aad95
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Oct 03 15:59:21 2014 +0400
+summary:     WA: publish
+
+changeset:   30818:13ca2ee85694
+parent:      30816:67a12c9f28a1
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Oct 03 15:53:51 2014 +0400
+summary:     WA: health monitoring improvment, storage formatting, new confirm for restart
+
+changeset:   30815:46a317542789
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Oct 03 14:45:24 2014 +0400
+summary:     WA: health monitoring - checkboxes
+
+changeset:   30814:6005bbd04390
+parent:      30811:1316662b1ec8
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Oct 03 13:48:09 2014 +0400
+summary:     WA: minor improvements
+
+changeset:   30682:a60cc988db94
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Mon Sep 29 17:25:32 2014 +0400
+summary:     health monitoring files
+
+changeset:   30681:737988bb1c4e
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Mon Sep 29 17:21:45 2014 +0400
+summary:     Health monitoring
+
+changeset:   30631:7c25e0784cfb
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Sep 26 11:40:56 2014 +0400
+summary:     WA: discoveredpeers fix
+
+changeset:   30610:fb22b590a1ee
+parent:      30608:f6b980a60373
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Thu Sep 25 16:43:09 2014 +0400
+summary:     WA: discover servers for join
+
+changeset:   30599:b7a663fcf554
+user:        Denis Klychkov <dklychkov@networkoptix.com>
+date:        Thu Sep 25 12:43:42 2014 +0400
+summary:     fix doc for mergeSystems
+
+changeset:   30598:15e3fc5813ff
+user:        Denis Klychkov <dklychkov@networkoptix.com>
+date:        Thu Sep 25 12:33:06 2014 +0400
+summary:     restore api doc removed by commit #6a84afc1fdb5
+
+changeset:   30571:221e1972d8be
+parent:      30569:04c2ad25ce0e
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Wed Sep 24 17:57:58 2014 +0400
+summary:     WA: merge systems
+
+changeset:   30567:95a643a0c344
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Wed Sep 24 17:28:52 2014 +0400
+summary:     WA: merge systems
+
+changeset:   30563:6119956bc696
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Wed Sep 24 16:58:04 2014 +0400
+summary:     WA: restart process, new merge system
+
+changeset:   30416:729be15d1389
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Sep 19 12:20:20 2014 +0400
+summary:     WA: Eula example
+
+changeset:   30383:9d419800df3a
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Thu Sep 18 19:47:55 2014 +0400
+summary:     WA: hotfix
+
+changeset:   30362:c45c1edccfc7
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Thu Sep 18 19:39:45 2014 +0400
+summary:     restart and ping process
+
+changeset:   30361:fa324ba3e6aa
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Thu Sep 18 19:39:15 2014 +0400
+summary:     restart and ping process
+
+changeset:   30347:a7e7d93049d2
+branch:      webadmin
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Thu Sep 18 17:02:51 2014 +0400
+summary:     WA: start merging
+
+changeset:   30345:5983fcab4e31
+branch:      webadmin
+parent:      30297:93b73109e954
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Thu Sep 18 14:43:24 2014 +0400
+summary:     advanced settings save
+
+changeset:   30297:93b73109e954
+branch:      webadmin
+parent:      30152:45444f94bec7
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Wed Sep 17 14:25:04 2014 +0400
+summary:     WA: htlp, developers, webclient pages
+
+changeset:   30152:45444f94bec7
+branch:      webadmin
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Sep 12 17:05:59 2014 +0400
+summary:     restart interface
+
+changeset:   30151:530420b26910
+branch:      webadmin
+parent:      30141:5b7d1de7ad6e
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Sep 12 15:25:30 2014 +0400
+summary:     WA - advanced - save changes
+
+changeset:   30141:5b7d1de7ad6e
+branch:      webadmin
+parent:      30107:b750af555d0a
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Sep 12 15:19:52 2014 +0400
+summary:     WA - advanced - save changes
+
+changeset:   30107:b750af555d0a
+branch:      webadmin
+parent:      30093:4826daa528e7
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Fri Sep 12 13:11:26 2014 +0400
+summary:     WA: advanced interface
+
+changeset:   30093:4826daa528e7
+branch:      webadmin
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Thu Sep 11 17:37:04 2014 +0400
+summary:     webadmin - settings and advanced page
+
+changeset:   30092:85d2963d2bc5
+branch:      webadmin
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Thu Sep 11 13:49:14 2014 +0400
+summary:     Info and advanced page created
+
+changeset:   29950:3487c9e54f83
+parent:      29948:1ab4c1379cfb
+user:        Ivan Vigasin <ivigasin@networkoptix.com>
+date:        Tue Sep 09 18:22:41 2014 +0400
+summary:     add webadmin mockup
+
+changeset:   29946:a18620b624af
+parent:      29944:0a6fa01f5b57
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Tue Sep 09 17:39:06 2014 +0400
+summary:     Webadmin: iframe with server log
+
+changeset:   29942:5b3f3113696a
+user:        Evgeny Balashov <ebalashov@networkoptix.com>
+date:        Tue Sep 09 17:13:16 2014 +0400
+summary:     Webadmin: servername in IP in header
+
+changeset:   29892:40c463dd5d3f
+parent:      29884:2b2db7fd914f
+user:        Ivan Vigasin <ivigasin@networkoptix.com>
+date:        Mon Sep 08 19:27:19 2014 +0400
+summary:     latest webadmin
+
+changeset:   27149:45a052aac002
+user:        Ivan Vigasin <ivigasin@networkoptix.com>
+date:        Mon Jun 16 20:31:25 2014 +0400
+summary:     Integrate webadmin into netoptix_vms project. Fix situation where MS always returned HTTP 200 for absent files in /static.
+
+changeset:   27148:9683fd667b7b
+parent:      27128:e148d289e019
+user:        Ivan Vigasin <ivigasin@networkoptix.com>
+date:        Mon Jun 16 17:00:17 2014 +0400
+summary:     webadmin: moved from separate repository
+
