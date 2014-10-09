@@ -208,7 +208,7 @@
                                                 <![CDATA[</RootNamespace>
     <TargetName>${project.artifactId}</TargetName>]]></value>
                                         </replacement> 
-										<replacement>
+                                        <replacement>
                                             <token>
                                                 <![CDATA[<PlatformToolSet>v110</PlatformToolSet>]]></token>
                                             <value>
@@ -268,6 +268,41 @@
                                             <xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.res')]</xpath>
                                             <token>CustomBuild</token>
                                             <value>None</value>
+                                        </replacement>
+
+                                        <!-- Disabling moc preprocessor steps, since we do it with jom -->
+                                        <replacement>
+                                            <xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.h')]</xpath>
+                                            <token><![CDATA[</CustomBuild>]]></token>
+                                            <value><![CDATA[
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </CustomBuild>
+                                            ]]></value>
+                                        </replacement>
+
+                                        <!-- Adding moc preprocessor steps with jom -->
+                                        <replacement>
+                                            <xpath>//Project/ItemDefinitionGroup[not(@*)]</xpath>
+                                            <token><![CDATA[</Link>]]></token>
+                                            <value><![CDATA[
+    </Link>
+    <PreBuildEvent>
+      <Command>\$\(ProjectDir\)../\$\(Platform\)/build_moc.bat \$\(ProjectDir\)../\$\(Platform\) \$\(Configuration\)</Command>
+    </PreBuildEvent>
+                                            ]]></value>
+                                        </replacement>
+
+                                        <!-- Cleaning moc files -->
+                                        <replacement>
+                                            <!-- <xpath>//Project/ItemDefinitionGroup[not(@*)]</xpath> -->
+                                            <token><![CDATA[<ItemDefinitionGroup>]]></token>
+                                            <value><![CDATA[
+  <Target Name="BeforeClean">
+    <Message Text="Cleaning moc generated files"/>
+    <Exec Command="del \$\(ProjectDir\)..\\\$\(Platform\)\\build\\\$\(Configuration\)\\generated\\moc_*.* /F /Q" />
+  </Target>
+  <ItemDefinitionGroup>
+                                            ]]></value>
                                         </replacement>
 
                                         <!-- Enabling SEH exceptions for crash stack dump -->

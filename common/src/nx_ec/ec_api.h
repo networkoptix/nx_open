@@ -277,10 +277,10 @@ namespace ec2
         /*!
             \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId. 
                 If NULL, returned list contains data of all known servers
-            \param handler Functor with params: (ErrorCode, const QnMediaServerUserAttributesList& serverUserAttributesList)
+            \param handler Functor with params: (ErrorCode, const QnResourceList& storages)
         */
         template<class TargetType, class HandlerType> int getStorages( const QnUuid& mediaServerId, TargetType* target, HandlerType handler ) {
-            return getStorages( mediaServerId, std::static_pointer_cast<impl::GetSStoragesHandler>(std::make_shared<impl::CustomGetStoragesHandler<TargetType, HandlerType>>(target, handler)) );
+            return getStorages( mediaServerId, std::static_pointer_cast<impl::GetStoragesHandler>(std::make_shared<impl::CustomGetStoragesHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
         /*!
