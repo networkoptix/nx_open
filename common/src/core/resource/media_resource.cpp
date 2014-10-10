@@ -134,12 +134,15 @@ QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const {
 }
 
 
-void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), toResource()->getId() );
-    if ((*userAttributesLock)->dewarpingParams == params)
-        return;
+void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) 
+{
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), toResource()->getId() );
+        if ((*userAttributesLock)->dewarpingParams == params)
+            return;
 
-    (*userAttributesLock)->dewarpingParams = params;
+        (*userAttributesLock)->dewarpingParams = params;
+    }
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
