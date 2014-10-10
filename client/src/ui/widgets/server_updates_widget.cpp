@@ -42,10 +42,10 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui(new Ui::QnServerUpdatesWidget),
     m_latestVersion(qnCommon->engineVersion()),
     m_checkingInternet(false),
-    m_checkingLocal(false)
+    m_checkingLocal(false),
+    m_longUpdateWarningTimer(new QTimer(this))
 {
     ui->setupUi(this);
-    setWarningStyle(ui->dayWarningLabel);
 
     m_updateTool = new QnMediaServerUpdateTool(this);
     m_updatesModel = new QnServerUpdatesModel(m_updateTool, this);
@@ -104,10 +104,12 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->dayWarningLabel->setText(tr("As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week."));
 
     setWarningStyle(ui->connectionProblemLabel);
+    setWarningStyle(ui->longUpdateWarning);
 
     static_assert(tooLateDayOfWeek <= Qt::Sunday, "In case of future days order change.");
     ui->dayWarningLabel->setVisible(false);
     ui->connectionProblemLabel->setVisible(false);
+    ui->longUpdateWarning->setVisible(false);
 
     QTimer* updateTimer = new QTimer(this);
     updateTimer->setSingleShot(false);
@@ -124,6 +126,10 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
         checkForUpdatesInternet();
     });
     updateTimer->start();
+
+    m_longUpdateWarningTimer->setInterval(longInstallWarningTimeout);
+    m_longUpdateWarningTimer->setSingleShot(true);
+    connect(m_longUpdateWarningTimer, &QTimer::timeout, ui->longUpdateWarning, &QLabel::show);
 
     at_tool_stageChanged(QnFullUpdateStage::Init);
 }
@@ -493,6 +499,8 @@ void QnServerUpdatesWidget::at_tool_stageChanged(QnFullUpdateStage stage) {
         ui->internetUpdateButton->setEnabled(false);
         ui->localUpdateButton->setEnabled(false);
     } else { /* Stage returned to idle, update finished. */
+        ui->longUpdateWarning->hide();
+        m_longUpdateWarningTimer->stop();
     }
 
     ui->dayWarningLabel->setVisible(QDateTime::currentDateTime().date().dayOfWeek() >= tooLateDayOfWeek);
@@ -511,6 +519,9 @@ void QnServerUpdatesWidget::at_tool_stageChanged(QnFullUpdateStage stage) {
     case QnFullUpdateStage::Incompatible:
     case QnFullUpdateStage::Push:
         cancellable = true;
+        break;
+    case QnFullUpdateStage::Servers:
+        m_longUpdateWarningTimer->start();
         break;
     default:
         break;
@@ -563,4 +574,3 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
     ui->updateProgessBar->setValue(value);
     ui->updateProgessBar->setFormat(status.arg(value));
 }
-

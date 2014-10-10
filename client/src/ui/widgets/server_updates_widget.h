@@ -68,6 +68,8 @@ private:
     bool m_checkingLocal;
 
     QUrl m_releaseNotesUrl;
+
+    QTimer *m_longUpdateWarningTimer;
 };
 
 #endif // SERVER_UPDATES_WIDGET_H
