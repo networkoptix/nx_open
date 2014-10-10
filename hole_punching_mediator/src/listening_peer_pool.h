@@ -24,7 +24,7 @@ public:
     /*!
         \note Follows \a STUNMessageDispatcher::MessageProcessorType signature
     */
-    bool processBindRequest( StunServerConnection* connection, nx_stun::Message&& message );
+    bool processListenRequest( StunServerConnection* connection, nx_stun::Message&& message );
     /*!
         \note Follows \a STUNMessageDispatcher::MessageProcessorType signature
     */

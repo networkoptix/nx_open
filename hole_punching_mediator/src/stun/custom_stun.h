@@ -16,8 +16,9 @@ namespace nx_hpm
     {
         enum Value
         {
-            bind = nx_stun::MethodType::user_method,
-            connect
+            listen = nx_stun::MethodType::userMethod,
+            connect,
+            connectionRequested
         };
     };
 

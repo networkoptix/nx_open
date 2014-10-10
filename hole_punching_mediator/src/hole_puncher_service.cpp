@@ -131,9 +131,9 @@ int HolePuncherProcess::executeApplication()
 
     STUNMessageDispatcher stunMessageDispatcher;
     stunMessageDispatcher.registerRequestProcessor(
-        nx_hpm::StunMethods::bind,
+        nx_hpm::StunMethods::listen,
         [&listeningPeerPool](StunServerConnection* connection, nx_stun::Message&& message) -> bool {
-            return listeningPeerPool.processBindRequest( connection, std::move(message) );
+            return listeningPeerPool.processListenRequest( connection, std::move(message) );
         } );
     stunMessageDispatcher.registerRequestProcessor(
         nx_hpm::StunMethods::connect,

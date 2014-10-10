@@ -118,7 +118,7 @@
     <h3>2.3. STUN interface</h3>
     Each requests should be verified so that only our modules can connect.
     Following requests are required:
-      - <b>bind</b>
+      - <b>listen</b>
         Register server accepting connections in mediator
         - Requests params:
           - system name
@@ -133,6 +133,7 @@
       - <b>connect</b>
         Client sends this request to connect to some server
         - Requests params:
+          - client peer id (guid)
           - system name
           - server id (optional). If not specified, connection to the nearest server is proposed
         - Response
@@ -147,6 +148,7 @@
         This indication is sent to the binded server when client requests connection to it
         - Params:
           - unique connection id (integer number)
+          - connecting peer id (guid)
           - client TCP endpoint
           - (optional) client UDT endpoint
       - <b>connection_update</b>
