@@ -166,11 +166,7 @@ public:
          */
         SayTextAction = 11,
 
-        /**
-         * Used when enumerating to build GUI lists, this and followed actions
-         * should not be displayed.
-         */
-        ActionCount // TODO: #Elric remove
+
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 

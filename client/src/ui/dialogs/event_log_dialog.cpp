@@ -84,12 +84,10 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
         m_actionTypesModel->appendRow(anyActionItem);
 
 
-        for (int i = 1; i < QnBusiness::ActionCount; i++) {
-            QnBusiness::ActionType val = (QnBusiness::ActionType) i;
-
-            QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
-            item->setData(val);
-            item->setData(QnBusiness::hasToggleState(val), ProlongedActionRole);
+        for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {
+            QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(actionType));
+            item->setData(actionType);
+            item->setData(QnBusiness::hasToggleState(actionType), ProlongedActionRole);
 
             QList<QStandardItem *> row;
             row << item;
