@@ -159,7 +159,9 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
 }
 
 void QnRoutingManagementWidget::at_removeButton_clicked() {
-    QModelIndex index = m_sortedServerAddressesModel->mapToSource(ui->addressesView->currentIndex());
+    QModelIndex currentIndex = ui->addressesView->currentIndex();
+
+    QModelIndex index = m_sortedServerAddressesModel->mapToSource(currentIndex);
     if (!index.isValid())
         return;
 
@@ -173,6 +175,13 @@ void QnRoutingManagementWidget::at_removeButton_clicked() {
 
     connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), QList<QUrl>() << url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     m_server->setAdditionalUrls(urls);
+
+    if (m_sortedServerAddressesModel->rowCount() > 0) {
+        ui->addressesView->setCurrentIndex(m_sortedServerAddressesModel->index(
+                                               qMin(currentIndex.row(), m_sortedServerAddressesModel->rowCount() - 1), currentIndex.column()));
+    } else {
+        ui->addressesView->setCurrentIndex(QModelIndex());
+    }
 }
 
 void QnRoutingManagementWidget::at_serversView_currentIndexChanged(const QModelIndex &current, const QModelIndex &previous) {
