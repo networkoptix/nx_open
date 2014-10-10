@@ -70,69 +70,31 @@
                     </execution>                            
                 </executions>
             </plugin>         
-            <!--    <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>2.5</version>
-                <executions>
-                    <execution>
-                        <id>auto-clean</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${clean-skip}</skip>
-                            <filesets>
-                                <fileset>
-                                    <directory>${project.build.directory}</directory>
-                                    <includes>
-                                        <include>${project.build.directory}/resources/static</include>
-                                    </includes>
-                                </fileset>   
-                            </filesets>                            
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>         
             <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
                 <executions>
                     <execution>
-                        <id>compile-sdk</id>
-                        <phase>initialize</phase>
+                        <id>copy-mediaserver-resources</id>
+                        <!-- This variable is for Android. Resources for all modules should be copied on the "generate-sources" phase. However Android should copy resources at "validate" -->
+                        <phase>${resources.phase}</phase>
                         <goals>
-                            <goal>run</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <failOnError>false</failOnError>
-                            <target>							
-                                <chmod file="${project.build.directory}/build_sdk.sh" perm="755"/>
-                                <exec dir="${project.build.directory}" executable="${project.build.directory}/build_sdk.${script.extension}" failifexecutionfails="true" />                                        
-                            </target>
-                        </configuration>
-                    </execution>					
-                </executions>
-            </plugin>        
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2.2</version>
-                <executions>
-                    <execution>
-                        <id>pack-sdk</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>${project.build.directory}/sdk.xml</descriptor>
-                            </descriptors>	
                             <outputDirectory>${project.build.directory}/resources/static</outputDirectory>
-                        </configuration>
+                            <overwrite>true</overwrite>
+                            <resources>          
+                                <resource>
+                                    <directory>${root.dir}/webadmin</directory>
+                                    <filtering>true</filtering>
+                                </resource>                                                                          
+                            </resources>              
+                        </configuration>            
                     </execution>
-                </executions>				
-            </plugin> 	-->   	
+                </executions>
+            </plugin>              
         </plugins>          
     </build>
 </project>

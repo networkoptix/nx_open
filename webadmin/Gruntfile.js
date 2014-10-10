@@ -131,15 +131,15 @@ module.exports = function (grunt) {
                 // Sasha
                 /*{
                     context: '/api/',
-                    host: '10.0.2.190',
-                    port: 7001,//7004,7005,2006
+                    host: '10.0.2.224',
+                    port: 7021,//7004,7005,2006
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
                 }, {
                     context: '/ec2/',
-                    host: '10.0.2.190',
-                    port: 7001,//7004,7005,2006
+                    host: '10.0.2.224',
+                    port: 7021,//7004,7005,2006
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
@@ -464,6 +464,7 @@ module.exports = function (grunt) {
                             '*.xml',
                             '*.xsl',
                             'views/{,*/}*.html',
+                            'customization/*',
                             //'bower_components/**/*',
                             'images/{,*/}*.{webp}',
                             'fonts/*'

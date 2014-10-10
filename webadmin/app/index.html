@@ -3,7 +3,7 @@
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title></title>
@@ -22,77 +22,79 @@
     <link rel="stylesheet" href="customization/styles.css">
 
     <style type="text/css">
-      body {
-          /*padding-top: 20px;*/
-          padding-bottom: 20px;
-      }
+        body {
+            /*padding-top: 20px;*/
+            padding-bottom: 20px;
+        }
     </style>
-  </head>
-  <body ng-app="webadminApp">
-    <!--[if lt IE 7]>
-      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-    <![endif]-->
+</head>
+<body ng-app="webadminApp">
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+<![endif]-->
 
-    <navbar></navbar>
+<navbar></navbar>
 
-    <!-- Add your site or application content here -->
-    <div class="container" ng-view=""></div>
+<!-- Add your site or application content here -->
+<div class="container" ng-view=""></div>
 
-    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
-     <!-- <script>
-       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+<!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
+<!-- <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-       ga('create', 'UA-XXXXX-X');
-       ga('send', 'pageview');
-    </script> -->
+  ga('create', 'UA-XXXXX-X');
+  ga('send', 'pageview');
+</script> -->
 
-    <!--[if lt IE 9]>
-    <script src="bower_components/es5-shim/es5-shim.js"></script>
-    <script src="bower_components/json3/lib/json3.min.js"></script>
-    <![endif]-->
+<!--[if lt IE 9]>
+<script src="bower_components/es5-shim/es5-shim.js"></script>
+<script src="bower_components/json3/lib/json3.min.js"></script>
+<![endif]-->
 
-    <!-- build:js scripts/vendor.js -->
-    <!-- bower:js -->
-    <script src="bower_components/jquery/jquery.js"></script>
-    <script src="bower_components/angular/angular.js"></script>
-    <script src="bower_components/sass-bootstrap/dist/js/bootstrap.js"></script>
-    <script src="bower_components/angular-resource/angular-resource.js"></script>
-    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
-    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
-    <script src="bower_components/angular-route/angular-route.js"></script>
-    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-    <script src="bower_components/underscore/underscore.js"></script>
-    <script src="bower_components/Chart.js/Chart.js"></script>
-    <script src="bower_components/tc-angular-chartjs/dist/tc-angular-chartjs.js"></script>
-    <!-- endbower -->
+<!-- build:js scripts/vendor.js -->
+<!-- bower:js -->
+<script src="bower_components/jquery/jquery.js"></script>
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/sass-bootstrap/dist/js/bootstrap.js"></script>
+<script src="bower_components/angular-resource/angular-resource.js"></script>
+<script src="bower_components/angular-cookies/angular-cookies.js"></script>
+<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+<script src="bower_components/angular-route/angular-route.js"></script>
+<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="bower_components/underscore/underscore.js"></script>
+<script src="bower_components/Chart.js/Chart.js"></script>
+<script src="bower_components/tc-angular-chartjs/dist/tc-angular-chartjs.js"></script>
+<!-- endbower -->
 
-    <!-- endbuild -->
+<!-- endbuild -->
 
-        <!-- build:js({.tmp,app}) scripts/scripts.js -->
-        <script src="scripts/app.js"></script>
-        <script src="scripts/controllers/main.js"></script>
-        <script src="scripts/controllers/navigation.js"></script>
-        <script src="scripts/directives/navbar.js"></script>
-        <script src="scripts/controllers/settings.js"></script>
-        <script src="scripts/controllers/join.js"></script>
-        <script src="scripts/services/mediaserver.js"></script>
-        <script src="scripts/directives/pwcheck.js"></script>
-        <script src="scripts/controllers/login.js"></script>
-        <script src="scripts/services/auth.js"></script>
-        <script src="scripts/directives/icon.js"></script>
-        <script src="scripts/directives/inplace-edit.js"></script>
-        <script src="scripts/controllers/advanced.js"></script>
-        <script src="scripts/controllers/info.js"></script>
-        <script src="scripts/controllers/restart.js"></script>
-        <script src="scripts/controllers/sdkeula.js"></script>
-        <script src="scripts/controllers/webclient.js"></script>
-        <script src="scripts/controllers/health.js"></script>
-        <!-- endbuild -->
+<!-- build:js({.tmp,app}) scripts/scripts.js -->
+
+<script src="scripts/config.js"></script>
+<script src="scripts/app.js"></script>
+<script src="scripts/controllers/main.js"></script>
+<script src="scripts/controllers/navigation.js"></script>
+<script src="scripts/directives/navbar.js"></script>
+<script src="scripts/controllers/settings.js"></script>
+<script src="scripts/controllers/join.js"></script>
+<script src="scripts/services/mediaserver.js"></script>
+<script src="scripts/directives/pwcheck.js"></script>
+<script src="scripts/controllers/login.js"></script>
+<script src="scripts/services/auth.js"></script>
+<script src="scripts/directives/icon.js"></script>
+<script src="scripts/directives/inplace-edit.js"></script>
+<script src="scripts/controllers/advanced.js"></script>
+<script src="scripts/controllers/info.js"></script>
+<script src="scripts/controllers/restart.js"></script>
+<script src="scripts/controllers/sdkeula.js"></script>
+<script src="scripts/controllers/webclient.js"></script>
+<script src="scripts/controllers/health.js"></script>
+<!-- endbuild -->
 
 
-    <script src="customization/config.js"></script>
+<script src="customization/config.js"></script>
 </body>
 </html>
