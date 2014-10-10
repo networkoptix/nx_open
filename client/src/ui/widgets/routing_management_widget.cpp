@@ -60,7 +60,7 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     ui->addressesView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     connect(ui->serversView->selectionModel(),  &QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::at_serversView_currentIndexChanged);
-    connect(ui->addressesView->selectionModel(),&QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::at_addressesView_currentIndexChanged);
+    connect(ui->addressesView->selectionModel(),&QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::updateUi);
     connect(ui->addressesView,                  &QAbstractItemView::doubleClicked,              this,   &QnRoutingManagementWidget::at_addressesView_doubleClicked);
     connect(m_serverAddressesModel,             &QnServerAddressesModel::ignoreChangeRequested, this,   &QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested);
     connect(ui->addButton,                      &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_addButton_clicked);
@@ -70,6 +70,8 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnRoutingManagementWidget::at_resourcePool_resourceRemoved);
 
     m_serverListModel->setResources(qnResPool->getResourcesWithFlag(Qn::server));
+
+    updateUi();
 }
 
 QnRoutingManagementWidget::~QnRoutingManagementWidget() {}
@@ -127,6 +129,13 @@ void QnRoutingManagementWidget::updateModel() {
 
     if (row < m_sortedServerAddressesModel->rowCount())
         ui->addressesView->setCurrentIndex(m_sortedServerAddressesModel->index(row, 0));
+}
+
+void QnRoutingManagementWidget::updateUi() {
+    QModelIndex sourceIndex = m_sortedServerAddressesModel->mapToSource(ui->addressesView->currentIndex());
+
+    ui->addButton->setEnabled(ui->serversView->currentIndex().isValid());
+    ui->removeButton->setEnabled(m_serverAddressesModel->isManualAddress(sourceIndex));
 }
 
 void QnRoutingManagementWidget::at_addButton_clicked() {
@@ -197,19 +206,12 @@ void QnRoutingManagementWidget::at_serversView_currentIndexChanged(const QModelI
 
     m_server = server;
     updateModel();
+    updateUi();
 
     if (server) {
         connect(server,      &QnMediaServerResource::resourceChanged,    this,   &QnRoutingManagementWidget::updateModel);
         connect(server,      &QnMediaServerResource::auxUrlsChanged,     this,   &QnRoutingManagementWidget::updateModel);
     }
-}
-
-void QnRoutingManagementWidget::at_addressesView_currentIndexChanged(const QModelIndex &index) {
-    QModelIndex sourceIndex = m_sortedServerAddressesModel->mapToSource(index);
-
-    bool manual = m_serverAddressesModel->isManualAddress(sourceIndex);
-
-    ui->removeButton->setEnabled(manual);
 }
 
 void QnRoutingManagementWidget::at_addressesView_doubleClicked(const QModelIndex &index) {
