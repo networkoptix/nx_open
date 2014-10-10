@@ -1,5 +1,8 @@
-<h2>Server settings</h2>
-
+<h2>Server Settings</h2>
+<p>
+    The system name shown below is the system this server currently belongs to.
+    Modifying the system name will allow you to create or join a new system.
+</p>
 <form novalidate name="settingsForm" class="form-horizontal" role="form">
     <div class="form-group" ng-class="{'has-error':!settingsForm.systemName.$valid}">
         <label for="systemName" class="col-md-3 control-label">System Name</label>
@@ -29,7 +32,11 @@
     </div>
 </form>
 
-<h2>Change system password</h2>
+<h2>Server System Password</h2>
+<p>
+    This password is used by this server to connect to the system.
+    Modifying the password could result in the server disconnecting from this system.
+</p>
 
 <form novalidate name="form" class="form-horizontal" role="form">
 

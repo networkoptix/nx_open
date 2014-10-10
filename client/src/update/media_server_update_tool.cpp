@@ -183,6 +183,8 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &
     foreach (const QnSystemInformation &systemInformation, systemInformationList)
         query.addQueryItem(lit("server"), systemInformation.toString().replace(L' ', L'_'));
 
+    query.addQueryItem(lit("customization"), QnAppInfo::customizationName());
+
     QUrl url(QN_UPDATE_PACKAGE_URL + versionSuffix);
     url.setQuery(query);
 
