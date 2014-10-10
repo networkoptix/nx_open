@@ -8,6 +8,7 @@ import com.networkoptix.qml 1.0
 import "../controls"
 
 import "login_dialog_functions.js" as LoginDialogFunctions
+import "../common_functions.js" as CommonFunctions
 
 Item {
     /* backgorund */
@@ -37,12 +38,26 @@ Item {
         QnTextField {
             id: address
             placeholderText: qsTr("Server address")
+            width: 200
+            height: 25
         }
-        SpinBox {
+        QnTextField {
             id: port
-            minimumValue: 1
-            maximumValue: 65535
-            value: 7001
+            validator: IntValidator {
+                bottom: 1
+                top: 65535
+            }
+            leftPadding: portLabel.width + CommonFunctions.dp(8)
+
+            Text {
+                id: portLabel
+                anchors.verticalCenter: parent.verticalCenter
+                x: 0
+                text: qsTr("Port")
+                color: colorTheme.color("inputPlaceholderText")
+            }
+
+            text: "7001"
         }
         QnTextField {
             id: login
