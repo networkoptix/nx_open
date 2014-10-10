@@ -16,12 +16,36 @@
 #include <utils/network/socket_common.h>
 
 
+/*!
+    This class introduced to remove cross-includes between stun_server_connection.h and stun_stream_socket_server.h.
+    Better find another solultion and remove this class
+*/
+template<class _ConnectionType>
+    class StreamConnectionHolder
+{
+public:
+    typedef _ConnectionType ConnectionType;
+
+    void closeConnection( ConnectionType* connection )
+    {
+        std::unique_lock<std::mutex> lk( m_mutex );
+        m_connections.erase( connection );
+    }
+
+protected:
+    std::mutex m_mutex;
+    //TODO #ak this map types seems strange. Replace with std::set?
+    std::map<ConnectionType*, std::unique_ptr<ConnectionType>> m_connections;
+};
+
 //!Listens local tcp address, accepts incoming connections and forwards them to the specified handler
 /*!
     \uses \a aio::AIOService
 */
 template<class CustomServerType, class ConnectionType>
     class StreamSocketServer
+:
+    public StreamConnectionHolder<ConnectionType>
 {
 public:
     typedef typename StreamSocketServer<CustomServerType, ConnectionType> SelfType;
@@ -82,16 +106,9 @@ public:
         m_socket->acceptAsync( std::bind( &SelfType::newConnectionAccepted, this, _1, _2 ) );
     }
 
-    void closeConnection( ConnectionType* connection )
-    {
-        std::unique_lock<std::mutex> lk( m_mutex );
-        m_connections.erase( connection );
-    }
-
 private:
+    //TODO #ak do we really need shared_ptr here?
     std::shared_ptr<AbstractStreamServerSocket> m_socket;
-    std::mutex m_mutex;
-    std::map<ConnectionType*, std::unique_ptr<ConnectionType>> m_connections;
 };
 
 #endif  //STREAM_SOCKET_SERVER_H
