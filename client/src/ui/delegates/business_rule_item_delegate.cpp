@@ -173,9 +173,8 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     case QnBusiness::EventColumn:
     {
         QComboBox* comboBox = new QComboBox(parent);
-        for (int i = 1; i < QnBusiness::EventCount; i++) {
-            QnBusiness::EventType val = (QnBusiness::EventType) i;
-            comboBox->addItem(QnBusinessStringsHelper::eventName(val), val);
+        for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
+            comboBox->addItem(QnBusinessStringsHelper::eventName(eventType), eventType);
         }
         return comboBox;
     }

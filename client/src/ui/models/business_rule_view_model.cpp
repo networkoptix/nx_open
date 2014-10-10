@@ -47,11 +47,9 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     m_actionTypesModel(new QStandardItemModel(this))
 {
 
-    for (int i = 1; i < QnBusiness::EventCount; i++) {
-        QnBusiness::EventType val = (QnBusiness::EventType)i;
-
-        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::eventName(val));
-        item->setData(val);
+    for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
+        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::eventName(eventType));
+        item->setData(eventType);
 
         QList<QStandardItem *> row;
         row << item;
