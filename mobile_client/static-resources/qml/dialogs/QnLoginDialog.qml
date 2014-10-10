@@ -89,7 +89,7 @@ Item {
         color: "#0096ff"
 
         icon: "/images/right.png"
-        onClicked: connectionManager.connectToServer(LoginDialogFunctions.makeUrl(address.text, port.value, login.text, password.text))
+        onClicked: connectionManager.connectToServer(LoginDialogFunctions.makeUrl(address.text, port.text, login.text, password.text))
     }
 
 
