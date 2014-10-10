@@ -96,9 +96,12 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
     if (camera) {
         // todo: if camera is offline function return false. Need some tries on timer event
         if (action->getToggleState() == QnBusiness::ActiveState)
-            rez = qnRecordingManager->startForcedRecording(camera, action->getStreamQuality(), action->getFps(), 
-                                                            action->getRecordBefore(), action->getRecordAfter(), 
-                                                            action->getRecordDuration());
+            rez = qnRecordingManager->startForcedRecording(
+                camera,
+                action->getStreamQuality(), action->getFps(), 
+                0, /* Record-before setup is forbidden */
+                action->getRecordAfter(), 
+                action->getRecordDuration());
         else
             rez = qnRecordingManager->stopForcedRecording(camera);
     }

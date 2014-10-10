@@ -174,8 +174,6 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 
-    bool isImplemented(ActionType actionType);
-
 } // namespace QnBusiness
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnBusiness::EventReason)(QnBusiness::EventState)(QnBusiness::EventType)(QnBusiness::ActionType), (metatype)(lexical))

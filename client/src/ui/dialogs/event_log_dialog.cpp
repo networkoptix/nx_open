@@ -86,8 +86,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 
         for (int i = 1; i < QnBusiness::ActionCount; i++) {
             QnBusiness::ActionType val = (QnBusiness::ActionType) i;
-            if (!QnBusiness::isImplemented(val))
-                continue;
 
             QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
             item->setData(val);

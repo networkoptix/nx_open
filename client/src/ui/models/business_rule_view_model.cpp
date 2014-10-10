@@ -69,9 +69,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
 
     for (int i = 1; i < QnBusiness::ActionCount; i++) {
         QnBusiness::ActionType val = (QnBusiness::ActionType)i;
-        if (!QnBusiness::isImplemented(val))
-            continue;
-
+        
         QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
         item->setData(val);
         item->setData(QnBusiness::hasToggleState(val), ProlongedActionRole);
@@ -128,14 +126,14 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
         {
             switch (m_actionType) {
             case QnBusiness::SendMailAction:
-                return m_actionParams.getEmailAddress();
+                return m_actionParams.emailAddress;
             case QnBusiness::ShowPopupAction:
-                return (int)m_actionParams.getUserGroup();
+                return (int)m_actionParams.userGroup;
             case QnBusiness::PlaySoundAction:
             case QnBusiness::PlaySoundOnceAction:
-                return m_actionParams.getSoundUrl();
+                return m_actionParams.soundUrl;
             case QnBusiness::SayTextAction:
-                return m_actionParams.getSayText();
+                return m_actionParams.sayText;
             default:
                 break;
             }
@@ -217,9 +215,8 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
             QnBusinessActionParameters params = m_actionParams;
 
             // TODO: #GDM #Business you're implicitly relying on what enum values are, which is very bad.
-            // This code will fail silently if someone changes the header. Please write it properly.
-            
-            params.setUserGroup((QnBusinessActionParameters::UserGroup)value.toInt()); 
+            // This code will fail silently if someone changes the header. Please write it properly.           
+            params.userGroup = (QnBusinessActionParameters::UserGroup)value.toInt(); 
             setActionParams(params);
             break;
         }
@@ -227,14 +224,14 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
         case QnBusiness::PlaySoundOnceAction:
         {
             QnBusinessActionParameters params;
-            params.setSoundUrl(value.toString());
+            params.soundUrl = value.toString();
             setActionParams(params);
             break;
         }
         case QnBusiness::SayTextAction:
         {
             QnBusinessActionParameters params;
-            params.setSayText(value.toString());
+            params.sayText = value.toString();
             setActionParams(params);
             break;
         }
@@ -659,7 +656,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
         }
         case QnBusiness::ShowPopupAction:
         {
-            if (m_actionParams.getUserGroup() == QnBusinessActionParameters::AdminOnly)
+            if (m_actionParams.userGroup == QnBusinessActionParameters::AdminOnly)
                 return qnResIconCache->icon(QnResourceIconCache::User);
             else
                 return qnResIconCache->icon(QnResourceIconCache::Users);
@@ -733,7 +730,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                 any = true;
             }
 
-            QStringList additional = m_actionParams.getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts);
+            QStringList additional = m_actionParams.emailAddress.split(QLatin1Char(';'), QString::SkipEmptyParts);
             foreach(const QString &email, additional) {
                 if (email.trimmed().isEmpty())
                     continue;
@@ -750,9 +747,9 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             return isResourcesListValid<QnCameraOutputPolicy>(m_actionResources);
         case QnBusiness::PlaySoundAction:
         case QnBusiness::PlaySoundOnceAction:
-            return !m_actionParams.getSoundUrl().isEmpty();
+            return !m_actionParams.soundUrl.isEmpty();
         case QnBusiness::SayTextAction:
-            return !m_actionParams.getSayText().isEmpty();
+            return !m_actionParams.sayText.isEmpty();
         default:
             break;
         }
@@ -810,7 +807,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     case QnBusiness::SendMailAction:
     {
         QStringList additional;
-        foreach (QString address, m_actionParams.getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts)) {
+        foreach (QString address, m_actionParams.emailAddress.split(QLatin1Char(';'), QString::SkipEmptyParts)) {
             QString trimmed = address.trimmed();
             if (trimmed.isEmpty())
                 continue;
@@ -822,7 +819,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     }
     case QnBusiness::ShowPopupAction:
     {
-        if (m_actionParams.getUserGroup() == QnBusinessActionParameters::AdminOnly)
+        if (m_actionParams.userGroup == QnBusinessActionParameters::AdminOnly)
             return tr("Administrators only");
         else
             return tr("All users");
@@ -839,7 +836,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     case QnBusiness::PlaySoundAction:
     case QnBusiness::PlaySoundOnceAction:
     {
-        QString filename = m_actionParams.getSoundUrl();
+        QString filename = m_actionParams.soundUrl;
         if (filename.isEmpty())
             return tr("Select a sound");
         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
@@ -847,7 +844,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     }
     case QnBusiness::SayTextAction:
     {
-        QString text = m_actionParams.getSayText();
+        QString text = m_actionParams.sayText;
         if (text.isEmpty())
             return tr("Enter text");
         return text;
