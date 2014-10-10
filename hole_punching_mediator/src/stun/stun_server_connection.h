@@ -6,21 +6,25 @@
 #ifndef STUN_SERVER_CONNECTION_H
 #define STUN_SERVER_CONNECTION_H
 
+#include <functional>
+
 #include <utils/common/stoppable.h>
 #include <utils/network/stun/stun_message.h>
 #include <utils/network/stun/stun_message_parser.h>
 #include <utils/network/stun/stun_message_parse_handler.h>
 #include <utils/network/stun/stun_message_serializer.h>
 #include <utils/network/connection_server/base_stream_protocol_connection.h>
-#include <functional>
+#include <utils/network/connection_server/stream_socket_server.h>
 
-class StunStreamSocketServer;
+
+class StunServerConnection;
+extern template class StreamConnectionHolder<StunServerConnection>;
 
 class StunServerConnection
 :
     public nx_api::BaseStreamProtocolConnection<
         StunServerConnection,
-        StunStreamSocketServer,
+        StreamConnectionHolder<StunServerConnection>,
         nx_stun::Message,
         nx_stun::MessageParser,
         nx_stun::MessageSerializer>
@@ -28,14 +32,14 @@ class StunServerConnection
 public:
     typedef BaseStreamProtocolConnection<
         StunServerConnection,
-        StunStreamSocketServer,
+        StreamConnectionHolder<StunServerConnection>,
         nx_stun::Message,
         nx_stun::MessageParser,
         nx_stun::MessageSerializer
     > BaseType;
 
     StunServerConnection(
-        StunStreamSocketServer* socketServer,
+        StreamConnectionHolder<StunServerConnection>* socketServer,
         AbstractCommunicatingSocket* sock );
 
     void processMessage( nx_stun::Message&& request );

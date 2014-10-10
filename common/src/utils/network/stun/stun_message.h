@@ -54,7 +54,7 @@ namespace nx_stun
     {
         binding = 1,
         //!Starting value for custom STUN methods
-        user_method = 2
+        userMethod = 2
     };
 
     class Header

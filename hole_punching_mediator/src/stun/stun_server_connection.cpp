@@ -12,7 +12,7 @@
 #include <functional>
 
 StunServerConnection::StunServerConnection(
-    StunStreamSocketServer* socketServer,
+    StreamConnectionHolder<StunServerConnection>* socketServer,
     AbstractCommunicatingSocket* sock )
 :
     BaseType( socketServer, sock )
@@ -116,7 +116,7 @@ void StunServerConnection::processGetIPAddressRequest( nx_stun::Message&& reques
 void StunServerConnection::sendSuccessReply( const nx_stun::TransactionID& transaction_id ) {
     nx_stun::Message message;
     message.header.messageClass = nx_stun::MessageClass::successResponse;
-    message.header.method = nx_hpm::StunMethods::bind;
+    message.header.method = nx_hpm::StunMethods::listen;
     message.header.transactionID = transaction_id;
     std::unique_ptr<nx_stun::attr::XorMappedAddress> addr( new nx_stun::attr::XorMappedAddress() );
     addr->type = nx_stun::attr::AttributeType::xorMappedAddress;
@@ -149,7 +149,7 @@ void StunServerConnection::sendErrorReply( const nx_stun::TransactionID& transac
     // Currently for the reason phase, we just put empty string there
     nx_stun::Message message;
     message.header.messageClass = nx_stun::MessageClass::errorResponse;
-    message.header.method = nx_hpm::StunMethods::bind;
+    message.header.method = nx_hpm::StunMethods::listen;
     message.header.transactionID = transaction_id;
     std::unique_ptr<nx_stun::attr::ErrorDescription> error_code( new nx_stun::attr::ErrorDescription() );
     error_code->type = nx_stun::attr::AttributeType::errorCode;
