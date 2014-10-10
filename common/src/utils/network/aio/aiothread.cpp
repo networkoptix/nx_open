@@ -9,7 +9,6 @@
 #include <deque>
 #include <memory>
 
-#include <QtCore/QAtomicInt>
 #include <QtCore/QDateTime>
 
 #include "../system_socket.h"
@@ -73,8 +72,8 @@ namespace aio
     class AIOEventHandlingData
     {
     public:
-        QAtomicInt beingProcessed;
-        QAtomicInt markedForRemoval;
+        std::atomic<int> beingProcessed;
+        std::atomic<int> markedForRemoval;
         AIOEventHandler<SocketType>* eventHandler;
         //!0 means no timeout
         unsigned int timeout;
@@ -201,6 +200,7 @@ namespace aio
                     case TaskType::tChangingTimeout:
                     {
                         void* userData = task.socket->impl()->getUserData(task.eventType);
+                        assert( userData );
                         AIOEventHandlingDataHolder<SocketType>* handlingData = reinterpret_cast<AIOEventHandlingDataHolder<SocketType>*>( userData );
                         //NOTE we are in aio thread currently
                         if( task.timeout > 0 )
@@ -362,16 +362,17 @@ namespace aio
                 //no need to lock mutex, since data is removed in this thread only
                 std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = static_cast<AIOEventHandlingDataHolder<SocketType>*>(it.userData())->data;
                 QMutexLocker lk( &processEventsMutex );
-                handlingData->beingProcessed.ref();
-                if( handlingData->markedForRemoval.load() > 0 ) //socket has been removed from watch
+                ++handlingData->beingProcessed;
+                //TODO #ak possibly some atomic fence is required here
+                if( handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0 ) //socket has been removed from watch
                 {
-                    handlingData->beingProcessed.deref();
+                    --handlingData->beingProcessed;
                     continue;
                 }
                 handlingData->eventHandler->eventTriggered( it.socket(), it.eventType() );
                 if( handlingData->timeout > 0 )
                     handlingData->updatedPeriodicTaskClock = curClock + handlingData->timeout;      //updating socket's periodic task (it's garanteed that there is periodic task for socket)
-                handlingData->beingProcessed.deref();
+                --handlingData->beingProcessed;
             }
         }
 
@@ -398,11 +399,12 @@ namespace aio
                 //no need to lock mutex, since data is removed in this thread only
                 std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = periodicTaskData.data;
                 QMutexLocker lk( &processEventsMutex );
-                handlingData->beingProcessed.ref();
+                ++handlingData->beingProcessed;
+                //TODO #ak atomic fence is required here (to avoid reordering)
                 //TODO #ak add some auto pointer for handlingData->beingProcessed
-                if( handlingData->markedForRemoval.load() > 0 ) //task has been removed from watch
+                if( handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0 ) //task has been removed from watch
                 {
-                    handlingData->beingProcessed.deref();
+                    --handlingData->beingProcessed;
                     continue;
                 }
 
@@ -418,7 +420,7 @@ namespace aio
                             periodicTaskData.socket,
                             periodicTaskData.eventType );
                         handlingData->updatedPeriodicTaskClock = 0;
-                        handlingData->beingProcessed.deref();
+                        --handlingData->beingProcessed;
                         continue;
                     }
 
@@ -429,7 +431,7 @@ namespace aio
                 {
                     //cancelling periodic task
                     handlingData->updatedPeriodicTaskClock = 0;
-                    handlingData->beingProcessed.deref();
+                    --handlingData->beingProcessed;
                     continue;
                 }
 
@@ -449,7 +451,7 @@ namespace aio
                 }
                 //else
                 //    periodicTaskData.periodicEventHandler->onTimeout( periodicTaskData.taskID );  //for periodic tasks not bound to socket
-                handlingData->beingProcessed.deref();
+                --handlingData->beingProcessed;
             }
 
             return tasksProcessedCount > 0;
@@ -548,12 +550,17 @@ namespace aio
         //TODO #ak looks like copy-paste of previous method. Remove copy-paste!!!
 
         //NOTE m_impl->mutex is locked up the stack
-        if( !canAcceptSocket( sock ) )
-            return false;
 
-        //checking queue for reverse task for \a sock
-        if( m_impl->removeReverseTask( sock, eventToWatch, TaskType::tAdding, eventHandler, timeoutMs ) )
-            return true;    //ignoring task
+        //this task does not cancel any other task. TODO #ak maybe it should cancel another timeout change?
+        ////checking queue for reverse task for \a sock
+        //if( m_impl->removeReverseTask( sock, eventToWatch, TaskType::tAdding, eventHandler, timeoutMs ) )
+        //    return true;    //ignoring task
+
+        //if socket is marked for removal, not adding task
+        void* userData = sock->impl()->getUserData(eventToWatch);
+        assert( userData != nullptr );  //socket is not polled, but someone wants to change timeout
+        if( static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->markedForRemoval.load(std::memory_order_relaxed) > 0 )
+            return true;   //socket marked for removal, ignoring timeout change (like, cancelling it right now)
 
         //if( currentThreadSystemId() == systemThreadId() )
         //{
@@ -588,11 +595,11 @@ namespace aio
         //void* userData = m_impl->pollSet.getUserData( sock, eventType );
         void* userData = sock->impl()->getUserData(eventType);
         if( userData == NULL )
-            return false;   //assert ???
+            return false;   //socket is not polled. assert?
         std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data;
-        if( handlingData->markedForRemoval.load() > 0 )
-            return false; //socket already marked for removal
-        handlingData->markedForRemoval.ref();
+        if( handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0 )
+            return false;   //socket already marked for removal
+        ++handlingData->markedForRemoval;
 
         const bool inAIOThread = currentThreadSystemId() == systemThreadId();
 
@@ -617,6 +624,9 @@ namespace aio
             //we can be sure that socket will be removed before next poll
 
             m_impl->mutex->unlock();
+
+            //TODO #ak maybe we just have to wait for remove completion, but not for running handler completion?
+                //I.e., is it possible that handler was launched (or still running) after removal task completion?
 
             //waiting for event handler completion (if it running)
             while( handlingData->beingProcessed.load() > 0 )
