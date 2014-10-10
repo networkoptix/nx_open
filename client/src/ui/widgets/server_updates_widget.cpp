@@ -182,47 +182,13 @@ void QnServerUpdatesWidget::initLinkButtons() {
         qApp->clipboard()->setText(ui->linkLineEdit->text());
         QMessageBox::information(this, tr("Success"), tr("URL copied to clipboard."));
     });
-
-    connect(ui->saveLinkButton, &QPushButton::clicked, this, [this] {
-        QString fileName = QnFileDialog::getSaveFileName(this, tr("Save to file..."), QString(), tr("Url Files (*.url)"), 0, QnCustomFileDialog::fileDialogOptions());
-        if (fileName.isEmpty())
-            return;
-        QString selectedExtension = lit(".url");
-        if (!fileName.toLower().endsWith(selectedExtension)) {
-            fileName += selectedExtension;
-            if (QFile::exists(fileName)) {
-                QMessageBox::StandardButton button = QMessageBox::information(
-                    this,
-                    tr("Save to file..."),
-                    tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).completeBaseName()),
-                    QMessageBox::Ok | QMessageBox::Cancel
-                    );
-                if(button == QMessageBox::Cancel)
-                    return;
-            }
-        }
-
-        QFile data(fileName);
-        if (!data.open(QFile::WriteOnly | QFile::Truncate)) {
-            QMessageBox::critical(this, tr("Error"), tr("Could not save url to file %1").arg(fileName));
-            return;
-        }
-
-        QString package = ui->linkLineEdit->text();
-        QTextStream out(&data);
-        out << lit("[InternetShortcut]") << endl << package << endl;
-
-        data.close();
-    });
-    
+ 
     connect(ui->linkLineEdit,           &QLineEdit::textChanged,    this, [this](const QString &text){
         ui->copyLinkButton->setEnabled(!text.isEmpty());
-        ui->saveLinkButton->setEnabled(!text.isEmpty());
         ui->linkLineEdit->setCursorPosition(0);
     });
 
     ui->copyLinkButton->setEnabled(false);
-    ui->saveLinkButton->setEnabled(false);
 
     connect(ui->releaseNotesLabel,  &QLabel::linkActivated, this, [this] {
         if (!m_releaseNotesUrl.isEmpty())
