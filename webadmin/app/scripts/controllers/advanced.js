@@ -80,8 +80,8 @@ angular.module('webadminApp')
                         }
                     });
 
-                    //mediaserver.saveStorages(info.storages).error(function(saveMediaServerReply){
-                    mediaserver.saveMediaServer(info).error(function(saveMediaServerReply){
+                    mediaserver.saveStorages(info.storages).error(function(saveMediaServerReply){
+                    //mediaserver.saveMediaServer(info).error(function(saveMediaServerReply){
                         alert("Error: Couldn't save settings");
                     }).then(function(saveMediaServerReply){
                         alert("Settings saved");

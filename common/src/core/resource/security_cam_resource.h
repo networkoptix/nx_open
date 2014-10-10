@@ -48,7 +48,6 @@ public:
 
     bool hasMotion() const;
     Qn::MotionType getMotionType() const;
-    Qn::MotionType getMotionTypeRaw() const;
     void setMotionType(Qn::MotionType value);
 
     //!Returns driver (built-in or external) name, used to manage camera

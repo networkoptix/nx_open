@@ -1009,7 +1009,7 @@
                     </result>
                 </function>
                 <function>
-                    <name>getMediaServersEx</name>
+                    <name>getMediaServers</name>
                     <description>Return media server list</description>
                     <method>GET</method>
                     <params>
@@ -1043,7 +1043,7 @@
                     </result>
                 </function>
                 <function>
-                    <name>getCamerasEx</name>
+                    <name>getCameras</name>
                     <description>Read camera list</description>
                     <method>GET</method>
                     <params>
@@ -1080,36 +1080,36 @@
                     </params>
                     <result>
                         <caption>Returns camera list data formatted in a requested format</caption>
-                            <attributes>
-                                <attribute> <name>addParams</name> <description>List of addition parameters for camera. This list can contain such information as full ONVIF url, camera maximum fps e.t.c</description>  </attribute>
-                                <attribute> <name>audioEnabled</name> <description>Media server will push audio stream from a camera if parameter is true</description></attribute>
-                                <attribute> <name>controlEnabled</name> <description>Media server will manage camera (change resolution, fps, create profiles e.t.c) if parameter if true</description></attribute> 
-                                <attribute><name>dewarpingParams</name> <description>Json string with devarping parameters</description></attribute> 
-                                <attribute><name>groupId</name> <description>Internal group identifier. It is used for grouping channels for multu-channels cameras together. </description></attribute> 
-                                <attribute><name>groupName</name> <description>Group name. This name can be changed by user</description></attribute> 
-                                <attribute><name>id</name> <description>Object ID. All ID for all objects in a system is GUIDs</description></attribute> 
-                                <attribute><name>login</name> <description>Login for camera authentication</description></attribute> 
-                                <attribute><name>mac</name> <description>camera MAC address</description></attribute> 
-                                <attribute><name>manuallyAdded</name> <description>True if user added camera manually</description></attribute> 
-                                <attribute><name>maxArchiveDays</name> <description>Maxumum archive duration in days for this camera. If value less or equal to zerro, it is not used</description></attribute> 
-                                <attribute><name>minArchiveDays</name> <description>Minimum archive duration in days for this camera. If value less or equal to zerro, it is not used</description></attribute> 
-                                <attribute><name>model</name> <description>Camera model</description></attribute> 
-                                <attribute><name>motionMask</name> <description>Camera's motion mask. This string defines several rects via ':' delimeter. Each rect is described by 5 digits: sensitivity, x,y(for left top corner), width, height</description></attribute> 
-                                <attribute><name>motionType</name> <description>If value is 'MT_SoftwareGrid' then media server determine mition, otherwise camera built-in motion will be used</description></attribute> 
-                                <attribute><name>name</name> <description>Camera name</description></attribute> 
-                                <attribute><name>parentId</name> <description>Camera's server ID</description></attribute> 
-                                <attribute><name>physicalId</name> <description>Camera unique identifier. This identifier is used in all requests related to a camera. For instance, in RTSP requests</description></attribute> 
-                                <attribute><name>password</name> <description>Password for camera authentication</description></attribute> 
-                                <attribute><name>scheduleEnabled</name> <description>Do record camera archive if true</description></attribute> 
-                                <attribute><name>scheduleTasks</name> <description>List of 'scheduleTask' objects with camera recording schedule.</description></attribute> 
-                                <attribute><name>secondaryStreamQuality</name> <description>Secondary stream quality. Possible values:'SSQualityLow', 'SSQualityMedium', 'SSQualityHigh', 'SSQualityDontUse' </description></attribute> 
-                                <attribute><name>status</name> <description>Camera status. Possible values are: 'Offline', 'Online', 'Recording'</description></attribute> 
-                                <attribute><name>statusFlags</name> <description>Usually this field is zerro. Non zerro value is used to mark that a lot of network issues was occured with this camera</description></attribute> 
-                                <attribute><name>typeId</name> <description>Guid with camera's type. Camera's type can describe predefined information such as camera maximum resolution, fps e.t.c.
-                                                                        Detailed type information can be obtained via 'getResourceTypes' request.</description></attribute> 
-                                <attribute><name>url</name> <description>Camera plain ip address or full http url if camera was added manually. Also, for multichannel encoders full url is used</description></attribute> 
-                                <attribute><name>vendor</name> <description>Camera manufacturer</description></attribute>
-                            </attributes>
+						    <attributes>
+							    <attribute> <name>addParams</name> <description>List of addition parameters for camera. This list can contain such information as full ONVIF url, camera maximum fps e.t.c</description>  </attribute>
+							    <attribute> <name>audioEnabled</name> <description>Media server will push audio stream from a camera if parameter is true</description></attribute>
+							    <attribute> <name>controlEnabled</name> <description>Media server will manage camera (change resolution, fps, create profiles e.t.c) if parameter if true</description></attribute> 
+								<attribute><name>dewarpingParams</name> <description>Json string with devarping parameters</description></attribute> 
+								<attribute><name>groupId</name> <description>Internal group identifier. It is used for grouping channels for multu-channels cameras together. </description></attribute> 
+								<attribute><name>groupName</name> <description>Group name. This name can be changed by user</description></attribute> 
+								<attribute><name>id</name> <description>Object ID. All ID for all objects in a system is GUIDs</description></attribute> 
+								<attribute><name>login</name> <description>Login for camera authentication</description></attribute> 
+								<attribute><name>mac</name> <description>camera MAC address</description></attribute> 
+								<attribute><name>manuallyAdded</name> <description>True if user added camera manually</description></attribute> 
+								<attribute><name>maxArchiveDays</name> <description>Maxumum archive duration in days for this camera. If value less or equal to zerro, it is not used</description></attribute> 
+								<attribute><name>minArchiveDays</name> <description>Minimum archive duration in days for this camera. If value less or equal to zerro, it is not used</description></attribute> 
+								<attribute><name>model</name> <description>Camera model</description></attribute> 
+								<attribute><name>motionMask</name> <description>Camera's motion mask. This string defines several rects via ':' delimeter. Each rect is described by 5 digits: sensitivity, x,y(for left top corner), width, height</description></attribute> 
+								<attribute><name>motionType</name> <description>If value is 'MT_SoftwareGrid' then media server determine mition, otherwise camera built-in motion will be used</description></attribute> 
+								<attribute><name>name</name> <description>Camera name</description></attribute> 
+								<attribute><name>parentId</name> <description>Camera's server ID</description></attribute> 
+								<attribute><name>physicalId</name> <description>Camera unique identifier. This identifier is used in all requests related to a camera. For instance, in RTSP requests</description></attribute> 
+								<attribute><name>password</name> <description>Password for camera authentication</description></attribute> 
+								<attribute><name>scheduleEnabled</name> <description>Do record camera archive if true</description></attribute> 
+								<attribute><name>scheduleTasks</name> <description>List of 'scheduleTask' objects with camera recording schedule.</description></attribute> 
+								<attribute><name>secondaryStreamQuality</name> <description>Secondary stream quality. Possible values:'SSQualityLow', 'SSQualityMedium', 'SSQualityHigh', 'SSQualityDontUse' </description></attribute> 
+								<attribute><name>status</name> <description>Camera status. Possible values are: 'Offline', 'Online', 'Recording'</description></attribute> 
+								<attribute><name>statusFlags</name> <description>Usually this field is zerro. Non zerro value is used to mark that a lot of network issues was occured with this camera</description></attribute> 
+								<attribute><name>typeId</name> <description>Guid with camera's type. Camera's type can describe predefined information such as camera maximum resolution, fps e.t.c.
+																	    Detailed type information can be obtained via 'getResourceTypes' request.</description></attribute> 
+								<attribute><name>url</name> <description>Camera plain ip address or full http url if camera was added manually. Also, for multichannel encoders full url is used</description></attribute> 
+								<attribute><name>vendor</name> <description>Camera manufacturer</description></attribute>
+						    </attributes>
                     </result>
                 </function>
                 <function>
@@ -1569,28 +1569,28 @@
             <groupName>RTSP API</groupName>
             <urlPrefix/>
             <groupDescription>
-                            This group contains information about media server RTSP api.
-                            RTSP api is accessible on the same port as HTTP requests. To request video for camera use:
-                        </groupDescription>
+							This group contains information about media server RTSP api.
+							RTSP api is accessible on the same port as HTTP requests. To request video for camera use:
+						</groupDescription>
             <functions>
                 <function>
                     <name>&lt;physicalId&gt;</name>
                     <description>
-                                        Open RTSP video from a camera. It is not an exact method name. It means that RTSP url may contain any camera unique ID. For instance:
-                                        rtsp://&lt;server_ip&gt;:&lt;port&gt;/12AB42FD5912?pos=1235631&amp;resolution=240p
-                                        </description>
+										Open RTSP video from a camera. It is not an exact method name. It means that RTSP url may contain any camera unique ID. For instance:
+										rtsp://&lt;server_ip&gt;:&lt;port&gt;/12AB42FD5912?pos=1235631&amp;resolution=240p
+										</description>
                     <method>PLAY</method>
                     <params>
                         <param>
                             <name>pos</name>
                             <description>By default media server opens camera from live position. This parameter defines position in an archive in microseconds in a UTC format.
-                                                        Position can be passed via standard RTSP attribute as well as via URL parameter</description>
+														Position can be passed via standard RTSP attribute as well as via URL parameter</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>resolution</name>
                             <description>Turn on video transcoding to the specified resolution. Resolution string either may contain width and height (for instance 320x240) or 
-                                                        height only (for instance 240p)</description>
+														height only (for instance 240p)</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -1635,17 +1635,17 @@
             <groupName>Http Live Streaming (HLS)</groupName>
             <urlPrefix/>
             <groupDescription>
-                            This group contains information about accessing server's media streams with HLS protocol.
+							This group contains information about accessing server's media streams with HLS protocol.
                             This protocol is supported by iOS-based devices (iPhone, iPad).
-                            HLS is available on the same port as HTTP and RTSP. To request video use:
-            </groupDescription>
+							HLS is available on the same port as HTTP and RTSP. To request video use:
+			</groupDescription>
             <functions>
                 <function>
                     <name>&lt;physicalId&gt;</name>
                     <description>
-                        Url format for opening camera stream with HLS:
-                        http://&lt;server_ip&gt;:&lt;port&gt;/hls/&lt;physicalId&gt;.m3u
-                    </description>
+					    Url format for opening camera stream with HLS:
+					    http://&lt;server_ip&gt;:&lt;port&gt;/hls/&lt;physicalId&gt;.m3u
+					</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -1686,10 +1686,10 @@
                 <function>
                     <name>&lt;physicalId&gt;</name>
                     <description>
-                        Url format:
-                        http://&lt;server_ip&gt;:&lt;port&gt;/media/&lt;physicalId&gt;.&lt;format&gt;
+					    Url format:
+					    http://&lt;server_ip&gt;:&lt;port&gt;/media/&lt;physicalId&gt;.&lt;format&gt;
                         Stream format can be one of following: webm, mpegts, mp4, 3gp, mpjpeg (motion jpeg)
-                    </description>
+					</description>
                     <method>GET</method>
                     <params>
                         <param>
