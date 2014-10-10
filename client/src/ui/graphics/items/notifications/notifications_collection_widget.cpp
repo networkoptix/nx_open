@@ -569,8 +569,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
     }
 
     //TODO: #GDM #Business REMOVE DEBUG
-    for (int i = 1; i < QnBusiness::EventCount; i++) {
-        QnBusiness::EventType eventType = QnBusiness::EventType(i);
+    for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
 
         QnBusinessEventParameters params;
         params.setEventType(eventType);

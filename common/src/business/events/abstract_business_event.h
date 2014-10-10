@@ -16,6 +16,8 @@ namespace QnBusiness
 
     QList<EventType> childEvents(EventType eventType);
 
+    QList<EventType> allEvents();
+
     EventType parentEvent(EventType eventType);
 
     bool isResourceRequired(EventType eventType);
