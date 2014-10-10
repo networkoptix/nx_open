@@ -12,14 +12,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,0,0,1">
    <item>
-    <widget class="QLabel" name="dayWarningLabel">
-     <property name="text">
-      <string>As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week.</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
+    <widget class="QnWordWrappedLabel" name="dayWarningLabel" native="true"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -241,11 +234,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QLabel" name="internetDetailLabel">
-            <property name="wordWrap">
-             <bool>true</bool>
-            </property>
-           </widget>
+           <widget class="QnWordWrappedLabel" name="internetDetailLabel" native="true"/>
           </item>
           <item>
            <spacer name="verticalSpacer">
@@ -414,11 +403,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QLabel" name="localDetailLabel">
-            <property name="wordWrap">
-             <bool>true</bool>
-            </property>
-           </widget>
+           <widget class="QnWordWrappedLabel" name="localDetailLabel" native="true"/>
           </item>
          </layout>
         </widget>
@@ -529,6 +514,12 @@
    <class>QnProgressBar</class>
    <extends>QProgressBar</extends>
    <header location="global">ui/widgets/progress_bar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>

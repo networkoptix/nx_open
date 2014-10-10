@@ -101,6 +101,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     connect(m_updateTool,       &QnMediaServerUpdateTool::updateFinished,           this,           &QnServerUpdatesWidget::at_updateFinished);
 
     setWarningStyle(ui->dayWarningLabel);
+    ui->dayWarningLabel->setText(tr("As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week."));
+
     setWarningStyle(ui->connectionProblemLabel);
 
     static_assert(tooLateDayOfWeek <= Qt::Sunday, "In case of future days order change.");
