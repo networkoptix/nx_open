@@ -33,11 +33,11 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
 
     setHelpTopic(this, Qn::SystemSettings_Notifications_Help);
 
-    for (int i = 1; i < QnBusiness::EventCount; i++) {
+    for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
         QCheckBox* checkbox = new QCheckBox(this);
-        checkbox->setText(QnBusinessStringsHelper::eventName(QnBusiness::EventType(i)));
+        checkbox->setText(QnBusinessStringsHelper::eventName(eventType));
         ui->businessEventsLayout->addWidget(checkbox);
-        m_businessRulesCheckBoxes << checkbox;
+        m_businessRulesCheckBoxes[eventType] = checkbox;
     }
 
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
@@ -74,8 +74,8 @@ void QnPopupSettingsWidget::submitToSettings() {
         quint64 eventsShown = 0xFFFFFFFFFFFFFFFFull;
         if (!ui->showAllCheckBox->isChecked()) {
             quint64 eventsFlag = 1;
-            for (int i = 1; i < QnBusiness::EventCount; i++) {
-                if (!m_businessRulesCheckBoxes[i-1]->isChecked())
+            for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
+                if (!m_businessRulesCheckBoxes[eventType]->isChecked())
                     eventsShown &= ~eventsFlag;
                 eventsFlag = eventsFlag << 1;
             }
@@ -123,9 +123,9 @@ void QnPopupSettingsWidget::at_showBusinessEvents_valueChanged() {
 
     quint64 eventsShown = m_adaptor->value();
     quint64 eventsFlag = 1;
-    for (int i = 1; i < QnBusiness::EventCount; i++) {
+    for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
         bool checked = eventsShown & eventsFlag;
-        m_businessRulesCheckBoxes[i-1]->setChecked(checked);
+        m_businessRulesCheckBoxes[eventType]->setChecked(checked);
         all = all && checked;
         eventsFlag = eventsFlag << 1;
     }

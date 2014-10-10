@@ -422,8 +422,14 @@ bool QnSecurityCamResource::hasMotion() const {
 
 Qn::MotionType QnSecurityCamResource::getMotionType() const {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    if ((*userAttributesLock)->motionType == Qn::MT_Default)
-        (*userAttributesLock)->motionType = getDefaultMotionType();
+    if ((*userAttributesLock)->motionType == Qn::MT_Default || !(supportedMotionType() & (*userAttributesLock)->motionType))
+        return getDefaultMotionType();
+    else
+        return (*userAttributesLock)->motionType;
+}
+
+Qn::MotionType QnSecurityCamResource::getMotionTypeRaw() const {
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     return (*userAttributesLock)->motionType;
 }
 

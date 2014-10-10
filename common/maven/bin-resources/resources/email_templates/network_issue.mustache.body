@@ -1,17 +1,4 @@
-<div class="content">
-    <div class="callout">
-        <h4>Details:</h4>
-        <table class="details">
-            <tr>
-                <th>Reason</th>
-                <th>Time</th>
-            </tr>
-            {{#aggregated}}
-                <tr>
-                    <td class="error">{{reason}}</td>
-                    <td><i>{{timestamp}}</i></td>
-                </tr>
-            {{/aggregated}}
-        </table>
-    </div>
-</div>
+{{#aggregated}}
+	<td class="error">Reason: {{reason}}</td>
+	<td><i>{{timestamp}}</i></td>
+{{/aggregated}}
