@@ -171,17 +171,13 @@ namespace nx_stun
     {
         // Checking the message to see whether it is an valid message or not
         if( msg.header.messageClass == nx_stun::MessageClass::errorResponse ) {
-            SystemError::setLastErrorCode(STUN_REQUEST_FAIL);
-            m_outstandingRequest->completion_handler(STUN_REQUEST_FAIL,std::move(msg));
-        } else {
-            // If we detect an error attributes here, we treat the package is broken or not
-            // STUN protocol compatible, this should not happen in our server configuration
-            if( hasErrorAttribute(msg) ) {
-                SystemError::setLastErrorCode(STUN_REPLY_PACKAGE_BROKEN);
+            if( !hasErrorAttribute((msg) ) ) {
                 m_outstandingRequest->completion_handler(STUN_REPLY_PACKAGE_BROKEN,std::move(msg));
             } else {
                 m_outstandingRequest->completion_handler(0,std::move(msg));
             }
+        } else {
+            m_outstandingRequest->completion_handler(0,std::move(msg));
         }
         // This message chain processing is finished here
         resetOutstandingRequest();

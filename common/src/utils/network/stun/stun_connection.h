@@ -80,9 +80,8 @@ namespace nx_stun
         // Those error code needs to define in order to make user's callback function know the specific error related 
         // to our STUN connection process
 
-        static const SystemError::ErrorCode STUN_REQUEST_FAIL = 1;
+        static const SystemError::ErrorCode STUN_CONN_CANNOT_READ = 1;
         static const SystemError::ErrorCode STUN_REPLY_PACKAGE_BROKEN = 2;
-        static const SystemError::ErrorCode STUN_CONN_CANNOT_READ = 3;
 
     private:
         typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
