@@ -38,7 +38,7 @@ void QnLicenseNotificationDialog::setLicenses(const QList<QnLicensePtr> &license
             invalidCount++;
 
     if(invalidCount > 0)
-        ui->label->setText(tr("Some of your licenses is unavailable."));
+        ui->label->setText(tr("Some of your licenses are unavailable."));
     else
         ui->label->setText(tr("Some of your licenses will soon expire."));
 

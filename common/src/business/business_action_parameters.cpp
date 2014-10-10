@@ -2,9 +2,9 @@
 
 #include <utils/serialization/json_functions.h>
 
-// TODO: #Elric #enum use QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS
+// TODO: #Elric #enum use QN_DEFINE_EXPLICIT_ENULEXICAL_FUNCTIONS
 
-static QLatin1String PARAM_NAMES[] =
+static QLatin1String PARANAMES[] =
 {
     QLatin1String("soundUrl"),
     QLatin1String("emailAddress"),
@@ -23,123 +23,13 @@ static QLatin1String PARAM_NAMES[] =
 
 static const char DELIMITER('$');
 
-QnBusinessActionParameters::QnBusinessActionParameters()
-{
-    m_userGroup = 0;
-    m_fps = 10;
-    m_streamQuality = int(Qn::QualityHighest);
-    m_recordingDuration = 0;
-    m_before = 0;
-    m_after = 0;
-    m_relayAutoResetTimeout = 0;
-}
-
-QString QnBusinessActionParameters::getSoundUrl() const {
-    return m_soundUrl;
-}
-
-void QnBusinessActionParameters::setSoundUrl(const QString &value) {
-    m_soundUrl = value;
-}
-
-QString QnBusinessActionParameters::getSayText() const {
-    return m_sayText;
-}
-
-void QnBusinessActionParameters::setSayText(const QString &value) {
-    m_sayText = value;
-}
-
-QString QnBusinessActionParameters::getEmailAddress() const {
-    return m_emailAddress;
-}
-
-void QnBusinessActionParameters::setEmailAddress(const QString &value) {
-    m_emailAddress = value;
-}
-
-QnBusinessActionParameters::UserGroup QnBusinessActionParameters::getUserGroup() const {
-    return (UserGroup) m_userGroup;
-}
-
-void QnBusinessActionParameters::setUserGroup(const UserGroup value) {
-    m_userGroup = (int)value;
-}
-
-
-int QnBusinessActionParameters::getFps() const {
-    return m_fps;
-}
-
-void QnBusinessActionParameters::setFps(int value) {
-    m_fps = value;
-}
-
-Qn::StreamQuality QnBusinessActionParameters::getStreamQuality() const {
-    return (Qn::StreamQuality) m_streamQuality;
-}
-
-void QnBusinessActionParameters::setStreamQuality(Qn::StreamQuality value) {
-    m_streamQuality = (int) value;
-}
-
-int QnBusinessActionParameters::getRecordDuration() const {
-    return m_recordingDuration;
-}
-
-void QnBusinessActionParameters::setRecordDuration(int value) {
-    m_recordingDuration = value;
-}
-
-int QnBusinessActionParameters::getRecordBefore() const {
-    return m_before;
-}
-
-void QnBusinessActionParameters::setRecordBefore(int value) {
-    m_before = value;
-}
-
-int QnBusinessActionParameters::getRecordAfter() const {
-    return m_after;
-}
-
-void QnBusinessActionParameters::setRecordAfter(int value)  {
-    m_after = value;
-}
-
-QString QnBusinessActionParameters::getRelayOutputId() const {
-    return m_relayOutputID;
-}
-
-void QnBusinessActionParameters::setRelayOutputId(const QString &value) {
-    m_relayOutputID = value;
-}
-
-int QnBusinessActionParameters::getRelayAutoResetTimeout() const {
-    return m_relayAutoResetTimeout;
-}
-
-void QnBusinessActionParameters::setRelayAutoResetTimeout(int value) {
-    m_relayAutoResetTimeout = value;
-}
-
-QString QnBusinessActionParameters::getParamsKey() const {
-    return m_keyParam;
-}
-
-void QnBusinessActionParameters::setParamsKey(QString value) {
-    m_keyParam = value;
-}
-
-
-QString QnBusinessActionParameters::getInputPortId() const
-{
-    return m_inputPortId;
-}
-
-void QnBusinessActionParameters::setInputPortId(const QString &value)
-{
-    m_inputPortId = value;
+QnBusinessActionParameters::QnBusinessActionParameters() {
+    userGroup = EveryOne;
+    fps = 10;
+    streamQuality = Qn::QualityHighest;
+    recordingDuration = 0;
+    recordAfter = 0;
+    relayAutoResetTimeout = 0;
 }
 
 inline int toInt(const QByteArray& ba)
@@ -156,7 +46,7 @@ inline int toInt(const QByteArray& ba)
     return result;
 }
 
-QnBusinessActionParameters QnBusinessActionParameters::deserialize(const QByteArray& value)
+QnBusinessActionParameters QnBusinessActionParameters::unpack(const QByteArray& value)
 {
     QnBusinessActionParameters result;
 
@@ -175,43 +65,43 @@ QnBusinessActionParameters QnBusinessActionParameters::deserialize(const QByteAr
         switch ((Param) i)
         {
             case SoundUrlParam:
-                result.m_soundUrl = QString::fromUtf8(field.data(), field.size());
+                result.soundUrl = QString::fromUtf8(field.data(), field.size());
                 break;
             case EmailAddressParam:
-                result.m_emailAddress = QString::fromUtf8(field.data(), field.size());
+                result.emailAddress = QString::fromUtf8(field.data(), field.size());
                 break;
             case UserGroupParam:
-                result.m_userGroup = toInt(field);
+                result.userGroup = static_cast<UserGroup>(toInt(field));
                 break;
             case FpsParam:
-                result.m_fps = toInt(field);
+                result.fps = toInt(field);
                 break;
             case QualityParam:
-                result.m_streamQuality = toInt(field);
+                result.streamQuality = static_cast<Qn::StreamQuality>(toInt(field));
                 break;
             case DurationParam:
-                result.m_recordingDuration = toInt(field);
+                result.recordingDuration = toInt(field);
                 break;
-            case BeforeParam:
-                result.m_before = toInt(field);
+            case RecordBeforeParam:
+                /* Record-before setup is forbidden */
                 break;
-            case AfterParam:
-                result.m_after = toInt(field);
+            case RecordAfterParam:
+                result.recordAfter = toInt(field);
                 break;
             case RelayOutputIdParam:
-                result.m_relayOutputID = QString::fromUtf8(field.data(), field.size());
+                result.relayOutputId = QString::fromUtf8(field.data(), field.size());
                 break;
-            case EelayAutoResetTimeoutParam:
-                result.m_relayAutoResetTimeout = toInt(field);
+            case RelayAutoResetTimeoutParam:
+                result.relayAutoResetTimeout = toInt(field);
                 break;
             case InputPortIdParam:
-                result.m_inputPortId = QString::fromUtf8(field.data(), field.size());
+                result.inputPortId = QString::fromUtf8(field.data(), field.size());
                 break;
             case KeyParam:
-                result.m_keyParam = QString::fromUtf8(field.data(), field.size());
+                result.keyParam = QString::fromUtf8(field.data(), field.size());
                 break;
             case SayTextParam:
-                result.m_sayText = QString::fromUtf8(field.data(), field.size());
+                result.sayText = QString::fromUtf8(field.data(), field.size());
                 break;
             default:
                 break;
@@ -229,33 +119,30 @@ bool QnBusinessActionParameters::isDefault() const
     return equalTo(empty);
 }
 
-bool QnBusinessActionParameters::equalTo(const QnBusinessActionParameters& other) const
-{
-    if (m_soundUrl != other.m_soundUrl)
+bool QnBusinessActionParameters::equalTo(const QnBusinessActionParameters& other) const {
+    if (soundUrl != other.soundUrl)
         return false;
-    if (m_emailAddress != other.m_emailAddress)
+    if (emailAddress != other.emailAddress)
         return false;
-    if (m_userGroup != other.m_userGroup)
+    if (userGroup != other.userGroup)
         return false;
-    if (m_fps != other.m_fps)
+    if (fps != other.fps)
         return false;
-    if (m_streamQuality != other.m_streamQuality)
+    if (streamQuality != other.streamQuality)
         return false;
-    if (m_recordingDuration != other.m_recordingDuration)
+    if (recordingDuration != other.recordingDuration)
         return false;
-    if (m_before != other.m_before)
+    if (recordAfter != other.recordAfter)
         return false;
-    if (m_after != other.m_after)
+    if (relayOutputId != other.relayOutputId)
         return false;
-    if (m_relayOutputID != other.m_relayOutputID)
+    if (relayAutoResetTimeout != other.relayAutoResetTimeout)
         return false;
-    if (m_relayAutoResetTimeout != other.m_relayAutoResetTimeout)
+    if (inputPortId != other.inputPortId)
         return false;
-    if (m_inputPortId != other.m_inputPortId)
+    if (keyParam != other.keyParam)
         return false;
-    if (m_keyParam != other.m_keyParam)
-        return false;
-    if (m_sayText != other.m_sayText)
+    if (sayText != other.sayText)
         return false;
 
     return true;
@@ -275,59 +162,57 @@ static void serializeStringParam(QByteArray& result, const QString& value, const
     result += DELIMITER;
 }
 
-QByteArray QnBusinessActionParameters::serialize() const
+QByteArray QnBusinessActionParameters::pack() const
 {
     QByteArray result;
 
-    static QnBusinessActionParameters m_defaultParams;
-    serializeStringParam(result, m_soundUrl, m_defaultParams.m_soundUrl);
-    serializeStringParam(result, m_emailAddress, m_defaultParams.m_emailAddress);
-    serializeIntParam(result, m_userGroup, m_defaultParams.m_userGroup);
-    serializeIntParam(result, m_fps, m_defaultParams.m_fps);
-    serializeIntParam(result, m_streamQuality, m_defaultParams.m_streamQuality);
-    serializeIntParam(result, m_recordingDuration, m_defaultParams.m_recordingDuration);
-    serializeIntParam(result, m_before, m_defaultParams.m_before);
-    serializeIntParam(result, m_after, m_defaultParams.m_after);
-    serializeStringParam(result, m_relayOutputID, m_defaultParams.m_relayOutputID);
-    serializeIntParam(result, m_relayAutoResetTimeout, m_defaultParams.m_relayAutoResetTimeout);
-    serializeStringParam(result, m_inputPortId, m_defaultParams.m_inputPortId);
-    serializeStringParam(result, m_keyParam, m_defaultParams.m_keyParam);
-    serializeStringParam(result, m_sayText, m_defaultParams.m_sayText);
+    static QnBusinessActionParameters defaultParams;
+    serializeStringParam(result, soundUrl, defaultParams.soundUrl);
+    serializeStringParam(result, emailAddress, defaultParams.emailAddress);
+    serializeIntParam(result, userGroup, defaultParams.userGroup);
+    serializeIntParam(result, fps, defaultParams.fps);
+    serializeIntParam(result, streamQuality, defaultParams.streamQuality);
+    serializeIntParam(result, recordingDuration, defaultParams.recordingDuration);
+    serializeIntParam(result, 0, 0);    /* Record-before setup is forbidden, leaving place to maintain compatibility. */
+    serializeIntParam(result, recordAfter, defaultParams.recordAfter);
+    serializeStringParam(result, relayOutputId, defaultParams.relayOutputId);
+    serializeIntParam(result, relayAutoResetTimeout, defaultParams.relayAutoResetTimeout);
+    serializeStringParam(result, inputPortId, defaultParams.inputPortId);
+    serializeStringParam(result, keyParam, defaultParams.keyParam);
+    serializeStringParam(result, sayText, defaultParams.sayText);
 
     return result;
 }
 
 QnBusinessParams QnBusinessActionParameters::toBusinessParams() const
 {
-    static QnBusinessActionParameters m_defaultParams;
+    static QnBusinessActionParameters defaultParams;
     QnBusinessParams result;
 
-    if (m_soundUrl != m_defaultParams.m_soundUrl)
-        result.insert(PARAM_NAMES[SoundUrlParam], m_soundUrl);
-    if (m_emailAddress != m_defaultParams.m_emailAddress)
-        result.insert(PARAM_NAMES[EmailAddressParam], m_emailAddress);
-    if (m_userGroup != m_defaultParams.m_userGroup)
-        result.insert(PARAM_NAMES[UserGroupParam], m_userGroup);
-    if (m_fps != m_defaultParams.m_fps)
-        result.insert(PARAM_NAMES[FpsParam], m_fps);
-    if (m_streamQuality != m_defaultParams.m_streamQuality)
-        result.insert(PARAM_NAMES[QualityParam], m_streamQuality);
-    if (m_recordingDuration != m_defaultParams.m_recordingDuration)
-        result.insert(PARAM_NAMES[DurationParam], m_recordingDuration);
-    if (m_before != m_defaultParams.m_before)
-        result.insert(PARAM_NAMES[BeforeParam], m_before);
-    if (m_after != m_defaultParams.m_after)
-        result.insert(PARAM_NAMES[AfterParam], m_after);
-    if (m_relayOutputID != m_defaultParams.m_relayOutputID)
-        result.insert(PARAM_NAMES[RelayOutputIdParam], m_relayOutputID);
-    if (m_relayAutoResetTimeout != m_defaultParams.m_relayAutoResetTimeout)
-        result.insert(PARAM_NAMES[EelayAutoResetTimeoutParam], m_relayAutoResetTimeout);
-    if (m_inputPortId != m_defaultParams.m_inputPortId)
-        result.insert(PARAM_NAMES[InputPortIdParam], m_inputPortId);
-    if (m_keyParam != m_defaultParams.m_keyParam)
-        result.insert(PARAM_NAMES[KeyParam], m_keyParam);
-    if (m_sayText != m_defaultParams.m_sayText)
-        result.insert(PARAM_NAMES[SayTextParam], m_sayText);
+    if (soundUrl != defaultParams.soundUrl)
+        result.insert(PARANAMES[SoundUrlParam], soundUrl);
+    if (emailAddress != defaultParams.emailAddress)
+        result.insert(PARANAMES[EmailAddressParam], emailAddress);
+    if (userGroup != defaultParams.userGroup)
+        result.insert(PARANAMES[UserGroupParam], userGroup);
+    if (fps != defaultParams.fps)
+        result.insert(PARANAMES[FpsParam], fps);
+    if (streamQuality != defaultParams.streamQuality)
+        result.insert(PARANAMES[QualityParam], streamQuality);
+    if (recordingDuration != defaultParams.recordingDuration)
+        result.insert(PARANAMES[DurationParam], recordingDuration);
+    if (recordAfter != defaultParams.recordAfter)
+        result.insert(PARANAMES[RecordAfterParam], recordAfter);
+    if (relayOutputId != defaultParams.relayOutputId)
+        result.insert(PARANAMES[RelayOutputIdParam], relayOutputId);
+    if (relayAutoResetTimeout != defaultParams.relayAutoResetTimeout)
+        result.insert(PARANAMES[RelayAutoResetTimeoutParam], relayAutoResetTimeout);
+    if (inputPortId != defaultParams.inputPortId)
+        result.insert(PARANAMES[InputPortIdParam], inputPortId);
+    if (keyParam != defaultParams.keyParam)
+        result.insert(PARANAMES[KeyParam], keyParam);
+    if (sayText != defaultParams.sayText)
+        result.insert(PARANAMES[SayTextParam], sayText);
 
     return result;
 }
@@ -336,7 +221,7 @@ int QnBusinessActionParameters::getParamIndex(const QString& key)
 {
     for (int i = 0; i < (int) ParamCount; ++i)
     {
-        if (key == PARAM_NAMES[i])
+        if (key == PARANAMES[i])
             return i;
     }
     return -1;
@@ -353,43 +238,40 @@ QnBusinessActionParameters QnBusinessActionParameters::fromBusinessParams(const 
         switch (Param( paramIndex))
         {
         case SoundUrlParam:
-            result.m_soundUrl = itr.value().toString();
+            result.soundUrl = itr.value().toString();
             break;
         case EmailAddressParam:
-            result.m_emailAddress = itr.value().toString();
+            result.emailAddress = itr.value().toString();
             break;
         case UserGroupParam:
-            result.m_userGroup = itr.value().toInt();
+            result.userGroup = static_cast<UserGroup>(itr.value().toInt());
             break;
         case FpsParam:
-            result.m_fps = itr.value().toInt();
+            result.fps = itr.value().toInt();
             break;
         case QualityParam:
-            result.m_streamQuality = itr.value().toInt();
+            result.streamQuality = static_cast<Qn::StreamQuality>(itr.value().toInt());
             break;
         case DurationParam:
-            result.m_recordingDuration = itr.value().toInt();
+            result.recordingDuration = itr.value().toInt();
             break;
-        case BeforeParam:
-            result.m_before = itr.value().toInt();
-            break;
-        case AfterParam:
-            result.m_after = itr.value().toInt();
+        case RecordAfterParam:
+            result.recordAfter = itr.value().toInt();
             break;
         case RelayOutputIdParam:
-            result.m_relayOutputID = itr.value().toString();
+            result.relayOutputId = itr.value().toString();
             break;
-        case EelayAutoResetTimeoutParam:
-            result.m_relayAutoResetTimeout = itr.value().toInt();
+        case RelayAutoResetTimeoutParam:
+            result.relayAutoResetTimeout = itr.value().toInt();
             break;
         case InputPortIdParam:
-            result.m_inputPortId = itr.value().toString();
+            result.inputPortId = itr.value().toString();
             break;
         case KeyParam:
-            result.m_keyParam = itr.value().toString();
+            result.keyParam = itr.value().toString();
             break;
         case SayTextParam:
-            result.m_sayText = itr.value().toString();
+            result.sayText = itr.value().toString();
             break;
         default:
             break;
