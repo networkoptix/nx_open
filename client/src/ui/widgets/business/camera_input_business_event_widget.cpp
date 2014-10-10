@@ -65,6 +65,6 @@ void QnCameraInputBusinessEventWidget::paramsChanged() {
         return;
 
     QnBusinessActionParameters params;
-    params.setInputPortId(ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString());
+    params.inputPortId = ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString();
     model()->setActionParams(params);
 }

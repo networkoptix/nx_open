@@ -77,13 +77,13 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleView
     if (fields & QnBusiness::ActionParamsField) {
         QnBusinessActionParameters params = model->actionParams();
 
-        QString text = params.getRelayOutputId();
+        QString text = params.relayOutputId;
         if (ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString() != text)
             ui->relayComboBox->setCurrentIndex(ui->relayComboBox->findData(text));
 
         bool instant = (model->actionType() == QnBusiness::CameraOutputOnceAction);
         if (!instant) {
-            int autoReset = params.getRelayAutoResetTimeout() / 1000;
+            int autoReset = params.relayAutoResetTimeout / 1000;
             ui->autoResetCheckBox->setChecked(autoReset > 0);
             if (autoReset > 0)
                 ui->autoResetSpinBox->setValue(autoReset);
@@ -96,10 +96,10 @@ void QnCameraOutputBusinessActionWidget::paramsChanged() {
         return;
 
     QnBusinessActionParameters params;
-    params.setRelayOutputId(ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString());
-    params.setRelayAutoResetTimeout(ui->autoResetCheckBox->isChecked()
+    params.relayOutputId = ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString();
+    params.relayAutoResetTimeout = ui->autoResetCheckBox->isChecked()
                                                          ? ui->autoResetSpinBox->value() * 1000
-                                                         : 0);
+                                                         : 0;
     model()->setActionParams(params);
 
 }

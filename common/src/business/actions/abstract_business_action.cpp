@@ -76,10 +76,6 @@ namespace QnBusiness {
             return false;
         }
     }
-
-    bool isImplemented(ActionType actionType) { 
-        return actionType != BookmarkAction; 
-    }
 }
 
 QnAbstractBusinessAction::QnAbstractBusinessAction(const QnBusiness::ActionType actionType, const QnBusinessEventParameters& runtimeParams):

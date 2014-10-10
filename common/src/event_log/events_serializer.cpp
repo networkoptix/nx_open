@@ -50,7 +50,7 @@ void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, cons
 
         int actionParamsLen = readInt(curPtr);
         ba = QByteArray::fromRawData((const char*)curPtr, actionParamsLen);
-        action.setParams(QnBusinessActionParameters::deserialize(ba));
+        action.setParams(QnBusinessActionParameters::unpack(ba));
         curPtr += actionParamsLen;
 
     }

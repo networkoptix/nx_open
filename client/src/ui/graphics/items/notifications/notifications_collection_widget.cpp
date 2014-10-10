@@ -262,7 +262,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     const bool soundAction = businessAction->actionType() == QnBusiness::PlaySoundAction;
     if (soundAction) {
-        QString soundUrl = businessAction->getParams().getSoundUrl();
+        QString soundUrl = businessAction->getParams().soundUrl;
         m_itemsByLoadingSound.insert(soundUrl, item);
         context()->instance<QnAppServerNotificationCache>()->downloadFile(soundUrl);
         item->setNotificationLevel(Qn::CommonNotification);
