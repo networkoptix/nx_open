@@ -50,6 +50,9 @@ QnSecurityCamResource::QnSecurityCamResource():
 
 QString QnSecurityCamResource::getName() const
 {
+    if( getId().isNull() )
+        return QnResource::getName();
+
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     if( !(*userAttributesLock)->name.isEmpty() )
         return (*userAttributesLock)->name;
@@ -426,11 +429,6 @@ Qn::MotionType QnSecurityCamResource::getMotionType() const {
         return getDefaultMotionType();
     else
         return (*userAttributesLock)->motionType;
-}
-
-Qn::MotionType QnSecurityCamResource::getMotionTypeRaw() const {
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    return (*userAttributesLock)->motionType;
 }
 
 void QnSecurityCamResource::setMotionType(Qn::MotionType value) {
