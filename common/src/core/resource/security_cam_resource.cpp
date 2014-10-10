@@ -62,13 +62,15 @@ QString QnSecurityCamResource::getName() const
 void QnSecurityCamResource::setName( const QString& name )
 {
     setCameraName( name );
-    QnResource::setName( name );
 }
 
 void QnSecurityCamResource::setCameraName( const QString& newCameraName )
 {
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    (*userAttributesLock)->name = newCameraName;
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+        (*userAttributesLock)->name = newCameraName;
+    }
+    QnResource::setName( newCameraName );
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
