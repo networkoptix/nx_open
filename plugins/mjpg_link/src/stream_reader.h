@@ -48,6 +48,7 @@ public:
     virtual void interrupt() override;
 
     void setFps( float fps );
+    void updateCameraInfo( const nxcip::CameraInfo& info );
 
 private:
     enum StreamType

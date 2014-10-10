@@ -117,9 +117,22 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
                 return nxcip::NX_INTERRUPTED;
         localHttpClientPtr->setUserName( QLatin1String(m_cameraInfo.defaultLogin) );
         localHttpClientPtr->setUserPassword( QLatin1String(m_cameraInfo.defaultPassword) );
-        if( !localHttpClientPtr->doGet( QUrl(QLatin1String(m_cameraInfo.url)) ) )
+        if( !localHttpClientPtr->doGet( QUrl(QLatin1String(m_cameraInfo.url)) ) ||
+            !localHttpClientPtr->response() )
         {
             NX_LOG( QString::fromLatin1("Failed to request %1").arg(QLatin1String(m_cameraInfo.url)), cl_logDEBUG1 );
+            return nxcip::NX_NETWORK_ERROR;
+        }
+        if( localHttpClientPtr->response()->statusLine.statusCode == nx_http::StatusCode::unauthorized )
+        {
+            NX_LOG( QString::fromLatin1("Failed to request %1: %2").arg(QLatin1String(m_cameraInfo.url)).
+                arg(QLatin1String(localHttpClientPtr->response()->statusLine.reasonPhrase)), cl_logDEBUG1 );
+            return nxcip::NX_NOT_AUTHORIZED;
+        }
+        if( localHttpClientPtr->response()->statusLine.statusCode / 100 * 100 != nx_http::StatusCode::ok )
+        {
+            NX_LOG( QString::fromLatin1("Failed to request %1: %2").arg(QLatin1String(m_cameraInfo.url)).
+                arg(QLatin1String(localHttpClientPtr->response()->statusLine.reasonPhrase)), cl_logDEBUG1 );
             return nxcip::NX_NETWORK_ERROR;
         }
 
@@ -167,6 +180,9 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             while( !m_videoPacket.get() && !localHttpClientPtr->eof() )
                 m_multipartContentParser.processData( localHttpClientPtr->fetchMessageBodyBuffer() );
             break;
+
+        default:
+            break;
     }
 
     if( m_videoPacket.get() )
@@ -200,6 +216,11 @@ void StreamReader::setFps( float fps )
 {
     m_fps = fps;
     m_frameDurationMSec = (qint64)(1000.0 / m_fps);
+}
+
+void StreamReader::updateCameraInfo( const nxcip::CameraInfo& info )
+{
+    m_cameraInfo = info;
 }
 
 void StreamReader::gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame )

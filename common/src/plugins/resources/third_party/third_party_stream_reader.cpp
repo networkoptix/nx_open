@@ -132,6 +132,8 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
     }
     nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
 
+    m_camManager.setCredentials( m_thirdPartyRes->getAuth().user(), m_thirdPartyRes->getAuth().password() );
+
     if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
         return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
 
