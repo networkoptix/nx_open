@@ -14,14 +14,7 @@ FocusScope {
     property int leftPadding
     property int rightPadding
 
-    property int __padding: {
-        return 0
-        // TODO: #dklychkov uncomment in production and remove dummy
-//        if (Qt.platform.os == "android")
-//            return 0
-//        else
-//            return textInput.contentHeight / 3
-    }
+    property int textPadding: textInput.contentHeight / 3
 
     signal accepted()
     signal editingFinished()
@@ -38,15 +31,15 @@ FocusScope {
         }
         y: parent.height
         border.width: 0
-        height: CommonFunctions.dp(2)
+        height: textInput.activeFocus ? CommonFunctions.dp(2) : CommonFunctions.dp(1)
         color: textInput.activeFocus ? colorTheme.color("inputBorderActive") : colorTheme.color("inputBorder")
     }
 
     Item {
         anchors {
             fill: parent
-            leftMargin: __padding + leftPadding
-            rightMargin: __padding / 3 + rightPadding
+            leftMargin: textPadding + leftPadding
+            rightMargin: textPadding / 3 + rightPadding
         }
 
         MouseArea {
