@@ -35,6 +35,7 @@
 #include "api/runtime_info_manager.h"
 #include "utils/common/log.h"
 #include "nx_ec/data/api_camera_data_ex.h"
+#include <QtXml/QXmlDefaultHandler>
 
 using std::nullptr_t;
 
@@ -2154,6 +2155,59 @@ ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
  ------------------------------------------------------------
 */
 
+class ResTypeXmlParser: public QXmlDefaultHandler
+{
+public:
+    ResTypeXmlParser(ApiResourceTypeDataList& data): m_data(data) {}
+
+    virtual bool characters( const QString& ch ) override
+    {
+        // todo: implement me
+        return true;
+    }
+
+    virtual bool startElement( const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& atts ) override
+    {
+        // todo: implement me
+        return true;
+    }
+
+    virtual bool endElement( const QString& namespaceURI, const QString& localName, const QString& qName ) override
+    {
+        // todo: implement me
+        return true;
+    }
+
+private:
+    ApiResourceTypeDataList& m_data;
+};
+
+
+void QnDbManager::loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data)
+{
+    QFile f(fileName);
+    if (!f.open(QFile::ReadOnly))
+        return;
+    QBuffer xmlData;
+    xmlData.setData(f.readAll());
+    ResTypeXmlParser parser(data);
+    QXmlSimpleReader reader;
+    reader.setContentHandler(&parser);
+    QXmlInputSource xmlSrc( &xmlData );
+    if(!reader.parse( &xmlSrc )) {
+        qWarning() << "Can't parse XML file " << fileName << "with additional resource types. Check XML file syntax.";
+    }
+}
+
+void QnDbManager::addResourceTypesFromXML(ApiResourceTypeDataList& data)
+{
+    foreach(const QFileInfo& fi, QDir(":/resources").entryInfoList(QDir::Files))
+        loadResourceTypeXML(fi.absoluteFilePath(), data);
+    QDir dir2(QCoreApplication::applicationDirPath() + QString(lit("/resources")));
+    foreach(const QFileInfo& fi, dir2.entryInfoList(QDir::Files))
+        loadResourceTypeXML(fi.absoluteFilePath(), data);
+}
+
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& data)
 {
     if (!m_cachedResTypes.empty())
@@ -2200,6 +2254,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
     std::vector<ApiPropertyTypeData> allProperties;
     QnSql::fetch_many(queryProperty, &allProperties);
     mergeObjectListData(data, allProperties, &ApiResourceTypeData::propertyTypes, &ApiPropertyTypeData::resourceTypeId);
+
+    addResourceTypesFromXML(data);
 
     m_cachedResTypes = data;
 
