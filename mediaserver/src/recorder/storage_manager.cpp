@@ -94,9 +94,7 @@ QnStorageManager::QnStorageManager():
 
     assert( QnStorageManager_instance == nullptr );
     QnStorageManager_instance = this;
-
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::DirectConnection);
 }
 
 std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -135,6 +133,9 @@ void QnStorageManager::initDone()
     m_initInProgress = false;
     foreach(QnStorageResourcePtr storage, getStorages())
         addDataFromDatabase(storage);
+    disconnect(qnResPool);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 }
 
 QMap<QString, QSet<int>> QnStorageManager::deserializeStorageFile()
