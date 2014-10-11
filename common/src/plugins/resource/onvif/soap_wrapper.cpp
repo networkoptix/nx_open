@@ -290,13 +290,16 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
     QString passwd;
     int soapRes = SOAP_OK;
     do {
-        NX_LOG( QString::fromLatin1("Trying login = %1 password = %2)").arg(login).arg(passwd), cl_logDEBUG2 );
+        QTime timer;
+        timer.restart();
         setLogin(login);
         setPassword(passwd);
 
         NetIfacesReq request1;
         NetIfacesResp response1;
         soapRes = getNetworkInterfaces(request1, response1);
+
+        NX_LOG( QString::fromLatin1("Trying login = '%1' password = '%2'. url=%3. time = %4)").arg(login).arg(passwd).arg(getEndpointUrl()).arg(timer.elapsed()), cl_logDEBUG2 );
 
         if (soapRes == SOAP_OK || !isNotAuthenticated()) {
             NX_LOG( lit("Finished picking password"), cl_logDEBUG2 );
