@@ -937,7 +937,7 @@ ErrorCode QnDbManager::insertResource(const ApiResourceData& data, qint32* inter
     //insQuery.prepare("INSERT INTO vms_resource VALUES(NULL, ?,?,?,?,?,?,?)");
     insQuery.prepare("INSERT INTO vms_resource(status, name, url, xtype_guid, parent_guid, guid) VALUES(?,?,?,?,?,?)");
 
-    insQuery.bindValue(0, QnSql::serialized_field(data.status));
+    insQuery.bindValue(0, QnSql::serialized_field(Qn::Offline));
     insQuery.bindValue(1, QnSql::serialized_field(data.name));
     insQuery.bindValue(2, QnSql::serialized_field(data.url));
     insQuery.bindValue(3, QnSql::serialized_field(data.typeId));
@@ -985,7 +985,7 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
         query.bindValue(":internalID", *internalId);
     }
     else {
-        query.prepare("INSERT OR REPLACE INTO vms_resource (guid, xtype_guid, parent_guid, name, url, status) VALUES(:id, :typeId, :parentId, :name, :url, :status)");
+        query.prepare("INSERT INTO vms_resource (guid, xtype_guid, parent_guid, name, url, status) VALUES(:id, :typeId, :parentId, :name, :url, 0)");
     }
     QnSql::bind(data, &query);
     //data.autoBindValues(query);
@@ -1018,7 +1018,7 @@ ErrorCode QnDbManager::updateResource(const ApiResourceData& data, qint32 intern
         return result;
 
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("UPDATE vms_resource SET xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url, status = :status WHERE id = :internalId");
+    insQuery.prepare("UPDATE vms_resource SET xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url WHERE id = :internalId");
     QnSql::bind(data, &insQuery);
     insQuery.bindValue(":internalId", internalId);
 
