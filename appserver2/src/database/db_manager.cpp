@@ -622,12 +622,12 @@ bool QnDbManager::updateGuids()
         return false;
 
     // update default rules
-    guids = getGuidList("SELECT id, id from vms_businessrule WHERE not (id between 1 and 19) and not (id between 10020 and 10023) ORDER BY id", CM_INT, "DEFAULT_BUSINESS_RULES");
+    guids = getGuidList("SELECT id, id from vms_businessrule WHERE (id between 1 and 19) or (id between 10020 and 10023) ORDER BY id", CM_INT, "DEFAULT_BUSINESS_RULES");
     if (!updateTableGuids("vms_businessrule", "guid", guids))
         return false;
 
     // update user's rules
-    guids = getGuidList("SELECT id, id from vms_businessrule WHERE length(guid) = 0 ORDER BY id", CM_INT, QnUuid::createUuid().toByteArray());
+    guids = getGuidList("SELECT id, id from vms_businessrule WHERE guid is null ORDER BY id", CM_INT, QnUuid::createUuid().toByteArray());
     if (!updateTableGuids("vms_businessrule", "guid", guids))
         return false;
 
