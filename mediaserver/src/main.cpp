@@ -1563,6 +1563,7 @@ void QnMain::run()
 
 
     qnStorageMan->doMigrateCSVCatalog();
+    qnStorageMan->initDone();
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);

@@ -310,6 +310,12 @@ private: // Handshake
 
 private: // SSL perform
 
+    enum {
+        FINISH_SSL_READ,
+        FINISH_SSL_WRITE,
+        FINISH_SSL_READ_WRITE
+    };
+
     // Call the following 3 functions to start each different SSL_read/SSL_write/SSL_conn
     void Perform( std::shared_ptr<AsyncSSLOperation>&& op , bool is_read );
     void PerformSSLRead( std::shared_ptr<AsyncSSLOperation>&& op );
@@ -322,7 +328,7 @@ private: // SSL perform
 
     void CheckSSLShutdown( int status_code , int ssl_error );
 
-    bool HandlePerformSSLResult( int ssl_error , bool need_write , std::shared_ptr<AsyncSSLOperation>&& op );
+    bool HandlePerformSSLResult( int ssl_error , bool ssl_io , std::shared_ptr<AsyncSSLOperation>&& op );
 
     void HandleSSLError( int ssl_error );
 
@@ -764,9 +770,17 @@ bool AsyncSSL::DecreaseOPPendingIOCount( const std::shared_ptr<AsyncSSLOperation
 bool AsyncSSL::DoWrite( PendingWriteIO* write_io ) {
     bool ret;
     switch( write_io->operation->status() ) {
-    case AsyncSSLOperation::EXECUTING:
-    case AsyncSSLOperation::SUCCESS:
+    case AsyncSSLOperation::FAIL:
     case AsyncSSLOperation::END_OF_STREAM:
+        if( DecreaseOPPendingIOCount(write_io->operation) ) {
+            RemoveCurrentWriteIO();
+            return false;
+        } else {
+            return true;
+        }
+        break;
+    case AsyncSSLOperation::SUCCESS:
+    case AsyncSSLOperation::EXECUTING:
         ret = socket_->sendAsync( write_io->data , std::bind(
             &AsyncSSL::OnUnderlySocketWriteDone,
             this,
@@ -785,14 +799,6 @@ bool AsyncSSL::DoWrite( PendingWriteIO* write_io ) {
             }
         }
         return true;
-    case AsyncSSLOperation::FAIL:
-        if( DecreaseOPPendingIOCount(write_io->operation) ) {
-            RemoveCurrentWriteIO();
-            return false;
-        } else {
-            return true;
-        }
-        break;
     default: Q_ASSERT(0); return false;
     }
 }
@@ -884,12 +890,14 @@ void AsyncSSL::HandleSSLError( int ssl_error ) {
     NX_LOG(
         lit("SSL error code:%1\n").arg(QLatin1String(SSLErrorStr(ssl_error))),
         cl_logDEBUG1 );
+    qDebug()<<QLatin1String(SSLErrorStr(ssl_error));
     int err;
     while( (err = ERR_get_error()) != 0 ) {
         char err_str[1024];
         ERR_error_string_n(err,err_str,1024);
         NX_LOG(
             lit("SSL error stack:%1\n").arg(QLatin1String(err_str)),cl_logDEBUG1);
+        qDebug()<<QLatin1String(err_str);
     }
     NX_LOG(
         lit("System error code:%1\n").arg(SystemError::getLastOSErrorCode()),cl_logDEBUG1);
@@ -946,7 +954,6 @@ void AsyncSSLRead::Perform( int* return_value , int* ssl_error ) {
     int ssl_read_sz = SSL_read(ssl_,buf,static_cast<int>(empty_size));
     if( ssl_read_sz <= 0 ) {
         user_buffer_->resize(static_cast<int>(old_size));
-        written_size_ += 0;
     } else {
         user_buffer_->resize(static_cast<int>(old_size)+ssl_read_sz);
         written_size_ += ssl_read_sz;

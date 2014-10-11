@@ -141,7 +141,7 @@ bool QnEventsDB::saveActionToDB(const QnAbstractBusinessActionPtr& action, const
     insQuery.bindValue(":timestamp", timestampUsec/1000000);
     insQuery.bindValue(":action_type", (int) action->actionType());
     insQuery.bindValue(":action_params", action->getParams().pack());
-    insQuery.bindValue(":runtime_params", actionRuntime.serialize());
+    insQuery.bindValue(":runtime_params", actionRuntime.pack());
     insQuery.bindValue(":business_rule_guid", action->getBusinessRuleId().toRfc4122());
     insQuery.bindValue(":toggle_state", (int) action->getToggleState());
     insQuery.bindValue(":aggregation_count", action->getAggregationCount());
@@ -244,7 +244,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     {
         QnBusiness::ActionType actionType = (QnBusiness::ActionType) query.value(actionTypeIdx).toInt();
         QnBusinessActionParameters actionParams = QnBusinessActionParameters::unpack(query.value(actionParamIdx).toByteArray());
-        QnBusinessEventParameters runtimeParams = QnBusinessEventParameters::deserialize(query.value(runtimeParamIdx).toByteArray());
+        QnBusinessEventParameters runtimeParams = QnBusinessEventParameters::unpack(query.value(runtimeParamIdx).toByteArray());
         QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
         action->setParams(actionParams);
         action->setBusinessRuleId(QnUuid(query.value(businessRuleIdx).toByteArray()));
@@ -395,7 +395,7 @@ void QnEventsDB::migrate()
     {
         QSqlQuery query2;
         query2.prepare("UPDATE runtime_actions set runtime_params=:runtime_params WHERE id =:id");
-        query2.bindValue(":runtime_params", result[i]->getRuntimeParams().serialize());
+        query2.bindValue(":runtime_params", result[i]->getRuntimeParams().pack());
         query2.bindValue(":id", idList[i]);
         query2.exec();
     }
