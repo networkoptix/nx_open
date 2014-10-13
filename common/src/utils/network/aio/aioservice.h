@@ -6,6 +6,7 @@
 #ifndef AIOSERVICE_H
 #define AIOSERVICE_H
 
+#include <atomic>
 #include <memory>
 
 #include <boost/optional.hpp>
@@ -110,7 +111,7 @@ namespace aio
             \note Call will always be queued. I.e., if called from handler running in aio thread, it will be called after handler has returned
         */
         template<class SocketType, class Handler>
-        bool postTyped( SocketType* sock, Handler&& handler )
+        bool post( SocketType* sock, Handler&& handler )
         {
             QMutexLocker lk( &m_mutex );
             //if sock is not still bound to aio thread, binding it
@@ -119,13 +120,7 @@ namespace aio
                 threadToUse = bindSocketToAioThread( sock );
             if( !threadToUse )
                 return false;
-            return threadToUse->post( std::forward<Handler>(handler) );
-        }
-
-        template<class Handler>
-        bool post( AbstractSocket* sock, Handler&& handler )
-        {
-            return sock->post( std::forward<Handler>(handler) );
+            return threadToUse->post( sock, std::forward<Handler>(handler) );
         }
 
         //!Call \a handler from within aio thread \a sock is bound to
@@ -133,7 +128,7 @@ namespace aio
             \note If called in aio thread, handler will be called from within this method, otherwise - queued like \a aio::AIOService::post does
         */
         template<class SocketType, class Handler>
-        bool dispatchTyped( SocketType* sock, Handler&& handler )
+        bool dispatch( SocketType* sock, Handler&& handler )
         {
             QMutexLocker lk( &m_mutex );
             //if sock is not still bound to aio thread, binding it
@@ -142,13 +137,7 @@ namespace aio
                 threadToUse = bindSocketToAioThread( sock );
             if( !threadToUse )
                 return false;
-            return threadToUse->dispatch( std::forward<Handler>(handler) );
-        }
-
-        template<class Handler>
-        bool dispatch( AbstractSocket* sock, Handler&& handler )
-        {
-            return sock->dispatch( std::forward<Handler>(handler) );
+            return threadToUse->dispatch( sock, std::forward<Handler>(handler) );
         }
 
         //TODO #ak better remove this method, violates encapsulation
@@ -246,6 +235,7 @@ namespace aio
             auto it = aioHandlingContext.sockets.find( sockCtx );
             if( it != aioHandlingContext.sockets.end() )
             {
+                //TODO #ak detecting if eventType is last event socket is polled for. And, if so, cancelling posted functor calls
                 if( it->second.first->removeFromWatch( sock, eventType, waitForRunningHandlerCompletion ) )
                     aioHandlingContext.sockets.erase( it );
             }

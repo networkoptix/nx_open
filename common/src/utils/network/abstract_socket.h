@@ -145,12 +145,14 @@ public:
     //!Call \a handler from within aio thread \a sock is bound to
     /*!
         \note Call will always be queued. I.e., if called from handler running in aio thread, it will be called after handler has returned
+        \note \a handler execution is cancelled if socket polling for every event is cancelled
     */
     template<class HandlerType>
     bool post( HandlerType&& handler ) { return postImpl( std::forward<HandlerType>(handler) ); }
     //!Call \a handler from within aio thread \a sock is bound to
     /*!
         \note If called in aio thread, handler will be called from within this method, otherwise - queued like \a AbstractSocket::post does
+        \note \a handler execution is cancelled if socket polling for every event is cancelled
     */
     template<class HandlerType>
     bool dispatch( HandlerType&& handler ) { return dispatchImpl( std::forward<HandlerType>(handler) ); }

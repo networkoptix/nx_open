@@ -3,6 +3,7 @@
 #include "memutil.h"
 #include "strutil.h"
 #include "Utils.h"
+#include "portchecker.h"
 
 CString GenerateGuid()
 {
@@ -42,26 +43,16 @@ LPCWSTR GetProperty(MSIHANDLE hInstall, LPCWSTR name)
 
 bool IsPortAvailable(int port)
 {
-    SOCKET serverfd = socket(AF_INET, SOCK_STREAM, 0);
-
-    sockaddr_in channel;
-    memset(&channel, 0, sizeof(channel));
-    channel.sin_family = AF_INET;
-    channel.sin_addr.s_addr = INADDR_ANY;
-    channel.sin_port = htons(port);
-
-    int reuse = 1;
-    setsockopt(serverfd, SOL_SOCKET, SO_REUSEADDR, (char *)&reuse, sizeof(reuse));
-    int bind_status = bind(serverfd, (sockaddr *) &channel, sizeof(channel));
-    closesocket(serverfd);
-
-    return bind_status == 0;
+    PortChecker port_checker;
+    return port_checker.isPortAvailable(port);
 }
 
 bool IsPortRangeAvailable(int firstPort, int count)
 {
+    PortChecker port_checker;
+
     for (int port = firstPort; count; port++, count--)
-        if (!IsPortAvailable(port))
+        if (!port_checker.isPortAvailable(port))
             return false;
 
     return true;
