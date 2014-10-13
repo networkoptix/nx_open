@@ -23,7 +23,7 @@ namespace ec2
             assert( tran.command == ApiCommand::saveMediaServer);
             QnMediaServerResourcePtr mserverRes(new QnMediaServerResource(m_resCtx.resTypePool));
             fromApiToResource(tran.params, mserverRes, m_resCtx);
-            emit addedOrUpdated( mserverRes );
+            emit addedOrUpdated( std::move(mserverRes ));
         }
 
         void triggerNotification( const QnTransaction<ApiStorageData>& tran ) {
@@ -36,7 +36,7 @@ namespace ec2
             QnAbstractStorageResourcePtr storage = m_resCtx.resFactory->createResource(resType->getId(), 
                 QnResourceParams(tran.params.id, tran.params.url, QString())).dynamicCast<QnAbstractStorageResource>();
             fromApiToResource(tran.params, storage);
-            emit storageChanged( storage );
+            emit storageChanged( std::move(storage) );
         }
 
         void triggerNotification( const QnTransaction<ApiStorageDataList>& tran )
@@ -48,7 +48,7 @@ namespace ec2
                 QnAbstractStorageResourcePtr storage = m_resCtx.resFactory->createResource(resType->getId(), 
                     QnResourceParams(apiStorageData.id, apiStorageData.url, QString())).dynamicCast<QnAbstractStorageResource>();
                 fromApiToResource(apiStorageData, storage);
-                emit storageChanged( storage );
+                emit storageChanged( std::move(storage) );
             }
         }
 

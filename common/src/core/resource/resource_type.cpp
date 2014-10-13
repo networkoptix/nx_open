@@ -244,10 +244,15 @@ QnResourceTypePool::QnResourceTypeMap QnResourceTypePool::getResourceTypeMap() c
 
 QnResourceTypePtr QnResourceTypePool::desktopCameraResourceType() const {
     QMutexLocker lock(&m_mutex);
-    for(QnResourceTypeMap::const_iterator itr = m_resourceTypeMap.begin(); itr != m_resourceTypeMap.end(); ++itr)
+    if (!m_desktopCamResourceType) 
     {
-        if (itr.value()->getName() == desktopCameraTypeName)
-            return itr.value();
+        for(auto itr = m_resourceTypeMap.begin(); itr != m_resourceTypeMap.end(); ++itr)
+        {
+            if (itr.value()->getName() == desktopCameraTypeName) {
+                m_desktopCamResourceType = itr.value();
+                break;
+            }
+        }
     }
-    return QnResourceTypePtr();
+    return m_desktopCamResourceType;
 }

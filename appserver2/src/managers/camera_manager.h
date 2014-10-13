@@ -30,7 +30,7 @@ namespace ec2
             Q_ASSERT(cameraRes);
             if (cameraRes) {
                 fromApiToResource(tran.params, cameraRes);
-                emit cameraAddedOrUpdated( cameraRes );
+                emit cameraAddedOrUpdated( std::move(cameraRes ));
             }
         }
 
@@ -43,7 +43,7 @@ namespace ec2
                     camera.typeId,
                     QnResourceParams(camera.id, camera.url, camera.vendor) ).dynamicCast<QnVirtualCameraResource>();
                 fromApiToResource(camera, cameraRes);
-                emit cameraAddedOrUpdated( cameraRes );
+                emit cameraAddedOrUpdated( std::move(cameraRes) );
             }
         }
 
@@ -51,7 +51,7 @@ namespace ec2
             assert( tran.command == ApiCommand::saveCameraUserAttributes );
             QnCameraUserAttributesPtr cameraAttrs( new QnCameraUserAttributes() );
             fromApiToResource( tran.params, cameraAttrs );
-            emit userAttributesChanged( cameraAttrs );
+            emit userAttributesChanged( std::move(cameraAttrs) );
         }
 
         void triggerNotification( const QnTransaction<ApiCameraAttributesDataList>& tran ) {
@@ -60,7 +60,7 @@ namespace ec2
             {
                 QnCameraUserAttributesPtr cameraAttrs( new QnCameraUserAttributes() );
                 fromApiToResource( attrs, cameraAttrs );
-                emit userAttributesChanged( cameraAttrs );
+                emit userAttributesChanged( std::move(cameraAttrs) );
             }
         }
 
@@ -77,9 +77,9 @@ namespace ec2
                 tran.params.timestamp,
                 tran.params.serverId ) );
             if (tran.command == ApiCommand::addCameraHistoryItem)
-                emit cameraHistoryChanged( cameraHistoryItem );
+                emit cameraHistoryChanged( std::move(cameraHistoryItem ));
             else
-                emit cameraHistoryRemoved( cameraHistoryItem );
+                emit cameraHistoryRemoved( std::move(cameraHistoryItem ));
         }
 
         void triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList>& tran )
@@ -91,10 +91,10 @@ namespace ec2
 
             switch (tran.command) {
             case ApiCommand::addCameraBookmarkTags:
-                emit cameraBookmarkTagsAdded(tags);
+                emit cameraBookmarkTagsAdded(std::move(tags));
                 break;
             case ApiCommand::removeCameraBookmarkTags:
-                emit cameraBookmarkTagsRemoved(tags);
+                emit cameraBookmarkTagsRemoved(std::move(tags));
                 break;
             default:
                 assert(false);  //should never get here

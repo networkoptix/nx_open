@@ -89,6 +89,7 @@ public:
 private:
     mutable QMutex m_mutex;
     QnResourceTypeMap m_resourceTypeMap;
+    mutable QnResourceTypePtr m_desktopCamResourceType;
 };
 
 #define qnResTypePool QnResourceTypePool::instance()

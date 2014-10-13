@@ -137,18 +137,15 @@ void fromApiToResource(const ApiBusinessActionData &src, QnAbstractBusinessActio
 ////////////////////////////////////////////////////////////
 
 void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst) {
-    QnResourcePtr tmp = dst;
-    fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
+    fromApiToResource(static_cast<const ApiResourceData &>(src), dst.data());
 
-    { // test if the camera is desktop camera
-        auto resType = qnResTypePool->desktopCameraResourceType();
-        if (resType && resType->getId() == src.typeId)
-            dst->addFlags(Qn::desktop_camera);
-    }
-
-    dst->setMAC(QnMacAddress(src.mac));
+    // test if the camera is desktop camera
+    auto resType = qnResTypePool->desktopCameraResourceType();
+    if (resType && resType->getId() == src.typeId)
+        dst->addFlags(Qn::desktop_camera);
 
     dst->setPhysicalId(src.physicalId);
+    dst->setMAC(QnMacAddress(src.mac));
     dst->setManuallyAdded(src.manuallyAdded);
     dst->setModel(src.model);
     dst->setGroupId(src.groupId);
@@ -450,8 +447,7 @@ void fromResourceToApi(const QnLayoutItemData &src, ApiLayoutItemData &dst) {
 }
 
 void fromApiToResource(const ApiLayoutData &src, QnLayoutResourcePtr &dst) {
-    QnResourcePtr tmp = dst;
-    fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
+    fromApiToResource(static_cast<const ApiResourceData &>(src), dst.data());
 
     dst->setCellAspectRatio(src.cellAspectRatio);
     dst->setCellSpacing(src.horizontalSpacing, src.verticalSpacing);
@@ -590,8 +586,7 @@ void fromResourceToApi(const QnAbstractStorageResourceList &src, ApiStorageDataL
 }
 
 void fromApiToResource(const ApiStorageData &src, QnAbstractStorageResourcePtr &dst) {
-    QnResourcePtr tmp = dst;
-    fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
+    fromApiToResource(static_cast<const ApiResourceData &>(src), dst.data());
 
     dst->setSpaceLimit(src.spaceLimit);
     dst->setUsedForWriting(src.usedForWriting);
@@ -611,8 +606,7 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &
 }
 
 void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &dst, const ResourceContext &/*ctx*/) {
-    QnResourcePtr tmp = dst;
-    fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
+    fromApiToResource(static_cast<const ApiResourceData &>(src), dst.data());
 
     QList<QHostAddress> resNetAddrList;
     deserializeNetAddrList(resNetAddrList, src.networkAddresses);
@@ -717,7 +711,8 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
 
 }
 
-void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
+
+void fromApiToResource(const ApiResourceData &src, QnResource* dst) {
     dst->setId(src.id);
     //dst->setGuid(guid);
     dst->QnResource::setName(src.name); //setting resource name, but not camera name or server name
@@ -732,7 +727,7 @@ void fromApiToResourceList(const ApiResourceDataList &src, QnResourceList &dst, 
     dst.reserve(dst.size() + (int)src.size());
     for(const ApiResourceData &srcResource: src) {
         dst.push_back(factory->createResource(srcResource.typeId, QnResourceParams(srcResource.id, srcResource.url, QString())));
-        fromApiToResource(srcResource, dst.back());
+        fromApiToResource(srcResource, dst.back().data());
     }
 }
 
@@ -769,8 +764,7 @@ void fromApiToResourceList(const ApiResourceTypeDataList &src, QnResourceTypeLis
 
 
 void fromApiToResource(const ApiUserData &src, QnUserResourcePtr &dst) {
-    QnResourcePtr tmp = dst;
-    fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
+    fromApiToResource(static_cast<const ApiResourceData &>(src), dst.data());
 
     dst->setAdmin(src.isAdmin);
     dst->setEmail(src.email);
@@ -883,8 +877,7 @@ void fromResourceToApi(const QnVideoWallPcData::PcScreen &src, ApiVideowallScree
 }
 
 void fromApiToResource(const ApiVideowallData &src, QnVideoWallResourcePtr &dst) {
-    QnResourcePtr tmp = dst;
-    fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
+    fromApiToResource(static_cast<const ApiResourceData &>(src), dst.data());
 
     dst->setAutorun(src.autorun);
     QnVideoWallItemList outItems;
