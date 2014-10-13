@@ -17,6 +17,11 @@
 #include "../../common/systemerror.h"
 
 //TODO #ak memory order semantic used with std::atomic
+//TODO #ak move task queues to socket for optimization
+//TODO #ak should add some sequence which will be incremented when socket is started polling on any event
+    //this is required to distinguish tasks. E.g., socket is polled, than polling stopped asynchronously, 
+    //before async stop completion socket is polled again. In this case remove task should not remove tasks 
+    //from new polling "session"? Something needs to be done about it
 
 
 //!used as clock for periodic events. Function introduced since implementation can be changed
@@ -34,6 +39,8 @@ namespace aio
         tRemoving,
         //!Call functor in aio thread
         tCallFunc,
+        //!Cancel \a tCallFunc tasks
+        tCancelPostedCalls,
         tAll
     };
 
@@ -115,19 +122,45 @@ namespace aio
                 taskCompletionEvent( _taskCompletionEvent )
             {
             }
+        };
 
-            //!Initializer for \a aio::tCallFunc
-            SocketAddRemoveTask(
+        class PostAsyncCallTask
+        :
+            public SocketAddRemoveTask
+        {
+        public:
+            PostAsyncCallTask(
                 SocketType* const _socket,
                 std::function<void()>&& _postHandler )
             :
-                type(TaskType::tCallFunc),
-                socket( _socket ),
-                eventType( aio::etNone ),
-                eventHandler( nullptr ),
-                timeout( 0 ),
-                taskCompletionEvent( nullptr ),
-                postHandler( std::move(_postHandler) )
+                SocketAddRemoveTask(
+                    TaskType::tCallFunc,
+                    _socket,
+                    aio::etNone,
+                    nullptr,
+                    0,
+                    nullptr )
+            {
+                postHandler = std::move(_postHandler);
+            }
+        };
+
+        class CancelPostedCallsTask
+        :
+            public SocketAddRemoveTask
+        {
+        public:
+            CancelPostedCallsTask(
+                SocketType* const _socket,
+                std::atomic<int>* const _taskCompletionEvent = nullptr )
+            :
+                SocketAddRemoveTask(
+                    TaskType::tCancelPostedCalls,
+                    _socket,
+                    aio::etNone,
+                    nullptr,
+                    0,
+                    _taskCompletionEvent )
             {
             }
         };
@@ -169,6 +202,7 @@ namespace aio
         unsigned int newWriteMonitorTaskCount;
         mutable QMutex mutex;
         std::multimap<qint64, PeriodicTaskData> periodicTasksByClock;
+        std::deque<SocketAddRemoveTask> postedCalls;
 
         AIOThreadImpl( QMutex* const _aioServiceMutex )
         :
@@ -182,8 +216,6 @@ namespace aio
         {
             if( pollSetModificationQueue.empty() )
                 return;
-
-            std::deque<SocketAddRemoveTask> postedFunctorCalls;
 
             QMutexLocker lk( aioServiceMutex );
 
@@ -248,7 +280,13 @@ namespace aio
                     case TaskType::tCallFunc:
                     {
                         assert( task.postHandler );
-                        postedFunctorCalls.push_back( std::move(task) );
+                        postedCalls.push_back( std::move(task) );
+                        break;
+                    }
+
+                    case TaskType::tCancelPostedCalls:
+                    {
+                        cancelPostedCallsInternal( task.socket );
                         break;
                     }
 
@@ -259,11 +297,6 @@ namespace aio
                     task.taskCompletionEvent->store( 1, std::memory_order_relaxed );
                 it = pollSetModificationQueue.erase( it );
             }
-
-            lk.unlock();
-            
-            for( SocketAddRemoveTask& task: postedFunctorCalls )
-                task.postHandler();
         }
 
         bool addSockToPollset(
@@ -474,6 +507,15 @@ namespace aio
             return tasksProcessedCount > 0;
         }
 
+        void processPostedCalls()
+        {
+            while( !postedCalls.empty() )
+            {
+                postedCalls.begin()->postHandler();
+                postedCalls.erase( postedCalls.begin() );
+            }
+        }
+
         void addPeriodicTask(
             const qint64 taskClock,
             const std::shared_ptr<AIOEventHandlingData<SocketType>>& handlingData,
@@ -493,6 +535,33 @@ namespace aio
             periodicTasksByClock.insert( std::make_pair(
                 taskClock,
                 PeriodicTaskData( handlingData, _socket, eventType ) ) );
+        }
+
+        void cancelPostedCallsInternal( SocketType* const sock )
+        {
+            for( typename std::deque<SocketAddRemoveTask>::iterator
+                it = pollSetModificationQueue.begin();
+                it != pollSetModificationQueue.end();
+                 )
+            {
+                if( it->socket == sock && it->type == TaskType::tCallFunc )
+                    pollSetModificationQueue.erase( it++ );
+                else
+                    ++it;
+            }
+
+            //TODO #ak copy-paste. Refactor it!
+
+            for( typename std::deque<SocketAddRemoveTask>::iterator
+                it = postedCalls.begin();
+                it != postedCalls.end();
+                 )
+            {
+                if( it->socket == sock )
+                    postedCalls.erase( it++ );
+                else
+                    ++it;
+            }
         }
     };
 
@@ -611,8 +680,7 @@ namespace aio
         if( m_impl->removeReverseTask( sock, eventType, TaskType::tRemoving, NULL, 0 ) )
             return true;    //ignoring task
 
-        //void* userData = m_impl->pollSet.getUserData( sock, eventType );
-        void* userData = sock->impl()->getUserData(eventType);
+        void*& userData = sock->impl()->getUserData(eventType);
         if( userData == NULL )
             return false;   //assert ???
         std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data;
@@ -622,15 +690,14 @@ namespace aio
 
         const bool inAIOThread = currentThreadSystemId() == systemThreadId();
 
-        //m_impl->pollSetModificationQueue.push_back( SocketAddRemoveTask(sock, eventType, NULL, TaskType::tRemoving, 0) );
-
         //inAIOThread is false in case async operation cancellation. In most cases, inAIOThread is true
         if( inAIOThread )
         {
             //removing socket from pollset does not invalidate iterators (iterating pollset may be higher the stack)
-            void* userData = m_impl->pollSet.remove( sock, eventType );
+            m_impl->pollSet.remove( sock, eventType );
             if( userData )
                 delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
+            userData = nullptr;
         }
         else if( waitForRunningHandlerCompletion )
         {
@@ -660,8 +727,20 @@ namespace aio
             //waiting for socket to be removed from pollset
             while( taskCompletedCondition.load( std::memory_order_relaxed ) == 0 )
                 msleep( 0 );    //yield. TODO #ak Better replace it with conditional_variable
+            //TODO #ak if remove task completed, doesn't it mean handler is not running and never be launched?
 
             m_impl->aioServiceMutex->lock();
+        }
+        else
+        {
+            //TODO #ak should receive user handler and call it when removal complete
+            m_impl->pollSetModificationQueue.push_back( typename AIOThreadImplType::SocketAddRemoveTask(
+                TaskType::tRemoving,
+                sock,
+                eventType,
+                nullptr,
+                0 ) );
+            m_impl->pollSet.interrupt();
         }
 
         return true;
@@ -671,7 +750,7 @@ namespace aio
     bool AIOThread<SocketType>::post( SocketType* const sock, std::function<void()>&& functor )
     {
         m_impl->pollSetModificationQueue.push_back(
-            typename AIOThreadImplType::SocketAddRemoveTask(
+            typename AIOThreadImplType::PostAsyncCallTask(
                 sock,
                 std::move(functor) ) );
         //if eventTriggered is lower on stack, socket will be added to pollset before the next poll call
@@ -690,6 +769,42 @@ namespace aio
         }
         //otherwise posting functor
         return post( sock, std::move(functor) );
+    }
+
+    template<class SocketType>
+    void AIOThread<SocketType>::cancelPostedCalls( SocketType* const sock, bool waitForRunningHandlerCompletion )
+    {
+        const bool inAIOThread = currentThreadSystemId() == systemThreadId();
+        if( inAIOThread )
+        {
+            //removing postedCall tasks and posted calls
+            m_impl->cancelPostedCallsInternal( sock );
+        }
+        else if( waitForRunningHandlerCompletion )
+        {
+            //posting cancellation task
+            std::atomic<int> taskCompletedCondition( 0 );
+            //we MUST remove socket from pollset before returning from here
+            m_impl->pollSetModificationQueue.push_back(
+                typename AIOThreadImplType::CancelPostedCallsTask( sock, &taskCompletedCondition ) );
+            m_impl->pollSet.interrupt();
+
+            //we can be sure that socket will be removed before next poll
+
+            m_impl->aioServiceMutex->unlock();
+
+            //waiting for socket to be removed from pollset
+            while( taskCompletedCondition.load( std::memory_order_relaxed ) == 0 )
+                msleep( 0 );    //yield. TODO #ak Better replace it with conditional_variable
+
+            m_impl->aioServiceMutex->lock();
+        }
+        else
+        {
+            m_impl->pollSetModificationQueue.push_back(
+                typename AIOThreadImplType::CancelPostedCallsTask( sock ) );
+            m_impl->pollSet.interrupt();
+        }
     }
 
     //!Returns number of sockets monitored for \a eventToWatch event
@@ -717,6 +832,9 @@ namespace aio
         while( !needToStop() )
         {
             m_impl->processPollSetModificationQueue( TaskType::tAll );
+
+            //making calls posted with post and dispatch
+            m_impl->processPostedCalls();
 
             qint64 curClock = getSystemTimerVal();
             //taking clock of the next periodic task

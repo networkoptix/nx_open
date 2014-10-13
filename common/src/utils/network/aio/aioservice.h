@@ -235,9 +235,18 @@ namespace aio
             auto it = aioHandlingContext.sockets.find( sockCtx );
             if( it != aioHandlingContext.sockets.end() )
             {
-                //TODO #ak detecting if eventType is last event socket is polled for. And, if so, cancelling posted functor calls
-                if( it->second.first->removeFromWatch( sock, eventType, waitForRunningHandlerCompletion ) )
-                    aioHandlingContext.sockets.erase( it );
+                auto aioThread = it->second.first;
+                aioHandlingContext.sockets.erase( it );
+                aioThread->removeFromWatch( sock, eventType, waitForRunningHandlerCompletion );
+                //TODO #ak make following check constant-time
+                auto sameSockIter = aioHandlingContext.sockets.lower_bound( std::make_pair( sock, (aio::EventType)0 ) );
+                if( sameSockIter == aioHandlingContext.sockets.end() || 
+                    sameSockIter->first.first != sock )
+                {
+                    //socket is not polled for any events or has been marked for 
+                        //pollig stop, removing scheduled functor calls (if any)
+                    aioThread->cancelPostedCalls( sock, waitForRunningHandlerCompletion );
+                }
             }
         }
 
