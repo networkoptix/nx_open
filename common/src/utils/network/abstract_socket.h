@@ -142,6 +142,22 @@ public:
         TODO: #ak remove this method after complete move to the new socket
     */
     virtual SOCKET_HANDLE handle() const = 0;
+    //!Call \a handler from within aio thread \a sock is bound to
+    /*!
+        \note Call will always be queued. I.e., if called from handler running in aio thread, it will be called after handler has returned
+    */
+    template<class HandlerType>
+    bool post( HandlerType&& handler ) { return postImpl( std::forward<HandlerType>(handler) ); }
+    //!Call \a handler from within aio thread \a sock is bound to
+    /*!
+        \note If called in aio thread, handler will be called from within this method, otherwise - queued like \a AbstractSocket::post does
+    */
+    template<class HandlerType>
+    bool dispatch( HandlerType&& handler ) { return dispatchImpl( std::forward<HandlerType>(handler) ); }
+
+protected:
+    virtual bool postImpl( std::function<void()>&& handler ) = 0;
+    virtual bool dispatchImpl( std::function<void()>&& handler ) = 0;
 };
 
 //!Interface for writing to/reading from socket
@@ -203,9 +219,9 @@ public:
         \note uses sendTimeout
     */
     template<class HandlerType>
-        bool connectAsync( const SocketAddress& addr, HandlerType handler )
+        bool connectAsync( const SocketAddress& addr, HandlerType&& handler )
         {
-            return connectAsyncImpl( addr, std::function<void( SystemError::ErrorCode )>( std::move( handler ) ) );
+            return connectAsyncImpl( addr, std::function<void( SystemError::ErrorCode )>( std::forward<HandlerType>(handler) ) );
         }
 
     //!Reads bytes from socket asynchronously
@@ -223,9 +239,9 @@ public:
         \warning Multiple concurrent asynchronous write operations result in undefined behavour
     */
     template<class HandlerType>
-        bool readSomeAsync( nx::Buffer* const dst, HandlerType handler )
+        bool readSomeAsync( nx::Buffer* const dst, HandlerType&& handler )
         {
-            return recvAsyncImpl( dst, std::function<void( SystemError::ErrorCode, size_t )>( std::move( handler ) ) );
+            return recvAsyncImpl( dst, std::function<void( SystemError::ErrorCode, size_t )>( std::forward<HandlerType>(handler) ) );
         }
 
     //!Asynchnouosly writes all bytes from input buffer
@@ -237,9 +253,9 @@ public:
             \a bytesWritten differ from \a src size only if errorCode is not SystemError::noError
     */
     template<class HandlerType>
-        bool sendAsync( const nx::Buffer& src, HandlerType handler )
+        bool sendAsync( const nx::Buffer& src, HandlerType&& handler )
         {
-            return sendAsyncImpl( src, std::function<void( SystemError::ErrorCode, size_t )>( std::move( handler ) ) );
+            return sendAsyncImpl( src, std::function<void( SystemError::ErrorCode, size_t )>( std::forward<HandlerType>(handler) ) );
         }
 
     //!Register timer on this socket
@@ -247,9 +263,9 @@ public:
         \param handler functor with no parameters
     */
     template<class HandlerType>
-        bool registerTimer( unsigned int timeoutMs, HandlerType handler )
+        bool registerTimer( unsigned int timeoutMs, HandlerType&& handler )
         {
-            return registerTimerImpl( timeoutMs, std::function<void()>( std::move( handler ) ) );
+            return registerTimerImpl( timeoutMs, std::function<void()>( std::forward<HandlerType>(handler) ) );
         }
 
     //!
@@ -373,13 +389,13 @@ public:
             \a newConnection is NULL, if errorCode is not SystemError::noError
     */
     template<class HandlerType>
-        bool acceptAsync( HandlerType handler )
+        bool acceptAsync( HandlerType&& handler )
         {
-            return acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>( std::move(handler) ) );
+            return acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>( std::forward<HandlerType>(handler) ) );
         }
 
 protected:
-    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) = 0;
+    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) = 0;
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));
