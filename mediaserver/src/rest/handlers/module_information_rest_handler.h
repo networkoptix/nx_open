@@ -6,7 +6,7 @@
 class QnModuleInformationRestHandler : public QnJsonRestHandler {
     Q_OBJECT
 public:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 };
 
 #endif // MODULE_INFORMATION_REST_HANDLER_H

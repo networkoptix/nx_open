@@ -32,7 +32,8 @@ bool QnWorkbenchStateManager::tryClose(bool force) {
             return false;
 
     /* Server can be stopped while tryClose(false) was in progress because it produces confirmation dialogs. */
-    if (canSaveState && context()->user()) {
+    /* currentLayoutIndex == -1 means we're in the end of disconnection process and all layout resource has already been deleted. Nothing to save now. */
+    if (canSaveState && context()->user() && state.currentLayoutIndex != -1) {
         QnWorkbenchStateHash states = qnSettings->userWorkbenchStates();
         states[context()->user()->getName()] = state;
         qnSettings->setUserWorkbenchStates(states);

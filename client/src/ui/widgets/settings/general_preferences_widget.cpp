@@ -32,10 +32,6 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/math/color_transformations.h>
 
-namespace {
-    const int defaultAlpha = 40;
-}
-
 QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -45,7 +41,8 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     m_oldDownmix(false),
     m_oldDoubleBuffering(false),
     m_oldLanguage(0),
-    m_oldSkin(0)
+    m_oldSkin(0),
+    m_oldBackgroundMode(Qn::DefaultBackground)
 {
     ui->setupUi(this);
 
@@ -82,8 +79,6 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     ui->idleTimeoutWidget->setEnabled(false);
     ui->doubleBufferRestartLabel->setVisible(false);
 
-    m_colorDialog->setCurrentColor(defaultBackgroundColor());
-
     connect(ui->browseMainMediaFolderButton,            &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_browseMainMediaFolderButton_clicked);
     connect(ui->addExtraMediaFolderButton,              &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked);
     connect(ui->removeExtraMediaFolderButton,           &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_removeExtraMediaFolderButton_clicked);
@@ -107,15 +102,26 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
         ui->doubleBufferRestartLabel->setVisible(toggled != m_oldDoubleBuffering);
     });
 
+    QButtonGroup* buttonGroup = new QButtonGroup(this);
+    buttonGroup->addButton(ui->backgroundEmptyRadioButton,      Qn::NoBackground);
+    buttonGroup->addButton(ui->backgroundDefaultRadioButton,    Qn::DefaultBackground);
+    buttonGroup->addButton(ui->backgroundRainbowRadioButton,    Qn::RainbowBackground);
+    buttonGroup->addButton(ui->backgroundCustomRadioButton,     Qn::CustomBackground);
+
+    connect(buttonGroup,    QnButtonGroupIdToggled, this, [this](int id, bool toggled) {
+        if (!toggled)
+            return;
+
+        action(Qn::ToggleBackgroundAnimationAction)->setChecked(id != Qn::NoBackground);
+        qnSettings->setBackgroundMode(static_cast<Qn::ClientBackground>(id));
+    });
+
     connect(ui->selectColorButton,                      &QPushButton::clicked,          this,   [this] {
         if (m_colorDialog->exec())
             updateBackgroundColor();
     });
 
-    connect(ui->defaultBackgroundCheckBox,  &QCheckBox::stateChanged,   this, [this](int state) {
-        ui->selectColorButton->setEnabled(state != Qt::Checked);
-        updateBackgroundColor();
-    });
+    connect(ui->backgroundOpacitySpinBox,               QnSpinboxIntValueChanged,       this,   &QnGeneralPreferencesWidget::updateBackgroundColor);
 }
 
 QnGeneralPreferencesWidget::~QnGeneralPreferencesWidget()
@@ -151,10 +157,15 @@ void QnGeneralPreferencesWidget::submitToSettings() {
         }
     }
 
-    if (ui->defaultBackgroundCheckBox->isChecked())
-        qnSettings->setBackgroundColor(QColor());
-    else
-        qnSettings->setBackgroundColor(backgroundColor());
+//     bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
+//     if (backgroundAllowed) {
+//         qnSettings->setBackgroundMode(!ui->backgroundEmptyRadioButton->isChecked());
+//         qnSettings->setRainbowMode(ui->backgroundRainbowRadioButton->isChecked());
+//         if (ui->backgroundCustomRadioButton->isChecked())
+//             qnSettings->setBackgroundColor(backgroundColor());
+//         else
+//             qnSettings->setBackgroundColor(QColor());            
+//     }
 }
 
 void QnGeneralPreferencesWidget::updateFromSettings() {
@@ -196,11 +207,27 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     }
     ui->languageComboBox->setCurrentIndex(m_oldLanguage);
 
-    m_oldBackgroundColor = qnSettings->backgroundColor();
-    ui->defaultBackgroundCheckBox->setChecked(!qnSettings->backgroundColor().isValid());
-    m_colorDialog->setCurrentColor(qnSettings->backgroundColor().isValid() 
-        ? withAlpha(qnSettings->backgroundColor(), 255)
-        : defaultBackgroundColor());
+    bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
+    ui->backgroundGroupBox->setEnabled(backgroundAllowed);
+    m_oldBackgroundMode = qnSettings->backgroundMode();
+    m_oldCustomBackgroundColor = qnSettings->customBackgroundColor();
+
+    if (!backgroundAllowed || qnSettings->backgroundMode() == Qn::NoBackground)
+        ui->backgroundEmptyRadioButton->setChecked(true);
+    else if (qnSettings->backgroundMode() == Qn::RainbowBackground)
+        ui->backgroundRainbowRadioButton->setChecked(true);
+    else if (qnSettings->backgroundMode() == Qn::CustomBackground)
+        ui->backgroundCustomRadioButton->setChecked(true);
+    else
+        ui->backgroundDefaultRadioButton->setChecked(true);
+
+    QColor customColor = qnSettings->customBackgroundColor();
+    if (!customColor.isValid())
+        customColor = withAlpha(Qt::darkBlue, 64);
+
+    m_colorDialog->setCurrentColor(withAlpha(customColor, 255));
+    ui->backgroundOpacitySpinBox->setValue(customColor.alphaF() * 100);
+
     updateBackgroundColor();
 }
 
@@ -236,7 +263,11 @@ bool QnGeneralPreferencesWidget::confirm() {
 }
 
 bool QnGeneralPreferencesWidget::discard() {
-    qnSettings->setBackgroundColor(m_oldBackgroundColor);
+    bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
+    if (backgroundAllowed) {
+        qnSettings->setBackgroundMode(m_oldBackgroundMode);
+        qnSettings->setCustomBackgroundColor(m_oldCustomBackgroundColor);
+    }
     return true;
 }
 
@@ -247,17 +278,9 @@ void QnGeneralPreferencesWidget::initTranslations() {
     ui->languageComboBox->setModel(model);
 }
 
-QColor QnGeneralPreferencesWidget::defaultBackgroundColor() const {
-    return qnSettings->defaultBackgroundColor();
-}
-
 QColor QnGeneralPreferencesWidget::backgroundColor() const {
-    if (ui->defaultBackgroundCheckBox->isChecked())
-        return defaultBackgroundColor();
     QColor opaque = m_colorDialog->currentColor();
-    return withAlpha(opaque, defaultBackgroundColor().isValid() 
-        ? defaultBackgroundColor().alpha()
-        : defaultAlpha);
+    return withAlpha(opaque, ui->backgroundOpacitySpinBox->value() * 255.0 / 100.0);
 }
 
 void QnGeneralPreferencesWidget::updateBackgroundColor() {
@@ -266,7 +289,7 @@ void QnGeneralPreferencesWidget::updateBackgroundColor() {
     ui->selectColorButton->setIcon(pixmap);
 
     if (!m_updating)
-        qnSettings->setBackgroundColor(backgroundColor());
+        qnSettings->setCustomBackgroundColor(backgroundColor());
 }
 
 

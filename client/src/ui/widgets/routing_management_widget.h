@@ -30,12 +30,12 @@ public:
 
 private:
     void updateModel();
+    void updateUi();
 
 private slots:
     void at_addButton_clicked();
     void at_removeButton_clicked();
     void at_serversView_currentIndexChanged(const QModelIndex &current, const QModelIndex &previous);
-    void at_addressesView_currentIndexChanged(const QModelIndex &index);
     void at_addressesView_doubleClicked(const QModelIndex &index);
     void at_serverAddressesModel_ignoreChangeRequested(const QString &address, bool ignore);
 

@@ -7,13 +7,18 @@
 #include <common/common_module.h>
 
 #include <utils/common/warnings.h>
+
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
+
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item_index.h>
+
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <recording/time_period_list.h>
@@ -905,9 +910,6 @@ Qn::ActionVisibility QnStartVideoWallControlActionCondition::check(const QnActio
 
     foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
         if (!index.isValid())
-            continue;
-
-        if (index.item().layout.isNull())
             continue;
 
         return Qn::EnabledAction;

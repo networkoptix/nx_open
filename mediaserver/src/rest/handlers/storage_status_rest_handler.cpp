@@ -14,7 +14,7 @@
 #include "media_server/settings.h"
 
 
-int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result)
+int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     QString storageUrl;
     if(!requireParameter(params, lit("path"), result, &storageUrl))

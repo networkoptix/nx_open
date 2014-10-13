@@ -5029,7 +5029,7 @@ At least %3 licenses are required.</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="232"/>
         <source>Invalid License. Please contact our support team to get a valid license.</source>
-        <translation>無效授權。請聯繫 [山宏有限公司] 購買授權 (02)82261416。</translation>
+        <translation>無效授權。請與我們聯繫 。</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="236"/>
@@ -5135,7 +5135,7 @@ Try to activate your License manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="39"/>
         <source>Please send E-Mail with the Serial Key and the Hardware ID provided to &lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;. Then we&apos;ll send you an Activation Key which should be filled in the field below.</source>
-        <translation>請將您的授權金鑰及硬體 ID 寄給 [山宏有限公司]。 &lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;.我們會寄送啟動碼給您並填入下面的欄位後即可啟動。</translation>
+        <translation>請將您的授權金鑰及硬體 ID 寄給客服信箱。 &lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;我們會寄送啟動碼給您並填入下面的欄位後即可啟動。</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="117"/>

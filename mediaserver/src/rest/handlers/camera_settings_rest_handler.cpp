@@ -41,7 +41,7 @@ struct AwaitedParameters
     std::map<QString, std::pair<QVariant, bool> > paramValues;
 };
 
-int QnCameraSettingsRestHandler::executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType)
+int QnCameraSettingsRestHandler::executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(contentType)
         // TODO: #Elric #enum
@@ -197,7 +197,7 @@ int QnCameraSettingsRestHandler::executeGet( const QString& path, const QnReques
 }
 
 int QnCameraSettingsRestHandler::executePost(const QString& /*path*/, const QnRequestParamList& /*params*/, 
-    const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& /*responseMessageBody*/, QByteArray& /*contentType*/)
+    const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& /*responseMessageBody*/, QByteArray& /*contentType*/, const QnRestConnectionProcessor*)
 {
     //TODO/IMPL
     return 0;

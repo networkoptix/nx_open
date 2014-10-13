@@ -529,7 +529,7 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
             recipients << email;
     }
 
-    QStringList additional = action->getParams().getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts);
+    QStringList additional = action->getParams().emailAddress.split(QLatin1Char(';'), QString::SkipEmptyParts);
     foreach(const QString &email, additional) {
         log << email;
         QString trimmed = email.trimmed();
@@ -597,7 +597,7 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
      * Therefore we are storing all used emails in order to not recalculate them in
      * the event log processing methods. --rvasilenko
      */
-    action->getParams().setEmailAddress(formatEmailList(recipients));
+    action->getParams().emailAddress = formatEmailList(recipients);
     return true;
 
 #else

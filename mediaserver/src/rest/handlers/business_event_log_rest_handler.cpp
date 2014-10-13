@@ -13,7 +13,7 @@
 
 #include <media_server/serverutil.h>
 
-int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
     Q_UNUSED(params)
@@ -50,14 +50,13 @@ int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnReque
             }
             else if (params[i].first == "event") {
                 eventType = (QnBusiness::EventType) params[i].second.toInt();
-                //TODO #ak check enum value for correctness
-                if( eventType == QnBusiness::UndefinedEvent )
+                if(!QnBusiness::allEvents().contains(eventType))
                     errStr = QString("Invalid event type %1").arg(params[i].second);
             }
             else if (params[i].first == "action") {
                 actionType = (QnBusiness::ActionType) params[i].second.toInt();
-                if (actionType < 0 || actionType >= QnBusiness::ActionCount)
-                    errStr = QString("Invalid action type %1. Valid range is [0..%2]").arg(params[i].second).arg(QnBusiness::ActionCount-1);
+                if (!QnBusiness::allActions().contains(actionType))
+                    errStr = QString("Invalid action type %1.").arg(params[i].second);
             }
             else if (params[i].first == "brule_id") {
                 businessRuleId = QnUuid(params[i].second);
@@ -85,8 +84,9 @@ int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnReque
     return CODE_OK;
 }
 
-int QnBusinessEventLogRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
+int QnBusinessEventLogRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
+                                               QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
-    return executeGet(path, params, result, contentType);
+    return executeGet(path, params, result, contentType, owner);
 }
 

@@ -198,7 +198,7 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
 
     dst.scheduleEnabled = !src->isScheduleDisabled();
-    dst.motionType = src->getMotionType();
+    dst.motionType = src->getMotionTypeRaw();
 
     QList<QnMotionRegion> regions;
     dst.motionMask = serializeMotionRegionList(src->getMotionRegionList()).toLatin1();

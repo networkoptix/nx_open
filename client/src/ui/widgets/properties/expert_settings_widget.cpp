@@ -8,6 +8,7 @@
 
 #include <core/resource/resource_type.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_resource.h>
 
 #include <utils/common/scoped_value_rollback.h>
 

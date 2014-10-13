@@ -90,7 +90,6 @@ QnClientSettings::QnClientSettings(QObject *parent):
     addArgumentName(SOFTWARE_YUV,           "--soft-yuv");
     addArgumentName(OPEN_LAYOUTS_ON_LOGIN,  "--open-layouts-on-login");
     addArgumentName(MAX_SCENE_VIDEO_ITEMS,  "--max-video-items");
-    addArgumentName(RAINBOW_MODE,           "--rainbow");
 
     /* Load from internal resource. */
     QFile file(QLatin1String(":/globals.json"));
@@ -175,7 +174,6 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
     case DEBUG_COUNTER:
     case DEV_MODE:
     case VIDEO_WALL_MODE:
-    case DEFAULT_BACKGROUND_COLOR:
         return defaultValue; /* Not to be read from settings. */
     default:
         return base_type::readValueFromSettings(settings, id, defaultValue);
@@ -234,9 +232,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     case PTZ_PRESET_IN_USE_WARNING_DISABLED:
     case VIDEO_WALL_MODE:
     case SOFTWARE_YUV:
-    case RAINBOW_MODE:
     case NO_CLIENT_UPDATE:
-    case DEFAULT_BACKGROUND_COLOR:
         break; /* Not to be saved to settings. */
     default:
         base_type::writeValueToSettings(settings, id, value);

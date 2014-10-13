@@ -9,6 +9,7 @@
 
 #include "utils/common/id.h"
 #include "utils/network/http/httptypes.h"
+#include "utils/common/uuid.h"
 
 
 namespace AuthMethod
@@ -73,7 +74,7 @@ public:
     static QnAuthHelper* instance();
 
     //!Authenticates request on server side
-    bool authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false);
+    bool authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0);
     //!Authenticates request on client side
     /*!
         Usage:\n
@@ -103,8 +104,8 @@ private:
     void addAuthHeader(nx_http::Response& responseHeaders, bool isProxy);
     QByteArray getNonce();
     bool isNonceValid(const QByteArray& nonce) const;
-    bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy);
-    bool doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders);
+    bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId);
+    bool doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
     bool doCustomAuthorization(const QByteArray& authData, nx_http::Response& response, const QByteArray& sesionKey);
 
     mutable QMutex m_mutex;

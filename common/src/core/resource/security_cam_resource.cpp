@@ -9,6 +9,8 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <core/dataprovider/data_provider_factory.h>
+
 #include "user_resource.h"
 #include "common/common_module.h"
 
@@ -441,7 +443,7 @@ Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const {
     return result;
 }
 
-bool QnSecurityCamResource::hasMotion() {
+bool QnSecurityCamResource::hasMotion() const {
     Qn::MotionType motionType = getMotionType();
     if (motionType == Qn::MT_SoftwareGrid)
         return hasDualStreaming2() || (getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability);
@@ -449,9 +451,14 @@ bool QnSecurityCamResource::hasMotion() {
         return motionType != Qn::MT_NoMotion;
 }
 
-Qn::MotionType QnSecurityCamResource::getMotionType() {
-    if (m_motionType == Qn::MT_Default)
-        m_motionType = getDefaultMotionType();
+Qn::MotionType QnSecurityCamResource::getMotionType() const {
+    if (m_motionType == Qn::MT_Default || !(supportedMotionType() & m_motionType))
+        return getDefaultMotionType();
+    else
+        return m_motionType;
+}
+
+Qn::MotionType QnSecurityCamResource::getMotionTypeRaw() const {
     return m_motionType;
 }
 

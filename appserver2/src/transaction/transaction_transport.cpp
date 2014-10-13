@@ -430,7 +430,8 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
     }
 
     using namespace std::placeholders;
-    m_socket->sendAsync( dataCtx.encodedSourceData, std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) );
+    bool result = m_socket->sendAsync( dataCtx.encodedSourceData, std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) );
+    Q_ASSERT(result); //TODO: #ak handle error
 }
 
 void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent )

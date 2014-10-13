@@ -6,20 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>605</width>
-    <height>635</height>
+    <width>603</width>
+    <height>633</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,0,0,1">
+  <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,0,0,1,0">
    <item>
-    <widget class="QLabel" name="dayWarningLabel">
-     <property name="text">
-      <string>As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week.</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
+    <widget class="QnWordWrappedLabel" name="dayWarningLabel" native="true"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -241,11 +234,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QLabel" name="internetDetailLabel">
-            <property name="wordWrap">
-             <bool>true</bool>
-            </property>
-           </widget>
+           <widget class="QnWordWrappedLabel" name="internetDetailLabel" native="true"/>
           </item>
           <item>
            <spacer name="verticalSpacer">
@@ -314,13 +303,6 @@
              <widget class="QPushButton" name="copyLinkButton">
               <property name="text">
                <string>Copy to Clipboard</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="saveLinkButton">
-              <property name="text">
-               <string>Save link to File</string>
               </property>
              </widget>
             </item>
@@ -414,11 +396,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QLabel" name="localDetailLabel">
-            <property name="wordWrap">
-             <bool>true</bool>
-            </property>
-           </widget>
+           <widget class="QnWordWrappedLabel" name="localDetailLabel" native="true"/>
           </item>
          </layout>
         </widget>
@@ -505,12 +483,22 @@
    </item>
    <item>
     <widget class="QTableView" name="tableView">
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
      </property>
      <attribute name="horizontalHeaderHighlightSections">
       <bool>false</bool>
      </attribute>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="longUpdateWarning">
+     <property name="text">
+      <string>It looks like the update process is taking more time than usual. Please keep waiting.</string>
+     </property>
     </widget>
    </item>
   </layout>
@@ -527,13 +515,18 @@
    <extends>QProgressBar</extends>
    <header location="global">ui/widgets/progress_bar.h</header>
   </customwidget>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>refreshButton</tabstop>
   <tabstop>internetUpdateButton</tabstop>
   <tabstop>linkLineEdit</tabstop>
   <tabstop>copyLinkButton</tabstop>
-  <tabstop>saveLinkButton</tabstop>
   <tabstop>filenameLineEdit</tabstop>
   <tabstop>browseFileButton</tabstop>
   <tabstop>localUpdateButton</tabstop>

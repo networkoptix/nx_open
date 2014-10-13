@@ -122,11 +122,13 @@ void QnDirectModuleFinder::stop() {
     m_discoveryCheckTimer->stop();
     m_aliveCheckTimer->stop();
     m_requestQueue.clear();
+    m_activeRequests.clear();
 }
 
 void QnDirectModuleFinder::pleaseStop() {
     m_discoveryCheckTimer->stop();
     m_requestQueue.clear();
+    m_activeRequests.clear();
 }
 
 QList<QnModuleInformation> QnDirectModuleFinder::foundModules() const {

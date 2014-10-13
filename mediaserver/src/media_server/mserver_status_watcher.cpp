@@ -13,6 +13,8 @@
 #include "serverutil.h"
 
 
+static const long long USEC_PER_MSEC = 1000;
+
 MediaServerStatusWatcher::MediaServerStatusWatcher()
 {
     connect(qnResPool, &QnResourcePool::statusChanged, this, &MediaServerStatusWatcher::at_resource_statusChanged);
@@ -62,7 +64,7 @@ void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& r
 
     qnBusinessRuleConnector->at_mserverFailure(
         mserverRes,
-        qnSyncTime->currentMSecsSinceEpoch(),
+        qnSyncTime->currentMSecsSinceEpoch() * USEC_PER_MSEC,
         QnBusiness::ServerTerminatedReason,
         QString() );
 }

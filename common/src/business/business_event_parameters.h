@@ -62,8 +62,8 @@ public:
 
     // convert/serialize/deserialize functions
 
-    static QnBusinessEventParameters deserialize(const QByteArray& value);
-    QByteArray serialize() const;
+    static QnBusinessEventParameters unpack(const QByteArray& value);
+    QByteArray pack() const;
 
     QnBusinessParams toBusinessParams() const;
     static QnBusinessEventParameters fromBusinessParams(const QnBusinessParams& bParams);

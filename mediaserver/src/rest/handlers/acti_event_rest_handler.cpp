@@ -15,7 +15,7 @@
 #include <utils/network/http/httptypes.h>
 
 
-int QnActiEventRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &responseMessageBody, QByteArray &contentType)
+int QnActiEventRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &responseMessageBody, QByteArray &contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(responseMessageBody)
     Q_UNUSED(contentType)
@@ -39,7 +39,7 @@ int QnActiEventRestHandler::executeGet(const QString &path, const QnRequestParam
     return nx_http::StatusCode::ok;
 }
 
-int QnActiEventRestHandler::executePost(const QString &, const QnRequestParamList &, const QByteArray &, const QByteArray& /*srcBodyContentType*/, QByteArray &, QByteArray &)
+int QnActiEventRestHandler::executePost(const QString &, const QnRequestParamList &, const QByteArray &, const QByteArray& /*srcBodyContentType*/, QByteArray &, QByteArray &, const QnRestConnectionProcessor*)
 {
     return nx_http::StatusCode::notImplemented;
 }

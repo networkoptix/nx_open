@@ -76,7 +76,7 @@ public:
         /** Event type is not defined. Used in rules. */
         UndefinedEvent = 0,
 
-        /** Motion has occured on a camera. */
+        /** Motion has occurred on a camera. */
         CameraMotionEvent = 1,
 
         /** Camera input signal is received. */
@@ -105,12 +105,6 @@ public:
         
         /** Not enough licenses */
         LicenseIssueEvent = 10,
-
-        /**
-         * Used when enumerating to build GUI lists, this and followed actions
-         * should not be displayed.
-         */
-        EventCount, // TODO: #Elric remove
 
         /** System health message. */
         SystemHealthEvent = 500,
@@ -174,15 +168,9 @@ public:
          */
         SayTextAction = 11,
 
-        /**
-         * Used when enumerating to build GUI lists, this and followed actions
-         * should not be displayed.
-         */
-        ActionCount // TODO: #Elric remove
+
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
-
-    bool isImplemented(ActionType actionType);
 
 } // namespace QnBusiness
 

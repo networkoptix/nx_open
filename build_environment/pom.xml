@@ -155,31 +155,6 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>1.1.1</version>
                         <executions>        
-                            <!-- <execution>
-                                <id>virtualenv-win</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${project.build.directory}/virtualenv.bat</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>    
-                                    <skip>${unix}</skip>                            
-                                </configuration>
-                            </execution>
-
-                            <execution>
-                                <id>virtualenv-unix</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${project.build.directory}/virtualenv.sh</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>     
-                                    <skip>${windows}</skip>
-                                </configuration>
-                            </execution>                      -->
                             <execution>
                                 <id>copy-additional-resources</id>
                                 <phase>process-sources</phase>

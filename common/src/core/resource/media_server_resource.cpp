@@ -85,8 +85,10 @@ const QList<QHostAddress>& QnMediaServerResource::getNetAddrList() const
 
 void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
 {
-    QMutexLocker lock(&m_mutex);
-    m_additionalUrls = urls;
+    {
+        QMutexLocker lock(&m_mutex);
+        m_additionalUrls = urls;
+    }
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
@@ -98,8 +100,10 @@ QList<QUrl> QnMediaServerResource::getAdditionalUrls() const
 
 void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
 {
-    QMutexLocker lock(&m_mutex);
-    m_ignoredUrls = urls;
+    {
+        QMutexLocker lock(&m_mutex);
+        m_ignoredUrls = urls;
+    }
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 

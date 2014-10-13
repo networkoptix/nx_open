@@ -58,6 +58,8 @@ cp ${libdir}/version.py $SHARESTAGE/dbsync-2.2/bin
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
 cp -r $SERVER_IMAGEFORMATS_PATH/*.* $BINSTAGE/imageformats
 cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
+rm -f $LIBSTAGE/*.debug
+
 #cp -r $SERVER_SQLDRIVERS_PATH $BINSTAGE
 
 # Strip and remove rpath
@@ -97,6 +99,7 @@ mkdir -p $STAGE/DEBIAN
 INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 
 cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/VERSION/$VERSION/g" | sed "s/ARCHITECTURE/$ARCHITECTURE/g" > $STAGE/DEBIAN/control
+install -m 755 debian/preinst $STAGE/DEBIAN
 install -m 755 debian/postinst $STAGE/DEBIAN
 install -m 755 debian/prerm $STAGE/DEBIAN
 install -m 644 debian/templates $STAGE/DEBIAN
