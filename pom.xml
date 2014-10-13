@@ -40,6 +40,8 @@
         <box>none</box>
         <modification/>
         <beta>true</beta>
+        <final.artifact.name>${project.artifactId}</final.artifact.name>
+        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${box}-${arch}-${build.configuration}-beta</finalName>        
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <!-- compile.option1. See profile no-webkit -->
@@ -104,12 +106,12 @@
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>platforms</qtplugin2>
         <qtplugin3/>    
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <build>
-    <defaultGoal>package</defaultGoal>
+        <defaultGoal>package</defaultGoal>
         <finalName>${finalName}</finalName>
         <plugins>
             <plugin>
@@ -328,7 +330,7 @@
             <modules>     
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
-        <!--<module>vmaxproxy</module>  -->                   
+                <!--<module>vmaxproxy</module>  -->                   
                 <module>client</module>                     
                 <module>wixsetup/wixsetup-server-only</module>
                 <module>wixsetup/wixsetup-client-only</module>

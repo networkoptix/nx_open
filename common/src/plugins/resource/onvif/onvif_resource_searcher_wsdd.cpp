@@ -383,6 +383,8 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result)
         findEndpoints(endpoints);
     //    endpoints.clear();
     //}
+    if (m_shouldStop)
+        return;
 
     m_onvifFetcher.findResources(endpoints, result);
 }

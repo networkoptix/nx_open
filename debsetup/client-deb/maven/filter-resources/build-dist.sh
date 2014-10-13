@@ -82,6 +82,7 @@ cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/styles
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/imageformats
 cp -r $CLIENT_VOX_PATH $BINSTAGE
 cp -r $CLIENT_PLATFORMS_PATH $BINSTAGE
+rm -f $LIBSTAGE/*.debug
 
 #'libstdc++.so.6 is needed on some machines
 cp -r /usr/lib/*-linux-gnu/libstdc++.so.6* $LIBSTAGE
@@ -101,6 +102,7 @@ cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/
 install -m 755 debian/prerm $STAGE/DEBIAN
 install -m 755 debian/preinst $STAGE/DEBIAN
 install -m 755 debian/postinst $STAGE/DEBIAN
+install -m 644 debian/templates $STAGE/DEBIAN
 
 (cd $STAGE; find * -type f -not -regex '^DEBIAN/.*' -print0 | xargs -0 md5sum > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 

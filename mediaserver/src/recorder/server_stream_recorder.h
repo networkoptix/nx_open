@@ -3,6 +3,8 @@
 
 #include <server/server_globals.h>
 
+#include <core/resource/resource_fwd.h>
+
 #include "recording/stream_recorder.h"
 #include "core/misc/schedule_task.h"
 #include "recorder/device_file_catalog.h"

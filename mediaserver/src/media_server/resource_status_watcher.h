@@ -3,7 +3,8 @@
 
 #include <QObject>
 #include <QSet>
-#include <core/resource/resource.h>
+
+#include <core/resource/resource_fwd.h>
 #include <nx_ec/ec_api.h>
 
 class QnResourceStatusWatcher : public QObject

@@ -180,7 +180,7 @@ ul.sidebar li a {
     margin:0;
 }
 ul.sidebar li a.last { border-bottom-width:0px;}
-ul.sidebar li a h1,ul.sidebar li a h2,ul.sidebar li a h3,ul.sidebar li a h4,ul.sidebar li a h5,ul.sidebar li a h6,ul.sidebar li a p { margin-bottom:0!important;}
+ul.sidebar li a h1,ul.sidebar li a h2,ul.sidebar li a h3,ul.sidebar li a h4,ul.sidebar li a h5,ul.sidebar li a h6,ul.sidebar li a p, h6.no-margin { margin-bottom:0!important;}
 
 
 

@@ -118,6 +118,10 @@ public:
     bool getLastError( SystemError::ErrorCode* errorCode ) const;
     //!Implementation of AbstractSocket::handle
     AbstractSocket::SOCKET_HANDLE handle() const;
+    //!Implementation of AbstractSocket::postImpl
+    bool postImpl( std::function<void()>&& handler );
+    //!Implementation of AbstractSocket::dispatchImpl
+    bool dispatchImpl( std::function<void()>&& handler );
 
 
     /**

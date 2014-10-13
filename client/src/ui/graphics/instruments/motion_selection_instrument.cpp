@@ -12,6 +12,7 @@
 #include <utils/common/variant.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/media_resource.h>
 
 #include <ui/graphics/items/resource/media_resource_widget.h>
 

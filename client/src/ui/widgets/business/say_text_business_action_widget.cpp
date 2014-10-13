@@ -42,7 +42,7 @@ void QnSayTextBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields & QnBusiness::ActionParamsField)
-        ui->textEdit->setText(model->actionParams().getSayText());
+        ui->textEdit->setText(model->actionParams().sayText);
 }
 
 void QnSayTextBusinessActionWidget::paramsChanged() {
@@ -52,7 +52,7 @@ void QnSayTextBusinessActionWidget::paramsChanged() {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     QnBusinessActionParameters params;
-    params.setSayText(ui->textEdit->text());
+    params.sayText = ui->textEdit->text();
     model()->setActionParams(params);
 }
 

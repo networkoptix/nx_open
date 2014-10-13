@@ -23,6 +23,7 @@
 #include <common/common_meta_types.h>
 
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/client_video_camera.h>
@@ -444,8 +445,7 @@ void QnWorkbenchDisplay::initSceneView() {
     } else {
         /* Never set QObject* parent in the QScopedPointer-stored objects if not sure in the descruction order. */
         m_backgroundPainter = new QnGradientBackgroundPainter(qnSettings->radialBackgroundCycle(), NULL, context());
-        if (action(Qn::ToggleBackgroundAnimationAction)->isChecked())
-            m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
     }
 
     /* Connect to context. */
@@ -485,10 +485,7 @@ void QnWorkbenchDisplay::toggleBackgroundAnimation(bool enabled) {
     if (!m_scene || !m_view || !m_backgroundPainter)
         return;
 
-    if(enabled) 
-        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
-    else 
-        m_view->uninstallLayerPainter(m_backgroundPainter.data());
+    m_backgroundPainter->setEnabled(enabled);
 }
 
 
@@ -896,6 +893,10 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     QColor frameColor = item->data(Qn::ItemFrameDistinctionColorRole).value<QColor>();
     if(frameColor.isValid())
         widget->setFrameDistinctionColor(frameColor);
+
+    QnResourceWidget::Options options = item->data(Qn::ItemWidgetOptions).value<QnResourceWidget::Options>();
+    if (options)
+        widget->setOptions(widget->options() | options);
 
     emit widgetAdded(widget);
 

@@ -9,6 +9,8 @@
 namespace {
     bool checkPassword(int buildNumber, const QString &password) {
 #ifdef _DEBUG
+        Q_UNUSED(buildNumber);
+        Q_UNUSED(password);
         return true;
 #else
         return passwordForBuild((unsigned)buildNumber) == password;
@@ -17,12 +19,15 @@ namespace {
 }
 
 QnBuildNumberDialog::QnBuildNumberDialog(QWidget *parent) :
-    QDialog(parent),
+    base_type(parent),
     ui(new Ui::QnBuildNumberDialog)
 {
     ui->setupUi(this);
-    ui->buildNumberEdit->setValidator(new QIntValidator(ui->buildNumberEdit));
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Update"));
+    auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
+    connect(ui->buildNumberEdit, &QLineEdit::textChanged, this, [this, okButton](const QString &text) {
+        okButton->setEnabled(text.toInt() > 0);
+    });
+    okButton->setEnabled(false);
 }
 
 QnBuildNumberDialog::~QnBuildNumberDialog() {}

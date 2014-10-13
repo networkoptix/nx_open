@@ -1532,10 +1532,8 @@ void QnMain::run()
 
         qnStorageMan->addStorage(newStorage);
     }
-
-
-
     qnStorageMan->doMigrateCSVCatalog();
+    qnStorageMan->initDone();
 
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();

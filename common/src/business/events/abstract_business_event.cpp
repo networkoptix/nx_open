@@ -68,6 +68,22 @@ namespace QnBusiness
         return result;
     }
 
+    QList<EventType> allEvents() {
+        QList<EventType> result;
+        result 
+            << CameraMotionEvent
+            << CameraInputEvent
+            << CameraDisconnectEvent 
+            << StorageFailureEvent 
+            << NetworkIssueEvent 
+            << CameraIpConflictEvent 
+            << ServerFailureEvent 
+            << ServerConflictEvent 
+            << ServerStartEvent 
+            << LicenseIssueEvent;
+        return result;
+    }
+
     bool isResourceRequired(EventType eventType) {
         return requiresCameraResource(eventType) || requiresServerResource(eventType);
     }

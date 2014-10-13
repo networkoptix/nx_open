@@ -20,6 +20,7 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
+#include "core/resource/resource.h"
 
 
 namespace {
@@ -121,8 +122,8 @@ int soap_wsse_add_PlainTextAuth(struct soap *soap, const char *id, const char *u
 
 
 
-const int SOAP_RECEIVE_TIMEOUT = 30; // "+" in seconds, "-" in mseconds
-const int SOAP_SEND_TIMEOUT = 30; // "+" in seconds, "-" in mseconds
+const int SOAP_RECEIVE_TIMEOUT = 10; // "+" in seconds, "-" in mseconds
+const int SOAP_SEND_TIMEOUT = 10; // "+" in seconds, "-" in mseconds
 const int SOAP_CONNECT_TIMEOUT = 5; // "+" in seconds, "-" in mseconds
 const int SOAP_ACCEPT_TIMEOUT = 5; // "+" in seconds, "-" in mseconds
 const QLatin1String DEFAULT_ONVIF_LOGIN = QLatin1String("admin");
@@ -290,6 +291,10 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
     QString passwd;
     int soapRes = SOAP_OK;
     do {
+
+        if (QnResource::isStopping())
+            return false;
+
         NX_LOG( QString::fromLatin1("Trying login = %1 password = %2)").arg(login).arg(passwd), cl_logDEBUG2 );
         setLogin(login);
         setPassword(passwd);

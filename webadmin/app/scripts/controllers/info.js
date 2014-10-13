@@ -5,6 +5,12 @@ angular.module('webadminApp')
     .controller('InfoCtrl', function ($scope, mediaserver) {
         $scope.storages = mediaserver.getStorages();
 
+
+        mediaserver.getSettings().then(function (r) {
+            $scope.settings = r.data.reply;
+        });
+
+
         function formatUrl(url){
             return decodeURIComponent(url.replace(/file:\/\/.+?:.+?\//gi,""));
         }

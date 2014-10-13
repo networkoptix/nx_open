@@ -15,8 +15,10 @@
 #include <QtWidgets/QMenu>
 
 #include <core/dataprovider/abstract_streamdataprovider.h>
+
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 
 #include <camera/resource_display.h>
 
@@ -1133,7 +1135,7 @@ void QnWorkbenchUi::createTreeWidget() {
 
             disconnect(m_treeHidingProcessor,  &HoverFocusProcessor::hoverFocusLeft, this, NULL);
 
-            QnCounter* counter = new QnCounter(0, this);
+            QnCounter* counter = new QnCounter(1, this);
             connect(menu(), &QnActionManager::menuAboutToShow, counter, &QnCounter::increment);
             connect(menu(), &QnActionManager::menuAboutToHide, counter, &QnCounter::decrement);
             connect(counter, &QnCounter::reachedZero, this, [this, connectTreeHidingProcessor]{
@@ -1142,6 +1144,13 @@ void QnWorkbenchUi::createTreeWidget() {
             });
             connect(counter, &QnCounter::reachedZero, counter, &QObject::deleteLater);
 
+            /* Make sure counter will be triggered even if no menu created. */
+            QTimer* nullMenuTimer = new QTimer(this);
+            nullMenuTimer->setSingleShot(true);
+            nullMenuTimer->setInterval(500);
+            connect(nullMenuTimer, &QTimer::timeout, counter, &QnCounter::decrement);
+            connect(nullMenuTimer, &QTimer::timeout, nullMenuTimer, &QObject::deleteLater);
+            nullMenuTimer->start();
         });
         connectTreeHidingProcessor();
     }

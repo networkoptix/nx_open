@@ -3,6 +3,8 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <core/resource/media_server_resource.h>
+
 #include <ui/common/ui_resource_name.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
@@ -56,7 +58,7 @@ QnServerUpdatesModel::Item::Item(const QnMediaServerResourcePtr &server) :
 }
 
 QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObject *parent) :
-    QAbstractTableModel(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_updateTool(tool),
     m_checkResult(QnCheckForUpdateResult::BadUpdateFile)

@@ -262,7 +262,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     const bool soundAction = businessAction->actionType() == QnBusiness::PlaySoundAction;
     if (soundAction) {
-        QString soundUrl = businessAction->getParams().getSoundUrl();
+        QString soundUrl = businessAction->getParams().soundUrl;
         m_itemsByLoadingSound.insert(soundUrl, item);
         context()->instance<QnAppServerNotificationCache>()->downloadFile(soundUrl);
         item->setNotificationLevel(Qn::CommonNotification);
@@ -569,8 +569,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
     }
 
     //TODO: #GDM #Business REMOVE DEBUG
-    for (int i = 1; i < QnBusiness::EventCount; i++) {
-        QnBusiness::EventType eventType = QnBusiness::EventType(i);
+    for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
 
         QnBusinessEventParameters params;
         params.setEventType(eventType);

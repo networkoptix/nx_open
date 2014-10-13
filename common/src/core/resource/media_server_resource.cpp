@@ -85,8 +85,10 @@ const QList<QHostAddress>& QnMediaServerResource::getNetAddrList() const
 
 void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
 {
-    QMutexLocker lock(&m_mutex);
-    m_additionalUrls = urls;
+    {
+        QMutexLocker lock(&m_mutex);
+        m_additionalUrls = urls;
+    }
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
@@ -98,8 +100,10 @@ QList<QUrl> QnMediaServerResource::getAdditionalUrls() const
 
 void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
 {
-    QMutexLocker lock(&m_mutex);
-    m_ignoredUrls = urls;
+    {
+        QMutexLocker lock(&m_mutex);
+        m_ignoredUrls = urls;
+    }
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
@@ -418,8 +422,14 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     return moduleInformation;
 }
 
+bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+        return (server->getServerFlags() & Qn::SF_Edge);
+    return false;
+}
+
 bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
-    if (QnMediaServerResource* server = dynamic_cast<QnMediaServerResource*>(resource.data())) 
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return (server->getServerFlags() & Qn::SF_Edge) && !server->isRedundancy();
     return false;
 }

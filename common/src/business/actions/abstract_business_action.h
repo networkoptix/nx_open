@@ -18,6 +18,8 @@ namespace QnBusiness
     bool requiresUserResource(ActionType actionType);
 
     bool hasToggleState(ActionType actionType);
+
+    QList<ActionType> allActions();
 }
 
 

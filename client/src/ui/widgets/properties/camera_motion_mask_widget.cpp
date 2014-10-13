@@ -142,23 +142,29 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
     m_camera = camera;
 
     m_context->workbench()->currentLayout()->clear();
+    m_resourceWidget = 0;
 
-    if(!m_camera) {
-        m_resourceWidget = 0;
-    } else {
+    if(m_camera) {
         /* Add single item to the layout. */
         QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QnUuid::createUuid(), this);
         item->setPinned(true);
         item->setGeometry(QRect(0, 0, 1, 1));
+
+        QnResourceWidget::Options forcedOptions = 
+            QnResourceWidget::DisplayMotionSensitivity | 
+            QnResourceWidget::DisplayMotion | 
+            QnResourceWidget::WindowRotationForbidden |
+            QnResourceWidget::SyncPlayForbidden;
+        item->setData(Qn::ItemWidgetOptions, forcedOptions);
+
         m_context->workbench()->currentLayout()->addItem(item);
         m_context->workbench()->setItem(Qn::ZoomedRole, item);
 
         /* Set up the corresponding widget. */
         m_resourceWidget = dynamic_cast<QnMediaResourceWidget *>(m_context->display()->widget(item)); // TODO: #Elric check for NULL
-        m_resourceWidget->setOption(QnResourceWidget::DisplayMotionSensitivity, true);
-        m_resourceWidget->setOption(QnResourceWidget::DisplayButtons, false);
-        m_resourceWidget->setOption(QnResourceWidget::DisplayMotion, true);
-        m_resourceWidget->setOption(QnResourceWidget::WindowRotationForbidden, true);
+        Q_ASSERT(m_resourceWidget);
+        if (m_resourceWidget)
+            m_resourceWidget->setOption(QnResourceWidget::DisplayButtons, false);
     }
     m_motionSensitivity = QnMotionRegion::MIN_SENSITIVITY;
 

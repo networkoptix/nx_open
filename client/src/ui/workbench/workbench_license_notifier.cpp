@@ -25,6 +25,8 @@ namespace {
         0
     };
 
+    const qint64 invalidLicenseNotificationInterval = day;
+
 } // anonymous namespace
 
 
@@ -64,7 +66,13 @@ void QnWorkbenchLicenseNotifier::checkLicenses() {
         if (someLicenseWillBeBlocked && !qnLicensePool->isLicenseValid(license))
         {
             licenses.push_back(license);
-            warn = true;
+
+            QnLicenseWarningState licenseWarningState = licenseWarningStates.value(license->key());
+            if (currentTime - licenseWarningState.lastWarningTime >= invalidLicenseNotificationInterval) {
+                licenseWarningStates[license->key()].lastWarningTime = currentTime;
+                warn = true;
+            }
+
             continue;
         }
 

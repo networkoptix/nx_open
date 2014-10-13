@@ -5,20 +5,22 @@
 
 #include <client/client_color_types.h>
 
-#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_fwd.h>
+
 #include <utils/common/system_information.h>
 #include <utils/common/software_version.h>
 
 #include <update/media_server_update_tool.h>
 
+#include <ui/customization/customized.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnServerUpdatesModel : public QAbstractTableModel, public QnWorkbenchContextAware {
+class QnServerUpdatesModel : public Customized<QAbstractTableModel>, public QnWorkbenchContextAware {
     Q_OBJECT
 
     Q_PROPERTY(QnServerUpdatesColors colors READ colors WRITE setColors)
 
-    typedef QAbstractTableModel base_type;
+    typedef Customized<QAbstractTableModel> base_type;
 public:
     enum Columns {
         NameColumn,

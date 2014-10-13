@@ -574,7 +574,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
-    forcedAR = true;
     if (forcedAR && getProperty(QnMediaResource::customAspectRatioKey()).isNull()) 
     {
         qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
@@ -808,6 +807,9 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(const QString
 
     DeviceInfoReq request;
     DeviceInfoResp response;
+
+    if (m_appStopping)
+        return CameraDiagnostics::ServerTerminatedResult();
 
     int soapRes = soapWrapper.getDeviceInformation(request, response);
     if (soapRes != SOAP_OK) 

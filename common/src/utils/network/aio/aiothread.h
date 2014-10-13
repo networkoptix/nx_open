@@ -10,9 +10,10 @@
 
 #include <QtCore/QMutex>
 
+#include <utils/common/long_runnable.h>
+
 #include "aioeventhandler.h"
 #include "pollset.h"
-#include "../../common/long_runnable.h"
 
 
 namespace aio
@@ -73,6 +74,12 @@ namespace aio
             SocketType* const sock,
             aio::EventType eventType,
             bool waitForRunningHandlerCompletion );
+        //!Queues \a functor to be executed from within this aio thread as soon as possible
+        bool post( SocketType* const sock, std::function<void()>&& functor );
+        //!If called in this aio thread, then calls \a functor immediately, otherwise queues \a functor in same way as \a aio::AIOThread::post does
+        bool dispatch( SocketType* const sock, std::function<void()>&& functor );
+        //!Cancels calls scheduled with \a aio::AIOThread::post and \a aio::AIOThread::dispatch
+        void cancelPostedCalls( SocketType* const sock, bool waitForRunningHandlerCompletion );
         //!Returns number of sockets handled by this object
         size_t socketsHandled() const;
         //!Returns true, if can accept socket \a sock for monitoring

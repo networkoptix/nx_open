@@ -19,7 +19,7 @@
 
 namespace {
 
-    const QString QN_UPDATE_PACKAGE_URL = lit("http://hdw.mx/upcombiner/upcombine");
+    const QString QN_UPDATE_PACKAGE_URL = lit("http://updates.hdw.mx/upcombiner/upcombine");
     
 
     #ifdef Q_OS_MACX
@@ -182,6 +182,8 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &
     query.addQueryItem(lit("client"), QnSystemInformation::currentSystemInformation().toString().replace(L' ', L'_'));
     foreach (const QnSystemInformation &systemInformation, systemInformationList)
         query.addQueryItem(lit("server"), systemInformation.toString().replace(L' ', L'_'));
+
+    query.addQueryItem(lit("customization"), QnAppInfo::customizationName());
 
     QUrl url(QN_UPDATE_PACKAGE_URL + versionSuffix);
     url.setQuery(query);
