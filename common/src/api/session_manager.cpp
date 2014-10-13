@@ -34,6 +34,7 @@ void QnSessionManagerSyncReply::terminate() {
 
 void QnSessionManagerSyncReply::requestFinished(const QnHTTPRawResponse& response, int handle) 
 {
+    Q_UNUSED(handle)
     QMutexLocker locker(&m_mutex);
     m_response = response;
     m_finished = true;
@@ -286,7 +287,7 @@ void QnSessionManager::at_aboutToBeStopped() {
     m_accessManager = 0;
 }
 
-void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & reply, QAuthenticator* authenticator)
+void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy &, QAuthenticator* authenticator)
 {
     QString user = QnAppServerConnectionFactory::url().userName();
     QString password = QnAppServerConnectionFactory::url().password();
