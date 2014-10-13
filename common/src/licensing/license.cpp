@@ -53,6 +53,8 @@ namespace {
         QScopedArrayPointer<unsigned char> decrypted(new unsigned char[signature.size()]);
         int ret = RSA_public_decrypt(signature.size(), (const unsigned char*)signature.data(), decrypted.data(), publicRSAKey, RSA_PKCS1_PADDING);
         RSA_free(publicRSAKey);
+        if (ret == -1)
+            return false;
 
         // Verify signature is correct
         return memcmp(decrypted.data(), dataHash.data(), ret) == 0;
