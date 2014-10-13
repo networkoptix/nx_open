@@ -22,6 +22,8 @@
                 <link rel="stylesheet" href="styles/29403685.vendor.css"/>
 
                 <link rel="stylesheet" href="styles/3889fc7d.main.css"/>
+
+                <link rel="stylesheet" href="customization/styles.css"/>
             </head>
             <body>
                 <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
@@ -31,7 +33,7 @@
                         </div>
                         <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
                             <ul class="nav navbar-nav navbar-right">
-                                <li ><a ng-href="index.html">Web. administration</a></li>
+                                <li ><a href="index.html">Web. administration</a></li>
                             </ul>
                         </nav>
                     </div>
