@@ -35,7 +35,7 @@
 #include "api/runtime_info_manager.h"
 #include "utils/common/log.h"
 #include "nx_ec/data/api_camera_data_ex.h"
-#include <QtXml/QXmlDefaultHandler>
+#include "restype_xml_parser.h"
 
 using std::nullptr_t;
 
@@ -2154,34 +2154,6 @@ ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
 -------------------------- getters --------------------------
  ------------------------------------------------------------
 */
-
-class ResTypeXmlParser: public QXmlDefaultHandler
-{
-public:
-    ResTypeXmlParser(ApiResourceTypeDataList& data): m_data(data) {}
-
-    virtual bool characters( const QString& ch ) override
-    {
-        // todo: implement me
-        return true;
-    }
-
-    virtual bool startElement( const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& atts ) override
-    {
-        // todo: implement me
-        return true;
-    }
-
-    virtual bool endElement( const QString& namespaceURI, const QString& localName, const QString& qName ) override
-    {
-        // todo: implement me
-        return true;
-    }
-
-private:
-    ApiResourceTypeDataList& m_data;
-};
-
 
 void QnDbManager::loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data)
 {
