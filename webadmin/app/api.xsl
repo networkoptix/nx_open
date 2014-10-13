@@ -24,8 +24,10 @@
                 <link rel="stylesheet" href="bower_components/sass-bootstrap/dist/css/bootstrap.css"/>
                 <!-- endbower -->
                 <!-- endbuild -->
+
                 <!-- build:css({.tmp,app}) styles/main.css -->
-                <link rel="stylesheet" href="styles/2ffdb355.main.css"/>
+                <link rel="stylesheet" href="styles/main.css" />
+                <!-- endbuild -->
             </head>
             <body>
                 <div class="container">
@@ -152,9 +154,15 @@
                                     </xsl:for-each> </section> </xsl:for-each>
                         </div>
                     </div> </div>
-            </body> <script src="bower_components/jquery/jquery.js"/>
+            </body>
+
+
+            <!-- build:js({.tmp,app}) scripts/api_documentation.js -->
+            <script src="bower_components/jquery/jquery.js"/>
             <script src="bower_components/sass-bootstrap/dist/js/bootstrap.js"/>
             <script src="bower_components/jquery-scrollspy-thesmart/scrollspy.js"/>
+            <!-- endbuild -->
+
             <script>
                 $(function () { 
                     $("[data-toggle='tooltip']").tooltip(); 

@@ -20,8 +20,8 @@
                 <meta name="viewport" content="width=device-width"/>
                 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
                 <link rel="stylesheet" href="styles/29403685.vendor.css"/>
-                <!-- build:css({.tmp,app}) styles/main.css -->
-                <link rel="stylesheet" href="styles/2ffdb355.main.css"/>
+
+                <link rel="stylesheet" href="styles/3889fc7d.main.css"/>
             </head>
             <body>
                 <div class="container">
@@ -148,9 +148,11 @@
                                     </xsl:for-each> </section> </xsl:for-each>
                         </div>
                     </div> </div>
-            </body> <script src="bower_components/jquery/jquery.js"/>
-            <script src="bower_components/sass-bootstrap/dist/js/bootstrap.js"/>
-            <script src="bower_components/jquery-scrollspy-thesmart/scrollspy.js"/>
+            </body>
+
+
+            <script src="scripts/5ed9c348.api_documentation.js"></script>
+
             <script>
                 $(function () { 
                     $("[data-toggle='tooltip']").tooltip(); 
