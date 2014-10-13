@@ -117,10 +117,12 @@ namespace aio
             }
 
             //!Initializer for \a aio::tCallFunc
-            SocketAddRemoveTask( std::function<void()>&& _postHandler )
+            SocketAddRemoveTask(
+                SocketType* const _socket,
+                std::function<void()>&& _postHandler )
             :
                 type(TaskType::tCallFunc),
-                socket( nullptr ),
+                socket( _socket ),
                 eventType( aio::etNone ),
                 eventHandler( nullptr ),
                 timeout( 0 ),
@@ -180,6 +182,8 @@ namespace aio
         {
             if( pollSetModificationQueue.empty() )
                 return;
+
+            std::deque<SocketAddRemoveTask> postedFunctorCalls;
 
             QMutexLocker lk( aioServiceMutex );
 
@@ -244,7 +248,7 @@ namespace aio
                     case TaskType::tCallFunc:
                     {
                         assert( task.postHandler );
-                        task.postHandler();
+                        postedFunctorCalls.push_back( std::move(task) );
                         break;
                     }
 
@@ -255,6 +259,11 @@ namespace aio
                     task.taskCompletionEvent->store( 1, std::memory_order_relaxed );
                 it = pollSetModificationQueue.erase( it );
             }
+
+            lk.unlock();
+            
+            for( SocketAddRemoveTask& task: postedFunctorCalls )
+                task.postHandler();
         }
 
         bool addSockToPollset(
@@ -659,16 +668,20 @@ namespace aio
     }
 
     template<class SocketType>
-    bool AIOThread<SocketType>::post( std::function<void()>&& functor )
+    bool AIOThread<SocketType>::post( SocketType* const sock, std::function<void()>&& functor )
     {
-        m_impl->pollSetModificationQueue.push_back( typename AIOThreadImplType::SocketAddRemoveTask( std::move(functor) ) );
-        if( currentThreadSystemId() != systemThreadId() )  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
+        m_impl->pollSetModificationQueue.push_back(
+            typename AIOThreadImplType::SocketAddRemoveTask(
+                sock,
+                std::move(functor) ) );
+        //if eventTriggered is lower on stack, socket will be added to pollset before the next poll call
+        if( currentThreadSystemId() != systemThreadId() )
             m_impl->pollSet.interrupt();
         return true;
     }
 
     template<class SocketType>
-    bool AIOThread<SocketType>::dispatch( std::function<void()>&& functor )
+    bool AIOThread<SocketType>::dispatch( SocketType* const sock, std::function<void()>&& functor )
     {
         if( currentThreadSystemId() == systemThreadId() )  //if called from this aio thread
         {
@@ -676,7 +689,7 @@ namespace aio
             return true;
         }
         //otherwise posting functor
-        return post( std::move(functor) );
+        return post( sock, std::move(functor) );
     }
 
     //!Returns number of sockets monitored for \a eventToWatch event

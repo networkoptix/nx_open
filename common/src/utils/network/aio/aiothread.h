@@ -73,9 +73,9 @@ namespace aio
             aio::EventType eventType,
             bool waitForRunningHandlerCompletion );
         //!Queues \a functor to be executed from within this aio thread as soon as possible
-        bool post( std::function<void()>&& functor );
+        bool post( SocketType* const sock, std::function<void()>&& functor );
         //!If called in this aio thread, then calls \a functor immediately, otherwise queues \a functor in same way as \a aio::AIOThread::post does
-        bool dispatch( std::function<void()>&& functor );
+        bool dispatch( SocketType* const sock, std::function<void()>&& functor );
         //!Returns number of sockets handled by this object
         size_t socketsHandled() const;
         //!Returns true, if can accept socket \a sock for monitoring
