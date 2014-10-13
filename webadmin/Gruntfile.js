@@ -29,7 +29,8 @@ module.exports = function (grunt) {
         wiredep: {
             target: {
                 src: [
-                    '<%= yeoman.app %>/index.html'
+                    '<%= yeoman.app %>/index.html',
+                    '<%= yeoman.app %>/index.xsl'
                 ],
                 ignorePath: '<%= yeoman.app %>/'
             }

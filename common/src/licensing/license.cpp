@@ -27,6 +27,12 @@ namespace {
         "EwVi0AB6ht0hQ3sZUtM9UAGrszPJOzFfZlDB2hZ4HFyXfVZcbPxOdmECAwEAAQ==\n"
         "-----END PUBLIC KEY-----";
 
+    // This key is introduced in v2.3 to make new license types do not work in v2.2 and earlier
+    const char *networkOptixRSAPublicKey2 = "-----BEGIN PUBLIC KEY-----\n"
+        "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALiqxgrnU2hl+8DVzgXrj6u4V+5ksnR5\n"
+        "vtLsDeNC9eU2aLCt0Ba4KLnuVnDDWSXQ9914i8s0KXXTM+GOHpvrChUCAwEAAQ==\n"
+        "-----END PUBLIC KEY-----";
+
     bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
     {
 #ifdef ENABLE_SSL
@@ -406,7 +412,7 @@ void QnLicense::parseLicenseBlock(
                 m_brand = QString::fromUtf8(avalue);
             else if (aname == "EXPIRATION")
                 m_expiration = QString::fromUtf8(avalue);
-            else if (aname == "SIGNATURE2")
+            else if (aname == "SIGNATURE2" || aname == "SIGNATURE3")
                 m_signature2 = avalue;
         }
 
@@ -422,14 +428,12 @@ void QnLicense::parseLicenseBlock(
 
         n++;
     }
-    // Remove trailing "\n"
-//    v1LicenseBlock.chop(1);
-//    v2LicenseBlock.chop(1);
 }
 
 void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock )
 {
-    if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey))) {
+    if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey2)) ||
+        isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey))) {
         m_isValid2 = true;
     } else if (isSignatureMatch(v1LicenseBlock, QByteArray::fromBase64(m_signature), QByteArray(networkOptixRSAPublicKey)) && m_brand.isEmpty()) {
         m_class = QLatin1String("digital");
