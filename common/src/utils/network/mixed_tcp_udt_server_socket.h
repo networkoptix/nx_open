@@ -78,6 +78,10 @@ public:
     virtual void cancelAsyncIO(bool waitForRunningHandlerCompletion) override;
 
 protected:
+    //!Implementation of AbstractSocket::postImpl
+    virtual bool postImpl( std::function<void()>&& handler ) override;
+    //!Implementation of AbstractSocket::dispatchImpl
+    virtual bool dispatchImpl( std::function<void()>&& handler ) override;
     //!Implementation of SSLServerSocket::acceptAsyncImpl
     virtual bool acceptAsyncImpl(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler) override;
 

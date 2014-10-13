@@ -348,12 +348,12 @@ AbstractSocket::SOCKET_HANDLE Socket::handle() const
     return m_socketHandle;
 }
 
-bool Socket::postImpl( std::function<void()>&& handler )
+bool Socket::post( std::function<void()>&& handler )
 {
     return aio::AIOService::instance()->post( this, std::move(handler) );
 }
 
-bool Socket::dispatchImpl( std::function<void()>&& handler )
+bool Socket::dispatch( std::function<void()>&& handler )
 {
     return aio::AIOService::instance()->dispatch( this, std::move(handler) );
 }
@@ -446,12 +446,12 @@ unsigned short Socket::resolveService(const QString &service,
         return ntohs(serv->s_port);    /* Found port (network byte order) by name */
 }
 
-SocketImpl* Socket::impl()
+SystemSocketImpl* Socket::impl()
 {
     return m_impl;
 }
 
-const SocketImpl* Socket::impl() const
+const SystemSocketImpl* Socket::impl() const
 {
     return m_impl;
 }
@@ -459,7 +459,7 @@ const SocketImpl* Socket::impl() const
 Socket::Socket(
     int type,
     int protocol,
-    SocketImpl* impl )
+    SystemSocketImpl* impl )
 :
     m_socketHandle( -1 ),
     m_impl( impl ),
@@ -470,10 +470,10 @@ Socket::Socket(
     createSocket( type, protocol );
 
     if( !m_impl )
-        m_impl = new SocketImpl();
+        m_impl = new SystemSocketImpl();
 }
 
-Socket::Socket( int _sockDesc, SocketImpl* impl )
+Socket::Socket( int _sockDesc, SystemSocketImpl* impl )
 :
     m_socketHandle( -1 ),
     m_impl( impl ),
@@ -483,7 +483,7 @@ Socket::Socket( int _sockDesc, SocketImpl* impl )
 {
     this->m_socketHandle = _sockDesc;
     if( !m_impl )
-        m_impl = new SocketImpl();
+        m_impl = new SystemSocketImpl();
 }
 
 // Function to fill in address structure given an address and port
@@ -596,7 +596,7 @@ namespace
 }
 #endif
 
-CommunicatingSocket::CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int type, int protocol, SocketImpl* sockImpl )
+CommunicatingSocket::CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int type, int protocol, SystemSocketImpl* sockImpl )
 :
     Socket( type, protocol, sockImpl ),
     m_aioHelper( new AsyncSocketImplHelper<Socket>( this, abstractSocketPtr ) ),
@@ -604,7 +604,7 @@ CommunicatingSocket::CommunicatingSocket( AbstractCommunicatingSocket* abstractS
 {
 }
 
-CommunicatingSocket::CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int newConnSD, SocketImpl* sockImpl )
+CommunicatingSocket::CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int newConnSD, SystemSocketImpl* sockImpl )
 :
     Socket( newConnSD, sockImpl ),
     m_aioHelper( new AsyncSocketImplHelper<Socket>( this, abstractSocketPtr ) ),
@@ -876,7 +876,7 @@ bool CommunicatingSocket::registerTimerImpl( unsigned int timeoutMs, std::functi
 #ifdef _WIN32
 class Win32TcpSocketImpl
 :
-    public SocketImpl
+    public SystemSocketImpl
 {
 public:
     MIB_TCPROW win32TcpTableRow;
@@ -1122,7 +1122,7 @@ static int acceptWithTimeout( int m_socketHandle, int timeoutMillis = DEFAULT_AC
 
 class TCPServerSocketPrivate
 :
-    public SocketImpl
+    public SystemSocketImpl
 {
 public:
     int socketHandle;

@@ -212,6 +212,16 @@ void MixedTcpUdtServerSocket::cancelAsyncIO(bool waitForRunningHandlerCompletion
         m_acceptingFlags[i] = false;
 }
 
+bool MixedTcpUdtServerSocket::postImpl( std::function<void()>&& handler )
+{
+    return m_socketDelegates[0]->post( std::move(handler) );
+}
+
+bool MixedTcpUdtServerSocket::dispatchImpl( std::function<void()>&& handler )
+{
+    return m_socketDelegates[0]->dispatch( std::move(handler) );
+}
+
 bool MixedTcpUdtServerSocket::acceptAsyncImpl(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler)
 {
     for( size_t i = 0; i < m_socketDelegates.size(); ++i )

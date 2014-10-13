@@ -110,7 +110,7 @@ UdtSocketImplPtr::~UdtSocketImplPtr(){}
 // Implementator to keep the layout of class clean and achieve binary compatible
 class UdtSocketImpl
 :
-    public SocketImpl
+    public UDTSocketImpl
 {
 public:
     enum {
@@ -610,12 +610,12 @@ bool UdtSocket::getSendTimeout(unsigned int* millis)
     return impl_->GetSendTimeout(millis);
 }
 
-SocketImpl* UdtSocket::impl()
+UDTSocketImpl* UdtSocket::impl()
 {
     return impl_.get();
 }
 
-const SocketImpl* UdtSocket::impl() const
+const UDTSocketImpl* UdtSocket::impl() const
 {
     return impl_.get();
 }
@@ -725,6 +725,16 @@ bool UdtStreamSocket::reopen() {
 
 void UdtStreamSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )  {
     return m_aioHelper->cancelAsyncIO(eventType, waitForRunningHandlerCompletion);
+}
+
+bool UdtStreamSocket::postImpl( std::function<void()>&& handler )
+{
+    return aio::AIOService::instance()->post( static_cast<UdtSocket*>(this), std::move(handler) );
+}
+
+bool UdtStreamSocket::dispatchImpl( std::function<void()>&& handler )
+{
+    return aio::AIOService::instance()->dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
 bool UdtStreamSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) {
@@ -861,6 +871,16 @@ bool UdtStreamServerSocket::getSendTimeout( unsigned int* millis ) const {
 
 bool UdtStreamServerSocket::getLastError( SystemError::ErrorCode* errorCode ) const {
     return impl_->GetLastError(errorCode);
+}
+
+bool UdtStreamServerSocket::postImpl( std::function<void()>&& handler )
+{
+    return aio::AIOService::instance()->post( static_cast<UdtSocket*>(this), std::move(handler) );
+}
+
+bool UdtStreamServerSocket::dispatchImpl( std::function<void()>&& handler )
+{
+    return aio::AIOService::instance()->dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
 bool UdtStreamServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) {

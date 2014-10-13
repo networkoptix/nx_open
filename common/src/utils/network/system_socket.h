@@ -59,7 +59,7 @@ private:
 };
 
 
-//class SocketImpl;
+//class SystemSocketImpl;
 
 /**
  *   Base class representing basic communication endpoint
@@ -67,8 +67,8 @@ private:
 class Socket
 {
 public:
-    Socket( int type, int protocol, SocketImpl* impl = nullptr );
-    Socket( int sockDesc, SocketImpl* impl = nullptr );
+    Socket( int type, int protocol, SystemSocketImpl* impl = nullptr );
+    Socket( int sockDesc, SystemSocketImpl* impl = nullptr );
 
     /**
      *   Close and deallocate this socket
@@ -119,9 +119,9 @@ public:
     //!Implementation of AbstractSocket::handle
     AbstractSocket::SOCKET_HANDLE handle() const;
     //!Implementation of AbstractSocket::postImpl
-    bool postImpl( std::function<void()>&& handler );
+    bool post( std::function<void()>&& handler );
     //!Implementation of AbstractSocket::dispatchImpl
-    bool dispatchImpl( std::function<void()>&& handler );
+    bool dispatch( std::function<void()>&& handler );
 
 
     /**
@@ -194,15 +194,15 @@ public:
 
     bool failed() const;
 
-    SocketImpl* impl();
-    const SocketImpl* impl() const;
+    SystemSocketImpl* impl();
+    const SystemSocketImpl* impl() const;
 
     bool fillAddr( const QString &address, unsigned short port, sockaddr_in &addr );
     bool createSocket( int type, int protocol );
 
 protected:
     int m_socketHandle;              // Socket descriptor
-    SocketImpl* m_impl;
+    SystemSocketImpl* m_impl;
 
 private:
     bool m_nonBlockingMode;
@@ -224,8 +224,8 @@ class CommunicatingSocket
     public Socket
 {
 public:
-    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int type, int protocol, SocketImpl* sockImpl = nullptr );
-    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int newConnSD, SocketImpl* sockImpl = nullptr );
+    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int type, int protocol, SystemSocketImpl* sockImpl = nullptr );
+    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int newConnSD, SystemSocketImpl* sockImpl = nullptr );
 
     virtual ~CommunicatingSocket();
 

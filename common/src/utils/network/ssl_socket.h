@@ -10,8 +10,6 @@
 #include "abstract_socket.h"
 #include "socket_common.h"
 #include "socket_impl_helper.h"
-#include "system_socket.h"
-#include "udt_socket.h"
 
 
 struct bio_st;

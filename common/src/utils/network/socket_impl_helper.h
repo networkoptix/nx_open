@@ -68,6 +68,10 @@ public:
     virtual bool getLastError(SystemError::ErrorCode* errorCode) const override { return m_abstractSocketProvider()->getLastError(errorCode); }
     //!Implementation of AbstractSocket::handle
     virtual AbstractSocket::SOCKET_HANDLE handle() const override { return m_abstractSocketProvider()->handle(); }
+    //!Implementation of AbstractSocket::postImpl
+    virtual bool postImpl( std::function<void()>&& handler ) override { return m_abstractSocketProvider()->post( std::move(handler) ); }
+    //!Implementation of AbstractSocket::dispatchImpl
+    virtual bool dispatchImpl( std::function<void()>&& handler ) override { return m_abstractSocketProvider()->dispatch( std::move(handler) ); }
 
 private:
     AbstractSocketProviderType m_abstractSocketProvider;

@@ -6,7 +6,10 @@
 #include "aio/pollset.h"
 #include <memory>
 
-#include "system_socket_impl.h"
+#include "common_socket_impl.h"
+
+class UdtSocket;
+typedef CommonSocketImpl<UdtSocket> UDTSocketImpl;
 
 
 template<class SocketType> class AsyncSocketImplHelper;
@@ -56,8 +59,8 @@ public:
     bool getRecvTimeout(unsigned int* millis);
     bool getSendTimeout(unsigned int* millis);
 
-    SocketImpl* impl();
-    const SocketImpl* impl() const;
+    UDTSocketImpl* impl();
+    const UDTSocketImpl* impl() const;
 
 protected:
     UdtSocket( detail::UdtSocketImpl* impl );
@@ -127,6 +130,13 @@ public:
     // Since this will make std::unique_ptr call correct destructor for our
     // partial, forward declaration of class UdtSocketImp;
     virtual ~UdtStreamSocket();
+
+protected:
+    //!Implementation of AbstractSocket::postImpl
+    virtual bool postImpl( std::function<void()>&& handler ) override;
+    //!Implementation of AbstractSocket::dispatchImpl
+    virtual bool dispatchImpl( std::function<void()>&& handler ) override;
+
 private:
     std::unique_ptr<AsyncSocketImplHelper<UdtSocket>> m_aioHelper;
 
@@ -171,7 +181,12 @@ public:
     virtual ~UdtStreamServerSocket();
 
 protected:
+    //!Implementation of AbstractSocket::postImpl
+    virtual bool postImpl( std::function<void()>&& handler ) override;
+    //!Implementation of AbstractSocket::dispatchImpl
+    virtual bool dispatchImpl( std::function<void()>&& handler ) override;
     virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) ;
+
 private:
     std::unique_ptr<AsyncServerSocketHelper<UdtSocket>> m_aioHelper;
 
