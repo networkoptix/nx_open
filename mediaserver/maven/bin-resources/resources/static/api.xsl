@@ -24,15 +24,21 @@
                 <link rel="stylesheet" href="styles/3889fc7d.main.css"/>
             </head>
             <body>
-                <div class="container">
-                    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-                        <div class="container">
-                            <div class="navbar-header">
-                                <h1>HD Witness <small>API Reference</small>
-                                </h1>
-                            </div>
+                <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" >API Reference</a>
                         </div>
-                    </nav> <div class="row">
+                        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+                            <ul class="nav navbar-nav navbar-right">
+                                <li ><a ng-href="index.html">Web. administration</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </header>
+
+                <div class="container">
+                    <div class="row">
                         <nav class="col-xs-4 bs-docs-sidebar">
                             <ul class="nav nav-stacked fixed" id="sidebar">
                                 <xsl:for-each select="/apidoc/groups/group">

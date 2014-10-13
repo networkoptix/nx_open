@@ -118,7 +118,7 @@ void QnCheckForUpdatesPeerTask::checkBuildOnline() {
 
     nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
-    QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient, this);
+    QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_buildReply_finished);
     if (!httpClient->doGet(url))
         finishTask(QnCheckForUpdateResult::InternetProblem);
@@ -143,7 +143,7 @@ void QnCheckForUpdatesPeerTask::checkOnlineUpdates() {
 
     nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
-    QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient, this);
+    QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_updateReply_finished);
     if (!httpClient->doGet(m_updatesUrl))
         finishTask(QnCheckForUpdateResult::InternetProblem);
