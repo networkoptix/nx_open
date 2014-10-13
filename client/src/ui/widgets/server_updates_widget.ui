@@ -30,6 +30,12 @@
        <property name="text">
         <string notr="true">&lt;Select update source&gt;</string>
        </property>
+       <property name="iconSize">
+        <size>
+         <width>8</width>
+         <height>8</height>
+        </size>
+       </property>
        <property name="flat">
         <bool>true</bool>
        </property>
@@ -98,9 +104,15 @@
            <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,1,0,0">
             <item>
              <widget class="QStackedWidget" name="internetRefreshWidget">
+              <property name="minimumSize">
+               <size>
+                <width>24</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="maximumSize">
                <size>
-                <width>16</width>
+                <width>24</width>
                 <height>16</height>
                </size>
               </property>
