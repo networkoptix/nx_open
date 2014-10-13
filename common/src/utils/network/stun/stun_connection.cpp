@@ -13,11 +13,9 @@ namespace nx_stun
         bool useSsl,
         SocketFactory::NatTraversalType natTraversalType )
     :
-    //    BaseConnectionType( this, nullptr )
         m_stunServerEndpoint( stunServerEndpoint ),
         m_state(NOT_CONNECTED)
     {
-        //TODO creating connection
         m_socket.reset( SocketFactory::createStreamSocket( useSsl, natTraversalType ) );
         m_baseConnection.reset( new BaseConnectionType( this, m_socket.get() ) );
         using namespace std::placeholders;
@@ -100,11 +98,11 @@ namespace nx_stun
         }
         // Dequeue the request from the pending request queue
         return m_baseConnection->sendMessage( 
-            nx_stun::Message(m_outstandingRequest->request_message),
+            nx_stun::Message(std::move(m_outstandingRequest->request_message)),
             std::bind(
-            &StunClientConnection::onRequestSend,
-            this,
-            std::placeholders::_1));
+                &StunClientConnection::onRequestSend,
+                this,
+                std::placeholders::_1));
     }
 
     bool StunClientConnection::openConnection( std::function<void(SystemError::ErrorCode)>&& completionHandler )
@@ -162,9 +160,10 @@ namespace nx_stun
         }
     }
 
-    void StunClientConnection::closeConnection( StunClientConnection* connection )
+    void StunClientConnection::closeConnection( BaseConnectionType* connection )
     {
-        connection->m_socket->close();
+        assert( connection == m_baseConnection.get() );
+        m_socket->close();
     }
 
     void StunClientConnection::onRequestMessageRecv( nx_stun::Message& msg ) 

@@ -5,9 +5,9 @@
 
 #include "hybrid_stream_socket.h"
 
-#include "utils/common/systemerror.h"
+#include <utils/common/systemerror.h>
 
-#include "cloud_connector.h"
+#include "cloud_tunnel.h"
 #include "../system_socket.h"
 
 
@@ -36,6 +36,7 @@ namespace nx_cc
 
         if( dnsEntries.empty() )
         {
+            m_connectHandler = std::function<void( SystemError::ErrorCode )>();     //resetting handler, since it may hold some resources
             SystemError::setLastErrorCode( SystemError::hostUnreach );
             return false;
         }
@@ -47,16 +48,22 @@ namespace nx_cc
                 //using tcp connection
                 m_socketDelegate.reset( new TCPSocket() );
                 applyCachedAttributes();
-                return m_socketDelegate->connectAsync( SocketAddress(dnsEntry.address, addr.port), m_connectHandler );
+                return m_socketDelegate->connectAsync( SocketAddress(dnsEntry.address, addr.port), std::move(m_connectHandler) );
 
             case nx_cc::AddressType::cloud:
             case nx_cc::AddressType::unknown:  //if peer is unknown, trying to establish cloud connect
             {
                 //establishing cloud connect
-                using namespace std::placeholders;
-                return CloudConnector::instance()->setupCloudConnection(
-                    dnsEntry.address,
-                    std::bind(&HybridStreamSocket::cloudConnectDone, this, _1, _2) );
+                auto tunnel = CloudTunnelPool::instance()->getTunnelToHost( dnsEntry.address );
+                auto connectCompletionHandler = [this]( nx_cc::ErrorDescription errorCode, std::unique_ptr<AbstractStreamSocket> cloudConnection ) { 
+                    cloudConnectDone( errorCode, std::move(cloudConnection) );
+                };
+                if( !tunnel->connect( connectCompletionHandler ) )
+                {
+                    m_connectHandler = std::function<void( SystemError::ErrorCode )>();     //resetting handler, since it may hold some resources
+                    return false;
+                }
+                return true;
             }
 
             default:
@@ -93,10 +100,11 @@ namespace nx_cc
             case nx_cc::AddressType::unknown:  //if peer is unknown, trying to establish cloud connect
             {
                 //establishing cloud connect
-                using namespace std::placeholders;
-                if( !CloudConnector::instance()->setupCloudConnection(
-                        dnsEntry.address,
-                        std::bind(&HybridStreamSocket::cloudConnectDone, this, _1, _2) ) )
+                auto tunnel = CloudTunnelPool::instance()->getTunnelToHost( dnsEntry.address );
+                auto connectCompletionHandler = [this]( nx_cc::ErrorDescription errorCode, std::unique_ptr<AbstractStreamSocket> cloudConnection ) { 
+                    cloudConnectDone( errorCode, std::move(cloudConnection) );
+                };
+                if( !tunnel->connect( connectCompletionHandler ) )
                     m_connectHandler( SystemError::getLastOSErrorCode() );
                 return;
             }
@@ -108,8 +116,20 @@ namespace nx_cc
         }
     }
 
-    void HybridStreamSocket::cloudConnectDone( nx_cc::ErrorDescription errorCode, AbstractStreamSocket* cloudConnection )
+    void HybridStreamSocket::cloudConnectDone( nx_cc::ErrorDescription errorCode, std::unique_ptr<AbstractStreamSocket> cloudConnection )
     {
-        //TODO #ak
+        if( errorCode.resultCode == nx_cc::ResultCode::ok )
+        {
+            m_socketDelegate = std::move(cloudConnection);
+            assert( errorCode.sysErrorCode == SystemError::noError );
+        }
+        else
+        {
+            assert( !cloudConnection );
+            if( errorCode.sysErrorCode == SystemError::noError )
+                errorCode.sysErrorCode = SystemError::hostUnreach;
+        }
+        auto userHandler = std::move(m_connectHandler);
+        userHandler( errorCode.sysErrorCode );  //this object can be freed in handler, so using local variable for handler
     }
 }

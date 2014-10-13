@@ -31,8 +31,14 @@ namespace nx_stun
         public QnStoppableAsync
     {
     public:
+        typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
+            StunClientConnection,
+            nx_stun::Message,
+            nx_stun::MessageParser,
+            nx_stun::MessageSerializer
+        > BaseConnectionType;
         //!As required by \a nx_api::BaseServerConnection
-        typedef StunClientConnection ConnectionType;
+        typedef BaseConnectionType ConnectionType;
 
         StunClientConnection(
             const SocketAddress& stunServerEndpoint,
@@ -75,7 +81,7 @@ namespace nx_stun
         /*!
             \note Required by \a nx_api::BaseServerConnection
         */
-        void closeConnection( StunClientConnection* );
+        void closeConnection( BaseConnectionType* );
 
         // Those error code needs to define in order to make user's callback function know the specific error related 
         // to our STUN connection process
@@ -84,13 +90,6 @@ namespace nx_stun
         static const SystemError::ErrorCode STUN_REPLY_PACKAGE_BROKEN = 2;
 
     private:
-        typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
-                StunClientConnection,
-                nx_stun::Message,
-                nx_stun::MessageParser,
-                nx_stun::MessageSerializer
-            > BaseConnectionType;
-
         std::unique_ptr<AbstractCommunicatingSocket> m_socket;
         std::unique_ptr<BaseConnectionType> m_baseConnection;
         const SocketAddress m_stunServerEndpoint;

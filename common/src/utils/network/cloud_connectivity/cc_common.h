@@ -10,6 +10,9 @@
 
 
 //!cc stands for "cloud connectivity". This namespace contains functionality to establish connection between two servers each behind different NAT
+/*!
+    TODO #ak doxygen page with description how to use this "cloud connectivity" and how it works
+*/
 namespace nx_cc
 {
     //!Result of mediator request
@@ -23,7 +26,9 @@ namespace nx_cc
         //!no connection to the mediator
         notConnected,
         //!requested address is already used
-        addrInUse
+        addrInUse,
+        //!local system I/O error
+        ioError
     };
 
     //!Description of error occured in some cloud connectivity operation
@@ -38,6 +43,15 @@ namespace nx_cc
         :
             resultCode( ResultCode::ok ),
             sysErrorCode( SystemError::noError )
+        {
+        }
+
+        ErrorDescription(
+            ResultCode _resultCode,
+            SystemError::ErrorCode _sysErrorCode )
+        :
+            resultCode( _resultCode ),
+            sysErrorCode( _sysErrorCode )
         {
         }
     };

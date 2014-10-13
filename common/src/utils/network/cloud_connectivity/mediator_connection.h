@@ -8,6 +8,7 @@
 
 #include <functional>
 
+#include <utils/common/singleton.h>
 #include <utils/common/stoppable.h>
 #include <utils/network/socket_common.h>
 
@@ -44,7 +45,8 @@ namespace nx_cc
     //!Connection to the mediator
     class MediatorConnection
     :
-        public QnStoppableAsync
+        public QnStoppableAsync,
+        public Singleton<MediatorConnection>
     {
     public:
         MediatorConnection();
@@ -52,6 +54,19 @@ namespace nx_cc
 
         //!Implementation of QnStoppableAsync::pleaseStop
         virtual void pleaseStop( std::function<void()>&& completionHandler ) override;
+
+        //!Initiate asynchronous connection to mediator on address \a mediatorAddress
+        /*!
+            Connection to the mediator is established with UDT protocol
+            \return \a true if async request started successfully
+            \note Request interleaving is allowed!
+        */
+        bool connectAsync( const SocketAddress& mediatorAddress, std::function<void(ErrorDescription)>&& completionHandler );
+        //!Request public IP of local peer
+        /*!
+            \return \a true if async request started successfully
+        */
+        bool getPublicIP( std::function<void(ErrorDescription, const HostAddress&)>&& completionHandler );
 
         /***************************
         *     Server operations    *
@@ -69,12 +84,6 @@ namespace nx_cc
         *     Client operations    *
         ****************************/
 
-        //!Initiate asynchronous connection to mediator on address \a mediatorAddress
-        /*!
-            Connection to the mediator is established with UDT protocol
-            \return \a true if async request started successfully
-        */
-        bool connectAsync( const SocketAddress& mediatorAddress, std::function<void(ErrorDescription)>&& completionHandler );
         //!Request connection to server \a request.targetHost listening on mediator
         /*!
             \param completionHandler \a ConnectionResponse is only valid if result code is \a nx_cc::ResultCode::ok
@@ -83,13 +92,6 @@ namespace nx_cc
         bool establishConnectionRequest(
             const ConnectionRequest& request,
             std::function<void(ErrorDescription, const ConnectionResponse&)>&& completionHandler );
-        //!Request public IP of local peer
-        /*!
-            \return \a true if async request started successfully
-        */
-        bool getPublicIP( std::function<void(ErrorDescription, const HostAddress&)>&& completionHandler );
-
-        static MediatorConnection* instance();
     };
 }
 

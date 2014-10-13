@@ -21,11 +21,12 @@ AbstractStreamSocket* SocketFactory::createStreamSocket( bool sslRequired, Socke
     switch( natTraversalRequired )
     {
         case nttAuto:
+        case nttEnabled:
             result = new TCPSocket(); //new HybridStreamSocket();  //that's where hole punching kicks in
             break;
-        case nttEnabled:
-            result = new UdtStreamSocket();
-            break;
+        //case nttEnabled:
+        //    result = new UdtStreamSocket();   //TODO #ak does it make sense to use UdtStreamSocket only?
+        //    break;
         case nttDisabled:
             result = new TCPSocket();
             break;
@@ -48,11 +49,12 @@ AbstractStreamServerSocket* SocketFactory::createStreamServerSocket( bool sslReq
     switch( natTraversalRequired )
     {
         case nttAuto:
+        case nttEnabled:
             serverSocket = new MixedTcpUdtServerSocket();
             break;
-        case nttEnabled:
-            serverSocket = new UdtStreamServerSocket();
-            break;
+        //case nttEnabled:
+        //    serverSocket = new UdtStreamServerSocket();
+        //    break;
         case nttDisabled:
             serverSocket = new TCPServerSocket();
             break;

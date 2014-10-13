@@ -43,7 +43,7 @@ namespace nx_cc
         void applyCachedAttributes();
         bool instanciateSocket( const nx_cc::DnsEntry& dnsEntry );
         void onResolveDone( const std::vector<nx_cc::DnsEntry>& dnsEntries );
-        void cloudConnectDone( nx_cc::ErrorDescription errorCode, AbstractStreamSocket* cloudConnection );
+        void cloudConnectDone( nx_cc::ErrorDescription errorCode, std::unique_ptr<AbstractStreamSocket> cloudConnection );
     };
 }
 

@@ -227,6 +227,10 @@ namespace nx_stun {
         Message(){}
         ~Message(){}
         void clear();
+
+    private:
+        Message( const Message& );
+        Message& operator=( const Message& );
     };
 
 }
