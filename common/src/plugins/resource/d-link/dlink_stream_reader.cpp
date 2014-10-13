@@ -545,4 +545,11 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
     return motion;
 }
 
+void PlDlinkStreamReader::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+    m_rtpReader.pleaseStop();
+}
+
+
 #endif // #ifdef ENABLE_DLINK
