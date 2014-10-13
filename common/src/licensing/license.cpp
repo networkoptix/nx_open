@@ -244,7 +244,7 @@ QnUuid QnLicense::findRuntimeDataByLicense() const
             continue;
 
         bool hwKeyOK = info.data.mainHardwareIds.contains(m_hardwareId) || info.data.compatibleHardwareIds.contains(m_hardwareId);
-        bool brandOK = (m_brand == info.data.brand);
+        bool brandOK = m_brand.isEmpty() || (m_brand == info.data.brand);
         if (hwKeyOK && brandOK)
             return info.uuid;
     }
@@ -435,9 +435,8 @@ void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2Li
     if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey2)) ||
         isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey))) {
         m_isValid2 = true;
-    } else if (isSignatureMatch(v1LicenseBlock, QByteArray::fromBase64(m_signature), QByteArray(networkOptixRSAPublicKey))) {
+    } else if (isSignatureMatch(v1LicenseBlock, QByteArray::fromBase64(m_signature), QByteArray(networkOptixRSAPublicKey)) && m_brand.isEmpty()) {
         m_class = QLatin1String("digital");
-        m_brand = QLatin1String("");
         m_version = QLatin1String("1.4");
         m_expiration = QLatin1String("");
         m_isValid1 = true;
