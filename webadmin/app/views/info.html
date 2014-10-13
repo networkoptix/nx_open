@@ -1,4 +1,10 @@
-
+<h2>Software</h2>
+<dl class="dl-horizontal">
+    <dt>Version</dt>            <dd>{{settings.version}}</dd>
+    <dt>Architecture</dt>       <dd>{{settings.systemInformation.arch}}</dd>
+    <dt>Platform</dt>           <dd>{{settings.systemInformation.platform}}</dd>
+    <dt>Operating system</dt>   <dd>{{settings.systemInformation.modification}}</dd>
+</dl>
 
 <h2>Storage</h2>
 <p>Below is a list of available storage locations currently configured for this server</p>
@@ -32,10 +38,7 @@
 </table>
 
 <h2>Health monitoring</h2>
-
 <ng-include src="'views/health.html'"></ng-include>
-
-
 
 <h2>Log</h2>
 <blockquote>
