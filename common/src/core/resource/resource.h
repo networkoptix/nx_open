@@ -201,6 +201,7 @@ public:
     void emitModificationSignals( const QSet<QByteArray>& modifiedFields );
 
     static QnInitResPool* initAsyncPoolInstance();
+    static bool isStopping() { return m_appStopping; }
 
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QString &param) const;
