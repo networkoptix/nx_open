@@ -82,7 +82,7 @@ bool QnStardotStreamReader::isStreamOpened() const
 
 void QnStardotStreamReader::pleaseStop()
 {
-    QnLongRunnable::pleaseStop();
+    CLServerPushStreamReader::pleaseStop();
     m_multiCodec.pleaseStop();
 }
 
