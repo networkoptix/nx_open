@@ -38,7 +38,7 @@ namespace {
     }
 
     QDir getUpdateDir(const QString &updateId) {
-        QnUuid uuid(updateId);
+        QUuid uuid(updateId);
         QString id = uuid.isNull() ? updateId : updateId.mid(1, updateId.length() - 2);
         QDir dir = getUpdatesDir();
         if (!dir.exists(id))
