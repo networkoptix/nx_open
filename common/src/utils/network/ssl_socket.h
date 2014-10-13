@@ -66,6 +66,10 @@ public:
     //!Implementation of AbstractSocket::getLastError
     virtual bool getLastError(SystemError::ErrorCode* errorCode) override;
     virtual SOCKET_HANDLE handle() const override;
+    //!Implementation of AbstractSocket::postImpl
+    virtual bool postImpl( std::function<void()>&& handler ) override;
+    //!Implementation of AbstractSocket::dispatchImpl
+    virtual bool dispatchImpl( std::function<void()>&& handler ) override;
 
     //!Implementation of AbstractEncryptedStreamSocket::connectWithoutEncryption
     virtual bool connectWithoutEncryption(

@@ -1742,6 +1742,18 @@ AbstractSocket::SOCKET_HANDLE QnSSLSocket::handle() const
     return d->wrappedSocket->handle();
 }
 
+bool QnSSLSocket::postImpl( std::function<void()>&& handler )
+{
+    Q_D(const QnSSLSocket);
+    return d->wrappedSocket->post( std::move(handler) );
+}
+
+bool QnSSLSocket::dispatchImpl( std::function<void()>&& handler )
+{
+    Q_D(const QnSSLSocket);
+    return d->wrappedSocket->dispatch( std::move(handler) );
+}
+
 bool QnSSLSocket::connectWithoutEncryption(
     const QString& foreignAddress,
     unsigned short foreignPort,
