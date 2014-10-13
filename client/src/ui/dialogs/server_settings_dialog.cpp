@@ -295,6 +295,9 @@ QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
     return result;
 }
 
+static const int PC_SERVER_MAX_CAMERAS = 128;
+static const int EDGE_SERVER_MAX_CAMERAS = 1;
+
 void QnServerSettingsDialog::updateFromResources() 
 {
     m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
@@ -306,15 +309,18 @@ void QnServerSettingsDialog::updateFromResources()
     setTableItems(QList<QnStorageSpaceData>());
     setBottomLabelText(tr("Loading..."));
 
-    //bool edge = QnMediaServerResource::isEdgeServer(m_server);
     ui->nameLineEdit->setText(m_server->getName());
-    //ui->nameLineEdit->setEnabled(!edge);
-    ui->maxCamerasSpinBox->setValue(m_server->getMaxCameras());
+    int currentMaxCamerasValue = m_server->getMaxCameras();
+    if( currentMaxCamerasValue == 0 )
+        if( !m_server->getServerFlags().testFlag(Qn::SF_Edge) )
+            currentMaxCamerasValue = PC_SERVER_MAX_CAMERAS; //not an edge server
+        else
+            currentMaxCamerasValue = EDGE_SERVER_MAX_CAMERAS;   //edge server
+    ui->maxCamerasSpinBox->setValue(currentMaxCamerasValue);
     ui->failoverCheckBox->setChecked(m_server->isRedundancy());
-    //ui->failoverCheckBox->setEnabled(!edge);
     ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());
 
-    int maxCameras = (m_server->getServerFlags() & Qn::SF_Edge) ? 1 : 128;
+    const int maxCameras = (m_server->getServerFlags() & Qn::SF_Edge) ? EDGE_SERVER_MAX_CAMERAS : PC_SERVER_MAX_CAMERAS;
     ui->maxCamerasSpinBox->setMaximum(maxCameras);
 
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
