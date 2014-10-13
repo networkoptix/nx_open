@@ -33,8 +33,11 @@ void QnVMax480ChunkReader::run()
 {
     //saveSysThreadID();
     bool registered = false;
-    while (!needToStop() && !registered)
+    while (!needToStop() && !registered && !QnResource::isStopping()) {
         registered = m_streamFetcher->registerConsumer(this);
+        if (!registered)
+            msleep(200);
+    }
 
     while (!needToStop())
     {

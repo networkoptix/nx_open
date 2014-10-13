@@ -7,13 +7,23 @@
 #define SOCKET_IMPL_H
 
 #include <array>
+#include <atomic>
 
 #include "aio/pollset.h"
+#include "aio/aiothread.h"
 
+
+class Socket;
+namespace aio
+{
+    extern template class AIOThread<Socket>;
+}
 
 class SocketImpl
 {
 public:
+    std::atomic<aio::AIOThread<Socket>*> aioThread;
+
     virtual ~SocketImpl() {}
 
     void*& getUserData( aio::EventType eventType )

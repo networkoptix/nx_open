@@ -17,6 +17,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 
+//#define DESKTOP_CAMERA_DEBUG
 
 #ifdef QN_RESOURCE_POOL_DEBUG
 #   define TRACE(...) qDebug << __VA_ARGS__;
@@ -112,6 +113,16 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, newResources.values())
     {
+#ifdef DESKTOP_CAMERA_DEBUG
+        if (resource.dynamicCast<QnNetworkResource>() &&
+            resource->getTypeId() == qnResTypePool->desktopCameraResourceType()->getId()) {
+            qDebug() << "desktop camera added to resource pool" << resource->getName() << resource.dynamicCast<QnNetworkResource>()->getPhysicalId();
+            connect(resource.data(), &QnResource::statusChanged, this, [this, resource] {
+                qDebug() << "desktop camera status changed" << resource->getName() << resource.dynamicCast<QnNetworkResource>()->getPhysicalId() << resource->getStatus();
+            });
+        }
+#endif
+
         connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(statusChanged(const QnResourcePtr &)),     Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),    this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
@@ -177,6 +188,13 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
         if(resource->resourcePool() != this)
             qnWarning("Given resource '%1' is not in the pool", resource->metaObject()->className());
+
+#ifdef DESKTOP_CAMERA_DEBUG
+        if (resource.dynamicCast<QnNetworkResource>() &&
+            resource->getTypeId() == qnResTypePool->desktopCameraResourceType()->getId()) {
+                qDebug() << "desktop camera removed from resource pool" << resource->getName() << resource.dynamicCast<QnNetworkResource>()->getPhysicalId();
+        }
+#endif
 
         //const QString& uniqueId = resource->getUniqueId();
         //if( m_resources.remove(uniqueId) != 0 )

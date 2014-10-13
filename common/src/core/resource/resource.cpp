@@ -829,6 +829,9 @@ void QnResource::initAsync(bool optional)
     if (t - m_lastInitTime < MIN_INIT_INTERVAL)
         return; 
 
+    if (m_appStopping)
+        return;
+
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
     if (optional) {
         if (m_initAsyncPool.tryStart(task))

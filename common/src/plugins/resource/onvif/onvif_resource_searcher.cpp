@@ -89,6 +89,9 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& url, const
 
 QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    if (shouldStop())
+        return QList<QnResourcePtr>();
+
     QString urlStr = url.toString();
 
     QList<QnResourcePtr> resList;
@@ -136,6 +139,8 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     }
 
     resource->calcTimeDrift();
+    if (shouldStop())
+        return QList<QnResourcePtr>();
     
     if (resource->readDeviceInformation() && resource->getFullUrlInfo())
     {
@@ -217,6 +222,9 @@ QnResourceList OnvifResourceSearcher::findResources()
 
     //Order is important! mdns should be the first to avoid creating ONVIF resource, when special is expected
     //mdnsSearcher.findResources(result, specialResourceCreator);
+    if (shouldStop())
+         return QnResourceList();
+
     m_wsddSearcher.findResources(result);
 
     return result;

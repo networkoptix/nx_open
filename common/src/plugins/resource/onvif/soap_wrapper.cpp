@@ -20,6 +20,7 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
+#include "core/resource/resource.h"
 
 
 namespace {
@@ -290,8 +291,12 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
     QString passwd;
     int soapRes = SOAP_OK;
     do {
+        if (QnResource::isStopping())
+            return false;
+
         QTime timer;
         timer.restart();
+
         setLogin(login);
         setPassword(passwd);
 

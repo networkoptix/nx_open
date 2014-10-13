@@ -348,6 +348,16 @@ AbstractSocket::SOCKET_HANDLE Socket::handle() const
     return m_socketHandle;
 }
 
+bool Socket::postImpl( std::function<void()>&& handler )
+{
+    return aio::AIOService::instance()->post( this, std::move(handler) );
+}
+
+bool Socket::dispatchImpl( std::function<void()>&& handler )
+{
+    return aio::AIOService::instance()->dispatch( this, std::move(handler) );
+}
+
 
 QString Socket::getLocalHostAddress() const
 {
@@ -1211,7 +1221,7 @@ int TCPServerSocket::accept(int sockDesc)
     return acceptWithTimeout( sockDesc );
 }
 
-bool TCPServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler )
+bool TCPServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler )
 {
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl());
 
