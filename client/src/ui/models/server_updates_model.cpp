@@ -58,7 +58,7 @@ QnServerUpdatesModel::Item::Item(const QnMediaServerResourcePtr &server) :
 }
 
 QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObject *parent) :
-    QAbstractTableModel(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_updateTool(tool),
     m_checkResult(QnCheckForUpdateResult::BadUpdateFile)

@@ -12,14 +12,15 @@
 
 #include <update/media_server_update_tool.h>
 
+#include <ui/customization/customized.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnServerUpdatesModel : public QAbstractTableModel, public QnWorkbenchContextAware {
+class QnServerUpdatesModel : public Customized<QAbstractTableModel>, public QnWorkbenchContextAware {
     Q_OBJECT
 
     Q_PROPERTY(QnServerUpdatesColors colors READ colors WRITE setColors)
 
-    typedef QAbstractTableModel base_type;
+    typedef Customized<QAbstractTableModel> base_type;
 public:
     enum Columns {
         NameColumn,
