@@ -393,6 +393,10 @@ protected:
         return socket_;
     }
 
+    std::mutex* ssl_mutex() const {
+        return &ssl_mutex_;
+    }
+
     enum {
         HANDSHAKE_UNINITIALIZE,
         HANDSHAKE_PENDING,
@@ -410,9 +414,9 @@ private:
     std::size_t bio_in_buffer_pos_;
     nx::Buffer bio_in_buffer_;
 
-    std::mutex write_mutex_;
-    std::mutex read_mutex_;
-    std::mutex ssl_mutex_;
+    mutable std::mutex write_mutex_;
+    mutable std::mutex read_mutex_;
+    mutable std::mutex ssl_mutex_;
     // Pending Read 
     std::list<std::shared_ptr<AsyncSSLOperation> > pending_read_io_list_;
 
@@ -441,7 +445,7 @@ private:
     // re-issued those operation again.
 
     int handshake_state_;
-    std::mutex handshake_mutex_;
+    mutable std::mutex handshake_mutex_;
     struct HandshakeQueuedOp {
         std::function<void()> callback;
         std::shared_ptr<AsyncSSLOperation> ssl_op;
@@ -1228,6 +1232,7 @@ public:
 
     // When blocking version detects it is an SSL, it has to notify me
     void set_ssl( bool ssl ) {
+        std::lock_guard<std::mutex> lock(*ssl_mutex());
         is_initialized_ = true;
         is_ssl_ = ssl;
         AsyncSSL::set_handshake_state(AsyncSSL::HANDSHAKE_DONE);
@@ -1406,7 +1411,7 @@ public:
     // keep the sync mode for historic reason , but during the support for async,
     // the call for sync is undefined. This is for purpose since it heavily reduce
     // the pain of 
-    int mode;
+    std::atomic<int> mode;
     std::shared_ptr<AsyncSSL> async_ssl_ptr;
 
     QnSSLSocketPrivate()
@@ -1430,8 +1435,9 @@ QnSSLSocket::QnSSLSocket(AbstractStreamSocket* wrappedSocket, bool isServerSide)
     d->wrappedSocket = wrappedSocket;
     d->isServerSide = isServerSide;
     d->extraBufferLen = 0;
-
     init();
+    InitOpenSSLGlobalLock();
+    d->async_ssl_ptr.reset( new AsyncSSL(d->ssl,isServerSide,d->wrappedSocket) );
 }
 
 QnSSLSocket::QnSSLSocket(QnSSLSocketPrivate* priv, AbstractStreamSocket* wrappedSocket, bool isServerSide):
@@ -1441,7 +1447,6 @@ QnSSLSocket::QnSSLSocket(QnSSLSocketPrivate* priv, AbstractStreamSocket* wrapped
     d->wrappedSocket = wrappedSocket;
     d->isServerSide = isServerSide;
     d->extraBufferLen = 0;
-
     init();
     InitOpenSSLGlobalLock();
 }
@@ -1528,7 +1533,7 @@ int QnSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
     if( !d->ecnryptionEnabled )
         return d->wrappedSocket->recv( buffer, bufferLen, flags );
 
-    d->mode = QnSSLSocket::SYNC;
+    d->mode.store(QnSSLSocket::SYNC,std::memory_order_release);
     if (!SSL_is_init_finished(d->ssl)) {
         if (d->isServerSide)
             doServerHandshake();
@@ -1551,7 +1556,7 @@ int QnSSLSocket::send( const void* buffer, unsigned int bufferLen )
     if( !d->ecnryptionEnabled )
         return d->wrappedSocket->send( buffer, bufferLen );
 
-    d->mode = QnSSLSocket::SYNC;
+    d->mode.store(QnSSLSocket::SYNC,std::memory_order_release);
     if (!SSL_is_init_finished(d->ssl)) {
         if (d->isServerSide)
             doServerHandshake();
@@ -1785,9 +1790,7 @@ bool QnSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::function<voi
 bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const buffer , std::function<void( SystemError::ErrorCode, std::size_t )>&& handler )
 {
     Q_D(QnSSLSocket);
-    d->mode = QnSSLSocket::ASYNC;
-    if(!(d->async_ssl_ptr))
-        d->async_ssl_ptr.reset( new AsyncSSL(d->ssl,d->isServerSide,d->wrappedSocket) );
+    d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
     d->async_ssl_ptr->AsyncRecv( buffer, std::move(handler) );
     return true;
 }
@@ -1795,9 +1798,7 @@ bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const buffer , std::function<void( 
 bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& buffer , std::function<void( SystemError::ErrorCode, std::size_t )>&& handler )
 {
     Q_D(QnSSLSocket);
-    d->mode = QnSSLSocket::ASYNC;
-    if(!(d->async_ssl_ptr))
-        d->async_ssl_ptr.reset( new AsyncSSL(d->ssl,d->isServerSide,d->wrappedSocket) );
+    d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
     d->async_ssl_ptr->AsyncSend( buffer, std::move(handler) );
     return true;
 }
@@ -1805,7 +1806,7 @@ bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& buffer , std::function<void( 
 int QnSSLSocket::asyncRecvInternal( void* buffer , unsigned int bufferLen ) {
     // For async operation here
     Q_D(QnSSLSocket);
-    Q_ASSERT(d->mode == ASYNC);
+    Q_ASSERT(mode() == ASYNC);
     Q_ASSERT(d->async_ssl_ptr != NULL);
     if(d->async_ssl_ptr->eof())
         return 0;
@@ -1815,7 +1816,7 @@ int QnSSLSocket::asyncRecvInternal( void* buffer , unsigned int bufferLen ) {
 
 int QnSSLSocket::asyncSendInternal( const void* buffer , unsigned int bufferLen ) {
     Q_D(QnSSLSocket);
-    Q_ASSERT(d->mode == ASYNC);
+    Q_ASSERT(mode() == ASYNC);
     Q_ASSERT(d->async_ssl_ptr != NULL);
     return d->async_ssl_ptr->BioWrite(buffer,bufferLen);
 }
@@ -1827,7 +1828,7 @@ bool QnSSLSocket::registerTimerImpl( unsigned int timeoutMs, std::function<void(
 
 int QnSSLSocket::mode() const {
     Q_D(const QnSSLSocket);
-    return d->mode;
+    return d->mode.load(std::memory_order_acquire);
 }
 
 // ------------------------------ QnMixedSSLSocket -------------------------------------------------------
@@ -1852,6 +1853,7 @@ QnMixedSSLSocket::QnMixedSSLSocket(AbstractStreamSocket* wrappedSocket):
     Q_D(QnMixedSSLSocket);
     d->initState = true;
     d->useSSL = false;
+    d->async_ssl_ptr.reset( new MixedAsyncSSL(d->ssl,d->wrappedSocket));
 }
 
 int QnMixedSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
@@ -1929,10 +1931,7 @@ bool QnMixedSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::functio
 bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const buffer, std::function<void( SystemError::ErrorCode , std::size_t )>&&  handler )
 {
     Q_D(QnMixedSSLSocket);
-    d->mode = QnSSLSocket::ASYNC;
-    if( d->async_ssl_ptr == NULL ) {
-        d->async_ssl_ptr.reset( new MixedAsyncSSL(d->ssl,d->wrappedSocket) );
-    }
+    d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
     MixedAsyncSSL* ssl_ptr = 
         static_cast< MixedAsyncSSL* >( d->async_ssl_ptr.get() );
     if( !d->initState )
@@ -1950,10 +1949,7 @@ bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const buffer, std::function<vo
 bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& buffer, std::function<void( SystemError::ErrorCode , std::size_t )>&&  handler )
 {
     Q_D(QnMixedSSLSocket);
-    d->mode = QnSSLSocket::ASYNC;
-    if( d->async_ssl_ptr == NULL ) {
-        d->async_ssl_ptr.reset( new MixedAsyncSSL(d->ssl,d->wrappedSocket) );
-    }
+    d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
     MixedAsyncSSL* ssl_ptr = 
         static_cast< MixedAsyncSSL* >( d->async_ssl_ptr.get() );
     if( !d->initState )
