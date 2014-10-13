@@ -808,6 +808,9 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(const QString
     DeviceInfoReq request;
     DeviceInfoResp response;
 
+    if (m_appStopping)
+        return CameraDiagnostics::ServerTerminatedResult();
+
     int soapRes = soapWrapper.getDeviceInformation(request, response);
     if (soapRes != SOAP_OK) 
     {
