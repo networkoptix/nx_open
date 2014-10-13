@@ -547,7 +547,7 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
 
 void PlDlinkStreamReader::pleaseStop()
 {
-    QnLongRunnable::pleaseStop();
+    CLServerPushStreamReader::pleaseStop();
     m_rtpReader.pleaseStop();
 }
 
