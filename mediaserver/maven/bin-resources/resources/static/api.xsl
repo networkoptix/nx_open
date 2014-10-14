@@ -170,7 +170,7 @@
                         offset: 40
                     });
                 });
-            </script>19
+            </script>
         </html>
     </xsl:template>
     <xsl:template match="result">
