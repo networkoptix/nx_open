@@ -398,6 +398,12 @@ namespace ec2
         template<class TargetType, class HandlerType> int saveUserAttributes( const QnCameraUserAttributesList& cameras, TargetType* target, HandlerType handler ) {
             return saveUserAttributes( cameras, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
+        
+        ErrorCode saveUserAttributesSync( const QnCameraUserAttributesList& cameras) {
+            int(AbstractCameraManager::*fn)(const QnCameraUserAttributesList&, impl::SimpleHandlerPtr) = &AbstractCameraManager::saveUserAttributes;
+            return impl::doSyncCall<impl::SimpleHandler>( std::bind(fn, this, cameras, std::placeholders::_1));
+        }
+
         /*!
             \param handler Functor with params: (ErrorCode, const QnCameraUserAttributesList& cameraUserAttributesList)
         */

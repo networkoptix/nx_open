@@ -31,6 +31,7 @@
 #include "api/runtime_info_manager.h"
 #include "utils/license_usage_helper.h"
 #include "media_server/settings.h"
+#include "core/resource/camera_user_attribute_pool.h"
 
 
 static const qint64 LICENSE_RECORDING_STOP_TIME = 60 * 24 * 7;
@@ -621,7 +622,9 @@ void QnRecordingManager::at_licenseMutexLocked()
         if (helper.isOverflowForCamera(camera))
         {
             camera->setScheduleDisabled(true);
-            ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addCameraSync(camera);
+            QList<QnUuid> idList;
+            idList << camera->getId();
+            ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributesSync(QnCameraUserAttributePool::instance()->getAttributesList(idList));
             if (errCode != ec2::ErrorCode::ok)
             {
                 qWarning() << "Can't turn off recording for camera:" << camera->getUniqueId() << "error:" << ec2::toString(errCode);
