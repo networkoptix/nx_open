@@ -55,7 +55,6 @@ private:
     Qn::ClientBackground m_oldBackgroundMode;
     QColor m_oldCustomBackgroundColor;
 
-    QString m_uploadingImage;
     QString m_oldBackgroundImage;
     qreal m_oldBackgroundImageOpacity;
 };
