@@ -206,7 +206,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         if (backgroundFile) {
             QByteArray data = backgroundFile->readAll();
             QnLocalFileCache cache;
-            cache.storeImage(layout->backgroundImageFilename(), data);
+            cache.storeImageData(layout->backgroundImageFilename(), data);
 
             backgroundFile.reset();
         }

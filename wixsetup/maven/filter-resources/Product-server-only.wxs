@@ -4,7 +4,7 @@
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
      xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
     <Product Id="*" Name="${product.name} Server" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.upgradeCode}">
-        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Server Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
+        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Server Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
         <?include BuildVars.wxi ?>
@@ -158,16 +158,6 @@
         <CustomAction Id="CloseTrayToolAction2" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
-        <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
-                      Value="&quot;[${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]$(var.ProductName) Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
-        <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
-                      Execute="deferred" Return="ignore" Impersonate="no" />
-
-        <CustomAction Id="CloseAppLauncherAction2_Cmd" Property="CloseAppLauncherAction2"
-                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "$(var.ProductName) Launcher.exe"' Execute="immediate" />
-        <CustomAction Id="CloseAppLauncherAction2" BinaryKey="WixCA" DllEntry="CAQuietExec"
-                      Execute="deferred" Return="ignore" Impersonate="no" />
-
         <CustomAction Id="SyncDatabaseAction_Cmd_WithWarning" Property="SyncDatabaseAction"
                       Value="&quot;[#dbsync.exe]&quot;;1;!(loc.UpgradeDlg_DatabaseRecovery)" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="SyncDatabaseAction_Cmd_WithoutWarning" Property="SyncDatabaseAction"
@@ -231,12 +221,6 @@
 
             <Custom Action="CloseTrayToolAction2_Cmd" Before="CloseTrayToolAction2">NOT $(var.VmsInstalling)</Custom>
             <Custom Action="CloseTrayToolAction2" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
-
-            <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">NOT $(var.VmsInstalling)</Custom>
-            <Custom Action="CloseAppLauncherAction" Before="CloseAppLauncherAction2_Cmd">NOT $(var.VmsInstalling)</Custom>
-
-            <Custom Action="CloseAppLauncherAction2_Cmd" Before="CloseAppLauncherAction2">NOT $(var.VmsInstalling)</Custom>
-            <Custom Action="CloseAppLauncherAction2" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
 
             <Custom Action="LaunchTrayTool" After="InstallFinalize">
             <![CDATA[ (!ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom>
