@@ -5,6 +5,7 @@ import QtQuick.Controls 1.2
 import com.networkoptix.qml 1.0
 
 import "dialogs"
+import "main.js" as Main
 
 Window {
     title: "HD Witness"
@@ -13,7 +14,20 @@ Window {
     width: 480
     height: 800
 
-    QnLoginDialog {
+    StackView {
+        id: stackView
+
         anchors.fill: parent
+
+        initialItem: QnLoginDialog {
+            anchors.fill: parent
+        }
     }
+
+    Connections {
+        target: connectionManager
+        onConnected: Main.openResources()
+    }
+
+    Component.onCompleted: Main.openLoginDialog()
 }
