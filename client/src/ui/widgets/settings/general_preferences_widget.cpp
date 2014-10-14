@@ -253,8 +253,8 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
         customColor = withAlpha(Qt::darkBlue, 64);
 
     m_colorDialog->setCurrentColor(withAlpha(customColor, 255));
-    ui->backgroundColorOpacitySpinBox->setValue(customColor.alphaF() * 100);
-    ui->backgroundImageOpacitySpinBox->setValue(qnSettings->backgroundImageOpacity() * 100);
+    ui->backgroundColorOpacitySpinBox->setValue(qRound(customColor.alphaF() * 100));
+    ui->backgroundImageOpacitySpinBox->setValue(qRound(qnSettings->backgroundImageOpacity() * 100));
 
     updateBackgroundColor();
 }
