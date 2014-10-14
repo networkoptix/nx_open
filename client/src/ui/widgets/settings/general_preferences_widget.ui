@@ -413,7 +413,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>249</width>
+             <width>174</width>
              <height>20</height>
             </size>
            </property>
@@ -425,6 +425,9 @@
             <string>Browse...</string>
            </property>
           </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="backgroundImageModeComboBox"/>
          </item>
          <item>
           <widget class="QLabel" name="backgroundImageOpacityLabel">

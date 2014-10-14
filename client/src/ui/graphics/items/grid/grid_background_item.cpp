@@ -45,7 +45,9 @@ class QnGridBackgroundItemPrivate {
 public:
     QnGridBackgroundItemPrivate():
         imageSize(1, 1),
+        imageAspectRatio(1),
         imageOpacity(0.7),
+        imageMode(Qn::StretchImage),
         isDefaultBackground(true),
         imageIsLocal(true),
         connected(false),
@@ -66,7 +68,9 @@ public:
 
     QString imageFilename;
     QSize imageSize;
+    qreal imageAspectRatio;
     qreal imageOpacity;
+    Qn::ImageBehaviour imageMode;
 
     /** Layout has no own background, using default image (if exists). */
     bool isDefaultBackground;
@@ -99,9 +103,10 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent, QnWorkbenchCon
     connect(this->context()->instance<QnAppServerImageCache>(), SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
     connect(this->context(), SIGNAL(userChanged(QnUserResourcePtr)), this, SLOT(at_context_userChanged()));
 
-    connect(qnSettings->notifier(QnClientSettings::BACKGROUND_MODE), &QnPropertyNotifier::valueChanged, this, &QnGridBackgroundItem::updateDefaultBackground);
-    connect(qnSettings->notifier(QnClientSettings::BACKGROUND_IMAGE), &QnPropertyNotifier::valueChanged, this, &QnGridBackgroundItem::updateDefaultBackground);
-    connect(qnSettings->notifier(QnClientSettings::BACKGROUND_IMAGE_OPACITY), &QnPropertyNotifier::valueChanged, this, &QnGridBackgroundItem::updateDefaultBackground);
+    connect(qnSettings->notifier(QnClientSettings::BACKGROUND_MODE),            &QnPropertyNotifier::valueChanged, this, &QnGridBackgroundItem::updateDefaultBackground);
+    connect(qnSettings->notifier(QnClientSettings::BACKGROUND_IMAGE),           &QnPropertyNotifier::valueChanged, this, &QnGridBackgroundItem::updateDefaultBackground);
+    connect(qnSettings->notifier(QnClientSettings::BACKGROUND_IMAGE_OPACITY),   &QnPropertyNotifier::valueChanged, this, &QnGridBackgroundItem::updateDefaultBackground);
+    connect(qnSettings->notifier(QnClientSettings::BACKGROUND_IMAGE_MODE),      &QnPropertyNotifier::valueChanged, this, &QnGridBackgroundItem::updateDefaultBackground);
 
     /* Don't disable this item here. When disabled, it starts accepting wheel events
      * (and probably other events too). Looks like a Qt bug. */
@@ -124,25 +129,42 @@ void QnGridBackgroundItem::updateDefaultBackground(int settingsId) {
     if (!d->isDefaultBackground)
         return;
 
-    if (settingsId == QnClientSettings::BACKGROUND_MODE || settingsId == QnClientSettings::BACKGROUND_IMAGE) {
+    switch (settingsId) {
+    case QnClientSettings::BACKGROUND_MODE:
+    case QnClientSettings::BACKGROUND_IMAGE:
+        {
+            QString filename = qnSettings->backgroundMode() == Qn::ImageBackground
+                ? qnSettings->backgroundImage()
+                : QString();
 
-        QString filename = qnSettings->backgroundMode() == Qn::ImageBackground
-            ? qnSettings->backgroundImage()
-            : QString();
+            if (d->imageFilename == filename) 
+                return;
 
-        if (d->imageFilename == filename) 
-            return;
-        
-        d->imageFilename = filename;
-        d->imageStatus = ImageStatus::None;
-        m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>();
-
-    } else if (settingsId == QnClientSettings::BACKGROUND_IMAGE_OPACITY) {
-        qreal opacity = qnSettings->backgroundImageOpacity();
-        if (qFuzzyCompare(d->imageOpacity, opacity))
-            return;
-        d->imageOpacity = opacity;
+            d->imageFilename = filename;
+            d->imageStatus = ImageStatus::None;
+            m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>();
+            break;
+        }
+    case QnClientSettings::BACKGROUND_IMAGE_OPACITY:
+        {
+            qreal opacity = qnSettings->backgroundImageOpacity();
+            if (qFuzzyCompare(d->imageOpacity, opacity))
+                return;
+            d->imageOpacity = opacity;
+            break;
+        }
+    case QnClientSettings::BACKGROUND_IMAGE_MODE:
+        {
+            Qn::ImageBehaviour mode = qnSettings->backgroundImageMode();
+            if (d->imageMode == mode)
+                return;
+            d->imageMode = mode;
+            break;
+        }
+    default:
+        return;
     }
+
     updateDisplay();
 }
 
@@ -316,6 +338,8 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
         d->imagesMemCache.insert(d->imageFilename, image);
     }
 
+    d->imageAspectRatio = QnGeometry::aspectRatio(image.size());
+
 #ifdef NATIVE_PAINT_BACKGROUND
     //converting image to ARGB32 since we cannot convert to YUV from monochrome, indexed, etc..
     const QImage* imgToLoad = NULL;
@@ -388,9 +412,20 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 {
     Q_D(QnGridBackgroundItem);
 
-    QRectF targetRect = d->isDefaultBackground
-        ? display()->viewportGeometry()
-        : d->rect;
+    QRectF targetRect = d->rect;
+    if (d->isDefaultBackground) {
+        switch (d->imageMode) {
+        case Qn::FitImage:
+            targetRect = QnGeometry::expanded(d->imageAspectRatio, display()->viewportGeometry(), Qt::KeepAspectRatio, Qt::AlignCenter);
+            break;
+        case Qn::CropImage:
+            targetRect = QnGeometry::expanded(d->imageAspectRatio, display()->viewportGeometry(), Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
+            break;
+        default:
+            targetRect = display()->viewportGeometry();
+            break;
+        }
+    }
 
 #ifdef NATIVE_PAINT_BACKGROUND
     if( !m_imgAsFrame )

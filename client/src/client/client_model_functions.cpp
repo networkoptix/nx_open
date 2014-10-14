@@ -16,6 +16,13 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::ClientBackground,
                                           (Qn::ImageBackground,         "ImageBackground")
                                           );
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::ImageBehaviour,
+                                          (Qn::StretchImage,            "StretchImage")
+                                          (Qn::CropImage,               "CropImage")
+                                          (Qn::FitImage,                "FitImage")
+                                          (Qn::TileImage,               "TileImage")
+                                          );
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnWorkbenchState, (datastream), (currentLayoutIndex)(layoutUuids));
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnServerStorageKey, (datastream)(eq)(hash), (serverUuid)(storagePath));
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnLicenseWarningState, (datastream), (lastWarningTime));

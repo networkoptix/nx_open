@@ -45,7 +45,8 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     m_oldLanguage(0),
     m_oldSkin(0),
     m_oldBackgroundMode(Qn::DefaultBackground),
-    m_oldBackgroundImageOpacity(0.5)
+    m_oldBackgroundImageOpacity(0.5),
+    m_oldBackgroundImageMode(Qn::StretchImage)
 {
     ui->setupUi(this);
 
@@ -132,6 +133,16 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
         if (!m_updating)
             qnSettings->setBackgroundImageOpacity(0.01 * value);
     });
+
+    ui->backgroundImageModeComboBox->addItem(tr("Stretch"), qVariantFromValue(Qn::StretchImage));
+    ui->backgroundImageModeComboBox->addItem(tr("Fit"),     qVariantFromValue(Qn::FitImage));
+    ui->backgroundImageModeComboBox->addItem(tr("Crop"),    qVariantFromValue(Qn::CropImage));
+
+    connect(ui->backgroundImageModeComboBox,            QnComboboxCurrentIndexChanged,  this,   [this] {
+        if (m_updating)
+            return;
+        qnSettings->setBackgroundImageMode(ui->backgroundImageModeComboBox->currentData().value<Qn::ImageBehaviour>());
+    });
 }
 
 QnGeneralPreferencesWidget::~QnGeneralPreferencesWidget()
@@ -213,6 +224,7 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     m_oldCustomBackgroundColor = qnSettings->customBackgroundColor();
     m_oldBackgroundImage = qnSettings->backgroundImage();
     m_oldBackgroundImageOpacity = qnSettings->backgroundImageOpacity();
+    m_oldBackgroundImageMode = qnSettings->backgroundImageMode();
 
     if (!backgroundAllowed) {
         ui->backgroundEmptyRadioButton->setChecked(true);
@@ -285,6 +297,7 @@ bool QnGeneralPreferencesWidget::discard() {
         qnSettings->setCustomBackgroundColor(m_oldCustomBackgroundColor);
         qnSettings->setBackgroundImage(m_oldBackgroundImage);
         qnSettings->setBackgroundImageOpacity(m_oldBackgroundImageOpacity);
+        qnSettings->setBackgroundImageMode(m_oldBackgroundImageMode);
     }
     return true;
 }
