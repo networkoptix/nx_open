@@ -279,8 +279,9 @@ void QnGeneralPreferencesWidget::initTranslations() {
 }
 
 QColor QnGeneralPreferencesWidget::backgroundColor() const {
-    QColor opaque = m_colorDialog->currentColor();
-    return withAlpha(opaque, ui->backgroundOpacitySpinBox->value() * 255.0 / 100.0);
+    QColor color = m_colorDialog->currentColor();
+    color.setAlphaF(0.01* ui->backgroundOpacitySpinBox->value());
+    return color;
 }
 
 void QnGeneralPreferencesWidget::updateBackgroundColor() {
