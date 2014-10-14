@@ -20,7 +20,8 @@ Window {
         anchors.fill: parent
 
         initialItem: QnLoginDialog {
-            anchors.fill: parent
+            width: parent
+            height: parent
         }
     }
 
