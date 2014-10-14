@@ -440,7 +440,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 void QnWorkbenchScreenshotHandler::showProgressDelayed(const QString &message) {
     if (!m_screenshotProgressDialog) {
         m_screenshotProgressDialog = new QnWorkbenchStateDependentDialog<QnProgressDialog>(mainWindow());
-        m_screenshotProgressDialog->setWindowTitle(tr("Saving...")); // TODO: #string_freeze replace with "Saving Screenshot"
+        m_screenshotProgressDialog->setWindowTitle(tr("Saving Screenshot..."));
         m_screenshotProgressDialog->setInfiniteProgress();
         // TODO: #dklychkov ensure concurrent screenshot saving is ok and disable modality
         m_screenshotProgressDialog->setModal(true);

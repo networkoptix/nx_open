@@ -249,9 +249,9 @@ int launchFile(const wstring& executePath)
         // check if MSVC MSI exists
         INSTALLSTATE state;
         if (sizeof(char*) == 4)
-            state = MsiQueryProductState(L"{9A25302D-30C0-39D9-BD6F-21E6EC160475}");
+            state = MsiQueryProductState(L"{E7D4E834-93EB-351F-B8FB-82CDAE623003}");
         else
-            state = MsiQueryProductState(L"{8220EEFE-38CD-377E-8595-13398D740ACE}");
+            state = MsiQueryProductState(L"{2EDC2FA3-1F34-34E5-9085-588C9EFD1CC6}");
         if (state != INSTALLSTATE_DEFAULT)
         {
             wchar_t buffer[MAX_PATH + 16];
