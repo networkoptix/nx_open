@@ -173,7 +173,7 @@
 
             <script>
                 $(function () {
-                    $("[data-toggle='tooltip']").tooltip(); 
+                    //$("[data-toggle='tooltip']").tooltip();
 
                     $('body').scrollspy({
                         target: '.bs-docs-sidebar',
