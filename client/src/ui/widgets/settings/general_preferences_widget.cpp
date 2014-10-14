@@ -21,6 +21,7 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/file_dialog.h>
+#include <ui/dialogs/progress_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/warning_style.h>
@@ -130,11 +131,6 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     connect(ui->backgroundImageOpacitySpinBox,          QnSpinboxIntValueChanged,       this,   [this](int value) {
         if (!m_updating)
             qnSettings->setBackgroundImageOpacity(0.01 * value);
-    });
-
-    connect(context()->instance<QnLocalFileCache>(),    &QnAppServerFileCache::fileUploaded,    this, [this](const QString &filename) {
-        if (filename == m_uploadingImage)
-            qnSettings->setBackgroundImage(filename);
     });
 }
 
@@ -342,12 +338,28 @@ void QnGeneralPreferencesWidget::selectBackgroundImage() {
 
     qnSettings->setBackgroundsFolder(QFileInfo(fileName).absolutePath());
 
-    QnLocalFileCache* imgCache = context()->instance<QnLocalFileCache>();
-    QString cachedName = imgCache->cachedImageFilename(fileName);
-    if (qnSettings->backgroundImage() != cachedName) {
-        imgCache->storeImage(fileName);
-        m_uploadingImage = cachedName;
-    }
+
+    QString cachedName = QnAppServerImageCache::cachedImageFilename(fileName);
+    if (qnSettings->backgroundImage() == cachedName)
+        return;
+
+    QnProgressDialog* progressDialog = new QnProgressDialog(this);
+    progressDialog->setWindowTitle(tr("Preparing Image..."));
+    progressDialog->setLabelText(tr("Please wait while image is being prepared..."));
+    progressDialog->setInfiniteProgress();
+    progressDialog->setModal(true);
+
+    QnLocalFileCache* imgCache = new QnLocalFileCache(this);
+    connect(imgCache, &QnAppServerFileCache::fileUploaded, this, [this, imgCache, progressDialog](const QString &filename) {
+        if (!progressDialog->wasCanceled())
+            qnSettings->setBackgroundImage(filename);
+        imgCache->deleteLater();
+        progressDialog->hide();
+        progressDialog->deleteLater();
+    });
+ 
+    imgCache->storeImage(fileName);
+    progressDialog->exec();
 }
 
 #include "ui/workaround/mac_utils.h"

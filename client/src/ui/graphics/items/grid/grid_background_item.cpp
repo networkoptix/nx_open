@@ -387,6 +387,11 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
 void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     Q_D(QnGridBackgroundItem);
+
+    QRectF targetRect = d->isDefaultBackground
+        ? display()->viewportGeometry()
+        : d->rect;
+
 #ifdef NATIVE_PAINT_BACKGROUND
     if( !m_imgAsFrame )
         return;
@@ -416,10 +421,6 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
     m_imgUploader->setOpacity( painter->opacity() );
 
-
-    QRectF targetRect = d->isDefaultBackground
-        ? display()->viewportGeometry()
-        : d->rect;
     m_renderer->paint(QRectF(0, 0, 1, 1), targetRect);
 
     if( m_imgAsFrame->format == PIX_FMT_YUVA420P || m_imgAsFrame->format == PIX_FMT_RGBA )
