@@ -731,7 +731,15 @@
                     <description>Updates server by the package contained in POST body</description>
                     <method>POST</method>
                     <params/>
-                    <result/>
+                    <result>
+                        <caption>JSON with error code</caption>
+                        When all is OK errorString will be empty. In case of error errorString will contain:
+                        UP_TO_DATE if the provided version is already installed;
+                        INVALID_FILE if the provided file cannot be opened as a ZIP archive;
+                        INCOMPATIBLE_SYSTEM if the update file is targeted for another system;
+                        EXTRACTION_ERROR if some extraction problems were found (e.g. not enough space);
+                        INSTALLATION_ERROR if the server couldn't execute installation script.
+                    </result>
                 </function>
                 <function>
                     <name>version</name>

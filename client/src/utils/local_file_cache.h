@@ -20,11 +20,10 @@ public:
      * @brief storeLocalImage
      * @param fileName
      * @param image
-     * \reimp
      */
-    void storeImage(const QString &fileName, const QByteArray &imageData);
+    void storeImageData(const QString &fileName, const QByteArray &imageData);
 
-    void storeImage(const QString &fileName, const QImage &image);
+    void storeImageData(const QString &fileName, const QImage &image);
 
     virtual void downloadFile(const QString &filename) override;
     virtual void uploadFile(const QString &filename) override;

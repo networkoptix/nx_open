@@ -48,7 +48,12 @@ angular.module('webadminApp')
         };
         $scope.toGBs = function(total){
             return    Math.floor(total / (1024*1024*1024));
-        }
+        };
+
+        $scope.update = function(){
+                
+        };
+
         $scope.save = function(){
             var needConfirm = false;
             var hasStorageForWriting;

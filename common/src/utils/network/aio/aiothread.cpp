@@ -140,7 +140,7 @@ namespace aio
                     0,
                     nullptr )
             {
-                postHandler = std::move(_postHandler);
+                this->postHandler = std::move(_postHandler);
             }
         };
 
