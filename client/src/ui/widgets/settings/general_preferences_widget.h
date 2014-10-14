@@ -31,6 +31,8 @@ private:
     QColor backgroundColor() const;
     void updateBackgroundColor();
 
+    void selectBackgroundImage();
+
 private slots:
     void at_browseMainMediaFolderButton_clicked();
     void at_addExtraMediaFolderButton_clicked();
@@ -52,6 +54,10 @@ private:
 
     Qn::ClientBackground m_oldBackgroundMode;
     QColor m_oldCustomBackgroundColor;
+
+    QString m_uploadingImage;
+    QString m_oldBackgroundImage;
+    qreal m_oldBackgroundImageOpacity;
 };
 
 #endif // GENERAL_PREFERENCES_WIDGET_H

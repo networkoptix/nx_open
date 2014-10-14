@@ -261,7 +261,8 @@ namespace Qn {
         NoBackground,
         DefaultBackground,
         RainbowBackground,
-        CustomBackground
+        CustomColorBackground,
+        ImageBackground
     };
 
 

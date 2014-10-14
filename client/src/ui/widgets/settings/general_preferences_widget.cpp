@@ -31,6 +31,7 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/math/color_transformations.h>
+#include <utils/local_file_cache.h>
 
 QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     base_type(parent),
@@ -42,7 +43,8 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     m_oldDoubleBuffering(false),
     m_oldLanguage(0),
     m_oldSkin(0),
-    m_oldBackgroundMode(Qn::DefaultBackground)
+    m_oldBackgroundMode(Qn::DefaultBackground),
+    m_oldBackgroundImageOpacity(0.5)
 {
     ui->setupUi(this);
 
@@ -106,13 +108,14 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     buttonGroup->addButton(ui->backgroundEmptyRadioButton,      Qn::NoBackground);
     buttonGroup->addButton(ui->backgroundDefaultRadioButton,    Qn::DefaultBackground);
     buttonGroup->addButton(ui->backgroundRainbowRadioButton,    Qn::RainbowBackground);
-    buttonGroup->addButton(ui->backgroundCustomRadioButton,     Qn::CustomBackground);
+    buttonGroup->addButton(ui->backgroundCustomRadioButton,     Qn::CustomColorBackground);
+    buttonGroup->addButton(ui->backgroundImageRadioButton,      Qn::ImageBackground);
 
     connect(buttonGroup,    QnButtonGroupIdToggled, this, [this](int id, bool toggled) {
         if (!toggled)
             return;
 
-        action(Qn::ToggleBackgroundAnimationAction)->setChecked(id != Qn::NoBackground);
+        action(Qn::ToggleBackgroundAnimationAction)->setChecked(id != Qn::NoBackground && id != Qn::ImageBackground);
         qnSettings->setBackgroundMode(static_cast<Qn::ClientBackground>(id));
     });
 
@@ -121,7 +124,18 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
             updateBackgroundColor();
     });
 
-    connect(ui->backgroundOpacitySpinBox,               QnSpinboxIntValueChanged,       this,   &QnGeneralPreferencesWidget::updateBackgroundColor);
+    connect(ui->backgroundColorOpacitySpinBox,          QnSpinboxIntValueChanged,       this,   &QnGeneralPreferencesWidget::updateBackgroundColor);
+
+    connect(ui->selectImageButton,                      &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::selectBackgroundImage);
+    connect(ui->backgroundImageOpacitySpinBox,          QnSpinboxIntValueChanged,       this,   [this](int value) {
+        if (!m_updating)
+            qnSettings->setBackgroundImageOpacity(0.01 * value);
+    });
+
+    connect(context()->instance<QnLocalFileCache>(),    &QnAppServerFileCache::fileUploaded,    this, [this](const QString &filename) {
+        if (filename == m_uploadingImage)
+            qnSettings->setBackgroundImage(filename);
+    });
 }
 
 QnGeneralPreferencesWidget::~QnGeneralPreferencesWidget()
@@ -156,16 +170,6 @@ void QnGeneralPreferencesWidget::submitToSettings() {
                 qnSettings->setTranslationPath(translation.filePaths()[0]);
         }
     }
-
-//     bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
-//     if (backgroundAllowed) {
-//         qnSettings->setBackgroundMode(!ui->backgroundEmptyRadioButton->isChecked());
-//         qnSettings->setRainbowMode(ui->backgroundRainbowRadioButton->isChecked());
-//         if (ui->backgroundCustomRadioButton->isChecked())
-//             qnSettings->setBackgroundColor(backgroundColor());
-//         else
-//             qnSettings->setBackgroundColor(QColor());            
-//     }
 }
 
 void QnGeneralPreferencesWidget::updateFromSettings() {
@@ -211,22 +215,38 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     ui->backgroundGroupBox->setEnabled(backgroundAllowed);
     m_oldBackgroundMode = qnSettings->backgroundMode();
     m_oldCustomBackgroundColor = qnSettings->customBackgroundColor();
+    m_oldBackgroundImage = qnSettings->backgroundImage();
+    m_oldBackgroundImageOpacity = qnSettings->backgroundImageOpacity();
 
-    if (!backgroundAllowed || qnSettings->backgroundMode() == Qn::NoBackground)
+    if (!backgroundAllowed) {
         ui->backgroundEmptyRadioButton->setChecked(true);
-    else if (qnSettings->backgroundMode() == Qn::RainbowBackground)
-        ui->backgroundRainbowRadioButton->setChecked(true);
-    else if (qnSettings->backgroundMode() == Qn::CustomBackground)
-        ui->backgroundCustomRadioButton->setChecked(true);
-    else
-        ui->backgroundDefaultRadioButton->setChecked(true);
+    } else {
+        switch (qnSettings->backgroundMode()) {
+        case Qn::NoBackground:
+            ui->backgroundEmptyRadioButton->setChecked(true);
+            break;
+        case Qn::RainbowBackground:
+            ui->backgroundRainbowRadioButton->setChecked(true);
+            break;
+        case Qn::CustomColorBackground:
+            ui->backgroundCustomRadioButton->setChecked(true);
+            break;
+        case Qn::ImageBackground:
+            ui->backgroundImageRadioButton->setChecked(true);
+            break;
+        default:
+            ui->backgroundDefaultRadioButton->setChecked(true);
+            break;
+        }
+    }
 
     QColor customColor = qnSettings->customBackgroundColor();
     if (!customColor.isValid())
         customColor = withAlpha(Qt::darkBlue, 64);
 
     m_colorDialog->setCurrentColor(withAlpha(customColor, 255));
-    ui->backgroundOpacitySpinBox->setValue(customColor.alphaF() * 100);
+    ui->backgroundColorOpacitySpinBox->setValue(customColor.alphaF() * 100);
+    ui->backgroundImageOpacitySpinBox->setValue(qnSettings->backgroundImageOpacity() * 100);
 
     updateBackgroundColor();
 }
@@ -267,6 +287,8 @@ bool QnGeneralPreferencesWidget::discard() {
     if (backgroundAllowed) {
         qnSettings->setBackgroundMode(m_oldBackgroundMode);
         qnSettings->setCustomBackgroundColor(m_oldCustomBackgroundColor);
+        qnSettings->setBackgroundImage(m_oldBackgroundImage);
+        qnSettings->setBackgroundImageOpacity(m_oldBackgroundImageOpacity);
     }
     return true;
 }
@@ -280,7 +302,7 @@ void QnGeneralPreferencesWidget::initTranslations() {
 
 QColor QnGeneralPreferencesWidget::backgroundColor() const {
     QColor color = m_colorDialog->currentColor();
-    color.setAlphaF(0.01* ui->backgroundOpacitySpinBox->value());
+    color.setAlphaF(0.01* ui->backgroundColorOpacitySpinBox->value());
     return color;
 }
 
@@ -293,6 +315,40 @@ void QnGeneralPreferencesWidget::updateBackgroundColor() {
         qnSettings->setCustomBackgroundColor(backgroundColor());
 }
 
+void QnGeneralPreferencesWidget::selectBackgroundImage() {
+    QString nameFilter;
+    foreach (const QByteArray &format, QImageReader::supportedImageFormats()) {
+        if (!nameFilter.isEmpty())
+            nameFilter += QLatin1Char(' ');
+        nameFilter += QLatin1String("*.") + QLatin1String(format);
+    }
+    nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
+
+    QScopedPointer<QnCustomFileDialog> dialog(
+        new QnCustomFileDialog (
+        this, tr("Select file..."),
+        qnSettings->backgroundsFolder(),
+        tr("Pictures %1").arg(nameFilter)
+        )
+        );
+    dialog->setFileMode(QFileDialog::ExistingFile);
+
+    if(!dialog->exec())
+        return;
+
+    QString fileName = dialog->selectedFile();
+    if (fileName.isEmpty())
+        return;
+
+    qnSettings->setBackgroundsFolder(QFileInfo(fileName).absolutePath());
+
+    QnLocalFileCache* imgCache = context()->instance<QnLocalFileCache>();
+    QString cachedName = imgCache->cachedImageFilename(fileName);
+    if (qnSettings->backgroundImage() != cachedName) {
+        imgCache->storeImage(fileName);
+        m_uploadingImage = cachedName;
+    }
+}
 
 #include "ui/workaround/mac_utils.h"
 // -------------------------------------------------------------------------- //
@@ -352,3 +408,4 @@ void QnGeneralPreferencesWidget::at_browseLogsButton_clicked() {
     }
     QDesktopServices::openUrl(QLatin1String("file:///") + logsLocation);
 }
+

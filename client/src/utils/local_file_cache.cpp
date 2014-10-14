@@ -22,7 +22,7 @@ QString QnLocalFileCache::getFullPath(const QString &filename) const {
                                     );
 }
 
-void QnLocalFileCache::storeImage(const QString &fileName, const QByteArray &imageData) {
+void QnLocalFileCache::storeImageData(const QString &fileName, const QByteArray &imageData) {
     ensureCacheFolder();
     QString fullPath = getFullPath(fileName);
     if (QFileInfo(fullPath).exists())
@@ -34,7 +34,7 @@ void QnLocalFileCache::storeImage(const QString &fileName, const QByteArray &ima
     file.close();
 }
 
-void QnLocalFileCache::storeImage(const QString &fileName, const QImage &image) {
+void QnLocalFileCache::storeImageData(const QString &fileName, const QImage &image) {
     ensureCacheFolder();
     QString fullPath = getFullPath(fileName);
     if (QFileInfo(fullPath).exists())

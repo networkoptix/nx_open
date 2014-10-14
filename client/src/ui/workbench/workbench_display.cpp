@@ -1203,11 +1203,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
             ? layoutBoundingRect
             : layoutBoundingRect.united(backgroundBoundingRect);
 
-    if (qnSettings->isVideoWallMode())
-        return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect));
-
-    const qreal adjust = 0.05; // half of minimal cell spacing
-    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect).adjusted(-adjust, -adjust, adjust, adjust));
+    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect));
 }
 
 QRectF QnWorkbenchDisplay::viewportGeometry() const {

@@ -9,10 +9,11 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::ClientSkin,
 );
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::ClientBackground,
-                                          (Qn::NoBackground,        "NoBackground")
-                                          (Qn::DefaultBackground,   "DefaultBackground")
-                                          (Qn::RainbowBackground,   "RainbowBackground")
-                                          (Qn::CustomBackground,    "CustomBackground")
+                                          (Qn::NoBackground,            "NoBackground")
+                                          (Qn::DefaultBackground,       "DefaultBackground")
+                                          (Qn::RainbowBackground,       "RainbowBackground")
+                                          (Qn::CustomColorBackground,   "CustomColorBackground")
+                                          (Qn::ImageBackground,         "ImageBackground")
                                           );
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnWorkbenchState, (datastream), (currentLayoutIndex)(layoutUuids));
