@@ -496,6 +496,7 @@ namespace ec2
         QnDbTransaction m_tranStatic;
         mutable QReadWriteLock m_mutexStatic;
         bool m_needResyncLog;
+        bool m_needResyncLicenses;
     };
 };
 
