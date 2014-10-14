@@ -156,7 +156,7 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &
 
     QString versionSuffix;
     if (targetVersion.isNull()) {
-        query.addQueryItem(lit("version"), qnCommon->engineVersion().toString());
+        query.addQueryItem(lit("version"), lit("latest"));
         query.addQueryItem(lit("current"), getCurrentVersion().toString());
     } else {
         query.addQueryItem(lit("version"), targetVersion.toString());
