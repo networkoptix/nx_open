@@ -172,14 +172,14 @@
             <!-- endbuild -->
 
             <script>
-                $(function () { 
+                /*$(function () {
                     $("[data-toggle='tooltip']").tooltip(); 
 
                     $('body').scrollspy({
                         target: '.bs-docs-sidebar',
                         offset: 40
                     });
-                });
+                });*/
             </script>
         </html>
     </xsl:template>
