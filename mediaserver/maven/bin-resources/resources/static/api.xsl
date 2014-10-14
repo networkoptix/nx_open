@@ -162,14 +162,14 @@
             <script src="scripts/5ed9c348.api_documentation.js"></script>
 
             <script>
-                $(function () { 
+                /*$(function () {
                     $("[data-toggle='tooltip']").tooltip(); 
 
                     $('body').scrollspy({
                         target: '.bs-docs-sidebar',
                         offset: 40
                     });
-                });
+                });*/
             </script>
         </html>
     </xsl:template>
