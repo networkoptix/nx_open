@@ -897,14 +897,22 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     if(!modifiedResources.empty()) {
         detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources);
 
+        processor->awaitedResponseCount.store( 2 );
+        auto completionHandler = [processor, modifiedResources](int reqID, ec2::ErrorCode errorCode) {
+            if( --processor->awaitedResponseCount == 0 )
+                processor->at_replyReceived(reqID, errorCode, modifiedResources);
+        };
+
+        connection2()->getCameraManager()->save(
+            modifiedResources,
+            processor,
+            completionHandler );
+
         const QList<QnUuid>& idList = idListFromResList(modifiedResources);
         connection2()->getCameraManager()->saveUserAttributes(
             QnCameraUserAttributePool::instance()->getAttributesList(idList),
             processor,
-            [processor, modifiedResources](int reqID, ec2::ErrorCode errorCode) {
-                processor->at_replyReceived(reqID, errorCode, modifiedResources);
-            }
-        );
+            completionHandler );
         propertyDictionary->saveParamsAsync(idList);    //saving modified properties
     }
 }

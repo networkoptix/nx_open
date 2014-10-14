@@ -894,6 +894,10 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if(frameColor.isValid())
         widget->setFrameDistinctionColor(frameColor);
 
+    QnResourceWidget::Options options = item->data(Qn::ItemWidgetOptions).value<QnResourceWidget::Options>();
+    if (options)
+        widget->setOptions(widget->options() | options);
+
     emit widgetAdded(widget);
 
     for(int i = 0; i < Qn::ItemRoleCount; i++)

@@ -67,13 +67,11 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
         m_eventStatesModel->appendRow(row);
     }
 
-    for (int i = 1; i < QnBusiness::ActionCount; i++) {
-        QnBusiness::ActionType val = (QnBusiness::ActionType)i;
+    for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {      
+        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(actionType));
+        item->setData(actionType);
+        item->setData(QnBusiness::hasToggleState(actionType), ProlongedActionRole);
         
-        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
-        item->setData(val);
-        item->setData(QnBusiness::hasToggleState(val), ProlongedActionRole);
-
         QList<QStandardItem *> row;
         row << item;
         m_actionTypesModel->appendRow(row);

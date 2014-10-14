@@ -1562,7 +1562,6 @@ void QnMain::run()
     } while (ec2Connection->getResourceManager()->setResourceStatusSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
 
 
-    qnStorageMan->doMigrateCSVCatalog();
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
@@ -1723,6 +1722,9 @@ void QnMain::run()
     saveStorages(ec2Connection, modifiedStorages);
     foreach(const QnAbstractStorageResourcePtr &storage, modifiedStorages)
         messageProcessor->updateResource(storage);
+
+    qnStorageMan->doMigrateCSVCatalog();
+    qnStorageMan->initDone();
 
 #ifndef EDGE_SERVER
     updateDisabledVendorsIfNeeded();

@@ -50,6 +50,9 @@ QnSecurityCamResource::QnSecurityCamResource():
 
 QString QnSecurityCamResource::getName() const
 {
+    if( getId().isNull() )
+        return QnResource::getName();
+
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     if( !(*userAttributesLock)->name.isEmpty() )
         return (*userAttributesLock)->name;
@@ -59,13 +62,15 @@ QString QnSecurityCamResource::getName() const
 void QnSecurityCamResource::setName( const QString& name )
 {
     setCameraName( name );
-    QnResource::setName( name );
 }
 
 void QnSecurityCamResource::setCameraName( const QString& newCameraName )
 {
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    (*userAttributesLock)->name = newCameraName;
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+        (*userAttributesLock)->name = newCameraName;
+    }
+    QnResource::setName( newCameraName );
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
@@ -249,8 +254,7 @@ bool QnSecurityCamResource::isAnalogEncoder() const {
 }
 
 bool QnSecurityCamResource::isEdge() const {
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(getParentId()).dynamicCast<QnMediaServerResource>();
-    return mServer && (mServer->getServerFlags() & Qn::SF_Edge);
+    return QnMediaServerResource::isEdgeServer(qnResPool->getResourceById(getParentId()));
 }
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const 
@@ -422,9 +426,10 @@ bool QnSecurityCamResource::hasMotion() const {
 
 Qn::MotionType QnSecurityCamResource::getMotionType() const {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    if ((*userAttributesLock)->motionType == Qn::MT_Default)
-        (*userAttributesLock)->motionType = getDefaultMotionType();
-    return (*userAttributesLock)->motionType;
+    if ((*userAttributesLock)->motionType == Qn::MT_Default || !(supportedMotionType() & (*userAttributesLock)->motionType))
+        return getDefaultMotionType();
+    else
+        return (*userAttributesLock)->motionType;
 }
 
 void QnSecurityCamResource::setMotionType(Qn::MotionType value) {

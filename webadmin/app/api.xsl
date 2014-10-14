@@ -24,19 +24,29 @@
                 <link rel="stylesheet" href="bower_components/sass-bootstrap/dist/css/bootstrap.css"/>
                 <!-- endbower -->
                 <!-- endbuild -->
+
                 <!-- build:css({.tmp,app}) styles/main.css -->
-                <link rel="stylesheet" href="styles/2ffdb355.main.css"/>
+                <link rel="stylesheet" href="styles/main.css" />
+                <!-- endbuild -->
+
+                <link rel="stylesheet" href="customization/styles.css"/>
             </head>
             <body>
-                <div class="container">
-                    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-                        <div class="container">
-                            <div class="navbar-header">
-                                <h1>HD Witness <small>API Reference</small>
-                                </h1>
-                            </div>
+                <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" >API Reference</a>
                         </div>
-                    </nav> <div class="row">
+                        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+                            <ul class="nav navbar-nav navbar-right">
+                                <li ><a href="index.html">Web. administration</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </header>
+
+                <div class="container">
+                    <div class="row">
                         <nav class="col-xs-4 bs-docs-sidebar">
                             <ul class="nav nav-stacked fixed" id="sidebar">
                                 <xsl:for-each select="/apidoc/groups/group">
@@ -152,9 +162,15 @@
                                     </xsl:for-each> </section> </xsl:for-each>
                         </div>
                     </div> </div>
-            </body> <script src="bower_components/jquery/jquery.js"/>
+            </body>
+
+
+            <!-- build:js({.tmp,app}) scripts/api_documentation.js -->
+            <script src="bower_components/jquery/jquery.js"/>
             <script src="bower_components/sass-bootstrap/dist/js/bootstrap.js"/>
             <script src="bower_components/jquery-scrollspy-thesmart/scrollspy.js"/>
+            <!-- endbuild -->
+
             <script>
                 $(function () { 
                     $("[data-toggle='tooltip']").tooltip(); 

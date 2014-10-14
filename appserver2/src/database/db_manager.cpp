@@ -35,6 +35,7 @@
 #include "api/runtime_info_manager.h"
 #include "utils/common/log.h"
 #include "nx_ec/data/api_camera_data_ex.h"
+#include "restype_xml_parser.h"
 
 using std::nullptr_t;
 
@@ -621,7 +622,13 @@ bool QnDbManager::updateGuids()
     if (!updateTableGuids("vms_resource", "xtype_guid", guids))
         return false;
 
-    guids = getGuidList("SELECT id, id from vms_businessrule ORDER BY id", CM_INT, QnUuid::createUuid().toByteArray());
+    // update default rules
+    guids = getGuidList("SELECT id, id from vms_businessrule WHERE (id between 1 and 19) or (id between 10020 and 10023) ORDER BY id", CM_INT, "DEFAULT_BUSINESS_RULES");
+    if (!updateTableGuids("vms_businessrule", "guid", guids))
+        return false;
+
+    // update user's rules
+    guids = getGuidList("SELECT id, id from vms_businessrule WHERE guid is null ORDER BY id", CM_INT, QnUuid::createUuid().toByteArray());
     if (!updateTableGuids("vms_businessrule", "guid", guids))
         return false;
 
@@ -929,30 +936,6 @@ ErrorCode QnDbManager::deleteAddParams(qint32 resourceId)
 }
 */
 
-ErrorCode QnDbManager::insertResource(const ApiResourceData& data, qint32* internalId)
-{
-    QSqlQuery insQuery(m_sdb);
-    //insQuery.prepare("INSERT INTO vms_resource (guid, xtype_guid, parent_guid, name, url, status, disabled) VALUES(:id, :typeId, :parentId, :name, :url, :status, :disabled)");
-    //data.autoBindValues(insQuery);
-    //insQuery.prepare("INSERT INTO vms_resource VALUES(NULL, ?,?,?,?,?,?,?)");
-    insQuery.prepare("INSERT INTO vms_resource(status, name, url, xtype_guid, parent_guid, guid) VALUES(?,?,?,?,?,?)");
-
-    insQuery.bindValue(0, QnSql::serialized_field(data.status));
-    insQuery.bindValue(1, QnSql::serialized_field(data.name));
-    insQuery.bindValue(2, QnSql::serialized_field(data.url));
-    insQuery.bindValue(3, QnSql::serialized_field(data.typeId));
-    insQuery.bindValue(4, QnSql::serialized_field(data.parentId));
-    insQuery.bindValue(5, QnSql::serialized_field(data.id));
-
-    if (!insQuery.exec()) {
-        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-        return ErrorCode::dbError;
-    }
-    *internalId = insQuery.lastInsertId().toInt();
-
-    return ErrorCode::ok;
-}
-
 qint32 QnDbManager::getResourceInternalId( const QnUuid& guid ) {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -985,11 +968,9 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
         query.bindValue(":internalID", *internalId);
     }
     else {
-        query.prepare("INSERT OR REPLACE INTO vms_resource (guid, xtype_guid, parent_guid, name, url, status) VALUES(:id, :typeId, :parentId, :name, :url, :status)");
+        query.prepare("INSERT INTO vms_resource (guid, xtype_guid, parent_guid, name, url, status) VALUES(:id, :typeId, :parentId, :name, :url, 0)");
     }
     QnSql::bind(data, &query);
-    //data.autoBindValues(query);
-
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -998,43 +979,6 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
     if (*internalId == 0)
         *internalId = query.lastInsertId().toInt();
 
-#if 0
-    if (!data.addParams.empty()) 
-    {
-        ErrorCode result = insertAddParams(data.addParams, *internalId);
-        if (result != ErrorCode::ok)
-            return result;
-    }
-#endif
-    return ErrorCode::ok;
-}
-
-ErrorCode QnDbManager::updateResource(const ApiResourceData& data, qint32 internalId)
-{
-    /* Check that we are updating really existing resource */
-    Q_ASSERT(internalId != 0);
-    ErrorCode result = checkExistingUser(data.name, internalId);
-    if (result != ErrorCode::ok)
-        return result;
-
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("UPDATE vms_resource SET xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url, status = :status WHERE id = :internalId");
-    QnSql::bind(data, &insQuery);
-    insQuery.bindValue(":internalId", internalId);
-
-    if (!insQuery.exec()) {
-        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-        return ErrorCode::dbError;
-    }
-
-#if 0
-    if (!data.addParams.empty()) 
-    {
-        result = insertAddParams(data.addParams, internalId);
-        if (result != ErrorCode::ok)
-            return result;
-    }
-#endif
     return ErrorCode::ok;
 }
 
@@ -1417,12 +1361,8 @@ ErrorCode QnDbManager::saveCameraUserAttributes( const ApiCameraAttributesData& 
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourceData>& tran)
 {
-    qint32 internalId = getResourceInternalId(tran.params.id);
-    ErrorCode err = updateResource(tran.params, internalId);
-    if (err != ErrorCode::ok)
-        return err;
-
-    return ErrorCode::ok;
+    qint32 internalId;
+    return insertOrReplaceResource(tran.params, &internalId);
 }
 
 ErrorCode QnDbManager::insertBRuleResource(const QString& tableName, const QnUuid& ruleGuid, const QnUuid& resourceGuid)
@@ -2215,6 +2155,31 @@ ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
  ------------------------------------------------------------
 */
 
+void QnDbManager::loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data)
+{
+    QFile f(fileName);
+    if (!f.open(QFile::ReadOnly))
+        return;
+    QBuffer xmlData;
+    xmlData.setData(f.readAll());
+    ResTypeXmlParser parser(data);
+    QXmlSimpleReader reader;
+    reader.setContentHandler(&parser);
+    QXmlInputSource xmlSrc( &xmlData );
+    if(!reader.parse( &xmlSrc )) {
+        qWarning() << "Can't parse XML file " << fileName << "with additional resource types. Check XML file syntax.";
+    }
+}
+
+void QnDbManager::addResourceTypesFromXML(ApiResourceTypeDataList& data)
+{
+    foreach(const QFileInfo& fi, QDir(":/resources").entryInfoList(QDir::Files))
+        loadResourceTypeXML(fi.absoluteFilePath(), data);
+    QDir dir2(QCoreApplication::applicationDirPath() + QString(lit("/resources")));
+    foreach(const QFileInfo& fi, dir2.entryInfoList(QDir::Files))
+        loadResourceTypeXML(fi.absoluteFilePath(), data);
+}
+
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& data)
 {
     if (!m_cachedResTypes.empty())
@@ -2261,6 +2226,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
     std::vector<ApiPropertyTypeData> allProperties;
     QnSql::fetch_many(queryProperty, &allProperties);
     mergeObjectListData(data, allProperties, &ApiResourceTypeData::propertyTypes, &ApiPropertyTypeData::resourceTypeId);
+
+    addResourceTypesFromXML(data);
 
     m_cachedResTypes = data;
 

@@ -182,11 +182,10 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     {
         bool instant = index.data(Qn::ActionIsInstantRole).toBool();
         QComboBox* comboBox = new QComboBox(parent);
-        for (int i = 1; i < QnBusiness::ActionCount; i++) {
-            QnBusiness::ActionType val = (QnBusiness::ActionType)i;
-            if (instant && QnBusiness::hasToggleState(val))
+        for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {
+            if (instant && QnBusiness::hasToggleState(actionType))
                 continue;
-            comboBox->addItem(QnBusinessStringsHelper::actionName(val), val);
+            comboBox->addItem(QnBusinessStringsHelper::actionName(actionType), actionType);
         }
         return comboBox;
     }

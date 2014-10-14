@@ -65,12 +65,8 @@ namespace nx_http
         }
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
         if( m_socket )
-        {
-            m_socket->cancelAsyncIO( aio::etWrite );
-            m_socket->cancelAsyncIO( aio::etRead );
-
-            //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
-        }
+            m_socket->cancelAsyncIO();
+        //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
     }
 
     void AsyncHttpClient::asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode )
@@ -508,7 +504,7 @@ namespace nx_http
         else {
             m_state = sInit;
 
-            m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(url.scheme() == lit("https")));
+            m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/));
             if( !m_socket->setNonBlockingMode( true ) ||
                 !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) ||
                 !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )

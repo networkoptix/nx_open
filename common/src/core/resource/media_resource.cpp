@@ -134,17 +134,21 @@ QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const {
 }
 
 
-void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), toResource()->getId() );
-    if ((*userAttributesLock)->dewarpingParams == params)
-        return;
+void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) 
+{
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), toResource()->getId() );
+        if ((*userAttributesLock)->dewarpingParams == params)
+            return;
 
-    (*userAttributesLock)->dewarpingParams = params;
+        (*userAttributesLock)->dewarpingParams = params;
+    }
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
 void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&modifiedFields)
 {
+    Q_UNUSED(modifiedFields)
     QnMediaResourcePtr other_casted = qSharedPointerDynamicCast<QnMediaResource>(other);
     if (other_casted) {
         //if (m_dewarpingParams != other_casted->m_dewarpingParams) {   //moved to QnCameraUserAttributePool

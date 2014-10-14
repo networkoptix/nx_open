@@ -151,6 +151,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     else
         soapWrapper.fetchLoginPassword(info.manufacturer);
 
+    if (m_shouldStop)
+        return;
+
     //Trying to get name and manufacturer
     if (existResource)
     {
@@ -170,6 +173,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         auth.setPassword(soapWrapper.getPassword());
         CameraDiagnostics::Result result = QnPlOnvifResource::readDeviceInformation(endpoint, auth, INT_MAX, &extInfo);
         
+        if (m_shouldStop)
+            return;
+
         if (!result && result.errorCode != CameraDiagnostics::ErrorCode::notAuthorised)
             return; // non onvif device
 

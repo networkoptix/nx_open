@@ -85,7 +85,8 @@ QnStorageManager::QnStorageManager():
     m_isWritableStorageAvail(false),
     m_rebuildState(RebuildState_None),
     m_rebuildProgress(0),
-    m_asyncRebuildTask(0)
+    m_asyncRebuildTask(0),
+    m_initInProgress(true)
 {
     m_lastTestTime.restart();
     m_storageWarnTimer.restart();
@@ -93,9 +94,7 @@ QnStorageManager::QnStorageManager():
 
     assert( QnStorageManager_instance == nullptr );
     QnStorageManager_instance = this;
-
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::DirectConnection);
 }
 
 std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -127,6 +126,16 @@ std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaDat
     sdb->flushRecords();
     // merge chunks
     return DeviceFileCatalog::mergeChunks(chunks, newChunks);
+}
+
+void QnStorageManager::initDone()
+{
+    m_initInProgress = false;
+    foreach(QnStorageResourcePtr storage, getStorages())
+        addDataFromDatabase(storage);
+    disconnect(qnResPool);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 }
 
 QMap<QString, QSet<int>> QnStorageManager::deserializeStorageFile()
@@ -179,12 +188,8 @@ bool QnStorageManager::loadFullFileCatalog(const QnStorageResourcePtr &storage, 
 
     if (!isRebuild)
     {
-        // load from database
-        foreach(DeviceFileCatalogPtr c, sdb->loadFullFileCatalog())
-        {
-            DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->cameraUniqueId(), c->getCatalog());
-            fileCatalog->addChunks(correctChunksFromMediaData(fileCatalog, storage, c->m_chunks));
-        }
+        if (!m_initInProgress)
+            addDataFromDatabase(storage);
     }
     else {
         // load from media folder
@@ -196,6 +201,18 @@ bool QnStorageManager::loadFullFileCatalog(const QnStorageResourcePtr &storage, 
     }
 
     return true;
+}
+
+void QnStorageManager::addDataFromDatabase(const QnStorageResourcePtr &storage)
+{
+    QnStorageDbPtr sdb = m_chunksDB[storage->getPath()];
+
+    // load from database
+    foreach(DeviceFileCatalogPtr c, sdb->loadFullFileCatalog())
+    {
+        DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->cameraUniqueId(), c->getCatalog());
+        fileCatalog->addChunks(correctChunksFromMediaData(fileCatalog, storage, c->m_chunks));
+    }
 }
 
 double QnStorageManager::rebuildProgress() const

@@ -30,7 +30,7 @@ namespace {
     }
 }
 
-int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) {
     Q_UNUSED(path)
 
     QUrl url = params.value(lit("url"));

@@ -20,11 +20,11 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiResourceData>& tran ) {
             QnResourcePtr resource( new QnResource() );
-            fromApiToResource(tran.params, resource);
+            fromApiToResource(tran.params, resource.data());
             QnResourcePtr existResource = m_resCtx.pool->getResourceById(tran.params.id);
             if (existResource)
                 resource->setFlags(existResource->flags());
-            emit resourceChanged( resource );
+            emit resourceChanged( std::move(resource ));
         }
 
         void triggerNotification( const QnTransaction<ApiSetResourceStatusData>& tran ) {

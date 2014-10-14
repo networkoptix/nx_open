@@ -262,15 +262,15 @@ void QnCameraSettingsDialog::at_cameras_properties_saved(int requestId, ec2::Err
 void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &cameras) {
     if (cameras.isEmpty())
         return;
-    QList<QnUuid> idLIst = idListFromResList(cameras);
+    QList<QnUuid> idList = idListFromResList(cameras);
     QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributes(
-        QnCameraUserAttributePool::instance()->getAttributesList(idLIst),
+        QnCameraUserAttributePool::instance()->getAttributesList(idList),
         this,
         [this, cameras]( int reqID, ec2::ErrorCode errorCode ) {
             Q_UNUSED(reqID);
             at_cameras_saved(errorCode, cameras); 
     } );
-    propertyDictionary->saveParamsAsync(idLIst);
+    propertyDictionary->saveParamsAsync(idList);
 }
 
 void QnCameraSettingsDialog::saveAdvancedCameraSettingsAsync(const QnVirtualCameraResourceList &cameras) {

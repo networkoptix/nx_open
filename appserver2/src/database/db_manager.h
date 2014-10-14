@@ -385,8 +385,6 @@ namespace ec2
         ErrorCode deleteTableRecord(const QnUuid& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
-        ErrorCode updateResource(const ApiResourceData& data, qint32 internalId);
-        ErrorCode insertResource(const ApiResourceData& data, qint32* internalId);
         ErrorCode insertOrReplaceResource(const ApiResourceData& data, qint32* internalId);
         //ErrorCode insertOrReplaceResource(const ApiResourceData& data);
         ErrorCode deleteRecordFromResourceTable(const qint32 id);
@@ -477,6 +475,8 @@ namespace ec2
         ErrorCode addCameraHistory(const ApiCameraServerItemData& params);
         ErrorCode removeCameraHistory(const ApiCameraServerItemData& params);
         ErrorCode getScheduleTasks(const QnUuid& cameraId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
+        void addResourceTypesFromXML(ApiResourceTypeDataList& data);
+        void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;

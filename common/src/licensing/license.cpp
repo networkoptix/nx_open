@@ -27,6 +27,12 @@ namespace {
         "EwVi0AB6ht0hQ3sZUtM9UAGrszPJOzFfZlDB2hZ4HFyXfVZcbPxOdmECAwEAAQ==\n"
         "-----END PUBLIC KEY-----";
 
+    // This key is introduced in v2.3 to make new license types do not work in v2.2 and earlier
+    const char *networkOptixRSAPublicKey2 = "-----BEGIN PUBLIC KEY-----\n"
+        "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALiqxgrnU2hl+8DVzgXrj6u4V+5ksnR5\n"
+        "vtLsDeNC9eU2aLCt0Ba4KLnuVnDDWSXQ9914i8s0KXXTM+GOHpvrChUCAwEAAQ==\n"
+        "-----END PUBLIC KEY-----";
+
     bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
     {
 #ifdef ENABLE_SSL
@@ -47,6 +53,8 @@ namespace {
         QScopedArrayPointer<unsigned char> decrypted(new unsigned char[signature.size()]);
         int ret = RSA_public_decrypt(signature.size(), (const unsigned char*)signature.data(), decrypted.data(), publicRSAKey, RSA_PKCS1_PADDING);
         RSA_free(publicRSAKey);
+        if (ret == -1)
+            return false;
 
         // Verify signature is correct
         return memcmp(decrypted.data(), dataHash.data(), ret) == 0;
@@ -238,7 +246,7 @@ QnUuid QnLicense::findRuntimeDataByLicense() const
             continue;
 
         bool hwKeyOK = info.data.mainHardwareIds.contains(m_hardwareId) || info.data.compatibleHardwareIds.contains(m_hardwareId);
-        bool brandOK = (m_brand == info.data.brand);
+        bool brandOK = m_brand.isEmpty() || (m_brand == info.data.brand);
         if (hwKeyOK && brandOK)
             return info.uuid;
     }
@@ -406,7 +414,7 @@ void QnLicense::parseLicenseBlock(
                 m_brand = QString::fromUtf8(avalue);
             else if (aname == "EXPIRATION")
                 m_expiration = QString::fromUtf8(avalue);
-            else if (aname == "SIGNATURE2")
+            else if (aname == "SIGNATURE2" || aname == "SIGNATURE3")
                 m_signature2 = avalue;
         }
 
@@ -422,18 +430,15 @@ void QnLicense::parseLicenseBlock(
 
         n++;
     }
-    // Remove trailing "\n"
-//    v1LicenseBlock.chop(1);
-//    v2LicenseBlock.chop(1);
 }
 
 void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock )
 {
-    if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey))) {
+    if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey2)) ||
+        isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey))) {
         m_isValid2 = true;
-    } else if (isSignatureMatch(v1LicenseBlock, QByteArray::fromBase64(m_signature), QByteArray(networkOptixRSAPublicKey))) {
+    } else if (isSignatureMatch(v1LicenseBlock, QByteArray::fromBase64(m_signature), QByteArray(networkOptixRSAPublicKey)) && m_brand.isEmpty()) {
         m_class = QLatin1String("digital");
-        m_brand = QLatin1String("");
         m_version = QLatin1String("1.4");
         m_expiration = QLatin1String("");
         m_isValid1 = true;
