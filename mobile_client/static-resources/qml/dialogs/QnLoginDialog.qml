@@ -13,10 +13,14 @@ import "../common_functions.js" as CommonFunctions
 Item {
     id: loginDialog
 
+    property var __syspal: SystemPalette {
+        colorGroup: SystemPalette.Active
+    }
+
     /* backgorund */
     Rectangle {
         anchors.fill: parent
-        color: colorTheme.color("login_background")
+        color: __syspal.window
     }
 
     Image {
@@ -91,9 +95,4 @@ Item {
         icon: "/images/right.png"
         onClicked: connectionManager.connectToServer(LoginDialogFunctions.makeUrl(address.text, port.text, login.text, password.text))
     }
-
-
-//    Connections {
-//        target: connectionManager
-//    }
 }

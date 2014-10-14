@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtGui/QColor>
+#include <QtGui/QPalette>
 
 class QnColorTheme : public QObject {
     Q_OBJECT
@@ -15,6 +16,7 @@ public:
 
 private:
     QHash<QString, QColor> m_colors;
+    QPalette m_palette;
 };
 
 #endif // COLOR_THEME_H
