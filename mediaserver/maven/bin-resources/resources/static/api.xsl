@@ -21,7 +21,7 @@
                 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
                 <link rel="stylesheet" href="styles/29403685.vendor.css"/>
 
-                <link rel="stylesheet" href="styles/3889fc7d.main.css"/>
+                <link rel="stylesheet" href="styles/662b3b67.main.css"/>
 
                 <link rel="stylesheet" href="customization/styles.css"/>
             </head>
@@ -162,15 +162,15 @@
             <script src="scripts/5ed9c348.api_documentation.js"></script>
 
             <script>
-                /*$(function () {
+                $(function () {
                     $("[data-toggle='tooltip']").tooltip(); 
 
                     $('body').scrollspy({
                         target: '.bs-docs-sidebar',
                         offset: 40
                     });
-                });*/
-            </script>
+                });
+            </script>19
         </html>
     </xsl:template>
     <xsl:template match="result">

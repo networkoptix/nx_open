@@ -168,19 +168,19 @@
             <!-- build:js({.tmp,app}) scripts/api_documentation.js -->
             <script src="bower_components/jquery/jquery.js"/>
             <script src="bower_components/sass-bootstrap/dist/js/bootstrap.js"/>
-            <script src="bower_components/jquery-scrollspy-thesmart/scrollspy.js"/>
+            <!-- <script src="bower_components/jquery-scrollspy-thesmart/scrollspy.js"/> -->
             <!-- endbuild -->
 
             <script>
-                /*$(function () {
+                $(function () {
                     $("[data-toggle='tooltip']").tooltip(); 
 
                     $('body').scrollspy({
                         target: '.bs-docs-sidebar',
                         offset: 40
                     });
-                });*/
-            </script>
+                });
+            </script>19
         </html>
     </xsl:template>
     <xsl:template match="result">
