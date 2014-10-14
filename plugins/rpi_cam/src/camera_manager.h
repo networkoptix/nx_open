@@ -44,12 +44,14 @@ namespace rpi_cam
 
         const nxcip::CameraInfo& info() const { return info_; }
         bool isOK() const { return isOK_; }
+        bool setResolution(unsigned width, unsigned height);
 
         nxcip::MediaDataPacket * nextFrame(unsigned encoderNumber);
 
     private:
         std::shared_ptr<RaspberryPiCamera> rpiCamera_;
-        std::shared_ptr<MediaEncoder> encoder_;
+        std::shared_ptr<MediaEncoder> encoderHQ_;
+        std::shared_ptr<MediaEncoder> encoderLQ_;
         bool isOK_;
 
         const char * errorStr_;

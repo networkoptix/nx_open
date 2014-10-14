@@ -18,12 +18,13 @@ namespace rpi_cam
 {
     DEFAULT_REF_COUNTER(VideoPacket)
 
-    VideoPacket::VideoPacket( const uint8_t* data, unsigned size )
+    VideoPacket::VideoPacket(nxcip::CompressionType type, const uint8_t* data, unsigned size)
     :
         m_refManager( this ),
-        m_size( 0 ),
-        m_time( 0 ),
-        m_flags( 0 )
+        m_type(type),
+        m_size(0),
+        m_time(0),
+        m_flags(0)
     {
         if (data)
         {
@@ -83,7 +84,7 @@ namespace rpi_cam
 
     nxcip::CompressionType VideoPacket::codecType() const
     {
-        return nxcip::CODEC_ID_H264;
+        return m_type;
     }
 
     unsigned int VideoPacket::flags() const

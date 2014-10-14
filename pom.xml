@@ -406,7 +406,7 @@
 			</properties>
 			<modules>
 				<!--<module>plugins/xvbadecoder</module>-->
-                                <module>plugins/pacidal_dvbt_plugin</module>
+				<module>plugins/pacidal_dvbt_plugin</module>
 			</modules>            
 		</profile>  
 		<profile>
@@ -550,6 +550,7 @@
 			</properties>
 			<modules>
 				<module>edge_firmware/rpi</module>
+				<module>plugins/rpi_cam</module>
 			</modules>             
 		</profile>
 

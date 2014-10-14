@@ -1,8 +1,6 @@
 #ifndef RASPBERRY_PI_CAMERA
 #define RASPBERRY_PI_CAMERA
 
-#include <iostream>
-
 #include <cstdint>
 #include <stdexcept>
 #include <memory>
@@ -38,7 +36,8 @@ enum
 
 // forward
 static void camera_control_callback(MMAL_PORT_T * port, MMAL_BUFFER_HEADER_T * buffer);
-static void encoder_buffer_callback(MMAL_PORT_T * port, MMAL_BUFFER_HEADER_T * buffer);
+static void h264_encoder_buffer_callback(MMAL_PORT_T * port, MMAL_BUFFER_HEADER_T * buffer);
+//static void jpeg_encoder_buffer_callback(MMAL_PORT_T * port, MMAL_BUFFER_HEADER_T * buffer);
 
 
 namespace rpi_cam
@@ -57,75 +56,90 @@ namespace rpi_cam
         virtual const char * what() const noexcept { return msg; }
     };
 
-    /// Structure containing all state information for the current run
-    struct RaspividState
+    ///
+    /// Resolution	Aspect Ratio    Framerates	Video	Image	FoV
+    /// 2592x1944   4:3             1-15fps     x       x       Full
+    /// 1296x972    4:3             1-42fps     x               Full
+    /// 1296x730    16:9            1-49fps     x               Full
+    /// 640x480     4:3             42.1-60fps  x               Full
+    /// 640x480     4:3             60.1-90fps  x               Full
+    /// 1920x1080   16:9            1-30fps     x               Partial
+    ///
+    struct VideoMode
     {
-        static const unsigned DEFAULT_BITRATE = 17000000;
-        static const unsigned FHD_WIDTH = 1920;
-        static const unsigned FHD_HEIGHT = 1080;
-
-        // Video format information (0 implies variable)
-        static const unsigned VIDEO_FRAME_RATE_NUM = 30;
-        static const unsigned VIDEO_FRAME_RATE_DEN = 1;
-
-        int timeout;                    ///< Time taken before frame is grabbed and app then shuts down. Units are milliseconds
-        int width;                      ///< Requested width of image
-        int height;                     ///< requested height of image
-
-        int framerate;                  ///< Requested frame rate (fps)
-        int bitrate;                    ///< Requested bitrate
-        unsigned quantisationParameter; ///< Quantisation parameter - quality. Set bitrate 0 and set this for variable bitrate
-
-        int cameraNum;                  ///< Camera number
-        int settings;                   ///< Request settings from the camera
-        int sensor_mode;                ///< Sensor mode. 0=auto. Check docs/forum for modes selected by other values.
-
-        RaspividState()
-        :   timeout(5000),
-            width(FHD_WIDTH),
-            height(FHD_HEIGHT),
-            framerate(VIDEO_FRAME_RATE_NUM),
-            bitrate(DEFAULT_BITRATE),
-            quantisationParameter(0),
-            cameraNum(0),
-            settings(0),
-            sensor_mode(0)
-        {}
-
-        void setDynamicFramerate(int shutter_speed)
+        enum Mode
         {
-            if (shutter_speed)
+            VM_1080p30,
+            VM_720p50,
+            VM_640x480p60,
+            VM_640x480p90,
+            //
+            JM_480x270,
+            JM_320x240
+        };
+
+        unsigned width;         ///< Requested width of image
+        unsigned height;        ///< Requested height of image
+        unsigned framerate;     ///< Requested frame rate (fps)
+
+        VideoMode(Mode mode, bool dynFramerate = false)
+        {
+            switch (mode)
             {
-                if (framerate > 1000000./shutter_speed)
+                case VM_1080p30:
+                    width = 1920;
+                    height = 1080;
+                    framerate = 30;
+                    break;
+
+                case VM_720p50:
+                    width = 1296;
+                    height = 730;
+                    framerate = 49;
+                    break;
+
+                case VM_640x480p60:
+                    width = 640;
+                    height = 480;
+                    framerate = 60;
+                    break;
+
+                case VM_640x480p90:
+                    width = 640;
+                    height = 480;
+                    framerate = 90;
+                    break;
+
+                case JM_480x270:
+                    width = 480;
+                    height = 270;
                     framerate = 0;
+                    break;
+
+                case JM_320x240:
+                    width = 320;
+                    height = 240;
+                    framerate = 0;
+                    break;
             }
+
+            if (dynFramerate)
+                framerate = 0;
         }
+    };
 
-        void streamFormat(MMAL_ES_FORMAT_T * format) const
-        {
-            format->encoding = MMAL_ENCODING_OPAQUE;
-            format->encoding_variant = MMAL_ENCODING_I420;
+    ///
+    struct Bitrate
+    {
+        static const unsigned DEFAULT_BITRATE = 8000000;
 
-            format->es->video.width = VCOS_ALIGN_UP(width, 32);
-            format->es->video.height = VCOS_ALIGN_UP(height, 16);
-            format->es->video.crop.x = 0;
-            format->es->video.crop.y = 0;
-            format->es->video.crop.width = width;
-            format->es->video.crop.height = height;
-            format->es->video.frame_rate.num = framerate;
-            format->es->video.frame_rate.den = VIDEO_FRAME_RATE_DEN;
-        }
+        unsigned bitrate;       ///< Requested bitrate
+        unsigned quantisation;  ///< Quantisation parameter - quality. Set bitrate 0 and set this for variable bitrate
 
-        // timeout seconds at bitrate Mbits
-        unsigned bufferSize() const
-        {
-            if (bitrate == 0)
-                throw MmalException(MMAL_SUCCESS, "error circular buffer requires constant bitrate and small intra period");
-            if (timeout == 0)
-                throw MmalException(MMAL_SUCCESS, "error circular buffer size is based on timeout must be greater than zero");
-
-            return bitrate * (timeout / 1000) / 8;
-        }
+        Bitrate(unsigned br = DEFAULT_BITRATE, unsigned quant = 0)
+        :   bitrate(br),
+            quantisation(quant)
+        {}
     };
 
     ///
@@ -194,13 +208,13 @@ namespace rpi_cam
         /// Video render needs at least 2 buffers.
         static const unsigned VIDEO_OUTPUT_BUFFERS_NUM = 3;
 
-        CameraComponent(RaspividState& state, int shutter_speed)
+        CameraComponent(int cameraNum, const VideoMode& mode, unsigned sensorMode = 0, bool requestSettings = false)
         :   camera_(nullptr),
             previewPort_(nullptr),
             videoPort_(nullptr),
             stillPort_(nullptr)
         {
-            resetCamConfig(state.width, state.height);
+            resetCamConfig(mode.width, mode.height);
 
             MMAL_STATUS_T status;
 
@@ -208,32 +222,24 @@ namespace rpi_cam
             if (status != MMAL_SUCCESS)
                 throw MmalException(status, "Failed to create camera component");
 
-            MMAL_PARAMETER_INT32_T camera_num = {{MMAL_PARAMETER_CAMERA_NUM, sizeof(camera_num)}, state.cameraNum};
-
-            status = mmal_port_parameter_set(camera_->control, &camera_num.hdr);
+            MMAL_PARAMETER_INT32_T camNo = {{MMAL_PARAMETER_CAMERA_NUM, sizeof(camNo)}, cameraNum};
+            status = mmal_port_parameter_set(camera_->control, &camNo.hdr);
             if (status != MMAL_SUCCESS)
                 throw MmalException(status, "Could not select camera");
 
             if (!camera_->output_num)
-            {
-                status = MMAL_ENOSYS;
-                throw MmalException(status, "Camera doesn't have output ports");
-            }
+                throw MmalException(MMAL_ENOSYS, "Camera doesn't have output ports");
 
-            status = mmal_port_parameter_set_uint32(camera_->control, MMAL_PARAMETER_CAMERA_CUSTOM_SENSOR_CONFIG, state.sensor_mode);
+            status = mmal_port_parameter_set_uint32(camera_->control, MMAL_PARAMETER_CAMERA_CUSTOM_SENSOR_CONFIG, sensorMode);
             if (status != MMAL_SUCCESS)
                 throw MmalException(status, "Could not set sensor mode");
 
-            previewPort_ = camera_->output[MMAL_CAMERA_PREVIEW_PORT];
-            videoPort_ = camera_->output[MMAL_CAMERA_VIDEO_PORT];
-            stillPort_ = camera_->output[MMAL_CAMERA_CAPTURE_PORT];
-
-            if (state.settings)
+            if (requestSettings)
             {
-                MMAL_PARAMETER_CHANGE_EVENT_REQUEST_T change_event_request =
+                MMAL_PARAMETER_CHANGE_EVENT_REQUEST_T changeEventRequest =
                     {{MMAL_PARAMETER_CHANGE_EVENT_REQUEST, sizeof(MMAL_PARAMETER_CHANGE_EVENT_REQUEST_T)}, MMAL_PARAMETER_CAMERA_SETTINGS, 1};
 
-                status = mmal_port_parameter_set(camera_->control, &change_event_request.hdr);
+                status = mmal_port_parameter_set(camera_->control, &changeEventRequest.hdr);
                 if (status != MMAL_SUCCESS)
                     throw MmalException(status, "No camera settings events");
             }
@@ -241,34 +247,25 @@ namespace rpi_cam
             // Enable the camera, and tell it its control callback function
             status = mmal_port_enable(camera_->control, camera_control_callback);
             if (status != MMAL_SUCCESS)
-                throw MmalException(status, "Unable to enable control port");
+                throw MmalException(status, "Could not enable camera control port");
 
             // setup the camera configuration
-            mmal_port_parameter_set(camera_->control, &camConfig_.hdr);
+            status = mmal_port_parameter_set(camera_->control, &camConfig_.hdr);
+            if (status != MMAL_SUCCESS)
+                throw MmalException(status, "Could not set camera config");
 
+            previewPort_ = camera_->output[MMAL_CAMERA_PREVIEW_PORT];
+            videoPort_ = camera_->output[MMAL_CAMERA_VIDEO_PORT];
+            stillPort_ = camera_->output[MMAL_CAMERA_CAPTURE_PORT];
 
             // Now set up the port formats
 
             // Set the encode format on the Preview port
             // HW limitations mean we need the preview to be the same size as the required recorded output
 
-            state.streamFormat(previewPort_->format);
-            previewPort_->format->es->video.frame_rate.num = PREVIEW_FRAME_RATE_NUM;
-            previewPort_->format->es->video.frame_rate.den = PREVIEW_FRAME_RATE_DEN;
-
-            if (shutter_speed > 6000000)
-            {
-                MMAL_PARAMETER_FPS_RANGE_T fps_range = {{MMAL_PARAMETER_FPS_RANGE, sizeof(fps_range)}, { 50, 1000 }, {166, 1000}};
-                mmal_port_parameter_set(previewPort_, &fps_range.hdr);
-            }
-            else if (shutter_speed > 1000000)
-            {
-                MMAL_PARAMETER_FPS_RANGE_T fps_range = {{MMAL_PARAMETER_FPS_RANGE, sizeof(fps_range)}, { 166, 1000 }, {999, 1000}};
-                mmal_port_parameter_set(previewPort_, &fps_range.hdr);
-            }
-
-            // enable dynamic framerate if necessary
-            state.setDynamicFramerate(shutter_speed);
+            streamFormat(mode, previewPort_->format);
+            //previewPort_->format->es->video.frame_rate.num = PREVIEW_FRAME_RATE_NUM;
+            //previewPort_->format->es->video.frame_rate.den = PREVIEW_FRAME_RATE_DEN;
 
             status = mmal_port_format_commit(previewPort_);
             if (status != MMAL_SUCCESS)
@@ -277,19 +274,7 @@ namespace rpi_cam
 
             // Set the encode format on the video port
 
-            state.streamFormat(videoPort_->format);
-
-            if (shutter_speed > 6000000)
-            {
-                MMAL_PARAMETER_FPS_RANGE_T fps_range = {{MMAL_PARAMETER_FPS_RANGE, sizeof(fps_range)}, { 50, 1000 }, {166, 1000}};
-                mmal_port_parameter_set(videoPort_, &fps_range.hdr);
-            }
-            else if (shutter_speed > 1000000)
-            {
-                MMAL_PARAMETER_FPS_RANGE_T fps_range = {{MMAL_PARAMETER_FPS_RANGE, sizeof(fps_range)}, { 167, 1000 }, {999, 1000}};
-                mmal_port_parameter_set(videoPort_, &fps_range.hdr);
-            }
-
+            streamFormat(mode, videoPort_->format);
             status = mmal_port_format_commit(videoPort_);
             if (status != MMAL_SUCCESS)
                 throw MmalException(status, "camera video format couldn't be set");
@@ -298,11 +283,11 @@ namespace rpi_cam
             if (videoPort_->buffer_num < VIDEO_OUTPUT_BUFFERS_NUM)
                 videoPort_->buffer_num = VIDEO_OUTPUT_BUFFERS_NUM;
 
-
             // Set the encode format on the still port
-            state.streamFormat(stillPort_->format);
+
+            streamFormat(mode, stillPort_->format);
+            //stillPort_->format->encoding = MMAL_ENCODING_OPAQUE;
             stillPort_->format->es->video.frame_rate.num = 0;
-            stillPort_->format->es->video.frame_rate.den = 1;
 
             status = mmal_port_format_commit(stillPort_);
             if (status != MMAL_SUCCESS)
@@ -316,6 +301,16 @@ namespace rpi_cam
             status = mmal_component_enable(camera_);
             if (status != MMAL_SUCCESS)
                 throw MmalException(status, "camera component couldn't be enabled");
+
+            // Camera parameters
+
+            RASPICAM_CAMERA_PARAMETERS parameters;
+            raspicamcontrol_set_defaults(&parameters);
+
+            parameters.exposureMode = MMAL_PARAM_EXPOSUREMODE_FIXEDFPS;
+            parameters.awbMode = MMAL_PARAM_AWBMODE_AUTO;
+
+            raspicamcontrol_set_all_parameters(camera_, &parameters);
         }
 
         ~CameraComponent()
@@ -333,6 +328,7 @@ namespace rpi_cam
         MMAL_COMPONENT_T * component() { return camera_; }
         MMAL_PORT_T * previewPort() { return previewPort_; }
         MMAL_PORT_T * videoPort() { return videoPort_; }
+        //MMAL_PORT_T * stillPort() { return stillPort_; }
 
 
         const MMAL_PARAMETER_CAMERA_CONFIG_T& config() const { return camConfig_; }
@@ -358,118 +354,95 @@ namespace rpi_cam
             camConfig_.fast_preview_resume = 0;
             camConfig_.use_stc_timestamp = MMAL_PARAM_TIMESTAMP_MODE_RESET_STC;
         }
+
+        void streamFormat(const VideoMode& mode, MMAL_ES_FORMAT_T * format) const
+        {
+            static const unsigned VIDEO_FRAME_RATE_DEN = 1;
+
+            format->encoding = MMAL_ENCODING_OPAQUE;
+            //format->encoding = MMAL_ENCODING_I420; // not MMAL_ENCODING_OPAQUE for splitter !!!
+            format->encoding_variant = MMAL_ENCODING_I420;
+
+            format->es->video.width = VCOS_ALIGN_UP(mode.width, 32);
+            format->es->video.height = VCOS_ALIGN_UP(mode.height, 16);
+            format->es->video.crop.x = 0;
+            format->es->video.crop.y = 0;
+            format->es->video.crop.width = mode.width;
+            format->es->video.crop.height = mode.height;
+            format->es->video.frame_rate.num = mode.framerate;
+            format->es->video.frame_rate.den = VIDEO_FRAME_RATE_DEN;
+        }
     };
 
     ///
     class EncoderComponent
     {
     public:
-        EncoderComponent(const MMAL_PARAMETER_VIDEO_PROFILE_T& profile, unsigned bitrate, unsigned quantisationParameter)
+        MMAL_PORT_T * inputPort() { return encoder_->input[0]; }
+        MMAL_PORT_T * outputPort() { return encoder_->output[0]; }
+
+        MMAL_POOL_T * pool() { return pool_; }
+
+    protected:
+        MMAL_COMPONENT_T * encoder_;
+        MMAL_POOL_T * pool_;
+
+        EncoderComponent()
         :   encoder_(nullptr),
             pool_(nullptr)
+        {}
+
+        virtual void setFormat() = 0;
+        virtual void setParameters() = 0;
+
+        void init(const char * component)
         {
             MMAL_STATUS_T status;
 
-            status = mmal_component_create(MMAL_COMPONENT_DEFAULT_VIDEO_ENCODER, &encoder_);
+            status = mmal_component_create(component, &encoder_);
             if (status != MMAL_SUCCESS)
-                throw MmalException(status, "Unable to create video encoder component");
+                throw MmalException(status, "Unable to create encoder component");
 
             if (!encoder_->input_num || !encoder_->output_num)
-                throw MmalException(MMAL_ENOSYS, "Video encoder doesn't have input/output ports");
-
-            MMAL_PORT_T * encoder_input = encoder_->input[0];
-            MMAL_PORT_T * encoder_output = encoder_->output[0];
+                throw MmalException(MMAL_ENOSYS, "Encoder doesn't have input/output ports");
 
             // We want same format on input and output
-            mmal_format_copy(encoder_output->format, encoder_input->format);
+            mmal_format_copy(outputPort()->format, inputPort()->format);
 
-            // Only supporting H264 at the moment
-            encoder_output->format->encoding = MMAL_ENCODING_H264;
-            encoder_output->format->bitrate = bitrate;
+            setFormat(); //
 
-            encoder_output->buffer_size = encoder_output->buffer_size_recommended;
-            if (encoder_output->buffer_size < encoder_output->buffer_size_min)
-                encoder_output->buffer_size = encoder_output->buffer_size_min;
+            outputPort()->buffer_size = outputPort()->buffer_size_recommended;
+            if (outputPort()->buffer_size < outputPort()->buffer_size_min)
+                outputPort()->buffer_size = outputPort()->buffer_size_min;
 
-            encoder_output->buffer_num = encoder_output->buffer_num_recommended;
-            if (encoder_output->buffer_num < encoder_output->buffer_num_min)
-                encoder_output->buffer_num = encoder_output->buffer_num_min;
+            outputPort()->buffer_num = outputPort()->buffer_num_recommended;
+            if (outputPort()->buffer_num < outputPort()->buffer_num_min)
+                outputPort()->buffer_num = outputPort()->buffer_num_min;
 
             // We need to set the frame rate on output to 0, to ensure it gets
             // updated correctly from the input framerate when port connected
-            encoder_output->format->es->video.frame_rate.num = 0;
-            encoder_output->format->es->video.frame_rate.den = 1;
+            outputPort()->format->es->video.frame_rate.num = 0;
+            outputPort()->format->es->video.frame_rate.den = 1;
 
             // Commit the port changes to the output port
-            status = mmal_port_format_commit(encoder_output);
+            status = mmal_port_format_commit(outputPort());
             if (status != MMAL_SUCCESS)
-                throw MmalException(status, "Unable to set format on video encoder output port");
+                throw MmalException(status, "Unable to set format on encoder output port");
 
-            // Set the rate control parameter
-#if 0
-            {
-                MMAL_PARAMETER_VIDEO_RATECONTROL_T param = {{ MMAL_PARAMETER_RATECONTROL, sizeof(param)}, MMAL_VIDEO_RATECONTROL_DEFAULT};
-                status = mmal_port_parameter_set(encoder_output, &param.hdr);
-                if (status != MMAL_SUCCESS)
-                    throw MmalException(status, "Unable to set ratecontrol");
-            }
-#endif
-#if 0
-            if (intraperiod != -1)
-            {
-                MMAL_PARAMETER_UINT32_T param = {{ MMAL_PARAMETER_INTRAPERIOD, sizeof(param)}, (unsigned)intraperiod};
-                status = mmal_port_parameter_set(encoder_output, &param.hdr);
-                if (status != MMAL_SUCCESS)
-                    throw MmalException(status, "Unable to set intraperiod");
-            }
-#endif
-            if (quantisationParameter)
-            {
-                MMAL_PARAMETER_UINT32_T param = {{ MMAL_PARAMETER_VIDEO_ENCODE_INITIAL_QUANT, sizeof(param)}, quantisationParameter};
-                status = mmal_port_parameter_set(encoder_output, &param.hdr);
-                if (status != MMAL_SUCCESS)
-                    throw MmalException(status, "Unable to set initial QP");
-
-                MMAL_PARAMETER_UINT32_T param2 = {{ MMAL_PARAMETER_VIDEO_ENCODE_MIN_QUANT, sizeof(param)}, quantisationParameter};
-                status = mmal_port_parameter_set(encoder_output, &param2.hdr);
-                if (status != MMAL_SUCCESS)
-                    throw MmalException(status, "Unable to set min QP");
-
-                MMAL_PARAMETER_UINT32_T param3 = {{ MMAL_PARAMETER_VIDEO_ENCODE_MAX_QUANT, sizeof(param)}, quantisationParameter};
-                status = mmal_port_parameter_set(encoder_output, &param3.hdr);
-                if (status != MMAL_SUCCESS)
-                    throw MmalException(status, "Unable to set max QP");
-            }
-
-            status = mmal_port_parameter_set(encoder_output, &profile.hdr);
-            if (status != MMAL_SUCCESS)
-                throw MmalException(status, "Unable to set H264 profile");
-#if 0
-            status = mmal_port_parameter_set_boolean(encoder_input, MMAL_PARAMETER_VIDEO_IMMUTABLE_INPUT, MMAL_TRUE);
-            if (status != MMAL_SUCCESS)
-            {
-                vcos_log_error("Unable to set immutable input flag");
-                // Continue rather than abort..
-            }
-#endif
-            //set INLINE HEADER flag to generate SPS and PPS for every IDR if requested
-            status = mmal_port_parameter_set_boolean(encoder_output, MMAL_PARAMETER_VIDEO_ENCODE_INLINE_HEADER, MMAL_TRUE);
-            if (status != MMAL_SUCCESS)
-                throw MmalException(status, "Unable to set INLINE HEADER FLAG parameters");
+            setParameters(); //
 
             //  Enable component
             status = mmal_component_enable(encoder_);
             if (status != MMAL_SUCCESS)
-                throw MmalException(status, "Unable to enable video encoder component");
+                throw MmalException(status, "Unable to enable encoder component");
 
-            /* Create pool of buffer headers for the output port to consume */
-            pool_ = mmal_port_pool_create(encoder_output, encoder_output->buffer_num, encoder_output->buffer_size);
+            // Create pool of buffer headers for the output port to consume
+            pool_ = mmal_port_pool_create(outputPort(), outputPort()->buffer_num, outputPort()->buffer_size);
             if (!pool_)
-            {
-                vcos_log_error("Failed to create buffer header pool for encoder output port %s", encoder_output->name);
-            }
+                throw MmalException(status, "Failed to create buffer header pool for encoder output port");
         }
 
+        // not virtual
         ~EncoderComponent()
         {
             MMAL_PORT_T * port = outputPort();
@@ -485,16 +458,204 @@ namespace rpi_cam
             if (encoder_)
                 mmal_component_destroy(encoder_);
         }
+    };
 
-        MMAL_POOL_T * pool() { return pool_; }
+    ///
+    class EncoderH264Component : public EncoderComponent
+    {
+    public:
+        EncoderH264Component(const Bitrate& bitrate, const MMAL_PARAMETER_VIDEO_PROFILE_T& profile)
+        :   bitrate_(bitrate),
+            profile_(profile)
+        {
+            init(MMAL_COMPONENT_DEFAULT_VIDEO_ENCODER);
+        }
 
-        MMAL_PORT_T * inputPort() { return encoder_->input[0]; }
-        MMAL_PORT_T * outputPort() { return encoder_->output[0]; }
+        void setCallback(EncCallbackData * userData)
+        {
+            outputPort()->userdata = (struct MMAL_PORT_USERDATA_T *) userData;
+
+            MMAL_STATUS_T status = mmal_port_enable(outputPort(), h264_encoder_buffer_callback);
+            if (status != MMAL_SUCCESS)
+                throw MmalException(status, "Failed to setup encoder callback");
+
+            // Send all the buffers to the encoder output port
+            unsigned qLen = mmal_queue_length(userData->encoderPool->queue);
+            for (unsigned i = 0; i < qLen; i++)
+            {
+                MMAL_BUFFER_HEADER_T * buffer = mmal_queue_get(userData->encoderPool->queue);
+                if (!buffer)
+                    vcos_log_error("Unable to get a required buffer %d from pool queue", i);
+
+                MMAL_STATUS_T status = mmal_port_send_buffer(outputPort(), buffer);
+                if (status != MMAL_SUCCESS)
+                    vcos_log_error("Unable to send a buffer to encoder output port (%d)", i);
+            }
+        }
 
     private:
-        MMAL_COMPONENT_T * encoder_;
-        MMAL_POOL_T * pool_;
+        virtual void setFormat() override
+        {
+            // Only supporting H264 at the moment
+            outputPort()->format->encoding = MMAL_ENCODING_H264;
+            outputPort()->format->bitrate = bitrate_.bitrate;
+        }
+
+        virtual void setParameters() override
+        {
+            MMAL_STATUS_T status;
+#if 0
+            MMAL_PARAMETER_VIDEO_RATECONTROL_T rateParam = {{ MMAL_PARAMETER_RATECONTROL, sizeof(rateParam)}, MMAL_VIDEO_RATECONTROL_DEFAULT};
+            status = mmal_port_parameter_set(outputPort(), &rateParam.hdr);
+            if (status != MMAL_SUCCESS)
+                throw MmalException(status, "Unable to set ratecontrol");
+
+            MMAL_PARAMETER_UINT32_T param = {{ MMAL_PARAMETER_INTRAPERIOD, sizeof(param)}, (unsigned)intraperiod};
+            status = mmal_port_parameter_set(outputPort(), &param.hdr);
+            if (status != MMAL_SUCCESS)
+                throw MmalException(status, "Unable to set intraperiod");
+
+            status = mmal_port_parameter_set_boolean(inputPort(), MMAL_PARAMETER_VIDEO_IMMUTABLE_INPUT, MMAL_TRUE);
+            if (status != MMAL_SUCCESS)
+            {
+                vcos_log_error("Unable to set immutable input flag");
+                // Continue rather than abort..
+            }
+#endif
+            if (bitrate_.bitrate == 0)
+            {
+                MMAL_PARAMETER_UINT32_T param = {{ MMAL_PARAMETER_VIDEO_ENCODE_INITIAL_QUANT, sizeof(param)}, bitrate_.quantisation};
+                status = mmal_port_parameter_set(outputPort(), &param.hdr);
+                if (status != MMAL_SUCCESS)
+                    throw MmalException(status, "Unable to set initial QP");
+
+                MMAL_PARAMETER_UINT32_T param2 = {{ MMAL_PARAMETER_VIDEO_ENCODE_MIN_QUANT, sizeof(param)}, bitrate_.quantisation};
+                status = mmal_port_parameter_set(outputPort(), &param2.hdr);
+                if (status != MMAL_SUCCESS)
+                    throw MmalException(status, "Unable to set min QP");
+
+                MMAL_PARAMETER_UINT32_T param3 = {{ MMAL_PARAMETER_VIDEO_ENCODE_MAX_QUANT, sizeof(param)}, bitrate_.quantisation};
+                status = mmal_port_parameter_set(outputPort(), &param3.hdr);
+                if (status != MMAL_SUCCESS)
+                    throw MmalException(status, "Unable to set max QP");
+            }
+
+            status = mmal_port_parameter_set(outputPort(), &profile_.hdr);
+            if (status != MMAL_SUCCESS)
+                throw MmalException(status, "Unable to set H264 profile");
+
+            //set INLINE HEADER flag to generate SPS and PPS for every IDR if requested
+            status = mmal_port_parameter_set_boolean(outputPort(), MMAL_PARAMETER_VIDEO_ENCODE_INLINE_HEADER, MMAL_TRUE);
+            if (status != MMAL_SUCCESS)
+                throw MmalException(status, "Unable to set INLINE HEADER FLAG parameters");
+        }
+
+    private:
+        Bitrate bitrate_;
+        MMAL_PARAMETER_VIDEO_PROFILE_T profile_;
     };
+
+#if 0
+    ///
+    class EncoderJpegComponent : public EncoderComponent
+    {
+    public:
+        static const unsigned JPEG_QUALITY = 75;
+
+        EncoderJpegComponent()
+        {
+            init(MMAL_COMPONENT_DEFAULT_IMAGE_ENCODER);
+        }
+
+        void setCallback(EncCallbackData * userData)
+        {
+            outputPort()->userdata = (struct MMAL_PORT_USERDATA_T *) userData;
+
+            MMAL_STATUS_T status = mmal_port_enable(outputPort(), jpeg_encoder_buffer_callback);
+            if (status != MMAL_SUCCESS)
+                throw MmalException(status, "Failed to setup encoder callback");
+
+            // Send all the buffers to the encoder output port
+            unsigned qLen = mmal_queue_length(userData->encoderPool->queue);
+            for (unsigned i = 0; i < qLen; i++)
+            {
+                MMAL_BUFFER_HEADER_T * buffer = mmal_queue_get(userData->encoderPool->queue);
+                if (!buffer)
+                    vcos_log_error("Unable to get a required buffer %d from pool queue", i);
+
+                MMAL_STATUS_T status = mmal_port_send_buffer(outputPort(), buffer);
+                if (status != MMAL_SUCCESS)
+                    vcos_log_error("Unable to send a buffer to encoder output port (%d)", i);
+            }
+        }
+
+    private:
+        virtual void setFormat() override
+        {
+            outputPort()->format->encoding = MMAL_ENCODING_JPEG;
+        }
+
+        virtual void setParameters() override
+        {
+            MMAL_STATUS_T status = mmal_port_parameter_set_uint32(outputPort(), MMAL_PARAMETER_JPEG_Q_FACTOR, JPEG_QUALITY);
+            if (status != MMAL_SUCCESS)
+                throw MmalException(status, "Unable to set jpeg quality");
+        }
+    };
+
+    ///
+    class SplitterComponent
+    {
+    public:
+        SplitterComponent(MMAL_PORT_T * videoPort)
+        {
+            MMAL_STATUS_T status = mmal_component_create(MMAL_COMPONENT_DEFAULT_SPLITTER, &component_);
+            if (status != MMAL_SUCCESS)
+                throw MmalException(status, "Unable to create encoder component");
+
+            if (component_->input_num < 1 || component_->output_num < 2)
+                throw MmalException(MMAL_ENOSYS, "Splitter doesn't have input/output ports");
+
+            mmal_format_copy(inputPort()->format, videoPort->format);
+            inputPort()->buffer_num = videoPort->buffer_num;
+
+            status = mmal_port_format_commit(inputPort());
+            if (status != MMAL_SUCCESS)
+                throw MmalException(status, "Unable to set format on splitter input port");
+#if 0
+            for (unsigned i=0; i<component_->output_num; ++i)
+            {
+                mmal_format_copy(outputPort(i)->format, inputPort()->format);
+
+                status = mmal_port_format_commit(outputPort(i));
+                if (status != MMAL_SUCCESS)
+                    throw MmalException(status, "Unable to set format on splitter output port");
+            }
+#endif
+        }
+
+        ~SplitterComponent()
+        {
+            for (unsigned i=0; i<component_->output_num; ++i)
+            {
+                if (outputPort(i) && outputPort(i)->is_enabled)
+                    mmal_port_disable(outputPort(i));
+            }
+
+            if (component_)
+            {
+                mmal_component_disable(component_);
+                mmal_component_destroy(component_);
+            }
+        }
+
+        MMAL_PORT_T * inputPort() { return component_->input[0]; }
+        MMAL_PORT_T * outputPort(unsigned id) { return component_->output[id]; }
+
+    private:
+        MMAL_COMPONENT_T * component_;
+    };
+#endif
 
     ///
     class Connection
@@ -535,7 +696,7 @@ namespace rpi_cam
     class RasPiPreview
     {
     public:
-        RasPiPreview(bool wantPreview = true)
+        RasPiPreview(bool wantPreview)
         {
             MMAL_STATUS_T status;
 
@@ -627,63 +788,63 @@ namespace rpi_cam
     class RaspberryPiCamera
     {
     public:
-        RaspberryPiCamera(bool wantPreview = true)
-        :   isOK_(false)
+        RaspberryPiCamera(int camNum, bool wantPreview = false)
+        :   cameraNum_(camNum),
+            mode_(VideoMode::VM_1080p30),
+            isOK_(false)
         {
             //bcm_host_init();
             vcos_log_register("RPiCam", VCOS_LOG_CATEGORY);
 
             try
             {
-                {
-                    RASPICAM_CAMERA_PARAMETERS cameraParameters;
-                    raspicamcontrol_set_defaults(&cameraParameters);
+                camera_ = std::make_shared<CameraComponent>(cameraNum_, mode_);
 
-                    camera_ = std::make_shared<CameraComponent>(state_, cameraParameters.shutter_speed);
-
-                    raspicamcontrol_set_all_parameters(camera_->component(), &cameraParameters);
-                }
-
-                {
-                    MMAL_PARAMETER_VIDEO_PROFILE_T profile;
-                    profile.hdr.id = MMAL_PARAMETER_PROFILE;
-                    profile.hdr.size = sizeof(profile);
-                    profile.profile[0].profile = MMAL_VIDEO_PROFILE_H264_HIGH;
-                    profile.profile[0].level = MMAL_VIDEO_LEVEL_H264_4; // This is the only value supported
-
-                    encoder_ = std::make_shared<EncoderComponent>(profile, state_.bitrate, state_.quantisationParameter);
-                    callbackData_.encoderPool = encoder_->pool();
-                }
-
+                // preview
                 {
                     preview_ = std::make_shared<RasPiPreview>(wantPreview);
                     if (wantPreview)
                         connPreview_ = std::make_shared<Connection>(camera_->previewPort(), preview_->inputPort());
                 }
-
+#if 0
+                // Splitter
                 {
-                    connEncoder_ = std::make_shared<Connection>(camera_->videoPort(), encoder_->inputPort());
-
-                    encoder_->outputPort()->userdata = (struct MMAL_PORT_USERDATA_T *) &callbackData_;
-
-                    MMAL_STATUS_T status = mmal_port_enable(encoder_->outputPort(), encoder_buffer_callback);
-                    if (status != MMAL_SUCCESS)
-                        throw MmalException(status, "Failed to setup encoder output");
+                    splitter_ = std::make_shared<SplitterComponent>(camera_->videoPort());
+                    connSplitter_ = std::make_shared<Connection>(camera_->videoPort(), splitter_->inputPort());
                 }
 
-                // Send all the buffers to the encoder output port
+                // MJPEG encoder
                 {
-                    unsigned qLen = mmal_queue_length(callbackData_.encoderPool->queue);
-                    for (unsigned i = 0; i < qLen; i++)
-                    {
-                        MMAL_BUFFER_HEADER_T * buffer = mmal_queue_get(callbackData_.encoderPool->queue);
-                        if (!buffer)
-                            vcos_log_error("Unable to get a required buffer %d from pool queue", i);
+                    encoderJpeg_ = std::make_shared<EncoderJpegComponent>();
+                }
 
-                        MMAL_STATUS_T status = mmal_port_send_buffer(encoder_->outputPort(), buffer);
-                        if (status != MMAL_SUCCESS)
-                            vcos_log_error("Unable to send a buffer to encoder output port (%d)", i);
-                    }
+                //
+                {
+                    connEncoderJpeg_ = std::make_shared<Connection>(splitter_->outputPort(1), encoderJpeg_->inputPort());
+
+                    callbackDataJpeg_.encoderPool = encoderJpeg_->pool();
+                    encoderJpeg_->setCallback(&callbackDataJpeg_);
+                }
+#endif
+                // H264 encoder
+                {
+                    MMAL_PARAMETER_VIDEO_PROFILE_T profile;
+                    profile.hdr.id = MMAL_PARAMETER_PROFILE;
+                    profile.hdr.size = sizeof(profile);
+                    profile.profile[0].profile = MMAL_VIDEO_PROFILE_H264_BASELINE;
+                    profile.profile[0].level = MMAL_VIDEO_LEVEL_H264_4; // This is the only value supported
+
+                    Bitrate bitrate;
+
+                    encoderH264_ = std::make_shared<EncoderH264Component>(bitrate, profile);
+                }
+
+                //
+                {
+                    connEncoderH264_ = std::make_shared<Connection>(camera_->videoPort(), encoderH264_->inputPort());
+
+                    callbackDataH264_.encoderPool = encoderH264_->pool();
+                    encoderH264_->setCallback(&callbackDataH264_);
                 }
 
                 isOK_ = true;
@@ -700,16 +861,28 @@ namespace rpi_cam
         {
             // destroy connections before components
             connPreview_.reset();
-            connEncoder_.reset();
+            connEncoderH264_.reset();
+#if 0
+            connEncoderJpeg_.reset();
+            connSplitter_.reset();
+#endif
         }
 
         bool isOK() const { return isOK_; }
-        bool startCapture() { return mmal_port_parameter_set_boolean(camera_->videoPort(), MMAL_PARAMETER_CAPTURE, MMAL_TRUE) == MMAL_SUCCESS; }
-        bool stopCapture() { return mmal_port_parameter_set_boolean(camera_->videoPort(), MMAL_PARAMETER_CAPTURE, MMAL_FALSE) == MMAL_SUCCESS; }
+
+        bool startCapture()
+        {
+            return mmal_port_parameter_set_boolean(camera_->videoPort(), MMAL_PARAMETER_CAPTURE, MMAL_TRUE) == MMAL_SUCCESS;
+        }
+
+        bool stopCapture()
+        {
+            return mmal_port_parameter_set_boolean(camera_->videoPort(), MMAL_PARAMETER_CAPTURE, MMAL_FALSE) == MMAL_SUCCESS;
+        }
 
         bool nextFrame(std::vector<uint8_t>& outData, int64_t& pts, bool& isKey)
         {
-            FramePtr frame = callbackData_.nextFrame();
+            FramePtr frame = callbackDataH264_.nextFrame();
             if (!frame)
                 return false;
 
@@ -718,15 +891,79 @@ namespace rpi_cam
             isKey = frame->isKey();
             return true;
         }
+#if 0
+        bool nextFrameLQ(std::vector<uint8_t>& outData)
+        {
+            FramePtr frame = callbackDataJpeg_.nextFrame();
+            if (!frame)
+                return false;
+
+            frame->swap(outData);
+            return true;
+        }
+#endif
+        unsigned maxBitrate() const { return 20000; } // kbit/s
+
+        bool resolutionHQ(unsigned num, VideoMode& m)
+        {
+            switch (num)
+            {
+                case 0:
+                    m = VideoMode(VideoMode::VM_1080p30);
+                    return true;
+                case 1:
+                    m = VideoMode(VideoMode::VM_720p50);
+                    return true;
+                case 2:
+                    m = VideoMode(VideoMode::VM_640x480p60);
+                    return true;
+                case 3:
+                    m = VideoMode(VideoMode::VM_640x480p90);
+                    return true;
+            };
+
+            return false;
+        }
+
+        bool resolutionLQ(unsigned num, VideoMode& m)
+        {
+            switch (num)
+            {
+                case 0:
+                    m = VideoMode(VideoMode::JM_480x270);
+                    return true;
+            };
+
+            return false;
+        }
+
+        // TODO
+        bool setResolution(unsigned width, unsigned height)
+        {
+            VideoMode m(VideoMode::VM_1080p30);
+            if (width == m.width && height == m.height)
+                return true;
+            return false;
+        }
 
     private:
-        RaspividState state_;
-        EncCallbackData callbackData_;
+        unsigned cameraNum_;
+        VideoMode mode_;
+        EncCallbackData callbackDataH264_;
+
         std::shared_ptr<CameraComponent> camera_;
-        std::shared_ptr<EncoderComponent> encoder_;
         std::shared_ptr<RasPiPreview> preview_;
+        std::shared_ptr<EncoderH264Component> encoderH264_;
+
         std::shared_ptr<Connection> connPreview_;
-        std::shared_ptr<Connection> connEncoder_;
+        std::shared_ptr<Connection> connEncoderH264_;
+#if 0
+        EncCallbackData callbackDataJpeg_;
+        std::shared_ptr<SplitterComponent> splitter_;
+        std::shared_ptr<EncoderJpegComponent> encoderJpeg_;
+        std::shared_ptr<Connection> connSplitter_;
+        std::shared_ptr<Connection> connEncoderJpeg_;
+#endif
         bool isOK_;
     };
 }
@@ -772,7 +1009,7 @@ static void camera_control_callback(MMAL_PORT_T * /*port*/, MMAL_BUFFER_HEADER_T
 /// @param port Pointer to port from which callback originated
 /// @param buffer mmal buffer header pointer
 ///
-static void encoder_buffer_callback(MMAL_PORT_T * port, MMAL_BUFFER_HEADER_T * buffer)
+static void h264_encoder_buffer_callback(MMAL_PORT_T * port, MMAL_BUFFER_HEADER_T * buffer)
 {
     static const unsigned MAX_QUEUE_SIZE = 32;
 
@@ -825,9 +1062,7 @@ static void encoder_buffer_callback(MMAL_PORT_T * port, MMAL_BUFFER_HEADER_T * b
         }
     }
     else
-    {
         vcos_log_error("Received a encoder buffer callback with no state");
-    }
 
     // release buffer back to the pool
     mmal_buffer_header_release(buffer);
@@ -844,5 +1079,60 @@ static void encoder_buffer_callback(MMAL_PORT_T * port, MMAL_BUFFER_HEADER_T * b
             vcos_log_error("Unable to return a buffer to the encoder port");
     }
 }
+
+#if 0
+/// buffer header callback function for encoder
+///
+/// @param port Pointer to port from which callback originated
+/// @param buffer mmal buffer header pointer
+///
+static void jpeg_encoder_buffer_callback(MMAL_PORT_T * port, MMAL_BUFFER_HEADER_T * buffer)
+{
+    static const unsigned MAX_QUEUE_SIZE = 32;
+
+    rpi_cam::EncCallbackData * pData = (rpi_cam::EncCallbackData *)port->userdata;
+
+    if (buffer->cmd)
+        vcos_log_error("encoder callback: received unexpected callback event, 0x%08x", buffer->cmd);
+
+    if (pData)
+    {
+        mmal_buffer_header_mem_lock(buffer); // BUFFER LOCK
+
+        pData->curFrame.insert(pData->curFrame.end(), buffer->data, buffer->data + buffer->length);
+
+        mmal_buffer_header_mem_unlock(buffer); // BUFFER UNLOCK
+
+        if (buffer->flags & MMAL_BUFFER_HEADER_FLAG_FRAME_END)
+        {
+            std::lock_guard<std::mutex>( pData->queueMutex ); // LOCK
+
+            while (pData->queue.size() >= MAX_QUEUE_SIZE)
+                pData->queue.pop_front();
+
+            pData->queue.push_back( std::make_shared<rpi_cam::Frame>(pData->curFrame, 0) );
+            pData->curFrame.clear();
+        }
+    }
+    else
+        vcos_log_error("Received a encoder buffer callback with no state");
+
+    // release buffer back to the pool
+    mmal_buffer_header_release(buffer);
+
+    // and send one back to the port (if still open)
+    if (pData && pData->encoderPool && port->is_enabled)
+    {
+        MMAL_STATUS_T status;
+        MMAL_BUFFER_HEADER_T * new_buffer = mmal_queue_get(pData->encoderPool->queue);
+        if (new_buffer)
+            status = mmal_port_send_buffer(port, new_buffer);
+
+        if (!new_buffer || status != MMAL_SUCCESS)
+            vcos_log_error("Unable to return a buffer to the encoder port");
+    }
+}
+#endif
+
 
 #endif // RASPBERRY_PI_CAMERA

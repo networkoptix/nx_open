@@ -18,11 +18,12 @@ namespace rpi_cam
     public:
         VideoPacket()
         :   m_refManager( this ),
+            m_type( nxcip::CODEC_ID_H264 ),
             m_data( nullptr ),
             m_size( 0 )
         {}
 
-        VideoPacket(const uint8_t* data, unsigned size);
+        VideoPacket(nxcip::CompressionType type, const uint8_t* data, unsigned size);
         virtual ~VideoPacket();
 
         // nxpl::MediaDataPacket
@@ -56,6 +57,7 @@ namespace rpi_cam
         }
 
     private:
+        nxcip::CompressionType m_type;
         std::shared_ptr<uint8_t> m_data;
         size_t m_size;
         nxcip::UsecUTCTimestamp m_time;

@@ -2,6 +2,7 @@
 #define RPI_MEDIA_ENCODER_H
 
 #include <memory>
+#include <vector>
 
 #include <plugins/camera_plugin.h>
 
@@ -19,7 +20,7 @@ namespace rpi_cam
         DEF_REF_COUNTER
 
     public:
-        MediaEncoder( CameraManager* cameraManager, int encoderNumber );
+        MediaEncoder( CameraManager* cameraManager, unsigned encoderNumber, unsigned maxBitrate = 0);
         virtual ~MediaEncoder();
 
         // nxcip::CameraMediaEncoder
@@ -39,14 +40,16 @@ namespace rpi_cam
         //
 
         nxpt::CommonRefManager * refManager() { return &m_refManager; }
-        nxcip::ResolutionInfo& resolution() { return resolution_; }
         nxcip::MediaDataPacket * nextFrame();
+
+        void addResolution(const nxcip::ResolutionInfo& res) { resolutions_.push_back(res); }
 
     private:
         CameraManager * cameraManager_;
         std::unique_ptr<StreamReader> streamReader_;
-        int encoderNumber_;
-        nxcip::ResolutionInfo resolution_;
+        unsigned encoderNumber_;
+        unsigned maxBitrate_;
+        std::vector<nxcip::ResolutionInfo> resolutions_;
     };
 }
 

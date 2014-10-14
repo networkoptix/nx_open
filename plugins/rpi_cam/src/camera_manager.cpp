@@ -13,26 +13,40 @@
 
 namespace rpi_cam
 {
+    static unsigned ENCODERS_COUNT = 1;
+
     DEFAULT_REF_COUNTER(CameraManager)
 
-    CameraManager::CameraManager(unsigned id)
+    CameraManager::CameraManager(unsigned cameraNum)
     :   m_refManager( DiscoveryManager::refManager() ),
         isOK_(false),
         errorStr_(nullptr)
     {
-        rpiCamera_ = std::make_shared<RaspberryPiCamera>(true);
-
+        rpiCamera_ = std::make_shared<RaspberryPiCamera>(cameraNum);
         if (rpiCamera_->isOK() && rpiCamera_->startCapture())
             isOK_ = true;
 
-        encoder_ = std::make_shared<MediaEncoder>(this, 0);
-
-        // FIXME
-        nxcip::ResolutionInfo& res = encoder_->resolution();
-        res.maxFps = 30;
-        res.resolution.width = 1920;
-        res.resolution.height = 1080;
-
+        VideoMode m(VideoMode::VM_1080p30);
+        encoderHQ_ = std::make_shared<MediaEncoder>(this, 0, rpiCamera_->maxBitrate());
+        for (unsigned i=0; rpiCamera_->resolutionHQ(i, m); ++i)
+        {
+            nxcip::ResolutionInfo res;
+            res.maxFps = m.framerate;
+            res.resolution.width = m.width;
+            res.resolution.height = m.height;
+            encoderHQ_->addResolution(res);
+        }
+#if 0
+        encoderLQ_ = std::make_shared<MediaEncoder>(this, 1);
+        for (unsigned i=0; rpiCamera_->resolutionLQ(i, m); ++i)
+        {
+            nxcip::ResolutionInfo res;
+            res.maxFps = m.framerate;
+            res.resolution.width = m.width;
+            res.resolution.height = m.height;
+            encoderLQ_->addResolution(res);
+        }
+#endif
         // TODO
         std::string strId = "RaspberryPi";
 
@@ -43,7 +57,13 @@ namespace rpi_cam
     }
 
     CameraManager::~CameraManager()
-    {}
+    {
+        if (encoderHQ_)
+            encoderHQ_->releaseRef();
+
+        if (encoderLQ_)
+            encoderLQ_->releaseRef();
+    }
 
     void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
@@ -57,11 +77,7 @@ namespace rpi_cam
             addRef();
             return static_cast<nxcip::BaseCameraManager*>(this);
         }
-        if (interfaceID == nxpl::IID_PluginInterface)
-        {
-            addRef();
-            return static_cast<nxpl::PluginInterface*>(this);
-        }
+
         return nullptr;
     }
 
@@ -72,17 +88,26 @@ namespace rpi_cam
             return nxcip::NX_TRY_AGAIN;
         }
 
-        *encoderCount = 1;
+        *encoderCount = ENCODERS_COUNT;
         return nxcip::NX_NO_ERROR;
     }
 
     int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
     {
-        if (static_cast<unsigned>(encoderIndex) > 0)
+        if (static_cast<unsigned>(encoderIndex) >= ENCODERS_COUNT)
             return nxcip::NX_INVALID_ENCODER_NUMBER;
 
-        encoder_->addRef();
-        *encoderPtr = encoder_.get();
+        if (encoderIndex)
+        {
+            if (encoderLQ_)
+                encoderLQ_->addRef();
+            *encoderPtr = encoderLQ_.get();
+        }
+        else
+        {
+            encoderHQ_->addRef();
+            *encoderPtr = encoderHQ_.get();
+        }
         return nxcip::NX_NO_ERROR;
     }
 
@@ -94,9 +119,7 @@ namespace rpi_cam
 
     int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
     {
-        *capabilitiesMask =
-                nxcip::BaseCameraManager::nativeMediaStreamCapability |
-                nxcip::BaseCameraManager::primaryStreamSoftMotionCapability;
+        *capabilitiesMask = nxcip::BaseCameraManager::nativeMediaStreamCapability;
         return nxcip::NX_NO_ERROR;
     }
 
@@ -151,9 +174,14 @@ namespace rpi_cam
 
     //
 
+    bool CameraManager::setResolution(unsigned width, unsigned height)
+    {
+        return rpiCamera_->setResolution(width, height);
+    }
+
     nxcip::MediaDataPacket * CameraManager::nextFrame(unsigned encoderNumber)
     {
-        if (encoderNumber)
+        if (encoderNumber >= ENCODERS_COUNT)
             return nullptr;
 
         static const unsigned MAX_READ_ATTEMPTS = 20;
@@ -162,19 +190,32 @@ namespace rpi_cam
         static std::chrono::milliseconds dura( SLEEP_DURATION_MS );
 
         std::vector<uint8_t> data;
-        int64_t pts;
-        bool isKey;
+        int64_t pts = 0;
+        bool isKey = false;
 
         for (unsigned i = 0; i < MAX_READ_ATTEMPTS; ++i)
         {
-            if (rpiCamera_->nextFrame(data, pts, isKey))
+            if (encoderNumber)
             {
-                VideoPacket * packet = new VideoPacket(&data[0], data.size());
-                packet->setTime(pts);
-                if (isKey)
-                    packet->setKeyFlag();
-
-                return packet;
+#if 0
+                if (rpiCamera_->nextFrameLQ(data))
+                {
+                    VideoPacket * packet = new VideoPacket(nxcip::CODEC_ID_MJPEG, &data[0], data.size());
+                    packet->setLowQualityFlag();
+                    return packet;
+                }
+#endif
+            }
+            else
+            {
+                if (rpiCamera_->nextFrame(data, pts, isKey))
+                {
+                    VideoPacket * packet = new VideoPacket(nxcip::CODEC_ID_H264, &data[0], data.size());
+                    packet->setTime(pts);
+                    if (isKey)
+                        packet->setKeyFlag();
+                    return packet;
+                }
             }
 
             std::this_thread::sleep_for(dura);

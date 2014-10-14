@@ -9,10 +9,11 @@ namespace rpi_cam
 {
     DEFAULT_REF_COUNTER(MediaEncoder)
 
-    MediaEncoder::MediaEncoder(CameraManager * const cameraManager, int encoderNumber)
+    MediaEncoder::MediaEncoder(CameraManager * const cameraManager, unsigned encoderNumber, unsigned maxBitrate)
     :   m_refManager( this ),
-        cameraManager_( cameraManager ),
-        encoderNumber_( encoderNumber )
+        cameraManager_(cameraManager),
+        encoderNumber_(encoderNumber),
+        maxBitrate_(maxBitrate)
     {
     }
 
@@ -44,28 +45,45 @@ namespace rpi_cam
 
     int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoListCount ) const
     {
-        infoList[0] = resolution_;
-        *infoListCount = 1;
+        *infoListCount = 0;
+        for (unsigned i=0; i < resolutions_.size(); ++i)
+        {
+            infoList[i] = resolutions_[i];
+            ++(*infoListCount);
+        }
 
         return nxcip::NX_NO_ERROR;
     }
 
     int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
     {
-        *maxBitrate = 0;
+        *maxBitrate = maxBitrate_;
         return nxcip::NX_NO_ERROR;
     }
 
-    int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
+    // TODO
+    int MediaEncoder::setResolution( const nxcip::Resolution& res )
     {
-        if (resolution.height != resolution_.resolution.height || resolution.width != resolution_.resolution.width)
+        unsigned num = 0;
+        for (; num < resolutions_.size(); ++num)
+        {
+            if (res.width == resolutions_[num].resolution.width &&
+                res.height == resolutions_[num].resolution.height)
+                break;
+        }
+
+        if (num == resolutions_.size())
             return nxcip::NX_UNSUPPORTED_RESOLUTION;
-        return nxcip::NX_NO_ERROR;
+
+        if (cameraManager_->setResolution(res.width, res.height))
+            return nxcip::NX_NO_ERROR;
+        return nxcip::NX_OTHER_ERROR;
     }
 
+    // TODO
     int MediaEncoder::setFps( const float& /*fps*/, float* selectedFps )
     {
-        *selectedFps = resolution_.maxFps;
+        *selectedFps = resolutions_[0].maxFps;
         return nxcip::NX_NO_ERROR;
     }
 
