@@ -76,12 +76,13 @@ namespace QnBusiness {
             return false;
         }
     }
+
     QList<ActionType> allActions() {
         QList<ActionType> result;
         result
             << CameraOutputAction
             << CameraOutputOnceAction
-            //<< BookmarkAction
+            << BookmarkAction
             << CameraRecordingAction
             << PanicRecordingAction
             << SendMailAction
@@ -91,7 +92,7 @@ namespace QnBusiness {
             << PlaySoundOnceAction
             << SayTextAction;
         return result;
-
+    }
 }
 
 QnAbstractBusinessAction::QnAbstractBusinessAction(const QnBusiness::ActionType actionType, const QnBusinessEventParameters& runtimeParams):
