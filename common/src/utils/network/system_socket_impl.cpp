@@ -6,3 +6,9 @@
 #include "system_socket_impl.h"
 
 
+SocketImpl::SocketImpl()
+:
+    aioThread( nullptr ),
+    terminated( false )
+{
+}

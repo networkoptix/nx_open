@@ -35,7 +35,7 @@ public:
     virtual bool getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc ) override;
 
 private:
-    std::unique_ptr<AbstractStreamSocket> m_tcpSock;
+    std::shared_ptr<AbstractStreamSocket> m_tcpSock;
     QByteArray m_timeStr;
     std::function<void(qint64, SystemError::ErrorCode)> m_handlerFunc;
 

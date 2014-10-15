@@ -50,7 +50,16 @@ namespace nx_http
     QSharedPointer<AbstractStreamSocket> AsyncHttpClient::takeSocket()
     {
         QSharedPointer<AbstractStreamSocket> result = m_socket;
-        terminate();
+
+        {
+            QMutexLocker lk( &m_mutex );
+            m_terminated = true;
+        }
+        //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
+        if( result )
+            result->cancelAsyncIO();
+        //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
+
         m_socket.clear();
         return result;
     }
@@ -65,12 +74,8 @@ namespace nx_http
         }
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
         if( m_socket )
-        {
-            m_socket->cancelAsyncIO( aio::etWrite );
-            m_socket->cancelAsyncIO( aio::etRead );
-
-            //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
-        }
+            m_socket->terminateAsyncIO( true );
+        //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
     }
 
     void AsyncHttpClient::asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode )
@@ -496,6 +501,7 @@ namespace nx_http
 
         if( m_socket )
         {
+            //TODO #ak think again about next cancellation
             m_socket->cancelAsyncIO( aio::etWrite );
             m_socket->cancelAsyncIO( aio::etRead );
 

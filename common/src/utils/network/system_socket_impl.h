@@ -23,7 +23,9 @@ class SocketImpl
 {
 public:
     std::atomic<aio::AIOThread<Socket>*> aioThread;
+    std::atomic<bool> terminated;
 
+    SocketImpl();
     virtual ~SocketImpl() {}
 
     void*& getUserData( aio::EventType eventType )

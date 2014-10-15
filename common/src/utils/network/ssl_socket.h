@@ -70,6 +70,8 @@ public:
     virtual bool postImpl( std::function<void()>&& handler ) override;
     //!Implementation of AbstractSocket::dispatchImpl
     virtual bool dispatchImpl( std::function<void()>&& handler ) override;
+    //!Implementation of AbstractSocket::terminateAsyncIO
+    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
 
     //!Implementation of AbstractEncryptedStreamSocket::connectWithoutEncryption
     virtual bool connectWithoutEncryption(

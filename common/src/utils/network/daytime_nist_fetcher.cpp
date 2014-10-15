@@ -33,12 +33,11 @@ DaytimeNISTFetcher::~DaytimeNISTFetcher()
 
 void DaytimeNISTFetcher::pleaseStop()
 {
-    if( !m_tcpSock )
+    std::shared_ptr<AbstractStreamSocket> tcpSock = m_tcpSock;
+    if( !tcpSock )
         return;
 
-    m_tcpSock->cancelAsyncIO( aio::etWrite );
-    if( m_tcpSock )
-        m_tcpSock->cancelAsyncIO( aio::etRead );
+    tcpSock->terminateAsyncIO( true );
     m_tcpSock.reset();
 }
 
@@ -68,6 +67,7 @@ bool DaytimeNISTFetcher::getTimeAsync( std::function<void(qint64, SystemError::E
     {
         m_tcpSock.reset();
         handlerFunc( timestamp, error );
+        m_handlerFunc = std::function<void( qint64, SystemError::ErrorCode )>();
     };
 
     using namespace std::placeholders;

@@ -381,7 +381,7 @@ public:
     bool AsyncSend( const nx::Buffer& buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& handler );
     bool AsyncRecv( nx::Buffer* buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& handler );
     void WaitForAllPendingIOFinish() {
-        underly_socket_->cancelAsyncIO();
+        underly_socket_->terminateAsyncIO( true );
     }
 private:
     void AsyncPerform( AsyncSSLOperation* operation );
@@ -1393,6 +1393,12 @@ bool QnSSLSocket::dispatchImpl( std::function<void()>&& handler )
 {
     Q_D(const QnSSLSocket);
     return d->wrappedSocket->dispatch( std::move(handler) );
+}
+
+void QnSSLSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
+{
+    Q_D(const QnSSLSocket);
+    return d->wrappedSocket->terminateAsyncIO( waitForRunningHandlerCompletion );
 }
 
 bool QnSSLSocket::connectWithoutEncryption(
