@@ -191,6 +191,7 @@ void OpenSSLInitGlobalLock() {
     Q_ASSERT(kOpenSSLGlobalLock == NULL);
     // not safe here, new can throw exception 
     kOpenSSLGlobalLock = new std::mutex[CRYPTO_num_locks()];
+    CRYPTO_set_locking_callback( OpenSSLGlobalLock );
 }
 
 void InitOpenSSLGlobalLock() {
@@ -634,7 +635,7 @@ void AsyncSSL::DoRead() {
     // we could just call SSL operation right here. And since this function
     // is executed inside of AIO thread, no recursive lock will happened in
     // user's callback function. 
-    if( recv_buffer_read_pos_ < underly_socket_recv_buffer_.size() ) {
+    if( static_cast<int>(recv_buffer_read_pos_) < underly_socket_recv_buffer_.size() ) {
         outstanding_read_->IncreasePendingIOCount();
         OnUnderlySocketRecv(SystemError::noError,
             underly_socket_recv_buffer_.size() - recv_buffer_read_pos_ );
@@ -710,7 +711,7 @@ void AsyncSSL::ContinueWrite() {
 
 std::size_t AsyncSSL::BIORead( void* data , std::size_t size ) {
     if( allow_bio_read_ ) {
-        if( underly_socket_recv_buffer_.size() == recv_buffer_read_pos_ ) {
+        if( underly_socket_recv_buffer_.size() == static_cast<int>(recv_buffer_read_pos_) ) {
             return 0;
         } else {
             std::size_t digest_size = 
@@ -720,7 +721,7 @@ std::size_t AsyncSSL::BIORead( void* data , std::size_t size ) {
                    underly_socket_recv_buffer_.constData() + recv_buffer_read_pos_ ,
                    digest_size);
             recv_buffer_read_pos_ += digest_size;
-            if( recv_buffer_read_pos_ == underly_socket_recv_buffer_.size() ) {
+            if( static_cast<int>(recv_buffer_read_pos_) == underly_socket_recv_buffer_.size() ) {
                 recv_buffer_read_pos_ = 0;
                 underly_socket_recv_buffer_.clear();
                 underly_socket_recv_buffer_.reserve( static_cast<int>(kAsyncSSLRecvBufferSize) );
