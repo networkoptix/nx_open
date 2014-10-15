@@ -258,7 +258,7 @@
                 <dependency>
                     <groupId>com.creativelabs</groupId>
                     <artifactId>openal</artifactId>
-                    <version>1.1-SNAPSHOT</version>
+                    <version>1.16-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>
@@ -286,7 +286,7 @@
                 <dependency>
                     <groupId>com.microsoft</groupId>
                     <artifactId>redistributable</artifactId>
-                    <version>vs2008-SNAPSHOT</version>
+                    <version>vs2012-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>       
