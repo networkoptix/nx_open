@@ -10,10 +10,8 @@ angular.module('webadminApp')
             }
         });
 
-        $scope.settings = mediaserver.getSettings();
 
-
-        $scope.settings.then(function (r) {
+        mediaserver.getSettings().then(function (r) {
             $scope.settings = {
                 systemName: r.data.reply.systemName,
                 port: r.data.reply.port
