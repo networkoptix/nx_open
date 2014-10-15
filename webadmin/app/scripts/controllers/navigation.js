@@ -11,9 +11,8 @@ angular.module('webadminApp')
                 isAdmin:result.reply.isAdmin
             }
         });
-        $scope.settings = mediaserver.getSettings();
 
-        $scope.settings.then(function (r) {
+        mediaserver.getSettings().then(function (r) {
             $scope.settings = {
                 name:r.data.reply.name,
                 remoteAddresses:r.data.reply.remoteAddresses.join("\n")

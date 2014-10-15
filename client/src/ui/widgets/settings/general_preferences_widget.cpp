@@ -256,6 +256,8 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     ui->backgroundColorOpacitySpinBox->setValue(qRound(customColor.alphaF() * 100));
     ui->backgroundImageOpacitySpinBox->setValue(qRound(qnSettings->backgroundImageOpacity() * 100));
 
+    ui->backgroundImageModeComboBox->setCurrentIndex(ui->backgroundImageModeComboBox->findData(qVariantFromValue(qnSettings->backgroundImageMode())));
+
     updateBackgroundColor();
 }
 

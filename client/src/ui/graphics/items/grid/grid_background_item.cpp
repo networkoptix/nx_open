@@ -232,13 +232,16 @@ void QnGridBackgroundItem::update(const QnLayoutResourcePtr &layout) {
        
     qreal opacity = isDefaultBackground
         ? qnSettings->backgroundImageOpacity()
-        : qBound(0.0, layout->backgroundOpacity(), 1.0);
+        : qBound(0.0, layout->backgroundOpacity(), 1.0);    
+
+    Qn::ImageBehaviour imageMode = qnSettings->backgroundImageMode();
 
     bool hasChanges =
             (d->isDefaultBackground != isDefaultBackground) ||
             (d->imageIsLocal != (isExportedLayout || isDefaultBackground) ) ||
             (d->imageFilename != filename) ||
             (d->imageSize != imageSize) ||
+            (d->imageMode != imageMode) ||
             (!qFuzzyCompare(d->imageOpacity, opacity));
 
     if (hasChanges) {
@@ -246,6 +249,7 @@ void QnGridBackgroundItem::update(const QnLayoutResourcePtr &layout) {
         d->imageIsLocal = isExportedLayout || isDefaultBackground;
         d->imageFilename = filename;
         d->imageSize = imageSize;
+        d->imageMode = imageMode;
         d->imageOpacity = opacity;
         d->imageStatus = ImageStatus::None;
 #ifdef NATIVE_PAINT_BACKGROUND
