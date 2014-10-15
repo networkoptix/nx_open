@@ -267,15 +267,8 @@ namespace aio
                     }
 
                     case TaskType::tRemoving:
-                    {
-                        if( task.eventType == aio::etRead || task.eventType == aio::etWrite )
-                            pollSet.remove( task.socket, task.eventType );
-                        void*& userData = task.socket->impl()->getUserData(task.eventType);
-                        if( userData )
-                            delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
-                        userData = nullptr;
+                        removeSocketFromPollSet( task.socket, task.eventType );
                         break;
-                    }
 
                     case TaskType::tCallFunc:
                     {
@@ -328,6 +321,16 @@ namespace aio
             handlingData.release();
 
             return true;
+        }
+
+        void removeSocketFromPollSet( SocketType* sock, aio::EventType eventType )
+        {
+            if( eventType == aio::etRead || eventType == aio::etWrite )
+                pollSet.remove( sock, eventType );
+            void*& userData = sock->impl()->getUserData(eventType);
+            if( userData )
+                delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
+            userData = nullptr;
         }
 
         void removeSocketsFromPollSet()
@@ -694,9 +697,7 @@ namespace aio
         if( inAIOThread )
         {
             //removing socket from pollset does not invalidate iterators (iterating pollset may be higher the stack)
-            m_impl->pollSet.remove( sock, eventType );
-            if( userData )
-                delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
+            m_impl->removeSocketFromPollSet( sock, eventType );
             userData = nullptr;
         }
         else if( waitForRunningHandlerCompletion )
@@ -764,7 +765,9 @@ namespace aio
     {
         if( currentThreadSystemId() == systemThreadId() )  //if called from this aio thread
         {
+            m_impl->aioServiceMutex->unlock();
             functor();
+            m_impl->aioServiceMutex->lock();
             return true;
         }
         //otherwise posting functor
@@ -836,6 +839,9 @@ namespace aio
             //making calls posted with post and dispatch
             m_impl->processPostedCalls();
 
+            //processing tasks that have been added from within \a processPostedCalls() call
+            m_impl->processPollSetModificationQueue( TaskType::tAll );
+
             qint64 curClock = getSystemTimerVal();
             //taking clock of the next periodic task
             qint64 nextPeriodicEventClock = 0;
@@ -849,7 +855,9 @@ namespace aio
                 ? aio::INFINITE_TIMEOUT    //no periodic task
                 : (nextPeriodicEventClock < curClock ? 0 : nextPeriodicEventClock - curClock);
 
-            const int triggeredSocketCount = m_impl->pollSet.poll( millisToTheNextPeriodicEvent );
+            //if there are posted calls, just checking sockets state in non-blocking mode
+            const int triggeredSocketCount = m_impl->pollSet.poll(
+                m_impl->postedCalls.empty() ? millisToTheNextPeriodicEvent : 0 );
 
             if( needToStop() )
                 break;
