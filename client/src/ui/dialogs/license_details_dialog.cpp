@@ -49,7 +49,7 @@ QString QnLicenseDetailsDialog::licenseDescription(const QnLicensePtr &license) 
         "Features:\n")
                 .arg(license->displayName())
                 .arg(QLatin1String(license->key()))
-                .arg(QLatin1String(qnLicensePool->currentHardwareId()))
+                .arg(QLatin1String(license->hardwareId()))
                 ;
      return details + features;
 }
