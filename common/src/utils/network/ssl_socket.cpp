@@ -516,7 +516,7 @@ AsyncSSL::AsyncSSL( SSL* ssl , AbstractStreamSocket* underly_socket , bool is_se
     handshake_stage_(HANDSHAKE_NOT_YET),
     underly_socket_(underly_socket),
     deletion_flag_(NULL){
-        underly_socket_recv_buffer_.reserve(kAsyncSSLRecvBufferSize);
+        underly_socket_recv_buffer_.reserve( static_cast<int>(kAsyncSSLRecvBufferSize) );
 }
 
 AsyncSSL::~AsyncSSL() {
@@ -759,7 +759,7 @@ std::size_t AsyncSSL::BIORead( void* data , std::size_t size ) {
 }
 
 std::size_t AsyncSSL::BIOWrite( const void* data , std::size_t size ) {
-    current_write_.write_buffer.append(static_cast<const char*>(data),size);
+    current_write_.write_buffer.append( static_cast<const char*>(data), static_cast<int>(size) );
     return size;
 }
 
