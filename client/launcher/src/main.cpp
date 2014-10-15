@@ -256,7 +256,7 @@ int launchFile(const wstring& executePath)
         {
             wchar_t buffer[MAX_PATH + 16];
             wchar_t* arch = sizeof(char*) == 4 ? L"x86" : L"x64";
-            wsprintf(buffer, L"\"%s\\vcredist_%3.exe\" /q", toNativeSeparator(dstDir).c_str(), arch);
+            wsprintf(buffer, L"\"%s\\vcredist_%s.exe\" /q", toNativeSeparator(dstDir).c_str(), arch);
             int result = _wsystem(buffer);
         }
 
