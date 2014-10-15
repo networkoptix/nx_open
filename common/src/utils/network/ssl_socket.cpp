@@ -191,7 +191,7 @@ void OpenSSLInitGlobalLock() {
     Q_ASSERT(kOpenSSLGlobalLock == NULL);
     // not safe here, new can throw exception 
     kOpenSSLGlobalLock = new std::mutex[CRYPTO_num_locks()];
-    CRYPTO_set_locking_callback( OpenSSLGlobalLock );
+    CRYPTO_set_locking_callback(OpenSSLGlobalLock);
 }
 
 void InitOpenSSLGlobalLock() {
@@ -588,9 +588,13 @@ void AsyncSSL::HandleSSLError( int ssl_return , int ssl_error ) {
 
 void AsyncSSL::OnUnderlySocketRecv( SystemError::ErrorCode error_code , std::size_t bytes_transferred ) {
     if( error_code != SystemError::noError ) {
+        DeletionFlag deleted(this);
         outstanding_read_->SetExitStatus(AsyncSSLOperation::EXCEPTION,error_code);
-        outstanding_read_->DecreasePendingIOCount();
-        ContinueRead();
+        if( !deleted ) {
+            outstanding_read_->DecreasePendingIOCount();
+            if( !deleted )
+                ContinueRead();
+        }
         return;
     } else {
         if( bytes_transferred == 0 ) {
@@ -661,9 +665,13 @@ void AsyncSSL::DoRead() {
 void AsyncSSL::OnUnderlySocketSend( SystemError::ErrorCode error_code , std::size_t bytes_transferred ) {
     Q_UNUSED(bytes_transferred);
     if( error_code != SystemError::noError ) {
+        DeletionFlag deleted(this);
         outstanding_write_->operation->SetExitStatus(AsyncSSLOperation::EXCEPTION,error_code);
-        outstanding_write_->operation->DecreasePendingIOCount();
-        ContinueWrite();
+        if( !deleted ) {
+            outstanding_write_->operation->DecreasePendingIOCount();
+            if( !deleted )
+                ContinueWrite();
+        }
         return;
     } else {
         // For read operations, if it succeeded, we don't need to call Perform
@@ -1014,7 +1022,6 @@ void QnSSLSocket::initSSLEngine(const QByteArray& certData)
     SSL_CTX_use_PrivateKey(SSLStaticData::instance()->serverCTX, SSLStaticData::instance()->pkey);
     BIO_free(bufio);
     // Initialize OpenSSL global lock, so server side will initialize it right here
-    InitOpenSSLGlobalLock();
 }
 
 void QnSSLSocket::releaseSSLEngine()
@@ -1566,42 +1573,50 @@ bool QnMixedSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::functio
 bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const buffer, std::function<void( SystemError::ErrorCode , std::size_t )>&&  handler )
 {
     Q_D(QnMixedSSLSocket);
-    return d->wrappedSocket->post(
-        [this,buffer,handler]() {
-            Q_D(QnMixedSSLSocket);
-            d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
-            MixedAsyncSSL* ssl_ptr = 
-                static_cast< MixedAsyncSSL* >( d->async_ssl_ptr.get() );
-            if( !d->initState )
-                ssl_ptr->set_ssl(d->useSSL);
-            if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() ) {
-                d->wrappedSocket->readSomeAsync( buffer, handler );
-            } else {
-                ssl_ptr->AsyncRecv(buffer,
-                    std::function<void( SystemError::ErrorCode , std::size_t )>(handler),
-                    std::function<void( SystemError::ErrorCode , std::size_t )>(handler));
-            }
-    });
+    if( !d->initState && !d->useSSL ) {
+        return d->wrappedSocket->readSomeAsync( buffer, handler );
+    } else {
+        return d->wrappedSocket->post(
+            [this,&buffer,handler]() {
+                Q_D(QnMixedSSLSocket);
+                d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
+                MixedAsyncSSL* ssl_ptr = 
+                    static_cast< MixedAsyncSSL* >( d->async_ssl_ptr.get() );
+                if( !d->initState )
+                    ssl_ptr->set_ssl(d->useSSL);
+                if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() ) {
+                    d->wrappedSocket->readSomeAsync( buffer, handler );
+                } else {
+                    ssl_ptr->AsyncRecv(buffer,
+                        std::function<void( SystemError::ErrorCode , std::size_t )>(handler),
+                        std::function<void( SystemError::ErrorCode , std::size_t )>(handler));
+                }
+        });
+    }
 }
 
 //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
 bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& buffer, std::function<void( SystemError::ErrorCode , std::size_t )>&&  handler )
 {
     Q_D(QnMixedSSLSocket);
-    return d->wrappedSocket->post(
-        [this,&buffer,handler]() {
-            Q_D(QnMixedSSLSocket);
-            d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
-            MixedAsyncSSL* ssl_ptr = 
-                static_cast< MixedAsyncSSL* >( d->async_ssl_ptr.get() );
-            if( !d->initState )
-                ssl_ptr->set_ssl(d->useSSL);
-            if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() ) 
-                d->wrappedSocket->sendAsync(buffer, handler );
-            else {
-                ssl_ptr->AsyncSend( buffer, std::function<void( SystemError::ErrorCode , std::size_t )>(handler) );
-            }
-    });
+    if( !d->initState && !d->useSSL ) {
+        return d->wrappedSocket->sendAsync(buffer, handler );
+    } else {
+        return d->wrappedSocket->post(
+            [this,&buffer,handler]() {
+                Q_D(QnMixedSSLSocket);
+                d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
+                MixedAsyncSSL* ssl_ptr = 
+                    static_cast< MixedAsyncSSL* >( d->async_ssl_ptr.get() );
+                if( !d->initState )
+                    ssl_ptr->set_ssl(d->useSSL);
+                if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() ) 
+                    d->wrappedSocket->sendAsync(buffer, handler );
+                else {
+                    ssl_ptr->AsyncSend( buffer, std::function<void( SystemError::ErrorCode , std::size_t )>(handler) );
+                }
+        });
+    }
 }
 
 bool QnMixedSSLSocket::registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) {
