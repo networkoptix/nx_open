@@ -545,7 +545,7 @@ namespace aio
                  )
             {
                 if( it->socket == sock && it->type == TaskType::tCallFunc )
-                    pollSetModificationQueue.erase( it++ );
+                    it = pollSetModificationQueue.erase( it );
                 else
                     ++it;
             }
@@ -558,7 +558,7 @@ namespace aio
                  )
             {
                 if( it->socket == sock )
-                    postedCalls.erase( it++ );
+                    it = postedCalls.erase( it );
                 else
                     ++it;
             }
