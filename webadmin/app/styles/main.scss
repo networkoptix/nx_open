@@ -72,7 +72,7 @@ body {
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {
     .container {
-        max-width: 750px;
+        max-width: 800px;
     }
 
     /* Remove the padding we set earlier */
@@ -320,3 +320,16 @@ body {
   }
 }
 
+
+
+.navbar-brand
+{
+  background-image: url('../customization/hdw_logo.png');
+  background-repeat: no-repeat;
+  background-size: 96px 48px;
+  padding-left:96px;
+  white-space: nowrap;
+  overflow:hidden;
+  max-width: 270px;
+  text-overflow: ellipsis;
+}
