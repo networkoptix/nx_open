@@ -327,5 +327,9 @@ body {
   background-image: url('../customization/logo.png');
   background-repeat: no-repeat;
   background-size: 96px 48px;
-  padding-left:96px
+  padding-left:96px;
+  white-space: nowrap;
+  overflow:hidden;
+  max-width: 270px;
+  text-overflow: ellipsis;
 }
