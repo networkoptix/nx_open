@@ -288,7 +288,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::SetAsBackgroundAction),                  SIGNAL(triggered()),    this,   SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
-    connect(action(Qn::ClearCacheAction),                       SIGNAL(triggered()),    this,   SLOT(at_clearCacheAction_triggered()));
     connect(action(Qn::MessageBoxAction),                       SIGNAL(triggered()),    this,   SLOT(at_messageBoxAction_triggered()));
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
@@ -2343,10 +2342,6 @@ void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
 void QnWorkbenchActionHandler::at_escapeHotkeyAction_triggered() {
     if (action(Qn::ToggleTourModeAction)->isChecked())
         menu()->trigger(Qn::ToggleTourModeAction);
-}
-
-void QnWorkbenchActionHandler::at_clearCacheAction_triggered() {
-    QnAppServerFileCache::clearLocalCache();
 }
 
 void QnWorkbenchActionHandler::at_messageBoxAction_triggered() {

@@ -90,7 +90,7 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
                                                                                         this,   &QnGeneralPreferencesWidget::at_extraMediaFoldersList_selectionChanged);
     connect(ui->timeModeComboBox,                       QnComboboxActivated,            this,   &QnGeneralPreferencesWidget::at_timeModeComboBox_activated);
     connect(ui->browseLogsButton,                       &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_browseLogsButton_clicked);
-    connect(ui->clearCacheButton,                       &QPushButton::clicked,          action(Qn::ClearCacheAction),   &QAction::trigger);
+    connect(ui->clearCacheButton,                       &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_clearCacheButton_clicked);
     connect(ui->pauseOnInactivityCheckBox,              &QCheckBox::toggled,            ui->idleTimeoutWidget,          &QWidget::setEnabled);
     connect(ui->downmixAudioCheckBox,                   &QCheckBox::toggled,            this,   [this](bool toggled) {
         ui->downmixWarningLabel->setVisible(m_oldDownmix != toggled);
@@ -436,3 +436,16 @@ void QnGeneralPreferencesWidget::at_browseLogsButton_clicked() {
     QDesktopServices::openUrl(QLatin1String("file:///") + logsLocation);
 }
 
+void QnGeneralPreferencesWidget::at_clearCacheButton_clicked() {
+    QString backgroundImage = qnSettings->backgroundImage();
+    if (!backgroundImage.isEmpty()) {
+        QnLocalFileCache cache;
+        QString path = cache.getFullPath(backgroundImage);
+        QFile lock(path);
+        lock.open(QFile::ReadWrite);
+        QnAppServerFileCache::clearLocalCache();
+        lock.close();
+    } else {
+        QnAppServerFileCache::clearLocalCache();
+    }
+}

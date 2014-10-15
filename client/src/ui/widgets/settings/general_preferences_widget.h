@@ -41,6 +41,7 @@ private slots:
     void at_timeModeComboBox_activated();
 
     void at_browseLogsButton_clicked();
+    void at_clearCacheButton_clicked();
 
 private:
     QScopedPointer<Ui::GeneralPreferencesWidget> ui;
