@@ -24,7 +24,7 @@
 static const int BUFFER_SIZE = 1024;
 const unsigned char sid[] = "Network Optix SSL socket";
 
-    // TODO: public methods are visible to all, quite bad
+// TODO: public methods are visible to all, quite bad
 int sock_read(BIO *b, char *out, int outl)
 {
     QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(b);
@@ -36,7 +36,7 @@ int sock_read(BIO *b, char *out, int outl)
         }
         return ret;
     }
-    
+
     int ret=0;
     if (out != NULL)
     {
@@ -87,846 +87,1217 @@ int sock_write(BIO *b, const char *in, int inl)
 }
 
 namespace {
-static int sock_puts(BIO *bp, const char *str)
-{
-    return sock_write(bp, str, strlen(str));
-}
-
-static long sock_ctrl(BIO *b, int cmd, long num, void* /*ptr*/)
-{
-    long ret=1;
-
-    switch (cmd)
+    static int sock_puts(BIO *bp, const char *str)
     {
-    case BIO_C_SET_FD:
-        Q_ASSERT("Invalid proxy socket use!");
-        break;
-    case BIO_C_GET_FD:
-        Q_ASSERT("Invalid proxy socket use!");
-        break;
-    case BIO_CTRL_GET_CLOSE:
-        ret=b->shutdown;
-        break;
-    case BIO_CTRL_SET_CLOSE:
-        b->shutdown=(int)num;
-        break;
-    case BIO_CTRL_DUP:
-    case BIO_CTRL_FLUSH:
-        ret=1;
-        break;
-    default:
-        ret=0;
-        break;
+        return sock_write(bp, str, strlen(str));
     }
-    return(ret);
-}
 
-static int sock_new(BIO *bi)
-{
-    bi->init=1;
-    bi->num=0;
-    bi->ptr=NULL;
-    bi->flags=0;
-    return(1);
-}
-
-static int sock_free(BIO *a)
-{
-    if (a == NULL) return(0);
-    if (a->shutdown)
+    static long sock_ctrl(BIO *b, int cmd, long num, void* /*ptr*/)
     {
-        if (a->init)
+        long ret=1;
+
+        switch (cmd)
         {
-            QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(a);
-            if (sslSock)
-                sslSock->close();
+        case BIO_C_SET_FD:
+            Q_ASSERT("Invalid proxy socket use!");
+            break;
+        case BIO_C_GET_FD:
+            Q_ASSERT("Invalid proxy socket use!");
+            break;
+        case BIO_CTRL_GET_CLOSE:
+            ret=b->shutdown;
+            break;
+        case BIO_CTRL_SET_CLOSE:
+            b->shutdown=(int)num;
+            break;
+        case BIO_CTRL_DUP:
+        case BIO_CTRL_FLUSH:
+            ret=1;
+            break;
+        default:
+            ret=0;
+            break;
         }
-        a->init=0;
-        a->flags=0;
+        return(ret);
     }
-    return(1);
-}
 
-static BIO_METHOD Proxy_server_socket =
-{
-    BIO_TYPE_SOCKET,
-    "proxy server socket",
-    sock_write,
-    sock_read,
-    sock_puts,
-    NULL, // sock_gets, 
-    sock_ctrl,
-    sock_new,
-    sock_free,
-    NULL,
-};
+    static int sock_new(BIO *bi)
+    {
+        bi->init=1;
+        bi->num=0;
+        bi->ptr=NULL;
+        bi->flags=0;
+        return(1);
+    }
+
+    static int sock_free(BIO *a)
+    {
+        if (a == NULL) return(0);
+        if (a->shutdown)
+        {
+            if (a->init)
+            {
+                QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(a);
+                if (sslSock)
+                    sslSock->close();
+            }
+            a->init=0;
+            a->flags=0;
+        }
+        return(1);
+    }
+
+    static BIO_METHOD Proxy_server_socket =
+    {
+        BIO_TYPE_SOCKET,
+        "proxy server socket",
+        sock_write,
+        sock_read,
+        sock_puts,
+        NULL, // sock_gets, 
+        sock_ctrl,
+        sock_new,
+        sock_free,
+        NULL,
+    };
 
 }
 
 namespace {
 
-// SSL global lock. This is a must even if the compilation has configured with THREAD for OpenSSL.
-// Based on the documentation of OpenSSL, it internally uses lots of global data structure. Apart
-// from this, I have suffered the wired access violation when not give OpenSSL lock callback. The
-// documentation says 2 types of callback is needed, however the other one, thread id , is not a 
-// must since OpenSSL configured with thread support will give default version. Additionally, the
-// dynamic lock interface is not used in current OpenSSL version. So we don't use it.
 
-static std::mutex* kOpenSSLGlobalLock;
+    // SSL global lock. This is a must even if the compilation has configured with THREAD for OpenSSL.
+    // Based on the documentation of OpenSSL, it internally uses lots of global data structure. Apart
+    // from this, I have suffered the wired access violation when not give OpenSSL lock callback. The
+    // documentation says 2 types of callback is needed, however the other one, thread id , is not a 
+    // must since OpenSSL configured with thread support will give default version. Additionally, the
+    // dynamic lock interface is not used in current OpenSSL version. So we don't use it.
 
-void OpenSSLGlobalLock( int mode , int type , const char* file , int line ) {
-    Q_UNUSED(file);
-    Q_UNUSED(line);
-    Q_ASSERT( kOpenSSLGlobalLock != NULL );
-    if( mode & CRYPTO_LOCK ) {
-        kOpenSSLGlobalLock[type].lock();
-    } else {
-        kOpenSSLGlobalLock[type].unlock();
-    }
-}
+    static std::mutex* kOpenSSLGlobalLock;
 
-static std::once_flag kOpenSSLGlobalLockFlag;
-
-void OpenSSLInitGlobalLock() {
-    Q_ASSERT(kOpenSSLGlobalLock == NULL);
-    // not safe here, new can throw exception 
-    kOpenSSLGlobalLock = new std::mutex[CRYPTO_num_locks()];
-    CRYPTO_set_locking_callback( OpenSSLGlobalLock );
-}
-
-void InitOpenSSLGlobalLock() {
-    std::call_once(kOpenSSLGlobalLockFlag,OpenSSLInitGlobalLock);
-}
-
-SystemError::ErrorCode kSSLInternalError = 100;
-static std::size_t kAsyncSSLRecvBufferSize = 1024*100;
-
-class AsyncSSLOperation {
-public:
-    enum {
-        PENDING,
-        EXCEPTION,
-        SUCCESS,
-        END_OF_STREAM
-    };
-    virtual void Perform( int* ssl_return , int* ssl_error ) = 0;
-    void IncreasePendingIOCount() {
-        ++pending_io_count_;
-    }
-    void DecreasePendingIOCount() {
-        Q_ASSERT(pending_io_count_ !=0);
-        --pending_io_count_;
-        if( pending_io_count_ == 0 ) {
-            // Check if we can invoke the IO operations , if the IO
-            // status is not PENDING, then we can invoke such async
-            // SSL operation's user callback function here
-            if( exit_status_ != PENDING )
-                InvokeUserCallback();
-        }
-    }
-    void SetExitStatus( int exit_status , SystemError::ErrorCode error_code ) {
-        if( exit_status_ == PENDING ) {
-            exit_status_ = exit_status;
-            error_code_ = error_code;
-            if( pending_io_count_ == 0 ) {
-                InvokeUserCallback();
-            }
-        }
-    }
-    AsyncSSLOperation( SSL* ssl ) :
-        pending_io_count_(0),
-        exit_status_(PENDING),
-        error_code_(SystemError::noError),
-        ssl_(ssl)
-    {}
-    ~AsyncSSLOperation() {
-        Q_ASSERT( pending_io_count_ == 0 );
-    }
-protected:
-    virtual void InvokeUserCallback() = 0;
-    void Reset() {
-        pending_io_count_ = 0;
-        exit_status_ = PENDING;
-        error_code_ = SystemError::noError;
-    }
-    int pending_io_count_;
-    int exit_status_;
-    SystemError::ErrorCode error_code_;
-    SSL* ssl_;
-};
-
-class AsyncRead : public AsyncSSLOperation {
-public:
-    virtual void Perform( int* ssl_return , int* ssl_error ) {
-        int old_size = read_buffer_->size();
-        int read_size = read_buffer_->capacity() - old_size;
-        read_buffer_->resize( read_buffer_->capacity() );
-        *ssl_return = SSL_read(ssl_,read_buffer_->data()+old_size,read_size);
-        *ssl_error = SSL_get_error(ssl_,*ssl_return);
-        if( *ssl_return<=0 ) {
-            read_buffer_->resize(old_size);
+    void OpenSSLGlobalLock( int mode , int type , const char* file , int line ) {
+        Q_UNUSED(file);
+        Q_UNUSED(line);
+        Q_ASSERT( kOpenSSLGlobalLock != NULL );
+        if( mode & CRYPTO_LOCK ) {
+            kOpenSSLGlobalLock[type].lock();
         } else {
-            read_buffer_->resize(old_size+*ssl_return);
-            read_bytes_ += *ssl_return;
+            kOpenSSLGlobalLock[type].unlock();
         }
     }
-    void Reset( nx::Buffer* buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& handler ) {
-        read_buffer_ = buffer;
-        handler_ = std::move(handler);
-        read_bytes_ = 0;
-        AsyncSSLOperation::Reset();
-    }
-    AsyncRead( SSL* ssl ) : AsyncSSLOperation(ssl) {}
-protected:
-    virtual void InvokeUserCallback() {
-        switch( exit_status_ ) {
-        case AsyncSSLOperation::EXCEPTION:
-            handler_(error_code_, (std::numeric_limits<std::size_t>::max)() );
-            return;
-        case AsyncSSLOperation::SUCCESS:
-            handler_(SystemError::noError,read_bytes_);
-            return;
-        case AsyncSSLOperation::END_OF_STREAM:
-            handler_(SystemError::noError,0);
-            return;
-        default: Q_ASSERT(false); return;
-        }
-    }
-private:
-    nx::Buffer* read_buffer_;
-    std::function<void(SystemError::ErrorCode,std::size_t)> handler_;
-    std::size_t read_bytes_;
-};
 
-class AsyncWrite : public AsyncSSLOperation {
-public:
-    virtual void Perform( int* ssl_return , int* ssl_error ) {
-        Q_ASSERT( !write_buffer_->isEmpty() );
-        *ssl_return = SSL_write(
-            ssl_,write_buffer_->constData(),write_buffer_->size());
-        *ssl_error = SSL_get_error(ssl_,*ssl_return);
-    }
-    void Reset( const nx::Buffer* buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& handler ) {
-        write_buffer_ = buffer;
-        handler_ = std::move(handler);
-        AsyncSSLOperation::Reset();
-    }
-    AsyncWrite( SSL* ssl ) : AsyncSSLOperation(ssl) {}
-protected:
-    virtual void InvokeUserCallback() {
-        switch( exit_status_ ) {
-        case AsyncSSLOperation::EXCEPTION:
-            handler_(kSSLInternalError, std::numeric_limits<std::size_t>::max() );
-            return;
-        case AsyncSSLOperation::END_OF_STREAM:
-            handler_(error_code_, std::numeric_limits<std::size_t>::max() );
-            return;
-        case AsyncSSLOperation::SUCCESS:
-            handler_(SystemError::noError,write_buffer_->size());
-            return;
-        default: Q_ASSERT(false); return;
-        }
-    }
-private:
-    const nx::Buffer* write_buffer_;
-    std::function<void(SystemError::ErrorCode,std::size_t)> handler_;
-};
+    static std::once_flag kOpenSSLGlobalLockFlag;
 
-class AsyncHandshake : public AsyncSSLOperation {
-public:
-    virtual void Perform( int* ssl_return , int* ssl_error ) {
-        *ssl_return = SSL_do_handshake(ssl_);
-        *ssl_error = SSL_get_error(ssl_,*ssl_return);
+    void OpenSSLInitGlobalLock() {
+        Q_ASSERT(kOpenSSLGlobalLock == NULL);
+        // not safe here, new can throw exception 
+        kOpenSSLGlobalLock = new std::mutex[CRYPTO_num_locks()];
     }
-    void Reset( std::function<void(SystemError::ErrorCode)>&& handler ) {
-        handler_ = std::move(handler);
-        AsyncSSLOperation::Reset();
-    }
-    AsyncHandshake( SSL* ssl ) : AsyncSSLOperation(ssl) {}
-protected:
-    virtual void InvokeUserCallback() {
-        switch( exit_status_ ) {
-        case AsyncSSLOperation::EXCEPTION:
-            handler_(error_code_);
-            return;
-        case AsyncSSLOperation::END_OF_STREAM:
-            handler_(kSSLInternalError);
-            return;
-        case AsyncSSLOperation::SUCCESS:
-            handler_(SystemError::noError);
-            return;
-        default: Q_ASSERT(false); return;
-        }
-    }
-private:
-    std::function<void(SystemError::ErrorCode)> handler_;
-};
 
-class AsyncSSL {
-public:
-    AsyncSSL( SSL* ssl , AbstractStreamSocket* underly_socket , bool is_server );
-    ~AsyncSSL();
-public:
-    // BIO operation function. These 2 BIO operation function will simulate BIO memory
-    // type. For read, it will simply checks the input read buffer, and for write operations
-    // it will write the data into the write buffer and then the upper will detect what
-    // needs to send out. This style makes the code easier and simpler and also since we
-    // have PendingIOCount, all the user callback function will be invoked in proper order
-    std::size_t BIOWrite( const void* data , std::size_t size );
-    std::size_t BIORead ( void* data , std::size_t size );
-    bool eof() const {
-        return eof_;
+    void InitOpenSSLGlobalLock() {
+        std::call_once(kOpenSSLGlobalLockFlag,OpenSSLInitGlobalLock);
     }
-    // Asynchronous operation
-    bool AsyncSend( const nx::Buffer& buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& handler );
-    bool AsyncRecv( nx::Buffer* buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& handler );
-    void WaitForAllPendingIOFinish() {
-        underly_socket_->cancelAsyncIO();
-    }
-private:
-    void AsyncPerform( AsyncSSLOperation* operation );
-    // Perform the corresponding SSL operations that is outstanding here.
-    // Since all the operation will be serialized inside of a single thread.
-    // We can simply pass all the parameter all around as a function parameter.
-    void Perform( AsyncSSLOperation* operation );
-    // Check whether SSL has been shutdown or not for this situations. 
-    void CheckShutdown( int ssl_return , int ssl_error );
-    // Handle SSL internal error 
-    void HandleSSLError( int ssl_return , int ssl_error );
-    // These 2 functions will issue the read/write operations directly to the underlying
-    // socket. It will use context variable outstanding_read_/outstanding_write_ operations
-    void EnqueueRead( AsyncSSLOperation* operation );
-    void DoRead();
-    void DoWrite();
-    void EnqueueWrite();
-    void DoHandshake( AsyncSSLOperation* next_op );
 
-    void OnUnderlySocketRecv( SystemError::ErrorCode error_code , std::size_t bytes_transferred );
-    void OnUnderlySocketSend( SystemError::ErrorCode error_code , std::size_t bytes_transferred );
-    void OnUnderlySocketConn( SystemError::ErrorCode error_code );
+    class AsyncSSL;
+    class AsyncSSLOperation;
+    class AsyncSSLRead;
+    class AsyncSSLWrite;
+    class AsyncSSLHandshake;
 
-    void ContinueRead();
-    void ContinueWrite();
-protected:
-    AbstractStreamSocket* socket() {
-        return underly_socket_;
-    }
-    void InjectSnifferData( const nx::Buffer& buffer ) {
-        underly_socket_recv_buffer_.append(buffer);
-    }
-    enum {
-        HANDSHAKE_NOT_YET,
-        HANDSHAKE_PENDING,
-        HANDSHAKE_DONE
-    };
-    void SetHandshakeStage( int handshake_stage ) {
-        handshake_stage_ = handshake_stage;
-    }
-private:
-    // Operations
-    std::unique_ptr<AsyncRead> read_;
-    std::unique_ptr<AsyncWrite> write_;
-    std::unique_ptr<AsyncHandshake> handshake_;
-    // Handshake
-    std::list<AsyncSSLOperation*> handshake_queue_;
-    // Read
-    bool allow_bio_read_;
-    nx::Buffer underly_socket_recv_buffer_;
-    std::size_t recv_buffer_read_pos_;
-    std::list<AsyncSSLOperation*> read_queue_;
-    AsyncSSLOperation* outstanding_read_;
-    // Write
-    struct PendingWrite {
-        nx::Buffer write_buffer;
-        AsyncSSLOperation* operation;
-        PendingWrite( PendingWrite&& write ) {
-            write_buffer = std::move(write.write_buffer);
-            operation = write.operation;
-        }
-        PendingWrite():operation(NULL){}
-        bool NeedWrite() const {
-            return !write_buffer.isEmpty();
-        }
-        void Reset( AsyncSSLOperation* op ) {
-            operation = op;
-            write_buffer.clear();
-        }
-    };
-    std::list<PendingWrite> write_queue_;
-    PendingWrite* outstanding_write_;
-    PendingWrite current_write_;
-    // SSL related
-    SSL* ssl_;
-    bool eof_;
-    bool is_server_;
-    int handshake_stage_;
-    AbstractStreamSocket* underly_socket_;
-    // A deletion flag must be used to protect the read/write
-    class DeletionFlag {
+    static const SystemError::ErrorCode kSSLInternalErrorCode = 100;
+    static const std::size_t kRecvBufferSize = 1024*64; // 64KB
+
+    class AsyncSSLOperation {
     public:
-        DeletionFlag( AsyncSSL* ssl ) : flag_( false ) , ssl_(ssl) {
-            ssl->deletion_flag_ = &flag_;
+        virtual void Perform( int* return_value , int* ssl_error ) = 0;
+        // For each IO operations that issued with underlying socket, called
+        // the pair function here.
+        void IncreasePendingIOCount() {
+            ++pending_io_count_;
         }
-        ~DeletionFlag() {
-            if( flag_ != true ) {
-                ssl_->deletion_flag_ = NULL;
+
+        void DecreasePendingIOCount() {
+            Q_ASSERT(pending_io_count() != 0);
+            --pending_io_count_;
+            if( pending_io_count() == 0 && status() != EXECUTING ) {
+                InvokeUserFinializeHandler();
             }
         }
-        operator bool () const {
-            return flag_;
+
+        void DecreasePendingIOCount( int status , SystemError::ErrorCode error_code ) {
+            SetExitStatus(status,error_code);
+            DecreasePendingIOCount();
         }
-        void Reset() {
-            flag_ = false;
+
+        int pending_io_count() const {
+            return pending_io_count_.load(std::memory_order_acquire);
         }
-    private:
-        bool flag_;
-        AsyncSSL* ssl_;
-    };
-    bool* deletion_flag_;
-    friend class DeletionFlag;
-};
 
-AsyncSSL::AsyncSSL( SSL* ssl , AbstractStreamSocket* underly_socket , bool is_server ) :
-    read_( new AsyncRead(ssl) ),
-    write_( new AsyncWrite(ssl) ),
-    handshake_( new AsyncHandshake(ssl) ),
-    allow_bio_read_(false),
-    recv_buffer_read_pos_(0),
-    ssl_(ssl),
-    eof_(false),
-    is_server_(is_server),
-    handshake_stage_(HANDSHAKE_NOT_YET),
-    underly_socket_(underly_socket),
-    deletion_flag_(NULL){
-        underly_socket_recv_buffer_.reserve(kAsyncSSLRecvBufferSize);
-}
+        enum {
+            EXECUTING,
+            FAIL,
+            SUCCESS,
+            END_OF_STREAM
+        };
 
-AsyncSSL::~AsyncSSL() {
-    if( deletion_flag_ != NULL ) {
-        *deletion_flag_ = true;
-    }
-}
-
-void AsyncSSL::Perform( AsyncSSLOperation* operation ) {
-    int ssl_return , ssl_error ;
-    // Setting up the write buffer here
-    current_write_.Reset(operation);
-    // Perform the underlying SSL operations
-    operation->Perform(&ssl_return,&ssl_error);
-    // Check the EOF/SHUTDOWN status of the ssl 
-    CheckShutdown(ssl_return,ssl_error);
-    // Handle each ssl error accordingly here
-    if( eof() ) {
-        operation->SetExitStatus(AsyncSSLOperation::END_OF_STREAM,SystemError::noError);
-        return;
-    }
-    // Handle existed write here
-    if( current_write_.NeedWrite() ) {
-        EnqueueWrite();
-    }
-    switch( ssl_error ) {
-    case SSL_ERROR_NONE: 
-        // The SSL operation has been finished here
-        operation->SetExitStatus(AsyncSSLOperation::SUCCESS,SystemError::noError);
-        break;
-    case SSL_ERROR_WANT_READ:
-        EnqueueRead( operation );
-        break;
-    case SSL_ERROR_WANT_WRITE:
-        break;
-    default:
-        HandleSSLError(ssl_return,ssl_error);
-        operation->SetExitStatus(AsyncSSLOperation::EXCEPTION,kSSLInternalError);
-        break;
-    }
-}
-
-void AsyncSSL::CheckShutdown( int ssl_return , int ssl_error ) {
-    Q_UNUSED(ssl_return);
-    if( SSL_get_shutdown(ssl_) == SSL_RECEIVED_SHUTDOWN || 
-        ssl_error == SSL_ERROR_ZERO_RETURN ) {
-            // This should be the normal shutdown which means the
-            // peer at least call SSL_shutdown once
-            eof_ = true;
-    } else if( ssl_error == SSL_ERROR_SYSCALL ) {
-        // Brute shutdown for SSL connection
-        if( ERR_get_error() == 0 ) {
-            eof_ = true;
+        int status() const {
+            return status_.load( std::memory_order_acquire );
         }
-    }
-}
 
-const char* SSLErrorStr( int ssl_error ) {
-    switch(ssl_error) {
-    case SSL_ERROR_SSL: 
-        return "SSL_ERROR_SSL";
-    case SSL_ERROR_SYSCALL:
-        return "SSL_ERROR_SYSCALL";
-    default:
-        return "<ssl not a real error>";
-    }
-}
-
-void AsyncSSL::HandleSSLError( int ssl_return , int ssl_error ) {
-    Q_UNUSED(ssl_return);
-    NX_LOG(
-        lit("SSL error code:%1\n").arg(QLatin1String(SSLErrorStr(ssl_error))),
-        cl_logDEBUG1 );
-    qDebug()<<QLatin1String(SSLErrorStr(ssl_error));
-    int err;
-    while( (err = ERR_get_error()) != 0 ) {
-        char err_str[1024];
-        ERR_error_string_n(err,err_str,1024);
-        NX_LOG(
-            lit("SSL error stack:%1\n").arg(QLatin1String(err_str)),cl_logDEBUG1);
-        qDebug()<<QLatin1String(err_str);
-    }
-    NX_LOG(
-        lit("System error code:%1\n").arg(SystemError::getLastOSErrorCode()),cl_logDEBUG1);
-
-}
-
-void AsyncSSL::OnUnderlySocketRecv( SystemError::ErrorCode error_code , std::size_t bytes_transferred ) {
-    if( error_code != SystemError::noError ) {
-        outstanding_read_->SetExitStatus(AsyncSSLOperation::EXCEPTION,error_code);
-        outstanding_read_->DecreasePendingIOCount();
-        ContinueRead();
-        return;
-    } else {
-        if( bytes_transferred == 0 ) {
-            eof_ = true;
-        }
-        // Since we are gonna invoke user's callback here, so a deletion flag will
-        // help us to avoid reuse member object once the user deleted such object 
-        DeletionFlag deleted(this);
-        // Set up the flag to let the user runs into the read operation's returned buffer
-        allow_bio_read_ = true;
-        Perform(outstanding_read_);
-        if( !deleted ) {
-            outstanding_read_->DecreasePendingIOCount();
-            if( !deleted ) {
-                allow_bio_read_ = false;
-                ContinueRead();
-            }
-        }
-    }
-}
-
-void AsyncSSL::EnqueueRead( AsyncSSLOperation* operation ) {
-    read_queue_.push_back(operation);
-    if( read_queue_.size() ==1 ) {
-        outstanding_read_ = read_queue_.front();
-        DoRead();
-    }
-}
-
-void AsyncSSL::ContinueRead() {
-    read_queue_.pop_front();
-    if( !read_queue_.empty() ) {
-        outstanding_read_ = read_queue_.front();
-        DoRead();
-    }
-}
-
-void AsyncSSL::DoRead() {
-    // Setting up the outstanding read here
-    outstanding_read_ = read_queue_.front();
-    // Checking if we have some data lefts inside of the read buffer, if so
-    // we could just call SSL operation right here. And since this function
-    // is executed inside of AIO thread, no recursive lock will happened in
-    // user's callback function. 
-    if( static_cast<int>(recv_buffer_read_pos_) < underly_socket_recv_buffer_.size() ) {
-        outstanding_read_->IncreasePendingIOCount();
-        OnUnderlySocketRecv(SystemError::noError,
-            underly_socket_recv_buffer_.size() - recv_buffer_read_pos_ );
-    } else {
-        // We have to issue our operations right just here since we have no
-        // left data inside of the buffer and our user needs to read all the
-        // data out in the buffer here. 
-        bool ret = underly_socket_->readSomeAsync(
-            &underly_socket_recv_buffer_,
-            std::bind(
-            &AsyncSSL::OnUnderlySocketRecv,
-            this,
-            std::placeholders::_1,
-            std::placeholders::_2));
-        if(!ret) {
-            outstanding_read_->SetExitStatus( AsyncSSLOperation::EXCEPTION , SystemError::getLastOSErrorCode() );
-        } else {
-            outstanding_read_->IncreasePendingIOCount();
-        }
-    }
-}
-
-void AsyncSSL::OnUnderlySocketSend( SystemError::ErrorCode error_code , std::size_t bytes_transferred ) {
-    Q_UNUSED(bytes_transferred);
-    if( error_code != SystemError::noError ) {
-        outstanding_write_->operation->SetExitStatus(AsyncSSLOperation::EXCEPTION,error_code);
-        outstanding_write_->operation->DecreasePendingIOCount();
-        ContinueWrite();
-        return;
-    } else {
-        // For read operations, if it succeeded, we don't need to call Perform
-        // since this operation has been go ahead for that SSL_related operations.
-        // What we need to do is just decrease user's pending IO count value.
-        DeletionFlag deleted(this);
-        outstanding_write_->operation->DecreasePendingIOCount();
-        if( !deleted ) {
-            ContinueWrite();
-        }
-    }
-}
-
-void AsyncSSL::DoWrite() {
-    bool ret = underly_socket_->sendAsync(
-        outstanding_write_->write_buffer,
-        std::bind(
-        &AsyncSSL::OnUnderlySocketSend,
-        this,
-        std::placeholders::_1,
-        std::placeholders::_2));
-    if(!ret) {
-        outstanding_write_->operation->SetExitStatus( 
-            AsyncSSLOperation::EXCEPTION, SystemError::getLastOSErrorCode() );
-    } else {
-        outstanding_write_->operation->IncreasePendingIOCount();
-    }
-}
-
-void AsyncSSL::EnqueueWrite() {
-    write_queue_.push_back(std::move(current_write_));
-    if( write_queue_.size() == 1 ) {
-        outstanding_write_ = &(write_queue_.front());
-        DoWrite();
-    }
-}
-
-void AsyncSSL::ContinueWrite() {
-    write_queue_.pop_front();
-    if( !write_queue_.empty() ) {
-        outstanding_write_ = &(write_queue_.front());
-        DoWrite();
-    }
-}
-
-std::size_t AsyncSSL::BIORead( void* data , std::size_t size ) {
-    if( allow_bio_read_ ) {
-        if( underly_socket_recv_buffer_.size() == static_cast<int>(recv_buffer_read_pos_) ) {
-            return 0;
-        } else {
-            std::size_t digest_size = 
-                std::min(size, 
-                    static_cast<int>(underly_socket_recv_buffer_.size()) - recv_buffer_read_pos_ );
-            memcpy(data,
-                   underly_socket_recv_buffer_.constData() + recv_buffer_read_pos_ ,
-                   digest_size);
-            recv_buffer_read_pos_ += digest_size;
-            if( static_cast<int>(recv_buffer_read_pos_) == underly_socket_recv_buffer_.size() ) {
-                recv_buffer_read_pos_ = 0;
-                underly_socket_recv_buffer_.clear();
-                underly_socket_recv_buffer_.reserve( static_cast<int>(kAsyncSSLRecvBufferSize) );
-            }
-            return digest_size;
-        }
-    }
-    return 0;
-}
-
-std::size_t AsyncSSL::BIOWrite( const void* data , std::size_t size ) {
-    current_write_.write_buffer.append(static_cast<const char*>(data),size);
-    return size;
-}
-
-void AsyncSSL::OnUnderlySocketConn( SystemError::ErrorCode error_code ) {
-    if( error_code != SystemError::noError ) {
-        // No, we cannot connect to the peer sides, so we just tell our user
-        // that we have expired whatever we've got currently 
-        for( auto op : handshake_queue_ ) {
-            DeletionFlag deleted(this);
-            op->SetExitStatus( AsyncSSLOperation::EXCEPTION , error_code );
-            if( deleted )
-                return;
-        }
-        handshake_queue_.clear();
-        handshake_stage_ = HANDSHAKE_NOT_YET;
-    } else {
-        for( auto op : handshake_queue_ ) {
-            DeletionFlag deleted(this);
-            Perform(op);
-            if( deleted )
-                return;
-        }
-        handshake_queue_.clear();
-        handshake_stage_ = HANDSHAKE_DONE;
-    }
-}
-
-void AsyncSSL::DoHandshake( AsyncSSLOperation* next_op ) {
-    handshake_queue_.push_back(next_op);
-    if( is_server_ ) {
-        SSL_set_accept_state(ssl_);
-    } else {
-        SSL_set_connect_state(ssl_);
-    }
-    handshake_->Reset(
-        std::bind(
-        &AsyncSSL::OnUnderlySocketConn,
-        this,
-        std::placeholders::_1));
-    Perform(handshake_.get());
-}
-
-void AsyncSSL::AsyncPerform( AsyncSSLOperation* operation ) {
-    switch( handshake_stage_ ) {
-    case HANDSHAKE_NOT_YET:
-        handshake_stage_ = HANDSHAKE_PENDING;
-        DoHandshake(operation);
-        break;
-    case HANDSHAKE_PENDING:
-        handshake_queue_.push_back(operation);
-        break;
-    case HANDSHAKE_DONE:
-        Perform(operation);
-        break;
-    default: Q_ASSERT(0); return;
-    }
-}
-
-bool AsyncSSL::AsyncSend( const nx::Buffer& buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& handler ) {
-    write_->Reset(&buffer,std::move(handler));
-    AsyncPerform(write_.get());
-    return true;
-}
-
-bool AsyncSSL::AsyncRecv( nx::Buffer* buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& handler ) {
-    read_->Reset(buffer,std::move(handler));
-    AsyncPerform(read_.get());
-    return true;
-}
-
-class MixedAsyncSSL : public AsyncSSL {
-public:
-
-    struct SnifferData {
-        std::function<void(SystemError::ErrorCode,std::size_t)> ssl_cb;
-        std::function<void(SystemError::ErrorCode,std::size_t)> other_cb;
-        nx::Buffer* buffer;
-        SnifferData( const std::function<void(SystemError::ErrorCode,std::size_t)>& ssl , 
-            const std::function<void(SystemError::ErrorCode,std::size_t)>& other,
-            nx::Buffer* buf ) :
-            ssl_cb(ssl),
-            other_cb(other),
-            buffer(buf){}
-    };
-
-public:
-    static const int kSnifferDataHeaderLength = 2;
-
-    MixedAsyncSSL( SSL* ssl , AbstractStreamSocket* socket )
-        :AsyncSSL(ssl,socket,true),
-        is_initialized_(false),
-        is_ssl_(false){}
-
-    // User could not issue a async_send before a async_recv . Otherwise
-    // we are in trouble since we don't know the type of the underly socking
-    void AsyncSend(
-        const nx::Buffer& buffer, std::function<void(SystemError::ErrorCode,std::size_t)>&& op ) {
-            // When you see this, it means you screw up since the very first call should 
-            // be a async_recv instead of async_send here . 
-            Q_ASSERT(is_initialized_);
-            Q_ASSERT(is_ssl_);
-            AsyncSSL::AsyncSend(buffer,std::move(op));
-    }
-
-    void AsyncRecv( nx::Buffer* buffer, 
-         std::function<void(SystemError::ErrorCode,std::size_t)>&& ssl ,
-         std::function<void(SystemError::ErrorCode,std::size_t)>&& other ) {
-            if( !is_initialized_ ) {
-                // We need to sniffer the buffer here
-                sniffer_buffer_.reserve(kSnifferDataHeaderLength);
-                socket()->
-                    readSomeAsync(
-                    &sniffer_buffer_,
-                    std::bind(
-                    &MixedAsyncSSL::Sniffer,
-                    this,
-                    std::placeholders::_1,
-                    std::placeholders::_2,
-                    SnifferData(std::move(ssl),std::move(other),buffer)));
+        void SetExitStatus( int st , SystemError::ErrorCode error_code ) {
+            if( status() == FAIL || status() == END_OF_STREAM ) {
                 return;
             } else {
-                Q_ASSERT(is_ssl_);
-                AsyncSSL::AsyncRecv(buffer,std::move(ssl));
+                status_.store(st,std::memory_order_release);
+                system_error_.store(error_code,std::memory_order_release);
             }
-    }
+        }
 
-    // When blocking version detects it is an SSL, it has to notify me
-    void set_ssl( bool ssl ) {
-        is_initialized_ = true;
-        is_ssl_ = ssl;
-        AsyncSSL::SetHandshakeStage( AsyncSSL::HANDSHAKE_DONE );
-    }
+        virtual void OnHandshakeFail( SystemError::ErrorCode ) = 0;
+
+        AsyncSSLOperation( SSL* ssl , AsyncSSL* async_ssl ): 
+            pending_io_count_(0),
+            status_(EXECUTING),
+            system_error_(SystemError::noError),
+            ssl_(ssl),
+            async_ssl_(async_ssl) {}
+
+    protected:
+        // In the DecreasePendingIOCount, once the PendingIOCount becomes zero again
+        // it will call this function to invoke the user callback, this is a safe call.
+        virtual void InvokeUserFinializeHandler() = 0;
+        std::atomic<int> pending_io_count_;
+        std::atomic<int> status_;
+        std::atomic<SystemError::ErrorCode> system_error_;
+        SSL* ssl_;
+        AsyncSSL* async_ssl_;
+    };
+
+    class AsyncSSL : public std::enable_shared_from_this<AsyncSSL> {
+    public:
+        // BIO buffer read/write function.
+        int BioRead( void* data , std::size_t size );
+
+        int BioWrite( const void* data , std::size_t size ) {
+            current_op_context_.Write(data,size);
+            return static_cast<int>(size);
+        }
+
+        AsyncSSL( SSL* ssl , bool server , AbstractStreamSocket* socket );
+
+        bool AsyncSend( const nx::Buffer& data, std::function<void(SystemError::ErrorCode,std::size_t)> && callback );
+        bool AsyncRecv( nx::Buffer* data, std::function<void(SystemError::ErrorCode,std::size_t)> && callback );
+
+        int DrainSSLBuffer( nx::Buffer* buffer );
+
+        void InjectSnifferData( const nx::Buffer& buffer ) {
+            std::lock_guard<std::mutex> lock(ssl_mutex_);
+            bio_in_buffer_.append(buffer);
+
+        }
+
+        void WaitForAllPendingIOFinish() {
+            socket_->cancelAsyncIO();
+        }
+
+        bool eof() const {
+            return eof_;
+        }
+
+    private: // Handshake
+
+        void OnHandshakeDone( SystemError::ErrorCode ec );
+
+    private: // SSL perform
+
+        enum {
+            FINISH_SSL_READ,
+            FINISH_SSL_WRITE,
+            FINISH_SSL_READ_WRITE
+        };
+
+        // Call the following 3 functions to start each different SSL_read/SSL_write/SSL_conn
+        void Perform( std::shared_ptr<AsyncSSLOperation>&& op , bool is_read );
+        void PerformSSLRead( std::shared_ptr<AsyncSSLOperation>&& op );
+        void PerformSSLWrite( std::shared_ptr<AsyncSSLOperation>&& op );
+        void PerformSSLConn();
+
+        bool PerformSSLForRead( int* ssl_error , const std::shared_ptr<AsyncSSLOperation>& op  );
+
+        bool PerformSSLForWrite(int* ssl_error , const std::shared_ptr<AsyncSSLOperation>& op  );
+
+        void CheckSSLShutdown( int status_code , int ssl_error );
+
+        bool HandlePerformSSLResult( int ssl_error , bool ssl_io , std::shared_ptr<AsyncSSLOperation>&& op );
+
+        void HandleSSLError( int ssl_error );
+
+        static const char* SSLErrorStr( int ssl_error ) {
+            switch(ssl_error) {
+            case SSL_ERROR_SSL: 
+                return "SSL_ERROR_SSL";
+            case SSL_ERROR_SYSCALL:
+                return "SSL_ERROR_SYSCALL";
+            default:
+                return "<ssl not a real error>";
+            }
+        }
+
+    private: // Read
+
+        void DispatchRead( std::shared_ptr<AsyncSSLOperation>&& op );
+
+        void OnRecvBufferNotEmpty( const std::shared_ptr<AsyncSSLOperation>& op );
+
+        void OnUnderlySocketReadDone( SystemError::ErrorCode ec , std::size_t transferred_bytes , const std::shared_ptr<AsyncSSLOperation>& op );
+
+        void ContinueReadOperation();
+
+        bool DoRead( std::shared_ptr<AsyncSSLOperation>&& op );
+
+        void RemoveCurrentReadIO();
+
+    private: // Write
+
+        bool FinishSSLWrite( );
+
+        void DispatchWrite( bool can_write );
+
+        void OnUnderlySocketWriteDone( SystemError::ErrorCode ec, std::size_t transferred_bytes , const std::shared_ptr<AsyncSSLOperation>& op );
+
+        void RemoveCurrentWriteIO() ;
+
+        void ContinueWriteOperation();
+
+        // Do not call AsyncSSLOperation::DecreasePendingIOCount, since it will result in the deletion
+        // of the object, so using this wrapper function to get the weak pointer and then you can check
+        // that if such deletion is happened or not.
+        bool DecreaseOPPendingIOCount( int status , SystemError::ErrorCode ec , const std::shared_ptr<AsyncSSLOperation>& op );
+        bool DecreaseOPPendingIOCount( const std::shared_ptr<AsyncSSLOperation>& op );
+
+        struct PendingWriteIO;
+        bool DoWrite( PendingWriteIO* write_io );
 
 
-    bool is_initialized() const {
-        return is_initialized_;
-    }
+    private: // MISC
 
-    bool is_ssl() const {
-        return is_ssl_;
-    }
+        bool IsBIOInBufferEmpty() {
+            return bio_in_buffer_pos_ != bio_in_buffer_.size();
+        }
 
-private:
-    void Sniffer( SystemError::ErrorCode ec , std::size_t bytes_transferred , SnifferData data ) {
-        // We have the data in our buffer right now
-        if(ec) {
-            data.ssl_cb(ec,0);
-            return;
+        int DrainSSLBufferComponent( nx::Buffer* buffer , int bit_pos );
+
+    protected:
+
+        AbstractStreamSocket* socket() const {
+            return socket_;
+        }
+
+        std::mutex* ssl_mutex() const {
+            return &ssl_mutex_;
+        }
+
+        enum {
+            HANDSHAKE_UNINITIALIZE,
+            HANDSHAKE_PENDING,
+            HANDSHAKE_DONE
+        };
+
+        void set_handshake_state( int state ) {
+            handshake_state_ = state;
+        }
+
+    private:
+        bool allow_bio_in_buffer_;
+
+        nx::Buffer underly_socket_recv_buffer_;
+        std::size_t bio_in_buffer_pos_;
+        nx::Buffer bio_in_buffer_;
+
+        mutable std::mutex write_mutex_;
+        mutable std::mutex read_mutex_;
+        mutable std::mutex ssl_mutex_;
+        // Pending Read 
+        std::list<std::shared_ptr<AsyncSSLOperation> > pending_read_io_list_;
+
+        // Pending Write 
+        struct PendingWriteIO {
+            std::shared_ptr<AsyncSSLOperation> operation;
+            nx::Buffer data;
+            PendingWriteIO( nx::Buffer&& buffer , const std::shared_ptr<AsyncSSLOperation>& op ) :
+                operation(op),
+                data(std::move(buffer))
+            {}
+        };
+
+        std::list<std::unique_ptr<PendingWriteIO> > pending_write_io_list_;
+        AbstractStreamSocket* socket_;
+
+        // For handshake, there's a subtle problem regarding SSL handshake :
+        // If we allow the user to issue read/write simultaneously, then 
+        // only one operation is allowed to issued the SSL handshake operations.
+        // However, the user's issued operation needs to wait until the SSL
+        // handshake finish and then redispatch that. So we need some work around
+        // here as well. We cannot rely on the SSL_is_initialized function since
+        // it is not thread safe. What we can do is setting up a atomic flag to
+        // tell our user that the SSL handshake is pending, the operations he/she
+        // issued will be enqueued. And once the handshake is finished, we can
+        // re-issued those operation again.
+
+        int handshake_state_;
+        mutable std::mutex handshake_mutex_;
+        struct HandshakeQueuedOp {
+            std::function<void()> callback;
+            std::shared_ptr<AsyncSSLOperation> ssl_op;
+            HandshakeQueuedOp( std::function<void()>&& cb , const std::shared_ptr<AsyncSSLOperation>& o ) :
+                callback(std::move(cb)),
+                ssl_op(o){}
+        };
+        std::list< HandshakeQueuedOp >handshake_queue_;
+
+        // This pointer serves as a global pointer that makes SSL_read/write operations
+        // choose correct target queued operations. I have no way to make another buffered
+        // IO for underlying read/write callback function since the void* user data has been
+        // used for other purpose. 
+
+        struct CurrentSSLOperationContext {
+        public:
+            void Reset( std::shared_ptr<AsyncSSLOperation>&& op ) {
+                current_operation = std::move(op);
+                pending_write_buffer.clear();
+            }
+            void Write( const void* data , std::size_t len ) {
+                if( pending_write_buffer.isEmpty() ) {
+                    current_operation->IncreasePendingIOCount();
+                }
+                pending_write_buffer.append( 
+                    static_cast<const char*>(data) , static_cast<int>(len));
+            }
+            bool NeedWrite() {
+                return !pending_write_buffer.isEmpty();
+            }
+            std::shared_ptr<AsyncSSLOperation> current_operation;
+            nx::Buffer pending_write_buffer;
+        };
+
+        CurrentSSLOperationContext current_op_context_;
+
+        // EOF and SSL shutdown
+        bool eof_;
+        bool ssl_shutdown_;
+        // SSL
+        SSL* ssl_;
+        // Socket type
+        bool server_;
+    };
+
+    void AsyncSSL::OnHandshakeDone( SystemError::ErrorCode ec ) {
+        Q_ASSERT( handshake_state_ == HANDSHAKE_PENDING );
+        std::weak_ptr<AsyncSSL> self(shared_from_this());
+        if( ec ) {
+            {
+                std::lock_guard<std::mutex> lock(handshake_mutex_);
+                handshake_state_ = HANDSHAKE_UNINITIALIZE;
+            }
+            for( auto& op : handshake_queue_ ) {
+                op.ssl_op->OnHandshakeFail( ec );
+                if(self.expired()) {
+                    return;
+                }
+            }
+            handshake_queue_.clear();
         } else {
-            if( bytes_transferred == 0 ) {
+            {
+                std::lock_guard<std::mutex> lock(handshake_mutex_);
+                handshake_state_ = HANDSHAKE_DONE;
+            }
+            for( auto& op : handshake_queue_ ) {
+                op.callback();
+                if(self.expired()) {
+                    return;
+                }
+            }
+            handshake_queue_.clear();
+        }
+    }
+
+    int AsyncSSL::BioRead( void* data , std::size_t size ) {
+        // The BIO Read operations will have 2 underlying behavior, since we need to
+        // allow the certain function runs into the received buffer to get the real data.
+        // Since we cannot tell SSL what we want, we can only setup a flag to do so .
+        if( allow_bio_in_buffer_ ) {
+            std::size_t digest_size = 
+                std::min( size , static_cast<std::size_t>( bio_in_buffer_.size() - bio_in_buffer_pos_ ));
+            memcpy(data, bio_in_buffer_.constData()+bio_in_buffer_pos_, digest_size);
+            bio_in_buffer_pos_ += digest_size;
+            if( bio_in_buffer_pos_ == bio_in_buffer_.size() ) {
+                bio_in_buffer_pos_ = 0;
+                bio_in_buffer_.clear();
+            }
+            return static_cast<int>(digest_size);
+        } else {
+            // This is where we have return zero and then SSL will stuck on SSL_ERROR_WANT_READ, thus
+            // leading to the corresponding read operation being appended into the read_queue later on.
+            return 0;
+        }
+    }
+
+    int AsyncSSL::DrainSSLBuffer( nx::Buffer* buffer ) {
+        std::lock_guard<std::mutex> lock(ssl_mutex_);
+        int read_bytes = 0;
+        char byte;
+        while( SSL_read(ssl_,&byte,1) == 1 ) {
+            // We need to push back the lead byte here
+            buffer->push_back(byte);
+            read_bytes += 1;
+            for( int i = 0 ; i < 14 ; ++i )
+                read_bytes += DrainSSLBufferComponent(buffer,i);
+        }
+        Q_ASSERT(SSL_read(ssl_,&byte,1) <=0);
+        return read_bytes;
+    }
+
+    int AsyncSSL::DrainSSLBufferComponent( nx::Buffer* buffer , int bit_pos ) {
+        int read_bytes = 0;
+        const int size = 1 <<(bit_pos);
+        int old_size = buffer->size();
+        buffer->resize(size+old_size);
+        int ret = SSL_read(ssl_,(buffer->data()+old_size),size);
+        if( ret >0 ) {
+            buffer->resize(ret+old_size);
+            read_bytes = ret;
+        } else 
+            buffer->resize(old_size);
+        return read_bytes;
+    }
+
+    void AsyncSSL::DispatchRead( std::shared_ptr<AsyncSSLOperation>&& op ) {
+        bool can_read = false;
+        // Inserting this read operation into the queue
+        op->IncreasePendingIOCount();
+        {
+            std::list<std::shared_ptr<AsyncSSLOperation> > element;
+            element.push_back(std::move(op));
+            std::lock_guard<std::mutex> lock(read_mutex_);
+            pending_read_io_list_.splice( pending_read_io_list_.end() , std::move(element) );
+            if( pending_read_io_list_.size() == 1 )
+                can_read = true;
+        }
+        // Initialize a read operation 
+        if( can_read ) {
+            ContinueReadOperation();
+        }
+    }
+
+    void AsyncSSL::OnUnderlySocketReadDone( SystemError::ErrorCode ec , std::size_t transferred_bytes , const std::shared_ptr<AsyncSSLOperation>& op ) {
+        if( ec ) {
+            if( DecreaseOPPendingIOCount(AsyncSSLOperation::FAIL,ec,op)) {
+                RemoveCurrentReadIO();
+                ContinueReadOperation();
+            }
+            return;
+        }
+        Q_ASSERT(op->pending_io_count() != 0);
+        if( transferred_bytes == 0 ) {
+            eof_ = true;
+        } else {
+            // Inject the underly_recv_buffer_ into the bio_in_buffer_. For this operation, no
+            // lock is needed. Since this operation is still in pending queue so no other send
+            // will be issued until this operation is removed and made visible
+            bio_in_buffer_.append( underly_socket_recv_buffer_ );
+            // Clear will clear the internal buffer and set the capacity to zero, using resize
+            underly_socket_recv_buffer_.clear();
+            underly_socket_recv_buffer_.reserve(kRecvBufferSize);
+        }
+        // Now we are same as RecvBufferNotEmpty status.
+        OnRecvBufferNotEmpty(op);
+    }
+
+    void AsyncSSL::OnRecvBufferNotEmpty( const std::shared_ptr<AsyncSSLOperation>& op ) {
+        // This function is invoked when the read operation is pending but there're data left
+        // in the read buffer area. 
+        int ssl_error;
+        bool can_write = PerformSSLForRead(&ssl_error,op);
+        if( HandlePerformSSLResult(ssl_error,can_write,std::shared_ptr<AsyncSSLOperation>(op)) ) {
+            if( !DecreaseOPPendingIOCount(op) )
+                return;
+            RemoveCurrentReadIO();
+            ContinueReadOperation();
+        }
+    }
+
+    void AsyncSSL::ContinueReadOperation() {
+        std::shared_ptr<AsyncSSLOperation>* op;
+        do {
+            std::lock_guard<std::mutex> lock(read_mutex_);
+            if( !pending_read_io_list_.empty() ) {
+                op = &(pending_read_io_list_.front());
+            } else {
+                return;
+            }
+        } while( !DoRead(std::move(*op)) );
+    }
+
+    bool AsyncSSL::DoRead( std::shared_ptr<AsyncSSLOperation>&& op ) {
+        bool ret;
+        switch(op->status()) {
+        case AsyncSSLOperation::FAIL:
+        case AsyncSSLOperation::SUCCESS:
+        case AsyncSSLOperation::END_OF_STREAM:
+            ret = DecreaseOPPendingIOCount(op);
+            if( ret ) {
+                RemoveCurrentReadIO();
+                return false;
+            } else {
+                return true;
+            }
+        case AsyncSSLOperation::EXECUTING:
+            // If we have left data inside of the bio_in_buffer_ we don't
+            // need to issue any write operation but just invoke the read
+            if( IsBIOInBufferEmpty() ) {
+                // We have extra data here, so we just issue the read locally
+                OnRecvBufferNotEmpty(op);
+                // Since we have issued at least one read successfully, return true;
+                return true;
+            }
+            ret = socket_->readSomeAsync(
+                &underly_socket_recv_buffer_,
+                std::bind(
+                &AsyncSSL::OnUnderlySocketReadDone,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                op));
+            if(!ret) {
+                if( DecreaseOPPendingIOCount(AsyncSSLOperation::FAIL,
+                    SystemError::getLastOSErrorCode(),op) ) {
+                        RemoveCurrentReadIO();
+                        return false;
+                }
+                return true;
+            } else {
+                return true;
+            }
+        default: Q_ASSERT(0); return false;
+        }
+    }
+
+    void AsyncSSL::RemoveCurrentReadIO() {
+        std::lock_guard<std::mutex> lock(read_mutex_);
+        pending_read_io_list_.pop_front();
+    }
+
+    // This function is invoked to finish the write operation and transfer the current
+    // writing data from the current_op_context_ to the backend writing queue.
+
+    bool AsyncSSL::FinishSSLWrite() {
+        bool need_write = false;
+        if( !current_op_context_.NeedWrite() )
+            return false;
+        {
+            std::list<std::unique_ptr<PendingWriteIO> > ele;
+            ele.push_back( std::unique_ptr<PendingWriteIO>(
+                new PendingWriteIO(std::move(current_op_context_.pending_write_buffer),
+                current_op_context_.current_operation)));
+            // Lock
+            std::lock_guard<std::mutex> lock(write_mutex_);
+            pending_write_io_list_.splice(
+                pending_write_io_list_.end(),std::move(ele));
+            if( pending_write_io_list_.size() == 1 )
+                need_write = true;
+        }
+        return need_write;
+    }
+
+    void AsyncSSL::DispatchWrite( bool can_write ) {
+        if( can_write ) {
+            ContinueWriteOperation();
+        }
+    }
+
+    void AsyncSSL::OnUnderlySocketWriteDone( SystemError::ErrorCode ec, std::size_t transferred_bytes , const std::shared_ptr<AsyncSSLOperation>& op ) {
+        Q_UNUSED(transferred_bytes);
+        if( ec ) {
+            if( DecreaseOPPendingIOCount(AsyncSSLOperation::FAIL,ec,op) ) {
+                RemoveCurrentWriteIO();
+                ContinueWriteOperation();
+            }
+            return;
+        }
+        Q_ASSERT(op->pending_io_count() != 0);
+        // For write operation, the SSL socket has been issued ahead that it is success, so
+        // no need to use PerformSSL function but just invokes the Decrease function to invoke
+        // the user's callback function here.
+        if( DecreaseOPPendingIOCount(op) ) {
+            // Remove the current IO operations
+            RemoveCurrentWriteIO();
+            // Now we need to check the next buffered data inside of the write queue
+            ContinueWriteOperation();
+        }
+    }
+
+    void AsyncSSL::RemoveCurrentWriteIO() {
+        std::lock_guard<std::mutex> lock(write_mutex_);
+        pending_write_io_list_.pop_front();
+    }
+
+    void AsyncSSL::ContinueWriteOperation() {
+        PendingWriteIO* write_io;
+        do {
+            // Dequeue the pending write IO from the list 
+            std::lock_guard<std::mutex> lock(write_mutex_);
+            // Pop the current IO operations
+            if( !pending_write_io_list_.empty() ) {
+                write_io = pending_write_io_list_.front().get();
+            } else {
+                return;
+            }
+        } while( !DoWrite(write_io) ) ;
+    }
+
+    // Do not call AsyncSSLOperation::DecreasePendingIOCount, since it will result in the deletion
+    // of the object, so using this wrapper function to get the weak pointer and then you can check
+    // that if such deletion is happened or not.
+
+    bool AsyncSSL::DecreaseOPPendingIOCount( int status , SystemError::ErrorCode ec , const std::shared_ptr<AsyncSSLOperation>& op ) {
+        std::weak_ptr<AsyncSSL> ret(shared_from_this());
+        op->DecreasePendingIOCount(status,ec);
+        return !ret.expired();
+    }
+
+    bool AsyncSSL::DecreaseOPPendingIOCount( const std::shared_ptr<AsyncSSLOperation>& op ) {
+        std::weak_ptr<AsyncSSL> ret(shared_from_this());
+        op->DecreasePendingIOCount();
+        return !ret.expired();
+    }
+
+    bool AsyncSSL::DoWrite( PendingWriteIO* write_io ) {
+        bool ret;
+        switch( write_io->operation->status() ) {
+        case AsyncSSLOperation::FAIL:
+        case AsyncSSLOperation::END_OF_STREAM:
+            if( DecreaseOPPendingIOCount(write_io->operation) ) {
+                RemoveCurrentWriteIO();
+                return false;
+            } else {
+                return true;
+            }
+            break;
+        case AsyncSSLOperation::SUCCESS:
+        case AsyncSSLOperation::EXECUTING:
+            ret = socket_->sendAsync( write_io->data , std::bind(
+                &AsyncSSL::OnUnderlySocketWriteDone,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                write_io->operation));
+            if(!ret) {
+                ret = DecreaseOPPendingIOCount(
+                    AsyncSSLOperation::FAIL,
+                    SystemError::getLastOSErrorCode(),write_io->operation);
+                if( !ret )
+                    return true;
+                else {
+                    RemoveCurrentWriteIO();
+                    return false;
+                }
+            }
+            return true;
+        default: Q_ASSERT(0); return false;
+        }
+    }
+
+    // SSL perform
+
+    bool AsyncSSL::PerformSSLForRead( int* ssl_error , const std::shared_ptr<AsyncSSLOperation>& op ) {
+        bool need_write;
+        int return_value;
+        {
+            std::lock_guard<std::mutex> lock(ssl_mutex_);
+            current_op_context_.Reset(std::shared_ptr<AsyncSSLOperation>(op));
+            allow_bio_in_buffer_ = true;
+            op->Perform(&return_value,ssl_error);
+            allow_bio_in_buffer_ = false;
+            need_write = FinishSSLWrite();
+        }
+        return need_write;
+    }
+
+    bool AsyncSSL::PerformSSLForWrite( int* ssl_error , const std::shared_ptr<AsyncSSLOperation>& op ) {
+        bool need_write;
+        int return_value;
+        {
+            std::lock_guard<std::mutex> lock(ssl_mutex_);
+            current_op_context_.Reset(std::shared_ptr<AsyncSSLOperation>(op));
+            op->Perform(&return_value,ssl_error);
+            CheckSSLShutdown(return_value,*ssl_error);
+            need_write = FinishSSLWrite();
+        }
+        return need_write;
+    }
+
+    bool AsyncSSL::HandlePerformSSLResult( int ssl_error , bool need_write , std::shared_ptr<AsyncSSLOperation>&& op ) {
+        std::weak_ptr<AsyncSSL> ret(shared_from_this());
+        // Flushing the read operations
+        if(need_write) {
+            DispatchWrite(need_write);
+        }
+        // Checking EOF
+        if( eof() ) {
+            op->SetExitStatus(AsyncSSLOperation::END_OF_STREAM,0);
+            return !ret.expired();
+        }
+        switch(ssl_error) {
+        case SSL_ERROR_NONE:
+            // This operation is finished to some extent, if we have pending write operations
+            // we can detect it based on our PendingIOCount area in the AsyncSSLOperation, but
+            // here we are safe the decrease the HandlePerformSSLResult operations and set the
+            // status to Success. But if a Fail is already set, the Success set will be ignored
+            op->SetExitStatus(AsyncSSLOperation::SUCCESS,0);
+            break;
+        case SSL_ERROR_WANT_READ:
+            DispatchRead(std::move(op));
+            break;
+        case SSL_ERROR_WANT_WRITE:
+            // SSL will still have SSL_ERROR_WANT_WRITE although I satisfy its every request of 
+            // write operations. I have no idea why it works like this .
+            break;
+        default:
+            HandleSSLError(ssl_error);
+            // Since it is an exception, it can be a SSL_SHUTDOWN_ however we will always treat it
+            // as an error no matter what happened. 
+            op->SetExitStatus(AsyncSSLOperation::FAIL,kSSLInternalErrorCode);
+            break;
+        }
+        return !ret.expired();
+    }
+
+    void AsyncSSL::CheckSSLShutdown( int return_value , int ssl_error ) {
+        Q_UNUSED(return_value);
+        if( SSL_get_shutdown(ssl_) == SSL_RECEIVED_SHUTDOWN || 
+            ssl_error == SSL_ERROR_ZERO_RETURN ) {
+                // This should be the normal shutdown which means the
+                // peer at least call SSL_shutdown once
+                ssl_shutdown_ = true;
+        } else if( ssl_error == SSL_ERROR_SYSCALL ) {
+            // Brute shutdown for SSL connection
+            if( ERR_get_error() == 0 ) {
+                ssl_shutdown_ = true;
+            }
+        } else {
+            ssl_shutdown_ = eof_ ;
+        }
+    }
+
+    void AsyncSSL::HandleSSLError( int ssl_error ) {
+        std::lock_guard<std::mutex> lock(ssl_mutex_);
+        NX_LOG(
+            lit("SSL error code:%1\n").arg(QLatin1String(SSLErrorStr(ssl_error))),
+            cl_logDEBUG1 );
+        qDebug()<<QLatin1String(SSLErrorStr(ssl_error));
+        int err;
+        while( (err = ERR_get_error()) != 0 ) {
+            char err_str[1024];
+            ERR_error_string_n(err,err_str,1024);
+            NX_LOG(
+                lit("SSL error stack:%1\n").arg(QLatin1String(err_str)),cl_logDEBUG1);
+            qDebug()<<QLatin1String(err_str);
+        }
+        NX_LOG(
+            lit("System error code:%1\n").arg(SystemError::getLastOSErrorCode()),cl_logDEBUG1);
+    }
+
+    // Async Operation
+    class AsyncSSLRead : public AsyncSSLOperation {
+    public:
+        AsyncSSLRead( nx::Buffer* user_buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& callback ,
+            SSL* ssl , AsyncSSL* async_ssl ) :
+        AsyncSSLOperation(ssl,async_ssl),
+            user_callback_(std::move(callback)),
+            user_buffer_(user_buffer),
+            written_size_(0)
+        {}
+
+    protected:
+        virtual void InvokeUserFinializeHandler() {
+            switch(status()) {
+            case FAIL:
+                user_callback_( system_error_ , std::numeric_limits<std::size_t>::max() );
+                return;
+            case SUCCESS:
+                written_size_ += async_ssl_->DrainSSLBuffer(user_buffer_);
+                user_callback_( 0 , written_size_ );
+                return;
+            case END_OF_STREAM:
+                user_callback_( 0 , 0 );
+                return;
+            default:
+                Q_ASSERT(0); return;
+            }
+        }
+
+        virtual void Perform( int* return_value , int* ssl_error );
+
+        virtual void OnHandshakeFail( SystemError::ErrorCode ec ) {
+            user_callback_( ec , std::numeric_limits<std::size_t>::max() );
+        }
+
+    private:
+        std::function<void(SystemError::ErrorCode,std::size_t)> user_callback_;
+        nx::Buffer* user_buffer_;
+        std::size_t written_size_;
+    };
+
+    void AsyncSSLRead::Perform( int* return_value , int* ssl_error ) {
+        Q_ASSERT(user_buffer_->capacity() != 0);
+        std::size_t old_size = user_buffer_->size();
+        std::size_t empty_size= user_buffer_->capacity() - user_buffer_->size();
+        Q_ASSERT( empty_size > 0 );
+        user_buffer_->resize(static_cast<int>(empty_size)+user_buffer_->size());
+        void* buf = user_buffer_->data() + old_size;
+        int ssl_read_sz = SSL_read(ssl_,buf,static_cast<int>(empty_size));
+        if( ssl_read_sz <= 0 ) {
+            user_buffer_->resize(static_cast<int>(old_size));
+        } else {
+            user_buffer_->resize(static_cast<int>(old_size)+ssl_read_sz);
+            written_size_ += ssl_read_sz;
+        }
+        *return_value = ssl_read_sz;
+        if( ssl_read_sz <= 0 ) {
+            *ssl_error = SSL_get_error(ssl_,ssl_read_sz);
+        } else {
+            *ssl_error = SSL_ERROR_NONE;
+        }
+    }
+
+    class AsyncSSLWrite : public AsyncSSLOperation {
+    public:
+        AsyncSSLWrite( const nx::Buffer& user_buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& user_callback ,
+            SSL* ssl, AsyncSSL* async_ssl ) :
+        AsyncSSLOperation(ssl,async_ssl),
+            user_callback_(std::move(user_callback)),
+            user_buffer_(user_buffer)
+        {}
+
+    protected:
+        virtual void InvokeUserFinializeHandler() {
+            switch(status()) {
+            case FAIL:
+                user_callback_( system_error_ , std::numeric_limits<std::size_t>::max() );
+                return;
+            case END_OF_STREAM:
+                user_callback_( kSSLInternalErrorCode , std::numeric_limits<std::size_t>::max() );
+                return;
+            case SUCCESS:
+                user_callback_( 0 , static_cast<std::size_t>(user_buffer_.size()) );
+                return;
+            default:
+                Q_ASSERT(0); return;
+            }
+        }
+
+        virtual void OnHandshakeFail( SystemError::ErrorCode ec ) {
+            user_callback_( ec , std::numeric_limits<std::size_t>::max() );
+        }
+
+        virtual void Perform( int* return_value , int* ssl_error );
+    private:
+        std::function<void(SystemError::ErrorCode,std::size_t)> user_callback_;
+        const nx::Buffer& user_buffer_;
+    };
+
+    void AsyncSSLWrite::Perform( int* return_value , int* ssl_error ) {
+        // Write the data through SSL_write operations
+        Q_ASSERT(!user_buffer_.isEmpty());
+        *return_value = SSL_write(ssl_,user_buffer_.constData(),user_buffer_.size());
+        if( *return_value<=0 ) {
+            *ssl_error = SSL_get_error(ssl_,*return_value);
+        } else {
+            *ssl_error = SSL_ERROR_NONE;
+        }
+    }
+
+    class AsyncSSLHandshake : public AsyncSSLOperation {
+    public:
+        AsyncSSLHandshake( bool server , std::function<void(SystemError::ErrorCode)>&& user_callback ,
+            SSL* ssl, AsyncSSL* async_ssl ) :
+        AsyncSSLOperation(ssl,async_ssl),
+            user_callback_(std::move(user_callback))
+        {
+            if(server)
+                SSL_set_accept_state(ssl_);
+            else
+                SSL_set_connect_state(ssl_);
+        }
+
+        virtual void Perform( int* return_value , int* ssl_error ) {
+            *return_value = SSL_do_handshake(ssl_);
+            if( *return_value != 1 ) {
+                *ssl_error = SSL_get_error(ssl_,*return_value);
+            } else {
+                *ssl_error = SSL_ERROR_NONE;
+            }
+        }
+
+        virtual void InvokeUserFinializeHandler() {
+            switch(status()) {
+            case FAIL:
+                user_callback_( system_error_ );
+                return;
+            case END_OF_STREAM:
+                user_callback_( kSSLInternalErrorCode );
+                return;
+            case SUCCESS:
+                user_callback_( 0 );
+                return;
+            default:
+                Q_ASSERT(0); return;
+            }
+        }
+
+        virtual void OnHandshakeFail( SystemError::ErrorCode ec ) {
+            user_callback_( ec );
+        }
+
+    private:
+        std::function<void(SystemError::ErrorCode)> user_callback_;
+    };
+
+    // Perform each specific SSL operations
+
+    void AsyncSSL::PerformSSLRead( std::shared_ptr<AsyncSSLOperation>&& op   ) {
+        int return_value, ssl_error;
+        bool need_write;
+        {
+            // Do not call this function with SSL not initialized
+            std::lock_guard<std::mutex> lock(ssl_mutex_);
+            current_op_context_.Reset(std::shared_ptr<AsyncSSLOperation>(op));
+            op->Perform(&return_value,&ssl_error); 
+            CheckSSLShutdown(return_value,ssl_error);
+            need_write = FinishSSLWrite();
+        }
+        HandlePerformSSLResult(ssl_error,need_write,std::move(op));
+    }
+
+    void AsyncSSL::PerformSSLWrite( std::shared_ptr<AsyncSSLOperation>&& op ) {
+        int return_value,ssl_error;
+        bool need_write;
+        {
+            std::lock_guard<std::mutex> lock(ssl_mutex_);
+            current_op_context_.Reset(std::shared_ptr<AsyncSSLOperation>(op));
+            op->Perform(&return_value,&ssl_error);
+            CheckSSLShutdown(return_value,ssl_error);
+            need_write = FinishSSLWrite();
+        }
+        HandlePerformSSLResult(ssl_error,need_write,std::move(op));
+    }
+
+    void AsyncSSL::PerformSSLConn() {
+        AsyncSSLHandshake* handshake = new AsyncSSLHandshake(server_,
+            std::bind(&AsyncSSL::OnHandshakeDone,this,std::placeholders::_1),
+            ssl_,this);
+        std::shared_ptr<AsyncSSLOperation> op(handshake);
+        bool need_write;
+        int return_value,ssl_error;
+        {
+            std::lock_guard<std::mutex> lock(ssl_mutex_);
+            current_op_context_.Reset(std::shared_ptr<AsyncSSLOperation>(op));
+            op->Perform(&return_value,&ssl_error);
+            CheckSSLShutdown(return_value,ssl_error);
+            need_write = FinishSSLWrite();
+        }
+        HandlePerformSSLResult(ssl_error,need_write,std::move(op));
+    }
+
+    void AsyncSSL::Perform( std::shared_ptr<AsyncSSLOperation>&& op , bool is_read ) {
+        bool issue_ssl_conn = false;
+        if( handshake_state_ != HANDSHAKE_DONE ) {
+            std::lock_guard<std::mutex> lock(handshake_mutex_);
+            switch(handshake_state_) {
+            case HANDSHAKE_DONE:
+                break;
+            case HANDSHAKE_UNINITIALIZE:
+                // Issue the Handshake operations 
+                handshake_state_ = HANDSHAKE_PENDING;
+                issue_ssl_conn = true;
+                // Fallen through to enqueue this operations
+            case HANDSHAKE_PENDING:
+                handshake_queue_.push_back(
+                    HandshakeQueuedOp(
+                    [this,is_read,op](){
+                        // The move here is safe since the capture value is by value
+                        if(is_read) {
+                            PerformSSLRead(std::shared_ptr<AsyncSSLOperation>(op));
+                        } else {
+                            PerformSSLWrite(std::shared_ptr<AsyncSSLOperation>(op));
+                        }
+                },
+                    op));
+                break;
+            default: Q_ASSERT(0); return;
+            }
+        }
+        if( issue_ssl_conn ) {
+            PerformSSLConn();
+        }
+        if( handshake_state_ == HANDSHAKE_DONE ) {
+            if( is_read ) {
+                PerformSSLRead(std::move(op));
+            } else {
+                PerformSSLWrite(std::move(op));
+            }
+        }
+    }
+
+    bool AsyncSSL::AsyncRecv( nx::Buffer* data, std::function<void(SystemError::ErrorCode,std::size_t)> && callback ) {
+        std::shared_ptr<AsyncSSLOperation> op( new AsyncSSLRead(data,std::move(callback),ssl_,this) );
+        Perform(std::move(op),true);
+        return true;
+    }
+
+    bool AsyncSSL::AsyncSend( const nx::Buffer& data, std::function<void(SystemError::ErrorCode,std::size_t)> && callback ) {
+        std::shared_ptr<AsyncSSLOperation> op( new AsyncSSLWrite(data,std::move(callback),ssl_,this) );
+        Perform(std::move(op),false);
+        return true;
+    }
+
+    AsyncSSL::AsyncSSL( SSL* ssl , bool server , AbstractStreamSocket* socket )
+        :allow_bio_in_buffer_(false),
+        bio_in_buffer_pos_(0),
+        socket_(socket),
+        handshake_state_(HANDSHAKE_UNINITIALIZE),
+        eof_(false),
+        ssl_shutdown_(false),
+        ssl_(ssl),
+        server_(server){
+            // Initialize all the buffer related the AsyncSSL operations
+            underly_socket_recv_buffer_.reserve(kRecvBufferSize);
+    }
+
+    class MixedAsyncSSL : public AsyncSSL {
+    public:
+
+        struct SnifferData {
+            std::function<void(SystemError::ErrorCode,std::size_t)> ssl_cb;
+            std::function<void(SystemError::ErrorCode,std::size_t)> other_cb;
+            nx::Buffer* buffer;
+            SnifferData( const std::function<void(SystemError::ErrorCode,std::size_t)>& ssl , 
+                const std::function<void(SystemError::ErrorCode,std::size_t)>& other,
+                nx::Buffer* buf ) :
+            ssl_cb(ssl),
+                other_cb(other),
+                buffer(buf){}
+        };
+
+    public:
+        static const int kSnifferDataHeaderLength = 2;
+
+        MixedAsyncSSL( SSL* ssl , AbstractStreamSocket* socket )
+            :AsyncSSL(ssl,true,socket),
+            is_initialized_(false),
+            is_ssl_(false){}
+
+        // User could not issue a async_send before a async_recv . Otherwise
+        // we are in trouble since we don't know the type of the underly socking
+        void AsyncSend(
+            const nx::Buffer& buffer, std::function<void(SystemError::ErrorCode,std::size_t)>&& op ) {
+                // When you see this, it means you screw up since the very first call should 
+                // be a async_recv instead of async_send here . 
+                Q_ASSERT(is_initialized_);
+                Q_ASSERT(is_ssl_);
+                AsyncSSL::AsyncSend(buffer,std::move(op));
+        }
+
+        void AsyncRecv( nx::Buffer* buffer, 
+            std::function<void(SystemError::ErrorCode,std::size_t)>&& ssl ,
+            std::function<void(SystemError::ErrorCode,std::size_t)>&& other ) {
+                if( !is_initialized_ ) {
+                    // We need to sniffer the buffer here
+                    sniffer_buffer_.reserve(kSnifferDataHeaderLength);
+                    socket()->
+                        readSomeAsync(
+                        &sniffer_buffer_,
+                        std::bind(
+                        &MixedAsyncSSL::Sniffer,
+                        this,
+                        std::placeholders::_1,
+                        std::placeholders::_2,
+                        SnifferData(std::move(ssl),std::move(other),buffer)));
+                    return;
+                } else {
+                    Q_ASSERT(is_ssl_);
+                    AsyncSSL::AsyncRecv(buffer,std::move(ssl));
+                }
+        }
+
+        // When blocking version detects it is an SSL, it has to notify me
+        void set_ssl( bool ssl ) {
+            std::lock_guard<std::mutex> lock(*ssl_mutex());
+            is_initialized_ = true;
+            is_ssl_ = ssl;
+            AsyncSSL::set_handshake_state(AsyncSSL::HANDSHAKE_DONE);
+        }
+
+
+        bool is_initialized() const {
+            return is_initialized_;
+        }
+
+        bool is_ssl() const {
+            return is_ssl_;
+        }
+
+    private:
+        void Sniffer( SystemError::ErrorCode ec , std::size_t bytes_transferred , SnifferData data ) {
+            // We have the data in our buffer right now
+            if(ec) {
                 data.ssl_cb(ec,0);
                 return;
-            } else if( sniffer_buffer_.size() < 2 ) {
-                socket()->readSomeAsync(
-                    &sniffer_buffer_,
-                    std::bind(
-                    &MixedAsyncSSL::Sniffer,
-                    this,
-                    std::placeholders::_1,
-                    std::placeholders::_2,
-                    data));
-                return;
-            }
-            // Fix for the bug that always false in terms of comparison of 0x80
-            const unsigned char* buf = reinterpret_cast<unsigned char*>(sniffer_buffer_.data());
-            if( buf[0] == 0x80 || (buf[0] == 0x16 && buf[1] == 0x03) ) {
-                is_ssl_ = true;
-                is_initialized_ = true;
             } else {
-                is_ssl_ = false;
-                is_initialized_ = true;
-            }
-            // If we are SSL , we need to push the data into the buffer
-            AsyncSSL::InjectSnifferData( sniffer_buffer_ );
-            // If it is an SSL we still need to continue our async operation
-            // otherwise we call the failed callback for the upper usage class
-            // it should be QnMixedSSLSocket class
-            if( is_ssl_ ) {
-                // request a SSL async recv
-                AsyncSSL::AsyncRecv(data.buffer,std::move(data.ssl_cb));
-            } else {
-                // request a common async recv
-                socket()->readSomeAsync(data.buffer,data.other_cb);
+                if( bytes_transferred == 0 ) {
+                    data.ssl_cb(ec,0);
+                    return;
+                } else if( sniffer_buffer_.size() < 2 ) {
+                    socket()->readSomeAsync(
+                        &sniffer_buffer_,
+                        std::bind(
+                        &MixedAsyncSSL::Sniffer,
+                        this,
+                        std::placeholders::_1,
+                        std::placeholders::_2,
+                        data));
+                    return;
+                }
+                // Fix for the bug that always false in terms of comparison of 0x80
+                const unsigned char* buf = reinterpret_cast<unsigned char*>(sniffer_buffer_.data());
+                if( buf[0] == 0x80 || (buf[0] == 0x16 && buf[1] == 0x03) ) {
+                    is_ssl_ = true;
+                    is_initialized_ = true;
+                } else {
+                    is_ssl_ = false;
+                    is_initialized_ = true;
+                }
+                // If we are SSL , we need to push the data into the buffer
+                AsyncSSL::InjectSnifferData( sniffer_buffer_ );
+                // If it is an SSL we still need to continue our async operation
+                // otherwise we call the failed callback for the upper usage class
+                // it should be QnMixedSSLSocket class
+                if( is_ssl_ ) {
+                    // request a SSL async recv
+                    AsyncSSL::AsyncRecv(data.buffer,std::move(data.ssl_cb));
+                } else {
+                    // request a common async recv
+                    socket()->readSomeAsync(data.buffer,data.other_cb);
+                }
             }
         }
-    }
 
-private:
-    bool is_initialized_;
-    bool is_ssl_;
-    nx::Buffer sniffer_buffer_; 
+    private:
+        bool is_initialized_;
+        bool is_ssl_;
+        nx::Buffer sniffer_buffer_; 
 
-};
+    };
 
 }// namespace
 
@@ -941,7 +1312,7 @@ public:
     SSL_CTX* clientCTX;
 
     SSLStaticData()
-    :
+        :
         pkey( nullptr ),
         serverCTX( nullptr ),
         clientCTX( nullptr )
@@ -981,7 +1352,7 @@ public:
             pkey = nullptr;
         }
     }
-    
+
     static SSLStaticData* instance();
 };
 
@@ -1044,7 +1415,7 @@ public:
     std::shared_ptr<AsyncSSL> async_ssl_ptr;
 
     QnSSLSocketPrivate()
-    :
+        :
         wrappedSocket( nullptr ),
         ssl(nullptr),
         read(nullptr),
@@ -1066,7 +1437,7 @@ QnSSLSocket::QnSSLSocket(AbstractStreamSocket* wrappedSocket, bool isServerSide)
     d->extraBufferLen = 0;
     init();
     InitOpenSSLGlobalLock();
-    d->async_ssl_ptr.reset( new AsyncSSL(d->ssl,d->wrappedSocket,isServerSide) );
+    d->async_ssl_ptr.reset( new AsyncSSL(d->ssl,isServerSide,d->wrappedSocket) );
 }
 
 QnSSLSocket::QnSSLSocket(QnSSLSocketPrivate* priv, AbstractStreamSocket* wrappedSocket, bool isServerSide):
@@ -1228,9 +1599,9 @@ bool QnSSLSocket::getConnectionStatistics( StreamSocketInfo* info )
 }
 
 bool QnSSLSocket::connect(
-                     const QString& foreignAddress,
-                     unsigned short foreignPort,
-                     unsigned int timeoutMillis)
+    const QString& foreignAddress,
+    unsigned short foreignPort,
+    unsigned int timeoutMillis)
 {
     Q_D(QnSSLSocket);
     d->ecnryptionEnabled = true;
@@ -1419,23 +1790,17 @@ bool QnSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::function<voi
 bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const buffer , std::function<void( SystemError::ErrorCode, std::size_t )>&& handler )
 {
     Q_D(QnSSLSocket);
-    return d->wrappedSocket->post(
-        [this,buffer,handler]() {
-            Q_D(QnSSLSocket);
-            d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
-            d->async_ssl_ptr->AsyncRecv( buffer, std::function<void( SystemError::ErrorCode, std::size_t )>(handler) );
-        });
+    d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
+    d->async_ssl_ptr->AsyncRecv( buffer, std::move(handler) );
+    return true;
 }
 
 bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& buffer , std::function<void( SystemError::ErrorCode, std::size_t )>&& handler )
 {
     Q_D(QnSSLSocket);
-    return d->wrappedSocket->post(
-        [this,&buffer,handler]() {
-            Q_D(QnSSLSocket);
-            d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
-            d->async_ssl_ptr->AsyncSend( buffer, std::function<void( SystemError::ErrorCode, std::size_t )>(handler) );
-    });
+    d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
+    d->async_ssl_ptr->AsyncSend( buffer, std::move(handler) );
+    return true;
 }
 
 int QnSSLSocket::asyncRecvInternal( void* buffer , unsigned int bufferLen ) {
@@ -1445,7 +1810,7 @@ int QnSSLSocket::asyncRecvInternal( void* buffer , unsigned int bufferLen ) {
     Q_ASSERT(d->async_ssl_ptr != NULL);
     if(d->async_ssl_ptr->eof())
         return 0;
-    int ret = static_cast<int>(d->async_ssl_ptr->BIORead( buffer , bufferLen ));
+    int ret = d->async_ssl_ptr->BioRead( buffer , bufferLen );
     return ret == 0 ? -1 : ret;
 }
 
@@ -1453,7 +1818,7 @@ int QnSSLSocket::asyncSendInternal( const void* buffer , unsigned int bufferLen 
     Q_D(QnSSLSocket);
     Q_ASSERT(mode() == ASYNC);
     Q_ASSERT(d->async_ssl_ptr != NULL);
-    return static_cast<int>(d->async_ssl_ptr->BIOWrite(buffer,bufferLen));
+    return d->async_ssl_ptr->BioWrite(buffer,bufferLen);
 }
 
 bool QnSSLSocket::registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) {
@@ -1475,7 +1840,7 @@ public:
     bool useSSL;
 
     QnMixedSSLSocketPrivate()
-    :
+        :
         initState( true ),
         useSSL( false )
     {
@@ -1566,42 +1931,35 @@ bool QnMixedSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::functio
 bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const buffer, std::function<void( SystemError::ErrorCode , std::size_t )>&&  handler )
 {
     Q_D(QnMixedSSLSocket);
-    return d->wrappedSocket->post(
-        [this,buffer,handler]() {
-            Q_D(QnMixedSSLSocket);
-            d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
-            MixedAsyncSSL* ssl_ptr = 
-                static_cast< MixedAsyncSSL* >( d->async_ssl_ptr.get() );
-            if( !d->initState )
-                ssl_ptr->set_ssl(d->useSSL);
-            if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() ) {
-                d->wrappedSocket->readSomeAsync( buffer, handler );
-            } else {
-                ssl_ptr->AsyncRecv(buffer,
-                    std::function<void( SystemError::ErrorCode , std::size_t )>(handler),
-                    std::function<void( SystemError::ErrorCode , std::size_t )>(handler));
-            }
-    });
+    d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
+    MixedAsyncSSL* ssl_ptr = 
+        static_cast< MixedAsyncSSL* >( d->async_ssl_ptr.get() );
+    if( !d->initState )
+        ssl_ptr->set_ssl(d->useSSL);
+    if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() ) {
+        d->wrappedSocket->readSomeAsync( buffer, handler );
+    } else {
+        std::function<void( SystemError::ErrorCode , std::size_t )> h(handler);
+        ssl_ptr->AsyncRecv(buffer,std::move(h),std::move(handler));
+    }
+    return true;
 }
 
 //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
 bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& buffer, std::function<void( SystemError::ErrorCode , std::size_t )>&&  handler )
 {
     Q_D(QnMixedSSLSocket);
-    return d->wrappedSocket->post(
-        [this,&buffer,handler]() {
-            Q_D(QnMixedSSLSocket);
-            d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
-            MixedAsyncSSL* ssl_ptr = 
-                static_cast< MixedAsyncSSL* >( d->async_ssl_ptr.get() );
-            if( !d->initState )
-                ssl_ptr->set_ssl(d->useSSL);
-            if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() ) 
-                d->wrappedSocket->sendAsync(buffer, handler );
-            else {
-                ssl_ptr->AsyncSend( buffer, std::function<void( SystemError::ErrorCode , std::size_t )>(handler) );
-            }
-    });
+    d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
+    MixedAsyncSSL* ssl_ptr = 
+        static_cast< MixedAsyncSSL* >( d->async_ssl_ptr.get() );
+    if( !d->initState )
+        ssl_ptr->set_ssl(d->useSSL);
+    if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() ) 
+        d->wrappedSocket->sendAsync(buffer, handler );
+    else {
+        ssl_ptr->AsyncSend( buffer, std::move(handler) );
+    }
+    return true;
 }
 
 bool QnMixedSSLSocket::registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) {
@@ -1615,7 +1973,7 @@ bool QnMixedSSLSocket::registerTimerImpl( unsigned int timeoutMs, std::function<
 //////////////////////////////////////////////////////////
 
 TCPSslServerSocket::TCPSslServerSocket(bool allowNonSecureConnect)
-:
+    :
     TCPServerSocket(),
     m_allowNonSecureConnect(allowNonSecureConnect)
 {
@@ -1640,7 +1998,7 @@ AbstractStreamSocket* TCPSslServerSocket::accept()
     QnSSLSocket* sslSock = new QnSSLSocket(sock);
     if (sslSock->doServerHandshake())
         return sslSock;
-    
+
     delete sslSock;
     return 0;
 #endif
