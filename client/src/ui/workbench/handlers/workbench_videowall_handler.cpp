@@ -2354,9 +2354,15 @@ void QnWorkbenchVideoWallHandler::setItemOnline(const QnUuid &instanceGuid, bool
 }
 
 void QnWorkbenchVideoWallHandler::setItemControlledBy(const QnUuid &layoutId, const QnUuid &controllerId, bool on) {
+    bool needUpdate = false;
+    QnUuid currentId = workbench()->currentLayout()->resource()->getId();
+
     foreach (const QnVideoWallResourcePtr &videoWall, qnResPool->getResources<QnVideoWallResource>()) {
         foreach (const QnVideoWallItem &item, videoWall->items()->getItems()) {
             if (!on && item.runtimeStatus.controlledBy == controllerId) {
+                /* Check layouts that were previously controlled by this client. */
+                needUpdate |= (item.layout == currentId && !item.layout.isNull());
+
                 QnVideoWallItem updated(item);
                 updated.runtimeStatus.controlledBy = QnUuid();
                 videoWall->items()->updateItem(updated);
@@ -2367,6 +2373,10 @@ void QnWorkbenchVideoWallHandler::setItemControlledBy(const QnUuid &layoutId, co
             }
         }
     }
+
+    /* Ignore local changes. */
+    if (controllerId != qnCommon->moduleGUID() && needUpdate)
+        updateMode();
 }
 
 
