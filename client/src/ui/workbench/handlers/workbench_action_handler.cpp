@@ -2419,7 +2419,12 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         "Please upgrade all components to the latest version %2."
     ).arg(components).arg(latestMsVersion.toString());
 
-    QScopedPointer<QMessageBox> messageBox(new QMessageBox(QMessageBox::Warning, tr("Version Mismatch"), message, QMessageBox::StandardButtons(QMessageBox::Cancel), mainWindow()));
+    QScopedPointer<QnWorkbenchStateDependentDialog<QMessageBox> > messageBox(
+        new QnWorkbenchStateDependentDialog<QMessageBox>(mainWindow()));
+    messageBox->setIcon(QMessageBox::Warning);
+    messageBox->setWindowTitle(tr("Version Mismatch"));
+    messageBox->setText(message);
+    messageBox->setStandardButtons(QMessageBox::Cancel);
     setHelpTopic(messageBox.data(), Qn::VersionMismatch_Help);
 
     QPushButton *updateButton = messageBox->addButton(tr("Upgrade..."), QMessageBox::HelpRole);
