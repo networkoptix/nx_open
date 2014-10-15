@@ -3,13 +3,17 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef RTSP_TYPES_H
-#define RTSP_TYPES_H
+#ifndef NX_RTSP_TYPES_H
+#define NX_RTSP_TYPES_H
+
+#include "../http/httptypes.h"
 
 
 namespace nx_rtsp
 {
     const int DEFAULT_RTSP_PORT = 554;
+
+    static const nx_http::MimeProtoVersion rtsp_1_0 = { "RTSP", "1.0" };
 }
 
-#endif  //RTSP_TYPES_H
+#endif  //NX_RTSP_TYPES_H

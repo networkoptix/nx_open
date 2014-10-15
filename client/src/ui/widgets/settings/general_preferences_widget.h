@@ -57,6 +57,7 @@ private:
 
     QString m_oldBackgroundImage;
     qreal m_oldBackgroundImageOpacity;
+    Qn::ImageBehaviour m_oldBackgroundImageMode;
 };
 
 #endif // GENERAL_PREFERENCES_WIDGET_H
