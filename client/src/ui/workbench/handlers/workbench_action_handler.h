@@ -274,8 +274,6 @@ protected slots:
 
     void at_escapeHotkeyAction_triggered();
 
-    void at_clearCacheAction_triggered();
-
     void at_messageBoxAction_triggered();
 
     void at_browseUrlAction_triggered();
